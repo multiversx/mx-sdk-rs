@@ -2,8 +2,8 @@ use crate::{
     api::{BlockchainApi, ManagedTypeApi, SendApi, StorageReadApi},
     esdt::ESDTSystemSmartContractProxy,
     types::{
-        BigUint, ContractCall, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer,
-        ManagedInto, ManagedVec, TokenIdentifier,
+        AsManagedRef, BigUint, ContractCall, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer,
+        ManagedBuffer, ManagedInto, ManagedVec, TokenIdentifier,
     },
 };
 use elrond_codec::TopDecode;
@@ -70,16 +70,40 @@ where
     ) where
         D: ManagedInto<A, ManagedBuffer<A>>,
     {
+        self.direct_with_gas_limit(to, token, nonce, amount, 0, data, &[]);
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn direct_with_gas_limit<D>(
+        &self,
+        to: &ManagedAddress<A>,
+        token: &TokenIdentifier<A>,
+        nonce: u64,
+        amount: &BigUint<A>,
+        gas: u64,
+        endpoint_name: D,
+        arguments: &[ManagedBuffer<A>],
+    ) where
+        D: ManagedInto<A, ManagedBuffer<A>>,
+    {
+        let endpoint_name_managed = endpoint_name.managed_into(self.type_manager());
+        let mut arg_buffer = ManagedArgBuffer::new_empty(self.type_manager());
+        for arg in arguments {
+            arg_buffer.push_arg(arg);
+        }
+
         if token.is_egld() {
-            self.direct_egld(to, amount, data);
+            let _ =
+                self.api
+                    .direct_egld_execute(to, amount, gas, &endpoint_name_managed, &arg_buffer);
         } else if nonce == 0 {
             let _ = self.api.direct_esdt_execute(
                 to,
                 token,
                 amount,
-                0,
-                &data.managed_into(self.type_manager()),
-                &ManagedArgBuffer::new_empty(self.type_manager()),
+                gas,
+                &endpoint_name_managed,
+                &arg_buffer,
             );
         } else {
             let _ = self.api.direct_esdt_nft_execute(
@@ -87,9 +111,9 @@ where
                 token,
                 nonce,
                 amount,
-                0,
-                &data.managed_into(self.type_manager()),
-                &ManagedArgBuffer::new_empty(self.type_manager()),
+                gas,
+                &endpoint_name_managed,
+                &arg_buffer,
             );
         }
     }
@@ -296,7 +320,7 @@ where
         );
 
         if let Some(first_result_bytes) = output.get(0) {
-            u64::top_decode(&first_result_bytes).unwrap_or_default()
+            u64::top_decode(first_result_bytes.as_managed_ref()).unwrap_or_default()
         } else {
             0
         }

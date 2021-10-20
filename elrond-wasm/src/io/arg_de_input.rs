@@ -54,7 +54,7 @@ impl<AA> TopDecodeInput for ArgDecodeInput<AA>
 where
     AA: ManagedTypeApi + EndpointArgumentApi,
 {
-    type NestedBuffer = ManagedBufferNestedDecodeInput<AA, ManagedBuffer<AA>>;
+    type NestedBuffer = ManagedBufferNestedDecodeInput<AA>;
 
     #[inline]
     fn byte_len(&self) -> usize {
