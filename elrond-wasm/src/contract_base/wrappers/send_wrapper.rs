@@ -2,8 +2,8 @@ use crate::{
     api::{BlockchainApi, ManagedTypeApi, SendApi, StorageReadApi},
     esdt::ESDTSystemSmartContractProxy,
     types::{
-        BigUint, ContractCall, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer,
-        ManagedInto, ManagedVec, TokenIdentifier,
+        AsManagedRef, BigUint, ContractCall, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer,
+        ManagedBuffer, ManagedInto, ManagedVec, TokenIdentifier,
     },
 };
 use elrond_codec::TopDecode;
@@ -296,7 +296,7 @@ where
         );
 
         if let Some(first_result_bytes) = output.get(0) {
-            u64::top_decode(&first_result_bytes).unwrap_or_default()
+            u64::top_decode(first_result_bytes.as_managed_ref()).unwrap_or_default()
         } else {
             0
         }

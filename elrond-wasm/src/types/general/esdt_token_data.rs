@@ -1,7 +1,7 @@
 use crate::{
     abi::TypeAbi,
     api::ManagedTypeApi,
-    types::{BigUint, ManagedAddress, ManagedBuffer, ManagedType, ManagedVec},
+    types::{AsManagedRef, BigUint, ManagedAddress, ManagedBuffer, ManagedType, ManagedVec},
 };
 use alloc::string::String;
 use elrond_codec::*;
@@ -29,7 +29,7 @@ impl<M: ManagedTypeApi> EsdtTokenData<M> {
     }
 
     pub fn decode_attributes<T: TopDecode>(&self) -> Result<T, DecodeError> {
-        T::top_decode(&self.attributes)
+        T::top_decode(self.attributes.as_managed_ref())
     }
 }
 

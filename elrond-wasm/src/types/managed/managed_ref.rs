@@ -88,3 +88,21 @@ where
         ))
     }
 }
+
+pub trait AsManagedRef<M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedType<M>,
+{
+    fn as_managed_ref(&self) -> ManagedRef<M, T>;
+}
+
+impl<M, T> AsManagedRef<M, T> for T
+where
+    M: ManagedTypeApi,
+    T: ManagedType<M>,
+{
+    fn as_managed_ref(&self) -> ManagedRef<M, T> {
+        self.into()
+    }
+}
