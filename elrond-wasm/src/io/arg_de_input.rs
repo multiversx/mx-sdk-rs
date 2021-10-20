@@ -57,7 +57,7 @@ where
     AA: ManagedTypeApi + EndpointArgumentApi,
 {
     type NestedBuffer =
-        ManagedBufferNestedDecodeInput<AA, ManagedRef<ManagedBuffer<AA>, ManagedBuffer<AA>>>;
+        ManagedBufferNestedDecodeInput<AA, ManagedRef<AA, ManagedBuffer<AA>>>;
 
     #[inline]
     fn byte_len(&self) -> usize {
