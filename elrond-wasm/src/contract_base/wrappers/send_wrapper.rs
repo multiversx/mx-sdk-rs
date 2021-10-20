@@ -80,11 +80,11 @@ where
         nonce: u64,
         amount: &BigUint<A>,
         gas: u64,
-        data: D,
+        endpoint_name: D,
     ) where
         D: ManagedInto<A, ManagedBuffer<A>>,
     {
-        let endpoint_name = data.managed_into(self.type_manager());
+        let endpoint_name = endpoint_name.managed_into(self.type_manager());
         let empty_arg_buffer = ManagedArgBuffer::new_empty(self.type_manager());
 
         if token.is_egld() {
