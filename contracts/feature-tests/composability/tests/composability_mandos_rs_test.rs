@@ -25,6 +25,11 @@ fn contract_map() -> ContractMap<DebugApi> {
     );
 
     contract_map.register_contract(
+        "file:../recursive-caller/output/recursive-caller.wasm",
+        Box::new(|context| Box::new(recursive_caller::contract_obj(context))),
+    );
+
+    contract_map.register_contract(
         "file:../vault/output/vault.wasm",
         Box::new(|context| Box::new(vault::contract_obj(context))),
     );
@@ -386,10 +391,10 @@ fn proxy_test_payment_sameshard_callback_rs() {
     );
 }
 
-// #[test]
-// fn recursive_caller_egld_1_rs() {
-// 	elrond_wasm_debug::mandos_rs("mandos/recursive_caller_egld_1.scen.json", contract_map());
-// }
+#[test]
+fn recursive_caller_egld_1_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/recursive_caller_egld_1.scen.json", contract_map());
+}
 
 // #[test]
 // fn recursive_caller_egld_2_rs() {
@@ -401,10 +406,10 @@ fn proxy_test_payment_sameshard_callback_rs() {
 // 	elrond_wasm_debug::mandos_rs("mandos/recursive_caller_egld_x.scen.json", contract_map());
 // }
 
-// #[test]
-// fn recursive_caller_esdt_1_rs() {
-// 	elrond_wasm_debug::mandos_rs("mandos/recursive_caller_esdt_1.scen.json", contract_map());
-// }
+#[test]
+fn recursive_caller_esdt_1_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/recursive_caller_esdt_1.scen.json", contract_map());
+}
 
 // #[test]
 // fn recursive_caller_esdt_2_rs() {
