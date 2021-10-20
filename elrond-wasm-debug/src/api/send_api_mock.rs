@@ -1,9 +1,14 @@
-use crate::{async_data::AsyncCallTxData, tx_mock::TxPanic, DebugApi};
+use crate::{
+    async_data::AsyncCallTxData,
+    tx_execution::execute_builtin_function_or_default,
+    tx_mock::{TxCache, TxInput, TxPanic},
+    DebugApi,
+};
 use elrond_wasm::{
     api::{BlockchainApi, SendApi, StorageReadApi, StorageWriteApi, ESDT_TRANSFER_STRING},
     types::{
         BigUint, CodeMetadata, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer,
-        ManagedInto, ManagedVec, TokenIdentifier,
+        ManagedFrom, ManagedInto, ManagedVec, TokenIdentifier,
     },
 };
 
@@ -194,12 +199,38 @@ impl SendApi for DebugApi {
     fn execute_on_dest_context_raw(
         &self,
         _gas: u64,
-        _to: &ManagedAddress<Self>,
-        _value: &BigUint<Self>,
-        _endpoint_name: &ManagedBuffer<Self>,
-        _arg_buffer: &ManagedArgBuffer<Self>,
+        to: &ManagedAddress<Self>,
+        value: &BigUint<Self>,
+        endpoint_name: &ManagedBuffer<Self>,
+        arg_buffer: &ManagedArgBuffer<Self>,
     ) -> ManagedVec<Self, ManagedBuffer<Self>> {
-        panic!("execute_on_dest_context_raw not implemented yet!");
+        let egld_value = self.big_uint_value(value);
+        let contract_address = &self.input_ref().to;
+        let recipient = to.to_address();
+        let tx_hash = self.get_tx_hash_legacy();
+        let tx_input = TxInput {
+            from: contract_address.clone(),
+            to: recipient,
+            egld_value,
+            esdt_values: Vec::new(),
+            func_name: endpoint_name.to_boxed_bytes().into_vec(),
+            args: arg_buffer.to_raw_args_vec(),
+            gas_limit: 1000,
+            gas_price: 0,
+            tx_hash,
+        };
+
+        let tx_cache = TxCache::new(self.blockchain_cache_rc());
+        let (tx_result, blockchain_updates) =
+            execute_builtin_function_or_default(tx_input, tx_cache);
+
+        if tx_result.result_status == 0 {
+            self.blockchain_cache().commit_updates(blockchain_updates);
+
+            self.result_borrow_mut().merge_after_sync_call(&tx_result);
+        }
+
+        ManagedVec::managed_from(self.clone(), tx_result.result_values)
     }
 
     fn execute_on_dest_context_raw_custom_result_range<F>(

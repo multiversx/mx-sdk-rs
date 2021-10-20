@@ -77,4 +77,11 @@ impl TxResult {
             result_calls: TxResultCalls::empty(),
         }
     }
+
+    pub fn merge_after_sync_call(&mut self, sync_call_result: &TxResult) {
+        self.result_values
+            .extend_from_slice(sync_call_result.result_values.as_slice());
+        self.result_logs
+            .extend_from_slice(sync_call_result.result_logs.as_slice());
+    }
 }
