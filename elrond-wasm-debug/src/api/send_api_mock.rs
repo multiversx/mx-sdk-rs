@@ -318,16 +318,37 @@ impl SendApi for DebugApi {
     fn execute_on_dest_context_raw_custom_result_range<F>(
         &self,
         _gas: u64,
-        _to: &ManagedAddress<Self>,
-        _value: &BigUint<Self>,
-        _endpoint_name: &ManagedBuffer<Self>,
-        _arg_buffer: &ManagedArgBuffer<Self>,
-        _range_closure: F,
+        to: &ManagedAddress<Self>,
+        value: &BigUint<Self>,
+        endpoint_name: &ManagedBuffer<Self>,
+        arg_buffer: &ManagedArgBuffer<Self>,
+        range_closure: F,
     ) -> ManagedVec<Self, ManagedBuffer<Self>>
     where
         F: FnOnce(usize, usize) -> (usize, usize),
     {
-        panic!("execute_on_dest_context_raw_custom_result_range not implemented yet!");
+        let egld_value = self.big_uint_value(value);
+        let recipient = to.to_address();
+
+        let num_return_data_before = self.result_borrow_mut().result_values.len();
+
+        let result = self.perform_execute_on_dest_context(
+            recipient,
+            egld_value,
+            endpoint_name.to_boxed_bytes().into_vec(),
+            arg_buffer.to_raw_args_vec(),
+        );
+
+        let num_return_data_after = result.len();
+        let (result_start_index, result_end_index) = range_closure(
+            num_return_data_before as usize,
+            num_return_data_after as usize,
+        );
+
+        ManagedVec::managed_from(
+            self.clone(),
+            result[result_start_index..result_end_index].to_vec(),
+        )
     }
 
     fn execute_on_dest_context_by_caller_raw(

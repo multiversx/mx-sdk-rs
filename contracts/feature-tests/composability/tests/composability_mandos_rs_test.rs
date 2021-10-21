@@ -416,10 +416,10 @@ fn forwarder_sync_echo_rs() {
     elrond_wasm_debug::mandos_rs("mandos/forwarder_sync_echo.scen.json", contract_map());
 }
 
-// #[test]
-// fn forwarder_sync_echo_range_rs() {
-//     elrond_wasm_debug::mandos_rs("mandos/forwarder_sync_echo_range.scen.json", contract_map());
-// }
+#[test]
+fn forwarder_sync_echo_range_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/forwarder_sync_echo_range.scen.json", contract_map());
+}
 
 #[test]
 fn forwarder_tranfer_esdt_with_fees_rs() {
