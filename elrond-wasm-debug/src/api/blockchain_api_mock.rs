@@ -1,4 +1,4 @@
-use crate::DebugApi;
+use crate::{world_mock::is_smart_contract_address, DebugApi};
 use elrond_wasm::types::{Address, BigUint, EsdtTokenData, ManagedAddress, TokenIdentifier, H256};
 
 impl elrond_wasm::api::BlockchainApi for DebugApi {
@@ -19,18 +19,8 @@ impl elrond_wasm::api::BlockchainApi for DebugApi {
         panic!("get_shard_of_address not implemented")
     }
 
-    fn is_smart_contract_legacy(&self, _address: &Address) -> bool {
-        panic!("is_smart_contract not implemented")
-
-        /*
-        Mock used when testing the marketplace contract
-
-        let mut addr_slice = [0u8; 32];
-        hex::decode_to_slice(b"6d61726b6574706c6163655f636f6e74726163745f5f5f5f5f5f5f5f5f5f5f5f",
-            &mut addr_slice);
-
-        _address == &Address::from_slice(&addr_slice)
-        */
+    fn is_smart_contract_legacy(&self, address: &Address) -> bool {
+        is_smart_contract_address(address)
     }
 
     fn get_caller_legacy(&self) -> Address {

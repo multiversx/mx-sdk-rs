@@ -12,6 +12,7 @@ pub use account_data::*;
 pub use account_esdt::*;
 pub use block_info::*;
 pub use blockchain_mock::*;
+pub use blockchain_mock_account_util::is_smart_contract_address;
 pub use blockchain_tx_info::*;
 pub use esdt_instance::*;
 pub use esdt_instances::*;

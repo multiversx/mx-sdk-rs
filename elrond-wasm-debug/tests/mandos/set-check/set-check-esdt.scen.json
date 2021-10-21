@@ -5,8 +5,6 @@
             "step": "setState",
             "accounts": {
                 "address:the-address": {
-                    "nonce": "",
-                    "balance": "",
                     "esdt": {
                         "str:NFT-123456": {
                             "instances": [

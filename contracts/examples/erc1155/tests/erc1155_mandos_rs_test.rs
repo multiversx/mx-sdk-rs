@@ -64,8 +64,6 @@ fn create_one_fungible_one_non_fungible_test_rs() {
     );
 }
 
-/* is_smart_contract not yet implemented - uncomment later
-
 // transfer tests -  to account
 #[test]
 fn transfer_fungible_ok_test_rs() {
@@ -100,43 +98,49 @@ fn batch_transfer_non_fungible_test_rs() {
 
 #[test]
 fn batch_transfer_both_types_test_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/batch_transfer_both_types.scen.json", contract_map());
+}
+
+#[test]
+fn transfer_fungible_ok_to_sc_test_rs() {
     elrond_wasm_debug::mandos_rs(
-        "mandos/batch_transfer_both_types.scen.json",
+        "mandos/transfer_fungible_ok_to_sc.scen.json",
         contract_map(),
     );
 }
 
-// transfer tests -  to smart contract
-// TODO: Uncomment once IsSmartContractAddress is added to framework
-
-/*#[test]
-fn transfer_fungible_ok_to_sc_test_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/transfer_fungible_ok_to_sc.scen.json", contract_map());
-}
-
 #[test]
 fn transfer_non_fungible_ok_to_sc_test_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/transfer_non_fungible_ok_to_sc.scen.json", contract_map());
+    elrond_wasm_debug::mandos_rs(
+        "mandos/transfer_non_fungible_ok_to_sc.scen.json",
+        contract_map(),
+    );
 }
-
 
 #[test]
 fn batch_transfer_fungible_to_sc_test_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/batch_transfer_fungible_to_sc.scen.json", contract_map());
+    elrond_wasm_debug::mandos_rs(
+        "mandos/batch_transfer_fungible_to_sc.scen.json",
+        contract_map(),
+    );
 }
 
 #[test]
 fn batch_transfer_non_fungible_to_sc_test_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/batch_transfer_non_fungible_to_sc.scen.json", contract_map());
+    elrond_wasm_debug::mandos_rs(
+        "mandos/batch_transfer_non_fungible_to_sc.scen.json",
+        contract_map(),
+    );
 }
 
 #[test]
 fn batch_transfer_both_types_to_sc_test_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/batch_transfer_both_types_to_sc.scen.json", contract_map());
+    elrond_wasm_debug::mandos_rs(
+        "mandos/batch_transfer_both_types_to_sc.scen.json",
+        contract_map(),
+    );
 }
-*/
 
-*/
 // mint tests
 
 #[test]

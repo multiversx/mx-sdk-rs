@@ -1,13 +1,12 @@
 use crate::{
-    async_data::AsyncCallTxData,
     tx_execution::{deploy_contract, execute_builtin_function_or_default},
-    tx_mock::{BlockchainUpdate, TxCache, TxInput, TxPanic, TxResult},
+    tx_mock::{AsyncCallTxData, BlockchainUpdate, TxCache, TxInput, TxPanic, TxResult},
     DebugApi,
 };
 use elrond_wasm::{
     api::{
         BlockchainApi, SendApi, StorageReadApi, StorageWriteApi, ESDT_MULTI_TRANSFER_FUNC_NAME,
-        ESDT_NFT_TRANSFER_FUNC_NAME, ESDT_TRANSFER_FUNC_NAME,
+        ESDT_NFT_TRANSFER_FUNC_NAME, ESDT_TRANSFER_FUNC_NAME, UPGRADE_CONTRACT_FUNC_NAME,
     },
     elrond_codec::top_encode_to_vec_u8,
     types::{
@@ -110,6 +109,43 @@ impl DebugApi {
             new_address,
             self.sync_call_post_processing(tx_result, blockchain_updates),
         )
+    }
+
+    fn perform_async_call(&self, call: AsyncCallTxData) -> ! {
+        // the cell is no longer needed, since we end in a panic
+        let mut tx_result = self.extract_result();
+        tx_result.result_calls.async_call = Some(call);
+        std::panic::panic_any(tx_result)
+    }
+
+    fn perform_upgrade_contract(
+        &self,
+        sc_address: &ManagedAddress<Self>,
+        amount: &BigUint<Self>,
+        contract_code: Vec<u8>,
+        code_metadata: CodeMetadata,
+        arg_buffer: &ManagedArgBuffer<Self>,
+    ) -> ! {
+        let recipient = sc_address.to_address();
+        let call_value = self.big_uint_value(amount);
+        let contract_address = self.input_ref().to.clone();
+        let tx_hash = self.get_tx_hash_legacy();
+
+        let mut arguments = vec![contract_code, top_encode_to_vec_u8(&code_metadata).unwrap()];
+        arguments.extend(
+            arg_buffer
+                .raw_arg_iter()
+                .map(|mb| mb.to_boxed_bytes().into_vec()),
+        );
+        let call = AsyncCallTxData {
+            from: contract_address,
+            to: recipient,
+            call_value,
+            endpoint_name: UPGRADE_CONTRACT_FUNC_NAME.to_vec(),
+            arguments,
+            tx_hash,
+        };
+        self.perform_async_call(call)
     }
 
     fn get_contract_code(&self, address: &Address) -> Vec<u8> {
@@ -289,10 +325,7 @@ impl SendApi for DebugApi {
             arguments: arg_buffer.to_raw_args_vec(),
             tx_hash,
         };
-        // the cell is no longer needed, since we end in a panic
-        let mut tx_result = self.extract_result();
-        tx_result.result_calls.async_call = Some(call);
-        std::panic::panic_any(tx_result)
+        self.perform_async_call(call)
     }
 
     fn deploy_contract(
@@ -336,28 +369,30 @@ impl SendApi for DebugApi {
         )
     }
 
-    fn upgrade_from_source_contract(
-        &self,
-        _sc_address: &ManagedAddress<Self>,
-        _gas: u64,
-        _amount: &BigUint<Self>,
-        _source_contract_address: &ManagedAddress<Self>,
-        _code_metadata: CodeMetadata,
-        _arg_buffer: &ManagedArgBuffer<Self>,
-    ) {
-        panic!("upgrade_from_source_contract not yet implemented")
-    }
-
     fn upgrade_contract(
         &self,
-        _sc_address: &ManagedAddress<Self>,
+        sc_address: &ManagedAddress<Self>,
         _gas: u64,
-        _amount: &BigUint<Self>,
-        _code: &ManagedBuffer<Self>,
-        _code_metadata: CodeMetadata,
-        _arg_buffer: &ManagedArgBuffer<Self>,
+        amount: &BigUint<Self>,
+        code: &ManagedBuffer<Self>,
+        code_metadata: CodeMetadata,
+        arg_buffer: &ManagedArgBuffer<Self>,
     ) {
-        panic!("upgrade_contract not yet implemented")
+        let contract_code = code.to_boxed_bytes().into_vec();
+        self.perform_upgrade_contract(sc_address, amount, contract_code, code_metadata, arg_buffer)
+    }
+
+    fn upgrade_from_source_contract(
+        &self,
+        sc_address: &ManagedAddress<Self>,
+        _gas: u64,
+        amount: &BigUint<Self>,
+        source_contract_address: &ManagedAddress<Self>,
+        code_metadata: CodeMetadata,
+        arg_buffer: &ManagedArgBuffer<Self>,
+    ) {
+        let contract_code = self.get_contract_code(&source_contract_address.to_address());
+        self.perform_upgrade_contract(sc_address, amount, contract_code, code_metadata, arg_buffer)
     }
 
     fn execute_on_dest_context_raw(
