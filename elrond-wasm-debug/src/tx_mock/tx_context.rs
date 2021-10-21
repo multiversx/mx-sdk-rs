@@ -15,25 +15,25 @@ use super::{TxCache, TxInput, TxManagedTypes, TxResult};
 #[derive(Debug)]
 pub struct TxContext {
     pub tx_input_box: Box<TxInput>,
-    pub blockchain_cache: TxCache,
+    pub tx_cache: Rc<TxCache>,
     pub managed_types: RefCell<TxManagedTypes>,
     pub tx_result_cell: RefCell<TxResult>,
 }
 
 impl TxContext {
-    pub fn new(tx_input: TxInput, blockchain_ref: Rc<BlockchainMock>) -> Self {
+    pub fn new(tx_input: TxInput, tx_cache: TxCache) -> Self {
         TxContext {
             tx_input_box: Box::new(tx_input),
-            blockchain_cache: TxCache::new(blockchain_ref),
+            tx_cache: Rc::new(tx_cache),
             managed_types: RefCell::new(TxManagedTypes::new()),
             tx_result_cell: RefCell::new(TxResult::empty()),
         }
     }
 
     pub fn dummy() -> Self {
-        let blockchain_cache = TxCache::new(Rc::new(BlockchainMock::new()));
+        let tx_cache = TxCache::new(Rc::new(BlockchainMock::new()));
         let contract_address = Address::from(&[b'c'; 32]);
-        blockchain_cache.insert_account(AccountData {
+        tx_cache.insert_account(AccountData {
             address: contract_address.clone(),
             nonce: 0,
             egld_balance: BigUint::zero(),
@@ -55,7 +55,7 @@ impl TxContext {
                 gas_price: 0,
                 tx_hash: b"dummy...........................".into(),
             }),
-            blockchain_cache,
+            tx_cache: Rc::new(tx_cache),
             managed_types: RefCell::new(TxManagedTypes::new()),
             tx_result_cell: RefCell::new(TxResult::empty()),
         }
@@ -66,18 +66,22 @@ impl TxContext {
     }
 
     pub fn blockchain_cache(&self) -> &TxCache {
-        &self.blockchain_cache
+        &self.tx_cache
+    }
+
+    pub fn blockchain_cache_rc(&self) -> Rc<TxCache> {
+        self.tx_cache.clone()
     }
 
     pub fn blockchain_ref(&self) -> &BlockchainMock {
-        self.blockchain_cache.blockchain_ref()
+        self.tx_cache.blockchain_ref()
     }
 
     pub fn with_account<R, F>(&self, address: &Address, f: F) -> R
     where
         F: FnOnce(&AccountData) -> R,
     {
-        self.blockchain_cache.with_account(address, f)
+        self.tx_cache.with_account(address, f)
     }
 
     pub fn with_contract_account<R, F>(&self, f: F) -> R
@@ -91,7 +95,7 @@ impl TxContext {
     where
         F: FnOnce(&mut AccountData) -> R,
     {
-        self.blockchain_cache.with_account_mut(address, f)
+        self.tx_cache.with_account_mut(address, f)
     }
 
     pub fn with_contract_account_mut<R, F>(&self, f: F) -> R
@@ -124,14 +128,11 @@ impl TxContext {
         contract_owner: Address,
     ) {
         assert!(
-            !self
-                .blockchain_cache
-                .blockchain_ref()
-                .account_exists(new_address),
+            !self.tx_cache.blockchain_ref().account_exists(new_address),
             "Account already exists at deploy address."
         );
 
-        self.blockchain_cache.insert_account(AccountData {
+        self.tx_cache.insert_account(AccountData {
             address: new_address.clone(),
             nonce: 0,
             egld_balance: BigUint::zero(),
