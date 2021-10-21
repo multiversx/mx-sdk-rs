@@ -67,7 +67,7 @@ pub fn top_encode_from_nested_or_exit<T, O, ExitCtx>(
     output.finalize_nested_encode(nested_buffer);
 }
 
-pub fn top_encode_to_vec<T: TopEncode>(obj: &T) -> Result<Vec<u8>, EncodeError> {
+pub fn top_encode_to_vec_u8<T: TopEncode>(obj: &T) -> Result<Vec<u8>, EncodeError> {
     let mut bytes = Vec::<u8>::new();
     obj.top_encode(&mut bytes)?;
     Ok(bytes)

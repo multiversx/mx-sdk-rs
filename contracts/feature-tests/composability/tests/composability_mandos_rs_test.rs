@@ -74,10 +74,10 @@ fn forw_raw_async_echo_rs() {
 //     );
 // }
 
-// #[test]
-// fn forw_raw_contract_deploy_rs() {
-//     elrond_wasm_debug::mandos_rs("mandos/forw_raw_contract_deploy.scen.json", contract_map());
-// }
+#[test]
+fn forw_raw_contract_deploy_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/forw_raw_contract_deploy.scen.json", contract_map());
+}
 
 // #[test]
 // fn forw_raw_contract_upgrade_rs() {
@@ -335,18 +335,18 @@ fn forwarder_call_transf_exec_multi_transfer_esdt_rs() {
     );
 }
 
-// #[test]
-// fn forwarder_contract_change_owner_rs() {
-//     elrond_wasm_debug::mandos_rs(
-//         "mandos/forwarder_contract_change_owner.scen.json",
-//         contract_map(),
-//     );
-// }
+#[test]
+fn forwarder_contract_change_owner_rs() {
+    elrond_wasm_debug::mandos_rs(
+        "mandos/forwarder_contract_change_owner.scen.json",
+        contract_map(),
+    );
+}
 
-// #[test]
-// fn forwarder_contract_deploy_rs() {
-//     elrond_wasm_debug::mandos_rs("mandos/forwarder_contract_deploy.scen.json", contract_map());
-// }
+#[test]
+fn forwarder_contract_deploy_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/forwarder_contract_deploy.scen.json", contract_map());
+}
 
 // #[test]
 // fn forwarder_contract_upgrade_rs() {
