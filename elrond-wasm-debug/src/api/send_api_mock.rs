@@ -397,9 +397,18 @@ impl SendApi for DebugApi {
     fn call_local_esdt_built_in_function(
         &self,
         _gas: u64,
-        _function_name: &ManagedBuffer<Self>,
-        _arg_buffer: &ManagedArgBuffer<Self>,
+        function_name: &ManagedBuffer<Self>,
+        arg_buffer: &ManagedArgBuffer<Self>,
     ) -> ManagedVec<Self, ManagedBuffer<Self>> {
-        panic!("call_local_esdt_built_in_function not implemented yet!");
+        let contract_address = &self.input_ref().to;
+
+        let result = self.perform_execute_on_dest_context(
+            contract_address.clone(),
+            num_bigint::BigUint::zero(),
+            function_name.to_boxed_bytes().into_vec(),
+            arg_buffer.to_raw_args_vec(),
+        );
+
+        ManagedVec::managed_from(self.clone(), result)
     }
 }
