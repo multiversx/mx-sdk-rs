@@ -9,7 +9,7 @@ use elrond_wasm::{
         BlockchainApi, SendApi, StorageReadApi, StorageWriteApi, ESDT_MULTI_TRANSFER_FUNC_NAME,
         ESDT_NFT_TRANSFER_FUNC_NAME, ESDT_TRANSFER_FUNC_NAME,
     },
-    elrond_codec::top_encode_to_vec,
+    elrond_codec::top_encode_to_vec_u8,
     types::{
         Address, BigUint, CodeMetadata, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer,
         ManagedBuffer, ManagedFrom, ManagedInto, ManagedVec, TokenIdentifier,
@@ -174,8 +174,8 @@ impl SendApi for DebugApi {
         arg_buffer: &ManagedArgBuffer<Self>,
     ) -> Result<(), &'static [u8]> {
         let recipient = to.to_address();
-        let token_bytes = top_encode_to_vec(token).unwrap();
-        let amount_bytes = top_encode_to_vec(amount).unwrap();
+        let token_bytes = top_encode_to_vec_u8(token).unwrap();
+        let amount_bytes = top_encode_to_vec_u8(amount).unwrap();
 
         let mut args = vec![token_bytes, amount_bytes];
         Self::append_endpoint_name_and_args(&mut args, endpoint_name, arg_buffer);
@@ -203,9 +203,9 @@ impl SendApi for DebugApi {
         let contract_address = self.input_ref().to.clone();
         let recipient = to.to_address();
 
-        let token_bytes = top_encode_to_vec(token).unwrap();
-        let nonce_bytes = top_encode_to_vec(&nonce).unwrap();
-        let amount_bytes = top_encode_to_vec(amount).unwrap();
+        let token_bytes = top_encode_to_vec_u8(token).unwrap();
+        let nonce_bytes = top_encode_to_vec_u8(&nonce).unwrap();
+        let amount_bytes = top_encode_to_vec_u8(amount).unwrap();
 
         let mut args = vec![
             token_bytes,
@@ -239,15 +239,15 @@ impl SendApi for DebugApi {
 
         let mut args = vec![
             recipient.as_bytes().to_vec(),
-            top_encode_to_vec(&payments.len()).unwrap(),
+            top_encode_to_vec_u8(&payments.len()).unwrap(),
         ];
 
         for payment in payments.into_iter() {
-            let token_bytes = top_encode_to_vec(&payment.token_identifier).unwrap();
+            let token_bytes = top_encode_to_vec_u8(&payment.token_identifier).unwrap();
             args.push(token_bytes);
-            let nonce_bytes = top_encode_to_vec(&payment.token_nonce).unwrap();
+            let nonce_bytes = top_encode_to_vec_u8(&payment.token_nonce).unwrap();
             args.push(nonce_bytes);
-            let amount_bytes = top_encode_to_vec(&payment.amount).unwrap();
+            let amount_bytes = top_encode_to_vec_u8(&payment.amount).unwrap();
             args.push(amount_bytes);
         }
 
