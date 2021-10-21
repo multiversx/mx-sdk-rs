@@ -9,6 +9,7 @@ use elrond_wasm::{
         BlockchainApi, SendApi, StorageReadApi, StorageWriteApi, ESDT_MULTI_TRANSFER_FUNC_NAME,
         ESDT_NFT_TRANSFER_FUNC_NAME, ESDT_TRANSFER_FUNC_NAME,
     },
+    elrond_codec::top_encode_to_vec,
     types::{
         Address, BigUint, CodeMetadata, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer,
         ManagedBuffer, ManagedFrom, ManagedInto, ManagedVec, TokenIdentifier,
@@ -173,10 +174,10 @@ impl SendApi for DebugApi {
         arg_buffer: &ManagedArgBuffer<Self>,
     ) -> Result<(), &'static [u8]> {
         let recipient = to.to_address();
-        let token_bytes = token.as_name();
-        let amount_value = self.big_uint_value(amount);
+        let token_bytes = top_encode_to_vec(token).unwrap();
+        let amount_bytes = top_encode_to_vec(amount).unwrap();
 
-        let mut args = vec![token_bytes.into_vec(), amount_value.to_bytes_be()];
+        let mut args = vec![token_bytes, amount_bytes];
         Self::append_endpoint_name_and_args(&mut args, endpoint_name, arg_buffer);
 
         let _ = self.perform_execute_on_dest_context(
@@ -201,9 +202,10 @@ impl SendApi for DebugApi {
     ) -> Result<(), &'static [u8]> {
         let contract_address = self.input_ref().to.clone();
         let recipient = to.to_address();
-        let token_bytes = token.as_name().into_vec();
-        let nonce_bytes = num_bigint::BigUint::from(nonce).to_bytes_be();
-        let amount_bytes = self.big_uint_value(amount).to_bytes_be();
+
+        let token_bytes = top_encode_to_vec(token).unwrap();
+        let nonce_bytes = top_encode_to_vec(&nonce).unwrap();
+        let amount_bytes = top_encode_to_vec(amount).unwrap();
 
         let mut args = vec![
             token_bytes,
@@ -237,15 +239,15 @@ impl SendApi for DebugApi {
 
         let mut args = vec![
             recipient.as_bytes().to_vec(),
-            num_bigint::BigUint::from(payments.len()).to_bytes_be(),
+            top_encode_to_vec(&payments.len()).unwrap(),
         ];
 
         for payment in payments.into_iter() {
-            let token_bytes = payment.token_identifier.as_name().into_vec();
+            let token_bytes = top_encode_to_vec(&payment.token_identifier).unwrap();
             args.push(token_bytes);
-            let nonce_bytes = num_bigint::BigUint::from(payment.token_nonce).to_bytes_be();
+            let nonce_bytes = top_encode_to_vec(&payment.token_nonce).unwrap();
             args.push(nonce_bytes);
-            let amount_bytes = self.big_uint_value(&payment.amount).to_bytes_be();
+            let amount_bytes = top_encode_to_vec(&payment.amount).unwrap();
             args.push(amount_bytes);
         }
 
