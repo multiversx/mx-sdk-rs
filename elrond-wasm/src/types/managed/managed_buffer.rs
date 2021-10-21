@@ -6,7 +6,7 @@ use crate::{
 use alloc::string::String;
 use elrond_codec::{
     DecodeError, EncodeError, NestedDecode, NestedDecodeInput, NestedEncode, NestedEncodeOutput,
-    TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, TryStaticCast,
+    TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, TryStaticCast, Vec,
 };
 
 /// A byte buffer managed by an external API.
@@ -79,6 +79,16 @@ where
     #[inline]
     fn managed_from(api: M, bytes: &[u8; N]) -> Self {
         Self::new_from_bytes(api, bytes)
+    }
+}
+
+impl<M> ManagedFrom<M, Vec<u8>> for ManagedBuffer<M>
+where
+    M: ManagedTypeApi,
+{
+    #[inline]
+    fn managed_from(api: M, bytes: Vec<u8>) -> Self {
+        Self::new_from_bytes(api, bytes.as_slice())
     }
 }
 
