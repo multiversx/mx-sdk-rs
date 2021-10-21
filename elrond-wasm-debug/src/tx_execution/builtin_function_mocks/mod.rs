@@ -1,4 +1,5 @@
 mod builtin_func_exec;
+mod change_owner_mock;
 mod esdt_multi_transfer_mock;
 mod esdt_nft_transfer_mock;
 mod esdt_transfer_mock;
