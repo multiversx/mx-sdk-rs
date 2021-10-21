@@ -3,7 +3,6 @@
 pub mod abi_json;
 pub mod api;
 mod arwen_mandos_runner;
-mod async_data;
 mod contract_map;
 mod display_util;
 mod execute_mandos;
@@ -13,7 +12,6 @@ pub mod tx_execution;
 pub mod tx_mock;
 pub mod world_mock;
 
-pub use async_data::*;
 pub use contract_map::*;
 pub use display_util::*;
 pub use managed_test_util::*;
