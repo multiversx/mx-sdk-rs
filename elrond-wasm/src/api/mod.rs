@@ -20,7 +20,7 @@ pub use error_api::ErrorApi;
 pub use log_api::LogApi;
 pub use managed_types::*;
 pub use send_api::{
-    SendApi, ESDT_MULTI_TRANSFER_STRING, ESDT_NFT_TRANSFER_STRING, ESDT_TRANSFER_STRING,
+    SendApi, ESDT_MULTI_TRANSFER_FUNC_NAME, ESDT_NFT_TRANSFER_FUNC_NAME, ESDT_TRANSFER_FUNC_NAME,
 };
 pub use storage_api::*;
 pub use vm_api::VMApi;

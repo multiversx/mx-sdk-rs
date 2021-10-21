@@ -5,7 +5,10 @@ use crate::{
     DebugApi,
 };
 use elrond_wasm::{
-    api::{BlockchainApi, SendApi, StorageReadApi, StorageWriteApi, ESDT_TRANSFER_STRING},
+    api::{
+        BlockchainApi, SendApi, StorageReadApi, StorageWriteApi, ESDT_MULTI_TRANSFER_FUNC_NAME,
+        ESDT_NFT_TRANSFER_FUNC_NAME, ESDT_TRANSFER_FUNC_NAME,
+    },
     types::{
         Address, BigUint, CodeMetadata, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer,
         ManagedBuffer, ManagedFrom, ManagedInto, ManagedVec, TokenIdentifier,
@@ -51,6 +54,21 @@ impl DebugApi {
                 status: tx_result.result_status,
                 message: tx_result.result_message.into_bytes(),
             })
+        }
+    }
+
+    fn append_endpoint_name_and_args(
+        args: &mut Vec<Vec<u8>>,
+        endpoint_name: &ManagedBuffer<Self>,
+        arg_buffer: &ManagedArgBuffer<Self>,
+    ) {
+        if !endpoint_name.is_empty() {
+            args.push(endpoint_name.to_boxed_bytes().into_vec());
+            args.extend(
+                arg_buffer
+                    .raw_arg_iter()
+                    .map(|mb| mb.to_boxed_bytes().into_vec()),
+            );
         }
     }
 }
@@ -114,6 +132,78 @@ impl SendApi for DebugApi {
         let amount_value = self.big_uint_value(amount);
 
         let mut args = vec![token_bytes.into_vec(), amount_value.to_bytes_be()];
+        Self::append_endpoint_name_and_args(&mut args, endpoint_name, arg_buffer);
+
+        let _ = self.perform_execute_on_dest_context(
+            recipient,
+            num_bigint::BigUint::zero(),
+            ESDT_TRANSFER_FUNC_NAME.to_vec(),
+            args,
+        );
+
+        Ok(())
+    }
+
+    fn direct_esdt_nft_execute(
+        &self,
+        to: &ManagedAddress<Self>,
+        token: &TokenIdentifier<Self>,
+        nonce: u64,
+        amount: &BigUint<Self>,
+        _gas_limit: u64,
+        endpoint_name: &ManagedBuffer<Self>,
+        arg_buffer: &ManagedArgBuffer<Self>,
+    ) -> Result<(), &'static [u8]> {
+        let contract_address = self.input_ref().to.clone();
+        let recipient = to.to_address();
+        let token_bytes = token.as_name().into_vec();
+        let nonce_bytes = num_bigint::BigUint::from(nonce).to_bytes_be();
+        let amount_bytes = self.big_uint_value(amount).to_bytes_be();
+
+        let mut args = vec![
+            token_bytes,
+            nonce_bytes,
+            amount_bytes,
+            recipient.as_bytes().to_vec(),
+        ];
+
+        Self::append_endpoint_name_and_args(&mut args, endpoint_name, arg_buffer);
+
+        let _ = self.perform_execute_on_dest_context(
+            contract_address,
+            num_bigint::BigUint::zero(),
+            ESDT_NFT_TRANSFER_FUNC_NAME.to_vec(),
+            args,
+        );
+
+        Ok(())
+    }
+
+    fn direct_multi_esdt_transfer_execute(
+        &self,
+        to: &ManagedAddress<Self>,
+        payments: &ManagedVec<Self, EsdtTokenPayment<Self>>,
+        _gas_limit: u64,
+        endpoint_name: &ManagedBuffer<Self>,
+        arg_buffer: &ManagedArgBuffer<Self>,
+    ) -> Result<(), &'static [u8]> {
+        let contract_address = self.input_ref().to.clone();
+        let recipient = to.to_address();
+
+        let mut args = vec![
+            recipient.as_bytes().to_vec(),
+            num_bigint::BigUint::from(payments.len()).to_bytes_be(),
+        ];
+
+        for payment in payments.into_iter() {
+            let token_bytes = payment.token_identifier.as_name().into_vec();
+            args.push(token_bytes);
+            let nonce_bytes = num_bigint::BigUint::from(payment.token_nonce).to_bytes_be();
+            args.push(nonce_bytes);
+            let amount_bytes = self.big_uint_value(&payment.amount).to_bytes_be();
+            args.push(amount_bytes);
+        }
+
         if !endpoint_name.is_empty() {
             args.push(endpoint_name.to_boxed_bytes().into_vec());
             args.extend(
@@ -124,37 +214,13 @@ impl SendApi for DebugApi {
         }
 
         let _ = self.perform_execute_on_dest_context(
-            recipient,
+            contract_address,
             num_bigint::BigUint::zero(),
-            ESDT_TRANSFER_STRING.to_vec(),
+            ESDT_MULTI_TRANSFER_FUNC_NAME.to_vec(),
             args,
         );
 
         Ok(())
-    }
-
-    fn direct_esdt_nft_execute(
-        &self,
-        _to: &ManagedAddress<Self>,
-        _token: &TokenIdentifier<Self>,
-        _nonce: u64,
-        _amount: &BigUint<Self>,
-        _gas_limit: u64,
-        _endpoint_name: &ManagedBuffer<Self>,
-        _arg_buffer: &ManagedArgBuffer<Self>,
-    ) -> Result<(), &'static [u8]> {
-        panic!("direct_esdt_nft_execute not implemented yet");
-    }
-
-    fn direct_multi_esdt_transfer_execute(
-        &self,
-        _to: &ManagedAddress<Self>,
-        _payments: &ManagedVec<Self, EsdtTokenPayment<Self>>,
-        _gas_limit: u64,
-        _endpoint_name: &ManagedBuffer<Self>,
-        _arg_buffer: &ManagedArgBuffer<Self>,
-    ) -> Result<(), &'static [u8]> {
-        panic!("direct_multi_esdt_transfer_execute not implemented yet");
     }
 
     fn async_call_raw(
