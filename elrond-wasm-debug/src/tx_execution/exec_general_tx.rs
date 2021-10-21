@@ -2,7 +2,7 @@ use elrond_wasm::types::Address;
 
 use crate::{
     tx_mock::{BlockchainUpdate, TxCache, TxContextRef, TxInput, TxResult},
-    world_mock::BlockchainMock,
+    world_mock::is_smart_contract_address,
 };
 
 use super::execute_tx_context;
@@ -35,7 +35,7 @@ pub fn default_execution(tx_input: TxInput, tx_cache: TxCache) -> (TxResult, Blo
         );
     }
 
-    let tx_result = if !BlockchainMock::is_smart_contract_address(&tx_context.tx_input_box.to)
+    let tx_result = if !is_smart_contract_address(&tx_context.tx_input_box.to)
         || tx_context.tx_input_box.func_name.is_empty()
     {
         // direct EGLD transfer

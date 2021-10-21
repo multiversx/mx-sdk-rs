@@ -79,10 +79,10 @@ fn forw_raw_contract_deploy_rs() {
     elrond_wasm_debug::mandos_rs("mandos/forw_raw_contract_deploy.scen.json", contract_map());
 }
 
-// #[test]
-// fn forw_raw_contract_upgrade_rs() {
-//     elrond_wasm_debug::mandos_rs("mandos/forw_raw_contract_upgrade.scen.json", contract_map());
-// }
+#[test]
+fn forw_raw_contract_upgrade_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/forw_raw_contract_upgrade.scen.json", contract_map());
+}
 
 #[test]
 fn forw_raw_direct_egld_rs() {
@@ -348,13 +348,13 @@ fn forwarder_contract_deploy_rs() {
     elrond_wasm_debug::mandos_rs("mandos/forwarder_contract_deploy.scen.json", contract_map());
 }
 
-// #[test]
-// fn forwarder_contract_upgrade_rs() {
-//     elrond_wasm_debug::mandos_rs(
-//         "mandos/forwarder_contract_upgrade.scen.json",
-//         contract_map(),
-//     );
-// }
+#[test]
+fn forwarder_contract_upgrade_rs() {
+    elrond_wasm_debug::mandos_rs(
+        "mandos/forwarder_contract_upgrade.scen.json",
+        contract_map(),
+    );
+}
 
 // #[test]
 // fn forwarder_nft_create_rs() {

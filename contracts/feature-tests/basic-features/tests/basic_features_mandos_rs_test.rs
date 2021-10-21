@@ -289,13 +289,10 @@ fn return_codes_rs() {
     elrond_wasm_debug::mandos_rs("mandos/return_codes.scen.json", contract_map());
 }
 
-// TODO: Fix by implementing is_smart_contract mock
-/*
 #[test]
 fn sc_properties_rs() {
     elrond_wasm_debug::mandos_rs("mandos/sc_properties.scen.json", contract_map());
 }
-*/
 
 #[test]
 fn sc_result_rs() {
