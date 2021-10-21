@@ -25,10 +25,6 @@ pub fn execute_esdt_nft_transfer(
     let value = BigUint::from_bytes_be(tx_input.args[2].as_slice());
     let destination = Address::top_decode(tx_input.args[3].as_slice()).unwrap();
 
-    // TODO: uncomment, after removing esdt transfer from `default_execution`
-    // tx_cache.subtract_esdt_balance(&tx_input.from, &token_identifier, 0, &value);
-    // tx_cache.increase_esdt_balance(&tx_input.to, &token_identifier, 0, &value);
-
     let esdt_values = vec![TxInputESDT {
         token_identifier,
         nonce,

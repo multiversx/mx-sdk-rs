@@ -1,58 +1,26 @@
 use std::rc::Rc;
 
-use elrond_wasm::types::Address;
-
 use crate::{
-    tx_mock::{TxCache, TxContextRef, TxInput, TxResult},
+    tx_mock::{TxCache, TxInput, TxResult},
     world_mock::BlockchainMock,
 };
 
-use super::execute_tx_context;
-
-fn get_new_address(tx_input: &TxInput, state: Rc<BlockchainMock>) -> Address {
-    let sender = state
-        .accounts
-        .get(&tx_input.from)
-        .unwrap_or_else(|| panic!("scDeploy sender does not exist"));
-    state
-        .get_new_address(tx_input.from.clone(), sender.nonce)
-        .unwrap_or_else(|| {
-            panic!("Missing new address. Only explicit new deploy addresses supported")
-        })
-}
+use super::deploy_contract;
 
 pub fn sc_create(
-    mut tx_input: TxInput,
+    tx_input: TxInput,
     contract_path: &[u8],
     state: &mut Rc<BlockchainMock>,
 ) -> TxResult {
-    let new_address = get_new_address(&tx_input, state.clone());
-    tx_input.to = new_address.clone();
-
     // nonce gets increased irrespective of whether the tx fails or not
     // must be done after computing the new address
     state.increase_account_nonce(&tx_input.from);
     state.subtract_tx_gas(&tx_input.from, tx_input.gas_limit, tx_input.gas_price);
 
     let tx_cache = TxCache::new(state.clone());
-    let tx_context = TxContextRef::new(tx_input, tx_cache);
-    let tx_input_ref = &*tx_context.tx_input_box;
+    let (tx_result, blockchain_updates, _) =
+        deploy_contract(tx_input, contract_path.to_vec(), tx_cache);
 
-    tx_context
-        .tx_cache
-        .subtract_egld_balance(&tx_input_ref.from, &tx_input_ref.egld_value);
-    tx_context.create_new_contract(
-        &new_address,
-        contract_path.to_vec(),
-        tx_input_ref.from.clone(),
-    );
-    tx_context
-        .tx_cache
-        .increase_egld_balance(&new_address, &tx_input_ref.egld_value);
-
-    let tx_result = execute_tx_context(tx_context.clone());
-
-    let blockchain_updates = tx_context.into_blockchain_updates();
     blockchain_updates.apply(Rc::get_mut(state).unwrap());
 
     tx_result

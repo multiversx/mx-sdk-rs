@@ -1,3 +1,5 @@
+use elrond_wasm::types::Address;
+
 use crate::{
     tx_mock::{BlockchainUpdate, TxCache, TxContextRef, TxInput, TxResult},
     world_mock::BlockchainMock,
@@ -45,4 +47,29 @@ pub fn default_execution(tx_input: TxInput, tx_cache: TxCache) -> (TxResult, Blo
     let blockchain_updates = tx_context.into_blockchain_updates();
 
     (tx_result, blockchain_updates)
+}
+
+pub fn deploy_contract(
+    mut tx_input: TxInput,
+    contract_path: Vec<u8>,
+    tx_cache: TxCache,
+) -> (TxResult, BlockchainUpdate, Address) {
+    let new_address = tx_cache.get_new_address(&tx_input.from);
+    tx_input.to = new_address.clone();
+    tx_input.func_name = b"init".to_vec();
+    let tx_context = TxContextRef::new(tx_input, tx_cache);
+    let tx_input_ref = &*tx_context.tx_input_box;
+
+    tx_context
+        .tx_cache
+        .subtract_egld_balance(&tx_input_ref.from, &tx_input_ref.egld_value);
+    tx_context.create_new_contract(&new_address, contract_path, tx_input_ref.from.clone());
+    tx_context
+        .tx_cache
+        .increase_egld_balance(&new_address, &tx_input_ref.egld_value);
+
+    let tx_result = execute_tx_context(tx_context.clone());
+    let blockchain_updates = tx_context.into_blockchain_updates();
+
+    (tx_result, blockchain_updates, new_address)
 }
