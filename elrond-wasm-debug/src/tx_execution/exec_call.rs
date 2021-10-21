@@ -9,7 +9,7 @@ use crate::{
 use super::{execute_builtin_function_or_default, execute_tx_context};
 
 pub fn sc_query(tx_input: TxInput, state: Rc<BlockchainMock>) -> TxResult {
-    let tx_cache = TxCache::new(state.clone());
+    let tx_cache = TxCache::new(state);
     let tx_context = TxContextRef::new(tx_input, tx_cache);
     execute_tx_context(tx_context)
 }
