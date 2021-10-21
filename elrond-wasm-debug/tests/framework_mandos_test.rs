@@ -197,15 +197,15 @@ fn set_check_username_rs() {
         contract_map(),
     );
 }
-/*  TODO: implement & test
+
 #[test]
 fn builtin_func_esdt_transfer() {
     elrond_wasm_debug::mandos_rs(
-        "tests/mandos/builtin-func-esdt-transfer.scen.json",
+        "/home/andreim/elrond/smartcontract/elrond-wasm-rs/elrond-wasm-debug/tests/mandos/builtin-func-esdt-transfer.scen.json",
         contract_map(),
     );
 }
-*/
+
 #[test]
 #[should_panic]
 fn esdt_non_zero_balance_check_err_rs() {
@@ -223,25 +223,22 @@ fn esdt_zero_balance_check_err_rs() {
         contract_map(),
     );
 }
-/* TODO: implement & test
+
 #[test]
 fn multi_transfer_esdt_rs() {
-    elrond_wasm_debug::mandos_rs(
-        "tests/mandos/multi-transfer-esdt.scen.json",
-        contract_map(),
-    );
+    elrond_wasm_debug::mandos_rs("tests/mandos/multi-transfer-esdt.scen.json", contract_map());
 }
-*/
+
 #[test]
 fn transfer_egld_rs() {
     elrond_wasm_debug::mandos_rs("tests/mandos/transfer-egld.scen.json", contract_map());
 }
-/* TODO: implement & test
+
 #[test]
 fn transfer_esdt_rs() {
     elrond_wasm_debug::mandos_rs("tests/mandos/transfer-esdt.scen.json", contract_map());
 }
-*/
+
 #[test]
 fn validator_reward_rs() {
     elrond_wasm_debug::mandos_rs("tests/mandos/validatorReward.scen.json", contract_map());

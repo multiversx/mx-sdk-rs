@@ -1,6 +1,6 @@
 use crate::{
     interpret_trait::{InterpretableFrom, InterpreterContext},
-    model::{AddressValue, BigUintValue},
+    model::{AddressValue, BigUintValue, U64Value},
     serde_raw::TxTransferRaw,
 };
 
@@ -12,6 +12,8 @@ pub struct TxTransfer {
     pub to: AddressValue,
     pub egld_value: BigUintValue,
     pub esdt_value: Vec<TxESDT>,
+    pub gas_limit: U64Value,
+    pub gas_price: U64Value,
 }
 
 impl InterpretableFrom<TxTransferRaw> for TxTransfer {
@@ -25,6 +27,8 @@ impl InterpretableFrom<TxTransferRaw> for TxTransfer {
                 .iter()
                 .map(|esdt_value| TxESDT::interpret_from(esdt_value.clone(), context))
                 .collect(),
+            gas_limit: U64Value::interpret_from(from.gas_limit.unwrap_or_default(), context),
+            gas_price: U64Value::interpret_from(from.gas_price.unwrap_or_default(), context),
         }
     }
 }
