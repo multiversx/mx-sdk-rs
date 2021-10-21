@@ -63,7 +63,7 @@ pub fn execute_esdt_multi_transfer(
         .args
         .get(arg_index)
         .map(Vec::clone)
-        .unwrap_or(Vec::new());
+        .unwrap_or_default();
     arg_index += 1;
     let args = if tx_input.args.len() > arg_index {
         tx_input.args[arg_index..].to_vec()

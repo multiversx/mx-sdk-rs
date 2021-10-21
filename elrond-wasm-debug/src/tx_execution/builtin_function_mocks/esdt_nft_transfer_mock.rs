@@ -30,9 +30,9 @@ pub fn execute_esdt_nft_transfer(
     // tx_cache.increase_esdt_balance(&tx_input.to, &token_identifier, 0, &value);
 
     let esdt_values = vec![TxInputESDT {
-        token_identifier: token_identifier.clone(),
+        token_identifier,
         nonce,
-        value: value.clone(),
+        value,
     }];
 
     let esdt_nft_transfer_log = TxLog {
@@ -46,7 +46,7 @@ pub fn execute_esdt_nft_transfer(
         data: vec![],
     };
 
-    let func_name = tx_input.args.get(4).map(Vec::clone).unwrap_or(Vec::new());
+    let func_name = tx_input.args.get(4).map(Vec::clone).unwrap_or_default();
     let args = if tx_input.args.len() > 5 {
         tx_input.args[5..].to_vec()
     } else {
