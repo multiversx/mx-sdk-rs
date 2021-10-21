@@ -1,6 +1,7 @@
 use std::{
     cell::{Ref, RefCell},
     collections::HashMap,
+    fmt,
     rc::Rc,
 };
 
@@ -11,29 +12,38 @@ use crate::{
     world_mock::{AccountData, BlockchainMock},
 };
 
-#[derive(Debug)]
+use super::TxCacheSource;
+
 pub struct TxCache {
-    blockchain_ref: Rc<BlockchainMock>,
-    accounts: RefCell<HashMap<Address, AccountData>>,
+    source_ref: Rc<dyn TxCacheSource>,
+    pub(super) accounts: RefCell<HashMap<Address, AccountData>>,
+}
+
+impl fmt::Debug for TxCache {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("TxCache")
+            .field("accounts", &self.accounts)
+            .finish()
+    }
 }
 
 impl TxCache {
-    pub fn new(blockchain_ref: Rc<BlockchainMock>) -> Self {
+    pub fn new(source_ref: Rc<dyn TxCacheSource>) -> Self {
         TxCache {
-            blockchain_ref,
+            source_ref,
             accounts: RefCell::new(HashMap::new()),
         }
     }
 
     pub fn blockchain_ref(&self) -> &BlockchainMock {
-        &*self.blockchain_ref
+        self.source_ref.blockchain_ref()
     }
 
     fn load_account_if_necessary(&self, address: &Address) {
         let mut accounts_mut = self.accounts.borrow_mut();
         if !accounts_mut.contains_key(address) {
-            if let Some(blockchain_account) = self.blockchain_ref.accounts.get(address) {
-                accounts_mut.insert(address.clone(), blockchain_account.clone());
+            if let Some(blockchain_account) = self.source_ref.load_account(address) {
+                accounts_mut.insert(address.clone(), blockchain_account);
             }
         }
     }
@@ -83,6 +93,12 @@ impl TxCache {
             accounts: self.accounts.into_inner(),
         }
     }
+
+    pub fn commit_updates(&self, updates: BlockchainUpdate) {
+        self.accounts
+            .borrow_mut()
+            .extend(updates.accounts.into_iter());
+    }
 }
 
 pub struct BlockchainUpdate {
@@ -90,6 +106,12 @@ pub struct BlockchainUpdate {
 }
 
 impl BlockchainUpdate {
+    pub fn empty() -> Self {
+        BlockchainUpdate {
+            accounts: HashMap::new(),
+        }
+    }
+
     pub fn apply(self, blockchain: &mut BlockchainMock) {
         blockchain.accounts.extend(self.accounts.into_iter());
     }

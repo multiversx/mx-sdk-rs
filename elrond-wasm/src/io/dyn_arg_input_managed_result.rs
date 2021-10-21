@@ -46,7 +46,7 @@ where
         self.next_index < self.data_len
     }
 
-    fn next_arg_input(&mut self) -> ManagedBuffer<A> {
+    fn next_arg_input(&mut self) -> Self::ItemInput {
         if let Some(buffer) = self.data.get(self.next_index) {
             self.next_index += 1;
             buffer

@@ -3,7 +3,7 @@ use elrond_codec::{DecodeError, EncodeError, TopDecode, TopEncode};
 use crate::{
     api::{ErrorApi, ManagedTypeApi},
     err_msg,
-    types::{BoxedBytes, ManagedBuffer, ManagedBytesTopDecodeInput, ManagedType},
+    types::{AsManagedRef, BoxedBytes, ManagedBuffer, ManagedBytesTopDecodeInput, ManagedType},
 };
 
 pub struct ManagedSerializer<M>
@@ -34,7 +34,7 @@ where
     }
 
     pub fn top_decode_from_managed_buffer<T: TopDecode>(&self, buffer: &ManagedBuffer<M>) -> T {
-        T::top_decode_or_exit(buffer, self.api.clone(), top_decode_exit)
+        T::top_decode_or_exit(buffer.as_managed_ref(), self.api.clone(), top_decode_exit)
     }
 
     pub fn top_decode_from_byte_slice<T: TopDecode>(&self, slice: &[u8]) -> T {

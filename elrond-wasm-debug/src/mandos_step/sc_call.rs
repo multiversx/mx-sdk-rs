@@ -31,7 +31,7 @@ pub fn execute(
         gas_price: tx.gas_price.value,
         tx_hash: generate_tx_hash_dummy(tx_id),
     };
-    let tx_result = sc_call_with_async_and_callback(tx_input, state, true).unwrap();
+    let tx_result = sc_call_with_async_and_callback(tx_input, state, true);
     if let Some(tx_expect) = expect {
         check_tx_output(tx_id, tx_expect, &tx_result);
     }

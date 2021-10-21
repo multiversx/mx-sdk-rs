@@ -20,15 +20,15 @@ fn init_rs() {
     elrond_wasm_debug::mandos_rs("mandos/init.scen.json", contract_map());
 }
 
-// #[test]
-// fn simple_transfer_full_rs() {
-//     elrond_wasm_debug::mandos_rs("mandos/simple_transfer_full.scen.json", contract_map());
-// }
+#[test]
+fn simple_transfer_full_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/simple_transfer_full.scen.json", contract_map());
+}
 
-// #[test]
-// fn simple_transfer_half_rs() {
-//     elrond_wasm_debug::mandos_rs("mandos/simple_transfer_half.scen.json", contract_map());
-// }
+#[test]
+fn simple_transfer_half_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/simple_transfer_half.scen.json", contract_map());
+}
 
 #[test]
 fn simple_transfer_full_wrong_token_rs() {

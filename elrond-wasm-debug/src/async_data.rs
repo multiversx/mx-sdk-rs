@@ -10,6 +10,7 @@ use alloc::vec::Vec;
 
 #[derive(Debug, Clone)]
 pub struct AsyncCallTxData {
+    pub from: Address,
     pub to: Address,
     pub call_value: BigUint,
     pub endpoint_name: Vec<u8>,
@@ -17,9 +18,9 @@ pub struct AsyncCallTxData {
     pub tx_hash: H256,
 }
 
-pub fn async_call_tx_input(async_data: &AsyncCallTxData, contract_addr: &Address) -> TxInput {
+pub fn async_call_tx_input(async_data: &AsyncCallTxData) -> TxInput {
     TxInput {
-        from: contract_addr.clone(),
+        from: async_data.from.clone(),
         to: async_data.to.clone(),
         egld_value: async_data.call_value.clone(),
         esdt_values: Vec::new(),
@@ -31,11 +32,7 @@ pub fn async_call_tx_input(async_data: &AsyncCallTxData, contract_addr: &Address
     }
 }
 
-pub fn async_callback_tx_input(
-    async_data: &AsyncCallTxData,
-    contract_addr: &Address,
-    async_result: &TxResult,
-) -> TxInput {
+pub fn async_callback_tx_input(async_data: &AsyncCallTxData, async_result: &TxResult) -> TxInput {
     let mut args: Vec<Vec<u8>> = Vec::new();
     let serialized_bytes = top_encode_to_vec(&async_result.result_status).unwrap();
     args.push(serialized_bytes);
@@ -46,7 +43,7 @@ pub fn async_callback_tx_input(
     }
     TxInput {
         from: async_data.to.clone(),
-        to: contract_addr.clone(),
+        to: async_data.from.clone(),
         egld_value: 0u32.into(),
         esdt_values: Vec::new(),
         func_name: b"callBack".to_vec(),
