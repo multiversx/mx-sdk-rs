@@ -4,8 +4,8 @@ use mandos::model::{Account, AddressKey, BlockInfo, NewAddress};
 use num_bigint::BigUint;
 
 use crate::world_mock::{
-    AccountData, AccountEsdt, BlockInfo as CrateBlockInfo, BlockchainMock, EsdtData, EsdtInstance,
-    EsdtInstances, EsdtRoles,
+    is_smart_contract_address, AccountData, AccountEsdt, BlockInfo as CrateBlockInfo,
+    BlockchainMock, EsdtData, EsdtInstance, EsdtInstances, EsdtRoles,
 };
 
 pub fn execute(
@@ -65,7 +65,7 @@ pub fn execute(
     }
     for new_address in new_addresses.iter() {
         assert!(
-            BlockchainMock::is_smart_contract_address(&new_address.new_address.value.into()),
+            is_smart_contract_address(&new_address.new_address.value.into()),
             "field should have SC format"
         );
         state.put_new_address(
