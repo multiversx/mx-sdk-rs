@@ -43,7 +43,7 @@ impl TxCache {
         let mut accounts_mut = self.accounts.borrow_mut();
         if !accounts_mut.contains_key(address) {
             if let Some(blockchain_account) = self.source_ref.load_account(address) {
-                accounts_mut.insert(address.clone(), blockchain_account.clone());
+                accounts_mut.insert(address.clone(), blockchain_account);
             }
         }
     }
