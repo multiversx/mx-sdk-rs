@@ -11,7 +11,6 @@ fn contract_map() -> ContractMap<DebugApi> {
     contract_map
 }
 
-/* Uncomment when mandos-rs is brought up to date with mandos-go features
 #[test]
 fn buy_all_tickets_different_accounts_rs() {
     elrond_wasm_debug::mandos_rs(
@@ -30,10 +29,7 @@ fn buy_more_tickets_than_allowed_rs() {
 
 #[test]
 fn buy_ticket_after_deadline_rs() {
-    elrond_wasm_debug::mandos_rs(
-        "mandos/buy-ticket-after-deadline.scen.json",
-        contract_map(),
-    );
+    elrond_wasm_debug::mandos_rs("mandos/buy-ticket-after-deadline.scen.json", contract_map());
 }
 
 #[test]
@@ -46,10 +42,7 @@ fn buy_ticket_after_determined_winner_rs() {
 
 #[test]
 fn buy_ticket_after_sold_out_rs() {
-    elrond_wasm_debug::mandos_rs(
-        "mandos/buy-ticket-after-sold-out.scen.json",
-        contract_map(),
-    );
+    elrond_wasm_debug::mandos_rs("mandos/buy-ticket-after-sold-out.scen.json", contract_map());
 }
 
 #[test]
@@ -80,10 +73,7 @@ fn buy_ticket_same_account_rs() {
 
 #[test]
 fn buy_ticket_second_lottery_rs() {
-    elrond_wasm_debug::mandos_rs(
-        "mandos/buy-ticket-second-lottery.scen.json",
-        contract_map(),
-    );
+    elrond_wasm_debug::mandos_rs("mandos/buy-ticket-second-lottery.scen.json", contract_map());
 }
 
 #[test]
@@ -204,4 +194,3 @@ fn start_with_all_options_rs() {
 fn start_with_no_options_rs() {
     elrond_wasm_debug::mandos_rs("mandos/start-with-no-options.scen.json", contract_map());
 }
-*/
