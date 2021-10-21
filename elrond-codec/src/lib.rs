@@ -45,8 +45,8 @@ pub use nested_ser::{dep_encode_to_vec, NestedEncode, NestedEncodeNoErr};
 pub use top_de::{top_decode_from_nested, top_decode_from_nested_or_exit, TopDecode};
 pub use top_de_input::TopDecodeInput;
 pub use top_ser::{
-    top_encode_from_nested, top_encode_from_nested_or_exit, top_encode_no_err, top_encode_to_vec,
-    TopEncode,
+    top_encode_from_nested, top_encode_from_nested_or_exit, top_encode_no_err,
+    top_encode_to_vec_u8, TopEncode,
 };
 pub use top_ser_output::TopEncodeOutput;
 pub use transmute::{boxed_slice_into_vec, vec_into_boxed_slice};
