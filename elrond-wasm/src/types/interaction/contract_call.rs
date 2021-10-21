@@ -1,5 +1,8 @@
 use crate::{
-    api::{SendApi, ESDT_MULTI_TRANSFER_STRING, ESDT_NFT_TRANSFER_STRING, ESDT_TRANSFER_STRING},
+    api::{
+        SendApi, ESDT_MULTI_TRANSFER_FUNC_NAME, ESDT_NFT_TRANSFER_FUNC_NAME,
+        ESDT_TRANSFER_FUNC_NAME,
+    },
     types::{
         AsyncCall, BigUint, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer,
         ManagedVec, TokenIdentifier,
@@ -168,7 +171,7 @@ where
 
                 let zero = BigUint::zero(self.api.clone());
                 let endpoint_name =
-                    ManagedBuffer::new_from_bytes(self.api.clone(), ESDT_TRANSFER_STRING);
+                    ManagedBuffer::new_from_bytes(self.api.clone(), ESDT_TRANSFER_FUNC_NAME);
 
                 ContractCall {
                     api: self.api.clone(),
@@ -200,7 +203,7 @@ where
                 let recipient_addr = self.api.get_sc_address();
                 let zero = BigUint::zero(self.api.clone());
                 let endpoint_name =
-                    ManagedBuffer::new_from_bytes(self.api.clone(), ESDT_NFT_TRANSFER_STRING);
+                    ManagedBuffer::new_from_bytes(self.api.clone(), ESDT_NFT_TRANSFER_FUNC_NAME);
 
                 ContractCall {
                     api: self.api,
@@ -237,7 +240,7 @@ where
         let recipient_addr = self.api.get_sc_address();
         let zero = BigUint::zero(self.api.clone());
         let endpoint_name =
-            ManagedBuffer::new_from_bytes(self.api.clone(), ESDT_MULTI_TRANSFER_STRING);
+            ManagedBuffer::new_from_bytes(self.api.clone(), ESDT_MULTI_TRANSFER_FUNC_NAME);
 
         ContractCall {
             api: self.api,
