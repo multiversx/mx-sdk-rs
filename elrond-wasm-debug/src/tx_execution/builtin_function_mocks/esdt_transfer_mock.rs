@@ -1,4 +1,4 @@
-use elrond_wasm::types::Address;
+use elrond_wasm::{api::ESDT_TRANSFER_FUNC_NAME, types::Address};
 use num_bigint::BigUint;
 use num_traits::Zero;
 
@@ -6,8 +6,6 @@ use crate::{
     tx_execution::default_execution,
     tx_mock::{BlockchainUpdate, TxCache, TxInput, TxInputESDT, TxLog, TxResult},
 };
-
-use super::builtin_func_exec::ESDT_TRANSFER_FUNC;
 
 pub fn execute_esdt_transfer(tx_input: TxInput, tx_cache: TxCache) -> (TxResult, BlockchainUpdate) {
     if tx_input.args.len() < 2 {
@@ -71,7 +69,7 @@ pub fn esdt_transfer_event_log(
     let nonce_topic = Vec::<u8>::new();
     TxLog {
         address: from,
-        endpoint: ESDT_TRANSFER_FUNC.to_vec(),
+        endpoint: ESDT_TRANSFER_FUNC_NAME.to_vec(),
         topics: vec![
             esdt_token_identifier,
             nonce_topic,
