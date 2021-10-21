@@ -335,13 +335,13 @@ fn forwarder_call_transf_exec_multi_transfer_esdt_rs() {
     );
 }
 
-// #[test]
-// fn forwarder_contract_change_owner_rs() {
-//     elrond_wasm_debug::mandos_rs(
-//         "mandos/forwarder_contract_change_owner.scen.json",
-//         contract_map(),
-//     );
-// }
+#[test]
+fn forwarder_contract_change_owner_rs() {
+    elrond_wasm_debug::mandos_rs(
+        "mandos/forwarder_contract_change_owner.scen.json",
+        contract_map(),
+    );
+}
 
 // #[test]
 // fn forwarder_contract_deploy_rs() {
