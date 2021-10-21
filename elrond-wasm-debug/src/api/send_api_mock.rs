@@ -1,7 +1,7 @@
 use crate::{
     async_data::AsyncCallTxData,
-    tx_execution::execute_builtin_function_or_default,
-    tx_mock::{TxCache, TxInput, TxPanic},
+    tx_execution::{deploy_contract, execute_builtin_function_or_default},
+    tx_mock::{BlockchainUpdate, TxCache, TxInput, TxPanic, TxResult},
     DebugApi,
 };
 use elrond_wasm::{
@@ -17,6 +17,41 @@ use elrond_wasm::{
 use num_traits::Zero;
 
 impl DebugApi {
+    fn append_endpoint_name_and_args(
+        args: &mut Vec<Vec<u8>>,
+        endpoint_name: &ManagedBuffer<Self>,
+        arg_buffer: &ManagedArgBuffer<Self>,
+    ) {
+        if !endpoint_name.is_empty() {
+            args.push(endpoint_name.to_boxed_bytes().into_vec());
+            args.extend(
+                arg_buffer
+                    .raw_arg_iter()
+                    .map(|mb| mb.to_boxed_bytes().into_vec()),
+            );
+        }
+    }
+
+    fn sync_call_post_processing(
+        &self,
+        tx_result: TxResult,
+        blockchain_updates: BlockchainUpdate,
+    ) -> Vec<Vec<u8>> {
+        if tx_result.result_status == 0 {
+            self.blockchain_cache().commit_updates(blockchain_updates);
+
+            self.result_borrow_mut().merge_after_sync_call(&tx_result);
+
+            tx_result.result_values
+        } else {
+            // also kill current execution
+            std::panic::panic_any(TxPanic {
+                status: tx_result.result_status,
+                message: tx_result.result_message.into_bytes(),
+            })
+        }
+    }
+
     fn perform_execute_on_dest_context(
         &self,
         to: Address,
@@ -42,34 +77,44 @@ impl DebugApi {
         let (tx_result, blockchain_updates) =
             execute_builtin_function_or_default(tx_input, tx_cache);
 
-        if tx_result.result_status == 0 {
-            self.blockchain_cache().commit_updates(blockchain_updates);
-
-            self.result_borrow_mut().merge_after_sync_call(&tx_result);
-
-            tx_result.result_values
-        } else {
-            // also kill current execution
-            std::panic::panic_any(TxPanic {
-                status: tx_result.result_status,
-                message: tx_result.result_message.into_bytes(),
-            })
-        }
+        self.sync_call_post_processing(tx_result, blockchain_updates)
     }
 
-    fn append_endpoint_name_and_args(
-        args: &mut Vec<Vec<u8>>,
-        endpoint_name: &ManagedBuffer<Self>,
-        arg_buffer: &ManagedArgBuffer<Self>,
-    ) {
-        if !endpoint_name.is_empty() {
-            args.push(endpoint_name.to_boxed_bytes().into_vec());
-            args.extend(
-                arg_buffer
-                    .raw_arg_iter()
-                    .map(|mb| mb.to_boxed_bytes().into_vec()),
-            );
-        }
+    fn perform_deploy(
+        &self,
+        contract_code: Vec<u8>,
+        egld_value: num_bigint::BigUint,
+        args: Vec<Vec<u8>>,
+    ) -> (Address, Vec<Vec<u8>>) {
+        let contract_address = &self.input_ref().to;
+        let tx_hash = self.get_tx_hash_legacy();
+        let tx_input = TxInput {
+            from: contract_address.clone(),
+            to: Address::zero(),
+            egld_value,
+            esdt_values: Vec::new(),
+            func_name: Vec::new(),
+            args,
+            gas_limit: 1000,
+            gas_price: 0,
+            tx_hash,
+        };
+
+        let tx_cache = TxCache::new(self.blockchain_cache_rc());
+        tx_cache.increase_acount_nonce(contract_address);
+        let (tx_result, blockchain_updates, new_address) =
+            deploy_contract(tx_input, contract_code, tx_cache);
+
+        (
+            new_address,
+            self.sync_call_post_processing(tx_result, blockchain_updates),
+        )
+    }
+
+    fn get_contract_code(&self, address: &Address) -> Vec<u8> {
+        self.blockchain_cache()
+            .with_account(address, |account| account.contract_path.clone())
+            .unwrap_or_else(|| panic!("Account is not a smart contract, it has no code"))
     }
 }
 
@@ -251,23 +296,42 @@ impl SendApi for DebugApi {
     fn deploy_contract(
         &self,
         _gas: u64,
-        _amount: &BigUint<Self>,
-        _code: &ManagedBuffer<Self>,
+        amount: &BigUint<Self>,
+        code: &ManagedBuffer<Self>,
         _code_metadata: CodeMetadata,
-        _arg_buffer: &ManagedArgBuffer<Self>,
+        arg_buffer: &ManagedArgBuffer<Self>,
     ) -> (ManagedAddress<Self>, ManagedVec<Self, ManagedBuffer<Self>>) {
-        panic!("deploy_contract not yet implemented")
+        let egld_value = self.big_uint_value(amount);
+        let contract_code = code.to_boxed_bytes().into_vec();
+        let (new_address, result) =
+            self.perform_deploy(contract_code, egld_value, arg_buffer.to_raw_args_vec());
+
+        (
+            ManagedAddress::managed_from(self.clone(), new_address),
+            ManagedVec::managed_from(self.clone(), result),
+        )
     }
 
     fn deploy_from_source_contract(
         &self,
         _gas: u64,
-        _amount: &BigUint<Self>,
-        _source_contract_address: &ManagedAddress<Self>,
+        amount: &BigUint<Self>,
+        source_contract_address: &ManagedAddress<Self>,
         _code_metadata: CodeMetadata,
-        _arg_buffer: &ManagedArgBuffer<Self>,
+        arg_buffer: &ManagedArgBuffer<Self>,
     ) -> (ManagedAddress<Self>, ManagedVec<Self, ManagedBuffer<Self>>) {
-        panic!("deploy_from_source_contract not yet implemented")
+        let egld_value = self.big_uint_value(amount);
+        let source_contract_code = self.get_contract_code(&source_contract_address.to_address());
+        let (new_address, result) = self.perform_deploy(
+            source_contract_code,
+            egld_value,
+            arg_buffer.to_raw_args_vec(),
+        );
+
+        (
+            ManagedAddress::managed_from(self.clone(), new_address),
+            ManagedVec::managed_from(self.clone(), result),
+        )
     }
 
     fn upgrade_from_source_contract(

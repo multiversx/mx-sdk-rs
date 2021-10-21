@@ -88,6 +88,16 @@ impl TxCache {
         self.accounts.borrow()
     }
 
+    /// Assumes the nonce has already been increased.
+    pub fn get_new_address(&self, creator_address: &Address) -> Address {
+        let current_nonce = self.with_account(creator_address, |account| account.nonce);
+        self.blockchain_ref()
+            .get_new_address(creator_address.clone(), current_nonce - 1)
+            .unwrap_or_else(|| {
+                panic!("Missing new address. Only explicit new deploy addresses supported")
+            })
+    }
+
     pub fn into_blockchain_updates(self) -> BlockchainUpdate {
         BlockchainUpdate {
             accounts: self.accounts.into_inner(),
