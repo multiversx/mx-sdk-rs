@@ -1,4 +1,4 @@
-use crate::AsyncCallTxData;
+use super::AsyncCallTxData;
 
 #[derive(Clone, Default, Debug)]
 pub struct TxResultCalls {
