@@ -201,7 +201,7 @@ fn set_check_username_rs() {
 #[test]
 fn builtin_func_esdt_transfer() {
     elrond_wasm_debug::mandos_rs(
-        "/home/andreim/elrond/smartcontract/elrond-wasm-rs/elrond-wasm-debug/tests/mandos/builtin-func-esdt-transfer.scen.json",
+        "tests/mandos/builtin-func-esdt-transfer.scen.json",
         contract_map(),
     );
 }
