@@ -357,6 +357,14 @@ fn forwarder_contract_upgrade_rs() {
 }
 
 #[test]
+fn forwarder_nft_add_quantity_rs() {
+    elrond_wasm_debug::mandos_rs(
+        "mandos/forwarder_nft_add_quantity.scen.json",
+        contract_map(),
+    );
+}
+
+#[test]
 fn forwarder_nft_create_rs() {
     elrond_wasm_debug::mandos_rs("mandos/forwarder_nft_create.scen.json", contract_map());
 }

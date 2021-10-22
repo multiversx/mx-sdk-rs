@@ -9,7 +9,7 @@ use crate::{
     world_mock::{EsdtInstance, EsdtInstanceMetadata},
 };
 
-pub fn execute_esdt_create_nft(
+pub fn execute_esdt_nft_create(
     tx_input: TxInput,
     tx_cache: TxCache,
 ) -> (TxResult, BlockchainUpdate) {

@@ -223,6 +223,11 @@ fn forwarder_contract_upgrade_go() {
 }
 
 #[test]
+fn forwarder_nft_add_quantity_go() {
+    elrond_wasm_debug::mandos_go("mandos/forwarder_nft_add_quantity.scen.json");
+}
+
+#[test]
 fn forwarder_nft_create_go() {
     elrond_wasm_debug::mandos_go("mandos/forwarder_nft_create.scen.json");
 }
