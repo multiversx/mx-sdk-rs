@@ -393,13 +393,13 @@ fn forwarder_nft_transfer_exec_rs() {
     );
 }
 
-// #[test]
-// fn forwarder_send_esdt_multi_transfer_rs() {
-//     elrond_wasm_debug::mandos_rs(
-//         "mandos/forwarder_send_esdt_multi_transfer.scen.json",
-//         contract_map(),
-//     );
-// }
+#[test]
+fn forwarder_send_esdt_multi_transfer_rs() {
+    elrond_wasm_debug::mandos_rs(
+        "mandos/forwarder_send_esdt_multi_transfer.scen.json",
+        contract_map(),
+    );
+}
 
 // #[test]
 // fn forwarder_send_twice_egld_rs() {
