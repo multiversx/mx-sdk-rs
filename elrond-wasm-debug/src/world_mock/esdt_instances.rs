@@ -1,19 +1,18 @@
 use num_bigint::BigUint;
+use num_traits::Zero;
 use std::{
     collections::BTreeMap,
     fmt::{self, Write},
 };
 
-use super::EsdtInstance;
+use super::{EsdtInstance, EsdtInstanceMetadata};
 
 #[derive(Clone, Debug, Default)]
 pub struct EsdtInstances(BTreeMap<u64, EsdtInstance>);
 
 impl EsdtInstances {
-    pub fn new(nonce: u64, value: BigUint) -> Self {
-        let mut instances = EsdtInstances(BTreeMap::new());
-        instances.add(nonce, value);
-        instances
+    pub fn new() -> Self {
+        EsdtInstances(BTreeMap::new())
     }
 
     pub fn new_from_hash(hash: BTreeMap<u64, EsdtInstance>) -> Self {
@@ -25,14 +24,28 @@ impl EsdtInstances {
             let esdt_balance = self.0.get_mut(&nonce).unwrap();
             esdt_balance.balance += value;
         } else {
-            self.add_new(nonce, value)
+            let mut instance = EsdtInstance::default(nonce);
+            instance.balance = value;
+            self.push_instance(instance)
         }
     }
 
-    pub fn add_new(&mut self, nonce: u64, value: BigUint) {
-        let mut instance = EsdtInstance::default(nonce);
-        instance.balance = value;
-        self.0.insert(nonce, instance);
+    pub fn push_instance(&mut self, instance: EsdtInstance) {
+        self.0.insert(instance.nonce, instance);
+    }
+
+    pub fn increase_balance(
+        &mut self,
+        nonce: u64,
+        value: &BigUint,
+        metadata: EsdtInstanceMetadata,
+    ) {
+        let instance = self.0.entry(nonce).or_insert_with(|| EsdtInstance {
+            nonce,
+            balance: BigUint::zero(),
+            metadata,
+        });
+        instance.balance += value;
     }
 
     pub fn get_by_nonce(&self, nonce: u64) -> Option<&EsdtInstance> {
@@ -85,11 +98,11 @@ impl fmt::Display for EsdtInstances {
                 }}",
                 value.nonce,
                 value.balance,
-                hex::encode(value.creator.as_ref().unwrap().as_slice()),
-                value.royalties,
-                hex::encode(value.hash.as_ref().unwrap().as_slice()),
-                hex::encode(value.uri.as_ref().unwrap().as_slice()),
-                hex::encode(value.attributes.as_slice())
+                hex::encode(value.metadata.creator.as_ref().unwrap().as_slice()),
+                value.metadata.royalties,
+                hex::encode(value.metadata.hash.as_ref().unwrap().as_slice()),
+                hex::encode(value.metadata.uri.as_ref().unwrap().as_slice()),
+                hex::encode(value.metadata.attributes.as_slice())
             )?;
         }
         Ok(())

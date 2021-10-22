@@ -21,13 +21,8 @@ pub fn default_execution(tx_input: TxInput, tx_cache: TxCache) -> (TxResult, Blo
 
     // TODO: temporary, will convert to explicit builtin function first
     for esdt_transfer in tx_context.tx_input_box.esdt_values.iter() {
-        tx_context.tx_cache.subtract_esdt_balance(
+        tx_context.tx_cache.transfer_esdt_balance(
             &tx_context.tx_input_box.from,
-            &esdt_transfer.token_identifier,
-            esdt_transfer.nonce,
-            &esdt_transfer.value,
-        );
-        tx_context.tx_cache.increase_esdt_balance(
             &tx_context.tx_input_box.to,
             &esdt_transfer.token_identifier,
             esdt_transfer.nonce,

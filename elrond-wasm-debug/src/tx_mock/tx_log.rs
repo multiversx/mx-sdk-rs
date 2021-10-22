@@ -1,5 +1,6 @@
 use alloc::vec::Vec;
 use elrond_wasm::types::Address;
+use mandos::model::Checkable;
 
 #[derive(Clone, Debug)]
 pub struct TxLog {
@@ -10,13 +11,13 @@ pub struct TxLog {
 }
 
 impl TxLog {
-    pub fn equals(&self, check_log: &mandos::model::CheckLog) -> bool {
+    pub fn mandos_check(&self, check_log: &mandos::model::CheckLog) -> bool {
         if self.address.to_vec() == check_log.address.value
-            && self.endpoint == check_log.endpoint.value
-            && self.data == check_log.data.value
+            && check_log.endpoint.check(self.endpoint.as_slice())
+            && check_log.data.check(self.data.as_slice())
         {
             for (topic, other_topic) in self.topics.iter().zip(check_log.topics.iter()) {
-                if topic != &other_topic.value {
+                if !other_topic.check(topic) {
                     return false;
                 }
             }

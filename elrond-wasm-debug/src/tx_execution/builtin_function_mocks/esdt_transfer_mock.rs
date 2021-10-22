@@ -16,10 +16,6 @@ pub fn execute_esdt_transfer(tx_input: TxInput, tx_cache: TxCache) -> (TxResult,
     let token_identifier = tx_input.args[0].clone();
     let value = BigUint::from_bytes_be(tx_input.args[1].as_slice());
 
-    // TODO: uncomment, after removing esdt transfer from `default_execution`
-    // tx_cache.subtract_esdt_balance(&tx_input.from, &token_identifier, 0, &value);
-    // tx_cache.increase_esdt_balance(&tx_input.to, &token_identifier, 0, &value);
-
     let esdt_values = vec![TxInputESDT {
         token_identifier: token_identifier.clone(),
         nonce: 0,
