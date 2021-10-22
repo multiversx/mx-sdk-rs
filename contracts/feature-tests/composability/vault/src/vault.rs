@@ -167,7 +167,6 @@ pub trait Vault {
                 token_identifier: token_id,
                 token_nonce: nonce,
                 amount,
-                token_type: EsdtTokenType::Invalid,
             });
         }
 
@@ -210,7 +209,6 @@ pub trait Vault {
                 token_identifier: payment.token_identifier,
                 token_nonce: new_token_nonce,
                 amount: payment.amount,
-                token_type: EsdtTokenType::Invalid, // ignored
             });
         }
 

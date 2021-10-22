@@ -11,7 +11,6 @@ use elrond_codec::elrond_codec_derive::{NestedDecode, NestedEncode, TopDecode, T
 
 #[derive(TopDecode, TopEncode, NestedDecode, NestedEncode, Clone, PartialEq, Debug)]
 pub struct EsdtTokenPayment<M: ManagedTypeApi> {
-    pub token_type: EsdtTokenType,
     pub token_identifier: TokenIdentifier<M>,
     pub token_nonce: u64,
     pub amount: BigUint<M>,
@@ -26,7 +25,6 @@ impl<M: ManagedTypeApi> TypeAbi for EsdtTokenPayment<M> {
 impl<M: ManagedTypeApi> EsdtTokenPayment<M> {
     pub fn no_payment(api: M) -> Self {
         EsdtTokenPayment {
-            token_type: EsdtTokenType::Invalid,
             token_identifier: TokenIdentifier::egld(api.clone()),
             token_nonce: 0,
             amount: BigUint::zero(api),
@@ -38,23 +36,24 @@ impl<M: ManagedTypeApi> EsdtTokenPayment<M> {
         token_nonce: u64,
         amount: BigUint<M>,
     ) -> Self {
-        let token_type = if amount != 0 && token_identifier.is_valid_esdt_identifier() {
-            if token_nonce == 0 {
+        EsdtTokenPayment {
+            token_identifier,
+            token_nonce,
+            amount,
+        }
+    }
+
+    pub fn get_token_type(&self) -> EsdtTokenType {
+        if self.amount != 0 && self.token_identifier.is_valid_esdt_identifier() {
+            if self.token_nonce == 0 {
                 EsdtTokenType::Fungible
-            } else if amount == 1u64 {
+            } else if self.amount == 1u64 {
                 EsdtTokenType::NonFungible
             } else {
                 EsdtTokenType::SemiFungible
             }
         } else {
             EsdtTokenType::Invalid
-        };
-
-        EsdtTokenPayment {
-            token_type,
-            token_identifier,
-            token_nonce,
-            amount,
         }
     }
 }
@@ -82,14 +81,7 @@ impl<M: ManagedTypeApi> ManagedVecItem<M> for EsdtTokenPayment<M> {
         let amount_handle = u32::from_be_bytes(amount_handle_raw);
         let amount = BigUint::from_raw_handle(api, amount_handle as Handle);
 
-        let token_type = if token_nonce > 0 {
-            EsdtTokenType::SemiFungible
-        } else {
-            EsdtTokenType::Fungible
-        };
-
         EsdtTokenPayment {
-            token_type,
             token_identifier: TokenIdentifier::from(token_identifier_buf),
             token_nonce,
             amount,
