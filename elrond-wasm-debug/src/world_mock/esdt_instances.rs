@@ -85,6 +85,11 @@ impl fmt::Display for EsdtInstances {
     fn fmt(&self, _f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut instance_buf = String::new();
         for (_, value) in self.0.iter() {
+            let creator_encoded = if let Some(creator) = &value.metadata.creator {
+                hex::encode(creator)
+            } else {
+                "".to_string()
+            };
             write!(
                 &mut instance_buf,
                 "{{
@@ -98,7 +103,7 @@ impl fmt::Display for EsdtInstances {
                 }}",
                 value.nonce,
                 value.balance,
-                hex::encode(value.metadata.creator.as_ref().unwrap().as_slice()),
+                creator_encoded,
                 value.metadata.royalties,
                 hex::encode(value.metadata.hash.as_ref().unwrap().as_slice()),
                 hex::encode(value.metadata.uri.as_ref().unwrap().as_slice()),

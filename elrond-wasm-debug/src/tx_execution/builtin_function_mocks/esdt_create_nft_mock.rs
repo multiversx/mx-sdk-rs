@@ -41,7 +41,7 @@ pub fn execute_esdt_create_nft(
             balance: amount.clone(),
             metadata: EsdtInstanceMetadata {
                 name,
-                creator: Some(tx_input.from.to_vec()),
+                creator: Some(tx_input.from.clone()),
                 royalties,
                 hash: Some(hash),
                 uri: Some(uri),

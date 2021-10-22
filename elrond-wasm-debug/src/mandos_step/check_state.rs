@@ -262,15 +262,19 @@ pub fn check_token_instance(
             &actual_value.balance,
         ))
     }
-    let actual_creator = actual_value.metadata.creator.clone().unwrap_or_default();
-    if !expected_value.creator.check(&actual_creator) {
+    let actual_creator = if let Some(creator) = &actual_value.metadata.creator {
+        creator.as_ref()
+    } else {
+        &[]
+    };
+    if !expected_value.creator.check(actual_creator) {
         errors.push(format!(
             "bad esdt creator. Address: {}. Token {}. Nonce {}. Want: {}. Have: {}",
             address,
             token,
             expected_value.nonce.value,
             expected_value.creator,
-            verbose_hex(&actual_creator),
+            verbose_hex(actual_creator),
         ))
     }
 
