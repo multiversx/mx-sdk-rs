@@ -1,11 +1,7 @@
 use elrond_wasm::types::Address;
 use num_bigint::BigUint;
-use num_traits::Zero;
 
-use crate::{
-    address_hex,
-    tx_mock::{TxInputESDT, TxPanic},
-};
+use crate::{address_hex, tx_mock::TxPanic, world_mock::EsdtInstanceMetadata};
 
 use super::TxCache;
 
@@ -43,7 +39,7 @@ impl TxCache {
         esdt_token_identifier: &[u8],
         nonce: u64,
         value: &BigUint,
-    ) {
+    ) -> EsdtInstanceMetadata {
         self.with_account_mut(address, |account| {
             let esdt_data_map = &mut account.esdt;
             let esdt_data = esdt_data_map
@@ -73,20 +69,9 @@ impl TxCache {
             }
 
             *esdt_balance -= value;
-        });
-    }
 
-    pub fn subtract_multi_esdt_balance(&self, address: &Address, esdt_transfers: &[TxInputESDT]) {
-        for esdt_transfer in esdt_transfers {
-            if !esdt_transfer.value.is_zero() {
-                self.subtract_esdt_balance(
-                    address,
-                    esdt_transfer.token_identifier.as_slice(),
-                    esdt_transfer.nonce,
-                    &esdt_transfer.value,
-                );
-            }
-        }
+            esdt_instance.metadata.clone()
+        })
     }
 
     pub fn increase_esdt_balance(
@@ -95,32 +80,28 @@ impl TxCache {
         esdt_token_identifier: &[u8],
         nonce: u64,
         value: &BigUint,
+        esdt_metadata: EsdtInstanceMetadata,
     ) {
         self.with_account_mut(address, |account| {
-            if let Some(esdt_data) = account.esdt.get_mut_by_identifier(esdt_token_identifier) {
-                esdt_data.instances.add(nonce, value.clone());
-            } else {
-                account
-                    .esdt
-                    .push_esdt(esdt_token_identifier.to_vec(), nonce, value.clone());
-            }
+            account.esdt.increase_balance(
+                esdt_token_identifier.to_vec(),
+                nonce,
+                value,
+                esdt_metadata,
+            );
         });
     }
 
-    pub fn increase_multi_esdt_balance(
-        &mut self,
-        address: &Address,
-        esdt_transfers: &[TxInputESDT],
+    pub fn transfer_esdt_balance(
+        &self,
+        from: &Address,
+        to: &Address,
+        esdt_token_identifier: &[u8],
+        nonce: u64,
+        value: &BigUint,
     ) {
-        for esdt_transfer in esdt_transfers {
-            if !esdt_transfer.value.is_zero() {
-                self.increase_esdt_balance(
-                    address,
-                    esdt_transfer.token_identifier.as_slice(),
-                    esdt_transfer.nonce,
-                    &esdt_transfer.value,
-                );
-            }
-        }
+        let metadata = self.subtract_esdt_balance(from, esdt_token_identifier, nonce, value);
+
+        self.increase_esdt_balance(to, esdt_token_identifier, nonce, value, metadata);
     }
 }

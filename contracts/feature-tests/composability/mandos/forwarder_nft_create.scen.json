@@ -65,6 +65,30 @@
                     "2"
                 ],
                 "status": "0",
+                "logs": [
+                    {
+                        "address": "sc:forwarder",
+                        "endpoint": "str:ESDTNFTCreate",
+                        "topics": [
+                            "str:NFT-0001",
+                            "2",
+                            "1",
+                            "*"
+                        ],
+                        "data": ""
+                    },
+                    {
+                        "address": "sc:forwarder",
+                        "endpoint": "str:nft_create",
+                        "topics": [
+                            "str:create",
+                            "str:NFT-0001",
+                            "2",
+                            "1"
+                        ],
+                        "data": ""
+                    }
+                ],
                 "gas": "*",
                 "refund": "*"
             }
