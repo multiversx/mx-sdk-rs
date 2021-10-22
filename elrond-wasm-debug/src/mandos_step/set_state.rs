@@ -1,5 +1,6 @@
 use std::collections::BTreeMap;
 
+use elrond_wasm::types::Address;
 use mandos::model::{Account, AddressKey, BlockInfo, NewAddress};
 use num_bigint::BigUint;
 
@@ -153,7 +154,7 @@ fn convert_mandos_esdt_instance_to_world_mock(
             creator: mandos_esdt
                 .creator
                 .as_ref()
-                .map(|creator| creator.value.clone()),
+                .map(|creator| Address::from_slice(creator.value.as_slice())),
             royalties: mandos_esdt
                 .royalties
                 .as_ref()

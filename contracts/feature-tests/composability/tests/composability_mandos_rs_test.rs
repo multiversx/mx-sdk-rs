@@ -369,13 +369,13 @@ fn forwarder_nft_create_and_send_rs() {
     );
 }
 
-// #[test]
-// fn forwarder_nft_decode_complex_attributes_rs() {
-//     elrond_wasm_debug::mandos_rs(
-//         "mandos/forwarder_nft_decode_complex_attributes.scen.json",
-//         contract_map(),
-//     );
-// }
+#[test]
+fn forwarder_nft_decode_complex_attributes_rs() {
+    elrond_wasm_debug::mandos_rs(
+        "mandos/forwarder_nft_decode_complex_attributes.scen.json",
+        contract_map(),
+    );
+}
 
 #[test]
 fn forwarder_nft_transfer_async_rs() {
