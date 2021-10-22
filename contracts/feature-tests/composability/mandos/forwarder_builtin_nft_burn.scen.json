@@ -26,12 +26,12 @@
                             "instances": [
                                 {
                                     "nonce": "1",
-                                    "balance": "1"
+                                    "balance": "1305"
                                 }
                             ],
                             "lastNonce": "1",
                             "roles": [
-                                "ESDTRoleNFTAddQuantity"
+                                "ESDTRoleNFTBurn"
                             ]
                         }
                     },
@@ -41,12 +41,11 @@
         },
         {
             "step": "scCall",
-            "txId": "nft_add_quantity",
-            "comment": "Attributes are Color(128, 128, 128)",
+            "txId": "nft_burn",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "function": "nft_add_quantity",
+                "function": "nft_burn",
                 "arguments": [
                     "str:NFT-0001",
                     "1",
@@ -61,7 +60,7 @@
                 "logs": [
                     {
                         "address": "sc:forwarder",
-                        "endpoint": "str:ESDTNFTAddQuantity",
+                        "endpoint": "str:ESDTNFTBurn",
                         "topics": [
                             "str:NFT-0001",
                             "1",
@@ -101,12 +100,12 @@
                             "instances": [
                                 {
                                     "nonce": "1",
-                                    "balance": "1201"
+                                    "balance": "105"
                                 }
                             ],
                             "lastNonce": "1",
                             "roles": [
-                                "ESDTRoleNFTAddQuantity"
+                                "ESDTRoleNFTBurn"
                             ]
                         }
                     },
