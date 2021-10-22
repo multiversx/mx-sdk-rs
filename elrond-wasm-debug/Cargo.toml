@@ -1,6 +1,6 @@
 [package]
 name = "elrond-wasm-debug"
-version = "0.20.1"
+version = "0.21.0"
 edition = "2018"
 
 authors = ["Andrei Marinica <andrei.marinica@elrond.com>", "Elrond Network <contact@elrond.com>"]
@@ -27,10 +27,10 @@ rustc_version = "0.4"
 arwen-tests = []
 
 [dependencies.elrond-wasm]
-version = "0.20.1"
+version = "0.21.0"
 path = "../elrond-wasm"
 features = ["derive"]
 
 [dependencies.mandos]
-version = "0.10.0"
+version = "0.11.0"
 path = "../mandos"
