@@ -356,26 +356,26 @@ fn forwarder_contract_upgrade_rs() {
     );
 }
 
-// #[test]
-// fn forwarder_nft_create_rs() {
-//     elrond_wasm_debug::mandos_rs("mandos/forwarder_nft_create.scen.json", contract_map());
-// }
+#[test]
+fn forwarder_nft_create_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/forwarder_nft_create.scen.json", contract_map());
+}
 
-// #[test]
-// fn forwarder_nft_create_and_send_rs() {
-//     elrond_wasm_debug::mandos_rs(
-//         "mandos/forwarder_nft_create_and_send.scen.json",
-//         contract_map(),
-//     );
-// }
+#[test]
+fn forwarder_nft_create_and_send_rs() {
+    elrond_wasm_debug::mandos_rs(
+        "mandos/forwarder_nft_create_and_send.scen.json",
+        contract_map(),
+    );
+}
 
-// #[test]
-// fn forwarder_nft_decode_complex_attributes_rs() {
-//     elrond_wasm_debug::mandos_rs(
-//         "mandos/forwarder_nft_decode_complex_attributes.scen.json",
-//         contract_map(),
-//     );
-// }
+#[test]
+fn forwarder_nft_decode_complex_attributes_rs() {
+    elrond_wasm_debug::mandos_rs(
+        "mandos/forwarder_nft_decode_complex_attributes.scen.json",
+        contract_map(),
+    );
+}
 
 #[test]
 fn forwarder_nft_transfer_async_rs() {
@@ -393,13 +393,13 @@ fn forwarder_nft_transfer_exec_rs() {
     );
 }
 
-// #[test]
-// fn forwarder_send_esdt_multi_transfer_rs() {
-//     elrond_wasm_debug::mandos_rs(
-//         "mandos/forwarder_send_esdt_multi_transfer.scen.json",
-//         contract_map(),
-//     );
-// }
+#[test]
+fn forwarder_send_esdt_multi_transfer_rs() {
+    elrond_wasm_debug::mandos_rs(
+        "mandos/forwarder_send_esdt_multi_transfer.scen.json",
+        contract_map(),
+    );
+}
 
 // #[test]
 // fn forwarder_send_twice_egld_rs() {
@@ -429,10 +429,10 @@ fn forwarder_tranfer_esdt_with_fees_rs() {
     );
 }
 
-// #[test]
-// fn proxy_test_init_rs() {
-//     elrond_wasm_debug::mandos_rs("mandos/proxy_test_init.scen.json", contract_map());
-// }
+#[test]
+fn proxy_test_init_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/proxy_test_init.scen.json", contract_map());
+}
 
 #[test]
 fn proxy_test_message_othershard_rs() {

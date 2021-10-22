@@ -1,8 +1,6 @@
 mod account_data;
 mod block_info;
 mod esdt_data;
-mod log_check;
-mod logs_check;
 mod new_address;
 mod scenario;
 mod step;
@@ -14,8 +12,6 @@ mod value;
 pub use account_data::*;
 pub use block_info::*;
 pub use esdt_data::*;
-pub use log_check::*;
-pub use logs_check::*;
 pub use new_address::*;
 pub use scenario::*;
 pub use step::*;
