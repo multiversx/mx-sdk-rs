@@ -1,8 +1,9 @@
 use crate::{
     api::{
         BlockchainApi, ManagedTypeApi, SendApi, StorageReadApi, CHANGE_OWNER_BUILTIN_FUNC_NAME,
-        ESDT_MULTI_TRANSFER_FUNC_NAME, ESDT_NFT_CREATE_FUNC_NAME, ESDT_NFT_TRANSFER_FUNC_NAME,
-        ESDT_TRANSFER_FUNC_NAME,
+        ESDT_LOCAL_BURN_FUNC_NAME, ESDT_LOCAL_MINT_FUNC_NAME, ESDT_MULTI_TRANSFER_FUNC_NAME,
+        ESDT_NFT_ADD_QUANTITY_FUNC_NAME, ESDT_NFT_BURN_FUNC_NAME, ESDT_NFT_CREATE_FUNC_NAME,
+        ESDT_NFT_TRANSFER_FUNC_NAME, ESDT_TRANSFER_FUNC_NAME,
     },
     esdt::ESDTSystemSmartContractProxy,
     types::{
@@ -238,9 +239,9 @@ where
         arg_buffer.push_arg(token);
 
         if nonce == 0 {
-            func_name = b"ESDTLocalMint";
+            func_name = ESDT_LOCAL_MINT_FUNC_NAME;
         } else {
-            func_name = b"ESDTNFTAddQuantity";
+            func_name = ESDT_NFT_ADD_QUANTITY_FUNC_NAME;
             arg_buffer.push_arg(nonce);
         }
 
@@ -262,9 +263,9 @@ where
 
         arg_buffer.push_arg(token);
         if nonce == 0 {
-            func_name = b"ESDTLocalBurn";
+            func_name = ESDT_LOCAL_BURN_FUNC_NAME;
         } else {
-            func_name = b"ESDTNFTBurn";
+            func_name = ESDT_NFT_BURN_FUNC_NAME;
             arg_buffer.push_arg(&nonce);
         }
 
