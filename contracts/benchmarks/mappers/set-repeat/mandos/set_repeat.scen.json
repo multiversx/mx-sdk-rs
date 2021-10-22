@@ -1,4 +1,5 @@
 {
+    "gasSchedule": "v4",
     "name": "set-repeat",
     "traceGas": true,
     "steps": [
