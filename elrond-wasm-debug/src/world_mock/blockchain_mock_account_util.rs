@@ -52,7 +52,7 @@ impl BlockchainMock {
     }
 
     pub fn validate_account(&self, account: &AccountData) {
-        let is_sc = self.is_smart_contract_address(&account.address);
+        let is_sc = is_smart_contract_address(&account.address);
         let has_code = self.check_account_has_code(account);
 
         assert!(
@@ -66,14 +66,6 @@ impl BlockchainMock {
         );
     }
 
-    pub fn is_smart_contract_address(&self, address: &Address) -> bool {
-        address
-            .as_bytes()
-            .iter()
-            .take(SC_ADDRESS_NUM_LEADING_ZEROS.into())
-            .all(|item| item == &0u8)
-    }
-
     pub fn check_account_has_code(&self, account: &AccountData) -> bool {
         !account
             .contract_path
@@ -81,4 +73,12 @@ impl BlockchainMock {
             .unwrap_or(&Vec::<u8>::new())
             .is_empty()
     }
+}
+
+pub fn is_smart_contract_address(address: &Address) -> bool {
+    address
+        .as_bytes()
+        .iter()
+        .take(SC_ADDRESS_NUM_LEADING_ZEROS.into())
+        .all(|item| item == &0u8)
 }

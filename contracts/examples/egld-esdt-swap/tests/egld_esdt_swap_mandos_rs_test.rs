@@ -1,6 +1,7 @@
 use elrond_wasm::*;
 use elrond_wasm_debug::*;
 
+#[allow(unused)]
 fn contract_map() -> ContractMap<DebugApi> {
     let mut contract_map = ContractMap::new();
     contract_map.register_contract(
@@ -12,10 +13,10 @@ fn contract_map() -> ContractMap<DebugApi> {
 
 #[test]
 fn unwrap_egld_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/unwrap_egld.scen.json", &contract_map());
+    elrond_wasm_debug::mandos_rs("mandos/unwrap_egld.scen.json", contract_map());
 }
 
 #[test]
 fn wrap_egld_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/wrap_egld.scen.json", &contract_map());
+    elrond_wasm_debug::mandos_rs("mandos/wrap_egld.scen.json", contract_map());
 }

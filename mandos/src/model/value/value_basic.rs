@@ -41,6 +41,15 @@ impl InterpretableFrom<ValueSubTree> for BytesValue {
     }
 }
 
+impl InterpretableFrom<String> for BytesValue {
+    fn interpret_from(from: String, _context: &InterpreterContext) -> Self {
+        BytesValue {
+            value: from.clone().into_bytes(),
+            original: ValueSubTree::Str(from),
+        }
+    }
+}
+
 impl Default for BytesValue {
     fn default() -> Self {
         Self {

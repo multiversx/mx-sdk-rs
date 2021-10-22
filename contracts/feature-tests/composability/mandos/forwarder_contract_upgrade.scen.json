@@ -20,10 +20,10 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "function": "upgradeChildContract",
+                "function": "upgrade_vault_from_source",
                 "arguments": [
                     "sc:child",
-                    "file:../forwarder/output/forwarder.wasm"
+                    "sc:forwarder"
                 ],
                 "gasLimit": "500,000,000",
                 "gasPrice": "0"

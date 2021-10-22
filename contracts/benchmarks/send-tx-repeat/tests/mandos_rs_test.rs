@@ -13,11 +13,11 @@ fn contract_map() -> ContractMap<DebugApi> {
 fn test_send_tx_repeat_without_data_mandos_rs() {
     elrond_wasm_debug::mandos_rs(
         "mandos/send_tx_repeat_without_data.scen.json",
-        &contract_map(),
+        contract_map(),
     );
 }
 
 #[test]
 fn test_send_tx_repeat_with_data_mandos_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/send_tx_repeat_with_data.scen.json", &contract_map());
+    elrond_wasm_debug::mandos_rs("mandos/send_tx_repeat_with_data.scen.json", contract_map());
 }

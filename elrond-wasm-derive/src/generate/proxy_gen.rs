@@ -47,6 +47,8 @@ pub fn generate_proxy_endpoint(m: &Method, endpoint_name: String) -> proc_macro2
     let mut nonce_expr = quote! { 0u64 };
     let mut payment_count = 0;
     let mut payment_expr = quote! { elrond_wasm::types::BigUint::zero(___api___.clone()) };
+    let mut multi_count = 0;
+    let mut multi_expr = quote! { elrond_wasm::types::ManagedVec::new(___api___.clone()) };
 
     let arg_push_snippets: Vec<proc_macro2::TokenStream> = m
         .method_args
@@ -79,6 +81,13 @@ pub fn generate_proxy_endpoint(m: &Method, endpoint_name: String) -> proc_macro2
 
                 quote! {}
             },
+            ArgPaymentMetadata::PaymentMulti => {
+                multi_count += 1;
+                let pat = &arg.pat;
+                multi_expr = quote! { #pat };
+
+                quote! {}
+            },
         })
         .collect();
 
@@ -94,10 +103,21 @@ pub fn generate_proxy_endpoint(m: &Method, endpoint_name: String) -> proc_macro2
         nonce_count <= 1,
         "No more than one payment nonce argument allowed in call proxy"
     );
+    assert!(
+        multi_count <= 1,
+        "No more than one payment multi argument allowed in call proxy"
+    );
 
     let single_payment_snippet = if token_count > 0 || nonce_count > 0 || payment_count > 0 {
         quote! {
             ___contract_call___ = ___contract_call___.add_token_transfer(#token_expr, #nonce_expr, #payment_expr);
+        }
+    } else {
+        quote! {}
+    };
+    let multiple_payment_snippet = if multi_count > 0 {
+        quote! {
+            ___contract_call___ = ___contract_call___.with_multi_token_transfer(#multi_expr);
         }
     } else {
         quote! {}
@@ -114,8 +134,10 @@ pub fn generate_proxy_endpoint(m: &Method, endpoint_name: String) -> proc_macro2
                 ___api___.clone(),
                 ___address___,
                 #endpoint_name_literal,
+                ManagedVec::new(___api___.clone()),
             );
             #single_payment_snippet
+            #multiple_payment_snippet
             #(#arg_push_snippets)*
             ___contract_call___
         }
@@ -128,6 +150,7 @@ pub fn generate_proxy_deploy(init_method: &Method) -> proc_macro2::TokenStream {
     let msig = generate_proxy_deploy_sig(init_method);
 
     let mut payment_count = 0;
+    let mut multi_count = 0;
     let mut token_count = 0;
     let mut nonce_count = 0;
 
@@ -156,6 +179,13 @@ pub fn generate_proxy_deploy(init_method: &Method) -> proc_macro2::TokenStream {
                 let pat = &arg.pat;
                 quote! {
                     ___contract_deploy___ = ___contract_deploy___.with_egld_transfer(#pat);
+                }
+            },
+            ArgPaymentMetadata::PaymentMulti => {
+                multi_count += 1;
+                let pat = &arg.pat;
+                quote! {
+                    ___contract_deploy___ = ___contract_deploy___.with_multi_token_transfer(#pat);
                 }
             },
         })

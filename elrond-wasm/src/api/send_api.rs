@@ -4,10 +4,6 @@ use crate::types::{
     ManagedInto, ManagedVec, TokenIdentifier,
 };
 
-pub const ESDT_TRANSFER_STRING: &[u8] = b"ESDTTransfer";
-pub const ESDT_NFT_TRANSFER_STRING: &[u8] = b"ESDTNFTTransfer";
-pub const ESDT_MULTI_TRANSFER_STRING: &[u8] = b"MultiESDTNFTTransfer";
-
 /// API that groups methods that either send EGLD or ESDT, or that call other contracts.
 pub trait SendApi: ManagedTypeApi + BlockchainApi + Clone + Sized {
     /// Sends EGLD to a given address, directly.
@@ -97,6 +93,16 @@ pub trait SendApi: ManagedTypeApi + BlockchainApi + Clone + Sized {
         code_metadata: CodeMetadata,
         arg_buffer: &ManagedArgBuffer<Self>,
     ) -> (ManagedAddress<Self>, ManagedVec<Self, ManagedBuffer<Self>>);
+
+    fn upgrade_from_source_contract(
+        &self,
+        sc_address: &ManagedAddress<Self>,
+        gas: u64,
+        amount: &BigUint<Self>,
+        source_contract_address: &ManagedAddress<Self>,
+        code_metadata: CodeMetadata,
+        arg_buffer: &ManagedArgBuffer<Self>,
+    );
 
     /// Upgrades a child contract of the currently executing contract.
     /// The upgrade is synchronous, and the current transaction will fail if the upgrade fails.

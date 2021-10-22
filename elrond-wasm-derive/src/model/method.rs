@@ -67,6 +67,13 @@ impl Method {
             .cloned()
     }
 
+    pub fn payment_multi_arg(&self) -> Option<MethodArgument> {
+        self.method_args
+            .iter()
+            .find(|&arg| matches!(arg.metadata.payment, ArgPaymentMetadata::PaymentMulti))
+            .cloned()
+    }
+
     pub fn is_payable(&self) -> bool {
         match &self.public_role {
             PublicRole::Init(init_metadata) => init_metadata.payable.is_payable(),
