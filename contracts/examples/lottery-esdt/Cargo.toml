@@ -12,15 +12,15 @@ path = "src/lottery.rs"
 wasm-output-mode = [ "elrond-wasm-node",]
 
 [dependencies.elrond-wasm]
-version = "0.20.1"
+version = "0.21.0"
 path = "../../../elrond-wasm"
 features = ["derive"]
 
 [dependencies.elrond-wasm-node]
-version = "0.20.1"
+version = "0.21.0"
 path = "../../../elrond-wasm-node"
 optional = true
 
 [dev-dependencies.elrond-wasm-debug]
-version = "0.20.1"
+version = "0.21.0"
 path = "../../../elrond-wasm-debug"
