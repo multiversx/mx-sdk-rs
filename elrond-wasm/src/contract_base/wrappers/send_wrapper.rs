@@ -1,7 +1,8 @@
 use crate::{
     api::{
         BlockchainApi, ManagedTypeApi, SendApi, StorageReadApi, CHANGE_OWNER_BUILTIN_FUNC_NAME,
-        ESDT_MULTI_TRANSFER_FUNC_NAME, ESDT_NFT_TRANSFER_FUNC_NAME, ESDT_TRANSFER_FUNC_NAME,
+        ESDT_MULTI_TRANSFER_FUNC_NAME, ESDT_NFT_CREATE_FUNC_NAME, ESDT_NFT_TRANSFER_FUNC_NAME,
+        ESDT_TRANSFER_FUNC_NAME,
     },
     esdt::ESDTSystemSmartContractProxy,
     types::{
@@ -313,7 +314,7 @@ where
 
         let output = self.call_local_esdt_built_in_function(
             self.api.get_gas_left(),
-            &ManagedBuffer::new_from_bytes(self.type_manager(), b"ESDTNFTCreate"),
+            &ManagedBuffer::new_from_bytes(self.type_manager(), ESDT_NFT_CREATE_FUNC_NAME),
             &arg_buffer,
         );
 

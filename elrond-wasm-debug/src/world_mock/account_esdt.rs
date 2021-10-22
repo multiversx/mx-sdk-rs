@@ -7,7 +7,7 @@ use std::{
     fmt::{self, Write},
 };
 
-use super::{EsdtInstances, EsdtRoles};
+use super::{EsdtInstanceMetadata, EsdtInstances, EsdtRoles};
 
 #[derive(Clone, Default, Debug)]
 pub struct EsdtData {
@@ -48,28 +48,28 @@ impl AccountEsdt {
         self.0.get_mut(identifier)
     }
 
-    pub fn new(token_identifier: Vec<u8>, nonce: u64, value: BigUint) -> Self {
-        let mut esdt = AccountEsdt::default();
-
-        esdt.push_esdt(token_identifier, nonce, value);
-        esdt
-    }
-
-    pub fn new_from_hash(hash: HashMap<Vec<u8>, EsdtData>) -> Self {
+    pub fn new_from_raw_map(hash: HashMap<Vec<u8>, EsdtData>) -> Self {
         AccountEsdt(hash)
     }
 
-    pub fn push_esdt(&mut self, token_identifier: Vec<u8>, nonce: u64, value: BigUint) {
-        self.0.insert(
-            token_identifier.clone(),
-            EsdtData {
+    pub fn increase_balance(
+        &mut self,
+        token_identifier: Vec<u8>,
+        nonce: u64,
+        value: &BigUint,
+        metadata: EsdtInstanceMetadata,
+    ) {
+        let esdt_data = self
+            .0
+            .entry(token_identifier.clone())
+            .or_insert_with(|| EsdtData {
                 token_identifier,
-                instances: EsdtInstances::new(nonce, value),
+                instances: EsdtInstances::new(),
                 last_nonce: nonce,
                 roles: EsdtRoles::default(),
                 frozen: false,
-            },
-        );
+            });
+        esdt_data.instances.increase_balance(nonce, value, metadata);
     }
 
     pub fn get_esdt_balance(&self, token_identifier: &[u8], nonce: u64) -> BigUint {

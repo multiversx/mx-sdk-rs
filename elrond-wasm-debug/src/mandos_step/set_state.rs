@@ -1,11 +1,12 @@
 use std::collections::BTreeMap;
 
+use elrond_wasm::types::Address;
 use mandos::model::{Account, AddressKey, BlockInfo, NewAddress};
 use num_bigint::BigUint;
 
 use crate::world_mock::{
     is_smart_contract_address, AccountData, AccountEsdt, BlockInfo as CrateBlockInfo,
-    BlockchainMock, EsdtData, EsdtInstance, EsdtInstances, EsdtRoles,
+    BlockchainMock, EsdtData, EsdtInstance, EsdtInstanceMetadata, EsdtInstances, EsdtRoles,
 };
 
 pub fn execute(
@@ -21,7 +22,7 @@ pub fn execute(
             .iter()
             .map(|(k, v)| (k.value.clone(), v.value.clone()))
             .collect();
-        let esdt = AccountEsdt::new_from_hash(
+        let esdt = AccountEsdt::new_from_raw_map(
             account
                 .esdt
                 .iter()
@@ -148,22 +149,25 @@ fn convert_mandos_esdt_instance_to_world_mock(
             .as_ref()
             .map(|value| value.value.clone())
             .unwrap_or_default(),
-        creator: mandos_esdt
-            .creator
-            .as_ref()
-            .map(|creator| creator.value.clone()),
-        royalties: mandos_esdt
-            .royalties
-            .as_ref()
-            .map(|royalties| royalties.value)
-            .unwrap_or_default(),
-        hash: mandos_esdt.hash.as_ref().map(|hash| hash.value.clone()),
-        uri: mandos_esdt.uri.as_ref().map(|uri| uri.value.clone()),
-        attributes: mandos_esdt
-            .attributes
-            .as_ref()
-            .map(|attributes| attributes.value.clone())
-            .unwrap_or_default(),
+        metadata: EsdtInstanceMetadata {
+            name: Vec::new(),
+            creator: mandos_esdt
+                .creator
+                .as_ref()
+                .map(|creator| Address::from_slice(creator.value.as_slice())),
+            royalties: mandos_esdt
+                .royalties
+                .as_ref()
+                .map(|royalties| royalties.value)
+                .unwrap_or_default(),
+            hash: mandos_esdt.hash.as_ref().map(|hash| hash.value.clone()),
+            uri: mandos_esdt.uri.as_ref().map(|uri| uri.value.clone()),
+            attributes: mandos_esdt
+                .attributes
+                .as_ref()
+                .map(|attributes| attributes.value.clone())
+                .unwrap_or_default(),
+        },
     }
 }
 

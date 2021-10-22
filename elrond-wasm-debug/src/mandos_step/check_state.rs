@@ -262,19 +262,23 @@ pub fn check_token_instance(
             &actual_value.balance,
         ))
     }
-    let actual_creator = actual_value.creator.clone().unwrap_or_default();
-    if !expected_value.creator.check(&actual_creator) {
+    let actual_creator = if let Some(creator) = &actual_value.metadata.creator {
+        creator.as_ref()
+    } else {
+        &[]
+    };
+    if !expected_value.creator.check(actual_creator) {
         errors.push(format!(
             "bad esdt creator. Address: {}. Token {}. Nonce {}. Want: {}. Have: {}",
             address,
             token,
             expected_value.nonce.value,
             expected_value.creator,
-            verbose_hex(&actual_creator),
+            verbose_hex(actual_creator),
         ))
     }
 
-    let actual_royalties = actual_value.royalties;
+    let actual_royalties = actual_value.metadata.royalties;
     if !expected_value.royalties.check(actual_royalties) {
         errors.push(format!(
             "bad esdt royalties. Address: {}. Token {}. Nonce {}. Want: {}. Have: {}",
@@ -282,7 +286,7 @@ pub fn check_token_instance(
         ))
     }
 
-    let actual_hash = actual_value.hash.clone().unwrap_or_default();
+    let actual_hash = actual_value.metadata.hash.clone().unwrap_or_default();
     if !expected_value.hash.check(&actual_hash) {
         errors.push(format!(
             "bad esdt hash. Address: {}. Token {}. Nonce {}. Want: {}. Have: {}",
@@ -294,7 +298,7 @@ pub fn check_token_instance(
         ))
     }
 
-    let actual_uri = actual_value.uri.clone().unwrap_or_default();
+    let actual_uri = actual_value.metadata.uri.clone().unwrap_or_default();
     if !expected_value.uri.check(&actual_uri) {
         errors.push(format!(
             "bad esdt uri. Address: {}. Token {}. Nonce {}. Want: {}. Have: {}",
