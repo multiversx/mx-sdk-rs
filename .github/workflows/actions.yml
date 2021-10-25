@@ -74,12 +74,14 @@ jobs:
       - name: Download base report
         uses: dawidd6/action-download-artifact@v2
         with:
+          workflow: actions.yml
           name: sizes
           commit: ${{github.event.pull_request.head.sha}}
           path: base-sizes.txt
       - name: Download current branch report
         uses: dawidd6/action-download-artifact@v2
         with:
+          workflow: actions.yml
           name: sizes
           path: current-sizes.txt
       - name: Generate report
