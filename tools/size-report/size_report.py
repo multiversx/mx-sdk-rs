@@ -69,7 +69,7 @@ def generate_size_report(before: Sizes, after: Sizes) -> str:
             "baz": 5, \
         }
     >>> print(generate_size_report(before, after))
-    Contract file size comparison (bytes):
+    Contract file size comparison (bytes) - from {{ .base }} to {{ .head }}
     Contract | Previous | Current | Difference | Percentage
     --:|--:|--:|--:|--:|
     bar | 50 | 30 | -20 | -40.00% &#x1F7E2;
@@ -80,7 +80,7 @@ def generate_size_report(before: Sizes, after: Sizes) -> str:
     """
     with io.StringIO() as output:
         names = sorted(set(before).union(after))
-        print("Contract file size comparison (bytes):")
+        print("Contract file size comparison (bytes) - from {{ .base }} to {{ .head }}")
         print("Contract | Previous | Current | Difference | Percentage", file=output)
         print("--:|--:|--:|--:|--:|", file=output, end='')
         for name in names:

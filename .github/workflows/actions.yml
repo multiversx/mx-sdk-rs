@@ -58,13 +58,16 @@ jobs:
         uses: chuhlomin/render-template@v1.2
         with:
           template: report.md
+          vars: |
+            base: ${{github.event.pull_request.base.sha}}
+            head: ${{github.event.pull_request.head.sha}}
       - name: Find sizes report comment
         uses: peter-evans/find-comment@v1
         id: fc
         with:
           issue-number: ${{ github.event.pull_request.number }}
           comment-author: 'github-actions[bot]'
-          body-includes: Build output
+          body-includes: Contract file size comparison
       - name: Create or update sizes report comment
         uses: peter-evans/create-or-update-comment@v1
         with:
