@@ -7,7 +7,7 @@ pub struct InterpreterContext {
 
 impl InterpreterContext {
     pub fn new(path: &Path) -> Self {
-        let context_path = path.parent().unwrap().to_str().unwrap().to_string();
+        let context_path = path.to_str().unwrap().to_string();
         InterpreterContext { context_path }
     }
 }

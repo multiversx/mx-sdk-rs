@@ -4,12 +4,12 @@ use elrond_wasm_debug::*;
 fn contract_map() -> ContractMap<DebugApi> {
     let mut contract_map = ContractMap::new();
     contract_map.register_contract(
-        "file:../output/lottery-erc20.wasm",
+        "file:output/lottery-erc20.wasm",
         Box::new(|context| Box::new(lottery_erc20::contract_obj(context))),
     );
 
     contract_map.register_contract(
-        "file:../../erc20/output/erc20.wasm",
+        "file:../erc20/output/erc20.wasm",
         Box::new(|context| Box::new(erc20::contract_obj(context))),
     );
 
