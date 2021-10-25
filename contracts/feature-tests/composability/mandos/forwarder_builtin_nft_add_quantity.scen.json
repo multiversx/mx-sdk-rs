@@ -36,6 +36,23 @@
                         }
                     },
                     "code": "file:../forwarder/output/forwarder.wasm"
+                },
+                "sc:forwarder2": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:NFT-0001": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "1"
+                                }
+                            ],
+                            "lastNonce": "1",
+                            "roles": []
+                        }
+                    },
+                    "code": "file:../forwarder/output/forwarder.wasm"
                 }
             }
         },
@@ -69,6 +86,29 @@
                         "data": ""
                     }
                 ],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "nft_add_quantity",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:forwarder2",
+                "function": "nft_add_quantity",
+                "arguments": [
+                    "str:NFT-0001",
+                    "1",
+                    "1200"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "10",
+                "message": "str:ESDTRoleNFTAddQuantity role not found",
                 "gas": "*",
                 "refund": "*"
             }
@@ -110,6 +150,23 @@
                         }
                     },
                     "storage": {},
+                    "code": "file:../forwarder/output/forwarder.wasm"
+                },
+                "sc:forwarder2": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:NFT-0001": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "1"
+                                }
+                            ],
+                            "lastNonce": "1",
+                            "roles": []
+                        }
+                    },
                     "code": "file:../forwarder/output/forwarder.wasm"
                 }
             }
