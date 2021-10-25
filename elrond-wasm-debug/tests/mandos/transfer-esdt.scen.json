@@ -31,7 +31,7 @@
                     }
                 ],
                 "gasLimit": "0x100000000",
-                "gasPrice": "0x01"
+                "gasPrice": "1"
             }
         },
         {

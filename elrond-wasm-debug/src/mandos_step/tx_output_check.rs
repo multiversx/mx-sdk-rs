@@ -54,13 +54,13 @@ pub fn check_tx_output(tx_id: &str, tx_expect: &TxExpect, tx_result: &TxResult) 
             for (expected_log, actual_log) in expected_logs.iter().zip(tx_result.result_logs.iter())
             {
                 assert!(
-					actual_log.equals(expected_log),
+					actual_log.mandos_check(expected_log),
 					"Logs do not match. Tx id: {}.\nWant: Address: {}, Identifier: {}, Topics: {:?}, Data: {}\nHave: Address: {}, Identifier: {}, Topics: {:?}, Data: {}",
 					tx_id,
 					verbose_hex(&expected_log.address.value),
-					bytes_to_string(&expected_log.endpoint.value),
-					expected_log.topics.iter().map(|topic| verbose_hex(&topic.value)).collect::<String>(),
-					verbose_hex(&expected_log.data.value),
+					&expected_log.endpoint,
+					expected_log.topics,
+					&expected_log.data,
 					address_hex(&actual_log.address),
 					bytes_to_string(&actual_log.endpoint),
 					actual_log.topics.iter().map(|topic| verbose_hex(topic)).collect::<String>(),

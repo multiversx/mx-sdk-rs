@@ -114,7 +114,7 @@ pub fn generate_legacy_event_impl(m: &Method, event_id_bytes: &[u8]) -> proc_mac
 			} else {
 				let pat = &arg.pat;
 				quote! {
-					let data_vec = match elrond_wasm::elrond_codec::top_encode_to_vec(&#pat) {
+					let data_vec = match elrond_wasm::elrond_codec::top_encode_to_vec_u8(&#pat) {
 						Result::Ok(data_vec) => data_vec,
 						Result::Err(encode_err) => self.raw_vm_api().signal_error(encode_err.message_bytes()),
 					};

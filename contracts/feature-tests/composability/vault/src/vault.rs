@@ -221,6 +221,7 @@ pub trait Vault {
         );
     }
 
+    /// TODO: invert token_payment and token_nonce, for consistency.
     #[event("accept_funds")]
     fn accept_funds_event(
         &self,

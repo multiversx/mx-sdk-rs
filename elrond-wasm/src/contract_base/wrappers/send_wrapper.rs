@@ -1,5 +1,10 @@
 use crate::{
-    api::{BlockchainApi, ManagedTypeApi, SendApi, StorageReadApi},
+    api::{
+        BlockchainApi, ManagedTypeApi, SendApi, StorageReadApi, CHANGE_OWNER_BUILTIN_FUNC_NAME,
+        ESDT_LOCAL_BURN_FUNC_NAME, ESDT_LOCAL_MINT_FUNC_NAME, ESDT_MULTI_TRANSFER_FUNC_NAME,
+        ESDT_NFT_ADD_QUANTITY_FUNC_NAME, ESDT_NFT_BURN_FUNC_NAME, ESDT_NFT_CREATE_FUNC_NAME,
+        ESDT_NFT_TRANSFER_FUNC_NAME, ESDT_TRANSFER_FUNC_NAME,
+    },
     esdt::ESDTSystemSmartContractProxy,
     types::{
         AsManagedRef, BigUint, ContractCall, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer,
@@ -7,11 +12,6 @@ use crate::{
     },
 };
 use elrond_codec::TopDecode;
-
-pub const ESDT_TRANSFER_STRING: &[u8] = b"ESDTTransfer";
-pub const ESDT_NFT_TRANSFER_STRING: &[u8] = b"ESDTNFTTransfer";
-pub const ESDT_MULTI_TRANSFER_STRING: &[u8] = b"MultiESDTNFTTransfer";
-pub const CHANGE_ADDRESS_BUILTIN_FUNC_NAME: &[u8] = b"ChangeOwnerAddress";
 
 const PERCENTAGE_TOTAL: u64 = 10_000;
 
@@ -146,7 +146,7 @@ where
             self.api.async_call_raw(
                 to,
                 &BigUint::zero(self.type_manager()),
-                &ManagedBuffer::new_from_bytes(self.type_manager(), ESDT_TRANSFER_STRING),
+                &ManagedBuffer::new_from_bytes(self.type_manager(), ESDT_TRANSFER_FUNC_NAME),
                 &arg_buffer,
             )
         } else {
@@ -160,7 +160,7 @@ where
             self.api.async_call_raw(
                 &self.api.get_sc_address(),
                 &BigUint::zero(self.type_manager()),
-                &ManagedBuffer::new_from_bytes(self.type_manager(), ESDT_NFT_TRANSFER_STRING),
+                &ManagedBuffer::new_from_bytes(self.type_manager(), ESDT_NFT_TRANSFER_FUNC_NAME),
                 &arg_buffer,
             )
         }
@@ -193,7 +193,7 @@ where
         self.api.async_call_raw(
             &self.api.get_sc_address(),
             &BigUint::zero(self.type_manager()),
-            &ManagedBuffer::new_from_bytes(self.type_manager(), ESDT_MULTI_TRANSFER_STRING),
+            &ManagedBuffer::new_from_bytes(self.type_manager(), ESDT_MULTI_TRANSFER_FUNC_NAME),
             &arg_buffer,
         );
     }
@@ -208,7 +208,7 @@ where
         let mut contract_call = ContractCall::new(
             self.api.clone(),
             child_sc_address,
-            ManagedBuffer::new_from_bytes(self.type_manager(), CHANGE_ADDRESS_BUILTIN_FUNC_NAME),
+            ManagedBuffer::new_from_bytes(self.type_manager(), CHANGE_OWNER_BUILTIN_FUNC_NAME),
         );
         contract_call.push_endpoint_arg(&new_owner);
         contract_call
@@ -239,9 +239,9 @@ where
         arg_buffer.push_arg(token);
 
         if nonce == 0 {
-            func_name = b"ESDTLocalMint";
+            func_name = ESDT_LOCAL_MINT_FUNC_NAME;
         } else {
-            func_name = b"ESDTNFTAddQuantity";
+            func_name = ESDT_NFT_ADD_QUANTITY_FUNC_NAME;
             arg_buffer.push_arg(nonce);
         }
 
@@ -263,9 +263,9 @@ where
 
         arg_buffer.push_arg(token);
         if nonce == 0 {
-            func_name = b"ESDTLocalBurn";
+            func_name = ESDT_LOCAL_BURN_FUNC_NAME;
         } else {
-            func_name = b"ESDTNFTBurn";
+            func_name = ESDT_NFT_BURN_FUNC_NAME;
             arg_buffer.push_arg(&nonce);
         }
 
@@ -315,7 +315,7 @@ where
 
         let output = self.call_local_esdt_built_in_function(
             self.api.get_gas_left(),
-            &ManagedBuffer::new_from_bytes(self.type_manager(), b"ESDTNFTCreate"),
+            &ManagedBuffer::new_from_bytes(self.type_manager(), ESDT_NFT_CREATE_FUNC_NAME),
             &arg_buffer,
         );
 

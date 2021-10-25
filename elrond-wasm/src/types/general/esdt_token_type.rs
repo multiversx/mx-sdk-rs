@@ -17,6 +17,14 @@ pub enum EsdtTokenType {
 }
 
 impl EsdtTokenType {
+    pub fn based_on_token_nonce(token_nonce: u64) -> Self {
+        if token_nonce == 0 {
+            EsdtTokenType::Fungible
+        } else {
+            EsdtTokenType::SemiFungible
+        }
+    }
+
     pub fn as_u8(&self) -> u8 {
         match self {
             Self::Fungible => 0,

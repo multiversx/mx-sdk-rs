@@ -26,12 +26,12 @@
                             "instances": [
                                 {
                                     "nonce": "1",
-                                    "balance": "1"
+                                    "balance": "1305"
                                 }
                             ],
                             "lastNonce": "1",
                             "roles": [
-                                "ESDTRoleNFTCreate"
+                                "ESDTRoleNFTBurn"
                             ]
                         }
                     },
@@ -41,30 +41,34 @@
         },
         {
             "step": "scCall",
-            "txId": "1",
-            "comment": "Attributes are Color(128, 128, 128)",
+            "txId": "nft_burn",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "function": "nft_create",
+                "function": "nft_burn",
                 "arguments": [
                     "str:NFT-0001",
                     "1",
-                    "str:nft-create-name",
-                    "0",
-                    "str:nft-create-hash-----------------",
-                    "0x808080",
-                    "str:nft-create-uri"
+                    "1200"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [
-                    "2",
-                    "2"
-                ],
+                "out": [],
                 "status": "0",
+                "logs": [
+                    {
+                        "address": "sc:forwarder",
+                        "endpoint": "str:ESDTNFTBurn",
+                        "topics": [
+                            "str:NFT-0001",
+                            "1",
+                            "1200"
+                        ],
+                        "data": ""
+                    }
+                ],
                 "gas": "*",
                 "refund": "*"
             }
@@ -96,23 +100,12 @@
                             "instances": [
                                 {
                                     "nonce": "1",
-                                    "balance": "1"
-                                },
-                                {
-                                    "nonce": "2",
-                                    "balance": "1",
-                                    "creator": "sc:forwarder",
-                                    "royalties": "0",
-                                    "hash": "str:nft-create-hash-----------------",
-                                    "uri": [
-                                        "str:nft-create-uri"
-                                    ],
-                                    "attributes": "0x808080"
+                                    "balance": "105"
                                 }
                             ],
-                            "lastNonce": "2",
+                            "lastNonce": "1",
                             "roles": [
-                                "ESDTRoleNFTCreate"
+                                "ESDTRoleNFTBurn"
                             ]
                         }
                     },

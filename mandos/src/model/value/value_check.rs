@@ -49,7 +49,7 @@ where
     T: InterpretableFrom<ValueSubTree> + Default,
 {
     fn default() -> Self {
-        CheckValue::Equal(T::default())
+        CheckValue::Star
     }
 }
 

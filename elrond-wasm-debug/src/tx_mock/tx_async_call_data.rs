@@ -34,7 +34,7 @@ pub fn async_call_tx_input(async_data: &AsyncCallTxData) -> TxInput {
 
 pub fn async_callback_tx_input(async_data: &AsyncCallTxData, async_result: &TxResult) -> TxInput {
     let mut args: Vec<Vec<u8>> = Vec::new();
-    let serialized_bytes = top_encode_to_vec(&async_result.result_status).unwrap();
+    let serialized_bytes = top_encode_to_vec_u8(&async_result.result_status).unwrap();
     args.push(serialized_bytes);
     if async_result.result_status == 0 {
         args.extend_from_slice(async_result.result_values.as_slice());
