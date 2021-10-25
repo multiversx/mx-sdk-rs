@@ -1,6 +1,7 @@
 use std::path::{Path, PathBuf};
 
 use elrond_wasm::contract_base::CallableContract;
+use mandos::{interpret_trait::InterpreterContext, value_interpreter::interpret_string};
 
 use crate::DebugApi;
 
@@ -33,10 +34,14 @@ impl BlockchainMock {
 
     pub fn register_contract(
         &mut self,
-        path: &str,
+        expression: &str,
         new_contract_closure: Box<dyn Fn(DebugApi) -> Box<dyn CallableContract<DebugApi>>>,
     ) {
+        let contract_bytes = interpret_string(
+            expression,
+            &InterpreterContext::new(self.current_dir.clone()),
+        );
         self.contract_map
-            .register_contract(path, new_contract_closure);
+            .register_contract(contract_bytes, new_contract_closure);
     }
 }
