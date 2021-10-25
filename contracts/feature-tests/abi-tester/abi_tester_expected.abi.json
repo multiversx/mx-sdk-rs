@@ -473,8 +473,12 @@
                     "discriminant": 2
                 },
                 {
-                    "name": "Invalid",
+                    "name": "Meta",
                     "discriminant": 3
+                },
+                {
+                    "name": "Invalid",
+                    "discriminant": 4
                 }
             ]
         },
