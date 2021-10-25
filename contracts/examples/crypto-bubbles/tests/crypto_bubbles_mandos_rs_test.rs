@@ -1,13 +1,15 @@
 use elrond_wasm::*;
 use elrond_wasm_debug::*;
 
-fn contract_map() -> ContractMap<DebugApi> {
-    let mut contract_map = ContractMap::new();
-    contract_map.register_contract(
-        "file:../output/crypto-bubbles.wasm",
+fn contract_map() -> BlockchainMock {
+    let mut blockchain = BlockchainMock::new();
+    blockchain.set_current_dir_from_workspace("contracts/examples/crypto-bubbles");
+
+    blockchain.register_contract(
+        "file:output/crypto-bubbles.wasm",
         Box::new(|context| Box::new(crypto_bubbles::contract_obj(context))),
     );
-    contract_map
+    blockchain
 }
 
 #[test]

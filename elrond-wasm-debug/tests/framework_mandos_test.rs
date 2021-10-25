@@ -2,8 +2,8 @@ use elrond_wasm_debug::*;
 
 // These tests don't really test any contract, but the testing framework itslef.
 
-fn contract_map() -> ContractMap<DebugApi> {
-    ContractMap::new()
+fn contract_map() -> BlockchainMock {
+    BlockchainMock::new()
 }
 
 /// Checks that externalSteps work fine.
