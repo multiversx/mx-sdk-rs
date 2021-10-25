@@ -1,7 +1,7 @@
 use elrond_wasm::types::Address;
 use num_bigint::BigUint;
 use num_traits::Zero;
-use std::{collections::HashMap, rc::Rc};
+use std::{collections::HashMap, path::PathBuf, rc::Rc};
 
 use crate::{
     tx_mock::{BlockchainUpdate, TxCache},
@@ -19,6 +19,7 @@ pub struct BlockchainMock {
     pub previous_block_info: BlockInfo,
     pub current_block_info: BlockInfo,
     pub contract_map: ContractMap<DebugApi>,
+    pub current_dir: PathBuf,
 }
 
 impl BlockchainMock {
@@ -29,6 +30,7 @@ impl BlockchainMock {
             previous_block_info: BlockInfo::new(),
             current_block_info: BlockInfo::new(),
             contract_map: ContractMap::default(),
+            current_dir: std::env::current_dir().unwrap(),
         }
     }
 }

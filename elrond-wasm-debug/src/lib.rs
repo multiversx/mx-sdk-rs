@@ -20,6 +20,7 @@ pub use mandos_step::*;
 pub use arwen_mandos_runner::mandos_go;
 pub use execute_mandos::mandos_rs;
 pub use tx_mock::DebugApi;
+pub use world_mock::BlockchainMock;
 
 #[macro_use]
 extern crate alloc;

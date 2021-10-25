@@ -1,19 +1,19 @@
 use elrond_wasm::*;
 use elrond_wasm_debug::*;
 
-fn contract_map() -> ContractMap<DebugApi> {
-    let mut contract_map = ContractMap::new();
+fn contract_map() -> BlockchainMock {
+    let mut blockchain = BlockchainMock::new();
 
-    contract_map.register_contract(
+    blockchain.register_contract(
         "file:../kitty-ownership/output/kitty-ownership.wasm",
         Box::new(|context| Box::new(kitty_ownership::contract_obj(context))),
     );
-    contract_map.register_contract(
+    blockchain.register_contract(
         "file:output/kitty-auction.wasm",
         Box::new(|context| Box::new(kitty_auction::contract_obj(context))),
     );
 
-    contract_map
+    blockchain
 }
 #[test]
 fn bid_first_rs() {

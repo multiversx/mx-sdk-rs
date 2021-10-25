@@ -2,13 +2,13 @@ use elrond_wasm::*;
 use elrond_wasm_debug::*;
 
 #[allow(unused)]
-fn contract_map() -> ContractMap<DebugApi> {
-    let mut contract_map = ContractMap::new();
-    contract_map.register_contract(
+fn contract_map() -> BlockchainMock {
+    let mut blockchain = BlockchainMock::new();
+    blockchain.register_contract(
         "file:output/egld-esdt-swap.wasm",
         Box::new(|context| Box::new(egld_esdt_swap::contract_obj(context))),
     );
-    contract_map
+    blockchain
 }
 
 #[test]
