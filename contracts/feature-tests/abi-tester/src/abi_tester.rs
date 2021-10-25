@@ -97,6 +97,16 @@ pub trait AbiTester {
         EsdtLocalRole::None
     }
 
+    #[endpoint]
+    fn esdt_token_payment(&self) -> EsdtTokenPayment<Self::Api> {
+        unreachable!()
+    }
+
+    #[endpoint]
+    fn esdt_token_data(&self) -> EsdtTokenData<Self::Api> {
+        unreachable!()
+    }
+
     #[view]
     #[storage_mapper("sample_storage_mapper")]
     fn sample_storage_mapper(&self) -> SingleValueMapper<OnlyShowsUpAsNested10>;
