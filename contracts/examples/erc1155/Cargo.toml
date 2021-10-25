@@ -15,15 +15,15 @@ wasm-output-mode = ["elrond-wasm-node"]
 path="../erc1155-user-mock"
 
 [dependencies.elrond-wasm]
-version = "0.21.0"
+version = "0.21.1"
 path = "../../../elrond-wasm"
 features = ["derive"]
 
 [dependencies.elrond-wasm-node]
-version = "0.21.0"
+version = "0.21.1"
 path = "../../../elrond-wasm-node"
 optional = true
 
 [dev-dependencies.elrond-wasm-debug]
-version = "0.21.0"
+version = "0.21.1"
 path = "../../../elrond-wasm-debug"
