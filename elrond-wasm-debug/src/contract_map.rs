@@ -4,7 +4,7 @@ use super::*;
 
 use alloc::{boxed::Box, vec::Vec};
 use elrond_wasm::contract_base::CallableContract;
-use std::{collections::HashMap, fmt};
+use std::{collections::HashMap, fmt, fs};
 
 pub type ContractCallFactory<A> = Box<dyn Fn(DebugApi) -> Box<dyn CallableContract<A>>>;
 
@@ -45,8 +45,13 @@ impl<A> ContractMap<A> {
         path: &str,
         new_contract_closure: Box<dyn Fn(DebugApi) -> Box<dyn CallableContract<A>>>,
     ) {
-        self.factories
-            .insert(path.as_bytes().to_vec(), new_contract_closure);
+        let contract_path = path.strip_prefix("file:").unwrap();
+        let mut absolute_path = std::env::current_dir().unwrap();
+        absolute_path.push(contract_path);
+        let contract_bytes = fs::read(&absolute_path)
+            .unwrap_or_else(|e| panic!("contract not found: {} {:?}", e, &absolute_path));
+        let previous_entry = self.factories.insert(contract_bytes, new_contract_closure);
+        assert!(previous_entry.is_none(), "contract inserted twice");
     }
 }
 
