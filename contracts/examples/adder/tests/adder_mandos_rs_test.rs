@@ -5,7 +5,6 @@ fn contract_map() -> BlockchainMock {
     let mut blockchain = BlockchainMock::new();
     blockchain.set_current_dir_from_workspace("contracts/examples/adder");
 
-    // let mut blockchain = BlockchainMock::new();
     blockchain.register_contract(
         "file:output/adder.wasm",
         Box::new(|context| Box::new(adder::contract_obj(context))),
