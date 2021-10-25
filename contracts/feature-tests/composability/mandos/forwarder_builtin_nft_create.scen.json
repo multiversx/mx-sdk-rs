@@ -36,6 +36,23 @@
                         }
                     },
                     "code": "file:../forwarder/output/forwarder.wasm"
+                },
+                "sc:forwarder2": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:NFT-0001": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "1"
+                                }
+                            ],
+                            "lastNonce": "1",
+                            "roles": []
+                        }
+                    },
+                    "code": "file:../forwarder/output/forwarder.wasm"
                 }
             }
         },
@@ -94,6 +111,34 @@
             }
         },
         {
+            "step": "scCall",
+            "txId": "1",
+            "comment": "Attributes are Color(128, 128, 128)",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:forwarder2",
+                "function": "nft_create",
+                "arguments": [
+                    "str:NFT-0001",
+                    "1",
+                    "str:nft-create-name",
+                    "0",
+                    "str:nft-create-hash-----------------",
+                    "0x808080",
+                    "str:nft-create-uri"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "10",
+                "message": "str:ESDTRoleNFTCreate role not found",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
             "step": "checkState",
             "accounts": {
                 "address:a_user": {
@@ -141,6 +186,23 @@
                         }
                     },
                     "storage": {},
+                    "code": "file:../forwarder/output/forwarder.wasm"
+                },
+                "sc:forwarder2": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:NFT-0001": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "1"
+                                }
+                            ],
+                            "lastNonce": "1",
+                            "roles": []
+                        }
+                    },
                     "code": "file:../forwarder/output/forwarder.wasm"
                 }
             }
