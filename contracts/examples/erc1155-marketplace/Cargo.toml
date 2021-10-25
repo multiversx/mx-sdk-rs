@@ -17,7 +17,6 @@ path = "../erc1155"
 [dependencies.elrond-wasm]
 version = "0.21.1"
 path = "../../../elrond-wasm"
-features = ["derive"]
 
 [dependencies.elrond-wasm-node]
 version = "0.21.1"

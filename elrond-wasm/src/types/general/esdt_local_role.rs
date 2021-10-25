@@ -1,7 +1,7 @@
 use elrond_codec::elrond_codec_derive::{NestedDecode, NestedEncode, TopDecode, TopEncode};
 
 use crate as elrond_wasm; // needed by the TypeAbi generated code
-use elrond_wasm_derive::TypeAbi;
+use crate::derive::TypeAbi;
 
 const ESDT_ROLE_NONE: &[u8] = &[];
 const ESDT_ROLE_LOCAL_MINT: &[u8] = b"ESDTRoleLocalMint";
