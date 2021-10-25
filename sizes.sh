@@ -7,7 +7,6 @@ stat --printf="crypto-bubbles %s\n" contracts/examples/crypto-bubbles/output/cry
 stat --printf="crowdfunding-erc20 %s\n" contracts/examples/crowdfunding-erc20/output/crowdfunding-erc20.wasm
 stat --printf="crowdfunding-esdt %s\n" contracts/examples/crowdfunding-esdt/output/crowdfunding-esdt.wasm
 stat --printf="factorial %s\n" contracts/examples/factorial/output/factorial.wasm
-stat --printf="lottery-egld %s\n" contracts/examples/lottery-egld/output/lottery-egld.wasm
 stat --printf="lottery-erc20 %s\n" contracts/examples/lottery-erc20/output/lottery-erc20.wasm
 stat --printf="lottery-esdt %s\n" contracts/examples/lottery-esdt/output/lottery-esdt.wasm
 stat --printf="erc20 %s\n" contracts/examples/simple-erc20/output/simple-erc20.wasm
