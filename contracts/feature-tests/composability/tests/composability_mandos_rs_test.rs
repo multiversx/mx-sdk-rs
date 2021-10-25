@@ -5,32 +5,32 @@ fn contract_map() -> ContractMap<DebugApi> {
     let mut contract_map = ContractMap::new();
 
     contract_map.register_contract(
-        "file:../forwarder/output/forwarder.wasm",
+        "file:forwarder/output/forwarder.wasm",
         Box::new(|context| Box::new(forwarder::contract_obj(context))),
     );
 
     contract_map.register_contract(
-        "file:../forwarder-raw/output/forwarder-raw.wasm",
+        "file:forwarder-raw/output/forwarder-raw.wasm",
         Box::new(|context| Box::new(forwarder_raw::contract_obj(context))),
     );
 
     contract_map.register_contract(
-        "file:../proxy-test-first/output/proxy-test-first.wasm",
+        "file:proxy-test-first/output/proxy-test-first.wasm",
         Box::new(|context| Box::new(proxy_test_first::contract_obj(context))),
     );
 
     contract_map.register_contract(
-        "file:../proxy-test-second/output/proxy-test-second.wasm",
+        "file:proxy-test-second/output/proxy-test-second.wasm",
         Box::new(|context| Box::new(proxy_test_second::contract_obj(context))),
     );
 
     contract_map.register_contract(
-        "file:../recursive-caller/output/recursive-caller.wasm",
+        "file:recursive-caller/output/recursive-caller.wasm",
         Box::new(|context| Box::new(recursive_caller::contract_obj(context))),
     );
 
     contract_map.register_contract(
-        "file:../vault/output/vault.wasm",
+        "file:vault/output/vault.wasm",
         Box::new(|context| Box::new(vault::contract_obj(context))),
     );
 
