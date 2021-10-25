@@ -188,6 +188,8 @@ where
         if token_type == EsdtTokenType::Fungible {
             contract_call.push_endpoint_arg(initial_supply);
             contract_call.push_endpoint_arg(&properties.num_decimals);
+        } else if token_type == EsdtTokenType::Meta {
+            contract_call.push_endpoint_arg(&properties.num_decimals);
         }
 
         set_token_property(&mut contract_call, &b"canFreeze"[..], properties.can_freeze);
