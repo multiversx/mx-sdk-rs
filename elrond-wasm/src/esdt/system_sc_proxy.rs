@@ -17,6 +17,7 @@ pub const ESDT_SYSTEM_SC_ADDRESS_ARRAY: [u8; 32] =
 const ISSUE_FUNGIBLE_ENDPOINT_NAME: &[u8] = b"issue";
 const ISSUE_NON_FUNGIBLE_ENDPOINT_NAME: &[u8] = b"issueNonFungible";
 const ISSUE_SEMI_FUNGIBLE_ENDPOINT_NAME: &[u8] = b"issueSemiFungible";
+const REGISTER_META_ESDT_ENDPOINT_NAME: &[u8] = b"registerMetaESDT";
 
 /// Proxy for the ESDT system smart contract.
 /// Unlike other contract proxies, this one has a fixed address,
@@ -123,6 +124,36 @@ where
         )
     }
 
+    /// Produces a contract call to the ESDT system SC,
+    /// which causes it to register a new Meta ESDT token.
+    pub fn register_meta_esdt(
+        self,
+        issue_cost: BigUint<SA>,
+        token_display_name: &ManagedBuffer<SA>,
+        token_ticker: &ManagedBuffer<SA>,
+        properties: MetaTokenProperties,
+    ) -> ContractCall<SA, ()> {
+        let zero = BigUint::zero(self.api.clone());
+        self.issue(
+            issue_cost,
+            EsdtTokenType::Meta,
+            token_display_name,
+            token_ticker,
+            &zero,
+            TokenProperties {
+                num_decimals: properties.num_decimals,
+                can_freeze: properties.can_freeze,
+                can_wipe: properties.can_wipe,
+                can_pause: properties.can_pause,
+                can_mint: false,
+                can_burn: false,
+                can_change_owner: properties.can_change_owner,
+                can_upgrade: properties.can_upgrade,
+                can_add_special_roles: properties.can_add_special_roles,
+            },
+        )
+    }
+
     /// Deduplicates code from all the possible issue functions
     fn issue(
         self,
@@ -140,6 +171,7 @@ where
             EsdtTokenType::Fungible => ISSUE_FUNGIBLE_ENDPOINT_NAME,
             EsdtTokenType::NonFungible => ISSUE_NON_FUNGIBLE_ENDPOINT_NAME,
             EsdtTokenType::SemiFungible => ISSUE_SEMI_FUNGIBLE_ENDPOINT_NAME,
+            EsdtTokenType::Meta => REGISTER_META_ESDT_ENDPOINT_NAME,
             EsdtTokenType::Invalid => &[],
         };
 
@@ -155,6 +187,8 @@ where
 
         if token_type == EsdtTokenType::Fungible {
             contract_call.push_endpoint_arg(initial_supply);
+            contract_call.push_endpoint_arg(&properties.num_decimals);
+        } else if token_type == EsdtTokenType::Meta {
             contract_call.push_endpoint_arg(&properties.num_decimals);
         }
 

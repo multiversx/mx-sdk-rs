@@ -3,6 +3,7 @@ use elrond_codec::*;
 const ESDT_TYPE_FUNGIBLE: &[u8] = b"FungibleESDT";
 const ESDT_TYPE_NON_FUNGIBLE: &[u8] = b"NonFungibleESDT";
 const ESDT_TYPE_SEMI_FUNGIBLE: &[u8] = b"SemiFungibleESDT";
+const ESDT_TYPE_META: &[u8] = b"MetaESDT";
 const ESDT_TYPE_INVALID: &[u8] = &[];
 
 use crate as elrond_wasm; // needed by the TypeAbi generated code
@@ -14,6 +15,7 @@ pub enum EsdtTokenType {
     Fungible,
     NonFungible,
     SemiFungible,
+    Meta,
     Invalid,
 }
 
@@ -31,7 +33,8 @@ impl EsdtTokenType {
             Self::Fungible => 0,
             Self::NonFungible => 1,
             Self::SemiFungible => 2,
-            Self::Invalid => 3,
+            Self::Meta => 3,
+            Self::Invalid => 4,
         }
     }
 
@@ -40,6 +43,7 @@ impl EsdtTokenType {
             Self::Fungible => ESDT_TYPE_FUNGIBLE,
             Self::NonFungible => ESDT_TYPE_NON_FUNGIBLE,
             Self::SemiFungible => ESDT_TYPE_SEMI_FUNGIBLE,
+            Self::Meta => ESDT_TYPE_META,
             Self::Invalid => ESDT_TYPE_INVALID,
         }
     }
@@ -52,6 +56,7 @@ impl From<u8> for EsdtTokenType {
             0 => Self::Fungible,
             1 => Self::NonFungible,
             2 => Self::SemiFungible,
+            3 => Self::Meta,
             _ => Self::Invalid,
         }
     }
@@ -66,6 +71,8 @@ impl<'a> From<&'a [u8]> for EsdtTokenType {
             Self::NonFungible
         } else if byte_slice == ESDT_TYPE_SEMI_FUNGIBLE {
             Self::SemiFungible
+        } else if byte_slice == ESDT_TYPE_META {
+            Self::Meta
         } else {
             Self::Invalid
         }
