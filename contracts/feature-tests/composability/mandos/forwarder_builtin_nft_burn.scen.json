@@ -107,7 +107,7 @@
             },
             "expect": {
                 "status": "10",
-                "message": "str:ESDTRoleNFTBurn role not found",
+                "message": "str:action is not allowed",
                 "gas": "*",
                 "refund": "*"
             }
