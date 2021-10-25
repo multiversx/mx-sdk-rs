@@ -3,6 +3,8 @@ use elrond_wasm_debug::*;
 
 fn contract_map() -> BlockchainMock {
     let mut blockchain = BlockchainMock::new();
+    blockchain.set_current_dir_from_workspace("contracts/examples/lottery-erc20");
+
     blockchain.register_contract(
         "file:output/lottery-erc20.wasm",
         Box::new(|context| Box::new(lottery_erc20::contract_obj(context))),
