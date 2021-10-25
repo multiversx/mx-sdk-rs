@@ -1,13 +1,12 @@
-use std::path::Path;
+use std::path::PathBuf;
 
 #[derive(Default)]
 pub struct InterpreterContext {
-    pub context_path: String,
+    pub context_path: PathBuf,
 }
 
 impl InterpreterContext {
-    pub fn new(path: &Path) -> Self {
-        let context_path = path.to_str().unwrap().to_string();
+    pub fn new(context_path: PathBuf) -> Self {
         InterpreterContext { context_path }
     }
 }

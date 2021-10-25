@@ -9,7 +9,7 @@ use std::{path::Path, rc::Rc};
 /// Uses a contract map to replace the references to the wasm bytecode
 /// with the contracts running in debug mode.
 pub fn mandos_rs<P: AsRef<Path>>(relative_path: P, blockchain_mock: BlockchainMock) {
-    let mut absolute_path = std::env::current_dir().unwrap();
+    let mut absolute_path = blockchain_mock.current_dir.clone();
     absolute_path.push(relative_path);
     let mut state = Rc::new(blockchain_mock);
     parse_execute_mandos_steps(absolute_path.as_ref(), &mut state);
