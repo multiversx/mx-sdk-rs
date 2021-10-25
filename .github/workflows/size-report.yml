@@ -17,18 +17,18 @@ jobs:
           workflow: actions.yml
           name: sizes
           commit: ${{github.event.pull_request.head.sha}}
-          path: base-sizes.txt
+          path: base-sizes
       - name: Download current branch report
         uses: dawidd6/action-download-artifact@v2
         with:
           workflow: actions.yml
           name: sizes
-          path: current-sizes.txt
+          path: current-sizes
       - name: Generate report
         id: sizes-report
         run: |
           source .github/workflows/env
-          python tools/size-report/size_report.py base-sizes.txt current-sizes.txt --allow-missing
+          python tools/size-report/size_report.py base-sizes/sizes.txt current-sizes/sizes.txt --allow-missing
       - name: Find sizes report comment
         uses: peter-evans/find-comment@v1
         id: fc
