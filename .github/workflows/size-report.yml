@@ -10,6 +10,12 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
+      - name: Wait for the base report action to complete
+        uses: lewagon/wait-on-check-action@v1.0.0
+        with:
+          ref: ${{github.event.pull_request.base.sha}}
+          check-name: wasm_test
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Download base report
         uses: dawidd6/action-download-artifact@v2
         continue-on-error: true
@@ -18,6 +24,12 @@ jobs:
           name: sizes
           commit: ${{github.event.pull_request.base.sha}}
           path: base-sizes
+      - name: Wait for the current report action to complete
+        uses: lewagon/wait-on-check-action@v1.0.0
+        with:
+          ref: ${{github.event.pull_request.head.sha}}
+          check-name: wasm_test
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Download current branch report
         uses: dawidd6/action-download-artifact@v2
         with:
