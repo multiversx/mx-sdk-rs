@@ -1,26 +1,21 @@
 use crate::{
-    abi::TypeAbi,
     api::{Handle, ManagedTypeApi},
     types::{BigUint, ManagedBuffer, ManagedType, ManagedVecItem},
 };
-use alloc::string::String;
 
 use super::{EsdtTokenType, TokenIdentifier};
 
 use elrond_codec::elrond_codec_derive::{NestedDecode, NestedEncode, TopDecode, TopEncode};
 
-#[derive(TopDecode, TopEncode, NestedDecode, NestedEncode, Clone, PartialEq, Debug)]
+use crate as elrond_wasm; // needed by the TypeAbi generated code
+use elrond_wasm_derive::TypeAbi;
+
+#[derive(TopDecode, TopEncode, NestedDecode, NestedEncode, TypeAbi, Clone, PartialEq, Debug)]
 pub struct EsdtTokenPayment<M: ManagedTypeApi> {
     pub token_type: EsdtTokenType,
     pub token_identifier: TokenIdentifier<M>,
     pub token_nonce: u64,
     pub amount: BigUint<M>,
-}
-
-impl<M: ManagedTypeApi> TypeAbi for EsdtTokenPayment<M> {
-    fn type_name() -> String {
-        "EsdtTokenPayment".into()
-    }
 }
 
 impl<M: ManagedTypeApi> EsdtTokenPayment<M> {
