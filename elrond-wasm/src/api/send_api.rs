@@ -4,10 +4,6 @@ use crate::types::{
     ManagedInto, ManagedVec, TokenIdentifier,
 };
 
-pub const ESDT_TRANSFER_STRING: &[u8] = b"ESDTTransfer";
-pub const ESDT_NFT_TRANSFER_STRING: &[u8] = b"ESDTNFTTransfer";
-pub const ESDT_MULTI_TRANSFER_STRING: &[u8] = b"MultiESDTNFTTransfer";
-
 /// API that groups methods that either send EGLD or ESDT, or that call other contracts.
 pub trait SendApi: ManagedTypeApi + BlockchainApi + Clone + Sized {
     /// Sends EGLD to a given address, directly.

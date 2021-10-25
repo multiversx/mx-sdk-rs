@@ -4,7 +4,7 @@ use core::fmt::Debug;
 
 /// Calls `top_encode_or_exit` and panics if an encoding error occurs.
 /// Do not use in smart contracts!
-pub fn top_encode_to_vec_or_panic<T: TopEncode>(obj: &T) -> Vec<u8> {
+pub fn top_encode_to_vec_u8_or_panic<T: TopEncode>(obj: &T) -> Vec<u8> {
     let mut bytes = Vec::<u8>::new();
     obj.top_encode_or_exit(&mut bytes, (), encode_panic_exit);
     bytes
@@ -29,8 +29,8 @@ fn encode_panic_exit(_: (), en_err: EncodeError) -> ! {
 /// compares that the outputs are equal, then returns the result.
 /// To be used in serialization tests.
 pub fn check_top_encode<T: TopEncode>(obj: &T) -> Vec<u8> {
-    let fast_exit_bytes = top_encode_to_vec_or_panic(obj);
-    let result_bytes = top_encode_to_vec(obj).unwrap();
+    let fast_exit_bytes = top_encode_to_vec_u8_or_panic(obj);
+    let result_bytes = top_encode_to_vec_u8(obj).unwrap();
     assert_eq!(fast_exit_bytes, result_bytes);
     fast_exit_bytes
 }

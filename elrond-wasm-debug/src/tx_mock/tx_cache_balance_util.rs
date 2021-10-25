@@ -1,11 +1,7 @@
 use elrond_wasm::types::Address;
 use num_bigint::BigUint;
-use num_traits::Zero;
 
-use crate::{
-    address_hex,
-    tx_mock::{TxInputESDT, TxPanic},
-};
+use crate::{tx_mock::TxPanic, world_mock::EsdtInstanceMetadata};
 
 use super::TxCache;
 
@@ -37,56 +33,33 @@ impl TxCache {
         });
     }
 
+    #[allow(clippy::redundant_closure)] // clippy is wrong here, `.unwrap_or_else(panic_insufficient_funds)` won't compile
     pub fn subtract_esdt_balance(
         &self,
         address: &Address,
         esdt_token_identifier: &[u8],
         nonce: u64,
         value: &BigUint,
-    ) {
+    ) -> EsdtInstanceMetadata {
         self.with_account_mut(address, |account| {
             let esdt_data_map = &mut account.esdt;
             let esdt_data = esdt_data_map
                 .get_mut_by_identifier(esdt_token_identifier)
-                .unwrap_or_else(|| {
-                    panic!(
-                        "Account {} has no esdt tokens with name {}",
-                        address_hex(address),
-                        String::from_utf8(esdt_token_identifier.to_vec()).unwrap()
-                    )
-                });
+                .unwrap_or_else(|| panic_insufficient_funds());
 
             let esdt_instances = &mut esdt_data.instances;
-            let esdt_instance = esdt_instances.get_mut_by_nonce(nonce).unwrap_or_else(|| {
-                panic!(
-                    "Esdt token {} has no nonce {}",
-                    String::from_utf8(esdt_token_identifier.to_vec()).unwrap(),
-                    nonce.to_string()
-                )
-            });
+            let esdt_instance = esdt_instances
+                .get_mut_by_nonce(nonce)
+                .unwrap_or_else(|| panic_insufficient_funds());
             let esdt_balance = &mut esdt_instance.balance;
             if &*esdt_balance < value {
-                std::panic::panic_any(TxPanic {
-                    status: 10,
-                    message: b"insufficient funds".to_vec(),
-                });
+                panic_insufficient_funds();
             }
 
             *esdt_balance -= value;
-        });
-    }
 
-    pub fn subtract_multi_esdt_balance(&self, address: &Address, esdt_transfers: &[TxInputESDT]) {
-        for esdt_transfer in esdt_transfers {
-            if !esdt_transfer.value.is_zero() {
-                self.subtract_esdt_balance(
-                    address,
-                    esdt_transfer.token_identifier.as_slice(),
-                    esdt_transfer.nonce,
-                    &esdt_transfer.value,
-                );
-            }
-        }
+            esdt_instance.metadata.clone()
+        })
     }
 
     pub fn increase_esdt_balance(
@@ -95,32 +68,35 @@ impl TxCache {
         esdt_token_identifier: &[u8],
         nonce: u64,
         value: &BigUint,
+        esdt_metadata: EsdtInstanceMetadata,
     ) {
         self.with_account_mut(address, |account| {
-            if let Some(esdt_data) = account.esdt.get_mut_by_identifier(esdt_token_identifier) {
-                esdt_data.instances.add(nonce, value.clone());
-            } else {
-                account
-                    .esdt
-                    .push_esdt(esdt_token_identifier.to_vec(), nonce, value.clone());
-            }
+            account.esdt.increase_balance(
+                esdt_token_identifier.to_vec(),
+                nonce,
+                value,
+                esdt_metadata,
+            );
         });
     }
 
-    pub fn increase_multi_esdt_balance(
-        &mut self,
-        address: &Address,
-        esdt_transfers: &[TxInputESDT],
+    pub fn transfer_esdt_balance(
+        &self,
+        from: &Address,
+        to: &Address,
+        esdt_token_identifier: &[u8],
+        nonce: u64,
+        value: &BigUint,
     ) {
-        for esdt_transfer in esdt_transfers {
-            if !esdt_transfer.value.is_zero() {
-                self.increase_esdt_balance(
-                    address,
-                    esdt_transfer.token_identifier.as_slice(),
-                    esdt_transfer.nonce,
-                    &esdt_transfer.value,
-                );
-            }
-        }
+        let metadata = self.subtract_esdt_balance(from, esdt_token_identifier, nonce, value);
+
+        self.increase_esdt_balance(to, esdt_token_identifier, nonce, value, metadata);
     }
+}
+
+fn panic_insufficient_funds() -> ! {
+    std::panic::panic_any(TxPanic {
+        status: 10,
+        message: b"insufficient funds".to_vec(),
+    });
 }

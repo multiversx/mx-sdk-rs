@@ -6,11 +6,11 @@ use serde::{Deserialize, Serialize};
 pub struct CheckLogRaw {
     pub address: ValueSubTree,
 
-    pub endpoint: ValueSubTree,
+    pub endpoint: CheckBytesValueRaw,
 
     #[serde(default)]
     #[serde(skip_serializing_if = "Vec::is_empty")]
-    pub topics: Vec<ValueSubTree>,
+    pub topics: Vec<CheckBytesValueRaw>,
 
-    pub data: ValueSubTree,
+    pub data: CheckBytesValueRaw,
 }

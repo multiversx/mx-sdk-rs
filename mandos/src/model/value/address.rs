@@ -5,7 +5,7 @@ use crate::{
 
 use std::{cmp::Ordering, fmt};
 
-#[derive(Debug, Eq)]
+#[derive(Debug, Eq, Default)]
 pub struct AddressKey {
     pub value: [u8; 32],
     pub original: String,

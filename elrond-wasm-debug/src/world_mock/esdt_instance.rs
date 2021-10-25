@@ -1,16 +1,14 @@
 use num_bigint::BigUint;
 use num_traits::Zero;
 
+use super::EsdtInstanceMetadata;
+
 /// Holds the data for a Elrond standard digital token transaction
 #[derive(Clone, Default, Debug)]
 pub struct EsdtInstance {
     pub nonce: u64,
     pub balance: BigUint,
-    pub creator: Option<Vec<u8>>,
-    pub royalties: u64,
-    pub hash: Option<Vec<u8>>,
-    pub uri: Option<Vec<u8>>,
-    pub attributes: Vec<u8>,
+    pub metadata: EsdtInstanceMetadata,
 }
 
 impl EsdtInstance {
@@ -18,11 +16,7 @@ impl EsdtInstance {
         EsdtInstance {
             nonce,
             balance: BigUint::zero(),
-            creator: None,
-            royalties: 0,
-            hash: None,
-            uri: None,
-            attributes: Vec::new(),
+            metadata: EsdtInstanceMetadata::default(),
         }
     }
 
@@ -30,11 +24,7 @@ impl EsdtInstance {
         EsdtInstance {
             nonce: 0,
             balance,
-            creator: None,
-            royalties: 0,
-            hash: None,
-            uri: None,
-            attributes: Vec::new(),
+            metadata: EsdtInstanceMetadata::default(),
         }
     }
 
