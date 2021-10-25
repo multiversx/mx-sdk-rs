@@ -5,11 +5,11 @@ fn contract_map() -> ContractMap<DebugApi> {
     let mut contract_map = ContractMap::new();
 
     contract_map.register_contract(
-        "file:../../kitty-ownership/output/kitty-ownership.wasm",
+        "file:../kitty-ownership/output/kitty-ownership.wasm",
         Box::new(|context| Box::new(kitty_ownership::contract_obj(context))),
     );
     contract_map.register_contract(
-        "file:../output/kitty-auction.wasm",
+        "file:output/kitty-auction.wasm",
         Box::new(|context| Box::new(kitty_auction::contract_obj(context))),
     );
 

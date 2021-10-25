@@ -5,11 +5,11 @@ use elrond_wasm_debug::*;
 fn contract_map() -> ContractMap<DebugApi> {
     let mut contract_map = ContractMap::new();
     contract_map.register_contract(
-        "file:../output/erc1155-marketplace.wasm",
+        "file:output/erc1155-marketplace.wasm",
         Box::new(|context| Box::new(erc1155_marketplace::contract_obj(context))),
     );
     contract_map.register_contract(
-        "file:../../erc1155/output/erc1155.wasm",
+        "file:../erc1155/output/erc1155.wasm",
         Box::new(|context| Box::new(erc1155::contract_obj(context))),
     );
 

@@ -488,7 +488,7 @@ fn test_add() {
 fn contract_map() -> elrond_wasm_debug::ContractMap<elrond_wasm_debug::DebugApi> {
     let mut contract_map = elrond_wasm_debug::ContractMap::new();
     contract_map.register_contract(
-        "file:../output/adder.wasm",
+        "file:../contracts/examples/adder/output/adder.wasm",
         Box::new(|context| Box::new(sample_adder::contract_obj(context))),
     );
     contract_map

@@ -1,3 +1,4 @@
+mod file_loader;
 mod functions;
 mod interpreter;
 mod parse_num;
