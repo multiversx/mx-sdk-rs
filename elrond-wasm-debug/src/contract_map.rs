@@ -4,7 +4,8 @@ use super::*;
 
 use alloc::{boxed::Box, vec::Vec};
 use elrond_wasm::contract_base::CallableContract;
-use std::{collections::HashMap, fmt, fs};
+use mandos::{interpret_trait::InterpreterContext, value_interpreter::interpret_string};
+use std::{collections::HashMap, fmt};
 
 pub type ContractCallFactory<A> = Box<dyn Fn(DebugApi) -> Box<dyn CallableContract<A>>>;
 
@@ -33,10 +34,7 @@ impl<A> ContractMap<A> {
         if let Some(new_contract_closure) = self.factories.get(contract_identifier) {
             new_contract_closure(debug_api)
         } else {
-            panic!(
-                "Unknown contract: {}",
-                std::str::from_utf8(contract_identifier).unwrap()
-            );
+            unknown_contract_panic(contract_identifier)
         }
     }
 
@@ -45,13 +43,22 @@ impl<A> ContractMap<A> {
         path: &str,
         new_contract_closure: Box<dyn Fn(DebugApi) -> Box<dyn CallableContract<A>>>,
     ) {
-        let contract_path = path.strip_prefix("file:").unwrap();
-        let mut absolute_path = std::env::current_dir().unwrap();
-        absolute_path.push(contract_path);
-        let contract_bytes = fs::read(&absolute_path)
-            .unwrap_or_else(|e| panic!("contract not found: {} {:?}", e, &absolute_path));
+        let absolute_path = std::env::current_dir().unwrap();
+        let contract_bytes =
+            interpret_string(path, &InterpreterContext::new(absolute_path.as_path()));
         let previous_entry = self.factories.insert(contract_bytes, new_contract_closure);
         assert!(previous_entry.is_none(), "contract inserted twice");
+    }
+}
+
+fn unknown_contract_panic(contract_identifier: &[u8]) -> ! {
+    if let Ok(s) = std::str::from_utf8(contract_identifier) {
+        panic!("Unknown contract: {}", s)
+    } else {
+        panic!(
+            "Unknown contract of length {} bytes",
+            contract_identifier.len()
+        )
     }
 }
 

@@ -4,7 +4,7 @@ use elrond_wasm_debug::*;
 fn contract_map() -> ContractMap<DebugApi> {
     let mut contract_map = ContractMap::new();
     contract_map.register_contract(
-        "file:../output/kitty-genetic-alg.wasm",
+        "file:output/kitty-genetic-alg.wasm",
         Box::new(|context| Box::new(kitty_genetic_alg::contract_obj(context))),
     );
     contract_map
