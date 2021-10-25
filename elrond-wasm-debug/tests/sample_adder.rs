@@ -485,13 +485,13 @@ fn test_add() {
     let _ = elrond_wasm_debug::abi_json::contract_abi::<sample_adder::AbiProvider>();
 }
 
-fn contract_map() -> elrond_wasm_debug::ContractMap<elrond_wasm_debug::DebugApi> {
-    let mut contract_map = elrond_wasm_debug::ContractMap::new();
-    contract_map.register_contract(
+fn contract_map() -> elrond_wasm_debug::BlockchainMock {
+    let mut blockchain = elrond_wasm_debug::BlockchainMock::new();
+    blockchain.register_contract(
         "file:../contracts/examples/adder/output/adder.wasm",
         Box::new(|context| Box::new(sample_adder::contract_obj(context))),
     );
-    contract_map
+    blockchain
 }
 
 #[test]
