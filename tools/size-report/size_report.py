@@ -12,13 +12,17 @@ YELLOW_CIRCLE = "&#x1F7E1;"
 CHECK = "&#x2713;"
 
 
-def load_sizes(path: Path) -> Sizes:
+def load_sizes(path: Path, strict: bool) -> Sizes:
     sizes: Dict[str, int] = {}
-    with open(path, 'r') as file:
-        lines = file.readlines()
-        for line in lines:
-            name, size = line.split(" ")
-            sizes[name] = int(size)
+    try:
+        with open(path, 'r') as file:
+            lines = file.readlines()
+            for line in lines:
+                name, size = line.split(" ")
+                sizes[name] = int(size)
+    except FileNotFoundError:
+        if not strict:
+            raise
     return sizes
 
 
@@ -64,7 +68,7 @@ def generate_size_report(before: Sizes, after: Sizes) -> str:
             "same": 50, \
             "baz": 5, \
         }
-    >>> print(size_diff(before, after))
+    >>> print(generate_size_report(before, after))
     Contract file size comparison (bytes):
     Contract | Previous | Current | Difference | Percentage
     --:|--:|--:|--:|--:|
@@ -88,8 +92,10 @@ def generate_size_report(before: Sizes, after: Sizes) -> str:
         return output.getvalue()
 
 
-def generate_size_report_from_paths(before: Path, after: Path) -> str:
-    return generate_size_report(load_sizes(before), load_sizes(after))
+def generate_size_report_from_paths(before: Path, after: Path, strict: bool) -> str:
+    before_sizes = load_sizes(before, strict)
+    after_sizes = load_sizes(after, strict)
+    return generate_size_report(before_sizes, after_sizes)
 
 
 if __name__ == "__main__":
@@ -97,6 +103,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Compares two file size tables.')
     parser.add_argument('before', help='foo help', type=Path)
     parser.add_argument('after', help='foo help', type=Path)
+    parser.add_argument('--allow-missing', help='ignore missing files', action='store_true')
     args = parser.parse_args()
-    size_diff_table = generate_size_report_from_paths(args.before, args.after)
-    print(size_diff_table)
+    size_report = generate_size_report_from_paths(args.before, args.after, args.allow_missing)
+    print(size_report)
