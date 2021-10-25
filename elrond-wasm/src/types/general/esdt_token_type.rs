@@ -1,5 +1,3 @@
-use crate::abi::TypeAbi;
-use alloc::string::String;
 use elrond_codec::*;
 
 const ESDT_TYPE_FUNGIBLE: &[u8] = b"FungibleESDT";
@@ -7,8 +5,11 @@ const ESDT_TYPE_NON_FUNGIBLE: &[u8] = b"NonFungibleESDT";
 const ESDT_TYPE_SEMI_FUNGIBLE: &[u8] = b"SemiFungibleESDT";
 const ESDT_TYPE_INVALID: &[u8] = &[];
 
+use crate as elrond_wasm; // needed by the TypeAbi generated code
+use elrond_wasm_derive::TypeAbi;
+
 // Note: In the current implementation, SemiFungible is never returned
-#[derive(Clone, PartialEq, Debug)]
+#[derive(Clone, PartialEq, Debug, TypeAbi)]
 pub enum EsdtTokenType {
     Fungible,
     NonFungible,
@@ -130,11 +131,5 @@ impl TopDecode for EsdtTokenType {
         exit: fn(ExitCtx, DecodeError) -> !,
     ) -> Self {
         Self::from(u8::top_decode_or_exit(input, c, exit))
-    }
-}
-
-impl TypeAbi for EsdtTokenType {
-    fn type_name() -> String {
-        "EsdtTokenType".into()
     }
 }
