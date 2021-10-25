@@ -73,6 +73,7 @@ jobs:
       - uses: actions/setup-python@v2
       - name: Download base report
         uses: dawidd6/action-download-artifact@v2
+        continue-on-error: true
         with:
           workflow: actions.yml
           name: sizes
