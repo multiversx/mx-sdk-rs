@@ -14,7 +14,6 @@ keywords = ["elrond", "wasm", "webassembly", "blockchain", "contract"]
 categories = ["no-std", "wasm", "cryptography::cryptocurrencies", "development-tools"]
 
 [features]
-derive = ["elrond-wasm-derive"]
 cb_closure_managed_deser = []
 
 [dependencies]
@@ -26,7 +25,6 @@ hex-literal = "0.3.1"
 [dependencies.elrond-wasm-derive]
 version = "=0.21.1"
 path = "../elrond-wasm-derive"
-optional = true
 
 [dependencies.elrond-codec]
 version = "0.8.1"

@@ -29,7 +29,6 @@ arwen-tests = []
 [dependencies.elrond-wasm]
 version = "0.21.1"
 path = "../elrond-wasm"
-features = ["derive"]
 
 [dependencies.mandos]
 version = "0.11.1"
