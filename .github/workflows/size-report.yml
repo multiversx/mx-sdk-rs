@@ -28,7 +28,12 @@ jobs:
         id: sizes-report
         run: |
           source .github/workflows/env
-          python tools/size-report/size_report.py base-sizes/sizes.txt current-sizes/sizes.txt --allow-missing
+          python tools/size-report/size_report.py base-sizes/sizes.txt current-sizes/sizes.txt --allow-missing > report.md
+      - name: Render report
+        id: template
+        uses: chuhlomin/render-template@v1.2
+        with:
+          template: report.md
       - name: Find sizes report comment
         uses: peter-evans/find-comment@v1
         id: fc
@@ -41,6 +46,5 @@ jobs:
         with:
           comment-id: ${{ steps.fc.outputs.comment-id }}
           issue-number: ${{ github.event.pull_request.number }}
-          body: |
-            ${{ steps.sizes-report.outputs.build-log }}
+          body: ${{ steps.template.outputs.result }}
           edit-mode: replace
