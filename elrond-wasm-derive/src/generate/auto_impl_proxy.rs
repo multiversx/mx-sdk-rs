@@ -16,10 +16,7 @@ pub struct ProxyGetterReturnType {
 /// Return type of the proxy getter method, split into module and type segment.
 pub fn proxy_getter_return_type(m: &Method) -> ProxyGetterReturnType {
     match &m.return_type {
-        syn::ReturnType::Default => panic!(
-            "Missing return type from proxy getter `{}`",
-            m.name.to_string()
-        ),
+        syn::ReturnType::Default => panic!("Missing return type from proxy getter `{}`", m.name),
         syn::ReturnType::Type(_, ty) => {
             if let syn::Type::Path(type_path) = ty.as_ref() {
                 if let Some((leading_segments, last_segment)) = split_path_last(&type_path.path) {
