@@ -16,7 +16,7 @@ jobs:
         with:
           workflow: actions.yml
           name: sizes
-          commit: ${{github.event.pull_request.head.sha}}
+          commit: ${{github.event.pull_request.base.sha}}
           path: base-sizes
       - name: Download current branch report
         uses: dawidd6/action-download-artifact@v2
@@ -42,6 +42,5 @@ jobs:
           comment-id: ${{ steps.fc.outputs.comment-id }}
           issue-number: ${{ github.event.pull_request.number }}
           body: |
-            Build output
             ${{ steps.sizes-report.outputs.result }}
           edit-mode: replace
