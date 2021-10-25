@@ -97,9 +97,5 @@ pub fn check_allowed_to_execute(
         return None;
     }
 
-    let error_msg = format!(
-        "{} role not found",
-        String::from_utf8_lossy(builtin_function_name)
-    );
-    Some(TxResult::from_vm_error(error_msg))
+    Some(TxResult::from_vm_error("action is not allowed".to_string()))
 }

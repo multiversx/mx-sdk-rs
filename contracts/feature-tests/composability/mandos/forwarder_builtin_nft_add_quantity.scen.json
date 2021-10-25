@@ -108,7 +108,7 @@
             "expect": {
                 "out": [],
                 "status": "10",
-                "message": "str:ESDTRoleNFTAddQuantity role not found",
+                "message": "str:action is not allowed",
                 "gas": "*",
                 "refund": "*"
             }

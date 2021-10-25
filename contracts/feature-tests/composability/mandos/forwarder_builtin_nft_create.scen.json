@@ -133,7 +133,7 @@
             "expect": {
                 "out": [],
                 "status": "10",
-                "message": "str:ESDTRoleNFTCreate role not found",
+                "message": "str:action is not allowed",
                 "gas": "*",
                 "refund": "*"
             }

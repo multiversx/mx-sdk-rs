@@ -91,7 +91,7 @@
             "expect": {
                 "out": [],
                 "status": "10",
-                "message": "str:ESDTRoleLocalBurn role not found",
+                "message": "str:action is not allowed",
                 "gas": "*",
                 "refund": "*"
             }
