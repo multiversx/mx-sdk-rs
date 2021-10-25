@@ -36,6 +36,23 @@
                         }
                     },
                     "code": "file:../forwarder/output/forwarder.wasm"
+                },
+                "sc:forwarder2": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:NFT-0001": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "1305"
+                                }
+                            ],
+                            "lastNonce": "1",
+                            "roles": []
+                        }
+                    },
+                    "code": "file:../forwarder/output/forwarder.wasm"
                 }
             }
         },
@@ -107,6 +124,24 @@
                             "roles": [
                                 "ESDTRoleNFTBurn"
                             ]
+                        }
+                    },
+                    "storage": {},
+                    "code": "file:../forwarder/output/forwarder.wasm"
+                },
+                "sc:forwarder2": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:NFT-0001": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "1305"
+                                }
+                            ],
+                            "lastNonce": "1",
+                            "roles": []
                         }
                     },
                     "storage": {},

@@ -19,22 +19,59 @@ use elrond_wasm::api::{
     SET_USERNAME_FUNC_NAME, UPGRADE_CONTRACT_FUNC_NAME,
 };
 
+const ESDT_ROLE_LOCAL_MINT: &[u8] = b"ESDTRoleLocalMint";
+const ESDT_ROLE_LOCAL_BURN: &[u8] = b"ESDTRoleLocalBurn";
+const ESDT_ROLE_NFT_CREATE: &[u8] = b"ESDTRoleNFTCreate";
+const ESDT_ROLE_NFT_ADD_QUANTITY: &[u8] = b"ESDTRoleNFTAddQuantity";
+const ESDT_ROLE_NFT_BURN: &[u8] = b"ESDTRoleNFTBurn";
+
 pub fn execute_builtin_function_or_default(
     tx_input: TxInput,
     tx_cache: TxCache,
 ) -> (TxResult, BlockchainUpdate) {
     match tx_input.func_name.as_slice() {
-        ESDT_LOCAL_MINT_FUNC_NAME => execute_local_mint(tx_input, tx_cache),
-        ESDT_LOCAL_BURN_FUNC_NAME => execute_local_burn(tx_input, tx_cache),
+        ESDT_LOCAL_MINT_FUNC_NAME => {
+            check_allowed_to_execute(ESDT_ROLE_LOCAL_MINT, &tx_input, &tx_cache);
+            execute_local_mint(tx_input, tx_cache)
+        },
+        ESDT_LOCAL_BURN_FUNC_NAME => {
+            check_allowed_to_execute(ESDT_ROLE_LOCAL_BURN, &tx_input, &tx_cache);
+            execute_local_burn(tx_input, tx_cache)
+        },
         ESDT_MULTI_TRANSFER_FUNC_NAME => execute_esdt_multi_transfer(tx_input, tx_cache),
         ESDT_NFT_TRANSFER_FUNC_NAME => execute_esdt_nft_transfer(tx_input, tx_cache),
-        ESDT_NFT_CREATE_FUNC_NAME => execute_esdt_nft_create(tx_input, tx_cache),
-        ESDT_NFT_ADD_QUANTITY_FUNC_NAME => execute_nft_add_quantity(tx_input, tx_cache),
-        ESDT_NFT_BURN_FUNC_NAME => execute_nft_burn(tx_input, tx_cache),
+        ESDT_NFT_CREATE_FUNC_NAME => {
+            check_allowed_to_execute(ESDT_ROLE_NFT_CREATE, &tx_input, &tx_cache);
+            execute_esdt_nft_create(tx_input, tx_cache)
+        },
+        ESDT_NFT_ADD_QUANTITY_FUNC_NAME => {
+            check_allowed_to_execute(ESDT_ROLE_NFT_ADD_QUANTITY, &tx_input, &tx_cache);
+            execute_nft_add_quantity(tx_input, tx_cache)
+        },
+        ESDT_NFT_BURN_FUNC_NAME => {
+            check_allowed_to_execute(ESDT_ROLE_NFT_BURN, &tx_input, &tx_cache);
+            execute_nft_burn(tx_input, tx_cache)
+        },
         ESDT_TRANSFER_FUNC_NAME => execute_esdt_transfer(tx_input, tx_cache),
         CHANGE_OWNER_BUILTIN_FUNC_NAME => execute_change_owner(tx_input, tx_cache),
         SET_USERNAME_FUNC_NAME => execute_set_username(tx_input, tx_cache),
         UPGRADE_CONTRACT_FUNC_NAME => execute_upgrade_contract(tx_input, tx_cache),
         _ => default_execution(tx_input, tx_cache),
     }
+}
+
+pub fn check_allowed_to_execute(
+    builtin_function_name: &[u8],
+    tx_input: &TxInput,
+    tx_cache: &TxCache,
+) {
+    let token_identifier = tx_input.args[0].clone();
+    let available_roles = tx_cache.with_account_mut(&tx_input.to, |account| {
+        account.esdt.get_roles(&token_identifier)
+    });
+    assert!(
+        available_roles.contains(&builtin_function_name.to_vec()),
+        "{} role not found",
+        String::from_utf8_lossy(builtin_function_name)
+    )
 }

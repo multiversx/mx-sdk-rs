@@ -11,6 +11,10 @@ impl EsdtRoles {
     pub fn is_empty(&self) -> bool {
         self.0.is_empty()
     }
+
+    pub fn get(&self) -> Vec<Vec<u8>> {
+        self.0.clone()
+    }
 }
 
 impl fmt::Display for EsdtRoles {
