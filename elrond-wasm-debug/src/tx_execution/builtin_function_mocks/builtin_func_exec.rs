@@ -29,27 +29,44 @@ pub fn execute_builtin_function_or_default(
     tx_input: TxInput,
     tx_cache: TxCache,
 ) -> (TxResult, BlockchainUpdate) {
+    let check_result;
     match tx_input.func_name.as_slice() {
         ESDT_LOCAL_MINT_FUNC_NAME => {
-            check_allowed_to_execute(ESDT_ROLE_LOCAL_MINT, &tx_input, &tx_cache);
+            check_result = check_allowed_to_execute(ESDT_ROLE_LOCAL_MINT, &tx_input, &tx_cache);
+            if let Some(tx_result) = check_result {
+                return (tx_result, BlockchainUpdate::empty());
+            }
             execute_local_mint(tx_input, tx_cache)
         },
         ESDT_LOCAL_BURN_FUNC_NAME => {
-            check_allowed_to_execute(ESDT_ROLE_LOCAL_BURN, &tx_input, &tx_cache);
+            check_result = check_allowed_to_execute(ESDT_ROLE_LOCAL_BURN, &tx_input, &tx_cache);
+            if let Some(tx_result) = check_result {
+                return (tx_result, BlockchainUpdate::empty());
+            }
             execute_local_burn(tx_input, tx_cache)
         },
         ESDT_MULTI_TRANSFER_FUNC_NAME => execute_esdt_multi_transfer(tx_input, tx_cache),
         ESDT_NFT_TRANSFER_FUNC_NAME => execute_esdt_nft_transfer(tx_input, tx_cache),
         ESDT_NFT_CREATE_FUNC_NAME => {
-            check_allowed_to_execute(ESDT_ROLE_NFT_CREATE, &tx_input, &tx_cache);
+            check_result = check_allowed_to_execute(ESDT_ROLE_NFT_CREATE, &tx_input, &tx_cache);
+            if let Some(tx_result) = check_result {
+                return (tx_result, BlockchainUpdate::empty());
+            }
             execute_esdt_nft_create(tx_input, tx_cache)
         },
         ESDT_NFT_ADD_QUANTITY_FUNC_NAME => {
-            check_allowed_to_execute(ESDT_ROLE_NFT_ADD_QUANTITY, &tx_input, &tx_cache);
+            check_result =
+                check_allowed_to_execute(ESDT_ROLE_NFT_ADD_QUANTITY, &tx_input, &tx_cache);
+            if let Some(tx_result) = check_result {
+                return (tx_result, BlockchainUpdate::empty());
+            }
             execute_nft_add_quantity(tx_input, tx_cache)
         },
         ESDT_NFT_BURN_FUNC_NAME => {
-            check_allowed_to_execute(ESDT_ROLE_NFT_BURN, &tx_input, &tx_cache);
+            check_result = check_allowed_to_execute(ESDT_ROLE_NFT_BURN, &tx_input, &tx_cache);
+            if let Some(tx_result) = check_result {
+                return (tx_result, BlockchainUpdate::empty());
+            }
             execute_nft_burn(tx_input, tx_cache)
         },
         ESDT_TRANSFER_FUNC_NAME => execute_esdt_transfer(tx_input, tx_cache),
@@ -64,14 +81,18 @@ pub fn check_allowed_to_execute(
     builtin_function_name: &[u8],
     tx_input: &TxInput,
     tx_cache: &TxCache,
-) {
+) -> Option<TxResult> {
     let token_identifier = tx_input.args[0].clone();
     let available_roles = tx_cache.with_account_mut(&tx_input.to, |account| {
         account.esdt.get_roles(&token_identifier)
     });
-    assert!(
-        available_roles.contains(&builtin_function_name.to_vec()),
+    if available_roles.contains(&builtin_function_name.to_vec()) {
+        return None;
+    }
+
+    let error_msg = format!(
         "{} role not found",
         String::from_utf8_lossy(builtin_function_name)
-    )
+    );
+    Some(TxResult::from_vm_error(error_msg))
 }
