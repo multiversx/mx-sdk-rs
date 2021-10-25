@@ -16,7 +16,7 @@ fn is_target(path_buf: &Path) -> bool {
 pub fn find_workspace() -> PathBuf {
     let current_exe = std::env::current_exe().unwrap();
     let mut path = current_exe.as_path();
-    while !is_target(&path) {
+    while !is_target(path) {
         path = path.parent().unwrap();
     }
 
