@@ -23,6 +23,7 @@ jobs:
         with:
           workflow: actions.yml
           name: sizes
+          commit: ${{github.event.pull_request.head.sha}}
           path: current-sizes
       - name: Generate report
         id: sizes-report
