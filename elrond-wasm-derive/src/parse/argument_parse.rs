@@ -32,7 +32,7 @@ pub fn extract_method_args(m: &syn::TraitItemMethod) -> Vec<MethodArgument> {
 fn missing_self_panic(m: &syn::TraitItemMethod) -> ! {
     panic!(
         "Trait method `{}` must have `&self` as its first argument.",
-        m.sig.ident.to_string()
+        m.sig.ident
     )
 }
 

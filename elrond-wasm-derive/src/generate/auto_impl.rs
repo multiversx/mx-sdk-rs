@@ -20,7 +20,7 @@ pub fn generate_auto_impls(contract: &ContractTrait) -> Vec<proc_macro2::TokenSt
             MethodImpl::NoImplementation => {
                 panic!(
                     "method `{}` needs either an auto-implementation or a default implementation",
-                    m.name.to_string()
+                    m.name
                 )
             },
         })
