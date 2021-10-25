@@ -13,6 +13,7 @@ pub fn parse_scenario_raw<P: AsRef<Path>>(path: P) -> ScenarioRaw {
 }
 
 pub fn parse_scenario<P: AsRef<Path>>(path: P) -> Scenario {
+    let interpreter_context = InterpreterContext::new(path.as_ref().parent().unwrap());
     let raw = parse_scenario_raw(path);
-    Scenario::interpret_from(raw, &InterpreterContext::default())
+    Scenario::interpret_from(raw, &interpreter_context)
 }
