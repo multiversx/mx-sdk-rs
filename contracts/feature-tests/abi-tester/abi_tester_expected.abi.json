@@ -13,7 +13,7 @@
         },
         "framework": {
             "name": "elrond-wasm",
-            "version": "0.21.0"
+            "version": "0.21.1"
         }
     },
     "docs": [
