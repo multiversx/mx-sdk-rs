@@ -1,4 +1,7 @@
-use std::{fs, path::{Component, Path, PathBuf}};
+use std::{
+    fs,
+    path::{Component, Path, PathBuf},
+};
 
 use crate::interpret_trait::InterpreterContext;
 
@@ -10,7 +13,7 @@ pub fn load_file(file_path: &str, context: &InterpreterContext) -> Vec<u8> {
     fs::read(&path_buf).unwrap_or_else(|_| missing_file_value(&path_buf))
 }
 
-fn missing_file_value(path_buf: &PathBuf) -> Vec<u8> {
+fn missing_file_value(path_buf: &Path) -> Vec<u8> {
     let expr_str = format!("MISSING:{:?}", path_buf);
     expr_str.into_bytes()
 }
@@ -23,12 +26,10 @@ fn missing_file_value(path_buf: &PathBuf) -> Vec<u8> {
 ///
 /// This function ensures a given path ending with '/' still
 /// ends with '/' after normalization.
-/// 
+///
 /// Source: https://stackoverflow.com/questions/68231306/stdfscanonicalize-for-files-that-dont-exist
 fn normalize_path<P: AsRef<Path>>(path: P) -> PathBuf {
-    let ends_with_slash = path.as_ref()
-        .to_str()
-        .map_or(false, |s| s.ends_with('/'));
+    let ends_with_slash = path.as_ref().to_str().map_or(false, |s| s.ends_with('/'));
     let mut normalized = PathBuf::new();
     for component in path.as_ref().components() {
         match &component {
@@ -36,10 +37,10 @@ fn normalize_path<P: AsRef<Path>>(path: P) -> PathBuf {
                 if !normalized.pop() {
                     normalized.push(component);
                 }
-            }
+            },
             _ => {
                 normalized.push(component);
-            }
+            },
         }
     }
     if ends_with_slash {
