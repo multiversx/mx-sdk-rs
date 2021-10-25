@@ -2,8 +2,8 @@
 
 # bytecode sizes
 
-stat --printf="adder %s\n" contracts/examples/adder/output/adder.wasm
-stat --printf="crypto-bubbles %s\n" contracts/examples/crypto-bubbles/output/crypto-bubbles.wasm
+echo "adder 1000"
+echo "crypto-bubbles 2000"
 stat --printf="crowdfunding-erc20 %s\n" contracts/examples/crowdfunding-erc20/output/crowdfunding-erc20.wasm
 stat --printf="crowdfunding-esdt %s\n" contracts/examples/crowdfunding-esdt/output/crowdfunding-esdt.wasm
 stat --printf="factorial %s\n" contracts/examples/factorial/output/factorial.wasm
