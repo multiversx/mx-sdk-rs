@@ -136,7 +136,7 @@ where
         let zero = BigUint::zero(self.api.clone());
         self.issue(
             issue_cost,
-            EsdtTokenType::SemiFungible,
+            EsdtTokenType::Meta,
             token_display_name,
             token_ticker,
             &zero,
