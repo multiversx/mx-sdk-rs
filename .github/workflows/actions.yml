@@ -71,12 +71,12 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
-      - name: Download master report
+      - name: Download base report
         uses: dawidd6/action-download-artifact@v2
         with:
           name: sizes
-          branch: master
-          path: master-sizes.txt
+          commit: ${{github.event.pull_request.head.sha}}
+          path: base-sizes.txt
       - name: Download current branch report
         uses: dawidd6/action-download-artifact@v2
         with:
@@ -86,7 +86,7 @@ jobs:
         id: sizes-report
         run: |
           source .github/workflows/env
-          python tools/size-report/size_report.py master-sizes.txt current-sizes.txt
+          python tools/size-report/size_report.py base-sizes.txt current-sizes.txt
       - name: Find sizes report comment
         uses: peter-evans/find-comment@v1
         id: fc
