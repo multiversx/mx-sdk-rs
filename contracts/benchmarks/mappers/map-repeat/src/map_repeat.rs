@@ -16,26 +16,9 @@ pub trait MapRepeat: benchmark_common::BenchmarkCommon {
     }
 
     #[endpoint]
-    fn count(&self, key: ManagedBuffer) -> usize {
+    fn count(&self, value: ManagedBuffer) -> usize {
         let bench = self.bench();
-        bench.iter().filter(|(k, _)| *k == key).count()
-    }
-
-    #[endpoint]
-    fn contains(&self, key: ManagedBuffer) -> bool {
-        self.bench().contains_key(&key)
-    }
-
-    #[endpoint]
-    fn get(&self, num_repeats: usize, key: ManagedBuffer) -> usize {
-        (0..num_repeats)
-            .map(|i| {
-                self.bench()
-                    .get(&self.append_index(&key, i))
-                    .map(|item| item.len())
-                    .unwrap_or_default()
-            })
-            .sum()
+        bench.iter().filter(|(_, v)| *v == value).count()
     }
 
     #[endpoint]
@@ -44,11 +27,6 @@ pub trait MapRepeat: benchmark_common::BenchmarkCommon {
         for i in 1..=num_repeats {
             bench.remove(&self.append_index(&key, i));
         }
-    }
-
-    #[view]
-    fn len(&self) -> usize {
-        self.bench().len()
     }
 
     #[storage_mapper("benchmark")]
