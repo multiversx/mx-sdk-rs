@@ -4,6 +4,17 @@ There are several crates in this repo, this changelog will keep track of all of 
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [elrond-wasm 0.21.2] - 2021-10-26
+- Bugfix regarding contract upgrade args in `elrond-wasm-debug`
+
+## [elrond-wasm 0.21.1, elrond-codec 0.8.1, mandos 0.11.1] - 2021-10-26
+- Relative path improvements and fixes in `elrond-wasm-debug`:
+	- mandos-rs `file:` syntax now actually loads files and correctly unifies equivalent paths
+	- debugging now works seamlessly, without needing to temporarily change paths in the tests
+- SC proxy - `register_meta_esdt`
+- Debugger builtin function mocks check for ESDT roles
+- ABI provides definitions for EsdtTokenPayment, EsdtTokenData, EsdtTokenType
+
 ## [elrond-wasm 0.21.0, elrond-codec 0.8.0, mandos 0.11.0] - 2021-10-22
 - Mandos support for NFT syntax. Many more small improvements and some major refactoring.
 - Major refactoring of the `elrond-wasm-debug` crate, which enables the debugger and the coverage tool. Many features added:
