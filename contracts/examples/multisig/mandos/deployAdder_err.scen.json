@@ -99,7 +99,7 @@
         },
         {
             "step": "scCall",
-            "txId": "sc-deploy-perform",
+            "txId": "sc-deploy-perform-err",
             "tx": {
                 "from": "address:paul",
                 "to": "sc:multisig",
