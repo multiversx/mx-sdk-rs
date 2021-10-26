@@ -52,6 +52,10 @@
             }
         },
         {
+            "step": "dumpState",
+            "comment": "print everything to console"
+        },
+        {
             "step": "checkState",
             "comment": "check after tx 1",
             "accounts": {
