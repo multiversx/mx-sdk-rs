@@ -25,3 +25,9 @@ optional = true
 [dev-dependencies.elrond-wasm-debug]
 version = "0.21.1"
 path = "../../../elrond-wasm-debug"
+
+[dev-dependencies.adder]
+path = "../adder"
+
+[dev-dependencies.factorial]
+path = "../factorial"
