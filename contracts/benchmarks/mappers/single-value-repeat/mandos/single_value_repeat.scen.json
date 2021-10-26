@@ -74,6 +74,7 @@
                 "function": "count",
                 "arguments": [
                     "1,000",
+                    "str:testing---testing---",
                     "str:testing---testing---"
                 ],
                 "gasLimit": "1,000,000,000,000",
@@ -81,7 +82,7 @@
             },
             "expect": {
                 "out": [
-                    "20,000"
+                    "1,000"
                 ],
                 "status": "",
                 "logs": [],
