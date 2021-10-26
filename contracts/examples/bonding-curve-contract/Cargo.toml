@@ -15,19 +15,19 @@ wasm-output-mode = [
 ]
 
 [dependencies.elrond-wasm-module-bonding-curve]
-version = "0.21.1"
+version = "0.21.2"
 path = "../../modules/elrond-wasm-module-bonding-curve"
 
 [dependencies.elrond-wasm]
-version = "0.21.1"
+version = "0.21.2"
 path = "../../../elrond-wasm"
 
 [dependencies.elrond-wasm-node]
-version = "0.21.1"
+version = "0.21.2"
 path = "../../../elrond-wasm-node"
 optional = true
 
 [dev-dependencies.elrond-wasm-debug]
-version = "0.21.1"
+version = "0.21.2"
 path = "../../../elrond-wasm-debug"
 
