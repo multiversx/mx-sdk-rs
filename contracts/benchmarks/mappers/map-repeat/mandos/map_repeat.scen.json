@@ -73,14 +73,14 @@
                 "value": "0",
                 "function": "count",
                 "arguments": [
-                    "str:testing---testing---|u32:500"
+                    "str:testing---testing---"
                 ],
                 "gasLimit": "1,000,000,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "1"
+                    "1000"
                 ],
                 "status": "",
                 "logs": [],
