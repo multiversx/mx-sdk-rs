@@ -9,7 +9,7 @@ use super::EsdtTokenType;
 use elrond_codec::elrond_codec_derive::{NestedDecode, NestedEncode, TopDecode, TopEncode};
 
 use crate as elrond_wasm; // needed by the TypeAbi generated code
-use elrond_wasm_derive::TypeAbi;
+use crate::derive::TypeAbi;
 
 #[derive(TopDecode, TopEncode, NestedDecode, NestedEncode, TypeAbi, Debug)]
 pub struct EsdtTokenData<M: ManagedTypeApi> {
