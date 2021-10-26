@@ -55,16 +55,16 @@ pub fn check_tx_output(tx_id: &str, tx_expect: &TxExpect, tx_result: &TxResult) 
             {
                 assert!(
 					actual_log.mandos_check(expected_log),
-					"Logs do not match. Tx id: {}.\nWant: Address: {}, Identifier: {}, Topics: {:?}, Data: {}\nHave: Address: {}, Identifier: {}, Topics: {:?}, Data: {}",
+					"Logs do not match. Tx id: {}.\nWant: Address: {}, Endpoint: {}, Topics: {:?}, Data: {}\nHave: Address: {}, Endpoint: {}, Topics: {:?}, Data: {}",
 					tx_id,
 					verbose_hex(&expected_log.address.value),
 					&expected_log.endpoint,
-					expected_log.topics,
+					expected_log.topics.iter().map(|topic| topic.to_string()).collect::<String>(),
 					&expected_log.data,
 					address_hex(&actual_log.address),
 					bytes_to_string(&actual_log.endpoint),
 					actual_log.topics.iter().map(|topic| verbose_hex(topic)).collect::<String>(),
-					verbose_hex(&actual_log.data),
+					bytes_to_string(&actual_log.data),
 				);
             }
         },
