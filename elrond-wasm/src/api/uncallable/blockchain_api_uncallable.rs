@@ -86,7 +86,7 @@ impl BlockchainApi for UncallableApi {
 
     fn get_current_esdt_nft_nonce(
         &self,
-        _address: &Address,
+        _address: &ManagedAddress<Self>,
         _token: &TokenIdentifier<Self>,
     ) -> u64 {
         unreachable!()
