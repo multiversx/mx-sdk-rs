@@ -29,3 +29,13 @@ pub struct SemiFungibleTokenProperties {
     pub can_upgrade: bool,
     pub can_add_special_roles: bool,
 }
+
+pub struct MetaTokenProperties {
+    pub num_decimals: usize,
+    pub can_freeze: bool,
+    pub can_wipe: bool,
+    pub can_pause: bool,
+    pub can_change_owner: bool,
+    pub can_upgrade: bool,
+    pub can_add_special_roles: bool,
+}
