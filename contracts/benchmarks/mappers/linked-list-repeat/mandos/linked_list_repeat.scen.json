@@ -65,28 +65,6 @@
         },
         {
             "step": "scCall",
-            "txId": "len",
-            "tx": {
-                "from": "address:owner",
-                "to": "sc:contract",
-                "value": "0",
-                "function": "len",
-                "arguments": [],
-                "gasLimit": "20,000,000",
-                "gasPrice": "0"
-            },
-            "expect": {
-                "out": [
-                    "1000"
-                ],
-                "status": "",
-                "logs": [],
-                "gas": "*",
-                "refund": "*"
-            }
-        },
-        {
-            "step": "scCall",
             "txId": "count",
             "tx": {
                 "from": "address:owner",

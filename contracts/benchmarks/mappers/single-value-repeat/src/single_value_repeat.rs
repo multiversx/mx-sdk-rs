@@ -15,10 +15,10 @@ pub trait SingleValueRepeat: benchmark_common::BenchmarkCommon {
     }
 
     #[endpoint]
-    fn get(&self, num_repeats: usize, key: ManagedBuffer) -> usize {
+    fn count(&self, num_repeats: usize, key: ManagedBuffer, value: ManagedBuffer) -> usize {
         (0..num_repeats)
-            .map(|i| self.bench(self.append_index(&key, i)).get().len())
-            .sum()
+            .filter(|&i| self.item_at(&key, i).get() == value)
+            .count()
     }
 
     #[endpoint]
@@ -26,6 +26,10 @@ pub trait SingleValueRepeat: benchmark_common::BenchmarkCommon {
         for i in 1..=num_repeats {
             self.bench(self.append_index(&key, i)).clear();
         }
+    }
+
+    fn item_at(&self, key: &ManagedBuffer, index: usize) -> SingleValueMapper<ManagedBuffer> {
+        self.bench(self.append_index(key, index))
     }
 
     #[storage_mapper("benchmark")]

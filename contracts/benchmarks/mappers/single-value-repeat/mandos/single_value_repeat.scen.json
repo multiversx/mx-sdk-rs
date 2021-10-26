@@ -66,12 +66,12 @@
         },
         {
             "step": "scCall",
-            "txId": "get",
+            "txId": "count",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
                 "value": "0",
-                "function": "get",
+                "function": "count",
                 "arguments": [
                     "1,000",
                     "str:testing---testing---"

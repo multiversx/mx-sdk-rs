@@ -31,11 +31,6 @@ pub trait LinkedListRepeat: benchmark_common::BenchmarkCommon {
         }
     }
 
-    #[view]
-    fn len(&self) -> usize {
-        self.bench().len()
-    }
-
     #[view(getBenchmark)]
     #[storage_mapper("benchmark")]
     fn bench(&self) -> LinkedListMapper<ManagedBuffer>;

@@ -28,11 +28,6 @@ pub trait SetRepeat: benchmark_common::BenchmarkCommon {
         }
     }
 
-    #[view]
-    fn len(&self) -> usize {
-        self.bench().len()
-    }
-
     #[view(getBenchmark)]
     #[storage_mapper("benchmark")]
     fn bench(&self) -> SetMapper<ManagedBuffer>;
