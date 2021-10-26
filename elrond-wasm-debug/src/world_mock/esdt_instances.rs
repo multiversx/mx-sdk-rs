@@ -105,8 +105,22 @@ impl fmt::Display for EsdtInstances {
                 value.balance,
                 creator_encoded,
                 value.metadata.royalties,
-                hex::encode(value.metadata.hash.as_ref().unwrap().as_slice()),
-                hex::encode(value.metadata.uri.as_ref().unwrap().as_slice()),
+                hex::encode(
+                    value
+                        .metadata
+                        .hash
+                        .as_ref()
+                        .unwrap_or(&Vec::new())
+                        .as_slice()
+                ),
+                hex::encode(
+                    value
+                        .metadata
+                        .uri
+                        .as_ref()
+                        .unwrap_or(&Vec::new())
+                        .as_slice()
+                ),
                 hex::encode(value.metadata.attributes.as_slice())
             )?;
         }
