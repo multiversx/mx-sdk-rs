@@ -64,7 +64,7 @@ fn {}_go() {{
 }
 
 /// Examples how to run:
-/// `cargo run ../../contracts/examples/erc20/mandos`
+/// `cargo run ../../contracts/examples/multisig/mandos`
 /// `cargo run ../../contracts/feature-tests/composability/mandos`
 fn main() {
     let args: Vec<String> = env::args().collect();

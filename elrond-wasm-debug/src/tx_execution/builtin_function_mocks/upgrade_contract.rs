@@ -20,7 +20,7 @@ pub fn execute_upgrade_contract(
     // TODO: model code metadata in Mandos
 
     let args = if tx_input.args.len() > 2 {
-        tx_input.args[3..].to_vec()
+        tx_input.args[2..].to_vec()
     } else {
         Vec::new()
     };
