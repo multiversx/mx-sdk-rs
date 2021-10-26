@@ -7,7 +7,7 @@ const ESDT_TYPE_META: &[u8] = b"MetaESDT";
 const ESDT_TYPE_INVALID: &[u8] = &[];
 
 use crate as elrond_wasm; // needed by the TypeAbi generated code
-use elrond_wasm_derive::TypeAbi;
+use crate::derive::TypeAbi;
 
 // Note: In the current implementation, SemiFungible is never returned
 #[derive(Clone, PartialEq, Debug, TypeAbi)]
