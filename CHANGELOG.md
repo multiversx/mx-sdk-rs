@@ -4,6 +4,9 @@ There are several crates in this repo, this changelog will keep track of all of 
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [elrond-wasm 0.21.2] - 2021-10-26
+- Bugfix regarding contract upgrade args in `elrond-wasm-debug`
+
 ## [elrond-wasm 0.21.1, elrond-codec 0.8.1, mandos 0.11.1] - 2021-10-26
 - Relative path improvements and fixes in `elrond-wasm-debug`:
 	- mandos-rs `file:` syntax now actually loads files and correctly unifies equivalent paths
