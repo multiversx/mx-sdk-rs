@@ -93,6 +93,18 @@ impl SendApi for super::UncallableApi {
         unreachable!()
     }
 
+    fn upgrade_from_source_contract(
+        &self,
+        _sc_address: &ManagedAddress<Self>,
+        _gas: u64,
+        _amount: &BigUint<Self>,
+        _source_contract_address: &ManagedAddress<Self>,
+        _code_metadata: CodeMetadata,
+        _arg_buffer: &ManagedArgBuffer<Self>,
+    ) {
+        unreachable!()
+    }
+
     fn upgrade_contract(
         &self,
         _sc_address: &ManagedAddress<Self>,

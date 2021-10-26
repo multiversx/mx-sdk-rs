@@ -9,8 +9,8 @@
         {
             "step": "setState",
             "currentBlockInfo": {
-                "blockNonce": "123,567",
-                "blockTimestamp": "123456789"
+                "blockTimestamp": "123456789",
+                "blockNonce": "123,567"
             }
         },
         {
@@ -19,7 +19,6 @@
             "tx": {
                 "from": "address:my_address",
                 "to": "sc:lottery",
-                "value": "0",
                 "function": "determine_winner",
                 "arguments": [
                     "str:lottery_name"
@@ -28,10 +27,11 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "0",
+                "logs": "*",
                 "gas": "*",
-                "refund": "*",
-                "logs": "*"
+                "refund": "*"
             }
         },
         {

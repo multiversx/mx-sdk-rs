@@ -6,26 +6,26 @@
             "accounts": {
                 "address:a_user": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 },
                 "sc:vault": {
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
                         "str:NFT-0001": {
-                            "nonce": "5",
-                            "balance": "1"
+                            "instances": [
+                                {
+                                    "nonce": "5",
+                                    "balance": "1"
+                                }
+                            ]
                         }
                     },
-                    "storage": {},
                     "code": "file:../vault/output/vault.wasm"
                 },
                 "sc:forwarder": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
                     "code": "file:../forwarder/output/forwarder.wasm"
                 }
             }
@@ -36,7 +36,6 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "value": "0",
                 "function": "forward_async_retrieve_funds",
                 "arguments": [
                     "sc:vault",
@@ -109,8 +108,12 @@
                     "balance": "0",
                     "esdt": {
                         "str:NFT-0001": {
-                            "nonce": "5",
-                            "balance": "1"
+                            "instances": [
+                                {
+                                    "nonce": "5",
+                                    "balance": "1"
+                                }
+                            ]
                         }
                     },
                     "storage": "*",

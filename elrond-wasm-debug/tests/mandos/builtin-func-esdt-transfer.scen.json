@@ -6,15 +6,13 @@
             "accounts": {
                 "address:A": {
                     "nonce": "0",
-                    "balance": "150",
-                    "storage": {},
-                    "code": ""
+                    "esdt": {
+                        "str:TOK-123": "150"
+                    }
                 },
                 "address:B": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 }
             }
         },
@@ -26,13 +24,27 @@
                 "to": "address:B",
                 "function": "ESDTTransfer",
                 "arguments": [
+                    "str:TOK-123",
                     "100"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "logs": [],
+                "out": [],
+                "logs": [
+                    {
+                        "address": "address:A",
+                        "endpoint": "str:ESDTTransfer",
+                        "topics": [
+                            "str:TOK-123",
+                            "",
+                            "100",
+                            "address:B"
+                        ],
+                        "data": ""
+                    }
+                ],
                 "gas": "*",
                 "refund": "*"
             }
@@ -42,13 +54,19 @@
             "accounts": {
                 "address:A": {
                     "nonce": "1",
-                    "balance": "50",
+                    "balance": "0",
+                    "esdt": {
+                        "str:TOK-123": "50"
+                    },
                     "storage": {},
                     "code": ""
                 },
                 "address:B": {
                     "nonce": "0",
-                    "balance": "100",
+                    "balance": "0",
+                    "esdt": {
+                        "str:TOK-123": "100"
+                    },
                     "storage": {},
                     "code": ""
                 }
@@ -60,7 +78,12 @@
             "tx": {
                 "from": "address:A",
                 "to": "address:B",
-                "value": "50"
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:TOK-123",
+                        "value": "50"
+                    }
+                ]
             }
         },
         {
@@ -69,12 +92,17 @@
                 "address:A": {
                     "nonce": "2",
                     "balance": "0",
+                    "esdt": {
+                        "str:TOK-123": "0"
+                    },
                     "storage": {},
                     "code": ""
                 },
                 "address:B": {
                     "nonce": "0",
-                    "balance": "150",
+                    "esdt": {
+                        "str:TOK-123": "150"
+                    },
                     "storage": {},
                     "code": ""
                 }

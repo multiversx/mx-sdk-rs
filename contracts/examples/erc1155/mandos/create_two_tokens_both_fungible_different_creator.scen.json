@@ -11,8 +11,7 @@
             "accounts": {
                 "address:second_creator": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {}
+                    "balance": "0"
                 }
             }
         },
@@ -22,7 +21,6 @@
             "tx": {
                 "from": "address:second_creator",
                 "to": "sc:erc1155",
-                "value": "0",
                 "function": "createToken",
                 "arguments": [
                     "str:https://other-token-cdn-domain/{id}.json",

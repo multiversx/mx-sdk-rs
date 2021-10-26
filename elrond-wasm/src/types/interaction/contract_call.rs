@@ -1,5 +1,8 @@
 use crate::{
-    api::{SendApi, ESDT_MULTI_TRANSFER_STRING, ESDT_NFT_TRANSFER_STRING, ESDT_TRANSFER_STRING},
+    api::{
+        SendApi, ESDT_MULTI_TRANSFER_FUNC_NAME, ESDT_NFT_TRANSFER_FUNC_NAME,
+        ESDT_TRANSFER_FUNC_NAME,
+    },
     types::{
         AsyncCall, BigUint, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer,
         ManagedVec, TokenIdentifier,
@@ -39,12 +42,13 @@ pub fn new_contract_call<SA, R>(
     api: SA,
     to: ManagedAddress<SA>,
     endpoint_name_slice: &'static [u8],
+    payments: ManagedVec<SA, EsdtTokenPayment<SA>>,
 ) -> ContractCall<SA, R>
 where
     SA: SendApi + 'static,
 {
     let endpoint_name = ManagedBuffer::new_from_bytes(api.clone(), endpoint_name_slice);
-    ContractCall::<SA, R>::new(api, to, endpoint_name)
+    ContractCall::<SA, R>::new_with_esdt_payment(api, to, endpoint_name, payments)
 }
 
 impl<SA, R> ContractCall<SA, R>
@@ -52,9 +56,18 @@ where
     SA: SendApi + 'static,
 {
     pub fn new(api: SA, to: ManagedAddress<SA>, endpoint_name: ManagedBuffer<SA>) -> Self {
+        let payments = ManagedVec::new(api.clone());
+        Self::new_with_esdt_payment(api, to, endpoint_name, payments)
+    }
+
+    pub fn new_with_esdt_payment(
+        api: SA,
+        to: ManagedAddress<SA>,
+        endpoint_name: ManagedBuffer<SA>,
+        payments: ManagedVec<SA, EsdtTokenPayment<SA>>,
+    ) -> Self {
         let arg_buffer = ManagedArgBuffer::new_empty(api.clone());
         let egld_payment = BigUint::zero(api.clone());
-        let payments = ManagedVec::new(api.clone());
         ContractCall {
             api,
             to,
@@ -158,7 +171,7 @@ where
 
                 let zero = BigUint::zero(self.api.clone());
                 let endpoint_name =
-                    ManagedBuffer::new_from_bytes(self.api.clone(), ESDT_TRANSFER_STRING);
+                    ManagedBuffer::new_from_bytes(self.api.clone(), ESDT_TRANSFER_FUNC_NAME);
 
                 ContractCall {
                     api: self.api.clone(),
@@ -190,7 +203,7 @@ where
                 let recipient_addr = self.api.get_sc_address();
                 let zero = BigUint::zero(self.api.clone());
                 let endpoint_name =
-                    ManagedBuffer::new_from_bytes(self.api.clone(), ESDT_NFT_TRANSFER_STRING);
+                    ManagedBuffer::new_from_bytes(self.api.clone(), ESDT_NFT_TRANSFER_FUNC_NAME);
 
                 ContractCall {
                     api: self.api,
@@ -227,7 +240,7 @@ where
         let recipient_addr = self.api.get_sc_address();
         let zero = BigUint::zero(self.api.clone());
         let endpoint_name =
-            ManagedBuffer::new_from_bytes(self.api.clone(), ESDT_MULTI_TRANSFER_STRING);
+            ManagedBuffer::new_from_bytes(self.api.clone(), ESDT_MULTI_TRANSFER_FUNC_NAME);
 
         ContractCall {
             api: self.api,

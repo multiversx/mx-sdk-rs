@@ -12,7 +12,6 @@
                 "sc:user_mock": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
                     "code": "file:../../erc1155-user-mock/output/erc1155-user-mock.wasm"
                 }
             }
@@ -23,7 +22,6 @@
             "tx": {
                 "from": "address:creator",
                 "to": "sc:erc1155",
-                "value": "0",
                 "function": "safeBatchTransferFrom",
                 "arguments": [
                     "address:creator",

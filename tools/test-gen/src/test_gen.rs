@@ -37,7 +37,7 @@ fn print_mandos_rs(file: &mut File, names: &[String]) {
             file,
             "#[test]
 fn {}_rs() {{
-    elrond_wasm_debug::mandos_rs(\"mandos/{}.scen.json\", &contract_map());
+    elrond_wasm_debug::mandos_rs(\"mandos/{}.scen.json\", contract_map());
 }}
 ",
             name.replace('-', "_").to_lowercase(),
@@ -65,7 +65,7 @@ fn {}_go() {{
 
 /// Examples how to run:
 /// `cargo run ../../contracts/examples/erc20/mandos`
-/// `cargo run ../../contracts/feature-tests/basic-features/mandos`
+/// `cargo run ../../contracts/feature-tests/composability/mandos`
 fn main() {
     let args: Vec<String> = env::args().collect();
     let files_path = &args[1];

@@ -15,7 +15,6 @@
             "tx": {
                 "from": "address:user1",
                 "to": "sc:pair",
-                "value": "0",
                 "function": "cancelAllOrders",
                 "arguments": [],
                 "gasLimit": "100,000,000",
@@ -34,7 +33,6 @@
             "tx": {
                 "from": "address:user1",
                 "to": "sc:pair",
-                "value": "0",
                 "function": "getAddressOrderIds",
                 "arguments": [
                     "address:user1"

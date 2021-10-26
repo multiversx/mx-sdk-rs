@@ -1,16 +1,17 @@
 use crate::{
-    abi::TypeAbi,
     api::ManagedTypeApi,
-    types::{BigUint, ManagedAddress, ManagedBuffer, ManagedType, ManagedVec},
+    types::{AsManagedRef, BigUint, ManagedAddress, ManagedBuffer, ManagedType, ManagedVec},
 };
-use alloc::string::String;
 use elrond_codec::*;
 
 use super::EsdtTokenType;
 
 use elrond_codec::elrond_codec_derive::{NestedDecode, NestedEncode, TopDecode, TopEncode};
 
-#[derive(TopDecode, TopEncode, NestedDecode, NestedEncode, Debug)]
+use crate as elrond_wasm; // needed by the TypeAbi generated code
+use crate::derive::TypeAbi;
+
+#[derive(TopDecode, TopEncode, NestedDecode, NestedEncode, TypeAbi, Debug)]
 pub struct EsdtTokenData<M: ManagedTypeApi> {
     pub token_type: EsdtTokenType,
     pub amount: BigUint<M>,
@@ -29,12 +30,6 @@ impl<M: ManagedTypeApi> EsdtTokenData<M> {
     }
 
     pub fn decode_attributes<T: TopDecode>(&self) -> Result<T, DecodeError> {
-        T::top_decode(&self.attributes)
-    }
-}
-
-impl<M: ManagedTypeApi> TypeAbi for EsdtTokenData<M> {
-    fn type_name() -> String {
-        "EsdtTokenData".into()
+        T::top_decode(self.attributes.as_managed_ref())
     }
 }

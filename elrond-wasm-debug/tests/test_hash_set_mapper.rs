@@ -2,15 +2,15 @@ use elrond_wasm::storage::{
     mappers::{SetMapper, StorageClearable, StorageMapper},
     StorageKey,
 };
-use elrond_wasm_debug::TxContext;
+use elrond_wasm_debug::DebugApi;
 
-fn create_set() -> SetMapper<TxContext, u64> {
-    let api = TxContext::dummy();
+fn create_set() -> SetMapper<DebugApi, u64> {
+    let api = DebugApi::dummy();
     let base_key = StorageKey::new(api.clone(), &b"my_set"[..]);
     SetMapper::new(api, base_key)
 }
 
-fn check_set(set: &SetMapper<TxContext, u64>, expected: Vec<u64>) {
+fn check_set(set: &SetMapper<DebugApi, u64>, expected: Vec<u64>) {
     assert_eq!(set.len(), expected.len());
     assert!(set.check_internal_consistency());
     let actual: Vec<u64> = set.iter().collect();

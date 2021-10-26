@@ -1,4 +1,7 @@
-use super::{ManagedBuffer, ManagedDefault, ManagedFrom, ManagedInto, ManagedType, ManagedVecItem};
+use super::{
+    ManagedBuffer, ManagedDefault, ManagedFrom, ManagedInto, ManagedType, ManagedVecItem,
+    ManagedVecIterator,
+};
 use crate::{
     abi::TypeAbi,
     api::{Handle, ManagedTypeApi},
@@ -165,10 +168,14 @@ where
 
     pub fn into_vec(self) -> Vec<T> {
         let mut v = Vec::new();
-        for item in self.into_vec() {
+        for item in self.into_iter() {
             v.push(item);
         }
         v
+    }
+
+    pub fn iter(&self) -> ManagedVecIterator<M, T> {
+        ManagedVecIterator::new(self)
     }
 }
 

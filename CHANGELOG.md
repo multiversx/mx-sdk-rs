@@ -4,6 +4,31 @@ There are several crates in this repo, this changelog will keep track of all of 
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [elrond-wasm 0.21.1, elrond-codec 0.8.1, mandos 0.11.1] - 2021-10-26
+- Relative path improvements and fixes in `elrond-wasm-debug`:
+	- mandos-rs `file:` syntax now actually loads files and correctly unifies equivalent paths
+	- debugging now works seamlessly, without needing to temporarily change paths in the tests
+- SC proxy - `register_meta_esdt`
+- Debugger builtin function mocks check for ESDT roles
+- ABI provides definitions for EsdtTokenPayment, EsdtTokenData, EsdtTokenType
+
+## [elrond-wasm 0.21.0, elrond-codec 0.8.0, mandos 0.11.0] - 2021-10-22
+- Mandos support for NFT syntax. Many more small improvements and some major refactoring.
+- Major refactoring of the `elrond-wasm-debug` crate, which enables the debugger and the coverage tool. Many features added:
+	- support for synchronous calls, also nested synchronous calls
+	- support for NFT simple transfers
+	- support for ESDT multitransfer (FT + NFT)
+	- builtin functions mocked in the debugger: `ESDTLocalMint`, `ESDTLocalBurn`, `MultiESDTNFTTransfer`, `ESDTNFTTransfer`, `ESDTNFTCreate`, `ESDTNFTAddQuantity`, `ESDTNFTBurn`, `ESDTTransfer`, `ChangeOwnerAddress`, `SetUserName`
+	- supports deploy/deploy from source/upgrade/upgrade from source from contracts
+- `#[payment_multi]` annotation
+- `ManagedRef` type, that allows easier handling of managed types
+- ABI contains endpoint mutability flag (mutable/readonly)
+- reverse iteration for `ManagedVec`
+
+## [elrond-wasm 0.20.1] - 2021-10-05
+- Added missing managed methods in blockchain API: `is_smart_contract`, `get_shard_of_address`, `get_balance`.
+- Improved preprocessor substitutions: `ManagedAddress`, `TokenIdentifier`.
+
 ## [elrond-wasm 0.20.0, elrond-codec 0.7.0, mandos 0.10.0] - 2021-10-02
 - Managed callback handling
 - Managed async call result

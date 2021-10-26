@@ -6,9 +6,7 @@
             "accounts": {
                 "address:a_user": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 },
                 "sc:forwarder": {
                     "nonce": "0",
@@ -32,13 +30,11 @@
                             ]
                         }
                     },
-                    "storage": {},
                     "code": "file:../forwarder/output/forwarder.wasm"
                 },
                 "sc:vault": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
                     "code": "file:../vault/output/vault.wasm"
                 }
             }
@@ -50,7 +46,6 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "value": "0",
                 "function": "forward_sync_accept_funds_multi_transfer",
                 "arguments": [
                     "sc:vault",
@@ -77,6 +72,123 @@
                 "out": [],
                 "status": "0",
                 "message": "",
+                "logs": [
+                    {
+                        "address": "sc:forwarder",
+                        "endpoint": "str:MultiESDTNFTTransfer",
+                        "topics": [
+                            "str:FWD-TOKEN",
+                            "0",
+                            "100",
+                            "sc:vault"
+                        ],
+                        "data": ""
+                    },
+                    {
+                        "address": "sc:forwarder",
+                        "endpoint": "str:MultiESDTNFTTransfer",
+                        "topics": [
+                            "str:FWD-TOKEN",
+                            "0",
+                            "200",
+                            "sc:vault"
+                        ],
+                        "data": ""
+                    },
+                    {
+                        "address": "sc:forwarder",
+                        "endpoint": "str:MultiESDTNFTTransfer",
+                        "topics": [
+                            "str:NFT-123",
+                            "1",
+                            "1",
+                            "sc:vault"
+                        ],
+                        "data": ""
+                    },
+                    {
+                        "address": "sc:forwarder",
+                        "endpoint": "str:MultiESDTNFTTransfer",
+                        "topics": [
+                            "str:SFT-456",
+                            "3",
+                            "3",
+                            "sc:vault"
+                        ],
+                        "data": ""
+                    },
+                    {
+                        "address": "sc:forwarder",
+                        "endpoint": "str:MultiESDTNFTTransfer",
+                        "topics": [
+                            "str:SFT-456",
+                            "3",
+                            "4",
+                            "sc:vault"
+                        ],
+                        "data": ""
+                    },
+                    {
+                        "address": "sc:vault",
+                        "endpoint": "str:accept_funds_multi_transfer",
+                        "topics": [
+                            "str:accept_funds",
+                            "str:FWD-TOKEN",
+                            "str:FungibleESDT",
+                            "100",
+                            "0"
+                        ],
+                        "data": ""
+                    },
+                    {
+                        "address": "sc:vault",
+                        "endpoint": "str:accept_funds_multi_transfer",
+                        "topics": [
+                            "str:accept_funds",
+                            "str:FWD-TOKEN",
+                            "str:FungibleESDT",
+                            "200",
+                            "0"
+                        ],
+                        "data": ""
+                    },
+                    {
+                        "address": "sc:vault",
+                        "endpoint": "str:accept_funds_multi_transfer",
+                        "topics": [
+                            "str:accept_funds",
+                            "str:NFT-123",
+                            "str:SemiFungibleESDT",
+                            "1",
+                            "1"
+                        ],
+                        "data": ""
+                    },
+                    {
+                        "address": "sc:vault",
+                        "endpoint": "str:accept_funds_multi_transfer",
+                        "topics": [
+                            "str:accept_funds",
+                            "str:SFT-456",
+                            "str:SemiFungibleESDT",
+                            "3",
+                            "3"
+                        ],
+                        "data": ""
+                    },
+                    {
+                        "address": "sc:vault",
+                        "endpoint": "str:accept_funds_multi_transfer",
+                        "topics": [
+                            "str:accept_funds",
+                            "str:SFT-456",
+                            "str:SemiFungibleESDT",
+                            "4",
+                            "3"
+                        ],
+                        "data": ""
+                    }
+                ],
                 "gas": "*",
                 "refund": "*"
             }

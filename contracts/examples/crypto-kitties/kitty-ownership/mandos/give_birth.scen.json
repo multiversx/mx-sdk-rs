@@ -19,7 +19,6 @@
             "tx": {
                 "from": "address:acc3",
                 "to": "sc:kitty_ownership_contract",
-                "value": "0",
                 "function": "giveBirth",
                 "arguments": [
                     "2"
@@ -31,8 +30,8 @@
                 "out": [
                     "u8:127|u8:127|u8:127|u8:127|u8:127|u8:127|u8:127"
                 ],
-                "message": "",
                 "status": "0",
+                "message": "",
                 "logs": "*",
                 "gas": "*",
                 "refund": "*"

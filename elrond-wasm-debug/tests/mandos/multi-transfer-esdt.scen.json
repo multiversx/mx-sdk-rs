@@ -11,18 +11,18 @@
                         "str:TOK-123": "150",
                         "str:OTHERTOK-123": "500",
                         "str:NFT-123": {
-                            "nonce": "5",
-                            "balance": "20"
+                            "instances": [
+                                {
+                                    "nonce": "5",
+                                    "balance": "20"
+                                }
+                            ]
                         }
-                    },
-                    "storage": {},
-                    "code": ""
+                    }
                 },
                 "address:B": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 }
             }
         },
@@ -32,7 +32,7 @@
             "tx": {
                 "from": "address:A",
                 "to": "address:B",
-                "esdt": [
+                "esdtValue": [
                     {
                         "tokenIdentifier": "str:TOK-123",
                         "value": "100"
@@ -62,8 +62,12 @@
                         "str:TOK-123": "50",
                         "str:OTHERTOK-123": "100",
                         "str:NFT-123": {
-                            "nonce": "5",
-                            "balance": "10"
+                            "instances": [
+                                {
+                                    "nonce": "5",
+                                    "balance": "10"
+                                }
+                            ]
                         }
                     },
                     "storage": {},
@@ -75,8 +79,12 @@
                         "str:TOK-123": "100",
                         "str:OTHERTOK-123": "400",
                         "str:NFT-123": {
-                            "nonce": "5",
-                            "balance": "10"
+                            "instances": [
+                                {
+                                    "nonce": "5",
+                                    "balance": "10"
+                                }
+                            ]
                         }
                     },
                     "storage": {},

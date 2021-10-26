@@ -1,20 +1,24 @@
-use mandos::TxTransfer;
+use std::rc::Rc;
 
-use crate::BlockchainMock;
+use elrond_wasm::types::H256;
+use mandos::model::TxTransfer;
 
-pub fn execute(state: &mut BlockchainMock, tx: &TxTransfer) {
-    let sender_address = &tx.from.value.into();
-    state.increase_nonce(sender_address);
-    state
-        .subtract_tx_payment(sender_address, &tx.value.value)
-        .unwrap();
-    let recipient_address = &tx.to.value.into();
-    state.increase_balance(recipient_address, &tx.value.value);
-    let esdt_token_identifier = tx.esdt_token_identifier.value.clone();
-    let esdt_value = tx.esdt_value.value.clone();
+use crate::{
+    sc_call::tx_esdt_transfers_from_mandos, tx_execution::sc_call, tx_mock::TxInput,
+    world_mock::BlockchainMock,
+};
 
-    if !esdt_token_identifier.is_empty() && esdt_value > 0u32.into() {
-        state.substract_esdt_balance(sender_address, &esdt_token_identifier[..], &esdt_value);
-        state.increase_esdt_balance(recipient_address, &esdt_token_identifier[..], &esdt_value);
-    }
+pub fn execute(state: &mut Rc<BlockchainMock>, tx_transfer: &TxTransfer) {
+    let tx_input = TxInput {
+        from: tx_transfer.from.value.into(),
+        to: tx_transfer.to.value.into(),
+        egld_value: tx_transfer.egld_value.value.clone(),
+        esdt_values: tx_esdt_transfers_from_mandos(tx_transfer.esdt_value.as_slice()),
+        func_name: Vec::new(),
+        args: Vec::new(),
+        gas_limit: tx_transfer.gas_limit.value,
+        gas_price: tx_transfer.gas_price.value,
+        tx_hash: H256::zero(),
+    };
+    sc_call(tx_input, state, true);
 }

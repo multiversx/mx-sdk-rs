@@ -12,7 +12,6 @@
             "tx": {
                 "from": "address:my_address",
                 "to": "sc:lottery",
-                "value": "0",
                 "function": "start",
                 "arguments": [
                     "str:lottery_name",
@@ -28,6 +27,7 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "",
                 "gas": "*",
                 "refund": "*"

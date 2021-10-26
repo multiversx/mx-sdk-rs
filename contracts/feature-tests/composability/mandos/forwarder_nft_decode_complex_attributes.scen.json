@@ -9,27 +9,32 @@
                     "balance": "0",
                     "esdt": {
                         "str:NFT-0001": {
-                            "nonce": "1",
-                            "balance": "1"
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "1"
+                                }
+                            ]
                         }
-                    },
-                    "storage": {},
-                    "code": ""
+                    }
                 },
                 "sc:forwarder": {
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
                         "str:NFT-0001": {
-                            "nonce": "1",
-                            "balance": "1",
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "1"
+                                }
+                            ],
                             "lastNonce": "1",
                             "roles": [
                                 "ESDTRoleNFTCreate"
                             ]
                         }
                     },
-                    "storage": {},
                     "code": "file:../forwarder/output/forwarder.wasm"
                 }
             }
@@ -75,8 +80,12 @@
                     "balance": "0",
                     "esdt": {
                         "str:NFT-0001": {
-                            "nonce": "1",
-                            "balance": "1"
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "1"
+                                }
+                            ]
                         }
                     },
                     "storage": {},
@@ -98,7 +107,6 @@
                                     "creator": "sc:forwarder",
                                     "royalties": "0",
                                     "hash": "str:nft-create-hash-----------------",
-                                    "attributes": "*",
                                     "uri": [
                                         "str:nft-create-uri"
                                     ]

@@ -17,19 +17,21 @@ path = "proxy-test-first"
 [dependencies.proxy-test-second]
 path = "proxy-test-second"
 
+[dependencies.recursive-caller]
+path = "recursive-caller"
+
 [dependencies.vault]
 path = "vault"
 
 [dependencies.elrond-wasm]
-version = "0.20.0"
+version = "0.21.1"
 path = "../../../elrond-wasm"
-features = ["derive"]
 
 [dependencies.elrond-wasm-node]
-version = "0.20.0"
+version = "0.21.1"
 path = "../../../elrond-wasm-node"
 optional = true
 
 [dev-dependencies.elrond-wasm-debug]
-version = "0.20.0"
+version = "0.21.1"
 path = "../../../elrond-wasm-debug"

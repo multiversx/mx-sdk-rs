@@ -6,9 +6,7 @@
             "accounts": {
                 "address:a_user": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 },
                 "sc:forwarder": {
                     "nonce": "0",
@@ -32,13 +30,11 @@
                             ]
                         }
                     },
-                    "storage": {},
                     "code": "file:../forwarder/output/forwarder.wasm"
                 },
                 "sc:vault": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
                     "code": "file:../vault/output/vault.wasm"
                 }
             }
@@ -50,7 +46,6 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "value": "0",
                 "function": "forward_transf_exec_accept_funds_multi_transfer",
                 "arguments": [
                     "sc:vault",
@@ -126,7 +121,6 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "value": "0",
                 "function": "forward_transf_exec_accept_funds_multi_transfer",
                 "arguments": [
                     "sc:vault",

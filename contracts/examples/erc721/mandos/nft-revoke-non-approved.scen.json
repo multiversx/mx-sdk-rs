@@ -11,7 +11,6 @@
             "tx": {
                 "from": "address:contract_owner",
                 "to": "sc:the_nft_contract",
-                "value": "0",
                 "function": "revoke",
                 "arguments": [
                     "1"
@@ -20,6 +19,7 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "",
                 "gas": "*",
                 "refund": "*"

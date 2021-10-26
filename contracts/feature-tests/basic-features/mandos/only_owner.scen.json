@@ -7,20 +7,15 @@
             "accounts": {
                 "address:owner": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 },
                 "address:an_account": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 },
                 "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
                     "code": "file:../output/basic-features.wasm",
                     "owner": "address:owner"
                 }
@@ -32,7 +27,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "only_owner_endpoint",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -53,7 +47,6 @@
             "tx": {
                 "from": "address:owner",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "only_owner_endpoint",
                 "arguments": [],
                 "gasLimit": "50,000,000",

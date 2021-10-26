@@ -44,7 +44,7 @@ fn top_decode_from_nested() {}
 fn top_decode_from_nested_or_exit() {}
 fn top_encode_from_nested() {}
 fn top_encode_from_nested_or_exit() {}
-fn top_encode_to_vec() {}
+fn top_encode_to_vec_u8() {}
 fn boxed_slice_into_vec() {}
 fn vec_into_boxed_slice() {}
 

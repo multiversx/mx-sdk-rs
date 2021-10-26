@@ -9,26 +9,20 @@
                     "balance": "0",
                     "esdt": {
                         "str:FWD-TOKEN": "1000"
-                    },
-                    "storage": {},
-                    "code": ""
+                    }
                 },
                 "address:other_user": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 },
                 "sc:vault": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
                     "code": "file:../vault/output/vault.wasm"
                 },
                 "sc:forwarder": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
                     "code": "file:../forwarder/output/forwarder.wasm"
                 }
             }
@@ -39,11 +33,12 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "value": "0",
-                "esdt": {
-                    "tokenIdentifier": "str:FWD-TOKEN",
-                    "value": "100"
-                },
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:FWD-TOKEN",
+                        "value": "100"
+                    }
+                ],
                 "function": "send_esdt_with_fees",
                 "arguments": [
                     "address:other_user",
@@ -104,11 +99,12 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "value": "0",
-                "esdt": {
-                    "tokenIdentifier": "str:FWD-TOKEN",
-                    "value": "100"
-                },
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:FWD-TOKEN",
+                        "value": "100"
+                    }
+                ],
                 "function": "forward_transf_execu_accept_funds_with_fees",
                 "arguments": [
                     "sc:vault",
@@ -174,11 +170,12 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "value": "0",
-                "esdt": {
-                    "tokenIdentifier": "str:FWD-TOKEN",
-                    "value": "100"
-                },
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:FWD-TOKEN",
+                        "value": "100"
+                    }
+                ],
                 "function": "forward_sync_accept_funds_with_fees",
                 "arguments": [
                     "sc:vault",
@@ -244,11 +241,12 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "value": "0",
-                "esdt": {
-                    "tokenIdentifier": "str:FWD-TOKEN",
-                    "value": "100"
-                },
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:FWD-TOKEN",
+                        "value": "100"
+                    }
+                ],
                 "function": "forward_async_accept_funds_with_fees",
                 "arguments": [
                     "sc:vault",

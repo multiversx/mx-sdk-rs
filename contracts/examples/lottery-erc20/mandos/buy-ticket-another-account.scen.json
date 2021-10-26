@@ -12,7 +12,6 @@
             "tx": {
                 "from": "address:acc2",
                 "to": "sc:lottery",
-                "value": "0",
                 "function": "buy_ticket",
                 "arguments": [
                     "str:lottery_name",
@@ -22,10 +21,11 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "",
+                "logs": "*",
                 "gas": "*",
-                "refund": "*",
-                "logs": "*"
+                "refund": "*"
             }
         },
         {

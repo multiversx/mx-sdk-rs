@@ -1,4 +1,5 @@
 mod blockchain_api;
+mod builtin_function_names;
 mod call_value_api;
 mod crypto_api;
 mod endpoint_arg_api;
@@ -12,6 +13,7 @@ pub mod uncallable;
 mod vm_api;
 
 pub use blockchain_api::BlockchainApi;
+pub use builtin_function_names::*;
 pub use call_value_api::CallValueApi;
 pub use crypto_api::CryptoApi;
 pub use endpoint_arg_api::EndpointArgumentApi;
@@ -19,8 +21,6 @@ pub use endpoint_finish_api::EndpointFinishApi;
 pub use error_api::ErrorApi;
 pub use log_api::LogApi;
 pub use managed_types::*;
-pub use send_api::{
-    SendApi, ESDT_MULTI_TRANSFER_STRING, ESDT_NFT_TRANSFER_STRING, ESDT_TRANSFER_STRING,
-};
+pub use send_api::SendApi;
 pub use storage_api::*;
 pub use vm_api::VMApi;

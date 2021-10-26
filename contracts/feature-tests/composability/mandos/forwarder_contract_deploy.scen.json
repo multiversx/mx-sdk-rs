@@ -11,7 +11,6 @@
                 "sc:forwarder": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
                     "code": "file:../forwarder/output/forwarder.wasm"
                 }
             },
@@ -29,11 +28,16 @@
                 {
                     "creatorAddress": "sc:forwarder",
                     "creatorNonce": "2",
-                    "newAddress": "sc:child-2"
+                    "newAddress": "sc:child2"
                 },
                 {
                     "creatorAddress": "sc:forwarder",
                     "creatorNonce": "3",
+                    "newAddress": "sc:child3"
+                },
+                {
+                    "creatorAddress": "sc:forwarder",
+                    "creatorNonce": "4",
                     "newAddress": "sc:child-src-with-arg"
                 }
             ]
@@ -44,7 +48,6 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "value": "0",
                 "function": "deploy_contract",
                 "arguments": [
                     "file:../vault/output/vault.wasm"
@@ -53,12 +56,12 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "status": "0",
-                "message": "",
                 "out": [
                     "sc:child",
                     ""
                 ],
+                "status": "0",
+                "message": "",
                 "gas": "*",
                 "refund": "*"
             }
@@ -70,10 +73,10 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
-                    "owner": "sc:forwarder",
-                    "code": "file:../vault/output/vault.wasm"
+                    "code": "file:../vault/output/vault.wasm",
+                    "owner": "sc:forwarder"
                 },
-                "+": {}
+                "+": ""
             }
         },
         {
@@ -82,7 +85,6 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "value": "0",
                 "function": "deploy_contract",
                 "arguments": [
                     "file:../vault/output/vault.wasm",
@@ -92,13 +94,13 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "status": "0",
-                "message": "",
                 "out": [
                     "str:some_argument",
                     "sc:child-with-arg",
                     "nested:str:some_argument"
                 ],
+                "status": "0",
+                "message": "",
                 "gas": "*",
                 "refund": "*"
             }
@@ -110,32 +112,32 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
-                    "owner": "sc:forwarder",
-                    "code": "file:../vault/output/vault.wasm"
+                    "code": "file:../vault/output/vault.wasm",
+                    "owner": "sc:forwarder"
                 },
-                "+": {}
+                "+": ""
             }
         },
         {
             "step": "scCall",
-            "txId": "deploy-vault-from-source",
+            "txId": "deploy-vault-twice",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "value": "0",
-                "function": "deployFromSource",
+                "function": "deploy_two_contracts",
                 "arguments": [
-                    "sc:child"
+                    "file:../vault/output/vault.wasm"
                 ],
-                "gasLimit": "50,000,000",
+                "gasLimit": "80,000,000",
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [
+                    "sc:child2",
+                    "sc:child3"
+                ],
                 "status": "0",
                 "message": "",
-                "out": [
-                    "sc:child-2"
-                ],
                 "gas": "*",
                 "refund": "*"
             }
@@ -143,12 +145,19 @@
         {
             "step": "checkState",
             "accounts": {
-                "sc:child-2": {
+                "sc:child2": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
-                    "owner": "sc:forwarder",
-                    "code": "file:../vault/output/vault.wasm"
+                    "code": "file:../vault/output/vault.wasm",
+                    "owner": "sc:forwarder"
+                },
+                "sc:child3": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "file:../vault/output/vault.wasm",
+                    "owner": "sc:forwarder"
                 },
                 "+": ""
             }
@@ -159,7 +168,6 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "value": "0",
                 "function": "deploy_vault_from_source",
                 "arguments": [
                     "sc:child",
@@ -169,15 +177,28 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "status": "0",
-                "message": "",
                 "out": [
                     "str:some_argument",
                     "sc:child-src-with-arg",
                     "nested:str:some_argument"
                 ],
+                "status": "0",
+                "message": "",
                 "gas": "*",
                 "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:child-src-with-arg": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "file:../vault/output/vault.wasm",
+                    "owner": "sc:forwarder"
+                },
+                "+": ""
             }
         }
     ]

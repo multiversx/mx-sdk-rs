@@ -14,8 +14,7 @@
                     "balance": "0",
                     "esdt": {
                         "str:boring_token": "1,000,000"
-                    },
-                    "storage": {}
+                    }
                 }
             }
         },
@@ -25,19 +24,21 @@
             "tx": {
                 "from": "address:acc1",
                 "to": "sc:first_contract",
-                "value": "0",
-                "esdt": {
-                    "tokenIdentifier": "str:boring_token",
-                    "value": "500,000"
-                },
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:boring_token",
+                        "value": "500,000"
+                    }
+                ],
                 "function": "transferToSecondContractFull",
                 "arguments": [],
                 "gasLimit": "100,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "message": "str:Wrong esdt token",
+                "out": [],
                 "status": "4",
+                "message": "str:Wrong esdt token",
                 "gas": "*",
                 "refund": "*"
             }

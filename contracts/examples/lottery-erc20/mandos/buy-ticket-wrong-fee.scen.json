@@ -16,7 +16,6 @@
             "tx": {
                 "from": "address:acc1",
                 "to": "sc:lottery",
-                "value": "0",
                 "function": "buy_ticket",
                 "arguments": [
                     "str:lottery_name",
@@ -26,6 +25,7 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "4",
                 "message": "str:Wrong ticket fee!",
                 "gas": "*",

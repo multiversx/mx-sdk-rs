@@ -43,25 +43,35 @@ fn validate_payment_args(m: &Method) {
         .iter()
         .filter(|&arg| matches!(arg.metadata.payment, ArgPaymentMetadata::PaymentNonce))
         .count();
+    let num_payment_multi = m
+        .method_args
+        .iter()
+        .filter(|&arg| matches!(arg.metadata.payment, ArgPaymentMetadata::PaymentMulti))
+        .count();
     assert!(
         num_payment_amount <= 1,
         "only one `#[payment]` argument allowed (method: `{}`)",
-        m.name.to_string()
+        m.name
     );
     assert!(
         num_payment_token <= 1,
         "only one `#[payment_token]` argument allowed (method: `{}`)",
-        m.name.to_string()
+        m.name
     );
     assert!(
         num_payment_nonce <= 1,
         "only one `#[payment_nonce]` argument allowed (method: `{}`)",
-        m.name.to_string()
+        m.name
+    );
+    assert!(
+        num_payment_multi <= 1,
+        "only one `#[payment_multi]` argument allowed (method: `{}`)",
+        m.name
     );
     if !m.is_payable() {
-        assert!(num_payment_amount == 0, "`#[payment]` only allowed in payable endpoints, payable init or callbacks (method: `{}`)", m.name.to_string());
+        assert!(num_payment_amount == 0, "`#[payment]` only allowed in payable endpoints, payable init or callbacks (method: `{}`)", m.name);
 
-        assert!(num_payment_token == 0, "`#[payment_token]` only allowed in payable endpoints, payable init or callbacks (method: `{}`)", m.name.to_string());
+        assert!(num_payment_token == 0, "`#[payment_token]` only allowed in payable endpoints, payable init or callbacks (method: `{}`)", m.name);
     }
     if let PublicRole::Init(init_metadata) = &m.public_role {
         assert!(

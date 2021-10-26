@@ -9,8 +9,8 @@
                     "code": "file:../forwarder/output/forwarder.wasm"
                 },
                 "sc:child": {
-                    "owner": "sc:forwarder",
-                    "code": "file:../vault/output/vault.wasm"
+                    "code": "file:../vault/output/vault.wasm",
+                    "owner": "sc:forwarder"
                 }
             }
         },
@@ -20,11 +20,10 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "value": "0",
-                "function": "upgradeChildContract",
+                "function": "upgrade_vault_from_source",
                 "arguments": [
                     "sc:child",
-                    "file:../forwarder/output/forwarder.wasm"
+                    "sc:forwarder"
                 ],
                 "gasLimit": "500,000,000",
                 "gasPrice": "0"
@@ -39,7 +38,7 @@
                 "sc:child": {
                     "code": "file:../forwarder/output/forwarder.wasm"
                 },
-                "+": {}
+                "+": ""
             }
         },
         {
@@ -49,7 +48,6 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "value": "0",
                 "function": "upgradeVault",
                 "arguments": [
                     "sc:child",
@@ -68,7 +66,7 @@
                 "sc:child": {
                     "code": "file:../vault/output/vault.wasm"
                 },
-                "+": {}
+                "+": ""
             }
         }
     ]

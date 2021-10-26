@@ -116,6 +116,14 @@ where
         self.data.append_vec(other.data);
         self
     }
+
+    pub fn to_raw_args_vec(&self) -> Vec<Vec<u8>> {
+        let mut v = Vec::new();
+        for item in self.data.into_iter() {
+            v.push(item.to_boxed_bytes().into_vec());
+        }
+        v
+    }
 }
 
 #[inline(always)]
@@ -142,12 +150,12 @@ where
     }
 }
 
-impl<'a, M: ManagedTypeApi> ManagedArgBuffer<M>
+impl<M: ManagedTypeApi> ManagedArgBuffer<M>
 where
     M: ManagedTypeApi + ErrorApi + 'static,
 {
-    pub fn raw_arg_iter(&'a self) -> ManagedVecIterator<'a, M, ManagedBuffer<M>> {
-        ManagedVecIterator::new(&self.data)
+    pub fn raw_arg_iter(&self) -> ManagedVecIterator<M, ManagedBuffer<M>> {
+        self.data.iter()
     }
 }
 

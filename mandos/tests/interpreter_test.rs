@@ -1,5 +1,6 @@
+use mandos::{interpret_trait::InterpreterContext, value_interpreter::interpret_string};
+
 extern crate mandos;
-use mandos::*;
 
 const EMPTY: Vec<u8> = Vec::<u8>::new();
 
