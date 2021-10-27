@@ -37,19 +37,11 @@ impl DebugApi {
         tx_result: TxResult,
         blockchain_updates: BlockchainUpdate,
     ) -> Vec<Vec<u8>> {
-        if tx_result.result_status == 0 {
-            self.blockchain_cache().commit_updates(blockchain_updates);
+        self.blockchain_cache().commit_updates(blockchain_updates);
 
-            self.result_borrow_mut().merge_after_sync_call(&tx_result);
+        self.result_borrow_mut().merge_after_sync_call(&tx_result);
 
-            tx_result.result_values
-        } else {
-            // also kill current execution
-            std::panic::panic_any(TxPanic {
-                status: tx_result.result_status,
-                message: tx_result.result_message.into_bytes(),
-            })
-        }
+        tx_result.result_values
     }
 
     fn perform_execute_on_dest_context(
@@ -77,7 +69,15 @@ impl DebugApi {
         let (tx_result, blockchain_updates) =
             execute_builtin_function_or_default(tx_input, tx_cache);
 
-        self.sync_call_post_processing(tx_result, blockchain_updates)
+        if tx_result.result_status == 0 {
+            self.sync_call_post_processing(tx_result, blockchain_updates)
+        } else {
+            // also kill current execution
+            std::panic::panic_any(TxPanic {
+                status: tx_result.result_status,
+                message: tx_result.result_message.into_bytes(),
+            })
+        }
     }
 
     fn perform_deploy(
@@ -105,10 +105,18 @@ impl DebugApi {
         let (tx_result, blockchain_updates, new_address) =
             deploy_contract(tx_input, contract_code, tx_cache);
 
-        (
-            new_address,
-            self.sync_call_post_processing(tx_result, blockchain_updates),
-        )
+        if tx_result.result_status == 0 {
+            (
+                new_address,
+                self.sync_call_post_processing(tx_result, blockchain_updates),
+            )
+        } else {
+            // also kill current execution
+            std::panic::panic_any(TxPanic {
+                status: 10,
+                message: b"error signalled by smartcontract".to_vec(),
+            })
+        }
     }
 
     fn perform_async_call(&self, call: AsyncCallTxData) -> ! {
