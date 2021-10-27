@@ -317,6 +317,21 @@ where
         contract_call
     }
 
+    /// This function converts and SFT to a metaESDT by adding decimals to its structure in the metachain ESDT System SC.
+    /// This function as almost all in case of ESDT can be called only by the owner.
+    pub fn change_sft_to_meta_esdt(
+        self,
+        token_identifier: &TokenIdentifier<SA>,
+        num_decimals: usize,
+    ) -> ContractCall<SA, ()> {
+        let mut contract_call = self.esdt_system_sc_call_no_args(b"changeSFTToMetaESDT");
+
+        contract_call.push_endpoint_arg(token_identifier);
+        contract_call.push_endpoint_arg(num_decimals);
+
+        contract_call
+    }
+
     /// This function can be called only if canSetSpecialRoles was set to true.
     /// The metachain system SC will evaluate the arguments and call “ESDTSetRole@tokenId@listOfRoles” for the given address.
     /// This will be actually a cross shard call.
