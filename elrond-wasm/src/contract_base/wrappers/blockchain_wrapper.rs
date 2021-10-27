@@ -193,7 +193,7 @@ where
     #[inline]
     pub fn get_current_esdt_nft_nonce(
         &self,
-        address: &ManagedAddress<A>,
+        address: &Address,
         token_id: &TokenIdentifier<A>,
     ) -> u64 {
         self.api.get_current_esdt_nft_nonce(address, token_id)
