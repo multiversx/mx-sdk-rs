@@ -3,6 +3,7 @@ use crate::{
     generate::{
         auto_impl::generate_auto_impls, auto_impl_proxy::generate_all_proxy_trait_imports,
         callback_gen::*, callback_proxies_gen::*, contract_gen::*,
+        endpoints_mod_gen::generate_endpoints_mod,
         function_selector::generate_function_selector_body, proxy_gen, supertrait_gen,
     },
     model::ContractTrait,
@@ -21,7 +22,7 @@ pub fn contract_implementation(
     let call_methods = generate_call_methods(contract);
     let auto_impl_defs = generate_auto_impl_defs(contract);
     let auto_impls = generate_auto_impls(contract);
-    let endpoints = generate_wasm_endpoints(contract);
+    let endpoints_mod = generate_endpoints_mod(contract, is_contract_main);
     let function_selector_body = generate_function_selector_body(contract);
     let (callback_selector_body, callback_body) = generate_callback_selector_and_main(contract);
 
@@ -119,35 +120,6 @@ pub fn contract_implementation(
         #new_contract_object_fn
     };
 
-    let wasm_callback_fn = if is_contract_main {
-        quote! {
-            #[no_mangle]
-            pub fn callBack () {
-                let inst = super::endpoints::new_arwen_instance();
-                super::EndpointWrappers::callback(&inst);
-            }
-        }
-    } else {
-        quote! {}
-    };
-
-    let wasm_endpoints = quote! {
-        #[cfg(feature = "wasm-output-mode")]
-        #[allow(non_snake_case)]
-        mod endpoints {
-            use super::*;
-
-            fn new_arwen_instance() -> super::ContractObj<elrond_wasm_node::ArwenApiImpl> {
-                let api = elrond_wasm_node::ArwenApiImpl{};
-                super::contract_obj(api)
-            }
-
-            #(#endpoints)*
-
-            #wasm_callback_fn
-        }
-    };
-
     let proxy_trait = proxy_gen::proxy_trait(contract);
     let proxy_obj_code = if is_contract_main {
         proxy_gen::proxy_obj_code(contract)
@@ -160,7 +132,7 @@ pub fn contract_implementation(
 
         #contract_obj_code
 
-        #wasm_endpoints
+        #endpoints_mod
 
         #proxy_trait
 

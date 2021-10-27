@@ -20,6 +20,10 @@ path = ".."
 default-features = false
 features=["wasm-output-mode"]
 
+[dependencies.elrond-wasm-node]
+version = "0.21.2"
+path = "../../../../elrond-wasm-node"
+
 [dependencies.elrond-wasm-output]
 version = "0.21.2"
 path = "../../../../elrond-wasm-output"
