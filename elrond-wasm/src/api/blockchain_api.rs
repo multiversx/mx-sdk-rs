@@ -92,7 +92,7 @@ pub trait BlockchainApi: ErrorApi + ManagedTypeApi + Clone + Sized + 'static {
 
     fn get_current_esdt_nft_nonce(
         &self,
-        address: &ManagedAddress<Self>,
+        address: &Address,
         token_id: &TokenIdentifier<Self>,
     ) -> u64;
 
