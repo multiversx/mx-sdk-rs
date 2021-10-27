@@ -317,7 +317,7 @@ where
         contract_call
     }
 
-    /// This function converts and SFT to a metaESDT by adding decimals to its structure in the metachain ESDT System SC.
+    /// This function converts an SFT to a metaESDT by adding decimals to its structure in the metachain ESDT System SC.
     /// This function as almost all in case of ESDT can be called only by the owner.
     pub fn change_sft_to_meta_esdt(
         self,
