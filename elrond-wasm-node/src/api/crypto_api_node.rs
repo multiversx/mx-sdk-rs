@@ -1,4 +1,4 @@
-use crate::ArwenApiImpl;
+use super::ArwenApiImpl;
 use elrond_wasm::{
     api::CryptoApi,
     types::{BoxedBytes, MessageHashType, H256},
