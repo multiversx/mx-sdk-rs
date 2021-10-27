@@ -76,6 +76,7 @@ members = [
   "contracts/feature-tests/payable-features/abi",
   "contracts/feature-tests/use-module",
   "contracts/feature-tests/use-module/abi",
+  "contracts/feature-tests/use-module/meta",
 
   "contracts/modules/elrond-wasm-module-bonding-curve",
   "contracts/modules/elrond-wasm-module-dns",

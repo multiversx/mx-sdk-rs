@@ -7,6 +7,7 @@ pub mod auto_impl_storage;
 pub mod callback_gen;
 pub mod callback_proxies_gen;
 pub mod contract_gen;
+pub mod endpoints_mod_gen;
 pub mod function_selector;
 pub mod method_call_gen;
 pub mod method_gen;
