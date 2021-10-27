@@ -261,4 +261,9 @@ where
 
         roles
     }
+
+    #[inline]
+    pub fn test_memory(&self) {
+        self.api.test_memory();
+    }
 }

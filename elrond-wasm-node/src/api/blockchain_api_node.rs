@@ -1,4 +1,6 @@
-use crate::api::managed_types::managed_buffer_api_node::unsafe_buffer_load_address;
+use crate::api::{
+    managed_types::managed_buffer_api_node::unsafe_buffer_load_address, unsafe_buffer::test_memory,
+};
 use elrond_wasm::{
     api::BlockchainApi,
     types::{
@@ -531,5 +533,9 @@ impl BlockchainApi for crate::ArwenApiImpl {
                 uris: ManagedVec::from_raw_handle(self.clone(), uris_handle),
             }
         }
+    }
+
+    fn test_memory(&self) {
+        test_memory(self.clone());
     }
 }

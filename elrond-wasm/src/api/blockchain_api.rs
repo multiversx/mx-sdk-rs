@@ -109,4 +109,6 @@ pub trait BlockchainApi: ErrorApi + ManagedTypeApi + Clone + Sized + 'static {
         token_id: &TokenIdentifier<Self>,
         nonce: u64,
     ) -> EsdtTokenData<Self>;
+
+    fn test_memory(&self);
 }

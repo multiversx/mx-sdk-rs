@@ -40,37 +40,20 @@
             }
         },
         {
-            "step": "scQuery",
-            "txId": "2",
-            "tx": {
-                "to": "sc:adder",
-                "function": "getSum",
-                "arguments": []
-            },
-            "expect": {
-                "out": [
-                    "5"
-                ],
-                "status": "",
-                "logs": []
-            }
-        },
-        {
             "step": "scCall",
             "txId": "3",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:adder",
-                "function": "add",
-                "arguments": [
-                    "3"
-                ],
-                "gasLimit": "5,000,000",
+                "function": "test_memory",
+                "arguments": [],
+                "gasLimit": "500,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [],
-                "status": "",
+                "status": "4",
+                "message": "",
                 "logs": [],
                 "gas": "*",
                 "refund": "*"

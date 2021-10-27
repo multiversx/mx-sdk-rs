@@ -22,4 +22,9 @@ pub trait Adder {
 
         Ok(())
     }
+
+    #[endpoint]
+    fn test_memory(&self) {
+        self.blockchain().test_memory();
+    }
 }

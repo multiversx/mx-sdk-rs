@@ -147,6 +147,8 @@ impl elrond_wasm::api::BlockchainApi for DebugApi {
                 self.esdt_token_data_from_instance(nonce, instance)
             })
     }
+
+    fn test_memory(&self) {}
 }
 
 impl DebugApi {

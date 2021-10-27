@@ -110,4 +110,8 @@ impl BlockchainApi for UncallableApi {
     ) -> EsdtTokenData<Self> {
         unreachable!()
     }
+
+    fn test_memory(&self) {
+        unreachable!()
+    }
 }
