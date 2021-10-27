@@ -349,11 +349,7 @@ impl BlockchainApi for crate::ArwenApiImpl {
     }
 
     #[inline]
-    fn get_current_esdt_nft_nonce(
-        &self,
-        address: &Address<Self>,
-        token: &TokenIdentifier<Self>,
-    ) -> u64 {
+    fn get_current_esdt_nft_nonce(&self, address: &Address, token: &TokenIdentifier<Self>) -> u64 {
         unsafe {
             getCurrentESDTNFTNonce(
                 address.as_ref().as_ptr(),
