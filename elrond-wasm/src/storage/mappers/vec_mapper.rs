@@ -184,12 +184,7 @@ where
     /// Loads all items from storage and places them in a Vec.
     /// Can easily consume a lot of gas.
     pub fn load_as_vec(&self) -> Vec<T> {
-        let len = self.len();
-        let mut result = Vec::with_capacity(len);
-        for i in 1..=len {
-            result.push(self.get(i));
-        }
-        result
+        self.iter().collect()
     }
 
     /// Deletes all contents form storage and sets count to 0.
@@ -200,6 +195,57 @@ where
             storage_clear(self.api.clone(), &self.item_key(i));
         }
         self.save_count(0);
+    }
+
+    /// Provides a forward iterator.
+    pub fn iter(&self) -> Iter<SA, T> {
+        Iter::new(self)
+    }
+}
+
+/// An iterator over the elements of a `VecMapper`.
+///
+/// This `struct` is created by [`VecMapper::iter()`]. See its
+/// documentation for more.
+pub struct Iter<'a, SA, T>
+where
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    T: TopEncode + TopDecode + 'static,
+{
+    index: usize,
+    len: usize,
+    vec: &'a VecMapper<SA, T>,
+}
+
+impl<'a, SA, T> Iter<'a, SA, T>
+where
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    T: TopEncode + TopDecode + 'static,
+{
+    fn new(vec: &'a VecMapper<SA, T>) -> Iter<'a, SA, T> {
+        Iter {
+            index: 1,
+            len: vec.len(),
+            vec,
+        }
+    }
+}
+
+impl<'a, SA, T> Iterator for Iter<'a, SA, T>
+where
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    T: TopEncode + TopDecode + 'static,
+{
+    type Item = T;
+
+    #[inline]
+    fn next(&mut self) -> Option<T> {
+        let current_index = self.index;
+        if current_index > self.len {
+            return None;
+        }
+        self.index += 1;
+        Some(self.vec.get_unchecked(current_index))
     }
 }
 
