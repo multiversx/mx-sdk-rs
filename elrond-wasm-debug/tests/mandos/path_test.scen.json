@@ -1,0 +1,25 @@
+{
+    "name": "test external steps resolution",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:an_account": {
+                    "storage": {
+                        "str:text": "file:path_test.txt"
+                    }
+                }
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:an_account": {
+                    "storage": {
+                        "str:text": "str:This file is used in the path test|0xa"
+                    }
+                }
+            }
+        }
+    ]
+}
