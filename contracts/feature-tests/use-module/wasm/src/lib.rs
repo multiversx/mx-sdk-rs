@@ -8,6 +8,11 @@
 pub use elrond_wasm_output;
 
 #[no_mangle]
+pub fn init() {
+    use_module::endpoints::init(elrond_wasm_node::arwen_api());
+}
+
+#[no_mangle]
 pub fn checkFeatureGuard() {
     use_module::endpoints::checkFeatureGuard(elrond_wasm_node::arwen_api());
 }

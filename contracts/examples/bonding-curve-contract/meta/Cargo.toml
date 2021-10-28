@@ -1,0 +1,17 @@
+[package]
+name = "bonding-curve-contract-meta"
+version = "0.0.0"
+authors = ["Alin Cruceat <alin.cruceat@elrond.com>"]
+edition = "2018"
+publish = false
+
+[dependencies.bonding-curve-contract]
+path = ".."
+
+[dependencies.elrond-wasm]
+version = "0.21.2"
+path = "../../../../elrond-wasm"
+
+[dependencies.elrond-wasm-debug]
+version = "0.21.2"
+path = "../../../../elrond-wasm-debug"
