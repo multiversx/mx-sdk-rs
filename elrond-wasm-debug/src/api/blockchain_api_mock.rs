@@ -100,13 +100,18 @@ impl elrond_wasm::api::BlockchainApi for DebugApi {
             .clone()
     }
 
-    fn get_current_esdt_nft_nonce(
-        &self,
-        _address: &Address,
-        _token: &TokenIdentifier<Self>,
-    ) -> u64 {
-        // TODO: Implement
-        0u64
+    fn get_current_esdt_nft_nonce(&self, address: &Address, token: &TokenIdentifier<Self>) -> u64 {
+        assert!(
+            address == &self.get_sc_address_legacy(),
+            "get_current_esdt_nft_nonce not yet implemented for accounts other than the contract itself"
+        );
+
+        self.with_contract_account(|account| {
+            account
+                .esdt
+                .get_by_identifier_or_default(token.to_esdt_identifier().as_slice())
+                .last_nonce
+        })
     }
 
     fn get_esdt_balance(
