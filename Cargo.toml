@@ -7,6 +7,13 @@ members = [
   "elrond-codec",
   "elrond-codec-derive",
 
+  "contracts/benchmarks/mappers/benchmark-common",
+  "contracts/benchmarks/mappers/linked-list-repeat",
+  "contracts/benchmarks/mappers/map-repeat",
+  "contracts/benchmarks/mappers/queue-repeat",
+  "contracts/benchmarks/mappers/set-repeat",
+  "contracts/benchmarks/mappers/single-value-repeat",
+  "contracts/benchmarks/mappers/vec-repeat",
   "contracts/benchmarks/str-repeat",
   "contracts/benchmarks/send-tx-repeat",
 
