@@ -182,6 +182,77 @@ pub trait Multisig {
         readable: bool,
         #[var_args] arguments: VarArgs<BoxedBytes>,
     ) -> SCResult<usize> {
+        let code_metadata = self.get_code_metadata(upgradeable, payable, readable);
+        self.propose_action(Action::SCDeploy {
+            amount,
+            code,
+            code_metadata,
+            arguments: arguments.into_vec(),
+        })
+    }
+
+    #[endpoint(proposeSCDeployFromSource)]
+    fn propose_sc_deploy_from_source(
+        &self,
+        amount: BigUint,
+        source: ManagedAddress,
+        upgradeable: bool,
+        payable: bool,
+        readable: bool,
+        #[var_args] arguments: VarArgs<BoxedBytes>,
+    ) -> SCResult<usize> {
+        let code_metadata = self.get_code_metadata(upgradeable, payable, readable);
+        self.propose_action(Action::SCDeployFromSource {
+            amount,
+            source,
+            code_metadata,
+            arguments: arguments.into_vec(),
+        })
+    }
+
+    #[endpoint(proposeSCUpgrade)]
+    fn propose_sc_upgrade(
+        &self,
+        sc_address: ManagedAddress,
+        amount: BigUint,
+        code: ManagedBuffer,
+        upgradeable: bool,
+        payable: bool,
+        readable: bool,
+        #[var_args] arguments: VarArgs<BoxedBytes>,
+    ) {
+        let code_metadata = self.get_code_metadata(upgradeable, payable, readable);
+        self.propose_action(Action::SCUpgrade {
+            sc_address,
+            amount,
+            code,
+            code_metadata,
+            arguments: arguments.into_vec(),
+        });
+    }
+
+    #[endpoint(proposeSCUpgradeFromSource)]
+    fn propose_sc_upgrade_from_source(
+        &self,
+        sc_address: ManagedAddress,
+        amount: BigUint,
+        source: ManagedAddress,
+        upgradeable: bool,
+        payable: bool,
+        readable: bool,
+        #[var_args] arguments: VarArgs<BoxedBytes>,
+    ) {
+        let code_metadata = self.get_code_metadata(upgradeable, payable, readable);
+        self.propose_action(Action::SCUpgradeFromSource {
+            sc_address,
+            amount,
+            source,
+            code_metadata,
+            arguments: arguments.into_vec(),
+        });
+    }
+
+    fn get_code_metadata(&self, upgradeable: bool, payable: bool, readable: bool) -> CodeMetadata {
         let mut code_metadata = CodeMetadata::DEFAULT;
         if upgradeable {
             code_metadata |= CodeMetadata::UPGRADEABLE;
@@ -192,31 +263,67 @@ pub trait Multisig {
         if readable {
             code_metadata |= CodeMetadata::READABLE;
         }
-        self.propose_action(Action::SCDeploy {
-            amount,
-            code,
-            code_metadata,
-            arguments: arguments.into_vec(),
-        })
+        code_metadata
     }
+
+    // #[endpoint(proposeESDTTransferExecute)]
+    // fn propose_esdt_transfer_execute(
+    //     &self,
+    //     to: ManagedAddress,
+    //     payments: VarArgs<(TokenIdentifier, u64, BigUint)>,
+    //     endpoint_name: ManagedBuffer,
+    //     #[var_args] arguments: VarArgs<BoxedBytes>,
+    // ) -> SCResult<usize> {
+    //     let mut all_payments = Vec::new();
+    //     for (token_identifier, token_nonce, amount) in payments.into_vec() {
+    //         all_payments.push(EsdtTokenPayment::from(
+    //             token_identifier,
+    //             token_nonce,
+    //             amount,
+    //         ));
+    //     }
+
+    //     self.propose_action(Action::ESDTTransferExecute {
+    //         to,
+    //         all_payments,
+    //         endpoint_name,
+    //         arguments: arguments.into_vec(),
+    //     })
+    // }
 
     /// To be used not only for smart contract calls,
     /// but also for ESDT calls or any protocol built-in function.
-    #[endpoint(proposeSCCall)]
-    fn propose_sc_call(
+    #[endpoint(proposeAsyncCall)]
+    fn propose_async_call(
         &self,
         to: ManagedAddress,
         egld_payment: BigUint,
         endpoint_name: BoxedBytes,
         #[var_args] arguments: VarArgs<BoxedBytes>,
     ) -> SCResult<usize> {
-        self.propose_action(Action::SCCall {
+        self.propose_action(Action::SCAsyncCall {
             to,
             egld_payment,
             endpoint_name,
             arguments: arguments.into_vec(),
         })
     }
+
+    // #[endpoint(proposeSyncCall)]
+    // fn propose_sync_call(
+    //     &self,
+    //     to: ManagedAddress,
+    //     egld_payment: BigUint,
+    //     endpoint_name: BoxedBytes,
+    //     #[var_args] arguments: VarArgs<BoxedBytes>,
+    // ) -> SCResult<usize> {
+    //     self.propose_action(Action::SCSyncCall {
+    //         to,
+    //         egld_payment,
+    //         endpoint_name,
+    //         arguments: arguments.into_vec(),
+    //     })
+    // }
 
     /// Returns `true` (`1`) if the user has signed the action.
     /// Does not check whether or not the user is still a board member and the signature valid.
@@ -481,6 +588,40 @@ pub trait Multisig {
                 amount,
                 data: data.as_slice().managed_into(),
             })),
+            Action::SCAsyncCall {
+                to,
+                egld_payment,
+                endpoint_name,
+                arguments,
+            } => {
+                let mut contract_call_raw = self
+                    .send()
+                    .contract_call::<()>(to, endpoint_name.managed_into())
+                    .with_egld_transfer(egld_payment);
+                for arg in arguments {
+                    contract_call_raw.push_argument_raw_bytes(arg.as_slice());
+                }
+                Ok(PerformActionResult::SendAsyncCall(
+                    contract_call_raw.async_call(),
+                ))
+            },
+            Action::SCSyncCall {
+                to,
+                egld_payment,
+                endpoint_name,
+                arguments,
+            } => {
+                let half_gas = self.blockchain().get_gas_left() / 2;
+                let result = self.raw_vm_api().execute_on_dest_context_raw(
+                    half_gas,
+                    &to,
+                    &egld_payment,
+                    &endpoint_name.managed_into(),
+                    &arguments.managed_into(),
+                );
+
+                Ok(PerformActionResult::ExecOnDestContext(result))
+            },
             Action::SCDeploy {
                 amount,
                 code,
@@ -498,16 +639,71 @@ pub trait Multisig {
                 );
                 Ok(PerformActionResult::DeployResult(new_address))
             },
-            Action::SCCall {
+            Action::SCDeployFromSource {
+                amount,
+                source,
+                code_metadata,
+                arguments,
+            } => {
+                let gas_left = self.blockchain().get_gas_left();
+                let arg_buffer = arguments.managed_into();
+                let (new_address, _) = self.raw_vm_api().deploy_from_source_contract(
+                    gas_left,
+                    &amount,
+                    &source,
+                    code_metadata,
+                    &arg_buffer,
+                );
+                Ok(PerformActionResult::DeployResult(new_address))
+            },
+            Action::SCUpgrade {
+                sc_address,
+                amount,
+                code,
+                code_metadata,
+                arguments,
+            } => {
+                let gas_left = self.blockchain().get_gas_left();
+                let arg_buffer = arguments.managed_into();
+                self.raw_vm_api().upgrade_contract(
+                    &sc_address,
+                    gas_left,
+                    &amount,
+                    &code,
+                    code_metadata,
+                    &arg_buffer,
+                );
+                Ok(PerformActionResult::Nothing)
+            },
+            Action::SCUpgradeFromSource {
+                sc_address,
+                amount,
+                source,
+                code_metadata,
+                arguments,
+            } => {
+                let gas_left = self.blockchain().get_gas_left();
+                let arg_buffer = arguments.managed_into();
+                self.raw_vm_api().upgrade_from_source_contract(
+                    &sc_address,
+                    gas_left,
+                    &amount,
+                    &source,
+                    code_metadata,
+                    &arg_buffer,
+                );
+                Ok(PerformActionResult::Nothing)
+            },
+            Action::ESDTTransferExecute {
                 to,
-                egld_payment,
+                payments,
                 endpoint_name,
                 arguments,
             } => {
                 let mut contract_call_raw = self
                     .send()
                     .contract_call::<()>(to, endpoint_name.managed_into())
-                    .with_egld_transfer(egld_payment);
+                    .with_multi_token_transfer(payments.managed_into());
                 for arg in arguments {
                     contract_call_raw.push_argument_raw_bytes(arg.as_slice());
                 }
