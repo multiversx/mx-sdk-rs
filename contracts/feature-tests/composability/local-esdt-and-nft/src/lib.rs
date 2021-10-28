@@ -248,6 +248,14 @@ pub trait LocalEsdtAndEsdtNft {
         )
     }
 
+    #[view(getCurrentNftNonce)]
+    fn get_current_nft_nonce(&self, token_identifier: &TokenIdentifier) -> u64 {
+        self.blockchain().get_current_esdt_nft_nonce(
+            &self.blockchain().get_sc_address_legacy(),
+            token_identifier,
+        )
+    }
+
     // callbacks
 
     #[callback]
