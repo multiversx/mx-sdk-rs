@@ -15,3 +15,5 @@ mod send_api_node_managed;
 
 #[cfg(feature = "unmanaged-ei")]
 mod send_api_node_legacy;
+
+pub use vm_api_node::ArwenApiImpl;
