@@ -11,17 +11,10 @@ path = "src/queue_repeat.rs"
 [dependencies.benchmark-common]
 path = "../benchmark-common"
 
-[features]
-wasm-output-mode = ["elrond-wasm-node"]
 
 [dependencies.elrond-wasm]
 version = "0.21.2"
 path = "../../../../elrond-wasm"
-
-[dependencies.elrond-wasm-node]
-version = "0.21.2"
-path = "../../../../elrond-wasm-node"
-optional = true
 
 [dev-dependencies.elrond-wasm-debug]
 version = "0.21.2"

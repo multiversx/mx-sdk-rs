@@ -7,6 +7,9 @@ elrond_wasm::imports!();
 /// i.e. the framework/Arwen functionality for accepting EGLD and ESDT payments.
 #[elrond_wasm::contract]
 pub trait PayableFeatures {
+    #[init]
+    fn init(&self) {}
+
     #[view]
     #[payable("*")]
     fn echo_call_value(
