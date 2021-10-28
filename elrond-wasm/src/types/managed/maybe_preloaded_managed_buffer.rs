@@ -71,8 +71,8 @@ where
         slice_len: usize,
     ) -> Option<ManagedBuffer<M>> {
         if let Some(buffer) = self.local_buffer {
+            let type_manager = self.managed_buffer.type_manager();
             let slice = self.get_slice(&buffer, starting_position, slice_len).ok()?;
-            let type_manager = self.managed_buffer.type_manager().clone();
             Some(ManagedBuffer::new_from_bytes(type_manager, slice))
         } else {
             self.managed_buffer.copy_slice(starting_position, slice_len)
