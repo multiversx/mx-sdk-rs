@@ -3,7 +3,7 @@ use std::{
     io::Write,
 };
 
-use elrond_wasm::contract_base::ContractAbiProvider;
+use elrond_wasm::abi::ContractAbi;
 
 const WASM_SRC_DIR: &str = "../wasm/src";
 const WASM_SRC_PATH: &str = "../wasm/src/lib.rs";
@@ -32,8 +32,7 @@ pub fn {}() {{
     .unwrap();
 }
 
-pub fn write_wasm_lib<AbiObj: ContractAbiProvider>() {
-    let abi = <AbiObj as ContractAbiProvider>::abi();
+pub fn write_wasm_lib(abi: &ContractAbi) {
     let contract_module_name = abi
         .build_info
         .contract_crate
