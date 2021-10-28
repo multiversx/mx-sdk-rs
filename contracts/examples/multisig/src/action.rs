@@ -2,8 +2,8 @@ use elrond_wasm::{
     api::{EndpointFinishApi, ManagedTypeApi, SendApi, StorageWriteApi},
     io::EndpointResult,
     types::{
-        AsyncCall, BigUint, BoxedBytes, CodeMetadata, ManagedAddress, ManagedBuffer,
-        OptionalResult, SendEgld, Vec,
+        AsyncCall, BigUint, BoxedBytes, CodeMetadata, EsdtTokenPayment, ManagedAddress,
+        ManagedBuffer, ManagedVec, OptionalResult, SendEgld, Vec,
     },
 };
 
@@ -21,16 +21,48 @@ pub enum Action<M: ManagedTypeApi> {
         amount: BigUint<M>,
         data: BoxedBytes,
     },
+    SCAsyncCall {
+        to: ManagedAddress<M>,
+        egld_payment: BigUint<M>,
+        endpoint_name: BoxedBytes,
+        arguments: Vec<BoxedBytes>,
+    },
+    SCSyncCall {
+        to: ManagedAddress<M>,
+        egld_payment: BigUint<M>,
+        endpoint_name: BoxedBytes,
+        arguments: Vec<BoxedBytes>,
+    },
     SCDeploy {
         amount: BigUint<M>,
         code: ManagedBuffer<M>,
         code_metadata: CodeMetadata,
         arguments: Vec<BoxedBytes>,
     },
-    SCCall {
+    SCDeployFromSource {
+        amount: BigUint<M>,
+        source: ManagedAddress<M>,
+        code_metadata: CodeMetadata,
+        arguments: Vec<BoxedBytes>,
+    },
+    SCUpgrade {
+        sc_address: ManagedAddress<M>,
+        amount: BigUint<M>,
+        code: ManagedBuffer<M>,
+        code_metadata: CodeMetadata,
+        arguments: Vec<BoxedBytes>,
+    },
+    SCUpgradeFromSource {
+        sc_address: ManagedAddress<M>,
+        amount: BigUint<M>,
+        source: ManagedAddress<M>,
+        code_metadata: CodeMetadata,
+        arguments: Vec<BoxedBytes>,
+    },
+    ESDTTransferExecute {
         to: ManagedAddress<M>,
-        egld_payment: BigUint<M>,
-        endpoint_name: BoxedBytes,
+        payments: Vec<EsdtTokenPayment<M>>,
+        endpoint_name: ManagedBuffer<M>,
         arguments: Vec<BoxedBytes>,
     },
 }
@@ -61,6 +93,7 @@ where
     SendEgld(SendEgld<SA>),
     DeployResult(ManagedAddress<SA>),
     SendAsyncCall(AsyncCall<SA>),
+    ExecOnDestContext(ManagedVec<SA, ManagedBuffer<SA>>),
 }
 
 impl<SA> EndpointResult for PerformActionResult<SA>
@@ -78,6 +111,7 @@ where
             PerformActionResult::SendEgld(send_egld) => send_egld.finish(api),
             PerformActionResult::DeployResult(address) => address.finish(api),
             PerformActionResult::SendAsyncCall(async_call) => async_call.finish(api),
+            PerformActionResult::ExecOnDestContext(exec) => exec.finish(api),
         }
     }
 }
