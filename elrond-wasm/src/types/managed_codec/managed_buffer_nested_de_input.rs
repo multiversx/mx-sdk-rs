@@ -6,7 +6,12 @@ use elrond_codec::{
 
 use crate::{
     api::ManagedTypeApi,
-    types::{managed::ManagedBufferSizeContext, BigInt, BigUint, ManagedBuffer, ManagedType},
+    types::{
+        managed::{
+            maybe_preloaded_managed_buffer::MaybePreloadedManagedBuffer, ManagedBufferSizeContext,
+        },
+        BigInt, BigUint, ManagedBuffer,
+    },
 };
 
 /// Nested decode buffer based on a managed buffer.
@@ -16,9 +21,9 @@ pub struct ManagedBufferNestedDecodeInput<M>
 where
     M: ManagedTypeApi,
 {
-    pub managed_buffer: ManagedBuffer<M>,
-    pub decode_index: usize,
-    pub buffer_len: usize,
+    buffer: MaybePreloadedManagedBuffer<M>,
+    decode_index: usize,
+    buffer_len: usize,
     _phantom: PhantomData<M>,
 }
 
@@ -30,10 +35,11 @@ where
         // retrieves buffer length eagerly because:
         // - it always gets called anyway at the end to check that no leftover bytes remain
         // - it is sometimes required multiple times during serialization
-        let buffer_len = managed_buffer.len();
+        let buffer = MaybePreloadedManagedBuffer::new(managed_buffer);
+        let buffer_len = buffer.buffer_len;
 
         ManagedBufferNestedDecodeInput {
-            managed_buffer,
+            buffer,
             decode_index: 0,
             buffer_len,
             _phantom: PhantomData,
@@ -49,7 +55,7 @@ where
         &mut self,
         size: usize,
     ) -> Result<ManagedBuffer<M>, DecodeError> {
-        if let Some(managed_buffer) = self.managed_buffer.copy_slice(self.decode_index, size) {
+        if let Some(managed_buffer) = self.buffer.copy_slice(self.decode_index, size) {
             self.decode_index += size;
             Ok(managed_buffer)
         } else {
@@ -72,7 +78,7 @@ where
         c: ExitCtx,
         exit: fn(ExitCtx, DecodeError) -> !,
     ) -> ManagedBuffer<M> {
-        if let Some(managed_buffer) = self.managed_buffer.copy_slice(self.decode_index, size) {
+        if let Some(managed_buffer) = self.buffer.copy_slice(self.decode_index, size) {
             self.decode_index += size;
             managed_buffer
         } else {
@@ -116,7 +122,7 @@ where
     }
 
     fn read_into(&mut self, into: &mut [u8]) -> Result<(), DecodeError> {
-        let err_result = self.managed_buffer.load_slice(self.decode_index, into);
+        let err_result = self.buffer.load_slice(self.decode_index, into);
         if err_result.is_ok() {
             self.decode_index += into.len();
             Ok(())
@@ -131,7 +137,7 @@ where
         c: ExitCtx,
         exit: fn(ExitCtx, DecodeError) -> !,
     ) {
-        let err_result = self.managed_buffer.load_slice(self.decode_index, into);
+        let err_result = self.buffer.load_slice(self.decode_index, into);
         if err_result.is_err() {
             exit(c, DecodeError::INPUT_TOO_SHORT);
         }
@@ -145,7 +151,7 @@ where
         C: TryStaticCast,
         F: FnOnce(&mut Self) -> Result<T, DecodeError>,
     {
-        if let Some(result) = self.managed_buffer.type_manager().try_cast_ref::<T>() {
+        if let Some(result) = self.buffer.type_manager().try_cast_ref::<T>() {
             // API for instancing empty Vec
             Ok(result.clone())
         } else if let Some(result) = try_execute_then_cast(|| {
@@ -179,7 +185,7 @@ where
         F: FnOnce(&mut Self, ExitCtx) -> T,
         ExitCtx: Clone,
     {
-        if let Some(result) = self.managed_buffer.type_manager().try_cast_ref::<T>() {
+        if let Some(result) = self.buffer.type_manager().try_cast_ref::<T>() {
             // API for instancing empty Vec
             result.clone()
         } else if let Some(result) = try_execute_then_cast(|| {
