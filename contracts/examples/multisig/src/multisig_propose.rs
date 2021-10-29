@@ -90,14 +90,13 @@ pub trait MultisigProposeModule: crate::multisig_state::MultisigStateModule {
     fn propose_send_esdt(
         &self,
         to: ManagedAddress,
-        esdt_payments: ManagedCountedMultiResultVec<MultiResult3<TokenIdentifier, u64, BigUint>>,
+        esdt_payment_args: ManagedCountedVarArgs<EsdtTokenPaymentMultiArg<Self::Api>>,
         #[var_args] opt_function: OptionalArg<ManagedBuffer>,
         #[var_args] arguments: ManagedVarArgs<ManagedBuffer>,
     ) -> SCResult<usize> {
         let mut esdt_payments_vec = ManagedVec::new();
-        for triple in esdt_payments.into_iter() {
-            let (token_identifier, nonce, value) = triple.into_tuple();
-            esdt_payments_vec.push(EsdtTokenPayment::new(token_identifier, nonce, value));
+        for payment_args in esdt_payment_args.into_vec().into_iter() {
+            esdt_payments_vec.push(payment_args.into_esdt_token_payment());
         }
         let endpoint_name = match opt_function {
             OptionalArg::Some(data) => data,
