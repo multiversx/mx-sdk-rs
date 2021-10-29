@@ -21,8 +21,10 @@ panic = "abort"
 
 [dependencies.egld-esdt-swap]
 path = ".."
-features = ["wasm-output-mode"]
-default-features = false
+
+[dependencies.elrond-wasm-node]
+version = "0.21.2"
+path = "../../../../elrond-wasm-node"
 
 [dependencies.elrond-wasm-output]
 version = "0.21.2"

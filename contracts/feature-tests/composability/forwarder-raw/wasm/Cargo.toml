@@ -17,7 +17,10 @@ panic = "abort"
 
 [dependencies.forwarder-raw]
 path = ".."
-features=["wasm-output-mode-managed-ei"]
+
+[dependencies.elrond-wasm-node]
+version = "0.21.2"
+path = "../../../../../elrond-wasm-node"
 
 [dependencies.elrond-wasm-output]
 version = "0.21.2"
