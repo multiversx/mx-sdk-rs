@@ -8,8 +8,8 @@ publish = false
 [lib]
 path = "src/lottery.rs"
 
-[features]
-wasm-output-mode = [ "elrond-wasm-node",]
+[dependencies.erc20]
+path = "../erc20"
 
 [dependencies.elrond-wasm]
 version = "0.21.2"
@@ -20,9 +20,6 @@ features = ["cb_closure_managed_deser"]
 version = "0.21.2"
 path = "../../../elrond-wasm-node"
 optional = true
-
-[dependencies.erc20]
-path = "../erc20"
 
 [dev-dependencies.elrond-wasm-debug]
 version = "0.21.2"

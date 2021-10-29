@@ -1,4 +1,4 @@
-use crate::ArwenApiImpl;
+use super::ArwenApiImpl;
 use alloc::vec::Vec;
 use elrond_wasm::{
     api::{Handle, StorageReadApi, StorageWriteApi},

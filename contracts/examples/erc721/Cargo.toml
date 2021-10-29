@@ -8,17 +8,10 @@ publish = false
 [lib]
 path = "src/erc721.rs"
 
-[features]
-wasm-output-mode = [ "elrond-wasm-node",]
 
 [dependencies.elrond-wasm]
 version = "0.21.2"
 path = "../../../elrond-wasm"
-
-[dependencies.elrond-wasm-node]
-version = "0.21.2"
-path = "../../../elrond-wasm-node"
-optional = true
 
 [dev-dependencies.elrond-wasm-debug]
 version = "0.21.2"
