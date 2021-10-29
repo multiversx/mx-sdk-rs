@@ -41,6 +41,20 @@ fn changequorum_toobig_rs() {
 fn deployadder_err_rs() {
     elrond_wasm_debug::mandos_rs("mandos/deployAdder_err.scen.json", contract_map());
 }
+#[test]
+fn deploy_from_source_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/deployOtherMultisig.scen.json", contract_map());
+}
+
+#[test]
+fn upgrade_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/upgrade.scen.json", contract_map());
+}
+
+#[test]
+fn upgrade_from_source_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/upgrade_from_source.scen.json", contract_map());
+}
 
 #[test]
 fn deployadder_then_call_rs() {
