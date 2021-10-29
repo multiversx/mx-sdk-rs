@@ -170,6 +170,6 @@ def load_report(path: str) -> Report:
 
 
 if __name__ == "__main__":
-    report = load_report("benchmarks_gas_v4.log")
-    print_summary(report, "benchmark_summary_v4.ods")
-    print_gas_traces(report, "benchmark_detailed_v4.ods")
+    report = load_report("bench.log")
+    print_summary(report, "bench_summary.txt")
+    print_gas_traces(report, "bench_detailed.txt")
