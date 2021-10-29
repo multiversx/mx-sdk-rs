@@ -19,6 +19,8 @@ where
     _phantom: PhantomData<T>,
 }
 
+pub type ManagedVarArgs<M, T> = ManagedMultiResultVec<M, T>;
+
 impl<M, T> ManagedMultiResultVec<M, T>
 where
     M: ManagedTypeApi,
@@ -98,6 +100,19 @@ where
 {
     pub fn into_vec_of_buffers(self) -> ManagedVec<M, ManagedBuffer<M>> {
         self.raw_buffers
+    }
+}
+
+impl<M, T> ManagedMultiResultVec<M, T>
+where
+    M: ManagedTypeApi + ErrorApi,
+{
+    pub fn len(&self) -> usize {
+        self.raw_buffers.len()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.raw_buffers.is_empty()
     }
 }
 
