@@ -85,6 +85,10 @@ fn add_special_methods(substitutions: &mut SubstitutionsMap) {
         quote!(self.types().managed_vec_new()),
     );
     substitutions.add_substitution(
+        quote!(ManagedVec::singleton),
+        quote!(self.types().managed_vec_singleton),
+    );
+    substitutions.add_substitution(
         quote!(ManagedVec::from),
         quote!(self.types().managed_vec_from),
     );

@@ -32,7 +32,8 @@ pub trait MultisigProposeModule: crate::multisig_state::MultisigStateModule {
         if caller_role.can_sign() {
             // also sign
             // since the action is newly created, the caller can be the only signer
-            self.action_signer_ids(action_id).set(&[caller_id].to_vec());
+            self.action_signer_ids(action_id)
+                .set(&ManagedVec::singleton(caller_id));
         }
 
         Ok(action_id)
@@ -63,53 +64,43 @@ pub trait MultisigProposeModule: crate::multisig_state::MultisigStateModule {
         self.propose_action(Action::ChangeQuorum(new_quorum))
     }
 
+    /// Propose a transaction in which the contract can send EGLD
+    /// and optionally execute a contract endpoint or builtin function.
     #[endpoint(proposeSendEgld)]
     fn propose_send_egld(
         &self,
         to: ManagedAddress,
         amount: BigUint,
-        #[var_args] opt_data: OptionalArg<BoxedBytes>,
+        #[var_args] opt_function: OptionalArg<ManagedBuffer>,
+        #[var_args] arguments: ManagedVarArgs<ManagedBuffer>,
     ) -> SCResult<usize> {
-        let data = match opt_data {
+        let function_name = match opt_function {
             OptionalArg::Some(data) => data,
-            OptionalArg::None => BoxedBytes::empty(),
+            OptionalArg::None => ManagedBuffer::new(),
         };
-        self.propose_action(Action::SendEgld { to, amount, data })
-    }
-
-    /// To be used not only for smart contract calls,
-    /// but also for ESDT calls or any protocol built-in function.
-    #[endpoint(proposeAsyncCall)]
-    fn propose_async_call(
-        &self,
-        to: ManagedAddress,
-        egld_payment: BigUint,
-        endpoint_name: BoxedBytes,
-        #[var_args] arguments: VarArgs<BoxedBytes>,
-    ) -> SCResult<usize> {
-        self.propose_action(Action::SCAsyncCall {
+        self.propose_action(Action::SendEGLD {
             to,
-            egld_payment,
-            endpoint_name,
-            arguments: arguments.into_vec(),
+            amount,
+            function_name,
+            arguments: arguments.into_vec_of_buffers(),
         })
     }
 
-    #[endpoint(proposeSyncCall)]
-    fn propose_sync_call(
-        &self,
-        to: ManagedAddress,
-        egld_payment: BigUint,
-        endpoint_name: BoxedBytes,
-        #[var_args] arguments: VarArgs<BoxedBytes>,
-    ) -> SCResult<usize> {
-        self.propose_action(Action::SCSyncCall {
-            to,
-            egld_payment,
-            endpoint_name,
-            arguments: arguments.into_vec(),
-        })
-    }
+    // #[endpoint(proposeSendEsdt)]
+    // fn propose_send_esdt(
+    //     &self,
+    //     to: ManagedAddress,
+    //     egld_payment: BigUint,
+    //     #[var_args] opt_function: OptionalArg<ManagedBuffer>,
+    //     #[var_args] arguments: ManagedVarArgs<ManagedBuffer>,
+    // ) -> SCResult<usize> {
+    //     self.propose_action(Action::SendESDT {
+    //         to,
+    //         amount,
+    //         function_name,
+    //         arguments: arguments,
+    //     })
+    // }
 
     #[endpoint(proposeSCDeploy)]
     fn propose_sc_deploy(
@@ -119,14 +110,14 @@ pub trait MultisigProposeModule: crate::multisig_state::MultisigStateModule {
         upgradeable: bool,
         payable: bool,
         readable: bool,
-        #[var_args] arguments: VarArgs<BoxedBytes>,
+        #[var_args] arguments: ManagedVarArgs<ManagedBuffer>,
     ) -> SCResult<usize> {
         let code_metadata = get_code_metadata(upgradeable, payable, readable);
         self.propose_action(Action::SCDeploy {
             amount,
             code,
             code_metadata,
-            arguments: arguments.into_vec(),
+            arguments: arguments.into_vec_of_buffers(),
         })
     }
 
@@ -138,14 +129,14 @@ pub trait MultisigProposeModule: crate::multisig_state::MultisigStateModule {
         upgradeable: bool,
         payable: bool,
         readable: bool,
-        #[var_args] arguments: VarArgs<BoxedBytes>,
+        #[var_args] arguments: ManagedVarArgs<ManagedBuffer>,
     ) -> SCResult<usize> {
         let code_metadata = get_code_metadata(upgradeable, payable, readable);
         self.propose_action(Action::SCDeployFromSource {
             amount,
             source,
             code_metadata,
-            arguments: arguments.into_vec(),
+            arguments: arguments.into_vec_of_buffers(),
         })
     }
 
@@ -158,7 +149,7 @@ pub trait MultisigProposeModule: crate::multisig_state::MultisigStateModule {
         upgradeable: bool,
         payable: bool,
         readable: bool,
-        #[var_args] arguments: VarArgs<BoxedBytes>,
+        #[var_args] arguments: ManagedVarArgs<ManagedBuffer>,
     ) -> SCResult<usize> {
         let code_metadata = get_code_metadata(upgradeable, payable, readable);
         self.propose_action(Action::SCUpgrade {
@@ -166,7 +157,7 @@ pub trait MultisigProposeModule: crate::multisig_state::MultisigStateModule {
             amount,
             code,
             code_metadata,
-            arguments: arguments.into_vec(),
+            arguments: arguments.into_vec_of_buffers(),
         })
     }
 
@@ -179,7 +170,7 @@ pub trait MultisigProposeModule: crate::multisig_state::MultisigStateModule {
         upgradeable: bool,
         payable: bool,
         readable: bool,
-        #[var_args] arguments: VarArgs<BoxedBytes>,
+        #[var_args] arguments: ManagedVarArgs<ManagedBuffer>,
     ) -> SCResult<usize> {
         let code_metadata = get_code_metadata(upgradeable, payable, readable);
         self.propose_action(Action::SCUpgradeFromSource {
@@ -187,7 +178,7 @@ pub trait MultisigProposeModule: crate::multisig_state::MultisigStateModule {
             amount,
             source,
             code_metadata,
-            arguments: arguments.into_vec(),
+            arguments: arguments.into_vec_of_buffers(),
         })
     }
 
@@ -195,9 +186,9 @@ pub trait MultisigProposeModule: crate::multisig_state::MultisigStateModule {
     // fn propose_esdt_transfer_execute(
     //     &self,
     //     to: ManagedAddress,
-    //     payments: VarArgs<(TokenIdentifier, u64, BigUint)>,
+    //     payments: ManagedVarArgs<(TokenIdentifier, u64, BigUint)>,
     //     endpoint_name: ManagedBuffer,
-    //     #[var_args] arguments: VarArgs<BoxedBytes>,
+    //     #[var_args] arguments: ManagedVarArgs<ManagedBuffer>,
     // ) -> SCResult<usize> {
     //     let mut all_payments = Vec::new();
     //     for (token_identifier, token_nonce, amount) in payments.into_vec() {

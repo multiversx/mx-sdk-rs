@@ -98,11 +98,6 @@ pub fn proposeAddProposer() {
 }
 
 #[no_mangle]
-pub fn proposeAsyncCall() {
-    multisig::endpoints::proposeAsyncCall(elrond_wasm_node::arwen_api());
-}
-
-#[no_mangle]
 pub fn proposeChangeQuorum() {
     multisig::endpoints::proposeChangeQuorum(elrond_wasm_node::arwen_api());
 }
@@ -135,11 +130,6 @@ pub fn proposeSCUpgradeFromSource() {
 #[no_mangle]
 pub fn proposeSendEgld() {
     multisig::endpoints::proposeSendEgld(elrond_wasm_node::arwen_api());
-}
-
-#[no_mangle]
-pub fn proposeSyncCall() {
-    multisig::endpoints::proposeSyncCall(elrond_wasm_node::arwen_api());
 }
 
 #[no_mangle]

@@ -66,7 +66,8 @@ pub trait Multisig:
         if caller_role.can_sign() {
             // also sign
             // since the action is newly created, the caller can be the only signer
-            self.action_signer_ids(action_id).set(&[caller_id].to_vec());
+            self.action_signer_ids(action_id)
+                .set(&ManagedVec::singleton(caller_id));
         }
 
         Ok(action_id)
@@ -79,7 +80,7 @@ pub trait Multisig:
     /// - (number of signers followed by) list of signer addresses.
     #[view(getPendingActionFullInfo)]
     fn get_pending_action_full_info(&self) -> MultiResultVec<ActionFullInfo<Self::Api>> {
-        let mut result = Vec::new();
+        let mut result = MultiResultVec::new();
         let action_last_index = self.get_action_last_index();
         let action_mapper = self.action_mapper();
         for action_id in 1..=action_last_index {
@@ -92,7 +93,7 @@ pub trait Multisig:
                 });
             }
         }
-        result.into()
+        result
     }
 
     /// Returns `true` (`1`) if the user has signed the action.
@@ -104,7 +105,7 @@ pub trait Multisig:
             false
         } else {
             let signer_ids = self.action_signer_ids(action_id).get();
-            signer_ids.contains(&user_id)
+            signer_ids.into_vec().contains(&user_id)
         }
     }
 
@@ -135,7 +136,7 @@ pub trait Multisig:
     }
 
     fn get_all_users_with_role(&self, role: UserRole) -> MultiResultVec<ManagedAddress> {
-        let mut result = Vec::new();
+        let mut result = MultiResultVec::new();
         let num_users = self.user_mapper().get_user_count();
         for user_id in 1..=num_users {
             if self.get_user_id_to_role(user_id) == role {
@@ -144,7 +145,7 @@ pub trait Multisig:
                 }
             }
         }
-        result.into()
+        result
     }
 
     /// Used by board members to sign actions.
@@ -161,9 +162,11 @@ pub trait Multisig:
         require!(caller_role.can_sign(), "only board members can sign");
 
         self.action_signer_ids(action_id).update(|signer_ids| {
-            if !signer_ids.contains(&caller_id) {
-                signer_ids.push(caller_id);
-            }
+            signer_ids.with_self_as_vec(|signer_ids_vec| {
+                if !signer_ids_vec.contains(&caller_id) {
+                    signer_ids_vec.push(caller_id);
+                }
+            });
         });
 
         Ok(())
@@ -184,14 +187,16 @@ pub trait Multisig:
         require!(caller_role.can_sign(), "only board members can un-sign");
 
         self.action_signer_ids(action_id).update(|signer_ids| {
-            if let Some(signer_pos) = signer_ids
-                .iter()
-                .position(|&signer_id| signer_id == caller_id)
-            {
-                // since we don't care about the order,
-                // it is ok to call swap_remove, which is O(1)
-                signer_ids.swap_remove(signer_pos);
-            }
+            signer_ids.with_self_as_vec(|signer_ids_vec| {
+                if let Some(signer_pos) = signer_ids_vec
+                    .iter()
+                    .position(|signer_id| *signer_id == caller_id)
+                {
+                    // since we don't care about the order,
+                    // it is ok to call swap_remove, which is O(1)
+                    let _ = signer_ids_vec.swap_remove(signer_pos);
+                }
+            });
         });
 
         Ok(())

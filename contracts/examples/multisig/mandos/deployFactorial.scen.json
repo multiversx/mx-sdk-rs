@@ -72,7 +72,7 @@
                         "str:quorum": "2",
                         "str:action_data.len": "3",
                         "str:action_data.item|u32:3": {
-                            "1-discriminant": "0x08",
+                            "1-discriminant": "0x07",
                             "2-amount": "u32:0",
                             "3-code": "nested:file:../test-contracts/factorial.wasm",
                             "4-code_metadata": "0x0000",

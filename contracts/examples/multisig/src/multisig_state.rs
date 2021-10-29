@@ -48,22 +48,23 @@ pub trait MultisigStateModule {
     }
 
     #[storage_mapper("action_signer_ids")]
-    fn action_signer_ids(&self, action_id: usize) -> SingleValueMapper<Vec<usize>>;
+    fn action_signer_ids(&self, action_id: usize) -> SingleValueMapper<ManagedVec<usize>>;
 
     /// Gets addresses of all users who signed an action.
     /// Does not check if those users are still board members or not,
     /// so the result may contain invalid signers.
     #[view(getActionSigners)]
-    fn get_action_signers(&self, action_id: usize) -> Vec<ManagedAddress> {
-        self.action_signer_ids(action_id)
-            .get()
-            .iter()
-            .map(|signer_id| {
+    fn get_action_signers(&self, action_id: usize) -> ManagedVec<ManagedAddress> {
+        let signer_ids = self.action_signer_ids(action_id).get();
+        let mut signers = ManagedVec::new();
+        for signer_id in signer_ids.iter() {
+            signers.push(
                 self.user_mapper()
-                    .get_user_address_unchecked(*signer_id)
-                    .managed_into()
-            })
-            .collect()
+                    .get_user_address_unchecked(signer_id)
+                    .managed_into(),
+            );
+        }
+        signers
     }
 
     /// Gets addresses of all users who signed an action and are still board members.
@@ -84,7 +85,7 @@ pub trait MultisigStateModule {
         signer_ids
             .iter()
             .filter(|signer_id| {
-                let signer_role = self.get_user_id_to_role(**signer_id);
+                let signer_role = self.get_user_id_to_role(*signer_id);
                 signer_role.can_sign()
             })
             .count()
