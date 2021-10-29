@@ -1,3 +1,5 @@
+use core::mem::MaybeUninit;
+
 use crate::api::{InvalidSliceError, ManagedTypeApi};
 
 use super::{ManagedBuffer, ManagedType};
@@ -20,7 +22,8 @@ where
     pub fn new(managed_buffer: ManagedBuffer<M>) -> Self {
         let buffer_len = managed_buffer.len();
         let local_buffer = if buffer_len <= BUFFER_SIZE {
-            let mut new_buffer = [0; BUFFER_SIZE];
+            //TODO: unsafe{ alloc_page() };
+            let mut new_buffer: [u8; BUFFER_SIZE] = unsafe { MaybeUninit::uninit().assume_init() }; // [0; BUFFER_SIZE];
             if managed_buffer.load_slice(0, &mut new_buffer).is_ok() {
                 Some(new_buffer)
             } else {
