@@ -128,45 +128,41 @@ pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
                 self.quorum().set(&new_quorum);
                 Ok(PerformActionResult::Nothing)
             },
-            Action::SendEgld { to, amount, data } => Ok(PerformActionResult::SendEgld(SendEgld {
-                api: self.raw_vm_api(),
+            Action::SendEGLD {
                 to,
                 amount,
-                data: data.as_slice().managed_into(),
-            })),
-            Action::SCAsyncCall {
-                to,
-                egld_payment,
-                endpoint_name,
+                function_name,
                 arguments,
             } => {
-                let mut contract_call_raw = self
-                    .send()
-                    .contract_call::<()>(to, endpoint_name.managed_into())
-                    .with_egld_transfer(egld_payment);
-                for arg in arguments {
-                    contract_call_raw.push_argument_raw_bytes(arg.as_slice());
-                }
-                Ok(PerformActionResult::SendAsyncCall(
-                    contract_call_raw.async_call(),
-                ))
-            },
-            Action::SCSyncCall {
-                to,
-                egld_payment,
-                endpoint_name,
-                arguments,
-            } => {
-                let half_gas = self.blockchain().get_gas_left() / 2;
-                let result = self.raw_vm_api().execute_on_dest_context_raw(
-                    half_gas,
+                let result = self.raw_vm_api().direct_egld_execute(
                     &to,
-                    &egld_payment,
-                    &endpoint_name.managed_into(),
-                    &arguments.managed_into(),
+                    &amount,
+                    self.blockchain().get_gas_left(),
+                    &function_name,
+                    &arguments.into(),
                 );
-
-                Ok(PerformActionResult::ExecOnDestContext(result))
+                if let Result::Err(e) = result {
+                    self.raw_vm_api().signal_error(e);
+                }
+                Ok(PerformActionResult::Nothing)
+            },
+            Action::SendESDT {
+                to,
+                esdt_payments,
+                endpoint_name,
+                arguments,
+            } => {
+                let result = self.raw_vm_api().direct_multi_esdt_transfer_execute(
+                    &to,
+                    &esdt_payments,
+                    self.blockchain().get_gas_left(),
+                    &endpoint_name,
+                    &arguments.into(),
+                );
+                if let Result::Err(e) = result {
+                    self.raw_vm_api().signal_error(e);
+                }
+                Ok(PerformActionResult::Nothing)
             },
             Action::SCDeploy {
                 amount,
@@ -175,13 +171,12 @@ pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
                 arguments,
             } => {
                 let gas_left = self.blockchain().get_gas_left();
-                let arg_buffer = arguments.managed_into();
                 let (new_address, _) = self.raw_vm_api().deploy_contract(
                     gas_left,
                     &amount,
                     &code,
                     code_metadata,
-                    &arg_buffer,
+                    &arguments.into(),
                 );
                 Ok(PerformActionResult::DeployResult(new_address))
             },
@@ -192,13 +187,12 @@ pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
                 arguments,
             } => {
                 let gas_left = self.blockchain().get_gas_left();
-                let arg_buffer = arguments.managed_into();
                 let (new_address, _) = self.raw_vm_api().deploy_from_source_contract(
                     gas_left,
                     &amount,
                     &source,
                     code_metadata,
-                    &arg_buffer,
+                    &arguments.into(),
                 );
                 Ok(PerformActionResult::DeployResult(new_address))
             },
@@ -210,14 +204,13 @@ pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
                 arguments,
             } => {
                 let gas_left = self.blockchain().get_gas_left();
-                let arg_buffer = arguments.managed_into();
                 self.raw_vm_api().upgrade_contract(
                     &sc_address,
                     gas_left,
                     &amount,
                     &code,
                     code_metadata,
-                    &arg_buffer,
+                    &arguments.into(),
                 );
                 Ok(PerformActionResult::Nothing)
             },
@@ -229,33 +222,15 @@ pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
                 arguments,
             } => {
                 let gas_left = self.blockchain().get_gas_left();
-                let arg_buffer = arguments.managed_into();
                 self.raw_vm_api().upgrade_from_source_contract(
                     &sc_address,
                     gas_left,
                     &amount,
                     &source,
                     code_metadata,
-                    &arg_buffer,
+                    &arguments.into(),
                 );
                 Ok(PerformActionResult::Nothing)
-            },
-            Action::ESDTTransferExecute {
-                to,
-                payments,
-                endpoint_name,
-                arguments,
-            } => {
-                let mut contract_call_raw = self
-                    .send()
-                    .contract_call::<()>(to, endpoint_name.managed_into())
-                    .with_multi_token_transfer(payments.managed_into());
-                for arg in arguments {
-                    contract_call_raw.push_argument_raw_bytes(arg.as_slice());
-                }
-                Ok(PerformActionResult::SendAsyncCall(
-                    contract_call_raw.async_call(),
-                ))
             },
         }
     }
