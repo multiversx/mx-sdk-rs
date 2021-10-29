@@ -21,7 +21,6 @@ fn contract_map() -> BlockchainMock {
 
     blockchain
 }
-
 #[test]
 fn changeboard_rs() {
     elrond_wasm_debug::mandos_rs("mandos/changeBoard.scen.json", contract_map());
@@ -41,20 +40,6 @@ fn changequorum_toobig_rs() {
 fn deployadder_err_rs() {
     elrond_wasm_debug::mandos_rs("mandos/deployAdder_err.scen.json", contract_map());
 }
-#[test]
-fn deploy_from_source_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/deployOtherMultisig.scen.json", contract_map());
-}
-
-#[test]
-fn upgrade_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/upgrade.scen.json", contract_map());
-}
-
-#[test]
-fn upgrade_from_source_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/upgrade_from_source.scen.json", contract_map());
-}
 
 #[test]
 fn deployadder_then_call_rs() {
@@ -64,6 +49,11 @@ fn deployadder_then_call_rs() {
 #[test]
 fn deployfactorial_rs() {
     elrond_wasm_debug::mandos_rs("mandos/deployFactorial.scen.json", contract_map());
+}
+
+#[test]
+fn deployothermultisig_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/deployOtherMultisig.scen.json", contract_map());
 }
 
 #[test]
@@ -77,6 +67,16 @@ fn remove_everyone_rs() {
 }
 
 #[test]
-fn sendesdt() {
+fn sendesdt_rs() {
     elrond_wasm_debug::mandos_rs("mandos/sendEsdt.scen.json", contract_map());
+}
+
+#[test]
+fn upgrade_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/upgrade.scen.json", contract_map());
+}
+
+#[test]
+fn upgrade_from_source_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/upgrade_from_source.scen.json", contract_map());
 }
