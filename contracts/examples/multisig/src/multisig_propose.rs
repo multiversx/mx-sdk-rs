@@ -86,21 +86,30 @@ pub trait MultisigProposeModule: crate::multisig_state::MultisigStateModule {
         })
     }
 
-    // #[endpoint(proposeSendEsdt)]
-    // fn propose_send_esdt(
-    //     &self,
-    //     to: ManagedAddress,
-    //     egld_payment: BigUint,
-    //     #[var_args] opt_function: OptionalArg<ManagedBuffer>,
-    //     #[var_args] arguments: ManagedVarArgs<ManagedBuffer>,
-    // ) -> SCResult<usize> {
-    //     self.propose_action(Action::SendESDT {
-    //         to,
-    //         amount,
-    //         function_name,
-    //         arguments: arguments,
-    //     })
-    // }
+    #[endpoint(proposeSendEsdt)]
+    fn propose_send_esdt(
+        &self,
+        to: ManagedAddress,
+        esdt_payments: ManagedCountedMultiResultVec<MultiResult3<TokenIdentifier, u64, BigUint>>,
+        #[var_args] opt_function: OptionalArg<ManagedBuffer>,
+        #[var_args] arguments: ManagedVarArgs<ManagedBuffer>,
+    ) -> SCResult<usize> {
+        let mut esdt_payments_vec = ManagedVec::new();
+        for triple in esdt_payments.into_iter() {
+            let (token_identifier, nonce, value) = triple.into_tuple();
+            esdt_payments_vec.push(EsdtTokenPayment::new(token_identifier, nonce, value));
+        }
+        let endpoint_name = match opt_function {
+            OptionalArg::Some(data) => data,
+            OptionalArg::None => ManagedBuffer::new(),
+        };
+        self.propose_action(Action::SendESDT {
+            to,
+            esdt_payments: esdt_payments_vec,
+            endpoint_name,
+            arguments: arguments.into_vec_of_buffers(),
+        })
+    }
 
     #[endpoint(proposeSCDeploy)]
     fn propose_sc_deploy(
@@ -181,29 +190,4 @@ pub trait MultisigProposeModule: crate::multisig_state::MultisigStateModule {
             arguments: arguments.into_vec_of_buffers(),
         })
     }
-
-    // #[endpoint(proposeESDTTransferExecute)]
-    // fn propose_esdt_transfer_execute(
-    //     &self,
-    //     to: ManagedAddress,
-    //     payments: ManagedVarArgs<(TokenIdentifier, u64, BigUint)>,
-    //     endpoint_name: ManagedBuffer,
-    //     #[var_args] arguments: ManagedVarArgs<ManagedBuffer>,
-    // ) -> SCResult<usize> {
-    //     let mut all_payments = Vec::new();
-    //     for (token_identifier, token_nonce, amount) in payments.into_vec() {
-    //         all_payments.push(EsdtTokenPayment::from(
-    //             token_identifier,
-    //             token_nonce,
-    //             amount,
-    //         ));
-    //     }
-
-    //     self.propose_action(Action::ESDTTransferExecute {
-    //         to,
-    //         all_payments,
-    //         endpoint_name,
-    //         arguments: arguments.into_vec(),
-    //     })
-    // }
 }
