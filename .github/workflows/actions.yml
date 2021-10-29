@@ -16,21 +16,21 @@ jobs:
         with:
           default: true
           toolchain: nightly
-      - name: Install erdpy and arwentools
-        run: |
-          source .github/workflows/env
-          pip3 install erdpy
-          mkdir $HOME/elrondsdk
-          erdpy config set dependencies.arwentools.tag v1.4.20
-          erdpy deps install arwentools
-      - name: Build the wasm contracts
-        run: |
-          source .github/workflows/env
-          ./build-wasm.sh
-      - name: Run Arwen tests
-        run: |
-          source .github/workflows/env
-          cargo test --features elrond-wasm-debug/arwen-tests
+      # - name: Install erdpy and arwentools
+      #   run: |
+      #     source .github/workflows/env
+      #     pip3 install erdpy
+      #     mkdir $HOME/elrondsdk
+      #     erdpy config set dependencies.arwentools.tag v1.4.20
+      #     erdpy deps install arwentools
+      # - name: Build the wasm contracts
+      #   run: |
+      #     source .github/workflows/env
+      #     ./build-wasm.sh
+      # - name: Run Arwen tests
+      #   run: |
+      #     source .github/workflows/env
+      #     cargo test --features elrond-wasm-debug/arwen-tests
       - name: Generate file size report
         run: |
           source .github/workflows/env
