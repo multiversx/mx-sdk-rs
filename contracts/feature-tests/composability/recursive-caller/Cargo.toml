@@ -8,18 +8,6 @@ publish = false
 [lib]
 path = "src/recursive_caller.rs"
 
-[features]
-wasm-output-mode = [
-    "elrond-wasm-node",
-]
-wasm-output-mode-managed-ei = [
-    "wasm-output-mode",
-]
-wasm-output-mode-unmanaged-ei = [
-    "wasm-output-mode",
-    "elrond-wasm-node/unmanaged-ei"
-]
-
 [dependencies.vault]
 path = "../vault"
 

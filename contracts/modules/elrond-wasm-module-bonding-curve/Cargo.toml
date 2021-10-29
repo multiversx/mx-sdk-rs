@@ -13,17 +13,9 @@ description = "Elrond Webassembly smart contract module that allows an address t
 keywords = ["elrond", "wasm", "bonding-curve", "blockchain", "contract"]
 categories = ["no-std", "wasm"]
 
-[features]
-wasm-output-mode = ["elrond-wasm-node"]
-
 [dependencies.elrond-wasm]
 version = "0.21.2"
 path = "../../../elrond-wasm"
-
-[dependencies.elrond-wasm-node]
-version = "0.21.2"
-path = "../../../elrond-wasm-node"
-optional = true
 
 [dev-dependencies.elrond-wasm-debug]
 version = "0.21.2"
