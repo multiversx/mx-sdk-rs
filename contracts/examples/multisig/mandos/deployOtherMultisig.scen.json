@@ -19,21 +19,21 @@
         },
         {
             "step": "scCall",
-            "txId": "proposeSCDeploy",
+            "txId": "proposeSCDeployFromSource",
             "tx": {
                 "from": "address:paul",
                 "to": "sc:multisig",
-                "function": "proposeSCDeploy",
+                "function": "proposeSCDeployFromSource",
                 "arguments": [
                     "0",
-                    "file:../output/multisig.wasm",
+                    "sc:multisig",
                     "false",
                     "false",
                     "false",
                     "1",
                     "address:paul"
                 ],
-                "gasLimit": "256,000,000",
+                "gasLimit": "20,000,000",
                 "gasPrice": "0"
             },
             "expect": {
