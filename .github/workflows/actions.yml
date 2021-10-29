@@ -23,10 +23,10 @@ jobs:
       #     mkdir $HOME/elrondsdk
       #     erdpy config set dependencies.arwentools.tag v1.4.20
       #     erdpy deps install arwentools
-      # - name: Build the wasm contracts
-      #   run: |
-      #     source .github/workflows/env
-      #     ./build-wasm.sh
+      - name: Build the wasm contracts
+        run: |
+          source .github/workflows/env
+          ./build-wasm.sh
       # - name: Run Arwen tests
       #   run: |
       #     source .github/workflows/env
