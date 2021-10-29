@@ -73,7 +73,7 @@
                         "str:quorum": "2",
                         "str:action_data.len": "3",
                         "str:action_data.item|u32:3": {
-                            "1-discriminant": "0x06",
+                            "1-discriminant": "0x08",
                             "2-amount": "u32:0",
                             "3-code": "nested:file:../test-contracts/adder.wasm",
                             "4-code_metadata": "0x0000",
@@ -179,18 +179,18 @@
         },
         {
             "step": "scCall",
-            "txId": "proposeSCCall",
+            "txId": "proposeAsyncCall",
             "tx": {
                 "from": "address:paul",
                 "to": "sc:multisig",
-                "function": "proposeSCCall",
+                "function": "proposeAsyncCall",
                 "arguments": [
                     "sc:adder",
                     "0",
                     "str:add",
                     "1234"
                 ],
-                "gasLimit": "50,000,000",
+                "gasLimit": "70,000,000",
                 "gasPrice": "0"
             },
             "expect": {
