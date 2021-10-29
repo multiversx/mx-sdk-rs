@@ -1,3 +1,5 @@
+use proc_macro2::Span;
+
 macro_rules! format_ident {
     ($ident:expr, $fstr:expr) => {
         syn::Ident::new(&format!($fstr, $ident), $ident.span())
@@ -6,6 +8,10 @@ macro_rules! format_ident {
 
 pub fn generate_call_method_name(method_ident: &proc_macro2::Ident) -> proc_macro2::Ident {
     format_ident!(method_ident, "call_{}")
+}
+
+pub fn generate_endpoints_mod_alias(index: usize) -> proc_macro2::Ident {
+    syn::Ident::new(&format!("__endpoints_{}__", index), Span::call_site())
 }
 
 pub fn array_literal(bytes: &[u8]) -> proc_macro2::TokenStream {

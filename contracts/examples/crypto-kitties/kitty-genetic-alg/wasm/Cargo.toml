@@ -18,11 +18,13 @@ debug = false
 panic = "abort"
 
 [dependencies.kitty-genetic-alg]
-features = [ "wasm-output-mode",]
-default-features = false
 path = ".."
+
+[dependencies.elrond-wasm-node]
+version = "0.21.2"
+path = "../../../../../elrond-wasm-node"
 
 [dependencies.elrond-wasm-output]
 version = "0.21.2"
 path = "../../../../../elrond-wasm-output"
-features = [ "wasm-output-mode",]
+features = ["wasm-output-mode"]
