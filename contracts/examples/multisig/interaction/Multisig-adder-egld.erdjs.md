@@ -56,7 +56,7 @@ await adder.address(deployAddress).sender(alice).query.getSum();
 
 // Create a proposal on calling the "add" method
 let formattedAdd = adder.format.add(1000);
-var addId = await multisig.sender(alice).call.proposeAsyncCall(adder, Egld(0), formattedAdd);
+var addId = await multisig.sender(alice).call.proposeSendEsdt(adder, Egld(0), formattedAdd);
 
 // Sign the add proposal
 await multisig.sender(bob).call.sign(addId);
