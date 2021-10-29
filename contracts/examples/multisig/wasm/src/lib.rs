@@ -78,8 +78,23 @@ pub fn proposeSCDeploy() {
 }
 
 #[no_mangle]
-pub fn proposeSCCall() {
-    multisig::endpoints::proposeSCCall(elrond_wasm_node::arwen_api());
+pub fn proposeSCDeployFromSource() {
+    multisig::endpoints::proposeSCDeployFromSource(elrond_wasm_node::arwen_api());
+}
+
+#[no_mangle]
+pub fn proposeSCUpgrade() {
+    multisig::endpoints::proposeSCUpgrade(elrond_wasm_node::arwen_api());
+}
+
+#[no_mangle]
+pub fn proposeSCUpgradeFromSource() {
+    multisig::endpoints::proposeSCUpgradeFromSource(elrond_wasm_node::arwen_api());
+}
+
+#[no_mangle]
+pub fn proposeAsyncCall() {
+    multisig::endpoints::proposeAsyncCall(elrond_wasm_node::arwen_api());
 }
 
 #[no_mangle]

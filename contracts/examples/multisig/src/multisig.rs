@@ -220,7 +220,7 @@ pub trait Multisig {
         payable: bool,
         readable: bool,
         #[var_args] arguments: VarArgs<BoxedBytes>,
-    ) {
+    ) -> SCResult<usize> {
         let code_metadata = self.get_code_metadata(upgradeable, payable, readable);
         self.propose_action(Action::SCUpgrade {
             sc_address,
@@ -228,7 +228,7 @@ pub trait Multisig {
             code,
             code_metadata,
             arguments: arguments.into_vec(),
-        });
+        })
     }
 
     #[endpoint(proposeSCUpgradeFromSource)]
@@ -241,7 +241,7 @@ pub trait Multisig {
         payable: bool,
         readable: bool,
         #[var_args] arguments: VarArgs<BoxedBytes>,
-    ) {
+    ) -> SCResult<usize> {
         let code_metadata = self.get_code_metadata(upgradeable, payable, readable);
         self.propose_action(Action::SCUpgradeFromSource {
             sc_address,
@@ -249,7 +249,7 @@ pub trait Multisig {
             source,
             code_metadata,
             arguments: arguments.into_vec(),
-        });
+        })
     }
 
     fn get_code_metadata(&self, upgradeable: bool, payable: bool, readable: bool) -> CodeMetadata {
