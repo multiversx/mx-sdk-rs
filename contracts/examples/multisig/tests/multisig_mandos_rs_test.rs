@@ -61,3 +61,8 @@ fn deploy_duplicate_bm_rs() {
 fn remove_everyone_rs() {
     elrond_wasm_debug::mandos_rs("mandos/remove_everyone.scen.json", contract_map());
 }
+
+#[test]
+fn sendesdt() {
+    elrond_wasm_debug::mandos_rs("mandos/sendEsdt.scen.json", contract_map());
+}

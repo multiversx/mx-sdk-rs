@@ -133,6 +133,11 @@ pub fn proposeSendEgld() {
 }
 
 #[no_mangle]
+pub fn proposeSendEsdt() {
+    multisig::endpoints::proposeSendEsdt(elrond_wasm_node::arwen_api());
+}
+
+#[no_mangle]
 pub fn quorumReached() {
     multisig::endpoints::quorumReached(elrond_wasm_node::arwen_api());
 }

@@ -134,6 +134,7 @@ where
 impl<M, T> DynArg for ManagedMultiResultVec<M, T>
 where
     M: ManagedTypeApi,
+    T: DynArg,
 {
     // #[inline(never)]
     fn dyn_load<I: DynArgInput>(loader: &mut I, arg_id: ArgId) -> Self {
