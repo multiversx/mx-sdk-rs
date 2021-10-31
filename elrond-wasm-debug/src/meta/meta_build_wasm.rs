@@ -25,3 +25,16 @@ pub fn build_wasm(abi: &ContractAbi) {
 
     fs::copy(source_wasm, dest_wasm).unwrap();
 }
+
+pub fn clean_wasm() {
+    let output = Command::new("cargo")
+        .args(["clean"])
+        .current_dir("../wasm")
+        .output()
+        .expect("failed to execute process");
+
+    io::stdout().write_all(&output.stdout).unwrap();
+    io::stderr().write_all(&output.stderr).unwrap();
+
+    fs::remove_dir_all("../output").unwrap();
+}
