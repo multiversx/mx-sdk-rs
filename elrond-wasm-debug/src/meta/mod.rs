@@ -1,4 +1,5 @@
 mod meta_abi;
+mod meta_build_wasm;
 mod meta_validate_abi;
 mod meta_wasm_src;
 
@@ -10,4 +11,5 @@ pub fn perform<AbiObj: ContractAbiProvider>() {
     meta_abi::write_abi(&abi);
     meta_wasm_src::write_wasm_lib(&abi);
     meta_wasm_src::copy_to_wasm_unmanaged_ei();
+    meta_build_wasm::build_wasm(&abi);
 }
