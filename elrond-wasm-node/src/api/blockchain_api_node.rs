@@ -130,7 +130,7 @@ extern "C" {
     );
 }
 
-impl BlockchainApi for crate::ArwenApiImpl {
+impl BlockchainApi for crate::VmApiImpl {
     #[inline]
     fn get_sc_address_legacy(&self) -> Address {
         unsafe {
