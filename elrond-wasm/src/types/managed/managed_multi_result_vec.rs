@@ -19,6 +19,8 @@ where
     _phantom: PhantomData<T>,
 }
 
+pub type ManagedVarArgs<M, T> = ManagedMultiResultVec<M, T>;
+
 impl<M, T> ManagedMultiResultVec<M, T>
 where
     M: ManagedTypeApi,
@@ -104,6 +106,19 @@ where
 impl<M, T> ManagedMultiResultVec<M, T>
 where
     M: ManagedTypeApi + ErrorApi,
+{
+    pub fn len(&self) -> usize {
+        self.raw_buffers.len()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.raw_buffers.is_empty()
+    }
+}
+
+impl<M, T> ManagedMultiResultVec<M, T>
+where
+    M: ManagedTypeApi + ErrorApi,
     T: ManagedVecItem<M> + TopDecode,
 {
     pub fn to_vec(&self) -> ManagedVec<M, T> {
@@ -119,6 +134,7 @@ where
 impl<M, T> DynArg for ManagedMultiResultVec<M, T>
 where
     M: ManagedTypeApi,
+    T: DynArg,
 {
     // #[inline(never)]
     fn dyn_load<I: DynArgInput>(loader: &mut I, arg_id: ArgId) -> Self {
