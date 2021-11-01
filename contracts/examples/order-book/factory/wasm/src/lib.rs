@@ -13,6 +13,11 @@ pub fn init() {
 }
 
 #[no_mangle]
+pub fn callBack() {
+    order_book_factory::endpoints::callBack(elrond_wasm_node::arwen_api());
+}
+
+#[no_mangle]
 pub fn createPair() {
     order_book_factory::endpoints::createPair(elrond_wasm_node::arwen_api());
 }
@@ -20,9 +25,4 @@ pub fn createPair() {
 #[no_mangle]
 pub fn getPair() {
     order_book_factory::endpoints::getPair(elrond_wasm_node::arwen_api());
-}
-
-#[no_mangle]
-pub fn callBack() {
-    order_book_factory::endpoints::callBack(elrond_wasm_node::arwen_api());
 }

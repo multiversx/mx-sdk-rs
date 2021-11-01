@@ -13,13 +13,28 @@ pub fn init() {
 }
 
 #[no_mangle]
-pub fn sellToken() {
-    bonding_curve_contract::endpoints::sellToken(elrond_wasm_node::arwen_api());
+pub fn callBack() {
+    bonding_curve_contract::endpoints::callBack(elrond_wasm_node::arwen_api());
 }
 
 #[no_mangle]
 pub fn buyToken() {
     bonding_curve_contract::endpoints::buyToken(elrond_wasm_node::arwen_api());
+}
+
+#[no_mangle]
+pub fn claim() {
+    bonding_curve_contract::endpoints::claim(elrond_wasm_node::arwen_api());
+}
+
+#[no_mangle]
+pub fn deposit() {
+    bonding_curve_contract::endpoints::deposit(elrond_wasm_node::arwen_api());
+}
+
+#[no_mangle]
+pub fn getTokenAvailability() {
+    bonding_curve_contract::endpoints::getTokenAvailability(elrond_wasm_node::arwen_api());
 }
 
 #[no_mangle]
@@ -33,8 +48,13 @@ pub fn get_sell_price() {
 }
 
 #[no_mangle]
-pub fn getTokenAvailability() {
-    bonding_curve_contract::endpoints::getTokenAvailability(elrond_wasm_node::arwen_api());
+pub fn sellToken() {
+    bonding_curve_contract::endpoints::sellToken(elrond_wasm_node::arwen_api());
+}
+
+#[no_mangle]
+pub fn setBondingCurve() {
+    bonding_curve_contract::endpoints::setBondingCurve(elrond_wasm_node::arwen_api());
 }
 
 #[no_mangle]
@@ -45,24 +65,4 @@ pub fn setLocalRoles() {
 #[no_mangle]
 pub fn unsetLocalRoles() {
     bonding_curve_contract::endpoints::unsetLocalRoles(elrond_wasm_node::arwen_api());
-}
-
-#[no_mangle]
-pub fn setBondingCurve() {
-    bonding_curve_contract::endpoints::setBondingCurve(elrond_wasm_node::arwen_api());
-}
-
-#[no_mangle]
-pub fn deposit() {
-    bonding_curve_contract::endpoints::deposit(elrond_wasm_node::arwen_api());
-}
-
-#[no_mangle]
-pub fn claim() {
-    bonding_curve_contract::endpoints::claim(elrond_wasm_node::arwen_api());
-}
-
-#[no_mangle]
-pub fn callBack() {
-    bonding_curve_contract::endpoints::callBack(elrond_wasm_node::arwen_api());
 }

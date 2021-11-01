@@ -13,11 +13,11 @@ pub fn init() {
 }
 
 #[no_mangle]
-pub fn recursive_send_funds() {
-    recursive_caller::endpoints::recursive_send_funds(elrond_wasm_node::arwen_api());
+pub fn callBack() {
+    recursive_caller::endpoints::callBack(elrond_wasm_node::arwen_api());
 }
 
 #[no_mangle]
-pub fn callBack() {
-    recursive_caller::endpoints::callBack(elrond_wasm_node::arwen_api());
+pub fn recursive_send_funds() {
+    recursive_caller::endpoints::recursive_send_funds(elrond_wasm_node::arwen_api());
 }

@@ -13,13 +13,13 @@ pub fn init() {
 }
 
 #[no_mangle]
-pub fn acceptEsdtPayment() {
-    second_contract::endpoints::acceptEsdtPayment(elrond_wasm_node::arwen_api());
+pub fn callBack() {
+    second_contract::endpoints::callBack(elrond_wasm_node::arwen_api());
 }
 
 #[no_mangle]
-pub fn rejectEsdtPayment() {
-    second_contract::endpoints::rejectEsdtPayment(elrond_wasm_node::arwen_api());
+pub fn acceptEsdtPayment() {
+    second_contract::endpoints::acceptEsdtPayment(elrond_wasm_node::arwen_api());
 }
 
 #[no_mangle]
@@ -28,6 +28,6 @@ pub fn getesdtTokenName() {
 }
 
 #[no_mangle]
-pub fn callBack() {
-    second_contract::endpoints::callBack(elrond_wasm_node::arwen_api());
+pub fn rejectEsdtPayment() {
+    second_contract::endpoints::rejectEsdtPayment(elrond_wasm_node::arwen_api());
 }

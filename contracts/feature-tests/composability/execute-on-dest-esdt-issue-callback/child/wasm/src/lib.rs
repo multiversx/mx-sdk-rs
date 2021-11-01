@@ -13,8 +13,8 @@ pub fn init() {
 }
 
 #[no_mangle]
-pub fn issueWrappedEgld() {
-    child::endpoints::issueWrappedEgld(elrond_wasm_node::arwen_api());
+pub fn callBack() {
+    child::endpoints::callBack(elrond_wasm_node::arwen_api());
 }
 
 #[no_mangle]
@@ -23,6 +23,6 @@ pub fn getWrappedEgldTokenIdentifier() {
 }
 
 #[no_mangle]
-pub fn callBack() {
-    child::endpoints::callBack(elrond_wasm_node::arwen_api());
+pub fn issueWrappedEgld() {
+    child::endpoints::issueWrappedEgld(elrond_wasm_node::arwen_api());
 }
