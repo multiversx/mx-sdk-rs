@@ -13,8 +13,23 @@ pub fn init() {
 }
 
 #[no_mangle]
+pub fn callBack() {
+    nft_minter::endpoints::callBack(elrond_wasm_node::arwen_api());
+}
+
+#[no_mangle]
+pub fn buyNft() {
+    nft_minter::endpoints::buyNft(elrond_wasm_node::arwen_api());
+}
+
+#[no_mangle]
 pub fn createNft() {
     nft_minter::endpoints::createNft(elrond_wasm_node::arwen_api());
+}
+
+#[no_mangle]
+pub fn getNftPrice() {
+    nft_minter::endpoints::getNftPrice(elrond_wasm_node::arwen_api());
 }
 
 #[no_mangle]
@@ -25,19 +40,4 @@ pub fn issueToken() {
 #[no_mangle]
 pub fn setLocalRoles() {
     nft_minter::endpoints::setLocalRoles(elrond_wasm_node::arwen_api());
-}
-
-#[no_mangle]
-pub fn buyNft() {
-    nft_minter::endpoints::buyNft(elrond_wasm_node::arwen_api());
-}
-
-#[no_mangle]
-pub fn getNftPrice() {
-    nft_minter::endpoints::getNftPrice(elrond_wasm_node::arwen_api());
-}
-
-#[no_mangle]
-pub fn callBack() {
-    nft_minter::endpoints::callBack(elrond_wasm_node::arwen_api());
 }

@@ -13,13 +13,8 @@ pub fn init() {
 }
 
 #[no_mangle]
-pub fn start() {
-    lottery_esdt::endpoints::start(elrond_wasm_node::arwen_api());
-}
-
-#[no_mangle]
-pub fn createLotteryPool() {
-    lottery_esdt::endpoints::createLotteryPool(elrond_wasm_node::arwen_api());
+pub fn callBack() {
+    lottery_esdt::endpoints::callBack(elrond_wasm_node::arwen_api());
 }
 
 #[no_mangle]
@@ -28,13 +23,13 @@ pub fn buy_ticket() {
 }
 
 #[no_mangle]
-pub fn determine_winner() {
-    lottery_esdt::endpoints::determine_winner(elrond_wasm_node::arwen_api());
+pub fn createLotteryPool() {
+    lottery_esdt::endpoints::createLotteryPool(elrond_wasm_node::arwen_api());
 }
 
 #[no_mangle]
-pub fn status() {
-    lottery_esdt::endpoints::status(elrond_wasm_node::arwen_api());
+pub fn determine_winner() {
+    lottery_esdt::endpoints::determine_winner(elrond_wasm_node::arwen_api());
 }
 
 #[no_mangle]
@@ -43,6 +38,11 @@ pub fn getLotteryInfo() {
 }
 
 #[no_mangle]
-pub fn callBack() {
-    lottery_esdt::endpoints::callBack(elrond_wasm_node::arwen_api());
+pub fn start() {
+    lottery_esdt::endpoints::start(elrond_wasm_node::arwen_api());
+}
+
+#[no_mangle]
+pub fn status() {
+    lottery_esdt::endpoints::status(elrond_wasm_node::arwen_api());
 }

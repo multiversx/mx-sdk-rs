@@ -13,18 +13,8 @@ pub fn init() {
 }
 
 #[no_mangle]
-pub fn fund() {
-    crowdfunding_esdt::endpoints::fund(elrond_wasm_node::arwen_api());
-}
-
-#[no_mangle]
-pub fn status() {
-    crowdfunding_esdt::endpoints::status(elrond_wasm_node::arwen_api());
-}
-
-#[no_mangle]
-pub fn getCurrentFunds() {
-    crowdfunding_esdt::endpoints::getCurrentFunds(elrond_wasm_node::arwen_api());
+pub fn callBack() {
+    crowdfunding_esdt::endpoints::callBack(elrond_wasm_node::arwen_api());
 }
 
 #[no_mangle]
@@ -33,8 +23,18 @@ pub fn claim() {
 }
 
 #[no_mangle]
-pub fn getTarget() {
-    crowdfunding_esdt::endpoints::getTarget(elrond_wasm_node::arwen_api());
+pub fn fund() {
+    crowdfunding_esdt::endpoints::fund(elrond_wasm_node::arwen_api());
+}
+
+#[no_mangle]
+pub fn getCrowdfundingTokenIdentifier() {
+    crowdfunding_esdt::endpoints::getCrowdfundingTokenIdentifier(elrond_wasm_node::arwen_api());
+}
+
+#[no_mangle]
+pub fn getCurrentFunds() {
+    crowdfunding_esdt::endpoints::getCurrentFunds(elrond_wasm_node::arwen_api());
 }
 
 #[no_mangle]
@@ -48,11 +48,11 @@ pub fn getDeposit() {
 }
 
 #[no_mangle]
-pub fn getCrowdfundingTokenIdentifier() {
-    crowdfunding_esdt::endpoints::getCrowdfundingTokenIdentifier(elrond_wasm_node::arwen_api());
+pub fn getTarget() {
+    crowdfunding_esdt::endpoints::getTarget(elrond_wasm_node::arwen_api());
 }
 
 #[no_mangle]
-pub fn callBack() {
-    crowdfunding_esdt::endpoints::callBack(elrond_wasm_node::arwen_api());
+pub fn status() {
+    crowdfunding_esdt::endpoints::status(elrond_wasm_node::arwen_api());
 }

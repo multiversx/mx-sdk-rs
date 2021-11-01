@@ -13,13 +13,8 @@ pub fn init() {
 }
 
 #[no_mangle]
-pub fn checkFeatureGuard() {
-    use_module::endpoints::checkFeatureGuard(elrond_wasm_node::arwen_api());
-}
-
-#[no_mangle]
-pub fn checkPause() {
-    use_module::endpoints::checkPause(elrond_wasm_node::arwen_api());
+pub fn callBack() {
+    use_module::endpoints::callBack(elrond_wasm_node::arwen_api());
 }
 
 #[no_mangle]
@@ -38,103 +33,18 @@ pub fn call_mod_c() {
 }
 
 #[no_mangle]
-pub fn dnsRegister() {
-    use_module::endpoints::dnsRegister(elrond_wasm_node::arwen_api());
-}
-
-#[no_mangle]
-pub fn issueToken() {
-    use_module::endpoints::issueToken(elrond_wasm_node::arwen_api());
-}
-
-#[no_mangle]
-pub fn setLocalRoles() {
-    use_module::endpoints::setLocalRoles(elrond_wasm_node::arwen_api());
-}
-
-#[no_mangle]
-pub fn setFeatureFlag() {
-    use_module::endpoints::setFeatureFlag(elrond_wasm_node::arwen_api());
-}
-
-#[no_mangle]
-pub fn depositTokensForAction() {
-    use_module::endpoints::depositTokensForAction(elrond_wasm_node::arwen_api());
-}
-
-#[no_mangle]
-pub fn withdrawGovernanceTokens() {
-    use_module::endpoints::withdrawGovernanceTokens(elrond_wasm_node::arwen_api());
-}
-
-#[no_mangle]
-pub fn propose() {
-    use_module::endpoints::propose(elrond_wasm_node::arwen_api());
-}
-
-#[no_mangle]
-pub fn vote() {
-    use_module::endpoints::vote(elrond_wasm_node::arwen_api());
-}
-
-#[no_mangle]
-pub fn downvote() {
-    use_module::endpoints::downvote(elrond_wasm_node::arwen_api());
-}
-
-#[no_mangle]
-pub fn queue() {
-    use_module::endpoints::queue(elrond_wasm_node::arwen_api());
-}
-
-#[no_mangle]
-pub fn execute() {
-    use_module::endpoints::execute(elrond_wasm_node::arwen_api());
-}
-
-#[no_mangle]
 pub fn cancel() {
     use_module::endpoints::cancel(elrond_wasm_node::arwen_api());
 }
 
 #[no_mangle]
-pub fn getProposalStatus() {
-    use_module::endpoints::getProposalStatus(elrond_wasm_node::arwen_api());
+pub fn changeLockTimeAfterVotingEndsInBlocks() {
+    use_module::endpoints::changeLockTimeAfterVotingEndsInBlocks(elrond_wasm_node::arwen_api());
 }
 
 #[no_mangle]
-pub fn getProposer() {
-    use_module::endpoints::getProposer(elrond_wasm_node::arwen_api());
-}
-
-#[no_mangle]
-pub fn getProposalDescription() {
-    use_module::endpoints::getProposalDescription(elrond_wasm_node::arwen_api());
-}
-
-#[no_mangle]
-pub fn getProposalActions() {
-    use_module::endpoints::getProposalActions(elrond_wasm_node::arwen_api());
-}
-
-#[no_mangle]
-pub fn getTotalVotes() {
-    use_module::endpoints::getTotalVotes(elrond_wasm_node::arwen_api());
-}
-
-#[no_mangle]
-pub fn getTotalDownvotes() {
-    use_module::endpoints::getTotalDownvotes(elrond_wasm_node::arwen_api());
-}
-
-#[no_mangle]
-pub fn initGovernanceModule() {
-    use_module::endpoints::initGovernanceModule(elrond_wasm_node::arwen_api());
-}
-
-#[no_mangle]
-pub fn changeQuorum() {
-    use_module::endpoints::changeQuorum(elrond_wasm_node::arwen_api());
+pub fn changeMaxActionsPerProposal() {
+    use_module::endpoints::changeMaxActionsPerProposal(elrond_wasm_node::arwen_api());
 }
 
 #[no_mangle]
@@ -143,8 +53,8 @@ pub fn changeMinTokenBalanceForProposing() {
 }
 
 #[no_mangle]
-pub fn changeMaxActionsPerProposal() {
-    use_module::endpoints::changeMaxActionsPerProposal(elrond_wasm_node::arwen_api());
+pub fn changeQuorum() {
+    use_module::endpoints::changeQuorum(elrond_wasm_node::arwen_api());
 }
 
 #[no_mangle]
@@ -158,8 +68,33 @@ pub fn changeVotingPeriodInBlocks() {
 }
 
 #[no_mangle]
-pub fn changeLockTimeAfterVotingEndsInBlocks() {
-    use_module::endpoints::changeLockTimeAfterVotingEndsInBlocks(elrond_wasm_node::arwen_api());
+pub fn checkFeatureGuard() {
+    use_module::endpoints::checkFeatureGuard(elrond_wasm_node::arwen_api());
+}
+
+#[no_mangle]
+pub fn checkPause() {
+    use_module::endpoints::checkPause(elrond_wasm_node::arwen_api());
+}
+
+#[no_mangle]
+pub fn depositTokensForAction() {
+    use_module::endpoints::depositTokensForAction(elrond_wasm_node::arwen_api());
+}
+
+#[no_mangle]
+pub fn dnsRegister() {
+    use_module::endpoints::dnsRegister(elrond_wasm_node::arwen_api());
+}
+
+#[no_mangle]
+pub fn downvote() {
+    use_module::endpoints::downvote(elrond_wasm_node::arwen_api());
+}
+
+#[no_mangle]
+pub fn execute() {
+    use_module::endpoints::execute(elrond_wasm_node::arwen_api());
 }
 
 #[no_mangle]
@@ -168,8 +103,13 @@ pub fn getGovernanceTokenId() {
 }
 
 #[no_mangle]
-pub fn getQuorum() {
-    use_module::endpoints::getQuorum(elrond_wasm_node::arwen_api());
+pub fn getLockTimeAfterVotingEndsInBlocks() {
+    use_module::endpoints::getLockTimeAfterVotingEndsInBlocks(elrond_wasm_node::arwen_api());
+}
+
+#[no_mangle]
+pub fn getMaxActionsPerProposal() {
+    use_module::endpoints::getMaxActionsPerProposal(elrond_wasm_node::arwen_api());
 }
 
 #[no_mangle]
@@ -178,8 +118,38 @@ pub fn getMinTokenBalanceForProposing() {
 }
 
 #[no_mangle]
-pub fn getMaxActionsPerProposal() {
-    use_module::endpoints::getMaxActionsPerProposal(elrond_wasm_node::arwen_api());
+pub fn getProposalActions() {
+    use_module::endpoints::getProposalActions(elrond_wasm_node::arwen_api());
+}
+
+#[no_mangle]
+pub fn getProposalDescription() {
+    use_module::endpoints::getProposalDescription(elrond_wasm_node::arwen_api());
+}
+
+#[no_mangle]
+pub fn getProposalStatus() {
+    use_module::endpoints::getProposalStatus(elrond_wasm_node::arwen_api());
+}
+
+#[no_mangle]
+pub fn getProposer() {
+    use_module::endpoints::getProposer(elrond_wasm_node::arwen_api());
+}
+
+#[no_mangle]
+pub fn getQuorum() {
+    use_module::endpoints::getQuorum(elrond_wasm_node::arwen_api());
+}
+
+#[no_mangle]
+pub fn getTotalDownvotes() {
+    use_module::endpoints::getTotalDownvotes(elrond_wasm_node::arwen_api());
+}
+
+#[no_mangle]
+pub fn getTotalVotes() {
+    use_module::endpoints::getTotalVotes(elrond_wasm_node::arwen_api());
 }
 
 #[no_mangle]
@@ -193,8 +163,8 @@ pub fn getVotingPeriodInBlocks() {
 }
 
 #[no_mangle]
-pub fn getLockTimeAfterVotingEndsInBlocks() {
-    use_module::endpoints::getLockTimeAfterVotingEndsInBlocks(elrond_wasm_node::arwen_api());
+pub fn initGovernanceModule() {
+    use_module::endpoints::initGovernanceModule(elrond_wasm_node::arwen_api());
 }
 
 #[no_mangle]
@@ -203,8 +173,33 @@ pub fn isPaused() {
 }
 
 #[no_mangle]
+pub fn issueToken() {
+    use_module::endpoints::issueToken(elrond_wasm_node::arwen_api());
+}
+
+#[no_mangle]
 pub fn pause() {
     use_module::endpoints::pause(elrond_wasm_node::arwen_api());
+}
+
+#[no_mangle]
+pub fn propose() {
+    use_module::endpoints::propose(elrond_wasm_node::arwen_api());
+}
+
+#[no_mangle]
+pub fn queue() {
+    use_module::endpoints::queue(elrond_wasm_node::arwen_api());
+}
+
+#[no_mangle]
+pub fn setFeatureFlag() {
+    use_module::endpoints::setFeatureFlag(elrond_wasm_node::arwen_api());
+}
+
+#[no_mangle]
+pub fn setLocalRoles() {
+    use_module::endpoints::setLocalRoles(elrond_wasm_node::arwen_api());
 }
 
 #[no_mangle]
@@ -213,6 +208,11 @@ pub fn unpause() {
 }
 
 #[no_mangle]
-pub fn callBack() {
-    use_module::endpoints::callBack(elrond_wasm_node::arwen_api());
+pub fn vote() {
+    use_module::endpoints::vote(elrond_wasm_node::arwen_api());
+}
+
+#[no_mangle]
+pub fn withdrawGovernanceTokens() {
+    use_module::endpoints::withdrawGovernanceTokens(elrond_wasm_node::arwen_api());
 }
