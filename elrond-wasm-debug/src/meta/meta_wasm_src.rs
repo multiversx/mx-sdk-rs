@@ -40,11 +40,18 @@ pub fn write_wasm_lib(abi: &ContractAbi) {
 
     write_endpoint(&mut wasm_lib_file, &contract_module_name, "init");
 
-    for endpoint in &abi.endpoints {
-        write_endpoint(&mut wasm_lib_file, &contract_module_name, endpoint.name);
-    }
-
     write_endpoint(&mut wasm_lib_file, &contract_module_name, "callBack");
+
+    let mut endpoint_names: Vec<String> = abi
+        .endpoints
+        .iter()
+        .map(|endpoint| endpoint.name.to_string())
+        .collect();
+    endpoint_names.sort();
+
+    for endpoint_name in &endpoint_names {
+        write_endpoint(&mut wasm_lib_file, &contract_module_name, endpoint_name);
+    }
 }
 
 /// This one is useful for some of the special unmanaged EI tests in the framework.

@@ -2,8 +2,8 @@ use elrond_wasm::{
     api::{EndpointFinishApi, ManagedTypeApi, SendApi, StorageWriteApi},
     io::EndpointResult,
     types::{
-        AsyncCall, BigUint, BoxedBytes, CodeMetadata, ManagedAddress, ManagedBuffer,
-        OptionalResult, SendEgld, Vec,
+        BigUint, CodeMetadata, EsdtTokenPayment, ManagedAddress, ManagedBuffer, ManagedVec,
+        OptionalResult,
     },
 };
 
@@ -16,22 +16,43 @@ pub enum Action<M: ManagedTypeApi> {
     AddProposer(ManagedAddress<M>),
     RemoveUser(ManagedAddress<M>),
     ChangeQuorum(usize),
-    SendEgld {
+    SendEGLD {
         to: ManagedAddress<M>,
         amount: BigUint<M>,
-        data: BoxedBytes,
+        endpoint_name: ManagedBuffer<M>,
+        arguments: ManagedVec<M, ManagedBuffer<M>>,
+    },
+    SendESDT {
+        to: ManagedAddress<M>,
+        esdt_payments: ManagedVec<M, EsdtTokenPayment<M>>,
+        endpoint_name: ManagedBuffer<M>,
+        arguments: ManagedVec<M, ManagedBuffer<M>>,
     },
     SCDeploy {
         amount: BigUint<M>,
         code: ManagedBuffer<M>,
         code_metadata: CodeMetadata,
-        arguments: Vec<BoxedBytes>,
+        arguments: ManagedVec<M, ManagedBuffer<M>>,
     },
-    SCCall {
-        to: ManagedAddress<M>,
-        egld_payment: BigUint<M>,
-        endpoint_name: BoxedBytes,
-        arguments: Vec<BoxedBytes>,
+    SCDeployFromSource {
+        amount: BigUint<M>,
+        source: ManagedAddress<M>,
+        code_metadata: CodeMetadata,
+        arguments: ManagedVec<M, ManagedBuffer<M>>,
+    },
+    SCUpgrade {
+        sc_address: ManagedAddress<M>,
+        amount: BigUint<M>,
+        code: ManagedBuffer<M>,
+        code_metadata: CodeMetadata,
+        arguments: ManagedVec<M, ManagedBuffer<M>>,
+    },
+    SCUpgradeFromSource {
+        sc_address: ManagedAddress<M>,
+        amount: BigUint<M>,
+        source: ManagedAddress<M>,
+        code_metadata: CodeMetadata,
+        arguments: ManagedVec<M, ManagedBuffer<M>>,
     },
 }
 
@@ -49,7 +70,7 @@ impl<M: ManagedTypeApi> Action<M> {
 pub struct ActionFullInfo<M: ManagedTypeApi> {
     pub action_id: usize,
     pub action_data: Action<M>,
-    pub signers: Vec<ManagedAddress<M>>,
+    pub signers: ManagedVec<M, ManagedAddress<M>>,
 }
 
 #[derive(TypeAbi)]
@@ -58,9 +79,8 @@ where
     SA: SendApi + ManagedTypeApi + StorageWriteApi + 'static,
 {
     Nothing,
-    SendEgld(SendEgld<SA>),
     DeployResult(ManagedAddress<SA>),
-    SendAsyncCall(AsyncCall<SA>),
+    ExecOnDestContext(ManagedVec<SA, ManagedBuffer<SA>>),
 }
 
 impl<SA> EndpointResult for PerformActionResult<SA>
@@ -75,9 +95,8 @@ where
     {
         match self {
             PerformActionResult::Nothing => (),
-            PerformActionResult::SendEgld(send_egld) => send_egld.finish(api),
             PerformActionResult::DeployResult(address) => address.finish(api),
-            PerformActionResult::SendAsyncCall(async_call) => async_call.finish(api),
+            PerformActionResult::ExecOnDestContext(exec) => exec.finish(api),
         }
     }
 }
