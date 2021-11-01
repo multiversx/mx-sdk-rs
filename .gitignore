@@ -16,7 +16,7 @@ Cargo.lock
 tutorial/book
 
 # Others
-my-arwen.sh
+my-vm-tests.sh
 publish.sh
 quick.sh
 
