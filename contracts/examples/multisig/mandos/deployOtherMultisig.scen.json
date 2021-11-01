@@ -1,5 +1,5 @@
 {
-    "gasSchedule": "v3",
+    "gasSchedule": "v4",
     "steps": [
         {
             "step": "externalSteps",
@@ -19,20 +19,21 @@
         },
         {
             "step": "scCall",
-            "txId": "proposeSCDeploy",
-            "comment": "missing argument",
+            "txId": "proposeSCDeployFromSource",
             "tx": {
                 "from": "address:paul",
                 "to": "sc:multisig",
-                "function": "proposeSCDeploy",
+                "function": "proposeSCDeployFromSource",
                 "arguments": [
                     "0",
-                    "file:../test-contracts/adder.wasm",
+                    "sc:multisig",
+                    "true",
                     "false",
                     "false",
-                    "false"
+                    "1",
+                    "address:paul"
                 ],
-                "gasLimit": "200,000,000",
+                "gasLimit": "20,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -93,13 +94,13 @@
                 {
                     "creatorAddress": "sc:multisig",
                     "creatorNonce": "0",
-                    "newAddress": "sc:adder"
+                    "newAddress": "sc:multisig-child"
                 }
             ]
         },
         {
             "step": "scCall",
-            "txId": "sc-deploy-perform-err",
+            "txId": "sc-deploy-perform-1",
             "tx": {
                 "from": "address:paul",
                 "to": "sc:multisig",
@@ -107,16 +108,36 @@
                 "arguments": [
                     "3"
                 ],
-                "gasLimit": "90,000,000",
+                "gasLimit": "80,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [],
-                "status": "10",
-                "message": "str:error signalled by smartcontract",
+                "out": [
+                    "sc:multisig-child"
+                ],
+                "status": "",
                 "logs": [],
                 "gas": "*",
                 "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:multisig-child": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:user_count": "1",
+                        "str:user_address_to_id|address:paul": "1",
+                        "str:user_id_to_address|u32:1": "address:paul",
+                        "str:user_role|u32:1": "2",
+                        "str:num_board_members": "1",
+                        "str:quorum": "1"
+                    },
+                    "code": "file:../output/multisig.wasm"
+                },
+                "+": ""
             }
         }
     ]
