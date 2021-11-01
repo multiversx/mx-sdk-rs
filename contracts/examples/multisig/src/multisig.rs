@@ -66,8 +66,7 @@ pub trait Multisig:
         if caller_role.can_sign() {
             // also sign
             // since the action is newly created, the caller can be the only signer
-            self.action_signer_ids(action_id)
-                .set(&ManagedVec::singleton(caller_id));
+            self.action_signer_ids(action_id).insert(caller_id);
         }
 
         Ok(action_id)
@@ -104,8 +103,7 @@ pub trait Multisig:
         if user_id == 0 {
             false
         } else {
-            let signer_ids = self.action_signer_ids(action_id).get();
-            signer_ids.into_vec().contains(&user_id)
+            self.action_signer_ids(action_id).contains(&user_id)
         }
     }
 
@@ -161,13 +159,9 @@ pub trait Multisig:
         let caller_role = self.get_user_id_to_role(caller_id);
         require!(caller_role.can_sign(), "only board members can sign");
 
-        self.action_signer_ids(action_id).update(|signer_ids| {
-            signer_ids.with_self_as_vec(|signer_ids_vec| {
-                if !signer_ids_vec.contains(&caller_id) {
-                    signer_ids_vec.push(caller_id);
-                }
-            });
-        });
+        if !self.action_signer_ids(action_id).contains(&caller_id) {
+            self.action_signer_ids(action_id).insert(caller_id);
+        }
 
         Ok(())
     }
@@ -186,19 +180,7 @@ pub trait Multisig:
         let caller_role = self.get_user_id_to_role(caller_id);
         require!(caller_role.can_sign(), "only board members can un-sign");
 
-        self.action_signer_ids(action_id).update(|signer_ids| {
-            signer_ids.with_self_as_vec(|signer_ids_vec| {
-                if let Some(signer_pos) = signer_ids_vec
-                    .iter()
-                    .position(|signer_id| *signer_id == caller_id)
-                {
-                    // since we don't care about the order,
-                    // it is ok to call swap_remove, which is O(1)
-                    let _ = signer_ids_vec.swap_remove(signer_pos);
-                }
-            });
-        });
-
+        self.action_signer_ids(action_id).remove(&caller_id);
         Ok(())
     }
 
