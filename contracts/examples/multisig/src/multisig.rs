@@ -1,9 +1,12 @@
 #![no_std]
 
 mod action;
+mod multisig_perform;
+mod multisig_propose;
+mod multisig_state;
 mod user_role;
 
-use action::{Action, ActionFullInfo, PerformActionResult};
+use action::{Action, ActionFullInfo};
 use user_role::UserRole;
 
 elrond_wasm::imports!();
@@ -12,52 +15,11 @@ elrond_wasm::imports!();
 /// Acts like a wallet that needs multiple signers for any action performed.
 /// See the readme file for more detailed documentation.
 #[elrond_wasm::contract]
-pub trait Multisig {
-    /// Minimum number of signatures needed to perform any action.
-    #[view(getQuorum)]
-    #[storage_mapper("quorum")]
-    fn quorum(&self) -> SingleValueMapper<usize>;
-
-    #[storage_mapper("user")]
-    fn user_mapper(&self) -> UserMapper;
-
-    #[storage_get("user_role")]
-    fn get_user_id_to_role(&self, user_id: usize) -> UserRole;
-
-    #[storage_set("user_role")]
-    fn set_user_id_to_role(&self, user_id: usize, user_role: UserRole);
-
-    /// Denormalized board member count.
-    /// It is kept in sync with the user list by the contract.
-    #[view(getNumBoardMembers)]
-    #[storage_mapper("num_board_members")]
-    fn num_board_members(&self) -> SingleValueMapper<usize>;
-
-    /// Denormalized proposer count.
-    /// It is kept in sync with the user list by the contract.
-    #[view(getNumProposers)]
-    #[storage_mapper("num_proposers")]
-    fn num_proposers(&self) -> SingleValueMapper<usize>;
-
-    #[storage_mapper("action_data")]
-    fn action_mapper(&self) -> VecMapper<Action<Self::Api>>;
-
-    /// The index of the last proposed action.
-    /// 0 means that no action was ever proposed yet.
-    #[view(getActionLastIndex)]
-    fn get_action_last_index(&self) -> usize {
-        self.action_mapper().len()
-    }
-
-    /// Serialized action data of an action with index.
-    #[view(getActionData)]
-    fn get_action_data(&self, action_id: usize) -> Action<Self::Api> {
-        self.action_mapper().get(action_id)
-    }
-
-    #[storage_mapper("action_signer_ids")]
-    fn action_signer_ids(&self, action_id: usize) -> SingleValueMapper<Vec<usize>>;
-
+pub trait Multisig:
+    multisig_state::MultisigStateModule
+    + multisig_propose::MultisigProposeModule
+    + multisig_perform::MultisigPerformModule
+{
     #[init]
     fn init(
         &self,
@@ -104,7 +66,7 @@ pub trait Multisig {
         if caller_role.can_sign() {
             // also sign
             // since the action is newly created, the caller can be the only signer
-            self.action_signer_ids(action_id).set(&[caller_id].to_vec());
+            self.action_signer_ids(action_id).insert(caller_id);
         }
 
         Ok(action_id)
@@ -117,7 +79,7 @@ pub trait Multisig {
     /// - (number of signers followed by) list of signer addresses.
     #[view(getPendingActionFullInfo)]
     fn get_pending_action_full_info(&self) -> MultiResultVec<ActionFullInfo<Self::Api>> {
-        let mut result = Vec::new();
+        let mut result = MultiResultVec::new();
         let action_last_index = self.get_action_last_index();
         let action_mapper = self.action_mapper();
         for action_id in 1..=action_last_index {
@@ -130,92 +92,7 @@ pub trait Multisig {
                 });
             }
         }
-        result.into()
-    }
-
-    /// Initiates board member addition process.
-    /// Can also be used to promote a proposer to board member.
-    #[endpoint(proposeAddBoardMember)]
-    fn propose_add_board_member(&self, board_member_address: ManagedAddress) -> SCResult<usize> {
-        self.propose_action(Action::AddBoardMember(board_member_address))
-    }
-
-    /// Initiates proposer addition process..
-    /// Can also be used to demote a board member to proposer.
-    #[endpoint(proposeAddProposer)]
-    fn propose_add_proposer(&self, proposer_address: ManagedAddress) -> SCResult<usize> {
-        self.propose_action(Action::AddProposer(proposer_address))
-    }
-
-    /// Removes user regardless of whether it is a board member or proposer.
-    #[endpoint(proposeRemoveUser)]
-    fn propose_remove_user(&self, user_address: ManagedAddress) -> SCResult<usize> {
-        self.propose_action(Action::RemoveUser(user_address))
-    }
-
-    #[endpoint(proposeChangeQuorum)]
-    fn propose_change_quorum(&self, new_quorum: usize) -> SCResult<usize> {
-        self.propose_action(Action::ChangeQuorum(new_quorum))
-    }
-
-    #[endpoint(proposeSendEgld)]
-    fn propose_send_egld(
-        &self,
-        to: ManagedAddress,
-        amount: BigUint,
-        #[var_args] opt_data: OptionalArg<BoxedBytes>,
-    ) -> SCResult<usize> {
-        let data = match opt_data {
-            OptionalArg::Some(data) => data,
-            OptionalArg::None => BoxedBytes::empty(),
-        };
-        self.propose_action(Action::SendEgld { to, amount, data })
-    }
-
-    #[endpoint(proposeSCDeploy)]
-    fn propose_sc_deploy(
-        &self,
-        amount: BigUint,
-        code: ManagedBuffer,
-        upgradeable: bool,
-        payable: bool,
-        readable: bool,
-        #[var_args] arguments: VarArgs<BoxedBytes>,
-    ) -> SCResult<usize> {
-        let mut code_metadata = CodeMetadata::DEFAULT;
-        if upgradeable {
-            code_metadata |= CodeMetadata::UPGRADEABLE;
-        }
-        if payable {
-            code_metadata |= CodeMetadata::PAYABLE;
-        }
-        if readable {
-            code_metadata |= CodeMetadata::READABLE;
-        }
-        self.propose_action(Action::SCDeploy {
-            amount,
-            code,
-            code_metadata,
-            arguments: arguments.into_vec(),
-        })
-    }
-
-    /// To be used not only for smart contract calls,
-    /// but also for ESDT calls or any protocol built-in function.
-    #[endpoint(proposeSCCall)]
-    fn propose_sc_call(
-        &self,
-        to: ManagedAddress,
-        egld_payment: BigUint,
-        endpoint_name: BoxedBytes,
-        #[var_args] arguments: VarArgs<BoxedBytes>,
-    ) -> SCResult<usize> {
-        self.propose_action(Action::SCCall {
-            to,
-            egld_payment,
-            endpoint_name,
-            arguments: arguments.into_vec(),
-        })
+        result
     }
 
     /// Returns `true` (`1`) if the user has signed the action.
@@ -226,8 +103,7 @@ pub trait Multisig {
         if user_id == 0 {
             false
         } else {
-            let signer_ids = self.action_signer_ids(action_id).get();
-            signer_ids.contains(&user_id)
+            self.action_signer_ids(action_id).contains(&user_id)
         }
     }
 
@@ -258,7 +134,7 @@ pub trait Multisig {
     }
 
     fn get_all_users_with_role(&self, role: UserRole) -> MultiResultVec<ManagedAddress> {
-        let mut result = Vec::new();
+        let mut result = MultiResultVec::new();
         let num_users = self.user_mapper().get_user_count();
         for user_id in 1..=num_users {
             if self.get_user_id_to_role(user_id) == role {
@@ -267,7 +143,7 @@ pub trait Multisig {
                 }
             }
         }
-        result.into()
+        result
     }
 
     /// Used by board members to sign actions.
@@ -283,11 +159,9 @@ pub trait Multisig {
         let caller_role = self.get_user_id_to_role(caller_id);
         require!(caller_role.can_sign(), "only board members can sign");
 
-        self.action_signer_ids(action_id).update(|signer_ids| {
-            if !signer_ids.contains(&caller_id) {
-                signer_ids.push(caller_id);
-            }
-        });
+        if !self.action_signer_ids(action_id).contains(&caller_id) {
+            self.action_signer_ids(action_id).insert(caller_id);
+        }
 
         Ok(())
     }
@@ -306,221 +180,8 @@ pub trait Multisig {
         let caller_role = self.get_user_id_to_role(caller_id);
         require!(caller_role.can_sign(), "only board members can un-sign");
 
-        self.action_signer_ids(action_id).update(|signer_ids| {
-            if let Some(signer_pos) = signer_ids
-                .iter()
-                .position(|&signer_id| signer_id == caller_id)
-            {
-                // since we don't care about the order,
-                // it is ok to call swap_remove, which is O(1)
-                signer_ids.swap_remove(signer_pos);
-            }
-        });
-
+        self.action_signer_ids(action_id).remove(&caller_id);
         Ok(())
-    }
-
-    /// Can be used to:
-    /// - create new user (board member / proposer)
-    /// - remove user (board member / proposer)
-    /// - reactivate removed user
-    /// - convert between board member and proposer
-    /// Will keep the board size and proposer count in sync.
-    fn change_user_role(&self, user_address: ManagedAddress, new_role: UserRole) {
-        let user_id = self.user_mapper().get_or_create_user(&user_address);
-        let old_role = if user_id == 0 {
-            UserRole::None
-        } else {
-            self.get_user_id_to_role(user_id)
-        };
-        self.set_user_id_to_role(user_id, new_role);
-
-        // update board size
-        #[allow(clippy::collapsible_else_if)]
-        if old_role == UserRole::BoardMember {
-            if new_role != UserRole::BoardMember {
-                self.num_board_members().update(|value| *value -= 1);
-            }
-        } else {
-            if new_role == UserRole::BoardMember {
-                self.num_board_members().update(|value| *value += 1);
-            }
-        }
-
-        // update num_proposers
-        #[allow(clippy::collapsible_else_if)]
-        if old_role == UserRole::Proposer {
-            if new_role != UserRole::Proposer {
-                self.num_proposers().update(|value| *value -= 1);
-            }
-        } else {
-            if new_role == UserRole::Proposer {
-                self.num_proposers().update(|value| *value += 1);
-            }
-        }
-    }
-
-    /// Gets addresses of all users who signed an action.
-    /// Does not check if those users are still board members or not,
-    /// so the result may contain invalid signers.
-    #[view(getActionSigners)]
-    fn get_action_signers(&self, action_id: usize) -> Vec<ManagedAddress> {
-        self.action_signer_ids(action_id)
-            .get()
-            .iter()
-            .map(|signer_id| {
-                self.user_mapper()
-                    .get_user_address_unchecked(*signer_id)
-                    .managed_into()
-            })
-            .collect()
-    }
-
-    /// Gets addresses of all users who signed an action and are still board members.
-    /// All these signatures are currently valid.
-    #[view(getActionSignerCount)]
-    fn get_action_signer_count(&self, action_id: usize) -> usize {
-        self.action_signer_ids(action_id).get().len()
-    }
-
-    /// It is possible for board members to lose their role.
-    /// They are not automatically removed from all actions when doing so,
-    /// therefore the contract needs to re-check every time when actions are performed.
-    /// This function is used to validate the signers before performing an action.
-    /// It also makes it easy to check before performing an action.
-    #[view(getActionValidSignerCount)]
-    fn get_action_valid_signer_count(&self, action_id: usize) -> usize {
-        let signer_ids = self.action_signer_ids(action_id).get();
-        signer_ids
-            .iter()
-            .filter(|signer_id| {
-                let signer_role = self.get_user_id_to_role(**signer_id);
-                signer_role.can_sign()
-            })
-            .count()
-    }
-
-    /// Returns `true` (`1`) if `getActionValidSignerCount >= getQuorum`.
-    #[view(quorumReached)]
-    fn quorum_reached(&self, action_id: usize) -> bool {
-        let quorum = self.quorum().get();
-        let valid_signers_count = self.get_action_valid_signer_count(action_id);
-        valid_signers_count >= quorum
-    }
-
-    /// Proposers and board members use this to launch signed actions.
-    #[endpoint(performAction)]
-    fn perform_action_endpoint(
-        &self,
-        action_id: usize,
-    ) -> SCResult<PerformActionResult<Self::Api>> {
-        let caller_address = self.blockchain().get_caller();
-        let caller_id = self.user_mapper().get_user_id(&caller_address);
-        let caller_role = self.get_user_id_to_role(caller_id);
-        require!(
-            caller_role.can_perform_action(),
-            "only board members and proposers can perform actions"
-        );
-        require!(
-            self.quorum_reached(action_id),
-            "quorum has not been reached"
-        );
-
-        self.perform_action(action_id)
-    }
-
-    fn perform_action(&self, action_id: usize) -> SCResult<PerformActionResult<Self::Api>> {
-        let action = self.action_mapper().get(action_id);
-
-        // clean up storage
-        // happens before actual execution, because the match provides the return on each branch
-        // syntax aside, the async_call_raw kills contract execution so cleanup cannot happen afterwards
-        self.clear_action(action_id);
-
-        match action {
-            Action::Nothing => Ok(PerformActionResult::Nothing),
-            Action::AddBoardMember(board_member_address) => {
-                self.change_user_role(board_member_address, UserRole::BoardMember);
-                Ok(PerformActionResult::Nothing)
-            },
-            Action::AddProposer(proposer_address) => {
-                self.change_user_role(proposer_address, UserRole::Proposer);
-
-                // validation required for the scenario when a board member becomes a proposer
-                require!(
-                    self.quorum().get() <= self.num_board_members().get(),
-                    "quorum cannot exceed board size"
-                );
-                Ok(PerformActionResult::Nothing)
-            },
-            Action::RemoveUser(user_address) => {
-                self.change_user_role(user_address, UserRole::None);
-                let num_board_members = self.num_board_members().get();
-                let num_proposers = self.num_proposers().get();
-                require!(
-                    num_board_members + num_proposers > 0,
-                    "cannot remove all board members and proposers"
-                );
-                require!(
-                    self.quorum().get() <= num_board_members,
-                    "quorum cannot exceed board size"
-                );
-                Ok(PerformActionResult::Nothing)
-            },
-            Action::ChangeQuorum(new_quorum) => {
-                require!(
-                    new_quorum <= self.num_board_members().get(),
-                    "quorum cannot exceed board size"
-                );
-                self.quorum().set(&new_quorum);
-                Ok(PerformActionResult::Nothing)
-            },
-            Action::SendEgld { to, amount, data } => Ok(PerformActionResult::SendEgld(SendEgld {
-                api: self.raw_vm_api(),
-                to,
-                amount,
-                data: data.as_slice().managed_into(),
-            })),
-            Action::SCDeploy {
-                amount,
-                code,
-                code_metadata,
-                arguments,
-            } => {
-                let gas_left = self.blockchain().get_gas_left();
-                let arg_buffer = arguments.managed_into();
-                let (new_address, _) = self.raw_vm_api().deploy_contract(
-                    gas_left,
-                    &amount,
-                    &code,
-                    code_metadata,
-                    &arg_buffer,
-                );
-                Ok(PerformActionResult::DeployResult(new_address))
-            },
-            Action::SCCall {
-                to,
-                egld_payment,
-                endpoint_name,
-                arguments,
-            } => {
-                let mut contract_call_raw = self
-                    .send()
-                    .contract_call::<()>(to, endpoint_name.managed_into())
-                    .with_egld_transfer(egld_payment);
-                for arg in arguments {
-                    contract_call_raw.push_argument_raw_bytes(arg.as_slice());
-                }
-                Ok(PerformActionResult::SendAsyncCall(
-                    contract_call_raw.async_call(),
-                ))
-            },
-        }
-    }
-
-    fn clear_action(&self, action_id: usize) {
-        self.action_mapper().clear_entry_unchecked(action_id);
-        self.action_signer_ids(action_id).clear();
     }
 
     /// Clears storage pertaining to an action that is no longer supposed to be executed.

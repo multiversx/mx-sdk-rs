@@ -104,7 +104,7 @@ pub trait ForwarderTransferExecuteModule {
 
         for multi_arg in token_payments.into_iter() {
             let (token_identifier, token_nonce, amount) = multi_arg.into_tuple();
-            let payment = EsdtTokenPayment::from(token_identifier, token_nonce, amount);
+            let payment = EsdtTokenPayment::new(token_identifier, token_nonce, amount);
 
             all_token_payments.push(payment);
         }
