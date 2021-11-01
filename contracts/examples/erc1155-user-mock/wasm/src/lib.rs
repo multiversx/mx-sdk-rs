@@ -13,8 +13,8 @@ pub fn init() {
 }
 
 #[no_mangle]
-pub fn onERC1155Received() {
-    erc1155_user_mock::endpoints::onERC1155Received(elrond_wasm_node::arwen_api());
+pub fn callBack() {
+    erc1155_user_mock::endpoints::callBack(elrond_wasm_node::arwen_api());
 }
 
 #[no_mangle]
@@ -23,6 +23,6 @@ pub fn onERC1155BatchReceived() {
 }
 
 #[no_mangle]
-pub fn callBack() {
-    erc1155_user_mock::endpoints::callBack(elrond_wasm_node::arwen_api());
+pub fn onERC1155Received() {
+    erc1155_user_mock::endpoints::onERC1155Received(elrond_wasm_node::arwen_api());
 }

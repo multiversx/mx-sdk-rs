@@ -13,6 +13,11 @@ pub fn init() {
 }
 
 #[no_mangle]
+pub fn callBack() {
+    single_value_repeat::endpoints::callBack(elrond_wasm_node::arwen_api());
+}
+
+#[no_mangle]
 pub fn add() {
     single_value_repeat::endpoints::add(elrond_wasm_node::arwen_api());
 }
@@ -25,9 +30,4 @@ pub fn count() {
 #[no_mangle]
 pub fn remove() {
     single_value_repeat::endpoints::remove(elrond_wasm_node::arwen_api());
-}
-
-#[no_mangle]
-pub fn callBack() {
-    single_value_repeat::endpoints::callBack(elrond_wasm_node::arwen_api());
 }

@@ -13,11 +13,11 @@ pub fn init() {
 }
 
 #[no_mangle]
-pub fn generateKittyGenes() {
-    kitty_genetic_alg::endpoints::generateKittyGenes(elrond_wasm_node::arwen_api());
+pub fn callBack() {
+    kitty_genetic_alg::endpoints::callBack(elrond_wasm_node::arwen_api());
 }
 
 #[no_mangle]
-pub fn callBack() {
-    kitty_genetic_alg::endpoints::callBack(elrond_wasm_node::arwen_api());
+pub fn generateKittyGenes() {
+    kitty_genetic_alg::endpoints::generateKittyGenes(elrond_wasm_node::arwen_api());
 }

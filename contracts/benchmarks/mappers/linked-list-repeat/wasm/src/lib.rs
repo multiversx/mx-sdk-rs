@@ -13,6 +13,11 @@ pub fn init() {
 }
 
 #[no_mangle]
+pub fn callBack() {
+    linked_list_repeat::endpoints::callBack(elrond_wasm_node::arwen_api());
+}
+
+#[no_mangle]
 pub fn add() {
     linked_list_repeat::endpoints::add(elrond_wasm_node::arwen_api());
 }
@@ -23,16 +28,11 @@ pub fn count() {
 }
 
 #[no_mangle]
-pub fn remove() {
-    linked_list_repeat::endpoints::remove(elrond_wasm_node::arwen_api());
-}
-
-#[no_mangle]
 pub fn getBenchmark() {
     linked_list_repeat::endpoints::getBenchmark(elrond_wasm_node::arwen_api());
 }
 
 #[no_mangle]
-pub fn callBack() {
-    linked_list_repeat::endpoints::callBack(elrond_wasm_node::arwen_api());
+pub fn remove() {
+    linked_list_repeat::endpoints::remove(elrond_wasm_node::arwen_api());
 }

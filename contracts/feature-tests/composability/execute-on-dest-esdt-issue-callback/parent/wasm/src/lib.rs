@@ -13,13 +13,18 @@ pub fn init() {
 }
 
 #[no_mangle]
-pub fn deposit() {
-    parent::endpoints::deposit(elrond_wasm_node::arwen_api());
+pub fn callBack() {
+    parent::endpoints::callBack(elrond_wasm_node::arwen_api());
 }
 
 #[no_mangle]
 pub fn deployChildContract() {
     parent::endpoints::deployChildContract(elrond_wasm_node::arwen_api());
+}
+
+#[no_mangle]
+pub fn deposit() {
+    parent::endpoints::deposit(elrond_wasm_node::arwen_api());
 }
 
 #[no_mangle]
@@ -30,9 +35,4 @@ pub fn executeOnDestIssueToken() {
 #[no_mangle]
 pub fn getChildContractAddress() {
     parent::endpoints::getChildContractAddress(elrond_wasm_node::arwen_api());
-}
-
-#[no_mangle]
-pub fn callBack() {
-    parent::endpoints::callBack(elrond_wasm_node::arwen_api());
 }
