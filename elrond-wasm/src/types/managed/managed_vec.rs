@@ -150,7 +150,7 @@ where
     }
 
     /// New `ManagedVec` instance with 1 element in it.
-    pub fn singleton(api: M, item: T) -> Self {
+    pub fn from_single_item(api: M, item: T) -> Self {
         let mut result = ManagedVec::new(api);
         result.push(item);
         result
