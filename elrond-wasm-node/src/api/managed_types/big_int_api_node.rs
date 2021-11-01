@@ -64,7 +64,7 @@ macro_rules! unary_op_wrapper {
     };
 }
 
-impl BigIntApi for crate::ArwenApiImpl {
+impl BigIntApi for crate::VmApiImpl {
     #[inline]
     fn bi_new(&self, value: i64) -> Handle {
         unsafe { bigIntNew(value) }
