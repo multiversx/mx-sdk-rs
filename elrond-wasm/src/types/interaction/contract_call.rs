@@ -86,7 +86,7 @@ where
         payment_nonce: u64,
         payment_amount: BigUint<SA>,
     ) -> Self {
-        self.payments.push(EsdtTokenPayment::from(
+        self.payments.push(EsdtTokenPayment::new(
             payment_token,
             payment_nonce,
             payment_amount,
@@ -96,7 +96,7 @@ where
 
     pub fn with_egld_transfer(mut self, egld_amount: BigUint<SA>) -> Self {
         self.payments
-            .overwrite_with_single_item(EsdtTokenPayment::from(
+            .overwrite_with_single_item(EsdtTokenPayment::new(
                 TokenIdentifier::egld(self.api.clone()),
                 0,
                 egld_amount,

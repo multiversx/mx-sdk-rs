@@ -3,41 +3,31 @@
     "steps": [
         {
             "step": "externalSteps",
-            "path": "steps/init_accounts.steps.json"
-        },
-        {
-            "step": "externalSteps",
-            "path": "steps/deploy.steps.json"
-        },
-        {
-            "step": "externalSteps",
-            "path": "steps/add_prop.steps.json"
-        },
-        {
-            "step": "externalSteps",
-            "path": "steps/add_bm.steps.json"
+            "path": "deployOtherMultisig.scen.json"
         },
         {
             "step": "scCall",
-            "txId": "proposeSCDeploy",
+            "txId": "proposeSCUpgrade",
             "comment": "missing argument",
             "tx": {
                 "from": "address:paul",
                 "to": "sc:multisig",
-                "function": "proposeSCDeploy",
+                "function": "proposeSCUpgrade",
                 "arguments": [
+                    "sc:multisig-child",
                     "0",
                     "file:../test-contracts/adder.wasm",
+                    "true",
                     "false",
                     "false",
-                    "false"
+                    "1234"
                 ],
                 "gasLimit": "200,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "3"
+                    "4"
                 ],
                 "status": "",
                 "logs": [],
@@ -47,13 +37,13 @@
         },
         {
             "step": "scCall",
-            "txId": "sc-deploy-sign-alice",
+            "txId": "sc-upgrade-sign-alice",
             "tx": {
                 "from": "address:alice",
                 "to": "sc:multisig",
                 "function": "sign",
                 "arguments": [
-                    "3"
+                    "4"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
@@ -68,13 +58,13 @@
         },
         {
             "step": "scCall",
-            "txId": "sc-deploy-sign-bob",
+            "txId": "sc-upgrade-sign-bob",
             "tx": {
                 "from": "address:bob",
                 "to": "sc:multisig",
                 "function": "sign",
                 "arguments": [
-                    "3"
+                    "4"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
@@ -88,35 +78,44 @@
             }
         },
         {
-            "step": "setState",
-            "newAddresses": [
-                {
-                    "creatorAddress": "sc:multisig",
-                    "creatorNonce": "0",
-                    "newAddress": "sc:adder"
-                }
-            ]
-        },
-        {
             "step": "scCall",
-            "txId": "sc-deploy-perform-err",
+            "txId": "sc-upgrade-perform-3",
             "tx": {
                 "from": "address:paul",
                 "to": "sc:multisig",
                 "function": "performAction",
                 "arguments": [
-                    "3"
+                    "4"
                 ],
-                "gasLimit": "90,000,000",
+                "gasLimit": "120,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [],
-                "status": "10",
-                "message": "str:error signalled by smartcontract",
+                "status": "",
                 "logs": [],
                 "gas": "*",
                 "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:multisig-child": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:user_count": "1",
+                        "str:user_address_to_id|address:paul": "1",
+                        "str:user_id_to_address|u32:1": "address:paul",
+                        "str:user_role|u32:1": "2",
+                        "str:num_board_members": "1",
+                        "str:quorum": "1",
+                        "str:sum": "1234"
+                    },
+                    "code": "file:../test-contracts/adder.wasm"
+                },
+                "+": ""
             }
         }
     ]
