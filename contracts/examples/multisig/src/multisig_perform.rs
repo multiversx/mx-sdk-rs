@@ -131,14 +131,14 @@ pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
             Action::SendEGLD {
                 to,
                 amount,
-                function_name,
+                endpoint_name,
                 arguments,
             } => {
                 let result = self.raw_vm_api().direct_egld_execute(
                     &to,
                     &amount,
                     self.blockchain().get_gas_left(),
-                    &function_name,
+                    &endpoint_name,
                     &arguments.into(),
                 );
                 if let Result::Err(e) = result {
