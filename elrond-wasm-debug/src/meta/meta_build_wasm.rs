@@ -1,8 +1,4 @@
-use std::{
-    fs,
-    io::{self, Write},
-    process::Command,
-};
+use std::{fs, process::Command};
 
 use elrond_wasm::abi::ContractAbi;
 
@@ -41,10 +37,13 @@ pub fn build_wasm(abi: &ContractAbi, args: &[String]) {
     if !build_args.debug_symbols {
         command.env("RUSTFLAGS", "-C link-arg=-s");
     }
-    let output = command.output().expect("failed to execute process");
+    let exit_status = command
+        .spawn()
+        .expect("failed to spawn contract build process")
+        .wait()
+        .expect("contract build process was not running");
 
-    io::stdout().write_all(&output.stdout).unwrap();
-    io::stderr().write_all(&output.stderr).unwrap();
+    assert!(exit_status.success(), "contract build process failed");
 
     let source_wasm = format!(
         "../wasm/target/wasm32-unknown-unknown/release/{}_wasm.wasm",
@@ -55,18 +54,19 @@ pub fn build_wasm(abi: &ContractAbi, args: &[String]) {
         .unwrap_or_else(|| format!("{}.wasm", abi.build_info.contract_crate.name));
     let dest_wasm = format!("../output/{}", wasm_name);
 
-    fs::copy(source_wasm, dest_wasm).unwrap();
+    fs::copy(source_wasm, dest_wasm).expect("failed to copy compiled contract to output directory");
 }
 
 pub fn clean_wasm() {
-    let output = Command::new("cargo")
+    let exit_status = Command::new("cargo")
         .args(["clean"])
         .current_dir("../wasm")
-        .output()
-        .expect("failed to execute process");
+        .spawn()
+        .expect("failed to spawn contract clean process")
+        .wait()
+        .expect("contract clean process was not running");
 
-    io::stdout().write_all(&output.stdout).unwrap();
-    io::stderr().write_all(&output.stderr).unwrap();
+    assert!(exit_status.success(), "contract clean process failed");
 
-    fs::remove_dir_all("../output").unwrap();
+    fs::remove_dir_all("../output").expect("failed to remove output directory");
 }
