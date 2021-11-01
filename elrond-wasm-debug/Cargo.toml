@@ -24,7 +24,7 @@ serde_json = "1.0"
 rustc_version = "0.4"
 
 [features]
-arwen-tests = []
+mandos-go-tests = []
 
 [dependencies.elrond-wasm]
 version = "=0.21.2"
