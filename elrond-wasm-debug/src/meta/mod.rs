@@ -15,9 +15,11 @@ pub fn perform<AbiObj: ContractAbiProvider>() {
     meta_wasm_src::copy_to_wasm_unmanaged_ei();
 
     let args: Vec<String> = env::args().collect();
-    if args.contains(&"build".to_string()) {
-        meta_build_wasm::build_wasm(&abi);
-    } else if args.contains(&"clean".to_string()) {
-        meta_build_wasm::clean_wasm();
+    if args.len() > 1 {
+        match args[1].as_str() {
+            "build" => meta_build_wasm::build_wasm(&abi, args.as_slice()),
+            "clean" => meta_build_wasm::clean_wasm(),
+            _ => (),
+        }
     }
 }
