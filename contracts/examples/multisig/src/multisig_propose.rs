@@ -73,14 +73,14 @@ pub trait MultisigProposeModule: crate::multisig_state::MultisigStateModule {
         #[var_args] opt_function: OptionalArg<ManagedBuffer>,
         #[var_args] arguments: ManagedVarArgs<ManagedBuffer>,
     ) -> SCResult<usize> {
-        let function_name = match opt_function {
+        let endpoint_name = match opt_function {
             OptionalArg::Some(data) => data,
             OptionalArg::None => ManagedBuffer::new(),
         };
         self.propose_action(Action::SendEGLD {
             to,
             amount,
-            function_name,
+            endpoint_name,
             arguments: arguments.into_vec_of_buffers(),
         })
     }

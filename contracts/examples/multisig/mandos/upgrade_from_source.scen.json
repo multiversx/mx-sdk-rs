@@ -17,7 +17,7 @@
                     "sc:multisig-child",
                     "0",
                     "sc:multisig",
-                    "false",
+                    "true",
                     "false",
                     "false",
                     "1",
