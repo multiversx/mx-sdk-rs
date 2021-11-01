@@ -29,7 +29,7 @@ mod dns_mock {
 
 use elrond_wasm_debug::*;
 
-fn contract_map() -> BlockchainMock {
+fn world() -> BlockchainMock {
     let mut blockchain = BlockchainMock::new();
     blockchain.register_contract(
         "file:output/use-module.wasm",
@@ -44,7 +44,7 @@ fn contract_map() -> BlockchainMock {
     blockchain
 }
 
-fn _gov_contract_map() -> BlockchainMock {
+fn _gov_world() -> BlockchainMock {
     let mut blockchain = BlockchainMock::new();
     blockchain.register_contract(
         "file:../output/use-module.wasm",
@@ -56,22 +56,22 @@ fn _gov_contract_map() -> BlockchainMock {
 
 #[test]
 fn use_module_dns_register_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/use_module_dns_register.scen.json", contract_map());
+    elrond_wasm_debug::mandos_rs("mandos/use_module_dns_register.scen.json", world());
 }
 
 #[test]
 fn use_module_features_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/use_module_features.scen.json", contract_map());
+    elrond_wasm_debug::mandos_rs("mandos/use_module_features.scen.json", world());
 }
 
 #[test]
 fn use_module_internal_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/use_module_internal.scen.json", contract_map());
+    elrond_wasm_debug::mandos_rs("mandos/use_module_internal.scen.json", world());
 }
 
 #[test]
 fn use_module_pause_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/use_module_pause.scen.json", contract_map());
+    elrond_wasm_debug::mandos_rs("mandos/use_module_pause.scen.json", world());
 }
 
 // Governance module tests
@@ -82,7 +82,7 @@ fn use_module_pause_rs() {
 fn cancel_defeated_proposal_rs() {
     elrond_wasm_debug::mandos_rs(
         "mandos/use_module_governance/cancel_defeated_proposal.scen.json",
-        &gov_contract_map(),
+        &gov_world(),
     );
 }
 
@@ -90,7 +90,7 @@ fn cancel_defeated_proposal_rs() {
 fn change_configuration_rs() {
     elrond_wasm_debug::mandos_rs(
         "/home/elrond/elrond-wasm-rs/contracts/feature-tests/use-module/mandos/use_module_governance/change_configuration.scen.json",
-        &gov_contract_map(),
+        &gov_world(),
     );
 }
 
@@ -98,7 +98,7 @@ fn change_configuration_rs() {
 fn init_rs() {
     elrond_wasm_debug::mandos_rs(
         "mandos/use_module_governance/init.scen.json",
-        &gov_contract_map(),
+        &gov_world(),
     );
 }
 
@@ -106,7 +106,7 @@ fn init_rs() {
 fn invalid_proposals_rs() {
     elrond_wasm_debug::mandos_rs(
         "mandos/use_module_governance/invalid_proposals.scen.json",
-        &gov_contract_map(),
+        &gov_world(),
     );
 }
 
@@ -114,7 +114,7 @@ fn invalid_proposals_rs() {
 fn withdraw_governance_tokens_rs() {
     elrond_wasm_debug::mandos_rs(
         "mandos/use_module_governance/withdraw_governance_tokens.scen.json",
-        &gov_contract_map(),
+        &gov_world(),
     );
 }
 
