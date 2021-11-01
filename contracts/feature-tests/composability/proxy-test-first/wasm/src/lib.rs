@@ -13,13 +13,13 @@ pub fn init() {
 }
 
 #[no_mangle]
-pub fn deploySecondContract() {
-    proxy_test_first::endpoints::deploySecondContract(elrond_wasm_node::arwen_api());
+pub fn callBack() {
+    proxy_test_first::endpoints::callBack(elrond_wasm_node::arwen_api());
 }
 
 #[no_mangle]
-pub fn upgradeSecondContract() {
-    proxy_test_first::endpoints::upgradeSecondContract(elrond_wasm_node::arwen_api());
+pub fn deploySecondContract() {
+    proxy_test_first::endpoints::deploySecondContract(elrond_wasm_node::arwen_api());
 }
 
 #[no_mangle]
@@ -43,6 +43,6 @@ pub fn messageOtherContractWithCallback() {
 }
 
 #[no_mangle]
-pub fn callBack() {
-    proxy_test_first::endpoints::callBack(elrond_wasm_node::arwen_api());
+pub fn upgradeSecondContract() {
+    proxy_test_first::endpoints::upgradeSecondContract(elrond_wasm_node::arwen_api());
 }

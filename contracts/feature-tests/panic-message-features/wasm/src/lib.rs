@@ -13,11 +13,11 @@ pub fn init() {
 }
 
 #[no_mangle]
-pub fn panicWithMessage() {
-    panic_message_features::endpoints::panicWithMessage(elrond_wasm_node::arwen_api());
+pub fn callBack() {
+    panic_message_features::endpoints::callBack(elrond_wasm_node::arwen_api());
 }
 
 #[no_mangle]
-pub fn callBack() {
-    panic_message_features::endpoints::callBack(elrond_wasm_node::arwen_api());
+pub fn panicWithMessage() {
+    panic_message_features::endpoints::panicWithMessage(elrond_wasm_node::arwen_api());
 }

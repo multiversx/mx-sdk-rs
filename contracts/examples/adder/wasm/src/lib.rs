@@ -13,8 +13,8 @@ pub fn init() {
 }
 
 #[no_mangle]
-pub fn getSum() {
-    adder::endpoints::getSum(elrond_wasm_node::arwen_api());
+pub fn callBack() {
+    adder::endpoints::callBack(elrond_wasm_node::arwen_api());
 }
 
 #[no_mangle]
@@ -23,6 +23,6 @@ pub fn add() {
 }
 
 #[no_mangle]
-pub fn callBack() {
-    adder::endpoints::callBack(elrond_wasm_node::arwen_api());
+pub fn getSum() {
+    adder::endpoints::getSum(elrond_wasm_node::arwen_api());
 }

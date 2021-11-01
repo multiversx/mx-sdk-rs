@@ -13,13 +13,8 @@ pub fn init() {
 }
 
 #[no_mangle]
-pub fn payMe() {
-    proxy_test_second::endpoints::payMe(elrond_wasm_node::arwen_api());
-}
-
-#[no_mangle]
-pub fn payMeWithResult() {
-    proxy_test_second::endpoints::payMeWithResult(elrond_wasm_node::arwen_api());
+pub fn callBack() {
+    proxy_test_second::endpoints::callBack(elrond_wasm_node::arwen_api());
 }
 
 #[no_mangle]
@@ -28,6 +23,11 @@ pub fn messageMe() {
 }
 
 #[no_mangle]
-pub fn callBack() {
-    proxy_test_second::endpoints::callBack(elrond_wasm_node::arwen_api());
+pub fn payMe() {
+    proxy_test_second::endpoints::payMe(elrond_wasm_node::arwen_api());
+}
+
+#[no_mangle]
+pub fn payMeWithResult() {
+    proxy_test_second::endpoints::payMeWithResult(elrond_wasm_node::arwen_api());
 }

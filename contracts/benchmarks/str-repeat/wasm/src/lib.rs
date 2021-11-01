@@ -13,13 +13,8 @@ pub fn init() {
 }
 
 #[no_mangle]
-pub fn repeat() {
-    str_repeat::endpoints::repeat(elrond_wasm_node::arwen_api());
-}
-
-#[no_mangle]
-pub fn getByteArrayLength() {
-    str_repeat::endpoints::getByteArrayLength(elrond_wasm_node::arwen_api());
+pub fn callBack() {
+    str_repeat::endpoints::callBack(elrond_wasm_node::arwen_api());
 }
 
 #[no_mangle]
@@ -28,6 +23,11 @@ pub fn getByteArray() {
 }
 
 #[no_mangle]
-pub fn callBack() {
-    str_repeat::endpoints::callBack(elrond_wasm_node::arwen_api());
+pub fn getByteArrayLength() {
+    str_repeat::endpoints::getByteArrayLength(elrond_wasm_node::arwen_api());
+}
+
+#[no_mangle]
+pub fn repeat() {
+    str_repeat::endpoints::repeat(elrond_wasm_node::arwen_api());
 }

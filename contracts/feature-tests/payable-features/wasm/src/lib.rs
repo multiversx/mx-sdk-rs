@@ -13,13 +13,13 @@ pub fn init() {
 }
 
 #[no_mangle]
-pub fn echo_call_value() {
-    payable_features::endpoints::echo_call_value(elrond_wasm_node::arwen_api());
+pub fn callBack() {
+    payable_features::endpoints::callBack(elrond_wasm_node::arwen_api());
 }
 
 #[no_mangle]
-pub fn payment_multiple() {
-    payable_features::endpoints::payment_multiple(elrond_wasm_node::arwen_api());
+pub fn echo_call_value() {
+    payable_features::endpoints::echo_call_value(elrond_wasm_node::arwen_api());
 }
 
 #[no_mangle]
@@ -83,6 +83,6 @@ pub fn payable_token_4() {
 }
 
 #[no_mangle]
-pub fn callBack() {
-    payable_features::endpoints::callBack(elrond_wasm_node::arwen_api());
+pub fn payment_multiple() {
+    payable_features::endpoints::payment_multiple(elrond_wasm_node::arwen_api());
 }
