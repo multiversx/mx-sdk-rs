@@ -12,7 +12,7 @@ use elrond_codec::{try_execute_then_cast, DecodeError, TopDecodeInput, TryStatic
 /// into_u64, into_i64, ...
 ///
 /// This is a performance-critical struct.
-/// Since the wasm EndpointArgumentApi (ArwenApiImpl) is zero-size,
+/// Since the wasm EndpointArgumentApi (VmApiImpl) is zero-size,
 /// it means that this structures translates to a single glorified i32 in wasm.
 pub struct ArgDecodeInput<AA>
 where

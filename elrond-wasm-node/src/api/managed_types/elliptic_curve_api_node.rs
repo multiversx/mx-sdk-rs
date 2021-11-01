@@ -91,7 +91,7 @@ extern "C" {
 
 }
 
-impl EllipticCurveApi for crate::ArwenApiImpl {
+impl EllipticCurveApi for crate::VmApiImpl {
     fn ec_create(&self, name: &[u8]) -> Handle {
         unsafe { createEC(name.as_ptr() as i32, name.len() as i32) }
     }

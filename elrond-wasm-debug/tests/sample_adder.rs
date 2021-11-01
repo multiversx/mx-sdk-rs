@@ -485,7 +485,7 @@ fn test_add() {
     let _ = elrond_wasm_debug::abi_json::contract_abi::<sample_adder::AbiProvider>();
 }
 
-fn contract_map() -> elrond_wasm_debug::BlockchainMock {
+fn world() -> elrond_wasm_debug::BlockchainMock {
     let mut blockchain = elrond_wasm_debug::BlockchainMock::new();
     blockchain.register_contract(
         "file:../contracts/examples/adder/output/adder.wasm",
@@ -498,6 +498,6 @@ fn contract_map() -> elrond_wasm_debug::BlockchainMock {
 fn test_mandos() {
     elrond_wasm_debug::mandos_rs(
         "../contracts/examples/adder/mandos/adder.scen.json",
-        contract_map(),
+        world(),
     );
 }

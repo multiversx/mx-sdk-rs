@@ -1,4 +1,4 @@
-use crate::{api::managed_types::big_int_api_node::unsafe_buffer_load_be_pad_right, ArwenApiImpl};
+use crate::{api::managed_types::big_int_api_node::unsafe_buffer_load_be_pad_right, VmApiImpl};
 use alloc::vec::Vec;
 use elrond_wasm::{
     api::{BlockchainApi, SendApi, StorageReadApi, StorageWriteApi},
@@ -173,7 +173,7 @@ extern "C" {
     fn getReturnData(result_index: i32, dataOffset: *const u8) -> i32;
 }
 
-impl SendApi for ArwenApiImpl {
+impl SendApi for VmApiImpl {
     fn direct_egld<D>(&self, to: &ManagedAddress<Self>, amount: &BigUint<Self>, data: D)
     where
         D: ManagedInto<Self, ManagedBuffer<Self>>,

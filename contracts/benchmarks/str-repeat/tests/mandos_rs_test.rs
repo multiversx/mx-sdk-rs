@@ -1,6 +1,6 @@
 use elrond_wasm_debug::*;
 
-fn contract_map() -> BlockchainMock {
+fn world() -> BlockchainMock {
     let mut blockchain = BlockchainMock::new();
     blockchain.register_contract(
         "file:output/str-repeat.wasm",
@@ -11,5 +11,5 @@ fn contract_map() -> BlockchainMock {
 
 #[test]
 fn test_str_repeat_mandos_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/str_repeat.scen.json", contract_map());
+    elrond_wasm_debug::mandos_rs("mandos/str_repeat.scen.json", world());
 }
