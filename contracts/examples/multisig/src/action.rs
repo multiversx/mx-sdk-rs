@@ -19,7 +19,7 @@ pub enum Action<M: ManagedTypeApi> {
     SendEGLD {
         to: ManagedAddress<M>,
         amount: BigUint<M>,
-        function_name: ManagedBuffer<M>,
+        endpoint_name: ManagedBuffer<M>,
         arguments: ManagedVec<M, ManagedBuffer<M>>,
     },
     SendESDT {

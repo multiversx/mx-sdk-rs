@@ -54,8 +54,8 @@ impl<M: ManagedTypeApi> ManagedTypeHelper<M> {
     }
 
     #[inline]
-    pub fn managed_vec_singleton<T: ManagedVecItem<M>>(&self, item: T) -> ManagedVec<M, T> {
-        ManagedVec::singleton(self.api.clone(), item)
+    pub fn managed_vec_from_single_item<T: ManagedVecItem<M>>(&self, item: T) -> ManagedVec<M, T> {
+        ManagedVec::from_single_item(self.api.clone(), item)
     }
 
     #[inline]

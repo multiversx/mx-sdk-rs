@@ -17,7 +17,7 @@
                     "sc:multisig-child",
                     "0",
                     "file:../test-contracts/adder.wasm",
-                    "false",
+                    "true",
                     "false",
                     "false",
                     "1234"
@@ -33,50 +33,6 @@
                 "logs": [],
                 "gas": "*",
                 "refund": "*"
-            }
-        },
-        {
-            "step": "checkState",
-            "accounts": {
-                "sc:multisig": {
-                    "nonce": "1",
-                    "balance": "0",
-                    "storage": {
-                        "str:user_count": "5",
-                        "str:user_address_to_id|address:alice": "1",
-                        "str:user_address_to_id|address:bob": "2",
-                        "str:user_address_to_id|address:charlie": "3",
-                        "str:user_address_to_id|address:paul": "4",
-                        "str:user_address_to_id|address:dan": "5",
-                        "str:user_id_to_address|u32:1": "address:alice",
-                        "str:user_id_to_address|u32:2": "address:bob",
-                        "str:user_id_to_address|u32:3": "address:charlie",
-                        "str:user_id_to_address|u32:4": "address:paul",
-                        "str:user_id_to_address|u32:5": "address:dan",
-                        "str:user_role|u32:1": "2",
-                        "str:user_role|u32:2": "2",
-                        "str:user_role|u32:3": "2",
-                        "str:user_role|u32:4": "1",
-                        "str:user_role|u32:5": "2",
-                        "str:num_board_members": "4",
-                        "str:num_proposers": "1",
-                        "str:quorum": "2",
-                        "str:action_data.len": "4",
-                        "str:action_data.item|u32:4": {
-                            "1-discriminant": "0x09",
-                            "2-sc_address": "sc:multisig-child",
-                            "3-amount": "u32:0",
-                            "4-code": "nested:file:../test-contracts/adder.wasm",
-                            "5-code_metadata": "0x0000",
-                            "6-arguments": [
-                                "u32:1",
-                                "u32:2|1234"
-                            ]
-                        }
-                    },
-                    "code": "file:../output/multisig.wasm"
-                },
-                "+": ""
             }
         },
         {
