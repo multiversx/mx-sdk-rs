@@ -1,1 +1,1 @@
-export PATH=$HOME/.local/bin:$HOME/elrondsdk/arwentools:$PATH
+export PATH=$HOME/.local/bin:$HOME/elrondsdk/vmtools:$PATH

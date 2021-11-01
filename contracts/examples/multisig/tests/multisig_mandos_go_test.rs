@@ -29,6 +29,11 @@ fn deployfactorial_go() {
 }
 
 #[test]
+fn deployothermultisig_go() {
+    elrond_wasm_debug::mandos_go("mandos/deployOtherMultisig.scen.json");
+}
+
+#[test]
 fn deploy_duplicate_bm_go() {
     elrond_wasm_debug::mandos_go("mandos/deploy_duplicate_bm.scen.json");
 }
@@ -36,4 +41,19 @@ fn deploy_duplicate_bm_go() {
 #[test]
 fn remove_everyone_go() {
     elrond_wasm_debug::mandos_go("mandos/remove_everyone.scen.json");
+}
+
+#[test]
+fn sendesdt_go() {
+    elrond_wasm_debug::mandos_go("mandos/sendEsdt.scen.json");
+}
+
+#[test]
+fn upgrade_go() {
+    elrond_wasm_debug::mandos_go("mandos/upgrade.scen.json");
+}
+
+#[test]
+fn upgrade_from_source_go() {
+    elrond_wasm_debug::mandos_go("mandos/upgrade_from_source.scen.json");
 }
