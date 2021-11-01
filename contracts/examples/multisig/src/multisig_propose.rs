@@ -32,8 +32,7 @@ pub trait MultisigProposeModule: crate::multisig_state::MultisigStateModule {
         if caller_role.can_sign() {
             // also sign
             // since the action is newly created, the caller can be the only signer
-            self.action_signer_ids(action_id)
-                .set(&ManagedVec::singleton(caller_id));
+            self.action_signer_ids(action_id).insert(caller_id);
         }
 
         Ok(action_id)
