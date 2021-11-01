@@ -41,6 +41,31 @@ fn test_into_vec() {
 }
 
 #[test]
+fn test_with_self_as_vec() {
+    let context = DebugApi::dummy();
+
+    let mut vec = Vec::new();
+    let mut managed_vec = ManagedVec::new(context.clone());
+    for i in 20u64..=30u64 {
+        let biguint = BigUint::managed_from(context.clone(), i);
+        managed_vec.push(biguint.clone());
+        vec.push(biguint);
+    }
+    let item_to_remove = 25u64;
+    if let Some(pos_to_remove) = vec.iter().position(|value| *value == item_to_remove) {
+        let _ = vec.swap_remove(pos_to_remove);
+    }
+
+    managed_vec.with_self_as_vec(|t_vec| {
+        if let Some(signer_pos) = t_vec.iter().position(|value| *value == item_to_remove) {
+            let _ = t_vec.swap_remove(signer_pos);
+        }
+    });
+
+    assert_eq!(managed_vec.into_vec(), vec);
+}
+
+#[test]
 fn test_managed_from() {
     let context = DebugApi::dummy();
 
