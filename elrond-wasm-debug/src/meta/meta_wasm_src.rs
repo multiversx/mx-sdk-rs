@@ -25,7 +25,7 @@ fn write_endpoint(wasm_lib_file: &mut File, contract_module_name: &str, endpoint
         "
 #[no_mangle]
 pub fn {}() {{
-    {}::endpoints::{}(elrond_wasm_node::arwen_api());
+    {}::endpoints::{}(elrond_wasm_node::vm_api());
 }}",
         endpoint_name, contract_module_name, endpoint_name
     )

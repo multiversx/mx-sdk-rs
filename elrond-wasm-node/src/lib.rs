@@ -10,6 +10,6 @@ pub use alloc::{boxed::Box, string::String, vec::Vec};
 pub use api::VmApiImpl;
 
 /// Provides an API instance.
-pub fn arwen_api() -> VmApiImpl {
+pub fn vm_api() -> VmApiImpl {
     VmApiImpl {}
 }
