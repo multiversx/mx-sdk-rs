@@ -5,9 +5,16 @@ use crate::{
 
 elrond_wasm::imports!();
 
+/// Gas required to finsh transaction after transfer-execute.
+const PERFORM_ACTION_FINISH_GAS: u64 = 200_000;
+
 /// Contains all events that can be emitted by the contract.
 #[elrond_wasm::module]
 pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
+    fn gas_for_transfer_exec(&self) -> u64 {
+        self.blockchain().get_gas_left() - PERFORM_ACTION_FINISH_GAS
+    }
+
     /// Can be used to:
     /// - create new user (board member / proposer)
     /// - remove user (board member / proposer)
@@ -137,7 +144,7 @@ pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
                 let result = self.raw_vm_api().direct_egld_execute(
                     &to,
                     &amount,
-                    self.blockchain().get_gas_left(),
+                    self.gas_for_transfer_exec(),
                     &endpoint_name,
                     &arguments.into(),
                 );
@@ -155,7 +162,7 @@ pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
                 let result = self.raw_vm_api().direct_multi_esdt_transfer_execute(
                     &to,
                     &esdt_payments,
-                    self.blockchain().get_gas_left(),
+                    self.gas_for_transfer_exec(),
                     &endpoint_name,
                     &arguments.into(),
                 );
