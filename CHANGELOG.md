@@ -4,6 +4,11 @@ There are several crates in this repo, this changelog will keep track of all of 
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [elrond-wasm 0.22.0] - 2021-11-02
+- Mechanism for generating contract endpoints based on ABI. Previously, all endpoints from all modules from a crate were automaticaly included, now they can be filtered based on what modules are used.
+- Contract `meta` crates are now capable of building the respective contracts and the ABIs without relying on `erdpy`.
+- Renamed feature `arwen-tests` to `mandos-go-tests`
+
 ## [elrond-wasm 0.21.2] - 2021-10-26
 - Bugfix regarding contract upgrade args in `elrond-wasm-debug`
 
