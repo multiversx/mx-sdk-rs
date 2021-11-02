@@ -17,9 +17,7 @@
                     "sc:multisig-child",
                     "0",
                     "sc:multisig",
-                    "true",
-                    "false",
-                    "false",
+                    "0x0000",
                     "1",
                     "address:alice"
                 ],
