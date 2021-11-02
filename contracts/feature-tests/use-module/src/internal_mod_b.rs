@@ -1,6 +1,6 @@
 elrond_wasm::imports!();
 
-/// Contains all events that can be emitted by the contract.
+/// Example of a module that lies in the same crate.
 #[elrond_wasm::module]
 pub trait InternalModuleB {
     #[view]
