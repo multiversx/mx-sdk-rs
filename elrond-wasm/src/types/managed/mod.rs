@@ -19,7 +19,7 @@ mod managed_type_trait;
 mod managed_vec;
 mod managed_vec_item;
 mod managed_vec_iter;
-pub(crate) mod maybe_preloaded_managed_buffer;
+pub(crate) mod preloaded_managed_buffer;
 
 pub use big_int::BigInt;
 pub use big_int_sign::Sign;
