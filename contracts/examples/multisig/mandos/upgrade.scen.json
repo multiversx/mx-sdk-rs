@@ -17,9 +17,7 @@
                     "sc:multisig-child",
                     "0",
                     "file:../test-contracts/adder.wasm",
-                    "true",
-                    "false",
-                    "false",
+                    "0x0000",
                     "1234"
                 ],
                 "gasLimit": "200,000,000",
