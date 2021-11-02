@@ -268,6 +268,11 @@ fn forwarder_nft_transfer_exec_go() {
 }
 
 #[test]
+fn forwarder_send_no_endpoint_go() {
+    elrond_wasm_debug::mandos_go("mandos/forwarder_no_endpoint.scen.json");
+}
+
+#[test]
 fn forwarder_send_esdt_multi_transfer_go() {
     elrond_wasm_debug::mandos_go("mandos/forwarder_send_esdt_multi_transfer.scen.json");
 }
