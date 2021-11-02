@@ -222,5 +222,7 @@ mod tests {
         assert!(!CodeMetadata::from_flags(false, false, false).is_upgradeable());
         assert!(!CodeMetadata::from_flags(false, false, false).is_payable());
         assert!(!CodeMetadata::from_flags(false, false, false).is_readable());
+
+        assert_eq!(CodeMetadata::from_flags(true, true, true).to_u16(), 0x0502);
     }
 }
