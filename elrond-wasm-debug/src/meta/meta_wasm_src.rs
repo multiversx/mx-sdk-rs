@@ -23,7 +23,7 @@ use elrond_wasm_node::create_endpoint_macro;
 
 fn write_create_endpoints<'a, I>(
     wasm_lib_file: &mut File,
-    contract_module_name: &String,
+    contract_module_name: &str,
     endpoint_names: I,
 ) where
     I: Iterator<Item = &'a String>,
