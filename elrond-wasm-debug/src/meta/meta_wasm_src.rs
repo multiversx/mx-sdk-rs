@@ -17,19 +17,26 @@ const PRELUDE: &str = "////////////////////////////////////////////////////
 #![allow(non_snake_case)]
 
 pub use elrond_wasm_output;
+use elrond_wasm_node::create_endpoint_macro;
+
 ";
 
-fn write_endpoint(wasm_lib_file: &mut File, contract_module_name: &str, endpoint_name: &str) {
+fn write_create_endpoints<'a, I>(
+    wasm_lib_file: &mut File,
+    contract_module_name: &String,
+    endpoint_names: I,
+) where
+    I: Iterator<Item = &'a String>,
+{
     writeln!(
         wasm_lib_file,
-        "
-#[no_mangle]
-pub fn {}() {{
-    {}::endpoints::{}(elrond_wasm_node::vm_api());
-}}",
-        endpoint_name, contract_module_name, endpoint_name
+        "create_endpoint_macro! {{ endpoint, {} }}",
+        contract_module_name
     )
     .unwrap();
+    for endpoint_name in endpoint_names {
+        writeln!(wasm_lib_file, "endpoint! {{ {} }}", endpoint_name).unwrap();
+    }
 }
 
 pub fn write_wasm_lib(abi: &ContractAbi) {
@@ -38,10 +45,6 @@ pub fn write_wasm_lib(abi: &ContractAbi) {
     let mut wasm_lib_file = File::create(WASM_SRC_PATH).unwrap();
     wasm_lib_file.write_all(PRELUDE.as_bytes()).unwrap();
 
-    write_endpoint(&mut wasm_lib_file, &contract_module_name, "init");
-
-    write_endpoint(&mut wasm_lib_file, &contract_module_name, "callBack");
-
     let mut endpoint_names: Vec<String> = abi
         .endpoints
         .iter()
@@ -49,9 +52,13 @@ pub fn write_wasm_lib(abi: &ContractAbi) {
         .collect();
     endpoint_names.sort();
 
-    for endpoint_name in &endpoint_names {
-        write_endpoint(&mut wasm_lib_file, &contract_module_name, endpoint_name);
-    }
+    let mandatory_endpoints = ["init".to_string(), "callBack".to_string()];
+    let all_endpoint_names = mandatory_endpoints.iter().chain(endpoint_names.iter());
+    write_create_endpoints(
+        &mut wasm_lib_file,
+        &contract_module_name,
+        all_endpoint_names,
+    );
 }
 
 /// This one is useful for some of the special unmanaged EI tests in the framework.
