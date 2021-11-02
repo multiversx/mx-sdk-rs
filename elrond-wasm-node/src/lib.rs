@@ -2,6 +2,7 @@
 #![feature(new_uninit)]
 
 mod api;
+pub mod endpoint_macro;
 pub mod error_hook;
 
 extern crate alloc;
