@@ -3,6 +3,7 @@
 mod internal_mod_a;
 mod internal_mod_b;
 mod internal_mod_c;
+mod internal_mod_d;
 
 elrond_wasm::imports!();
 

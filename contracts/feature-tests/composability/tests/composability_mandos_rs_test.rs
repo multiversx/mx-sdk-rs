@@ -370,6 +370,11 @@ fn forwarder_nft_transfer_exec_rs() {
 }
 
 #[test]
+fn forwarder_send_no_endpoint_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/forwarder_no_endpoint.scen.json", world());
+}
+
+#[test]
 fn forwarder_send_esdt_multi_transfer_rs() {
     elrond_wasm_debug::mandos_rs(
         "mandos/forwarder_send_esdt_multi_transfer.scen.json",

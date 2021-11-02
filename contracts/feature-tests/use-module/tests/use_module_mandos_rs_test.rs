@@ -70,6 +70,11 @@ fn use_module_internal_rs() {
 }
 
 #[test]
+fn use_module_no_endpoint_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/use_module_no_endpoint.scen.json", world());
+}
+
+#[test]
 fn use_module_pause_rs() {
     elrond_wasm_debug::mandos_rs("mandos/use_module_pause.scen.json", world());
 }
