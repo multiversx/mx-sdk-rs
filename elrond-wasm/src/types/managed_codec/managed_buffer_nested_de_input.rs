@@ -7,9 +7,7 @@ use elrond_codec::{
 use crate::{
     api::ManagedTypeApi,
     types::{
-        managed::{
-            maybe_preloaded_managed_buffer::MaybePreloadedManagedBuffer, ManagedBufferSizeContext,
-        },
+        managed::{preloaded_managed_buffer::PreloadedManagedBuffer, ManagedBufferSizeContext},
         BigInt, BigUint, ManagedBuffer,
     },
 };
@@ -21,7 +19,7 @@ pub struct ManagedBufferNestedDecodeInput<M>
 where
     M: ManagedTypeApi,
 {
-    buffer: MaybePreloadedManagedBuffer<M>,
+    buffer: PreloadedManagedBuffer<M>,
     decode_index: usize,
     buffer_len: usize,
     _phantom: PhantomData<M>,
@@ -35,7 +33,7 @@ where
         // retrieves buffer length eagerly because:
         // - it always gets called anyway at the end to check that no leftover bytes remain
         // - it is sometimes required multiple times during serialization
-        let buffer = MaybePreloadedManagedBuffer::new(managed_buffer);
+        let buffer = PreloadedManagedBuffer::new(managed_buffer);
         let buffer_len = buffer.buffer_len;
 
         ManagedBufferNestedDecodeInput {
