@@ -54,7 +54,7 @@ where
         dest_slice: &mut [u8],
     ) -> Result<(), InvalidSliceError> {
         let slice = self.get_slice(
-            &self.local_buffer.as_slice(),
+            self.local_buffer.as_slice(),
             starting_position,
             dest_slice.len(),
         )?;
@@ -69,7 +69,7 @@ where
     ) -> Option<ManagedBuffer<M>> {
         let type_manager = self.managed_buffer.type_manager();
         let slice = self
-            .get_slice(&self.local_buffer.as_slice(), starting_position, slice_len)
+            .get_slice(self.local_buffer.as_slice(), starting_position, slice_len)
             .ok()?;
         Some(ManagedBuffer::new_from_bytes(type_manager, slice))
     }
