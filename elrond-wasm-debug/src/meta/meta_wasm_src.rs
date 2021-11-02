@@ -16,8 +16,8 @@ const PRELUDE: &str = "////////////////////////////////////////////////////
 #![no_std]
 #![allow(non_snake_case)]
 
-pub use elrond_wasm_output;
 use elrond_wasm_node::create_endpoint_macro;
+pub use elrond_wasm_output;
 
 ";
 
