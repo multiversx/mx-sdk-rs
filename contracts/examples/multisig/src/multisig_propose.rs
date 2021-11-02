@@ -2,20 +2,6 @@ use crate::action::Action;
 
 elrond_wasm::imports!();
 
-fn get_code_metadata(upgradeable: bool, payable: bool, readable: bool) -> CodeMetadata {
-    let mut code_metadata = CodeMetadata::DEFAULT;
-    if upgradeable {
-        code_metadata |= CodeMetadata::UPGRADEABLE;
-    }
-    if payable {
-        code_metadata |= CodeMetadata::PAYABLE;
-    }
-    if readable {
-        code_metadata |= CodeMetadata::READABLE;
-    }
-    code_metadata
-}
-
 /// Contains all events that can be emitted by the contract.
 #[elrond_wasm::module]
 pub trait MultisigProposeModule: crate::multisig_state::MultisigStateModule {
@@ -114,12 +100,9 @@ pub trait MultisigProposeModule: crate::multisig_state::MultisigStateModule {
         &self,
         amount: BigUint,
         code: ManagedBuffer,
-        upgradeable: bool,
-        payable: bool,
-        readable: bool,
+        code_metadata: CodeMetadata,
         #[var_args] arguments: ManagedVarArgs<ManagedBuffer>,
     ) -> SCResult<usize> {
-        let code_metadata = get_code_metadata(upgradeable, payable, readable);
         self.propose_action(Action::SCDeploy {
             amount,
             code,
@@ -133,12 +116,9 @@ pub trait MultisigProposeModule: crate::multisig_state::MultisigStateModule {
         &self,
         amount: BigUint,
         source: ManagedAddress,
-        upgradeable: bool,
-        payable: bool,
-        readable: bool,
+        code_metadata: CodeMetadata,
         #[var_args] arguments: ManagedVarArgs<ManagedBuffer>,
     ) -> SCResult<usize> {
-        let code_metadata = get_code_metadata(upgradeable, payable, readable);
         self.propose_action(Action::SCDeployFromSource {
             amount,
             source,
@@ -153,12 +133,9 @@ pub trait MultisigProposeModule: crate::multisig_state::MultisigStateModule {
         sc_address: ManagedAddress,
         amount: BigUint,
         code: ManagedBuffer,
-        upgradeable: bool,
-        payable: bool,
-        readable: bool,
+        code_metadata: CodeMetadata,
         #[var_args] arguments: ManagedVarArgs<ManagedBuffer>,
     ) -> SCResult<usize> {
-        let code_metadata = get_code_metadata(upgradeable, payable, readable);
         self.propose_action(Action::SCUpgrade {
             sc_address,
             amount,
@@ -174,12 +151,9 @@ pub trait MultisigProposeModule: crate::multisig_state::MultisigStateModule {
         sc_address: ManagedAddress,
         amount: BigUint,
         source: ManagedAddress,
-        upgradeable: bool,
-        payable: bool,
-        readable: bool,
+        code_metadata: CodeMetadata,
         #[var_args] arguments: ManagedVarArgs<ManagedBuffer>,
     ) -> SCResult<usize> {
-        let code_metadata = get_code_metadata(upgradeable, payable, readable);
         self.propose_action(Action::SCUpgradeFromSource {
             sc_address,
             amount,

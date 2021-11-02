@@ -1,4 +1,4 @@
-use crate::{error_hook, ArwenApiImpl};
+use crate::{error_hook, VmApiImpl};
 use elrond_wasm::{
     api::{BlockchainApi, Handle, SendApi, StorageReadApi, StorageWriteApi},
     types::{
@@ -114,7 +114,7 @@ unsafe fn code_metadata_to_buffer_handle(code_metadata: CodeMetadata) -> Handle 
     )
 }
 
-impl SendApi for ArwenApiImpl {
+impl SendApi for VmApiImpl {
     fn direct_egld<D>(&self, to: &ManagedAddress<Self>, amount: &BigUint<Self>, data: D)
     where
         D: ManagedInto<Self, ManagedBuffer<Self>>,

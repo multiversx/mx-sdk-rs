@@ -1,4 +1,4 @@
-use super::ArwenApiImpl;
+use super::VmApiImpl;
 use elrond_wasm::{
     api::CryptoApi,
     types::{BoxedBytes, MessageHashType, H256},
@@ -54,7 +54,7 @@ extern "C" {
 
 }
 
-impl CryptoApi for ArwenApiImpl {
+impl CryptoApi for VmApiImpl {
     fn sha256(&self, data: &[u8]) -> H256 {
         unsafe {
             let mut res = H256::zero();

@@ -1,6 +1,6 @@
 use elrond_wasm_debug::*;
 
-fn contract_map() -> BlockchainMock {
+fn world() -> BlockchainMock {
     let mut blockchain = BlockchainMock::new();
     blockchain.set_current_dir_from_workspace("contracts/benchmarks/mappers/linked-list-repeat");
 
@@ -13,5 +13,5 @@ fn contract_map() -> BlockchainMock {
 
 #[test]
 fn linked_list_repeat_mandos_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/linked_list_repeat.scen.json", contract_map());
+    elrond_wasm_debug::mandos_rs("mandos/linked_list_repeat.scen.json", world());
 }
