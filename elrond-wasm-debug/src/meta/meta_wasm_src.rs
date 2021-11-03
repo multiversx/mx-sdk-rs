@@ -14,29 +14,21 @@ const PRELUDE: &str = "////////////////////////////////////////////////////
 ////////////////////////////////////////////////////
 
 #![no_std]
-#![allow(non_snake_case)]
-
-use elrond_wasm_node::create_endpoint_macro;
-pub use elrond_wasm_output;
 
 ";
 
-fn write_create_endpoints<'a, I>(
-    wasm_lib_file: &mut File,
-    contract_module_name: &str,
-    endpoint_names: I,
-) where
+fn write_endpoints_macro<'a, I>(wasm_lib_file: &mut File, contract_module_name: &str, endpoint_names: I)
+where
     I: Iterator<Item = &'a String>,
 {
-    writeln!(
-        wasm_lib_file,
-        "create_endpoint_macro! {{ endpoint, {} }}",
-        contract_module_name
-    )
-    .unwrap();
+    writeln!(wasm_lib_file, "elrond_wasm_node::wasm_endpoints! {{").unwrap();
+    writeln!(wasm_lib_file, "   {}", contract_module_name).unwrap();
+    writeln!(wasm_lib_file, "   (").unwrap();
     for endpoint_name in endpoint_names {
-        writeln!(wasm_lib_file, "endpoint! {{ {} }}", endpoint_name).unwrap();
+        writeln!(wasm_lib_file, "        {}", endpoint_name).unwrap();
     }
+    writeln!(wasm_lib_file, "   )").unwrap();
+    writeln!(wasm_lib_file, "}}").unwrap();
 }
 
 pub fn write_wasm_lib(abi: &ContractAbi) {
@@ -54,7 +46,7 @@ pub fn write_wasm_lib(abi: &ContractAbi) {
 
     let mandatory_endpoints = ["init".to_string(), "callBack".to_string()];
     let all_endpoint_names = mandatory_endpoints.iter().chain(endpoint_names.iter());
-    write_create_endpoints(
+    write_endpoints_macro(
         &mut wasm_lib_file,
         &contract_module_name,
         all_endpoint_names,
