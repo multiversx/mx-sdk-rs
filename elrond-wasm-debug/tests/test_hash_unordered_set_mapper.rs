@@ -11,10 +11,8 @@ fn create_set() -> UnorderedSetMapper<DebugApi, u64> {
 }
 
 fn check_set(set: &UnorderedSetMapper<DebugApi, u64>, expected: Vec<u64>) {
-    println! { "Da lengths: want {:?} have {:?}",set.len(), expected.len()}
     assert_eq!(set.len(), expected.len());
     let actual: Vec<u64> = set.iter().collect();
-    println! { "Da vectors: want {:?} have {:?}",actual, expected}
     assert_eq!(actual, expected);
 }
 
