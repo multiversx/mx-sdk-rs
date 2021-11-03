@@ -116,7 +116,7 @@ where
             self.set_index(&last_item, index);
             self.vec_mapper.set(index, &last_item);
         }
-        self.clear_index(&value);
+        self.clear_index(value);
         self.vec_mapper.clear_entry(length);
         self.vec_mapper.save_count(length - 1);
         true
