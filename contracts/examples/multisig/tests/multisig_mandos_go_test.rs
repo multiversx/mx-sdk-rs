@@ -9,6 +9,11 @@ fn call_other_shard_2_go() {
 }
 
 #[test]
+fn call_other_shard_insufficient_gas_go() {
+    elrond_wasm_debug::mandos_go("mandos/call_other_shard-insufficient-gas.scen.json");
+}
+
+#[test]
 fn changeboard_go() {
     elrond_wasm_debug::mandos_go("mandos/changeBoard.scen.json");
 }

@@ -6,13 +6,17 @@ use crate::{
 elrond_wasm::imports!();
 
 /// Gas required to finsh transaction after transfer-execute.
-const PERFORM_ACTION_FINISH_GAS: u64 = 200_000;
+const PERFORM_ACTION_FINISH_GAS: u64 = 300_000;
 
 /// Contains all events that can be emitted by the contract.
 #[elrond_wasm::module]
 pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
     fn gas_for_transfer_exec(&self) -> u64 {
-        self.blockchain().get_gas_left() - PERFORM_ACTION_FINISH_GAS
+        let gas_left = self.blockchain().get_gas_left();
+        if gas_left <= PERFORM_ACTION_FINISH_GAS {
+            self.raw_vm_api().signal_error(b"insufficient gas for call");
+        }
+        gas_left - PERFORM_ACTION_FINISH_GAS
     }
 
     /// Can be used to:
