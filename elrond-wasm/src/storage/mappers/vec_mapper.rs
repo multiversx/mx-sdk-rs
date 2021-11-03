@@ -70,7 +70,7 @@ where
         item_key
     }
 
-    fn save_count(&self, new_len: usize) {
+    pub(crate) fn save_count(&self, new_len: usize) {
         storage_set(self.api.clone(), &self.len_key, &new_len);
     }
 
