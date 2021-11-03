@@ -17,8 +17,11 @@ const PRELUDE: &str = "////////////////////////////////////////////////////
 
 ";
 
-fn write_endpoints_macro<'a, I>(wasm_lib_file: &mut File, contract_module_name: &str, endpoint_names: I)
-where
+fn write_endpoints_macro<'a, I>(
+    wasm_lib_file: &mut File,
+    contract_module_name: &str,
+    endpoint_names: I,
+) where
     I: Iterator<Item = &'a String>,
 {
     writeln!(wasm_lib_file, "elrond_wasm_node::wasm_endpoints! {{").unwrap();
