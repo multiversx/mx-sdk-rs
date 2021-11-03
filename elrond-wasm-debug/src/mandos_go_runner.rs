@@ -3,7 +3,7 @@ use std::{path::Path, process::Command};
 /// Runs the Arwen executable,
 /// which reads parses and executes one or more mandos tests.
 pub fn mandos_go<P: AsRef<Path>>(relative_path: P) {
-    if cfg!(not(feature = "arwen-tests")) {
+    if cfg!(not(feature = "mandos-go-tests")) {
         return;
     }
 

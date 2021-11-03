@@ -12,14 +12,17 @@ rm -f ${CONTRACT_PATH}/output/${CONTRACT_NAME}-dbg.wasm
 rm -f ${CONTRACT_PATH}/output/${CONTRACT_NAME}-dbg.c
 rm -f ${CONTRACT_PATH}/output/${CONTRACT_NAME}-dbg.wat
 
-erdpy contract build "${CONTRACT_PATH}" 
-erdpy contract build "${CONTRACT_PATH}" --wasm-symbols --wasm-name "${CONTRACT_NAME}-dbg.wasm"
+cd ${CONTRACT_PATH}/meta
+cargo run build
+cargo run build --wasm-symbols --wasm-name "${CONTRACT_NAME}-dbg.wasm"
+
+cd ../output
 wasm2wat \
-    ${CONTRACT_PATH}/output/${CONTRACT_NAME}-dbg.wasm \
+    ${CONTRACT_NAME}-dbg.wasm \
     -o \
-    ${CONTRACT_PATH}/output/${CONTRACT_NAME}-dbg.wat
+    ${CONTRACT_NAME}-dbg.wat
 
 wasm2c \
-    ${CONTRACT_PATH}/output/${CONTRACT_NAME}-dbg.wasm \
+    ${CONTRACT_NAME}-dbg.wasm \
     -o \
-    ${CONTRACT_PATH}/output/${CONTRACT_NAME}-dbg.c
+    ${CONTRACT_NAME}-dbg.c
