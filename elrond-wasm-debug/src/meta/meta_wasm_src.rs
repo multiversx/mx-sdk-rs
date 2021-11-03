@@ -25,7 +25,7 @@ fn write_endpoint(wasm_lib_file: &mut File, contract_module_name: &str, endpoint
         "
 #[no_mangle]
 pub fn {}() {{
-    {}::endpoints::{}(elrond_wasm_node::arwen_api());
+    {}::endpoints::{}(elrond_wasm_node::vm_api());
 }}",
         endpoint_name, contract_module_name, endpoint_name
     )
@@ -33,12 +33,7 @@ pub fn {}() {{
 }
 
 pub fn write_wasm_lib(abi: &ContractAbi) {
-    let contract_module_name = abi
-        .build_info
-        .contract_crate
-        .name
-        .replace('-', "_")
-        .to_lowercase();
+    let contract_module_name = abi.get_module_name();
     create_dir_all(WASM_SRC_DIR).unwrap();
     let mut wasm_lib_file = File::create(WASM_SRC_PATH).unwrap();
     wasm_lib_file.write_all(PRELUDE.as_bytes()).unwrap();

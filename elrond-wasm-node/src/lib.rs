@@ -7,9 +7,9 @@ pub mod error_hook;
 extern crate alloc;
 pub use alloc::{boxed::Box, string::String, vec::Vec};
 
-pub use api::ArwenApiImpl;
+pub use api::VmApiImpl;
 
 /// Provides an API instance.
-pub fn arwen_api() -> ArwenApiImpl {
-    ArwenApiImpl {}
+pub fn vm_api() -> VmApiImpl {
+    VmApiImpl {}
 }

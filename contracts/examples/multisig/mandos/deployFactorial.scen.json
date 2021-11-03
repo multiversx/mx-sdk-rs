@@ -27,9 +27,7 @@
                 "arguments": [
                     "0",
                     "file:../test-contracts/factorial.wasm",
-                    "false",
-                    "false",
-                    "false"
+                    "0x0000"
                 ],
                 "gasLimit": "200,000,000",
                 "gasPrice": "0"

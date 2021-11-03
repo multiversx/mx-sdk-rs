@@ -30,7 +30,7 @@ jobs:
       - name: Run Arwen tests
         run: |
           source .github/workflows/env
-          cargo test --features elrond-wasm-debug/arwen-tests
+          cargo test --features elrond-wasm-debug/mandos-go-tests
       - name: Generate file size report
         run: |
           source .github/workflows/env

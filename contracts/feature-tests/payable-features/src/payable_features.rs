@@ -26,8 +26,8 @@ pub trait PayableFeatures {
     #[payable("*")]
     fn payment_multiple(
         &self,
-        #[payment_multi] payments: ManagedVec<Self::Api, EsdtTokenPayment<Self::Api>>,
-    ) -> ManagedVec<Self::Api, EsdtTokenPayment<Self::Api>> {
+        #[payment_multi] payments: ManagedVec<EsdtTokenPayment<Self::Api>>,
+    ) -> ManagedVec<EsdtTokenPayment<Self::Api>> {
         payments
     }
 
