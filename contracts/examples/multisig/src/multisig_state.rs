@@ -13,16 +13,13 @@ pub trait MultisigStateModule {
     #[storage_mapper("user")]
     fn user_mapper(&self) -> UserMapper;
 
-    #[storage_get("user_role")]
-    fn get_user_id_to_role(&self, user_id: usize) -> UserRole;
-
-    #[storage_set("user_role")]
-    fn set_user_id_to_role(&self, user_id: usize, user_role: UserRole);
+    #[storage_mapper("user_role")]
+    fn user_id_to_role(&self, user_id: usize) -> SingleValueMapper<UserRole>;
 
     fn get_caller_id_and_role(&self) -> (usize, UserRole) {
         let caller_address = self.blockchain().get_caller();
         let caller_id = self.user_mapper().get_user_id(&caller_address);
-        let caller_role = self.get_user_id_to_role(caller_id);
+        let caller_role = self.user_id_to_role(caller_id).get();
         (caller_id, caller_role)
     }
 
@@ -92,7 +89,7 @@ pub trait MultisigStateModule {
         signer_ids
             .iter()
             .filter(|signer_id| {
-                let signer_role = self.get_user_id_to_role(*signer_id);
+                let signer_role = self.user_id_to_role(*signer_id).get();
                 signer_role.can_sign()
             })
             .count()

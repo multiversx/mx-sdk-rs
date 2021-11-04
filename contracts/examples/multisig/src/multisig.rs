@@ -40,7 +40,7 @@ pub trait Multisig:
                 if !new_user {
                     duplicates = true;
                 }
-                self.set_user_id_to_role(user_id, UserRole::BoardMember);
+                self.user_id_to_role(user_id).set(&UserRole::BoardMember);
             });
         require!(!duplicates, "duplicate board member");
         self.num_board_members().set(&board_vec.len());
@@ -98,7 +98,7 @@ pub trait Multisig:
         if user_id == 0 {
             UserRole::None
         } else {
-            self.get_user_id_to_role(user_id)
+            self.user_id_to_role(user_id).get()
         }
     }
 
@@ -118,7 +118,7 @@ pub trait Multisig:
         let mut result = MultiResultVec::new();
         let num_users = self.user_mapper().get_user_count();
         for user_id in 1..=num_users {
-            if self.get_user_id_to_role(user_id) == role {
+            if self.user_id_to_role(user_id).get() == role {
                 if let Some(address) = self.user_mapper().get_user_address(user_id) {
                     result.push(address.managed_into());
                 }
