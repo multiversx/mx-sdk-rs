@@ -69,6 +69,11 @@ fn forw_raw_contract_deploy_rs() {
 }
 
 #[test]
+fn forw_raw_contract_upgrade_self_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/forw_raw_contract_upgrade_self.scen.json", world());
+}
+
+#[test]
 fn forw_raw_contract_upgrade_rs() {
     elrond_wasm_debug::mandos_rs("mandos/forw_raw_contract_upgrade.scen.json", world());
 }
