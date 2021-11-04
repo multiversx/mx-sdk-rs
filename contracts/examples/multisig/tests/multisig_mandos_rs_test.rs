@@ -21,6 +21,17 @@ fn world() -> BlockchainMock {
 
     blockchain
 }
+
+// #[test]
+// fn call_other_shard_1_rs() {
+//     elrond_wasm_debug::mandos_rs("mandos/call_other_shard-1.scen.json", world());
+// }
+
+// #[test]
+// fn call_other_shard_2_rs() {
+//     elrond_wasm_debug::mandos_rs("mandos/call_other_shard-2.scen.json", world());
+// }
+
 #[test]
 fn changeboard_rs() {
     elrond_wasm_debug::mandos_rs("mandos/changeBoard.scen.json", world());
