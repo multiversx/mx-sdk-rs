@@ -161,7 +161,7 @@ pub trait Multisig:
         let caller_role = self.get_user_id_to_role(caller_id);
         require!(caller_role.can_sign(), "only board members can un-sign");
 
-        self.action_signer_ids(action_id).remove(&caller_id);
+        self.action_signer_ids(action_id).swap_remove(&caller_id);
         Ok(())
     }
 

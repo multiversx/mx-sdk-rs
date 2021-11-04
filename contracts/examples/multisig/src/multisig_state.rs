@@ -48,7 +48,7 @@ pub trait MultisigStateModule {
     }
 
     #[storage_mapper("action_signer_ids")]
-    fn action_signer_ids(&self, action_id: usize) -> SetMapper<usize>;
+    fn action_signer_ids(&self, action_id: usize) -> UnorderedSetMapper<usize>;
 
     /// Gets addresses of all users who signed an action.
     /// Does not check if those users are still board members or not,
