@@ -199,7 +199,6 @@ where
     }
 
     /// Sends a synchronous call to change a smart contract address.
-    /// Only works in the same shard.
     pub fn change_owner_address(
         &self,
         child_sc_address: ManagedAddress<A>,
