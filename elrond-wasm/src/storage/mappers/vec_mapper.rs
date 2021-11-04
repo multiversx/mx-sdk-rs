@@ -181,6 +181,31 @@ where
         storage_clear(self.api.clone(), &self.item_key(index));
     }
 
+    /// Clears item at index from storage by swap remove
+    /// last item takes the index of the item to remove
+    /// and we remove the last index.
+    pub fn swap_remove(&mut self, index: usize) -> bool {
+        let _ = self.swap_remove_and_get_old_last(index);
+        true
+    }
+
+    pub(crate) fn swap_remove_and_get_old_last(&mut self, index: usize) -> Option<T> {
+        if index == 0 || index > self.len() {
+            self.api.signal_error(&b"index out of range"[..]);
+        }
+
+        let length = self.len();
+        let mut last_item_as_option = Option::None;
+        if index != length {
+            let last_item = self.get(length);
+            self.set(index, &last_item);
+            last_item_as_option = Some(last_item);
+        }
+        self.clear_entry(length);
+        self.save_count(length - 1);
+        last_item_as_option
+    }
+
     /// Loads all items from storage and places them in a Vec.
     /// Can easily consume a lot of gas.
     pub fn load_as_vec(&self) -> Vec<T> {
