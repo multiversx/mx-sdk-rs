@@ -9,14 +9,14 @@ publish = false
 path = "src/lib.rs"
 
 [dependencies.elrond-wasm-module-bonding-curve]
-version = "0.22.0"
+version = "0.22.1"
 path = "../../modules/elrond-wasm-module-bonding-curve"
 
 [dependencies.elrond-wasm]
-version = "0.22.0"
+version = "0.22.1"
 path = "../../../elrond-wasm"
 
 [dev-dependencies.elrond-wasm-debug]
-version = "0.22.0"
+version = "0.22.1"
 path = "../../../elrond-wasm-debug"
 
