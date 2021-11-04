@@ -110,15 +110,10 @@ where
         if index == NULL_ENTRY {
             return false;
         }
-        let length = self.vec_mapper.len();
-        if index != length {
-            let last_item = self.vec_mapper.get(length);
+        if let Some(last_item) = self.vec_mapper.swap_remove_and_get_old_last(index) {
             self.set_index(&last_item, index);
-            self.vec_mapper.set(index, &last_item);
         }
         self.clear_index(value);
-        self.vec_mapper.clear_entry(length);
-        self.vec_mapper.save_count(length - 1);
         true
     }
 
