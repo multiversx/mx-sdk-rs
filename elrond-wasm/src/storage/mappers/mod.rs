@@ -6,6 +6,7 @@ mod queue_mapper;
 mod set_mapper;
 mod single_value_mapper;
 mod token_attributes_mapper;
+mod unordered_set_mapper;
 mod user_mapper;
 mod vec_mapper;
 
@@ -17,5 +18,6 @@ pub use queue_mapper::QueueMapper;
 pub use set_mapper::SetMapper;
 pub use single_value_mapper::SingleValueMapper;
 pub use token_attributes_mapper::TokenAttributesMapper;
+pub use unordered_set_mapper::UnorderedSetMapper;
 pub use user_mapper::UserMapper;
 pub use vec_mapper::VecMapper;

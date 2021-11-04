@@ -1,4 +1,4 @@
-use super::ArwenApiImpl;
+use super::VmApiImpl;
 use alloc::vec::Vec;
 use elrond_wasm::{
     api::{Handle, StorageReadApi, StorageWriteApi},
@@ -30,7 +30,7 @@ extern "C" {
     fn mBufferGetLength(mBufferHandle: i32) -> i32;
 }
 
-impl StorageReadApi for ArwenApiImpl {
+impl StorageReadApi for VmApiImpl {
     #[inline]
     fn storage_load_len(&self, key: &[u8]) -> usize {
         unsafe { storageLoadLength(key.as_ref().as_ptr(), key.len() as i32) as usize }
@@ -96,7 +96,7 @@ impl StorageReadApi for ArwenApiImpl {
     }
 }
 
-impl StorageWriteApi for ArwenApiImpl {
+impl StorageWriteApi for VmApiImpl {
     fn storage_store_slice_u8(&self, key: &[u8], value: &[u8]) {
         unsafe {
             storageStore(

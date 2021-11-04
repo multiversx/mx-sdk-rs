@@ -33,6 +33,20 @@ impl CodeMetadata {
         self.0[METADATA_READABLE_BYTE] & METADATA_READABLE_MASK > 0
     }
 
+    pub fn from_flags(upgradeable: bool, payable: bool, readable: bool) -> CodeMetadata {
+        let mut code_metadata = CodeMetadata::DEFAULT;
+        if upgradeable {
+            code_metadata |= CodeMetadata::UPGRADEABLE;
+        }
+        if payable {
+            code_metadata |= CodeMetadata::PAYABLE;
+        }
+        if readable {
+            code_metadata |= CodeMetadata::READABLE;
+        }
+        code_metadata
+    }
+
     #[inline]
     pub fn as_ptr(&self) -> *const u8 {
         self.0[..].as_ptr()
@@ -42,12 +56,23 @@ impl CodeMetadata {
     pub fn into_bytes(self) -> [u8; 2] {
         self.0
     }
+
+    pub fn to_u16(&self) -> u16 {
+        u16::from_be_bytes(self.0)
+    }
 }
 
 impl From<[u8; 2]> for CodeMetadata {
     #[inline]
     fn from(arr: [u8; 2]) -> Self {
         CodeMetadata(arr)
+    }
+}
+
+impl From<u16> for CodeMetadata {
+    #[inline]
+    fn from(value: u16) -> Self {
+        CodeMetadata(value.to_be_bytes())
     }
 }
 
@@ -85,7 +110,7 @@ impl BitOrAssign<&CodeMetadata> for CodeMetadata {
 
 impl NestedEncode for CodeMetadata {
     fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
-        self.0.dep_encode(dest)?;
+        self.to_u16().dep_encode(dest)?;
         Ok(())
     }
 
@@ -95,7 +120,7 @@ impl NestedEncode for CodeMetadata {
         c: ExitCtx,
         exit: fn(ExitCtx, EncodeError) -> !,
     ) {
-        self.0.dep_encode_or_exit(dest, c, exit);
+        self.to_u16().dep_encode_or_exit(dest, c, exit);
     }
 }
 
@@ -118,7 +143,7 @@ impl TopEncode for CodeMetadata {
 
 impl NestedDecode for CodeMetadata {
     fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
-        Ok(CodeMetadata(<[u8; 2]>::dep_decode(input)?))
+        Ok(CodeMetadata::from(u16::dep_decode(input)?))
     }
 
     fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
@@ -126,7 +151,7 @@ impl NestedDecode for CodeMetadata {
         c: ExitCtx,
         exit: fn(ExitCtx, DecodeError) -> !,
     ) -> Self {
-        CodeMetadata(<[u8; 2]>::dep_decode_or_exit(input, c, exit))
+        CodeMetadata::from(u16::dep_decode_or_exit(input, c, exit))
     }
 }
 
@@ -176,9 +201,9 @@ mod tests {
         assert!(all.is_readable());
     }
 
-    /// Translated from Arwen.
+    /// Translated from vm-wasm.
     #[test]
-    fn test_from() {
+    fn test_from_array() {
         assert!(CodeMetadata::from([1, 0]).is_upgradeable());
         assert!(!CodeMetadata::from([1, 0]).is_readable());
         assert!(CodeMetadata::from([0, 2]).is_payable());
@@ -187,5 +212,17 @@ mod tests {
         assert!(!CodeMetadata::from([0, 0]).is_upgradeable());
         assert!(!CodeMetadata::from([0, 0]).is_payable());
         assert!(!CodeMetadata::from([0, 0]).is_readable());
+    }
+
+    #[test]
+    fn test_from_flags() {
+        assert!(CodeMetadata::from_flags(true, false, false).is_upgradeable());
+        assert!(CodeMetadata::from_flags(false, true, false).is_payable());
+        assert!(CodeMetadata::from_flags(false, false, true).is_readable());
+        assert!(!CodeMetadata::from_flags(false, false, false).is_upgradeable());
+        assert!(!CodeMetadata::from_flags(false, false, false).is_payable());
+        assert!(!CodeMetadata::from_flags(false, false, false).is_readable());
+
+        assert_eq!(CodeMetadata::from_flags(true, true, true).to_u16(), 0x0502);
     }
 }

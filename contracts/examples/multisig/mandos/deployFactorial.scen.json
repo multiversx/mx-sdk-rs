@@ -27,9 +27,7 @@
                 "arguments": [
                     "0",
                     "file:../test-contracts/factorial.wasm",
-                    "false",
-                    "false",
-                    "false"
+                    "0x0000"
                 ],
                 "gasLimit": "200,000,000",
                 "gasPrice": "0"
@@ -72,7 +70,7 @@
                         "str:quorum": "2",
                         "str:action_data.len": "3",
                         "str:action_data.item|u32:3": {
-                            "1-discriminant": "0x06",
+                            "1-discriminant": "0x07",
                             "2-amount": "u32:0",
                             "3-code": "nested:file:../test-contracts/factorial.wasm",
                             "4-code_metadata": "0x0000",

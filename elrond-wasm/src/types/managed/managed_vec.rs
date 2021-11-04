@@ -149,6 +149,13 @@ where
         });
     }
 
+    /// New `ManagedVec` instance with 1 element in it.
+    pub fn from_single_item(api: M, item: T) -> Self {
+        let mut result = ManagedVec::new(api);
+        result.push(item);
+        result
+    }
+
     pub fn overwrite_with_single_item(&mut self, item: T) {
         item.to_byte_writer(|bytes| {
             self.buffer.overwrite(bytes);
@@ -172,6 +179,24 @@ where
             v.push(item);
         }
         v
+    }
+
+    /// Temporarily converts self to a `Vec<T>`.
+    /// All operations performed on the temporary vector get saved back to the underlying buffer.
+    pub fn with_self_as_vec<F>(&mut self, f: F)
+    where
+        F: FnOnce(&mut Vec<T>),
+    {
+        let new = ManagedVec::new(self.type_manager());
+        let old = core::mem::replace(self, new);
+        let mut temp_vec = Vec::new();
+        for item in old.into_iter() {
+            temp_vec.push(item);
+        }
+        f(&mut temp_vec);
+        for new_item in temp_vec {
+            self.push(new_item);
+        }
     }
 
     pub fn iter(&self) -> ManagedVecIterator<M, T> {
