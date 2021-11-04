@@ -8,6 +8,10 @@ elrond_wasm::imports!();
 /// Gas required to finsh transaction after transfer-execute.
 const PERFORM_ACTION_FINISH_GAS: u64 = 300_000;
 
+fn usize_add_isize(value: &mut usize, delta: isize) {
+    *value = (*value as isize + delta) as usize;
+}
+
 /// Contains all events that can be emitted by the contract.
 #[elrond_wasm::module]
 pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
@@ -27,35 +31,33 @@ pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
     /// Will keep the board size and proposer count in sync.
     fn change_user_role(&self, user_address: ManagedAddress, new_role: UserRole) {
         let user_id = self.user_mapper().get_or_create_user(&user_address);
-        let old_role = if user_id == 0 {
-            UserRole::None
-        } else {
-            self.user_id_to_role(user_id).get()
-        };
-        self.user_id_to_role(user_id).set(&new_role);
+        let user_id_to_role_mapper = self.user_id_to_role(user_id);
+        let old_role = user_id_to_role_mapper.get();
+        user_id_to_role_mapper.set(&new_role);
 
         // update board size
-        #[allow(clippy::collapsible_else_if)]
+        let mut board_members_delta = 0isize;
         if old_role == UserRole::BoardMember {
-            if new_role != UserRole::BoardMember {
-                self.num_board_members().update(|value| *value -= 1);
-            }
-        } else {
-            if new_role == UserRole::BoardMember {
-                self.num_board_members().update(|value| *value += 1);
-            }
+            board_members_delta -= 1;
+        }
+        if new_role == UserRole::BoardMember {
+            board_members_delta += 1;
+        }
+        if board_members_delta != 0 {
+            self.num_board_members()
+                .update(|value| usize_add_isize(value, board_members_delta));
         }
 
-        // update num_proposers
-        #[allow(clippy::collapsible_else_if)]
+        let mut proposers_delta = 0isize;
         if old_role == UserRole::Proposer {
-            if new_role != UserRole::Proposer {
-                self.num_proposers().update(|value| *value -= 1);
-            }
-        } else {
-            if new_role == UserRole::Proposer {
-                self.num_proposers().update(|value| *value += 1);
-            }
+            proposers_delta -= 1;
+        }
+        if new_role == UserRole::Proposer {
+            proposers_delta += 1;
+        }
+        if proposers_delta != 0 {
+            self.num_proposers()
+                .update(|value| usize_add_isize(value, proposers_delta));
         }
     }
 
