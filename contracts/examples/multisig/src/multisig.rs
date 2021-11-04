@@ -135,9 +135,7 @@ pub trait Multisig:
             "action does not exist"
         );
 
-        let caller_address = self.blockchain().get_caller();
-        let caller_id = self.user_mapper().get_user_id(&caller_address);
-        let caller_role = self.get_user_id_to_role(caller_id);
+        let (caller_id, caller_role) = self.get_caller_id_and_role();
         require!(caller_role.can_sign(), "only board members can sign");
 
         if !self.action_signer_ids(action_id).contains(&caller_id) {
@@ -156,9 +154,7 @@ pub trait Multisig:
             "action does not exist"
         );
 
-        let caller_address = self.blockchain().get_caller();
-        let caller_id = self.user_mapper().get_user_id(&caller_address);
-        let caller_role = self.get_user_id_to_role(caller_id);
+        let (caller_id, caller_role) = self.get_caller_id_and_role();
         require!(caller_role.can_sign(), "only board members can un-sign");
 
         self.action_signer_ids(action_id).swap_remove(&caller_id);
@@ -170,9 +166,7 @@ pub trait Multisig:
     /// Otherwise this endpoint would be prone to abuse.
     #[endpoint(discardAction)]
     fn discard_action(&self, action_id: usize) -> SCResult<()> {
-        let caller_address = self.blockchain().get_caller();
-        let caller_id = self.user_mapper().get_user_id(&caller_address);
-        let caller_role = self.get_user_id_to_role(caller_id);
+        let (_, caller_role) = self.get_caller_id_and_role();
         require!(
             caller_role.can_discard_action(),
             "only board members and proposers can discard actions"

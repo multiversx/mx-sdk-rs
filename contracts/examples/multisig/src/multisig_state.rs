@@ -19,6 +19,13 @@ pub trait MultisigStateModule {
     #[storage_set("user_role")]
     fn set_user_id_to_role(&self, user_id: usize, user_role: UserRole);
 
+    fn get_caller_id_and_role(&self) -> (usize, UserRole) {
+        let caller_address = self.blockchain().get_caller();
+        let caller_id = self.user_mapper().get_user_id(&caller_address);
+        let caller_role = self.get_user_id_to_role(caller_id);
+        (caller_id, caller_role)
+    }
+
     /// Denormalized board member count.
     /// It is kept in sync with the user list by the contract.
     #[view(getNumBoardMembers)]
