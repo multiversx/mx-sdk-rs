@@ -30,9 +30,9 @@ pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
         let old_role = if user_id == 0 {
             UserRole::None
         } else {
-            self.get_user_id_to_role(user_id)
+            self.user_id_to_role(user_id).get()
         };
-        self.set_user_id_to_role(user_id, new_role);
+        self.user_id_to_role(user_id).set(&new_role);
 
         // update board size
         #[allow(clippy::collapsible_else_if)]
