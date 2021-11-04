@@ -78,9 +78,7 @@ pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
         &self,
         action_id: usize,
     ) -> SCResult<PerformActionResult<Self::Api>> {
-        let caller_address = self.blockchain().get_caller();
-        let caller_id = self.user_mapper().get_user_id(&caller_address);
-        let caller_role = self.get_user_id_to_role(caller_id);
+        let (_, caller_role) = self.get_caller_id_and_role();
         require!(
             caller_role.can_perform_action(),
             "only board members and proposers can perform actions"
