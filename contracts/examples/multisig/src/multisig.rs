@@ -6,7 +6,7 @@ mod multisig_propose;
 mod multisig_state;
 mod user_role;
 
-use action::{Action, ActionFullInfo};
+use action::ActionFullInfo;
 use user_role::UserRole;
 
 elrond_wasm::imports!();
@@ -52,25 +52,6 @@ pub trait Multisig:
     #[payable("*")]
     #[endpoint]
     fn deposit(&self) {}
-
-    fn propose_action(&self, action: Action<Self::Api>) -> SCResult<usize> {
-        let caller_address = self.blockchain().get_caller();
-        let caller_id = self.user_mapper().get_user_id(&caller_address);
-        let caller_role = self.get_user_id_to_role(caller_id);
-        require!(
-            caller_role.can_propose(),
-            "only board members and proposers can propose"
-        );
-
-        let action_id = self.action_mapper().push(&action);
-        if caller_role.can_sign() {
-            // also sign
-            // since the action is newly created, the caller can be the only signer
-            self.action_signer_ids(action_id).insert(caller_id);
-        }
-
-        Ok(action_id)
-    }
 
     /// Iterates through all actions and retrieves those that are still pending.
     /// Serialized full action data:
