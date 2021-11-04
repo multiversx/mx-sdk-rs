@@ -30,7 +30,7 @@ extern "C" {
     fn mBufferAppendBytes(accumulatorHandle: i32, byte_ptr: *const u8, byte_len: i32) -> i32;
 }
 
-impl ManagedBufferApi for crate::ArwenApiImpl {
+impl ManagedBufferApi for crate::VmApiImpl {
     #[inline]
     fn mb_new_empty(&self) -> Handle {
         unsafe { mBufferNew() }

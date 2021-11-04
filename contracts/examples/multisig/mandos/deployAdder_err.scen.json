@@ -28,9 +28,7 @@
                 "arguments": [
                     "0",
                     "file:../test-contracts/adder.wasm",
-                    "false",
-                    "false",
-                    "false"
+                    "0x0000"
                 ],
                 "gasLimit": "200,000,000",
                 "gasPrice": "0"
@@ -107,7 +105,7 @@
                 "arguments": [
                     "3"
                 ],
-                "gasLimit": "70,000,000",
+                "gasLimit": "90,000,000",
                 "gasPrice": "0"
             },
             "expect": {

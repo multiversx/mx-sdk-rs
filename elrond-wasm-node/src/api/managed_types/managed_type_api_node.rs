@@ -11,7 +11,7 @@ extern "C" {
     fn mBufferFromBigIntSigned(mBufferHandle: i32, bigIntHandle: i32) -> i32;
 }
 
-impl elrond_wasm::api::ManagedTypeApi for crate::ArwenApiImpl {
+impl elrond_wasm::api::ManagedTypeApi for crate::VmApiImpl {
     #[inline]
     fn mb_to_big_int_unsigned(&self, buffer_handle: Handle) -> Handle {
         unsafe {

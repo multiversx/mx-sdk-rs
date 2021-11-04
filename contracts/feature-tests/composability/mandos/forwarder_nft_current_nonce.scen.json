@@ -55,45 +55,6 @@
                 "gas": "*",
                 "refund": "*"
             }
-        },
-        {
-            "step": "checkState",
-            "accounts": {
-                "address:a_user": {
-                    "nonce": "*",
-                    "balance": "0",
-                    "esdt": {
-                        "str:NFT-0001": {
-                            "instances": [
-                                {
-                                    "nonce": "1",
-                                    "balance": "1"
-                                }
-                            ],
-                            "lastNonce": "1"
-                        }
-                    },
-                    "storage": {},
-                    "code": ""
-                },
-                "sc:forwarder": {
-                    "nonce": "0",
-                    "balance": "0",
-                    "esdt": {
-                        "str:NFT-0001": {
-                            "instances": [
-                                {
-                                    "nonce": "1",
-                                    "balance": "0"
-                                }
-                            ],
-                            "lastNonce": "1"
-                        }
-                    },
-                    "storage": {},
-                    "code": "file:../forwarder/output/forwarder.wasm"
-                }
-            }
         }
     ]
 }

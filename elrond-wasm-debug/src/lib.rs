@@ -2,11 +2,11 @@
 
 pub mod abi_json;
 pub mod api;
-mod arwen_mandos_runner;
 mod contract_map;
 mod display_util;
-mod execute_mandos;
 mod managed_test_util;
+mod mandos_go_runner;
+mod mandos_rs_runner;
 mod mandos_step;
 pub mod meta;
 pub mod tx_execution;
@@ -18,8 +18,8 @@ pub use display_util::*;
 pub use managed_test_util::*;
 pub use mandos_step::*;
 
-pub use arwen_mandos_runner::mandos_go;
-pub use execute_mandos::mandos_rs;
+pub use mandos_go_runner::mandos_go;
+pub use mandos_rs_runner::mandos_rs;
 pub use tx_mock::DebugApi;
 pub use world_mock::BlockchainMock;
 
