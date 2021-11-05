@@ -1,6 +1,6 @@
 [package]
 name = "multisig"
-version = "0.0.0"
+version = "1.0.0"
 authors = ["Andrei Marinica <andrei.marinica@elrond.com>"]
 edition = "2018"
 publish = false
