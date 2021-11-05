@@ -53,4 +53,12 @@ pub trait DynArgInput {
                 .signal_error(err_msg::ARG_WRONG_NUMBER);
         }
     }
+
+    /// Consumes all inputs and ignores them.
+    /// After executing this, assert_no_more_args should not fail.
+    fn flush_ignore(&mut self) {
+        while self.has_next() {
+            let _ = self.next_arg_input();
+        }
+    }
 }
