@@ -101,6 +101,11 @@ fn forwarder_builtin_nft_create_go() {
 }
 
 #[test]
+fn forwarder_builtin_nft_create_by_caller() {
+    elrond_wasm_debug::mandos_go("mandos/forwarder_builtin_nft_create_by_caller.scen.json");
+}
+
+#[test]
 fn forwarder_builtin_nft_local_burn_go() {
     elrond_wasm_debug::mandos_go("mandos/forwarder_builtin_nft_local_burn.scen.json");
 }
