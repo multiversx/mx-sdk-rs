@@ -24,12 +24,12 @@ elrond_wasm_node::wasm_endpoints! {
         performAction
         proposeAddBoardMember
         proposeAddProposer
+        proposeAsyncCall
         proposeChangeQuorum
         proposeRemoveUser
         proposeSCDeployFromSource
         proposeSCUpgradeFromSource
-        proposeSendEgld
-        proposeSendEsdt
+        proposeTransferExecute
         quorumReached
         sign
         signed
