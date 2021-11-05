@@ -5,10 +5,9 @@
 #![no_std]
 
 elrond_wasm_node::wasm_endpoints! {
-   multisig
-   (
+    multisig
+    (
         init
-        callBack
         deposit
         discardAction
         getActionData
@@ -36,5 +35,7 @@ elrond_wasm_node::wasm_endpoints! {
         signed
         unsign
         userRole
-   )
+    )
 }
+
+elrond_wasm_node::wasm_empty_callback! {}
