@@ -176,4 +176,8 @@ pub trait Multisig:
         self.clear_action(action_id);
         Ok(())
     }
+
+    /// No callbacks currently possible.
+    #[callback_raw]
+    fn callback_raw(&self) {}
 }
