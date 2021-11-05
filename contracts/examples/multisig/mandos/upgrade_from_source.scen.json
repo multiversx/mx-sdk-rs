@@ -111,7 +111,7 @@
                         "str:user_id_to_address|u32:2": "address:alice",
                         "str:user_role|u32:1": "2",
                         "str:user_role|u32:2": "2",
-                        "str:num_board_members": "1",
+                        "str:num_board_members": "2",
                         "str:quorum": "1",
                         "str:sum": "1234"
                     },
