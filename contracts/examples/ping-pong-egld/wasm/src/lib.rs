@@ -5,10 +5,9 @@
 #![no_std]
 
 elrond_wasm_node::wasm_endpoints! {
-   ping_pong_egld
-   (
+    ping_pong_egld
+    (
         init
-        callBack
         getActivationTimestamp
         getDeadline
         getMaxFunds
@@ -19,5 +18,7 @@ elrond_wasm_node::wasm_endpoints! {
         pong
         pongAll
         pongAllLastUser
-   )
+    )
 }
+
+elrond_wasm_node::wasm_empty_callback! {}

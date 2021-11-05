@@ -5,11 +5,11 @@
 #![no_std]
 
 elrond_wasm_node::wasm_endpoints! {
-   child
-   (
+    child
+    (
         init
         callBack
         getWrappedEgldTokenIdentifier
         issueWrappedEgld
-   )
+    )
 }

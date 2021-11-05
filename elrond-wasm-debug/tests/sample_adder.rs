@@ -14,8 +14,6 @@ use elrond_wasm::{
 use crate::module_1::VersionModule;
 
 mod module_1 {
-    use elrond_wasm::abi::EndpointMutabilityAbi;
-
     elrond_wasm::imports!();
 
     /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -85,20 +83,7 @@ mod module_1 {
         type Api = elrond_wasm::api::uncallable::UncallableApi;
 
         fn abi() -> elrond_wasm::abi::ContractAbi {
-            let mut contract_abi = elrond_wasm :: abi :: ContractAbi { build_info : elrond_wasm :: abi :: BuildInfoAbi { contract_crate : elrond_wasm :: abi :: ContractCrateBuildAbi { name : "adder" , version : "0.0.0" , } , framework : elrond_wasm :: abi :: FrameworkBuildAbi :: create () , } , docs : & ["One of the simplest smart contracts possible," , "it holds a single variable in storage, which anyone can increment."] , name : "Adder" , constructor : None , endpoints : Vec :: new () , type_descriptions : < elrond_wasm :: abi :: TypeDescriptionContainerImpl as elrond_wasm :: abi :: TypeDescriptionContainer > :: new () , } ;
-            let mut endpoint_abi = elrond_wasm::abi::EndpointAbi {
-                docs: &[],
-                name: "version",
-                only_owner: false,
-                mutability: EndpointMutabilityAbi::Mutable,
-                payable_in_tokens: &[],
-                inputs: Vec::new(),
-                outputs: Vec::new(),
-            };
-            endpoint_abi.add_output::<BigInt<Self::Api>>(&[]);
-            contract_abi.add_type_descriptions::<BigInt<Self::Api>>();
-            contract_abi.endpoints.push(endpoint_abi);
-            contract_abi
+            elrond_wasm::abi::ContractAbi::default()
         }
     }
 
@@ -120,8 +105,6 @@ mod module_1 {
 }
 
 mod sample_adder {
-    use elrond_wasm::abi::EndpointMutabilityAbi;
-
     elrond_wasm::imports!();
 
     /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -329,49 +312,7 @@ mod sample_adder {
         type Api = elrond_wasm::api::uncallable::UncallableApi;
 
         fn abi() -> elrond_wasm::abi::ContractAbi {
-            let mut contract_abi = elrond_wasm :: abi :: ContractAbi { build_info : elrond_wasm :: abi :: BuildInfoAbi { contract_crate : elrond_wasm :: abi :: ContractCrateBuildAbi { name : "adder" , version : "0.0.0" , } , framework : elrond_wasm :: abi :: FrameworkBuildAbi :: create () , } , docs : & ["One of the simplest smart contracts possible," , "it holds a single variable in storage, which anyone can increment."] , name : "Adder" , constructor : None , endpoints : Vec :: new () , type_descriptions : < elrond_wasm :: abi :: TypeDescriptionContainerImpl as elrond_wasm :: abi :: TypeDescriptionContainer > :: new () , } ;
-            let mut endpoint_abi = elrond_wasm::abi::EndpointAbi {
-                docs: &[],
-                name: "getSum",
-                only_owner: false,
-                mutability: EndpointMutabilityAbi::Readonly,
-                payable_in_tokens: &[],
-                inputs: Vec::new(),
-                outputs: Vec::new(),
-            };
-            endpoint_abi.add_output::<BigInt<Self::Api>>(&[]);
-            contract_abi.add_type_descriptions::<BigInt<Self::Api>>();
-            contract_abi.endpoints.push(endpoint_abi);
-            let mut endpoint_abi = elrond_wasm::abi::EndpointAbi {
-                docs: &[],
-                name: "init",
-                only_owner: false,
-                mutability: EndpointMutabilityAbi::Pure,
-                payable_in_tokens: &[],
-                inputs: Vec::new(),
-                outputs: Vec::new(),
-            };
-            endpoint_abi.add_input::<&BigInt<Self::Api>>("initial_value");
-            contract_abi.add_type_descriptions::<&BigInt<Self::Api>>();
-            contract_abi.constructor = Some(endpoint_abi);
-            let mut endpoint_abi = elrond_wasm::abi::EndpointAbi {
-                docs: &["Add desired amount to the storage variable."],
-                name: "add",
-                only_owner: false,
-                mutability: EndpointMutabilityAbi::Mutable,
-                payable_in_tokens: &[],
-                inputs: Vec::new(),
-                outputs: Vec::new(),
-            };
-            endpoint_abi.add_input::<&BigInt<Self::Api>>("value");
-            contract_abi.add_type_descriptions::<&BigInt<Self::Api>>();
-            endpoint_abi.add_output::<SCResult<()>>(&[]);
-            contract_abi.add_type_descriptions::<SCResult<()>>();
-            contract_abi.endpoints.push(endpoint_abi);
-            contract_abi.coalesce(
-                <super::module_1::AbiProvider as elrond_wasm::contract_base::ContractAbiProvider>::abi(),
-            );
-            contract_abi
+            elrond_wasm::abi::ContractAbi::default()
         }
     }
 

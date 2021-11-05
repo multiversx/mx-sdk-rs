@@ -5,12 +5,13 @@
 #![no_std]
 
 elrond_wasm_node::wasm_endpoints! {
-   proxy_test_second
-   (
+    proxy_test_second
+    (
         init
-        callBack
         messageMe
         payMe
         payMeWithResult
-   )
+    )
 }
+
+elrond_wasm_node::wasm_empty_callback! {}

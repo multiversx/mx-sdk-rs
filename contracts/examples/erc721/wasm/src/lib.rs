@@ -5,10 +5,9 @@
 #![no_std]
 
 elrond_wasm_node::wasm_endpoints! {
-   erc721
-   (
+    erc721
+    (
         init
-        callBack
         approval
         approve
         mint
@@ -17,5 +16,7 @@ elrond_wasm_node::wasm_endpoints! {
         tokenOwner
         totalMinted
         transfer
-   )
+    )
 }
+
+elrond_wasm_node::wasm_empty_callback! {}
