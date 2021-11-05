@@ -8,6 +8,7 @@ mod sc_error;
 mod sc_error_managed;
 mod sc_error_static;
 mod sc_result;
+mod ignore_args;
 
 pub use async_call_result::{AsyncCallError, AsyncCallResult};
 pub use async_call_result_managed::{ManagedAsyncCallError, ManagedAsyncCallResult};
@@ -19,3 +20,4 @@ pub use sc_error::SCError;
 pub use sc_error_managed::ManagedSCError;
 pub use sc_error_static::StaticSCError;
 pub use sc_result::SCResult;
+pub use ignore_args::IgnoreVarArgs;

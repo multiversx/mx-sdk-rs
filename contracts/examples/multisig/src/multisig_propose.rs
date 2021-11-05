@@ -6,9 +6,7 @@ elrond_wasm::imports!();
 #[elrond_wasm::module]
 pub trait MultisigProposeModule: crate::multisig_state::MultisigStateModule {
     fn propose_action(&self, action: Action<Self::Api>) -> SCResult<usize> {
-        let caller_address = self.blockchain().get_caller();
-        let caller_id = self.user_mapper().get_user_id(&caller_address);
-        let caller_role = self.get_user_id_to_role(caller_id);
+        let (caller_id, caller_role) = self.get_caller_id_and_role();
         require!(
             caller_role.can_propose(),
             "only board members and proposers can propose"
@@ -95,22 +93,6 @@ pub trait MultisigProposeModule: crate::multisig_state::MultisigStateModule {
         })
     }
 
-    #[endpoint(proposeSCDeploy)]
-    fn propose_sc_deploy(
-        &self,
-        amount: BigUint,
-        code: ManagedBuffer,
-        code_metadata: CodeMetadata,
-        #[var_args] arguments: ManagedVarArgs<ManagedBuffer>,
-    ) -> SCResult<usize> {
-        self.propose_action(Action::SCDeploy {
-            amount,
-            code,
-            code_metadata,
-            arguments: arguments.into_vec_of_buffers(),
-        })
-    }
-
     #[endpoint(proposeSCDeployFromSource)]
     fn propose_sc_deploy_from_source(
         &self,
@@ -122,24 +104,6 @@ pub trait MultisigProposeModule: crate::multisig_state::MultisigStateModule {
         self.propose_action(Action::SCDeployFromSource {
             amount,
             source,
-            code_metadata,
-            arguments: arguments.into_vec_of_buffers(),
-        })
-    }
-
-    #[endpoint(proposeSCUpgrade)]
-    fn propose_sc_upgrade(
-        &self,
-        sc_address: ManagedAddress,
-        amount: BigUint,
-        code: ManagedBuffer,
-        code_metadata: CodeMetadata,
-        #[var_args] arguments: ManagedVarArgs<ManagedBuffer>,
-    ) -> SCResult<usize> {
-        self.propose_action(Action::SCUpgrade {
-            sc_address,
-            amount,
-            code,
             code_metadata,
             arguments: arguments.into_vec_of_buffers(),
         })

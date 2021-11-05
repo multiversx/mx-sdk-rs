@@ -31,6 +31,11 @@ fn forw_raw_contract_deploy_go() {
 }
 
 #[test]
+fn forw_raw_contract_upgrade_self_go() {
+    elrond_wasm_debug::mandos_go("mandos/forw_raw_contract_upgrade_self.scen.json");
+}
+
+#[test]
 fn forw_raw_contract_upgrade_go() {
     elrond_wasm_debug::mandos_go("mandos/forw_raw_contract_upgrade.scen.json");
 }
