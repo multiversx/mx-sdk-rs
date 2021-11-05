@@ -540,6 +540,7 @@
             "outputs": []
         }
     ],
+    "hasCallback": true,
     "types": {
         "GovernanceProposalStatus": {
             "type": "enum",

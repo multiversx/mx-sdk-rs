@@ -176,9 +176,4 @@ pub trait Multisig:
         self.clear_action(action_id);
         Ok(())
     }
-
-    /// One callback currently possible: upgradeFromSource does an async call.
-    /// However, the result is ignored.
-    #[callback_raw]
-    fn callback_raw(&self, #[var_args] _args: IgnoreVarArgs) {}
 }
