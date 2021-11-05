@@ -6,7 +6,7 @@ elrond_wasm::imports!();
 #[elrond_wasm::module]
 pub trait MultisigProposeModule: crate::multisig_state::MultisigStateModule {
     fn propose_action(&self, action: Action<Self::Api>) -> SCResult<usize> {
-        let (caller_id, caller_role) = self.get_caller_id_and_role();
+        let (caller_address, caller_id, caller_role) = self.get_caller_address_id_and_role();
         require!(
             caller_role.can_propose(),
             "only board members and proposers can propose"

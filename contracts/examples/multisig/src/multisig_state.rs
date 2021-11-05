@@ -16,11 +16,11 @@ pub trait MultisigStateModule {
     #[storage_mapper("user_role")]
     fn user_id_to_role(&self, user_id: usize) -> SingleValueMapper<UserRole>;
 
-    fn get_caller_id_and_role(&self) -> (usize, UserRole) {
+    fn get_caller_address_id_and_role(&self) -> (ManagedAddress, usize, UserRole) {
         let caller_address = self.blockchain().get_caller();
         let caller_id = self.user_mapper().get_user_id(&caller_address);
         let caller_role = self.user_id_to_role(caller_id).get();
-        (caller_id, caller_role)
+        (caller_address, caller_id, caller_role)
     }
 
     /// Denormalized board member count.

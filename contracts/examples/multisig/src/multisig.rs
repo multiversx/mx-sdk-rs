@@ -1,6 +1,7 @@
 #![no_std]
 
 mod action;
+mod multisig_events;
 mod multisig_perform;
 mod multisig_propose;
 mod multisig_state;
@@ -19,6 +20,7 @@ pub trait Multisig:
     multisig_state::MultisigStateModule
     + multisig_propose::MultisigProposeModule
     + multisig_perform::MultisigPerformModule
+    + multisig_events::MultisigEventsModule
 {
     #[init]
     fn init(
@@ -132,12 +134,15 @@ pub trait Multisig:
             "action does not exist"
         );
 
-        let (caller_id, caller_role) = self.get_caller_id_and_role();
+        let (caller_address, caller_id, caller_role) = self.get_caller_address_id_and_role();
         require!(caller_role.can_sign(), "only board members can sign");
 
-        if !self.action_signer_ids(action_id).contains(&caller_id) {
-            self.action_signer_ids(action_id).insert(caller_id);
+        let mut action_signers_mapper = self.action_signer_ids(action_id);
+        if !action_signers_mapper.contains(&caller_id) {
+            action_signers_mapper.insert(caller_id);
         }
+
+        self.sign_event(&caller_address, action_id);
 
         Ok(())
     }
@@ -151,10 +156,13 @@ pub trait Multisig:
             "action does not exist"
         );
 
-        let (caller_id, caller_role) = self.get_caller_id_and_role();
+        let (caller_address, caller_id, caller_role) = self.get_caller_address_id_and_role();
         require!(caller_role.can_sign(), "only board members can un-sign");
 
         self.action_signer_ids(action_id).swap_remove(&caller_id);
+
+        self.unsign_event(&caller_address, action_id);
+
         Ok(())
     }
 
@@ -163,7 +171,7 @@ pub trait Multisig:
     /// Otherwise this endpoint would be prone to abuse.
     #[endpoint(discardAction)]
     fn discard_action(&self, action_id: usize) -> SCResult<()> {
-        let (_, caller_role) = self.get_caller_id_and_role();
+        let (caller_address, _, caller_role) = self.get_caller_address_id_and_role();
         require!(
             caller_role.can_discard_action(),
             "only board members and proposers can discard actions"
@@ -174,6 +182,9 @@ pub trait Multisig:
         );
 
         self.clear_action(action_id);
+
+        self.discard_action_event(&caller_address, action_id);
+
         Ok(())
     }
 }

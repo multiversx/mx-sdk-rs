@@ -14,7 +14,9 @@ fn usize_add_isize(value: &mut usize, delta: isize) {
 
 /// Contains all events that can be emitted by the contract.
 #[elrond_wasm::module]
-pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
+pub trait MultisigPerformModule:
+    crate::multisig_state::MultisigStateModule + crate::multisig_events::MultisigEventsModule
+{
     fn gas_for_transfer_exec(&self) -> u64 {
         let gas_left = self.blockchain().get_gas_left();
         if gas_left <= PERFORM_ACTION_FINISH_GAS {
@@ -28,9 +30,12 @@ pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
     /// - remove user (board member / proposer)
     /// - reactivate removed user
     /// - convert between board member and proposer
+    ///
     /// Will keep the board size and proposer count in sync.
-    fn change_user_role(&self, user_address: ManagedAddress, new_role: UserRole) {
-        let user_id = self.user_mapper().get_or_create_user(&user_address);
+    ///
+    /// Returns the old role, to be used for event logs.
+    fn change_user_role(&self, user_address: &ManagedAddress, new_role: UserRole) -> UserRole {
+        let user_id = self.user_mapper().get_or_create_user(user_address);
         let user_id_to_role_mapper = self.user_id_to_role(user_id);
         let old_role = user_id_to_role_mapper.get();
         user_id_to_role_mapper.set(&new_role);
@@ -59,6 +64,19 @@ pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
             self.num_proposers()
                 .update(|value| usize_add_isize(value, proposers_delta));
         }
+
+        old_role
+    }
+
+    fn change_user_role_log_event(
+        &self,
+        caller: &ManagedAddress,
+        action_id: usize,
+        user_address: ManagedAddress,
+        new_role: UserRole,
+    ) {
+        let old_role = self.change_user_role(&user_address, new_role);
+        self.perform_change_user_event(caller, action_id, &user_address, old_role, new_role);
     }
 
     /// Returns `true` (`1`) if `getActionValidSignerCount >= getQuorum`.
@@ -80,7 +98,7 @@ pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
         &self,
         action_id: usize,
     ) -> SCResult<PerformActionResult<Self::Api>> {
-        let (_, caller_role) = self.get_caller_id_and_role();
+        let (caller_address, _, caller_role) = self.get_caller_address_id_and_role();
         require!(
             caller_role.can_perform_action(),
             "only board members and proposers can perform actions"
@@ -90,10 +108,14 @@ pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
             "quorum has not been reached"
         );
 
-        self.perform_action(action_id)
+        self.perform_action(&caller_address, action_id)
     }
 
-    fn perform_action(&self, action_id: usize) -> SCResult<PerformActionResult<Self::Api>> {
+    fn perform_action(
+        &self,
+        caller_address: &ManagedAddress,
+        action_id: usize,
+    ) -> SCResult<PerformActionResult<Self::Api>> {
         let action = self.action_mapper().get(action_id);
 
         // clean up storage
@@ -104,11 +126,21 @@ pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
         match action {
             Action::Nothing => Ok(PerformActionResult::Nothing),
             Action::AddBoardMember(board_member_address) => {
-                self.change_user_role(board_member_address, UserRole::BoardMember);
+                self.change_user_role_log_event(
+                    caller_address,
+                    action_id,
+                    board_member_address,
+                    UserRole::BoardMember,
+                );
                 Ok(PerformActionResult::Nothing)
             },
             Action::AddProposer(proposer_address) => {
-                self.change_user_role(proposer_address, UserRole::Proposer);
+                self.change_user_role_log_event(
+                    caller_address,
+                    action_id,
+                    proposer_address,
+                    UserRole::Proposer,
+                );
 
                 // validation required for the scenario when a board member becomes a proposer
                 require!(
@@ -118,7 +150,12 @@ pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
                 Ok(PerformActionResult::Nothing)
             },
             Action::RemoveUser(user_address) => {
-                self.change_user_role(user_address, UserRole::None);
+                self.change_user_role_log_event(
+                    caller_address,
+                    action_id,
+                    user_address,
+                    UserRole::None,
+                );
                 let num_board_members = self.num_board_members().get();
                 let num_proposers = self.num_proposers().get();
                 require!(
