@@ -27,9 +27,7 @@ elrond_wasm_node::wasm_endpoints! {
         proposeAddProposer
         proposeChangeQuorum
         proposeRemoveUser
-        proposeSCDeploy
         proposeSCDeployFromSource
-        proposeSCUpgrade
         proposeSCUpgradeFromSource
         proposeSendEgld
         proposeSendEsdt

@@ -28,22 +28,9 @@ pub enum Action<M: ManagedTypeApi> {
         endpoint_name: ManagedBuffer<M>,
         arguments: ManagedVec<M, ManagedBuffer<M>>,
     },
-    SCDeploy {
-        amount: BigUint<M>,
-        code: ManagedBuffer<M>,
-        code_metadata: CodeMetadata,
-        arguments: ManagedVec<M, ManagedBuffer<M>>,
-    },
     SCDeployFromSource {
         amount: BigUint<M>,
         source: ManagedAddress<M>,
-        code_metadata: CodeMetadata,
-        arguments: ManagedVec<M, ManagedBuffer<M>>,
-    },
-    SCUpgrade {
-        sc_address: ManagedAddress<M>,
-        amount: BigUint<M>,
-        code: ManagedBuffer<M>,
         code_metadata: CodeMetadata,
         arguments: ManagedVec<M, ManagedBuffer<M>>,
     },

@@ -175,22 +175,6 @@ pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
                 }
                 Ok(PerformActionResult::Nothing)
             },
-            Action::SCDeploy {
-                amount,
-                code,
-                code_metadata,
-                arguments,
-            } => {
-                let gas_left = self.blockchain().get_gas_left();
-                let (new_address, _) = self.raw_vm_api().deploy_contract(
-                    gas_left,
-                    &amount,
-                    &code,
-                    code_metadata,
-                    &arguments.into(),
-                );
-                Ok(PerformActionResult::DeployResult(new_address))
-            },
             Action::SCDeployFromSource {
                 amount,
                 source,
@@ -206,24 +190,6 @@ pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
                     &arguments.into(),
                 );
                 Ok(PerformActionResult::DeployResult(new_address))
-            },
-            Action::SCUpgrade {
-                sc_address,
-                amount,
-                code,
-                code_metadata,
-                arguments,
-            } => {
-                let gas_left = self.blockchain().get_gas_left();
-                self.raw_vm_api().upgrade_contract(
-                    &sc_address,
-                    gas_left,
-                    &amount,
-                    &code,
-                    code_metadata,
-                    &arguments.into(),
-                );
-                Ok(PerformActionResult::Nothing)
             },
             Action::SCUpgradeFromSource {
                 sc_address,
