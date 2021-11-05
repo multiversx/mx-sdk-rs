@@ -5,10 +5,11 @@
 #![no_std]
 
 elrond_wasm_node::wasm_endpoints! {
-   panic_message_features
-   (
+    panic_message_features
+    (
         init
-        callBack
         panicWithMessage
-   )
+    )
 }
+
+elrond_wasm_node::wasm_empty_callback! {}
