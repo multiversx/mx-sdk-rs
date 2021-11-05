@@ -7,16 +7,16 @@
         },
         {
             "step": "scCall",
-            "txId": "proposeSCUpgrade",
+            "txId": "proposeSCUpgradeFromSource",
             "comment": "missing argument",
             "tx": {
                 "from": "address:paul",
                 "to": "sc:multisig",
-                "function": "proposeSCUpgrade",
+                "function": "proposeSCUpgradeFromSource",
                 "arguments": [
                     "sc:multisig-child",
                     "0",
-                    "file:../test-contracts/adder.wasm",
+                    "sc:adder-code",
                     "0x0000",
                     "1234"
                 ],

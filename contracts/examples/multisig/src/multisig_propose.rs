@@ -93,22 +93,6 @@ pub trait MultisigProposeModule: crate::multisig_state::MultisigStateModule {
         })
     }
 
-    #[endpoint(proposeSCDeploy)]
-    fn propose_sc_deploy(
-        &self,
-        amount: BigUint,
-        code: ManagedBuffer,
-        code_metadata: CodeMetadata,
-        #[var_args] arguments: ManagedVarArgs<ManagedBuffer>,
-    ) -> SCResult<usize> {
-        self.propose_action(Action::SCDeploy {
-            amount,
-            code,
-            code_metadata,
-            arguments: arguments.into_vec_of_buffers(),
-        })
-    }
-
     #[endpoint(proposeSCDeployFromSource)]
     fn propose_sc_deploy_from_source(
         &self,
@@ -120,24 +104,6 @@ pub trait MultisigProposeModule: crate::multisig_state::MultisigStateModule {
         self.propose_action(Action::SCDeployFromSource {
             amount,
             source,
-            code_metadata,
-            arguments: arguments.into_vec_of_buffers(),
-        })
-    }
-
-    #[endpoint(proposeSCUpgrade)]
-    fn propose_sc_upgrade(
-        &self,
-        sc_address: ManagedAddress,
-        amount: BigUint,
-        code: ManagedBuffer,
-        code_metadata: CodeMetadata,
-        #[var_args] arguments: ManagedVarArgs<ManagedBuffer>,
-    ) -> SCResult<usize> {
-        self.propose_action(Action::SCUpgrade {
-            sc_address,
-            amount,
-            code,
             code_metadata,
             arguments: arguments.into_vec_of_buffers(),
         })
