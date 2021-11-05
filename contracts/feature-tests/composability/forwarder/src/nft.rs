@@ -150,8 +150,6 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
         let mut uris = ManagedVec::new(self.type_manager());
         uris.push(uri);
 
-        // /home/elrond/arwen-wasm-vm/arwen/host/arwen.go
-
         self.send().esdt_nft_create_as_caller::<Color>(
             &token_identifier,
             &amount,
