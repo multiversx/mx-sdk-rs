@@ -27,23 +27,20 @@ pub trait Multisig:
         #[var_args] board: ManagedVarArgs<ManagedAddress>,
     ) -> SCResult<()> {
         let board_vec = board.to_vec();
+
+        let new_num_board_members = self.add_multiple_board_members(board_vec)?;
+
+        let num_proposers = self.num_proposers().get();
         require!(
-            !board_vec.is_empty(),
+            new_num_board_members + num_proposers > 0,
             "board cannot be empty on init, no-one would be able to propose"
         );
-        require!(quorum <= board_vec.len(), "quorum cannot exceed board size");
-        self.quorum().set(&quorum);
 
-        let mut duplicates = false;
-        self.user_mapper()
-            .get_or_create_users(board_vec.into_iter(), |user_id, new_user| {
-                if !new_user {
-                    duplicates = true;
-                }
-                self.user_id_to_role(user_id).set(&UserRole::BoardMember);
-            });
-        require!(!duplicates, "duplicate board member");
-        self.num_board_members().set(&board_vec.len());
+        require!(
+            quorum <= new_num_board_members,
+            "quorum cannot exceed board size"
+        );
+        self.quorum().set(&quorum);
 
         Ok(())
     }
