@@ -58,42 +58,48 @@ fn generate_endpoint_snippet(
     }
 }
 
+fn generate_endpoint_snippets(
+    contract: &ContractTrait,
+) -> Vec<proc_macro2::TokenStream> {
+    contract
+    .methods
+    .iter()
+    .filter_map(|m| match &m.public_role {
+        PublicRole::Init(_) => {
+            let endpoint_def = generate_endpoint_snippet(
+                m,
+                "init",
+                false,
+                EndpointMutabilityMetadata::Mutable,
+            );
+            Some(quote! {
+                #endpoint_def
+                contract_abi.constructor = Some(endpoint_abi);
+            })
+        },
+        PublicRole::Endpoint(endpoint_metadata) => {
+            let endpoint_name_str = endpoint_metadata.public_name.to_string();
+            let endpoint_def = generate_endpoint_snippet(
+                m,
+                &endpoint_name_str,
+                endpoint_metadata.only_owner,
+                endpoint_metadata.mutability.clone(),
+            );
+            Some(quote! {
+                #endpoint_def
+                contract_abi.endpoints.push(endpoint_abi);
+            })
+        },
+        _ => None,
+    })
+    .collect()
+}
+
 fn generate_abi_method_body(
     contract: &ContractTrait,
     is_contract_main: bool,
 ) -> proc_macro2::TokenStream {
-    let endpoint_snippets: Vec<proc_macro2::TokenStream> = contract
-        .methods
-        .iter()
-        .filter_map(|m| {
-            if let PublicRole::Init(_) = &m.public_role {
-                let endpoint_def = generate_endpoint_snippet(
-                    m,
-                    "init",
-                    false,
-                    EndpointMutabilityMetadata::Mutable,
-                );
-                Some(quote! {
-                    #endpoint_def
-                    contract_abi.constructor = Some(endpoint_abi);
-                })
-            } else if let PublicRole::Endpoint(endpoint_metadata) = &m.public_role {
-                let endpoint_name_str = endpoint_metadata.public_name.to_string();
-                let endpoint_def = generate_endpoint_snippet(
-                    m,
-                    &endpoint_name_str,
-                    endpoint_metadata.only_owner,
-                    endpoint_metadata.mutability.clone(),
-                );
-                Some(quote! {
-                    #endpoint_def
-                    contract_abi.endpoints.push(endpoint_abi);
-                })
-            } else {
-                None
-            }
-        })
-        .collect();
+    let endpoint_snippets = generate_endpoint_snippets(contract);
 
     let supertrait_snippets: Vec<proc_macro2::TokenStream> = if is_contract_main {
         contract
