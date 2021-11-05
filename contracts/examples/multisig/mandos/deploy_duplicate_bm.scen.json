@@ -1,6 +1,5 @@
 {
     "comment": "add then check",
-    "gasSchedule": "v3",
     "steps": [
         {
             "step": "externalSteps",
