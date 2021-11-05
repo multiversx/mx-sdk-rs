@@ -109,6 +109,7 @@ elrond_wasm_node::wasm_endpoints! {
         echo_ser_example_2
         echo_simple_enum
         echo_slice_u8
+        echo_some_args_ignore_others
         echo_str
         echo_str_box
         echo_string

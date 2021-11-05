@@ -94,15 +94,12 @@ fn generate_endpoint_snippets(contract: &ContractTrait) -> Vec<proc_macro2::Toke
 }
 
 fn has_callback(contract: &ContractTrait) -> bool {
-    contract
-        .methods
-        .iter()
-        .any(|m| {
-            matches!(
-                m.public_role,
-                PublicRole::Callback(_) | PublicRole::CallbackRaw
-            )
-        })
+    contract.methods.iter().any(|m| {
+        matches!(
+            m.public_role,
+            PublicRole::Callback(_) | PublicRole::CallbackRaw
+        )
+    })
 }
 
 fn generate_supertrait_snippets(contract: &ContractTrait) -> Vec<proc_macro2::TokenStream> {
