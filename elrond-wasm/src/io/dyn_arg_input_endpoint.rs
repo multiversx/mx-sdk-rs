@@ -53,4 +53,8 @@ where
             arg_input
         }
     }
+
+    fn flush_ignore(&mut self) {
+        self.current_index = self.num_arguments;
+    }
 }

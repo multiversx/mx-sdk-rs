@@ -23,10 +23,10 @@
             "tx": {
                 "from": "address:paul",
                 "to": "sc:multisig",
-                "function": "proposeSCDeploy",
+                "function": "proposeSCDeployFromSource",
                 "arguments": [
                     "0",
-                    "file:../test-contracts/adder.wasm",
+                    "sc:adder-code",
                     "0x0000",
                     "1234"
                 ],
@@ -73,7 +73,7 @@
                         "str:action_data.item|u32:3": {
                             "1-discriminant": "0x07",
                             "2-amount": "u32:0",
-                            "3-code": "nested:file:../test-contracts/adder.wasm",
+                            "3-code_source": "sc:adder-code",
                             "4-code_metadata": "0x0000",
                             "5-arguments": [
                                 "u32:1",
