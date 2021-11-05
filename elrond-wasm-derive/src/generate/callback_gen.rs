@@ -23,7 +23,10 @@ pub fn generate_callback_selector_and_main(
             elrond_wasm::types::CallbackSelectorResult::Processed
         };
         let cb_main_body = quote! {
-            let _ = self.callback_selector(elrond_wasm::types::CallbackClosureForDeser::new_empty(self.raw_vm_api()));
+            let _ = self::EndpointWrappers::callback_selector(
+                self,
+                elrond_wasm::types::CallbackClosureForDeser::new_empty(self.raw_vm_api()),
+            );
         };
         (cb_selector_body, cb_main_body)
     } else {
