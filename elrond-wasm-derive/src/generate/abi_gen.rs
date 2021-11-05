@@ -107,15 +107,8 @@ fn has_callback(contract: &ContractTrait) -> bool {
     callback_count > 0
 }
 
-fn generate_abi_method_body(
-    contract: &ContractTrait,
-    is_contract_main: bool,
-) -> proc_macro2::TokenStream {
-    let endpoint_snippets = generate_endpoint_snippets(contract);
-    let has_callbacks = has_callback(contract);
-
-    let supertrait_snippets: Vec<proc_macro2::TokenStream> = if is_contract_main {
-        contract
+fn generate_supertrait_snippets(contract: &ContractTrait) -> Vec<proc_macro2::TokenStream> {
+    contract
 			.supertraits
 			.iter()
 			.map(|supertrait| {
@@ -125,12 +118,22 @@ fn generate_abi_method_body(
 				}
 			})
 			.collect()
+}
+
+fn generate_abi_method_body(
+    contract: &ContractTrait,
+    is_contract_main: bool,
+) -> proc_macro2::TokenStream {
+    let contract_docs = &contract.docs;
+    let contract_name = &contract.trait_name.to_string();
+    let endpoint_snippets = generate_endpoint_snippets(contract);
+    let has_callbacks = has_callback(contract);
+    let supertrait_snippets: Vec<proc_macro2::TokenStream> = if is_contract_main {
+        generate_supertrait_snippets(contract)
     } else {
         Vec::new()
     };
 
-    let contract_docs = &contract.docs;
-    let contract_name = &contract.trait_name.to_string();
     quote! {
         let mut contract_abi = elrond_wasm::abi::ContractAbi {
             build_info: elrond_wasm::abi::BuildInfoAbi {
