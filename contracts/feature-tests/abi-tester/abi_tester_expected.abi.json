@@ -285,6 +285,7 @@
             "outputs": []
         }
     ],
+    "hasCallback": false,
     "types": {
         "AbiEnum": {
             "type": "enum",
