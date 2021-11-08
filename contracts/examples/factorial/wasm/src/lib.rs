@@ -5,10 +5,11 @@
 #![no_std]
 
 elrond_wasm_node::wasm_endpoints! {
-   factorial
-   (
+    factorial
+    (
         init
-        callBack
         factorial
-   )
+    )
 }
+
+elrond_wasm_node::wasm_empty_callback! {}

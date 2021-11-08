@@ -1,5 +1,4 @@
 {
-    "gasSchedule": "v3",
     "steps": [
         {
             "step": "externalSteps",
@@ -20,7 +19,7 @@
                     "0x0000",
                     "1234"
                 ],
-                "gasLimit": "200,000,000",
+                "gasLimit": "15,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -43,7 +42,7 @@
                 "arguments": [
                     "4"
                 ],
-                "gasLimit": "50,000,000",
+                "gasLimit": "15,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -64,7 +63,7 @@
                 "arguments": [
                     "4"
                 ],
-                "gasLimit": "50,000,000",
+                "gasLimit": "15,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -85,7 +84,7 @@
                 "arguments": [
                     "4"
                 ],
-                "gasLimit": "120,000,000",
+                "gasLimit": "30,000,000",
                 "gasPrice": "0"
             },
             "expect": {

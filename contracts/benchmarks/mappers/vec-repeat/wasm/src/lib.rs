@@ -5,13 +5,14 @@
 #![no_std]
 
 elrond_wasm_node::wasm_endpoints! {
-   vec_repeat
-   (
+    vec_repeat
+    (
         init
-        callBack
         add
         count
         getBenchmark
         remove
-   )
+    )
 }
+
+elrond_wasm_node::wasm_empty_callback! {}

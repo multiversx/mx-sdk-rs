@@ -58,15 +58,12 @@ fn generate_endpoint_snippet(
     }
 }
 
-fn generate_abi_method_body(
-    contract: &ContractTrait,
-    is_contract_main: bool,
-) -> proc_macro2::TokenStream {
-    let endpoint_snippets: Vec<proc_macro2::TokenStream> = contract
+fn generate_endpoint_snippets(contract: &ContractTrait) -> Vec<proc_macro2::TokenStream> {
+    contract
         .methods
         .iter()
-        .filter_map(|m| {
-            if let PublicRole::Init(_) = &m.public_role {
+        .filter_map(|m| match &m.public_role {
+            PublicRole::Init(_) => {
                 let endpoint_def = generate_endpoint_snippet(
                     m,
                     "init",
@@ -77,7 +74,8 @@ fn generate_abi_method_body(
                     #endpoint_def
                     contract_abi.constructor = Some(endpoint_abi);
                 })
-            } else if let PublicRole::Endpoint(endpoint_metadata) = &m.public_role {
+            },
+            PublicRole::Endpoint(endpoint_metadata) => {
                 let endpoint_name_str = endpoint_metadata.public_name.to_string();
                 let endpoint_def = generate_endpoint_snippet(
                     m,
@@ -89,14 +87,23 @@ fn generate_abi_method_body(
                     #endpoint_def
                     contract_abi.endpoints.push(endpoint_abi);
                 })
-            } else {
-                None
-            }
+            },
+            _ => None,
         })
-        .collect();
+        .collect()
+}
 
-    let supertrait_snippets: Vec<proc_macro2::TokenStream> = if is_contract_main {
-        contract
+fn has_callback(contract: &ContractTrait) -> bool {
+    contract.methods.iter().any(|m| {
+        matches!(
+            m.public_role,
+            PublicRole::Callback(_) | PublicRole::CallbackRaw
+        )
+    })
+}
+
+fn generate_supertrait_snippets(contract: &ContractTrait) -> Vec<proc_macro2::TokenStream> {
+    contract
 			.supertraits
 			.iter()
 			.map(|supertrait| {
@@ -106,14 +113,24 @@ fn generate_abi_method_body(
 				}
 			})
 			.collect()
+}
+
+fn generate_abi_method_body(
+    contract: &ContractTrait,
+    is_contract_main: bool,
+) -> proc_macro2::TokenStream {
+    let contract_docs = &contract.docs;
+    let contract_name = &contract.trait_name.to_string();
+    let endpoint_snippets = generate_endpoint_snippets(contract);
+    let has_callbacks = has_callback(contract);
+    let supertrait_snippets: Vec<proc_macro2::TokenStream> = if is_contract_main {
+        generate_supertrait_snippets(contract)
     } else {
         Vec::new()
     };
 
-    let contract_docs = &contract.docs;
-    let contract_name = &contract.trait_name.to_string();
     quote! {
-        let mut contract_abi = elrond_wasm::abi::ContractAbi{
+        let mut contract_abi = elrond_wasm::abi::ContractAbi {
             build_info: elrond_wasm::abi::BuildInfoAbi {
                 contract_crate: elrond_wasm::abi::ContractCrateBuildAbi {
                     name: env!("CARGO_PKG_NAME"),
@@ -125,6 +142,7 @@ fn generate_abi_method_body(
             name: #contract_name,
             constructor: None,
             endpoints: Vec::new(),
+            has_callback: #has_callbacks,
             type_descriptions: <elrond_wasm::abi::TypeDescriptionContainerImpl as elrond_wasm::abi::TypeDescriptionContainer>::new(),
         };
         #(#endpoint_snippets)*

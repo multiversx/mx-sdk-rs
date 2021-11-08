@@ -5,8 +5,8 @@
 #![no_std]
 
 elrond_wasm_node::wasm_endpoints! {
-   nft_minter
-   (
+    nft_minter
+    (
         init
         callBack
         buyNft
@@ -14,5 +14,5 @@ elrond_wasm_node::wasm_endpoints! {
         getNftPrice
         issueToken
         setLocalRoles
-   )
+    )
 }

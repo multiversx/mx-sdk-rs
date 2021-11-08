@@ -12,3 +12,12 @@ macro_rules! wasm_endpoints {
         )+
     };
 }
+
+#[macro_export]
+macro_rules! wasm_empty_callback {
+    () => {
+        #[allow(non_snake_case)]
+        #[no_mangle]
+        fn callBack() {}
+    };
+}
