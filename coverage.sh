@@ -10,6 +10,7 @@ cargo test
 grcov ./target/debug/ -s . -t html --llvm --branch -o ./target/debug/coverage/ \
 	--ignore-not-existing \
 	--ignore *abi/src* \
+	--ignore *meta/src* \
 	--ignore *tests*
 
 
