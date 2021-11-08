@@ -5,11 +5,12 @@
 #![no_std]
 
 elrond_wasm_node::wasm_endpoints! {
-   adder
-   (
+    adder
+    (
         init
-        callBack
         add
         getSum
-   )
+    )
 }
+
+elrond_wasm_node::wasm_empty_callback! {}

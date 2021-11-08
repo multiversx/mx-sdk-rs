@@ -5,8 +5,8 @@
 #![no_std]
 
 elrond_wasm_node::wasm_endpoints! {
-   use_module
-   (
+    use_module
+    (
         init
         callBack
         call_mod_a
@@ -49,5 +49,5 @@ elrond_wasm_node::wasm_endpoints! {
         unpause
         vote
         withdrawGovernanceTokens
-   )
+    )
 }

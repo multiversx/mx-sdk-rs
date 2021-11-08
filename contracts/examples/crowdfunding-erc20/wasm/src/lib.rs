@@ -5,8 +5,8 @@
 #![no_std]
 
 elrond_wasm_node::wasm_endpoints! {
-   crowdfunding_erc20
-   (
+    crowdfunding_erc20
+    (
         init
         callBack
         claim
@@ -17,5 +17,5 @@ elrond_wasm_node::wasm_endpoints! {
         get_target
         get_total_balance
         status
-   )
+    )
 }

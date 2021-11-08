@@ -5,8 +5,8 @@
 #![no_std]
 
 elrond_wasm_node::wasm_endpoints! {
-   bonding_curve_contract
-   (
+    bonding_curve_contract
+    (
         init
         callBack
         buyToken
@@ -19,5 +19,5 @@ elrond_wasm_node::wasm_endpoints! {
         setBondingCurve
         setLocalRoles
         unsetLocalRoles
-   )
+    )
 }

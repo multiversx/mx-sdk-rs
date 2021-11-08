@@ -5,8 +5,8 @@
 #![no_std]
 
 elrond_wasm_node::wasm_endpoints! {
-   forwarder
-   (
+    forwarder
+    (
         init
         callBack
         buy_nft
@@ -63,5 +63,5 @@ elrond_wasm_node::wasm_endpoints! {
         unsetLocalRoles
         upgradeVault
         upgrade_vault_from_source
-   )
+    )
 }

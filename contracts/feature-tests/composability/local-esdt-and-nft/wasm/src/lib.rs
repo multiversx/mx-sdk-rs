@@ -5,8 +5,8 @@
 #![no_std]
 
 elrond_wasm_node::wasm_endpoints! {
-   local_esdt_and_nft
-   (
+    local_esdt_and_nft
+    (
         init
         callBack
         getCurrentNftNonce
@@ -26,5 +26,5 @@ elrond_wasm_node::wasm_endpoints! {
         transferNftViaAsyncCall
         transfer_nft_and_execute
         unsetLocalRoles
-   )
+    )
 }

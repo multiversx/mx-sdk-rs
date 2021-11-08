@@ -14,7 +14,7 @@
             "tx": {
                 "from": "address:alice",
                 "to": "sc:multisig",
-                "function": "proposeSendEgld",
+                "function": "proposeTransferExecute",
                 "arguments": [
                     "sc:other-shard-1",
                     "0"

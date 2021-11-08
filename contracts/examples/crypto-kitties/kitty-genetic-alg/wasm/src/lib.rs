@@ -5,10 +5,11 @@
 #![no_std]
 
 elrond_wasm_node::wasm_endpoints! {
-   kitty_genetic_alg
-   (
+    kitty_genetic_alg
+    (
         init
-        callBack
         generateKittyGenes
-   )
+    )
 }
+
+elrond_wasm_node::wasm_empty_callback! {}
