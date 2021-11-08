@@ -1,5 +1,4 @@
 {
-    "gasSchedule": "v3",
     "steps": [
         {
             "step": "externalSteps",
@@ -148,7 +147,7 @@
                 "arguments": [
                     "3"
                 ],
-                "gasLimit": "90,000,000",
+                "gasLimit": "40,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -177,11 +176,11 @@
         },
         {
             "step": "scCall",
-            "txId": "proposeSendEgld",
+            "txId": "proposeTransferExecute",
             "tx": {
                 "from": "address:paul",
                 "to": "sc:multisig",
-                "function": "proposeSendEgld",
+                "function": "proposeTransferExecute",
                 "arguments": [
                     "sc:adder",
                     "0",
