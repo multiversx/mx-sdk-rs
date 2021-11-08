@@ -1,5 +1,4 @@
 {
-    "gasSchedule": "v3",
     "steps": [
         {
             "step": "externalSteps",
@@ -21,7 +20,7 @@
                     "1",
                     "address:alice"
                 ],
-                "gasLimit": "200,000,000",
+                "gasLimit": "20,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -86,7 +85,7 @@
                 "arguments": [
                     "5"
                 ],
-                "gasLimit": "90,000,000",
+                "gasLimit": "70,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -111,7 +110,7 @@
                         "str:user_id_to_address|u32:2": "address:alice",
                         "str:user_role|u32:1": "2",
                         "str:user_role|u32:2": "2",
-                        "str:num_board_members": "1",
+                        "str:num_board_members": "2",
                         "str:quorum": "1",
                         "str:sum": "1234"
                     },

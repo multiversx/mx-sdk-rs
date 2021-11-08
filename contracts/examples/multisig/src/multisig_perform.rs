@@ -8,6 +8,10 @@ elrond_wasm::imports!();
 /// Gas required to finsh transaction after transfer-execute.
 const PERFORM_ACTION_FINISH_GAS: u64 = 300_000;
 
+fn usize_add_isize(value: &mut usize, delta: isize) {
+    *value = (*value as isize + delta) as usize;
+}
+
 /// Contains all events that can be emitted by the contract.
 #[elrond_wasm::module]
 pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
@@ -27,35 +31,33 @@ pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
     /// Will keep the board size and proposer count in sync.
     fn change_user_role(&self, user_address: ManagedAddress, new_role: UserRole) {
         let user_id = self.user_mapper().get_or_create_user(&user_address);
-        let old_role = if user_id == 0 {
-            UserRole::None
-        } else {
-            self.get_user_id_to_role(user_id)
-        };
-        self.set_user_id_to_role(user_id, new_role);
+        let user_id_to_role_mapper = self.user_id_to_role(user_id);
+        let old_role = user_id_to_role_mapper.get();
+        user_id_to_role_mapper.set(&new_role);
 
         // update board size
-        #[allow(clippy::collapsible_else_if)]
+        let mut board_members_delta = 0isize;
         if old_role == UserRole::BoardMember {
-            if new_role != UserRole::BoardMember {
-                self.num_board_members().update(|value| *value -= 1);
-            }
-        } else {
-            if new_role == UserRole::BoardMember {
-                self.num_board_members().update(|value| *value += 1);
-            }
+            board_members_delta -= 1;
+        }
+        if new_role == UserRole::BoardMember {
+            board_members_delta += 1;
+        }
+        if board_members_delta != 0 {
+            self.num_board_members()
+                .update(|value| usize_add_isize(value, board_members_delta));
         }
 
-        // update num_proposers
-        #[allow(clippy::collapsible_else_if)]
+        let mut proposers_delta = 0isize;
         if old_role == UserRole::Proposer {
-            if new_role != UserRole::Proposer {
-                self.num_proposers().update(|value| *value -= 1);
-            }
-        } else {
-            if new_role == UserRole::Proposer {
-                self.num_proposers().update(|value| *value += 1);
-            }
+            proposers_delta -= 1;
+        }
+        if new_role == UserRole::Proposer {
+            proposers_delta += 1;
+        }
+        if proposers_delta != 0 {
+            self.num_proposers()
+                .update(|value| usize_add_isize(value, proposers_delta));
         }
     }
 
@@ -78,9 +80,7 @@ pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
         &self,
         action_id: usize,
     ) -> SCResult<PerformActionResult<Self::Api>> {
-        let caller_address = self.blockchain().get_caller();
-        let caller_id = self.user_mapper().get_user_id(&caller_address);
-        let caller_role = self.get_user_id_to_role(caller_id);
+        let (_, caller_role) = self.get_caller_id_and_role();
         require!(
             caller_role.can_perform_action(),
             "only board members and proposers can perform actions"
@@ -139,57 +139,31 @@ pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
                 self.quorum().set(&new_quorum);
                 Ok(PerformActionResult::Nothing)
             },
-            Action::SendEGLD {
-                to,
-                amount,
-                endpoint_name,
-                arguments,
-            } => {
+            Action::SendTransferExecute(call_data) => {
                 let result = self.raw_vm_api().direct_egld_execute(
-                    &to,
-                    &amount,
+                    &call_data.to,
+                    &call_data.egld_amount,
                     self.gas_for_transfer_exec(),
-                    &endpoint_name,
-                    &arguments.into(),
+                    &call_data.endpoint_name,
+                    &call_data.arguments.into(),
                 );
                 if let Result::Err(e) = result {
                     self.raw_vm_api().signal_error(e);
                 }
                 Ok(PerformActionResult::Nothing)
             },
-            Action::SendESDT {
-                to,
-                esdt_payments,
-                endpoint_name,
-                arguments,
-            } => {
-                let result = self.raw_vm_api().direct_multi_esdt_transfer_execute(
-                    &to,
-                    &esdt_payments,
-                    self.gas_for_transfer_exec(),
-                    &endpoint_name,
-                    &arguments.into(),
-                );
-                if let Result::Err(e) = result {
-                    self.raw_vm_api().signal_error(e);
-                }
-                Ok(PerformActionResult::Nothing)
-            },
-            Action::SCDeploy {
-                amount,
-                code,
-                code_metadata,
-                arguments,
-            } => {
-                let gas_left = self.blockchain().get_gas_left();
-                let (new_address, _) = self.raw_vm_api().deploy_contract(
-                    gas_left,
-                    &amount,
-                    &code,
-                    code_metadata,
-                    &arguments.into(),
-                );
-                Ok(PerformActionResult::DeployResult(new_address))
+            Action::SendAsyncCall(call_data) => {
+                let contract_call_raw = self
+                    .send()
+                    .contract_call::<()>(call_data.to, call_data.endpoint_name)
+                    .with_egld_transfer(call_data.egld_amount)
+                    .with_arguments_raw(call_data.arguments.into());
+                // for arg in arguments {
+                //     contract_call_raw.push_argument_raw_bytes(arg.as_slice());
+                // }
+                Ok(PerformActionResult::SendAsyncCall(
+                    contract_call_raw.async_call(),
+                ))
             },
             Action::SCDeployFromSource {
                 amount,
@@ -206,24 +180,6 @@ pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
                     &arguments.into(),
                 );
                 Ok(PerformActionResult::DeployResult(new_address))
-            },
-            Action::SCUpgrade {
-                sc_address,
-                amount,
-                code,
-                code_metadata,
-                arguments,
-            } => {
-                let gas_left = self.blockchain().get_gas_left();
-                self.raw_vm_api().upgrade_contract(
-                    &sc_address,
-                    gas_left,
-                    &amount,
-                    &code,
-                    code_metadata,
-                    &arguments.into(),
-                );
-                Ok(PerformActionResult::Nothing)
             },
             Action::SCUpgradeFromSource {
                 sc_address,

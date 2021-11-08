@@ -5,10 +5,9 @@
 #![no_std]
 
 elrond_wasm_node::wasm_endpoints! {
-   crowdfunding_esdt
-   (
+    crowdfunding_esdt
+    (
         init
-        callBack
         claim
         fund
         getCrowdfundingTokenIdentifier
@@ -17,5 +16,7 @@ elrond_wasm_node::wasm_endpoints! {
         getDeposit
         getTarget
         status
-   )
+    )
 }
+
+elrond_wasm_node::wasm_empty_callback! {}

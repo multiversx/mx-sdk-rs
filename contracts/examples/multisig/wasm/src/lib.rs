@@ -5,10 +5,9 @@
 #![no_std]
 
 elrond_wasm_node::wasm_endpoints! {
-   multisig
-   (
+    multisig
+    (
         init
-        callBack
         deposit
         discardAction
         getActionData
@@ -25,18 +24,18 @@ elrond_wasm_node::wasm_endpoints! {
         performAction
         proposeAddBoardMember
         proposeAddProposer
+        proposeAsyncCall
         proposeChangeQuorum
         proposeRemoveUser
-        proposeSCDeploy
         proposeSCDeployFromSource
-        proposeSCUpgrade
         proposeSCUpgradeFromSource
-        proposeSendEgld
-        proposeSendEsdt
+        proposeTransferExecute
         quorumReached
         sign
         signed
         unsign
         userRole
-   )
+    )
 }
+
+elrond_wasm_node::wasm_empty_callback! {}

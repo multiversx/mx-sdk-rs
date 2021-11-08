@@ -19,6 +19,7 @@ tutorial/book
 my-vm-tests.sh
 publish.sh
 quick.sh
+twiggy*
 
 # Zip output with example wasm binaries
 examples-wasm.zip

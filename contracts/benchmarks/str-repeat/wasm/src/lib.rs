@@ -5,12 +5,13 @@
 #![no_std]
 
 elrond_wasm_node::wasm_endpoints! {
-   str_repeat
-   (
+    str_repeat
+    (
         init
-        callBack
         getByteArray
         getByteArrayLength
         repeat
-   )
+    )
 }
+
+elrond_wasm_node::wasm_empty_callback! {}

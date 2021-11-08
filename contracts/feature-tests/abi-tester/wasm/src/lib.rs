@@ -5,10 +5,9 @@
 #![no_std]
 
 elrond_wasm_node::wasm_endpoints! {
-   abi_tester
-   (
+    abi_tester
+    (
         init
-        callBack
         address_vs_h256
         echo_abi_test_type
         echo_enum
@@ -26,5 +25,7 @@ elrond_wasm_node::wasm_endpoints! {
         payable_some_token
         sample_storage_mapper
         var_args
-   )
+    )
 }
+
+elrond_wasm_node::wasm_empty_callback! {}
