@@ -56,9 +56,8 @@ pub trait MapRepeat: benchmark_common::BenchmarkCommon {
     #[endpoint]
     fn remove_struct(&self, num_repeats: usize, key: ExampleStruct<Self::Api>) {
         let mut bench = self.bench_struct();
-        let mut mut_key = key;
         for i in 1..=num_repeats {
-            bench.remove(&self.use_index_struct(&mut mut_key, i));
+            bench.remove(&self.use_index_struct(&key, i));
         }
     }
 
