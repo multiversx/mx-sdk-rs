@@ -109,6 +109,11 @@ fn echo_i64_go() {
 }
 
 #[test]
+fn echo_ignore_go() {
+    elrond_wasm_debug::mandos_go("mandos/echo_ignore.scen.json");
+}
+
+#[test]
 fn echo_managed_bytes_go() {
     elrond_wasm_debug::mandos_go("mandos/echo_managed_bytes.scen.json");
 }

@@ -5,10 +5,9 @@
 #![no_std]
 
 elrond_wasm_node::wasm_endpoints! {
-   vault
-   (
+    vault
+    (
         init
-        callBack
         accept_funds
         accept_funds_echo_payment
         accept_funds_multi_transfer
@@ -22,5 +21,7 @@ elrond_wasm_node::wasm_endpoints! {
         reject_funds
         retrieve_funds
         retrieve_multi_funds_async
-   )
+    )
 }
+
+elrond_wasm_node::wasm_empty_callback! {}

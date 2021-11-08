@@ -5,8 +5,8 @@
 #![no_std]
 
 elrond_wasm_node::wasm_endpoints! {
-   forwarder_raw
-   (
+    forwarder_raw
+    (
         init
         callBack
         call_execute_on_dest_context
@@ -29,5 +29,5 @@ elrond_wasm_node::wasm_endpoints! {
         forwarder_async_send_and_retrieve_multi_transfer_funds
         upgrade
         upgrade_from_source
-   )
+    )
 }

@@ -1,6 +1,6 @@
 [package]
 name = "multisig"
-version = "0.0.0"
+version = "1.0.0"
 authors = ["Andrei Marinica <andrei.marinica@elrond.com>"]
 edition = "2018"
 publish = false
@@ -9,11 +9,11 @@ publish = false
 path = "src/multisig.rs"
 
 [dependencies.elrond-wasm]
-version = "0.22.1"
+version = "0.22.2"
 path = "../../../elrond-wasm"
 
 [dev-dependencies.elrond-wasm-debug]
-version = "0.22.1"
+version = "0.22.2"
 path = "../../../elrond-wasm-debug"
 
 [dev-dependencies.adder]

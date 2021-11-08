@@ -5,10 +5,9 @@
 #![no_std]
 
 elrond_wasm_node::wasm_endpoints! {
-   set_repeat
-   (
+    set_repeat
+    (
         init
-        callBack
         add
         add_struct
         bench
@@ -17,5 +16,7 @@ elrond_wasm_node::wasm_endpoints! {
         count_struct
         remove
         remove_struct
-   )
+    )
 }
+
+elrond_wasm_node::wasm_empty_callback! {}

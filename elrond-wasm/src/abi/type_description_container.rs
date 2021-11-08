@@ -18,7 +18,7 @@ pub trait TypeDescriptionContainer {
     fn insert_all(&mut self, other: &Self);
 }
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct TypeDescriptionContainerImpl(pub HashMap<String, TypeDescription>);
 
 impl TypeDescriptionContainer for TypeDescriptionContainerImpl {

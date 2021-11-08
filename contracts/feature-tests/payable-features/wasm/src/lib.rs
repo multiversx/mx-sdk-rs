@@ -5,10 +5,9 @@
 #![no_std]
 
 elrond_wasm_node::wasm_endpoints! {
-   payable_features
-   (
+    payable_features
+    (
         init
-        callBack
         echo_call_value
         payable_any_1
         payable_any_2
@@ -23,5 +22,7 @@ elrond_wasm_node::wasm_endpoints! {
         payable_token_3
         payable_token_4
         payment_multiple
-   )
+    )
 }
+
+elrond_wasm_node::wasm_empty_callback! {}

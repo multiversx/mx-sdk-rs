@@ -5,11 +5,12 @@
 #![no_std]
 
 elrond_wasm_node::wasm_endpoints! {
-   order_book_factory
-   (
+    order_book_factory
+    (
         init
-        callBack
         createPair
         getPair
-   )
+    )
 }
+
+elrond_wasm_node::wasm_empty_callback! {}
