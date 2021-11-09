@@ -33,4 +33,12 @@ impl ManagedTypeApi for DebugApi {
             .managed_buffer_map
             .insert_new_handle(bi_bytes.into_vec())
     }
+
+    fn mb_to_big_float(&self, _buffer_handle: Handle) -> Handle {
+        panic!("mb_to_big_float not implemented")
+    }
+
+    fn mb_from_big_float(&self, _big_float_handle: Handle) -> Handle {
+        panic!("mb_from_big_float not implemented")
+    }
 }
