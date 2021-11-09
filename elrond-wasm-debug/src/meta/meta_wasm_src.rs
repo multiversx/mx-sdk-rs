@@ -25,13 +25,18 @@ fn write_endpoints_macro<'a, I>(
     I: Iterator<Item = &'a String>,
 {
     writeln!(wasm_lib_file, "elrond_wasm_node::wasm_endpoints! {{").unwrap();
-    writeln!(wasm_lib_file, "   {}", contract_module_name).unwrap();
-    writeln!(wasm_lib_file, "   (").unwrap();
+    writeln!(wasm_lib_file, "    {}", contract_module_name).unwrap();
+    writeln!(wasm_lib_file, "    (").unwrap();
     for endpoint_name in endpoint_names {
         writeln!(wasm_lib_file, "        {}", endpoint_name).unwrap();
     }
-    writeln!(wasm_lib_file, "   )").unwrap();
+    writeln!(wasm_lib_file, "    )").unwrap();
     writeln!(wasm_lib_file, "}}").unwrap();
+}
+
+fn write_wasm_empty_callback_macro(wasm_lib_file: &mut File) {
+    writeln!(wasm_lib_file).unwrap();
+    writeln!(wasm_lib_file, "elrond_wasm_node::wasm_empty_callback! {{}}").unwrap();
 }
 
 pub fn write_wasm_lib(abi: &ContractAbi) {
@@ -47,13 +52,20 @@ pub fn write_wasm_lib(abi: &ContractAbi) {
         .collect();
     endpoint_names.sort();
 
-    let mandatory_endpoints = ["init".to_string(), "callBack".to_string()];
+    let mut mandatory_endpoints = vec!["init".to_string()];
+    if abi.has_callback {
+        mandatory_endpoints.push("callBack".to_string());
+    }
     let all_endpoint_names = mandatory_endpoints.iter().chain(endpoint_names.iter());
     write_endpoints_macro(
         &mut wasm_lib_file,
         &contract_module_name,
         all_endpoint_names,
     );
+
+    if !abi.has_callback {
+        write_wasm_empty_callback_macro(&mut wasm_lib_file);
+    }
 }
 
 /// This one is useful for some of the special unmanaged EI tests in the framework.

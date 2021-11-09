@@ -5,8 +5,8 @@
 #![no_std]
 
 elrond_wasm_node::wasm_endpoints! {
-   egld_esdt_swap
-   (
+    egld_esdt_swap
+    (
         init
         callBack
         getLockedEgldBalance
@@ -16,5 +16,5 @@ elrond_wasm_node::wasm_endpoints! {
         mintWrappedEgld
         unwrapEgld
         wrapEgld
-   )
+    )
 }

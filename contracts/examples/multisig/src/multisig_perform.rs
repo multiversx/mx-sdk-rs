@@ -139,41 +139,31 @@ pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
                 self.quorum().set(&new_quorum);
                 Ok(PerformActionResult::Nothing)
             },
-            Action::SendEGLD {
-                to,
-                amount,
-                endpoint_name,
-                arguments,
-            } => {
+            Action::SendTransferExecute(call_data) => {
                 let result = self.raw_vm_api().direct_egld_execute(
-                    &to,
-                    &amount,
+                    &call_data.to,
+                    &call_data.egld_amount,
                     self.gas_for_transfer_exec(),
-                    &endpoint_name,
-                    &arguments.into(),
+                    &call_data.endpoint_name,
+                    &call_data.arguments.into(),
                 );
                 if let Result::Err(e) = result {
                     self.raw_vm_api().signal_error(e);
                 }
                 Ok(PerformActionResult::Nothing)
             },
-            Action::SendESDT {
-                to,
-                esdt_payments,
-                endpoint_name,
-                arguments,
-            } => {
-                let result = self.raw_vm_api().direct_multi_esdt_transfer_execute(
-                    &to,
-                    &esdt_payments,
-                    self.gas_for_transfer_exec(),
-                    &endpoint_name,
-                    &arguments.into(),
-                );
-                if let Result::Err(e) = result {
-                    self.raw_vm_api().signal_error(e);
-                }
-                Ok(PerformActionResult::Nothing)
+            Action::SendAsyncCall(call_data) => {
+                let contract_call_raw = self
+                    .send()
+                    .contract_call::<()>(call_data.to, call_data.endpoint_name)
+                    .with_egld_transfer(call_data.egld_amount)
+                    .with_arguments_raw(call_data.arguments.into());
+                // for arg in arguments {
+                //     contract_call_raw.push_argument_raw_bytes(arg.as_slice());
+                // }
+                Ok(PerformActionResult::SendAsyncCall(
+                    contract_call_raw.async_call(),
+                ))
             },
             Action::SCDeployFromSource {
                 amount,
