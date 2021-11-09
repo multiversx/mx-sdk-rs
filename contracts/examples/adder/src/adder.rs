@@ -18,6 +18,8 @@ pub trait Adder {
     /// Add desired amount to the storage variable.
     #[endpoint]
     fn add(&self, value: BigInt) -> SCResult<()> {
+        let biguint = BigUint::managed_from(self.type_manager(), 257u64);
+        self.print().print_biguint(&biguint);
         self.sum().update(|sum| *sum += value);
 
         Ok(())
