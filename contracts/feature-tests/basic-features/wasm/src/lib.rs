@@ -5,10 +5,9 @@
 #![no_std]
 
 elrond_wasm_node::wasm_endpoints! {
-   basic_features
-   (
+    basic_features
+    (
         init
-        callBack
         add_assign_big_int
         add_assign_big_int_ref
         add_assign_big_uint
@@ -110,6 +109,7 @@ elrond_wasm_node::wasm_endpoints! {
         echo_ser_example_2
         echo_simple_enum
         echo_slice_u8
+        echo_some_args_ignore_others
         echo_str
         echo_str_box
         echo_string
@@ -322,5 +322,7 @@ elrond_wasm_node::wasm_endpoints! {
         verify_custom_secp256k1_signature
         verify_ed25519_signature
         verify_secp256k1_signature
-   )
+    )
 }
+
+elrond_wasm_node::wasm_empty_callback! {}

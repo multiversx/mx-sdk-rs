@@ -5,10 +5,9 @@
 #![no_std]
 
 elrond_wasm_node::wasm_endpoints! {
-   first_contract
-   (
+    first_contract
+    (
         init
-        callBack
         getSecondContractAddress
         getesdtTokenName
         transferToSecondContractFull
@@ -16,5 +15,7 @@ elrond_wasm_node::wasm_endpoints! {
         transferToSecondContractHalf
         transferToSecondContractRejected
         transferToSecondContractRejectedWithTransferAndExecute
-   )
+    )
 }
+
+elrond_wasm_node::wasm_empty_callback! {}

@@ -14,6 +14,7 @@ pub struct ContractAbiJson {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub constructor: Option<ConstructorAbiJson>,
     pub endpoints: Vec<EndpointAbiJson>,
+    pub has_callback: bool,
     pub types: BTreeMap<String, TypeDescriptionJson>,
 }
 
@@ -25,6 +26,7 @@ impl From<&ContractAbi> for ContractAbiJson {
             name: abi.name.to_string(),
             constructor: abi.constructor.as_ref().map(ConstructorAbiJson::from),
             endpoints: Vec::new(),
+            has_callback: abi.has_callback,
             types: BTreeMap::new(),
         };
         for endpoint in &abi.endpoints {

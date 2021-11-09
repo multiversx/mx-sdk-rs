@@ -5,8 +5,8 @@
 #![no_std]
 
 elrond_wasm_node::wasm_endpoints! {
-   kitty_ownership
-   (
+    kitty_ownership
+    (
         init
         callBack
         allowAuctioning
@@ -30,5 +30,5 @@ elrond_wasm_node::wasm_endpoints! {
         totalSupply
         transfer
         transfer_from
-   )
+    )
 }

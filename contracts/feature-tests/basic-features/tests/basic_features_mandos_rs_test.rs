@@ -18,6 +18,11 @@ fn big_int_to_i64_rs() {
 }
 
 #[test]
+fn echo_ignore_go() {
+    elrond_wasm_debug::mandos_rs("mandos/echo_ignore.scen.json", world());
+}
+
+#[test]
 fn big_num_conversions_rs() {
     elrond_wasm_debug::mandos_rs("mandos/big_num_conversions.scen.json", world());
 }

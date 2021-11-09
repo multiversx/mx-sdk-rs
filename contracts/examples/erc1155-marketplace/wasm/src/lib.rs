@@ -5,10 +5,9 @@
 #![no_std]
 
 elrond_wasm_node::wasm_endpoints! {
-   erc1155_marketplace
-   (
+    erc1155_marketplace
+    (
         init
-        callBack
         bid
         claim
         endAuction
@@ -21,5 +20,7 @@ elrond_wasm_node::wasm_endpoints! {
         onERC1155Received
         setCutPercentage
         setTokenOwnershipContractAddress
-   )
+    )
 }
+
+elrond_wasm_node::wasm_empty_callback! {}

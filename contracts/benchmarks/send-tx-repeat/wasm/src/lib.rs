@@ -5,10 +5,11 @@
 #![no_std]
 
 elrond_wasm_node::wasm_endpoints! {
-   send_tx_repeat
-   (
+    send_tx_repeat
+    (
         init
-        callBack
         repeat
-   )
+    )
 }
+
+elrond_wasm_node::wasm_empty_callback! {}
