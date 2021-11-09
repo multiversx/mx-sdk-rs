@@ -44,4 +44,11 @@ impl EndpointFinishApi for DebugApi {
             self.finish_slice_u8(BigUint::from(value).to_bytes_be().as_slice());
         }
     }
+
+    fn finish_big_float(&self, handle: Handle) {
+        let managed_types = self.m_types_borrow();
+        let bf = managed_types.big_float_map.get(handle);
+        let bf_bytes = &bf.to_be_bytes()[..];
+        self.finish_slice_u8(bf_bytes)
+    }
 }
