@@ -197,4 +197,14 @@ pub trait EchoTypes {
     fn echo_non_zero_usize(&self, nz: NonZeroUsize) -> NonZeroUsize {
         nz
     }
+
+    #[view]
+    fn echo_some_args_ignore_others(
+        &self,
+        i: i32,
+        #[var_args] opt: OptionalArg<i32>,
+        #[var_args] _ignore: IgnoreVarArgs,
+    ) -> MultiResult2<i32, OptionalResult<i32>> {
+        (i, opt).into()
+    }
 }

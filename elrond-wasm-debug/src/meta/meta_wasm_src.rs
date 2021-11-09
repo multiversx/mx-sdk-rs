@@ -14,22 +14,29 @@ const PRELUDE: &str = "////////////////////////////////////////////////////
 ////////////////////////////////////////////////////
 
 #![no_std]
-#![allow(non_snake_case)]
 
-pub use elrond_wasm_output;
 ";
 
-fn write_endpoint(wasm_lib_file: &mut File, contract_module_name: &str, endpoint_name: &str) {
-    writeln!(
-        wasm_lib_file,
-        "
-#[no_mangle]
-pub fn {}() {{
-    {}::endpoints::{}(elrond_wasm_node::vm_api());
-}}",
-        endpoint_name, contract_module_name, endpoint_name
-    )
-    .unwrap();
+fn write_endpoints_macro<'a, I>(
+    wasm_lib_file: &mut File,
+    contract_module_name: &str,
+    endpoint_names: I,
+) where
+    I: Iterator<Item = &'a String>,
+{
+    writeln!(wasm_lib_file, "elrond_wasm_node::wasm_endpoints! {{").unwrap();
+    writeln!(wasm_lib_file, "    {}", contract_module_name).unwrap();
+    writeln!(wasm_lib_file, "    (").unwrap();
+    for endpoint_name in endpoint_names {
+        writeln!(wasm_lib_file, "        {}", endpoint_name).unwrap();
+    }
+    writeln!(wasm_lib_file, "    )").unwrap();
+    writeln!(wasm_lib_file, "}}").unwrap();
+}
+
+fn write_wasm_empty_callback_macro(wasm_lib_file: &mut File) {
+    writeln!(wasm_lib_file).unwrap();
+    writeln!(wasm_lib_file, "elrond_wasm_node::wasm_empty_callback! {{}}").unwrap();
 }
 
 pub fn write_wasm_lib(abi: &ContractAbi) {
@@ -38,10 +45,6 @@ pub fn write_wasm_lib(abi: &ContractAbi) {
     let mut wasm_lib_file = File::create(WASM_SRC_PATH).unwrap();
     wasm_lib_file.write_all(PRELUDE.as_bytes()).unwrap();
 
-    write_endpoint(&mut wasm_lib_file, &contract_module_name, "init");
-
-    write_endpoint(&mut wasm_lib_file, &contract_module_name, "callBack");
-
     let mut endpoint_names: Vec<String> = abi
         .endpoints
         .iter()
@@ -49,8 +52,19 @@ pub fn write_wasm_lib(abi: &ContractAbi) {
         .collect();
     endpoint_names.sort();
 
-    for endpoint_name in &endpoint_names {
-        write_endpoint(&mut wasm_lib_file, &contract_module_name, endpoint_name);
+    let mut mandatory_endpoints = vec!["init".to_string()];
+    if abi.has_callback {
+        mandatory_endpoints.push("callBack".to_string());
+    }
+    let all_endpoint_names = mandatory_endpoints.iter().chain(endpoint_names.iter());
+    write_endpoints_macro(
+        &mut wasm_lib_file,
+        &contract_module_name,
+        all_endpoint_names,
+    );
+
+    if !abi.has_callback {
+        write_wasm_empty_callback_macro(&mut wasm_lib_file);
     }
 }
 

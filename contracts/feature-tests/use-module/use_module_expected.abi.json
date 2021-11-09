@@ -13,7 +13,7 @@
         },
         "framework": {
             "name": "elrond-wasm",
-            "version": "0.22.0"
+            "version": "0.22.2"
         }
     },
     "docs": [
@@ -540,6 +540,7 @@
             "outputs": []
         }
     ],
+    "hasCallback": true,
     "types": {
         "GovernanceProposalStatus": {
             "type": "enum",
