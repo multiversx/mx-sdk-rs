@@ -4,7 +4,7 @@ use crate::{
     api::{EndpointFinishApi, ErrorApi, ManagedTypeApi},
     elrond_codec::{EncodeError, TopEncode, TopEncodeOutput},
     err_msg,
-    types::{BigInt, BigUint, ManagedBuffer, ManagedType},
+    types::{BigFloat, BigInt, BigUint, ManagedBuffer, ManagedType},
 };
 
 struct ApiOutputAdapter<FA>
@@ -61,6 +61,9 @@ where
             Ok(())
         } else if let Some(big_int) = value.try_cast_ref::<BigInt<FA>>() {
             self.api.finish_big_int_raw(big_int.handle);
+            Ok(())
+        } else if let Some(big_float) = value.try_cast_ref::<BigFloat<FA>>() {
+            self.api.finish_big_float(big_float.handle);
             Ok(())
         } else {
             else_serialization(self)
