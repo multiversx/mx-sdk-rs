@@ -1,3 +1,5 @@
+use std::convert::TryInto;
+
 use elrond_wasm::api::{BigIntApi, Handle, ManagedTypeApi};
 use num_bigint::{BigInt, Sign};
 
@@ -34,11 +36,23 @@ impl ManagedTypeApi for DebugApi {
             .insert_new_handle(bi_bytes.into_vec())
     }
 
-    fn mb_to_big_float(&self, _buffer_handle: Handle) -> Handle {
-        panic!("mb_to_big_float not implemented")
+    fn mb_to_big_float(&self, buffer_handle: Handle) -> Handle {
+        let mut managed_types = self.m_types_borrow_mut();
+        let mb_bytes = managed_types.managed_buffer_map.get(buffer_handle);
+        let float_bytes: [u8; 8] = mb_bytes
+            .as_slice()
+            .try_into()
+            .expect("slice with incorrect length");
+        let new_bf = f64::from_be_bytes(float_bytes);
+        managed_types.big_float_map.insert_new_handle(new_bf)
     }
 
-    fn mb_from_big_float(&self, _big_float_handle: Handle) -> Handle {
-        panic!("mb_from_big_float not implemented")
+    fn mb_from_big_float(&self, big_float_handle: Handle) -> Handle {
+        let mut managed_types = self.m_types_borrow_mut();
+        let bf = managed_types.big_float_map.get(big_float_handle);
+        let bf_bytes = bf.to_be_bytes();
+        managed_types
+            .managed_buffer_map
+            .insert_new_handle(Vec::<u8>::from(bf_bytes))
     }
 }
