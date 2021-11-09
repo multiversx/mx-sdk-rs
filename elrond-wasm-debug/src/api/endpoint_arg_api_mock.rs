@@ -1,3 +1,5 @@
+use std::convert::TryInto;
+
 use crate::{tx_mock::TxPanic, DebugApi};
 use alloc::vec::Vec;
 use elrond_wasm::{
@@ -82,5 +84,17 @@ impl EndpointArgumentApi for DebugApi {
                 message: b"argument out of range".to_vec(),
             })
         }
+    }
+
+    fn get_argument_big_float(&self, arg_index: i32) -> Handle {
+        let bytes = self.get_argument_vec_u8(arg_index);
+        let mut managed_types = self.m_types_borrow_mut();
+        let result = f64::from_be_bytes(
+            bytes
+                .as_slice()
+                .try_into()
+                .expect("slice with incorrect length"),
+        );
+        managed_types.big_float_map.insert_new_handle(result)
     }
 }
