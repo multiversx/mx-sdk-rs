@@ -39,4 +39,8 @@ impl EndpointArgumentApi for UncallableApi {
     fn get_argument_i64(&self, _arg_id: i32) -> i64 {
         unreachable!()
     }
+
+    fn get_argument_big_float(&self, _arg_id: i32) -> Handle {
+        unreachable!()
+    }
 }
