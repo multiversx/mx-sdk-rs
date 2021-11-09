@@ -12,8 +12,8 @@ macro_rules! imports {
         };
         use elrond_wasm::{
             api::{
-                BigIntApi, BlockchainApi, CallValueApi, CryptoApi, EllipticCurveApi, ErrorApi,
-                LogApi, ManagedTypeApi, SendApi,
+                BigFloatApi, BigIntApi, BlockchainApi, CallValueApi, CryptoApi, EllipticCurveApi,
+                ErrorApi, LogApi, ManagedTypeApi, SendApi,
             },
             contract_base::{ContractBase, ProxyObjBase},
             elrond_codec::{DecodeError, NestedDecode, NestedEncode, TopDecode},
