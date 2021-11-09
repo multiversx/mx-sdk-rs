@@ -40,6 +40,12 @@
                     "balance": "0",
                     "storage": {},
                     "code": ""
+                },
+                "sc:adder-code": {
+                    "code": "file:../../test-contracts/adder.wasm"
+                },
+                "sc:factorial-code": {
+                    "code": "file:../../test-contracts/factorial.wasm"
                 }
             },
             "newAddresses": [

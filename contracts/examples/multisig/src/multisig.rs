@@ -6,7 +6,7 @@ mod multisig_propose;
 mod multisig_state;
 mod user_role;
 
-use action::{Action, ActionFullInfo};
+use action::ActionFullInfo;
 use user_role::UserRole;
 
 elrond_wasm::imports!();
@@ -27,23 +27,20 @@ pub trait Multisig:
         #[var_args] board: ManagedVarArgs<ManagedAddress>,
     ) -> SCResult<()> {
         let board_vec = board.to_vec();
+
+        let new_num_board_members = self.add_multiple_board_members(board_vec)?;
+
+        let num_proposers = self.num_proposers().get();
         require!(
-            !board_vec.is_empty(),
+            new_num_board_members + num_proposers > 0,
             "board cannot be empty on init, no-one would be able to propose"
         );
-        require!(quorum <= board_vec.len(), "quorum cannot exceed board size");
-        self.quorum().set(&quorum);
 
-        let mut duplicates = false;
-        self.user_mapper()
-            .get_or_create_users(board_vec.into_iter(), |user_id, new_user| {
-                if !new_user {
-                    duplicates = true;
-                }
-                self.set_user_id_to_role(user_id, UserRole::BoardMember);
-            });
-        require!(!duplicates, "duplicate board member");
-        self.num_board_members().set(&board_vec.len());
+        require!(
+            quorum <= new_num_board_members,
+            "quorum cannot exceed board size"
+        );
+        self.quorum().set(&quorum);
 
         Ok(())
     }
@@ -53,33 +50,14 @@ pub trait Multisig:
     #[endpoint]
     fn deposit(&self) {}
 
-    fn propose_action(&self, action: Action<Self::Api>) -> SCResult<usize> {
-        let caller_address = self.blockchain().get_caller();
-        let caller_id = self.user_mapper().get_user_id(&caller_address);
-        let caller_role = self.get_user_id_to_role(caller_id);
-        require!(
-            caller_role.can_propose(),
-            "only board members and proposers can propose"
-        );
-
-        let action_id = self.action_mapper().push(&action);
-        if caller_role.can_sign() {
-            // also sign
-            // since the action is newly created, the caller can be the only signer
-            self.action_signer_ids(action_id).insert(caller_id);
-        }
-
-        Ok(action_id)
-    }
-
     /// Iterates through all actions and retrieves those that are still pending.
     /// Serialized full action data:
     /// - the action id
     /// - the serialized action data
     /// - (number of signers followed by) list of signer addresses.
     #[view(getPendingActionFullInfo)]
-    fn get_pending_action_full_info(&self) -> MultiResultVec<ActionFullInfo<Self::Api>> {
-        let mut result = MultiResultVec::new();
+    fn get_pending_action_full_info(&self) -> ManagedMultiResultVec<ActionFullInfo<Self::Api>> {
+        let mut result = ManagedMultiResultVec::new(self.raw_vm_api());
         let action_last_index = self.get_action_last_index();
         let action_mapper = self.action_mapper();
         for action_id in 1..=action_last_index {
@@ -117,27 +95,27 @@ pub trait Multisig:
         if user_id == 0 {
             UserRole::None
         } else {
-            self.get_user_id_to_role(user_id)
+            self.user_id_to_role(user_id).get()
         }
     }
 
     /// Lists all users that can sign actions.
     #[view(getAllBoardMembers)]
-    fn get_all_board_members(&self) -> MultiResultVec<ManagedAddress> {
+    fn get_all_board_members(&self) -> ManagedMultiResultVec<ManagedAddress> {
         self.get_all_users_with_role(UserRole::BoardMember)
     }
 
     /// Lists all proposers that are not board members.
     #[view(getAllProposers)]
-    fn get_all_proposers(&self) -> MultiResultVec<ManagedAddress> {
+    fn get_all_proposers(&self) -> ManagedMultiResultVec<ManagedAddress> {
         self.get_all_users_with_role(UserRole::Proposer)
     }
 
-    fn get_all_users_with_role(&self, role: UserRole) -> MultiResultVec<ManagedAddress> {
-        let mut result = MultiResultVec::new();
+    fn get_all_users_with_role(&self, role: UserRole) -> ManagedMultiResultVec<ManagedAddress> {
+        let mut result = ManagedMultiResultVec::new(self.raw_vm_api());
         let num_users = self.user_mapper().get_user_count();
         for user_id in 1..=num_users {
-            if self.get_user_id_to_role(user_id) == role {
+            if self.user_id_to_role(user_id).get() == role {
                 if let Some(address) = self.user_mapper().get_user_address(user_id) {
                     result.push(address.managed_into());
                 }
@@ -154,9 +132,7 @@ pub trait Multisig:
             "action does not exist"
         );
 
-        let caller_address = self.blockchain().get_caller();
-        let caller_id = self.user_mapper().get_user_id(&caller_address);
-        let caller_role = self.get_user_id_to_role(caller_id);
+        let (caller_id, caller_role) = self.get_caller_id_and_role();
         require!(caller_role.can_sign(), "only board members can sign");
 
         if !self.action_signer_ids(action_id).contains(&caller_id) {
@@ -175,12 +151,10 @@ pub trait Multisig:
             "action does not exist"
         );
 
-        let caller_address = self.blockchain().get_caller();
-        let caller_id = self.user_mapper().get_user_id(&caller_address);
-        let caller_role = self.get_user_id_to_role(caller_id);
+        let (caller_id, caller_role) = self.get_caller_id_and_role();
         require!(caller_role.can_sign(), "only board members can un-sign");
 
-        self.action_signer_ids(action_id).remove(&caller_id);
+        self.action_signer_ids(action_id).swap_remove(&caller_id);
         Ok(())
     }
 
@@ -189,9 +163,7 @@ pub trait Multisig:
     /// Otherwise this endpoint would be prone to abuse.
     #[endpoint(discardAction)]
     fn discard_action(&self, action_id: usize) -> SCResult<()> {
-        let caller_address = self.blockchain().get_caller();
-        let caller_id = self.user_mapper().get_user_id(&caller_address);
-        let caller_role = self.get_user_id_to_role(caller_id);
+        let (_, caller_role) = self.get_caller_id_and_role();
         require!(
             caller_role.can_discard_action(),
             "only board members and proposers can discard actions"

@@ -1,5 +1,4 @@
 {
-    "gasSchedule": "v3",
     "steps": [
         {
             "step": "externalSteps",
@@ -24,10 +23,10 @@
             "tx": {
                 "from": "address:paul",
                 "to": "sc:multisig",
-                "function": "proposeSCDeploy",
+                "function": "proposeSCDeployFromSource",
                 "arguments": [
                     "0",
-                    "file:../test-contracts/adder.wasm",
+                    "sc:adder-code",
                     "0x0000"
                 ],
                 "gasLimit": "200,000,000",

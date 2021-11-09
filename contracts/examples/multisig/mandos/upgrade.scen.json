@@ -1,5 +1,4 @@
 {
-    "gasSchedule": "v3",
     "steps": [
         {
             "step": "externalSteps",
@@ -7,20 +6,20 @@
         },
         {
             "step": "scCall",
-            "txId": "proposeSCUpgrade",
+            "txId": "proposeSCUpgradeFromSource",
             "comment": "missing argument",
             "tx": {
                 "from": "address:paul",
                 "to": "sc:multisig",
-                "function": "proposeSCUpgrade",
+                "function": "proposeSCUpgradeFromSource",
                 "arguments": [
                     "sc:multisig-child",
                     "0",
-                    "file:../test-contracts/adder.wasm",
+                    "sc:adder-code",
                     "0x0000",
                     "1234"
                 ],
-                "gasLimit": "200,000,000",
+                "gasLimit": "15,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -43,7 +42,7 @@
                 "arguments": [
                     "4"
                 ],
-                "gasLimit": "50,000,000",
+                "gasLimit": "15,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -64,7 +63,7 @@
                 "arguments": [
                     "4"
                 ],
-                "gasLimit": "50,000,000",
+                "gasLimit": "15,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -85,7 +84,7 @@
                 "arguments": [
                     "4"
                 ],
-                "gasLimit": "120,000,000",
+                "gasLimit": "30,000,000",
                 "gasPrice": "0"
             },
             "expect": {

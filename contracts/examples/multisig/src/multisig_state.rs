@@ -13,11 +13,15 @@ pub trait MultisigStateModule {
     #[storage_mapper("user")]
     fn user_mapper(&self) -> UserMapper;
 
-    #[storage_get("user_role")]
-    fn get_user_id_to_role(&self, user_id: usize) -> UserRole;
+    #[storage_mapper("user_role")]
+    fn user_id_to_role(&self, user_id: usize) -> SingleValueMapper<UserRole>;
 
-    #[storage_set("user_role")]
-    fn set_user_id_to_role(&self, user_id: usize, user_role: UserRole);
+    fn get_caller_id_and_role(&self) -> (usize, UserRole) {
+        let caller_address = self.blockchain().get_caller();
+        let caller_id = self.user_mapper().get_user_id(&caller_address);
+        let caller_role = self.user_id_to_role(caller_id).get();
+        (caller_id, caller_role)
+    }
 
     /// Denormalized board member count.
     /// It is kept in sync with the user list by the contract.
@@ -30,6 +34,28 @@ pub trait MultisigStateModule {
     #[view(getNumProposers)]
     #[storage_mapper("num_proposers")]
     fn num_proposers(&self) -> SingleValueMapper<usize>;
+
+    fn add_multiple_board_members(
+        &self,
+        new_board_members: ManagedVec<ManagedAddress>,
+    ) -> SCResult<usize> {
+        let mut duplicates = false;
+        self.user_mapper().get_or_create_users(
+            new_board_members.into_iter(),
+            |user_id, new_user| {
+                if !new_user {
+                    duplicates = true;
+                }
+                self.user_id_to_role(user_id).set(&UserRole::BoardMember);
+            },
+        );
+        require!(!duplicates, "duplicate board member");
+
+        let num_board_members_mapper = self.num_board_members();
+        let new_num_board_members = num_board_members_mapper.get() + new_board_members.len();
+        num_board_members_mapper.set(&new_num_board_members);
+        Ok(new_num_board_members)
+    }
 
     #[storage_mapper("action_data")]
     fn action_mapper(&self) -> VecMapper<Action<Self::Api>>;
@@ -48,7 +74,7 @@ pub trait MultisigStateModule {
     }
 
     #[storage_mapper("action_signer_ids")]
-    fn action_signer_ids(&self, action_id: usize) -> SetMapper<usize>;
+    fn action_signer_ids(&self, action_id: usize) -> UnorderedSetMapper<usize>;
 
     /// Gets addresses of all users who signed an action.
     /// Does not check if those users are still board members or not,
@@ -85,7 +111,7 @@ pub trait MultisigStateModule {
         signer_ids
             .iter()
             .filter(|signer_id| {
-                let signer_role = self.get_user_id_to_role(*signer_id);
+                let signer_role = self.user_id_to_role(*signer_id).get();
                 signer_role.can_sign()
             })
             .count()
