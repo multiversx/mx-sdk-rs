@@ -1,4 +1,4 @@
-use crate::action::Action;
+use crate::action::{Action, CallActionData};
 
 elrond_wasm::imports!();
 
@@ -47,50 +47,56 @@ pub trait MultisigProposeModule: crate::multisig_state::MultisigStateModule {
         self.propose_action(Action::ChangeQuorum(new_quorum))
     }
 
-    /// Propose a transaction in which the contract can send EGLD
-    /// and optionally execute a contract endpoint or builtin function.
-    #[endpoint(proposeSendEgld)]
-    fn propose_send_egld(
+    fn prepare_call_data(
         &self,
         to: ManagedAddress,
-        amount: BigUint,
-        #[var_args] opt_function: OptionalArg<ManagedBuffer>,
-        #[var_args] arguments: ManagedVarArgs<ManagedBuffer>,
-    ) -> SCResult<usize> {
+        egld_amount: BigUint,
+        opt_function: OptionalArg<ManagedBuffer>,
+        arguments: ManagedVarArgs<ManagedBuffer>,
+    ) -> CallActionData<Self::Api> {
         let endpoint_name = match opt_function {
             OptionalArg::Some(data) => data,
             OptionalArg::None => ManagedBuffer::new(),
         };
-        self.propose_action(Action::SendEGLD {
+        CallActionData {
             to,
-            amount,
+            egld_amount,
             endpoint_name,
             arguments: arguments.into_vec_of_buffers(),
-        })
+        }
     }
 
-    #[endpoint(proposeSendEsdt)]
-    fn propose_send_esdt(
+    /// Propose a transaction in which the contract will perform a transfer-execute call.
+    /// Can send EGLD without calling anything.
+    /// Can call smart contract endpoints directly.
+    /// Doesn't really work with builtin functions.
+    #[endpoint(proposeTransferExecute)]
+    fn propose_transfer_execute(
         &self,
         to: ManagedAddress,
-        esdt_payment_args: ManagedCountedVarArgs<EsdtTokenPaymentMultiArg<Self::Api>>,
+        egld_amount: BigUint,
         #[var_args] opt_function: OptionalArg<ManagedBuffer>,
         #[var_args] arguments: ManagedVarArgs<ManagedBuffer>,
     ) -> SCResult<usize> {
-        let mut esdt_payments_vec = ManagedVec::new();
-        for payment_args in esdt_payment_args.into_vec().into_iter() {
-            esdt_payments_vec.push(payment_args.into_esdt_token_payment());
-        }
-        let endpoint_name = match opt_function {
-            OptionalArg::Some(data) => data,
-            OptionalArg::None => ManagedBuffer::new(),
-        };
-        self.propose_action(Action::SendESDT {
-            to,
-            esdt_payments: esdt_payments_vec,
-            endpoint_name,
-            arguments: arguments.into_vec_of_buffers(),
-        })
+        let call_data = self.prepare_call_data(to, egld_amount, opt_function, arguments);
+        self.propose_action(Action::SendTransferExecute(call_data))
+    }
+
+    /// Propose a transaction in which the contract will perform a transfer-execute call.
+    /// Can call smart contract endpoints directly.
+    /// Can use ESDTTransfer/ESDTNFTTransfer/MultiESDTTransfer to send tokens, while also optionally calling endpoints.
+    /// Works well with builtin functions.
+    /// Cannot simply send EGLD directly without calling anything.
+    #[endpoint(proposeAsyncCall)]
+    fn propose_async_call(
+        &self,
+        to: ManagedAddress,
+        egld_amount: BigUint,
+        #[var_args] opt_function: OptionalArg<ManagedBuffer>,
+        #[var_args] arguments: ManagedVarArgs<ManagedBuffer>,
+    ) -> SCResult<usize> {
+        let call_data = self.prepare_call_data(to, egld_amount, opt_function, arguments);
+        self.propose_action(Action::SendAsyncCall(call_data))
     }
 
     #[endpoint(proposeSCDeployFromSource)]

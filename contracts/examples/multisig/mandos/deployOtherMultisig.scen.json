@@ -1,5 +1,4 @@
 {
-    "gasSchedule": "v4",
     "steps": [
         {
             "step": "externalSteps",

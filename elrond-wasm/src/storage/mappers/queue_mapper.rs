@@ -4,7 +4,7 @@ use crate::{
     api::{EndpointFinishApi, ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi},
     io::EndpointResult,
     storage::{storage_get, storage_set, StorageKey},
-    types::{BoxedBytes, MultiResultVec},
+    types::MultiResultVec,
 };
 use alloc::vec::Vec;
 use core::marker::PhantomData;
@@ -151,7 +151,7 @@ where
         storage_set(
             self.api.clone(),
             &self.build_node_id_named_key(NODE_IDENTIFIER, node_id),
-            &BoxedBytes::empty(),
+            &(),
         );
     }
 
@@ -181,7 +181,7 @@ where
         storage_set(
             self.api.clone(),
             &self.build_node_id_named_key(VALUE_IDENTIFIER, node_id),
-            &BoxedBytes::empty(),
+            &(),
         )
     }
 
