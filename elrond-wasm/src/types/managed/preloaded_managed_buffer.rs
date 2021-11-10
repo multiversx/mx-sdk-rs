@@ -1,6 +1,6 @@
 use crate::{
     api::{InvalidSliceError, ManagedTypeApi},
-    types::BoxedBytes,
+    types::StaticBufferRef,
 };
 
 use super::{ManagedBuffer, ManagedType};
@@ -11,7 +11,7 @@ where
 {
     pub managed_buffer: ManagedBuffer<M>,
     pub buffer_len: usize,
-    local_buffer: BoxedBytes,
+    static_cache: Option<StaticBufferRef>,
 }
 
 impl<M> PreloadedManagedBuffer<M>
@@ -20,46 +20,35 @@ where
 {
     pub fn new(managed_buffer: ManagedBuffer<M>) -> Self {
         let buffer_len = managed_buffer.len();
-        let mut local_buffer = BoxedBytes::zeros(buffer_len);
-        if managed_buffer
-            .load_slice(0, local_buffer.as_mut_slice())
-            .is_err()
-        {
-            managed_buffer.api.signal_error(b"preload buffer error");
-        }
         Self {
             managed_buffer,
             buffer_len,
-            local_buffer,
+            static_cache: None,
         }
     }
 
-    fn get_slice<'a>(
-        &self,
-        buffer: &'a [u8],
-        starting_position: usize,
-        slice_len: usize,
-    ) -> Result<&'a [u8], InvalidSliceError> {
-        if starting_position + slice_len <= self.buffer_len {
-            Ok(&buffer[starting_position..starting_position + slice_len])
-        } else {
-            Err(InvalidSliceError)
+    fn try_load_static_cache_if_necessary(&mut self) {
+        if self.static_cache.is_some() {
+            return;
         }
+        self.static_cache =
+            StaticBufferRef::try_new_from_copy_bytes(self.buffer_len, |dest_slice| {
+                let _ = self.managed_buffer.load_slice(0, dest_slice);
+            });
     }
 
-    #[inline]
     pub fn load_slice(
-        &self,
+        &mut self,
         starting_position: usize,
         dest_slice: &mut [u8],
     ) -> Result<(), InvalidSliceError> {
-        let slice = self.get_slice(
-            self.local_buffer.as_slice(),
-            starting_position,
-            dest_slice.len(),
-        )?;
-        dest_slice.copy_from_slice(slice);
-        Ok(())
+        self.try_load_static_cache_if_necessary();
+        if let Some(static_cache) = &self.static_cache {
+            static_cache.load_slice(starting_position, dest_slice)
+        } else {
+            self.managed_buffer
+                .load_slice(starting_position, dest_slice)
+        }
     }
 
     pub fn copy_slice(
@@ -67,11 +56,7 @@ where
         starting_position: usize,
         slice_len: usize,
     ) -> Option<ManagedBuffer<M>> {
-        let type_manager = self.managed_buffer.type_manager();
-        let slice = self
-            .get_slice(self.local_buffer.as_slice(), starting_position, slice_len)
-            .ok()?;
-        Some(ManagedBuffer::new_from_bytes(type_manager, slice))
+        self.managed_buffer.copy_slice(starting_position, slice_len)
     }
 
     pub fn type_manager(&self) -> M {
