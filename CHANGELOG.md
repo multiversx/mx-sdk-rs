@@ -4,6 +4,9 @@ There are several crates in this repo, this changelog will keep track of all of 
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [elrond-wasm 0.22.3] - 2021-11-10
+- Memory allocation optimisations.
+
 ## [elrond-wasm 0.22.2] - 2021-11-06
 - Callback endpoint automatically created empty for contracts that have no callbacks. This is determined by the `meta` crate, based on the ABI of the contract and its modules.
 - `UnorderedSetMapper`
