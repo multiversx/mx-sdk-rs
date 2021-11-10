@@ -1,4 +1,8 @@
-use crate::{*, api::{ErrorApi, ManagedTypeApi, StorageWriteApi}, types::{BigInt, BigUint, ManagedBuffer, ManagedInto, ManagedType}};
+use crate::{
+    api::{ErrorApi, ManagedTypeApi, StorageWriteApi},
+    err_msg,
+    types::{BigInt, BigUint, ManagedBuffer, ManagedInto, ManagedType},
+};
 use elrond_codec::*;
 
 use super::StorageKey;
