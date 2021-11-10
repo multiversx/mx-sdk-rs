@@ -1,5 +1,4 @@
 {
-    "gasSchedule": "v3",
     "steps": [
         {
             "step": "externalSteps",
@@ -21,7 +20,7 @@
                     "1",
                     "address:alice"
                 ],
-                "gasLimit": "200,000,000",
+                "gasLimit": "20,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -86,7 +85,7 @@
                 "arguments": [
                     "5"
                 ],
-                "gasLimit": "90,000,000",
+                "gasLimit": "70,000,000",
                 "gasPrice": "0"
             },
             "expect": {
