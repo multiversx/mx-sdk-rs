@@ -104,6 +104,8 @@ members = [
   "contracts/feature-tests/panic-message-features/meta",
   "contracts/feature-tests/payable-features",
   "contracts/feature-tests/payable-features/meta",
+  "contracts/feature-tests/rust-testing-framework-tester",
+  "contracts/feature-tests/rust-testing-framework-tester/meta",
   "contracts/feature-tests/use-module",
   "contracts/feature-tests/use-module/meta",
 

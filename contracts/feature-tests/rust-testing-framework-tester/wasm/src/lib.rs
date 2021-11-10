@@ -1,0 +1,16 @@
+////////////////////////////////////////////////////
+////////////////// AUTO-GENERATED //////////////////
+////////////////////////////////////////////////////
+
+#![no_std]
+
+elrond_wasm_node::wasm_endpoints! {
+    rust_testing_framework_tester
+    (
+        init
+        add
+        getSum
+    )
+}
+
+elrond_wasm_node::wasm_empty_callback! {}
