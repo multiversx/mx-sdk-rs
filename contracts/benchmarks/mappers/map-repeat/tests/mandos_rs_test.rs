@@ -12,6 +12,11 @@ fn world() -> BlockchainMock {
 }
 
 #[test]
-fn map_repeat_mandos_rs() {
+fn map_repeat_struct_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/map_repeat_struct.scen.json", world());
+}
+
+#[test]
+fn map_repeat_rs() {
     elrond_wasm_debug::mandos_rs("mandos/map_repeat.scen.json", world());
 }
