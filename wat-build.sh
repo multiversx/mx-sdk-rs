@@ -6,7 +6,6 @@ CONTRACT_PATH=$1
 
 CONTRACT_NAME=${CONTRACT_PATH##*/}
 
-
 rm -f ${CONTRACT_PATH}/output/${CONTRACT_NAME}.wasm
 rm -f ${CONTRACT_PATH}/output/${CONTRACT_NAME}-dbg.wasm
 rm -f ${CONTRACT_PATH}/output/${CONTRACT_NAME}-dbg.c

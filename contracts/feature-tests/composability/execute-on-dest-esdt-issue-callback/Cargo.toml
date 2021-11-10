@@ -16,9 +16,9 @@ path = "parent"
 path = "child"
 
 [dependencies.elrond-wasm]
-version = "0.22.2"
+version = "0.22.3"
 path = "../../../elrond-wasm"
 
 [dev-dependencies.elrond-wasm-debug]
-version = "0.22.2"
+version = "0.22.3"
 path = "../../../elrond-wasm-debug"
