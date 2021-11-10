@@ -5,7 +5,7 @@ use crate::{
     api::{EndpointFinishApi, ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi},
     io::EndpointResult,
     storage::{storage_get, storage_set, StorageKey},
-    types::{BoxedBytes, MultiResultVec},
+    types::MultiResultVec,
 };
 use alloc::vec::Vec;
 use elrond_codec::{NestedDecode, NestedEncode, TopDecode, TopEncode};
@@ -81,7 +81,7 @@ where
         storage_set(
             self.api.clone(),
             &self.build_named_value_key(NODE_ID_IDENTIFIER, value),
-            &BoxedBytes::empty(),
+            &(),
         );
     }
 
