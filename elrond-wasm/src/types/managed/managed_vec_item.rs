@@ -48,7 +48,9 @@ macro_rules! impl_int {
 }
 
 impl_int! {u32, 4}
+impl_int! {u64, 8}
 impl_int! {i32, 4}
+impl_int! {i64, 8}
 
 impl<M: ManagedTypeApi> ManagedVecItem<M> for usize {
     const PAYLOAD_SIZE: usize = 4;
