@@ -54,7 +54,7 @@ impl_int! {i64, 8}
 
 impl<M: ManagedTypeApi> ManagedVecItem<M> for usize {
     const PAYLOAD_SIZE: usize = 4;
-    const SKIPS_RESERIALIZATION: bool = false;
+    const SKIPS_RESERIALIZATION: bool = true;
 
     fn from_byte_reader<Reader: FnMut(&mut [u8])>(_api: M, mut reader: Reader) -> Self {
         let mut arr: [u8; 4] = [0u8; 4];
