@@ -2,7 +2,7 @@ use super::{ManagedVec, ManagedVecItem};
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer},
     api::{EndpointFinishApi, ManagedTypeApi},
-    ArgId, ContractCallArg, DynArg, DynArgInput, DynArgOutput, EndpointResult,
+    finish_all, ArgId, ContractCallArg, DynArg, DynArgInput, DynArgOutput, EndpointResult,
 };
 use alloc::string::String;
 
@@ -104,9 +104,7 @@ where
         FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static,
     {
         self.len().finish(api.clone());
-        for item in self.contents.iter() {
-            item.finish(api.clone());
-        }
+        finish_all(api, self.contents.iter());
     }
 }
 
