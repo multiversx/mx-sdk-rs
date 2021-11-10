@@ -90,18 +90,17 @@ impl<M: ManagedTypeApi> ManagedVecItem<M> for EsdtTokenPayment<M> {
     fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, mut writer: Writer) -> R {
         let mut arr: [u8; 16] = [0u8; 16];
 
-        let token_id_handle_raw = self
-            .token_identifier
-            .as_managed_buffer()
-            .get_raw_handle()
-            .to_be_bytes();
-        arr[0..4].copy_from_slice(&token_id_handle_raw[..]);
+        ManagedVecItem::<M>::to_byte_writer(&self.token_identifier, |bytes| {
+            arr[0..TokenIdentifier::<M>::PAYLOAD_SIZE].copy_from_slice(bytes);
+        });
 
-        let nonce_raw = self.token_nonce.to_be_bytes();
-        arr[4..12].copy_from_slice(&nonce_raw[..]);
+        ManagedVecItem::<M>::to_byte_writer(&self.token_nonce, |bytes| {
+            arr[4..12].copy_from_slice(bytes);
+        });
 
-        let amount_handle_raw = self.amount.get_raw_handle().to_be_bytes();
-        arr[12..16].copy_from_slice(&amount_handle_raw[..]);
+        ManagedVecItem::<M>::to_byte_writer(&self.amount, |bytes| {
+            arr[12..16].copy_from_slice(bytes);
+        });
 
         writer(&arr[..])
     }
