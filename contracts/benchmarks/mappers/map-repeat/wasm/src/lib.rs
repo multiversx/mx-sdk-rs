@@ -9,8 +9,11 @@ elrond_wasm_node::wasm_endpoints! {
     (
         init
         add
+        add_struct
         count
+        count_struct
         remove
+        remove_struct
     )
 }
 
