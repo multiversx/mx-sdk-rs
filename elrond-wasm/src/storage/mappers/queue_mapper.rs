@@ -2,6 +2,7 @@ use super::{StorageClearable, StorageMapper};
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
     api::{EndpointFinishApi, ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi},
+    finish_all,
     io::EndpointResult,
     storage::{storage_get, storage_set, StorageKey},
     types::MultiResultVec,
@@ -463,8 +464,7 @@ where
     where
         FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static,
     {
-        let v: Vec<T> = self.iter().collect();
-        MultiResultVec::<T>::from(v).finish(api);
+        finish_all(api, self.iter());
     }
 }
 
