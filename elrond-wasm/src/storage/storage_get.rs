@@ -39,6 +39,12 @@ where
     fn to_big_int(&self) -> BigInt<A> {
         BigInt::from_signed_bytes_be_buffer(&self.to_managed_buffer())
     }
+
+    fn load_len_managed_buffer(&self) -> usize {
+        self.api.storage_load_managed_buffer_len(
+            self.key.buffer.get_raw_handle()
+        )
+    }
 }
 
 impl<'k, A> TopDecodeInput for StorageGetInput<'k, A>
@@ -48,8 +54,7 @@ where
     type NestedBuffer = ManagedBufferNestedDecodeInput<A>;
 
     fn byte_len(&self) -> usize {
-        let key_bytes = self.key.to_boxed_bytes();
-        self.api.storage_load_len(key_bytes.as_slice())
+        self.load_len_managed_buffer()
     }
 
     fn into_boxed_slice_u8(self) -> Box<[u8]> {
@@ -60,8 +65,12 @@ where
     }
 
     fn into_u64(self) -> u64 {
-        let key_bytes = self.key.to_boxed_bytes();
-        self.api.storage_load_u64(key_bytes.as_slice())
+        let mb = self.to_managed_buffer();
+        if let Some(num) = mb.parse_as_u64() {
+            num
+        } else {
+            storage_get_exit(self.api, DecodeError::INPUT_TOO_LONG)
+        }
     }
 
     fn into_i64(self) -> i64 {
