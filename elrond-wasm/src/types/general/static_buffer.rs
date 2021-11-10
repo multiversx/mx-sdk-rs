@@ -15,9 +15,7 @@ impl StaticBufferRef {
         copy_bytes: F,
     ) -> Option<Self> {
         unsafe {
-            if LOCKED {
-                None
-            } else if len > BUFFER_SIZE {
+            if LOCKED || len > BUFFER_SIZE {
                 None
             } else {
                 LOCKED = true;
@@ -34,6 +32,10 @@ impl StaticBufferRef {
 
     pub fn len(&self) -> usize {
         unsafe { USED_SIZE }
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
     }
 
     pub fn capacity(&self) -> usize {
