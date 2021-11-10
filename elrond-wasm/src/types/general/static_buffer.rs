@@ -1,6 +1,6 @@
 use crate::api::InvalidSliceError;
 
-const BUFFER_SIZE: usize = 1000;
+const BUFFER_SIZE: usize = 10000;
 
 static mut BUFFER: [u8; BUFFER_SIZE] = [0; BUFFER_SIZE];
 
