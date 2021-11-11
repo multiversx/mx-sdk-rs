@@ -16,10 +16,10 @@ pub trait ManagedVecItem<M: ManagedTypeApi> {
     /// Size of the data stored in the underlying `ManagedBuffer`.
     const PAYLOAD_SIZE: usize;
 
-    /// If false, then the encoding of the item is identical to the payload,
+    /// If true, then the encoding of the item is identical to the payload,
     /// and no further conversion is necessary
     /// (the underlying buffer can be used as-is during serialization).
-    /// True for all managed types, but false for basic types (like `u32`).
+    /// False for all managed types, but true for basic types (like `u32`).
     const SKIPS_RESERIALIZATION: bool;
 
     fn from_byte_reader<Reader: FnMut(&mut [u8])>(api: M, reader: Reader) -> Self;
