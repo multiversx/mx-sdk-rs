@@ -22,7 +22,7 @@ pub struct ManagedStructWithToken<M: ManagedTypeApi> {
 fn struct_with_numbers_static() {
     assert_eq!(
         <ManagedStructWithToken<DebugApi> as elrond_wasm::types::ManagedVecItem<DebugApi>>::PAYLOAD_SIZE,
-        8
+        20
     );
     assert!(
         !<ManagedStructWithToken<DebugApi> as elrond_wasm::types::ManagedVecItem<DebugApi>>::SKIPS_RESERIALIZATION
@@ -38,6 +38,7 @@ fn struct_to_bytes_writer() {
                 &b"MYTOKEN-12345"[..],
             ),
             token_nonce: 0u64,
+            token_type: elrond_wasm::types::EsdtTokenType::Fungible,
             amount: BigUint::managed_from(DebugApi::dummy(), 42u64),
         },
         num: 0x12345,
@@ -65,11 +66,15 @@ fn struct_from_bytes_reader() {
                 &b"MYTOKEN-12345"[..],
             ),
             token_nonce: 0u64,
+            token_type: elrond_wasm::types::EsdtTokenType::Fungible,
             amount: BigUint::managed_from(DebugApi::dummy(), 42u64),
         },
         num: 0x12345,
     };
-    let arr: [u8; 8] = [0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x23, 0x45];
+    let arr: [u8; 20] = [
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x01, 0x23, 0x45,
+    ];
 
     let struct_from_bytes = <ManagedStructWithToken<DebugApi> as elrond_wasm::types::ManagedVecItem<
         DebugApi,
