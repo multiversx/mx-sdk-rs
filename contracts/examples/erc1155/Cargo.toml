@@ -12,9 +12,9 @@ path = "src/erc1155.rs"
 path="../erc1155-user-mock"
 
 [dependencies.elrond-wasm]
-version = "0.22.3"
+version = "0.22.4"
 path = "../../../elrond-wasm"
 
 [dev-dependencies.elrond-wasm-debug]
-version = "0.22.3"
+version = "0.22.4"
 path = "../../../elrond-wasm-debug"
