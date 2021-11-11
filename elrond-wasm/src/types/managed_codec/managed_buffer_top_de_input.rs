@@ -22,6 +22,15 @@ where
         self.to_boxed_bytes().into_box()
     }
 
+    fn into_u64(self) -> u64 {
+        if let Some(num) = self.parse_as_u64() {
+            num
+        } else {
+            self.api
+                .signal_error(DecodeError::INPUT_TOO_LONG.message_bytes())
+        }
+    }
+
     fn into_specialized<T, F>(self, else_deser: F) -> Result<T, DecodeError>
     where
         T: TryStaticCast,
