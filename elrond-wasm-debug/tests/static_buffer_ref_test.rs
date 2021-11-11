@@ -35,27 +35,27 @@ fn test_extend_past_buffer_limits() {
     assert!(!s.try_extend_from_slice(&[44; 1]));
 }
 
-fn new_should_fail() {
-    let buffer_option = new_static_buffer(b"test");
+fn new_should_fail(api: DebugApi) {
+    let buffer_option = StaticBufferRef::try_new(api, b"test");
     assert!(buffer_option.is_none());
 }
 
-fn new_should_succeed() {
-    let buffer_option = new_static_buffer(b"test");
+fn new_should_succeed(api: DebugApi) {
+    let buffer_option = StaticBufferRef::try_new(api, b"test");
     assert!(buffer_option.is_some());
 }
 
 #[test]
 fn test_lock_2() {
     let api = DebugApi::dummy();
-    let buffer_option = StaticBufferRef::try_new(api, b"locking_test");
-    new_should_fail();
+    let buffer_option = StaticBufferRef::try_new(api.clone(), b"locking_test");
+    new_should_fail(api.clone());
     assert!(buffer_option.is_some());
     let s1_buffer = buffer_option.unwrap();
-    new_should_fail();
+    new_should_fail(api.clone());
     assert!(s1_buffer.contents_eq(b"locking_test"));
-    new_should_fail();
+    new_should_fail(api.clone());
     drop(s1_buffer);
-    new_should_succeed();
-    new_should_succeed();
+    new_should_succeed(api.clone());
+    new_should_succeed(api);
 }
