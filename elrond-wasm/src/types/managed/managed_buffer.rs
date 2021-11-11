@@ -171,10 +171,14 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
         const U64_NUM_BYTES: usize = 8;
         let l = self.len();
         if l > U64_NUM_BYTES {
-            return None
+            return None;
         }
         let mut bytes = [0u8; U64_NUM_BYTES];
-        if let Err(_) = self.api.mb_load_slice(self.handle, 0, &mut bytes[U64_NUM_BYTES-l..]) {
+        if self
+            .api
+            .mb_load_slice(self.handle, 0, &mut bytes[U64_NUM_BYTES - l..])
+            .is_err()
+        {
             None
         } else {
             Some(u64::from_be_bytes(bytes))
