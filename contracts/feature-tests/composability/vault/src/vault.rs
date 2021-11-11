@@ -43,7 +43,9 @@ pub trait Vault {
         #[payment_nonce] nonce: u64,
         #[payment_amount] payment: BigUint,
     ) {
-        self.accept_funds_event(&token, &payment, nonce);
+        let token_type = self.call_value().esdt_token_type();
+
+        self.accept_funds_event(&token, token_type.as_type_name(), &payment, nonce);
 
         self.call_counts(b"accept_funds").update(|c| *c += 1);
     }
@@ -56,6 +58,7 @@ pub trait Vault {
         for payment in payments.into_iter() {
             self.accept_funds_event(
                 &payment.token_identifier,
+                payment.token_type.as_type_name(),
                 &payment.amount,
                 payment.token_nonce,
             );
@@ -95,7 +98,12 @@ pub trait Vault {
     ) -> SCResult<MultiResult4<TokenIdentifier, BoxedBytes, BigUint, u64>> {
         let token_type = self.call_value().esdt_token_type();
 
-        self.accept_funds_event(&token_identifier, &token_payment, token_nonce);
+        self.accept_funds_event(
+            &token_identifier,
+            token_type.as_type_name(),
+            &token_payment,
+            token_nonce,
+        );
 
         self.call_counts(b"accept_funds_echo_payment")
             .update(|c| *c += 1);
@@ -159,6 +167,7 @@ pub trait Vault {
                 token_identifier: token_id,
                 token_nonce: nonce,
                 amount,
+                token_type: EsdtTokenType::Invalid,
             });
         }
 
@@ -201,6 +210,7 @@ pub trait Vault {
                 token_identifier: payment.token_identifier,
                 token_nonce: new_token_nonce,
                 amount: payment.amount,
+                token_type: EsdtTokenType::Invalid, // ignored
             });
         }
 
@@ -216,6 +226,7 @@ pub trait Vault {
     fn accept_funds_event(
         &self,
         #[indexed] token_identifier: &TokenIdentifier,
+        #[indexed] token_type: &[u8],
         #[indexed] token_payment: &BigUint,
         #[indexed] token_nonce: u64,
     );
