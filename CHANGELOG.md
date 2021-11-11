@@ -4,6 +4,10 @@ There are several crates in this repo, this changelog will keep track of all of 
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [elrond-wasm 0.22.6] - 2021-11-11
+- Optimized decode u64 from `ManagedBuffer`
+- `ManagedVecItem` in `derive_imports`
+
 ## [elrond-wasm 0.22.5] - 2021-11-11
 - Implemented `ManagedVecItem` for `bool`.
 - Substitution for `ManagedMultiResultVec::new()`.

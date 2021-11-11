@@ -1,12 +1,7 @@
-use elrond_wasm::{
-    derive::ManagedVecItem,
-    elrond_codec,
-    elrond_codec::{
-        elrond_codec_derive::{NestedDecode, NestedEncode, TopDecode, TopEncode},
-        test_util::{check_dep_encode_decode, check_top_encode_decode},
-    },
-};
+use elrond_wasm::elrond_codec::test_util::{check_dep_encode_decode, check_top_encode_decode};
 use elrond_wasm_debug::DebugApi;
+
+elrond_wasm::derive_imports!();
 
 // to test, run the following command in elrond-wasm-debug folder:
 // cargo expand --test derive_managed_vec_item_numbers_test > expanded.rs
