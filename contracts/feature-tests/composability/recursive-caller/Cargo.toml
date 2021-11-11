@@ -12,15 +12,15 @@ path = "src/recursive_caller.rs"
 path = "../vault"
 
 [dependencies.elrond-wasm]
-version = "0.22.4"
+version = "0.22.5"
 path = "../../../../elrond-wasm"
 features = ["cb_closure_managed_deser"]
 
 [dependencies.elrond-wasm-node]
-version = "0.22.4"
+version = "0.22.5"
 path = "../../../../elrond-wasm-node"
 optional = true
 
 [dev-dependencies.elrond-wasm-debug]
-version = "0.22.4"
+version = "0.22.5"
 path = "../../../../elrond-wasm-debug"
