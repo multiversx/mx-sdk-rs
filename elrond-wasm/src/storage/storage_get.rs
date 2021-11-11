@@ -41,9 +41,8 @@ where
     }
 
     fn load_len_managed_buffer(&self) -> usize {
-        self.api.storage_load_managed_buffer_len(
-            self.key.buffer.get_raw_handle()
-        )
+        self.api
+            .storage_load_managed_buffer_len(self.key.buffer.get_raw_handle())
     }
 }
 
