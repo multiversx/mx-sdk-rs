@@ -44,7 +44,9 @@ where
         let old_static_cache = core::mem::replace(&mut self.static_cache, None);
         if let Some(_static_cache) = &old_static_cache {
             // TODO: encapsulate
-            self.managed_buffer.type_manager().mb_append_entire_static_buffer(self.managed_buffer.get_raw_handle());
+            self.managed_buffer
+                .type_manager()
+                .append_static_buffer_to_mb(self.managed_buffer.get_raw_handle());
         }
     }
 
@@ -60,23 +62,19 @@ where
     }
 
     pub fn append_managed_buffer(&mut self, item: &ManagedBuffer<M>) {
-        if let Some(static_cache) = &mut self.static_cache {
-            if !Self::try_append_managed_buffer_to_static_buffer(static_cache, item) {
+        if let Some(_static_cache) = &mut self.static_cache {
+            // TODO: encapsulate
+            if !self
+                .managed_buffer
+                .type_manager()
+                .append_mb_to_static_buffer(item.get_raw_handle())
+            {
                 self.flush_to_managed_buffer();
                 self.managed_buffer.append(item);
             }
         } else {
             self.managed_buffer.append(item);
         }
-    }
-
-    fn try_append_managed_buffer_to_static_buffer(
-        static_cache: &mut StaticBufferRef<M>,
-        mb: &ManagedBuffer<M>,
-    ) -> bool {
-        static_cache.try_extend_from_copy_bytes(mb.len(), |dest_slice| {
-            let _ = mb.load_slice(0, dest_slice);
-        })
     }
 
     #[inline]

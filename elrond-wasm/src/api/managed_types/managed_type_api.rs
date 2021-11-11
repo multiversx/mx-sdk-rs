@@ -33,7 +33,16 @@ pub trait ManagedTypeApi:
         })
     }
 
-    fn mb_append_entire_static_buffer(&self, buffer_handle: Handle) {
+    fn append_mb_to_static_buffer(&self, buffer_handle: Handle) -> bool {
+        self.with_lockable_static_buffer(|lsb| {
+            let len = self.mb_len(buffer_handle);
+            lsb.try_extend_from_copy_bytes(len, |dest| {
+                let _ = self.mb_load_slice(buffer_handle, 0, dest);
+            })
+        })
+    }
+
+    fn append_static_buffer_to_mb(&self, buffer_handle: Handle) {
         self.with_lockable_static_buffer(|lsb| {
             self.mb_append_bytes(buffer_handle, lsb.as_slice());
         });
