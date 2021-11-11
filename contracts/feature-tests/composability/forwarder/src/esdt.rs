@@ -83,7 +83,6 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
                 token_identifier,
                 token_nonce,
                 amount,
-                token_type: EsdtTokenType::Invalid, // not used
             };
 
             all_token_payments.push(payment);
