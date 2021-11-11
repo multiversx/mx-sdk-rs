@@ -19,13 +19,14 @@ pub struct StructWithNumbers {
     pub u_16: u16,
     pub u_32: u32,
     pub u_64: u64,
+    pub bool_field: bool,
 }
 
 #[test]
 fn struct_with_numbers_static() {
     assert_eq!(
         <StructWithNumbers as elrond_wasm::types::ManagedVecItem<DebugApi>>::PAYLOAD_SIZE,
-        15
+        16
     );
     assert!(
         <StructWithNumbers as elrond_wasm::types::ManagedVecItem<DebugApi>>::SKIPS_RESERIALIZATION
@@ -39,6 +40,7 @@ fn struct_named_fields_test() {
         u_16: 2u16,
         u_32: 3u32,
         u_64: 4u64,
+        bool_field: true,
     };
 
     #[rustfmt::skip]
@@ -47,6 +49,7 @@ fn struct_named_fields_test() {
 		/* u_16 */ 0x00, 0x02,
 		/* u_32 */ 0x00, 0x00, 0x00, 0x03,
 		/* u_64 */ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04,
+		/* bool */ 0x01,
 	];
 
     check_top_encode_decode(s.clone(), bytes_1);
@@ -60,8 +63,9 @@ fn struct_to_bytes_writer() {
         u_16: 2u16,
         u_32: 3u32,
         u_64: 4u64,
+        bool_field: true,
     };
-    let mut arr: [u8; 15] =
+    let mut arr: [u8; 16] =
         [0u8; <StructWithNumbers as elrond_wasm::types::ManagedVecItem<DebugApi>>::PAYLOAD_SIZE];
 
     <StructWithNumbers as elrond_wasm::types::ManagedVecItem<DebugApi>>::to_byte_writer(
@@ -72,7 +76,7 @@ fn struct_to_bytes_writer() {
                 arr,
                 [
                     0x01, 0x00, 0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                    0x00, 0x04
+                    0x00, 0x04, 0x01,
                 ]
             );
         },
@@ -86,9 +90,11 @@ fn struct_from_bytes_reader() {
         u_16: 2u16,
         u_32: 3u32,
         u_64: 4u64,
+        bool_field: false,
     };
-    let arr: [u8; 15] = [
+    let arr: [u8; 16] = [
         0x01, 0x00, 0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04,
+        0x00,
     ];
 
     let struct_from_bytes =

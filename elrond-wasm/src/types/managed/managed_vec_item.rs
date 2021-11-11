@@ -69,6 +69,20 @@ impl<M: ManagedTypeApi> ManagedVecItem<M> for usize {
     }
 }
 
+impl<M: ManagedTypeApi> ManagedVecItem<M> for bool {
+    const PAYLOAD_SIZE: usize = 1;
+    const SKIPS_RESERIALIZATION: bool = true;
+
+    fn from_byte_reader<Reader: FnMut(&mut [u8])>(api: M, reader: Reader) -> Self {
+        u8::from_byte_reader(api, reader) > 0
+    }
+
+    fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, writer: Writer) -> R {
+        let u8_value = if *self { 1u8 } else { 0u8 };
+        <u8 as ManagedVecItem<M>>::to_byte_writer(&u8_value, writer)
+    }
+}
+
 macro_rules! impl_managed_type {
     ($ty:ident) => {
         impl<M: ManagedTypeApi> ManagedVecItem<M> for $ty<M> {
