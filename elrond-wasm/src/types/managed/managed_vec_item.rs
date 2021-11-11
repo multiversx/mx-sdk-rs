@@ -46,7 +46,8 @@ macro_rules! impl_int {
         }
     };
 }
-
+impl_int! {u8, 1}
+impl_int! {u16, 2}
 impl_int! {u32, 4}
 impl_int! {u64, 8}
 impl_int! {i32, 4}
