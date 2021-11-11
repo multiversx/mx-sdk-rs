@@ -9,7 +9,7 @@ use elrond_wasm::{
 use elrond_wasm_debug::DebugApi;
 
 // to test, run the following command in elrond-wasm-debug folder:
-// cargo expand --test derive_managed_vec_item_1_test > expanded.rs
+// cargo expand --test derive_managed_vec_item_numbers_test > expanded.rs
 
 #[derive(
     ManagedVecItem, NestedEncode, NestedDecode, TopEncode, TopDecode, PartialEq, Clone, Debug,
