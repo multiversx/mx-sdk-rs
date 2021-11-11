@@ -34,11 +34,17 @@ impl ManagedTypeApi for DebugApi {
             .insert_new_handle(bi_bytes.into_vec())
     }
 
-    fn mb_to_locked_static_buffer(&self, buffer_handle: Handle) -> bool {
+    fn mb_overwrite_static_buffer(&self, buffer_handle: Handle) -> bool {
         let mut managed_types = self.m_types_borrow_mut();
         let bytes = managed_types.managed_buffer_map.get(buffer_handle).clone();
         managed_types
             .lockable_static_buffer
             .try_lock_with_copy_bytes(bytes.len(), |dest| dest.copy_from_slice(bytes.as_slice()))
+    }
+
+    fn mb_append_entire_static_buffer(&self, buffer_handle: Handle) {
+        let mut managed_types = self.m_types_borrow_mut();
+        let bytes = managed_types.lockable_static_buffer.as_slice().to_vec();
+        managed_types.managed_buffer_map.get_mut(buffer_handle).extend_from_slice(bytes.as_slice());
     }
 }
