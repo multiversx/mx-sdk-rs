@@ -89,6 +89,42 @@ impl<M: ManagedTypeApi> BigFloat<M> {
             api: big_int.api.clone(),
         }
     }
+
+    #[inline]
+    pub fn from_parts(
+        &self,
+        integral_part_value: i32,
+        fractional_part_value: i32,
+        exponent_value: i32,
+    ) -> Self {
+        let new_bf_handle =
+            self.api
+                .bf_from_parts(integral_part_value, fractional_part_value, exponent_value);
+        BigFloat {
+            handle: new_bf_handle,
+            api: self.api.clone(),
+        }
+    }
+
+    #[inline]
+    pub fn from_frac(&self, numerator_value: i64, denominator_value: i64) -> Self {
+        let new_bf_handle = self.api.bf_from_frac(numerator_value, denominator_value);
+        BigFloat {
+            handle: new_bf_handle,
+            api: self.api.clone(),
+        }
+    }
+
+    #[inline]
+    pub fn from_sci(&self, significand_value: i64, exponent_value: i32) -> Self {
+        let new_bf_handle = self
+            .api
+            .bf_from_sci(significand_value, exponent_value as i64);
+        BigFloat {
+            handle: new_bf_handle,
+            api: self.api.clone(),
+        }
+    }
 }
 
 impl<M: ManagedTypeApi> BigFloat<M> {
