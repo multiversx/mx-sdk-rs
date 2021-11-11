@@ -1,9 +1,29 @@
 use proc_macro::TokenStream;
 use quote::quote;
 
+/// Replaces every generic with `<elrond_wasm::api::uncallable::UncallableApi>` in a type, indiscriminately.
+/// A bit of a hack, but it works.
+fn type_generic_replace_with_uncallable(type_name: &syn::Type) -> syn::Type {
+    let mut replaced = type_name.clone();
+    if let syn::Type::Path(path) = &mut replaced {
+        for segment in path.path.segments.iter_mut() {
+            if let syn::PathArguments::AngleBracketed(args) = &mut segment.arguments {
+                for arg in args.args.iter_mut() {
+                    if let syn::GenericArgument::Type(gen_ty) = arg {
+                        *gen_ty =
+                            syn::parse_str("elrond_wasm::api::uncallable::UncallableApi").unwrap();
+                    }
+                }
+            }
+        }
+    }
+    replaced
+}
+
 fn type_payload_size(type_name: &syn::Type) -> proc_macro2::TokenStream {
+    let type_name_replaced = type_generic_replace_with_uncallable(type_name);
     quote! {
-        <#type_name as elrond_wasm::types::ManagedVecItem<elrond_wasm::api::uncallable::UncallableApi>>::PAYLOAD_SIZE
+        <#type_name_replaced as elrond_wasm::types::ManagedVecItem<elrond_wasm::api::uncallable::UncallableApi>>::PAYLOAD_SIZE
     }
 }
 
@@ -26,7 +46,7 @@ fn generate_skips_reserialization_snippets(fields: &syn::Fields) -> Vec<proc_mac
             .named
             .iter()
             .map(|field| {
-                let type_name = &field.ty;
+                let type_name = type_generic_replace_with_uncallable(&field.ty);
                 quote! {
                     <#type_name as elrond_wasm::types::ManagedVecItem<M>>::SKIPS_RESERIALIZATION
                 }
@@ -84,37 +104,46 @@ fn generate_to_byte_writer_snippets(fields: &syn::Fields) -> Vec<proc_macro2::To
     }
 }
 
-fn generate_array_init_snippet(fields: &syn::Fields) -> proc_macro2::TokenStream {
-    let payload_snippets = generate_payload_snippets(fields);
+fn generate_array_init_snippet(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
+    let name = &ast.ident;
+    let self_expr = if ast.generics.params.is_empty() {
+        quote! { #name }
+    } else {
+        quote! { #name <elrond_wasm::api::uncallable::UncallableApi> }
+    };
     quote! {
-        const SELF_PAYLOAD_SIZE: usize = #(#payload_snippets)+*;
+        const SELF_PAYLOAD_SIZE: usize = <#self_expr as elrond_wasm::types::ManagedVecItem<elrond_wasm::api::uncallable::UncallableApi>>::PAYLOAD_SIZE;
         let mut arr: [u8; SELF_PAYLOAD_SIZE] = [0u8; SELF_PAYLOAD_SIZE];
     }
 }
 
 pub fn managed_vec_item_derive(ast: &syn::DeriveInput) -> TokenStream {
     let name = &ast.ident;
-    // let (impl_generics, ty_generics, where_clause) = &ast.generics.split_for_impl();
-    // let (top_encode_body, top_encode_or_exit_body) = top_encode_method_bodies(ast);
+    let (original_impl_generics, ty_generics, where_clause) = &ast.generics.split_for_impl();
+    let impl_generics = if ast.generics.params.is_empty() {
+        quote! { <M: elrond_wasm::api::ManagedTypeApi> }
+    } else {
+        quote! { #original_impl_generics }
+    };
 
     let payload_snippets: Vec<proc_macro2::TokenStream>;
     let skips_reserialization_snippets: Vec<proc_macro2::TokenStream>;
     let from_byte_reader_snippets: Vec<proc_macro2::TokenStream>;
     let to_byte_writer_snippets: Vec<proc_macro2::TokenStream>;
-    let array_init_snippet: proc_macro2::TokenStream;
     if let syn::Data::Struct(data_struct) = &ast.data {
         payload_snippets = generate_payload_snippets(&data_struct.fields);
         skips_reserialization_snippets =
             generate_skips_reserialization_snippets(&data_struct.fields);
         from_byte_reader_snippets = generate_from_byte_reader_snippets(&data_struct.fields);
         to_byte_writer_snippets = generate_to_byte_writer_snippets(&data_struct.fields);
-        array_init_snippet = generate_array_init_snippet(&data_struct.fields);
     } else {
         panic!("ManagedVecItem can only be implemented for struct")
     }
 
+    let array_init_snippet = generate_array_init_snippet(ast);
+
     let gen = quote! {
-        impl <M: elrond_wasm::api::ManagedTypeApi> elrond_wasm::types::ManagedVecItem<M> for #name {
+        impl #impl_generics elrond_wasm::types::ManagedVecItem<M> for #name #ty_generics #where_clause {
             const PAYLOAD_SIZE: usize = #(#payload_snippets)+*;
             const SKIPS_RESERIALIZATION: bool = #(#skips_reserialization_snippets)&&*;
 
