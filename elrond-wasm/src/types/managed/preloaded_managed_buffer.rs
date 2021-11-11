@@ -31,8 +31,7 @@ where
         if self.static_cache.is_some() {
             return;
         }
-        self.static_cache = self.type_manager().mb_to_locked_static_buffer(&self.managed_buffer);
-            
+        self.static_cache = StaticBufferRef::try_from_managed_buffer(&self.managed_buffer);
     }
 
     pub fn load_slice(
