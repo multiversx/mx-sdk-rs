@@ -120,4 +120,36 @@ mod test {
         assert!(StaticBufferRef::try_new(b"no, locked").is_none());
         assert_eq!(s.as_slice(), b"another");
     }
+
+    #[test]
+    fn test_extend_past_buffer_limits() {
+        let mut s = StaticBufferRef::try_new(&[]).unwrap();
+        assert!(s.try_extend_from_slice(&[22; BUFFER_SIZE - 1]));
+        assert!(s.try_extend_from_slice(&[33; 1]));
+        assert!(!s.try_extend_from_slice(&[44; 1]));
+    }
+
+    fn new_should_fail() {
+        let buffer_option = StaticBufferRef::try_new(b"test");
+        assert!(buffer_option.is_none());
+    }
+
+    fn new_should_succeed() {
+        let buffer_option = StaticBufferRef::try_new(b"test");
+        assert!(buffer_option.is_some());
+    }
+
+    #[test]
+    fn test_lock_2() {
+        let buffer_option = StaticBufferRef::try_new(b"locking_test");
+        new_should_fail();
+        assert!(buffer_option.is_some());
+        let s1_buffer = buffer_option.unwrap();
+        new_should_fail();
+        assert_eq!(s1_buffer.as_slice(), b"locking_test");
+        new_should_fail();
+        drop(s1_buffer);
+        new_should_succeed();
+        new_should_succeed();
+    }
 }
