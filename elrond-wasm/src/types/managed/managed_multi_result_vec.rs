@@ -3,6 +3,7 @@ use crate::{
     abi::{TypeAbi, TypeDescriptionContainer},
     api::{EndpointFinishApi, ErrorApi, ManagedTypeApi},
     contract_base::ManagedSerializer,
+    finish_all,
     types::{ManagedArgBuffer, MultiResultVec},
     ArgId, ContractCallArg, DynArg, DynArgInput, DynArgOutput, EndpointResult,
 };
@@ -161,9 +162,7 @@ where
     where
         FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static,
     {
-        for elem in self.raw_buffers.into_iter() {
-            elem.finish(api.clone());
-        }
+        finish_all(api, self.raw_buffers.into_iter());
     }
 }
 
