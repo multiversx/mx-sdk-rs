@@ -3,7 +3,7 @@ use crate::{
     types::{BigUint, ManagedVecItem},
 };
 
-use super::TokenIdentifier;
+use super::{EsdtTokenType, TokenIdentifier};
 
 use elrond_codec::elrond_codec_derive::{NestedDecode, NestedEncode, TopDecode, TopEncode};
 
@@ -12,6 +12,7 @@ use crate::derive::TypeAbi;
 
 #[derive(TopDecode, TopEncode, NestedDecode, NestedEncode, TypeAbi, Clone, PartialEq, Debug)]
 pub struct EsdtTokenPayment<M: ManagedTypeApi> {
+    pub token_type: EsdtTokenType,
     pub token_identifier: TokenIdentifier<M>,
     pub token_nonce: u64,
     pub amount: BigUint<M>,
@@ -20,6 +21,7 @@ pub struct EsdtTokenPayment<M: ManagedTypeApi> {
 impl<M: ManagedTypeApi> EsdtTokenPayment<M> {
     pub fn no_payment(api: M) -> Self {
         EsdtTokenPayment {
+            token_type: EsdtTokenType::Invalid,
             token_identifier: TokenIdentifier::egld(api.clone()),
             token_nonce: 0,
             amount: BigUint::zero(api),
@@ -27,7 +29,20 @@ impl<M: ManagedTypeApi> EsdtTokenPayment<M> {
     }
 
     pub fn new(token_identifier: TokenIdentifier<M>, token_nonce: u64, amount: BigUint<M>) -> Self {
+        let token_type = if amount != 0 && token_identifier.is_esdt() {
+            if token_nonce == 0 {
+                EsdtTokenType::Fungible
+            } else if amount == 1u64 {
+                EsdtTokenType::NonFungible
+            } else {
+                EsdtTokenType::SemiFungible
+            }
+        } else {
+            EsdtTokenType::Invalid
+        };
+
         EsdtTokenPayment {
+            token_type,
             token_identifier,
             token_nonce,
             amount,
@@ -72,7 +87,14 @@ impl<M: ManagedTypeApi> ManagedVecItem<M> for EsdtTokenPayment<M> {
         let token_nonce = managed_vec_item_from_slice(api.clone(), &arr, &mut index);
         let amount = managed_vec_item_from_slice(api, &arr, &mut index);
 
+        let token_type = if token_nonce > 0 {
+            EsdtTokenType::SemiFungible
+        } else {
+            EsdtTokenType::Fungible
+        };
+
         EsdtTokenPayment {
+            token_type,
             token_identifier,
             token_nonce,
             amount,
