@@ -264,15 +264,15 @@ where
 {
     #[inline]
     fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
-        if T::NEEDS_RESERIALIZATION {
+        if T::SKIPS_RESERIALIZATION {
+            self.buffer.top_encode(output)
+        } else {
             let mut nested_buffer = output.start_nested_encode();
             for item in self {
                 item.dep_encode(&mut nested_buffer)?;
             }
             output.finalize_nested_encode(nested_buffer);
             Ok(())
-        } else {
-            self.buffer.top_encode(output)
         }
     }
 }
@@ -298,15 +298,15 @@ where
 {
     fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
         let buffer = ManagedBuffer::top_decode(input)?;
-        if T::NEEDS_RESERIALIZATION {
+        if T::SKIPS_RESERIALIZATION {
+            Ok(ManagedVec::new_from_raw_buffer(buffer))
+        } else {
             let mut result = ManagedVec::new(buffer.type_manager());
             let mut nested_de_input = ManagedBufferNestedDecodeInput::new(buffer);
             while nested_de_input.remaining_len() > 0 {
                 result.push(T::dep_decode(&mut nested_de_input)?);
             }
             Ok(result)
-        } else {
-            Ok(ManagedVec::new_from_raw_buffer(buffer))
         }
     }
 }

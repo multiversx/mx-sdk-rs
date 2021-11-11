@@ -16,11 +16,11 @@ pub trait ManagedVecItem<M: ManagedTypeApi> {
     /// Size of the data stored in the underlying `ManagedBuffer`.
     const PAYLOAD_SIZE: usize;
 
-    /// If false, then the encoding of the item is identical to the payload,
+    /// If true, then the encoding of the item is identical to the payload,
     /// and no further conversion is necessary
     /// (the underlying buffer can be used as-is during serialization).
-    /// True for all managed types, but false for basic types (like `u32`).
-    const NEEDS_RESERIALIZATION: bool;
+    /// False for all managed types, but true for basic types (like `u32`).
+    const SKIPS_RESERIALIZATION: bool;
 
     fn from_byte_reader<Reader: FnMut(&mut [u8])>(api: M, reader: Reader) -> Self;
 
@@ -31,7 +31,7 @@ macro_rules! impl_int {
     ($ty:ident, $payload_size:expr) => {
         impl<M: ManagedTypeApi> ManagedVecItem<M> for $ty {
             const PAYLOAD_SIZE: usize = $payload_size;
-            const NEEDS_RESERIALIZATION: bool = false;
+            const SKIPS_RESERIALIZATION: bool = true;
 
             fn from_byte_reader<Reader: FnMut(&mut [u8])>(_api: M, mut reader: Reader) -> Self {
                 let mut arr: [u8; $payload_size] = [0u8; $payload_size];
@@ -46,13 +46,16 @@ macro_rules! impl_int {
         }
     };
 }
-
+impl_int! {u8, 1}
+impl_int! {u16, 2}
 impl_int! {u32, 4}
+impl_int! {u64, 8}
 impl_int! {i32, 4}
+impl_int! {i64, 8}
 
 impl<M: ManagedTypeApi> ManagedVecItem<M> for usize {
     const PAYLOAD_SIZE: usize = 4;
-    const NEEDS_RESERIALIZATION: bool = false;
+    const SKIPS_RESERIALIZATION: bool = true;
 
     fn from_byte_reader<Reader: FnMut(&mut [u8])>(_api: M, mut reader: Reader) -> Self {
         let mut arr: [u8; 4] = [0u8; 4];
@@ -70,7 +73,7 @@ macro_rules! impl_managed_type {
     ($ty:ident) => {
         impl<M: ManagedTypeApi> ManagedVecItem<M> for $ty<M> {
             const PAYLOAD_SIZE: usize = 4;
-            const NEEDS_RESERIALIZATION: bool = true;
+            const SKIPS_RESERIALIZATION: bool = false;
 
             fn from_byte_reader<Reader: FnMut(&mut [u8])>(api: M, reader: Reader) -> Self {
                 let handle = Handle::from_byte_reader(api.clone(), reader);
@@ -97,7 +100,7 @@ where
     T: ManagedVecItem<M>,
 {
     const PAYLOAD_SIZE: usize = 4;
-    const NEEDS_RESERIALIZATION: bool = true;
+    const SKIPS_RESERIALIZATION: bool = false;
 
     fn from_byte_reader<Reader: FnMut(&mut [u8])>(api: M, reader: Reader) -> Self {
         let handle = Handle::from_byte_reader(api.clone(), reader);
