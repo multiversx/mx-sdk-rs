@@ -86,6 +86,10 @@ fn add_special_methods(substitutions: &mut SubstitutionsMap) {
         quote!(self.types().managed_vec_from),
     );
     substitutions.add_substitution(
+        quote!(ManagedMultiResultVec::new()),
+        quote!(self.types().managed_multi_result_vec_new()),
+    );
+    substitutions.add_substitution(
         quote!(TokenIdentifier::egld()),
         quote!(self.types().token_identifier_egld()),
     );
