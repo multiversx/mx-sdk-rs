@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use elrond_wasm::api::Handle;
+use elrond_wasm::{api::Handle, types::LockableStaticBuffer};
 use num_bigint::BigInt;
 
 type ManagedBufferImpl = Vec<u8>;
@@ -51,6 +51,7 @@ impl<V> HandleMap<V> {
 pub struct TxManagedTypes {
     pub(crate) big_int_map: HandleMap<BigInt>,
     pub(crate) managed_buffer_map: HandleMap<ManagedBufferImpl>,
+    pub(crate) lockable_static_buffer: LockableStaticBuffer,
 }
 
 impl TxManagedTypes {
@@ -58,6 +59,7 @@ impl TxManagedTypes {
         TxManagedTypes {
             big_int_map: HandleMap::new(),
             managed_buffer_map: HandleMap::new(),
+            lockable_static_buffer: LockableStaticBuffer::new(),
         }
     }
 }

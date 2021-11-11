@@ -2,6 +2,7 @@ use crate::api::InvalidSliceError;
 
 const BUFFER_SIZE: usize = 10000;
 
+#[derive(Debug)]
 pub struct LockableStaticBuffer {
     pub buffer: [u8; BUFFER_SIZE],
     pub locked: bool,
@@ -13,6 +14,14 @@ impl LockableStaticBuffer {
         LockableStaticBuffer {
             buffer: [0u8; BUFFER_SIZE],
             locked: false,
+            used_size: 0,
+        }
+    }
+
+    pub const fn new_locked() -> Self {
+        LockableStaticBuffer {
+            buffer: [0u8; BUFFER_SIZE],
+            locked: true,
             used_size: 0,
         }
     }
@@ -46,7 +55,7 @@ impl LockableStaticBuffer {
         self.len() == 0
     }
 
-    pub fn capacity(&self) -> usize {
+    pub const fn capacity() -> usize {
         BUFFER_SIZE
     }
 

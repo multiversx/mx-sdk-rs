@@ -23,4 +23,13 @@ pub trait ManagedTypeApi:
     fn mb_from_big_int_unsigned(&self, big_int_handle: Handle) -> Handle;
 
     fn mb_from_big_int_signed(&self, big_int_handle: Handle) -> Handle;
+
+    fn mb_to_locked_static_buffer(&self, buffer_handle: Handle) -> bool {
+        self.with_lockable_static_buffer(|lsb| {
+            let len = self.mb_len(buffer_handle);
+            lsb.try_lock_with_copy_bytes(len, |dest| {
+                let _ = self.mb_load_slice(buffer_handle, 0, dest);
+            })
+        })
+    }
 }
