@@ -87,6 +87,17 @@ pub trait EndpointResult: Sized {
         FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static;
 }
 
+pub fn finish_all<FA, I, T>(api: FA, items: I)
+where
+    FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static,
+    I: Iterator<Item = T>,
+    T: EndpointResult,
+{
+    for item in items {
+        item.finish(api.clone());
+    }
+}
+
 /// All serializable objects can be used as smart contract function result.
 impl<T> EndpointResult for T
 where
