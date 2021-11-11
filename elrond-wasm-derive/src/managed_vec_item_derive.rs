@@ -48,7 +48,7 @@ fn generate_skips_reserialization_snippets(fields: &syn::Fields) -> Vec<proc_mac
             .map(|field| {
                 let type_name = type_generic_replace_with_uncallable(&field.ty);
                 quote! {
-                    <#type_name as elrond_wasm::types::ManagedVecItem<M>>::SKIPS_RESERIALIZATION
+                    <#type_name as elrond_wasm::types::ManagedVecItem<elrond_wasm::api::uncallable::UncallableApi>>::SKIPS_RESERIALIZATION
                 }
             })
             .collect(),
