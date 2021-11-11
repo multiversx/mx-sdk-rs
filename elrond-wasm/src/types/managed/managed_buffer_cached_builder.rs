@@ -2,7 +2,7 @@ use elrond_codec::{EncodeError, NestedEncodeOutput, TryStaticCast};
 
 use crate::{api::ManagedTypeApi, types::StaticBufferRef};
 
-use super::{BigInt, BigUint, ManagedBuffer, ManagedBufferSizeContext, ManagedInto};
+use super::{BigInt, BigUint, ManagedBuffer, ManagedBufferSizeContext, ManagedInto, ManagedType};
 
 pub struct ManagedBufferCachedBuilder<M>
 where
@@ -40,16 +40,11 @@ where
         self.managed_buffer
     }
 
-    // fn append_to_managed_buffer(&mut self, bytes: &[u8]) {
-    //     self.managed_buffer.append_bytes(bytes);
-    // }
-
     fn flush_to_managed_buffer(&mut self) {
         let old_static_cache = core::mem::replace(&mut self.static_cache, None);
-        if let Some(static_cache) = &old_static_cache {
-            static_cache.with_buffer_contents(|bytes| {
-                self.managed_buffer.append_bytes(bytes);
-            });
+        if let Some(_static_cache) = &old_static_cache {
+            // TODO: encapsulate
+            self.managed_buffer.type_manager().mb_append_entire_static_buffer(self.managed_buffer.get_raw_handle());
         }
     }
 

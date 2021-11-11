@@ -31,7 +31,7 @@ impl<M: ManagedTypeApi> StaticBufferRef<M> {
     pub fn try_from_managed_buffer(managed_buffer: &ManagedBuffer<M>) -> Option<Self> {
         if managed_buffer
             .type_manager()
-            .mb_to_locked_static_buffer(managed_buffer.get_raw_handle())
+            .mb_overwrite_static_buffer(managed_buffer.get_raw_handle())
         {
             Some(StaticBufferRef {
                 api: managed_buffer.type_manager(),
@@ -99,4 +99,9 @@ impl<M: ManagedTypeApi> StaticBufferRef<M> {
         self.api
             .with_lockable_static_buffer(|lsb| lsb.try_extend_from_copy_bytes(len, copy_bytes))
     }
+
+    // pub fn try_extend_from_managed_buffer(&mut self, managed_buffer: &ManagedBuffer<M>) -> bool {
+    //     self.api
+    //         .try_extend_from_managed_buffer(managed_buffer.get_raw_handle())
+    // }
 }
