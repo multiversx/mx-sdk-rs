@@ -87,7 +87,7 @@ impl StaticBufferRef {
     }
 }
 
-pub trait Drop {
+impl Drop for StaticBufferRef {
     fn drop(&mut self) {
         unsafe {
             LOCKED = false;
@@ -106,5 +106,18 @@ mod test {
         assert!(s.try_extend_from_slice(b"abc"));
         assert!(s.try_extend_from_slice(b"def"));
         assert_eq!(s.as_slice(), b"zabcdef");
+    }
+
+    #[test]
+    fn test_lock_unlock() {
+        {
+            let s = StaticBufferRef::try_new(b"first").unwrap();
+            assert_eq!(s.as_slice(), b"first");
+            // should unlock here
+        }
+
+        let s = StaticBufferRef::try_new(b"another").unwrap();
+        assert!(StaticBufferRef::try_new(b"no, locked").is_none());
+        assert_eq!(s.as_slice(), b"another");
     }
 }
