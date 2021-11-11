@@ -60,7 +60,7 @@ fn struct_to_bytes_writer() {
         &s,
         |bytes| {
             arr[0..<StructWithNumbers as elrond_wasm::types::ManagedVecItem<DebugApi>>::PAYLOAD_SIZE].copy_from_slice(bytes);
-            assert_eq!(arr, [0, 0, 0, 0x42, 0, 0, 0, 0x42]);
+            assert_eq!(arr, [0x00, 0x00, 0x00, 0x42, 0x00, 0x00, 0x00, 0x42]);
         },
     );
 }
@@ -71,7 +71,7 @@ fn struct_from_bytes_reader() {
         int1: 0x42,
         int2: 0x42,
     };
-    let arr: [u8; 8] = [0, 0, 0, 0x42, 0, 0, 0, 0x42];
+    let arr: [u8; 8] = [0x00, 0x00, 0x00, 0x42, 0x00, 0x00, 0x00, 0x42];
 
     let struct_from_bytes =
         <StructWithNumbers as elrond_wasm::types::ManagedVecItem<DebugApi>>::from_byte_reader(
