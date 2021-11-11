@@ -99,9 +99,4 @@ impl<M: ManagedTypeApi> StaticBufferRef<M> {
         self.api
             .with_lockable_static_buffer(|lsb| lsb.try_extend_from_copy_bytes(len, copy_bytes))
     }
-
-    // pub fn try_extend_from_managed_buffer(&mut self, managed_buffer: &ManagedBuffer<M>) -> bool {
-    //     self.api
-    //         .try_extend_from_managed_buffer(managed_buffer.get_raw_handle())
-    // }
 }
