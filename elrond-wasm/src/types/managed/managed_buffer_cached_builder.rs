@@ -9,7 +9,7 @@ where
     M: ManagedTypeApi,
 {
     managed_buffer: ManagedBuffer<M>,
-    static_cache: Option<StaticBufferRef>,
+    static_cache: Option<StaticBufferRef<M>>,
 }
 
 impl<M> ManagedBufferCachedBuilder<M>
@@ -45,9 +45,11 @@ where
     // }
 
     fn flush_to_managed_buffer(&mut self) {
-        if let Some(static_cache) = &mut self.static_cache {
-            self.managed_buffer.append_bytes(static_cache.as_slice());
-            self.static_cache = None;
+        let old_static_cache = core::mem::replace(&mut self.static_cache, None);
+        if let Some(static_cache) = &old_static_cache {
+            static_cache.with_buffer_contents(|bytes| {
+                self.managed_buffer.append_bytes(bytes);
+            });
         }
     }
 
@@ -74,7 +76,7 @@ where
     }
 
     fn try_append_managed_buffer_to_static_buffer(
-        static_cache: &mut StaticBufferRef,
+        static_cache: &mut StaticBufferRef<M>,
         mb: &ManagedBuffer<M>,
     ) -> bool {
         static_cache.try_extend_from_copy_bytes(mb.len(), |dest_slice| {

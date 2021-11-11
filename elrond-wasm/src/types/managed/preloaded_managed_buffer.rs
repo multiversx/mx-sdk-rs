@@ -11,7 +11,7 @@ where
 {
     pub managed_buffer: ManagedBuffer<M>,
     pub buffer_len: usize,
-    static_cache: Option<StaticBufferRef>,
+    static_cache: Option<StaticBufferRef<M>>,
 }
 
 impl<M> PreloadedManagedBuffer<M>
