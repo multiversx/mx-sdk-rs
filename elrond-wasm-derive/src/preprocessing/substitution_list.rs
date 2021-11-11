@@ -44,6 +44,7 @@ fn add_managed_types(substitutions: &mut SubstitutionsMap) {
     add_managed_type(substitutions, &quote!(ManagedAsyncCallError));
 
     add_managed_type_with_generics(substitutions, &quote!(ManagedVec));
+    add_managed_type_with_generics(substitutions, &quote!(ManagedVecIterator));
     add_managed_type_with_generics(substitutions, &quote!(ManagedVarArgs));
     add_managed_type_with_generics(substitutions, &quote!(ManagedMultiResultVec));
     add_managed_type_with_generics(substitutions, &quote!(ManagedAsyncCallResult));
