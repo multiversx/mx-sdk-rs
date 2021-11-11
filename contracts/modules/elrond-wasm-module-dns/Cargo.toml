@@ -1,6 +1,6 @@
 [package]
 name = "elrond-wasm-module-dns"
-version = "0.22.4"
+version = "0.22.5"
 edition = "2018"
 
 authors = ["Andrei Marinica <andrei.marinica@elrond.com>", "Elrond Network <contact@elrond.com>"]
@@ -14,9 +14,9 @@ keywords = ["elrond", "wasm", "webassembly", "blockchain", "contract"]
 categories = ["no-std", "wasm", "cryptography::cryptocurrencies"]
 
 [dependencies.elrond-wasm]
-version = "0.22.4"
+version = "0.22.5"
 path = "../../../elrond-wasm"
 
 [dev-dependencies.elrond-wasm-debug]
-version = "0.22.4"
+version = "0.22.5"
 path = "../../../elrond-wasm-debug"
