@@ -57,7 +57,7 @@ pub trait Multisig:
     /// - (number of signers followed by) list of signer addresses.
     #[view(getPendingActionFullInfo)]
     fn get_pending_action_full_info(&self) -> ManagedMultiResultVec<ActionFullInfo<Self::Api>> {
-        let mut result = ManagedMultiResultVec::new(self.raw_vm_api());
+        let mut result = ManagedMultiResultVec::new();
         let action_last_index = self.get_action_last_index();
         let action_mapper = self.action_mapper();
         for action_id in 1..=action_last_index {
