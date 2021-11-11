@@ -13,6 +13,7 @@ mod generate;
 mod macro_contract;
 mod macro_module;
 mod macro_proxy;
+mod managed_vec_item_derive;
 mod model;
 mod parse;
 mod preprocessing;
@@ -48,4 +49,11 @@ pub fn type_abi_derive(input: proc_macro::TokenStream) -> proc_macro::TokenStrea
     let ast = syn::parse(input).unwrap();
 
     type_abi_derive::type_abi_derive(&ast)
+}
+
+#[proc_macro_derive(ManagedVecItem)]
+pub fn managed_vec_item_derive(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    let ast = syn::parse(input).unwrap();
+
+    managed_vec_item_derive::managed_vec_item_derive(&ast)
 }

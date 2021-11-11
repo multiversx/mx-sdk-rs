@@ -1,6 +1,6 @@
 use crate::{
-    api::{Handle, ManagedTypeApi},
-    types::{BigUint, ManagedBuffer, ManagedType, ManagedVecItem},
+    api::ManagedTypeApi,
+    types::{BigUint, ManagedVecItem},
 };
 
 use super::{EsdtTokenType, TokenIdentifier};
@@ -50,28 +50,42 @@ impl<M: ManagedTypeApi> EsdtTokenPayment<M> {
     }
 }
 
+fn managed_vec_item_from_slice<M, T>(api: M, arr: &[u8], index: &mut usize) -> T
+where
+    M: ManagedTypeApi,
+    T: ManagedVecItem<M>,
+{
+    ManagedVecItem::<M>::from_byte_reader(api, |bytes| {
+        let size = T::PAYLOAD_SIZE;
+        bytes.copy_from_slice(&arr[*index..*index + size]);
+        *index += size;
+    })
+}
+
+fn managed_vec_item_to_slice<M, T>(arr: &mut [u8], index: &mut usize, item: &T)
+where
+    M: ManagedTypeApi,
+    T: ManagedVecItem<M>,
+{
+    ManagedVecItem::<M>::to_byte_writer(item, |bytes| {
+        let size = T::PAYLOAD_SIZE;
+        arr[*index..*index + size].copy_from_slice(bytes);
+        *index += size;
+    });
+}
+
 impl<M: ManagedTypeApi> ManagedVecItem<M> for EsdtTokenPayment<M> {
     const PAYLOAD_SIZE: usize = 16;
-    const NEEDS_RESERIALIZATION: bool = true;
+    const SKIPS_RESERIALIZATION: bool = false;
 
     fn from_byte_reader<Reader: FnMut(&mut [u8])>(api: M, mut reader: Reader) -> Self {
         let mut arr: [u8; 16] = [0u8; 16];
         reader(&mut arr[..]);
+        let mut index = 0;
 
-        let mut token_id_handle_raw = [0u8; 4];
-        token_id_handle_raw.copy_from_slice(&arr[0..4]);
-        let token_id_handle = u32::from_be_bytes(token_id_handle_raw);
-        let token_identifier_buf =
-            ManagedBuffer::from_raw_handle(api.clone(), token_id_handle as Handle);
-
-        let mut nonce_raw = [0u8; 8];
-        nonce_raw.copy_from_slice(&arr[4..12]);
-        let token_nonce = u64::from_be_bytes(nonce_raw);
-
-        let mut amount_handle_raw = [0u8; 4];
-        amount_handle_raw.copy_from_slice(&arr[12..16]);
-        let amount_handle = u32::from_be_bytes(amount_handle_raw);
-        let amount = BigUint::from_raw_handle(api, amount_handle as Handle);
+        let token_identifier = managed_vec_item_from_slice(api.clone(), &arr, &mut index);
+        let token_nonce = managed_vec_item_from_slice(api.clone(), &arr, &mut index);
+        let amount = managed_vec_item_from_slice(api, &arr, &mut index);
 
         let token_type = if token_nonce > 0 {
             EsdtTokenType::SemiFungible
@@ -81,7 +95,7 @@ impl<M: ManagedTypeApi> ManagedVecItem<M> for EsdtTokenPayment<M> {
 
         EsdtTokenPayment {
             token_type,
-            token_identifier: TokenIdentifier::from(token_identifier_buf),
+            token_identifier,
             token_nonce,
             amount,
         }
@@ -89,19 +103,11 @@ impl<M: ManagedTypeApi> ManagedVecItem<M> for EsdtTokenPayment<M> {
 
     fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, mut writer: Writer) -> R {
         let mut arr: [u8; 16] = [0u8; 16];
+        let mut index = 0;
 
-        let token_id_handle_raw = self
-            .token_identifier
-            .as_managed_buffer()
-            .get_raw_handle()
-            .to_be_bytes();
-        arr[0..4].copy_from_slice(&token_id_handle_raw[..]);
-
-        let nonce_raw = self.token_nonce.to_be_bytes();
-        arr[4..12].copy_from_slice(&nonce_raw[..]);
-
-        let amount_handle_raw = self.amount.get_raw_handle().to_be_bytes();
-        arr[12..16].copy_from_slice(&amount_handle_raw[..]);
+        managed_vec_item_to_slice::<M, _>(&mut arr, &mut index, &self.token_identifier);
+        managed_vec_item_to_slice::<M, _>(&mut arr, &mut index, &self.token_nonce);
+        managed_vec_item_to_slice::<M, _>(&mut arr, &mut index, &self.amount);
 
         writer(&arr[..])
     }
