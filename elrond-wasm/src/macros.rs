@@ -38,7 +38,7 @@ macro_rules! imports {
 macro_rules! derive_imports {
     () => {
         use elrond_wasm::{
-            derive::TypeAbi,
+            derive::{ManagedVecItem, TypeAbi},
             elrond_codec,
             elrond_codec::elrond_codec_derive::{
                 NestedDecode, NestedEncode, TopDecode, TopDecodeOrDefault, TopEncode,
