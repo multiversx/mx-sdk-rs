@@ -99,30 +99,3 @@ impl LockableStaticBuffer {
         true
     }
 }
-
-// #[cfg(test)]
-// mod test {
-//     use super::*;
-
-//     #[test]
-//     fn test_try_extend_from_slice() {
-//         let mut lsb = LockableStaticBuffer::new();
-//         let mut s = StaticBufferRef::try_new(b"z").unwrap();
-//         assert!(s.try_extend_from_slice(b"abc"));
-//         assert!(s.try_extend_from_slice(b"def"));
-//         assert_eq!(s.as_slice(), b"zabcdef");
-//     }
-
-//     #[test]
-//     fn test_lock_unlock() {
-//         {
-//             let s = StaticBufferRef::try_new(b"first").unwrap();
-//             assert_eq!(s.as_slice(), b"first");
-//             // should unlock here
-//         }
-
-//         let s = StaticBufferRef::try_new(b"another").unwrap();
-//         assert!(StaticBufferRef::try_new(b"no, locked").is_none());
-//         assert_eq!(s.as_slice(), b"another");
-//     }
-// }
