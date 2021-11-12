@@ -84,11 +84,24 @@ pub trait EchoManagedTypes {
     }
 
     #[endpoint]
-    fn echo_managed_varags_eager(
+    fn echo_varags_managed_eager(
         &self,
         #[var_args] m: ManagedVarArgsEager<Self::Api, u32>,
     ) -> MultiResult2<usize, ManagedMultiResultVecEager<Self::Api, u32>> {
         let v = m.into_vec();
         (v.len(), v.into()).into()
+    }
+
+    #[endpoint]
+    fn echo_varags_managed_sum(
+        &self,
+        #[var_args] m: ManagedVarArgs<MultiArg2<u32, u32>>,
+    ) -> ManagedMultiResultVec<MultiResult3<u32, u32, u32>> {
+        let mut result = ManagedMultiResultVec::new();
+        for arg in m.into_iter() {
+            let (x, y) = arg.into_tuple();
+            result.push((x, y, x + y).into())
+        }
+        result
     }
 }
