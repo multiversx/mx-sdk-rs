@@ -2,9 +2,10 @@ use super::{StorageClearable, StorageMapper};
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
     api::{EndpointFinishApi, ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi},
+    finish_all,
     io::EndpointResult,
     storage::{storage_get, storage_set, StorageKey},
-    types::{BoxedBytes, MultiResultVec},
+    types::MultiResultVec,
 };
 use alloc::vec::Vec;
 use core::marker::PhantomData;
@@ -151,7 +152,7 @@ where
         storage_set(
             self.api.clone(),
             &self.build_node_id_named_key(NODE_IDENTIFIER, node_id),
-            &BoxedBytes::empty(),
+            &(),
         );
     }
 
@@ -181,7 +182,7 @@ where
         storage_set(
             self.api.clone(),
             &self.build_node_id_named_key(VALUE_IDENTIFIER, node_id),
-            &BoxedBytes::empty(),
+            &(),
         )
     }
 
@@ -463,8 +464,7 @@ where
     where
         FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static,
     {
-        let v: Vec<T> = self.iter().collect();
-        MultiResultVec::<T>::from(v).finish(api);
+        finish_all(api, self.iter());
     }
 }
 

@@ -12,15 +12,15 @@ path = "src/proxy-test-first.rs"
 hex-literal = "0.3.1"
 
 [dependencies.elrond-wasm]
-version = "0.22.2"
+version = "0.22.6"
 path = "../../../../elrond-wasm"
 features = ["cb_closure_managed_deser"]
 
 [dependencies.elrond-wasm-node]
-version = "0.22.2"
+version = "0.22.6"
 path = "../../../../elrond-wasm-node"
 optional = true
 
 [dev-dependencies.elrond-wasm-debug]
-version = "0.22.2"
+version = "0.22.6"
 path = "../../../../elrond-wasm-debug"

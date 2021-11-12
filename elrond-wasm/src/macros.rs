@@ -13,7 +13,7 @@ macro_rules! imports {
         use elrond_wasm::{
             api::{
                 BigIntApi, BlockchainApi, CallValueApi, CryptoApi, EllipticCurveApi, ErrorApi,
-                LogApi, ManagedTypeApi, SendApi,
+                LogApi, ManagedTypeApi, PrintApi, SendApi,
             },
             contract_base::{ContractBase, ProxyObjBase},
             elrond_codec::{DecodeError, NestedDecode, NestedEncode, TopDecode},
@@ -38,7 +38,7 @@ macro_rules! imports {
 macro_rules! derive_imports {
     () => {
         use elrond_wasm::{
-            derive::TypeAbi,
+            derive::{ManagedVecItem, TypeAbi},
             elrond_codec,
             elrond_codec::elrond_codec_derive::{
                 NestedDecode, NestedEncode, TopDecode, TopDecodeOrDefault, TopEncode,

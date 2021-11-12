@@ -1,6 +1,6 @@
 #[macro_export]
 macro_rules! wasm_endpoints {
-    ($mod_name:ident ( $($endpoint_name:ident)+ ) ) => { 
+    ($mod_name:ident ( $($endpoint_name:ident)+ ) ) => {
         pub use elrond_wasm_output;
 
         $(
