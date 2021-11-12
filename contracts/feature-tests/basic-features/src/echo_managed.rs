@@ -82,4 +82,13 @@ pub trait EchoManagedTypes {
             ManagedAsyncCallResult::Err(msg) => Err(msg.err_msg.into()),
         }
     }
+
+    #[endpoint]
+    fn echo_managed_varags_eager(
+        &self,
+        #[var_args] m: ManagedVarArgsEager<Self::Api, u32>,
+    ) -> MultiResult2<usize, ManagedMultiResultVecEager<Self::Api, u32>> {
+        let v = m.into_vec();
+        (v.len(), v.into()).into()
+    }
 }
