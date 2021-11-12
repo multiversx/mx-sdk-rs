@@ -21,21 +21,24 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "echo_managed_varags_eager",
+                "function": "echo_varags_managed_sum",
                 "arguments": [
-                    "10",
-                    "20",
-                    "30"
+                    "1",
+                    "2",
+                    "40",
+                    "50"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
+                    "1",
+                    "2",
                     "3",
-                    "10",
-                    "20",
-                    "30"
+                    "40",
+                    "50",
+                    "90"
                 ],
                 "status": "",
                 "logs": [],
@@ -49,16 +52,39 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "echo_managed_varags_eager",
+                "function": "echo_varags_managed_sum",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [
-                    "0"
-                ],
+                "out": [],
                 "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "1",
+            "comment": "only even number of arguments possible",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "echo_varags_managed_sum",
+                "arguments": [
+                    "10",
+                    "20",
+                    "30"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:wrong number of arguments",
                 "logs": [],
                 "gas": "*",
                 "refund": "*"
