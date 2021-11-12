@@ -18,8 +18,7 @@ impl EsdtLocalRoleFlags {
     }
 
     pub fn iter_roles(&self) -> impl Iterator<Item = &EsdtLocalRole> {
-        let self_clone = self.clone();
-        EsdtLocalRole::iter_all().filter(move |role| self_clone.has_role(role))
+        EsdtLocalRole::iter_all().filter(move |role| self.has_role(role))
     }
 }
 
