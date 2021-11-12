@@ -9,21 +9,21 @@ use crate::{
 
 use super::{ManagedFrom, ManagedInto, ManagedVec, ManagedVecItem, ManagedVecIterator};
 
-pub struct ManagedVarArgsEager<M: ManagedTypeApi, T: ManagedVecItem<M>>(ManagedVec<M, T>);
+pub struct ManagedMultiResultVecEager<M: ManagedTypeApi, T: ManagedVecItem<M>>(ManagedVec<M, T>);
 
-impl<M, T> ManagedVarArgsEager<M, T>
+impl<M, T> ManagedMultiResultVecEager<M, T>
 where
     M: ManagedTypeApi,
     T: ManagedVecItem<M>,
 {
     #[inline]
     pub fn new(api: M) -> Self {
-        ManagedVarArgsEager(ManagedVec::new(api))
+        ManagedMultiResultVecEager(ManagedVec::new(api))
     }
 
     // #[inline]
     // pub(crate) fn new_from_raw_buffer(buffer: ManagedBuffer<M>) -> Self {
-    //     ManagedVarArgsEager(ManagedVec::new_from_raw_buffer(buffer))
+    //     ManagedMultiResultVecEager(ManagedVec::new_from_raw_buffer(buffer))
     // }
 
     #[inline]
@@ -56,7 +56,7 @@ where
     }
 
     pub fn from_single_item(api: M, item: T) -> Self {
-        let mut result = ManagedVarArgsEager::new(api);
+        let mut result = ManagedMultiResultVecEager::new(api);
         result.push(item);
         result
     }
@@ -65,7 +65,7 @@ where
         self.0.overwrite_with_single_item(item)
     }
 
-    pub fn append_vec(&mut self, item: ManagedVarArgsEager<M, T>) {
+    pub fn append_vec(&mut self, item: ManagedMultiResultVecEager<M, T>) {
         self.0.append_vec(item.0)
     }
 
@@ -89,7 +89,7 @@ where
     }
 }
 
-impl<M, T, I> ManagedFrom<M, Vec<I>> for ManagedVarArgsEager<M, T>
+impl<M, T, I> ManagedFrom<M, Vec<I>> for ManagedMultiResultVecEager<M, T>
 where
     M: ManagedTypeApi,
     T: ManagedVecItem<M>,
@@ -103,7 +103,7 @@ where
         result
     }
 }
-impl<M, T> DynArg for ManagedVarArgsEager<M, T>
+impl<M, T> DynArg for ManagedMultiResultVecEager<M, T>
 where
     M: ManagedTypeApi,
     T: ManagedVecItem<M> + DynArg,
@@ -113,16 +113,16 @@ where
         while loader.has_next() {
             result_vec.push(T::dyn_load(loader, arg_id));
         }
-        ManagedVarArgsEager(result_vec)
+        ManagedMultiResultVecEager(result_vec)
     }
 }
 
-impl<M, T> EndpointResult for ManagedVarArgsEager<M, T>
+impl<M, T> EndpointResult for ManagedMultiResultVecEager<M, T>
 where
     M: ManagedTypeApi,
     T: ManagedVecItem<M> + EndpointResult,
 {
-    type DecodeAs = ManagedVarArgsEager<M, T>;
+    type DecodeAs = ManagedMultiResultVecEager<M, T>;
 
     #[inline]
     fn finish<FA>(&self, api: FA)
@@ -134,7 +134,7 @@ where
         }
     }
 }
-impl<M, T> ContractCallArg for &ManagedVarArgsEager<M, T>
+impl<M, T> ContractCallArg for &ManagedMultiResultVecEager<M, T>
 where
     M: ManagedTypeApi,
     T: ManagedVecItem<M> + ContractCallArg,
@@ -146,7 +146,7 @@ where
     }
 }
 
-impl<M, T> ContractCallArg for ManagedVarArgsEager<M, T>
+impl<M, T> ContractCallArg for ManagedMultiResultVecEager<M, T>
 where
     M: ManagedTypeApi,
     T: ManagedVecItem<M> + ContractCallArg,
@@ -156,7 +156,7 @@ where
     }
 }
 
-impl<M, T: TypeAbi> TypeAbi for ManagedVarArgsEager<M, T>
+impl<M, T: TypeAbi> TypeAbi for ManagedMultiResultVecEager<M, T>
 where
     M: ManagedTypeApi,
     T: ManagedVecItem<M>,

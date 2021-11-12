@@ -14,10 +14,10 @@ mod managed_conversion;
 mod managed_default;
 mod managed_multi_result_vec;
 mod managed_multi_result_vec_counted;
+mod managed_multi_result_vec_eager;
 mod managed_multi_result_vec_iter;
 mod managed_ref;
 mod managed_type_trait;
-mod managed_var_args_eager;
 mod managed_vec;
 mod managed_vec_item;
 mod managed_vec_iter;
@@ -36,10 +36,10 @@ pub use managed_conversion::{ManagedFrom, ManagedInto};
 pub use managed_default::ManagedDefault;
 pub use managed_multi_result_vec::{ManagedMultiResultVec, ManagedVarArgs};
 pub use managed_multi_result_vec_counted::{ManagedCountedMultiResultVec, ManagedCountedVarArgs};
+pub use managed_multi_result_vec_eager::ManagedMultiResultVecEager;
 pub use managed_multi_result_vec_iter::ManagedMultiResultVecIterator;
 pub use managed_ref::{AsManagedRef, ManagedRef};
 pub use managed_type_trait::ManagedType;
-pub use managed_var_args_eager::ManagedVarArgsEager;
 pub use managed_vec::{
     managed_vec_from_slice_of_boxed_bytes, managed_vec_of_buffers_to_arg_buffer, ManagedVec,
 };
