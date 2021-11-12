@@ -1,6 +1,9 @@
 use crate::{tx_mock::TxPanic, DebugApi};
 use alloc::vec::Vec;
-use elrond_wasm::api::{BigIntApi, Handle, ManagedBufferApi, StorageReadApi, StorageWriteApi};
+use elrond_wasm::{
+    api::{BigIntApi, ErrorApi, Handle, ManagedBufferApi, StorageReadApi, StorageWriteApi},
+    err_msg,
+};
 use num_bigint::{BigInt, BigUint, Sign};
 use num_traits::ToPrimitive;
 
@@ -14,6 +17,14 @@ impl StorageReadApi for DebugApi {
             None => Vec::with_capacity(0),
             Some(value) => value.clone(),
         })
+    }
+
+    fn storage_load_into_slice_or_fail(&self, key: &[u8], dest_slice: &mut [u8]) {
+        let bytes = self.storage_load_vec_u8(key);
+        if bytes.len() > dest_slice.len() {
+            self.signal_error(err_msg::STORAGE_VALUE_EXCEEDS_BUFFER);
+        }
+        dest_slice[..bytes.len()].copy_from_slice(bytes.as_slice());
     }
 
     fn storage_load_big_uint_raw(&self, key: &[u8]) -> Handle {

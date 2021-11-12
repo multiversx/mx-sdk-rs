@@ -12,6 +12,9 @@ pub trait StorageReadApi {
         self.storage_load_vec_u8(key).into()
     }
 
+    /// TODO: not yet tested.
+    fn storage_load_into_slice_or_fail(&self, key: &[u8], dest_slice: &mut [u8]);
+
     fn storage_load_big_uint_raw(&self, key: &[u8]) -> Handle;
 
     fn storage_load_managed_buffer_raw(&self, key_handle: Handle) -> Handle;

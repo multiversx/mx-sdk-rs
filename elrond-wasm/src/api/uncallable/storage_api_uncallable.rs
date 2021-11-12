@@ -10,6 +10,10 @@ impl StorageReadApi for super::UncallableApi {
         unreachable!()
     }
 
+    fn storage_load_into_slice_or_fail(&self, _key: &[u8], _dest_slice: &mut [u8]) {
+        unreachable!();
+    }
+
     fn storage_load_big_uint_raw(&self, _key: &[u8]) -> Handle {
         unreachable!()
     }

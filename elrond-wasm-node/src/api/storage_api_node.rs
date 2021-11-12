@@ -1,7 +1,10 @@
+use crate::error_hook;
+
 use super::VmApiImpl;
 use alloc::vec::Vec;
 use elrond_wasm::{
     api::{Handle, StorageReadApi, StorageWriteApi},
+    err_msg,
     types::BoxedBytes,
 };
 
@@ -54,6 +57,19 @@ impl StorageReadApi for VmApiImpl {
                 storageLoad(key.as_ref().as_ptr(), key.len() as i32, res.as_mut_ptr());
             }
             res
+        }
+    }
+
+    fn storage_load_into_slice_or_fail(&self, key: &[u8], dest_slice: &mut [u8]) {
+        unsafe {
+            let len = storageLoad(
+                key.as_ref().as_ptr(),
+                key.len() as i32,
+                dest_slice.as_mut_ptr(),
+            );
+            if len as usize > dest_slice.len() {
+                error_hook::signal_error(err_msg::STORAGE_VALUE_EXCEEDS_BUFFER);
+            }
         }
     }
 
