@@ -362,7 +362,6 @@ impl BlockchainApi for crate::VmApiImpl {
         }
     }
 
-    #[inline(never)]
     fn get_esdt_balance(
         &self,
         address: &ManagedAddress<Self>,

@@ -137,7 +137,6 @@ where
     M: ManagedTypeApi,
     T: DynArg,
 {
-    // #[inline(never)]
     fn dyn_load<I: DynArgInput>(loader: &mut I, arg_id: ArgId) -> Self {
         let mut raw_buffers = ManagedVec::new(loader.vm_api_cast::<M>());
         while loader.has_next() {
