@@ -11,6 +11,19 @@ use super::{ManagedFrom, ManagedInto, ManagedVec, ManagedVecItem, ManagedVecIter
 
 pub struct ManagedMultiResultVecEager<M: ManagedTypeApi, T: ManagedVecItem<M>>(ManagedVec<M, T>);
 
+pub type ManagedVarArgsEager<M, T> = ManagedMultiResultVecEager<M, T>;
+
+impl<M, T> From<ManagedVec<M, T>> for ManagedMultiResultVecEager<M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedVecItem<M>,
+{
+    #[inline]
+    fn from(managed_vec: ManagedVec<M, T>) -> Self {
+        ManagedMultiResultVecEager(managed_vec)
+    }
+}
+
 impl<M, T> ManagedMultiResultVecEager<M, T>
 where
     M: ManagedTypeApi,
@@ -20,11 +33,6 @@ where
     pub fn new(api: M) -> Self {
         ManagedMultiResultVecEager(ManagedVec::new(api))
     }
-
-    // #[inline]
-    // pub(crate) fn new_from_raw_buffer(buffer: ManagedBuffer<M>) -> Self {
-    //     ManagedMultiResultVecEager(ManagedVec::new_from_raw_buffer(buffer))
-    // }
 
     #[inline]
     pub fn byte_len(&self) -> usize {
@@ -73,8 +81,8 @@ where
         self.0.clear()
     }
 
-    pub fn into_vec(self) -> Vec<T> {
-        self.0.into_vec()
+    pub fn into_vec(self) -> ManagedVec<M, T> {
+        self.0
     }
 
     pub fn with_self_as_vec<F>(&mut self, f: F)
