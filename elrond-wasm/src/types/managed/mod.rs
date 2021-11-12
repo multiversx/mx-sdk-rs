@@ -36,7 +36,7 @@ pub use managed_conversion::{ManagedFrom, ManagedInto};
 pub use managed_default::ManagedDefault;
 pub use managed_multi_result_vec::{ManagedMultiResultVec, ManagedVarArgs};
 pub use managed_multi_result_vec_counted::{ManagedCountedMultiResultVec, ManagedCountedVarArgs};
-pub use managed_multi_result_vec_eager::ManagedMultiResultVecEager;
+pub use managed_multi_result_vec_eager::{ManagedMultiResultVecEager, ManagedVarArgsEager};
 pub use managed_multi_result_vec_iter::ManagedMultiResultVecIterator;
 pub use managed_ref::{AsManagedRef, ManagedRef};
 pub use managed_type_trait::ManagedType;
