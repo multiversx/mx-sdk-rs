@@ -9,9 +9,9 @@ publish = false
 path = "src/send_tx_repeat.rs"
 
 [dependencies.elrond-wasm]
-version = "0.22.6"
+version = "0.22.7"
 path = "../../../elrond-wasm"
 
 [dev-dependencies.elrond-wasm-debug]
-version = "0.22.6"
+version = "0.22.7"
 path = "../../../elrond-wasm-debug"
