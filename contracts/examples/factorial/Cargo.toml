@@ -9,9 +9,9 @@ publish = false
 path = "src/factorial.rs"
 
 [dependencies.elrond-wasm]
-version = "0.22.8"
+version = "0.22.9"
 path = "../../../elrond-wasm"
 
 [dev-dependencies.elrond-wasm-debug]
-version = "0.22.8"
+version = "0.22.9"
 path = "../../../elrond-wasm-debug"
