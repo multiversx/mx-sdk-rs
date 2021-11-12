@@ -2,7 +2,7 @@ use crate::{api::unsafe_buffer, error_hook};
 use elrond_wasm::{
     api::{Handle, InvalidSliceError, ManagedBufferApi},
     err_msg,
-    types::BoxedBytes,
+    types::{BoxedBytes, ManagedAddress, ManagedType, TokenIdentifier},
 };
 
 // #[allow(dead_code)]
@@ -165,8 +165,20 @@ impl ManagedBufferApi for crate::VmApiImpl {
     }
 }
 
-pub(crate) unsafe fn unsafe_buffer_load_address(address_handle: Handle) -> *const u8 {
-    let unsafe_buffer_ptr = unsafe_buffer::buffer_ptr();
-    let _ = mBufferGetBytes(address_handle, unsafe_buffer_ptr);
-    unsafe_buffer_ptr
+pub(crate) unsafe fn unsafe_buffer_load_address(
+    address: &ManagedAddress<crate::VmApiImpl>,
+) -> *const u8 {
+    let unsafe_buffer_1_ptr = unsafe_buffer::buffer_1_ptr();
+    let _ = mBufferGetBytes(address.get_raw_handle(), unsafe_buffer_1_ptr);
+    unsafe_buffer_1_ptr
+}
+
+/// We usually need it at the same time with the address,
+/// so we put in in buffer #2.
+pub(crate) unsafe fn unsafe_buffer_load_token_identifier(
+    token: &TokenIdentifier<crate::VmApiImpl>,
+) -> *const u8 {
+    let unsafe_buffer_1_ptr = unsafe_buffer::buffer_2_ptr();
+    let _ = mBufferGetBytes(token.get_raw_handle(), unsafe_buffer_1_ptr);
+    unsafe_buffer_1_ptr
 }
