@@ -1,6 +1,6 @@
 [package]
 name = "elrond-wasm"
-version = "0.22.7"
+version = "0.22.8"
 edition = "2018"
 
 authors = ["Andrei Marinica <andrei.marinica@elrond.com>", "Elrond Network <contact@elrond.com>"]
@@ -23,10 +23,10 @@ hashbrown = "0.11.2"
 hex-literal = "0.3.1"
 
 [dependencies.elrond-wasm-derive]
-version = "=0.22.7"
+version = "=0.22.8"
 path = "../elrond-wasm-derive"
 
 [dependencies.elrond-codec]
-version = "0.8.1"
+version = "0.8.2"
 path = "../elrond-codec"
 features = ["derive"]
