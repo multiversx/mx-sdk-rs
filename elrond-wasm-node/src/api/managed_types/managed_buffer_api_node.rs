@@ -178,7 +178,7 @@ pub(crate) unsafe fn unsafe_buffer_load_address(
 pub(crate) unsafe fn unsafe_buffer_load_token_identifier(
     token: &TokenIdentifier<crate::VmApiImpl>,
 ) -> *const u8 {
-    let unsafe_buffer_1_ptr = unsafe_buffer::buffer_2_ptr();
-    let _ = mBufferGetBytes(token.get_raw_handle(), unsafe_buffer_1_ptr);
-    unsafe_buffer_1_ptr
+    let unsafe_buffer_2_ptr = unsafe_buffer::buffer_2_ptr();
+    let _ = mBufferGetBytes(token.get_raw_handle(), unsafe_buffer_2_ptr);
+    unsafe_buffer_2_ptr
 }

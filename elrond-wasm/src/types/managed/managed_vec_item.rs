@@ -4,7 +4,8 @@ use crate::{
 };
 
 use super::{
-    BigInt, BigUint, EllipticCurve, ManagedAddress, ManagedBuffer, ManagedByteArray, ManagedType, ManagedVec,
+    BigInt, BigUint, EllipticCurve, ManagedAddress, ManagedBuffer, ManagedByteArray, ManagedType,
+    ManagedVec,
 };
 
 /// Types that implement this trait can be items inside a `ManagedVec`.
