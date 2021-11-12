@@ -169,6 +169,17 @@ fn echo_usize_go() {
 }
 
 #[test]
+fn echo_varargs_managed_eager_go() {
+    elrond_wasm_debug::mandos_go("mandos/echo_varargs_managed_eager.scen.json");
+}
+
+#[test]
+fn echo_varargs_managed_sum_go() {
+    elrond_wasm_debug::mandos_go("mandos/echo_varargs_managed_sum.scen.json");
+}
+
+
+#[test]
 fn echo_varags_tuples_go() {
     elrond_wasm_debug::mandos_go("mandos/echo_varags_tuples.scen.json");
 }
@@ -176,11 +187,6 @@ fn echo_varags_tuples_go() {
 #[test]
 fn echo_varargs_u32_go() {
     elrond_wasm_debug::mandos_go("mandos/echo_varargs_u32.scen.json");
-}
-
-#[test]
-fn echo_varargs_u32_managed_eager_go() {
-    elrond_wasm_debug::mandos_go("mandos/echo_varargs_u32_managed_eager.scen.json");
 }
 
 #[test]

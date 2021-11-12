@@ -100,7 +100,6 @@ elrond_wasm_node::wasm_endpoints! {
         echo_managed_address
         echo_managed_async_result_empty
         echo_managed_buffer
-        echo_managed_varags_eager
         echo_managed_vec_of_managed_vec
         echo_managed_vec_of_token_identifier
         echo_non_zero_usize
@@ -120,6 +119,8 @@ elrond_wasm_node::wasm_endpoints! {
         echo_u8
         echo_usize
         echo_varags_big_uint
+        echo_varags_managed_eager
+        echo_varags_managed_sum
         echo_varags_tuples
         echo_varags_u32
         echo_vec_of_managed_buffer
