@@ -4,6 +4,9 @@ There are several crates in this repo, this changelog will keep track of all of 
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [elrond-wasm 0.22.10] - 2021-11-12
+- `ManagedMultiResultVec` push accepts multi result
+
 ## [elrond-wasm 0.22.9] - 2021-11-12
 - `ManagedVarArgsEager` implementation
 - `EsdtLocalRoleFlags`, no heap allocation in `get_esdt_local_roles`
