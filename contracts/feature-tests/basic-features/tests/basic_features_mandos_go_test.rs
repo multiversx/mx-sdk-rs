@@ -179,6 +179,11 @@ fn echo_varargs_u32_go() {
 }
 
 #[test]
+fn echo_varargs_u32_managed_eager_go() {
+    elrond_wasm_debug::mandos_go("mandos/echo_varargs_u32_managed_eager.scen.json");
+}
+
+#[test]
 fn echo_vec_u8_go() {
     elrond_wasm_debug::mandos_go("mandos/echo_vec_u8.scen.json");
 }
