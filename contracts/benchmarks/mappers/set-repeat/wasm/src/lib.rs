@@ -9,9 +9,13 @@ elrond_wasm_node::wasm_endpoints! {
     (
         init
         add
+        add_struct
+        bench
+        bench_struct
         count
-        getBenchmark
+        count_struct
         remove
+        remove_struct
     )
 }
 

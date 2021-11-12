@@ -166,6 +166,24 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
         self.api
             .mb_append_bytes(self.handle, &item.to_be_bytes()[..]);
     }
+
+    pub fn parse_as_u64(&self) -> Option<u64> {
+        const U64_NUM_BYTES: usize = 8;
+        let l = self.len();
+        if l > U64_NUM_BYTES {
+            return None;
+        }
+        let mut bytes = [0u8; U64_NUM_BYTES];
+        if self
+            .api
+            .mb_load_slice(self.handle, 0, &mut bytes[U64_NUM_BYTES - l..])
+            .is_err()
+        {
+            None
+        } else {
+            Some(u64::from_be_bytes(bytes))
+        }
+    }
 }
 
 impl<M: ManagedTypeApi> Clone for ManagedBuffer<M> {

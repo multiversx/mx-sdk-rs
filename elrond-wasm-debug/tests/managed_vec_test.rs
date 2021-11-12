@@ -26,6 +26,25 @@ fn test_managed_vec_iter_rev() {
 }
 
 #[test]
+fn test_managed_vec_iter_exact_size_trait() {
+    let context = DebugApi::dummy();
+
+    let mut managed_vec = ManagedVec::new(context.clone());
+    for i in 1..=10 {
+        managed_vec.push(i);
+    }
+    assert!(managed_vec.len() == 10);
+    let it = managed_vec.iter();
+    assert!(it.size_hint() == (10, Some(10)));
+    assert!(it.len() == 10);
+    let it2 = it.skip(2);
+    assert!(it2.len() == 8);
+    let it3 = it2.clone();
+    assert!(it2.skip(3).len() == 5);
+    assert!(it3.skip(5).len() == 3);
+}
+
+#[test]
 fn test_into_vec() {
     let context = DebugApi::dummy();
 
