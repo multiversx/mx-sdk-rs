@@ -4,6 +4,14 @@ There are several crates in this repo, this changelog will keep track of all of 
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [elrond-wasm 0.22.78, elrond-codec 0.8.2] - 2021-11-12
+- Optimized decode unsigned number from slice
+
+## [elrond-wasm 0.22.7] - 2021-11-12
+- Optimized decode unsigned number from slice
+- Optimized blockchain API: managed get token nonce, get esdt balance
+- `ManagedVecItem` for `ManagedByteArray`
+
 ## [elrond-wasm 0.22.6] - 2021-11-11
 - Optimized decode u64 from `ManagedBuffer`
 - `ManagedVecItem` in `derive_imports`
