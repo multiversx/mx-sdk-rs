@@ -1,6 +1,7 @@
 use std::rc::Rc;
 
 use elrond_wasm::{
+    api::VMApi,
     contract_base::ContractBase,
     sc_error,
     types::{Address, BigUint, ManagedFrom, SCResult, H256},
@@ -156,15 +157,71 @@ fn test_sc_payment() {
     };
 
     let rc_world = Rc::new(blockchain_mock);
-    let debug_api = DebugApi::new(tx_input, TxCache::new(rc_world));
+    let debug_api = DebugApi::new(tx_input, TxCache::new(rc_world.clone()));
     let sc = rust_testing_framework_tester::contract_obj(debug_api);
-    let api = sc.raw_vm_api();
+    {
+        let actual_payment_amount = sc.receive_egld();
+        let expected_payment_amount = BigUint::managed_from(sc.raw_vm_api(), 1_000u32);
+        assert_eq!(actual_payment_amount, expected_payment_amount);
+    }
 
-    let actual_payment_amount = sc.receive_egld();
-    let expected_payment_amount = BigUint::managed_from(api.clone(), 1_000u32);
-    assert_eq!(actual_payment_amount, expected_payment_amount);
+    let api = into_api(sc);
+    let bu = api.into_blockchain_updates();
 
-    // let bu = api.into_blockchain_updates();
+    blockchain_mock = Rc::try_unwrap(rc_world).unwrap();
+    bu.apply(&mut blockchain_mock);
+
+    let user_acc_after = blockchain_mock.accounts.get(&caller_addr).unwrap();
+    let sc_acc_after = blockchain_mock.accounts.get(&sc_addr).unwrap();
+
+    assert_eq!(user_acc_after.egld_balance, num_bigint::BigUint::from(0u32));
+    assert_eq!(
+        sc_acc_after.egld_balance,
+        num_bigint::BigUint::from(3_000u32)
+    );
+}
+
+/*
+Update cache before call?
+
+tx_context.tx_cache.subtract_egld_balance(
+        &tx_context.tx_input_box.from,
+        &tx_context.tx_input_box.egld_value,
+    );
+    tx_context.tx_cache.increase_egld_balance(
+        &tx_context.tx_input_box.to,
+        &tx_context.tx_input_box.egld_value,
+    );
+
+    // TODO: temporary, will convert to explicit builtin function first
+    for esdt_transfer in tx_context.tx_input_box.esdt_values.iter() {
+        tx_context.tx_cache.transfer_esdt_balance(
+            &tx_context.tx_input_box.from,
+            &tx_context.tx_input_box.to,
+            &esdt_transfer.token_identifier,
+            esdt_transfer.nonce,
+            &esdt_transfer.value,
+        );
+    }
+
+    let tx_result = if !is_smart_contract_address(&tx_context.tx_input_box.to)
+        || tx_context.tx_input_box.func_name.is_empty()
+    {
+        // direct EGLD transfer
+        TxResult::empty()
+    } else {
+        execute_tx_context(tx_context.clone())
+    };
+
+    let blockchain_updates = tx_context.into_blockchain_updates();
+
+    (tx_result, blockchain_updates)
+*/
+
+// fn type_test<A: VMApi>(_sc: ContractObj<A>) {}
+
+fn into_api<CB: ContractBase>(sc_obj: CB) -> CB::Api {
+    sc_obj.raw_vm_api()
 }
 
 /*
