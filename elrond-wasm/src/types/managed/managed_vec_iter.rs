@@ -65,6 +65,18 @@ where
         self.byte_start = next_byte_start;
         Some(result)
     }
+
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        let remaining = (self.byte_end - self.byte_start) / T::PAYLOAD_SIZE;
+        (remaining, Some(remaining))
+    }
+}
+
+impl<'a, M, T> ExactSizeIterator for ManagedVecIterator<'a, M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedVecItem<M>,
+{
 }
 
 impl<'a, M, T> DoubleEndedIterator for ManagedVecIterator<'a, M, T>
@@ -86,5 +98,20 @@ where
         });
 
         Some(result)
+    }
+}
+
+impl<'a, M, T> Clone for ManagedVecIterator<'a, M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedVecItem<M>,
+{
+    #[allow(clippy::clone_double_ref)]
+    fn clone(&self) -> Self {
+        Self {
+            managed_vec: self.managed_vec,
+            byte_start: self.byte_start,
+            byte_end: self.byte_end,
+        }
     }
 }

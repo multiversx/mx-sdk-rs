@@ -1,4 +1,6 @@
-use crate::api::managed_types::managed_buffer_api_node::unsafe_buffer_load_address;
+use crate::api::managed_types::managed_buffer_api_node::{
+    unsafe_buffer_load_address, unsafe_buffer_load_token_identifier,
+};
 use elrond_wasm::{
     api::BlockchainApi,
     types::{
@@ -176,7 +178,7 @@ impl BlockchainApi for crate::VmApiImpl {
 
     #[inline]
     fn get_shard_of_address(&self, address: &ManagedAddress<Self>) -> u32 {
-        unsafe { getShardOfAddress(unsafe_buffer_load_address(address.get_raw_handle())) as u32 }
+        unsafe { getShardOfAddress(unsafe_buffer_load_address(address)) as u32 }
     }
 
     #[inline]
@@ -186,7 +188,7 @@ impl BlockchainApi for crate::VmApiImpl {
 
     #[inline]
     fn is_smart_contract(&self, address: &ManagedAddress<Self>) -> bool {
-        unsafe { isSmartContract(unsafe_buffer_load_address(address.get_raw_handle())) > 0 }
+        unsafe { isSmartContract(unsafe_buffer_load_address(address)) > 0 }
     }
 
     #[inline]
@@ -219,10 +221,7 @@ impl BlockchainApi for crate::VmApiImpl {
     fn get_balance(&self, address: &ManagedAddress<Self>) -> BigUint<Self> {
         unsafe {
             let balance_handle = bigIntNew(0);
-            bigIntGetExternalBalance(
-                unsafe_buffer_load_address(address.get_raw_handle()),
-                balance_handle,
-            );
+            bigIntGetExternalBalance(unsafe_buffer_load_address(address), balance_handle);
             BigUint::from_raw_handle(self.clone(), balance_handle)
         }
     }
@@ -349,29 +348,31 @@ impl BlockchainApi for crate::VmApiImpl {
     }
 
     #[inline]
-    fn get_current_esdt_nft_nonce(&self, address: &Address, token: &TokenIdentifier<Self>) -> u64 {
+    fn get_current_esdt_nft_nonce(
+        &self,
+        address: &ManagedAddress<Self>,
+        token: &TokenIdentifier<Self>,
+    ) -> u64 {
         unsafe {
             getCurrentESDTNFTNonce(
-                address.as_ref().as_ptr(),
-                token.to_esdt_identifier().as_ptr(),
+                unsafe_buffer_load_address(address),
+                unsafe_buffer_load_token_identifier(token),
                 token.len() as i32,
             ) as u64
         }
     }
 
-    #[inline]
     fn get_esdt_balance(
         &self,
-        m_address: &ManagedAddress<Self>,
+        address: &ManagedAddress<Self>,
         token: &TokenIdentifier<Self>,
         nonce: u64,
     ) -> BigUint<Self> {
-        let address = m_address.to_address();
         unsafe {
             let balance_handle = bigIntNew(0);
             bigIntGetESDTExternalBalance(
-                address.as_ref().as_ptr(),
-                token.to_esdt_identifier().as_ptr(),
+                unsafe_buffer_load_address(address),
+                unsafe_buffer_load_token_identifier(token),
                 token.len() as i32,
                 nonce as i64,
                 balance_handle,

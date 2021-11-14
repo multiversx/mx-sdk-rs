@@ -122,7 +122,6 @@ impl<const CB_NAME_MAX_LENGTH: usize> CallbackClosureMatcher<CB_NAME_MAX_LENGTH>
         self.name_len == 0
     }
 
-    #[inline(never)]
     pub fn name_matches(&self, name_match: &[u8]) -> bool {
         if self.name_len != name_match.len() {
             false

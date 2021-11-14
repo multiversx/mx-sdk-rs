@@ -179,6 +179,10 @@ where
         self.value.into_boxed_slice_u8()
     }
 
+    fn into_u64(self) -> u64 {
+        self.value.into_u64()
+    }
+
     fn into_specialized<TSC, F>(self, else_deser: F) -> Result<TSC, DecodeError>
     where
         TSC: TryStaticCast,

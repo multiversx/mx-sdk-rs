@@ -1,8 +1,8 @@
 use crate::{
     api::ManagedTypeApi,
     types::{
-        BigInt, BigUint, EllipticCurve, ManagedAddress, ManagedBuffer, ManagedInto, ManagedVec,
-        ManagedVecItem, TokenIdentifier,
+        BigInt, BigUint, EllipticCurve, ManagedAddress, ManagedBuffer, ManagedInto,
+        ManagedMultiResultVec, ManagedVec, ManagedVecItem, TokenIdentifier,
     },
 };
 
@@ -64,6 +64,11 @@ impl<M: ManagedTypeApi> ManagedTypeHelper<M> {
         value: V,
     ) -> ManagedVec<M, T> {
         value.managed_into(self.api.clone())
+    }
+
+    #[inline]
+    pub fn managed_multi_result_vec_new<T>(&self) -> ManagedMultiResultVec<M, T> {
+        ManagedMultiResultVec::new(self.api.clone())
     }
 
     #[inline]
