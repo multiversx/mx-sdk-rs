@@ -24,16 +24,11 @@ impl From<&ContractAbi> for ContractAbiJson {
             build_info: BuildInfoAbiJson::from(&abi.build_info),
             docs: abi.docs.iter().map(|d| d.to_string()).collect(),
             name: abi.name.to_string(),
-            constructor: abi.constructor.as_ref().map(ConstructorAbiJson::from),
-            endpoints: Vec::new(),
+            constructor: abi.constructors.get(0).map(ConstructorAbiJson::from),
+            endpoints: abi.endpoints.iter().map(EndpointAbiJson::from).collect(),
             has_callback: abi.has_callback,
             types: BTreeMap::new(),
         };
-        for endpoint in &abi.endpoints {
-            contract_json
-                .endpoints
-                .push(EndpointAbiJson::from(endpoint));
-        }
         for (type_name, type_description) in abi.type_descriptions.0.iter() {
             if type_description.contents.is_specified() {
                 contract_json.types.insert(
