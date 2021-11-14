@@ -1,0 +1,72 @@
+{
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "100000000000"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "new big float from parts",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "new_from_parts_big_float",
+                "arguments": [
+                    "62345",
+                    "6523452345",
+                    "-7"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "0x01020000003500000010F615586149C6F000"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "new big float from parts - fail positive exponent",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "new_from_parts_big_float",
+                "arguments": [
+                    "62345",
+                    "6523452345",
+                    "223"
+                ]
+            },
+            "expect": {
+                "status": "4"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "new big float from parts - fail exponent value too small (less that -322)",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "new_from_parts_big_float",
+                "arguments": [
+                    "62345",
+                    "6523452345",
+                    "-323"
+                ]
+            },
+            "expect": {
+                "status": "4"
+            }
+        }
+    ]
+}

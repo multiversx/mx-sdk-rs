@@ -1,4 +1,4 @@
-use super::{ManagedBuffer, ManagedType};
+use super::{ManagedBuffer, ManagedDefault, ManagedType};
 use crate::{
     api::{Handle, ManagedTypeApi, Sign},
     types::{BigInt, BigUint},
@@ -69,7 +69,34 @@ impl<M: ManagedTypeApi> From<BigInt<M>> for BigFloat<M> {
     }
 }
 
+impl<M: ManagedTypeApi> ManagedDefault<M> for BigFloat<M> {
+    #[inline]
+    fn managed_default(api: M) -> Self {
+        Self::from_i64(api, 0)
+    }
+}
+
 impl<M: ManagedTypeApi> BigFloat<M> {
+    #[inline]
+    pub fn neg(&self) -> Self {
+        let new_bf_handle = self.api.bf_new_zero();
+        self.api.bf_neg(new_bf_handle, self.handle);
+        BigFloat {
+            handle: new_bf_handle,
+            api: self.api.clone(),
+        }
+    }
+
+    #[inline]
+    pub fn from_i64(api: M, small_value: i64) -> Self {
+        let new_bf_handle = api.bf_new_zero();
+        api.bf_set_i64(new_bf_handle, small_value);
+        BigFloat {
+            handle: new_bf_handle,
+            api,
+        }
+    }
+
     #[inline]
     pub fn from_big_uint(big_uint: &BigUint<M>) -> Self {
         let new_bf_handle = big_uint.api.bf_new_zero();
@@ -92,37 +119,34 @@ impl<M: ManagedTypeApi> BigFloat<M> {
 
     #[inline]
     pub fn from_parts(
-        &self,
+        api: M,
         integral_part_value: i32,
         fractional_part_value: i32,
         exponent_value: i32,
     ) -> Self {
         let new_bf_handle =
-            self.api
-                .bf_from_parts(integral_part_value, fractional_part_value, exponent_value);
+            api.bf_from_parts(integral_part_value, fractional_part_value, exponent_value);
         BigFloat {
             handle: new_bf_handle,
-            api: self.api.clone(),
+            api,
         }
     }
 
     #[inline]
-    pub fn from_frac(&self, numerator_value: i64, denominator_value: i64) -> Self {
-        let new_bf_handle = self.api.bf_from_frac(numerator_value, denominator_value);
+    pub fn from_frac(api: M, numerator_value: i64, denominator_value: i64) -> Self {
+        let new_bf_handle = api.bf_from_frac(numerator_value, denominator_value);
         BigFloat {
             handle: new_bf_handle,
-            api: self.api.clone(),
+            api,
         }
     }
 
     #[inline]
-    pub fn from_sci(&self, significand_value: i64, exponent_value: i32) -> Self {
-        let new_bf_handle = self
-            .api
-            .bf_from_sci(significand_value, exponent_value as i64);
+    pub fn from_sci(api: M, significand_value: i64, exponent_value: i32) -> Self {
+        let new_bf_handle = api.bf_from_sci(significand_value, exponent_value as i64);
         BigFloat {
             handle: new_bf_handle,
-            api: self.api.clone(),
+            api,
         }
     }
 }
@@ -190,6 +214,12 @@ impl<M: ManagedTypeApi> BigFloat<M> {
             handle: result,
             api: self.api.clone(),
         }
+    }
+
+    /// Convert this `BigFloat` into its `Sign` and its magnitude,
+    /// the reverse of `BigInt::from_biguint`.
+    pub fn to_parts(self) -> (Sign, BigFloat<M>) {
+        (self.sign(), self.magnitude())
     }
 }
 
