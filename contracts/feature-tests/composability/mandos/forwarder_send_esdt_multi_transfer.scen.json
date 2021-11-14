@@ -13,7 +13,7 @@
                     "balance": "1000",
                     "esdt": {
                         "str:FWD-TOKEN": "1000",
-                        "str:NFT-123": {
+                        "str:NFT-123456": {
                             "instances": [
                                 {
                                     "nonce": "1",
@@ -21,7 +21,7 @@
                                 }
                             ]
                         },
-                        "str:SFT-456": {
+                        "str:SFT-456789": {
                             "instances": [
                                 {
                                     "nonce": "3",
@@ -79,7 +79,7 @@
                     "balance": "1000",
                     "esdt": {
                         "str:FWD-TOKEN": "700",
-                        "str:NFT-123": {
+                        "str:NFT-123456": {
                             "instances": [
                                 {
                                     "nonce": "1",
@@ -87,7 +87,7 @@
                                 }
                             ]
                         },
-                        "str:SFT-456": {
+                        "str:SFT-456789": {
                             "instances": [
                                 {
                                     "nonce": "3",
@@ -114,10 +114,10 @@
                     "str:FWD-TOKEN",
                     "0",
                     "500",
-                    "str:NFT-123",
+                    "str:NFT-123456",
                     "1",
                     "1",
-                    "str:SFT-456",
+                    "str:SFT-456789",
                     "3",
                     "6"
                 ],
@@ -140,7 +140,7 @@
                     "balance": "0",
                     "esdt": {
                         "str:FWD-TOKEN": "800",
-                        "str:NFT-123": {
+                        "str:NFT-123456": {
                             "instances": [
                                 {
                                     "nonce": "1",
@@ -148,7 +148,7 @@
                                 }
                             ]
                         },
-                        "str:SFT-456": {
+                        "str:SFT-456789": {
                             "instances": [
                                 {
                                     "nonce": "3",
@@ -165,7 +165,7 @@
                     "balance": "1000",
                     "esdt": {
                         "str:FWD-TOKEN": "200",
-                        "str:SFT-456": {
+                        "str:SFT-456789": {
                             "instances": [
                                 {
                                     "nonce": "3",

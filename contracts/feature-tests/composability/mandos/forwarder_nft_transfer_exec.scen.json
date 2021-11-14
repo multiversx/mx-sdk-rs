@@ -8,7 +8,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
-                        "str:NFT-0001": {
+                        "str:NFT-000001": {
                             "instances": [
                                 {
                                     "nonce": "1",
@@ -22,7 +22,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
-                        "str:NFT-0001": {
+                        "str:NFT-000001": {
                             "instances": [
                                 {
                                     "nonce": "1",
@@ -44,7 +44,7 @@
                 "function": "transfer_nft_and_execute",
                 "arguments": [
                     "address:a_user",
-                    "str:NFT-0001",
+                    "str:NFT-000001",
                     "1",
                     "1",
                     ""
@@ -66,7 +66,7 @@
                     "nonce": "*",
                     "balance": "0",
                     "esdt": {
-                        "str:NFT-0001": {
+                        "str:NFT-000001": {
                             "instances": [
                                 {
                                     "nonce": "1",
@@ -82,7 +82,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
-                        "str:NFT-0001": {
+                        "str:NFT-000001": {
                             "instances": [
                                 {
                                     "nonce": "1",
