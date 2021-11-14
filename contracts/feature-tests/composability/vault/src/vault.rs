@@ -95,7 +95,7 @@ pub trait Vault {
         #[payment_token] token_identifier: TokenIdentifier,
         #[payment_amount] token_payment: BigUint,
         #[payment_nonce] token_nonce: u64,
-    ) -> SCResult<MultiResult4<TokenIdentifier, BoxedBytes, BigUint, u64>> {
+    ) -> SCResult<MultiResult4<TokenIdentifier, ManagedBuffer, BigUint, u64>> {
         let token_type = self.call_value().esdt_token_type();
 
         self.accept_funds_event(
@@ -110,7 +110,7 @@ pub trait Vault {
 
         Ok((
             token_identifier,
-            BoxedBytes::from(token_type.as_type_name()),
+            token_type.as_type_name().managed_into(),
             token_payment,
             token_nonce,
         )
