@@ -14,7 +14,7 @@ pub struct Color {
 #[derive(TopEncode, TopDecode, TypeAbi, PartialEq, Clone)]
 pub struct ComplexAttributes<M: ManagedTypeApi> {
     pub biguint: BigUint<M>,
-    pub vec_u8: Vec<u8>,
+    pub vec_u8: ManagedBuffer<M>,
     pub token_id: TokenIdentifier<M>,
     pub boolean: bool,
     pub boxed_bytes: ManagedBuffer<M>,
@@ -170,7 +170,7 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
         royalties: BigUint,
         hash: ManagedBuffer,
         uri: ManagedBuffer,
-        #[var_args] attrs_arg: MultiArg5<BigUint, Vec<u8>, TokenIdentifier, bool, ManagedBuffer>,
+        #[var_args] attrs_arg: MultiArg5<BigUint, ManagedBuffer, TokenIdentifier, bool, ManagedBuffer>,
     ) -> SCResult<()> {
         let attrs_pieces = attrs_arg.into_tuple();
         let orig_attr = ComplexAttributes {

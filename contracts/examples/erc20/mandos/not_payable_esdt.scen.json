@@ -9,7 +9,7 @@
                     "nonce": "0",
                     "balance": "0x10000000",
                     "esdt": {
-                        "str:ANY_TOKEN": "1000"
+                        "str:ANY-TOKENA": "1000"
                     }
                 },
                 "sc:erc20": {
@@ -31,7 +31,7 @@
                 "to": "sc:erc20",
                 "esdtValue": [
                     {
-                        "tokenIdentifier": "str:ANY_TOKEN",
+                        "tokenIdentifier": "str:ANY-TOKENA",
                         "value": "1"
                     }
                 ],
@@ -57,7 +57,7 @@
                 "to": "sc:erc20",
                 "esdtValue": [
                     {
-                        "tokenIdentifier": "str:ANY_TOKEN",
+                        "tokenIdentifier": "str:ANY-TOKENA",
                         "value": "1"
                     }
                 ],
@@ -85,7 +85,7 @@
                 "to": "sc:erc20",
                 "esdtValue": [
                     {
-                        "tokenIdentifier": "str:ANY_TOKEN",
+                        "tokenIdentifier": "str:ANY-TOKENA",
                         "value": "1"
                     }
                 ],
@@ -114,7 +114,7 @@
                 "to": "sc:erc20",
                 "esdtValue": [
                     {
-                        "tokenIdentifier": "str:ANY_TOKEN",
+                        "tokenIdentifier": "str:ANY-TOKENA",
                         "value": "1"
                     }
                 ],
@@ -143,7 +143,7 @@
                 "to": "sc:erc20",
                 "esdtValue": [
                     {
-                        "tokenIdentifier": "str:ANY_TOKEN",
+                        "tokenIdentifier": "str:ANY-TOKENA",
                         "value": "1"
                     }
                 ],
@@ -172,7 +172,7 @@
                 "to": "sc:erc20",
                 "esdtValue": [
                     {
-                        "tokenIdentifier": "str:ANY_TOKEN",
+                        "tokenIdentifier": "str:ANY-TOKENA",
                         "value": "1"
                     }
                 ],
@@ -201,7 +201,7 @@
                     "nonce": "6",
                     "balance": "0xfa00000",
                     "esdt": {
-                        "str:ANY_TOKEN": "1000"
+                        "str:ANY-TOKENA": "1000"
                     },
                     "storage": {},
                     "code": ""
