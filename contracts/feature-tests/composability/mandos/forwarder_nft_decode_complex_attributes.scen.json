@@ -8,7 +8,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
-                        "str:NFT-0001": {
+                        "str:NFT-000001": {
                             "instances": [
                                 {
                                     "nonce": "1",
@@ -22,7 +22,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
-                        "str:NFT-0001": {
+                        "str:NFT-000001": {
                             "instances": [
                                 {
                                     "nonce": "1",
@@ -48,7 +48,7 @@
                 "to": "sc:forwarder",
                 "function": "nft_decode_complex_attributes",
                 "arguments": [
-                    "str:NFT-0001",
+                    "str:NFT-000001",
                     "1",
                     "str:nft-create-name",
                     "0",
@@ -56,7 +56,7 @@
                     "str:nft-create-uri",
                     "123",
                     "u32:4|u8:1|u8:2|u8:3|u8:4",
-                    "str:NFT-0001",
+                    "str:NFT-000001",
                     "1",
                     "str:MY_BOXED_BYTES"
                 ],
@@ -79,7 +79,7 @@
                     "nonce": "*",
                     "balance": "0",
                     "esdt": {
-                        "str:NFT-0001": {
+                        "str:NFT-000001": {
                             "instances": [
                                 {
                                     "nonce": "1",
@@ -95,7 +95,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
-                        "str:NFT-0001": {
+                        "str:NFT-000001": {
                             "instances": [
                                 {
                                     "nonce": "1",

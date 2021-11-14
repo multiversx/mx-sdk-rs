@@ -18,7 +18,7 @@ build_and_copy() {
       $vm_contract_path
 }
 
-# building all contracts takes a lot of time, only the ones for Arwen are built below
+# building all contracts takes a lot of time, only the ones for the wasm-vm tests are built below
 # if you still want to build all:
 # ./build-wasm.sh
 

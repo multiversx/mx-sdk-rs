@@ -171,15 +171,20 @@ pub trait ForwarderAsyncCallModule {
     fn callback_data_at_index(
         &self,
         index: usize,
-    ) -> MultiResult5<ManagedBuffer, TokenIdentifier, u64, BigUint, MultiResultVec<ManagedBuffer>>
-    {
+    ) -> MultiResult5<
+        ManagedBuffer,
+        TokenIdentifier,
+        u64,
+        BigUint,
+        ManagedMultiResultVecEager<Self::Api, ManagedBuffer>,
+    > {
         let cb_data = self.callback_data().get(index);
         (
             cb_data.callback_name,
             cb_data.token_identifier,
             cb_data.token_nonce,
             cb_data.token_amount,
-            cb_data.args.into_vec().into(),
+            cb_data.args.into(),
         )
             .into()
     }
