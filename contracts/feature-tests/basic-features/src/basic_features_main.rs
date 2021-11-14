@@ -3,6 +3,8 @@
 
 elrond_wasm::imports!();
 
+pub mod big_float_methods;
+pub mod big_float_operators;
 pub mod big_num_methods;
 pub mod big_num_operators;
 pub mod block_info_features;
@@ -32,7 +34,9 @@ pub mod types;
 
 #[elrond_wasm::contract]
 pub trait BasicFeatures:
-    big_num_methods::BigIntMethods
+    big_float_methods::BigFloatMethods
+    + big_float_operators::BigFloatOperators
+    + big_num_methods::BigIntMethods
     + big_num_operators::BigIntOperators
     + elliptic_curve_features::EllipticCurveFeatures
     + block_info_features::BlockInfoFeatures
