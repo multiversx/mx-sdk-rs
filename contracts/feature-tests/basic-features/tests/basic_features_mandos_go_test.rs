@@ -178,7 +178,6 @@ fn echo_varargs_managed_sum_go() {
     elrond_wasm_debug::mandos_go("mandos/echo_varargs_managed_sum.scen.json");
 }
 
-
 #[test]
 fn echo_varags_tuples_go() {
     elrond_wasm_debug::mandos_go("mandos/echo_varags_tuples.scen.json");
