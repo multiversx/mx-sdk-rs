@@ -72,7 +72,7 @@ fn generate_endpoint_snippets(contract: &ContractTrait) -> Vec<proc_macro2::Toke
                 );
                 Some(quote! {
                     #endpoint_def
-                    contract_abi.constructor = Some(endpoint_abi);
+                    contract_abi.constructors.push(endpoint_abi);
                 })
             },
             PublicRole::Endpoint(endpoint_metadata) => {
@@ -140,7 +140,7 @@ fn generate_abi_method_body(
             },
             docs: &[ #(#contract_docs),* ],
             name: #contract_name,
-            constructor: None,
+            constructors: Vec::new(),
             endpoints: Vec::new(),
             has_callback: #has_callbacks,
             type_descriptions: <elrond_wasm::abi::TypeDescriptionContainerImpl as elrond_wasm::abi::TypeDescriptionContainer>::new(),

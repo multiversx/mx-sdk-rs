@@ -4,6 +4,7 @@ mod internal_mod_a;
 mod internal_mod_b;
 mod internal_mod_c;
 mod internal_mod_d;
+mod internal_mod_init;
 
 elrond_wasm::imports!();
 
@@ -19,6 +20,7 @@ pub trait UseModule:
     internal_mod_a::InternalModuleA
     + internal_mod_b::InternalModuleB
     + internal_mod_c::InternalModuleC
+    + internal_mod_init::InternalModuleInit
     + elrond_wasm_module_dns::DnsModule
     + elrond_wasm_module_esdt::EsdtModule
     + elrond_wasm_module_features::FeaturesModule
@@ -26,9 +28,6 @@ pub trait UseModule:
     + elrond_wasm_module_governance::governance_configurable::GovernanceConfigurablePropertiesModule
     + elrond_wasm_module_pause::PauseModule
 {
-    #[init]
-    fn init(&self) {}
-
     /// Validates that the "featureName" feature is on.
     /// Uses the `feature_guard!` macro.
     #[endpoint(checkFeatureGuard)]
