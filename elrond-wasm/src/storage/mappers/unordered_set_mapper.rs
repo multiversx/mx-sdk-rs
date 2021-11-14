@@ -3,12 +3,13 @@ use super::{StorageClearable, StorageMapper, VecMapper};
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
     api::{EndpointFinishApi, ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi},
+    finish_all,
     storage::StorageKey,
     storage_clear, storage_get, storage_set,
     types::MultiResultVec,
     EndpointResult,
 };
-use elrond_codec::{NestedDecode, NestedEncode, TopDecode, TopEncode, Vec};
+use elrond_codec::{NestedDecode, NestedEncode, TopDecode, TopEncode};
 
 const ITEM_INDEX: &[u8] = b".index";
 const NULL_ENTRY: usize = 0;
@@ -136,8 +137,7 @@ where
     where
         FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static,
     {
-        let v: Vec<T> = self.iter().collect();
-        MultiResultVec::<T>::from(v).finish(api);
+        finish_all(api, self.iter());
     }
 }
 

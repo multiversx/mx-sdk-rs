@@ -2,6 +2,7 @@ use super::StorageMapper;
 use crate::{
     abi::{TypeAbi, TypeName},
     api::{EndpointFinishApi, ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi},
+    finish_all,
     io::EndpointResult,
     storage::{storage_get, storage_get_len, storage_set, StorageKey},
     types::{ManagedAddress, ManagedVec, MultiResultVec},
@@ -180,9 +181,7 @@ where
         FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static,
     {
         let all_addresses = self.get_all_addresses();
-        for address in all_addresses.into_iter() {
-            address.finish(api.clone());
-        }
+        finish_all(api, all_addresses.into_iter());
     }
 }
 

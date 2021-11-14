@@ -44,12 +44,15 @@ pub trait BlockchainApiFeatures {
     }
 
     #[endpoint]
-    fn get_esdt_local_roles(&self, token_id: TokenIdentifier) -> MultiResultVec<BoxedBytes> {
+    fn get_esdt_local_roles(
+        &self,
+        token_id: TokenIdentifier,
+    ) -> ManagedMultiResultVec<ManagedBuffer> {
         let roles = self.blockchain().get_esdt_local_roles(&token_id);
-        let role_names: Vec<BoxedBytes> = roles
-            .iter()
-            .map(|role| BoxedBytes::from(role.as_role_name()))
-            .collect();
-        role_names.into()
+        let mut result = ManagedMultiResultVec::new();
+        for role in roles.iter_roles() {
+            result.push(role.as_role_name().managed_into());
+        }
+        result
     }
 }

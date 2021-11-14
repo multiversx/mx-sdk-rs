@@ -208,7 +208,7 @@ pub trait NftModule {
         let roles = self.blockchain().get_esdt_local_roles(&nft_token_id);
 
         require!(
-            roles.contains(&EsdtLocalRole::NftCreate),
+            roles.has_role(&EsdtLocalRole::NftCreate),
             "NFTCreate role not set"
         );
 

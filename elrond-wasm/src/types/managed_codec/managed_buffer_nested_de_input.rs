@@ -14,7 +14,6 @@ use crate::{
 
 /// Nested decode buffer based on a managed buffer.
 /// Uses the load/copy slice API to extract pieces of the managed buffer for deserialization.
-
 pub struct ManagedBufferNestedDecodeInput<M>
 where
     M: ManagedTypeApi,

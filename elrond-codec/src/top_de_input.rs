@@ -99,6 +99,14 @@ impl<'a> TopDecodeInput for &'a [u8] {
         self.len()
     }
 
+    fn into_u64(self) -> u64 {
+        bytes_to_number(self, false)
+    }
+
+    fn into_i64(self) -> i64 {
+        bytes_to_number(self, true) as i64
+    }
+
     fn into_boxed_slice_u8(self) -> Box<[u8]> {
         Box::from(self)
     }

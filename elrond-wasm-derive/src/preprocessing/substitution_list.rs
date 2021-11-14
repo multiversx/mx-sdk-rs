@@ -44,6 +44,7 @@ fn add_managed_types(substitutions: &mut SubstitutionsMap) {
     add_managed_type(substitutions, &quote!(ManagedAsyncCallError));
 
     add_managed_type_with_generics(substitutions, &quote!(ManagedVec));
+    add_managed_type_with_generics(substitutions, &quote!(ManagedVecIterator));
     add_managed_type_with_generics(substitutions, &quote!(ManagedVarArgs));
     add_managed_type_with_generics(substitutions, &quote!(ManagedMultiResultVec));
     add_managed_type_with_generics(substitutions, &quote!(ManagedAsyncCallResult));
@@ -83,6 +84,10 @@ fn add_special_methods(substitutions: &mut SubstitutionsMap) {
     substitutions.add_substitution(
         quote!(ManagedVec::from),
         quote!(self.types().managed_vec_from),
+    );
+    substitutions.add_substitution(
+        quote!(ManagedMultiResultVec::new()),
+        quote!(self.types().managed_multi_result_vec_new()),
     );
     substitutions.add_substitution(
         quote!(TokenIdentifier::egld()),

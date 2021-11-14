@@ -1,9 +1,10 @@
 use crate::{
     api::{BlockchainApi, ErrorApi, ManagedTypeApi, StorageReadApi},
+    err_msg,
     storage::{self, StorageKey},
     types::{
-        Address, BigUint, BoxedBytes, EsdtLocalRole, EsdtTokenData, ManagedAddress,
-        ManagedByteArray, ManagedType, TokenIdentifier, Vec, H256,
+        Address, BigUint, EsdtLocalRole, EsdtLocalRoleFlags, EsdtTokenData, ManagedAddress,
+        ManagedBuffer, ManagedByteArray, ManagedType, TokenIdentifier, H256,
     },
 };
 use alloc::boxed::Box;
@@ -193,7 +194,7 @@ where
     #[inline]
     pub fn get_current_esdt_nft_nonce(
         &self,
-        address: &Address,
+        address: &ManagedAddress<A>,
         token_id: &TokenIdentifier<A>,
     ) -> u64 {
         self.api.get_current_esdt_nft_nonce(address, token_id)
@@ -230,35 +231,41 @@ where
 
     /// Retrieves local roles for the token, by reading protected storage.
     /// TODO: rewrite using managed types
-    pub fn get_esdt_local_roles(&self, token_id: &TokenIdentifier<A>) -> Vec<EsdtLocalRole> {
-        let mut roles = Vec::new();
-
+    pub fn get_esdt_local_roles(&self, token_id: &TokenIdentifier<A>) -> EsdtLocalRoleFlags {
         let mut key = StorageKey::new(
             self.api.clone(),
             storage::protected_keys::ELROND_ESDT_LOCAL_ROLES_KEY,
         );
         key.append_managed_buffer(token_id.as_managed_buffer());
-        let raw_storage = storage::storage_get::<A, BoxedBytes>(self.api.clone(), &key);
-        let raw_storage_bytes = raw_storage.as_slice();
+        let value_mb = storage::storage_get::<A, ManagedBuffer<A>>(self.api.clone(), &key);
+        let value_len = value_mb.len();
+        const DATA_MAX_LEN: usize = 300;
+        if value_len > DATA_MAX_LEN {
+            self.api.signal_error(err_msg::STORAGE_VALUE_EXCEEDS_BUFFER);
+        }
+        let mut data_buffer = [0u8; DATA_MAX_LEN];
+        let _ = value_mb.load_slice(0, &mut data_buffer[..value_len]);
+
         let mut current_index = 0;
 
-        while current_index < raw_storage_bytes.len() {
+        let mut result = EsdtLocalRoleFlags::NONE;
+
+        while current_index < value_len {
             // first character before each role is a \n, so we skip it
             current_index += 1;
 
             // next is the length of the role as string
-            let role_len = raw_storage_bytes[current_index];
+            let role_len = data_buffer[current_index];
             current_index += 1;
 
             // next is role's ASCII string representation
             let end_index = current_index + role_len as usize;
-            let role_name = &raw_storage_bytes[current_index..end_index];
+            let role_name = &data_buffer[current_index..end_index];
             current_index = end_index;
 
-            let esdt_local_role = EsdtLocalRole::from(role_name);
-            roles.push(esdt_local_role);
+            result |= EsdtLocalRole::from(role_name).to_flag();
         }
 
-        roles
+        result
     }
 }

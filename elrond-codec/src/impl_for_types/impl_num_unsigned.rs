@@ -19,7 +19,6 @@ dep_encode_num_mimic! {usize, u32, TypeInfo::USIZE}
 macro_rules! dep_encode_num_unsigned {
     ($num_type:ty, $size_in_bits:expr, $type_info:expr) => {
         impl NestedEncodeNoErr for $num_type {
-            #[inline(never)]
             fn dep_encode_no_err<O: NestedEncodeOutput>(&self, dest: &mut O) {
                 dest.write(&self.to_be_bytes()[..]);
             }
