@@ -8,7 +8,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
-                        "str:TOK-123": "150"
+                        "str:TOK-123000": "150"
                     }
                 },
                 "address:B": {
@@ -24,7 +24,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
-                        "str:TOK-123": "150"
+                        "str:TOK-123000": "150"
                     },
                     "storage": {},
                     "code": ""
@@ -33,7 +33,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
-                        "str:TOK-123": "100"
+                        "str:TOK-123000": "100"
                     },
                     "storage": {},
                     "code": ""
