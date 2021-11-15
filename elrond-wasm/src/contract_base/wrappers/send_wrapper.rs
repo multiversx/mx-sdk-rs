@@ -347,7 +347,7 @@ where
 
         if uris.is_empty() {
             // at least one URI is required, so we push an empty one
-            arg_buffer.push_arg(ManagedBuffer::new(self.api.clone()));
+            arg_buffer.push_arg(&());
         } else {
             // The API function has the last argument as variadic,
             // so we top-encode each and send as separate argument
@@ -365,7 +365,7 @@ where
         );
 
         if let Some(first_result_bytes) = output.get(0) {
-            u64::top_decode(first_result_bytes.as_managed_ref()).unwrap_or_default()
+            first_result_bytes.parse_as_u64().unwrap_or_default()
         } else {
             0
         }
