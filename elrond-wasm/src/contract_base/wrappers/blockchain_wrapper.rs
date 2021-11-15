@@ -268,4 +268,13 @@ where
 
         result
     }
+
+    pub fn check_token_has_roles(
+        &self,
+        token_id: &TokenIdentifier<A>,
+        role: &EsdtLocalRole,
+    ) -> bool {
+        let roles = self.get_esdt_local_roles(token_id);
+        roles.has_role(role)
+    }
 }
