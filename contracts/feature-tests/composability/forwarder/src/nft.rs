@@ -137,6 +137,31 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
     }
 
     #[endpoint]
+    fn nft_create_on_caller_behalf(
+        &self,
+        token_identifier: TokenIdentifier,
+        amount: BigUint,
+        name: ManagedBuffer,
+        royalties: BigUint,
+        hash: ManagedBuffer,
+        color: Color,
+        uri: ManagedBuffer,
+    ) -> u64 {
+        let mut uris = ManagedVec::new(self.type_manager());
+        uris.push(uri);
+
+        self.send().esdt_nft_create_as_caller::<Color>(
+            &token_identifier,
+            &amount,
+            &name,
+            &royalties,
+            &hash,
+            &color,
+            &uris,
+        )
+    }
+
+    #[endpoint]
     fn nft_decode_complex_attributes(
         &self,
         token_identifier: TokenIdentifier,
@@ -145,7 +170,13 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
         royalties: BigUint,
         hash: ManagedBuffer,
         uri: ManagedBuffer,
-        #[var_args] attrs_arg: MultiArg5<BigUint, ManagedBuffer, TokenIdentifier, bool, ManagedBuffer>,
+        #[var_args] attrs_arg: MultiArg5<
+            BigUint,
+            ManagedBuffer,
+            TokenIdentifier,
+            bool,
+            ManagedBuffer,
+        >,
     ) -> SCResult<()> {
         let attrs_pieces = attrs_arg.into_tuple();
         let orig_attr = ComplexAttributes {
