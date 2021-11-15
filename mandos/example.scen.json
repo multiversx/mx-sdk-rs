@@ -479,15 +479,15 @@
                 "to": "address:B",
                 "esdtValue": [
                     {
-                        "tokenIdentifier": "str:TOK-123",
+                        "tokenIdentifier": "str:TOK-123000",
                         "value": "100"
                     },
                     {
-                        "tokenIdentifier": "str:OTHERTOK-123",
+                        "tokenIdentifier": "str:OTHERTOK-123777",
                         "value": "1000"
                     },
                     {
-                        "tokenIdentifier": "str:NFT-123",
+                        "tokenIdentifier": "str:NFT-123456",
                         "nonce": "5",
                         "value": "10"
                     }
