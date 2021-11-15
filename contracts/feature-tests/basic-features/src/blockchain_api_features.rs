@@ -55,4 +55,10 @@ pub trait BlockchainApiFeatures {
         }
         result
     }
+
+    #[endpoint]
+    fn check_token_has_roles(&self, token_id: TokenIdentifier, role: EsdtLocalRole) -> bool {
+        let roles = self.blockchain().get_esdt_local_roles(&token_id);
+        roles.has_role(&role)
+    }
 }
