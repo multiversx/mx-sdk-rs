@@ -3,10 +3,8 @@ use quote::quote;
 
 /// Gets the first generic of the main type, for more accurate replacements in the field types.
 fn extract_first_generic_ident(generics: &syn::Generics) -> Option<syn::Ident> {
-    if let Some(param) = generics.params.first() {
-        if let syn::GenericParam::Type(type_param) = param {
-            return Some(type_param.ident.clone());
-        }
+    if let Some(syn::GenericParam::Type(type_param)) = generics.params.first() {
+        return Some(type_param.ident.clone());
     }
 
     None
