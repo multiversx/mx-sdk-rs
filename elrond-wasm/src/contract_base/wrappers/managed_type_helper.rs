@@ -1,7 +1,7 @@
 use crate::{
     api::ManagedTypeApi,
     types::{
-        BigInt, BigUint, EllipticCurve, ManagedAddress, ManagedBuffer, ManagedInto,
+        BigFloat, BigInt, BigUint, EllipticCurve, ManagedAddress, ManagedBuffer, ManagedInto,
         ManagedMultiResultVec, ManagedVec, ManagedVecItem, TokenIdentifier,
     },
 };
@@ -33,6 +33,41 @@ impl<M: ManagedTypeApi> ManagedTypeHelper<M> {
     #[inline]
     pub fn big_int_from<T: ManagedInto<M, BigInt<M>>>(&self, value: T) -> BigInt<M> {
         value.managed_into(self.api.clone())
+    }
+
+    #[inline]
+    pub fn big_float_from<T: ManagedInto<M, BigFloat<M>>>(&self, value: T) -> BigFloat<M> {
+        value.managed_into(self.api.clone())
+    }
+
+    #[inline]
+    pub fn big_float_zero(&self) -> BigFloat<M> {
+        BigFloat::zero(self.api.clone())
+    }
+
+    #[inline]
+    pub fn big_float_from_parts(
+        &self,
+        integral_part_value: i32,
+        fractional_part_value: i32,
+        exponent_value: i32,
+    ) -> BigFloat<M> {
+        BigFloat::from_parts(
+            self.api.clone(),
+            integral_part_value,
+            fractional_part_value,
+            exponent_value,
+        )
+    }
+
+    #[inline]
+    pub fn big_float_from_frac(&self, numerator_value: i64, denominator_value: i64) -> BigFloat<M> {
+        BigFloat::from_frac(self.api.clone(), numerator_value, denominator_value)
+    }
+
+    #[inline]
+    pub fn big_float_from_sci(&self, significand_value: i64, exponent_value: i64) -> BigFloat<M> {
+        BigFloat::from_frac(self.api.clone(), significand_value, exponent_value)
     }
 
     #[inline]

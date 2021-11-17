@@ -35,6 +35,7 @@ fn add_managed_type_with_generics(
 fn add_managed_types(substitutions: &mut SubstitutionsMap) {
     add_managed_type(substitutions, &quote!(BigInt));
     add_managed_type(substitutions, &quote!(BigUint));
+    add_managed_type(substitutions, &quote!(BigFloat));
     add_managed_type(substitutions, &quote!(ManagedBuffer));
     add_managed_type(substitutions, &quote!(EllipticCurve));
     add_managed_type(substitutions, &quote!(ManagedAddress));
@@ -65,6 +66,23 @@ fn add_special_methods(substitutions: &mut SubstitutionsMap) {
     substitutions.add_substitution(quote!(BigUint::from), quote!(self.types().big_uint_from));
     substitutions.add_substitution(quote!(BigInt::zero()), quote!(self.types().big_int_zero()));
     substitutions.add_substitution(quote!(BigInt::from), quote!(self.types().big_int_from));
+    substitutions.add_substitution(
+        quote!(BigFloat::zero()),
+        quote!(self.types().big_float_zero()),
+    );
+    substitutions.add_substitution(quote!(BigFloat::from), quote!(self.types().big_float_from));
+    substitutions.add_substitution(
+        quote!(BigFloat::from_parts),
+        quote!(self.types().big_float_from_parts),
+    );
+    substitutions.add_substitution(
+        quote!(BigFloat::from_frac),
+        quote!(self.types().big_float_from_frac),
+    );
+    substitutions.add_substitution(
+        quote!(BigFloat::from_sci),
+        quote!(self.types().big_float_from_sci),
+    );
     substitutions.add_substitution(
         quote!(ManagedBuffer::new()),
         quote!(self.types().managed_buffer_new()),
