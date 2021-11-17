@@ -8,20 +8,35 @@ elrond_wasm_node::wasm_endpoints! {
     basic_features
     (
         init
+        add_assign_big_float
+        add_assign_big_float_ref
         add_assign_big_int
         add_assign_big_int_ref
         add_assign_big_uint
         add_assign_big_uint_ref
+        add_big_float
+        add_big_float_ref
         add_big_int
         add_big_int_ref
         add_big_uint
         add_big_uint_ref
+        big_float_from_big_int_1
+        big_float_from_big_int_2
+        big_float_from_big_uint_1
+        big_float_from_big_uint_2
+        big_float_from_i64
+        big_float_from_man_buf
+        big_float_from_man_buf_ref
+        big_float_neg
+        big_float_zero
         big_int_from_biguint
         big_int_from_i64_1
         big_int_from_i64_2
         big_int_to_i64
         big_int_to_parts
         big_int_zero
+        big_uint_from_managed_buffer
+        big_uint_from_managed_buffer_ref
         big_uint_from_u64_1
         big_uint_from_u64_2
         big_uint_to_u64
@@ -71,10 +86,14 @@ elrond_wasm_node::wasm_endpoints! {
         compute_unmarshal_compressed_ec
         compute_unmarshal_ec
         count_ones
+        div_assign_big_float
+        div_assign_big_float_ref
         div_assign_big_int
         div_assign_big_int_ref
         div_assign_big_uint
         div_assign_big_uint_ref
+        div_big_float
+        div_big_float_ref
         div_big_int
         div_big_int_ref
         div_big_uint
@@ -220,10 +239,14 @@ elrond_wasm_node::wasm_endpoints! {
         mbuffer_overwrite
         mbuffer_slice_1
         mbuffer_slice_2
+        mul_assign_big_float
+        mul_assign_big_float_ref
         mul_assign_big_int
         mul_assign_big_int_ref
         mul_assign_big_uint
         mul_assign_big_uint_ref
+        mul_big_float
+        mul_big_float_ref
         mul_big_int
         mul_big_int_ref
         mul_big_uint
@@ -232,11 +255,16 @@ elrond_wasm_node::wasm_endpoints! {
         my_single_value_mapper_increment_2
         my_single_value_mapper_set_if_empty
         my_single_value_mapper_subtract_with_require
+        new_from_frac_big_float
+        new_from_parts_big_float
+        new_from_sci_big_float
         non_zero_usize_iter
         non_zero_usize_macro
         only_owner_endpoint
         only_owner_legacy
         panicWithMessage
+        pow_big_float
+        pow_big_float_ref
         pow_big_int
         pow_big_int_ref
         pow_big_uint
@@ -277,6 +305,8 @@ elrond_wasm_node::wasm_endpoints! {
         shr_assign_big_uint_ref
         shr_big_uint
         shr_big_uint_ref
+        sqrt_big_float
+        sqrt_big_float_ref
         sqrt_big_uint
         sqrt_big_uint_ref
         store_addr
@@ -297,10 +327,14 @@ elrond_wasm_node::wasm_endpoints! {
         store_u64
         store_usize
         store_vec_u8
+        sub_assign_big_float
+        sub_assign_big_float_ref
         sub_assign_big_int
         sub_assign_big_int_ref
         sub_assign_big_uint
         sub_assign_big_uint_ref
+        sub_big_float
+        sub_big_float_ref
         sub_big_int
         sub_big_int_ref
         sub_big_uint

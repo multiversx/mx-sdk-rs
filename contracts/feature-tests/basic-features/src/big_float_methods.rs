@@ -23,37 +23,37 @@ pub trait BigFloatMethods {
     }
 
     #[endpoint]
-    fn big_float_from_big_uint_1(&self, bi: BigUint) -> Self {
-        BigFloat::from_big_uint(bi)
+    fn big_float_from_big_uint_1(&self, bi: BigUint) -> BigFloat {
+        BigFloat::from_big_uint(&bi)
     }
 
     #[endpoint]
-    fn big_float_from_big_uint_2(&self, bi: BigUint) -> Self {
+    fn big_float_from_big_uint_2(&self, bi: BigUint) -> BigFloat {
         BigFloat::from(bi)
     }
 
     #[endpoint]
-    fn big_float_from_big_int_1(&self, bi: BigInt) -> Self {
-        BigFloat::from_big_int(bi)
+    fn big_float_from_big_int_1(&self, bi: BigInt) -> BigFloat {
+        BigFloat::from_big_int(&bi)
     }
 
     #[endpoint]
-    fn big_float_from_big_int_2(&self, bi: BigInt) -> Self {
+    fn big_float_from_big_int_2(&self, bi: BigInt) -> BigFloat {
         BigFloat::from(bi)
     }
 
     #[endpoint]
-    fn big_float_from_i64(&self, small_value: i64) -> Self {
+    fn big_float_from_i64(&self, small_value: i64) -> BigFloat {
         BigFloat::from(small_value)
     }
 
     #[endpoint]
-    fn big_float_from_man_buf(&self, man_buf: ManagedBuffer) -> Self {
+    fn big_float_from_man_buf(&self, man_buf: ManagedBuffer) -> BigFloat {
         BigFloat::from(man_buf)
     }
 
     #[endpoint]
-    fn big_float_from_man_buf_ref(&self, man_buf: &ManagedBuffer) -> Self {
+    fn big_float_from_man_buf_ref(&self, man_buf: &ManagedBuffer) -> BigFloat {
         BigFloat::from(man_buf)
     }
 

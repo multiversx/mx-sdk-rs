@@ -17,7 +17,7 @@ pub trait BigFloatOperators {
         a - b
     }
     #[endpoint]
-    fn sub_big_float(&self, a: &BigFloat, b: &BigFloat) -> BigFloat {
+    fn sub_big_float_ref(&self, a: &BigFloat, b: &BigFloat) -> BigFloat {
         a - b
     }
     #[endpoint]
@@ -25,7 +25,7 @@ pub trait BigFloatOperators {
         a * b
     }
     #[endpoint]
-    fn mul_big_float(&self, a: &BigFloat, b: &BigFloat) -> BigFloat {
+    fn mul_big_float_ref(&self, a: &BigFloat, b: &BigFloat) -> BigFloat {
         a * b
     }
     #[endpoint]
@@ -33,7 +33,7 @@ pub trait BigFloatOperators {
         a / b
     }
     #[endpoint]
-    fn div_big_float(&self, a: &BigFloat, b: &BigFloat) -> BigFloat {
+    fn div_big_float_ref(&self, a: &BigFloat, b: &BigFloat) -> BigFloat {
         a / b
     }
 
