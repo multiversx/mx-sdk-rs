@@ -1,14 +1,71 @@
-use super::{ManagedBuffer, ManagedDefault, ManagedType};
+use super::{ManagedBuffer, ManagedDefault, ManagedFrom, ManagedType};
 use crate::{
     api::{Handle, ManagedTypeApi, Sign},
     types::{BigInt, BigUint},
 };
-use elrond_codec::TryStaticCast;
+use alloc::string::String;
+
+use elrond_codec::{
+    DecodeError, EncodeError, NestedDecode, NestedDecodeInput, NestedEncode, NestedEncodeOutput,
+    TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, TryStaticCast,
+};
 
 #[derive(Debug)]
 pub struct BigFloat<M: ManagedTypeApi> {
     pub(crate) handle: Handle,
     pub(crate) api: M,
+}
+
+impl<M, U> ManagedFrom<M, U> for BigFloat<M>
+where
+    M: ManagedTypeApi,
+    U: Into<i64>,
+{
+    fn managed_from(api: M, value: U) -> Self {
+        BigFloat::from_i64(api, value.into())
+    }
+}
+
+impl<M: ManagedTypeApi> ManagedFrom<M, &ManagedBuffer<M>> for BigFloat<M> {
+    #[inline]
+    fn managed_from(_api: M, item: &ManagedBuffer<M>) -> Self {
+        Self::from(item)
+    }
+}
+
+impl<M: ManagedTypeApi> ManagedFrom<M, ManagedBuffer<M>> for BigFloat<M> {
+    #[inline]
+    fn managed_from(_api: M, item: ManagedBuffer<M>) -> Self {
+        Self::from(item)
+    }
+}
+
+impl<M: ManagedTypeApi> ManagedFrom<M, &BigUint<M>> for BigFloat<M> {
+    #[inline]
+    fn managed_from(_api: M, item: &BigUint<M>) -> Self {
+        Self::from(item)
+    }
+}
+
+impl<M: ManagedTypeApi> ManagedFrom<M, BigUint<M>> for BigFloat<M> {
+    #[inline]
+    fn managed_from(_api: M, item: BigUint<M>) -> Self {
+        Self::from(item)
+    }
+}
+
+impl<M: ManagedTypeApi> ManagedFrom<M, &BigInt<M>> for BigFloat<M> {
+    #[inline]
+    fn managed_from(_api: M, item: &BigInt<M>) -> Self {
+        Self::from(item)
+    }
+}
+
+impl<M: ManagedTypeApi> ManagedFrom<M, BigInt<M>> for BigFloat<M> {
+    #[inline]
+    fn managed_from(_api: M, item: BigInt<M>) -> Self {
+        Self::from(item)
+    }
 }
 
 impl<M: ManagedTypeApi> ManagedType<M> for BigFloat<M> {
@@ -30,8 +87,6 @@ impl<M: ManagedTypeApi> ManagedType<M> for BigFloat<M> {
         self.api.clone()
     }
 }
-
-impl<M: ManagedTypeApi> TryStaticCast for BigFloat<M> {}
 
 impl<M: ManagedTypeApi> From<&ManagedBuffer<M>> for BigFloat<M> {
     fn from(item: &ManagedBuffer<M>) -> Self {
@@ -231,5 +286,56 @@ impl<M: ManagedTypeApi> Clone for BigFloat<M> {
             handle: new_handle,
             api: self.api.clone(),
         }
+    }
+}
+
+impl<M: ManagedTypeApi> TryStaticCast for BigFloat<M> {}
+
+impl<M: ManagedTypeApi> TopEncode for BigFloat<M> {
+    #[inline]
+    fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
+        self.to_buffer().top_encode(output)
+    }
+}
+
+impl<M: ManagedTypeApi> TopDecode for BigFloat<M> {
+    #[inline]
+    fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
+        Ok(BigFloat::from(ManagedBuffer::top_decode(input)?))
+    }
+
+    fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
+        input: I,
+        c: ExitCtx,
+        exit: fn(ExitCtx, DecodeError) -> !,
+    ) -> Self {
+        BigFloat::from(ManagedBuffer::top_decode_or_exit(input, c, exit))
+    }
+}
+
+impl<M: ManagedTypeApi> NestedEncode for BigFloat<M> {
+    #[inline]
+    fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
+        self.to_buffer().dep_encode(dest)
+    }
+}
+
+impl<M: ManagedTypeApi> NestedDecode for BigFloat<M> {
+    fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
+        Ok(BigFloat::from(ManagedBuffer::dep_decode(input)?))
+    }
+
+    fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
+        input: &mut I,
+        c: ExitCtx,
+        exit: fn(ExitCtx, DecodeError) -> !,
+    ) -> Self {
+        BigFloat::from(ManagedBuffer::dep_decode_or_exit(input, c, exit))
+    }
+}
+
+impl<M: ManagedTypeApi> crate::abi::TypeAbi for BigFloat<M> {
+    fn type_name() -> String {
+        String::from("BigFloat")
     }
 }
