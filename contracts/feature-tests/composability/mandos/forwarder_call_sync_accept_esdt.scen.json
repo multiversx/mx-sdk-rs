@@ -8,7 +8,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
-                        "str:TEST-TOKEN": "1000"
+                        "str:TEST-TOKENA": "1000"
                     }
                 },
                 "sc:vault": {
@@ -31,7 +31,7 @@
                 "to": "sc:forwarder",
                 "esdtValue": [
                     {
-                        "tokenIdentifier": "str:TEST-TOKEN",
+                        "tokenIdentifier": "str:TEST-TOKENA",
                         "value": "1000"
                     }
                 ],
@@ -44,7 +44,7 @@
             },
             "expect": {
                 "out": [
-                    "str:TEST-TOKEN",
+                    "str:TEST-TOKENA",
                     "str:FungibleESDT",
                     "1000",
                     "0"
@@ -55,7 +55,7 @@
                         "address": "sc:forwarder",
                         "endpoint": "str:ESDTTransfer",
                         "topics": [
-                            "str:TEST-TOKEN",
+                            "str:TEST-TOKENA",
                             "",
                             "1000",
                             "sc:vault"
@@ -67,7 +67,7 @@
                         "endpoint": "str:accept_funds_echo_payment",
                         "topics": [
                             "str:accept_funds",
-                            "str:TEST-TOKEN",
+                            "str:TEST-TOKENA",
                             "str:FungibleESDT",
                             "1000",
                             "0"
@@ -79,7 +79,7 @@
                         "endpoint": "str:forward_sync_accept_funds",
                         "topics": [
                             "str:accept_funds_sync_result",
-                            "str:TEST-TOKEN",
+                            "str:TEST-TOKENA",
                             "str:FungibleESDT",
                             "1000",
                             "0"
@@ -98,7 +98,7 @@
                     "nonce": "*",
                     "balance": "0",
                     "esdt": {
-                        "str:TEST-TOKEN": "0"
+                        "str:TEST-TOKENA": "0"
                     },
                     "storage": {},
                     "code": ""
@@ -107,7 +107,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
-                        "str:TEST-TOKEN": "1000"
+                        "str:TEST-TOKENA": "1000"
                     },
                     "storage": {
                         "str:call_counts|nested:str:accept_funds_echo_payment": "1"

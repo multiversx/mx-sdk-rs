@@ -6,6 +6,7 @@ mod endpoint_finish_api_node;
 mod error_api_node;
 mod log_api_node;
 mod managed_types;
+mod print_api_node;
 mod storage_api_node;
 mod unsafe_buffer;
 mod vm_api_node;

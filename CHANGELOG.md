@@ -4,6 +4,37 @@ There are several crates in this repo, this changelog will keep track of all of 
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [elrond-wasm 0.22.10] - 2021-11-12
+- `ManagedMultiResultVec` push accepts multi result
+
+## [elrond-wasm 0.22.9] - 2021-11-12
+- `ManagedVarArgsEager` implementation
+- `EsdtLocalRoleFlags`, no heap allocation in `get_esdt_local_roles`
+
+## [elrond-wasm 0.22.8, elrond-codec 0.8.2] - 2021-11-12
+- Optimized decode unsigned number from slice
+
+## [elrond-wasm 0.22.7] - 2021-11-12
+- Optimized decode unsigned number from slice
+- Optimized blockchain API: managed get token nonce, get esdt balance
+- `ManagedVecItem` for `ManagedByteArray`
+
+## [elrond-wasm 0.22.6] - 2021-11-11
+- Optimized decode u64 from `ManagedBuffer`
+- `ManagedVecItem` in `derive_imports`
+
+## [elrond-wasm 0.22.5] - 2021-11-11
+- Implemented `ManagedVecItem` for `bool`.
+- Substitution for `ManagedMultiResultVec::new()`.
+
+## [elrond-wasm 0.22.4] - 2021-11-11
+- Derive `ManagedVecItem`.
+- Nested encode and decode from ManagedBuffers cached in a static singleton buffer.
+- Implemented `ExactSizeIterator` for `ManagedVecIterator`.
+
+## [elrond-wasm 0.22.3] - 2021-11-10
+- Memory allocation optimisations.
+
 ## [elrond-wasm 0.22.2] - 2021-11-06
 - Callback endpoint automatically created empty for contracts that have no callbacks. This is determined by the `meta` crate, based on the ABI of the contract and its modules.
 - `UnorderedSetMapper`

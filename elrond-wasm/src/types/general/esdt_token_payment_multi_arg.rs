@@ -32,7 +32,7 @@ impl<M: ManagedTypeApi> EsdtTokenPaymentMultiArg<M> {
 
 impl<M: ManagedTypeApi> ManagedVecItem<M> for EsdtTokenPaymentMultiArg<M> {
     const PAYLOAD_SIZE: usize = EsdtTokenPayment::<M>::PAYLOAD_SIZE;
-    const NEEDS_RESERIALIZATION: bool = EsdtTokenPayment::<M>::NEEDS_RESERIALIZATION;
+    const SKIPS_RESERIALIZATION: bool = EsdtTokenPayment::<M>::SKIPS_RESERIALIZATION;
 
     #[inline]
     fn from_byte_reader<Reader: FnMut(&mut [u8])>(api: M, reader: Reader) -> Self {

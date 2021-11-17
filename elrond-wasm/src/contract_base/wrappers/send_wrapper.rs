@@ -7,8 +7,8 @@ use crate::{
     },
     esdt::ESDTSystemSmartContractProxy,
     types::{
-        AsManagedRef, BigUint, ContractCall, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer,
-        ManagedBuffer, ManagedInto, ManagedVec, TokenIdentifier,
+        BigUint, ContractCall, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer,
+        ManagedInto, ManagedVec, TokenIdentifier,
     },
 };
 use elrond_codec::TopDecode;
@@ -319,7 +319,53 @@ where
         );
 
         if let Some(first_result_bytes) = output.get(0) {
-            u64::top_decode(first_result_bytes.as_managed_ref()).unwrap_or_default()
+            u64::top_decode(first_result_bytes).unwrap_or_default()
+        } else {
+            0
+        }
+    }
+
+    // Creates an NFT on behalf of the caller. This will set the "creator" field to the caller's address
+    #[allow(clippy::too_many_arguments)]
+    pub fn esdt_nft_create_as_caller<T: elrond_codec::TopEncode>(
+        &self,
+        token: &TokenIdentifier<A>,
+        amount: &BigUint<A>,
+        name: &ManagedBuffer<A>,
+        royalties: &BigUint<A>,
+        hash: &ManagedBuffer<A>,
+        attributes: &T,
+        uris: &ManagedVec<A, ManagedBuffer<A>>,
+    ) -> u64 {
+        let mut arg_buffer = ManagedArgBuffer::new_empty(self.type_manager());
+        arg_buffer.push_arg(token);
+        arg_buffer.push_arg(amount);
+        arg_buffer.push_arg(name);
+        arg_buffer.push_arg(royalties);
+        arg_buffer.push_arg(hash);
+        arg_buffer.push_arg(attributes);
+
+        if uris.is_empty() {
+            // at least one URI is required, so we push an empty one
+            arg_buffer.push_arg(&());
+        } else {
+            // The API function has the last argument as variadic,
+            // so we top-encode each and send as separate argument
+            for uri in uris {
+                arg_buffer.push_arg(uri);
+            }
+        }
+
+        let output = self.api.execute_on_dest_context_by_caller_raw(
+            self.api.get_gas_left(),
+            &self.api.get_caller(),
+            &BigUint::zero(self.api.clone()),
+            &ManagedBuffer::new_from_bytes(self.type_manager(), ESDT_NFT_CREATE_FUNC_NAME),
+            &arg_buffer,
+        );
+
+        if let Some(first_result_bytes) = output.get(0) {
+            first_result_bytes.parse_as_u64().unwrap_or_default()
         } else {
             0
         }

@@ -119,6 +119,8 @@ elrond_wasm_node::wasm_endpoints! {
         echo_u8
         echo_usize
         echo_varags_big_uint
+        echo_varags_managed_eager
+        echo_varags_managed_sum
         echo_varags_tuples
         echo_varags_u32
         echo_vec_of_managed_buffer

@@ -19,6 +19,7 @@ pub const STORAGE_VALUE_OUT_OF_RANGE: &[u8] = b"storage value out of range";
 pub const STORAGE_DECODE_ERROR: &[u8] = b"storage decode error: ";
 pub const STORAGE_ENCODE_ERROR: &[u8] = b"storage encode error: ";
 pub const STORAGE_KEY_ENCODE_ERROR: &[u8] = b"storage key encode error: ";
+pub const STORAGE_VALUE_EXCEEDS_BUFFER: &[u8] = b"storage value exceeds buffer";
 pub const FINISH_ENCODE_ERROR: &[u8] = b"endpoint result encode error: ";
 pub const SERIALIZER_DECODE_ERROR: &[u8] = b"serializer decode error: ";
 pub const SERIALIZER_ENCODE_ERROR: &[u8] = b"serializer encode error: ";
