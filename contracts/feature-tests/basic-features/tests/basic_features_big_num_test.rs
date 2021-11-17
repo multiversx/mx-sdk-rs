@@ -1,4 +1,4 @@
-use elrond_wasm::types::{BigInt, BigUint, ManagedFrom};
+use elrond_wasm::types::{BigInt, BigUint, ManagedBuffer, ManagedFrom};
 use elrond_wasm_debug::*;
 
 use basic_features::big_num_methods::BigIntMethods;
@@ -18,6 +18,12 @@ fn test_big_uint_from() {
     let result = bf.big_uint_from_u64_1(5);
     assert_eq!(BigUint::managed_from(context.clone(), 5u32), result);
     let result = bf.big_uint_from_u64_2(5);
+    assert_eq!(BigUint::managed_from(context.clone(), 5u32), result);
+    let result =
+        bf.big_uint_from_managed_buffer(ManagedBuffer::managed_from(context.clone(), &[5u8]));
+    assert_eq!(BigUint::managed_from(context.clone(), 5u32), result);
+    let result =
+        bf.big_uint_from_managed_buffer_ref(&ManagedBuffer::managed_from(context.clone(), &[5u8]));
     assert_eq!(BigUint::managed_from(context, 5u32), result);
 }
 
