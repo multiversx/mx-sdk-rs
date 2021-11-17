@@ -70,9 +70,11 @@ pub trait Vault {
 
     #[payable("*")]
     #[endpoint]
-    fn accept_multi_funds_echo(&self) -> MultiResultVec<MultiArg3<TokenIdentifier, u64, BigUint>> {
+    fn accept_multi_funds_echo(
+        &self,
+    ) -> ManagedMultiResultVec<MultiArg3<TokenIdentifier, u64, BigUint>> {
         let payments = self.call_value().all_esdt_transfers();
-        let mut result = Vec::new();
+        let mut result = ManagedMultiResultVec::new();
 
         for payment in payments.into_iter() {
             result.push(
@@ -85,7 +87,7 @@ pub trait Vault {
             );
         }
 
-        result.into()
+        result
     }
 
     #[payable("*")]
@@ -95,7 +97,7 @@ pub trait Vault {
         #[payment_token] token_identifier: TokenIdentifier,
         #[payment_amount] token_payment: BigUint,
         #[payment_nonce] token_nonce: u64,
-    ) -> SCResult<MultiResult4<TokenIdentifier, BoxedBytes, BigUint, u64>> {
+    ) -> SCResult<MultiResult4<TokenIdentifier, ManagedBuffer, BigUint, u64>> {
         let token_type = self.call_value().esdt_token_type();
 
         self.accept_funds_event(
@@ -110,7 +112,7 @@ pub trait Vault {
 
         Ok((
             token_identifier,
-            BoxedBytes::from(token_type.as_type_name()),
+            token_type.as_type_name().managed_into(),
             token_payment,
             token_nonce,
         )
@@ -158,7 +160,7 @@ pub trait Vault {
         #[var_args] token_payments: ManagedVarArgs<MultiArg3<TokenIdentifier, u64, BigUint>>,
     ) {
         let caller = self.blockchain().get_caller();
-        let mut all_payments = Vec::new();
+        let mut all_payments = ManagedVec::new();
 
         for multi_arg in token_payments.into_iter() {
             let (token_id, nonce, amount) = multi_arg.into_tuple();
@@ -171,11 +173,8 @@ pub trait Vault {
             });
         }
 
-        self.send().transfer_multiple_esdt_via_async_call(
-            &caller,
-            &all_payments.managed_into(self.raw_vm_api()),
-            b"",
-        );
+        self.send()
+            .transfer_multiple_esdt_via_async_call(&caller, &all_payments, b"");
     }
 
     #[payable("*")]
@@ -185,7 +184,7 @@ pub trait Vault {
         let mut uris = ManagedVec::new(self.type_manager());
         uris.push(ManagedBuffer::new());
 
-        let mut new_tokens = Vec::new();
+        let mut new_tokens = ManagedVec::new();
 
         for payment in payments.into_iter() {
             // burn old tokens
@@ -216,7 +215,7 @@ pub trait Vault {
 
         self.send().transfer_multiple_esdt_via_async_call(
             &self.blockchain().get_caller(),
-            &new_tokens.managed_into(self.raw_vm_api()),
+            &new_tokens,
             &[],
         );
     }

@@ -13,7 +13,7 @@
         },
         "framework": {
             "name": "elrond-wasm",
-            "version": "0.22.2"
+            "version": "0.22.10"
         }
     },
     "docs": [
@@ -27,6 +27,10 @@
     ],
     "name": "UseModule",
     "constructor": {
+        "docs": [
+            "The constructor can reside in a module.",
+            "The method can have any name."
+        ],
         "inputs": [],
         "outputs": []
     },

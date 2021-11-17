@@ -8,9 +8,9 @@
                     "nonce": "0",
                     "balance": "0x1000000000",
                     "esdt": {
-                        "str:TOK-123": "150",
-                        "str:OTHERTOK-123": "500",
-                        "str:NFT-123": {
+                        "str:TOK-123000": "150",
+                        "str:OTHERTOK-123777": "500",
+                        "str:NFT-123456": {
                             "instances": [
                                 {
                                     "nonce": "5",
@@ -34,15 +34,15 @@
                 "to": "address:B",
                 "esdtValue": [
                     {
-                        "tokenIdentifier": "str:TOK-123",
+                        "tokenIdentifier": "str:TOK-123000",
                         "value": "100"
                     },
                     {
-                        "tokenIdentifier": "str:OTHERTOK-123",
+                        "tokenIdentifier": "str:OTHERTOK-123777",
                         "value": "400"
                     },
                     {
-                        "tokenIdentifier": "str:NFT-123",
+                        "tokenIdentifier": "str:NFT-123456",
                         "nonce": "5",
                         "value": "10"
                     }
@@ -59,9 +59,9 @@
                     "nonce": "1",
                     "balance": "0xf00000000",
                     "esdt": {
-                        "str:TOK-123": "50",
-                        "str:OTHERTOK-123": "100",
-                        "str:NFT-123": {
+                        "str:TOK-123000": "50",
+                        "str:OTHERTOK-123777": "100",
+                        "str:NFT-123456": {
                             "instances": [
                                 {
                                     "nonce": "5",
@@ -76,9 +76,9 @@
                 "address:B": {
                     "nonce": "0",
                     "esdt": {
-                        "str:TOK-123": "100",
-                        "str:OTHERTOK-123": "400",
-                        "str:NFT-123": {
+                        "str:TOK-123000": "100",
+                        "str:OTHERTOK-123777": "400",
+                        "str:NFT-123456": {
                             "instances": [
                                 {
                                     "nonce": "5",

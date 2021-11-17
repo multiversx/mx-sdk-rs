@@ -4,7 +4,7 @@ use crate::{
     api::{EndpointFinishApi, ErrorApi, ManagedTypeApi},
     elrond_codec::{EncodeError, TopEncode, TopEncodeOutput},
     err_msg,
-    types::{BigFloat, BigInt, BigUint, ManagedBuffer, ManagedType},
+    types::{BigFloat, BigInt, BigUint, ManagedBuffer, ManagedBufferCachedBuilder, ManagedType},
 };
 
 struct ApiOutputAdapter<FA>
@@ -28,7 +28,7 @@ impl<FA> TopEncodeOutput for ApiOutputAdapter<FA>
 where
     FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static,
 {
-    type NestedBuffer = ManagedBuffer<FA>;
+    type NestedBuffer = ManagedBufferCachedBuilder<FA>;
 
     fn set_slice_u8(self, bytes: &[u8]) {
         self.api.finish_slice_u8(bytes);
@@ -71,11 +71,12 @@ where
     }
 
     fn start_nested_encode(&self) -> Self::NestedBuffer {
-        ManagedBuffer::new(self.api.clone())
+        ManagedBufferCachedBuilder::new_from_slice(self.api.clone(), &[])
     }
 
     fn finalize_nested_encode(self, nb: Self::NestedBuffer) {
-        self.api.finish_managed_buffer_raw(nb.handle);
+        self.api
+            .finish_managed_buffer_raw(nb.into_managed_buffer().get_raw_handle());
     }
 }
 
@@ -88,6 +89,17 @@ pub trait EndpointResult: Sized {
     fn finish<FA>(&self, api: FA)
     where
         FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static;
+}
+
+pub fn finish_all<FA, I, T>(api: FA, items: I)
+where
+    FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static,
+    I: Iterator<Item = T>,
+    T: EndpointResult,
+{
+    for item in items {
+        item.finish(api.clone());
+    }
 }
 
 /// All serializable objects can be used as smart contract function result.

@@ -1,7 +1,7 @@
 use crate::{
     api::{ErrorApi, ManagedTypeApi, StorageWriteApi},
-    types::{BigInt, BigUint, ManagedBuffer, ManagedType},
-    *,
+    err_msg,
+    types::{BigInt, BigUint, ManagedBuffer, ManagedBufferCachedBuilder, ManagedInto, ManagedType},
 };
 use elrond_codec::*;
 
@@ -36,21 +36,22 @@ impl<'k, A> TopEncodeOutput for StorageSetOutput<'k, A>
 where
     A: StorageWriteApi + ManagedTypeApi + ErrorApi + 'static,
 {
-    type NestedBuffer = ManagedBuffer<A>;
+    type NestedBuffer = ManagedBufferCachedBuilder<A>;
 
     fn set_slice_u8(self, bytes: &[u8]) {
-        let key_bytes = self.key.to_boxed_bytes();
-        self.api.storage_store_slice_u8(key_bytes.as_slice(), bytes)
+        self.set_managed_buffer(&bytes.managed_into(self.api.clone()))
     }
 
     fn set_u64(self, value: u64) {
-        let key_bytes = self.key.to_boxed_bytes();
-        self.api.storage_store_u64(key_bytes.as_slice(), value);
+        using_encoded_number(value, 64, false, true, |bytes| {
+            self.set_managed_buffer(&bytes.managed_into(self.api.clone()))
+        });
     }
 
     fn set_i64(self, value: i64) {
-        let key_bytes = self.key.to_boxed_bytes();
-        self.api.storage_store_i64(key_bytes.as_slice(), value);
+        using_encoded_number(value as u64, 64, true, true, |bytes| {
+            self.set_managed_buffer(&bytes.managed_into(self.api.clone()))
+        });
     }
 
     #[inline]
@@ -74,11 +75,11 @@ where
     }
 
     fn start_nested_encode(&self) -> Self::NestedBuffer {
-        ManagedBuffer::new(self.api.clone())
+        ManagedBufferCachedBuilder::new_from_slice(self.api.clone(), &[])
     }
 
     fn finalize_nested_encode(self, nb: Self::NestedBuffer) {
-        self.set_managed_buffer(&nb);
+        self.set_managed_buffer(&nb.into_managed_buffer());
     }
 }
 
