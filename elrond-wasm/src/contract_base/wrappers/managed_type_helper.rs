@@ -67,7 +67,7 @@ impl<M: ManagedTypeApi> ManagedTypeHelper<M> {
 
     #[inline]
     pub fn big_float_from_sci(&self, significand_value: i64, exponent_value: i64) -> BigFloat<M> {
-        BigFloat::from_frac(self.api.clone(), significand_value, exponent_value)
+        BigFloat::from_sci(self.api.clone(), significand_value, exponent_value)
     }
 
     #[inline]
