@@ -128,6 +128,21 @@ fn test_sc_payment() {
 }
 
 #[test]
+fn test_sc_half_payment() {
+    let mut wrapper = ContractObjWrapper::new(rust_testing_framework_tester::contract_obj);
+
+    let caller_addr = wrapper.create_user_account(&rust_biguint!(1_000));
+    let sc_addr = wrapper.create_sc_account(&rust_biguint!(2_000), Some(&caller_addr));
+
+    wrapper = wrapper.execute_tx(&caller_addr, &sc_addr, &rust_biguint!(1_000), |sc| {
+        sc.recieve_egld_half();
+    });
+
+    wrapper.check_balance(&caller_addr, &rust_biguint!(500));
+    wrapper.check_balance(&sc_addr, &rust_biguint!(2_500));
+}
+
+#[test]
 fn test_query() {
     let mut wrapper = ContractObjWrapper::new(rust_testing_framework_tester::contract_obj);
     let sc_addr = wrapper.create_sc_account(&rust_biguint!(2_000), None);
