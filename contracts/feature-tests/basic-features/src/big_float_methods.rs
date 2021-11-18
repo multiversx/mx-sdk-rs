@@ -18,7 +18,7 @@ pub trait BigFloatMethods {
     }
 
     #[endpoint]
-    fn new_from_sci_big_float(&self, significand_value: i64, exponent_value: i64) -> BigFloat {
+    fn new_from_sci_big_float(&self, significand_value: i64, exponent_value: i32) -> BigFloat {
         BigFloat::from_sci(significand_value, exponent_value)
     }
 
