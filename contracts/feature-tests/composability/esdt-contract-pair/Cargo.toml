@@ -16,9 +16,9 @@ path = "first-contract"
 path = "second-contract"
 
 [dependencies.elrond-wasm]
-version = "0.22.10"
+version = "0.22.11"
 path = "../../../../elrond-wasm"
 
 [dev-dependencies.elrond-wasm-debug]
-version = "0.22.10"
+version = "0.22.11"
 path = "../../../../elrond-wasm-debug"
