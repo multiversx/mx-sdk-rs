@@ -186,12 +186,12 @@ pub(crate) unsafe fn unsafe_buffer_load_be_pad_right(
     if byte_len > nr_bytes {
         error_hook::signal_error(err_msg::BIG_UINT_EXCEEDS_SLICE);
     }
-    unsafe_buffer::clear_buffer();
+    unsafe_buffer::clear_buffer_1();
     if byte_len > 0 {
         bigIntGetUnsignedBytes(
             bi_handle,
-            unsafe_buffer::buffer_ptr().add(nr_bytes - byte_len),
+            unsafe_buffer::buffer_1_ptr().add(nr_bytes - byte_len),
         );
     }
-    unsafe_buffer::buffer_ptr()
+    unsafe_buffer::buffer_1_ptr()
 }

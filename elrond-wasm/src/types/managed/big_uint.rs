@@ -36,14 +36,30 @@ impl<M: ManagedTypeApi> ManagedType<M> for BigUint<M> {
 }
 
 impl<M: ManagedTypeApi> From<&ManagedBuffer<M>> for BigUint<M> {
+    #[inline]
     fn from(item: &ManagedBuffer<M>) -> Self {
         BigUint::from_bytes_be_buffer(item)
     }
 }
 
+impl<M: ManagedTypeApi> ManagedFrom<M, &ManagedBuffer<M>> for BigUint<M> {
+    #[inline]
+    fn managed_from(_api: M, item: &ManagedBuffer<M>) -> Self {
+        Self::from(item)
+    }
+}
+
 impl<M: ManagedTypeApi> From<ManagedBuffer<M>> for BigUint<M> {
+    #[inline]
     fn from(item: ManagedBuffer<M>) -> Self {
         BigUint::from_bytes_be_buffer(&item)
+    }
+}
+
+impl<M: ManagedTypeApi> ManagedFrom<M, ManagedBuffer<M>> for BigUint<M> {
+    #[inline]
+    fn managed_from(_api: M, item: ManagedBuffer<M>) -> Self {
+        Self::from(item)
     }
 }
 
@@ -52,6 +68,7 @@ where
     M: ManagedTypeApi,
     U: Into<u64>,
 {
+    #[inline]
     fn managed_from(api: M, value: U) -> Self {
         BigUint {
             handle: api.bi_new(value.into() as i64),

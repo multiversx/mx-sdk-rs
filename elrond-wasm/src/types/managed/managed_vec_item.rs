@@ -4,7 +4,8 @@ use crate::{
 };
 
 use super::{
-    BigInt, BigUint, EllipticCurve, ManagedAddress, ManagedBuffer, ManagedType, ManagedVec,
+    BigInt, BigUint, EllipticCurve, ManagedAddress, ManagedBuffer, ManagedByteArray, ManagedType,
+    ManagedVec,
 };
 
 /// Types that implement this trait can be items inside a `ManagedVec`.
@@ -107,6 +108,23 @@ impl_managed_type! {BigInt}
 impl_managed_type! {EllipticCurve}
 impl_managed_type! {ManagedAddress}
 impl_managed_type! {TokenIdentifier}
+
+impl<M, const N: usize> ManagedVecItem<M> for ManagedByteArray<M, N>
+where
+    M: ManagedTypeApi,
+{
+    const PAYLOAD_SIZE: usize = 4;
+    const SKIPS_RESERIALIZATION: bool = false;
+
+    fn from_byte_reader<Reader: FnMut(&mut [u8])>(api: M, reader: Reader) -> Self {
+        let handle = Handle::from_byte_reader(api.clone(), reader);
+        Self::from_raw_handle(api, handle)
+    }
+
+    fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, writer: Writer) -> R {
+        <Handle as ManagedVecItem<M>>::to_byte_writer(&self.get_raw_handle(), writer)
+    }
+}
 
 impl<M, T> ManagedVecItem<M> for ManagedVec<M, T>
 where

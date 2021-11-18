@@ -9,7 +9,7 @@
                     "nonce": "1000",
                     "balance": "0",
                     "esdt": {
-                        "str:BASIC-FEATURES-TOKEN": "1,000"
+                        "str:BASIC-FEATUR": "1,000"
                     },
                     "code": "file:../forwarder/output/forwarder.wasm"
                 },
@@ -28,7 +28,7 @@
                 "function": "send_esdt",
                 "arguments": [
                     "address:an_account",
-                    "str:BASIC-FEATURES-TOKEN",
+                    "str:BASIC-FEATUR",
                     "10000"
                 ],
                 "gasLimit": "50,000,000",
@@ -50,7 +50,7 @@
                 "function": "send_esdt",
                 "arguments": [
                     "address:an_account",
-                    "str:BASIC-FEATURES-TOKEN",
+                    "str:BASIC-FEATUR",
                     "100"
                 ],
                 "gasLimit": "50,000,000",
@@ -64,7 +64,7 @@
                         "address": "sc:basic-features",
                         "endpoint": "str:ESDTTransfer",
                         "topics": [
-                            "str:BASIC-FEATURES-TOKEN",
+                            "str:BASIC-FEATUR",
                             "",
                             "100",
                             "address:an_account"
@@ -83,7 +83,7 @@
                 "function": "send_esdt",
                 "arguments": [
                     "address:an_account",
-                    "str:BASIC-FEATURES-TOKEN",
+                    "str:BASIC-FEATUR",
                     "100",
                     "str:send tx message here"
                 ],
@@ -98,7 +98,7 @@
                         "address": "sc:basic-features",
                         "endpoint": "str:ESDTTransfer",
                         "topics": [
-                            "str:BASIC-FEATURES-TOKEN",
+                            "str:BASIC-FEATUR",
                             "",
                             "100",
                             "address:an_account"
@@ -115,7 +115,7 @@
                     "nonce": "1000",
                     "balance": "0",
                     "esdt": {
-                        "str:BASIC-FEATURES-TOKEN": "800"
+                        "str:BASIC-FEATUR": "800"
                     },
                     "storage": {},
                     "code": "file:../forwarder/output/forwarder.wasm"
@@ -124,7 +124,7 @@
                     "nonce": "*",
                     "balance": "0",
                     "esdt": {
-                        "str:BASIC-FEATURES-TOKEN": "200"
+                        "str:BASIC-FEATUR": "200"
                     },
                     "storage": {},
                     "code": ""

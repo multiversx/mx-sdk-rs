@@ -75,8 +75,7 @@ pub fn top_encode_number_to_output<O: NestedEncodeOutput>(output: &mut O, x: u64
 }
 
 /// Handles both signed and unsigned of any length.
-/// No generics here, because we want the executable binary as small as possible.
-#[inline(never)]
+/// No generics here, because we want the executable binary as small as possible
 pub fn bytes_to_number(bytes: &[u8], signed: bool) -> u64 {
     if bytes.is_empty() {
         return 0;

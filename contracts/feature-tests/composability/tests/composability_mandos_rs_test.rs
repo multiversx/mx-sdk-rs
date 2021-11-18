@@ -157,6 +157,14 @@ fn forwarder_builtin_nft_create_rs() {
     elrond_wasm_debug::mandos_rs("mandos/forwarder_builtin_nft_create.scen.json", world());
 }
 
+// #[test]
+// fn forwarder_builtin_nft_create_by_caller_rs() {
+//     elrond_wasm_debug::mandos_rs(
+//         "mandos/forwarder_builtin_nft_create_by_caller.scen.json",
+//         world(),
+//     );
+// }
+
 #[test]
 fn forwarder_builtin_nft_local_burn_rs() {
     elrond_wasm_debug::mandos_rs("mandos/forwarder_builtin_nft_local_burn.scen.json", world());
@@ -359,6 +367,11 @@ fn forwarder_contract_deploy_rs() {
 #[test]
 fn forwarder_contract_upgrade_rs() {
     elrond_wasm_debug::mandos_rs("mandos/forwarder_contract_upgrade.scen.json", world());
+}
+
+#[test]
+fn forwarder_nft_create_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/forwarder_nft_create.scen.json", world());
 }
 
 #[test]

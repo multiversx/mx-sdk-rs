@@ -4,6 +4,26 @@ There are several crates in this repo, this changelog will keep track of all of 
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+
+## [elrond-wasm 0.22.11] - 2021-11-17
+- Derive `ManagedVecItem` generics fix
+- Constructor can reside in module
+
+## [elrond-wasm 0.22.10] - 2021-11-12
+- `ManagedMultiResultVec` push accepts multi result
+
+## [elrond-wasm 0.22.9] - 2021-11-12
+- `ManagedVarArgsEager` implementation
+- `EsdtLocalRoleFlags`, no heap allocation in `get_esdt_local_roles`
+
+## [elrond-wasm 0.22.8, elrond-codec 0.8.2] - 2021-11-12
+- Optimized decode unsigned number from slice
+
+## [elrond-wasm 0.22.7] - 2021-11-12
+- Optimized decode unsigned number from slice
+- Optimized blockchain API: managed get token nonce, get esdt balance
+- `ManagedVecItem` for `ManagedByteArray`
+
 ## [elrond-wasm 0.22.6] - 2021-11-11
 - Optimized decode u64 from `ManagedBuffer`
 - `ManagedVecItem` in `derive_imports`
