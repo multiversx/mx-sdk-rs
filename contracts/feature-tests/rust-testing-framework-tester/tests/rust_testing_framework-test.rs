@@ -115,23 +115,28 @@ fn test_sc_payment() {
     let mut wrapper = ContractObjWrapper::new(rust_testing_framework_tester::contract_obj);
 
     let caller_addr = wrapper.create_user_account(&rust_biguint!(1_000));
-    let sc_addr = wrapper.create_sc_account(&rust_biguint!(2_000), &caller_addr);
+    let sc_addr = wrapper.create_sc_account(&rust_biguint!(2_000), Some(&caller_addr));
 
     wrapper = wrapper.execute_tx(&caller_addr, &sc_addr, &rust_biguint!(1_000), |sc| {
         let actual_payment = sc.receive_egld();
         let expected_payment = managed_biguint!(sc, 1_000);
         assert_eq!(actual_payment, expected_payment);
-
-        let actual_sc_balance = sc.get_egld_balance();
-        let expected_sc_balance = managed_biguint!(sc, 3_000);
-        assert_eq!(actual_sc_balance, expected_sc_balance);
     });
 
-    /*
-    let expected_user_balance = rust_biguint!(0);
-    let actual_user_balance = &b_mock.accounts.get(&caller_addr).unwrap().egld_balance;
-    assert_eq!(&expected_user_balance, actual_user_balance);
-    */
+    wrapper.check_balance(&caller_addr, &rust_biguint!(0));
+    wrapper.check_balance(&sc_addr, &rust_biguint!(3_000));
+}
+
+#[test]
+fn test_query() {
+    let mut wrapper = ContractObjWrapper::new(rust_testing_framework_tester::contract_obj);
+    let sc_addr = wrapper.create_sc_account(&rust_biguint!(2_000), None);
+
+    let _ = wrapper.execute_query(&sc_addr, |sc| {
+        let actual_balance = sc.get_egld_balance();
+        let expected_balance = managed_biguint!(sc, 2_000);
+        assert_eq!(actual_balance, expected_balance);
+    });
 }
 
 /*

@@ -6,6 +6,7 @@ use elrond_wasm::{
 };
 
 use crate::{
+    rust_biguint,
     tx_mock::{TxCache, TxInput},
     world_mock::{AccountData, AccountEsdt},
     BlockchainMock, DebugApi,
@@ -35,6 +36,15 @@ where
             b_mock: BlockchainMock::new(),
             _phantom: PhantomData,
         }
+    }
+
+    pub fn check_balance(&self, address: &Address, expected_balance: &num_bigint::BigUint) {
+        let actual_balance = match &self.b_mock.accounts.get(address) {
+            Some(acc) => acc.egld_balance.clone(),
+            None => rust_biguint!(0),
+        };
+
+        assert_eq!(&actual_balance, expected_balance);
     }
 
     pub fn check_state<F: Fn(DebugApi)>(&self, _func: F) {
@@ -77,7 +87,7 @@ where
     pub fn create_sc_account(
         &mut self,
         egld_balance: &num_bigint::BigUint,
-        owner: &Address,
+        owner: Option<&Address>,
     ) -> Address {
         let address = self.address_factory.new_sc_address();
         self.b_mock.add_account(AccountData {
@@ -88,7 +98,7 @@ where
             storage: HashMap::new(),
             username: Vec::new(),
             contract_path: None,
-            contract_owner: Some(owner.clone()),
+            contract_owner: owner.map(|owner_ref| owner_ref.clone()),
         });
 
         address
@@ -134,7 +144,41 @@ where
             address_factory: self.address_factory,
             obj_builder: self.obj_builder,
             b_mock: new_b_mock,
-            _phantom: PhantomData
+            _phantom: PhantomData,
+        }
+    }
+
+    pub fn execute_query<TxFn: Fn(&CB)>(self, sc_address: &Address, query_fn: TxFn) -> Self {
+        let rc_b_mock = Rc::new(self.b_mock);
+        let tx_cache = TxCache::new(rc_b_mock.clone());
+
+        let tx_input = TxInput {
+            from: sc_address.clone(),
+            to: sc_address.clone(),
+            egld_value: rust_biguint!(0),
+            esdt_values: Vec::new(),
+            func_name: Vec::new(),
+            args: Vec::new(),
+            gas_limit: u64::MAX,
+            gas_price: 0,
+            tx_hash: H256::zero(),
+        };
+        let debug_api = DebugApi::new(tx_input, tx_cache);
+        let sc = (self.obj_builder)(debug_api);
+
+        query_fn(&sc);
+
+        // we don't actually apply the updates, we only make sure to destroy the API object
+        let api_after_exec = into_api(sc);
+        let _ = api_after_exec.into_blockchain_updates();
+
+        let new_b_mock = Rc::try_unwrap(rc_b_mock).unwrap();
+
+        Self {
+            address_factory: self.address_factory,
+            obj_builder: self.obj_builder,
+            b_mock: new_b_mock,
+            _phantom: PhantomData,
         }
     }
 
