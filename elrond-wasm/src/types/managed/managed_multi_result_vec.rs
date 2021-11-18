@@ -43,12 +43,10 @@ where
 impl<M, T> ManagedMultiResultVec<M, T>
 where
     M: ManagedTypeApi + ErrorApi,
-    T: TopEncode,
+    T: ContractCallArg,
 {
     pub fn push(&mut self, item: T) {
-        let serializer = ManagedSerializer::new(self.raw_buffers.type_manager());
-        self.raw_buffers
-            .push(serializer.top_encode_to_managed_buffer(&item));
+        item.push_dyn_arg(self);
     }
 }
 
@@ -137,7 +135,6 @@ where
     M: ManagedTypeApi,
     T: DynArg,
 {
-    // #[inline(never)]
     fn dyn_load<I: DynArgInput>(loader: &mut I, arg_id: ArgId) -> Self {
         let mut raw_buffers = ManagedVec::new(loader.vm_api_cast::<M>());
         while loader.has_next() {
@@ -147,6 +144,18 @@ where
             raw_buffers,
             _phantom: PhantomData,
         }
+    }
+}
+
+impl<M, T> DynArgOutput for ManagedMultiResultVec<M, T>
+where
+    M: ManagedTypeApi,
+    T: ContractCallArg,
+{
+    fn push_single_arg<I: TopEncode>(&mut self, item: I) {
+        let serializer = ManagedSerializer::new(self.raw_buffers.type_manager());
+        self.raw_buffers
+            .push(serializer.top_encode_to_managed_buffer(&item));
     }
 }
 

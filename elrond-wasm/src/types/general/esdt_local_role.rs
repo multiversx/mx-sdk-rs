@@ -1,7 +1,8 @@
 use elrond_codec::elrond_codec_derive::{NestedDecode, NestedEncode, TopDecode, TopEncode};
 
-use crate as elrond_wasm; // needed by the TypeAbi generated code
-use crate::derive::TypeAbi;
+use super::EsdtLocalRoleFlags;
+use crate as elrond_wasm;
+use crate::{api::ManagedTypeApi, derive::TypeAbi, types::ManagedVecItem};
 
 const ESDT_ROLE_NONE: &[u8] = &[];
 const ESDT_ROLE_LOCAL_MINT: &[u8] = b"ESDTRoleLocalMint";
@@ -10,7 +11,9 @@ const ESDT_ROLE_NFT_CREATE: &[u8] = b"ESDTRoleNFTCreate";
 const ESDT_ROLE_NFT_ADD_QUANTITY: &[u8] = b"ESDTRoleNFTAddQuantity";
 const ESDT_ROLE_NFT_BURN: &[u8] = b"ESDTRoleNFTBurn";
 
-#[derive(TopDecode, TopEncode, NestedDecode, NestedEncode, TypeAbi, Clone, PartialEq, Debug)]
+#[derive(
+    TopDecode, TopEncode, NestedDecode, NestedEncode, TypeAbi, Clone, PartialEq, Debug, Copy,
+)]
 pub enum EsdtLocalRole {
     None,
     Mint,
@@ -41,6 +44,33 @@ impl EsdtLocalRole {
             Self::NftAddQuantity => ESDT_ROLE_NFT_ADD_QUANTITY,
             Self::NftBurn => ESDT_ROLE_NFT_BURN,
         }
+    }
+
+    pub fn to_flag(&self) -> EsdtLocalRoleFlags {
+        match self {
+            Self::None => EsdtLocalRoleFlags::NONE,
+            Self::Mint => EsdtLocalRoleFlags::MINT,
+            Self::Burn => EsdtLocalRoleFlags::BURN,
+            Self::NftCreate => EsdtLocalRoleFlags::NFT_CREATE,
+            Self::NftAddQuantity => EsdtLocalRoleFlags::NFT_ADD_QUANTITY,
+            Self::NftBurn => EsdtLocalRoleFlags::NFT_BURN,
+        }
+    }
+}
+
+// TODO: can be done with macros, but I didn't find a public library that does it and is no_std
+// we can implement it, it's easy
+const ALL_ROLES: [EsdtLocalRole; 5] = [
+    EsdtLocalRole::Mint,
+    EsdtLocalRole::Burn,
+    EsdtLocalRole::NftCreate,
+    EsdtLocalRole::NftAddQuantity,
+    EsdtLocalRole::NftBurn,
+];
+
+impl EsdtLocalRole {
+    pub fn iter_all() -> core::slice::Iter<'static, EsdtLocalRole> {
+        ALL_ROLES.iter()
     }
 }
 
@@ -74,5 +104,18 @@ impl<'a> From<&'a [u8]> for EsdtLocalRole {
         } else {
             Self::None
         }
+    }
+}
+
+impl<M: ManagedTypeApi> ManagedVecItem<M> for EsdtLocalRole {
+    const PAYLOAD_SIZE: usize = 1;
+    const SKIPS_RESERIALIZATION: bool = false; // TODO: might be ok to be true, but needs testing
+
+    fn from_byte_reader<Reader: FnMut(&mut [u8])>(api: M, reader: Reader) -> Self {
+        u8::from_byte_reader(api, reader).into()
+    }
+
+    fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, writer: Writer) -> R {
+        <u8 as ManagedVecItem<M>>::to_byte_writer(&self.as_u8(), writer)
     }
 }

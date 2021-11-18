@@ -83,7 +83,6 @@ impl<T> DynArg for MultiArgVec<T>
 where
     T: DynArg,
 {
-    // #[inline(never)]
     fn dyn_load<I: DynArgInput>(loader: &mut I, arg_id: ArgId) -> Self {
         let mut result_vec: Vec<T> = Vec::new();
         while loader.has_next() {

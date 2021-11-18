@@ -22,7 +22,7 @@
                 "address:esdt-owner": {
                     "esdt": {
                         "str:FUNG-TOKEN": "1000",
-                        "str:NFT-123": {
+                        "str:NFT-123456": {
                             "instances": [
                                 {
                                     "nonce": "1",
@@ -30,7 +30,7 @@
                                 }
                             ]
                         },
-                        "str:SFT-456": {
+                        "str:SFT-456789": {
                             "instances": [
                                 {
                                     "nonce": "3",
@@ -54,12 +54,12 @@
                         "value": "1000"
                     },
                     {
-                        "tokenIdentifier": "str:NFT-123",
+                        "tokenIdentifier": "str:NFT-123456",
                         "nonce": "1",
                         "value": "1"
                     },
                     {
-                        "tokenIdentifier": "str:SFT-456",
+                        "tokenIdentifier": "str:SFT-456789",
                         "nonce": "3",
                         "value": "10"
                     }
@@ -84,10 +84,10 @@
                     "str:FUNG-TOKEN",
                     "0",
                     "1000",
-                    "str:NFT-123",
+                    "str:NFT-123456",
                     "1",
                     "1",
-                    "str:SFT-456",
+                    "str:SFT-456789",
                     "3",
                     "10"
                 ],
@@ -177,7 +177,7 @@
                         "address": "sc:multisig",
                         "endpoint": "str:MultiESDTNFTTransfer",
                         "topics": [
-                            "str:NFT-123",
+                            "str:NFT-123456",
                             "1",
                             "1",
                             "address:esdt-owner"
@@ -188,7 +188,7 @@
                         "address": "sc:multisig",
                         "endpoint": "str:MultiESDTNFTTransfer",
                         "topics": [
-                            "str:SFT-456",
+                            "str:SFT-456789",
                             "3",
                             "10",
                             "address:esdt-owner"
@@ -207,7 +207,7 @@
                     "nonce": "1",
                     "esdt": {
                         "str:FUNG-TOKEN": "1000",
-                        "str:NFT-123": {
+                        "str:NFT-123456": {
                             "instances": [
                                 {
                                     "nonce": "1",
@@ -215,7 +215,7 @@
                                 }
                             ]
                         },
-                        "str:SFT-456": {
+                        "str:SFT-456789": {
                             "instances": [
                                 {
                                     "nonce": "3",
