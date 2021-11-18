@@ -39,7 +39,7 @@ pub trait RustTestingFrameworkTester {
     #[endpoint]
     fn recieve_egld_half(&self) {
         let caller = self.blockchain().get_caller();
-        let payment_amount = self.call_value().egld_value();
+        let payment_amount = self.call_value().egld_value() / 2u32;
         self.send()
             .direct(&caller, &TokenIdentifier::egld(), 0, &payment_amount, &[]);
     }
