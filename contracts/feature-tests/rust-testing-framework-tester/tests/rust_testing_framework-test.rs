@@ -1,12 +1,13 @@
 use std::rc::Rc;
 
 use elrond_wasm::{
-    api::VMApi,
     contract_base::ContractBase,
     sc_error,
     types::{Address, BigUint, ManagedFrom, SCResult, H256},
 };
 use elrond_wasm_debug::{
+    managed_biguint, rust_biguint,
+    testing_framework::*,
     tx_mock::{TxCache, TxInput},
     world_mock::{AccountData, AccountEsdt},
     BlockchainMock, DebugApi, HashMap,
@@ -111,74 +112,26 @@ fn test_sc_set_tx_input() {
 
 #[test]
 fn test_sc_payment() {
-    let mut blockchain_mock = BlockchainMock::new();
-    let caller_addr = Address::from([1u8; 32]);
+    let mut wrapper = ContractObjWrapper::new(rust_testing_framework_tester::contract_obj);
 
-    let mut sc_addr_raw = [1u8; 32];
-    for i in 0..8 {
-        sc_addr_raw[i] = 0;
-    }
-    let sc_addr = Address::from(sc_addr_raw);
+    let caller_addr = wrapper.create_user_account(&rust_biguint!(1_000));
+    let sc_addr = wrapper.create_sc_account(&rust_biguint!(2_000), &caller_addr);
 
-    // add the address to the state, with 1000 EGLD balance
-    blockchain_mock.add_account(AccountData {
-        address: caller_addr.clone(),
-        nonce: 0,
-        egld_balance: num_bigint::BigUint::from(1_000u32),
-        esdt: AccountEsdt::default(),
-        storage: HashMap::new(),
-        username: Vec::new(),
-        contract_path: None,
-        contract_owner: None,
+    wrapper = wrapper.execute_tx(&caller_addr, &sc_addr, &rust_biguint!(1_000), |sc| {
+        let actual_payment = sc.receive_egld();
+        let expected_payment = managed_biguint!(sc, 1_000);
+        assert_eq!(actual_payment, expected_payment);
+
+        let actual_sc_balance = sc.get_egld_balance();
+        let expected_sc_balance = managed_biguint!(sc, 3_000);
+        assert_eq!(actual_sc_balance, expected_sc_balance);
     });
 
-    // add sc to the state, with 2000 EGLD balance
-    blockchain_mock.add_account(AccountData {
-        address: sc_addr.clone(),
-        nonce: 0,
-        egld_balance: num_bigint::BigUint::from(2_000u32),
-        esdt: AccountEsdt::default(),
-        storage: HashMap::new(),
-        username: Vec::new(),
-        contract_path: None,
-        contract_owner: None,
-    });
-
-    let tx_input = TxInput {
-        from: caller_addr.clone(),
-        to: sc_addr.clone(),
-        egld_value: num_bigint::BigUint::from(1_000u32),
-        esdt_values: Vec::new(),
-        func_name: Vec::new(),
-        args: Vec::new(),
-        gas_limit: u64::MAX,
-        gas_price: 0,
-        tx_hash: H256::zero(),
-    };
-
-    let rc_world = Rc::new(blockchain_mock);
-    let debug_api = DebugApi::new(tx_input, TxCache::new(rc_world.clone()));
-    let sc = rust_testing_framework_tester::contract_obj(debug_api);
-    {
-        let actual_payment_amount = sc.receive_egld();
-        let expected_payment_amount = BigUint::managed_from(sc.raw_vm_api(), 1_000u32);
-        assert_eq!(actual_payment_amount, expected_payment_amount);
-    }
-
-    let api = into_api(sc);
-    let bu = api.into_blockchain_updates();
-
-    blockchain_mock = Rc::try_unwrap(rc_world).unwrap();
-    bu.apply(&mut blockchain_mock);
-
-    let user_acc_after = blockchain_mock.accounts.get(&caller_addr).unwrap();
-    let sc_acc_after = blockchain_mock.accounts.get(&sc_addr).unwrap();
-
-    assert_eq!(user_acc_after.egld_balance, num_bigint::BigUint::from(0u32));
-    assert_eq!(
-        sc_acc_after.egld_balance,
-        num_bigint::BigUint::from(3_000u32)
-    );
+    /*
+    let expected_user_balance = rust_biguint!(0);
+    let actual_user_balance = &b_mock.accounts.get(&caller_addr).unwrap().egld_balance;
+    assert_eq!(&expected_user_balance, actual_user_balance);
+    */
 }
 
 /*
@@ -219,10 +172,6 @@ tx_context.tx_cache.subtract_egld_balance(
 */
 
 // fn type_test<A: VMApi>(_sc: ContractObj<A>) {}
-
-fn into_api<CB: ContractBase>(sc_obj: CB) -> CB::Api {
-    sc_obj.raw_vm_api()
-}
 
 /*
 fn execute_test_tx<F: FnOnce(DebugApi)>(
