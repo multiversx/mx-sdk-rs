@@ -66,8 +66,8 @@ fn test_sc_payment_ok() {
         StateChange::Commit
     });
 
-    wrapper.check_egkd_balance(&caller_addr, &rust_biguint!(0));
-    wrapper.check_egkd_balance(&sc_addr, &rust_biguint!(3_000));
+    wrapper.check_egld_balance(&caller_addr, &rust_biguint!(0));
+    wrapper.check_egld_balance(&sc_addr, &rust_biguint!(3_000));
 }
 
 #[test]
@@ -85,8 +85,8 @@ fn test_sc_payment_reverted() {
         StateChange::Revert
     });
 
-    wrapper.check_egkd_balance(&caller_addr, &rust_biguint!(1_000));
-    wrapper.check_egkd_balance(&sc_addr, &rust_biguint!(2_000));
+    wrapper.check_egld_balance(&caller_addr, &rust_biguint!(1_000));
+    wrapper.check_egld_balance(&sc_addr, &rust_biguint!(2_000));
 }
 
 #[test]
@@ -102,8 +102,8 @@ fn test_sc_half_payment() {
         StateChange::Commit
     });
 
-    wrapper.check_egkd_balance(&caller_addr, &rust_biguint!(500));
-    wrapper.check_egkd_balance(&sc_addr, &rust_biguint!(2_500));
+    wrapper.check_egld_balance(&caller_addr, &rust_biguint!(500));
+    wrapper.check_egld_balance(&sc_addr, &rust_biguint!(2_500));
 }
 
 #[test]
@@ -244,5 +244,30 @@ fn storage_set_test() {
 
         assert_eq!(expected_value, actual_total);
         assert_eq!(expected_value, actual_per_caller);
+    });
+}
+
+#[test]
+fn blockchain_state_test() {
+    let rust_zero = rust_biguint!(0);
+    let mut wrapper = ContractObjWrapper::new(rust_testing_framework_tester::contract_obj);
+    let sc_addr = wrapper.create_sc_account(&rust_zero, None);
+
+    let expected_epoch = 10;
+    let expected_nonce = 20;
+    let expected_timestamp = 30;
+
+    wrapper.set_block_epoch(expected_epoch);
+    wrapper.set_block_nonce(expected_nonce);
+    wrapper.set_block_timestamp(expected_timestamp);
+
+    wrapper.execute_query(&sc_addr, |sc| {
+        let actual_epoch = sc.get_block_epoch();
+        let actual_nonce = sc.get_block_nonce();
+        let actual_timestamp = sc.get_block_timestamp();
+
+        assert_eq!(expected_epoch, actual_epoch);
+        assert_eq!(expected_nonce, actual_nonce);
+        assert_eq!(expected_timestamp, actual_timestamp);
     });
 }

@@ -47,6 +47,21 @@ pub trait RustTestingFrameworkTester {
     }
 
     #[endpoint]
+    fn get_block_epoch(&self) -> u64 {
+        self.blockchain().get_block_epoch()
+    }
+
+    #[endpoint]
+    fn get_block_nonce(&self) -> u64 {
+        self.blockchain().get_block_nonce()
+    }
+
+    #[endpoint]
+    fn get_block_timestamp(&self) -> u64 {
+        self.blockchain().get_block_timestamp()
+    }
+
+    #[endpoint]
     fn add(&self, value: BigUint) {
         let caller = self.blockchain().get_caller();
 
