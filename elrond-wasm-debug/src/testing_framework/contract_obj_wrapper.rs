@@ -43,22 +43,13 @@ where
         }
     }
 
-    pub fn check_egkd_balance(&self, address: &Address, expected_balance: &num_bigint::BigUint) {
+    pub fn check_egld_balance(&self, address: &Address, expected_balance: &num_bigint::BigUint) {
         let actual_balance = match &self.b_mock.accounts.get(address) {
             Some(acc) => acc.egld_balance.clone(),
             None => rust_biguint!(0),
         };
 
         assert_eq!(&actual_balance, expected_balance);
-    }
-
-    pub fn check_state<F: Fn(DebugApi)>(&self, _func: F) {
-        /*
-        match &self.api {
-            Some(api) => func(api.clone()),
-            None => panic!("Api instance not created yet"),
-        }
-        */
     }
 }
 
@@ -103,6 +94,52 @@ where
         address
     }
 
+    pub fn set_block_epoch(&mut self, block_epoch: u64) {
+        self.b_mock.current_block_info.block_epoch = block_epoch;
+    }
+
+    pub fn set_block_nonce(&mut self, block_nonce: u64) {
+        self.b_mock.current_block_info.block_nonce = block_nonce;
+    }
+
+    pub fn set_block_random_seed(&mut self, block_random_seed: Box<[u8; 48]>) {
+        self.b_mock.current_block_info.block_random_seed = block_random_seed;
+    }
+
+    pub fn set_block_round(&mut self, block_round: u64) {
+        self.b_mock.current_block_info.block_round = block_round;
+    }
+
+    pub fn set_block_timestamp(&mut self, block_timestamp: u64) {
+        self.b_mock.current_block_info.block_timestamp = block_timestamp;
+    }
+
+    pub fn set_prev_block_epoch(&mut self, block_epoch: u64) {
+        self.b_mock.previous_block_info.block_epoch = block_epoch;
+    }
+
+    pub fn set_prev_block_nonce(&mut self, block_nonce: u64) {
+        self.b_mock.previous_block_info.block_nonce = block_nonce;
+    }
+
+    pub fn set_prev_block_random_seed(&mut self, block_random_seed: Box<[u8; 48]>) {
+        self.b_mock.previous_block_info.block_random_seed = block_random_seed;
+    }
+
+    pub fn set_prev_block_round(&mut self, block_round: u64) {
+        self.b_mock.previous_block_info.block_round = block_round;
+    }
+
+    pub fn set_prev_block_timestamp(&mut self, block_timestamp: u64) {
+        self.b_mock.previous_block_info.block_timestamp = block_timestamp;
+    }
+}
+
+impl<CB, ContractObjBuilder> ContractObjWrapper<CB, ContractObjBuilder>
+where
+    CB: ContractBase<Api = DebugApi>,
+    ContractObjBuilder: Fn(DebugApi) -> CB,
+{
     pub fn execute_tx<TxFn: FnOnce(&CB) -> StateChange>(
         self,
         caller: &Address,
