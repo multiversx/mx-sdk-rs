@@ -1,113 +1,52 @@
-use std::rc::Rc;
-
 use elrond_wasm::{
     contract_base::ContractBase,
-    sc_error,
     types::{Address, BigUint, ManagedFrom, SCResult, H256},
 };
-use elrond_wasm_debug::{
-    managed_biguint, rust_biguint,
-    testing_framework::*,
-    tx_mock::{TxCache, TxInput},
-    world_mock::{AccountData, AccountEsdt},
-    BlockchainMock, DebugApi, HashMap,
-};
+use elrond_wasm_debug::{assert_sc_error, managed_biguint, rust_biguint, testing_framework::*};
 use rust_testing_framework_tester::*;
 
 #[test]
-fn test_call_sum_biguint() {
-    let sc = rust_testing_framework_tester::contract_obj(DebugApi::dummy());
-    let api = sc.raw_vm_api(); // will be removed entirely in the next version
+fn test_add() {
+    let mut wrapper = ContractObjWrapper::new(rust_testing_framework_tester::contract_obj);
+    let sc_addr = wrapper.create_sc_account(&rust_biguint!(0), None);
 
-    let first = BigUint::managed_from(api.clone(), 2u64);
-    let second = BigUint::managed_from(api.clone(), 3u64);
-    let expected_result = first.clone() + second.clone();
-    let actual_result = sc.sum(first, second);
-    assert_eq!(expected_result, actual_result);
-}
+    wrapper.execute_query(&sc_addr, |sc| {
+        let first = managed_biguint!(sc, 1000);
+        let second = managed_biguint!(sc, 2000);
 
-#[test]
-fn test_call_sum_sc_result_ok() {
-    let sc = rust_testing_framework_tester::contract_obj(DebugApi::dummy());
-    let api = sc.raw_vm_api(); // will be removed entirely in the next version
-
-    let first = BigUint::managed_from(api.clone(), 2u64);
-    let second = BigUint::managed_from(api.clone(), 3u64);
-    let expected_result = SCResult::Ok(first.clone() + second.clone());
-    let actual_result = sc.sum_sc_result(first, second);
-    assert_eq!(expected_result, actual_result);
-}
-
-#[test]
-fn test_call_sum_sc_result_err() {
-    let sc = rust_testing_framework_tester::contract_obj(DebugApi::dummy());
-    let api = sc.raw_vm_api(); // will be removed entirely in the next version
-
-    let first = BigUint::managed_from(api.clone(), 0u64);
-    let second = BigUint::managed_from(api.clone(), 3u64);
-    let expected_result: SCResult<BigUint<DebugApi>> = sc_error!("Non-zero required");
-    let actual_result = sc.sum_sc_result(first, second);
-    assert_eq!(expected_result, actual_result);
-}
-
-#[test]
-fn test_sc_set_tx_input() {
-    let mut blockchain_mock = BlockchainMock::new();
-    let caller_addr = Address::from([1u8; 32]);
-
-    let mut sc_addr_raw = [1u8; 32];
-    for i in 0..8 {
-        sc_addr_raw[i] = 0;
-    }
-    let sc_addr = Address::from(sc_addr_raw);
-
-    // add the address to the state, with 1000 EGLD balance
-    blockchain_mock.add_account(AccountData {
-        address: caller_addr.clone(),
-        nonce: 0,
-        egld_balance: num_bigint::BigUint::from(1_000u32),
-        esdt: AccountEsdt::default(),
-        storage: HashMap::new(),
-        username: Vec::new(),
-        contract_path: None,
-        contract_owner: None,
+        let expected_result = first.clone() + second.clone();
+        let actual_result = sc.sum(first, second);
+        assert_eq!(expected_result, actual_result);
     });
+}
 
-    // add sc to the state, with 2000 EGLD balance
-    blockchain_mock.add_account(AccountData {
-        address: sc_addr.clone(),
-        nonce: 0,
-        egld_balance: num_bigint::BigUint::from(2_000u32),
-        esdt: AccountEsdt::default(),
-        storage: HashMap::new(),
-        username: Vec::new(),
-        contract_path: None,
-        contract_owner: None,
+#[test]
+fn test_sc_result_ok() {
+    let mut wrapper = ContractObjWrapper::new(rust_testing_framework_tester::contract_obj);
+    let sc_addr = wrapper.create_sc_account(&rust_biguint!(0), None);
+
+    wrapper.execute_query(&sc_addr, |sc| {
+        let first = managed_biguint!(sc, 1000);
+        let second = managed_biguint!(sc, 2000);
+
+        let expected_result = SCResult::Ok(first.clone() + second.clone());
+        let actual_result = sc.sum_sc_result(first, second);
+        assert_eq!(expected_result, actual_result);
     });
+}
 
-    let tx_input = TxInput {
-        from: caller_addr.clone(),
-        to: sc_addr.clone(),
-        egld_value: num_bigint::BigUint::from(0u32),
-        esdt_values: Vec::new(),
-        func_name: Vec::new(),
-        args: Vec::new(),
-        gas_limit: u64::MAX,
-        gas_price: 0,
-        tx_hash: H256::zero(),
-    };
+#[test]
+fn test_sc_result_err() {
+    let mut wrapper = ContractObjWrapper::new(rust_testing_framework_tester::contract_obj);
+    let sc_addr = wrapper.create_sc_account(&rust_biguint!(0), None);
 
-    let rc_world = Rc::new(blockchain_mock);
-    let debug_api = DebugApi::new(tx_input, TxCache::new(rc_world));
-    let sc = rust_testing_framework_tester::contract_obj(debug_api);
-    let api = sc.raw_vm_api();
+    wrapper.execute_query(&sc_addr, |sc| {
+        let first = managed_biguint!(sc, 0);
+        let second = managed_biguint!(sc, 2000);
 
-    let expected_balance = BigUint::managed_from(api.clone(), 2_000u32);
-    let actual_balance = sc.get_egld_balance();
-    assert_eq!(expected_balance, actual_balance);
-
-    let actual_caller = sc.get_caller_legacy();
-    assert_eq!(caller_addr, actual_caller);
+        let actual_result = sc.sum_sc_result(first, second);
+        assert_sc_error!(actual_result, b"Non-zero required");
+    });
 }
 
 #[test]
@@ -123,8 +62,8 @@ fn test_sc_payment() {
         assert_eq!(actual_payment, expected_payment);
     });
 
-    wrapper.check_balance(&caller_addr, &rust_biguint!(0));
-    wrapper.check_balance(&sc_addr, &rust_biguint!(3_000));
+    wrapper.check_egkd_balance(&caller_addr, &rust_biguint!(0));
+    wrapper.check_egkd_balance(&sc_addr, &rust_biguint!(3_000));
 }
 
 #[test]
@@ -138,8 +77,8 @@ fn test_sc_half_payment() {
         sc.recieve_egld_half();
     });
 
-    wrapper.check_balance(&caller_addr, &rust_biguint!(500));
-    wrapper.check_balance(&sc_addr, &rust_biguint!(2_500));
+    wrapper.check_egkd_balance(&caller_addr, &rust_biguint!(500));
+    wrapper.check_egkd_balance(&sc_addr, &rust_biguint!(2_500));
 }
 
 #[test]
