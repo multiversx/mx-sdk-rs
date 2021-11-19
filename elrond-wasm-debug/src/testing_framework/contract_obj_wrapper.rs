@@ -24,6 +24,11 @@ pub struct ContractObjWrapper<
     _phantom: PhantomData<CB>,
 }
 
+pub enum StateChange {
+    Commit,
+    Revert,
+}
+
 impl<CB, ContractObjBuilder> ContractObjWrapper<CB, ContractObjBuilder>
 where
     CB: ContractBase<Api = DebugApi>,
@@ -98,7 +103,7 @@ where
         address
     }
 
-    pub fn execute_tx<TxFn: Fn(&CB)>(
+    pub fn execute_tx<TxFn: FnOnce(&CB) -> StateChange>(
         self,
         caller: &Address,
         sc_address: &Address,
@@ -108,31 +113,27 @@ where
         let rc_b_mock = Rc::new(self.b_mock);
         let tx_cache = TxCache::new(rc_b_mock.clone());
 
-        if egld_payment > &num_bigint::BigUint::from(0u32) {
+        if egld_payment > &rust_biguint!(0) {
             tx_cache.subtract_egld_balance(caller, egld_payment);
             tx_cache.increase_egld_balance(sc_address, egld_payment);
         }
 
-        let tx_input = TxInput {
-            from: caller.clone(),
-            to: sc_address.clone(),
-            egld_value: egld_payment.clone(),
-            esdt_values: Vec::new(),
-            func_name: Vec::new(),
-            args: Vec::new(),
-            gas_limit: u64::MAX,
-            gas_price: 0,
-            tx_hash: H256::zero(),
-        };
+        let tx_input = build_tx_input(caller, sc_address, egld_payment);
         let debug_api = DebugApi::new(tx_input, tx_cache);
         let sc = (self.obj_builder)(debug_api);
 
-        tx_fn(&sc);
+        let state_change = tx_fn(&sc);
 
         let api_after_exec = into_api(sc);
         let updates = api_after_exec.into_blockchain_updates();
         let mut new_b_mock = Rc::try_unwrap(rc_b_mock).unwrap();
-        updates.apply(&mut new_b_mock);
+
+        match state_change {
+            StateChange::Commit => {
+                updates.apply(&mut new_b_mock);
+            },
+            StateChange::Revert => {},
+        }
 
         Self {
             address_factory: self.address_factory,
@@ -142,42 +143,28 @@ where
         }
     }
 
-    pub fn execute_query<TxFn: Fn(&CB)>(self, sc_address: &Address, query_fn: TxFn) -> Self {
-        let rc_b_mock = Rc::new(self.b_mock);
-        let tx_cache = TxCache::new(rc_b_mock.clone());
-
-        let tx_input = TxInput {
-            from: sc_address.clone(),
-            to: sc_address.clone(),
-            egld_value: rust_biguint!(0),
-            esdt_values: Vec::new(),
-            func_name: Vec::new(),
-            args: Vec::new(),
-            gas_limit: u64::MAX,
-            gas_price: 0,
-            tx_hash: H256::zero(),
-        };
-        let debug_api = DebugApi::new(tx_input, tx_cache);
-        let sc = (self.obj_builder)(debug_api);
-
-        query_fn(&sc);
-
-        // we don't actually apply the updates, we only make sure to destroy the API object
-        let api_after_exec = into_api(sc);
-        let _ = api_after_exec.into_blockchain_updates();
-        let new_b_mock = Rc::try_unwrap(rc_b_mock).unwrap();
-
-        Self {
-            address_factory: self.address_factory,
-            obj_builder: self.obj_builder,
-            b_mock: new_b_mock,
-            _phantom: PhantomData,
-        }
+    pub fn execute_query<TxFn: FnOnce(&CB)>(self, sc_address: &Address, query_fn: TxFn) -> Self {
+        self.execute_tx(sc_address, sc_address, &rust_biguint!(0), |sc| {
+            query_fn(sc);
+            StateChange::Revert
+        })
     }
-
-    // pub fn set_storage(&mut self, address: Address, key: ?, value: dyn TopEncode)
 }
 
 fn into_api<CB: ContractBase<Api = DebugApi>>(sc_obj: CB) -> DebugApi {
     sc_obj.raw_vm_api()
+}
+
+fn build_tx_input(caller: &Address, dest: &Address, egld_value: &num_bigint::BigUint) -> TxInput {
+    TxInput {
+        from: caller.clone(),
+        to: dest.clone(),
+        egld_value: egld_value.clone(),
+        esdt_values: Vec::new(),
+        func_name: Vec::new(),
+        args: Vec::new(),
+        gas_limit: u64::MAX,
+        gas_price: 0,
+        tx_hash: H256::zero(),
+    }
 }
