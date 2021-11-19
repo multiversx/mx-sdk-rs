@@ -38,7 +38,7 @@ where
         }
     }
 
-    pub fn check_balance(&self, address: &Address, expected_balance: &num_bigint::BigUint) {
+    pub fn check_egkd_balance(&self, address: &Address, expected_balance: &num_bigint::BigUint) {
         let actual_balance = match &self.b_mock.accounts.get(address) {
             Some(acc) => acc.egld_balance.clone(),
             None => rust_biguint!(0),
@@ -55,12 +55,6 @@ where
         }
         */
     }
-
-    /*
-    pub fn start_transaction(&self);
-
-    pub fn end_transaction()
-    */
 }
 
 impl<CB, ContractObjBuilder> ContractObjWrapper<CB, ContractObjBuilder>
@@ -171,7 +165,6 @@ where
         // we don't actually apply the updates, we only make sure to destroy the API object
         let api_after_exec = into_api(sc);
         let _ = api_after_exec.into_blockchain_updates();
-
         let new_b_mock = Rc::try_unwrap(rc_b_mock).unwrap();
 
         Self {
@@ -182,51 +175,8 @@ where
         }
     }
 
-    /*
-    pub fn execute_query<TxFn: Fn(CB) -> dyn TopEncode>(
-        self,
-        sc_address: Address,
-        tx_fn: TxFn,
-    ) -> () {
-        self.execute_tx(
-            sc_address.clone(),
-            sc_address,
-            num_bigint::BigUint::from(0u32),
-            tx_fn,
-        )
-    }
-    */
-
     // pub fn set_storage(&mut self, address: Address, key: ?, value: dyn TopEncode)
 }
-
-/*
-impl<CB, ContractObjBuilder> ContractObjWrapper<CB, ContractObjBuilder>
-where
-    CB: ContractBase<Api = DebugApi>,
-    ContractObjBuilder: Fn(DebugApi) -> CB,
-{
-    pub fn into_api(self) -> DebugApi {
-        match self.obj {
-            Some(obj) => obj.raw_vm_api(),
-            None => panic!("Api instance not created yet"),
-        }
-    }
-}
-*/
-
-/*
-impl<CB, ContractObjBuilder> From<ContractObjWrapper<CB, ContractObjBuilder>>
-    for ContractObjWrapper<CB, ContractObjBuilder>
-where
-    CB: ContractBase<Api = DebugApi>,
-    ContractObjBuilder: Fn(DebugApi) -> CB,
-{
-    fn from(_: ContractObjWrapper<CB, ContractObjBuilder>) -> Self {
-        todo!()
-    }
-}
-*/
 
 fn into_api<CB: ContractBase<Api = DebugApi>>(sc_obj: CB) -> DebugApi {
     sc_obj.raw_vm_api()
