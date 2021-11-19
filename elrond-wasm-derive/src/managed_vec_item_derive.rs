@@ -1,17 +1,45 @@
 use proc_macro::TokenStream;
 use quote::quote;
 
+/// Gets the first generic of the main type, for more accurate replacements in the field types.
+fn extract_first_generic_ident(generics: &syn::Generics) -> Option<syn::Ident> {
+    if let Some(syn::GenericParam::Type(type_param)) = generics.params.first() {
+        return Some(type_param.ident.clone());
+    }
+
+    None
+}
+
+fn type_matches_ident(ty: &syn::Type, ident: &syn::Ident) -> bool {
+    if let syn::Type::Path(type_path) = ty {
+        if let Some(first_segment) = type_path.path.segments.first() {
+            if &first_segment.ident == ident {
+                return true;
+            }
+        }
+    }
+    false
+}
+
 /// Replaces every generic with `<elrond_wasm::api::uncallable::UncallableApi>` in a type, indiscriminately.
 /// A bit of a hack, but it works.
-fn type_generic_replace_with_uncallable(type_name: &syn::Type) -> syn::Type {
+fn type_generic_replace_with_uncallable(
+    parent_generics: &syn::Generics,
+    type_name: &syn::Type,
+) -> syn::Type {
     let mut replaced = type_name.clone();
-    if let syn::Type::Path(path) = &mut replaced {
-        for segment in path.path.segments.iter_mut() {
-            if let syn::PathArguments::AngleBracketed(args) = &mut segment.arguments {
-                for arg in args.args.iter_mut() {
-                    if let syn::GenericArgument::Type(gen_ty) = arg {
-                        *gen_ty =
-                            syn::parse_str("elrond_wasm::api::uncallable::UncallableApi").unwrap();
+    if let Some(parent_first_generic) = extract_first_generic_ident(parent_generics) {
+        if let syn::Type::Path(path) = &mut replaced {
+            for segment in path.path.segments.iter_mut() {
+                if let syn::PathArguments::AngleBracketed(args) = &mut segment.arguments {
+                    for arg in args.args.iter_mut() {
+                        if let syn::GenericArgument::Type(generic_type) = arg {
+                            if type_matches_ident(&*generic_type, &parent_first_generic) {
+                                *generic_type =
+                                    syn::parse_str("elrond_wasm::api::uncallable::UncallableApi")
+                                        .unwrap();
+                            }
+                        }
                     }
                 }
             }
@@ -20,19 +48,25 @@ fn type_generic_replace_with_uncallable(type_name: &syn::Type) -> syn::Type {
     replaced
 }
 
-fn type_payload_size(type_name: &syn::Type) -> proc_macro2::TokenStream {
-    let type_name_replaced = type_generic_replace_with_uncallable(type_name);
+fn type_payload_size(
+    parent_generics: &syn::Generics,
+    type_name: &syn::Type,
+) -> proc_macro2::TokenStream {
+    let type_name_replaced = type_generic_replace_with_uncallable(parent_generics, type_name);
     quote! {
         <#type_name_replaced as elrond_wasm::types::ManagedVecItem<elrond_wasm::api::uncallable::UncallableApi>>::PAYLOAD_SIZE
     }
 }
 
-fn generate_payload_snippets(fields: &syn::Fields) -> Vec<proc_macro2::TokenStream> {
+fn generate_payload_snippets(
+    parent_generics: &syn::Generics,
+    fields: &syn::Fields,
+) -> Vec<proc_macro2::TokenStream> {
     match fields {
         syn::Fields::Named(fields_named) => fields_named
             .named
             .iter()
-            .map(|field| type_payload_size(&field.ty))
+            .map(|field| type_payload_size(parent_generics, &field.ty))
             .collect(),
         _ => {
             panic!("ManagedVecItem only supports named fields")
@@ -40,13 +74,16 @@ fn generate_payload_snippets(fields: &syn::Fields) -> Vec<proc_macro2::TokenStre
     }
 }
 
-fn generate_skips_reserialization_snippets(fields: &syn::Fields) -> Vec<proc_macro2::TokenStream> {
+fn generate_skips_reserialization_snippets(
+    parent_generics: &syn::Generics,
+    fields: &syn::Fields,
+) -> Vec<proc_macro2::TokenStream> {
     match fields {
         syn::Fields::Named(fields_named) => fields_named
             .named
             .iter()
             .map(|field| {
-                let type_name = type_generic_replace_with_uncallable(&field.ty);
+                let type_name = type_generic_replace_with_uncallable(parent_generics, &field.ty);
                 quote! {
                     <#type_name as elrond_wasm::types::ManagedVecItem<elrond_wasm::api::uncallable::UncallableApi>>::SKIPS_RESERIALIZATION
                 }
@@ -131,9 +168,9 @@ pub fn managed_vec_item_derive(ast: &syn::DeriveInput) -> TokenStream {
     let from_byte_reader_snippets: Vec<proc_macro2::TokenStream>;
     let to_byte_writer_snippets: Vec<proc_macro2::TokenStream>;
     if let syn::Data::Struct(data_struct) = &ast.data {
-        payload_snippets = generate_payload_snippets(&data_struct.fields);
+        payload_snippets = generate_payload_snippets(&ast.generics, &data_struct.fields);
         skips_reserialization_snippets =
-            generate_skips_reserialization_snippets(&data_struct.fields);
+            generate_skips_reserialization_snippets(&ast.generics, &data_struct.fields);
         from_byte_reader_snippets = generate_from_byte_reader_snippets(&data_struct.fields);
         to_byte_writer_snippets = generate_to_byte_writer_snippets(&data_struct.fields);
     } else {

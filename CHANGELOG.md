@@ -4,6 +4,11 @@ There are several crates in this repo, this changelog will keep track of all of 
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+
+## [elrond-wasm 0.22.11] - 2021-11-17
+- Derive `ManagedVecItem` generics fix
+- Constructor can reside in module
+
 ## [elrond-wasm 0.22.10] - 2021-11-12
 - `ManagedMultiResultVec` push accepts multi result
 

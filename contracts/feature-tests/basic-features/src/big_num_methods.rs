@@ -63,6 +63,16 @@ pub trait BigIntMethods {
     }
 
     #[endpoint]
+    fn big_uint_from_managed_buffer(&self, mb: ManagedBuffer) -> BigUint {
+        BigUint::from(mb)
+    }
+
+    #[endpoint]
+    fn big_uint_from_managed_buffer_ref(&self, mb: &ManagedBuffer) -> BigUint {
+        BigUint::from(mb)
+    }
+
+    #[endpoint]
     fn big_int_zero(&self) -> BigInt {
         BigInt::zero()
     }
