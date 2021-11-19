@@ -13,6 +13,13 @@ macro_rules! managed_biguint {
 }
 
 #[macro_export]
+macro_rules! managed_address {
+    ($sc_instance:expr, $address:expr) => {{
+        ManagedAddress::from_address($sc_instance.raw_vm_api(), $address)
+    }};
+}
+
+#[macro_export]
 macro_rules! assert_sc_error {
     ($sc_result:expr, $expected_string:expr) => {{
         assert_eq!($sc_result.err().unwrap().as_bytes(), $expected_string)

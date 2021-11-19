@@ -5,7 +5,9 @@ elrond_wasm::imports!();
 #[elrond_wasm::derive::contract]
 pub trait RustTestingFrameworkTester {
     #[init]
-    fn init(&self) {}
+    fn init(&self) {
+        self.total_value().set(&BigUint::from(1u32));
+    }
 
     #[endpoint]
     fn sum(&self, first: BigUint, second: BigUint) -> BigUint {
@@ -43,4 +45,18 @@ pub trait RustTestingFrameworkTester {
         self.send()
             .direct(&caller, &TokenIdentifier::egld(), 0, &payment_amount, &[]);
     }
+
+    #[endpoint]
+    fn add(&self, value: BigUint) {
+        let caller = self.blockchain().get_caller();
+
+        self.total_value().update(|val| *val += &value);
+        self.value_per_caller(&caller).update(|val| *val += value);
+    }
+
+    #[storage_mapper("totalValue")]
+    fn total_value(&self) -> SingleValueMapper<BigUint>;
+
+    #[storage_mapper("valuePerCaller")]
+    fn value_per_caller(&self, caller: &ManagedAddress) -> SingleValueMapper<BigUint>;
 }
