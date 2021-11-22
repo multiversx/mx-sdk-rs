@@ -350,6 +350,22 @@ where
         self.execute_tx_any(caller, sc_address, &rust_biguint!(0), esdt_transfer, tx_fn)
     }
 
+    pub fn execute_esdt_multi_transfer<TxFn: FnOnce(&CB) -> StateChange>(
+        self,
+        caller: &Address,
+        sc_address: &Address,
+        esdt_transfers: &[TxInputESDT],
+        tx_fn: TxFn,
+    ) -> Self {
+        self.execute_tx_any(
+            caller,
+            sc_address,
+            &rust_biguint!(0),
+            esdt_transfers.to_vec(),
+            tx_fn,
+        )
+    }
+
     pub fn execute_query<TxFn: FnOnce(&CB)>(self, sc_address: &Address, query_fn: TxFn) -> Self {
         self.execute_tx(sc_address, sc_address, &rust_biguint!(0), |sc| {
             query_fn(sc);
