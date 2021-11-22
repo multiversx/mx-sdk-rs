@@ -172,7 +172,7 @@ where
             storage: HashMap::new(),
             username: Vec::new(),
             contract_path: None,
-            contract_owner: owner.map(|owner_ref| owner_ref.clone()),
+            contract_owner: owner.cloned(),
         });
     }
 
@@ -219,6 +219,7 @@ where
         );
     }
 
+    #[allow(clippy::too_many_arguments)]
     pub fn set_nft_balance_all_properties<T: elrond_wasm::elrond_codec::TopEncode>(
         &mut self,
         address: &Address,
@@ -239,7 +240,7 @@ where
                     nonce,
                     balance,
                     EsdtInstanceMetadata {
-                        creator: creator.map(|c| c.clone()),
+                        creator: creator.cloned(),
                         attributes: serialize_attributes(attributes),
                         royalties,
                         name: name.unwrap_or_default().to_vec(),
@@ -343,7 +344,7 @@ where
         tx_fn: TxFn,
     ) -> Self {
         let esdt_transfer = vec![TxInputESDT {
-            token_identifier: token_id.clone().to_vec(),
+            token_identifier: token_id.to_vec(),
             nonce: esdt_nonce,
             value: esdt_amount.clone(),
         }];

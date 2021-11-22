@@ -8,6 +8,12 @@ pub struct AddressFactory {
     last_generated_address: [u8; ADDRESS_LEN],
 }
 
+impl Default for AddressFactory {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl AddressFactory {
     pub fn new() -> Self {
         Self {
@@ -21,8 +27,8 @@ impl AddressFactory {
 
     pub fn new_sc_address(&mut self) -> Address {
         let mut addr = self.new_address_raw();
-        for i in 0..SC_ADDR_LEADING_ZEROES {
-            addr[i] = 0;
+        for byte in addr.iter_mut().take(SC_ADDR_LEADING_ZEROES) {
+            *byte = 0;
         }
 
         Address::from(addr)
@@ -33,7 +39,7 @@ impl AddressFactory {
         hasher.update(self.last_generated_address);
         let result: [u8; ADDRESS_LEN] = hasher.finalize().into();
 
-        self.last_generated_address = result.clone();
+        self.last_generated_address = result;
 
         result
     }
