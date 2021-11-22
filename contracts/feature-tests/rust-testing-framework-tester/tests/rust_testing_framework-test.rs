@@ -1,10 +1,13 @@
 use elrond_wasm::{
     contract_base::ContractBase,
-    types::{BigUint, EsdtLocalRole, ManagedAddress, ManagedFrom, SCResult, TokenIdentifier},
+    types::{
+        BigUint, EsdtLocalRole, EsdtTokenPayment, ManagedAddress, ManagedFrom, SCResult,
+        TokenIdentifier,
+    },
 };
 use elrond_wasm_debug::{
     assert_sc_error, managed_address, managed_biguint, managed_token_id, rust_biguint,
-    testing_framework::*,
+    testing_framework::*, tx_mock::TxInputESDT,
 };
 use rust_testing_framework_tester::*;
 
@@ -352,6 +355,72 @@ fn test_sc_nft() {
 
     wrapper.check_nft_balance(&sc_addr, token_id, 1, &rust_biguint!(200), &nft_attributes);
     wrapper.check_nft_balance(&sc_addr, token_id, 2, &rust_biguint!(50), &nft_attributes);
+}
+
+#[test]
+fn test_esdt_multi_transfer() {
+    let mut wrapper = ContractObjWrapper::new(rust_testing_framework_tester::contract_obj);
+    let caller_addr = wrapper.create_user_account(&rust_biguint!(0));
+    let sc_addr = wrapper.create_sc_account(&rust_biguint!(0), None);
+    let token_id_1 = &b"COOL-123456"[..];
+    let token_id_2 = &b"VERYCOOL-123456"[..];
+    let nft_nonce = 5;
+
+    wrapper.set_esdt_balance(&caller_addr, token_id_1, &rust_biguint!(100));
+    wrapper.set_nft_balance(&caller_addr, token_id_2, nft_nonce, &rust_biguint!(1), &());
+
+    let transfers = vec![
+        TxInputESDT {
+            token_identifier: token_id_1.to_vec(),
+            nonce: 0,
+            value: rust_biguint!(100),
+        },
+        TxInputESDT {
+            token_identifier: token_id_2.to_vec(),
+            nonce: nft_nonce,
+            value: rust_biguint!(1),
+        },
+    ];
+
+    wrapper = wrapper.execute_esdt_multi_transfer(&caller_addr, &sc_addr, &transfers, |sc| {
+        let mut expected_transfers = Vec::new();
+        expected_transfers.push(EsdtTokenPayment::new(
+            managed_token_id!(sc, token_id_1),
+            0,
+            managed_biguint!(sc, 100),
+        ));
+        expected_transfers.push(EsdtTokenPayment::new(
+            managed_token_id!(sc, token_id_2),
+            nft_nonce,
+            managed_biguint!(sc, 1),
+        ));
+
+        let actual_transfers = sc.receive_multi_esdt().into_vec();
+        assert_eq!(
+            expected_transfers[0].token_identifier,
+            actual_transfers[0].token_identifier
+        );
+        assert_eq!(
+            expected_transfers[0].token_nonce,
+            actual_transfers[0].token_nonce
+        );
+        assert_eq!(expected_transfers[0].amount, actual_transfers[0].amount);
+
+        assert_eq!(
+            expected_transfers[1].token_identifier,
+            actual_transfers[1].token_identifier
+        );
+        assert_eq!(
+            expected_transfers[1].token_nonce,
+            actual_transfers[1].token_nonce
+        );
+        assert_eq!(expected_transfers[1].amount, actual_transfers[1].amount);
+
+        StateChange::Commit
+    });
+
+    wrapper.check_esdt_balance(&sc_addr, token_id_1, &rust_biguint!(100));
+    wrapper.check_nft_balance(&sc_addr, token_id_2, nft_nonce, &rust_biguint!(1), &());
 }
 
 #[test]

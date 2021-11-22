@@ -79,6 +79,12 @@ pub trait RustTestingFrameworkTester {
 
     #[payable("*")]
     #[endpoint]
+    fn receive_multi_esdt(&self) -> ManagedVec<EsdtTokenPayment<Self::Api>> {
+        self.call_value().all_esdt_transfers()
+    }
+
+    #[payable("*")]
+    #[endpoint]
     fn send_nft(
         &self,
         to: ManagedAddress,
