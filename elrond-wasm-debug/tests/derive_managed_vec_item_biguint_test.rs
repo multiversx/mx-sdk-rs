@@ -53,15 +53,16 @@ fn struct_to_bytes_writer() {
 
 #[test]
 fn struct_from_bytes_reader() {
+    let api = DebugApi::dummy();
     let s = ManagedStructWithBigUint::<DebugApi> {
-        big_uint: BigUint::managed_from(DebugApi::dummy(), 42u64),
+        big_uint: BigUint::managed_from(api.clone(), 42u64),
         num: 0x12345,
     };
     let arr: [u8; 8] = [0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x23, 0x45];
 
     let struct_from_bytes = <ManagedStructWithBigUint<DebugApi> as elrond_wasm::types::ManagedVecItem<
         DebugApi,
-    >>::from_byte_reader(DebugApi::dummy(), |bytes| {
+    >>::from_byte_reader(api, |bytes| {
         bytes.copy_from_slice(
                     &arr
                         [0

@@ -87,7 +87,7 @@ fn struct_from_bytes_reader() {
 
     let struct_from_bytes = <ManagedStructWithToken<DebugApi> as elrond_wasm::types::ManagedVecItem<
         DebugApi,
-    >>::from_byte_reader(DebugApi::dummy(), |bytes| {
+    >>::from_byte_reader(api.clone(), |bytes| {
         bytes.copy_from_slice(
                     &arr
                         [0
