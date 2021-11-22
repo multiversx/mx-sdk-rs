@@ -7,8 +7,8 @@ use elrond_wasm::{
 
 use crate::{
     rust_biguint,
-    tx_mock::{TxCache, TxInput},
-    world_mock::{AccountData, AccountEsdt},
+    tx_mock::{TxCache, TxInput, TxInputESDT},
+    world_mock::{AccountData, AccountEsdt, EsdtInstanceMetadata},
     BlockchainMock, DebugApi,
 };
 
@@ -49,8 +49,90 @@ where
             None => rust_biguint!(0),
         };
 
-        assert_eq!(&actual_balance, expected_balance);
+        assert_eq!(
+            expected_balance,
+            &actual_balance,
+            "EGLD balance mismatch for address {}. Expected: {}, have {}",
+            address_to_hex(address),
+            expected_balance,
+            actual_balance
+        );
     }
+
+    pub fn check_esdt_balance(
+        &self,
+        address: &Address,
+        token_id: &[u8],
+        expected_balance: &num_bigint::BigUint,
+    ) {
+        let actual_balance = match &self.b_mock.accounts.get(address) {
+            Some(acc) => acc.esdt.get_esdt_balance(token_id, 0),
+            None => rust_biguint!(0),
+        };
+
+        assert_eq!(
+            expected_balance,
+            &actual_balance,
+            "ESDT balance mismatch for address {}. Expected: {}, have {}",
+            address_to_hex(address),
+            expected_balance,
+            actual_balance
+        );
+    }
+
+    pub fn check_nft_balance<T: elrond_wasm::elrond_codec::TopEncode>(
+        &self,
+        address: &Address,
+        token_id: &[u8],
+        nonce: u64,
+        expected_balance: &num_bigint::BigUint,
+        expected_attributes: &T,
+    ) {
+        let actual_attributes = match &self.b_mock.accounts.get(address) {
+            Some(acc) => {
+                let esdt_data = acc.esdt.get_by_identifier_or_default(token_id);
+                let opt_instance = esdt_data.instances.get_by_nonce(nonce);
+
+                match opt_instance {
+                    Some(instance) => {
+                        assert_eq!(
+                            expected_balance,
+                            &instance.balance,
+                            "ESDT NFT balance mismatch for address {}. Expected: {}, have {}",
+                            address_to_hex(address),
+                            expected_balance,
+                            instance.balance
+                        );
+
+                        instance.metadata.attributes.clone()
+                    },
+                    None => Vec::new(),
+                }
+            },
+            None => Vec::new(),
+        };
+
+        let serialized_expected = serialize_attributes(expected_attributes);
+        assert_eq!(
+            &serialized_expected,
+            &actual_attributes,
+            "ESDT NFT attributes mismatch for address {}. Expected: {}, have {}",
+            address_to_hex(address),
+            bytes_to_hex(&serialized_expected),
+            bytes_to_hex(&actual_attributes),
+        );
+    }
+
+    /*
+    pub fn check_nft_balance_with_properties(
+        &self,
+        address: &Address,
+        token_id: &[u8],
+        nonce: u64,
+        expected_balance: &num_bigint::BigUint,
+    ) {
+    }
+    */
 }
 
 impl<CB, ContractObjBuilder> ContractObjWrapper<CB, ContractObjBuilder>
@@ -60,16 +142,7 @@ where
 {
     pub fn create_user_account(&mut self, egld_balance: &num_bigint::BigUint) -> Address {
         let address = self.address_factory.new_address();
-        self.b_mock.add_account(AccountData {
-            address: address.clone(),
-            nonce: 0,
-            egld_balance: egld_balance.clone(),
-            esdt: AccountEsdt::default(),
-            storage: HashMap::new(),
-            username: Vec::new(),
-            contract_path: None,
-            contract_owner: None,
-        });
+        self.create_account_raw(&address, egld_balance, None);
 
         address
     }
@@ -80,6 +153,17 @@ where
         owner: Option<&Address>,
     ) -> Address {
         let address = self.address_factory.new_sc_address();
+        self.create_account_raw(&address, egld_balance, owner);
+
+        address
+    }
+
+    pub fn create_account_raw(
+        &mut self,
+        address: &Address,
+        egld_balance: &num_bigint::BigUint,
+        owner: Option<&Address>,
+    ) {
         self.b_mock.add_account(AccountData {
             address: address.clone(),
             nonce: 0,
@@ -90,8 +174,76 @@ where
             contract_path: None,
             contract_owner: owner.map(|owner_ref| owner_ref.clone()),
         });
+    }
 
-        address
+    pub fn set_egld_balance(&mut self, address: &Address, balance: &num_bigint::BigUint) {
+        match self.b_mock.accounts.get_mut(address) {
+            Some(acc) => acc.egld_balance = balance.clone(),
+            None => panic!("set_egld_balance: Account {:?} does not exist", address),
+        }
+    }
+
+    pub fn set_esdt_balance(
+        &mut self,
+        address: &Address,
+        token_id: &[u8],
+        balance: &num_bigint::BigUint,
+    ) {
+        match self.b_mock.accounts.get_mut(address) {
+            Some(acc) => acc.esdt.set_esdt_balance(
+                token_id.to_vec(),
+                0,
+                balance,
+                EsdtInstanceMetadata::default(),
+            ),
+            None => panic!("set_esdt_balance: Account {:?} does not exist", address),
+        }
+    }
+
+    pub fn set_nft_balance<T: elrond_wasm::elrond_codec::TopEncode>(
+        &mut self,
+        address: &Address,
+        token_id: &[u8],
+        nonce: u64,
+        balance: &num_bigint::BigUint,
+        attributes: &T,
+    ) {
+        self.set_nft_balance_all_properties(
+            address, token_id, nonce, balance, attributes, 0, None, None, None, None,
+        );
+    }
+
+    pub fn set_nft_balance_all_properties<T: elrond_wasm::elrond_codec::TopEncode>(
+        &mut self,
+        address: &Address,
+        token_id: &[u8],
+        nonce: u64,
+        balance: &num_bigint::BigUint,
+        attributes: &T,
+        royalties: u64,
+        creator: Option<&Address>,
+        name: Option<&[u8]>,
+        hash: Option<&[u8]>,
+        uri: Option<&[u8]>,
+    ) {
+        match self.b_mock.accounts.get_mut(address) {
+            Some(acc) => {
+                acc.esdt.set_esdt_balance(
+                    token_id.to_vec(),
+                    nonce,
+                    balance,
+                    EsdtInstanceMetadata {
+                        creator: creator.map(|c| c.clone()),
+                        attributes: serialize_attributes(attributes),
+                        royalties,
+                        name: name.unwrap_or_default().to_vec(),
+                        hash: hash.map(|h| h.to_vec()),
+                        uri: uri.map(|u| u.to_vec()),
+                    },
+                );
+            },
+            None => panic!("set_nft_balance: Account {:?} does not exist", address),
+        }
     }
 
     pub fn set_block_epoch(&mut self, block_epoch: u64) {
@@ -147,15 +299,70 @@ where
         egld_payment: &num_bigint::BigUint,
         tx_fn: TxFn,
     ) -> Self {
+        self.execute_tx_any(caller, sc_address, egld_payment, Vec::new(), tx_fn)
+    }
+
+    pub fn execute_esdt_transfer<TxFn: FnOnce(&CB) -> StateChange>(
+        self,
+        caller: &Address,
+        sc_address: &Address,
+        token_id: &[u8],
+        esdt_nonce: u64,
+        esdt_amount: &num_bigint::BigUint,
+        tx_fn: TxFn,
+    ) -> Self {
+        let esdt_transfer = vec![TxInputESDT {
+            token_identifier: token_id.clone().to_vec(),
+            nonce: esdt_nonce,
+            value: esdt_amount.clone(),
+        }];
+        self.execute_tx_any(caller, sc_address, &rust_biguint!(0), esdt_transfer, tx_fn)
+    }
+
+    pub fn execute_query<TxFn: FnOnce(&CB)>(self, sc_address: &Address, query_fn: TxFn) -> Self {
+        self.execute_tx(sc_address, sc_address, &rust_biguint!(0), |sc| {
+            query_fn(sc);
+            StateChange::Revert
+        })
+    }
+
+    // deduplicates code for execution
+    fn execute_tx_any<TxFn: FnOnce(&CB) -> StateChange>(
+        self,
+        caller: &Address,
+        sc_address: &Address,
+        egld_payment: &num_bigint::BigUint,
+        esdt_payments: Vec<TxInputESDT>,
+        tx_fn: TxFn,
+    ) -> Self {
         let rc_b_mock = Rc::new(self.b_mock);
         let tx_cache = TxCache::new(rc_b_mock.clone());
+        let rust_zero = rust_biguint!(0);
 
-        if egld_payment > &rust_biguint!(0) {
+        if egld_payment > &rust_zero {
             tx_cache.subtract_egld_balance(caller, egld_payment);
             tx_cache.increase_egld_balance(sc_address, egld_payment);
         }
 
-        let tx_input = build_tx_input(caller, sc_address, egld_payment);
+        for esdt in &esdt_payments {
+            if esdt.value > rust_zero {
+                let metadata = tx_cache.subtract_esdt_balance(
+                    caller,
+                    &esdt.token_identifier,
+                    esdt.nonce,
+                    &esdt.value,
+                );
+                tx_cache.increase_esdt_balance(
+                    sc_address,
+                    &esdt.token_identifier,
+                    esdt.nonce,
+                    &esdt.value,
+                    metadata,
+                );
+            }
+        }
+
+        let tx_input = build_tx_input(caller, sc_address, egld_payment, esdt_payments);
         let debug_api = DebugApi::new(tx_input, tx_cache);
         let sc = (self.obj_builder)(debug_api);
 
@@ -179,29 +386,44 @@ where
             _phantom: PhantomData,
         }
     }
-
-    pub fn execute_query<TxFn: FnOnce(&CB)>(self, sc_address: &Address, query_fn: TxFn) -> Self {
-        self.execute_tx(sc_address, sc_address, &rust_biguint!(0), |sc| {
-            query_fn(sc);
-            StateChange::Revert
-        })
-    }
 }
 
 fn into_api<CB: ContractBase<Api = DebugApi>>(sc_obj: CB) -> DebugApi {
     sc_obj.raw_vm_api()
 }
 
-fn build_tx_input(caller: &Address, dest: &Address, egld_value: &num_bigint::BigUint) -> TxInput {
+fn build_tx_input(
+    caller: &Address,
+    dest: &Address,
+    egld_value: &num_bigint::BigUint,
+    esdt_values: Vec<TxInputESDT>,
+) -> TxInput {
     TxInput {
         from: caller.clone(),
         to: dest.clone(),
         egld_value: egld_value.clone(),
-        esdt_values: Vec::new(),
+        esdt_values,
         func_name: Vec::new(),
         args: Vec::new(),
         gas_limit: u64::MAX,
         gas_price: 0,
         tx_hash: H256::zero(),
     }
+}
+
+fn address_to_hex(address: &Address) -> String {
+    hex::encode(address.as_bytes())
+}
+
+fn bytes_to_hex(bytes: &[u8]) -> String {
+    hex::encode(bytes)
+}
+
+fn serialize_attributes<T: elrond_wasm::elrond_codec::TopEncode>(attributes: &T) -> Vec<u8> {
+    let mut serialized_attributes = Vec::new();
+    if let Result::Err(err) = attributes.top_encode(&mut serialized_attributes) {
+        panic!("Failed to encode attributes: {:?}", err)
+    }
+
+    serialized_attributes
 }

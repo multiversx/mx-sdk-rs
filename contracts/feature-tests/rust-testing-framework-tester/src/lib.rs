@@ -1,6 +1,13 @@
 #![no_std]
 
 elrond_wasm::imports!();
+elrond_wasm::derive_imports!();
+
+#[derive(TopEncode, TopDecode)]
+pub struct NftDummyAttributes {
+    pub creation_epoch: u64,
+    pub cool_factor: u8,
+}
 
 #[elrond_wasm::derive::contract]
 pub trait RustTestingFrameworkTester {
@@ -31,6 +38,11 @@ pub trait RustTestingFrameworkTester {
             .get_sc_balance(&TokenIdentifier::egld(), 0)
     }
 
+    #[endpoint]
+    fn get_esdt_balance(&self, token_id: TokenIdentifier, nonce: u64) -> BigUint {
+        self.blockchain().get_sc_balance(&token_id, nonce)
+    }
+
     #[payable("EGLD")]
     #[endpoint]
     fn receive_egld(&self) -> BigUint {
@@ -44,6 +56,42 @@ pub trait RustTestingFrameworkTester {
         let payment_amount = self.call_value().egld_value() / 2u32;
         self.send()
             .direct(&caller, &TokenIdentifier::egld(), 0, &payment_amount, &[]);
+    }
+
+    #[payable("*")]
+    #[endpoint]
+    fn receive_esdt(&self) -> (TokenIdentifier, BigUint) {
+        let token_id = self.call_value().token();
+        let amount = self.call_value().esdt_value();
+
+        (token_id, amount)
+    }
+
+    #[payable("*")]
+    #[endpoint]
+    fn receive_esdt_half(&self) {
+        let caller = self.blockchain().get_caller();
+        let token_id = self.call_value().token();
+        let amount = self.call_value().esdt_value() / 2u32;
+
+        self.send().direct(&caller, &token_id, 0, &amount, &[]);
+    }
+
+    #[payable("*")]
+    #[endpoint]
+    fn send_nft(
+        &self,
+        to: ManagedAddress,
+        token_id: TokenIdentifier,
+        nft_nonce: u64,
+        amount: BigUint,
+    ) {
+        self.send().direct(&to, &token_id, nft_nonce, &amount, &[]);
+    }
+
+    #[endpoint]
+    fn mint_esdt(&self, token_id: TokenIdentifier, nonce: u64, amount: BigUint) {
+        self.send().esdt_local_mint(&token_id, nonce, &amount);
     }
 
     #[endpoint]

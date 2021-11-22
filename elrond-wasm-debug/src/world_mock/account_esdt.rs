@@ -43,6 +43,21 @@ impl AccountEsdt {
     pub fn get_roles(&self, identifier: &[u8]) -> Vec<Vec<u8>> {
         self.get_by_identifier_or_default(identifier).get_roles()
     }
+
+    pub fn set_roles(&mut self, token_identifier: Vec<u8>, roles: Vec<Vec<u8>>) {
+        let esdt_data = self
+            .0
+            .entry(token_identifier.clone())
+            .or_insert_with(|| EsdtData {
+                token_identifier,
+                instances: EsdtInstances::new(),
+                last_nonce: 0,
+                roles: EsdtRoles::default(),
+                frozen: false,
+            });
+        esdt_data.roles = EsdtRoles::new(roles);
+    }
+
     /// Will provide a clone.
     pub fn get_by_identifier_or_default(&self, identifier: &[u8]) -> EsdtData {
         if let Some(value) = self.0.get(identifier) {
@@ -78,6 +93,26 @@ impl AccountEsdt {
                 frozen: false,
             });
         esdt_data.instances.increase_balance(nonce, value, metadata);
+    }
+
+    pub fn set_esdt_balance(
+        &mut self,
+        token_identifier: Vec<u8>,
+        nonce: u64,
+        value: &BigUint,
+        metadata: EsdtInstanceMetadata,
+    ) {
+        let esdt_data = self
+            .0
+            .entry(token_identifier.clone())
+            .or_insert_with(|| EsdtData {
+                token_identifier,
+                instances: EsdtInstances::new(),
+                last_nonce: nonce,
+                roles: EsdtRoles::default(),
+                frozen: false,
+            });
+        esdt_data.instances.set_balance(nonce, value, metadata);
     }
 
     pub fn get_esdt_balance(&self, token_identifier: &[u8], nonce: u64) -> BigUint {
