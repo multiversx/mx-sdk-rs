@@ -50,9 +50,7 @@ where
 
     #[inline]
     pub fn exit_now(&self) -> ! {
-        self.buffer
-            .api
-            .signal_error_from_buffer(self.buffer.get_raw_handle())
+        M::instance().signal_error_from_buffer(self.buffer.get_raw_handle())
     }
 }
 

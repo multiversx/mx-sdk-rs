@@ -30,11 +30,6 @@ impl<M: ManagedTypeApi> ManagedType<M> for BigUint<M> {
     fn get_raw_handle(&self) -> Handle {
         self.handle
     }
-
-    #[inline]
-    fn type_manager(&self) -> M {
-        M::instance()
-    }
 }
 
 impl<M: ManagedTypeApi> From<&ManagedBuffer<M>> for BigUint<M> {
@@ -130,20 +125,12 @@ impl<M: ManagedTypeApi> BigUint<M> {
 
     #[inline]
     pub fn from_bytes_be_buffer(managed_buffer: &ManagedBuffer<M>) -> Self {
-        BigUint {
-            handle: managed_buffer
-                .api
-                .mb_to_big_int_unsigned(managed_buffer.handle),
-            _phantom: PhantomData,
-        }
+        BigUint::from_raw_handle_no_api(M::instance().mb_to_big_int_unsigned(managed_buffer.handle))
     }
 
     #[inline]
     pub fn to_bytes_be_buffer(&self) -> ManagedBuffer<M> {
-        ManagedBuffer {
-            handle: self.type_manager().mb_from_big_int_unsigned(self.handle),
-            api: self.type_manager(),
-        }
+        ManagedBuffer::from_raw_handle_no_api(M::instance().mb_from_big_int_unsigned(self.handle))
     }
 
     pub fn copy_to_array_big_endian_pad_right(&self, target: &mut [u8; 32]) {

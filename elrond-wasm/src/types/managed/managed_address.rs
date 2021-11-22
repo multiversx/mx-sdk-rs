@@ -93,11 +93,6 @@ where
     fn get_raw_handle(&self) -> Handle {
         self.bytes.get_raw_handle()
     }
-
-    #[inline]
-    fn type_manager(&self) -> M {
-        self.bytes.type_manager()
-    }
 }
 
 impl<M> ManagedDefault<M> for ManagedAddress<M>
