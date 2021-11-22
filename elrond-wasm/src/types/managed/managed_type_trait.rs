@@ -8,5 +8,8 @@ pub trait ManagedType<M: ManagedTypeApi> {
     #[doc(hidden)]
     fn get_raw_handle(&self) -> Handle;
 
-    fn type_manager(&self) -> M;
+    #[inline]
+    fn type_manager(&self) -> M {
+        M::instance()
+    }
 }

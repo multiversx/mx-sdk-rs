@@ -37,11 +37,6 @@ where
     fn get_raw_handle(&self) -> Handle {
         self.buffer.get_raw_handle()
     }
-
-    #[inline]
-    fn type_manager(&self) -> M {
-        self.buffer.type_manager()
-    }
 }
 
 impl<M, const N: usize> ManagedDefault<M> for ManagedByteArray<M, N>

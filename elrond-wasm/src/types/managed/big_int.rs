@@ -114,30 +114,27 @@ impl<M: ManagedTypeApi> BigInt<M> {
 
     #[inline]
     pub fn from_signed_bytes_be_buffer(managed_buffer: &ManagedBuffer<M>) -> Self {
+        // ManagedBuffer::from_raw_handle_no_api(M::instance().mb_to_big_int_signed(managed_buffer.handle))
         BigInt {
-            handle: managed_buffer
-                .api
-                .mb_to_big_int_signed(managed_buffer.handle),
-            api: managed_buffer.api.clone(),
+            handle: M::instance().mb_to_big_int_signed(managed_buffer.handle),
+            api: M::instance(),
         }
     }
 
     #[inline]
     pub fn to_signed_bytes_be_buffer(&self) -> ManagedBuffer<M> {
-        ManagedBuffer {
-            handle: self.api.mb_from_big_int_signed(self.handle),
-            api: self.api.clone(),
-        }
+        ManagedBuffer::from_raw_handle_no_api(M::instance().mb_from_big_int_signed(self.handle))
     }
 }
 
 impl<M: ManagedTypeApi> Clone for BigInt<M> {
     fn clone(&self) -> Self {
-        let clone_handle = self.api.bi_new_zero();
-        self.api.bi_add(clone_handle, clone_handle, self.handle);
+        let api = M::instance();
+        let clone_handle = api.bi_new_zero();
+        api.bi_add(clone_handle, clone_handle, self.handle);
         BigInt {
             handle: clone_handle,
-            api: self.api.clone(),
+            api,
         }
     }
 }
