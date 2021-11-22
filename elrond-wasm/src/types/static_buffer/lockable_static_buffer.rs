@@ -1,12 +1,21 @@
 use crate::api::InvalidSliceError;
+use core::fmt;
 
 const BUFFER_SIZE: usize = 10000;
 
-#[derive(Debug)]
 pub struct LockableStaticBuffer {
     pub buffer: [u8; BUFFER_SIZE],
     pub locked: bool,
     pub used_size: usize,
+}
+
+impl fmt::Debug for LockableStaticBuffer {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("LockableStaticBuffer")
+            .field("locked", &self.locked)
+            .field("used_size", &self.used_size)
+            .finish()
+    }
 }
 
 impl LockableStaticBuffer {

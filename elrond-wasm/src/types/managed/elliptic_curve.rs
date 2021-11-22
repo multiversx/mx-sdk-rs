@@ -76,26 +76,11 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
             y_base_point_handle,
         );
         (
-            BigUint {
-                handle: field_order_handle,
-                api: self.api.clone(),
-            },
-            BigUint {
-                handle: base_point_order_handle,
-                api: self.api.clone(),
-            },
-            BigUint {
-                handle: eq_constant_handle,
-                api: self.api.clone(),
-            },
-            BigUint {
-                handle: x_base_point_handle,
-                api: self.api.clone(),
-            },
-            BigUint {
-                handle: y_base_point_handle,
-                api: self.api.clone(),
-            },
+            BigUint::from_raw_handle_no_api(field_order_handle),
+            BigUint::from_raw_handle_no_api(base_point_order_handle),
+            BigUint::from_raw_handle_no_api(eq_constant_handle),
+            BigUint::from_raw_handle_no_api(x_base_point_handle),
+            BigUint::from_raw_handle_no_api(y_base_point_handle),
             self.api.ec_curve_length(self.handle),
         )
     }
@@ -127,14 +112,8 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
             y_second_point.handle,
         );
         (
-            BigUint {
-                handle: x_result_handle,
-                api: self.api.clone(),
-            },
-            BigUint {
-                handle: y_result_handle,
-                api: self.api.clone(),
-            },
+            BigUint::from_raw_handle_no_api(x_result_handle),
+            BigUint::from_raw_handle_no_api(y_result_handle),
         )
     }
 
@@ -149,14 +128,8 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
             y_point.handle,
         );
         (
-            BigUint {
-                handle: x_result_handle,
-                api: self.api.clone(),
-            },
-            BigUint {
-                handle: y_result_handle,
-                api: self.api.clone(),
-            },
+            BigUint::from_raw_handle_no_api(x_result_handle),
+            BigUint::from_raw_handle_no_api(y_result_handle),
         )
     }
 
@@ -182,14 +155,8 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
             data,
         );
         (
-            BigUint {
-                handle: x_result_handle,
-                api: self.api.clone(),
-            },
-            BigUint {
-                handle: y_result_handle,
-                api: self.api.clone(),
-            },
+            BigUint::from_raw_handle_no_api(x_result_handle),
+            BigUint::from_raw_handle_no_api(y_result_handle),
         )
     }
 
@@ -199,14 +166,8 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
         self.api
             .ec_scalar_base_mult(x_result_handle, y_result_handle, self.handle, data);
         (
-            BigUint {
-                handle: x_result_handle,
-                api: self.api.clone(),
-            },
-            BigUint {
-                handle: y_result_handle,
-                api: self.api.clone(),
-            },
+            BigUint::from_raw_handle_no_api(x_result_handle),
+            BigUint::from_raw_handle_no_api(y_result_handle),
         )
     }
 
@@ -226,14 +187,8 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
         self.api
             .ec_unmarshal(x_pair_handle, y_pair_handle, self.handle, data);
         (
-            BigUint {
-                handle: x_pair_handle,
-                api: self.api.clone(),
-            },
-            BigUint {
-                handle: y_pair_handle,
-                api: self.api.clone(),
-            },
+            BigUint::from_raw_handle_no_api(x_pair_handle),
+            BigUint::from_raw_handle_no_api(y_pair_handle),
         )
     }
 
@@ -243,14 +198,8 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
         self.api
             .ec_unmarshal_compressed(x_pair_handle, y_pair_handle, self.handle, data);
         (
-            BigUint {
-                handle: x_pair_handle,
-                api: self.api.clone(),
-            },
-            BigUint {
-                handle: y_pair_handle,
-                api: self.api.clone(),
-            },
+            BigUint::from_raw_handle_no_api(x_pair_handle),
+            BigUint::from_raw_handle_no_api(y_pair_handle),
         )
     }
 
@@ -261,14 +210,8 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
             .api
             .ec_generate_key(x_pub_key_handle, y_pub_key_handle, self.handle);
         (
-            BigUint {
-                handle: x_pub_key_handle,
-                api: self.api.clone(),
-            },
-            BigUint {
-                handle: y_pub_key_handle,
-                api: self.api.clone(),
-            },
+            BigUint::from_raw_handle_no_api(x_pub_key_handle),
+            BigUint::from_raw_handle_no_api(y_pub_key_handle),
             private_key,
         )
     }

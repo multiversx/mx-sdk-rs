@@ -13,7 +13,7 @@ extern "C" {
 
 impl elrond_wasm::api::ManagedTypeApi for crate::VmApiImpl {
     fn instance() -> Self {
-        crate::VmApiImpl
+        crate::VmApiImpl {}
     }
 
     #[inline]

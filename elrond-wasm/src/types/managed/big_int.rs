@@ -144,12 +144,13 @@ impl<M: ManagedTypeApi> Clone for BigInt<M> {
 
 impl<M: ManagedTypeApi> BigInt<M> {
     pub fn from_biguint(sign: Sign, unsigned: BigUint<M>) -> Self {
+        let api = M::instance();
         if sign.is_minus() {
-            unsigned.api.bi_neg(unsigned.handle, unsigned.handle);
+            api.bi_neg(unsigned.handle, unsigned.handle);
         }
         BigInt {
             handle: unsigned.handle,
-            api: unsigned.api,
+            api,
         }
     }
 
@@ -166,10 +167,7 @@ impl<M: ManagedTypeApi> BigInt<M> {
     pub fn magnitude(&self) -> BigUint<M> {
         let result = self.api.bi_new_zero();
         self.api.bi_abs(result, self.handle);
-        BigUint {
-            handle: result,
-            api: self.api.clone(),
-        }
+        BigUint::from_raw_handle_no_api(result)
     }
 
     /// Convert this `BigInt` into its `Sign` and `BigUint` magnitude,
@@ -183,10 +181,7 @@ impl<M: ManagedTypeApi> BigInt<M> {
         if let Sign::Minus = self.sign() {
             None
         } else {
-            Some(BigUint {
-                handle: self.handle,
-                api: self.api,
-            })
+            Some(BigUint::from_raw_handle_no_api(self.handle))
         }
     }
 }

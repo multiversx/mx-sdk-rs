@@ -35,7 +35,11 @@ impl TxContextRef {
     }
 
     pub fn dummy() -> Self {
-        Self(Rc::new(TxContext::dummy()))
+        let tx_context = TxContext::dummy();
+        let tx_context_rc = Rc::new(tx_context);
+        // TODO: WARNING: this does not clean up after itself, must fix!!!
+        TxContextStack::static_push(tx_context_rc.clone());
+        Self(tx_context_rc)
     }
 
     pub fn into_blockchain_updates(self) -> BlockchainUpdate {

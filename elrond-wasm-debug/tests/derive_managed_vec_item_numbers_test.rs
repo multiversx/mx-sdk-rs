@@ -80,6 +80,7 @@ fn struct_to_bytes_writer() {
 
 #[test]
 fn struct_from_bytes_reader() {
+    let api = DebugApi::dummy();
     let s = StructWithNumbers {
         u_8: 1u8,
         u_16: 2u16,
@@ -94,7 +95,7 @@ fn struct_from_bytes_reader() {
 
     let struct_from_bytes =
         <StructWithNumbers as elrond_wasm::types::ManagedVecItem<DebugApi>>::from_byte_reader(
-            DebugApi::dummy(),
+            api,
             |bytes| {
                 bytes.copy_from_slice(
                     &arr

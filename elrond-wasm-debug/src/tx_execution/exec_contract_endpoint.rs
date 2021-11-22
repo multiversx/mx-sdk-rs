@@ -14,6 +14,15 @@ use crate::{
 /// Catches and wraps any panics thrown in the contract.
 pub fn execute_tx_context(tx_context: TxContext) -> (TxContext, TxResult) {
     let tx_context_rc = Rc::new(tx_context);
+    let (tx_context_rc, tx_result) = execute_tx_context_rc(tx_context_rc);
+    let tx_context = Rc::try_unwrap(tx_context_rc).unwrap();
+    (tx_context, tx_result)
+}
+
+/// The actual core of the execution.
+/// The argument is returned and can be unwrapped,
+/// since the lifetimes of all other references created from it cannot outlive this function.
+fn execute_tx_context_rc(tx_context_rc: Rc<TxContext>) -> (Rc<TxContext>, TxResult) {
     let tx_context_ref = DebugApi::new(tx_context_rc.clone());
 
     let func_name = tx_context_ref.tx_input_box.func_name.as_slice();
@@ -27,8 +36,7 @@ pub fn execute_tx_context(tx_context: TxContext) -> (TxContext, TxResult) {
     let tx_result = execute_contract_instance_endpoint(contract_instance, func_name);
 
     let tx_context_rc = TxContextStack::static_pop();
-    let tx_context = Rc::try_unwrap(tx_context_rc).unwrap();
-    (tx_context, tx_result)
+    (tx_context_rc, tx_result)
 }
 
 fn get_contract_identifier(tx_context: &TxContext) -> Vec<u8> {
