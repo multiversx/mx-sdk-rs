@@ -134,8 +134,6 @@ elrond_wasm_node::wasm_endpoints! {
         get_block_timestamp
         get_caller
         get_cumulated_validator_rewards
-        get_esdt_local_roles
-        check_token_has_roles
         get_gas_left
         get_nr_to_clear
         get_owner_address
