@@ -9,6 +9,11 @@ fn forw_raw_async_accept_esdt_go() {
 }
 
 #[test]
+fn forwarder_get_esdt_local_roles_go() {
+    elrond_wasm_debug::mandos_go("mandos/forwarder_get_esdt_local_roles.scen.json");
+}
+
+#[test]
 fn forw_raw_async_echo_go() {
     elrond_wasm_debug::mandos_go("mandos/forw_raw_async_echo.scen.json");
 }

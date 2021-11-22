@@ -42,23 +42,4 @@ pub trait BlockchainApiFeatures {
     fn get_cumulated_validator_rewards(&self) -> BigUint {
         self.blockchain().get_cumulated_validator_rewards()
     }
-
-    #[endpoint]
-    fn get_esdt_local_roles(
-        &self,
-        token_id: TokenIdentifier,
-    ) -> ManagedMultiResultVec<ManagedBuffer> {
-        let roles = self.blockchain().get_esdt_local_roles(&token_id);
-        let mut result = ManagedMultiResultVec::new();
-        for role in roles.iter_roles() {
-            result.push(role.as_role_name().managed_into());
-        }
-        result
-    }
-
-    #[endpoint]
-    fn check_token_has_roles(&self, token_id: TokenIdentifier, role: EsdtLocalRole) -> bool {
-        let roles = self.blockchain().get_esdt_local_roles(&token_id);
-        roles.has_role(&role)
-    }
 }

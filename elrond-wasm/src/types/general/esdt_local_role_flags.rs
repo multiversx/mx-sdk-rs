@@ -2,7 +2,7 @@ use super::EsdtLocalRole;
 use bitflags::bitflags;
 
 bitflags! {
-    pub struct EsdtLocalRoleFlags: u32 {
+    pub struct EsdtLocalRoleFlags: u64 {
         const NONE             = 0b00000000;
         const MINT             = 0b00000001;
         const BURN             = 0b00000010;

@@ -1,6 +1,11 @@
-use super::{ErrorApi, ManagedTypeApi};
-use crate::types::{
-    Address, BigUint, EsdtTokenData, ManagedAddress, ManagedByteArray, TokenIdentifier, H256,
+use super::{ErrorApi, ManagedTypeApi, StorageReadApi};
+use crate::{
+    err_msg,
+    storage::{self, StorageKey},
+    types::{
+        Address, BigUint, EsdtLocalRole, EsdtLocalRoleFlags, EsdtTokenData, ManagedAddress,
+        ManagedBuffer, ManagedByteArray, TokenIdentifier, H256,
+    },
 };
 use alloc::boxed::Box;
 
@@ -10,7 +15,9 @@ use alloc::boxed::Box;
 /// They simply pass on/retrieve data to/from the protocol.
 /// When mocking the blockchain state, we use the Rc/RefCell pattern
 /// to isolate mock state mutability from the contract interface.
-pub trait BlockchainApi: ErrorApi + ManagedTypeApi + Clone + Sized + 'static {
+pub trait BlockchainApi:
+    ErrorApi + ManagedTypeApi + Clone + Sized + StorageReadApi + 'static
+{
     fn get_caller_legacy(&self) -> Address;
 
     fn get_caller(&self) -> ManagedAddress<Self> {
@@ -109,4 +116,44 @@ pub trait BlockchainApi: ErrorApi + ManagedTypeApi + Clone + Sized + 'static {
         token_id: &TokenIdentifier<Self>,
         nonce: u64,
     ) -> EsdtTokenData<Self>;
+
+    /// Retrieves local roles for the token, by reading protected storage.
+    /// TODO: rewrite using managed types
+    fn get_esdt_local_roles(&self, token_id: &TokenIdentifier<Self>) -> EsdtLocalRoleFlags {
+        let mut key = StorageKey::new(
+            self.clone(),
+            storage::protected_keys::ELROND_ESDT_LOCAL_ROLES_KEY,
+        );
+        key.append_managed_buffer(token_id.as_managed_buffer());
+        let value_mb = storage::storage_get::<Self, ManagedBuffer<Self>>(self.clone(), &key);
+        let value_len = value_mb.len();
+        const DATA_MAX_LEN: usize = 300;
+        if value_len > DATA_MAX_LEN {
+            self.signal_error(err_msg::STORAGE_VALUE_EXCEEDS_BUFFER);
+        }
+        let mut data_buffer = [0u8; DATA_MAX_LEN];
+        let _ = value_mb.load_slice(0, &mut data_buffer[..value_len]);
+
+        let mut current_index = 0;
+
+        let mut result = EsdtLocalRoleFlags::NONE;
+
+        while current_index < value_len {
+            // first character before each role is a \n, so we skip it
+            current_index += 1;
+
+            // next is the length of the role as string
+            let role_len = data_buffer[current_index];
+            current_index += 1;
+
+            // next is role's ASCII string representation
+            let end_index = current_index + role_len as usize;
+            let role_name = &data_buffer[current_index..end_index];
+            current_index = end_index;
+
+            result |= EsdtLocalRole::from(role_name).to_flag();
+        }
+
+        result
+    }
 }
