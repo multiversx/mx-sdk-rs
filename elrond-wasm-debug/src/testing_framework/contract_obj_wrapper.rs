@@ -2,7 +2,7 @@ use std::{collections::HashMap, marker::PhantomData, rc::Rc};
 
 use elrond_wasm::{
     contract_base::ContractBase,
-    types::{Address, H256},
+    types::{Address, EsdtLocalRole, H256},
 };
 
 use crate::{
@@ -179,7 +179,10 @@ where
     pub fn set_egld_balance(&mut self, address: &Address, balance: &num_bigint::BigUint) {
         match self.b_mock.accounts.get_mut(address) {
             Some(acc) => acc.egld_balance = balance.clone(),
-            None => panic!("set_egld_balance: Account {:?} does not exist", address),
+            None => panic!(
+                "set_egld_balance: Account {:?} does not exist",
+                address_to_hex(address)
+            ),
         }
     }
 
@@ -196,7 +199,10 @@ where
                 balance,
                 EsdtInstanceMetadata::default(),
             ),
-            None => panic!("set_esdt_balance: Account {:?} does not exist", address),
+            None => panic!(
+                "set_esdt_balance: Account {:?} does not exist",
+                address_to_hex(address)
+            ),
         }
     }
 
@@ -242,7 +248,32 @@ where
                     },
                 );
             },
-            None => panic!("set_nft_balance: Account {:?} does not exist", address),
+            None => panic!(
+                "set_nft_balance: Account {:?} does not exist",
+                address_to_hex(address)
+            ),
+        }
+    }
+
+    pub fn set_esdt_local_roles(
+        &mut self,
+        address: &Address,
+        token_id: &[u8],
+        roles: &[EsdtLocalRole],
+    ) {
+        match self.b_mock.accounts.get_mut(address) {
+            Some(acc) => {
+                let mut roles_raw = Vec::new();
+                for role in roles {
+                    roles_raw.push(role.as_role_name().to_vec());
+                }
+
+                acc.esdt.set_roles(token_id.to_vec(), roles_raw);
+            },
+            None => panic!(
+                "set_esdt_local_roles: Account {:?} does not exist",
+                address_to_hex(address)
+            ),
         }
     }
 

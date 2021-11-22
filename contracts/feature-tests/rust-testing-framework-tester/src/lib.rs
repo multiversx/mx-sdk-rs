@@ -3,7 +3,7 @@
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
-#[derive(TopEncode, TopDecode)]
+#[derive(TopEncode, TopDecode, TypeAbi, Clone)]
 pub struct NftDummyAttributes {
     pub creation_epoch: u64,
     pub cool_factor: u8,
@@ -92,6 +92,29 @@ pub trait RustTestingFrameworkTester {
     #[endpoint]
     fn mint_esdt(&self, token_id: TokenIdentifier, nonce: u64, amount: BigUint) {
         self.send().esdt_local_mint(&token_id, nonce, &amount);
+    }
+
+    #[endpoint]
+    fn burn_esdt(&self, token_id: TokenIdentifier, nonce: u64, amount: BigUint) {
+        self.send().esdt_local_burn(&token_id, nonce, &amount);
+    }
+
+    #[endpoint]
+    fn create_nft(
+        &self,
+        token_id: TokenIdentifier,
+        amount: BigUint,
+        attributes: NftDummyAttributes,
+    ) -> u64 {
+        self.send().esdt_nft_create(
+            &token_id,
+            &amount,
+            &ManagedBuffer::new(),
+            &BigUint::zero(),
+            &ManagedBuffer::new(),
+            &attributes,
+            &ManagedVec::new(),
+        )
     }
 
     #[endpoint]

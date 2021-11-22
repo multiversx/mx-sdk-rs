@@ -1,6 +1,6 @@
 use elrond_wasm::{
     contract_base::ContractBase,
-    types::{BigUint, ManagedAddress, ManagedFrom, SCResult, TokenIdentifier},
+    types::{BigUint, EsdtLocalRole, ManagedAddress, ManagedFrom, SCResult, TokenIdentifier},
 };
 use elrond_wasm_debug::{
     assert_sc_error, managed_address, managed_biguint, managed_token_id, rust_biguint,
@@ -257,13 +257,101 @@ fn test_sc_send_nft_to_user() {
 }
 
 #[test]
-fn test_sc_esdt_mint() {
+fn test_sc_esdt_mint_burn() {
     let mut wrapper = ContractObjWrapper::new(rust_testing_framework_tester::contract_obj);
     let caller_addr = wrapper.create_user_account(&rust_biguint!(0));
     let sc_addr = wrapper.create_sc_account(&rust_biguint!(0), None);
     let token_id = &b"COOL-123456"[..];
 
-    // TODO
+    wrapper.set_esdt_local_roles(
+        &sc_addr,
+        token_id,
+        &[EsdtLocalRole::Mint, EsdtLocalRole::Burn][..],
+    );
+
+    wrapper = wrapper.execute_tx(&caller_addr, &sc_addr, &rust_biguint!(0), |sc| {
+        let managed_id = managed_token_id!(sc, token_id);
+        let managed_amt = managed_biguint!(sc, 400);
+        sc.mint_esdt(managed_id, 0, managed_amt);
+
+        StateChange::Commit
+    });
+
+    wrapper.check_esdt_balance(&sc_addr, token_id, &rust_biguint!(400));
+
+    wrapper = wrapper.execute_tx(&caller_addr, &sc_addr, &rust_biguint!(0), |sc| {
+        let managed_id = managed_token_id!(sc, token_id);
+        let managed_amt = managed_biguint!(sc, 100);
+        sc.burn_esdt(managed_id, 0, managed_amt);
+
+        StateChange::Commit
+    });
+
+    wrapper.check_esdt_balance(&sc_addr, token_id, &rust_biguint!(300));
+}
+
+#[test]
+fn test_sc_nft() {
+    let mut wrapper = ContractObjWrapper::new(rust_testing_framework_tester::contract_obj);
+    let caller_addr = wrapper.create_user_account(&rust_biguint!(0));
+    let sc_addr = wrapper.create_sc_account(&rust_biguint!(0), None);
+    let token_id = &b"COOL-123456"[..];
+    let nft_attributes = NftDummyAttributes {
+        creation_epoch: 666,
+        cool_factor: 101,
+    };
+
+    wrapper.set_esdt_local_roles(
+        &sc_addr,
+        token_id,
+        &[
+            EsdtLocalRole::NftCreate,
+            EsdtLocalRole::NftAddQuantity,
+            EsdtLocalRole::NftBurn,
+        ][..],
+    );
+
+    wrapper = wrapper.execute_tx(&caller_addr, &sc_addr, &rust_biguint!(0), |sc| {
+        let managed_id = managed_token_id!(sc, token_id);
+        let managed_amt = managed_biguint!(sc, 100);
+
+        let nft_nonce = sc.create_nft(
+            managed_id.clone(),
+            managed_amt.clone(),
+            nft_attributes.clone(),
+        );
+        assert_eq!(nft_nonce, 1u64);
+
+        let nft_nonce_second = sc.create_nft(managed_id, managed_amt, nft_attributes.clone());
+        assert_eq!(nft_nonce_second, 2u64);
+
+        StateChange::Commit
+    });
+
+    wrapper.check_nft_balance(&sc_addr, token_id, 1, &rust_biguint!(100), &nft_attributes);
+    wrapper.check_nft_balance(&sc_addr, token_id, 2, &rust_biguint!(100), &nft_attributes);
+
+    wrapper = wrapper.execute_tx(&caller_addr, &sc_addr, &rust_biguint!(0), |sc| {
+        let managed_id = managed_token_id!(sc, token_id);
+        let managed_amt = managed_biguint!(sc, 100);
+        sc.mint_esdt(managed_id, 1, managed_amt);
+
+        StateChange::Commit
+    });
+
+    wrapper.check_nft_balance(&sc_addr, token_id, 1, &rust_biguint!(200), &nft_attributes);
+    wrapper.check_nft_balance(&sc_addr, token_id, 2, &rust_biguint!(100), &nft_attributes);
+
+    wrapper = wrapper.execute_tx(&caller_addr, &sc_addr, &rust_biguint!(0), |sc| {
+        let managed_id = managed_token_id!(sc, token_id);
+        let managed_amt = managed_biguint!(sc, 50);
+        sc.burn_esdt(managed_id, 2, managed_amt);
+
+        StateChange::Commit
+    });
+
+    wrapper.check_nft_balance(&sc_addr, token_id, 1, &rust_biguint!(200), &nft_attributes);
+    wrapper.check_nft_balance(&sc_addr, token_id, 2, &rust_biguint!(50), &nft_attributes);
 }
 
 #[test]
