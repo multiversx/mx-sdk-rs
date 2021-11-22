@@ -1,9 +1,10 @@
 use elrond_wasm::{
     contract_base::ContractBase,
-    types::{BigUint, ManagedAddress, ManagedFrom, SCResult},
+    types::{BigUint, ManagedAddress, ManagedFrom, SCResult, TokenIdentifier},
 };
 use elrond_wasm_debug::{
-    assert_sc_error, managed_address, managed_biguint, rust_biguint, testing_framework::*,
+    assert_sc_error, managed_address, managed_biguint, managed_token_id, rust_biguint,
+    testing_framework::*,
 };
 use rust_testing_framework_tester::*;
 
@@ -104,6 +105,165 @@ fn test_sc_half_payment() {
 
     wrapper.check_egld_balance(&caller_addr, &rust_biguint!(500));
     wrapper.check_egld_balance(&sc_addr, &rust_biguint!(2_500));
+}
+
+#[test]
+fn test_esdt_balance() {
+    let mut wrapper = ContractObjWrapper::new(rust_testing_framework_tester::contract_obj);
+    let sc_addr = wrapper.create_sc_account(&rust_biguint!(0), None);
+    let token_id = &b"COOL-123456"[..];
+
+    wrapper.set_esdt_balance(&sc_addr, token_id, &rust_biguint!(1_000));
+    wrapper.check_esdt_balance(&sc_addr, token_id, &rust_biguint!(1_000));
+
+    wrapper.execute_query(&sc_addr, |sc| {
+        let managed_id = managed_token_id!(sc, token_id);
+
+        let actual_balance = sc.get_esdt_balance(managed_id, 0);
+        let expected_balance = managed_biguint!(sc, 1_000);
+        assert_eq!(expected_balance, actual_balance);
+    });
+}
+
+#[test]
+fn test_esdt_payment_ok() {
+    let mut wrapper = ContractObjWrapper::new(rust_testing_framework_tester::contract_obj);
+    let rust_zero = rust_biguint!(0);
+
+    let caller_addr = wrapper.create_user_account(&rust_zero);
+    let sc_addr = wrapper.create_sc_account(&rust_zero, None);
+    let token_id = &b"COOL-123456"[..];
+
+    wrapper.set_esdt_balance(&caller_addr, token_id, &rust_biguint!(1_000));
+    wrapper.set_esdt_balance(&sc_addr, token_id, &rust_biguint!(2_000));
+
+    wrapper = wrapper.execute_esdt_transfer(
+        &caller_addr,
+        &sc_addr,
+        token_id,
+        0,
+        &rust_biguint!(1_000),
+        |sc| {
+            let (actual_token_id, actual_payment) = sc.receive_esdt();
+            let expected_payment = managed_biguint!(sc, 1_000);
+
+            assert_eq!(actual_token_id, managed_token_id!(sc, token_id));
+            assert_eq!(actual_payment, expected_payment);
+
+            StateChange::Commit
+        },
+    );
+
+    wrapper.check_esdt_balance(&caller_addr, token_id, &rust_zero);
+    wrapper.check_esdt_balance(&sc_addr, token_id, &rust_biguint!(3_000));
+}
+
+#[test]
+fn test_esdt_payment_reverted() {
+    let mut wrapper = ContractObjWrapper::new(rust_testing_framework_tester::contract_obj);
+    let rust_zero = rust_biguint!(0);
+
+    let caller_addr = wrapper.create_user_account(&rust_zero);
+    let sc_addr = wrapper.create_sc_account(&rust_zero, None);
+    let token_id = &b"COOL-123456"[..];
+
+    wrapper.set_esdt_balance(&caller_addr, token_id, &rust_biguint!(1_000));
+    wrapper.set_esdt_balance(&sc_addr, token_id, &rust_biguint!(2_000));
+
+    wrapper = wrapper.execute_esdt_transfer(
+        &caller_addr,
+        &sc_addr,
+        token_id,
+        0,
+        &rust_biguint!(1_000),
+        |sc| {
+            let (actual_token_id, actual_payment) = sc.receive_esdt();
+            let expected_payment = managed_biguint!(sc, 1_000);
+
+            assert_eq!(actual_token_id, managed_token_id!(sc, token_id));
+            assert_eq!(actual_payment, expected_payment);
+
+            StateChange::Revert
+        },
+    );
+
+    wrapper.check_esdt_balance(&caller_addr, token_id, &rust_biguint!(1_000));
+    wrapper.check_esdt_balance(&sc_addr, token_id, &rust_biguint!(2_000));
+}
+
+#[test]
+fn test_nft_balance() {
+    let mut wrapper = ContractObjWrapper::new(rust_testing_framework_tester::contract_obj);
+    let sc_addr = wrapper.create_sc_account(&rust_biguint!(0), None);
+    let token_id = &b"COOL-123456"[..];
+    let nft_nonce = 2;
+    let nft_balance = rust_biguint!(1_000);
+    let nft_attributes = NftDummyAttributes {
+        creation_epoch: 666,
+        cool_factor: 101,
+    };
+
+    wrapper.set_nft_balance(&sc_addr, token_id, nft_nonce, &nft_balance, &nft_attributes);
+    wrapper.check_nft_balance(&sc_addr, token_id, nft_nonce, &nft_balance, &nft_attributes);
+
+    wrapper.execute_query(&sc_addr, |sc| {
+        let managed_id = managed_token_id!(sc, token_id);
+
+        let actual_balance = sc.get_esdt_balance(managed_id, nft_nonce);
+        let expected_balance = managed_biguint!(sc, 1_000);
+        assert_eq!(expected_balance, actual_balance);
+    });
+}
+
+#[test]
+fn test_sc_send_nft_to_user() {
+    let mut wrapper = ContractObjWrapper::new(rust_testing_framework_tester::contract_obj);
+    let caller_addr = wrapper.create_user_account(&rust_biguint!(0));
+    let sc_addr = wrapper.create_sc_account(&rust_biguint!(0), None);
+    let token_id = &b"COOL-123456"[..];
+    let nft_nonce = 2;
+    let nft_balance = rust_biguint!(1_000);
+    let nft_attributes = NftDummyAttributes {
+        creation_epoch: 666,
+        cool_factor: 101,
+    };
+
+    wrapper.set_nft_balance(&sc_addr, token_id, nft_nonce, &nft_balance, &nft_attributes);
+    wrapper.check_nft_balance(&sc_addr, token_id, nft_nonce, &nft_balance, &nft_attributes);
+
+    wrapper = wrapper.execute_tx(&caller_addr, &sc_addr, &rust_biguint!(0), |sc| {
+        let managed_addr = managed_address!(sc, &caller_addr);
+        let managed_id = managed_token_id!(sc, token_id);
+        let managed_amt = managed_biguint!(sc, 400);
+        sc.send_nft(managed_addr, managed_id, nft_nonce, managed_amt);
+
+        StateChange::Commit
+    });
+
+    wrapper.check_nft_balance(
+        &caller_addr,
+        token_id,
+        nft_nonce,
+        &rust_biguint!(400),
+        &nft_attributes,
+    );
+    wrapper.check_nft_balance(
+        &sc_addr,
+        token_id,
+        nft_nonce,
+        &rust_biguint!(600),
+        &nft_attributes,
+    );
+}
+
+#[test]
+fn test_sc_esdt_mint() {
+    let mut wrapper = ContractObjWrapper::new(rust_testing_framework_tester::contract_obj);
+    let caller_addr = wrapper.create_user_account(&rust_biguint!(0));
+    let sc_addr = wrapper.create_sc_account(&rust_biguint!(0), None);
+    let token_id = &b"COOL-123456"[..];
+
+    // TODO
 }
 
 #[test]
