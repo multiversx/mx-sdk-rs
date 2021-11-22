@@ -9,4 +9,3 @@ mod managed_types;
 mod print_api_mock;
 mod send_api_mock;
 mod storage_api_mock;
-mod vm_api_mock;

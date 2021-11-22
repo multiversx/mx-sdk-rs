@@ -3,19 +3,19 @@ use elrond_wasm::contract_base::CallableContract;
 
 use crate::{
     address_hex,
-    tx_mock::{TxContext, TxContextRef, TxPanic, TxResult},
+    tx_mock::{TxContext, TxPanic, TxResult},
     DebugApi,
 };
 
 /// Runs contract code using the auto-generated function selector.
 /// The endpoint name is taken from the tx context.
 /// Catches and wraps any panics thrown in the contract.
-pub fn execute_tx_context(tx_context_ref: TxContextRef) -> TxResult {
-    let func_name = tx_context_ref.tx_input_box.func_name.as_slice();
-    let contract_identifier = get_contract_identifier(&tx_context_ref);
-    let contract_map = &tx_context_ref.blockchain_ref().contract_map;
+pub fn execute_tx_context(tx_context: &TxContext) -> TxResult {
+    let func_name = tx_context.tx_input_box.func_name.as_slice();
+    let contract_identifier = get_contract_identifier(&tx_context);
+    let contract_map = &tx_context.blockchain_ref().contract_map;
     let contract_instance =
-        contract_map.new_contract_instance(contract_identifier.as_slice(), tx_context_ref.clone());
+        contract_map.new_contract_instance(contract_identifier.as_slice(), tx_context);
     execute_contract_instance_endpoint(contract_instance, func_name)
 }
 

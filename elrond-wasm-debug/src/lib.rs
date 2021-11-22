@@ -1,3 +1,5 @@
+#![feature(once_cell)]
+#![feature(generic_associated_types)]
 #![allow(clippy::type_complexity)]
 
 pub mod abi_json;
