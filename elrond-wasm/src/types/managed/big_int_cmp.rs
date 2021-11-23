@@ -7,7 +7,7 @@ use super::BigInt;
 impl<M: ManagedTypeApi> PartialEq for BigInt<M> {
     #[inline]
     fn eq(&self, other: &Self) -> bool {
-        self.api.bi_cmp(self.handle, other.handle).is_eq()
+        M::instance().bi_cmp(self.handle, other.handle).is_eq()
     }
 }
 
@@ -23,19 +23,20 @@ impl<M: ManagedTypeApi> PartialOrd for BigInt<M> {
 impl<M: ManagedTypeApi> Ord for BigInt<M> {
     #[inline]
     fn cmp(&self, other: &Self) -> Ordering {
-        self.api.bi_cmp(self.handle, other.handle)
+        M::instance().bi_cmp(self.handle, other.handle)
     }
 }
 
 fn cmp_i64<M: ManagedTypeApi>(bi: &BigInt<M>, other: i64) -> Ordering {
+    let api = M::instance();
     if other == 0 {
-        match bi.api.bi_sign(bi.handle) {
+        match api.bi_sign(bi.handle) {
             crate::api::Sign::Plus => Ordering::Greater,
             crate::api::Sign::NoSign => Ordering::Equal,
             crate::api::Sign::Minus => Ordering::Less,
         }
     } else {
-        bi.api.bi_cmp(bi.handle, bi.api.bi_new(other))
+        api.bi_cmp(bi.handle, api.bi_new(other))
     }
 }
 

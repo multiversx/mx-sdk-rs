@@ -1,25 +1,19 @@
-use elrond_wasm::types::{
-    BigInt, BigUint, BoxedBytes, ManagedAddress, ManagedBuffer, ManagedFrom, ManagedVec,
-};
+use elrond_wasm::types::{BigInt, BigUint, BoxedBytes, ManagedAddress, ManagedBuffer, ManagedVec};
 use elrond_wasm_debug::{check_managed_top_encode_decode, DebugApi};
 
 #[test]
 fn test_big_uint_serialization() {
     let api = DebugApi::dummy();
 
-    check_managed_top_encode_decode(
-        api.clone(),
-        BigUint::managed_from(api.clone(), 5u32),
-        &[5u8],
-    );
+    check_managed_top_encode_decode(api.clone(), BigUint::<DebugApi>::from(5u32), &[5u8]);
 }
 
 #[test]
 fn test_vec_of_big_uint_serialization() {
     let api = DebugApi::dummy();
     let v = vec![
-        BigUint::managed_from(api.clone(), 5u32),
-        BigUint::managed_from(api.clone(), 6u32),
+        BigUint::<DebugApi>::from(5u32),
+        BigUint::<DebugApi>::from(6u32),
     ];
 
     check_managed_top_encode_decode(api, v, &[0, 0, 0, 1, 5, 0, 0, 0, 1, 6]);
@@ -29,17 +23,14 @@ fn test_vec_of_big_uint_serialization() {
 fn test_big_int_serialization() {
     let api = DebugApi::dummy();
 
-    check_managed_top_encode_decode(api.clone(), BigInt::from_i64(api.clone(), 5), &[5u8]);
-    check_managed_top_encode_decode(api.clone(), BigInt::from_i64(api, -5), &[251u8]);
+    check_managed_top_encode_decode(api.clone(), BigInt::<DebugApi>::from(5), &[5u8]);
+    check_managed_top_encode_decode(api.clone(), BigInt::<DebugApi>::from(-5), &[251u8]);
 }
 
 #[test]
 fn test_vec_of_big_int_serialization() {
     let api = DebugApi::dummy();
-    let v = vec![
-        BigInt::from_i32(api.clone(), 5),
-        BigInt::from_i32(api.clone(), 6),
-    ];
+    let v = vec![BigInt::<DebugApi>::from(5), BigInt::<DebugApi>::from(6)];
 
     check_managed_top_encode_decode(api, v, &[0, 0, 0, 1, 5, 0, 0, 0, 1, 6]);
 }
@@ -50,7 +41,7 @@ fn test_man_buf_serialization() {
 
     check_managed_top_encode_decode(
         api.clone(),
-        ManagedBuffer::new_from_bytes(api.clone(), &b"abc"[..]),
+        ManagedBuffer::<DebugApi>::new_from_bytes(&b"abc"[..]),
         &b"abc"[..],
     );
 }
@@ -59,8 +50,8 @@ fn test_man_buf_serialization() {
 fn test_vec_of_man_buf_serialization() {
     let api = DebugApi::dummy();
     let v = vec![
-        ManagedBuffer::new_from_bytes(api.clone(), &b"abc"[..]),
-        ManagedBuffer::new_from_bytes(api.clone(), &b"de"[..]),
+        ManagedBuffer::<DebugApi>::new_from_bytes(&b"abc"[..]),
+        ManagedBuffer::<DebugApi>::new_from_bytes(&b"de"[..]),
     ];
 
     check_managed_top_encode_decode(
@@ -73,7 +64,7 @@ fn test_vec_of_man_buf_serialization() {
 #[test]
 fn test_man_address_serialization() {
     let api = DebugApi::dummy();
-    let v = ManagedAddress::new_from_bytes(api.clone(), &[7u8; 32]);
+    let v = ManagedAddress::<DebugApi>::new_from_bytes(&[7u8; 32]);
 
     check_managed_top_encode_decode(api, v, &[7u8; 32]);
 }
@@ -81,10 +72,10 @@ fn test_man_address_serialization() {
 #[test]
 fn test_managed_vec_of_man_address_serialization() {
     let api = DebugApi::dummy();
-    let mut v = ManagedVec::new(api.clone());
-    v.push(ManagedAddress::new_from_bytes(api.clone(), &[7u8; 32]));
-    v.push(ManagedAddress::new_from_bytes(api.clone(), &[8u8; 32]));
-    v.push(ManagedAddress::new_from_bytes(api.clone(), &[9u8; 32]));
+    let mut v = ManagedVec::<DebugApi, ManagedAddress<DebugApi>>::new();
+    v.push(ManagedAddress::new_from_bytes(&[7u8; 32]));
+    v.push(ManagedAddress::new_from_bytes(&[8u8; 32]));
+    v.push(ManagedAddress::new_from_bytes(&[9u8; 32]));
 
     let expected_v = BoxedBytes::from_concat(&[&[7u8; 32], &[8u8; 32], &[9u8; 32]]);
 

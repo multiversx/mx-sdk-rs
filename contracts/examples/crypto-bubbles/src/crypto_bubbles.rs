@@ -40,7 +40,7 @@ pub trait CryptoBubbles {
         })?;
 
         self.send()
-            .direct_egld(&player.managed_into(), amount, b"crypto bubbles");
+            .direct_egld(&player.into(), amount, b"crypto bubbles");
 
         self.withdraw_event(player, amount);
 

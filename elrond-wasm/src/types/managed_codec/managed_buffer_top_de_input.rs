@@ -26,8 +26,7 @@ where
         if let Some(num) = self.parse_as_u64() {
             num
         } else {
-            self.api
-                .signal_error(DecodeError::INPUT_TOO_LONG.message_bytes())
+            M::instance().signal_error(DecodeError::INPUT_TOO_LONG.message_bytes())
         }
     }
 

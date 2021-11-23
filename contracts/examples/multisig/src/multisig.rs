@@ -112,12 +112,12 @@ pub trait Multisig:
     }
 
     fn get_all_users_with_role(&self, role: UserRole) -> ManagedMultiResultVec<ManagedAddress> {
-        let mut result = ManagedMultiResultVec::new(self.raw_vm_api());
+        let mut result = ManagedMultiResultVec::new();
         let num_users = self.user_mapper().get_user_count();
         for user_id in 1..=num_users {
             if self.user_id_to_role(user_id).get() == role {
                 if let Some(address) = self.user_mapper().get_user_address(user_id) {
-                    result.push(address.managed_into());
+                    result.push(address);
                 }
             }
         }

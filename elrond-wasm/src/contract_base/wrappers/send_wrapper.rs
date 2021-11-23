@@ -8,7 +8,7 @@ use crate::{
     esdt::ESDTSystemSmartContractProxy,
     types::{
         BigUint, ContractCall, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer,
-        ManagedInto, ManagedVec, TokenIdentifier,
+        ManagedVec, TokenIdentifier,
     },
 };
 use elrond_codec::TopDecode;
@@ -29,10 +29,6 @@ impl<A> SendWrapper<A>
 where
     A: SendApi + ManagedTypeApi + StorageReadApi + BlockchainApi,
 {
-    fn type_manager(&self) -> A {
-        self.api.clone()
-    }
-
     pub(crate) fn new(api: A) -> Self {
         SendWrapper { api }
     }
@@ -53,7 +49,7 @@ where
     /// Used especially for sending EGLD to regular accounts.
     pub fn direct_egld<D>(&self, to: &ManagedAddress<A>, amount: &BigUint<A>, data: D)
     where
-        D: ManagedInto<A, ManagedBuffer<A>>,
+        D: Into<ManagedBuffer<A>>,
     {
         self.api.direct_egld(to, amount, data)
     }
@@ -68,7 +64,7 @@ where
         amount: &BigUint<A>,
         data: D,
     ) where
-        D: ManagedInto<A, ManagedBuffer<A>>,
+        D: Into<ManagedBuffer<A>>,
     {
         self.direct_with_gas_limit(to, token, nonce, amount, 0, data, &[]);
     }
@@ -84,10 +80,10 @@ where
         endpoint_name: D,
         arguments: &[ManagedBuffer<A>],
     ) where
-        D: ManagedInto<A, ManagedBuffer<A>>,
+        D: Into<ManagedBuffer<A>>,
     {
-        let endpoint_name_managed = endpoint_name.managed_into(self.type_manager());
-        let mut arg_buffer = ManagedArgBuffer::new_empty(self.type_manager());
+        let endpoint_name_managed = endpoint_name.into();
+        let mut arg_buffer = ManagedArgBuffer::new_empty();
         for arg in arguments {
             arg_buffer.push_arg(arg);
         }
@@ -132,10 +128,10 @@ where
         data: D,
     ) -> !
     where
-        D: ManagedInto<A, ManagedBuffer<A>>,
+        D: Into<ManagedBuffer<A>>,
     {
-        let data_buf: ManagedBuffer<A> = data.managed_into(self.type_manager());
-        let mut arg_buffer = ManagedArgBuffer::new_empty(self.type_manager());
+        let data_buf: ManagedBuffer<A> = data.into();
+        let mut arg_buffer = ManagedArgBuffer::new_empty();
         arg_buffer.push_arg(token);
         if nonce == 0 {
             arg_buffer.push_arg(amount);
@@ -145,8 +141,8 @@ where
 
             self.api.async_call_raw(
                 to,
-                &BigUint::zero(self.type_manager()),
-                &ManagedBuffer::new_from_bytes(self.type_manager(), ESDT_TRANSFER_FUNC_NAME),
+                &BigUint::zero(),
+                &ManagedBuffer::new_from_bytes(ESDT_TRANSFER_FUNC_NAME),
                 &arg_buffer,
             )
         } else {
@@ -159,8 +155,8 @@ where
 
             self.api.async_call_raw(
                 &self.api.get_sc_address(),
-                &BigUint::zero(self.type_manager()),
-                &ManagedBuffer::new_from_bytes(self.type_manager(), ESDT_NFT_TRANSFER_FUNC_NAME),
+                &BigUint::zero(),
+                &ManagedBuffer::new_from_bytes(ESDT_NFT_TRANSFER_FUNC_NAME),
                 &arg_buffer,
             )
         }
@@ -173,9 +169,9 @@ where
         data: D,
     ) -> !
     where
-        D: ManagedInto<A, ManagedBuffer<A>>,
+        D: Into<ManagedBuffer<A>>,
     {
-        let mut arg_buffer = ManagedArgBuffer::new_empty(self.type_manager());
+        let mut arg_buffer = ManagedArgBuffer::new_empty();
         arg_buffer.push_arg(to);
         arg_buffer.push_arg(payments.len());
 
@@ -185,15 +181,15 @@ where
             arg_buffer.push_arg(payment.token_nonce);
             arg_buffer.push_arg(payment.amount);
         }
-        let data_buf: ManagedBuffer<A> = data.managed_into(self.type_manager());
+        let data_buf: ManagedBuffer<A> = data.into();
         if !data_buf.is_empty() {
             arg_buffer.push_arg_raw(data_buf);
         }
 
         self.api.async_call_raw(
             &self.api.get_sc_address(),
-            &BigUint::zero(self.type_manager()),
-            &ManagedBuffer::new_from_bytes(self.type_manager(), ESDT_MULTI_TRANSFER_FUNC_NAME),
+            &BigUint::zero(),
+            &ManagedBuffer::new_from_bytes(ESDT_MULTI_TRANSFER_FUNC_NAME),
             &arg_buffer,
         );
     }
@@ -207,7 +203,7 @@ where
         let mut contract_call = ContractCall::new(
             self.api.clone(),
             child_sc_address,
-            ManagedBuffer::new_from_bytes(self.type_manager(), CHANGE_OWNER_BUILTIN_FUNC_NAME),
+            ManagedBuffer::new_from_bytes(CHANGE_OWNER_BUILTIN_FUNC_NAME),
         );
         contract_call.push_endpoint_arg(&new_owner);
         contract_call
@@ -232,7 +228,7 @@ where
     /// For SFTs, you must use `self.send().esdt_nft_create()` before adding additional quantity.
     /// This function cannot be used for NFTs.
     pub fn esdt_local_mint(&self, token: &TokenIdentifier<A>, nonce: u64, amount: &BigUint<A>) {
-        let mut arg_buffer = ManagedArgBuffer::new_empty(self.type_manager());
+        let mut arg_buffer = ManagedArgBuffer::new_empty();
         let func_name: &[u8];
 
         arg_buffer.push_arg(token);
@@ -248,7 +244,7 @@ where
 
         let _ = self.call_local_esdt_built_in_function(
             self.api.get_gas_left(),
-            &ManagedBuffer::new_from_bytes(self.type_manager(), func_name),
+            &ManagedBuffer::new_from_bytes(func_name),
             &arg_buffer,
         );
     }
@@ -257,7 +253,7 @@ where
     /// Note that the SC must have the ESDTLocalBurn or ESDTNftBurn roles set,
     /// or this will fail with "action is not allowed"
     pub fn esdt_local_burn(&self, token: &TokenIdentifier<A>, nonce: u64, amount: &BigUint<A>) {
-        let mut arg_buffer = ManagedArgBuffer::new_empty(self.type_manager());
+        let mut arg_buffer = ManagedArgBuffer::new_empty();
         let func_name: &[u8];
 
         arg_buffer.push_arg(token);
@@ -272,7 +268,7 @@ where
 
         let _ = self.call_local_esdt_built_in_function(
             self.api.get_gas_left(),
-            &ManagedBuffer::new_from_bytes(self.type_manager(), func_name),
+            &ManagedBuffer::new_from_bytes(func_name),
             &arg_buffer,
         );
     }
@@ -293,7 +289,7 @@ where
         attributes: &T,
         uris: &ManagedVec<A, ManagedBuffer<A>>,
     ) -> u64 {
-        let mut arg_buffer = ManagedArgBuffer::new_empty(self.type_manager());
+        let mut arg_buffer = ManagedArgBuffer::new_empty();
         arg_buffer.push_arg(token);
         arg_buffer.push_arg(amount);
         arg_buffer.push_arg(name);
@@ -303,7 +299,7 @@ where
 
         if uris.is_empty() {
             // at least one URI is required, so we push an empty one
-            arg_buffer.push_arg(ManagedBuffer::new(self.api.clone()));
+            arg_buffer.push_arg(());
         } else {
             // The API function has the last argument as variadic,
             // so we top-encode each and send as separate argument
@@ -314,7 +310,7 @@ where
 
         let output = self.call_local_esdt_built_in_function(
             self.api.get_gas_left(),
-            &ManagedBuffer::new_from_bytes(self.type_manager(), ESDT_NFT_CREATE_FUNC_NAME),
+            &ManagedBuffer::new_from_bytes(ESDT_NFT_CREATE_FUNC_NAME),
             &arg_buffer,
         );
 
@@ -337,7 +333,7 @@ where
         attributes: &T,
         uris: &ManagedVec<A, ManagedBuffer<A>>,
     ) -> u64 {
-        let mut arg_buffer = ManagedArgBuffer::new_empty(self.type_manager());
+        let mut arg_buffer = ManagedArgBuffer::new_empty();
         arg_buffer.push_arg(token);
         arg_buffer.push_arg(amount);
         arg_buffer.push_arg(name);
@@ -359,8 +355,8 @@ where
         let output = self.api.execute_on_dest_context_by_caller_raw(
             self.api.get_gas_left(),
             &self.api.get_caller(),
-            &BigUint::zero(self.api.clone()),
-            &ManagedBuffer::new_from_bytes(self.type_manager(), ESDT_NFT_CREATE_FUNC_NAME),
+            &BigUint::zero(),
+            &ManagedBuffer::new_from_bytes(ESDT_NFT_CREATE_FUNC_NAME),
             &arg_buffer,
         );
 
