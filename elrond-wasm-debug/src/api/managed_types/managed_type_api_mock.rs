@@ -4,6 +4,10 @@ use num_bigint::{BigInt, Sign};
 use crate::DebugApi;
 
 impl ManagedTypeApi for DebugApi {
+    fn instance() -> Self {
+        DebugApi::new_from_static()
+    }
+
     fn mb_to_big_int_unsigned(&self, buffer_handle: Handle) -> Handle {
         let mut managed_types = self.m_types_borrow_mut();
         let bytes = managed_types.managed_buffer_map.get(buffer_handle);

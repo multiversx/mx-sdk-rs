@@ -98,7 +98,7 @@ where
         if storage_get_len(self.api.clone(), &key) > 0 {
             storage_get(self.api.clone(), &key)
         } else {
-            ManagedAddress::zero(self.api.clone())
+            ManagedAddress::zero()
         }
     }
 
@@ -160,7 +160,7 @@ where
     /// Can easily consume a lot of gas.
     pub fn get_all_addresses(&self) -> ManagedVec<SA, ManagedAddress<SA>> {
         let user_count = self.get_user_count();
-        let mut result = ManagedVec::new(self.api.clone());
+        let mut result = ManagedVec::new();
         for i in 1..=user_count {
             result.push(self.get_user_address_or_zero(i));
         }

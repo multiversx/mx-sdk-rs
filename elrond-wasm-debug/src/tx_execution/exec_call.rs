@@ -2,8 +2,8 @@ use std::{collections::HashMap, rc::Rc};
 
 use crate::{
     tx_mock::{
-        async_call_tx_input, async_callback_tx_input, merge_results, TxCache, TxContextRef,
-        TxInput, TxResult, TxResultCalls,
+        async_call_tx_input, async_callback_tx_input, merge_results, TxCache, TxContext, TxInput,
+        TxResult, TxResultCalls,
     },
     world_mock::{AccountData, AccountEsdt, BlockchainMock},
 };
@@ -12,8 +12,9 @@ use super::{execute_builtin_function_or_default, execute_tx_context};
 
 pub fn sc_query(tx_input: TxInput, state: Rc<BlockchainMock>) -> TxResult {
     let tx_cache = TxCache::new(state);
-    let tx_context = TxContextRef::new(tx_input, tx_cache);
-    execute_tx_context(tx_context)
+    let tx_context = TxContext::new(tx_input, tx_cache);
+    let (_, tx_result) = execute_tx_context(tx_context);
+    tx_result
 }
 
 pub fn sc_call(

@@ -1,4 +1,6 @@
-use super::{ManagedDefault, ManagedFrom, ManagedType};
+use core::marker::PhantomData;
+
+use super::ManagedType;
 use crate::{
     api::{Handle, InvalidSliceError, ManagedTypeApi},
     types::BoxedBytes,
@@ -13,96 +15,88 @@ use elrond_codec::{
 #[derive(Debug)]
 pub struct ManagedBuffer<M: ManagedTypeApi> {
     pub(crate) handle: Handle,
-    pub(crate) api: M,
+    _phantom: PhantomData<M>,
 }
 
 impl<M: ManagedTypeApi> ManagedType<M> for ManagedBuffer<M> {
     #[inline]
-    fn from_raw_handle(api: M, handle: Handle) -> Self {
-        ManagedBuffer { handle, api }
+    fn from_raw_handle(handle: Handle) -> Self {
+        ManagedBuffer {
+            handle,
+            _phantom: PhantomData,
+        }
     }
 
     #[doc(hidden)]
     fn get_raw_handle(&self) -> Handle {
         self.handle
     }
-
-    #[inline]
-    fn type_manager(&self) -> M {
-        self.api.clone()
-    }
 }
 
 impl<M: ManagedTypeApi> ManagedBuffer<M> {
     #[inline]
-    pub fn new(api: M) -> Self {
-        ManagedBuffer {
-            handle: api.mb_new_empty(),
-            api,
-        }
+    pub fn new() -> Self {
+        ManagedBuffer::from_raw_handle(M::instance().mb_new_empty())
     }
 
-    #[inline(always)]
-    pub fn new_from_bytes(api: M, bytes: &[u8]) -> Self {
-        ManagedBuffer {
-            handle: api.mb_new_from_bytes(bytes),
-            api,
-        }
+    #[inline]
+    pub fn new_from_bytes(bytes: &[u8]) -> Self {
+        ManagedBuffer::from_raw_handle(M::instance().mb_new_from_bytes(bytes))
     }
 }
 
-impl<M> ManagedFrom<M, &[u8]> for ManagedBuffer<M>
+impl<M> From<&[u8]> for ManagedBuffer<M>
 where
     M: ManagedTypeApi,
 {
     #[inline]
-    fn managed_from(api: M, bytes: &[u8]) -> Self {
-        Self::new_from_bytes(api, bytes)
+    fn from(bytes: &[u8]) -> Self {
+        Self::new_from_bytes(bytes)
     }
 }
 
-impl<M> ManagedFrom<M, BoxedBytes> for ManagedBuffer<M>
+impl<M> From<BoxedBytes> for ManagedBuffer<M>
 where
     M: ManagedTypeApi,
 {
     #[inline]
-    fn managed_from(api: M, bytes: BoxedBytes) -> Self {
-        Self::new_from_bytes(api, bytes.as_slice())
+    fn from(bytes: BoxedBytes) -> Self {
+        Self::new_from_bytes(bytes.as_slice())
     }
 }
 
 /// Syntactic sugar only.
-impl<M, const N: usize> ManagedFrom<M, &[u8; N]> for ManagedBuffer<M>
+impl<M, const N: usize> From<&[u8; N]> for ManagedBuffer<M>
 where
     M: ManagedTypeApi,
 {
     #[inline]
-    fn managed_from(api: M, bytes: &[u8; N]) -> Self {
-        Self::new_from_bytes(api, bytes)
+    fn from(bytes: &[u8; N]) -> Self {
+        Self::new_from_bytes(bytes)
     }
 }
 
-impl<M> ManagedFrom<M, Vec<u8>> for ManagedBuffer<M>
+impl<M> From<Vec<u8>> for ManagedBuffer<M>
 where
     M: ManagedTypeApi,
 {
     #[inline]
-    fn managed_from(api: M, bytes: Vec<u8>) -> Self {
-        Self::new_from_bytes(api, bytes.as_slice())
+    fn from(bytes: Vec<u8>) -> Self {
+        Self::new_from_bytes(bytes.as_slice())
     }
 }
 
-impl<M: ManagedTypeApi> ManagedDefault<M> for ManagedBuffer<M> {
+impl<M: ManagedTypeApi> Default for ManagedBuffer<M> {
     #[inline]
-    fn managed_default(api: M) -> Self {
-        Self::new(api)
+    fn default() -> Self {
+        Self::new()
     }
 }
 
 impl<M: ManagedTypeApi> ManagedBuffer<M> {
     #[inline]
     pub fn len(&self) -> usize {
-        self.api.mb_len(self.handle)
+        M::instance().mb_len(self.handle)
     }
 
     #[inline]
@@ -112,7 +106,7 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
 
     #[inline]
     pub fn to_boxed_bytes(&self) -> BoxedBytes {
-        self.api.mb_to_boxed_bytes(self.handle)
+        M::instance().mb_to_boxed_bytes(self.handle)
     }
 
     /// TODO: investigate the impact of using `Result<(), ()>` on the wasm output.
@@ -122,8 +116,7 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
         starting_position: usize,
         dest_slice: &mut [u8],
     ) -> Result<(), InvalidSliceError> {
-        self.api
-            .mb_load_slice(self.handle, starting_position, dest_slice)
+        M::instance().mb_load_slice(self.handle, starting_position, dest_slice)
     }
 
     pub fn copy_slice(
@@ -131,15 +124,12 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
         starting_position: usize,
         slice_len: usize,
     ) -> Option<ManagedBuffer<M>> {
-        let result_handle = self.api.mb_new_empty();
+        let api = M::instance();
+        let result_handle = api.mb_new_empty();
         let err_result =
-            self.api
-                .mb_copy_slice(self.handle, starting_position, slice_len, result_handle);
+            api.mb_copy_slice(self.handle, starting_position, slice_len, result_handle);
         if err_result.is_ok() {
-            Some(ManagedBuffer::from_raw_handle(
-                self.api.clone(),
-                result_handle,
-            ))
+            Some(ManagedBuffer::from_raw_handle(result_handle))
         } else {
             None
         }
@@ -147,23 +137,22 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
 
     #[inline]
     pub fn overwrite(&mut self, value: &[u8]) {
-        self.api.mb_overwrite(self.handle, value);
+        M::instance().mb_overwrite(self.handle, value);
     }
 
     #[inline]
     pub fn append(&mut self, other: &ManagedBuffer<M>) {
-        self.api.mb_append(self.handle, other.handle);
+        M::instance().mb_append(self.handle, other.handle);
     }
 
     #[inline(always)]
     pub fn append_bytes(&mut self, slice: &[u8]) {
-        self.api.mb_append_bytes(self.handle, slice);
+        M::instance().mb_append_bytes(self.handle, slice);
     }
 
     /// Utility function: helps serialize lengths (or any other value of type usize) easier.
     pub fn append_u32_be(&mut self, item: u32) {
-        self.api
-            .mb_append_bytes(self.handle, &item.to_be_bytes()[..]);
+        M::instance().mb_append_bytes(self.handle, &item.to_be_bytes()[..]);
     }
 
     pub fn parse_as_u64(&self) -> Option<u64> {
@@ -173,8 +162,7 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
             return None;
         }
         let mut bytes = [0u8; U64_NUM_BYTES];
-        if self
-            .api
+        if M::instance()
             .mb_load_slice(self.handle, 0, &mut bytes[U64_NUM_BYTES - l..])
             .is_err()
         {
@@ -187,19 +175,17 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
 
 impl<M: ManagedTypeApi> Clone for ManagedBuffer<M> {
     fn clone(&self) -> Self {
-        let clone_handle = self.api.mb_new_empty();
-        self.api.mb_append(clone_handle, self.handle);
-        ManagedBuffer {
-            handle: clone_handle,
-            api: self.api.clone(),
-        }
+        let api = M::instance();
+        let clone_handle = api.mb_new_empty();
+        api.mb_append(clone_handle, self.handle);
+        ManagedBuffer::from_raw_handle(clone_handle)
     }
 }
 
 impl<M: ManagedTypeApi> PartialEq for ManagedBuffer<M> {
     #[inline]
     fn eq(&self, other: &Self) -> bool {
-        self.api.mb_eq(self.handle, other.handle)
+        M::instance().mb_eq(self.handle, other.handle)
     }
 }
 
@@ -212,15 +198,15 @@ impl<M: ManagedTypeApi, const N: usize> PartialEq<&[u8; N]> for ManagedBuffer<M>
             return false;
         }
         let mut self_bytes = [0u8; N];
-        let _ = self.api.mb_load_slice(self.handle, 0, &mut self_bytes[..]);
+        let _ = M::instance().mb_load_slice(self.handle, 0, &mut self_bytes[..]);
         &self_bytes[..] == &other[..]
     }
 }
 
 impl<M: ManagedTypeApi> PartialEq<[u8]> for ManagedBuffer<M> {
     fn eq(&self, other: &[u8]) -> bool {
-        // TODO: push this to the api and optiize by using a temporary handle
-        let other_mb = ManagedBuffer::new_from_bytes(self.api.clone(), other);
+        // TODO: push this to the api and optimize by using a temporary handle
+        let other_mb = ManagedBuffer::new_from_bytes(other);
         self == &other_mb
     }
 }

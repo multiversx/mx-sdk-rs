@@ -1,22 +1,42 @@
+use std::rc::Rc;
+
 use alloc::boxed::Box;
 use elrond_wasm::contract_base::CallableContract;
 
 use crate::{
     address_hex,
-    tx_mock::{TxContext, TxContextRef, TxPanic, TxResult},
+    tx_mock::{TxContext, TxContextStack, TxPanic, TxResult},
     DebugApi,
 };
 
 /// Runs contract code using the auto-generated function selector.
 /// The endpoint name is taken from the tx context.
 /// Catches and wraps any panics thrown in the contract.
-pub fn execute_tx_context(tx_context_ref: TxContextRef) -> TxResult {
+pub fn execute_tx_context(tx_context: TxContext) -> (TxContext, TxResult) {
+    let tx_context_rc = Rc::new(tx_context);
+    let (tx_context_rc, tx_result) = execute_tx_context_rc(tx_context_rc);
+    let tx_context = Rc::try_unwrap(tx_context_rc).unwrap();
+    (tx_context, tx_result)
+}
+
+/// The actual core of the execution.
+/// The argument is returned and can be unwrapped,
+/// since the lifetimes of all other references created from it cannot outlive this function.
+fn execute_tx_context_rc(tx_context_rc: Rc<TxContext>) -> (Rc<TxContext>, TxResult) {
+    let tx_context_ref = DebugApi::new(tx_context_rc.clone());
+
     let func_name = tx_context_ref.tx_input_box.func_name.as_slice();
     let contract_identifier = get_contract_identifier(&tx_context_ref);
-    let contract_map = &tx_context_ref.blockchain_ref().contract_map;
+    let contract_map = &tx_context_rc.blockchain_ref().contract_map;
+
     let contract_instance =
         contract_map.new_contract_instance(contract_identifier.as_slice(), tx_context_ref.clone());
-    execute_contract_instance_endpoint(contract_instance, func_name)
+
+    TxContextStack::static_push(tx_context_rc.clone());
+    let tx_result = execute_contract_instance_endpoint(contract_instance, func_name);
+
+    let tx_context_rc = TxContextStack::static_pop();
+    (tx_context_rc, tx_result)
 }
 
 fn get_contract_identifier(tx_context: &TxContext) -> Vec<u8> {

@@ -1,4 +1,4 @@
-use super::{ManagedByteArray, ManagedDefault, ManagedFrom, ManagedType};
+use super::{ManagedByteArray, ManagedType};
 use crate::{
     abi::TypeAbi,
     api::{Handle, ManagedTypeApi},
@@ -20,13 +20,13 @@ where
     M: ManagedTypeApi,
 {
     #[inline]
-    pub fn from_address(api: M, address: &Address) -> Self {
-        Self::new_from_bytes(api, address.as_array())
+    pub fn from_address(address: &Address) -> Self {
+        Self::new_from_bytes(address.as_array())
     }
 
     #[inline]
-    pub fn zero(api: M) -> Self {
-        Self::new_from_bytes(api, &[0u8; 32])
+    pub fn zero() -> Self {
+        Self::new_from_bytes(&[0u8; 32])
     }
 
     pub fn to_address(&self) -> Address {
@@ -41,40 +41,40 @@ where
     }
 
     #[inline]
-    pub fn new_from_bytes(api: M, bytes: &[u8; 32]) -> Self {
+    pub fn new_from_bytes(bytes: &[u8; 32]) -> Self {
         ManagedAddress {
-            bytes: ManagedByteArray::new_from_bytes(api, bytes),
+            bytes: ManagedByteArray::new_from_bytes(bytes),
         }
     }
 }
 
-impl<M> ManagedFrom<M, &Address> for ManagedAddress<M>
+impl<M> From<&Address> for ManagedAddress<M>
 where
     M: ManagedTypeApi,
 {
     #[inline]
-    fn managed_from(api: M, address: &Address) -> Self {
-        Self::from_address(api, address)
+    fn from(address: &Address) -> Self {
+        Self::from_address(address)
     }
 }
 
-impl<M> ManagedFrom<M, Address> for ManagedAddress<M>
+impl<M> From<Address> for ManagedAddress<M>
 where
     M: ManagedTypeApi,
 {
     #[inline]
-    fn managed_from(api: M, address: Address) -> Self {
-        Self::managed_from(api, &address)
+    fn from(address: Address) -> Self {
+        Self::from(&address)
     }
 }
 
-impl<M> ManagedFrom<M, &[u8; 32]> for ManagedAddress<M>
+impl<M> From<&[u8; 32]> for ManagedAddress<M>
 where
     M: ManagedTypeApi,
 {
     #[inline]
-    fn managed_from(api: M, bytes: &[u8; 32]) -> Self {
-        Self::new_from_bytes(api, bytes)
+    fn from(bytes: &[u8; 32]) -> Self {
+        Self::new_from_bytes(bytes)
     }
 }
 
@@ -83,9 +83,9 @@ where
     M: ManagedTypeApi,
 {
     #[inline]
-    fn from_raw_handle(api: M, handle: Handle) -> Self {
+    fn from_raw_handle(handle: Handle) -> Self {
         ManagedAddress {
-            bytes: ManagedByteArray::from_raw_handle(api, handle),
+            bytes: ManagedByteArray::from_raw_handle(handle),
         }
     }
 
@@ -93,20 +93,15 @@ where
     fn get_raw_handle(&self) -> Handle {
         self.bytes.get_raw_handle()
     }
-
-    #[inline]
-    fn type_manager(&self) -> M {
-        self.bytes.type_manager()
-    }
 }
 
-impl<M> ManagedDefault<M> for ManagedAddress<M>
+impl<M> Default for ManagedAddress<M>
 where
     M: ManagedTypeApi,
 {
     #[inline]
-    fn managed_default(api: M) -> Self {
-        Self::zero(api)
+    fn default() -> Self {
+        Self::zero()
     }
 }
 
