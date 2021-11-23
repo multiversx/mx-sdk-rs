@@ -1,3 +1,5 @@
+use core::convert::{TryFrom, TryInto};
+
 use super::{ManagedBuffer, ManagedByteArray, ManagedType};
 use crate::{
     abi::TypeAbi,
@@ -80,6 +82,29 @@ where
     #[inline]
     fn from(bytes: &[u8; 32]) -> Self {
         Self::new_from_bytes(bytes)
+    }
+}
+
+impl<M> From<ManagedByteArray<M, 32>> for ManagedAddress<M>
+where
+    M: ManagedTypeApi,
+{
+    fn from(value: ManagedByteArray<M, 32>) -> Self {
+        Self {
+            bytes: value
+        }
+    }
+}
+
+impl<M> TryFrom<ManagedBuffer<M>> for ManagedAddress<M>
+where
+    M: ManagedTypeApi,
+{
+    type Error = DecodeError;
+
+    fn try_from(value: ManagedBuffer<M>) -> Result<Self, Self::Error> {
+        let bytes: ManagedByteArray<M, 32> = value.try_into()?;
+        Ok(bytes.into())
     }
 }
 
