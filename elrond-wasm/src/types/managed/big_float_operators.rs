@@ -2,7 +2,7 @@ use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAss
 
 use crate::api::ManagedTypeApi;
 
-use super::BigFloat;
+use super::{BigFloat, ManagedType};
 
 macro_rules! binary_operator {
     ($trait:ident, $method:ident, $api_func:ident) => {
@@ -10,11 +10,9 @@ macro_rules! binary_operator {
             type Output = BigFloat<M>;
 
             fn $method(self, other: BigFloat<M>) -> BigFloat<M> {
-                self.api.$api_func(self.handle, self.handle, other.handle);
-                BigFloat {
-                    handle: self.handle,
-                    api: self.api.clone(),
-                }
+                let api = M::instance();
+                api.$api_func(self.handle, self.handle, other.handle);
+                BigFloat::from_raw_handle(self.handle)
             }
         }
 
@@ -22,12 +20,10 @@ macro_rules! binary_operator {
             type Output = BigFloat<M>;
 
             fn $method(self, other: &BigFloat<M>) -> BigFloat<M> {
-                let result = self.api.bf_new_zero();
-                self.api.$api_func(result, self.handle, other.handle);
-                BigFloat {
-                    handle: result,
-                    api: self.api.clone(),
-                }
+                let api = M::instance();
+                let result = api.bf_new_zero();
+                api.$api_func(result, self.handle, other.handle);
+                BigFloat::from_raw_handle(self.handle)
             }
         }
     };
@@ -43,14 +39,16 @@ macro_rules! binary_assign_operator {
         impl<M: ManagedTypeApi> $trait<BigFloat<M>> for BigFloat<M> {
             #[inline]
             fn $method(&mut self, other: Self) {
-                self.api.$api_func(self.handle, self.handle, other.handle);
+                let api = M::instance();
+                api.$api_func(self.handle, self.handle, other.handle);
             }
         }
 
         impl<M: ManagedTypeApi> $trait<&BigFloat<M>> for BigFloat<M> {
             #[inline]
             fn $method(&mut self, other: &BigFloat<M>) {
-                self.api.$api_func(self.handle, self.handle, other.handle);
+                let api = M::instance();
+                api.$api_func(self.handle, self.handle, other.handle);
             }
         }
     };
@@ -65,11 +63,9 @@ impl<M: ManagedTypeApi> Neg for BigFloat<M> {
     type Output = BigFloat<M>;
 
     fn neg(self) -> Self::Output {
-        let result = self.api.bf_new_zero();
-        self.api.bf_neg(result, self.handle);
-        BigFloat {
-            handle: result,
-            api: self.api,
-        }
+        let api = M::instance();
+        let result = api.bf_new_zero();
+        api.bf_neg(result, self.handle);
+        BigFloat::from_raw_handle(result)
     }
 }
