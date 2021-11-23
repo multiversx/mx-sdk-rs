@@ -126,7 +126,7 @@ pub trait Lottery {
             prize_distribution,
             whitelist,
             current_ticket_number: 0u32,
-            prize_pool: self.types().big_uint_zero(),
+            prize_pool: BigUint::zero(),
             queued_tickets: 0u32,
         };
 
@@ -274,9 +274,7 @@ pub trait Lottery {
         let prize: BigUint;
 
         if current_winning_ticket_index != 0 {
-            prize = self
-                .types()
-                .big_uint_from(info.prize_distribution[current_winning_ticket_index] as u32)
+            prize = BigUint::from(info.prize_distribution[current_winning_ticket_index] as u32)
                 * &info.prize_pool
                 / PERCENTAGE_TOTAL as u32;
         } else {
