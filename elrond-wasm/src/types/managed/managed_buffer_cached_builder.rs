@@ -21,7 +21,7 @@ where
     /// If not, it is saved into the managed buffer so that the data is not lost.
     /// Use `flush_to_managed_buffer` after this to ensure that the managed buffer is populated.
     pub fn new_from_slice(api: M, slice: &[u8]) -> Self {
-        let static_cache = StaticBufferRef::try_new(api.clone(), slice);
+        let static_cache = StaticBufferRef::try_new(slice);
         if static_cache.is_some() {
             ManagedBufferCachedBuilder {
                 managed_buffer: ManagedBuffer::new(api),
