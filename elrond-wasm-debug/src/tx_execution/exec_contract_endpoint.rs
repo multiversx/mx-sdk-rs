@@ -29,13 +29,14 @@ fn execute_tx_context_rc(tx_context_rc: Rc<TxContext>) -> (Rc<TxContext>, TxResu
     let contract_identifier = get_contract_identifier(&tx_context_ref);
     let contract_map = &tx_context_rc.blockchain_ref().contract_map;
 
-    let contract_instance =
-        contract_map.new_contract_instance(contract_identifier.as_slice(), tx_context_ref.clone());
-
     TxContextStack::static_push(tx_context_rc.clone());
+
+    let contract_instance = contract_map.new_contract_instance(contract_identifier.as_slice());
+
     let tx_result = execute_contract_instance_endpoint(contract_instance, func_name);
 
     let tx_context_rc = TxContextStack::static_pop();
+
     (tx_context_rc, tx_result)
 }
 

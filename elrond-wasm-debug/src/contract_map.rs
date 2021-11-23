@@ -28,9 +28,9 @@ impl<A> ContractMap<A> {
     pub fn new_contract_instance(
         &self,
         contract_identifier: &[u8],
-        debug_api: DebugApi,
     ) -> Box<dyn CallableContract<A>> {
         if let Some(new_contract_closure) = self.factories.get(contract_identifier) {
+            let debug_api = DebugApi::new_from_static();
             new_contract_closure(debug_api)
         } else {
             unknown_contract_panic(contract_identifier)
