@@ -104,9 +104,9 @@ impl<M: ManagedTypeApi> ManagedVecItem for EsdtTokenPayment<M> {
         let mut arr: [u8; 16] = [0u8; 16];
         let mut index = 0;
 
-        managed_vec_item_to_slice::<_>(&mut arr, &mut index, &self.token_identifier);
-        managed_vec_item_to_slice::<_>(&mut arr, &mut index, &self.token_nonce);
-        managed_vec_item_to_slice::<_>(&mut arr, &mut index, &self.amount);
+        managed_vec_item_to_slice(&mut arr, &mut index, &self.token_identifier);
+        managed_vec_item_to_slice(&mut arr, &mut index, &self.token_nonce);
+        managed_vec_item_to_slice(&mut arr, &mut index, &self.amount);
 
         writer(&arr[..])
     }
