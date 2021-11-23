@@ -2,14 +2,14 @@ use crate::{
     api::SendApi,
     types::{
         BigUint, CodeMetadata, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer,
-        ManagedInto, ManagedVec, TokenIdentifier,
+        ManagedVec, TokenIdentifier,
     },
 };
 
 impl SendApi for super::UncallableApi {
     fn direct_egld<D>(&self, _to: &ManagedAddress<Self>, _amount: &BigUint<Self>, _data: D)
     where
-        D: ManagedInto<Self, ManagedBuffer<Self>>,
+        D: Into<ManagedBuffer<Self>>,
     {
         unreachable!()
     }

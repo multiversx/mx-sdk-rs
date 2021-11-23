@@ -30,7 +30,7 @@ pub fn generate_event_impl(m: &Method, event_identifier: &str) -> proc_macro2::T
         }
     } else {
         quote! {
-            let ___data_buffer___ = elrond_wasm::types::ManagedBuffer::new(self.raw_vm_api());
+            let ___data_buffer___ = elrond_wasm::types::ManagedBuffer::<Self::Api>::new();
         }
     };
 
@@ -39,7 +39,6 @@ pub fn generate_event_impl(m: &Method, event_identifier: &str) -> proc_macro2::T
     quote! {
         #msig {
             let mut ___topic_accumulator___ = elrond_wasm::log_util::event_topic_accumulator(
-                self.raw_vm_api(),
                 #event_identifier_literal,
             );
             #(#topic_push_snippets)*

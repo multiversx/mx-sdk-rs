@@ -1,6 +1,6 @@
 use elrond_wasm::{
     load_dyn_arg,
-    types::{AsyncCallResult, BigUint, ManagedFrom, MultiArg2, OptionalArg, VarArgs},
+    types::{AsyncCallResult, BigUint, MultiArg2, OptionalArg, VarArgs},
     ArgId, CallDataArgLoader, DynArgInput, HexCallDataDeserializer,
 };
 use elrond_wasm_debug::DebugApi;
@@ -27,7 +27,7 @@ fn test_simple_managed_arg() {
     let de = HexCallDataDeserializer::new(input);
     let mut cd_loader = CallDataArgLoader::new(de, api.clone());
     let arg1: BigUint<DebugApi> = load_dyn_arg(&mut cd_loader, ArgId::empty());
-    assert_eq!(arg1, BigUint::managed_from(api, 5u32));
+    assert_eq!(arg1, BigUint::from(5u32));
 
     cd_loader.assert_no_more_args();
 }

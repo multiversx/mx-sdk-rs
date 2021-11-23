@@ -40,7 +40,7 @@ pub trait FirstContract {
             &self
                 .types()
                 .managed_buffer_from(SECOND_CONTRACT_ACCEPT_ESDT_PAYMENT),
-            &ManagedVec::new(self.type_manager()),
+            &ManagedVec::new(),
         );
 
         Ok(())
@@ -68,7 +68,7 @@ pub trait FirstContract {
             &self
                 .types()
                 .managed_buffer_from(SECOND_CONTRACT_ACCEPT_ESDT_PAYMENT),
-            &ManagedVec::new(self.type_manager()),
+            &ManagedVec::new(),
         );
 
         Ok(())
@@ -96,7 +96,7 @@ pub trait FirstContract {
             &self
                 .types()
                 .managed_buffer_from(SECOND_CONTRACT_REJECT_ESDT_PAYMENT),
-            &ManagedVec::new(self.type_manager()),
+            &ManagedVec::new(),
         );
 
         Ok(())
@@ -126,7 +126,7 @@ pub trait FirstContract {
             &self
                 .types()
                 .managed_buffer_from(SECOND_CONTRACT_REJECT_ESDT_PAYMENT),
-            &ManagedArgBuffer::new_empty(self.type_manager()),
+            &ManagedArgBuffer::new_empty(),
         );
 
         Ok(())
@@ -156,7 +156,7 @@ pub trait FirstContract {
             &self
                 .types()
                 .managed_buffer_from(SECOND_CONTRACT_ACCEPT_ESDT_PAYMENT),
-            &ManagedArgBuffer::new_empty(self.type_manager()),
+            &ManagedArgBuffer::new_empty(),
         );
 
         Ok(())
@@ -170,7 +170,7 @@ pub trait FirstContract {
         func_name: &ManagedBuffer,
         args: &ManagedVec<Self::Api, ManagedBuffer>,
     ) {
-        let mut arg_buffer = ManagedArgBuffer::new_empty(self.type_manager());
+        let mut arg_buffer = ManagedArgBuffer::new_empty();
         arg_buffer.push_arg(esdt_token_identifier);
         arg_buffer.push_arg(amount);
         arg_buffer.push_arg(func_name);

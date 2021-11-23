@@ -16,6 +16,8 @@ pub trait ManagedTypeApi:
     + Clone
     + 'static
 {
+    fn instance() -> Self;
+
     fn mb_to_big_int_unsigned(&self, buffer_handle: Handle) -> Handle;
 
     fn mb_to_big_int_signed(&self, buffer_handle: Handle) -> Handle;

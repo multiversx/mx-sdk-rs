@@ -112,7 +112,7 @@ pub trait Vault {
 
         Ok((
             token_identifier,
-            token_type.as_type_name().managed_into(),
+            token_type.as_type_name().into(),
             token_payment,
             token_nonce,
         )
@@ -181,7 +181,7 @@ pub trait Vault {
     #[endpoint]
     fn burn_and_create_retrive_async(&self) {
         let payments = self.call_value().all_esdt_transfers();
-        let mut uris = ManagedVec::new(self.type_manager());
+        let mut uris = ManagedVec::new();
         uris.push(ManagedBuffer::new());
 
         let mut new_tokens = ManagedVec::new();

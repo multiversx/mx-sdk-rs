@@ -1,7 +1,7 @@
 use super::{BlockchainApi, ManagedTypeApi};
 use crate::types::{
     BigUint, CodeMetadata, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer,
-    ManagedInto, ManagedVec, TokenIdentifier,
+    ManagedVec, TokenIdentifier,
 };
 
 /// API that groups methods that either send EGLD or ESDT, or that call other contracts.
@@ -10,7 +10,7 @@ pub trait SendApi: ManagedTypeApi + BlockchainApi + Clone + Sized {
     /// Used especially for sending EGLD to regular accounts.
     fn direct_egld<D>(&self, to: &ManagedAddress<Self>, amount: &BigUint<Self>, data: D)
     where
-        D: ManagedInto<Self, ManagedBuffer<Self>>;
+        D: Into<ManagedBuffer<Self>>;
 
     /// Sends EGLD to an address (optionally) and executes like an async call, but without callback.
     fn direct_egld_execute(

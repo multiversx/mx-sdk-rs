@@ -59,7 +59,7 @@ pub trait BigIntMethods {
 
     #[endpoint]
     fn big_uint_from_u64_2(&self, small: u64) -> BigUint {
-        small.managed_into()
+        small.into()
     }
 
     #[endpoint]
@@ -84,7 +84,7 @@ pub trait BigIntMethods {
 
     #[endpoint]
     fn big_int_from_i64_2(&self, small: i64) -> BigInt {
-        small.managed_into()
+        small.into()
     }
 
     #[endpoint]

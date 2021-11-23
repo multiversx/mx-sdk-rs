@@ -22,6 +22,8 @@ elrond_wasm_node::wasm_endpoints! {
         big_int_to_i64
         big_int_to_parts
         big_int_zero
+        big_uint_from_managed_buffer
+        big_uint_from_managed_buffer_ref
         big_uint_from_u64_1
         big_uint_from_u64_2
         big_uint_to_u64

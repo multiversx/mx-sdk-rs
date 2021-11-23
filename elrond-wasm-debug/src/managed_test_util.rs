@@ -34,8 +34,8 @@ pub fn check_managed_top_decode<T: TopDecode + PartialEq + Debug>(
     api: DebugApi,
     bytes: &[u8],
 ) -> T {
-    let serializer = ManagedSerializer::new(api.clone());
-    let mb = ManagedBuffer::new_from_bytes(api, bytes);
+    let serializer = ManagedSerializer::new(api);
+    let mb = ManagedBuffer::new_from_bytes(bytes);
     let from_mb: T = serializer.top_decode_from_managed_buffer(&mb);
     let from_slice: T = serializer.top_decode_from_byte_slice(bytes);
     assert_eq!(from_mb, from_slice);
