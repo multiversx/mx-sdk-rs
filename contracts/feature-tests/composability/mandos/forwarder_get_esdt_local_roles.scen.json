@@ -168,7 +168,7 @@
                 "function": "check_token_has_roles",
                 "arguments": [
                     "str:ESDT-123456",
-                    "u64:3"
+                    "u64:4"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
