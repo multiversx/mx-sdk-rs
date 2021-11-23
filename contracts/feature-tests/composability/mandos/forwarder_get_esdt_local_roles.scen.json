@@ -134,6 +134,81 @@
             }
         },
         {
+            "step": "scCall",
+            "txId": "3",
+            "comment": "multiple roles",
+            "tx": {
+                "from": "address:viewer",
+                "to": "sc:forwarder",
+                "function": "get_esdt_local_roles",
+                "arguments": [
+                    "str:ESDT-123456"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "str:ESDTRoleLocalMint",
+                    "str:ESDTRoleLocalBurn"
+                ],
+                "status": "0",
+                "message": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "4",
+            "comment": "verify roles",
+            "tx": {
+                "from": "address:viewer",
+                "to": "sc:forwarder",
+                "function": "check_token_has_roles",
+                "arguments": [
+                    "str:ESDT-123456",
+                    "ESDTRoleNFTCreate"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "1"
+                ],
+                "status": "0",
+                "message": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "5",
+            "comment": "verify roles",
+            "tx": {
+                "from": "address:viewer",
+                "to": "sc:forwarder",
+                "function": "check_token_has_roles",
+                "arguments": [
+                    "str:ESDT-123456",
+                    "ESDTRoleLocalMint"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ],
+                "status": "0",
+                "message": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
             "step": "setState",
             "accounts": {
                 "sc:forwarder": {
@@ -159,7 +234,7 @@
         },
         {
             "step": "scCall",
-            "txId": "3",
+            "txId": "6",
             "comment": "nft roles",
             "tx": {
                 "from": "address:viewer",
