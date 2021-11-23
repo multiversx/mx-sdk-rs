@@ -7,12 +7,12 @@ use crate::{
 };
 
 pub struct ManagedTypeHelper<M: ManagedTypeApi> {
-    api: M,
+    _api: M,
 }
 
 impl<M: ManagedTypeApi> ManagedTypeHelper<M> {
-    pub(crate) fn new(api: M) -> Self {
-        ManagedTypeHelper { api }
+    pub(crate) fn new(_api: M) -> Self {
+        ManagedTypeHelper { _api }
     }
 
     #[inline]
@@ -65,7 +65,7 @@ impl<M: ManagedTypeApi> ManagedTypeHelper<M> {
 
     #[inline]
     pub fn managed_multi_result_vec_new<T>(&self) -> ManagedMultiResultVec<M, T> {
-        ManagedMultiResultVec::new(self.api.clone())
+        ManagedMultiResultVec::new()
     }
 
     #[inline]
