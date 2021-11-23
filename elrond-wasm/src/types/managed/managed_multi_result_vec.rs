@@ -11,7 +11,7 @@ use alloc::string::String;
 use core::marker::PhantomData;
 use elrond_codec::{try_cast_execute_or_else, TopDecode, TopEncode};
 
-#[derive(Clone)]
+#[derive(Clone, Default)]
 pub struct ManagedMultiResultVec<M, T>
 where
     M: ManagedTypeApi,

@@ -9,6 +9,7 @@ use crate::{
 
 use super::{ManagedVec, ManagedVecItem, ManagedVecIterator};
 
+#[derive(Clone, Default)]
 pub struct ManagedMultiResultVecEager<M: ManagedTypeApi, T: ManagedVecItem<M>>(ManagedVec<M, T>);
 
 pub type ManagedVarArgsEager<M, T> = ManagedMultiResultVecEager<M, T>;

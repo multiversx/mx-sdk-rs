@@ -117,7 +117,7 @@ where
     const SKIPS_RESERIALIZATION: bool = false;
 
     fn from_byte_reader<Reader: FnMut(&mut [u8])>(api: M, reader: Reader) -> Self {
-        let handle = Handle::from_byte_reader(api.clone(), reader);
+        let handle = Handle::from_byte_reader(api, reader);
         Self::from_raw_handle(handle)
     }
 
@@ -135,7 +135,7 @@ where
     const SKIPS_RESERIALIZATION: bool = false;
 
     fn from_byte_reader<Reader: FnMut(&mut [u8])>(api: M, reader: Reader) -> Self {
-        let handle = Handle::from_byte_reader(api.clone(), reader);
+        let handle = Handle::from_byte_reader(api, reader);
         Self::from_raw_handle(handle)
     }
 
