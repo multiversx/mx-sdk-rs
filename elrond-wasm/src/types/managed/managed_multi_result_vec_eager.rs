@@ -10,14 +10,14 @@ use crate::{
 use super::{ManagedVec, ManagedVecItem, ManagedVecIterator};
 
 #[derive(Clone, Default)]
-pub struct ManagedMultiResultVecEager<M: ManagedTypeApi, T: ManagedVecItem<M>>(ManagedVec<M, T>);
+pub struct ManagedMultiResultVecEager<M: ManagedTypeApi, T: ManagedVecItem>(ManagedVec<M, T>);
 
 pub type ManagedVarArgsEager<M, T> = ManagedMultiResultVecEager<M, T>;
 
 impl<M, T> From<ManagedVec<M, T>> for ManagedMultiResultVecEager<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem<M>,
+    T: ManagedVecItem,
 {
     #[inline]
     fn from(managed_vec: ManagedVec<M, T>) -> Self {
@@ -28,7 +28,7 @@ where
 impl<M, T> ManagedMultiResultVecEager<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem<M>,
+    T: ManagedVecItem,
 {
     #[inline]
     pub fn new() -> Self {
@@ -101,7 +101,7 @@ where
 impl<M, T, I> From<Vec<I>> for ManagedMultiResultVecEager<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem<M>,
+    T: ManagedVecItem,
     I: Into<T>,
 {
     fn from(v: Vec<I>) -> Self {
@@ -115,7 +115,7 @@ where
 impl<M, T> DynArg for ManagedMultiResultVecEager<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem<M> + DynArg,
+    T: ManagedVecItem + DynArg,
 {
     fn dyn_load<I: DynArgInput>(loader: &mut I, arg_id: ArgId) -> Self {
         let mut result_vec: ManagedVec<M, T> = ManagedVec::new();
@@ -129,7 +129,7 @@ where
 impl<M, T> EndpointResult for ManagedMultiResultVecEager<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem<M> + EndpointResult,
+    T: ManagedVecItem + EndpointResult,
 {
     type DecodeAs = ManagedMultiResultVecEager<M, T>;
 
@@ -146,7 +146,7 @@ where
 impl<M, T> ContractCallArg for &ManagedMultiResultVecEager<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem<M> + ContractCallArg,
+    T: ManagedVecItem + ContractCallArg,
 {
     fn push_dyn_arg<O: DynArgOutput>(&self, output: &mut O) {
         for elem in self.0.iter() {
@@ -158,7 +158,7 @@ where
 impl<M, T> ContractCallArg for ManagedMultiResultVecEager<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem<M> + ContractCallArg,
+    T: ManagedVecItem + ContractCallArg,
 {
     fn push_dyn_arg<O: DynArgOutput>(&self, output: &mut O) {
         (&self).push_dyn_arg(output)
@@ -168,7 +168,7 @@ where
 impl<M, T: TypeAbi> TypeAbi for ManagedMultiResultVecEager<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem<M>,
+    T: ManagedVecItem,
 {
     fn type_name() -> String {
         let mut repr = String::from("variadic<");

@@ -13,7 +13,7 @@ use alloc::string::String;
 pub struct ManagedCountedMultiResultVec<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem<M>,
+    T: ManagedVecItem,
 {
     pub(super) contents: ManagedVec<M, T>,
 }
@@ -23,7 +23,7 @@ pub type ManagedCountedVarArgs<M, T> = ManagedCountedMultiResultVec<M, T>;
 impl<M, T> ManagedCountedMultiResultVec<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem<M>,
+    T: ManagedVecItem,
 {
     #[inline]
     pub fn new() -> Self {
@@ -34,7 +34,7 @@ where
 impl<M, T> ManagedCountedMultiResultVec<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem<M>,
+    T: ManagedVecItem,
 {
     #[inline]
     pub fn len(&self) -> usize {
@@ -50,7 +50,7 @@ where
 impl<M, T> ManagedCountedMultiResultVec<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem<M>,
+    T: ManagedVecItem,
 {
     #[inline]
     pub fn push(&mut self, item: T) {
@@ -66,7 +66,7 @@ where
 impl<M, T> From<ManagedVec<M, T>> for ManagedCountedMultiResultVec<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem<M>,
+    T: ManagedVecItem,
 {
     #[inline]
     #[rustfmt::skip]
@@ -80,7 +80,7 @@ where
 impl<M, T> DynArg for ManagedCountedMultiResultVec<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem<M> + DynArg,
+    T: ManagedVecItem + DynArg,
 {
     fn dyn_load<I: DynArgInput>(loader: &mut I, arg_id: ArgId) -> Self {
         let mut result = ManagedCountedMultiResultVec::new();
@@ -95,7 +95,7 @@ where
 impl<M, T> EndpointResult for ManagedCountedMultiResultVec<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem<M> + EndpointResult,
+    T: ManagedVecItem + EndpointResult,
 {
     type DecodeAs = ManagedCountedMultiResultVec<M, T>;
 
@@ -112,7 +112,7 @@ where
 impl<M, T> ContractCallArg for &ManagedCountedMultiResultVec<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem<M> + ContractCallArg,
+    T: ManagedVecItem + ContractCallArg,
 {
     fn push_dyn_arg<O: DynArgOutput>(&self, output: &mut O) {
         self.len().push_dyn_arg(output);
@@ -125,7 +125,7 @@ where
 impl<M, T> ContractCallArg for ManagedCountedMultiResultVec<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem<M> + ContractCallArg,
+    T: ManagedVecItem + ContractCallArg,
 {
     fn push_dyn_arg<O: DynArgOutput>(&self, output: &mut O) {
         (&self).push_dyn_arg(output)
@@ -135,7 +135,7 @@ where
 impl<M, T> TypeAbi for ManagedCountedMultiResultVec<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem<M> + TypeAbi,
+    T: ManagedVecItem + TypeAbi,
 {
     fn type_name() -> String {
         let mut repr = String::from("counted-variadic<");

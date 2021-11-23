@@ -18,7 +18,7 @@ use elrond_codec::{
 pub struct ManagedVec<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem<M>,
+    T: ManagedVecItem,
 {
     pub(crate) buffer: ManagedBuffer<M>,
     _phantom: PhantomData<T>,
@@ -27,7 +27,7 @@ where
 impl<M, T> ManagedType<M> for ManagedVec<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem<M>,
+    T: ManagedVecItem,
 {
     #[inline]
     fn from_raw_handle(handle: Handle) -> Self {
@@ -46,7 +46,7 @@ where
 impl<M, T> ManagedVec<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem<M>,
+    T: ManagedVecItem,
 {
     #[inline]
     pub fn new() -> Self {
@@ -68,7 +68,7 @@ where
 impl<M, T, I> From<Vec<I>> for ManagedVec<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem<M>,
+    T: ManagedVecItem,
     I: Into<T>,
 {
     fn from(v: Vec<I>) -> Self {
@@ -83,7 +83,7 @@ where
 impl<M, T> Default for ManagedVec<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem<M>,
+    T: ManagedVecItem,
 {
     #[inline]
     fn default() -> Self {
@@ -94,7 +94,7 @@ where
 impl<M, T> ManagedVec<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem<M>,
+    T: ManagedVecItem,
 {
     /// Length of the underlying buffer in bytes.
     #[inline]
@@ -119,7 +119,7 @@ where
     pub fn get(&self, index: usize) -> Option<T> {
         let byte_index = index * T::PAYLOAD_SIZE;
         let mut load_result = Ok(());
-        let result = T::from_byte_reader(self.type_manager(), |dest_slice| {
+        let result = T::from_byte_reader(|dest_slice| {
             load_result = self.buffer.load_slice(byte_index, dest_slice);
         });
         match load_result {
@@ -199,7 +199,7 @@ where
 impl<M, T> Clone for ManagedVec<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem<M> + Clone,
+    T: ManagedVecItem + Clone,
 {
     fn clone(&self) -> Self {
         let mut result = ManagedVec::new();
@@ -213,7 +213,7 @@ where
 impl<M, T> PartialEq for ManagedVec<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem<M> + PartialEq,
+    T: ManagedVecItem + PartialEq,
 {
     #[inline]
     fn eq(&self, other: &Self) -> bool {
@@ -227,10 +227,10 @@ where
         }
         let mut byte_index = 0;
         while byte_index < self_len {
-            let self_item = T::from_byte_reader(self.type_manager(), |dest_slice| {
+            let self_item = T::from_byte_reader(|dest_slice| {
                 let _ = self.buffer.load_slice(byte_index, dest_slice);
             });
-            let other_item = T::from_byte_reader(self.type_manager(), |dest_slice| {
+            let other_item = T::from_byte_reader(|dest_slice| {
                 let _ = other.buffer.load_slice(byte_index, dest_slice);
             });
             if self_item != other_item {
@@ -245,14 +245,14 @@ where
 impl<M, T> Eq for ManagedVec<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem<M> + PartialEq,
+    T: ManagedVecItem + PartialEq,
 {
 }
 
 impl<M, T> TopEncode for ManagedVec<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem<M> + NestedEncode,
+    T: ManagedVecItem + NestedEncode,
 {
     #[inline]
     fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
@@ -272,7 +272,7 @@ where
 impl<M, T> NestedEncode for ManagedVec<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem<M> + NestedEncode,
+    T: ManagedVecItem + NestedEncode,
 {
     fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
         self.len().dep_encode(dest)?;
@@ -286,7 +286,7 @@ where
 impl<M, T> TopDecode for ManagedVec<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem<M> + NestedDecode,
+    T: ManagedVecItem + NestedDecode,
 {
     fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
         let buffer = ManagedBuffer::top_decode(input)?;
@@ -306,7 +306,7 @@ where
 impl<M, T> NestedDecode for ManagedVec<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem<M> + NestedDecode,
+    T: ManagedVecItem + NestedDecode,
 {
     fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
         let size = usize::dep_decode(input)?;
@@ -321,7 +321,7 @@ where
 impl<M, T> TypeAbi for ManagedVec<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem<M> + TypeAbi,
+    T: ManagedVecItem + TypeAbi,
 {
     /// It is semantically equivalent to any list of `T`.
     fn type_name() -> String {

@@ -53,7 +53,7 @@ where
 impl<M, T> From<ManagedVec<M, T>> for ManagedMultiResultVec<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem<M> + TopEncode + 'static,
+    T: ManagedVecItem + TopEncode + 'static,
 {
     #[inline]
     #[rustfmt::skip]
@@ -69,7 +69,7 @@ where
 impl<M, T> From<&ManagedVec<M, T>> for ManagedMultiResultVec<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem<M> + TopEncode,
+    T: ManagedVecItem + TopEncode,
 {
     #[inline]
     fn from(v: &ManagedVec<M, T>) -> Self {
@@ -115,7 +115,7 @@ where
 impl<M, T> ManagedMultiResultVec<M, T>
 where
     M: ManagedTypeApi + ErrorApi,
-    T: ManagedVecItem<M> + TopDecode,
+    T: ManagedVecItem + TopDecode,
 {
     pub fn to_vec(&self) -> ManagedVec<M, T> {
         let mut result = ManagedVec::new();
