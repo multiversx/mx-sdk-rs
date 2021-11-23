@@ -247,9 +247,8 @@ impl SendApi for VmApiImpl {
                 result_handle,
             );
 
-            let new_managed_address =
-                ManagedAddress::from_raw_handle(self.clone(), new_address_handle);
-            let results = ManagedVec::from_raw_handle(self.clone(), result_handle);
+            let new_managed_address = ManagedAddress::from_raw_handle(new_address_handle);
+            let results = ManagedVec::from_raw_handle(result_handle);
 
             (new_managed_address, results)
         }
@@ -277,9 +276,8 @@ impl SendApi for VmApiImpl {
                 result_handle,
             );
 
-            let new_managed_address =
-                ManagedAddress::from_raw_handle(self.clone(), new_address_handle);
-            let results = ManagedVec::from_raw_handle(self.clone(), result_handle);
+            let new_managed_address = ManagedAddress::from_raw_handle(new_address_handle);
+            let results = ManagedVec::from_raw_handle(result_handle);
 
             (new_managed_address, results)
         }
@@ -356,7 +354,7 @@ impl SendApi for VmApiImpl {
                 result_handle,
             );
 
-            ManagedVec::from_raw_handle(self.clone(), result_handle)
+            ManagedVec::from_raw_handle(result_handle)
         }
     }
 
@@ -385,7 +383,7 @@ impl SendApi for VmApiImpl {
                 result_handle,
             );
 
-            let result = ManagedVec::from_raw_handle(self.clone(), result_handle);
+            let result = ManagedVec::from_raw_handle(result_handle);
 
             let num_return_data_after = num_return_data_before + result.len();
             let (result_start_index, result_end_index) = range_closure(
@@ -421,7 +419,7 @@ impl SendApi for VmApiImpl {
                 result_handle,
             );
 
-            ManagedVec::from_raw_handle(self.clone(), result_handle)
+            ManagedVec::from_raw_handle(result_handle)
         }
     }
 
@@ -445,7 +443,7 @@ impl SendApi for VmApiImpl {
                 result_handle,
             );
 
-            ManagedVec::from_raw_handle(self.clone(), result_handle)
+            ManagedVec::from_raw_handle(result_handle)
         }
     }
 
@@ -467,7 +465,7 @@ impl SendApi for VmApiImpl {
                 result_handle,
             );
 
-            ManagedVec::from_raw_handle(self.clone(), result_handle)
+            ManagedVec::from_raw_handle(result_handle)
         }
     }
 
@@ -479,7 +477,6 @@ impl SendApi for VmApiImpl {
     fn storage_load_tx_hash_key(&self) -> ManagedBuffer<Self> {
         let tx_hash = self.get_tx_hash();
         ManagedBuffer::from_raw_handle(
-            self.clone(),
             self.storage_load_managed_buffer_raw(tx_hash.get_raw_handle()),
         )
     }

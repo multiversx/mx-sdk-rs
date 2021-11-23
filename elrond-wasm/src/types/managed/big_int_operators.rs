@@ -4,7 +4,7 @@ use core::ops::{
 
 use crate::api::ManagedTypeApi;
 
-use super::BigInt;
+use super::{BigInt, ManagedType};
 
 macro_rules! binary_operator {
     ($trait:ident, $method:ident, $api_func:ident) => {
@@ -14,7 +14,7 @@ macro_rules! binary_operator {
             fn $method(self, other: BigInt<M>) -> BigInt<M> {
                 let api = M::instance();
                 api.$api_func(self.handle, self.handle, other.handle);
-                BigInt::from_raw_handle_no_api(self.handle)
+                BigInt::from_raw_handle(self.handle)
             }
         }
 
@@ -25,7 +25,7 @@ macro_rules! binary_operator {
                 let api = M::instance();
                 let result = api.bi_new_zero();
                 api.$api_func(result, self.handle, other.handle);
-                BigInt::from_raw_handle_no_api(result)
+                BigInt::from_raw_handle(result)
             }
         }
     };
@@ -70,6 +70,6 @@ impl<M: ManagedTypeApi> Neg for BigInt<M> {
         let api = M::instance();
         let result = api.bi_new_zero();
         api.bi_neg(result, self.handle);
-        BigInt::from_raw_handle_no_api(result)
+        BigInt::from_raw_handle(result)
     }
 }

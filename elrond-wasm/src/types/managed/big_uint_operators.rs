@@ -15,7 +15,7 @@ macro_rules! binary_operator {
             fn $method(self, other: BigUint<M>) -> BigUint<M> {
                 self.type_manager()
                     .$api_func(self.handle, self.handle, other.handle);
-                BigUint::from_raw_handle_no_api(self.handle)
+                BigUint::from_raw_handle(self.handle)
             }
         }
 
@@ -26,7 +26,7 @@ macro_rules! binary_operator {
                 let result = self.type_manager().bi_new_zero();
                 self.type_manager()
                     .$api_func(result, self.handle, other.handle);
-                BigUint::from_raw_handle_no_api(result)
+                BigUint::from_raw_handle(result)
             }
         }
 
@@ -36,7 +36,7 @@ macro_rules! binary_operator {
             fn $method(self, other: &BigUint<M>) -> BigUint<M> {
                 self.type_manager()
                     .$api_func(self.handle, self.handle, other.handle);
-                BigUint::from_raw_handle_no_api(self.handle)
+                BigUint::from_raw_handle(self.handle)
             }
         }
 
@@ -47,7 +47,7 @@ macro_rules! binary_operator {
                 let other_handle = self.type_manager().bi_new(other as i64);
                 self.type_manager()
                     .$api_func(self.handle, self.handle, other_handle);
-                BigUint::from_raw_handle_no_api(self.handle)
+                BigUint::from_raw_handle(self.handle)
             }
         }
 
@@ -59,7 +59,7 @@ macro_rules! binary_operator {
                 let result = self.type_manager().bi_new_zero();
                 self.type_manager()
                     .$api_func(result, self.handle, other_handle);
-                BigUint::from_raw_handle_no_api(result)
+                BigUint::from_raw_handle(result)
             }
         }
 
@@ -70,7 +70,7 @@ macro_rules! binary_operator {
                 let other_handle = self.type_manager().bi_new(other as i64);
                 self.type_manager()
                     .$api_func(self.handle, self.handle, other_handle);
-                BigUint::from_raw_handle_no_api(self.handle)
+                BigUint::from_raw_handle(self.handle)
             }
         }
 
@@ -82,7 +82,7 @@ macro_rules! binary_operator {
                 let result = self.type_manager().bi_new_zero();
                 self.type_manager()
                     .$api_func(result, self.handle, other_handle);
-                BigUint::from_raw_handle_no_api(result)
+                BigUint::from_raw_handle(result)
             }
         }
     };
@@ -160,7 +160,7 @@ macro_rules! shift_traits {
             fn $method(self, rhs: usize) -> BigUint<M> {
                 let result = self.type_manager().bi_new_zero();
                 self.type_manager().$api_func(result, self.handle, rhs);
-                BigUint::from_raw_handle_no_api(result)
+                BigUint::from_raw_handle(result)
             }
         }
     };

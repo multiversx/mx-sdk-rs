@@ -19,9 +19,9 @@ pub struct BigUint<M: ManagedTypeApi> {
 
 impl<M: ManagedTypeApi> ManagedType<M> for BigUint<M> {
     #[doc(hidden)]
-    fn from_raw_handle(_api: M, raw_handle: Handle) -> Self {
+    fn from_raw_handle(handle: Handle) -> Self {
         BigUint {
-            handle: raw_handle,
+            handle,
             _phantom: PhantomData,
         }
     }
@@ -83,15 +83,6 @@ impl<M: ManagedTypeApi> ManagedDefault<M> for BigUint<M> {
 
 /// More conversions here.
 impl<M: ManagedTypeApi> BigUint<M> {
-    /// TODO: will be the only one left
-    #[inline]
-    pub fn from_raw_handle_no_api(handle: Handle) -> Self {
-        BigUint {
-            handle,
-            _phantom: PhantomData,
-        }
-    }
-
     #[inline]
     pub fn zero(api: M) -> Self {
         BigUint {
@@ -125,12 +116,12 @@ impl<M: ManagedTypeApi> BigUint<M> {
 
     #[inline]
     pub fn from_bytes_be_buffer(managed_buffer: &ManagedBuffer<M>) -> Self {
-        BigUint::from_raw_handle_no_api(M::instance().mb_to_big_int_unsigned(managed_buffer.handle))
+        BigUint::from_raw_handle(M::instance().mb_to_big_int_unsigned(managed_buffer.handle))
     }
 
     #[inline]
     pub fn to_bytes_be_buffer(&self) -> ManagedBuffer<M> {
-        ManagedBuffer::from_raw_handle_no_api(M::instance().mb_from_big_int_unsigned(self.handle))
+        ManagedBuffer::from_raw_handle(M::instance().mb_from_big_int_unsigned(self.handle))
     }
 
     pub fn copy_to_array_big_endian_pad_right(&self, target: &mut [u8; 32]) {

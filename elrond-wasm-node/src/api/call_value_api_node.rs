@@ -45,7 +45,7 @@ impl CallValueApi for VmApiImpl {
         unsafe {
             let value_handle = bigIntNew(0);
             bigIntGetCallValue(value_handle);
-            BigUint::from_raw_handle(self.clone(), value_handle)
+            BigUint::from_raw_handle(value_handle)
         }
     }
 
@@ -53,7 +53,7 @@ impl CallValueApi for VmApiImpl {
         unsafe {
             let value_handle = bigIntNew(0);
             bigIntGetESDTCallValue(value_handle);
-            BigUint::from_raw_handle(self.clone(), value_handle)
+            BigUint::from_raw_handle(value_handle)
         }
     }
 
@@ -85,7 +85,7 @@ impl CallValueApi for VmApiImpl {
         unsafe {
             let value_handle = bigIntNew(0);
             bigIntGetESDTCallValueByIndex(value_handle, index as i32);
-            BigUint::from_raw_handle(self.clone(), value_handle)
+            BigUint::from_raw_handle(value_handle)
         }
     }
 
@@ -116,7 +116,7 @@ impl CallValueApi for VmApiImpl {
         unsafe {
             let result_handle = mBufferNew();
             managedGetMultiESDTCallValue(result_handle);
-            elrond_wasm::types::ManagedVec::from_raw_handle(self.clone(), result_handle)
+            elrond_wasm::types::ManagedVec::from_raw_handle(result_handle)
         }
     }
 }
