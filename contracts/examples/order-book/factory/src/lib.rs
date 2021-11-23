@@ -26,7 +26,7 @@ pub trait Factory {
 
         let (pair_address, _) = self.raw_vm_api().deploy_from_source_contract(
             self.blockchain().get_gas_left(),
-            &self.types().big_uint_zero(),
+            &BigUint::zero(),
             &self.pair_template_address().get(),
             CodeMetadata::DEFAULT,
             &arguments,

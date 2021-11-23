@@ -199,7 +199,7 @@ pub trait Vault {
                 &payment.token_identifier,
                 &payment.amount,
                 &ManagedBuffer::new(),
-                &self.types().big_uint_zero(),
+                &BigUint::zero(),
                 &ManagedBuffer::new(),
                 &(),
                 &uris,

@@ -55,7 +55,7 @@ pub trait KittyOwnership {
             &self.blockchain().get_caller(),
             &self
                 .blockchain()
-                .get_sc_balance(&self.types().token_identifier_egld(), 0),
+                .get_sc_balance(&TokenIdentifier::egld(), 0),
             b"claim",
         );
 

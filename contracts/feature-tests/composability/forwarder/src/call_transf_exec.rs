@@ -85,13 +85,7 @@ pub trait ForwarderTransferExecuteModule {
 
         let gas_left_after = self.blockchain().get_gas_left();
 
-        (
-            gas_left_before,
-            gas_left_after,
-            self.types().big_uint_zero(),
-            token,
-        )
-            .into()
+        (gas_left_before, gas_left_after, BigUint::zero(), token).into()
     }
 
     #[endpoint]
