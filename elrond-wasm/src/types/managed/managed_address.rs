@@ -1,4 +1,4 @@
-use super::{ManagedByteArray, ManagedType};
+use super::{ManagedBuffer, ManagedByteArray, ManagedType};
 use crate::{
     abi::TypeAbi,
     api::{Handle, ManagedTypeApi},
@@ -45,6 +45,11 @@ where
         ManagedAddress {
             bytes: ManagedByteArray::new_from_bytes(bytes),
         }
+    }
+
+    #[inline]
+    pub fn as_managed_buffer(&self) -> &ManagedBuffer<M> {
+        self.bytes.as_managed_buffer()
     }
 }
 
