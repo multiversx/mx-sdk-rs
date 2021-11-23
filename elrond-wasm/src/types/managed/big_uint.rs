@@ -46,16 +46,22 @@ impl<M: ManagedTypeApi> From<&ManagedBuffer<M>> for BigUint<M> {
     }
 }
 
-impl<M, U> From<U> for BigUint<M>
-where
-    M: ManagedTypeApi,
-    U: Into<u64>,
-{
-    #[inline]
-    fn from(value: U) -> Self {
-        BigUint::from_raw_handle(M::instance().bi_new(value.into() as i64))
-    }
+macro_rules! big_uint_conv_num {
+    ($num_ty:ty) => {
+        impl<M: ManagedTypeApi> From<$num_ty> for BigUint<M> {
+            #[inline]
+            fn from(value: $num_ty) -> Self {
+                BigUint::from_raw_handle(M::instance().bi_new(value as i64))
+            }
+        }
+    };
 }
+
+big_uint_conv_num! {u64}
+big_uint_conv_num! {u32}
+big_uint_conv_num! {usize}
+big_uint_conv_num! {u16}
+big_uint_conv_num! {u8}
 
 impl<M: ManagedTypeApi> Default for BigUint<M> {
     #[inline]
