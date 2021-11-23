@@ -22,7 +22,7 @@ where
     }
 
     pub fn top_encode_to_managed_buffer<T: TopEncode>(&self, value: &T) -> ManagedBuffer<M> {
-        let mut result = ManagedBuffer::new(self.api.clone());
+        let mut result = ManagedBuffer::new();
         value.top_encode_or_exit(&mut result, self.api.clone(), top_encode_exit);
         result
     }
@@ -49,8 +49,7 @@ fn top_encode_exit<M>(api: M, encode_err: EncodeError) -> !
 where
     M: ManagedTypeApi + ErrorApi + 'static,
 {
-    let mut message_buffer =
-        ManagedBuffer::new_from_bytes(api.clone(), err_msg::SERIALIZER_ENCODE_ERROR);
+    let mut message_buffer = ManagedBuffer::<M>::new_from_bytes(err_msg::SERIALIZER_ENCODE_ERROR);
     message_buffer.append_bytes(encode_err.message_bytes());
     api.signal_error_from_buffer(message_buffer.get_raw_handle())
 }
@@ -60,8 +59,7 @@ fn top_decode_exit<M>(api: M, decode_err: DecodeError) -> !
 where
     M: ManagedTypeApi + ErrorApi + 'static,
 {
-    let mut message_buffer =
-        ManagedBuffer::new_from_bytes(api.clone(), err_msg::SERIALIZER_DECODE_ERROR);
+    let mut message_buffer = ManagedBuffer::<M>::new_from_bytes(err_msg::SERIALIZER_DECODE_ERROR);
     message_buffer.append_bytes(decode_err.message_bytes());
     api.signal_error_from_buffer(message_buffer.get_raw_handle())
 }

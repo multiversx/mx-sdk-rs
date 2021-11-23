@@ -84,11 +84,7 @@ pub trait MultisigStateModule {
         let signer_ids = self.action_signer_ids(action_id);
         let mut signers = ManagedVec::new();
         for signer_id in signer_ids.iter() {
-            signers.push(
-                self.user_mapper()
-                    .get_user_address_unchecked(signer_id)
-                    .managed_into(),
-            );
+            signers.push(self.user_mapper().get_user_address_unchecked(signer_id));
         }
         signers
     }

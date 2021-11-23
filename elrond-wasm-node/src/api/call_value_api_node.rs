@@ -45,7 +45,7 @@ impl CallValueApi for VmApiImpl {
         unsafe {
             let value_handle = bigIntNew(0);
             bigIntGetCallValue(value_handle);
-            BigUint::from_raw_handle(self.clone(), value_handle)
+            BigUint::from_raw_handle(value_handle)
         }
     }
 
@@ -53,7 +53,7 @@ impl CallValueApi for VmApiImpl {
         unsafe {
             let value_handle = bigIntNew(0);
             bigIntGetESDTCallValue(value_handle);
-            BigUint::from_raw_handle(self.clone(), value_handle)
+            BigUint::from_raw_handle(value_handle)
         }
     }
 
@@ -62,9 +62,9 @@ impl CallValueApi for VmApiImpl {
             let mut name_buffer = [0u8; MAX_POSSIBLE_TOKEN_IDENTIFIER_LENGTH];
             let name_len = getESDTTokenName(name_buffer.as_mut_ptr());
             if name_len == 0 {
-                TokenIdentifier::egld(self.clone())
+                TokenIdentifier::egld()
             } else {
-                TokenIdentifier::from_esdt_bytes(self.clone(), &name_buffer[..name_len as usize])
+                TokenIdentifier::from_esdt_bytes(&name_buffer[..name_len as usize])
             }
         }
     }
@@ -85,7 +85,7 @@ impl CallValueApi for VmApiImpl {
         unsafe {
             let value_handle = bigIntNew(0);
             bigIntGetESDTCallValueByIndex(value_handle, index as i32);
-            BigUint::from_raw_handle(self.clone(), value_handle)
+            BigUint::from_raw_handle(value_handle)
         }
     }
 
@@ -94,9 +94,9 @@ impl CallValueApi for VmApiImpl {
             let mut name_buffer = [0u8; MAX_POSSIBLE_TOKEN_IDENTIFIER_LENGTH];
             let name_len = getESDTTokenNameByIndex(name_buffer.as_mut_ptr(), index as i32);
             if name_len == 0 {
-                TokenIdentifier::egld(self.clone())
+                TokenIdentifier::egld()
             } else {
-                TokenIdentifier::from_esdt_bytes(self.clone(), &name_buffer[..name_len as usize])
+                TokenIdentifier::from_esdt_bytes(&name_buffer[..name_len as usize])
             }
         }
     }
@@ -116,7 +116,7 @@ impl CallValueApi for VmApiImpl {
         unsafe {
             let result_handle = mBufferNew();
             managedGetMultiESDTCallValue(result_handle);
-            elrond_wasm::types::ManagedVec::from_raw_handle(self.clone(), result_handle)
+            elrond_wasm::types::ManagedVec::from_raw_handle(result_handle)
         }
     }
 }

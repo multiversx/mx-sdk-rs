@@ -226,7 +226,7 @@ where
         let raw_handle = self
             .api
             .storage_load_big_uint_raw(storage::protected_keys::ELROND_REWARD_KEY);
-        BigUint::from_raw_handle(self.api.clone(), raw_handle)
+        BigUint::from_raw_handle(raw_handle)
     }
 
     /// Retrieves local roles for the token, by reading protected storage.
