@@ -25,11 +25,11 @@ pub struct ManagedStructWithToken<M: ManagedTypeApi> {
 #[test]
 fn struct_with_numbers_static() {
     assert_eq!(
-        <ManagedStructWithToken<DebugApi> as elrond_wasm::types::ManagedVecItem<DebugApi>>::PAYLOAD_SIZE,
+        <ManagedStructWithToken<DebugApi> as elrond_wasm::types::ManagedVecItem>::PAYLOAD_SIZE,
         28
     );
     assert!(
-        !<ManagedStructWithToken<DebugApi> as elrond_wasm::types::ManagedVecItem<DebugApi>>::SKIPS_RESERIALIZATION
+        !<ManagedStructWithToken<DebugApi> as elrond_wasm::types::ManagedVecItem>::SKIPS_RESERIALIZATION
     );
 }
 
@@ -47,28 +47,29 @@ fn struct_to_bytes_writer() {
         eth_address_1: ManagedByteArray::new_from_bytes(&[1u8; 20]),
         eth_address_2: ManagedByteArray::new_from_bytes(&[2u8; 20]),
     };
-    let mut arr: [u8; 28] = [0u8; <ManagedStructWithToken<DebugApi> as elrond_wasm::types::ManagedVecItem<
-        DebugApi,
-    >>::PAYLOAD_SIZE];
+    let mut arr: [u8; 28] = [0u8;
+        <ManagedStructWithToken<DebugApi> as elrond_wasm::types::ManagedVecItem>::PAYLOAD_SIZE];
 
-    <ManagedStructWithToken<DebugApi> as elrond_wasm::types::ManagedVecItem<DebugApi>>::to_byte_writer(
+    <ManagedStructWithToken<DebugApi> as elrond_wasm::types::ManagedVecItem>::to_byte_writer(
         &s,
         |bytes| {
-            arr[0..<ManagedStructWithToken::<DebugApi> as elrond_wasm::types::ManagedVecItem<DebugApi>>::PAYLOAD_SIZE].copy_from_slice(bytes);
+            arr[0..<ManagedStructWithToken::<DebugApi> as elrond_wasm::types::ManagedVecItem>::PAYLOAD_SIZE].copy_from_slice(bytes);
 
-            assert_eq!(arr, [
-                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                0x00, 0x01, 0x23, 0x45,
-                0x00, 0x00, 0x00, 0x01,
-                0x00, 0x00, 0x00, 0x02,
-            ]);
+            assert_eq!(
+                arr,
+                [
+                    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                    0x00, 0x00, 0x00, 0x00, 0x01, 0x23, 0x45, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00,
+                    0x00, 0x02,
+                ]
+            );
         },
     );
 }
 
 #[test]
 fn struct_from_bytes_reader() {
-    let api = DebugApi::dummy();
+    let _ = DebugApi::dummy();
     let s = ManagedStructWithToken::<DebugApi> {
         token: EsdtTokenPayment {
             token_identifier: TokenIdentifier::from(&b"MYTOKEN-12345"[..]),
@@ -85,17 +86,16 @@ fn struct_from_bytes_reader() {
         0x00, 0x00, 0x01, 0x23, 0x45, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02,
     ];
 
-    let struct_from_bytes = <ManagedStructWithToken<DebugApi> as elrond_wasm::types::ManagedVecItem<
-        DebugApi,
-    >>::from_byte_reader(api.clone(), |bytes| {
-        bytes.copy_from_slice(
+    let struct_from_bytes =
+        <ManagedStructWithToken<DebugApi> as elrond_wasm::types::ManagedVecItem>::from_byte_reader(
+            |bytes| {
+                bytes.copy_from_slice(
                     &arr
                         [0
-                            ..<ManagedStructWithToken::<DebugApi> as elrond_wasm::types::ManagedVecItem<
-                                DebugApi,
-                            >>::PAYLOAD_SIZE],
+                            ..<ManagedStructWithToken::<DebugApi> as elrond_wasm::types::ManagedVecItem>::PAYLOAD_SIZE],
                 );
-    });
+            },
+        );
     assert_eq!(s.num, struct_from_bytes.num);
     assert_eq!(
         s.token.token_identifier,
