@@ -143,8 +143,8 @@ pub trait OrdersModule:
 
         let penalty_percent = penalty_count * FEE_PENALTY_INCREASE_PERCENT;
         let penalty_amount = self.rule_of_three(
-            &self.types().big_uint_from(penalty_percent),
-            &self.types().big_uint_from(PERCENT_BASE_POINTS),
+            &BigUint::from(penalty_percent),
+            &BigUint::from(PERCENT_BASE_POINTS),
             &order.input_amount,
         );
         let amount = &order.input_amount - &penalty_amount;
@@ -188,8 +188,8 @@ pub trait OrdersModule:
         let penalty_count = (epoch - order.create_epoch) / FEE_PENALTY_INCREASE_EPOCHS;
         let penalty_percent = penalty_count * FEE_PENALTY_INCREASE_PERCENT;
         let penalty_amount = self.rule_of_three(
-            &self.types().big_uint_from(penalty_percent),
-            &self.types().big_uint_from(PERCENT_BASE_POINTS),
+            &BigUint::from(penalty_percent),
+            &BigUint::from(PERCENT_BASE_POINTS),
             &order.input_amount,
         );
         let amount = &order.input_amount - &penalty_amount;
@@ -267,8 +267,8 @@ pub trait OrdersModule:
     }
 
     fn get_orders_sum_up(&self, orders: &[Order<Self::Api>]) -> (BigUint, BigUint) {
-        let mut amount_paid = self.types().big_uint_zero();
-        let mut amount_requested = self.types().big_uint_zero();
+        let mut amount_paid = BigUint::zero();
+        let mut amount_requested = BigUint::zero();
 
         orders.iter().for_each(|x| {
             amount_paid += &x.input_amount;
@@ -291,7 +291,7 @@ pub trait OrdersModule:
             to: self.blockchain().get_caller(),
             payment: Payment {
                 token_id: token_requested.clone(),
-                amount: self.types().big_uint_zero(),
+                amount: BigUint::zero(),
             },
         };
 
@@ -302,10 +302,8 @@ pub trait OrdersModule:
 
             let order_deal = self.rule_of_three(&order.input_amount, &total_paid, &leftover);
             let match_provider_deal_amount = self.rule_of_three(
-                &self
-                    .types()
-                    .big_uint_from(order.deal_config.match_provider_percent),
-                &self.types().big_uint_from(PERCENT_BASE_POINTS),
+                &order.deal_config.match_provider_percent.into(),
+                &PERCENT_BASE_POINTS.into(),
                 &order_deal,
             );
             let creator_deal_amount = &order_deal - &match_provider_deal_amount;

@@ -20,7 +20,7 @@ pub trait EsdtModule {
         only_owner!(self, "only owner can issue token");
         require!(self.token_id().is_empty(), "Token already issued");
 
-        let initial_supply = self.types().big_uint_from(1u32);
+        let initial_supply = BigUint::from(1u32);
 
         Ok(self
             .send()
