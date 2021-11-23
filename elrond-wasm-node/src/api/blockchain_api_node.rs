@@ -533,4 +533,10 @@ impl BlockchainApi for crate::VmApiImpl {
             }
         }
     }
+
+    // #[cfg(feature = "unmanaged-ei")]
+    // fn get_esdt_local_roles(&self, token_id: &TokenIdentifier<Self>) -> EsdtLocalRoleFlags {
+    //     let managed_token_id = token.as_managed_buffer();
+    //     unsafe { getESDTLocalRoles(managed_token_id.get_raw_handle()) as u64 }
+    // }
 }
