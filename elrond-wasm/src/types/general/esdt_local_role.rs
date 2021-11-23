@@ -2,7 +2,7 @@ use elrond_codec::elrond_codec_derive::{NestedDecode, NestedEncode, TopDecode, T
 
 use super::EsdtLocalRoleFlags;
 use crate as elrond_wasm;
-use crate::{api::ManagedTypeApi, derive::TypeAbi, types::ManagedVecItem};
+use crate::{derive::TypeAbi, types::ManagedVecItem};
 
 const ESDT_ROLE_NONE: &[u8] = &[];
 const ESDT_ROLE_LOCAL_MINT: &[u8] = b"ESDTRoleLocalMint";
@@ -107,15 +107,15 @@ impl<'a> From<&'a [u8]> for EsdtLocalRole {
     }
 }
 
-impl<M: ManagedTypeApi> ManagedVecItem<M> for EsdtLocalRole {
+impl ManagedVecItem for EsdtLocalRole {
     const PAYLOAD_SIZE: usize = 1;
     const SKIPS_RESERIALIZATION: bool = false; // TODO: might be ok to be true, but needs testing
 
-    fn from_byte_reader<Reader: FnMut(&mut [u8])>(api: M, reader: Reader) -> Self {
-        u8::from_byte_reader(api, reader).into()
+    fn from_byte_reader<Reader: FnMut(&mut [u8])>(reader: Reader) -> Self {
+        u8::from_byte_reader(reader).into()
     }
 
     fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, writer: Writer) -> R {
-        <u8 as ManagedVecItem<M>>::to_byte_writer(&self.as_u8(), writer)
+        <u8 as ManagedVecItem>::to_byte_writer(&self.as_u8(), writer)
     }
 }

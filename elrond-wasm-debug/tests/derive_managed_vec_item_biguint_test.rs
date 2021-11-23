@@ -21,31 +21,29 @@ pub struct ManagedStructWithBigUint<M: ManagedTypeApi> {
 #[test]
 fn struct_with_numbers_static() {
     assert_eq!(
-        <ManagedStructWithBigUint<DebugApi> as elrond_wasm::types::ManagedVecItem<DebugApi>>::PAYLOAD_SIZE,
+        <ManagedStructWithBigUint<DebugApi> as elrond_wasm::types::ManagedVecItem>::PAYLOAD_SIZE,
         8
     );
     assert!(
-        !<ManagedStructWithBigUint<DebugApi> as elrond_wasm::types::ManagedVecItem<DebugApi>>::SKIPS_RESERIALIZATION
+        !<ManagedStructWithBigUint<DebugApi> as elrond_wasm::types::ManagedVecItem>::SKIPS_RESERIALIZATION
     );
 }
 
 #[test]
-fn struct_to_bytes_writer() {
+fn managed_struct_to_bytes_writer() {
     let _ = DebugApi::dummy();
     let fortytwo = 42u64;
     let s = ManagedStructWithBigUint::<DebugApi> {
         big_uint: BigUint::from(fortytwo),
         num: 0x12345,
     };
-    let mut arr: [u8; 8] =
-        [0u8; <ManagedStructWithBigUint<DebugApi> as elrond_wasm::types::ManagedVecItem<
-            DebugApi,
-        >>::PAYLOAD_SIZE];
+    let mut arr: [u8; 8] = [0u8;
+        <ManagedStructWithBigUint<DebugApi> as elrond_wasm::types::ManagedVecItem>::PAYLOAD_SIZE];
 
-    <ManagedStructWithBigUint<DebugApi> as elrond_wasm::types::ManagedVecItem<DebugApi>>::to_byte_writer(
+    <ManagedStructWithBigUint<DebugApi> as elrond_wasm::types::ManagedVecItem>::to_byte_writer(
         &s,
         |bytes| {
-            arr[0..<ManagedStructWithBigUint::<DebugApi> as elrond_wasm::types::ManagedVecItem<DebugApi>>::PAYLOAD_SIZE].copy_from_slice(bytes);
+            arr[0..<ManagedStructWithBigUint::<DebugApi> as elrond_wasm::types::ManagedVecItem>::PAYLOAD_SIZE].copy_from_slice(bytes);
 
             assert_eq!(arr, [0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x23, 0x45]);
         },
@@ -53,23 +51,19 @@ fn struct_to_bytes_writer() {
 }
 
 #[test]
-fn struct_from_bytes_reader() {
-    let api = DebugApi::dummy();
+fn managed_struct_from_bytes_reader() {
+    let _ = DebugApi::dummy();
     let s = ManagedStructWithBigUint::<DebugApi> {
         big_uint: BigUint::from(42u64),
         num: 0x12345,
     };
     let arr: [u8; 8] = [0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x23, 0x45];
 
-    let struct_from_bytes = <ManagedStructWithBigUint<DebugApi> as elrond_wasm::types::ManagedVecItem<
-        DebugApi,
-    >>::from_byte_reader(api, |bytes| {
+    let struct_from_bytes = <ManagedStructWithBigUint<DebugApi> as elrond_wasm::types::ManagedVecItem>::from_byte_reader( |bytes| {
         bytes.copy_from_slice(
                     &arr
                         [0
-                            ..<ManagedStructWithBigUint::<DebugApi> as elrond_wasm::types::ManagedVecItem<
-                                DebugApi,
-                            >>::PAYLOAD_SIZE],
+                            ..<ManagedStructWithBigUint::<DebugApi> as elrond_wasm::types::ManagedVecItem>::PAYLOAD_SIZE],
                 );
     });
     assert_eq!(s.num, struct_from_bytes.num);

@@ -46,17 +46,17 @@ impl<M: ManagedTypeApi> ManagedTypeHelper<M> {
     }
 
     #[inline]
-    pub fn managed_vec_new<T: ManagedVecItem<M>>(&self) -> ManagedVec<M, T> {
+    pub fn managed_vec_new<T: ManagedVecItem>(&self) -> ManagedVec<M, T> {
         ManagedVec::new()
     }
 
     #[inline]
-    pub fn managed_vec_from_single_item<T: ManagedVecItem<M>>(&self, item: T) -> ManagedVec<M, T> {
+    pub fn managed_vec_from_single_item<T: ManagedVecItem>(&self, item: T) -> ManagedVec<M, T> {
         ManagedVec::from_single_item(item)
     }
 
     #[inline]
-    pub fn managed_vec_from<T: ManagedVecItem<M>, V: Into<ManagedVec<M, T>>>(
+    pub fn managed_vec_from<T: ManagedVecItem, V: Into<ManagedVec<M, T>>>(
         &self,
         value: V,
     ) -> ManagedVec<M, T> {

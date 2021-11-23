@@ -1,11 +1,11 @@
 use crate::api::ManagedTypeApi;
 
-use super::{ManagedType, ManagedVec, ManagedVecItem};
+use super::{ManagedVec, ManagedVecItem};
 
 impl<'a, M, T> IntoIterator for &'a ManagedVec<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem<M>,
+    T: ManagedVecItem,
 {
     type Item = T;
     type IntoIter = ManagedVecIterator<'a, M, T>;
@@ -17,7 +17,7 @@ where
 pub struct ManagedVecIterator<'a, M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem<M>,
+    T: ManagedVecItem,
 {
     managed_vec: &'a ManagedVec<M, T>,
     byte_start: usize,
@@ -27,7 +27,7 @@ where
 impl<'a, M, T> ManagedVecIterator<'a, M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem<M>,
+    T: ManagedVecItem,
 {
     pub(crate) fn new(managed_vec: &'a ManagedVec<M, T>) -> Self {
         ManagedVecIterator {
@@ -36,17 +36,12 @@ where
             byte_end: managed_vec.byte_len(),
         }
     }
-
-    #[inline]
-    pub(crate) fn type_manager(&self) -> M {
-        self.managed_vec.type_manager()
-    }
 }
 
 impl<'a, M, T> Iterator for ManagedVecIterator<'a, M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem<M>,
+    T: ManagedVecItem,
 {
     type Item = T;
 
@@ -55,7 +50,7 @@ where
         if next_byte_start > self.byte_end {
             return None;
         }
-        let result = T::from_byte_reader(self.type_manager(), |dest_slice| {
+        let result = T::from_byte_reader(|dest_slice| {
             let _ = self
                 .managed_vec
                 .buffer
@@ -75,14 +70,14 @@ where
 impl<'a, M, T> ExactSizeIterator for ManagedVecIterator<'a, M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem<M>,
+    T: ManagedVecItem,
 {
 }
 
 impl<'a, M, T> DoubleEndedIterator for ManagedVecIterator<'a, M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem<M>,
+    T: ManagedVecItem,
 {
     fn next_back(&mut self) -> Option<Self::Item> {
         if self.byte_start + T::PAYLOAD_SIZE > self.byte_end {
@@ -90,7 +85,7 @@ where
         }
         self.byte_end -= T::PAYLOAD_SIZE;
 
-        let result = T::from_byte_reader(self.type_manager(), |dest_slice| {
+        let result = T::from_byte_reader(|dest_slice| {
             let _ = self
                 .managed_vec
                 .buffer
@@ -104,7 +99,7 @@ where
 impl<'a, M, T> Clone for ManagedVecIterator<'a, M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem<M>,
+    T: ManagedVecItem,
 {
     #[allow(clippy::clone_double_ref)]
     fn clone(&self) -> Self {
