@@ -53,17 +53,24 @@ impl<M: ManagedTypeApi> From<ManagedBuffer<M>> for BigInt<M> {
     }
 }
 
-impl<M, U> From<U> for BigInt<M>
-where
-    M: ManagedTypeApi,
-    U: Into<i64>,
-{
-    fn from(value: U) -> Self {
-        BigInt::from_raw_handle(M::instance().bi_new(value.into()))
-    }
+macro_rules! big_int_conv_num {
+    ($num_ty:ty) => {
+        impl<M: ManagedTypeApi> From<$num_ty> for BigInt<M> {
+            #[inline]
+            fn from(value: $num_ty) -> Self {
+                BigInt::from_raw_handle(M::instance().bi_new(value as i64))
+            }
+        }
+    };
 }
 
-/// More conversions here.
+// TODO: more coverage, only from i64 currently tested
+big_int_conv_num! {i64}
+big_int_conv_num! {i32}
+big_int_conv_num! {isize}
+big_int_conv_num! {i16}
+big_int_conv_num! {i8}
+
 impl<M: ManagedTypeApi> BigInt<M> {
     #[inline]
     pub fn zero() -> Self {
