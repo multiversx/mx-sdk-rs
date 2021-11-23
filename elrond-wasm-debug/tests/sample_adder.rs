@@ -7,7 +7,7 @@
 // and maintenance.
 
 use elrond_wasm::{
-    contract_base::{ContractBase, ProxyObjBase},
+    contract_base::ProxyObjBase,
     types::{BigInt, ManagedAddress},
 };
 
@@ -97,7 +97,7 @@ mod module_1 {
                 ___api___.clone(),
                 ___address___,
                 &b"version"[..],
-                ManagedVec::new(___api___.clone()),
+                ManagedVec::<Self::Api, EsdtTokenPayment<Self::Api>>::new(),
             );
             ___contract_call___
         }
@@ -235,7 +235,7 @@ mod sample_adder {
                 ___api___.clone(),
                 ___address___,
                 &b"get_sum"[..],
-                ManagedVec::new(___api___.clone()),
+                ManagedVec::<Self::Api, EsdtTokenPayment<Self::Api>>::new(),
             );
             ___contract_call___
         }
@@ -249,7 +249,7 @@ mod sample_adder {
                 ___api___.clone(),
                 ___address___,
                 &b"add"[..],
-                ManagedVec::new(___api___.clone()),
+                ManagedVec::<Self::Api, EsdtTokenPayment<Self::Api>>::new(),
             );
             ___contract_call___.push_endpoint_arg(amount);
             ___contract_call___
@@ -338,7 +338,7 @@ mod sample_adder {
         type Api = A;
 
         fn new_proxy_obj(api: A) -> Self {
-            let zero_address = ManagedAddress::zero(api.clone());
+            let zero_address = ManagedAddress::zero();
             Proxy {
                 api,
                 address: zero_address,
@@ -401,26 +401,26 @@ fn test_add() {
 
     let adder = sample_adder::contract_obj(tx_context.clone());
 
-    adder.init(&BigInt::from_i64(adder.type_manager(), 5));
-    assert_eq!(BigInt::from_i64(adder.type_manager(), 5), adder.get_sum());
+    adder.init(&BigInt::from(5));
+    assert_eq!(BigInt::from(5), adder.get_sum());
 
-    let _ = adder.add(BigInt::from_i64(adder.type_manager(), 7));
-    assert_eq!(BigInt::from_i64(adder.type_manager(), 12), adder.get_sum());
+    let _ = adder.add(BigInt::from(7));
+    assert_eq!(BigInt::from(12), adder.get_sum());
 
-    let _ = adder.add(BigInt::from_i64(adder.type_manager(), -1));
-    assert_eq!(BigInt::from_i64(adder.type_manager(), 11), adder.get_sum());
+    let _ = adder.add(BigInt::from(-1));
+    assert_eq!(BigInt::from(11), adder.get_sum());
 
-    assert_eq!(BigInt::from_i64(adder.type_manager(), 100), adder.version());
+    assert_eq!(BigInt::from(100), adder.version());
 
     let _ = adder.add_version();
-    assert_eq!(BigInt::from_i64(adder.type_manager(), 111), adder.get_sum());
+    assert_eq!(BigInt::from(111), adder.get_sum());
 
     assert!(!adder.call(b"invalid_endpoint"));
 
     assert!(adder.call(b"version"));
 
-    let own_proxy = sample_adder::Proxy::new_proxy_obj(tx_context.clone())
-        .contract(ManagedAddress::zero(tx_context));
+    let own_proxy =
+        sample_adder::Proxy::new_proxy_obj(tx_context.clone()).contract(ManagedAddress::zero());
     let _ = own_proxy.get_sum();
 
     let _ = elrond_wasm_debug::abi_json::contract_abi::<sample_adder::AbiProvider>();

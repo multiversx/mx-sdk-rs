@@ -62,9 +62,9 @@ impl CallValueApi for VmApiImpl {
             let mut name_buffer = [0u8; MAX_POSSIBLE_TOKEN_IDENTIFIER_LENGTH];
             let name_len = getESDTTokenName(name_buffer.as_mut_ptr());
             if name_len == 0 {
-                TokenIdentifier::egld(self.clone())
+                TokenIdentifier::egld()
             } else {
-                TokenIdentifier::from_esdt_bytes(self.clone(), &name_buffer[..name_len as usize])
+                TokenIdentifier::from_esdt_bytes(&name_buffer[..name_len as usize])
             }
         }
     }
@@ -94,9 +94,9 @@ impl CallValueApi for VmApiImpl {
             let mut name_buffer = [0u8; MAX_POSSIBLE_TOKEN_IDENTIFIER_LENGTH];
             let name_len = getESDTTokenNameByIndex(name_buffer.as_mut_ptr(), index as i32);
             if name_len == 0 {
-                TokenIdentifier::egld(self.clone())
+                TokenIdentifier::egld()
             } else {
-                TokenIdentifier::from_esdt_bytes(self.clone(), &name_buffer[..name_len as usize])
+                TokenIdentifier::from_esdt_bytes(&name_buffer[..name_len as usize])
             }
         }
     }

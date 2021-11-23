@@ -11,7 +11,7 @@ use elrond_wasm::{
     elrond_codec::top_encode_to_vec_u8,
     types::{
         Address, BigUint, CodeMetadata, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer,
-        ManagedBuffer, ManagedFrom, ManagedInto, ManagedVec, TokenIdentifier,
+        ManagedBuffer, ManagedVec, TokenIdentifier,
     },
 };
 use num_traits::Zero;
@@ -166,7 +166,7 @@ impl DebugApi {
 impl SendApi for DebugApi {
     fn direct_egld<D>(&self, to: &ManagedAddress<Self>, amount: &BigUint<Self>, _data: D)
     where
-        D: ManagedInto<Self, ManagedBuffer<Self>>,
+        D: Into<ManagedBuffer<Self>>,
     {
         let amount_value = self.big_uint_value(amount);
         let available_egld_balance =
@@ -349,10 +349,7 @@ impl SendApi for DebugApi {
         let (new_address, result) =
             self.perform_deploy(contract_code, egld_value, arg_buffer.to_raw_args_vec());
 
-        (
-            ManagedAddress::managed_from(self.clone(), new_address),
-            ManagedVec::managed_from(self.clone(), result),
-        )
+        (ManagedAddress::from(new_address), ManagedVec::from(result))
     }
 
     fn deploy_from_source_contract(
@@ -371,10 +368,7 @@ impl SendApi for DebugApi {
             arg_buffer.to_raw_args_vec(),
         );
 
-        (
-            ManagedAddress::managed_from(self.clone(), new_address),
-            ManagedVec::managed_from(self.clone(), result),
-        )
+        (ManagedAddress::from(new_address), ManagedVec::from(result))
     }
 
     fn upgrade_contract(
@@ -421,7 +415,7 @@ impl SendApi for DebugApi {
             arg_buffer.to_raw_args_vec(),
         );
 
-        ManagedVec::managed_from(self.clone(), result)
+        ManagedVec::from(result)
     }
 
     fn execute_on_dest_context_raw_custom_result_range<F>(
@@ -454,10 +448,7 @@ impl SendApi for DebugApi {
             num_return_data_after as usize,
         );
 
-        ManagedVec::managed_from(
-            self.clone(),
-            result[result_start_index..result_end_index].to_vec(),
-        )
+        ManagedVec::from(result[result_start_index..result_end_index].to_vec())
     }
 
     fn execute_on_dest_context_by_caller_raw(
@@ -500,7 +491,7 @@ impl SendApi for DebugApi {
     fn storage_load_tx_hash_key(&self) -> ManagedBuffer<Self> {
         let tx_hash = self.get_tx_hash_legacy();
         let bytes = self.storage_load_boxed_bytes(tx_hash.as_bytes());
-        ManagedBuffer::new_from_bytes(self.clone(), bytes.as_slice())
+        ManagedBuffer::new_from_bytes(bytes.as_slice())
     }
 
     fn call_local_esdt_built_in_function(
@@ -518,6 +509,6 @@ impl SendApi for DebugApi {
             arg_buffer.to_raw_args_vec(),
         );
 
-        ManagedVec::managed_from(self.clone(), result)
+        ManagedVec::from(result)
     }
 }

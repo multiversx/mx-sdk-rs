@@ -25,8 +25,8 @@ where
     T: ManagedVecItem<M>,
 {
     #[inline]
-    pub fn new(api: M) -> Self {
-        ManagedCountedMultiResultVec::from(ManagedVec::new(api))
+    pub fn new() -> Self {
+        ManagedCountedMultiResultVec::from(ManagedVec::new())
     }
 }
 
@@ -82,7 +82,7 @@ where
     T: ManagedVecItem<M> + DynArg,
 {
     fn dyn_load<I: DynArgInput>(loader: &mut I, arg_id: ArgId) -> Self {
-        let mut result = ManagedCountedMultiResultVec::new(loader.vm_api_cast::<M>());
+        let mut result = ManagedCountedMultiResultVec::new();
         let count = usize::dyn_load(loader, arg_id);
         for _ in 0..count {
             result.contents.push(T::dyn_load(loader, arg_id));

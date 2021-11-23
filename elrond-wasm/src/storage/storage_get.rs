@@ -124,8 +124,7 @@ fn storage_get_exit<A>(api: A, de_err: DecodeError) -> !
 where
     A: StorageReadApi + ManagedTypeApi + ErrorApi + 'static,
 {
-    let mut message_buffer =
-        ManagedBuffer::new_from_bytes(api.clone(), err_msg::STORAGE_DECODE_ERROR);
+    let mut message_buffer = ManagedBuffer::<A>::new_from_bytes(err_msg::STORAGE_DECODE_ERROR);
     message_buffer.append_bytes(de_err.message_bytes());
     api.signal_error_from_buffer(message_buffer.get_raw_handle())
 }

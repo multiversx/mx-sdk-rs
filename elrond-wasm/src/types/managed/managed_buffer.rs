@@ -1,6 +1,6 @@
 use core::marker::PhantomData;
 
-use super::{ManagedDefault, ManagedFrom, ManagedType};
+use super::ManagedType;
 use crate::{
     api::{Handle, InvalidSliceError, ManagedTypeApi},
     types::BoxedBytes,
@@ -35,61 +35,61 @@ impl<M: ManagedTypeApi> ManagedType<M> for ManagedBuffer<M> {
 
 impl<M: ManagedTypeApi> ManagedBuffer<M> {
     #[inline]
-    pub fn new(_api: M) -> Self {
+    pub fn new() -> Self {
         ManagedBuffer::from_raw_handle(M::instance().mb_new_empty())
     }
 
-    #[inline(always)]
-    pub fn new_from_bytes(_api: M, bytes: &[u8]) -> Self {
+    #[inline]
+    pub fn new_from_bytes(bytes: &[u8]) -> Self {
         ManagedBuffer::from_raw_handle(M::instance().mb_new_from_bytes(bytes))
     }
 }
 
-impl<M> ManagedFrom<M, &[u8]> for ManagedBuffer<M>
+impl<M> From<&[u8]> for ManagedBuffer<M>
 where
     M: ManagedTypeApi,
 {
     #[inline]
-    fn managed_from(api: M, bytes: &[u8]) -> Self {
-        Self::new_from_bytes(api, bytes)
+    fn from(bytes: &[u8]) -> Self {
+        Self::new_from_bytes(bytes)
     }
 }
 
-impl<M> ManagedFrom<M, BoxedBytes> for ManagedBuffer<M>
+impl<M> From<BoxedBytes> for ManagedBuffer<M>
 where
     M: ManagedTypeApi,
 {
     #[inline]
-    fn managed_from(api: M, bytes: BoxedBytes) -> Self {
-        Self::new_from_bytes(api, bytes.as_slice())
+    fn from(bytes: BoxedBytes) -> Self {
+        Self::new_from_bytes(bytes.as_slice())
     }
 }
 
 /// Syntactic sugar only.
-impl<M, const N: usize> ManagedFrom<M, &[u8; N]> for ManagedBuffer<M>
+impl<M, const N: usize> From<&[u8; N]> for ManagedBuffer<M>
 where
     M: ManagedTypeApi,
 {
     #[inline]
-    fn managed_from(api: M, bytes: &[u8; N]) -> Self {
-        Self::new_from_bytes(api, bytes)
+    fn from(bytes: &[u8; N]) -> Self {
+        Self::new_from_bytes(bytes)
     }
 }
 
-impl<M> ManagedFrom<M, Vec<u8>> for ManagedBuffer<M>
+impl<M> From<Vec<u8>> for ManagedBuffer<M>
 where
     M: ManagedTypeApi,
 {
     #[inline]
-    fn managed_from(api: M, bytes: Vec<u8>) -> Self {
-        Self::new_from_bytes(api, bytes.as_slice())
+    fn from(bytes: Vec<u8>) -> Self {
+        Self::new_from_bytes(bytes.as_slice())
     }
 }
 
-impl<M: ManagedTypeApi> ManagedDefault<M> for ManagedBuffer<M> {
+impl<M: ManagedTypeApi> Default for ManagedBuffer<M> {
     #[inline]
-    fn managed_default(api: M) -> Self {
-        Self::new(api)
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -205,8 +205,8 @@ impl<M: ManagedTypeApi, const N: usize> PartialEq<&[u8; N]> for ManagedBuffer<M>
 
 impl<M: ManagedTypeApi> PartialEq<[u8]> for ManagedBuffer<M> {
     fn eq(&self, other: &[u8]) -> bool {
-        // TODO: push this to the api and optiize by using a temporary handle
-        let other_mb = ManagedBuffer::new_from_bytes(M::instance(), other);
+        // TODO: push this to the api and optimize by using a temporary handle
+        let other_mb = ManagedBuffer::new_from_bytes(other);
         self == &other_mb
     }
 }

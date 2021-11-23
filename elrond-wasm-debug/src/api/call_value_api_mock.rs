@@ -82,7 +82,7 @@ impl CallValueApi for DebugApi {
                 self.insert_new_managed_buffer(esdt_value.token_identifier.clone()),
             )
         } else {
-            TokenIdentifier::egld(self.clone())
+            TokenIdentifier::egld()
         }
     }
 

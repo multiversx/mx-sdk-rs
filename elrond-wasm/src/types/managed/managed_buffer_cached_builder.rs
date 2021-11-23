@@ -2,7 +2,7 @@ use elrond_codec::{EncodeError, NestedEncodeOutput, TryStaticCast};
 
 use crate::{api::ManagedTypeApi, types::StaticBufferRef};
 
-use super::{BigInt, BigUint, ManagedBuffer, ManagedBufferSizeContext, ManagedInto, ManagedType};
+use super::{BigInt, BigUint, ManagedBuffer, ManagedBufferSizeContext, ManagedType};
 
 pub struct ManagedBufferCachedBuilder<M>
 where
@@ -20,16 +20,16 @@ where
     /// If possible, the slice is loaded into the static buffer.
     /// If not, it is saved into the managed buffer so that the data is not lost.
     /// Use `flush_to_managed_buffer` after this to ensure that the managed buffer is populated.
-    pub fn new_from_slice(api: M, slice: &[u8]) -> Self {
+    pub fn new_from_slice(slice: &[u8]) -> Self {
         let static_cache = StaticBufferRef::try_new(slice);
         if static_cache.is_some() {
             ManagedBufferCachedBuilder {
-                managed_buffer: ManagedBuffer::new(api),
+                managed_buffer: ManagedBuffer::new(),
                 static_cache,
             }
         } else {
             ManagedBufferCachedBuilder {
-                managed_buffer: slice.managed_into(api),
+                managed_buffer: slice.into(),
                 static_cache: None,
             }
         }

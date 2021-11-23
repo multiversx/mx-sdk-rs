@@ -1,7 +1,7 @@
 use crate::{
     api::{ErrorApi, ManagedTypeApi, StorageWriteApi},
     err_msg,
-    types::{BigInt, BigUint, ManagedBuffer, ManagedBufferCachedBuilder, ManagedInto, ManagedType},
+    types::{BigInt, BigUint, ManagedBuffer, ManagedBufferCachedBuilder, ManagedType},
 };
 use elrond_codec::*;
 
@@ -39,18 +39,18 @@ where
     type NestedBuffer = ManagedBufferCachedBuilder<A>;
 
     fn set_slice_u8(self, bytes: &[u8]) {
-        self.set_managed_buffer(&bytes.managed_into(self.api.clone()))
+        self.set_managed_buffer(&bytes.into())
     }
 
     fn set_u64(self, value: u64) {
         using_encoded_number(value, 64, false, true, |bytes| {
-            self.set_managed_buffer(&bytes.managed_into(self.api.clone()))
+            self.set_managed_buffer(&bytes.into())
         });
     }
 
     fn set_i64(self, value: i64) {
         using_encoded_number(value as u64, 64, true, true, |bytes| {
-            self.set_managed_buffer(&bytes.managed_into(self.api.clone()))
+            self.set_managed_buffer(&bytes.into())
         });
     }
 
@@ -75,7 +75,7 @@ where
     }
 
     fn start_nested_encode(&self) -> Self::NestedBuffer {
-        ManagedBufferCachedBuilder::new_from_slice(self.api.clone(), &[])
+        ManagedBufferCachedBuilder::new_from_slice(&[])
     }
 
     fn finalize_nested_encode(self, nb: Self::NestedBuffer) {
@@ -110,8 +110,7 @@ fn storage_set_exit<A>(api: A, encode_err: EncodeError) -> !
 where
     A: StorageWriteApi + ManagedTypeApi + ErrorApi + 'static,
 {
-    let mut message_buffer =
-        ManagedBuffer::new_from_bytes(api.clone(), err_msg::STORAGE_ENCODE_ERROR);
+    let mut message_buffer = ManagedBuffer::<A>::new_from_bytes(err_msg::STORAGE_ENCODE_ERROR);
     message_buffer.append_bytes(encode_err.message_bytes());
     api.signal_error_from_buffer(message_buffer.get_raw_handle())
 }

@@ -73,7 +73,7 @@ where
         token_ticker: &ManagedBuffer<SA>,
         properties: NonFungibleTokenProperties,
     ) -> ContractCall<SA, ()> {
-        let zero = BigUint::zero(self.api.clone());
+        let zero = BigUint::zero();
         self.issue(
             issue_cost,
             EsdtTokenType::NonFungible,
@@ -103,7 +103,7 @@ where
         token_ticker: &ManagedBuffer<SA>,
         properties: SemiFungibleTokenProperties,
     ) -> ContractCall<SA, ()> {
-        let zero = BigUint::zero(self.api.clone());
+        let zero = BigUint::zero();
         self.issue(
             issue_cost,
             EsdtTokenType::SemiFungible,
@@ -133,7 +133,7 @@ where
         token_ticker: &ManagedBuffer<SA>,
         properties: MetaTokenProperties,
     ) -> ContractCall<SA, ()> {
-        let zero = BigUint::zero(self.api.clone());
+        let zero = BigUint::zero();
         self.issue(
             issue_cost,
             EsdtTokenType::Meta,
@@ -164,7 +164,6 @@ where
         initial_supply: &BigUint<SA>,
         properties: TokenProperties,
     ) -> ContractCall<SA, ()> {
-        let type_manager = self.api.clone();
         let esdt_system_sc_address = self.esdt_system_sc_address();
 
         let endpoint_name = match token_type {
@@ -178,7 +177,7 @@ where
         let mut contract_call = ContractCall::new(
             self.api,
             esdt_system_sc_address,
-            ManagedBuffer::new_from_bytes(type_manager, endpoint_name),
+            ManagedBuffer::new_from_bytes(endpoint_name),
         )
         .with_egld_transfer(issue_cost);
 
@@ -407,16 +406,15 @@ where
     }
 
     pub fn esdt_system_sc_address(&self) -> ManagedAddress<SA> {
-        ManagedAddress::new_from_bytes(self.api.clone(), &ESDT_SYSTEM_SC_ADDRESS_ARRAY)
+        ManagedAddress::new_from_bytes(&ESDT_SYSTEM_SC_ADDRESS_ARRAY)
     }
 
     fn esdt_system_sc_call_no_args(self, endpoint_name: &[u8]) -> ContractCall<SA, ()> {
-        let type_manager = self.api.clone();
         let esdt_system_sc_address = self.esdt_system_sc_address();
         ContractCall::new(
             self.api,
             esdt_system_sc_address,
-            ManagedBuffer::new_from_bytes(type_manager, endpoint_name),
+            ManagedBuffer::new_from_bytes(endpoint_name),
         )
     }
 }

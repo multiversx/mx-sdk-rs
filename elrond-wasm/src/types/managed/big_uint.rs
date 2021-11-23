@@ -1,6 +1,6 @@
 use core::marker::PhantomData;
 
-use super::{ManagedBuffer, ManagedDefault, ManagedFrom, ManagedType};
+use super::{ManagedBuffer, ManagedType};
 use crate::{
     api::{Handle, ManagedTypeApi},
     types::BoxedBytes,
@@ -32,20 +32,6 @@ impl<M: ManagedTypeApi> ManagedType<M> for BigUint<M> {
     }
 }
 
-impl<M: ManagedTypeApi> From<&ManagedBuffer<M>> for BigUint<M> {
-    #[inline]
-    fn from(item: &ManagedBuffer<M>) -> Self {
-        BigUint::from_bytes_be_buffer(item)
-    }
-}
-
-impl<M: ManagedTypeApi> ManagedFrom<M, &ManagedBuffer<M>> for BigUint<M> {
-    #[inline]
-    fn managed_from(_api: M, item: &ManagedBuffer<M>) -> Self {
-        Self::from(item)
-    }
-}
-
 impl<M: ManagedTypeApi> From<ManagedBuffer<M>> for BigUint<M> {
     #[inline]
     fn from(item: ManagedBuffer<M>) -> Self {
@@ -53,42 +39,36 @@ impl<M: ManagedTypeApi> From<ManagedBuffer<M>> for BigUint<M> {
     }
 }
 
-impl<M: ManagedTypeApi> ManagedFrom<M, ManagedBuffer<M>> for BigUint<M> {
+impl<M: ManagedTypeApi> From<&ManagedBuffer<M>> for BigUint<M> {
     #[inline]
-    fn managed_from(_api: M, item: ManagedBuffer<M>) -> Self {
-        Self::from(item)
+    fn from(item: &ManagedBuffer<M>) -> Self {
+        BigUint::from_bytes_be_buffer(item)
     }
 }
 
-impl<M, U> ManagedFrom<M, U> for BigUint<M>
+impl<M, U> From<U> for BigUint<M>
 where
     M: ManagedTypeApi,
     U: Into<u64>,
 {
     #[inline]
-    fn managed_from(api: M, value: U) -> Self {
-        BigUint {
-            handle: api.bi_new(value.into() as i64),
-            _phantom: PhantomData,
-        }
+    fn from(value: U) -> Self {
+        BigUint::from_raw_handle(M::instance().bi_new(value.into() as i64))
     }
 }
 
-impl<M: ManagedTypeApi> ManagedDefault<M> for BigUint<M> {
+impl<M: ManagedTypeApi> Default for BigUint<M> {
     #[inline]
-    fn managed_default(api: M) -> Self {
-        Self::zero(api)
+    fn default() -> Self {
+        Self::zero()
     }
 }
 
 /// More conversions here.
 impl<M: ManagedTypeApi> BigUint<M> {
     #[inline]
-    pub fn zero(api: M) -> Self {
-        BigUint {
-            handle: api.bi_new_zero(),
-            _phantom: PhantomData,
-        }
+    pub fn zero() -> Self {
+        BigUint::from_raw_handle(M::instance().bi_new_zero())
     }
 
     #[inline]
@@ -99,7 +79,7 @@ impl<M: ManagedTypeApi> BigUint<M> {
     }
 
     #[inline]
-    pub fn from_bytes_be(_api: M, bytes: &[u8]) -> Self {
+    pub fn from_bytes_be(bytes: &[u8]) -> Self {
         let api = M::instance();
         let handle = api.bi_new(0);
         api.bi_set_unsigned_bytes(handle, bytes);

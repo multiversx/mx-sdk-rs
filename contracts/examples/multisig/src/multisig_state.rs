@@ -87,7 +87,6 @@ pub trait MultisigStateModule {
             signers.push(
                 self.user_mapper()
                     .get_user_address_unchecked(signer_id)
-                    .managed_into(),
             );
         }
         signers

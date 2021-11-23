@@ -35,8 +35,8 @@ where
     }
 
     #[inline]
-    pub fn new(api: M) -> Self {
-        ManagedMultiResultVec::from_raw_vec(ManagedVec::new(api))
+    pub fn new(_api: M) -> Self {
+        ManagedMultiResultVec::from_raw_vec(ManagedVec::new())
     }
 }
 
@@ -118,8 +118,8 @@ where
     T: ManagedVecItem<M> + TopDecode,
 {
     pub fn to_vec(&self) -> ManagedVec<M, T> {
-        let mut result = ManagedVec::new(self.raw_buffers.type_manager());
-        let serializer = ManagedSerializer::new(self.raw_buffers.type_manager());
+        let mut result = ManagedVec::new();
+        let serializer = ManagedSerializer::new(M::instance());
         for item in self.raw_buffers.into_iter() {
             result.push(serializer.top_decode_from_managed_buffer(&item));
         }
@@ -133,7 +133,7 @@ where
     T: DynArg,
 {
     fn dyn_load<I: DynArgInput>(loader: &mut I, arg_id: ArgId) -> Self {
-        let mut raw_buffers = ManagedVec::new(loader.vm_api_cast::<M>());
+        let mut raw_buffers = ManagedVec::new();
         while loader.has_next() {
             raw_buffers.push(ManagedBuffer::dyn_load(loader, arg_id));
         }
@@ -150,7 +150,7 @@ where
     T: ContractCallArg,
 {
     fn push_single_arg<I: TopEncode>(&mut self, item: I) {
-        let serializer = ManagedSerializer::new(self.raw_buffers.type_manager());
+        let serializer = ManagedSerializer::new(M::instance());
         self.raw_buffers
             .push(serializer.top_encode_to_managed_buffer(&item));
     }
