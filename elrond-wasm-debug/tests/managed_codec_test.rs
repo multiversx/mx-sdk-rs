@@ -23,17 +23,14 @@ fn test_vec_of_big_uint_serialization() {
 fn test_big_int_serialization() {
     let api = DebugApi::dummy();
 
-    check_managed_top_encode_decode(api.clone(), BigInt::from_i64(api.clone(), 5), &[5u8]);
-    check_managed_top_encode_decode(api.clone(), BigInt::from_i64(api, -5), &[251u8]);
+    check_managed_top_encode_decode(api.clone(), BigInt::<DebugApi>::from(5), &[5u8]);
+    check_managed_top_encode_decode(api.clone(), BigInt::<DebugApi>::from(-5), &[251u8]);
 }
 
 #[test]
 fn test_vec_of_big_int_serialization() {
     let api = DebugApi::dummy();
-    let v = vec![
-        BigInt::from_i32(api.clone(), 5),
-        BigInt::from_i32(api.clone(), 6),
-    ];
+    let v = vec![BigInt::<DebugApi>::from(5), BigInt::<DebugApi>::from(6)];
 
     check_managed_top_encode_decode(api, v, &[0, 0, 0, 1, 5, 0, 0, 0, 1, 6]);
 }

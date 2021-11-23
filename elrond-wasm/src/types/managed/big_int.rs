@@ -71,19 +71,8 @@ impl<M: ManagedTypeApi> BigInt<M> {
     }
 
     #[inline]
-    pub fn from_i64(_api: M, value: i64) -> Self {
-        BigInt::from_raw_handle(M::instance().bi_new(value))
-    }
-
-    #[inline]
-    pub fn from_i32(_api: M, value: i32) -> Self {
-        BigInt::from_raw_handle(M::instance().bi_new(value as i64))
-    }
-
-    #[inline]
     pub fn to_i64(&self) -> Option<i64> {
-        let api = M::instance();
-        api.bi_to_i64(self.handle)
+        M::instance().bi_to_i64(self.handle)
     }
 
     #[inline]
