@@ -50,7 +50,7 @@ fn payable_single_snippet_for_metadata(
             let token_init = if let Some(arg) = payment_token_arg {
                 let pat = &arg.pat;
                 quote! {
-                    let #pat = TokenIdentifier::from_esdt_bytes(self.raw_vm_api(), #token_literal);
+                    let #pat = TokenIdentifier::<Self::Api>::from_esdt_bytes(#token_literal);
                 }
             } else {
                 quote! {}
@@ -95,7 +95,7 @@ fn egld_token_init(opt_arg: &Option<MethodArgument>) -> proc_macro2::TokenStream
     if let Some(arg) = opt_arg {
         let pat = &arg.pat;
         quote! {
-            let #pat = TokenIdentifier::egld(self.raw_vm_api());
+            let #pat = TokenIdentifier::<Self::Api>::egld();
         }
     } else {
         quote! {}

@@ -165,14 +165,14 @@ impl DebugApi {
         instance: &EsdtInstance,
     ) -> EsdtTokenData<Self> {
         let creator = if let Some(creator) = &instance.metadata.creator {
-            ManagedAddress::from_address(self.clone(), creator)
+            ManagedAddress::from_address(creator)
         } else {
-            ManagedAddress::zero(self.clone())
+            ManagedAddress::zero()
         };
 
-        let mut uris = ManagedVec::new(self.clone());
+        let mut uris = ManagedVec::new();
         if let Some(uri) = &instance.metadata.uri {
-            uris.push(ManagedBuffer::new_from_bytes(self.clone(), uri.as_slice()));
+            uris.push(ManagedBuffer::new_from_bytes(uri.as_slice()));
         }
 
         EsdtTokenData {

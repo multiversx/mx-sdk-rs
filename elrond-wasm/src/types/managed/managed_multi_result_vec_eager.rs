@@ -7,8 +7,9 @@ use crate::{
     ArgId, ContractCallArg, DynArg, DynArgInput, DynArgOutput, EndpointResult,
 };
 
-use super::{ManagedFrom, ManagedInto, ManagedVec, ManagedVecItem, ManagedVecIterator};
+use super::{ManagedVec, ManagedVecItem, ManagedVecIterator};
 
+#[derive(Clone, Default)]
 pub struct ManagedMultiResultVecEager<M: ManagedTypeApi, T: ManagedVecItem<M>>(ManagedVec<M, T>);
 
 pub type ManagedVarArgsEager<M, T> = ManagedMultiResultVecEager<M, T>;
@@ -30,8 +31,8 @@ where
     T: ManagedVecItem<M>,
 {
     #[inline]
-    pub fn new(api: M) -> Self {
-        ManagedMultiResultVecEager(ManagedVec::new(api))
+    pub fn new() -> Self {
+        ManagedMultiResultVecEager(ManagedVec::new())
     }
 
     #[inline]
@@ -63,8 +64,8 @@ where
         self.0.push(item)
     }
 
-    pub fn from_single_item(api: M, item: T) -> Self {
-        let mut result = ManagedMultiResultVecEager::new(api);
+    pub fn from_single_item(item: T) -> Self {
+        let mut result = ManagedMultiResultVecEager::new();
         result.push(item);
         result
     }
@@ -97,16 +98,16 @@ where
     }
 }
 
-impl<M, T, I> ManagedFrom<M, Vec<I>> for ManagedMultiResultVecEager<M, T>
+impl<M, T, I> From<Vec<I>> for ManagedMultiResultVecEager<M, T>
 where
     M: ManagedTypeApi,
     T: ManagedVecItem<M>,
-    I: ManagedInto<M, T>,
+    I: Into<T>,
 {
-    fn managed_from(api: M, v: Vec<I>) -> Self {
-        let mut result = Self::new(api.clone());
+    fn from(v: Vec<I>) -> Self {
+        let mut result = Self::new();
         for item in v.into_iter() {
-            result.push(item.managed_into(api.clone()));
+            result.push(item.into());
         }
         result
     }
@@ -117,7 +118,7 @@ where
     T: ManagedVecItem<M> + DynArg,
 {
     fn dyn_load<I: DynArgInput>(loader: &mut I, arg_id: ArgId) -> Self {
-        let mut result_vec: ManagedVec<M, T> = ManagedVec::new(loader.vm_api_cast());
+        let mut result_vec: ManagedVec<M, T> = ManagedVec::new();
         while loader.has_next() {
             result_vec.push(T::dyn_load(loader, arg_id));
         }

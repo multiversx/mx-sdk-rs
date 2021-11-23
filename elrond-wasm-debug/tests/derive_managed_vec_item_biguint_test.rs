@@ -3,7 +3,7 @@ use elrond_wasm::{
     derive::ManagedVecItem,
     elrond_codec,
     elrond_codec::elrond_codec_derive::{NestedDecode, NestedEncode, TopDecode, TopEncode},
-    types::{BigUint, ManagedFrom},
+    types::BigUint,
 };
 use elrond_wasm_debug::DebugApi;
 
@@ -31,9 +31,10 @@ fn struct_with_numbers_static() {
 
 #[test]
 fn struct_to_bytes_writer() {
+    let _ = DebugApi::dummy();
     let fortytwo = 42u64;
     let s = ManagedStructWithBigUint::<DebugApi> {
-        big_uint: BigUint::managed_from(DebugApi::dummy(), fortytwo),
+        big_uint: BigUint::from(fortytwo),
         num: 0x12345,
     };
     let mut arr: [u8; 8] =
@@ -53,15 +54,16 @@ fn struct_to_bytes_writer() {
 
 #[test]
 fn struct_from_bytes_reader() {
+    let api = DebugApi::dummy();
     let s = ManagedStructWithBigUint::<DebugApi> {
-        big_uint: BigUint::managed_from(DebugApi::dummy(), 42u64),
+        big_uint: BigUint::from(42u64),
         num: 0x12345,
     };
     let arr: [u8; 8] = [0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x23, 0x45];
 
     let struct_from_bytes = <ManagedStructWithBigUint<DebugApi> as elrond_wasm::types::ManagedVecItem<
         DebugApi,
-    >>::from_byte_reader(DebugApi::dummy(), |bytes| {
+    >>::from_byte_reader(api, |bytes| {
         bytes.copy_from_slice(
                     &arr
                         [0

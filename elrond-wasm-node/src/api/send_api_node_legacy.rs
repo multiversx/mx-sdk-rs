@@ -176,10 +176,10 @@ extern "C" {
 impl SendApi for VmApiImpl {
     fn direct_egld<D>(&self, to: &ManagedAddress<Self>, amount: &BigUint<Self>, data: D)
     where
-        D: ManagedInto<Self, ManagedBuffer<Self>>,
+        D: Into<ManagedBuffer<Self>>,
     {
         let to_address = to.to_address();
-        let data_bytes = data.managed_into(self.clone()).to_boxed_bytes();
+        let data_bytes = data.into().to_boxed_bytes();
         unsafe {
             let amount_bytes32_ptr = unsafe_buffer_load_be_pad_right(amount.get_raw_handle(), 32);
             let _ = transferValue(
@@ -397,10 +397,7 @@ impl SendApi for VmApiImpl {
             let results =
                 managed_vec_from_slice_of_boxed_bytes(self.clone(), result_bytes.as_slice());
 
-            (
-                ManagedAddress::managed_from(self.clone(), new_address),
-                results,
-            )
+            (ManagedAddress::from(new_address), results)
         }
     }
 
@@ -435,10 +432,7 @@ impl SendApi for VmApiImpl {
             let results =
                 managed_vec_from_slice_of_boxed_bytes(self.clone(), result_bytes.as_slice());
 
-            (
-                ManagedAddress::managed_from(self.clone(), new_address),
-                results,
-            )
+            (ManagedAddress::from(new_address), results)
         }
     }
 
