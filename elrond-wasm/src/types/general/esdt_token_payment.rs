@@ -19,12 +19,12 @@ pub struct EsdtTokenPayment<M: ManagedTypeApi> {
 }
 
 impl<M: ManagedTypeApi> EsdtTokenPayment<M> {
-    pub fn no_payment(api: M) -> Self {
+    pub fn no_payment() -> Self {
         EsdtTokenPayment {
             token_type: EsdtTokenType::Invalid,
-            token_identifier: TokenIdentifier::egld(api.clone()),
+            token_identifier: TokenIdentifier::egld(),
             token_nonce: 0,
-            amount: BigUint::zero(api),
+            amount: BigUint::zero(),
         }
     }
 

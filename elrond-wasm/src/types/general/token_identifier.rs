@@ -2,7 +2,7 @@ use super::BoxedBytes;
 use crate::{
     abi::TypeAbi,
     api::{Handle, ManagedTypeApi},
-    types::{ManagedBuffer, ManagedFrom, ManagedInto, ManagedType},
+    types::{ManagedBuffer, ManagedType},
 };
 use alloc::string::String;
 use elrond_codec::*;
@@ -19,20 +19,15 @@ pub struct TokenIdentifier<M: ManagedTypeApi> {
 
 impl<M: ManagedTypeApi> ManagedType<M> for TokenIdentifier<M> {
     #[inline]
-    fn from_raw_handle(api: M, handle: Handle) -> Self {
+    fn from_raw_handle(handle: Handle) -> Self {
         TokenIdentifier {
-            buffer: ManagedBuffer::from_raw_handle(api, handle),
+            buffer: ManagedBuffer::from_raw_handle(handle),
         }
     }
 
     #[doc(hidden)]
     fn get_raw_handle(&self) -> Handle {
         self.buffer.get_raw_handle()
-    }
-
-    #[inline]
-    fn type_manager(&self) -> M {
-        self.buffer.type_manager()
     }
 }
 
@@ -53,17 +48,17 @@ impl<M: ManagedTypeApi> TokenIdentifier<M> {
     pub const DASH_CHARACTER: u8 = b'-';
 
     #[inline]
-    pub fn from_esdt_bytes<B: ManagedInto<M, ManagedBuffer<M>>>(api: M, bytes: B) -> Self {
+    pub fn from_esdt_bytes<B: Into<ManagedBuffer<M>>>(bytes: B) -> Self {
         TokenIdentifier {
-            buffer: bytes.managed_into(api),
+            buffer: bytes.into(),
         }
     }
 
     /// New instance of the special EGLD token representation.
     #[inline]
-    pub fn egld(api: M) -> Self {
+    pub fn egld() -> Self {
         TokenIdentifier {
-            buffer: ManagedBuffer::new(api),
+            buffer: ManagedBuffer::new(),
         }
     }
 
@@ -178,20 +173,13 @@ impl<M: ManagedTypeApi> From<ManagedBuffer<M>> for TokenIdentifier<M> {
     }
 }
 
-impl<M: ManagedTypeApi> ManagedFrom<M, ManagedBuffer<M>> for TokenIdentifier<M> {
-    #[inline]
-    fn managed_from(_: M, buffer: ManagedBuffer<M>) -> Self {
-        TokenIdentifier::from(buffer)
-    }
-}
-
-impl<M: ManagedTypeApi> ManagedFrom<M, &[u8]> for TokenIdentifier<M> {
-    fn managed_from(api: M, bytes: &[u8]) -> Self {
+impl<M: ManagedTypeApi> From<&[u8]> for TokenIdentifier<M> {
+    fn from(bytes: &[u8]) -> Self {
         if bytes == Self::EGLD_REPRESENTATION {
-            TokenIdentifier::egld(api)
+            TokenIdentifier::egld()
         } else {
             TokenIdentifier {
-                buffer: ManagedBuffer::new_from_bytes(api, bytes),
+                buffer: ManagedBuffer::new_from_bytes(bytes),
             }
         }
     }

@@ -3,8 +3,8 @@ use elrond_wasm_debug::{check_managed_top_decode, check_managed_top_encode_decod
 
 #[test]
 fn test_egld() {
-    let api = DebugApi::dummy();
-    assert!(TokenIdentifier::egld(api).is_egld());
+    let _ = DebugApi::dummy();
+    assert!(TokenIdentifier::<DebugApi>::egld().is_egld());
 }
 
 #[test]
@@ -12,7 +12,7 @@ fn test_codec() {
     let api = DebugApi::dummy();
     check_managed_top_encode_decode(
         api.clone(),
-        TokenIdentifier::egld(api.clone()),
+        TokenIdentifier::<DebugApi>::egld(),
         TokenIdentifier::<DebugApi>::EGLD_REPRESENTATION,
     );
 
@@ -22,17 +22,17 @@ fn test_codec() {
     ]);
     check_managed_top_encode_decode(
         api.clone(),
-        vec![TokenIdentifier::egld(api.clone())],
+        vec![TokenIdentifier::<DebugApi>::egld()],
         expected.as_slice(),
     );
 
     // also allowed
     assert_eq!(
-        TokenIdentifier::egld(api.clone()),
+        TokenIdentifier::<DebugApi>::egld(),
         check_managed_top_decode::<TokenIdentifier<DebugApi>>(api.clone(), &[])
     );
     assert_eq!(
-        vec![TokenIdentifier::egld(api.clone())],
+        vec![TokenIdentifier::<DebugApi>::egld()],
         check_managed_top_decode::<Vec<TokenIdentifier<DebugApi>>>(api, &[0, 0, 0, 0])
     );
 }
@@ -40,35 +40,35 @@ fn test_codec() {
 #[test]
 #[rustfmt::skip]
 fn test_is_valid_esdt_identifier() {
-    let api = DebugApi::dummy();
+    let _ = DebugApi::dummy();
 
     // valid identifier
-    assert!(TokenIdentifier::from_esdt_bytes(api.clone(), &b"ALC-6258d2"[..]).is_valid_esdt_identifier());
+    assert!(TokenIdentifier::<DebugApi>::from_esdt_bytes(&b"ALC-6258d2"[..]).is_valid_esdt_identifier());
 
     // valid identifier with numbers in ticker
-    assert!(TokenIdentifier::from_esdt_bytes(api.clone(), &b"ALC123-6258d2"[..]).is_valid_esdt_identifier());
+    assert!(TokenIdentifier::<DebugApi>::from_esdt_bytes(&b"ALC123-6258d2"[..]).is_valid_esdt_identifier());
 
     // valid ticker only numbers
-    assert!(TokenIdentifier::from_esdt_bytes(api.clone(), &b"12345-6258d2"[..]).is_valid_esdt_identifier());
+    assert!(TokenIdentifier::<DebugApi>::from_esdt_bytes(&b"12345-6258d2"[..]).is_valid_esdt_identifier());
 
     // missing dash
-    assert!(!TokenIdentifier::from_esdt_bytes(api.clone(), &b"ALC6258d2"[..]).is_valid_esdt_identifier());
+    assert!(!TokenIdentifier::<DebugApi>::from_esdt_bytes(&b"ALC6258d2"[..]).is_valid_esdt_identifier());
 
     // wrong dash position
-    assert!(!TokenIdentifier::from_esdt_bytes(api.clone(), &b"AL-C6258d2"[..]).is_valid_esdt_identifier());
+    assert!(!TokenIdentifier::<DebugApi>::from_esdt_bytes(&b"AL-C6258d2"[..]).is_valid_esdt_identifier());
 
     // lowercase ticker
-    assert!(!TokenIdentifier::from_esdt_bytes(api.clone(), &b"alc-6258d2"[..]).is_valid_esdt_identifier());
+    assert!(!TokenIdentifier::<DebugApi>::from_esdt_bytes(&b"alc-6258d2"[..]).is_valid_esdt_identifier());
 
     // uppercase random chars
-    assert!(!TokenIdentifier::from_esdt_bytes(api.clone(), &b"ALC-6258D2"[..]).is_valid_esdt_identifier());
+    assert!(!TokenIdentifier::<DebugApi>::from_esdt_bytes(&b"ALC-6258D2"[..]).is_valid_esdt_identifier());
 
     // too many random chars
-    assert!(!TokenIdentifier::from_esdt_bytes(api.clone(), &b"ALC-6258d2ff"[..]).is_valid_esdt_identifier());
+    assert!(!TokenIdentifier::<DebugApi>::from_esdt_bytes(&b"ALC-6258d2ff"[..]).is_valid_esdt_identifier());
 
     // ticker too short
-    assert!(!TokenIdentifier::from_esdt_bytes(api.clone(), &b"AL-6258d2"[..]).is_valid_esdt_identifier());
+    assert!(!TokenIdentifier::<DebugApi>::from_esdt_bytes(&b"AL-6258d2"[..]).is_valid_esdt_identifier());
 
     // ticker too long
-    assert!(!TokenIdentifier::from_esdt_bytes(api, &b"ALCCCCCCCCC-6258d2"[..]).is_valid_esdt_identifier());
+    assert!(!TokenIdentifier::<DebugApi>::from_esdt_bytes(&b"ALCCCCCCCCC-6258d2"[..]).is_valid_esdt_identifier());
 }

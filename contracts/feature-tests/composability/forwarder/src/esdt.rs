@@ -73,7 +73,7 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
         to: ManagedAddress,
         #[var_args] token_payments: ManagedVarArgs<MultiArg3<TokenIdentifier, u64, BigUint>>,
     ) {
-        let mut all_token_payments = ManagedVec::new(self.type_manager());
+        let mut all_token_payments = ManagedVec::new();
 
         for multi_arg in token_payments.into_iter() {
             let (token_identifier, token_nonce, amount) = multi_arg.into_tuple();
@@ -92,7 +92,7 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
             &all_token_payments,
             self.blockchain().get_gas_left(),
             &ManagedBuffer::new(),
-            &ManagedArgBuffer::new_empty(self.type_manager()),
+            &ManagedArgBuffer::new_empty(),
         );
     }
 

@@ -10,7 +10,7 @@ use std::{
     rc::Rc,
 };
 
-use super::{TxCache, TxInput, TxManagedTypes, TxResult};
+use super::{BlockchainUpdate, TxCache, TxInput, TxManagedTypes, TxResult};
 
 #[derive(Debug)]
 pub struct TxContext {
@@ -142,5 +142,10 @@ impl TxContext {
             contract_path: Some(contract_path),
             contract_owner: Some(contract_owner),
         });
+    }
+
+    pub fn into_blockchain_updates(self) -> BlockchainUpdate {
+        let tx_cache = Rc::try_unwrap(self.tx_cache).unwrap();
+        tx_cache.into_blockchain_updates()
     }
 }
