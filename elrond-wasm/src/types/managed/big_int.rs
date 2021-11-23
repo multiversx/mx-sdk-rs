@@ -1,6 +1,6 @@
 use core::marker::PhantomData;
 
-use super::{BigUint, ManagedBuffer, ManagedDefault, ManagedFrom, ManagedType, Sign};
+use super::{BigUint, ManagedBuffer, ManagedType, Sign};
 use crate::{
     api::{Handle, ManagedTypeApi},
     types::BoxedBytes,
@@ -32,10 +32,10 @@ impl<M: ManagedTypeApi> ManagedType<M> for BigInt<M> {
     }
 }
 
-impl<M: ManagedTypeApi> ManagedDefault<M> for BigInt<M> {
+impl<M: ManagedTypeApi> Default for BigInt<M> {
     #[inline]
-    fn managed_default(api: M) -> Self {
-        Self::from_i64(api, 0)
+    fn default() -> Self {
+        Self::zero()
     }
 }
 
@@ -53,12 +53,12 @@ impl<M: ManagedTypeApi> From<ManagedBuffer<M>> for BigInt<M> {
     }
 }
 
-impl<M, U> ManagedFrom<M, U> for BigInt<M>
+impl<M, U> From<U> for BigInt<M>
 where
     M: ManagedTypeApi,
     U: Into<i64>,
 {
-    fn managed_from(_api: M, value: U) -> Self {
+    fn from(value: U) -> Self {
         BigInt::from_raw_handle(M::instance().bi_new(value.into()))
     }
 }
@@ -66,7 +66,7 @@ where
 /// More conversions here.
 impl<M: ManagedTypeApi> BigInt<M> {
     #[inline]
-    pub fn zero(_api: M) -> Self {
+    pub fn zero() -> Self {
         BigInt::from_raw_handle(M::instance().bi_new_zero())
     }
 
@@ -87,7 +87,7 @@ impl<M: ManagedTypeApi> BigInt<M> {
     }
 
     #[inline]
-    pub fn from_signed_bytes_be(_api: M, bytes: &[u8]) -> Self {
+    pub fn from_signed_bytes_be(bytes: &[u8]) -> Self {
         let api = M::instance();
         let handle = api.bi_new(0);
         api.bi_set_signed_bytes(handle, bytes);

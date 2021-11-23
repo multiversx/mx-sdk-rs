@@ -2,7 +2,7 @@ use super::ArgBuffer;
 use crate::{
     api::{ErrorApi, Handle, ManagedTypeApi},
     err_msg,
-    types::{ManagedBuffer, ManagedFrom, ManagedInto, ManagedType, ManagedVec, ManagedVecIterator},
+    types::{ManagedBuffer, ManagedType, ManagedVec, ManagedVecIterator},
     DynArgOutput,
 };
 use alloc::vec::Vec;
@@ -41,22 +41,20 @@ where
     M: ManagedTypeApi + ErrorApi + 'static,
 {
     #[inline]
-    pub fn new_empty(api: M) -> Self {
+    pub fn new_empty() -> Self {
         ManagedArgBuffer {
-            data: ManagedVec::new(api),
+            data: ManagedVec::new(),
         }
     }
 }
 
-impl<M, I> ManagedFrom<M, Vec<I>> for ManagedArgBuffer<M>
+impl<M, I> From<Vec<I>> for ManagedArgBuffer<M>
 where
     M: ManagedTypeApi,
-    I: ManagedInto<M, ManagedBuffer<M>>,
+    I: Into<ManagedBuffer<M>>,
 {
-    fn managed_from(api: M, v: Vec<I>) -> Self {
-        ManagedArgBuffer {
-            data: v.managed_into(api),
-        }
+    fn from(v: Vec<I>) -> Self {
+        ManagedArgBuffer { data: v.into() }
     }
 }
 
@@ -89,7 +87,7 @@ where
     }
 
     pub fn push_arg<T: TopEncode>(&mut self, arg: T) {
-        let mut encoded_buffer = ManagedBuffer::new(M::instance());
+        let mut encoded_buffer = ManagedBuffer::new();
         arg.top_encode_or_exit(
             &mut encoded_buffer,
             M::instance(), // TODO: remove
@@ -120,7 +118,7 @@ where
     A: ManagedTypeApi + ErrorApi + 'static,
 {
     let mut message_buffer =
-        ManagedBuffer::new_from_bytes(api.clone(), err_msg::CONTRACT_CALL_ENCODE_ERROR);
+        ManagedBuffer::<A>::new_from_bytes(err_msg::CONTRACT_CALL_ENCODE_ERROR);
     message_buffer.append_bytes(encode_err.message_bytes());
     api.signal_error_from_buffer(message_buffer.get_raw_handle())
 }

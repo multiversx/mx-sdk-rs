@@ -456,7 +456,7 @@ impl BlockchainApi for crate::VmApiImpl {
             // Token is frozen if properties are not 0
             let frozen = properties[0] == 0 && properties[1] == 0;
 
-            let mut uris_vec = ManagedVec::new(self.clone());
+            let mut uris_vec = ManagedVec::new();
             uris_vec.push(ManagedBuffer::new_from_bytes(
                 self.clone(),
                 uri_bytes.as_slice(),
@@ -466,10 +466,10 @@ impl BlockchainApi for crate::VmApiImpl {
                 token_type,
                 amount: BigUint::from_raw_handle(value_handle),
                 frozen,
-                hash: ManagedBuffer::new_from_bytes(self.clone(), hash.as_slice()),
-                name: ManagedBuffer::new_from_bytes(self.clone(), name_bytes.as_slice()),
-                attributes: ManagedBuffer::new_from_bytes(self.clone(), attr_bytes.as_slice()),
-                creator: ManagedAddress::from_address(self.clone(), &creator),
+                hash: ManagedBuffer::new_from_bytes(hash.as_slice()),
+                name: ManagedBuffer::new_from_bytes(name_bytes.as_slice()),
+                attributes: ManagedBuffer::new_from_bytes(attr_bytes.as_slice()),
+                creator: ManagedAddress::from_address(&creator),
                 royalties: BigUint::from_raw_handle(royalties_handle),
                 uris: uris_vec,
             }

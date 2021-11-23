@@ -3,7 +3,7 @@ use elrond_wasm::{
     api::{BlockchainApi, Handle, SendApi, StorageReadApi, StorageWriteApi},
     types::{
         BigUint, CodeMetadata, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer,
-        ManagedInto, ManagedType, ManagedVec, TokenIdentifier,
+        ManagedType, ManagedVec, TokenIdentifier,
     },
 };
 
@@ -117,9 +117,9 @@ unsafe fn code_metadata_to_buffer_handle(code_metadata: CodeMetadata) -> Handle 
 impl SendApi for VmApiImpl {
     fn direct_egld<D>(&self, to: &ManagedAddress<Self>, amount: &BigUint<Self>, data: D)
     where
-        D: ManagedInto<Self, ManagedBuffer<Self>>,
+        D: Into<ManagedBuffer<Self>>,
     {
-        let data_buffer = data.managed_into(self.clone());
+        let data_buffer = data.into();
         unsafe {
             let arguments_handle = mBufferNew();
 
@@ -179,7 +179,7 @@ impl SendApi for VmApiImpl {
         endpoint_name: &ManagedBuffer<Self>,
         arg_buffer: &ManagedArgBuffer<Self>,
     ) -> Result<(), &'static [u8]> {
-        let mut payments = ManagedVec::new(self.clone());
+        let mut payments = ManagedVec::new();
         payments.push(EsdtTokenPayment::new(token.clone(), nonce, amount.clone()));
         self.direct_multi_esdt_transfer_execute(to, &payments, gas_limit, endpoint_name, arg_buffer)
     }
@@ -493,7 +493,7 @@ impl SendApi for VmApiImpl {
         self.execute_on_dest_context_raw(
             gas,
             &own_address,
-            &BigUint::zero(self.clone()),
+            &BigUint::zero(),
             function_name,
             arg_buffer,
         )

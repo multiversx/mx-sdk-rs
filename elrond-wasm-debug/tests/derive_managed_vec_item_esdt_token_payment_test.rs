@@ -3,7 +3,7 @@ use elrond_wasm::{
     derive::ManagedVecItem,
     elrond_codec,
     elrond_codec::elrond_codec_derive::{NestedDecode, NestedEncode, TopDecode, TopEncode},
-    types::{BigUint, EsdtTokenPayment, ManagedByteArray, ManagedFrom, TokenIdentifier},
+    types::{BigUint, EsdtTokenPayment, ManagedByteArray, TokenIdentifier},
 };
 use elrond_wasm_debug::DebugApi;
 
@@ -35,17 +35,17 @@ fn struct_with_numbers_static() {
 
 #[test]
 fn struct_to_bytes_writer() {
-    let api = DebugApi::dummy();
+    let _ = DebugApi::dummy();
     let s = ManagedStructWithToken::<DebugApi> {
         token: EsdtTokenPayment {
-            token_identifier: TokenIdentifier::managed_from(api.clone(), &b"MYTOKEN-12345"[..]),
+            token_identifier: TokenIdentifier::from(&b"MYTOKEN-12345"[..]),
             token_nonce: 0u64,
             token_type: elrond_wasm::types::EsdtTokenType::Fungible,
-            amount: BigUint::managed_from(api.clone(), 42u64),
+            amount: BigUint::from(42u64),
         },
         num: 0x12345,
-        eth_address_1: ManagedByteArray::new_from_bytes(api.clone(), &[1u8; 20]),
-        eth_address_2: ManagedByteArray::new_from_bytes(api.clone(), &[2u8; 20]),
+        eth_address_1: ManagedByteArray::new_from_bytes(&[1u8; 20]),
+        eth_address_2: ManagedByteArray::new_from_bytes(&[2u8; 20]),
     };
     let mut arr: [u8; 28] = [0u8; <ManagedStructWithToken<DebugApi> as elrond_wasm::types::ManagedVecItem<
         DebugApi,
@@ -71,14 +71,14 @@ fn struct_from_bytes_reader() {
     let api = DebugApi::dummy();
     let s = ManagedStructWithToken::<DebugApi> {
         token: EsdtTokenPayment {
-            token_identifier: TokenIdentifier::managed_from(api.clone(), &b"MYTOKEN-12345"[..]),
+            token_identifier: TokenIdentifier::from(&b"MYTOKEN-12345"[..]),
             token_nonce: 0u64,
             token_type: elrond_wasm::types::EsdtTokenType::Fungible,
-            amount: BigUint::managed_from(api.clone(), 42u64),
+            amount: 42u64.into(),
         },
         num: 0x12345,
-        eth_address_1: ManagedByteArray::new_from_bytes(api.clone(), &[1u8; 20]),
-        eth_address_2: ManagedByteArray::new_from_bytes(api.clone(), &[2u8; 20]),
+        eth_address_1: ManagedByteArray::new_from_bytes(&[1u8; 20]),
+        eth_address_2: ManagedByteArray::new_from_bytes(&[2u8; 20]),
     };
     let arr: [u8; 28] = [
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,

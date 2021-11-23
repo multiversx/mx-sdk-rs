@@ -24,7 +24,7 @@ pub trait Parent {
             &self.types().big_uint_zero(),
             &code,
             CodeMetadata::DEFAULT,
-            &ManagedArgBuffer::new_empty(self.type_manager()),
+            &ManagedArgBuffer::new_empty(),
         );
 
         self.child_contract_address().set(&child_contract_address);
