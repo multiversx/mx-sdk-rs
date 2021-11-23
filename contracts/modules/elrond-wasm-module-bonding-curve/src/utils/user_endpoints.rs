@@ -146,7 +146,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
                 self.nonce_amount(&token, nonce)
                     .update(|val| *val -= total_amount.clone());
                 amount_to_send = total_amount.clone();
-                total_amount = self.types().big_uint_zero();
+                total_amount = BigUint::zero();
             }
             self.send()
                 .direct(caller, &token, nonce, &amount_to_send, b"buying");
@@ -214,10 +214,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
             bonding_curve.curve.is_none(),
             "The token price was not set yet!"
         );
-        require!(
-            amount > &self.types().big_uint_zero(),
-            "Must pay more than 0 tokens!"
-        );
+        require!(amount > &0, "Must pay more than 0 tokens!");
         Ok(bonding_curve.payment_token)
     }
 

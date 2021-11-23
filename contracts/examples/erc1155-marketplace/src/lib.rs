@@ -333,7 +333,7 @@ pub trait Erc1155Marketplace {
             max_bid: max_bid.clone(),
             deadline,
             original_owner: original_owner.clone(),
-            current_bid: self.types().big_uint_zero(),
+            current_bid: BigUint::zero(),
             current_winner: ManagedAddress::zero(),
         });
 
@@ -360,16 +360,14 @@ pub trait Erc1155Marketplace {
 
     fn add_claimable_funds(&self, token_identifier: &TokenIdentifier, amount: &BigUint) {
         let mut mapper = self.get_claimable_funds_mapper();
-        let mut total = mapper
-            .get(token_identifier)
-            .unwrap_or_else(|| self.types().big_uint_zero());
+        let mut total = mapper.get(token_identifier).unwrap_or_default();
         total += amount;
         mapper.insert(token_identifier.clone(), total);
     }
 
     fn clear_claimable_funds(&self, token_identifier: &TokenIdentifier) {
         let mut mapper = self.get_claimable_funds_mapper();
-        mapper.insert(token_identifier.clone(), self.types().big_uint_zero());
+        mapper.insert(token_identifier.clone(), BigUint::zero());
     }
 
     fn data_or_empty_if_sc(&self, dest: &ManagedAddress, data: &'static [u8]) -> &[u8] {
