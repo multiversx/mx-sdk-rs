@@ -1,6 +1,6 @@
 use super::{
     BlockchainWrapper, CallValueWrapper, CryptoWrapper, ErrorHelper, ManagedSerializer,
-    ManagedTypeHelper, PrintHelper, SendWrapper,
+    PrintHelper, SendWrapper,
 };
 use crate::api::VMApi;
 
@@ -34,12 +34,6 @@ pub trait ContractBase: Sized {
     #[inline]
     fn type_manager(&self) -> Self::Api {
         self.raw_vm_api()
-    }
-
-    /// Helps create new instances of managed types
-    #[inline]
-    fn types(&self) -> ManagedTypeHelper<Self::Api> {
-        ManagedTypeHelper::new(self.raw_vm_api())
     }
 
     /// Gateway blockchain info related to the current transaction and to accounts.

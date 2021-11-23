@@ -29,7 +29,7 @@ pub trait NftMinter: nft_module::NftModule {
     ) -> SCResult<u64> {
         let token_used_as_payment = opt_token_used_as_payment
             .into_option()
-            .unwrap_or_else(|| self.types().token_identifier_egld());
+            .unwrap_or_else(|| TokenIdentifier::egld());
 
         let token_used_as_payment_nonce = if token_used_as_payment.is_egld() {
             0

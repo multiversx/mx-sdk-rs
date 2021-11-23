@@ -154,7 +154,7 @@ pub trait Lottery {
             max_entries_per_user,
             prize_distribution,
             whitelist,
-            prize_pool: self.types().big_uint_zero(),
+            prize_pool: BigUint::zero(),
         };
 
         self.lottery_info(&lottery_name).set(&info);
@@ -288,10 +288,8 @@ pub trait Lottery {
         for i in (1..total_winning_tickets).rev() {
             let winning_ticket_id = winning_tickets[i];
             let winner_address = self.ticket_holders(lottery_name).get(winning_ticket_id);
-            let prize = self.calculate_percentage_of(
-                &total_prize,
-                &self.types().big_uint_from(info.prize_distribution[i]),
-            );
+            let prize = self
+                .calculate_percentage_of(&total_prize, &BigUint::from(info.prize_distribution[i]));
 
             self.send().direct(
                 &winner_address,
