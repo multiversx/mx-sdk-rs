@@ -29,7 +29,7 @@ where
         let mbuf_handle = self
             .api
             .storage_load_managed_buffer_raw(self.key.buffer.get_raw_handle());
-        ManagedBuffer::from_raw_handle(self.api.clone(), mbuf_handle)
+        ManagedBuffer::from_raw_handle(mbuf_handle)
     }
 
     fn to_big_uint(&self) -> BigUint<A> {

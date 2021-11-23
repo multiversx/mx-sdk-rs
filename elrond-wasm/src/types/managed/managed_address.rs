@@ -83,9 +83,9 @@ where
     M: ManagedTypeApi,
 {
     #[inline]
-    fn from_raw_handle(api: M, handle: Handle) -> Self {
+    fn from_raw_handle(handle: Handle) -> Self {
         ManagedAddress {
-            bytes: ManagedByteArray::from_raw_handle(api, handle),
+            bytes: ManagedByteArray::from_raw_handle(handle),
         }
     }
 

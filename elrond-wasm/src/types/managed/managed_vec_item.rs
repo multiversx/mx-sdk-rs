@@ -92,7 +92,7 @@ macro_rules! impl_managed_type {
 
             fn from_byte_reader<Reader: FnMut(&mut [u8])>(api: M, reader: Reader) -> Self {
                 let handle = Handle::from_byte_reader(api.clone(), reader);
-                $ty::from_raw_handle(api, handle)
+                $ty::from_raw_handle(handle)
             }
 
             fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, writer: Writer) -> R {
@@ -118,7 +118,7 @@ where
 
     fn from_byte_reader<Reader: FnMut(&mut [u8])>(api: M, reader: Reader) -> Self {
         let handle = Handle::from_byte_reader(api.clone(), reader);
-        Self::from_raw_handle(api, handle)
+        Self::from_raw_handle(handle)
     }
 
     fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, writer: Writer) -> R {
@@ -136,7 +136,7 @@ where
 
     fn from_byte_reader<Reader: FnMut(&mut [u8])>(api: M, reader: Reader) -> Self {
         let handle = Handle::from_byte_reader(api.clone(), reader);
-        Self::from_raw_handle(api, handle)
+        Self::from_raw_handle(handle)
     }
 
     fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, writer: Writer) -> R {

@@ -20,7 +20,7 @@ pub struct ManagedBuffer<M: ManagedTypeApi> {
 
 impl<M: ManagedTypeApi> ManagedType<M> for ManagedBuffer<M> {
     #[inline]
-    fn from_raw_handle(_api: M, handle: Handle) -> Self {
+    fn from_raw_handle(handle: Handle) -> Self {
         ManagedBuffer {
             handle,
             _phantom: PhantomData,
@@ -34,23 +34,14 @@ impl<M: ManagedTypeApi> ManagedType<M> for ManagedBuffer<M> {
 }
 
 impl<M: ManagedTypeApi> ManagedBuffer<M> {
-    /// TODO: will be the only one left
-    #[inline]
-    pub fn from_raw_handle_no_api(handle: Handle) -> Self {
-        ManagedBuffer {
-            handle,
-            _phantom: PhantomData,
-        }
-    }
-
     #[inline]
     pub fn new(_api: M) -> Self {
-        ManagedBuffer::from_raw_handle_no_api(M::instance().mb_new_empty())
+        ManagedBuffer::from_raw_handle(M::instance().mb_new_empty())
     }
 
     #[inline(always)]
     pub fn new_from_bytes(_api: M, bytes: &[u8]) -> Self {
-        ManagedBuffer::from_raw_handle_no_api(M::instance().mb_new_from_bytes(bytes))
+        ManagedBuffer::from_raw_handle(M::instance().mb_new_from_bytes(bytes))
     }
 }
 
@@ -133,14 +124,12 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
         starting_position: usize,
         slice_len: usize,
     ) -> Option<ManagedBuffer<M>> {
-        let result_handle = M::instance().mb_new_empty();
+        let api = M::instance();
+        let result_handle = api.mb_new_empty();
         let err_result =
-            M::instance().mb_copy_slice(self.handle, starting_position, slice_len, result_handle);
+            api.mb_copy_slice(self.handle, starting_position, slice_len, result_handle);
         if err_result.is_ok() {
-            Some(ManagedBuffer::from_raw_handle(
-                M::instance().clone(),
-                result_handle,
-            ))
+            Some(ManagedBuffer::from_raw_handle(result_handle))
         } else {
             None
         }
@@ -189,7 +178,7 @@ impl<M: ManagedTypeApi> Clone for ManagedBuffer<M> {
         let api = M::instance();
         let clone_handle = api.mb_new_empty();
         api.mb_append(clone_handle, self.handle);
-        ManagedBuffer::from_raw_handle_no_api(clone_handle)
+        ManagedBuffer::from_raw_handle(clone_handle)
     }
 }
 

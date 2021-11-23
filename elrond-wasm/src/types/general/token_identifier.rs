@@ -19,9 +19,9 @@ pub struct TokenIdentifier<M: ManagedTypeApi> {
 
 impl<M: ManagedTypeApi> ManagedType<M> for TokenIdentifier<M> {
     #[inline]
-    fn from_raw_handle(api: M, handle: Handle) -> Self {
+    fn from_raw_handle(handle: Handle) -> Self {
         TokenIdentifier {
-            buffer: ManagedBuffer::from_raw_handle(api, handle),
+            buffer: ManagedBuffer::from_raw_handle(handle),
         }
     }
 

@@ -86,10 +86,7 @@ where
     M: ManagedTypeApi,
 {
     pub fn to_arg_buffer(&self) -> ManagedArgBuffer<M> {
-        ManagedArgBuffer::from_raw_handle(
-            self.raw_buffers.type_manager(),
-            self.raw_buffers.get_raw_handle(),
-        )
+        ManagedArgBuffer::from_raw_handle(self.raw_buffers.get_raw_handle())
     }
 }
 
