@@ -37,7 +37,7 @@ mod module_1 {
         C: AutoImpl,
     {
         fn version(&self) -> BigInt<Self::Api> {
-            BigInt::from_i64(self.type_manager(), 100)
+            BigInt::from(100)
         }
 
         fn some_async(&self) -> AsyncCall<Self::Api> {
