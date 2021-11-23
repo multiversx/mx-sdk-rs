@@ -35,7 +35,7 @@ where
     }
 
     #[inline]
-    pub fn new(_api: M) -> Self {
+    pub fn new() -> Self {
         ManagedMultiResultVec::from_raw_vec(ManagedVec::new())
     }
 }
@@ -73,7 +73,7 @@ where
 {
     #[inline]
     fn from(v: &ManagedVec<M, T>) -> Self {
-        let mut result = ManagedMultiResultVec::new(v.type_manager());
+        let mut result = ManagedMultiResultVec::new();
         for item in v.into_iter() {
             result.push(item);
         }
