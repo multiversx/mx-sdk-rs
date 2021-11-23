@@ -42,13 +42,14 @@ pub fn generate_proxy_endpoint(m: &Method, endpoint_name: String) -> proc_macro2
     let msig = generate_proxy_endpoint_sig(m);
 
     let mut token_count = 0;
-    let mut token_expr = quote! { elrond_wasm::types::TokenIdentifier::egld(___api___.clone()) };
+    let mut token_expr = quote! { elrond_wasm::types::TokenIdentifier::<Self::Api>::egld() };
     let mut nonce_count = 0;
     let mut nonce_expr = quote! { 0u64 };
     let mut payment_count = 0;
-    let mut payment_expr = quote! { elrond_wasm::types::BigUint::zero(___api___.clone()) };
+    let mut payment_expr = quote! { elrond_wasm::types::BigUint::<Self::Api>::zero() };
     let mut multi_count = 0;
-    let mut multi_expr = quote! { elrond_wasm::types::ManagedVec::new(___api___.clone()) };
+    let mut multi_expr =
+        quote! { elrond_wasm::types::ManagedVec::<Self::Api, EsdtTokenPayment<Self::Api>>::new() };
 
     let arg_push_snippets: Vec<proc_macro2::TokenStream> = m
         .method_args
@@ -134,7 +135,7 @@ pub fn generate_proxy_endpoint(m: &Method, endpoint_name: String) -> proc_macro2
                 ___api___.clone(),
                 ___address___,
                 #endpoint_name_literal,
-                ManagedVec::new(___api___.clone()),
+                ManagedVec::<Self::Api, EsdtTokenPayment<Self::Api>>::new(),
             );
             #single_payment_snippet
             #multiple_payment_snippet

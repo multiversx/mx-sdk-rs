@@ -2,7 +2,7 @@ use super::ArgBuffer;
 use crate::{
     api::{ErrorApi, Handle, ManagedTypeApi},
     err_msg,
-    types::{ManagedBuffer, ManagedFrom, ManagedInto, ManagedType, ManagedVec, ManagedVecIterator},
+    types::{ManagedBuffer, ManagedType, ManagedVec, ManagedVecIterator},
     DynArgOutput,
 };
 use alloc::vec::Vec;
@@ -16,7 +16,6 @@ pub struct ManagedArgBuffer<M>
 where
     M: ManagedTypeApi + ErrorApi + 'static,
 {
-    api: M,
     pub(crate) data: ManagedVec<M, ManagedBuffer<M>>,
 }
 
@@ -25,21 +24,15 @@ where
     M: ManagedTypeApi + ErrorApi + 'static,
 {
     #[inline]
-    fn from_raw_handle(api: M, handle: Handle) -> Self {
+    fn from_raw_handle(handle: Handle) -> Self {
         ManagedArgBuffer {
-            api: api.clone(),
-            data: ManagedVec::from_raw_handle(api, handle),
+            data: ManagedVec::from_raw_handle(handle),
         }
     }
 
     #[doc(hidden)]
     fn get_raw_handle(&self) -> Handle {
         self.data.get_raw_handle()
-    }
-
-    #[inline]
-    fn type_manager(&self) -> M {
-        self.data.type_manager()
     }
 }
 
@@ -48,24 +41,20 @@ where
     M: ManagedTypeApi + ErrorApi + 'static,
 {
     #[inline]
-    pub fn new_empty(api: M) -> Self {
+    pub fn new_empty() -> Self {
         ManagedArgBuffer {
-            api: api.clone(),
-            data: ManagedVec::new(api),
+            data: ManagedVec::new(),
         }
     }
 }
 
-impl<M, I> ManagedFrom<M, Vec<I>> for ManagedArgBuffer<M>
+impl<M, I> From<Vec<I>> for ManagedArgBuffer<M>
 where
     M: ManagedTypeApi,
-    I: ManagedInto<M, ManagedBuffer<M>>,
+    I: Into<ManagedBuffer<M>>,
 {
-    fn managed_from(api: M, v: Vec<I>) -> Self {
-        ManagedArgBuffer {
-            api: api.clone(),
-            data: v.managed_into(api),
-        }
+    fn from(v: Vec<I>) -> Self {
+        ManagedArgBuffer { data: v.into() }
     }
 }
 
@@ -74,10 +63,7 @@ where
     M: ManagedTypeApi,
 {
     fn from(data: ManagedVec<M, ManagedBuffer<M>>) -> Self {
-        ManagedArgBuffer {
-            api: data.type_manager(),
-            data,
-        }
+        ManagedArgBuffer { data }
     }
 }
 
@@ -101,10 +87,10 @@ where
     }
 
     pub fn push_arg<T: TopEncode>(&mut self, arg: T) {
-        let mut encoded_buffer = ManagedBuffer::new(self.api.clone());
+        let mut encoded_buffer = ManagedBuffer::new();
         arg.top_encode_or_exit(
             &mut encoded_buffer,
-            self.api.clone(),
+            M::instance(), // TODO: remove
             managed_arg_buffer_push_exit,
         );
         self.push_arg_raw(encoded_buffer);
@@ -132,7 +118,7 @@ where
     A: ManagedTypeApi + ErrorApi + 'static,
 {
     let mut message_buffer =
-        ManagedBuffer::new_from_bytes(api.clone(), err_msg::CONTRACT_CALL_ENCODE_ERROR);
+        ManagedBuffer::<A>::new_from_bytes(err_msg::CONTRACT_CALL_ENCODE_ERROR);
     message_buffer.append_bytes(encode_err.message_bytes());
     api.signal_error_from_buffer(message_buffer.get_raw_handle())
 }

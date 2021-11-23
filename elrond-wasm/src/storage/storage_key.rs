@@ -17,9 +17,9 @@ where
     A: ManagedTypeApi + ErrorApi + 'static,
 {
     #[inline]
-    pub fn new(api: A, base_key: &[u8]) -> Self {
+    pub fn new(_api: A, base_key: &[u8]) -> Self {
         StorageKey {
-            buffer: ManagedBuffer::new_from_bytes(api, base_key),
+            buffer: ManagedBuffer::new_from_bytes(base_key),
         }
     }
 
@@ -77,8 +77,7 @@ fn storage_key_append_exit<A>(api: A, encode_err: EncodeError) -> !
 where
     A: ManagedTypeApi + ErrorApi + 'static,
 {
-    let mut message_buffer =
-        ManagedBuffer::new_from_bytes(api.clone(), err_msg::STORAGE_KEY_ENCODE_ERROR);
+    let mut message_buffer = ManagedBuffer::<A>::new_from_bytes(err_msg::STORAGE_KEY_ENCODE_ERROR);
     message_buffer.append_bytes(encode_err.message_bytes());
     api.signal_error_from_buffer(message_buffer.get_raw_handle())
 }

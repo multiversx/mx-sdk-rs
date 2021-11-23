@@ -1,6 +1,10 @@
 use crate::api::{Handle, ManagedTypeApi};
 
 impl ManagedTypeApi for super::UncallableApi {
+    fn instance() -> Self {
+        unreachable!()
+    }
+
     fn mb_to_big_int_unsigned(&self, _buffer_handle: Handle) -> Handle {
         unreachable!()
     }

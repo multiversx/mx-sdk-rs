@@ -16,6 +16,10 @@ extern "C" {
 }
 
 impl elrond_wasm::api::ManagedTypeApi for crate::VmApiImpl {
+    fn instance() -> Self {
+        crate::VmApiImpl {}
+    }
+
     #[inline]
     fn mb_to_big_int_unsigned(&self, buffer_handle: Handle) -> Handle {
         unsafe {

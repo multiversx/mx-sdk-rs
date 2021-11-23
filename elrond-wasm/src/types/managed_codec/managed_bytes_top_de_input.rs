@@ -38,17 +38,17 @@ where
         T: TryStaticCast,
         F: FnOnce(Self) -> Result<T, DecodeError>,
     {
-        if let Some(result) = try_execute_then_cast(|| {
-            ManagedBuffer::new_from_bytes(self.api.clone(), self.bytes.as_slice())
-        }) {
+        if let Some(result) =
+            try_execute_then_cast(|| ManagedBuffer::<M>::new_from_bytes(self.bytes.as_slice()))
+        {
             Ok(result)
-        } else if let Some(result) = try_execute_then_cast(|| {
-            BigUint::from_bytes_be(self.api.clone(), self.bytes.as_slice())
-        }) {
+        } else if let Some(result) =
+            try_execute_then_cast(|| BigUint::<M>::from_bytes_be(self.bytes.as_slice()))
+        {
             Ok(result)
-        } else if let Some(result) = try_execute_then_cast(|| {
-            BigInt::from_signed_bytes_be(self.api.clone(), self.bytes.as_slice())
-        }) {
+        } else if let Some(result) =
+            try_execute_then_cast(|| BigInt::<M>::from_signed_bytes_be(self.bytes.as_slice()))
+        {
             Ok(result)
         } else {
             else_deser(self)

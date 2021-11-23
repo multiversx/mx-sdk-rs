@@ -346,7 +346,7 @@ pub trait GovernanceModule:
         proposal_id: usize,
     ) -> MultiResultVec<GovernanceActionAsMultiArg<Self::Api>> {
         if !self.proposal_exists(proposal_id) {
-            return Vec::new().into();
+            return MultiResultVec::new();
         }
 
         let actions = self.proposals().get(proposal_id).actions;

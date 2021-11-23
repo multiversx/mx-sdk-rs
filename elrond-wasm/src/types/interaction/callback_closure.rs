@@ -3,7 +3,7 @@ use crate::{
     contract_base::ManagedSerializer,
     storage::StorageKey,
     storage_clear, storage_get, storage_set,
-    types::{ManagedBuffer, ManagedType},
+    types::ManagedBuffer,
     ContractCallArg, ManagedResultArgLoader,
 };
 use elrond_codec::elrond_codec_derive::{TopDecode, TopEncode};
@@ -20,18 +20,17 @@ pub struct CallbackClosure<M: ManagedTypeApi> {
 
 /// Syntactical sugar to help macros to generate code easier.
 /// Unlike calling `CallbackClosure::<SA, R>::new`, here types can be inferred from the context.
-pub fn new_callback_call<A>(api: A, callback_name_slice: &'static [u8]) -> CallbackClosure<A>
+pub fn new_callback_call<A>(_api: A, callback_name_slice: &'static [u8]) -> CallbackClosure<A>
 where
     A: ManagedTypeApi + ErrorApi,
 {
-    let callback_name = ManagedBuffer::new_from_bytes(api, callback_name_slice);
+    let callback_name = ManagedBuffer::new_from_bytes(callback_name_slice);
     CallbackClosure::new(callback_name)
 }
 
 impl<M: ManagedTypeApi> CallbackClosure<M> {
     pub fn new(callback_name: ManagedBuffer<M>) -> Self {
-        let type_manager = callback_name.type_manager();
-        let arg_buffer = ManagedArgBuffer::new_empty(type_manager);
+        let arg_buffer = ManagedArgBuffer::new_empty();
         CallbackClosure {
             callback_name,
             closure_args: arg_buffer,
@@ -40,10 +39,10 @@ impl<M: ManagedTypeApi> CallbackClosure<M> {
 
     /// Used by callback_raw.
     /// TODO: avoid creating any new managed buffers.
-    pub fn new_empty(api: M) -> Self {
+    pub fn new_empty(_api: M) -> Self {
         CallbackClosure {
-            callback_name: ManagedBuffer::new(api.clone()),
-            closure_args: ManagedArgBuffer::new_empty(api),
+            callback_name: ManagedBuffer::new(),
+            closure_args: ManagedArgBuffer::new_empty(),
         }
     }
 
