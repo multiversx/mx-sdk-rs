@@ -55,7 +55,7 @@ where
                 // error messages should not normally be missing
                 // but there was a problem with Arwen in the past,
                 // so we are keeping this a little longer, for safety
-                ManagedBuffer::new(loader.vm_api_cast())
+                ManagedBuffer::new()
             };
             ManagedAsyncCallResult::Err(ManagedAsyncCallError { err_code, err_msg })
         }

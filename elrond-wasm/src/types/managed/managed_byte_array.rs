@@ -1,4 +1,4 @@
-use super::{ManagedBuffer, ManagedDefault, ManagedType};
+use super::{ManagedBuffer, ManagedType};
 use crate::{
     abi::TypeAbi,
     api::{Handle, ManagedTypeApi},
@@ -27,9 +27,9 @@ where
     M: ManagedTypeApi,
 {
     #[inline]
-    fn from_raw_handle(api: M, handle: Handle) -> Self {
+    fn from_raw_handle(handle: Handle) -> Self {
         ManagedByteArray {
-            buffer: ManagedBuffer::from_raw_handle(api, handle),
+            buffer: ManagedBuffer::from_raw_handle(handle),
         }
     }
 
@@ -37,20 +37,15 @@ where
     fn get_raw_handle(&self) -> Handle {
         self.buffer.get_raw_handle()
     }
-
-    #[inline]
-    fn type_manager(&self) -> M {
-        self.buffer.type_manager()
-    }
 }
 
-impl<M, const N: usize> ManagedDefault<M> for ManagedByteArray<M, N>
+impl<M, const N: usize> Default for ManagedByteArray<M, N>
 where
     M: ManagedTypeApi,
 {
     #[inline]
-    fn managed_default(api: M) -> Self {
-        Self::new_from_bytes(api, &[0u8; N])
+    fn default() -> Self {
+        Self::new_from_bytes(&[0u8; N])
     }
 }
 
@@ -59,9 +54,9 @@ where
     M: ManagedTypeApi,
 {
     #[inline]
-    pub fn new_from_bytes(api: M, bytes: &[u8; N]) -> Self {
+    pub fn new_from_bytes(bytes: &[u8; N]) -> Self {
         ManagedByteArray {
-            buffer: ManagedBuffer::new_from_bytes(api, &bytes[..]),
+            buffer: ManagedBuffer::new_from_bytes(&bytes[..]),
         }
     }
 

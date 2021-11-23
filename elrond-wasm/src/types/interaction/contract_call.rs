@@ -47,7 +47,7 @@ pub fn new_contract_call<SA, R>(
 where
     SA: SendApi + 'static,
 {
-    let endpoint_name = ManagedBuffer::new_from_bytes(api.clone(), endpoint_name_slice);
+    let endpoint_name = ManagedBuffer::new_from_bytes(endpoint_name_slice);
     ContractCall::<SA, R>::new_with_esdt_payment(api, to, endpoint_name, payments)
 }
 
@@ -56,7 +56,7 @@ where
     SA: SendApi + 'static,
 {
     pub fn new(api: SA, to: ManagedAddress<SA>, endpoint_name: ManagedBuffer<SA>) -> Self {
-        let payments = ManagedVec::new(api.clone());
+        let payments = ManagedVec::new();
         Self::new_with_esdt_payment(api, to, endpoint_name, payments)
     }
 
@@ -66,8 +66,8 @@ where
         endpoint_name: ManagedBuffer<SA>,
         payments: ManagedVec<SA, EsdtTokenPayment<SA>>,
     ) -> Self {
-        let arg_buffer = ManagedArgBuffer::new_empty(api.clone());
-        let egld_payment = BigUint::zero(api.clone());
+        let arg_buffer = ManagedArgBuffer::new_empty();
+        let egld_payment = BigUint::zero();
         ContractCall {
             api,
             to,
@@ -97,7 +97,7 @@ where
     pub fn with_egld_transfer(mut self, egld_amount: BigUint<SA>) -> Self {
         self.payments
             .overwrite_with_single_item(EsdtTokenPayment::new(
-                TokenIdentifier::egld(self.api.clone()),
+                TokenIdentifier::egld(),
                 0,
                 egld_amount,
             ));
@@ -133,7 +133,7 @@ where
     /// Convenience method, also creates the new managed buffer from bytes.
     pub fn push_argument_raw_bytes(&mut self, bytes: &[u8]) {
         self.arg_buffer
-            .push_arg_raw(ManagedBuffer::new_from_bytes(self.api.clone(), bytes));
+            .push_arg_raw(ManagedBuffer::new_from_bytes(bytes));
     }
 
     pub fn push_endpoint_arg<D: ContractCallArg>(&mut self, endpoint_arg: D) {
@@ -141,7 +141,7 @@ where
     }
 
     fn no_payments(&self) -> ManagedVec<SA, EsdtTokenPayment<SA>> {
-        ManagedVec::new(self.api.clone())
+        ManagedVec::new()
     }
 
     /// If this is an ESDT call, it converts it to a regular call to ESDTTransfer.
@@ -164,14 +164,13 @@ where
                 let no_payments = self.no_payments();
 
                 // fungible ESDT
-                let mut new_arg_buffer = ManagedArgBuffer::new_empty(self.api.clone());
+                let mut new_arg_buffer = ManagedArgBuffer::new_empty();
                 new_arg_buffer.push_arg(&payment.token_identifier);
                 new_arg_buffer.push_arg(&payment.amount);
                 new_arg_buffer.push_arg(&self.endpoint_name);
 
-                let zero = BigUint::zero(self.api.clone());
-                let endpoint_name =
-                    ManagedBuffer::new_from_bytes(self.api.clone(), ESDT_TRANSFER_FUNC_NAME);
+                let zero = BigUint::zero();
+                let endpoint_name = ManagedBuffer::new_from_bytes(ESDT_TRANSFER_FUNC_NAME);
 
                 ContractCall {
                     api: self.api.clone(),
@@ -192,7 +191,7 @@ where
                 // arg1 - nonce
                 // arg2 - quantity to transfer
                 // arg3 - destination address
-                let mut new_arg_buffer = ManagedArgBuffer::new_empty(self.api.clone());
+                let mut new_arg_buffer = ManagedArgBuffer::new_empty();
                 new_arg_buffer.push_arg(&payment.token_identifier);
                 new_arg_buffer.push_arg(&payment.token_nonce);
                 new_arg_buffer.push_arg(&payment.amount);
@@ -201,9 +200,8 @@ where
 
                 // nft transfer is sent to self, sender = receiver
                 let recipient_addr = self.api.get_sc_address();
-                let zero = BigUint::zero(self.api.clone());
-                let endpoint_name =
-                    ManagedBuffer::new_from_bytes(self.api.clone(), ESDT_NFT_TRANSFER_FUNC_NAME);
+                let zero = BigUint::zero();
+                let endpoint_name = ManagedBuffer::new_from_bytes(ESDT_NFT_TRANSFER_FUNC_NAME);
 
                 ContractCall {
                     api: self.api,
@@ -224,7 +222,7 @@ where
     fn convert_to_multi_transfer_esdt_call(self) -> Self {
         let payments = self.no_payments();
 
-        let mut new_arg_buffer = ManagedArgBuffer::new_empty(self.api.clone());
+        let mut new_arg_buffer = ManagedArgBuffer::new_empty();
         new_arg_buffer.push_arg(self.to);
         new_arg_buffer.push_arg(self.payments.len());
 
@@ -238,9 +236,8 @@ where
 
         // multi transfer is sent to self, sender = receiver
         let recipient_addr = self.api.get_sc_address();
-        let zero = BigUint::zero(self.api.clone());
-        let endpoint_name =
-            ManagedBuffer::new_from_bytes(self.api.clone(), ESDT_MULTI_TRANSFER_FUNC_NAME);
+        let zero = BigUint::zero();
+        let endpoint_name = ManagedBuffer::new_from_bytes(ESDT_MULTI_TRANSFER_FUNC_NAME);
 
         ContractCall {
             api: self.api,
@@ -392,7 +389,7 @@ where
 
         let _ = self.api.direct_egld_execute(
             &self.to,
-            &BigUint::zero(self.api.clone()),
+            &BigUint::zero(),
             gas_limit,
             &self.endpoint_name,
             &self.arg_buffer,

@@ -39,9 +39,9 @@ where
     SA: SendApi + 'static,
 {
     pub fn new(api: SA) -> Self {
-        let zero = BigUint::zero(api.clone());
-        let zero_address = ManagedAddress::zero(api.clone());
-        let arg_buffer = ManagedArgBuffer::new_empty(api.clone());
+        let zero = BigUint::zero();
+        let zero_address = ManagedAddress::zero();
+        let arg_buffer = ManagedArgBuffer::new_empty();
         ContractDeploy {
             api,
             to: zero_address,

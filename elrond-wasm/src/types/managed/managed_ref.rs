@@ -49,8 +49,8 @@ where
     M: ManagedTypeApi,
     T: ManagedType<M>,
 {
-    fn from_raw_handle(api: M, raw_handle: Handle) -> Self {
-        Self::new(T::from_raw_handle(api, raw_handle))
+    fn from_raw_handle(handle: Handle) -> Self {
+        Self::new(T::from_raw_handle(handle))
     }
 
     fn get_raw_handle(&self) -> Handle {
@@ -68,7 +68,7 @@ where
     T: ManagedType<M>,
 {
     fn clone(&self) -> Self {
-        Self::from_raw_handle(self.type_manager(), self.get_raw_handle())
+        Self::from_raw_handle(self.get_raw_handle())
     }
 }
 
@@ -88,10 +88,7 @@ where
     T: ManagedType<M>,
 {
     fn from(value: &T) -> Self {
-        Self::new(T::from_raw_handle(
-            value.type_manager(),
-            value.get_raw_handle(),
-        ))
+        Self::new(T::from_raw_handle(value.get_raw_handle()))
     }
 }
 

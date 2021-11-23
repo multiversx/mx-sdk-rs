@@ -8,7 +8,7 @@ pub trait MapStorageMapperFeatures {
 
     #[view]
     fn map_storage_mapper_view(&self) -> ManagedMultiResultVec<u32> {
-        let mut result = ManagedMultiResultVec::new(self.raw_vm_api());
+        let mut result = ManagedMultiResultVec::new();
         for (key1, map) in self.map_storage_mapper().iter() {
             for (key2, value) in map.iter() {
                 result.push(key1);
