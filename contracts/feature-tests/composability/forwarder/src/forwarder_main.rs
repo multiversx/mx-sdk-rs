@@ -55,7 +55,7 @@ pub trait Forwarder:
         let roles = self.blockchain().get_esdt_local_roles(&token_id);
         let mut result = ManagedMultiResultVec::new();
         for role in roles.iter_roles() {
-            result.push(role.as_role_name().managed_into());
+            result.push(role.as_role_name().into());
         }
         result
     }
