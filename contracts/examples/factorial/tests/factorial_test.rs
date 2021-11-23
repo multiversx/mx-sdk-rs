@@ -1,4 +1,4 @@
-use elrond_wasm::{contract_base::ContractBase, types::BigUint};
+use elrond_wasm::types::BigUint;
 use elrond_wasm_debug::DebugApi;
 use factorial::*;
 
