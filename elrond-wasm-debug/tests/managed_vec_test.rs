@@ -64,7 +64,7 @@ fn test_with_self_as_vec() {
     let _ = DebugApi::dummy();
 
     let mut vec = Vec::<BigUint<DebugApi>>::new();
-    let mut managed_vec = ManagedVec::new();
+    let mut managed_vec = ManagedVec::<DebugApi, BigUint<DebugApi>>::new();
     for i in 20u64..=30u64 {
         let biguint = BigUint::from(i);
         managed_vec.push(biguint.clone());

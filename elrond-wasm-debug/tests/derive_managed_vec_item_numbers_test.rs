@@ -20,12 +20,10 @@ pub struct StructWithNumbers {
 #[test]
 fn struct_with_numbers_static() {
     assert_eq!(
-        <StructWithNumbers as elrond_wasm::types::ManagedVecItem<DebugApi>>::PAYLOAD_SIZE,
+        <StructWithNumbers as elrond_wasm::types::ManagedVecItem>::PAYLOAD_SIZE,
         16
     );
-    assert!(
-        <StructWithNumbers as elrond_wasm::types::ManagedVecItem<DebugApi>>::SKIPS_RESERIALIZATION
-    );
+    assert!(<StructWithNumbers as elrond_wasm::types::ManagedVecItem>::SKIPS_RESERIALIZATION);
 }
 
 #[test]
@@ -61,26 +59,24 @@ fn struct_to_bytes_writer() {
         bool_field: true,
     };
     let mut arr: [u8; 16] =
-        [0u8; <StructWithNumbers as elrond_wasm::types::ManagedVecItem<DebugApi>>::PAYLOAD_SIZE];
+        [0u8; <StructWithNumbers as elrond_wasm::types::ManagedVecItem>::PAYLOAD_SIZE];
 
-    <StructWithNumbers as elrond_wasm::types::ManagedVecItem<DebugApi>>::to_byte_writer(
-        &s,
-        |bytes| {
-            arr[0..<StructWithNumbers as elrond_wasm::types::ManagedVecItem<DebugApi>>::PAYLOAD_SIZE].copy_from_slice(bytes);
-            assert_eq!(
-                arr,
-                [
-                    0x01, 0x00, 0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                    0x00, 0x04, 0x01,
-                ]
-            );
-        },
-    );
+    <StructWithNumbers as elrond_wasm::types::ManagedVecItem>::to_byte_writer(&s, |bytes| {
+        arr[0..<StructWithNumbers as elrond_wasm::types::ManagedVecItem>::PAYLOAD_SIZE]
+            .copy_from_slice(bytes);
+        assert_eq!(
+            arr,
+            [
+                0x01, 0x00, 0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x04, 0x01,
+            ]
+        );
+    });
 }
 
 #[test]
 fn struct_from_bytes_reader() {
-    let api = DebugApi::dummy();
+    let _ = DebugApi::dummy();
     let s = StructWithNumbers {
         u_8: 1u8,
         u_16: 2u16,
@@ -94,17 +90,10 @@ fn struct_from_bytes_reader() {
     ];
 
     let struct_from_bytes =
-        <StructWithNumbers as elrond_wasm::types::ManagedVecItem<DebugApi>>::from_byte_reader(
-            api,
-            |bytes| {
-                bytes.copy_from_slice(
-                    &arr
-                        [0
-                            ..<StructWithNumbers as elrond_wasm::types::ManagedVecItem<
-                                DebugApi,
-                            >>::PAYLOAD_SIZE],
-                );
-            },
-        );
+        <StructWithNumbers as elrond_wasm::types::ManagedVecItem>::from_byte_reader(|bytes| {
+            bytes.copy_from_slice(
+                &arr[0..<StructWithNumbers as elrond_wasm::types::ManagedVecItem>::PAYLOAD_SIZE],
+            );
+        });
     assert_eq!(s, struct_from_bytes);
 }
