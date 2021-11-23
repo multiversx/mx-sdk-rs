@@ -90,7 +90,7 @@ pub trait ForwarderAsyncCallModule {
         self.retrieve_funds_callback_event(&token, nonce, &payment);
 
         let _ = self.callback_data().push(&CallbackData {
-            callback_name: self.types().managed_buffer_from(b"retrieve_funds_callback"),
+            callback_name: ManagedBuffer::from(b"retrieve_funds_callback"),
             token_identifier: token,
             token_nonce: nonce,
             token_amount: payment,

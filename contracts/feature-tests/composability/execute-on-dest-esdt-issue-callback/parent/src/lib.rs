@@ -21,7 +21,7 @@ pub trait Parent {
     fn deploy_child_contract(&self, code: ManagedBuffer) {
         let (child_contract_address, _) = self.raw_vm_api().deploy_contract(
             self.blockchain().get_gas_left(),
-            &self.types().big_uint_zero(),
+            &BigUint::zero(),
             &code,
             CodeMetadata::DEFAULT,
             &ManagedArgBuffer::new_empty(),

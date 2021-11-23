@@ -113,7 +113,7 @@ pub trait ProxyTestFirst {
             .contract(other_contract)
             .message_me(
                 0x01,
-                &self.types().big_uint_from(2u32),
+                &BigUint::from(2u32),
                 [3u8; 3].to_vec(),
                 &ManagedAddress::from(&HARDCODED_ADDRESS),
             )
@@ -127,7 +127,7 @@ pub trait ProxyTestFirst {
             .contract(other_contract)
             .message_me(
                 0x01,
-                &self.types().big_uint_from(2u32),
+                &BigUint::from(2u32),
                 [3u8; 3].to_vec(),
                 &ManagedAddress::from(&HARDCODED_ADDRESS),
             )
