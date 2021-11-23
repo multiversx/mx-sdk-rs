@@ -73,12 +73,12 @@ impl<M: ManagedTypeApi> ManagedTypeHelper<M> {
 
     #[inline]
     pub fn elliptic_curve(&self, name: &str) -> EllipticCurve<M> {
-        EllipticCurve::from_name(self.api.clone(), name)
+        EllipticCurve::from_name(name)
     }
 
     #[inline]
     pub fn elliptic_curve_from_bitsize(&self, bitsize: u32) -> Option<EllipticCurve<M>> {
-        EllipticCurve::from_bitsize(self.api.clone(), bitsize)
+        EllipticCurve::from_bitsize(bitsize)
     }
 
     #[inline]
