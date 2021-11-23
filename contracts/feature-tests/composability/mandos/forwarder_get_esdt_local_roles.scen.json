@@ -168,7 +168,7 @@
                 "function": "check_token_has_roles",
                 "arguments": [
                     "str:ESDT-123456",
-                    "ESDTRoleNFTCreate"
+                    "u64:3"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
@@ -193,7 +193,7 @@
                 "function": "check_token_has_roles",
                 "arguments": [
                     "str:ESDT-123456",
-                    "ESDTRoleLocalMint"
+                    "u64:1"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
