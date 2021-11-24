@@ -219,6 +219,16 @@ fn get_esdt_local_roles_go() {
 }
 
 #[test]
+fn managed_address_array_go() {
+    elrond_wasm_debug::mandos_go("mandos/managed_address_array.scen.json");
+}
+
+#[test]
+fn managed_address_managed_buffer_go() {
+    elrond_wasm_debug::mandos_go("mandos/managed_address_managed_buffer.scen.json");
+}
+
+#[test]
 fn managed_buffer_concat_1_go() {
     elrond_wasm_debug::mandos_go("mandos/managed_buffer_concat_1.scen.json");
 }
