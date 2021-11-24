@@ -4,8 +4,8 @@ use elrond_wasm::{
     api::{BlockchainApi, SendApi, StorageReadApi, StorageWriteApi},
     types::{
         managed_vec_from_slice_of_boxed_bytes, Address, BigUint, BoxedBytes, CodeMetadata,
-        EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer, ManagedFrom,
-        ManagedInto, ManagedType, ManagedVec, TokenIdentifier,
+        EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer, ManagedType, ManagedVec,
+        TokenIdentifier,
     },
     HexCallDataSerializer,
 };
@@ -667,7 +667,6 @@ impl SendApi for VmApiImpl {
     fn storage_load_tx_hash_key(&self) -> ManagedBuffer<Self> {
         let tx_hash = self.get_tx_hash();
         ManagedBuffer::from_raw_handle(
-            self.clone(),
             self.storage_load_managed_buffer_raw(tx_hash.get_raw_handle()),
         )
     }
@@ -684,7 +683,7 @@ impl SendApi for VmApiImpl {
         self.execute_on_dest_context_raw(
             gas,
             &own_address,
-            &BigUint::zero(self.clone()),
+            &BigUint::zero(),
             function_name,
             arg_buffer,
         )
