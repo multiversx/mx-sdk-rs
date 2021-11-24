@@ -213,7 +213,10 @@ fn get_cumulated_validator_rewards_go() {
     elrond_wasm_debug::mandos_go("mandos/get_cumulated_validator_rewards.scen.json");
 }
 
-#[test]
+fn get_esdt_local_roles_go() {
+    elrond_wasm_debug::mandos_go("mandos/get_esdt_local_roles.scen.json");
+}
+
 fn managed_buffer_concat_1_go() {
     elrond_wasm_debug::mandos_go("mandos/managed_buffer_concat_1.scen.json");
 }

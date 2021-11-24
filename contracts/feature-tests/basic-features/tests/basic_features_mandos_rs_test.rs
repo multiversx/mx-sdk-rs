@@ -228,6 +228,16 @@ fn get_cumulated_validator_rewards_rs() {
 }
 
 #[test]
+fn managed_address_array_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/managed_address_array.scen.json", world());
+}
+
+#[test]
+fn managed_address_managed_buffer_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/managed_address_managed_buffer.scen.json", world());
+}
+
+#[test]
 fn managed_buffer_concat_1_rs() {
     elrond_wasm_debug::mandos_rs("mandos/managed_buffer_concat_1.scen.json", world());
 }

@@ -14,6 +14,7 @@ pub mod echo_managed;
 pub mod elliptic_curve_features;
 pub mod event_features;
 pub mod macro_features;
+pub mod managed_address_features;
 pub mod managed_buffer_features;
 pub mod managed_vec_features;
 pub mod storage_direct_load;
@@ -43,6 +44,7 @@ pub trait BasicFeatures:
     + echo_managed::EchoManagedTypes
     + event_features::EventFeatures
     + macro_features::Macros
+    + managed_address_features::ManagedAddressFeatures
     + managed_buffer_features::ManagedBufferFeatures
     + managed_vec_features::ManagedVecFeatures
     + storage_direct_load::StorageLoadFeatures
