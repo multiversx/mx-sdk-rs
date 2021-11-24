@@ -1,3 +1,5 @@
+use core::convert::{TryFrom, TryInto};
+
 use super::{ManagedBuffer, ManagedType};
 use crate::{
     abi::TypeAbi,
@@ -89,6 +91,20 @@ where
 
 impl<M, const N: usize> Eq for ManagedByteArray<M, N> where M: ManagedTypeApi {}
 
+impl<M, const N: usize> TryFrom<ManagedBuffer<M>> for ManagedByteArray<M, N>
+where
+    M: ManagedTypeApi
+{
+    type Error = DecodeError;
+
+    fn try_from(value: ManagedBuffer<M>) -> Result<Self, Self::Error> {
+        if value.len() != N {
+            return Err(DecodeError::from(DECODE_ERROR_BAD_LENGTH));
+        }
+        Ok(ManagedByteArray { buffer: value })
+    }
+}
+
 impl<M, const N: usize> TopEncode for ManagedByteArray<M, N>
 where
     M: ManagedTypeApi,
@@ -105,10 +121,7 @@ where
 {
     fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
         let buffer = ManagedBuffer::top_decode(input)?;
-        if buffer.len() != N {
-            return Err(DecodeError::from(DECODE_ERROR_BAD_LENGTH));
-        }
-        Ok(ManagedByteArray { buffer })
+        buffer.try_into()
     }
 }
 
