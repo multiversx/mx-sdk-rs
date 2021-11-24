@@ -4,6 +4,8 @@ There are several crates in this repo, this changelog will keep track of all of 
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [elrond-wasm 0.23.0] - 2021-11-23
+- Static access to API. Static thread-local context stack in the debugger.
 
 ## [elrond-wasm 0.22.11] - 2021-11-17
 - Derive `ManagedVecItem` generics fix
