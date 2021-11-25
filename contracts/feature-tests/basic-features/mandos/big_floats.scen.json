@@ -774,7 +774,7 @@
         },
         {
             "step": "scCall",
-            "txId": "BigFloatAdd - 2",
+            "txId": "BigFloatAddRef - 2",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
