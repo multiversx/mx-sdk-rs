@@ -165,4 +165,28 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
     fn local_burn(&self, token_identifier: TokenIdentifier, amount: BigUint) {
         self.send().esdt_local_burn(&token_identifier, 0, &amount);
     }
+
+    #[endpoint]
+    fn get_esdt_local_roles(
+        &self,
+        token_id: TokenIdentifier,
+    ) -> ManagedMultiResultVec<ManagedBuffer> {
+        let roles = self.blockchain().get_esdt_local_roles(&token_id);
+        let mut result = ManagedMultiResultVec::new();
+        for role in roles.iter_roles() {
+            result.push(role.as_role_name().into());
+        }
+        result
+    }
+
+    #[endpoint]
+    fn check_token_has_roles(&self, token_id: TokenIdentifier, role: EsdtLocalRole) -> bool {
+        let roles = self.blockchain().get_esdt_local_roles(&token_id);
+        roles.has_role(&role)
+    }
+
+    #[endpoint]
+    fn validate_token_identifier(&self, token_id: TokenIdentifier) -> bool {
+        self.blockchain().validate_token_identifier(&token_id)
+    }
 }

@@ -46,23 +46,4 @@ pub trait Forwarder:
         };
         self.send().direct_egld(to, amount, data);
     }
-
-    #[endpoint]
-    fn get_esdt_local_roles(
-        &self,
-        token_id: TokenIdentifier,
-    ) -> ManagedMultiResultVec<ManagedBuffer> {
-        let roles = self.blockchain().get_esdt_local_roles(&token_id);
-        let mut result = ManagedMultiResultVec::new();
-        for role in roles.iter_roles() {
-            result.push(role.as_role_name().into());
-        }
-        result
-    }
-
-    #[endpoint]
-    fn check_token_has_roles(&self, token_id: TokenIdentifier, role: EsdtLocalRole) -> bool {
-        let roles = self.blockchain().get_esdt_local_roles(&token_id);
-        roles.has_role(&role)
-    }
 }

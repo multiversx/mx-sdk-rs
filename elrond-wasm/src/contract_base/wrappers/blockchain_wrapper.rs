@@ -240,4 +240,8 @@ where
         let roles = self.api.get_esdt_local_roles(token_id);
         roles.has_role(role)
     }
+
+    pub fn validate_token_identifier(&self, token_id: &TokenIdentifier<A>) -> bool {
+        self.api.validate_token_identifier(token_id)
+    }
 }

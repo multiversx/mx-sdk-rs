@@ -156,4 +156,8 @@ pub trait BlockchainApi:
 
         result
     }
+
+    fn validate_token_identifier(&self, token_id: &TokenIdentifier<Self>) -> bool {
+        token_id.is_valid_esdt_identifier()
+    }
 }
