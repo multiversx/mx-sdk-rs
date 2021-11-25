@@ -61,7 +61,7 @@ pub trait ManagedTypeApi:
         });
     }
 
-    fn is_valid_esdt_identifier(&self, token_id_handle: Handle) -> bool {
+    fn validate_token_identifier(&self, token_id_handle: Handle) -> bool {
         let token_id_bytes = self.mb_to_boxed_bytes(token_id_handle);
         let id_len = token_id_bytes.len();
 
