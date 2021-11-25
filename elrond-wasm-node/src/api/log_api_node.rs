@@ -57,9 +57,9 @@ impl LogApi for VmApiImpl {
         use elrond_wasm::types::{
             managed_vec_of_buffers_to_arg_buffer, ManagedBuffer, ManagedType, ManagedVec,
         };
-        let topics = ManagedVec::from_raw_handle(self.clone(), topics_handle);
+        let topics = ManagedVec::<Self, ManagedBuffer<Self>>::from_raw_handle(topics_handle);
         let topics_arg_buffer = managed_vec_of_buffers_to_arg_buffer(&topics);
-        let data = ManagedBuffer::from_raw_handle(self.clone(), data_handle);
+        let data = ManagedBuffer::<Self>::from_raw_handle(data_handle);
         self.write_event_log(&topics_arg_buffer, data.to_boxed_bytes().as_slice());
     }
 

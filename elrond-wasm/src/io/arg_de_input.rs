@@ -34,19 +34,19 @@ where
     #[inline]
     fn to_managed_buffer(&self) -> ManagedBuffer<AA> {
         let mbuf_handle = self.api.get_argument_managed_buffer_raw(self.arg_index);
-        ManagedBuffer::from_raw_handle(self.api.clone(), mbuf_handle)
+        ManagedBuffer::from_raw_handle(mbuf_handle)
     }
 
     #[inline]
     fn to_big_int(&self) -> BigInt<AA> {
         let bi_handle = self.api.get_argument_big_int_raw(self.arg_index);
-        BigInt::from_raw_handle(self.api.clone(), bi_handle)
+        BigInt::from_raw_handle(bi_handle)
     }
 
     #[inline]
     fn to_big_uint(&self) -> BigUint<AA> {
         let bi_handle = self.api.get_argument_big_uint_raw(self.arg_index);
-        BigUint::from_raw_handle(self.api.clone(), bi_handle)
+        BigUint::from_raw_handle(bi_handle)
     }
 }
 

@@ -42,14 +42,8 @@ pub trait GovernanceModule:
 
         let caller = self.blockchain().get_caller();
         let governance_token_id = self.governance_token_id().get();
-        let nr_votes_tokens = self
-            .votes(proposal_id)
-            .get(&caller)
-            .unwrap_or_else(|| self.types().big_uint_zero());
-        let nr_downvotes_tokens = self
-            .downvotes(proposal_id)
-            .get(&caller)
-            .unwrap_or_else(|| self.types().big_uint_zero());
+        let nr_votes_tokens = self.votes(proposal_id).get(&caller).unwrap_or_default();
+        let nr_downvotes_tokens = self.downvotes(proposal_id).get(&caller).unwrap_or_default();
         let total_tokens = nr_votes_tokens + nr_downvotes_tokens;
 
         if total_tokens > 0 {
@@ -346,7 +340,7 @@ pub trait GovernanceModule:
         proposal_id: usize,
     ) -> MultiResultVec<GovernanceActionAsMultiArg<Self::Api>> {
         if !self.proposal_exists(proposal_id) {
-            return Vec::new().into();
+            return MultiResultVec::new();
         }
 
         let actions = self.proposals().get(proposal_id).actions;

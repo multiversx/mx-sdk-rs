@@ -103,7 +103,7 @@ pub trait NftModule {
             &caller,
             &nft_token_id,
             nft_nonce,
-            &self.types().big_uint_from(NFT_AMOUNT),
+            &BigUint::from(NFT_AMOUNT),
             &[],
         );
 
@@ -174,14 +174,14 @@ pub trait NftModule {
         attributes.top_encode(&mut serialized_attributes)?;
 
         let attributes_hash = self.crypto().sha256(&serialized_attributes);
-        let hash_buffer = self.types().managed_buffer_from(attributes_hash.as_bytes());
+        let hash_buffer = ManagedBuffer::from(attributes_hash.as_bytes());
 
-        let mut uris = ManagedVec::new(self.type_manager());
+        let mut uris = ManagedVec::new();
         uris.push(uri);
 
         let nft_nonce = self.send().esdt_nft_create(
             &nft_token_id,
-            &self.types().big_uint_from(NFT_AMOUNT),
+            &BigUint::from(NFT_AMOUNT),
             &name,
             &royalties,
             &hash_buffer,

@@ -68,7 +68,7 @@ where
     }
 
     fn start_nested_encode(&self) -> Self::NestedBuffer {
-        ManagedBufferCachedBuilder::new_from_slice(self.api.clone(), &[])
+        ManagedBufferCachedBuilder::new_from_slice(&[])
     }
 
     fn finalize_nested_encode(self, nb: Self::NestedBuffer) {
@@ -119,8 +119,7 @@ fn finish_exit<FA>(api: FA, encode_err: EncodeError) -> !
 where
     FA: ManagedTypeApi + EndpointFinishApi + ErrorApi + 'static,
 {
-    let mut message_buffer =
-        ManagedBuffer::new_from_bytes(api.clone(), err_msg::FINISH_ENCODE_ERROR);
+    let mut message_buffer = ManagedBuffer::<FA>::new_from_bytes(err_msg::FINISH_ENCODE_ERROR);
     message_buffer.append_bytes(encode_err.message_bytes());
     api.signal_error_from_buffer(message_buffer.get_raw_handle())
 }

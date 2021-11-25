@@ -90,11 +90,11 @@ pub trait ForwarderAsyncCallModule {
         self.retrieve_funds_callback_event(&token, nonce, &payment);
 
         let _ = self.callback_data().push(&CallbackData {
-            callback_name: self.types().managed_buffer_from(b"retrieve_funds_callback"),
+            callback_name: ManagedBuffer::from(b"retrieve_funds_callback"),
             token_identifier: token,
             token_nonce: nonce,
             token_amount: payment,
-            args: ManagedVec::new(self.type_manager()),
+            args: ManagedVec::new(),
         });
     }
 
@@ -142,7 +142,7 @@ pub trait ForwarderAsyncCallModule {
         to: ManagedAddress,
         #[var_args] token_payments: ManagedVarArgs<MultiArg3<TokenIdentifier, u64, BigUint>>,
     ) {
-        let mut all_token_payments = ManagedVec::new(self.type_manager());
+        let mut all_token_payments = ManagedVec::new();
 
         for multi_arg in token_payments.into_iter() {
             let (token_identifier, token_nonce, amount) = multi_arg.into_tuple();

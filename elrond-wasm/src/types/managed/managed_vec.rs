@@ -1,7 +1,4 @@
-use super::{
-    ManagedBuffer, ManagedDefault, ManagedFrom, ManagedInto, ManagedType, ManagedVecItem,
-    ManagedVecIterator,
-};
+use super::{ManagedBuffer, ManagedType, ManagedVecItem, ManagedVecIterator};
 use crate::{
     abi::TypeAbi,
     api::{Handle, ManagedTypeApi},
@@ -21,7 +18,7 @@ use elrond_codec::{
 pub struct ManagedVec<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem<M>,
+    T: ManagedVecItem,
 {
     pub(crate) buffer: ManagedBuffer<M>,
     _phantom: PhantomData<T>,
@@ -30,12 +27,12 @@ where
 impl<M, T> ManagedType<M> for ManagedVec<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem<M>,
+    T: ManagedVecItem,
 {
     #[inline]
-    fn from_raw_handle(api: M, handle: Handle) -> Self {
+    fn from_raw_handle(handle: Handle) -> Self {
         ManagedVec {
-            buffer: ManagedBuffer::from_raw_handle(api, handle),
+            buffer: ManagedBuffer::from_raw_handle(handle),
             _phantom: PhantomData,
         }
     }
@@ -44,22 +41,17 @@ where
     fn get_raw_handle(&self) -> Handle {
         self.buffer.get_raw_handle()
     }
-
-    #[inline]
-    fn type_manager(&self) -> M {
-        self.buffer.type_manager()
-    }
 }
 
 impl<M, T> ManagedVec<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem<M>,
+    T: ManagedVecItem,
 {
     #[inline]
-    pub fn new(api: M) -> Self {
+    pub fn new() -> Self {
         ManagedVec {
-            buffer: ManagedBuffer::new(api),
+            buffer: ManagedBuffer::new(),
             _phantom: PhantomData,
         }
     }
@@ -73,36 +65,36 @@ where
     }
 }
 
-impl<M, T, I> ManagedFrom<M, Vec<I>> for ManagedVec<M, T>
+impl<M, T, I> From<Vec<I>> for ManagedVec<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem<M>,
-    I: ManagedInto<M, T>,
+    T: ManagedVecItem,
+    I: Into<T>,
 {
-    fn managed_from(api: M, v: Vec<I>) -> Self {
-        let mut result = Self::new(api.clone());
+    fn from(v: Vec<I>) -> Self {
+        let mut result = Self::new();
         for item in v.into_iter() {
-            result.push(item.managed_into(api.clone()));
+            result.push(item.into());
         }
         result
     }
 }
 
-impl<M, T> ManagedDefault<M> for ManagedVec<M, T>
+impl<M, T> Default for ManagedVec<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem<M>,
+    T: ManagedVecItem,
 {
     #[inline]
-    fn managed_default(api: M) -> Self {
-        Self::new(api)
+    fn default() -> Self {
+        Self::new()
     }
 }
 
 impl<M, T> ManagedVec<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem<M>,
+    T: ManagedVecItem,
 {
     /// Length of the underlying buffer in bytes.
     #[inline]
@@ -127,7 +119,7 @@ where
     pub fn get(&self, index: usize) -> Option<T> {
         let byte_index = index * T::PAYLOAD_SIZE;
         let mut load_result = Ok(());
-        let result = T::from_byte_reader(self.type_manager(), |dest_slice| {
+        let result = T::from_byte_reader(|dest_slice| {
             load_result = self.buffer.load_slice(byte_index, dest_slice);
         });
         match load_result {
@@ -150,8 +142,8 @@ where
     }
 
     /// New `ManagedVec` instance with 1 element in it.
-    pub fn from_single_item(api: M, item: T) -> Self {
-        let mut result = ManagedVec::new(api);
+    pub fn from_single_item(item: T) -> Self {
+        let mut result = ManagedVec::new();
         result.push(item);
         result
     }
@@ -187,7 +179,7 @@ where
     where
         F: FnOnce(&mut Vec<T>),
     {
-        let new = ManagedVec::new(self.type_manager());
+        let new = ManagedVec::new();
         let old = core::mem::replace(self, new);
         let mut temp_vec = Vec::new();
         for item in old.into_iter() {
@@ -207,10 +199,10 @@ where
 impl<M, T> Clone for ManagedVec<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem<M> + Clone,
+    T: ManagedVecItem + Clone,
 {
     fn clone(&self) -> Self {
-        let mut result = ManagedVec::new(self.type_manager());
+        let mut result = ManagedVec::new();
         for item in self.into_iter() {
             result.push(item.clone())
         }
@@ -221,7 +213,7 @@ where
 impl<M, T> PartialEq for ManagedVec<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem<M> + PartialEq,
+    T: ManagedVecItem + PartialEq,
 {
     #[inline]
     fn eq(&self, other: &Self) -> bool {
@@ -235,10 +227,10 @@ where
         }
         let mut byte_index = 0;
         while byte_index < self_len {
-            let self_item = T::from_byte_reader(self.type_manager(), |dest_slice| {
+            let self_item = T::from_byte_reader(|dest_slice| {
                 let _ = self.buffer.load_slice(byte_index, dest_slice);
             });
-            let other_item = T::from_byte_reader(self.type_manager(), |dest_slice| {
+            let other_item = T::from_byte_reader(|dest_slice| {
                 let _ = other.buffer.load_slice(byte_index, dest_slice);
             });
             if self_item != other_item {
@@ -253,14 +245,14 @@ where
 impl<M, T> Eq for ManagedVec<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem<M> + PartialEq,
+    T: ManagedVecItem + PartialEq,
 {
 }
 
 impl<M, T> TopEncode for ManagedVec<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem<M> + NestedEncode,
+    T: ManagedVecItem + NestedEncode,
 {
     #[inline]
     fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
@@ -280,7 +272,7 @@ where
 impl<M, T> NestedEncode for ManagedVec<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem<M> + NestedEncode,
+    T: ManagedVecItem + NestedEncode,
 {
     fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
         self.len().dep_encode(dest)?;
@@ -294,14 +286,14 @@ where
 impl<M, T> TopDecode for ManagedVec<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem<M> + NestedDecode,
+    T: ManagedVecItem + NestedDecode,
 {
     fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
         let buffer = ManagedBuffer::top_decode(input)?;
         if T::SKIPS_RESERIALIZATION {
             Ok(ManagedVec::new_from_raw_buffer(buffer))
         } else {
-            let mut result = ManagedVec::new(buffer.type_manager());
+            let mut result = ManagedVec::new();
             let mut nested_de_input = ManagedBufferNestedDecodeInput::new(buffer);
             while nested_de_input.remaining_len() > 0 {
                 result.push(T::dep_decode(&mut nested_de_input)?);
@@ -314,12 +306,11 @@ where
 impl<M, T> NestedDecode for ManagedVec<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem<M> + NestedDecode,
+    T: ManagedVecItem + NestedDecode,
 {
     fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
         let size = usize::dep_decode(input)?;
-        let api: M = input.read_specialized((), |_| Err(DecodeError::UNSUPPORTED_OPERATION))?;
-        let mut result = ManagedVec::new(api);
+        let mut result = ManagedVec::new();
         for _ in 0..size {
             result.push(T::dep_decode(input)?);
         }
@@ -330,7 +321,7 @@ where
 impl<M, T> TypeAbi for ManagedVec<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem<M> + TypeAbi,
+    T: ManagedVecItem + TypeAbi,
 {
     /// It is semantically equivalent to any list of `T`.
     fn type_name() -> String {
@@ -350,15 +341,12 @@ pub fn managed_vec_of_buffers_to_arg_buffer<M: ManagedTypeApi>(
 }
 
 pub fn managed_vec_from_slice_of_boxed_bytes<M: ManagedTypeApi>(
-    api: M,
+    _api: M,
     data: &[BoxedBytes],
 ) -> ManagedVec<M, ManagedBuffer<M>> {
-    let mut result = ManagedVec::new(api.clone());
+    let mut result = ManagedVec::new();
     for boxed_bytes in data {
-        result.push(ManagedBuffer::new_from_bytes(
-            api.clone(),
-            boxed_bytes.as_slice(),
-        ));
+        result.push(ManagedBuffer::new_from_bytes(boxed_bytes.as_slice()));
     }
     result
 }

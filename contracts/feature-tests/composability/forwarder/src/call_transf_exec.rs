@@ -85,13 +85,7 @@ pub trait ForwarderTransferExecuteModule {
 
         let gas_left_after = self.blockchain().get_gas_left();
 
-        (
-            gas_left_before,
-            gas_left_after,
-            self.types().big_uint_zero(),
-            token,
-        )
-            .into()
+        (gas_left_before, gas_left_after, BigUint::zero(), token).into()
     }
 
     #[endpoint]
@@ -100,7 +94,7 @@ pub trait ForwarderTransferExecuteModule {
         to: ManagedAddress,
         #[var_args] token_payments: ManagedVarArgs<MultiArg3<TokenIdentifier, u64, BigUint>>,
     ) {
-        let mut all_token_payments = ManagedVec::new(self.type_manager());
+        let mut all_token_payments = ManagedVec::new();
 
         for multi_arg in token_payments.into_iter() {
             let (token_identifier, token_nonce, amount) = multi_arg.into_tuple();

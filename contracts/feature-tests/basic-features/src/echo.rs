@@ -154,7 +154,7 @@ pub trait EchoTypes {
     ) -> SCResult<(), ManagedSCError> {
         match a {
             AsyncCallResult::Ok(()) => Ok(()),
-            AsyncCallResult::Err(msg) => Err(msg.err_msg.managed_into()),
+            AsyncCallResult::Err(msg) => Err(msg.err_msg.into()),
         }
     }
 

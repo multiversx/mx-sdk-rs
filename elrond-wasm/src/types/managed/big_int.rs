@@ -1,4 +1,6 @@
-use super::{BigUint, ManagedBuffer, ManagedDefault, ManagedFrom, ManagedType, Sign};
+use core::marker::PhantomData;
+
+use super::{BigUint, ManagedBuffer, ManagedType, Sign};
 use crate::{
     api::{Handle, ManagedTypeApi},
     types::BoxedBytes,
@@ -12,15 +14,15 @@ use elrond_codec::{
 #[derive(Debug)]
 pub struct BigInt<M: ManagedTypeApi> {
     pub(crate) handle: Handle,
-    pub(crate) api: M,
+    _phantom: PhantomData<M>,
 }
 
 impl<M: ManagedTypeApi> ManagedType<M> for BigInt<M> {
     #[doc(hidden)]
-    fn from_raw_handle(api: M, raw_handle: Handle) -> Self {
+    fn from_raw_handle(handle: Handle) -> Self {
         BigInt {
-            handle: raw_handle,
-            api,
+            handle,
+            _phantom: PhantomData,
         }
     }
 
@@ -28,17 +30,12 @@ impl<M: ManagedTypeApi> ManagedType<M> for BigInt<M> {
     fn get_raw_handle(&self) -> Handle {
         self.handle
     }
-
-    #[inline]
-    fn type_manager(&self) -> M {
-        self.api.clone()
-    }
 }
 
-impl<M: ManagedTypeApi> ManagedDefault<M> for BigInt<M> {
+impl<M: ManagedTypeApi> Default for BigInt<M> {
     #[inline]
-    fn managed_default(api: M) -> Self {
-        Self::from_i64(api, 0)
+    fn default() -> Self {
+        Self::zero()
     }
 }
 
@@ -56,106 +53,82 @@ impl<M: ManagedTypeApi> From<ManagedBuffer<M>> for BigInt<M> {
     }
 }
 
-impl<M, U> ManagedFrom<M, U> for BigInt<M>
-where
-    M: ManagedTypeApi,
-    U: Into<i64>,
-{
-    fn managed_from(api: M, value: U) -> Self {
-        BigInt {
-            handle: api.bi_new(value.into()),
-            api,
+macro_rules! big_int_conv_num {
+    ($num_ty:ty) => {
+        impl<M: ManagedTypeApi> From<$num_ty> for BigInt<M> {
+            #[inline]
+            fn from(value: $num_ty) -> Self {
+                BigInt::from_raw_handle(M::instance().bi_new(value as i64))
+            }
         }
-    }
+    };
 }
 
-/// More conversions here.
+// TODO: more coverage, only from i64 currently tested
+big_int_conv_num! {i64}
+big_int_conv_num! {i32}
+big_int_conv_num! {isize}
+big_int_conv_num! {i16}
+big_int_conv_num! {i8}
+
 impl<M: ManagedTypeApi> BigInt<M> {
     #[inline]
-    pub fn zero(api: M) -> Self {
-        BigInt {
-            handle: api.bi_new_zero(),
-            api,
-        }
-    }
-
-    #[inline]
-    pub fn from_i64(api: M, value: i64) -> Self {
-        BigInt {
-            handle: api.bi_new(value),
-            api,
-        }
-    }
-
-    #[inline]
-    pub fn from_i32(api: M, value: i32) -> Self {
-        BigInt {
-            handle: api.bi_new(value as i64),
-            api,
-        }
+    pub fn zero() -> Self {
+        BigInt::from_raw_handle(M::instance().bi_new_zero())
     }
 
     #[inline]
     pub fn to_i64(&self) -> Option<i64> {
-        self.api.bi_to_i64(self.handle)
+        M::instance().bi_to_i64(self.handle)
     }
 
     #[inline]
-    pub fn from_signed_bytes_be(api: M, bytes: &[u8]) -> Self {
+    pub fn from_signed_bytes_be(bytes: &[u8]) -> Self {
+        let api = M::instance();
         let handle = api.bi_new(0);
         api.bi_set_signed_bytes(handle, bytes);
-        BigInt { handle, api }
+        BigInt::from_raw_handle(handle)
     }
 
     #[inline]
     pub fn to_signed_bytes_be(&self) -> BoxedBytes {
-        self.api.bi_get_signed_bytes(self.handle)
+        let api = M::instance();
+        api.bi_get_signed_bytes(self.handle)
     }
 
     #[inline]
     pub fn from_signed_bytes_be_buffer(managed_buffer: &ManagedBuffer<M>) -> Self {
-        BigInt {
-            handle: managed_buffer
-                .api
-                .mb_to_big_int_signed(managed_buffer.handle),
-            api: managed_buffer.api.clone(),
-        }
+        BigInt::from_raw_handle(M::instance().mb_to_big_int_signed(managed_buffer.handle))
     }
 
     #[inline]
     pub fn to_signed_bytes_be_buffer(&self) -> ManagedBuffer<M> {
-        ManagedBuffer {
-            handle: self.api.mb_from_big_int_signed(self.handle),
-            api: self.api.clone(),
-        }
+        ManagedBuffer::from_raw_handle(M::instance().mb_from_big_int_signed(self.handle))
     }
 }
 
 impl<M: ManagedTypeApi> Clone for BigInt<M> {
     fn clone(&self) -> Self {
-        let clone_handle = self.api.bi_new_zero();
-        self.api.bi_add(clone_handle, clone_handle, self.handle);
-        BigInt {
-            handle: clone_handle,
-            api: self.api.clone(),
-        }
+        let api = M::instance();
+        let clone_handle = api.bi_new_zero();
+        api.bi_add(clone_handle, clone_handle, self.handle);
+        BigInt::from_raw_handle(clone_handle)
     }
 }
 
 impl<M: ManagedTypeApi> BigInt<M> {
     pub fn from_biguint(sign: Sign, unsigned: BigUint<M>) -> Self {
+        let api = M::instance();
         if sign.is_minus() {
-            unsigned.api.bi_neg(unsigned.handle, unsigned.handle);
+            api.bi_neg(unsigned.handle, unsigned.handle);
         }
-        BigInt {
-            handle: unsigned.handle,
-            api: unsigned.api,
-        }
+        BigInt::from_raw_handle(unsigned.handle)
     }
 
     /// Returns the sign of the `BigInt` as a `Sign`.
     pub fn sign(&self) -> Sign {
-        match self.api.bi_sign(self.handle) {
+        let api = M::instance();
+        match api.bi_sign(self.handle) {
             crate::api::Sign::Plus => Sign::Plus,
             crate::api::Sign::NoSign => Sign::NoSign,
             crate::api::Sign::Minus => Sign::Minus,
@@ -164,12 +137,10 @@ impl<M: ManagedTypeApi> BigInt<M> {
 
     /// Returns the magnitude of the `BigInt` as a `BigUint`.
     pub fn magnitude(&self) -> BigUint<M> {
-        let result = self.api.bi_new_zero();
-        self.api.bi_abs(result, self.handle);
-        BigUint {
-            handle: result,
-            api: self.api.clone(),
-        }
+        let api = M::instance();
+        let result = api.bi_new_zero();
+        api.bi_abs(result, self.handle);
+        BigUint::from_raw_handle(result)
     }
 
     /// Convert this `BigInt` into its `Sign` and `BigUint` magnitude,
@@ -183,10 +154,7 @@ impl<M: ManagedTypeApi> BigInt<M> {
         if let Sign::Minus = self.sign() {
             None
         } else {
-            Some(BigUint {
-                handle: self.handle,
-                api: self.api,
-            })
+            Some(BigUint::from_raw_handle(self.handle))
         }
     }
 }
@@ -242,12 +210,10 @@ impl<M: ManagedTypeApi> crate::abi::TypeAbi for BigInt<M> {
 
 impl<M: ManagedTypeApi> BigInt<M> {
     pub fn pow(&self, exp: u32) -> Self {
-        let handle = self.api.bi_new_zero();
-        let exp_handle = self.api.bi_new(exp as i64);
-        self.api.bi_pow(handle, self.handle, exp_handle);
-        BigInt {
-            handle,
-            api: self.api.clone(),
-        }
+        let api = M::instance();
+        let handle = api.bi_new_zero();
+        let exp_handle = api.bi_new(exp as i64);
+        api.bi_pow(handle, self.handle, exp_handle);
+        BigInt::from_raw_handle(handle)
     }
 }
