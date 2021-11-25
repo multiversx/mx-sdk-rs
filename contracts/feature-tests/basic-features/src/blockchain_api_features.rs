@@ -43,16 +43,16 @@ pub trait BlockchainApiFeatures {
         self.blockchain().get_cumulated_validator_rewards()
     }
 
-//    #[endpoint]
-//    fn get_esdt_local_roles(
-//        &self,
-//        token_id: TokenIdentifier,
-//    ) -> ManagedMultiResultVec<ManagedBuffer> {
-//        let roles = self.blockchain().get_esdt_local_roles(&token_id);
-//        let mut result = ManagedMultiResultVec::new();
-//        for role in roles.iter_roles() {
-//            result.push(role.as_role_name().into());
-//        }
-//        result
-//    }
+    //    #[endpoint]
+    //    fn get_esdt_local_roles(
+    //        &self,
+    //        token_id: TokenIdentifier,
+    //    ) -> ManagedMultiResultVec<ManagedBuffer> {
+    //        let roles = self.blockchain().get_esdt_local_roles(&token_id);
+    //        let mut result = ManagedMultiResultVec::new();
+    //        for role in roles.iter_roles() {
+    //            result.push(role.as_role_name().into());
+    //        }
+    //        result
+    //    }
 }

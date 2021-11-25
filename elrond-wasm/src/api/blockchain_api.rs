@@ -119,7 +119,7 @@ pub trait BlockchainApi:
 
     /// Retrieves local roles for the token, by reading protected storage.
     /// TODO: rewrite using managed types
-    fn get_esdt_local_roles(&self, token_id: &TokenIdentifier<Self>) -> EsdtLocalRoleFlags {
+    fn vm_get_esdt_local_roles(&self, token_id: &TokenIdentifier<Self>) -> EsdtLocalRoleFlags {
         let mut key = StorageKey::new(
             self.clone(),
             storage::protected_keys::ELROND_ESDT_LOCAL_ROLES_KEY,
@@ -155,9 +155,5 @@ pub trait BlockchainApi:
         }
 
         result
-    }
-
-    fn validate_token_identifier(&self, token_id: &TokenIdentifier<Self>) -> bool {
-        token_id.is_valid_esdt_identifier()
     }
 }
