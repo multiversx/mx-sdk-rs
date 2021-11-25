@@ -7,7 +7,7 @@ use elrond_wasm::{
 
 use crate::{
     rust_biguint,
-    tx_mock::{TxCache, TxInput, TxInputESDT},
+    tx_mock::{TxCache, TxContext, TxContextStack, TxInput, TxInputESDT},
     world_mock::{AccountData, AccountEsdt, EsdtInstanceMetadata},
     BlockchainMock, DebugApi,
 };
@@ -324,7 +324,7 @@ where
     CB: ContractBase<Api = DebugApi>,
     ContractObjBuilder: Fn(DebugApi) -> CB,
 {
-    pub fn execute_tx<TxFn: FnOnce(&CB) -> StateChange>(
+    pub fn execute_tx<TxFn: FnOnce(CB) -> StateChange>(
         self,
         caller: &Address,
         sc_address: &Address,
@@ -334,7 +334,7 @@ where
         self.execute_tx_any(caller, sc_address, egld_payment, Vec::new(), tx_fn)
     }
 
-    pub fn execute_esdt_transfer<TxFn: FnOnce(&CB) -> StateChange>(
+    pub fn execute_esdt_transfer<TxFn: FnOnce(CB) -> StateChange>(
         self,
         caller: &Address,
         sc_address: &Address,
@@ -351,7 +351,7 @@ where
         self.execute_tx_any(caller, sc_address, &rust_biguint!(0), esdt_transfer, tx_fn)
     }
 
-    pub fn execute_esdt_multi_transfer<TxFn: FnOnce(&CB) -> StateChange>(
+    pub fn execute_esdt_multi_transfer<TxFn: FnOnce(CB) -> StateChange>(
         self,
         caller: &Address,
         sc_address: &Address,
@@ -367,7 +367,7 @@ where
         )
     }
 
-    pub fn execute_query<TxFn: FnOnce(&CB)>(self, sc_address: &Address, query_fn: TxFn) -> Self {
+    pub fn execute_query<TxFn: FnOnce(CB)>(self, sc_address: &Address, query_fn: TxFn) -> Self {
         self.execute_tx(sc_address, sc_address, &rust_biguint!(0), |sc| {
             query_fn(sc);
             StateChange::Revert
@@ -375,7 +375,7 @@ where
     }
 
     // deduplicates code for execution
-    fn execute_tx_any<TxFn: FnOnce(&CB) -> StateChange>(
+    fn execute_tx_any<TxFn: FnOnce(CB) -> StateChange>(
         self,
         caller: &Address,
         sc_address: &Address,
@@ -411,12 +411,15 @@ where
         }
 
         let tx_input = build_tx_input(caller, sc_address, egld_payment, esdt_payments);
-        let debug_api = DebugApi::new(tx_input, tx_cache);
+        let tx_context_rc = Rc::new(TxContext::new(tx_input, tx_cache));
+        TxContextStack::static_push(tx_context_rc.clone());
+
+        let debug_api = DebugApi::new(tx_context_rc);
         let sc = (self.obj_builder)(debug_api);
 
-        let state_change = tx_fn(&sc);
+        let state_change = tx_fn(sc);
 
-        let api_after_exec = into_api(sc);
+        let api_after_exec = Rc::try_unwrap(TxContextStack::static_pop()).unwrap();
         let updates = api_after_exec.into_blockchain_updates();
         let mut new_b_mock = Rc::try_unwrap(rc_b_mock).unwrap();
 
@@ -434,10 +437,6 @@ where
             _phantom: PhantomData,
         }
     }
-}
-
-fn into_api<CB: ContractBase<Api = DebugApi>>(sc_obj: CB) -> DebugApi {
-    sc_obj.raw_vm_api()
 }
 
 fn build_tx_input(
