@@ -13,6 +13,7 @@ elrond_wasm_node::wasm_endpoints! {
         callback_data
         callback_data_at_index
         changeOwnerAddress
+        check_token_has_roles
         clear_callback_data
         create_and_send
         deploy_contract
@@ -38,7 +39,6 @@ elrond_wasm_node::wasm_endpoints! {
         getCurrentNftNonce
         getFungibleEsdtBalance
         get_esdt_local_roles
-        check_token_has_roles
         get_nft_balance
         issue_fungible_token
         lastErrorMessage
@@ -65,5 +65,6 @@ elrond_wasm_node::wasm_endpoints! {
         unsetLocalRoles
         upgradeVault
         upgrade_vault_from_source
+        validate_token_identifier
     )
 }
