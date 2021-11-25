@@ -229,7 +229,7 @@ where
     }
 
     pub fn get_esdt_local_roles(&self, token_id: &TokenIdentifier<A>) -> EsdtLocalRoleFlags {
-        self.api.vm_get_esdt_local_roles(token_id)
+        self.api.get_esdt_local_roles(token_id)
     }
 
     pub fn check_token_has_roles(
@@ -237,7 +237,7 @@ where
         token_id: &TokenIdentifier<A>,
         role: &EsdtLocalRole,
     ) -> bool {
-        let roles = self.api.vm_get_esdt_local_roles(token_id);
+        let roles = self.api.get_esdt_local_roles(token_id);
         roles.has_role(role)
     }
 }
