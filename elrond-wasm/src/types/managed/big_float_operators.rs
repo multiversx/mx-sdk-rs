@@ -23,7 +23,7 @@ macro_rules! binary_operator {
                 let api = M::instance();
                 let result = api.bf_new_zero();
                 api.$api_func(result, self.handle, other.handle);
-                BigFloat::from_raw_handle(self.handle)
+                BigFloat::from_raw_handle(result)
             }
         }
     };
