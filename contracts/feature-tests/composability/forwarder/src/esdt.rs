@@ -181,8 +181,7 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
 
     #[endpoint]
     fn check_token_has_roles(&self, token_id: TokenIdentifier, role: EsdtLocalRole) -> bool {
-        let roles = self.blockchain().get_esdt_local_roles(&token_id);
-        roles.has_role(&role)
+        self.blockchain().check_token_has_roles(&token_id, &role)
     }
 
     #[endpoint]

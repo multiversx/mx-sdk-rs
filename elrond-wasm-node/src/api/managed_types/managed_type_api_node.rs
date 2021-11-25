@@ -9,7 +9,7 @@ extern "C" {
     fn mBufferToBigIntSigned(mBufferHandle: i32, bigIntHandle: i32) -> i32;
     fn mBufferFromBigIntUnsigned(mBufferHandle: i32, bigIntHandle: i32) -> i32;
     fn mBufferFromBigIntSigned(mBufferHandle: i32, bigIntHandle: i32) -> i32;
-    fn validateTokenIdentifier(token_id_handle: i32) -> bool;
+    fn validateTokenIdentifier(token_id_handle: i32) -> i32;
 }
 
 impl elrond_wasm::api::ManagedTypeApi for crate::VmApiImpl {

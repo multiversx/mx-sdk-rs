@@ -117,6 +117,8 @@ extern "C" {
         nonce: i64,
     ) -> i32;
 
+    fn getESDTLocalRoles(tokenhandle: i32) -> i64;
+
     #[cfg(not(feature = "unmanaged-ei"))]
     fn managedGetESDTTokenData(
         addressHandle: i32,
@@ -131,7 +133,6 @@ extern "C" {
         royaltiesHandle: i32,
         urisHandle: i32,
     );
-    fn getESDTLocalRoles(tokenhandle: i32) -> i64;
 }
 
 impl BlockchainApi for crate::VmApiImpl {
