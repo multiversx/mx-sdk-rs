@@ -183,6 +183,8 @@ elrond_wasm_node::wasm_endpoints! {
         logEventB
         logLegacyEventA
         logLegacyEventB
+        maddress_from_array
+        maddress_from_managed_buffer
         managed_address_eq
         managed_address_from
         managed_address_zero
