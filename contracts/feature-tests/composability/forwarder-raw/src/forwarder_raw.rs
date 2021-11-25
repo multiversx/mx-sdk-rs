@@ -91,15 +91,9 @@ pub trait ForwarderRaw {
         endpoint_name: ManagedBuffer,
         #[var_args] args: ManagedVarArgs<ManagedBuffer>,
     ) {
-        self.forward_contract_call(
-            to,
-            self.types().token_identifier_egld(),
-            payment,
-            endpoint_name,
-            args,
-        )
-        .with_gas_limit(self.blockchain().get_gas_left() / 2)
-        .transfer_execute();
+        self.forward_contract_call(to, TokenIdentifier::egld(), payment, endpoint_name, args)
+            .with_gas_limit(self.blockchain().get_gas_left() / 2)
+            .transfer_execute();
     }
 
     #[endpoint]
@@ -138,7 +132,7 @@ pub trait ForwarderRaw {
         to: ManagedAddress,
         #[var_args] token_payments: ManagedVarArgs<MultiArg3<TokenIdentifier, u64, BigUint>>,
     ) {
-        let mut arg_buffer = ManagedArgBuffer::new_empty(self.raw_vm_api());
+        let mut arg_buffer = ManagedArgBuffer::new_empty();
         for multi_arg in token_payments.into_iter() {
             let (token_identifier, token_nonce, amount) = multi_arg.into_tuple();
 
@@ -149,10 +143,8 @@ pub trait ForwarderRaw {
 
         self.raw_vm_api().async_call_raw(
             &to,
-            &self.types().big_uint_zero(),
-            &self
-                .types()
-                .managed_buffer_from(&b"retrieve_multi_funds_async"[..]),
+            &BigUint::zero(),
+            &ManagedBuffer::from(&b"retrieve_multi_funds_async"[..]),
             &arg_buffer,
         );
     }
@@ -177,7 +169,7 @@ pub trait ForwarderRaw {
 
         self.send().transfer_multiple_esdt_via_async_call(
             &to,
-            &all_payments.managed_into(self.raw_vm_api()),
+            &all_payments.into(),
             &b"burn_and_create_retrive_async"[..],
         );
     }
@@ -200,11 +192,9 @@ pub trait ForwarderRaw {
         if payments.len() == 0 {
             let egld_value = self.call_value().egld_value();
             if egld_value > 0 {
-                let _ = self.callback_payments().push(&(
-                    self.types().token_identifier_egld(),
-                    0,
-                    egld_value,
-                ));
+                let _ = self
+                    .callback_payments()
+                    .push(&(TokenIdentifier::egld(), 0, egld_value));
             }
         } else {
             for payment in payments.into_iter() {
@@ -355,7 +345,7 @@ pub trait ForwarderRaw {
         self.raw_vm_api()
             .deploy_contract(
                 self.blockchain().get_gas_left(),
-                &self.types().big_uint_zero(),
+                &BigUint::zero(),
                 &code,
                 CodeMetadata::DEFAULT,
                 &args.to_arg_buffer(),
@@ -371,7 +361,7 @@ pub trait ForwarderRaw {
     ) -> ManagedAddress {
         let (address, _) = self.raw_vm_api().deploy_from_source_contract(
             self.blockchain().get_gas_left(),
-            &self.types().big_uint_zero(),
+            &BigUint::zero(),
             &source_contract_address,
             CodeMetadata::DEFAULT,
             &arguments.to_arg_buffer(),
@@ -390,7 +380,7 @@ pub trait ForwarderRaw {
         self.raw_vm_api().upgrade_contract(
             child_sc_address,
             self.blockchain().get_gas_left(),
-            &self.types().big_uint_zero(),
+            &BigUint::zero(),
             new_code,
             CodeMetadata::UPGRADEABLE,
             &arguments.to_arg_buffer(),
@@ -407,7 +397,7 @@ pub trait ForwarderRaw {
         self.raw_vm_api().upgrade_from_source_contract(
             &sc_address,
             self.blockchain().get_gas_left(),
-            &self.types().big_uint_zero(),
+            &BigUint::zero(),
             &source_contract_address,
             CodeMetadata::DEFAULT,
             &arguments.to_arg_buffer(),

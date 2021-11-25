@@ -1,4 +1,6 @@
-use super::{ManagedBuffer, ManagedDefault, ManagedType};
+use core::convert::{TryFrom, TryInto};
+
+use super::{ManagedBuffer, ManagedType};
 use crate::{
     abi::TypeAbi,
     api::{Handle, ManagedTypeApi},
@@ -27,9 +29,9 @@ where
     M: ManagedTypeApi,
 {
     #[inline]
-    fn from_raw_handle(api: M, handle: Handle) -> Self {
+    fn from_raw_handle(handle: Handle) -> Self {
         ManagedByteArray {
-            buffer: ManagedBuffer::from_raw_handle(api, handle),
+            buffer: ManagedBuffer::from_raw_handle(handle),
         }
     }
 
@@ -37,20 +39,15 @@ where
     fn get_raw_handle(&self) -> Handle {
         self.buffer.get_raw_handle()
     }
-
-    #[inline]
-    fn type_manager(&self) -> M {
-        self.buffer.type_manager()
-    }
 }
 
-impl<M, const N: usize> ManagedDefault<M> for ManagedByteArray<M, N>
+impl<M, const N: usize> Default for ManagedByteArray<M, N>
 where
     M: ManagedTypeApi,
 {
     #[inline]
-    fn managed_default(api: M) -> Self {
-        Self::new_from_bytes(api, &[0u8; N])
+    fn default() -> Self {
+        Self::new_from_bytes(&[0u8; N])
     }
 }
 
@@ -59,9 +56,9 @@ where
     M: ManagedTypeApi,
 {
     #[inline]
-    pub fn new_from_bytes(api: M, bytes: &[u8; N]) -> Self {
+    pub fn new_from_bytes(bytes: &[u8; N]) -> Self {
         ManagedByteArray {
-            buffer: ManagedBuffer::new_from_bytes(api, &bytes[..]),
+            buffer: ManagedBuffer::new_from_bytes(&bytes[..]),
         }
     }
 
@@ -94,6 +91,20 @@ where
 
 impl<M, const N: usize> Eq for ManagedByteArray<M, N> where M: ManagedTypeApi {}
 
+impl<M, const N: usize> TryFrom<ManagedBuffer<M>> for ManagedByteArray<M, N>
+where
+    M: ManagedTypeApi
+{
+    type Error = DecodeError;
+
+    fn try_from(value: ManagedBuffer<M>) -> Result<Self, Self::Error> {
+        if value.len() != N {
+            return Err(DecodeError::from(DECODE_ERROR_BAD_LENGTH));
+        }
+        Ok(ManagedByteArray { buffer: value })
+    }
+}
+
 impl<M, const N: usize> TopEncode for ManagedByteArray<M, N>
 where
     M: ManagedTypeApi,
@@ -110,10 +121,7 @@ where
 {
     fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
         let buffer = ManagedBuffer::top_decode(input)?;
-        if buffer.len() != N {
-            return Err(DecodeError::from(DECODE_ERROR_BAD_LENGTH));
-        }
-        Ok(ManagedByteArray { buffer })
+        buffer.try_into()
     }
 }
 

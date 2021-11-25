@@ -2,7 +2,7 @@ elrond_wasm::derive_imports!();
 
 use elrond_wasm::{
     api::ManagedTypeApi,
-    types::{BigUint, ManagedAddress, ManagedType},
+    types::{BigUint, ManagedAddress},
 };
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi)]
@@ -30,15 +30,14 @@ impl<M: ManagedTypeApi> Auction<M> {
         deadline: u64,
         kitty_owner: &ManagedAddress<M>,
     ) -> Self {
-        let type_manager = starting_price.type_manager();
         Auction {
             auction_type,
-            starting_price: starting_price.clone(),
-            ending_price: ending_price.clone(),
+            starting_price: starting_price.clone(), // TODO: pass owned objects and let the caller clone if needed
+            ending_price: ending_price.clone(), // TODO: pass owned objects and let the caller clone if needed
             deadline,
-            kitty_owner: kitty_owner.clone(),
-            current_bid: BigUint::zero(type_manager.clone()),
-            current_winner: ManagedAddress::zero(type_manager),
+            kitty_owner: kitty_owner.clone(), // TODO: pass owned objects and let the caller clone if needed
+            current_bid: BigUint::zero(),
+            current_winner: ManagedAddress::zero(),
         }
     }
 }

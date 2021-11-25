@@ -148,7 +148,7 @@ impl BlockchainApi for crate::VmApiImpl {
         unsafe {
             let handle = mBufferNew();
             managedSCAddress(handle);
-            ManagedAddress::from_raw_handle(self.clone(), handle)
+            ManagedAddress::from_raw_handle(handle)
         }
     }
 
@@ -167,7 +167,7 @@ impl BlockchainApi for crate::VmApiImpl {
         unsafe {
             let handle = mBufferNew();
             managedOwnerAddress(handle);
-            ManagedAddress::from_raw_handle(self.clone(), handle)
+            ManagedAddress::from_raw_handle(handle)
         }
     }
 
@@ -206,7 +206,7 @@ impl BlockchainApi for crate::VmApiImpl {
         unsafe {
             let handle = mBufferNew();
             managedCaller(handle);
-            ManagedAddress::from_raw_handle(self.clone(), handle)
+            ManagedAddress::from_raw_handle(handle)
         }
     }
 
@@ -214,7 +214,7 @@ impl BlockchainApi for crate::VmApiImpl {
         unsafe {
             let balance_handle = bigIntNew(0);
             bigIntGetExternalBalance(address.as_ref().as_ptr(), balance_handle);
-            BigUint::from_raw_handle(self.clone(), balance_handle)
+            BigUint::from_raw_handle(balance_handle)
         }
     }
 
@@ -222,7 +222,7 @@ impl BlockchainApi for crate::VmApiImpl {
         unsafe {
             let balance_handle = bigIntNew(0);
             bigIntGetExternalBalance(unsafe_buffer_load_address(address), balance_handle);
-            BigUint::from_raw_handle(self.clone(), balance_handle)
+            BigUint::from_raw_handle(balance_handle)
         }
     }
 
@@ -241,7 +241,7 @@ impl BlockchainApi for crate::VmApiImpl {
         unsafe {
             let result_handle = mBufferNew();
             managedGetStateRootHash(result_handle);
-            elrond_wasm::types::ManagedByteArray::from_raw_handle(self.clone(), result_handle)
+            elrond_wasm::types::ManagedByteArray::from_raw_handle(result_handle)
         }
     }
 
@@ -260,7 +260,7 @@ impl BlockchainApi for crate::VmApiImpl {
         unsafe {
             let result_handle = mBufferNew();
             managedGetOriginalTxHash(result_handle);
-            elrond_wasm::types::ManagedByteArray::from_raw_handle(self.clone(), result_handle)
+            elrond_wasm::types::ManagedByteArray::from_raw_handle(result_handle)
         }
     }
 
@@ -304,7 +304,7 @@ impl BlockchainApi for crate::VmApiImpl {
         unsafe {
             let result_handle = mBufferNew();
             managedGetBlockRandomSeed(result_handle);
-            elrond_wasm::types::ManagedByteArray::from_raw_handle(self.clone(), result_handle)
+            elrond_wasm::types::ManagedByteArray::from_raw_handle(result_handle)
         }
     }
 
@@ -343,7 +343,7 @@ impl BlockchainApi for crate::VmApiImpl {
         unsafe {
             let result_handle = mBufferNew();
             managedGetPrevBlockRandomSeed(result_handle);
-            elrond_wasm::types::ManagedByteArray::from_raw_handle(self.clone(), result_handle)
+            elrond_wasm::types::ManagedByteArray::from_raw_handle(result_handle)
         }
     }
 
@@ -378,7 +378,7 @@ impl BlockchainApi for crate::VmApiImpl {
                 balance_handle,
             );
 
-            BigUint::from_raw_handle(self.clone(), balance_handle)
+            BigUint::from_raw_handle(balance_handle)
         }
     }
 
@@ -456,21 +456,18 @@ impl BlockchainApi for crate::VmApiImpl {
             // Token is frozen if properties are not 0
             let frozen = properties[0] == 0 && properties[1] == 0;
 
-            let mut uris_vec = ManagedVec::new(self.clone());
-            uris_vec.push(ManagedBuffer::new_from_bytes(
-                self.clone(),
-                uri_bytes.as_slice(),
-            ));
+            let mut uris_vec = ManagedVec::new();
+            uris_vec.push(ManagedBuffer::new_from_bytes(uri_bytes.as_slice()));
 
             EsdtTokenData {
                 token_type,
-                amount: BigUint::from_raw_handle(self.clone(), value_handle),
+                amount: BigUint::from_raw_handle(value_handle),
                 frozen,
-                hash: ManagedBuffer::new_from_bytes(self.clone(), hash.as_slice()),
-                name: ManagedBuffer::new_from_bytes(self.clone(), name_bytes.as_slice()),
-                attributes: ManagedBuffer::new_from_bytes(self.clone(), attr_bytes.as_slice()),
-                creator: ManagedAddress::from_address(self.clone(), &creator),
-                royalties: BigUint::from_raw_handle(self.clone(), royalties_handle),
+                hash: ManagedBuffer::new_from_bytes(hash.as_slice()),
+                name: ManagedBuffer::new_from_bytes(name_bytes.as_slice()),
+                attributes: ManagedBuffer::new_from_bytes(attr_bytes.as_slice()),
+                creator: ManagedAddress::from_address(&creator),
+                royalties: BigUint::from_raw_handle(royalties_handle),
                 uris: uris_vec,
             }
         }
@@ -515,21 +512,21 @@ impl BlockchainApi for crate::VmApiImpl {
             };
 
             // here we trust Arwen that it always gives us a properties buffer of length 2
-            let properties_buffer = ManagedBuffer::from_raw_handle(self.clone(), properties_handle);
+            let properties_buffer = ManagedBuffer::<Self>::from_raw_handle(properties_handle);
             let mut properties_bytes = [0u8; 2];
             let _ = properties_buffer.load_slice(0, &mut properties_bytes[..]);
             let frozen = properties_bytes[0] == 0 && properties_bytes[1] == 0; // token is frozen if properties are not 0
 
             EsdtTokenData {
                 token_type,
-                amount: BigUint::from_raw_handle(self.clone(), value_handle),
+                amount: BigUint::from_raw_handle(value_handle),
                 frozen,
-                hash: ManagedBuffer::from_raw_handle(self.clone(), hash_handle),
-                name: ManagedBuffer::from_raw_handle(self.clone(), name_handle),
-                attributes: ManagedBuffer::from_raw_handle(self.clone(), attributes_handle),
-                creator: ManagedAddress::from_raw_handle(self.clone(), creator_handle),
-                royalties: BigUint::from_raw_handle(self.clone(), royalties_handle),
-                uris: ManagedVec::from_raw_handle(self.clone(), uris_handle),
+                hash: ManagedBuffer::from_raw_handle(hash_handle),
+                name: ManagedBuffer::from_raw_handle(name_handle),
+                attributes: ManagedBuffer::from_raw_handle(attributes_handle),
+                creator: ManagedAddress::from_raw_handle(creator_handle),
+                royalties: BigUint::from_raw_handle(royalties_handle),
+                uris: ManagedVec::from_raw_handle(uris_handle),
             }
         }
     }

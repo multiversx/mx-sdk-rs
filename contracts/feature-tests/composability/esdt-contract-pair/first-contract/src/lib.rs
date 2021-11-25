@@ -37,10 +37,8 @@ pub trait FirstContract {
             &expected_token_identifier,
             &esdt_value,
             &self.get_second_contract_address(),
-            &self
-                .types()
-                .managed_buffer_from(SECOND_CONTRACT_ACCEPT_ESDT_PAYMENT),
-            &ManagedVec::new(self.type_manager()),
+            &ManagedBuffer::from(SECOND_CONTRACT_ACCEPT_ESDT_PAYMENT),
+            &ManagedVec::new(),
         );
 
         Ok(())
@@ -65,10 +63,8 @@ pub trait FirstContract {
             &expected_token_identifier,
             &(esdt_value / 2u32),
             &self.get_second_contract_address(),
-            &self
-                .types()
-                .managed_buffer_from(SECOND_CONTRACT_ACCEPT_ESDT_PAYMENT),
-            &ManagedVec::new(self.type_manager()),
+            &ManagedBuffer::from(SECOND_CONTRACT_ACCEPT_ESDT_PAYMENT),
+            &ManagedVec::new(),
         );
 
         Ok(())
@@ -93,10 +89,8 @@ pub trait FirstContract {
             &expected_token_identifier,
             &esdt_value,
             &self.get_second_contract_address(),
-            &self
-                .types()
-                .managed_buffer_from(SECOND_CONTRACT_REJECT_ESDT_PAYMENT),
-            &ManagedVec::new(self.type_manager()),
+            &ManagedBuffer::from(SECOND_CONTRACT_REJECT_ESDT_PAYMENT),
+            &ManagedVec::new(),
         );
 
         Ok(())
@@ -123,10 +117,8 @@ pub trait FirstContract {
             &expected_token_identifier,
             &esdt_value,
             self.blockchain().get_gas_left(),
-            &self
-                .types()
-                .managed_buffer_from(SECOND_CONTRACT_REJECT_ESDT_PAYMENT),
-            &ManagedArgBuffer::new_empty(self.type_manager()),
+            &ManagedBuffer::from(SECOND_CONTRACT_REJECT_ESDT_PAYMENT),
+            &ManagedArgBuffer::new_empty(),
         );
 
         Ok(())
@@ -153,10 +145,8 @@ pub trait FirstContract {
             &expected_token_identifier,
             &esdt_value,
             self.blockchain().get_gas_left(),
-            &self
-                .types()
-                .managed_buffer_from(SECOND_CONTRACT_ACCEPT_ESDT_PAYMENT),
-            &ManagedArgBuffer::new_empty(self.type_manager()),
+            &ManagedBuffer::from(SECOND_CONTRACT_ACCEPT_ESDT_PAYMENT),
+            &ManagedArgBuffer::new_empty(),
         );
 
         Ok(())
@@ -170,7 +160,7 @@ pub trait FirstContract {
         func_name: &ManagedBuffer,
         args: &ManagedVec<Self::Api, ManagedBuffer>,
     ) {
-        let mut arg_buffer = ManagedArgBuffer::new_empty(self.type_manager());
+        let mut arg_buffer = ManagedArgBuffer::new_empty();
         arg_buffer.push_arg(esdt_token_identifier);
         arg_buffer.push_arg(amount);
         arg_buffer.push_arg(func_name);
@@ -180,8 +170,8 @@ pub trait FirstContract {
 
         self.raw_vm_api().async_call_raw(
             to,
-            &self.types().big_uint_zero(),
-            &self.types().managed_buffer_from(ESDT_TRANSFER_STRING),
+            &BigUint::zero(),
+            &ManagedBuffer::from(ESDT_TRANSFER_STRING),
             &arg_buffer,
         );
     }

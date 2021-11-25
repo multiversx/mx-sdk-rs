@@ -105,7 +105,7 @@ pub trait LocalEsdtAndEsdtNft {
         color: Color,
         uri: ManagedBuffer,
     ) {
-        let mut uris = ManagedVec::new(self.type_manager());
+        let mut uris = ManagedVec::new();
         uris.push(uri);
 
         self.send().esdt_nft_create::<Color>(
@@ -154,7 +154,7 @@ pub trait LocalEsdtAndEsdtNft {
         function: ManagedBuffer,
         #[var_args] arguments: VarArgs<ManagedBuffer>,
     ) {
-        let mut arg_buffer = ManagedArgBuffer::new_empty(self.type_manager());
+        let mut arg_buffer = ManagedArgBuffer::new_empty();
         for arg in arguments.into_vec() {
             arg_buffer.push_arg_raw(arg);
         }

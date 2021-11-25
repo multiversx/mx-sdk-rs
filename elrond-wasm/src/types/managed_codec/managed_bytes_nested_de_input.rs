@@ -24,7 +24,7 @@ impl<M: ManagedTypeApi> ManagedBytesNestedDecodeInput<M> {
 
     fn read_managed_buffer(&mut self) -> Result<ManagedBuffer<M>, DecodeError> {
         let bytes = BoxedBytes::dep_decode(self)?;
-        let result = ManagedBuffer::new_from_bytes(self.api.clone(), bytes.as_slice());
+        let result = ManagedBuffer::new_from_bytes(bytes.as_slice());
         Ok(result)
     }
 
@@ -35,7 +35,7 @@ impl<M: ManagedTypeApi> ManagedBytesNestedDecodeInput<M> {
         unsafe {
             let mut bytes = BoxedBytes::allocate(size);
             self.read_into(bytes.as_mut_slice())?;
-            let result = ManagedBuffer::new_from_bytes(self.api.clone(), bytes.as_slice());
+            let result = ManagedBuffer::new_from_bytes(bytes.as_slice());
             Ok(result)
         }
     }
@@ -46,7 +46,7 @@ impl<M: ManagedTypeApi> ManagedBytesNestedDecodeInput<M> {
         exit: fn(ExitCtx, DecodeError) -> !,
     ) -> ManagedBuffer<M> {
         let bytes = BoxedBytes::dep_decode_or_exit(self, c, exit);
-        ManagedBuffer::new_from_bytes(self.api.clone(), bytes.as_slice())
+        ManagedBuffer::new_from_bytes(bytes.as_slice())
     }
 
     fn read_managed_buffer_of_size_or_exit<ExitCtx: Clone>(
@@ -58,14 +58,14 @@ impl<M: ManagedTypeApi> ManagedBytesNestedDecodeInput<M> {
         unsafe {
             let mut bytes = BoxedBytes::allocate(size);
             self.read_into_or_exit(bytes.as_mut_slice(), c, exit);
-            let result = ManagedBuffer::new_from_bytes(self.api.clone(), bytes.as_slice());
+            let result = ManagedBuffer::new_from_bytes(bytes.as_slice());
             result
         }
     }
 
     fn read_big_uint(&mut self) -> Result<BigUint<M>, DecodeError> {
         let bytes = BoxedBytes::dep_decode(self)?;
-        let result = BigUint::from_bytes_be(self.api.clone(), bytes.as_slice());
+        let result = BigUint::from_bytes_be(bytes.as_slice());
         Ok(result)
     }
 
@@ -75,12 +75,12 @@ impl<M: ManagedTypeApi> ManagedBytesNestedDecodeInput<M> {
         exit: fn(ExitCtx, DecodeError) -> !,
     ) -> BigUint<M> {
         let bytes = BoxedBytes::dep_decode_or_exit(self, c, exit);
-        BigUint::from_bytes_be(self.api.clone(), bytes.as_slice())
+        BigUint::from_bytes_be(bytes.as_slice())
     }
 
     fn read_big_int(&mut self) -> Result<BigInt<M>, DecodeError> {
         let bytes = BoxedBytes::dep_decode(self)?;
-        let result = BigInt::from_signed_bytes_be(self.api.clone(), bytes.as_slice());
+        let result = BigInt::from_signed_bytes_be(bytes.as_slice());
         Ok(result)
     }
 
@@ -90,7 +90,7 @@ impl<M: ManagedTypeApi> ManagedBytesNestedDecodeInput<M> {
         exit: fn(ExitCtx, DecodeError) -> !,
     ) -> BigInt<M> {
         let bytes = BoxedBytes::dep_decode_or_exit(self, c, exit);
-        BigInt::from_signed_bytes_be(self.api.clone(), bytes.as_slice())
+        BigInt::from_signed_bytes_be(bytes.as_slice())
     }
 }
 

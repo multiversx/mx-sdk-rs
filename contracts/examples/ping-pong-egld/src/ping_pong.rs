@@ -75,7 +75,7 @@ pub trait PingPong {
             require!(
                 &self
                     .blockchain()
-                    .get_sc_balance(&self.types().token_identifier_egld(), 0)
+                    .get_sc_balance(&TokenIdentifier::egld(), 0)
                     + &payment
                     <= max_funds,
                 "smart contract full"
@@ -108,11 +108,8 @@ pub trait PingPong {
             UserStatus::Registered => {
                 self.user_status(user_id).set(&UserStatus::Withdrawn);
                 if let Some(user_address) = self.user_mapper().get_user_address(user_id) {
-                    self.send().direct_egld(
-                        &user_address.managed_into(),
-                        &self.ping_amount().get(),
-                        b"pong",
-                    );
+                    self.send()
+                        .direct_egld(&user_address, &self.ping_amount().get(), b"pong");
                     Ok(())
                 } else {
                     sc_error!("unknown user")

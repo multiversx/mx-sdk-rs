@@ -14,19 +14,19 @@ pub trait BlockchainApi: ErrorApi + ManagedTypeApi + Clone + Sized + 'static {
     fn get_caller_legacy(&self) -> Address;
 
     fn get_caller(&self) -> ManagedAddress<Self> {
-        ManagedAddress::from_address(self.clone(), &self.get_caller_legacy())
+        ManagedAddress::from_address(&self.get_caller_legacy())
     }
 
     fn get_sc_address_legacy(&self) -> Address;
 
     fn get_sc_address(&self) -> ManagedAddress<Self> {
-        ManagedAddress::from_address(self.clone(), &self.get_sc_address_legacy())
+        ManagedAddress::from_address(&self.get_sc_address_legacy())
     }
 
     fn get_owner_address_legacy(&self) -> Address;
 
     fn get_owner_address(&self) -> ManagedAddress<Self> {
-        ManagedAddress::from_address(self.clone(), &self.get_owner_address_legacy())
+        ManagedAddress::from_address(&self.get_owner_address_legacy())
     }
 
     fn get_shard_of_address_legacy(&self, address: &Address) -> u32;
@@ -51,13 +51,13 @@ pub trait BlockchainApi: ErrorApi + ManagedTypeApi + Clone + Sized + 'static {
 
     #[inline]
     fn get_state_root_hash(&self) -> ManagedByteArray<Self, 32> {
-        ManagedByteArray::new_from_bytes(self.clone(), self.get_state_root_hash_legacy().as_array())
+        ManagedByteArray::new_from_bytes(self.get_state_root_hash_legacy().as_array())
     }
 
     fn get_tx_hash_legacy(&self) -> H256;
 
     fn get_tx_hash(&self) -> ManagedByteArray<Self, 32> {
-        ManagedByteArray::new_from_bytes(self.clone(), self.get_tx_hash_legacy().as_array())
+        ManagedByteArray::new_from_bytes(self.get_tx_hash_legacy().as_array())
     }
 
     fn get_gas_left(&self) -> u64;
@@ -73,7 +73,7 @@ pub trait BlockchainApi: ErrorApi + ManagedTypeApi + Clone + Sized + 'static {
     fn get_block_random_seed_legacy(&self) -> Box<[u8; 48]>;
 
     fn get_block_random_seed(&self) -> ManagedByteArray<Self, 48> {
-        ManagedByteArray::new_from_bytes(self.clone(), &*self.get_block_random_seed_legacy())
+        ManagedByteArray::new_from_bytes(&*self.get_block_random_seed_legacy())
     }
 
     fn get_prev_block_timestamp(&self) -> u64;
@@ -87,7 +87,7 @@ pub trait BlockchainApi: ErrorApi + ManagedTypeApi + Clone + Sized + 'static {
     fn get_prev_block_random_seed_legacy(&self) -> Box<[u8; 48]>;
 
     fn get_prev_block_random_seed(&self) -> ManagedByteArray<Self, 48> {
-        ManagedByteArray::new_from_bytes(self.clone(), &*self.get_prev_block_random_seed_legacy())
+        ManagedByteArray::new_from_bytes(&*self.get_prev_block_random_seed_legacy())
     }
 
     fn get_current_esdt_nft_nonce(

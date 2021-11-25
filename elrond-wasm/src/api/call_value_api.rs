@@ -75,7 +75,7 @@ pub trait CallValueApi: ManagedTypeApi + ErrorApi + Sized {
 
     fn get_all_esdt_transfers(&self) -> ManagedVec<Self, EsdtTokenPayment<Self>> {
         let num_transfers = self.esdt_num_transfers();
-        let mut transfers = ManagedVec::new(self.clone());
+        let mut transfers = ManagedVec::new();
 
         for i in 0..num_transfers {
             let token_type = self.esdt_token_type_by_index(i);

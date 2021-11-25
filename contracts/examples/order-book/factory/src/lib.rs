@@ -20,13 +20,13 @@ pub trait Factory {
     fn create_pair(&self, token_id_pair: TokenIdPair<Self::Api>) -> SCResult<ManagedAddress> {
         require!(self.get_pair(&token_id_pair).is_none(), "Already has pair");
 
-        let mut arguments = ManagedArgBuffer::new_empty(self.type_manager());
+        let mut arguments = ManagedArgBuffer::new_empty();
         arguments.push_arg(&token_id_pair.first_token_id);
         arguments.push_arg(&token_id_pair.second_token_id);
 
         let (pair_address, _) = self.raw_vm_api().deploy_from_source_contract(
             self.blockchain().get_gas_left(),
-            &self.types().big_uint_zero(),
+            &BigUint::zero(),
             &self.pair_template_address().get(),
             CodeMetadata::DEFAULT,
             &arguments,
