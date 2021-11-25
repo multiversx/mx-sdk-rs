@@ -9,6 +9,7 @@ extern "C" {
     fn mBufferToBigIntSigned(mBufferHandle: i32, bigIntHandle: i32) -> i32;
     fn mBufferFromBigIntUnsigned(mBufferHandle: i32, bigIntHandle: i32) -> i32;
     fn mBufferFromBigIntSigned(mBufferHandle: i32, bigIntHandle: i32) -> i32;
+    fn validateTokenIdentifier(token_id_handle: i32) -> bool;
 }
 
 impl elrond_wasm::api::ManagedTypeApi for crate::VmApiImpl {
@@ -54,6 +55,6 @@ impl elrond_wasm::api::ManagedTypeApi for crate::VmApiImpl {
 
     #[cfg(feature = "validate_token_identifier")]
     fn validate_token_identifier(&self, token_id_handle: Handle) -> bool {
-        unsafe { validate_esdt_identifier(token_id_handle) != 0 }
+        unsafe { validateTokenIdentifier(token_id_handle) != 0 }
     }
 }
