@@ -457,10 +457,7 @@ impl BlockchainApi for crate::VmApiImpl {
             let frozen = properties[0] == 0 && properties[1] == 0;
 
             let mut uris_vec = ManagedVec::new();
-            uris_vec.push(ManagedBuffer::new_from_bytes(
-                self.clone(),
-                uri_bytes.as_slice(),
-            ));
+            uris_vec.push(ManagedBuffer::new_from_bytes(uri_bytes.as_slice()));
 
             EsdtTokenData {
                 token_type,
