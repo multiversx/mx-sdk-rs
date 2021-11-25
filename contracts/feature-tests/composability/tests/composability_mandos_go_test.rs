@@ -146,6 +146,11 @@ fn forwarder_call_async_accept_nft_go() {
 }
 
 #[test]
+fn forwarder_validate_token_identifier_go() {
+    elrond_wasm_debug::mandos_go("mandos/forwarder_validate_token_identifier.scen.json");
+}
+
+#[test]
 fn forwarder_call_async_multi_transfer_go() {
     elrond_wasm_debug::mandos_go("mandos/forwarder_call_async_multi_transfer.scen.json");
 }

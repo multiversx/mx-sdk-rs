@@ -200,6 +200,14 @@ fn forwarder_call_async_accept_nft_rs() {
 }
 
 #[test]
+fn forwarder_validate_token_identifier_rs() {
+    elrond_wasm_debug::mandos_rs(
+        "mandos/forwarder_validate_token_identifier.scen.json",
+        world(),
+    );
+}
+
+#[test]
 fn forwarder_call_async_multi_transfer_rs() {
     elrond_wasm_debug::mandos_rs(
         "mandos/forwarder_call_async_multi_transfer.scen.json",

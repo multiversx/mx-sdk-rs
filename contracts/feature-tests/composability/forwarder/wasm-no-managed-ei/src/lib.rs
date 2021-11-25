@@ -65,5 +65,6 @@ elrond_wasm_node::wasm_endpoints! {
         unsetLocalRoles
         upgradeVault
         upgrade_vault_from_source
+        validate_token_identifier
     )
 }
