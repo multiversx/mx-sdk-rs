@@ -51,4 +51,9 @@ impl elrond_wasm::api::ManagedTypeApi for crate::VmApiImpl {
             buffer_handle
         }
     }
+
+    #[cfg(feature = "validate_token_identifier")]
+    fn validate_token_identifier(&self, token_id_handle: Handle) -> bool {
+        unsafe { validate_esdt_identifier(token_id_handle) != 0 }
+    }
 }

@@ -187,6 +187,6 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
 
     #[endpoint]
     fn validate_token_identifier(&self, token_id: TokenIdentifier) -> bool {
-        self.blockchain().validate_token_identifier(&token_id)
+        token_id.is_valid_esdt_identifier()
     }
 }

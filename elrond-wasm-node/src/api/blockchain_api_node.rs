@@ -1,11 +1,12 @@
 use crate::api::managed_types::managed_buffer_api_node::{
     unsafe_buffer_load_address, unsafe_buffer_load_token_identifier,
 };
+use core::convert::TryInto;
 use elrond_wasm::{
     api::BlockchainApi,
     types::{
-        Address, BigUint, Box, EsdtTokenData, EsdtTokenType, ManagedAddress, ManagedBuffer,
-        ManagedType, ManagedVec, TokenIdentifier, H256,
+        Address, BigUint, Box, EsdtLocalRoleFlags, EsdtTokenData, EsdtTokenType, ManagedAddress,
+        ManagedBuffer, ManagedType, ManagedVec, TokenIdentifier, H256,
     },
 };
 
@@ -130,6 +131,7 @@ extern "C" {
         royaltiesHandle: i32,
         urisHandle: i32,
     );
+    fn getESDTLocalRoles(tokenhandle: i32) -> i64;
 }
 
 impl BlockchainApi for crate::VmApiImpl {
@@ -531,15 +533,14 @@ impl BlockchainApi for crate::VmApiImpl {
         }
     }
 
-    // #[cfg(feature = "unmanaged-ei")]
-    // fn get_esdt_local_roles(&self, token_id: &TokenIdentifier<Self>) -> EsdtLocalRoleFlags {
-    //     let managed_token_id = token.as_managed_buffer();
-    //     unsafe { getESDTLocalRoles(managed_token_id.get_raw_handle()) }
-    // }
-
-    // #[cfg(feature = "unmanaged-ei")]
-    // fn validate_token_identifier(&self, token_id: &TokenIdentifier<Self>) -> bool {
-    //     let managed_token_id = token.as_managed_buffer();
-    //     unsafe { validateTokenIdentifier(managed_token_id.get_raw_handle()) > 0 }
-    // }
+    fn vm_get_esdt_local_roles(&self, token_id: &TokenIdentifier<Self>) -> EsdtLocalRoleFlags {
+        let managed_token_id = token_id.as_managed_buffer();
+        unsafe {
+            EsdtLocalRoleFlags::from_bits_unchecked(
+                getESDTLocalRoles(managed_token_id.get_raw_handle())
+                    .try_into()
+                    .unwrap(),
+            )
+        }
+    }
 }
