@@ -26,7 +26,7 @@ path = "vault"
 [dependencies.elrond-wasm]
 version = "0.23.0"
 path = "../../../elrond-wasm"
-features = ["validate_token_identifier"]
+features = ["vm_validate_token_identifier"]
 
 [dev-dependencies.elrond-wasm-debug]
 version = "0.23.0"

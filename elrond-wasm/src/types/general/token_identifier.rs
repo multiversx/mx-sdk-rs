@@ -96,7 +96,7 @@ impl<M: ManagedTypeApi> TokenIdentifier<M> {
     }
 
     pub fn is_valid_esdt_identifier(&self) -> bool {
-        M::instance().is_valid_esdt_identifier(self.buffer.handle)
+        M::instance().validate_token_identifier(self.buffer.handle)
     }
     /// Converts `"EGLD"` to `""`.
     /// Does nothing for the other values.

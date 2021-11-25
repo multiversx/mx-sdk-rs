@@ -14,7 +14,7 @@ hex-literal = "0.3.1"
 [dependencies.elrond-wasm]
 version = "0.23.0"
 path = "../../../../elrond-wasm"
-features = ["cb_closure_managed_deser", "validate_token_identifier"]
+features = ["cb_closure_managed_deser", "vm_validate_token_identifier"]
 
 [dependencies.elrond-wasm-node]
 version = "0.23.0"

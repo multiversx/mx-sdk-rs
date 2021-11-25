@@ -15,7 +15,7 @@ categories = ["no-std", "wasm", "cryptography::cryptocurrencies", "development-t
 
 [features]
 cb_closure_managed_deser = []
-validate_token_identifier = []
+vm_validate_token_identifier = []
 
 [dependencies]
 wee_alloc = "0.4"
