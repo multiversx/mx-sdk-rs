@@ -90,9 +90,7 @@ where
     M: ManagedTypeApi,
 {
     fn from(value: ManagedByteArray<M, 32>) -> Self {
-        Self {
-            bytes: value
-        }
+        Self { bytes: value }
     }
 }
 

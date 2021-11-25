@@ -40,4 +40,5 @@ impl DecodeError {
     pub const UNSUPPORTED_OPERATION: DecodeError = DecodeError(b"unsupported operation");
     pub const ARRAY_DECODE_ERROR: DecodeError = DecodeError(b"array decode error");
     pub const UTF8_DECODE_ERROR: DecodeError = DecodeError(b"utf-8 decode error");
+    pub const CAPACITY_EXCEEDED_ERROR: DecodeError = DecodeError(b"capacity exceeded");
 }
