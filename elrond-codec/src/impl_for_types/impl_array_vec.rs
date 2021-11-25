@@ -59,7 +59,7 @@ impl<T: NestedDecode, const CAP: usize> TopDecode for ArrayVec<T, CAP> {
         while !nested_buffer.is_depleted() {
             let elem = T::dep_decode_or_exit(&mut nested_buffer, c.clone(), exit);
             if result.try_push(elem).is_err() {
-                exit(c.clone(), DecodeError::CAPACITY_EXCEEDED_ERROR)
+                exit(c, DecodeError::CAPACITY_EXCEEDED_ERROR)
             }
         }
         if !nested_buffer.is_depleted() {
