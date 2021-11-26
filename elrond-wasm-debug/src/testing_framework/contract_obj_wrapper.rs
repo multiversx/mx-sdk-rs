@@ -1,7 +1,7 @@
 use std::{collections::HashMap, marker::PhantomData, rc::Rc};
 
 use elrond_wasm::{
-    contract_base::ContractBase,
+    contract_base::{CallableContract, ContractBase},
     types::{Address, EsdtLocalRole, H256},
 };
 
@@ -15,7 +15,7 @@ use crate::{
 use super::AddressFactory;
 
 pub struct ContractObjWrapper<
-    CB: ContractBase<Api = DebugApi>,
+    CB: ContractBase<Api = DebugApi> + CallableContract<DebugApi> + 'static,
     ContractObjBuilder: Fn(DebugApi) -> CB,
 > {
     address_factory: AddressFactory,
@@ -31,7 +31,7 @@ pub enum StateChange {
 
 impl<CB, ContractObjBuilder> ContractObjWrapper<CB, ContractObjBuilder>
 where
-    CB: ContractBase<Api = DebugApi>,
+    CB: ContractBase<Api = DebugApi> + CallableContract<DebugApi> + 'static,
     ContractObjBuilder: Fn(DebugApi) -> CB,
 {
     pub fn new(obj_builder: ContractObjBuilder) -> Self {
@@ -137,12 +137,12 @@ where
 
 impl<CB, ContractObjBuilder> ContractObjWrapper<CB, ContractObjBuilder>
 where
-    CB: ContractBase<Api = DebugApi>,
+    CB: ContractBase<Api = DebugApi> + CallableContract<DebugApi> + 'static,
     ContractObjBuilder: Fn(DebugApi) -> CB,
 {
     pub fn create_user_account(&mut self, egld_balance: &num_bigint::BigUint) -> Address {
         let address = self.address_factory.new_address();
-        self.create_account_raw(&address, egld_balance, None);
+        self.create_account_raw(&address, egld_balance, None, None);
 
         address
     }
@@ -151,9 +151,19 @@ where
         &mut self,
         egld_balance: &num_bigint::BigUint,
         owner: Option<&Address>,
+        instance_fn: Box<dyn Fn(DebugApi) -> Box<dyn CallableContract<DebugApi>>>,
     ) -> Address {
         let address = self.address_factory.new_sc_address();
-        self.create_account_raw(&address, egld_balance, owner);
+        let addr_string = "0x".to_owned() + &address_to_hex(&address);
+
+        self.create_account_raw(
+            &address,
+            egld_balance,
+            owner,
+            Some(address.as_bytes().to_vec()),
+        );
+
+        self.b_mock.register_contract(&addr_string, instance_fn);
 
         address
     }
@@ -163,6 +173,7 @@ where
         address: &Address,
         egld_balance: &num_bigint::BigUint,
         owner: Option<&Address>,
+        sc_identifier: Option<Vec<u8>>,
     ) {
         self.b_mock.add_account(AccountData {
             address: address.clone(),
@@ -171,7 +182,7 @@ where
             esdt: AccountEsdt::default(),
             storage: HashMap::new(),
             username: Vec::new(),
-            contract_path: None,
+            contract_path: sc_identifier,
             contract_owner: owner.cloned(),
         });
     }
@@ -321,7 +332,7 @@ where
 
 impl<CB, ContractObjBuilder> ContractObjWrapper<CB, ContractObjBuilder>
 where
-    CB: ContractBase<Api = DebugApi>,
+    CB: ContractBase<Api = DebugApi> + CallableContract<DebugApi> + 'static,
     ContractObjBuilder: Fn(DebugApi) -> CB,
 {
     pub fn execute_tx<TxFn: FnOnce(CB) -> StateChange>(

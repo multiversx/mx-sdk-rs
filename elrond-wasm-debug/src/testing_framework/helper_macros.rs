@@ -32,3 +32,10 @@ macro_rules! assert_sc_error {
         assert_eq!($sc_result.err().unwrap().as_bytes(), $expected_string)
     }};
 }
+
+#[macro_export]
+macro_rules! sc_instance_fn {
+    ($scope:ident) => {{
+        Box::new(|context| Box::new($scope::contract_obj(context)))
+    }};
+}
