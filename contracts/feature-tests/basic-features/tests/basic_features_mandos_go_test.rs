@@ -44,6 +44,11 @@ fn crypto_elliptic_curves_go() {
 }
 
 #[test]
+fn crypto_keccak256_legacy_go() {
+    elrond_wasm_debug::mandos_go("mandos/crypto_keccak256_legacy.scen.json");
+}
+
+#[test]
 fn crypto_keccak256_go() {
     elrond_wasm_debug::mandos_go("mandos/crypto_keccak256.scen.json");
 }

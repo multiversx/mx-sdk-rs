@@ -14,7 +14,7 @@ impl CryptoApi for DebugApi {
         hash.into()
     }
 
-    fn keccak256(&self, data: &[u8]) -> H256 {
+    fn keccak256_legacy(&self, data: &[u8]) -> H256 {
         let mut hasher = Keccak256::new();
         hasher.update(data);
         let hash: [u8; 32] = hasher.finalize().into();

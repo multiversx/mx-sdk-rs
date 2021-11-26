@@ -63,6 +63,11 @@ fn count_ones_rs() {
 // }
 
 #[test]
+fn crypto_keccak256_legacy_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/crypto_keccak256_legacy.scen.json", world());
+}
+
+#[test]
 fn crypto_keccak256_rs() {
     elrond_wasm_debug::mandos_rs("mandos/crypto_keccak256.scen.json", world());
 }

@@ -51,6 +51,16 @@ where
     }
 }
 
+impl<M, const N: usize> From<&[u8; N]> for ManagedByteArray<M, N>
+where
+    M: ManagedTypeApi,
+{
+    #[inline]
+    fn from(bytes: &[u8; N]) -> Self {
+        Self::new_from_bytes(bytes)
+    }
+}
+
 impl<M, const N: usize> ManagedByteArray<M, N>
 where
     M: ManagedTypeApi,
@@ -76,6 +86,13 @@ where
     #[inline]
     pub fn as_managed_buffer(&self) -> &ManagedBuffer<M> {
         &self.buffer
+    }
+
+    #[inline]
+    pub fn into_byte_array(&self) -> [u8; N] {
+        let mut result = [0u8; N];
+        let _ = self.buffer.load_slice(0, &mut result[..]);
+        result
     }
 }
 

@@ -1,15 +1,19 @@
 use super::VmApiImpl;
 use elrond_wasm::{
     api::CryptoApi,
-    types::{BoxedBytes, MessageHashType, H256},
+    types::{BoxedBytes, ManagedBuffer, ManagedByteArray, ManagedType, MessageHashType, H256},
     Box,
 };
 
 extern "C" {
+    // managed buffer API
+    fn mBufferNew() -> i32;
 
     fn sha256(dataOffset: *const u8, length: i32, resultOffset: *mut u8) -> i32;
 
     fn keccak256(dataOffset: *const u8, length: i32, resultOffset: *mut u8) -> i32;
+
+    fn managedKeccak256(inputHandle: i32, outputHandle: i32) -> i32;
 
     fn ripemd160(dataOffset: *const u8, length: i32, resultOffset: *mut u8) -> i32;
 
@@ -63,11 +67,19 @@ impl CryptoApi for VmApiImpl {
         }
     }
 
-    fn keccak256(&self, data: &[u8]) -> H256 {
+    fn keccak256_legacy(&self, data: &[u8]) -> H256 {
         unsafe {
             let mut res = H256::zero();
             keccak256(data.as_ptr(), data.len() as i32, res.as_mut_ptr());
             res
+        }
+    }
+
+    fn keccak256(&self, data: &ManagedBuffer<Self>) -> ManagedByteArray<Self, 32> {
+        unsafe {
+            let result_handle = mBufferNew();
+            managedKeccak256(data.get_raw_handle(), result_handle);
+            ManagedByteArray::from_raw_handle(result_handle)
         }
     }
 

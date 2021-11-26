@@ -1,10 +1,18 @@
-use crate::types::{BoxedBytes, MessageHashType, H256};
+use crate::types::{BoxedBytes, ManagedBuffer, ManagedByteArray, MessageHashType, H256};
 use alloc::boxed::Box;
 
-pub trait CryptoApi {
+use super::ManagedTypeApi;
+
+pub trait CryptoApi: ManagedTypeApi {
     fn sha256(&self, data: &[u8]) -> H256;
 
-    fn keccak256(&self, data: &[u8]) -> H256;
+    fn keccak256_legacy(&self, data: &[u8]) -> H256;
+
+    fn keccak256(&self, data: &ManagedBuffer<Self>) -> ManagedByteArray<Self, 32> {
+        self.keccak256_legacy(data.to_boxed_bytes().as_slice())
+            .as_array()
+            .into()
+    }
 
     fn ripemd160(&self, data: &[u8]) -> Box<[u8; 20]>;
 

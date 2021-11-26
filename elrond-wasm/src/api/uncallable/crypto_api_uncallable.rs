@@ -10,7 +10,7 @@ impl CryptoApi for UncallableApi {
         unreachable!()
     }
 
-    fn keccak256(&self, _data: &[u8]) -> H256 {
+    fn keccak256_legacy(&self, _data: &[u8]) -> H256 {
         unreachable!()
     }
 
