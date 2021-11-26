@@ -2,8 +2,8 @@ use crate::{
     api::{BlockchainApi, ErrorApi, ManagedTypeApi, StorageReadApi},
     storage::{self},
     types::{
-        Address, BigUint, EsdtLocalRole, EsdtLocalRoleFlags, EsdtTokenData, ManagedAddress,
-        ManagedByteArray, ManagedType, TokenIdentifier, H256,
+        Address, BigUint, EsdtLocalRoleFlags, EsdtTokenData, ManagedAddress, ManagedByteArray,
+        ManagedType, TokenIdentifier, H256,
     },
 };
 use alloc::boxed::Box;
@@ -230,14 +230,5 @@ where
 
     pub fn get_esdt_local_roles(&self, token_id: &TokenIdentifier<A>) -> EsdtLocalRoleFlags {
         self.api.get_esdt_local_roles(token_id)
-    }
-
-    pub fn check_token_has_roles(
-        &self,
-        token_id: &TokenIdentifier<A>,
-        role: &EsdtLocalRole,
-    ) -> bool {
-        let roles = self.api.get_esdt_local_roles(token_id);
-        roles.has_role(role)
     }
 }
