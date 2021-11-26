@@ -53,7 +53,7 @@ impl elrond_wasm::api::ManagedTypeApi for crate::VmApiImpl {
         }
     }
 
-    #[cfg(feature = "vm_validate_token_identifier")]
+    #[cfg(feature = "vm-validate-token-identifier")]
     fn validate_token_identifier(&self, token_id_handle: Handle) -> bool {
         unsafe { validateTokenIdentifier(token_id_handle) != 0 }
     }
