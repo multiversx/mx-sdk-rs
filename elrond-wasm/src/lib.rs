@@ -11,6 +11,9 @@ pub use elrond_wasm_derive::{self as derive, contract, module, proxy};
 extern crate alloc;
 pub use alloc::{boxed::Box, string::String, vec::Vec};
 
+/// Reexported for convenience.
+pub use elrond_codec::arrayvec;
+
 pub use elrond_codec;
 
 pub mod abi;

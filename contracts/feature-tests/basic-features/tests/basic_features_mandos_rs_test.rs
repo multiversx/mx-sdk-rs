@@ -88,6 +88,11 @@ fn echo_array_u8_rs() {
 }
 
 #[test]
+fn echo_arrayvec_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/echo_arrayvec.scen.json", world());
+}
+
+#[test]
 fn echo_async_result_empty_rs() {
     elrond_wasm_debug::mandos_rs("mandos/echo_async_result_empty.scen.json", world());
 }

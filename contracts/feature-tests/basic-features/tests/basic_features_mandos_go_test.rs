@@ -69,6 +69,11 @@ fn echo_array_u8_go() {
 }
 
 #[test]
+fn echo_arrayvec_go() {
+    elrond_wasm_debug::mandos_go("mandos/echo_arrayvec.scen.json");
+}
+
+#[test]
 fn echo_async_result_empty_go() {
     elrond_wasm_debug::mandos_go("mandos/echo_async_result_empty.scen.json");
 }
