@@ -15,6 +15,7 @@ categories = ["no-std", "wasm", "cryptography::cryptocurrencies", "development-t
 
 [features]
 unmanaged-ei = []
+vm-validate-token-identifier = []
 
 [dependencies.elrond-wasm]
 version = "=0.23.1"

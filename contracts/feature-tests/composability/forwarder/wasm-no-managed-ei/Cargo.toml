@@ -21,7 +21,7 @@ path = ".."
 [dependencies.elrond-wasm-node]
 version = "0.23.1"
 path = "../../../../../elrond-wasm-node"
-features=["unmanaged-ei"]
+features=["unmanaged-ei", "vm-validate-token-identifier"]
 
 [dependencies.elrond-wasm-output]
 version = "0.23.1"

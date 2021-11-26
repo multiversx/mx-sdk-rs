@@ -14,7 +14,7 @@ path = "../vault"
 [dependencies.elrond-wasm]
 version = "0.23.1"
 path = "../../../../elrond-wasm"
-features = ["cb_closure_managed_deser", "vm_validate_token_identifier"]
+features = ["cb_closure_managed_deser"]
 
 [dependencies.elrond-wasm-node]
 version = "0.23.1"
