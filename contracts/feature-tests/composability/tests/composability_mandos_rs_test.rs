@@ -47,7 +47,6 @@ fn forw_raw_async_echo_rs() {
     elrond_wasm_debug::mandos_rs("mandos/forw_raw_async_echo.scen.json", world());
 }
 
-// TODO: uncomment after implemented the full ESDT format in mandos-rs
 // #[test]
 // fn forwarder_get_esdt_local_roles_rs() {
 // 	elrond_wasm_debug::mandos_rs(

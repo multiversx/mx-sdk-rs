@@ -13,7 +13,6 @@ elrond_wasm_node::wasm_endpoints! {
         callback_data
         callback_data_at_index
         changeOwnerAddress
-        check_token_has_roles
         clear_callback_data
         create_and_send
         deploy_contract
