@@ -9,6 +9,7 @@ mod mandos_go_runner;
 mod mandos_rs_runner;
 mod mandos_step;
 pub mod meta;
+pub mod testing_framework;
 pub mod tx_execution;
 pub mod tx_mock;
 pub mod world_mock;

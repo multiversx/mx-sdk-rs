@@ -1,0 +1,31 @@
+[package]
+name = "rust-testing-framework-tester-wasm"
+version = "0.0.0"
+authors = ["Dorin Iancu <dorin.iancu@elrond.com>"]
+edition = "2018"
+publish = false
+
+[lib]
+crate-type = ["cdylib"]
+
+[profile.release]
+codegen-units = 1
+opt-level = "z"
+lto = true
+debug = false
+panic = "abort"
+
+[dependencies.rust-testing-framework-tester]
+path = ".."
+
+[dependencies.elrond-wasm-node]
+version = "0.23.0"
+path = "../../../../elrond-wasm-node"
+
+[dependencies.elrond-wasm-output]
+version = "0.23.0"
+path = "../../../../elrond-wasm-output"
+features = ["wasm-output-mode"]
+
+[workspace]
+members = ["."]
