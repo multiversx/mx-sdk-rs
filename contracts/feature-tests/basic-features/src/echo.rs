@@ -207,4 +207,9 @@ pub trait EchoTypes {
     ) -> MultiResult2<i32, OptionalResult<i32>> {
         (i, opt).into()
     }
+
+    #[view]
+    fn echo_arrayvec(&self, av: ArrayVec<i32, 3>) -> ArrayVec<i32, 3> {
+        av
+    }
 }
