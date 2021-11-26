@@ -1,0 +1,19 @@
+[package]
+name = "rust-testing-framework-tester"
+version = "0.0.0"
+authors = ["Dorin Iancu <dorin.iancu@elrond.com>"]
+edition = "2018"
+publish = false
+
+[dependencies.elrond-wasm]
+version = "0.23.0"
+path = "../../../elrond-wasm"
+
+[dev-dependencies.elrond-wasm-debug]
+version = "0.23.0"
+path = "../../../elrond-wasm-debug"
+
+[dependencies]
+num-bigint = "0.4.2"
+num-traits = "0.2"
+hex = "0.4"
