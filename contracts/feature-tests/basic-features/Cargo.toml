@@ -9,10 +9,10 @@ publish = false
 path = "src/basic_features_main.rs"
 
 [dependencies.elrond-wasm]
-version = "0.23.0"
+version = "0.23.1"
 path = "../../../elrond-wasm"
 
 [dev-dependencies.elrond-wasm-debug]
-version = "0.23.0"
+version = "0.23.1"
 path = "../../../elrond-wasm-debug"
 

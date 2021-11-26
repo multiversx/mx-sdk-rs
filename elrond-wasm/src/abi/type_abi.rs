@@ -1,4 +1,5 @@
 use super::*;
+use crate::arrayvec::ArrayVec;
 use alloc::{
     boxed::Box,
     string::{String, ToString},
@@ -97,6 +98,12 @@ impl<T: TypeAbi> TypeAbi for &[T] {
 }
 
 impl<T: TypeAbi> TypeAbi for Vec<T> {
+    fn type_name() -> String {
+        <&[T]>::type_name()
+    }
+}
+
+impl<T: TypeAbi, const CAP: usize> TypeAbi for ArrayVec<T, CAP> {
     fn type_name() -> String {
         <&[T]>::type_name()
     }
