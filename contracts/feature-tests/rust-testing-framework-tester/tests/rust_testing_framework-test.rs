@@ -717,7 +717,7 @@ fn execute_on_dest_context_change_state_test() {
         StateChange::Commit
     });
 
-    wrapper = wrapper.execute_query(&other_sc_addr, |sc| {
+    wrapper.execute_query(&other_sc_addr, |sc| {
         let expected_result = managed_biguint!(10);
         let actual_result = sc.get_val();
 
