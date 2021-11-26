@@ -93,7 +93,7 @@ impl<M, const N: usize> Eq for ManagedByteArray<M, N> where M: ManagedTypeApi {}
 
 impl<M, const N: usize> TryFrom<ManagedBuffer<M>> for ManagedByteArray<M, N>
 where
-    M: ManagedTypeApi
+    M: ManagedTypeApi,
 {
     type Error = DecodeError;
 

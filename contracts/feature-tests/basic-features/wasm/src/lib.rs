@@ -82,6 +82,7 @@ elrond_wasm_node::wasm_endpoints! {
         div_big_uint
         div_big_uint_ref
         echo_array_u8
+        echo_arrayvec
         echo_async_result_empty
         echo_big_int
         echo_big_int_option
