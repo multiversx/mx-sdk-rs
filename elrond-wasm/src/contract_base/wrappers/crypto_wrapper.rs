@@ -24,7 +24,7 @@ where
     }
 
     pub fn keccak256(&self, data: &[u8]) -> H256 {
-        self.api.keccak256(data)
+        self.api.keccak256_legacy(data)
     }
 
     pub fn ripemd160(&self, data: &[u8]) -> Box<[u8; 20]> {
