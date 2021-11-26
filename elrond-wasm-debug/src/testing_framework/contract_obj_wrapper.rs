@@ -16,10 +16,10 @@ use super::AddressFactory;
 
 pub struct ContractObjWrapper<
     CB: ContractBase<Api = DebugApi> + CallableContract<DebugApi> + 'static,
-    ContractObjBuilder: Fn(DebugApi) -> CB,
+    ContractObjBuilder: 'static + Copy + Fn(DebugApi) -> CB,
 > {
     address_factory: AddressFactory,
-    obj_builder: ContractObjBuilder,
+    obj_builders: HashMap<Address, ContractObjBuilder>,
     b_mock: BlockchainMock,
     _phantom: PhantomData<CB>,
 }
@@ -32,12 +32,15 @@ pub enum StateChange {
 impl<CB, ContractObjBuilder> ContractObjWrapper<CB, ContractObjBuilder>
 where
     CB: ContractBase<Api = DebugApi> + CallableContract<DebugApi> + 'static,
-    ContractObjBuilder: Fn(DebugApi) -> CB,
+    ContractObjBuilder: 'static + Copy + Fn(DebugApi) -> CB,
 {
-    pub fn new(obj_builder: ContractObjBuilder) -> Self {
+    pub fn new() -> Self {
+        // let mut b_mock = BlockchainMock::new();
+        // b_mock.set_current_dir_from_workspace("contracts/examples/crowdfunding-erc20");
+
         ContractObjWrapper {
             address_factory: AddressFactory::new(),
-            obj_builder,
+            obj_builders: HashMap::new(),
             b_mock: BlockchainMock::new(),
             _phantom: PhantomData,
         }
@@ -138,7 +141,7 @@ where
 impl<CB, ContractObjBuilder> ContractObjWrapper<CB, ContractObjBuilder>
 where
     CB: ContractBase<Api = DebugApi> + CallableContract<DebugApi> + 'static,
-    ContractObjBuilder: Fn(DebugApi) -> CB,
+    ContractObjBuilder: 'static + Copy + Fn(DebugApi) -> CB,
 {
     pub fn create_user_account(&mut self, egld_balance: &num_bigint::BigUint) -> Address {
         let address = self.address_factory.new_address();
@@ -151,7 +154,7 @@ where
         &mut self,
         egld_balance: &num_bigint::BigUint,
         owner: Option<&Address>,
-        instance_fn: Box<dyn Fn(DebugApi) -> Box<dyn CallableContract<DebugApi>>>,
+        obj_builder: ContractObjBuilder,
     ) -> Address {
         let address = self.address_factory.new_sc_address();
         let addr_string = "0x".to_owned() + &address_to_hex(&address);
@@ -162,8 +165,10 @@ where
             owner,
             Some(address.as_bytes().to_vec()),
         );
+        self.obj_builders.insert(address.clone(), obj_builder);
 
-        self.b_mock.register_contract(&addr_string, instance_fn);
+        let closure = convert_full_fn(obj_builder);
+        self.b_mock.register_contract(&addr_string, closure);
 
         address
     }
@@ -333,7 +338,7 @@ where
 impl<CB, ContractObjBuilder> ContractObjWrapper<CB, ContractObjBuilder>
 where
     CB: ContractBase<Api = DebugApi> + CallableContract<DebugApi> + 'static,
-    ContractObjBuilder: Fn(DebugApi) -> CB,
+    ContractObjBuilder: 'static + Copy + Fn(DebugApi) -> CB,
 {
     pub fn execute_tx<TxFn: FnOnce(CB) -> StateChange>(
         self,
@@ -426,7 +431,8 @@ where
         TxContextStack::static_push(tx_context_rc.clone());
 
         let debug_api = DebugApi::new(tx_context_rc);
-        let sc = (self.obj_builder)(debug_api);
+        let obj_builder = self.obj_builders.get(&sc_address).unwrap();
+        let sc = (obj_builder)(debug_api);
 
         let state_change = tx_fn(sc);
 
@@ -443,7 +449,7 @@ where
 
         Self {
             address_factory: self.address_factory,
-            obj_builder: self.obj_builder,
+            obj_builders: self.obj_builders,
             b_mock: new_b_mock,
             _phantom: PhantomData,
         }
@@ -484,4 +490,23 @@ fn serialize_attributes<T: elrond_wasm::elrond_codec::TopEncode>(attributes: &T)
     }
 
     serialized_attributes
+}
+
+fn convert_full_fn<CB, ContractObjBuilder>(
+    func: ContractObjBuilder,
+) -> Box<dyn Fn(DebugApi) -> Box<dyn CallableContract<DebugApi>>>
+where
+    CB: ContractBase<Api = DebugApi> + CallableContract<DebugApi> + 'static,
+    ContractObjBuilder: 'static + Fn(DebugApi) -> CB,
+{
+    let raw_closure = move |context| convert_part(func(context));
+
+    Box::new(raw_closure)
+}
+
+fn convert_part<CB>(c_base: CB) -> Box<dyn CallableContract<DebugApi>>
+where
+    CB: ContractBase<Api = DebugApi> + CallableContract<DebugApi> + 'static,
+{
+    Box::new(c_base)
 }
