@@ -78,6 +78,11 @@ fn crypto_keccak256_rs() {
 // }
 
 #[test]
+fn crypto_sha256_legacy_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/crypto_sha256_legacy.scen.json", world());
+}
+
+#[test]
 fn crypto_sha256_rs() {
     elrond_wasm_debug::mandos_rs("mandos/crypto_sha256.scen.json", world());
 }
