@@ -71,6 +71,7 @@ elrond_wasm_node::wasm_endpoints! {
         compute_scalar_mult
         compute_secp256k1_der_signature
         compute_sha256
+        compute_sha256_legacy
         compute_unmarshal_compressed_ec
         compute_unmarshal_ec
         count_ones
