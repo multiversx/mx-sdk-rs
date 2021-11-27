@@ -4,8 +4,8 @@ use crate::api::managed_types::managed_buffer_api_node::{
 use elrond_wasm::{
     api::BlockchainApi,
     types::{
-        Address, BigUint, Box, EsdtLocalRoleFlags, EsdtTokenData, EsdtTokenType, ManagedAddress,
-        ManagedBuffer, ManagedType, ManagedVec, TokenIdentifier, H256,
+        Address, BigUint, Box, EsdtTokenData, EsdtTokenType, ManagedAddress, ManagedBuffer,
+        ManagedType, ManagedVec, TokenIdentifier, H256,
     },
 };
 
@@ -533,10 +533,14 @@ impl BlockchainApi for crate::VmApiImpl {
         }
     }
 
-    fn get_esdt_local_roles(&self, token_id: &TokenIdentifier<Self>) -> EsdtLocalRoleFlags {
+    #[cfg(feature = "vm-esdt-local-roles")]
+    fn get_esdt_local_roles(
+        &self,
+        token_id: &TokenIdentifier<Self>,
+    ) -> elrond_wasm::types::EsdtLocalRoleFlags {
         let managed_token_id = token_id.as_managed_buffer();
         unsafe {
-            EsdtLocalRoleFlags::from_bits_unchecked(getESDTLocalRoles(
+            elrond_wasm::types::EsdtLocalRoleFlags::from_bits_unchecked(getESDTLocalRoles(
                 managed_token_id.get_raw_handle(),
             ) as u64)
         }
