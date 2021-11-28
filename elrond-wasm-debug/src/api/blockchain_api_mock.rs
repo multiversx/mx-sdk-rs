@@ -3,8 +3,8 @@ use crate::{
     DebugApi,
 };
 use elrond_wasm::types::{
-    Address, BigUint, EsdtTokenData, EsdtTokenType, ManagedAddress, ManagedBuffer, ManagedVec,
-    TokenIdentifier, H256,
+    Address, BigUint, EsdtLocalRole, EsdtLocalRoleFlags, EsdtTokenData, EsdtTokenType,
+    ManagedAddress, ManagedBuffer, ManagedVec, TokenIdentifier, H256,
 };
 
 impl elrond_wasm::api::BlockchainApi for DebugApi {
@@ -154,6 +154,24 @@ impl elrond_wasm::api::BlockchainApi for DebugApi {
                     .unwrap();
 
                 self.esdt_token_data_from_instance(nonce, instance)
+            })
+    }
+
+    fn get_esdt_local_roles(&self, token_id: &TokenIdentifier<Self>) -> EsdtLocalRoleFlags {
+        let sc_address = self.input_ref().to.clone();
+        self.blockchain_cache()
+            .with_account(&sc_address, |account| {
+                let mut result = EsdtLocalRoleFlags::NONE;
+                if let Some(esdt_data) = account
+                    .esdt
+                    .get_by_identifier(token_id.to_esdt_identifier().as_slice())
+                {
+                    for role_name in esdt_data.roles.get() {
+                        result |= EsdtLocalRole::from(role_name.as_slice()).to_flag();
+                    }
+                }
+
+                result
             })
     }
 }
