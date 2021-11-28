@@ -19,3 +19,4 @@ features = ["cb_closure_managed_deser"]
 [dev-dependencies.elrond-wasm-debug]
 version = "0.23.1"
 path = "../../../../elrond-wasm-debug"
+
