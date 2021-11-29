@@ -5,13 +5,13 @@
         {
             "step": "setState",
             "accounts": {
-                "sc:basic-features": {
+                "sc:forwarder": {
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
                         "str:ESDT-123456": "200"
                     },
-                    "code": "file:../output/basic-features.wasm"
+                    "code": "file:../forwarder/output/forwarder.wasm"
                 },
                 "address:viewer": {
                     "nonce": "0",
@@ -25,7 +25,7 @@
             "comment": "no roles",
             "tx": {
                 "from": "address:viewer",
-                "to": "sc:basic-features",
+                "to": "sc:forwarder",
                 "function": "get_esdt_local_roles",
                 "arguments": [
                     "str:ESDT-123456"
@@ -44,7 +44,7 @@
         {
             "step": "setState",
             "accounts": {
-                "sc:basic-features": {
+                "sc:forwarder": {
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
@@ -54,7 +54,7 @@
                             ]
                         }
                     },
-                    "code": "file:../output/basic-features.wasm"
+                    "code": "file:../forwarder/output/forwarder.wasm"
                 },
                 "address:viewer": {
                     "nonce": "0",
@@ -68,7 +68,7 @@
             "comment": "one role",
             "tx": {
                 "from": "address:viewer",
-                "to": "sc:basic-features",
+                "to": "sc:forwarder",
                 "function": "get_esdt_local_roles",
                 "arguments": [
                     "str:ESDT-123456"
@@ -89,7 +89,7 @@
         {
             "step": "setState",
             "accounts": {
-                "sc:basic-features": {
+                "sc:forwarder": {
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
@@ -100,7 +100,7 @@
                             ]
                         }
                     },
-                    "code": "file:../output/basic-features.wasm"
+                    "code": "file:../forwarder/output/forwarder.wasm"
                 },
                 "address:viewer": {
                     "nonce": "0",
@@ -114,7 +114,7 @@
             "comment": "multiple roles",
             "tx": {
                 "from": "address:viewer",
-                "to": "sc:basic-features",
+                "to": "sc:forwarder",
                 "function": "get_esdt_local_roles",
                 "arguments": [
                     "str:ESDT-123456"
@@ -136,7 +136,7 @@
         {
             "step": "setState",
             "accounts": {
-                "sc:basic-features": {
+                "sc:forwarder": {
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
@@ -149,7 +149,7 @@
                             ]
                         }
                     },
-                    "code": "file:../output/basic-features.wasm"
+                    "code": "file:../forwarder/output/forwarder.wasm"
                 },
                 "address:viewer": {
                     "nonce": "0",
@@ -163,7 +163,7 @@
             "comment": "nft roles",
             "tx": {
                 "from": "address:viewer",
-                "to": "sc:basic-features",
+                "to": "sc:forwarder",
                 "function": "get_esdt_local_roles",
                 "arguments": [
                     "str:ESDT-123456"

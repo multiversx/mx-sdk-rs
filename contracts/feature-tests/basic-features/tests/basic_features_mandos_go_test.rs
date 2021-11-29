@@ -219,21 +219,6 @@ fn get_cumulated_validator_rewards_go() {
 }
 
 #[test]
-fn get_esdt_local_roles_go() {
-    elrond_wasm_debug::mandos_go("mandos/get_esdt_local_roles.scen.json");
-}
-
-#[test]
-fn managed_address_array_go() {
-    elrond_wasm_debug::mandos_go("mandos/managed_address_array.scen.json");
-}
-
-#[test]
-fn managed_address_managed_buffer_go() {
-    elrond_wasm_debug::mandos_go("mandos/managed_address_managed_buffer.scen.json");
-}
-
-#[test]
 fn managed_buffer_concat_1_go() {
     elrond_wasm_debug::mandos_go("mandos/managed_buffer_concat_1.scen.json");
 }

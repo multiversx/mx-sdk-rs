@@ -21,12 +21,16 @@ path = ".."
 [dependencies.elrond-wasm-node]
 version = "0.23.1"
 path = "../../../../../elrond-wasm-node"
-features=["unmanaged-ei"]
+features = [
+    "unmanaged-ei",
+    "vm-validate-token-identifier",
+    "vm-esdt-local-roles",
+]
 
 [dependencies.elrond-wasm-output]
 version = "0.23.1"
 path = "../../../../../elrond-wasm-output"
-features=["wasm-output-mode"]
+features = ["wasm-output-mode"]
 
 [workspace]
 members = ["."]
