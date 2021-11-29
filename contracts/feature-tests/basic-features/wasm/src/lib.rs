@@ -82,6 +82,7 @@ elrond_wasm_node::wasm_endpoints! {
         div_big_uint
         div_big_uint_ref
         echo_array_u8
+        echo_arrayvec
         echo_async_result_empty
         echo_big_int
         echo_big_int_option
@@ -184,6 +185,8 @@ elrond_wasm_node::wasm_endpoints! {
         logEventB
         logLegacyEventA
         logLegacyEventB
+        maddress_from_array
+        maddress_from_managed_buffer
         managed_address_eq
         managed_address_from
         managed_address_zero
