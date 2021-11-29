@@ -232,15 +232,6 @@ fn get_cumulated_validator_rewards_rs() {
     elrond_wasm_debug::mandos_rs("mandos/get_cumulated_validator_rewards.scen.json", world());
 }
 
-// TODO: uncomment after implemented the full ESDT format in mandos-rs
-// #[test]
-// fn get_esdt_local_roles_rs() {
-// 	elrond_wasm_debug::mandos_rs(
-// 		"mandos/get_esdt_local_roles.scen.json",
-// 		world(),
-// 	);
-// }
-
 #[test]
 fn managed_address_array_rs() {
     elrond_wasm_debug::mandos_rs("mandos/managed_address_array.scen.json", world());

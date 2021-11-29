@@ -47,6 +47,11 @@ fn forw_raw_async_echo_rs() {
     elrond_wasm_debug::mandos_rs("mandos/forw_raw_async_echo.scen.json", world());
 }
 
+#[test]
+fn forwarder_get_esdt_local_roles_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/forwarder_get_esdt_local_roles.scen.json", world());
+}
+
 // #[test]
 // fn forw_raw_async_send_and_retrieve_multi_transfer_funds_rs() {
 //     elrond_wasm_debug::mandos_rs(
@@ -188,6 +193,14 @@ fn forwarder_call_async_accept_esdt_rs() {
 #[test]
 fn forwarder_call_async_accept_nft_rs() {
     elrond_wasm_debug::mandos_rs("mandos/forwarder_call_async_accept_nft.scen.json", world());
+}
+
+#[test]
+fn forwarder_validate_token_identifier_rs() {
+    elrond_wasm_debug::mandos_rs(
+        "mandos/forwarder_validate_token_identifier.scen.json",
+        world(),
+    );
 }
 
 #[test]
