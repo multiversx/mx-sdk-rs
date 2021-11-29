@@ -22,7 +22,7 @@ fn test_add() {
         SC_PATH_EXPR,
     );
 
-    wrapper = wrapper.execute_query(&sc_addr, |sc| {
+    wrapper.execute_query(&sc_addr, |sc| {
         let first = managed_biguint!(1000);
         let second = managed_biguint!(2000);
 
@@ -30,8 +30,6 @@ fn test_add() {
         let actual_result = sc.sum(first, second);
         assert_eq!(expected_result, actual_result);
     });
-
-    wrapper.write_mandos_output(TEST_OUTPUT_PATH);
 }
 
 #[test]
@@ -676,7 +674,7 @@ fn blockchain_state_test() {
     wrapper.set_block_nonce(expected_nonce);
     wrapper.set_block_timestamp(expected_timestamp);
 
-    wrapper.execute_query(&sc_addr, |sc| {
+    wrapper = wrapper.execute_query(&sc_addr, |sc| {
         let actual_epoch = sc.get_block_epoch();
         let actual_nonce = sc.get_block_nonce();
         let actual_timestamp = sc.get_block_timestamp();
@@ -685,6 +683,8 @@ fn blockchain_state_test() {
         assert_eq!(expected_nonce, actual_nonce);
         assert_eq!(expected_timestamp, actual_timestamp);
     });
+
+    wrapper.write_mandos_output(TEST_OUTPUT_PATH);
 }
 
 #[test]

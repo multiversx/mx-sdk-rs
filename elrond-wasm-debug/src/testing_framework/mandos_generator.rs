@@ -5,7 +5,7 @@ use mandos::serde_raw::{ScenarioRaw, StepRaw};
 use serde::Serialize;
 
 use super::raw_converter::*;
-use crate::world_mock::AccountData;
+use crate::world_mock::{AccountData, BlockInfo};
 
 pub struct MandosGenerator {
     scenario: ScenarioRaw,
@@ -48,10 +48,25 @@ impl MandosGenerator {
         let step = StepRaw::SetState {
             accounts: accounts_raw,
             block_hashes: Vec::new(),
+            new_addresses: Vec::new(),
             comment: None,
             current_block_info: None,
-            new_addresses: Vec::new(),
             previous_block_info: None,
+        };
+        self.scenario.steps.push(step);
+    }
+
+    pub fn set_block_info(&mut self, current_block_info: &BlockInfo, prev_block_info: &BlockInfo) {
+        let current_raw = block_info_as_raw(current_block_info);
+        let prev_raw = block_info_as_raw(prev_block_info);
+
+        let step = StepRaw::SetState {
+            accounts: BTreeMap::new(),
+            block_hashes: Vec::new(),
+            new_addresses: Vec::new(),
+            comment: None,
+            current_block_info: Some(current_raw),
+            previous_block_info: Some(prev_raw),
         };
         self.scenario.steps.push(step);
     }

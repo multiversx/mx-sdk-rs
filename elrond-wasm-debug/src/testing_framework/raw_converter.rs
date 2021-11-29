@@ -1,8 +1,10 @@
 use std::collections::BTreeMap;
 
-use crate::world_mock::{AccountData, EsdtData};
-use elrond_wasm::{elrond_codec::TopEncode, types::Address};
-use mandos::serde_raw::{AccountRaw, EsdtFullRaw, EsdtRaw, InstanceRaw, ValueSubTree};
+use crate::world_mock::{AccountData, BlockInfo, EsdtData};
+use elrond_wasm::types::Address;
+use mandos::serde_raw::{
+    AccountRaw, BlockInfoRaw, EsdtFullRaw, EsdtRaw, InstanceRaw, ValueSubTree,
+};
 
 pub fn account_as_raw(acc: &AccountData) -> AccountRaw {
     let balance_raw = Some(rust_biguint_as_raw(&acc.egld_balance));
@@ -73,8 +75,18 @@ pub fn esdt_data_as_raw(esdt: &EsdtData) -> EsdtRaw {
     })
 }
 
+pub fn block_info_as_raw(block_info: &BlockInfo) -> BlockInfoRaw {
+    BlockInfoRaw {
+        block_epoch: Some(u64_as_raw(block_info.block_epoch)),
+        block_nonce: Some(u64_as_raw(block_info.block_nonce)),
+        block_round: Some(u64_as_raw(block_info.block_round)),
+        block_timestamp: Some(u64_as_raw(block_info.block_timestamp)),
+        block_random_seed: Some(bytes_as_raw(&block_info.block_random_seed[..])),
+    }
+}
+
 pub fn rust_biguint_as_raw(big_uint: &num_bigint::BigUint) -> ValueSubTree {
-    bytes_as_raw(&big_uint.to_bytes_be())
+    ValueSubTree::Str(big_uint.to_string())
 }
 
 pub fn address_as_raw(address: &Address) -> ValueSubTree {
@@ -82,10 +94,7 @@ pub fn address_as_raw(address: &Address) -> ValueSubTree {
 }
 
 pub fn u64_as_raw(value: u64) -> ValueSubTree {
-    let mut min_bytes = Vec::new();
-    value.top_encode(&mut min_bytes).unwrap();
-
-    bytes_as_raw(&min_bytes)
+    ValueSubTree::Str(value.to_string())
 }
 
 pub fn bytes_as_raw(bytes: &[u8]) -> ValueSubTree {

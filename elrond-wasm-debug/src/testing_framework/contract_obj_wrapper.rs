@@ -326,42 +326,92 @@ where
 
     pub fn set_block_epoch(&mut self, block_epoch: u64) {
         self.b_mock.current_block_info.block_epoch = block_epoch;
+
+        self.mandos_generator.set_block_info(
+            &self.b_mock.current_block_info,
+            &self.b_mock.previous_block_info,
+        );
     }
 
     pub fn set_block_nonce(&mut self, block_nonce: u64) {
         self.b_mock.current_block_info.block_nonce = block_nonce;
+
+        self.mandos_generator.set_block_info(
+            &self.b_mock.current_block_info,
+            &self.b_mock.previous_block_info,
+        );
     }
 
     pub fn set_block_random_seed(&mut self, block_random_seed: Box<[u8; 48]>) {
         self.b_mock.current_block_info.block_random_seed = block_random_seed;
+
+        self.mandos_generator.set_block_info(
+            &self.b_mock.current_block_info,
+            &self.b_mock.previous_block_info,
+        );
     }
 
     pub fn set_block_round(&mut self, block_round: u64) {
         self.b_mock.current_block_info.block_round = block_round;
+
+        self.mandos_generator.set_block_info(
+            &self.b_mock.current_block_info,
+            &self.b_mock.previous_block_info,
+        );
     }
 
     pub fn set_block_timestamp(&mut self, block_timestamp: u64) {
         self.b_mock.current_block_info.block_timestamp = block_timestamp;
+
+        self.mandos_generator.set_block_info(
+            &self.b_mock.current_block_info,
+            &self.b_mock.previous_block_info,
+        );
     }
 
     pub fn set_prev_block_epoch(&mut self, block_epoch: u64) {
         self.b_mock.previous_block_info.block_epoch = block_epoch;
+
+        self.mandos_generator.set_block_info(
+            &self.b_mock.current_block_info,
+            &self.b_mock.previous_block_info,
+        );
     }
 
     pub fn set_prev_block_nonce(&mut self, block_nonce: u64) {
         self.b_mock.previous_block_info.block_nonce = block_nonce;
+
+        self.mandos_generator.set_block_info(
+            &self.b_mock.current_block_info,
+            &self.b_mock.previous_block_info,
+        );
     }
 
     pub fn set_prev_block_random_seed(&mut self, block_random_seed: Box<[u8; 48]>) {
         self.b_mock.previous_block_info.block_random_seed = block_random_seed;
+
+        self.mandos_generator.set_block_info(
+            &self.b_mock.current_block_info,
+            &self.b_mock.previous_block_info,
+        );
     }
 
     pub fn set_prev_block_round(&mut self, block_round: u64) {
         self.b_mock.previous_block_info.block_round = block_round;
+
+        self.mandos_generator.set_block_info(
+            &self.b_mock.current_block_info,
+            &self.b_mock.previous_block_info,
+        );
     }
 
     pub fn set_prev_block_timestamp(&mut self, block_timestamp: u64) {
         self.b_mock.previous_block_info.block_timestamp = block_timestamp;
+
+        self.mandos_generator.set_block_info(
+            &self.b_mock.current_block_info,
+            &self.b_mock.previous_block_info,
+        );
     }
 }
 
