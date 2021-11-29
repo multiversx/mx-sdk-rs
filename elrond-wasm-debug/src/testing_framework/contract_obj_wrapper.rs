@@ -21,6 +21,7 @@ pub struct ContractObjWrapper<
     address_factory: AddressFactory,
     obj_builders: HashMap<Address, ContractObjBuilder>,
     b_mock: BlockchainMock,
+    address_to_code_path: HashMap<Address, Vec<u8>>,
     _phantom: PhantomData<CB>,
 }
 
@@ -34,14 +35,17 @@ where
     CB: ContractBase<Api = DebugApi> + CallableContract<DebugApi> + 'static,
     ContractObjBuilder: 'static + Copy + Fn(DebugApi) -> CB,
 {
-    pub fn new() -> Self {
+    pub fn new(_workspace_path: &str) -> Self {
         // let mut b_mock = BlockchainMock::new();
-        // b_mock.set_current_dir_from_workspace("contracts/examples/crowdfunding-erc20");
+
+        // let path = "/home/elrond/elrond-wasm-rs/elrond-wasm-debug/src/testing_framework/";
+        // b_mock.set_current_dir_from_workspace(path);
 
         ContractObjWrapper {
             address_factory: AddressFactory::new(),
             obj_builders: HashMap::new(),
             b_mock: BlockchainMock::new(),
+            address_to_code_path: HashMap::new(),
             _phantom: PhantomData,
         }
     }
@@ -155,20 +159,29 @@ where
         egld_balance: &num_bigint::BigUint,
         owner: Option<&Address>,
         obj_builder: ContractObjBuilder,
+        contract_path_expr: &str,
     ) -> Address {
         let address = self.address_factory.new_sc_address();
-        let addr_string = "0x".to_owned() + &address_to_hex(&address);
+        self.address_to_code_path
+            .insert(address.clone(), contract_path_expr.as_bytes().to_vec());
+
+        let contract_bytes = mandos::value_interpreter::interpret_string(
+            contract_path_expr,
+            &mandos::interpret_trait::InterpreterContext::new(std::path::PathBuf::new()),
+        );
 
         self.create_account_raw(
             &address,
             egld_balance,
             owner,
-            Some(address.as_bytes().to_vec()),
+            Some(contract_bytes), // Some(contract_path_expr.as_bytes().to_vec())
         );
-        self.obj_builders.insert(address.clone(), obj_builder);
+        let _ = self.obj_builders.insert(address.clone(), obj_builder);
 
-        let closure = convert_full_fn(obj_builder);
-        self.b_mock.register_contract(&addr_string, closure);
+        if !self.b_mock.contains_contract(contract_path_expr) {
+            let closure = convert_full_fn(obj_builder);
+            self.b_mock.register_contract(contract_path_expr, closure);
+        }
 
         address
     }
@@ -451,6 +464,7 @@ where
             address_factory: self.address_factory,
             obj_builders: self.obj_builders,
             b_mock: new_b_mock,
+            address_to_code_path: self.address_to_code_path,
             _phantom: PhantomData,
         }
     }
