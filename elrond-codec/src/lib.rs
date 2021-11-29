@@ -8,6 +8,9 @@ pub use elrond_codec_derive;
 /// Reexport needed by derive.
 pub use alloc::vec::Vec;
 
+/// Reexported for convenience.
+pub use arrayvec;
+
 // TODO: group into smaller sub-modules
 
 mod codec_err;
