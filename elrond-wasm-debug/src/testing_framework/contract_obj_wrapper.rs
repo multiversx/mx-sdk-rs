@@ -36,11 +36,6 @@ where
     ContractObjBuilder: 'static + Copy + Fn(DebugApi) -> CB,
 {
     pub fn new(_workspace_path: &str) -> Self {
-        // let mut b_mock = BlockchainMock::new();
-
-        // let path = "/home/elrond/elrond-wasm-rs/elrond-wasm-debug/src/testing_framework/";
-        // b_mock.set_current_dir_from_workspace(path);
-
         ContractObjWrapper {
             address_factory: AddressFactory::new(),
             obj_builders: HashMap::new(),
