@@ -7,12 +7,13 @@ use elrond_wasm::{
 
 use crate::{
     rust_biguint,
+    testing_framework::bytes_to_hex,
     tx_mock::{TxCache, TxContext, TxContextStack, TxInput, TxInputESDT},
     world_mock::{AccountData, AccountEsdt, EsdtInstanceMetadata},
     BlockchainMock, DebugApi,
 };
 
-use super::AddressFactory;
+use super::{AddressFactory, MandosGenerator};
 
 pub struct ContractObjWrapper<
     CB: ContractBase<Api = DebugApi> + CallableContract<DebugApi> + 'static,
@@ -22,6 +23,7 @@ pub struct ContractObjWrapper<
     obj_builders: HashMap<Address, ContractObjBuilder>,
     b_mock: BlockchainMock,
     address_to_code_path: HashMap<Address, Vec<u8>>,
+    mandos_generator: MandosGenerator,
     _phantom: PhantomData<CB>,
 }
 
@@ -41,8 +43,13 @@ where
             obj_builders: HashMap::new(),
             b_mock: BlockchainMock::new(),
             address_to_code_path: HashMap::new(),
+            mandos_generator: MandosGenerator::new(),
             _phantom: PhantomData,
         }
+    }
+
+    pub fn write_mandos_output(self, file_path: &str) {
+        self.mandos_generator.write_mandos_output(file_path);
     }
 
     pub fn check_egld_balance(&self, address: &Address, expected_balance: &num_bigint::BigUint) {
@@ -188,7 +195,7 @@ where
         owner: Option<&Address>,
         sc_identifier: Option<Vec<u8>>,
     ) {
-        self.b_mock.add_account(AccountData {
+        let acc_data = AccountData {
             address: address.clone(),
             nonce: 0,
             egld_balance: egld_balance.clone(),
@@ -197,12 +204,20 @@ where
             username: Vec::new(),
             contract_path: sc_identifier,
             contract_owner: owner.cloned(),
-        });
+        };
+        self.mandos_generator.set_account(address, &acc_data);
+
+        self.b_mock.add_account(acc_data);
     }
 
     pub fn set_egld_balance(&mut self, address: &Address, balance: &num_bigint::BigUint) {
         match self.b_mock.accounts.get_mut(address) {
-            Some(acc) => acc.egld_balance = balance.clone(),
+            Some(acc) => {
+                acc.egld_balance = balance.clone();
+
+                self.mandos_generator.set_account(address, acc);
+            },
+
             None => panic!(
                 "set_egld_balance: Account {:?} does not exist",
                 address_to_hex(address)
@@ -217,12 +232,16 @@ where
         balance: &num_bigint::BigUint,
     ) {
         match self.b_mock.accounts.get_mut(address) {
-            Some(acc) => acc.esdt.set_esdt_balance(
-                token_id.to_vec(),
-                0,
-                balance,
-                EsdtInstanceMetadata::default(),
-            ),
+            Some(acc) => {
+                acc.esdt.set_esdt_balance(
+                    token_id.to_vec(),
+                    0,
+                    balance,
+                    EsdtInstanceMetadata::default(),
+                );
+
+                self.mandos_generator.set_account(address, acc);
+            },
             None => panic!(
                 "set_esdt_balance: Account {:?} does not exist",
                 address_to_hex(address)
@@ -272,6 +291,8 @@ where
                         uri: uri.map(|u| u.to_vec()),
                     },
                 );
+
+                self.mandos_generator.set_account(address, acc);
             },
             None => panic!(
                 "set_nft_balance: Account {:?} does not exist",
@@ -292,8 +313,9 @@ where
                 for role in roles {
                     roles_raw.push(role.as_role_name().to_vec());
                 }
-
                 acc.esdt.set_roles(token_id.to_vec(), roles_raw);
+
+                self.mandos_generator.set_account(address, acc);
             },
             None => panic!(
                 "set_esdt_local_roles: Account {:?} does not exist",
@@ -460,6 +482,7 @@ where
             obj_builders: self.obj_builders,
             b_mock: new_b_mock,
             address_to_code_path: self.address_to_code_path,
+            mandos_generator: self.mandos_generator,
             _phantom: PhantomData,
         }
     }
@@ -486,10 +509,6 @@ fn build_tx_input(
 
 fn address_to_hex(address: &Address) -> String {
     hex::encode(address.as_bytes())
-}
-
-fn bytes_to_hex(bytes: &[u8]) -> String {
-    hex::encode(bytes)
 }
 
 fn serialize_attributes<T: elrond_wasm::elrond_codec::TopEncode>(attributes: &T) -> Vec<u8> {

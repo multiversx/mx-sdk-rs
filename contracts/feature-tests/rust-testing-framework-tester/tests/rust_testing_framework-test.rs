@@ -10,6 +10,7 @@ use rust_testing_framework_tester::*;
 const WORKSPACE_PATH: &'static str = "contracts/feature-tests/rust-testing-framework-tester";
 // const SC_PATH_EXPR: &'static str = "file:output/rust-testing-framework-tester.wasm";
 const SC_PATH_EXPR: &'static str = "file:/home/elrond/elrond-wasm-rs/contracts/feature-tests/rust-testing-framework-tester/output/rust-testing-framework-tester.wasm";
+const TEST_OUTPUT_PATH: &'static str = "/home/elrond/elrond-wasm-rs/contracts/feature-tests/rust-testing-framework-tester/mandos/test.scen.json";
 
 #[test]
 fn test_add() {
@@ -21,7 +22,7 @@ fn test_add() {
         SC_PATH_EXPR,
     );
 
-    wrapper.execute_query(&sc_addr, |sc| {
+    wrapper = wrapper.execute_query(&sc_addr, |sc| {
         let first = managed_biguint!(1000);
         let second = managed_biguint!(2000);
 
@@ -29,6 +30,8 @@ fn test_add() {
         let actual_result = sc.sum(first, second);
         assert_eq!(expected_result, actual_result);
     });
+
+    wrapper.write_mandos_output(TEST_OUTPUT_PATH);
 }
 
 #[test]
