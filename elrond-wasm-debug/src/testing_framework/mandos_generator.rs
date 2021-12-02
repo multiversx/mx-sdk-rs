@@ -4,11 +4,12 @@ use elrond_wasm::types::Address;
 use mandos::serde_raw::{ScenarioRaw, StepRaw};
 use serde::Serialize;
 
-use super::raw_converter::*;
+use super::{raw_converter::*, TxCallCustom, TxExpectCustom, TxQueryCustom};
 use crate::world_mock::{AccountData, BlockInfo};
 
-pub struct MandosGenerator {
+pub(crate) struct MandosGenerator {
     scenario: ScenarioRaw,
+    current_tx_id: u64,
 }
 
 impl MandosGenerator {
@@ -21,6 +22,7 @@ impl MandosGenerator {
                 name: None,
                 steps: Vec::new(),
             },
+            current_tx_id: 0,
         }
     }
 
@@ -67,6 +69,41 @@ impl MandosGenerator {
             comment: None,
             current_block_info: Some(current_raw),
             previous_block_info: Some(prev_raw),
+        };
+        self.scenario.steps.push(step);
+    }
+
+    pub fn next_tx_id_string(&mut self) -> String {
+        let id_str = self.current_tx_id.to_string();
+        self.current_tx_id += 1;
+
+        id_str
+    }
+
+    pub fn create_tx(&mut self, tx: &TxCallCustom, expect: &TxExpectCustom) {
+        let tx_raw = tx_call_as_raw(tx);
+        let expect_raw = tx_expect_as_raw(expect);
+
+        let step = StepRaw::ScCall {
+            comment: None,
+            display_logs: None,
+            tx_id: self.next_tx_id_string(),
+            tx: tx_raw,
+            expect: Some(expect_raw),
+        };
+        self.scenario.steps.push(step);
+    }
+
+    pub fn create_query(&mut self, query: &TxQueryCustom, expect: &TxExpectCustom) {
+        let query_raw = tx_query_as_raw(query);
+        let expect_raw = tx_expect_as_raw(expect);
+
+        let step = StepRaw::ScQuery {
+            comment: None,
+            display_logs: None,
+            tx_id: self.next_tx_id_string(),
+            tx: query_raw,
+            expect: Some(expect_raw),
         };
         self.scenario.steps.push(step);
     }
