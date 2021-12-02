@@ -204,6 +204,9 @@ where
     pub fn sort(&mut self) {
         self.with_self_as_vec(|t_vec| t_vec.sort())
     }
+    pub fn sort_unstable(&mut self) {
+        self.with_self_as_vec(|t_vec| t_vec.sort_unstable())
+    }
 }
 
 impl<M, T> ManagedVec<M, T>
