@@ -532,7 +532,7 @@ where
         TxContextStack::static_push(tx_context_rc.clone());
 
         let debug_api = DebugApi::new(tx_context_rc);
-        let obj_builder = self.obj_builders.get(&sc_address).unwrap();
+        let obj_builder = self.obj_builders.get(sc_address).unwrap();
         let sc = (obj_builder)(debug_api);
 
         let state_change = tx_fn(sc);

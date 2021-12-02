@@ -44,7 +44,7 @@ impl MandosGenerator {
         let mut accounts_raw = BTreeMap::new();
 
         let addr_as_str = bytes_to_hex(address.as_bytes());
-        let acc_raw = account_as_raw(&acc);
+        let acc_raw = account_as_raw(acc);
         accounts_raw.insert(addr_as_str, acc_raw);
 
         let step = StepRaw::SetState {
@@ -82,7 +82,7 @@ impl MandosGenerator {
 
     pub fn create_tx(&mut self, tx: &ScCallMandos, opt_expect: Option<&TxExpectMandos>) {
         let tx_raw = tx_call_as_raw(tx);
-        let expect_raw = opt_expect.map(|exp| tx_expect_as_raw(exp));
+        let expect_raw = opt_expect.map(tx_expect_as_raw);
 
         let step = StepRaw::ScCall {
             comment: None,
@@ -96,7 +96,7 @@ impl MandosGenerator {
 
     pub fn create_query(&mut self, query: &ScQueryMandos, opt_expect: Option<&TxExpectMandos>) {
         let query_raw = tx_query_as_raw(query);
-        let expect_raw = opt_expect.map(|exp| tx_expect_as_raw(exp));
+        let expect_raw = opt_expect.map(tx_expect_as_raw);
 
         let step = StepRaw::ScQuery {
             comment: None,

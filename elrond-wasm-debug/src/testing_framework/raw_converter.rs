@@ -9,7 +9,7 @@ use mandos::serde_raw::{
 
 use super::{ScCallMandos, ScQueryMandos, TxExpectMandos};
 
-pub(crate) const STAR_STR: &'static str = "*";
+pub(crate) const STAR_STR: &str = "*";
 
 pub(crate) fn account_as_raw(acc: &AccountData) -> AccountRaw {
     let balance_raw = Some(rust_biguint_as_raw(&acc.egld_balance));
@@ -37,7 +37,7 @@ pub(crate) fn account_as_raw(acc: &AccountData) -> AccountRaw {
         comment: None,
         esdt: all_esdt_raw,
         nonce: Some(u64_as_raw(acc.nonce)),
-        owner: acc.contract_owner.as_ref().map(|o| address_as_raw(o)),
+        owner: acc.contract_owner.as_ref().map(address_as_raw),
         storage: storage_raw,
         username: None, // TODO: Add if needed
     }
@@ -57,11 +57,11 @@ pub(crate) fn esdt_data_as_raw(esdt: &EsdtData) -> EsdtRaw {
     }
 
     let mut instances_raw = Vec::new();
-    for (_, inst) in esdt.instances.get_instances() {
+    for inst in esdt.instances.get_instances().values() {
         let inst_raw = InstanceRaw {
             attributes: Some(bytes_as_raw(&inst.metadata.attributes)),
             balance: Some(rust_biguint_as_raw(&inst.balance)),
-            creator: inst.metadata.creator.as_ref().map(|c| address_as_raw(c)),
+            creator: inst.metadata.creator.as_ref().map(address_as_raw),
             hash: inst.metadata.hash.as_ref().map(|h| bytes_as_raw(h)),
             nonce: Some(u64_as_raw(inst.nonce)),
             royalties: Some(u64_as_raw(inst.metadata.royalties)),
@@ -147,7 +147,7 @@ pub(crate) fn tx_expect_as_raw(tx_expect: &TxExpectMandos) -> TxExpectRaw {
         out_values_raw.push(out_raw);
     }
 
-    let msg_raw = if &tx_expect.message == STAR_STR {
+    let msg_raw = if tx_expect.message == STAR_STR {
         CheckBytesValueRaw::Star
     } else {
         let mandos_formatted_str = "str:".to_owned() + &tx_expect.message;
