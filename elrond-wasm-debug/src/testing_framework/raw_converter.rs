@@ -3,10 +3,13 @@ use std::collections::BTreeMap;
 use crate::world_mock::{AccountData, BlockInfo, EsdtData};
 use elrond_wasm::types::Address;
 use mandos::serde_raw::{
-    AccountRaw, BlockInfoRaw, EsdtFullRaw, EsdtRaw, InstanceRaw, ValueSubTree,
+    AccountRaw, BlockInfoRaw, CheckBytesValueRaw, CheckLogsRaw, EsdtFullRaw, EsdtRaw, InstanceRaw,
+    TxCallRaw, TxESDTRaw, TxExpectRaw, TxQueryRaw, ValueSubTree,
 };
 
-pub fn account_as_raw(acc: &AccountData) -> AccountRaw {
+use super::{TxCallCustom, TxExpectCustom, TxQueryCustom};
+
+pub(crate) fn account_as_raw(acc: &AccountData) -> AccountRaw {
     let balance_raw = Some(rust_biguint_as_raw(&acc.egld_balance));
     let code_raw = acc.contract_path.clone().map(|c| bytes_as_raw(&c));
 
@@ -38,7 +41,7 @@ pub fn account_as_raw(acc: &AccountData) -> AccountRaw {
     }
 }
 
-pub fn esdt_data_as_raw(esdt: &EsdtData) -> EsdtRaw {
+pub(crate) fn esdt_data_as_raw(esdt: &EsdtData) -> EsdtRaw {
     let last_nonce_raw = if esdt.last_nonce == 0 {
         None
     } else {
@@ -75,7 +78,7 @@ pub fn esdt_data_as_raw(esdt: &EsdtData) -> EsdtRaw {
     })
 }
 
-pub fn block_info_as_raw(block_info: &BlockInfo) -> BlockInfoRaw {
+pub(crate) fn block_info_as_raw(block_info: &BlockInfo) -> BlockInfoRaw {
     BlockInfoRaw {
         block_epoch: Some(u64_as_raw(block_info.block_epoch)),
         block_nonce: Some(u64_as_raw(block_info.block_nonce)),
@@ -85,22 +88,97 @@ pub fn block_info_as_raw(block_info: &BlockInfo) -> BlockInfoRaw {
     }
 }
 
-pub fn rust_biguint_as_raw(big_uint: &num_bigint::BigUint) -> ValueSubTree {
+pub(crate) fn tx_call_as_raw(tx_call: &TxCallCustom) -> TxCallRaw {
+    let mut all_esdt_raw = Vec::with_capacity(tx_call.esdt.len());
+    for esdt in tx_call.esdt.iter() {
+        let esdt_raw = TxESDTRaw {
+            token_identifier: Some(bytes_as_raw(&esdt.token_identifier)),
+            nonce: Some(u64_as_raw(esdt.nonce)),
+            value: rust_biguint_as_raw(&esdt.value),
+        };
+
+        all_esdt_raw.push(esdt_raw);
+    }
+
+    let mut arguments_raw = Vec::with_capacity(tx_call.arguments.len());
+    for arg in tx_call.arguments.iter() {
+        let arg_raw = bytes_as_raw(arg);
+        arguments_raw.push(arg_raw);
+    }
+
+    TxCallRaw {
+        from: address_as_raw(&tx_call.from),
+        to: address_as_raw(&tx_call.to),
+        value: None, // this is the old "value" field, which is now "egld_value". Only kept for backwards compatibility
+        egld_value: Some(rust_biguint_as_raw(&tx_call.egld_value)),
+        esdt_value: all_esdt_raw,
+        function: tx_call.function.clone(),
+        arguments: arguments_raw,
+        gas_limit: u64_as_raw(tx_call.gas_limit),
+        gas_price: u64_as_raw(tx_call.gas_price),
+    }
+}
+
+pub(crate) fn tx_query_as_raw(tx_query: &TxQueryCustom) -> TxQueryRaw {
+    let mut arguments_raw = Vec::with_capacity(tx_query.arguments.len());
+    for arg in tx_query.arguments.iter() {
+        let arg_raw = bytes_as_raw(arg);
+        arguments_raw.push(arg_raw);
+    }
+
+    TxQueryRaw {
+        to: address_as_raw(&tx_query.to),
+        function: tx_query.function.clone(),
+        arguments: arguments_raw,
+    }
+}
+
+pub(crate) fn tx_expect_as_raw(tx_expect: &TxExpectCustom) -> TxExpectRaw {
+    let mut out_values_raw = Vec::with_capacity(tx_expect.out.len());
+    for out_val in tx_expect.out.iter() {
+        let out_raw = if out_val.len() == 1 && out_val[0] == b'*' {
+            CheckBytesValueRaw::Star
+        } else {
+            CheckBytesValueRaw::Equal(bytes_as_raw(out_val))
+        };
+
+        out_values_raw.push(out_raw);
+    }
+
+    let star_as_string = String::from_utf8(b"*".to_vec()).unwrap();
+    let msg_raw = if tx_expect.message == star_as_string {
+        CheckBytesValueRaw::Star
+    } else {
+        let mandos_formatted_str = "str:".to_owned() + &tx_expect.message;
+        CheckBytesValueRaw::Equal(ValueSubTree::Str(mandos_formatted_str))
+    };
+
+    TxExpectRaw {
+        out: out_values_raw,
+        status: CheckBytesValueRaw::Equal(u64_as_raw(tx_expect.status)),
+        message: msg_raw,
+        logs: CheckLogsRaw::Star,
+        gas: CheckBytesValueRaw::Star,
+        refund: CheckBytesValueRaw::Star,
+    }
+}
+
+pub(crate) fn rust_biguint_as_raw(big_uint: &num_bigint::BigUint) -> ValueSubTree {
     ValueSubTree::Str(big_uint.to_string())
 }
 
-pub fn address_as_raw(address: &Address) -> ValueSubTree {
+pub(crate) fn address_as_raw(address: &Address) -> ValueSubTree {
     bytes_as_raw(address.as_bytes())
 }
 
-pub fn u64_as_raw(value: u64) -> ValueSubTree {
+pub(crate) fn u64_as_raw(value: u64) -> ValueSubTree {
     ValueSubTree::Str(value.to_string())
 }
 
-pub fn bytes_as_raw(bytes: &[u8]) -> ValueSubTree {
+pub(crate) fn bytes_as_raw(bytes: &[u8]) -> ValueSubTree {
     ValueSubTree::Str(bytes_to_hex(bytes))
 }
 
-pub fn bytes_to_hex(bytes: &[u8]) -> String {
+pub(crate) fn bytes_to_hex(bytes: &[u8]) -> String {
     "0x".to_owned() + &hex::encode(bytes)
 }
