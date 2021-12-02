@@ -60,6 +60,23 @@ fn test_into_vec() {
 }
 
 #[test]
+fn test_sort() {
+    let _ = DebugApi::dummy();
+
+    let mut vec = Vec::<BigUint<DebugApi>>::new();
+    let mut managed_vec = ManagedVec::<DebugApi, BigUint<DebugApi>>::new();
+    for i in (20u64..=30u64).rev() {
+        let biguint = BigUint::from(i);
+        managed_vec.push(biguint.clone());
+        vec.push(biguint);
+    }
+    managed_vec.sort();
+    vec.sort();
+
+    assert_eq!(vec, managed_vec.into_vec());
+}
+
+#[test]
 fn test_with_self_as_vec() {
     let _ = DebugApi::dummy();
 

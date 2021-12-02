@@ -94,6 +94,16 @@ where
 impl<M, T> ManagedVec<M, T>
 where
     M: ManagedTypeApi,
+    T: ManagedVecItem + Ord,
+{
+    pub fn sort(&mut self) {
+        self.with_self_as_vec(|t_vec| t_vec.sort())
+    }
+}
+
+impl<M, T> ManagedVec<M, T>
+where
+    M: ManagedTypeApi,
     T: ManagedVecItem,
 {
     /// Length of the underlying buffer in bytes.
