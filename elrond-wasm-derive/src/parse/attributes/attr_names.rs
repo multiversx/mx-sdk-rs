@@ -9,6 +9,7 @@ pub(super) static ATTR_PAYMENT_MULTI: &str = "payment_multi";
 pub(super) static ATTR_VAR_ARGS: &str = "var_args";
 pub(super) static ATTR_INIT: &str = "init";
 pub(super) static ATTR_VIEW: &str = "view";
+pub(super) static ATTR_EXTERNAL_VIEW: &str = "external_view";
 pub(super) static ATTR_LEGACY_EVENT: &str = "legacy_event";
 pub(super) static ATTR_EVENT: &str = "event";
 pub(super) static ATTR_EVENT_INDEXED: &str = "indexed";

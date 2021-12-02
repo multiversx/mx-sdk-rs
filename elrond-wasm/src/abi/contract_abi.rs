@@ -21,6 +21,40 @@ impl ContractAbi {
         self.type_descriptions.insert_all(&other.type_descriptions);
     }
 
+    pub fn main_contract(&self) -> ContractAbi {
+        ContractAbi {
+            build_info: self.build_info.clone(),
+            docs: self.docs,
+            name: self.name,
+            constructors: self.constructors.clone(),
+            endpoints: self
+                .endpoints.clone()
+                .iter()
+                .filter(|endpoint| endpoint.location == EndpointLocationAbi::MainContract)
+                .cloned()
+                .collect(),
+            has_callback: self.has_callback,
+            type_descriptions: self.type_descriptions.clone(),
+        }
+    }
+
+    pub fn secondary_contract(&self, location: EndpointLocationAbi) -> ContractAbi {
+        ContractAbi {
+            build_info: self.build_info.clone(),
+            docs: self.docs,
+            name: self.name,
+            constructors: Vec::new(),
+            endpoints: self
+                .endpoints.clone()
+                .iter()
+                .filter(|endpoint| endpoint.location == location)
+                .cloned()
+                .collect(),
+            has_callback: false,
+            type_descriptions: self.type_descriptions.clone(),
+        }
+    }
+
     /// A type can provide more than 1 type descripions.
     /// For instance, a struct can also provide the descriptions of its fields.
     pub fn add_type_descriptions<T: TypeAbi>(&mut self) {

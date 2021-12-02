@@ -133,4 +133,7 @@ pub trait AbiTester {
         #[payment_token] _token: TokenIdentifier,
     ) {
     }
+
+    #[external_view]
+    fn external_view(&self) {}
 }
