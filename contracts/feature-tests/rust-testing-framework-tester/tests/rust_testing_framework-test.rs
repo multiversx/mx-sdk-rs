@@ -674,7 +674,7 @@ fn blockchain_state_test() {
     wrapper.set_block_nonce(expected_nonce);
     wrapper.set_block_timestamp(expected_timestamp);
 
-    wrapper = wrapper.execute_query(&sc_addr, |sc| {
+    wrapper.execute_query(&sc_addr, |sc| {
         let actual_epoch = sc.get_block_epoch();
         let actual_nonce = sc.get_block_nonce();
         let actual_timestamp = sc.get_block_timestamp();
@@ -683,8 +683,6 @@ fn blockchain_state_test() {
         assert_eq!(expected_nonce, actual_nonce);
         assert_eq!(expected_timestamp, actual_timestamp);
     });
-
-    wrapper.write_mandos_output(TEST_OUTPUT_PATH);
 }
 
 #[test]
@@ -753,4 +751,68 @@ fn execute_on_dest_context_change_state_test() {
 
         assert_eq!(expected_result, actual_result);
     });
+}
+
+#[test]
+fn test_mandos_generation() {
+    let rust_zero = rust_biguint!(0);
+    let mut wrapper = ContractObjWrapper::new(WORKSPACE_PATH);
+    let user_addr = wrapper.create_user_account(&rust_zero);
+    let sc_addr = wrapper.create_sc_account(
+        &rust_zero,
+        None,
+        rust_testing_framework_tester::contract_obj,
+        SC_PATH_EXPR,
+    );
+
+    let add_value = rust_biguint!(50);
+    let mut sc_call_mandos = ScCallMandos::new(&user_addr, &sc_addr, "addValue");
+    sc_call_mandos.add_argument(&add_value.to_bytes_be());
+    sc_call_mandos.set_gas_limit(100_000_000);
+
+    let tx_expect = TxExpectMandos::new(0);
+    wrapper.add_mandos_sc_call(sc_call_mandos, Some(tx_expect));
+
+    wrapper = wrapper.execute_tx(&user_addr, &sc_addr, &rust_zero, |sc| {
+        let total_before = sc.total_value().get();
+        let per_caller_before = sc.value_per_caller(&managed_address!(&user_addr)).get();
+
+        assert_eq!(total_before, managed_biguint!(0));
+        assert_eq!(per_caller_before, managed_biguint!(0));
+
+        let added_value = managed_biguint!(50);
+        sc.add(added_value.clone());
+
+        let expected_total_after = total_before + added_value.clone();
+        let expected_per_caller_after = per_caller_before + added_value;
+
+        let actual_total_after = sc.total_value().get();
+        let actual_per_caller_after = sc.value_per_caller(&managed_address!(&user_addr)).get();
+
+        assert_eq!(expected_total_after, actual_total_after);
+        assert_eq!(expected_per_caller_after, actual_per_caller_after);
+
+        StateChange::Commit
+    });
+
+    let expected_value = rust_biguint!(50);
+    let sc_query_mandos = ScQueryMandos::new(&sc_addr, "getTotalValue");
+
+    let mut query_expect = TxExpectMandos::new(0);
+    query_expect.add_out_value(&expected_value.to_bytes_be());
+
+    wrapper.add_mandos_sc_query(sc_query_mandos, Some(query_expect));
+
+    wrapper = wrapper.execute_query(&sc_addr, |sc| {
+        let expected_total = managed_biguint!(50);
+        let expected_per_caller = managed_biguint!(50);
+
+        let actual_total = sc.total_value().get();
+        let actual_per_caller = sc.value_per_caller(&managed_address!(&user_addr)).get();
+
+        assert_eq!(expected_total, actual_total);
+        assert_eq!(expected_per_caller, actual_per_caller);
+    });
+
+    wrapper.write_mandos_output(TEST_OUTPUT_PATH);
 }

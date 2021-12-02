@@ -171,7 +171,7 @@ pub trait RustTestingFrameworkTester {
         );
     }
 
-    #[endpoint]
+    #[endpoint(addValue)]
     fn add(&self, value: BigUint) {
         let caller = self.blockchain().get_caller();
 

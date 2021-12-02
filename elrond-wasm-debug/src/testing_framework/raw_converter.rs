@@ -7,7 +7,9 @@ use mandos::serde_raw::{
     TxCallRaw, TxESDTRaw, TxExpectRaw, TxQueryRaw, ValueSubTree,
 };
 
-use super::{TxCallCustom, TxExpectCustom, TxQueryCustom};
+use super::{ScCallMandos, ScQueryMandos, TxExpectMandos};
+
+pub(crate) const STAR_STR: &'static str = "*";
 
 pub(crate) fn account_as_raw(acc: &AccountData) -> AccountRaw {
     let balance_raw = Some(rust_biguint_as_raw(&acc.egld_balance));
@@ -88,7 +90,7 @@ pub(crate) fn block_info_as_raw(block_info: &BlockInfo) -> BlockInfoRaw {
     }
 }
 
-pub(crate) fn tx_call_as_raw(tx_call: &TxCallCustom) -> TxCallRaw {
+pub(crate) fn tx_call_as_raw(tx_call: &ScCallMandos) -> TxCallRaw {
     let mut all_esdt_raw = Vec::with_capacity(tx_call.esdt.len());
     for esdt in tx_call.esdt.iter() {
         let esdt_raw = TxESDTRaw {
@@ -119,7 +121,7 @@ pub(crate) fn tx_call_as_raw(tx_call: &TxCallCustom) -> TxCallRaw {
     }
 }
 
-pub(crate) fn tx_query_as_raw(tx_query: &TxQueryCustom) -> TxQueryRaw {
+pub(crate) fn tx_query_as_raw(tx_query: &ScQueryMandos) -> TxQueryRaw {
     let mut arguments_raw = Vec::with_capacity(tx_query.arguments.len());
     for arg in tx_query.arguments.iter() {
         let arg_raw = bytes_as_raw(arg);
@@ -133,7 +135,7 @@ pub(crate) fn tx_query_as_raw(tx_query: &TxQueryCustom) -> TxQueryRaw {
     }
 }
 
-pub(crate) fn tx_expect_as_raw(tx_expect: &TxExpectCustom) -> TxExpectRaw {
+pub(crate) fn tx_expect_as_raw(tx_expect: &TxExpectMandos) -> TxExpectRaw {
     let mut out_values_raw = Vec::with_capacity(tx_expect.out.len());
     for out_val in tx_expect.out.iter() {
         let out_raw = if out_val.len() == 1 && out_val[0] == b'*' {
@@ -145,8 +147,7 @@ pub(crate) fn tx_expect_as_raw(tx_expect: &TxExpectCustom) -> TxExpectRaw {
         out_values_raw.push(out_raw);
     }
 
-    let star_as_string = String::from_utf8(b"*".to_vec()).unwrap();
-    let msg_raw = if tx_expect.message == star_as_string {
+    let msg_raw = if &tx_expect.message == STAR_STR {
         CheckBytesValueRaw::Star
     } else {
         let mandos_formatted_str = "str:".to_owned() + &tx_expect.message;
