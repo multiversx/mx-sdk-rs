@@ -13,7 +13,10 @@ use crate::{
     BlockchainMock, DebugApi,
 };
 
-use super::{AddressFactory, MandosGenerator};
+use super::{
+    tx_mandos::{ScCallMandos, TxExpectMandos},
+    AddressFactory, MandosGenerator, ScQueryMandos,
+};
 
 pub struct ContractObjWrapper<
     CB: ContractBase<Api = DebugApi> + CallableContract<DebugApi> + 'static,
@@ -412,6 +415,24 @@ where
             &self.b_mock.current_block_info,
             &self.b_mock.previous_block_info,
         );
+    }
+
+    pub fn add_mandos_sc_call(
+        &mut self,
+        sc_call: ScCallMandos,
+        opt_expect: Option<TxExpectMandos>,
+    ) {
+        self.mandos_generator
+            .create_tx(&sc_call, opt_expect.as_ref());
+    }
+
+    pub fn add_mandos_sc_query(
+        &mut self,
+        sc_query: ScQueryMandos,
+        opt_expect: Option<TxExpectMandos>,
+    ) {
+        self.mandos_generator
+            .create_query(&sc_query, opt_expect.as_ref());
     }
 }
 
