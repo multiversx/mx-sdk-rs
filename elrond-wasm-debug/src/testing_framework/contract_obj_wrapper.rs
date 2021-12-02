@@ -1,7 +1,7 @@
 use std::{collections::HashMap, marker::PhantomData, rc::Rc};
 
 use elrond_wasm::{
-    contract_base::ContractBase,
+    contract_base::{CallableContract, ContractBase},
     types::{Address, EsdtLocalRole, H256},
 };
 
@@ -15,12 +15,13 @@ use crate::{
 use super::AddressFactory;
 
 pub struct ContractObjWrapper<
-    CB: ContractBase<Api = DebugApi>,
-    ContractObjBuilder: Fn(DebugApi) -> CB,
+    CB: ContractBase<Api = DebugApi> + CallableContract<DebugApi> + 'static,
+    ContractObjBuilder: 'static + Copy + Fn(DebugApi) -> CB,
 > {
     address_factory: AddressFactory,
-    obj_builder: ContractObjBuilder,
+    obj_builders: HashMap<Address, ContractObjBuilder>,
     b_mock: BlockchainMock,
+    address_to_code_path: HashMap<Address, Vec<u8>>,
     _phantom: PhantomData<CB>,
 }
 
@@ -31,14 +32,15 @@ pub enum StateChange {
 
 impl<CB, ContractObjBuilder> ContractObjWrapper<CB, ContractObjBuilder>
 where
-    CB: ContractBase<Api = DebugApi>,
-    ContractObjBuilder: Fn(DebugApi) -> CB,
+    CB: ContractBase<Api = DebugApi> + CallableContract<DebugApi> + 'static,
+    ContractObjBuilder: 'static + Copy + Fn(DebugApi) -> CB,
 {
-    pub fn new(obj_builder: ContractObjBuilder) -> Self {
+    pub fn new(_workspace_path: &str) -> Self {
         ContractObjWrapper {
             address_factory: AddressFactory::new(),
-            obj_builder,
+            obj_builders: HashMap::new(),
             b_mock: BlockchainMock::new(),
+            address_to_code_path: HashMap::new(),
             _phantom: PhantomData,
         }
     }
@@ -137,12 +139,12 @@ where
 
 impl<CB, ContractObjBuilder> ContractObjWrapper<CB, ContractObjBuilder>
 where
-    CB: ContractBase<Api = DebugApi>,
-    ContractObjBuilder: Fn(DebugApi) -> CB,
+    CB: ContractBase<Api = DebugApi> + CallableContract<DebugApi> + 'static,
+    ContractObjBuilder: 'static + Copy + Fn(DebugApi) -> CB,
 {
     pub fn create_user_account(&mut self, egld_balance: &num_bigint::BigUint) -> Address {
         let address = self.address_factory.new_address();
-        self.create_account_raw(&address, egld_balance, None);
+        self.create_account_raw(&address, egld_balance, None, None);
 
         address
     }
@@ -151,9 +153,30 @@ where
         &mut self,
         egld_balance: &num_bigint::BigUint,
         owner: Option<&Address>,
+        obj_builder: ContractObjBuilder,
+        contract_path_expr: &str,
     ) -> Address {
         let address = self.address_factory.new_sc_address();
-        self.create_account_raw(&address, egld_balance, owner);
+        self.address_to_code_path
+            .insert(address.clone(), contract_path_expr.as_bytes().to_vec());
+
+        let contract_bytes = mandos::value_interpreter::interpret_string(
+            contract_path_expr,
+            &mandos::interpret_trait::InterpreterContext::new(std::path::PathBuf::new()),
+        );
+
+        self.create_account_raw(
+            &address,
+            egld_balance,
+            owner,
+            Some(contract_bytes), // Some(contract_path_expr.as_bytes().to_vec())
+        );
+        let _ = self.obj_builders.insert(address.clone(), obj_builder);
+
+        if !self.b_mock.contains_contract(contract_path_expr) {
+            let closure = convert_full_fn(obj_builder);
+            self.b_mock.register_contract(contract_path_expr, closure);
+        }
 
         address
     }
@@ -163,6 +186,7 @@ where
         address: &Address,
         egld_balance: &num_bigint::BigUint,
         owner: Option<&Address>,
+        sc_identifier: Option<Vec<u8>>,
     ) {
         self.b_mock.add_account(AccountData {
             address: address.clone(),
@@ -171,7 +195,7 @@ where
             esdt: AccountEsdt::default(),
             storage: HashMap::new(),
             username: Vec::new(),
-            contract_path: None,
+            contract_path: sc_identifier,
             contract_owner: owner.cloned(),
         });
     }
@@ -321,8 +345,8 @@ where
 
 impl<CB, ContractObjBuilder> ContractObjWrapper<CB, ContractObjBuilder>
 where
-    CB: ContractBase<Api = DebugApi>,
-    ContractObjBuilder: Fn(DebugApi) -> CB,
+    CB: ContractBase<Api = DebugApi> + CallableContract<DebugApi> + 'static,
+    ContractObjBuilder: 'static + Copy + Fn(DebugApi) -> CB,
 {
     pub fn execute_tx<TxFn: FnOnce(CB) -> StateChange>(
         self,
@@ -415,7 +439,8 @@ where
         TxContextStack::static_push(tx_context_rc.clone());
 
         let debug_api = DebugApi::new(tx_context_rc);
-        let sc = (self.obj_builder)(debug_api);
+        let obj_builder = self.obj_builders.get(&sc_address).unwrap();
+        let sc = (obj_builder)(debug_api);
 
         let state_change = tx_fn(sc);
 
@@ -432,8 +457,9 @@ where
 
         Self {
             address_factory: self.address_factory,
-            obj_builder: self.obj_builder,
+            obj_builders: self.obj_builders,
             b_mock: new_b_mock,
+            address_to_code_path: self.address_to_code_path,
             _phantom: PhantomData,
         }
     }
@@ -473,4 +499,23 @@ fn serialize_attributes<T: elrond_wasm::elrond_codec::TopEncode>(attributes: &T)
     }
 
     serialized_attributes
+}
+
+fn convert_full_fn<CB, ContractObjBuilder>(
+    func: ContractObjBuilder,
+) -> Box<dyn Fn(DebugApi) -> Box<dyn CallableContract<DebugApi>>>
+where
+    CB: ContractBase<Api = DebugApi> + CallableContract<DebugApi> + 'static,
+    ContractObjBuilder: 'static + Fn(DebugApi) -> CB,
+{
+    let raw_closure = move |context| convert_part(func(context));
+
+    Box::new(raw_closure)
+}
+
+fn convert_part<CB>(c_base: CB) -> Box<dyn CallableContract<DebugApi>>
+where
+    CB: ContractBase<Api = DebugApi> + CallableContract<DebugApi> + 'static,
+{
+    Box::new(c_base)
 }

@@ -1,4 +1,5 @@
 use elrond_wasm::types::Address;
+use mandos::{interpret_trait::InterpreterContext, value_interpreter::interpret_string};
 use num_bigint::BigUint;
 use num_traits::Zero;
 use std::{collections::HashMap, path::PathBuf, rc::Rc};
@@ -44,6 +45,15 @@ impl Default for BlockchainMock {
 impl BlockchainMock {
     pub fn account_exists(&self, address: &Address) -> bool {
         self.accounts.contains_key(address)
+    }
+
+    pub fn contains_contract(&self, contract_path_expr: &str) -> bool {
+        let contract_bytes = interpret_string(
+            contract_path_expr,
+            &InterpreterContext::new(self.current_dir.clone()),
+        );
+
+        self.contract_map.contains_contract(&contract_bytes)
     }
 
     pub fn commit_updates(self: &mut Rc<Self>, updates: BlockchainUpdate) {

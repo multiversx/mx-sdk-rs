@@ -139,11 +139,48 @@ pub trait RustTestingFrameworkTester {
     }
 
     #[endpoint]
+    fn call_other_contract_execute_on_dest(&self, other_sc_address: ManagedAddress) -> BigUint {
+        let call_result = self.raw_vm_api().execute_on_dest_context_raw(
+            self.blockchain().get_gas_left(),
+            &other_sc_address,
+            &BigUint::zero(),
+            &ManagedBuffer::new_from_bytes(b"getTotalValue"),
+            &ManagedArgBuffer::new_empty(),
+        );
+        let raw_value = call_result.get(0).unwrap_or_default();
+
+        BigUint::from(raw_value.parse_as_u64().unwrap_or_default())
+    }
+
+    #[endpoint(getTotalValue)]
+    fn get_total_value(&self) -> BigUint {
+        self.total_value().get()
+    }
+
+    #[endpoint]
+    fn execute_on_dest_add_value(&self, other_sc_address: ManagedAddress, value: BigUint) {
+        let mut args = ManagedArgBuffer::new_empty();
+        args.push_arg(value);
+
+        let _ = self.raw_vm_api().execute_on_dest_context_raw(
+            self.blockchain().get_gas_left(),
+            &other_sc_address,
+            &BigUint::zero(),
+            &ManagedBuffer::new_from_bytes(b"add"),
+            &args,
+        );
+    }
+
+    #[endpoint]
     fn add(&self, value: BigUint) {
         let caller = self.blockchain().get_caller();
 
         self.total_value().update(|val| *val += &value);
         self.value_per_caller(&caller).update(|val| *val += value);
+    }
+
+    fn get_val(&self) -> BigUint {
+        self.total_value().get()
     }
 
     #[storage_mapper("totalValue")]
