@@ -13,7 +13,10 @@ pub(crate) const STAR_STR: &str = "*";
 
 pub(crate) fn account_as_raw(acc: &AccountData) -> AccountRaw {
     let balance_raw = Some(rust_biguint_as_raw(&acc.egld_balance));
-    let code_raw = acc.contract_path.clone().map(|c| bytes_as_raw(&c));
+    let code_raw = acc
+        .contract_path
+        .clone()
+        .map(|c| ValueSubTree::Str(String::from_utf8(c).unwrap()));
 
     let mut all_esdt_raw = BTreeMap::new();
     for (token_id, esdt_data) in acc.esdt.iter() {
