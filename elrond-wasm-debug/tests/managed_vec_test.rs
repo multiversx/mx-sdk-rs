@@ -77,6 +77,43 @@ fn test_sort() {
 }
 
 #[test]
+fn test_dedup() {
+    let _ = DebugApi::dummy();
+
+    let mut vec = Vec::<BigUint<DebugApi>>::new();
+    let mut managed_vec = ManagedVec::<DebugApi, BigUint<DebugApi>>::new();
+    for i in [2u64, 3u64, 2u64, 2u64, 6u64, 3u64, 5u64, 2u64] {
+        let biguint = BigUint::from(i);
+        managed_vec.push(biguint.clone());
+        vec.push(biguint);
+    }
+    managed_vec.dedup();
+    vec.dedup();
+
+    assert_eq!(vec, managed_vec.into_vec());
+}
+
+#[test]
+fn test_sorted_dedup() {
+    let _ = DebugApi::dummy();
+
+    let mut vec = Vec::<BigUint<DebugApi>>::new();
+    let mut managed_vec = ManagedVec::<DebugApi, BigUint<DebugApi>>::new();
+    for i in [2u64, 3u64, 2u64, 2u64, 6u64, 3u64, 5u64, 2u64] {
+        let biguint = BigUint::from(i);
+        managed_vec.push(biguint.clone());
+        vec.push(biguint);
+    }
+    managed_vec.sort();
+    vec.sort();
+    managed_vec.dedup();
+    vec.dedup();
+
+    assert_eq!(4, managed_vec.len());
+    assert_eq!(vec, managed_vec.into_vec());
+}
+
+#[test]
 fn test_with_self_as_vec() {
     let _ = DebugApi::dummy();
 

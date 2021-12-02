@@ -104,6 +104,16 @@ where
 impl<M, T> ManagedVec<M, T>
 where
     M: ManagedTypeApi,
+    T: ManagedVecItem + PartialEq,
+{
+    pub fn dedup(&mut self) {
+        self.with_self_as_vec(|t_vec| t_vec.dedup())
+    }
+}
+
+impl<M, T> ManagedVec<M, T>
+where
+    M: ManagedTypeApi,
     T: ManagedVecItem,
 {
     /// Length of the underlying buffer in bytes.
