@@ -1,4 +1,4 @@
-use std::{collections::HashMap, marker::PhantomData, rc::Rc};
+use std::{collections::HashMap, marker::PhantomData, path::PathBuf, rc::Rc, str::FromStr};
 
 use elrond_wasm::{
     contract_base::{CallableContract, ContractBase},
@@ -27,6 +27,7 @@ pub struct ContractObjWrapper<
     b_mock: BlockchainMock,
     address_to_code_path: HashMap<Address, Vec<u8>>,
     mandos_generator: MandosGenerator,
+    workspace_path: PathBuf,
     _phantom: PhantomData<CB>,
 }
 
@@ -40,13 +41,17 @@ where
     CB: ContractBase<Api = DebugApi> + CallableContract<DebugApi> + 'static,
     ContractObjBuilder: 'static + Copy + Fn(DebugApi) -> CB,
 {
-    pub fn new(_workspace_path: &str) -> Self {
+    pub fn new() -> Self {
+        let mut current_dir = std::env::current_dir().unwrap();
+        current_dir.push(PathBuf::from_str("mandos/").unwrap());
+
         ContractObjWrapper {
             address_factory: AddressFactory::new(),
             obj_builders: HashMap::new(),
             b_mock: BlockchainMock::new(),
             address_to_code_path: HashMap::new(),
             mandos_generator: MandosGenerator::new(),
+            workspace_path: current_dir,
             _phantom: PhantomData,
         }
     }
@@ -154,7 +159,7 @@ where
 {
     pub fn create_user_account(&mut self, egld_balance: &num_bigint::BigUint) -> Address {
         let address = self.address_factory.new_address();
-        self.create_account_raw(&address, egld_balance, None, None);
+        self.create_account_raw(&address, egld_balance, None, None, None);
 
         address
     }
@@ -164,28 +169,41 @@ where
         egld_balance: &num_bigint::BigUint,
         owner: Option<&Address>,
         obj_builder: ContractObjBuilder,
-        contract_path_expr: &str,
+        contract_wasm_path: &str,
     ) -> Address {
         let address = self.address_factory.new_sc_address();
-        self.address_to_code_path
-            .insert(address.clone(), contract_path_expr.as_bytes().to_vec());
 
+        let mut wasm_full_path = std::env::current_dir().unwrap();
+        wasm_full_path.push(PathBuf::from_str(contract_wasm_path).unwrap());
+
+        let path_diff =
+            pathdiff::diff_paths(wasm_full_path.clone(), self.workspace_path.clone()).unwrap();
+        let path_str = path_diff.to_str().unwrap();
+        let path_bytes = path_str.as_bytes().to_vec();
+
+        self.address_to_code_path
+            .insert(address.clone(), path_bytes);
+
+        let wasm_full_path_as_expr = "file:".to_owned() + &wasm_full_path.to_str().unwrap();
         let contract_bytes = mandos::value_interpreter::interpret_string(
-            contract_path_expr,
+            &wasm_full_path_as_expr,
             &mandos::interpret_trait::InterpreterContext::new(std::path::PathBuf::new()),
         );
 
+        let wasm_relative_path_expr = "file:".to_owned() + path_str;
         self.create_account_raw(
             &address,
             egld_balance,
             owner,
             Some(contract_bytes), // Some(contract_path_expr.as_bytes().to_vec())
+            Some(wasm_relative_path_expr.as_bytes().to_vec()),
         );
         let _ = self.obj_builders.insert(address.clone(), obj_builder);
 
-        if !self.b_mock.contains_contract(contract_path_expr) {
+        if !self.b_mock.contains_contract(&wasm_full_path_as_expr) {
             let closure = convert_full_fn(obj_builder);
-            self.b_mock.register_contract(contract_path_expr, closure);
+            self.b_mock
+                .register_contract(&wasm_full_path_as_expr, closure);
         }
 
         address
@@ -197,6 +215,7 @@ where
         egld_balance: &num_bigint::BigUint,
         owner: Option<&Address>,
         sc_identifier: Option<Vec<u8>>,
+        sc_mandos_path_expr: Option<Vec<u8>>,
     ) {
         let acc_data = AccountData {
             address: address.clone(),
@@ -208,7 +227,8 @@ where
             contract_path: sc_identifier,
             contract_owner: owner.cloned(),
         };
-        self.mandos_generator.set_account(address, &acc_data);
+        self.mandos_generator
+            .set_account(address, &acc_data, sc_mandos_path_expr);
 
         self.b_mock.add_account(acc_data);
     }
@@ -218,7 +238,9 @@ where
             Some(acc) => {
                 acc.egld_balance = balance.clone();
 
-                self.mandos_generator.set_account(address, acc);
+                let opt_contract_path = self.address_to_code_path.get(address);
+                self.mandos_generator
+                    .set_account(address, acc, opt_contract_path.cloned());
             },
 
             None => panic!(
@@ -243,7 +265,9 @@ where
                     EsdtInstanceMetadata::default(),
                 );
 
-                self.mandos_generator.set_account(address, acc);
+                let opt_contract_path = self.address_to_code_path.get(address);
+                self.mandos_generator
+                    .set_account(address, acc, opt_contract_path.cloned());
             },
             None => panic!(
                 "set_esdt_balance: Account {:?} does not exist",
@@ -295,7 +319,9 @@ where
                     },
                 );
 
-                self.mandos_generator.set_account(address, acc);
+                let opt_contract_path = self.address_to_code_path.get(address);
+                self.mandos_generator
+                    .set_account(address, acc, opt_contract_path.cloned());
             },
             None => panic!(
                 "set_nft_balance: Account {:?} does not exist",
@@ -318,7 +344,9 @@ where
                 }
                 acc.esdt.set_roles(token_id.to_vec(), roles_raw);
 
-                self.mandos_generator.set_account(address, acc);
+                let opt_contract_path = self.address_to_code_path.get(address);
+                self.mandos_generator
+                    .set_account(address, acc, opt_contract_path.cloned());
             },
             None => panic!(
                 "set_esdt_local_roles: Account {:?} does not exist",
@@ -554,6 +582,7 @@ where
             b_mock: new_b_mock,
             address_to_code_path: self.address_to_code_path,
             mandos_generator: self.mandos_generator,
+            workspace_path: self.workspace_path,
             _phantom: PhantomData,
         }
     }

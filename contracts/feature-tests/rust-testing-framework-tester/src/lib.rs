@@ -166,7 +166,7 @@ pub trait RustTestingFrameworkTester {
             self.blockchain().get_gas_left(),
             &other_sc_address,
             &BigUint::zero(),
-            &ManagedBuffer::new_from_bytes(b"add"),
+            &ManagedBuffer::new_from_bytes(b"addValue"),
             &args,
         );
     }

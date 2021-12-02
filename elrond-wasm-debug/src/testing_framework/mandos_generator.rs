@@ -40,11 +40,23 @@ impl MandosGenerator {
 }
 
 impl MandosGenerator {
-    pub fn set_account(&mut self, address: &Address, acc: &AccountData) {
+    fn add_step(&mut self, step: StepRaw) {
+        self.scenario.steps.push(step);
+    }
+
+    pub fn set_account(
+        &mut self,
+        address: &Address,
+        acc: &AccountData,
+        sc_mandos_path_expr: Option<Vec<u8>>,
+    ) {
         let mut accounts_raw = BTreeMap::new();
 
         let addr_as_str = bytes_to_hex(address.as_bytes());
-        let acc_raw = account_as_raw(acc);
+        let mut acc_clone = acc.clone();
+        acc_clone.contract_path = sc_mandos_path_expr;
+
+        let acc_raw = account_as_raw(&acc_clone);
         accounts_raw.insert(addr_as_str, acc_raw);
 
         let step = StepRaw::SetState {
@@ -55,7 +67,7 @@ impl MandosGenerator {
             current_block_info: None,
             previous_block_info: None,
         };
-        self.scenario.steps.push(step);
+        self.add_step(step);
     }
 
     pub fn set_block_info(&mut self, current_block_info: &BlockInfo, prev_block_info: &BlockInfo) {
@@ -70,7 +82,7 @@ impl MandosGenerator {
             current_block_info: Some(current_raw),
             previous_block_info: Some(prev_raw),
         };
-        self.scenario.steps.push(step);
+        self.add_step(step);
     }
 
     pub fn next_tx_id_string(&mut self) -> String {
@@ -91,7 +103,7 @@ impl MandosGenerator {
             tx: tx_raw,
             expect: expect_raw,
         };
-        self.scenario.steps.push(step);
+        self.add_step(step);
     }
 
     pub fn create_query(&mut self, query: &ScQueryMandos, opt_expect: Option<&TxExpectMandos>) {
@@ -105,6 +117,6 @@ impl MandosGenerator {
             tx: query_raw,
             expect: expect_raw,
         };
-        self.scenario.steps.push(step);
+        self.add_step(step);
     }
 }
