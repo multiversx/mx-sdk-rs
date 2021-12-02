@@ -41,6 +41,7 @@ where
     CB: ContractBase<Api = DebugApi> + CallableContract<DebugApi> + 'static,
     ContractObjBuilder: 'static + Copy + Fn(DebugApi) -> CB,
 {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         let mut current_dir = std::env::current_dir().unwrap();
         current_dir.push(PathBuf::from_str("mandos/").unwrap());
@@ -184,7 +185,7 @@ where
         self.address_to_code_path
             .insert(address.clone(), path_bytes);
 
-        let wasm_full_path_as_expr = "file:".to_owned() + &wasm_full_path.to_str().unwrap();
+        let wasm_full_path_as_expr = "file:".to_owned() + wasm_full_path.to_str().unwrap();
         let contract_bytes = mandos::value_interpreter::interpret_string(
             &wasm_full_path_as_expr,
             &mandos::interpret_trait::InterpreterContext::new(std::path::PathBuf::new()),
