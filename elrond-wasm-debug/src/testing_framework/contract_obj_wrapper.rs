@@ -57,8 +57,12 @@ where
         }
     }
 
-    pub fn write_mandos_output(self, file_path: &str) {
-        self.mandos_generator.write_mandos_output(file_path);
+    pub fn write_mandos_output(self, file_name: &str) {
+        let mut full_path = self.workspace_path;
+        full_path.push(file_name);
+
+        self.mandos_generator
+            .write_mandos_output(full_path.to_str().unwrap());
     }
 
     pub fn check_egld_balance(&self, address: &Address, expected_balance: &num_bigint::BigUint) {

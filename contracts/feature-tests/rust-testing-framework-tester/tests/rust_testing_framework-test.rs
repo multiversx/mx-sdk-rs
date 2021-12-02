@@ -7,8 +7,7 @@ use elrond_wasm_debug::{
 };
 use rust_testing_framework_tester::*;
 
-const TEST_OUTPUT_PATH: &'static str = "/home/elrond/elrond-wasm-rs/contracts/feature-tests/rust-testing-framework-tester/mandos/test.scen.json";
-
+const TEST_OUTPUT_PATH: &'static str = "test.scen.json";
 const SC_WASM_PATH: &'static str = "output/rust-testing-framework-tester.wasm";
 
 #[test]
@@ -815,23 +814,3 @@ fn test_mandos_generation() {
 
     wrapper.write_mandos_output(TEST_OUTPUT_PATH);
 }
-
-/*
-#[test]
-fn test_path() {
-    let mut current_dir = std::env::current_dir().unwrap();
-    current_dir.push(PathBuf::from_str("mandos/").unwrap());
-
-    // let path_as_string = current_dir.to_str().unwrap();
-
-    let mut wasm_full_path = std::env::current_dir().unwrap();
-    wasm_full_path.push(PathBuf::from_str(SC_WASM_PATH).unwrap());
-
-    let path_diff = pathdiff::diff_paths(wasm_full_path, current_dir).unwrap();
-
-    // in run mode: /home/elrond/elrond-wasm-rs/contracts/feature-tests/rust-testing-framework-tester
-    // in debug mode: /home/elrond/elrond-wasm-rs
-
-    assert_eq!(path_diff.to_str().unwrap(), "");
-}
-*/
