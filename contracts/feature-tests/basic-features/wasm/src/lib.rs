@@ -222,8 +222,8 @@ elrond_wasm_node::wasm_endpoints! {
         mbuffer_from_slice
         mbuffer_new
         mbuffer_overwrite
-        mbuffer_slice_1
-        mbuffer_slice_2
+        mbuffer_load_slice
+        mbuffer_copy_slice
         mul_assign_big_int
         mul_assign_big_int_ref
         mul_assign_big_uint
