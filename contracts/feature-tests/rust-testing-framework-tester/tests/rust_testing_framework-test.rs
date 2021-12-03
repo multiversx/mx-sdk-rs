@@ -763,6 +763,15 @@ fn test_mandos_generation() {
         SC_WASM_PATH,
     );
 
+    // simulate deploy
+    wrapper = wrapper.execute_tx(&user_addr, &sc_addr, &rust_zero, |sc| {
+        sc.init();
+
+        StateChange::Commit
+    });
+    wrapper.add_mandos_set_account(&sc_addr);
+    wrapper.add_mandos_check_account(&sc_addr);
+
     let add_value = rust_biguint!(50);
     let mut sc_call_mandos = ScCallMandos::new(&user_addr, &sc_addr, "addValue");
     sc_call_mandos.add_argument(&add_value.to_bytes_be());
@@ -775,7 +784,7 @@ fn test_mandos_generation() {
         let total_before = sc.total_value().get();
         let per_caller_before = sc.value_per_caller(&managed_address!(&user_addr)).get();
 
-        assert_eq!(total_before, managed_biguint!(0));
+        assert_eq!(total_before, managed_biguint!(1));
         assert_eq!(per_caller_before, managed_biguint!(0));
 
         let added_value = managed_biguint!(50);
@@ -792,8 +801,9 @@ fn test_mandos_generation() {
 
         StateChange::Commit
     });
+    wrapper.add_mandos_check_account(&sc_addr);
 
-    let expected_value = rust_biguint!(50);
+    let expected_value = rust_biguint!(51);
     let sc_query_mandos = ScQueryMandos::new(&sc_addr, "getTotalValue");
 
     let mut query_expect = TxExpectMandos::new(0);
@@ -802,7 +812,7 @@ fn test_mandos_generation() {
     wrapper.add_mandos_sc_query(sc_query_mandos, Some(query_expect));
 
     wrapper = wrapper.execute_query(&sc_addr, |sc| {
-        let expected_total = managed_biguint!(50);
+        let expected_total = managed_biguint!(51);
         let expected_per_caller = managed_biguint!(50);
 
         let actual_total = sc.total_value().get();

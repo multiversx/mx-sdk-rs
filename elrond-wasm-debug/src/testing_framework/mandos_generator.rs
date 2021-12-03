@@ -1,6 +1,5 @@
 use std::{collections::BTreeMap, fs::File, io::Write};
 
-use elrond_wasm::types::Address;
 use mandos::serde_raw::{ScenarioRaw, StepRaw};
 use serde::Serialize;
 
@@ -44,15 +43,10 @@ impl MandosGenerator {
         self.scenario.steps.push(step);
     }
 
-    pub fn set_account(
-        &mut self,
-        address: &Address,
-        acc: &AccountData,
-        sc_mandos_path_expr: Option<Vec<u8>>,
-    ) {
+    pub fn set_account(&mut self, acc: &AccountData, sc_mandos_path_expr: Option<Vec<u8>>) {
         let mut accounts_raw = BTreeMap::new();
 
-        let addr_as_str = bytes_to_hex(address.as_bytes());
+        let addr_as_str = bytes_to_hex(acc.address.as_bytes());
         let mut acc_clone = acc.clone();
         acc_clone.contract_path = sc_mandos_path_expr;
 
@@ -116,6 +110,16 @@ impl MandosGenerator {
             tx_id: self.next_tx_id_string(),
             tx: query_raw,
             expect: expect_raw,
+        };
+        self.add_step(step);
+    }
+
+    pub fn check_account(&mut self, acc: &AccountData) {
+        let check_raw = account_as_check_state_raw(acc);
+
+        let step = StepRaw::CheckState {
+            accounts: check_raw,
+            comment: None,
         };
         self.add_step(step);
     }

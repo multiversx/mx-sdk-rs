@@ -3,8 +3,10 @@ use std::collections::BTreeMap;
 use crate::world_mock::{AccountData, BlockInfo, EsdtData};
 use elrond_wasm::types::Address;
 use mandos::serde_raw::{
-    AccountRaw, BlockInfoRaw, CheckBytesValueRaw, CheckLogsRaw, EsdtFullRaw, EsdtRaw, InstanceRaw,
-    TxCallRaw, TxESDTRaw, TxExpectRaw, TxQueryRaw, ValueSubTree,
+    AccountRaw, BlockInfoRaw, CheckAccountRaw, CheckAccountsRaw, CheckBytesValueRaw,
+    CheckEsdtDataRaw, CheckEsdtInstanceRaw, CheckEsdtInstancesRaw, CheckEsdtMapContentsRaw,
+    CheckEsdtMapRaw, CheckEsdtRaw, CheckLogsRaw, CheckStorageDetailsRaw, CheckStorageRaw,
+    EsdtFullRaw, EsdtRaw, InstanceRaw, TxCallRaw, TxESDTRaw, TxExpectRaw, TxQueryRaw, ValueSubTree,
 };
 
 use super::{ScCallMandos, ScQueryMandos, TxExpectMandos};
@@ -28,7 +30,7 @@ pub(crate) fn account_as_raw(acc: &AccountData) -> AccountRaw {
 
     let mut storage_raw = BTreeMap::new();
     for (key, value) in acc.storage.iter() {
-        let key_raw = String::from_utf8(key.clone()).unwrap();
+        let key_raw = bytes_to_mandos_string_or_hex(key);
         let value_raw = bytes_as_raw(value);
 
         let _ = storage_raw.insert(key_raw, value_raw);
@@ -167,6 +169,104 @@ pub(crate) fn tx_expect_as_raw(tx_expect: &TxExpectMandos) -> TxExpectRaw {
     }
 }
 
+pub(crate) fn account_as_check_state_raw(acc: &AccountData) -> CheckAccountsRaw {
+    let mut all_check_esdt_raw = BTreeMap::new();
+    for (token_id, esdt_data) in acc.esdt.iter() {
+        let esdt_data_raw = match esdt_data_as_raw(esdt_data) {
+            EsdtRaw::Short(_) => unreachable!(), // this can't happen, esdt_data_as_raw always returns the full format
+            EsdtRaw::Full(full_raw) => full_raw,
+        };
+        let last_nonce_check = opt_raw_value_to_check_raw(&esdt_data_raw.last_nonce);
+
+        let mut esdt_instances_check_raw = Vec::new();
+        for inst_raw in esdt_data_raw.instances.iter() {
+            let inst_check_raw = CheckEsdtInstanceRaw {
+                attributes: opt_raw_value_to_check_raw(&inst_raw.attributes),
+                balance: opt_raw_value_to_check_raw(&inst_raw.balance),
+                creator: opt_raw_value_to_check_raw(&inst_raw.creator),
+                hash: opt_raw_value_to_check_raw(&inst_raw.hash),
+                nonce: inst_raw
+                    .nonce
+                    .clone()
+                    .unwrap_or_else(|| ValueSubTree::Str("0".to_owned())),
+                royalties: opt_raw_value_to_check_raw(&inst_raw.royalties),
+                uri: opt_raw_value_to_check_raw(&inst_raw.uri),
+            };
+
+            esdt_instances_check_raw.push(inst_check_raw);
+        }
+
+        let mut roles_as_str = Vec::new();
+        for role in esdt_data.roles.get() {
+            let role_str = String::from_utf8(role).unwrap();
+            roles_as_str.push(role_str);
+        }
+
+        let esdt_check_raw = CheckEsdtDataRaw {
+            frozen: CheckBytesValueRaw::Unspecified,
+            last_nonce: last_nonce_check,
+            instances: CheckEsdtInstancesRaw::Equal(esdt_instances_check_raw),
+            roles: roles_as_str,
+        };
+
+        let token_id_str = String::from_utf8(token_id.clone()).unwrap();
+        all_check_esdt_raw.insert(token_id_str, CheckEsdtRaw::Full(esdt_check_raw));
+    }
+
+    let mut raw_storage = BTreeMap::new();
+    for (key, value) in acc.storage.iter() {
+        let key_as_str = bytes_to_mandos_string_or_hex(key);
+        let check_val_raw = CheckBytesValueRaw::Equal(bytes_as_raw(value));
+
+        raw_storage.insert(key_as_str, check_val_raw);
+    }
+
+    let check_storage_raw = CheckStorageDetailsRaw {
+        other_storages_allowed: false,
+        storages: raw_storage,
+    };
+    let check_acc_raw = CheckAccountRaw {
+        nonce: CheckBytesValueRaw::Equal(u64_as_raw(acc.nonce)),
+        balance: CheckBytesValueRaw::Equal(rust_biguint_as_raw(&acc.egld_balance)),
+        esdt: CheckEsdtMapRaw::Equal(CheckEsdtMapContentsRaw {
+            other_esdts_allowed: false,
+            contents: all_check_esdt_raw,
+        }),
+        owner: CheckBytesValueRaw::Star, // TODO: Add owner check?
+        storage: CheckStorageRaw::Equal(check_storage_raw),
+        code: CheckBytesValueRaw::Star,
+        async_call_data: CheckBytesValueRaw::Unspecified,
+        comment: None,
+        username: CheckBytesValueRaw::Unspecified,
+    };
+
+    let mut all_accounts_check_raw = BTreeMap::new();
+    all_accounts_check_raw.insert(
+        bytes_to_hex(acc.address.as_bytes()),
+        Box::new(check_acc_raw),
+    );
+
+    CheckAccountsRaw {
+        other_accounts_allowed: true, // so we only check the current account
+        accounts: all_accounts_check_raw,
+    }
+}
+
+pub(crate) fn opt_raw_value_to_check_raw(raw_value: &Option<ValueSubTree>) -> CheckBytesValueRaw {
+    match raw_value {
+        Some(val) => CheckBytesValueRaw::Equal(val.clone()),
+        None => CheckBytesValueRaw::Unspecified,
+    }
+}
+
+pub(crate) fn bytes_to_mandos_string_or_hex(bytes: &[u8]) -> String {
+    let conversion_result = String::from_utf8(bytes.to_vec());
+    match conversion_result {
+        core::result::Result::Ok(bytes_as_str) => format!("str:{}", bytes_as_str),
+        core::result::Result::Err(_) => bytes_to_hex(bytes),
+    }
+}
+
 pub(crate) fn rust_biguint_as_raw(big_uint: &num_bigint::BigUint) -> ValueSubTree {
     ValueSubTree::Str(big_uint.to_string())
 }
@@ -184,5 +284,5 @@ pub(crate) fn bytes_as_raw(bytes: &[u8]) -> ValueSubTree {
 }
 
 pub(crate) fn bytes_to_hex(bytes: &[u8]) -> String {
-    "0x".to_owned() + &hex::encode(bytes)
+    format!("0x{}", hex::encode(bytes))
 }
