@@ -128,6 +128,11 @@ where
         }
     }
 
+    pub fn set(&mut self, index: usize, item: &T) -> Result<(), ()> {
+        let byte_index = index * T::PAYLOAD_SIZE;
+        item.to_byte_writer(|slice| self.buffer.set_slice(byte_index, slice))
+    }
+
     pub fn slice(&self, start_index: usize, end_index: usize) -> Option<Self> {
         let byte_start = start_index * T::PAYLOAD_SIZE;
         let byte_end = end_index * T::PAYLOAD_SIZE;
