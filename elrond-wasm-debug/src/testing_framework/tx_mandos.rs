@@ -1,32 +1,6 @@
 use crate::{rust_biguint, tx_mock::TxInputESDT};
 use elrond_wasm::{elrond_codec::TopEncode, types::Address};
 
-/*
-pub struct ScDeployMandos {
-    pub(crate) from: Address,
-    pub(crate) expected_sc_address: Address,
-    pub(crate) egld_value: num_bigint::BigUint,
-    pub(crate) contract_code_relative_path_expr: String,
-    pub(crate) init_args: Vec<Vec<u8>>,
-    pub(crate) gas_limit: u64,
-    pub(crate) gas_price: u64,
-}
-
-impl ScDeployMandos {
-    pub fn new(from: &Address, expected_sc_address: &Address, contract_code_path: &str) -> Self {
-        ScDeployMandos {
-            from: from.clone(),
-            expected_sc_address: expected_sc_address.clone(),
-            egld_value: rust_biguint!(0),
-            contract_code_relative_path_expr: (),
-            init_args: (),
-            gas_limit: (),
-            gas_price: (),
-        }
-    }
-}
-*/
-
 pub struct ScCallMandos {
     pub(crate) from: Address,
     pub(crate) to: Address,
