@@ -12,6 +12,16 @@ fn test_managed_buffer_new_empty() {
 }
 
 #[test]
+fn test_managed_buffer_set_slice() {
+    let context = DebugApi::dummy();
+    let bf = basic_features::contract_obj(context.clone());
+    let result = bf.mbuffer_from_slice(&[1, 2, 3][..]);
+    let set_result = bf.mbuffer_set_slice(result.clone(), 1, &[5][..]).unwrap();
+    assert_eq!(bf.mbuffer_from_slice(&[1, 5, 3][..]), set_result);
+    assert!(bf.mbuffer_set_slice(result, 4, &[5]).is_err());
+}
+
+#[test]
 fn test_managed_buffer_from() {
     let context = DebugApi::dummy();
     let bf = basic_features::contract_obj(context.clone());
