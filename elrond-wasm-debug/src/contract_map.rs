@@ -46,7 +46,7 @@ impl<A> ContractMap<A> {
         assert!(previous_entry.is_none(), "contract inserted twice");
     }
 
-    pub fn contains_contract(&self, contract_bytes: &Vec<u8>) -> bool {
+    pub fn contains_contract(&self, contract_bytes: &[u8]) -> bool {
         self.factories.contains_key(contract_bytes)
     }
 }
