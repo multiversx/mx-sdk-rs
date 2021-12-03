@@ -4,7 +4,7 @@ use sha2::{Digest, Sha256};
 const ADDRESS_LEN: usize = 32;
 const SC_ADDR_LEADING_ZEROES: usize = 8;
 
-pub struct AddressFactory {
+pub(crate) struct AddressFactory {
     last_generated_address: [u8; ADDRESS_LEN],
 }
 
