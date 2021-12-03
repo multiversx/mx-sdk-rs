@@ -6,13 +6,12 @@ use crate::{
 pub fn process_module(
     args: proc_macro::TokenStream,
     input: proc_macro::TokenStream,
-    only_owner: bool,
 ) -> proc_macro::TokenStream {
     let new_input = trait_preprocessing(input);
     let args_input = parse_macro_input!(args as syn::AttributeArgs);
     let proc_input = &parse_macro_input!(new_input as syn::ItemTrait);
 
-    let contract = parse_contract_trait(args_input, proc_input, only_owner);
+    let contract = parse_contract_trait(args_input, proc_input);
     validate_contract(&contract);
 
     let contract_impl = contract_implementation(&contract, false);
