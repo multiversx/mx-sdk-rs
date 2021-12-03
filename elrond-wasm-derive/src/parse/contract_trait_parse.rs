@@ -7,6 +7,7 @@ use crate::model::{ContractTrait, Method, Supertrait};
 pub fn parse_contract_trait(
     args: syn::AttributeArgs,
     contract_trait: &syn::ItemTrait,
+    only_owner: bool,
 ) -> ContractTrait {
     validate_attribute_args(args);
 
@@ -22,7 +23,7 @@ pub fn parse_contract_trait(
         .items
         .iter()
         .map(|itm| match itm {
-            syn::TraitItem::Method(m) => process_method(m),
+            syn::TraitItem::Method(m) => process_method(m, only_owner),
             _ => panic!("Only methods allowed in contract traits"),
         })
         .collect();

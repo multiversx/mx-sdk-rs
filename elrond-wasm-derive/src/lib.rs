@@ -33,7 +33,15 @@ pub fn module(
     args: proc_macro::TokenStream,
     input: proc_macro::TokenStream,
 ) -> proc_macro::TokenStream {
-    macro_module::process_module(args, input)
+    macro_module::process_module(args, input, false)
+}
+
+#[proc_macro_attribute]
+pub fn only_owner_module(
+    args: proc_macro::TokenStream,
+    input: proc_macro::TokenStream,
+) -> proc_macro::TokenStream {
+    macro_module::process_module(args, input, true)
 }
 
 #[proc_macro_attribute]

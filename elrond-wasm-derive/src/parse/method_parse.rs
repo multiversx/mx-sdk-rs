@@ -18,7 +18,7 @@ pub struct MethodAttributesPass1 {
     pub only_owner: bool,
 }
 
-pub fn process_method(m: &syn::TraitItemMethod) -> Method {
+pub fn process_method(m: &syn::TraitItemMethod, only_owner: bool) -> Method {
     let method_args = extract_method_args(m);
 
     let implementation = if let Some(body) = m.default.clone() {
@@ -30,7 +30,7 @@ pub fn process_method(m: &syn::TraitItemMethod) -> Method {
     let mut first_pass_data = MethodAttributesPass1 {
         method_name: m.sig.ident.to_string(),
         payable: MethodPayableMetadata::NotPayable,
-        only_owner: false,
+        only_owner,
     };
     let mut first_pass_unprocessed_attributes = Vec::new();
 

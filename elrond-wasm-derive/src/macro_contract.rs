@@ -11,7 +11,7 @@ pub fn process_contract(
     let args_input = parse_macro_input!(args as syn::AttributeArgs);
     let proc_input = &parse_macro_input!(new_input as syn::ItemTrait);
 
-    let contract = parse_contract_trait(args_input, proc_input);
+    let contract = parse_contract_trait(args_input, proc_input, false);
     validate_contract(&contract);
 
     let contract_impl = contract_implementation(&contract, true);

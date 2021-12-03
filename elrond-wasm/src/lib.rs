@@ -5,7 +5,7 @@
 #![allow(clippy::type_complexity)]
 #![allow(deprecated)]
 
-pub use elrond_wasm_derive::{self as derive, contract, module, proxy};
+pub use elrond_wasm_derive::{self as derive, contract, module, only_owner_module, proxy};
 
 // re-export basic heap types
 extern crate alloc;
