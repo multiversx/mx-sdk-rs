@@ -5,6 +5,7 @@ mod internal_mod_b;
 mod internal_mod_c;
 mod internal_mod_d;
 mod internal_mod_init;
+mod only_owner_derived_mod;
 mod only_owner_mod;
 
 elrond_wasm::imports!();
@@ -23,6 +24,7 @@ pub trait UseModule:
     + internal_mod_c::InternalModuleC
     + internal_mod_init::InternalModuleInit
     + only_owner_mod::OnlyOwnerModule
+    + only_owner_derived_mod::OnlyOwnerDerivedModule
     + elrond_wasm_module_dns::DnsModule
     + elrond_wasm_module_esdt::EsdtModule
     + elrond_wasm_module_features::FeaturesModule
