@@ -140,6 +140,14 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
         M::instance().mb_overwrite(self.handle, value);
     }
 
+    pub fn set_slice(&mut self, starting_position: usize, source_slice: &[u8]) -> Result<(), ()> {
+        if let Ok(()) = M::instance().mb_set_slice(self.handle, starting_position, source_slice) {
+            Ok(())
+        } else {
+            Err(())
+        }
+    }
+
     #[inline]
     pub fn append(&mut self, other: &ManagedBuffer<M>) {
         M::instance().mb_append(self.handle, other.handle);

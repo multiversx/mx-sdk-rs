@@ -26,6 +26,12 @@ extern "C" {
     #[cfg(not(feature = "unmanaged-ei"))]
     fn mBufferEq(handle1: i32, handle2: i32) -> i32;
     fn mBufferSetBytes(mBufferHandle: i32, byte_ptr: *const u8, byte_len: i32) -> i32;
+    fn mBufferSetByteSlice(
+        mBufferHandle: i32,
+        startingPosition: i32,
+        dataLength: i32,
+        dataOffset: *const u8,
+    ) -> i32;
     fn mBufferAppend(accumulatorHandle: i32, dataHandle: i32) -> i32;
     fn mBufferAppendBytes(accumulatorHandle: i32, byte_ptr: *const u8, byte_len: i32) -> i32;
 }
@@ -118,6 +124,28 @@ impl ManagedBufferApi for crate::VmApiImpl {
     fn mb_overwrite(&self, handle: Handle, bytes: &[u8]) {
         unsafe {
             let _ = mBufferSetBytes(handle as i32, bytes.as_ptr(), bytes.len() as i32);
+        }
+    }
+
+    #[inline]
+    fn mb_set_slice(
+        &self,
+        dest_handle: Handle,
+        starting_position: usize,
+        source_slice: &[u8],
+    ) -> Result<(), InvalidSliceError> {
+        unsafe {
+            let err = mBufferSetByteSlice(
+                dest_handle,
+                starting_position as i32,
+                source_slice.len() as i32,
+                source_slice.as_ptr(),
+            );
+            if err == 0 {
+                Ok(())
+            } else {
+                Err(InvalidSliceError)
+            }
         }
     }
 
