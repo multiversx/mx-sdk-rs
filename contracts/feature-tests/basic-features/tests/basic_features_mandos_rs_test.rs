@@ -282,6 +282,11 @@ fn managed_vec_biguint_push_rs() {
     elrond_wasm_debug::mandos_rs("mandos/managed_vec_biguint_push.scen.json", world());
 }
 
+#[test]
+fn only_owner_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/only_owner.scen.json", world());
+}
+
 // Will never run in mandos-rs.
 // #[test]
 // fn out_of_gas_rs() {
