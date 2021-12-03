@@ -55,13 +55,7 @@ impl MethodArgument {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub struct TraitProperties {
     pub only_owner: bool,
-}
-
-impl Default for TraitProperties {
-    fn default() -> Self {
-        TraitProperties { only_owner: false }
-    }
 }
