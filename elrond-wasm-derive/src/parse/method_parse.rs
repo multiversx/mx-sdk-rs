@@ -30,7 +30,7 @@ pub fn process_method(m: &syn::TraitItemMethod, trait_attributes: &TraitProperti
     let mut first_pass_data = MethodAttributesPass1 {
         method_name: m.sig.ident.to_string(),
         payable: MethodPayableMetadata::NotPayable,
-        only_owner: trait_attributes.only_owner.clone(),
+        only_owner: trait_attributes.only_owner,
     };
     let mut first_pass_unprocessed_attributes = Vec::new();
 
