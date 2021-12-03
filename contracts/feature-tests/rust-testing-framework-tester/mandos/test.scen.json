@@ -1,0 +1,65 @@
+{
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "0x66687aadf862bd776c8fc18b8e9f8e20089714856ee233b3902a591d0d5f2925": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            }
+        },
+        {
+            "step": "setState",
+            "accounts": {
+                "0x0000000000000000fb1397e8225ea85e0f0e6e8c7b126d0016ccbde0e667151e": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../output/rust-testing-framework-tester.wasm"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "0",
+            "tx": {
+                "from": "0x66687aadf862bd776c8fc18b8e9f8e20089714856ee233b3902a591d0d5f2925",
+                "to": "0x0000000000000000fb1397e8225ea85e0f0e6e8c7b126d0016ccbde0e667151e",
+                "egldValue": "0",
+                "function": "addValue",
+                "arguments": [
+                    "0x32"
+                ],
+                "gasLimit": "100000000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "logs": "*",
+                "message": "str:",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scQuery",
+            "txId": "1",
+            "tx": {
+                "to": "0x0000000000000000fb1397e8225ea85e0f0e6e8c7b126d0016ccbde0e667151e",
+                "function": "getTotalValue",
+                "arguments": []
+            },
+            "expect": {
+                "out": [
+                    "0x32"
+                ],
+                "status": "0",
+                "logs": "*",
+                "message": "str:",
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}
