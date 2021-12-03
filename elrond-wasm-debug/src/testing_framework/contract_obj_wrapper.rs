@@ -1,4 +1,4 @@
-use std::{collections::HashMap, marker::PhantomData, rc::Rc};
+use std::{collections::HashMap, marker::PhantomData, path::PathBuf, rc::Rc, str::FromStr};
 
 use elrond_wasm::{
     contract_base::{CallableContract, ContractBase},
@@ -7,12 +7,16 @@ use elrond_wasm::{
 
 use crate::{
     rust_biguint,
+    testing_framework::bytes_to_hex,
     tx_mock::{TxCache, TxContext, TxContextStack, TxInput, TxInputESDT},
     world_mock::{AccountData, AccountEsdt, EsdtInstanceMetadata},
     BlockchainMock, DebugApi,
 };
 
-use super::AddressFactory;
+use super::{
+    tx_mandos::{ScCallMandos, TxExpectMandos},
+    AddressFactory, MandosGenerator, ScQueryMandos,
+};
 
 pub struct ContractObjWrapper<
     CB: ContractBase<Api = DebugApi> + CallableContract<DebugApi> + 'static,
@@ -22,6 +26,8 @@ pub struct ContractObjWrapper<
     obj_builders: HashMap<Address, ContractObjBuilder>,
     b_mock: BlockchainMock,
     address_to_code_path: HashMap<Address, Vec<u8>>,
+    mandos_generator: MandosGenerator,
+    workspace_path: PathBuf,
     _phantom: PhantomData<CB>,
 }
 
@@ -35,14 +41,28 @@ where
     CB: ContractBase<Api = DebugApi> + CallableContract<DebugApi> + 'static,
     ContractObjBuilder: 'static + Copy + Fn(DebugApi) -> CB,
 {
-    pub fn new(_workspace_path: &str) -> Self {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        let mut current_dir = std::env::current_dir().unwrap();
+        current_dir.push(PathBuf::from_str("mandos/").unwrap());
+
         ContractObjWrapper {
             address_factory: AddressFactory::new(),
             obj_builders: HashMap::new(),
             b_mock: BlockchainMock::new(),
             address_to_code_path: HashMap::new(),
+            mandos_generator: MandosGenerator::new(),
+            workspace_path: current_dir,
             _phantom: PhantomData,
         }
+    }
+
+    pub fn write_mandos_output(self, file_name: &str) {
+        let mut full_path = self.workspace_path;
+        full_path.push(file_name);
+
+        self.mandos_generator
+            .write_mandos_output(full_path.to_str().unwrap());
     }
 
     pub fn check_egld_balance(&self, address: &Address, expected_balance: &num_bigint::BigUint) {
@@ -144,7 +164,7 @@ where
 {
     pub fn create_user_account(&mut self, egld_balance: &num_bigint::BigUint) -> Address {
         let address = self.address_factory.new_address();
-        self.create_account_raw(&address, egld_balance, None, None);
+        self.create_account_raw(&address, egld_balance, None, None, None);
 
         address
     }
@@ -154,28 +174,41 @@ where
         egld_balance: &num_bigint::BigUint,
         owner: Option<&Address>,
         obj_builder: ContractObjBuilder,
-        contract_path_expr: &str,
+        contract_wasm_path: &str,
     ) -> Address {
         let address = self.address_factory.new_sc_address();
-        self.address_to_code_path
-            .insert(address.clone(), contract_path_expr.as_bytes().to_vec());
 
+        let mut wasm_full_path = std::env::current_dir().unwrap();
+        wasm_full_path.push(PathBuf::from_str(contract_wasm_path).unwrap());
+
+        let path_diff =
+            pathdiff::diff_paths(wasm_full_path.clone(), self.workspace_path.clone()).unwrap();
+        let path_str = path_diff.to_str().unwrap();
+        let path_bytes = path_str.as_bytes().to_vec();
+
+        self.address_to_code_path
+            .insert(address.clone(), path_bytes);
+
+        let wasm_full_path_as_expr = "file:".to_owned() + wasm_full_path.to_str().unwrap();
         let contract_bytes = mandos::value_interpreter::interpret_string(
-            contract_path_expr,
+            &wasm_full_path_as_expr,
             &mandos::interpret_trait::InterpreterContext::new(std::path::PathBuf::new()),
         );
 
+        let wasm_relative_path_expr = "file:".to_owned() + path_str;
         self.create_account_raw(
             &address,
             egld_balance,
             owner,
             Some(contract_bytes), // Some(contract_path_expr.as_bytes().to_vec())
+            Some(wasm_relative_path_expr.as_bytes().to_vec()),
         );
         let _ = self.obj_builders.insert(address.clone(), obj_builder);
 
-        if !self.b_mock.contains_contract(contract_path_expr) {
+        if !self.b_mock.contains_contract(&wasm_full_path_as_expr) {
             let closure = convert_full_fn(obj_builder);
-            self.b_mock.register_contract(contract_path_expr, closure);
+            self.b_mock
+                .register_contract(&wasm_full_path_as_expr, closure);
         }
 
         address
@@ -187,8 +220,9 @@ where
         egld_balance: &num_bigint::BigUint,
         owner: Option<&Address>,
         sc_identifier: Option<Vec<u8>>,
+        sc_mandos_path_expr: Option<Vec<u8>>,
     ) {
-        self.b_mock.add_account(AccountData {
+        let acc_data = AccountData {
             address: address.clone(),
             nonce: 0,
             egld_balance: egld_balance.clone(),
@@ -197,12 +231,23 @@ where
             username: Vec::new(),
             contract_path: sc_identifier,
             contract_owner: owner.cloned(),
-        });
+        };
+        self.mandos_generator
+            .set_account(address, &acc_data, sc_mandos_path_expr);
+
+        self.b_mock.add_account(acc_data);
     }
 
     pub fn set_egld_balance(&mut self, address: &Address, balance: &num_bigint::BigUint) {
         match self.b_mock.accounts.get_mut(address) {
-            Some(acc) => acc.egld_balance = balance.clone(),
+            Some(acc) => {
+                acc.egld_balance = balance.clone();
+
+                let opt_contract_path = self.address_to_code_path.get(address);
+                self.mandos_generator
+                    .set_account(address, acc, opt_contract_path.cloned());
+            },
+
             None => panic!(
                 "set_egld_balance: Account {:?} does not exist",
                 address_to_hex(address)
@@ -217,12 +262,18 @@ where
         balance: &num_bigint::BigUint,
     ) {
         match self.b_mock.accounts.get_mut(address) {
-            Some(acc) => acc.esdt.set_esdt_balance(
-                token_id.to_vec(),
-                0,
-                balance,
-                EsdtInstanceMetadata::default(),
-            ),
+            Some(acc) => {
+                acc.esdt.set_esdt_balance(
+                    token_id.to_vec(),
+                    0,
+                    balance,
+                    EsdtInstanceMetadata::default(),
+                );
+
+                let opt_contract_path = self.address_to_code_path.get(address);
+                self.mandos_generator
+                    .set_account(address, acc, opt_contract_path.cloned());
+            },
             None => panic!(
                 "set_esdt_balance: Account {:?} does not exist",
                 address_to_hex(address)
@@ -272,6 +323,10 @@ where
                         uri: uri.map(|u| u.to_vec()),
                     },
                 );
+
+                let opt_contract_path = self.address_to_code_path.get(address);
+                self.mandos_generator
+                    .set_account(address, acc, opt_contract_path.cloned());
             },
             None => panic!(
                 "set_nft_balance: Account {:?} does not exist",
@@ -292,8 +347,11 @@ where
                 for role in roles {
                     roles_raw.push(role.as_role_name().to_vec());
                 }
-
                 acc.esdt.set_roles(token_id.to_vec(), roles_raw);
+
+                let opt_contract_path = self.address_to_code_path.get(address);
+                self.mandos_generator
+                    .set_account(address, acc, opt_contract_path.cloned());
             },
             None => panic!(
                 "set_esdt_local_roles: Account {:?} does not exist",
@@ -304,42 +362,110 @@ where
 
     pub fn set_block_epoch(&mut self, block_epoch: u64) {
         self.b_mock.current_block_info.block_epoch = block_epoch;
+
+        self.mandos_generator.set_block_info(
+            &self.b_mock.current_block_info,
+            &self.b_mock.previous_block_info,
+        );
     }
 
     pub fn set_block_nonce(&mut self, block_nonce: u64) {
         self.b_mock.current_block_info.block_nonce = block_nonce;
+
+        self.mandos_generator.set_block_info(
+            &self.b_mock.current_block_info,
+            &self.b_mock.previous_block_info,
+        );
     }
 
     pub fn set_block_random_seed(&mut self, block_random_seed: Box<[u8; 48]>) {
         self.b_mock.current_block_info.block_random_seed = block_random_seed;
+
+        self.mandos_generator.set_block_info(
+            &self.b_mock.current_block_info,
+            &self.b_mock.previous_block_info,
+        );
     }
 
     pub fn set_block_round(&mut self, block_round: u64) {
         self.b_mock.current_block_info.block_round = block_round;
+
+        self.mandos_generator.set_block_info(
+            &self.b_mock.current_block_info,
+            &self.b_mock.previous_block_info,
+        );
     }
 
     pub fn set_block_timestamp(&mut self, block_timestamp: u64) {
         self.b_mock.current_block_info.block_timestamp = block_timestamp;
+
+        self.mandos_generator.set_block_info(
+            &self.b_mock.current_block_info,
+            &self.b_mock.previous_block_info,
+        );
     }
 
     pub fn set_prev_block_epoch(&mut self, block_epoch: u64) {
         self.b_mock.previous_block_info.block_epoch = block_epoch;
+
+        self.mandos_generator.set_block_info(
+            &self.b_mock.current_block_info,
+            &self.b_mock.previous_block_info,
+        );
     }
 
     pub fn set_prev_block_nonce(&mut self, block_nonce: u64) {
         self.b_mock.previous_block_info.block_nonce = block_nonce;
+
+        self.mandos_generator.set_block_info(
+            &self.b_mock.current_block_info,
+            &self.b_mock.previous_block_info,
+        );
     }
 
     pub fn set_prev_block_random_seed(&mut self, block_random_seed: Box<[u8; 48]>) {
         self.b_mock.previous_block_info.block_random_seed = block_random_seed;
+
+        self.mandos_generator.set_block_info(
+            &self.b_mock.current_block_info,
+            &self.b_mock.previous_block_info,
+        );
     }
 
     pub fn set_prev_block_round(&mut self, block_round: u64) {
         self.b_mock.previous_block_info.block_round = block_round;
+
+        self.mandos_generator.set_block_info(
+            &self.b_mock.current_block_info,
+            &self.b_mock.previous_block_info,
+        );
     }
 
     pub fn set_prev_block_timestamp(&mut self, block_timestamp: u64) {
         self.b_mock.previous_block_info.block_timestamp = block_timestamp;
+
+        self.mandos_generator.set_block_info(
+            &self.b_mock.current_block_info,
+            &self.b_mock.previous_block_info,
+        );
+    }
+
+    pub fn add_mandos_sc_call(
+        &mut self,
+        sc_call: ScCallMandos,
+        opt_expect: Option<TxExpectMandos>,
+    ) {
+        self.mandos_generator
+            .create_tx(&sc_call, opt_expect.as_ref());
+    }
+
+    pub fn add_mandos_sc_query(
+        &mut self,
+        sc_query: ScQueryMandos,
+        opt_expect: Option<TxExpectMandos>,
+    ) {
+        self.mandos_generator
+            .create_query(&sc_query, opt_expect.as_ref());
     }
 }
 
@@ -439,7 +565,7 @@ where
         TxContextStack::static_push(tx_context_rc.clone());
 
         let debug_api = DebugApi::new(tx_context_rc);
-        let obj_builder = self.obj_builders.get(&sc_address).unwrap();
+        let obj_builder = self.obj_builders.get(sc_address).unwrap();
         let sc = (obj_builder)(debug_api);
 
         let state_change = tx_fn(sc);
@@ -460,6 +586,8 @@ where
             obj_builders: self.obj_builders,
             b_mock: new_b_mock,
             address_to_code_path: self.address_to_code_path,
+            mandos_generator: self.mandos_generator,
+            workspace_path: self.workspace_path,
             _phantom: PhantomData,
         }
     }
@@ -486,10 +614,6 @@ fn build_tx_input(
 
 fn address_to_hex(address: &Address) -> String {
     hex::encode(address.as_bytes())
-}
-
-fn bytes_to_hex(bytes: &[u8]) -> String {
-    hex::encode(bytes)
 }
 
 fn serialize_attributes<T: elrond_wasm::elrond_codec::TopEncode>(attributes: &T) -> Vec<u8> {

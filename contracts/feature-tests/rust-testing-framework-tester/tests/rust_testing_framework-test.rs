@@ -7,18 +7,17 @@ use elrond_wasm_debug::{
 };
 use rust_testing_framework_tester::*;
 
-const WORKSPACE_PATH: &'static str = "contracts/feature-tests/rust-testing-framework-tester";
-// const SC_PATH_EXPR: &'static str = "file:output/rust-testing-framework-tester.wasm";
-const SC_PATH_EXPR: &'static str = "file:/home/elrond/elrond-wasm-rs/contracts/feature-tests/rust-testing-framework-tester/output/rust-testing-framework-tester.wasm";
+const TEST_OUTPUT_PATH: &'static str = "test.scen.json";
+const SC_WASM_PATH: &'static str = "output/rust-testing-framework-tester.wasm";
 
 #[test]
 fn test_add() {
-    let mut wrapper = ContractObjWrapper::new(WORKSPACE_PATH);
+    let mut wrapper = ContractObjWrapper::new();
     let sc_addr = wrapper.create_sc_account(
         &rust_biguint!(0),
         None,
         rust_testing_framework_tester::contract_obj,
-        SC_PATH_EXPR,
+        SC_WASM_PATH,
     );
 
     wrapper.execute_query(&sc_addr, |sc| {
@@ -33,12 +32,12 @@ fn test_add() {
 
 #[test]
 fn test_sc_result_ok() {
-    let mut wrapper = ContractObjWrapper::new(WORKSPACE_PATH);
+    let mut wrapper = ContractObjWrapper::new();
     let sc_addr = wrapper.create_sc_account(
         &rust_biguint!(0),
         None,
         rust_testing_framework_tester::contract_obj,
-        SC_PATH_EXPR,
+        SC_WASM_PATH,
     );
 
     wrapper.execute_query(&sc_addr, |sc| {
@@ -53,12 +52,12 @@ fn test_sc_result_ok() {
 
 #[test]
 fn test_sc_result_err() {
-    let mut wrapper = ContractObjWrapper::new(WORKSPACE_PATH);
+    let mut wrapper = ContractObjWrapper::new();
     let sc_addr = wrapper.create_sc_account(
         &rust_biguint!(0),
         None,
         rust_testing_framework_tester::contract_obj,
-        SC_PATH_EXPR,
+        SC_WASM_PATH,
     );
 
     wrapper.execute_query(&sc_addr, |sc| {
@@ -72,14 +71,14 @@ fn test_sc_result_err() {
 
 #[test]
 fn test_sc_payment_ok() {
-    let mut wrapper = ContractObjWrapper::new(WORKSPACE_PATH);
+    let mut wrapper = ContractObjWrapper::new();
 
     let caller_addr = wrapper.create_user_account(&rust_biguint!(1_000));
     let sc_addr = wrapper.create_sc_account(
         &rust_biguint!(2_000),
         Some(&caller_addr),
         rust_testing_framework_tester::contract_obj,
-        SC_PATH_EXPR,
+        SC_WASM_PATH,
     );
 
     wrapper = wrapper.execute_tx(&caller_addr, &sc_addr, &rust_biguint!(1_000), |sc| {
@@ -96,14 +95,14 @@ fn test_sc_payment_ok() {
 
 #[test]
 fn test_sc_payment_reverted() {
-    let mut wrapper = ContractObjWrapper::new(WORKSPACE_PATH);
+    let mut wrapper = ContractObjWrapper::new();
 
     let caller_addr = wrapper.create_user_account(&rust_biguint!(1_000));
     let sc_addr = wrapper.create_sc_account(
         &rust_biguint!(2_000),
         Some(&caller_addr),
         rust_testing_framework_tester::contract_obj,
-        SC_PATH_EXPR,
+        SC_WASM_PATH,
     );
 
     wrapper = wrapper.execute_tx(&caller_addr, &sc_addr, &rust_biguint!(1_000), |sc| {
@@ -120,14 +119,14 @@ fn test_sc_payment_reverted() {
 
 #[test]
 fn test_sc_half_payment() {
-    let mut wrapper = ContractObjWrapper::new(WORKSPACE_PATH);
+    let mut wrapper = ContractObjWrapper::new();
 
     let caller_addr = wrapper.create_user_account(&rust_biguint!(1_000));
     let sc_addr = wrapper.create_sc_account(
         &rust_biguint!(2_000),
         Some(&caller_addr),
         rust_testing_framework_tester::contract_obj,
-        SC_PATH_EXPR,
+        SC_WASM_PATH,
     );
 
     wrapper = wrapper.execute_tx(&caller_addr, &sc_addr, &rust_biguint!(1_000), |sc| {
@@ -142,12 +141,12 @@ fn test_sc_half_payment() {
 
 #[test]
 fn test_esdt_balance() {
-    let mut wrapper = ContractObjWrapper::new(WORKSPACE_PATH);
+    let mut wrapper = ContractObjWrapper::new();
     let sc_addr = wrapper.create_sc_account(
         &rust_biguint!(0),
         None,
         rust_testing_framework_tester::contract_obj,
-        SC_PATH_EXPR,
+        SC_WASM_PATH,
     );
     let token_id = &b"COOL-123456"[..];
 
@@ -165,7 +164,7 @@ fn test_esdt_balance() {
 
 #[test]
 fn test_esdt_payment_ok() {
-    let mut wrapper = ContractObjWrapper::new(WORKSPACE_PATH);
+    let mut wrapper = ContractObjWrapper::new();
     let rust_zero = rust_biguint!(0);
 
     let caller_addr = wrapper.create_user_account(&rust_zero);
@@ -173,7 +172,7 @@ fn test_esdt_payment_ok() {
         &rust_zero,
         None,
         rust_testing_framework_tester::contract_obj,
-        SC_PATH_EXPR,
+        SC_WASM_PATH,
     );
     let token_id = &b"COOL-123456"[..];
 
@@ -203,7 +202,7 @@ fn test_esdt_payment_ok() {
 
 #[test]
 fn test_esdt_payment_reverted() {
-    let mut wrapper = ContractObjWrapper::new(WORKSPACE_PATH);
+    let mut wrapper = ContractObjWrapper::new();
     let rust_zero = rust_biguint!(0);
 
     let caller_addr = wrapper.create_user_account(&rust_zero);
@@ -211,7 +210,7 @@ fn test_esdt_payment_reverted() {
         &rust_zero,
         None,
         rust_testing_framework_tester::contract_obj,
-        SC_PATH_EXPR,
+        SC_WASM_PATH,
     );
     let token_id = &b"COOL-123456"[..];
 
@@ -241,12 +240,12 @@ fn test_esdt_payment_reverted() {
 
 #[test]
 fn test_nft_balance() {
-    let mut wrapper = ContractObjWrapper::new(WORKSPACE_PATH);
+    let mut wrapper = ContractObjWrapper::new();
     let sc_addr = wrapper.create_sc_account(
         &rust_biguint!(0),
         None,
         rust_testing_framework_tester::contract_obj,
-        SC_PATH_EXPR,
+        SC_WASM_PATH,
     );
     let token_id = &b"COOL-123456"[..];
     let nft_nonce = 2;
@@ -270,13 +269,13 @@ fn test_nft_balance() {
 
 #[test]
 fn test_sc_send_nft_to_user() {
-    let mut wrapper = ContractObjWrapper::new(WORKSPACE_PATH);
+    let mut wrapper = ContractObjWrapper::new();
     let caller_addr = wrapper.create_user_account(&rust_biguint!(0));
     let sc_addr = wrapper.create_sc_account(
         &rust_biguint!(0),
         None,
         rust_testing_framework_tester::contract_obj,
-        SC_PATH_EXPR,
+        SC_WASM_PATH,
     );
     let token_id = &b"COOL-123456"[..];
     let nft_nonce = 2;
@@ -316,13 +315,13 @@ fn test_sc_send_nft_to_user() {
 
 #[test]
 fn test_sc_esdt_mint_burn() {
-    let mut wrapper = ContractObjWrapper::new(WORKSPACE_PATH);
+    let mut wrapper = ContractObjWrapper::new();
     let caller_addr = wrapper.create_user_account(&rust_biguint!(0));
     let sc_addr = wrapper.create_sc_account(
         &rust_biguint!(0),
         None,
         rust_testing_framework_tester::contract_obj,
-        SC_PATH_EXPR,
+        SC_WASM_PATH,
     );
     let token_id = &b"COOL-123456"[..];
 
@@ -355,13 +354,13 @@ fn test_sc_esdt_mint_burn() {
 
 #[test]
 fn test_sc_nft() {
-    let mut wrapper = ContractObjWrapper::new(WORKSPACE_PATH);
+    let mut wrapper = ContractObjWrapper::new();
     let caller_addr = wrapper.create_user_account(&rust_biguint!(0));
     let sc_addr = wrapper.create_sc_account(
         &rust_biguint!(0),
         None,
         rust_testing_framework_tester::contract_obj,
-        SC_PATH_EXPR,
+        SC_WASM_PATH,
     );
     let token_id = &b"COOL-123456"[..];
     let nft_attributes = NftDummyAttributes {
@@ -424,13 +423,13 @@ fn test_sc_nft() {
 
 #[test]
 fn test_esdt_multi_transfer() {
-    let mut wrapper = ContractObjWrapper::new(WORKSPACE_PATH);
+    let mut wrapper = ContractObjWrapper::new();
     let caller_addr = wrapper.create_user_account(&rust_biguint!(0));
     let sc_addr = wrapper.create_sc_account(
         &rust_biguint!(0),
         None,
         rust_testing_framework_tester::contract_obj,
-        SC_PATH_EXPR,
+        SC_WASM_PATH,
     );
     let token_id_1 = &b"COOL-123456"[..];
     let token_id_2 = &b"VERYCOOL-123456"[..];
@@ -495,12 +494,12 @@ fn test_esdt_multi_transfer() {
 
 #[test]
 fn test_query() {
-    let mut wrapper = ContractObjWrapper::new(WORKSPACE_PATH);
+    let mut wrapper = ContractObjWrapper::new();
     let sc_addr = wrapper.create_sc_account(
         &rust_biguint!(2_000),
         None,
         rust_testing_framework_tester::contract_obj,
-        SC_PATH_EXPR,
+        SC_WASM_PATH,
     );
 
     let _ = wrapper.execute_query(&sc_addr, |sc| {
@@ -513,13 +512,13 @@ fn test_query() {
 #[test]
 fn storage_check_test() {
     let rust_zero = rust_biguint!(0);
-    let mut wrapper = ContractObjWrapper::new(WORKSPACE_PATH);
+    let mut wrapper = ContractObjWrapper::new();
     let user_addr = wrapper.create_user_account(&rust_zero);
     let sc_addr = wrapper.create_sc_account(
         &rust_zero,
         None,
         rust_testing_framework_tester::contract_obj,
-        SC_PATH_EXPR,
+        SC_WASM_PATH,
     );
 
     // simulate deploy
@@ -566,13 +565,13 @@ fn storage_check_test() {
 #[test]
 fn storage_revert_test() {
     let rust_zero = rust_biguint!(0);
-    let mut wrapper = ContractObjWrapper::new(WORKSPACE_PATH);
+    let mut wrapper = ContractObjWrapper::new();
     let user_addr = wrapper.create_user_account(&rust_zero);
     let sc_addr = wrapper.create_sc_account(
         &rust_zero,
         None,
         rust_testing_framework_tester::contract_obj,
-        SC_PATH_EXPR,
+        SC_WASM_PATH,
     );
 
     // simulate deploy
@@ -619,13 +618,13 @@ fn storage_revert_test() {
 #[test]
 fn storage_set_test() {
     let rust_zero = rust_biguint!(0);
-    let mut wrapper = ContractObjWrapper::new(WORKSPACE_PATH);
+    let mut wrapper = ContractObjWrapper::new();
     let user_addr = wrapper.create_user_account(&rust_zero);
     let sc_addr = wrapper.create_sc_account(
         &rust_zero,
         None,
         rust_testing_framework_tester::contract_obj,
-        SC_PATH_EXPR,
+        SC_WASM_PATH,
     );
 
     // simulate deploy
@@ -657,12 +656,12 @@ fn storage_set_test() {
 #[test]
 fn blockchain_state_test() {
     let rust_zero = rust_biguint!(0);
-    let mut wrapper = ContractObjWrapper::new(WORKSPACE_PATH);
+    let mut wrapper = ContractObjWrapper::new();
     let sc_addr = wrapper.create_sc_account(
         &rust_zero,
         None,
         rust_testing_framework_tester::contract_obj,
-        SC_PATH_EXPR,
+        SC_WASM_PATH,
     );
 
     let expected_epoch = 10;
@@ -687,19 +686,19 @@ fn blockchain_state_test() {
 #[test]
 fn execute_on_dest_context_query_test() {
     let rust_zero = rust_biguint!(0);
-    let mut wrapper = ContractObjWrapper::new(WORKSPACE_PATH);
+    let mut wrapper = ContractObjWrapper::new();
     let user_addr = wrapper.create_user_account(&rust_zero);
     let sc_addr = wrapper.create_sc_account(
         &rust_zero,
         None,
         rust_testing_framework_tester::contract_obj,
-        SC_PATH_EXPR,
+        SC_WASM_PATH,
     );
     let other_sc_addr = wrapper.create_sc_account(
         &rust_zero,
         None,
         rust_testing_framework_tester::contract_obj,
-        SC_PATH_EXPR,
+        SC_WASM_PATH,
     );
 
     wrapper = wrapper.execute_tx(&user_addr, &other_sc_addr, &rust_zero, |sc| {
@@ -719,19 +718,19 @@ fn execute_on_dest_context_query_test() {
 #[test]
 fn execute_on_dest_context_change_state_test() {
     let rust_zero = rust_biguint!(0);
-    let mut wrapper = ContractObjWrapper::new(WORKSPACE_PATH);
+    let mut wrapper = ContractObjWrapper::new();
     let user_addr = wrapper.create_user_account(&rust_zero);
     let sc_addr = wrapper.create_sc_account(
         &rust_zero,
         None,
         rust_testing_framework_tester::contract_obj,
-        SC_PATH_EXPR,
+        SC_WASM_PATH,
     );
     let other_sc_addr = wrapper.create_sc_account(
         &rust_zero,
         None,
         rust_testing_framework_tester::contract_obj,
-        SC_PATH_EXPR,
+        SC_WASM_PATH,
     );
 
     wrapper = wrapper.execute_tx(&user_addr, &other_sc_addr, &rust_zero, |sc| {
@@ -750,4 +749,68 @@ fn execute_on_dest_context_change_state_test() {
 
         assert_eq!(expected_result, actual_result);
     });
+}
+
+#[test]
+fn test_mandos_generation() {
+    let rust_zero = rust_biguint!(0);
+    let mut wrapper = ContractObjWrapper::new();
+    let user_addr = wrapper.create_user_account(&rust_zero);
+    let sc_addr = wrapper.create_sc_account(
+        &rust_zero,
+        None,
+        rust_testing_framework_tester::contract_obj,
+        SC_WASM_PATH,
+    );
+
+    let add_value = rust_biguint!(50);
+    let mut sc_call_mandos = ScCallMandos::new(&user_addr, &sc_addr, "addValue");
+    sc_call_mandos.add_argument(&add_value.to_bytes_be());
+    sc_call_mandos.set_gas_limit(100_000_000);
+
+    let tx_expect = TxExpectMandos::new(0);
+    wrapper.add_mandos_sc_call(sc_call_mandos, Some(tx_expect));
+
+    wrapper = wrapper.execute_tx(&user_addr, &sc_addr, &rust_zero, |sc| {
+        let total_before = sc.total_value().get();
+        let per_caller_before = sc.value_per_caller(&managed_address!(&user_addr)).get();
+
+        assert_eq!(total_before, managed_biguint!(0));
+        assert_eq!(per_caller_before, managed_biguint!(0));
+
+        let added_value = managed_biguint!(50);
+        sc.add(added_value.clone());
+
+        let expected_total_after = total_before + added_value.clone();
+        let expected_per_caller_after = per_caller_before + added_value;
+
+        let actual_total_after = sc.total_value().get();
+        let actual_per_caller_after = sc.value_per_caller(&managed_address!(&user_addr)).get();
+
+        assert_eq!(expected_total_after, actual_total_after);
+        assert_eq!(expected_per_caller_after, actual_per_caller_after);
+
+        StateChange::Commit
+    });
+
+    let expected_value = rust_biguint!(50);
+    let sc_query_mandos = ScQueryMandos::new(&sc_addr, "getTotalValue");
+
+    let mut query_expect = TxExpectMandos::new(0);
+    query_expect.add_out_value(&expected_value.to_bytes_be());
+
+    wrapper.add_mandos_sc_query(sc_query_mandos, Some(query_expect));
+
+    wrapper = wrapper.execute_query(&sc_addr, |sc| {
+        let expected_total = managed_biguint!(50);
+        let expected_per_caller = managed_biguint!(50);
+
+        let actual_total = sc.total_value().get();
+        let actual_per_caller = sc.value_per_caller(&managed_address!(&user_addr)).get();
+
+        assert_eq!(expected_total, actual_total);
+        assert_eq!(expected_per_caller, actual_per_caller);
+    });
+
+    wrapper.write_mandos_output(TEST_OUTPUT_PATH);
 }
