@@ -1,4 +1,4 @@
-use super::{Method, PublicRole, Supertrait};
+use super::{Method, PublicRole, Supertrait, TraitProperties};
 
 /// Models a contract or module trait.
 pub struct ContractTrait {
@@ -13,6 +13,7 @@ pub struct ContractTrait {
     pub auto_inheritance_modules: Vec<Supertrait>,
 
     pub methods: Vec<Method>,
+    pub trait_attributes: TraitProperties,
 }
 
 impl ContractTrait {
