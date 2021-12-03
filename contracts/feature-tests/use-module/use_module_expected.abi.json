@@ -81,6 +81,12 @@
             "outputs": []
         },
         {
+            "name": "call_derived_not_owner_only",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": []
+        },
+        {
             "name": "dnsRegister",
             "mutability": "mutable",
             "payableInTokens": [
