@@ -54,3 +54,14 @@ impl MethodArgument {
         matches!(self.metadata.payment, ArgPaymentMetadata::NotPayment)
     }
 }
+
+#[derive(Clone, Debug)]
+pub struct TraitProperties {
+    pub only_owner: bool,
+}
+
+impl Default for TraitProperties {
+    fn default() -> Self {
+        TraitProperties { only_owner: false }
+    }
+}
