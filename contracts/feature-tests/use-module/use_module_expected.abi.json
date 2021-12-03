@@ -74,6 +74,13 @@
             "outputs": []
         },
         {
+            "name": "only_owner_mod_endpoint",
+            "onlyOwner": true,
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": []
+        },
+        {
             "name": "dnsRegister",
             "mutability": "mutable",
             "payableInTokens": [
