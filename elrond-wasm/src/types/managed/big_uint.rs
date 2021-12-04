@@ -11,7 +11,6 @@ use elrond_codec::{
     TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, TryStaticCast,
 };
 
-#[derive(Debug)]
 pub struct BigUint<M: ManagedTypeApi> {
     pub(crate) handle: Handle,
     _phantom: PhantomData<M>,
@@ -201,5 +200,14 @@ impl<M: ManagedTypeApi> TopDecode for BigUint<M> {
 impl<M: ManagedTypeApi> crate::abi::TypeAbi for BigUint<M> {
     fn type_name() -> String {
         String::from("BigUint")
+    }
+}
+
+impl<M: ManagedTypeApi> core::fmt::Debug for BigUint<M> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        f.debug_struct("BigUint")
+            .field("handle", &self.handle)
+            .field("hex-value-be", &hex::encode(&self.to_bytes_be().as_slice()))
+            .finish()
     }
 }
