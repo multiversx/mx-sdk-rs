@@ -29,6 +29,8 @@ pub mod non_zero_util;
 pub mod storage;
 pub mod types;
 
+pub use hex;
 pub use hex_call_data::*;
+pub use hex_literal;
 pub use io::*;
 pub use storage::{storage_clear, storage_get, storage_get_len, storage_set};
