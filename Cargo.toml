@@ -3,6 +3,7 @@ members = [
   "elrond-wasm",
   "elrond-wasm-debug",
   "elrond-wasm-derive",
+  "elrond-wasm-modules",
   "mandos",
   "elrond-codec",
   "elrond-codec-derive",
