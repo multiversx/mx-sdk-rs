@@ -4,6 +4,7 @@ use super::{ManagedBuffer, ManagedByteArray, ManagedType};
 use crate::{
     abi::TypeAbi,
     api::{Handle, ManagedTypeApi},
+    hex_util::encode_bytes_as_hex,
     types::Address,
 };
 use alloc::string::String;
@@ -211,7 +212,7 @@ impl<M: ManagedTypeApi> core::fmt::Debug for ManagedAddress<M> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         f.debug_struct("ManagedAddress")
             .field("handle", &self.bytes.buffer.handle)
-            .field("hex-value", &hex::encode(&self.to_byte_array()))
+            .field("hex-value", &encode_bytes_as_hex(&self.to_byte_array()))
             .finish()
     }
 }
