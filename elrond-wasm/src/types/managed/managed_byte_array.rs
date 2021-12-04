@@ -4,6 +4,7 @@ use super::{ManagedBuffer, ManagedType};
 use crate::{
     abi::TypeAbi,
     api::{Handle, ManagedTypeApi},
+    hex_util::encode_bytes_as_hex,
 };
 use alloc::string::String;
 use elrond_codec::{
@@ -191,7 +192,7 @@ where
         f.debug_struct("ManagedByteArray")
             .field("handle", &self.buffer.handle)
             .field("size", &N)
-            .field("hex-value", &hex::encode(&self.to_byte_array()))
+            .field("hex-value", &encode_bytes_as_hex(&self.to_byte_array()))
             .finish()
     }
 }
