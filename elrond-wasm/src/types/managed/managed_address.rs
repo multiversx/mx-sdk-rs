@@ -4,6 +4,7 @@ use super::{ManagedBuffer, ManagedByteArray, ManagedType};
 use crate::{
     abi::TypeAbi,
     api::{Handle, ManagedTypeApi},
+    hex_util::encode_bytes_as_hex,
     types::Address,
 };
 use alloc::string::String;
@@ -12,7 +13,7 @@ use elrond_codec::{
     TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, TryStaticCast,
 };
 
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub struct ManagedAddress<M: ManagedTypeApi> {
     bytes: ManagedByteArray<M, 32>,
 }
@@ -52,6 +53,11 @@ where
     #[inline]
     pub fn as_managed_buffer(&self) -> &ManagedBuffer<M> {
         self.bytes.as_managed_buffer()
+    }
+
+    #[inline]
+    pub fn to_byte_array(&self) -> [u8; 32] {
+        self.bytes.to_byte_array()
     }
 }
 
@@ -199,5 +205,14 @@ where
     /// `"Address"` instead of `"array32<u8>"`.
     fn type_name() -> String {
         Address::type_name()
+    }
+}
+
+impl<M: ManagedTypeApi> core::fmt::Debug for ManagedAddress<M> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        f.debug_struct("ManagedAddress")
+            .field("handle", &self.bytes.buffer.handle)
+            .field("hex-value", &encode_bytes_as_hex(&self.to_byte_array()))
+            .finish()
     }
 }
