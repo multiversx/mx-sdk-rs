@@ -3,6 +3,7 @@ use core::marker::PhantomData;
 use super::ManagedType;
 use crate::{
     api::{Handle, InvalidSliceError, ManagedTypeApi},
+    hex_util::encode_bytes_as_hex,
     types::BoxedBytes,
 };
 use alloc::string::String;
@@ -12,7 +13,6 @@ use elrond_codec::{
 };
 
 /// A byte buffer managed by an external API.
-#[derive(Debug)]
 pub struct ManagedBuffer<M: ManagedTypeApi> {
     pub(crate) handle: Handle,
     _phantom: PhantomData<M>,
@@ -264,5 +264,17 @@ impl<M: ManagedTypeApi> NestedDecode for ManagedBuffer<M> {
 impl<M: ManagedTypeApi> crate::abi::TypeAbi for ManagedBuffer<M> {
     fn type_name() -> String {
         "bytes".into()
+    }
+}
+
+impl<M: ManagedTypeApi> core::fmt::Debug for ManagedBuffer<M> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        f.debug_struct("ManagedBuffer")
+            .field("handle", &self.handle)
+            .field(
+                "hex-value",
+                &encode_bytes_as_hex(&self.to_boxed_bytes().as_slice()),
+            )
+            .finish()
     }
 }
