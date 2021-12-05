@@ -1,0 +1,565 @@
+{
+    "buildInfo": {
+        "rustc": {
+            "version": "x.x.x-nightly",
+            "commitHash": "<commit hash here>",
+            "commitDate": "<commit date here>",
+            "channel": "Channel",
+            "short": "rustc <version> (<short hash> <date>)"
+        },
+        "contractCrate": {
+            "name": "abi-tester",
+            "version": "0.0.0"
+        },
+        "framework": {
+            "name": "elrond-wasm",
+            "version": "0.23.1"
+        }
+    },
+    "docs": [
+        "Contract whose sole purpose is to verify that",
+        "the ABI generation framework works sa expected.",
+        "",
+        "Note: any change in this contract must also be reflected in `abi_test_expected.abi.json`,",
+        "including Rust docs."
+    ],
+    "name": "AbiTester",
+    "constructor": {
+        "docs": [
+            "Contract constructor."
+        ],
+        "payableInTokens": [
+            "EGLD"
+        ],
+        "inputs": [
+            {
+                "name": "_constructor_arg_1",
+                "type": "i32"
+            },
+            {
+                "name": "_constructor_arg_2",
+                "type": "OnlyShowsUpInConstructor"
+            }
+        ],
+        "outputs": []
+    },
+    "endpoints": [
+        {
+            "docs": [
+                "Example endpoint docs."
+            ],
+            "name": "echo_abi_test_type",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "att",
+                    "type": "AbiTestType"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "single output",
+                    "type": "AbiTestType"
+                }
+            ]
+        },
+        {
+            "name": "echo_enum",
+            "onlyOwner": true,
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "e",
+                    "type": "AbiEnum"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "AbiEnum"
+                }
+            ]
+        },
+        {
+            "name": "multi_result_3",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "name": "multi-result-1",
+                    "type": "i32"
+                },
+                {
+                    "name": "multi-result-2",
+                    "type": "array3<u8>"
+                },
+                {
+                    "name": "multi-result-3",
+                    "type": "bytes"
+                }
+            ]
+        },
+        {
+            "name": "multi_result_4",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "name": "multi-too-few-1",
+                    "type": "i32"
+                },
+                {
+                    "name": "multi-too-few-2",
+                    "type": "array3<u8>"
+                },
+                {
+                    "type": "bytes"
+                },
+                {
+                    "type": "OnlyShowsUpAsNested03"
+                }
+            ]
+        },
+        {
+            "name": "var_args",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "_simple_arg",
+                    "type": "u32"
+                },
+                {
+                    "name": "_var_args",
+                    "type": "variadic<multi<OnlyShowsUpAsNested04,i32>>",
+                    "multi_arg": true
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "multi_result_vec",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "variadic<multi<OnlyShowsUpAsNested05,bool,()>>",
+                    "multi_result": true
+                }
+            ]
+        },
+        {
+            "name": "optional_arg",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "_simple_arg",
+                    "type": "u32"
+                },
+                {
+                    "name": "_opt_args",
+                    "type": "optional<OnlyShowsUpAsNested06>",
+                    "multi_arg": true
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "optional_result",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "optional<OnlyShowsUpAsNested07>",
+                    "multi_result": true
+                }
+            ]
+        },
+        {
+            "name": "address_vs_h256",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "address",
+                    "type": "Address"
+                },
+                {
+                    "name": "h256",
+                    "type": "H256"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "Address"
+                },
+                {
+                    "type": "H256"
+                }
+            ]
+        },
+        {
+            "name": "managed_address_vs_byte_array",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "address",
+                    "type": "Address"
+                },
+                {
+                    "name": "byte_array",
+                    "type": "array32<u8>"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "Address"
+                },
+                {
+                    "type": "array32<u8>"
+                }
+            ]
+        },
+        {
+            "name": "esdt_local_role",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "EsdtLocalRole"
+                }
+            ]
+        },
+        {
+            "name": "esdt_token_payment",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "EsdtTokenPayment"
+                }
+            ]
+        },
+        {
+            "name": "esdt_token_data",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "EsdtTokenData"
+                }
+            ]
+        },
+        {
+            "name": "sample_storage_mapper",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "OnlyShowsUpAsNested10"
+                }
+            ]
+        },
+        {
+            "name": "payable_egld",
+            "mutability": "mutable",
+            "payableInTokens": [
+                "EGLD"
+            ],
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "payable_some_token",
+            "mutability": "mutable",
+            "payableInTokens": [
+                "TOKEN-FOR-ABI"
+            ],
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "payable_any_token",
+            "mutability": "mutable",
+            "payableInTokens": [
+                "*"
+            ],
+            "inputs": [],
+            "outputs": []
+        }
+    ],
+    "hasCallback": false,
+    "types": {
+        "AbiEnum": {
+            "type": "enum",
+            "docs": [
+                "Its only purpose is to test that the ABI generator works fine."
+            ],
+            "variants": [
+                {
+                    "name": "Nothing",
+                    "discriminant": 0
+                },
+                {
+                    "name": "Something",
+                    "discriminant": 1,
+                    "fields": [
+                        {
+                            "name": "0",
+                            "type": "i32"
+                        }
+                    ]
+                },
+                {
+                    "name": "SomethingMore",
+                    "discriminant": 2,
+                    "fields": [
+                        {
+                            "name": "0",
+                            "type": "u8"
+                        },
+                        {
+                            "name": "1",
+                            "type": "OnlyShowsUpAsNested08"
+                        }
+                    ]
+                },
+                {
+                    "name": "SomeStruct",
+                    "discriminant": 3,
+                    "fields": [
+                        {
+                            "name": "a",
+                            "type": "u16"
+                        },
+                        {
+                            "name": "b",
+                            "type": "OnlyShowsUpAsNested09"
+                        }
+                    ]
+                }
+            ]
+        },
+        "AbiTestType": {
+            "type": "struct",
+            "docs": [
+                "Its only purpose is to test that the ABI generator works fine."
+            ],
+            "fields": [
+                {
+                    "docs": [
+                        "This type should only appear here."
+                    ],
+                    "name": "nested",
+                    "type": "OnlyShowsUpAsNested01"
+                },
+                {
+                    "docs": [
+                        "Tests that recursive types will not send the ABI generator into an infinite loop."
+                    ],
+                    "name": "next",
+                    "type": "Option<AbiTestType>"
+                },
+                {
+                    "docs": [
+                        "Tests that tuples tell the ABI of their component types even if they appear nowhere else.",
+                        "Also, just like above, recursive types need to work even when nested into a tuple."
+                    ],
+                    "name": "tuple_madness",
+                    "type": "tuple<OnlyShowsUpAsNested02,Option<AbiTestType>>"
+                }
+            ]
+        },
+        "EsdtLocalRole": {
+            "type": "enum",
+            "variants": [
+                {
+                    "name": "None",
+                    "discriminant": 0
+                },
+                {
+                    "name": "Mint",
+                    "discriminant": 1
+                },
+                {
+                    "name": "Burn",
+                    "discriminant": 2
+                },
+                {
+                    "name": "NftCreate",
+                    "discriminant": 3
+                },
+                {
+                    "name": "NftAddQuantity",
+                    "discriminant": 4
+                },
+                {
+                    "name": "NftBurn",
+                    "discriminant": 5
+                }
+            ]
+        },
+        "EsdtTokenData": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "token_type",
+                    "type": "EsdtTokenType"
+                },
+                {
+                    "name": "amount",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "frozen",
+                    "type": "bool"
+                },
+                {
+                    "name": "hash",
+                    "type": "bytes"
+                },
+                {
+                    "name": "name",
+                    "type": "bytes"
+                },
+                {
+                    "name": "attributes",
+                    "type": "bytes"
+                },
+                {
+                    "name": "creator",
+                    "type": "Address"
+                },
+                {
+                    "name": "royalties",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "uris",
+                    "type": "List<bytes>"
+                }
+            ]
+        },
+        "EsdtTokenPayment": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "token_type",
+                    "type": "EsdtTokenType"
+                },
+                {
+                    "name": "token_identifier",
+                    "type": "TokenIdentifier"
+                },
+                {
+                    "name": "token_nonce",
+                    "type": "u64"
+                },
+                {
+                    "name": "amount",
+                    "type": "BigUint"
+                }
+            ]
+        },
+        "EsdtTokenType": {
+            "type": "enum",
+            "variants": [
+                {
+                    "name": "Fungible",
+                    "discriminant": 0
+                },
+                {
+                    "name": "NonFungible",
+                    "discriminant": 1
+                },
+                {
+                    "name": "SemiFungible",
+                    "discriminant": 2
+                },
+                {
+                    "name": "Meta",
+                    "discriminant": 3
+                },
+                {
+                    "name": "Invalid",
+                    "discriminant": 4
+                }
+            ]
+        },
+        "OnlyShowsUpAsNested01": {
+            "type": "struct",
+            "docs": [
+                "Tests that the ABI generator also fetches types that only appear as fields."
+            ]
+        },
+        "OnlyShowsUpAsNested02": {
+            "type": "struct",
+            "docs": [
+                "Tests that the ABI generator also fetches types that only appear as fields."
+            ],
+            "fields": [
+                {
+                    "name": "something",
+                    "type": "array0<u8>"
+                }
+            ]
+        },
+        "OnlyShowsUpAsNested03": {
+            "type": "struct",
+            "docs": [
+                "Tests that the ABI generator also fetches types that only appear as fields."
+            ]
+        },
+        "OnlyShowsUpAsNested04": {
+            "type": "struct",
+            "docs": [
+                "Tests that the ABI generator also fetches types that only appear as fields."
+            ]
+        },
+        "OnlyShowsUpAsNested05": {
+            "type": "struct",
+            "docs": [
+                "Tests that the ABI generator also fetches types that only appear as fields."
+            ]
+        },
+        "OnlyShowsUpAsNested06": {
+            "type": "struct",
+            "docs": [
+                "Tests that the ABI generator also fetches types that only appear as fields."
+            ]
+        },
+        "OnlyShowsUpAsNested07": {
+            "type": "struct",
+            "docs": [
+                "Tests that the ABI generator also fetches types that only appear as fields."
+            ]
+        },
+        "OnlyShowsUpAsNested08": {
+            "type": "struct",
+            "docs": [
+                "Tests that the ABI generator also fetches types that only appear as fields."
+            ]
+        },
+        "OnlyShowsUpAsNested09": {
+            "type": "struct",
+            "docs": [
+                "Tests that the ABI generator also fetches types that only appear as fields."
+            ]
+        },
+        "OnlyShowsUpAsNested10": {
+            "type": "struct",
+            "docs": [
+                "Tests that the ABI generator also fetches types that only appear as fields."
+            ]
+        },
+        "OnlyShowsUpInConstructor": {
+            "type": "struct",
+            "docs": [
+                "Tests that the ABI generator also fetches types that only appear as fields."
+            ],
+            "fields": [
+                {
+                    "name": "something",
+                    "type": "()"
+                }
+            ]
+        }
+    }
+}
