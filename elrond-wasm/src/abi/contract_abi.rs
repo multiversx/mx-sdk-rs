@@ -1,7 +1,7 @@
 use super::*;
 use alloc::{string::String, vec::Vec};
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct ContractAbi {
     pub build_info: BuildInfoAbi,
     pub docs: &'static [&'static str],
@@ -28,7 +28,8 @@ impl ContractAbi {
             name: self.name,
             constructors: self.constructors.clone(),
             endpoints: self
-                .endpoints.clone()
+                .endpoints
+                .clone()
                 .iter()
                 .filter(|endpoint| endpoint.location == EndpointLocationAbi::MainContract)
                 .cloned()
@@ -45,7 +46,8 @@ impl ContractAbi {
             name: self.name,
             constructors: Vec::new(),
             endpoints: self
-                .endpoints.clone()
+                .endpoints
+                .clone()
                 .iter()
                 .filter(|endpoint| endpoint.location == location)
                 .cloned()
@@ -62,7 +64,7 @@ impl ContractAbi {
     }
 
     /// Crate name, but with underscores instead of dashes.
-    pub fn get_module_name(&self) -> String {
+    pub fn get_crate_name(&self) -> String {
         self.build_info
             .contract_crate
             .name

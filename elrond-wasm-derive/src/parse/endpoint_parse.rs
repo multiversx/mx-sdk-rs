@@ -1,6 +1,15 @@
-use crate::model::{CallbackMetadata, EndpointLocationMetadata, EndpointMetadata, EndpointMutabilityMetadata, InitMetadata, Method, PublicRole};
+use crate::model::{
+    CallbackMetadata, EndpointLocationMetadata, EndpointMetadata, EndpointMutabilityMetadata,
+    InitMetadata, Method, PublicRole,
+};
 
-use super::{MethodAttributesPass1, attributes::{CallbackAttribute, EndpointAttribute, ExternalViewAttribute, OutputNameAttribute, ViewAttribute, is_callback_raw, is_init, is_only_owner}};
+use super::{
+    attributes::{
+        is_callback_raw, is_init, is_only_owner, CallbackAttribute, EndpointAttribute,
+        ExternalViewAttribute, OutputNameAttribute, ViewAttribute,
+    },
+    MethodAttributesPass1,
+};
 
 fn check_single_role(method: &Method) {
     assert!(matches!(method.public_role, PublicRole::Private),
