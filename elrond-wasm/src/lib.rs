@@ -22,6 +22,7 @@ pub mod contract_base;
 pub mod err_msg;
 pub mod esdt;
 pub mod hex_call_data;
+pub mod hex_util;
 pub mod io;
 pub mod log_util;
 mod macros;
@@ -30,5 +31,6 @@ pub mod storage;
 pub mod types;
 
 pub use hex_call_data::*;
+pub use hex_literal;
 pub use io::*;
 pub use storage::{storage_clear, storage_get, storage_get_len, storage_set};
