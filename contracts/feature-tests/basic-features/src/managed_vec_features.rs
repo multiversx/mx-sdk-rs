@@ -42,7 +42,10 @@ pub trait ManagedVecFeatures {
         item: &BigUint,
     ) -> SCResult<ManagedVec<BigUint>> {
         let mut result = mv;
-        result.set(index, item).map_err(|_| "index out of bounds")?;
-        Ok(result)
+        if result.set(index, item) {
+            Ok(result)
+        } else {
+            Err("index out of bounds".into())
+        }
     }
 }
