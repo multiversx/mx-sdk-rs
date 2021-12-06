@@ -824,3 +824,21 @@ fn test_mandos_generation() {
 
     wrapper.write_mandos_output(TEST_OUTPUT_PATH);
 }
+
+#[test]
+fn test_multiple_contracts() {
+    let mut wrapper = ContractObjWrapper::new();
+    let sc_addr = wrapper.create_sc_account(
+        &rust_biguint!(0u64),
+        None,
+        rust_testing_framework_tester::contract_obj,
+        SC_WASM_PATH,
+    );
+
+    let sc_addr_other = wrapper.create_sc_account(
+        &rust_biguint!(0u64),
+        None,
+        adder::contract_obj,
+        SC_WASM_PATH,
+    );
+}
