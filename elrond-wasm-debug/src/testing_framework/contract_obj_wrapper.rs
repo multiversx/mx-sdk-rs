@@ -24,7 +24,7 @@ pub struct ContractObjWrapper<
 > {
     address_factory: AddressFactory,
     obj_builders: HashMap<Address, ContractObjBuilder>,
-    b_mock: BlockchainMock,
+    rc_b_mock: Rc<BlockchainMock>,
     address_to_code_path: HashMap<Address, Vec<u8>>,
     mandos_generator: MandosGenerator,
     workspace_path: PathBuf,
@@ -49,7 +49,7 @@ where
         ContractObjWrapper {
             address_factory: AddressFactory::new(),
             obj_builders: HashMap::new(),
-            b_mock: BlockchainMock::new(),
+            rc_b_mock: Rc::new(BlockchainMock::new()),
             address_to_code_path: HashMap::new(),
             mandos_generator: MandosGenerator::new(),
             workspace_path: current_dir,
@@ -66,7 +66,7 @@ where
     }
 
     pub fn check_egld_balance(&self, address: &Address, expected_balance: &num_bigint::BigUint) {
-        let actual_balance = match &self.b_mock.accounts.get(address) {
+        let actual_balance = match &self.rc_b_mock.accounts.get(address) {
             Some(acc) => acc.egld_balance.clone(),
             None => rust_biguint!(0),
         };
@@ -87,7 +87,7 @@ where
         token_id: &[u8],
         expected_balance: &num_bigint::BigUint,
     ) {
-        let actual_balance = match &self.b_mock.accounts.get(address) {
+        let actual_balance = match &self.rc_b_mock.accounts.get(address) {
             Some(acc) => acc.esdt.get_esdt_balance(token_id, 0),
             None => rust_biguint!(0),
         };
@@ -110,7 +110,7 @@ where
         expected_balance: &num_bigint::BigUint,
         expected_attributes: &T,
     ) {
-        let actual_attributes = match &self.b_mock.accounts.get(address) {
+        let actual_attributes = match &self.rc_b_mock.accounts.get(address) {
             Some(acc) => {
                 let esdt_data = acc.esdt.get_by_identifier_or_default(token_id);
                 let opt_instance = esdt_data.instances.get_by_nonce(nonce);
@@ -184,10 +184,6 @@ where
         let path_diff =
             pathdiff::diff_paths(wasm_full_path.clone(), self.workspace_path.clone()).unwrap();
         let path_str = path_diff.to_str().unwrap();
-        let path_bytes = path_str.as_bytes().to_vec();
-
-        self.address_to_code_path
-            .insert(address.clone(), path_bytes);
 
         let wasm_full_path_as_expr = "file:".to_owned() + wasm_full_path.to_str().unwrap();
         let contract_bytes = mandos::value_interpreter::interpret_string(
@@ -196,19 +192,25 @@ where
         );
 
         let wasm_relative_path_expr = "file:".to_owned() + path_str;
+        let was_relative_path_expr_bytes = wasm_relative_path_expr.as_bytes().to_vec();
+
+        self.address_to_code_path
+            .insert(address.clone(), was_relative_path_expr_bytes.clone());
+
         self.create_account_raw(
             &address,
             egld_balance,
             owner,
-            Some(contract_bytes), // Some(contract_path_expr.as_bytes().to_vec())
-            Some(wasm_relative_path_expr.as_bytes().to_vec()),
+            Some(contract_bytes),
+            Some(was_relative_path_expr_bytes),
         );
         let _ = self.obj_builders.insert(address.clone(), obj_builder);
 
-        if !self.b_mock.contains_contract(&wasm_full_path_as_expr) {
+        if !self.rc_b_mock.contains_contract(&wasm_full_path_as_expr) {
             let closure = convert_full_fn(obj_builder);
-            self.b_mock
-                .register_contract(&wasm_full_path_as_expr, closure);
+
+            let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
+            b_mock_ref.register_contract(&wasm_full_path_as_expr, closure);
         }
 
         address
@@ -233,19 +235,19 @@ where
             contract_owner: owner.cloned(),
         };
         self.mandos_generator
-            .set_account(address, &acc_data, sc_mandos_path_expr);
+            .set_account(&acc_data, sc_mandos_path_expr);
 
-        self.b_mock.add_account(acc_data);
+        let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
+        b_mock_ref.add_account(acc_data);
     }
 
     pub fn set_egld_balance(&mut self, address: &Address, balance: &num_bigint::BigUint) {
-        match self.b_mock.accounts.get_mut(address) {
+        let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
+        match b_mock_ref.accounts.get_mut(address) {
             Some(acc) => {
                 acc.egld_balance = balance.clone();
 
-                let opt_contract_path = self.address_to_code_path.get(address);
-                self.mandos_generator
-                    .set_account(address, acc, opt_contract_path.cloned());
+                self.add_mandos_set_account(address);
             },
 
             None => panic!(
@@ -261,7 +263,8 @@ where
         token_id: &[u8],
         balance: &num_bigint::BigUint,
     ) {
-        match self.b_mock.accounts.get_mut(address) {
+        let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
+        match b_mock_ref.accounts.get_mut(address) {
             Some(acc) => {
                 acc.esdt.set_esdt_balance(
                     token_id.to_vec(),
@@ -269,10 +272,6 @@ where
                     balance,
                     EsdtInstanceMetadata::default(),
                 );
-
-                let opt_contract_path = self.address_to_code_path.get(address);
-                self.mandos_generator
-                    .set_account(address, acc, opt_contract_path.cloned());
             },
             None => panic!(
                 "set_esdt_balance: Account {:?} does not exist",
@@ -308,7 +307,8 @@ where
         hash: Option<&[u8]>,
         uri: Option<&[u8]>,
     ) {
-        match self.b_mock.accounts.get_mut(address) {
+        let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
+        match b_mock_ref.accounts.get_mut(address) {
             Some(acc) => {
                 acc.esdt.set_esdt_balance(
                     token_id.to_vec(),
@@ -324,9 +324,7 @@ where
                     },
                 );
 
-                let opt_contract_path = self.address_to_code_path.get(address);
-                self.mandos_generator
-                    .set_account(address, acc, opt_contract_path.cloned());
+                self.add_mandos_set_account(address);
             },
             None => panic!(
                 "set_nft_balance: Account {:?} does not exist",
@@ -341,7 +339,8 @@ where
         token_id: &[u8],
         roles: &[EsdtLocalRole],
     ) {
-        match self.b_mock.accounts.get_mut(address) {
+        let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
+        match b_mock_ref.accounts.get_mut(address) {
             Some(acc) => {
                 let mut roles_raw = Vec::new();
                 for role in roles {
@@ -349,9 +348,7 @@ where
                 }
                 acc.esdt.set_roles(token_id.to_vec(), roles_raw);
 
-                let opt_contract_path = self.address_to_code_path.get(address);
-                self.mandos_generator
-                    .set_account(address, acc, opt_contract_path.cloned());
+                self.add_mandos_set_account(address);
             },
             None => panic!(
                 "set_esdt_local_roles: Account {:?} does not exist",
@@ -361,92 +358,102 @@ where
     }
 
     pub fn set_block_epoch(&mut self, block_epoch: u64) {
-        self.b_mock.current_block_info.block_epoch = block_epoch;
+        let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
+        b_mock_ref.current_block_info.block_epoch = block_epoch;
 
         self.mandos_generator.set_block_info(
-            &self.b_mock.current_block_info,
-            &self.b_mock.previous_block_info,
+            &self.rc_b_mock.current_block_info,
+            &self.rc_b_mock.previous_block_info,
         );
     }
 
     pub fn set_block_nonce(&mut self, block_nonce: u64) {
-        self.b_mock.current_block_info.block_nonce = block_nonce;
+        let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
+        b_mock_ref.current_block_info.block_nonce = block_nonce;
 
         self.mandos_generator.set_block_info(
-            &self.b_mock.current_block_info,
-            &self.b_mock.previous_block_info,
+            &self.rc_b_mock.current_block_info,
+            &self.rc_b_mock.previous_block_info,
         );
     }
 
     pub fn set_block_random_seed(&mut self, block_random_seed: Box<[u8; 48]>) {
-        self.b_mock.current_block_info.block_random_seed = block_random_seed;
+        let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
+        b_mock_ref.current_block_info.block_random_seed = block_random_seed;
 
         self.mandos_generator.set_block_info(
-            &self.b_mock.current_block_info,
-            &self.b_mock.previous_block_info,
+            &self.rc_b_mock.current_block_info,
+            &self.rc_b_mock.previous_block_info,
         );
     }
 
     pub fn set_block_round(&mut self, block_round: u64) {
-        self.b_mock.current_block_info.block_round = block_round;
+        let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
+        b_mock_ref.current_block_info.block_round = block_round;
 
         self.mandos_generator.set_block_info(
-            &self.b_mock.current_block_info,
-            &self.b_mock.previous_block_info,
+            &self.rc_b_mock.current_block_info,
+            &self.rc_b_mock.previous_block_info,
         );
     }
 
     pub fn set_block_timestamp(&mut self, block_timestamp: u64) {
-        self.b_mock.current_block_info.block_timestamp = block_timestamp;
+        let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
+        b_mock_ref.current_block_info.block_timestamp = block_timestamp;
 
         self.mandos_generator.set_block_info(
-            &self.b_mock.current_block_info,
-            &self.b_mock.previous_block_info,
+            &self.rc_b_mock.current_block_info,
+            &self.rc_b_mock.previous_block_info,
         );
     }
 
     pub fn set_prev_block_epoch(&mut self, block_epoch: u64) {
-        self.b_mock.previous_block_info.block_epoch = block_epoch;
+        let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
+        b_mock_ref.previous_block_info.block_epoch = block_epoch;
 
         self.mandos_generator.set_block_info(
-            &self.b_mock.current_block_info,
-            &self.b_mock.previous_block_info,
+            &self.rc_b_mock.current_block_info,
+            &self.rc_b_mock.previous_block_info,
         );
     }
 
     pub fn set_prev_block_nonce(&mut self, block_nonce: u64) {
-        self.b_mock.previous_block_info.block_nonce = block_nonce;
+        let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
+        b_mock_ref.previous_block_info.block_nonce = block_nonce;
 
         self.mandos_generator.set_block_info(
-            &self.b_mock.current_block_info,
-            &self.b_mock.previous_block_info,
+            &self.rc_b_mock.current_block_info,
+            &self.rc_b_mock.previous_block_info,
         );
     }
 
     pub fn set_prev_block_random_seed(&mut self, block_random_seed: Box<[u8; 48]>) {
-        self.b_mock.previous_block_info.block_random_seed = block_random_seed;
+        let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
+        b_mock_ref.previous_block_info.block_random_seed = block_random_seed;
 
         self.mandos_generator.set_block_info(
-            &self.b_mock.current_block_info,
-            &self.b_mock.previous_block_info,
+            &self.rc_b_mock.current_block_info,
+            &self.rc_b_mock.previous_block_info,
         );
     }
 
     pub fn set_prev_block_round(&mut self, block_round: u64) {
-        self.b_mock.previous_block_info.block_round = block_round;
+        let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
+        b_mock_ref.previous_block_info.block_round = block_round;
 
         self.mandos_generator.set_block_info(
-            &self.b_mock.current_block_info,
-            &self.b_mock.previous_block_info,
+            &self.rc_b_mock.current_block_info,
+            &self.rc_b_mock.previous_block_info,
         );
     }
 
     pub fn set_prev_block_timestamp(&mut self, block_timestamp: u64) {
-        self.b_mock.previous_block_info.block_timestamp = block_timestamp;
+        let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
+        b_mock_ref.previous_block_info.block_timestamp = block_timestamp;
 
         self.mandos_generator.set_block_info(
-            &self.b_mock.current_block_info,
-            &self.b_mock.previous_block_info,
+            &self.rc_b_mock.current_block_info,
+            &self.rc_b_mock.previous_block_info,
         );
     }
 
@@ -467,6 +474,20 @@ where
         self.mandos_generator
             .create_query(&sc_query, opt_expect.as_ref());
     }
+
+    pub fn add_mandos_set_account(&mut self, address: &Address) {
+        if let Some(acc) = self.rc_b_mock.accounts.get(address) {
+            let opt_contract_path = self.address_to_code_path.get(address);
+            self.mandos_generator
+                .set_account(acc, opt_contract_path.cloned());
+        }
+    }
+
+    pub fn add_mandos_check_account(&mut self, address: &Address) {
+        if let Some(acc) = self.rc_b_mock.accounts.get(address) {
+            self.mandos_generator.check_account(acc);
+        }
+    }
 }
 
 impl<CB, ContractObjBuilder> ContractObjWrapper<CB, ContractObjBuilder>
@@ -475,66 +496,65 @@ where
     ContractObjBuilder: 'static + Copy + Fn(DebugApi) -> CB,
 {
     pub fn execute_tx<TxFn: FnOnce(CB) -> StateChange>(
-        self,
+        &mut self,
         caller: &Address,
         sc_address: &Address,
         egld_payment: &num_bigint::BigUint,
         tx_fn: TxFn,
-    ) -> Self {
-        self.execute_tx_any(caller, sc_address, egld_payment, Vec::new(), tx_fn)
+    ) {
+        self.execute_tx_any(caller, sc_address, egld_payment, Vec::new(), tx_fn);
     }
 
     pub fn execute_esdt_transfer<TxFn: FnOnce(CB) -> StateChange>(
-        self,
+        &mut self,
         caller: &Address,
         sc_address: &Address,
         token_id: &[u8],
         esdt_nonce: u64,
         esdt_amount: &num_bigint::BigUint,
         tx_fn: TxFn,
-    ) -> Self {
+    ) {
         let esdt_transfer = vec![TxInputESDT {
             token_identifier: token_id.to_vec(),
             nonce: esdt_nonce,
             value: esdt_amount.clone(),
         }];
-        self.execute_tx_any(caller, sc_address, &rust_biguint!(0), esdt_transfer, tx_fn)
+        self.execute_tx_any(caller, sc_address, &rust_biguint!(0), esdt_transfer, tx_fn);
     }
 
     pub fn execute_esdt_multi_transfer<TxFn: FnOnce(CB) -> StateChange>(
-        self,
+        &mut self,
         caller: &Address,
         sc_address: &Address,
         esdt_transfers: &[TxInputESDT],
         tx_fn: TxFn,
-    ) -> Self {
+    ) {
         self.execute_tx_any(
             caller,
             sc_address,
             &rust_biguint!(0),
             esdt_transfers.to_vec(),
             tx_fn,
-        )
+        );
     }
 
-    pub fn execute_query<TxFn: FnOnce(CB)>(self, sc_address: &Address, query_fn: TxFn) -> Self {
+    pub fn execute_query<TxFn: FnOnce(CB)>(&mut self, sc_address: &Address, query_fn: TxFn) {
         self.execute_tx(sc_address, sc_address, &rust_biguint!(0), |sc| {
             query_fn(sc);
             StateChange::Revert
-        })
+        });
     }
 
     // deduplicates code for execution
     fn execute_tx_any<TxFn: FnOnce(CB) -> StateChange>(
-        self,
+        &mut self,
         caller: &Address,
         sc_address: &Address,
         egld_payment: &num_bigint::BigUint,
         esdt_payments: Vec<TxInputESDT>,
         tx_fn: TxFn,
-    ) -> Self {
-        let rc_b_mock = Rc::new(self.b_mock);
-        let tx_cache = TxCache::new(rc_b_mock.clone());
+    ) {
+        let tx_cache = TxCache::new(self.rc_b_mock.clone());
         let rust_zero = rust_biguint!(0);
 
         if egld_payment > &rust_zero {
@@ -572,23 +592,13 @@ where
 
         let api_after_exec = Rc::try_unwrap(TxContextStack::static_pop()).unwrap();
         let updates = api_after_exec.into_blockchain_updates();
-        let mut new_b_mock = Rc::try_unwrap(rc_b_mock).unwrap();
 
+        let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
         match state_change {
             StateChange::Commit => {
-                updates.apply(&mut new_b_mock);
+                updates.apply(b_mock_ref);
             },
             StateChange::Revert => {},
-        }
-
-        Self {
-            address_factory: self.address_factory,
-            obj_builders: self.obj_builders,
-            b_mock: new_b_mock,
-            address_to_code_path: self.address_to_code_path,
-            mandos_generator: self.mandos_generator,
-            workspace_path: self.workspace_path,
-            _phantom: PhantomData,
         }
     }
 }

@@ -81,7 +81,7 @@ fn test_sc_payment_ok() {
         SC_WASM_PATH,
     );
 
-    wrapper = wrapper.execute_tx(&caller_addr, &sc_addr, &rust_biguint!(1_000), |sc| {
+    wrapper.execute_tx(&caller_addr, &sc_addr, &rust_biguint!(1_000), |sc| {
         let actual_payment = sc.receive_egld();
         let expected_payment = managed_biguint!(1_000);
         assert_eq!(actual_payment, expected_payment);
@@ -105,7 +105,7 @@ fn test_sc_payment_reverted() {
         SC_WASM_PATH,
     );
 
-    wrapper = wrapper.execute_tx(&caller_addr, &sc_addr, &rust_biguint!(1_000), |sc| {
+    wrapper.execute_tx(&caller_addr, &sc_addr, &rust_biguint!(1_000), |sc| {
         let actual_payment = sc.receive_egld();
         let expected_payment = managed_biguint!(1_000);
         assert_eq!(actual_payment, expected_payment);
@@ -129,7 +129,7 @@ fn test_sc_half_payment() {
         SC_WASM_PATH,
     );
 
-    wrapper = wrapper.execute_tx(&caller_addr, &sc_addr, &rust_biguint!(1_000), |sc| {
+    wrapper.execute_tx(&caller_addr, &sc_addr, &rust_biguint!(1_000), |sc| {
         sc.recieve_egld_half();
 
         StateChange::Commit
@@ -179,7 +179,7 @@ fn test_esdt_payment_ok() {
     wrapper.set_esdt_balance(&caller_addr, token_id, &rust_biguint!(1_000));
     wrapper.set_esdt_balance(&sc_addr, token_id, &rust_biguint!(2_000));
 
-    wrapper = wrapper.execute_esdt_transfer(
+    wrapper.execute_esdt_transfer(
         &caller_addr,
         &sc_addr,
         token_id,
@@ -217,7 +217,7 @@ fn test_esdt_payment_reverted() {
     wrapper.set_esdt_balance(&caller_addr, token_id, &rust_biguint!(1_000));
     wrapper.set_esdt_balance(&sc_addr, token_id, &rust_biguint!(2_000));
 
-    wrapper = wrapper.execute_esdt_transfer(
+    wrapper.execute_esdt_transfer(
         &caller_addr,
         &sc_addr,
         token_id,
@@ -288,7 +288,7 @@ fn test_sc_send_nft_to_user() {
     wrapper.set_nft_balance(&sc_addr, token_id, nft_nonce, &nft_balance, &nft_attributes);
     wrapper.check_nft_balance(&sc_addr, token_id, nft_nonce, &nft_balance, &nft_attributes);
 
-    wrapper = wrapper.execute_tx(&caller_addr, &sc_addr, &rust_biguint!(0), |sc| {
+    wrapper.execute_tx(&caller_addr, &sc_addr, &rust_biguint!(0), |sc| {
         let managed_addr = managed_address!(&caller_addr);
         let managed_id = managed_token_id!(token_id);
         let managed_amt = managed_biguint!(400);
@@ -331,7 +331,7 @@ fn test_sc_esdt_mint_burn() {
         &[EsdtLocalRole::Mint, EsdtLocalRole::Burn][..],
     );
 
-    wrapper = wrapper.execute_tx(&caller_addr, &sc_addr, &rust_biguint!(0), |sc| {
+    wrapper.execute_tx(&caller_addr, &sc_addr, &rust_biguint!(0), |sc| {
         let managed_id = managed_token_id!(token_id);
         let managed_amt = managed_biguint!(400);
         sc.mint_esdt(managed_id, 0, managed_amt);
@@ -341,7 +341,7 @@ fn test_sc_esdt_mint_burn() {
 
     wrapper.check_esdt_balance(&sc_addr, token_id, &rust_biguint!(400));
 
-    wrapper = wrapper.execute_tx(&caller_addr, &sc_addr, &rust_biguint!(0), |sc| {
+    wrapper.execute_tx(&caller_addr, &sc_addr, &rust_biguint!(0), |sc| {
         let managed_id = managed_token_id!(token_id);
         let managed_amt = managed_biguint!(100);
         sc.burn_esdt(managed_id, 0, managed_amt);
@@ -378,7 +378,7 @@ fn test_sc_nft() {
         ][..],
     );
 
-    wrapper = wrapper.execute_tx(&caller_addr, &sc_addr, &rust_biguint!(0), |sc| {
+    wrapper.execute_tx(&caller_addr, &sc_addr, &rust_biguint!(0), |sc| {
         let managed_id = managed_token_id!(token_id);
         let managed_amt = managed_biguint!(100);
 
@@ -398,7 +398,7 @@ fn test_sc_nft() {
     wrapper.check_nft_balance(&sc_addr, token_id, 1, &rust_biguint!(100), &nft_attributes);
     wrapper.check_nft_balance(&sc_addr, token_id, 2, &rust_biguint!(100), &nft_attributes);
 
-    wrapper = wrapper.execute_tx(&caller_addr, &sc_addr, &rust_biguint!(0), |sc| {
+    wrapper.execute_tx(&caller_addr, &sc_addr, &rust_biguint!(0), |sc| {
         let managed_id = managed_token_id!(token_id);
         let managed_amt = managed_biguint!(100);
         sc.mint_esdt(managed_id, 1, managed_amt);
@@ -409,7 +409,7 @@ fn test_sc_nft() {
     wrapper.check_nft_balance(&sc_addr, token_id, 1, &rust_biguint!(200), &nft_attributes);
     wrapper.check_nft_balance(&sc_addr, token_id, 2, &rust_biguint!(100), &nft_attributes);
 
-    wrapper = wrapper.execute_tx(&caller_addr, &sc_addr, &rust_biguint!(0), |sc| {
+    wrapper.execute_tx(&caller_addr, &sc_addr, &rust_biguint!(0), |sc| {
         let managed_id = managed_token_id!(token_id);
         let managed_amt = managed_biguint!(50);
         sc.burn_esdt(managed_id, 2, managed_amt);
@@ -451,7 +451,7 @@ fn test_esdt_multi_transfer() {
         },
     ];
 
-    wrapper = wrapper.execute_esdt_multi_transfer(&caller_addr, &sc_addr, &transfers, |sc| {
+    wrapper.execute_esdt_multi_transfer(&caller_addr, &sc_addr, &transfers, |sc| {
         let mut expected_transfers = Vec::new();
         expected_transfers.push(EsdtTokenPayment::new(
             managed_token_id!(token_id_1),
@@ -522,13 +522,13 @@ fn storage_check_test() {
     );
 
     // simulate deploy
-    wrapper = wrapper.execute_tx(&user_addr, &sc_addr, &rust_zero, |sc| {
+    wrapper.execute_tx(&user_addr, &sc_addr, &rust_zero, |sc| {
         sc.init();
 
         StateChange::Commit
     });
 
-    wrapper = wrapper.execute_tx(&user_addr, &sc_addr, &rust_zero, |sc| {
+    wrapper.execute_tx(&user_addr, &sc_addr, &rust_zero, |sc| {
         let total_before = sc.total_value().get();
         let per_caller_before = sc.value_per_caller(&managed_address!(&user_addr)).get();
 
@@ -575,13 +575,13 @@ fn storage_revert_test() {
     );
 
     // simulate deploy
-    wrapper = wrapper.execute_tx(&user_addr, &sc_addr, &rust_zero, |sc| {
+    wrapper.execute_tx(&user_addr, &sc_addr, &rust_zero, |sc| {
         sc.init();
 
         StateChange::Commit
     });
 
-    wrapper = wrapper.execute_tx(&user_addr, &sc_addr, &rust_zero, |sc| {
+    wrapper.execute_tx(&user_addr, &sc_addr, &rust_zero, |sc| {
         let total_before = sc.total_value().get();
         let per_caller_before = sc.value_per_caller(&managed_address!(&user_addr)).get();
 
@@ -628,13 +628,13 @@ fn storage_set_test() {
     );
 
     // simulate deploy
-    wrapper = wrapper.execute_tx(&user_addr, &sc_addr, &rust_zero, |sc| {
+    wrapper.execute_tx(&user_addr, &sc_addr, &rust_zero, |sc| {
         sc.init();
 
         StateChange::Commit
     });
 
-    wrapper = wrapper.execute_tx(&user_addr, &sc_addr, &rust_zero, |sc| {
+    wrapper.execute_tx(&user_addr, &sc_addr, &rust_zero, |sc| {
         sc.total_value().set(&managed_biguint!(50));
         sc.value_per_caller(&managed_address!(&user_addr))
             .set(&managed_biguint!(50));
@@ -701,7 +701,7 @@ fn execute_on_dest_context_query_test() {
         SC_WASM_PATH,
     );
 
-    wrapper = wrapper.execute_tx(&user_addr, &other_sc_addr, &rust_zero, |sc| {
+    wrapper.execute_tx(&user_addr, &other_sc_addr, &rust_zero, |sc| {
         sc.total_value().set(&managed_biguint!(5));
         StateChange::Commit
     });
@@ -733,12 +733,12 @@ fn execute_on_dest_context_change_state_test() {
         SC_WASM_PATH,
     );
 
-    wrapper = wrapper.execute_tx(&user_addr, &other_sc_addr, &rust_zero, |sc| {
+    wrapper.execute_tx(&user_addr, &other_sc_addr, &rust_zero, |sc| {
         sc.total_value().set(&managed_biguint!(5));
         StateChange::Commit
     });
 
-    wrapper = wrapper.execute_tx(&user_addr, &sc_addr, &rust_zero, |sc| {
+    wrapper.execute_tx(&user_addr, &sc_addr, &rust_zero, |sc| {
         sc.execute_on_dest_add_value(managed_address!(&other_sc_addr), managed_biguint!(5));
         StateChange::Commit
     });
@@ -763,6 +763,15 @@ fn test_mandos_generation() {
         SC_WASM_PATH,
     );
 
+    // simulate deploy
+    wrapper.execute_tx(&user_addr, &sc_addr, &rust_zero, |sc| {
+        sc.init();
+
+        StateChange::Commit
+    });
+    wrapper.add_mandos_set_account(&sc_addr);
+    wrapper.add_mandos_check_account(&sc_addr);
+
     let add_value = rust_biguint!(50);
     let mut sc_call_mandos = ScCallMandos::new(&user_addr, &sc_addr, "addValue");
     sc_call_mandos.add_argument(&add_value.to_bytes_be());
@@ -771,11 +780,11 @@ fn test_mandos_generation() {
     let tx_expect = TxExpectMandos::new(0);
     wrapper.add_mandos_sc_call(sc_call_mandos, Some(tx_expect));
 
-    wrapper = wrapper.execute_tx(&user_addr, &sc_addr, &rust_zero, |sc| {
+    wrapper.execute_tx(&user_addr, &sc_addr, &rust_zero, |sc| {
         let total_before = sc.total_value().get();
         let per_caller_before = sc.value_per_caller(&managed_address!(&user_addr)).get();
 
-        assert_eq!(total_before, managed_biguint!(0));
+        assert_eq!(total_before, managed_biguint!(1));
         assert_eq!(per_caller_before, managed_biguint!(0));
 
         let added_value = managed_biguint!(50);
@@ -792,8 +801,9 @@ fn test_mandos_generation() {
 
         StateChange::Commit
     });
+    wrapper.add_mandos_check_account(&sc_addr);
 
-    let expected_value = rust_biguint!(50);
+    let expected_value = rust_biguint!(51);
     let sc_query_mandos = ScQueryMandos::new(&sc_addr, "getTotalValue");
 
     let mut query_expect = TxExpectMandos::new(0);
@@ -801,8 +811,8 @@ fn test_mandos_generation() {
 
     wrapper.add_mandos_sc_query(sc_query_mandos, Some(query_expect));
 
-    wrapper = wrapper.execute_query(&sc_addr, |sc| {
-        let expected_total = managed_biguint!(50);
+    wrapper.execute_query(&sc_addr, |sc| {
+        let expected_total = managed_biguint!(51);
         let expected_per_caller = managed_biguint!(50);
 
         let actual_total = sc.total_value().get();
