@@ -53,7 +53,7 @@ impl BlockchainMock {
             &InterpreterContext::new(self.current_dir.clone()),
         );
 
-        self.contract_map.contains_contract(contract_bytes)
+        self.contract_map.contains_contract(&contract_bytes)
     }
 
     pub fn commit_updates(self: &mut Rc<Self>, updates: BlockchainUpdate) {
