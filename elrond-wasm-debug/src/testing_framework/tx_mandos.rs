@@ -1,4 +1,4 @@
-use crate::tx_mock::TxInputESDT;
+use crate::{rust_biguint, tx_mock::TxInputESDT};
 use elrond_wasm::{elrond_codec::TopEncode, types::Address};
 
 pub struct ScCallMandos {
@@ -17,7 +17,7 @@ impl ScCallMandos {
         ScCallMandos {
             from: from.clone(),
             to: to.clone(),
-            egld_value: num_bigint::BigUint::from(0u64),
+            egld_value: rust_biguint!(0),
             esdt: Vec::new(),
             function: function.to_owned(),
             arguments: Vec::new(),
