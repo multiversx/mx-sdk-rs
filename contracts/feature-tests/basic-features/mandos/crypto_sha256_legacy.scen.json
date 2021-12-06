@@ -22,16 +22,16 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "compute_keccak256",
+                "function": "compute_sha256_legacy",
                 "arguments": [
-                    "0x61"
+                    "0x010203"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "0x3ac225168df54212a25c1c01fd35bebfea408fdac2e31ddd6f80a4bbf9a5f1cb"
+                    "0x039058c6f2c0cb492c533b0a4d14ef77cc0f78abccced5287d84a1a2011cfb81"
                 ],
                 "status": "",
                 "logs": [],
@@ -45,7 +45,7 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "compute_keccak256",
+                "function": "compute_sha256_legacy",
                 "arguments": [
                     "0x0102030405060708"
                 ],
@@ -54,7 +54,7 @@
             },
             "expect": {
                 "out": [
-                    "keccak256:0x0102030405060708"
+                    "0x66840dda154e8a113c31dd0ad32f7f3a366a80e8136979d8f5a101d3d29d6f72"
                 ],
                 "status": "",
                 "logs": [],
