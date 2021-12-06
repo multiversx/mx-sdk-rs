@@ -184,10 +184,6 @@ where
         let path_diff =
             pathdiff::diff_paths(wasm_full_path.clone(), self.workspace_path.clone()).unwrap();
         let path_str = path_diff.to_str().unwrap();
-        let path_bytes = path_str.as_bytes().to_vec();
-
-        self.address_to_code_path
-            .insert(address.clone(), path_bytes);
 
         let wasm_full_path_as_expr = "file:".to_owned() + wasm_full_path.to_str().unwrap();
         let contract_bytes = mandos::value_interpreter::interpret_string(
@@ -196,12 +192,17 @@ where
         );
 
         let wasm_relative_path_expr = "file:".to_owned() + path_str;
+        let was_relative_path_expr_bytes = wasm_relative_path_expr.as_bytes().to_vec();
+
+        self.address_to_code_path
+            .insert(address.clone(), was_relative_path_expr_bytes.clone());
+
         self.create_account_raw(
             &address,
             egld_balance,
             owner,
-            Some(contract_bytes), // Some(contract_path_expr.as_bytes().to_vec())
-            Some(wasm_relative_path_expr.as_bytes().to_vec()),
+            Some(contract_bytes),
+            Some(was_relative_path_expr_bytes),
         );
         let _ = self.obj_builders.insert(address.clone(), obj_builder);
 
@@ -233,7 +234,7 @@ where
             contract_owner: owner.cloned(),
         };
         self.mandos_generator
-            .set_account(address, &acc_data, sc_mandos_path_expr);
+            .set_account(&acc_data, sc_mandos_path_expr);
 
         self.b_mock.add_account(acc_data);
     }
@@ -243,9 +244,7 @@ where
             Some(acc) => {
                 acc.egld_balance = balance.clone();
 
-                let opt_contract_path = self.address_to_code_path.get(address);
-                self.mandos_generator
-                    .set_account(address, acc, opt_contract_path.cloned());
+                self.add_mandos_set_account(address);
             },
 
             None => panic!(
@@ -269,10 +268,6 @@ where
                     balance,
                     EsdtInstanceMetadata::default(),
                 );
-
-                let opt_contract_path = self.address_to_code_path.get(address);
-                self.mandos_generator
-                    .set_account(address, acc, opt_contract_path.cloned());
             },
             None => panic!(
                 "set_esdt_balance: Account {:?} does not exist",
@@ -324,9 +319,7 @@ where
                     },
                 );
 
-                let opt_contract_path = self.address_to_code_path.get(address);
-                self.mandos_generator
-                    .set_account(address, acc, opt_contract_path.cloned());
+                self.add_mandos_set_account(address);
             },
             None => panic!(
                 "set_nft_balance: Account {:?} does not exist",
@@ -349,9 +342,7 @@ where
                 }
                 acc.esdt.set_roles(token_id.to_vec(), roles_raw);
 
-                let opt_contract_path = self.address_to_code_path.get(address);
-                self.mandos_generator
-                    .set_account(address, acc, opt_contract_path.cloned());
+                self.add_mandos_set_account(address);
             },
             None => panic!(
                 "set_esdt_local_roles: Account {:?} does not exist",
@@ -466,6 +457,20 @@ where
     ) {
         self.mandos_generator
             .create_query(&sc_query, opt_expect.as_ref());
+    }
+
+    pub fn add_mandos_set_account(&mut self, address: &Address) {
+        if let Some(acc) = self.b_mock.accounts.get(address) {
+            let opt_contract_path = self.address_to_code_path.get(address);
+            self.mandos_generator
+                .set_account(acc, opt_contract_path.cloned());
+        }
+    }
+
+    pub fn add_mandos_check_account(&mut self, address: &Address) {
+        if let Some(acc) = self.b_mock.accounts.get(address) {
+            self.mandos_generator.check_account(acc);
+        }
     }
 }
 
