@@ -9,6 +9,9 @@ publish = false
 version = "0.23.0"
 path = "../../../elrond-wasm"
 
+[dependencies.adder]
+path = "../../examples/adder"
+
 [dev-dependencies.elrond-wasm-debug]
 version = "0.23.0"
 path = "../../../elrond-wasm-debug"
