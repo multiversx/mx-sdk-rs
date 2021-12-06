@@ -22,7 +22,7 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "computeRipemd160",
+                "function": "compute_ripemd160",
                 "arguments": [
                     "0x010203"
                 ],
@@ -45,7 +45,7 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "computeRipemd160",
+                "function": "compute_ripemd160",
                 "arguments": [
                     "0x0102030405060708"
                 ],
