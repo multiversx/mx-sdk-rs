@@ -19,12 +19,20 @@ where
         CryptoWrapper { api }
     }
 
+    /// Still pointing to the old implementation.
+    /// Use the raw API if you need the new one.
+    /// Will be changed after the new VM goes live.
+    /// We also need to wait for the next minor release so we don't break backwards compatibility.
     pub fn sha256(&self, data: &[u8]) -> H256 {
-        self.api.sha256(data)
+        self.api.sha256_legacy(data)
     }
 
+    /// Still pointing to the old implementation.
+    /// Use the raw API if you need the new one.
+    /// Will be changed after the new VM goes live.
+    /// We also need to wait for the next minor release so we don't break backwards compatibility.
     pub fn keccak256(&self, data: &[u8]) -> H256 {
-        self.api.keccak256(data)
+        self.api.keccak256_legacy(data)
     }
 
     pub fn ripemd160(&self, data: &[u8]) -> Box<[u8; 20]> {

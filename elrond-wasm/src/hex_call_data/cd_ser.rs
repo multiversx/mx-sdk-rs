@@ -1,24 +1,11 @@
 use crate::{
     api::ManagedTypeApi,
+    hex_util::byte_to_hex_digits,
     types::{ArgBuffer, ManagedArgBuffer, ManagedBuffer},
 };
 use alloc::vec::Vec;
 
 use super::SEPARATOR;
-
-fn half_byte_to_hex_digit(num: u8) -> u8 {
-    if num < 10 {
-        b'0' + num
-    } else {
-        b'a' + num - 0xau8
-    }
-}
-
-fn byte_to_hex(byte: u8) -> (u8, u8) {
-    let digit1 = half_byte_to_hex_digit(byte >> 4);
-    let digit2 = half_byte_to_hex_digit(byte & 0x0f);
-    (digit1, digit2)
-}
 
 /// Serializes to Elrond's smart contract call format.
 ///
@@ -66,7 +53,7 @@ impl HexCallDataSerializer {
     }
 
     fn push_byte(&mut self, byte: u8) {
-        let (digit1, digit2) = byte_to_hex(byte);
+        let (digit1, digit2) = byte_to_hex_digits(byte);
         self.0.push(digit1);
         self.0.push(digit2);
     }
