@@ -84,7 +84,7 @@ impl ManagedBufferApi for DebugApi {
     fn mb_copy_to_slice_pad_right(&self, handle: Handle, destination: &mut [u8]) {
         let bytes = self.mb_to_boxed_bytes(handle);
         let offset = 32 - bytes.len();
-        destination[offset..].clone_from_slice(bytes.as_slice());
+        destination[offset..].copy_from_slice(bytes.as_slice());
     }
 
     fn mb_overwrite(&self, handle: Handle, value: &[u8]) {
@@ -92,6 +92,23 @@ impl ManagedBufferApi for DebugApi {
         managed_types
             .managed_buffer_map
             .insert(handle, value.into());
+    }
+
+    fn mb_set_slice(
+        &self,
+        dest_handle: Handle,
+        starting_position: usize,
+        source_slice: &[u8],
+    ) -> Result<(), InvalidSliceError> {
+        let mut managed_types = self.m_types_borrow_mut();
+        let bytes = managed_types.managed_buffer_map.get_mut(dest_handle);
+        let end_position = starting_position + source_slice.len();
+        if end_position <= bytes.len() {
+            bytes[starting_position..end_position].copy_from_slice(source_slice);
+            Ok(())
+        } else {
+            Err(InvalidSliceError)
+        }
     }
 
     fn mb_append(&self, accumulator_handle: Handle, data_handle: Handle) {

@@ -1,7 +1,7 @@
 use super::{ManagedBuffer, ManagedType, ManagedVecItem, ManagedVecIterator};
 use crate::{
     abi::TypeAbi,
-    api::{Handle, ManagedTypeApi},
+    api::{Handle, InvalidSliceError, ManagedTypeApi},
     types::{ArgBuffer, BoxedBytes, ManagedBufferNestedDecodeInput},
 };
 use alloc::{string::String, vec::Vec};
@@ -125,6 +125,11 @@ where
             Ok(_) => Some(result),
             Err(_) => None,
         }
+    }
+
+    pub fn set(&mut self, index: usize, item: &T) -> Result<(), InvalidSliceError> {
+        let byte_index = index * T::PAYLOAD_SIZE;
+        item.to_byte_writer(|slice| self.buffer.set_slice(byte_index, slice))
     }
 
     pub fn slice(&self, start_index: usize, end_index: usize) -> Option<Self> {

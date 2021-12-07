@@ -39,7 +39,7 @@ pub trait ManagedBufferFeatures {
     }
 
     #[endpoint]
-    fn mbuffer_slice_1(
+    fn mbuffer_load_slice(
         &self,
         mb: ManagedBuffer,
         starting_position: usize,
@@ -57,7 +57,21 @@ pub trait ManagedBufferFeatures {
     }
 
     #[endpoint]
-    fn mbuffer_slice_2(
+    fn mbuffer_set_slice(
+        &self,
+        mb: ManagedBuffer,
+        index: usize,
+        item: &[u8],
+    ) -> SCResult<ManagedBuffer> {
+        let mut result = mb;
+        result
+            .set_slice(index, item)
+            .map_err(|_| "index out of bounds")?;
+        Ok(result)
+    }
+
+    #[endpoint]
+    fn mbuffer_copy_slice(
         &self,
         mb: ManagedBuffer,
         starting_position: usize,

@@ -140,6 +140,18 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
         M::instance().mb_overwrite(self.handle, value);
     }
 
+    pub fn set_slice(
+        &mut self,
+        starting_position: usize,
+        source_slice: &[u8],
+    ) -> Result<(), InvalidSliceError> {
+        if let Ok(()) = M::instance().mb_set_slice(self.handle, starting_position, source_slice) {
+            Ok(())
+        } else {
+            Err(InvalidSliceError)
+        }
+    }
+
     #[inline]
     pub fn append(&mut self, other: &ManagedBuffer<M>) {
         M::instance().mb_append(self.handle, other.handle);
@@ -265,7 +277,7 @@ impl<M: ManagedTypeApi> core::fmt::Debug for ManagedBuffer<M> {
             .field("handle", &self.handle)
             .field(
                 "hex-value",
-                &encode_bytes_as_hex(&self.to_boxed_bytes().as_slice()),
+                &encode_bytes_as_hex(self.to_boxed_bytes().as_slice()),
             )
             .finish()
     }
