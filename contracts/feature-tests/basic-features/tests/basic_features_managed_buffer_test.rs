@@ -15,10 +15,13 @@ fn test_managed_buffer_new_empty() {
 fn test_managed_buffer_set_slice() {
     let context = DebugApi::dummy();
     let bf = basic_features::contract_obj(context.clone());
-    let result = bf.mbuffer_from_slice(&[1, 2, 3][..]);
-    let set_result = bf.mbuffer_set_slice(result.clone(), 1, &[5][..]).unwrap();
-    assert_eq!(bf.mbuffer_from_slice(&[1, 5, 3][..]), set_result);
-    assert!(bf.mbuffer_set_slice(result, 4, &[5]).is_err());
+    let buffer = bf.mbuffer_from_slice(&[1, 2, 3][..]);
+    let result = bf.mbuffer_set_slice(buffer.clone(), 4, &[5]);
+    assert!(result.is_err());
+
+    let set_result = bf.mbuffer_set_slice(buffer, 1, &[5][..]).unwrap();
+    let expected_set_result = bf.mbuffer_from_slice(&[1, 5, 3][..]);
+    assert_eq!(expected_set_result, set_result);
 }
 
 #[test]
