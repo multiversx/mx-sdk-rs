@@ -1,0 +1,24 @@
+{
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "0x00000000000000006c8fc18b8e9f8e20089714856ee233b3902a591d0d5f2925": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../output/rust-testing-framework-tester.wasm"
+                }
+            }
+        },
+        {
+            "step": "setState",
+            "accounts": {
+                "0x0000000000000000fb1397e8225ea85e0f0e6e8c7b126d0016ccbde0e667151e": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../../../examples/adder/output/adder.wasm"
+                }
+            }
+        }
+    ]
+}
