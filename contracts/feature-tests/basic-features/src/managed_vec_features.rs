@@ -33,4 +33,19 @@ pub trait ManagedVecFeatures {
         result.push(item);
         result
     }
+
+    #[endpoint]
+    fn managed_vec_set(
+        &self,
+        mv: ManagedVec<BigUint>,
+        index: usize,
+        item: &BigUint,
+    ) -> SCResult<ManagedVec<BigUint>> {
+        let mut result = mv;
+        if result.set(index, item).is_ok() {
+            Ok(result)
+        } else {
+            Err("index out of bounds".into())
+        }
+    }
 }

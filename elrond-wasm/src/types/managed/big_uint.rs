@@ -210,7 +210,7 @@ impl<M: ManagedTypeApi> core::fmt::Debug for BigUint<M> {
             .field("handle", &self.handle)
             .field(
                 "hex-value-be",
-                &encode_bytes_as_hex(&self.to_bytes_be().as_slice()),
+                &encode_bytes_as_hex(self.to_bytes_be().as_slice()),
             )
             .finish()
     }
