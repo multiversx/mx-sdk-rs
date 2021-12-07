@@ -6,14 +6,14 @@ edition = "2018"
 publish = false
 
 [dependencies.elrond-wasm]
-version = "0.23.0"
+version = "0.24.0"
 path = "../../../elrond-wasm"
 
 [dependencies.adder]
 path = "../../examples/adder"
 
 [dev-dependencies.elrond-wasm-debug]
-version = "0.23.0"
+version = "0.24.0"
 path = "../../../elrond-wasm-debug"
 
 [dependencies]
