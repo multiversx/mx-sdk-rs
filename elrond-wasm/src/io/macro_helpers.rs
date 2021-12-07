@@ -18,12 +18,11 @@ where
 }
 
 #[inline(always)]
-fn load_single_arg_exit<AA>(ctx: (AA, ArgId), de_err: DecodeError) -> !
+fn load_single_arg_exit<AA>(arg_id: ArgId, de_err: DecodeError) -> !
 where
     AA: ManagedTypeApi + EndpointArgumentApi + ErrorApi,
 {
-    let (api, arg_id) = ctx;
-    signal_arg_de_error(api, arg_id, de_err)
+    signal_arg_de_error(arg_id, de_err)
 }
 
 /// It's easier to generate code from macros using this function, instead of the DynArg method.

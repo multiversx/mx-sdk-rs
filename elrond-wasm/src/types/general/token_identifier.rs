@@ -1,9 +1,5 @@
 use super::BoxedBytes;
-use crate::{
-    abi::TypeAbi,
-    api::{Handle, ManagedTypeApi},
-    types::{ManagedBuffer, ManagedType},
-};
+use crate::{abi::TypeAbi, api::{Handle, ManagedTypeApi, ManagedTypeApiImpl}, types::{ManagedBuffer, ManagedType}};
 use alloc::string::String;
 use elrond_codec::*;
 

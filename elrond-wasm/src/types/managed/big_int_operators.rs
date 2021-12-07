@@ -2,7 +2,7 @@ use core::ops::{
     Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Rem, RemAssign, Sub, SubAssign,
 };
 
-use crate::api::ManagedTypeApi;
+use crate::api::{BigIntApi, ManagedTypeApi};
 
 use super::{BigInt, ManagedType};
 

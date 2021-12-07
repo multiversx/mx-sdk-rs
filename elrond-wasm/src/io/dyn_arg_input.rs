@@ -1,7 +1,4 @@
-use crate::{
-    api::{ErrorApi, ManagedTypeApi},
-    err_msg,
-};
+use crate::{api::{ErrorApi, ManagedTypeApi, ManagedTypeApiImpl}, err_msg};
 use elrond_codec::TopDecodeInput;
 
 /// Abstracts away the loading of multi-arguments.
@@ -24,8 +21,9 @@ use elrond_codec::TopDecodeInput;
 pub trait DynArgInput {
     type ItemInput: TopDecodeInput;
 
-    type ErrorApi: ErrorApi + ManagedTypeApi + Sized;
+    type ErrorApi: ManagedTypeApi + Sized;
 
+    #[inline]
     fn dyn_arg_vm_api(&self) -> Self::ErrorApi;
 
     /// Check if there are more arguments that can be loaded.

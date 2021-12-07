@@ -2,7 +2,7 @@ use core::marker::PhantomData;
 
 use super::{ManagedBuffer, ManagedType};
 use crate::{
-    api::{Handle, ManagedTypeApi},
+    api::{BigIntApi, Handle, ManagedTypeApi, ManagedTypeApiImpl},
     types::BoxedBytes,
 };
 use alloc::string::String;
@@ -79,9 +79,8 @@ impl<M: ManagedTypeApi> BigUint<M> {
 
     #[inline]
     pub fn to_u64(&self) -> Option<u64> {
-        self.type_manager()
-            .bi_to_i64(self.handle)
-            .map(|bi| bi as u64)
+        let api = M::instance();
+        api.bi_to_i64(self.handle).map(|bi| bi as u64)
     }
 
     #[inline]
@@ -97,7 +96,8 @@ impl<M: ManagedTypeApi> BigUint<M> {
 
     #[inline]
     pub fn to_bytes_be(&self) -> BoxedBytes {
-        self.type_manager().bi_get_unsigned_bytes(self.handle)
+        let api = M::instance();
+        api.bi_get_unsigned_bytes(self.handle)
     }
 
     #[inline]
@@ -111,17 +111,18 @@ impl<M: ManagedTypeApi> BigUint<M> {
     }
 
     pub fn copy_to_array_big_endian_pad_right(&self, target: &mut [u8; 32]) {
-        let mb_handle = self.type_manager().mb_from_big_int_unsigned(self.handle);
-        self.type_manager()
-            .mb_copy_to_slice_pad_right(mb_handle, &mut target[..]);
+        let api = M::instance();
+        let mb_handle = api.mb_from_big_int_unsigned(self.handle);
+        api.mb_copy_to_slice_pad_right(mb_handle, &mut target[..]);
     }
 }
 
 impl<M: ManagedTypeApi> BigUint<M> {
     #[inline]
     pub fn sqrt(&self) -> Self {
-        let handle = self.type_manager().bi_new_zero();
-        self.type_manager().bi_sqrt(handle, self.handle);
+        let api = M::instance();
+        let handle = api.bi_new_zero();
+        api.bi_sqrt(handle, self.handle);
         BigUint {
             handle,
             _phantom: PhantomData,
@@ -129,9 +130,10 @@ impl<M: ManagedTypeApi> BigUint<M> {
     }
 
     pub fn pow(&self, exp: u32) -> Self {
-        let handle = self.type_manager().bi_new_zero();
-        let exp_handle = self.type_manager().bi_new(exp as i64);
-        self.type_manager().bi_pow(handle, self.handle, exp_handle);
+        let api = M::instance();
+        let handle = api.bi_new_zero();
+        let exp_handle = api.bi_new(exp as i64);
+        api.bi_pow(handle, self.handle, exp_handle);
         BigUint {
             handle,
             _phantom: PhantomData,
@@ -140,15 +142,16 @@ impl<M: ManagedTypeApi> BigUint<M> {
 
     #[inline]
     pub fn log2(&self) -> u32 {
-        self.type_manager().bi_log2(self.handle)
+        let api = M::instance();
+        api.bi_log2(self.handle)
     }
 }
 
 impl<M: ManagedTypeApi> Clone for BigUint<M> {
     fn clone(&self) -> Self {
-        let clone_handle = self.type_manager().bi_new_zero();
-        self.type_manager()
-            .bi_add(clone_handle, clone_handle, self.handle);
+        let api = M::instance();
+        let clone_handle = api.bi_new_zero();
+        api.bi_add(clone_handle, clone_handle, self.handle);
         BigUint {
             handle: clone_handle,
             _phantom: PhantomData,

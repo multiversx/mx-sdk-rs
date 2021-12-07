@@ -1,10 +1,7 @@
 use core::marker::PhantomData;
 
 use super::ManagedType;
-use crate::{
-    api::{Handle, InvalidSliceError, ManagedTypeApi},
-    types::BoxedBytes,
-};
+use crate::{api::{Handle, InvalidSliceError, ManagedBufferApi, ManagedTypeApi}, types::BoxedBytes};
 use alloc::string::String;
 use elrond_codec::{
     DecodeError, EncodeError, NestedDecode, NestedDecodeInput, NestedEncode, NestedEncodeOutput,

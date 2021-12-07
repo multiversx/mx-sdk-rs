@@ -5,6 +5,9 @@
 #![allow(clippy::type_complexity)]
 #![allow(deprecated)]
 
+
+#![allow(unused)]
+
 pub use elrond_wasm_derive::{self as derive, contract, module, proxy};
 
 // re-export basic heap types

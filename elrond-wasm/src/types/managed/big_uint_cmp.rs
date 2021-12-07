@@ -1,13 +1,14 @@
 use core::cmp::Ordering;
 
-use crate::api::ManagedTypeApi;
+
+use crate::api::{BigIntApi, ManagedTypeApi};
 
 use super::{BigUint, ManagedType};
 
 impl<M: ManagedTypeApi> PartialEq for BigUint<M> {
     #[inline]
     fn eq(&self, other: &Self) -> bool {
-        self.type_manager()
+        M::instance()
             .bi_cmp(self.handle, other.handle)
             .is_eq()
     }
@@ -25,7 +26,7 @@ impl<M: ManagedTypeApi> PartialOrd for BigUint<M> {
 impl<M: ManagedTypeApi> Ord for BigUint<M> {
     #[inline]
     fn cmp(&self, other: &Self) -> Ordering {
-        self.type_manager().bi_cmp(self.handle, other.handle)
+        M::instance().bi_cmp(self.handle, other.handle)
     }
 }
 

@@ -1,4 +1,4 @@
-use crate::api::{Handle, ManagedTypeApi};
+use crate::api::{Handle, ManagedTypeApi, ManagedTypeApiImpl};
 
 /// Commonalities between all managed types.
 pub trait ManagedType<M: ManagedTypeApi> {
@@ -9,7 +9,7 @@ pub trait ManagedType<M: ManagedTypeApi> {
     fn get_raw_handle(&self) -> Handle;
 
     #[inline]
-    fn type_manager(&self) -> M {
+    fn type_manager(&self) -> M::Impl {
         M::instance()
     }
 }

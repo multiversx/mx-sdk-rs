@@ -32,11 +32,11 @@ where
 {
     type ItemInput = ArgDecodeInput<AA>;
 
-    type ErrorApi = AA;
+    type ErrorApi = AA::Impl;
 
     #[inline]
     fn dyn_arg_vm_api(&self) -> Self::ErrorApi {
-        self.api.clone()
+        AA::instance()
     }
 
     fn has_next(&self) -> bool {

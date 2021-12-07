@@ -7,14 +7,14 @@ use elrond_codec::*;
 
 pub struct StorageKey<A>
 where
-    A: ManagedTypeApi + ErrorApi + 'static,
+    A: ManagedTypeApi  + 'static,
 {
     pub(crate) buffer: ManagedBuffer<A>,
 }
 
 impl<A> StorageKey<A>
 where
-    A: ManagedTypeApi + ErrorApi + 'static,
+    A: ManagedTypeApi  + 'static,
 {
     #[inline]
     pub fn new(_api: A, base_key: &[u8]) -> Self {
@@ -73,11 +73,11 @@ impl<M: ManagedTypeApi> Clone for StorageKey<M> {
 }
 
 #[inline(always)]
-fn storage_key_append_exit<A>(api: A, encode_err: EncodeError) -> !
+fn storage_key_append_exit<A>(_api: A, encode_err: EncodeError) -> !
 where
-    A: ManagedTypeApi + ErrorApi + 'static,
+    A: ManagedTypeApi  + 'static,
 {
     let mut message_buffer = ManagedBuffer::<A>::new_from_bytes(err_msg::STORAGE_KEY_ENCODE_ERROR);
     message_buffer.append_bytes(encode_err.message_bytes());
-    api.signal_error_from_buffer(message_buffer.get_raw_handle())
+    A::instance().signal_error_from_buffer(message_buffer.get_raw_handle())
 }

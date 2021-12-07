@@ -1,4 +1,4 @@
-use elrond_wasm::api::{BigIntApi, Handle, ManagedTypeApi};
+use elrond_wasm::api::{BigIntApi, Handle, ManagedTypeApi, ManagedTypeApiImpl};
 use num_bigint::{BigInt, Sign};
 
 use crate::DebugApi;

@@ -1,6 +1,6 @@
 use core::cmp::Ordering;
 
-use crate::api::ManagedTypeApi;
+use crate::api::{BigIntApi, ManagedTypeApi};
 
 use super::BigInt;
 

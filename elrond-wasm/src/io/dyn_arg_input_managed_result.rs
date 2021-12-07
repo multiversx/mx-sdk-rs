@@ -7,7 +7,7 @@ use crate::{
 
 pub struct ManagedResultArgLoader<A>
 where
-    A: ManagedTypeApi + ErrorApi,
+    A: ManagedTypeApi ,
 {
     data: ManagedVec<A, ManagedBuffer<A>>,
     data_len: usize,
@@ -16,7 +16,7 @@ where
 
 impl<A> ManagedResultArgLoader<A>
 where
-    A: ManagedTypeApi + ErrorApi,
+    A: ManagedTypeApi ,
 {
     pub fn new(data: ManagedVec<A, ManagedBuffer<A>>) -> Self {
         let data_len = data.len();
@@ -30,15 +30,15 @@ where
 
 impl<A> DynArgInput for ManagedResultArgLoader<A>
 where
-    A: ManagedTypeApi + ErrorApi,
+    A: ManagedTypeApi ,
 {
     type ItemInput = ManagedBuffer<A>;
 
-    type ErrorApi = A;
+    type ErrorApi = A::Impl;
 
     #[inline]
     fn dyn_arg_vm_api(&self) -> Self::ErrorApi {
-        self.data.type_manager()
+        A::instance()
     }
 
     #[inline]
