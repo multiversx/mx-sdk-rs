@@ -11,14 +11,14 @@ use super::SCError;
 /// The message is kept as a managed buffer in the VM.
 pub struct ManagedSCError<M>
 where
-    M: ManagedTypeApi + ErrorApi,
+    M: ManagedTypeApi ,
 {
     buffer: ManagedBuffer<M>,
 }
 
 impl<M> SCError for ManagedSCError<M>
 where
-    M: ManagedTypeApi + ErrorApi,
+    M: ManagedTypeApi ,
 {
     fn finish_err<FA: EndpointFinishApi>(&self, api: FA) -> ! {
         api.signal_error_from_buffer(self.buffer.get_raw_handle())
@@ -27,7 +27,7 @@ where
 
 impl<M> ManagedSCError<M>
 where
-    M: ManagedTypeApi + ErrorApi,
+    M: ManagedTypeApi ,
 {
     #[inline]
     pub fn new_empty() -> Self {

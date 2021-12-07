@@ -28,7 +28,7 @@ where
 {
     type ItemInput = ManagedBytesTopDecodeInput<A>;
 
-    type ErrorApi = A;
+    type ErrorApi = A::Impl;
 
     #[inline]
     fn dyn_arg_vm_api(&self) -> Self::ErrorApi {

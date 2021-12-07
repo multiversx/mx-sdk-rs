@@ -56,7 +56,7 @@ where
         self.managed_buffer.copy_slice(starting_position, slice_len)
     }
 
-    pub fn type_manager(&self) -> M {
+    pub fn type_manager(&self) -> M::Impl {
         self.managed_buffer.type_manager()
     }
 }

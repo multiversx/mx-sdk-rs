@@ -8,14 +8,14 @@ use crate::{
 
 pub struct ManagedSerializer<M>
 where
-    M: ManagedTypeApi + ErrorApi + 'static,
+    M: ManagedTypeApi + 'static,
 {
     api: M,
 }
 
 impl<M> ManagedSerializer<M>
 where
-    M: ManagedTypeApi + ErrorApi + 'static,
+    M: ManagedTypeApi + 'static,
 {
     pub fn new(api: M) -> Self {
         ManagedSerializer { api }
@@ -47,11 +47,11 @@ where
 #[inline(always)]
 fn top_encode_exit<M>(api: M, encode_err: EncodeError) -> !
 where
-    M: ManagedTypeApi + ErrorApi + 'static,
+    M: ManagedTypeApi + 'static,
 {
     let mut message_buffer = ManagedBuffer::<M>::new_from_bytes(err_msg::SERIALIZER_ENCODE_ERROR);
     message_buffer.append_bytes(encode_err.message_bytes());
-    api.signal_error_from_buffer(message_buffer.get_raw_handle())
+    M::instance().signal_error_from_buffer(message_buffer.get_raw_handle())
 }
 
 #[inline(always)]
@@ -61,5 +61,5 @@ where
 {
     let mut message_buffer = ManagedBuffer::<M>::new_from_bytes(err_msg::SERIALIZER_DECODE_ERROR);
     message_buffer.append_bytes(decode_err.message_bytes());
-    api.signal_error_from_buffer(message_buffer.get_raw_handle())
+    M::instance().signal_error_from_buffer(message_buffer.get_raw_handle())
 }

@@ -10,7 +10,7 @@ use crate::{
 /// Consumes a vector of `BoxedBytes` and deserializes from the vector one by one.
 pub struct BytesArgLoader<A>
 where
-    A: ManagedTypeApi + ErrorApi,
+    A: ManagedTypeApi ,
 {
     bytes_vec: Vec<BoxedBytes>,
     next_index: usize,
@@ -19,7 +19,7 @@ where
 
 impl<A> BytesArgLoader<A>
 where
-    A: ManagedTypeApi + ErrorApi,
+    A: ManagedTypeApi ,
 {
     pub fn new(api: A, bytes_vec: Vec<BoxedBytes>) -> Self {
         BytesArgLoader {
@@ -32,15 +32,15 @@ where
 
 impl<A> DynArgInput for BytesArgLoader<A>
 where
-    A: ManagedTypeApi + ErrorApi,
+    A: ManagedTypeApi ,
 {
     type ItemInput = ManagedBytesTopDecodeInput<A>;
 
-    type ErrorApi = A;
+    type ErrorApi = A::Impl;
 
     #[inline]
     fn dyn_arg_vm_api(&self) -> Self::ErrorApi {
-        self.api.clone()
+        A::instance()
     }
 
     #[inline]

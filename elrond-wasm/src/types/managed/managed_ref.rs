@@ -57,7 +57,7 @@ where
         self.value.get_raw_handle()
     }
 
-    fn type_manager(&self) -> M {
+    fn type_manager(&self) -> M::Impl {
         self.value.type_manager()
     }
 }

@@ -22,7 +22,7 @@ pub struct CallbackClosure<M: ManagedTypeApi> {
 /// Unlike calling `CallbackClosure::<SA, R>::new`, here types can be inferred from the context.
 pub fn new_callback_call<A>(_api: A, callback_name_slice: &'static [u8]) -> CallbackClosure<A>
 where
-    A: ManagedTypeApi + ErrorApi,
+    A: ManagedTypeApi ,
 {
     let callback_name = ManagedBuffer::new_from_bytes(callback_name_slice);
     CallbackClosure::new(callback_name)

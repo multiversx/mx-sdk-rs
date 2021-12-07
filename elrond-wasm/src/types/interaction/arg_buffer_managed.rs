@@ -14,14 +14,14 @@ use elrond_codec::{
 #[derive(Debug)]
 pub struct ManagedArgBuffer<M>
 where
-    M: ManagedTypeApi + ErrorApi + 'static,
+    M: ManagedTypeApi  + 'static,
 {
     pub(crate) data: ManagedVec<M, ManagedBuffer<M>>,
 }
 
 impl<M: ManagedTypeApi> ManagedType<M> for ManagedArgBuffer<M>
 where
-    M: ManagedTypeApi + ErrorApi + 'static,
+    M: ManagedTypeApi  + 'static,
 {
     #[inline]
     fn from_raw_handle(handle: Handle) -> Self {
@@ -38,7 +38,7 @@ where
 
 impl<M: ManagedTypeApi> ManagedArgBuffer<M>
 where
-    M: ManagedTypeApi + ErrorApi + 'static,
+    M: ManagedTypeApi  + 'static,
 {
     #[inline]
     pub fn new_empty() -> Self {
@@ -69,7 +69,7 @@ where
 
 impl<M: ManagedTypeApi> ManagedArgBuffer<M>
 where
-    M: ManagedTypeApi + ErrorApi + 'static,
+    M: ManagedTypeApi  + 'static,
 {
     #[inline]
     pub fn len(&self) -> usize {
@@ -115,7 +115,7 @@ where
 #[inline(always)]
 fn managed_arg_buffer_push_exit<A>(api: A, encode_err: EncodeError) -> !
 where
-    A: ManagedTypeApi + ErrorApi + 'static,
+    A: ManagedTypeApi  + 'static,
 {
     let mut message_buffer =
         ManagedBuffer::<A>::new_from_bytes(err_msg::CONTRACT_CALL_ENCODE_ERROR);
@@ -125,7 +125,7 @@ where
 
 impl<M: ManagedTypeApi> ManagedArgBuffer<M>
 where
-    M: ManagedTypeApi + ErrorApi + 'static,
+    M: ManagedTypeApi  + 'static,
 {
     pub fn to_legacy_arg_buffer(&self) -> ArgBuffer {
         let mut result = ArgBuffer::new();
@@ -138,7 +138,7 @@ where
 
 impl<M: ManagedTypeApi> ManagedArgBuffer<M>
 where
-    M: ManagedTypeApi + ErrorApi + 'static,
+    M: ManagedTypeApi  + 'static,
 {
     pub fn raw_arg_iter(&self) -> ManagedVecIterator<M, ManagedBuffer<M>> {
         self.data.iter()

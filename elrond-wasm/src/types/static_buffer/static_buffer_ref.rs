@@ -1,9 +1,6 @@
 use core::marker::PhantomData;
 
-use crate::{
-    api::{InvalidSliceError, ManagedTypeApi},
-    types::{ManagedBuffer, ManagedType},
-};
+use crate::{api::{InvalidSliceError, ManagedTypeApi, ManagedTypeApiImpl, StaticBufferApi}, types::{ManagedBuffer, ManagedType}};
 
 use super::LockableStaticBuffer;
 
@@ -36,8 +33,7 @@ impl<M: ManagedTypeApi> StaticBufferRef<M> {
     }
 
     pub fn try_from_managed_buffer(managed_buffer: &ManagedBuffer<M>) -> Option<Self> {
-        if managed_buffer
-            .type_manager()
+        if M::instance()
             .mb_overwrite_static_buffer(managed_buffer.get_raw_handle())
         {
             Some(StaticBufferRef::new())
