@@ -224,7 +224,7 @@ impl<M: ManagedTypeApi> core::fmt::Debug for BigInt<M> {
             .field("handle", &self.handle)
             .field(
                 "hex-value-be",
-                &encode_bytes_as_hex(&self.to_signed_bytes_be().as_slice()),
+                &encode_bytes_as_hex(self.to_signed_bytes_be().as_slice()),
             )
             .finish()
     }
