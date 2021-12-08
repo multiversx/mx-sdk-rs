@@ -99,7 +99,9 @@ pub(crate) fn tx_call_as_raw(tx_call: &ScCallMandos) -> TxCallRaw {
     let mut all_esdt_raw = Vec::with_capacity(tx_call.esdt.len());
     for esdt in tx_call.esdt.iter() {
         let esdt_raw = TxESDTRaw {
-            token_identifier: Some(bytes_as_raw(&esdt.token_identifier)),
+            token_identifier: Some(ValueSubTree::Str(bytes_to_mandos_string_or_hex(
+                &esdt.token_identifier,
+            ))),
             nonce: Some(u64_as_raw(esdt.nonce)),
             value: rust_biguint_as_raw(&esdt.value),
         };
