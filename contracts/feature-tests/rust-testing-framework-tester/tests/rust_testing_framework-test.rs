@@ -9,6 +9,8 @@ use rust_testing_framework_tester::*;
 
 const TEST_OUTPUT_PATH: &'static str = "test.scen.json";
 const TEST_MULTIPLE_SC_OUTPUT_PATH: &'static str = "test_multiple_sc.scen.json";
+const TEST_ESDT_OUTPUT_PATH: &'static str = "test_esdt_generation.scen.json";
+
 const SC_WASM_PATH: &'static str = "output/rust-testing-framework-tester.wasm";
 const ADDER_WASM_PATH: &'static str = "../../examples/adder/output/adder.wasm";
 
@@ -162,6 +164,9 @@ fn test_esdt_balance() {
         let expected_balance = managed_biguint!(1_000);
         assert_eq!(expected_balance, actual_balance);
     });
+
+    wrapper.add_mandos_check_account(sc_wrapper.address_ref());
+    wrapper.write_mandos_output(TEST_ESDT_OUTPUT_PATH);
 }
 
 #[test]
