@@ -285,6 +285,8 @@ impl BlockchainStateWrapper {
                     balance,
                     EsdtInstanceMetadata::default(),
                 );
+
+                self.add_mandos_set_account(address);
             },
             None => panic!(
                 "set_esdt_balance: Account {:?} does not exist",
