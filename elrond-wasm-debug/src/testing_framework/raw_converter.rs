@@ -22,7 +22,7 @@ pub(crate) fn account_as_raw(acc: &AccountData) -> AccountRaw {
 
     let mut all_esdt_raw = BTreeMap::new();
     for (token_id, esdt_data) in acc.esdt.iter() {
-        let token_id_raw = bytes_to_mandos_string_or_hex(&token_id);
+        let token_id_raw = bytes_to_mandos_string_or_hex(token_id);
         let esdt_raw = esdt_data_as_raw(esdt_data);
 
         let _ = all_esdt_raw.insert(token_id_raw, esdt_raw);
