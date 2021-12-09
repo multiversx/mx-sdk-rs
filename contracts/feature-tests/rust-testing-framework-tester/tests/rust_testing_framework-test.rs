@@ -922,3 +922,46 @@ fn test_multiple_contracts() {
 
     wrapper.write_mandos_output(TEST_MULTIPLE_SC_OUTPUT_PATH);
 }
+
+#[test]
+fn test_wrapper_getters() {
+    let mut wrapper = BlockchainStateWrapper::new();
+    let egld_balance = rust_biguint!(1_000);
+
+    let esdt_token_id = b"ESDT-123456";
+    let esdt_balance = rust_biguint!(100);
+
+    let nft_token_id = b"NFT-123456";
+    let nft_nonce = 5;
+    let nft_balance = rust_biguint!(10);
+    let nft_attributes = NftDummyAttributes {
+        creation_epoch: 2,
+        cool_factor: 100,
+    };
+
+    let user_addr = wrapper.create_user_account(&egld_balance);
+    wrapper.set_esdt_balance(&user_addr, esdt_token_id, &esdt_balance);
+    wrapper.set_nft_balance(
+        &user_addr,
+        nft_token_id,
+        nft_nonce,
+        &nft_balance,
+        &nft_attributes,
+    );
+
+    let actual_egld_balance = wrapper.get_egld_balance(&user_addr);
+    let actual_esdt_balance = wrapper.get_esdt_balance(&user_addr, esdt_token_id, 0);
+    let actual_nft_balance = wrapper.get_esdt_balance(&user_addr, nft_token_id, nft_nonce);
+    let actual_attributes = wrapper
+        .get_nft_attributes::<NftDummyAttributes>(&user_addr, nft_token_id, nft_nonce)
+        .unwrap();
+
+    assert_eq!(egld_balance, actual_egld_balance);
+    assert_eq!(esdt_balance, actual_esdt_balance);
+    assert_eq!(nft_balance, actual_nft_balance);
+    assert_eq!(
+        nft_attributes.creation_epoch,
+        actual_attributes.creation_epoch
+    );
+    assert_eq!(nft_attributes.cool_factor, actual_attributes.cool_factor);
+}
