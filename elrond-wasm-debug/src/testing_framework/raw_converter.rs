@@ -211,7 +211,7 @@ pub(crate) fn account_as_check_state_raw(acc: &AccountData) -> CheckAccountsRaw 
             roles: roles_as_str,
         };
 
-        let token_id_str = bytes_to_mandos_string_or_hex(&token_id);
+        let token_id_str = bytes_to_mandos_string_or_hex(token_id);
         all_check_esdt_raw.insert(token_id_str, CheckEsdtRaw::Full(esdt_check_raw));
     }
 
