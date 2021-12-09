@@ -22,7 +22,7 @@ pub(crate) fn account_as_raw(acc: &AccountData) -> AccountRaw {
 
     let mut all_esdt_raw = BTreeMap::new();
     for (token_id, esdt_data) in acc.esdt.iter() {
-        let token_id_raw = String::from_utf8(token_id.clone()).unwrap();
+        let token_id_raw = bytes_to_mandos_string_or_hex(token_id);
         let esdt_raw = esdt_data_as_raw(esdt_data);
 
         let _ = all_esdt_raw.insert(token_id_raw, esdt_raw);
@@ -81,7 +81,7 @@ pub(crate) fn esdt_data_as_raw(esdt: &EsdtData) -> EsdtRaw {
         instances: instances_raw,
         last_nonce: last_nonce_raw,
         roles: roles_raw,
-        token_identifier: Some(bytes_as_raw(&esdt.token_identifier)),
+        token_identifier: None,
     })
 }
 
@@ -99,7 +99,9 @@ pub(crate) fn tx_call_as_raw(tx_call: &ScCallMandos) -> TxCallRaw {
     let mut all_esdt_raw = Vec::with_capacity(tx_call.esdt.len());
     for esdt in tx_call.esdt.iter() {
         let esdt_raw = TxESDTRaw {
-            token_identifier: Some(bytes_as_raw(&esdt.token_identifier)),
+            token_identifier: Some(ValueSubTree::Str(bytes_to_mandos_string_or_hex(
+                &esdt.token_identifier,
+            ))),
             nonce: Some(u64_as_raw(esdt.nonce)),
             value: rust_biguint_as_raw(&esdt.value),
         };
@@ -209,7 +211,7 @@ pub(crate) fn account_as_check_state_raw(acc: &AccountData) -> CheckAccountsRaw 
             roles: roles_as_str,
         };
 
-        let token_id_str = String::from_utf8(token_id.clone()).unwrap();
+        let token_id_str = bytes_to_mandos_string_or_hex(token_id);
         all_check_esdt_raw.insert(token_id_str, CheckEsdtRaw::Full(esdt_check_raw));
     }
 
