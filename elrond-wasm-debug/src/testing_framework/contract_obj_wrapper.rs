@@ -2,6 +2,7 @@ use std::{collections::HashMap, path::PathBuf, rc::Rc, str::FromStr};
 
 use elrond_wasm::{
     contract_base::{CallableContract, ContractBase},
+    elrond_codec::TopDecode,
     types::{Address, EsdtLocalRole, H256},
 };
 
@@ -634,6 +635,54 @@ impl BlockchainStateWrapper {
                 updates.apply(b_mock_ref);
             },
             StateChange::Revert => {},
+        }
+    }
+}
+
+impl BlockchainStateWrapper {
+    pub fn get_egld_balance(&self, address: &Address) -> num_bigint::BigUint {
+        match self.rc_b_mock.accounts.get(address) {
+            Some(acc) => acc.egld_balance.clone(),
+            None => panic!(
+                "get_egld_balance: Account {:?} does not exist",
+                address_to_hex(address)
+            ),
+        }
+    }
+
+    pub fn get_esdt_balance(
+        &self,
+        address: &Address,
+        token_id: &[u8],
+        token_nonce: u64,
+    ) -> num_bigint::BigUint {
+        match self.rc_b_mock.accounts.get(address) {
+            Some(acc) => acc.esdt.get_esdt_balance(token_id, token_nonce),
+            None => panic!(
+                "get_esdt_balance: Account {:?} does not exist",
+                address_to_hex(address)
+            ),
+        }
+    }
+
+    pub fn get_nft_attributes<T: TopDecode>(
+        &self,
+        address: &Address,
+        token_id: &[u8],
+        token_nonce: u64,
+    ) -> Option<T> {
+        match self.rc_b_mock.accounts.get(address) {
+            Some(acc) => match acc.esdt.get_by_identifier(token_id) {
+                Some(esdt_data) => esdt_data
+                    .instances
+                    .get_by_nonce(token_nonce)
+                    .map(|inst| T::top_decode(inst.metadata.attributes.clone()).unwrap()),
+                None => None,
+            },
+            None => panic!(
+                "get_nft_attributes: Account {:?} does not exist",
+                address_to_hex(address)
+            ),
         }
     }
 }
