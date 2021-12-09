@@ -673,10 +673,10 @@ impl BlockchainStateWrapper {
     ) -> Option<T> {
         match self.rc_b_mock.accounts.get(address) {
             Some(acc) => match acc.esdt.get_by_identifier(token_id) {
-                Some(esdt_data) => match esdt_data.instances.get_by_nonce(token_nonce) {
-                    Some(inst) => Some(T::top_decode(inst.metadata.attributes.clone()).unwrap()),
-                    None => None,
-                },
+                Some(esdt_data) => esdt_data
+                    .instances
+                    .get_by_nonce(token_nonce)
+                    .map(|inst| T::top_decode(inst.metadata.attributes.clone()).unwrap()),
                 None => None,
             },
             None => panic!(
