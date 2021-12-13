@@ -76,6 +76,10 @@ impl LockableStaticBuffer {
         &self.buffer[..self.used_size]
     }
 
+    pub fn as_slice_mut(&mut self) -> &mut [u8] {
+        &mut self.buffer[..self.used_size]
+    }
+
     pub fn load_slice(
         &self,
         starting_position: usize,

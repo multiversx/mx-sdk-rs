@@ -66,7 +66,7 @@ fn test_sort() {
     let mut vec = Vec::<BigUint<DebugApi>>::new();
     let mut managed_vec = ManagedVec::<DebugApi, BigUint<DebugApi>>::new();
     for i in (20u64..=30u64).rev() {
-        let biguint = BigUint::from(i);
+        let biguint = BigUint::<DebugApi>::from(i);
         managed_vec.push(biguint.clone());
         vec.push(biguint);
     }

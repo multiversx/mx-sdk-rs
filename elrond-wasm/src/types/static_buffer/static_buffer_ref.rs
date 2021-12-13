@@ -76,6 +76,10 @@ impl<M: ManagedTypeApi> StaticBufferRef<M> {
         M::instance().with_lockable_static_buffer(|lsb| f(lsb.as_slice()))
     }
 
+    pub fn with_buffer_contents_mut<R, F: FnMut(&mut [u8]) -> R>(&self, mut f: F) -> R {
+        M::instance().with_lockable_static_buffer(|lsb| f(lsb.as_slice_mut()))
+    }
+
     pub fn contents_eq(&self, bytes: &[u8]) -> bool {
         M::instance().with_lockable_static_buffer(|lsb| lsb.as_slice() == bytes)
     }

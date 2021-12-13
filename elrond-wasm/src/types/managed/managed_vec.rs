@@ -2,10 +2,10 @@ use super::{ManagedBuffer, ManagedType, ManagedVecItem, ManagedVecIterator};
 use crate::{
     abi::TypeAbi,
     api::{Handle, InvalidSliceError, ManagedTypeApi},
-    types::{ArgBuffer, BoxedBytes, ManagedBufferNestedDecodeInput},
+    types::{ArgBuffer, BoxedBytes, ManagedBufferNestedDecodeInput, StaticBufferRef},
 };
 use alloc::{string::String, vec::Vec};
-use core::marker::PhantomData;
+use core::{fmt::Debug, marker::PhantomData};
 use elrond_codec::{
     DecodeError, EncodeError, NestedDecode, NestedDecodeInput, NestedEncode, NestedEncodeOutput,
     TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
@@ -204,13 +204,33 @@ where
 impl<M, T> ManagedVec<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem + Ord,
+    T: ManagedVecItem + Debug,
+{
+    pub fn with_self_as_slice<F>(&mut self, mut f: F)
+    where
+        F: FnMut(&mut [T]),
+    {
+        if let Some(static_cache) = StaticBufferRef::try_from_managed_buffer(&self.buffer) {
+            static_cache.with_buffer_contents_mut(|bytes| {
+                let ptr = bytes.as_mut_ptr() as *mut T;
+                let len = bytes.len() / T::PAYLOAD_SIZE;
+                let values = unsafe { core::slice::from_raw_parts_mut(ptr, len) };
+                f(values);
+            });
+        }
+    }
+}
+
+impl<M, T> ManagedVec<M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedVecItem + Ord + Debug,
 {
     pub fn sort(&mut self) {
-        self.with_self_as_vec(|t_vec| t_vec.sort())
+        self.with_self_as_slice(|f| f.sort())
     }
     pub fn sort_unstable(&mut self) {
-        self.with_self_as_vec(|t_vec| t_vec.sort_unstable())
+        self.with_self_as_slice(|f| f.sort_unstable())
     }
 }
 
