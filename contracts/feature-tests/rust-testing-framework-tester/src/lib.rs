@@ -9,6 +9,11 @@ pub struct NftDummyAttributes {
     pub cool_factor: u8,
 }
 
+pub struct StructWithManagedTypes<M: ManagedTypeApi> {
+    pub big_uint: BigUint<M>,
+    pub buffer: ManagedBuffer<M>,
+}
+
 #[elrond_wasm::derive::contract]
 pub trait RustTestingFrameworkTester {
     #[init]
