@@ -1,6 +1,4 @@
-use elrond_wasm::types::{
-    BigUint, EsdtLocalRole, EsdtTokenPayment, ManagedAddress, SCResult, TokenIdentifier,
-};
+use elrond_wasm::types::{EsdtLocalRole, EsdtTokenPayment, SCResult};
 use elrond_wasm_debug::{
     assert_sc_error, managed_address, managed_biguint, managed_token_id, rust_biguint,
     testing_framework::*, tx_mock::TxInputESDT,
