@@ -1,9 +1,10 @@
-use elrond_wasm::types::{EsdtLocalRole, EsdtTokenPayment, SCResult};
+use elrond_wasm::types::{BigInt, EsdtLocalRole, EsdtTokenPayment, SCResult};
 use elrond_wasm_debug::{
     assert_sc_error, managed_address, managed_biguint, managed_token_id, rust_biguint,
     testing_framework::*, tx_mock::TxInputESDT,
 };
 use rust_testing_framework_tester::*;
+use adder::*;
 
 const TEST_OUTPUT_PATH: &'static str = "test.scen.json";
 const TEST_MULTIPLE_SC_OUTPUT_PATH: &'static str = "test_multiple_sc.scen.json";
@@ -919,6 +920,42 @@ fn test_multiple_contracts() {
     );
 
     wrapper.write_mandos_output(TEST_MULTIPLE_SC_OUTPUT_PATH);
+}
+
+// TODO: Fix async calls
+#[should_panic]
+#[test]
+fn test_async_call() {
+    let rust_zero = rust_biguint!(0);
+    let mut wrapper = BlockchainStateWrapper::new();
+    let user_addr = wrapper.create_user_account(&rust_zero);
+    let sc_wrapper = wrapper.create_sc_account(
+        &rust_zero,
+        None,
+        rust_testing_framework_tester::contract_obj,
+        SC_WASM_PATH,
+    );
+    let adder_wrapper =
+        wrapper.create_sc_account(&rust_zero, None, adder::contract_obj, ADDER_WASM_PATH);
+
+    wrapper.execute_tx(&user_addr, &sc_wrapper, &rust_zero, |sc| {
+        let adder_address = managed_address!(adder_wrapper.address_ref());
+        let value_to_add = managed_biguint!(10);
+        sc.call_other_contract_add_async_call(adder_address, value_to_add);
+
+        StateChange::Commit
+    });
+
+    wrapper.execute_query(&sc_wrapper, |sc| {
+        let callback_executed = sc.callback_executed().get();
+        assert!(callback_executed);
+    });
+
+    wrapper.execute_query(&adder_wrapper, |sc| {
+        let current_sum = sc.sum().get();
+        let expected_sum = BigInt::from(10);
+        assert_eq!(current_sum, expected_sum);
+    });
 }
 
 #[test]
