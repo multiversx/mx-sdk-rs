@@ -1,10 +1,10 @@
-use elrond_wasm::types::{BigInt, EsdtLocalRole, EsdtTokenPayment, SCResult};
+use adder::*;
+use elrond_wasm::types::{BigInt, EsdtLocalRole, EsdtTokenPayment, ManagedBuffer, SCResult};
 use elrond_wasm_debug::{
     assert_sc_error, managed_address, managed_biguint, managed_token_id, rust_biguint,
-    testing_framework::*, tx_mock::TxInputESDT,
+    testing_framework::*, tx_mock::TxInputESDT, DebugApi,
 };
 use rust_testing_framework_tester::*;
-use adder::*;
 
 const TEST_OUTPUT_PATH: &'static str = "test.scen.json";
 const TEST_MULTIPLE_SC_OUTPUT_PATH: &'static str = "test_multiple_sc.scen.json";
@@ -999,4 +999,24 @@ fn test_wrapper_getters() {
         actual_attributes.creation_epoch
     );
     assert_eq!(nft_attributes.cool_factor, actual_attributes.cool_factor);
+}
+
+#[test]
+fn managed_environment_test() {
+    let wrapper = BlockchainStateWrapper::new();
+    wrapper.execute_in_managed_environment(|| {
+        let _my_struct = StructWithManagedTypes::<DebugApi> {
+            big_uint: managed_biguint!(500),
+            buffer: ManagedBuffer::new_from_bytes(b"MyBuffer"),
+        };
+    })
+}
+
+#[should_panic]
+#[test]
+fn test_managed_types_without_environment() {
+    let _my_struct = StructWithManagedTypes::<DebugApi> {
+        big_uint: managed_biguint!(500),
+        buffer: ManagedBuffer::new_from_bytes(b"MyBuffer"),
+    };
 }
