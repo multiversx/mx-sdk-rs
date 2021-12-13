@@ -71,6 +71,18 @@ impl NestedDecode for bool {
             _ => exit(c, DecodeError::INVALID_VALUE),
         }
     }
+
+    fn dep_decode_err_closure<I, C, Err>(input: &mut I, err_closure: C) -> Result<Self, Err>
+    where
+        I: NestedDecodeInput,
+        C: Fn(DecodeError) -> Err + Clone,
+    {
+        match input.read_byte_or_err(err_closure.clone())? {
+            0 => Ok(false),
+            1 => Ok(true),
+            _ => Err(err_closure(DecodeError::INVALID_VALUE)),
+        }
+    }
 }
 
 #[cfg(test)]

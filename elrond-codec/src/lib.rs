@@ -1,4 +1,7 @@
 #![no_std]
+#![feature(try_trait_v2)]
+#![feature(never_type)]
+#![feature(exhaustive_patterns)]
 
 extern crate alloc;
 

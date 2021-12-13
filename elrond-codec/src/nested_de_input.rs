@@ -23,6 +23,16 @@ pub trait NestedDecodeInput {
         exit: fn(ExitCtx, DecodeError) -> !,
     );
 
+    fn read_into_or_err<C, Err>(&mut self, into: &mut [u8], err_closure: C) -> Result<(), Err>
+    where
+        C: FnOnce(DecodeError) -> Err,
+    {
+        match self.read_into(into) {
+            Ok(()) => Ok(()),
+            Err(e) => Err(err_closure(e)),
+        }
+    }
+
     #[inline]
     fn read_specialized<T, C, F>(&mut self, _context: C, else_deser: F) -> Result<T, DecodeError>
     where
@@ -66,5 +76,14 @@ pub trait NestedDecodeInput {
         let mut buf = [0u8];
         self.read_into_or_exit(&mut buf[..], c, exit);
         buf[0]
+    }
+
+    fn read_byte_or_err<C, Err>(&mut self, err_closure: C) -> Result<u8, Err>
+    where
+        C: FnOnce(DecodeError) -> Err,
+    {
+        let mut buf = [0u8];
+        self.read_into_or_err(&mut buf[..], err_closure)?;
+        Ok(buf[0])
     }
 }
