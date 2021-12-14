@@ -5,6 +5,7 @@ use crate::{
     finish_all, ArgId, ContractCallArg, DynArg, DynArgInput, DynArgOutput, EndpointResult,
 };
 use alloc::string::String;
+use elrond_codec::TopEncode;
 
 /// Argument or result that is made up of the argument count, followed by the arguments themselves.
 /// Think of it as a `VarArgs` preceded by the count.
@@ -105,7 +106,7 @@ where
         FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static,
     {
         self.len().finish(api.clone());
-        finish_all(api, self.contents.iter());
+        finish_all(api, self.contents.into_iter());
     }
 }
 
@@ -113,6 +114,7 @@ impl<M, T> ContractCallArg for &ManagedCountedMultiResultVec<M, T>
 where
     M: ManagedTypeApi,
     T: ManagedVecItem + ContractCallArg,
+    <T as ManagedVecItem>::ReadOnly: TopEncode,
 {
     fn push_dyn_arg<O: DynArgOutput>(&self, output: &mut O) {
         self.len().push_dyn_arg(output);
