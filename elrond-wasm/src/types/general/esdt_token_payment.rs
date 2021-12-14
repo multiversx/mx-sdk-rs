@@ -77,7 +77,6 @@ impl<M: ManagedTypeApi> ManagedVecItem for EsdtTokenPayment<M> {
     const SKIPS_RESERIALIZATION: bool = false;
 
     fn from_byte_reader<Reader: FnMut(&mut [u8])>(mut reader: Reader) -> Self {
-        // const SELF_PAYLOAD_SIZE: usize = <EsdtTokenPayment<M> as ManagedVecItem>::PAYLOAD_SIZE;
         let mut arr: [u8; 16] = [0u8; 16];
         reader(&mut arr[..]);
         let mut index = 0;
