@@ -35,13 +35,12 @@ fn hex_digit_to_half_byte(digit: u8) -> Option<u8> {
 }
 
 pub fn hex_digits_to_byte(digit1: u8, digit2: u8) -> Option<u8> {
-    let mut result: u8;
-    match hex_digit_to_half_byte(digit1) {
+    let mut result = match hex_digit_to_half_byte(digit1) {
         None => {
             return None;
         },
         Some(num) => {
-            result = num << 4;
+            num << 4
         },
     };
     match hex_digit_to_half_byte(digit2) {
