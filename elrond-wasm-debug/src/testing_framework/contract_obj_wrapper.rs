@@ -637,6 +637,12 @@ impl BlockchainStateWrapper {
             StateChange::Revert => {},
         }
     }
+
+    pub fn execute_in_managed_environment<Func: FnOnce()>(&self, f: Func) {
+        let _ = DebugApi::dummy();
+        f();
+        let _ = TxContextStack::static_pop();
+    }
 }
 
 impl BlockchainStateWrapper {
