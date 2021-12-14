@@ -4,7 +4,13 @@ pub const FEATURE_NOT_SET: u8 = 0;
 pub const FEATURE_ON: u8 = 1;
 pub const FEATURE_OFF: u8 = 2;
 
-/// Standard module for managing feature flags.
+/// This is a standard smart contract module, that when added to a smart contract offers feature flag capabilities.
+///
+/// It offers:
+/// * an endpoint where the owner can turn features on/off
+/// * a method to check if feature is on or not
+/// * a macro to make calling this method even more compact
+///
 #[elrond_wasm::module]
 pub trait FeaturesModule {
     #[storage_get("feat:")]
