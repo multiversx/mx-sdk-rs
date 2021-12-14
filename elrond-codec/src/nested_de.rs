@@ -36,9 +36,7 @@ pub trait NestedDecode: Sized {
         c: ExitCtx,
         exit: fn(ExitCtx, DecodeError) -> !,
     ) -> Self {
-        let result = Self::dep_decode_err_closure(input, |e | {
-            exit(c.clone(), e)
-        });
+        let result = Self::dep_decode_err_closure(input, |e| exit(c.clone(), e));
         if let Ok(t) = result {
             t
         } else {
@@ -67,6 +65,4 @@ pub trait NestedDecode: Sized {
     //         Err(e) => R::from_residual(e),
     //     }
     // }
-
-
 }

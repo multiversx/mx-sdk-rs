@@ -141,6 +141,19 @@ where
         self.decode_index += into.len();
     }
 
+    fn read_into_or_err<C, Err>(&mut self, into: &mut [u8], err_closure: C) -> Result<(), Err>
+    where
+        C: FnOnce(DecodeError) -> Err,
+    {
+        let err_result = self.buffer.load_slice(self.decode_index, into);
+        if err_result.is_ok() {
+            self.decode_index += into.len();
+            Ok(())
+        } else {
+            Err(err_closure(DecodeError::INPUT_TOO_SHORT))
+        }
+    }
+
     #[inline]
     fn read_specialized<T, C, F>(&mut self, context: C, else_deser: F) -> Result<T, DecodeError>
     where

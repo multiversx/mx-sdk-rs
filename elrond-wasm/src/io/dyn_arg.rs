@@ -23,15 +23,11 @@ where
 
         let dyn_arg_vm_api = loader.dyn_arg_vm_api();
         let arg_input = loader.next_arg_input();
-        T::top_decode_or_exit(arg_input, (dyn_arg_vm_api, arg_id), dyn_load_exit)
-    }
-}
 
-#[inline(always)]
-fn dyn_load_exit<EA>(ctx: (EA, ArgId), de_err: DecodeError) -> !
-where
-    EA: ErrorApi + ManagedTypeApi,
-{
-    let (api, arg_id) = ctx;
-    signal_arg_de_error(api, arg_id, de_err)
+        let result = T::top_decode_err_closure(arg_input, |e| -> ! {
+            signal_arg_de_error(dyn_arg_vm_api.clone(), arg_id, e)
+        });
+        let Ok(value) = result;
+        value
+    }
 }
