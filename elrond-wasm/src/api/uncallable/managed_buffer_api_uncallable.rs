@@ -47,6 +47,15 @@ impl ManagedBufferApi for super::UncallableApi {
         unreachable!()
     }
 
+    fn mb_set_slice(
+        &self,
+        _dest_handle: Handle,
+        _starting_position: usize,
+        _source_slice: &[u8],
+    ) -> Result<(), InvalidSliceError> {
+        unreachable!()
+    }
+
     fn mb_append(&self, _accumulator_handle: Handle, _data_handle: Handle) {
         unreachable!()
     }

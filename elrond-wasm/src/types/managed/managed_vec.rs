@@ -1,7 +1,7 @@
 use super::{ManagedBuffer, ManagedType, ManagedVecItem, ManagedVecIterator};
 use crate::{
     abi::TypeAbi,
-    api::{Handle, ManagedTypeApi},
+    api::{Handle, InvalidSliceError, ManagedTypeApi},
     types::{ArgBuffer, BoxedBytes, ManagedBufferNestedDecodeInput},
 };
 use alloc::{string::String, vec::Vec};
@@ -14,7 +14,6 @@ use elrond_codec::{
 /// A list of items that lives inside a managed buffer.
 /// Items can be either stored there in full (e.g. `u32`),
 /// or just via handle (e.g. `BigUint<M>`).
-#[derive(Debug)]
 pub struct ManagedVec<M, T>
 where
     M: ManagedTypeApi,
@@ -128,6 +127,11 @@ where
         }
     }
 
+    pub fn set(&mut self, index: usize, item: &T) -> Result<(), InvalidSliceError> {
+        let byte_index = index * T::PAYLOAD_SIZE;
+        item.to_byte_writer(|slice| self.buffer.set_slice(byte_index, slice))
+    }
+
     pub fn slice(&self, start_index: usize, end_index: usize) -> Option<Self> {
         let byte_start = start_index * T::PAYLOAD_SIZE;
         let byte_end = end_index * T::PAYLOAD_SIZE;
@@ -175,9 +179,9 @@ where
 
     /// Temporarily converts self to a `Vec<T>`.
     /// All operations performed on the temporary vector get saved back to the underlying buffer.
-    pub fn with_self_as_vec<F>(&mut self, f: F)
+    pub fn with_self_as_vec<R, F>(&mut self, f: F) -> R
     where
-        F: FnOnce(&mut Vec<T>),
+        F: FnOnce(&mut Vec<T>) -> R,
     {
         let new = ManagedVec::new();
         let old = core::mem::replace(self, new);
@@ -185,10 +189,11 @@ where
         for item in old.into_iter() {
             temp_vec.push(item);
         }
-        f(&mut temp_vec);
+        let result = f(&mut temp_vec);
         for new_item in temp_vec {
             self.push(new_item);
         }
+        result
     }
 
     pub fn iter(&self) -> ManagedVecIterator<M, T> {
@@ -349,4 +354,18 @@ pub fn managed_vec_from_slice_of_boxed_bytes<M: ManagedTypeApi>(
         result.push(ManagedBuffer::new_from_bytes(boxed_bytes.as_slice()));
     }
     result
+}
+
+impl<M, T> core::fmt::Debug for ManagedVec<M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedVecItem + core::fmt::Debug + Clone,
+{
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        let mut dbg_list = f.debug_list();
+        for item in self.into_iter() {
+            dbg_list.entry(&item);
+        }
+        dbg_list.finish()
+    }
 }

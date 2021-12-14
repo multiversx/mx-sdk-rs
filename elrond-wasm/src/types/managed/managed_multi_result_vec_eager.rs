@@ -54,6 +54,7 @@ where
         self.0.get(index)
     }
 
+    #[allow(clippy::redundant_closure)]
     pub fn slice(&self, start_index: usize, end_index: usize) -> Option<Self> {
         self.0
             .slice(start_index, end_index)

@@ -1,26 +1,29 @@
-use elrond_wasm::types::{
-    BigUint, EsdtLocalRole, EsdtTokenPayment, ManagedAddress, SCResult, TokenIdentifier,
-};
+use adder::*;
+use elrond_wasm::types::{BigInt, EsdtLocalRole, EsdtTokenPayment, ManagedBuffer, SCResult};
 use elrond_wasm_debug::{
     assert_sc_error, managed_address, managed_biguint, managed_token_id, rust_biguint,
-    testing_framework::*, tx_mock::TxInputESDT,
+    testing_framework::*, tx_mock::TxInputESDT, DebugApi,
 };
 use rust_testing_framework_tester::*;
 
 const TEST_OUTPUT_PATH: &'static str = "test.scen.json";
+const TEST_MULTIPLE_SC_OUTPUT_PATH: &'static str = "test_multiple_sc.scen.json";
+const TEST_ESDT_OUTPUT_PATH: &'static str = "test_esdt_generation.scen.json";
+
 const SC_WASM_PATH: &'static str = "output/rust-testing-framework-tester.wasm";
+const ADDER_WASM_PATH: &'static str = "../../examples/adder/output/adder.wasm";
 
 #[test]
 fn test_add() {
-    let mut wrapper = ContractObjWrapper::new();
-    let sc_addr = wrapper.create_sc_account(
+    let mut wrapper = BlockchainStateWrapper::new();
+    let sc_wrapper = wrapper.create_sc_account(
         &rust_biguint!(0),
         None,
         rust_testing_framework_tester::contract_obj,
         SC_WASM_PATH,
     );
 
-    wrapper.execute_query(&sc_addr, |sc| {
+    wrapper.execute_query(&sc_wrapper, |sc| {
         let first = managed_biguint!(1000);
         let second = managed_biguint!(2000);
 
@@ -32,15 +35,15 @@ fn test_add() {
 
 #[test]
 fn test_sc_result_ok() {
-    let mut wrapper = ContractObjWrapper::new();
-    let sc_addr = wrapper.create_sc_account(
+    let mut wrapper = BlockchainStateWrapper::new();
+    let sc_wrapper = wrapper.create_sc_account(
         &rust_biguint!(0),
         None,
         rust_testing_framework_tester::contract_obj,
         SC_WASM_PATH,
     );
 
-    wrapper.execute_query(&sc_addr, |sc| {
+    wrapper.execute_query(&sc_wrapper, |sc| {
         let first = managed_biguint!(1000);
         let second = managed_biguint!(2000);
 
@@ -52,15 +55,15 @@ fn test_sc_result_ok() {
 
 #[test]
 fn test_sc_result_err() {
-    let mut wrapper = ContractObjWrapper::new();
-    let sc_addr = wrapper.create_sc_account(
+    let mut wrapper = BlockchainStateWrapper::new();
+    let sc_wrapper = wrapper.create_sc_account(
         &rust_biguint!(0),
         None,
         rust_testing_framework_tester::contract_obj,
         SC_WASM_PATH,
     );
 
-    wrapper.execute_query(&sc_addr, |sc| {
+    wrapper.execute_query(&sc_wrapper, |sc| {
         let first = managed_biguint!(0);
         let second = managed_biguint!(2000);
 
@@ -71,17 +74,17 @@ fn test_sc_result_err() {
 
 #[test]
 fn test_sc_payment_ok() {
-    let mut wrapper = ContractObjWrapper::new();
+    let mut wrapper = BlockchainStateWrapper::new();
 
     let caller_addr = wrapper.create_user_account(&rust_biguint!(1_000));
-    let sc_addr = wrapper.create_sc_account(
+    let sc_wrapper = wrapper.create_sc_account(
         &rust_biguint!(2_000),
         Some(&caller_addr),
         rust_testing_framework_tester::contract_obj,
         SC_WASM_PATH,
     );
 
-    wrapper = wrapper.execute_tx(&caller_addr, &sc_addr, &rust_biguint!(1_000), |sc| {
+    wrapper.execute_tx(&caller_addr, &sc_wrapper, &rust_biguint!(1_000), |sc| {
         let actual_payment = sc.receive_egld();
         let expected_payment = managed_biguint!(1_000);
         assert_eq!(actual_payment, expected_payment);
@@ -90,22 +93,22 @@ fn test_sc_payment_ok() {
     });
 
     wrapper.check_egld_balance(&caller_addr, &rust_biguint!(0));
-    wrapper.check_egld_balance(&sc_addr, &rust_biguint!(3_000));
+    wrapper.check_egld_balance(sc_wrapper.address_ref(), &rust_biguint!(3_000));
 }
 
 #[test]
 fn test_sc_payment_reverted() {
-    let mut wrapper = ContractObjWrapper::new();
+    let mut wrapper = BlockchainStateWrapper::new();
 
     let caller_addr = wrapper.create_user_account(&rust_biguint!(1_000));
-    let sc_addr = wrapper.create_sc_account(
+    let sc_wrapper = wrapper.create_sc_account(
         &rust_biguint!(2_000),
         Some(&caller_addr),
         rust_testing_framework_tester::contract_obj,
         SC_WASM_PATH,
     );
 
-    wrapper = wrapper.execute_tx(&caller_addr, &sc_addr, &rust_biguint!(1_000), |sc| {
+    wrapper.execute_tx(&caller_addr, &sc_wrapper, &rust_biguint!(1_000), |sc| {
         let actual_payment = sc.receive_egld();
         let expected_payment = managed_biguint!(1_000);
         assert_eq!(actual_payment, expected_payment);
@@ -114,35 +117,35 @@ fn test_sc_payment_reverted() {
     });
 
     wrapper.check_egld_balance(&caller_addr, &rust_biguint!(1_000));
-    wrapper.check_egld_balance(&sc_addr, &rust_biguint!(2_000));
+    wrapper.check_egld_balance(sc_wrapper.address_ref(), &rust_biguint!(2_000));
 }
 
 #[test]
 fn test_sc_half_payment() {
-    let mut wrapper = ContractObjWrapper::new();
+    let mut wrapper = BlockchainStateWrapper::new();
 
     let caller_addr = wrapper.create_user_account(&rust_biguint!(1_000));
-    let sc_addr = wrapper.create_sc_account(
+    let sc_wrapper = wrapper.create_sc_account(
         &rust_biguint!(2_000),
         Some(&caller_addr),
         rust_testing_framework_tester::contract_obj,
         SC_WASM_PATH,
     );
 
-    wrapper = wrapper.execute_tx(&caller_addr, &sc_addr, &rust_biguint!(1_000), |sc| {
+    wrapper.execute_tx(&caller_addr, &sc_wrapper, &rust_biguint!(1_000), |sc| {
         sc.recieve_egld_half();
 
         StateChange::Commit
     });
 
     wrapper.check_egld_balance(&caller_addr, &rust_biguint!(500));
-    wrapper.check_egld_balance(&sc_addr, &rust_biguint!(2_500));
+    wrapper.check_egld_balance(sc_wrapper.address_ref(), &rust_biguint!(2_500));
 }
 
 #[test]
 fn test_esdt_balance() {
-    let mut wrapper = ContractObjWrapper::new();
-    let sc_addr = wrapper.create_sc_account(
+    let mut wrapper = BlockchainStateWrapper::new();
+    let sc_wrapper = wrapper.create_sc_account(
         &rust_biguint!(0),
         None,
         rust_testing_framework_tester::contract_obj,
@@ -150,25 +153,28 @@ fn test_esdt_balance() {
     );
     let token_id = &b"COOL-123456"[..];
 
-    wrapper.set_esdt_balance(&sc_addr, token_id, &rust_biguint!(1_000));
-    wrapper.check_esdt_balance(&sc_addr, token_id, &rust_biguint!(1_000));
+    wrapper.set_esdt_balance(sc_wrapper.address_ref(), token_id, &rust_biguint!(1_000));
+    wrapper.check_esdt_balance(sc_wrapper.address_ref(), token_id, &rust_biguint!(1_000));
 
-    wrapper.execute_query(&sc_addr, |sc| {
+    wrapper.execute_query(&sc_wrapper, |sc| {
         let managed_id = managed_token_id!(token_id);
 
         let actual_balance = sc.get_esdt_balance(managed_id, 0);
         let expected_balance = managed_biguint!(1_000);
         assert_eq!(expected_balance, actual_balance);
     });
+
+    wrapper.add_mandos_check_account(sc_wrapper.address_ref());
+    wrapper.write_mandos_output(TEST_ESDT_OUTPUT_PATH);
 }
 
 #[test]
 fn test_esdt_payment_ok() {
-    let mut wrapper = ContractObjWrapper::new();
+    let mut wrapper = BlockchainStateWrapper::new();
     let rust_zero = rust_biguint!(0);
 
     let caller_addr = wrapper.create_user_account(&rust_zero);
-    let sc_addr = wrapper.create_sc_account(
+    let sc_wrapper = wrapper.create_sc_account(
         &rust_zero,
         None,
         rust_testing_framework_tester::contract_obj,
@@ -177,11 +183,11 @@ fn test_esdt_payment_ok() {
     let token_id = &b"COOL-123456"[..];
 
     wrapper.set_esdt_balance(&caller_addr, token_id, &rust_biguint!(1_000));
-    wrapper.set_esdt_balance(&sc_addr, token_id, &rust_biguint!(2_000));
+    wrapper.set_esdt_balance(sc_wrapper.address_ref(), token_id, &rust_biguint!(2_000));
 
-    wrapper = wrapper.execute_esdt_transfer(
+    wrapper.execute_esdt_transfer(
         &caller_addr,
-        &sc_addr,
+        &sc_wrapper,
         token_id,
         0,
         &rust_biguint!(1_000),
@@ -197,16 +203,16 @@ fn test_esdt_payment_ok() {
     );
 
     wrapper.check_esdt_balance(&caller_addr, token_id, &rust_zero);
-    wrapper.check_esdt_balance(&sc_addr, token_id, &rust_biguint!(3_000));
+    wrapper.check_esdt_balance(sc_wrapper.address_ref(), token_id, &rust_biguint!(3_000));
 }
 
 #[test]
 fn test_esdt_payment_reverted() {
-    let mut wrapper = ContractObjWrapper::new();
+    let mut wrapper = BlockchainStateWrapper::new();
     let rust_zero = rust_biguint!(0);
 
     let caller_addr = wrapper.create_user_account(&rust_zero);
-    let sc_addr = wrapper.create_sc_account(
+    let sc_wrapper = wrapper.create_sc_account(
         &rust_zero,
         None,
         rust_testing_framework_tester::contract_obj,
@@ -215,11 +221,11 @@ fn test_esdt_payment_reverted() {
     let token_id = &b"COOL-123456"[..];
 
     wrapper.set_esdt_balance(&caller_addr, token_id, &rust_biguint!(1_000));
-    wrapper.set_esdt_balance(&sc_addr, token_id, &rust_biguint!(2_000));
+    wrapper.set_esdt_balance(sc_wrapper.address_ref(), token_id, &rust_biguint!(2_000));
 
-    wrapper = wrapper.execute_esdt_transfer(
+    wrapper.execute_esdt_transfer(
         &caller_addr,
-        &sc_addr,
+        &sc_wrapper,
         token_id,
         0,
         &rust_biguint!(1_000),
@@ -235,13 +241,13 @@ fn test_esdt_payment_reverted() {
     );
 
     wrapper.check_esdt_balance(&caller_addr, token_id, &rust_biguint!(1_000));
-    wrapper.check_esdt_balance(&sc_addr, token_id, &rust_biguint!(2_000));
+    wrapper.check_esdt_balance(sc_wrapper.address_ref(), token_id, &rust_biguint!(2_000));
 }
 
 #[test]
 fn test_nft_balance() {
-    let mut wrapper = ContractObjWrapper::new();
-    let sc_addr = wrapper.create_sc_account(
+    let mut wrapper = BlockchainStateWrapper::new();
+    let sc_wrapper = wrapper.create_sc_account(
         &rust_biguint!(0),
         None,
         rust_testing_framework_tester::contract_obj,
@@ -255,10 +261,22 @@ fn test_nft_balance() {
         cool_factor: 101,
     };
 
-    wrapper.set_nft_balance(&sc_addr, token_id, nft_nonce, &nft_balance, &nft_attributes);
-    wrapper.check_nft_balance(&sc_addr, token_id, nft_nonce, &nft_balance, &nft_attributes);
+    wrapper.set_nft_balance(
+        sc_wrapper.address_ref(),
+        token_id,
+        nft_nonce,
+        &nft_balance,
+        &nft_attributes,
+    );
+    wrapper.check_nft_balance(
+        sc_wrapper.address_ref(),
+        token_id,
+        nft_nonce,
+        &nft_balance,
+        &nft_attributes,
+    );
 
-    wrapper.execute_query(&sc_addr, |sc| {
+    wrapper.execute_query(&sc_wrapper, |sc| {
         let managed_id = managed_token_id!(token_id);
 
         let actual_balance = sc.get_esdt_balance(managed_id, nft_nonce);
@@ -269,9 +287,9 @@ fn test_nft_balance() {
 
 #[test]
 fn test_sc_send_nft_to_user() {
-    let mut wrapper = ContractObjWrapper::new();
+    let mut wrapper = BlockchainStateWrapper::new();
     let caller_addr = wrapper.create_user_account(&rust_biguint!(0));
-    let sc_addr = wrapper.create_sc_account(
+    let sc_wrapper = wrapper.create_sc_account(
         &rust_biguint!(0),
         None,
         rust_testing_framework_tester::contract_obj,
@@ -285,10 +303,22 @@ fn test_sc_send_nft_to_user() {
         cool_factor: 101,
     };
 
-    wrapper.set_nft_balance(&sc_addr, token_id, nft_nonce, &nft_balance, &nft_attributes);
-    wrapper.check_nft_balance(&sc_addr, token_id, nft_nonce, &nft_balance, &nft_attributes);
+    wrapper.set_nft_balance(
+        sc_wrapper.address_ref(),
+        token_id,
+        nft_nonce,
+        &nft_balance,
+        &nft_attributes,
+    );
+    wrapper.check_nft_balance(
+        sc_wrapper.address_ref(),
+        token_id,
+        nft_nonce,
+        &nft_balance,
+        &nft_attributes,
+    );
 
-    wrapper = wrapper.execute_tx(&caller_addr, &sc_addr, &rust_biguint!(0), |sc| {
+    wrapper.execute_tx(&caller_addr, &sc_wrapper, &rust_biguint!(0), |sc| {
         let managed_addr = managed_address!(&caller_addr);
         let managed_id = managed_token_id!(token_id);
         let managed_amt = managed_biguint!(400);
@@ -305,7 +335,7 @@ fn test_sc_send_nft_to_user() {
         &nft_attributes,
     );
     wrapper.check_nft_balance(
-        &sc_addr,
+        sc_wrapper.address_ref(),
         token_id,
         nft_nonce,
         &rust_biguint!(600),
@@ -315,9 +345,9 @@ fn test_sc_send_nft_to_user() {
 
 #[test]
 fn test_sc_esdt_mint_burn() {
-    let mut wrapper = ContractObjWrapper::new();
+    let mut wrapper = BlockchainStateWrapper::new();
     let caller_addr = wrapper.create_user_account(&rust_biguint!(0));
-    let sc_addr = wrapper.create_sc_account(
+    let sc_wrapper = wrapper.create_sc_account(
         &rust_biguint!(0),
         None,
         rust_testing_framework_tester::contract_obj,
@@ -326,12 +356,12 @@ fn test_sc_esdt_mint_burn() {
     let token_id = &b"COOL-123456"[..];
 
     wrapper.set_esdt_local_roles(
-        &sc_addr,
+        sc_wrapper.address_ref(),
         token_id,
         &[EsdtLocalRole::Mint, EsdtLocalRole::Burn][..],
     );
 
-    wrapper = wrapper.execute_tx(&caller_addr, &sc_addr, &rust_biguint!(0), |sc| {
+    wrapper.execute_tx(&caller_addr, &sc_wrapper, &rust_biguint!(0), |sc| {
         let managed_id = managed_token_id!(token_id);
         let managed_amt = managed_biguint!(400);
         sc.mint_esdt(managed_id, 0, managed_amt);
@@ -339,9 +369,9 @@ fn test_sc_esdt_mint_burn() {
         StateChange::Commit
     });
 
-    wrapper.check_esdt_balance(&sc_addr, token_id, &rust_biguint!(400));
+    wrapper.check_esdt_balance(sc_wrapper.address_ref(), token_id, &rust_biguint!(400));
 
-    wrapper = wrapper.execute_tx(&caller_addr, &sc_addr, &rust_biguint!(0), |sc| {
+    wrapper.execute_tx(&caller_addr, &sc_wrapper, &rust_biguint!(0), |sc| {
         let managed_id = managed_token_id!(token_id);
         let managed_amt = managed_biguint!(100);
         sc.burn_esdt(managed_id, 0, managed_amt);
@@ -349,14 +379,14 @@ fn test_sc_esdt_mint_burn() {
         StateChange::Commit
     });
 
-    wrapper.check_esdt_balance(&sc_addr, token_id, &rust_biguint!(300));
+    wrapper.check_esdt_balance(sc_wrapper.address_ref(), token_id, &rust_biguint!(300));
 }
 
 #[test]
 fn test_sc_nft() {
-    let mut wrapper = ContractObjWrapper::new();
+    let mut wrapper = BlockchainStateWrapper::new();
     let caller_addr = wrapper.create_user_account(&rust_biguint!(0));
-    let sc_addr = wrapper.create_sc_account(
+    let sc_wrapper = wrapper.create_sc_account(
         &rust_biguint!(0),
         None,
         rust_testing_framework_tester::contract_obj,
@@ -369,7 +399,7 @@ fn test_sc_nft() {
     };
 
     wrapper.set_esdt_local_roles(
-        &sc_addr,
+        sc_wrapper.address_ref(),
         token_id,
         &[
             EsdtLocalRole::NftCreate,
@@ -378,7 +408,7 @@ fn test_sc_nft() {
         ][..],
     );
 
-    wrapper = wrapper.execute_tx(&caller_addr, &sc_addr, &rust_biguint!(0), |sc| {
+    wrapper.execute_tx(&caller_addr, &sc_wrapper, &rust_biguint!(0), |sc| {
         let managed_id = managed_token_id!(token_id);
         let managed_amt = managed_biguint!(100);
 
@@ -395,10 +425,22 @@ fn test_sc_nft() {
         StateChange::Commit
     });
 
-    wrapper.check_nft_balance(&sc_addr, token_id, 1, &rust_biguint!(100), &nft_attributes);
-    wrapper.check_nft_balance(&sc_addr, token_id, 2, &rust_biguint!(100), &nft_attributes);
+    wrapper.check_nft_balance(
+        sc_wrapper.address_ref(),
+        token_id,
+        1,
+        &rust_biguint!(100),
+        &nft_attributes,
+    );
+    wrapper.check_nft_balance(
+        sc_wrapper.address_ref(),
+        token_id,
+        2,
+        &rust_biguint!(100),
+        &nft_attributes,
+    );
 
-    wrapper = wrapper.execute_tx(&caller_addr, &sc_addr, &rust_biguint!(0), |sc| {
+    wrapper.execute_tx(&caller_addr, &sc_wrapper, &rust_biguint!(0), |sc| {
         let managed_id = managed_token_id!(token_id);
         let managed_amt = managed_biguint!(100);
         sc.mint_esdt(managed_id, 1, managed_amt);
@@ -406,10 +448,22 @@ fn test_sc_nft() {
         StateChange::Commit
     });
 
-    wrapper.check_nft_balance(&sc_addr, token_id, 1, &rust_biguint!(200), &nft_attributes);
-    wrapper.check_nft_balance(&sc_addr, token_id, 2, &rust_biguint!(100), &nft_attributes);
+    wrapper.check_nft_balance(
+        sc_wrapper.address_ref(),
+        token_id,
+        1,
+        &rust_biguint!(200),
+        &nft_attributes,
+    );
+    wrapper.check_nft_balance(
+        sc_wrapper.address_ref(),
+        token_id,
+        2,
+        &rust_biguint!(100),
+        &nft_attributes,
+    );
 
-    wrapper = wrapper.execute_tx(&caller_addr, &sc_addr, &rust_biguint!(0), |sc| {
+    wrapper.execute_tx(&caller_addr, &sc_wrapper, &rust_biguint!(0), |sc| {
         let managed_id = managed_token_id!(token_id);
         let managed_amt = managed_biguint!(50);
         sc.burn_esdt(managed_id, 2, managed_amt);
@@ -417,15 +471,27 @@ fn test_sc_nft() {
         StateChange::Commit
     });
 
-    wrapper.check_nft_balance(&sc_addr, token_id, 1, &rust_biguint!(200), &nft_attributes);
-    wrapper.check_nft_balance(&sc_addr, token_id, 2, &rust_biguint!(50), &nft_attributes);
+    wrapper.check_nft_balance(
+        sc_wrapper.address_ref(),
+        token_id,
+        1,
+        &rust_biguint!(200),
+        &nft_attributes,
+    );
+    wrapper.check_nft_balance(
+        sc_wrapper.address_ref(),
+        token_id,
+        2,
+        &rust_biguint!(50),
+        &nft_attributes,
+    );
 }
 
 #[test]
 fn test_esdt_multi_transfer() {
-    let mut wrapper = ContractObjWrapper::new();
+    let mut wrapper = BlockchainStateWrapper::new();
     let caller_addr = wrapper.create_user_account(&rust_biguint!(0));
-    let sc_addr = wrapper.create_sc_account(
+    let sc_wrapper = wrapper.create_sc_account(
         &rust_biguint!(0),
         None,
         rust_testing_framework_tester::contract_obj,
@@ -451,7 +517,7 @@ fn test_esdt_multi_transfer() {
         },
     ];
 
-    wrapper = wrapper.execute_esdt_multi_transfer(&caller_addr, &sc_addr, &transfers, |sc| {
+    wrapper.execute_esdt_multi_transfer(&caller_addr, &sc_wrapper, &transfers, |sc| {
         let mut expected_transfers = Vec::new();
         expected_transfers.push(EsdtTokenPayment::new(
             managed_token_id!(token_id_1),
@@ -488,21 +554,27 @@ fn test_esdt_multi_transfer() {
         StateChange::Commit
     });
 
-    wrapper.check_esdt_balance(&sc_addr, token_id_1, &rust_biguint!(100));
-    wrapper.check_nft_balance(&sc_addr, token_id_2, nft_nonce, &rust_biguint!(1), &());
+    wrapper.check_esdt_balance(sc_wrapper.address_ref(), token_id_1, &rust_biguint!(100));
+    wrapper.check_nft_balance(
+        sc_wrapper.address_ref(),
+        token_id_2,
+        nft_nonce,
+        &rust_biguint!(1),
+        &(),
+    );
 }
 
 #[test]
 fn test_query() {
-    let mut wrapper = ContractObjWrapper::new();
-    let sc_addr = wrapper.create_sc_account(
+    let mut wrapper = BlockchainStateWrapper::new();
+    let sc_wrapper = wrapper.create_sc_account(
         &rust_biguint!(2_000),
         None,
         rust_testing_framework_tester::contract_obj,
         SC_WASM_PATH,
     );
 
-    let _ = wrapper.execute_query(&sc_addr, |sc| {
+    let _ = wrapper.execute_query(&sc_wrapper, |sc| {
         let actual_balance = sc.get_egld_balance();
         let expected_balance = managed_biguint!(2_000);
         assert_eq!(actual_balance, expected_balance);
@@ -512,9 +584,9 @@ fn test_query() {
 #[test]
 fn storage_check_test() {
     let rust_zero = rust_biguint!(0);
-    let mut wrapper = ContractObjWrapper::new();
+    let mut wrapper = BlockchainStateWrapper::new();
     let user_addr = wrapper.create_user_account(&rust_zero);
-    let sc_addr = wrapper.create_sc_account(
+    let sc_wrapper = wrapper.create_sc_account(
         &rust_zero,
         None,
         rust_testing_framework_tester::contract_obj,
@@ -522,13 +594,13 @@ fn storage_check_test() {
     );
 
     // simulate deploy
-    wrapper = wrapper.execute_tx(&user_addr, &sc_addr, &rust_zero, |sc| {
+    wrapper.execute_tx(&user_addr, &sc_wrapper, &rust_zero, |sc| {
         sc.init();
 
         StateChange::Commit
     });
 
-    wrapper = wrapper.execute_tx(&user_addr, &sc_addr, &rust_zero, |sc| {
+    wrapper.execute_tx(&user_addr, &sc_wrapper, &rust_zero, |sc| {
         let total_before = sc.total_value().get();
         let per_caller_before = sc.value_per_caller(&managed_address!(&user_addr)).get();
 
@@ -550,7 +622,7 @@ fn storage_check_test() {
         StateChange::Commit
     });
 
-    wrapper.execute_query(&sc_addr, |sc| {
+    wrapper.execute_query(&sc_wrapper, |sc| {
         let expected_total = managed_biguint!(51);
         let expected_per_caller = managed_biguint!(50);
 
@@ -565,9 +637,9 @@ fn storage_check_test() {
 #[test]
 fn storage_revert_test() {
     let rust_zero = rust_biguint!(0);
-    let mut wrapper = ContractObjWrapper::new();
+    let mut wrapper = BlockchainStateWrapper::new();
     let user_addr = wrapper.create_user_account(&rust_zero);
-    let sc_addr = wrapper.create_sc_account(
+    let sc_wrapper = wrapper.create_sc_account(
         &rust_zero,
         None,
         rust_testing_framework_tester::contract_obj,
@@ -575,13 +647,13 @@ fn storage_revert_test() {
     );
 
     // simulate deploy
-    wrapper = wrapper.execute_tx(&user_addr, &sc_addr, &rust_zero, |sc| {
+    wrapper.execute_tx(&user_addr, &sc_wrapper, &rust_zero, |sc| {
         sc.init();
 
         StateChange::Commit
     });
 
-    wrapper = wrapper.execute_tx(&user_addr, &sc_addr, &rust_zero, |sc| {
+    wrapper.execute_tx(&user_addr, &sc_wrapper, &rust_zero, |sc| {
         let total_before = sc.total_value().get();
         let per_caller_before = sc.value_per_caller(&managed_address!(&user_addr)).get();
 
@@ -603,7 +675,7 @@ fn storage_revert_test() {
         StateChange::Revert
     });
 
-    wrapper.execute_query(&sc_addr, |sc| {
+    wrapper.execute_query(&sc_wrapper, |sc| {
         let expected_total = managed_biguint!(1);
         let expected_per_caller = managed_biguint!(0);
 
@@ -618,9 +690,9 @@ fn storage_revert_test() {
 #[test]
 fn storage_set_test() {
     let rust_zero = rust_biguint!(0);
-    let mut wrapper = ContractObjWrapper::new();
+    let mut wrapper = BlockchainStateWrapper::new();
     let user_addr = wrapper.create_user_account(&rust_zero);
-    let sc_addr = wrapper.create_sc_account(
+    let sc_wrapper = wrapper.create_sc_account(
         &rust_zero,
         None,
         rust_testing_framework_tester::contract_obj,
@@ -628,13 +700,13 @@ fn storage_set_test() {
     );
 
     // simulate deploy
-    wrapper = wrapper.execute_tx(&user_addr, &sc_addr, &rust_zero, |sc| {
+    wrapper.execute_tx(&user_addr, &sc_wrapper, &rust_zero, |sc| {
         sc.init();
 
         StateChange::Commit
     });
 
-    wrapper = wrapper.execute_tx(&user_addr, &sc_addr, &rust_zero, |sc| {
+    wrapper.execute_tx(&user_addr, &sc_wrapper, &rust_zero, |sc| {
         sc.total_value().set(&managed_biguint!(50));
         sc.value_per_caller(&managed_address!(&user_addr))
             .set(&managed_biguint!(50));
@@ -642,7 +714,7 @@ fn storage_set_test() {
         StateChange::Commit
     });
 
-    wrapper.execute_query(&sc_addr, |sc| {
+    wrapper.execute_query(&sc_wrapper, |sc| {
         let expected_value = managed_biguint!(50);
 
         let actual_total = sc.total_value().get();
@@ -656,8 +728,8 @@ fn storage_set_test() {
 #[test]
 fn blockchain_state_test() {
     let rust_zero = rust_biguint!(0);
-    let mut wrapper = ContractObjWrapper::new();
-    let sc_addr = wrapper.create_sc_account(
+    let mut wrapper = BlockchainStateWrapper::new();
+    let sc_wrapper = wrapper.create_sc_account(
         &rust_zero,
         None,
         rust_testing_framework_tester::contract_obj,
@@ -672,7 +744,7 @@ fn blockchain_state_test() {
     wrapper.set_block_nonce(expected_nonce);
     wrapper.set_block_timestamp(expected_timestamp);
 
-    wrapper.execute_query(&sc_addr, |sc| {
+    wrapper.execute_query(&sc_wrapper, |sc| {
         let actual_epoch = sc.get_block_epoch();
         let actual_nonce = sc.get_block_nonce();
         let actual_timestamp = sc.get_block_timestamp();
@@ -686,30 +758,32 @@ fn blockchain_state_test() {
 #[test]
 fn execute_on_dest_context_query_test() {
     let rust_zero = rust_biguint!(0);
-    let mut wrapper = ContractObjWrapper::new();
+    let mut wrapper = BlockchainStateWrapper::new();
     let user_addr = wrapper.create_user_account(&rust_zero);
-    let sc_addr = wrapper.create_sc_account(
+    let sc_wrapper = wrapper.create_sc_account(
         &rust_zero,
         None,
         rust_testing_framework_tester::contract_obj,
         SC_WASM_PATH,
     );
-    let other_sc_addr = wrapper.create_sc_account(
+    let other_sc_wrapper = wrapper.create_sc_account(
         &rust_zero,
         None,
         rust_testing_framework_tester::contract_obj,
         SC_WASM_PATH,
     );
 
-    wrapper = wrapper.execute_tx(&user_addr, &other_sc_addr, &rust_zero, |sc| {
+    wrapper.execute_tx(&user_addr, &other_sc_wrapper, &rust_zero, |sc| {
         sc.total_value().set(&managed_biguint!(5));
         StateChange::Commit
     });
 
-    wrapper.execute_query(&sc_addr, |sc| {
+    wrapper.execute_query(&sc_wrapper, |sc| {
         let expected_result = managed_biguint!(5);
         let actual_result =
-            sc.call_other_contract_execute_on_dest(managed_address!(&other_sc_addr));
+            sc.call_other_contract_execute_on_dest(managed_address!(&other_sc_wrapper
+                .address_ref()
+                .clone()));
 
         assert_eq!(expected_result, actual_result);
     });
@@ -718,32 +792,35 @@ fn execute_on_dest_context_query_test() {
 #[test]
 fn execute_on_dest_context_change_state_test() {
     let rust_zero = rust_biguint!(0);
-    let mut wrapper = ContractObjWrapper::new();
+    let mut wrapper = BlockchainStateWrapper::new();
     let user_addr = wrapper.create_user_account(&rust_zero);
-    let sc_addr = wrapper.create_sc_account(
+    let sc_wrapper = wrapper.create_sc_account(
         &rust_zero,
         None,
         rust_testing_framework_tester::contract_obj,
         SC_WASM_PATH,
     );
-    let other_sc_addr = wrapper.create_sc_account(
+    let other_sc_wrapper = wrapper.create_sc_account(
         &rust_zero,
         None,
         rust_testing_framework_tester::contract_obj,
         SC_WASM_PATH,
     );
 
-    wrapper = wrapper.execute_tx(&user_addr, &other_sc_addr, &rust_zero, |sc| {
+    wrapper.execute_tx(&user_addr, &other_sc_wrapper, &rust_zero, |sc| {
         sc.total_value().set(&managed_biguint!(5));
         StateChange::Commit
     });
 
-    wrapper = wrapper.execute_tx(&user_addr, &sc_addr, &rust_zero, |sc| {
-        sc.execute_on_dest_add_value(managed_address!(&other_sc_addr), managed_biguint!(5));
+    wrapper.execute_tx(&user_addr, &sc_wrapper, &rust_zero, |sc| {
+        sc.execute_on_dest_add_value(
+            managed_address!(&other_sc_wrapper.address_ref().clone()),
+            managed_biguint!(5),
+        );
         StateChange::Commit
     });
 
-    wrapper.execute_query(&other_sc_addr, |sc| {
+    wrapper.execute_query(&other_sc_wrapper, |sc| {
         let expected_result = managed_biguint!(10);
         let actual_result = sc.get_val();
 
@@ -754,28 +831,37 @@ fn execute_on_dest_context_change_state_test() {
 #[test]
 fn test_mandos_generation() {
     let rust_zero = rust_biguint!(0);
-    let mut wrapper = ContractObjWrapper::new();
+    let mut wrapper = BlockchainStateWrapper::new();
     let user_addr = wrapper.create_user_account(&rust_zero);
-    let sc_addr = wrapper.create_sc_account(
+    let sc_wrapper = wrapper.create_sc_account(
         &rust_zero,
         None,
         rust_testing_framework_tester::contract_obj,
         SC_WASM_PATH,
     );
 
+    // simulate deploy
+    wrapper.execute_tx(&user_addr, &sc_wrapper, &rust_zero, |sc| {
+        sc.init();
+
+        StateChange::Commit
+    });
+    wrapper.add_mandos_set_account(sc_wrapper.address_ref());
+    wrapper.add_mandos_check_account(sc_wrapper.address_ref());
+
     let add_value = rust_biguint!(50);
-    let mut sc_call_mandos = ScCallMandos::new(&user_addr, &sc_addr, "addValue");
+    let mut sc_call_mandos = ScCallMandos::new(&user_addr, sc_wrapper.address_ref(), "addValue");
     sc_call_mandos.add_argument(&add_value.to_bytes_be());
     sc_call_mandos.set_gas_limit(100_000_000);
 
     let tx_expect = TxExpectMandos::new(0);
     wrapper.add_mandos_sc_call(sc_call_mandos, Some(tx_expect));
 
-    wrapper = wrapper.execute_tx(&user_addr, &sc_addr, &rust_zero, |sc| {
+    wrapper.execute_tx(&user_addr, &sc_wrapper, &rust_zero, |sc| {
         let total_before = sc.total_value().get();
         let per_caller_before = sc.value_per_caller(&managed_address!(&user_addr)).get();
 
-        assert_eq!(total_before, managed_biguint!(0));
+        assert_eq!(total_before, managed_biguint!(1));
         assert_eq!(per_caller_before, managed_biguint!(0));
 
         let added_value = managed_biguint!(50);
@@ -792,17 +878,18 @@ fn test_mandos_generation() {
 
         StateChange::Commit
     });
+    wrapper.add_mandos_check_account(sc_wrapper.address_ref());
 
-    let expected_value = rust_biguint!(50);
-    let sc_query_mandos = ScQueryMandos::new(&sc_addr, "getTotalValue");
+    let expected_value = rust_biguint!(51);
+    let sc_query_mandos = ScQueryMandos::new(sc_wrapper.address_ref(), "getTotalValue");
 
     let mut query_expect = TxExpectMandos::new(0);
     query_expect.add_out_value(&expected_value.to_bytes_be());
 
     wrapper.add_mandos_sc_query(sc_query_mandos, Some(query_expect));
 
-    wrapper = wrapper.execute_query(&sc_addr, |sc| {
-        let expected_total = managed_biguint!(50);
+    wrapper.execute_query(&sc_wrapper, |sc| {
+        let expected_total = managed_biguint!(51);
         let expected_per_caller = managed_biguint!(50);
 
         let actual_total = sc.total_value().get();
@@ -813,4 +900,123 @@ fn test_mandos_generation() {
     });
 
     wrapper.write_mandos_output(TEST_OUTPUT_PATH);
+}
+
+#[test]
+fn test_multiple_contracts() {
+    let mut wrapper = BlockchainStateWrapper::new();
+    let _sc_wrapper = wrapper.create_sc_account(
+        &rust_biguint!(0u64),
+        None,
+        rust_testing_framework_tester::contract_obj,
+        SC_WASM_PATH,
+    );
+
+    let _sc_wrapper_other = wrapper.create_sc_account(
+        &rust_biguint!(0u64),
+        None,
+        adder::contract_obj,
+        ADDER_WASM_PATH,
+    );
+
+    wrapper.write_mandos_output(TEST_MULTIPLE_SC_OUTPUT_PATH);
+}
+
+// TODO: Fix async calls
+#[should_panic]
+#[test]
+fn test_async_call() {
+    let rust_zero = rust_biguint!(0);
+    let mut wrapper = BlockchainStateWrapper::new();
+    let user_addr = wrapper.create_user_account(&rust_zero);
+    let sc_wrapper = wrapper.create_sc_account(
+        &rust_zero,
+        None,
+        rust_testing_framework_tester::contract_obj,
+        SC_WASM_PATH,
+    );
+    let adder_wrapper =
+        wrapper.create_sc_account(&rust_zero, None, adder::contract_obj, ADDER_WASM_PATH);
+
+    wrapper.execute_tx(&user_addr, &sc_wrapper, &rust_zero, |sc| {
+        let adder_address = managed_address!(adder_wrapper.address_ref());
+        let value_to_add = managed_biguint!(10);
+        sc.call_other_contract_add_async_call(adder_address, value_to_add);
+
+        StateChange::Commit
+    });
+
+    wrapper.execute_query(&sc_wrapper, |sc| {
+        let callback_executed = sc.callback_executed().get();
+        assert!(callback_executed);
+    });
+
+    wrapper.execute_query(&adder_wrapper, |sc| {
+        let current_sum = sc.sum().get();
+        let expected_sum = BigInt::from(10);
+        assert_eq!(current_sum, expected_sum);
+    });
+}
+
+#[test]
+fn test_wrapper_getters() {
+    let mut wrapper = BlockchainStateWrapper::new();
+    let egld_balance = rust_biguint!(1_000);
+
+    let esdt_token_id = b"ESDT-123456";
+    let esdt_balance = rust_biguint!(100);
+
+    let nft_token_id = b"NFT-123456";
+    let nft_nonce = 5;
+    let nft_balance = rust_biguint!(10);
+    let nft_attributes = NftDummyAttributes {
+        creation_epoch: 2,
+        cool_factor: 100,
+    };
+
+    let user_addr = wrapper.create_user_account(&egld_balance);
+    wrapper.set_esdt_balance(&user_addr, esdt_token_id, &esdt_balance);
+    wrapper.set_nft_balance(
+        &user_addr,
+        nft_token_id,
+        nft_nonce,
+        &nft_balance,
+        &nft_attributes,
+    );
+
+    let actual_egld_balance = wrapper.get_egld_balance(&user_addr);
+    let actual_esdt_balance = wrapper.get_esdt_balance(&user_addr, esdt_token_id, 0);
+    let actual_nft_balance = wrapper.get_esdt_balance(&user_addr, nft_token_id, nft_nonce);
+    let actual_attributes = wrapper
+        .get_nft_attributes::<NftDummyAttributes>(&user_addr, nft_token_id, nft_nonce)
+        .unwrap();
+
+    assert_eq!(egld_balance, actual_egld_balance);
+    assert_eq!(esdt_balance, actual_esdt_balance);
+    assert_eq!(nft_balance, actual_nft_balance);
+    assert_eq!(
+        nft_attributes.creation_epoch,
+        actual_attributes.creation_epoch
+    );
+    assert_eq!(nft_attributes.cool_factor, actual_attributes.cool_factor);
+}
+
+#[test]
+fn managed_environment_test() {
+    let wrapper = BlockchainStateWrapper::new();
+    wrapper.execute_in_managed_environment(|| {
+        let _my_struct = StructWithManagedTypes::<DebugApi> {
+            big_uint: managed_biguint!(500),
+            buffer: ManagedBuffer::new_from_bytes(b"MyBuffer"),
+        };
+    })
+}
+
+#[should_panic]
+#[test]
+fn test_managed_types_without_environment() {
+    let _my_struct = StructWithManagedTypes::<DebugApi> {
+        big_uint: managed_biguint!(500),
+        buffer: ManagedBuffer::new_from_bytes(b"MyBuffer"),
+    };
 }
