@@ -9,6 +9,11 @@ pub struct NftDummyAttributes {
     pub cool_factor: u8,
 }
 
+pub struct StructWithManagedTypes<M: ManagedTypeApi> {
+    pub big_uint: BigUint<M>,
+    pub buffer: ManagedBuffer<M>,
+}
+
 #[elrond_wasm::derive::contract]
 pub trait RustTestingFrameworkTester {
     #[init]
@@ -152,6 +157,24 @@ pub trait RustTestingFrameworkTester {
         BigUint::from(raw_value.parse_as_u64().unwrap_or_default())
     }
 
+    #[endpoint]
+    fn call_other_contract_add_async_call(&self, other_sc_address: ManagedAddress, value: BigUint) {
+        let mut args = ManagedArgBuffer::new_empty();
+        args.push_arg(&value);
+
+        self.raw_vm_api().async_call_raw(
+            &other_sc_address,
+            &BigUint::zero(),
+            &ManagedBuffer::new_from_bytes(b"add"),
+            &args,
+        );
+    }
+
+    #[callback_raw]
+    fn callback_raw(&self) {
+        self.callback_executed().set(&true);
+    }
+
     #[endpoint(getTotalValue)]
     fn get_total_value(&self) -> BigUint {
         self.total_value().get()
@@ -188,4 +211,7 @@ pub trait RustTestingFrameworkTester {
 
     #[storage_mapper("valuePerCaller")]
     fn value_per_caller(&self, caller: &ManagedAddress) -> SingleValueMapper<BigUint>;
+
+    #[storage_mapper("callbackExecuted")]
+    fn callback_executed(&self) -> SingleValueMapper<bool>;
 }
