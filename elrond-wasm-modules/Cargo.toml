@@ -3,13 +3,13 @@ name = "elrond-wasm-modules"
 version = "0.24.0"
 edition = "2018"
 
-authors = ["Andrei Marinica <andrei.marinica@elrond.com>", "Elrond Network <contact@elrond.com>"]
+authors = ["Elrond Network <contact@elrond.com>"]
 license = "GPL-3.0-only"
 readme = "README.md"
 repository = "https://github.com/ElrondNetwork/elrond-wasm-rs"
 homepage = "https://elrond.com/"
 documentation = "https://docs.elrond.com/"
-description = "Elrond WebAssembly smart contract module for adding feature flags"
+description = "Elrond WebAssembly standard smart contract modules"
 keywords = ["elrond", "wasm", "webassembly", "blockchain", "contract"]
 categories = ["no-std", "wasm", "cryptography::cryptocurrencies"]
 
