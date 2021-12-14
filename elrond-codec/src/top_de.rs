@@ -39,6 +39,17 @@ pub trait TopDecode: Sized {
         }
     }
 
+    fn top_decode_err_closure<I, C, Err>(input: I, err_closure: C) -> Result<Self, Err>
+    where
+        I: TopDecodeInput,
+        C: Fn(DecodeError) -> Err + Clone,
+    {
+        match Self::top_decode(input) {
+            Ok(v) => Ok(v),
+            Err(e) => Err(err_closure(e)),
+        }
+    }
+
     /// Allows types to provide optimized implementations for their boxed version.
     /// Especially designed for byte arrays that can be transmuted directly from the input sometimes.
     #[doc(hidden)]
