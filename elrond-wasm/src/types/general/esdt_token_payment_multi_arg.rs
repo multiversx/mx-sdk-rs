@@ -33,10 +33,16 @@ impl<M: ManagedTypeApi> EsdtTokenPaymentMultiArg<M> {
 impl<M: ManagedTypeApi> ManagedVecItem for EsdtTokenPaymentMultiArg<M> {
     const PAYLOAD_SIZE: usize = EsdtTokenPayment::<M>::PAYLOAD_SIZE;
     const SKIPS_RESERIALIZATION: bool = EsdtTokenPayment::<M>::SKIPS_RESERIALIZATION;
+    type ReadOnly = Self;
 
     #[inline]
     fn from_byte_reader<Reader: FnMut(&mut [u8])>(reader: Reader) -> Self {
         EsdtTokenPayment::from_byte_reader(reader).into()
+    }
+
+    #[inline]
+    fn from_byte_reader_as_read_only<Reader: FnMut(&mut [u8])>(reader: Reader) -> Self::ReadOnly {
+        Self::from_byte_reader(reader)
     }
 
     #[inline]
