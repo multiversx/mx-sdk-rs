@@ -56,6 +56,10 @@ impl ManagedBufferApi for super::UncallableApi {
         unreachable!()
     }
 
+    fn mb_set_random(&self, _dest_handle: Handle, _length: usize) {
+        unreachable!()
+    }
+
     fn mb_append(&self, _accumulator_handle: Handle, _data_handle: Handle) {
         unreachable!()
     }

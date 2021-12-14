@@ -44,6 +44,8 @@ pub trait ManagedBufferApi {
         source_slice: &[u8],
     ) -> Result<(), InvalidSliceError>;
 
+    fn mb_set_random(&self, dest_handle: Handle, length: usize);
+
     fn mb_append(&self, accumulator_handle: Handle, data_handle: Handle);
 
     fn mb_append_bytes(&self, accumulator_handle: Handle, bytes: &[u8]);
