@@ -258,28 +258,25 @@ pub trait Lottery {
             return OptionalResult::None;
         }
 
-        let last_winning_ticket_index: usize;
-
         // less tickets purchased than total winning tickets
-        if total_tickets < total_winning_tickets as u32 {
-            last_winning_ticket_index = (total_tickets - 1) as usize;
+        let last_winning_ticket_index = if total_tickets < total_winning_tickets as u32 {
+            (total_tickets - 1) as usize
         } else {
-            last_winning_ticket_index = info.prize_distribution.len() - 1;
-        }
+            info.prize_distribution.len() - 1
+        };
 
         let current_winning_ticket_index = last_winning_ticket_index - prev_winners_count;
         let winning_ticket_id = self.get_random_winning_ticket_id(&prev_winners, total_tickets);
 
         let winner_address = self.get_ticket_holder(lottery_name, winning_ticket_id);
-        let prize: BigUint;
 
-        if current_winning_ticket_index != 0 {
-            prize = BigUint::from(info.prize_distribution[current_winning_ticket_index] as u32)
+        let prize = if current_winning_ticket_index != 0 {
+            BigUint::from(info.prize_distribution[current_winning_ticket_index] as u32)
                 * &info.prize_pool
-                / PERCENTAGE_TOTAL as u32;
+                / PERCENTAGE_TOTAL as u32
         } else {
-            prize = info.prize_pool.clone();
-        }
+            info.prize_pool.clone()
+        };
 
         self.reduce_prize_pool(lottery_name, prize.clone());
 
