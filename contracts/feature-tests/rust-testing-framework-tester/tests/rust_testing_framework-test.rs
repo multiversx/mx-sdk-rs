@@ -1020,3 +1020,41 @@ fn test_managed_types_without_environment() {
         buffer: ManagedBuffer::new_from_bytes(b"MyBuffer"),
     };
 }
+
+#[test]
+fn test_random_buffer() {
+    let mut wrapper = BlockchainStateWrapper::new();
+    let sc_wrapper = wrapper.create_sc_account(
+        &rust_biguint!(0),
+        None,
+        rust_testing_framework_tester::contract_obj,
+        SC_WASM_PATH,
+    );
+
+    wrapper.execute_query(&sc_wrapper, |sc| {
+        let rand_buffer = sc.get_random_buffer_once(2);
+        let expected_buffer = ManagedBuffer::new_from_bytes(&[0x8b, 0xdd]);
+        assert_eq!(rand_buffer, expected_buffer);
+    });
+}
+
+#[test]
+fn test_random_buffer_twice() {
+    let mut wrapper = BlockchainStateWrapper::new();
+    let sc_wrapper = wrapper.create_sc_account(
+        &rust_biguint!(0),
+        None,
+        rust_testing_framework_tester::contract_obj,
+        SC_WASM_PATH,
+    );
+
+    wrapper.execute_query(&sc_wrapper, |sc| {
+        let (rand_buffer_1, rand_buffer_2) = sc.get_random_buffer_twice(2, 2);
+
+        let expected_buffer_1 = ManagedBuffer::new_from_bytes(&[0x8b, 0xdd]);
+        let expected_buffer_2 = ManagedBuffer::new_from_bytes(&[0xbe, 0x24]);
+
+        assert_eq!(rand_buffer_1, expected_buffer_1);
+        assert_eq!(rand_buffer_2, expected_buffer_2);
+    });
+}
