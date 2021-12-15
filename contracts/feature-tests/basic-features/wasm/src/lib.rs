@@ -227,6 +227,7 @@ elrond_wasm_node::wasm_endpoints! {
         mbuffer_load_slice
         mbuffer_new
         mbuffer_overwrite
+        mbuffer_set_random
         mbuffer_set_slice
         mul_assign_big_int
         mul_assign_big_int_ref

@@ -43,6 +43,14 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
     pub fn new_from_bytes(bytes: &[u8]) -> Self {
         ManagedBuffer::from_raw_handle(M::instance().mb_new_from_bytes(bytes))
     }
+
+    #[inline]
+    pub fn new_random(nr_bytes: usize) -> Self {
+        let handle = M::instance().mb_new_empty();
+        M::instance().mb_set_random(handle, nr_bytes);
+
+        ManagedBuffer::from_raw_handle(handle)
+    }
 }
 
 impl<M> From<&[u8]> for ManagedBuffer<M>
@@ -150,6 +158,10 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
         } else {
             Err(InvalidSliceError)
         }
+    }
+
+    pub fn set_random(&mut self, nr_bytes: usize) {
+        M::instance().mb_set_random(self.handle, nr_bytes);
     }
 
     #[inline]

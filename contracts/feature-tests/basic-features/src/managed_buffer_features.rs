@@ -81,6 +81,11 @@ pub trait ManagedBufferFeatures {
     }
 
     #[endpoint]
+    fn mbuffer_set_random(&self, nr_bytes: usize) -> ManagedBuffer {
+        ManagedBuffer::new_random(nr_bytes)
+    }
+
+    #[endpoint]
     fn mbuffer_eq(&self, mb1: ManagedBuffer, mb2: ManagedBuffer) -> bool {
         mb1 == mb2
     }
