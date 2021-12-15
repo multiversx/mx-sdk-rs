@@ -18,7 +18,8 @@ mod managed_ref;
 mod managed_type_trait;
 mod managed_vec;
 mod managed_vec_item;
-mod managed_vec_iter;
+mod managed_vec_owned_iter;
+mod managed_vec_ref_iter;
 pub(crate) mod preloaded_managed_buffer;
 
 pub use big_int::BigInt;
@@ -40,4 +41,5 @@ pub use managed_vec::{
     managed_vec_from_slice_of_boxed_bytes, managed_vec_of_buffers_to_arg_buffer, ManagedVec,
 };
 pub use managed_vec_item::ManagedVecItem;
-pub use managed_vec_iter::ManagedVecIterator;
+pub use managed_vec_owned_iter::ManagedVecOwnedIterator;
+pub use managed_vec_ref_iter::ManagedVecRefIterator;
