@@ -21,8 +21,8 @@ pub struct BlockchainRng {
 
 impl BlockchainRng {
     pub fn new(
-        prev_block_random_seed: &Box<[u8; 48]>,
-        current_block_random_seed: &Box<[u8; 48]>,
+        prev_block_random_seed: &[u8; 48],
+        current_block_random_seed: &[u8; 48],
         tx_hash: &H256,
     ) -> Self {
         let mut seed = Vec::new();
