@@ -1,4 +1,4 @@
-use super::{ManagedBuffer, ManagedType, ManagedVecItem, ManagedVecIterator};
+use super::{ManagedBuffer, ManagedType, ManagedVecItem, ManagedVecRefIterator};
 use crate::{
     abi::TypeAbi,
     api::{Handle, InvalidSliceError, ManagedTypeApi},
@@ -196,8 +196,8 @@ where
         result
     }
 
-    pub fn iter(&self) -> ManagedVecIterator<M, T> {
-        ManagedVecIterator::new(self)
+    pub fn iter(&self) -> ManagedVecRefIterator<M, T> {
+        ManagedVecRefIterator::new(self)
     }
 }
 
@@ -379,10 +379,10 @@ where
 
 /// For compatibility with the older Arwen EI.
 pub fn managed_vec_of_buffers_to_arg_buffer<M: ManagedTypeApi>(
-    managed_vec: &ManagedVec<M, ManagedBuffer<M>>,
+    managed_vec: ManagedVec<M, ManagedBuffer<M>>,
 ) -> ArgBuffer {
     let mut arg_buffer = ArgBuffer::new();
-    for buffer in managed_vec {
+    for buffer in &managed_vec {
         arg_buffer.push_argument_bytes(buffer.to_boxed_bytes().as_slice());
     }
     arg_buffer

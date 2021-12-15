@@ -4,8 +4,8 @@ use crate::{
 };
 
 use super::{
-    BigInt, BigUint, EllipticCurve, ManagedAddress, ManagedBuffer, ManagedByteArray, ManagedType,
-    ManagedVec,
+    BigInt, BigUint, EllipticCurve, ManagedAddress, ManagedBuffer, ManagedByteArray, ManagedRef,
+    ManagedType, ManagedVec,
 };
 
 /// Types that implement this trait can be items inside a `ManagedVec`.
@@ -23,7 +23,11 @@ pub trait ManagedVecItem {
     /// False for all managed types, but true for basic types (like `u32`).
     const SKIPS_RESERIALIZATION: bool;
 
+    type ReadOnly;
+
     fn from_byte_reader<Reader: FnMut(&mut [u8])>(reader: Reader) -> Self;
+
+    fn from_byte_reader_as_read_only<Reader: FnMut(&mut [u8])>(reader: Reader) -> Self::ReadOnly;
 
     fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, writer: Writer) -> R;
 }
@@ -33,11 +37,16 @@ macro_rules! impl_int {
         impl ManagedVecItem for $ty {
             const PAYLOAD_SIZE: usize = $payload_size;
             const SKIPS_RESERIALIZATION: bool = true;
-
+            type ReadOnly = Self;
             fn from_byte_reader<Reader: FnMut(&mut [u8])>(mut reader: Reader) -> Self {
                 let mut arr: [u8; $payload_size] = [0u8; $payload_size];
                 reader(&mut arr[..]);
                 $ty::from_be_bytes(arr)
+            }
+            fn from_byte_reader_as_read_only<Reader: FnMut(&mut [u8])>(
+                reader: Reader,
+            ) -> Self::ReadOnly {
+                Self::from_byte_reader(reader)
             }
 
             fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, mut writer: Writer) -> R {
@@ -57,11 +66,16 @@ impl_int! {i64, 8}
 impl ManagedVecItem for usize {
     const PAYLOAD_SIZE: usize = 4;
     const SKIPS_RESERIALIZATION: bool = true;
+    type ReadOnly = Self;
 
     fn from_byte_reader<Reader: FnMut(&mut [u8])>(mut reader: Reader) -> Self {
         let mut arr: [u8; 4] = [0u8; 4];
         reader(&mut arr[..]);
         u32::from_be_bytes(arr) as usize
+    }
+
+    fn from_byte_reader_as_read_only<Reader: FnMut(&mut [u8])>(reader: Reader) -> Self::ReadOnly {
+        Self::from_byte_reader(reader)
     }
 
     fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, mut writer: Writer) -> R {
@@ -73,9 +87,14 @@ impl ManagedVecItem for usize {
 impl ManagedVecItem for bool {
     const PAYLOAD_SIZE: usize = 1;
     const SKIPS_RESERIALIZATION: bool = true;
+    type ReadOnly = Self;
 
     fn from_byte_reader<Reader: FnMut(&mut [u8])>(reader: Reader) -> Self {
         u8::from_byte_reader(reader) > 0
+    }
+
+    fn from_byte_reader_as_read_only<Reader: FnMut(&mut [u8])>(reader: Reader) -> Self::ReadOnly {
+        Self::from_byte_reader(reader)
     }
 
     fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, writer: Writer) -> R {
@@ -89,10 +108,17 @@ macro_rules! impl_managed_type {
         impl<M: ManagedTypeApi> ManagedVecItem for $ty<M> {
             const PAYLOAD_SIZE: usize = 4;
             const SKIPS_RESERIALIZATION: bool = false;
+            type ReadOnly = ManagedRef<M, Self>;
 
             fn from_byte_reader<Reader: FnMut(&mut [u8])>(reader: Reader) -> Self {
                 let handle = Handle::from_byte_reader(reader);
                 $ty::from_raw_handle(handle)
+            }
+
+            fn from_byte_reader_as_read_only<Reader: FnMut(&mut [u8])>(
+                reader: Reader,
+            ) -> Self::ReadOnly {
+                ManagedRef::new(Self::from_byte_reader(reader))
             }
 
             fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, writer: Writer) -> R {
@@ -115,10 +141,15 @@ where
 {
     const PAYLOAD_SIZE: usize = 4;
     const SKIPS_RESERIALIZATION: bool = false;
+    type ReadOnly = ManagedRef<M, Self>;
 
     fn from_byte_reader<Reader: FnMut(&mut [u8])>(reader: Reader) -> Self {
         let handle = Handle::from_byte_reader(reader);
         Self::from_raw_handle(handle)
+    }
+
+    fn from_byte_reader_as_read_only<Reader: FnMut(&mut [u8])>(reader: Reader) -> Self::ReadOnly {
+        ManagedRef::new(Self::from_byte_reader(reader))
     }
 
     fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, writer: Writer) -> R {
@@ -133,10 +164,15 @@ where
 {
     const PAYLOAD_SIZE: usize = 4;
     const SKIPS_RESERIALIZATION: bool = false;
+    type ReadOnly = ManagedRef<M, Self>;
 
     fn from_byte_reader<Reader: FnMut(&mut [u8])>(reader: Reader) -> Self {
         let handle = Handle::from_byte_reader(reader);
         Self::from_raw_handle(handle)
+    }
+
+    fn from_byte_reader_as_read_only<Reader: FnMut(&mut [u8])>(reader: Reader) -> Self::ReadOnly {
+        ManagedRef::new(Self::from_byte_reader(reader))
     }
 
     fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, writer: Writer) -> R {

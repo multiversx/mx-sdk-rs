@@ -1,5 +1,5 @@
 use alloc::string::String;
-use elrond_codec::Vec;
+use elrond_codec::{TopEncode, Vec};
 
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer},
@@ -7,7 +7,7 @@ use crate::{
     ArgId, ContractCallArg, DynArg, DynArgInput, DynArgOutput, EndpointResult,
 };
 
-use super::{ManagedVec, ManagedVecItem, ManagedVecIterator};
+use super::{ManagedVec, ManagedVecItem, ManagedVecRefIterator};
 
 #[derive(Clone, Default)]
 pub struct ManagedMultiResultVecEager<M: ManagedTypeApi, T: ManagedVecItem>(ManagedVec<M, T>);
@@ -94,8 +94,8 @@ where
         self.0.with_self_as_vec(f)
     }
 
-    pub fn iter(&self) -> ManagedVecIterator<M, T> {
-        ManagedVecIterator::new(&self.0)
+    pub fn iter(&self) -> ManagedVecRefIterator<M, T> {
+        ManagedVecRefIterator::new(&self.0)
     }
 }
 
@@ -131,6 +131,7 @@ impl<M, T> EndpointResult for ManagedMultiResultVecEager<M, T>
 where
     M: ManagedTypeApi,
     T: ManagedVecItem + EndpointResult,
+    <T as ManagedVecItem>::ReadOnly: TopEncode,
 {
     type DecodeAs = ManagedMultiResultVecEager<M, T>;
 
@@ -148,6 +149,7 @@ impl<M, T> ContractCallArg for &ManagedMultiResultVecEager<M, T>
 where
     M: ManagedTypeApi,
     T: ManagedVecItem + ContractCallArg,
+    <T as ManagedVecItem>::ReadOnly: TopEncode,
 {
     fn push_dyn_arg<O: DynArgOutput>(&self, output: &mut O) {
         for elem in self.0.iter() {
@@ -160,6 +162,7 @@ impl<M, T> ContractCallArg for ManagedMultiResultVecEager<M, T>
 where
     M: ManagedTypeApi,
     T: ManagedVecItem + ContractCallArg,
+    <T as ManagedVecItem>::ReadOnly: TopEncode,
 {
     fn push_dyn_arg<O: DynArgOutput>(&self, output: &mut O) {
         (&self).push_dyn_arg(output)
