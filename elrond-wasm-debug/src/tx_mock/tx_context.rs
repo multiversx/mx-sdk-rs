@@ -1,9 +1,11 @@
 use crate::world_mock::{AccountData, AccountEsdt, BlockchainMock};
 use alloc::vec::Vec;
+use rand::{Fill, Rng};
 use core::cell::RefCell;
-use elrond_wasm::types::Address;
+use elrond_wasm::types::{Address, H256};
 use num_bigint::BigUint;
 use num_traits::Zero;
+use rand_seeder::{SipHasher, SipRng};
 use std::{
     cell::{Ref, RefMut},
     collections::HashMap,
@@ -13,20 +15,60 @@ use std::{
 use super::{BlockchainUpdate, TxCache, TxInput, TxManagedTypes, TxResult};
 
 #[derive(Debug)]
+pub struct BlockchainRng {
+    pub rng: SipRng,
+}
+
+impl BlockchainRng {
+    pub fn new(
+        prev_block_random_seed: &Box<[u8; 48]>,
+        current_block_random_seed: &Box<[u8; 48]>,
+        tx_hash: &H256,
+    ) -> Self {
+        let mut seed = Vec::new();
+        seed.extend_from_slice(&prev_block_random_seed[..]);
+        seed.extend_from_slice(&current_block_random_seed[..]);
+        seed.extend_from_slice(tx_hash.as_bytes());
+
+        let hasher = SipHasher::from(&seed);
+        Self {
+            rng: hasher.into_rng(),
+        }
+    }
+
+    pub fn fill<T: Fill + ?Sized>(&mut self, dest: &mut T) {
+        self.rng.fill(dest);
+    }
+}
+
+#[derive(Debug)]
 pub struct TxContext {
     pub tx_input_box: Box<TxInput>,
     pub tx_cache: Rc<TxCache>,
     pub managed_types: RefCell<TxManagedTypes>,
     pub tx_result_cell: RefCell<TxResult>,
+    pub b_rng: RefCell<BlockchainRng>,
 }
 
 impl TxContext {
     pub fn new(tx_input: TxInput, tx_cache: TxCache) -> Self {
+        let b_rng = BlockchainRng::new(
+            &tx_cache
+                .blockchain_ref()
+                .previous_block_info
+                .block_random_seed,
+            &tx_cache
+                .blockchain_ref()
+                .current_block_info
+                .block_random_seed,
+            &tx_input.tx_hash,
+        );
         TxContext {
             tx_input_box: Box::new(tx_input),
             tx_cache: Rc::new(tx_cache),
             managed_types: RefCell::new(TxManagedTypes::new()),
             tx_result_cell: RefCell::new(TxResult::empty()),
+            b_rng: RefCell::new(b_rng),
         }
     }
 
@@ -43,6 +85,19 @@ impl TxContext {
             contract_path: None,
             contract_owner: None,
         });
+
+        let dummy_tx_hash = b"dummy...........................".into();
+        let b_rng = BlockchainRng::new(
+            &tx_cache
+                .blockchain_ref()
+                .previous_block_info
+                .block_random_seed,
+            &tx_cache
+                .blockchain_ref()
+                .current_block_info
+                .block_random_seed,
+            &dummy_tx_hash,
+        );
         TxContext {
             tx_input_box: Box::new(TxInput {
                 from: contract_address.clone(),
@@ -53,11 +108,12 @@ impl TxContext {
                 args: Vec::new(),
                 gas_limit: 0,
                 gas_price: 0,
-                tx_hash: b"dummy...........................".into(),
+                tx_hash: dummy_tx_hash,
             }),
             tx_cache: Rc::new(tx_cache),
             managed_types: RefCell::new(TxManagedTypes::new()),
             tx_result_cell: RefCell::new(TxResult::empty()),
+            b_rng: RefCell::new(b_rng),
         }
     }
 
@@ -119,6 +175,10 @@ impl TxContext {
 
     pub fn extract_result(&self) -> TxResult {
         self.tx_result_cell.replace(TxResult::empty())
+    }
+
+    pub fn rng_borrow_mut(&self) -> RefMut<BlockchainRng> {
+        self.b_rng.borrow_mut()
     }
 
     pub fn create_new_contract(

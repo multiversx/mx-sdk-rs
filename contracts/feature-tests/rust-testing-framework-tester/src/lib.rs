@@ -144,6 +144,19 @@ pub trait RustTestingFrameworkTester {
     }
 
     #[endpoint]
+    fn get_random_buffer_once(&self, len: usize) -> ManagedBuffer {
+        ManagedBuffer::new_random(len)
+    }
+
+    #[endpoint]
+    fn get_random_buffer_twice(&self, len1: usize, len2: usize) -> (ManagedBuffer, ManagedBuffer) {
+        (
+            ManagedBuffer::new_random(len1),
+            ManagedBuffer::new_random(len2),
+        )
+    }
+
+    #[endpoint]
     fn call_other_contract_execute_on_dest(&self, other_sc_address: ManagedAddress) -> BigUint {
         let call_result = self.raw_vm_api().execute_on_dest_context_raw(
             self.blockchain().get_gas_left(),
