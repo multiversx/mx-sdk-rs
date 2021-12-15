@@ -2,19 +2,7 @@ use crate::api::ManagedTypeApi;
 
 use super::{ManagedVec, ManagedVecItem};
 
-impl<'a, M, T> IntoIterator for &'a ManagedVec<M, T>
-where
-    M: ManagedTypeApi,
-    T: ManagedVecItem,
-{
-    type Item = T;
-    type IntoIter = ManagedVecIterator<'a, M, T>;
-    fn into_iter(self) -> Self::IntoIter {
-        ManagedVecIterator::new(self)
-    }
-}
-
-pub struct ManagedVecIterator<'a, M, T>
+pub struct ManagedVecRefIterator<'a, M, T>
 where
     M: ManagedTypeApi,
     T: ManagedVecItem,
@@ -24,13 +12,13 @@ where
     byte_end: usize,
 }
 
-impl<'a, M, T> ManagedVecIterator<'a, M, T>
+impl<'a, M, T> ManagedVecRefIterator<'a, M, T>
 where
     M: ManagedTypeApi,
     T: ManagedVecItem,
 {
     pub(crate) fn new(managed_vec: &'a ManagedVec<M, T>) -> Self {
-        ManagedVecIterator {
+        ManagedVecRefIterator {
             managed_vec,
             byte_start: 0,
             byte_end: managed_vec.byte_len(),
@@ -38,19 +26,19 @@ where
     }
 }
 
-impl<'a, M, T> Iterator for ManagedVecIterator<'a, M, T>
+impl<'a, M, T> Iterator for ManagedVecRefIterator<'a, M, T>
 where
     M: ManagedTypeApi,
     T: ManagedVecItem,
 {
-    type Item = T;
+    type Item = T::ReadOnly;
 
-    fn next(&mut self) -> Option<T> {
+    fn next(&mut self) -> Option<Self::Item> {
         let next_byte_start = self.byte_start + T::PAYLOAD_SIZE;
         if next_byte_start > self.byte_end {
             return None;
         }
-        let result = T::from_byte_reader(|dest_slice| {
+        let result = T::from_byte_reader_as_read_only(|dest_slice| {
             let _ = self
                 .managed_vec
                 .buffer
@@ -67,14 +55,14 @@ where
     }
 }
 
-impl<'a, M, T> ExactSizeIterator for ManagedVecIterator<'a, M, T>
+impl<'a, M, T> ExactSizeIterator for ManagedVecRefIterator<'a, M, T>
 where
     M: ManagedTypeApi,
     T: ManagedVecItem,
 {
 }
 
-impl<'a, M, T> DoubleEndedIterator for ManagedVecIterator<'a, M, T>
+impl<'a, M, T> DoubleEndedIterator for ManagedVecRefIterator<'a, M, T>
 where
     M: ManagedTypeApi,
     T: ManagedVecItem,
@@ -85,7 +73,7 @@ where
         }
         self.byte_end -= T::PAYLOAD_SIZE;
 
-        let result = T::from_byte_reader(|dest_slice| {
+        let result = T::from_byte_reader_as_read_only(|dest_slice| {
             let _ = self
                 .managed_vec
                 .buffer
@@ -96,7 +84,7 @@ where
     }
 }
 
-impl<'a, M, T> Clone for ManagedVecIterator<'a, M, T>
+impl<'a, M, T> Clone for ManagedVecRefIterator<'a, M, T>
 where
     M: ManagedTypeApi,
     T: ManagedVecItem,
