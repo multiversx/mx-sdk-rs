@@ -215,7 +215,26 @@ where
                 let ptr = bytes.as_mut_ptr() as *mut T;
                 let len = bytes.len() / T::PAYLOAD_SIZE;
                 let values = unsafe { core::slice::from_raw_parts_mut(ptr, len) };
+
+                let mut index_start = 0;
+                for index in 0..len {
+                    let index_end = index_start + T::PAYLOAD_SIZE;
+                    let value = T::from_byte_reader(|item_bytes| {
+                        item_bytes.copy_from_slice(&bytes[index_start..index_end]);
+                    });
+                    values[index] = value;
+                    index_start += T::PAYLOAD_SIZE;
+                }
                 f(values);
+                index_start = 0;
+                for index in 0..len {
+                    let index_end = index_start + T::PAYLOAD_SIZE;
+                    values[index].to_byte_writer(|item_bytes| {
+                        bytes[index_start..index_end].copy_from_slice(item_bytes);
+                    });
+                    index_start += T::PAYLOAD_SIZE;
+                }
+                self.buffer.overwrite(bytes);
             });
         }
     }
