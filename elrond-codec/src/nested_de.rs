@@ -25,7 +25,7 @@ pub trait NestedDecode: Sized {
     /// using the format of an object nested inside another structure.
     /// In case of success returns the deserialized value and the number of bytes consumed during the operation.
     fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
-        Self::dep_decode_err_closure(input, |e| e)
+        Self::dep_decode_or_err(input, |e| e)
     }
 
     /// Version of `top_decode` that exits quickly in case of error.
@@ -36,7 +36,7 @@ pub trait NestedDecode: Sized {
         c: ExitCtx,
         exit: fn(ExitCtx, DecodeError) -> !,
     ) -> Self {
-        let result = Self::dep_decode_err_closure(input, |e| exit(c.clone(), e));
+        let result = Self::dep_decode_or_err(input, |e| exit(c.clone(), e));
         if let Ok(t) = result {
             t
         } else {
@@ -44,25 +44,14 @@ pub trait NestedDecode: Sized {
         }
     }
 
-    fn dep_decode_err_closure<I, C, Err>(input: &mut I, err_closure: C) -> Result<Self, Err>
+    fn dep_decode_or_err<I, EC, Err>(input: &mut I, err_closure: EC) -> Result<Self, Err>
     where
         I: NestedDecodeInput,
-        C: Fn(DecodeError) -> Err + Clone,
+        EC: Fn(DecodeError) -> Err + Clone,
     {
         match Self::dep_decode(input) {
             Ok(v) => Ok(v),
             Err(e) => Err(err_closure(e)),
         }
     }
-
-    // fn dep_decode_try<I, C, R>(input: &mut I) -> R
-    // where
-    //     I: NestedDecodeInput,
-    //     R: Try<Output=Self, Residual=DecodeError>,
-    // {
-    //     match Self::dep_decode(input) {
-    //         Ok(v) => R::from_output(v),
-    //         Err(e) => R::from_residual(e),
-    //     }
-    // }
 }

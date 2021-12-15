@@ -141,9 +141,9 @@ where
         self.decode_index += into.len();
     }
 
-    fn read_into_or_err<C, Err>(&mut self, into: &mut [u8], err_closure: C) -> Result<(), Err>
+    fn read_into_or_err<EC, Err>(&mut self, into: &mut [u8], err_closure: EC) -> Result<(), Err>
     where
-        C: FnOnce(DecodeError) -> Err,
+        EC: Fn(DecodeError) -> Err,
     {
         let err_result = self.buffer.load_slice(self.decode_index, into);
         if err_result.is_ok() {
