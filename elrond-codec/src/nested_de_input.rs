@@ -23,9 +23,9 @@ pub trait NestedDecodeInput {
         exit: fn(ExitCtx, DecodeError) -> !,
     );
 
-    fn read_into_or_err<C, Err>(&mut self, into: &mut [u8], err_closure: C) -> Result<(), Err>
+    fn read_into_or_err<EC, Err>(&mut self, into: &mut [u8], err_closure: EC) -> Result<(), Err>
     where
-        C: FnOnce(DecodeError) -> Err,
+        EC: Fn(DecodeError) -> Err,
     {
         match self.read_into(into) {
             Ok(()) => Ok(()),
@@ -60,6 +60,18 @@ pub trait NestedDecodeInput {
         else_deser(self, c)
     }
 
+    // fn read_specialized_or_err<C, Err>(&mut self, into: &mut [u8], err_closure: EC) -> Result<T, Err>
+    // where
+    //     T: TryStaticCast,
+    //     EC: Fn(DecodeError) -> Err,
+    //     F: FnOnce(&mut Self, ExitCtx) -> T,
+    // {
+    //     match self.read_into(into) {
+    //         Ok(()) => Ok(()),
+    //         Err(e) => Err(err_closure(e)),
+    //     }
+    // }
+
     /// Read a single byte from the input.
     fn read_byte(&mut self) -> Result<u8, DecodeError> {
         let mut buf = [0u8];
@@ -78,9 +90,9 @@ pub trait NestedDecodeInput {
         buf[0]
     }
 
-    fn read_byte_or_err<C, Err>(&mut self, err_closure: C) -> Result<u8, Err>
+    fn read_byte_or_err<EC, Err>(&mut self, err_closure: EC) -> Result<u8, Err>
     where
-        C: FnOnce(DecodeError) -> Err,
+        EC: Fn(DecodeError) -> Err,
     {
         let mut buf = [0u8];
         self.read_into_or_err(&mut buf[..], err_closure)?;

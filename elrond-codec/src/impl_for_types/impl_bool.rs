@@ -72,10 +72,10 @@ impl NestedDecode for bool {
         }
     }
 
-    fn dep_decode_err_closure<I, C, Err>(input: &mut I, err_closure: C) -> Result<Self, Err>
+    fn dep_decode_or_err<I, EC, Err>(input: &mut I, err_closure: EC) -> Result<Self, Err>
     where
         I: NestedDecodeInput,
-        C: Fn(DecodeError) -> Err + Clone,
+        EC: Fn(DecodeError) -> Err + Clone,
     {
         match input.read_byte_or_err(err_closure.clone())? {
             0 => Ok(false),

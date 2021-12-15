@@ -63,14 +63,14 @@ impl<T: NestedDecode> NestedDecode for Option<T> {
         }
     }
 
-    fn dep_decode_err_closure<I, C, Err>(input: &mut I, err_closure: C) -> Result<Self, Err>
+    fn dep_decode_or_err<I, EC, Err>(input: &mut I, err_closure: EC) -> Result<Self, Err>
     where
         I: NestedDecodeInput,
-        C: Fn(DecodeError) -> Err + Clone,
+        EC: Fn(DecodeError) -> Err + Clone,
     {
         match input.read_byte_or_err(err_closure.clone())? {
             0 => Ok(None),
-            1 => Ok(Some(T::dep_decode_err_closure(input, err_closure)?)),
+            1 => Ok(Some(T::dep_decode_or_err(input, err_closure)?)),
             _ => Err(err_closure(DecodeError::INVALID_VALUE)),
         }
     }
@@ -159,10 +159,10 @@ impl<T: NestedDecode> TopDecode for Option<T> {
         }
     }
 
-    fn top_decode_err_closure<I, C, Err>(input: I, err_closure: C) -> Result<Self, Err>
+    fn top_decode_or_err<I, EC, Err>(input: I, err_closure: EC) -> Result<Self, Err>
     where
         I: TopDecodeInput,
-        C: Fn(DecodeError) -> Err + Clone,
+        EC: Fn(DecodeError) -> Err + Clone,
     {
         let mut buffer = input.into_nested_buffer();
         if buffer.is_depleted() {
@@ -170,7 +170,7 @@ impl<T: NestedDecode> TopDecode for Option<T> {
         } else {
             let first_byte = buffer.read_byte_or_err(err_closure.clone())?;
             if first_byte == 1 {
-                let item = T::dep_decode_err_closure(&mut buffer, err_closure.clone())?;
+                let item = T::dep_decode_or_err(&mut buffer, err_closure.clone())?;
                 if buffer.is_depleted() {
                     Ok(Some(item))
                 } else {

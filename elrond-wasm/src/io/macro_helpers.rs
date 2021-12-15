@@ -10,20 +10,11 @@ where
     AA: ManagedTypeApi + EndpointArgumentApi + ErrorApi,
 {
     let input = ArgDecodeInput::new(api.clone(), index);
-    let result = T::top_decode_err_closure(input, |e| -> ! {
+    let result = T::top_decode_or_err(input, |e| -> ! {
         signal_arg_de_error(api.clone(), arg_id, e)
     });
     let Ok(value) = result;
     value
-}
-
-#[inline(always)]
-fn load_single_arg_exit<AA>(ctx: (AA, ArgId), de_err: DecodeError) -> !
-where
-    AA: ManagedTypeApi + EndpointArgumentApi + ErrorApi,
-{
-    let (api, arg_id) = ctx;
-    signal_arg_de_error(api, arg_id, de_err)
 }
 
 /// It's easier to generate code from macros using this function, instead of the DynArg method.
