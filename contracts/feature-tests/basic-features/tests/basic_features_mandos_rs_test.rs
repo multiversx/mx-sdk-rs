@@ -282,6 +282,13 @@ fn managed_buffer_slice_2_rs() {
     elrond_wasm_debug::mandos_rs("mandos/managed_buffer_slice_2.scen.json", world());
 }
 
+/*
+#[test]
+fn managed_buffer_random_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/managed_buffer_set_random.scen.json", world());
+}
+*/
+
 #[test]
 fn managed_vec_address_push_rs() {
     elrond_wasm_debug::mandos_rs("mandos/managed_vec_address_push.scen.json", world());
