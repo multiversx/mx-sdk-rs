@@ -2,6 +2,7 @@ use crate::{
     action::{Action, PerformActionResult},
     user_role::UserRole,
 };
+use elrond_wasm::api::ErrorApiImpl;
 
 elrond_wasm::imports!();
 
@@ -148,7 +149,7 @@ pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
                     &call_data.arguments.into(),
                 );
                 if let Result::Err(e) = result {
-                    self.raw_vm_api().signal_error(e);
+                    Self::Api::error_api_impl().signal_error(e);
                 }
                 Ok(PerformActionResult::Nothing)
             },
