@@ -8,15 +8,15 @@ publish = false
 [lib]
 path = "src/lib.rs"
 
-[dependencies.elrond-wasm-module-bonding-curve]
-version = "0.23.1"
-path = "../../modules/elrond-wasm-module-bonding-curve"
-
 [dependencies.elrond-wasm]
-version = "0.23.1"
+version = "0.25.0"
 path = "../../../elrond-wasm"
 
+[dependencies.elrond-wasm-modules]
+version = "0.25.0"
+path = "../../../elrond-wasm-modules"
+
 [dev-dependencies.elrond-wasm-debug]
-version = "0.23.1"
+version = "0.25.0"
 path = "../../../elrond-wasm-debug"
 

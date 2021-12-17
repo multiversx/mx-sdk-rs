@@ -6,11 +6,11 @@ use crate::{
 use alloc::boxed::Box;
 
 impl CryptoApi for UncallableApi {
-    fn sha256(&self, _data: &[u8]) -> H256 {
+    fn sha256_legacy(&self, _data: &[u8]) -> H256 {
         unreachable!()
     }
 
-    fn keccak256(&self, _data: &[u8]) -> H256 {
+    fn keccak256_legacy(&self, _data: &[u8]) -> H256 {
         unreachable!()
     }
 

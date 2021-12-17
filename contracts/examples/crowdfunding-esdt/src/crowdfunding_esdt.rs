@@ -3,7 +3,7 @@
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
-#[derive(TopEncode, TopDecode, TypeAbi, PartialEq, Clone, Copy)]
+#[derive(TopEncode, TopDecode, TypeAbi, PartialEq, Clone, Copy, Debug)]
 pub enum Status {
     FundingPeriod,
     Successful,
@@ -41,8 +41,8 @@ pub trait Crowdfunding {
     #[payable("*")]
     fn fund(
         &self,
-        #[payment] payment: BigUint,
         #[payment_token] token: TokenIdentifier,
+        #[payment] payment: BigUint,
     ) -> SCResult<()> {
         require!(
             self.status() == Status::FundingPeriod,

@@ -2,7 +2,7 @@ use super::ArgBuffer;
 use crate::{
     api::{ErrorApi, ErrorApiImpl, Handle, ManagedTypeApi},
     err_msg,
-    types::{ManagedBuffer, ManagedType, ManagedVec, ManagedVecIterator},
+    types::{ManagedBuffer, ManagedType, ManagedVec, ManagedVecRefIterator},
     DynArgOutput,
 };
 use alloc::vec::Vec;
@@ -141,7 +141,7 @@ impl<M: ManagedTypeApi> ManagedArgBuffer<M>
 where
     M: ManagedTypeApi + 'static,
 {
-    pub fn raw_arg_iter(&self) -> ManagedVecIterator<M, ManagedBuffer<M>> {
+    pub fn raw_arg_iter(&self) -> ManagedVecRefIterator<M, ManagedBuffer<M>> {
         self.data.iter()
     }
 }
