@@ -1,7 +1,9 @@
+use core::fmt::Error;
+
 use alloc::{string::String, vec::Vec};
 
 use crate::{
-    api::{EndpointFinishApi, ErrorApi, ManagedTypeApi},
+    api::{EndpointFinishApi, ErrorApi, ErrorApiImpl, ManagedTypeApi},
     types::{BoxedBytes, ManagedBuffer, ManagedType},
 };
 
@@ -11,23 +13,23 @@ use super::SCError;
 /// The message is kept as a managed buffer in the VM.
 pub struct ManagedSCError<M>
 where
-    M: ManagedTypeApi ,
+    M: ManagedTypeApi + ErrorApi,
 {
     buffer: ManagedBuffer<M>,
 }
 
 impl<M> SCError for ManagedSCError<M>
 where
-    M: ManagedTypeApi ,
+    M: ManagedTypeApi + ErrorApi,
 {
     fn finish_err<FA: EndpointFinishApi>(&self, api: FA) -> ! {
-        api.signal_error_from_buffer(self.buffer.get_raw_handle())
+        M::error_api_impl().signal_error_from_buffer(self.buffer.get_raw_handle())
     }
 }
 
 impl<M> ManagedSCError<M>
 where
-    M: ManagedTypeApi ,
+    M: ManagedTypeApi + ErrorApi,
 {
     #[inline]
     pub fn new_empty() -> Self {
@@ -50,13 +52,13 @@ where
 
     #[inline]
     pub fn exit_now(&self) -> ! {
-        M::instance().signal_error_from_buffer(self.buffer.get_raw_handle())
+        M::error_api_impl().signal_error_from_buffer(self.buffer.get_raw_handle())
     }
 }
 
 impl<M> From<&[u8]> for ManagedSCError<M>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi + ErrorApi,
 {
     #[inline]
     fn from(message: &[u8]) -> Self {
@@ -66,7 +68,7 @@ where
 
 impl<M> From<BoxedBytes> for ManagedSCError<M>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi + ErrorApi,
 {
     #[inline]
     fn from(message: BoxedBytes) -> Self {
@@ -76,7 +78,7 @@ where
 
 impl<M> From<&str> for ManagedSCError<M>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi + ErrorApi,
 {
     #[inline]
     fn from(message: &str) -> Self {
@@ -86,7 +88,7 @@ where
 
 impl<M> From<String> for ManagedSCError<M>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi + ErrorApi,
 {
     #[inline]
     fn from(message: String) -> Self {
@@ -96,7 +98,7 @@ where
 
 impl<M> From<Vec<u8>> for ManagedSCError<M>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi + ErrorApi,
 {
     #[inline]
     fn from(message: Vec<u8>) -> Self {
@@ -106,7 +108,7 @@ where
 
 impl<M> From<ManagedBuffer<M>> for ManagedSCError<M>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi + ErrorApi,
 {
     #[inline]
     fn from(message: ManagedBuffer<M>) -> Self {

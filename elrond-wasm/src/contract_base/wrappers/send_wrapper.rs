@@ -1,9 +1,9 @@
 use crate::{
     api::{
-        BlockchainApi, ManagedTypeApi, SendApi, StorageReadApi, CHANGE_OWNER_BUILTIN_FUNC_NAME,
-        ESDT_LOCAL_BURN_FUNC_NAME, ESDT_LOCAL_MINT_FUNC_NAME, ESDT_MULTI_TRANSFER_FUNC_NAME,
-        ESDT_NFT_ADD_QUANTITY_FUNC_NAME, ESDT_NFT_BURN_FUNC_NAME, ESDT_NFT_CREATE_FUNC_NAME,
-        ESDT_NFT_TRANSFER_FUNC_NAME, ESDT_TRANSFER_FUNC_NAME,
+        BlockchainApi, CallTypeApi, ManagedTypeApi, SendApi, StorageReadApi,
+        CHANGE_OWNER_BUILTIN_FUNC_NAME, ESDT_LOCAL_BURN_FUNC_NAME, ESDT_LOCAL_MINT_FUNC_NAME,
+        ESDT_MULTI_TRANSFER_FUNC_NAME, ESDT_NFT_ADD_QUANTITY_FUNC_NAME, ESDT_NFT_BURN_FUNC_NAME,
+        ESDT_NFT_CREATE_FUNC_NAME, ESDT_NFT_TRANSFER_FUNC_NAME, ESDT_TRANSFER_FUNC_NAME,
     },
     esdt::ESDTSystemSmartContractProxy,
     types::{
@@ -20,14 +20,14 @@ const PERCENTAGE_TOTAL: u64 = 10_000;
 
 pub struct SendWrapper<A>
 where
-    A: SendApi + ManagedTypeApi + StorageReadApi + BlockchainApi,
+    A: CallTypeApi + StorageReadApi + BlockchainApi,
 {
     pub(crate) api: A,
 }
 
 impl<A> SendWrapper<A>
 where
-    A: SendApi + ManagedTypeApi + StorageReadApi + BlockchainApi,
+    A: CallTypeApi + StorageReadApi + BlockchainApi,
 {
     pub(crate) fn new(api: A) -> Self {
         SendWrapper { api }

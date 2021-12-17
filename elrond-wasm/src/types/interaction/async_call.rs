@@ -1,6 +1,6 @@
 use crate::{
     abi::{OutputAbi, TypeAbi, TypeDescriptionContainer},
-    api::{ManagedTypeApi, SendApi, StorageWriteApi},
+    api::{CallTypeApi, ManagedTypeApi, ManagedTypeErrorApi, SendApi, StorageWriteApi},
     io::EndpointResult,
     types::{BigUint, CallbackClosure, ManagedAddress, ManagedArgBuffer, ManagedBuffer},
 };
@@ -9,7 +9,7 @@ use alloc::{string::String, vec::Vec};
 #[must_use]
 pub struct AsyncCall<SA>
 where
-    SA: SendApi + ManagedTypeApi + 'static,
+    SA: CallTypeApi + 'static,
 {
     pub(crate) api: SA,
     pub(crate) to: ManagedAddress<SA>,
@@ -21,7 +21,7 @@ where
 
 impl<SA> AsyncCall<SA>
 where
-    SA: SendApi + 'static,
+    SA: CallTypeApi,
 {
     pub fn with_callback(self, callback_call: CallbackClosure<SA>) -> Self {
         AsyncCall {
@@ -33,7 +33,7 @@ where
 
 impl<SA> EndpointResult for AsyncCall<SA>
 where
-    SA: SendApi + ManagedTypeApi + StorageWriteApi + 'static,
+    SA: CallTypeApi + StorageWriteApi + 'static,
 {
     type DecodeAs = ();
 
@@ -56,7 +56,7 @@ where
 
 impl<SA> TypeAbi for AsyncCall<SA>
 where
-    SA: SendApi + 'static,
+    SA: CallTypeApi + 'static,
 {
     fn type_name() -> String {
         "AsyncCall".into()

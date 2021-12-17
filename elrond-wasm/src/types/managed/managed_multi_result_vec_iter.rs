@@ -1,7 +1,7 @@
 use core::marker::PhantomData;
 
 use crate::{
-    api::{ErrorApi, ManagedTypeApi},
+    api::{ErrorApi, ManagedTypeApi, ManagedTypeErrorApi},
     ArgId, DynArg, DynArgInput, ManagedResultArgLoader,
 };
 
@@ -9,7 +9,7 @@ use super::ManagedMultiResultVec;
 
 impl<M, T> IntoIterator for ManagedMultiResultVec<M, T>
 where
-    M: ManagedTypeApi + ErrorApi,
+    M: ManagedTypeErrorApi,
     T: DynArg,
 {
     type Item = T;
@@ -21,7 +21,7 @@ where
 
 pub struct ManagedMultiResultVecIterator<M, T>
 where
-    M: ManagedTypeApi + ErrorApi,
+    M: ManagedTypeErrorApi,
     T: DynArg,
 {
     data_loader: ManagedResultArgLoader<M>,
@@ -30,7 +30,7 @@ where
 
 impl<M, T> ManagedMultiResultVecIterator<M, T>
 where
-    M: ManagedTypeApi + ErrorApi,
+    M: ManagedTypeErrorApi,
     T: DynArg,
 {
     pub(crate) fn new(obj: ManagedMultiResultVec<M, T>) -> Self {
@@ -43,7 +43,7 @@ where
 
 impl<M, T> Iterator for ManagedMultiResultVecIterator<M, T>
 where
-    M: ManagedTypeApi + ErrorApi,
+    M: ManagedTypeErrorApi,
     T: DynArg,
 {
     type Item = T;

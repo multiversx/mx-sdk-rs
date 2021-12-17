@@ -2,7 +2,7 @@ use elrond_codec::{NestedDecode, NestedEncode, TopDecode, TopEncode};
 
 use super::StorageMapper;
 use crate::{
-    api::{ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi},
+    api::{ErrorApi, ErrorApiImpl, ManagedTypeApi, StorageReadApi, StorageWriteApi},
     storage::{storage_clear, storage_get, storage_get_len, storage_set, StorageKey},
     types::TokenIdentifier,
 };
@@ -55,7 +55,7 @@ where
         } else {
             let mut counter = self.get_counter_value();
             if counter == u8::MAX {
-                self.api.signal_error(COUNTER_OVERFLOW_ERROR_MESSAGE);
+                SA::error_api_impl().signal_error(COUNTER_OVERFLOW_ERROR_MESSAGE);
             }
 
             counter += 1;
@@ -66,7 +66,7 @@ where
 
         let has_value = self.has_token_attributes_value(mapping, token_nonce);
         if has_value {
-            self.api.signal_error(VALUE_ALREADY_SET_ERROR_MESSAGE);
+            SA::error_api_impl().signal_error(VALUE_ALREADY_SET_ERROR_MESSAGE);
         }
 
         self.set_token_attributes_value(mapping, token_nonce, attributes);
@@ -82,14 +82,13 @@ where
     ) {
         let has_mapping = self.has_mapping_value(token_id);
         if !has_mapping {
-            self.api.signal_error(UNKNOWN_TOKEN_ID_ERROR_MESSAGE);
+            SA::error_api_impl().signal_error(UNKNOWN_TOKEN_ID_ERROR_MESSAGE);
         }
 
         let mapping = self.get_mapping_value(token_id);
         let has_value = self.has_token_attributes_value(mapping, token_nonce);
         if !has_value {
-            self.api
-                .signal_error(VALUE_NOT_PREVIOUSLY_SET_ERROR_MESSAGE);
+            SA::error_api_impl().signal_error(VALUE_NOT_PREVIOUSLY_SET_ERROR_MESSAGE);
         }
 
         let old_attr = self.get_token_attributes_value::<T>(mapping, token_nonce);
@@ -158,14 +157,13 @@ where
     ) -> T {
         let has_mapping = self.has_mapping_value(token_id);
         if !has_mapping {
-            self.api.signal_error(UNKNOWN_TOKEN_ID_ERROR_MESSAGE);
+            SA::error_api_impl().signal_error(UNKNOWN_TOKEN_ID_ERROR_MESSAGE);
         }
 
         let mapping = self.get_mapping_value(token_id);
         let has_value = self.has_token_attributes_value(mapping, token_nonce);
         if !has_value {
-            self.api
-                .signal_error(VALUE_NOT_PREVIOUSLY_SET_ERROR_MESSAGE);
+            SA::error_api_impl().signal_error(VALUE_NOT_PREVIOUSLY_SET_ERROR_MESSAGE);
         }
 
         self.get_token_attributes_value(mapping, token_nonce)
@@ -178,14 +176,13 @@ where
     ) -> u64 {
         let has_mapping = self.has_mapping_value(token_id);
         if !has_mapping {
-            self.api.signal_error(UNKNOWN_TOKEN_ID_ERROR_MESSAGE);
+            SA::error_api_impl().signal_error(UNKNOWN_TOKEN_ID_ERROR_MESSAGE);
         }
 
         let mapping = self.get_mapping_value(token_id);
         let has_value = self.has_attr_to_nonce_mapping::<T>(mapping, attr);
         if !has_value {
-            self.api
-                .signal_error(VALUE_NOT_PREVIOUSLY_SET_ERROR_MESSAGE);
+            SA::error_api_impl().signal_error(VALUE_NOT_PREVIOUSLY_SET_ERROR_MESSAGE);
         }
 
         self.get_attributes_to_nonce_mapping(mapping, attr)

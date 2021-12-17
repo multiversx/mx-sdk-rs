@@ -2,7 +2,7 @@ use super::properties::*;
 use hex_literal::hex;
 
 use crate::{
-    api::SendApi,
+    api::{CallTypeApi, SendApi},
     types::{
         Address, BigUint, ContractCall, EsdtLocalRole, EsdtTokenType, ManagedAddress,
         ManagedBuffer, TokenIdentifier,
@@ -42,7 +42,7 @@ where
 
 impl<SA> ESDTSystemSmartContractProxy<SA>
 where
-    SA: SendApi + 'static,
+    SA: CallTypeApi + 'static,
 {
     /// Produces a contract call to the ESDT system SC,
     /// which causes it to issue a new fungible ESDT token.
@@ -432,7 +432,7 @@ fn bool_name_bytes(b: bool) -> &'static [u8] {
 
 fn set_token_property<SA, R>(contract_call: &mut ContractCall<SA, R>, name: &[u8], value: bool)
 where
-    SA: SendApi + 'static,
+    SA: CallTypeApi + 'static,
 {
     contract_call.push_argument_raw_bytes(name);
     contract_call.push_argument_raw_bytes(bool_name_bytes(value));

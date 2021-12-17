@@ -2,7 +2,7 @@ use core::marker::PhantomData;
 
 use super::{ManagedBuffer, ManagedType};
 use crate::{
-    api::{BigIntApi, Handle, ManagedTypeApi, ManagedTypeApiImpl},
+    api::{BigIntApi, Handle, ManagedBufferApi, ManagedTypeApi, ManagedTypeApiImpl},
     types::BoxedBytes,
 };
 use alloc::string::String;

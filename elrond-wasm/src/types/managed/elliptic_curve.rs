@@ -2,7 +2,10 @@ use core::marker::PhantomData;
 
 use alloc::string::String;
 
-use crate::{abi::TypeAbi, api::{BigIntApi, EllipticCurveApi, Handle, ManagedTypeApi, ManagedTypeApiImpl}};
+use crate::{
+    abi::TypeAbi,
+    api::{BigIntApi, EllipticCurveApi, Handle, ManagedTypeApi, ManagedTypeApiImpl},
+};
 use elrond_codec::*;
 
 use crate::types::BoxedBytes;

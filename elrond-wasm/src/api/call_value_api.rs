@@ -1,4 +1,4 @@
-use super::{ErrorApi, ManagedTypeApi};
+use super::{ErrorApi, ErrorApiImpl, ManagedTypeApi};
 use crate::{
     err_msg,
     types::{BigUint, EsdtTokenPayment, EsdtTokenType, ManagedVec, TokenIdentifier},
@@ -35,7 +35,7 @@ pub trait CallValueApi: ManagedTypeApi + ErrorApi + Sized {
     /// Especially used in the auto-generated call value processing.
     fn require_egld(&self) -> BigUint<Self> {
         if !self.token().is_egld() {
-            self.signal_error(err_msg::NON_PAYABLE_FUNC_ESDT);
+            Self::error_api_impl().signal_error(err_msg::NON_PAYABLE_FUNC_ESDT);
         }
         self.egld_value()
     }
@@ -45,7 +45,7 @@ pub trait CallValueApi: ManagedTypeApi + ErrorApi + Sized {
     /// Especially used in the auto-generated call value processing.
     fn require_esdt(&self, token: &[u8]) -> BigUint<Self> {
         if self.token().as_managed_buffer() != token {
-            self.signal_error(err_msg::BAD_TOKEN_PROVIDED);
+            Self::error_api_impl().signal_error(err_msg::BAD_TOKEN_PROVIDED);
         }
         self.esdt_value()
     }

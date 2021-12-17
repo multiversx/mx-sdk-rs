@@ -1,17 +1,20 @@
 use super::{
-    BlockchainApi, CallValueApi, CryptoApi, EndpointArgumentApi, EndpointFinishApi, ErrorApi,
-    LogApi, ManagedTypeApi, PrintApi, SendApi, StorageReadApi, StorageWriteApi,
+    BlockchainApi, CallTypeApi, CallValueApi, CryptoApi, EndpointArgumentApi, EndpointFinishApi,
+    ErrorApi, LogApi, ManagedTypeApi, ManagedTypeErrorApi, PrintApi, SendApi, StorageReadApi,
+    StorageWriteApi,
 };
 
+// TODO: cleanup
 pub trait VMApi:
     BlockchainApi
     + CallValueApi
     + CryptoApi
     + EndpointArgumentApi
     + EndpointFinishApi
-    + ErrorApi
+    // + ErrorApi
     + LogApi
-    + ManagedTypeApi
+    + ManagedTypeErrorApi
+    + CallTypeApi
     + SendApi
     + StorageReadApi
     + StorageWriteApi

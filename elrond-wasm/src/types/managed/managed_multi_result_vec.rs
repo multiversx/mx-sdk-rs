@@ -119,7 +119,7 @@ where
 {
     pub fn to_vec(&self) -> ManagedVec<M, T> {
         let mut result = ManagedVec::new();
-        let serializer = ManagedSerializer::new(M::instance());
+        let serializer = ManagedSerializer::<M>::new();
         for item in self.raw_buffers.into_iter() {
             result.push(serializer.top_decode_from_managed_buffer(&item));
         }
@@ -150,7 +150,7 @@ where
     T: ContractCallArg,
 {
     fn push_single_arg<I: TopEncode>(&mut self, item: I) {
-        let serializer = ManagedSerializer::new(M::instance());
+        let serializer = ManagedSerializer::<M>::new();
         self.raw_buffers
             .push(serializer.top_encode_to_managed_buffer(&item));
     }

@@ -1,6 +1,9 @@
 use elrond_codec::{EncodeError, NestedEncodeOutput, TryStaticCast};
 
-use crate::{api::ManagedTypeApi, types::StaticBufferRef};
+use crate::{
+    api::{ManagedTypeApi, ManagedTypeApiImpl},
+    types::StaticBufferRef,
+};
 
 use super::{BigInt, BigUint, ManagedBuffer, ManagedBufferSizeContext, ManagedType};
 

@@ -1,6 +1,6 @@
 use crate::{
     abi::{OutputAbi, TypeAbi, TypeDescriptionContainer},
-    api::SendApi,
+    api::CallTypeApi,
     io::EndpointResult,
     types::{BigUint, ManagedAddress, ManagedBuffer},
 };
@@ -8,7 +8,7 @@ use alloc::{string::String, vec::Vec};
 
 pub struct SendEgld<SA>
 where
-    SA: SendApi + 'static,
+    SA: CallTypeApi + 'static,
 {
     pub api: SA,
     pub to: ManagedAddress<SA>,
@@ -18,7 +18,7 @@ where
 
 impl<SA> EndpointResult for SendEgld<SA>
 where
-    SA: SendApi + 'static,
+    SA: CallTypeApi + 'static,
 {
     type DecodeAs = ();
 
@@ -31,7 +31,7 @@ where
 
 impl<SA> TypeAbi for SendEgld<SA>
 where
-    SA: SendApi + 'static,
+    SA: CallTypeApi + 'static,
 {
     fn type_name() -> String {
         "SendEgld".into()

@@ -52,7 +52,7 @@ pub trait ContractBase: Sized {
     /// to highly optimized manual serialization and deserialization.
     #[inline]
     fn serializer(&self) -> ManagedSerializer<Self::Api> {
-        ManagedSerializer::new(self.raw_vm_api())
+        ManagedSerializer::new()
     }
 
     #[inline]

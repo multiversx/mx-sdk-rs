@@ -1,5 +1,5 @@
 use crate::{
-    api::{ErrorApi, ManagedTypeApi},
+    api::{ErrorApi, ErrorApiImpl, ManagedTypeApi},
     types::{BoxedBytes, ManagedBuffer, ManagedByteArray, ManagedType},
     *,
 };
@@ -7,14 +7,14 @@ use elrond_codec::*;
 
 pub struct StorageKey<A>
 where
-    A: ManagedTypeApi  + 'static,
+    A: ManagedTypeApi + ErrorApi + 'static,
 {
     pub(crate) buffer: ManagedBuffer<A>,
 }
 
 impl<A> StorageKey<A>
 where
-    A: ManagedTypeApi  + 'static,
+    A: ManagedTypeApi + ErrorApi + 'static,
 {
     #[inline]
     pub fn new(_api: A, base_key: &[u8]) -> Self {
@@ -37,8 +37,7 @@ where
     where
         T: NestedEncode,
     {
-        let exit_ctx = self.buffer.type_manager();
-        item.dep_encode_or_exit(&mut self.buffer, exit_ctx, storage_key_append_exit);
+        item.dep_encode_or_exit(&mut self.buffer, (), storage_key_append_exit::<A>);
     }
 
     #[inline]
@@ -56,7 +55,7 @@ impl<M: ManagedTypeApi> From<ManagedBuffer<M>> for StorageKey<M> {
 
 impl<M, const N: usize> From<ManagedByteArray<M, N>> for StorageKey<M>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi + ErrorApi,
 {
     #[inline]
     fn from(mba: ManagedByteArray<M, N>) -> Self {
@@ -73,11 +72,11 @@ impl<M: ManagedTypeApi> Clone for StorageKey<M> {
 }
 
 #[inline(always)]
-fn storage_key_append_exit<A>(_api: A, encode_err: EncodeError) -> !
+fn storage_key_append_exit<A>(_: (), encode_err: EncodeError) -> !
 where
-    A: ManagedTypeApi  + 'static,
+    A: ManagedTypeApi + ErrorApi + 'static,
 {
     let mut message_buffer = ManagedBuffer::<A>::new_from_bytes(err_msg::STORAGE_KEY_ENCODE_ERROR);
     message_buffer.append_bytes(encode_err.message_bytes());
-    A::instance().signal_error_from_buffer(message_buffer.get_raw_handle())
+    A::error_api_impl().signal_error_from_buffer(message_buffer.get_raw_handle())
 }

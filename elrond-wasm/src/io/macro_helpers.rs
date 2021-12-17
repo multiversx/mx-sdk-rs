@@ -12,8 +12,8 @@ where
 {
     T::top_decode_or_exit(
         ArgDecodeInput::new(api.clone(), index),
-        (api, arg_id),
-        load_single_arg_exit,
+        arg_id,
+        load_single_arg_exit::<AA>,
     )
 }
 
@@ -22,7 +22,7 @@ fn load_single_arg_exit<AA>(arg_id: ArgId, de_err: DecodeError) -> !
 where
     AA: ManagedTypeApi + EndpointArgumentApi + ErrorApi,
 {
-    signal_arg_de_error(arg_id, de_err)
+    signal_arg_de_error::<AA>(arg_id, de_err)
 }
 
 /// It's easier to generate code from macros using this function, instead of the DynArg method.

@@ -4,8 +4,6 @@
 #![feature(control_flow_enum)]
 #![allow(clippy::type_complexity)]
 #![allow(deprecated)]
-
-
 #![allow(unused)]
 
 pub use elrond_wasm_derive::{self as derive, contract, module, proxy};

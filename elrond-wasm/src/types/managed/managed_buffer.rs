@@ -1,7 +1,10 @@
 use core::marker::PhantomData;
 
 use super::ManagedType;
-use crate::{api::{Handle, InvalidSliceError, ManagedBufferApi, ManagedTypeApi}, types::BoxedBytes};
+use crate::{
+    api::{Handle, InvalidSliceError, ManagedBufferApi, ManagedTypeApi},
+    types::BoxedBytes,
+};
 use alloc::string::String;
 use elrond_codec::{
     DecodeError, EncodeError, NestedDecode, NestedDecodeInput, NestedEncode, NestedEncodeOutput,
@@ -230,7 +233,9 @@ impl<M: ManagedTypeApi> NestedEncode for ManagedBuffer<M> {
 
 impl<M: ManagedTypeApi> TopDecode for ManagedBuffer<M> {
     fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
-        input.into_specialized(|_| Err(DecodeError::UNSUPPORTED_OPERATION))
+        input.into_specialized(|input| {
+            Ok(ManagedBuffer::new_from_bytes(&input.into_boxed_slice_u8()))
+        })
     }
 }
 
