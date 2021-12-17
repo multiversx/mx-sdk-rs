@@ -9,6 +9,11 @@ pub struct NftDummyAttributes {
     pub cool_factor: u8,
 }
 
+pub struct StructWithManagedTypes<M: ManagedTypeApi> {
+    pub big_uint: BigUint<M>,
+    pub buffer: ManagedBuffer<M>,
+}
+
 #[elrond_wasm::derive::contract]
 pub trait RustTestingFrameworkTester {
     #[init]
@@ -139,6 +144,70 @@ pub trait RustTestingFrameworkTester {
     }
 
     #[endpoint]
+    fn get_random_buffer_once(&self, len: usize) -> ManagedBuffer {
+        ManagedBuffer::new_random(len)
+    }
+
+    #[endpoint]
+    fn get_random_buffer_twice(&self, len1: usize, len2: usize) -> (ManagedBuffer, ManagedBuffer) {
+        (
+            ManagedBuffer::new_random(len1),
+            ManagedBuffer::new_random(len2),
+        )
+    }
+
+    #[endpoint]
+    fn call_other_contract_execute_on_dest(&self, other_sc_address: ManagedAddress) -> BigUint {
+        let call_result = self.raw_vm_api().execute_on_dest_context_raw(
+            self.blockchain().get_gas_left(),
+            &other_sc_address,
+            &BigUint::zero(),
+            &ManagedBuffer::new_from_bytes(b"getTotalValue"),
+            &ManagedArgBuffer::new_empty(),
+        );
+        let raw_value = call_result.get(0).unwrap_or_default();
+
+        BigUint::from(raw_value.parse_as_u64().unwrap_or_default())
+    }
+
+    #[endpoint]
+    fn call_other_contract_add_async_call(&self, other_sc_address: ManagedAddress, value: BigUint) {
+        let mut args = ManagedArgBuffer::new_empty();
+        args.push_arg(&value);
+
+        self.raw_vm_api().async_call_raw(
+            &other_sc_address,
+            &BigUint::zero(),
+            &ManagedBuffer::new_from_bytes(b"add"),
+            &args,
+        );
+    }
+
+    #[callback_raw]
+    fn callback_raw(&self) {
+        self.callback_executed().set(&true);
+    }
+
+    #[endpoint(getTotalValue)]
+    fn get_total_value(&self) -> BigUint {
+        self.total_value().get()
+    }
+
+    #[endpoint]
+    fn execute_on_dest_add_value(&self, other_sc_address: ManagedAddress, value: BigUint) {
+        let mut args = ManagedArgBuffer::new_empty();
+        args.push_arg(value);
+
+        let _ = self.raw_vm_api().execute_on_dest_context_raw(
+            self.blockchain().get_gas_left(),
+            &other_sc_address,
+            &BigUint::zero(),
+            &ManagedBuffer::new_from_bytes(b"addValue"),
+            &args,
+        );
+    }
+
+    #[endpoint(addValue)]
     fn add(&self, value: BigUint) {
         let caller = self.blockchain().get_caller();
 
@@ -146,9 +215,16 @@ pub trait RustTestingFrameworkTester {
         self.value_per_caller(&caller).update(|val| *val += value);
     }
 
+    fn get_val(&self) -> BigUint {
+        self.total_value().get()
+    }
+
     #[storage_mapper("totalValue")]
     fn total_value(&self) -> SingleValueMapper<BigUint>;
 
     #[storage_mapper("valuePerCaller")]
     fn value_per_caller(&self, caller: &ManagedAddress) -> SingleValueMapper<BigUint>;
+
+    #[storage_mapper("callbackExecuted")]
+    fn callback_executed(&self) -> SingleValueMapper<bool>;
 }

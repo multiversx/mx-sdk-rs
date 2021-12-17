@@ -1,37 +1,6 @@
 use super::SEPARATOR;
-use crate::{err_msg, types::StaticSCError};
+use crate::{err_msg, hex_util::hex_digits_to_byte, types::StaticSCError};
 use alloc::vec::Vec;
-
-fn hex_digit_to_half_byte(digit: u8) -> Option<u8> {
-    if (b'0'..=b'9').contains(&digit) {
-        return Some(digit - b'0');
-    }
-    if (b'a'..=b'f').contains(&digit) {
-        return Some(digit - b'a' + 0xau8);
-    }
-    None
-}
-
-fn hex_to_byte(digit1: u8, digit2: u8) -> Option<u8> {
-    let mut result: u8;
-    match hex_digit_to_half_byte(digit1) {
-        None => {
-            return None;
-        },
-        Some(num) => {
-            result = num << 4;
-        },
-    };
-    match hex_digit_to_half_byte(digit2) {
-        None => {
-            return None;
-        },
-        Some(num) => {
-            result |= num;
-        },
-    };
-    Some(result)
-}
 
 /// Deserializes from Elrond's smart contract call format.
 ///
@@ -113,7 +82,7 @@ impl<'a> HexCallDataDeserializer<'a> {
                 let res_len = arg_hex.len() / 2;
                 let mut res_vec = Vec::with_capacity(res_len);
                 for i in 0..res_len {
-                    match hex_to_byte(arg_hex[2 * i], arg_hex[2 * i + 1]) {
+                    match hex_digits_to_byte(arg_hex[2 * i], arg_hex[2 * i + 1]) {
                         None => {
                             return Err(StaticSCError::from(err_msg::DESERIALIZATION_INVALID_BYTE));
                         },

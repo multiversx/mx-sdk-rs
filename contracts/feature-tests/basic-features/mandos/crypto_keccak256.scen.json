@@ -22,7 +22,7 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "computeKeccak256",
+                "function": "compute_keccak256",
                 "arguments": [
                     "0x61"
                 ],
@@ -45,7 +45,7 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "computeKeccak256",
+                "function": "compute_keccak256",
                 "arguments": [
                     "0x0102030405060708"
                 ],
