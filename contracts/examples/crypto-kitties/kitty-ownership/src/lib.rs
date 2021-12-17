@@ -3,6 +3,8 @@
 
 elrond_wasm::imports!();
 
+use core::cmp::max;
+
 use kitty::{kitty_genes::*, Kitty};
 use random::*;
 
@@ -570,12 +572,7 @@ pub trait KittyOwnership {
                 let sire_id = matron.siring_with_id;
                 let mut sire = self.get_kitty_by_id(sire_id);
 
-                let new_kitty_generation: u16; // MAX(gen_matron, gen_sire) + 1
-                if matron.generation > sire.generation {
-                    new_kitty_generation = matron.generation + 1;
-                } else {
-                    new_kitty_generation = sire.generation + 1;
-                }
+                let new_kitty_generation = max(matron.generation, sire.generation) + 1;
 
                 // new kitty goes to the owner of the matron
                 let new_kitty_owner = self.get_kitty_owner(matron_id);

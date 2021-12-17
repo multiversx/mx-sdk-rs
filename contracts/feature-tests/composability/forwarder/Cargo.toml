@@ -12,11 +12,11 @@ path = "src/forwarder_main.rs"
 path = "../vault"
 
 [dependencies.elrond-wasm]
-version = "0.23.1"
+version = "0.25.0"
 path = "../../../../elrond-wasm"
 features = ["cb_closure_managed_deser"]
 
 [dev-dependencies.elrond-wasm-debug]
-version = "0.23.1"
+version = "0.25.0"
 path = "../../../../elrond-wasm-debug"
 

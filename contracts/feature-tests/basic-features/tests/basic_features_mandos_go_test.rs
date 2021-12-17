@@ -44,9 +44,15 @@ fn crypto_elliptic_curves_go() {
 }
 
 #[test]
-fn crypto_keccak256_go() {
-    elrond_wasm_debug::mandos_go("mandos/crypto_keccak256.scen.json");
+fn crypto_keccak256_legacy_go() {
+    elrond_wasm_debug::mandos_go("mandos/crypto_keccak256_legacy.scen.json");
 }
+
+// TODO: enable after new VM release is out.
+// #[test]
+// fn crypto_keccak256_go() {
+//     elrond_wasm_debug::mandos_go("mandos/crypto_keccak256.scen.json");
+// }
 
 #[test]
 fn crypto_ripemd160_go() {
@@ -54,9 +60,15 @@ fn crypto_ripemd160_go() {
 }
 
 #[test]
-fn crypto_sha256_go() {
-    elrond_wasm_debug::mandos_go("mandos/crypto_sha256.scen.json");
+fn crypto_sha256_legacy_go() {
+    elrond_wasm_debug::mandos_go("mandos/crypto_sha256_legacy.scen.json");
 }
+
+// TODO: enable after new VM release is out.
+// #[test]
+// fn crypto_sha256_go() {
+//     elrond_wasm_debug::mandos_go("mandos/crypto_sha256.scen.json");
+// }
 
 #[test]
 fn crypto_verify_funcs_go() {
@@ -246,6 +258,11 @@ fn managed_buffer_slice_1_go() {
 #[test]
 fn managed_buffer_slice_2_go() {
     elrond_wasm_debug::mandos_go("mandos/managed_buffer_slice_2.scen.json");
+}
+
+#[test]
+fn managed_buffer_random_go() {
+    elrond_wasm_debug::mandos_go("mandos/managed_buffer_set_random.scen.json");
 }
 
 #[test]
