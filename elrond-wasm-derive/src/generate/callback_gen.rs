@@ -45,7 +45,10 @@ pub fn generate_callback_selector_and_main(
                 if let Some(___cb_closure___) = elrond_wasm::types::CallbackClosureForDeser::storage_load_and_clear(self.raw_vm_api()) {
                     if let elrond_wasm::types::CallbackSelectorResult::NotProcessed(_) =
                         self::EndpointWrappers::callback_selector(self, ___cb_closure___)	{
-                        elrond_wasm::api::ErrorApi::signal_error(&self.raw_vm_api(), err_msg::CALLBACK_BAD_FUNC);
+                        elrond_wasm::api::ErrorApiImpl::signal_error(
+                            &self.raw_vm_api(),
+                            err_msg::CALLBACK_BAD_FUNC,
+                        );
                     }
                 }
             };
