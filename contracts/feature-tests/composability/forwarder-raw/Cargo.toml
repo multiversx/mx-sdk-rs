@@ -9,15 +9,15 @@ publish = false
 path = "src/forwarder_raw.rs"
 
 [dependencies.elrond-wasm]
-version = "0.23.1"
+version = "0.25.0"
 path = "../../../../elrond-wasm"
 features = ["cb_closure_managed_deser"]
 
 [dependencies.elrond-wasm-node]
-version = "0.23.1"
+version = "0.25.0"
 path = "../../../../elrond-wasm-node"
 optional = true
 
 [dev-dependencies.elrond-wasm-debug]
-version = "0.23.1"
+version = "0.25.0"
 path = "../../../../elrond-wasm-debug"
