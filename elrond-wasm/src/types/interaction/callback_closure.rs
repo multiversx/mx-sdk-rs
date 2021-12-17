@@ -1,5 +1,5 @@
 use crate::{
-    api::{BlockchainApi, ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi},
+    api::{BlockchainApi, ErrorApi, ManagedTypeErrorApi, StorageReadApi, StorageWriteApi},
     contract_base::ManagedSerializer,
     storage::StorageKey,
     storage_clear, storage_get, storage_set,
@@ -13,7 +13,7 @@ use super::ManagedArgBuffer;
 pub const CALLBACK_CLOSURE_STORAGE_BASE_KEY: &[u8] = b"CB_CLOSURE";
 
 #[derive(TopEncode, TopDecode)]
-pub struct CallbackClosure<M: ManagedTypeApi> {
+pub struct CallbackClosure<M: ManagedTypeErrorApi> {
     callback_name: ManagedBuffer<M>,
     closure_args: ManagedArgBuffer<M>,
 }
@@ -22,13 +22,13 @@ pub struct CallbackClosure<M: ManagedTypeApi> {
 /// Unlike calling `CallbackClosure::<SA, R>::new`, here types can be inferred from the context.
 pub fn new_callback_call<A>(_api: A, callback_name_slice: &'static [u8]) -> CallbackClosure<A>
 where
-    A: ManagedTypeApi ,
+    A: ManagedTypeErrorApi,
 {
     let callback_name = ManagedBuffer::new_from_bytes(callback_name_slice);
     CallbackClosure::new(callback_name)
 }
 
-impl<M: ManagedTypeApi> CallbackClosure<M> {
+impl<M: ManagedTypeErrorApi> CallbackClosure<M> {
     pub fn new(callback_name: ManagedBuffer<M>) -> Self {
         let arg_buffer = ManagedArgBuffer::new_empty();
         CallbackClosure {
@@ -61,7 +61,7 @@ impl<M: ManagedTypeApi> CallbackClosure<M> {
         let storage_key = cb_closure_storage_key(api.clone());
         let storage_value_raw: ManagedBuffer<A> = storage_get(api.clone(), &storage_key);
         if !storage_value_raw.is_empty() {
-            let serializer = ManagedSerializer::new(api.clone());
+            let serializer = ManagedSerializer::<A>::new();
             let closure = serializer.top_decode_from_managed_buffer(&storage_value_raw);
             storage_clear(api, &storage_key);
             Some(closure)
@@ -97,7 +97,7 @@ pub struct CallbackClosureMatcher<const CB_NAME_MAX_LENGTH: usize> {
 }
 
 impl<const CB_NAME_MAX_LENGTH: usize> CallbackClosureMatcher<CB_NAME_MAX_LENGTH> {
-    pub fn new<M: ManagedTypeApi>(callback_name: &ManagedBuffer<M>) -> Self {
+    pub fn new<M: ManagedTypeErrorApi>(callback_name: &ManagedBuffer<M>) -> Self {
         let mut compare_buffer = [0u8; CB_NAME_MAX_LENGTH];
         let name_len = callback_name.len();
         let _ = callback_name.load_slice(0, &mut compare_buffer[..name_len]);

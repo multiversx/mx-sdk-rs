@@ -1,5 +1,5 @@
 use crate::{
-    api::{ErrorApi, ManagedTypeApi, StorageReadApi},
+    api::{ErrorApi, ErrorApiImpl, ManagedTypeApi, StorageReadApi},
     err_msg,
     types::{BigInt, BigUint, ManagedBuffer, ManagedBufferNestedDecodeInput, ManagedType},
 };
@@ -126,5 +126,5 @@ where
 {
     let mut message_buffer = ManagedBuffer::<A>::new_from_bytes(err_msg::STORAGE_DECODE_ERROR);
     message_buffer.append_bytes(de_err.message_bytes());
-    api.signal_error_from_buffer(message_buffer.get_raw_handle())
+    A::error_api_impl().signal_error_from_buffer(message_buffer.get_raw_handle())
 }

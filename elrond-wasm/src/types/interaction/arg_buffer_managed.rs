@@ -1,6 +1,6 @@
 use super::ArgBuffer;
 use crate::{
-    api::{ErrorApi, Handle, ManagedTypeApi},
+    api::{ErrorApi, ErrorApiImpl, Handle, ManagedTypeApi},
     err_msg,
     types::{ManagedBuffer, ManagedType, ManagedVec, ManagedVecIterator},
     DynArgOutput,
@@ -14,14 +14,14 @@ use elrond_codec::{
 #[derive(Debug)]
 pub struct ManagedArgBuffer<M>
 where
-    M: ManagedTypeApi  + 'static,
+    M: ManagedTypeApi + 'static,
 {
     pub(crate) data: ManagedVec<M, ManagedBuffer<M>>,
 }
 
 impl<M: ManagedTypeApi> ManagedType<M> for ManagedArgBuffer<M>
 where
-    M: ManagedTypeApi  + 'static,
+    M: ManagedTypeApi + 'static,
 {
     #[inline]
     fn from_raw_handle(handle: Handle) -> Self {
@@ -38,7 +38,7 @@ where
 
 impl<M: ManagedTypeApi> ManagedArgBuffer<M>
 where
-    M: ManagedTypeApi  + 'static,
+    M: ManagedTypeApi + 'static,
 {
     #[inline]
     pub fn new_empty() -> Self {
@@ -67,9 +67,9 @@ where
     }
 }
 
-impl<M: ManagedTypeApi> ManagedArgBuffer<M>
+impl<M> ManagedArgBuffer<M>
 where
-    M: ManagedTypeApi  + 'static,
+    M: ManagedTypeApi + 'static,
 {
     #[inline]
     pub fn len(&self) -> usize {
@@ -84,16 +84,6 @@ where
     #[inline]
     pub fn push_arg_raw(&mut self, raw_arg: ManagedBuffer<M>) {
         self.data.push(raw_arg);
-    }
-
-    pub fn push_arg<T: TopEncode>(&mut self, arg: T) {
-        let mut encoded_buffer = ManagedBuffer::new();
-        arg.top_encode_or_exit(
-            &mut encoded_buffer,
-            M::instance(), // TODO: remove
-            managed_arg_buffer_push_exit,
-        );
-        self.push_arg_raw(encoded_buffer);
     }
 
     /// Concatenates 2 managed arg buffers. Consumes both arguments in the process.
@@ -112,20 +102,31 @@ where
     }
 }
 
-#[inline(always)]
-fn managed_arg_buffer_push_exit<A>(api: A, encode_err: EncodeError) -> !
+impl<M> ManagedArgBuffer<M>
 where
-    A: ManagedTypeApi  + 'static,
+    M: ManagedTypeApi + ErrorApi + 'static,
+{
+    pub fn push_arg<T: TopEncode>(&mut self, arg: T) {
+        let mut encoded_buffer = ManagedBuffer::new();
+        arg.top_encode_or_exit(&mut encoded_buffer, (), managed_arg_buffer_push_exit::<M>);
+        self.push_arg_raw(encoded_buffer);
+    }
+}
+
+#[inline(always)]
+fn managed_arg_buffer_push_exit<A>(_: (), encode_err: EncodeError) -> !
+where
+    A: ManagedTypeApi + ErrorApi + 'static,
 {
     let mut message_buffer =
         ManagedBuffer::<A>::new_from_bytes(err_msg::CONTRACT_CALL_ENCODE_ERROR);
     message_buffer.append_bytes(encode_err.message_bytes());
-    api.signal_error_from_buffer(message_buffer.get_raw_handle())
+    A::error_api_impl().signal_error_from_buffer(message_buffer.get_raw_handle())
 }
 
 impl<M: ManagedTypeApi> ManagedArgBuffer<M>
 where
-    M: ManagedTypeApi  + 'static,
+    M: ManagedTypeApi + 'static,
 {
     pub fn to_legacy_arg_buffer(&self) -> ArgBuffer {
         let mut result = ArgBuffer::new();
@@ -138,7 +139,7 @@ where
 
 impl<M: ManagedTypeApi> ManagedArgBuffer<M>
 where
-    M: ManagedTypeApi  + 'static,
+    M: ManagedTypeApi + 'static,
 {
     pub fn raw_arg_iter(&self) -> ManagedVecIterator<M, ManagedBuffer<M>> {
         self.data.iter()

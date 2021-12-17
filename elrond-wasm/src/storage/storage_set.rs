@@ -1,5 +1,5 @@
 use crate::{
-    api::{ErrorApi, ManagedTypeApi, StorageWriteApi},
+    api::{ErrorApi, ErrorApiImpl, ManagedTypeApi, StorageWriteApi},
     err_msg,
     types::{BigInt, BigUint, ManagedBuffer, ManagedBufferCachedBuilder, ManagedType},
 };
@@ -91,8 +91,8 @@ where
 {
     value.top_encode_or_exit(
         StorageSetOutput::new(api.clone(), key),
-        api,
-        storage_set_exit,
+        (),
+        storage_set_exit::<A>,
     );
 }
 
@@ -106,11 +106,11 @@ where
 }
 
 #[inline(always)]
-fn storage_set_exit<A>(api: A, encode_err: EncodeError) -> !
+fn storage_set_exit<A>(_: (), encode_err: EncodeError) -> !
 where
     A: StorageWriteApi + ManagedTypeApi + ErrorApi + 'static,
 {
     let mut message_buffer = ManagedBuffer::<A>::new_from_bytes(err_msg::STORAGE_ENCODE_ERROR);
     message_buffer.append_bytes(encode_err.message_bytes());
-    api.signal_error_from_buffer(message_buffer.get_raw_handle())
+    A::error_api_impl().signal_error_from_buffer(message_buffer.get_raw_handle())
 }

@@ -1,5 +1,5 @@
 use crate::{
-    api::{ErrorApi, ManagedTypeApi},
+    api::{ErrorApi, ErrorApiImpl, ManagedTypeErrorApi},
     err_msg,
     types::{ManagedBuffer, ManagedType, ManagedVec},
     DynArgInput,
@@ -7,7 +7,7 @@ use crate::{
 
 pub struct ManagedResultArgLoader<A>
 where
-    A: ManagedTypeApi ,
+    A: ManagedTypeErrorApi,
 {
     data: ManagedVec<A, ManagedBuffer<A>>,
     data_len: usize,
@@ -16,7 +16,7 @@ where
 
 impl<A> ManagedResultArgLoader<A>
 where
-    A: ManagedTypeApi ,
+    A: ManagedTypeErrorApi,
 {
     pub fn new(data: ManagedVec<A, ManagedBuffer<A>>) -> Self {
         let data_len = data.len();
@@ -30,16 +30,16 @@ where
 
 impl<A> DynArgInput for ManagedResultArgLoader<A>
 where
-    A: ManagedTypeApi ,
+    A: ManagedTypeErrorApi,
 {
     type ItemInput = ManagedBuffer<A>;
 
-    type ErrorApi = A::Impl;
+    type ManagedTypeErrorApi = A;
 
-    #[inline]
-    fn dyn_arg_vm_api(&self) -> Self::ErrorApi {
-        A::instance()
-    }
+    // #[inline]
+    // fn dyn_arg_vm_api(&self) -> Self::ErrorApi {
+    //     A::instance()
+    // }
 
     #[inline]
     fn has_next(&self) -> bool {
@@ -51,8 +51,7 @@ where
             self.next_index += 1;
             buffer
         } else {
-            self.dyn_arg_vm_api()
-                .signal_error(err_msg::ARG_WRONG_NUMBER)
+            A::error_api_impl().signal_error(err_msg::ARG_WRONG_NUMBER)
         }
     }
 }

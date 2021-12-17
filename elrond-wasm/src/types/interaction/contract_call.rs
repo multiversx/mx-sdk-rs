@@ -1,7 +1,7 @@
 use crate::{
     api::{
-        SendApi, ESDT_MULTI_TRANSFER_FUNC_NAME, ESDT_NFT_TRANSFER_FUNC_NAME,
-        ESDT_TRANSFER_FUNC_NAME,
+        CallTypeApi, ErrorApiImpl, SendApi, ESDT_MULTI_TRANSFER_FUNC_NAME,
+        ESDT_NFT_TRANSFER_FUNC_NAME, ESDT_TRANSFER_FUNC_NAME,
     },
     types::{
         AsyncCall, BigUint, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer,
@@ -24,7 +24,7 @@ const TRANSFER_EXECUTE_DEFAULT_LEFTOVER: u64 = 100_000;
 #[must_use]
 pub struct ContractCall<SA, R>
 where
-    SA: SendApi + 'static,
+    SA: CallTypeApi + 'static,
 {
     api: SA,
     to: ManagedAddress<SA>,
@@ -45,7 +45,7 @@ pub fn new_contract_call<SA, R>(
     payments: ManagedVec<SA, EsdtTokenPayment<SA>>,
 ) -> ContractCall<SA, R>
 where
-    SA: SendApi + 'static,
+    SA: CallTypeApi + 'static,
 {
     let endpoint_name = ManagedBuffer::new_from_bytes(endpoint_name_slice);
     ContractCall::<SA, R>::new_with_esdt_payment(api, to, endpoint_name, payments)
@@ -53,7 +53,7 @@ where
 
 impl<SA, R> ContractCall<SA, R>
 where
-    SA: SendApi + 'static,
+    SA: CallTypeApi + 'static,
 {
     pub fn new(api: SA, to: ManagedAddress<SA>, endpoint_name: ManagedBuffer<SA>) -> Self {
         let payments = ManagedVec::new();
@@ -274,7 +274,7 @@ where
 
 impl<SA, R> ContractCall<SA, R>
 where
-    SA: SendApi + 'static,
+    SA: CallTypeApi + 'static,
     R: DynArg,
 {
     /// Executes immediately, synchronously, and returns contract call result.
@@ -334,7 +334,7 @@ where
 
 impl<SA, R> ContractCall<SA, R>
 where
-    SA: SendApi + 'static,
+    SA: CallTypeApi + 'static,
 {
     /// Executes immediately, synchronously.
     /// The result (if any) is ignored.
@@ -443,7 +443,7 @@ where
         );
 
         if let Err(e) = result {
-            self.api.signal_error(e);
+            SA::error_api_impl().signal_error(e);
         }
     }
 }

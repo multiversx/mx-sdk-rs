@@ -1,7 +1,9 @@
 use super::{StorageClearable, StorageMapper};
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
-    api::{EndpointFinishApi, ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi},
+    api::{
+        EndpointFinishApi, ErrorApi, ErrorApiImpl, ManagedTypeApi, StorageReadApi, StorageWriteApi,
+    },
     finish_all,
     io::EndpointResult,
     storage::{storage_clear, storage_get, storage_get_len, storage_set, StorageKey},
@@ -112,7 +114,7 @@ where
     /// Index must be valid (1 <= index <= count).
     pub fn get(&self, index: usize) -> T {
         if index == 0 || index > self.len() {
-            self.api.signal_error(&b"index out of range"[..]);
+            SA::error_api_impl().signal_error(&b"index out of range"[..]);
         }
         self.get_unchecked(index)
     }
@@ -147,7 +149,7 @@ where
     /// Index must be valid (1 <= index <= count).
     pub fn item_is_empty(&self, index: usize) -> bool {
         if index == 0 || index > self.len() {
-            self.api.signal_error(&b"index out of range"[..]);
+            SA::error_api_impl().signal_error(&b"index out of range"[..]);
         }
         self.item_is_empty_unchecked(index)
     }
@@ -156,7 +158,7 @@ where
     /// Index must be valid (1 <= index <= count).
     pub fn set(&self, index: usize, item: &T) {
         if index == 0 || index > self.len() {
-            self.api.signal_error(&b"index out of range"[..]);
+            SA::error_api_impl().signal_error(&b"index out of range"[..]);
         }
         self.set_unchecked(index, item);
     }
@@ -170,7 +172,7 @@ where
     /// Index must be valid (1 <= index <= count).
     pub fn clear_entry(&self, index: usize) {
         if index == 0 || index > self.len() {
-            self.api.signal_error(&b"index out of range"[..]);
+            SA::error_api_impl().signal_error(&b"index out of range"[..]);
         }
         self.clear_entry_unchecked(index)
     }
@@ -192,7 +194,7 @@ where
     pub(crate) fn swap_remove_and_get_old_last(&mut self, index: usize) -> Option<T> {
         let last_item_index = self.len();
         if index == 0 || index > last_item_index {
-            self.api.signal_error(&b"index out of range"[..]);
+            SA::error_api_impl().signal_error(&b"index out of range"[..]);
         }
 
         let mut last_item_as_option = Option::None;

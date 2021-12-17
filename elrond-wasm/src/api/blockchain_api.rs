@@ -1,4 +1,4 @@
-use super::{ErrorApi, ManagedTypeApi, StorageReadApi};
+use super::{ErrorApi, ErrorApiImpl, ManagedTypeApi, StorageReadApi};
 use crate::{
     err_msg,
     storage::{self, StorageKey},
@@ -16,7 +16,7 @@ use alloc::boxed::Box;
 /// When mocking the blockchain state, we use the Rc/RefCell pattern
 /// to isolate mock state mutability from the contract interface.
 pub trait BlockchainApi:
-    ErrorApi + ManagedTypeApi + Clone + Sized + StorageReadApi + 'static
+    ErrorApiImpl + ManagedTypeApi + Clone + Sized + StorageReadApi + 'static
 {
     fn get_caller_legacy(&self) -> Address;
 

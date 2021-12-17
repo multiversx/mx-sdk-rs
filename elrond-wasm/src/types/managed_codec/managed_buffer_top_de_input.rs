@@ -1,7 +1,10 @@
 use alloc::boxed::Box;
 use elrond_codec::{try_execute_then_cast, DecodeError, TopDecodeInput, TryStaticCast};
 
-use crate::{api::{ErrorApi, ManagedTypeApi}, types::{BigInt, BigUint, ManagedBuffer}};
+use crate::{
+    api::{ErrorApi, ErrorApiImpl, ManagedTypeApi},
+    types::{BigInt, BigUint, ManagedBuffer},
+};
 
 use super::ManagedBufferNestedDecodeInput;
 
@@ -23,7 +26,7 @@ where
         if let Some(num) = self.parse_as_u64() {
             num
         } else {
-            M::instance().signal_error(DecodeError::INPUT_TOO_LONG.message_bytes())
+            M::error_api_impl().signal_error(DecodeError::INPUT_TOO_LONG.message_bytes())
         }
     }
 

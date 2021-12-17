@@ -1,7 +1,7 @@
 use elrond_codec::{EncodeError, TopEncode};
 
 use crate::{
-    api::{ErrorApi, LogApi, ManagedTypeApi},
+    api::{ErrorApi, ErrorApiImpl, LogApi, ManagedTypeApi},
     err_msg,
     types::{ManagedBuffer, ManagedType, ManagedVec},
 };
@@ -21,22 +21,18 @@ where
     T: TopEncode,
 {
     let mut topic_buffer = ManagedBuffer::new();
-    topic.top_encode_or_exit(
-        &mut topic_buffer,
-        accumulator.type_manager(),
-        serialize_log_topic_exit,
-    );
+    topic.top_encode_or_exit(&mut topic_buffer, (), serialize_log_topic_exit::<A>);
     accumulator.push(topic_buffer);
 }
 
 #[inline(always)]
-fn serialize_log_topic_exit<A>(api: A, encode_err: EncodeError) -> !
+fn serialize_log_topic_exit<A>(_: (), encode_err: EncodeError) -> !
 where
     A: ErrorApi + ManagedTypeApi + 'static,
 {
     let mut message_buffer = ManagedBuffer::<A>::new_from_bytes(err_msg::LOG_TOPIC_ENCODE_ERROR);
     message_buffer.append_bytes(encode_err.message_bytes());
-    api.signal_error_from_buffer(message_buffer.get_raw_handle())
+    A::error_api_impl().signal_error_from_buffer(message_buffer.get_raw_handle())
 }
 
 pub fn serialize_log_data<T, A>(api: A, data: T) -> ManagedBuffer<A>
@@ -56,7 +52,7 @@ where
 {
     let mut message_buffer = ManagedBuffer::<A>::new_from_bytes(err_msg::LOG_DATA_ENCODE_ERROR);
     message_buffer.append_bytes(encode_err.message_bytes());
-    api.signal_error_from_buffer(message_buffer.get_raw_handle())
+    A::error_api_impl().signal_error_from_buffer(message_buffer.get_raw_handle())
 }
 
 pub fn write_log<L, A>(api: L, topics: &ManagedVec<A, ManagedBuffer<A>>, data: &ManagedBuffer<A>)

@@ -1,3 +1,5 @@
+use core::marker::PhantomData;
+
 use alloc::boxed::Box;
 use elrond_codec::{
     try_execute_then_cast, DecodeError, NestedDecode, NestedDecodeInput,
@@ -11,14 +13,14 @@ use crate::{
 
 pub struct ManagedBytesNestedDecodeInput<M: ManagedTypeApi> {
     bytes_input: OwnedBytesNestedDecodeInput,
-    api: M,
+    _phantom: PhantomData<M>,
 }
 
 impl<M: ManagedTypeApi> ManagedBytesNestedDecodeInput<M> {
-    pub fn new(api: M, bytes: Box<[u8]>) -> Self {
+    pub fn new(bytes: Box<[u8]>) -> Self {
         ManagedBytesNestedDecodeInput {
             bytes_input: OwnedBytesNestedDecodeInput::new(bytes),
-            api,
+            _phantom: PhantomData,
         }
     }
 

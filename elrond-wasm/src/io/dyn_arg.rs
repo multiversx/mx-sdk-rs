@@ -22,7 +22,7 @@ where
         }
 
         let arg_input = loader.next_arg_input();
-        T::top_decode_or_exit(arg_input, arg_id, dyn_load_exit::<I::ErrorApi>)
+        T::top_decode_or_exit(arg_input, arg_id, dyn_load_exit::<I::ManagedTypeErrorApi>)
     }
 }
 

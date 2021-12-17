@@ -1,4 +1,4 @@
-use crate::api::ManagedTypeApi;
+use crate::api::{ErrorApi, ManagedTypeApi, ManagedTypeErrorApi};
 
 use super::CallbackClosureForDeser;
 
@@ -6,7 +6,7 @@ use super::CallbackClosureForDeser;
 /// It is likely to be removed in the future.
 pub enum CallbackSelectorResult<A>
 where
-    A: ManagedTypeApi,
+    A: ManagedTypeErrorApi,
 {
     Processed,
     NotProcessed(CallbackClosureForDeser<A>),

@@ -1,7 +1,7 @@
 use elrond_codec::TryStaticCast;
 
 use crate::{
-    api::{EndpointFinishApi, ErrorApi, ManagedTypeApi},
+    api::{EndpointFinishApi, ErrorApi, ErrorApiImpl, ManagedTypeApi},
     elrond_codec::{EncodeError, TopEncode, TopEncodeOutput},
     err_msg,
     types::{BigInt, BigUint, ManagedBuffer, ManagedBufferCachedBuilder, ManagedType},
@@ -121,5 +121,5 @@ where
 {
     let mut message_buffer = ManagedBuffer::<FA>::new_from_bytes(err_msg::FINISH_ENCODE_ERROR);
     message_buffer.append_bytes(encode_err.message_bytes());
-    api.signal_error_from_buffer(message_buffer.get_raw_handle())
+    FA::error_api_impl().signal_error_from_buffer(message_buffer.get_raw_handle())
 }

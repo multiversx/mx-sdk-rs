@@ -1,6 +1,6 @@
 use crate::{
     abi::{OutputAbi, TypeAbi, TypeDescriptionContainer},
-    api::{SendApi, StorageReadApi},
+    api::{CallTypeApi, SendApi, StorageReadApi},
     contract_base::SendWrapper,
     io::EndpointResult,
     types::{BigUint, ManagedAddress, ManagedBuffer, TokenIdentifier},
@@ -9,7 +9,7 @@ use alloc::{string::String, vec::Vec};
 
 pub struct SendEsdt<SA>
 where
-    SA: SendApi + StorageReadApi + 'static,
+    SA: CallTypeApi + StorageReadApi + 'static,
 {
     pub(super) api: SA,
     pub(super) to: ManagedAddress<SA>,
@@ -20,7 +20,7 @@ where
 
 impl<SA> EndpointResult for SendEsdt<SA>
 where
-    SA: SendApi + StorageReadApi + 'static,
+    SA: CallTypeApi + StorageReadApi + 'static,
 {
     type DecodeAs = ();
 
@@ -38,7 +38,7 @@ where
 
 impl<SA> TypeAbi for SendEsdt<SA>
 where
-    SA: SendApi + StorageReadApi + 'static,
+    SA: CallTypeApi + StorageReadApi + 'static,
 {
     fn type_name() -> String {
         "SendEsdt".into()
