@@ -1,5 +1,8 @@
 use crate::{
-    api::{BlockchainApi, ErrorApi, ManagedTypeErrorApi, StorageReadApi, StorageWriteApi},
+    api::{
+        BlockchainApi, ErrorApi, ManagedTypeErrorApi, StorageReadApi, StorageReadApiImpl,
+        StorageWriteApi, StorageWriteApiImpl,
+    },
     contract_base::ManagedSerializer,
     storage::StorageKey,
     storage_clear, storage_get, storage_set,

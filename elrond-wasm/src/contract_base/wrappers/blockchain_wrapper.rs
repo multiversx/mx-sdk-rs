@@ -1,5 +1,5 @@
 use crate::{
-    api::{BlockchainApi, ErrorApi, ManagedTypeApi, StorageReadApi},
+    api::{BlockchainApi, ErrorApi, ManagedTypeApi, StorageReadApi, StorageReadApiImpl},
     storage::{self},
     types::{
         Address, BigUint, EsdtLocalRoleFlags, EsdtTokenData, ManagedAddress, ManagedByteArray,
@@ -222,8 +222,7 @@ where
     /// Retrieves validator rewards, as set by the protocol.
     #[inline]
     pub fn get_cumulated_validator_rewards(&self) -> BigUint<A> {
-        let raw_handle = self
-            .api
+        let raw_handle = A::storage_read_api_impl()
             .storage_load_big_uint_raw(storage::protected_keys::ELROND_REWARD_KEY);
         BigUint::from_raw_handle(raw_handle)
     }

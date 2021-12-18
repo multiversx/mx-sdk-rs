@@ -2,7 +2,10 @@ pub use super::vec_mapper::Iter;
 use super::{StorageClearable, StorageMapper, VecMapper};
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
-    api::{EndpointFinishApi, ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi},
+    api::{
+        EndpointFinishApi, ErrorApi, ManagedTypeApi, StorageReadApi, StorageReadApiImpl,
+        StorageWriteApi, StorageWriteApiImpl,
+    },
     finish_all,
     storage::StorageKey,
     storage_clear, storage_get, storage_set,

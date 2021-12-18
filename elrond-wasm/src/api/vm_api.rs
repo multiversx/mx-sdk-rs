@@ -1,7 +1,7 @@
 use super::{
     BlockchainApi, CallTypeApi, CallValueApi, CryptoApi, EndpointArgumentApi, EndpointFinishApi,
     ErrorApi, LogApi, ManagedTypeApi, ManagedTypeErrorApi, PrintApi, SendApi, StorageReadApi,
-    StorageWriteApi,
+    StorageReadApiImpl, StorageWriteApi, StorageWriteApiImpl,
 };
 
 // TODO: cleanup

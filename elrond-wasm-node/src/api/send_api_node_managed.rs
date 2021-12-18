@@ -1,6 +1,6 @@
 use crate::{error_hook, VmApiImpl};
 use elrond_wasm::{
-    api::{BlockchainApi, Handle, SendApi, StorageReadApi, StorageWriteApi},
+    api::{BlockchainApi, Handle, SendApi, StorageReadApiImpl, StorageWriteApiImpl},
     types::{
         BigUint, CodeMetadata, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer,
         ManagedType, ManagedVec, TokenIdentifier,

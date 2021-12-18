@@ -1,6 +1,6 @@
 use crate::{
     abi::{OutputAbi, TypeAbi, TypeDescriptionContainer},
-    api::{CallTypeApi, StorageReadApi},
+    api::{CallTypeApi, StorageReadApi, StorageReadApiImpl},
     contract_base::SendWrapper,
     io::EndpointResult,
     types::{BigUint, ManagedAddress, ManagedBuffer, TokenIdentifier},

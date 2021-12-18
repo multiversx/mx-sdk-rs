@@ -1,6 +1,9 @@
 use super::{set_mapper, SetMapper, StorageClearable, StorageMapper};
 use crate::{
-    api::{ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi},
+    api::{
+        ErrorApi, ManagedTypeApi, StorageReadApi, StorageReadApiImpl, StorageWriteApi,
+        StorageWriteApiImpl,
+    },
     storage::{self, StorageKey},
 };
 use core::marker::PhantomData;
