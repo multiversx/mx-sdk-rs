@@ -2,7 +2,8 @@ use super::{StorageClearable, StorageMapper};
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
     api::{
-        EndpointFinishApi, ErrorApi, ErrorApiImpl, ManagedTypeApi, StorageReadApi, StorageWriteApi,
+        EndpointFinishApi, ErrorApi, ErrorApiImpl, ManagedTypeApi, StorageReadApi,
+        StorageReadApiImpl, StorageWriteApi, StorageWriteApiImpl,
     },
     finish_all,
     io::EndpointResult,

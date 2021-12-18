@@ -1,6 +1,9 @@
 use crate::{
     abi::{OutputAbi, TypeAbi, TypeDescriptionContainer},
-    api::{CallTypeApi, ManagedTypeApi, ManagedTypeErrorApi, SendApi, StorageWriteApi},
+    api::{
+        CallTypeApi, ManagedTypeApi, ManagedTypeErrorApi, SendApi, StorageWriteApi,
+        StorageWriteApiImpl,
+    },
     io::EndpointResult,
     types::{BigUint, CallbackClosure, ManagedAddress, ManagedArgBuffer, ManagedBuffer},
 };

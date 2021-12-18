@@ -1,7 +1,10 @@
 use core::marker::PhantomData;
 
 use crate::{
-    api::{BlockchainApi, ManagedTypeApi, StorageReadApi, StorageWriteApi},
+    api::{
+        BlockchainApi, ManagedTypeApi, StorageReadApi, StorageReadApiImpl, StorageWriteApi,
+        StorageWriteApiImpl,
+    },
     storage_clear, storage_get, storage_get_len,
     types::{BoxedBytes, ManagedBuffer, ManagedBytesNestedDecodeInput, ManagedType},
     BytesArgLoader,

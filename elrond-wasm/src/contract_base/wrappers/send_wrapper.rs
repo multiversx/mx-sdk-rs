@@ -1,6 +1,6 @@
 use crate::{
     api::{
-        BlockchainApi, CallTypeApi, ManagedTypeApi, SendApi, StorageReadApi,
+        BlockchainApi, CallTypeApi, ManagedTypeApi, SendApi, StorageReadApi, StorageReadApiImpl,
         CHANGE_OWNER_BUILTIN_FUNC_NAME, ESDT_LOCAL_BURN_FUNC_NAME, ESDT_LOCAL_MINT_FUNC_NAME,
         ESDT_MULTI_TRANSFER_FUNC_NAME, ESDT_NFT_ADD_QUANTITY_FUNC_NAME, ESDT_NFT_BURN_FUNC_NAME,
         ESDT_NFT_CREATE_FUNC_NAME, ESDT_NFT_TRANSFER_FUNC_NAME, ESDT_TRANSFER_FUNC_NAME,

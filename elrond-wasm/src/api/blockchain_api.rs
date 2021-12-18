@@ -1,4 +1,4 @@
-use super::{ErrorApi, ErrorApiImpl, ManagedTypeApi, StorageReadApi};
+use super::{ErrorApi, ErrorApiImpl, ManagedTypeApi, StorageReadApi, StorageReadApiImpl};
 use crate::{
     err_msg,
     storage::{self, StorageKey},

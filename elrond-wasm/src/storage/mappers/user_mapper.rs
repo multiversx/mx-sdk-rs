@@ -1,7 +1,10 @@
 use super::StorageMapper;
 use crate::{
     abi::{TypeAbi, TypeName},
-    api::{EndpointFinishApi, ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi},
+    api::{
+        EndpointFinishApi, ErrorApi, ManagedTypeApi, StorageReadApi, StorageReadApiImpl,
+        StorageWriteApi, StorageWriteApiImpl,
+    },
     finish_all,
     io::EndpointResult,
     storage::{storage_get, storage_get_len, storage_set, StorageKey},
