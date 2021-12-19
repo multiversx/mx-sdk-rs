@@ -1,5 +1,5 @@
 [package]
-name = "adder-wasm"
+name = "abi-tester-wasm"
 version = "0.0.0"
 authors = ["Andrei Marinica <andrei.marinica@elrond.com>"]
 edition = "2018"
@@ -15,7 +15,7 @@ lto = true
 debug = false
 panic = "abort"
 
-[dependencies.adder]
+[dependencies.abi-tester]
 path = ".."
 
 [dependencies.elrond-wasm-node]
