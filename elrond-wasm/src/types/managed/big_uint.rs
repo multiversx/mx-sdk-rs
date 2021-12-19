@@ -119,6 +119,7 @@ impl<M: ManagedTypeApi> BigUint<M> {
 
 impl<M: ManagedTypeApi> BigUint<M> {
     #[inline]
+    #[must_use]
     pub fn sqrt(&self) -> Self {
         let api = M::instance();
         let handle = api.bi_new_zero();
@@ -129,6 +130,7 @@ impl<M: ManagedTypeApi> BigUint<M> {
         }
     }
 
+    #[must_use]
     pub fn pow(&self, exp: u32) -> Self {
         let api = M::instance();
         let handle = api.bi_new_zero();

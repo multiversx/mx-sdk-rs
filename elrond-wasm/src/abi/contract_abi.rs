@@ -21,6 +21,7 @@ impl ContractAbi {
         self.type_descriptions.insert_all(&other.type_descriptions);
     }
 
+    #[must_use]
     pub fn main_contract(&self) -> ContractAbi {
         ContractAbi {
             build_info: self.build_info.clone(),
@@ -46,6 +47,7 @@ impl ContractAbi {
             .any(|endpoint| endpoint.location == location)
     }
 
+    #[must_use]
     pub fn secondary_contract(&self, location: EndpointLocationAbi) -> ContractAbi {
         ContractAbi {
             build_info: self.build_info.clone(),

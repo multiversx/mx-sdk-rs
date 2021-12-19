@@ -15,6 +15,33 @@ pub struct ContractMetadata {
     pub abi: ContractAbi,
 }
 
+impl ContractMetadata {
+    pub fn cargo_toml_path(&self) -> String {
+        format!("{}/Cargo.toml", &self.wasm_crate_path)
+    }
+
+    /// This is where Rust will initially compile the WASM binary.
+    pub fn wasm_compilation_output_path(&self) -> String {
+        format!(
+            "{}/target/wasm32-unknown-unknown/release/{}.wasm",
+            &self.wasm_crate_path,
+            &self.wasm_crate_name.replace('-', "_")
+        )
+    }
+
+    pub fn abi_output_name(&self) -> String {
+        format!("{}.abi.json", &self.output_base_name)
+    }
+
+    pub fn wasm_output_name(&self) -> String {
+        format!("{}.wasm", &self.output_base_name)
+    }
+
+    pub fn wasm_output_path(&self, output_dir: &str) -> String {
+        format!("{}/{}", output_dir, self.wasm_output_name())
+    }
+}
+
 pub struct MetaConfig {
     pub build_args: BuildArgs,
     pub output_dir: String,

@@ -12,6 +12,7 @@ pub struct Color {
 impl Color {
     // ratios are integers, 0 < ratio < 100, ratioFirst + ratioSecond = 100
     // checks should be done in the caller
+    #[must_use]
     pub fn mix_with(&self, other_color: &Color, ratio_first: u8, ratio_second: u8) -> Color {
         let r = ((self.r as u16 * ratio_first as u16 + other_color.r as u16 * ratio_second as u16)
             / 100) as u8;
