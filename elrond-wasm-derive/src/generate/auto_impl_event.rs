@@ -102,30 +102,30 @@ pub fn generate_legacy_event_impl(m: &Method, event_id_bytes: &[u8]) -> proc_mac
 
     let mut topic_index: usize = 1;
     let topic_conv_snippets: Vec<proc_macro2::TokenStream> = m
-		.method_args
-		.iter()
-		.map(|arg| {
-			let result = if topic_index < nr_args_no_self {
-				let conversion = generate_topic_conversion_code(topic_index, arg);
-				quote! {
-					#conversion
-				}
-			} else {
-				let pat = &arg.pat;
-				quote! {
-					let data_vec = match elrond_wasm::elrond_codec::top_encode_to_vec_u8(&#pat) {
-						Result::Ok(data_vec) => data_vec,
-						Result::Err(encode_err) => elrond_wasm::api::ErrorApiImpl::signal_error(
+        .method_args
+        .iter()
+        .map(|arg| {
+            let result = if topic_index < nr_args_no_self {
+                let conversion = generate_topic_conversion_code(topic_index, arg);
+                quote! {
+                    #conversion
+                }
+            } else {
+                let pat = &arg.pat;
+                quote! {
+                    let data_vec = match elrond_wasm::elrond_codec::top_encode_to_vec_u8(&#pat) {
+                        Result::Ok(data_vec) => data_vec,
+                        Result::Err(encode_err) => elrond_wasm::api::ErrorApiImpl::signal_error(
                             &self.raw_vm_api(),
                             encode_err.message_bytes()
                         ),
-					};
-				}
-			};
-			topic_index += 1;
-			result
-		})
-		.collect();
+                    };
+                }
+            };
+            topic_index += 1;
+            result
+        })
+        .collect();
     let msig = method_gen::generate_sig_with_attributes(m);
     let event_id_literal = array_literal(event_id_bytes);
     quote! {

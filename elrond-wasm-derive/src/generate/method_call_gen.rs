@@ -65,7 +65,9 @@ pub fn generate_call_method_body_fixed_args(m: &Method) -> proc_macro2::TokenStr
     quote! {
         #payable_snippet
         #only_owner_snippet
-        elrond_wasm::api::EndpointArgumentApi::check_num_arguments(&self.raw_vm_api(), #nr_args);
+        elrond_wasm::api::EndpointArgumentApiImpl::check_num_arguments(
+            &<Self::Api as elrond_wasm::api::EndpointArgumentApi>::argument_api_impl(),
+            #nr_args);
         #(#arg_init_snippets)*
         #body_with_result
     }
@@ -95,7 +97,7 @@ fn generate_call_method_body_variable_nr_args(m: &Method) -> proc_macro2::TokenS
 
         #only_owner_snippet
 
-        let mut ___arg_loader = EndpointDynArgLoader::new(self.raw_vm_api());
+        let mut ___arg_loader = elrond_wasm::io::EndpointDynArgLoader::<Self::Api>::new();
 
         #(#arg_init_snippets)*
 

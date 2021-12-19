@@ -164,16 +164,21 @@ mod sample_adder {
         #[inline]
         fn call_get_sum(&self) {
             elrond_wasm::api::CallValueApi::check_not_payable(&self.raw_vm_api());
-            elrond_wasm::api::EndpointArgumentApi::check_num_arguments(&self.raw_vm_api(), 0i32);
+            elrond_wasm::api::EndpointArgumentApiImpl::check_num_arguments(
+                &<Self::Api as elrond_wasm::api::EndpointArgumentApi>::argument_api_impl(),
+                0i32,
+            );
             let result = self.get_sum();
             elrond_wasm::io::EndpointResult::finish(&result, self.raw_vm_api());
         }
         #[inline]
         fn call_init(&self) {
             elrond_wasm::api::CallValueApi::check_not_payable(&self.raw_vm_api());
-            elrond_wasm::api::EndpointArgumentApi::check_num_arguments(&self.raw_vm_api(), 1i32);
+            elrond_wasm::api::EndpointArgumentApiImpl::check_num_arguments(
+                &<Self::Api as elrond_wasm::api::EndpointArgumentApi>::argument_api_impl(),
+                1i32,
+            );
             let initial_value = elrond_wasm::load_single_arg::<Self::Api, BigInt<Self::Api>>(
-                self.raw_vm_api(),
                 0i32,
                 ArgId::from(&b"initial_value"[..]),
             );
@@ -182,9 +187,11 @@ mod sample_adder {
         #[inline]
         fn call_add(&self) {
             elrond_wasm::api::CallValueApi::check_not_payable(&self.raw_vm_api());
-            elrond_wasm::api::EndpointArgumentApi::check_num_arguments(&self.raw_vm_api(), 1i32);
+            elrond_wasm::api::EndpointArgumentApiImpl::check_num_arguments(
+                &<Self::Api as elrond_wasm::api::EndpointArgumentApi>::argument_api_impl(),
+                1i32,
+            );
             let value = elrond_wasm::load_single_arg::<Self::Api, BigInt<Self::Api>>(
-                self.raw_vm_api(),
                 0i32,
                 ArgId::from(&b"value"[..]),
             );

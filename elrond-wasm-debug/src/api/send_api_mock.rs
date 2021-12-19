@@ -5,8 +5,9 @@ use crate::{
 };
 use elrond_wasm::{
     api::{
-        BlockchainApi, SendApi, StorageReadApiImpl, StorageWriteApiImpl, ESDT_MULTI_TRANSFER_FUNC_NAME,
-        ESDT_NFT_TRANSFER_FUNC_NAME, ESDT_TRANSFER_FUNC_NAME, UPGRADE_CONTRACT_FUNC_NAME,
+        BlockchainApi, SendApi, StorageReadApiImpl, StorageWriteApiImpl,
+        ESDT_MULTI_TRANSFER_FUNC_NAME, ESDT_NFT_TRANSFER_FUNC_NAME, ESDT_TRANSFER_FUNC_NAME,
+        UPGRADE_CONTRACT_FUNC_NAME,
     },
     elrond_codec::top_encode_to_vec_u8,
     types::{

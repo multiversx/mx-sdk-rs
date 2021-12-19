@@ -1,5 +1,7 @@
+use core::marker::PhantomData;
+
 use crate::{
-    api::{EndpointArgumentApi, ErrorApiImpl, ManagedTypeErrorApi},
+    api::{EndpointArgumentApi, EndpointArgumentApiImpl, ErrorApiImpl, ManagedTypeErrorApi},
     err_msg, ArgDecodeInput, DynArgInput,
 };
 
@@ -7,7 +9,7 @@ pub struct EndpointDynArgLoader<AA>
 where
     AA: ManagedTypeErrorApi + EndpointArgumentApi,
 {
-    api: AA,
+    _phantom: PhantomData<AA>,
     current_index: i32,
     num_arguments: i32,
 }
@@ -16,10 +18,10 @@ impl<AA> EndpointDynArgLoader<AA>
 where
     AA: ManagedTypeErrorApi + EndpointArgumentApi,
 {
-    pub fn new(api: AA) -> Self {
-        let num_arguments = api.get_num_arguments();
+    pub fn new() -> Self {
+        let num_arguments = AA::argument_api_impl().get_num_arguments();
         EndpointDynArgLoader {
-            api,
+            _phantom: PhantomData,
             current_index: 0,
             num_arguments,
         }
@@ -47,7 +49,7 @@ where
         if self.current_index >= self.num_arguments {
             AA::error_api_impl().signal_error(err_msg::ARG_WRONG_NUMBER)
         } else {
-            let arg_input = ArgDecodeInput::new(self.api.clone(), self.current_index);
+            let arg_input = ArgDecodeInput::new(self.current_index);
             self.current_index += 1;
             arg_input
         }
