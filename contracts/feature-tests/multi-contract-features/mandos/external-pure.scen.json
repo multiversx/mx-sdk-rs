@@ -1,0 +1,53 @@
+{
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:multi-contract-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../output/multi-contract-features.wasm"
+                },
+                "sc:multi-contract-features-view": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../output/multi-contract-features-view.wasm"
+                },
+                "address:an-account": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            }
+        },
+        {
+            "step": "scQuery",
+            "txId": "external-function-in-external-view",
+            "tx": {
+                "to": "sc:multi-contract-features-view",
+                "function": "external_pure",
+                "arguments": []
+            },
+            "expect": {
+                "out": [
+                    "1"
+                ],
+                "status": "",
+                "logs": []
+            }
+        },
+        {
+            "step": "scQuery",
+            "txId": "external-function-not-in-main",
+            "tx": {
+                "to": "sc:multi-contract-features",
+                "function": "external_pure",
+                "arguments": []
+            },
+            "expect": {
+                "out": [],
+                "status": "1",
+                "message": "str:invalid function (not found)"
+            }
+        }
+    ]
+}

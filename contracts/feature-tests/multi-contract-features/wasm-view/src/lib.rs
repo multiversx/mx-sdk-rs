@@ -1,0 +1,15 @@
+////////////////////////////////////////////////////
+////////////////// AUTO-GENERATED //////////////////
+////////////////////////////////////////////////////
+
+#![no_std]
+
+elrond_wasm_node::wasm_endpoints! {
+    multi_contract_features
+    (
+        init
+        external_pure
+    )
+}
+
+elrond_wasm_node::wasm_empty_callback! {}
