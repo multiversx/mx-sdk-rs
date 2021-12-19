@@ -48,15 +48,11 @@ impl MetaConfig {
 
         let main_contract_abi = original_contract_abi.main_contract();
         let main_contract_crate_name = main_contract_abi.get_crate_name();
-        let main_output_base_name = build_args
-            .wasm_name
-            .clone()
-            .unwrap_or_else(|| main_contract_crate_name.clone());
 
         let main_contract = ContractMetadata {
             wasm_crate_name: format!("{}-wasm", &main_contract_crate_name),
             wasm_crate_path: "../wasm".to_string(),
-            output_base_name: main_output_base_name,
+            output_base_name: main_contract_crate_name.to_string(),
             abi: main_contract_abi.clone(),
         };
 

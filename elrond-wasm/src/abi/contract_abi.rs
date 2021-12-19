@@ -70,12 +70,13 @@ impl ContractAbi {
         T::provide_type_descriptions(&mut self.type_descriptions);
     }
 
-    /// Crate name, but with underscores instead of dashes.
-    pub fn get_crate_name(&self) -> String {
-        self.build_info
-            .contract_crate
-            .name
-            .replace('-', "_")
-            .to_lowercase()
+    /// Contract main crate name.
+    pub fn get_crate_name(&self) -> &str {
+        self.build_info.contract_crate.name
+    }
+
+    /// Contract main crate name, but with underscores instead of dashes.
+    pub fn get_crate_name_for_code(&self) -> String {
+        self.get_crate_name().replace('-', "_").to_lowercase()
     }
 }
