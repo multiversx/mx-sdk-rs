@@ -11,11 +11,7 @@ fn write_contract_abi(contract_metadata: &ContractMetadata, output_path: &str) {
     let abi_json = ContractAbiJson::from(&contract_metadata.abi);
     let abi_string = serialize_abi_to_json(&abi_json);
 
-    let abi_file_path = format!(
-        "{}/{}.abi.json",
-        output_path,
-        contract_metadata.output_base_name.as_str(),
-    );
+    let abi_file_path = format!("{}/{}", output_path, contract_metadata.abi_output_name(),);
     let mut abi_file = File::create(abi_file_path).unwrap();
     write!(abi_file, "{}", abi_string).unwrap();
 }

@@ -209,6 +209,7 @@ impl<M: ManagedTypeApi> crate::abi::TypeAbi for BigInt<M> {
 }
 
 impl<M: ManagedTypeApi> BigInt<M> {
+    #[must_use]
     pub fn pow(&self, exp: u32) -> Self {
         let api = M::instance();
         let handle = api.bi_new_zero();
