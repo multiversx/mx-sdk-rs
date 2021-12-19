@@ -9,7 +9,7 @@ impl MetaConfig {
         if let Some(main_contract) = &self.main_contract {
             if let Some(view_contract) = &self.view_contract {
                 create_dir_all(&view_contract.wasm_crate_path).unwrap();
-                create_cargo_toml_from_source(&main_contract, &view_contract);
+                create_cargo_toml_from_source(main_contract, view_contract);
             }
         }
     }
