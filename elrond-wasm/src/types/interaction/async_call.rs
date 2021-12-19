@@ -41,7 +41,7 @@ where
     type DecodeAs = ();
 
     #[inline]
-    fn finish<FA>(&self, _api: FA) {
+    fn finish<FA>(&self) {
         // first, save the callback closure
         if let Some(callback_call) = &self.callback_call {
             callback_call.save_to_storage(self.api.clone());

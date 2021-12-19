@@ -73,14 +73,14 @@ where
 {
     type DecodeAs = OptionalResult<ManagedAddress<SA>>;
 
-    fn finish<FA>(&self, api: FA)
+    fn finish<FA>(&self)
     where
         FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static,
     {
         match self {
             PerformActionResult::Nothing => (),
-            PerformActionResult::DeployResult(address) => address.finish(api),
-            PerformActionResult::SendAsyncCall(async_call) => async_call.finish(api),
+            PerformActionResult::DeployResult(address) => address.finish::<FA>(),
+            PerformActionResult::SendAsyncCall(async_call) => async_call.finish::<FA>(),
         }
     }
 }

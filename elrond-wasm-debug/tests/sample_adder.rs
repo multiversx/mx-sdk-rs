@@ -52,12 +52,12 @@ mod module_1 {
         fn call_version(&self) {
             elrond_wasm::api::CallValueApi::check_not_payable(&self.raw_vm_api());
             let result = self.version();
-            elrond_wasm::io::EndpointResult::finish(&result, self.raw_vm_api())
+            elrond_wasm::io::EndpointResult::finish::<Self::Api>(&result)
         }
 
         fn call_some_async(&self) {
             let result = self.some_async();
-            elrond_wasm::io::EndpointResult::finish(&result, self.raw_vm_api())
+            elrond_wasm::io::EndpointResult::finish::<Self::Api>(&result)
         }
 
         fn call(&self, fn_name: &[u8]) -> bool {
@@ -169,7 +169,7 @@ mod sample_adder {
                 0i32,
             );
             let result = self.get_sum();
-            elrond_wasm::io::EndpointResult::finish(&result, self.raw_vm_api());
+            elrond_wasm::io::EndpointResult::finish::<Self::Api>(&result);
         }
         #[inline]
         fn call_init(&self) {
@@ -196,7 +196,7 @@ mod sample_adder {
                 ArgId::from(&b"value"[..]),
             );
             let result = self.add(value);
-            elrond_wasm::io::EndpointResult::finish(&result, self.raw_vm_api());
+            elrond_wasm::io::EndpointResult::finish::<Self::Api>(&result);
         }
 
         fn call(&self, fn_name: &[u8]) -> bool {

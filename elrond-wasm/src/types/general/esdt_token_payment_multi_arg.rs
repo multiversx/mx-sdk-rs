@@ -70,13 +70,13 @@ where
     type DecodeAs = EsdtTokenPaymentMultiArg<M>;
 
     #[inline]
-    fn finish<FA>(&self, api: FA)
+    fn finish<FA>(&self)
     where
         FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static,
     {
-        self.obj.token_identifier.finish(api.clone());
-        self.obj.token_nonce.finish(api.clone());
-        self.obj.amount.finish(api);
+        self.obj.token_identifier.finish::<FA>();
+        self.obj.token_nonce.finish::<FA>();
+        self.obj.amount.finish::<FA>();
     }
 }
 

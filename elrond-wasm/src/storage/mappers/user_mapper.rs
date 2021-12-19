@@ -179,12 +179,12 @@ where
 {
     type DecodeAs = MultiResultVec<ManagedAddress<SA>>;
 
-    fn finish<FA>(&self, api: FA)
+    fn finish<FA>(&self)
     where
         FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static,
     {
         let all_addresses = self.get_all_addresses();
-        finish_all(api, all_addresses.into_iter());
+        finish_all::<FA, _, _>(all_addresses.into_iter());
     }
 }
 

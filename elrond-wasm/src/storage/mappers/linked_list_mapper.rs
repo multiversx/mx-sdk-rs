@@ -543,12 +543,12 @@ where
 {
     type DecodeAs = MultiResultVec<T::DecodeAs>;
 
-    fn finish<FA>(&self, api: FA)
+    fn finish<FA>(&self)
     where
         FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static,
     {
         let values_iter = self.iter().map(|x| x.into_value());
-        finish_all(api, values_iter);
+        finish_all::<FA, _, _>(values_iter);
     }
 }
 

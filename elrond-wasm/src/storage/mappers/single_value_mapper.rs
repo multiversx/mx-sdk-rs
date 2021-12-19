@@ -91,11 +91,11 @@ where
 {
     type DecodeAs = T::DecodeAs;
 
-    fn finish<FA>(&self, api: FA)
+    fn finish<FA>(&self)
     where
         FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static,
     {
-        self.get().finish(api);
+        self.get().finish::<FA>();
     }
 }
 
