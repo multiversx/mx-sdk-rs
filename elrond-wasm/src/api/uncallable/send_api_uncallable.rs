@@ -1,12 +1,24 @@
 use crate::{
-    api::SendApi,
+    api::{SendApi, SendApiImpl},
     types::{
         BigUint, CodeMetadata, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer,
         ManagedVec, TokenIdentifier,
     },
 };
 
-impl SendApi for super::UncallableApi {
+use super::UncallableApi;
+
+impl SendApi for UncallableApi {
+    type SendApiImpl = UncallableApi;
+
+    fn send_api_impl() -> Self::SendApiImpl {
+        unreachable!()
+    }
+}
+
+impl SendApiImpl for UncallableApi {
+    type ManagedTypeApi = UncallableApi;
+
     fn direct_egld<D>(&self, _to: &ManagedAddress<Self>, _amount: &BigUint<Self>, _data: D)
     where
         D: Into<ManagedBuffer<Self>>,

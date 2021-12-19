@@ -1,7 +1,9 @@
+use core::marker::PhantomData;
+
 use crate::{
     abi::{OutputAbi, TypeAbi, TypeDescriptionContainer},
     api::{
-        CallTypeApi, ManagedTypeApi, ManagedTypeErrorApi, SendApi, StorageWriteApi,
+        CallTypeApi, ManagedTypeApi, ManagedTypeErrorApi, SendApi, SendApiImpl, StorageWriteApi,
         StorageWriteApiImpl,
     },
     io::EndpointResult,
@@ -14,7 +16,7 @@ pub struct AsyncCall<SA>
 where
     SA: CallTypeApi + 'static,
 {
-    pub(crate) api: SA,
+    pub(crate) _phantom: PhantomData<SA>,
     pub(crate) to: ManagedAddress<SA>,
     pub(crate) egld_payment: BigUint<SA>,
     pub(crate) endpoint_name: ManagedBuffer<SA>,
@@ -45,11 +47,11 @@ where
     fn finish<FA>(&self) {
         // first, save the callback closure
         if let Some(callback_call) = &self.callback_call {
-            callback_call.save_to_storage(self.api.clone());
+            callback_call.save_to_storage::<SA>();
         }
 
         // last, send the async call, which will kill the execution
-        self.api.async_call_raw(
+        SA::send_api_impl().async_call_raw(
             &self.to,
             &self.egld_payment,
             &self.endpoint_name,

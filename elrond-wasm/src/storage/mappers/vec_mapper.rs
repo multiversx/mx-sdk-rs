@@ -75,12 +75,12 @@ where
     }
 
     fn save_count(&self, new_len: usize) {
-        storage_set(self.api.clone(), &self.len_key, &new_len);
+        storage_set(&self.len_key, &new_len);
     }
 
     /// Number of items managed by the mapper.
     pub fn len(&self) -> usize {
-        storage_get(self.api.clone(), &self.len_key)
+        storage_get(&self.len_key)
     }
 
     /// True if no items present in the mapper.
@@ -93,7 +93,7 @@ where
     pub fn push(&mut self, item: &T) -> usize {
         let mut len = self.len();
         len += 1;
-        storage_set(self.api.clone(), &self.item_key(len), item);
+        storage_set(&self.item_key(len), item);
         self.save_count(len);
         len
     }
@@ -105,7 +105,7 @@ where
         let mut len = self.len();
         for item in items {
             len += 1;
-            storage_set(self.api.clone(), &self.item_key(len), item);
+            storage_set(&self.item_key(len), item);
         }
         self.save_count(len);
         len
@@ -124,7 +124,7 @@ where
     /// There are no restrictions on the index,
     /// calling for an invalid index will simply return the zero-value.
     pub fn get_unchecked(&self, index: usize) -> T {
-        storage_get(self.api.clone(), &self.item_key(index))
+        storage_get(&self.item_key(index))
     }
 
     /// Get item at index from storage.
@@ -143,7 +143,7 @@ where
     /// There are no restrictions on the index,
     /// calling for an invalid index will simply return `true`.
     pub fn item_is_empty_unchecked(&self, index: usize) -> bool {
-        storage_get_len(self.api.clone(), &self.item_key(index)) == 0
+        storage_get_len(&self.item_key(index)) == 0
     }
 
     /// Checks whether or not there is anything ins storage at index.
@@ -166,7 +166,7 @@ where
 
     /// Keeping `set_unchecked` private on purpose, so developers don't write out of index limits by accident.
     fn set_unchecked(&self, index: usize, item: &T) {
-        storage_set(self.api.clone(), &self.item_key(index), item);
+        storage_set(&self.item_key(index), item);
     }
 
     /// Clears item at index from storage.
@@ -182,7 +182,7 @@ where
     /// There are no restrictions on the index,
     /// calling for an invalid index will simply do nothing.
     pub fn clear_entry_unchecked(&self, index: usize) {
-        storage_clear(self.api.clone(), &self.item_key(index));
+        storage_clear(&self.item_key(index));
     }
 
     /// Clears item at index from storage by swap remove
@@ -220,7 +220,7 @@ where
     pub fn clear(&mut self) {
         let len = self.len();
         for i in 1..=len {
-            storage_clear(self.api.clone(), &self.item_key(i));
+            storage_clear(&self.item_key(i));
         }
         self.save_count(0);
     }

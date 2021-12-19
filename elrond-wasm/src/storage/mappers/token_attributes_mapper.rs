@@ -244,27 +244,23 @@ where
     }
 
     fn get_counter_value(&self) -> u8 {
-        storage_get(self.api.clone(), &self.build_key_token_id_counter())
+        storage_get(&self.build_key_token_id_counter())
     }
 
     fn set_counter_value(&self, value: u8) {
-        storage_set(self.api.clone(), &self.build_key_token_id_counter(), &value);
+        storage_set(&self.build_key_token_id_counter(), &value);
     }
 
     fn get_mapping_value<M: ManagedTypeApi>(&self, token_id: &TokenIdentifier<M>) -> u8 {
-        storage_get(self.api.clone(), &self.build_key_token_id_mapping(token_id))
+        storage_get(&self.build_key_token_id_mapping(token_id))
     }
 
     fn set_mapping_value<M: ManagedTypeApi>(&self, token_id: &TokenIdentifier<M>, value: u8) {
-        storage_set(
-            self.api.clone(),
-            &self.build_key_token_id_mapping(token_id),
-            &value,
-        );
+        storage_set(&self.build_key_token_id_mapping(token_id), &value);
     }
 
     fn is_empty_mapping_value<M: ManagedTypeApi>(&self, token_id: &TokenIdentifier<M>) -> bool {
-        storage_get_len(self.api.clone(), &self.build_key_token_id_mapping(token_id)) == 0
+        storage_get_len(&self.build_key_token_id_mapping(token_id)) == 0
     }
 
     fn get_attributes_to_nonce_mapping<T: TopEncode + TopDecode + NestedEncode + NestedDecode>(
@@ -272,10 +268,7 @@ where
         mapping: u8,
         attr: &T,
     ) -> u64 {
-        storage_get(
-            self.api.clone(),
-            &self.build_key_attr_to_nonce_mapping(mapping, attr),
-        )
+        storage_get(&self.build_key_attr_to_nonce_mapping(mapping, attr))
     }
 
     fn set_attributes_to_nonce_mapping<T: TopEncode + TopDecode + NestedEncode + NestedDecode>(
@@ -285,7 +278,6 @@ where
         token_nonce: u64,
     ) {
         storage_set(
-            self.api.clone(),
             &self.build_key_attr_to_nonce_mapping(mapping, attr),
             &token_nonce,
         );
@@ -298,10 +290,7 @@ where
         mapping: u8,
         attr: &T,
     ) -> bool {
-        storage_get_len(
-            self.api.clone(),
-            &self.build_key_attr_to_nonce_mapping(mapping, attr),
-        ) == 0
+        storage_get_len(&self.build_key_attr_to_nonce_mapping(mapping, attr)) == 0
     }
 
     fn clear_attributes_to_nonce_mapping<T: TopEncode + TopDecode + NestedEncode + NestedDecode>(
@@ -309,10 +298,7 @@ where
         mapping: u8,
         attr: &T,
     ) {
-        storage_clear(
-            self.api.clone(),
-            &self.build_key_attr_to_nonce_mapping(mapping, attr),
-        );
+        storage_clear(&self.build_key_attr_to_nonce_mapping(mapping, attr));
     }
 
     fn get_token_attributes_value<T: TopEncode + TopDecode + NestedEncode + NestedDecode>(
@@ -320,10 +306,7 @@ where
         mapping: u8,
         token_nonce: u64,
     ) -> T {
-        storage_get(
-            self.api.clone(),
-            &self.build_key_token_attr_value(mapping, token_nonce),
-        )
+        storage_get(&self.build_key_token_attr_value(mapping, token_nonce))
     }
 
     fn set_token_attributes_value<T: TopEncode + TopDecode + NestedEncode + NestedDecode>(
@@ -333,23 +316,16 @@ where
         value: &T,
     ) {
         storage_set(
-            self.api.clone(),
             &self.build_key_token_attr_value(mapping, token_nonce),
             value,
         );
     }
 
     fn is_empty_token_attributes_value(&self, mapping: u8, token_nonce: u64) -> bool {
-        storage_get_len(
-            self.api.clone(),
-            &self.build_key_token_attr_value(mapping, token_nonce),
-        ) == 0
+        storage_get_len(&self.build_key_token_attr_value(mapping, token_nonce)) == 0
     }
 
     fn clear_token_attributes_value(&self, mapping: u8, token_nonce: u64) {
-        storage_clear(
-            self.api.clone(),
-            &self.build_key_token_attr_value(mapping, token_nonce),
-        );
+        storage_clear(&self.build_key_token_attr_value(mapping, token_nonce));
     }
 }

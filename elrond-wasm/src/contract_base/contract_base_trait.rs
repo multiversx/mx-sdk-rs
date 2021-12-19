@@ -27,7 +27,7 @@ pub trait ContractBase: Sized {
     /// Gateway to the functionality related to sending transactions from the current contract.
     #[inline]
     fn send(&self) -> SendWrapper<Self::Api> {
-        SendWrapper::new(self.raw_vm_api())
+        SendWrapper::<Self::Api>::new()
     }
 
     /// Managed types API. Required to create new instances of managed types.
@@ -39,7 +39,7 @@ pub trait ContractBase: Sized {
     /// Gateway blockchain info related to the current transaction and to accounts.
     #[inline]
     fn blockchain(&self) -> BlockchainWrapper<Self::Api> {
-        BlockchainWrapper::new(self.raw_vm_api())
+        BlockchainWrapper::<Self::Api>::new()
     }
 
     /// Stateless crypto functions provided by the Arwen VM.

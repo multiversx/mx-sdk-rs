@@ -152,34 +152,23 @@ where
     }
 
     fn get_info(&self) -> LinkedListInfo {
-        storage_get(self.api.clone(), &self.build_name_key(INFO_IDENTIFIER))
+        storage_get(&self.build_name_key(INFO_IDENTIFIER))
     }
 
     fn set_info(&mut self, value: LinkedListInfo) {
-        storage_set(
-            self.api.clone(),
-            &self.build_name_key(INFO_IDENTIFIER),
-            &value,
-        );
+        storage_set(&self.build_name_key(INFO_IDENTIFIER), &value);
     }
 
     fn get_node(&self, node_id: u32) -> LinkedListNode<T> {
-        storage_get(
-            self.api.clone(),
-            &self.build_node_id_named_key(NODE_IDENTIFIER, node_id),
-        )
+        storage_get(&self.build_node_id_named_key(NODE_IDENTIFIER, node_id))
     }
 
     fn is_empty_node(&self, node_id: u32) -> bool {
-        storage_get_len(
-            self.api.clone(),
-            &self.build_node_id_named_key(NODE_IDENTIFIER, node_id),
-        ) == 0
+        storage_get_len(&self.build_node_id_named_key(NODE_IDENTIFIER, node_id)) == 0
     }
 
     fn set_node(&mut self, node_id: u32, item: &LinkedListNode<T>) {
         storage_set(
-            self.api.clone(),
             &self.build_node_id_named_key(NODE_IDENTIFIER, node_id),
             item,
         );
@@ -187,7 +176,6 @@ where
 
     fn clear_node(&mut self, node_id: u32) {
         storage_set(
-            self.api.clone(),
             &self.build_node_id_named_key(NODE_IDENTIFIER, node_id),
             &BoxedBytes::empty(),
         );

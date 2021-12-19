@@ -46,7 +46,7 @@ pub fn generate_callback_selector_and_main(
                     if let elrond_wasm::types::CallbackSelectorResult::NotProcessed(_) =
                         self::EndpointWrappers::callback_selector(self, ___cb_closure___)	{
                         elrond_wasm::api::ErrorApiImpl::signal_error(
-                            &self.raw_vm_api(),
+                            &Self::Api::error_api_impl(),
                             err_msg::CALLBACK_BAD_FUNC,
                         );
                     }

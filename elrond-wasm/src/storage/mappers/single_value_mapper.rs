@@ -43,7 +43,7 @@ where
 {
     /// Retrieves current value from storage.
     pub fn get(&self) -> T {
-        storage_get(self.api.clone(), &self.key)
+        storage_get(&self.key)
     }
 
     /// Returns whether the storage managed by this mapper is empty.
@@ -53,7 +53,7 @@ where
 
     /// Saves argument to storage.
     pub fn set(&self, new_value: &T) {
-        storage_set(self.api.clone(), &self.key, new_value);
+        storage_set(&self.key, new_value);
     }
 
     /// Saves argument to storage only if the storage is empty.
@@ -66,7 +66,7 @@ where
 
     /// Clears the storage for this mapper.
     pub fn clear(&self) {
-        storage_clear(self.api.clone(), &self.key);
+        storage_clear(&self.key);
     }
 
     /// Syntactic sugar, to more compactly express a get, update and set in one line.
@@ -80,7 +80,7 @@ where
     }
 
     pub fn raw_byte_length(&self) -> usize {
-        storage_get_len(self.api.clone(), &self.key)
+        storage_get_len(&self.key)
     }
 }
 

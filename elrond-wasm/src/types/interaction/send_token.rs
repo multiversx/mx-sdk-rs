@@ -1,6 +1,8 @@
+use core::marker::PhantomData;
+
 use crate::{
     abi::{OutputAbi, TypeAbi, TypeDescriptionContainer},
-    api::{CallTypeApi, StorageReadApi, StorageReadApiImpl},
+    api::{CallTypeApi, SendApiImpl, StorageReadApi, StorageReadApiImpl},
     contract_base::SendWrapper,
     io::EndpointResult,
     types::{BigUint, ManagedAddress, ManagedBuffer, TokenIdentifier},
@@ -11,11 +13,31 @@ pub struct SendToken<SA>
 where
     SA: CallTypeApi + StorageReadApi + 'static,
 {
-    pub api: SA,
+    _phantom: PhantomData<SA>,
     pub to: ManagedAddress<SA>,
     pub token: TokenIdentifier<SA>,
     pub amount: BigUint<SA>,
     pub data: ManagedBuffer<SA>,
+}
+
+impl<SA> SendToken<SA>
+where
+    SA: CallTypeApi + StorageReadApi + 'static,
+{
+    pub fn new(
+        to: ManagedAddress<SA>,
+        token: TokenIdentifier<SA>,
+        amount: BigUint<SA>,
+        data: ManagedBuffer<SA>,
+    ) -> Self {
+        Self {
+            _phantom: PhantomData,
+            to,
+            token,
+            amount,
+            data,
+        }
+    }
 }
 
 impl<SA> EndpointResult for SendToken<SA>
@@ -27,10 +49,9 @@ where
     #[inline]
     fn finish<FA>(&self) {
         if self.token.is_egld() {
-            self.api
-                .direct_egld(&self.to, &self.amount, self.data.clone());
+            SA::send_api_impl().direct_egld(&self.to, &self.amount, self.data.clone());
         } else {
-            SendWrapper::new(self.api.clone()).transfer_esdt_via_async_call(
+            SendWrapper::new().transfer_esdt_via_async_call(
                 &self.to,
                 &self.token,
                 0,

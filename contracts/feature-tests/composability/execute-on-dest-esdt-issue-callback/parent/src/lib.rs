@@ -19,7 +19,7 @@ pub trait Parent {
 
     #[endpoint(deployChildContract)]
     fn deploy_child_contract(&self, code: ManagedBuffer) {
-        let (child_contract_address, _) = self.raw_vm_api().deploy_contract(
+        let (child_contract_address, _) = Self::Api::send_api_impl().deploy_contract(
             self.blockchain().get_gas_left(),
             &BigUint::zero(),
             &code,

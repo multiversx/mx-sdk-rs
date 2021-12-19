@@ -94,7 +94,6 @@ mod module_1 {
         {
             let (___api___, ___address___) = self.into_fields();
             let mut ___contract_call___ = elrond_wasm::types::new_contract_call(
-                ___api___.clone(),
                 ___address___,
                 &b"version"[..],
                 ManagedVec::<Self::Api, EsdtTokenPayment<Self::Api>>::new(),
@@ -143,14 +142,12 @@ mod sample_adder {
         C: AutoImpl + super::module_1::AutoImpl,
     {
         fn get_sum(&self) -> BigInt<Self::Api> {
-            let mut ___key___ =
-                elrond_wasm::storage::StorageKey::<Self::Api>::new(self.raw_vm_api(), &b"sum"[..]);
-            elrond_wasm::storage_get(self.raw_vm_api(), &___key___)
+            let mut ___key___ = elrond_wasm::storage::StorageKey::<Self::Api>::new(&b"sum"[..]);
+            elrond_wasm::storage_get(&___key___)
         }
         fn set_sum(&self, sum: &BigInt<Self::Api>) {
-            let mut ___key___ =
-                elrond_wasm::storage::StorageKey::<Self::Api>::new(self.raw_vm_api(), &b"sum"[..]);
-            elrond_wasm::storage_set(self.raw_vm_api(), &___key___, &sum);
+            let mut ___key___ = elrond_wasm::storage::StorageKey::<Self::Api>::new(&b"sum"[..]);
+            elrond_wasm::storage_set(&___key___, &sum);
         }
         fn callback(&self) {}
         fn callbacks(&self) -> self::CallbackProxyObj<Self::Api> {
@@ -239,7 +236,6 @@ mod sample_adder {
         > {
             let (___api___, ___address___) = self.into_fields();
             let mut ___contract_call___ = elrond_wasm::types::new_contract_call(
-                ___api___.clone(),
                 ___address___,
                 &b"get_sum"[..],
                 ManagedVec::<Self::Api, EsdtTokenPayment<Self::Api>>::new(),
@@ -253,7 +249,6 @@ mod sample_adder {
         {
             let (___api___, ___address___) = self.into_fields();
             let mut ___contract_call___ = elrond_wasm::types::new_contract_call(
-                ___api___.clone(),
                 ___address___,
                 &b"add"[..],
                 ManagedVec::<Self::Api, EsdtTokenPayment<Self::Api>>::new(),

@@ -67,15 +67,15 @@ where
     }
 
     pub fn get_index(&self, value: &T) -> usize {
-        storage_get(self.api.clone(), &self.item_index_key(value))
+        storage_get(&self.item_index_key(value))
     }
 
     fn set_index(&self, value: &T, index: usize) {
-        storage_set(self.api.clone(), &self.item_index_key(value), &index);
+        storage_set(&self.item_index_key(value), &index);
     }
 
     fn clear_index(&self, value: &T) {
-        storage_clear(self.api.clone(), &self.item_index_key(value));
+        storage_clear(&self.item_index_key(value));
     }
 
     /// Returns `true` if the set contains no elements.

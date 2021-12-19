@@ -6,7 +6,7 @@ use elrond_wasm_debug::DebugApi;
 
 fn create_queue() -> QueueMapper<DebugApi, u64> {
     let api = DebugApi::dummy();
-    let base_key = StorageKey::new(api.clone(), &b"my_queue"[..]);
+    let base_key = StorageKey::new(&b"my_queue"[..]);
     QueueMapper::new(api, base_key)
 }
 
