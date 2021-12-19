@@ -6,7 +6,7 @@ use elrond_wasm_debug::DebugApi;
 
 fn create_list() -> LinkedListMapper<DebugApi, u64> {
     let api = DebugApi::dummy();
-    let base_key = StorageKey::new(api.clone(), &b"my_list"[..]);
+    let base_key = StorageKey::new(&b"my_list"[..]);
     LinkedListMapper::new(api, base_key)
 }
 

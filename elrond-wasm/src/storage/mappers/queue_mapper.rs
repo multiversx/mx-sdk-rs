@@ -125,45 +125,30 @@ where
     }
 
     fn get_info(&self) -> QueueMapperInfo {
-        storage_get(self.api.clone(), &self.build_name_key(INFO_IDENTIFIER))
+        storage_get(&self.build_name_key(INFO_IDENTIFIER))
     }
 
     fn set_info(&mut self, value: QueueMapperInfo) {
-        storage_set(
-            self.api.clone(),
-            &self.build_name_key(INFO_IDENTIFIER),
-            &value,
-        );
+        storage_set(&self.build_name_key(INFO_IDENTIFIER), &value);
     }
 
     fn get_node(&self, node_id: u32) -> Node {
-        storage_get(
-            self.api.clone(),
-            &self.build_node_id_named_key(NODE_IDENTIFIER, node_id),
-        )
+        storage_get(&self.build_node_id_named_key(NODE_IDENTIFIER, node_id))
     }
 
     fn set_node(&mut self, node_id: u32, item: Node) {
         storage_set(
-            self.api.clone(),
             &self.build_node_id_named_key(NODE_IDENTIFIER, node_id),
             &item,
         );
     }
 
     fn clear_node(&mut self, node_id: u32) {
-        storage_set(
-            self.api.clone(),
-            &self.build_node_id_named_key(NODE_IDENTIFIER, node_id),
-            &(),
-        );
+        storage_set(&self.build_node_id_named_key(NODE_IDENTIFIER, node_id), &());
     }
 
     fn get_value(&self, node_id: u32) -> T {
-        storage_get(
-            self.api.clone(),
-            &self.build_node_id_named_key(VALUE_IDENTIFIER, node_id),
-        )
+        storage_get(&self.build_node_id_named_key(VALUE_IDENTIFIER, node_id))
     }
 
     fn get_value_option(&self, node_id: u32) -> Option<T> {
@@ -175,7 +160,6 @@ where
 
     fn set_value(&mut self, node_id: u32, value: &T) {
         storage_set(
-            self.api.clone(),
             &self.build_node_id_named_key(VALUE_IDENTIFIER, node_id),
             value,
         )
@@ -183,7 +167,6 @@ where
 
     fn clear_value(&mut self, node_id: u32) {
         storage_set(
-            self.api.clone(),
             &self.build_node_id_named_key(VALUE_IDENTIFIER, node_id),
             &(),
         )

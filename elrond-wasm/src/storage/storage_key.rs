@@ -17,7 +17,7 @@ where
     A: ManagedTypeApi + ErrorApi + 'static,
 {
     #[inline]
-    pub fn new(_api: A, base_key: &[u8]) -> Self {
+    pub fn new(base_key: &[u8]) -> Self {
         StorageKey {
             buffer: ManagedBuffer::new_from_bytes(base_key),
         }

@@ -16,7 +16,6 @@ fn generate_key_snippet(key_args: &[MethodArgument], identifier: &str) -> proc_m
         .collect();
     quote! {
         let mut ___key___ = elrond_wasm::storage::StorageKey::<Self::Api>::new(
-            self.raw_vm_api(),
             &#id_literal[..],
         );
         #(#key_appends)*
@@ -32,7 +31,7 @@ pub fn generate_getter_impl(m: &Method, identifier: &str) -> proc_macro2::TokenS
             quote! {
                 #msig {
                     #key_snippet
-                    elrond_wasm::storage::storage_get(self.raw_vm_api(), &___key___)
+                    elrond_wasm::storage::storage_get(&___key___)
                 }
             }
         },
@@ -56,7 +55,7 @@ pub fn generate_setter_impl(m: &Method, identifier: &str) -> proc_macro2::TokenS
     quote! {
         #msig {
             #key_snippet
-            elrond_wasm::storage::storage_set(self.raw_vm_api(), &___key___, & #pat);
+            elrond_wasm::storage::storage_set(&___key___, & #pat);
         }
     }
 }
@@ -86,7 +85,7 @@ pub fn generate_is_empty_impl(m: &Method, identifier: &str) -> proc_macro2::Toke
     quote! {
         #msig {
             #key_snippet
-            elrond_wasm::storage::storage_get_len(self.raw_vm_api(), &___key___) == 0
+            elrond_wasm::storage::storage_get_len(&___key___) == 0
         }
     }
 }
@@ -101,7 +100,7 @@ pub fn generate_clear_impl(m: &Method, identifier: &str) -> proc_macro2::TokenSt
     quote! {
         #msig {
             #key_snippet
-            elrond_wasm::storage::storage_clear(self.raw_vm_api(), &___key___);
+            elrond_wasm::storage::storage_clear(&___key___);
         }
     }
 }

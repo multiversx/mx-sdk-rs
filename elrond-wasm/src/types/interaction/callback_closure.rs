@@ -1,7 +1,7 @@
 use crate::{
     api::{
-        BlockchainApi, ErrorApi, ManagedTypeErrorApi, StorageReadApi, StorageReadApiImpl,
-        StorageWriteApi, StorageWriteApiImpl,
+        BlockchainApi, BlockchainApiImpl, ErrorApi, ManagedTypeErrorApi, StorageReadApi,
+        StorageReadApiImpl, StorageWriteApi, StorageWriteApiImpl,
     },
     contract_base::ManagedSerializer,
     storage::StorageKey,
@@ -53,20 +53,20 @@ impl<M: ManagedTypeErrorApi> CallbackClosure<M> {
         endpoint_arg.push_dyn_arg(&mut self.closure_args);
     }
 
-    pub fn save_to_storage<A: BlockchainApi + StorageWriteApi>(&self, api: A) {
-        let storage_key = cb_closure_storage_key(api.clone());
-        storage_set(api, &storage_key, self);
+    pub fn save_to_storage<A: BlockchainApi + StorageWriteApi>(&self) {
+        let storage_key = cb_closure_storage_key::<A>();
+        storage_set(&storage_key, self);
     }
 
     pub fn storage_load_and_clear<A: BlockchainApi + StorageReadApi + StorageWriteApi>(
         api: A,
     ) -> Option<Self> {
-        let storage_key = cb_closure_storage_key(api.clone());
-        let storage_value_raw: ManagedBuffer<A> = storage_get(api.clone(), &storage_key);
+        let storage_key = cb_closure_storage_key::<A>();
+        let storage_value_raw: ManagedBuffer<A> = storage_get(&storage_key);
         if !storage_value_raw.is_empty() {
             let serializer = ManagedSerializer::<A>::new();
             let closure = serializer.top_decode_from_managed_buffer(&storage_value_raw);
-            storage_clear(api, &storage_key);
+            storage_clear(&storage_key);
             Some(closure)
         } else {
             None
@@ -84,9 +84,9 @@ impl<M: ManagedTypeErrorApi> CallbackClosure<M> {
     }
 }
 
-pub(super) fn cb_closure_storage_key<A: BlockchainApi>(api: A) -> StorageKey<A> {
-    let tx_hash = api.get_tx_hash();
-    let mut storage_key = StorageKey::new(api, CALLBACK_CLOSURE_STORAGE_BASE_KEY);
+pub(super) fn cb_closure_storage_key<A: BlockchainApi>() -> StorageKey<A> {
+    let tx_hash = A::blockchain_api_impl().get_tx_hash();
+    let mut storage_key = StorageKey::new(CALLBACK_CLOSURE_STORAGE_BASE_KEY);
     storage_key.append_managed_buffer(tx_hash.as_managed_buffer());
     storage_key
 }

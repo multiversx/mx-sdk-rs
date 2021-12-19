@@ -1,3 +1,5 @@
+use core::marker::PhantomData;
+
 use super::properties::*;
 use hex_literal::hex;
 
@@ -26,7 +28,7 @@ pub struct ESDTSystemSmartContractProxy<SA>
 where
     SA: SendApi + 'static,
 {
-    pub api: SA,
+    _phantom: PhantomData<SA>,
 }
 
 impl<SA> ESDTSystemSmartContractProxy<SA>
@@ -35,8 +37,10 @@ where
 {
     /// Constructor.
     /// TODO: consider moving this to a new Proxy contructor trait (bonus: better proxy constructor syntax).
-    pub fn new_proxy_obj(api: SA) -> Self {
-        ESDTSystemSmartContractProxy { api }
+    pub fn new_proxy_obj() -> Self {
+        ESDTSystemSmartContractProxy {
+            _phantom: PhantomData,
+        }
     }
 }
 
@@ -175,7 +179,6 @@ where
         };
 
         let mut contract_call = ContractCall::new(
-            self.api,
             esdt_system_sc_address,
             ManagedBuffer::new_from_bytes(endpoint_name),
         )
@@ -412,7 +415,6 @@ where
     fn esdt_system_sc_call_no_args(self, endpoint_name: &[u8]) -> ContractCall<SA, ()> {
         let esdt_system_sc_address = self.esdt_system_sc_address();
         ContractCall::new(
-            self.api,
             esdt_system_sc_address,
             ManagedBuffer::new_from_bytes(endpoint_name),
         )

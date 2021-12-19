@@ -68,25 +68,15 @@ where
     }
 
     fn get_mapped_value(&self, key: &K) -> V {
-        storage_get(
-            self.api.clone(),
-            &self.build_named_key(MAPPED_VALUE_IDENTIFIER, key),
-        )
+        storage_get(&self.build_named_key(MAPPED_VALUE_IDENTIFIER, key))
     }
 
     fn set_mapped_value(&self, key: &K, value: &V) {
-        storage_set(
-            self.api.clone(),
-            &self.build_named_key(MAPPED_VALUE_IDENTIFIER, key),
-            &value,
-        );
+        storage_set(&self.build_named_key(MAPPED_VALUE_IDENTIFIER, key), &value);
     }
 
     fn clear_mapped_value(&self, key: &K) {
-        storage_clear(
-            self.api.clone(),
-            &self.build_named_key(MAPPED_VALUE_IDENTIFIER, key),
-        );
+        storage_clear(&self.build_named_key(MAPPED_VALUE_IDENTIFIER, key));
     }
 
     /// Returns `true` if the map contains no elements.

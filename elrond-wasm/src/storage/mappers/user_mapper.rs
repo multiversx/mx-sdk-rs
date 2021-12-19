@@ -68,11 +68,11 @@ where
     /// Yields the user id for a given address.
     /// Will return 0 if the address is not known to the contract.
     pub fn get_user_id(&self, address: &ManagedAddress<SA>) -> usize {
-        storage_get(self.api.clone(), &self.get_user_id_key(address))
+        storage_get(&self.get_user_id_key(address))
     }
 
     fn set_user_id(&self, address: &ManagedAddress<SA>, id: usize) {
-        storage_set(self.api.clone(), &self.get_user_id_key(address), &id);
+        storage_set(&self.get_user_id_key(address), &id);
     }
 
     /// Yields the user address for a given id, if the id is valid.
@@ -80,8 +80,8 @@ where
         let key = self.get_user_address_key(id);
         // TODO: optimize, storage_load_managed_buffer_len is currently called twice
 
-        if storage_get_len(self.api.clone(), &key) > 0 {
-            Some(storage_get(self.api.clone(), &key))
+        if storage_get_len(&key) > 0 {
+            Some(storage_get(&key))
         } else {
             None
         }
@@ -90,7 +90,7 @@ where
     /// Yields the user address for a given id.
     /// Will cause a deserialization error if the id is invalid.
     pub fn get_user_address_unchecked(&self, id: usize) -> ManagedAddress<SA> {
-        storage_get(self.api.clone(), &self.get_user_address_key(id))
+        storage_get(&self.get_user_address_key(id))
     }
 
     /// Yields the user address for a given id, if the id is valid.
@@ -98,24 +98,24 @@ where
     pub fn get_user_address_or_zero(&self, id: usize) -> ManagedAddress<SA> {
         let key = self.get_user_address_key(id);
         // TODO: optimize, storage_load_managed_buffer_len is currently called twice
-        if storage_get_len(self.api.clone(), &key) > 0 {
-            storage_get(self.api.clone(), &key)
+        if storage_get_len(&key) > 0 {
+            storage_get(&key)
         } else {
             ManagedAddress::zero()
         }
     }
 
     fn set_user_address(&self, id: usize, address: &ManagedAddress<SA>) {
-        storage_set(self.api.clone(), &self.get_user_address_key(id), address);
+        storage_set(&self.get_user_address_key(id), address);
     }
 
     /// Number of users.
     pub fn get_user_count(&self) -> usize {
-        storage_get(self.api.clone(), &self.get_user_count_key())
+        storage_get(&self.get_user_count_key())
     }
 
     fn set_user_count(&self, user_count: usize) {
-        storage_set(self.api.clone(), &self.get_user_count_key(), &user_count);
+        storage_set(&self.get_user_count_key(), &user_count);
     }
 
     /// Yields the user id for a given address, or creates a new user id if there isn't one.

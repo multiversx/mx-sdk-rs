@@ -66,26 +66,18 @@ where
     }
 
     fn get_node_id(&self, value: &T) -> u32 {
-        storage_get(
-            self.api.clone(),
-            &self.build_named_value_key(NODE_ID_IDENTIFIER, value),
-        )
+        storage_get(&self.build_named_value_key(NODE_ID_IDENTIFIER, value))
     }
 
     fn set_node_id(&self, value: &T, node_id: u32) {
         storage_set(
-            self.api.clone(),
             &self.build_named_value_key(NODE_ID_IDENTIFIER, value),
             &node_id,
         );
     }
 
     fn clear_node_id(&self, value: &T) {
-        storage_set(
-            self.api.clone(),
-            &self.build_named_value_key(NODE_ID_IDENTIFIER, value),
-            &(),
-        );
+        storage_set(&self.build_named_value_key(NODE_ID_IDENTIFIER, value), &());
     }
 
     /// Returns `true` if the set contains no elements.

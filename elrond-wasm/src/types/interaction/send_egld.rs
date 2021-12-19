@@ -1,6 +1,8 @@
+use core::marker::PhantomData;
+
 use crate::{
     abi::{OutputAbi, TypeAbi, TypeDescriptionContainer},
-    api::CallTypeApi,
+    api::{CallTypeApi, SendApiImpl},
     io::EndpointResult,
     types::{BigUint, ManagedAddress, ManagedBuffer},
 };
@@ -10,10 +12,24 @@ pub struct SendEgld<SA>
 where
     SA: CallTypeApi + 'static,
 {
-    pub api: SA,
+    _phantom: PhantomData<SA>,
     pub to: ManagedAddress<SA>,
     pub amount: BigUint<SA>,
     pub data: ManagedBuffer<SA>,
+}
+
+impl<SA> SendEgld<SA>
+where
+    SA: CallTypeApi + 'static,
+{
+    pub fn new(to: ManagedAddress<SA>, amount: BigUint<SA>, data: ManagedBuffer<SA>) -> Self {
+        Self {
+            _phantom: PhantomData,
+            to,
+            amount,
+            data,
+        }
+    }
 }
 
 impl<SA> EndpointResult for SendEgld<SA>
@@ -24,8 +40,7 @@ where
 
     #[inline]
     fn finish<FA>(&self) {
-        self.api
-            .direct_egld(&self.to, &self.amount, self.data.clone());
+        SA::send_api_impl().direct_egld(&self.to, &self.amount, self.data.clone());
     }
 }
 

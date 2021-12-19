@@ -1,3 +1,5 @@
+use core::marker::PhantomData;
+
 use crate::{
     abi::{OutputAbi, TypeAbi, TypeDescriptionContainer},
     api::{CallTypeApi, SendApi, StorageReadApi, StorageReadApiImpl},
@@ -11,11 +13,31 @@ pub struct SendEsdt<SA>
 where
     SA: CallTypeApi + StorageReadApi + 'static,
 {
-    pub(super) api: SA,
+    _phantom: PhantomData<SA>,
     pub(super) to: ManagedAddress<SA>,
     pub(super) token_identifier: TokenIdentifier<SA>,
     pub(super) amount: BigUint<SA>,
     pub data: ManagedBuffer<SA>,
+}
+
+impl<SA> SendEsdt<SA>
+where
+    SA: CallTypeApi + StorageReadApi + 'static,
+{
+    pub fn new(
+        to: ManagedAddress<SA>,
+        token_identifier: TokenIdentifier<SA>,
+        amount: BigUint<SA>,
+        data: ManagedBuffer<SA>,
+    ) -> Self {
+        Self {
+            _phantom: PhantomData,
+            to,
+            token_identifier,
+            amount,
+            data,
+        }
+    }
 }
 
 impl<SA> EndpointResult for SendEsdt<SA>
@@ -26,7 +48,7 @@ where
 
     #[inline]
     fn finish<FA>(&self) {
-        SendWrapper::new(self.api.clone()).transfer_esdt_via_async_call(
+        SendWrapper::new().transfer_esdt_via_async_call(
             &self.to,
             &self.token_identifier,
             0,
