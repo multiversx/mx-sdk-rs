@@ -11,7 +11,7 @@ pub trait SendApi: ManagedTypeApi + BlockchainApi {
 }
 
 /// API that groups methods that either send EGLD or ESDT, or that call other contracts.
-pub trait SendApiImpl: ManagedTypeApi + BlockchainApi + Clone + Sized {
+pub trait SendApiImpl {
     type ManagedTypeApi: ManagedTypeApi;
 
     /// Sends EGLD to a given address, directly.
