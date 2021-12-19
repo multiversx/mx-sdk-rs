@@ -98,6 +98,7 @@ where
 
     /// Concatenates 2 managed arg buffers. Consumes both arguments in the process.
     #[inline]
+    #[must_use]
     pub fn concat(mut self, other: ManagedArgBuffer<M>) -> Self {
         self.data.append_vec(other.data);
         self
