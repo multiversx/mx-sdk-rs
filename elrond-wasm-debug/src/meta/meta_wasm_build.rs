@@ -18,17 +18,8 @@ fn build_contract(contract_metadata: &ContractMetadata, build_args: &BuildArgs, 
 
     assert!(exit_status.success(), "contract build process failed");
 
-    let source_wasm = format!(
-        "{}/target/wasm32-unknown-unknown/release/{}.wasm",
-        &contract_metadata.wasm_crate_path,
-        &contract_metadata.wasm_crate_name.replace('-', "_")
-    );
-
-    let dest_wasm = format!(
-        "{}/{}.wasm",
-        output_path, &contract_metadata.output_base_name
-    );
-
+    let source_wasm = contract_metadata.wasm_compilation_output_path();
+    let dest_wasm = contract_metadata.wasm_output_path(output_path);
     fs::copy(source_wasm, dest_wasm).expect("failed to copy compiled contract to output directory");
 }
 
