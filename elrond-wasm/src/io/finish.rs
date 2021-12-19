@@ -1,7 +1,9 @@
+use core::marker::PhantomData;
+
 use elrond_codec::TryStaticCast;
 
 use crate::{
-    api::{EndpointFinishApi, ErrorApi, ErrorApiImpl, ManagedTypeApi},
+    api::{EndpointFinishApi, EndpointFinishApiImpl, ErrorApi, ErrorApiImpl, ManagedTypeApi},
     elrond_codec::{EncodeError, TopEncode, TopEncodeOutput},
     err_msg,
     types::{BigInt, BigUint, ManagedBuffer, ManagedBufferCachedBuilder, ManagedType},
@@ -11,7 +13,7 @@ struct ApiOutputAdapter<FA>
 where
     FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static,
 {
-    api: FA,
+    _phantom: PhantomData<FA>,
 }
 
 impl<FA> ApiOutputAdapter<FA>
@@ -19,8 +21,10 @@ where
     FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static,
 {
     #[inline]
-    fn new(api: FA) -> Self {
-        ApiOutputAdapter { api }
+    fn new() -> Self {
+        ApiOutputAdapter {
+            _phantom: PhantomData,
+        }
     }
 }
 
@@ -31,15 +35,15 @@ where
     type NestedBuffer = ManagedBufferCachedBuilder<FA>;
 
     fn set_slice_u8(self, bytes: &[u8]) {
-        self.api.finish_slice_u8(bytes);
+        FA::finish_api_impl().finish_slice_u8(bytes);
     }
 
     fn set_u64(self, value: u64) {
-        self.api.finish_u64(value);
+        FA::finish_api_impl().finish_u64(value);
     }
 
     fn set_i64(self, value: i64) {
-        self.api.finish_i64(value);
+        FA::finish_api_impl().finish_i64(value);
     }
 
     #[inline]
@@ -54,13 +58,13 @@ where
         F: FnOnce(Self) -> Result<(), EncodeError>,
     {
         if let Some(managed_buffer) = value.try_cast_ref::<ManagedBuffer<FA>>() {
-            self.api.finish_managed_buffer_raw(managed_buffer.handle);
+            FA::finish_api_impl().finish_managed_buffer_raw(managed_buffer.handle);
             Ok(())
         } else if let Some(big_uint) = value.try_cast_ref::<BigUint<FA>>() {
-            self.api.finish_big_uint_raw(big_uint.handle);
+            FA::finish_api_impl().finish_big_uint_raw(big_uint.handle);
             Ok(())
         } else if let Some(big_int) = value.try_cast_ref::<BigInt<FA>>() {
-            self.api.finish_big_int_raw(big_int.handle);
+            FA::finish_api_impl().finish_big_int_raw(big_int.handle);
             Ok(())
         } else {
             else_serialization(self)
@@ -72,8 +76,7 @@ where
     }
 
     fn finalize_nested_encode(self, nb: Self::NestedBuffer) {
-        self.api
-            .finish_managed_buffer_raw(nb.into_managed_buffer().get_raw_handle());
+        FA::finish_api_impl().finish_managed_buffer_raw(nb.into_managed_buffer().get_raw_handle());
     }
 }
 
@@ -110,12 +113,12 @@ where
     where
         FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static,
     {
-        self.top_encode_or_exit(ApiOutputAdapter::new(api.clone()), api, finish_exit);
+        self.top_encode_or_exit(ApiOutputAdapter::<FA>::new(), (), finish_exit::<FA>);
     }
 }
 
 #[inline(always)]
-fn finish_exit<FA>(api: FA, encode_err: EncodeError) -> !
+fn finish_exit<FA>(_: (), encode_err: EncodeError) -> !
 where
     FA: ManagedTypeApi + EndpointFinishApi + ErrorApi + 'static,
 {

@@ -1,8 +1,16 @@
-use crate::api::{EndpointFinishApi, Handle};
+use crate::api::{EndpointFinishApi, EndpointFinishApiImpl, Handle};
 
 use super::UncallableApi;
 
 impl EndpointFinishApi for UncallableApi {
+    type EndpointFinishApiImpl = UncallableApi;
+
+    fn finish_api_impl() -> Self::EndpointFinishApiImpl {
+        unreachable!()
+    }
+}
+
+impl EndpointFinishApiImpl for UncallableApi {
     fn finish_slice_u8(&self, _slice: &[u8]) {
         unreachable!()
     }
