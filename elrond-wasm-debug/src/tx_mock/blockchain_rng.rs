@@ -9,13 +9,20 @@ pub struct BlockchainRng {
 }
 
 impl BlockchainRng {
-    pub fn new(
-        tx_input: &TxInput,
-        tx_cache: &TxCache,
-    ) -> Self {
+    pub fn new(tx_input: &TxInput, tx_cache: &TxCache) -> Self {
         let mut seed = Vec::new();
-        seed.extend_from_slice(&tx_cache.blockchain_ref().previous_block_info.block_random_seed[..]);
-        seed.extend_from_slice(&tx_cache.blockchain_ref().current_block_info.block_random_seed[..]);
+        seed.extend_from_slice(
+            &tx_cache
+                .blockchain_ref()
+                .previous_block_info
+                .block_random_seed[..],
+        );
+        seed.extend_from_slice(
+            &tx_cache
+                .blockchain_ref()
+                .current_block_info
+                .block_random_seed[..],
+        );
         seed.extend_from_slice(tx_input.tx_hash.as_bytes());
 
         let hasher = SipHasher::from(&seed);
