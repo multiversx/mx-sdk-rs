@@ -4,7 +4,7 @@ use crate::{
     types::{BigUint, EsdtTokenPayment, EsdtTokenType, ManagedVec, TokenIdentifier},
 };
 
-pub trait CallValueApi: ManagedTypeApi + ErrorApi + Sized {
+pub trait CallValueApi: ManagedTypeApi + ErrorApi {
     fn check_not_payable(&self);
 
     /// Retrieves the EGLD call value from the VM.
