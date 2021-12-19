@@ -5,6 +5,7 @@ use crate::{
     err_msg, ArgDecodeInput, DynArgInput,
 };
 
+#[derive(Default)]
 pub struct EndpointDynArgLoader<AA>
 where
     AA: ManagedTypeErrorApi + EndpointArgumentApi,
