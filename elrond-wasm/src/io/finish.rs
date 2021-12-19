@@ -86,19 +86,19 @@ pub trait EndpointResult: Sized {
     /// `Self` for most types.
     type DecodeAs;
 
-    fn finish<FA>(&self, api: FA)
+    fn finish<FA>(&self)
     where
         FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static;
 }
 
-pub fn finish_all<FA, I, T>(api: FA, items: I)
+pub fn finish_all<FA, I, T>(items: I)
 where
     FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static,
     I: Iterator<Item = T>,
     T: EndpointResult,
 {
     for item in items {
-        item.finish(api.clone());
+        item.finish::<FA>();
     }
 }
 
@@ -109,7 +109,7 @@ where
 {
     type DecodeAs = Self;
 
-    fn finish<FA>(&self, api: FA)
+    fn finish<FA>(&self)
     where
         FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static,
     {

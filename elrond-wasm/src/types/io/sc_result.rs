@@ -53,7 +53,7 @@ impl<T, E> SCResult<T, E> {
     {
         match self {
             SCResult::Ok(t) => t,
-            SCResult::Err(e) => e.finish_err(api),
+            SCResult::Err(e) => e.finish_err::<FA>(),
         }
     }
 
@@ -117,16 +117,16 @@ where
     type DecodeAs = T::DecodeAs;
 
     #[inline]
-    fn finish<FA>(&self, api: FA)
+    fn finish<FA>(&self)
     where
         FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static,
     {
         match self {
             SCResult::Ok(t) => {
-                t.finish(api);
+                t.finish::<FA>();
             },
             SCResult::Err(e) => {
-                e.finish_err(api);
+                e.finish_err::<FA>();
             },
         }
     }

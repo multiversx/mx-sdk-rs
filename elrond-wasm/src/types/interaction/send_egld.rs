@@ -23,7 +23,7 @@ where
     type DecodeAs = ();
 
     #[inline]
-    fn finish<FA>(&self, _api: FA) {
+    fn finish<FA>(&self) {
         self.api
             .direct_egld(&self.to, &self.amount, self.data.clone());
     }

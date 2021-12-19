@@ -25,7 +25,7 @@ where
     type DecodeAs = ();
 
     #[inline]
-    fn finish<FA>(&self, _api: FA) {
+    fn finish<FA>(&self) {
         SendWrapper::new(self.api.clone()).transfer_esdt_via_async_call(
             &self.to,
             &self.token_identifier,

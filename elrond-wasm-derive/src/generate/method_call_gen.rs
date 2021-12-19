@@ -118,7 +118,7 @@ pub fn generate_body_with_result(
         syn::ReturnType::Type(_, _) => {
             quote! {
                 let result = #mbody;
-                elrond_wasm::io::EndpointResult::finish(&result, self.raw_vm_api());
+                elrond_wasm::io::EndpointResult::finish::<Self::Api>(&result);
             }
         },
     }
