@@ -53,25 +53,32 @@ impl MetaConfig {
             .clone()
             .unwrap_or_else(|| main_contract_crate_name.clone());
 
-        // TODO: only create if extern-views exist
-        let view_contract_abi =
-            original_contract_abi.secondary_contract(EndpointLocationAbi::ViewContract);
+        let main_contract = ContractMetadata {
+            wasm_crate_name: format!("{}-wasm", &main_contract_crate_name),
+            wasm_crate_path: "../wasm".to_string(),
+            output_base_name: main_output_base_name,
+            abi: main_contract_abi.clone(),
+        };
+
+        let view_contract_opt =
+            if original_contract_abi.location_exists(EndpointLocationAbi::ViewContract) {
+                let view_contract_abi =
+                    original_contract_abi.secondary_contract(EndpointLocationAbi::ViewContract);
+                Some(ContractMetadata {
+                    wasm_crate_name: format!("{}-wasm", &main_contract_crate_name),
+                    wasm_crate_path: "../wasm-view".to_string(),
+                    output_base_name: format!("{}-view", main_contract_crate_name),
+                    abi: view_contract_abi,
+                })
+            } else {
+                None
+            };
 
         MetaConfig {
             build_args,
             output_dir: "../output".to_string(),
-            main_contract: Some(ContractMetadata {
-                wasm_crate_name: format!("{}-wasm", &main_contract_crate_name),
-                wasm_crate_path: "../wasm".to_string(),
-                output_base_name: main_output_base_name,
-                abi: main_contract_abi.clone(),
-            }),
-            view_contract: Some(ContractMetadata {
-                wasm_crate_name: format!("{}-wasm", &main_contract_crate_name),
-                wasm_crate_path: "../wasm-view".to_string(),
-                output_base_name: format!("{}-view", main_contract_crate_name),
-                abi: view_contract_abi,
-            }),
+            main_contract: Some(main_contract),
+            view_contract: view_contract_opt,
         }
     }
 }

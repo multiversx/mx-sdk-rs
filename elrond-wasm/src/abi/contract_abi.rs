@@ -39,6 +39,13 @@ impl ContractAbi {
         }
     }
 
+    pub fn location_exists(&self, location: EndpointLocationAbi) -> bool {
+        self.constructors
+            .iter()
+            .chain(self.endpoints.iter())
+            .any(|endpoint| endpoint.location == location)
+    }
+
     pub fn secondary_contract(&self, location: EndpointLocationAbi) -> ContractAbi {
         ContractAbi {
             build_info: self.build_info.clone(),
