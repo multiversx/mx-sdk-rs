@@ -36,12 +36,11 @@ where
     contract_deploy
 }
 
-#[allow(clippy::return_self_not_must_use)]
-impl<SA> ContractDeploy<SA>
+impl<SA> Default for ContractDeploy<SA>
 where
     SA: SendApi + 'static,
 {
-    pub fn new() -> Self {
+    fn default() -> Self {
         let zero = BigUint::zero();
         let zero_address = ManagedAddress::zero();
         let arg_buffer = ManagedArgBuffer::new_empty();
@@ -52,6 +51,16 @@ where
             explicit_gas_limit: UNSPECIFIED_GAS_LIMIT,
             arg_buffer,
         }
+    }
+}
+
+#[allow(clippy::return_self_not_must_use)]
+impl<SA> ContractDeploy<SA>
+where
+    SA: SendApi + 'static,
+{
+    pub fn new() -> Self {
+        Self::default()
     }
 
     pub fn with_egld_transfer(mut self, payment_amount: BigUint<SA>) -> Self {

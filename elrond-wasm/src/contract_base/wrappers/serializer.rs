@@ -8,6 +8,7 @@ use crate::{
     types::{AsManagedRef, BoxedBytes, ManagedBuffer, ManagedBytesTopDecodeInput, ManagedType},
 };
 
+#[derive(Default)]
 pub struct ManagedSerializer<M>
 where
     M: ManagedTypeApi + ErrorApi + 'static,
