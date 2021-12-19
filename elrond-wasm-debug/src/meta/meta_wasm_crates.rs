@@ -39,7 +39,7 @@ fn write_wasm_empty_callback_macro(wasm_lib_file: &mut File) {
 }
 
 fn write_wasm_src_lib(contract_metadata: &ContractMetadata) {
-    let contract_module_name = contract_metadata.abi.get_crate_name();
+    let contract_module_name = contract_metadata.abi.get_crate_name_for_code();
     let lib_path = format!("{}/src/lib.rs", &contract_metadata.wasm_crate_path);
     let mut wasm_lib_file = File::create(lib_path).unwrap();
     wasm_lib_file.write_all(PRELUDE.as_bytes()).unwrap();

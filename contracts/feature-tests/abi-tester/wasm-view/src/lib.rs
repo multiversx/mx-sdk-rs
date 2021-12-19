@@ -5,9 +5,10 @@
 #![no_std]
 
 elrond_wasm_node::wasm_endpoints! {
-    adder
+    abi_tester
     (
         init
+        external_view
     )
 }
 
