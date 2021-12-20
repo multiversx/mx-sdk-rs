@@ -18,7 +18,7 @@ impl<M: ManagedTypeApi> Default for RandomnessSource<M> {
 }
 
 impl<M: ManagedTypeApi> RandomnessSource<M> {
-    #[inline(always)]
+    #[inline]
     pub fn new() -> Self {
         Self::default()
     }
@@ -71,13 +71,13 @@ impl<M: ManagedTypeApi> RandomnessSource<M> {
         min + rand % (max - min)
     }
 
-    #[inline(always)]
+    #[inline]
     pub fn next_usize(&mut self) -> usize {
         self.next_u32() as usize
     }
 
     /// Range is [min, max)
-    #[inline(always)]
+    #[inline]
     pub fn next_usize_in_range(&mut self, min: usize, max: usize) -> usize {
         self.next_u32_in_range(min as u32, max as u32) as usize
     }
