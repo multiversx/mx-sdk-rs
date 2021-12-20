@@ -45,7 +45,7 @@
                     "nonce": "1",
                     "balance": "1,000,000",
                     "esdt": {
-                        "str:LOTTERY-123456": "125"
+                        "str:LOTTERY-123456": "375"
                     },
                     "storage": {}
                 },
@@ -62,14 +62,14 @@
                 "address:acc4": {
                     "nonce": "2",
                     "balance": "1,000,000",
+                    "esdt": {
+                        "str:LOTTERY-123456": "125"
+                    },
                     "storage": {}
                 },
                 "address:acc5": {
                     "nonce": "1",
                     "balance": "1,000,000",
-                    "esdt": {
-                        "str:LOTTERY-123456": "375"
-                    },
                     "storage": {}
                 },
                 "sc:lottery": {
