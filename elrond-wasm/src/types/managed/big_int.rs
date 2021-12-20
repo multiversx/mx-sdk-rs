@@ -3,6 +3,7 @@ use core::marker::PhantomData;
 use super::{BigUint, ManagedBuffer, ManagedType, Sign};
 use crate::{
     api::{Handle, ManagedTypeApi},
+    hex_util::encode_bytes_as_hex,
     types::BoxedBytes,
 };
 use alloc::string::String;
@@ -11,7 +12,6 @@ use elrond_codec::{
     TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, TryStaticCast,
 };
 
-#[derive(Debug)]
 pub struct BigInt<M: ManagedTypeApi> {
     pub(crate) handle: Handle,
     _phantom: PhantomData<M>,
@@ -215,5 +215,17 @@ impl<M: ManagedTypeApi> BigInt<M> {
         let exp_handle = api.bi_new(exp as i64);
         api.bi_pow(handle, self.handle, exp_handle);
         BigInt::from_raw_handle(handle)
+    }
+}
+
+impl<M: ManagedTypeApi> core::fmt::Debug for BigInt<M> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        f.debug_struct("BigInt")
+            .field("handle", &self.handle)
+            .field(
+                "hex-value-be",
+                &encode_bytes_as_hex(self.to_signed_bytes_be().as_slice()),
+            )
+            .finish()
     }
 }

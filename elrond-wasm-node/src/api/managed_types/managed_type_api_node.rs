@@ -13,6 +13,7 @@ extern "C" {
     fn mBufferToBigFloat(mBufferHandle: i32, bigFloatHandle: i32) -> i32;
     fn mBufferFromBigFloat(mBufferHandle: i32, bigFloatHandle: i32) -> i32;
 
+    fn validateTokenIdentifier(token_id_handle: i32) -> i32;
 }
 
 impl elrond_wasm::api::ManagedTypeApi for crate::VmApiImpl {
@@ -72,5 +73,9 @@ impl elrond_wasm::api::ManagedTypeApi for crate::VmApiImpl {
             mBufferFromBigFloat(buffer_handle, big_float_handle);
             buffer_handle
         }
+        
+    #[cfg(feature = "vm-validate-token-identifier")]
+    fn validate_token_identifier(&self, token_id_handle: Handle) -> bool {
+        unsafe { validateTokenIdentifier(token_id_handle) != 0 }
     }
 }

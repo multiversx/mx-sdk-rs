@@ -44,9 +44,15 @@ fn crypto_elliptic_curves_go() {
 }
 
 #[test]
-fn crypto_keccak256_go() {
-    elrond_wasm_debug::mandos_go("mandos/crypto_keccak256.scen.json");
+fn crypto_keccak256_legacy_go() {
+    elrond_wasm_debug::mandos_go("mandos/crypto_keccak256_legacy.scen.json");
 }
+
+// TODO: enable after new VM release is out.
+// #[test]
+// fn crypto_keccak256_go() {
+//     elrond_wasm_debug::mandos_go("mandos/crypto_keccak256.scen.json");
+// }
 
 #[test]
 fn crypto_ripemd160_go() {
@@ -54,9 +60,15 @@ fn crypto_ripemd160_go() {
 }
 
 #[test]
-fn crypto_sha256_go() {
-    elrond_wasm_debug::mandos_go("mandos/crypto_sha256.scen.json");
+fn crypto_sha256_legacy_go() {
+    elrond_wasm_debug::mandos_go("mandos/crypto_sha256_legacy.scen.json");
 }
+
+// TODO: enable after new VM release is out.
+// #[test]
+// fn crypto_sha256_go() {
+//     elrond_wasm_debug::mandos_go("mandos/crypto_sha256.scen.json");
+// }
 
 #[test]
 fn crypto_verify_funcs_go() {
@@ -66,6 +78,11 @@ fn crypto_verify_funcs_go() {
 #[test]
 fn echo_array_u8_go() {
     elrond_wasm_debug::mandos_go("mandos/echo_array_u8.scen.json");
+}
+
+#[test]
+fn echo_arrayvec_go() {
+    elrond_wasm_debug::mandos_go("mandos/echo_arrayvec.scen.json");
 }
 
 #[test]
@@ -214,21 +231,6 @@ fn get_cumulated_validator_rewards_go() {
 }
 
 #[test]
-fn get_esdt_local_roles_go() {
-    elrond_wasm_debug::mandos_go("mandos/get_esdt_local_roles.scen.json");
-}
-
-#[test]
-fn managed_address_array_go() {
-    elrond_wasm_debug::mandos_go("mandos/managed_address_array.scen.json");
-}
-
-#[test]
-fn managed_address_managed_buffer_go() {
-    elrond_wasm_debug::mandos_go("mandos/managed_address_managed_buffer.scen.json");
-}
-
-#[test]
 fn managed_buffer_concat_1_go() {
     elrond_wasm_debug::mandos_go("mandos/managed_buffer_concat_1.scen.json");
 }
@@ -256,6 +258,11 @@ fn managed_buffer_slice_1_go() {
 #[test]
 fn managed_buffer_slice_2_go() {
     elrond_wasm_debug::mandos_go("mandos/managed_buffer_slice_2.scen.json");
+}
+
+#[test]
+fn managed_buffer_random_go() {
+    elrond_wasm_debug::mandos_go("mandos/managed_buffer_set_random.scen.json");
 }
 
 #[test]

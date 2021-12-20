@@ -19,7 +19,7 @@
             "txId": "1",
             "tx": {
                 "to": "sc:basic-features",
-                "function": "mbuffer_slice_1",
+                "function": "mbuffer_load_slice",
                 "arguments": [
                     "str:abcdef",
                     "0",
@@ -37,7 +37,7 @@
             "txId": "2",
             "tx": {
                 "to": "sc:basic-features",
-                "function": "mbuffer_slice_1",
+                "function": "mbuffer_load_slice",
                 "arguments": [
                     "str:abcdef",
                     "3",
@@ -55,7 +55,7 @@
             "txId": "3",
             "tx": {
                 "to": "sc:basic-features",
-                "function": "mbuffer_slice_1",
+                "function": "mbuffer_load_slice",
                 "arguments": [
                     "str:abcdef",
                     "3",
@@ -71,7 +71,7 @@
             "txId": "3",
             "tx": {
                 "to": "sc:basic-features",
-                "function": "mbuffer_slice_1",
+                "function": "mbuffer_load_slice",
                 "arguments": [
                     "",
                     "0",
@@ -89,7 +89,7 @@
             "txId": "3",
             "tx": {
                 "to": "sc:basic-features",
-                "function": "mbuffer_slice_1",
+                "function": "mbuffer_load_slice",
                 "arguments": [
                     "",
                     "0",

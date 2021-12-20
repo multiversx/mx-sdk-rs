@@ -116,6 +116,8 @@ extern "C" {
         nonce: i64,
     ) -> i32;
 
+    fn getESDTLocalRoles(tokenhandle: i32) -> i64;
+
     #[cfg(not(feature = "unmanaged-ei"))]
     fn managedGetESDTTokenData(
         addressHandle: i32,
@@ -528,6 +530,19 @@ impl BlockchainApi for crate::VmApiImpl {
                 royalties: BigUint::from_raw_handle(royalties_handle),
                 uris: ManagedVec::from_raw_handle(uris_handle),
             }
+        }
+    }
+
+    #[cfg(feature = "vm-esdt-local-roles")]
+    fn get_esdt_local_roles(
+        &self,
+        token_id: &TokenIdentifier<Self>,
+    ) -> elrond_wasm::types::EsdtLocalRoleFlags {
+        let managed_token_id = token_id.as_managed_buffer();
+        unsafe {
+            elrond_wasm::types::EsdtLocalRoleFlags::from_bits_unchecked(getESDTLocalRoles(
+                managed_token_id.get_raw_handle(),
+            ) as u64)
         }
     }
 }

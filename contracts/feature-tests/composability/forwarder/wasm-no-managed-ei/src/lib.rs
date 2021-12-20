@@ -37,6 +37,7 @@ elrond_wasm_node::wasm_endpoints! {
         forward_transf_execu_accept_funds_with_fees
         getCurrentNftNonce
         getFungibleEsdtBalance
+        get_esdt_local_roles
         get_nft_balance
         issue_fungible_token
         lastErrorMessage
@@ -63,5 +64,6 @@ elrond_wasm_node::wasm_endpoints! {
         unsetLocalRoles
         upgradeVault
         upgrade_vault_from_source
+        validate_token_identifier
     )
 }

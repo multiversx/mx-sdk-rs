@@ -15,6 +15,7 @@ macro_rules! imports {
                 BigFloatApi, BigIntApi, BlockchainApi, CallValueApi, CryptoApi, EllipticCurveApi,
                 ErrorApi, LogApi, ManagedTypeApi, PrintApi, SendApi,
             },
+            arrayvec::ArrayVec,
             contract_base::{ContractBase, ProxyObjBase},
             elrond_codec::{DecodeError, NestedDecode, NestedEncode, TopDecode},
             err_msg,
@@ -29,7 +30,7 @@ macro_rules! imports {
                 *,
             },
             Box, Vec,
-        }; // TODO: remove at some point, they shouldn't be public
+        };
     };
 }
 

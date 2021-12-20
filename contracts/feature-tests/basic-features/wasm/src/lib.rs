@@ -67,9 +67,6 @@ elrond_wasm_node::wasm_endpoints! {
         codec_err_storage_key
         codec_err_storage_set
         compare_h256
-        computeKeccak256
-        computeRipemd160
-        computeSha256
         compute_create_ec
         compute_ec_add
         compute_ec_double
@@ -78,11 +75,16 @@ elrond_wasm_node::wasm_endpoints! {
         compute_get_priv_key_byte_length
         compute_get_values
         compute_is_on_curve_ec
+        compute_keccak256
+        compute_keccak256_legacy
         compute_marshal_compressed_ec
         compute_marshal_ec
+        compute_ripemd160
         compute_scalar_base_mult
         compute_scalar_mult
         compute_secp256k1_der_signature
+        compute_sha256
+        compute_sha256_legacy
         compute_unmarshal_compressed_ec
         compute_unmarshal_ec
         count_ones
@@ -99,6 +101,7 @@ elrond_wasm_node::wasm_endpoints! {
         div_big_uint
         div_big_uint_ref
         echo_array_u8
+        echo_arrayvec
         echo_async_result_empty
         echo_big_int
         echo_big_int_option
@@ -153,7 +156,6 @@ elrond_wasm_node::wasm_endpoints! {
         get_block_timestamp
         get_caller
         get_cumulated_validator_rewards
-        get_esdt_local_roles
         get_gas_left
         get_nr_to_clear
         get_owner_address
@@ -210,6 +212,7 @@ elrond_wasm_node::wasm_endpoints! {
         managed_vec_biguint_eq
         managed_vec_biguint_push
         managed_vec_new
+        managed_vec_set
         map_mapper_contains_key
         map_mapper_entry_and_modify
         map_mapper_entry_or_default_update_increment
@@ -234,15 +237,19 @@ elrond_wasm_node::wasm_endpoints! {
         map_storage_mapper_view
         mbuffer_concat_1
         mbuffer_concat_2
+        mbuffer_copy_slice
         mbuffer_eq
         mbuffer_from_boxed_bytes
         mbuffer_from_slice
+        mbuffer_load_slice
         mbuffer_new
         mbuffer_overwrite
         mbuffer_slice_1
         mbuffer_slice_2
         //mul_assign_big_float
         //mul_assign_big_float_ref
+        mbuffer_set_random
+        mbuffer_set_slice
         mul_assign_big_int
         mul_assign_big_int_ref
         mul_assign_big_uint
