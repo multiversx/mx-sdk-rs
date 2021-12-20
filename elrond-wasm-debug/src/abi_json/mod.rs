@@ -5,7 +5,7 @@ mod type_abi_json;
 
 pub use build_info_abi_json::{BuildInfoAbiJson, RustcAbiJson};
 pub use contract_abi_json::*;
-use elrond_wasm::contract_base::ContractAbiProvider;
+use elrond_wasm::{abi::ContractAbi, contract_base::ContractAbiProvider};
 pub use endpoint_abi_json::*;
 pub use type_abi_json::*;
 
@@ -25,9 +25,9 @@ pub fn print_abi<AbiTrait: ContractAbiProvider>() {
 
 /// Same as `contract_abi`, but allows caller to replace the compiler metadata,
 /// so that ABI tests are deterministc and independent on compiler version.
-pub fn contract_abi_dummy_environment<AbiObj: ContractAbiProvider>() -> String {
-    let abi = <AbiObj as ContractAbiProvider>::abi();
-    let mut abi_json = ContractAbiJson::from(&abi);
+/// Will return the main contract ABI + view contract ABI.
+pub fn abi_to_json_dummy_environment(contract_abi: &ContractAbi) -> String {
+    let mut abi_json = ContractAbiJson::from(contract_abi);
     abi_json.build_info.rustc = RustcAbiJson {
         version: "x.x.x-nightly".to_string(),
         commit_hash: "<commit hash here>".to_string(),

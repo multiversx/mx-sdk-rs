@@ -34,6 +34,7 @@ where
     contract_deploy
 }
 
+#[allow(clippy::return_self_not_must_use)]
 impl<SA> ContractDeploy<SA>
 where
     SA: SendApi + 'static,

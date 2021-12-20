@@ -8,4 +8,7 @@ pub trait InternalModuleA:
 {
     #[view]
     fn call_mod_a(&self) {}
+
+    #[external_view]
+    fn external_view_mod_a(&self) {}
 }
