@@ -11,7 +11,7 @@ where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
 {
     /// Will be called automatically by the `#[storage_mapper]` annotation generated code.
-    fn new(api: SA, base_key: StorageKey<SA>) -> Self;
+    fn new(base_key: StorageKey<SA>) -> Self;
 }
 
 pub trait StorageClearable {

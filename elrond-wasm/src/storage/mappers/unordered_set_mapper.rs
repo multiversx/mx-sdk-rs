@@ -1,3 +1,5 @@
+use core::marker::PhantomData;
+
 pub use super::vec_mapper::Iter;
 use super::{StorageClearable, StorageMapper, VecMapper};
 use crate::{
@@ -22,7 +24,7 @@ where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
 {
-    api: SA,
+    _phantom_api: PhantomData<SA>,
     base_key: StorageKey<SA>,
     vec_mapper: VecMapper<SA, T>,
 }
@@ -32,11 +34,11 @@ where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode,
 {
-    fn new(api: SA, base_key: StorageKey<SA>) -> Self {
+    fn new(base_key: StorageKey<SA>) -> Self {
         UnorderedSetMapper {
-            api: api.clone(),
+            _phantom_api: PhantomData,
             base_key: base_key.clone(),
-            vec_mapper: VecMapper::<SA, T>::new(api, base_key),
+            vec_mapper: VecMapper::<SA, T>::new(base_key),
         }
     }
 }

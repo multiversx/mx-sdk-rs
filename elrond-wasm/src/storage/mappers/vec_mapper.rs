@@ -28,10 +28,10 @@ where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     T: TopEncode + TopDecode + 'static,
 {
-    api: SA,
+    _phantom_api: PhantomData<SA>,
     base_key: StorageKey<SA>,
     len_key: StorageKey<SA>,
-    _phantom: core::marker::PhantomData<T>,
+    _phantom_item: PhantomData<T>,
 }
 
 impl<SA, T> StorageMapper<SA> for VecMapper<SA, T>
@@ -39,15 +39,15 @@ where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     T: TopEncode + TopDecode,
 {
-    fn new(api: SA, base_key: StorageKey<SA>) -> Self {
+    fn new(base_key: StorageKey<SA>) -> Self {
         let mut len_key = base_key.clone();
         len_key.append_bytes(LEN_SUFFIX);
 
         VecMapper {
-            api,
+            _phantom_api: PhantomData,
             base_key,
             len_key,
-            _phantom: PhantomData,
+            _phantom_item: PhantomData,
         }
     }
 }

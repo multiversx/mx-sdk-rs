@@ -1,3 +1,5 @@
+use core::marker::PhantomData;
+
 use elrond_codec::{NestedDecode, NestedEncode, TopDecode, TopEncode};
 
 use super::StorageMapper;
@@ -28,7 +30,7 @@ pub struct TokenAttributesMapper<SA>
 where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
 {
-    api: SA,
+    _phantom_api: PhantomData<SA>,
     base_key: StorageKey<SA>,
 }
 
@@ -36,8 +38,11 @@ impl<SA> StorageMapper<SA> for TokenAttributesMapper<SA>
 where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
 {
-    fn new(api: SA, base_key: StorageKey<SA>) -> Self {
-        TokenAttributesMapper { api, base_key }
+    fn new(base_key: StorageKey<SA>) -> Self {
+        TokenAttributesMapper {
+            _phantom_api: PhantomData,
+            base_key,
+        }
     }
 }
 

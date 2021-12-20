@@ -70,7 +70,6 @@ pub fn generate_mapper_impl(m: &Method, identifier: &str) -> proc_macro2::TokenS
                 #msig {
                     #key_snippet
                     <#ty as elrond_wasm::storage::mappers::StorageMapper<Self::Api>>::new(
-                        self.raw_vm_api(),
                         ___key___
                     )
                 }

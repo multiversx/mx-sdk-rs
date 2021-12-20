@@ -1,3 +1,5 @@
+use core::marker::PhantomData;
+
 use super::{StorageClearable, StorageMapper};
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
@@ -11,7 +13,6 @@ use crate::{
     types::MultiResultVec,
 };
 use alloc::vec::Vec;
-use core::marker::PhantomData;
 use elrond_codec::{
     elrond_codec_derive::{TopDecode, TopDecodeOrDefault, TopEncode, TopEncodeOrDefault},
     DecodeDefault, EncodeDefault, TopDecode, TopEncode,
@@ -69,9 +70,9 @@ where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     T: TopEncode + TopDecode + 'static,
 {
-    api: SA,
+    _phantom_api: PhantomData<SA>,
     base_key: StorageKey<SA>,
-    _phantom: core::marker::PhantomData<T>,
+    _phantom_item: PhantomData<T>,
 }
 
 impl<SA, T> StorageMapper<SA> for QueueMapper<SA, T>
@@ -79,11 +80,11 @@ where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     T: TopEncode + TopDecode,
 {
-    fn new(api: SA, base_key: StorageKey<SA>) -> Self {
+    fn new(base_key: StorageKey<SA>) -> Self {
         QueueMapper {
-            api,
+            _phantom_api: PhantomData,
             base_key,
-            _phantom: PhantomData,
+            _phantom_item: PhantomData,
         }
     }
 }

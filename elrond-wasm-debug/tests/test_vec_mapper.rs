@@ -5,9 +5,9 @@ use elrond_wasm::storage::{
 use elrond_wasm_debug::DebugApi;
 
 fn create_vec() -> VecMapper<DebugApi, u64> {
-    let api = DebugApi::dummy();
+    let _ = DebugApi::dummy();
     let base_key = StorageKey::new(&b"my_queue"[..]);
-    VecMapper::new(api, base_key)
+    VecMapper::new(base_key)
 }
 
 #[test]
