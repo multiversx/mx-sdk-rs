@@ -24,7 +24,7 @@ pub struct CallbackClosureUnmanagedArgs<M: ManagedTypeApi> {
 
 impl<M: ManagedTypeApi> CallbackClosureUnmanagedArgs<M> {
     /// Used by callback_raw.
-    pub fn new_empty(api: M) -> Self {
+    pub fn new_empty() -> Self {
         CallbackClosureUnmanagedArgs {
             callback_name: BoxedBytes::empty(),
             closure_args: Vec::new(),

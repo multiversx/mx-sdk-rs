@@ -386,7 +386,7 @@ mod sample_adder {
     pub trait CallbackProxy: elrond_wasm::contract_base::CallbackProxyObjBase + Sized {
         fn my_callback(self, caller: &Address) -> elrond_wasm::types::CallbackClosure<Self::Api> {
             let mut ___callback_call___ =
-                elrond_wasm::types::new_callback_call(self.cb_call_api(), &b"my_callback"[..]);
+                elrond_wasm::types::new_callback_call::<Self::Api>(&b"my_callback"[..]);
             ___callback_call___.push_endpoint_arg(caller);
             ___callback_call___
         }

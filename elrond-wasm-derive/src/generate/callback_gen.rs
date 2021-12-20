@@ -25,7 +25,7 @@ pub fn generate_callback_selector_and_main(
         let cb_main_body = quote! {
             let _ = self::EndpointWrappers::callback_selector(
                 self,
-                elrond_wasm::types::CallbackClosureForDeser::new_empty(self.raw_vm_api()),
+                elrond_wasm::types::CallbackClosureForDeser::new_empty(),
             );
         };
         (cb_selector_body, cb_main_body)
