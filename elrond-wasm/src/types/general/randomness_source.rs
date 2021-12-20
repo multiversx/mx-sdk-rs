@@ -32,6 +32,13 @@ impl<M: ManagedTypeApi> RandomnessSource<M> {
         u8::from_be_bytes(bytes)
     }
 
+    /// Range is [min, max)
+    pub fn next_u8_in_range(&mut self, min: u8, max: u8) -> u8 {
+        let rand = self.next_u8();
+
+        min + rand % (max - min)
+    }
+
     pub fn next_u16(&mut self) -> u16 {
         self.buffer.set_random(U16_BYTES);
 
@@ -39,6 +46,13 @@ impl<M: ManagedTypeApi> RandomnessSource<M> {
         let _ = self.buffer.load_slice(0, &mut bytes[..]);
 
         u16::from_be_bytes(bytes)
+    }
+
+    /// Range is [min, max)
+    pub fn next_u16_in_range(&mut self, min: u16, max: u16) -> u16 {
+        let rand = self.next_u16();
+
+        min + rand % (max - min)
     }
 
     pub fn next_u32(&mut self) -> u32 {
@@ -50,6 +64,23 @@ impl<M: ManagedTypeApi> RandomnessSource<M> {
         u32::from_be_bytes(bytes)
     }
 
+    /// Range is [min, max)
+    pub fn next_u32_in_range(&mut self, min: u32, max: u32) -> u32 {
+        let rand = self.next_u32();
+
+        min + rand % (max - min)
+    }
+
+    #[inline(always)]
+    pub fn next_usize(&mut self) -> usize {
+        self.next_u32() as usize
+    }
+
+    #[inline(always)]
+    pub fn next_usize_in_range(&mut self, min: usize, max: usize) -> usize {
+        self.next_u32_in_range(min as u32, max as u32) as usize
+    }
+
     pub fn next_u64(&mut self) -> u64 {
         self.buffer.set_random(U64_BYTES);
 
@@ -57,6 +88,13 @@ impl<M: ManagedTypeApi> RandomnessSource<M> {
         let _ = self.buffer.load_slice(0, &mut bytes[..]);
 
         u64::from_be_bytes(bytes)
+    }
+
+    /// Range is [min, max)
+    pub fn next_u64_in_range(&mut self, min: u64, max: u64) -> u64 {
+        let rand = self.next_u64();
+
+        min + rand % (max - min)
     }
 
     pub fn next_bytes(&mut self, len: usize) -> ManagedBuffer<M> {
