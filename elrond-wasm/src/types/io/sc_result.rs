@@ -47,7 +47,7 @@ impl<T, E> SCResult<T, E> {
 
     #[inline]
     /// Returns the contained Ok value or signals the error and exits.
-    pub fn unwrap_or_signal_error<FA: EndpointFinishApi>(self, api: FA) -> T
+    pub fn unwrap_or_signal_error<FA: EndpointFinishApi>(self) -> T
     where
         E: SCError,
     {
