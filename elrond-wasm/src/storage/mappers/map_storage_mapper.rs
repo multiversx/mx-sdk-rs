@@ -1,3 +1,5 @@
+use core::marker::PhantomData;
+
 use super::{set_mapper, SetMapper, StorageClearable, StorageMapper};
 use crate::{
     api::{
@@ -6,7 +8,6 @@ use crate::{
     },
     storage::{self, StorageKey},
 };
-use core::marker::PhantomData;
 use elrond_codec::{NestedDecode, NestedEncode, TopDecode, TopEncode};
 
 const MAPPED_STORAGE_VALUE_IDENTIFIER: &[u8] = b".storage";
@@ -18,10 +19,10 @@ where
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
     V: StorageMapper<SA> + StorageClearable,
 {
-    api: SA,
+    _phantom_api: PhantomData<SA>,
     base_key: StorageKey<SA>,
     keys_set: SetMapper<SA, K>,
-    _phantom: core::marker::PhantomData<V>,
+    _phantom_value: PhantomData<V>,
 }
 
 impl<SA, K, V> StorageMapper<SA> for MapStorageMapper<SA, K, V>
@@ -30,12 +31,12 @@ where
     K: TopEncode + TopDecode + NestedEncode + NestedDecode,
     V: StorageMapper<SA> + StorageClearable,
 {
-    fn new(api: SA, base_key: StorageKey<SA>) -> Self {
+    fn new(base_key: StorageKey<SA>) -> Self {
         Self {
-            api: api.clone(),
+            _phantom_api: PhantomData,
             base_key: base_key.clone(),
-            keys_set: SetMapper::<SA, K>::new(api, base_key),
-            _phantom: PhantomData,
+            keys_set: SetMapper::<SA, K>::new(base_key),
+            _phantom_value: PhantomData,
         }
     }
 }
@@ -69,7 +70,7 @@ where
 
     fn get_mapped_storage_value(&self, key: &K) -> V {
         let key = self.build_named_key(MAPPED_STORAGE_VALUE_IDENTIFIER, key);
-        <V as storage::mappers::StorageMapper<SA>>::new(self.api.clone(), key)
+        <V as storage::mappers::StorageMapper<SA>>::new(key)
     }
 
     /// Returns `true` if the map contains no elements.

@@ -5,9 +5,9 @@ use elrond_wasm::storage::{
 use elrond_wasm_debug::DebugApi;
 
 fn create_map() -> MapMapper<DebugApi, u64, u64> {
-    let api = DebugApi::dummy();
+    let _ = DebugApi::dummy();
     let base_key = StorageKey::new(&b"my_map"[..]);
-    MapMapper::new(api, base_key)
+    MapMapper::new(base_key)
 }
 
 #[test]

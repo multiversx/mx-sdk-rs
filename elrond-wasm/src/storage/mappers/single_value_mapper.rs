@@ -1,3 +1,5 @@
+use core::marker::PhantomData;
+
 use super::StorageMapper;
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
@@ -8,7 +10,6 @@ use crate::{
     io::EndpointResult,
     storage::{storage_clear, storage_get, storage_get_len, storage_set, StorageKey},
 };
-use core::marker::PhantomData;
 use elrond_codec::{TopDecode, TopEncode};
 
 /// Manages a single serializable item in storage.
@@ -17,9 +18,9 @@ where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     T: TopEncode + TopDecode + 'static,
 {
-    api: SA,
+    _phantom_api: PhantomData<SA>,
     key: StorageKey<SA>,
-    _phantom: core::marker::PhantomData<T>,
+    _phantom_item: PhantomData<T>,
 }
 
 impl<SA, T> StorageMapper<SA> for SingleValueMapper<SA, T>
@@ -27,11 +28,11 @@ where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     T: TopEncode + TopDecode,
 {
-    fn new(api: SA, base_key: StorageKey<SA>) -> Self {
+    fn new(base_key: StorageKey<SA>) -> Self {
         SingleValueMapper {
-            api,
+            _phantom_api: PhantomData,
             key: base_key,
-            _phantom: PhantomData,
+            _phantom_item: PhantomData,
         }
     }
 }
