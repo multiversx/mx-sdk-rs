@@ -18,9 +18,11 @@ fn build_contract(contract_metadata: &ContractMetadata, build_args: &BuildArgs, 
 
     assert!(exit_status.success(), "contract build process failed");
 
-    let source_wasm = contract_metadata.wasm_compilation_output_path();
-    let dest_wasm = contract_metadata.wasm_output_path(output_path);
-    fs::copy(source_wasm, dest_wasm).expect("failed to copy compiled contract to output directory");
+    let source_wasm_path = contract_metadata.wasm_compilation_output_path();
+    let dest_wasm_name = build_args.wasm_name(contract_metadata);
+    let dest_wasm_path = format!("{}/{}", output_path, dest_wasm_name);
+    fs::copy(source_wasm_path, dest_wasm_path)
+        .expect("failed to copy compiled contract to output directory");
 }
 
 impl MetaConfig {
