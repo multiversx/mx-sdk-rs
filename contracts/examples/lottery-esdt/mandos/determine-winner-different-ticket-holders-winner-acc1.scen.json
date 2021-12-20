@@ -14,7 +14,7 @@
         },
         {
             "step": "scCall",
-            "txId": "determine-winner-different-ticket-holder-winner-acc1",
+            "txId": "",
             "tx": {
                 "from": "address:my_address",
                 "to": "sc:lottery",
