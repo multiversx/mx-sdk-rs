@@ -12,9 +12,9 @@ macro_rules! imports {
         };
         use elrond_wasm::{
             api::{
-                BigIntApi, BlockchainApi, BlockchainApiImpl, CallValueApi, CryptoApi,
-                EllipticCurveApi, ErrorApi, ErrorApiImpl, LogApi, ManagedTypeApi, PrintApi,
-                SendApi, SendApiImpl,
+                BigIntApi, BlockchainApi, BlockchainApiImpl, CallValueApi, CallValueApiImpl,
+                CryptoApi, CryptoApiImpl, EllipticCurveApi, ErrorApi, ErrorApiImpl, LogApi,
+                LogApiImpl, ManagedTypeApi, PrintApi, PrintApiImpl, SendApi, SendApiImpl,
             },
             arrayvec::ArrayVec,
             contract_base::{ContractBase, ProxyObjBase},

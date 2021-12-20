@@ -21,13 +21,13 @@ pub trait ContractBase: Sized {
     /// The payment annotations should normally be the ones to handle this,
     /// but the developer is also given direct access to the API.
     fn call_value(&self) -> CallValueWrapper<Self::Api> {
-        CallValueWrapper::new(self.raw_vm_api())
+        CallValueWrapper::new()
     }
 
     /// Gateway to the functionality related to sending transactions from the current contract.
     #[inline]
     fn send(&self) -> SendWrapper<Self::Api> {
-        SendWrapper::<Self::Api>::new()
+        SendWrapper::new()
     }
 
     /// Managed types API. Required to create new instances of managed types.
@@ -45,7 +45,7 @@ pub trait ContractBase: Sized {
     /// Stateless crypto functions provided by the Arwen VM.
     #[inline]
     fn crypto(&self) -> CryptoWrapper<Self::Api> {
-        CryptoWrapper::new(self.raw_vm_api())
+        CryptoWrapper::new()
     }
 
     /// Component that provides contract developers access
@@ -62,6 +62,6 @@ pub trait ContractBase: Sized {
 
     #[inline]
     fn print(&self) -> PrintHelper<Self::Api> {
-        PrintHelper::new(self.raw_vm_api())
+        PrintHelper::new()
     }
 }

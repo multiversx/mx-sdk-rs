@@ -1,11 +1,21 @@
 use crate::{
-    api::CallValueApi,
+    api::{CallValueApi, CallValueApiImpl},
     types::{BigUint, EsdtTokenType, TokenIdentifier},
 };
 
 use super::UncallableApi;
 
 impl CallValueApi for UncallableApi {
+    type CallValueApiImpl = UncallableApi;
+
+    fn call_value_api_impl() -> Self::CallValueApiImpl {
+        unreachable!()
+    }
+}
+
+impl CallValueApiImpl for UncallableApi {
+    type ManagedTypeApi = UncallableApi;
+
     fn check_not_payable(&self) {
         unreachable!()
     }
