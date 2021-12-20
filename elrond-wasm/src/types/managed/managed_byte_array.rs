@@ -4,6 +4,7 @@ use super::{ManagedBuffer, ManagedType};
 use crate::{
     abi::TypeAbi,
     api::{Handle, ManagedTypeApi},
+    hex_util::encode_bytes_as_hex,
 };
 use alloc::string::String;
 use elrond_codec::{
@@ -16,7 +17,7 @@ const DECODE_ERROR_BAD_LENGTH: &[u8] = b"bad array length";
 /// A list of items that lives inside a managed buffer.
 /// Items can be either stored there in full (e.g. `u32`),
 /// or just via handle (e.g. `BigUint<M>`).
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub struct ManagedByteArray<M, const N: usize>
 where
     M: ManagedTypeApi,
@@ -51,6 +52,16 @@ where
     }
 }
 
+impl<M, const N: usize> From<&[u8; N]> for ManagedByteArray<M, N>
+where
+    M: ManagedTypeApi,
+{
+    #[inline]
+    fn from(bytes: &[u8; N]) -> Self {
+        Self::new_from_bytes(bytes)
+    }
+}
+
 impl<M, const N: usize> ManagedByteArray<M, N>
 where
     M: ManagedTypeApi,
@@ -77,6 +88,13 @@ where
     pub fn as_managed_buffer(&self) -> &ManagedBuffer<M> {
         &self.buffer
     }
+
+    #[inline]
+    pub fn to_byte_array(&self) -> [u8; N] {
+        let mut result = [0u8; N];
+        let _ = self.buffer.load_slice(0, &mut result[..]);
+        result
+    }
 }
 
 impl<M, const N: usize> PartialEq for ManagedByteArray<M, N>
@@ -93,7 +111,7 @@ impl<M, const N: usize> Eq for ManagedByteArray<M, N> where M: ManagedTypeApi {}
 
 impl<M, const N: usize> TryFrom<ManagedBuffer<M>> for ManagedByteArray<M, N>
 where
-    M: ManagedTypeApi
+    M: ManagedTypeApi,
 {
     type Error = DecodeError;
 
@@ -163,5 +181,18 @@ where
     /// It is semantically equivalent to `[u8; N]`.
     fn type_name() -> String {
         <&[u8; N] as TypeAbi>::type_name()
+    }
+}
+
+impl<M, const N: usize> core::fmt::Debug for ManagedByteArray<M, N>
+where
+    M: ManagedTypeApi,
+{
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        f.debug_struct("ManagedByteArray")
+            .field("handle", &self.buffer.handle)
+            .field("size", &N)
+            .field("hex-value", &encode_bytes_as_hex(&self.to_byte_array()))
+            .finish()
     }
 }

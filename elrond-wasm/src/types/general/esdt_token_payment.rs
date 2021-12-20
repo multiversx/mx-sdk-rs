@@ -75,9 +75,9 @@ where
 impl<M: ManagedTypeApi> ManagedVecItem for EsdtTokenPayment<M> {
     const PAYLOAD_SIZE: usize = 16;
     const SKIPS_RESERIALIZATION: bool = false;
+    type ReadOnly = Self;
 
     fn from_byte_reader<Reader: FnMut(&mut [u8])>(mut reader: Reader) -> Self {
-        // const SELF_PAYLOAD_SIZE: usize = <EsdtTokenPayment<M> as ManagedVecItem>::PAYLOAD_SIZE;
         let mut arr: [u8; 16] = [0u8; 16];
         reader(&mut arr[..]);
         let mut index = 0;
@@ -98,6 +98,9 @@ impl<M: ManagedTypeApi> ManagedVecItem for EsdtTokenPayment<M> {
             token_nonce,
             amount,
         }
+    }
+    fn from_byte_reader_as_read_only<Reader: FnMut(&mut [u8])>(reader: Reader) -> Self::ReadOnly {
+        Self::from_byte_reader(reader)
     }
 
     fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, mut writer: Writer) -> R {

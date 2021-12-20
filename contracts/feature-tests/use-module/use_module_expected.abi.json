@@ -13,7 +13,7 @@
         },
         "framework": {
             "name": "elrond-wasm",
-            "version": "0.23.0"
+            "version": "0.25.0"
         }
     },
     "docs": [
@@ -69,6 +69,19 @@
         },
         {
             "name": "call_mod_c",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "only_owner_mod_endpoint",
+            "onlyOwner": true,
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "call_derived_not_owner_only",
             "mutability": "readonly",
             "inputs": [],
             "outputs": []

@@ -1,0 +1,17 @@
+[package]
+name = "erc1155-user-mock-meta"
+version = "0.0.0"
+authors = ["Dorin Iancu <dorin.iancu@elrond.com>"]
+edition = "2018"
+publish = false
+
+[dependencies.erc1155-user-mock]
+path = ".."
+
+[dependencies.elrond-wasm]
+version = "0.25.0"
+path = "../../../../../elrond-wasm"
+
+[dependencies.elrond-wasm-debug]
+version = "0.25.0"
+path = "../../../../../elrond-wasm-debug"

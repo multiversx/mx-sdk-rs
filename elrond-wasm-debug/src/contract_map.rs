@@ -45,6 +45,10 @@ impl<A> ContractMap<A> {
         let previous_entry = self.factories.insert(contract_bytes, new_contract_closure);
         assert!(previous_entry.is_none(), "contract inserted twice");
     }
+
+    pub fn contains_contract(&self, contract_bytes: &[u8]) -> bool {
+        self.factories.contains_key(contract_bytes)
+    }
 }
 
 fn unknown_contract_panic(contract_identifier: &[u8]) -> ! {

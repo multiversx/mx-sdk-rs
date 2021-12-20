@@ -63,6 +63,11 @@ fn count_ones_rs() {
 // }
 
 #[test]
+fn crypto_keccak256_legacy_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/crypto_keccak256_legacy.scen.json", world());
+}
+
+#[test]
 fn crypto_keccak256_rs() {
     elrond_wasm_debug::mandos_rs("mandos/crypto_keccak256.scen.json", world());
 }
@@ -71,6 +76,11 @@ fn crypto_keccak256_rs() {
 // fn crypto_ripemd160_rs() {
 //     elrond_wasm_debug::mandos_rs("mandos/crypto_ripemd160.scen.json", world());
 // }
+
+#[test]
+fn crypto_sha256_legacy_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/crypto_sha256_legacy.scen.json", world());
+}
 
 #[test]
 fn crypto_sha256_rs() {
@@ -85,6 +95,11 @@ fn crypto_sha256_rs() {
 #[test]
 fn echo_array_u8_rs() {
     elrond_wasm_debug::mandos_rs("mandos/echo_array_u8.scen.json", world());
+}
+
+#[test]
+fn echo_arrayvec_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/echo_arrayvec.scen.json", world());
 }
 
 #[test]
@@ -227,15 +242,6 @@ fn get_cumulated_validator_rewards_rs() {
     elrond_wasm_debug::mandos_rs("mandos/get_cumulated_validator_rewards.scen.json", world());
 }
 
-// TODO: uncomment after implemented the full ESDT format in mandos-rs
-// #[test]
-// fn get_esdt_local_roles_rs() {
-// 	elrond_wasm_debug::mandos_rs(
-// 		"mandos/get_esdt_local_roles.scen.json",
-// 		world(),
-// 	);
-// }
-
 #[test]
 fn managed_address_array_rs() {
     elrond_wasm_debug::mandos_rs("mandos/managed_address_array.scen.json", world());
@@ -275,6 +281,13 @@ fn managed_buffer_slice_1_rs() {
 fn managed_buffer_slice_2_rs() {
     elrond_wasm_debug::mandos_rs("mandos/managed_buffer_slice_2.scen.json", world());
 }
+
+/*
+#[test]
+fn managed_buffer_random_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/managed_buffer_set_random.scen.json", world());
+}
+*/
 
 #[test]
 fn managed_vec_address_push_rs() {

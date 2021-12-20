@@ -4,6 +4,20 @@ There are several crates in this repo, this changelog will keep track of all of 
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [elrond-wasm 0.25.0] - 2021-12-14
+- Rust testing framework - mandos generation fixes and some more getters
+- Standard modules moved to `elrond-wasm-modules` crates
+
+## [elrond-wasm 0.24.0] - 2021-12-07
+- Rust testing framework
+- Managed Crypto API - keccak256 and sha256
+- New hook for ESDT local roles
+- Only-owner module annotation
+
+## [elrond-wasm 0.23.1, elrond-codec 0.8.3] - 2021-11-25
+- `ArrayVec` serialization
+- `ManagedAddress` additional conversions
+
 ## [elrond-wasm 0.23.0] - 2021-11-23
 - Static access to API. Static thread-local context stack in the debugger.
 
