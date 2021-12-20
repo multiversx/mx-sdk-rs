@@ -5,7 +5,24 @@ use elrond_wasm::abi::{ContractAbi, EndpointLocationAbi};
 #[derive(Default, Debug)]
 pub struct BuildArgs {
     pub debug_symbols: bool,
-    pub wasm_name: Option<String>,
+    pub wasm_name_override: Option<String>,
+    pub wasm_name_suffix: Option<String>,
+}
+
+impl BuildArgs {
+    pub fn wasm_name(&self, contract_metadata: &ContractMetadata) -> String {
+        if let Some(wasm_name_override) = &self.wasm_name_override {
+            return wasm_name_override.clone();
+        }
+        if let Some(wasm_suffix) = &self.wasm_name_suffix {
+            format!(
+                "{}-{}.wasm",
+                contract_metadata.output_base_name, wasm_suffix
+            )
+        } else {
+            contract_metadata.wasm_output_name()
+        }
+    }
 }
 
 pub struct ContractMetadata {
@@ -36,10 +53,6 @@ impl ContractMetadata {
     pub fn wasm_output_name(&self) -> String {
         format!("{}.wasm", &self.output_base_name)
     }
-
-    pub fn wasm_output_path(&self, output_dir: &str) -> String {
-        format!("{}/{}", output_dir, self.wasm_output_name())
-    }
 }
 
 pub struct MetaConfig {
@@ -61,7 +74,13 @@ pub fn process_args(args: &[String]) -> BuildArgs {
                 let name = iter
                     .next()
                     .expect("argument `--wasm-name` must be followed by the desired name");
-                result.wasm_name = Some(name.clone());
+                result.wasm_name_override = Some(name.clone());
+            },
+            "--wasm-suffix" => {
+                let suffix = iter
+                    .next()
+                    .expect("argument `--wasm-suffix` must be followed by the desired suffix");
+                result.wasm_name_suffix = Some(suffix.clone());
             },
             _ => {},
         }
