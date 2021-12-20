@@ -76,6 +76,7 @@ impl<M: ManagedTypeApi> RandomnessSource<M> {
         self.next_u32() as usize
     }
 
+    /// Range is [min, max)
     #[inline(always)]
     pub fn next_usize_in_range(&mut self, min: usize, max: usize) -> usize {
         self.next_u32_in_range(min as u32, max as u32) as usize
