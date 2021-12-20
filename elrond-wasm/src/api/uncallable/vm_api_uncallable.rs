@@ -2,8 +2,6 @@ use crate::api::{CallTypeApi, ManagedTypeErrorApi, VMApi};
 
 use super::UncallableApi;
 
-// impl ManagedTypeErrorApiImpl for UncallableApi {}
-
 impl ManagedTypeErrorApi for UncallableApi {
     type ManagedTypeErrorApiImpl = UncallableApi;
 

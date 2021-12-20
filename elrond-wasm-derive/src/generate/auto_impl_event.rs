@@ -26,7 +26,7 @@ pub fn generate_event_impl(m: &Method, event_identifier: &str) -> proc_macro2::T
     let data_buffer_snippet = if let Some(data_arg) = data_arg {
         let data_pat = &data_arg.pat;
         quote! {
-            let ___data_buffer___ = elrond_wasm::log_util::serialize_log_data(self.raw_vm_api(), #data_pat);
+            let ___data_buffer___ = elrond_wasm::log_util::serialize_log_data(#data_pat);
         }
     } else {
         quote! {
@@ -38,12 +38,12 @@ pub fn generate_event_impl(m: &Method, event_identifier: &str) -> proc_macro2::T
     let event_identifier_literal = byte_slice_literal(event_identifier.as_bytes());
     quote! {
         #msig {
-            let mut ___topic_accumulator___ = elrond_wasm::log_util::event_topic_accumulator(
+            let mut ___topic_accumulator___ = elrond_wasm::log_util::event_topic_accumulator::<Self::Api>(
                 #event_identifier_literal,
             );
             #(#topic_push_snippets)*
             #data_buffer_snippet
-            elrond_wasm::log_util::write_log(self.raw_vm_api(), &___topic_accumulator___, &___data_buffer___);
+            elrond_wasm::log_util::write_log(&___topic_accumulator___, &___data_buffer___);
         }
     }
 }
@@ -133,7 +133,11 @@ pub fn generate_legacy_event_impl(m: &Method, event_id_bytes: &[u8]) -> proc_mac
             let mut topics = [[0u8; 32]; #nr_topics];
             topics[0] = #event_id_literal;
             #(#topic_conv_snippets)*
-            self.raw_vm_api().write_legacy_log(&topics[..], &data_vec.as_slice());
+            elrond_wasm::api::LogApiImpl::write_legacy_log(
+                &Self::Api::log_api_impl(),
+                &topics[..],
+                &data_vec.as_slice()
+            );
         }
     }
 }

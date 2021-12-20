@@ -50,7 +50,7 @@ mod module_1 {
     pub trait EndpointWrappers: VersionModule + elrond_wasm::contract_base::ContractBase {
         #[inline]
         fn call_version(&self) {
-            elrond_wasm::api::CallValueApi::check_not_payable(&self.raw_vm_api());
+            elrond_wasm::api::CallValueApiImpl::check_not_payable(&Self::Api::call_value_api_impl());
             let result = self.version();
             elrond_wasm::io::EndpointResult::finish::<Self::Api>(&result)
         }
@@ -160,7 +160,7 @@ mod sample_adder {
     {
         #[inline]
         fn call_get_sum(&self) {
-            elrond_wasm::api::CallValueApi::check_not_payable(&self.raw_vm_api());
+            elrond_wasm::api::CallValueApiImpl::check_not_payable(&Self::Api::call_value_api_impl());
             elrond_wasm::api::EndpointArgumentApiImpl::check_num_arguments(
                 &<Self::Api as elrond_wasm::api::EndpointArgumentApi>::argument_api_impl(),
                 0i32,
@@ -170,7 +170,7 @@ mod sample_adder {
         }
         #[inline]
         fn call_init(&self) {
-            elrond_wasm::api::CallValueApi::check_not_payable(&self.raw_vm_api());
+            elrond_wasm::api::CallValueApiImpl::check_not_payable(&Self::Api::call_value_api_impl());
             elrond_wasm::api::EndpointArgumentApiImpl::check_num_arguments(
                 &<Self::Api as elrond_wasm::api::EndpointArgumentApi>::argument_api_impl(),
                 1i32,
@@ -183,7 +183,7 @@ mod sample_adder {
         }
         #[inline]
         fn call_add(&self) {
-            elrond_wasm::api::CallValueApi::check_not_payable(&self.raw_vm_api());
+            elrond_wasm::api::CallValueApiImpl::check_not_payable(&Self::Api::call_value_api_impl());
             elrond_wasm::api::EndpointArgumentApiImpl::check_num_arguments(
                 &<Self::Api as elrond_wasm::api::EndpointArgumentApi>::argument_api_impl(),
                 1i32,
