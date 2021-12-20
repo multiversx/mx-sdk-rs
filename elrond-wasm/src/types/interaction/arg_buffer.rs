@@ -5,11 +5,13 @@ use elrond_codec::TopEncodeOutput;
 /// Helper structure for providing arguments to all SC call functions other than async_call_raw.
 /// It keeps argument lengths separately from the argument data itself.
 /// Argument data is concatenated into a single byte buffer.
+#[must_use]
 pub struct ArgBuffer {
     arg_lengths: Vec<usize>,
     arg_data: Vec<u8>,
 }
 
+#[allow(clippy::return_self_not_must_use)]
 impl ArgBuffer {
     pub fn new() -> Self {
         ArgBuffer {
