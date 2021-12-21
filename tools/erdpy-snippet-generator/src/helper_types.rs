@@ -1,4 +1,9 @@
+use elrond_wasm::types::Address;
+
 use crate::constants::*;
+
+pub type EsdtTransferTuple = (String, u64, num_bigint::BigUint);
+const ADDRESS_LEN: usize = 32;
 
 pub enum WalletType {
     PemPath(String),
@@ -45,11 +50,45 @@ pub enum TransactionType {
         sender_address_bech32: String,
         dest_address_bech32: String,
         function: String,
-        esdt_transfers: Vec<(String, u64, num_bigint::BigUint)>,
+        esdt_transfers: Vec<EsdtTransferTuple>,
     },
     Query {
         dest_address_bech32: String,
         function: String,
-        esdt_transfers: Vec<(String, u64, num_bigint::BigUint)>,
     },
+}
+
+impl TransactionType {
+    pub fn add_esdt_transfer(
+        &mut self,
+        token_id: String,
+        token_nonce: u64,
+        amount: num_bigint::BigUint,
+    ) {
+        match self {
+            TransactionType::Call {
+                sender_address_bech32: _,
+                dest_address_bech32: _,
+                function: _,
+                esdt_transfers,
+            } => {
+                esdt_transfers.push((token_id, token_nonce, amount));
+            },
+            _ => {},
+        }
+    }
+}
+
+pub fn bech32_to_bytes(bech32_address: &str) -> Address {
+    let (_, dest_address_bytes, _) = bech32::decode(bech32_address).unwrap();
+    if dest_address_bytes.len() != ADDRESS_LEN {
+        panic!("Invalid address length after decoding")
+    }
+
+    let mut addr_bytes = [0u8; ADDRESS_LEN];
+    for (i, byte) in dest_address_bytes.iter().enumerate() {
+        addr_bytes[i] = byte.to_u8();
+    }
+
+    Address::from(addr_bytes)
 }
