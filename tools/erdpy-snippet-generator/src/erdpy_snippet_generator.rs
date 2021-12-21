@@ -210,7 +210,20 @@ impl ErdpySnippetGenerator {
                             esdt_transfer_clone,
                         );
                     },
-                    _ => {},
+                    _ => {
+                        let sender_clone = sender_address_bech32.clone();
+                        let dest_clone = dest_address_bech32.clone();
+                        let function_clone = function.clone();
+                        let transfers_clone = esdt_transfers.clone();
+
+                        self.contract_call_multi_transfer(
+                            &mut cmd_builder,
+                            sender_clone,
+                            dest_clone,
+                            function_clone,
+                            transfers_clone,
+                        )
+                    },
                 }
 
                 self.handle_common_non_query_steps(&mut cmd_builder);
@@ -322,6 +335,43 @@ impl ErdpySnippetGenerator {
 
             self.arguments = args;
         }
+    }
+
+    fn contract_call_multi_transfer(
+        &mut self,
+        cmd_builder: &mut CmdBuilder,
+        sender_address_bech32: String,
+        dest_address_bech32: String,
+        function: String,
+        esdt_transfers: Vec<EsdtTransferTuple>,
+    ) {
+        cmd_builder.append_string_no_quotes(&sender_address_bech32);
+        cmd_builder.add_raw_named_argument(FUNCTION_ARG_NAME, MULTI_TRANSFER_FUNC_NAME);
+
+        let dest_addr = bech32_to_bytes(&dest_address_bech32);
+
+        let mut args = Vec::new();
+        let dest_encoded = self.encode_arg(&dest_addr);
+        let nr_transfers_encoded = self.encode_arg(&esdt_transfers.len());
+        let function_encoded = self.encode_arg(&function);
+
+        args.push(dest_encoded);
+        args.push(nr_transfers_encoded);
+
+        for (token_id, token_nonce, amount) in esdt_transfers {
+            let token_id_encoded = self.encode_arg(&token_id);
+            let token_nonce_encoded = self.encode_arg(&token_nonce);
+            let amount_encoded = self.encode_arg(&amount.to_bytes_be());
+
+            args.push(token_id_encoded);
+            args.push(token_nonce_encoded);
+            args.push(amount_encoded);
+        }
+
+        args.push(function_encoded);
+        args.extend_from_slice(&self.arguments);
+
+        self.arguments = args;
     }
 }
 
@@ -438,6 +488,29 @@ fn main() {
     generator.add_esdt_transfer("MYTOKEN-abcdef".to_owned(), 5, amount);
 
     println!("SC Call with one NFT transfer:");
+    generator.print();
+    println!();
+    println!();
+
+    // sc call with multiple ESDT transfers
+
+    generator = ErdpySnippetGenerator::new_sc_call(
+        ChainConfig::Devnet,
+        WalletType::PemPath("../some_path/my_file.pem".to_owned()),
+        "erd1dyxrt6ky32hpvqh9w9kgt262z4c6su65myzy33styw47m9nkrplqrtnc5r".to_owned(),
+        "erd1qqqqqqqqqqqqqpgqju6muu3kj2uqpqwz798g2jeepyn8jwn5rkqsgwvu0x".to_owned(),
+        "someEndpointName".to_owned(),
+        100_000_000,
+    );
+    generator.add_argument(&my_val);
+    generator.add_argument(&other_arg);
+
+    let amount = num_bigint::BigUint::from_str("10_000_000_000_000_000_000").unwrap();
+    generator.add_esdt_transfer("MYTOKEN-abcdef".to_owned(), 5, amount.clone());
+
+    generator.add_esdt_transfer("OTHERTOK-123456".to_owned(), 0, amount);
+
+    println!("SC Call multiple ESDT transfers:");
     generator.print();
     println!();
     println!();
