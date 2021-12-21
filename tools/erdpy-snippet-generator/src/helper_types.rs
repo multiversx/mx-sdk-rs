@@ -1,3 +1,4 @@
+use bech32::FromBase32;
 use elrond_wasm::types::Address;
 
 use crate::constants::*;
@@ -80,15 +81,11 @@ impl TransactionType {
 }
 
 pub fn bech32_to_bytes(bech32_address: &str) -> Address {
-    let (_, dest_address_bytes, _) = bech32::decode(bech32_address).unwrap();
+    let (_, dest_address_bytes_u5, _) = bech32::decode(bech32_address).unwrap();
+    let dest_address_bytes = Vec::<u8>::from_base32(&dest_address_bytes_u5).unwrap();
     if dest_address_bytes.len() != ADDRESS_LEN {
         panic!("Invalid address length after decoding")
     }
 
-    let mut addr_bytes = [0u8; ADDRESS_LEN];
-    for (i, byte) in dest_address_bytes.iter().enumerate() {
-        addr_bytes[i] = byte.to_u8();
-    }
-
-    Address::from(addr_bytes)
+    Address::from_slice(&dest_address_bytes)
 }
