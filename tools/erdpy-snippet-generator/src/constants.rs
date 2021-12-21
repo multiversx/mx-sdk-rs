@@ -6,6 +6,7 @@ pub const MAX_GAS_LIMIT: u64 = 500_000_000;
 pub const DEPLOY_COMMAND_NAME: &str = "deploy";
 pub const UPGRADE_COMMAND_NAME: &str = "upgrade";
 pub const CALL_COMMAND_NAME: &str = "call";
+pub const QUERY_COMMAND_NAME: &str = "query";
 pub const PROJECT_ARG_NAME: &str = "project";
 pub const WASM_PATH_ARG_NAME: &str = "bytecode";
 pub const OUT_FILE_PATH_ARG_NAME: &str = "outfile";

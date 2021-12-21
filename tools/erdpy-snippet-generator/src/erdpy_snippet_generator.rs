@@ -103,6 +103,28 @@ impl ErdpySnippetGenerator {
         }
     }
 
+    pub fn new_sc_query(
+        chain_config: ChainConfig,
+        dest_address_bech32: String,
+        function: String,
+    ) -> Self {
+        let (proxy, chain_id) = chain_config.to_strings();
+
+        ErdpySnippetGenerator {
+            wallet_type: WalletType::PemPath(String::new()),
+            sender_nonce: None,
+            tx: TransactionType::Query {
+                dest_address_bech32,
+                function,
+            },
+            gas_limit: 0,
+            egld_value: num_bigint::BigUint::zero(),
+            arguments: Vec::new(),
+            proxy,
+            chain_id,
+        }
+    }
+
     pub fn set_egld_value(&mut self, egld_value: &num_bigint::BigUint) {
         self.egld_value = egld_value.clone();
     }
@@ -228,7 +250,16 @@ impl ErdpySnippetGenerator {
 
                 self.handle_common_non_query_steps(&mut cmd_builder);
             },
-            _ => {},
+            TransactionType::Query {
+                dest_address_bech32,
+                function,
+            } => {
+                cmd_builder.add_command(QUERY_COMMAND_NAME);
+
+                let dest_clone = dest_address_bech32.clone();
+                let function_clone = function.clone();
+                self.contract_call_no_esdt(&mut cmd_builder, dest_clone, function_clone);
+            },
         }
 
         if !self.arguments.is_empty() {
@@ -511,6 +542,21 @@ fn main() {
     generator.add_esdt_transfer("OTHERTOK-123456".to_owned(), 0, amount);
 
     println!("SC Call multiple ESDT transfers:");
+    generator.print();
+    println!();
+    println!();
+
+    // SC Query
+
+    generator = ErdpySnippetGenerator::new_sc_query(
+        ChainConfig::Devnet,
+        "erd1qqqqqqqqqqqqqpgqju6muu3kj2uqpqwz798g2jeepyn8jwn5rkqsgwvu0x".to_owned(),
+        "someEndpointName".to_owned(),
+    );
+    generator.add_argument(&my_val);
+    generator.add_argument(&other_arg);
+
+    println!("SC Query:");
     generator.print();
     println!();
     println!();
