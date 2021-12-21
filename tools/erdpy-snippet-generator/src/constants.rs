@@ -3,6 +3,7 @@ pub const CONTRACT_COMMAND_NAME: &str = "contract";
 
 // deploy/upgrade arg names
 pub const DEPLOY_COMMAND_NAME: &str = "deploy";
+pub const UPGRADE_COMMAND_NAME: &str = "upgrade";
 pub const PROJECT_ARG_NAME: &str = "project";
 pub const WASM_PATH_ARG_NAME: &str = "bytecode";
 pub const OUT_FILE_PATH_ARG_NAME: &str = "outfile";

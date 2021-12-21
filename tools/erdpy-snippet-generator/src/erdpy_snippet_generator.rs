@@ -46,6 +46,33 @@ impl ErdpySnippetGenerator {
         }
     }
 
+    pub fn new_sc_upgrade(
+        chain_config: ChainConfig,
+        wallet_type: WalletType,
+        dest_address_bech32: String,
+        deploy_type: DeployType,
+        opt_json_out_file: Option<String>,
+        gas_limit: u64,
+    ) -> Self {
+        let bounded_gas_limit = core::cmp::min(gas_limit, MAX_GAS_LIMIT);
+        let (proxy, chain_id) = chain_config.to_strings();
+
+        ErdpySnippetGenerator {
+            wallet_type,
+            sender_nonce: None,
+            tx: TransactionType::Upgrade {
+                dest_address_bech32,
+                deploy_type,
+                opt_json_out_file,
+            },
+            gas_limit: bounded_gas_limit,
+            egld_value: num_bigint::BigUint::zero(),
+            arguments: Vec::new(),
+            proxy,
+            chain_id,
+        }
+    }
+
     pub fn set_egld_value(&mut self, egld_value: &num_bigint::BigUint) {
         self.egld_value = egld_value.clone();
     }
@@ -66,7 +93,7 @@ impl ErdpySnippetGenerator {
         cmd_builder.add_flag(VERBOSE_FLAG);
         cmd_builder.add_command(CONTRACT_COMMAND_NAME);
 
-        match self.tx {
+        match &self.tx {
             TransactionType::Deploy {
                 deploy_type,
                 opt_json_out_file,
@@ -75,31 +102,68 @@ impl ErdpySnippetGenerator {
 
                 match deploy_type {
                     DeployType::ProjectPath(path) => {
-                        cmd_builder.add_raw_named_argument(PROJECT_ARG_NAME, &path);
+                        cmd_builder.add_raw_named_argument(PROJECT_ARG_NAME, path);
                     },
                     DeployType::WasmFilePath(path) => {
-                        cmd_builder.add_raw_named_argument(WASM_PATH_ARG_NAME, &path);
+                        cmd_builder.add_raw_named_argument(WASM_PATH_ARG_NAME, path);
                     },
                 }
 
                 if let Some(json_out_file) = opt_json_out_file {
-                    cmd_builder.add_raw_named_argument(OUT_FILE_PATH_ARG_NAME, &json_out_file);
+                    cmd_builder.add_raw_named_argument(OUT_FILE_PATH_ARG_NAME, json_out_file);
+                }
+
+                self.handle_common_non_query_steps(&mut cmd_builder);
+            },
+            TransactionType::Upgrade {
+                dest_address_bech32,
+                deploy_type,
+                opt_json_out_file,
+            } => {
+                cmd_builder.add_command(UPGRADE_COMMAND_NAME);
+                cmd_builder.append_string_no_quotes(dest_address_bech32);
+
+                match deploy_type {
+                    DeployType::ProjectPath(path) => {
+                        cmd_builder.add_raw_named_argument(PROJECT_ARG_NAME, path);
+                    },
+                    DeployType::WasmFilePath(path) => {
+                        cmd_builder.add_raw_named_argument(WASM_PATH_ARG_NAME, path);
+                    },
+                }
+
+                if let Some(json_out_file) = opt_json_out_file {
+                    cmd_builder.add_raw_named_argument(OUT_FILE_PATH_ARG_NAME, json_out_file);
                 }
             },
-            // TODO: Remember to handle sc query differently
             _ => {},
         }
 
-        match self.wallet_type {
+        if !self.arguments.is_empty() {
+            cmd_builder.add_flag(ARGUMENTS_ARG_NAME);
+            for arg in self.arguments {
+                cmd_builder.add_standalone_argument(&arg);
+            }
+        }
+
+        cmd_builder.add_raw_named_argument(PROXY_ARG_NAME, &self.proxy);
+        cmd_builder.add_raw_named_argument(CHAIN_ID_ARG_NAME, &self.chain_id);
+        cmd_builder.add_flag(SEND_FLAG);
+
+        cmd_builder.print();
+    }
+
+    fn handle_common_non_query_steps(&self, cmd_builder: &mut CmdBuilder) {
+        match &self.wallet_type {
             WalletType::PemPath(path) => {
-                cmd_builder.add_raw_named_argument(PEM_PATH_ARG_NAME, &path);
+                cmd_builder.add_raw_named_argument(PEM_PATH_ARG_NAME, path);
             },
             WalletType::KeyFile {
                 keyfile_path,
                 passfile_path,
             } => {
-                cmd_builder.add_raw_named_argument(KEYFILE_PATH_ARG_NAME, &keyfile_path);
-                cmd_builder.add_raw_named_argument(PASSFILE_PATH_ARG_NAME, &passfile_path);
+                cmd_builder.add_raw_named_argument(KEYFILE_PATH_ARG_NAME, keyfile_path);
+                cmd_builder.add_raw_named_argument(PASSFILE_PATH_ARG_NAME, passfile_path);
             },
         }
 
@@ -121,19 +185,6 @@ impl ErdpySnippetGenerator {
             GAS_LIMIT_ARG_NAME,
             &num_bigint::BigUint::from(self.gas_limit),
         );
-
-        if !self.arguments.is_empty() {
-            cmd_builder.add_flag(ARGUMENTS_ARG_NAME);
-            for arg in self.arguments {
-                cmd_builder.add_standalone_argument(&arg);
-            }
-        }
-
-        cmd_builder.add_raw_named_argument(PROXY_ARG_NAME, &self.proxy);
-        cmd_builder.add_raw_named_argument(CHAIN_ID_ARG_NAME, &self.chain_id);
-        cmd_builder.add_flag(SEND_FLAG);
-
-        cmd_builder.print();
     }
 }
 
@@ -153,4 +204,21 @@ fn main() {
     generator.add_argument(&other_arg);
 
     generator.print();
+    println!();
+    println!();
+
+    generator = ErdpySnippetGenerator::new_sc_upgrade(
+        ChainConfig::Devnet,
+        WalletType::PemPath("../some_path/my_file.pem".to_owned()),
+        "erd1dyxrt6ky32hpvqh9w9kgt262z4c6su65myzy33styw47m9nkrplqrtnc5r".to_owned(),
+        DeployType::WasmFilePath("../path_to_wasm/file.wasm".to_owned()),
+        Some("some_out_file.json".to_owned()),
+        10_000_000,
+    );
+    generator.add_argument(&my_val);
+    generator.add_argument(&other_arg);
+
+    generator.print();
+    println!();
+    println!();
 }
