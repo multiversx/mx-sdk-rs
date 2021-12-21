@@ -24,6 +24,7 @@ const LEGACY_TOPIC_LENGTH: usize = 32;
 impl LogApi for VmApiImpl {
     type LogApiImpl = VmApiImpl;
 
+    #[inline]
     fn log_api_impl() -> Self::LogApiImpl {
         VmApiImpl {}
     }

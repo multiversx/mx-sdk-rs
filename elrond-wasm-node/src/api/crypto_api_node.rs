@@ -63,6 +63,7 @@ extern "C" {
 impl CryptoApi for VmApiImpl {
     type CryptoApiImpl = VmApiImpl;
 
+    #[inline]
     fn crypto_api_impl() -> Self::CryptoApiImpl {
         VmApiImpl {}
     }

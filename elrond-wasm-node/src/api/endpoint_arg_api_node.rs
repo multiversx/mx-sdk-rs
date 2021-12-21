@@ -28,6 +28,7 @@ extern "C" {
 impl EndpointArgumentApi for VmApiImpl {
     type EndpointArgumentApiImpl = VmApiImpl;
 
+    #[inline]
     fn argument_api_impl() -> Self::EndpointArgumentApiImpl {
         VmApiImpl {}
     }

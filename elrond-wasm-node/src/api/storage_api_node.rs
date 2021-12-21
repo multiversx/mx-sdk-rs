@@ -33,6 +33,7 @@ extern "C" {
 impl StorageReadApi for VmApiImpl {
     type StorageReadApiImpl = VmApiImpl;
 
+    #[inline]
     fn storage_read_api_impl() -> Self::StorageReadApiImpl {
         VmApiImpl {}
     }
@@ -107,6 +108,7 @@ impl StorageReadApiImpl for VmApiImpl {
 impl StorageWriteApi for VmApiImpl {
     type StorageWriteApiImpl = VmApiImpl;
 
+    #[inline]
     fn storage_write_api_impl() -> Self::StorageWriteApiImpl {
         VmApiImpl {}
     }

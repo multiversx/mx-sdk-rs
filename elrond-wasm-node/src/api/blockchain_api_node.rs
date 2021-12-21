@@ -140,6 +140,7 @@ extern "C" {
 impl BlockchainApi for VmApiImpl {
     type BlockchainApiImpl = VmApiImpl;
 
+    #[inline]
     fn blockchain_api_impl() -> Self::BlockchainApiImpl {
         VmApiImpl {}
     }
