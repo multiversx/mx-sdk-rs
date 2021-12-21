@@ -32,11 +32,6 @@ impl CmdBuilder {
         self.cmd += flag_name;
     }
 
-    pub fn add_named_argument<T: TopEncode>(&mut self, arg_name: &str, arg: &T) {
-        self.add_flag(arg_name);
-        self.add_standalone_argument(arg);
-    }
-
     pub fn add_standalone_argument<T: TopEncode>(&mut self, arg: &T) {
         let mut arg_bytes = Vec::new();
         arg.top_encode(&mut arg_bytes).unwrap();
