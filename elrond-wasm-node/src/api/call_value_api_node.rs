@@ -36,6 +36,7 @@ extern "C" {
 impl CallValueApi for VmApiImpl {
     type CallValueApiImpl = VmApiImpl;
 
+    #[inline]
     fn call_value_api_impl() -> Self::CallValueApiImpl {
         VmApiImpl {}
     }

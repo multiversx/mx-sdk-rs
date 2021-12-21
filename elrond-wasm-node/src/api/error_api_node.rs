@@ -9,6 +9,7 @@ extern "C" {
 impl ErrorApi for VmApiImpl {
     type ErrorApiImpl = VmApiImpl;
 
+    #[inline]
     fn error_api_impl() -> Self {
         VmApiImpl {}
     }

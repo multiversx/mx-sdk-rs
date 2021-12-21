@@ -19,6 +19,7 @@ extern "C" {
 impl EndpointFinishApi for VmApiImpl {
     type EndpointFinishApiImpl = VmApiImpl;
 
+    #[inline]
     fn finish_api_impl() -> Self::EndpointFinishApiImpl {
         VmApiImpl {}
     }

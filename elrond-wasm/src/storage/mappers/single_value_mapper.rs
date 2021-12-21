@@ -18,8 +18,8 @@ where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     T: TopEncode + TopDecode + 'static,
 {
-    _phantom_api: PhantomData<SA>,
     key: StorageKey<SA>,
+    _phantom_api: PhantomData<SA>,
     _phantom_item: PhantomData<T>,
 }
 
@@ -28,10 +28,11 @@ where
     SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
     T: TopEncode + TopDecode,
 {
+    #[inline]
     fn new(base_key: StorageKey<SA>) -> Self {
         SingleValueMapper {
-            _phantom_api: PhantomData,
             key: base_key,
+            _phantom_api: PhantomData,
             _phantom_item: PhantomData,
         }
     }
