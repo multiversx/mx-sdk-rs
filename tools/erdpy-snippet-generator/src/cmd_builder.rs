@@ -16,6 +16,11 @@ impl CmdBuilder {
         }
     }
 
+    pub fn append_string_no_quotes(&mut self, string: &str) {
+        self.add_space();
+        self.cmd += string;
+    }
+
     pub fn add_command(&mut self, command: &str) {
         self.add_space();
         self.cmd += command;
