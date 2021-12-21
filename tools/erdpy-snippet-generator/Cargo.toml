@@ -15,6 +15,7 @@ version = "0.25.0"
 version = "0.25.0"
 
 [dependencies]
+bech32 = "0.8.1"
 num-bigint = "0.4.2"
 num-traits = "0.2"
 hex = "0.4"
