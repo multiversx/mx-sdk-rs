@@ -118,6 +118,7 @@ members = [
   "contracts/modules-legacy/elrond-wasm-module-users",
 
   "tools/test-gen",
+  "tools/erdpy-snippet-generator",
 ]
 
 exclude = [
