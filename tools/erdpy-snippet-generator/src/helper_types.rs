@@ -66,16 +66,14 @@ impl TransactionType {
         token_nonce: u64,
         amount: num_bigint::BigUint,
     ) {
-        match self {
-            TransactionType::Call {
-                sender_address_bech32: _,
-                dest_address_bech32: _,
-                function: _,
-                esdt_transfers,
-            } => {
-                esdt_transfers.push((token_id, token_nonce, amount));
-            },
-            _ => {},
+        if let TransactionType::Call {
+            sender_address_bech32: _,
+            dest_address_bech32: _,
+            function: _,
+            esdt_transfers,
+        } = self
+        {
+            esdt_transfers.push((token_id, token_nonce, amount));
         }
     }
 }
