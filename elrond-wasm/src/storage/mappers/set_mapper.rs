@@ -11,7 +11,7 @@ use crate::{
     finish_all,
     io::EndpointResult,
     storage::{storage_get, storage_set, StorageKey},
-    types::MultiResultVec,
+    types::{ManagedType, MultiResultVec},
 };
 use elrond_codec::{NestedDecode, NestedEncode, TopDecode, TopEncode};
 
@@ -68,7 +68,10 @@ where
     }
 
     fn get_node_id(&self, value: &T) -> u32 {
-        storage_get(&self.build_named_value_key(NODE_ID_IDENTIFIER, value))
+        storage_get(
+            self.build_named_value_key(NODE_ID_IDENTIFIER, value)
+                .as_ref(),
+        )
     }
 
     fn set_node_id(&self, value: &T, node_id: u32) {

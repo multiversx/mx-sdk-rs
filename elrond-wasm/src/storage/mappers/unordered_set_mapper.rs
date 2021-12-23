@@ -11,7 +11,7 @@ use crate::{
     finish_all,
     storage::StorageKey,
     storage_clear, storage_get, storage_set,
-    types::MultiResultVec,
+    types::{ManagedType, MultiResultVec},
     EndpointResult,
 };
 use elrond_codec::{NestedDecode, NestedEncode, TopDecode, TopEncode};
@@ -69,7 +69,7 @@ where
     }
 
     pub fn get_index(&self, value: &T) -> usize {
-        storage_get(&self.item_index_key(value))
+        storage_get(self.item_index_key(value).as_ref())
     }
 
     fn set_index(&self, value: &T, index: usize) {

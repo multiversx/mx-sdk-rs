@@ -9,6 +9,7 @@ use crate::{
     },
     io::EndpointResult,
     storage::{storage_clear, storage_get, storage_get_len, storage_set, StorageKey},
+    types::ManagedType,
 };
 use elrond_codec::{TopDecode, TopEncode};
 
@@ -45,7 +46,7 @@ where
 {
     /// Retrieves current value from storage.
     pub fn get(&self) -> T {
-        storage_get(&self.key)
+        storage_get(self.key.as_ref())
     }
 
     /// Returns whether the storage managed by this mapper is empty.

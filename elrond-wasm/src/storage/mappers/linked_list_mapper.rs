@@ -10,7 +10,7 @@ use crate::{
     finish_all,
     io::EndpointResult,
     storage::{storage_get, storage_set, StorageKey},
-    types::{BoxedBytes, MultiResultVec},
+    types::{BoxedBytes, ManagedType, MultiResultVec},
 };
 use alloc::vec::Vec;
 use elrond_codec::{
@@ -153,15 +153,18 @@ where
     }
 
     fn get_info(&self) -> LinkedListInfo {
-        storage_get(&self.build_name_key(INFO_IDENTIFIER))
+        storage_get(self.build_name_key(INFO_IDENTIFIER).as_ref())
     }
 
     fn set_info(&mut self, value: LinkedListInfo) {
-        storage_set(&self.build_name_key(INFO_IDENTIFIER), &value);
+        storage_set(&self.build_name_key(INFO_IDENTIFIER).as_ref(), &value);
     }
 
     fn get_node(&self, node_id: u32) -> LinkedListNode<T> {
-        storage_get(&self.build_node_id_named_key(NODE_IDENTIFIER, node_id))
+        storage_get(
+            self.build_node_id_named_key(NODE_IDENTIFIER, node_id)
+                .as_ref(),
+        )
     }
 
     fn is_empty_node(&self, node_id: u32) -> bool {

@@ -10,7 +10,7 @@ use crate::{
     finish_all,
     io::EndpointResult,
     storage::{storage_get, storage_get_len, storage_set, StorageKey},
-    types::{ManagedAddress, ManagedVec, MultiResultVec},
+    types::{ManagedAddress, ManagedType, ManagedVec, MultiResultVec},
 };
 
 const ADDRESS_TO_ID_SUFFIX: &[u8] = b"_address_to_id";
@@ -73,7 +73,7 @@ where
     /// Yields the user id for a given address.
     /// Will return 0 if the address is not known to the contract.
     pub fn get_user_id(&self, address: &ManagedAddress<SA>) -> usize {
-        storage_get(&self.get_user_id_key(address))
+        storage_get(self.get_user_id_key(address).as_ref())
     }
 
     fn set_user_id(&self, address: &ManagedAddress<SA>, id: usize) {
@@ -86,7 +86,7 @@ where
         // TODO: optimize, storage_load_managed_buffer_len is currently called twice
 
         if storage_get_len(&key) > 0 {
-            Some(storage_get(&key))
+            Some(storage_get(key.as_ref()))
         } else {
             None
         }
@@ -95,7 +95,7 @@ where
     /// Yields the user address for a given id.
     /// Will cause a deserialization error if the id is invalid.
     pub fn get_user_address_unchecked(&self, id: usize) -> ManagedAddress<SA> {
-        storage_get(&self.get_user_address_key(id))
+        storage_get(self.get_user_address_key(id).as_ref())
     }
 
     /// Yields the user address for a given id, if the id is valid.
@@ -104,7 +104,7 @@ where
         let key = self.get_user_address_key(id);
         // TODO: optimize, storage_load_managed_buffer_len is currently called twice
         if storage_get_len(&key) > 0 {
-            storage_get(&key)
+            storage_get(key.as_ref())
         } else {
             ManagedAddress::zero()
         }
@@ -116,7 +116,7 @@ where
 
     /// Number of users.
     pub fn get_user_count(&self) -> usize {
-        storage_get(&self.get_user_count_key())
+        storage_get(self.get_user_count_key().as_ref())
     }
 
     fn set_user_count(&self, user_count: usize) {

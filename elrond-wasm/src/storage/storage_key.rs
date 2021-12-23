@@ -1,5 +1,5 @@
 use crate::{
-    api::{ErrorApi, ErrorApiImpl, ManagedTypeApi},
+    api::{ErrorApi, ErrorApiImpl, Handle, ManagedTypeApi},
     types::{BoxedBytes, ManagedBuffer, ManagedByteArray, ManagedType},
     *,
 };
@@ -10,6 +10,27 @@ where
     A: ManagedTypeApi + ErrorApi + 'static,
 {
     pub(crate) buffer: ManagedBuffer<A>,
+}
+
+impl<A> ManagedType<A> for StorageKey<A>
+where
+    A: ManagedTypeApi + ErrorApi + 'static,
+{
+    #[inline]
+    fn from_raw_handle(handle: Handle) -> Self {
+        StorageKey {
+            buffer: ManagedBuffer::from_raw_handle(handle),
+        }
+    }
+
+    #[doc(hidden)]
+    fn get_raw_handle(&self) -> Handle {
+        self.buffer.get_raw_handle()
+    }
+
+    fn transmute_from_handle_ref(handle_ref: &Handle) -> &Self {
+        unsafe { core::mem::transmute(handle_ref) }
+    }
 }
 
 impl<A> StorageKey<A>
