@@ -40,18 +40,6 @@ where
     }
 }
 
-// impl<M, T> ManagedReadonly<M, T>
-// where
-//     M: ManagedTypeApi,
-//     T: ManagedType<M> + Clone,
-// {
-//     /// Creates a new mutable managed type instance.
-//     /// Clones the underlying data.
-//     pub fn clone_item(self) -> T {
-//         T::from_raw_handle(self.handle).clone()
-//     }
-// }
-
 impl<M, T> Copy for ManagedReadonly<M, T>
 where
     M: ManagedTypeApi,
