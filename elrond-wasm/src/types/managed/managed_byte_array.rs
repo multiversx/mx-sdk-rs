@@ -40,6 +40,10 @@ where
     fn get_raw_handle(&self) -> Handle {
         self.buffer.get_raw_handle()
     }
+
+    fn transmute_from_handle_ref(handle_ref: &Handle) -> &Self {
+        unsafe { core::mem::transmute(handle_ref) }
+    }
 }
 
 impl<M, const N: usize> Default for ManagedByteArray<M, N>
