@@ -265,7 +265,7 @@ where
     }
 
     fn is_empty_mapping_value<M: ManagedTypeApi>(&self, token_id: &TokenIdentifier<M>) -> bool {
-        storage_get_len(&self.build_key_token_id_mapping(token_id)) == 0
+        storage_get_len(self.build_key_token_id_mapping(token_id).as_ref()) == 0
     }
 
     fn get_attributes_to_nonce_mapping<T: TopEncode + TopDecode + NestedEncode + NestedDecode>(
@@ -295,7 +295,7 @@ where
         mapping: u8,
         attr: &T,
     ) -> bool {
-        storage_get_len(&self.build_key_attr_to_nonce_mapping(mapping, attr)) == 0
+        storage_get_len(self.build_key_attr_to_nonce_mapping(mapping, attr).as_ref()) == 0
     }
 
     fn clear_attributes_to_nonce_mapping<T: TopEncode + TopDecode + NestedEncode + NestedDecode>(
@@ -331,7 +331,10 @@ where
     }
 
     fn is_empty_token_attributes_value(&self, mapping: u8, token_nonce: u64) -> bool {
-        storage_get_len(&self.build_key_token_attr_value(mapping, token_nonce)) == 0
+        storage_get_len(
+            self.build_key_token_attr_value(mapping, token_nonce)
+                .as_ref(),
+        ) == 0
     }
 
     fn clear_token_attributes_value(&self, mapping: u8, token_nonce: u64) {

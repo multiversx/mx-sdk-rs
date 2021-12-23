@@ -36,7 +36,7 @@ impl<M: ManagedTypeApi> CallbackClosureUnmanagedArgs<M> {
         api: A,
     ) -> Option<Self> {
         let storage_key = super::callback_closure::cb_closure_storage_key::<A>();
-        if storage_get_len(&storage_key) > 0 {
+        if storage_get_len(storage_key.as_ref()) > 0 {
             let closure = storage_get(storage_key.as_ref());
             storage_clear(storage_key.as_ref());
             Some(closure)

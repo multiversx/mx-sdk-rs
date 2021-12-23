@@ -143,7 +143,7 @@ where
     /// There are no restrictions on the index,
     /// calling for an invalid index will simply return `true`.
     pub fn item_is_empty_unchecked(&self, index: usize) -> bool {
-        storage_get_len(&self.item_key(index)) == 0
+        storage_get_len(self.item_key(index).as_ref()) == 0
     }
 
     /// Checks whether or not there is anything ins storage at index.
