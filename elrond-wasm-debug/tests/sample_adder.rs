@@ -143,11 +143,11 @@ mod sample_adder {
     {
         fn get_sum(&self) -> BigInt<Self::Api> {
             let mut ___key___ = elrond_wasm::storage::StorageKey::<Self::Api>::new(&b"sum"[..]);
-            elrond_wasm::storage_get(&___key___)
+            elrond_wasm::storage_get(elrond_wasm::types::ManagedRef::new(&___key___))
         }
         fn set_sum(&self, sum: &BigInt<Self::Api>) {
             let mut ___key___ = elrond_wasm::storage::StorageKey::<Self::Api>::new(&b"sum"[..]);
-            elrond_wasm::storage_set(&___key___, &sum);
+            elrond_wasm::storage_set(elrond_wasm::types::ManagedRef::new(&___key___), &sum);
         }
         fn callback(&self) {}
         fn callbacks(&self) -> self::CallbackProxyObj<Self::Api> {

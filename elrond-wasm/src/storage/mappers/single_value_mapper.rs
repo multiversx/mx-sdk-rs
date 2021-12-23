@@ -55,8 +55,9 @@ where
     }
 
     /// Saves argument to storage.
+    #[inline]
     pub fn set(&self, new_value: &T) {
-        storage_set(&self.key, new_value);
+        storage_set(self.key.as_ref(), new_value);
     }
 
     /// Saves argument to storage only if the storage is empty.

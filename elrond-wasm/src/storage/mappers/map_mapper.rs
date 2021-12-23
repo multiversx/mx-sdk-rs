@@ -74,7 +74,10 @@ where
     }
 
     fn set_mapped_value(&self, key: &K, value: &V) {
-        storage_set(&self.build_named_key(MAPPED_VALUE_IDENTIFIER, key), &value);
+        storage_set(
+            self.build_named_key(MAPPED_VALUE_IDENTIFIER, key).as_ref(),
+            &value,
+        );
     }
 
     fn clear_mapped_value(&self, key: &K) {

@@ -31,7 +31,9 @@ pub fn generate_getter_impl(m: &Method, identifier: &str) -> proc_macro2::TokenS
             quote! {
                 #msig {
                     #key_snippet
-                    elrond_wasm::storage::storage_get(&___key___)
+                    elrond_wasm::storage::storage_get(
+                        elrond_wasm::types::ManagedRef::new(&___key___),
+                    )
                 }
             }
         },
@@ -55,7 +57,9 @@ pub fn generate_setter_impl(m: &Method, identifier: &str) -> proc_macro2::TokenS
     quote! {
         #msig {
             #key_snippet
-            elrond_wasm::storage::storage_set(&___key___, & #pat);
+            elrond_wasm::storage::storage_set(
+                elrond_wasm::types::ManagedRef::new(&___key___),
+                &#pat);
         }
     }
 }

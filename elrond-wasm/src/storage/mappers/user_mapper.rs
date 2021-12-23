@@ -77,7 +77,7 @@ where
     }
 
     fn set_user_id(&self, address: &ManagedAddress<SA>, id: usize) {
-        storage_set(&self.get_user_id_key(address), &id);
+        storage_set(self.get_user_id_key(address).as_ref(), &id);
     }
 
     /// Yields the user address for a given id, if the id is valid.
@@ -111,7 +111,7 @@ where
     }
 
     fn set_user_address(&self, id: usize, address: &ManagedAddress<SA>) {
-        storage_set(&self.get_user_address_key(id), address);
+        storage_set(self.get_user_address_key(id).as_ref(), address);
     }
 
     /// Number of users.
@@ -120,7 +120,7 @@ where
     }
 
     fn set_user_count(&self, user_count: usize) {
-        storage_set(&self.get_user_count_key(), &user_count);
+        storage_set(self.get_user_count_key().as_ref(), &user_count);
     }
 
     /// Yields the user id for a given address, or creates a new user id if there isn't one.

@@ -253,7 +253,7 @@ where
     }
 
     fn set_counter_value(&self, value: u8) {
-        storage_set(&self.build_key_token_id_counter(), &value);
+        storage_set(self.build_key_token_id_counter().as_ref(), &value);
     }
 
     fn get_mapping_value<M: ManagedTypeApi>(&self, token_id: &TokenIdentifier<M>) -> u8 {
@@ -261,7 +261,7 @@ where
     }
 
     fn set_mapping_value<M: ManagedTypeApi>(&self, token_id: &TokenIdentifier<M>, value: u8) {
-        storage_set(&self.build_key_token_id_mapping(token_id), &value);
+        storage_set(self.build_key_token_id_mapping(token_id).as_ref(), &value);
     }
 
     fn is_empty_mapping_value<M: ManagedTypeApi>(&self, token_id: &TokenIdentifier<M>) -> bool {
@@ -283,7 +283,7 @@ where
         token_nonce: u64,
     ) {
         storage_set(
-            &self.build_key_attr_to_nonce_mapping(mapping, attr),
+            self.build_key_attr_to_nonce_mapping(mapping, attr).as_ref(),
             &token_nonce,
         );
     }
@@ -324,7 +324,8 @@ where
         value: &T,
     ) {
         storage_set(
-            &self.build_key_token_attr_value(mapping, token_nonce),
+            self.build_key_token_attr_value(mapping, token_nonce)
+                .as_ref(),
             value,
         );
     }

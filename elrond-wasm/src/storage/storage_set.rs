@@ -1,7 +1,7 @@
 use crate::{
     api::{ErrorApi, ErrorApiImpl, ManagedTypeApi, StorageWriteApi, StorageWriteApiImpl},
     err_msg,
-    types::{BigInt, BigUint, ManagedBuffer, ManagedBufferCachedBuilder, ManagedType},
+    types::{BigInt, BigUint, ManagedBuffer, ManagedBufferCachedBuilder, ManagedRef, ManagedType},
 };
 use elrond_codec::*;
 
@@ -11,7 +11,7 @@ struct StorageSetOutput<'k, A>
 where
     A: StorageWriteApi + ManagedTypeApi + ErrorApi + 'static,
 {
-    key: &'k StorageKey<A>,
+    key: ManagedRef<'k, A, StorageKey<A>>,
 }
 
 impl<'k, A> StorageSetOutput<'k, A>
@@ -19,7 +19,7 @@ where
     A: StorageWriteApi + ManagedTypeApi + ErrorApi + 'static,
 {
     #[inline]
-    fn new(key: &'k StorageKey<A>) -> Self {
+    fn new(key: ManagedRef<'k, A, StorageKey<A>>) -> Self {
         StorageSetOutput { key }
     }
 
@@ -83,7 +83,7 @@ where
 }
 
 // #[inline]
-pub fn storage_set<A, T>(key: &StorageKey<A>, value: &T)
+pub fn storage_set<'k, A, T>(key: ManagedRef<'k, A, StorageKey<A>>, value: &T)
 where
     T: TopEncode,
     A: StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
