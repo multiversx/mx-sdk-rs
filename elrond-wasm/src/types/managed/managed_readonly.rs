@@ -81,6 +81,24 @@ where
     }
 }
 
+impl<M, T> PartialEq for ManagedReadonly<M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedType<M> + PartialEq,
+{
+    #[inline]
+    fn eq(&self, other: &Self) -> bool {
+        self.deref() == other.deref()
+    }
+}
+
+impl<M, T> Eq for ManagedReadonly<M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedType<M> + PartialEq,
+{
+}
+
 impl<M, T> ManagedType<M> for ManagedReadonly<M, T>
 where
     M: ManagedTypeApi,
@@ -189,5 +207,17 @@ where
 
     fn into_nested_buffer(self) -> Self::NestedBuffer {
         T::from_raw_handle(self.handle).into_nested_buffer()
+    }
+}
+
+impl<M, T> core::fmt::Debug for ManagedReadonly<M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedType<M> + core::fmt::Debug,
+{
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        f.debug_tuple("ManagedReadonly")
+            .field(self.deref())
+            .finish()
     }
 }
