@@ -994,11 +994,7 @@ fn test_wrapper_getters() {
     assert_eq!(egld_balance, actual_egld_balance);
     assert_eq!(esdt_balance, actual_esdt_balance);
     assert_eq!(nft_balance, actual_nft_balance);
-    assert_eq!(
-        nft_attributes.creation_epoch,
-        actual_attributes.creation_epoch
-    );
-    assert_eq!(nft_attributes.cool_factor, actual_attributes.cool_factor);
+    assert_eq!(nft_attributes, actual_attributes);
 }
 
 #[test]

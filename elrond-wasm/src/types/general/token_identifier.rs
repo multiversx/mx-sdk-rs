@@ -29,6 +29,11 @@ impl<M: ManagedTypeApi> ManagedType<M> for TokenIdentifier<M> {
     fn get_raw_handle(&self) -> Handle {
         self.buffer.get_raw_handle()
     }
+
+    #[doc(hidden)]
+    fn transmute_from_handle_ref(handle_ref: &Handle) -> &Self {
+        unsafe { core::mem::transmute(handle_ref) }
+    }
 }
 
 impl<M: ManagedTypeApi> TokenIdentifier<M> {
