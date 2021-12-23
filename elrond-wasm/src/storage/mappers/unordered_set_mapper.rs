@@ -77,7 +77,7 @@ where
     }
 
     fn clear_index(&self, value: &T) {
-        storage_clear(&self.item_index_key(value));
+        storage_clear(self.item_index_key(value).as_ref());
     }
 
     /// Returns `true` if the set contains no elements.

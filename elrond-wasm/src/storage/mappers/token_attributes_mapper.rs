@@ -303,7 +303,7 @@ where
         mapping: u8,
         attr: &T,
     ) {
-        storage_clear(&self.build_key_attr_to_nonce_mapping(mapping, attr));
+        storage_clear(self.build_key_attr_to_nonce_mapping(mapping, attr).as_ref());
     }
 
     fn get_token_attributes_value<T: TopEncode + TopDecode + NestedEncode + NestedDecode>(
@@ -335,6 +335,9 @@ where
     }
 
     fn clear_token_attributes_value(&self, mapping: u8, token_nonce: u64) {
-        storage_clear(&self.build_key_token_attr_value(mapping, token_nonce));
+        storage_clear(
+            self.build_key_token_attr_value(mapping, token_nonce)
+                .as_ref(),
+        );
     }
 }

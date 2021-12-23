@@ -103,7 +103,9 @@ pub fn generate_clear_impl(m: &Method, identifier: &str) -> proc_macro2::TokenSt
     quote! {
         #msig {
             #key_snippet
-            elrond_wasm::storage::storage_clear(&___key___);
+            elrond_wasm::storage::storage_clear(
+                elrond_wasm::types::ManagedRef::new(&___key___),
+            );
         }
     }
 }
