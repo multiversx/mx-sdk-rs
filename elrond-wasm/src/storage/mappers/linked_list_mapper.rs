@@ -168,7 +168,10 @@ where
     }
 
     fn is_empty_node(&self, node_id: u32) -> bool {
-        storage_get_len(&self.build_node_id_named_key(NODE_IDENTIFIER, node_id)) == 0
+        storage_get_len(
+            self.build_node_id_named_key(NODE_IDENTIFIER, node_id)
+                .as_ref(),
+        ) == 0
     }
 
     fn set_node(&mut self, node_id: u32, item: &LinkedListNode<T>) {

@@ -84,7 +84,7 @@ where
     }
 
     pub fn raw_byte_length(&self) -> usize {
-        storage_get_len(&self.key)
+        storage_get_len(self.key.as_ref())
     }
 }
 

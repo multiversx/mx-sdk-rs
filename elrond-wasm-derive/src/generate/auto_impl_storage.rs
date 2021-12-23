@@ -88,7 +88,9 @@ pub fn generate_is_empty_impl(m: &Method, identifier: &str) -> proc_macro2::Toke
     quote! {
         #msig {
             #key_snippet
-            elrond_wasm::storage::storage_get_len(&___key___) == 0
+            elrond_wasm::storage::storage_get_len(
+                elrond_wasm::types::ManagedRef::new(&___key___),
+            ) == 0
         }
     }
 }

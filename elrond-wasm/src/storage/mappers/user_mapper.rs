@@ -85,7 +85,7 @@ where
         let key = self.get_user_address_key(id);
         // TODO: optimize, storage_load_managed_buffer_len is currently called twice
 
-        if storage_get_len(&key) > 0 {
+        if storage_get_len(key.as_ref()) > 0 {
             Some(storage_get(key.as_ref()))
         } else {
             None
@@ -103,7 +103,7 @@ where
     pub fn get_user_address_or_zero(&self, id: usize) -> ManagedAddress<SA> {
         let key = self.get_user_address_key(id);
         // TODO: optimize, storage_load_managed_buffer_len is currently called twice
-        if storage_get_len(&key) > 0 {
+        if storage_get_len(key.as_ref()) > 0 {
             storage_get(key.as_ref())
         } else {
             ManagedAddress::zero()
