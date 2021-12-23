@@ -70,7 +70,7 @@ where
 
     /// Clears the storage for this mapper.
     pub fn clear(&self) {
-        storage_clear(&self.key);
+        storage_clear(self.key.as_ref());
     }
 
     /// Syntactic sugar, to more compactly express a get, update and set in one line.

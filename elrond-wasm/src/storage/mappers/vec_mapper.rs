@@ -182,7 +182,7 @@ where
     /// There are no restrictions on the index,
     /// calling for an invalid index will simply do nothing.
     pub fn clear_entry_unchecked(&self, index: usize) {
-        storage_clear(&self.item_key(index));
+        storage_clear(self.item_key(index).as_ref());
     }
 
     /// Clears item at index from storage by swap remove
@@ -220,7 +220,7 @@ where
     pub fn clear(&mut self) {
         let len = self.len();
         for i in 1..=len {
-            storage_clear(&self.item_key(i));
+            storage_clear(self.item_key(i).as_ref());
         }
         self.save_count(0);
     }

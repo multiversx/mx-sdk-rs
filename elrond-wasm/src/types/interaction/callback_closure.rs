@@ -66,7 +66,7 @@ impl<M: ManagedTypeErrorApi> CallbackClosure<M> {
         if !storage_value_raw.is_empty() {
             let serializer = ManagedSerializer::<A>::new();
             let closure = serializer.top_decode_from_managed_buffer(&storage_value_raw);
-            storage_clear(&storage_key);
+            storage_clear(storage_key.as_ref());
             Some(closure)
         } else {
             None

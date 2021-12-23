@@ -81,7 +81,7 @@ where
     }
 
     fn clear_mapped_value(&self, key: &K) {
-        storage_clear(&self.build_named_key(MAPPED_VALUE_IDENTIFIER, key));
+        storage_clear(self.build_named_key(MAPPED_VALUE_IDENTIFIER, key).as_ref());
     }
 
     /// Returns `true` if the map contains no elements.
