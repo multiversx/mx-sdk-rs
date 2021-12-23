@@ -15,6 +15,10 @@ pub trait ManagedType<M: ManagedTypeApi>: Sized {
         M::instance()
     }
 
+    /// Implement carefully, since the underlying transmutation is an unsafe operation.
+    /// For types that wrap a handle to some VM-managed data,
+    /// make sure the type only contains the handle (plus ZSTs if necessary).
+    /// For types that just wrap another managed type it is easier, call for the wrapped object.
     #[doc(hidden)]
     fn transmute_from_handle_ref(handle_ref: &Handle) -> &Self;
 
