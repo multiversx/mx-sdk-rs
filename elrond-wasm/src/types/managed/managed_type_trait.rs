@@ -22,7 +22,7 @@ pub trait ManagedType<M: ManagedTypeApi>: Sized {
         ManagedReadonly::from_raw_handle(self.get_raw_handle())
     }
 
-    fn as_ref<'a>(&'a self) -> ManagedRef<'a, M, Self> {
+    fn as_ref(&self) -> ManagedRef<'_, M, Self> {
         ManagedRef::new(self)
     }
 }
