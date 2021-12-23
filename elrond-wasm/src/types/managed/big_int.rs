@@ -30,6 +30,10 @@ impl<M: ManagedTypeApi> ManagedType<M> for BigInt<M> {
     fn get_raw_handle(&self) -> Handle {
         self.handle
     }
+
+    fn transmute_from_handle_ref(handle_ref: &Handle) -> &Self {
+        unsafe { core::mem::transmute(handle_ref) }
+    }
 }
 
 impl<M: ManagedTypeApi> Default for BigInt<M> {

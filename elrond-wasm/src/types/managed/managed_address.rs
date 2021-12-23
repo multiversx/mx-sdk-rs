@@ -127,6 +127,10 @@ where
     fn get_raw_handle(&self) -> Handle {
         self.bytes.get_raw_handle()
     }
+
+    fn transmute_from_handle_ref(handle_ref: &Handle) -> &Self {
+        unsafe { core::mem::transmute(handle_ref) }
+    }
 }
 
 impl<M> Default for ManagedAddress<M>

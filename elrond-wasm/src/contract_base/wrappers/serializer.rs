@@ -5,7 +5,7 @@ use elrond_codec::{DecodeError, EncodeError, TopDecode, TopEncode};
 use crate::{
     api::{ErrorApi, ErrorApiImpl, ManagedTypeApi, ManagedTypeErrorApi},
     err_msg,
-    types::{AsManagedRef, BoxedBytes, ManagedBuffer, ManagedBytesTopDecodeInput, ManagedType},
+    types::{BoxedBytes, ManagedBuffer, ManagedBytesTopDecodeInput, ManagedType},
 };
 
 #[derive(Default)]
@@ -39,7 +39,8 @@ where
     }
 
     pub fn top_decode_from_managed_buffer<T: TopDecode>(&self, buffer: &ManagedBuffer<M>) -> T {
-        T::top_decode_or_exit(buffer.as_managed_ref(), (), top_decode_exit::<M>)
+        T::top_decode_or_exit(buffer.clone(), (), top_decode_exit::<M>)
+        // TODO: remove clone
     }
 
     pub fn top_decode_from_byte_slice<T: TopDecode>(&self, slice: &[u8]) -> T {
