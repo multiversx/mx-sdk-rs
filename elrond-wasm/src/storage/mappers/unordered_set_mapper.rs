@@ -73,7 +73,7 @@ where
     }
 
     fn set_index(&self, value: &T, index: usize) {
-        storage_set(&self.item_index_key(value), &index);
+        storage_set(self.item_index_key(value).as_ref(), &index);
     }
 
     fn clear_index(&self, value: &T) {

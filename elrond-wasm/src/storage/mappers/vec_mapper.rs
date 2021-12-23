@@ -75,7 +75,7 @@ where
     }
 
     fn save_count(&self, new_len: usize) {
-        storage_set(&self.len_key, &new_len);
+        storage_set(self.len_key.as_ref(), &new_len);
     }
 
     /// Number of items managed by the mapper.
@@ -93,7 +93,7 @@ where
     pub fn push(&mut self, item: &T) -> usize {
         let mut len = self.len();
         len += 1;
-        storage_set(&self.item_key(len), item);
+        storage_set(self.item_key(len).as_ref(), item);
         self.save_count(len);
         len
     }
@@ -105,7 +105,7 @@ where
         let mut len = self.len();
         for item in items {
             len += 1;
-            storage_set(&self.item_key(len), item);
+            storage_set(self.item_key(len).as_ref(), item);
         }
         self.save_count(len);
         len
@@ -166,7 +166,7 @@ where
 
     /// Keeping `set_unchecked` private on purpose, so developers don't write out of index limits by accident.
     fn set_unchecked(&self, index: usize, item: &T) {
-        storage_set(&self.item_key(index), item);
+        storage_set(self.item_key(index).as_ref(), item);
     }
 
     /// Clears item at index from storage.

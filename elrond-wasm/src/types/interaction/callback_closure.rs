@@ -55,7 +55,7 @@ impl<M: ManagedTypeErrorApi> CallbackClosure<M> {
 
     pub fn save_to_storage<A: BlockchainApi + StorageWriteApi>(&self) {
         let storage_key = cb_closure_storage_key::<A>();
-        storage_set(&storage_key, self);
+        storage_set(storage_key.as_ref(), self);
     }
 
     pub fn storage_load_and_clear<A: BlockchainApi + StorageReadApi + StorageWriteApi>(

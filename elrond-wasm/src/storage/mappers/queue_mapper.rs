@@ -130,7 +130,7 @@ where
     }
 
     fn set_info(&mut self, value: QueueMapperInfo) {
-        storage_set(&self.build_name_key(INFO_IDENTIFIER), &value);
+        storage_set(self.build_name_key(INFO_IDENTIFIER).as_ref(), &value);
     }
 
     fn get_node(&self, node_id: u32) -> Node {
@@ -142,13 +142,18 @@ where
 
     fn set_node(&mut self, node_id: u32, item: Node) {
         storage_set(
-            &self.build_node_id_named_key(NODE_IDENTIFIER, node_id),
+            self.build_node_id_named_key(NODE_IDENTIFIER, node_id)
+                .as_ref(),
             &item,
         );
     }
 
     fn clear_node(&mut self, node_id: u32) {
-        storage_set(&self.build_node_id_named_key(NODE_IDENTIFIER, node_id), &());
+        storage_set(
+            self.build_node_id_named_key(NODE_IDENTIFIER, node_id)
+                .as_ref(),
+            &(),
+        );
     }
 
     fn get_value(&self, node_id: u32) -> T {
@@ -167,14 +172,16 @@ where
 
     fn set_value(&mut self, node_id: u32, value: &T) {
         storage_set(
-            &self.build_node_id_named_key(VALUE_IDENTIFIER, node_id),
+            self.build_node_id_named_key(VALUE_IDENTIFIER, node_id)
+                .as_ref(),
             value,
         )
     }
 
     fn clear_value(&mut self, node_id: u32) {
         storage_set(
-            &self.build_node_id_named_key(VALUE_IDENTIFIER, node_id),
+            self.build_node_id_named_key(VALUE_IDENTIFIER, node_id)
+                .as_ref(),
             &(),
         )
     }
