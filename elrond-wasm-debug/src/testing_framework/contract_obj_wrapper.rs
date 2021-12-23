@@ -2,13 +2,12 @@ use std::{collections::HashMap, path::PathBuf, rc::Rc, str::FromStr};
 
 use elrond_wasm::{
     contract_base::{CallableContract, ContractBase},
-    elrond_codec::TopDecode,
+    elrond_codec::{TopDecode, TopEncode},
     types::{Address, EsdtLocalRole, H256},
 };
 
 use crate::{
     rust_biguint,
-    testing_framework::bytes_to_hex,
     tx_mock::{TxCache, TxContext, TxContextStack, TxInput, TxInputESDT},
     world_mock::{AccountData, AccountEsdt, EsdtInstanceMetadata},
     BlockchainMock, DebugApi,
@@ -117,15 +116,17 @@ impl BlockchainStateWrapper {
         );
     }
 
-    pub fn check_nft_balance<T: elrond_wasm::elrond_codec::TopEncode>(
+    pub fn check_nft_balance<T>(
         &self,
         address: &Address,
         token_id: &[u8],
         nonce: u64,
         expected_balance: &num_bigint::BigUint,
         expected_attributes: &T,
-    ) {
-        let actual_attributes = match &self.rc_b_mock.accounts.get(address) {
+    ) where
+        T: TopEncode + TopDecode + PartialEq + core::fmt::Debug,
+    {
+        let actual_attributes_serialized = match &self.rc_b_mock.accounts.get(address) {
             Some(acc) => {
                 let esdt_data = acc.esdt.get_by_identifier_or_default(token_id);
                 let opt_instance = esdt_data.instances.get_by_nonce(nonce);
@@ -149,27 +150,16 @@ impl BlockchainStateWrapper {
             None => Vec::new(),
         };
 
-        let serialized_expected = serialize_attributes(expected_attributes);
+        let actual_attributes = T::top_decode(actual_attributes_serialized).unwrap();
         assert_eq!(
-            &serialized_expected,
+            expected_attributes,
             &actual_attributes,
-            "ESDT NFT attributes mismatch for address {}. Expected: {}, have {}",
+            "ESDT NFT attributes mismatch for address {}. Expected: {:?}, have {:?}",
             address_to_hex(address),
-            bytes_to_hex(&serialized_expected),
-            bytes_to_hex(&actual_attributes),
+            expected_attributes,
+            actual_attributes,
         );
     }
-
-    /*
-    pub fn check_nft_balance_with_properties(
-        &self,
-        address: &Address,
-        token_id: &[u8],
-        nonce: u64,
-        expected_balance: &num_bigint::BigUint,
-    ) {
-    }
-    */
 }
 
 impl BlockchainStateWrapper {
@@ -296,7 +286,7 @@ impl BlockchainStateWrapper {
         }
     }
 
-    pub fn set_nft_balance<T: elrond_wasm::elrond_codec::TopEncode>(
+    pub fn set_nft_balance<T: TopEncode>(
         &mut self,
         address: &Address,
         token_id: &[u8],
@@ -310,7 +300,7 @@ impl BlockchainStateWrapper {
     }
 
     #[allow(clippy::too_many_arguments)]
-    pub fn set_nft_balance_all_properties<T: elrond_wasm::elrond_codec::TopEncode>(
+    pub fn set_nft_balance_all_properties<T: TopEncode>(
         &mut self,
         address: &Address,
         token_id: &[u8],
@@ -716,7 +706,7 @@ fn address_to_hex(address: &Address) -> String {
     hex::encode(address.as_bytes())
 }
 
-fn serialize_attributes<T: elrond_wasm::elrond_codec::TopEncode>(attributes: &T) -> Vec<u8> {
+fn serialize_attributes<T: TopEncode>(attributes: &T) -> Vec<u8> {
     let mut serialized_attributes = Vec::new();
     if let Result::Err(err) = attributes.top_encode(&mut serialized_attributes) {
         panic!("Failed to encode attributes: {:?}", err)
