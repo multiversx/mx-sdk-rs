@@ -7,6 +7,7 @@ use crate::{
         StorageWriteApiImpl,
     },
     storage::{storage_clear, storage_get, storage_set, StorageKey},
+    types::ManagedType,
 };
 use elrond_codec::{NestedDecode, NestedEncode, TopDecode, TopEncode};
 
@@ -69,7 +70,7 @@ where
     }
 
     fn get_mapped_value(&self, key: &K) -> V {
-        storage_get(&self.build_named_key(MAPPED_VALUE_IDENTIFIER, key))
+        storage_get(self.build_named_key(MAPPED_VALUE_IDENTIFIER, key).as_ref())
     }
 
     fn set_mapped_value(&self, key: &K, value: &V) {

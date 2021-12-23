@@ -1,7 +1,9 @@
 use crate::{
     api::{ErrorApi, ErrorApiImpl, ManagedTypeApi, StorageReadApi, StorageReadApiImpl},
     err_msg,
-    types::{BigInt, BigUint, ManagedBuffer, ManagedBufferNestedDecodeInput, ManagedType},
+    types::{
+        BigInt, BigUint, ManagedBuffer, ManagedBufferNestedDecodeInput, ManagedRef, ManagedType,
+    },
 };
 use alloc::boxed::Box;
 use elrond_codec::*;
@@ -12,7 +14,7 @@ struct StorageGetInput<'k, A>
 where
     A: StorageReadApi + ManagedTypeApi + ErrorApi + 'static,
 {
-    key: &'k StorageKey<A>,
+    key: ManagedRef<'k, A, StorageKey<A>>,
 }
 
 impl<'k, A> StorageGetInput<'k, A>
@@ -20,7 +22,7 @@ where
     A: StorageReadApi + ManagedTypeApi + ErrorApi + 'static,
 {
     #[inline]
-    fn new(key: &'k StorageKey<A>) -> Self {
+    fn new(key: ManagedRef<'k, A, StorageKey<A>>) -> Self {
         StorageGetInput { key }
     }
 
@@ -95,7 +97,7 @@ where
     }
 }
 
-pub fn storage_get<A, T>(key: &StorageKey<A>) -> T
+pub fn storage_get<'k, A, T>(key: ManagedRef<'k, A, StorageKey<A>>) -> T
 where
     T: TopDecode,
     A: StorageReadApi + ManagedTypeApi + ErrorApi + Clone + 'static,

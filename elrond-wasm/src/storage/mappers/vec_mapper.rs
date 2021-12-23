@@ -8,7 +8,7 @@ use crate::{
     finish_all,
     io::EndpointResult,
     storage::{storage_clear, storage_get, storage_get_len, storage_set, StorageKey},
-    types::MultiResultVec,
+    types::{ManagedType, MultiResultVec},
 };
 use alloc::vec::Vec;
 use core::{marker::PhantomData, usize};
@@ -80,7 +80,7 @@ where
 
     /// Number of items managed by the mapper.
     pub fn len(&self) -> usize {
-        storage_get(&self.len_key)
+        storage_get(self.len_key.as_ref())
     }
 
     /// True if no items present in the mapper.
@@ -124,7 +124,7 @@ where
     /// There are no restrictions on the index,
     /// calling for an invalid index will simply return the zero-value.
     pub fn get_unchecked(&self, index: usize) -> T {
-        storage_get(&self.item_key(index))
+        storage_get(self.item_key(index).as_ref())
     }
 
     /// Get item at index from storage.

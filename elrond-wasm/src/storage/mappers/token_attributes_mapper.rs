@@ -9,7 +9,7 @@ use crate::{
         StorageWriteApi, StorageWriteApiImpl,
     },
     storage::{storage_clear, storage_get, storage_get_len, storage_set, StorageKey},
-    types::TokenIdentifier,
+    types::{ManagedType, TokenIdentifier},
 };
 
 const MAPPING_SUFFIX: &[u8] = b".mapping";
@@ -249,7 +249,7 @@ where
     }
 
     fn get_counter_value(&self) -> u8 {
-        storage_get(&self.build_key_token_id_counter())
+        storage_get(self.build_key_token_id_counter().as_ref())
     }
 
     fn set_counter_value(&self, value: u8) {
@@ -257,7 +257,7 @@ where
     }
 
     fn get_mapping_value<M: ManagedTypeApi>(&self, token_id: &TokenIdentifier<M>) -> u8 {
-        storage_get(&self.build_key_token_id_mapping(token_id))
+        storage_get(self.build_key_token_id_mapping(token_id).as_ref())
     }
 
     fn set_mapping_value<M: ManagedTypeApi>(&self, token_id: &TokenIdentifier<M>, value: u8) {
@@ -273,7 +273,7 @@ where
         mapping: u8,
         attr: &T,
     ) -> u64 {
-        storage_get(&self.build_key_attr_to_nonce_mapping(mapping, attr))
+        storage_get(self.build_key_attr_to_nonce_mapping(mapping, attr).as_ref())
     }
 
     fn set_attributes_to_nonce_mapping<T: TopEncode + TopDecode + NestedEncode + NestedDecode>(
@@ -311,7 +311,10 @@ where
         mapping: u8,
         token_nonce: u64,
     ) -> T {
-        storage_get(&self.build_key_token_attr_value(mapping, token_nonce))
+        storage_get(
+            self.build_key_token_attr_value(mapping, token_nonce)
+                .as_ref(),
+        )
     }
 
     fn set_token_attributes_value<T: TopEncode + TopDecode + NestedEncode + NestedDecode>(

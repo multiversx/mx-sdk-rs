@@ -10,7 +10,7 @@ use crate::{
     finish_all,
     io::EndpointResult,
     storage::{storage_get, storage_set, StorageKey},
-    types::MultiResultVec,
+    types::{ManagedType, MultiResultVec},
 };
 use alloc::vec::Vec;
 use elrond_codec::{
@@ -126,7 +126,7 @@ where
     }
 
     fn get_info(&self) -> QueueMapperInfo {
-        storage_get(&self.build_name_key(INFO_IDENTIFIER))
+        storage_get(self.build_name_key(INFO_IDENTIFIER).as_ref())
     }
 
     fn set_info(&mut self, value: QueueMapperInfo) {
@@ -134,7 +134,10 @@ where
     }
 
     fn get_node(&self, node_id: u32) -> Node {
-        storage_get(&self.build_node_id_named_key(NODE_IDENTIFIER, node_id))
+        storage_get(
+            self.build_node_id_named_key(NODE_IDENTIFIER, node_id)
+                .as_ref(),
+        )
     }
 
     fn set_node(&mut self, node_id: u32, item: Node) {
@@ -149,7 +152,10 @@ where
     }
 
     fn get_value(&self, node_id: u32) -> T {
-        storage_get(&self.build_node_id_named_key(VALUE_IDENTIFIER, node_id))
+        storage_get(
+            self.build_node_id_named_key(VALUE_IDENTIFIER, node_id)
+                .as_ref(),
+        )
     }
 
     fn get_value_option(&self, node_id: u32) -> Option<T> {

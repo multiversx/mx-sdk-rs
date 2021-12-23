@@ -6,7 +6,7 @@ use crate::{
     contract_base::ManagedSerializer,
     storage::StorageKey,
     storage_clear, storage_get, storage_set,
-    types::ManagedBuffer,
+    types::{ManagedBuffer, ManagedType},
     ContractCallArg, ManagedResultArgLoader,
 };
 use elrond_codec::elrond_codec_derive::{TopDecode, TopEncode};
@@ -62,7 +62,7 @@ impl<M: ManagedTypeErrorApi> CallbackClosure<M> {
         api: A,
     ) -> Option<Self> {
         let storage_key = cb_closure_storage_key::<A>();
-        let storage_value_raw: ManagedBuffer<A> = storage_get(&storage_key);
+        let storage_value_raw: ManagedBuffer<A> = storage_get(storage_key.as_ref());
         if !storage_value_raw.is_empty() {
             let serializer = ManagedSerializer::<A>::new();
             let closure = serializer.top_decode_from_managed_buffer(&storage_value_raw);
