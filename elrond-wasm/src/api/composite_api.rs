@@ -1,9 +1,5 @@
-use super::{ErrorApi, ErrorApiImpl, ManagedTypeApi, ManagedTypeApiImpl, SendApi};
+use super::{ErrorApi, ManagedTypeApi, SendApi};
 
-pub trait ManagedTypeErrorApi: ManagedTypeApi + ErrorApi {
-    type ManagedTypeErrorApiImpl: ManagedTypeApiImpl + ErrorApiImpl;
-
-    fn managed_type_error_api() -> Self::ManagedTypeErrorApiImpl;
-}
-
-pub trait CallTypeApi: SendApi + ManagedTypeErrorApi {}
+/// Provided for convenience.
+/// Designed to be used in any types that send tokens or calls.
+pub trait CallTypeApi: SendApi + ManagedTypeApi + ErrorApi {}
