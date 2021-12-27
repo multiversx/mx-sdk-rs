@@ -151,7 +151,7 @@ mod sample_adder {
         }
         fn callback(&self) {}
         fn callbacks(&self) -> self::CallbackProxyObj<Self::Api> {
-            <self::CallbackProxyObj::<Self::Api> as elrond_wasm::contract_base::CallbackProxyObjBase>::new_cb_proxy_obj(self.raw_vm_api())
+            <self::CallbackProxyObj::<Self::Api> as elrond_wasm::contract_base::CallbackProxyObjBase>::new_cb_proxy_obj()
         }
     }
 
@@ -360,7 +360,7 @@ mod sample_adder {
     where
         A: elrond_wasm::api::VMApi + 'static,
     {
-        pub api: A,
+        _phantom: core::marker::PhantomData<A>,
     }
 
     impl<A> elrond_wasm::contract_base::CallbackProxyObjBase for CallbackProxyObj<A>
@@ -369,8 +369,10 @@ mod sample_adder {
     {
         type Api = A;
 
-        fn new_cb_proxy_obj(api: A) -> Self {
-            CallbackProxyObj { api }
+        fn new_cb_proxy_obj() -> Self {
+            CallbackProxyObj {
+                _phantom: core::marker::PhantomData,
+            }
         }
     }
 
