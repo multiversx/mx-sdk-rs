@@ -8,7 +8,7 @@ use elrond_codec::{
 
 use crate::api::{Handle, ManagedTypeApi};
 
-use super::ManagedType;
+use super::{ManagedRef, ManagedType};
 
 /// Encapsulates the same handle as the base managed type, but restricts operations to only readonly ones.
 /// This makes it safe to be copied as-is, since any number of immutable references are allowed.
@@ -36,6 +36,15 @@ where
             _phantom_m: PhantomData,
             _phantom_t: PhantomData,
             handle: value.get_raw_handle(),
+        }
+    }
+
+    #[inline]
+    pub fn as_content_ref(&self) -> ManagedRef<'_, M, T> {
+        ManagedRef {
+            _phantom_m: PhantomData,
+            _phantom_t: PhantomData,
+            handle: self.handle,
         }
     }
 }

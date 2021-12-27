@@ -1,4 +1,4 @@
-use core::marker::PhantomData;
+use core::{borrow::Borrow, marker::PhantomData};
 
 use super::StorageMapper;
 use crate::{
@@ -55,9 +55,14 @@ where
     }
 
     /// Saves argument to storage.
+    ///
+    /// Accepts owned item of type `T`, or any borrowed form of it, such as `&T`.
     #[inline]
-    pub fn set(&self, new_value: &T) {
-        storage_set(self.key.as_ref(), new_value);
+    pub fn set<BT>(&self, new_value: BT)
+    where
+        BT: Borrow<T>,
+    {
+        storage_set(self.key.as_ref(), new_value.borrow());
     }
 
     /// Saves argument to storage only if the storage is empty.
@@ -79,7 +84,7 @@ where
     pub fn update<R, F: FnOnce(&mut T) -> R>(&self, f: F) -> R {
         let mut value = self.get();
         let result = f(&mut value);
-        self.set(&value);
+        self.set(value);
         result
     }
 
