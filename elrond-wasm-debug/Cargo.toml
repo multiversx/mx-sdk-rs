@@ -25,6 +25,8 @@ rand = "0.8.4"
 rand_pcg = "0.2.1"
 rand_seeder = "0.2.2"
 rustc_version = "0.4"
+toml = "0.5.8"
+cargo_toml = "0.10.1"
 pathdiff = "0.2.1"
 
 [features]

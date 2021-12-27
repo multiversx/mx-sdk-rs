@@ -3,11 +3,9 @@
 elrond_wasm::imports!();
 
 mod lottery_info;
-mod random;
 mod status;
 
 use lottery_info::LotteryInfo;
-use random::Random;
 use status::Status;
 
 const PERCENTAGE_TOTAL: u32 = 100;
@@ -339,11 +337,10 @@ pub trait Lottery {
     fn get_distinct_random(&self, min: usize, max: usize, amount: usize) -> Vec<usize> {
         let mut rand_numbers: Vec<usize> = (min..=max).collect();
         let total_numbers = rand_numbers.len();
-        let seed = self.blockchain().get_block_random_seed_legacy();
-        let mut rand = Random::new(*seed);
+        let mut rand = RandomnessSource::<Self::Api>::new();
 
         for i in 0..amount {
-            let rand_index = (rand.next() as usize) % total_numbers;
+            let rand_index = rand.next_usize_in_range(0, total_numbers);
             rand_numbers.swap(i, rand_index);
         }
 

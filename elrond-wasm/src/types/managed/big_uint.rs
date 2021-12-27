@@ -119,6 +119,7 @@ impl<M: ManagedTypeApi> BigUint<M> {
 
 impl<M: ManagedTypeApi> BigUint<M> {
     #[inline]
+    #[must_use]
     pub fn sqrt(&self) -> Self {
         let handle = self.type_manager().bi_new_zero();
         self.type_manager().bi_sqrt(handle, self.handle);
@@ -128,6 +129,7 @@ impl<M: ManagedTypeApi> BigUint<M> {
         }
     }
 
+    #[must_use]
     pub fn pow(&self, exp: u32) -> Self {
         let handle = self.type_manager().bi_new_zero();
         let exp_handle = self.type_manager().bi_new(exp as i64);
