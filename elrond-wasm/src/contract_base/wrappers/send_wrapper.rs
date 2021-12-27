@@ -75,7 +75,7 @@ where
     }
 
     #[allow(clippy::too_many_arguments)]
-    fn direct_with_gas_limit<D>(
+    pub fn direct_with_gas_limit<D>(
         &self,
         to: &ManagedAddress<A>,
         token: &TokenIdentifier<A>,
