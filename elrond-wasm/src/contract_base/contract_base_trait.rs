@@ -30,12 +30,6 @@ pub trait ContractBase: Sized {
         SendWrapper::new()
     }
 
-    /// Managed types API. Required to create new instances of managed types.
-    #[inline]
-    fn type_manager(&self) -> Self::Api {
-        self.raw_vm_api()
-    }
-
     /// Gateway blockchain info related to the current transaction and to accounts.
     #[inline]
     fn blockchain(&self) -> BlockchainWrapper<Self::Api> {
@@ -57,7 +51,7 @@ pub trait ContractBase: Sized {
 
     #[inline]
     fn error(&self) -> ErrorHelper<Self::Api> {
-        ErrorHelper::new_instance(self.raw_vm_api())
+        ErrorHelper::new_instance()
     }
 
     #[inline]
