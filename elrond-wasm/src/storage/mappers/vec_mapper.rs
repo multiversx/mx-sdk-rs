@@ -1,9 +1,7 @@
 use super::{StorageClearable, StorageMapper};
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
-    api::{
-        EndpointFinishApi, ErrorApi, ErrorApiImpl, ManagedTypeApi, StorageReadApi, StorageWriteApi,
-    },
+    api::{EndpointFinishApi, ErrorApiImpl, ManagedTypeApi, StorageMapperApi},
     finish_all,
     io::EndpointResult,
     storage::{storage_clear, storage_get, storage_get_len, storage_set, StorageKey},
@@ -24,7 +22,7 @@ const LEN_SUFFIX: &[u8] = b".len";
 /// The count is always kept in sync automatically.
 pub struct VecMapper<SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
+    SA: StorageMapperApi,
     T: TopEncode + TopDecode + 'static,
 {
     _phantom_api: PhantomData<SA>,
@@ -35,7 +33,7 @@ where
 
 impl<SA, T> StorageMapper<SA> for VecMapper<SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
+    SA: StorageMapperApi,
     T: TopEncode + TopDecode,
 {
     fn new(base_key: StorageKey<SA>) -> Self {
@@ -53,7 +51,7 @@ where
 
 impl<SA, T> StorageClearable for VecMapper<SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
+    SA: StorageMapperApi,
     T: TopEncode + TopDecode,
 {
     fn clear(&mut self) {
@@ -63,7 +61,7 @@ where
 
 impl<SA, T> VecMapper<SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
+    SA: StorageMapperApi,
     T: TopEncode + TopDecode,
 {
     fn item_key(&self, index: usize) -> StorageKey<SA> {
@@ -236,7 +234,7 @@ where
 /// documentation for more.
 pub struct Iter<'a, SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
+    SA: StorageMapperApi,
     T: TopEncode + TopDecode + 'static,
 {
     index: usize,
@@ -246,7 +244,7 @@ where
 
 impl<'a, SA, T> Iter<'a, SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
+    SA: StorageMapperApi,
     T: TopEncode + TopDecode + 'static,
 {
     fn new(vec: &'a VecMapper<SA, T>) -> Iter<'a, SA, T> {
@@ -260,7 +258,7 @@ where
 
 impl<'a, SA, T> Iterator for Iter<'a, SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
+    SA: StorageMapperApi,
     T: TopEncode + TopDecode + 'static,
 {
     type Item = T;
@@ -279,7 +277,7 @@ where
 /// Behaves like a MultiResultVec when an endpoint result.
 impl<SA, T> EndpointResult for VecMapper<SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
+    SA: StorageMapperApi,
     T: TopEncode + TopDecode + EndpointResult,
 {
     type DecodeAs = MultiResultVec<T::DecodeAs>;
@@ -295,7 +293,7 @@ where
 /// Behaves like a MultiResultVec when an endpoint result.
 impl<SA, T> TypeAbi for VecMapper<SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
+    SA: StorageMapperApi,
     T: TopEncode + TopDecode + TypeAbi,
 {
     fn type_name() -> TypeName {

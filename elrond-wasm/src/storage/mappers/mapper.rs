@@ -1,11 +1,8 @@
-use crate::{
-    api::{ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi},
-    storage::StorageKey,
-};
+use crate::{api::StorageMapperApi, storage::StorageKey};
 
 pub trait StorageMapper<SA>: 'static
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
+    SA: StorageMapperApi,
 {
     /// Will be called automatically by the `#[storage_mapper]` annotation generated code.
     fn new(base_key: StorageKey<SA>) -> Self;

@@ -1,5 +1,5 @@
 use elrond_wasm::{
-    api::{CallTypeApi, VMApi},
+    api::{CallTypeApi, StorageMapperApi, VMApi},
     elrond_codec::TryStaticCast,
 };
 
@@ -11,6 +11,8 @@ pub struct VmApiImpl {}
 impl TryStaticCast for VmApiImpl {}
 
 impl CallTypeApi for VmApiImpl {}
+
+impl StorageMapperApi for VmApiImpl {}
 
 impl VMApi for VmApiImpl {}
 

@@ -121,9 +121,6 @@ pub fn callback_proxy_object_def() -> proc_macro2::TokenStream {
             fn new_cb_proxy_obj(api: A) -> Self {
                 CallbackProxyObj { api }
             }
-            fn cb_call_api(self) -> Self::Api {
-                self.api.clone()
-            }
         }
     }
 }

@@ -561,7 +561,8 @@ impl BlockchainApiImpl for VmApiImpl {
         let mut key =
             StorageKey::new(elrond_wasm::storage::protected_keys::ELROND_ESDT_LOCAL_ROLES_KEY);
         key.append_managed_buffer(token_id.as_managed_buffer());
-        let value_mb = elrond_wasm::storage::storage_get::<Self, ManagedBuffer<VmApiImpl>>(key.as_ref());
+        let value_mb =
+            elrond_wasm::storage::storage_get::<Self, ManagedBuffer<VmApiImpl>>(key.as_ref());
         let value_len = value_mb.len();
         const DATA_MAX_LEN: usize = 300;
         if value_len > DATA_MAX_LEN {

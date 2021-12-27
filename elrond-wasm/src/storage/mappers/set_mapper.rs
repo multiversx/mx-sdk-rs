@@ -4,7 +4,7 @@ pub use super::queue_mapper::Iter;
 use super::{QueueMapper, StorageClearable, StorageMapper};
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
-    api::{EndpointFinishApi, ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi},
+    api::{EndpointFinishApi, ManagedTypeApi, StorageMapperApi},
     finish_all,
     io::EndpointResult,
     storage::{storage_get, storage_set, StorageKey},
@@ -17,7 +17,7 @@ const NODE_ID_IDENTIFIER: &[u8] = b".node_id";
 
 pub struct SetMapper<SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
+    SA: StorageMapperApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
 {
     _phantom_api: PhantomData<SA>,
@@ -27,7 +27,7 @@ where
 
 impl<SA, T> StorageMapper<SA> for SetMapper<SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
+    SA: StorageMapperApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode,
 {
     fn new(base_key: StorageKey<SA>) -> Self {
@@ -41,7 +41,7 @@ where
 
 impl<SA, T> StorageClearable for SetMapper<SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
+    SA: StorageMapperApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode,
 {
     fn clear(&mut self) {
@@ -54,7 +54,7 @@ where
 
 impl<SA, T> SetMapper<SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
+    SA: StorageMapperApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode,
 {
     fn build_named_value_key(&self, name: &[u8], value: &T) -> StorageKey<SA> {
@@ -143,7 +143,7 @@ where
 /// Behaves like a MultiResultVec when an endpoint result.
 impl<SA, T> EndpointResult for SetMapper<SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
+    SA: StorageMapperApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + EndpointResult,
 {
     type DecodeAs = MultiResultVec<T::DecodeAs>;
@@ -159,7 +159,7 @@ where
 /// Behaves like a MultiResultVec when an endpoint result.
 impl<SA, T> TypeAbi for SetMapper<SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
+    SA: StorageMapperApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + TypeAbi,
 {
     fn type_name() -> TypeName {

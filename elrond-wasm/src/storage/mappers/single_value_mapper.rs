@@ -3,7 +3,7 @@ use core::{borrow::Borrow, marker::PhantomData};
 use super::StorageMapper;
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
-    api::{EndpointFinishApi, ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi},
+    api::{EndpointFinishApi, ManagedTypeApi, StorageMapperApi},
     io::EndpointResult,
     storage::{storage_clear, storage_get, storage_get_len, storage_set, StorageKey},
     types::ManagedType,
@@ -13,7 +13,7 @@ use elrond_codec::{TopDecode, TopEncode};
 /// Manages a single serializable item in storage.
 pub struct SingleValueMapper<SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
+    SA: StorageMapperApi,
     T: TopEncode + TopDecode + 'static,
 {
     key: StorageKey<SA>,
@@ -23,7 +23,7 @@ where
 
 impl<SA, T> StorageMapper<SA> for SingleValueMapper<SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
+    SA: StorageMapperApi,
     T: TopEncode + TopDecode,
 {
     #[inline]
@@ -38,7 +38,7 @@ where
 
 impl<SA, T> SingleValueMapper<SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
+    SA: StorageMapperApi,
     T: TopEncode + TopDecode,
 {
     /// Retrieves current value from storage.
@@ -92,7 +92,7 @@ where
 
 impl<SA, T> EndpointResult for SingleValueMapper<SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
+    SA: StorageMapperApi,
     T: TopEncode + TopDecode + EndpointResult,
 {
     type DecodeAs = T::DecodeAs;
@@ -107,7 +107,7 @@ where
 
 impl<SA, T> TypeAbi for SingleValueMapper<SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
+    SA: StorageMapperApi,
     T: TopEncode + TopDecode + TypeAbi,
 {
     fn type_name() -> TypeName {
