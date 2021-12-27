@@ -396,8 +396,7 @@ impl SendApiImpl for VmApiImpl {
 
             let num_return_data_after = getNumReturnData();
             let result_bytes = get_return_data_range(num_return_data_before, num_return_data_after);
-            let results =
-                managed_vec_from_slice_of_boxed_bytes(self.clone(), result_bytes.as_slice());
+            let results = managed_vec_from_slice_of_boxed_bytes(result_bytes.as_slice());
 
             (ManagedAddress::from(new_address), results)
         }
@@ -431,8 +430,7 @@ impl SendApiImpl for VmApiImpl {
 
             let num_return_data_after = getNumReturnData();
             let result_bytes = get_return_data_range(num_return_data_before, num_return_data_after);
-            let results =
-                managed_vec_from_slice_of_boxed_bytes(self.clone(), result_bytes.as_slice());
+            let results = managed_vec_from_slice_of_boxed_bytes(result_bytes.as_slice());
 
             (ManagedAddress::from(new_address), results)
         }
@@ -522,7 +520,7 @@ impl SendApiImpl for VmApiImpl {
 
             let num_return_data_after = getNumReturnData();
             let result_bytes = get_return_data_range(num_return_data_before, num_return_data_after);
-            managed_vec_from_slice_of_boxed_bytes(self.clone(), result_bytes.as_slice())
+            managed_vec_from_slice_of_boxed_bytes(result_bytes.as_slice())
         }
     }
 
@@ -564,7 +562,7 @@ impl SendApiImpl for VmApiImpl {
 
             let result_bytes =
                 get_return_data_range(result_start_index as i32, result_end_index as i32);
-            managed_vec_from_slice_of_boxed_bytes(self.clone(), result_bytes.as_slice())
+            managed_vec_from_slice_of_boxed_bytes(result_bytes.as_slice())
         }
     }
 
@@ -596,7 +594,7 @@ impl SendApiImpl for VmApiImpl {
 
             let num_return_data_after = getNumReturnData();
             let result_bytes = get_return_data_range(num_return_data_before, num_return_data_after);
-            managed_vec_from_slice_of_boxed_bytes(self.clone(), result_bytes.as_slice())
+            managed_vec_from_slice_of_boxed_bytes(result_bytes.as_slice())
         }
     }
 
@@ -628,7 +626,7 @@ impl SendApiImpl for VmApiImpl {
 
             let num_return_data_after = getNumReturnData();
             let result_bytes = get_return_data_range(num_return_data_before, num_return_data_after);
-            managed_vec_from_slice_of_boxed_bytes(self.clone(), result_bytes.as_slice())
+            managed_vec_from_slice_of_boxed_bytes(result_bytes.as_slice())
         }
     }
 
@@ -657,7 +655,7 @@ impl SendApiImpl for VmApiImpl {
 
             let num_return_data_after = getNumReturnData();
             let result_bytes = get_return_data_range(num_return_data_before, num_return_data_after);
-            managed_vec_from_slice_of_boxed_bytes(self.clone(), result_bytes.as_slice())
+            managed_vec_from_slice_of_boxed_bytes(result_bytes.as_slice())
         }
     }
 
