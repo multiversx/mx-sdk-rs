@@ -265,7 +265,7 @@ mod sample_adder {
     where
         A: elrond_wasm::api::VMApi,
     {
-        api: A,
+        _phantom: core::marker::PhantomData<A>,
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -276,10 +276,6 @@ mod sample_adder {
         A: elrond_wasm::api::VMApi,
     {
         type Api = A;
-
-        fn raw_vm_api(&self) -> Self::Api {
-            self.api.clone()
-        }
     }
 
     impl<A> super::module_1::AutoImpl for ContractObj<A> where A: elrond_wasm::api::VMApi {}
@@ -297,9 +293,6 @@ mod sample_adder {
         fn call(&self, fn_name: &[u8]) -> bool {
             EndpointWrappers::call(self, fn_name)
         }
-        fn into_api(self: Box<Self>) -> A {
-            self.api
-        }
     }
 
     pub struct AbiProvider {}
@@ -312,11 +305,13 @@ mod sample_adder {
         }
     }
 
-    pub fn contract_obj<A>(api: A) -> ContractObj<A>
+    pub fn contract_obj<A>() -> ContractObj<A>
     where
         A: elrond_wasm::api::VMApi,
     {
-        ContractObj { api }
+        ContractObj {
+            _phantom: core::marker::PhantomData,
+        }
     }
 
     pub struct Proxy<A>
