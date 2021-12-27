@@ -65,8 +65,7 @@ fn execute_contract_instance_endpoint(
                 message: b"invalid function (not found)".to_vec(),
             });
         }
-        let debug_api = contract_instance.into_api();
-        debug_api.into_tx_result()
+        DebugApi::new_from_static().into_tx_result()
     }));
     match result {
         Ok(tx_output) => tx_output,

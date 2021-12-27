@@ -13,10 +13,6 @@ use crate::api::VMApi;
 pub trait ContractBase: Sized {
     type Api: VMApi;
 
-    /// Grants direct access to the underlying VM API.
-    /// Avoid using it directly.
-    fn raw_vm_api(&self) -> Self::Api;
-
     /// Gateway into the call value retrieval functionality.
     /// The payment annotations should normally be the ones to handle this,
     /// but the developer is also given direct access to the API.

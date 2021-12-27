@@ -4,7 +4,7 @@ pub fn contract_object_def() -> proc_macro2::TokenStream {
         where
             A: elrond_wasm::api::VMApi,
         {
-            api: A,
+            _phantom: core::marker::PhantomData<A>,
         }
     }
 }
@@ -16,21 +16,19 @@ pub fn impl_contract_base() -> proc_macro2::TokenStream {
             A: elrond_wasm::api::VMApi,
         {
             type Api = A;
-
-            fn raw_vm_api(&self) -> Self::Api {
-                self.api.clone()
-            }
         }
     }
 }
 
 pub fn new_contract_object_fn() -> proc_macro2::TokenStream {
     quote! {
-        pub fn contract_obj<A>(api: A) -> ContractObj<A>
+        pub fn contract_obj<A>(_api: A) -> ContractObj<A>
         where
             A: elrond_wasm::api::VMApi,
         {
-            ContractObj { api }
+            ContractObj {
+                _phantom: core::marker::PhantomData,
+            }
         }
     }
 }
@@ -58,9 +56,6 @@ pub fn impl_callable_contract() -> proc_macro2::TokenStream {
         {
             fn call(&self, fn_name: &[u8]) -> bool {
                 EndpointWrappers::call(self, fn_name)
-            }
-            fn into_api(self: Box<Self>) -> A {
-                self.api
             }
         }
     }
