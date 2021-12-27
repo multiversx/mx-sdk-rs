@@ -4,8 +4,8 @@ use crate::{
 };
 
 use super::{
-    BigInt, BigUint, EllipticCurve, ManagedAddress, ManagedBuffer, ManagedByteArray, ManagedRef,
-    ManagedType, ManagedVec,
+    BigInt, BigUint, EllipticCurve, ManagedAddress, ManagedBuffer, ManagedByteArray,
+    ManagedReadonly, ManagedType, ManagedVec,
 };
 
 /// Types that implement this trait can be items inside a `ManagedVec`.
@@ -108,7 +108,7 @@ macro_rules! impl_managed_type {
         impl<M: ManagedTypeApi> ManagedVecItem for $ty<M> {
             const PAYLOAD_SIZE: usize = 4;
             const SKIPS_RESERIALIZATION: bool = false;
-            type ReadOnly = ManagedRef<M, Self>;
+            type ReadOnly = ManagedReadonly<M, Self>;
 
             fn from_byte_reader<Reader: FnMut(&mut [u8])>(reader: Reader) -> Self {
                 let handle = Handle::from_byte_reader(reader);
@@ -118,7 +118,7 @@ macro_rules! impl_managed_type {
             fn from_byte_reader_as_read_only<Reader: FnMut(&mut [u8])>(
                 reader: Reader,
             ) -> Self::ReadOnly {
-                ManagedRef::new(Self::from_byte_reader(reader))
+                ManagedReadonly::new(Self::from_byte_reader(reader))
             }
 
             fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, writer: Writer) -> R {
@@ -141,7 +141,7 @@ where
 {
     const PAYLOAD_SIZE: usize = 4;
     const SKIPS_RESERIALIZATION: bool = false;
-    type ReadOnly = ManagedRef<M, Self>;
+    type ReadOnly = ManagedReadonly<M, Self>;
 
     fn from_byte_reader<Reader: FnMut(&mut [u8])>(reader: Reader) -> Self {
         let handle = Handle::from_byte_reader(reader);
@@ -149,7 +149,7 @@ where
     }
 
     fn from_byte_reader_as_read_only<Reader: FnMut(&mut [u8])>(reader: Reader) -> Self::ReadOnly {
-        ManagedRef::new(Self::from_byte_reader(reader))
+        ManagedReadonly::new(Self::from_byte_reader(reader))
     }
 
     fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, writer: Writer) -> R {
@@ -164,7 +164,7 @@ where
 {
     const PAYLOAD_SIZE: usize = 4;
     const SKIPS_RESERIALIZATION: bool = false;
-    type ReadOnly = ManagedRef<M, Self>;
+    type ReadOnly = ManagedReadonly<M, Self>;
 
     fn from_byte_reader<Reader: FnMut(&mut [u8])>(reader: Reader) -> Self {
         let handle = Handle::from_byte_reader(reader);
@@ -172,7 +172,7 @@ where
     }
 
     fn from_byte_reader_as_read_only<Reader: FnMut(&mut [u8])>(reader: Reader) -> Self::ReadOnly {
-        ManagedRef::new(Self::from_byte_reader(reader))
+        ManagedReadonly::new(Self::from_byte_reader(reader))
     }
 
     fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, writer: Writer) -> R {
