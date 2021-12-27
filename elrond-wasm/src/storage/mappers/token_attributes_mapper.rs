@@ -4,7 +4,7 @@ use elrond_codec::{NestedDecode, NestedEncode, TopDecode, TopEncode};
 
 use super::StorageMapper;
 use crate::{
-    api::{ErrorApi, ErrorApiImpl, ManagedTypeApi, StorageReadApi, StorageWriteApi},
+    api::{ErrorApiImpl, ManagedTypeApi, StorageMapperApi},
     storage::{storage_clear, storage_get, storage_get_len, storage_set, StorageKey},
     types::{ManagedType, TokenIdentifier},
 };
@@ -25,7 +25,7 @@ const COUNTER_OVERFLOW_ERROR_MESSAGE: &[u8] =
 
 pub struct TokenAttributesMapper<SA>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
+    SA: StorageMapperApi,
 {
     _phantom_api: PhantomData<SA>,
     base_key: StorageKey<SA>,
@@ -33,7 +33,7 @@ where
 
 impl<SA> StorageMapper<SA> for TokenAttributesMapper<SA>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
+    SA: StorageMapperApi,
 {
     fn new(base_key: StorageKey<SA>) -> Self {
         TokenAttributesMapper {
@@ -45,7 +45,7 @@ where
 
 impl<SA> TokenAttributesMapper<SA>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
+    SA: StorageMapperApi,
 {
     pub fn set<T: TopEncode + TopDecode + NestedEncode + NestedDecode, M: ManagedTypeApi>(
         &self,

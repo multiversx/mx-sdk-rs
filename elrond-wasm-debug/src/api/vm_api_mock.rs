@@ -1,12 +1,9 @@
-use elrond_wasm::{
-    api::{CallTypeApi, VMApi},
-    elrond_codec::TryStaticCast,
-};
+use elrond_wasm::api::{CallTypeApi, StorageMapperApi, VMApi};
 
 use crate::DebugApi;
 
-impl TryStaticCast for DebugApi {}
-
 impl CallTypeApi for DebugApi {}
+
+impl StorageMapperApi for DebugApi {}
 
 impl VMApi for DebugApi {}

@@ -5,6 +5,4 @@ pub trait CallbackProxyObjBase {
     type Api: VMApi;
 
     fn new_cb_proxy_obj(api: Self::Api) -> Self;
-
-    fn cb_call_api(self) -> Self::Api;
 }

@@ -1,5 +1,3 @@
-use elrond_codec::TryStaticCast;
-
 use crate::api::ErrorApi;
 
 use super::{BigIntApi, EllipticCurveApi, ManagedBufferApi, StaticBufferApi};
@@ -7,7 +5,7 @@ use super::{BigIntApi, EllipticCurveApi, ManagedBufferApi, StaticBufferApi};
 pub type Handle = i32;
 
 pub trait ManagedTypeApiImpl:
-    TryStaticCast + BigIntApi + EllipticCurveApi + ManagedBufferApi + StaticBufferApi + ErrorApi
+    BigIntApi + EllipticCurveApi + ManagedBufferApi + StaticBufferApi + ErrorApi
 {
     const TICKER_MIN_LENGTH: usize = 3;
     const TICKER_MAX_LENGTH: usize = 10;

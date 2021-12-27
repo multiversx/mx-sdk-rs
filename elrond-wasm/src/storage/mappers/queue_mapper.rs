@@ -3,7 +3,7 @@ use core::marker::PhantomData;
 use super::{StorageClearable, StorageMapper};
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
-    api::{EndpointFinishApi, ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi},
+    api::{EndpointFinishApi, ManagedTypeApi, StorageMapperApi},
     finish_all,
     io::EndpointResult,
     storage::{storage_get, storage_set, StorageKey},
@@ -64,7 +64,7 @@ impl QueueMapperInfo {
 /// in constant time.
 pub struct QueueMapper<SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
+    SA: StorageMapperApi,
     T: TopEncode + TopDecode + 'static,
 {
     _phantom_api: PhantomData<SA>,
@@ -74,7 +74,7 @@ where
 
 impl<SA, T> StorageMapper<SA> for QueueMapper<SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
+    SA: StorageMapperApi,
     T: TopEncode + TopDecode,
 {
     fn new(base_key: StorageKey<SA>) -> Self {
@@ -88,7 +88,7 @@ where
 
 impl<SA, T> StorageClearable for QueueMapper<SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
+    SA: StorageMapperApi,
     T: TopEncode + TopDecode,
 {
     fn clear(&mut self) {
@@ -106,7 +106,7 @@ where
 
 impl<SA, T> QueueMapper<SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
+    SA: StorageMapperApi,
     T: TopEncode + TopDecode,
 {
     fn build_node_id_named_key(&self, name: &[u8], node_id: u32) -> StorageKey<SA> {
@@ -411,7 +411,7 @@ where
 /// documentation for more.
 pub struct Iter<'a, SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
+    SA: StorageMapperApi,
     T: TopEncode + TopDecode + 'static,
 {
     node_id: u32,
@@ -420,7 +420,7 @@ where
 
 impl<'a, SA, T> Iter<'a, SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
+    SA: StorageMapperApi,
     T: TopEncode + TopDecode + 'static,
 {
     fn new(queue: &'a QueueMapper<SA, T>) -> Iter<'a, SA, T> {
@@ -433,7 +433,7 @@ where
 
 impl<'a, SA, T> Iterator for Iter<'a, SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
+    SA: StorageMapperApi,
     T: TopEncode + TopDecode + 'static,
 {
     type Item = T;
@@ -452,7 +452,7 @@ where
 /// Behaves like a MultiResultVec when an endpoint result.
 impl<SA, T> EndpointResult for QueueMapper<SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
+    SA: StorageMapperApi,
     T: TopEncode + TopDecode + EndpointResult,
 {
     type DecodeAs = MultiResultVec<T::DecodeAs>;
@@ -468,7 +468,7 @@ where
 /// Behaves like a MultiResultVec when an endpoint result.
 impl<SA, T> TypeAbi for QueueMapper<SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
+    SA: StorageMapperApi,
     T: TopEncode + TopDecode + TypeAbi,
 {
     fn type_name() -> TypeName {

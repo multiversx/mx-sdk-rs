@@ -372,9 +372,6 @@ mod sample_adder {
         fn new_cb_proxy_obj(api: A) -> Self {
             CallbackProxyObj { api }
         }
-        fn cb_call_api(self) -> Self::Api {
-            self.api.clone()
-        }
     }
 
     pub trait CallbackProxy: elrond_wasm::contract_base::CallbackProxyObjBase + Sized {

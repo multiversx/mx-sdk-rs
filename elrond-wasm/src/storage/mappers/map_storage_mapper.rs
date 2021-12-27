@@ -2,7 +2,7 @@ use core::marker::PhantomData;
 
 use super::{set_mapper, SetMapper, StorageClearable, StorageMapper};
 use crate::{
-    api::{ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi},
+    api::StorageMapperApi,
     storage::{self, StorageKey},
 };
 use elrond_codec::{NestedDecode, NestedEncode, TopDecode, TopEncode};
@@ -12,7 +12,7 @@ type Keys<'a, SA, T> = set_mapper::Iter<'a, SA, T>;
 
 pub struct MapStorageMapper<SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
+    SA: StorageMapperApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
     V: StorageMapper<SA> + StorageClearable,
 {
@@ -24,7 +24,7 @@ where
 
 impl<SA, K, V> StorageMapper<SA> for MapStorageMapper<SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
+    SA: StorageMapperApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode,
     V: StorageMapper<SA> + StorageClearable,
 {
@@ -40,7 +40,7 @@ where
 
 impl<SA, K, V> StorageClearable for MapStorageMapper<SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
+    SA: StorageMapperApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode,
     V: StorageMapper<SA> + StorageClearable,
 {
@@ -54,7 +54,7 @@ where
 
 impl<SA, K, V> MapStorageMapper<SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
+    SA: StorageMapperApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode,
     V: StorageMapper<SA> + StorageClearable,
 {
@@ -153,7 +153,7 @@ where
 
 pub struct Iter<'a, SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
+    SA: StorageMapperApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
     V: StorageMapper<SA> + StorageClearable,
 {
@@ -163,7 +163,7 @@ where
 
 impl<'a, SA, K, V> Iter<'a, SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
+    SA: StorageMapperApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
     V: StorageMapper<SA> + StorageClearable,
 {
@@ -177,7 +177,7 @@ where
 
 impl<'a, SA, K, V> Iterator for Iter<'a, SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
+    SA: StorageMapperApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
     V: StorageMapper<SA> + StorageClearable,
 {
@@ -195,7 +195,7 @@ where
 
 pub struct Values<'a, SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
+    SA: StorageMapperApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
     V: StorageMapper<SA> + StorageClearable,
 {
@@ -205,7 +205,7 @@ where
 
 impl<'a, SA, K, V> Values<'a, SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
+    SA: StorageMapperApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
     V: StorageMapper<SA> + StorageClearable,
 {
@@ -219,7 +219,7 @@ where
 
 impl<'a, SA, K, V> Iterator for Values<'a, SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
+    SA: StorageMapperApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
     V: StorageMapper<SA> + StorageClearable,
 {
@@ -237,7 +237,7 @@ where
 
 pub enum Entry<'a, SA, K: 'a, V: 'a>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
+    SA: StorageMapperApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
     V: StorageMapper<SA> + StorageClearable,
 {
@@ -252,7 +252,7 @@ where
 /// It is part of the [`Entry`] enum.
 pub struct VacantEntry<'a, SA, K: 'a, V: 'a>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
+    SA: StorageMapperApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
     V: StorageMapper<SA> + StorageClearable,
 {
@@ -267,7 +267,7 @@ where
 /// It is part of the [`Entry`] enum.
 pub struct OccupiedEntry<'a, SA, K: 'a, V: 'a>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
+    SA: StorageMapperApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
     V: StorageMapper<SA> + StorageClearable,
 {
@@ -280,7 +280,7 @@ where
 
 impl<'a, SA, K, V> Entry<'a, SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
+    SA: StorageMapperApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + 'static,
     V: StorageMapper<SA> + StorageClearable,
 {
@@ -319,7 +319,7 @@ where
 
 impl<'a, SA, K, V> Entry<'a, SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
+    SA: StorageMapperApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + 'static,
     V: StorageMapper<SA> + StorageClearable,
 {
@@ -335,7 +335,7 @@ where
 
 impl<'a, SA, K, V> VacantEntry<'a, SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
+    SA: StorageMapperApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + 'static,
     V: StorageMapper<SA> + StorageClearable,
 {
@@ -359,7 +359,7 @@ where
 
 impl<'a, SA, K, V> OccupiedEntry<'a, SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
+    SA: StorageMapperApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + 'static,
     V: StorageMapper<SA> + StorageClearable,
 {
