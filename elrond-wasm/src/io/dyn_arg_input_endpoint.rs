@@ -37,11 +37,6 @@ where
 
     type ManagedTypeErrorApi = AA;
 
-    // #[inline]
-    // fn dyn_arg_vm_api(&self) -> Self::ErrorApi {
-    //     AA::instance()
-    // }
-
     fn has_next(&self) -> bool {
         self.current_index < self.num_arguments
     }
@@ -55,12 +50,6 @@ where
             arg_input
         }
     }
-
-    // fn assert_no_more_args(&self) {
-    //     if self.has_next() {
-    //         AA::error_api_impl().signal_error(err_msg::ARG_WRONG_NUMBER);
-    //     }
-    // }
 
     fn flush_ignore(&mut self) {
         self.current_index = self.num_arguments;

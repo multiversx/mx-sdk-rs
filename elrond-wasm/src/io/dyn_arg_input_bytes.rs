@@ -40,11 +40,6 @@ where
 
     type ManagedTypeErrorApi = A;
 
-    // #[inline]
-    // fn dyn_arg_vm_api(&self) -> Self::ErrorApi {
-    //     A::managed_type_error_api()
-    // }
-
     #[inline]
     fn has_next(&self) -> bool {
         self.next_index < self.bytes_vec.len()
