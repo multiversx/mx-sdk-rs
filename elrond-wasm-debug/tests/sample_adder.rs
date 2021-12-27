@@ -92,7 +92,7 @@ mod module_1 {
             self,
         ) -> ContractCall<Self::Api, <BigInt<Self::Api> as elrond_wasm::io::EndpointResult>::DecodeAs>
         {
-            let (___api___, ___address___) = self.into_fields();
+            let ___address___ = self.into_fields();
             let mut ___contract_call___ = elrond_wasm::types::new_contract_call(
                 ___address___,
                 &b"version"[..],
@@ -234,7 +234,7 @@ mod sample_adder {
             Self::Api,
             <BigInt<Self::Api> as elrond_wasm::io::EndpointResult>::DecodeAs,
         > {
-            let (___api___, ___address___) = self.into_fields();
+            let ___address___ = self.into_fields();
             let mut ___contract_call___ = elrond_wasm::types::new_contract_call(
                 ___address___,
                 &b"get_sum"[..],
@@ -247,7 +247,7 @@ mod sample_adder {
             amount: &BigInt<Self::Api>,
         ) -> ContractCall<Self::Api, <SCResult<()> as elrond_wasm::io::EndpointResult>::DecodeAs>
         {
-            let (___api___, ___address___) = self.into_fields();
+            let ___address___ = self.into_fields();
             let mut ___contract_call___ = elrond_wasm::types::new_contract_call(
                 ___address___,
                 &b"add"[..],
@@ -323,7 +323,6 @@ mod sample_adder {
     where
         A: elrond_wasm::api::VMApi + 'static,
     {
-        pub api: A,
         pub address: elrond_wasm::types::ManagedAddress<A>,
     }
 
@@ -333,10 +332,9 @@ mod sample_adder {
     {
         type Api = A;
 
-        fn new_proxy_obj(api: A) -> Self {
+        fn new_proxy_obj() -> Self {
             let zero_address = ManagedAddress::zero();
             Proxy {
-                api,
                 address: zero_address,
             }
         }
@@ -347,8 +345,8 @@ mod sample_adder {
         }
 
         #[inline]
-        fn into_fields(self) -> (Self::Api, ManagedAddress<Self::Api>) {
-            (self.api, self.address)
+        fn into_fields(self) -> ManagedAddress<Self::Api> {
+            self.address
         }
     }
 
@@ -415,7 +413,7 @@ fn test_add() {
     assert!(adder.call(b"version"));
 
     let own_proxy =
-        sample_adder::Proxy::new_proxy_obj(tx_context.clone()).contract(ManagedAddress::zero());
+        sample_adder::Proxy::<DebugApi>::new_proxy_obj().contract(ManagedAddress::zero());
     let _ = own_proxy.get_sum();
 
     let _ = elrond_wasm_debug::abi_json::contract_abi::<sample_adder::AbiProvider>();

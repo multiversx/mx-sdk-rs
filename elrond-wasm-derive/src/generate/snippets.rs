@@ -72,7 +72,6 @@ pub fn proxy_object_def() -> proc_macro2::TokenStream {
         where
             A: elrond_wasm::api::VMApi + 'static,
         {
-            pub api: A,
             pub address: elrond_wasm::types::ManagedAddress<A>,
         }
 
@@ -82,10 +81,9 @@ pub fn proxy_object_def() -> proc_macro2::TokenStream {
         {
             type Api = A;
 
-            fn new_proxy_obj(api: A) -> Self {
+            fn new_proxy_obj() -> Self {
                 let zero_address = ManagedAddress::zero();
                 Proxy {
-                    api,
                     address: zero_address,
                 }
             }
@@ -96,8 +94,8 @@ pub fn proxy_object_def() -> proc_macro2::TokenStream {
             }
 
             #[inline]
-            fn into_fields(self) -> (Self::Api, ManagedAddress<Self::Api>) {
-                (self.api, self.address)
+            fn into_fields(self) -> ManagedAddress<Self::Api> {
+                self.address
             }
         }
     }
