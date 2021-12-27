@@ -1,5 +1,5 @@
 use crate::{
-    api::{ErrorApi, ErrorApiImpl, ManagedTypeApi, ManagedTypeErrorApi},
+    api::{ErrorApi, ErrorApiImpl, ManagedTypeApi},
     err_msg,
     types::ManagedBytesTopDecodeInput,
     DynArgInput, HexCallDataDeserializer,
@@ -10,15 +10,15 @@ where
     A: ManagedTypeApi + ErrorApi,
 {
     deser: HexCallDataDeserializer<'a>,
-    api: A,
+    _api: A,
 }
 
 impl<'a, A> CallDataArgLoader<'a, A>
 where
     A: ManagedTypeApi + ErrorApi,
 {
-    pub fn new(deser: HexCallDataDeserializer<'a>, api: A) -> Self {
-        CallDataArgLoader { deser, api }
+    pub fn new(deser: HexCallDataDeserializer<'a>, _api: A) -> Self {
+        CallDataArgLoader { deser, _api }
     }
 }
 

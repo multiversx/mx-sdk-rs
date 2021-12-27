@@ -123,7 +123,7 @@ impl BlockchainApiImpl for UncallableApi {
 
     fn get_esdt_local_roles(
         &self,
-        token_id: &TokenIdentifier<Self::ManagedTypeApi>,
+        _token_id: &TokenIdentifier<Self::ManagedTypeApi>,
     ) -> crate::types::EsdtLocalRoleFlags {
         unreachable!()
     }

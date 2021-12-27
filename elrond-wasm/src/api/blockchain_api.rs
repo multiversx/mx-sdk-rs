@@ -1,11 +1,7 @@
-use super::{ErrorApi, ErrorApiImpl, ManagedTypeApi, StorageReadApi, StorageReadApiImpl};
-use crate::{
-    err_msg,
-    storage::{self, StorageKey},
-    types::{
-        Address, BigUint, EsdtLocalRole, EsdtLocalRoleFlags, EsdtTokenData, ManagedAddress,
-        ManagedBuffer, ManagedByteArray, TokenIdentifier, H256,
-    },
+use super::ManagedTypeApi;
+use crate::types::{
+    Address, BigUint, EsdtLocalRoleFlags, EsdtTokenData, ManagedAddress, ManagedByteArray,
+    TokenIdentifier, H256,
 };
 use alloc::boxed::Box;
 

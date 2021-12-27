@@ -1,4 +1,4 @@
-use super::{ErrorApi, ErrorApiImpl, ManagedTypeApi};
+use super::{ErrorApiImpl, ManagedTypeApi};
 use crate::{
     err_msg,
     types::{BigUint, EsdtTokenPayment, EsdtTokenType, ManagedVec, TokenIdentifier},

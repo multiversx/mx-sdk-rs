@@ -1,7 +1,7 @@
 use core::marker::PhantomData;
 
 use crate::{
-    api::{ErrorApi, ManagedTypeApi, ManagedTypeErrorApi},
+    api::{ErrorApi, ManagedTypeApi},
     ArgId, DynArg, DynArgInput, ManagedResultArgLoader,
 };
 

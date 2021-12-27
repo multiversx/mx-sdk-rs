@@ -2,7 +2,7 @@ use core::marker::PhantomData;
 
 use crate::{
     abi::{OutputAbi, TypeAbi, TypeDescriptionContainer},
-    api::{CallTypeApi, SendApiImpl, StorageReadApi, StorageReadApiImpl},
+    api::{CallTypeApi, SendApiImpl, StorageReadApi},
     contract_base::SendWrapper,
     io::EndpointResult,
     types::{BigUint, ManagedAddress, ManagedBuffer, TokenIdentifier},

@@ -4,7 +4,7 @@ use alloc::string::String;
 
 use crate::{
     abi::TypeAbi,
-    api::{BigIntApi, EllipticCurveApi, Handle, ManagedTypeApi, ManagedTypeApiImpl},
+    api::{BigIntApi, EllipticCurveApi, Handle, ManagedTypeApi},
 };
 use elrond_codec::*;
 

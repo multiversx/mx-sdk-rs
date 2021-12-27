@@ -3,10 +3,7 @@ use core::marker::PhantomData;
 use super::{StorageClearable, StorageMapper};
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
-    api::{
-        EndpointFinishApi, ErrorApi, ManagedTypeApi, StorageReadApi, StorageReadApiImpl,
-        StorageWriteApi, StorageWriteApiImpl,
-    },
+    api::{EndpointFinishApi, ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi},
     finish_all,
     io::EndpointResult,
     storage::{storage_get, storage_set, StorageKey},

@@ -1,7 +1,7 @@
 use crate::{
-    api::{ErrorApi, ErrorApiImpl, ManagedTypeApi, ManagedTypeErrorApi},
+    api::{ErrorApi, ErrorApiImpl, ManagedTypeApi},
     err_msg,
-    types::{ManagedBuffer, ManagedType, ManagedVec},
+    types::{ManagedBuffer, ManagedVec},
     DynArgInput,
 };
 

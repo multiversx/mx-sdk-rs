@@ -1,10 +1,7 @@
 use core::marker::PhantomData;
 
 use crate::{
-    api::{
-        EndpointArgumentApi, EndpointArgumentApiImpl, ErrorApi, ErrorApiImpl, ManagedTypeApi,
-        ManagedTypeErrorApi,
-    },
+    api::{EndpointArgumentApi, EndpointArgumentApiImpl, ErrorApi, ErrorApiImpl, ManagedTypeApi},
     err_msg, ArgDecodeInput, DynArgInput,
 };
 

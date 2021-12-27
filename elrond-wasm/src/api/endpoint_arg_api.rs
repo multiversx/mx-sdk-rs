@@ -1,4 +1,4 @@
-use crate::{api::ErrorApi, err_msg, types::BoxedBytes};
+use crate::{err_msg, types::BoxedBytes};
 use alloc::vec::Vec;
 
 use super::{ErrorApiImpl, Handle};

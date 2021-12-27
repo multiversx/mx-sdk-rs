@@ -2,7 +2,7 @@ use core::cmp::Ordering;
 
 use crate::api::{BigIntApi, ManagedTypeApi};
 
-use super::{BigUint, ManagedType};
+use super::BigUint;
 
 impl<M: ManagedTypeApi> PartialEq for BigUint<M> {
     #[inline]
