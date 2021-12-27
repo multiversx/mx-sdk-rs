@@ -34,7 +34,7 @@ where
 
 impl<A> DynArgInput for BytesArgLoader<A>
 where
-    A: ManagedTypeErrorApi,
+    A: ManagedTypeApi + ErrorApi,
 {
     type ItemInput = ManagedBytesTopDecodeInput<A>;
 

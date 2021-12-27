@@ -6,7 +6,7 @@ use super::CallbackClosureForDeser;
 /// It is likely to be removed in the future.
 pub enum CallbackSelectorResult<A>
 where
-    A: ManagedTypeErrorApi,
+    A: ManagedTypeApi + ErrorApi,
 {
     Processed,
     NotProcessed(CallbackClosureForDeser<A>),

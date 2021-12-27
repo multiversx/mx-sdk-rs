@@ -7,7 +7,7 @@ use crate::{
 
 pub struct CallDataArgLoader<'a, A>
 where
-    A: ManagedTypeErrorApi,
+    A: ManagedTypeApi + ErrorApi,
 {
     deser: HexCallDataDeserializer<'a>,
     api: A,
@@ -15,7 +15,7 @@ where
 
 impl<'a, A> CallDataArgLoader<'a, A>
 where
-    A: ManagedTypeErrorApi,
+    A: ManagedTypeApi + ErrorApi,
 {
     pub fn new(deser: HexCallDataDeserializer<'a>, api: A) -> Self {
         CallDataArgLoader { deser, api }
@@ -24,7 +24,7 @@ where
 
 impl<'a, A> DynArgInput for CallDataArgLoader<'a, A>
 where
-    A: ManagedTypeErrorApi,
+    A: ManagedTypeApi + ErrorApi,
 {
     type ItemInput = ManagedBytesTopDecodeInput<A>;
 

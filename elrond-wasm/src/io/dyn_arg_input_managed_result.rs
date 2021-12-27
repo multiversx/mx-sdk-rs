@@ -1,5 +1,5 @@
 use crate::{
-    api::{ErrorApi, ErrorApiImpl, ManagedTypeErrorApi},
+    api::{ErrorApi, ErrorApiImpl, ManagedTypeApi, ManagedTypeErrorApi},
     err_msg,
     types::{ManagedBuffer, ManagedType, ManagedVec},
     DynArgInput,
@@ -7,7 +7,7 @@ use crate::{
 
 pub struct ManagedResultArgLoader<A>
 where
-    A: ManagedTypeErrorApi,
+    A: ManagedTypeApi + ErrorApi,
 {
     data: ManagedVec<A, ManagedBuffer<A>>,
     data_len: usize,
@@ -16,7 +16,7 @@ where
 
 impl<A> ManagedResultArgLoader<A>
 where
-    A: ManagedTypeErrorApi,
+    A: ManagedTypeApi + ErrorApi,
 {
     pub fn new(data: ManagedVec<A, ManagedBuffer<A>>) -> Self {
         let data_len = data.len();
@@ -30,7 +30,7 @@ where
 
 impl<A> DynArgInput for ManagedResultArgLoader<A>
 where
-    A: ManagedTypeErrorApi,
+    A: ManagedTypeApi + ErrorApi,
 {
     type ItemInput = ManagedBuffer<A>;
 
