@@ -9,7 +9,7 @@ use super::ManagedMultiResultVec;
 
 impl<M, T> IntoIterator for ManagedMultiResultVec<M, T>
 where
-    M: ManagedTypeErrorApi,
+    M: ManagedTypeApi + ErrorApi,
     T: DynArg,
 {
     type Item = T;
@@ -21,7 +21,7 @@ where
 
 pub struct ManagedMultiResultVecIterator<M, T>
 where
-    M: ManagedTypeErrorApi,
+    M: ManagedTypeApi + ErrorApi,
     T: DynArg,
 {
     data_loader: ManagedResultArgLoader<M>,
@@ -30,7 +30,7 @@ where
 
 impl<M, T> ManagedMultiResultVecIterator<M, T>
 where
-    M: ManagedTypeErrorApi,
+    M: ManagedTypeApi + ErrorApi,
     T: DynArg,
 {
     pub(crate) fn new(obj: ManagedMultiResultVec<M, T>) -> Self {
@@ -43,7 +43,7 @@ where
 
 impl<M, T> Iterator for ManagedMultiResultVecIterator<M, T>
 where
-    M: ManagedTypeErrorApi,
+    M: ManagedTypeApi + ErrorApi,
     T: DynArg,
 {
     type Item = T;

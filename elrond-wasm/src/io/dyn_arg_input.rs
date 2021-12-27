@@ -24,7 +24,7 @@ use elrond_codec::TopDecodeInput;
 pub trait DynArgInput {
     type ItemInput: TopDecodeInput;
 
-    type ManagedTypeErrorApi: ManagedTypeErrorApi;
+    type ManagedTypeErrorApi: ManagedTypeApi + ErrorApi;
 
     // #[inline]
     // fn dyn_arg_vm_api(&self) -> Self::ErrorApi;

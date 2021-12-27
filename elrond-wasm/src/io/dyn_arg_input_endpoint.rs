@@ -1,14 +1,17 @@
 use core::marker::PhantomData;
 
 use crate::{
-    api::{EndpointArgumentApi, EndpointArgumentApiImpl, ErrorApiImpl, ManagedTypeErrorApi},
+    api::{
+        EndpointArgumentApi, EndpointArgumentApiImpl, ErrorApi, ErrorApiImpl, ManagedTypeApi,
+        ManagedTypeErrorApi,
+    },
     err_msg, ArgDecodeInput, DynArgInput,
 };
 
 #[derive(Default)]
 pub struct EndpointDynArgLoader<AA>
 where
-    AA: ManagedTypeErrorApi + EndpointArgumentApi,
+    AA: ManagedTypeApi + ErrorApi + EndpointArgumentApi,
 {
     _phantom: PhantomData<AA>,
     current_index: i32,
@@ -17,7 +20,7 @@ where
 
 impl<AA> EndpointDynArgLoader<AA>
 where
-    AA: ManagedTypeErrorApi + EndpointArgumentApi,
+    AA: ManagedTypeApi + ErrorApi + EndpointArgumentApi,
 {
     pub fn new() -> Self {
         let num_arguments = AA::argument_api_impl().get_num_arguments();
@@ -31,7 +34,7 @@ where
 
 impl<AA> DynArgInput for EndpointDynArgLoader<AA>
 where
-    AA: ManagedTypeErrorApi + EndpointArgumentApi,
+    AA: ManagedTypeApi + ErrorApi + EndpointArgumentApi,
 {
     type ItemInput = ArgDecodeInput<AA>;
 

@@ -1,7 +1,7 @@
 use crate::{
     api::{
-        BlockchainApi, BlockchainApiImpl, ErrorApi, ManagedTypeErrorApi, StorageReadApi,
-        StorageReadApiImpl, StorageWriteApi, StorageWriteApiImpl,
+        BlockchainApi, BlockchainApiImpl, ErrorApi, ManagedTypeApi, ManagedTypeErrorApi,
+        StorageReadApi, StorageReadApiImpl, StorageWriteApi, StorageWriteApiImpl,
     },
     contract_base::ManagedSerializer,
     storage::StorageKey,
@@ -16,7 +16,7 @@ use super::ManagedArgBuffer;
 pub const CALLBACK_CLOSURE_STORAGE_BASE_KEY: &[u8] = b"CB_CLOSURE";
 
 #[derive(TopEncode, TopDecode)]
-pub struct CallbackClosure<M: ManagedTypeErrorApi> {
+pub struct CallbackClosure<M: ManagedTypeApi + ErrorApi> {
     callback_name: ManagedBuffer<M>,
     closure_args: ManagedArgBuffer<M>,
 }
@@ -25,13 +25,13 @@ pub struct CallbackClosure<M: ManagedTypeErrorApi> {
 /// Unlike calling `CallbackClosure::<SA, R>::new`, here types can be inferred from the context.
 pub fn new_callback_call<A>(callback_name_slice: &'static [u8]) -> CallbackClosure<A>
 where
-    A: ManagedTypeErrorApi,
+    A: ManagedTypeApi + ErrorApi,
 {
     let callback_name = ManagedBuffer::new_from_bytes(callback_name_slice);
     CallbackClosure::new(callback_name)
 }
 
-impl<M: ManagedTypeErrorApi> CallbackClosure<M> {
+impl<M: ManagedTypeApi + ErrorApi> CallbackClosure<M> {
     pub fn new(callback_name: ManagedBuffer<M>) -> Self {
         let arg_buffer = ManagedArgBuffer::new_empty();
         CallbackClosure {
@@ -100,7 +100,7 @@ pub struct CallbackClosureMatcher<const CB_NAME_MAX_LENGTH: usize> {
 }
 
 impl<const CB_NAME_MAX_LENGTH: usize> CallbackClosureMatcher<CB_NAME_MAX_LENGTH> {
-    pub fn new<M: ManagedTypeErrorApi>(callback_name: &ManagedBuffer<M>) -> Self {
+    pub fn new<M: ManagedTypeApi + ErrorApi>(callback_name: &ManagedBuffer<M>) -> Self {
         let mut compare_buffer = [0u8; CB_NAME_MAX_LENGTH];
         let name_len = callback_name.len();
         let _ = callback_name.load_slice(0, &mut compare_buffer[..name_len]);
