@@ -26,9 +26,6 @@ pub trait DynArgInput {
 
     type ManagedTypeErrorApi: ManagedTypeApi + ErrorApi;
 
-    // #[inline]
-    // fn dyn_arg_vm_api(&self) -> Self::ErrorApi;
-
     /// Check if there are more arguments that can be loaded.
     fn has_next(&self) -> bool;
 
@@ -44,8 +41,6 @@ pub trait DynArgInput {
             Self::ManagedTypeErrorApi::error_api_impl().signal_error(err_msg::ARG_WRONG_NUMBER);
         }
     }
-
-    // fn assert_no_more_args(&self);
 
     /// Consumes all inputs and ignores them.
     /// After executing this, assert_no_more_args should not fail.
