@@ -1,0 +1,312 @@
+{
+    "buildInfo": {
+        "rustc": {
+            "version": "x.x.x-nightly",
+            "commitHash": "<commit hash here>",
+            "commitDate": "<commit date here>",
+            "channel": "Channel",
+            "short": "rustc <version> (<short hash> <date>)"
+        },
+        "contractCrate": {
+            "name": "abi-tester",
+            "version": "0.0.0"
+        },
+        "framework": {
+            "name": "elrond-wasm",
+            "version": "0.25.0"
+        }
+    },
+    "docs": [
+        "Contract whose sole purpose is to verify that",
+        "the ABI generation framework works sa expected.",
+        "",
+        "Note: any change in this contract must also be reflected in `abi_test_expected.abi.json`,",
+        "including Rust docs."
+    ],
+    "name": "AbiTester",
+    "endpoints": [
+        {
+            "name": "external_view",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": []
+        }
+    ],
+    "hasCallback": false,
+    "types": {
+        "AbiEnum": {
+            "type": "enum",
+            "docs": [
+                "Its only purpose is to test that the ABI generator works fine."
+            ],
+            "variants": [
+                {
+                    "name": "Nothing",
+                    "discriminant": 0
+                },
+                {
+                    "name": "Something",
+                    "discriminant": 1,
+                    "fields": [
+                        {
+                            "name": "0",
+                            "type": "i32"
+                        }
+                    ]
+                },
+                {
+                    "name": "SomethingMore",
+                    "discriminant": 2,
+                    "fields": [
+                        {
+                            "name": "0",
+                            "type": "u8"
+                        },
+                        {
+                            "name": "1",
+                            "type": "OnlyShowsUpAsNested08"
+                        }
+                    ]
+                },
+                {
+                    "name": "SomeStruct",
+                    "discriminant": 3,
+                    "fields": [
+                        {
+                            "name": "a",
+                            "type": "u16"
+                        },
+                        {
+                            "name": "b",
+                            "type": "OnlyShowsUpAsNested09"
+                        }
+                    ]
+                }
+            ]
+        },
+        "AbiTestType": {
+            "type": "struct",
+            "docs": [
+                "Its only purpose is to test that the ABI generator works fine."
+            ],
+            "fields": [
+                {
+                    "docs": [
+                        "This type should only appear here."
+                    ],
+                    "name": "nested",
+                    "type": "OnlyShowsUpAsNested01"
+                },
+                {
+                    "docs": [
+                        "Tests that recursive types will not send the ABI generator into an infinite loop."
+                    ],
+                    "name": "next",
+                    "type": "Option<AbiTestType>"
+                },
+                {
+                    "docs": [
+                        "Tests that tuples tell the ABI of their component types even if they appear nowhere else.",
+                        "Also, just like above, recursive types need to work even when nested into a tuple."
+                    ],
+                    "name": "tuple_madness",
+                    "type": "tuple<OnlyShowsUpAsNested02,Option<AbiTestType>>"
+                }
+            ]
+        },
+        "EsdtLocalRole": {
+            "type": "enum",
+            "variants": [
+                {
+                    "name": "None",
+                    "discriminant": 0
+                },
+                {
+                    "name": "Mint",
+                    "discriminant": 1
+                },
+                {
+                    "name": "Burn",
+                    "discriminant": 2
+                },
+                {
+                    "name": "NftCreate",
+                    "discriminant": 3
+                },
+                {
+                    "name": "NftAddQuantity",
+                    "discriminant": 4
+                },
+                {
+                    "name": "NftBurn",
+                    "discriminant": 5
+                }
+            ]
+        },
+        "EsdtTokenData": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "token_type",
+                    "type": "EsdtTokenType"
+                },
+                {
+                    "name": "amount",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "frozen",
+                    "type": "bool"
+                },
+                {
+                    "name": "hash",
+                    "type": "bytes"
+                },
+                {
+                    "name": "name",
+                    "type": "bytes"
+                },
+                {
+                    "name": "attributes",
+                    "type": "bytes"
+                },
+                {
+                    "name": "creator",
+                    "type": "Address"
+                },
+                {
+                    "name": "royalties",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "uris",
+                    "type": "List<bytes>"
+                }
+            ]
+        },
+        "EsdtTokenPayment": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "token_type",
+                    "type": "EsdtTokenType"
+                },
+                {
+                    "name": "token_identifier",
+                    "type": "TokenIdentifier"
+                },
+                {
+                    "name": "token_nonce",
+                    "type": "u64"
+                },
+                {
+                    "name": "amount",
+                    "type": "BigUint"
+                }
+            ]
+        },
+        "EsdtTokenType": {
+            "type": "enum",
+            "variants": [
+                {
+                    "name": "Fungible",
+                    "discriminant": 0
+                },
+                {
+                    "name": "NonFungible",
+                    "discriminant": 1
+                },
+                {
+                    "name": "SemiFungible",
+                    "discriminant": 2
+                },
+                {
+                    "name": "Meta",
+                    "discriminant": 3
+                },
+                {
+                    "name": "Invalid",
+                    "discriminant": 4
+                }
+            ]
+        },
+        "OnlyShowsUpAsNested01": {
+            "type": "struct",
+            "docs": [
+                "Tests that the ABI generator also fetches types that only appear as fields."
+            ]
+        },
+        "OnlyShowsUpAsNested02": {
+            "type": "struct",
+            "docs": [
+                "Tests that the ABI generator also fetches types that only appear as fields."
+            ],
+            "fields": [
+                {
+                    "name": "something",
+                    "type": "array0<u8>"
+                }
+            ]
+        },
+        "OnlyShowsUpAsNested03": {
+            "type": "struct",
+            "docs": [
+                "Tests that the ABI generator also fetches types that only appear as fields."
+            ]
+        },
+        "OnlyShowsUpAsNested04": {
+            "type": "struct",
+            "docs": [
+                "Tests that the ABI generator also fetches types that only appear as fields."
+            ]
+        },
+        "OnlyShowsUpAsNested05": {
+            "type": "struct",
+            "docs": [
+                "Tests that the ABI generator also fetches types that only appear as fields."
+            ]
+        },
+        "OnlyShowsUpAsNested06": {
+            "type": "struct",
+            "docs": [
+                "Tests that the ABI generator also fetches types that only appear as fields."
+            ]
+        },
+        "OnlyShowsUpAsNested07": {
+            "type": "struct",
+            "docs": [
+                "Tests that the ABI generator also fetches types that only appear as fields."
+            ]
+        },
+        "OnlyShowsUpAsNested08": {
+            "type": "struct",
+            "docs": [
+                "Tests that the ABI generator also fetches types that only appear as fields."
+            ]
+        },
+        "OnlyShowsUpAsNested09": {
+            "type": "struct",
+            "docs": [
+                "Tests that the ABI generator also fetches types that only appear as fields."
+            ]
+        },
+        "OnlyShowsUpAsNested10": {
+            "type": "struct",
+            "docs": [
+                "Tests that the ABI generator also fetches types that only appear as fields."
+            ]
+        },
+        "OnlyShowsUpInConstructor": {
+            "type": "struct",
+            "docs": [
+                "Tests that the ABI generator also fetches types that only appear as fields."
+            ],
+            "fields": [
+                {
+                    "name": "something",
+                    "type": "()"
+                }
+            ]
+        }
+    }
+}

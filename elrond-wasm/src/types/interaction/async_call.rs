@@ -19,6 +19,7 @@ where
     pub(crate) callback_call: Option<CallbackClosure<SA>>,
 }
 
+#[allow(clippy::return_self_not_must_use)]
 impl<SA> AsyncCall<SA>
 where
     SA: SendApi + 'static,
