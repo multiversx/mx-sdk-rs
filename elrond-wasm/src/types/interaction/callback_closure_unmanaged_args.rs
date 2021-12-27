@@ -1,10 +1,7 @@
 use core::marker::PhantomData;
 
 use crate::{
-    api::{
-        BlockchainApi, ManagedTypeApi, StorageReadApi, StorageReadApiImpl, StorageWriteApi,
-        StorageWriteApiImpl,
-    },
+    api::{BlockchainApi, ManagedTypeApi, StorageReadApi, StorageWriteApi},
     storage_clear, storage_get, storage_get_len,
     types::{BoxedBytes, ManagedBuffer, ManagedBytesNestedDecodeInput, ManagedType},
     BytesArgLoader,
@@ -33,7 +30,7 @@ impl<M: ManagedTypeApi> CallbackClosureUnmanagedArgs<M> {
     }
 
     pub fn storage_load_and_clear<A: BlockchainApi + StorageReadApi + StorageWriteApi>(
-        api: A,
+        _api: A,
     ) -> Option<Self> {
         let storage_key = super::callback_closure::cb_closure_storage_key::<A>();
         if storage_get_len(storage_key.as_ref()) > 0 {

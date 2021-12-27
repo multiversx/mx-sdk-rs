@@ -1,4 +1,4 @@
-use crate::api::{ErrorApi, ManagedTypeApi, ManagedTypeErrorApi};
+use crate::api::{ErrorApi, ManagedTypeApi};
 
 use super::CallbackClosureForDeser;
 

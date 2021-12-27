@@ -3,7 +3,7 @@ use core::marker::PhantomData;
 use alloc::vec::Vec;
 
 use crate::{
-    api::{ErrorApi, ErrorApiImpl, ManagedTypeApi, ManagedTypeErrorApi},
+    api::{ErrorApi, ErrorApiImpl, ManagedTypeApi},
     err_msg,
     types::{BoxedBytes, ManagedBytesTopDecodeInput},
     DynArgInput,

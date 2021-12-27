@@ -1,7 +1,7 @@
 use core::marker::PhantomData;
 
 use crate::{
-    api::{BlockchainApi, ManagedTypeApi, PrintApi, PrintApiImpl},
+    api::{ManagedTypeApi, PrintApi, PrintApiImpl},
     types::BigUint,
 };
 

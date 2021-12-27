@@ -1,4 +1,4 @@
-use crate::api::{Handle, ManagedTypeApi, ManagedTypeApiImpl};
+use crate::api::{Handle, ManagedTypeApi};
 
 use super::{ManagedReadonly, ManagedRef};
 

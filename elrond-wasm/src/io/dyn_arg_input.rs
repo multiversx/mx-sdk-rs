@@ -1,5 +1,5 @@
 use crate::{
-    api::{ErrorApi, ErrorApiImpl, ManagedTypeApi, ManagedTypeApiImpl, ManagedTypeErrorApi},
+    api::{ErrorApi, ErrorApiImpl, ManagedTypeApi},
     err_msg,
 };
 use elrond_codec::TopDecodeInput;

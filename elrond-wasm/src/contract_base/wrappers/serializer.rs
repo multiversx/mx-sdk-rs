@@ -3,7 +3,7 @@ use core::marker::PhantomData;
 use elrond_codec::{DecodeError, EncodeError, TopDecode, TopEncode};
 
 use crate::{
-    api::{ErrorApi, ErrorApiImpl, ManagedTypeApi, ManagedTypeErrorApi},
+    api::{ErrorApi, ErrorApiImpl, ManagedTypeApi},
     err_msg,
     types::{BoxedBytes, ManagedBuffer, ManagedBytesTopDecodeInput, ManagedType},
 };

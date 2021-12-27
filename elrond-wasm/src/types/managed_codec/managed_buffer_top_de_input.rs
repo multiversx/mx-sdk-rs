@@ -2,7 +2,7 @@ use alloc::boxed::Box;
 use elrond_codec::{try_execute_then_cast, DecodeError, TopDecodeInput, TryStaticCast};
 
 use crate::{
-    api::{ErrorApi, ErrorApiImpl, ManagedTypeApi},
+    api::{ErrorApiImpl, ManagedTypeApi},
     types::{BigInt, BigUint, ManagedBuffer},
 };
 

@@ -1,7 +1,4 @@
-use crate::{
-    api::{ErrorApi, ManagedTypeApi},
-    signal_arg_de_error, ArgId, DynArgInput,
-};
+use crate::{api::ManagedTypeApi, signal_arg_de_error, ArgId, DynArgInput};
 use elrond_codec::*;
 
 /// Any type that is used as an endpoint argument must implement this trait.

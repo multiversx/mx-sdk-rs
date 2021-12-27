@@ -1,5 +1,3 @@
-use core::fmt::Error;
-
 use alloc::{string::String, vec::Vec};
 
 use crate::{
