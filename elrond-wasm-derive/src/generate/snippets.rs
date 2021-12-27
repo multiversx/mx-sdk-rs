@@ -109,7 +109,7 @@ pub fn callback_proxy_object_def() -> proc_macro2::TokenStream {
         where
             A: elrond_wasm::api::VMApi + 'static,
         {
-            pub api: A,
+            _phantom: core::marker::PhantomData<A>,
         }
 
         impl<A> elrond_wasm::contract_base::CallbackProxyObjBase for CallbackProxyObj<A>
@@ -118,8 +118,10 @@ pub fn callback_proxy_object_def() -> proc_macro2::TokenStream {
         {
             type Api = A;
 
-            fn new_cb_proxy_obj(api: A) -> Self {
-                CallbackProxyObj { api }
+            fn new_cb_proxy_obj() -> Self {
+                CallbackProxyObj {
+                    _phantom: core::marker::PhantomData,
+                }
             }
         }
     }

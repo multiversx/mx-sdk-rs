@@ -94,7 +94,7 @@ pub fn generate_callback_proxies(
             },
             quote! {
                 fn callbacks(&self) -> self::CallbackProxyObj<Self::Api> {
-                    <self::CallbackProxyObj::<Self::Api> as elrond_wasm::contract_base::CallbackProxyObjBase>::new_cb_proxy_obj(self.raw_vm_api())
+                    <self::CallbackProxyObj::<Self::Api> as elrond_wasm::contract_base::CallbackProxyObjBase>::new_cb_proxy_obj()
                 }
             },
             generate_callback_proxies_object(contract.methods.as_slice()),
