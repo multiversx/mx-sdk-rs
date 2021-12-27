@@ -1,5 +1,5 @@
 use elrond_wasm::{
-    api::{CallTypeApi, ManagedTypeErrorApi, VMApi},
+    api::{CallTypeApi, VMApi},
     elrond_codec::TryStaticCast,
 };
 
@@ -9,14 +9,6 @@ use elrond_wasm::{
 pub struct VmApiImpl {}
 
 impl TryStaticCast for VmApiImpl {}
-
-impl ManagedTypeErrorApi for VmApiImpl {
-    type ManagedTypeErrorApiImpl = VmApiImpl;
-
-    fn managed_type_error_api() -> Self::ManagedTypeErrorApiImpl {
-        VmApiImpl {}
-    }
-}
 
 impl CallTypeApi for VmApiImpl {}
 
