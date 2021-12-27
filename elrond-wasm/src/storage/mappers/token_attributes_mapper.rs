@@ -25,7 +25,7 @@ const COUNTER_OVERFLOW_ERROR_MESSAGE: &[u8] =
 
 pub struct TokenAttributesMapper<SA>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
 {
     _phantom_api: PhantomData<SA>,
     base_key: StorageKey<SA>,
@@ -33,7 +33,7 @@ where
 
 impl<SA> StorageMapper<SA> for TokenAttributesMapper<SA>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
 {
     fn new(base_key: StorageKey<SA>) -> Self {
         TokenAttributesMapper {
@@ -45,7 +45,7 @@ where
 
 impl<SA> TokenAttributesMapper<SA>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
 {
     pub fn set<T: TopEncode + TopDecode + NestedEncode + NestedDecode, M: ManagedTypeApi>(
         &self,

@@ -18,7 +18,7 @@ const NULL_ENTRY: usize = 0;
 
 pub struct UnorderedSetMapper<SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
 {
     _phantom_api: PhantomData<SA>,
@@ -28,7 +28,7 @@ where
 
 impl<SA, T> StorageMapper<SA> for UnorderedSetMapper<SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode,
 {
     fn new(base_key: StorageKey<SA>) -> Self {
@@ -42,7 +42,7 @@ where
 
 impl<SA, T> StorageClearable for UnorderedSetMapper<SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode,
 {
     fn clear(&mut self) {
@@ -55,7 +55,7 @@ where
 
 impl<SA, T> UnorderedSetMapper<SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode,
 {
     fn item_index_key(&self, value: &T) -> StorageKey<SA> {
@@ -130,14 +130,14 @@ where
 /// Behaves like a MultiResultVec when an endpoint result.
 impl<SA, T> EndpointResult for UnorderedSetMapper<SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + EndpointResult,
 {
     type DecodeAs = MultiResultVec<T::DecodeAs>;
 
     fn finish<FA>(&self)
     where
-        FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static,
+        FA: ManagedTypeApi + EndpointFinishApi,
     {
         finish_all::<FA, _, _>(self.iter());
     }
@@ -146,7 +146,7 @@ where
 /// Behaves like a MultiResultVec when an endpoint result.
 impl<SA, T> TypeAbi for UnorderedSetMapper<SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + TypeAbi,
 {
     fn type_name() -> TypeName {

@@ -16,6 +16,5 @@ pub trait VMApi:
     + StorageReadApi
     + StorageWriteApi
     + PrintApi
-    + Clone
 {
 }
