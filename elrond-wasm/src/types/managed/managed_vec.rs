@@ -351,7 +351,6 @@ pub fn managed_vec_of_buffers_to_arg_buffer<M: ManagedTypeApi>(
 }
 
 pub fn managed_vec_from_slice_of_boxed_bytes<M: ManagedTypeApi>(
-    _api: M,
     data: &[BoxedBytes],
 ) -> ManagedVec<M, ManagedBuffer<M>> {
     let mut result = ManagedVec::new();
