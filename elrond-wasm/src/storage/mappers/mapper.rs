@@ -5,7 +5,7 @@ use crate::{
 
 pub trait StorageMapper<SA>: 'static
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
 {
     /// Will be called automatically by the `#[storage_mapper]` annotation generated code.
     fn new(base_key: StorageKey<SA>) -> Self;

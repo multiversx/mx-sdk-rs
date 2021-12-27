@@ -39,7 +39,7 @@ macro_rules! multi_arg_impls {
                 #[inline]
 				fn finish<FA>(&self)
                 where
-                    FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static,
+                    FA: ManagedTypeApi + EndpointFinishApi ,
                 {
                     $(
                         (self.0).$n.finish::<FA>();

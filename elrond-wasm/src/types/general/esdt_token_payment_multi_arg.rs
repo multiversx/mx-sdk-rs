@@ -72,7 +72,7 @@ where
     #[inline]
     fn finish<FA>(&self)
     where
-        FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static,
+        FA: ManagedTypeApi + EndpointFinishApi,
     {
         self.obj.token_identifier.finish::<FA>();
         self.obj.token_nonce.finish::<FA>();

@@ -49,7 +49,7 @@ fn impl_auto_impl(module_path: &ModulePath) -> proc_macro2::TokenStream {
     quote! {
         impl<A> #module_path AutoImpl for ContractObj<A>
         where
-            A: elrond_wasm::api::VMApi + Clone + 'static,
+            A: elrond_wasm::api::VMApi,
         {
         }
     }
@@ -84,7 +84,7 @@ fn impl_endpoint_wrappers(module_path: &ModulePath) -> proc_macro2::TokenStream 
     quote! {
         impl<A> #module_path EndpointWrappers for ContractObj<A>
         where
-            A: elrond_wasm::api::VMApi + Clone + 'static,
+            A: elrond_wasm::api::VMApi,
         {
         }
     }

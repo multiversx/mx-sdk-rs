@@ -13,7 +13,7 @@ type Keys<'a, SA, T> = set_mapper::Iter<'a, SA, T>;
 
 pub struct MapMapper<SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
     V: TopEncode + TopDecode + 'static,
 {
@@ -25,7 +25,7 @@ where
 
 impl<SA, K, V> StorageMapper<SA> for MapMapper<SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode,
     V: TopEncode + TopDecode,
 {
@@ -41,7 +41,7 @@ where
 
 impl<SA, K, V> StorageClearable for MapMapper<SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode,
     V: TopEncode + TopDecode,
 {
@@ -55,7 +55,7 @@ where
 
 impl<SA, K, V> MapMapper<SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode,
     V: TopEncode + TopDecode,
 {
@@ -160,7 +160,7 @@ where
 
 pub struct Iter<'a, SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
     V: TopEncode + TopDecode + 'static,
 {
@@ -170,7 +170,7 @@ where
 
 impl<'a, SA, K, V> Iter<'a, SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
     V: TopEncode + TopDecode + 'static,
 {
@@ -184,7 +184,7 @@ where
 
 impl<'a, SA, K, V> Iterator for Iter<'a, SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
     V: TopEncode + TopDecode + 'static,
 {
@@ -202,7 +202,7 @@ where
 
 pub struct Values<'a, SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
     V: TopEncode + TopDecode + 'static,
 {
@@ -212,7 +212,7 @@ where
 
 impl<'a, SA, K, V> Values<'a, SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
     V: TopEncode + TopDecode + 'static,
 {
@@ -226,7 +226,7 @@ where
 
 impl<'a, SA, K, V> Iterator for Values<'a, SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
     V: TopEncode + TopDecode + 'static,
 {
@@ -244,7 +244,7 @@ where
 
 pub enum Entry<'a, SA, K: 'a, V: 'a>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
     V: TopEncode + TopDecode + 'static,
 {
@@ -259,7 +259,7 @@ where
 /// It is part of the [`Entry`] enum.
 pub struct VacantEntry<'a, SA, K: 'a, V: 'a>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
     V: TopEncode + TopDecode + 'static,
 {
@@ -274,7 +274,7 @@ where
 /// It is part of the [`Entry`] enum.
 pub struct OccupiedEntry<'a, SA, K: 'a, V: 'a>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
     V: TopEncode + TopDecode + 'static,
 {
@@ -287,8 +287,8 @@ where
 
 impl<'a, SA, K, V> Entry<'a, SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
-    K: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
+    K: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone,
     V: TopEncode + TopDecode + 'static,
 {
     /// Ensures a value is in the entry by inserting the default if empty, and returns
@@ -351,8 +351,8 @@ where
 
 impl<'a, SA, K, V: Default> Entry<'a, SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
-    K: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
+    K: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone,
     V: TopEncode + TopDecode + 'static,
 {
     /// Ensures a value is in the entry by inserting the default value if empty,
@@ -367,8 +367,8 @@ where
 
 impl<'a, SA, K, V> VacantEntry<'a, SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
-    K: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
+    K: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone,
     V: TopEncode + TopDecode + 'static,
 {
     /// Gets a reference to the key that would be used when inserting a value
@@ -391,8 +391,8 @@ where
 
 impl<'a, SA, K, V> OccupiedEntry<'a, SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
-    K: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
+    K: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone,
     V: TopEncode + TopDecode + 'static,
 {
     /// Gets a reference to the key in the entry.

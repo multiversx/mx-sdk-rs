@@ -69,13 +69,13 @@ where
 
 impl<SA> EndpointResult for PerformActionResult<SA>
 where
-    SA: CallTypeApi + StorageWriteApi + Clone + 'static,
+    SA: CallTypeApi + StorageWriteApi,
 {
     type DecodeAs = OptionalResult<ManagedAddress<SA>>;
 
     fn finish<FA>(&self)
     where
-        FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static,
+        FA: ManagedTypeApi + EndpointFinishApi,
     {
         match self {
             PerformActionResult::Nothing => (),

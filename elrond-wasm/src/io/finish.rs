@@ -11,14 +11,14 @@ use crate::{
 
 struct ApiOutputAdapter<FA>
 where
-    FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static,
+    FA: ManagedTypeApi + EndpointFinishApi,
 {
     _phantom: PhantomData<FA>,
 }
 
 impl<FA> ApiOutputAdapter<FA>
 where
-    FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static,
+    FA: ManagedTypeApi + EndpointFinishApi,
 {
     #[inline]
     fn new() -> Self {
@@ -30,7 +30,7 @@ where
 
 impl<FA> TopEncodeOutput for ApiOutputAdapter<FA>
 where
-    FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static,
+    FA: ManagedTypeApi + EndpointFinishApi,
 {
     type NestedBuffer = ManagedBufferCachedBuilder<FA>;
 
@@ -88,12 +88,12 @@ pub trait EndpointResult: Sized {
 
     fn finish<FA>(&self)
     where
-        FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static;
+        FA: ManagedTypeApi + EndpointFinishApi;
 }
 
 pub fn finish_all<FA, I, T>(items: I)
 where
-    FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static,
+    FA: ManagedTypeApi + EndpointFinishApi,
     I: Iterator<Item = T>,
     T: EndpointResult,
 {
@@ -111,7 +111,7 @@ where
 
     fn finish<FA>(&self)
     where
-        FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static,
+        FA: ManagedTypeApi + EndpointFinishApi,
     {
         self.top_encode_or_exit(ApiOutputAdapter::<FA>::new(), (), finish_exit::<FA>);
     }

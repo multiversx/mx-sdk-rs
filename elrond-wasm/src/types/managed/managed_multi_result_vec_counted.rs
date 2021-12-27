@@ -103,7 +103,7 @@ where
     #[inline]
     fn finish<FA>(&self)
     where
-        FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static,
+        FA: ManagedTypeApi + EndpointFinishApi,
     {
         self.len().finish::<FA>();
         finish_all::<FA, _, _>(self.contents.into_iter());

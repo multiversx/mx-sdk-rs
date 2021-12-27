@@ -7,14 +7,7 @@ use super::{BigIntApi, EllipticCurveApi, ManagedBufferApi, StaticBufferApi};
 pub type Handle = i32;
 
 pub trait ManagedTypeApiImpl:
-    TryStaticCast
-    + BigIntApi
-    + EllipticCurveApi
-    + ManagedBufferApi
-    + StaticBufferApi
-    + ErrorApi
-    + Clone
-    + 'static
+    TryStaticCast + BigIntApi + EllipticCurveApi + ManagedBufferApi + StaticBufferApi + ErrorApi
 {
     const TICKER_MIN_LENGTH: usize = 3;
     const TICKER_MAX_LENGTH: usize = 10;

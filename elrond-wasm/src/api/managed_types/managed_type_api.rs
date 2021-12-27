@@ -4,7 +4,7 @@ use crate::api::ErrorApi;
 
 use super::ManagedTypeApiImpl;
 
-pub trait ManagedTypeApi: TryStaticCast + ErrorApi + Clone + 'static {
+pub trait ManagedTypeApi: TryStaticCast + ErrorApi {
     type Impl: ManagedTypeApiImpl;
 
     fn instance() -> Self::Impl;

@@ -13,7 +13,7 @@ use elrond_codec::{TopDecode, TopEncode};
 /// Manages a single serializable item in storage.
 pub struct SingleValueMapper<SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
     T: TopEncode + TopDecode + 'static,
 {
     key: StorageKey<SA>,
@@ -23,7 +23,7 @@ where
 
 impl<SA, T> StorageMapper<SA> for SingleValueMapper<SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
     T: TopEncode + TopDecode,
 {
     #[inline]
@@ -38,7 +38,7 @@ where
 
 impl<SA, T> SingleValueMapper<SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
     T: TopEncode + TopDecode,
 {
     /// Retrieves current value from storage.
@@ -92,14 +92,14 @@ where
 
 impl<SA, T> EndpointResult for SingleValueMapper<SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
     T: TopEncode + TopDecode + EndpointResult,
 {
     type DecodeAs = T::DecodeAs;
 
     fn finish<FA>(&self)
     where
-        FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static,
+        FA: ManagedTypeApi + EndpointFinishApi,
     {
         self.get().finish::<FA>();
     }
@@ -107,7 +107,7 @@ where
 
 impl<SA, T> TypeAbi for SingleValueMapper<SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
     T: TopEncode + TopDecode + TypeAbi,
 {
     fn type_name() -> TypeName {

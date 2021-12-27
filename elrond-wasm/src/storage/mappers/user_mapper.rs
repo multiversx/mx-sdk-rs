@@ -25,7 +25,7 @@ const COUNT_SUFFIX: &[u8] = b"_count";
 /// It also doesn't allow removing users. Once in, their ids are reserved forever.
 pub struct UserMapper<SA>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
 {
     _phantom_api: PhantomData<SA>,
     base_key: StorageKey<SA>,
@@ -33,7 +33,7 @@ where
 
 impl<SA> StorageMapper<SA> for UserMapper<SA>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
 {
     fn new(base_key: StorageKey<SA>) -> Self {
         UserMapper {
@@ -45,7 +45,7 @@ where
 
 impl<SA> UserMapper<SA>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
 {
     fn get_user_id_key(&self, address: &ManagedAddress<SA>) -> StorageKey<SA> {
         let mut user_id_key = self.base_key.clone();
@@ -177,13 +177,13 @@ where
 /// and lists all users addresses.
 impl<SA> EndpointResult for UserMapper<SA>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
 {
     type DecodeAs = MultiResultVec<ManagedAddress<SA>>;
 
     fn finish<FA>(&self)
     where
-        FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static,
+        FA: ManagedTypeApi + EndpointFinishApi,
     {
         let all_addresses = self.get_all_addresses();
         finish_all::<FA, _, _>(all_addresses.into_iter());
@@ -193,7 +193,7 @@ where
 /// Behaves like a MultiResultVec when an endpoint result.
 impl<SA> TypeAbi for UserMapper<SA>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
 {
     fn type_name() -> TypeName {
         crate::types::MultiResultVec::<ManagedAddress<SA>>::type_name()

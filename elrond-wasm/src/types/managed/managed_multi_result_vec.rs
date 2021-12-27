@@ -166,7 +166,7 @@ where
     #[inline]
     fn finish<FA>(&self)
     where
-        FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static,
+        FA: ManagedTypeApi + EndpointFinishApi,
     {
         finish_all::<FA, _, _>(self.raw_buffers.into_iter());
     }

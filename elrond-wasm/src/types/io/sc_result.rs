@@ -119,7 +119,7 @@ where
     #[inline]
     fn finish<FA>(&self)
     where
-        FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static,
+        FA: ManagedTypeApi + EndpointFinishApi,
     {
         match self {
             SCResult::Ok(t) => {

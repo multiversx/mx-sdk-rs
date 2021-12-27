@@ -263,7 +263,7 @@ mod sample_adder {
     /////////////////////////////////////////////////////////////////////////////////////////////////
     pub struct ContractObj<A>
     where
-        A: elrond_wasm::api::VMApi + Clone + 'static,
+        A: elrond_wasm::api::VMApi,
     {
         api: A,
     }
@@ -273,7 +273,7 @@ mod sample_adder {
     /////////////////////////////////////////////////////////////////////////////////////////////////
     impl<A> elrond_wasm::contract_base::ContractBase for ContractObj<A>
     where
-        A: elrond_wasm::api::VMApi + Clone + 'static,
+        A: elrond_wasm::api::VMApi,
     {
         type Api = A;
 
@@ -282,23 +282,17 @@ mod sample_adder {
         }
     }
 
-    impl<A> super::module_1::AutoImpl for ContractObj<A> where
-        A: elrond_wasm::api::VMApi + Clone + 'static
-    {
-    }
+    impl<A> super::module_1::AutoImpl for ContractObj<A> where A: elrond_wasm::api::VMApi {}
 
-    impl<A> AutoImpl for ContractObj<A> where A: elrond_wasm::api::VMApi + Clone + 'static {}
+    impl<A> AutoImpl for ContractObj<A> where A: elrond_wasm::api::VMApi {}
 
-    impl<A> super::module_1::EndpointWrappers for ContractObj<A> where
-        A: elrond_wasm::api::VMApi + Clone + 'static
-    {
-    }
+    impl<A> super::module_1::EndpointWrappers for ContractObj<A> where A: elrond_wasm::api::VMApi {}
 
-    impl<A> EndpointWrappers for ContractObj<A> where A: elrond_wasm::api::VMApi + Clone + 'static {}
+    impl<A> EndpointWrappers for ContractObj<A> where A: elrond_wasm::api::VMApi {}
 
     impl<A> elrond_wasm::contract_base::CallableContract<A> for ContractObj<A>
     where
-        A: elrond_wasm::api::VMApi + Clone + 'static,
+        A: elrond_wasm::api::VMApi,
     {
         fn call(&self, fn_name: &[u8]) -> bool {
             EndpointWrappers::call(self, fn_name)
@@ -320,7 +314,7 @@ mod sample_adder {
 
     pub fn contract_obj<A>(api: A) -> ContractObj<A>
     where
-        A: elrond_wasm::api::VMApi + Clone + 'static,
+        A: elrond_wasm::api::VMApi,
     {
         ContractObj { api }
     }
