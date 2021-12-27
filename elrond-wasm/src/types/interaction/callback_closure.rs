@@ -58,7 +58,6 @@ impl<M: ManagedTypeApi + ErrorApi> CallbackClosure<M> {
     }
 
     pub fn storage_load_and_clear<A: BlockchainApi + StorageReadApi + StorageWriteApi>(
-        _api: A,
     ) -> Option<Self> {
         let storage_key = cb_closure_storage_key::<A>();
         let storage_value_raw: ManagedBuffer<A> = storage_get(storage_key.as_ref());

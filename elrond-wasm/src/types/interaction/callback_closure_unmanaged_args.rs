@@ -30,7 +30,6 @@ impl<M: ManagedTypeApi> CallbackClosureUnmanagedArgs<M> {
     }
 
     pub fn storage_load_and_clear<A: BlockchainApi + StorageReadApi + StorageWriteApi>(
-        _api: A,
     ) -> Option<Self> {
         let storage_key = super::callback_closure::cb_closure_storage_key::<A>();
         if storage_get_len(storage_key.as_ref()) > 0 {
