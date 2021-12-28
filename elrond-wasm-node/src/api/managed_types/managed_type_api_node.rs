@@ -17,7 +17,7 @@ extern "C" {
 impl ManagedTypeApi for VmApiImpl {
     type Impl = VmApiImpl;
 
-    fn instance() -> Self {
+    fn managed_type_impl() -> Self {
         VmApiImpl {}
     }
 }
