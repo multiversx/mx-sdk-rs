@@ -2,7 +2,7 @@ use core::ops::{
     Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Rem, RemAssign, Sub, SubAssign,
 };
 
-use crate::api::ManagedTypeApi;
+use crate::api::{BigIntApi, ManagedTypeApi};
 
 use super::{BigInt, ManagedType};
 
@@ -12,7 +12,7 @@ macro_rules! binary_operator {
             type Output = BigInt<M>;
 
             fn $method(self, other: BigInt<M>) -> BigInt<M> {
-                let api = M::instance();
+                let api = M::managed_type_impl();
                 api.$api_func(self.handle, self.handle, other.handle);
                 BigInt::from_raw_handle(self.handle)
             }
@@ -22,7 +22,7 @@ macro_rules! binary_operator {
             type Output = BigInt<M>;
 
             fn $method(self, other: &BigInt<M>) -> BigInt<M> {
-                let api = M::instance();
+                let api = M::managed_type_impl();
                 let result = api.bi_new_zero();
                 api.$api_func(result, self.handle, other.handle);
                 BigInt::from_raw_handle(result)
@@ -42,7 +42,7 @@ macro_rules! binary_assign_operator {
         impl<M: ManagedTypeApi> $trait<BigInt<M>> for BigInt<M> {
             #[inline]
             fn $method(&mut self, other: Self) {
-                let api = M::instance();
+                let api = M::managed_type_impl();
                 api.$api_func(self.handle, self.handle, other.handle);
             }
         }
@@ -50,7 +50,7 @@ macro_rules! binary_assign_operator {
         impl<M: ManagedTypeApi> $trait<&BigInt<M>> for BigInt<M> {
             #[inline]
             fn $method(&mut self, other: &BigInt<M>) {
-                let api = M::instance();
+                let api = M::managed_type_impl();
                 api.$api_func(self.handle, self.handle, other.handle);
             }
         }
@@ -67,7 +67,7 @@ impl<M: ManagedTypeApi> Neg for BigInt<M> {
     type Output = BigInt<M>;
 
     fn neg(self) -> Self::Output {
-        let api = M::instance();
+        let api = M::managed_type_impl();
         let result = api.bi_new_zero();
         api.bi_neg(result, self.handle);
         BigInt::from_raw_handle(result)

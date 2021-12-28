@@ -63,12 +63,12 @@ where
     type DecodeAs = OptionalArg<T::DecodeAs>;
 
     #[inline]
-    fn finish<FA>(&self, api: FA)
+    fn finish<FA>(&self)
     where
-        FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static,
+        FA: ManagedTypeApi + EndpointFinishApi,
     {
         if let OptionalResult::Some(t) = self {
-            t.finish(api);
+            t.finish::<FA>();
         }
     }
 }

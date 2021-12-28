@@ -101,12 +101,12 @@ where
     type DecodeAs = ManagedCountedMultiResultVec<M, T>;
 
     #[inline]
-    fn finish<FA>(&self, api: FA)
+    fn finish<FA>(&self)
     where
-        FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static,
+        FA: ManagedTypeApi + EndpointFinishApi,
     {
-        self.len().finish(api.clone());
-        finish_all(api, self.contents.into_iter());
+        self.len().finish::<FA>();
+        finish_all::<FA, _, _>(self.contents.into_iter());
     }
 }
 

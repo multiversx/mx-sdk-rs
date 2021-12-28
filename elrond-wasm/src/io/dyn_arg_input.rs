@@ -1,5 +1,5 @@
 use crate::{
-    api::{ErrorApi, ManagedTypeApi},
+    api::{ErrorApi, ErrorApiImpl, ManagedTypeApi},
     err_msg,
 };
 use elrond_codec::TopDecodeInput;
@@ -24,9 +24,7 @@ use elrond_codec::TopDecodeInput;
 pub trait DynArgInput {
     type ItemInput: TopDecodeInput;
 
-    type ErrorApi: ErrorApi + ManagedTypeApi + Sized;
-
-    fn dyn_arg_vm_api(&self) -> Self::ErrorApi;
+    type ManagedTypeErrorApi: ManagedTypeApi + ErrorApi;
 
     /// Check if there are more arguments that can be loaded.
     fn has_next(&self) -> bool;
@@ -40,8 +38,7 @@ pub trait DynArgInput {
     /// Called after retrieving all arguments to validate that extra arguments were not provided.
     fn assert_no_more_args(&self) {
         if self.has_next() {
-            self.dyn_arg_vm_api()
-                .signal_error(err_msg::ARG_WRONG_NUMBER);
+            Self::ManagedTypeErrorApi::error_api_impl().signal_error(err_msg::ARG_WRONG_NUMBER);
         }
     }
 

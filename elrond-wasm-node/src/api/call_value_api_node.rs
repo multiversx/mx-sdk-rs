@@ -1,6 +1,6 @@
 use super::VmApiImpl;
 use elrond_wasm::{
-    api::CallValueApi,
+    api::{CallValueApi, CallValueApiImpl},
     types::{BigUint, EsdtTokenType, ManagedType, TokenIdentifier},
 };
 
@@ -34,6 +34,17 @@ extern "C" {
 }
 
 impl CallValueApi for VmApiImpl {
+    type CallValueApiImpl = VmApiImpl;
+
+    #[inline]
+    fn call_value_api_impl() -> Self::CallValueApiImpl {
+        VmApiImpl {}
+    }
+}
+
+impl CallValueApiImpl for VmApiImpl {
+    type ManagedTypeApi = VmApiImpl;
+
     #[inline]
     fn check_not_payable(&self) {
         unsafe {

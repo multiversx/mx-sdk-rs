@@ -1,6 +1,6 @@
 use super::{
-    BlockchainApi, CallValueApi, CryptoApi, EndpointArgumentApi, EndpointFinishApi, ErrorApi,
-    LogApi, ManagedTypeApi, PrintApi, SendApi, StorageReadApi, StorageWriteApi,
+    BlockchainApi, CallTypeApi, CallValueApi, CryptoApi, EndpointArgumentApi, EndpointFinishApi,
+    ErrorApi, LogApi, PrintApi, SendApi, StorageMapperApi, StorageReadApi, StorageWriteApi,
 };
 
 pub trait VMApi:
@@ -11,11 +11,12 @@ pub trait VMApi:
     + EndpointFinishApi
     + ErrorApi
     + LogApi
-    + ManagedTypeApi
     + SendApi
     + StorageReadApi
     + StorageWriteApi
     + PrintApi
-    + Clone
+    + CallTypeApi
+    + StorageMapperApi
+    + Clone // TODO: remove
 {
 }

@@ -1,10 +1,21 @@
 use crate::{tx_mock::TxPanic, DebugApi};
 use alloc::vec::Vec;
-use elrond_wasm::api::{BigIntApi, Handle, ManagedBufferApi, StorageReadApi, StorageWriteApi};
+use elrond_wasm::api::{
+    BigIntApi, Handle, ManagedBufferApi, StorageReadApi, StorageReadApiImpl, StorageWriteApi,
+    StorageWriteApiImpl,
+};
 use num_bigint::{BigInt, BigUint, Sign};
 use num_traits::ToPrimitive;
 
 impl StorageReadApi for DebugApi {
+    type StorageReadApiImpl = DebugApi;
+
+    fn storage_read_api_impl() -> Self::StorageReadApiImpl {
+        DebugApi::new_from_static()
+    }
+}
+
+impl StorageReadApiImpl for DebugApi {
     fn storage_load_len(&self, key: &[u8]) -> usize {
         self.storage_load_vec_u8(key).len()
     }
@@ -63,6 +74,14 @@ impl StorageReadApi for DebugApi {
 }
 
 impl StorageWriteApi for DebugApi {
+    type StorageWriteApiImpl = DebugApi;
+
+    fn storage_write_api_impl() -> Self::StorageWriteApiImpl {
+        DebugApi::new_from_static()
+    }
+}
+
+impl StorageWriteApiImpl for DebugApi {
     fn storage_store_slice_u8(&self, key: &[u8], value: &[u8]) {
         // TODO: extract magic strings somewhere
         if key.starts_with(&b"ELROND"[..]) {

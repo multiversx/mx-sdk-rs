@@ -4,6 +4,12 @@ use alloc::vec::Vec;
 use super::Handle;
 
 pub trait StorageReadApi {
+    type StorageReadApiImpl: StorageReadApiImpl;
+
+    fn storage_read_api_impl() -> Self::StorageReadApiImpl;
+}
+
+pub trait StorageReadApiImpl {
     fn storage_load_len(&self, key: &[u8]) -> usize;
 
     fn storage_load_vec_u8(&self, key: &[u8]) -> Vec<u8>;
@@ -24,6 +30,12 @@ pub trait StorageReadApi {
 }
 
 pub trait StorageWriteApi {
+    type StorageWriteApiImpl: StorageWriteApiImpl;
+
+    fn storage_write_api_impl() -> Self::StorageWriteApiImpl;
+}
+
+pub trait StorageWriteApiImpl {
     fn storage_store_slice_u8(&self, key: &[u8], value: &[u8]);
 
     fn storage_store_big_uint_raw(&self, key: &[u8], value_handle: Handle);

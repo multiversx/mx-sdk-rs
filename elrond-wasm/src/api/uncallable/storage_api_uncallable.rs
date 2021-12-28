@@ -1,7 +1,19 @@
-use crate::api::{Handle, StorageReadApi, StorageWriteApi};
+use crate::api::{
+    Handle, StorageReadApi, StorageReadApiImpl, StorageWriteApi, StorageWriteApiImpl,
+};
 use alloc::vec::Vec;
 
-impl StorageReadApi for super::UncallableApi {
+use super::UncallableApi;
+
+impl StorageReadApi for UncallableApi {
+    type StorageReadApiImpl = UncallableApi;
+
+    fn storage_read_api_impl() -> Self::StorageReadApiImpl {
+        unreachable!()
+    }
+}
+
+impl StorageReadApiImpl for UncallableApi {
     fn storage_load_len(&self, _key: &[u8]) -> usize {
         unreachable!()
     }
@@ -31,7 +43,15 @@ impl StorageReadApi for super::UncallableApi {
     }
 }
 
-impl StorageWriteApi for super::UncallableApi {
+impl StorageWriteApi for UncallableApi {
+    type StorageWriteApiImpl = UncallableApi;
+
+    fn storage_write_api_impl() -> Self::StorageWriteApiImpl {
+        unreachable!()
+    }
+}
+
+impl StorageWriteApiImpl for super::UncallableApi {
     fn storage_store_slice_u8(&self, _key: &[u8], _value: &[u8]) {
         unreachable!()
     }
