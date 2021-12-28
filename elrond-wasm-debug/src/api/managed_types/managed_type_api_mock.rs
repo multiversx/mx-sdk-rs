@@ -6,7 +6,7 @@ use crate::DebugApi;
 impl ManagedTypeApi for DebugApi {
     type Impl = DebugApi;
 
-    fn instance() -> Self {
+    fn managed_type_impl() -> Self {
         DebugApi::new_from_static()
     }
 }
