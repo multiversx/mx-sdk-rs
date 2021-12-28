@@ -47,13 +47,13 @@ impl<T, E> SCResult<T, E> {
 
     #[inline]
     /// Returns the contained Ok value or signals the error and exits.
-    pub fn unwrap_or_signal_error<FA: EndpointFinishApi>(self, api: FA) -> T
+    pub fn unwrap_or_signal_error<FA: EndpointFinishApi>(self) -> T
     where
         E: SCError,
     {
         match self {
             SCResult::Ok(t) => t,
-            SCResult::Err(e) => e.finish_err(api),
+            SCResult::Err(e) => e.finish_err::<FA>(),
         }
     }
 
@@ -117,16 +117,16 @@ where
     type DecodeAs = T::DecodeAs;
 
     #[inline]
-    fn finish<FA>(&self, api: FA)
+    fn finish<FA>(&self)
     where
-        FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static,
+        FA: ManagedTypeApi + EndpointFinishApi,
     {
         match self {
             SCResult::Ok(t) => {
-                t.finish(api);
+                t.finish::<FA>();
             },
             SCResult::Err(e) => {
-                e.finish_err(api);
+                e.finish_err::<FA>();
             },
         }
     }

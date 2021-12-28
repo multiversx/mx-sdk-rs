@@ -14,9 +14,9 @@ where
     M: ManagedTypeApi,
     T: ManagedType<M>,
 {
-    _phantom_m: PhantomData<M>,
-    _phantom_t: PhantomData<&'a T>,
-    handle: Handle,
+    pub(super) _phantom_m: PhantomData<M>,
+    pub(super) _phantom_t: PhantomData<&'a T>,
+    pub(super) handle: Handle,
 }
 
 impl<'a, M, T> ManagedRef<'a, M, T>
@@ -51,6 +51,7 @@ where
     M: ManagedTypeApi,
     T: ManagedType<M>,
 {
+    #[inline]
     fn clone(&self) -> Self {
         *self
     }
@@ -63,6 +64,7 @@ where
 {
     type Target = T;
 
+    #[inline]
     fn deref(&self) -> &Self::Target {
         Self::Target::transmute_from_handle_ref(&self.handle)
     }
@@ -73,6 +75,7 @@ where
     M: ManagedTypeApi,
     T: ManagedType<M>,
 {
+    #[inline]
     fn from(value_ref: &'a T) -> Self {
         Self::new(value_ref)
     }

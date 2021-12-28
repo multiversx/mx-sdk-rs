@@ -1,5 +1,7 @@
+use core::marker::PhantomData;
+
 use crate::{
-    api::SendApi,
+    api::{BlockchainApiImpl, SendApi, SendApiImpl},
     types::{BigUint, CodeMetadata, ManagedAddress, ManagedBuffer, ManagedVec},
     ContractCallArg,
 };
@@ -16,7 +18,7 @@ pub struct ContractDeploy<SA>
 where
     SA: SendApi + 'static,
 {
-    api: SA,
+    _phantom: PhantomData<SA>,
     to: ManagedAddress<SA>, // only used for Upgrade, ignored for Deploy
     egld_payment: BigUint<SA>,
     explicit_gas_limit: u64,
@@ -25,13 +27,31 @@ where
 
 /// Syntactical sugar to help macros to generate code easier.
 /// Unlike calling `ContractDeploy::<SA>::new`, here types can be inferred from the context.
-pub fn new_contract_deploy<SA>(api: SA, to: ManagedAddress<SA>) -> ContractDeploy<SA>
+pub fn new_contract_deploy<SA>(to: ManagedAddress<SA>) -> ContractDeploy<SA>
 where
     SA: SendApi + 'static,
 {
-    let mut contract_deploy = ContractDeploy::<SA>::new(api);
+    let mut contract_deploy = ContractDeploy::<SA>::new();
     contract_deploy.to = to;
     contract_deploy
+}
+
+impl<SA> Default for ContractDeploy<SA>
+where
+    SA: SendApi + 'static,
+{
+    fn default() -> Self {
+        let zero = BigUint::zero();
+        let zero_address = ManagedAddress::zero();
+        let arg_buffer = ManagedArgBuffer::new_empty();
+        ContractDeploy {
+            _phantom: PhantomData,
+            to: zero_address,
+            egld_payment: zero,
+            explicit_gas_limit: UNSPECIFIED_GAS_LIMIT,
+            arg_buffer,
+        }
+    }
 }
 
 #[allow(clippy::return_self_not_must_use)]
@@ -39,17 +59,8 @@ impl<SA> ContractDeploy<SA>
 where
     SA: SendApi + 'static,
 {
-    pub fn new(api: SA) -> Self {
-        let zero = BigUint::zero();
-        let zero_address = ManagedAddress::zero();
-        let arg_buffer = ManagedArgBuffer::new_empty();
-        ContractDeploy {
-            api,
-            to: zero_address,
-            egld_payment: zero,
-            explicit_gas_limit: UNSPECIFIED_GAS_LIMIT,
-            arg_buffer,
-        }
+    pub fn new() -> Self {
+        Self::default()
     }
 
     pub fn with_egld_transfer(mut self, payment_amount: BigUint<SA>) -> Self {
@@ -77,7 +88,7 @@ where
 
     fn resolve_gas_limit(&self) -> u64 {
         if self.explicit_gas_limit == UNSPECIFIED_GAS_LIMIT {
-            self.api.get_gas_left()
+            SA::blockchain_api_impl().get_gas_left()
         } else {
             self.explicit_gas_limit
         }
@@ -95,7 +106,7 @@ where
         code: &ManagedBuffer<SA>,
         code_metadata: CodeMetadata,
     ) -> (ManagedAddress<SA>, ManagedVec<SA, ManagedBuffer<SA>>) {
-        self.api.deploy_contract(
+        SA::send_api_impl().deploy_contract(
             self.resolve_gas_limit(),
             &self.egld_payment,
             code,
@@ -109,7 +120,7 @@ where
         source_address: &ManagedAddress<SA>,
         code_metadata: CodeMetadata,
     ) -> (ManagedAddress<SA>, ManagedVec<SA, ManagedBuffer<SA>>) {
-        self.api.deploy_from_source_contract(
+        SA::send_api_impl().deploy_from_source_contract(
             self.resolve_gas_limit(),
             &self.egld_payment,
             source_address,
@@ -123,7 +134,7 @@ where
         source_address: &ManagedAddress<SA>,
         code_metadata: CodeMetadata,
     ) {
-        self.api.upgrade_from_source_contract(
+        SA::send_api_impl().upgrade_from_source_contract(
             &self.to,
             self.resolve_gas_limit(),
             &self.egld_payment,
@@ -134,7 +145,7 @@ where
     }
 
     pub fn upgrade_contract(self, code: &ManagedBuffer<SA>, code_metadata: CodeMetadata) {
-        self.api.upgrade_contract(
+        SA::send_api_impl().upgrade_contract(
             &self.to,
             self.resolve_gas_limit(),
             &self.egld_payment,

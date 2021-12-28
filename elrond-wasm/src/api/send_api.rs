@@ -4,55 +4,67 @@ use crate::types::{
     ManagedVec, TokenIdentifier,
 };
 
+pub trait SendApi: ManagedTypeApi + BlockchainApi {
+    type SendApiImpl: SendApiImpl<ManagedTypeApi = Self>;
+
+    fn send_api_impl() -> Self::SendApiImpl;
+}
+
 /// API that groups methods that either send EGLD or ESDT, or that call other contracts.
-pub trait SendApi: ManagedTypeApi + BlockchainApi + Clone + Sized {
+pub trait SendApiImpl {
+    type ManagedTypeApi: ManagedTypeApi;
+
     /// Sends EGLD to a given address, directly.
     /// Used especially for sending EGLD to regular accounts.
-    fn direct_egld<D>(&self, to: &ManagedAddress<Self>, amount: &BigUint<Self>, data: D)
-    where
-        D: Into<ManagedBuffer<Self>>;
+    fn direct_egld<D>(
+        &self,
+        to: &ManagedAddress<Self::ManagedTypeApi>,
+        amount: &BigUint<Self::ManagedTypeApi>,
+        data: D,
+    ) where
+        D: Into<ManagedBuffer<Self::ManagedTypeApi>>;
 
     /// Sends EGLD to an address (optionally) and executes like an async call, but without callback.
     fn direct_egld_execute(
         &self,
-        to: &ManagedAddress<Self>,
-        amount: &BigUint<Self>,
+        to: &ManagedAddress<Self::ManagedTypeApi>,
+        amount: &BigUint<Self::ManagedTypeApi>,
         gas_limit: u64,
-        endpoint_name: &ManagedBuffer<Self>,
-        arg_buffer: &ManagedArgBuffer<Self>,
+        endpoint_name: &ManagedBuffer<Self::ManagedTypeApi>,
+        arg_buffer: &ManagedArgBuffer<Self::ManagedTypeApi>,
     ) -> Result<(), &'static [u8]>;
 
     /// Sends ESDT to an address and executes like an async call, but without callback.
     fn direct_esdt_execute(
         &self,
-        to: &ManagedAddress<Self>,
-        token: &TokenIdentifier<Self>,
-        amount: &BigUint<Self>,
+        to: &ManagedAddress<Self::ManagedTypeApi>,
+        token: &TokenIdentifier<Self::ManagedTypeApi>,
+        amount: &BigUint<Self::ManagedTypeApi>,
         gas_limit: u64,
-        endpoint_name: &ManagedBuffer<Self>,
-        arg_buffer: &ManagedArgBuffer<Self>,
+        endpoint_name: &ManagedBuffer<Self::ManagedTypeApi>,
+        arg_buffer: &ManagedArgBuffer<Self::ManagedTypeApi>,
     ) -> Result<(), &'static [u8]>;
 
     /// Sends ESDT NFT to an address and executes like an async call, but without callback.
     #[allow(clippy::too_many_arguments)]
     fn direct_esdt_nft_execute(
         &self,
-        to: &ManagedAddress<Self>,
-        token: &TokenIdentifier<Self>,
+        to: &ManagedAddress<Self::ManagedTypeApi>,
+        token: &TokenIdentifier<Self::ManagedTypeApi>,
         nonce: u64,
-        amount: &BigUint<Self>,
+        amount: &BigUint<Self::ManagedTypeApi>,
         gas_limit: u64,
-        endpoint_name: &ManagedBuffer<Self>,
-        arg_buffer: &ManagedArgBuffer<Self>,
+        endpoint_name: &ManagedBuffer<Self::ManagedTypeApi>,
+        arg_buffer: &ManagedArgBuffer<Self::ManagedTypeApi>,
     ) -> Result<(), &'static [u8]>;
 
     fn direct_multi_esdt_transfer_execute(
         &self,
-        to: &ManagedAddress<Self>,
-        payments: &ManagedVec<Self, EsdtTokenPayment<Self>>,
+        to: &ManagedAddress<Self::ManagedTypeApi>,
+        payments: &ManagedVec<Self::ManagedTypeApi, EsdtTokenPayment<Self::ManagedTypeApi>>,
         gas_limit: u64,
-        endpoint_name: &ManagedBuffer<Self>,
-        arg_buffer: &ManagedArgBuffer<Self>,
+        endpoint_name: &ManagedBuffer<Self::ManagedTypeApi>,
+        arg_buffer: &ManagedArgBuffer<Self::ManagedTypeApi>,
     ) -> Result<(), &'static [u8]>;
 
     /// Sends an asynchronous call to another contract.
@@ -63,10 +75,10 @@ pub trait SendApi: ManagedTypeApi + BlockchainApi + Clone + Sized {
     /// Use a `HexCallDataSerializer` to prepare this field.
     fn async_call_raw(
         &self,
-        to: &ManagedAddress<Self>,
-        amount: &BigUint<Self>,
-        endpoint_name: &ManagedBuffer<Self>,
-        arg_buffer: &ManagedArgBuffer<Self>,
+        to: &ManagedAddress<Self::ManagedTypeApi>,
+        amount: &BigUint<Self::ManagedTypeApi>,
+        endpoint_name: &ManagedBuffer<Self::ManagedTypeApi>,
+        arg_buffer: &ManagedArgBuffer<Self::ManagedTypeApi>,
     ) -> !;
 
     /// Deploys a new contract in the same shard.
@@ -76,11 +88,14 @@ pub trait SendApi: ManagedTypeApi + BlockchainApi + Clone + Sized {
     fn deploy_contract(
         &self,
         gas: u64,
-        amount: &BigUint<Self>,
-        code: &ManagedBuffer<Self>,
+        amount: &BigUint<Self::ManagedTypeApi>,
+        code: &ManagedBuffer<Self::ManagedTypeApi>,
         code_metadata: CodeMetadata,
-        arg_buffer: &ManagedArgBuffer<Self>,
-    ) -> (ManagedAddress<Self>, ManagedVec<Self, ManagedBuffer<Self>>);
+        arg_buffer: &ManagedArgBuffer<Self::ManagedTypeApi>,
+    ) -> (
+        ManagedAddress<Self::ManagedTypeApi>,
+        ManagedVec<Self::ManagedTypeApi, ManagedBuffer<Self::ManagedTypeApi>>,
+    );
 
     /// Deploys a new contract in the same shard by re-using the code of an already deployed source contract.
     /// The deployment is done synchronously and the new contract's address is returned.
@@ -88,20 +103,23 @@ pub trait SendApi: ManagedTypeApi + BlockchainApi + Clone + Sized {
     fn deploy_from_source_contract(
         &self,
         gas: u64,
-        amount: &BigUint<Self>,
-        source_contract_address: &ManagedAddress<Self>,
+        amount: &BigUint<Self::ManagedTypeApi>,
+        source_contract_address: &ManagedAddress<Self::ManagedTypeApi>,
         code_metadata: CodeMetadata,
-        arg_buffer: &ManagedArgBuffer<Self>,
-    ) -> (ManagedAddress<Self>, ManagedVec<Self, ManagedBuffer<Self>>);
+        arg_buffer: &ManagedArgBuffer<Self::ManagedTypeApi>,
+    ) -> (
+        ManagedAddress<Self::ManagedTypeApi>,
+        ManagedVec<Self::ManagedTypeApi, ManagedBuffer<Self::ManagedTypeApi>>,
+    );
 
     fn upgrade_from_source_contract(
         &self,
-        sc_address: &ManagedAddress<Self>,
+        sc_address: &ManagedAddress<Self::ManagedTypeApi>,
         gas: u64,
-        amount: &BigUint<Self>,
-        source_contract_address: &ManagedAddress<Self>,
+        amount: &BigUint<Self::ManagedTypeApi>,
+        source_contract_address: &ManagedAddress<Self::ManagedTypeApi>,
         code_metadata: CodeMetadata,
-        arg_buffer: &ManagedArgBuffer<Self>,
+        arg_buffer: &ManagedArgBuffer<Self::ManagedTypeApi>,
     );
 
     /// Upgrades a child contract of the currently executing contract.
@@ -109,23 +127,23 @@ pub trait SendApi: ManagedTypeApi + BlockchainApi + Clone + Sized {
     /// The child contract's new init function will be called with the provided arguments
     fn upgrade_contract(
         &self,
-        sc_address: &ManagedAddress<Self>,
+        sc_address: &ManagedAddress<Self::ManagedTypeApi>,
         gas: u64,
-        amount: &BigUint<Self>,
-        code: &ManagedBuffer<Self>,
+        amount: &BigUint<Self::ManagedTypeApi>,
+        code: &ManagedBuffer<Self::ManagedTypeApi>,
         code_metadata: CodeMetadata,
-        arg_buffer: &ManagedArgBuffer<Self>,
+        arg_buffer: &ManagedArgBuffer<Self::ManagedTypeApi>,
     );
 
     /// Same shard, in-line execution of another contract.
     fn execute_on_dest_context_raw(
         &self,
         gas: u64,
-        address: &ManagedAddress<Self>,
-        value: &BigUint<Self>,
-        endpoint_name: &ManagedBuffer<Self>,
-        arg_buffer: &ManagedArgBuffer<Self>,
-    ) -> ManagedVec<Self, ManagedBuffer<Self>>;
+        address: &ManagedAddress<Self::ManagedTypeApi>,
+        value: &BigUint<Self::ManagedTypeApi>,
+        endpoint_name: &ManagedBuffer<Self::ManagedTypeApi>,
+        arg_buffer: &ManagedArgBuffer<Self::ManagedTypeApi>,
+    ) -> ManagedVec<Self::ManagedTypeApi, ManagedBuffer<Self::ManagedTypeApi>>;
 
     /// Same shard, in-line execution of another contract.
     /// Allows the contract to specify which result range to extract as sync call result.
@@ -137,46 +155,46 @@ pub trait SendApi: ManagedTypeApi + BlockchainApi + Clone + Sized {
     fn execute_on_dest_context_raw_custom_result_range<F>(
         &self,
         gas: u64,
-        address: &ManagedAddress<Self>,
-        value: &BigUint<Self>,
-        endpoint_name: &ManagedBuffer<Self>,
-        arg_buffer: &ManagedArgBuffer<Self>,
+        address: &ManagedAddress<Self::ManagedTypeApi>,
+        value: &BigUint<Self::ManagedTypeApi>,
+        endpoint_name: &ManagedBuffer<Self::ManagedTypeApi>,
+        arg_buffer: &ManagedArgBuffer<Self::ManagedTypeApi>,
         range_closure: F,
-    ) -> ManagedVec<Self, ManagedBuffer<Self>>
+    ) -> ManagedVec<Self::ManagedTypeApi, ManagedBuffer<Self::ManagedTypeApi>>
     where
         F: FnOnce(usize, usize) -> (usize, usize);
 
     fn execute_on_dest_context_by_caller_raw(
         &self,
         gas: u64,
-        address: &ManagedAddress<Self>,
-        value: &BigUint<Self>,
-        endpoint_name: &ManagedBuffer<Self>,
-        arg_buffer: &ManagedArgBuffer<Self>,
-    ) -> ManagedVec<Self, ManagedBuffer<Self>>;
+        address: &ManagedAddress<Self::ManagedTypeApi>,
+        value: &BigUint<Self::ManagedTypeApi>,
+        endpoint_name: &ManagedBuffer<Self::ManagedTypeApi>,
+        arg_buffer: &ManagedArgBuffer<Self::ManagedTypeApi>,
+    ) -> ManagedVec<Self::ManagedTypeApi, ManagedBuffer<Self::ManagedTypeApi>>;
 
     fn execute_on_same_context_raw(
         &self,
         gas: u64,
-        address: &ManagedAddress<Self>,
-        value: &BigUint<Self>,
-        endpoint_name: &ManagedBuffer<Self>,
-        arg_buffer: &ManagedArgBuffer<Self>,
-    ) -> ManagedVec<Self, ManagedBuffer<Self>>;
+        address: &ManagedAddress<Self::ManagedTypeApi>,
+        value: &BigUint<Self::ManagedTypeApi>,
+        endpoint_name: &ManagedBuffer<Self::ManagedTypeApi>,
+        arg_buffer: &ManagedArgBuffer<Self::ManagedTypeApi>,
+    ) -> ManagedVec<Self::ManagedTypeApi, ManagedBuffer<Self::ManagedTypeApi>>;
 
     fn execute_on_dest_context_readonly_raw(
         &self,
         gas: u64,
-        address: &ManagedAddress<Self>,
-        endpoint_name: &ManagedBuffer<Self>,
-        arg_buffer: &ManagedArgBuffer<Self>,
-    ) -> ManagedVec<Self, ManagedBuffer<Self>>;
+        address: &ManagedAddress<Self::ManagedTypeApi>,
+        endpoint_name: &ManagedBuffer<Self::ManagedTypeApi>,
+        arg_buffer: &ManagedArgBuffer<Self::ManagedTypeApi>,
+    ) -> ManagedVec<Self::ManagedTypeApi, ManagedBuffer<Self::ManagedTypeApi>>;
 
     /// Used to store data between async call and callback.
-    fn storage_store_tx_hash_key(&self, data: &ManagedBuffer<Self>);
+    fn storage_store_tx_hash_key(&self, data: &ManagedBuffer<Self::ManagedTypeApi>);
 
     /// Used to store data between async call and callback.
-    fn storage_load_tx_hash_key(&self) -> ManagedBuffer<Self>;
+    fn storage_load_tx_hash_key(&self) -> ManagedBuffer<Self::ManagedTypeApi>;
 
     /// Allows synchronously calling a local function by name. Execution is resumed afterwards.
     /// You should never have to call this function directly.
@@ -184,7 +202,7 @@ pub trait SendApi: ManagedTypeApi + BlockchainApi + Clone + Sized {
     fn call_local_esdt_built_in_function(
         &self,
         gas: u64,
-        endpoint_name: &ManagedBuffer<Self>,
-        arg_buffer: &ManagedArgBuffer<Self>,
-    ) -> ManagedVec<Self, ManagedBuffer<Self>>;
+        endpoint_name: &ManagedBuffer<Self::ManagedTypeApi>,
+        arg_buffer: &ManagedArgBuffer<Self::ManagedTypeApi>,
+    ) -> ManagedVec<Self::ManagedTypeApi, ManagedBuffer<Self::ManagedTypeApi>>;
 }

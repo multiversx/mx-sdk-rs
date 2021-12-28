@@ -25,7 +25,7 @@ pub fn generate_callback_selector_and_main(
         let cb_main_body = quote! {
             let _ = self::EndpointWrappers::callback_selector(
                 self,
-                elrond_wasm::types::CallbackClosureForDeser::new_empty(self.raw_vm_api()),
+                elrond_wasm::types::CallbackClosureForDeser::new_empty(),
             );
         };
         (cb_selector_body, cb_main_body)
@@ -42,10 +42,13 @@ pub fn generate_callback_selector_and_main(
         } else {
             let cb_selector_body = callback_selector_body(match_arms, module_calls);
             let cb_main_body = quote! {
-                if let Some(___cb_closure___) = elrond_wasm::types::CallbackClosureForDeser::storage_load_and_clear(self.raw_vm_api()) {
+                if let Some(___cb_closure___) = elrond_wasm::types::CallbackClosureForDeser::storage_load_and_clear::<Self::Api>() {
                     if let elrond_wasm::types::CallbackSelectorResult::NotProcessed(_) =
                         self::EndpointWrappers::callback_selector(self, ___cb_closure___)	{
-                        elrond_wasm::api::ErrorApi::signal_error(&self.raw_vm_api(), err_msg::CALLBACK_BAD_FUNC);
+                        elrond_wasm::api::ErrorApiImpl::signal_error(
+                            &Self::Api::error_api_impl(),
+                            err_msg::CALLBACK_BAD_FUNC,
+                        );
                     }
                 }
             };
@@ -66,7 +69,7 @@ fn callback_selector_body(
     module_calls: Vec<proc_macro2::TokenStream>,
 ) -> proc_macro2::TokenStream {
     quote! {
-        let mut ___call_result_loader___ = EndpointDynArgLoader::new(self.raw_vm_api());
+        let mut ___call_result_loader___ = elrond_wasm::io::EndpointDynArgLoader::<Self::Api>::new();
         let ___cb_closure_matcher___ = ___cb_closure___.matcher::<#CALLBACK_NAME_MAX_LENGTH>();
         if ___cb_closure_matcher___.matches_empty() {
             return elrond_wasm::types::CallbackSelectorResult::Processed;

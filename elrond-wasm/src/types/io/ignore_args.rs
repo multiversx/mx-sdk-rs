@@ -22,9 +22,9 @@ impl EndpointResult for IgnoreVarArgs {
     type DecodeAs = IgnoreVarArgs;
 
     #[inline]
-    fn finish<FA>(&self, _api: FA)
+    fn finish<FA>(&self)
     where
-        FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static,
+        FA: ManagedTypeApi + EndpointFinishApi,
     {
     }
 }

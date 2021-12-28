@@ -2,12 +2,25 @@ use crate::{
     world_mock::{is_smart_contract_address, EsdtInstance},
     DebugApi,
 };
-use elrond_wasm::types::{
-    Address, BigUint, EsdtLocalRole, EsdtLocalRoleFlags, EsdtTokenData, EsdtTokenType,
-    ManagedAddress, ManagedBuffer, ManagedVec, TokenIdentifier, H256,
+use elrond_wasm::{
+    api::{BlockchainApi, BlockchainApiImpl},
+    types::{
+        Address, BigUint, EsdtLocalRole, EsdtLocalRoleFlags, EsdtTokenData, EsdtTokenType,
+        ManagedAddress, ManagedBuffer, ManagedVec, TokenIdentifier, H256,
+    },
 };
 
-impl elrond_wasm::api::BlockchainApi for DebugApi {
+impl BlockchainApi for DebugApi {
+    type BlockchainApiImpl = DebugApi;
+
+    fn blockchain_api_impl() -> Self::BlockchainApiImpl {
+        DebugApi::new_from_static()
+    }
+}
+
+impl BlockchainApiImpl for DebugApi {
+    type ManagedTypeApi = DebugApi;
+
     fn get_sc_address_legacy(&self) -> Address {
         self.input_ref().to.clone()
     }

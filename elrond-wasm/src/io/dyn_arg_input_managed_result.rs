@@ -1,7 +1,7 @@
 use crate::{
-    api::{ErrorApi, ManagedTypeApi},
+    api::{ErrorApi, ErrorApiImpl, ManagedTypeApi},
     err_msg,
-    types::{ManagedBuffer, ManagedType, ManagedVec},
+    types::{ManagedBuffer, ManagedVec},
     DynArgInput,
 };
 
@@ -34,12 +34,7 @@ where
 {
     type ItemInput = ManagedBuffer<A>;
 
-    type ErrorApi = A;
-
-    #[inline]
-    fn dyn_arg_vm_api(&self) -> Self::ErrorApi {
-        self.data.type_manager()
-    }
+    type ManagedTypeErrorApi = A;
 
     #[inline]
     fn has_next(&self) -> bool {
@@ -51,8 +46,7 @@ where
             self.next_index += 1;
             buffer
         } else {
-            self.dyn_arg_vm_api()
-                .signal_error(err_msg::ARG_WRONG_NUMBER)
+            A::error_api_impl().signal_error(err_msg::ARG_WRONG_NUMBER)
         }
     }
 }

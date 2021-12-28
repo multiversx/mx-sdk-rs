@@ -1,4 +1,6 @@
-use elrond_wasm::api::Handle;
+use elrond_wasm::api::{Handle, ManagedTypeApi, ManagedTypeApiImpl};
+
+use crate::VmApiImpl;
 
 #[allow(dead_code)]
 extern "C" {
@@ -12,11 +14,15 @@ extern "C" {
     fn validateTokenIdentifier(token_id_handle: i32) -> i32;
 }
 
-impl elrond_wasm::api::ManagedTypeApi for crate::VmApiImpl {
-    fn instance() -> Self {
-        crate::VmApiImpl {}
-    }
+impl ManagedTypeApi for VmApiImpl {
+    type Impl = VmApiImpl;
 
+    fn managed_type_impl() -> Self {
+        VmApiImpl {}
+    }
+}
+
+impl ManagedTypeApiImpl for VmApiImpl {
     #[inline]
     fn mb_to_big_int_unsigned(&self, buffer_handle: Handle) -> Handle {
         unsafe {

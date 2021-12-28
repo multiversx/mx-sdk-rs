@@ -106,13 +106,13 @@ pub trait FirstContract {
         let second_contract_address = self.get_second_contract_address();
         let expected_token_identifier = self.get_contract_esdt_token_identifier();
 
-        require!(esdt_value > 0, "no esdt transfered!");
+        require!(esdt_value > 0u32, "no esdt transfered!");
         require!(
             actual_token_identifier == expected_token_identifier,
             "Wrong esdt token"
         );
 
-        let _ = self.raw_vm_api().direct_esdt_execute(
+        let _ = Self::Api::send_api_impl().direct_esdt_execute(
             &second_contract_address,
             &expected_token_identifier,
             &esdt_value,
@@ -134,13 +134,13 @@ pub trait FirstContract {
         let second_contract_address = self.get_second_contract_address();
         let expected_token_identifier = self.get_contract_esdt_token_identifier();
 
-        require!(esdt_value > 0, "no esdt transfered!");
+        require!(esdt_value > 0u32, "no esdt transfered!");
         require!(
             actual_token_identifier == expected_token_identifier,
             "Wrong esdt token"
         );
 
-        let _ = self.raw_vm_api().direct_esdt_execute(
+        let _ = Self::Api::send_api_impl().direct_esdt_execute(
             &second_contract_address,
             &expected_token_identifier,
             &esdt_value,
@@ -168,7 +168,7 @@ pub trait FirstContract {
             arg_buffer.push_arg_raw(arg);
         }
 
-        self.raw_vm_api().async_call_raw(
+        Self::Api::send_api_impl().async_call_raw(
             to,
             &BigUint::zero(),
             &ManagedBuffer::from(ESDT_TRANSFER_STRING),
