@@ -305,7 +305,7 @@ mod sample_adder {
         }
     }
 
-    pub fn contract_obj<A>() -> ContractObj<A>
+    pub fn contract_obj<A>(_: A) -> ContractObj<A>
     where
         A: elrond_wasm::api::VMApi,
     {
