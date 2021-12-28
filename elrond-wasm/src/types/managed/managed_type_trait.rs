@@ -12,7 +12,7 @@ pub trait ManagedType<M: ManagedTypeApi>: Sized {
 
     #[inline]
     fn type_manager(&self) -> M::Impl {
-        M::instance()
+        M::managed_type_impl()
     }
 
     /// Implement carefully, since the underlying transmutation is an unsafe operation.

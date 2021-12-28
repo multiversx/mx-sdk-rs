@@ -3,7 +3,7 @@ use crate::api::{Handle, ManagedTypeApi, ManagedTypeApiImpl};
 impl ManagedTypeApi for super::UncallableApi {
     type Impl = Self;
 
-    fn instance() -> Self {
+    fn managed_type_impl() -> Self {
         unreachable!()
     }
 }
