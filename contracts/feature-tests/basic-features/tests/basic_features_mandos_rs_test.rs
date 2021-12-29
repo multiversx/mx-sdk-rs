@@ -360,6 +360,11 @@ fn storage_i64_rs() {
 }
 
 #[test]
+fn storage_load_from_address_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/storage_load_from_address.scen.json", world());
+}
+
+#[test]
 fn storage_i64_bad_rs() {
     elrond_wasm_debug::mandos_rs("mandos/storage_i64_bad.scen.json", world());
 }
