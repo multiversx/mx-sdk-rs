@@ -1,0 +1,34 @@
+{
+  "name": "token release add group test",
+  "steps": [
+    {
+      "step": "externalSteps",
+      "path": "test-init.scen.json"
+    },
+    {
+      "step": "scCall",
+      "txId": "add-group",
+      "tx": {
+        "from": "address:owner",
+        "to": "sc:token_release_contract",
+        "value": "0",
+        "function": "addPercentageBasedGroup",
+        "arguments": [
+            "str:MyFirstGroup",
+            "10000",
+            "25",
+            "3600",
+            "4"
+        ],
+        "gasLimit": "100,000,000",
+        "gasPrice": "0"
+      },
+      "expect": {
+          "out": [],
+          "status": "",
+          "gas": "*",
+          "refund": "*"
+      }
+    }
+  ]
+}
