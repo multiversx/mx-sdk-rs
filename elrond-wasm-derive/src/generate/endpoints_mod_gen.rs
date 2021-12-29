@@ -81,9 +81,9 @@ fn generate_wasm_endpoint(
     let fn_ident = &m.name;
     let call_method_ident = generate_call_method_name(fn_ident);
     quote! {
-        pub fn #endpoint_ident <A>(api: A)
+        pub fn #endpoint_ident<A>()
         where
-            A: elrond_wasm::api::VMApi ,
+            A: elrond_wasm::api::VMApi,
         {
             super::contract_obj::<A>().#call_method_ident();
         }

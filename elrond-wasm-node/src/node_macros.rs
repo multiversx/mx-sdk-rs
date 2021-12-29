@@ -7,7 +7,7 @@ macro_rules! wasm_endpoints {
             #[allow(non_snake_case)]
             #[no_mangle]
             fn $endpoint_name() {
-                $mod_name::endpoints::$endpoint_name(elrond_wasm_node::vm_api());
+                $mod_name::endpoints::$endpoint_name::<elrond_wasm_node::VmApiImpl>();
             }
         )+
     };
