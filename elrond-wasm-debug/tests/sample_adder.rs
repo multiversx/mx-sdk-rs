@@ -293,6 +293,10 @@ mod sample_adder {
         fn call(&self, fn_name: &[u8]) -> bool {
             EndpointWrappers::call(self, fn_name)
         }
+
+        fn clone_obj(&self) -> elrond_wasm::Box<dyn elrond_wasm::contract_base::CallableContract<A>> {
+            self::contract_builder()
+        }
     }
 
     pub struct AbiProvider {}
@@ -305,13 +309,22 @@ mod sample_adder {
         }
     }
 
-    pub fn contract_obj<A>(_: A) -> ContractObj<A>
+    pub fn contract_obj<A>() -> ContractObj<A>
     where
         A: elrond_wasm::api::VMApi,
     {
         ContractObj {
             _phantom: core::marker::PhantomData,
         }
+    }
+
+    pub fn contract_builder<A>() -> elrond_wasm::Box<dyn elrond_wasm::contract_base::CallableContract<A>>
+    where
+        A: elrond_wasm::api::VMApi,
+    {
+        elrond_wasm::Box::new(ContractObj {
+            _phantom: core::marker::PhantomData,
+        })
     }
 
     pub struct Proxy<A>
@@ -385,9 +398,9 @@ fn test_add() {
     use elrond_wasm_debug::DebugApi;
     use sample_adder::{Adder, EndpointWrappers, ProxyTrait};
 
-    let tx_context = DebugApi::dummy();
+    let _ = DebugApi::dummy();
 
-    let adder = sample_adder::contract_obj(tx_context.clone());
+    let adder = sample_adder::contract_obj::<DebugApi>();
 
     adder.init(&BigInt::from(5));
     assert_eq!(BigInt::from(5), adder.get_sum());
@@ -416,9 +429,9 @@ fn test_add() {
 
 fn world() -> elrond_wasm_debug::BlockchainMock {
     let mut blockchain = elrond_wasm_debug::BlockchainMock::new();
-    blockchain.register_contract(
+    blockchain.register_contract_builder(
         "file:../contracts/examples/adder/output/adder.wasm",
-        Box::new(|context| Box::new(sample_adder::contract_obj(context))),
+        sample_adder::contract_builder,
     );
     blockchain
 }
