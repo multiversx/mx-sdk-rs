@@ -4,7 +4,8 @@ use factorial::*;
 
 #[test]
 fn test_factorial() {
-    let factorial = factorial::contract_obj(DebugApi::dummy());
+    let _ = DebugApi::dummy();
+    let factorial = factorial::contract_obj::<DebugApi>();
 
     assert_eq!(
         BigUint::<DebugApi>::from(1u32),

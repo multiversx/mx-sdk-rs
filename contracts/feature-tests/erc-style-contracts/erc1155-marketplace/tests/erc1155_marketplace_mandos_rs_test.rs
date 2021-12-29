@@ -1,16 +1,14 @@
-use elrond_wasm::*;
 use elrond_wasm_debug::*;
 
-#[allow(dead_code)]
 fn world() -> BlockchainMock {
     let mut blockchain = BlockchainMock::new();
-    blockchain.register_contract(
+    blockchain.register_contract_builder(
         "file:output/erc1155-marketplace.wasm",
-        Box::new(|context| Box::new(erc1155_marketplace::contract_obj(context))),
+        erc1155_marketplace::contract_builder,
     );
-    blockchain.register_contract(
+    blockchain.register_contract_builder(
         "file:../erc1155/output/erc1155.wasm",
-        Box::new(|context| Box::new(erc1155::contract_obj(context))),
+        erc1155::contract_builder,
     );
 
     blockchain
