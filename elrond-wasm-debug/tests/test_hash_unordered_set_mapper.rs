@@ -5,9 +5,9 @@ use elrond_wasm::storage::{
 use elrond_wasm_debug::DebugApi;
 
 fn create_set() -> UnorderedSetMapper<DebugApi, u64> {
-    let api = DebugApi::dummy();
-    let base_key = StorageKey::new(api.clone(), &b"my_unordered_set"[..]);
-    UnorderedSetMapper::new(api, base_key)
+    let _ = DebugApi::dummy();
+    let base_key = StorageKey::new(&b"my_unordered_set"[..]);
+    UnorderedSetMapper::new(base_key)
 }
 
 fn check_set(set: &UnorderedSetMapper<DebugApi, u64>, expected: Vec<u64>) {

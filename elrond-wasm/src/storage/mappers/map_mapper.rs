@@ -1,9 +1,11 @@
+use core::marker::PhantomData;
+
 use super::{set_mapper, SetMapper, StorageClearable, StorageMapper};
 use crate::{
-    api::{ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi},
+    api::StorageMapperApi,
     storage::{storage_clear, storage_get, storage_set, StorageKey},
+    types::ManagedType,
 };
-use core::marker::PhantomData;
 use elrond_codec::{NestedDecode, NestedEncode, TopDecode, TopEncode};
 
 const MAPPED_VALUE_IDENTIFIER: &[u8] = b".mapped";
@@ -11,35 +13,35 @@ type Keys<'a, SA, T> = set_mapper::Iter<'a, SA, T>;
 
 pub struct MapMapper<SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    SA: StorageMapperApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
     V: TopEncode + TopDecode + 'static,
 {
-    api: SA,
+    _phantom_api: PhantomData<SA>,
     base_key: StorageKey<SA>,
     keys_set: SetMapper<SA, K>,
-    _phantom: core::marker::PhantomData<V>,
+    _phantom_value: PhantomData<V>,
 }
 
 impl<SA, K, V> StorageMapper<SA> for MapMapper<SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    SA: StorageMapperApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode,
     V: TopEncode + TopDecode,
 {
-    fn new(api: SA, base_key: StorageKey<SA>) -> Self {
+    fn new(base_key: StorageKey<SA>) -> Self {
         MapMapper {
-            api: api.clone(),
+            _phantom_api: PhantomData,
             base_key: base_key.clone(),
-            keys_set: SetMapper::<SA, K>::new(api, base_key),
-            _phantom: PhantomData,
+            keys_set: SetMapper::<SA, K>::new(base_key),
+            _phantom_value: PhantomData,
         }
     }
 }
 
 impl<SA, K, V> StorageClearable for MapMapper<SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    SA: StorageMapperApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode,
     V: TopEncode + TopDecode,
 {
@@ -53,7 +55,7 @@ where
 
 impl<SA, K, V> MapMapper<SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    SA: StorageMapperApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode,
     V: TopEncode + TopDecode,
 {
@@ -65,25 +67,18 @@ where
     }
 
     fn get_mapped_value(&self, key: &K) -> V {
-        storage_get(
-            self.api.clone(),
-            &self.build_named_key(MAPPED_VALUE_IDENTIFIER, key),
-        )
+        storage_get(self.build_named_key(MAPPED_VALUE_IDENTIFIER, key).as_ref())
     }
 
     fn set_mapped_value(&self, key: &K, value: &V) {
         storage_set(
-            self.api.clone(),
-            &self.build_named_key(MAPPED_VALUE_IDENTIFIER, key),
+            self.build_named_key(MAPPED_VALUE_IDENTIFIER, key).as_ref(),
             &value,
         );
     }
 
     fn clear_mapped_value(&self, key: &K) {
-        storage_clear(
-            self.api.clone(),
-            &self.build_named_key(MAPPED_VALUE_IDENTIFIER, key),
-        );
+        storage_clear(self.build_named_key(MAPPED_VALUE_IDENTIFIER, key).as_ref());
     }
 
     /// Returns `true` if the map contains no elements.
@@ -165,7 +160,7 @@ where
 
 pub struct Iter<'a, SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    SA: StorageMapperApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
     V: TopEncode + TopDecode + 'static,
 {
@@ -175,7 +170,7 @@ where
 
 impl<'a, SA, K, V> Iter<'a, SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    SA: StorageMapperApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
     V: TopEncode + TopDecode + 'static,
 {
@@ -189,7 +184,7 @@ where
 
 impl<'a, SA, K, V> Iterator for Iter<'a, SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    SA: StorageMapperApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
     V: TopEncode + TopDecode + 'static,
 {
@@ -207,7 +202,7 @@ where
 
 pub struct Values<'a, SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    SA: StorageMapperApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
     V: TopEncode + TopDecode + 'static,
 {
@@ -217,7 +212,7 @@ where
 
 impl<'a, SA, K, V> Values<'a, SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    SA: StorageMapperApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
     V: TopEncode + TopDecode + 'static,
 {
@@ -231,7 +226,7 @@ where
 
 impl<'a, SA, K, V> Iterator for Values<'a, SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    SA: StorageMapperApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
     V: TopEncode + TopDecode + 'static,
 {
@@ -249,7 +244,7 @@ where
 
 pub enum Entry<'a, SA, K: 'a, V: 'a>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    SA: StorageMapperApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
     V: TopEncode + TopDecode + 'static,
 {
@@ -264,7 +259,7 @@ where
 /// It is part of the [`Entry`] enum.
 pub struct VacantEntry<'a, SA, K: 'a, V: 'a>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    SA: StorageMapperApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
     V: TopEncode + TopDecode + 'static,
 {
@@ -279,7 +274,7 @@ where
 /// It is part of the [`Entry`] enum.
 pub struct OccupiedEntry<'a, SA, K: 'a, V: 'a>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    SA: StorageMapperApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
     V: TopEncode + TopDecode + 'static,
 {
@@ -292,8 +287,8 @@ where
 
 impl<'a, SA, K, V> Entry<'a, SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
-    K: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + 'static,
+    SA: StorageMapperApi,
+    K: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone,
     V: TopEncode + TopDecode + 'static,
 {
     /// Ensures a value is in the entry by inserting the default if empty, and returns
@@ -356,8 +351,8 @@ where
 
 impl<'a, SA, K, V: Default> Entry<'a, SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
-    K: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + 'static,
+    SA: StorageMapperApi,
+    K: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone,
     V: TopEncode + TopDecode + 'static,
 {
     /// Ensures a value is in the entry by inserting the default value if empty,
@@ -372,8 +367,8 @@ where
 
 impl<'a, SA, K, V> VacantEntry<'a, SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
-    K: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + 'static,
+    SA: StorageMapperApi,
+    K: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone,
     V: TopEncode + TopDecode + 'static,
 {
     /// Gets a reference to the key that would be used when inserting a value
@@ -396,8 +391,8 @@ where
 
 impl<'a, SA, K, V> OccupiedEntry<'a, SA, K, V>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
-    K: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + 'static,
+    SA: StorageMapperApi,
+    K: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone,
     V: TopEncode + TopDecode + 'static,
 {
     /// Gets a reference to the key in the entry.

@@ -5,9 +5,9 @@ use elrond_wasm::storage::{
 use elrond_wasm_debug::DebugApi;
 
 fn create_set() -> SetMapper<DebugApi, u64> {
-    let api = DebugApi::dummy();
-    let base_key = StorageKey::new(api.clone(), &b"my_set"[..]);
-    SetMapper::new(api, base_key)
+    let _ = DebugApi::dummy();
+    let base_key = StorageKey::new(&b"my_set"[..]);
+    SetMapper::new(base_key)
 }
 
 fn check_set(set: &SetMapper<DebugApi, u64>, expected: Vec<u64>) {

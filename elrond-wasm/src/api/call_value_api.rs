@@ -1,26 +1,34 @@
-use super::{ErrorApi, ManagedTypeApi};
+use super::{ErrorApiImpl, ManagedTypeApi};
 use crate::{
     err_msg,
     types::{BigUint, EsdtTokenPayment, EsdtTokenType, ManagedVec, TokenIdentifier},
 };
 
-pub trait CallValueApi: ManagedTypeApi + ErrorApi + Sized {
+pub trait CallValueApi: ManagedTypeApi {
+    type CallValueApiImpl: CallValueApiImpl<ManagedTypeApi = Self>;
+
+    fn call_value_api_impl() -> Self::CallValueApiImpl;
+}
+
+pub trait CallValueApiImpl: ErrorApiImpl {
+    type ManagedTypeApi: ManagedTypeApi;
+
     fn check_not_payable(&self);
 
     /// Retrieves the EGLD call value from the VM.
     /// Will return 0 in case of an ESDT transfer (cannot have both EGLD and ESDT transfer simultaneously).
-    fn egld_value(&self) -> BigUint<Self>;
+    fn egld_value(&self) -> BigUint<Self::ManagedTypeApi>;
 
     /// Retrieves the ESDT call value from the VM.
     /// Will return 0 in case of an EGLD transfer (cannot have both EGLD and ESDT transfer simultaneously).
-    fn esdt_value(&self) -> BigUint<Self>;
+    fn esdt_value(&self) -> BigUint<Self::ManagedTypeApi>;
 
     /// Returns the call value token identifier of the current call.
     /// The identifier is wrapped in a TokenIdentifier object, to hide underlying logic.
     ///
     /// A note on implementation: even though the underlying api returns an empty name for EGLD,
     /// but the EGLD TokenIdentifier is serialized as `EGLD`.
-    fn token(&self) -> TokenIdentifier<Self>;
+    fn token(&self) -> TokenIdentifier<Self::ManagedTypeApi>;
 
     /// Returns the nonce of the received ESDT token.
     /// Will return 0 in case of EGLD or fungible ESDT transfer.
@@ -33,7 +41,7 @@ pub trait CallValueApi: ManagedTypeApi + ErrorApi + Sized {
     /// Will return the EGLD call value,
     /// but also fail with an error if ESDT is sent.
     /// Especially used in the auto-generated call value processing.
-    fn require_egld(&self) -> BigUint<Self> {
+    fn require_egld(&self) -> BigUint<Self::ManagedTypeApi> {
         if !self.token().is_egld() {
             self.signal_error(err_msg::NON_PAYABLE_FUNC_ESDT);
         }
@@ -43,7 +51,7 @@ pub trait CallValueApi: ManagedTypeApi + ErrorApi + Sized {
     /// Will return the ESDT call value,
     /// but also fail with an error if EGLD or the wrong ESDT token is sent.
     /// Especially used in the auto-generated call value processing.
-    fn require_esdt(&self, token: &[u8]) -> BigUint<Self> {
+    fn require_esdt(&self, token: &[u8]) -> BigUint<Self::ManagedTypeApi> {
         if self.token().as_managed_buffer() != token {
             self.signal_error(err_msg::BAD_TOKEN_PROVIDED);
         }
@@ -54,7 +62,12 @@ pub trait CallValueApi: ManagedTypeApi + ErrorApi + Sized {
     /// Especially used in the `#[payable("*")] auto-generated snippets.
     /// The method might seem redundant, but there is such a hook in Arwen
     /// that might be used in this scenario in the future.
-    fn payment_token_pair(&self) -> (BigUint<Self>, TokenIdentifier<Self>) {
+    fn payment_token_pair(
+        &self,
+    ) -> (
+        BigUint<Self::ManagedTypeApi>,
+        TokenIdentifier<Self::ManagedTypeApi>,
+    ) {
         let token = self.token();
         if token.is_egld() {
             (self.egld_value(), token)
@@ -65,15 +78,17 @@ pub trait CallValueApi: ManagedTypeApi + ErrorApi + Sized {
 
     fn esdt_num_transfers(&self) -> usize;
 
-    fn esdt_value_by_index(&self, index: usize) -> BigUint<Self>;
+    fn esdt_value_by_index(&self, index: usize) -> BigUint<Self::ManagedTypeApi>;
 
-    fn token_by_index(&self, index: usize) -> TokenIdentifier<Self>;
+    fn token_by_index(&self, index: usize) -> TokenIdentifier<Self::ManagedTypeApi>;
 
     fn esdt_token_nonce_by_index(&self, index: usize) -> u64;
 
     fn esdt_token_type_by_index(&self, index: usize) -> EsdtTokenType;
 
-    fn get_all_esdt_transfers(&self) -> ManagedVec<Self, EsdtTokenPayment<Self>> {
+    fn get_all_esdt_transfers(
+        &self,
+    ) -> ManagedVec<Self::ManagedTypeApi, EsdtTokenPayment<Self::ManagedTypeApi>> {
         let num_transfers = self.esdt_num_transfers();
         let mut transfers = ManagedVec::new();
 
@@ -83,7 +98,7 @@ pub trait CallValueApi: ManagedTypeApi + ErrorApi + Sized {
             let token_nonce = self.esdt_token_nonce_by_index(i);
             let amount = self.esdt_value_by_index(i);
 
-            transfers.push(EsdtTokenPayment::<Self> {
+            transfers.push(EsdtTokenPayment::<Self::ManagedTypeApi> {
                 token_type,
                 token_identifier,
                 token_nonce,

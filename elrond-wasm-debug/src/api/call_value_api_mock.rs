@@ -1,6 +1,6 @@
 use crate::{tx_mock::TxPanic, DebugApi};
 use elrond_wasm::{
-    api::CallValueApi,
+    api::{CallValueApi, CallValueApiImpl},
     err_msg,
     types::{BigUint, EsdtTokenType, TokenIdentifier},
 };
@@ -17,6 +17,16 @@ impl DebugApi {
 }
 
 impl CallValueApi for DebugApi {
+    type CallValueApiImpl = DebugApi;
+
+    fn call_value_api_impl() -> Self::CallValueApiImpl {
+        DebugApi::new_from_static()
+    }
+}
+
+impl CallValueApiImpl for DebugApi {
+    type ManagedTypeApi = DebugApi;
+
     fn check_not_payable(&self) {
         if self.egld_value() > 0 {
             std::panic::panic_any(TxPanic {

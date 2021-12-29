@@ -1,8 +1,11 @@
-use crate::api::managed_types::managed_buffer_api_node::{
-    unsafe_buffer_load_address, unsafe_buffer_load_token_identifier,
+use crate::{
+    api::managed_types::managed_buffer_api_node::{
+        unsafe_buffer_load_address, unsafe_buffer_load_token_identifier,
+    },
+    VmApiImpl,
 };
 use elrond_wasm::{
-    api::BlockchainApi,
+    api::{BlockchainApi, BlockchainApiImpl},
     types::{
         Address, BigUint, Box, EsdtTokenData, EsdtTokenType, ManagedAddress, ManagedBuffer,
         ManagedType, ManagedVec, TokenIdentifier, H256,
@@ -134,7 +137,18 @@ extern "C" {
     );
 }
 
-impl BlockchainApi for crate::VmApiImpl {
+impl BlockchainApi for VmApiImpl {
+    type BlockchainApiImpl = VmApiImpl;
+
+    #[inline]
+    fn blockchain_api_impl() -> Self::BlockchainApiImpl {
+        VmApiImpl {}
+    }
+}
+
+impl BlockchainApiImpl for VmApiImpl {
+    type ManagedTypeApi = VmApiImpl;
+
     #[inline]
     fn get_sc_address_legacy(&self) -> Address {
         unsafe {
@@ -531,6 +545,53 @@ impl BlockchainApi for crate::VmApiImpl {
                 uris: ManagedVec::from_raw_handle(uris_handle),
             }
         }
+    }
+
+    #[cfg(not(feature = "vm-esdt-local-roles"))]
+    fn get_esdt_local_roles(
+        &self,
+        token_id: &TokenIdentifier<VmApiImpl>,
+    ) -> elrond_wasm::types::EsdtLocalRoleFlags {
+        use elrond_wasm::{
+            api::ErrorApiImpl,
+            storage::StorageKey,
+            types::{EsdtLocalRole, EsdtLocalRoleFlags},
+        };
+
+        let mut key =
+            StorageKey::new(elrond_wasm::storage::protected_keys::ELROND_ESDT_LOCAL_ROLES_KEY);
+        key.append_managed_buffer(token_id.as_managed_buffer());
+        let value_mb =
+            elrond_wasm::storage::storage_get::<Self, ManagedBuffer<VmApiImpl>>(key.as_ref());
+        let value_len = value_mb.len();
+        const DATA_MAX_LEN: usize = 300;
+        if value_len > DATA_MAX_LEN {
+            self.signal_error(elrond_wasm::err_msg::STORAGE_VALUE_EXCEEDS_BUFFER);
+        }
+        let mut data_buffer = [0u8; DATA_MAX_LEN];
+        let _ = value_mb.load_slice(0, &mut data_buffer[..value_len]);
+
+        let mut current_index = 0;
+
+        let mut result = EsdtLocalRoleFlags::NONE;
+
+        while current_index < value_len {
+            // first character before each role is a \n, so we skip it
+            current_index += 1;
+
+            // next is the length of the role as string
+            let role_len = data_buffer[current_index];
+            current_index += 1;
+
+            // next is role's ASCII string representation
+            let end_index = current_index + role_len as usize;
+            let role_name = &data_buffer[current_index..end_index];
+            current_index = end_index;
+
+            result |= EsdtLocalRole::from(role_name).to_flag();
+        }
+
+        result
     }
 
     #[cfg(feature = "vm-esdt-local-roles")]

@@ -25,7 +25,7 @@ pub struct EsdtTokenData<M: ManagedTypeApi> {
 }
 
 impl<M: ManagedTypeApi> EsdtTokenData<M> {
-    pub fn type_manager(&self) -> M {
+    pub fn type_manager(&self) -> M::Impl {
         self.amount.type_manager()
     }
 

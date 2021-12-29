@@ -20,13 +20,7 @@ pub trait ForwarderRaw {
         #[payment_token] token: TokenIdentifier,
         #[payment] payment: BigUint,
     ) -> SendToken<Self::Api> {
-        SendToken {
-            api: self.raw_vm_api(),
-            to,
-            token,
-            amount: payment,
-            data: ManagedBuffer::new(),
-        }
+        SendToken::new(to, token, payment, ManagedBuffer::new())
     }
 
     #[endpoint]
@@ -141,7 +135,7 @@ pub trait ForwarderRaw {
             arg_buffer.push_arg(amount);
         }
 
-        self.raw_vm_api().async_call_raw(
+        Self::Api::send_api_impl().async_call_raw(
             &to,
             &BigUint::zero(),
             &ManagedBuffer::from(&b"retrieve_multi_funds_async"[..]),
@@ -227,7 +221,7 @@ pub trait ForwarderRaw {
         #[var_args] args: ManagedVarArgs<ManagedBuffer>,
     ) {
         let half_gas = self.blockchain().get_gas_left() / 2;
-        let result = self.raw_vm_api().execute_on_dest_context_raw(
+        let result = Self::Api::send_api_impl().execute_on_dest_context_raw(
             half_gas,
             &to,
             &payment,
@@ -251,7 +245,7 @@ pub trait ForwarderRaw {
         let half_payment = payment / 2u32;
         let arg_buffer = args.to_arg_buffer();
 
-        let result = self.raw_vm_api().execute_on_dest_context_raw(
+        let result = Self::Api::send_api_impl().execute_on_dest_context_raw(
             one_third_gas,
             &to,
             &half_payment,
@@ -260,7 +254,7 @@ pub trait ForwarderRaw {
         );
         self.execute_on_dest_context_result(result);
 
-        let result = self.raw_vm_api().execute_on_dest_context_raw(
+        let result = Self::Api::send_api_impl().execute_on_dest_context_raw(
             one_third_gas,
             &to,
             &half_payment,
@@ -280,7 +274,7 @@ pub trait ForwarderRaw {
         #[var_args] args: ManagedVarArgs<ManagedBuffer>,
     ) {
         let half_gas = self.blockchain().get_gas_left() / 2;
-        let result = self.raw_vm_api().execute_on_dest_context_by_caller_raw(
+        let result = Self::Api::send_api_impl().execute_on_dest_context_by_caller_raw(
             half_gas,
             &to,
             &payment,
@@ -301,7 +295,7 @@ pub trait ForwarderRaw {
         #[var_args] args: ManagedVarArgs<ManagedBuffer>,
     ) {
         let half_gas = self.blockchain().get_gas_left() / 2;
-        let result = self.raw_vm_api().execute_on_same_context_raw(
+        let result = Self::Api::send_api_impl().execute_on_same_context_raw(
             half_gas,
             &to,
             &payment,
@@ -320,7 +314,7 @@ pub trait ForwarderRaw {
         #[var_args] args: ManagedVarArgs<ManagedBuffer>,
     ) {
         let half_gas = self.blockchain().get_gas_left() / 2;
-        let result = self.raw_vm_api().execute_on_dest_context_readonly_raw(
+        let result = Self::Api::send_api_impl().execute_on_dest_context_readonly_raw(
             half_gas,
             &to,
             &endpoint_name,
@@ -342,7 +336,7 @@ pub trait ForwarderRaw {
         code: ManagedBuffer,
         #[var_args] args: ManagedVarArgs<ManagedBuffer>,
     ) -> MultiResult2<ManagedAddress, ManagedVec<Self::Api, ManagedBuffer>> {
-        self.raw_vm_api()
+        Self::Api::send_api_impl()
             .deploy_contract(
                 self.blockchain().get_gas_left(),
                 &BigUint::zero(),
@@ -359,7 +353,7 @@ pub trait ForwarderRaw {
         source_contract_address: ManagedAddress,
         #[var_args] arguments: ManagedVarArgs<ManagedBuffer>,
     ) -> ManagedAddress {
-        let (address, _) = self.raw_vm_api().deploy_from_source_contract(
+        let (address, _) = Self::Api::send_api_impl().deploy_from_source_contract(
             self.blockchain().get_gas_left(),
             &BigUint::zero(),
             &source_contract_address,
@@ -377,7 +371,7 @@ pub trait ForwarderRaw {
         new_code: &ManagedBuffer,
         #[var_args] arguments: ManagedVarArgs<ManagedBuffer>,
     ) {
-        self.raw_vm_api().upgrade_contract(
+        Self::Api::send_api_impl().upgrade_contract(
             child_sc_address,
             self.blockchain().get_gas_left(),
             &BigUint::zero(),
@@ -394,7 +388,7 @@ pub trait ForwarderRaw {
         source_contract_address: ManagedAddress,
         #[var_args] arguments: ManagedVarArgs<ManagedBuffer>,
     ) {
-        self.raw_vm_api().upgrade_from_source_contract(
+        Self::Api::send_api_impl().upgrade_from_source_contract(
             &sc_address,
             self.blockchain().get_gas_left(),
             &BigUint::zero(),

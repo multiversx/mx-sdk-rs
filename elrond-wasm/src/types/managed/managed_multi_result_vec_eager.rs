@@ -136,12 +136,12 @@ where
     type DecodeAs = ManagedMultiResultVecEager<M, T>;
 
     #[inline]
-    fn finish<FA>(&self, api: FA)
+    fn finish<FA>(&self)
     where
-        FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static,
+        FA: ManagedTypeApi + EndpointFinishApi,
     {
         for elem in self.0.iter() {
-            elem.finish(api.clone());
+            elem.finish::<FA>();
         }
     }
 }

@@ -37,12 +37,12 @@ macro_rules! multi_arg_impls {
                 type DecodeAs = Self; // TODO: reassemble from component DecodeAs
 
                 #[inline]
-				fn finish<FA>(&self, api: FA)
+				fn finish<FA>(&self)
                 where
-                    FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static,
+                    FA: ManagedTypeApi + EndpointFinishApi ,
                 {
                     $(
-                        (self.0).$n.finish(api.clone());
+                        (self.0).$n.finish::<FA>();
                     )+
                 }
             }

@@ -1,7 +1,7 @@
 use crate::{api::managed_types::big_int_api_node::unsafe_buffer_load_be_pad_right, VmApiImpl};
 use alloc::vec::Vec;
 use elrond_wasm::{
-    api::{BlockchainApi, SendApi, StorageReadApi, StorageWriteApi},
+    api::{BlockchainApi, BlockchainApiImpl, SendApiImpl, StorageReadApiImpl, StorageWriteApiImpl},
     types::{
         managed_vec_from_slice_of_boxed_bytes, Address, BigUint, BoxedBytes, CodeMetadata,
         EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer, ManagedType, ManagedVec,
@@ -173,7 +173,9 @@ extern "C" {
     fn getReturnData(result_index: i32, dataOffset: *const u8) -> i32;
 }
 
-impl SendApi for VmApiImpl {
+impl SendApiImpl for VmApiImpl {
+    type ManagedTypeApi = VmApiImpl;
+
     fn direct_egld<D>(&self, to: &ManagedAddress<Self>, amount: &BigUint<Self>, data: D)
     where
         D: Into<ManagedBuffer<Self>>,
@@ -394,8 +396,7 @@ impl SendApi for VmApiImpl {
 
             let num_return_data_after = getNumReturnData();
             let result_bytes = get_return_data_range(num_return_data_before, num_return_data_after);
-            let results =
-                managed_vec_from_slice_of_boxed_bytes(self.clone(), result_bytes.as_slice());
+            let results = managed_vec_from_slice_of_boxed_bytes(result_bytes.as_slice());
 
             (ManagedAddress::from(new_address), results)
         }
@@ -429,8 +430,7 @@ impl SendApi for VmApiImpl {
 
             let num_return_data_after = getNumReturnData();
             let result_bytes = get_return_data_range(num_return_data_before, num_return_data_after);
-            let results =
-                managed_vec_from_slice_of_boxed_bytes(self.clone(), result_bytes.as_slice());
+            let results = managed_vec_from_slice_of_boxed_bytes(result_bytes.as_slice());
 
             (ManagedAddress::from(new_address), results)
         }
@@ -520,7 +520,7 @@ impl SendApi for VmApiImpl {
 
             let num_return_data_after = getNumReturnData();
             let result_bytes = get_return_data_range(num_return_data_before, num_return_data_after);
-            managed_vec_from_slice_of_boxed_bytes(self.clone(), result_bytes.as_slice())
+            managed_vec_from_slice_of_boxed_bytes(result_bytes.as_slice())
         }
     }
 
@@ -562,7 +562,7 @@ impl SendApi for VmApiImpl {
 
             let result_bytes =
                 get_return_data_range(result_start_index as i32, result_end_index as i32);
-            managed_vec_from_slice_of_boxed_bytes(self.clone(), result_bytes.as_slice())
+            managed_vec_from_slice_of_boxed_bytes(result_bytes.as_slice())
         }
     }
 
@@ -594,7 +594,7 @@ impl SendApi for VmApiImpl {
 
             let num_return_data_after = getNumReturnData();
             let result_bytes = get_return_data_range(num_return_data_before, num_return_data_after);
-            managed_vec_from_slice_of_boxed_bytes(self.clone(), result_bytes.as_slice())
+            managed_vec_from_slice_of_boxed_bytes(result_bytes.as_slice())
         }
     }
 
@@ -626,7 +626,7 @@ impl SendApi for VmApiImpl {
 
             let num_return_data_after = getNumReturnData();
             let result_bytes = get_return_data_range(num_return_data_before, num_return_data_after);
-            managed_vec_from_slice_of_boxed_bytes(self.clone(), result_bytes.as_slice())
+            managed_vec_from_slice_of_boxed_bytes(result_bytes.as_slice())
         }
     }
 
@@ -655,7 +655,7 @@ impl SendApi for VmApiImpl {
 
             let num_return_data_after = getNumReturnData();
             let result_bytes = get_return_data_range(num_return_data_before, num_return_data_after);
-            managed_vec_from_slice_of_boxed_bytes(self.clone(), result_bytes.as_slice())
+            managed_vec_from_slice_of_boxed_bytes(result_bytes.as_slice())
         }
     }
 
@@ -678,7 +678,7 @@ impl SendApi for VmApiImpl {
         arg_buffer: &ManagedArgBuffer<Self>,
     ) -> ManagedVec<Self, ManagedBuffer<Self>> {
         // account-level built-in function, so the destination address is the contract itself
-        let own_address = BlockchainApi::get_sc_address(self);
+        let own_address = VmApiImpl::blockchain_api_impl().get_sc_address();
 
         self.execute_on_dest_context_raw(
             gas,

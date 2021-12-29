@@ -3,7 +3,7 @@ use crate::{
     types::StaticBufferRef,
 };
 
-use super::{ManagedBuffer, ManagedType};
+use super::ManagedBuffer;
 
 pub(crate) struct PreloadedManagedBuffer<M>
 where
@@ -54,9 +54,5 @@ where
         slice_len: usize,
     ) -> Option<ManagedBuffer<M>> {
         self.managed_buffer.copy_slice(starting_position, slice_len)
-    }
-
-    pub fn type_manager(&self) -> M {
-        self.managed_buffer.type_manager()
     }
 }
