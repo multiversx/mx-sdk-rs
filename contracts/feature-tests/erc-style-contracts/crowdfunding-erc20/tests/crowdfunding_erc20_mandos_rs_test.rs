@@ -11,10 +11,8 @@ fn world() -> BlockchainMock {
         crowdfunding_erc20::contract_builder,
     );
 
-    blockchain.register_contract_builder(
-        "file:../erc20/output/erc20.wasm",
-        erc20::contract_builder,
-    );
+    blockchain
+        .register_contract_builder("file:../erc20/output/erc20.wasm", erc20::contract_builder);
 
     blockchain
 }

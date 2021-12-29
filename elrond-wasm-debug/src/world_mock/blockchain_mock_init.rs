@@ -1,6 +1,6 @@
 use std::path::{Path, PathBuf};
 
-use elrond_wasm::contract_base::{CallableContract};
+use elrond_wasm::contract_base::CallableContract;
 use mandos::{interpret_trait::InterpreterContext, value_interpreter::interpret_string};
 
 use crate::DebugApi;

@@ -24,10 +24,7 @@ fn world() -> BlockchainMock {
         "file:recursive-caller/output/recursive-caller.wasm",
         recursive_caller::contract_builder,
     );
-    blockchain.register_contract_builder(
-        "file:vault/output/vault.wasm",
-        vault::contract_builder,
-    );
+    blockchain.register_contract_builder("file:vault/output/vault.wasm", vault::contract_builder);
     blockchain
 }
 
