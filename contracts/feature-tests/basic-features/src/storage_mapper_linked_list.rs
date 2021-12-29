@@ -106,6 +106,17 @@ pub trait LinkedListMapperFeatures {
         }
     }
 
+    #[endpoint(listMapperSetValue)]
+    fn list_mapper_set_value(&self, node_id: u32, new_value: u32) {
+        let node = self.list_mapper().get_node_by_id(node_id).unwrap();
+        self.list_mapper().set_node_value(node, new_value);
+    }
+
+    #[endpoint(listMapperSetValueById)]
+    fn list_mapper_set_value_by_id(&self, node_id: u32, new_value: u32) {
+        self.list_mapper().set_node_value_by_id(node_id, new_value);
+    }
+
     #[endpoint(listMapperIterateByHand)]
     fn list_mapper_iterate_by_hand(&self, node_id: u32) -> MultiResultVec<u32> {
         let mut result = Vec::new();
