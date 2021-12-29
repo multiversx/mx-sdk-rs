@@ -85,10 +85,9 @@ impl BlockchainStateWrapper {
             None => rust_biguint!(0),
         };
 
-        assert_eq!(
-            expected_balance,
-            &actual_balance,
-            "EGLD balance mismatch for address {}. Expected: {}, have {}",
+        assert!(
+            expected_balance == &actual_balance,
+            "EGLD balance mismatch for address {}\n Expected: {}\n Have: {}\n",
             address_to_hex(address),
             expected_balance,
             actual_balance
@@ -106,11 +105,11 @@ impl BlockchainStateWrapper {
             None => rust_biguint!(0),
         };
 
-        assert_eq!(
-            expected_balance,
-            &actual_balance,
-            "ESDT balance mismatch for address {}. Expected: {}, have {}",
+        assert!(
+            expected_balance == &actual_balance,
+            "ESDT balance mismatch for address {}\n Token: {}\n Expected: {}\n Have: {}\n",
             address_to_hex(address),
+            String::from_utf8(token_id.to_vec()).unwrap(),
             expected_balance,
             actual_balance
         );
@@ -133,11 +132,12 @@ impl BlockchainStateWrapper {
 
                 match opt_instance {
                     Some(instance) => {
-                        assert_eq!(
-                            expected_balance,
-                            &instance.balance,
-                            "ESDT NFT balance mismatch for address {}. Expected: {}, have {}",
+                        assert!(
+                            expected_balance == &instance.balance,
+                            "ESDT NFT balance mismatch for address {}\n Token: {}, nonce: {}\n Expected: {}\n Have: {}\n",
                             address_to_hex(address),
+                            String::from_utf8(token_id.to_vec()).unwrap(),
+                            nonce,
                             expected_balance,
                             instance.balance
                         );
@@ -151,11 +151,12 @@ impl BlockchainStateWrapper {
         };
 
         let actual_attributes = T::top_decode(actual_attributes_serialized).unwrap();
-        assert_eq!(
-            expected_attributes,
-            &actual_attributes,
-            "ESDT NFT attributes mismatch for address {}. Expected: {:?}, have {:?}",
+        assert!(
+            expected_attributes == &actual_attributes,
+            "ESDT NFT attributes mismatch for address {}\n Token: {}, nonce: {}\n Expected: {:?}\n Have: {:?}\n",
             address_to_hex(address),
+            String::from_utf8(token_id.to_vec()).unwrap(),
+            nonce,
             expected_attributes,
             actual_attributes,
         );

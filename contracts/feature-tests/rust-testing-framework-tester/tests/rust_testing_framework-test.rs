@@ -1,8 +1,9 @@
 use adder::*;
 use elrond_wasm::types::{BigInt, EsdtLocalRole, EsdtTokenPayment, ManagedBuffer, SCResult};
 use elrond_wasm_debug::{
-    assert_sc_error, managed_address, managed_biguint, managed_token_id, rust_biguint,
-    testing_framework::*, tx_mock::TxInputESDT, DebugApi,
+    assert_sc_error, assert_values_eq, managed_address, managed_biguint, managed_buffer,
+    managed_token_id, rust_biguint, testing_framework::*, tx_mock::TxInputESDT, unwrap_or_panic,
+    DebugApi,
 };
 use rust_testing_framework_tester::*;
 
@@ -29,7 +30,28 @@ fn test_add() {
 
         let expected_result = first.clone() + second.clone();
         let actual_result = sc.sum(first, second);
-        assert_eq!(expected_result, actual_result);
+        assert_values_eq!(expected_result, actual_result);
+    });
+}
+
+#[should_panic]
+#[test]
+fn test_add_wrong_expect() {
+    let mut wrapper = BlockchainStateWrapper::new();
+    let sc_wrapper = wrapper.create_sc_account(
+        &rust_biguint!(0),
+        None,
+        rust_testing_framework_tester::contract_obj,
+        SC_WASM_PATH,
+    );
+
+    wrapper.execute_query(&sc_wrapper, |sc| {
+        let first = managed_biguint!(1000);
+        let second = managed_biguint!(2000);
+
+        let expected_result = first.clone() + second.clone() + 1u32;
+        let actual_result = sc.sum(first, second);
+        assert_values_eq!(expected_result, actual_result);
     });
 }
 
@@ -54,6 +76,26 @@ fn test_sc_result_ok() {
 }
 
 #[test]
+fn test_sc_result_ok_unwrap() {
+    let mut wrapper = BlockchainStateWrapper::new();
+    let sc_wrapper = wrapper.create_sc_account(
+        &rust_biguint!(0),
+        None,
+        rust_testing_framework_tester::contract_obj,
+        SC_WASM_PATH,
+    );
+
+    wrapper.execute_query(&sc_wrapper, |sc| {
+        let first = managed_biguint!(1000);
+        let second = managed_biguint!(2000);
+
+        let expected_result = first.clone() + second.clone();
+        let actual_result = unwrap_or_panic!(sc.sum_sc_result(first, second));
+        assert_eq!(expected_result, actual_result);
+    });
+}
+
+#[test]
 fn test_sc_result_err() {
     let mut wrapper = BlockchainStateWrapper::new();
     let sc_wrapper = wrapper.create_sc_account(
@@ -68,7 +110,49 @@ fn test_sc_result_err() {
         let second = managed_biguint!(2000);
 
         let actual_result = sc.sum_sc_result(first, second);
-        assert_sc_error!(actual_result, b"Non-zero required");
+        assert_sc_error!(actual_result, "Non-zero required");
+    });
+}
+
+#[should_panic(expected = "Non-zero required")]
+#[test]
+fn test_sc_result_err_unwrap() {
+    let mut wrapper = BlockchainStateWrapper::new();
+    let sc_wrapper = wrapper.create_sc_account(
+        &rust_biguint!(0),
+        None,
+        rust_testing_framework_tester::contract_obj,
+        SC_WASM_PATH,
+    );
+
+    wrapper.execute_query(&sc_wrapper, |sc| {
+        let first = managed_biguint!(0);
+        let second = managed_biguint!(2000);
+
+        let result_err = sc.sum_sc_result(first, second);
+        unwrap_or_panic!(result_err);
+    });
+}
+
+#[should_panic(
+    expected = "Expected SCError, but got SCResult::Ok: BigUint { handle: 0, hex-value-be: \"0bb8\" }"
+)]
+#[test]
+fn test_assert_err_with_ok() {
+    let mut wrapper = BlockchainStateWrapper::new();
+    let sc_wrapper = wrapper.create_sc_account(
+        &rust_biguint!(0),
+        None,
+        rust_testing_framework_tester::contract_obj,
+        SC_WASM_PATH,
+    );
+
+    wrapper.execute_query(&sc_wrapper, |sc| {
+        let first = managed_biguint!(1000);
+        let second = managed_biguint!(2000);
+
+        let actual_result = sc.sum_sc_result(first, second);
+        assert_sc_error!(actual_result, "Non-zero required");
     });
 }
 
@@ -1003,7 +1087,7 @@ fn managed_environment_test() {
     wrapper.execute_in_managed_environment(|| {
         let _my_struct = StructWithManagedTypes::<DebugApi> {
             big_uint: managed_biguint!(500),
-            buffer: ManagedBuffer::new_from_bytes(b"MyBuffer"),
+            buffer: managed_buffer!(b"MyBuffer"),
         };
     })
 }
@@ -1013,7 +1097,7 @@ fn managed_environment_test() {
 fn test_managed_types_without_environment() {
     let _my_struct = StructWithManagedTypes::<DebugApi> {
         big_uint: managed_biguint!(500),
-        buffer: ManagedBuffer::new_from_bytes(b"MyBuffer"),
+        buffer: managed_buffer!(b"MyBuffer"),
     };
 }
 
@@ -1029,7 +1113,7 @@ fn test_random_buffer() {
 
     wrapper.execute_query(&sc_wrapper, |sc| {
         let rand_buffer = sc.get_random_buffer_once(2);
-        let expected_buffer = ManagedBuffer::new_from_bytes(&[0x8b, 0xdd]);
+        let expected_buffer = managed_buffer!(&[0x8b, 0xdd]);
         assert_eq!(rand_buffer, expected_buffer);
     });
 }
@@ -1047,8 +1131,8 @@ fn test_random_buffer_twice() {
     wrapper.execute_query(&sc_wrapper, |sc| {
         let (rand_buffer_1, rand_buffer_2) = sc.get_random_buffer_twice(2, 2);
 
-        let expected_buffer_1 = ManagedBuffer::new_from_bytes(&[0x8b, 0xdd]);
-        let expected_buffer_2 = ManagedBuffer::new_from_bytes(&[0xbe, 0x24]);
+        let expected_buffer_1 = managed_buffer!(&[0x8b, 0xdd]);
+        let expected_buffer_2 = managed_buffer!(&[0xbe, 0x24]);
 
         assert_eq!(rand_buffer_1, expected_buffer_1);
         assert_eq!(rand_buffer_2, expected_buffer_2);

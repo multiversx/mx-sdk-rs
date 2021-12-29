@@ -369,6 +369,21 @@ where
         node
     }
 
+    pub fn set_node_value(&mut self, mut node: LinkedListNode<T>, new_value: T) {
+        if self.is_empty_node(node.node_id) {
+            return;
+        }
+
+        node.value = new_value;
+        self.set_node(node.node_id, &node);
+    }
+
+    pub fn set_node_value_by_id(&mut self, node_id: u32, new_value: T) {
+        if let Some(node) = self.get_node_by_id(node_id) {
+            self.set_node_value(node, new_value)
+        }
+    }
+
     pub fn remove_node(&mut self, node: &LinkedListNode<T>) {
         let node_id = node.node_id;
 
