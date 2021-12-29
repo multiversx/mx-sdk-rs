@@ -294,7 +294,9 @@ mod sample_adder {
             EndpointWrappers::call(self, fn_name)
         }
 
-        fn clone_obj(&self) -> elrond_wasm::Box<dyn elrond_wasm::contract_base::CallableContract<A>> {
+        fn clone_obj(
+            &self,
+        ) -> elrond_wasm::Box<dyn elrond_wasm::contract_base::CallableContract<A>> {
             self::contract_builder()
         }
     }
@@ -318,7 +320,8 @@ mod sample_adder {
         }
     }
 
-    pub fn contract_builder<A>() -> elrond_wasm::Box<dyn elrond_wasm::contract_base::CallableContract<A>>
+    pub fn contract_builder<A>(
+    ) -> elrond_wasm::Box<dyn elrond_wasm::contract_base::CallableContract<A>>
     where
         A: elrond_wasm::api::VMApi,
     {
