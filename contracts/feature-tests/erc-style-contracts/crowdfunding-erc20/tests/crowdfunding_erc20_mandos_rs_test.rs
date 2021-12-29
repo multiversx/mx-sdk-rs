@@ -1,4 +1,3 @@
-use elrond_wasm::*;
 use elrond_wasm_debug::*;
 
 fn world() -> BlockchainMock {
@@ -7,14 +6,14 @@ fn world() -> BlockchainMock {
         "contracts/feature-tests/erc-style-contracts/crowdfunding-erc20",
     );
 
-    blockchain.register_contract(
+    blockchain.register_contract_builder(
         "file:output/crowdfunding-erc20.wasm",
-        Box::new(|context| Box::new(crowdfunding_erc20::contract_obj(context))),
+        crowdfunding_erc20::contract_builder,
     );
 
-    blockchain.register_contract(
+    blockchain.register_contract_builder(
         "file:../erc20/output/erc20.wasm",
-        Box::new(|context| Box::new(erc20::contract_obj(context))),
+        erc20::contract_builder,
     );
 
     blockchain
