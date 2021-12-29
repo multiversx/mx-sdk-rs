@@ -3,7 +3,8 @@ use elrond_wasm_debug::*;
 
 #[test]
 fn test_function_selector() {
-    let use_module = use_module::contract_obj(DebugApi::dummy());
+    let _ = DebugApi::dummy();
+    let use_module = use_module::contract_obj::<DebugApi>();
 
     assert!(!use_module.call(b"invalid_endpoint"));
 
