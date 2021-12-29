@@ -1,7 +1,7 @@
 use super::BoxedBytes;
 use crate::{
     abi::TypeAbi,
-    api::{Handle, ManagedTypeApi},
+    api::{Handle, ManagedTypeApi, ManagedTypeApiImpl},
     types::{ManagedBuffer, ManagedType},
 };
 use alloc::string::String;
@@ -101,7 +101,7 @@ impl<M: ManagedTypeApi> TokenIdentifier<M> {
     }
 
     pub fn is_valid_esdt_identifier(&self) -> bool {
-        M::instance().validate_token_identifier(self.buffer.handle)
+        M::managed_type_impl().validate_token_identifier(self.buffer.handle)
     }
     /// Converts `"EGLD"` to `""`.
     /// Does nothing for the other values.

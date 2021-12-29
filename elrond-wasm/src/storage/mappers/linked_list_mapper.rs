@@ -1,14 +1,15 @@
+use core::marker::PhantomData;
+
 use super::{StorageClearable, StorageMapper};
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
-    api::{EndpointFinishApi, ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi},
+    api::{EndpointFinishApi, ManagedTypeApi, StorageMapperApi},
     finish_all,
     io::EndpointResult,
     storage::{storage_get, storage_set, StorageKey},
-    types::{BoxedBytes, MultiResultVec},
+    types::{BoxedBytes, ManagedType, MultiResultVec},
 };
 use alloc::vec::Vec;
-use core::marker::PhantomData;
 use elrond_codec::{
     elrond_codec_derive::{
         NestedDecode, NestedEncode, TopDecode, TopDecodeOrDefault, TopEncode, TopEncodeOrDefault,
@@ -89,31 +90,31 @@ impl LinkedListInfo {
 
 pub struct LinkedListMapper<SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    SA: StorageMapperApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + 'static,
 {
-    api: SA,
+    _phantom_api: PhantomData<SA>,
     base_key: StorageKey<SA>,
-    _phantom: core::marker::PhantomData<T>,
+    _phantom_item: PhantomData<T>,
 }
 
 impl<SA, T> StorageMapper<SA> for LinkedListMapper<SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    SA: StorageMapperApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone,
 {
-    fn new(api: SA, base_key: StorageKey<SA>) -> Self {
+    fn new(base_key: StorageKey<SA>) -> Self {
         LinkedListMapper {
-            api,
+            _phantom_api: PhantomData,
             base_key,
-            _phantom: PhantomData,
+            _phantom_item: PhantomData,
         }
     }
 }
 
 impl<SA, T> StorageClearable for LinkedListMapper<SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    SA: StorageMapperApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone,
 {
     fn clear(&mut self) {
@@ -132,7 +133,7 @@ where
 
 impl<SA, T> LinkedListMapper<SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    SA: StorageMapperApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone,
 {
     fn build_node_id_named_key(&self, name: &[u8], node_id: u32) -> StorageKey<SA> {
@@ -149,43 +150,39 @@ where
     }
 
     fn get_info(&self) -> LinkedListInfo {
-        storage_get(self.api.clone(), &self.build_name_key(INFO_IDENTIFIER))
+        storage_get(self.build_name_key(INFO_IDENTIFIER).as_ref())
     }
 
     fn set_info(&mut self, value: LinkedListInfo) {
-        storage_set(
-            self.api.clone(),
-            &self.build_name_key(INFO_IDENTIFIER),
-            &value,
-        );
+        storage_set(self.build_name_key(INFO_IDENTIFIER).as_ref(), &value);
     }
 
     fn get_node(&self, node_id: u32) -> LinkedListNode<T> {
         storage_get(
-            self.api.clone(),
-            &self.build_node_id_named_key(NODE_IDENTIFIER, node_id),
+            self.build_node_id_named_key(NODE_IDENTIFIER, node_id)
+                .as_ref(),
         )
     }
 
     fn is_empty_node(&self, node_id: u32) -> bool {
         storage_get_len(
-            self.api.clone(),
-            &self.build_node_id_named_key(NODE_IDENTIFIER, node_id),
+            self.build_node_id_named_key(NODE_IDENTIFIER, node_id)
+                .as_ref(),
         ) == 0
     }
 
     fn set_node(&mut self, node_id: u32, item: &LinkedListNode<T>) {
         storage_set(
-            self.api.clone(),
-            &self.build_node_id_named_key(NODE_IDENTIFIER, node_id),
+            self.build_node_id_named_key(NODE_IDENTIFIER, node_id)
+                .as_ref(),
             item,
         );
     }
 
     fn clear_node(&mut self, node_id: u32) {
         storage_set(
-            self.api.clone(),
-            &self.build_node_id_named_key(NODE_IDENTIFIER, node_id),
+            self.build_node_id_named_key(NODE_IDENTIFIER, node_id)
+                .as_ref(),
             &BoxedBytes::empty(),
         );
     }
@@ -505,7 +502,7 @@ where
 
 pub struct Iter<'a, SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    SA: StorageMapperApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + 'static,
 {
     node_opt: Option<LinkedListNode<T>>,
@@ -514,8 +511,8 @@ where
 
 impl<'a, SA, T> Iter<'a, SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
-    T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + 'static,
+    SA: StorageMapperApi,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone,
 {
     fn new(linked_list: &'a LinkedListMapper<SA, T>) -> Iter<'a, SA, T> {
         Iter {
@@ -534,7 +531,7 @@ where
 
 impl<'a, SA, T> Iterator for Iter<'a, SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    SA: StorageMapperApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + 'static,
 {
     type Item = LinkedListNode<T>;
@@ -550,23 +547,23 @@ where
 
 impl<SA, T> EndpointResult for LinkedListMapper<SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    SA: StorageMapperApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + EndpointResult,
 {
     type DecodeAs = MultiResultVec<T::DecodeAs>;
 
-    fn finish<FA>(&self, api: FA)
+    fn finish<FA>(&self)
     where
-        FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static,
+        FA: ManagedTypeApi + EndpointFinishApi,
     {
         let values_iter = self.iter().map(|x| x.into_value());
-        finish_all(api, values_iter);
+        finish_all::<FA, _, _>(values_iter);
     }
 }
 
 impl<SA, T> TypeAbi for LinkedListMapper<SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    SA: StorageMapperApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + TypeAbi,
 {
     fn type_name() -> TypeName {

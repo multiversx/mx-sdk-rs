@@ -1,7 +1,7 @@
 use super::VmApiImpl;
 use alloc::vec::Vec;
 use elrond_wasm::{
-    api::{Handle, StorageReadApi, StorageWriteApi},
+    api::{Handle, StorageReadApi, StorageReadApiImpl, StorageWriteApi, StorageWriteApiImpl},
     types::BoxedBytes,
 };
 
@@ -31,6 +31,15 @@ extern "C" {
 }
 
 impl StorageReadApi for VmApiImpl {
+    type StorageReadApiImpl = VmApiImpl;
+
+    #[inline]
+    fn storage_read_api_impl() -> Self::StorageReadApiImpl {
+        VmApiImpl {}
+    }
+}
+
+impl StorageReadApiImpl for VmApiImpl {
     #[inline]
     fn storage_load_len(&self, key: &[u8]) -> usize {
         unsafe { storageLoadLength(key.as_ref().as_ptr(), key.len() as i32) as usize }
@@ -97,6 +106,15 @@ impl StorageReadApi for VmApiImpl {
 }
 
 impl StorageWriteApi for VmApiImpl {
+    type StorageWriteApiImpl = VmApiImpl;
+
+    #[inline]
+    fn storage_write_api_impl() -> Self::StorageWriteApiImpl {
+        VmApiImpl {}
+    }
+}
+
+impl StorageWriteApiImpl for VmApiImpl {
     fn storage_store_slice_u8(&self, key: &[u8], value: &[u8]) {
         unsafe {
             storageStore(

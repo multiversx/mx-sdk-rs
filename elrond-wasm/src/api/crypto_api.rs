@@ -4,9 +4,20 @@ use alloc::boxed::Box;
 use super::ManagedTypeApi;
 
 pub trait CryptoApi: ManagedTypeApi {
+    type CryptoApiImpl: CryptoApiImpl<ManagedTypeApi = Self>;
+
+    fn crypto_api_impl() -> Self::CryptoApiImpl;
+}
+
+pub trait CryptoApiImpl {
+    type ManagedTypeApi: ManagedTypeApi;
+
     fn sha256_legacy(&self, data: &[u8]) -> H256;
 
-    fn sha256(&self, data: &ManagedBuffer<Self>) -> ManagedByteArray<Self, 32> {
+    fn sha256(
+        &self,
+        data: &ManagedBuffer<Self::ManagedTypeApi>,
+    ) -> ManagedByteArray<Self::ManagedTypeApi, 32> {
         self.sha256_legacy(data.to_boxed_bytes().as_slice())
             .as_array()
             .into()
@@ -14,7 +25,10 @@ pub trait CryptoApi: ManagedTypeApi {
 
     fn keccak256_legacy(&self, data: &[u8]) -> H256;
 
-    fn keccak256(&self, data: &ManagedBuffer<Self>) -> ManagedByteArray<Self, 32> {
+    fn keccak256(
+        &self,
+        data: &ManagedBuffer<Self::ManagedTypeApi>,
+    ) -> ManagedByteArray<Self::ManagedTypeApi, 32> {
         self.keccak256_legacy(data.to_boxed_bytes().as_slice())
             .as_array()
             .into()

@@ -1,10 +1,14 @@
-use crate::api::{Handle, ManagedTypeApi};
+use crate::api::{Handle, ManagedTypeApi, ManagedTypeApiImpl};
 
 impl ManagedTypeApi for super::UncallableApi {
-    fn instance() -> Self {
+    type Impl = Self;
+
+    fn managed_type_impl() -> Self {
         unreachable!()
     }
+}
 
+impl ManagedTypeApiImpl for super::UncallableApi {
     fn mb_to_big_int_unsigned(&self, _buffer_handle: Handle) -> Handle {
         unreachable!()
     }

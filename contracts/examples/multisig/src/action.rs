@@ -1,5 +1,5 @@
 use elrond_wasm::{
-    api::{EndpointFinishApi, ManagedTypeApi, SendApi, StorageWriteApi},
+    api::{CallTypeApi, EndpointFinishApi, ManagedTypeApi, StorageWriteApi},
     io::EndpointResult,
     types::{
         AsyncCall, BigUint, CodeMetadata, ManagedAddress, ManagedBuffer, ManagedVec, OptionalResult,
@@ -60,7 +60,7 @@ pub struct ActionFullInfo<M: ManagedTypeApi> {
 #[derive(TypeAbi)]
 pub enum PerformActionResult<SA>
 where
-    SA: SendApi + ManagedTypeApi + StorageWriteApi + 'static,
+    SA: CallTypeApi + ManagedTypeApi + StorageWriteApi + 'static,
 {
     Nothing,
     DeployResult(ManagedAddress<SA>),
@@ -69,18 +69,18 @@ where
 
 impl<SA> EndpointResult for PerformActionResult<SA>
 where
-    SA: SendApi + StorageWriteApi + Clone + 'static,
+    SA: CallTypeApi + StorageWriteApi,
 {
     type DecodeAs = OptionalResult<ManagedAddress<SA>>;
 
-    fn finish<FA>(&self, api: FA)
+    fn finish<FA>(&self)
     where
-        FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static,
+        FA: ManagedTypeApi + EndpointFinishApi,
     {
         match self {
             PerformActionResult::Nothing => (),
-            PerformActionResult::DeployResult(address) => address.finish(api),
-            PerformActionResult::SendAsyncCall(async_call) => async_call.finish(api),
+            PerformActionResult::DeployResult(address) => address.finish::<FA>(),
+            PerformActionResult::SendAsyncCall(async_call) => async_call.finish::<FA>(),
         }
     }
 }

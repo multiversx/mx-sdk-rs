@@ -5,8 +5,9 @@ use crate::{
 };
 use elrond_wasm::{
     api::{
-        BlockchainApi, SendApi, StorageReadApi, StorageWriteApi, ESDT_MULTI_TRANSFER_FUNC_NAME,
-        ESDT_NFT_TRANSFER_FUNC_NAME, ESDT_TRANSFER_FUNC_NAME, UPGRADE_CONTRACT_FUNC_NAME,
+        BlockchainApiImpl, SendApi, SendApiImpl, StorageReadApiImpl, StorageWriteApiImpl,
+        ESDT_MULTI_TRANSFER_FUNC_NAME, ESDT_NFT_TRANSFER_FUNC_NAME, ESDT_TRANSFER_FUNC_NAME,
+        UPGRADE_CONTRACT_FUNC_NAME,
     },
     elrond_codec::top_encode_to_vec_u8,
     types::{
@@ -164,6 +165,16 @@ impl DebugApi {
 }
 
 impl SendApi for DebugApi {
+    type SendApiImpl = DebugApi;
+
+    fn send_api_impl() -> Self::SendApiImpl {
+        DebugApi::new_from_static()
+    }
+}
+
+impl SendApiImpl for DebugApi {
+    type ManagedTypeApi = DebugApi;
+
     fn direct_egld<D>(&self, to: &ManagedAddress<Self>, amount: &BigUint<Self>, _data: D)
     where
         D: Into<ManagedBuffer<Self>>,

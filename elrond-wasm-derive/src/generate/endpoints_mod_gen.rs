@@ -34,7 +34,7 @@ pub fn generate_endpoints_mod(
         quote! {
             pub fn callBack<A>(api: A)
             where
-                A: elrond_wasm::api::VMApi + Clone + 'static,
+                A: elrond_wasm::api::VMApi ,
             {
                 super::contract_obj(api).callback();
             }
@@ -83,7 +83,7 @@ fn generate_wasm_endpoint(
     quote! {
         pub fn #endpoint_ident <A>(api: A)
         where
-            A: elrond_wasm::api::VMApi + Clone + 'static,
+            A: elrond_wasm::api::VMApi ,
         {
             super::contract_obj(api).#call_method_ident();
         }

@@ -1,13 +1,23 @@
 use alloc::boxed::Box;
 
 use crate::{
-    api::BlockchainApi,
+    api::{BlockchainApi, BlockchainApiImpl},
     types::{Address, BigUint, EsdtTokenData, ManagedAddress, TokenIdentifier, H256},
 };
 
 use super::UncallableApi;
 
 impl BlockchainApi for UncallableApi {
+    type BlockchainApiImpl = UncallableApi;
+
+    fn blockchain_api_impl() -> Self::BlockchainApiImpl {
+        unreachable!()
+    }
+}
+
+impl BlockchainApiImpl for UncallableApi {
+    type ManagedTypeApi = UncallableApi;
+
     fn get_sc_address_legacy(&self) -> Address {
         unreachable!()
     }
@@ -108,6 +118,13 @@ impl BlockchainApi for UncallableApi {
         _token: &TokenIdentifier<Self>,
         _nonce: u64,
     ) -> EsdtTokenData<Self> {
+        unreachable!()
+    }
+
+    fn get_esdt_local_roles(
+        &self,
+        _token_id: &TokenIdentifier<Self::ManagedTypeApi>,
+    ) -> crate::types::EsdtLocalRoleFlags {
         unreachable!()
     }
 }
