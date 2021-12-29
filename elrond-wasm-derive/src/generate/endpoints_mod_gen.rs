@@ -32,11 +32,11 @@ pub fn generate_endpoints_mod(
 
     let wasm_callback_fn = if is_contract_main {
         quote! {
-            pub fn callBack<A>(api: A)
+            pub fn callBack<A>()
             where
                 A: elrond_wasm::api::VMApi ,
             {
-                super::contract_obj(api).callback();
+                super::contract_obj::<A>().callback();
             }
         }
     } else {
@@ -81,11 +81,11 @@ fn generate_wasm_endpoint(
     let fn_ident = &m.name;
     let call_method_ident = generate_call_method_name(fn_ident);
     quote! {
-        pub fn #endpoint_ident <A>(api: A)
+        pub fn #endpoint_ident<A>()
         where
-            A: elrond_wasm::api::VMApi ,
+            A: elrond_wasm::api::VMApi,
         {
-            super::contract_obj(api).#call_method_ident();
+            super::contract_obj::<A>().#call_method_ident();
         }
     }
 }
