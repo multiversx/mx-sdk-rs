@@ -1,0 +1,119 @@
+{
+    "name": "token release change user test",
+    "steps": [
+      {
+        "step": "externalSteps",
+        "path": "test-init.scen.json"
+      },
+      {
+        "step": "externalSteps",
+        "path": "test-add-group.scen.json"
+      },
+      {
+        "step": "externalSteps",
+        "path": "test-add-user.scen.json"
+      },
+      {
+        "step": "externalSteps",
+        "path": "test-end-setup.scen.json"
+      },
+      {
+        "step": "externalSteps",
+        "path": "test-claim.scen.json"
+      },
+      {
+        "step": "setState",
+        "accounts": {
+            "address:user1new": {
+                "nonce": "0",
+                "balance": "0",
+                "esdt": {
+                    "str:MyFirstToken-101": "0"
+                },
+                "storage": {}
+            }
+        }
+      },
+      {
+        "step": "scCall",
+        "txId": "request-change-user1",
+        "tx": {
+          "from": "address:user1",
+          "to": "sc:token_release_contract",
+          "value": "0",
+          "function": "requestAddressChange",
+          "arguments": [
+            "address:user1new"
+          ],
+          "gasLimit": "100,000,000",
+          "gasPrice": "0"
+        },
+        "expect": {
+            "out": [],
+            "status": "",
+            "gas": "*",
+            "refund": "*"
+        }
+      },
+      {
+        "step": "scCall",
+        "txId": "approve-change-user1",
+        "tx": {
+          "from": "address:owner",
+          "to": "sc:token_release_contract",
+          "value": "0",
+          "function": "approveAddressChange",
+          "arguments": [
+            "address:user1"
+          ],
+          "gasLimit": "100,000,000",
+          "gasPrice": "0"
+        },
+        "expect": {
+            "out": [],
+            "status": "",
+            "gas": "*",
+            "refund": "*"
+        }
+      },
+      {
+        "step": "checkState",
+        "accounts": {
+            "address:user1": {
+                "nonce": "2",
+                "balance": "0",
+                "esdt": {
+                    "str:MyFirstToken-101": "1,250"
+                },
+                "storage": {}
+            },
+            "address:user2": {
+                "nonce": "1",
+                "balance": "0",
+                "esdt": {
+                    "str:MyFirstToken-101": "2,500"
+                },
+                "storage": {}
+            },
+            "address:user1new": {
+                "nonce": "0",
+                "balance": "0",
+                "esdt": {
+                    "str:MyFirstToken-101": "0"
+                },
+                "storage": {}
+            },
+          "sc:token_release_contract": {
+            "nonce": "0",
+            "balance": "0",
+            "storage": {
+                "str:claimedBalance|address:user1": "0",
+                "str:claimedBalance|address:user2": "2,500",
+                "str:claimedBalance|address:user1new": "1,250"
+            },
+            "code": "file:../output/sc-token-release.wasm"
+          }
+        }
+    }
+    ]
+  }

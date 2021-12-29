@@ -1,0 +1,64 @@
+{
+    "name": "token release deployment test",
+    "steps": [
+      {
+        "step": "setState",
+        "accounts": {
+          "address:owner": {
+            "nonce": "0",
+            "balance": "1,000,000"
+          }
+        },
+        "newAddresses": [
+          {
+            "creatorAddress": "address:owner",
+            "creatorNonce": "0",
+            "newAddress": "sc:token_release_contract"
+          }
+        ]
+      },
+      {
+        "step": "setState",
+        "currentBlockInfo": {
+            "blockTimestamp": "1"
+        }
+      },
+      {
+        "step": "scDeploy",
+        "txId": "deploy",
+        "tx": {
+          "from": "address:owner",
+          "value": "0",
+          "contractCode": "file:../output/sc-token-release.wasm",
+          "arguments": [
+            "str:MyFirstToken-101"
+          ],
+          "gasLimit": "100,000,000",
+          "gasPrice": "0"
+        },
+        "expect": {
+            "out": [],
+            "status": "",
+            "gas": "*",
+            "refund": "*"
+        }
+      },
+      {
+        "step": "checkState",
+        "accounts": {
+          "address:owner": {
+            "nonce": "1",
+            "balance": "1,000,000"
+          },
+          "sc:token_release_contract": {
+            "nonce": "0",
+            "balance": "0",
+            "storage": {
+              "str:tokenIdentifier": "str:MyFirstToken-101"
+            },
+            "code": "file:../output/sc-token-release.wasm"
+          }
+        }
+      }
+    ]
+  }

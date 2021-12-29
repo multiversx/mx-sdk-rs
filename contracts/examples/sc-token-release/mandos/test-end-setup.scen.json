@@ -1,0 +1,65 @@
+{
+    "name": "token release end setup test",
+    "steps": [
+      {
+        "step": "externalSteps",
+        "path": "test-init.scen.json"
+      },
+      {
+        "step": "externalSteps",
+        "path": "test-add-group.scen.json"
+      },
+      {
+        "step": "externalSteps",
+        "path": "test-add-user.scen.json"
+      },
+      {
+        "step": "scCall",
+        "txId": "end-setup-tx",
+        "tx": {
+          "from": "address:owner",
+          "to": "sc:token_release_contract",
+          "value": "0",
+          "function": "endSetupPeriod",
+          "arguments": [],
+          "gasLimit": "100,000,000",
+          "gasPrice": "0"
+        },
+        "expect": {
+            "out": [],
+            "status": "",
+            "gas": "*",
+            "refund": "*"
+        }
+      },
+      {
+        "step": "checkState",
+        "accounts": {
+            "address:user1": {
+                "nonce": "0",
+                "balance": "0",
+                "esdt": {
+                    "str:MyFirstToken-101": "0"
+                },
+                "storage": {}
+            },
+            "address:user2": {
+                "nonce": "0",
+                "balance": "0",
+                "esdt": {
+                    "str:MyFirstToken-101": "0"
+                },
+                "storage": {}
+            },
+          "sc:token_release_contract": {
+            "nonce": "0",
+            "balance": "0",
+            "storage": {
+                "str:tokenTotalSupply":"10,000"
+            },
+            "code": "file:../output/sc-token-release.wasm"
+          }
+        }
+    }
+    ]
+  }

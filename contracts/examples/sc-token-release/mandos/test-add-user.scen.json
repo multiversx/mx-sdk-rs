@@ -1,0 +1,78 @@
+{
+    "name": "token release add user test",
+    "steps": [
+      {
+        "step": "externalSteps",
+        "path": "test-init.scen.json"
+      },
+      {
+        "step": "externalSteps",
+        "path": "test-add-group.scen.json"
+      },
+      {
+        "step": "setState",
+        "accounts": {
+            "address:user1": {
+                "nonce": "0",
+                "balance": "0",
+                "esdt": {
+                  "str:MyFirstToken-101": "0"
+              },
+                "storage": {}
+            },
+            "address:user2": {
+                "nonce": "0",
+                "balance": "0",
+                "esdt": {
+                  "str:MyFirstToken-101": "0"
+              },
+                "storage": {}
+            }
+        }
+      },
+      {
+        "step": "scCall",
+        "txId": "add-user-1",
+        "tx": {
+          "from": "address:owner",
+          "to": "sc:token_release_contract",
+          "value": "0",
+          "function": "addUserGroup",
+          "arguments": [
+              "address:user1",
+              "str:MyFirstGroup"
+          ],
+          "gasLimit": "100,000,000",
+          "gasPrice": "0"
+        },
+        "expect": {
+            "out": [],
+            "status": "",
+            "gas": "*",
+            "refund": "*"
+        }
+      },
+      {
+        "step": "scCall",
+        "txId": "add-user-2",
+        "tx": {
+          "from": "address:owner",
+          "to": "sc:token_release_contract",
+          "value": "0",
+          "function": "addUserGroup",
+          "arguments": [
+              "address:user2",
+              "str:MyFirstGroup"
+          ],
+          "gasLimit": "100,000,000",
+          "gasPrice": "0"
+        },
+        "expect": {
+            "out": [],
+            "status": "",
+            "gas": "*",
+            "refund": "*"
+        }
+      }
+    ]
+  }
