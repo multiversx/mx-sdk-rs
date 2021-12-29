@@ -166,6 +166,8 @@ elrond_wasm_node::wasm_endpoints! {
         listMapperPushFront
         listMapperRemoveNode
         listMapperRemoveNodeById
+        listMapperSetValue
+        listMapperSetValueById
         load_addr
         load_big_int
         load_big_uint
