@@ -22,7 +22,7 @@ pub fn impl_contract_base() -> proc_macro2::TokenStream {
 
 pub fn new_contract_object_fn() -> proc_macro2::TokenStream {
     quote! {
-        pub fn contract_obj<A>(_api: A) -> ContractObj<A>
+        pub fn contract_obj<A>() -> ContractObj<A>
         where
             A: elrond_wasm::api::VMApi,
         {

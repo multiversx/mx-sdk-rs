@@ -20,7 +20,7 @@ use super::{
 
 pub struct ContractObjWrapper<
     CB: ContractBase<Api = DebugApi> + CallableContract<DebugApi> + 'static,
-    ContractObjBuilder: 'static + Copy + Fn(DebugApi) -> CB,
+    ContractObjBuilder: 'static + Copy + Fn() -> CB,
 > {
     pub(crate) address: Address,
     pub(crate) obj_builder: ContractObjBuilder,
@@ -29,7 +29,7 @@ pub struct ContractObjWrapper<
 impl<CB, ContractObjBuilder> ContractObjWrapper<CB, ContractObjBuilder>
 where
     CB: ContractBase<Api = DebugApi> + CallableContract<DebugApi> + 'static,
-    ContractObjBuilder: 'static + Copy + Fn(DebugApi) -> CB,
+    ContractObjBuilder: 'static + Copy + Fn() -> CB,
 {
     pub(crate) fn new(address: Address, obj_builder: ContractObjBuilder) -> Self {
         ContractObjWrapper {
@@ -179,7 +179,7 @@ impl BlockchainStateWrapper {
     ) -> ContractObjWrapper<CB, ContractObjBuilder>
     where
         CB: ContractBase<Api = DebugApi> + CallableContract<DebugApi> + 'static,
-        ContractObjBuilder: 'static + Copy + Fn(DebugApi) -> CB,
+        ContractObjBuilder: 'static + Copy + Fn() -> CB,
     {
         let address = self.address_factory.new_sc_address();
 
@@ -211,10 +211,10 @@ impl BlockchainStateWrapper {
         );
 
         if !self.rc_b_mock.contains_contract(&wasm_full_path_as_expr) {
-            let closure = convert_full_fn(obj_builder);
+            let contract_obj = create_contract_obj_box(obj_builder);
 
             let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
-            let contract_obj = closure(DebugApi::new_from_static());
+            // let contract_obj = closure(DebugApi::new_from_static());
             b_mock_ref.register_contract_old(&wasm_full_path_as_expr, contract_obj);
         }
 
@@ -506,7 +506,7 @@ impl BlockchainStateWrapper {
         tx_fn: TxFn,
     ) where
         CB: ContractBase<Api = DebugApi> + CallableContract<DebugApi> + 'static,
-        ContractObjBuilder: 'static + Copy + Fn(DebugApi) -> CB,
+        ContractObjBuilder: 'static + Copy + Fn() -> CB,
     {
         self.execute_tx_any(caller, sc_wrapper, egld_payment, Vec::new(), tx_fn);
     }
@@ -521,7 +521,7 @@ impl BlockchainStateWrapper {
         tx_fn: TxFn,
     ) where
         CB: ContractBase<Api = DebugApi> + CallableContract<DebugApi> + 'static,
-        ContractObjBuilder: 'static + Copy + Fn(DebugApi) -> CB,
+        ContractObjBuilder: 'static + Copy + Fn() -> CB,
     {
         let esdt_transfer = vec![TxInputESDT {
             token_identifier: token_id.to_vec(),
@@ -539,7 +539,7 @@ impl BlockchainStateWrapper {
         tx_fn: TxFn,
     ) where
         CB: ContractBase<Api = DebugApi> + CallableContract<DebugApi> + 'static,
-        ContractObjBuilder: 'static + Copy + Fn(DebugApi) -> CB,
+        ContractObjBuilder: 'static + Copy + Fn() -> CB,
     {
         self.execute_tx_any(
             caller,
@@ -556,7 +556,7 @@ impl BlockchainStateWrapper {
         query_fn: TxFn,
     ) where
         CB: ContractBase<Api = DebugApi> + CallableContract<DebugApi> + 'static,
-        ContractObjBuilder: 'static + Copy + Fn(DebugApi) -> CB,
+        ContractObjBuilder: 'static + Copy + Fn() -> CB,
     {
         self.execute_tx(
             sc_wrapper.address_ref(),
@@ -579,7 +579,7 @@ impl BlockchainStateWrapper {
         tx_fn: TxFn,
     ) where
         CB: ContractBase<Api = DebugApi> + CallableContract<DebugApi> + 'static,
-        ContractObjBuilder: 'static + Copy + Fn(DebugApi) -> CB,
+        ContractObjBuilder: 'static + Copy + Fn() -> CB,
     {
         let sc_address = sc_wrapper.address_ref();
         let tx_cache = TxCache::new(self.rc_b_mock.clone());
@@ -610,11 +610,9 @@ impl BlockchainStateWrapper {
 
         let tx_input = build_tx_input(caller, sc_address, egld_payment, esdt_payments);
         let tx_context_rc = Rc::new(TxContext::new(tx_input, tx_cache));
-        TxContextStack::static_push(tx_context_rc.clone());
+        TxContextStack::static_push(tx_context_rc);
 
-        let debug_api = DebugApi::new(tx_context_rc);
-        let sc = (sc_wrapper.obj_builder)(debug_api);
-
+        let sc = (sc_wrapper.obj_builder)();
         let state_change = tx_fn(sc);
 
         let api_after_exec = Rc::try_unwrap(TxContextStack::static_pop()).unwrap();
@@ -716,21 +714,13 @@ fn serialize_attributes<T: TopEncode>(attributes: &T) -> Vec<u8> {
     serialized_attributes
 }
 
-fn convert_full_fn<CB, ContractObjBuilder>(
+fn create_contract_obj_box<CB, ContractObjBuilder>(
     func: ContractObjBuilder,
-) -> Box<dyn Fn(DebugApi) -> Box<dyn CallableContract<DebugApi>>>
+) -> Box<dyn CallableContract<DebugApi>>
 where
     CB: ContractBase<Api = DebugApi> + CallableContract<DebugApi> + 'static,
-    ContractObjBuilder: 'static + Fn(DebugApi) -> CB,
+    ContractObjBuilder: 'static + Fn() -> CB,
 {
-    let raw_closure = move |context| convert_part(func(context));
-
-    Box::new(raw_closure)
-}
-
-fn convert_part<CB>(c_base: CB) -> Box<dyn CallableContract<DebugApi>>
-where
-    CB: ContractBase<Api = DebugApi> + CallableContract<DebugApi> + 'static,
-{
+    let c_base = func();
     Box::new(c_base)
 }

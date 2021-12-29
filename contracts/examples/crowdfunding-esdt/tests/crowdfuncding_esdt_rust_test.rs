@@ -15,7 +15,7 @@ const WASM_PATH: &'static str = "output/crowdfunding-esdt.wasm";
 struct CrowdfundingSetup<CrowdfundingObjBuilder>
 where
     CrowdfundingObjBuilder:
-        'static + Copy + Fn(DebugApi) -> crowdfunding_esdt::ContractObj<DebugApi>,
+        'static + Copy + Fn() -> crowdfunding_esdt::ContractObj<DebugApi>,
 {
     pub blockchain_wrapper: BlockchainStateWrapper,
     pub owner_address: Address,
@@ -30,7 +30,7 @@ fn setup_crowdfunding<CrowdfundingObjBuilder>(
 ) -> CrowdfundingSetup<CrowdfundingObjBuilder>
 where
     CrowdfundingObjBuilder:
-        'static + Copy + Fn(DebugApi) -> crowdfunding_esdt::ContractObj<DebugApi>,
+        'static + Copy + Fn() -> crowdfunding_esdt::ContractObj<DebugApi>,
 {
     let rust_zero = rust_biguint!(0u64);
     let mut blockchain_wrapper = BlockchainStateWrapper::new();
