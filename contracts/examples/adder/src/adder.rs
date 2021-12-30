@@ -12,7 +12,7 @@ pub trait Adder {
 
     #[init]
     fn init(&self, initial_value: BigInt) {
-        self.sum().set(&initial_value);
+        self.sum().set(initial_value);
     }
 
     /// Add desired amount to the storage variable.

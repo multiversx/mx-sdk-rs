@@ -14,7 +14,7 @@ pub trait StrRepeat {
             byte_array.extend_from_slice(string);
         }
 
-        self.byte_array().set(&byte_array);
+        self.byte_array().set(byte_array);
     }
 
     #[view(getByteArrayLength)]

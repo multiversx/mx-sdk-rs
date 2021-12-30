@@ -1,6 +1,6 @@
 use crate::{
     api::ManagedTypeApi,
-    types::{BigUint, ManagedAddress, ManagedBuffer, ManagedType, ManagedVec},
+    types::{BigUint, ManagedAddress, ManagedBuffer, ManagedVec},
 };
 use elrond_codec::*;
 
@@ -25,10 +25,6 @@ pub struct EsdtTokenData<M: ManagedTypeApi> {
 }
 
 impl<M: ManagedTypeApi> EsdtTokenData<M> {
-    pub fn type_manager(&self) -> M::Impl {
-        self.amount.type_manager()
-    }
-
     pub fn decode_attributes<T: TopDecode>(&self) -> Result<T, DecodeError> {
         T::top_decode(self.attributes.clone()) // TODO: remove clone
     }

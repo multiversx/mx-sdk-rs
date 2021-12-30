@@ -14,6 +14,7 @@ use elrond_codec::{
 /// A list of items that lives inside a managed buffer.
 /// Items can be either stored there in full (e.g. `u32`),
 /// or just via handle (e.g. `BigUint<M>`).
+#[repr(transparent)]
 pub struct ManagedVec<M, T>
 where
     M: ManagedTypeApi,
