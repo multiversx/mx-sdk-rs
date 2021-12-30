@@ -11,6 +11,13 @@ use cmd_builder::*;
 use constants::*;
 use helper_types::*;
 
+#[derive(PartialEq)]
+pub enum PrintOption {
+    ErdpySnippet,
+    TxData,
+    Both,
+}
+
 pub struct ErdpySnippetGenerator {
     wallet_type: WalletType,
     sender_nonce: Option<u64>,
@@ -154,11 +161,12 @@ impl ErdpySnippetGenerator {
         self.arguments.push(arg_bytes);
     }
 
-    pub fn print(mut self) {
+    pub fn print(mut self, print_option: PrintOption) {
         let mut cmd_builder = CmdBuilder::new(ERDPY_PROGRAM_NAME);
         cmd_builder.add_flag(VERBOSE_FLAG);
         cmd_builder.add_command(CONTRACT_COMMAND_NAME);
 
+        let function_name: Option<String>;
         match &self.tx {
             TransactionType::Deploy {
                 deploy_type,
@@ -180,6 +188,7 @@ impl ErdpySnippetGenerator {
                 }
 
                 self.handle_common_non_query_steps(&mut cmd_builder);
+                function_name = None;
             },
             TransactionType::Upgrade {
                 dest_address_bech32,
@@ -203,6 +212,7 @@ impl ErdpySnippetGenerator {
                 }
 
                 self.handle_common_non_query_steps(&mut cmd_builder);
+                function_name = None;
             },
             TransactionType::Call {
                 sender_address_bech32,
@@ -216,6 +226,8 @@ impl ErdpySnippetGenerator {
                     0 => {
                         let dest_clone = dest_address_bech32.clone();
                         let function_clone = function.clone();
+
+                        function_name = Some(function.clone());
                         self.contract_call_no_esdt(&mut cmd_builder, dest_clone, function_clone);
                     },
                     1 => {
@@ -224,13 +236,14 @@ impl ErdpySnippetGenerator {
                         let function_clone = function.clone();
                         let esdt_transfer_clone = esdt_transfers[0].clone();
 
-                        self.contract_call_one_esdt(
+                        let transfer_func_name = self.contract_call_one_esdt(
                             &mut cmd_builder,
                             sender_clone,
                             dest_clone,
                             function_clone,
                             esdt_transfer_clone,
                         );
+                        function_name = Some(transfer_func_name);
                     },
                     _ => {
                         let sender_clone = sender_address_bech32.clone();
@@ -244,7 +257,8 @@ impl ErdpySnippetGenerator {
                             dest_clone,
                             function_clone,
                             transfers_clone,
-                        )
+                        );
+                        function_name = Some(MULTI_TRANSFER_FUNC_NAME.to_owned());
                     },
                 }
 
@@ -258,14 +272,16 @@ impl ErdpySnippetGenerator {
 
                 let dest_clone = dest_address_bech32.clone();
                 let function_clone = function.clone();
+
+                function_name = Some(function.clone());
                 self.contract_call_no_esdt(&mut cmd_builder, dest_clone, function_clone);
             },
         }
 
         if !self.arguments.is_empty() {
             cmd_builder.add_flag(ARGUMENTS_ARG_NAME);
-            for arg in self.arguments {
-                cmd_builder.add_standalone_argument(&arg);
+            for arg in &self.arguments {
+                cmd_builder.add_standalone_argument(arg);
             }
         }
 
@@ -273,7 +289,31 @@ impl ErdpySnippetGenerator {
         cmd_builder.add_raw_named_argument(CHAIN_ID_ARG_NAME, &self.chain_id);
         cmd_builder.add_flag(SEND_FLAG);
 
-        cmd_builder.print();
+        match print_option {
+            PrintOption::ErdpySnippet => cmd_builder.print(),
+            PrintOption::TxData => Self::print_tx_data(function_name, &self.arguments),
+            PrintOption::Both => {
+                Self::print_tx_data(function_name, &self.arguments);
+                println!();
+                cmd_builder.print();
+            },
+        }
+    }
+
+    fn print_tx_data(opt_function_name: Option<String>, arguments: &[Vec<u8>]) {
+        let function_name = match opt_function_name {
+            Some(f) => f,
+            None => return,
+        };
+
+        let mut tx_data = function_name;
+        for arg in arguments {
+            let arg_as_hex = CmdBuilder::to_hex(arg);
+            tx_data += "@";
+            tx_data += &arg_as_hex;
+        }
+
+        println!("{}", tx_data);
     }
 
     fn handle_common_non_query_steps(&self, cmd_builder: &mut CmdBuilder) {
@@ -327,7 +367,7 @@ impl ErdpySnippetGenerator {
         dest_address_bech32: String,
         function: String,
         esdt_transfer: EsdtTransferTuple,
-    ) {
+    ) -> String {
         let (token_id, token_nonce, amount) = esdt_transfer;
         if token_nonce == 0 {
             cmd_builder.append_string_no_quotes(&dest_address_bech32);
@@ -344,6 +384,8 @@ impl ErdpySnippetGenerator {
             args.extend_from_slice(&self.arguments);
 
             self.arguments = args;
+
+            ESDT_TRANSFER_FUNC_NAME.to_owned()
         } else {
             cmd_builder.append_string_no_quotes(&sender_address_bech32);
             cmd_builder.add_raw_named_argument(FUNCTION_ARG_NAME, NFT_TRANSFER_FUNC_NAME);
@@ -365,6 +407,8 @@ impl ErdpySnippetGenerator {
             args.extend_from_slice(&self.arguments);
 
             self.arguments = args;
+
+            NFT_TRANSFER_FUNC_NAME.to_owned()
         }
     }
 
@@ -423,7 +467,7 @@ fn main() {
     generator.add_argument(&other_arg);
 
     println!("SC Deploy:");
-    generator.print();
+    generator.print(PrintOption::ErdpySnippet);
     println!();
     println!();
 
@@ -440,7 +484,7 @@ fn main() {
     generator.add_argument(&other_arg);
 
     println!("SC Upgrade:");
-    generator.print();
+    generator.print(PrintOption::ErdpySnippet);
     println!();
     println!();
 
@@ -457,7 +501,7 @@ fn main() {
     generator.add_argument(&other_arg);
 
     println!("SC Call:");
-    generator.print();
+    generator.print(PrintOption::Both);
     println!();
     println!();
 
@@ -477,7 +521,7 @@ fn main() {
     generator.set_egld_value(&num_bigint::BigUint::from_str("10_000_000_000_000_000_000").unwrap());
 
     println!("SC Call with EGLD transfer:");
-    generator.print();
+    generator.print(PrintOption::Both);
     println!();
     println!();
 
@@ -498,7 +542,7 @@ fn main() {
     generator.add_esdt_transfer("MYTOKEN-abcdef".to_owned(), 0, amount);
 
     println!("SC Call with one ESDT transfer:");
-    generator.print();
+    generator.print(PrintOption::Both);
     println!();
     println!();
 
@@ -519,7 +563,7 @@ fn main() {
     generator.add_esdt_transfer("MYTOKEN-abcdef".to_owned(), 5, amount);
 
     println!("SC Call with one NFT transfer:");
-    generator.print();
+    generator.print(PrintOption::Both);
     println!();
     println!();
 
@@ -542,7 +586,7 @@ fn main() {
     generator.add_esdt_transfer("OTHERTOK-123456".to_owned(), 0, amount);
 
     println!("SC Call multiple ESDT transfers:");
-    generator.print();
+    generator.print(PrintOption::Both);
     println!();
     println!();
 
@@ -557,7 +601,7 @@ fn main() {
     generator.add_argument(&other_arg);
 
     println!("SC Query:");
-    generator.print();
+    generator.print(PrintOption::Both);
     println!();
     println!();
 }
