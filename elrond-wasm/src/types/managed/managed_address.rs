@@ -13,6 +13,7 @@ use elrond_codec::{
     TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, TryStaticCast,
 };
 
+#[repr(transparent)]
 #[derive(Clone)]
 pub struct ManagedAddress<M: ManagedTypeApi> {
     bytes: ManagedByteArray<M, 32>,

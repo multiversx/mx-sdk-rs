@@ -13,6 +13,7 @@ use elrond_codec::{
 };
 
 /// A byte buffer managed by an external API.
+#[repr(transparent)]
 pub struct ManagedBuffer<M: ManagedTypeApi> {
     pub(crate) handle: Handle,
     _phantom: PhantomData<M>,
