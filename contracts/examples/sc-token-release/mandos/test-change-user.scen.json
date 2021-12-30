@@ -28,7 +28,7 @@
                 "nonce": "0",
                 "balance": "0",
                 "esdt": {
-                    "str:MyFirstToken-101": "0"
+                    "str:FIRSTTOKEN-123456": "0"
                 },
                 "storage": {}
             }
@@ -83,7 +83,7 @@
                 "nonce": "2",
                 "balance": "0",
                 "esdt": {
-                    "str:MyFirstToken-101": "1,250"
+                    "str:FIRSTTOKEN-123456": "1,250"
                 },
                 "storage": {}
             },
@@ -91,7 +91,7 @@
                 "nonce": "1",
                 "balance": "0",
                 "esdt": {
-                    "str:MyFirstToken-101": "2,500"
+                    "str:FIRSTTOKEN-123456": "2,500"
                 },
                 "storage": {}
             },
@@ -99,7 +99,7 @@
                 "nonce": "0",
                 "balance": "0",
                 "esdt": {
-                    "str:MyFirstToken-101": "0"
+                    "str:FIRSTTOKEN-123456": "0"
                 },
                 "storage": {}
             },

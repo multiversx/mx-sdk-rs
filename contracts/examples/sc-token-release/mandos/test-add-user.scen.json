@@ -16,7 +16,7 @@
                 "nonce": "0",
                 "balance": "0",
                 "esdt": {
-                  "str:MyFirstToken-101": "0"
+                  "str:FIRSTTOKEN-123456": "0"
               },
                 "storage": {}
             },
@@ -24,7 +24,7 @@
                 "nonce": "0",
                 "balance": "0",
                 "esdt": {
-                  "str:MyFirstToken-101": "0"
+                  "str:FIRSTTOKEN-123456": "0"
               },
                 "storage": {}
             }
