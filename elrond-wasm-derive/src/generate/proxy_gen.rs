@@ -130,7 +130,7 @@ pub fn generate_proxy_endpoint(m: &Method, endpoint_name: String) -> proc_macro2
         #[allow(clippy::too_many_arguments)]
         #[allow(clippy::type_complexity)]
         #msig {
-            let (___api___, ___address___) = self.into_fields();
+            let ___address___ = self.into_fields();
             let mut ___contract_call___ = elrond_wasm::types::new_contract_call(
                 ___address___,
                 #endpoint_name_literal,
@@ -202,8 +202,7 @@ pub fn generate_proxy_deploy(init_method: &Method) -> proc_macro2::TokenStream {
         #[allow(clippy::too_many_arguments)]
         #[allow(clippy::type_complexity)]
         #msig {
-            let (___api___, ___address___) =
-                self.into_fields();
+            let ___address___ = self.into_fields();
             let mut ___contract_deploy___ = elrond_wasm::types::new_contract_deploy::<Self::Api>(
                 ___address___,
             );

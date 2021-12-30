@@ -4,7 +4,9 @@ use elrond_wasm_debug::DebugApi;
 
 #[test]
 fn test_add() {
-    let adder = adder::contract_obj(DebugApi::dummy());
+    let _ = DebugApi::dummy();
+
+    let adder = adder::contract_obj::<DebugApi>();
 
     adder.init(BigInt::from(5));
     assert_eq!(BigInt::from(5), adder.sum().get());
