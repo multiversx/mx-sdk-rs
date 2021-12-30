@@ -46,14 +46,14 @@ pub trait MultisigStateModule {
                 if !new_user {
                     duplicates = true;
                 }
-                self.user_id_to_role(user_id).set(&UserRole::BoardMember);
+                self.user_id_to_role(user_id).set(UserRole::BoardMember);
             },
         );
         require!(!duplicates, "duplicate board member");
 
         let num_board_members_mapper = self.num_board_members();
         let new_num_board_members = num_board_members_mapper.get() + new_board_members.len();
-        num_board_members_mapper.set(&new_num_board_members);
+        num_board_members_mapper.set(new_num_board_members);
         Ok(new_num_board_members)
     }
 
