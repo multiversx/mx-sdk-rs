@@ -11,7 +11,7 @@ pub trait ManagedType<M: ManagedTypeApi>: Sized {
     fn get_raw_handle(&self) -> Handle;
 
     #[inline]
-    fn type_manager(&self) -> M::Impl {
+    fn type_manager(&self) -> M::ManagedTypeApiImpl {
         M::managed_type_impl()
     }
 
