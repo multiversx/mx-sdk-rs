@@ -21,6 +21,7 @@ pub type EllipticCurveComponents<M> = (
     u32,
 );
 
+#[repr(transparent)]
 #[derive(Debug)]
 pub struct EllipticCurve<M: ManagedTypeApi> {
     pub(super) handle: Handle,
