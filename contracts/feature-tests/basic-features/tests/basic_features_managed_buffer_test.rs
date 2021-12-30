@@ -5,16 +5,16 @@ use basic_features::managed_buffer_features::ManagedBufferFeatures;
 
 #[test]
 fn test_managed_buffer_new_empty() {
-    let context = DebugApi::dummy();
-    let bf = basic_features::contract_obj(context.clone());
+    let _ = DebugApi::dummy();
+    let bf = basic_features::contract_obj::<DebugApi>();
     let result = bf.mbuffer_new();
     assert_eq!(ManagedBuffer::new(), result);
 }
 
 #[test]
 fn test_managed_buffer_set_slice() {
-    let context = DebugApi::dummy();
-    let bf = basic_features::contract_obj(context.clone());
+    let _ = DebugApi::dummy();
+    let bf = basic_features::contract_obj::<DebugApi>();
     let buffer = bf.mbuffer_from_slice(&[1, 2, 3][..]);
     let result = bf.mbuffer_set_slice(buffer.clone(), 4, &[5]);
     assert!(result.is_err());
@@ -26,8 +26,8 @@ fn test_managed_buffer_set_slice() {
 
 #[test]
 fn test_managed_buffer_from() {
-    let context = DebugApi::dummy();
-    let bf = basic_features::contract_obj(context.clone());
+    let _ = DebugApi::dummy();
+    let bf = basic_features::contract_obj::<DebugApi>();
     let result = bf.mbuffer_from_slice(&[1, 2, 3][..]);
     assert_eq!(ManagedBuffer::from(&[1, 2, 3][..]), result);
     let result = bf.mbuffer_from_boxed_bytes(BoxedBytes::from(&[4, 5, 6][..]));
@@ -36,16 +36,16 @@ fn test_managed_buffer_from() {
 
 #[test]
 fn test_managed_address_zero() {
-    let context = DebugApi::dummy();
-    let bf = basic_features::contract_obj(context.clone());
+    let _ = DebugApi::dummy();
+    let bf = basic_features::contract_obj::<DebugApi>();
     let result = bf.managed_address_zero();
     assert_eq!(ManagedAddress::zero(), result);
 }
 
 #[test]
 fn test_managed_address_from() {
-    let context = DebugApi::dummy();
-    let bf = basic_features::contract_obj(context.clone());
+    let _ = DebugApi::dummy();
+    let bf = basic_features::contract_obj::<DebugApi>();
     assert_eq!(
         bf.managed_address_zero(),
         bf.managed_address_from(&[0u8; 32])

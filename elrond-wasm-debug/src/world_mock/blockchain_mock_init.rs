@@ -32,16 +32,24 @@ impl BlockchainMock {
         self.current_dir = path;
     }
 
-    pub fn register_contract(
+    pub fn register_contract_old(
         &mut self,
         expression: &str,
-        new_contract_closure: Box<dyn Fn(DebugApi) -> Box<dyn CallableContract<DebugApi>>>,
+        new_contract_obj: Box<dyn CallableContract<DebugApi>>,
     ) {
         let contract_bytes = interpret_string(
             expression,
             &InterpreterContext::new(self.current_dir.clone()),
         );
         self.contract_map
-            .register_contract(contract_bytes, new_contract_closure);
+            .register_contract(contract_bytes, new_contract_obj);
+    }
+
+    pub fn register_contract_builder(
+        &mut self,
+        expression: &str,
+        contract_builder: fn() -> Box<dyn CallableContract<DebugApi>>,
+    ) {
+        self.register_contract_old(expression, contract_builder())
     }
 }

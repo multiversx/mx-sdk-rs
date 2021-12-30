@@ -4,7 +4,7 @@ pub fn contract_object_def() -> proc_macro2::TokenStream {
         where
             A: elrond_wasm::api::VMApi,
         {
-            api: A,
+            _phantom: core::marker::PhantomData<A>,
         }
     }
 }
@@ -16,21 +16,28 @@ pub fn impl_contract_base() -> proc_macro2::TokenStream {
             A: elrond_wasm::api::VMApi,
         {
             type Api = A;
-
-            fn raw_vm_api(&self) -> Self::Api {
-                self.api.clone()
-            }
         }
     }
 }
 
 pub fn new_contract_object_fn() -> proc_macro2::TokenStream {
     quote! {
-        pub fn contract_obj<A>(api: A) -> ContractObj<A>
+        pub fn contract_obj<A>() -> ContractObj<A>
         where
             A: elrond_wasm::api::VMApi,
         {
-            ContractObj { api }
+            ContractObj {
+                _phantom: core::marker::PhantomData,
+            }
+        }
+
+        pub fn contract_builder<A>() -> elrond_wasm::Box<dyn elrond_wasm::contract_base::CallableContract<A>>
+        where
+            A: elrond_wasm::api::VMApi,
+        {
+            elrond_wasm::Box::new(ContractObj {
+                _phantom: core::marker::PhantomData,
+            })
         }
     }
 }
@@ -59,8 +66,9 @@ pub fn impl_callable_contract() -> proc_macro2::TokenStream {
             fn call(&self, fn_name: &[u8]) -> bool {
                 EndpointWrappers::call(self, fn_name)
             }
-            fn into_api(self: Box<Self>) -> A {
-                self.api
+
+            fn clone_obj(&self) -> elrond_wasm::Box<dyn elrond_wasm::contract_base::CallableContract<A>> {
+                self::contract_builder()
             }
         }
     }
@@ -72,7 +80,6 @@ pub fn proxy_object_def() -> proc_macro2::TokenStream {
         where
             A: elrond_wasm::api::VMApi + 'static,
         {
-            pub api: A,
             pub address: elrond_wasm::types::ManagedAddress<A>,
         }
 
@@ -82,10 +89,9 @@ pub fn proxy_object_def() -> proc_macro2::TokenStream {
         {
             type Api = A;
 
-            fn new_proxy_obj(api: A) -> Self {
+            fn new_proxy_obj() -> Self {
                 let zero_address = ManagedAddress::zero();
                 Proxy {
-                    api,
                     address: zero_address,
                 }
             }
@@ -96,8 +102,8 @@ pub fn proxy_object_def() -> proc_macro2::TokenStream {
             }
 
             #[inline]
-            fn into_fields(self) -> (Self::Api, ManagedAddress<Self::Api>) {
-                (self.api, self.address)
+            fn into_fields(self) -> ManagedAddress<Self::Api> {
+                self.address
             }
         }
     }
@@ -109,7 +115,7 @@ pub fn callback_proxy_object_def() -> proc_macro2::TokenStream {
         where
             A: elrond_wasm::api::VMApi + 'static,
         {
-            pub api: A,
+            _phantom: core::marker::PhantomData<A>,
         }
 
         impl<A> elrond_wasm::contract_base::CallbackProxyObjBase for CallbackProxyObj<A>
@@ -118,8 +124,10 @@ pub fn callback_proxy_object_def() -> proc_macro2::TokenStream {
         {
             type Api = A;
 
-            fn new_cb_proxy_obj(api: A) -> Self {
-                CallbackProxyObj { api }
+            fn new_cb_proxy_obj() -> Self {
+                CallbackProxyObj {
+                    _phantom: core::marker::PhantomData,
+                }
             }
         }
     }
