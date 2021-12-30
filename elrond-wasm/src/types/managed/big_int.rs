@@ -12,6 +12,7 @@ use elrond_codec::{
     TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, TryStaticCast,
 };
 
+#[repr(transparent)]
 pub struct BigInt<M: ManagedTypeApi> {
     pub(crate) handle: Handle,
     _phantom: PhantomData<M>,

@@ -16,6 +16,7 @@ use super::{ManagedRef, ManagedType};
 /// It can be thought of as a "smart" pointer to immutable data.
 ///
 /// Also note that unlike the `ManagedReadonly`, the data is owned.
+#[repr(transparent)]
 pub struct ManagedReadonly<M, T>
 where
     M: ManagedTypeApi,
