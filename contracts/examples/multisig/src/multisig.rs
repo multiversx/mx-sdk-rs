@@ -40,7 +40,7 @@ pub trait Multisig:
             quorum <= new_num_board_members,
             "quorum cannot exceed board size"
         );
-        self.quorum().set(&quorum);
+        self.quorum().set(quorum);
 
         Ok(())
     }
