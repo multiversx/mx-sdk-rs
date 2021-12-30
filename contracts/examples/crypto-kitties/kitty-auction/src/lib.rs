@@ -16,14 +16,14 @@ pub trait KittyAuction {
         #[var_args] opt_kitty_ownership_contract_address: OptionalArg<ManagedAddress>,
     ) {
         self.gen_zero_kitty_starting_price()
-            .set(&gen_zero_kitty_starting_price);
+            .set(gen_zero_kitty_starting_price);
         self.gen_zero_kitty_ending_price()
-            .set(&gen_zero_kitty_ending_price);
+            .set(gen_zero_kitty_ending_price);
         self.gen_zero_kitty_auction_duration()
-            .set(&gen_zero_kitty_auction_duration);
+            .set(gen_zero_kitty_auction_duration);
 
         match opt_kitty_ownership_contract_address {
-            OptionalArg::Some(addr) => self.kitty_ownership_contract_address().set(&addr),
+            OptionalArg::Some(addr) => self.kitty_ownership_contract_address().set(addr),
             OptionalArg::None => {},
         }
     }
@@ -36,7 +36,7 @@ pub trait KittyAuction {
         &self,
         address: ManagedAddress,
     ) -> SCResult<()> {
-        self.kitty_ownership_contract_address().set(&address);
+        self.kitty_ownership_contract_address().set(address);
 
         Ok(())
     }
@@ -193,7 +193,7 @@ pub trait KittyAuction {
         // update auction bid and winner
         auction.current_bid = payment;
         auction.current_winner = caller;
-        self.auction(kitty_id).set(&auction);
+        self.auction(kitty_id).set(auction);
 
         Ok(())
     }
@@ -275,7 +275,7 @@ pub trait KittyAuction {
             &self.blockchain().get_sc_address(),
         );
 
-        self.auction(kitty_id).set(&auction);
+        self.auction(kitty_id).set(auction);
     }
 
     fn transfer_to(&self, address: ManagedAddress, kitty_id: u32) -> OptionalResult<AsyncCall> {
@@ -345,7 +345,7 @@ pub trait KittyAuction {
                     &kitty_owner,
                 );
 
-                self.auction(cb_kitty_id).set(&auction);
+                self.auction(cb_kitty_id).set(auction);
             },
             ManagedAsyncCallResult::Err(_) => {
                 // nothing to revert in case of error

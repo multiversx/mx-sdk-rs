@@ -10,11 +10,6 @@ pub trait ManagedType<M: ManagedTypeApi>: Sized {
     #[doc(hidden)]
     fn get_raw_handle(&self) -> Handle;
 
-    #[inline]
-    fn type_manager(&self) -> M::Impl {
-        M::managed_type_impl()
-    }
-
     /// Implement carefully, since the underlying transmutation is an unsafe operation.
     /// For types that wrap a handle to some VM-managed data,
     /// make sure the type only contains the handle (plus ZSTs if necessary).
