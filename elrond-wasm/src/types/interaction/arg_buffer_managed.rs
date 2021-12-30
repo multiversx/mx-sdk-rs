@@ -12,6 +12,7 @@ use elrond_codec::{
 };
 
 #[derive(Debug)]
+#[repr(transparent)]
 pub struct ManagedArgBuffer<M>
 where
     M: ManagedTypeApi + 'static,
