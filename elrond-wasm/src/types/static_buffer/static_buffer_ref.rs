@@ -1,19 +1,19 @@
 use core::marker::PhantomData;
 
-use crate::api::{InvalidSliceError, StaticBufferApi, StaticBufferApiImpl};
+use crate::api::{InvalidSliceError, StaticVarApi, StaticVarApiImpl};
 
 use super::LockableStaticBuffer;
 
 pub struct StaticBufferRef<M>
 where
-    M: StaticBufferApi,
+    M: StaticVarApi,
 {
     _phantom: PhantomData<M>,
 }
 
 impl<M> StaticBufferRef<M>
 where
-    M: StaticBufferApi,
+    M: StaticVarApi,
 {
     fn new() -> Self {
         StaticBufferRef {
@@ -25,7 +25,7 @@ where
         len: usize,
         copy_bytes: F,
     ) -> Option<Self> {
-        M::static_buffer_api_impl().with_lockable_static_buffer(|lsb| {
+        M::static_var_api_impl().with_lockable_static_buffer(|lsb| {
             if lsb.try_lock_with_copy_bytes(len, copy_bytes) {
                 Some(StaticBufferRef::new())
             } else {
@@ -39,21 +39,21 @@ where
     }
 }
 
-impl<M: StaticBufferApi> Drop for StaticBufferRef<M> {
+impl<M: StaticVarApi> Drop for StaticBufferRef<M> {
     fn drop(&mut self) {
-        M::static_buffer_api_impl().with_lockable_static_buffer(|lsb| {
+        M::static_var_api_impl().with_lockable_static_buffer(|lsb| {
             lsb.unlock();
         })
     }
 }
 
-impl<M: StaticBufferApi> StaticBufferRef<M> {
+impl<M: StaticVarApi> StaticBufferRef<M> {
     pub fn len(&self) -> usize {
-        M::static_buffer_api_impl().with_lockable_static_buffer(|lsb| lsb.len())
+        M::static_var_api_impl().with_lockable_static_buffer(|lsb| lsb.len())
     }
 
     pub fn is_empty(&self) -> bool {
-        M::static_buffer_api_impl().with_lockable_static_buffer(|lsb| lsb.is_empty())
+        M::static_var_api_impl().with_lockable_static_buffer(|lsb| lsb.is_empty())
     }
 
     pub fn capacity(&self) -> usize {
@@ -61,15 +61,15 @@ impl<M: StaticBufferApi> StaticBufferRef<M> {
     }
 
     pub fn remaining_capacity(&self) -> usize {
-        M::static_buffer_api_impl().with_lockable_static_buffer(|lsb| lsb.remaining_capacity())
+        M::static_var_api_impl().with_lockable_static_buffer(|lsb| lsb.remaining_capacity())
     }
 
     pub fn with_buffer_contents<R, F: FnMut(&[u8]) -> R>(&self, mut f: F) -> R {
-        M::static_buffer_api_impl().with_lockable_static_buffer(|lsb| f(lsb.as_slice()))
+        M::static_var_api_impl().with_lockable_static_buffer(|lsb| f(lsb.as_slice()))
     }
 
     pub fn contents_eq(&self, bytes: &[u8]) -> bool {
-        M::static_buffer_api_impl().with_lockable_static_buffer(|lsb| lsb.as_slice() == bytes)
+        M::static_var_api_impl().with_lockable_static_buffer(|lsb| lsb.as_slice() == bytes)
     }
 
     pub fn load_slice(
@@ -77,7 +77,7 @@ impl<M: StaticBufferApi> StaticBufferRef<M> {
         starting_position: usize,
         dest: &mut [u8],
     ) -> Result<(), InvalidSliceError> {
-        M::static_buffer_api_impl()
+        M::static_var_api_impl()
             .with_lockable_static_buffer(|lsb| lsb.load_slice(starting_position, dest))
     }
 
@@ -90,7 +90,7 @@ impl<M: StaticBufferApi> StaticBufferRef<M> {
         len: usize,
         copy_bytes: F,
     ) -> bool {
-        M::static_buffer_api_impl()
+        M::static_var_api_impl()
             .with_lockable_static_buffer(|lsb| lsb.try_extend_from_copy_bytes(len, copy_bytes))
     }
 }

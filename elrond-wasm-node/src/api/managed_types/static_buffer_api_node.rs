@@ -1,5 +1,5 @@
 use elrond_wasm::{
-    api::{StaticBufferApi, StaticBufferApiImpl},
+    api::{StaticVarApi, StaticVarApiImpl},
     types::LockableStaticBuffer,
 };
 
@@ -7,15 +7,15 @@ use crate::VmApiImpl;
 
 static mut STATIC_BUFFER: LockableStaticBuffer = LockableStaticBuffer::new();
 
-impl StaticBufferApi for VmApiImpl {
-    type StaticBufferApiImpl = VmApiImpl;
+impl StaticVarApi for VmApiImpl {
+    type StaticVarApiImpl = VmApiImpl;
 
-    fn static_buffer_api_impl() -> Self::StaticBufferApiImpl {
+    fn static_var_api_impl() -> Self::StaticVarApiImpl {
         VmApiImpl {}
     }
 }
 
-impl StaticBufferApiImpl for VmApiImpl {
+impl StaticVarApiImpl for VmApiImpl {
     fn with_lockable_static_buffer<R, F: FnOnce(&mut LockableStaticBuffer) -> R>(&self, f: F) -> R {
         unsafe { f(&mut STATIC_BUFFER) }
     }
