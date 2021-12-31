@@ -19,10 +19,14 @@ impl StaticVarApiImpl for DebugApi {
     }
 
     fn set_external_view_target_address_handle(&self, handle: Handle) {
-        self.static_vars_cell.borrow_mut().external_view_target_address_handle = handle;
+        self.static_vars_cell
+            .borrow_mut()
+            .external_view_target_address_handle = handle;
     }
 
     fn get_external_view_target_address_handle(&self) -> Handle {
-        self.static_vars_cell.borrow().external_view_target_address_handle
+        self.static_vars_cell
+            .borrow()
+            .external_view_target_address_handle
     }
 }
