@@ -1,19 +1,19 @@
 use crate::{
-    api::{StaticBufferApi, StaticBufferApiImpl},
+    api::{StaticVarApi, StaticVarApiImpl},
     types::LockableStaticBuffer,
 };
 
 use super::UncallableApi;
 
-impl StaticBufferApi for UncallableApi {
-    type StaticBufferApiImpl = UncallableApi;
+impl StaticVarApi for UncallableApi {
+    type StaticVarApiImpl = UncallableApi;
 
-    fn static_buffer_api_impl() -> Self::StaticBufferApiImpl {
+    fn static_var_api_impl() -> Self::StaticVarApiImpl {
         unreachable!()
     }
 }
 
-impl StaticBufferApiImpl for UncallableApi {
+impl StaticVarApiImpl for UncallableApi {
     fn with_lockable_static_buffer<R, F: FnOnce(&mut LockableStaticBuffer) -> R>(
         &self,
         _f: F,
