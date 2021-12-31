@@ -1,4 +1,4 @@
-use core::{marker::PhantomData, ops::Deref};
+use core::{borrow::Borrow, marker::PhantomData, ops::Deref};
 
 use elrond_codec::{EncodeError, NestedEncode, NestedEncodeOutput, TopEncode, TopEncodeOutput};
 
@@ -67,6 +67,17 @@ where
     #[inline]
     fn deref(&self) -> &Self::Target {
         Self::Target::transmute_from_handle_ref(&self.handle)
+    }
+}
+
+impl<'a, M, T> Borrow<T> for ManagedRef<'a, M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedType<M>,
+{
+    #[inline]
+    fn borrow(&self) -> &T {
+        self.deref()
     }
 }
 

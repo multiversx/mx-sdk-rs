@@ -1,4 +1,4 @@
-use core::{marker::PhantomData, ops::Deref};
+use core::{borrow::Borrow, marker::PhantomData, ops::Deref};
 
 use alloc::boxed::Box;
 use elrond_codec::{
@@ -15,7 +15,8 @@ use super::{ManagedRef, ManagedType};
 ///
 /// It can be thought of as a "smart" pointer to immutable data.
 ///
-/// Also note that unlike the `ManagedReadonly`, the data is owned.
+/// Also note that unlike the `ManagedRef`, the data is owned.
+#[repr(transparent)]
 pub struct ManagedReadonly<M, T>
 where
     M: ManagedTypeApi,
@@ -75,6 +76,17 @@ where
 
     fn deref(&self) -> &Self::Target {
         Self::Target::transmute_from_handle_ref(&self.handle)
+    }
+}
+
+impl<'a, M, T> Borrow<T> for ManagedReadonly<M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedType<M>,
+{
+    #[inline]
+    fn borrow(&self) -> &T {
+        self.deref()
     }
 }
 

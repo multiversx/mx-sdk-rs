@@ -12,6 +12,7 @@ use elrond_codec::*;
 /// EGLD is stored as an empty name.
 ///
 /// Not yet implemented, but we might add additional restrictions when deserializing as argument.
+#[repr(transparent)]
 #[derive(Clone, Debug)]
 pub struct TokenIdentifier<M: ManagedTypeApi> {
     buffer: ManagedBuffer<M>,

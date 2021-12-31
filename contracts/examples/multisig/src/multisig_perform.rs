@@ -136,7 +136,7 @@ pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
                     new_quorum <= self.num_board_members().get(),
                     "quorum cannot exceed board size"
                 );
-                self.quorum().set(&new_quorum);
+                self.quorum().set(new_quorum);
                 Ok(PerformActionResult::Nothing)
             },
             Action::SendTransferExecute(call_data) => {
