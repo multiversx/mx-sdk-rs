@@ -1,8 +1,8 @@
 use crate::api::ErrorApi;
 
-use super::{ManagedTypeApiImpl, StaticBufferApi};
+use super::{ManagedTypeApiImpl, StaticVarApi};
 
-pub trait ManagedTypeApi: StaticBufferApi + ErrorApi + Clone + 'static {
+pub trait ManagedTypeApi: StaticVarApi + ErrorApi + Clone + 'static {
     type ManagedTypeApiImpl: ManagedTypeApiImpl;
 
     fn managed_type_impl() -> Self::ManagedTypeApiImpl;
