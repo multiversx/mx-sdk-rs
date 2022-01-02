@@ -4,6 +4,7 @@ elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
 mod contract_data;
+
 use contract_data::Schedule;
 use contract_data::UnlockType;
 
@@ -197,11 +198,11 @@ pub trait TokenRelease {
     #[endpoint(endSetupPeriod)]
     fn end_setup_period(&self) -> SCResult<()> {
         let token_identifier = self.token_identifier().get();
-        self.setup_period_status().set(&false);
         let total_mint_tokens = self.token_total_supply().get();
         self.mint_all_tokens(&token_identifier, &total_mint_tokens);
         let activation_timestamp = self.blockchain().get_block_timestamp();
         self.activation_timestamp().set(&activation_timestamp);
+        self.setup_period_status().set(false);
         Ok(())
     }
 
