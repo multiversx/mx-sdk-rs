@@ -24,21 +24,8 @@
             "str:FIRSTTOKEN-123456": "0"
         },
           "storage": {}
+        }
         },
-        "sc:token_release_contract": {
-          "nonce": "0",
-          "balance": "0",
-          "esdt": {
-              "str:FIRSTTOKEN-123456": {
-                  "roles": [
-                      "ESDTRoleLocalMint"
-                  ]
-              }
-          },
-          "code": "file:../output/token-release.wasm",
-          "owner": "address:owner"
-      }
-      },
         "newAddresses": [
           {
             "creatorAddress": "address:owner",
@@ -49,10 +36,28 @@
       },
       {
         "step": "setState",
+        "accounts": {
+          "sc:token_release_contract": {
+            "nonce": "0",
+            "balance": "0",
+            "esdt": {
+                "str:FIRSTTOKEN-123456": {
+                    "roles": [
+                        "ESDTRoleLocalMint"
+                    ]
+                }
+            },
+            "code": "file:../output/token-release.wasm",
+            "owner": "address:owner"
+          }
+        }
+      },
+      {
+        "step": "setState",
         "currentBlockInfo": {
             "blockTimestamp": "1"
         }
-    },
+      },
       {
         "step": "scDeploy",
         "txId": "deploy",
