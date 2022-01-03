@@ -107,12 +107,7 @@ pub trait ManagedBufferFeatures {
 
     #[endpoint]
     fn dynamic_message(&self, bytes: ManagedBuffer) {
-        let mut builder = FormattedMessageBuilder::<Self::Api>::new(
-            b"Got this buffer: {}. I don't like it, ERROR!",
-        );
-        builder.add_argument(&bytes);
-
-        builder.signal_error();
+        signal_error!("Got this buffer: {}. I don't like it, ERROR!", bytes);
     }
 
     #[payable("*")]
@@ -123,13 +118,11 @@ pub trait ManagedBufferFeatures {
         #[payment_nonce] nonce: u64,
         #[payment_amount] amount: BigUint,
     ) {
-        let mut builder = FormattedMessageBuilder::<Self::Api>::new(
-            b"Got token {}, with nonce {}, amount {}. I prefer EGLD. ERROR!",
+        signal_error!(
+            "Got token {}, with nonce {}, amount {}. I prefer EGLD. ERROR!",
+            token_id,
+            nonce,
+            amount
         );
-        builder.add_argument(&token_id);
-        builder.add_argument(&nonce);
-        builder.add_argument(&amount);
-
-        builder.signal_error();
     }
 }
