@@ -81,6 +81,17 @@ pub trait SendApiImpl {
         arg_buffer: &ManagedArgBuffer<Self::ManagedTypeApi>,
     ) -> !;
 
+    fn create_async_call_raw(
+        &self,
+        to: &ManagedAddress<Self::ManagedTypeApi>,
+        amount: &BigUint<Self::ManagedTypeApi>,
+        endpoint_name: &ManagedBuffer<Self::ManagedTypeApi>,
+        arg_buffer: &ManagedArgBuffer<Self::ManagedTypeApi>,
+        success: &ManagedBuffer<Self::ManagedTypeApi>,
+        error: &ManagedBuffer<Self::ManagedTypeApi>,
+        gas: u64,
+        extra_gas_for_callback: u64,
+    ) -> Result<(), &'static [u8]>;
     /// Deploys a new contract in the same shard.
     /// Unlike `async_call_raw`, the deployment is synchronous and tx execution continues afterwards.
     /// Also unlike `async_call_raw`, it uses an argument buffer to pass arguments
