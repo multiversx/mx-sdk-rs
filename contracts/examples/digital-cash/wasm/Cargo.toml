@@ -21,10 +21,13 @@ debug = false
 panic = "abort"
 
 [dependencies.digital-cash]
-features = [ "wasm-output-mode",]
-default-features = false
 path = ".."
 
+[dependencies.elrond-wasm-node]
+version = "0.25.0"
+path = "../../../../elrond-wasm-node"
+
 [dependencies.elrond-wasm-output]
-version = "0.13.0"
-features = [ "wasm-output-mode",]
+version = "0.25.0"
+features = ["wasm-output-mode"]
+path = "../../../../elrond-wasm-output"

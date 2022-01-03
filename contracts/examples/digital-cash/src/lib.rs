@@ -1,7 +1,6 @@
 #![no_std]
 #![allow(unused_attributes)]
 
-use elrond_wasm::{require, sc_error};
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
@@ -10,7 +9,7 @@ use deposit_info::DepositInfo;
 
 pub const SECONDS_PER_ROUND: u64 = 6;
 
-#[elrond_wasm_derive::contract(DigitalCashImpl)]
+#[elrond_wasm::contract]
 pub trait DigitalCash {
     #[init]
     fn init(&self) {}
@@ -18,7 +17,7 @@ pub trait DigitalCash {
     fn get_expiration_round(&self, valability: u64) -> u64 {
         let valability_rounds = valability / SECONDS_PER_ROUND;
 
-        return self.get_block_round() + valability_rounds;
+        self.blockchain().get_block_round() + valability_rounds
     }
 
     #[endpoint]
@@ -27,7 +26,7 @@ pub trait DigitalCash {
         &self,
         #[payment] payment: BigUint,
         #[payment_token] token: TokenIdentifier,
-        address: Address,
+        address: ManagedAddress,
         valability: u64,
     ) -> SCResult<()> {
         require!(payment > 0, "amount must be greater than 0");
@@ -37,7 +36,7 @@ pub trait DigitalCash {
 
         let deposit = &DepositInfo {
             amount: payment,
-            depositor_address: self.get_caller(),
+            depositor_address: self.blockchain().get_caller(),
             expiration_round: self.get_expiration_round(valability),
             token_name: token,
             nonce: nft_nonce,
@@ -49,75 +48,61 @@ pub trait DigitalCash {
     }
 
     #[endpoint]
-    fn withdraw(&self, address: Address) -> SCResult<()> {
+    fn withdraw(&self, address: ManagedAddress) -> SCResult<()> {
         require!(!self.deposit(&address).is_empty(), "non-existent key");
 
         let deposit = self.deposit(&address).get();
 
         require!(
-            deposit.expiration_round < self.get_block_round(),
+            deposit.expiration_round < self.blockchain().get_block_round(),
             "withdrawal has not been available yet"
         );
-        if deposit.nonce != 0 {
-            self.send().direct_esdt_nft_via_transfer_exec(
-                &deposit.depositor_address,
-                &deposit.token_name.as_esdt_identifier(),
-                deposit.nonce,
-                &deposit.amount,
-                b"successful withdrawal",
-            );
-        } else {
-            self.send().direct(
-                &deposit.depositor_address,
-                &deposit.token_name,
-                &deposit.amount,
-                b"successful withdrawal",
-            );
-            self.deposit(&address).clear();
-        };
+        self.send().direct(
+            &deposit.depositor_address,
+            &deposit.token_name,
+            deposit.nonce,
+            &deposit.amount,
+            b"successful withdrawal",
+        );
+        self.deposit(&address).clear();
 
         Ok(())
     }
 
     #[endpoint]
-    fn claim(&self, address: Address, signature: &[u8]) -> SCResult<()> {
+    fn claim(&self, address: ManagedAddress, signature: ManagedBuffer) -> SCResult<()> {
         require!(!self.deposit(&address).is_empty(), "non-existent key");
 
         let deposit = self.deposit(&address).get();
-        let caller_address: Address = self.get_caller();
+        let caller_address = self.blockchain().get_caller();
 
         require!(
-            deposit.expiration_round >= self.get_block_round(),
+            deposit.expiration_round >= self.blockchain().get_block_round(),
             "deposit expired"
         );
         require!(
-            self.verify_ed25519(address.as_bytes(), caller_address.as_bytes(), signature),
+            self.crypto().verify_ed25519(
+                &address.to_byte_array()[..],
+                &caller_address.to_byte_array()[..],
+                signature.to_boxed_bytes().as_slice()
+            ),
             "invalid signature"
         );
 
-        if deposit.nonce != 0 {
-            self.send().direct_esdt_nft_via_transfer_exec(
-                &self.get_caller(),
-                &deposit.token_name.as_esdt_identifier(),
-                deposit.nonce,
-                &deposit.amount,
-                b"successful withdrawal",
-            );
-        } else {
-            self.send().direct(
-                &self.get_caller(),
-                &deposit.token_name,
-                &deposit.amount,
-                b"successful claim",
-            );
-        }
+        self.send().direct(
+            &caller_address,
+            &deposit.token_name,
+            deposit.nonce,
+            &deposit.amount,
+            b"successful claim",
+        );
         self.deposit(&address).clear();
 
         Ok(())
     }
 
     #[view(amount)]
-    fn get_amount(&self, address: Address) -> SCResult<BigUint> {
+    fn get_amount(&self, address: ManagedAddress) -> SCResult<BigUint> {
         require!(!self.deposit(&address).is_empty(), "non-existent key");
 
         let data = self.deposit(&address).get();
@@ -129,6 +114,5 @@ pub trait DigitalCash {
 
     #[view]
     #[storage_mapper("deposit")]
-    fn deposit(&self, donor: &Address) -> SingleValueMapper<Self::Storage, DepositInfo<BigUint>>;
+    fn deposit(&self, donor: &ManagedAddress) -> SingleValueMapper<DepositInfo<Self::Api>>;
 }
-

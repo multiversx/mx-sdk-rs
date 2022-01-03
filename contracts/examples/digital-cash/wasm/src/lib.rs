@@ -1,4 +1,19 @@
+////////////////////////////////////////////////////
+////////////////// AUTO-GENERATED //////////////////
+////////////////////////////////////////////////////
+
 #![no_std]
 
-pub use digital_cash::*;
-pub use elrond_wasm_output::*;
+elrond_wasm_node::wasm_endpoints! {
+    digital_cash
+    (
+        init
+        amount
+        claim
+        deposit
+        fund
+        withdraw
+    )
+}
+
+elrond_wasm_node::wasm_empty_callback! {}
