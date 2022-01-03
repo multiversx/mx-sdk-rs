@@ -83,6 +83,8 @@ elrond_wasm_node::wasm_endpoints! {
         div_big_int_ref
         div_big_uint
         div_big_uint_ref
+        dynamic_message
+        dynamic_message_multiple
         echo_array_u8
         echo_arrayvec
         echo_async_result_empty

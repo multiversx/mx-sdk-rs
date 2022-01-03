@@ -104,4 +104,32 @@ pub trait ManagedBufferFeatures {
     fn managed_address_eq(&self, mb1: ManagedAddress, mb2: ManagedAddress) -> bool {
         mb1 == mb2
     }
+
+    #[endpoint]
+    fn dynamic_message(&self, bytes: ManagedBuffer) {
+        let mut builder = FormattedMessageBuilder::<Self::Api>::new(
+            b"Got this buffer: {}. I don't like it, ERROR!",
+        );
+        builder.add_argument(&bytes);
+
+        builder.signal_error();
+    }
+
+    #[payable("*")]
+    #[endpoint]
+    fn dynamic_message_multiple(
+        &self,
+        #[payment_token] token_id: TokenIdentifier,
+        #[payment_nonce] nonce: u64,
+        #[payment_amount] amount: BigUint,
+    ) {
+        let mut builder = FormattedMessageBuilder::<Self::Api>::new(
+            b"Got token {}, with nonce {}, amount {}. I prefer EGLD. ERROR!",
+        );
+        builder.add_argument(&token_id);
+        builder.add_argument(&nonce);
+        builder.add_argument(&amount);
+
+        builder.signal_error();
+    }
 }
