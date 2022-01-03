@@ -253,7 +253,7 @@ impl SendApiImpl for VmApiImpl {
         error: &ManagedBuffer<Self>,
         gas: u64,
         extra_gas_for_callback: u64,
-    ) -> ! {
+    ) -> Result<(), &'static [u8]> {
         unsafe {
             let success_function = success.to_boxed_bytes();
             let error_function = error.to_boxed_bytes();
