@@ -1,5 +1,9 @@
 use super::BoxedBytes;
-use crate::abi::TypeAbi;
+use crate::{
+    abi::TypeAbi,
+    api::{Handle, ManagedTypeApi, ManagedTypeApiImpl},
+    types::{ManagedBuffer, ManagedType},
+};
 use alloc::string::String;
 use elrond_codec::*;
 
@@ -8,195 +12,189 @@ use elrond_codec::*;
 /// EGLD is stored as an empty name.
 ///
 /// Not yet implemented, but we might add additional restrictions when deserializing as argument.
-#[derive(Clone, PartialEq, Debug)]
-pub struct TokenIdentifier(BoxedBytes);
-
-impl TokenIdentifier {
-	/// This special representation is interpreted as the EGLD token.
-	pub const EGLD_REPRESENTATION: &'static [u8] = b"EGLD";
-
-	/// New instance of the special EGLD token representation.
-	pub fn egld() -> Self {
-		TokenIdentifier(BoxedBytes::empty())
-	}
-
-	#[inline]
-	pub fn is_egld(&self) -> bool {
-		self.0.is_empty()
-	}
-
-	#[inline]
-	pub fn is_esdt(&self) -> bool {
-		!self.is_egld()
-	}
-
-	#[inline]
-	pub fn into_boxed_bytes(self) -> BoxedBytes {
-		self.0
-	}
-
-	#[deprecated(
-		note = "Please use the as_esdt_identifier method instead, its name is more suggestive."
-	)]
-	#[inline]
-	pub fn as_slice(&self) -> &[u8] {
-		self.0.as_slice()
-	}
-
-	#[inline]
-	pub fn as_esdt_identifier(&self) -> &[u8] {
-		self.0.as_slice()
-	}
-
-	#[inline]
-	pub fn as_name(&self) -> &[u8] {
-		if self.is_egld() {
-			TokenIdentifier::EGLD_REPRESENTATION
-		} else {
-			self.0.as_slice()
-		}
-	}
+#[repr(transparent)]
+#[derive(Clone, Debug)]
+pub struct TokenIdentifier<M: ManagedTypeApi> {
+    buffer: ManagedBuffer<M>,
 }
 
-impl AsRef<[u8]> for TokenIdentifier {
-	#[inline]
-	fn as_ref(&self) -> &[u8] {
-		self.0.as_ref()
-	}
+impl<M: ManagedTypeApi> ManagedType<M> for TokenIdentifier<M> {
+    #[inline]
+    fn from_raw_handle(handle: Handle) -> Self {
+        TokenIdentifier {
+            buffer: ManagedBuffer::from_raw_handle(handle),
+        }
+    }
+
+    #[doc(hidden)]
+    fn get_raw_handle(&self) -> Handle {
+        self.buffer.get_raw_handle()
+    }
+
+    #[doc(hidden)]
+    fn transmute_from_handle_ref(handle_ref: &Handle) -> &Self {
+        unsafe { core::mem::transmute(handle_ref) }
+    }
 }
 
-impl From<BoxedBytes> for TokenIdentifier {
-	#[inline]
-	fn from(boxed_bytes: BoxedBytes) -> Self {
-		if boxed_bytes.as_slice() == TokenIdentifier::EGLD_REPRESENTATION {
-			TokenIdentifier::egld()
-		} else {
-			TokenIdentifier(boxed_bytes)
-		}
-	}
+impl<M: ManagedTypeApi> TokenIdentifier<M> {
+    /// This special representation is interpreted as the EGLD token.
+    #[allow(clippy::needless_borrow)] // clippy is wrog here, there is no other way
+    pub const EGLD_REPRESENTATION: &'static [u8; 4] = &b"EGLD";
+
+    #[inline]
+    pub fn from_esdt_bytes<B: Into<ManagedBuffer<M>>>(bytes: B) -> Self {
+        TokenIdentifier {
+            buffer: bytes.into(),
+        }
+    }
+
+    /// New instance of the special EGLD token representation.
+    #[inline]
+    pub fn egld() -> Self {
+        TokenIdentifier {
+            buffer: ManagedBuffer::new(),
+        }
+    }
+
+    #[inline]
+    pub fn is_egld(&self) -> bool {
+        self.is_empty()
+    }
+
+    #[inline]
+    pub fn is_esdt(&self) -> bool {
+        !self.is_egld()
+    }
+
+    #[inline]
+    pub fn len(&self) -> usize {
+        self.buffer.len()
+    }
+
+    #[inline]
+    pub fn is_empty(&self) -> bool {
+        self.buffer.is_empty()
+    }
+
+    #[inline]
+    pub fn into_managed_buffer(self) -> ManagedBuffer<M> {
+        self.buffer
+    }
+
+    #[inline]
+    pub fn as_managed_buffer(&self) -> &ManagedBuffer<M> {
+        &self.buffer
+    }
+
+    #[inline]
+    pub fn to_esdt_identifier(&self) -> BoxedBytes {
+        self.buffer.to_boxed_bytes()
+    }
+
+    #[inline]
+    pub fn as_name(&self) -> BoxedBytes {
+        if self.is_egld() {
+            BoxedBytes::from(&Self::EGLD_REPRESENTATION[..])
+        } else {
+            self.buffer.to_boxed_bytes()
+        }
+    }
+
+    pub fn is_valid_esdt_identifier(&self) -> bool {
+        M::managed_type_impl().validate_token_identifier(self.buffer.handle)
+    }
+    /// Converts `"EGLD"` to `""`.
+    /// Does nothing for the other values.
+    fn normalize(&mut self) {
+        if self.buffer == Self::EGLD_REPRESENTATION {
+            self.buffer.overwrite(&[]);
+        }
+    }
 }
 
-impl<'a> From<&'a [u8]> for TokenIdentifier {
-	#[inline]
-	fn from(byte_slice: &'a [u8]) -> Self {
-		if byte_slice == TokenIdentifier::EGLD_REPRESENTATION {
-			TokenIdentifier::egld()
-		} else {
-			TokenIdentifier(BoxedBytes::from(byte_slice))
-		}
-	}
+impl<M: ManagedTypeApi> From<ManagedBuffer<M>> for TokenIdentifier<M> {
+    #[inline]
+    fn from(buffer: ManagedBuffer<M>) -> Self {
+        let mut token_identifier = TokenIdentifier { buffer };
+        token_identifier.normalize();
+        token_identifier
+    }
 }
 
-impl PartialEq<&[u8]> for TokenIdentifier {
-	#[inline]
-	fn eq(&self, other: &&[u8]) -> bool {
-		if self.is_egld() {
-			*other == TokenIdentifier::EGLD_REPRESENTATION
-		} else {
-			self.0.as_slice().eq(*other)
-		}
-	}
+impl<M: ManagedTypeApi> From<&[u8]> for TokenIdentifier<M> {
+    fn from(bytes: &[u8]) -> Self {
+        if bytes == Self::EGLD_REPRESENTATION {
+            TokenIdentifier::egld()
+        } else {
+            TokenIdentifier {
+                buffer: ManagedBuffer::new_from_bytes(bytes),
+            }
+        }
+    }
 }
 
-impl NestedEncode for TokenIdentifier {
-	#[inline]
-	fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
-		self.as_name().dep_encode(dest)
-	}
-
-	#[inline]
-	fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(
-		&self,
-		dest: &mut O,
-		c: ExitCtx,
-		exit: fn(ExitCtx, EncodeError) -> !,
-	) {
-		self.as_name().dep_encode_or_exit(dest, c, exit);
-	}
+impl<M: ManagedTypeApi> PartialEq for TokenIdentifier<M> {
+    #[inline]
+    fn eq(&self, other: &Self) -> bool {
+        self.buffer == other.buffer
+    }
 }
 
-impl TopEncode for TokenIdentifier {
-	#[inline]
-	fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
-		self.as_name().top_encode(output)
-	}
+impl<M: ManagedTypeApi> Eq for TokenIdentifier<M> {}
 
-	#[inline]
-	fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
-		&self,
-		output: O,
-		c: ExitCtx,
-		exit: fn(ExitCtx, EncodeError) -> !,
-	) {
-		self.as_name().top_encode_or_exit(output, c, exit);
-	}
+impl<M: ManagedTypeApi> NestedEncode for TokenIdentifier<M> {
+    #[inline]
+    fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
+        if self.is_empty() {
+            (&Self::EGLD_REPRESENTATION[..]).dep_encode(dest)
+        } else {
+            self.buffer.dep_encode(dest)
+        }
+    }
 }
 
-impl NestedDecode for TokenIdentifier {
-	fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
-		Ok(TokenIdentifier::from(BoxedBytes::dep_decode(input)?))
-	}
-
-	fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
-		input: &mut I,
-		c: ExitCtx,
-		exit: fn(ExitCtx, DecodeError) -> !,
-	) -> Self {
-		TokenIdentifier::from(BoxedBytes::dep_decode_or_exit(input, c, exit))
-	}
+impl<M: ManagedTypeApi> TopEncode for TokenIdentifier<M> {
+    #[inline]
+    fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
+        if self.is_empty() {
+            (&Self::EGLD_REPRESENTATION[..]).top_encode(output)
+        } else {
+            self.buffer.top_encode(output)
+        }
+    }
 }
 
-impl TopDecode for TokenIdentifier {
-	fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
-		Ok(TokenIdentifier::from(BoxedBytes::top_decode(input)?))
-	}
+impl<M: ManagedTypeApi> NestedDecode for TokenIdentifier<M> {
+    fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
+        Ok(TokenIdentifier::from(ManagedBuffer::dep_decode(input)?))
+    }
 
-	fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
-		input: I,
-		c: ExitCtx,
-		exit: fn(ExitCtx, DecodeError) -> !,
-	) -> Self {
-		TokenIdentifier::from(BoxedBytes::top_decode_or_exit(input, c, exit))
-	}
+    fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
+        input: &mut I,
+        c: ExitCtx,
+        exit: fn(ExitCtx, DecodeError) -> !,
+    ) -> Self {
+        TokenIdentifier::from(ManagedBuffer::dep_decode_or_exit(input, c, exit))
+    }
 }
 
-impl TypeAbi for TokenIdentifier {
-	fn type_name() -> String {
-		"TokenIdentifier".into()
-	}
+impl<M: ManagedTypeApi> TopDecode for TokenIdentifier<M> {
+    fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
+        Ok(TokenIdentifier::from(ManagedBuffer::top_decode(input)?))
+    }
+
+    fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
+        input: I,
+        c: ExitCtx,
+        exit: fn(ExitCtx, DecodeError) -> !,
+    ) -> Self {
+        TokenIdentifier::from(ManagedBuffer::top_decode_or_exit(input, c, exit))
+    }
 }
 
-////////////////////////////////////////////////////////////////////////////////
-
-#[cfg(test)]
-mod tests {
-	use super::*;
-	use elrond_codec::test_util::*;
-
-	#[test]
-	fn test_egld() {
-		assert!(TokenIdentifier::egld().is_egld());
-	}
-
-	#[test]
-	fn test_codec() {
-		check_top_encode_decode(
-			TokenIdentifier::egld(),
-			TokenIdentifier::EGLD_REPRESENTATION,
-		);
-		check_dep_encode_decode(
-			TokenIdentifier::egld(),
-			dep_encode_to_vec_or_panic(&TokenIdentifier::EGLD_REPRESENTATION).as_slice(),
-		);
-
-		// also allowed
-		assert_eq!(
-			TokenIdentifier::egld(),
-			check_top_decode::<TokenIdentifier>(&[])
-		);
-		assert_eq!(
-			TokenIdentifier::egld(),
-			check_dep_decode::<TokenIdentifier>(&[0, 0, 0, 0])
-		);
-	}
+impl<M: ManagedTypeApi> TypeAbi for TokenIdentifier<M> {
+    fn type_name() -> String {
+        "TokenIdentifier".into()
+    }
 }

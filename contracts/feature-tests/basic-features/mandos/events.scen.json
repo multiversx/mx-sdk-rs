@@ -1,20 +1,17 @@
 {
-    "gasSchedule": "v2",
+    "gasSchedule": "v3",
     "steps": [
         {
             "step": "setState",
             "accounts": {
-                "address:features_contract": {
+                "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
                     "code": "file:../output/basic-features.wasm"
                 },
                 "address:an_account": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 }
             }
         },
@@ -23,8 +20,7 @@
             "txId": "A1",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
-                "value": "0",
+                "to": "sc:basic-features",
                 "function": "logEventA",
                 "arguments": [
                     "0"
@@ -37,9 +33,11 @@
                 "status": "",
                 "logs": [
                     {
-                        "address": "address:features_contract",
-                        "identifier": "str:event_a",
-                        "topics": [],
+                        "address": "sc:basic-features",
+                        "endpoint": "str:logEventA",
+                        "topics": [
+                            "str:event_a"
+                        ],
                         "data": ""
                     }
                 ],
@@ -52,8 +50,7 @@
             "txId": "A2",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
-                "value": "0",
+                "to": "sc:basic-features",
                 "function": "logEventA",
                 "arguments": [
                     "0x1234abc"
@@ -66,9 +63,11 @@
                 "status": "",
                 "logs": [
                     {
-                        "address": "address:features_contract",
-                        "identifier": "str:event_a",
-                        "topics": [],
+                        "address": "sc:basic-features",
+                        "endpoint": "str:logEventA",
+                        "topics": [
+                            "str:event_a"
+                        ],
                         "data": "0x1234abc"
                     }
                 ],
@@ -81,12 +80,11 @@
             "txId": "B1",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
-                "value": "0",
+                "to": "sc:basic-features",
                 "function": "logEventB",
                 "arguments": [
                     "0xa1",
-                    "``arg2_an_address_______________s3",
+                    "str:arg2_an_address_______________s3",
                     "1",
                     "2"
                 ],
@@ -98,17 +96,17 @@
                 "status": "",
                 "logs": [
                     {
-                        "address": "address:features_contract",
-                        "identifier": "str:event_b",
+                        "address": "sc:basic-features",
+                        "endpoint": "str:logEventB",
                         "topics": [
+                            "str:event_b",
                             "0xa1",
-                            "``arg2_an_address_______________s3"
+                            "str:arg2_an_address_______________s3"
                         ],
                         "data": [
                             "biguint:1",
                             "biguint:2"
                         ]
-                        
                     }
                 ],
                 "gas": "*",

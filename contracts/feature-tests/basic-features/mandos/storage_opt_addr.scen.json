@@ -1,23 +1,24 @@
 {
     "name": "storage",
-    "gasSchedule": "v2",
+    "gasSchedule": "v3",
     "steps": [
         {
             "step": "setState",
             "accounts": {
-                "address:features_contract": {
+                "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "``opt_addr": ["1", "``____________address_too_long____________"]
+                        "str:opt_addr": [
+                            "1",
+                            "str:____________address_too_long____________"
+                        ]
                     },
                     "code": "file:../output/basic-features.wasm"
                 },
                 "address:an_account": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 }
             }
         },
@@ -26,8 +27,7 @@
             "txId": "load-val",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
-                "value": "0",
+                "to": "sc:basic-features",
                 "function": "load_opt_addr",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -47,11 +47,10 @@
             "txId": "store-val",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
-                "value": "0",
+                "to": "sc:basic-features",
                 "function": "store_opt_addr",
                 "arguments": [
-                    "``____________address_____________"
+                    "str:____________address_____________"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
@@ -67,11 +66,11 @@
         {
             "step": "checkState",
             "accounts": {
-                "address:features_contract": {
+                "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "``opt_addr": "1|``____________address_____________"
+                        "str:opt_addr": "1|str:____________address_____________"
                     },
                     "code": "file:../output/basic-features.wasm"
                 },
@@ -83,15 +82,16 @@
             "txId": "load-val",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
-                "value": "0",
+                "to": "sc:basic-features",
                 "function": "load_opt_addr",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "``____________address_____________" ],
+                "out": [
+                    "str:____________address_____________"
+                ],
                 "status": "",
                 "logs": [],
                 "gas": "*",
@@ -103,15 +103,16 @@
             "txId": "is-empty-false",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
-                "value": "0",
+                "to": "sc:basic-features",
                 "function": "is_empty_opt_addr",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "false" ],
+                "out": [
+                    "false"
+                ],
                 "status": "",
                 "logs": [],
                 "gas": "*",
@@ -123,11 +124,9 @@
             "txId": "store-empty",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
-                "value": "0",
+                "to": "sc:basic-features",
                 "function": "store_opt_addr",
-                "arguments": [
-                ],
+                "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
@@ -144,15 +143,16 @@
             "txId": "is-empty-true",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
-                "value": "0",
+                "to": "sc:basic-features",
                 "function": "is_empty_opt_addr",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "true" ],
+                "out": [
+                    "true"
+                ],
                 "status": "",
                 "logs": [],
                 "gas": "*",
@@ -162,11 +162,11 @@
         {
             "step": "checkState",
             "accounts": {
-                "address:features_contract": {
+                "sc:basic-features": {
                     "nonce": "*",
                     "balance": "*",
                     "storage": {
-                        "``opt_addr": ""
+                        "str:opt_addr": ""
                     },
                     "code": "file:../output/basic-features.wasm"
                 },
@@ -178,15 +178,14 @@
             "txId": "load-empty",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
-                "value": "0",
+                "to": "sc:basic-features",
                 "function": "load_opt_addr",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ ],
+                "out": [],
                 "status": "",
                 "logs": [],
                 "gas": "*",

@@ -18,7 +18,7 @@ Once the SC has been deployed, anyone can start a lottery, using the following f
 
 ```
 start(lottery_name: Vec<u8>,
-        esdt_token_name: Vec<u8>,
+        token_identifier: Vec<u8>,
         ticket_price: BigUint, 
         opt_total_tickets: Option<u32>, 
         opt_deadline: Option<u64>,
@@ -37,7 +37,7 @@ The function requires the following arguments: (Note: Optional arguments still h
         Example: Option&lt;u32&gt; want to pass 4 as value, pass 0x0100000004)  
 
 - lottery_name: Each lottery has to have a unique, case-sensitive name, using ASCII characters only.
-- esdt_token_name: The name of the esdt token that will be used as currency for this lottery.
+- token_identifier: The identifier of the esdt token that will be used as currency for this lottery.
 - ticket_price: The price of the ticket, currency is the esdt token set above.
 - total_tickets (Optional): The total available tickets for the lottery. If they're sold out, the lottery can be ended. Default is "unlimited"
 - deadline (Optional): The deadline for the lottery, expressed as a timestamp. The default and the maximum is 30 days in the future.
@@ -79,14 +79,14 @@ The functions described above only give very basic information about a lottery. 
 ```
 #[view(lotteryInfo)]
 #[storage_get_mut("lotteryInfo")]
-fn get_mut_lottery_info(lottery_name: &Vec<u8>) -> mut_storage!(LotteryInfo<BigUint>)
+fn get_mut_lottery_info(lottery_name: &Vec<u8>) -> mut_storage!(LotteryInfo<Self::Api>)
 ```
 
 *LotteryInfo* is a struct, with its definition as follows:
 
 ```
 pub struct LotteryInfo<BigUint:BigUintApi> {
-    pub esdt_token_name: Vec<u8>
+    pub token_identifier: Vec<u8>
     pub ticket_price: BigUint,
     pub tickets_left: u32,
     pub deadline: u64,

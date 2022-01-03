@@ -1,4 +1,20 @@
+////////////////////////////////////////////////////
+////////////////// AUTO-GENERATED //////////////////
+////////////////////////////////////////////////////
+
 #![no_std]
 
-pub use egld_esdt_swap::*;
-pub use elrond_wasm_output::*;
+elrond_wasm_node::wasm_endpoints! {
+    egld_esdt_swap
+    (
+        init
+        callBack
+        getLockedEgldBalance
+        getUnusedWrappedEgld
+        getWrappedEgldTokenIdentifier
+        issueWrappedEgld
+        mintWrappedEgld
+        unwrapEgld
+        wrapEgld
+    )
+}

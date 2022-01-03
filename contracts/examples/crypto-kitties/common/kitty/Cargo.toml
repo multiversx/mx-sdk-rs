@@ -9,12 +9,8 @@ publish = false
 path = "src/lib.rs"
 
 [dependencies.elrond-wasm]
-version = "0.14.1"
+version = "0.25.0"
 path = "../../../../../elrond-wasm"
-
-[dependencies.elrond-wasm-derive]
-version = "0.14.1"
-path = "../../../../../elrond-wasm-derive"
 
 [dependencies.random]
 version = "0.0.0"

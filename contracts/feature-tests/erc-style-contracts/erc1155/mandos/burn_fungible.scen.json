@@ -1,0 +1,64 @@
+{
+    "name": "burn fungible",
+    "gasSchedule": "dummy",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "create_token_fungible.scen.json"
+        },
+        {
+            "step": "scCall",
+            "txId": "mint-fungible-token",
+            "tx": {
+                "from": "address:creator",
+                "to": "sc:erc1155",
+                "function": "burn",
+                "arguments": [
+                    "1",
+                    "400"
+                ],
+                "gasLimit": "0x100000",
+                "gasPrice": "0x00"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "message": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "1",
+                    "balance": "0",
+                    "storage": {}
+                },
+                "address:creator": {
+                    "nonce": "2",
+                    "balance": "0",
+                    "storage": {}
+                },
+                "sc:erc1155": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:tokenTypeCreator|biguint:1": "address:creator",
+                        "str:isFungible|biguint:1": "true",
+                        "str:tokenTypeUri|biguint:1": "str:https://token-cdn-domain/{id}.json",
+                        "str:balanceOf|address:creator|str:.mapped|biguint:1": "600",
+                        "str:lastValidTypeId": "1",
+                        "str:balanceOf|address:creator|str:.node_links|u32:1": "u32:0|u32:0",
+                        "str:balanceOf|address:creator|str:.value|u32:1": "1",
+                        "str:balanceOf|address:creator|str:.node_id|biguint:1": "1",
+                        "str:balanceOf|address:creator|str:.info": "u32:1|u32:1|u32:1|u32:1"
+                    },
+                    "code": "file:../output/erc1155.wasm"
+                }
+            }
+        }
+    ]
+}

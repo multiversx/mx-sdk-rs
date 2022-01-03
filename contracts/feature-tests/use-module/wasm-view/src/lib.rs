@@ -1,0 +1,16 @@
+////////////////////////////////////////////////////
+////////////////// AUTO-GENERATED //////////////////
+////////////////////////////////////////////////////
+
+#![no_std]
+
+elrond_wasm_node::wasm_endpoints! {
+    use_module
+    (
+        init
+        external_view_mod_a
+        external_view_mod_b
+    )
+}
+
+elrond_wasm_node::wasm_empty_callback! {}

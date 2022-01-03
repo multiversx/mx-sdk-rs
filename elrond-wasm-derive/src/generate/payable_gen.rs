@@ -2,130 +2,144 @@ use super::util::*;
 use crate::model::{Method, MethodArgument, MethodPayableMetadata};
 
 pub fn generate_payable_snippet(m: &Method) -> proc_macro2::TokenStream {
-	payable_snippet_for_metadata(m.payable_metadata(), &m.payment_arg(), &m.token_arg())
+    let payment_single = payable_single_snippet_for_metadata(
+        m.payable_metadata(),
+        &m.payment_token_arg(),
+        &m.payment_amount_arg(),
+        &m.payment_nonce_arg(),
+    );
+    let payment_multi = multi_getter_init(&m.payment_multi_arg());
+
+    quote! {
+        #payment_single
+        #payment_multi
+    }
 }
 
-fn payable_snippet_for_metadata(
-	mpm: MethodPayableMetadata,
-	payment_arg: &Option<MethodArgument>,
-	token_arg: &Option<MethodArgument>,
+fn payable_single_snippet_for_metadata(
+    mpm: MethodPayableMetadata,
+    payment_token_arg: &Option<MethodArgument>,
+    payment_amount_arg: &Option<MethodArgument>,
+    payment_nonce_arg: &Option<MethodArgument>,
 ) -> proc_macro2::TokenStream {
-	match mpm {
-		MethodPayableMetadata::NoMetadata => quote! {},
-		MethodPayableMetadata::NotPayable => {
-			let payment_init = if let Some(arg) = payment_arg {
-				let pat = &arg.pat;
-				quote! {
-					let #pat = BigUint::zero();
-				}
-			} else {
-				quote! {}
-			};
-			let token_init = if let Some(arg) = token_arg {
-				let pat = &arg.pat;
-				quote! {
-					let #pat = TokenIdentifier::egld();
-				}
-			} else {
-				quote! {}
-			};
-			quote! {
-				self.call_value().check_not_payable();
-				#payment_init
-				#token_init
-			}
-		},
-		MethodPayableMetadata::Egld => {
-			let payment_var_name = var_name_or_underscore(payment_arg);
-			let token_init = if let Some(arg) = token_arg {
-				let pat = &arg.pat;
-				quote! {
-					let #pat = TokenIdentifier::egld();
-				}
-			} else {
-				quote! {}
-			};
-			quote! {
-				let #payment_var_name = self.call_value().require_egld();
-				#token_init
-			}
-		},
-		MethodPayableMetadata::SingleEsdtToken(token_name) => {
-			let token_literal = byte_str_slice_literal(token_name.as_bytes());
-			let payment_var_name = var_name_or_underscore(payment_arg);
-			let token_init = if let Some(arg) = token_arg {
-				let pat = &arg.pat;
-				quote! {
-					let #pat = TokenIdentifier::from(#token_literal);
-				}
-			} else {
-				quote! {}
-			};
-			quote! {
-				let #payment_var_name = self.call_value().require_esdt(#token_literal);
-				#token_init
-			}
-		},
-		MethodPayableMetadata::AnyToken => {
-			if payment_arg.is_none() && token_arg.is_none() {
-				quote! {}
-			} else {
-				let payment_var_name = var_name_or_underscore(payment_arg);
-				let token_var_name = var_name_or_underscore(token_arg);
-				quote! {
-					let (#payment_var_name, #token_var_name) = self.call_value().payment_token_pair();
-				}
-			}
-		},
-	}
+    match mpm {
+        MethodPayableMetadata::NotPayable => {
+            let amount_init = zero_amount_init(payment_amount_arg);
+            let token_init = egld_token_init(payment_token_arg);
+            let nonce_init = zero_nonce_init(payment_nonce_arg);
+            quote! {
+                elrond_wasm::api::CallValueApiImpl::check_not_payable(&Self::Api::call_value_api_impl());
+                #amount_init
+                #token_init
+                #nonce_init
+            }
+        },
+        MethodPayableMetadata::Egld => {
+            let payment_var_name = var_name_or_underscore(payment_amount_arg);
+            let token_init = egld_token_init(payment_token_arg);
+            let nonce_init = zero_nonce_init(payment_nonce_arg);
+            quote! {
+                let #payment_var_name = elrond_wasm::api::CallValueApiImpl::require_egld(&Self::Api::call_value_api_impl());
+                #token_init
+                #nonce_init
+            }
+        },
+        MethodPayableMetadata::SingleEsdtToken(token_identifier) => {
+            let token_literal = byte_str_slice_literal(token_identifier.as_bytes());
+            let payment_var_name = var_name_or_underscore(payment_amount_arg);
+            let token_init = if let Some(arg) = payment_token_arg {
+                let pat = &arg.pat;
+                quote! {
+                    let #pat = TokenIdentifier::<Self::Api>::from_esdt_bytes(#token_literal);
+                }
+            } else {
+                quote! {}
+            };
+            let nonce_init = nonce_getter_init(payment_nonce_arg);
+
+            quote! {
+                let #payment_var_name = elrond_wasm::api::CallValueApiImpl::require_esdt(&Self::Api::call_value_api_impl(), #token_literal);
+                #token_init
+                #nonce_init
+            }
+        },
+        MethodPayableMetadata::AnyToken => {
+            let nonce_init = nonce_getter_init(payment_nonce_arg);
+            if payment_amount_arg.is_none() && payment_token_arg.is_none() {
+                nonce_init
+            } else {
+                let payment_var_name = var_name_or_underscore(payment_amount_arg);
+                let token_var_name = var_name_or_underscore(payment_token_arg);
+
+                quote! {
+                    let (#payment_var_name, #token_var_name) = elrond_wasm::api::CallValueApiImpl::payment_token_pair(&Self::Api::call_value_api_impl());
+                    #nonce_init
+                }
+            }
+        },
+    }
+}
+
+fn zero_amount_init(opt_arg: &Option<MethodArgument>) -> proc_macro2::TokenStream {
+    if let Some(arg) = opt_arg {
+        let pat = &arg.pat;
+        quote! {
+            let #pat = BigUint::zero();
+        }
+    } else {
+        quote! {}
+    }
+}
+
+fn egld_token_init(opt_arg: &Option<MethodArgument>) -> proc_macro2::TokenStream {
+    if let Some(arg) = opt_arg {
+        let pat = &arg.pat;
+        quote! {
+            let #pat = TokenIdentifier::<Self::Api>::egld();
+        }
+    } else {
+        quote! {}
+    }
+}
+
+fn zero_nonce_init(opt_arg: &Option<MethodArgument>) -> proc_macro2::TokenStream {
+    if let Some(arg) = opt_arg {
+        let pat = &arg.pat;
+        quote! {
+            let #pat = 0u64;
+        }
+    } else {
+        quote! {}
+    }
+}
+
+fn nonce_getter_init(opt_arg: &Option<MethodArgument>) -> proc_macro2::TokenStream {
+    if let Some(arg) = opt_arg {
+        let pat = &arg.pat;
+        quote! {
+            let #pat = self.call_value().esdt_token_nonce();
+        }
+    } else {
+        quote! {}
+    }
+}
+
+fn multi_getter_init(opt_arg: &Option<MethodArgument>) -> proc_macro2::TokenStream {
+    if let Some(arg) = opt_arg {
+        let pat = &arg.pat;
+        quote! {
+            let #pat = self.call_value().all_esdt_transfers();
+        }
+    } else {
+        quote! {}
+    }
 }
 
 fn var_name_or_underscore(opt_arg: &Option<MethodArgument>) -> proc_macro2::TokenStream {
-	if let Some(arg) = opt_arg {
-		let pat = &arg.pat;
-		quote! { #pat }
-	} else {
-		quote! { _ }
-	}
-}
-
-pub fn generate_payment_snippet(arg: &MethodArgument) -> proc_macro2::TokenStream {
-	match &arg.ty {
-		syn::Type::Path(type_path) => {
-			let type_path_segment = type_path.path.segments.last().unwrap().clone();
-			generate_payment_snippet_for_arg_type(&type_path_segment, &arg.pat)
-		},
-		syn::Type::Reference(type_reference) => {
-			if type_reference.mutability.is_some() {
-				panic!("Mutable references not supported as contract method arguments");
-			}
-			match &*type_reference.elem {
-				syn::Type::Path(type_path) => {
-					let type_path_segment = type_path.path.segments.last().unwrap().clone();
-					generate_payment_snippet_for_arg_type(&type_path_segment, &arg.pat)
-				},
-				_ => panic!("Unsupported reference argument type, reference does not contain type path: {:?}", type_reference),
-			}
-		},
-		other_arg => panic!(
-			"Unsupported argument type: {:?}, neither path nor reference",
-			other_arg
-		),
-	}
-}
-
-fn generate_payment_snippet_for_arg_type(
-	type_path_segment: &syn::PathSegment,
-	pat: &syn::Pat,
-) -> proc_macro2::TokenStream {
-	let type_str = type_path_segment.ident.to_string();
-	match type_str.as_str() {
-		"BigUint" => quote! {
-			let #pat = self.api.egld_value();
-		},
-		other_stype_str => panic!(
-			"Arguments annotated with #[payment] must be of type BigUint. Found: {}",
-			other_stype_str
-		),
-	}
+    if let Some(arg) = opt_arg {
+        let pat = &arg.pat;
+        quote! { #pat }
+    } else {
+        quote! { _ }
+    }
 }

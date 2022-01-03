@@ -1,0 +1,110 @@
+{
+    "name": "try to determine winner too early",
+    "gasSchedule": "dummy",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "buy-ticket.scen.json"
+        },
+        {
+            "step": "setState",
+            "currentBlockInfo": {
+                "blockNonce": "123,000"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "status-test",
+            "tx": {
+                "from": "address:my_address",
+                "to": "sc:lottery",
+                "function": "status",
+                "arguments": [
+                    "str:lottery_name"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "1"
+                ],
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "determine-winner-early",
+            "tx": {
+                "from": "address:my_address",
+                "to": "sc:lottery",
+                "function": "determine_winner",
+                "arguments": [
+                    "str:lottery_name"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:Lottery is still running!",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:my_address": {
+                    "nonce": "4",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "address:acc1": {
+                    "nonce": "1",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "address:acc2": {
+                    "nonce": "0",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "sc:lottery": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:lotteryInfo|u32:12|str:lottery_name": "u32:1|u8:100|u32:1|u64:123,456|0xffffffff|u32:1|u8:100|u32:0|u32:1|u32:1|u8:100|u32:0",
+                        "str:erc20ContractAddress": "sc:erc20",
+                        "str:ticketHolder|u32:12|str:lottery_name|0x00000000": "address:acc1",
+                        "str:numberOfEntriesForUser|u32:12|str:lottery_name|address:acc1": "1"
+                    },
+                    "code": "file:../output/lottery-erc20.wasm"
+                },
+                "sc:erc20": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:balance|address:erc20_owner": "997,000,000",
+                        "str:balance|address:my_address": "1,000,000",
+                        "str:balance|address:acc1": "999,900",
+                        "str:balance|address:acc2": "1,000,000",
+                        "str:balance|sc:lottery": "100",
+                        "str:allowance|address:acc1|sc:lottery": "0",
+                        "str:allowance|address:acc2|sc:lottery": "100",
+                        "str:totalSupply": "1,000,000,000"
+                    },
+                    "code": "file:../../erc20/output/erc20.wasm"
+                },
+                "address:erc20_owner": {
+                    "nonce": "1",
+                    "balance": "1,000,000",
+                    "storage": {}
+                }
+            }
+        }
+    ]
+}

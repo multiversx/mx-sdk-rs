@@ -40,13 +40,19 @@
                     "balance": "0",
                     "storage": {},
                     "code": ""
+                },
+                "sc:adder-code": {
+                    "code": "file:../../test-contracts/adder.wasm"
+                },
+                "sc:factorial-code": {
+                    "code": "file:../../test-contracts/factorial.wasm"
                 }
             },
             "newAddresses": [
                 {
                     "creatorAddress": "address:owner",
                     "creatorNonce": "0",
-                    "newAddress": "address:multisig"
+                    "newAddress": "sc:multisig"
                 }
             ]
         }

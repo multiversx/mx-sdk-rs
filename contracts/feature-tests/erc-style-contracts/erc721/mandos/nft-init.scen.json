@@ -1,0 +1,62 @@
+{
+    "name": "deploy nft",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:contract_owner": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            },
+            "newAddresses": [
+                {
+                    "creatorAddress": "address:contract_owner",
+                    "creatorNonce": "0",
+                    "newAddress": "sc:the_nft_contract"
+                }
+            ]
+        },
+        {
+            "step": "scDeploy",
+            "txId": "deploy",
+            "tx": {
+                "from": "address:contract_owner",
+                "contractCode": "file:../output/erc721.wasm",
+                "arguments": [
+                    "3"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:contract_owner": {
+                    "nonce": "1",
+                    "balance": "0",
+                    "storage": {}
+                },
+                "sc:the_nft_contract": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:totalMinted": "3",
+                        "str:tokenCount|address:contract_owner": "3",
+                        "str:tokenOwner|u64:0": "address:contract_owner",
+                        "str:tokenOwner|u64:1": "address:contract_owner",
+                        "str:tokenOwner|u64:2": "address:contract_owner"
+                    },
+                    "code": "*"
+                }
+            }
+        }
+    ]
+}

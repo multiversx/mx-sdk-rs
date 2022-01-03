@@ -1,0 +1,52 @@
+{
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            }
+        },
+        {
+            "step": "scQuery",
+            "txId": "1",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "managed_vec_address_push",
+                "arguments": [
+                    "address:a1",
+                    "address:a2"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "address:a1|address:a2"
+                ]
+            }
+        },
+        {
+            "step": "scQuery",
+            "txId": "2",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "managed_vec_address_push",
+                "arguments": [
+                    "",
+                    "address:a2"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "address:a2"
+                ]
+            }
+        }
+    ]
+}

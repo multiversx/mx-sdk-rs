@@ -1,0 +1,103 @@
+{
+    "name": "fund with insufficient allowance",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "deploy_erc20_and_crowdfunding.scen.json"
+        },
+        {
+            "step": "externalSteps",
+            "path": "set_accounts.step.json"
+        },
+        {
+            "step": "scCall",
+            "txId": "set-insufficient-allowance",
+            "tx": {
+                "from": "address:acc1",
+                "to": "sc:erc20",
+                "function": "approve",
+                "arguments": [
+                    "sc:crowdfunding",
+                    "400,000"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "fund-with-insufficient-allowance",
+            "tx": {
+                "from": "address:acc1",
+                "to": "sc:crowdfunding",
+                "function": "fund",
+                "arguments": [
+                    "500,000"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:acc1": {
+                    "nonce": "2",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "address:acc2": {
+                    "nonce": "0",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "address:erc20_owner": {
+                    "nonce": "1",
+                    "balance": "0",
+                    "storage": {}
+                },
+                "address:crowdfunding_owner": {
+                    "nonce": "1",
+                    "balance": "0",
+                    "storage": {}
+                },
+                "sc:erc20": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:balance|address:erc20_owner": "1,000,000,000",
+                        "str:balance|address:acc1": "600,000",
+                        "str:allowance|address:erc20_owner|address:acc1": "400,000",
+                        "str:allowance|address:acc1|sc:crowdfunding": "400,000",
+                        "str:totalSupply": "1,000,000,000"
+                    },
+                    "code": "file:../../erc20/output/erc20.wasm"
+                },
+                "sc:crowdfunding": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:target": "1,000,000",
+                        "str:deadline": "123,456",
+                        "str:erc20ContractAddress": "sc:erc20"
+                    },
+                    "code": "file:../output/crowdfunding-erc20.wasm"
+                }
+            }
+        }
+    ]
+}

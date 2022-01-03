@@ -1,0 +1,32 @@
+[package]
+name = "async"
+version = "0.0.0"
+authors = ["Andrei Marinica <andrei.marinica@elrond.com>"]
+edition = "2018"
+publish = false
+
+[dependencies.forwarder]
+path = "forwarder"
+
+[dependencies.forwarder-raw]
+path = "forwarder-raw"
+
+[dependencies.proxy-test-first]
+path = "proxy-test-first"
+
+[dependencies.proxy-test-second]
+path = "proxy-test-second"
+
+[dependencies.recursive-caller]
+path = "recursive-caller"
+
+[dependencies.vault]
+path = "vault"
+
+[dependencies.elrond-wasm]
+version = "0.25.0"
+path = "../../../elrond-wasm"
+
+[dev-dependencies.elrond-wasm-debug]
+version = "0.25.0"
+path = "../../../elrond-wasm-debug"

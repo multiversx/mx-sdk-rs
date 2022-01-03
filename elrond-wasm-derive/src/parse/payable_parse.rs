@@ -1,21 +1,26 @@
-use super::attributes::PayableAttribute;
+use super::{attributes::PayableAttribute, MethodAttributesPass1};
 use crate::model::MethodPayableMetadata;
 
-pub fn process_payable(m: &syn::TraitItemMethod) -> MethodPayableMetadata {
-	let payable_attr_opt = PayableAttribute::parse(m);
-	if let Some(payable_attr) = payable_attr_opt {
+pub fn process_payable_attribute(
+    attr: &syn::Attribute,
+    pass_1_data: &mut MethodAttributesPass1,
+) -> bool {
+    PayableAttribute::parse(attr).map(|payable_attr| {
 		if let Some(identifier) = payable_attr.identifier {
-			match identifier.as_str() {
-				"EGLD" => MethodPayableMetadata::Egld,
-				"*" => MethodPayableMetadata::AnyToken,
-				"" => panic!("empty token name not allowed in #[payable] attribute"),
-				_ => MethodPayableMetadata::SingleEsdtToken(identifier),
-			}
+			pass_1_data.payable = parse_payable_identifier(identifier.as_str());
 		} else {
-			eprintln!("Warning: usage of #[payable] without argument is deprecated. Replace with #[payable(\"EGLD\")]. Method name: {}", m.sig.ident.to_string());
-			MethodPayableMetadata::Egld
+			panic!(
+				"Endpoint `payable` attribute requires one argument. Replace with `#[payable(\"*\")]` or `#[payable(\"EGLD\")]`. Method name: {}",
+				&pass_1_data.method_name);
 		}
-	} else {
-		MethodPayableMetadata::NotPayable
-	}
+	}).is_some()
+}
+
+fn parse_payable_identifier(identifier: &str) -> MethodPayableMetadata {
+    match identifier {
+        "EGLD" => MethodPayableMetadata::Egld,
+        "*" => MethodPayableMetadata::AnyToken,
+        "" => panic!("empty token name not allowed in #[payable] attribute"),
+        _ => MethodPayableMetadata::SingleEsdtToken(identifier.to_string()),
+    }
 }

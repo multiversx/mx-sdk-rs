@@ -1,13 +1,11 @@
 elrond_wasm::imports!();
 
-use super::internal_mod_a::*;
+/// Example of a module that lies in the same crate.
+#[elrond_wasm::module]
+pub trait InternalModuleB {
+    #[view]
+    fn call_mod_b(&self) {}
 
-/// Contains all events that can be emitted by the contract.
-#[elrond_wasm_derive::module(InteralModuleBImpl)]
-pub trait InteralModuleB {
-	#[module(InteralModuleAImpl)]
-	fn internal_module_a(&self) -> InteralModuleAImpl<T, BigInt, BigUint>;
-
-	#[view]
-	fn call_mod_b(&self) {}
+    #[external_view]
+    fn external_view_mod_b(&self) {}
 }

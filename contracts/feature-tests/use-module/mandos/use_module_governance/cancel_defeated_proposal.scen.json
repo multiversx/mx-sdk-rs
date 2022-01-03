@@ -1,0 +1,177 @@
+{
+    "name": "cancel a defeated proposal",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "init.scen.json"
+        },
+        {
+            "step": "scCall",
+            "txId": "propose-change-quorum",
+            "tx": {
+                "from": "address:user1",
+                "to": "sc:governance",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:GOV-123456",
+                        "value": "500"
+                    }
+                ],
+                "function": "propose",
+                "arguments": [
+                    "str:change-quorum",
+                    "50,000,000",
+                    "sc:governance",
+                    "",
+                    "0",
+                    "0",
+                    "str:changeQuorum",
+                    "biguint:1000"
+                ],
+                "gasLimit": "40,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "1"
+                ],
+                "status": "0",
+                "message": "",
+                "gas": "*"
+            }
+        },
+        {
+            "step": "setState",
+            "currentBlockInfo": {
+                "blockNonce": "25"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "user2-downvote",
+            "tx": {
+                "from": "address:user2",
+                "to": "sc:governance",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:GOV-123456",
+                        "value": "999"
+                    }
+                ],
+                "function": "downvote",
+                "arguments": [
+                    "1"
+                ],
+                "gasLimit": "30,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "message": "",
+                "gas": "*"
+            }
+        },
+        {
+            "step": "setState",
+            "currentBlockInfo": {
+                "blockNonce": "30"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "try-cancel-too-early",
+            "tx": {
+                "from": "address:user2",
+                "to": "sc:governance",
+                "function": "cancel",
+                "arguments": [
+                    "1"
+                ],
+                "gasLimit": "30,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:Only original proposer may cancel a non-defeated proposal",
+                "gas": "*"
+            }
+        },
+        {
+            "step": "setState",
+            "currentBlockInfo": {
+                "blockNonce": "50"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "cancel",
+            "tx": {
+                "from": "address:user2",
+                "to": "sc:governance",
+                "function": "cancel",
+                "arguments": [
+                    "1"
+                ],
+                "gasLimit": "30,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "message": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "*",
+                    "balance": "*",
+                    "esdt": {
+                        "str:GOV-123456": "1000"
+                    },
+                    "storage": {}
+                },
+                "address:user1": {
+                    "nonce": "*",
+                    "balance": "*",
+                    "esdt": {
+                        "str:GOV-123456": "500"
+                    },
+                    "storage": {}
+                },
+                "address:user2": {
+                    "nonce": "*",
+                    "balance": "*",
+                    "esdt": {
+                        "str:GOV-123456": "1"
+                    },
+                    "storage": {}
+                },
+                "sc:governance": {
+                    "nonce": "*",
+                    "balance": "0",
+                    "esdt": {
+                        "str:GOV-123456": "1499"
+                    },
+                    "storage": {
+                        "str:governance:votes|u32:1|str:.mapped|address:user1": "500",
+                        "str:governance:downvotes|u32:1|str:.mapped|address:user2": "999",
+                        "str:governance:proposalStartBlock|u32:1": "",
+                        "str:governance:totalVotes|u32:1": "",
+                        "str:governance:totalDownvotes|u32:1": "",
+                        "str:governance:proposals.item|u32:1": "",
+                        "str:governance:quorum": "1500",
+                        "+": ""
+                    },
+                    "code": "*"
+                },
+                "+": ""
+            }
+        }
+    ]
+}

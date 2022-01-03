@@ -1,0 +1,36 @@
+{
+    "name": "deploy router",
+    "steps": [
+        {
+            "step": "setState",
+            "newAddresses": [
+                {
+                    "creatorAddress": "address:owner",
+                    "creatorNonce": "0",
+                    "newAddress": "sc:pair"
+                }
+            ]
+        },
+        {
+            "step": "scDeploy",
+            "txId": "deploy-router",
+            "tx": {
+                "from": "address:owner",
+                "value": "0",
+                "contractCode": "file:../../output/pair.wasm",
+                "arguments": [
+                    "str:WEGLD-abcdef",
+                    "str:BUSD-abcdef"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

@@ -1,5 +1,4 @@
 {
-    "gasSchedule": "v2",
     "steps": [
         {
             "step": "externalSteps",
@@ -14,8 +13,7 @@
             "txId": "change-quorum-propose",
             "tx": {
                 "from": "address:alice",
-                "to": "address:multisig",
-                "value": "0",
+                "to": "sc:multisig",
                 "function": "proposeChangeQuorum",
                 "arguments": [
                     "3"
@@ -24,7 +22,9 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": ["1"],
+                "out": [
+                    "1"
+                ],
                 "status": "",
                 "logs": [],
                 "gas": "*",
@@ -36,10 +36,11 @@
             "txId": "change-quorum-sign-bob",
             "tx": {
                 "from": "address:bob",
-                "to": "address:multisig",
-                "value": "0",
+                "to": "sc:multisig",
                 "function": "sign",
-                "arguments": ["1"],
+                "arguments": [
+                    "1"
+                ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
@@ -56,8 +57,7 @@
             "txId": "pending-action-data",
             "tx": {
                 "from": "address:bob",
-                "to": "address:multisig",
-                "value": "0",
+                "to": "sc:multisig",
                 "function": "getPendingActionFullInfo",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -82,10 +82,11 @@
             "txId": "change-quorum-perform",
             "tx": {
                 "from": "address:alice",
-                "to": "address:multisig",
-                "value": "0",
+                "to": "sc:multisig",
                 "function": "performAction",
-                "arguments": ["1"],
+                "arguments": [
+                    "1"
+                ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
@@ -102,8 +103,7 @@
             "txId": "getQuorum",
             "tx": {
                 "from": "address:owner",
-                "to": "address:multisig",
-                "value": "0",
+                "to": "sc:multisig",
                 "function": "getQuorum",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -124,8 +124,7 @@
             "txId": "pending-action-data-none",
             "tx": {
                 "from": "address:bob",
-                "to": "address:multisig",
-                "value": "0",
+                "to": "sc:multisig",
                 "function": "getPendingActionFullInfo",
                 "arguments": [],
                 "gasLimit": "50,000,000",

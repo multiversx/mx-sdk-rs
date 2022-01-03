@@ -1,0 +1,623 @@
+{
+    "name": "storage",
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:contract": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "address:owner": {
+                    "nonce": "0",
+                    "balance": "1000"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "set-token-attributes-1",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:contract",
+                "function": "token_attributes_set",
+                "arguments": [
+                    "str:ALICE-abcdef",
+                    "u64:1",
+                    "biguint:10|u64:20|u32:2|u32:1|u32:2"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "message": "*",
+                "gas": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "set-token-attributes-2",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:contract",
+                "function": "token_attributes_set",
+                "arguments": [
+                    "str:ALICE-abcdef",
+                    "u64:1",
+                    "biguint:10|u64:20|u32:2|u32:1|u32:2"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:A value was already set",
+                "gas": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "set-token-attributes-3",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:contract",
+                "function": "token_attributes_set",
+                "arguments": [
+                    "str:BOB-abcdef",
+                    "u64:1",
+                    "biguint:20|u64:20|u32:2|u32:1|u32:2"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "message": "*",
+                "gas": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "set-token-attributes-4",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:contract",
+                "function": "token_attributes_set",
+                "arguments": [
+                    "str:BOB-abcdef",
+                    "u64:1",
+                    "biguint:20|u64:20|u32:2|u32:1|u32:2"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:A value was already set",
+                "gas": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "4",
+                    "balance": "1000",
+                    "storage": {},
+                    "code": ""
+                },
+                "sc:contract": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:TokenAttributes.attr|u8:1|u64:1": "biguint:10|u64:20|u32:2|u32:1|u32:2",
+                        "str:TokenAttributes.attr|u8:2|u64:1": "biguint:20|u64:20|u32:2|u32:1|u32:2",
+                        "str:TokenAttributes.nonce|u8:1|biguint:10|u64:20|u32:2|u32:1|u32:2": "1",
+                        "str:TokenAttributes.nonce|u8:2|biguint:20|u64:20|u32:2|u32:1|u32:2": "1",
+                        "str:TokenAttributes.counter": "2",
+                        "str:TokenAttributes.mapping|nested:str:BOB-abcdef": "2",
+                        "str:TokenAttributes.mapping|nested:str:ALICE-abcdef": "1"
+                    },
+                    "code": "file:../output/basic-features.wasm"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "get-token-attributes-1",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:contract",
+                "function": "token_attributes_get_attributes",
+                "arguments": [
+                    "str:ALICE-abcdef",
+                    "u64:1"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "biguint:10|u64:20|u32:2|u32:1|u32:2"
+                ],
+                "status": "0",
+                "message": "*",
+                "gas": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "get-token-attributes-2",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:contract",
+                "function": "token_attributes_get_attributes",
+                "arguments": [
+                    "str:ALICE-abcdef",
+                    "u64:10"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:A value was not previously set",
+                "gas": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "get-token-attributes-3",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:contract",
+                "function": "token_attributes_get_attributes",
+                "arguments": [
+                    "str:BOB-abcdef",
+                    "u64:1"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "biguint:20|u64:20|u32:2|u32:1|u32:2"
+                ],
+                "status": "0",
+                "message": "*",
+                "gas": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "get-token-attributes-4",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:contract",
+                "function": "token_attributes_get_attributes",
+                "arguments": [
+                    "str:BOB2-abcdef",
+                    "u64:1"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:Unknown token id",
+                "gas": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "get-token-nonce-1",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:contract",
+                "function": "token_attributes_get_nonce",
+                "arguments": [
+                    "str:ALICE-abcdef",
+                    "biguint:10|u64:20|u32:2|u32:1|u32:2"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "1"
+                ],
+                "status": "0",
+                "message": "*",
+                "gas": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "get-token-nonce-2",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:contract",
+                "function": "token_attributes_get_nonce",
+                "arguments": [
+                    "str:ALICE-abcdef",
+                    "biguint:10|u64:20|u32:2|u32:1|u32:10"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:A value was not previously set",
+                "gas": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "get-token-nonce-3",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:contract",
+                "function": "token_attributes_get_nonce",
+                "arguments": [
+                    "str:BOB-abcdef",
+                    "biguint:20|u64:20|u32:2|u32:1|u32:2"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "1"
+                ],
+                "status": "0",
+                "message": "*",
+                "gas": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "get-token-nonce-4",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:contract",
+                "function": "token_attributes_get_nonce",
+                "arguments": [
+                    "str:BOB2-abcdef",
+                    "biguint:10|u64:20|u32:2|u32:1|u32:2"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:Unknown token id",
+                "gas": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "has_attributes-token-attributes-1",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:contract",
+                "function": "token_attributes_has_attributes",
+                "arguments": [
+                    "str:ALICE-abcdef",
+                    "u64:1"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    ""
+                ],
+                "status": "0",
+                "message": "*",
+                "gas": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "has_attributes-token-attributes-2",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:contract",
+                "function": "token_attributes_has_attributes",
+                "arguments": [
+                    "str:ALICE-abcdef",
+                    "u64:10"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "1"
+                ],
+                "status": "0",
+                "message": "*",
+                "gas": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "has_attributes-token-attributes-3",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:contract",
+                "function": "token_attributes_has_attributes",
+                "arguments": [
+                    "str:BOB-abcdef",
+                    "u64:1"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    ""
+                ],
+                "status": "0",
+                "message": "*",
+                "gas": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "has_attributes-token-attributes-4",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:contract",
+                "function": "token_attributes_has_attributes",
+                "arguments": [
+                    "str:BOB2-abcdef",
+                    "u64:1"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "1"
+                ],
+                "status": "0",
+                "message": "*",
+                "gas": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "update-token-attributes-1",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:contract",
+                "function": "token_attributes_update",
+                "arguments": [
+                    "str:ALICE-abcdef",
+                    "u64:1",
+                    "biguint:30|u64:20|u32:2|u32:1|u32:2"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "message": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "update-token-attributes-2",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:contract",
+                "function": "token_attributes_update",
+                "arguments": [
+                    "str:ALICE-abcdef",
+                    "u64:10",
+                    "biguint:30|u64:20|u32:2|u32:1|u32:2"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:A value was not previously set",
+                "gas": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "update-token-attributes-3",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:contract",
+                "function": "token_attributes_update",
+                "arguments": [
+                    "str:BOB-abcdef",
+                    "u64:1",
+                    "biguint:40|u64:20|u32:2|u32:1|u32:2"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "message": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "update-token-attributes-4",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:contract",
+                "function": "token_attributes_update",
+                "arguments": [
+                    "str:BOB2-abcdef",
+                    "u64:1",
+                    "biguint:40|u64:20|u32:2|u32:1|u32:2"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:Unknown token id",
+                "gas": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "20",
+                    "balance": "1000",
+                    "storage": {},
+                    "code": ""
+                },
+                "sc:contract": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:TokenAttributes.attr|u8:1|u64:1": "biguint:30|u64:20|u32:2|u32:1|u32:2",
+                        "str:TokenAttributes.attr|u8:2|u64:1": "biguint:40|u64:20|u32:2|u32:1|u32:2",
+                        "str:TokenAttributes.nonce|u8:1|biguint:30|u64:20|u32:2|u32:1|u32:2": "1",
+                        "str:TokenAttributes.nonce|u8:2|biguint:40|u64:20|u32:2|u32:1|u32:2": "1",
+                        "str:TokenAttributes.counter": "2",
+                        "str:TokenAttributes.mapping|nested:str:BOB-abcdef": "2",
+                        "str:TokenAttributes.mapping|nested:str:ALICE-abcdef": "1"
+                    },
+                    "code": "file:../output/basic-features.wasm"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "clear-token-attributes-1",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:contract",
+                "function": "token_attributes_clear",
+                "arguments": [
+                    "str:ALICE-abcdef",
+                    "u64:1"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "message": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "clear-token-attributes-2",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:contract",
+                "function": "token_attributes_clear",
+                "arguments": [
+                    "str:ALICE-abcdef",
+                    "u64:10"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "message": "*",
+                "gas": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "clear-token-attributes-3",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:contract",
+                "function": "token_attributes_clear",
+                "arguments": [
+                    "str:BOB-abcdef",
+                    "u64:1"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "message": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "clear-token-attributes-4",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:contract",
+                "function": "token_attributes_clear",
+                "arguments": [
+                    "str:BOB2-abcdef",
+                    "u64:1"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "message": "*",
+                "gas": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "24",
+                    "balance": "1000",
+                    "storage": {},
+                    "code": ""
+                },
+                "sc:contract": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:TokenAttributes.counter": "2",
+                        "str:TokenAttributes.mapping|nested:str:BOB-abcdef": "2",
+                        "str:TokenAttributes.mapping|nested:str:ALICE-abcdef": "1"
+                    },
+                    "code": "file:../output/basic-features.wasm"
+                }
+            }
+        }
+    ]
+}

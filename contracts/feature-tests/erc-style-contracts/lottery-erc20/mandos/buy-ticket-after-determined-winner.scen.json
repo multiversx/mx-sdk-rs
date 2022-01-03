@@ -1,0 +1,80 @@
+{
+    "name": "buy ticket after announced winner",
+    "gasSchedule": "dummy",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "determine-winner-different-ticket-holders-winner-acc1.scen.json"
+        },
+        {
+            "step": "scCall",
+            "txId": "buy-ticket-after-announced-winner",
+            "tx": {
+                "from": "address:acc1",
+                "to": "sc:lottery",
+                "function": "buy_ticket",
+                "arguments": [
+                    "str:lottery_name",
+                    "100"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:Lottery is currently inactive.",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:my_address": {
+                    "nonce": "3",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "address:acc1": {
+                    "nonce": "2",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "address:acc2": {
+                    "nonce": "1",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "sc:lottery": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:erc20ContractAddress": "sc:erc20"
+                    },
+                    "code": "file:../output/lottery-erc20.wasm"
+                },
+                "sc:erc20": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:balance|address:erc20_owner": "997,000,000",
+                        "str:balance|address:my_address": "1,000,000",
+                        "str:balance|address:acc1": "1,000,100",
+                        "str:balance|address:acc2": "999,900",
+                        "str:balance|sc:lottery": "0",
+                        "str:allowance|address:acc1|sc:lottery": "0",
+                        "str:allowance|address:acc2|sc:lottery": "0",
+                        "str:totalSupply": "1,000,000,000"
+                    },
+                    "code": "file:../../erc20/output/erc20.wasm"
+                },
+                "address:erc20_owner": {
+                    "nonce": "1",
+                    "balance": "1,000,000",
+                    "storage": {}
+                }
+            }
+        }
+    ]
+}

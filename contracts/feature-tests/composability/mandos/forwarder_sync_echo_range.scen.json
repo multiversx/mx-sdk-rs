@@ -1,0 +1,65 @@
+{
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:a_user": {
+                    "nonce": "0",
+                    "balance": "0"
+                },
+                "sc:vault": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../vault/output/vault.wasm"
+                },
+                "sc:forwarder": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../forwarder/output/forwarder.wasm"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "echo_arguments_sync_range",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:forwarder",
+                "function": "echo_arguments_sync_range",
+                "arguments": [
+                    "sc:vault",
+                    "1",
+                    "2",
+                    "5",
+                    "6"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "5",
+                    "6"
+                ],
+                "status": "0",
+                "logs": [
+                    {
+                        "address": "sc:forwarder",
+                        "endpoint": "str:echo_arguments_sync_range",
+                        "topics": [
+                            "str:echo_arguments_sync_result"
+                        ],
+                        "data": {
+                            "0-echoed-args": [
+                                "biguint:6"
+                            ]
+                        }
+                    }
+                ],
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

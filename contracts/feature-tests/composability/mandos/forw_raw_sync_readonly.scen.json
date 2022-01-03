@@ -1,0 +1,73 @@
+{
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:a_user": {
+                    "nonce": "0",
+                    "balance": "2000"
+                },
+                "sc:vault": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../vault/output/vault.wasm"
+                },
+                "sc:forwarder": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../forwarder-raw/output/forwarder-raw.wasm"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "call_execute_on_dest_context_readonly",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:forwarder",
+                "function": "call_execute_on_dest_context_readonly",
+                "arguments": [
+                    "sc:vault",
+                    "str:echo_arguments",
+                    "1",
+                    "2"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "1",
+                    "2"
+                ],
+                "status": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:a_user": {
+                    "nonce": "*",
+                    "balance": "2000",
+                    "storage": {},
+                    "code": ""
+                },
+                "sc:vault": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "file:../vault/output/vault.wasm"
+                },
+                "sc:forwarder": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "file:../forwarder-raw/output/forwarder-raw.wasm"
+                }
+            }
+        }
+    ]
+}

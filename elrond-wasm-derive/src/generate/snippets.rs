@@ -1,222 +1,134 @@
-pub fn big_int_where() -> proc_macro2::TokenStream {
-	quote! {
-		where
-			BigUint: BigUintApi + 'static,
-			for<'a, 'b> &'a BigUint: Add<&'b BigUint, Output=BigUint>,
-			for<'a, 'b> &'a BigUint: Sub<&'b BigUint, Output=BigUint>,
-			for<'a, 'b> &'a BigUint: Mul<&'b BigUint, Output=BigUint>,
-			for<'a, 'b> &'a BigUint: Div<&'b BigUint, Output=BigUint>,
-			for<'a, 'b> &'a BigUint: Rem<&'b BigUint, Output=BigUint>,
-			for<'b> BigUint: AddAssign<&'b BigUint>,
-			for<'b> BigUint: SubAssign<&'b BigUint>,
-			for<'b> BigUint: MulAssign<&'b BigUint>,
-			for<'b> BigUint: DivAssign<&'b BigUint>,
-			for<'b> BigUint: RemAssign<&'b BigUint>,
-			for<'a, 'b> &'a BigUint: BitAnd<&'b BigUint, Output=BigUint>,
-			for<'a, 'b> &'a BigUint: BitOr<&'b BigUint, Output=BigUint>,
-			for<'a, 'b> &'a BigUint: BitXor<&'b BigUint, Output=BigUint>,
-			for<'b> BigUint: BitAndAssign<&'b BigUint>,
-			for<'b> BigUint: BitOrAssign<&'b BigUint>,
-			for<'b> BigUint: BitXorAssign<&'b BigUint>,
-			for<'a> &'a BigUint: Shr<usize, Output=BigUint>,
-			for<'a> &'a BigUint: Shl<usize, Output=BigUint>,
-
-			BigInt: BigIntApi<BigUint> + 'static,
-			for<'a, 'b> &'a BigInt: Add<&'b BigInt, Output=BigInt>,
-			for<'a, 'b> &'a BigInt: Sub<&'b BigInt, Output=BigInt>,
-			for<'a, 'b> &'a BigInt: Mul<&'b BigInt, Output=BigInt>,
-			for<'a, 'b> &'a BigInt: Div<&'b BigInt, Output=BigInt>,
-			for<'a, 'b> &'a BigInt: Rem<&'b BigInt, Output=BigInt>,
-			for<'b> BigInt: AddAssign<&'b BigInt>,
-			for<'b> BigInt: SubAssign<&'b BigInt>,
-			for<'b> BigInt: MulAssign<&'b BigInt>,
-			for<'b> BigInt: DivAssign<&'b BigInt>,
-			for<'b> BigInt: RemAssign<&'b BigInt>,
-	}
+pub fn contract_object_def() -> proc_macro2::TokenStream {
+    quote! {
+        pub struct ContractObj<A>
+        where
+            A: elrond_wasm::api::VMApi,
+        {
+            _phantom: core::marker::PhantomData<A>,
+        }
+    }
 }
 
-pub fn api_where() -> proc_macro2::TokenStream {
-	let bi_where = big_int_where();
-
-	quote! {
-	  #bi_where
-		T: elrond_wasm::api::ContractHookApi<BigInt, BigUint>
-		 + elrond_wasm::api::ErrorApi
-		 + elrond_wasm::api::CallValueApi<BigUint>
-		 + elrond_wasm::api::SendApi<BigUint>
-		 + elrond_wasm::api::EndpointArgumentApi
-		 + elrond_wasm::api::EndpointFinishApi
-		 + elrond_wasm::api::StorageReadApi
-		 + elrond_wasm::api::StorageWriteApi
-		 + elrond_wasm::api::LogApi
-		 + Clone
-		 + 'static,
-	}
+pub fn impl_contract_base() -> proc_macro2::TokenStream {
+    quote! {
+        impl<A> elrond_wasm::contract_base::ContractBase for ContractObj<A>
+        where
+            A: elrond_wasm::api::VMApi,
+        {
+            type Api = A;
+        }
+    }
 }
 
-pub fn contract_trait_api_impl(contract_struct: &syn::Path) -> proc_macro2::TokenStream {
-	let api_where = api_where();
-	quote! {
-		impl <T, BigInt, BigUint> elrond_wasm::api::ContractHookApi<BigInt, BigUint> for #contract_struct<T, BigInt, BigUint>
-		#api_where
-		{
-			type Storage = T::Storage;
-			type CallValue = T::CallValue;
-			type SendApi = T::SendApi;
+pub fn new_contract_object_fn() -> proc_macro2::TokenStream {
+    quote! {
+        pub fn contract_obj<A>() -> ContractObj<A>
+        where
+            A: elrond_wasm::api::VMApi,
+        {
+            ContractObj {
+                _phantom: core::marker::PhantomData,
+            }
+        }
 
-			#[inline]
-			fn get_storage_raw(&self) -> Self::Storage {
-				self.api.get_storage_raw()
-			}
+        pub fn contract_builder<A>() -> elrond_wasm::Box<dyn elrond_wasm::contract_base::CallableContract<A>>
+        where
+            A: elrond_wasm::api::VMApi,
+        {
+            elrond_wasm::Box::new(ContractObj {
+                _phantom: core::marker::PhantomData,
+            })
+        }
+    }
+}
 
-			#[inline]
-			fn call_value(&self) -> Self::CallValue {
-				self.api.call_value()
-			}
+// TODO: explore auto-implementations of supertraits
+#[allow(dead_code)]
+pub fn impl_auto_impl() -> proc_macro2::TokenStream {
+    quote! {
+        impl<A> AutoImpl for ContractObj<A> where
+            A: elrond_wasm::contract_base::ContractBase
+                + elrond_wasm::api::ErrorApi
+                + elrond_wasm::api::EndpointArgumentApi
+                + elrond_wasm::api::EndpointFinishApi
+                + elrond_wasm::api::ManagedTypeApi
+        {
+        }
+    }
+}
 
-			#[inline]
-			fn send(&self) -> Self::SendApi {
-				self.api.send()
-			}
+pub fn impl_callable_contract() -> proc_macro2::TokenStream {
+    quote! {
+        impl<A> elrond_wasm::contract_base::CallableContract<A> for ContractObj<A>
+        where
+            A: elrond_wasm::api::VMApi,
+        {
+            fn call(&self, fn_name: &[u8]) -> bool {
+                EndpointWrappers::call(self, fn_name)
+            }
 
-			#[inline]
-			fn get_sc_address(&self) -> Address {
-				self.api.get_sc_address()
-			}
+            fn clone_obj(&self) -> elrond_wasm::Box<dyn elrond_wasm::contract_base::CallableContract<A>> {
+                self::contract_builder()
+            }
+        }
+    }
+}
 
-			#[inline]
-			fn get_owner_address(&self) -> Address {
-				self.api.get_owner_address()
-			}
+pub fn proxy_object_def() -> proc_macro2::TokenStream {
+    quote! {
+        pub struct Proxy<A>
+        where
+            A: elrond_wasm::api::VMApi + 'static,
+        {
+            pub address: elrond_wasm::types::ManagedAddress<A>,
+        }
 
-			#[inline]
-			fn get_shard_of_address(&self, address: &Address) -> u32 {
-				self.api.get_shard_of_address(address)
-			}
+        impl<A> elrond_wasm::contract_base::ProxyObjBase for Proxy<A>
+        where
+            A: elrond_wasm::api::VMApi + 'static,
+        {
+            type Api = A;
 
-			#[inline]
-			fn is_smart_contract(&self, address: &Address) -> bool {
-				self.api.is_smart_contract(address)
-			}
+            fn new_proxy_obj() -> Self {
+                let zero_address = ManagedAddress::zero();
+                Proxy {
+                    address: zero_address,
+                }
+            }
 
-			#[inline]
-			fn get_caller(&self) -> Address {
-				self.api.get_caller()
-			}
+            fn contract(mut self, address: ManagedAddress<Self::Api>) -> Self {
+                self.address = address;
+                self
+            }
 
-			#[inline]
-			fn get_balance(&self, address: &Address) -> BigUint {
-				self.api.get_balance(address)
-			}
+            #[inline]
+            fn into_fields(self) -> ManagedAddress<Self::Api> {
+                self.address
+            }
+        }
+    }
+}
 
-			#[inline]
-			fn get_tx_hash(&self) -> H256 {
-				self.api.get_tx_hash()
-			}
+pub fn callback_proxy_object_def() -> proc_macro2::TokenStream {
+    quote! {
+        pub struct CallbackProxyObj<A>
+        where
+            A: elrond_wasm::api::VMApi + 'static,
+        {
+            _phantom: core::marker::PhantomData<A>,
+        }
 
-			#[inline]
-			fn get_gas_left(&self) -> u64 {
-				self.api.get_gas_left()
-			}
+        impl<A> elrond_wasm::contract_base::CallbackProxyObjBase for CallbackProxyObj<A>
+        where
+            A: elrond_wasm::api::VMApi + 'static,
+        {
+            type Api = A;
 
-			#[inline]
-			fn get_block_timestamp(&self) -> u64 {
-				self.api.get_block_timestamp()
-			}
-
-			#[inline]
-			fn get_block_nonce(&self) -> u64 {
-				self.api.get_block_nonce()
-			}
-
-			#[inline]
-			fn get_block_round(&self) -> u64 {
-				self.api.get_block_round()
-			}
-
-			#[inline]
-			fn get_block_epoch(&self) -> u64 {
-				self.api.get_block_epoch()
-			}
-
-			#[inline]
-			fn get_block_random_seed(&self) -> Box<[u8; 48]> {
-				self.api.get_block_random_seed()
-			}
-
-			#[inline]
-			fn get_prev_block_timestamp(&self) -> u64 {
-				self.api.get_prev_block_timestamp()
-			}
-
-			#[inline]
-			fn get_prev_block_nonce(&self) -> u64 {
-				self.api.get_prev_block_nonce()
-			}
-
-			#[inline]
-			fn get_prev_block_round(&self) -> u64 {
-				self.api.get_prev_block_round()
-			}
-
-			#[inline]
-			fn get_prev_block_epoch(&self) -> u64 {
-				self.api.get_prev_block_epoch()
-			}
-
-			#[inline]
-			fn get_prev_block_random_seed(&self) -> Box<[u8; 48]> {
-				self.api.get_prev_block_random_seed()
-			}
-
-			#[inline]
-			fn get_current_esdt_nft_nonce(&self, address: &Address, token: &[u8]) -> u64 {
-				self.api.get_current_esdt_nft_nonce(address, token)
-			}
-
-			#[inline]
-			fn get_esdt_balance(&self, address: &Address, token: &[u8], nonce: u64) -> BigUint {
-				self.api.get_esdt_balance(address, token, nonce)
-			}
-
-			#[inline]
-			fn get_esdt_token_data(
-				&self,
-				address: &Address,
-				token: &[u8],
-				nonce: u64,
-			) -> EsdtTokenData<BigUint> {
-				self.api.get_esdt_token_data(address, token, nonce)
-			}
-		}
-
-		impl <T, BigInt, BigUint> elrond_wasm::api::CryptoApi for #contract_struct<T, BigInt, BigUint>
-		#api_where
-		{
-			#[inline]
-			fn sha256(&self, data: &[u8]) -> H256 {
-				self.api.sha256(data)
-			}
-
-			#[inline]
-			fn keccak256(&self, data: &[u8]) -> H256 {
-				self.api.keccak256(data)
-			}
-
-			#[inline]
-			fn verify_bls(&self, key: &[u8], message: &[u8], signature: &[u8]) -> bool {
-				self.api.verify_bls(key, message, signature)
-			}
-
-			#[inline]
-			fn verify_ed25519(&self, key: &[u8], message: &[u8], signature: &[u8]) -> bool {
-				self.api.verify_ed25519(key, message, signature)
-			}
-
-			#[inline]
-			fn verify_secp256k1(&self, key: &[u8], message: &[u8], signature: &[u8]) -> bool {
-				self.api.verify_secp256k1(key, message, signature)
-			}
-		}
-	}
+            fn new_cb_proxy_obj() -> Self {
+                CallbackProxyObj {
+                    _phantom: core::marker::PhantomData,
+                }
+            }
+        }
+    }
 }

@@ -1,0 +1,18 @@
+[package]
+name = "egld-esdt-swap-meta"
+version = "0.0.0"
+edition = "2018"
+publish = false
+
+[dev-dependencies]
+
+[dependencies.egld-esdt-swap]
+path = ".."
+
+[dependencies.elrond-wasm]
+version = "0.25.0"
+path = "../../../../elrond-wasm"
+
+[dependencies.elrond-wasm-debug]
+version = "0.25.0"
+path = "../../../../elrond-wasm-debug"

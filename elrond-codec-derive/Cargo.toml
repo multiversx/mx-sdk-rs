@@ -1,6 +1,6 @@
 [package]
 name = "elrond-codec-derive"
-version = "0.5.1"
+version = "0.8.3"
 edition = "2018"
 
 authors = ["dorin.iancu <dorin.iancu@elrond.com>", "Andrei Marinica <andrei.marinica@elrond.com>", "Elrond Network <contact@elrond.com>"]

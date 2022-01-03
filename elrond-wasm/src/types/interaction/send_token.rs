@@ -1,37 +1,79 @@
-use crate::abi::{OutputAbi, TypeAbi, TypeDescriptionContainer};
-use crate::api::{BigUintApi, EndpointFinishApi, ErrorApi, SendApi};
-use crate::io::EndpointResult;
-use crate::types::{Address, BoxedBytes, TokenIdentifier};
-use alloc::string::String;
-use alloc::vec::Vec;
+use core::marker::PhantomData;
 
-pub struct SendToken<BigUint: BigUintApi> {
-	pub to: Address,
-	pub token: TokenIdentifier,
-	pub amount: BigUint,
-	pub data: BoxedBytes,
-}
+use crate::{
+    abi::{OutputAbi, TypeAbi, TypeDescriptionContainer},
+    api::{CallTypeApi, SendApiImpl, StorageReadApi},
+    contract_base::SendWrapper,
+    io::EndpointResult,
+    types::{BigUint, ManagedAddress, ManagedBuffer, TokenIdentifier},
+};
+use alloc::{string::String, vec::Vec};
 
-impl<FA, BigUint> EndpointResult<FA> for SendToken<BigUint>
+pub struct SendToken<SA>
 where
-	BigUint: BigUintApi + 'static,
-	FA: EndpointFinishApi + SendApi<BigUint> + ErrorApi + Clone + 'static,
+    SA: CallTypeApi + StorageReadApi + 'static,
 {
-	#[inline]
-	fn finish(&self, api: FA) {
-		api.direct_via_async_call(&self.to, &self.token, &self.amount, self.data.as_slice());
-	}
+    _phantom: PhantomData<SA>,
+    pub to: ManagedAddress<SA>,
+    pub token: TokenIdentifier<SA>,
+    pub amount: BigUint<SA>,
+    pub data: ManagedBuffer<SA>,
 }
 
-impl<BigUint: BigUintApi> TypeAbi for SendToken<BigUint> {
-	fn type_name() -> String {
-		"SendToken".into()
-	}
+impl<SA> SendToken<SA>
+where
+    SA: CallTypeApi + StorageReadApi + 'static,
+{
+    pub fn new(
+        to: ManagedAddress<SA>,
+        token: TokenIdentifier<SA>,
+        amount: BigUint<SA>,
+        data: ManagedBuffer<SA>,
+    ) -> Self {
+        Self {
+            _phantom: PhantomData,
+            to,
+            token,
+            amount,
+            data,
+        }
+    }
+}
 
-	/// No ABI output.
-	fn output_abis(_: &[&'static str]) -> Vec<OutputAbi> {
-		Vec::new()
-	}
+impl<SA> EndpointResult for SendToken<SA>
+where
+    SA: CallTypeApi + StorageReadApi + 'static,
+{
+    type DecodeAs = ();
 
-	fn provide_type_descriptions<TDC: TypeDescriptionContainer>(_: &mut TDC) {}
+    #[inline]
+    fn finish<FA>(&self) {
+        if self.token.is_egld() {
+            SA::send_api_impl().direct_egld(&self.to, &self.amount, self.data.clone());
+        } else {
+            SendWrapper::new().transfer_esdt_via_async_call(
+                &self.to,
+                &self.token,
+                0,
+                &self.amount,
+                self.data.clone(),
+            );
+        }
+    }
+}
+
+impl<SA> TypeAbi for SendToken<SA>
+where
+    SA: CallTypeApi + StorageReadApi + 'static,
+{
+    fn type_name() -> String {
+        "SendToken".into()
+    }
+
+    /// No ABI output.
+    fn output_abis(_: &[&'static str]) -> Vec<OutputAbi> {
+        Vec::new()
+    }
+
+    fn provide_type_descriptions<TDC: TypeDescriptionContainer>(_: &mut TDC) {}
 }

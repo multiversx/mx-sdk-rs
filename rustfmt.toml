@@ -12,6 +12,8 @@
 # This should actually automatically be shipped with cargo fmt or rustfmt itself!
 # ----------------------------------------------------------------------------------
 
+imports_granularity="Crate"
+
 # Use verbose output.
 # Default: false
 #   verbose = 
@@ -218,7 +220,7 @@
 
 # Use tab characters for indentation, spaces for alignment.
 # Default: false
-  hard_tabs = true
+  # hard_tabs = false
 
 # Break comments to fit on the line.
 # Default: false

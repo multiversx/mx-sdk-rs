@@ -1,0 +1,16 @@
+[package]
+name = "local-esdt-and-nft-meta"
+version = "0.0.0"
+edition = "2018"
+publish = false
+
+[dependencies.local-esdt-and-nft]
+path = ".."
+
+[dependencies.elrond-wasm]
+version = "0.25.0"
+path = "../../../../../elrond-wasm"
+
+[dependencies.elrond-wasm-debug]
+version = "0.25.0"
+path = "../../../../../elrond-wasm-debug"

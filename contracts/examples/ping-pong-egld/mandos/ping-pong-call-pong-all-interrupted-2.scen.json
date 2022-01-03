@@ -1,6 +1,6 @@
 {
     "comment": "initially, the gas is only enough to perform 1 of 2 pongs",
-    "gasSchedule": "v2",
+    "gasSchedule": "v3",
     "steps": [
         {
             "step": "externalSteps",
@@ -18,15 +18,16 @@
             "comment": "initially, the gas is only enough to perform 1 of 2 pongs",
             "tx": {
                 "from": "address:participant1",
-                "to": "address:the_ping_pong_contract",
-                "value": "0",
+                "to": "sc:ping-pong",
                 "function": "pongAll",
                 "arguments": [],
-                "gasLimit": "9,000,000",
+                "gasLimit": "8,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "str:interrupted" ],
+                "out": [
+                    "str:interrupted"
+                ],
                 "status": "0",
                 "message": "",
                 "gas": "*",
@@ -51,21 +52,21 @@
                     "balance": "2,000,000,000,000",
                     "storage": {}
                 },
-                "address:the_ping_pong_contract": {
+                "sc:ping-pong": {
                     "nonce": "0",
                     "balance": "500,000,000,000",
                     "storage": {
-                        "''ping_amount": "500,000,000,000",
-                        "''activation_timestamp": "780",
-                        "''deadline": "123,780",
-                        "''user_address_to_id|address:participant1": "1",
-                        "''user_id_to_address|0x0000001": "address:participant1",
-                        "''user_status|0x0000001": "2",
-                        "''user_address_to_id|address:participant2": "2",
-                        "''user_id_to_address|0x0000002": "address:participant2",
-                        "''user_status|0x0000002": "1",
-                        "''user_count": "2",
-                        "''pong_all_last_user": "1"
+                        "str:pingAmount": "500,000,000,000",
+                        "str:activationTimestamp": "780",
+                        "str:deadline": "123,780",
+                        "str:user_address_to_id|address:participant1": "1",
+                        "str:user_id_to_address|0x0000001": "address:participant1",
+                        "str:userStatus|0x0000001": "2",
+                        "str:user_address_to_id|address:participant2": "2",
+                        "str:user_id_to_address|0x0000002": "address:participant2",
+                        "str:userStatus|0x0000002": "1",
+                        "str:user_count": "2",
+                        "str:pongAllLastUser": "1"
                     },
                     "code": "file:../output/ping-pong-egld.wasm"
                 }
@@ -77,15 +78,16 @@
             "comment": "only give it enough gas to perform 1 more pong, but this is also the last pong ",
             "tx": {
                 "from": "address:participant1",
-                "to": "address:the_ping_pong_contract",
-                "value": "0",
+                "to": "sc:ping-pong",
                 "function": "pongAll",
                 "arguments": [],
                 "gasLimit": "9,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "str:completed" ],
+                "out": [
+                    "str:completed"
+                ],
                 "status": "0",
                 "message": "",
                 "gas": "*",
@@ -110,20 +112,20 @@
                     "balance": "2,500,000,000,000",
                     "storage": {}
                 },
-                "address:the_ping_pong_contract": {
+                "sc:ping-pong": {
                     "nonce": "0",
                     "balance": "*",
                     "storage": {
-                        "''ping_amount": "500,000,000,000",
-                        "''activation_timestamp": "780",
-                        "''deadline": "123,780",
-                        "''user_address_to_id|address:participant1": "1",
-                        "''user_id_to_address|0x0000001": "address:participant1",
-                        "''user_status|0x0000001": "2",
-                        "''user_address_to_id|address:participant2": "2",
-                        "''user_id_to_address|0x0000002": "address:participant2",
-                        "''user_status|0x0000002": "2",
-                        "''user_count": "2"
+                        "str:pingAmount": "500,000,000,000",
+                        "str:activationTimestamp": "780",
+                        "str:deadline": "123,780",
+                        "str:user_address_to_id|address:participant1": "1",
+                        "str:user_id_to_address|0x0000001": "address:participant1",
+                        "str:userStatus|0x0000001": "2",
+                        "str:user_address_to_id|address:participant2": "2",
+                        "str:user_id_to_address|0x0000002": "address:participant2",
+                        "str:userStatus|0x0000002": "2",
+                        "str:user_count": "2"
                     },
                     "code": "file:../output/ping-pong-egld.wasm"
                 }

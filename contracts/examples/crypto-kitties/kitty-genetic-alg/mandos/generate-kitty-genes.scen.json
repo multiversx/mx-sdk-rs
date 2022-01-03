@@ -1,5 +1,6 @@
 {
     "name": "generate kitty genes test",
+    "gasSchedule": "dummy",
     "steps": [
         {
             "step": "externalSteps",
@@ -18,8 +19,7 @@
             "comment": "arguments are matron and sire serialized kitties.",
             "tx": {
                 "from": "address:my_address",
-                "to": "address:contract_address",
-                "value": "0",
+                "to": "sc:kitty_genetic_alg",
                 "function": "generateKittyGenes",
                 "arguments": [
                     "u8:0|u8:0|u8:0|u8:0|u8:0|u8:0|u8:0|u64:0|u64:0|u32:0|u32:0|u32:0|u16:0|u16:0",
@@ -29,7 +29,9 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": ["u8:127|u8:127|u8:127|u8:127|u8:127|u8:127|u8:127"],
+                "out": [
+                    "u8:127|u8:127|u8:127|u8:127|u8:127|u8:127|u8:127"
+                ],
                 "status": "0",
                 "gas": "*",
                 "refund": "*"

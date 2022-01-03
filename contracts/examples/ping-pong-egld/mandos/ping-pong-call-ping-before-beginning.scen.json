@@ -1,0 +1,67 @@
+{
+    "name": "try to ping before the contract has begun",
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "ping-pong-init.scen.json"
+        },
+        {
+            "step": "setState",
+            "currentBlockInfo": {
+                "blockTimestamp": "779"
+            }
+        },
+        {
+            "step": "scCall",
+            "tx": {
+                "from": "address:participant1",
+                "to": "sc:ping-pong",
+                "egldValue": "500,000,000,000",
+                "function": "ping",
+                "arguments": [
+                    ""
+                ],
+                "gasLimit": "10,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:smart contract not active yet",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:my_address": {
+                    "nonce": "1",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "address:participant1": {
+                    "nonce": "1",
+                    "balance": "1,800,000,000,000",
+                    "storage": {}
+                },
+                "address:participant2": {
+                    "nonce": "0",
+                    "balance": "2,500,000,000,000",
+                    "storage": {}
+                },
+                "sc:ping-pong": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:pingAmount": "500,000,000,000",
+                        "str:activationTimestamp": "780",
+                        "str:deadline": "123,780"
+                    },
+                    "code": "file:../output/ping-pong-egld.wasm"
+                }
+            }
+        }
+    ]
+}

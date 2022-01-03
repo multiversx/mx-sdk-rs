@@ -1,0 +1,70 @@
+{
+    "steps": [
+        {
+            "step": "scDeploy",
+            "txId": "multisig-deploy",
+            "tx": {
+                "from": "address:owner",
+                "value": "0",
+                "contractCode": "file:../../output/multisig.wasm",
+                "arguments": [
+                    "0",
+                    "address:alice"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "getQuorum",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:multisig",
+                "value": "0",
+                "function": "getQuorum",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "getNumBoardMembers",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:multisig",
+                "value": "0",
+                "function": "getNumBoardMembers",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "1"
+                ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

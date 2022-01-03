@@ -1,6 +1,5 @@
 {
     "comment": "add then check",
-    "gasSchedule": "v2",
     "steps": [
         {
             "step": "externalSteps",
@@ -11,7 +10,6 @@
             "txId": "multisig-deploy",
             "tx": {
                 "from": "address:owner",
-                "value": "0",
                 "contractCode": "file:../output/multisig.wasm",
                 "arguments": [
                     "2",

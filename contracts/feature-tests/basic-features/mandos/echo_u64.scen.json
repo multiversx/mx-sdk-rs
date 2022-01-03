@@ -1,21 +1,18 @@
 {
     "name": "echo_u64",
-    "gasSchedule": "v2",
+    "gasSchedule": "v3",
     "steps": [
         {
             "step": "setState",
             "accounts": {
-                "address:features_contract": {
+                "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
                     "code": "file:../output/basic-features.wasm"
                 },
                 "address:an_account": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 }
             }
         },
@@ -24,8 +21,7 @@
             "txId": "1",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
-                "value": "0",
+                "to": "sc:basic-features",
                 "function": "echo_u64",
                 "arguments": [
                     "0"
@@ -48,8 +44,7 @@
             "txId": "2",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
-                "value": "0",
+                "to": "sc:basic-features",
                 "function": "echo_u64",
                 "arguments": [
                     "5"
@@ -72,8 +67,7 @@
             "txId": "3",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
-                "value": "0",
+                "to": "sc:basic-features",
                 "function": "echo_u64",
                 "arguments": [
                     "0xc8"
@@ -96,8 +90,7 @@
             "txId": "4",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
-                "value": "0",
+                "to": "sc:basic-features",
                 "function": "echo_u64",
                 "arguments": [
                     "0xffffffffffffffff"
@@ -120,8 +113,7 @@
             "txId": "5",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
-                "value": "0",
+                "to": "sc:basic-features",
                 "function": "echo_u64",
                 "arguments": [
                     "0x010000000000000000"
@@ -141,7 +133,7 @@
         {
             "step": "checkState",
             "accounts": {
-                "address:features_contract": {
+                "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},

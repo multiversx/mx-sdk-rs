@@ -1,0 +1,77 @@
+{
+    "name": "transfer_Caller-Zero",
+    "gasSchedule": "dummy",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:account_1": {
+                    "nonce": "0",
+                    "balance": "0xe8d4a51000"
+                },
+                "sc:erc20": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:balance|address:account_1": "0x2710",
+                        "str:totalSupply": "0x2710"
+                    },
+                    "code": "file:../output/erc20.wasm"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "1",
+            "tx": {
+                "from": "address:account_1",
+                "to": "sc:erc20",
+                "function": "transfer",
+                "arguments": [
+                    "address:account_1",
+                    "0"
+                ],
+                "gasLimit": "0x100000",
+                "gasPrice": "0x01"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": [
+                    {
+                        "address": "sc:erc20",
+                        "endpoint": "str:transfer",
+                        "topics": [
+                            "str:transfer",
+                            "address:account_1",
+                            "address:account_1"
+                        ],
+                        "data": "0"
+                    }
+                ],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:account_1": {
+                    "nonce": "1",
+                    "balance": "0xe8d4951000",
+                    "storage": {},
+                    "code": ""
+                },
+                "sc:erc20": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:balance|address:account_1": "0x2710",
+                        "str:totalSupply": "0x2710"
+                    },
+                    "code": "file:../output/erc20.wasm"
+                }
+            }
+        }
+    ]
+}

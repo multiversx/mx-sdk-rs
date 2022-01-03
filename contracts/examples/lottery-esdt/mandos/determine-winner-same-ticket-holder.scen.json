@@ -1,5 +1,6 @@
 {
     "name": "same account both tickets",
+    "gasSchedule": "dummy",
     "steps": [
         {
             "step": "externalSteps",
@@ -8,7 +9,6 @@
         {
             "step": "setState",
             "currentBlockInfo": {
-                "blockNonce": "123,567",
                 "blockTimestamp": "123456789"
             }
         },
@@ -17,8 +17,7 @@
             "txId": "determine-winner-same-ticket-holder",
             "tx": {
                 "from": "address:my_address",
-                "to": "address:the_lottery_contract",
-                "value": "0",
+                "to": "sc:lottery",
                 "function": "determine_winner",
                 "arguments": [
                     "str:lottery_name"
@@ -27,6 +26,7 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "0",
                 "gas": "*",
                 "refund": "*"
@@ -43,17 +43,17 @@
                 "address:acc1": {
                     "nonce": "2",
                     "balance": "1,000,000",
-                    "storage": {},
                     "esdt": {
-                        "str:lottery_token": "200"
-                    }
+                        "str:LOTTERY-123456": "200"
+                    },
+                    "storage": {}
                 },
                 "address:acc2": {
                     "nonce": "0",
                     "balance": "1,000,000",
                     "storage": {}
                 },
-                "address:the_lottery_contract": {
+                "sc:lottery": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},

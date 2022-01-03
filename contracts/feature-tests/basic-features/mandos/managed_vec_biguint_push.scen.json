@@ -1,0 +1,86 @@
+{
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            }
+        },
+        {
+            "step": "scQuery",
+            "txId": "1",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "managed_vec_biguint_push",
+                "arguments": [
+                    "biguint:1",
+                    "2"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "biguint:1|biguint:2"
+                ]
+            }
+        },
+        {
+            "step": "scQuery",
+            "txId": "2",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "managed_vec_biguint_push",
+                "arguments": [
+                    "",
+                    "2"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "biguint:2"
+                ]
+            }
+        },
+        {
+            "step": "scQuery",
+            "txId": "3",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "managed_vec_biguint_push",
+                "arguments": [
+                    "biguint:1",
+                    ""
+                ]
+            },
+            "expect": {
+                "out": [
+                    "biguint:1|biguint:0"
+                ]
+            }
+        },
+        {
+            "step": "scQuery",
+            "txId": "4",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "managed_vec_biguint_push",
+                "arguments": [
+                    "",
+                    ""
+                ]
+            },
+            "expect": {
+                "out": [
+                    "biguint:0"
+                ]
+            }
+        }
+    ]
+}

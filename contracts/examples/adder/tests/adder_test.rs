@@ -1,18 +1,19 @@
-extern crate adder;
 use adder::*;
-use elrond_wasm_debug::api::RustBigInt;
-use elrond_wasm_debug::TxContext;
+use elrond_wasm::types::BigInt;
+use elrond_wasm_debug::DebugApi;
 
 #[test]
 fn test_add() {
-	let adder = AdderImpl::new(TxContext::dummy());
+    let _ = DebugApi::dummy();
 
-	adder.init(&RustBigInt::from(5));
-	assert_eq!(RustBigInt::from(5), adder.get_sum());
+    let adder = adder::contract_obj::<DebugApi>();
 
-	let _ = adder.add(&RustBigInt::from(7));
-	assert_eq!(RustBigInt::from(12), adder.get_sum());
+    adder.init(BigInt::from(5));
+    assert_eq!(BigInt::from(5), adder.sum().get());
 
-	let _ = adder.add(&RustBigInt::from(1));
-	assert_eq!(RustBigInt::from(13), adder.get_sum());
+    let _ = adder.add(BigInt::from(7));
+    assert_eq!(BigInt::from(12), adder.sum().get());
+
+    let _ = adder.add(BigInt::from(1));
+    assert_eq!(BigInt::from(13), adder.sum().get());
 }

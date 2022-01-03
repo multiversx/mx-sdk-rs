@@ -1,5 +1,4 @@
 {
-    "gasSchedule": "v2",
     "steps": [
         {
             "step": "externalSteps",
@@ -10,7 +9,6 @@
             "txId": "multisig-deploy",
             "tx": {
                 "from": "address:owner",
-                "value": "0",
                 "contractCode": "file:../output/multisig.wasm",
                 "arguments": [
                     "1",
@@ -32,8 +30,7 @@
             "txId": "rem-alice-prop",
             "tx": {
                 "from": "address:alice",
-                "to": "address:multisig",
-                "value": "0",
+                "to": "sc:multisig",
                 "function": "proposeRemoveUser",
                 "arguments": [
                     "address:alice"
@@ -42,7 +39,9 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": ["1"],
+                "out": [
+                    "1"
+                ],
                 "status": "",
                 "logs": [],
                 "gas": "*",
@@ -54,10 +53,11 @@
             "txId": "rem-alice-sign-alice",
             "tx": {
                 "from": "address:alice",
-                "to": "address:multisig",
-                "value": "0",
+                "to": "sc:multisig",
                 "function": "sign",
-                "arguments": ["1"],
+                "arguments": [
+                    "1"
+                ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
@@ -74,10 +74,11 @@
             "txId": "rem-alice--perform",
             "tx": {
                 "from": "address:alice",
-                "to": "address:multisig",
-                "value": "0",
+                "to": "sc:multisig",
                 "function": "performAction",
-                "arguments": ["1"],
+                "arguments": [
+                    "1"
+                ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },

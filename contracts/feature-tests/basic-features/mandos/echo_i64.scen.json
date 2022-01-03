@@ -1,21 +1,18 @@
 {
     "name": "echo_i64",
-    "gasSchedule": "v2",
+    "gasSchedule": "v3",
     "steps": [
         {
             "step": "setState",
             "accounts": {
-                "address:features_contract": {
+                "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
                     "code": "file:../output/basic-features.wasm"
                 },
                 "address:an_account": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 }
             }
         },
@@ -24,8 +21,7 @@
             "txId": "1",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
-                "value": "0",
+                "to": "sc:basic-features",
                 "function": "echo_i64",
                 "arguments": [
                     "0"
@@ -48,8 +44,7 @@
             "txId": "2",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
-                "value": "0",
+                "to": "sc:basic-features",
                 "function": "echo_i64",
                 "arguments": [
                     "5"
@@ -72,8 +67,7 @@
             "txId": "3",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
-                "value": "0",
+                "to": "sc:basic-features",
                 "function": "echo_i64",
                 "arguments": [
                     "-3"
@@ -96,8 +90,7 @@
             "txId": "4",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
-                "value": "0",
+                "to": "sc:basic-features",
                 "function": "echo_i64",
                 "arguments": [
                     "0x010000000000000000"
@@ -119,8 +112,7 @@
             "txId": "5",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
-                "value": "0",
+                "to": "sc:basic-features",
                 "function": "echo_i64",
                 "arguments": [
                     "0xffffffffffffffff"
@@ -143,8 +135,7 @@
             "txId": "6",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
-                "value": "0",
+                "to": "sc:basic-features",
                 "function": "echo_i64",
                 "arguments": [
                     "0x7fffffffffffffff"
@@ -167,8 +158,7 @@
             "txId": "7",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
-                "value": "0",
+                "to": "sc:basic-features",
                 "function": "echo_i64",
                 "arguments": [
                     "+9223372036854775808"
@@ -190,8 +180,7 @@
             "txId": "8",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
-                "value": "0",
+                "to": "sc:basic-features",
                 "function": "echo_i64",
                 "arguments": [
                     "-9223372036854775809"
@@ -213,8 +202,7 @@
             "txId": "9-zero",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
-                "value": "0",
+                "to": "sc:basic-features",
                 "function": "echo_i64",
                 "arguments": [
                     "0x00"
@@ -223,7 +211,9 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "0" ],
+                "out": [
+                    "0"
+                ],
                 "status": "0",
                 "logs": [],
                 "gas": "*",
@@ -233,7 +223,7 @@
         {
             "step": "checkState",
             "accounts": {
-                "address:features_contract": {
+                "sc:basic-features": {
                     "nonce": "*",
                     "balance": "*",
                     "storage": {},

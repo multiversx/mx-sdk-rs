@@ -1,4 +1,17 @@
+////////////////////////////////////////////////////
+////////////////// AUTO-GENERATED //////////////////
+////////////////////////////////////////////////////
+
 #![no_std]
 
-pub use str_repeat::*;
-pub use elrond_wasm_output::*;
+elrond_wasm_node::wasm_endpoints! {
+    str_repeat
+    (
+        init
+        getByteArray
+        getByteArrayLength
+        repeat
+    )
+}
+
+elrond_wasm_node::wasm_empty_callback! {}

@@ -1,55 +1,57 @@
-use crate::api::{EndpointArgumentApi, ErrorApi};
-use crate::err_msg;
-use crate::{ArgDecodeInput, DynArgInput};
+use core::marker::PhantomData;
 
+use crate::{
+    api::{EndpointArgumentApi, EndpointArgumentApiImpl, ErrorApi, ErrorApiImpl, ManagedTypeApi},
+    err_msg, ArgDecodeInput, DynArgInput,
+};
+
+#[derive(Default)]
 pub struct EndpointDynArgLoader<AA>
 where
-	AA: EndpointArgumentApi + 'static,
+    AA: ManagedTypeApi + ErrorApi + EndpointArgumentApi,
 {
-	api: AA,
-	current_index: i32,
-	num_arguments: i32,
+    _phantom: PhantomData<AA>,
+    current_index: i32,
+    num_arguments: i32,
 }
 
 impl<AA> EndpointDynArgLoader<AA>
 where
-	AA: EndpointArgumentApi + 'static,
+    AA: ManagedTypeApi + ErrorApi + EndpointArgumentApi,
 {
-	pub fn new(api: AA) -> Self {
-		let num_arguments = api.get_num_arguments();
-		EndpointDynArgLoader {
-			api,
-			current_index: 0,
-			num_arguments,
-		}
-	}
+    pub fn new() -> Self {
+        let num_arguments = AA::argument_api_impl().get_num_arguments();
+        EndpointDynArgLoader {
+            _phantom: PhantomData,
+            current_index: 0,
+            num_arguments,
+        }
+    }
 }
 
-impl<AA> ErrorApi for EndpointDynArgLoader<AA>
+impl<AA> DynArgInput for EndpointDynArgLoader<AA>
 where
-	AA: EndpointArgumentApi + ErrorApi + 'static,
+    AA: ManagedTypeApi + ErrorApi + EndpointArgumentApi,
 {
-	#[inline]
-	fn signal_error(&self, message: &[u8]) -> ! {
-		self.api.signal_error(message)
-	}
-}
+    type ItemInput = ArgDecodeInput<AA>;
 
-impl<AA> DynArgInput<ArgDecodeInput<AA>> for EndpointDynArgLoader<AA>
-where
-	AA: EndpointArgumentApi + Clone + 'static,
-{
-	fn has_next(&self) -> bool {
-		self.current_index < self.num_arguments
-	}
+    type ManagedTypeErrorApi = AA;
 
-	fn next_arg_input(&mut self) -> ArgDecodeInput<AA> {
-		if self.current_index >= self.num_arguments {
-			self.signal_error(err_msg::ARG_WRONG_NUMBER)
-		} else {
-			let arg_input = ArgDecodeInput::new(self.api.clone(), self.current_index);
-			self.current_index += 1;
-			arg_input
-		}
-	}
+    fn has_next(&self) -> bool {
+        self.current_index < self.num_arguments
+    }
+
+    fn next_arg_input(&mut self) -> ArgDecodeInput<AA> {
+        if self.current_index >= self.num_arguments {
+            AA::error_api_impl().signal_error(err_msg::ARG_WRONG_NUMBER)
+        } else {
+            let arg_input = ArgDecodeInput::new(self.current_index);
+            self.current_index += 1;
+            arg_input
+        }
+    }
+
+    fn flush_ignore(&mut self) {
+        self.current_index = self.num_arguments;
+    }
 }

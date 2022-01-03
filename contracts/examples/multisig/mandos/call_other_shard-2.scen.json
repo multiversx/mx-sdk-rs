@@ -1,0 +1,69 @@
+{
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "steps/init_accounts.steps.json"
+        },
+        {
+            "step": "externalSteps",
+            "path": "steps/deploy_minimal.steps.json"
+        },
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:other-shard-2": {
+                    "shard": "1",
+                    "code": "file:../output/multisig.wasm"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "propose-send-to-other-shard-2",
+            "tx": {
+                "from": "address:alice",
+                "to": "sc:multisig",
+                "function": "proposeTransferExecute",
+                "arguments": [
+                    "sc:other-shard-2",
+                    "0",
+                    "str:method-from-other-shard",
+                    "str:arg1",
+                    "str:arg2"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "1"
+                ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "perform-send-to-other-shard-2",
+            "tx": {
+                "from": "address:alice",
+                "to": "sc:multisig",
+                "function": "performAction",
+                "arguments": [
+                    "1"
+                ],
+                "gasLimit": "200,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

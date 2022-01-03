@@ -1,0 +1,67 @@
+{
+    "name": "transfer non-owned token without approval",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "nft-init.scen.json"
+        },
+        {
+            "step": "setState",
+            "accounts": {
+                "address:acc1": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "transfer-without-approval",
+            "tx": {
+                "from": "address:acc1",
+                "to": "sc:the_nft_contract",
+                "function": "transfer",
+                "arguments": [
+                    "1",
+                    "address:acc2"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:Only the owner or the approved account may transfer the token!",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:contract_owner": {
+                    "nonce": "1",
+                    "balance": "0",
+                    "storage": {}
+                },
+                "address:acc1": {
+                    "nonce": "1",
+                    "balance": "0",
+                    "storage": {}
+                },
+                "sc:the_nft_contract": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:totalMinted": "3",
+                        "str:tokenCount|address:contract_owner": "3",
+                        "str:tokenOwner|u64:0": "address:contract_owner",
+                        "str:tokenOwner|u64:1": "address:contract_owner",
+                        "str:tokenOwner|u64:2": "address:contract_owner"
+                    },
+                    "code": "*"
+                }
+            }
+        }
+    ]
+}

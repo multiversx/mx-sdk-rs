@@ -1,0 +1,86 @@
+{
+    "name": "echo_managed_async_result_empty",
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "1-ok",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "echo_managed_async_result_empty",
+                "arguments": [
+                    "0"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "2-err",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "echo_managed_async_result_empty",
+                "arguments": [
+                    "5",
+                    "str:message"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:message",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "2-err-no-message",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "echo_managed_async_result_empty",
+                "arguments": [
+                    "5"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

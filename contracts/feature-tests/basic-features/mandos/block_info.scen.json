@@ -1,20 +1,17 @@
 {
-    "gasSchedule": "v2",
+    "gasSchedule": "v3",
     "steps": [
         {
             "step": "setState",
             "accounts": {
-                "address:features_contract": {
+                "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
                     "code": "file:../output/basic-features.wasm"
                 },
                 "address:an_account": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 }
             },
             "previousBlockInfo": {
@@ -37,15 +34,16 @@
             "txId": "get_prev_block_timestamp",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
-                "value": "0",
+                "to": "sc:basic-features",
                 "function": "get_prev_block_timestamp",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "506" ],
+                "out": [
+                    "506"
+                ],
                 "status": "",
                 "logs": [],
                 "gas": "*",
@@ -57,15 +55,16 @@
             "txId": "get_prev_block_nonce",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
-                "value": "0",
+                "to": "sc:basic-features",
                 "function": "get_prev_block_nonce",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "521" ],
+                "out": [
+                    "521"
+                ],
                 "status": "",
                 "logs": [],
                 "gas": "*",
@@ -77,15 +76,16 @@
             "txId": "get_prev_block_round",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
-                "value": "0",
+                "to": "sc:basic-features",
                 "function": "get_prev_block_round",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "532" ],
+                "out": [
+                    "532"
+                ],
                 "status": "",
                 "logs": [],
                 "gas": "*",
@@ -97,15 +97,16 @@
             "txId": "get_prev_block_epoch",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
-                "value": "0",
+                "to": "sc:basic-features",
                 "function": "get_prev_block_epoch",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "544" ],
+                "out": [
+                    "544"
+                ],
                 "status": "",
                 "logs": [],
                 "gas": "*",
@@ -117,36 +118,37 @@
             "txId": "get_prev_block_random_seed",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
-                "value": "0",
+                "to": "sc:basic-features",
                 "function": "get_prev_block_random_seed",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000" ],
+                "out": [
+                    "0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+                ],
                 "status": "",
                 "logs": [],
                 "gas": "*",
                 "refund": "*"
             }
         },
-
         {
             "step": "scCall",
             "txId": "get_block_timestamp",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
-                "value": "0",
+                "to": "sc:basic-features",
                 "function": "get_block_timestamp",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "511" ],
+                "out": [
+                    "511"
+                ],
                 "status": "",
                 "logs": [],
                 "gas": "*",
@@ -158,15 +160,16 @@
             "txId": "get_block_nonce",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
-                "value": "0",
+                "to": "sc:basic-features",
                 "function": "get_block_nonce",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "522" ],
+                "out": [
+                    "522"
+                ],
                 "status": "",
                 "logs": [],
                 "gas": "*",
@@ -178,15 +181,16 @@
             "txId": "get_block_round",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
-                "value": "0",
+                "to": "sc:basic-features",
                 "function": "get_block_round",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "533" ],
+                "out": [
+                    "533"
+                ],
                 "status": "",
                 "logs": [],
                 "gas": "*",
@@ -198,15 +202,16 @@
             "txId": "get_block_epoch",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
-                "value": "0",
+                "to": "sc:basic-features",
                 "function": "get_block_epoch",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "544" ],
+                "out": [
+                    "544"
+                ],
                 "status": "",
                 "logs": [],
                 "gas": "*",
@@ -219,15 +224,16 @@
             "comment": "0-padding added in out-value",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
-                "value": "0",
+                "to": "sc:basic-features",
                 "function": "get_block_random_seed",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "0x123456000000000000000000000000000000000000000000000000000000000000000000000000000000000000000007" ],
+                "out": [
+                    "0x123456000000000000000000000000000000000000000000000000000000000000000000000000000000000000000007"
+                ],
                 "status": "",
                 "logs": [],
                 "gas": "*",

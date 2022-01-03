@@ -1,21 +1,18 @@
 {
     "name": "get caller",
-    "gasSchedule": "v2",
+    "gasSchedule": "v3",
     "steps": [
         {
             "step": "setState",
             "accounts": {
-                "address:features_contract": {
+                "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
                     "code": "file:../output/basic-features.wasm"
                 },
                 "address:an_account": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 }
             }
         },
@@ -24,15 +21,16 @@
             "txId": "get_caller",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
-                "value": "0",
+                "to": "sc:basic-features",
                 "function": "get_caller",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "address:an_account" ],
+                "out": [
+                    "address:an_account"
+                ],
                 "status": "",
                 "logs": [],
                 "gas": "*",
@@ -43,11 +41,14 @@
             "step": "scQuery",
             "txId": "get_caller_query",
             "tx": {
-                "to": "address:features_contract",
-                "function": "get_caller"
+                "to": "sc:basic-features",
+                "function": "get_caller",
+                "arguments": []
             },
             "expect": {
-                "out": [ "address:features_contract" ],
+                "out": [
+                    "sc:basic-features"
+                ],
                 "status": "",
                 "logs": [],
                 "gas": "*",
