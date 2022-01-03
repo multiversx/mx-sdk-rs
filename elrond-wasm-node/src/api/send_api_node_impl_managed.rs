@@ -249,8 +249,8 @@ impl SendApiImpl for VmApiImpl {
         amount: &BigUint<Self>,
         endpoint_name: &ManagedBuffer<Self>,
         arg_buffer: &ManagedArgBuffer<Self>,
-        success: &ManagedBuffer<Self>,
-        error: &ManagedBuffer<Self>,
+        success: &'static [u8],
+        error: &'static [u8],
         gas: u64,
         extra_gas_for_callback: u64,
     ) -> Result<(), &'static [u8]> {

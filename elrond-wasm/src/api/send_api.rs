@@ -87,8 +87,8 @@ pub trait SendApiImpl {
         amount: &BigUint<Self::ManagedTypeApi>,
         endpoint_name: &ManagedBuffer<Self::ManagedTypeApi>,
         arg_buffer: &ManagedArgBuffer<Self::ManagedTypeApi>,
-        success: &ManagedBuffer<Self::ManagedTypeApi>,
-        error: &ManagedBuffer<Self::ManagedTypeApi>,
+        success: &'static [u8],
+        error: &'static [u8],
         gas: u64,
         extra_gas_for_callback: u64,
     ) -> Result<(), &'static [u8]>;

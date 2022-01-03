@@ -83,6 +83,20 @@ impl SendApiImpl for UncallableApi {
         unreachable!()
     }
 
+    fn create_async_call_raw(
+        &self,
+        _to: &ManagedAddress<Self>,
+        _amount: &BigUint<Self>,
+        _endpoint_name: &ManagedBuffer<Self>,
+        _arg_buffer: &ManagedArgBuffer<Self>,
+        _success: &'static [u8],
+        _error: &'static [u8],
+        _gas: u64,
+        _extra_gas_for_callback: u64,
+    ) -> Result<(), &'static [u8]> {
+        unreachable!()
+    }
+
     fn deploy_contract(
         &self,
         _gas: u64,

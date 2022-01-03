@@ -1,6 +1,8 @@
 #![no_std]
 #![allow(clippy::type_complexity)]
 
+use core::borrow::Borrow;
+
 elrond_wasm::imports!();
 
 /// Test contract for investigating async calls.
@@ -60,6 +62,31 @@ pub trait ForwarderRaw {
     ) -> AsyncCall {
         self.forward_contract_call(to, token, payment, endpoint_name, args)
             .async_call()
+    }
+
+    #[endpoint]
+    #[payable("*")]
+    fn forward_create_async_call(
+        &self,
+        to: ManagedAddress,
+        #[payment] payment: BigUint,
+        endpoint_name: ManagedBuffer,
+        #[var_args] args: ManagedVarArgs<ManagedBuffer>,
+        success: ManagedBuffer,
+        error: ManagedBuffer,
+        gas: u64,
+        extra_gas_for_callback: u64,
+    ) {
+        Self::Api::send_api_impl().create_async_call_raw(
+            &to,
+            &payment,
+            &endpoint_name,
+            args.to_arg_buffer().borrow(),
+            success.to_boxed_bytes().as_slice(),
+            error.to_boxed_bytes().as_slice(),
+            gas,
+            extra_gas_for_callback,
+        );
     }
 
     #[endpoint]
