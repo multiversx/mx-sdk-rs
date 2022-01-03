@@ -1,0 +1,121 @@
+{
+    "name": "withdraw tokens after executing an action",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "change_configuration.scen.json"
+        },
+        {
+            "step": "scCall",
+            "txId": "user1-withdraw",
+            "tx": {
+                "from": "address:user1",
+                "to": "sc:governance",
+                "function": "withdrawGovernanceTokens",
+                "arguments": [
+                    "1"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "message": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "user2-withdraw",
+            "tx": {
+                "from": "address:user2",
+                "to": "sc:governance",
+                "function": "withdrawGovernanceTokens",
+                "arguments": [
+                    "1"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "message": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "owner-withdraw",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:governance",
+                "function": "withdrawGovernanceTokens",
+                "arguments": [
+                    "1"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "message": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "*",
+                    "balance": "*",
+                    "esdt": {
+                        "str:GOV-123456": "1000"
+                    },
+                    "storage": {}
+                },
+                "address:user1": {
+                    "nonce": "*",
+                    "balance": "*",
+                    "esdt": {
+                        "str:GOV-123456": "1000"
+                    },
+                    "storage": {}
+                },
+                "address:user2": {
+                    "nonce": "*",
+                    "balance": "*",
+                    "esdt": {
+                        "str:GOV-123456": "1000"
+                    },
+                    "storage": {}
+                },
+                "sc:governance": {
+                    "nonce": "*",
+                    "balance": "0",
+                    "esdt": {
+                        "str:GOV-123456": "0"
+                    },
+                    "storage": {
+                        "str:governance:votes|u32:1|str:.mapped|address:user1": "",
+                        "str:governance:votes|u32:1|str:.mapped|address:user2": "",
+                        "str:governance:downvotes|u32:1|str:.mapped|address:owner": "",
+                        "str:governance:proposalStartBlock|u32:1": "",
+                        "str:governance:totalVotes|u32:1": "",
+                        "str:governance:totalDownvotes|u32:1": "",
+                        "str:governance:proposals.item|u32:1": "",
+                        "str:governance:quorum": "1000",
+                        "+": ""
+                    },
+                    "code": "*"
+                },
+                "+": ""
+            }
+        }
+    ]
+}

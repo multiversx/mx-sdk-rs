@@ -1,5 +1,6 @@
 {
     "name": "buy ticket",
+    "gasSchedule": "dummy",
     "steps": [
         {
             "step": "externalSteps",
@@ -11,9 +12,8 @@
                 "address:acc1": {
                     "nonce": "0",
                     "balance": "1,000,000",
-                    "storage": {},
                     "esdt": {
-                        "str:lottery_token": "100"
+                        "str:LOTTERY-123456": "100"
                     }
                 }
             }
@@ -23,10 +23,13 @@
             "txId": "buy-ticket",
             "tx": {
                 "from": "address:acc1",
-                "to": "address:the_lottery_contract",
-                "value": "0",
-                "esdtTokenName": "str:lottery_token",
-                "esdtValue": "100",
+                "to": "sc:lottery",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:LOTTERY-123456",
+                        "value": "100"
+                    }
+                ],
                 "function": "buy_ticket",
                 "arguments": [
                     "str:lottery_name"
@@ -35,6 +38,7 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "",
                 "gas": "*",
                 "refund": "*"
@@ -58,16 +62,26 @@
                     "balance": "1,000,000",
                     "storage": {}
                 },
-                "address:the_lottery_contract": {
+                "sc:lottery": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {
-                        "''lotteryInfo|u32:12|''lottery_name": "u32:13|str:lottery_token|u32:1|u8:100|u32:1|u64:123,456|u32:800|u32:1|u8:100|u32:0|u32:1|u32:1|u8:100",
-                        "''ticketHolder|u32:12|''lottery_name|0x00000000": "address:acc1",
-                        "''numberOfEntriesForUser|u32:12|''lottery_name|address:acc1": "1"
-                    },
                     "esdt": {
-                        "str:lottery_token": "100"
+                        "str:LOTTERY-123456": "100"
+                    },
+                    "storage": {
+                        "str:lotteryInfo|nested:str:lottery_name": {
+                            "0-token_identifier": "nested:str:LOTTERY-123456",
+                            "1-ticket_price": "biguint:100",
+                            "2-tickets-left": "u32:1",
+                            "3-deadline": "u64:123,456",
+                            "4-max_entries_per_user": "u32:800",
+                            "5-prize_distribution": "nested:u8:100",
+                            "6-whitelist": "nested:",
+                            "7-prize_pool": "biguint:100"
+                        },
+                        "str:ticketHolder|nested:str:lottery_name|str:.len": "1",
+                        "str:ticketHolder|nested:str:lottery_name|str:.item|u32:1": "address:acc1",
+                        "str:numberOfEntriesForUser|u32:12|str:lottery_name|address:acc1": "1"
                     },
                     "code": "file:../output/lottery-esdt.wasm"
                 }

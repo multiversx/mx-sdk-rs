@@ -1,0 +1,592 @@
+{
+    "buildInfo": {
+        "rustc": {
+            "version": "x.x.x-nightly",
+            "commitHash": "<commit hash here>",
+            "commitDate": "<commit date here>",
+            "channel": "Channel",
+            "short": "rustc <version> (<short hash> <date>)"
+        },
+        "contractCrate": {
+            "name": "use-module",
+            "version": "0.0.0"
+        },
+        "framework": {
+            "name": "elrond-wasm",
+            "version": "0.25.0"
+        }
+    },
+    "docs": [
+        "Contract that tests that using modules works correctly.",
+        "Also provides testing for the most common modules:",
+        "- DnsModule",
+        "- FeaturesModule",
+        "- EsdtModule",
+        "- GovernanceModule",
+        "- PauseModule"
+    ],
+    "name": "UseModule",
+    "constructor": {
+        "docs": [
+            "The constructor can reside in a module.",
+            "The method can have any name."
+        ],
+        "inputs": [],
+        "outputs": []
+    },
+    "endpoints": [
+        {
+            "docs": [
+                "Validates that the \"featureName\" feature is on.",
+                "Uses the `feature_guard!` macro."
+            ],
+            "name": "checkFeatureGuard",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "checkPause",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "call_mod_a",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "call_mod_b",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "call_mod_c",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "only_owner_mod_endpoint",
+            "onlyOwner": true,
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "call_derived_not_owner_only",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "dnsRegister",
+            "mutability": "mutable",
+            "payableInTokens": [
+                "EGLD"
+            ],
+            "inputs": [
+                {
+                    "name": "dns_address",
+                    "type": "Address"
+                },
+                {
+                    "name": "name",
+                    "type": "bytes"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "issueToken",
+            "mutability": "mutable",
+            "payableInTokens": [
+                "EGLD"
+            ],
+            "inputs": [
+                {
+                    "name": "token_display_name",
+                    "type": "bytes"
+                },
+                {
+                    "name": "token_ticker",
+                    "type": "bytes"
+                },
+                {
+                    "name": "num_decimals",
+                    "type": "u32"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "docs": [
+                "optional address to set roles for. Defaults to SC's address."
+            ],
+            "name": "setLocalRoles",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "opt_dest_address",
+                    "type": "optional<Address>",
+                    "multi_arg": true
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "setFeatureFlag",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "feature_name",
+                    "type": "bytes"
+                },
+                {
+                    "name": "value",
+                    "type": "bool"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "depositTokensForAction",
+            "mutability": "mutable",
+            "payableInTokens": [
+                "*"
+            ],
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "withdrawGovernanceTokens",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "proposal_id",
+                    "type": "u32"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "propose",
+            "mutability": "mutable",
+            "payableInTokens": [
+                "*"
+            ],
+            "inputs": [
+                {
+                    "name": "description",
+                    "type": "bytes"
+                },
+                {
+                    "name": "actions",
+                    "type": "variadic<multi<u64,Address,TokenIdentifier,u64,BigUint,bytes,List<bytes>>>",
+                    "multi_arg": true
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "u32"
+                }
+            ]
+        },
+        {
+            "name": "vote",
+            "mutability": "mutable",
+            "payableInTokens": [
+                "*"
+            ],
+            "inputs": [
+                {
+                    "name": "proposal_id",
+                    "type": "u32"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "downvote",
+            "mutability": "mutable",
+            "payableInTokens": [
+                "*"
+            ],
+            "inputs": [
+                {
+                    "name": "proposal_id",
+                    "type": "u32"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "queue",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "proposal_id",
+                    "type": "u32"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "execute",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "proposal_id",
+                    "type": "u32"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "cancel",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "proposal_id",
+                    "type": "u32"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "getProposalStatus",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "proposal_id",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "GovernanceProposalStatus"
+                }
+            ]
+        },
+        {
+            "name": "getProposer",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "proposal_id",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "optional<Address>",
+                    "multi_result": true
+                }
+            ]
+        },
+        {
+            "name": "getProposalDescription",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "proposal_id",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "optional<bytes>",
+                    "multi_result": true
+                }
+            ]
+        },
+        {
+            "name": "getProposalActions",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "proposal_id",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "variadic<multi<u64,Address,TokenIdentifier,u64,BigUint,bytes,List<bytes>>>",
+                    "multi_result": true
+                }
+            ]
+        },
+        {
+            "docs": [
+                "Could be calculated by iterating over the \"votes\" mapper, but that costs a lot of gas"
+            ],
+            "name": "getTotalVotes",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "proposal_id",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "docs": [
+                "Could be calculated by iterating over the \"downvotes\" mapper, but that costs a lot of gas"
+            ],
+            "name": "getTotalDownvotes",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "proposal_id",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "docs": [
+                "The module can't protect its storage from the main SC, so it's the developers responsibility",
+                "to not modify parameters manually"
+            ],
+            "name": "initGovernanceModule",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "governance_token_id",
+                    "type": "TokenIdentifier"
+                },
+                {
+                    "name": "quorum",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "min_token_balance_for_proposal",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "max_actions_per_proposal",
+                    "type": "u32"
+                },
+                {
+                    "name": "voting_delay_in_blocks",
+                    "type": "u64"
+                },
+                {
+                    "name": "voting_period_in_blocks",
+                    "type": "u64"
+                },
+                {
+                    "name": "lock_time_after_voting_ends_in_blocks",
+                    "type": "u64"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "changeQuorum",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "new_value",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "changeMinTokenBalanceForProposing",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "new_value",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "changeMaxActionsPerProposal",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "new_value",
+                    "type": "u32"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "changeVotingDelayInBlocks",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "new_value",
+                    "type": "u64"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "changeVotingPeriodInBlocks",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "new_value",
+                    "type": "u64"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "changeLockTimeAfterVotingEndsInBlocks",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "new_value",
+                    "type": "u64"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "getGovernanceTokenId",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "TokenIdentifier"
+                }
+            ]
+        },
+        {
+            "name": "getQuorum",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "getMinTokenBalanceForProposing",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "getMaxActionsPerProposal",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u32"
+                }
+            ]
+        },
+        {
+            "name": "getVotingDelayInBlocks",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "getVotingPeriodInBlocks",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "getLockTimeAfterVotingEndsInBlocks",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "isPaused",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "pause",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "unpause",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": []
+        }
+    ],
+    "hasCallback": true,
+    "types": {
+        "GovernanceProposalStatus": {
+            "type": "enum",
+            "variants": [
+                {
+                    "name": "None",
+                    "discriminant": 0
+                },
+                {
+                    "name": "Pending",
+                    "discriminant": 1
+                },
+                {
+                    "name": "Active",
+                    "discriminant": 2
+                },
+                {
+                    "name": "Defeated",
+                    "discriminant": 3
+                },
+                {
+                    "name": "Succeeded",
+                    "discriminant": 4
+                },
+                {
+                    "name": "Queued",
+                    "discriminant": 5
+                }
+            ]
+        }
+    }
+}

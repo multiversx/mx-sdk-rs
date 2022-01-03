@@ -6,10 +6,9 @@
             "accounts": {
                 "address:user": {
                     "nonce": "0",
-                    "balance": "1000",
-                    "storage": {}
+                    "balance": "1000"
                 },
-                "address:contract": {
+                "sc:egld-esdt-swap": {
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
@@ -28,21 +27,34 @@
             "txId": "wrap-egld",
             "tx": {
                 "from": "address:user",
-                "to": "address:contract",
-                "value": "500",
+                "to": "sc:egld-esdt-swap",
+                "egldValue": "500",
                 "function": "wrapEgld",
                 "arguments": [],
                 "gasLimit": "100,000,000",
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "0",
                 "message": "",
                 "logs": [
                     {
-                        "address": "address:contract",
-                        "identifier": "str:wrap-egld",
+                        "address": "sc:egld-esdt-swap",
+                        "endpoint": "str:ESDTTransfer",
                         "topics": [
+                            "str:WEGLD-abcdef",
+                            "",
+                            "500",
+                            "address:user"
+                        ],
+                        "data": ""
+                    },
+                    {
+                        "address": "sc:egld-esdt-swap",
+                        "endpoint": "str:wrapEgld",
+                        "topics": [
+                            "str:wrap-egld",
                             "address:user"
                         ],
                         "data": "500"
@@ -63,7 +75,7 @@
                     },
                     "storage": {}
                 },
-                "address:contract": {
+                "sc:egld-esdt-swap": {
                     "nonce": "0",
                     "balance": "500",
                     "esdt": {

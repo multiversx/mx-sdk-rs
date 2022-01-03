@@ -1,21 +1,18 @@
 {
     "name": "crypto",
-    "gasSchedule": "v2",
+    "gasSchedule": "v3",
     "steps": [
         {
             "step": "setState",
             "accounts": {
-                "address:features_contract": {
+                "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
                     "code": "file:../output/basic-features.wasm"
                 },
                 "address:an_account": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 }
             }
         },
@@ -24,9 +21,8 @@
             "txId": "1",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
-                "value": "0",
-                "function": "computeSha256",
+                "to": "sc:basic-features",
+                "function": "compute_sha256",
                 "arguments": [
                     "0x010203"
                 ],
@@ -48,9 +44,8 @@
             "txId": "2",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
-                "value": "0",
-                "function": "computeSha256",
+                "to": "sc:basic-features",
+                "function": "compute_sha256",
                 "arguments": [
                     "0x0102030405060708"
                 ],

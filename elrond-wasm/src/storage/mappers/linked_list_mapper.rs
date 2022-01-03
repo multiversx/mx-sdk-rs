@@ -1,486 +1,580 @@
-use super::{StorageClearable, StorageMapper};
-use crate::abi::{TypeAbi, TypeDescriptionContainer, TypeName};
-use crate::api::{EndpointFinishApi, ErrorApi, StorageReadApi, StorageWriteApi};
-use crate::io::EndpointResult;
-use crate::storage::{storage_get, storage_set};
-use crate::types::{BoxedBytes, MultiResultVec};
-use alloc::vec::Vec;
 use core::marker::PhantomData;
-use elrond_codec::elrond_codec_derive::{
-	TopDecode, TopDecodeOrDefault, TopEncode, TopEncodeOrDefault,
+
+use super::{StorageClearable, StorageMapper};
+use crate::{
+    abi::{TypeAbi, TypeDescriptionContainer, TypeName},
+    api::{EndpointFinishApi, ManagedTypeApi, StorageMapperApi},
+    finish_all,
+    io::EndpointResult,
+    storage::{storage_get, storage_set, StorageKey},
+    types::{BoxedBytes, ManagedType, MultiResultVec},
 };
-use elrond_codec::{DecodeDefault, EncodeDefault, TopDecode, TopEncode};
+use alloc::vec::Vec;
+use elrond_codec::{
+    elrond_codec_derive::{
+        NestedDecode, NestedEncode, TopDecode, TopDecodeOrDefault, TopEncode, TopEncodeOrDefault,
+    },
+    DecodeDefault, EncodeDefault, NestedDecode, NestedEncode, TopDecode, TopEncode,
+};
+use storage_get::storage_get_len;
 
 const NULL_ENTRY: u32 = 0;
 const INFO_IDENTIFIER: &[u8] = b".info";
-const NODE_IDENTIFIER: &[u8] = b".node_links";
-const VALUE_IDENTIFIER: &[u8] = b".value";
+const NODE_IDENTIFIER: &[u8] = b".node";
 
-#[derive(TopEncode, TopDecode, PartialEq, Clone, Copy)]
-pub struct Node {
-	pub previous: u32,
-	pub next: u32,
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, PartialEq, Clone, Copy)]
+pub struct LinkedListNode<T: NestedEncode + NestedDecode + TopEncode + TopDecode + Clone> {
+    pub(crate) value: T,
+    pub(crate) node_id: u32,
+    pub(crate) next_id: u32,
+    pub(crate) prev_id: u32,
+}
+
+impl<T: NestedEncode + NestedDecode + TopEncode + TopDecode + Clone> LinkedListNode<T> {
+    pub fn get_value_cloned(&self) -> T {
+        self.value.clone()
+    }
+
+    pub fn get_value_as_ref(&self) -> &T {
+        &self.value
+    }
+
+    pub fn into_value(self) -> T {
+        self.value
+    }
+
+    pub fn get_node_id(&self) -> u32 {
+        self.node_id
+    }
+
+    pub fn get_next_node_id(&self) -> u32 {
+        self.next_id
+    }
+
+    pub fn get_prev_node_id(&self) -> u32 {
+        self.prev_id
+    }
 }
 
 #[derive(TopEncodeOrDefault, TopDecodeOrDefault, PartialEq, Clone, Copy)]
-pub struct LinkedListMapperInfo {
-	pub len: u32,
-	pub front: u32,
-	pub back: u32,
-	pub new: u32,
+pub struct LinkedListInfo {
+    pub len: u32,
+    pub front: u32,
+    pub back: u32,
+    pub new: u32,
 }
 
-impl EncodeDefault for LinkedListMapperInfo {
-	fn is_default(&self) -> bool {
-		self.len == 0
-	}
+impl EncodeDefault for LinkedListInfo {
+    fn is_default(&self) -> bool {
+        self.len == 0
+    }
 }
 
-impl DecodeDefault for LinkedListMapperInfo {
-	fn default() -> Self {
-		Self {
-			len: 0,
-			front: 0,
-			back: 0,
-			new: 0,
-		}
-	}
+impl DecodeDefault for LinkedListInfo {
+    fn default() -> Self {
+        Self {
+            len: 0,
+            front: 0,
+            back: 0,
+            new: 0,
+        }
+    }
 }
 
-impl LinkedListMapperInfo {
-	pub fn generate_new_node_id(&mut self) -> u32 {
-		self.new += 1;
-		self.new
-	}
+impl LinkedListInfo {
+    pub fn generate_new_node_id(&mut self) -> u32 {
+        self.new += 1;
+        self.new
+    }
 }
 
-/// A doubly-linked list with owned nodes.
-///
-/// The `LinkedListMapper` allows pushing and popping elements at either end
-/// in constant time.
 pub struct LinkedListMapper<SA, T>
 where
-	SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
-	T: TopEncode + TopDecode + 'static,
+    SA: StorageMapperApi,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + 'static,
 {
-	api: SA,
-	main_key: BoxedBytes,
-	_phantom: core::marker::PhantomData<T>,
+    _phantom_api: PhantomData<SA>,
+    base_key: StorageKey<SA>,
+    _phantom_item: PhantomData<T>,
 }
 
 impl<SA, T> StorageMapper<SA> for LinkedListMapper<SA, T>
 where
-	SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
-	T: TopEncode + TopDecode,
+    SA: StorageMapperApi,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone,
 {
-	fn new(api: SA, main_key: BoxedBytes) -> Self {
-		LinkedListMapper {
-			api,
-			main_key,
-			_phantom: PhantomData,
-		}
-	}
+    fn new(base_key: StorageKey<SA>) -> Self {
+        LinkedListMapper {
+            _phantom_api: PhantomData,
+            base_key,
+            _phantom_item: PhantomData,
+        }
+    }
 }
 
 impl<SA, T> StorageClearable for LinkedListMapper<SA, T>
 where
-	SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
-	T: TopEncode + TopDecode,
+    SA: StorageMapperApi,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone,
 {
-	fn clear(&mut self) {
-		let info = self.get_info();
-		let mut node_id = info.front;
-		while node_id != NULL_ENTRY {
-			let node = self.get_node(node_id);
-			self.clear_node(node_id);
-			self.clear_value(node_id);
-			node_id = node.next;
-		}
-		self.set_info(LinkedListMapperInfo::default());
-	}
+    fn clear(&mut self) {
+        let info = self.get_info();
+        let mut node_id = info.front;
+
+        while node_id != NULL_ENTRY {
+            let node = self.get_node(node_id);
+            self.clear_node(node_id);
+            node_id = node.next_id;
+        }
+
+        self.set_info(LinkedListInfo::default());
+    }
 }
 
 impl<SA, T> LinkedListMapper<SA, T>
 where
-	SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
-	T: TopEncode + TopDecode,
+    SA: StorageMapperApi,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone,
 {
-	fn build_node_id_named_key(&self, name: &[u8], node_id: u32) -> BoxedBytes {
-		BoxedBytes::from_concat(&[self.main_key.as_slice(), name, &node_id.to_be_bytes()])
-	}
+    fn build_node_id_named_key(&self, name: &[u8], node_id: u32) -> StorageKey<SA> {
+        let mut named_key = self.base_key.clone();
+        named_key.append_bytes(name);
+        named_key.append_item(&node_id);
+        named_key
+    }
 
-	fn build_name_key(&self, name: &[u8]) -> BoxedBytes {
-		BoxedBytes::from_concat(&[self.main_key.as_slice(), name])
-	}
+    fn build_name_key(&self, name: &[u8]) -> StorageKey<SA> {
+        let mut name_key = self.base_key.clone();
+        name_key.append_bytes(name);
+        name_key
+    }
 
-	fn get_info(&self) -> LinkedListMapperInfo {
-		storage_get(
-			self.api.clone(),
-			self.build_name_key(INFO_IDENTIFIER).as_slice(),
-		)
-	}
+    fn get_info(&self) -> LinkedListInfo {
+        storage_get(self.build_name_key(INFO_IDENTIFIER).as_ref())
+    }
 
-	fn set_info(&mut self, value: LinkedListMapperInfo) {
-		storage_set(
-			self.api.clone(),
-			self.build_name_key(INFO_IDENTIFIER).as_slice(),
-			&value,
-		);
-	}
+    fn set_info(&mut self, value: LinkedListInfo) {
+        storage_set(self.build_name_key(INFO_IDENTIFIER).as_ref(), &value);
+    }
 
-	fn get_node(&self, node_id: u32) -> Node {
-		storage_get(
-			self.api.clone(),
-			self.build_node_id_named_key(NODE_IDENTIFIER, node_id)
-				.as_slice(),
-		)
-	}
+    fn get_node(&self, node_id: u32) -> LinkedListNode<T> {
+        storage_get(
+            self.build_node_id_named_key(NODE_IDENTIFIER, node_id)
+                .as_ref(),
+        )
+    }
 
-	fn set_node(&mut self, node_id: u32, item: Node) {
-		storage_set(
-			self.api.clone(),
-			self.build_node_id_named_key(NODE_IDENTIFIER, node_id)
-				.as_slice(),
-			&item,
-		);
-	}
+    fn is_empty_node(&self, node_id: u32) -> bool {
+        storage_get_len(
+            self.build_node_id_named_key(NODE_IDENTIFIER, node_id)
+                .as_ref(),
+        ) == 0
+    }
 
-	fn clear_node(&mut self, node_id: u32) {
-		storage_set(
-			self.api.clone(),
-			self.build_node_id_named_key(NODE_IDENTIFIER, node_id)
-				.as_slice(),
-			&BoxedBytes::empty(),
-		);
-	}
+    fn set_node(&mut self, node_id: u32, item: &LinkedListNode<T>) {
+        storage_set(
+            self.build_node_id_named_key(NODE_IDENTIFIER, node_id)
+                .as_ref(),
+            item,
+        );
+    }
 
-	fn get_value(&self, node_id: u32) -> T {
-		storage_get(
-			self.api.clone(),
-			self.build_node_id_named_key(VALUE_IDENTIFIER, node_id)
-				.as_slice(),
-		)
-	}
+    fn clear_node(&mut self, node_id: u32) {
+        storage_set(
+            self.build_node_id_named_key(NODE_IDENTIFIER, node_id)
+                .as_ref(),
+            &BoxedBytes::empty(),
+        );
+    }
 
-	fn get_value_option(&self, node_id: u32) -> Option<T> {
-		if node_id == NULL_ENTRY {
-			return None;
-		}
-		Some(self.get_value(node_id))
-	}
+    pub fn is_empty(&self) -> bool {
+        self.get_info().len == 0
+    }
 
-	fn set_value(&mut self, node_id: u32, value: &T) {
-		storage_set(
-			self.api.clone(),
-			self.build_node_id_named_key(VALUE_IDENTIFIER, node_id)
-				.as_slice(),
-			value,
-		)
-	}
+    pub fn len(&self) -> usize {
+        self.get_info().len as usize
+    }
 
-	fn clear_value(&mut self, node_id: u32) {
-		storage_set(
-			self.api.clone(),
-			self.build_node_id_named_key(VALUE_IDENTIFIER, node_id)
-				.as_slice(),
-			&BoxedBytes::empty(),
-		)
-	}
+    pub fn front(&self) -> Option<LinkedListNode<T>> {
+        let info = self.get_info();
 
-	/// Returns `true` if the `LinkedList` is empty.
-	///
-	/// This operation should compute in *O*(1) time.
-	pub fn is_empty(&self) -> bool {
-		self.get_info().len == 0
-	}
+        self.get_node_by_id(info.front)
+    }
 
-	/// Returns the length of the `LinkedList`.
-	///
-	/// This operation should compute in *O*(1) time.
-	pub fn len(&self) -> usize {
-		self.get_info().len as usize
-	}
+    pub fn back(&self) -> Option<LinkedListNode<T>> {
+        let info = self.get_info();
 
-	/// Appends an element to the back of a list
-	/// and returns the node id of the newly added node.
-	///
-	/// This operation should compute in *O*(1) time.
-	pub(crate) fn push_back_node_id(&mut self, elt: &T) -> u32 {
-		let mut info = self.get_info();
-		let new_node_id = info.generate_new_node_id();
-		let mut previous = NULL_ENTRY;
-		if info.len == 0 {
-			info.front = new_node_id;
-		} else {
-			let back = info.back;
-			let mut back_node = self.get_node(back);
-			back_node.next = new_node_id;
-			previous = back;
-			self.set_node(back, back_node);
-		}
-		self.set_node(
-			new_node_id,
-			Node {
-				previous,
-				next: NULL_ENTRY,
-			},
-		);
-		info.back = new_node_id;
-		self.set_value(new_node_id, &elt);
-		info.len += 1;
-		self.set_info(info);
-		new_node_id
-	}
+        self.get_node_by_id(info.back)
+    }
 
-	/// Appends an element to the back of a list.
-	///
-	/// This operation should compute in *O*(1) time.
-	pub fn push_back(&mut self, elt: T) {
-		let _ = self.push_back_node_id(&elt);
-	}
+    pub fn pop_back(&mut self) -> Option<LinkedListNode<T>> {
+        let info = self.get_info();
 
-	/// Adds an element first in the list.
-	///
-	/// This operation should compute in *O*(1) time.
-	pub fn push_front(&mut self, elt: T) {
-		let mut info = self.get_info();
-		let new_node_id = info.generate_new_node_id();
-		let mut next = NULL_ENTRY;
-		if info.len == 0 {
-			info.back = new_node_id;
-		} else {
-			let front = info.front;
-			let mut front_node = self.get_node(front);
-			front_node.previous = new_node_id;
-			next = front;
-			self.set_node(front, front_node);
-		}
-		self.set_node(
-			new_node_id,
-			Node {
-				previous: NULL_ENTRY,
-				next,
-			},
-		);
-		info.front = new_node_id;
-		self.set_value(new_node_id, &elt);
-		info.len += 1;
-		self.set_info(info);
-	}
+        self.remove_node_by_id(info.back)
+    }
 
-	/// Provides a copy to the front element, or `None` if the list is
-	/// empty.
-	pub fn front(&self) -> Option<T> {
-		self.get_value_option(self.get_info().front)
-	}
+    pub fn pop_front(&mut self) -> Option<LinkedListNode<T>> {
+        let info = self.get_info();
 
-	/// Provides a copy to the back element, or `None` if the list is
-	/// empty.
-	pub fn back(&self) -> Option<T> {
-		self.get_value_option(self.get_info().back)
-	}
+        self.remove_node_by_id(info.front)
+    }
 
-	/// Removes the last element from a list and returns it, or `None` if
-	/// it is empty.
-	///
-	/// This operation should compute in *O*(1) time.
-	pub fn pop_back(&mut self) -> Option<T> {
-		self.remove_by_node_id(self.get_info().back)
-	}
+    pub fn push_after(
+        &mut self,
+        node: &mut LinkedListNode<T>,
+        element: T,
+    ) -> Option<LinkedListNode<T>> {
+        if self.is_empty_node(node.node_id) {
+            return None;
+        }
 
-	/// Removes the first element and returns it, or `None` if the list is
-	/// empty.
-	///
-	/// This operation should compute in *O*(1) time.
-	pub fn pop_front(&mut self) -> Option<T> {
-		self.remove_by_node_id(self.get_info().front)
-	}
+        let mut info = self.get_info();
+        let new_node_id = info.generate_new_node_id();
 
-	/// Removes element with the given node id and returns it, or `None` if the list is
-	/// empty.
-	/// Note: has undefined behavior if there's no node with the given node id in the list
-	///
-	/// This operation should compute in *O*(1) time.
-	pub(crate) fn remove_by_node_id(&mut self, node_id: u32) -> Option<T> {
-		if node_id == NULL_ENTRY {
-			return None;
-		}
-		let node = self.get_node(node_id);
+        let new_node_next_id = node.next_id;
+        node.next_id = new_node_id;
+        self.set_node(node.node_id, node);
 
-		let mut info = self.get_info();
-		if node.previous == NULL_ENTRY {
-			info.front = node.next;
-		} else {
-			let mut previous = self.get_node(node.previous);
-			previous.next = node.next;
-			self.set_node(node.previous, previous);
-		}
+        if new_node_next_id == NULL_ENTRY {
+            info.back = new_node_id;
+        } else {
+            let mut next_node = self.get_node(new_node_next_id);
+            next_node.prev_id = new_node_id;
+            self.set_node(new_node_next_id, &next_node);
+        }
 
-		if node.next == NULL_ENTRY {
-			info.back = node.previous;
-		} else {
-			let mut next = self.get_node(node.next);
-			next.previous = node.previous;
-			self.set_node(node.next, next);
-		}
+        let new_node = LinkedListNode {
+            value: element,
+            node_id: new_node_id,
+            next_id: new_node_next_id,
+            prev_id: node.node_id,
+        };
+        self.set_node(new_node_id, &new_node);
 
-		self.clear_node(node_id);
-		let removed_value = self.get_value(node_id);
-		self.clear_value(node_id);
-		info.len -= 1;
-		self.set_info(info);
-		Some(removed_value)
-	}
+        info.len += 1;
+        self.set_info(info);
+        Some(new_node)
+    }
 
-	/// Provides a forward iterator.
-	pub fn iter(&self) -> Iter<SA, T> {
-		Iter::new(self)
-	}
+    pub fn push_before(
+        &mut self,
+        node: &mut LinkedListNode<T>,
+        element: T,
+    ) -> Option<LinkedListNode<T>> {
+        if self.is_empty_node(node.node_id) {
+            return None;
+        }
 
-	/// Runs several checks in order to verify that both forwards and backwards iteration
-	/// yields the same node entries and that the number of items in the list is correct.
-	/// Used for unit testing.
-	///
-	/// This operation should compute in *O*(n) time.
-	pub fn check_internal_consistency(&self) -> bool {
-		let info = self.get_info();
-		let mut front = info.front;
-		let mut back = info.back;
-		if info.len == 0 {
-			// if the list is empty, both ends should point to null entries
-			if front != NULL_ENTRY {
-				return false;
-			}
-			if back != NULL_ENTRY {
-				return false;
-			}
-			true
-		} else {
-			// if the list is non-empty, both ends should point to non-null entries
-			if front == NULL_ENTRY {
-				return false;
-			}
-			if back == NULL_ENTRY {
-				return false;
-			}
+        let mut info = self.get_info();
+        let new_node_id = info.generate_new_node_id();
 
-			// the node before the first and the one after the last should both be null
-			if self.get_node(front).previous != NULL_ENTRY {
-				return false;
-			}
-			if self.get_node(back).next != NULL_ENTRY {
-				return false;
-			}
+        let new_node_prev_id = node.prev_id;
+        node.prev_id = new_node_id;
+        self.set_node(node.node_id, node);
 
-			// iterate forwards
-			let mut forwards = Vec::new();
-			while front != NULL_ENTRY {
-				forwards.push(front);
-				front = self.get_node(front).next;
-			}
-			if forwards.len() != info.len as usize {
-				return false;
-			}
+        if new_node_prev_id == NULL_ENTRY {
+            info.front = new_node_id;
+        } else {
+            let mut previous_node = self.get_node(new_node_prev_id);
+            previous_node.next_id = new_node_id;
+            self.set_node(new_node_prev_id, &previous_node);
+        }
 
-			// iterate backwards
-			let mut backwards = Vec::new();
-			while back != NULL_ENTRY {
-				backwards.push(back);
-				back = self.get_node(back).previous;
-			}
-			if backwards.len() != info.len as usize {
-				return false;
-			}
+        let new_node = LinkedListNode {
+            value: element,
+            node_id: new_node_id,
+            next_id: node.node_id,
+            prev_id: new_node_prev_id,
+        };
+        self.set_node(new_node_id, &new_node);
 
-			// check that both iterations match element-wise
-			let backwards_reversed: Vec<u32> = backwards.iter().rev().cloned().collect();
-			if forwards != backwards_reversed {
-				return false;
-			}
+        info.len += 1;
+        self.set_info(info);
+        Some(new_node)
+    }
 
-			// check that the node IDs are unique
-			forwards.sort_unstable();
-			forwards.dedup();
-			if forwards.len() != info.len as usize {
-				return false;
-			}
-			true
-		}
-	}
+    pub fn push_after_node_id(&mut self, node_id: u32, element: T) -> Option<LinkedListNode<T>> {
+        if !self.is_empty_node(node_id) {
+            let mut node = self.get_node(node_id);
+            self.push_after(&mut node, element)
+        } else {
+            None
+        }
+    }
+
+    pub fn push_before_node_id(&mut self, node_id: u32, element: T) -> Option<LinkedListNode<T>> {
+        if !self.is_empty_node(node_id) {
+            let mut node = self.get_node(node_id);
+            self.push_before(&mut node, element)
+        } else {
+            None
+        }
+    }
+
+    pub fn push_back(&mut self, element: T) -> LinkedListNode<T> {
+        let mut info = self.get_info();
+        let new_node_id = info.generate_new_node_id();
+        let mut previous = NULL_ENTRY;
+
+        if info.len == 0 {
+            info.front = new_node_id;
+        } else {
+            let back = info.back;
+            let mut back_node = self.get_node(back);
+            back_node.next_id = new_node_id;
+            previous = back;
+            self.set_node(back, &back_node);
+        }
+
+        let node = LinkedListNode {
+            value: element,
+            node_id: new_node_id,
+            prev_id: previous,
+            next_id: NULL_ENTRY,
+        };
+        self.set_node(new_node_id, &node);
+
+        info.back = new_node_id;
+        info.len += 1;
+        self.set_info(info);
+        node
+    }
+
+    pub fn push_front(&mut self, element: T) -> LinkedListNode<T> {
+        let mut info = self.get_info();
+        let new_node_id = info.generate_new_node_id();
+        let mut next = NULL_ENTRY;
+
+        if info.len == 0 {
+            info.back = new_node_id;
+        } else {
+            let front = info.front;
+            let mut front_node = self.get_node(front);
+            front_node.prev_id = new_node_id;
+            next = front;
+            self.set_node(front, &front_node);
+        }
+
+        let node = LinkedListNode {
+            value: element,
+            node_id: new_node_id,
+            prev_id: NULL_ENTRY,
+            next_id: next,
+        };
+        self.set_node(new_node_id, &node);
+
+        info.front = new_node_id;
+        info.len += 1;
+        self.set_info(info);
+        node
+    }
+
+    pub fn set_node_value(&mut self, mut node: LinkedListNode<T>, new_value: T) {
+        if self.is_empty_node(node.node_id) {
+            return;
+        }
+
+        node.value = new_value;
+        self.set_node(node.node_id, &node);
+    }
+
+    pub fn set_node_value_by_id(&mut self, node_id: u32, new_value: T) {
+        if let Some(node) = self.get_node_by_id(node_id) {
+            self.set_node_value(node, new_value)
+        }
+    }
+
+    pub fn remove_node(&mut self, node: &LinkedListNode<T>) {
+        let node_id = node.node_id;
+
+        if self.is_empty_node(node_id) {
+            return;
+        }
+
+        let mut info = self.get_info();
+        if node.prev_id == NULL_ENTRY {
+            info.front = node.next_id;
+        } else {
+            let mut previous = self.get_node(node.prev_id);
+            previous.next_id = node.next_id;
+            self.set_node(node.prev_id, &previous);
+        }
+
+        if node.next_id == NULL_ENTRY {
+            info.back = node.prev_id;
+        } else {
+            let mut next = self.get_node(node.next_id);
+            next.prev_id = node.prev_id;
+            self.set_node(node.next_id, &next);
+        }
+
+        self.clear_node(node_id);
+        info.len -= 1;
+        self.set_info(info);
+    }
+
+    pub fn remove_node_by_id(&mut self, node_id: u32) -> Option<LinkedListNode<T>> {
+        if self.is_empty_node(node_id) {
+            return None;
+        }
+
+        let node = self.get_node_by_id(node_id).unwrap();
+        self.remove_node(&node);
+        Some(node)
+    }
+
+    pub fn get_node_by_id(&self, node_id: u32) -> Option<LinkedListNode<T>> {
+        if self.is_empty_node(node_id) {
+            return None;
+        }
+
+        Some(self.get_node(node_id))
+    }
+
+    pub fn iter(&self) -> Iter<SA, T> {
+        Iter::new(self)
+    }
+
+    pub fn iter_from_node_id(&self, node_id: u32) -> Iter<SA, T> {
+        Iter::new_from_node_id(self, node_id)
+    }
+
+    pub fn check_internal_consistency(&self) -> bool {
+        let info = self.get_info();
+        let mut front = info.front;
+        let mut back = info.back;
+
+        if info.len == 0 {
+            if front != NULL_ENTRY {
+                return false;
+            }
+            if back != NULL_ENTRY {
+                return false;
+            }
+            true
+        } else {
+            if front == NULL_ENTRY {
+                return false;
+            }
+            if back == NULL_ENTRY {
+                return false;
+            }
+
+            if self.get_node(front).prev_id != NULL_ENTRY {
+                return false;
+            }
+            if self.get_node(back).next_id != NULL_ENTRY {
+                return false;
+            }
+
+            let mut forwards = Vec::new();
+            while front != NULL_ENTRY {
+                forwards.push(front);
+                front = self.get_node(front).next_id;
+            }
+            if forwards.len() != info.len as usize {
+                return false;
+            }
+
+            let mut backwards = Vec::new();
+            while back != NULL_ENTRY {
+                backwards.push(back);
+                back = self.get_node(back).prev_id;
+            }
+            if backwards.len() != info.len as usize {
+                return false;
+            }
+
+            let backwards_reversed: Vec<u32> = backwards.iter().rev().cloned().collect();
+            if forwards != backwards_reversed {
+                return false;
+            }
+
+            forwards.sort_unstable();
+            forwards.dedup();
+            if forwards.len() != info.len as usize {
+                return false;
+            }
+            true
+        }
+    }
 }
 
-/// An iterator over the elements of a `LinkedListMapper`.
-///
-/// This `struct` is created by [`LinkedListMapper::iter()`]. See its
-/// documentation for more.
 pub struct Iter<'a, SA, T>
 where
-	SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
-	T: TopEncode + TopDecode + 'static,
+    SA: StorageMapperApi,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + 'static,
 {
-	node_id: u32,
-	linked_list: &'a LinkedListMapper<SA, T>,
+    node_opt: Option<LinkedListNode<T>>,
+    linked_list: &'a LinkedListMapper<SA, T>,
 }
 
 impl<'a, SA, T> Iter<'a, SA, T>
 where
-	SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
-	T: TopEncode + TopDecode + 'static,
+    SA: StorageMapperApi,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone,
 {
-	fn new(linked_list: &'a LinkedListMapper<SA, T>) -> Iter<'a, SA, T> {
-		Iter {
-			node_id: linked_list.get_info().front,
-			linked_list,
-		}
-	}
+    fn new(linked_list: &'a LinkedListMapper<SA, T>) -> Iter<'a, SA, T> {
+        Iter {
+            node_opt: linked_list.front(),
+            linked_list,
+        }
+    }
+
+    fn new_from_node_id(linked_list: &'a LinkedListMapper<SA, T>, node_id: u32) -> Iter<'a, SA, T> {
+        Iter {
+            node_opt: linked_list.get_node_by_id(node_id),
+            linked_list,
+        }
+    }
 }
 
 impl<'a, SA, T> Iterator for Iter<'a, SA, T>
 where
-	SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
-	T: TopEncode + TopDecode + 'static,
+    SA: StorageMapperApi,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + 'static,
 {
-	type Item = T;
+    type Item = LinkedListNode<T>;
 
-	#[inline]
-	fn next(&mut self) -> Option<T> {
-		let current_node_id = self.node_id;
-		if current_node_id == NULL_ENTRY {
-			return None;
-		}
-		self.node_id = self.linked_list.get_node(current_node_id).next;
-		Some(self.linked_list.get_value(current_node_id))
-	}
+    #[inline]
+    fn next(&mut self) -> Option<LinkedListNode<T>> {
+        self.node_opt.as_ref()?;
+        let node = self.node_opt.clone().unwrap();
+        self.node_opt = self.linked_list.get_node_by_id(node.next_id);
+        Some(node)
+    }
 }
 
-/// Behaves like a MultiResultVec when an endpoint result.
-impl<SA, FA, T> EndpointResult<FA> for LinkedListMapper<SA, T>
+impl<SA, T> EndpointResult for LinkedListMapper<SA, T>
 where
-	SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
-	FA: EndpointFinishApi + Clone + 'static,
-	T: TopEncode + TopDecode + EndpointResult<FA>,
+    SA: StorageMapperApi,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + EndpointResult,
 {
-	fn finish(&self, api: FA) {
-		let v: Vec<T> = self.iter().collect();
-		MultiResultVec::<T>::from(v).finish(api);
-	}
+    type DecodeAs = MultiResultVec<T::DecodeAs>;
+
+    fn finish<FA>(&self)
+    where
+        FA: ManagedTypeApi + EndpointFinishApi,
+    {
+        let values_iter = self.iter().map(|x| x.into_value());
+        finish_all::<FA, _, _>(values_iter);
+    }
 }
 
-/// Behaves like a MultiResultVec when an endpoint result.
 impl<SA, T> TypeAbi for LinkedListMapper<SA, T>
 where
-	SA: StorageReadApi + StorageWriteApi + ErrorApi + Clone + 'static,
-	T: TopEncode + TopDecode + TypeAbi,
+    SA: StorageMapperApi,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + TypeAbi,
 {
-	fn type_name() -> TypeName {
-		crate::types::MultiResultVec::<T>::type_name()
-	}
+    fn type_name() -> TypeName {
+        crate::types::MultiResultVec::<T>::type_name()
+    }
 
-	fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
-		T::provide_type_descriptions(accumulator);
-	}
+    fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
+        T::provide_type_descriptions(accumulator);
+    }
 
-	fn is_multi_arg_or_result() -> bool {
-		true
-	}
+    fn is_multi_arg_or_result() -> bool {
+        true
+    }
 }

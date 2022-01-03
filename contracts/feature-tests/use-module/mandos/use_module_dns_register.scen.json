@@ -1,0 +1,64 @@
+{
+    "steps": [
+        {
+            "step": "setState",
+            "comment": "«dns#87» is not arbitrary, it is the address that «coolname0001.elrond» maps to",
+            "accounts": {
+                "address:a_user": {
+                    "nonce": "0",
+                    "balance": "1000"
+                },
+                "sc:use_module": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../output/use-module.wasm",
+                    "owner": "address:a_user"
+                },
+                "sc:dns#87": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:registration_cost": "1000"
+                    },
+                    "code": "file:../test-wasm/dns.wasm"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "dnsRegister",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:use_module",
+                "egldValue": "1000",
+                "function": "dnsRegister",
+                "arguments": [
+                    "sc:dns#87",
+                    "str:coolname0001.elrond"
+                ],
+                "gasLimit": "70,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:use_module": {
+                    "nonce": "0",
+                    "balance": "*",
+                    "username": "str:coolname0001.elrond",
+                    "storage": {},
+                    "code": "file:../output/use-module.wasm"
+                },
+                "+": ""
+            }
+        }
+    ]
+}

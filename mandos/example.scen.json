@@ -2,10 +2,11 @@
     "name": "example scenario file",
     "comment": "comments are nice",
     "checkGas": false,
-    "gasSchedule": "v2",
+    "gasSchedule": "v3",
     "steps": [
         {
             "step": "externalSteps",
+            "comment": "include comment",
             "path": "other.scen.json"
         },
         {
@@ -16,15 +17,113 @@
                     "comment": "we can comment on individual account initializations",
                     "nonce": "0",
                     "balance": "0xe8d4a51000",
-                    "storage": {},
                     "esdt": {
-                        "str:MyToken": "400,000,000,000"
+                        "str:1-MyToken": "400,000,000,000",
+                        "str:2-AnotherToken": {
+                            "instances": [
+                                {
+                                    "nonce": "0",
+                                    "balance": "400,000,000,000"
+                                }
+                            ],
+                            "frozen": "false"
+                        },
+                        "str:3-AnotherTokenThatIsFrozen": {
+                            "instances": [
+                                {
+                                    "nonce": "0",
+                                    "balance": "400,000,000,000"
+                                }
+                            ],
+                            "frozen": "true"
+                        },
+                        "str:4-SimpleNFT": {
+                            "instances": [
+                                {
+                                    "nonce": "1023"
+                                }
+                            ],
+                            "roles": [
+                                "role1",
+                                "role2"
+                            ]
+                        },
+                        "str:5-SeveralNFTs": {
+                            "instances": [
+                                {
+                                    "nonce": "1"
+                                },
+                                {
+                                    "nonce": "1",
+                                    "balance": "3"
+                                }
+                            ],
+                            "lastNonce": "7",
+                            "roles": [
+                                "ESDTRoleLocalMint",
+                                "ESDTRoleLocalBurn",
+                                "ESDTRoleNFTCreate",
+                                "ESDTRoleNFTAddQuantity",
+                                "ESDTRoleNFTBurn"
+                            ],
+                            "frozen": "false"
+                        },
+                        "str:6-NFTWithAttributes": {
+                            "instances": [
+                                {
+                                    "nonce": "1"
+                                },
+                                {
+                                    "nonce": "1",
+                                    "balance": "3"
+                                },
+                                {
+                                    "nonce": "2",
+                                    "balance": "5",
+                                    "attributes": "str:MyCustomAttributes"
+                                }
+                            ]
+                        },
+                        "str:7-NFTWithPartialMetadata": {
+                            "instances": [
+                                {
+                                    "nonce": "1"
+                                },
+                                {
+                                    "nonce": "2",
+                                    "balance": "100",
+                                    "creator": "address:creator_address",
+                                    "hash": "keccak256:str:nft_hash",
+                                    "attributes": "str:attributes"
+                                }
+                            ]
+                        },
+                        "str:8-NFTWithFullMetadata": {
+                            "instances": [
+                                {
+                                    "nonce": "24",
+                                    "balance": "1"
+                                },
+                                {
+                                    "nonce": "25",
+                                    "balance": "1",
+                                    "creator": "address:other_creator_address",
+                                    "royalties": "5000",
+                                    "hash": "keccak256:str:other_nft_hash",
+                                    "uri": [
+                                        "str:www.something.com/funny.jpeg"
+                                    ],
+                                    "attributes": "str:other_attributes"
+                                }
+                            ]
+                        }
                     },
-                    "code": ""
+                    "username": "str:myusername.elrond"
                 },
                 "address:smart_contract_address": {
                     "nonce": "0x00",
                     "balance": "23,000",
+                    "username": "str:mysmartcontract.elrond",
                     "storage": {
                         "0x19efaebcc296cffac396adb4a60d54c05eff43926a6072498a618e943908efe1": "-5",
                         "``32_byte_key_____________________": "``string___interpreted___as__bytes",
@@ -41,7 +140,8 @@
                             ]
                         }
                     },
-                    "code": "file:smart-contract.wasm"
+                    "code": "file:smart-contract.wasm",
+                    "owner": "address:alice"
                 }
             },
             "newAddresses": [
@@ -69,8 +169,7 @@
                 "blockTimestamp": "511",
                 "blockNonce": "522",
                 "blockRound": "533",
-                "blockEpoch": "544",
-                "blockRandomSeed": "0x567A4637C658910A21C2AED8638D8A1A543B065929CD6D0452F279A9CF72CE80F6A15F66A217E92045DED9E3DF9441FB"
+                "blockEpoch": "544"
             }
         },
         {
@@ -80,7 +179,7 @@
             "tx": {
                 "from": "address:an_address",
                 "to": "0x1000000000000000000000000000000000000000000000000000000000000000",
-                "value": "0x00",
+                "egldValue": "0x00",
                 "function": "someFunctionName",
                 "arguments": [
                     "0x1234123400000000000000000000000000000000000000000000000000000004",
@@ -116,8 +215,9 @@
                 "logs": [
                     {
                         "address": "address:smart_contract_address",
-                        "identifier": "0xf099cd8bde557814842a3121e8ddfd433a539b8c9f14bf31ebf108d12e6196e9",
+                        "endpoint": "str:transferFrom",
                         "topics": [
+                            "0xf099cd8bde557814842a3121e8ddfd433a539b8c9f14bf31ebf108d12e6196e9",
                             "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b000000000000000000000000",
                             "0x1234123400000000000000000000000000000000000000000000000000000004"
                         ],
@@ -135,9 +235,13 @@
             "tx": {
                 "from": "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b000000000000000000000000",
                 "to": "0x1000000000000000000000000000000000000000000000000000000000000000",
-                "value": "0x00",
-                "esdtValue": "250,000,000,000",
-                "esdtTokenName": "str:MyToken",
+                "egldValue": "0x00",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:MyToken",
+                        "value": "250,000,000,000"
+                    }
+                ],
                 "function": "someFunctionName",
                 "arguments": [],
                 "gasLimit": "0x100000",
@@ -151,7 +255,6 @@
             "tx": {
                 "from": "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b000000000000000000000000",
                 "to": "0x1000000000000000000000000000000000000000000000000000000000000000",
-                "value": "0x00",
                 "function": "someFunctionName",
                 "arguments": [],
                 "gasLimit": "0x100000",
@@ -170,7 +273,6 @@
             "tx": {
                 "from": "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b000000000000000000000000",
                 "to": "0x1000000000000000000000000000000000000000000000000000000000000000",
-                "value": "0x00",
                 "function": "someFunctionName",
                 "arguments": [],
                 "gasLimit": "0x100000",
@@ -187,9 +289,7 @@
             "comment": "another",
             "tx": {
                 "from": "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b000000000000000000000000",
-                "value": "0x00",
-                "esdtValue": "250,000,000,000",
-                "esdtTokenName": "str:CrowdToken",
+                "egldValue": "123,456,000",
                 "contractCode": "``new contract code here",
                 "arguments": [
                     "0x1234123400000000000000000000000000000000000000000000000000000004",
@@ -209,15 +309,33 @@
             }
         },
         {
+            "step": "scQuery",
+            "txId": "1b",
+            "comment": "a query, as would be performed off-chain",
+            "tx": {
+                "to": "address:the_smart_contract",
+                "function": "someFunctionName",
+                "arguments": []
+            },
+            "expect": {
+                "out": [],
+                "status": ""
+            }
+        },
+        {
             "step": "transfer",
             "txId": "3",
             "comment": "simple transfer, no VM",
             "tx": {
                 "from": "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b000000000000000000000000",
                 "to": "0x1000000000000000000000000000000000000000000000000000000000000000",
-                "value": "1234",
-                "esdtValue": "250,000,000,000",
-                "esdtTokenName": "str:MyToken"
+                "egldValue": "1234",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:MyToken",
+                        "value": "250,000,000,000"
+                    }
+                ]
             }
         },
         {
@@ -225,8 +343,22 @@
             "txId": "4",
             "comment": "system send out validator rewards",
             "tx": {
-                "to": "``delegation_contract___________s1",
-                "value": "555,000,000"
+                "to": "sc:delegation",
+                "egldValue": "555,000,000"
+            }
+        },
+        {
+            "step": "scQuery",
+            "txId": "5",
+            "displayLogs": true,
+            "tx": {
+                "to": "address:this_is_just_a_display_logs_test",
+                "function": "thisIsJustADisplayLogsTest",
+                "arguments": []
+            },
+            "expect": {
+                "out": [],
+                "status": ""
             }
         },
         {
@@ -237,15 +369,71 @@
                     "comment": "we can comment on individual account checks",
                     "nonce": "1",
                     "balance": "0xe8d4951000",
+                    "esdt": {
+                        "str:1-MyToken": "400,000,000,000",
+                        "str:2-AnotherToken": {
+                            "instances": [
+                                {
+                                    "nonce": "0",
+                                    "balance": "400,000,000,000"
+                                }
+                            ],
+                            "frozen": "*"
+                        },
+                        "str:3-AnotherTokenThatIsFrozen": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "*"
+                                }
+                            ],
+                            "frozen": "true"
+                        },
+                        "str:4-SimpleNFT": {
+                            "instances": [
+                                {
+                                    "nonce": "1023"
+                                }
+                            ],
+                            "roles": [
+                                "role1",
+                                "role2"
+                            ]
+                        },
+                        "str:5-SeveralNFTs": {
+                            "instances": [
+                                {
+                                    "nonce": "*"
+                                },
+                                {
+                                    "nonce": "1",
+                                    "balance": "3"
+                                }
+                            ],
+                            "lastNonce": "*",
+                            "roles": [
+                                "ESDTRoleLocalMint",
+                                "ESDTRoleLocalBurn",
+                                "ESDTRoleNFTCreate",
+                                "ESDTRoleNFTAddQuantity",
+                                "ESDTRoleNFTBurn"
+                            ],
+                            "frozen": "false"
+                        },
+                        "+": ""
+                    },
+                    "username": "str:check.elrond",
                     "storage": {},
                     "code": ""
                 },
                 "address:account_with_defaults": {
+                    "esdt": "*",
                     "storage": "*"
                 },
                 "address:smart_contract_address": {
                     "nonce": "0x00",
                     "balance": "23,000",
+                    "username": "str:mysmartcontract.elrond",
                     "storage": {
                         "0x19efaebcc296cffac396adb4a60d54c05eff43926a6072498a618e943908efe1": "-5",
                         "``32_byte_key_____________________": "``string___interpreted___as__bytes",
@@ -256,16 +444,24 @@
                                 "u64:0",
                                 "``field2elem3"
                             ]
-                        }
+                        },
+                        "str:anything-goes": "*",
+                        "+": ""
                     },
-                    "code": "file:smart-contract.wasm"
+                    "code": "file:smart-contract.wasm",
+                    "owner": "address:bob"
                 },
                 "address:smart_contract_address_2": {
                     "nonce": "*",
                     "balance": "*",
+                    "username": "*",
                     "storage": "*",
                     "code": "*",
+                    "owner": "*",
                     "asyncCallData": "``func@arg1@arg2"
+                },
+                "str:account_with_defaults___________": {
+                    "storage": "*"
                 },
                 "+": ""
             }
@@ -273,6 +469,32 @@
         {
             "step": "dumpState",
             "comment": "print everything to console"
+        },
+        {
+            "step": "transfer",
+            "txId": "multi-transfer",
+            "comment": "test ESDT multi-transfer",
+            "tx": {
+                "from": "address:A",
+                "to": "address:B",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:TOK-123000",
+                        "value": "100"
+                    },
+                    {
+                        "tokenIdentifier": "str:OTHERTOK-123777",
+                        "value": "1000"
+                    },
+                    {
+                        "tokenIdentifier": "str:NFT-123456",
+                        "nonce": "5",
+                        "value": "10"
+                    }
+                ],
+                "gasLimit": "0x100000000",
+                "gasPrice": "0x01"
+            }
         }
     ]
 }

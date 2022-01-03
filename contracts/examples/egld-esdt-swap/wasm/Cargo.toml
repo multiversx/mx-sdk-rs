@@ -1,7 +1,6 @@
 [package]
 name = "egld-esdt-swap-wasm"
 version = "0.0.0"
-authors = [ "you",]
 edition = "2018"
 publish = false
 
@@ -22,10 +21,12 @@ panic = "abort"
 
 [dependencies.egld-esdt-swap]
 path = ".."
-features = ["wasm-output-mode"]
-default-features = false
+
+[dependencies.elrond-wasm-node]
+version = "0.25.0"
+path = "../../../../elrond-wasm-node"
 
 [dependencies.elrond-wasm-output]
-version = "0.14.1"
+version = "0.25.0"
 path = "../../../../elrond-wasm-output"
 features = ["wasm-output-mode"]

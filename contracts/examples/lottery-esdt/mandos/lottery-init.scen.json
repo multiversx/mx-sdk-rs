@@ -1,30 +1,28 @@
 {
     "name": "lottery deployment test",
+    "gasSchedule": "dummy",
     "steps": [
         {
             "step": "setState",
             "accounts": {
                 "address:my_address": {
                     "nonce": "0",
-                    "balance": "1,000,000",
-                    "storage": {}
+                    "balance": "1,000,000"
                 },
                 "address:acc1": {
                     "nonce": "0",
-                    "balance": "1,000,000",
-                    "storage": {}
+                    "balance": "1,000,000"
                 },
                 "address:acc2": {
                     "nonce": "0",
-                    "balance": "1,000,000",
-                    "storage": {}
+                    "balance": "1,000,000"
                 }
             },
             "newAddresses": [
                 {
                     "creatorAddress": "address:my_address",
                     "creatorNonce": "0",
-                    "newAddress": "address:the_lottery_contract"
+                    "newAddress": "sc:lottery"
                 }
             ]
         },
@@ -34,12 +32,12 @@
             "tx": {
                 "from": "address:my_address",
                 "contractCode": "file:../output/lottery-esdt.wasm",
-                "value": "0",
                 "arguments": [],
                 "gasLimit": "1,000,000",
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "0",
                 "gas": "*",
                 "refund": "*"
@@ -63,7 +61,7 @@
                     "balance": "1,000,000",
                     "storage": {}
                 },
-                "address:the_lottery_contract": {
+                "sc:lottery": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},

@@ -1,0 +1,86 @@
+{
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            }
+        },
+        {
+            "step": "scQuery",
+            "txId": "1",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mbuffer_concat_2",
+                "arguments": [
+                    "str:abc",
+                    "str:def"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "str:abcdef"
+                ]
+            }
+        },
+        {
+            "step": "scQuery",
+            "txId": "2",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mbuffer_concat_2",
+                "arguments": [
+                    "",
+                    "str:def"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "str:def"
+                ]
+            }
+        },
+        {
+            "step": "scQuery",
+            "txId": "3",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mbuffer_concat_2",
+                "arguments": [
+                    "str:abc",
+                    ""
+                ]
+            },
+            "expect": {
+                "out": [
+                    "str:abc"
+                ]
+            }
+        },
+        {
+            "step": "scQuery",
+            "txId": "4",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mbuffer_concat_2",
+                "arguments": [
+                    "",
+                    ""
+                ]
+            },
+            "expect": {
+                "out": [
+                    ""
+                ]
+            }
+        }
+    ]
+}

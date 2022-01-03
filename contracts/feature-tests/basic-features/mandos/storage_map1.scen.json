@@ -1,21 +1,18 @@
 {
     "name": "storage",
-    "gasSchedule": "v2",
+    "gasSchedule": "v3",
     "steps": [
         {
             "step": "setState",
             "accounts": {
-                "address:features_contract": {
+                "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
                     "code": "file:../output/basic-features.wasm"
                 },
                 "address:an_account": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 }
             }
         },
@@ -24,11 +21,10 @@
             "txId": "store-val",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
-                "value": "0",
+                "to": "sc:basic-features",
                 "function": "store_map1",
                 "arguments": [
-                    "``__________address_1_____________",
+                    "str:__________address_1_____________",
                     "123"
                 ],
                 "gasLimit": "50,000,000",
@@ -45,11 +41,11 @@
         {
             "step": "checkState",
             "accounts": {
-                "address:features_contract": {
+                "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "``map1__________address_1_____________": "123"
+                        "str:map1__________address_1_____________": "123"
                     },
                     "code": "file:../output/basic-features.wasm"
                 },
@@ -66,17 +62,18 @@
             "txId": "load-val",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
-                "value": "0",
+                "to": "sc:basic-features",
                 "function": "load_map1",
                 "arguments": [
-                    "``__________address_1_____________"
+                    "str:__________address_1_____________"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "123" ],
+                "out": [
+                    "123"
+                ],
                 "status": "",
                 "logs": [],
                 "gas": "*",
@@ -88,11 +85,10 @@
             "txId": "store-empty",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
-                "value": "0",
+                "to": "sc:basic-features",
                 "function": "store_map1",
                 "arguments": [
-                    "``__________address_1_____________",
+                    "str:__________address_1_____________",
                     "0"
                 ],
                 "gasLimit": "50,000,000",
@@ -109,11 +105,11 @@
         {
             "step": "checkState",
             "accounts": {
-                "address:features_contract": {
+                "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "``map1__________address_1_____________": "0"
+                        "str:map1__________address_1_____________": "0"
                     },
                     "code": "file:../output/basic-features.wasm"
                 },
@@ -130,17 +126,18 @@
             "txId": "load-empty",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
-                "value": "0",
+                "to": "sc:basic-features",
                 "function": "load_map1",
                 "arguments": [
-                    "``__________address_1_____________"
+                    "str:__________address_1_____________"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "0" ],
+                "out": [
+                    "0"
+                ],
                 "status": "",
                 "logs": [],
                 "gas": "*",

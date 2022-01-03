@@ -1,5 +1,6 @@
 {
     "name": "second bidder too low",
+    "gasSchedule": "dummy",
     "steps": [
         {
             "step": "externalSteps",
@@ -10,8 +11,7 @@
             "accounts": {
                 "address:bidder2": {
                     "nonce": "0",
-                    "balance": "1,000,000",
-                    "storage": {}
+                    "balance": "1,000,000"
                 }
             }
         },
@@ -20,16 +20,19 @@
             "txId": "tx-second-bid-too-low",
             "tx": {
                 "from": "address:bidder2",
-                "to": "address:kitty_auction_contract_address",
-                "value": "150",
+                "to": "sc:kitty_auction_contract",
+                "egldValue": "150",
                 "function": "bid",
-                "arguments": ["1"],
+                "arguments": [
+                    "1"
+                ],
                 "gasLimit": "100,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "message": "str:bid amount must be higher than current winning bid!",
+                "out": [],
                 "status": "4",
+                "message": "str:bid amount must be higher than current winning bid!",
                 "gas": "*",
                 "refund": "*"
             }
@@ -52,30 +55,28 @@
                     "balance": "1,000,000",
                     "storage": {}
                 },
-                "address:kitty_ownership_contract_address": {
+                "sc:kitty_ownership_contract": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "str:kittyAuctionContractAddress": "address:kitty_auction_contract_address",
+                        "str:kittyAuctionContractAddress": "sc:kitty_auction_contract",
                         "str:totalKitties": "2",
                         "str:kitty|u32:0": "u8:0|u8:0|u8:0|u8:0|u8:0|u8:0|u8:0|u64:0|u64:0|u32:0|u32:0|u32:0|u16:0|u16:0",
                         "str:kitty|u32:1": "u8:1|u8:2|u8:3|u8:4|u8:5|u8:6|u8:7|u64:123456|u64:0|u32:0|u32:0|u32:0|u16:0|u16:0",
-
-                        "str:nrOwnedKitties|address:kitty_auction_contract_address": "1",
-                        "str:owner|u32:1": "address:kitty_auction_contract_address"
+                        "str:nrOwnedKitties|sc:kitty_auction_contract": "1",
+                        "str:owner|u32:1": "sc:kitty_auction_contract"
                     },
                     "code": "file:../../kitty-ownership/output/kitty-ownership.wasm"
                 },
-                "address:kitty_auction_contract_address": {
+                "sc:kitty_auction_contract": {
                     "nonce": "0",
                     "balance": "200",
                     "storage": {
-                        "str:kittyOwnershipContractAddress": "address:kitty_ownership_contract_address",
+                        "str:kittyOwnershipContractAddress": "sc:kitty_ownership_contract",
                         "str:genZeroKittyStartingPrice": "100",
                         "str:genZeroKittyEndingPrice": "500",
                         "str:genZeroKittyAuctionDuration": "100,000",
-
-                        "str:auction|u32:1": "u8:0|u32:1|u8:100|u32:2|u16:500|u64:223456|address:kitty_auction_contract_address|u32:1|u8:200|address:bidder1"
+                        "str:auction|u32:1": "u8:0|u32:1|u8:100|u32:2|u16:500|u64:223456|sc:kitty_auction_contract|u32:1|u8:200|address:bidder1"
                     },
                     "code": "file:../output/kitty-auction.wasm"
                 }

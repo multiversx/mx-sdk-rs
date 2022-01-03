@@ -6,16 +6,14 @@
             "accounts": {
                 "address:owner": {
                     "nonce": "5",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 }
             },
             "newAddresses": [
                 {
                     "creatorAddress": "address:owner",
                     "creatorNonce": "5",
-                    "newAddress": "address:use_module_address"
+                    "newAddress": "sc:use_module"
                 }
             ]
         },
@@ -24,10 +22,9 @@
             "txId": "1",
             "tx": {
                 "from": "address:owner",
-                "value": "0",
                 "contractCode": "file:../output/use-module.wasm",
                 "arguments": [],
-                "gasLimit": "100,000",
+                "gasLimit": "20,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -43,15 +40,16 @@
             "txId": "2",
             "tx": {
                 "from": "address:owner",
-                "to": "address:use_module_address",
-                "value": "0",
+                "to": "sc:use_module",
                 "function": "checkPause",
                 "arguments": [],
-                "gasLimit": "100,000",
+                "gasLimit": "20,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "false" ],
+                "out": [
+                    "false"
+                ],
                 "status": "",
                 "logs": [],
                 "gas": "*",
@@ -63,11 +61,10 @@
             "txId": "pause",
             "tx": {
                 "from": "address:owner",
-                "to": "address:use_module_address",
-                "value": "0",
+                "to": "sc:use_module",
                 "function": "pause",
                 "arguments": [],
-                "gasLimit": "100,000",
+                "gasLimit": "20,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -83,15 +80,16 @@
             "txId": "check paused",
             "tx": {
                 "from": "address:owner",
-                "to": "address:use_module_address",
-                "value": "0",
+                "to": "sc:use_module",
                 "function": "checkPause",
                 "arguments": [],
-                "gasLimit": "100,000",
+                "gasLimit": "20,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "true" ],
+                "out": [
+                    "true"
+                ],
                 "status": "",
                 "logs": [],
                 "gas": "*",
@@ -103,11 +101,10 @@
             "txId": "unpause",
             "tx": {
                 "from": "address:owner",
-                "to": "address:use_module_address",
-                "value": "0",
+                "to": "sc:use_module",
                 "function": "unpause",
                 "arguments": [],
-                "gasLimit": "100,000",
+                "gasLimit": "20,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -123,15 +120,16 @@
             "txId": "check unpaused",
             "tx": {
                 "from": "address:owner",
-                "to": "address:use_module_address",
-                "value": "0",
+                "to": "sc:use_module",
                 "function": "checkPause",
                 "arguments": [],
-                "gasLimit": "100,000",
+                "gasLimit": "20,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "false" ],
+                "out": [
+                    "false"
+                ],
                 "status": "",
                 "logs": [],
                 "gas": "*",

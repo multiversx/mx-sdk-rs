@@ -1,52 +1,74 @@
-use crate::abi::{OutputAbi, TypeAbi, TypeDescriptionContainer};
-use crate::api::{BigUintApi, ErrorApi, SendApi};
-use crate::hex_call_data::HexCallDataSerializer;
-use crate::io::EndpointResult;
-use crate::types::{Address, CallbackCall};
-use alloc::string::String;
-use alloc::vec::Vec;
+use core::marker::PhantomData;
+
+use crate::{
+    abi::{OutputAbi, TypeAbi, TypeDescriptionContainer},
+    api::{CallTypeApi, SendApiImpl, StorageWriteApi},
+    io::EndpointResult,
+    types::{BigUint, CallbackClosure, ManagedAddress, ManagedArgBuffer, ManagedBuffer},
+};
+use alloc::{string::String, vec::Vec};
 
 #[must_use]
-pub struct AsyncCall<BigUint: BigUintApi> {
-	pub(crate) to: Address,
-	pub(crate) egld_payment: BigUint,
-	pub(crate) hex_data: HexCallDataSerializer,
-	pub(crate) callback_data: HexCallDataSerializer,
-}
-
-impl<BigUint: BigUintApi> AsyncCall<BigUint> {
-	pub fn with_callback(self, callback: CallbackCall) -> Self {
-		AsyncCall {
-			callback_data: callback.closure_data,
-			..self
-		}
-	}
-}
-
-impl<FA, BigUint> EndpointResult<FA> for AsyncCall<BigUint>
+pub struct AsyncCall<SA>
 where
-	BigUint: BigUintApi + 'static,
-	FA: SendApi<BigUint> + ErrorApi + Clone + 'static,
+    SA: CallTypeApi + 'static,
 {
-	#[inline]
-	fn finish(&self, api: FA) {
-		// first, save the callback closure
-		api.storage_store_tx_hash_key(self.callback_data.as_slice());
-
-		// last, send the async call, which will kill the execution
-		api.async_call_raw(&self.to, &self.egld_payment, self.hex_data.as_slice());
-	}
+    pub(crate) _phantom: PhantomData<SA>,
+    pub(crate) to: ManagedAddress<SA>,
+    pub(crate) egld_payment: BigUint<SA>,
+    pub(crate) endpoint_name: ManagedBuffer<SA>,
+    pub(crate) arg_buffer: ManagedArgBuffer<SA>,
+    pub(crate) callback_call: Option<CallbackClosure<SA>>,
 }
 
-impl<BigUint: BigUintApi> TypeAbi for AsyncCall<BigUint> {
-	fn type_name() -> String {
-		"AsyncCall".into()
-	}
+#[allow(clippy::return_self_not_must_use)]
+impl<SA> AsyncCall<SA>
+where
+    SA: CallTypeApi,
+{
+    pub fn with_callback(self, callback_call: CallbackClosure<SA>) -> Self {
+        AsyncCall {
+            callback_call: Some(callback_call),
+            ..self
+        }
+    }
+}
 
-	/// No ABI output.
-	fn output_abis(_: &[&'static str]) -> Vec<OutputAbi> {
-		Vec::new()
-	}
+impl<SA> EndpointResult for AsyncCall<SA>
+where
+    SA: CallTypeApi + StorageWriteApi + 'static,
+{
+    type DecodeAs = ();
 
-	fn provide_type_descriptions<TDC: TypeDescriptionContainer>(_: &mut TDC) {}
+    #[inline]
+    fn finish<FA>(&self) {
+        // first, save the callback closure
+        if let Some(callback_call) = &self.callback_call {
+            callback_call.save_to_storage::<SA>();
+        }
+
+        // last, send the async call, which will kill the execution
+        SA::send_api_impl().async_call_raw(
+            &self.to,
+            &self.egld_payment,
+            &self.endpoint_name,
+            &self.arg_buffer,
+        );
+    }
+}
+
+impl<SA> TypeAbi for AsyncCall<SA>
+where
+    SA: CallTypeApi + 'static,
+{
+    fn type_name() -> String {
+        "AsyncCall".into()
+    }
+
+    /// No ABI output.
+    fn output_abis(_: &[&'static str]) -> Vec<OutputAbi> {
+        Vec::new()
+    }
+
+    fn provide_type_descriptions<TDC: TypeDescriptionContainer>(_: &mut TDC) {}
 }

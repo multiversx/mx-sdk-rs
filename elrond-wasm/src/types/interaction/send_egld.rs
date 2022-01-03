@@ -1,36 +1,61 @@
-use crate::abi::{OutputAbi, TypeAbi, TypeDescriptionContainer};
-use crate::api::{BigUintApi, EndpointFinishApi, ErrorApi, SendApi};
-use crate::io::EndpointResult;
-use crate::types::{Address, BoxedBytes};
-use alloc::string::String;
-use alloc::vec::Vec;
+use core::marker::PhantomData;
 
-pub struct SendEgld<BigUint: BigUintApi> {
-	pub to: Address,
-	pub amount: BigUint,
-	pub data: BoxedBytes,
-}
+use crate::{
+    abi::{OutputAbi, TypeAbi, TypeDescriptionContainer},
+    api::{CallTypeApi, SendApiImpl},
+    io::EndpointResult,
+    types::{BigUint, ManagedAddress, ManagedBuffer},
+};
+use alloc::{string::String, vec::Vec};
 
-impl<FA, BigUint> EndpointResult<FA> for SendEgld<BigUint>
+pub struct SendEgld<SA>
 where
-	BigUint: BigUintApi + 'static,
-	FA: EndpointFinishApi + SendApi<BigUint> + ErrorApi + Clone + 'static,
+    SA: CallTypeApi + 'static,
 {
-	#[inline]
-	fn finish(&self, api: FA) {
-		api.direct_egld(&self.to, &self.amount, self.data.as_slice());
-	}
+    _phantom: PhantomData<SA>,
+    pub to: ManagedAddress<SA>,
+    pub amount: BigUint<SA>,
+    pub data: ManagedBuffer<SA>,
 }
 
-impl<BigUint: BigUintApi> TypeAbi for SendEgld<BigUint> {
-	fn type_name() -> String {
-		"SendEgld".into()
-	}
+impl<SA> SendEgld<SA>
+where
+    SA: CallTypeApi + 'static,
+{
+    pub fn new(to: ManagedAddress<SA>, amount: BigUint<SA>, data: ManagedBuffer<SA>) -> Self {
+        Self {
+            _phantom: PhantomData,
+            to,
+            amount,
+            data,
+        }
+    }
+}
 
-	/// No ABI output.
-	fn output_abis(_: &[&'static str]) -> Vec<OutputAbi> {
-		Vec::new()
-	}
+impl<SA> EndpointResult for SendEgld<SA>
+where
+    SA: CallTypeApi + 'static,
+{
+    type DecodeAs = ();
 
-	fn provide_type_descriptions<TDC: TypeDescriptionContainer>(_: &mut TDC) {}
+    #[inline]
+    fn finish<FA>(&self) {
+        SA::send_api_impl().direct_egld(&self.to, &self.amount, self.data.clone());
+    }
+}
+
+impl<SA> TypeAbi for SendEgld<SA>
+where
+    SA: CallTypeApi + 'static,
+{
+    fn type_name() -> String {
+        "SendEgld".into()
+    }
+
+    /// No ABI output.
+    fn output_abis(_: &[&'static str]) -> Vec<OutputAbi> {
+        Vec::new()
+    }
+
+    fn provide_type_descriptions<TDC: TypeDescriptionContainer>(_: &mut TDC) {}
 }

@@ -15,42 +15,42 @@ use proc_macro::TokenStream;
 
 #[proc_macro_derive(NestedEncode)]
 pub fn nested_encode_derive(input: TokenStream) -> TokenStream {
-	let ast = syn::parse(input).unwrap();
+    let ast = syn::parse(input).unwrap();
 
-	nested_encode_impl(&ast)
+    nested_encode_impl(&ast)
 }
 
 #[proc_macro_derive(TopEncode)]
 pub fn top_encode_derive(input: TokenStream) -> TokenStream {
-	let ast = syn::parse(input).unwrap();
+    let ast = syn::parse(input).unwrap();
 
-	top_encode_impl(&ast)
+    top_encode_impl(&ast)
 }
 
 #[proc_macro_derive(TopEncodeOrDefault)]
 pub fn top_encode_or_default_derive(input: TokenStream) -> TokenStream {
-	let ast = syn::parse(input).unwrap();
+    let ast = syn::parse(input).unwrap();
 
-	top_encode_or_default_impl(&ast)
+    top_encode_or_default_impl(&ast)
 }
 
 #[proc_macro_derive(NestedDecode)]
 pub fn nested_decode_derive(input: TokenStream) -> TokenStream {
-	let ast = syn::parse(input).unwrap();
+    let ast = syn::parse(input).unwrap();
 
-	nested_decode_impl(&ast)
+    nested_decode_impl(&ast)
 }
 
 #[proc_macro_derive(TopDecode)]
 pub fn top_decode_derive(input: TokenStream) -> TokenStream {
-	let ast = syn::parse(input).unwrap();
+    let ast = syn::parse(input).unwrap();
 
-	top_decode_impl(&ast)
+    top_decode_impl(&ast)
 }
 
 #[proc_macro_derive(TopDecodeOrDefault)]
 pub fn top_decode_or_default_derive(input: TokenStream) -> TokenStream {
-	let ast = syn::parse(input).unwrap();
+    let ast = syn::parse(input).unwrap();
 
-	top_decode_or_default_impl(&ast)
+    top_decode_or_default_impl(&ast)
 }

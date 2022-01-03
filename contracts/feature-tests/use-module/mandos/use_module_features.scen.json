@@ -6,16 +6,14 @@
             "accounts": {
                 "address:owner": {
                     "nonce": "5",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 }
             },
             "newAddresses": [
                 {
                     "creatorAddress": "address:owner",
                     "creatorNonce": "5",
-                    "newAddress": "address:use_module_address"
+                    "newAddress": "sc:use_module"
                 }
             ]
         },
@@ -24,10 +22,9 @@
             "txId": "1",
             "tx": {
                 "from": "address:owner",
-                "value": "0",
                 "contractCode": "file:../output/use-module.wasm",
                 "arguments": [],
-                "gasLimit": "100,000",
+                "gasLimit": "20,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -43,11 +40,10 @@
             "txId": "2",
             "tx": {
                 "from": "address:owner",
-                "to": "address:use_module_address",
-                "value": "0",
+                "to": "sc:use_module",
                 "function": "checkFeatureGuard",
                 "arguments": [],
-                "gasLimit": "100,000",
+                "gasLimit": "20,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -63,14 +59,13 @@
             "txId": "3",
             "tx": {
                 "from": "address:owner",
-                "to": "address:use_module_address",
-                "value": "0",
+                "to": "sc:use_module",
                 "function": "setFeatureFlag",
                 "arguments": [
                     "str:featureName",
                     "0"
                 ],
-                "gasLimit": "100,000",
+                "gasLimit": "20,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -86,11 +81,10 @@
             "txId": "4",
             "tx": {
                 "from": "address:owner",
-                "to": "address:use_module_address",
-                "value": "0",
+                "to": "sc:use_module",
                 "function": "checkFeatureGuard",
                 "arguments": [],
-                "gasLimit": "100,000",
+                "gasLimit": "20,000,000",
                 "gasPrice": "0"
             },
             "expect": {

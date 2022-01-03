@@ -1,0 +1,121 @@
+{
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:a_user": {
+                    "nonce": "0",
+                    "balance": "0"
+                },
+                "sc:vault": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../vault/output/vault.wasm"
+                },
+                "sc:forwarder": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../forwarder-raw/output/forwarder-raw.wasm"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "call_execute_on_dest_context",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:forwarder",
+                "function": "call_execute_on_dest_context",
+                "arguments": [
+                    "sc:vault",
+                    "str:echo_arguments",
+                    "1",
+                    "2"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "1",
+                    "2"
+                ],
+                "status": "0",
+                "logs": [
+                    {
+                        "address": "sc:forwarder",
+                        "endpoint": "str:call_execute_on_dest_context",
+                        "topics": [
+                            "str:execute_on_dest_context_result"
+                        ],
+                        "data": {
+                            "0-echoed-args": [
+                                "biguint:1",
+                                "biguint:2"
+                            ]
+                        }
+                    }
+                ],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "call_execute_on_dest_context_twice",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:forwarder",
+                "function": "call_execute_on_dest_context_twice",
+                "arguments": [
+                    "sc:vault",
+                    "str:echo_arguments",
+                    "1",
+                    "2"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "1",
+                    "2",
+                    "1",
+                    "2"
+                ],
+                "status": "0",
+                "logs": [
+                    {
+                        "address": "sc:forwarder",
+                        "endpoint": "str:call_execute_on_dest_context_twice",
+                        "topics": [
+                            "str:execute_on_dest_context_result"
+                        ],
+                        "data": {
+                            "0-echoed-args": [
+                                "biguint:1",
+                                "biguint:2"
+                            ]
+                        }
+                    },
+                    {
+                        "address": "sc:forwarder",
+                        "endpoint": "str:call_execute_on_dest_context_twice",
+                        "topics": [
+                            "str:execute_on_dest_context_result"
+                        ],
+                        "data": {
+                            "0-echoed-args": [
+                                "biguint:1",
+                                "biguint:2"
+                            ]
+                        }
+                    }
+                ],
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

@@ -1,31 +1,23 @@
 [package]
 name = "multisig"
-version = "0.0.0"
+version = "1.0.0"
 authors = ["Andrei Marinica <andrei.marinica@elrond.com>"]
 edition = "2018"
 publish = false
 
 [lib]
-path = "src/lib.rs"
-
-[features]
-wasm-output-mode = [
-    "elrond-wasm-node"
-]
+path = "src/multisig.rs"
 
 [dependencies.elrond-wasm]
-version = "0.14.1"
+version = "0.25.0"
 path = "../../../elrond-wasm"
 
-[dependencies.elrond-wasm-derive]
-version = "0.14.1"
-path = "../../../elrond-wasm-derive"
-
-[dependencies.elrond-wasm-node]
-version = "0.14.1"
-path = "../../../elrond-wasm-node"
-optional = true
-
 [dev-dependencies.elrond-wasm-debug]
-version = "0.14.1"
+version = "0.25.0"
 path = "../../../elrond-wasm-debug"
+
+[dev-dependencies.adder]
+path = "../adder"
+
+[dev-dependencies.factorial]
+path = "../factorial"

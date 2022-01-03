@@ -1,21 +1,11 @@
-use crate::types::ArgBuffer;
+use crate::{
+    api::ManagedTypeApi,
+    hex_util::byte_to_hex_digits,
+    types::{ArgBuffer, ManagedArgBuffer, ManagedBuffer},
+};
 use alloc::vec::Vec;
 
 use super::SEPARATOR;
-
-fn half_byte_to_hex_digit(num: u8) -> u8 {
-	if num < 10 {
-		b'0' + num
-	} else {
-		b'a' + num - 0xau8
-	}
-}
-
-fn byte_to_hex(byte: u8) -> (u8, u8) {
-	let digit1 = half_byte_to_hex_digit(byte >> 4);
-	let digit2 = half_byte_to_hex_digit(byte & 0x0f);
-	(digit1, digit2)
-}
 
 /// Serializes to Elrond's smart contract call format.
 ///
@@ -31,103 +21,118 @@ fn byte_to_hex(byte: u8) -> (u8, u8) {
 pub struct HexCallDataSerializer(Vec<u8>);
 
 impl HexCallDataSerializer {
-	pub fn new(endpoint_name: &[u8]) -> Self {
-		let mut data = Vec::with_capacity(endpoint_name.len());
-		data.extend_from_slice(endpoint_name);
-		HexCallDataSerializer(data)
-	}
+    pub fn new(endpoint_name: &[u8]) -> Self {
+        let mut data = Vec::with_capacity(endpoint_name.len());
+        data.extend_from_slice(endpoint_name);
+        HexCallDataSerializer(data)
+    }
 
-	pub fn from_arg_buffer(endpoint_name: &[u8], arg_buffer: &ArgBuffer) -> Self {
-		let mut hex_data = HexCallDataSerializer::new(endpoint_name);
-		arg_buffer.for_each_arg(|arg_bytes| hex_data.push_argument_bytes(arg_bytes));
-		hex_data
-	}
+    pub fn from_arg_buffer(endpoint_name: &[u8], arg_buffer: &ArgBuffer) -> Self {
+        let mut hex_data = HexCallDataSerializer::new(endpoint_name);
+        arg_buffer.for_each_arg(|arg_bytes| hex_data.push_argument_bytes(arg_bytes));
+        hex_data
+    }
 
-	pub fn as_slice(&self) -> &[u8] {
-		self.0.as_slice()
-	}
+    pub fn from_managed_arg_buffer<M: ManagedTypeApi>(
+        endpoint_name: &ManagedBuffer<M>,
+        arg_buffer: &ManagedArgBuffer<M>,
+    ) -> Self {
+        let mut hex_data = HexCallDataSerializer::new(endpoint_name.to_boxed_bytes().as_slice());
+        for arg in arg_buffer.raw_arg_iter() {
+            hex_data.push_argument_bytes(arg.to_boxed_bytes().as_slice());
+        }
+        hex_data
+    }
 
-	fn push_byte(&mut self, byte: u8) {
-		let (digit1, digit2) = byte_to_hex(byte);
-		self.0.push(digit1);
-		self.0.push(digit2);
-	}
+    pub fn as_slice(&self) -> &[u8] {
+        self.0.as_slice()
+    }
 
-	pub fn push_argument_bytes(&mut self, bytes: &[u8]) {
-		self.0.reserve(1 + bytes.len() * 2);
-		self.0.push(SEPARATOR);
-		for byte in bytes.iter() {
-			self.push_byte(*byte);
-		}
-	}
+    pub fn into_vec(self) -> Vec<u8> {
+        self.0
+    }
+
+    fn push_byte(&mut self, byte: u8) {
+        let (digit1, digit2) = byte_to_hex_digits(byte);
+        self.0.push(digit1);
+        self.0.push(digit2);
+    }
+
+    pub fn push_argument_bytes(&mut self, bytes: &[u8]) {
+        self.0.reserve(1 + bytes.len() * 2);
+        self.0.push(SEPARATOR);
+        for byte in bytes.iter() {
+            self.push_byte(*byte);
+        }
+    }
 }
 
 #[cfg(test)]
 mod tests {
-	use super::*;
+    use super::*;
 
-	#[test]
-	fn test_push_bytes_1() {
-		let mut cd = HexCallDataSerializer::new(&*b"func");
-		let arg_bytes: &[u8] = &[0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef];
-		cd.push_argument_bytes(arg_bytes);
-		assert_eq!(cd.as_slice(), &b"func@0123456789abcdef"[..]);
-	}
+    #[test]
+    fn test_push_bytes_1() {
+        let mut cd = HexCallDataSerializer::new(&*b"func");
+        let arg_bytes: &[u8] = &[0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef];
+        cd.push_argument_bytes(arg_bytes);
+        assert_eq!(cd.as_slice(), &b"func@0123456789abcdef"[..]);
+    }
 
-	#[test]
-	fn test_push_bytes_2() {
-		let mut cd = HexCallDataSerializer::new(&*b"func");
-		let arg_bytes: &[u8] = &[0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef];
-		cd.push_argument_bytes(arg_bytes);
-		cd.push_argument_bytes(arg_bytes);
-		assert_eq!(
-			cd.as_slice(),
-			&b"func@0123456789abcdef@0123456789abcdef"[..]
-		);
-	}
+    #[test]
+    fn test_push_bytes_2() {
+        let mut cd = HexCallDataSerializer::new(&*b"func");
+        let arg_bytes: &[u8] = &[0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef];
+        cd.push_argument_bytes(arg_bytes);
+        cd.push_argument_bytes(arg_bytes);
+        assert_eq!(
+            cd.as_slice(),
+            &b"func@0123456789abcdef@0123456789abcdef"[..]
+        );
+    }
 
-	#[test]
-	fn test_push_empty_1() {
-		let mut cd = HexCallDataSerializer::new(&*b"func");
-		cd.push_argument_bytes(&[][..]);
-		assert_eq!(cd.as_slice(), &b"func@"[..]);
-	}
+    #[test]
+    fn test_push_empty_1() {
+        let mut cd = HexCallDataSerializer::new(&*b"func");
+        cd.push_argument_bytes(&[][..]);
+        assert_eq!(cd.as_slice(), &b"func@"[..]);
+    }
 
-	#[test]
-	fn test_push_empty_2() {
-		let mut cd = HexCallDataSerializer::new(&*b"func");
-		cd.push_argument_bytes(&[][..]);
-		cd.push_argument_bytes(&[][..]);
-		assert_eq!(cd.as_slice(), &b"func@@"[..]);
-	}
+    #[test]
+    fn test_push_empty_2() {
+        let mut cd = HexCallDataSerializer::new(&*b"func");
+        cd.push_argument_bytes(&[][..]);
+        cd.push_argument_bytes(&[][..]);
+        assert_eq!(cd.as_slice(), &b"func@@"[..]);
+    }
 
-	#[test]
-	fn test_push_empty_3() {
-		let mut cd = HexCallDataSerializer::new(&*b"");
-		cd.push_argument_bytes(&[][..]);
-		cd.push_argument_bytes(&[][..]);
-		cd.push_argument_bytes(&[][..]);
-		assert_eq!(cd.as_slice(), &b"@@@"[..]);
-	}
+    #[test]
+    fn test_push_empty_3() {
+        let mut cd = HexCallDataSerializer::new(&*b"");
+        cd.push_argument_bytes(&[][..]);
+        cd.push_argument_bytes(&[][..]);
+        cd.push_argument_bytes(&[][..]);
+        assert_eq!(cd.as_slice(), &b"@@@"[..]);
+    }
 
-	#[test]
-	fn test_push_some_empty_1() {
-		let mut cd = HexCallDataSerializer::new(&*b"func");
-		let arg_bytes: &[u8] = &[0xff, 0xff];
-		cd.push_argument_bytes(arg_bytes);
-		cd.push_argument_bytes(&[][..]);
-		assert_eq!(cd.as_slice(), &b"func@ffff@"[..]);
-	}
+    #[test]
+    fn test_push_some_empty_1() {
+        let mut cd = HexCallDataSerializer::new(&*b"func");
+        let arg_bytes: &[u8] = &[0xff, 0xff];
+        cd.push_argument_bytes(arg_bytes);
+        cd.push_argument_bytes(&[][..]);
+        assert_eq!(cd.as_slice(), &b"func@ffff@"[..]);
+    }
 
-	#[test]
-	fn test_push_some_empty_2() {
-		let mut cd = HexCallDataSerializer::new(&*b"func");
-		let arg_bytes: &[u8] = &[0xff, 0xff];
-		cd.push_argument_bytes(&[][..]);
-		cd.push_argument_bytes(&[][..]);
-		cd.push_argument_bytes(arg_bytes);
-		cd.push_argument_bytes(&[][..]);
-		cd.push_argument_bytes(&[][..]);
-		assert_eq!(cd.as_slice(), &b"func@@@ffff@@"[..]);
-	}
+    #[test]
+    fn test_push_some_empty_2() {
+        let mut cd = HexCallDataSerializer::new(&*b"func");
+        let arg_bytes: &[u8] = &[0xff, 0xff];
+        cd.push_argument_bytes(&[][..]);
+        cd.push_argument_bytes(&[][..]);
+        cd.push_argument_bytes(arg_bytes);
+        cd.push_argument_bytes(&[][..]);
+        cd.push_argument_bytes(&[][..]);
+        assert_eq!(cd.as_slice(), &b"func@@@ffff@@"[..]);
+    }
 }

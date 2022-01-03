@@ -1,0 +1,57 @@
+{
+    "name": "createSellOrder",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "steps/complete_setup.steps.json"
+        },
+        {
+            "step": "externalSteps",
+            "path": "steps/create_sell_order.steps.json"
+        },
+        {
+            "step": "scCall",
+            "txId": "getOrderById",
+            "tx": {
+                "from": "address:user2",
+                "to": "sc:pair",
+                "function": "getOrderById",
+                "arguments": [
+                    "0"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "u64:0|address:user2|0x01|address:match_provider|biguint:200000|biguint:2000000|0x00|biguint:10000|u64:1000|u64:0|0x01"
+                ],
+                "status": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "getAddressOrderIds",
+            "tx": {
+                "from": "address:user2",
+                "to": "sc:pair",
+                "function": "getAddressOrderIds",
+                "arguments": [
+                    "address:user2"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ],
+                "status": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

@@ -1,34 +1,34 @@
-extern crate factorial;
-use elrond_wasm_debug::api::RustBigUint;
-use elrond_wasm_debug::TxContext;
+use elrond_wasm::types::BigUint;
+use elrond_wasm_debug::DebugApi;
 use factorial::*;
 
 #[test]
-fn test_add() {
-	let factorial = FactorialImpl::new(TxContext::dummy());
+fn test_factorial() {
+    let _ = DebugApi::dummy();
+    let factorial = factorial::contract_obj::<DebugApi>();
 
-	assert_eq!(
-		RustBigUint::from(1u32),
-		factorial.factorial(RustBigUint::from(0u32))
-	);
-	assert_eq!(
-		RustBigUint::from(1u32),
-		factorial.factorial(RustBigUint::from(1u32))
-	);
-	assert_eq!(
-		RustBigUint::from(2u32),
-		factorial.factorial(RustBigUint::from(2u32))
-	);
-	assert_eq!(
-		RustBigUint::from(6u32),
-		factorial.factorial(RustBigUint::from(3u32))
-	);
-	assert_eq!(
-		RustBigUint::from(24u32),
-		factorial.factorial(RustBigUint::from(4u32))
-	);
-	assert_eq!(
-		RustBigUint::from(120u32),
-		factorial.factorial(RustBigUint::from(5u32))
-	);
+    assert_eq!(
+        BigUint::<DebugApi>::from(1u32),
+        factorial.factorial(0u32.into())
+    );
+    assert_eq!(
+        BigUint::<DebugApi>::from(1u32),
+        factorial.factorial(1u32.into())
+    );
+    assert_eq!(
+        BigUint::<DebugApi>::from(2u32),
+        factorial.factorial(2u32.into())
+    );
+    assert_eq!(
+        BigUint::<DebugApi>::from(6u32),
+        factorial.factorial(3u32.into())
+    );
+    assert_eq!(
+        BigUint::<DebugApi>::from(24u32),
+        factorial.factorial(4u32.into())
+    );
+    assert_eq!(
+        BigUint::<DebugApi>::from(120u32),
+        factorial.factorial(5u32.into())
+    );
 }

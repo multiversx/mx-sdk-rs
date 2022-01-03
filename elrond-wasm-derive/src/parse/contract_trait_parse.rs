@@ -1,39 +1,50 @@
-use super::attributes::extract_doc;
-use super::method_parse::process_method;
-use super::parse_util::extract_struct_name;
-use crate::model::{ContractTrait, Method};
+use super::{
+    attributes::extract_doc, method_parse::process_method, parse_util::validate_attribute_args,
+    supertrait_parse::parse_supertrait,
+};
+use crate::{
+    model::{ContractTrait, Method, Supertrait, TraitProperties},
+    parse::process_trait_arguments,
+};
 
 pub fn parse_contract_trait(
-	args: syn::AttributeArgs,
-	contract_trait: &syn::ItemTrait,
+    args: syn::AttributeArgs,
+    contract_trait: &syn::ItemTrait,
 ) -> ContractTrait {
-	let contract_impl_name = extract_struct_name(args);
+    validate_attribute_args(args);
 
-	let docs = extract_doc(contract_trait.attrs.as_slice());
+    let docs = extract_doc(contract_trait.attrs.as_slice());
 
-	let supertrait_paths: Vec<syn::Path> = contract_trait
-		.supertraits
-		.iter()
-		.map(|supertrait| match supertrait {
-			syn::TypeParamBound::Trait(t) => t.path.clone(),
-			_ => panic!("Contract trait can only extend other traits."),
-		})
-		.collect();
+    let mut trait_attributes = TraitProperties::default();
+    let mut unprocessed_attributes = Vec::new();
+    process_trait_arguments(
+        contract_trait.attrs.as_slice(),
+        &mut trait_attributes,
+        &mut unprocessed_attributes,
+    );
 
-	let methods: Vec<Method> = contract_trait
-		.items
-		.iter()
-		.map(|itm| match itm {
-			syn::TraitItem::Method(m) => process_method(m),
-			_ => panic!("Only methods allowed in contract traits"),
-		})
-		.collect();
+    let supertraits: Vec<Supertrait> = contract_trait
+        .supertraits
+        .iter()
+        .map(parse_supertrait)
+        .collect();
 
-	ContractTrait {
-		docs,
-		trait_name: contract_trait.ident.clone(),
-		contract_impl_name,
-		supertrait_paths,
-		methods,
-	}
+    let methods: Vec<Method> = contract_trait
+        .items
+        .iter()
+        .map(|itm| match itm {
+            syn::TraitItem::Method(m) => process_method(m, &trait_attributes),
+            _ => panic!("Only methods allowed in contract traits"),
+        })
+        .collect();
+
+    ContractTrait {
+        docs,
+        original_attributes: unprocessed_attributes,
+        trait_name: contract_trait.ident.clone(),
+        supertraits,
+        auto_inheritance_modules: Vec::new(),
+        methods,
+        trait_attributes,
+    }
 }

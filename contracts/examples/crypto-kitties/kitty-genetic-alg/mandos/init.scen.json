@@ -1,20 +1,20 @@
 {
     "name": "deploy kitty genetic alg",
+    "gasSchedule": "dummy",
     "steps": [
         {
             "step": "setState",
             "accounts": {
                 "address:my_address": {
                     "nonce": "0",
-                    "balance": "1,000,000",
-                    "storage": {}
+                    "balance": "1,000,000"
                 }
             },
             "newAddresses": [
                 {
                     "creatorAddress": "address:my_address",
                     "creatorNonce": "0",
-                    "newAddress": "address:contract_address"
+                    "newAddress": "sc:kitty_genetic_alg"
                 }
             ]
         },
@@ -24,12 +24,12 @@
             "tx": {
                 "from": "address:my_address",
                 "contractCode": "file:../output/kitty-genetic-alg.wasm",
-                "value": "0",
                 "arguments": [],
                 "gasLimit": "1,000,000",
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "0",
                 "gas": "*",
                 "refund": "*"
@@ -43,7 +43,7 @@
                     "balance": "1,000,000",
                     "storage": {}
                 },
-                "address:contract_address": {
+                "sc:kitty_genetic_alg": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},

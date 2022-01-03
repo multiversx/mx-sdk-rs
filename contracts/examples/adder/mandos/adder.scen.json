@@ -1,22 +1,21 @@
 {
     "name": "adder",
     "comment": "add then check",
+    "gasSchedule": "v3",
     "steps": [
         {
             "step": "setState",
             "accounts": {
                 "address:owner": {
-                    "nonce": "5",
-                    "balance": "0x500000",
-                    "storage": {},
-                    "code": ""
+                    "nonce": "1",
+                    "balance": "0"
                 }
             },
             "newAddresses": [
                 {
                     "creatorAddress": "address:owner",
-                    "creatorNonce": "5",
-                    "newAddress": "address:adder_address"
+                    "creatorNonce": "1",
+                    "newAddress": "sc:adder"
                 }
             ]
         },
@@ -25,13 +24,12 @@
             "txId": "1",
             "tx": {
                 "from": "address:owner",
-                "value": "0",
                 "contractCode": "file:../output/adder.wasm",
                 "arguments": [
-                    "0x05"
+                    "5"
                 ],
-                "gasLimit": "0x100000",
-                "gasPrice": "0x01"
+                "gasLimit": "5,000,000",
+                "gasPrice": "0"
             },
             "expect": {
                 "out": [],
@@ -42,25 +40,19 @@
             }
         },
         {
-            "step": "scCall",
+            "step": "scQuery",
             "txId": "2",
             "tx": {
-                "from": "address:owner",
-                "to": "address:adder_address",
-                "value": "0",
+                "to": "sc:adder",
                 "function": "getSum",
-                "arguments": [],
-                "gasLimit": "0x100000",
-                "gasPrice": "0x01"
+                "arguments": []
             },
             "expect": {
                 "out": [
                     "5"
                 ],
                 "status": "",
-                "logs": [],
-                "gas": "*",
-                "refund": "*"
+                "logs": []
             }
         },
         {
@@ -68,14 +60,13 @@
             "txId": "3",
             "tx": {
                 "from": "address:owner",
-                "to": "address:adder_address",
-                "value": "0",
+                "to": "sc:adder",
                 "function": "add",
                 "arguments": [
                     "3"
                 ],
-                "gasLimit": "0x100000",
-                "gasPrice": "0x01"
+                "gasLimit": "5,000,000",
+                "gasPrice": "0"
             },
             "expect": {
                 "out": [],
@@ -89,16 +80,16 @@
             "step": "checkState",
             "accounts": {
                 "address:owner": {
-                    "nonce": "8",
-                    "balance": "0x200000",
+                    "nonce": "*",
+                    "balance": "0",
                     "storage": {},
                     "code": ""
                 },
-                "address:adder_address": {
+                "sc:adder": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "``sum": "0x08"
+                        "str:sum": "8"
                     },
                     "code": "file:../output/adder.wasm"
                 }

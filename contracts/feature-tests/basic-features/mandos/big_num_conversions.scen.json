@@ -1,0 +1,121 @@
+{
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            }
+        },
+        {
+            "step": "scQuery",
+            "txId": "big_int_to_parts+",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "big_int_to_parts",
+                "arguments": [
+                    "1234"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "+1",
+                    "1234"
+                ]
+            }
+        },
+        {
+            "step": "scQuery",
+            "txId": "big_int_to_parts0",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "big_int_to_parts",
+                "arguments": [
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "0",
+                    "0"
+                ]
+            }
+        },
+        {
+            "step": "scQuery",
+            "txId": "big_int_to_parts-",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "big_int_to_parts",
+                "arguments": [
+                    "-1234"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "-1",
+                    "1234"
+                ]
+            }
+        },
+        {
+            "step": "scQuery",
+            "txId": "big_int_from_biguint+",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "big_int_from_biguint",
+                "arguments": [
+                    "+1",
+                    "1234"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "1234"
+                ]
+            }
+        },
+        {
+            "step": "scQuery",
+            "txId": "big_int_from_parts0",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "big_int_from_biguint",
+                "arguments": [
+                    "0",
+                    "1234"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "1234"
+                ]
+            }
+        },
+        {
+            "step": "scQuery",
+            "txId": "big_int_from_biguint-",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "big_int_from_biguint",
+                "arguments": [
+                    "-1",
+                    "1234"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "-1234"
+                ]
+            }
+        }
+    ]
+}

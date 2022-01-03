@@ -1,21 +1,18 @@
 {
     "name": "storage",
-    "gasSchedule": "v2",
+    "gasSchedule": "v3",
     "steps": [
         {
             "step": "setState",
             "accounts": {
-                "address:features_contract": {
+                "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
                     "code": "file:../output/basic-features.wasm"
                 },
                 "address:an_account": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 }
             }
         },
@@ -24,8 +21,7 @@
             "txId": "before",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
-                "value": "0",
+                "to": "sc:basic-features",
                 "function": "vec_mapper",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -44,10 +40,11 @@
             "txId": "increment-1",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
-                "value": "0",
+                "to": "sc:basic-features",
                 "function": "vec_mapper_push",
-                "arguments": [ "123" ],
+                "arguments": [
+                    "123"
+                ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
@@ -64,15 +61,16 @@
             "txId": "after-1",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
-                "value": "0",
+                "to": "sc:basic-features",
                 "function": "vec_mapper",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "123" ],
+                "out": [
+                    "123"
+                ],
                 "status": "",
                 "logs": [],
                 "gas": "*",
@@ -84,10 +82,11 @@
             "txId": "increment-2",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
-                "value": "0",
+                "to": "sc:basic-features",
                 "function": "vec_mapper_push",
-                "arguments": [ "111" ],
+                "arguments": [
+                    "111"
+                ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
@@ -104,15 +103,17 @@
             "txId": "after-2",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
-                "value": "0",
+                "to": "sc:basic-features",
                 "function": "vec_mapper",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "123", "111" ],
+                "out": [
+                    "123",
+                    "111"
+                ],
                 "status": "",
                 "logs": [],
                 "gas": "*",
@@ -124,15 +125,16 @@
             "txId": "after-2-len",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
-                "value": "0",
+                "to": "sc:basic-features",
                 "function": "vec_mapper_len",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "2" ],
+                "out": [
+                    "2"
+                ],
                 "status": "",
                 "logs": [],
                 "gas": "*",
@@ -142,13 +144,13 @@
         {
             "step": "checkState",
             "accounts": {
-                "address:features_contract": {
+                "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "``vec_mapper.len": "2",
-                        "``vec_mapper.item|u32:1": "123",
-                        "``vec_mapper.item|u32:2": "111"
+                        "str:vec_mapper.len": "2",
+                        "str:vec_mapper.item|u32:1": "123",
+                        "str:vec_mapper.item|u32:2": "111"
                     },
                     "code": "file:../output/basic-features.wasm"
                 },
@@ -165,10 +167,11 @@
             "txId": "index-0",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
-                "value": "0",
+                "to": "sc:basic-features",
                 "function": "vec_mapper_get",
-                "arguments": [ "0" ],
+                "arguments": [
+                    "0"
+                ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
@@ -186,15 +189,18 @@
             "txId": "index-2",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
-                "value": "0",
+                "to": "sc:basic-features",
                 "function": "vec_mapper_get",
-                "arguments": [ "2" ],
+                "arguments": [
+                    "2"
+                ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "111" ],
+                "out": [
+                    "111"
+                ],
                 "status": "",
                 "logs": [],
                 "gas": "*",
@@ -206,10 +212,11 @@
             "txId": "index-3",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
-                "value": "0",
+                "to": "sc:basic-features",
                 "function": "vec_mapper_get",
-                "arguments": [ "3" ],
+                "arguments": [
+                    "3"
+                ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },

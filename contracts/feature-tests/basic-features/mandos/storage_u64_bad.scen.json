@@ -1,23 +1,21 @@
 {
     "name": "storage",
-    "gasSchedule": "v2",
+    "gasSchedule": "v3",
     "steps": [
         {
             "step": "setState",
             "accounts": {
-                "address:features_contract": {
+                "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "``u64": "0x010000000000000000"
+                        "str:u64": "0x010000000000000000"
                     },
                     "code": "file:../output/basic-features.wasm"
                 },
                 "address:an_account": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 }
             }
         },
@@ -26,8 +24,7 @@
             "txId": "load-val",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
-                "value": "0",
+                "to": "sc:basic-features",
                 "function": "load_u64",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -35,8 +32,8 @@
             },
             "expect": {
                 "out": [],
-                "status": "*",
-                "message": "str:storage value out of range",
+                "status": "4",
+                "message": "str:storage decode error: input too long",
                 "logs": [],
                 "gas": "*",
                 "refund": "*"

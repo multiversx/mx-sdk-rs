@@ -1,0 +1,128 @@
+{
+    "name": "deploy erc20 and give its address to the crowdfunding contract",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:erc20_owner": {
+                    "nonce": "0",
+                    "balance": "0"
+                },
+                "address:crowdfunding_owner": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            },
+            "newAddresses": [
+                {
+                    "creatorAddress": "address:erc20_owner",
+                    "creatorNonce": "0",
+                    "newAddress": "sc:erc20"
+                },
+                {
+                    "creatorAddress": "address:crowdfunding_owner",
+                    "creatorNonce": "0",
+                    "newAddress": "sc:crowdfunding"
+                }
+            ]
+        },
+        {
+            "step": "scDeploy",
+            "txId": "deploy",
+            "tx": {
+                "from": "address:erc20_owner",
+                "contractCode": "file:../../erc20/output/erc20.wasm",
+                "arguments": [
+                    "1,000,000,000"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:erc20_owner": {
+                    "nonce": "1",
+                    "balance": "0",
+                    "storage": {}
+                },
+                "address:crowdfunding_owner": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {}
+                },
+                "sc:erc20": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:balance|address:erc20_owner": "1,000,000,000",
+                        "str:totalSupply": "1,000,000,000"
+                    },
+                    "code": "file:../../erc20/output/erc20.wasm"
+                }
+            }
+        },
+        {
+            "step": "scDeploy",
+            "txId": "deploy",
+            "tx": {
+                "from": "address:crowdfunding_owner",
+                "contractCode": "file:../output/crowdfunding-erc20.wasm",
+                "arguments": [
+                    "1,000,000",
+                    "123,456",
+                    "sc:erc20"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:erc20_owner": {
+                    "nonce": "1",
+                    "balance": "0",
+                    "storage": {}
+                },
+                "address:crowdfunding_owner": {
+                    "nonce": "1",
+                    "balance": "0",
+                    "storage": {}
+                },
+                "sc:erc20": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:balance|address:erc20_owner": "1,000,000,000",
+                        "str:totalSupply": "1,000,000,000"
+                    },
+                    "code": "file:../../erc20/output/erc20.wasm"
+                },
+                "sc:crowdfunding": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:target": "1,000,000",
+                        "str:deadline": "123,456",
+                        "str:erc20ContractAddress": "sc:erc20"
+                    },
+                    "code": "file:../output/crowdfunding-erc20.wasm"
+                }
+            }
+        }
+    ]
+}

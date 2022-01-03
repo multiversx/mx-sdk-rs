@@ -1,0 +1,106 @@
+{
+    "name": "init",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "0",
+                    "balance": "1000",
+                    "esdt": {
+                        "str:GOV-123456": "1000"
+                    }
+                },
+                "address:user1": {
+                    "nonce": "0",
+                    "balance": "1000",
+                    "esdt": {
+                        "str:GOV-123456": "1000"
+                    }
+                },
+                "address:user2": {
+                    "nonce": "0",
+                    "balance": "1000",
+                    "esdt": {
+                        "str:GOV-123456": "1000"
+                    }
+                }
+            },
+            "newAddresses": [
+                {
+                    "creatorAddress": "address:owner",
+                    "creatorNonce": "0",
+                    "newAddress": "sc:governance"
+                }
+            ]
+        },
+        {
+            "step": "scDeploy",
+            "txId": "deploy",
+            "tx": {
+                "from": "address:owner",
+                "contractCode": "file:../../output/use-module.wasm",
+                "arguments": [],
+                "gasLimit": "20,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "gas": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "init-governance-module",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:governance",
+                "function": "initGovernanceModule",
+                "arguments": [
+                    "str:GOV-123456",
+                    "1500",
+                    "500",
+                    "2",
+                    "10",
+                    "20",
+                    "30"
+                ],
+                "gasLimit": "20,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "message": "",
+                "gas": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:governance": {
+                    "nonce": "*",
+                    "balance": "*",
+                    "storage": {
+                        "str:governance:governanceTokenId": "str:GOV-123456",
+                        "str:governance:quorum": "1500",
+                        "str:governance:minTokenBalanceForProposing": "500",
+                        "str:governance:maxActionsPerProposal": "2",
+                        "str:governance:votingDelayInBlocks": "10",
+                        "str:governance:votingPeriodInBlocks": "20",
+                        "str:governance:lockTimeAfterVotingEndsInBlocks": "30"
+                    },
+                    "code": "file:../../output/use-module.wasm"
+                },
+                "+": ""
+            }
+        },
+        {
+            "step": "setState",
+            "currentBlockInfo": {
+                "blockNonce": "10"
+            }
+        }
+    ]
+}

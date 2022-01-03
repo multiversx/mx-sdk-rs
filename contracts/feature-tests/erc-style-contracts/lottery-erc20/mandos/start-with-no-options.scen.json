@@ -1,0 +1,79 @@
+{
+    "name": "start with no options",
+    "gasSchedule": "dummy",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "lottery-init.scen.json"
+        },
+        {
+            "step": "scCall",
+            "txId": "start with no options",
+            "tx": {
+                "from": "address:my_address",
+                "to": "sc:lottery",
+                "function": "start",
+                "arguments": [
+                    "str:lottery_name",
+                    "100",
+                    "0x",
+                    "0x",
+                    "0x",
+                    "0x",
+                    "0x"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:my_address": {
+                    "nonce": "2",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "address:acc1": {
+                    "nonce": "0",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "address:acc2": {
+                    "nonce": "0",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "sc:lottery": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:lotteryInfo|u32:12|str:lottery_name": "u32:1|u8:100|0xffffffff|u64:2592000|0xffffffff|u32:1|u8:100|u32:0|u32:0|u32:0|u32:0",
+                        "str:erc20ContractAddress": "sc:erc20"
+                    },
+                    "code": "file:../output/lottery-erc20.wasm"
+                },
+                "sc:erc20": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:balance|address:erc20_owner": "1,000,000,000",
+                        "str:totalSupply": "1,000,000,000"
+                    },
+                    "code": "file:../../erc20/output/erc20.wasm"
+                },
+                "address:erc20_owner": {
+                    "nonce": "1",
+                    "balance": "1,000,000",
+                    "storage": {}
+                }
+            }
+        }
+    ]
+}

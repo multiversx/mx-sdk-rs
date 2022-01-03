@@ -1,0 +1,143 @@
+{
+    "name": "smart contract properties: is_smart_contract, owner, more to follow",
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../output/basic-features.wasm",
+                    "owner": "address:someone_else"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            },
+            "newAddresses": [
+                {
+                    "creatorAddress": "address:an_account",
+                    "creatorNonce": "0",
+                    "newAddress": "sc:also-features-contract"
+                }
+            ]
+        },
+        {
+            "step": "scQuery",
+            "txId": "is_smart_contract",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "is_smart_contract",
+                "arguments": [
+                    "address:an_account"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "false"
+                ]
+            }
+        },
+        {
+            "step": "scQuery",
+            "txId": "is_smart_contract",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "is_smart_contract",
+                "arguments": [
+                    "sc:basic-features"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "true"
+                ]
+            }
+        },
+        {
+            "step": "scQuery",
+            "txId": "get_owner_address",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "get_owner_address",
+                "arguments": []
+            },
+            "expect": {
+                "out": [
+                    "address:someone_else"
+                ]
+            }
+        },
+        {
+            "step": "scDeploy",
+            "txId": "1",
+            "tx": {
+                "from": "address:an_account",
+                "contractCode": "file:../output/basic-features.wasm",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": []
+            }
+        },
+        {
+            "step": "scQuery",
+            "txId": "is_smart_contract_deployed",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "is_smart_contract",
+                "arguments": [
+                    "sc:also-features-contract"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "true"
+                ]
+            }
+        },
+        {
+            "step": "scQuery",
+            "txId": "get_owner_address",
+            "tx": {
+                "to": "sc:also-features-contract",
+                "function": "get_owner_address",
+                "arguments": []
+            },
+            "expect": {
+                "out": [
+                    "address:an_account"
+                ]
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "file:../output/basic-features.wasm",
+                    "owner": "address:someone_else"
+                },
+                "address:an_account": {
+                    "nonce": "1",
+                    "balance": "0",
+                    "storage": {},
+                    "code": ""
+                },
+                "sc:also-features-contract": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "file:../output/basic-features.wasm",
+                    "owner": "address:an_account"
+                }
+            }
+        }
+    ]
+}

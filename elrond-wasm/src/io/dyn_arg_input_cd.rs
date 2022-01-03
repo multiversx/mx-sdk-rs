@@ -1,51 +1,45 @@
-use crate::api::ErrorApi;
-use crate::hex_call_data::*;
-use crate::*;
+use crate::{
+    api::{ErrorApi, ErrorApiImpl, ManagedTypeApi},
+    err_msg,
+    types::ManagedBytesTopDecodeInput,
+    DynArgInput, HexCallDataDeserializer,
+};
 
-pub struct CallDataArgLoader<'a, SE>
+pub struct CallDataArgLoader<'a, A>
 where
-	SE: ErrorApi,
+    A: ManagedTypeApi + ErrorApi,
 {
-	deser: HexCallDataDeserializer<'a>,
-	signal_error: SE,
+    deser: HexCallDataDeserializer<'a>,
+    _api: A,
 }
 
-impl<'a, SE> CallDataArgLoader<'a, SE>
+impl<'a, A> CallDataArgLoader<'a, A>
 where
-	SE: ErrorApi,
+    A: ManagedTypeApi + ErrorApi,
 {
-	pub fn new(deser: HexCallDataDeserializer<'a>, signal_error: SE) -> Self {
-		CallDataArgLoader {
-			deser,
-			signal_error,
-		}
-	}
+    pub fn new(deser: HexCallDataDeserializer<'a>, _api: A) -> Self {
+        CallDataArgLoader { deser, _api }
+    }
 }
 
-impl<'a, SE> ErrorApi for CallDataArgLoader<'a, SE>
+impl<'a, A> DynArgInput for CallDataArgLoader<'a, A>
 where
-	SE: ErrorApi,
+    A: ManagedTypeApi + ErrorApi,
 {
-	#[inline]
-	fn signal_error(&self, message: &[u8]) -> ! {
-		self.signal_error.signal_error(message)
-	}
-}
+    type ItemInput = ManagedBytesTopDecodeInput<A>;
 
-impl<'a, SE> DynArgInput<Vec<u8>> for CallDataArgLoader<'a, SE>
-where
-	SE: ErrorApi,
-{
-	#[inline]
-	fn has_next(&self) -> bool {
-		self.deser.has_next()
-	}
+    type ManagedTypeErrorApi = A;
 
-	fn next_arg_input(&mut self) -> Vec<u8> {
-		match self.deser.next_argument() {
-			Ok(Some(arg_bytes)) => arg_bytes,
-			Ok(None) => self.signal_error(err_msg::ARG_WRONG_NUMBER),
-			Err(sc_err) => self.signal_error(sc_err.as_bytes()),
-		}
-	}
+    #[inline]
+    fn has_next(&self) -> bool {
+        self.deser.has_next()
+    }
+
+    fn next_arg_input(&mut self) -> ManagedBytesTopDecodeInput<A> {
+        match self.deser.next_argument() {
+            Ok(Some(arg_bytes)) => ManagedBytesTopDecodeInput::<A>::new(arg_bytes.into()),
+            Ok(None) => A::error_api_impl().signal_error(err_msg::ARG_WRONG_NUMBER),
+            Err(sc_err) => A::error_api_impl().signal_error(sc_err.as_bytes()),
+        }
+    }
 }

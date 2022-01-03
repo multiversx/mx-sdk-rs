@@ -1,5 +1,6 @@
 {
-    "name": "start with all options",
+    "name": "start with all options, bigger whitelist",
+    "gasSchedule": "dummy",
     "steps": [
         {
             "step": "externalSteps",
@@ -7,26 +8,26 @@
         },
         {
             "step": "scCall",
-            "txId": "start with all options",
+            "txId": "start with all options, bigger whitelist",
             "tx": {
                 "from": "address:my_address",
-                "to": "address:the_lottery_contract",
-                "value": "0",
+                "to": "sc:lottery",
                 "function": "start",
                 "arguments": [
                     "str:lottery_name",
-                    "str:lottery_token",
+                    "str:LOTTERY-123456",
                     "100",
                     "0x01|u32:5",
                     "0x01|u64:123,456",
                     "0x01|u32:1",
-                    "0x",
+                    "0x01|u32:2|u8:75|u8:25",
                     "0x01|u32:5|address:acc1|address:acc2|address:acc3|address:acc4|address:acc5"
                 ],
                 "gasLimit": "100,000,000",
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "",
                 "gas": "*",
                 "refund": "*"
@@ -37,18 +38,15 @@
             "accounts": {
                 "address:acc3": {
                     "nonce": "0",
-                    "balance": "1,000,000",
-                    "storage": {}
+                    "balance": "1,000,000"
                 },
                 "address:acc4": {
                     "nonce": "0",
-                    "balance": "1,000,000",
-                    "storage": {}
+                    "balance": "1,000,000"
                 },
                 "address:acc5": {
                     "nonce": "0",
-                    "balance": "1,000,000",
-                    "storage": {}
+                    "balance": "1,000,000"
                 }
             }
         },
@@ -85,11 +83,20 @@
                     "balance": "1,000,000",
                     "storage": {}
                 },
-                "address:the_lottery_contract": {
+                "sc:lottery": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "''lotteryInfo|u32:12|''lottery_name": "u32:13|str:lottery_token|u32:1|u8:100|u32:5|u64:123,456|u32:1|u32:1|u8:100|u32:5|address:acc1|address:acc2|address:acc3|address:acc4|address:acc5|u32:0|u32:0"
+                        "str:lotteryInfo|nested:str:lottery_name": {
+                            "0-token_identifier": "nested:str:LOTTERY-123456",
+                            "1-ticket_price": "biguint:100",
+                            "2-tickets-left": "u32:5",
+                            "3-deadline": "u64:123,456",
+                            "4-max_entries_per_user": "u32:1",
+                            "5-prize_distribution": "u32:2|u8:75|u8:25",
+                            "6-whitelist": "u32:5|address:acc1|address:acc2|address:acc3|address:acc4|address:acc5",
+                            "7-prize_pool": "biguint:0"
+                        }
                     },
                     "code": "file:../output/lottery-esdt.wasm"
                 }

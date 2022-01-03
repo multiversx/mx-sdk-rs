@@ -1,0 +1,21 @@
+{
+    "comment": "verifies that setState and checkState are consistent",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:contract-address": {
+                    "code": "file:set-check-esdt.scen.json"
+                }
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:contract-address": {
+                    "code": "file:set-check-code.scen.json"
+                }
+            }
+        }
+    ]
+}

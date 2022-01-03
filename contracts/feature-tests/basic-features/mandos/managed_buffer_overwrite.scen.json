@@ -1,0 +1,35 @@
+{
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            }
+        },
+        {
+            "step": "scQuery",
+            "txId": "1",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mbuffer_overwrite",
+                "arguments": [
+                    "str:old",
+                    "str:new"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "str:new"
+                ]
+            }
+        }
+    ]
+}

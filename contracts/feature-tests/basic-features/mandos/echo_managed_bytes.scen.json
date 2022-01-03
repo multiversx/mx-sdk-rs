@@ -1,0 +1,72 @@
+{
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            }
+        },
+        {
+            "step": "scQuery",
+            "txId": "1",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "echo_managed_address",
+                "arguments": [
+                    "address:a1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "address:a1"
+                ],
+                "status": ""
+            }
+        },
+        {
+            "step": "scQuery",
+            "txId": "address-eq",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "managed_address_eq",
+                "arguments": [
+                    "address:a1",
+                    "address:a1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "true"
+                ],
+                "status": ""
+            }
+        },
+        {
+            "step": "scQuery",
+            "txId": "address-not-eq",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "managed_address_eq",
+                "arguments": [
+                    "address:a1",
+                    "address:a2"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "false"
+                ],
+                "status": ""
+            }
+        }
+    ]
+}

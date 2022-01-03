@@ -16,8 +16,12 @@ Cargo.lock
 tutorial/book
 
 # Others
-arwen.sh
-publish.sh
+my-vm-tests.sh
+quick.sh
+twiggy*
+
+# Zip output with example wasm binaries
+examples-wasm.zip
 
 tags
 
@@ -27,3 +31,6 @@ tags
 **/testnet/**
 **/erdpy.data-storage.json
 **/*.interaction.json
+
+# Python scripts
+**/__pycache__/**

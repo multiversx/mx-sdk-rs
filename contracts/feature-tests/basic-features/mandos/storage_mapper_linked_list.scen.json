@@ -1,21 +1,18 @@
 {
     "name": "storage",
-    "gasSchedule": "v2",
+    "gasSchedule": "v3",
     "steps": [
         {
             "step": "setState",
             "accounts": {
-                "address:features_contract": {
+                "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
                     "code": "file:../output/basic-features.wasm"
                 },
                 "address:an_account": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 }
             }
         },
@@ -24,9 +21,8 @@
             "txId": "before",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
-                "value": "0",
-                "function": "list_mapper",
+                "to": "sc:basic-features",
+                "function": "getListMapper",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
@@ -44,9 +40,8 @@
             "txId": "first-push-back",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
-                "value": "0",
-                "function": "list_mapper_push_back",
+                "to": "sc:basic-features",
+                "function": "listMapperPushBack",
                 "arguments": [
                     "123"
                 ],
@@ -64,13 +59,12 @@
         {
             "step": "checkState",
             "accounts": {
-                "address:features_contract": {
+                "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "``list_mapper.node_links|u32:1": "u32:0|u32:0",
-                        "``list_mapper.value|u32:1": "123",
-                        "``list_mapper.info": "u32:1|u32:1|u32:1|u32:1"
+                        "str:list_mapper.node|u32:1": "u32:123|u32:1|u32:0|u32:0",
+                        "str:list_mapper.info": "u32:1|u32:1|u32:1|u32:1"
                     },
                     "code": "file:../output/basic-features.wasm"
                 },
@@ -87,9 +81,8 @@
             "txId": "check-list-after-first-push-back",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
-                "value": "0",
-                "function": "list_mapper",
+                "to": "sc:basic-features",
+                "function": "getListMapper",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
@@ -109,9 +102,8 @@
             "txId": "second-push-back",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
-                "value": "0",
-                "function": "list_mapper_push_back",
+                "to": "sc:basic-features",
+                "function": "listMapperPushBack",
                 "arguments": [
                     "111"
                 ],
@@ -131,9 +123,96 @@
             "txId": "check-list-after-second-push-back",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
-                "value": "0",
-                "function": "list_mapper",
+                "to": "sc:basic-features",
+                "function": "getListMapper",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "123",
+                    "111"
+                ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "set-node-value",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "listMapperSetValue",
+                "arguments": [
+                    "1",
+                    "500"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "check-list-after-set-value",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "getListMapper",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "500",
+                    "111"
+                ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "set-node-value-by-id",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "listMapperSetValueById",
+                "arguments": [
+                    "1",
+                    "123"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "check-list-after-set-value-back-to-original",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "getListMapper",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
@@ -152,15 +231,13 @@
         {
             "step": "checkState",
             "accounts": {
-                "address:features_contract": {
+                "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "``list_mapper.node_links|u32:1": "u32:0|u32:2",
-                        "``list_mapper.node_links|u32:2": "u32:1|u32:0",
-                        "``list_mapper.value|u32:1": "123",
-                        "``list_mapper.value|u32:2": "111",
-                        "``list_mapper.info": "u32:2|u32:1|u32:2|u32:2"
+                        "str:list_mapper.node|u32:1": "u32:123|u32:1|u32:2|u32:0",
+                        "str:list_mapper.node|u32:2": "u32:111|u32:2|u32:0|u32:1",
+                        "str:list_mapper.info": "u32:2|u32:1|u32:2|u32:2"
                     },
                     "code": "file:../output/basic-features.wasm"
                 },
@@ -177,9 +254,8 @@
             "txId": "check-front-after-second-push-back",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
-                "value": "0",
-                "function": "list_mapper_front",
+                "to": "sc:basic-features",
+                "function": "listMapperFront",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
@@ -199,16 +275,15 @@
             "txId": "first-pop-front",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
-                "value": "0",
-                "function": "list_mapper_pop_front",
+                "to": "sc:basic-features",
+                "function": "listMapperPopFront",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "1|u32:123"
+                    "123"
                 ],
                 "status": "",
                 "logs": [],
@@ -219,13 +294,12 @@
         {
             "step": "checkState",
             "accounts": {
-                "address:features_contract": {
+                "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "``list_mapper.node_links|u32:2": "u32:0|u32:0",
-                        "``list_mapper.value|u32:2": "111",
-                        "``list_mapper.info": "u32:1|u32:2|u32:2|u32:2"
+                        "str:list_mapper.node|u32:2": "u32:111|u32:2|u32:0|u32:0",
+                        "str:list_mapper.info": "u32:1|u32:2|u32:2|u32:2"
                     },
                     "code": "file:../output/basic-features.wasm"
                 },
@@ -242,16 +316,15 @@
             "txId": "second-pop-front",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
-                "value": "0",
-                "function": "list_mapper_pop_front",
+                "to": "sc:basic-features",
+                "function": "listMapperPopFront",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "1|u32:111"
+                    "111"
                 ],
                 "status": "",
                 "logs": [],
@@ -262,7 +335,7 @@
         {
             "step": "checkState",
             "accounts": {
-                "address:features_contract": {
+                "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
@@ -281,20 +354,373 @@
             "txId": "check-front-after-second-pop-front",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
-                "value": "0",
-                "function": "list_mapper_front",
+                "to": "sc:basic-features",
+                "function": "listMapperFront",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [],
-                "status": "4",
-                "message": "str:List empty!",
+                "status": "",
+                "message": "",
                 "logs": [],
                 "gas": "*",
                 "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "first-push-back",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "listMapperPushBack",
+                "arguments": [
+                    "5"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "first-push-back",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "listMapperPushAfter",
+                "arguments": [
+                    "1",
+                    "6"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "6"
+                ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "first-push-back",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "listMapperPushBefore",
+                "arguments": [
+                    "1",
+                    "4"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "4"
+                ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "first-push-back",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "listMapperPushFront",
+                "arguments": [
+                    "3"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "first-push-back",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "getListMapper",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "3",
+                    "4",
+                    "5",
+                    "6"
+                ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "first-push-back",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "listMapperIterateByHand",
+                "arguments": [
+                    "4"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "3",
+                    "4",
+                    "5",
+                    "6"
+                ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "first-push-back",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "listMapperIterateByIter",
+                "arguments": [
+                    "4"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "3",
+                    "4",
+                    "5",
+                    "6"
+                ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "first-push-back",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "listMapperRemoveNode",
+                "arguments": [
+                    "1"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "first-push-back",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "getListMapper",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "3",
+                    "4",
+                    "6"
+                ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "first-push-back",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "listMapperPopFront",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "3"
+                ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "first-push-back",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "getListMapper",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "4",
+                    "6"
+                ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "first-push-back",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "listMapperRemoveNodeById",
+                "arguments": [
+                    "2"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "6"
+                ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "first-push-back",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "getListMapper",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "4"
+                ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "first-push-back",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "listMapperPopBack",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "4"
+                ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "first-push-back",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "getListMapper",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "*",
+                    "balance": "*",
+                    "storage": {},
+                    "code": ""
+                }
             }
         }
     ]

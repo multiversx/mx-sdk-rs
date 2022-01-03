@@ -1,0 +1,30 @@
+name: Upload assets on release
+
+on:
+  release:
+    types:
+      - created
+
+jobs:
+  build:
+    name: Upload release asset to ${{ github.ref }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Install erdpy
+        run: |
+          source .github/workflows/env
+          pip3 install erdpy
+      - name: Build project example outputs
+        run: |
+          ./zip-example-wasm.sh
+      - name: Upload binaries to release ${{ github.ref }}
+        uses: svenstaro/upload-release-action@v2
+        with:
+          tag: ${{ github.ref }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ./examples-wasm.zip
+          asset_name: examples-wasm.zip
+          overwrite: true
+          body: "This is my release text"

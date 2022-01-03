@@ -1,0 +1,115 @@
+{
+    "name": "invalid proposals",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "init.scen.json"
+        },
+        {
+            "step": "scCall",
+            "txId": "propose-too-few-tokens",
+            "tx": {
+                "from": "address:user1",
+                "to": "sc:governance",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:GOV-123456",
+                        "value": "400"
+                    }
+                ],
+                "function": "propose",
+                "arguments": [
+                    "str:try-propose-with-too-few-tokens",
+                    "50,000,000",
+                    "sc:governance",
+                    "",
+                    "0",
+                    "0",
+                    "str:changeQuorum",
+                    "biguint:1000"
+                ],
+                "gasLimit": "20,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:Not enough tokens for proposing action",
+                "gas": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "propose-with-no-actions",
+            "tx": {
+                "from": "address:user1",
+                "to": "sc:governance",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:GOV-123456",
+                        "value": "500"
+                    }
+                ],
+                "function": "propose",
+                "arguments": [
+                    "str:try-propose-with-too-few-tokens"
+                ],
+                "gasLimit": "20,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:Proposal has no actions",
+                "gas": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "propose-too-many-actions",
+            "tx": {
+                "from": "address:user1",
+                "to": "sc:governance",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:GOV-123456",
+                        "value": "500"
+                    }
+                ],
+                "function": "propose",
+                "arguments": [
+                    "str:try-propose-with-too-few-tokens",
+                    "50,000,000",
+                    "sc:governance",
+                    "",
+                    "0",
+                    "0",
+                    "str:changeQuorum",
+                    "biguint:1000",
+                    "50,000,000",
+                    "sc:governance",
+                    "",
+                    "0",
+                    "0",
+                    "str:changeQuorum",
+                    "biguint:1000",
+                    "50,000,000",
+                    "sc:governance",
+                    "",
+                    "0",
+                    "0",
+                    "str:changeQuorum",
+                    "biguint:1000"
+                ],
+                "gasLimit": "20,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:Exceeded max actions per proposal",
+                "gas": "*"
+            }
+        }
+    ]
+}

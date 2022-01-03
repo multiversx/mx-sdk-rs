@@ -1,29 +1,25 @@
 {
     "name": "balanceOf",
+    "gasSchedule": "dummy",
     "steps": [
         {
             "step": "setState",
             "accounts": {
-                "address:creator_address": {
+                "address:crypto_bubbles_owner": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 },
-                "address:contract_address": {
+                "sc:crypto_bubbles": {
                     "nonce": "0",
                     "balance": "0x100",
                     "storage": {
-                        "''owner": "address:creator_address",
-                        "''playerBalance|address:acc2": "0x100"
+                        "str:playerBalance|address:acc2": "0x100"
                     },
                     "code": "file:../output/crypto-bubbles.wasm"
                 },
                 "address:acc1": {
                     "nonce": "0",
-                    "balance": "0x300abc",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0x300abc"
                 }
             }
         },
@@ -32,8 +28,7 @@
             "txId": "1",
             "tx": {
                 "from": "address:acc1",
-                "to": "address:contract_address",
-                "value": "0",
+                "to": "sc:crypto_bubbles",
                 "function": "balanceOf",
                 "arguments": [
                     "address:acc2"
@@ -56,8 +51,7 @@
             "txId": "2",
             "tx": {
                 "from": "address:acc1",
-                "to": "address:contract_address",
-                "value": "0",
+                "to": "sc:crypto_bubbles",
                 "function": "balanceOf",
                 "arguments": [
                     "address:acc3"
@@ -78,18 +72,17 @@
         {
             "step": "checkState",
             "accounts": {
-                "address:creator_address": {
+                "address:crypto_bubbles_owner": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
                     "code": ""
                 },
-                "address:contract_address": {
+                "sc:crypto_bubbles": {
                     "nonce": "0",
                     "balance": "0x100",
                     "storage": {
-                        "''owner": "address:creator_address",
-                        "''playerBalance|address:acc2": "0x100"
+                        "str:playerBalance|address:acc2": "0x100"
                     },
                     "code": "file:../output/crypto-bubbles.wasm"
                 },

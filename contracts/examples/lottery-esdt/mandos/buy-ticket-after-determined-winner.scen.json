@@ -1,5 +1,6 @@
 {
     "name": "buy ticket after announced winner",
+    "gasSchedule": "dummy",
     "steps": [
         {
             "step": "externalSteps",
@@ -11,9 +12,8 @@
                 "address:acc1": {
                     "nonce": "1",
                     "balance": "1,000,000",
-                    "storage": {},
                     "esdt": {
-                        "str:lottery_token": "100"
+                        "str:LOTTERY-123456": "100"
                     }
                 }
             }
@@ -23,10 +23,13 @@
             "txId": "buy-ticket-after-announced-winner",
             "tx": {
                 "from": "address:acc1",
-                "to": "address:the_lottery_contract",
-                "value": "0",
-                "esdtTokenName": "str:lottery_token",
-                "esdtValue": "100",
+                "to": "sc:lottery",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:LOTTERY-123456",
+                        "value": "100"
+                    }
+                ],
                 "function": "buy_ticket",
                 "arguments": [
                     "str:lottery_name"
@@ -35,6 +38,7 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "4",
                 "message": "str:Lottery is currently inactive.",
                 "gas": "*",
@@ -52,17 +56,17 @@
                 "address:acc1": {
                     "nonce": "2",
                     "balance": "1,000,000",
-                    "storage": {},
                     "esdt": {
-                        "str:lottery_token": "100"
-                    }
+                        "str:LOTTERY-123456": "100"
+                    },
+                    "storage": {}
                 },
                 "address:acc2": {
                     "nonce": "1",
                     "balance": "1,000,000",
                     "storage": {}
                 },
-                "address:the_lottery_contract": {
+                "sc:lottery": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
