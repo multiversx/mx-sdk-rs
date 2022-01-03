@@ -40,6 +40,8 @@ members = [
   "contracts/examples/crypto-kitties/kitty-genetic-alg/meta",
   "contracts/examples/crypto-kitties/kitty-auction",
   "contracts/examples/crypto-kitties/kitty-auction/meta",
+  "contracts/examples/digital-cash",
+  "contracts/examples/digital-cash/meta",
   "contracts/examples/egld-esdt-swap",
   "contracts/examples/egld-esdt-swap/meta",
   "contracts/examples/factorial",
