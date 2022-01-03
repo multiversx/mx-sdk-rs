@@ -11,7 +11,6 @@ pub struct ArgBuffer {
     arg_data: Vec<u8>,
 }
 
-#[allow(clippy::return_self_not_must_use)]
 impl ArgBuffer {
     pub fn new() -> Self {
         ArgBuffer {

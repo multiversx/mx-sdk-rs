@@ -50,7 +50,6 @@ where
     ContractCall::<SA, R>::new_with_esdt_payment(to, endpoint_name, payments)
 }
 
-#[allow(clippy::return_self_not_must_use)]
 impl<SA, R> ContractCall<SA, R>
 where
     SA: CallTypeApi + 'static,
