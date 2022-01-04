@@ -7,10 +7,23 @@ use elrond_codec::TopEncode;
 
 const OPEN_BRACE: u8 = b'{';
 const CLOSED_BRACE: u8 = b'}';
+const TWO_DOTS: u8 = b':';
+const QUESTION_MARK: u8 = b'?';
 const HEX_VALUE_PREFIX: &[u8] = b"0x";
 
 const STATIC_BUFFER_LEN: usize = 10;
 const TOO_MANY_ARGUMENTS_ERR_MSG: &[u8] = b"Too many arguments for error message";
+
+enum ArgDisplayType {
+    Hex {
+        static_part_start: usize,
+        static_part_end: usize,
+    },
+    Ascii {
+        static_part_start: usize,
+        static_part_end: usize,
+    },
+}
 
 pub struct FormattedMessageBuilder<M: ManagedTypeApi> {
     buffer: ManagedBufferCachedBuilder<M>,
@@ -47,37 +60,64 @@ impl<M: ManagedTypeApi> FormattedMessageBuilder<M> {
             M::error_api_impl().signal_error(TOO_MANY_ARGUMENTS_ERR_MSG);
         }
 
+        match self.advance_after_next_arg_position() {
+            ArgDisplayType::Hex {
+                static_part_start,
+                static_part_end,
+            } => {
+                self.add_static_part(static_part_start, static_part_end);
+                self.add_arg_as_hex(encoded_arg);
+            },
+            ArgDisplayType::Ascii {
+                static_part_start,
+                static_part_end,
+            } => {
+                self.add_static_part(static_part_start, static_part_end);
+                self.add_arg_as_ascii(encoded_arg);
+            },
+        }
+    }
+
+    fn advance_after_next_arg_position(&mut self) -> ArgDisplayType {
+        let starting_index = self.index_in_message;
+
         loop {
-            while self.format_message[self.index_in_message] != OPEN_BRACE
-                && self.index_in_message < msg_len
-            {
+            while self.get_format_byte_or_panic(self.index_in_message) != OPEN_BRACE {
                 self.index_in_message += 1;
             }
 
-            if self.format_message[self.index_in_message] == OPEN_BRACE {
-                self.index_in_message += 1;
+            let static_msg_end_index = self.index_in_message;
+            self.index_in_message += 1;
 
-                // for the case when the message ends with a `{` for whatever reason
-                if self.index_in_message < msg_len
-                    && self.format_message[self.index_in_message] == CLOSED_BRACE
-                {
-                    let static_msg_end_index = self.index_in_message - 1;
-                    if starting_index != static_msg_end_index {
-                        let static_part =
-                            &self.format_message[starting_index..static_msg_end_index];
-                        self.buffer.append_bytes(static_part);
-                    }
-
-                    self.add_arg_as_hex(encoded_arg);
-
+            match self.get_format_byte_or_panic(self.index_in_message) {
+                CLOSED_BRACE => {
                     self.index_in_message += 1;
 
-                    break;
-                }
-            } else {
-                M::error_api_impl().signal_error(TOO_MANY_ARGUMENTS_ERR_MSG);
+                    return ArgDisplayType::Hex {
+                        static_part_start: starting_index,
+                        static_part_end: static_msg_end_index,
+                    };
+                },
+                TWO_DOTS => {
+                    if self.get_format_byte_or_panic(self.index_in_message + 1) == QUESTION_MARK
+                        && self.get_format_byte_or_panic(self.index_in_message + 2) == CLOSED_BRACE
+                    {
+                        self.index_in_message += 3;
+
+                        return ArgDisplayType::Ascii {
+                            static_part_start: starting_index,
+                            static_part_end: static_msg_end_index,
+                        };
+                    }
+                },
+                _ => {}, // continue the loop
             }
         }
+    }
+
+    fn add_static_part(&mut self, start_index: usize, end_index: usize) {
+        let static_part = &self.format_message[start_index..end_index];
+        self.buffer.append_bytes(static_part);
     }
 
     fn add_arg_as_hex(&mut self, arg: ManagedBuffer<M>) {
@@ -109,6 +149,17 @@ impl<M: ManagedTypeApi> FormattedMessageBuilder<M> {
             self.buffer.append_bytes(hex_slice);
 
             current_arg_index += STATIC_BUFFER_LEN;
+        }
+    }
+
+    fn add_arg_as_ascii(&mut self, arg: ManagedBuffer<M>) {
+        self.buffer.append_managed_buffer(&arg);
+    }
+
+    fn get_format_byte_or_panic(&self, index: usize) -> u8 {
+        match self.format_message.get(index) {
+            Some(b) => *b,
+            None => M::error_api_impl().signal_error(TOO_MANY_ARGUMENTS_ERR_MSG),
         }
     }
 
