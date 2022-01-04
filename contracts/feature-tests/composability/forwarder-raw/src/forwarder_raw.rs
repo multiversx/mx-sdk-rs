@@ -1,8 +1,6 @@
 #![no_std]
 #![allow(clippy::type_complexity)]
 
-use core::borrow::Borrow;
-
 elrond_wasm::imports!();
 
 /// Test contract for investigating async calls.
@@ -71,23 +69,37 @@ pub trait ForwarderRaw {
         to: ManagedAddress,
         #[payment] payment: BigUint,
         endpoint_name: ManagedBuffer,
-        #[var_args] args: ManagedVarArgs<ManagedBuffer>,
-        success: ManagedBuffer,
-        error: ManagedBuffer,
         gas: u64,
         extra_gas_for_callback: u64,
-    ) {
-        Self::Api::send_api_impl().create_async_call_raw(
-            &to,
-            &payment,
-            &endpoint_name,
-            args.to_arg_buffer().borrow(),
-            success.to_boxed_bytes().as_slice(),
-            error.to_boxed_bytes().as_slice(),
-            gas,
-            extra_gas_for_callback,
-        );
+        #[var_args] args: ManagedVarArgs<ManagedBuffer>,
+    ) -> SCResult<()> {
+        Self::Api::send_api_impl()
+            .create_async_call_raw(
+                &to,
+                &payment,
+                &endpoint_name,
+                &args.to_arg_buffer(),
+                b"success_callback",
+                b"error_callback",
+                gas,
+                extra_gas_for_callback,
+            )
+            .into()
     }
+
+    #[callback]
+    fn success_callback(&self) {
+        self.async_call_callback_data().set(true);
+    }
+
+    #[callback]
+    fn error_callback(&self) {
+        self.async_call_callback_data().set(false);
+    }
+
+    #[view]
+    #[storage_mapper("async_call_callback_data")]
+    fn async_call_callback_data(&self) -> SingleValueMapper<bool>;
 
     #[endpoint]
     #[payable("*")]
