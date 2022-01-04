@@ -35,30 +35,6 @@
         ]
       },
       {
-        "step": "setState",
-        "accounts": {
-          "sc:token_release_contract": {
-            "nonce": "0",
-            "balance": "0",
-            "esdt": {
-                "str:FIRSTTOKEN-123456": {
-                    "roles": [
-                        "ESDTRoleLocalMint"
-                    ]
-                }
-            },
-            "code": "file:../output/token-release.wasm",
-            "owner": "address:owner"
-          }
-        }
-      },
-      {
-        "step": "setState",
-        "currentBlockInfo": {
-            "blockTimestamp": "1"
-        }
-      },
-      {
         "step": "scDeploy",
         "txId": "deploy",
         "tx": {
@@ -99,19 +75,72 @@
           "sc:token_release_contract": {
             "nonce": "0",
             "balance": "0",
-            "esdt": {
-              "str:FIRSTTOKEN-123456": {
-                  "roles": [
-                      "ESDTRoleLocalMint"
-                  ]
-              }
-            },
             "storage": {
               "str:setupPeriodStatus": "1",
               "str:tokenIdentifier": "str:FIRSTTOKEN-123456"
             },
             "code": "file:../output/token-release.wasm"
           }
+        }
+      },
+      {
+        "step": "setState",
+        "accounts": {
+        "address:owner": {
+          "nonce": "0",
+          "balance": "1,000,000"
+        },
+        "address:user1": {
+          "nonce": "0",
+          "balance": "0",
+          "esdt": {
+            "str:FIRSTTOKEN-123456": "10"
+          },
+          "storage": {}
+        },
+        "address:user2": {
+          "nonce": "0",
+          "balance": "0",
+          "esdt": {
+            "str:FIRSTTOKEN-123456": "0"
+        },
+          "storage": {}
+        }
+        },
+        "newAddresses": [
+          {
+            "creatorAddress": "address:owner",
+            "creatorNonce": "0",
+            "newAddress": "sc:token_release_contract"
+          }
+        ]
+      },
+      {
+        "step": "setState",
+        "accounts": {
+          "sc:token_release_contract": {
+            "nonce": "0",
+            "balance": "0",
+            "esdt": {
+                "str:FIRSTTOKEN-123456": {
+                    "roles": [
+                        "ESDTRoleLocalMint"
+                    ]
+                }
+            },
+            "storage": {
+              "str:setupPeriodStatus": "1",
+              "str:tokenIdentifier": "str:FIRSTTOKEN-123456"
+            },
+            "code": "file:../output/token-release.wasm",
+            "owner": "address:owner"
+          }
+        }
+      },
+      {
+        "step": "setState",
+        "currentBlockInfo": {
+            "blockTimestamp": "1"
         }
       }
     ]

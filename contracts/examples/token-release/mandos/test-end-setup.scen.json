@@ -29,7 +29,7 @@
         "step": "checkState",
         "accounts": {
           "address:owner": {
-            "nonce": "5",
+            "nonce": "4",
             "balance": "1,000,000"
           },
           "address:user1": {
