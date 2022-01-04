@@ -1,19 +1,32 @@
 use std::cmp::Ordering;
 
-use elrond_wasm::types::{ManagedBuffer, ManagedType};
+use elrond_wasm::{
+    api::Handle,
+    types::{ManagedBuffer, ManagedType},
+};
 use num_bigint::Sign;
 use num_traits::Zero;
 
 use crate::DebugApi;
 
 impl DebugApi {
-    pub fn insert_new_managed_buffer(&self, value: Vec<u8>) -> ManagedBuffer<Self> {
+    pub fn insert_new_managed_buffer(&self, value: Vec<u8>) -> Handle {
+        let mut managed_types = self.m_types_borrow_mut();
+        managed_types.managed_buffer_map.insert_new_handle(value)
+    }
+
+    pub fn insert_new_managed_buffer_old(&self, value: Vec<u8>) -> ManagedBuffer<Self> {
         let mut managed_types = self.m_types_borrow_mut();
         let handle = managed_types.managed_buffer_map.insert_new_handle(value);
         ManagedBuffer::from_raw_handle(handle)
     }
 
-    pub fn insert_new_big_uint(
+    pub fn insert_new_big_uint(&self, value: num_bigint::BigUint) -> Handle {
+        let mut managed_types = self.m_types_borrow_mut();
+        managed_types.big_int_map.insert_new_handle(value.into())
+    }
+
+    pub fn insert_new_big_uint_old(
         &self,
         value: num_bigint::BigUint,
     ) -> elrond_wasm::types::BigUint<Self> {
@@ -22,7 +35,7 @@ impl DebugApi {
         elrond_wasm::types::BigUint::from_raw_handle(handle)
     }
 
-    pub fn insert_new_big_uint_zero(&self) -> elrond_wasm::types::BigUint<Self> {
+    pub fn insert_new_big_uint_zero(&self) -> Handle {
         self.insert_new_big_uint(num_bigint::BigUint::zero())
     }
 
