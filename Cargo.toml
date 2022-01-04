@@ -60,6 +60,9 @@ members = [
   "contracts/examples/order-book/pair/meta",
   "contracts/examples/ping-pong-egld",
   "contracts/examples/ping-pong-egld/meta",
+  "contracts/examples/digital-cash",
+  "contracts/examples/digital-cash/meta",
+
 
   "contracts/feature-tests/abi-tester",
   "contracts/feature-tests/abi-tester/meta",
