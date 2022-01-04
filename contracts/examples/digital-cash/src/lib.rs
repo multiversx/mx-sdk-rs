@@ -14,11 +14,7 @@ pub trait DigitalCash {
     #[init]
     fn init(&self) {}
 
-    fn get_expiration_round(&self, valability: u64) -> u64 {
-        let valability_rounds = valability / SECONDS_PER_ROUND;
-
-        self.blockchain().get_block_round() + valability_rounds
-    }
+    //endpoints
 
     #[endpoint]
     #[payable("*")]
@@ -27,9 +23,9 @@ pub trait DigitalCash {
         #[payment] payment: BigUint,
         #[payment_token] token: TokenIdentifier,
         address: ManagedAddress,
-        valability: u64,
+        valability: u64
     ) -> SCResult<()> {
-        require!(payment > 0, "amount must be greater than 0");
+        require!(payment > BigUint::zero(), "amount must be greater than 0");
         require!(self.deposit(&address).is_empty(), "key already used");
 
         let nft_nonce = self.call_value().esdt_token_nonce();
@@ -71,7 +67,10 @@ pub trait DigitalCash {
 
     #[endpoint]
     fn claim(&self, address: ManagedAddress, signature: ManagedBuffer) -> SCResult<()> {
-        require!(!self.deposit(&address).is_empty(), "non-existent key");
+        require!(
+            !self.deposit(&address).is_empty(), 
+            "non-existent key"
+        );
 
         let deposit = self.deposit(&address).get();
         let caller_address = self.blockchain().get_caller();
@@ -101,6 +100,8 @@ pub trait DigitalCash {
         Ok(())
     }
 
+    //views
+
     #[view(amount)]
     fn get_amount(&self, address: ManagedAddress) -> SCResult<BigUint> {
         require!(!self.deposit(&address).is_empty(), "non-existent key");
@@ -108,6 +109,13 @@ pub trait DigitalCash {
         let data = self.deposit(&address).get();
 
         Ok(data.amount)
+    }
+
+    //private functions
+
+    fn get_expiration_round(&self, valability: u64) -> u64 {
+        let valability_rounds = valability / SECONDS_PER_ROUND;
+        self.blockchain().get_block_round() + valability_rounds
     }
 
     //storage

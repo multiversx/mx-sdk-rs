@@ -2,7 +2,7 @@
     "name": "claim-egld",
     "steps": [{
             "step": "externalSteps",
-            "path": "set-accounts.json"
+            "path": "set-accounts.scen.json"
         },
         {
             "step": "setState",
@@ -29,12 +29,12 @@
             "txId": "fund",
             "tx": {
                 "from": "address:acc1",
-                "to": "address:the_digital_cash_contract",
+                "to": "sc:the_digital_cash_contract",
                 "value": "5",
                 "function": "fund",
                 "arguments": [
                     "0xdfc7efc43c36853ab160e783ad65766043734e30ce46188a448c44e2bbab9d91",
-                    "605"
+                    "u64:605"
                 ],
                 "gasLimit": "500,000,000",
                 "gasPrice": "0"
@@ -50,20 +50,19 @@
         {
             "step": "checkState",
             "accounts": {
-                "address:the_digital_cash_contract": {
+                "sc:the_digital_cash_contract": {
                     "nonce": "0",
                     "balance": "5",
                     "storage": {
-                        "''deposit|0xdfc7efc43c36853ab160e783ad65766043734e30ce46188a448c44e2bbab9d91": {
-                            "1-amount": "u32:1|5",
+                        "str:deposit|0xdfc7efc43c36853ab160e783ad65766043734e30ce46188a448c44e2bbab9d91": {
+                            "1-amount": "biguint:5",
                             "2-depositor_address": "address:acc1",
                             "3-expiration_round": "u64:100",
-                            "4-token_name": "u32:4|str:EGLD"
+                            "4-token_name": "nested:str:EGLD",
+                            "5-nonce": "u64:0"
                         }
                     },
-                    "code": "file:../output/mycontract2.wasm"
-
-
+                    "code": "file:../output/digital-cash.wasm"
                 },
                 "address:acc1": {
                     "nonce": "1",
@@ -75,22 +74,19 @@
                     "balance": "1,000,000",
                     "storage": {},
                     "esdt": {
-                        "str:CashToken": "100"
+                        "str:CASHTOKEN-123456": "100"
                     }
                 },
-
                 "0xebfd923cd251f857ed7639e87143ac83f12f423827abc4a0cdde0119c3e37915": {
                     "nonce": "0",
                     "balance": "1,000,000",
                     "storage": {}
                 },
-
                 "address:digital_cash_owner_address": {
                     "nonce": "1",
                     "balance": "0",
                     "storage": {}
                 }
-
             }
         },
         {
@@ -98,7 +94,7 @@
             "txId": "claim2",
             "tx": {
                 "from": "0xebfd923cd251f857ed7639e87143ac83f12f423827abc4a0cdde0119c3e37915",
-                "to": "address:the_digital_cash_contract",
+                "to": "sc:the_digital_cash_contract",
                 "value": "0",
                 "function": "claim",
                 "arguments": [
@@ -131,7 +127,7 @@
             "txId": "claim3",
             "tx": {
                 "from": "0xebfd923cd251f857ed7639e87143ac83f12f423827abc4a0cdde0119c3e37915",
-                "to": "address:the_digital_cash_contract",
+                "to": "sc:the_digital_cash_contract",
                 "value": "0",
                 "function": "claim",
                 "arguments": [
@@ -164,7 +160,7 @@
             "txId": "claim4",
             "tx": {
                 "from": "0xebfd923cd251f857ed7639e87143ac83f12f423827abc4a0cdde0119c3e37915",
-                "to": "address:the_digital_cash_contract",
+                "to": "sc:the_digital_cash_contract",
                 "value": "0",
                 "function": "claim",
                 "arguments": [
@@ -187,7 +183,7 @@
             "txId": "claim5",
             "tx": {
                 "from": "0xebfd923cd251f857ed7639e87143ac83f12f423827abc4a0cdde0119c3e37915",
-                "to": "address:the_digital_cash_contract",
+                "to": "sc:the_digital_cash_contract",
                 "value": "0",
                 "function": "claim",
                 "arguments": [
@@ -208,11 +204,11 @@
         {
             "step": "checkState",
             "accounts": {
-                "address:the_digital_cash_contract": {
+                "sc:the_digital_cash_contract": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
-                    "code": "file:../output/mycontract2.wasm"
+                    "code": "file:../output/digital-cash.wasm"
 
 
                 },
@@ -226,7 +222,7 @@
                     "balance": "1,000,000",
                     "storage": {},
                     "esdt": {
-                        "str:CashToken": "100"
+                        "str:CASHTOKEN-123456": "100"
                     }
                 },
 
@@ -241,9 +237,7 @@
                     "balance": "0",
                     "storage": {}
                 }
-
             }
         }
-
     ]
 }

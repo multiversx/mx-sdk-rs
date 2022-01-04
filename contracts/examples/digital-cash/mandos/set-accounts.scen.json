@@ -13,7 +13,7 @@
                     "balance": "1,000,000",
                     "storage": {},
                     "esdt": {
-                        "str:CashToken": "100"
+                        "str:CASHTOKEN-123456": "100"
                     }
                 },
                 "address:digital_cash_owner_address": {
@@ -25,16 +25,15 @@
             "newAddresses": [{
                 "creatorAddress": "address:digital_cash_owner_address",
                 "creatorNonce": "0",
-                "newAddress": "address:the_digital_cash_contract"
+                "newAddress": "sc:the_digital_cash_contract"
             }]
-
         },
         {
             "step": "scDeploy",
             "txId": "deploy",
             "tx": {
                 "from": "address:digital_cash_owner_address",
-                "contractCode": "file:../output/mycontract2.wasm",
+                "contractCode": "file:../output/digital-cash.wasm",
                 "value": "0",
                 "arguments": [],
                 "gasLimit": "5,000,000",
