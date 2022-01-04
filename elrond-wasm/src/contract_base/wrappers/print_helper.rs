@@ -2,7 +2,7 @@ use core::marker::PhantomData;
 
 use crate::{
     api::{ManagedTypeApi, PrintApi, PrintApiImpl},
-    types::BigUint,
+    types::{BigUint, ManagedType},
 };
 
 pub struct PrintHelper<A>
@@ -23,6 +23,6 @@ where
     }
 
     pub fn print_biguint(&self, biguint: &BigUint<A>) {
-        A::print_api_impl().print_biguint(biguint);
+        A::print_api_impl().print_biguint(biguint.get_raw_handle());
     }
 }
