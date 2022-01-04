@@ -61,6 +61,29 @@
                 "gas": "*",
                 "refund": "*"
             }
+        },
+        {
+            "step": "scCall",
+            "txId": "3",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "dynamic_message_ascii",
+                "esdt": {
+                    "tokenIdentifier": "str:TOKEN-123456",
+                    "value": "1,000"
+                },
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:Got token TOKEN-123456, with nonce 0x, amount 0x03e8. I prefer EGLD. ERROR!",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
         }
     ]
 }

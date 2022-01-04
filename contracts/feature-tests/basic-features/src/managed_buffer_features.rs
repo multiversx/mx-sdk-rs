@@ -125,4 +125,20 @@ pub trait ManagedBufferFeatures {
             amount
         );
     }
+
+    #[payable("*")]
+    #[endpoint]
+    fn dynamic_message_ascii(
+        &self,
+        #[payment_token] token_id: TokenIdentifier,
+        #[payment_nonce] nonce: u64,
+        #[payment_amount] amount: BigUint,
+    ) {
+        signal_error!(
+            "Got token {:?}, with nonce {}, amount {}. I prefer EGLD. ERROR!",
+            token_id,
+            nonce,
+            amount
+        );
+    }
 }
