@@ -107,7 +107,7 @@ pub trait ManagedBufferFeatures {
 
     #[endpoint]
     fn dynamic_message(&self, bytes: ManagedBuffer) {
-        signal_error!("Got this buffer: {}. I don't like it, ERROR!", bytes);
+        signal_error!("Got this buffer: {:x}. I don't like it, ERROR!", bytes);
     }
 
     #[payable("*")]
@@ -119,7 +119,7 @@ pub trait ManagedBufferFeatures {
         #[payment_amount] amount: BigUint,
     ) {
         signal_error!(
-            "Got token {}, with nonce {}, amount {}. I prefer EGLD. ERROR!",
+            "Got token {:x}, with nonce {:x}, amount {:x}. I prefer EGLD. ERROR!",
             token_id,
             nonce,
             amount
@@ -135,7 +135,7 @@ pub trait ManagedBufferFeatures {
         #[payment_amount] amount: BigUint,
     ) {
         signal_error!(
-            "Got token {:?}, with nonce {}, amount {}. I prefer EGLD. ERROR!",
+            "Got token {}, with nonce {:x}, amount {:x}. I prefer EGLD. ERROR!",
             token_id,
             nonce,
             amount

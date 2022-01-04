@@ -8,7 +8,7 @@ use elrond_codec::TopEncode;
 const OPEN_BRACE: u8 = b'{';
 const CLOSED_BRACE: u8 = b'}';
 const TWO_DOTS: u8 = b':';
-const QUESTION_MARK: u8 = b'?';
+const X_LETTER: u8 = b'x';
 const HEX_VALUE_PREFIX: &[u8] = b"0x";
 
 const STATIC_BUFFER_LEN: usize = 10;
@@ -93,18 +93,18 @@ impl<M: ManagedTypeApi> FormattedMessageBuilder<M> {
                 CLOSED_BRACE => {
                     self.index_in_message += 1;
 
-                    return ArgDisplayType::Hex {
+                    return ArgDisplayType::Ascii {
                         static_part_start: starting_index,
                         static_part_end: static_msg_end_index,
                     };
                 },
                 TWO_DOTS => {
-                    if self.get_format_byte_or_panic(self.index_in_message + 1) == QUESTION_MARK
+                    if self.get_format_byte_or_panic(self.index_in_message + 1) == X_LETTER
                         && self.get_format_byte_or_panic(self.index_in_message + 2) == CLOSED_BRACE
                     {
                         self.index_in_message += 3;
 
-                        return ArgDisplayType::Ascii {
+                        return ArgDisplayType::Hex {
                             static_part_start: starting_index,
                             static_part_end: static_msg_end_index,
                         };
