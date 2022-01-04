@@ -4,6 +4,7 @@ mod managed_buffer_api;
 mod managed_type_api;
 mod managed_type_api_impl;
 mod static_var_api;
+mod token_identifier_util;
 
 pub use big_int_api::*;
 pub use elliptic_curve_api::*;
