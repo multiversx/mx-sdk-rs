@@ -52,7 +52,7 @@ impl BlockchainApiImpl for DebugApi {
             "get balance not yet implemented for accounts other than the contract itself"
         );
         let egld_balance = self.with_contract_account(|account| account.egld_balance.clone());
-        self.insert_new_big_uint(egld_balance)
+        self.insert_new_big_uint_old(egld_balance)
     }
 
     fn get_state_root_hash_legacy(&self) -> H256 {
@@ -147,7 +147,7 @@ impl BlockchainApiImpl for DebugApi {
                 .esdt
                 .get_esdt_balance(token.to_esdt_identifier().as_slice(), nonce)
         });
-        self.insert_new_big_uint(esdt_balance)
+        self.insert_new_big_uint_old(esdt_balance)
     }
 
     fn get_esdt_token_data(
@@ -208,15 +208,15 @@ impl DebugApi {
 
         EsdtTokenData {
             token_type: EsdtTokenType::based_on_token_nonce(nonce),
-            amount: self.insert_new_big_uint(instance.balance.clone()),
+            amount: self.insert_new_big_uint_old(instance.balance.clone()),
             frozen: false,
             hash: self
-                .insert_new_managed_buffer(instance.metadata.hash.clone().unwrap_or_default()),
-            name: self.insert_new_managed_buffer(instance.metadata.name.clone()),
-            attributes: self.insert_new_managed_buffer(instance.metadata.attributes.clone()),
+                .insert_new_managed_buffer_old(instance.metadata.hash.clone().unwrap_or_default()),
+            name: self.insert_new_managed_buffer_old(instance.metadata.name.clone()),
+            attributes: self.insert_new_managed_buffer_old(instance.metadata.attributes.clone()),
             creator,
             royalties: self
-                .insert_new_big_uint(num_bigint::BigUint::from(instance.metadata.royalties)),
+                .insert_new_big_uint_old(num_bigint::BigUint::from(instance.metadata.royalties)),
             uris,
         }
     }
