@@ -115,7 +115,7 @@ extern "C" {
         errorLength: i32,
         gas: i64,
         extraGasForCallback: i64,
-    ) -> !;
+    ) -> i32;
 
     /// Allows us to filter results from nested sync call
     fn getNumReturnData() -> i32;
@@ -255,7 +255,7 @@ impl SendApiImpl for VmApiImpl {
         arg_buffer: &ManagedArgBuffer<Self>,
     ) -> Result<(), &'static [u8]> {
         unsafe {
-            managedCreateAsyncCall(
+            let result = managedCreateAsyncCall(
                 to.get_raw_handle(),
                 amount.get_raw_handle(),
                 endpoint_name.get_raw_handle(),
@@ -266,8 +266,12 @@ impl SendApiImpl for VmApiImpl {
                 error.len() as i32,
                 gas as i64,
                 extra_gas_for_callback as i64,
-            )
+            );
+            if result != 0 {
+                error_hook::signal_error(b"register async call failed")
+            }
         }
+        Ok(())
     }
 
     fn deploy_contract(
