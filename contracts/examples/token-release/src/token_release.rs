@@ -42,7 +42,7 @@ pub trait TokenRelease {
             "The group already exists"
         );
         require!(
-            release_ticks > (0 as u64),
+            release_ticks > 0_u64,
             "The schedule must have at least 1 unlock period"
         );
         require!(
@@ -81,7 +81,7 @@ pub trait TokenRelease {
             "The group already exists"
         );
         require!(
-            release_ticks > (0 as u64),
+            release_ticks > 0_u64,
             "The schedule must have at least 1 unlock period"
         );
         require!(
@@ -150,7 +150,7 @@ pub trait TokenRelease {
         let address_groups = self.user_groups(&address).get();
         for group_identifier in address_groups.iter()
         {
-            self.users_in_group(&group_identifier).update(|users_in_group_no| *users_in_group_no -= 1);
+            self.users_in_group(group_identifier).update(|users_in_group_no| *users_in_group_no -= 1);
         }
         self.user_groups(&address).clear();
         self.claimed_balance(&address).clear();
@@ -227,14 +227,14 @@ pub trait TokenRelease {
 
     #[view]
     fn verify_address_change(&self, address: &ManagedAddress) -> ManagedAddress {
-        let new_address = self.address_change_request(&address).get();
+        let new_address = self.address_change_request(address).get();
         new_address
     }
 
     #[view]
     fn get_claimable_tokens(&self, address: &ManagedAddress) -> BigUint {
-        let total_claimable_amount = self.calculate_claimable_tokens(&address);
-        let current_balance = self.claimed_balance(&address).get();
+        let total_claimable_amount = self.calculate_claimable_tokens(address);
+        let current_balance = self.claimed_balance(address).get();
         if total_claimable_amount > current_balance {
             total_claimable_amount - current_balance
         } else {
@@ -247,15 +247,15 @@ pub trait TokenRelease {
     fn calculate_claimable_tokens(&self, address: &ManagedAddress) -> (BigUint) {
         let starting_timestamp = self.activation_timestamp().get();
         let current_timestamp = self.blockchain().get_block_timestamp();
-        let address_groups = self.user_groups(&address).get();
+        let address_groups = self.user_groups(address).get();
 
         let mut claimable_amount = BigUint::zero();
 
         // Compute the total claimable amount at the time of the request, for all of the user groups
         for group_identifier in address_groups.iter()
         {
-            let schedule = self.group_schedule(&group_identifier).get();
-            let users_in_group_no = self.users_in_group(&group_identifier).get();            
+            let schedule = self.group_schedule(group_identifier).get();
+            let users_in_group_no = self.users_in_group(group_identifier).get();            
             let time_passed = current_timestamp - starting_timestamp;
 
             match schedule.unlock_type {
@@ -292,11 +292,11 @@ pub trait TokenRelease {
     }
 
     fn send_tokens(&self, token_identifier: &TokenIdentifier, address: &ManagedAddress, amount: &BigUint) {
-        self.send().direct(&address, &token_identifier, 0, &amount, &[]);
+        self.send().direct(address, token_identifier, 0, amount, &[]);
     }
 
     fn mint_all_tokens(&self, token_identifier: &TokenIdentifier, amount: &BigUint) {
-        self.send().esdt_local_mint(&token_identifier, 0, &amount);
+        self.send().esdt_local_mint(token_identifier, 0, amount);
     }
 
     fn require_setup_period_live(&self) -> SCResult<()> {
