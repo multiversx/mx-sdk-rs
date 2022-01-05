@@ -660,12 +660,12 @@ impl SendApiImpl for VmApiImpl {
     }
 
     fn storage_store_tx_hash_key(&self, data: &ManagedBuffer<Self>) {
-        let tx_hash = self.get_tx_hash();
+        let tx_hash = self.get_tx_hash::<Self>();
         self.storage_store_managed_buffer_raw(tx_hash.get_raw_handle(), data.get_raw_handle());
     }
 
     fn storage_load_tx_hash_key(&self) -> ManagedBuffer<Self> {
-        let tx_hash = self.get_tx_hash();
+        let tx_hash = self.get_tx_hash::<Self>();
         ManagedBuffer::from_raw_handle(
             self.storage_load_managed_buffer_raw(tx_hash.get_raw_handle()),
         )
@@ -678,11 +678,11 @@ impl SendApiImpl for VmApiImpl {
         arg_buffer: &ManagedArgBuffer<Self>,
     ) -> ManagedVec<Self, ManagedBuffer<Self>> {
         // account-level built-in function, so the destination address is the contract itself
-        let own_address = VmApiImpl::blockchain_api_impl().get_sc_address();
+        let own_address = VmApiImpl::blockchain_api_impl().get_sc_address_handle();
 
         self.execute_on_dest_context_raw(
             gas,
-            &own_address,
+            &ManagedAddress::from_raw_handle(own_address),
             &BigUint::zero(),
             function_name,
             arg_buffer,

@@ -1,8 +1,8 @@
 use std::cmp::Ordering;
 
 use elrond_wasm::{
-    api::Handle,
-    types::{ManagedBuffer, ManagedType},
+    api::{Handle, ManagedBufferApi},
+    types::{Address, ManagedBuffer, ManagedType},
 };
 use num_bigint::Sign;
 use num_traits::Zero;
@@ -19,6 +19,13 @@ impl DebugApi {
         let mut managed_types = self.m_types_borrow_mut();
         let handle = managed_types.managed_buffer_map.insert_new_handle(value);
         ManagedBuffer::from_raw_handle(handle)
+    }
+
+    pub fn address_handle_to_value(&self, address_handle: Handle) -> Address {
+        let mut address = Address::zero();
+        self.mb_load_slice(address_handle, 0, address.as_mut())
+            .unwrap();
+        address
     }
 
     pub fn insert_new_big_uint(&self, value: num_bigint::BigUint) -> Handle {

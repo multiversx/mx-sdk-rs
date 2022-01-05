@@ -21,16 +21,16 @@ use alloc::boxed::Box;
 /// to isolate mock state mutability from the contract interface.
 pub struct BlockchainWrapper<A>
 where
-    A: BlockchainApi + StorageReadApi + ManagedTypeApi + ErrorApi,
+    A: BlockchainApi + ManagedTypeApi + ErrorApi,
 {
     _phantom: PhantomData<A>,
 }
 
 impl<A> BlockchainWrapper<A>
 where
-    A: BlockchainApi + StorageReadApi + ManagedTypeApi + ErrorApi,
+    A: BlockchainApi + ManagedTypeApi + ErrorApi,
 {
-    pub(crate) fn new() -> Self {
+    pub fn new() -> Self {
         BlockchainWrapper {
             _phantom: PhantomData,
         }
@@ -43,7 +43,7 @@ where
 
     #[inline]
     pub fn get_caller(&self) -> ManagedAddress<A> {
-        A::blockchain_api_impl().get_caller()
+        ManagedAddress::from_raw_handle(A::blockchain_api_impl().get_caller_handle())
     }
 
     #[inline]
@@ -53,7 +53,7 @@ where
 
     #[inline]
     pub fn get_sc_address(&self) -> ManagedAddress<A> {
-        A::blockchain_api_impl().get_sc_address()
+        ManagedAddress::from_raw_handle(A::blockchain_api_impl().get_sc_address_handle())
     }
 
     #[inline]
@@ -63,7 +63,7 @@ where
 
     #[inline]
     pub fn get_owner_address(&self) -> ManagedAddress<A> {
-        A::blockchain_api_impl().get_owner_address()
+        ManagedAddress::from_raw_handle(A::blockchain_api_impl().get_owner_address_handle())
     }
 
     pub fn check_caller_is_owner(&self) {
@@ -79,7 +79,7 @@ where
 
     #[inline]
     pub fn get_shard_of_address(&self, address: &ManagedAddress<A>) -> u32 {
-        A::blockchain_api_impl().get_shard_of_address(address)
+        A::blockchain_api_impl().get_shard_of_address(address.get_raw_handle())
     }
 
     #[inline]
@@ -89,17 +89,19 @@ where
 
     #[inline]
     pub fn is_smart_contract(&self, address: &ManagedAddress<A>) -> bool {
-        A::blockchain_api_impl().is_smart_contract(address)
+        A::blockchain_api_impl().is_smart_contract(address.get_raw_handle())
     }
 
     #[inline]
     pub fn get_balance_legacy(&self, address: &Address) -> BigUint<A> {
-        A::blockchain_api_impl().get_balance_legacy(address)
+        BigUint::from_raw_handle(A::blockchain_api_impl().get_balance_legacy(address))
     }
 
     #[inline]
     pub fn get_balance(&self, address: &ManagedAddress<A>) -> BigUint<A> {
-        A::blockchain_api_impl().get_balance(address)
+        BigUint::from_raw_handle(
+            A::blockchain_api_impl().get_balance_handle(address.get_raw_handle()),
+        )
     }
 
     #[inline]
@@ -128,7 +130,7 @@ where
 
     #[inline]
     pub fn get_tx_hash(&self) -> ManagedByteArray<A, 32> {
-        A::blockchain_api_impl().get_tx_hash()
+        A::blockchain_api_impl().get_tx_hash::<A>()
     }
 
     #[inline]
@@ -163,7 +165,7 @@ where
 
     #[inline]
     pub fn get_block_random_seed(&self) -> ManagedByteArray<A, 48> {
-        A::blockchain_api_impl().get_block_random_seed()
+        A::blockchain_api_impl().get_block_random_seed::<A>()
     }
 
     #[inline]
@@ -193,7 +195,7 @@ where
 
     #[inline]
     pub fn get_prev_block_random_seed(&self) -> ManagedByteArray<A, 48> {
-        A::blockchain_api_impl().get_prev_block_random_seed()
+        A::blockchain_api_impl().get_prev_block_random_seed::<A>()
     }
 
     #[inline]
@@ -202,7 +204,7 @@ where
         address: &ManagedAddress<A>,
         token_id: &TokenIdentifier<A>,
     ) -> u64 {
-        A::blockchain_api_impl().get_current_esdt_nft_nonce(address, token_id)
+        A::blockchain_api_impl().get_current_esdt_nft_nonce::<A>(address, token_id)
     }
 
     #[inline]
@@ -212,7 +214,7 @@ where
         token_id: &TokenIdentifier<A>,
         nonce: u64,
     ) -> BigUint<A> {
-        A::blockchain_api_impl().get_esdt_balance(address, token_id, nonce)
+        A::blockchain_api_impl().get_esdt_balance::<A>(address, token_id, nonce)
     }
 
     #[inline]
@@ -222,18 +224,23 @@ where
         token_id: &TokenIdentifier<A>,
         nonce: u64,
     ) -> EsdtTokenData<A> {
-        A::blockchain_api_impl().get_esdt_token_data(address, token_id, nonce)
+        A::blockchain_api_impl().get_esdt_token_data::<A>(address, token_id, nonce)
     }
 
+    pub fn get_esdt_local_roles(&self, token_id: &TokenIdentifier<A>) -> EsdtLocalRoleFlags {
+        A::blockchain_api_impl().get_esdt_local_roles::<A>(token_id)
+    }
+}
+
+impl<A> BlockchainWrapper<A>
+where
+    A: BlockchainApi + StorageReadApi + ManagedTypeApi + ErrorApi,
+{
     /// Retrieves validator rewards, as set by the protocol.
     #[inline]
     pub fn get_cumulated_validator_rewards(&self) -> BigUint<A> {
         let raw_handle = A::storage_read_api_impl()
             .storage_load_big_uint_raw(storage::protected_keys::ELROND_REWARD_KEY);
         BigUint::from_raw_handle(raw_handle)
-    }
-
-    pub fn get_esdt_local_roles(&self, token_id: &TokenIdentifier<A>) -> EsdtLocalRoleFlags {
-        A::blockchain_api_impl().get_esdt_local_roles(token_id)
     }
 }
