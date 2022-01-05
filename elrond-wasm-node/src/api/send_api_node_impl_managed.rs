@@ -248,24 +248,22 @@ impl SendApiImpl for VmApiImpl {
         to: &ManagedAddress<Self>,
         amount: &BigUint<Self>,
         endpoint_name: &ManagedBuffer<Self>,
-        arg_buffer: &ManagedArgBuffer<Self>,
         success: &'static [u8],
         error: &'static [u8],
         gas: u64,
         extra_gas_for_callback: u64,
+        arg_buffer: &ManagedArgBuffer<Self>,
     ) -> Result<(), &'static [u8]> {
         unsafe {
-            let success_function = success.to_boxed_bytes();
-            let error_function = error.to_boxed_bytes();
             managedCreateAsyncCall(
                 to.get_raw_handle(),
                 amount.get_raw_handle(),
                 endpoint_name.get_raw_handle(),
                 arg_buffer.get_raw_handle(),
-                success_function.as_ptr(),
-                success_function.len() as i64,
-                error_function.as_ptr(),
-                error_function.len() as i64,
+                success.as_ptr(),
+                success.len() as i32,
+                error.as_ptr(),
+                error.len() as i32,
                 gas as i64,
                 extra_gas_for_callback as i64,
             )

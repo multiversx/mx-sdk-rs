@@ -193,6 +193,19 @@ impl SendApiImpl for VmApiImpl {
         }
     }
 
+    fn create_async_call_raw(
+        &self,
+        to: &ManagedAddress<Self>,
+        amount: &BigUint<Self>,
+        endpoint_name: &ManagedBuffer<Self>,
+        success: &'static [u8],
+        error: &'static [u8],
+        gas: u64,
+        extra_gas_for_callback: u64,
+        arg_buffer: &ManagedArgBuffer<Self>,
+    ) -> Result<(), &'static [u8]> {
+        unreachable!()
+    }
     fn direct_egld_execute(
         &self,
         to: &ManagedAddress<Self>,

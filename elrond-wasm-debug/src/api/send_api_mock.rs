@@ -352,11 +352,11 @@ impl SendApiImpl for DebugApi {
         _to: &ManagedAddress<Self>,
         _amount: &BigUint<Self>,
         _endpoint_name: &ManagedBuffer<Self>,
-        _arg_buffer: &ManagedArgBuffer<Self>,
         _success: &'static [u8],
         _error: &'static [u8],
         _gas: u64,
         _extra_gas_for_callback: u64,
+        _arg_buffer: &ManagedArgBuffer<Self>,
     ) -> Result<(), &'static [u8]> {
         panic!("create_async_call_raw not implemented yet!");
     }

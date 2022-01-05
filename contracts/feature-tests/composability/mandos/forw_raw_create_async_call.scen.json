@@ -27,10 +27,9 @@
                 "from": "address:a_user",
                 "to": "sc:forwarder",
                 "egldValue": "1000",
-                "function": "forward_async_call",
+                "function": "forward_create_async_call",
                 "arguments": [
                     "sc:vault",
-                    "str:echo_caller",
                     "30,000,000",
                     "10,000,000"
                 ],
@@ -42,26 +41,14 @@
                 "status": "0",
                 "logs": [
                     {
-                        "address": "sc:vault",
-                        "endpoint": "str:accept_funds",
-                        "topics": [
-                            "str:accept_funds",
-                            "str:EGLD",
-                            "str:FungibleESDT",
-                            "1000",
-                            "0"
-                        ],
-                        "data": ""
-                    },
-                    {
                         "address": "sc:forwarder",
-                        "endpoint": "str:callBack",
+                        "endpoint": "str:forward_create_async_call",
                         "topics": [
-                            "str:callback_raw"
+                            "str:create_async_call_raw"
                         ],
-                        "data": {
-                            "0-status": "biguint:0"
-                        }
+                        "data": [
+                            "nested:sc:forwarder"
+                        ]
                     }
                 ],
                 "gas": "*",
@@ -72,27 +59,19 @@
             "step": "checkState",
             "accounts": {
                 "address:a_user": {
-                    "nonce": "*",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "nonce": "0",
+                    "balance": "1000"
                 },
                 "sc:vault": {
                     "nonce": "0",
-                    "balance": "1000",
-                    "storage": {
-                        "str:call_counts|nested:str:accept_funds": "1"
-                    },
+                    "balance": "0",
                     "code": "file:../vault/output/vault.wasm"
                 },
                 "sc:forwarder": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "str:callback_data.len": "1",
-                        "str:callback_data.item|u32:1": [
-                            "u32:0"
-                        ]
+                        "str:async_call_callback_data": "1"
                     },
                     "code": "file:../forwarder-raw/output/forwarder-raw.wasm"
                 }

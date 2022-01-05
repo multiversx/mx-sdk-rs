@@ -9,6 +9,7 @@ elrond_wasm_node::wasm_endpoints! {
     (
         init
         callBack
+        async_call_callback_data
         call_execute_on_dest_context
         call_execute_on_dest_context_by_caller
         call_execute_on_dest_context_readonly
@@ -21,6 +22,7 @@ elrond_wasm_node::wasm_endpoints! {
         forward_async_call
         forward_async_call_half_payment
         forward_async_retrieve_multi_transfer_funds
+        forward_create_async_call
         forward_direct_esdt_via_transf_exec
         forward_payment
         forward_transf_exec
