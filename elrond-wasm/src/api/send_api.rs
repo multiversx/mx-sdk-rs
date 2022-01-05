@@ -86,11 +86,11 @@ pub trait SendApiImpl {
         to: &ManagedAddress<Self::ManagedTypeApi>,
         amount: &BigUint<Self::ManagedTypeApi>,
         endpoint_name: &ManagedBuffer<Self::ManagedTypeApi>,
-        arg_buffer: &ManagedArgBuffer<Self::ManagedTypeApi>,
         success: &'static [u8],
         error: &'static [u8],
         gas: u64,
         extra_gas_for_callback: u64,
+        arg_buffer: &ManagedArgBuffer<Self::ManagedTypeApi>,
     ) -> Result<(), &'static [u8]>;
     /// Deploys a new contract in the same shard.
     /// Unlike `async_call_raw`, the deployment is synchronous and tx execution continues afterwards.
