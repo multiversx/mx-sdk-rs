@@ -4,6 +4,7 @@ use super::Handle;
 
 /// Returned if load/copy slice could not be performed.
 /// No further data needed.
+#[derive(Debug)]
 pub struct InvalidSliceError;
 
 /// A raw bytes buffer managed by Arwen.

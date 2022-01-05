@@ -3,10 +3,10 @@ use crate::{
     DebugApi,
 };
 use elrond_wasm::{
-    api::{BlockchainApi, BlockchainApiImpl},
+    api::{BlockchainApi, BlockchainApiImpl, Handle, ManagedBufferApi, ManagedTypeApi},
     types::{
         Address, BigUint, EsdtLocalRole, EsdtLocalRoleFlags, EsdtTokenData, EsdtTokenType,
-        ManagedAddress, ManagedBuffer, ManagedVec, TokenIdentifier, H256,
+        ManagedAddress, ManagedBuffer, ManagedType, ManagedVec, TokenIdentifier, H256,
     },
 };
 
@@ -19,7 +19,9 @@ impl BlockchainApi for DebugApi {
 }
 
 impl BlockchainApiImpl for DebugApi {
-    type ManagedTypeApi = DebugApi;
+    fn get_caller_legacy(&self) -> Address {
+        self.input_ref().from.clone()
+    }
 
     fn get_sc_address_legacy(&self) -> Address {
         self.input_ref().to.clone()
@@ -42,17 +44,13 @@ impl BlockchainApiImpl for DebugApi {
         is_smart_contract_address(address)
     }
 
-    fn get_caller_legacy(&self) -> Address {
-        self.input_ref().from.clone()
-    }
-
-    fn get_balance_legacy(&self, address: &Address) -> BigUint<Self> {
+    fn get_balance_legacy(&self, address: &Address) -> Handle {
         assert!(
             address == &self.get_sc_address_legacy(),
             "get balance not yet implemented for accounts other than the contract itself"
         );
         let egld_balance = self.with_contract_account(|account| account.egld_balance.clone());
-        self.insert_new_big_uint_old(egld_balance)
+        self.insert_new_big_uint(egld_balance)
     }
 
     fn get_state_root_hash_legacy(&self) -> H256 {
@@ -113,13 +111,13 @@ impl BlockchainApiImpl for DebugApi {
             .clone()
     }
 
-    fn get_current_esdt_nft_nonce(
+    fn get_current_esdt_nft_nonce<M: ManagedTypeApi>(
         &self,
-        address: &ManagedAddress<Self>,
-        token: &TokenIdentifier<Self>,
+        address: &ManagedAddress<M>,
+        token: &TokenIdentifier<M>,
     ) -> u64 {
         assert!(
-            address == &self.get_sc_address(),
+            self.mb_eq(address.get_raw_handle(), self.get_sc_address_handle()),
             "get_current_esdt_nft_nonce not yet implemented for accounts other than the contract itself"
         );
 
@@ -131,14 +129,14 @@ impl BlockchainApiImpl for DebugApi {
         })
     }
 
-    fn get_esdt_balance(
+    fn get_esdt_balance<M: ManagedTypeApi>(
         &self,
-        address: &ManagedAddress<Self>,
-        token: &TokenIdentifier<Self>,
+        address: &ManagedAddress<M>,
+        token: &TokenIdentifier<M>,
         nonce: u64,
-    ) -> BigUint<Self> {
+    ) -> BigUint<M> {
         assert!(
-            address == &self.get_sc_address(),
+            self.mb_eq(address.get_raw_handle(), self.get_sc_address_handle()),
             "get_esdt_balance not yet implemented for accounts other than the contract itself"
         );
 
@@ -147,15 +145,15 @@ impl BlockchainApiImpl for DebugApi {
                 .esdt
                 .get_esdt_balance(token.to_esdt_identifier().as_slice(), nonce)
         });
-        self.insert_new_big_uint_old(esdt_balance)
+        BigUint::from_raw_handle(self.insert_new_big_uint(esdt_balance))
     }
 
-    fn get_esdt_token_data(
+    fn get_esdt_token_data<M: ManagedTypeApi>(
         &self,
-        address: &ManagedAddress<Self>,
-        token: &TokenIdentifier<Self>,
+        address: &ManagedAddress<M>,
+        token: &TokenIdentifier<M>,
         nonce: u64,
-    ) -> EsdtTokenData<Self> {
+    ) -> EsdtTokenData<M> {
         self.blockchain_cache()
             .with_account(&address.to_address(), |account| {
                 let instance = account
@@ -170,7 +168,10 @@ impl BlockchainApiImpl for DebugApi {
             })
     }
 
-    fn get_esdt_local_roles(&self, token_id: &TokenIdentifier<Self>) -> EsdtLocalRoleFlags {
+    fn get_esdt_local_roles<M: ManagedTypeApi>(
+        &self,
+        token_id: &TokenIdentifier<M>,
+    ) -> EsdtLocalRoleFlags {
         let sc_address = self.input_ref().to.clone();
         self.blockchain_cache()
             .with_account(&sc_address, |account| {
@@ -190,11 +191,11 @@ impl BlockchainApiImpl for DebugApi {
 }
 
 impl DebugApi {
-    fn esdt_token_data_from_instance(
+    fn esdt_token_data_from_instance<M: ManagedTypeApi>(
         &self,
         nonce: u64,
         instance: &EsdtInstance,
-    ) -> EsdtTokenData<Self> {
+    ) -> EsdtTokenData<M> {
         let creator = if let Some(creator) = &instance.metadata.creator {
             ManagedAddress::from_address(creator)
         } else {
@@ -208,15 +209,21 @@ impl DebugApi {
 
         EsdtTokenData {
             token_type: EsdtTokenType::based_on_token_nonce(nonce),
-            amount: self.insert_new_big_uint_old(instance.balance.clone()),
+            amount: BigUint::from_raw_handle(self.insert_new_big_uint(instance.balance.clone())),
             frozen: false,
-            hash: self
-                .insert_new_managed_buffer_old(instance.metadata.hash.clone().unwrap_or_default()),
-            name: self.insert_new_managed_buffer_old(instance.metadata.name.clone()),
-            attributes: self.insert_new_managed_buffer_old(instance.metadata.attributes.clone()),
+            hash: ManagedBuffer::from_raw_handle(
+                self.insert_new_managed_buffer(instance.metadata.hash.clone().unwrap_or_default()),
+            ),
+            name: ManagedBuffer::from_raw_handle(
+                self.insert_new_managed_buffer(instance.metadata.name.clone()),
+            ),
+            attributes: ManagedBuffer::from_raw_handle(
+                self.insert_new_managed_buffer(instance.metadata.attributes.clone()),
+            ),
             creator,
-            royalties: self
-                .insert_new_big_uint_old(num_bigint::BigUint::from(instance.metadata.royalties)),
+            royalties: BigUint::from_raw_handle(
+                self.insert_new_big_uint(num_bigint::BigUint::from(instance.metadata.royalties)),
+            ),
             uris,
         }
     }
