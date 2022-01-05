@@ -11,6 +11,7 @@ stat --printf="examples/lottery-erc20 %s\n" contracts/examples/lottery-erc20/out
 stat --printf="examples/lottery-esdt %s\n" contracts/examples/lottery-esdt/output/lottery-esdt.wasm
 stat --printf="examples/erc20 %s\n" contracts/examples/erc20/output/erc20.wasm
 stat --printf="examples/multisig %s\n" contracts/examples/multisig/output/multisig.wasm
+stat --printf="examples/proxy-pause %s\n" contracts/examples/proxy-pause/output/proxy-pause.wasm
 
 stat --printf="tests/basic-features %s\n" contracts/feature-tests/basic-features/output/basic-features.wasm
 stat --printf="tests/forwarder %s\n" contracts/feature-tests/composability/forwarder/output/forwarder.wasm
