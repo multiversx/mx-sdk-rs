@@ -24,7 +24,7 @@ macro_rules! imports {
             io::*,
             non_zero_usize,
             non_zero_util::*,
-            only_owner, require, sc_error,
+            only_owner, require, sc_error, signal_error,
             storage::mappers::*,
             types::{
                 SCResult::{Err, Ok},
@@ -55,6 +55,19 @@ macro_rules! derive_imports {
 macro_rules! sc_error {
     ($s:expr) => {
         elrond_wasm::types::SCResult::Err(elrond_wasm::types::StaticSCError::from($s)).into()
+    };
+}
+
+#[macro_export]
+macro_rules! signal_error {
+    ($msg:expr, $($arg:expr),*) => {
+        {
+            let mut builder = FormattedMessageBuilder::<Self::Api>::new($msg.as_bytes());
+            $(
+                builder.add_argument(&$arg);
+            )*
+            builder.signal_error();
+        }
     };
 }
 
