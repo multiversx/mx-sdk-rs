@@ -1,0 +1,89 @@
+{
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:TOKEN-123456": "1,000"
+                    }
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "1",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "dynamic_message",
+                "arguments": [
+                    "str:abcd"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:Got this buffer: 0x61626364. I don't like it, ERROR!",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "2",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "dynamic_message_multiple",
+                "esdt": {
+                    "tokenIdentifier": "str:TOKEN-123456",
+                    "value": "1,000"
+                },
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:Got token 0x544f4b454e2d313233343536, with nonce 0x, amount 0x03e8. I prefer EGLD. ERROR!",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "3",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "dynamic_message_ascii",
+                "esdt": {
+                    "tokenIdentifier": "str:TOKEN-123456",
+                    "value": "1,000"
+                },
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:Got token TOKEN-123456, with nonce 0x, amount 0x03e8. I prefer EGLD. ERROR!",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}
