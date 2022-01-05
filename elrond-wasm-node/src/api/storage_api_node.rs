@@ -27,7 +27,7 @@ extern "C" {
     fn mBufferNew() -> i32;
     fn mBufferStorageStore(keyHandle: i32, mBufferHandle: i32) -> i32;
     fn mBufferStorageLoad(keyHandle: i32, mBufferHandle: i32) -> i32;
-    fn mBufferStorageLoadFromAddress(addressHandle: i32, keyHandle: i32, mBufferHandle: i32) -> i32;
+    fn mBufferStorageLoadFromAddress(addressHandle: i32, keyHandle: i32, mBufferHandle: i32);
     fn mBufferGetLength(mBufferHandle: i32) -> i32;
 }
 
