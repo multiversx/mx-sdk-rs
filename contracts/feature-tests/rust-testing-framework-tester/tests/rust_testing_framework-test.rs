@@ -5,7 +5,7 @@ use elrond_wasm_debug::{
     managed_token_id, rust_biguint, testing_framework::*, tx_mock::TxInputESDT, unwrap_or_panic,
     DebugApi,
 };
-use rust_testing_framework_tester::*;
+use rust_testing_framework_tester::{dummy_module::DummyModule, *};
 
 const TEST_OUTPUT_PATH: &'static str = "test.scen.json";
 const TEST_MULTIPLE_SC_OUTPUT_PATH: &'static str = "test_multiple_sc.scen.json";
@@ -1136,5 +1136,20 @@ fn test_random_buffer_twice() {
 
         assert_eq!(rand_buffer_1, expected_buffer_1);
         assert_eq!(rand_buffer_2, expected_buffer_2);
+    });
+}
+
+#[test]
+fn test_modules() {
+    let mut wrapper = BlockchainStateWrapper::new();
+    let sc_wrapper = wrapper.create_sc_account(
+        &rust_biguint!(0),
+        None,
+        rust_testing_framework_tester::contract_obj,
+        SC_WASM_PATH,
+    );
+
+    wrapper.execute_query(&sc_wrapper, |sc| {
+        let _ = sc.some_function();
     });
 }

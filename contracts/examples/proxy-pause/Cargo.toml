@@ -1,0 +1,24 @@
+[package]
+name = "proxy-pause"
+version = "0.0.0"
+authors = [ "you",]
+edition = "2018"
+publish = false
+
+[lib]
+path = "src/proxy_pause.rs"
+
+[dependencies.elrond-wasm]
+version = "0.25.0"
+path = "../../../elrond-wasm"
+
+[dependencies.elrond-wasm-modules]
+version = "0.25.0"
+path = "../../../elrond-wasm-modules"
+
+[dev-dependencies.elrond-wasm-debug]
+version = "0.25.0"
+path = "../../../elrond-wasm-debug"
+
+[dev-dependencies.use-module]
+path = "../../feature-tests/use-module"
