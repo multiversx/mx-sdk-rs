@@ -8,6 +8,7 @@ stat --printf="examples/crowdfunding-esdt %s\n" contracts/examples/crowdfunding-
 stat --printf="examples/factorial %s\n" contracts/examples/factorial/output/factorial.wasm
 stat --printf="examples/lottery-esdt %s\n" contracts/examples/lottery-esdt/output/lottery-esdt.wasm
 stat --printf="examples/multisig %s\n" contracts/examples/multisig/output/multisig.wasm
+stat --printf="examples/proxy-pause %s\n" contracts/examples/proxy-pause/output/proxy-pause.wasm
 
 stat --printf="examples/erc20 %s\n" contracts/feature-tests/erc-style-contracts/erc20/output/erc20.wasm
 stat --printf="examples/crowdfunding-erc20 %s\n" contracts/feature-tests/erc-style-contracts/crowdfunding-erc20/output/crowdfunding-erc20.wasm

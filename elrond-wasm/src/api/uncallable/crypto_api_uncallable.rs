@@ -14,8 +14,6 @@ impl CryptoApi for UncallableApi {
 }
 
 impl CryptoApiImpl for UncallableApi {
-    type ManagedTypeApi = UncallableApi;
-
     fn sha256_legacy(&self, _data: &[u8]) -> H256 {
         unreachable!()
     }
