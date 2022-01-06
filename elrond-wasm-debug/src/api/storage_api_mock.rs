@@ -1,8 +1,11 @@
 use crate::{tx_mock::TxPanic, DebugApi};
 use alloc::vec::Vec;
-use elrond_wasm::api::{
-    BigIntApi, Handle, ManagedBufferApi, StorageReadApi, StorageReadApiImpl, StorageWriteApi,
-    StorageWriteApiImpl,
+use elrond_wasm::{
+    api::{
+        BigIntApi, Handle, ManagedBufferApi, StorageReadApi, StorageReadApiImpl, StorageWriteApi,
+        StorageWriteApiImpl,
+    },
+    types::Address,
 };
 use num_bigint::{BigInt, BigUint, Sign};
 use num_traits::ToPrimitive;
@@ -70,6 +73,17 @@ impl StorageReadApiImpl for DebugApi {
                 message: b"storage value out of range".to_vec(),
             })
         }
+    }
+
+    fn storage_load_from_address(&self, address_handle: Handle, key_handle: Handle) -> Handle {
+        let address = Address::from_slice(self.mb_to_boxed_bytes(address_handle).as_slice());
+        let key_bytes = self.mb_to_boxed_bytes(key_handle);
+        self.with_account(&address, |account| {
+            match account.storage.get(key_bytes.as_slice()) {
+                None => self.mb_new_from_bytes(&[]),
+                Some(value) => self.mb_new_from_bytes(value.as_slice()),
+            }
+        })
     }
 }
 
