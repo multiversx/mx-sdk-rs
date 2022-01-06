@@ -336,6 +336,11 @@ fn storage_i64_go() {
 }
 
 #[test]
+fn storage_load_from_address_go() {
+    elrond_wasm_debug::mandos_go("mandos/storage_load_from_address.scen.json");
+}
+
+#[test]
 fn storage_i64_bad_go() {
     elrond_wasm_debug::mandos_go("mandos/storage_i64_bad.scen.json");
 }
