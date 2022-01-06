@@ -44,7 +44,8 @@ pub trait FormattedMessageFeatures: elrond_wasm::contract_base::ContractBase + S
                 elrond_wasm::types::ManagedBufferCachedBuilder::<Self::Api>::new_from_slice(&[]);
             let mut ___encoded_arg___ = elrond_wasm::types::ManagedBuffer::<Self::Api>::new();
             ___buffer___.append_bytes(b"Got this buffer:");
-            bytes.top_encode(&mut ___encoded_arg___).unwrap();
+            elrond_wasm::elrond_codec::TopEncode::top_encode(&bytes, &mut ___encoded_arg___)
+                .unwrap();
             elrond_wasm::hex_util::add_arg_as_hex_to_buffer(&mut ___buffer___, ___encoded_arg___);
             ___buffer___.append_bytes(b". I don\'t like it, ERROR!");
             let mut ___as_managed_buffer___ = ___buffer___.into_managed_buffer();
@@ -65,13 +66,16 @@ pub trait FormattedMessageFeatures: elrond_wasm::contract_base::ContractBase + S
                 elrond_wasm::types::ManagedBufferCachedBuilder::<Self::Api>::new_from_slice(&[]);
             let mut ___encoded_arg___ = elrond_wasm::types::ManagedBuffer::<Self::Api>::new();
             ___buffer___.append_bytes(b"Got token");
-            token_id.top_encode(&mut ___encoded_arg___).unwrap();
+            elrond_wasm::elrond_codec::TopEncode::top_encode(&token_id, &mut ___encoded_arg___)
+                .unwrap();
             elrond_wasm::hex_util::add_arg_as_hex_to_buffer(&mut ___buffer___, ___encoded_arg___);
             ___buffer___.append_bytes(b", with nonce");
-            nonce.top_encode(&mut ___encoded_arg___).unwrap();
+            elrond_wasm::elrond_codec::TopEncode::top_encode(&nonce, &mut ___encoded_arg___)
+                .unwrap();
             elrond_wasm::hex_util::add_arg_as_hex_to_buffer(&mut ___buffer___, ___encoded_arg___);
             ___buffer___.append_bytes(b", amount");
-            amount.top_encode(&mut ___encoded_arg___).unwrap();
+            elrond_wasm::elrond_codec::TopEncode::top_encode(&amount, &mut ___encoded_arg___)
+                .unwrap();
             elrond_wasm::hex_util::add_arg_as_hex_to_buffer(&mut ___buffer___, ___encoded_arg___);
             ___buffer___.append_bytes(b". I prefer EGLD. ERROR!");
             let mut ___as_managed_buffer___ = ___buffer___.into_managed_buffer();
@@ -92,13 +96,16 @@ pub trait FormattedMessageFeatures: elrond_wasm::contract_base::ContractBase + S
                 elrond_wasm::types::ManagedBufferCachedBuilder::<Self::Api>::new_from_slice(&[]);
             let mut ___encoded_arg___ = elrond_wasm::types::ManagedBuffer::<Self::Api>::new();
             ___buffer___.append_bytes(b"Got token");
-            token_id.top_encode(&mut ___encoded_arg___).unwrap();
+            elrond_wasm::elrond_codec::TopEncode::top_encode(&token_id, &mut ___encoded_arg___)
+                .unwrap();
             ___buffer___.append_managed_buffer(&___encoded_arg___);
             ___buffer___.append_bytes(b", with nonce");
-            nonce.top_encode(&mut ___encoded_arg___).unwrap();
+            elrond_wasm::elrond_codec::TopEncode::top_encode(&nonce, &mut ___encoded_arg___)
+                .unwrap();
             elrond_wasm::hex_util::add_arg_as_hex_to_buffer(&mut ___buffer___, ___encoded_arg___);
             ___buffer___.append_bytes(b", amount");
-            amount.top_encode(&mut ___encoded_arg___).unwrap();
+            elrond_wasm::elrond_codec::TopEncode::top_encode(&amount, &mut ___encoded_arg___)
+                .unwrap();
             elrond_wasm::hex_util::add_arg_as_hex_to_buffer(&mut ___buffer___, ___encoded_arg___);
             ___buffer___.append_bytes(b". I prefer EGLD. ERROR!");
             let mut ___as_managed_buffer___ = ___buffer___.into_managed_buffer();
