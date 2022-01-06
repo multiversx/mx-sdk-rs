@@ -5,6 +5,7 @@ use crate::{
     types::{BigUint, ManagedType},
 };
 
+#[derive(Default)]
 pub struct PrintHelper<A>
 where
     A: PrintApi + ManagedTypeApi,

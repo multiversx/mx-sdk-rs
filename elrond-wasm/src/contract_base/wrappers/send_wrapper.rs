@@ -20,6 +20,7 @@ const PERCENTAGE_TOTAL: u64 = 10_000;
 /// API that groups methods that either send EGLD or ESDT, or that call other contracts.
 // pub trait SendApi: Clone + Sized {
 
+#[derive(Default)]
 pub struct SendWrapper<A>
 where
     A: CallTypeApi + StorageReadApi + BlockchainApi,

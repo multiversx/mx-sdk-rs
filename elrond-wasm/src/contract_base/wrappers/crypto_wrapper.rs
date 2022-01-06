@@ -6,6 +6,7 @@ use crate::{
 };
 use alloc::boxed::Box;
 
+#[derive(Default)]
 pub struct CryptoWrapper<A>
 where
     A: CryptoApi,

@@ -5,6 +5,7 @@ use crate::{
     types::{BigUint, EsdtTokenPayment, EsdtTokenType, ManagedType, ManagedVec, TokenIdentifier},
 };
 
+#[derive(Default)]
 pub struct CallValueWrapper<A>
 where
     A: CallValueApi + ErrorApi + ManagedTypeApi,
