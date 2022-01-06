@@ -1,7 +1,7 @@
 use crate::{BigUintPrinter, DebugApi};
 use elrond_wasm::{
-    api::{PrintApi, PrintApiImpl},
-    types::BigUint,
+    api::{Handle, PrintApi, PrintApiImpl},
+    types::{BigUint, ManagedType},
 };
 
 impl PrintApi for DebugApi {
@@ -13,13 +13,11 @@ impl PrintApi for DebugApi {
 }
 
 impl PrintApiImpl for DebugApi {
-    type ManagedTypeApi = DebugApi;
-
-    fn print_biguint(&self, biguint: &BigUint<Self>) {
+    fn print_biguint(&self, bu_handle: Handle) {
         println!(
             "{:?}",
             BigUintPrinter {
-                value: biguint.clone()
+                value: BigUint::<Self>::from_raw_handle(bu_handle)
             }
         );
     }

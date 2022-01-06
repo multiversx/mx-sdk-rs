@@ -15,8 +15,6 @@ impl CryptoApi for DebugApi {
 }
 
 impl CryptoApiImpl for DebugApi {
-    type ManagedTypeApi = DebugApi;
-
     fn sha256_legacy(&self, data: &[u8]) -> H256 {
         let mut hasher = Sha256::new();
         hasher.update(data);
