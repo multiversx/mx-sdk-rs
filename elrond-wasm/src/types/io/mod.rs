@@ -1,5 +1,6 @@
 mod async_call_result;
 mod async_call_result_managed;
+mod formatted_message_builder;
 mod ignore_args;
 mod multi_args;
 mod multi_args_vec;
@@ -12,6 +13,7 @@ mod sc_result;
 
 pub use async_call_result::{AsyncCallError, AsyncCallResult};
 pub use async_call_result_managed::{ManagedAsyncCallError, ManagedAsyncCallResult};
+pub use formatted_message_builder::FormattedMessageBuilder;
 pub use ignore_args::IgnoreVarArgs;
 pub use multi_args::*;
 pub use multi_args_vec::{MultiArgVec, MultiResultVec, VarArgs};
