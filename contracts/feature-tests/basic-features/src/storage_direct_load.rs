@@ -76,4 +76,13 @@ pub trait StorageLoadFeatures {
     #[endpoint]
     #[storage_get("map3")]
     fn load_map3(&self, x: usize) -> bool;
+
+    #[endpoint]
+    fn load_from_address_raw(&self, address: ManagedAddress, key: ManagedBuffer) -> ManagedBuffer {
+        use elrond_wasm::api::{StorageReadApi, StorageReadApiImpl};
+        ManagedBuffer::from_raw_handle(
+            Self::Api::storage_read_api_impl()
+                .storage_load_from_address(address.get_raw_handle(), key.get_raw_handle()),
+        )
+    }
 }
