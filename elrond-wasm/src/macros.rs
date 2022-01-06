@@ -65,8 +65,6 @@ macro_rules! signal_error {
             elrond_wasm::types::ManagedBufferCachedBuilder::<Self::Api>::new_from_slice(&[]);
         let mut ___encoded_arg___ = elrond_wasm::types::ManagedBuffer::<Self::Api>::new();
 
-        // $($arg);*
-
         elrond_wasm::derive::sc_error_format!($msg, $($arg)+);
 
         let mut ___as_managed_buffer___ = ___buffer___.into_managed_buffer();
