@@ -1,4 +1,7 @@
-use crate::api::{ErrorApiImpl, Handle, ManagedBufferApi, ManagedTypeApiImpl, StaticVarApiImpl, StorageReadApi, StorageReadApiImpl, VMApi};
+use crate::api::{
+    ErrorApiImpl, Handle, ManagedBufferApi, ManagedTypeApiImpl, StaticVarApiImpl, StorageReadApi,
+    StorageReadApiImpl, VMApi,
+};
 
 use super::ExternalViewApi;
 use alloc::vec::Vec;
@@ -42,14 +45,16 @@ impl<A: VMApi> StorageReadApiImpl for ExternalViewApi<A> {
         A::managed_type_impl().mb_len(value_handle)
     }
 
-    fn storage_load_u64(&self, key: &[u8]) -> u64 {
+    fn storage_load_u64(&self, _key: &[u8]) -> u64 {
         // TODO: probably unreachable, investigate whether or not we can remove forever
-        A::error_api_impl().signal_error(b"storage_load_u64 not implemented for external view contracts")
+        A::error_api_impl()
+            .signal_error(b"storage_load_u64 not implemented for external view contracts")
     }
 
-    fn storage_load_i64(&self, key: &[u8]) -> i64 {
+    fn storage_load_i64(&self, _key: &[u8]) -> i64 {
         // TODO: probably unreachable, investigate whether or not we can remove forever
-        A::error_api_impl().signal_error(b"storage_load_i64 not implemented for external view contracts")
+        A::error_api_impl()
+            .signal_error(b"storage_load_i64 not implemented for external view contracts")
     }
 
     fn storage_load_from_address(&self, address_handle: Handle, key_handle: Handle) -> Handle {
