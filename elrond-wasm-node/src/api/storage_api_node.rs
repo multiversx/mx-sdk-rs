@@ -27,6 +27,7 @@ extern "C" {
     fn mBufferNew() -> i32;
     fn mBufferStorageStore(keyHandle: i32, mBufferHandle: i32) -> i32;
     fn mBufferStorageLoad(keyHandle: i32, mBufferHandle: i32) -> i32;
+    fn mBufferStorageLoadFromAddress(addressHandle: i32, keyHandle: i32, mBufferHandle: i32);
     fn mBufferGetLength(mBufferHandle: i32) -> i32;
 }
 
@@ -102,6 +103,15 @@ impl StorageReadApiImpl for VmApiImpl {
     #[inline]
     fn storage_load_i64(&self, key: &[u8]) -> i64 {
         unsafe { smallIntStorageLoadSigned(key.as_ref().as_ptr(), key.len() as i32) }
+    }
+
+    #[inline]
+    fn storage_load_from_address(&self, address_handle: Handle, key_handle: Handle) -> Handle {
+        unsafe {
+            let value_handle = mBufferNew();
+            mBufferStorageLoadFromAddress(address_handle, key_handle, value_handle);
+            value_handle
+        }
     }
 }
 

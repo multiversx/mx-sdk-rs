@@ -41,6 +41,10 @@ impl StorageReadApiImpl for UncallableApi {
     fn storage_load_i64(&self, _key: &[u8]) -> i64 {
         unreachable!()
     }
+
+    fn storage_load_from_address(&self, _address_handle: Handle, _key_handle: Handle) -> Handle {
+        unreachable!()
+    }
 }
 
 impl StorageWriteApi for UncallableApi {
