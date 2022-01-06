@@ -128,6 +128,15 @@ where
         true
     }
 
+    pub fn remove_all<I>(&mut self, iter: I)
+    where
+        I: IntoIterator<Item = T>,
+    {
+        for item in iter {
+            self.remove(&item);
+        }
+    }
+
     /// An iterator visiting all elements in arbitrary order.
     /// The iterator element type is `&'a T`.
     pub fn iter(&self) -> Iter<SA, T> {
@@ -137,6 +146,21 @@ where
     /// Checks the internal consistency of the collection. Used for unit tests.
     pub fn check_internal_consistency(&self) -> bool {
         self.queue_mapper.check_internal_consistency()
+    }
+}
+
+impl<SA, T> Extend<T> for SetMapper<SA, T>
+where
+    SA: StorageMapperApi,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
+{
+    fn extend<I>(&mut self, iter: I)
+    where
+        I: IntoIterator<Item = T>,
+    {
+        for item in iter {
+            self.insert(item);
+        }
     }
 }
 

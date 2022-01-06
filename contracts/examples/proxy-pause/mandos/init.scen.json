@@ -1,0 +1,109 @@
+{
+    "name": "init",
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "1",
+                    "balance": "0"
+                },
+                "sc:use-module": {
+                    "nonce": "1",
+                    "balance": "0",
+                    "code": "file:../../../feature-tests/use-module/output/use-module.wasm",
+                    "owner": "sc:proxy-pause"
+                }
+            },
+            "newAddresses": [
+                {
+                    "creatorAddress": "address:owner",
+                    "creatorNonce": "1",
+                    "newAddress": "sc:proxy-pause"
+                }
+            ]
+        },
+        {
+            "step": "scDeploy",
+            "txId": "1-deploy",
+            "tx": {
+                "from": "address:owner",
+                "contractCode": "file:../output/proxy-pause.wasm",
+                "arguments": [],
+                "gasLimit": "20,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "2-check-owners",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:proxy-pause",
+                "function": "owners",
+                "arguments": [],
+                "gasLimit": "5,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "address:owner"
+                ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "3-add-contract",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:proxy-pause",
+                "function": "addContracts",
+                "arguments": [
+                    "sc:use-module"
+                ],
+                "gasLimit": "20,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "4-check-contracts",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:proxy-pause",
+                "function": "contracts",
+                "arguments": [],
+                "gasLimit": "5,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "sc:use-module"
+                ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

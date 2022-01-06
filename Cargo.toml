@@ -56,6 +56,8 @@ members = [
   "contracts/examples/order-book/factory/meta",
   "contracts/examples/order-book/pair",
   "contracts/examples/order-book/pair/meta",
+  "contracts/examples/proxy-pause",
+  "contracts/examples/proxy-pause/meta",
   "contracts/examples/ping-pong-egld",
   "contracts/examples/ping-pong-egld/meta",
 

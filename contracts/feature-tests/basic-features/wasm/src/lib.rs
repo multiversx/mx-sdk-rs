@@ -175,6 +175,7 @@ elrond_wasm_node::wasm_endpoints! {
         load_big_int
         load_big_uint
         load_bool
+        load_from_address_raw
         load_i64
         load_map1
         load_map2
