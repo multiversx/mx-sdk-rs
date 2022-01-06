@@ -46,13 +46,9 @@ impl DebugApi {
         self.insert_new_big_uint(num_bigint::BigUint::zero())
     }
 
-    pub fn big_uint_value(&self, bu: &elrond_wasm::types::BigUint<Self>) -> num_bigint::BigUint {
+    pub fn big_uint_handle_to_value(&self, bu_handle: Handle) -> num_bigint::BigUint {
         let managed_types = self.m_types_borrow();
-        managed_types
-            .big_int_map
-            .get(bu.get_raw_handle())
-            .magnitude()
-            .clone()
+        managed_types.big_int_map.get(bu_handle).magnitude().clone()
     }
 }
 

@@ -339,7 +339,7 @@ where
         attributes: &T,
         uris: &ManagedVec<A, ManagedBuffer<A>>,
     ) -> u64 {
-        let mut arg_buffer = ManagedArgBuffer::new_empty();
+        let mut arg_buffer = ManagedArgBuffer::<A>::new_empty();
         arg_buffer.push_arg(token);
         arg_buffer.push_arg(amount);
         arg_buffer.push_arg(name);
