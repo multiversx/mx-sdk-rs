@@ -19,6 +19,7 @@ use alloc::boxed::Box;
 /// They simply pass on/retrieve data to/from the protocol.
 /// When mocking the blockchain state, we use the Rc/RefCell pattern
 /// to isolate mock state mutability from the contract interface.
+#[derive(Default)]
 pub struct BlockchainWrapper<A>
 where
     A: BlockchainApi + ManagedTypeApi + ErrorApi,
