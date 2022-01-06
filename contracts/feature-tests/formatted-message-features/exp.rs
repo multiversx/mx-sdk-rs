@@ -42,11 +42,21 @@ pub trait FormattedMessageFeatures: elrond_wasm::contract_base::ContractBase + S
         {
             let mut ___buffer___ =
                 elrond_wasm::types::ManagedBufferCachedBuilder::<Self::Api>::new_from_slice(&[]);
-            let mut ___encoded_arg___ = elrond_wasm::types::ManagedBuffer::<Self::Api>::new();
+            let mut ___encoded_args___ = elrond_wasm::types::ManagedVec::<
+                Self::Api,
+                elrond_wasm::types::ManagedBuffer<Self::Api>,
+            >::new();
+            let mut ___temp_buffer___ = elrond_wasm::types::ManagedBuffer::<Self::Api>::new();
+            let _ =
+                elrond_wasm::elrond_codec::TopEncode::top_encode(&bytes, &mut ___temp_buffer___);
+            ___encoded_args___.push(___temp_buffer___);
+            let mut encoded_arg_by_index: elrond_wasm::types::ManagedBuffer<Self::Api>;
             ___buffer___.append_bytes(b"Got this buffer:");
-            elrond_wasm::elrond_codec::TopEncode::top_encode(&bytes, &mut ___encoded_arg___)
-                .unwrap();
-            elrond_wasm::hex_util::add_arg_as_hex_to_buffer(&mut ___buffer___, ___encoded_arg___);
+            encoded_arg_by_index = ___encoded_args___.get(0usize).unwrap();
+            elrond_wasm::hex_util::add_arg_as_hex_to_buffer(
+                &mut ___buffer___,
+                &encoded_arg_by_index,
+            );
             ___buffer___.append_bytes(b". I don\'t like it, ERROR!");
             let mut ___as_managed_buffer___ = ___buffer___.into_managed_buffer();
             Self::Api::error_api_impl()
@@ -64,19 +74,41 @@ pub trait FormattedMessageFeatures: elrond_wasm::contract_base::ContractBase + S
         {
             let mut ___buffer___ =
                 elrond_wasm::types::ManagedBufferCachedBuilder::<Self::Api>::new_from_slice(&[]);
-            let mut ___encoded_arg___ = elrond_wasm::types::ManagedBuffer::<Self::Api>::new();
+            let mut ___encoded_args___ = elrond_wasm::types::ManagedVec::<
+                Self::Api,
+                elrond_wasm::types::ManagedBuffer<Self::Api>,
+            >::new();
+            let mut ___temp_buffer___ = elrond_wasm::types::ManagedBuffer::<Self::Api>::new();
+            let _ =
+                elrond_wasm::elrond_codec::TopEncode::top_encode(&token_id, &mut ___temp_buffer___);
+            ___encoded_args___.push(___temp_buffer___);
+            let mut ___temp_buffer___ = elrond_wasm::types::ManagedBuffer::<Self::Api>::new();
+            let _ =
+                elrond_wasm::elrond_codec::TopEncode::top_encode(&nonce, &mut ___temp_buffer___);
+            ___encoded_args___.push(___temp_buffer___);
+            let mut ___temp_buffer___ = elrond_wasm::types::ManagedBuffer::<Self::Api>::new();
+            let _ =
+                elrond_wasm::elrond_codec::TopEncode::top_encode(&amount, &mut ___temp_buffer___);
+            ___encoded_args___.push(___temp_buffer___);
+            let mut encoded_arg_by_index: elrond_wasm::types::ManagedBuffer<Self::Api>;
             ___buffer___.append_bytes(b"Got token");
-            elrond_wasm::elrond_codec::TopEncode::top_encode(&token_id, &mut ___encoded_arg___)
-                .unwrap();
-            elrond_wasm::hex_util::add_arg_as_hex_to_buffer(&mut ___buffer___, ___encoded_arg___);
+            encoded_arg_by_index = ___encoded_args___.get(0usize).unwrap();
+            elrond_wasm::hex_util::add_arg_as_hex_to_buffer(
+                &mut ___buffer___,
+                &encoded_arg_by_index,
+            );
             ___buffer___.append_bytes(b", with nonce");
-            elrond_wasm::elrond_codec::TopEncode::top_encode(&nonce, &mut ___encoded_arg___)
-                .unwrap();
-            elrond_wasm::hex_util::add_arg_as_hex_to_buffer(&mut ___buffer___, ___encoded_arg___);
+            encoded_arg_by_index = ___encoded_args___.get(1usize).unwrap();
+            elrond_wasm::hex_util::add_arg_as_hex_to_buffer(
+                &mut ___buffer___,
+                &encoded_arg_by_index,
+            );
             ___buffer___.append_bytes(b", amount");
-            elrond_wasm::elrond_codec::TopEncode::top_encode(&amount, &mut ___encoded_arg___)
-                .unwrap();
-            elrond_wasm::hex_util::add_arg_as_hex_to_buffer(&mut ___buffer___, ___encoded_arg___);
+            encoded_arg_by_index = ___encoded_args___.get(2usize).unwrap();
+            elrond_wasm::hex_util::add_arg_as_hex_to_buffer(
+                &mut ___buffer___,
+                &encoded_arg_by_index,
+            );
             ___buffer___.append_bytes(b". I prefer EGLD. ERROR!");
             let mut ___as_managed_buffer___ = ___buffer___.into_managed_buffer();
             Self::Api::error_api_impl()
@@ -94,19 +126,38 @@ pub trait FormattedMessageFeatures: elrond_wasm::contract_base::ContractBase + S
         {
             let mut ___buffer___ =
                 elrond_wasm::types::ManagedBufferCachedBuilder::<Self::Api>::new_from_slice(&[]);
-            let mut ___encoded_arg___ = elrond_wasm::types::ManagedBuffer::<Self::Api>::new();
+            let mut ___encoded_args___ = elrond_wasm::types::ManagedVec::<
+                Self::Api,
+                elrond_wasm::types::ManagedBuffer<Self::Api>,
+            >::new();
+            let mut ___temp_buffer___ = elrond_wasm::types::ManagedBuffer::<Self::Api>::new();
+            let _ =
+                elrond_wasm::elrond_codec::TopEncode::top_encode(&token_id, &mut ___temp_buffer___);
+            ___encoded_args___.push(___temp_buffer___);
+            let mut ___temp_buffer___ = elrond_wasm::types::ManagedBuffer::<Self::Api>::new();
+            let _ =
+                elrond_wasm::elrond_codec::TopEncode::top_encode(&nonce, &mut ___temp_buffer___);
+            ___encoded_args___.push(___temp_buffer___);
+            let mut ___temp_buffer___ = elrond_wasm::types::ManagedBuffer::<Self::Api>::new();
+            let _ =
+                elrond_wasm::elrond_codec::TopEncode::top_encode(&amount, &mut ___temp_buffer___);
+            ___encoded_args___.push(___temp_buffer___);
+            let mut encoded_arg_by_index: elrond_wasm::types::ManagedBuffer<Self::Api>;
             ___buffer___.append_bytes(b"Got token");
-            elrond_wasm::elrond_codec::TopEncode::top_encode(&token_id, &mut ___encoded_arg___)
-                .unwrap();
-            ___buffer___.append_managed_buffer(&___encoded_arg___);
+            encoded_arg_by_index = ___encoded_args___.get(0usize).unwrap();
+            ___buffer___.append_managed_buffer(&encoded_arg_by_index);
             ___buffer___.append_bytes(b", with nonce");
-            elrond_wasm::elrond_codec::TopEncode::top_encode(&nonce, &mut ___encoded_arg___)
-                .unwrap();
-            elrond_wasm::hex_util::add_arg_as_hex_to_buffer(&mut ___buffer___, ___encoded_arg___);
+            encoded_arg_by_index = ___encoded_args___.get(1usize).unwrap();
+            elrond_wasm::hex_util::add_arg_as_hex_to_buffer(
+                &mut ___buffer___,
+                &encoded_arg_by_index,
+            );
             ___buffer___.append_bytes(b", amount");
-            elrond_wasm::elrond_codec::TopEncode::top_encode(&amount, &mut ___encoded_arg___)
-                .unwrap();
-            elrond_wasm::hex_util::add_arg_as_hex_to_buffer(&mut ___buffer___, ___encoded_arg___);
+            encoded_arg_by_index = ___encoded_args___.get(2usize).unwrap();
+            elrond_wasm::hex_util::add_arg_as_hex_to_buffer(
+                &mut ___buffer___,
+                &encoded_arg_by_index,
+            );
             ___buffer___.append_bytes(b". I prefer EGLD. ERROR!");
             let mut ___as_managed_buffer___ = ___buffer___.into_managed_buffer();
             Self::Api::error_api_impl()

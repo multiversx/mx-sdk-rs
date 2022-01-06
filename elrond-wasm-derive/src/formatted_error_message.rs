@@ -35,7 +35,7 @@ pub(crate) fn split_msg_into_format_parts(raw_string: &str) -> Vec<FormatPartTyp
                     if i > 1 {
                         let end_index = i - 1;
                         if start_index != end_index {
-                            let static_part = &ascii_bytes[start_index..end_index];
+                            let static_part = &ascii_bytes[start_index..=end_index];
                             let as_str = String::from_utf8(static_part.to_vec()).unwrap();
                             parts.push(FormatPartType::StaticAscii(as_str));
                         }
@@ -66,7 +66,7 @@ pub(crate) fn split_msg_into_format_parts(raw_string: &str) -> Vec<FormatPartTyp
                     if i > 1 {
                         let end_index = i - 1;
                         if start_index != end_index {
-                            let static_part = &ascii_bytes[start_index..end_index];
+                            let static_part = &ascii_bytes[start_index..=end_index];
                             let as_str = String::from_utf8(static_part.to_vec()).unwrap();
                             parts.push(FormatPartType::StaticAscii(as_str));
                         }

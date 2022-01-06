@@ -106,34 +106,18 @@ pub fn sc_error_format(input: proc_macro::TokenStream) -> proc_macro::TokenStrea
                 token_stream.extend_one(proc_macro::TokenStream::from(add_static_part));
             },
             FormatPartType::Ascii => {
-                let group_as_tt = arg_groups[arg_index].stream();
-                let mut group_tt_iter = group_as_tt.into_iter();
-                let ident = match group_tt_iter.next().unwrap() {
-                    proc_macro::TokenTree::Ident(ident) => ident,
-                    _ => panic!("Invalid argument, expected a named variable"),
-                };
-
-                let varname = format_ident!("{}", ident.to_string());
                 let encode_arg = quote! {
-                    elrond_wasm::elrond_codec::TopEncode::top_encode(&#varname, &mut ___encoded_arg___).unwrap();
-                    ___buffer___.append_managed_buffer(&___encoded_arg___);
+                    encoded_arg_by_index = ___encoded_args___.get(#arg_index).unwrap();
+                    ___buffer___.append_managed_buffer(&encoded_arg_by_index);
                 };
                 token_stream.extend_one(proc_macro::TokenStream::from(encode_arg));
 
                 arg_index += 1;
             },
             FormatPartType::Hex => {
-                let group_as_tt = arg_groups[arg_index].stream();
-                let mut group_tt_iter = group_as_tt.into_iter();
-                let ident = match group_tt_iter.next().unwrap() {
-                    proc_macro::TokenTree::Ident(ident) => ident,
-                    _ => panic!("Invalid argument, expected a named variable"),
-                };
-
-                let varname = format_ident!("{}", ident.to_string());
                 let encode_arg = quote! {
-                    elrond_wasm::elrond_codec::TopEncode::top_encode(&#varname, &mut ___encoded_arg___).unwrap();
-                    elrond_wasm::hex_util::add_arg_as_hex_to_buffer(&mut ___buffer___, ___encoded_arg___);
+                    encoded_arg_by_index = ___encoded_args___.get(#arg_index).unwrap();
+                    elrond_wasm::hex_util::add_arg_as_hex_to_buffer(&mut ___buffer___, &encoded_arg_by_index);
                 };
                 token_stream.extend_one(proc_macro::TokenStream::from(encode_arg));
 

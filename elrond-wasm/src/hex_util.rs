@@ -62,7 +62,7 @@ pub fn hex_digits_to_byte(digit1: u8, digit2: u8) -> Option<u8> {
 
 pub fn add_arg_as_hex_to_buffer<M: ManagedTypeApi>(
     buffer: &mut ManagedBufferCachedBuilder<M>,
-    arg: ManagedBuffer<M>,
+    arg: &ManagedBuffer<M>,
 ) {
     buffer.append_bytes(HEX_VALUE_PREFIX);
 
