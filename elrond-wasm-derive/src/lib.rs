@@ -115,7 +115,7 @@ pub fn sc_error_format(input: proc_macro::TokenStream) -> proc_macro::TokenStrea
 
                 let varname = format_ident!("{}", ident.to_string());
                 let encode_arg = quote! {
-                    #varname.top_encode(&mut ___encoded_arg___).unwrap();
+                    elrond_wasm::elrond_codec::TopEncode::top_encode(&#varname, &mut ___encoded_arg___).unwrap();
                     ___buffer___.append_managed_buffer(&___encoded_arg___);
                 };
                 token_stream.extend_one(proc_macro::TokenStream::from(encode_arg));
@@ -132,7 +132,7 @@ pub fn sc_error_format(input: proc_macro::TokenStream) -> proc_macro::TokenStrea
 
                 let varname = format_ident!("{}", ident.to_string());
                 let encode_arg = quote! {
-                    #varname.top_encode(&mut ___encoded_arg___).unwrap();
+                    elrond_wasm::elrond_codec::TopEncode::top_encode(&#varname, &mut ___encoded_arg___).unwrap();
                     elrond_wasm::hex_util::add_arg_as_hex_to_buffer(&mut ___buffer___, ___encoded_arg___);
                 };
                 token_stream.extend_one(proc_macro::TokenStream::from(encode_arg));
