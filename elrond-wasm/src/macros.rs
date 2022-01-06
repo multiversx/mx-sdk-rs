@@ -60,15 +60,18 @@ macro_rules! sc_error {
 
 #[macro_export]
 macro_rules! signal_error {
-    ($msg:expr, $($arg:expr),*) => {
-        {
-            let mut builder = FormattedMessageBuilder::<Self::Api>::new($msg.as_bytes());
-            $(
-                builder.add_argument(&$arg);
-            )*
-            builder.signal_error();
-        }
-    };
+    ($msg:tt, $($arg:expr),*) => {{
+        let mut ___buffer___ =
+            elrond_wasm::types::ManagedBufferCachedBuilder::<Self::Api>::new_from_slice(&[]);
+        let mut ___encoded_arg___ = elrond_wasm::types::ManagedBuffer::<Self::Api>::new();
+
+        // $($arg);*
+
+        elrond_wasm::derive::sc_error_format!($msg, $($arg)+);
+
+        let mut ___as_managed_buffer___ = ___buffer___.into_managed_buffer();
+        Self::Api::error_api_impl().signal_error_from_buffer(___as_managed_buffer___.get_raw_handle());
+    }};
 }
 
 /// Equivalent to the `?` operator for SCResult.

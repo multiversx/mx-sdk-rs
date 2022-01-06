@@ -1,6 +1,10 @@
 #![allow(stable_features)]
 // ensure we don't run out of macro stack
 #![recursion_limit = "1024"]
+#![feature(extend_one)]
+use formatted_error_message::{count_args, split_msg_into_format_parts, FormatPartType};
+
+use crate::generate::util::byte_str_literal;
 
 #[macro_use]
 extern crate syn;
@@ -19,6 +23,8 @@ mod parse;
 mod preprocessing;
 mod type_abi_derive;
 mod validate;
+
+mod formatted_error_message;
 
 #[proc_macro_attribute]
 pub fn contract(
@@ -56,4 +62,85 @@ pub fn managed_vec_item_derive(input: proc_macro::TokenStream) -> proc_macro::To
     let ast = syn::parse(input).unwrap();
 
     managed_vec_item_derive::managed_vec_item_derive(&ast)
+}
+
+#[proc_macro]
+pub fn sc_error_format(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    let mut token_stream = proc_macro::TokenStream::new();
+    let mut arg_index = 0usize;
+
+    // println!("{:#?}", input);
+
+    let mut iter = input.into_iter();
+    let format_string = if let proc_macro::TokenTree::Literal(lit) = iter.next().unwrap() {
+        lit.to_string()
+    } else {
+        panic!("First argument should be the format string");
+    };
+
+    let mut arg_groups = Vec::new();
+    for tt in iter {
+        match tt {
+            proc_macro::TokenTree::Group(g) => arg_groups.push(g),
+            _ => {},
+        }
+    }
+
+    let parts = split_msg_into_format_parts(&format_string);
+    let nr_args_provided = count_args(&parts);
+    if nr_args_provided != arg_groups.len() {
+        panic!(
+            "Number of braces ({}) does not match number of arguments ({}).",
+            nr_args_provided,
+            arg_groups.len()
+        )
+    }
+
+    for part in parts {
+        match part {
+            FormatPartType::StaticAscii(ascii_string) => {
+                let str_as_bytes = byte_str_literal(ascii_string.as_bytes());
+                let add_static_part = quote! {
+                    ___buffer___.append_bytes(#str_as_bytes);
+                };
+                token_stream.extend_one(proc_macro::TokenStream::from(add_static_part));
+            },
+            FormatPartType::Ascii => {
+                let group_as_tt = arg_groups[arg_index].stream();
+                let mut group_tt_iter = group_as_tt.into_iter();
+                let ident = match group_tt_iter.next().unwrap() {
+                    proc_macro::TokenTree::Ident(ident) => ident,
+                    _ => panic!("Invalid argument, expected a named variable"),
+                };
+
+                let varname = format_ident!("{}", ident.to_string());
+                let encode_arg = quote! {
+                    #varname.top_encode(&mut ___encoded_arg___).unwrap();
+                    ___buffer___.append_managed_buffer(&___encoded_arg___);
+                };
+                token_stream.extend_one(proc_macro::TokenStream::from(encode_arg));
+
+                arg_index += 1;
+            },
+            FormatPartType::Hex => {
+                let group_as_tt = arg_groups[arg_index].stream();
+                let mut group_tt_iter = group_as_tt.into_iter();
+                let ident = match group_tt_iter.next().unwrap() {
+                    proc_macro::TokenTree::Ident(ident) => ident,
+                    _ => panic!("Invalid argument, expected a named variable"),
+                };
+
+                let varname = format_ident!("{}", ident.to_string());
+                let encode_arg = quote! {
+                    #varname.top_encode(&mut ___encoded_arg___).unwrap();
+                    elrond_wasm::hex_util::add_arg_as_hex_to_buffer(&mut ___buffer___, ___encoded_arg___);
+                };
+                token_stream.extend_one(proc_macro::TokenStream::from(encode_arg));
+
+                arg_index += 1;
+            },
+        }
+    }
+
+    token_stream
 }
