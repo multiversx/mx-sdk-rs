@@ -83,6 +83,9 @@ elrond_wasm_node::wasm_endpoints! {
         div_big_int_ref
         div_big_uint
         div_big_uint_ref
+        dynamic_message
+        dynamic_message_ascii
+        dynamic_message_multiple
         echo_array_u8
         echo_arrayvec
         echo_async_result_empty
@@ -172,6 +175,7 @@ elrond_wasm_node::wasm_endpoints! {
         load_big_int
         load_big_uint
         load_bool
+        load_from_address_raw
         load_i64
         load_map1
         load_map2
