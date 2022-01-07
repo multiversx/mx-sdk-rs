@@ -1,11 +1,12 @@
-use core::marker::PhantomData;
+use core::{borrow::Borrow, marker::PhantomData};
 
 use crate::{
     api::{CryptoApi, CryptoApiImpl},
-    types::{BoxedBytes, MessageHashType, H256},
+    types::{BoxedBytes, ManagedBuffer, ManagedByteArray, ManagedType, MessageHashType, H256},
 };
 use alloc::boxed::Box;
 
+#[derive(Default)]
 pub struct CryptoWrapper<A>
 where
     A: CryptoApi,
@@ -23,20 +24,24 @@ where
         }
     }
 
-    /// Still pointing to the old implementation.
-    /// Use the raw API if you need the new one.
-    /// Will be changed after the new VM goes live.
-    /// We also need to wait for the next minor release so we don't break backwards compatibility.
-    pub fn sha256(&self, data: &[u8]) -> H256 {
+    pub fn sha256_legacy(&self, data: &[u8]) -> H256 {
         A::crypto_api_impl().sha256_legacy(data)
     }
 
-    /// Still pointing to the old implementation.
-    /// Use the raw API if you need the new one.
-    /// Will be changed after the new VM goes live.
-    /// We also need to wait for the next minor release so we don't break backwards compatibility.
-    pub fn keccak256(&self, data: &[u8]) -> H256 {
+    pub fn sha256<B: Borrow<ManagedBuffer<A>>>(&self, data: B) -> ManagedByteArray<A, 32> {
+        ManagedByteArray::from_raw_handle(
+            A::crypto_api_impl().sha256(data.borrow().get_raw_handle()),
+        )
+    }
+
+    pub fn keccak256_legacy(&self, data: &[u8]) -> H256 {
         A::crypto_api_impl().keccak256_legacy(data)
+    }
+
+    pub fn keccak256<B: Borrow<ManagedBuffer<A>>>(&self, data: B) -> ManagedByteArray<A, 32> {
+        ManagedByteArray::from_raw_handle(
+            A::crypto_api_impl().keccak256(data.borrow().get_raw_handle()),
+        )
     }
 
     pub fn ripemd160(&self, data: &[u8]) -> Box<[u8; 20]> {
