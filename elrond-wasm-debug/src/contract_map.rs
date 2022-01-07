@@ -6,19 +6,19 @@ use alloc::{boxed::Box, vec::Vec};
 use elrond_wasm::contract_base::CallableContract;
 use std::{collections::HashMap, fmt};
 
-pub type ContractCallFactory<A> = Box<dyn Fn(DebugApi) -> Box<dyn CallableContract<A>>>;
+pub type ContractCallFactory = Box<dyn Fn(DebugApi) -> Box<dyn CallableContract>>;
 
-pub struct ContractMap<A> {
-    contract_objs: HashMap<Vec<u8>, Box<dyn CallableContract<A>>>,
+pub struct ContractMap {
+    contract_objs: HashMap<Vec<u8>, Box<dyn CallableContract>>,
 }
 
-impl<A> fmt::Debug for ContractMap<A> {
+impl fmt::Debug for ContractMap {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("ContractMap").finish()
     }
 }
 
-impl<A> ContractMap<A> {
+impl ContractMap {
     pub fn new() -> Self {
         ContractMap {
             contract_objs: HashMap::new(),
@@ -29,7 +29,7 @@ impl<A> ContractMap<A> {
         &self,
         contract_identifier: &[u8],
         _debug_api: DebugApi,
-    ) -> Box<dyn CallableContract<A>> {
+    ) -> Box<dyn CallableContract> {
         if let Some(contract_obj) = self.contract_objs.get(contract_identifier) {
             contract_obj.clone_obj()
         } else {
@@ -40,7 +40,7 @@ impl<A> ContractMap<A> {
     pub fn register_contract(
         &mut self,
         contract_bytes: Vec<u8>,
-        new_contract_obj: Box<dyn CallableContract<A>>,
+        new_contract_obj: Box<dyn CallableContract>,
     ) {
         let previous_entry = self.contract_objs.insert(contract_bytes, new_contract_obj);
         assert!(previous_entry.is_none(), "contract inserted twice");
@@ -62,7 +62,7 @@ fn unknown_contract_panic(contract_identifier: &[u8]) -> ! {
     }
 }
 
-impl<A> Default for ContractMap<A> {
+impl Default for ContractMap {
     fn default() -> Self {
         Self::new()
     }
