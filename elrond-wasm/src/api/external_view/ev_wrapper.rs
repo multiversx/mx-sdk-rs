@@ -1,9 +1,12 @@
 use core::marker::PhantomData;
 
-use crate::api::{
-    BlockchainApi, CallTypeApi, CallValueApi, CryptoApi, EndpointArgumentApi, EndpointFinishApi,
-    ErrorApi, LogApi, ManagedTypeApi, PrintApi, SendApi, StaticVarApi, StorageMapperApi,
-    StorageWriteApi, VMApi,
+use crate::{
+    abi::EndpointLocationAbi,
+    api::{
+        BlockchainApi, CallTypeApi, CallValueApi, CryptoApi, EndpointArgumentApi,
+        EndpointFinishApi, ErrorApi, LogApi, ManagedTypeApi, PrintApi, SendApi, StaticVarApi,
+        StorageMapperApi, StorageWriteApi, VMApi,
+    },
 };
 
 #[derive(Clone)]
@@ -121,3 +124,9 @@ impl<A: VMApi> StorageWriteApi for ExternalViewApi<A> {
 impl<A: VMApi> CallTypeApi for ExternalViewApi<A> {}
 
 impl<A: VMApi> StorageMapperApi for ExternalViewApi<A> {}
+
+impl<A: VMApi> VMApi for ExternalViewApi<A> {
+    fn has_location(location: EndpointLocationAbi) -> bool {
+        location == EndpointLocationAbi::ViewContract
+    }
+}

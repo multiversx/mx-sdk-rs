@@ -1,3 +1,5 @@
+use crate::abi::EndpointLocationAbi;
+
 use super::{
     BlockchainApi, CallTypeApi, CallValueApi, CryptoApi, EndpointArgumentApi, EndpointFinishApi,
     ErrorApi, LogApi, ManagedTypeApi, PrintApi, SendApi, StorageMapperApi, StorageReadApi,
@@ -21,4 +23,5 @@ pub trait VMApi:
     + StorageMapperApi
     + Clone // TODO: remove
 {
+    fn has_location(location: EndpointLocationAbi) -> bool;
 }

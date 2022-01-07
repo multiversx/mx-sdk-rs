@@ -1,12 +1,17 @@
 use super::{supertrait_gen, util::*};
-use crate::model::{ContractTrait, Method, PublicRole};
+use crate::model::{ContractTrait, EndpointLocationMetadata, Method, PublicRole};
 
-fn function_selector_match_arm(m: &Method, endpoint_name: &str) -> proc_macro2::TokenStream {
+fn endpoint_match_arm(
+    m: &Method,
+    endpoint_name: &str,
+    location: &EndpointLocationMetadata,
+) -> proc_macro2::TokenStream {
     let fn_ident = &m.name;
     let call_method_ident = generate_call_method_name(fn_ident);
     let endpoint_name_str = array_literal(endpoint_name.to_string().as_bytes());
+    let location_tokens = location.to_tokens();
     quote! {
-        #endpoint_name_str =>
+        #endpoint_name_str if <Self::Api as elrond_wasm::api::VMApi>::has_location(#location_tokens) =>
         {
             self.#call_method_ident();
             true
@@ -19,10 +24,15 @@ pub fn generate_function_selector_body(contract: &ContractTrait) -> proc_macro2:
         .methods
         .iter()
         .filter_map(|m| match &m.public_role {
-            PublicRole::Init(_) => Some(function_selector_match_arm(m, "init")),
-            PublicRole::Endpoint(endpoint_metadata) => Some(function_selector_match_arm(
+            PublicRole::Init(_) => Some(endpoint_match_arm(
+                m,
+                "init",
+                &EndpointLocationMetadata::MainContract,
+            )),
+            PublicRole::Endpoint(endpoint_metadata) => Some(endpoint_match_arm(
                 m,
                 endpoint_metadata.public_name.to_string().as_str(),
+                &endpoint_metadata.location,
             )),
             _ => None,
         })
@@ -31,7 +41,7 @@ pub fn generate_function_selector_body(contract: &ContractTrait) -> proc_macro2:
         supertrait_gen::function_selector_module_calls(contract.supertraits.as_slice());
     quote! {
         if match fn_name {
-            b"callBack" => {
+            b"callBack" if <Self::Api as elrond_wasm::api::VMApi>::has_location(elrond_wasm::abi::EndpointLocationAbi::MainContract) => {
                 self::EndpointWrappers::callback(self);
                 return true;
             }
