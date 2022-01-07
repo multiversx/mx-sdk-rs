@@ -197,14 +197,14 @@ impl SendApiImpl for VmApiImpl {
 
     fn create_async_call_raw<M: ManagedTypeApi>(
         &self,
-        to: &ManagedAddress<Self>,
-        amount: &BigUint<Self>,
-        endpoint_name: &ManagedBuffer<Self>,
+        to: &ManagedAddress<M>,
+        amount: &BigUint<M>,
+        endpoint_name: &ManagedBuffer<M>,
         success: &'static [u8],
         error: &'static [u8],
         gas: u64,
         extra_gas_for_callback: u64,
-        arg_buffer: &ManagedArgBuffer<Self>,
+        arg_buffer: &ManagedArgBuffer<M>,
     ) -> Result<(), &'static [u8]> {
         unreachable!()
     }
