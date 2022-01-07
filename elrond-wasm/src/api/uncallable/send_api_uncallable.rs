@@ -84,14 +84,14 @@ impl SendApiImpl for UncallableApi {
 
     fn create_async_call_raw<M: ManagedTypeApi>(
         &self,
-        _to: &ManagedAddress<Self>,
-        _amount: &BigUint<Self>,
-        _endpoint_name: &ManagedBuffer<Self>,
+        _to: &ManagedAddress<M>,
+        _amount: &BigUint<M>,
+        _endpoint_name: &ManagedBuffer<M>,
         _success: &'static [u8],
         _error: &'static [u8],
         _gas: u64,
         _extra_gas_for_callback: u64,
-        _arg_buffer: &ManagedArgBuffer<Self>,
+        _arg_buffer: &ManagedArgBuffer<M>,
     ) -> Result<(), &'static [u8]> {
         unreachable!()
     }
