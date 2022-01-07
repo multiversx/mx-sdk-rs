@@ -26,29 +26,38 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "egldValue": "1000",
                 "function": "forward_create_async_call",
                 "arguments": [
                     "sc:vault",
-                    "30,000,000",
-                    "10,000,000"
+                    "str:echo_arguments",
+                    "300,000,000",
+                    "100,000,000",
+                    "1",
+                    "2"
                 ],
-                "gasLimit": "50,000,000",
+                "gasLimit": "500,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [],
+                "out": [
+                    "1",
+                    "2"
+                ],
                 "status": "0",
                 "logs": [
                     {
                         "address": "sc:forwarder",
-                        "endpoint": "str:forward_create_async_call",
+                        "endpoint": "str:success_callback",
                         "topics": [
-                            "str:create_async_call_raw"
+                            "str:async_call_event_callback"
                         ],
-                        "data": [
-                            "nested:sc:forwarder"
-                        ]
+                        "data": {
+                            "0-status": "biguint:0",
+                            "1-echoed-args": [
+                                "biguint:1",
+                                "biguint:2"
+                            ]
+                        }
                     }
                 ],
                 "gas": "*",
@@ -59,7 +68,7 @@
             "step": "checkState",
             "accounts": {
                 "address:a_user": {
-                    "nonce": "0",
+                    "nonce": "1",
                     "balance": "1000"
                 },
                 "sc:vault": {
@@ -71,7 +80,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "str:async_call_callback_data": "1"
+                        "str:async_call_callback_data": "true"
                     },
                     "code": "file:../forwarder-raw/output/forwarder-raw.wasm"
                 }

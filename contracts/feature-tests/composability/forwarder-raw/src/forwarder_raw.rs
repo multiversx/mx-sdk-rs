@@ -66,14 +66,16 @@ pub trait ForwarderRaw {
     fn forward_create_async_call(
         &self,
         to: ManagedAddress,
+        endpoint_name: ManagedBuffer,
         gas: u64,
         extra_gas_for_callback: u64,
         #[var_args] args: ManagedVarArgs<ManagedBuffer>,
     ) -> SCResult<()> {
+        let amount = BigUint::from(0u64);
         let _ = Self::Api::send_api_impl().create_async_call_raw(
             &to,
-            &BigUint::zero(),
-            &ManagedBuffer::from(&b"echo_caller"[..]),
+            &amount,
+            &endpoint_name,
             b"success_callback",
             b"error_callback",
             gas,
@@ -83,19 +85,26 @@ pub trait ForwarderRaw {
         Ok(())
     }
 
-    #[callback]
-    fn success_callback(&self) {
+    #[endpoint]
+    fn success_callback(&self, #[var_args] args: ManagedVarArgs<ManagedBuffer>) {
         self.async_call_callback_data().set(true);
+        let args_as_vec = args.into_vec_of_buffers();
+        self.async_call_event_callback(&args_as_vec);
     }
 
-    #[callback]
-    fn error_callback(&self) {
+    #[endpoint]
+    fn error_callback(&self, #[var_args] args: ManagedVarArgs<ManagedBuffer>) {
         self.async_call_callback_data().set(false);
+        let args_as_vec = args.into_vec_of_buffers();
+        self.async_call_event_callback(&args_as_vec);
     }
 
     #[view]
     #[storage_mapper("async_call_callback_data")]
     fn async_call_callback_data(&self) -> SingleValueMapper<bool>;
+
+    #[event("async_call_event_callback")]
+    fn async_call_event_callback(&self, arguments: &ManagedVec<Self::Api, ManagedBuffer>);
 
     #[endpoint]
     #[payable("*")]
