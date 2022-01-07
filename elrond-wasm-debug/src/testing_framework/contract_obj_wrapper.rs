@@ -216,7 +216,7 @@ impl BlockchainStateWrapper {
 
             let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
             // let contract_obj = closure(DebugApi::new_from_static());
-            b_mock_ref.register_contract_old(&wasm_full_path_as_expr, contract_obj);
+            b_mock_ref.register_contract_obj(&wasm_full_path_as_expr, contract_obj);
         }
 
         ContractObjWrapper::new(address, obj_builder)

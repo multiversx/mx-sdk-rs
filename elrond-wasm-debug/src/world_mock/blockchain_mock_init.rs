@@ -32,7 +32,7 @@ impl BlockchainMock {
         self.current_dir = path;
     }
 
-    pub fn register_contract_old(
+    pub fn register_contract_obj(
         &mut self,
         expression: &str,
         new_contract_obj: Box<dyn CallableContract>,
@@ -45,19 +45,11 @@ impl BlockchainMock {
             .register_contract(contract_bytes, new_contract_obj);
     }
 
-    // pub fn register_contract_builder(
-    //     &mut self,
-    //     expression: &str,
-    //     contract_builder: fn() -> Box<dyn CallableContract>,
-    // ) {
-    //     self.register_contract_old(expression, contract_builder())
-    // }
-
     pub fn register_contract_builder<B: CallableContractBuilder>(
         &mut self,
         expression: &str,
         contract_builder: B,
     ) {
-        self.register_contract_old(expression, contract_builder.new_contract_obj::<DebugApi>())
+        self.register_contract_obj(expression, contract_builder.new_contract_obj::<DebugApi>())
     }
 }
