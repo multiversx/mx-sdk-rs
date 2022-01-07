@@ -206,6 +206,7 @@ impl SendApiImpl for VmApiImpl {
     ) -> Result<(), &'static [u8]> {
         unreachable!()
     }
+
     fn direct_egld_execute(
         &self,
         to: &ManagedAddress<Self>,

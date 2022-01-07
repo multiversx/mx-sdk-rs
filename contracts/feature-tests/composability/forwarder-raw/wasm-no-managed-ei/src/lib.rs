@@ -19,6 +19,7 @@ elrond_wasm_node::wasm_endpoints! {
         clear_callback_info
         deploy_contract
         deploy_from_source
+        error_callback
         forward_async_call
         forward_async_call_half_payment
         forward_async_retrieve_multi_transfer_funds
@@ -29,6 +30,7 @@ elrond_wasm_node::wasm_endpoints! {
         forward_transf_exec_egld
         forward_transf_exec_esdt
         forwarder_async_send_and_retrieve_multi_transfer_funds
+        success_callback
         upgrade
         upgrade_from_source
     )
