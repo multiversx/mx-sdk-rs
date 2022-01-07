@@ -434,10 +434,6 @@ fn test_add() {
 
 fn world() -> elrond_wasm_debug::BlockchainMock {
     let mut blockchain = elrond_wasm_debug::BlockchainMock::new();
-    // blockchain.register_contract_old(
-    //     "file:../contracts/examples/adder/output/adder.wasm",
-    //     sample_adder::ContractBuilder::<DebugApi>(),
-    // );
     blockchain.register_contract_builder(
         "file:../contracts/examples/adder/output/adder.wasm",
         sample_adder::ContractBuilder,
