@@ -1,6 +1,6 @@
 use std::path::{Path, PathBuf};
 
-use elrond_wasm::contract_base::CallableContract;
+use elrond_wasm::contract_base::{CallableContract, CallableContractBuilder};
 use mandos::{interpret_trait::InterpreterContext, value_interpreter::interpret_string};
 
 use crate::DebugApi;
@@ -35,7 +35,7 @@ impl BlockchainMock {
     pub fn register_contract_old(
         &mut self,
         expression: &str,
-        new_contract_obj: Box<dyn CallableContract<DebugApi>>,
+        new_contract_obj: Box<dyn CallableContract>,
     ) {
         let contract_bytes = interpret_string(
             expression,
@@ -45,11 +45,19 @@ impl BlockchainMock {
             .register_contract(contract_bytes, new_contract_obj);
     }
 
-    pub fn register_contract_builder(
+    // pub fn register_contract_builder(
+    //     &mut self,
+    //     expression: &str,
+    //     contract_builder: fn() -> Box<dyn CallableContract>,
+    // ) {
+    //     self.register_contract_old(expression, contract_builder())
+    // }
+
+    pub fn register_contract_builder<B: CallableContractBuilder>(
         &mut self,
         expression: &str,
-        contract_builder: fn() -> Box<dyn CallableContract<DebugApi>>,
+        contract_builder: B,
     ) {
-        self.register_contract_old(expression, contract_builder())
+        self.register_contract_old(expression, contract_builder.new_contract_obj::<DebugApi>())
     }
 }

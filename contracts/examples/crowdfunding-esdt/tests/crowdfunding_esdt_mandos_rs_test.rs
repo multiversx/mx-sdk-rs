@@ -6,7 +6,7 @@ fn world() -> BlockchainMock {
 
     blockchain.register_contract_builder(
         "file:output/crowdfunding-esdt.wasm",
-        crowdfunding_esdt::contract_builder,
+        crowdfunding_esdt::ContractBuilder,
     );
     blockchain
 }
