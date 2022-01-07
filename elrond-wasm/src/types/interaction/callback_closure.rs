@@ -83,7 +83,7 @@ impl<M: ManagedTypeApi + ErrorApi> CallbackClosure<M> {
 }
 
 pub(super) fn cb_closure_storage_key<A: BlockchainApi>() -> StorageKey<A> {
-    let tx_hash = A::blockchain_api_impl().get_tx_hash();
+    let tx_hash = A::blockchain_api_impl().get_tx_hash::<A>();
     let mut storage_key = StorageKey::new(CALLBACK_CLOSURE_STORAGE_BASE_KEY);
     storage_key.append_managed_buffer(tx_hash.as_managed_buffer());
     storage_key

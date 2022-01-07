@@ -1,7 +1,7 @@
 use crate::{error_hook, VmApiImpl};
 use elrond_wasm::{
     api::{
-        BlockchainApi, BlockchainApiImpl, Handle, SendApiImpl, StorageReadApiImpl,
+        BlockchainApi, BlockchainApiImpl, Handle, ManagedTypeApi, SendApiImpl, StorageReadApiImpl,
         StorageWriteApiImpl,
     },
     types::{
@@ -131,11 +131,10 @@ unsafe fn code_metadata_to_buffer_handle(code_metadata: CodeMetadata) -> Handle 
 }
 
 impl SendApiImpl for VmApiImpl {
-    type ManagedTypeApi = VmApiImpl;
-
-    fn direct_egld<D>(&self, to: &ManagedAddress<Self>, amount: &BigUint<Self>, data: D)
+    fn direct_egld<M, D>(&self, to: &ManagedAddress<M>, amount: &BigUint<M>, data: D)
     where
-        D: Into<ManagedBuffer<Self>>,
+        M: ManagedTypeApi,
+        D: Into<ManagedBuffer<M>>,
     {
         let data_buffer = data.into();
         unsafe {
@@ -151,13 +150,13 @@ impl SendApiImpl for VmApiImpl {
         }
     }
 
-    fn direct_egld_execute(
+    fn direct_egld_execute<M: ManagedTypeApi>(
         &self,
-        to: &ManagedAddress<Self>,
-        amount: &BigUint<Self>,
+        to: &ManagedAddress<M>,
+        amount: &BigUint<M>,
         gas_limit: u64,
-        endpoint_name: &ManagedBuffer<Self>,
-        arg_buffer: &ManagedArgBuffer<Self>,
+        endpoint_name: &ManagedBuffer<M>,
+        arg_buffer: &ManagedArgBuffer<M>,
     ) -> Result<(), &'static [u8]> {
         unsafe {
             let result = managedTransferValueExecute(
@@ -175,40 +174,40 @@ impl SendApiImpl for VmApiImpl {
         }
     }
 
-    fn direct_esdt_execute(
+    fn direct_esdt_execute<M: ManagedTypeApi>(
         &self,
-        to: &ManagedAddress<Self>,
-        token: &TokenIdentifier<Self>,
-        amount: &BigUint<Self>,
+        to: &ManagedAddress<M>,
+        token: &TokenIdentifier<M>,
+        amount: &BigUint<M>,
         gas_limit: u64,
-        endpoint_name: &ManagedBuffer<Self>,
-        arg_buffer: &ManagedArgBuffer<Self>,
+        endpoint_name: &ManagedBuffer<M>,
+        arg_buffer: &ManagedArgBuffer<M>,
     ) -> Result<(), &'static [u8]> {
         self.direct_esdt_nft_execute(to, token, 0, amount, gas_limit, endpoint_name, arg_buffer)
     }
 
-    fn direct_esdt_nft_execute(
+    fn direct_esdt_nft_execute<M: ManagedTypeApi>(
         &self,
-        to: &ManagedAddress<Self>,
-        token: &TokenIdentifier<Self>,
+        to: &ManagedAddress<M>,
+        token: &TokenIdentifier<M>,
         nonce: u64,
-        amount: &BigUint<Self>,
+        amount: &BigUint<M>,
         gas_limit: u64,
-        endpoint_name: &ManagedBuffer<Self>,
-        arg_buffer: &ManagedArgBuffer<Self>,
+        endpoint_name: &ManagedBuffer<M>,
+        arg_buffer: &ManagedArgBuffer<M>,
     ) -> Result<(), &'static [u8]> {
         let mut payments = ManagedVec::new();
         payments.push(EsdtTokenPayment::new(token.clone(), nonce, amount.clone()));
         self.direct_multi_esdt_transfer_execute(to, &payments, gas_limit, endpoint_name, arg_buffer)
     }
 
-    fn direct_multi_esdt_transfer_execute(
+    fn direct_multi_esdt_transfer_execute<M: ManagedTypeApi>(
         &self,
-        to: &ManagedAddress<Self>,
-        payments: &ManagedVec<Self, EsdtTokenPayment<Self>>,
+        to: &ManagedAddress<M>,
+        payments: &ManagedVec<M, EsdtTokenPayment<M>>,
         gas_limit: u64,
-        endpoint_name: &ManagedBuffer<Self>,
-        arg_buffer: &ManagedArgBuffer<Self>,
+        endpoint_name: &ManagedBuffer<M>,
+        arg_buffer: &ManagedArgBuffer<M>,
     ) -> Result<(), &'static [u8]> {
         unsafe {
             let result = managedMultiTransferESDTNFTExecute(
@@ -226,12 +225,12 @@ impl SendApiImpl for VmApiImpl {
         }
     }
 
-    fn async_call_raw(
+    fn async_call_raw<M: ManagedTypeApi>(
         &self,
-        to: &ManagedAddress<Self>,
-        amount: &BigUint<Self>,
-        endpoint_name: &ManagedBuffer<Self>,
-        arg_buffer: &ManagedArgBuffer<Self>,
+        to: &ManagedAddress<M>,
+        amount: &BigUint<M>,
+        endpoint_name: &ManagedBuffer<M>,
+        arg_buffer: &ManagedArgBuffer<M>,
     ) -> ! {
         unsafe {
             managedAsyncCall(
@@ -243,7 +242,7 @@ impl SendApiImpl for VmApiImpl {
         }
     }
 
-    fn create_async_call_raw(
+    fn create_async_call_raw<M: ManagedTypeApi>(
         &self,
         to: &ManagedAddress<Self>,
         amount: &BigUint<Self>,
@@ -274,14 +273,14 @@ impl SendApiImpl for VmApiImpl {
         Ok(())
     }
 
-    fn deploy_contract(
+    fn deploy_contract<M: ManagedTypeApi>(
         &self,
         gas: u64,
-        amount: &BigUint<Self>,
-        code: &ManagedBuffer<Self>,
+        amount: &BigUint<M>,
+        code: &ManagedBuffer<M>,
         code_metadata: CodeMetadata,
-        arg_buffer: &ManagedArgBuffer<Self>,
-    ) -> (ManagedAddress<Self>, ManagedVec<Self, ManagedBuffer<Self>>) {
+        arg_buffer: &ManagedArgBuffer<M>,
+    ) -> (ManagedAddress<M>, ManagedVec<M, ManagedBuffer<M>>) {
         unsafe {
             let code_metadata_handle = code_metadata_to_buffer_handle(code_metadata);
             let new_address_handle = mBufferNew();
@@ -303,14 +302,14 @@ impl SendApiImpl for VmApiImpl {
         }
     }
 
-    fn deploy_from_source_contract(
+    fn deploy_from_source_contract<M: ManagedTypeApi>(
         &self,
         gas: u64,
-        amount: &BigUint<Self>,
-        source_contract_address: &ManagedAddress<Self>,
+        amount: &BigUint<M>,
+        source_contract_address: &ManagedAddress<M>,
         code_metadata: CodeMetadata,
-        arg_buffer: &ManagedArgBuffer<Self>,
-    ) -> (ManagedAddress<Self>, ManagedVec<Self, ManagedBuffer<Self>>) {
+        arg_buffer: &ManagedArgBuffer<M>,
+    ) -> (ManagedAddress<M>, ManagedVec<M, ManagedBuffer<M>>) {
         unsafe {
             let code_metadata_handle = code_metadata_to_buffer_handle(code_metadata);
             let new_address_handle = mBufferNew();
@@ -332,14 +331,14 @@ impl SendApiImpl for VmApiImpl {
         }
     }
 
-    fn upgrade_from_source_contract(
+    fn upgrade_from_source_contract<M: ManagedTypeApi>(
         &self,
-        sc_address: &ManagedAddress<Self>,
+        sc_address: &ManagedAddress<M>,
         gas: u64,
-        amount: &BigUint<Self>,
-        source_contract_address: &ManagedAddress<Self>,
+        amount: &BigUint<M>,
+        source_contract_address: &ManagedAddress<M>,
         code_metadata: CodeMetadata,
-        arg_buffer: &ManagedArgBuffer<Self>,
+        arg_buffer: &ManagedArgBuffer<M>,
     ) {
         unsafe {
             let code_metadata_handle = code_metadata_to_buffer_handle(code_metadata);
@@ -356,14 +355,14 @@ impl SendApiImpl for VmApiImpl {
         }
     }
 
-    fn upgrade_contract(
+    fn upgrade_contract<M: ManagedTypeApi>(
         &self,
-        sc_address: &ManagedAddress<Self>,
+        sc_address: &ManagedAddress<M>,
         gas: u64,
-        amount: &BigUint<Self>,
-        code: &ManagedBuffer<Self>,
+        amount: &BigUint<M>,
+        code: &ManagedBuffer<M>,
         code_metadata: CodeMetadata,
-        arg_buffer: &ManagedArgBuffer<Self>,
+        arg_buffer: &ManagedArgBuffer<M>,
     ) {
         unsafe {
             let code_metadata_handle = code_metadata_to_buffer_handle(code_metadata);
@@ -383,14 +382,14 @@ impl SendApiImpl for VmApiImpl {
         }
     }
 
-    fn execute_on_dest_context_raw(
+    fn execute_on_dest_context_raw<M: ManagedTypeApi>(
         &self,
         gas: u64,
-        to: &ManagedAddress<Self>,
-        amount: &BigUint<Self>,
-        endpoint_name: &ManagedBuffer<Self>,
-        arg_buffer: &ManagedArgBuffer<Self>,
-    ) -> ManagedVec<Self, ManagedBuffer<Self>> {
+        to: &ManagedAddress<M>,
+        amount: &BigUint<M>,
+        endpoint_name: &ManagedBuffer<M>,
+        arg_buffer: &ManagedArgBuffer<M>,
+    ) -> ManagedVec<M, ManagedBuffer<M>> {
         unsafe {
             let result_handle = mBufferNew();
 
@@ -407,16 +406,17 @@ impl SendApiImpl for VmApiImpl {
         }
     }
 
-    fn execute_on_dest_context_raw_custom_result_range<F>(
+    fn execute_on_dest_context_raw_custom_result_range<M, F>(
         &self,
         gas: u64,
-        to: &ManagedAddress<Self>,
-        amount: &BigUint<Self>,
-        endpoint_name: &ManagedBuffer<Self>,
-        arg_buffer: &ManagedArgBuffer<Self>,
+        to: &ManagedAddress<M>,
+        amount: &BigUint<M>,
+        endpoint_name: &ManagedBuffer<M>,
+        arg_buffer: &ManagedArgBuffer<M>,
         range_closure: F,
-    ) -> ManagedVec<Self, ManagedBuffer<Self>>
+    ) -> ManagedVec<M, ManagedBuffer<M>>
     where
+        M: ManagedTypeApi,
         F: FnOnce(usize, usize) -> (usize, usize),
     {
         unsafe {
@@ -448,14 +448,14 @@ impl SendApiImpl for VmApiImpl {
         }
     }
 
-    fn execute_on_dest_context_by_caller_raw(
+    fn execute_on_dest_context_by_caller_raw<M: ManagedTypeApi>(
         &self,
         gas: u64,
-        to: &ManagedAddress<Self>,
-        amount: &BigUint<Self>,
-        endpoint_name: &ManagedBuffer<Self>,
-        arg_buffer: &ManagedArgBuffer<Self>,
-    ) -> ManagedVec<Self, ManagedBuffer<Self>> {
+        to: &ManagedAddress<M>,
+        amount: &BigUint<M>,
+        endpoint_name: &ManagedBuffer<M>,
+        arg_buffer: &ManagedArgBuffer<M>,
+    ) -> ManagedVec<M, ManagedBuffer<M>> {
         unsafe {
             let result_handle = mBufferNew();
 
@@ -472,14 +472,14 @@ impl SendApiImpl for VmApiImpl {
         }
     }
 
-    fn execute_on_same_context_raw(
+    fn execute_on_same_context_raw<M: ManagedTypeApi>(
         &self,
         gas: u64,
-        to: &ManagedAddress<Self>,
-        amount: &BigUint<Self>,
-        endpoint_name: &ManagedBuffer<Self>,
-        arg_buffer: &ManagedArgBuffer<Self>,
-    ) -> ManagedVec<Self, ManagedBuffer<Self>> {
+        to: &ManagedAddress<M>,
+        amount: &BigUint<M>,
+        endpoint_name: &ManagedBuffer<M>,
+        arg_buffer: &ManagedArgBuffer<M>,
+    ) -> ManagedVec<M, ManagedBuffer<M>> {
         unsafe {
             let result_handle = mBufferNew();
 
@@ -496,13 +496,13 @@ impl SendApiImpl for VmApiImpl {
         }
     }
 
-    fn execute_on_dest_context_readonly_raw(
+    fn execute_on_dest_context_readonly_raw<M: ManagedTypeApi>(
         &self,
         gas: u64,
-        to: &ManagedAddress<Self>,
-        endpoint_name: &ManagedBuffer<Self>,
-        arg_buffer: &ManagedArgBuffer<Self>,
-    ) -> ManagedVec<Self, ManagedBuffer<Self>> {
+        to: &ManagedAddress<M>,
+        endpoint_name: &ManagedBuffer<M>,
+        arg_buffer: &ManagedArgBuffer<M>,
+    ) -> ManagedVec<M, ManagedBuffer<M>> {
         unsafe {
             let result_handle = mBufferNew();
 
@@ -518,30 +518,30 @@ impl SendApiImpl for VmApiImpl {
         }
     }
 
-    fn storage_store_tx_hash_key(&self, data: &ManagedBuffer<Self>) {
-        let tx_hash = self.get_tx_hash();
+    fn storage_store_tx_hash_key<M: ManagedTypeApi>(&self, data: &ManagedBuffer<M>) {
+        let tx_hash = self.get_tx_hash::<M>();
         self.storage_store_managed_buffer_raw(tx_hash.get_raw_handle(), data.get_raw_handle());
     }
 
-    fn storage_load_tx_hash_key(&self) -> ManagedBuffer<Self> {
-        let tx_hash = self.get_tx_hash();
+    fn storage_load_tx_hash_key<M: ManagedTypeApi>(&self) -> ManagedBuffer<M> {
+        let tx_hash = self.get_tx_hash::<M>();
         ManagedBuffer::from_raw_handle(
             self.storage_load_managed_buffer_raw(tx_hash.get_raw_handle()),
         )
     }
 
-    fn call_local_esdt_built_in_function(
+    fn call_local_esdt_built_in_function<M: ManagedTypeApi>(
         &self,
         gas: u64,
-        function_name: &ManagedBuffer<Self>,
-        arg_buffer: &ManagedArgBuffer<Self>,
-    ) -> ManagedVec<Self, ManagedBuffer<Self>> {
+        function_name: &ManagedBuffer<M>,
+        arg_buffer: &ManagedArgBuffer<M>,
+    ) -> ManagedVec<M, ManagedBuffer<M>> {
         // account-level built-in function, so the destination address is the contract itself
-        let own_address = VmApiImpl::blockchain_api_impl().get_sc_address();
+        let own_address = VmApiImpl::blockchain_api_impl().get_sc_address_handle();
 
         self.execute_on_dest_context_raw(
             gas,
-            &own_address,
+            &ManagedAddress::from_raw_handle(own_address),
             &BigUint::zero(),
             function_name,
             arg_buffer,
