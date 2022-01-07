@@ -4,7 +4,7 @@ fn world() -> BlockchainMock {
     let mut blockchain = BlockchainMock::new();
     blockchain.register_contract_builder(
         "file:output/egld-esdt-swap.wasm",
-        egld_esdt_swap::contract_builder,
+        egld_esdt_swap::ContractBuilder,
     );
     blockchain
 }

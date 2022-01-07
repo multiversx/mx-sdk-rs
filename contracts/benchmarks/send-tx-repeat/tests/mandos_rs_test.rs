@@ -4,7 +4,7 @@ fn world() -> BlockchainMock {
     let mut blockchain = BlockchainMock::new();
     blockchain.register_contract_builder(
         "file:output/send-tx-repeat.wasm",
-        send_tx_repeat::contract_builder,
+        send_tx_repeat::ContractBuilder,
     );
     blockchain
 }
