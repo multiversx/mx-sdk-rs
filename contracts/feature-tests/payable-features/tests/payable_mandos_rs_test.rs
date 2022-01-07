@@ -5,7 +5,7 @@ fn world() -> BlockchainMock {
     blockchain.set_current_dir_from_workspace("contracts/feature-tests/payable-features");
     blockchain.register_contract_builder(
         "file:output/payable-features.wasm",
-        payable_features::contract_builder,
+        payable_features::ContractBuilder,
     );
     blockchain
 }

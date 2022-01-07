@@ -286,7 +286,7 @@ mod sample_adder {
 
     impl<A> EndpointWrappers for ContractObj<A> where A: elrond_wasm::api::VMApi {}
 
-    impl<A> elrond_wasm::contract_base::CallableContract<A> for ContractObj<A>
+    impl<A> elrond_wasm::contract_base::CallableContract for ContractObj<A>
     where
         A: elrond_wasm::api::VMApi,
     {
@@ -294,10 +294,22 @@ mod sample_adder {
             EndpointWrappers::call(self, fn_name)
         }
 
-        fn clone_obj(
+        fn clone_obj(&self) -> elrond_wasm::Box<dyn elrond_wasm::contract_base::CallableContract> {
+            elrond_wasm::Box::new(ContractObj::<A> {
+                _phantom: core::marker::PhantomData,
+            })
+        }
+    }
+
+    pub struct ContractBuilder;
+
+    impl elrond_wasm::contract_base::CallableContractBuilder for ContractBuilder {
+        fn new_contract_obj<A: elrond_wasm::api::VMApi>(
             &self,
-        ) -> elrond_wasm::Box<dyn elrond_wasm::contract_base::CallableContract<A>> {
-            self::contract_builder()
+        ) -> elrond_wasm::Box<dyn elrond_wasm::contract_base::CallableContract> {
+            elrond_wasm::Box::new(ContractObj::<A> {
+                _phantom: core::marker::PhantomData,
+            })
         }
     }
 
@@ -318,16 +330,6 @@ mod sample_adder {
         ContractObj {
             _phantom: core::marker::PhantomData,
         }
-    }
-
-    pub fn contract_builder<A>(
-    ) -> elrond_wasm::Box<dyn elrond_wasm::contract_base::CallableContract<A>>
-    where
-        A: elrond_wasm::api::VMApi,
-    {
-        elrond_wasm::Box::new(ContractObj {
-            _phantom: core::marker::PhantomData,
-        })
     }
 
     pub struct Proxy<A>
@@ -432,9 +434,13 @@ fn test_add() {
 
 fn world() -> elrond_wasm_debug::BlockchainMock {
     let mut blockchain = elrond_wasm_debug::BlockchainMock::new();
+    // blockchain.register_contract_old(
+    //     "file:../contracts/examples/adder/output/adder.wasm",
+    //     sample_adder::ContractBuilder::<DebugApi>(),
+    // );
     blockchain.register_contract_builder(
         "file:../contracts/examples/adder/output/adder.wasm",
-        sample_adder::contract_builder,
+        sample_adder::ContractBuilder,
     );
     blockchain
 }
