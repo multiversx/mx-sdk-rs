@@ -5,7 +5,7 @@ mod proxy_obj_base;
 mod proxy_obj_callback_base;
 mod wrappers;
 
-pub use callable_contract::CallableContract;
+pub use callable_contract::{CallableContract, CallableContractBuilder};
 pub use contract_abi_provider::ContractAbiProvider;
 pub use contract_base_trait::ContractBase;
 pub use proxy_obj_base::ProxyObjBase;

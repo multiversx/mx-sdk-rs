@@ -5,11 +5,11 @@ fn world() -> BlockchainMock {
 
     blockchain.register_contract_builder(
         "file:../kitty-genetic-alg/output/kitty-genetic-alg.wasm",
-        kitty_genetic_alg::contract_builder,
+        kitty_genetic_alg::ContractBuilder,
     );
     blockchain.register_contract_builder(
         "file:output/kitty-ownership.wasm",
-        kitty_ownership::contract_builder,
+        kitty_ownership::ContractBuilder,
     );
 
     blockchain

@@ -6,7 +6,7 @@ fn world() -> BlockchainMock {
 
     blockchain.register_contract_builder(
         "file:output/ping-pong-egld.wasm",
-        ping_pong_egld::contract_builder,
+        ping_pong_egld::ContractBuilder,
     );
     blockchain
 }
