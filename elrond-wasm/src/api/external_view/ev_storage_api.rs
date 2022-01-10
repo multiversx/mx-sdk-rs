@@ -6,6 +6,8 @@ use crate::api::{
 use super::ExternalViewApi;
 use alloc::vec::Vec;
 
+pub const EXTERNAL_VIEW_TARGET_ADRESS_KEY: &[u8] = b"external-view-target-address";
+
 impl<A: VMApi> StorageReadApi for ExternalViewApi<A> {
     type StorageReadApiImpl = ExternalViewApi<A>;
 
@@ -15,6 +17,17 @@ impl<A: VMApi> StorageReadApi for ExternalViewApi<A> {
 }
 
 impl<A: VMApi> StorageReadApiImpl for ExternalViewApi<A> {
+    /// Reads what lies in storage at `external-view-target-address` and loads into a managed buffer.
+    /// The same managed buffer will be used for all reads in the tx.
+    fn storage_read_api_init(&self) {
+        let external_view_target_key_handle =
+            A::managed_type_impl().mb_new_from_bytes(EXTERNAL_VIEW_TARGET_ADRESS_KEY);
+        let external_view_target_address_handle = A::storage_read_api_impl()
+            .storage_load_managed_buffer_raw(external_view_target_key_handle);
+        A::static_var_api_impl()
+            .set_external_view_target_address_handle(external_view_target_address_handle);
+    }
+
     fn storage_load_len(&self, key: &[u8]) -> usize {
         let key_handle = A::managed_type_impl().mb_new_from_bytes(key);
         self.storage_load_managed_buffer_len(key_handle)

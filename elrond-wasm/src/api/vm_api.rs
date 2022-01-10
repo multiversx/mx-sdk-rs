@@ -3,7 +3,7 @@ use crate::abi::EndpointLocationAbi;
 use super::{
     BlockchainApi, CallTypeApi, CallValueApi, CryptoApi, EndpointArgumentApi, EndpointFinishApi,
     ErrorApi, LogApi, ManagedTypeApi, PrintApi, SendApi, StorageMapperApi, StorageReadApi,
-    StorageWriteApi,
+    StorageReadApiImpl, StorageWriteApi,
 };
 
 pub trait VMApi:
@@ -23,5 +23,11 @@ pub trait VMApi:
     + StorageMapperApi
     + Clone // TODO: remove
 {
-    fn has_location(location: EndpointLocationAbi) -> bool;
+    fn has_location(location: EndpointLocationAbi) -> bool {
+        location == EndpointLocationAbi::MainContract
+    }
+
+    fn init_static() {
+        Self::storage_read_api_impl().storage_read_api_init()
+    }
 }

@@ -19,3 +19,8 @@ fn world() -> BlockchainMock {
 fn external_pure_rs() {
     elrond_wasm_debug::mandos_rs("mandos/external-pure.scen.json", world());
 }
+
+#[test]
+fn external_get_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/external-get.scen.json", world());
+}

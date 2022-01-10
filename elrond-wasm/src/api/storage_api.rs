@@ -10,6 +10,8 @@ pub trait StorageReadApi {
 }
 
 pub trait StorageReadApiImpl {
+    fn storage_read_api_init(&self) {}
+
     fn storage_load_len(&self, key: &[u8]) -> usize;
 
     fn storage_load_vec_u8(&self, key: &[u8]) -> Vec<u8>;
