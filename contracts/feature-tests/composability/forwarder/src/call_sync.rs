@@ -168,6 +168,28 @@ pub trait ForwarderSyncCallModule {
     }
 
     #[endpoint]
+    fn forward_sync_retrieve_funds_with_accept_func(
+        &self,
+        #[payment_multi] payments: ManagedVec<EsdtTokenPayment<Self::Api>>,
+        to: ManagedAddress,
+        token: TokenIdentifier,
+        amount: BigUint,
+    ) {
+        self.vault_proxy()
+            .contract(to)
+            .retrieve_funds_with_transfer_exec(
+                payments,
+                token,
+                amount,
+                OptionalArg::Some(b"accept_funds_func".into()),
+            )
+            .execute_on_dest_context();
+    }
+
+    #[endpoint]
+    fn accept_funds_func(&self) {}
+
+    #[endpoint]
     fn forward_sync_accept_funds_multi_transfer(
         &self,
         to: ManagedAddress,
