@@ -20,3 +20,9 @@ path = "../../../elrond-wasm-debug"
 num-bigint = "0.4.2"
 num-traits = "0.2"
 hex = "0.4"
+
+[dev-dependencies.forwarder]
+path = "../composability/forwarder"
+
+[dev-dependencies.vault]
+path = "../composability/vault"

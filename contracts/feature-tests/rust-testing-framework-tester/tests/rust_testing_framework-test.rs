@@ -1,5 +1,10 @@
 use adder::*;
-use elrond_wasm::types::{BigInt, EsdtLocalRole, EsdtTokenPayment, ManagedBuffer, SCResult};
+use forwarder::call_sync::*;
+use num_traits::ToPrimitive;
+
+use elrond_wasm::types::{
+    BigInt, EsdtLocalRole, EsdtTokenPayment, EsdtTokenType, ManagedBuffer, ManagedVec, SCResult,
+};
 use elrond_wasm_debug::{
     assert_sc_error, assert_values_eq, managed_address, managed_biguint, managed_buffer,
     managed_token_id, rust_biguint, testing_framework::*, tx_mock::TxInputESDT, unwrap_or_panic,
@@ -1152,4 +1157,83 @@ fn test_modules() {
     wrapper.execute_query(&sc_wrapper, |sc| {
         let _ = sc.some_function();
     });
+}
+
+#[test]
+fn test_back_and_forth_transfers() {
+    let mut wrapper = BlockchainStateWrapper::new();
+    let user = wrapper.create_user_account(&rust_biguint!(0));
+
+    let first_token_id = b"FIRSTTOKEN-abcdef";
+    let second_token_id = b"SECTOKEN-abcdef";
+    let third_token_id = b"THIRDTOKEN-abcdef";
+
+    let first_token_amount = rust_biguint!(1_000_000);
+    let second_token_amount = rust_biguint!(2_000_000);
+    let third_token_amount = rust_biguint!(5_000_000);
+
+    wrapper.set_esdt_balance(&user, &first_token_id[..], &first_token_amount);
+    wrapper.set_esdt_balance(&user, &second_token_id[..], &second_token_amount);
+
+    let forwarder_wrapper = wrapper.create_sc_account(
+        &rust_biguint!(0),
+        None,
+        forwarder::contract_obj,
+        "../forwarder/output/forwarder.wasm",
+    );
+
+    let vault_wrapper = wrapper.create_sc_account(
+        &rust_biguint!(0),
+        None,
+        vault::contract_obj,
+        "../vault/output/vault.wasm",
+    );
+    wrapper.set_esdt_balance(
+        vault_wrapper.address_ref(),
+        &third_token_id[..],
+        &third_token_amount,
+    );
+
+    let mut transfers = Vec::new();
+    transfers.push(TxInputESDT {
+        token_identifier: first_token_id.to_vec(),
+        nonce: 0,
+        value: first_token_amount.clone(),
+    });
+    transfers.push(TxInputESDT {
+        token_identifier: second_token_id.to_vec(),
+        nonce: 0,
+        value: second_token_amount.clone(),
+    });
+
+    wrapper.execute_esdt_multi_transfer(&user, &forwarder_wrapper, &transfers, |sc| {
+        let mut managed_payments = ManagedVec::new();
+        managed_payments.push(EsdtTokenPayment {
+            token_type: EsdtTokenType::Fungible,
+            token_identifier: managed_token_id!(&first_token_id[..]),
+            token_nonce: 0,
+            amount: managed_biguint!(first_token_amount.to_u64().unwrap()),
+        });
+        managed_payments.push(EsdtTokenPayment {
+            token_type: EsdtTokenType::Fungible,
+            token_identifier: managed_token_id!(&second_token_id[..]),
+            token_nonce: 0,
+            amount: managed_biguint!(second_token_amount.to_u64().unwrap()),
+        });
+
+        sc.forward_sync_retrieve_funds_with_accept_func(
+            managed_payments,
+            managed_address!(vault_wrapper.address_ref()),
+            managed_token_id!(&third_token_id[..]),
+            managed_biguint!(third_token_amount.to_u64().unwrap()),
+        );
+
+        StateChange::Commit
+    });
+
+    wrapper.check_esdt_balance(
+        forwarder_wrapper.address_ref(),
+        &third_token_id[..],
+        &third_token_amount,
+    );
 }
