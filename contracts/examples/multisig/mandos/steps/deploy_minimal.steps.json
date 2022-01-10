@@ -5,7 +5,6 @@
             "txId": "multisig-deploy",
             "tx": {
                 "from": "address:owner",
-                "value": "0",
                 "contractCode": "file:../../output/multisig.wasm",
                 "arguments": [
                     "0",
@@ -28,7 +27,6 @@
             "tx": {
                 "from": "address:owner",
                 "to": "sc:multisig",
-                "value": "0",
                 "function": "getQuorum",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -50,7 +48,6 @@
             "tx": {
                 "from": "address:owner",
                 "to": "sc:multisig",
-                "value": "0",
                 "function": "getNumBoardMembers",
                 "arguments": [],
                 "gasLimit": "50,000,000",
