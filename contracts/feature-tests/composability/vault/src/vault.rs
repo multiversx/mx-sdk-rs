@@ -130,6 +130,7 @@ pub trait Vault {
         sc_error!("reject_funds")
     }
 
+    #[payable("*")]
     #[endpoint]
     fn retrieve_funds_with_transfer_exec(
         &self,
