@@ -1180,11 +1180,15 @@ fn test_back_and_forth_transfers() {
         &rust_biguint!(0),
         None,
         forwarder::contract_obj,
-        SC_WASM_PATH,
+        "../forwarder/output/forwarder.wasm",
     );
 
-    let vault_wrapper =
-        wrapper.create_sc_account(&rust_biguint!(0), None, vault::contract_obj, SC_WASM_PATH);
+    let vault_wrapper = wrapper.create_sc_account(
+        &rust_biguint!(0),
+        None,
+        vault::contract_obj,
+        "../vault/output/vault.wasm",
+    );
     wrapper.set_esdt_balance(
         vault_wrapper.address_ref(),
         &third_token_id[..],
@@ -1227,4 +1231,10 @@ fn test_back_and_forth_transfers() {
 
         StateChange::Commit
     });
+
+    wrapper.check_esdt_balance(
+        forwarder_wrapper.address_ref(),
+        &third_token_id[..],
+        &third_token_amount,
+    );
 }
