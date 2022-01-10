@@ -167,6 +167,7 @@ pub trait ForwarderSyncCallModule {
             .execute_on_dest_context()
     }
 
+    #[payable("*")]
     #[endpoint]
     fn forward_sync_retrieve_funds_with_accept_func(
         &self,
@@ -186,6 +187,7 @@ pub trait ForwarderSyncCallModule {
             .execute_on_dest_context();
     }
 
+    #[payable("*")]
     #[endpoint]
     fn accept_funds_func(&self) {}
 
