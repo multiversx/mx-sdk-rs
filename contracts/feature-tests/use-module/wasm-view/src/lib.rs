@@ -4,10 +4,9 @@
 
 #![no_std]
 
-elrond_wasm_node::wasm_endpoints! {
+elrond_wasm_node::external_view_wasm_endpoints! {
     use_module
     (
-        init
         external_view_mod_a
         external_view_mod_b
     )

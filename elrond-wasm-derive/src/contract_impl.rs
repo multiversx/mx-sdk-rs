@@ -25,7 +25,6 @@ pub fn contract_implementation(
     let endpoints_mod = generate_endpoints_mod(contract, is_contract_main);
     let function_selector_body = generate_function_selector_body(contract);
     let (callback_selector_body, callback_body) = generate_callback_selector_and_main(contract);
-
     let (callbacks_def, callbacks_impl, callback_proxies_obj) = generate_callback_proxies(contract);
 
     // this definition is common to release and debug mode
