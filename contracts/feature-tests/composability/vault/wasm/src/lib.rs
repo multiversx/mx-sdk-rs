@@ -7,7 +7,6 @@
 elrond_wasm_node::wasm_endpoints! {
     vault
     (
-        init
         accept_funds
         accept_funds_echo_payment
         accept_funds_multi_transfer
