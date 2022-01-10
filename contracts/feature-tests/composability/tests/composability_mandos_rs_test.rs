@@ -279,6 +279,14 @@ fn forwarder_call_sync_accept_then_read_nft_rs() {
 }
 
 #[test]
+fn forwarder_retrieve_funds_with_accept_func_rs() {
+    elrond_wasm_debug::mandos_rs(
+        "mandos/forwarder_retrieve_funds_with_accept_func.scen.json",
+        world(),
+    );
+}
+
+#[test]
 fn forwarder_call_sync_retrieve_egld_rs() {
     elrond_wasm_debug::mandos_rs(
         "mandos/forwarder_call_sync_retrieve_egld.scen.json",
