@@ -7,7 +7,6 @@
 elrond_wasm_node::wasm_endpoints! {
     payable_features
     (
-        init
         echo_call_value
         payable_any_1
         payable_any_2

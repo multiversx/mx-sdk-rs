@@ -7,7 +7,6 @@
 elrond_wasm_node::wasm_endpoints! {
     kitty_genetic_alg
     (
-        init
         generateKittyGenes
     )
 }

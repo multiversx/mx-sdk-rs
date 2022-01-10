@@ -7,7 +7,6 @@
 elrond_wasm_node::wasm_endpoints! {
     erc1155_marketplace
     (
-        init
         bid
         claim
         endAuction
