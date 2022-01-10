@@ -9,6 +9,7 @@ elrond_wasm_node::wasm_endpoints! {
     (
         init
         callBack
+        accept_funds_func
         buy_nft
         callback_data
         callback_data_at_index
@@ -30,6 +31,7 @@ elrond_wasm_node::wasm_endpoints! {
         forward_sync_accept_funds_then_read
         forward_sync_accept_funds_with_fees
         forward_sync_retrieve_funds
+        forward_sync_retrieve_funds_with_accept_func
         forward_transf_exec_accept_funds
         forward_transf_exec_accept_funds_multi_transfer
         forward_transf_exec_accept_funds_return_values
