@@ -27,6 +27,8 @@ pub trait StorageReadApiImpl {
     fn storage_load_u64(&self, key: &[u8]) -> u64;
 
     fn storage_load_i64(&self, key: &[u8]) -> i64;
+
+    fn storage_load_from_address(&self, address_handle: Handle, key_handle: Handle) -> Handle;
 }
 
 pub trait StorageWriteApi {

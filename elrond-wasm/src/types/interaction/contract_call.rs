@@ -3,9 +3,10 @@ use crate::{
         BlockchainApiImpl, CallTypeApi, ErrorApiImpl, SendApiImpl, ESDT_MULTI_TRANSFER_FUNC_NAME,
         ESDT_NFT_TRANSFER_FUNC_NAME, ESDT_TRANSFER_FUNC_NAME,
     },
+    contract_base::BlockchainWrapper,
     types::{
         AsyncCall, BigUint, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer,
-        ManagedVec, TokenIdentifier,
+        ManagedType, ManagedVec, TokenIdentifier,
     },
     ArgId, ContractCallArg, DynArg, ManagedResultArgLoader,
 };
@@ -198,7 +199,9 @@ where
                 new_arg_buffer.push_arg(&self.endpoint_name);
 
                 // nft transfer is sent to self, sender = receiver
-                let recipient_addr = SA::blockchain_api_impl().get_sc_address();
+                let recipient_addr = ManagedAddress::from_raw_handle(
+                    SA::blockchain_api_impl().get_sc_address_handle(),
+                );
                 let zero = BigUint::zero();
                 let endpoint_name = ManagedBuffer::new_from_bytes(ESDT_NFT_TRANSFER_FUNC_NAME);
 
@@ -234,7 +237,7 @@ where
         new_arg_buffer.push_arg(self.endpoint_name);
 
         // multi transfer is sent to self, sender = receiver
-        let recipient_addr = SA::blockchain_api_impl().get_sc_address();
+        let recipient_addr = BlockchainWrapper::<SA>::new().get_sc_address();
         let zero = BigUint::zero();
         let endpoint_name = ManagedBuffer::new_from_bytes(ESDT_MULTI_TRANSFER_FUNC_NAME);
 

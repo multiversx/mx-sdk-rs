@@ -4,13 +4,13 @@ fn world() -> BlockchainMock {
     let mut blockchain = BlockchainMock::new();
     blockchain.set_current_dir_from_workspace("contracts/examples/multisig");
 
-    blockchain.register_contract_builder("file:output/multisig.wasm", multisig::contract_builder);
+    blockchain.register_contract_builder("file:output/multisig.wasm", multisig::ContractBuilder);
 
-    blockchain.register_contract_builder("file:test-contracts/adder.wasm", adder::contract_builder);
+    blockchain.register_contract_builder("file:test-contracts/adder.wasm", adder::ContractBuilder);
 
     blockchain.register_contract_builder(
         "file:test-contracts/factorial.wasm",
-        factorial::contract_builder,
+        factorial::ContractBuilder,
     );
 
     blockchain

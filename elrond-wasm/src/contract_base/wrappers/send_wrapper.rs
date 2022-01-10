@@ -10,7 +10,7 @@ use crate::{
     esdt::ESDTSystemSmartContractProxy,
     types::{
         BigUint, ContractCall, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer,
-        ManagedVec, TokenIdentifier,
+        ManagedType, ManagedVec, TokenIdentifier,
     },
 };
 use elrond_codec::TopDecode;
@@ -20,6 +20,7 @@ const PERCENTAGE_TOTAL: u64 = 10_000;
 /// API that groups methods that either send EGLD or ESDT, or that call other contracts.
 // pub trait SendApi: Clone + Sized {
 
+#[derive(Default)]
 pub struct SendWrapper<A>
 where
     A: CallTypeApi + StorageReadApi + BlockchainApi,
@@ -162,7 +163,7 @@ where
             }
 
             A::send_api_impl().async_call_raw(
-                &A::blockchain_api_impl().get_sc_address(),
+                &ManagedAddress::from_raw_handle(A::blockchain_api_impl().get_sc_address_handle()),
                 &BigUint::zero(),
                 &ManagedBuffer::new_from_bytes(ESDT_NFT_TRANSFER_FUNC_NAME),
                 &arg_buffer,
@@ -195,7 +196,7 @@ where
         }
 
         A::send_api_impl().async_call_raw(
-            &A::blockchain_api_impl().get_sc_address(),
+            &ManagedAddress::from_raw_handle(A::blockchain_api_impl().get_sc_address_handle()),
             &BigUint::zero(),
             &ManagedBuffer::new_from_bytes(ESDT_MULTI_TRANSFER_FUNC_NAME),
             &arg_buffer,
@@ -339,7 +340,7 @@ where
         attributes: &T,
         uris: &ManagedVec<A, ManagedBuffer<A>>,
     ) -> u64 {
-        let mut arg_buffer = ManagedArgBuffer::new_empty();
+        let mut arg_buffer = ManagedArgBuffer::<A>::new_empty();
         arg_buffer.push_arg(token);
         arg_buffer.push_arg(amount);
         arg_buffer.push_arg(name);
@@ -360,7 +361,7 @@ where
 
         let output = A::send_api_impl().execute_on_dest_context_by_caller_raw(
             A::blockchain_api_impl().get_gas_left(),
-            &A::blockchain_api_impl().get_caller(),
+            &ManagedAddress::from_raw_handle(A::blockchain_api_impl().get_caller_handle()),
             &BigUint::zero(),
             &ManagedBuffer::new_from_bytes(ESDT_NFT_CREATE_FUNC_NAME),
             &arg_buffer,
@@ -386,8 +387,8 @@ where
         payment_nonce: u64,
         payment_amount: &BigUint<A>,
     ) -> BigUint<A> {
-        let nft_token_data = A::blockchain_api_impl().get_esdt_token_data(
-            &A::blockchain_api_impl().get_sc_address(),
+        let nft_token_data = A::blockchain_api_impl().get_esdt_token_data::<A>(
+            &ManagedAddress::from_raw_handle(A::blockchain_api_impl().get_sc_address_handle()),
             nft_id,
             nft_nonce,
         );

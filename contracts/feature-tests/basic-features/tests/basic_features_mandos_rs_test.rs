@@ -6,7 +6,7 @@ fn world() -> BlockchainMock {
 
     blockchain.register_contract_builder(
         "file:output/basic-features.wasm",
-        basic_features::contract_builder,
+        basic_features::ContractBuilder,
     );
     blockchain
 }
@@ -357,6 +357,11 @@ fn storage_clear_rs() {
 #[test]
 fn storage_i64_rs() {
     elrond_wasm_debug::mandos_rs("mandos/storage_i64.scen.json", world());
+}
+
+#[test]
+fn storage_load_from_address_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/storage_load_from_address.scen.json", world());
 }
 
 #[test]
