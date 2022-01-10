@@ -1,7 +1,6 @@
 use adder::*;
-use forwarder::{call_sync::*, *};
+use forwarder::call_sync::*;
 use num_traits::ToPrimitive;
-use vault::*;
 
 use elrond_wasm::types::{
     BigInt, EsdtLocalRole, EsdtTokenPayment, EsdtTokenType, ManagedBuffer, ManagedVec, SCResult,
