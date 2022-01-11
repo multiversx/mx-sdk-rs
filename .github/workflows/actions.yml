@@ -74,7 +74,7 @@ jobs:
           body-includes: Contract file size comparison
       - name: Create or update sizes report comment
         uses: peter-evans/create-or-update-comment@v1
-        if: ${{ github.event_name == 'pull_request' }}
+        if: ${{ github.event_name == 'pull_request' }} && github.event.pull_request.head.repo.full_name == github.repository
         with:
           comment-id: ${{ steps.fc.outputs.comment-id }}
           issue-number: ${{ github.event.pull_request.number }}
