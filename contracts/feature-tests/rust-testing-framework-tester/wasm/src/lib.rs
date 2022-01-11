@@ -7,7 +7,6 @@
 elrond_wasm_node::wasm_endpoints! {
     rust_testing_framework_tester
     (
-        init
         callBack
         addValue
         burn_esdt

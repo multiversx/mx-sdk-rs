@@ -137,3 +137,9 @@ pub fn callback_proxy_object_def() -> proc_macro2::TokenStream {
         }
     }
 }
+
+pub fn call_method_api_static_init() -> proc_macro2::TokenStream {
+    quote! {
+        <Self::Api as elrond_wasm::api::VMApi>::init_static();
+    }
+}

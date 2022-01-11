@@ -7,7 +7,6 @@
 elrond_wasm_node::wasm_endpoints! {
     forwarder
     (
-        init
         callBack
         accept_funds_func
         buy_nft

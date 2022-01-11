@@ -1,7 +1,7 @@
 use super::{
     arg_regular::*, method_gen::generate_arg_call_name, only_owner_gen::*, payable_gen::*, util::*,
 };
-use crate::model::Method;
+use crate::{generate::snippets, model::Method};
 
 pub fn generate_call_to_method_expr(m: &Method) -> proc_macro2::TokenStream {
     let fn_ident = &m.name;
@@ -32,6 +32,7 @@ pub fn generate_call_method_body(m: &Method) -> proc_macro2::TokenStream {
 }
 
 pub fn generate_call_method_body_fixed_args(m: &Method) -> proc_macro2::TokenStream {
+    let api_static_init = snippets::call_method_api_static_init();
     let payable_snippet = generate_payable_snippet(m);
     let only_owner_snippet = generate_only_owner_snippet(m);
 
@@ -63,6 +64,7 @@ pub fn generate_call_method_body_fixed_args(m: &Method) -> proc_macro2::TokenStr
     let nr_args = arg_index + 1;
 
     quote! {
+        #api_static_init
         #payable_snippet
         #only_owner_snippet
         elrond_wasm::api::EndpointArgumentApiImpl::check_num_arguments(
@@ -74,6 +76,7 @@ pub fn generate_call_method_body_fixed_args(m: &Method) -> proc_macro2::TokenStr
 }
 
 fn generate_call_method_body_variable_nr_args(m: &Method) -> proc_macro2::TokenStream {
+    let api_static_init = snippets::call_method_api_static_init();
     let payable_snippet = generate_payable_snippet(m);
     let only_owner_snippet = generate_only_owner_snippet(m);
 
@@ -93,6 +96,8 @@ fn generate_call_method_body_variable_nr_args(m: &Method) -> proc_macro2::TokenS
     let body_with_result = generate_body_with_result(&m.return_type, &call);
 
     quote! {
+        #api_static_init
+
         #payable_snippet
 
         #only_owner_snippet
