@@ -7,7 +7,6 @@
 elrond_wasm_node::wasm_endpoints! {
     abi_tester
     (
-        init
         address_vs_h256
         echo_abi_test_type
         echo_enum

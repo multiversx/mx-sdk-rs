@@ -67,3 +67,8 @@ impl Default for TxManagedTypes {
         TxManagedTypes::new()
     }
 }
+
+#[derive(Debug, Default)]
+pub struct TxStaticVars {
+    pub(crate) external_view_target_address_handle: Handle,
+}

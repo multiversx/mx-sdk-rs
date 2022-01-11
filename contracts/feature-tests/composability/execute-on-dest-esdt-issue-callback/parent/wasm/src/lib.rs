@@ -7,7 +7,6 @@
 elrond_wasm_node::wasm_endpoints! {
     parent
     (
-        init
         deployChildContract
         deposit
         executeOnDestIssueToken

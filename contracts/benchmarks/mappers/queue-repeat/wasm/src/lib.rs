@@ -7,7 +7,6 @@
 elrond_wasm_node::wasm_endpoints! {
     queue_repeat
     (
-        init
         add
         add_struct
         bench

@@ -7,7 +7,6 @@
 elrond_wasm_node::wasm_endpoints! {
     basic_features
     (
-        init
         add_assign_big_int
         add_assign_big_int_ref
         add_assign_big_uint
