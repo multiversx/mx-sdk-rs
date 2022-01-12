@@ -22,6 +22,7 @@ pub mod api;
 pub mod contract_base;
 pub mod err_msg;
 pub mod esdt;
+pub mod external_view_contract;
 pub mod hex_call_data;
 pub mod hex_util;
 pub mod io;

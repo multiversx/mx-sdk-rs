@@ -7,7 +7,6 @@
 elrond_wasm_node::wasm_endpoints! {
     ping_pong_egld
     (
-        init
         getActivationTimestamp
         getDeadline
         getMaxFunds
