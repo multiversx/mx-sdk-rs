@@ -7,7 +7,6 @@
 elrond_wasm_node::wasm_endpoints! {
     use_module
     (
-        init
         callBack
         call_derived_not_owner_only
         call_mod_a

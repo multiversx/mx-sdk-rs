@@ -7,7 +7,6 @@
 elrond_wasm_node::wasm_endpoints! {
     send_tx_repeat
     (
-        init
         repeat
     )
 }

@@ -7,7 +7,6 @@
 elrond_wasm_node::wasm_endpoints! {
     egld_esdt_swap
     (
-        init
         callBack
         getLockedEgldBalance
         getUnusedWrappedEgld

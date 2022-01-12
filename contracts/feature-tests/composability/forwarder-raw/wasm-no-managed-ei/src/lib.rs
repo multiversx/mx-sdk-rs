@@ -7,7 +7,6 @@
 elrond_wasm_node::wasm_endpoints! {
     forwarder_raw
     (
-        init
         callBack
         call_execute_on_dest_context
         call_execute_on_dest_context_by_caller
