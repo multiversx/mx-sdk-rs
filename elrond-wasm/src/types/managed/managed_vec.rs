@@ -1,7 +1,7 @@
-use super::{ManagedBuffer, ManagedType, ManagedVecItem, ManagedVecRefIterator};
+use super::{ManagedBuffer, ManagedType, ManagedVecItem, ManagedVecRef, ManagedVecRefIterator};
 use crate::{
     abi::TypeAbi,
-    api::{Handle, InvalidSliceError, ManagedTypeApi},
+    api::{ErrorApiImpl, Handle, InvalidSliceError, ManagedTypeApi},
     types::{ArgBuffer, BoxedBytes, ManagedBufferNestedDecodeInput},
 };
 use alloc::{string::String, vec::Vec};
@@ -10,6 +10,8 @@ use elrond_codec::{
     DecodeError, EncodeError, NestedDecode, NestedDecodeInput, NestedEncode, NestedEncodeOutput,
     TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
 };
+
+pub(crate) const INDEX_OUT_OF_RANGE_MSG: &[u8] = b"ManagedVec index out of range";
 
 /// A list of items that lives inside a managed buffer.
 /// Items can be either stored there in full (e.g. `u32`),
@@ -121,7 +123,7 @@ where
     /// Retrieves element at index, if the index is valid.
     /// Warning! Ownership around this method is murky, managed items are copied without respecting ownership.
     /// TODO: Find a way to fix it by returning some kind of reference to the item, not the owned type.
-    pub fn get(&self, index: usize) -> Option<T> {
+    pub fn try_get(&self, index: usize) -> Option<T> {
         let byte_index = index * T::PAYLOAD_SIZE;
         let mut load_result = Ok(());
         let result = T::from_byte_reader(|dest_slice| {
@@ -131,6 +133,25 @@ where
             Ok(_) => Some(result),
             Err(_) => None,
         }
+    }
+
+    /// Retrieves element at index, if the index is valid.
+    /// Otherwise, signals an error and terminates execution.
+    pub fn get(&self, index: usize) -> T::ReadOnly {
+        let byte_index = index * T::PAYLOAD_SIZE;
+        let mut load_result = Ok(());
+        let result = T::from_byte_reader_as_read_only(|dest_slice| {
+            load_result = self.buffer.load_slice(byte_index, dest_slice);
+        });
+
+        match load_result {
+            Ok(_) => result,
+            Err(_) => M::error_api_impl().signal_error(INDEX_OUT_OF_RANGE_MSG),
+        }
+    }
+
+    pub fn get_mut(&mut self, index: usize) -> ManagedVecRef<M, T> {
+        ManagedVecRef::new(self, index)
     }
 
     pub fn set(&mut self, index: usize, item: &T) -> Result<(), InvalidSliceError> {

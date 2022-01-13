@@ -51,7 +51,7 @@ where
     }
 
     pub fn get(&self, index: usize) -> Option<T> {
-        self.0.get(index)
+        self.0.try_get(index)
     }
 
     #[allow(clippy::redundant_closure)]
