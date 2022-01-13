@@ -7,7 +7,6 @@
 elrond_wasm_node::wasm_endpoints! {
     second_contract
     (
-        init
         acceptEsdtPayment
         getesdtTokenName
         rejectEsdtPayment
