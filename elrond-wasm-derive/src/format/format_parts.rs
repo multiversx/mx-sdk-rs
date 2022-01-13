@@ -3,7 +3,7 @@ const CLOSED_BRACE: u8 = b'}';
 const TWO_DOTS: u8 = b':';
 const X_LETTER: u8 = b'x';
 
-const UNMATCHED_BRACE_ERR_MSG: &'static str = "Unmatched `{` in the format string";
+const UNMATCHED_BRACE_ERR_MSG: &str = "Unmatched `{` in the format string";
 
 pub enum FormatPartType {
     StaticAscii(String),
@@ -92,10 +92,10 @@ pub fn parse_format_string(raw_string: &str) -> Vec<FormatPartType> {
 pub(crate) fn count_args(format_types: &[FormatPartType]) -> usize {
     let mut nr_args = 0;
     for f in format_types {
-        match f {
-            &FormatPartType::Ascii => nr_args += 1,
-            &FormatPartType::Hex => nr_args += 1,
-            &FormatPartType::StaticAscii(_) => {},
+        match *f {
+            FormatPartType::Ascii => nr_args += 1,
+            FormatPartType::Hex => nr_args += 1,
+            FormatPartType::StaticAscii(_) => {},
         }
     }
 

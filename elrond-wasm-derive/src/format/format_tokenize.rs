@@ -27,7 +27,7 @@ pub fn tokenize(input: proc_macro::TokenStream) -> Vec<proc_macro::TokenTree> {
     let mut output = Vec::new();
     for tt in input.into_iter() {
         if token_tree_is_comma(&tt) {
-            flush_token_buffer(&mut output, core::mem::replace(&mut buffer, Vec::new()));
+            flush_token_buffer(&mut output, core::mem::take(&mut buffer));
         } else {
             buffer.push(tt);
         }
