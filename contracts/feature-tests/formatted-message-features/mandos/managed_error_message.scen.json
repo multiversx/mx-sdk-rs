@@ -19,6 +19,26 @@
         },
         {
             "step": "scCall",
+            "txId": "static_message",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:msg-features",
+                "function": "static_message",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:Static error",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
             "txId": "1",
             "tx": {
                 "from": "address:an_account",

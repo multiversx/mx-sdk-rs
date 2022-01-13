@@ -59,36 +59,16 @@ macro_rules! sc_error {
 }
 
 #[macro_export]
-macro_rules! encode_all_args {
-    ($args_buffer:expr, $arg:expr) => {
-        let mut ___temp_buffer___ = elrond_wasm::types::ManagedBuffer::<Self::Api>::new();
-        let _ = elrond_wasm::elrond_codec::TopEncode::top_encode(&$arg, &mut ___temp_buffer___);
-
-        $args_buffer.push(___temp_buffer___);
-    };
-    ($args_buffer:expr, $arg:expr, $($other_args:expr),+) => {
-        elrond_wasm::encode_all_args!($args_buffer, $arg);
-        elrond_wasm::encode_all_args!($args_buffer, $($other_args),+);
-    };
-}
-
-#[macro_export]
 macro_rules! signal_error {
     ($msg:tt, $($arg:expr),+) => {{
         let mut ___buffer___ =
             elrond_wasm::types::ManagedBufferCachedBuilder::<Self::Api>::new_from_slice(&[]);
-
-        let mut ___encoded_args___ = elrond_wasm::types::ManagedVec::<Self::Api, elrond_wasm::types::ManagedBuffer::<Self::Api>>::new();
-        elrond_wasm::encode_all_args!(___encoded_args___, $($arg),+);
-
-        // #[allow(unused_variables)]
-        let mut encoded_arg_by_index: elrond_wasm::types::ManagedBuffer<Self::Api>;
-
-        elrond_wasm::derive::sc_error_format!($msg, $($arg)+);
-
-        let mut ___as_managed_buffer___ = ___buffer___.into_managed_buffer();
-        Self::Api::error_api_impl().signal_error_from_buffer(___as_managed_buffer___.get_raw_handle());
+        elrond_wasm::derive::format_receiver_args!(___buffer___, $msg, $($arg),+);
+        Self::Api::error_api_impl().signal_error_from_buffer(___buffer___.into_managed_buffer().get_raw_handle());
     }};
+    ($msg:tt) => {
+        Self::Api::error_api_impl().signal_error($msg.as_bytes());
+    };
 }
 
 /// Equivalent to the `?` operator for SCResult.

@@ -11,9 +11,7 @@ pub enum FormatPartType {
     Ascii,
 }
 
-// pub struct
-
-pub(crate) fn split_msg_into_format_parts(raw_string: &str) -> Vec<FormatPartType> {
+pub fn parse_format_string(raw_string: &str) -> Vec<FormatPartType> {
     if !raw_string.is_ascii() {
         panic!("Only ASCII strings allowed");
     }
