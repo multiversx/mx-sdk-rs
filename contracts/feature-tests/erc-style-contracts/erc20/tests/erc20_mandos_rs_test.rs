@@ -4,7 +4,7 @@ fn world() -> BlockchainMock {
     let mut blockchain = BlockchainMock::new();
     blockchain.set_current_dir_from_workspace("contracts/feature-tests/erc-style-contracts/erc20");
 
-    blockchain.register_contract_builder("file:output/erc20.wasm", erc20::contract_builder);
+    blockchain.register_contract_builder("file:output/erc20.wasm", erc20::ContractBuilder);
     blockchain
 }
 
