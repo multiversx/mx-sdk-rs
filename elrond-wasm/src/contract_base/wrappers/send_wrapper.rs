@@ -321,7 +321,7 @@ where
             &arg_buffer,
         );
 
-        if let Some(first_result_bytes) = output.get(0) {
+        if let Some(first_result_bytes) = output.try_get(0) {
             u64::top_decode(first_result_bytes).unwrap_or_default()
         } else {
             0
@@ -367,7 +367,7 @@ where
             &arg_buffer,
         );
 
-        if let Some(first_result_bytes) = output.get(0) {
+        if let Some(first_result_bytes) = output.try_get(0) {
             first_result_bytes.parse_as_u64().unwrap_or_default()
         } else {
             0

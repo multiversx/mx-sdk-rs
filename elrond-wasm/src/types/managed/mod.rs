@@ -20,6 +20,7 @@ mod managed_type_trait;
 mod managed_vec;
 mod managed_vec_item;
 mod managed_vec_owned_iter;
+mod managed_vec_ref;
 mod managed_vec_ref_iter;
 pub(crate) mod preloaded_managed_buffer;
 
@@ -44,4 +45,5 @@ pub use managed_vec::{
 };
 pub use managed_vec_item::ManagedVecItem;
 pub use managed_vec_owned_iter::ManagedVecOwnedIterator;
+pub use managed_vec_ref::ManagedVecRef;
 pub use managed_vec_ref_iter::ManagedVecRefIterator;
