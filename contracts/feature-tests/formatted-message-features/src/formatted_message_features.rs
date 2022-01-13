@@ -8,6 +8,11 @@ pub trait FormattedMessageFeatures {
     fn init(&self) {}
 
     #[endpoint]
+    fn static_message(&self) {
+        signal_error!("Static error");
+    }
+
+    #[endpoint]
     fn dynamic_message(&self, bytes: ManagedBuffer) {
         signal_error!("Got this buffer: {:x}. I don't like it, ERROR!", bytes);
     }
