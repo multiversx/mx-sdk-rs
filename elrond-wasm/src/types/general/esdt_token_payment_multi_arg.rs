@@ -41,7 +41,9 @@ impl<M: ManagedTypeApi> ManagedVecItem for EsdtTokenPaymentMultiArg<M> {
     }
 
     #[inline]
-    fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(reader: Reader) -> Self::Ref<'a> {
+    unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
+        reader: Reader,
+    ) -> Self::Ref<'a> {
         Self::from_byte_reader(reader)
     }
 

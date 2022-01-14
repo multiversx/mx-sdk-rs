@@ -38,12 +38,14 @@ where
         if next_byte_start > self.byte_end {
             return None;
         }
-        let result = T::from_byte_reader_as_borrow(|dest_slice| {
-            let _ = self
-                .managed_vec
-                .buffer
-                .load_slice(self.byte_start, dest_slice);
-        });
+        let result = unsafe {
+            T::from_byte_reader_as_borrow(|dest_slice| {
+                let _ = self
+                    .managed_vec
+                    .buffer
+                    .load_slice(self.byte_start, dest_slice);
+            })
+        };
 
         self.byte_start = next_byte_start;
         Some(result)
@@ -73,12 +75,14 @@ where
         }
         self.byte_end -= T::PAYLOAD_SIZE;
 
-        let result = T::from_byte_reader_as_borrow(|dest_slice| {
-            let _ = self
-                .managed_vec
-                .buffer
-                .load_slice(self.byte_end, dest_slice);
-        });
+        let result = unsafe {
+            T::from_byte_reader_as_borrow(|dest_slice| {
+                let _ = self
+                    .managed_vec
+                    .buffer
+                    .load_slice(self.byte_end, dest_slice);
+            })
+        };
 
         Some(result)
     }
