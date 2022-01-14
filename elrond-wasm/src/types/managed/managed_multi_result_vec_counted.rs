@@ -1,3 +1,5 @@
+use core::borrow::Borrow;
+
 use super::{ManagedVec, ManagedVecItem};
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer},
@@ -113,13 +115,12 @@ where
 impl<M, T> ContractCallArg for &ManagedCountedMultiResultVec<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem + ContractCallArg,
-    <T as ManagedVecItem>::ReadOnly: TopEncode,
+    T: ManagedVecItem + ContractCallArg + TopEncode,
 {
     fn push_dyn_arg<O: DynArgOutput>(&self, output: &mut O) {
         self.len().push_dyn_arg(output);
         for item in self.contents.iter() {
-            item.push_dyn_arg(output);
+            item.borrow().push_dyn_arg(output);
         }
     }
 }
@@ -127,11 +128,11 @@ where
 impl<M, T> ContractCallArg for ManagedCountedMultiResultVec<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem + ContractCallArg,
+    T: ManagedVecItem + ContractCallArg + TopEncode,
     <T as ManagedVecItem>::ReadOnly: TopEncode,
 {
     fn push_dyn_arg<O: DynArgOutput>(&self, output: &mut O) {
-        (&self).push_dyn_arg(output)
+        self.borrow().push_dyn_arg(output)
     }
 }
 

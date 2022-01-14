@@ -137,10 +137,10 @@ where
 
     /// Retrieves element at index, if the index is valid.
     /// Otherwise, signals an error and terminates execution.
-    pub fn get(&self, index: usize) -> T::ReadOnly {
+    pub fn get<'a>(&'a self, index: usize) -> T::Ref<'a> {
         let byte_index = index * T::PAYLOAD_SIZE;
         let mut load_result = Ok(());
-        let result = T::from_byte_reader_as_read_only(|dest_slice| {
+        let result = T::from_byte_reader_as_borrow(|dest_slice| {
             load_result = self.buffer.load_slice(byte_index, dest_slice);
         });
 

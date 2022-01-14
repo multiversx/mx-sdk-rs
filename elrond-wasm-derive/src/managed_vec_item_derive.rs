@@ -122,6 +122,7 @@ pub fn managed_vec_item_derive(ast: &syn::DeriveInput) -> TokenStream {
             const PAYLOAD_SIZE: usize = #(#payload_snippets)+*;
             const SKIPS_RESERIALIZATION: bool = #(#skips_reserialization_snippets)&&*;
             type ReadOnly = Self;
+            type Ref<'a> = Self;
 
             fn from_byte_reader<Reader: FnMut(&mut [u8])>(mut reader: Reader) -> Self {
                 #array_init_snippet
@@ -133,7 +134,7 @@ pub fn managed_vec_item_derive(ast: &syn::DeriveInput) -> TokenStream {
                 }
             }
 
-            fn from_byte_reader_as_read_only<Reader: FnMut(&mut [u8])>(mut reader: Reader) -> Self::ReadOnly {
+            fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(reader: Reader) -> Self::Ref<'a> {
                 Self::from_byte_reader(reader)
             }
 

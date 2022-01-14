@@ -31,14 +31,14 @@ where
     M: ManagedTypeApi,
     T: ManagedVecItem,
 {
-    type Item = T::ReadOnly;
+    type Item = T::Ref<'a>;
 
     fn next(&mut self) -> Option<Self::Item> {
         let next_byte_start = self.byte_start + T::PAYLOAD_SIZE;
         if next_byte_start > self.byte_end {
             return None;
         }
-        let result = T::from_byte_reader_as_read_only(|dest_slice| {
+        let result = T::from_byte_reader_as_borrow(|dest_slice| {
             let _ = self
                 .managed_vec
                 .buffer
@@ -73,7 +73,7 @@ where
         }
         self.byte_end -= T::PAYLOAD_SIZE;
 
-        let result = T::from_byte_reader_as_read_only(|dest_slice| {
+        let result = T::from_byte_reader_as_borrow(|dest_slice| {
             let _ = self
                 .managed_vec
                 .buffer

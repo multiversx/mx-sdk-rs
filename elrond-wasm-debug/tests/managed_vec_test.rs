@@ -1,3 +1,5 @@
+use std::ops::Deref;
+
 use elrond_wasm::types::{BigUint, ManagedVec};
 use elrond_wasm_debug::DebugApi;
 
@@ -163,9 +165,9 @@ fn test_managed_vec_get_mut() {
     assert_eq!(*managed_vec.get(1), 100u32);
 
     {
-        let first_elem = managed_vec.get(0);
+        let first_elem = managed_vec.get(0).deref().clone();
         let mut second_elem = managed_vec.get_mut(1);
-        *second_elem += &*first_elem;
+        *second_elem += first_elem;
     }
 
     assert_eq!(*managed_vec.get(0), 200u32);
