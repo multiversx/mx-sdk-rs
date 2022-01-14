@@ -13,11 +13,8 @@ extern "C" {
 
     fn checkNoPayment();
 
+    // EGLD call value
     fn bigIntGetCallValue(dest: i32);
-    fn bigIntGetESDTCallValue(dest: i32);
-    fn getESDTTokenName(resultOffset: *const u8) -> i32;
-    fn getESDTTokenNonce() -> i64;
-    fn getESDTTokenType() -> i32;
 
     // multi-transfer API
     fn getNumESDTTransfers() -> i32;
@@ -27,10 +24,6 @@ extern "C" {
     fn getESDTTokenTypeByIndex(index: i32) -> i32;
     #[cfg(not(feature = "unmanaged-ei"))]
     fn managedGetMultiESDTCallValue(resultHandle: i32);
-
-    /// TODO: decide if it is worth using or not
-    #[allow(dead_code)]
-    fn getCallValueTokenName(callValueOffset: *const u8, resultOffset: *const u8) -> i32;
 }
 
 impl CallValueApi for VmApiImpl {
@@ -56,35 +49,6 @@ impl CallValueApiImpl for VmApiImpl {
             bigIntGetCallValue(value_handle);
             value_handle
         }
-    }
-
-    fn esdt_value(&self) -> Handle {
-        unsafe {
-            let value_handle = bigIntNew(0);
-            bigIntGetESDTCallValue(value_handle);
-            value_handle
-        }
-    }
-
-    fn token(&self) -> Handle {
-        unsafe {
-            let mut name_buffer = [0u8; MAX_POSSIBLE_TOKEN_IDENTIFIER_LENGTH];
-            let name_len = getESDTTokenName(name_buffer.as_mut_ptr());
-            if name_len == 0 {
-                TokenIdentifier::<Self>::egld().get_raw_handle()
-            } else {
-                TokenIdentifier::<Self>::from_esdt_bytes(&name_buffer[..name_len as usize])
-                    .get_raw_handle()
-            }
-        }
-    }
-
-    fn esdt_token_nonce(&self) -> u64 {
-        unsafe { getESDTTokenNonce() as u64 }
-    }
-
-    fn esdt_token_type(&self) -> EsdtTokenType {
-        unsafe { (getESDTTokenType() as u8).into() }
     }
 
     fn esdt_num_transfers(&self) -> usize {

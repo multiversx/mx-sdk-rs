@@ -4,6 +4,8 @@ use crate::{
     types::{BigUint, EsdtTokenPayment, EsdtTokenType, ManagedType, ManagedVec, TokenIdentifier},
 };
 
+const FIRST_TOKEN_INDEX: usize = 0;
+
 pub trait CallValueApi {
     type CallValueApiImpl: CallValueApiImpl;
 
@@ -13,28 +15,46 @@ pub trait CallValueApi {
 pub trait CallValueApiImpl: ErrorApiImpl + ManagedTypeApiImpl {
     fn check_not_payable(&self);
 
+    fn require_max_one_esdt_transfer(&self) {
+        if self.esdt_num_transfers() > 1 {
+            self.signal_error(err_msg::TOO_MANY_ESDT_TRANSFERS);
+        }
+    }
+
     /// Retrieves the EGLD call value from the VM.
     /// Will return 0 in case of an ESDT transfer (cannot have both EGLD and ESDT transfer simultaneously).
     fn egld_value(&self) -> Handle;
 
     /// Retrieves the ESDT call value from the VM.
     /// Will return 0 in case of an EGLD transfer (cannot have both EGLD and ESDT transfer simultaneously).
-    fn esdt_value(&self) -> Handle;
+    fn esdt_value(&self) -> Handle {
+        self.require_max_one_esdt_transfer();
+        self.esdt_value_by_index(FIRST_TOKEN_INDEX)
+    }
 
     /// Returns the call value token identifier of the current call.
     /// The identifier is wrapped in a TokenIdentifier object, to hide underlying logic.
     ///
     /// A note on implementation: even though the underlying api returns an empty name for EGLD,
     /// but the EGLD TokenIdentifier is serialized as `EGLD`.
-    fn token(&self) -> Handle;
+    fn token(&self) -> Handle {
+        self.require_max_one_esdt_transfer();
+        self.token_by_index(FIRST_TOKEN_INDEX)
+    }
 
     /// Returns the nonce of the received ESDT token.
     /// Will return 0 in case of EGLD or fungible ESDT transfer.
-    fn esdt_token_nonce(&self) -> u64;
+    fn esdt_token_nonce(&self) -> u64 {
+        self.require_max_one_esdt_transfer();
+        self.esdt_token_nonce_by_index(FIRST_TOKEN_INDEX)
+    }
 
     /// Returns the ESDT token type.
     /// Will return "Fungible" for EGLD.
-    fn esdt_token_type(&self) -> EsdtTokenType;
+    fn esdt_token_type(&self) -> EsdtTokenType {
+        self.require_max_one_esdt_transfer();
+        self.esdt_token_type_by_index(FIRST_TOKEN_INDEX)
+    }
 
     /// Will return the EGLD call value,
     /// but also fail with an error if ESDT is sent.

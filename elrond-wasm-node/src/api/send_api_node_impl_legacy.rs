@@ -35,33 +35,6 @@ extern "C" {
         dataOffset: *const u8,
     ) -> i32;
 
-    fn transferESDTExecute(
-        dstOffset: *const u8,
-        tokenIdOffset: *const u8,
-        tokenIdLen: i32,
-        valueOffset: *const u8,
-        gasLimit: i64,
-        functionOffset: *const u8,
-        functionLength: i32,
-        numArguments: i32,
-        argumentsLengthOffset: *const u8,
-        dataOffset: *const u8,
-    ) -> i32;
-
-    fn transferESDTNFTExecute(
-        dstOffset: *const u8,
-        tokenIdOffset: *const u8,
-        tokenIdLen: i32,
-        valueOffset: *const u8,
-        nonce: i64,
-        gasLimit: i64,
-        functionOffset: *const u8,
-        functionLength: i32,
-        numArguments: i32,
-        argumentsLengthOffset: *const u8,
-        dataOffset: *const u8,
-    ) -> i32;
-
     fn multiTransferESDTNFTExecute(
         dstOffset: *const u8,
         numTokenTransfers: i32,
@@ -226,6 +199,7 @@ impl SendApiImpl for VmApiImpl {
         }
     }
 
+    #[inline]
     fn direct_esdt_execute<M: ManagedTypeApi>(
         &self,
         to: &ManagedAddress<M>,
@@ -235,29 +209,7 @@ impl SendApiImpl for VmApiImpl {
         endpoint_name: &ManagedBuffer<M>,
         arg_buffer: &ManagedArgBuffer<M>,
     ) -> Result<(), &'static [u8]> {
-        let to_address = to.to_address();
-        unsafe {
-            let amount_bytes32_ptr = unsafe_buffer_load_be_pad_right(amount.get_raw_handle(), 32);
-            let function = endpoint_name.to_boxed_bytes();
-            let legacy_arg_buffer = arg_buffer.to_legacy_arg_buffer();
-            let result = transferESDTExecute(
-                to_address.as_ptr(),
-                token.to_esdt_identifier().as_ptr(),
-                token.len() as i32,
-                amount_bytes32_ptr,
-                gas_limit as i64,
-                function.as_ptr(),
-                function.len() as i32,
-                legacy_arg_buffer.num_args() as i32,
-                legacy_arg_buffer.arg_lengths_bytes_ptr(),
-                legacy_arg_buffer.arg_data_ptr(),
-            );
-            if result == 0 {
-                Ok(())
-            } else {
-                Err(b"transferESDTExecute failed")
-            }
-        }
+        self.direct_esdt_nft_execute(to, token, 0, amount, gas_limit, endpoint_name, arg_buffer)
     }
 
     fn direct_esdt_nft_execute<M: ManagedTypeApi>(
@@ -270,30 +222,10 @@ impl SendApiImpl for VmApiImpl {
         endpoint_name: &ManagedBuffer<M>,
         arg_buffer: &ManagedArgBuffer<M>,
     ) -> Result<(), &'static [u8]> {
-        let to_address = to.to_address();
-        unsafe {
-            let amount_bytes32_ptr = unsafe_buffer_load_be_pad_right(amount.get_raw_handle(), 32);
-            let function = endpoint_name.to_boxed_bytes();
-            let legacy_arg_buffer = arg_buffer.to_legacy_arg_buffer();
-            let result = transferESDTNFTExecute(
-                to_address.as_ptr(),
-                token.to_esdt_identifier().as_ptr(),
-                token.len() as i32,
-                amount_bytes32_ptr,
-                nonce as i64,
-                gas_limit as i64,
-                function.as_ptr(),
-                function.len() as i32,
-                legacy_arg_buffer.num_args() as i32,
-                legacy_arg_buffer.arg_lengths_bytes_ptr(),
-                legacy_arg_buffer.arg_data_ptr(),
-            );
-            if result == 0 {
-                Ok(())
-            } else {
-                Err(b"transferESDTNFTExecute failed")
-            }
-        }
+        let mut payments = ManagedVec::new();
+        payments.push(EsdtTokenPayment::new(token.clone(), nonce, amount.clone()));
+
+        self.direct_multi_esdt_transfer_execute(to, &payments, gas_limit, endpoint_name, arg_buffer)
     }
 
     fn direct_multi_esdt_transfer_execute<M: ManagedTypeApi>(

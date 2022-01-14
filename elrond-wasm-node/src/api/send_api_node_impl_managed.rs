@@ -161,6 +161,7 @@ impl SendApiImpl for VmApiImpl {
         }
     }
 
+    #[inline]
     fn direct_esdt_execute<M: ManagedTypeApi>(
         &self,
         to: &ManagedAddress<M>,
