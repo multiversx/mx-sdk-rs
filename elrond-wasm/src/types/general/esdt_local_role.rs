@@ -110,7 +110,6 @@ impl<'a> From<&'a [u8]> for EsdtLocalRole {
 impl ManagedVecItem for EsdtLocalRole {
     const PAYLOAD_SIZE: usize = 1;
     const SKIPS_RESERIALIZATION: bool = false; // TODO: might be ok to be true, but needs testing
-    type ReadOnly = Self;
     type Ref<'a> = Self;
 
     fn from_byte_reader<Reader: FnMut(&mut [u8])>(reader: Reader) -> Self {
