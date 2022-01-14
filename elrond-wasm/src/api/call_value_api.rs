@@ -79,7 +79,7 @@ pub trait CallValueApiImpl: ErrorApiImpl + ManagedTypeApiImpl {
 
     /// Returns both the call value (either EGLD or ESDT) and the token identifier.
     /// Especially used in the `#[payable("*")] auto-generated snippets.
-    /// The method might seem redundant, but there is such a hook in Arwen
+    /// The method might seem redundant, but there is such a hook
     /// that might be used in this scenario in the future.
     fn payment_token_pair(&self) -> (Handle, Handle) {
         let token = self.token();
