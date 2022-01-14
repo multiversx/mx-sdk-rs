@@ -52,7 +52,7 @@ where
         self.0.is_empty()
     }
 
-    pub fn get<'a>(&'a self, index: usize) -> T::Ref<'a> {
+    pub fn get(&self, index: usize) -> T::Ref<'_> {
         self.0.get(index)
     }
 
