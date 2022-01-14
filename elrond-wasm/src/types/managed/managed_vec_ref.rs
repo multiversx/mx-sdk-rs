@@ -1,15 +1,20 @@
-use core::ops::{Deref, DerefMut};
+use core::{
+    marker::PhantomData,
+    ops::{Deref, DerefMut},
+};
 
-use crate::api::{ErrorApiImpl, ManagedTypeApi};
+use crate::api::{Handle, ManagedTypeApi};
 
-use super::{managed_vec::INDEX_OUT_OF_RANGE_MSG, ManagedVec, ManagedVecItem};
+use super::{ManagedType, ManagedVec, ManagedVecItem};
 
 pub struct ManagedVecRef<'a, M, T>
 where
     M: ManagedTypeApi,
     T: ManagedVecItem,
 {
-    managed_vec: &'a mut ManagedVec<M, T>,
+    _phantom_m: PhantomData<M>,
+    _phantom_t: PhantomData<&'a mut T>, // needed for the lifetime, even though T is present
+    managed_vec_handle: Handle,
     item_index: usize,
     item: T,
 }
@@ -19,14 +24,17 @@ where
     M: ManagedTypeApi,
     T: ManagedVecItem,
 {
-    pub(crate) fn new(managed_vec: &'a mut ManagedVec<M, T>, item_index: usize) -> Self {
-        let item = match managed_vec.try_get(item_index) {
-            Some(t) => t,
-            None => M::error_api_impl().signal_error(INDEX_OUT_OF_RANGE_MSG),
-        };
+    #[inline]
+    fn wrap_as_managed_vec(managed_vec_handle: Handle) -> ManagedVec<M, T> {
+        ManagedVec::from_raw_handle(managed_vec_handle)
+    }
 
+    pub(super) fn new(managed_vec_handle: Handle, item_index: usize) -> Self {
+        let item = unsafe { Self::wrap_as_managed_vec(managed_vec_handle).get_unsafe(item_index) };
         Self {
-            managed_vec,
+            _phantom_m: PhantomData,
+            _phantom_t: PhantomData,
+            managed_vec_handle,
             item_index,
             item,
         }
@@ -39,7 +47,7 @@ where
     T: ManagedVecItem,
 {
     fn drop(&mut self) {
-        let _ = self.managed_vec.set(self.item_index, &self.item);
+        let _ = Self::wrap_as_managed_vec(self.managed_vec_handle).set(self.item_index, &self.item);
     }
 }
 
