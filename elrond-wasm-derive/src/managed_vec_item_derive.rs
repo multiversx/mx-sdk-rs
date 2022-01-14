@@ -121,7 +121,6 @@ pub fn managed_vec_item_derive(ast: &syn::DeriveInput) -> TokenStream {
         impl #impl_generics elrond_wasm::types::ManagedVecItem for #name #ty_generics #where_clause {
             const PAYLOAD_SIZE: usize = #(#payload_snippets)+*;
             const SKIPS_RESERIALIZATION: bool = #(#skips_reserialization_snippets)&&*;
-            type ReadOnly = Self;
             type Ref<'a> = Self;
 
             fn from_byte_reader<Reader: FnMut(&mut [u8])>(mut reader: Reader) -> Self {

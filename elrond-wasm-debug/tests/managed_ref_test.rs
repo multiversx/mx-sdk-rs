@@ -36,30 +36,22 @@ fn test_managed_ref() {
 }
 
 #[test]
-fn test_managed_ref_or_readonly() {
+fn test_managed_ref_clone() {
     let _ = DebugApi::dummy();
 
     let obj = BigUint::<DebugApi>::from(7u32);
-    let obj_readonly = obj.into_readonly();
-
-    let obj_ref_to_readonly = obj_readonly.as_ref();
+    let obj_ref = obj.as_ref();
     assert_eq!(
-        obj_ref_to_readonly.get_raw_handle(),
-        ManagedRef::get_raw_handle_of_ref(obj_ref_to_readonly)
+        obj.get_raw_handle(),
+        obj_ref.get_raw_handle()
     );
 
-    // cloning the readonly reference
-    let obj_readonly_clone = Clone::clone(&*obj_ref_to_readonly);
-    assert_eq!(obj_readonly, obj_readonly_clone);
-    assert_eq!(
-        obj_ref_to_readonly.get_raw_handle(),
-        obj_readonly_clone.get_raw_handle()
+    let obj_clone = Clone::clone(&*obj_ref);
+    assert_eq!(obj, obj_clone);
+    assert_ne!(
+        obj.get_raw_handle(),
+        obj_clone.get_raw_handle()
     );
-
-    // cloning the object itself, so double deref
-    let obj_clone = (**obj_ref_to_readonly).clone();
-    assert_eq!(obj_clone, BigUint::<DebugApi>::from(7u32));
-    assert_ne!(obj_clone.get_raw_handle(), obj_readonly.get_raw_handle());
 }
 
 #[test]
@@ -74,20 +66,5 @@ fn test_managed_ref_eq() {
     assert_ne!(
         BigUint::<DebugApi>::from(1u32).as_ref(),
         BigUint::<DebugApi>::from(2u32).as_ref()
-    );
-}
-
-#[test]
-fn test_managed_readonly_eq() {
-    let _ = DebugApi::dummy();
-
-    assert_eq!(
-        BigUint::<DebugApi>::from(1u32).into_readonly(),
-        BigUint::<DebugApi>::from(1u32).into_readonly()
-    );
-
-    assert_ne!(
-        BigUint::<DebugApi>::from(1u32).into_readonly(),
-        BigUint::<DebugApi>::from(2u32).into_readonly()
     );
 }

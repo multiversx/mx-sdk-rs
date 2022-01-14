@@ -32,6 +32,7 @@ where
         }
     }
 
+    #[doc(hidden)]
     pub(super) fn wrap_handle(handle: Handle) -> Self {
         Self {
             _phantom_m: PhantomData,

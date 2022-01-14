@@ -129,7 +129,6 @@ impl<M, T> ContractCallArg for ManagedCountedMultiResultVec<M, T>
 where
     M: ManagedTypeApi,
     T: ManagedVecItem + ContractCallArg + TopEncode,
-    <T as ManagedVecItem>::ReadOnly: TopEncode,
 {
     fn push_dyn_arg<O: DynArgOutput>(&self, output: &mut O) {
         self.borrow().push_dyn_arg(output)

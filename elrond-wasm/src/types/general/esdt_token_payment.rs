@@ -75,7 +75,6 @@ where
 impl<M: ManagedTypeApi> ManagedVecItem for EsdtTokenPayment<M> {
     const PAYLOAD_SIZE: usize = 16;
     const SKIPS_RESERIALIZATION: bool = false;
-    type ReadOnly = Self;
     type Ref<'a> = Self;
 
     fn from_byte_reader<Reader: FnMut(&mut [u8])>(mut reader: Reader) -> Self {
