@@ -25,10 +25,22 @@ pub trait ManagedVecItem: 'static {
     /// False for all managed types, but true for basic types (like `u32`).
     const SKIPS_RESERIALIZATION: bool;
 
+    /// Reference representation of the ManagedVec item.
+    ///
+    /// Implementations:
+    /// - For items with Copy semantics, it should be the type itself.
+    /// - For managed types, ManagedRef does the job.
+    /// - For any other types, `Self` is currently used, although this is technically unsafe.
+    /// TODO: wrap other types in readonly wrapper.
     type Ref<'a>: Borrow<Self>;
 
+    /// Parses given bytes as a an owned object.
     fn from_byte_reader<Reader: FnMut(&mut [u8])>(reader: Reader) -> Self;
 
+    /// Parses given bytes as a representation of the object, either owned, or a reference.
+    ///
+    /// # Safety
+    ///
     /// In certain cases this involves practically disregarding the lifetimes, hence it is unsafe.
     unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
         reader: Reader,

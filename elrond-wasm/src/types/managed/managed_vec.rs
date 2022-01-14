@@ -120,7 +120,7 @@ where
         self.byte_len() == 0
     }
 
-    pub fn try_get<'a>(&'a self, index: usize) -> Option<T::Ref<'a>> {
+    pub fn try_get(&self, index: usize) -> Option<T::Ref<'_>> {
         let byte_index = index * T::PAYLOAD_SIZE;
         let mut load_result = Ok(());
         let result = unsafe {
@@ -136,7 +136,7 @@ where
 
     /// Retrieves element at index, if the index is valid.
     /// Otherwise, signals an error and terminates execution.
-    pub fn get<'a>(&'a self, index: usize) -> T::Ref<'a> {
+    pub fn get(&self, index: usize) -> T::Ref<'_> {
         match self.try_get(index) {
             Some(result) => result,
             None => M::error_api_impl().signal_error(INDEX_OUT_OF_RANGE_MSG),
