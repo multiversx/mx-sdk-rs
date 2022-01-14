@@ -1,3 +1,5 @@
+use core::borrow::Borrow;
+
 use alloc::string::String;
 use elrond_codec::{TopEncode, Vec};
 
@@ -130,8 +132,7 @@ where
 impl<M, T> EndpointResult for ManagedMultiResultVecEager<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem + EndpointResult,
-    <T as ManagedVecItem>::ReadOnly: TopEncode,
+    T: ManagedVecItem + EndpointResult + TopEncode,
 {
     type DecodeAs = ManagedMultiResultVecEager<M, T>;
 
@@ -141,19 +142,18 @@ where
         FA: ManagedTypeApi + EndpointFinishApi,
     {
         for elem in self.0.iter() {
-            elem.finish::<FA>();
+            elem.borrow().finish::<FA>();
         }
     }
 }
 impl<M, T> ContractCallArg for &ManagedMultiResultVecEager<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem + ContractCallArg,
-    <T as ManagedVecItem>::ReadOnly: TopEncode,
+    T: ManagedVecItem + ContractCallArg + TopEncode,
 {
     fn push_dyn_arg<O: DynArgOutput>(&self, output: &mut O) {
         for elem in self.0.iter() {
-            elem.push_dyn_arg(output);
+            elem.borrow().push_dyn_arg(output);
         }
     }
 }
@@ -161,8 +161,7 @@ where
 impl<M, T> ContractCallArg for ManagedMultiResultVecEager<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem + ContractCallArg,
-    <T as ManagedVecItem>::ReadOnly: TopEncode,
+    T: ManagedVecItem + ContractCallArg + TopEncode,
 {
     fn push_dyn_arg<O: DynArgOutput>(&self, output: &mut O) {
         (&self).push_dyn_arg(output)
