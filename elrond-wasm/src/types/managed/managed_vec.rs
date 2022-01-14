@@ -151,7 +151,20 @@ where
     }
 
     pub fn get_mut(&mut self, index: usize) -> ManagedVecRef<M, T> {
-        ManagedVecRef::new(self, index)
+        ManagedVecRef::new(self.get_raw_handle(), index)
+    }
+
+    pub(super) unsafe fn get_unsafe(&self, index: usize) -> T {
+        let byte_index = index * T::PAYLOAD_SIZE;
+        let mut load_result = Ok(());
+        let result = T::from_byte_reader(|dest_slice| {
+            load_result = self.buffer.load_slice(byte_index, dest_slice);
+        });
+
+        match load_result {
+            Ok(_) => result,
+            Err(_) => M::error_api_impl().signal_error(INDEX_OUT_OF_RANGE_MSG),
+        }
     }
 
     pub fn set(&mut self, index: usize, item: &T) -> Result<(), InvalidSliceError> {
