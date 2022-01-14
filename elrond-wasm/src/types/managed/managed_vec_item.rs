@@ -29,7 +29,10 @@ pub trait ManagedVecItem: 'static {
 
     fn from_byte_reader<Reader: FnMut(&mut [u8])>(reader: Reader) -> Self;
 
-    fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(reader: Reader) -> Self::Ref<'a>;
+    /// In certain cases this involves practically disregarding the lifetimes, hence it is unsafe.
+    unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
+        reader: Reader,
+    ) -> Self::Ref<'a>;
 
     fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, writer: Writer) -> R;
 }
@@ -45,7 +48,7 @@ macro_rules! impl_int {
                 reader(&mut arr[..]);
                 $ty::from_be_bytes(arr)
             }
-            fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
+            unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
                 reader: Reader,
             ) -> Self::Ref<'a> {
                 Self::from_byte_reader(reader)
@@ -76,7 +79,9 @@ impl ManagedVecItem for usize {
         u32::from_be_bytes(arr) as usize
     }
 
-    fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(reader: Reader) -> Self::Ref<'a> {
+    unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
+        reader: Reader,
+    ) -> Self::Ref<'a> {
         Self::from_byte_reader(reader)
     }
 
@@ -95,7 +100,9 @@ impl ManagedVecItem for bool {
         u8::from_byte_reader(reader) > 0
     }
 
-    fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(reader: Reader) -> Self::Ref<'a> {
+    unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
+        reader: Reader,
+    ) -> Self::Ref<'a> {
         Self::from_byte_reader(reader)
     }
 
@@ -117,7 +124,7 @@ macro_rules! impl_managed_type {
                 $ty::from_raw_handle(handle)
             }
 
-            fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
+            unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
                 reader: Reader,
             ) -> Self::Ref<'a> {
                 let handle = Handle::from_byte_reader(reader);
@@ -151,7 +158,9 @@ where
         Self::from_raw_handle(handle)
     }
 
-    fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(reader: Reader) -> Self::Ref<'a> {
+    unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
+        reader: Reader,
+    ) -> Self::Ref<'a> {
         let handle = Handle::from_byte_reader(reader);
         ManagedRef::wrap_handle(handle)
     }
@@ -175,7 +184,9 @@ where
         Self::from_raw_handle(handle)
     }
 
-    fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(reader: Reader) -> Self::Ref<'a> {
+    unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
+        reader: Reader,
+    ) -> Self::Ref<'a> {
         let handle = Handle::from_byte_reader(reader);
         ManagedRef::wrap_handle(handle)
     }

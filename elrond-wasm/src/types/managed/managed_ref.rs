@@ -32,8 +32,9 @@ where
         }
     }
 
+    /// Will completely disregard lifetimes, use with care.
     #[doc(hidden)]
-    pub(super) fn wrap_handle(handle: Handle) -> Self {
+    pub(super) unsafe fn wrap_handle(handle: Handle) -> Self {
         Self {
             _phantom_m: PhantomData,
             _phantom_t: PhantomData,
