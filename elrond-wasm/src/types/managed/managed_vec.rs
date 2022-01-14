@@ -120,15 +120,14 @@ where
         self.byte_len() == 0
     }
 
-    /// Retrieves element at index, if the index is valid.
-    /// Warning! Ownership around this method is murky, managed items are copied without respecting ownership.
-    /// TODO: Find a way to fix it by returning some kind of reference to the item, not the owned type.
-    pub fn try_get(&self, index: usize) -> Option<T> {
+    pub fn try_get<'a>(&'a self, index: usize) -> Option<T::Ref<'a>> {
         let byte_index = index * T::PAYLOAD_SIZE;
         let mut load_result = Ok(());
-        let result = T::from_byte_reader(|dest_slice| {
-            load_result = self.buffer.load_slice(byte_index, dest_slice);
-        });
+        let result = unsafe {
+            T::from_byte_reader_as_borrow(|dest_slice| {
+                load_result = self.buffer.load_slice(byte_index, dest_slice);
+            })
+        };
         match load_result {
             Ok(_) => Some(result),
             Err(_) => None,
@@ -138,17 +137,9 @@ where
     /// Retrieves element at index, if the index is valid.
     /// Otherwise, signals an error and terminates execution.
     pub fn get<'a>(&'a self, index: usize) -> T::Ref<'a> {
-        let byte_index = index * T::PAYLOAD_SIZE;
-        let mut load_result = Ok(());
-        let result = unsafe {
-            T::from_byte_reader_as_borrow(|dest_slice| {
-                load_result = self.buffer.load_slice(byte_index, dest_slice);
-            })
-        };
-
-        match load_result {
-            Ok(_) => result,
-            Err(_) => M::error_api_impl().signal_error(INDEX_OUT_OF_RANGE_MSG),
+        match self.try_get(index) {
+            Some(result) => result,
+            None => M::error_api_impl().signal_error(INDEX_OUT_OF_RANGE_MSG),
         }
     }
 
