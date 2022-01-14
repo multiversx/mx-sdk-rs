@@ -6,8 +6,9 @@ fn world() -> BlockchainMock {
 
     blockchain.register_contract_builder(
         "file:output/formatted-message-features.wasm",
-        formatted_message_features::contract_builder,
+        formatted_message_features::ContractBuilder,
     );
+
     blockchain
 }
 
