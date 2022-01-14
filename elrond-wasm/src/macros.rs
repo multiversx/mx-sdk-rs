@@ -60,14 +60,14 @@ macro_rules! sc_error {
 
 #[macro_export]
 macro_rules! signal_error {
-    ($msg:expr, $($arg:expr),*) => {
-        {
-            let mut builder = FormattedMessageBuilder::<Self::Api>::new($msg.as_bytes());
-            $(
-                builder.add_argument(&$arg);
-            )*
-            builder.signal_error();
-        }
+    ($msg:tt, $($arg:expr),+) => {{
+        let mut ___buffer___ =
+            elrond_wasm::types::ManagedBufferCachedBuilder::<Self::Api>::new_from_slice(&[]);
+        elrond_wasm::derive::format_receiver_args!(___buffer___, $msg, $($arg),+);
+        Self::Api::error_api_impl().signal_error_from_buffer(___buffer___.into_managed_buffer().get_raw_handle());
+    }};
+    ($msg:tt) => {
+        Self::Api::error_api_impl().signal_error($msg.as_bytes());
     };
 }
 

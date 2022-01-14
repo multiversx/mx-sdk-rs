@@ -12,8 +12,10 @@ build_and_copy() {
 
    erdpy --verbose contract build $contract_path || return 1
    mkdir -p $vm_contract_path/output
-   cp -R $contract_path/output/$contract_name.wasm \
+   cp $contract_path/output/$contract_name.wasm \
       $vm_contract_path/output/$contract_name.wasm
+   cp $contract_path/output/$contract_name-view.wasm \
+      $vm_contract_path/output/$contract_name-view.wasm
    cp -R $contract_path/mandos \
       $vm_contract_path
 }
