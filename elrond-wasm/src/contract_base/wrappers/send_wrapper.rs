@@ -13,7 +13,6 @@ use crate::{
         ManagedType, ManagedVec, TokenIdentifier,
     },
 };
-use elrond_codec::TopDecode;
 
 const PERCENTAGE_TOTAL: u64 = 10_000;
 
@@ -322,7 +321,7 @@ where
         );
 
         if let Some(first_result_bytes) = output.try_get(0) {
-            u64::top_decode(first_result_bytes).unwrap_or_default()
+            first_result_bytes.parse_as_u64().unwrap_or_default()
         } else {
             0
         }

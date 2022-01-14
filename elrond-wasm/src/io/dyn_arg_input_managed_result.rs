@@ -44,7 +44,7 @@ where
     fn next_arg_input(&mut self) -> Self::ItemInput {
         if let Some(buffer) = self.data.try_get(self.next_index) {
             self.next_index += 1;
-            buffer
+            (*buffer).clone()
         } else {
             A::error_api_impl().signal_error(err_msg::ARG_WRONG_NUMBER)
         }

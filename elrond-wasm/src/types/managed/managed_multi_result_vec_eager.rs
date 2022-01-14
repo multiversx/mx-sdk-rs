@@ -52,8 +52,8 @@ where
         self.0.is_empty()
     }
 
-    pub fn get(&self, index: usize) -> Option<T> {
-        self.0.try_get(index)
+    pub fn get<'a>(&'a self, index: usize) -> T::Ref<'a> {
+        self.0.get(index)
     }
 
     #[allow(clippy::redundant_closure)]
