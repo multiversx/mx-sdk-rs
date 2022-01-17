@@ -155,7 +155,7 @@ where
     }
 
     fn convert_to_single_transfer_esdt_call(mut self) -> Self {
-        if let Some(payment) = self.payments.get(0) {
+        if let Some(payment) = self.payments.try_get(0) {
             if payment.token_identifier.is_egld() {
                 self.egld_payment = payment.amount;
                 self.payments.clear();
@@ -400,7 +400,7 @@ where
 
     fn single_transfer_execute(self) {
         let gas_limit = self.resolve_gas_limit_with_leftover();
-        let payment = &self.payments.get(0).unwrap();
+        let payment = &self.payments.try_get(0).unwrap();
 
         if payment.token_identifier.is_egld() {
             let _ = SA::send_api_impl().direct_egld_execute(
