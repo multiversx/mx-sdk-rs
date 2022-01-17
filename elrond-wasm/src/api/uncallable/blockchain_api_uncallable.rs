@@ -1,7 +1,7 @@
 use alloc::boxed::Box;
 
 use crate::{
-    api::{BlockchainApi, BlockchainApiImpl},
+    api::{BlockchainApi, BlockchainApiImpl, Handle, ManagedTypeApi},
     types::{Address, BigUint, EsdtTokenData, ManagedAddress, TokenIdentifier, H256},
 };
 
@@ -16,8 +16,6 @@ impl BlockchainApi for UncallableApi {
 }
 
 impl BlockchainApiImpl for UncallableApi {
-    type ManagedTypeApi = UncallableApi;
-
     fn get_sc_address_legacy(&self) -> Address {
         unreachable!()
     }
@@ -38,7 +36,7 @@ impl BlockchainApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn get_balance_legacy(&self, _address: &Address) -> BigUint<Self> {
+    fn get_balance_legacy(&self, _address: &Address) -> Handle {
         unreachable!()
     }
 
@@ -94,36 +92,35 @@ impl BlockchainApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn get_current_esdt_nft_nonce(
+    fn get_current_esdt_nft_nonce<M: ManagedTypeApi>(
         &self,
-        _address: &ManagedAddress<Self>,
-        _token: &TokenIdentifier<Self>,
+        _address: &ManagedAddress<M>,
+        _token: &TokenIdentifier<M>,
     ) -> u64 {
         unreachable!()
     }
 
-    // TODO: Include nonce and create a map like: TokenId -> Nonce -> Amount
-    fn get_esdt_balance(
+    fn get_esdt_balance<M: ManagedTypeApi>(
         &self,
-        _address: &ManagedAddress<Self>,
-        _token: &TokenIdentifier<Self>,
+        _address: &ManagedAddress<M>,
+        _token: &TokenIdentifier<M>,
         _nonce: u64,
-    ) -> BigUint<Self> {
+    ) -> BigUint<M> {
         unreachable!()
     }
 
-    fn get_esdt_token_data(
+    fn get_esdt_token_data<M: ManagedTypeApi>(
         &self,
-        _address: &ManagedAddress<Self>,
-        _token: &TokenIdentifier<Self>,
+        _address: &ManagedAddress<M>,
+        _token: &TokenIdentifier<M>,
         _nonce: u64,
-    ) -> EsdtTokenData<Self> {
+    ) -> EsdtTokenData<M> {
         unreachable!()
     }
 
-    fn get_esdt_local_roles(
+    fn get_esdt_local_roles<M: ManagedTypeApi>(
         &self,
-        _token_id: &TokenIdentifier<Self::ManagedTypeApi>,
+        _token_id: &TokenIdentifier<M>,
     ) -> crate::types::EsdtLocalRoleFlags {
         unreachable!()
     }

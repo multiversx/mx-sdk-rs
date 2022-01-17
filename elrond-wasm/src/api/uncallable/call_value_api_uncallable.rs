@@ -1,6 +1,6 @@
 use crate::{
-    api::{CallValueApi, CallValueApiImpl},
-    types::{BigUint, EsdtTokenType, TokenIdentifier},
+    api::{CallValueApi, CallValueApiImpl, Handle},
+    types::EsdtTokenType,
 };
 
 use super::UncallableApi;
@@ -14,21 +14,19 @@ impl CallValueApi for UncallableApi {
 }
 
 impl CallValueApiImpl for UncallableApi {
-    type ManagedTypeApi = UncallableApi;
-
     fn check_not_payable(&self) {
         unreachable!()
     }
 
-    fn egld_value(&self) -> BigUint<Self> {
+    fn egld_value(&self) -> Handle {
         unreachable!()
     }
 
-    fn esdt_value(&self) -> BigUint<Self> {
+    fn esdt_value(&self) -> Handle {
         unreachable!()
     }
 
-    fn token(&self) -> TokenIdentifier<Self> {
+    fn token(&self) -> Handle {
         unreachable!()
     }
 
@@ -44,11 +42,11 @@ impl CallValueApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn esdt_value_by_index(&self, _index: usize) -> BigUint<Self> {
+    fn esdt_value_by_index(&self, _index: usize) -> Handle {
         unreachable!()
     }
 
-    fn token_by_index(&self, _index: usize) -> TokenIdentifier<Self> {
+    fn token_by_index(&self, _index: usize) -> Handle {
         unreachable!()
     }
 

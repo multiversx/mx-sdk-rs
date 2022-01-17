@@ -7,7 +7,6 @@
 elrond_wasm_node::wasm_endpoints! {
     local_esdt_and_nft
     (
-        init
         callBack
         getCurrentNftNonce
         getFungibleEsdtBalance

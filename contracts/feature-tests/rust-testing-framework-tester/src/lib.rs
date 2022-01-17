@@ -3,6 +3,8 @@
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
+pub mod dummy_module;
+
 #[derive(TopEncode, TopDecode, TypeAbi, Clone, Debug, PartialEq)]
 pub struct NftDummyAttributes {
     pub creation_epoch: u64,
@@ -14,8 +16,8 @@ pub struct StructWithManagedTypes<M: ManagedTypeApi> {
     pub buffer: ManagedBuffer<M>,
 }
 
-#[elrond_wasm::derive::contract]
-pub trait RustTestingFrameworkTester {
+#[elrond_wasm::contract]
+pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
     #[init]
     fn init(&self) {
         self.total_value().set(&BigUint::from(1u32));
@@ -165,9 +167,11 @@ pub trait RustTestingFrameworkTester {
             &ManagedBuffer::new_from_bytes(b"getTotalValue"),
             &ManagedArgBuffer::new_empty(),
         );
-        let raw_value = call_result.get(0).unwrap_or_default();
-
-        BigUint::from(raw_value.parse_as_u64().unwrap_or_default())
+        if let Some(raw_value) = call_result.try_get(0) {
+            BigUint::from_bytes_be_buffer(&raw_value)
+        } else {
+            BigUint::zero()
+        }
     }
 
     #[endpoint]
