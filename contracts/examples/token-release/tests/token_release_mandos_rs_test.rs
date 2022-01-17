@@ -6,7 +6,7 @@ fn world() -> BlockchainMock {
 
     blockchain.register_contract_builder(
         "file:output/token-release.wasm",
-        token_release::contract_builder,
+        token_release::ContractBuilder,
     );
     blockchain
 }
