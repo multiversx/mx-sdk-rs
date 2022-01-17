@@ -13,6 +13,7 @@ use elrond_codec::{
     TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, TryStaticCast,
 };
 
+#[repr(transparent)]
 #[derive(Clone)]
 pub struct ManagedAddress<M: ManagedTypeApi> {
     bytes: ManagedByteArray<M, 32>,
@@ -126,6 +127,10 @@ where
     #[doc(hidden)]
     fn get_raw_handle(&self) -> Handle {
         self.bytes.get_raw_handle()
+    }
+
+    fn transmute_from_handle_ref(handle_ref: &Handle) -> &Self {
+        unsafe { core::mem::transmute(handle_ref) }
     }
 }
 

@@ -1,10 +1,16 @@
 use adder::*;
-use elrond_wasm::types::{BigInt, EsdtLocalRole, EsdtTokenPayment, ManagedBuffer, SCResult};
-use elrond_wasm_debug::{
-    assert_sc_error, managed_address, managed_biguint, managed_token_id, rust_biguint,
-    testing_framework::*, tx_mock::TxInputESDT, DebugApi,
+use forwarder::call_sync::*;
+use num_traits::ToPrimitive;
+
+use elrond_wasm::types::{
+    BigInt, EsdtLocalRole, EsdtTokenPayment, EsdtTokenType, ManagedBuffer, ManagedVec, SCResult,
 };
-use rust_testing_framework_tester::*;
+use elrond_wasm_debug::{
+    assert_sc_error, assert_values_eq, managed_address, managed_biguint, managed_buffer,
+    managed_token_id, rust_biguint, testing_framework::*, tx_mock::TxInputESDT, unwrap_or_panic,
+    DebugApi,
+};
+use rust_testing_framework_tester::{dummy_module::DummyModule, *};
 
 const TEST_OUTPUT_PATH: &'static str = "test.scen.json";
 const TEST_MULTIPLE_SC_OUTPUT_PATH: &'static str = "test_multiple_sc.scen.json";
@@ -29,7 +35,28 @@ fn test_add() {
 
         let expected_result = first.clone() + second.clone();
         let actual_result = sc.sum(first, second);
-        assert_eq!(expected_result, actual_result);
+        assert_values_eq!(expected_result, actual_result);
+    });
+}
+
+#[should_panic]
+#[test]
+fn test_add_wrong_expect() {
+    let mut wrapper = BlockchainStateWrapper::new();
+    let sc_wrapper = wrapper.create_sc_account(
+        &rust_biguint!(0),
+        None,
+        rust_testing_framework_tester::contract_obj,
+        SC_WASM_PATH,
+    );
+
+    wrapper.execute_query(&sc_wrapper, |sc| {
+        let first = managed_biguint!(1000);
+        let second = managed_biguint!(2000);
+
+        let expected_result = first.clone() + second.clone() + 1u32;
+        let actual_result = sc.sum(first, second);
+        assert_values_eq!(expected_result, actual_result);
     });
 }
 
@@ -54,6 +81,26 @@ fn test_sc_result_ok() {
 }
 
 #[test]
+fn test_sc_result_ok_unwrap() {
+    let mut wrapper = BlockchainStateWrapper::new();
+    let sc_wrapper = wrapper.create_sc_account(
+        &rust_biguint!(0),
+        None,
+        rust_testing_framework_tester::contract_obj,
+        SC_WASM_PATH,
+    );
+
+    wrapper.execute_query(&sc_wrapper, |sc| {
+        let first = managed_biguint!(1000);
+        let second = managed_biguint!(2000);
+
+        let expected_result = first.clone() + second.clone();
+        let actual_result = unwrap_or_panic!(sc.sum_sc_result(first, second));
+        assert_eq!(expected_result, actual_result);
+    });
+}
+
+#[test]
 fn test_sc_result_err() {
     let mut wrapper = BlockchainStateWrapper::new();
     let sc_wrapper = wrapper.create_sc_account(
@@ -68,7 +115,49 @@ fn test_sc_result_err() {
         let second = managed_biguint!(2000);
 
         let actual_result = sc.sum_sc_result(first, second);
-        assert_sc_error!(actual_result, b"Non-zero required");
+        assert_sc_error!(actual_result, "Non-zero required");
+    });
+}
+
+#[should_panic(expected = "Non-zero required")]
+#[test]
+fn test_sc_result_err_unwrap() {
+    let mut wrapper = BlockchainStateWrapper::new();
+    let sc_wrapper = wrapper.create_sc_account(
+        &rust_biguint!(0),
+        None,
+        rust_testing_framework_tester::contract_obj,
+        SC_WASM_PATH,
+    );
+
+    wrapper.execute_query(&sc_wrapper, |sc| {
+        let first = managed_biguint!(0);
+        let second = managed_biguint!(2000);
+
+        let result_err = sc.sum_sc_result(first, second);
+        unwrap_or_panic!(result_err);
+    });
+}
+
+#[should_panic(
+    expected = "Expected SCError, but got SCResult::Ok: BigUint { handle: 0, hex-value-be: \"0bb8\" }"
+)]
+#[test]
+fn test_assert_err_with_ok() {
+    let mut wrapper = BlockchainStateWrapper::new();
+    let sc_wrapper = wrapper.create_sc_account(
+        &rust_biguint!(0),
+        None,
+        rust_testing_framework_tester::contract_obj,
+        SC_WASM_PATH,
+    );
+
+    wrapper.execute_query(&sc_wrapper, |sc| {
+        let first = managed_biguint!(1000);
+        let second = managed_biguint!(2000);
+
+        let actual_result = sc.sum_sc_result(first, second);
+        assert_sc_error!(actual_result, "Non-zero required");
     });
 }
 
@@ -994,11 +1083,7 @@ fn test_wrapper_getters() {
     assert_eq!(egld_balance, actual_egld_balance);
     assert_eq!(esdt_balance, actual_esdt_balance);
     assert_eq!(nft_balance, actual_nft_balance);
-    assert_eq!(
-        nft_attributes.creation_epoch,
-        actual_attributes.creation_epoch
-    );
-    assert_eq!(nft_attributes.cool_factor, actual_attributes.cool_factor);
+    assert_eq!(nft_attributes, actual_attributes);
 }
 
 #[test]
@@ -1007,7 +1092,7 @@ fn managed_environment_test() {
     wrapper.execute_in_managed_environment(|| {
         let _my_struct = StructWithManagedTypes::<DebugApi> {
             big_uint: managed_biguint!(500),
-            buffer: ManagedBuffer::new_from_bytes(b"MyBuffer"),
+            buffer: managed_buffer!(b"MyBuffer"),
         };
     })
 }
@@ -1017,6 +1102,138 @@ fn managed_environment_test() {
 fn test_managed_types_without_environment() {
     let _my_struct = StructWithManagedTypes::<DebugApi> {
         big_uint: managed_biguint!(500),
-        buffer: ManagedBuffer::new_from_bytes(b"MyBuffer"),
+        buffer: managed_buffer!(b"MyBuffer"),
     };
+}
+
+#[test]
+fn test_random_buffer() {
+    let mut wrapper = BlockchainStateWrapper::new();
+    let sc_wrapper = wrapper.create_sc_account(
+        &rust_biguint!(0),
+        None,
+        rust_testing_framework_tester::contract_obj,
+        SC_WASM_PATH,
+    );
+
+    wrapper.execute_query(&sc_wrapper, |sc| {
+        let rand_buffer = sc.get_random_buffer_once(2);
+        let expected_buffer = managed_buffer!(&[0x8b, 0xdd]);
+        assert_eq!(rand_buffer, expected_buffer);
+    });
+}
+
+#[test]
+fn test_random_buffer_twice() {
+    let mut wrapper = BlockchainStateWrapper::new();
+    let sc_wrapper = wrapper.create_sc_account(
+        &rust_biguint!(0),
+        None,
+        rust_testing_framework_tester::contract_obj,
+        SC_WASM_PATH,
+    );
+
+    wrapper.execute_query(&sc_wrapper, |sc| {
+        let (rand_buffer_1, rand_buffer_2) = sc.get_random_buffer_twice(2, 2);
+
+        let expected_buffer_1 = managed_buffer!(&[0x8b, 0xdd]);
+        let expected_buffer_2 = managed_buffer!(&[0xbe, 0x24]);
+
+        assert_eq!(rand_buffer_1, expected_buffer_1);
+        assert_eq!(rand_buffer_2, expected_buffer_2);
+    });
+}
+
+#[test]
+fn test_modules() {
+    let mut wrapper = BlockchainStateWrapper::new();
+    let sc_wrapper = wrapper.create_sc_account(
+        &rust_biguint!(0),
+        None,
+        rust_testing_framework_tester::contract_obj,
+        SC_WASM_PATH,
+    );
+
+    wrapper.execute_query(&sc_wrapper, |sc| {
+        let _ = sc.some_function();
+    });
+}
+
+#[test]
+fn test_back_and_forth_transfers() {
+    let mut wrapper = BlockchainStateWrapper::new();
+    let user = wrapper.create_user_account(&rust_biguint!(0));
+
+    let first_token_id = b"FIRSTTOKEN-abcdef";
+    let second_token_id = b"SECTOKEN-abcdef";
+    let third_token_id = b"THIRDTOKEN-abcdef";
+
+    let first_token_amount = rust_biguint!(1_000_000);
+    let second_token_amount = rust_biguint!(2_000_000);
+    let third_token_amount = rust_biguint!(5_000_000);
+
+    wrapper.set_esdt_balance(&user, &first_token_id[..], &first_token_amount);
+    wrapper.set_esdt_balance(&user, &second_token_id[..], &second_token_amount);
+
+    let forwarder_wrapper = wrapper.create_sc_account(
+        &rust_biguint!(0),
+        None,
+        forwarder::contract_obj,
+        "../forwarder/output/forwarder.wasm",
+    );
+
+    let vault_wrapper = wrapper.create_sc_account(
+        &rust_biguint!(0),
+        None,
+        vault::contract_obj,
+        "../vault/output/vault.wasm",
+    );
+    wrapper.set_esdt_balance(
+        vault_wrapper.address_ref(),
+        &third_token_id[..],
+        &third_token_amount,
+    );
+
+    let mut transfers = Vec::new();
+    transfers.push(TxInputESDT {
+        token_identifier: first_token_id.to_vec(),
+        nonce: 0,
+        value: first_token_amount.clone(),
+    });
+    transfers.push(TxInputESDT {
+        token_identifier: second_token_id.to_vec(),
+        nonce: 0,
+        value: second_token_amount.clone(),
+    });
+
+    wrapper.execute_esdt_multi_transfer(&user, &forwarder_wrapper, &transfers, |sc| {
+        let mut managed_payments = ManagedVec::new();
+        managed_payments.push(EsdtTokenPayment {
+            token_type: EsdtTokenType::Fungible,
+            token_identifier: managed_token_id!(&first_token_id[..]),
+            token_nonce: 0,
+            amount: managed_biguint!(first_token_amount.to_u64().unwrap()),
+        });
+        managed_payments.push(EsdtTokenPayment {
+            token_type: EsdtTokenType::Fungible,
+            token_identifier: managed_token_id!(&second_token_id[..]),
+            token_nonce: 0,
+            amount: managed_biguint!(second_token_amount.to_u64().unwrap()),
+        });
+
+        sc.forward_sync_retrieve_funds_with_accept_func(
+            managed_payments,
+            managed_address!(vault_wrapper.address_ref()),
+            managed_token_id!(&third_token_id[..]),
+            managed_biguint!(third_token_amount.to_u64().unwrap()),
+        );
+
+        StateChange::Commit
+    });
+
+    wrapper.check_esdt_balance(
+        forwarder_wrapper.address_ref(),
+        &third_token_id[..],
+        &third_token_amount,
+    );
 }

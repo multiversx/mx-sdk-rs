@@ -40,7 +40,7 @@ pub trait Multisig:
             quorum <= new_num_board_members,
             "quorum cannot exceed board size"
         );
-        self.quorum().set(&quorum);
+        self.quorum().set(quorum);
 
         Ok(())
     }
@@ -55,7 +55,7 @@ pub trait Multisig:
     /// - the action id
     /// - the serialized action data
     /// - (number of signers followed by) list of signer addresses.
-    #[view(getPendingActionFullInfo)]
+    #[external_view(getPendingActionFullInfo)]
     fn get_pending_action_full_info(&self) -> ManagedMultiResultVec<ActionFullInfo<Self::Api>> {
         let mut result = ManagedMultiResultVec::new();
         let action_last_index = self.get_action_last_index();
@@ -89,7 +89,7 @@ pub trait Multisig:
     /// `0` = no rights,
     /// `1` = can propose, but not sign,
     /// `2` = can propose and sign.
-    #[view(userRole)]
+    #[external_view(userRole)]
     fn user_role(&self, user: ManagedAddress) -> UserRole {
         let user_id = self.user_mapper().get_user_id(&user);
         if user_id == 0 {
@@ -100,13 +100,13 @@ pub trait Multisig:
     }
 
     /// Lists all users that can sign actions.
-    #[view(getAllBoardMembers)]
+    #[external_view(getAllBoardMembers)]
     fn get_all_board_members(&self) -> ManagedMultiResultVec<ManagedAddress> {
         self.get_all_users_with_role(UserRole::BoardMember)
     }
 
     /// Lists all proposers that are not board members.
-    #[view(getAllProposers)]
+    #[external_view(getAllProposers)]
     fn get_all_proposers(&self) -> ManagedMultiResultVec<ManagedAddress> {
         self.get_all_users_with_role(UserRole::Proposer)
     }

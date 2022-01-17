@@ -17,6 +17,7 @@ const DECODE_ERROR_BAD_LENGTH: &[u8] = b"bad array length";
 /// A list of items that lives inside a managed buffer.
 /// Items can be either stored there in full (e.g. `u32`),
 /// or just via handle (e.g. `BigUint<M>`).
+#[repr(transparent)]
 #[derive(Clone)]
 pub struct ManagedByteArray<M, const N: usize>
 where
@@ -39,6 +40,10 @@ where
     #[doc(hidden)]
     fn get_raw_handle(&self) -> Handle {
         self.buffer.get_raw_handle()
+    }
+
+    fn transmute_from_handle_ref(handle_ref: &Handle) -> &Self {
+        unsafe { core::mem::transmute(handle_ref) }
     }
 }
 

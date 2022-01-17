@@ -1,3 +1,5 @@
+use std::ops::Deref;
+
 use elrond_wasm::types::{BigUint, ManagedVec};
 use elrond_wasm_debug::DebugApi;
 
@@ -199,4 +201,29 @@ fn test_overwrite_with_single_item() {
     vec = vec![single_elem];
 
     assert_eq!(vec, managed_vec.into_vec());
+}
+
+#[test]
+fn test_managed_vec_get_mut() {
+    let _ = DebugApi::dummy();
+
+    let mut managed_vec = ManagedVec::<DebugApi, BigUint<DebugApi>>::new();
+    managed_vec.push(BigUint::from(100u32));
+    managed_vec.push(BigUint::from(100u32));
+
+    {
+        let mut first_elem = managed_vec.get_mut(0);
+        *first_elem += 100u32;
+    }
+    assert_eq!(*managed_vec.get(0), 200u32);
+    assert_eq!(*managed_vec.get(1), 100u32);
+
+    {
+        let first_elem = managed_vec.get(0).deref().clone();
+        let mut second_elem = managed_vec.get_mut(1);
+        *second_elem += first_elem;
+    }
+
+    assert_eq!(*managed_vec.get(0), 200u32);
+    assert_eq!(*managed_vec.get(1), 300u32);
 }

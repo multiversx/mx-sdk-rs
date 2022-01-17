@@ -4,9 +4,9 @@ fn world() -> BlockchainMock {
     let mut blockchain = BlockchainMock::new();
     blockchain.set_current_dir_from_workspace("contracts/benchmarks/mappers/single-value-repeat");
 
-    blockchain.register_contract(
+    blockchain.register_contract_builder(
         "file:output/single-value-repeat.wasm",
-        Box::new(|context| Box::new(single_value_repeat::contract_obj(context))),
+        single_value_repeat::ContractBuilder,
     );
     blockchain
 }

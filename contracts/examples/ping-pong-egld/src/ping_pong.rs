@@ -41,9 +41,9 @@ pub trait PingPong {
         let activation_timestamp =
             opt_activation_timestamp.unwrap_or_else(|| self.blockchain().get_block_timestamp());
         let deadline = activation_timestamp + duration_in_seconds;
-        self.deadline().set(&deadline);
-        self.activation_timestamp().set(&activation_timestamp);
-        self.max_funds().set(&max_funds.into_option());
+        self.deadline().set(deadline);
+        self.activation_timestamp().set(activation_timestamp);
+        self.max_funds().set(max_funds.into_option());
     }
 
     /// User sends some EGLD to be locked in the contract for a period of time.
@@ -87,7 +87,7 @@ pub trait PingPong {
         let user_status = self.user_status(user_id).get();
         match user_status {
             UserStatus::New => {
-                self.user_status(user_id).set(&UserStatus::Registered);
+                self.user_status(user_id).set(UserStatus::Registered);
                 Ok(())
             },
             UserStatus::Registered => {
@@ -106,7 +106,7 @@ pub trait PingPong {
                 sc_error!("can't pong, never pinged")
             },
             UserStatus::Registered => {
-                self.user_status(user_id).set(&UserStatus::Withdrawn);
+                self.user_status(user_id).set(UserStatus::Withdrawn);
                 if let Some(user_address) = self.user_mapper().get_user_address(user_id) {
                     self.send()
                         .direct_egld(&user_address, &self.ping_amount().get(), b"pong");
@@ -153,12 +153,12 @@ pub trait PingPong {
             if pong_all_last_user >= num_users {
                 // clear field and reset to 0
                 pong_all_last_user = 0;
-                self.pong_all_last_user().set(&pong_all_last_user);
+                self.pong_all_last_user().set(pong_all_last_user);
                 return Ok(OperationCompletionStatus::Completed);
             }
 
             if self.blockchain().get_gas_left() < PONG_ALL_LOW_GAS_LIMIT {
-                self.pong_all_last_user().set(&pong_all_last_user);
+                self.pong_all_last_user().set(pong_all_last_user);
                 return Ok(OperationCompletionStatus::InterruptedBeforeOutOfGas);
             }
 

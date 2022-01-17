@@ -1,11 +1,19 @@
 use crate::{
-    api::{Handle, LogApi},
+    api::{Handle, LogApi, LogApiImpl},
     types::ArgBuffer,
 };
 
 use super::UncallableApi;
 
 impl LogApi for UncallableApi {
+    type LogApiImpl = UncallableApi;
+
+    fn log_api_impl() -> Self::LogApiImpl {
+        unreachable!()
+    }
+}
+
+impl LogApiImpl for UncallableApi {
     fn write_event_log(&self, _topics_buffer: &ArgBuffer, _data: &[u8]) {
         unreachable!()
     }

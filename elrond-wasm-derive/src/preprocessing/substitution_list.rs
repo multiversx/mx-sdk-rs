@@ -4,7 +4,6 @@ pub fn substitutions() -> SubstitutionsMap {
     let mut substitutions = SubstitutionsMap::new();
 
     add_managed_types(&mut substitutions);
-    add_special_methods(&mut substitutions);
     add_storage_mappers(&mut substitutions);
 
     substitutions
@@ -50,13 +49,6 @@ fn add_managed_types(substitutions: &mut SubstitutionsMap) {
     add_managed_type_with_generics(substitutions, &quote!(ManagedAsyncCallResult));
     add_managed_type_with_generics(substitutions, &quote!(ManagedCountedVarArgs));
     add_managed_type_with_generics(substitutions, &quote!(ManagedCountedMultiResultVec));
-}
-
-fn add_special_methods(substitutions: &mut SubstitutionsMap) {
-    substitutions.add_substitution(
-        quote!(.unwrap_or_signal_error()),
-        quote!(.unwrap_or_signal_error(self.raw_vm_api())),
-    );
 }
 
 fn add_storage_mapper_single_generic_arg(

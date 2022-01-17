@@ -2,7 +2,7 @@ use core::marker::PhantomData;
 
 use super::ManagedType;
 use crate::{
-    api::{Handle, InvalidSliceError, ManagedTypeApi},
+    api::{Handle, InvalidSliceError, ManagedBufferApi, ManagedTypeApi},
     hex_util::encode_bytes_as_hex,
     types::BoxedBytes,
 };
@@ -13,6 +13,7 @@ use elrond_codec::{
 };
 
 /// A byte buffer managed by an external API.
+#[repr(transparent)]
 pub struct ManagedBuffer<M: ManagedTypeApi> {
     pub(crate) handle: Handle,
     _phantom: PhantomData<M>,
@@ -31,17 +32,29 @@ impl<M: ManagedTypeApi> ManagedType<M> for ManagedBuffer<M> {
     fn get_raw_handle(&self) -> Handle {
         self.handle
     }
+
+    fn transmute_from_handle_ref(handle_ref: &Handle) -> &Self {
+        unsafe { core::mem::transmute(handle_ref) }
+    }
 }
 
 impl<M: ManagedTypeApi> ManagedBuffer<M> {
     #[inline]
     pub fn new() -> Self {
-        ManagedBuffer::from_raw_handle(M::instance().mb_new_empty())
+        ManagedBuffer::from_raw_handle(M::managed_type_impl().mb_new_empty())
     }
 
     #[inline]
     pub fn new_from_bytes(bytes: &[u8]) -> Self {
-        ManagedBuffer::from_raw_handle(M::instance().mb_new_from_bytes(bytes))
+        ManagedBuffer::from_raw_handle(M::managed_type_impl().mb_new_from_bytes(bytes))
+    }
+
+    #[inline]
+    pub fn new_random(nr_bytes: usize) -> Self {
+        let handle = M::managed_type_impl().mb_new_empty();
+        M::managed_type_impl().mb_set_random(handle, nr_bytes);
+
+        ManagedBuffer::from_raw_handle(handle)
     }
 }
 
@@ -96,7 +109,7 @@ impl<M: ManagedTypeApi> Default for ManagedBuffer<M> {
 impl<M: ManagedTypeApi> ManagedBuffer<M> {
     #[inline]
     pub fn len(&self) -> usize {
-        M::instance().mb_len(self.handle)
+        M::managed_type_impl().mb_len(self.handle)
     }
 
     #[inline]
@@ -106,7 +119,7 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
 
     #[inline]
     pub fn to_boxed_bytes(&self) -> BoxedBytes {
-        M::instance().mb_to_boxed_bytes(self.handle)
+        M::managed_type_impl().mb_to_boxed_bytes(self.handle)
     }
 
     /// TODO: investigate the impact of using `Result<(), ()>` on the wasm output.
@@ -116,7 +129,7 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
         starting_position: usize,
         dest_slice: &mut [u8],
     ) -> Result<(), InvalidSliceError> {
-        M::instance().mb_load_slice(self.handle, starting_position, dest_slice)
+        M::managed_type_impl().mb_load_slice(self.handle, starting_position, dest_slice)
     }
 
     pub fn copy_slice(
@@ -124,7 +137,7 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
         starting_position: usize,
         slice_len: usize,
     ) -> Option<ManagedBuffer<M>> {
-        let api = M::instance();
+        let api = M::managed_type_impl();
         let result_handle = api.mb_new_empty();
         let err_result =
             api.mb_copy_slice(self.handle, starting_position, slice_len, result_handle);
@@ -137,7 +150,7 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
 
     #[inline]
     pub fn overwrite(&mut self, value: &[u8]) {
-        M::instance().mb_overwrite(self.handle, value);
+        M::managed_type_impl().mb_overwrite(self.handle, value);
     }
 
     pub fn set_slice(
@@ -145,26 +158,32 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
         starting_position: usize,
         source_slice: &[u8],
     ) -> Result<(), InvalidSliceError> {
-        if let Ok(()) = M::instance().mb_set_slice(self.handle, starting_position, source_slice) {
+        if let Ok(()) =
+            M::managed_type_impl().mb_set_slice(self.handle, starting_position, source_slice)
+        {
             Ok(())
         } else {
             Err(InvalidSliceError)
         }
     }
 
+    pub fn set_random(&mut self, nr_bytes: usize) {
+        M::managed_type_impl().mb_set_random(self.handle, nr_bytes);
+    }
+
     #[inline]
     pub fn append(&mut self, other: &ManagedBuffer<M>) {
-        M::instance().mb_append(self.handle, other.handle);
+        M::managed_type_impl().mb_append(self.handle, other.handle);
     }
 
     #[inline(always)]
     pub fn append_bytes(&mut self, slice: &[u8]) {
-        M::instance().mb_append_bytes(self.handle, slice);
+        M::managed_type_impl().mb_append_bytes(self.handle, slice);
     }
 
     /// Utility function: helps serialize lengths (or any other value of type usize) easier.
     pub fn append_u32_be(&mut self, item: u32) {
-        M::instance().mb_append_bytes(self.handle, &item.to_be_bytes()[..]);
+        M::managed_type_impl().mb_append_bytes(self.handle, &item.to_be_bytes()[..]);
     }
 
     pub fn parse_as_u64(&self) -> Option<u64> {
@@ -174,7 +193,7 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
             return None;
         }
         let mut bytes = [0u8; U64_NUM_BYTES];
-        if M::instance()
+        if M::managed_type_impl()
             .mb_load_slice(self.handle, 0, &mut bytes[U64_NUM_BYTES - l..])
             .is_err()
         {
@@ -187,7 +206,7 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
 
 impl<M: ManagedTypeApi> Clone for ManagedBuffer<M> {
     fn clone(&self) -> Self {
-        let api = M::instance();
+        let api = M::managed_type_impl();
         let clone_handle = api.mb_new_empty();
         api.mb_append(clone_handle, self.handle);
         ManagedBuffer::from_raw_handle(clone_handle)
@@ -197,7 +216,7 @@ impl<M: ManagedTypeApi> Clone for ManagedBuffer<M> {
 impl<M: ManagedTypeApi> PartialEq for ManagedBuffer<M> {
     #[inline]
     fn eq(&self, other: &Self) -> bool {
-        M::instance().mb_eq(self.handle, other.handle)
+        M::managed_type_impl().mb_eq(self.handle, other.handle)
     }
 }
 
@@ -210,7 +229,7 @@ impl<M: ManagedTypeApi, const N: usize> PartialEq<&[u8; N]> for ManagedBuffer<M>
             return false;
         }
         let mut self_bytes = [0u8; N];
-        let _ = M::instance().mb_load_slice(self.handle, 0, &mut self_bytes[..]);
+        let _ = M::managed_type_impl().mb_load_slice(self.handle, 0, &mut self_bytes[..]);
         &self_bytes[..] == &other[..]
     }
 }
@@ -245,7 +264,9 @@ impl<M: ManagedTypeApi> NestedEncode for ManagedBuffer<M> {
 
 impl<M: ManagedTypeApi> TopDecode for ManagedBuffer<M> {
     fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
-        input.into_specialized(|_| Err(DecodeError::UNSUPPORTED_OPERATION))
+        input.into_specialized(|input| {
+            Ok(ManagedBuffer::new_from_bytes(&input.into_boxed_slice_u8()))
+        })
     }
 }
 

@@ -1,12 +1,10 @@
-use elrond_wasm::*;
 use elrond_wasm_debug::*;
 
-#[allow(unused)]
 fn world() -> BlockchainMock {
     let mut blockchain = BlockchainMock::new();
-    blockchain.register_contract(
+    blockchain.register_contract_builder(
         "file:output/egld-esdt-swap.wasm",
-        Box::new(|context| Box::new(egld_esdt_swap::contract_obj(context))),
+        egld_esdt_swap::ContractBuilder,
     );
     blockchain
 }

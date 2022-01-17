@@ -71,8 +71,8 @@ pub trait EgldEsdtSwap {
         match result {
             ManagedAsyncCallResult::Ok(()) => {
                 self.issue_success_event(caller, &token_identifier, &returned_tokens);
-                self.unused_wrapped_egld().set(&returned_tokens);
-                self.wrapped_egld_token_id().set(&token_identifier);
+                self.unused_wrapped_egld().set(returned_tokens.as_ref());
+                self.wrapped_egld_token_id().set(token_identifier.as_ref());
             },
             ManagedAsyncCallResult::Err(message) => {
                 self.issue_failure_event(caller, &message.err_msg);

@@ -1,7 +1,7 @@
 use super::BoxedBytes;
 use crate::{
     abi::TypeAbi,
-    api::{Handle, ManagedTypeApi},
+    api::{Handle, ManagedTypeApi, ManagedTypeApiImpl},
     types::{ManagedBuffer, ManagedType},
 };
 use alloc::string::String;
@@ -12,6 +12,7 @@ use elrond_codec::*;
 /// EGLD is stored as an empty name.
 ///
 /// Not yet implemented, but we might add additional restrictions when deserializing as argument.
+#[repr(transparent)]
 #[derive(Clone, Debug)]
 pub struct TokenIdentifier<M: ManagedTypeApi> {
     buffer: ManagedBuffer<M>,
@@ -28,6 +29,11 @@ impl<M: ManagedTypeApi> ManagedType<M> for TokenIdentifier<M> {
     #[doc(hidden)]
     fn get_raw_handle(&self) -> Handle {
         self.buffer.get_raw_handle()
+    }
+
+    #[doc(hidden)]
+    fn transmute_from_handle_ref(handle_ref: &Handle) -> &Self {
+        unsafe { core::mem::transmute(handle_ref) }
     }
 }
 
@@ -96,7 +102,7 @@ impl<M: ManagedTypeApi> TokenIdentifier<M> {
     }
 
     pub fn is_valid_esdt_identifier(&self) -> bool {
-        M::instance().validate_token_identifier(self.buffer.handle)
+        M::managed_type_impl().validate_token_identifier(self.buffer.handle)
     }
     /// Converts `"EGLD"` to `""`.
     /// Does nothing for the other values.

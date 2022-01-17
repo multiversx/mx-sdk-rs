@@ -54,7 +54,7 @@ fn get_contract_identifier(tx_context: &TxContext) -> Vec<u8> {
 
 /// The actual execution and the extraction/wrapping of results.
 fn execute_contract_instance_endpoint(
-    contract_instance: Box<dyn CallableContract<DebugApi>>,
+    contract_instance: Box<dyn CallableContract>,
     endpoint_name: &[u8],
 ) -> TxResult {
     let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
@@ -65,8 +65,7 @@ fn execute_contract_instance_endpoint(
                 message: b"invalid function (not found)".to_vec(),
             });
         }
-        let debug_api = contract_instance.into_api();
-        debug_api.into_tx_result()
+        DebugApi::new_from_static().into_tx_result()
     }));
     match result {
         Ok(tx_output) => tx_output,

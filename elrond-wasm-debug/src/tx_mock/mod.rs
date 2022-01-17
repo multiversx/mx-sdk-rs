@@ -1,5 +1,6 @@
 #![allow(clippy::type_complexity)]
 
+mod blockchain_rng;
 mod tx_async_call_data;
 mod tx_cache;
 mod tx_cache_balance_util;
@@ -15,6 +16,7 @@ mod tx_panic;
 mod tx_result;
 mod tx_result_calls;
 
+pub use blockchain_rng::*;
 pub use tx_async_call_data::*;
 pub use tx_cache::*;
 pub use tx_cache_source::*;
