@@ -7,7 +7,6 @@
 elrond_wasm_node::wasm_endpoints! {
     token_release
     (
-        init
         addFixedAmountGroup
         addPercentageBasedGroup
         addUserGroup
