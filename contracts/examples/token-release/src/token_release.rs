@@ -52,7 +52,7 @@ pub trait TokenRelease {
             "The schedule must have a positive number of total tokens released"
         );
         require!(
-            period_unlock_amount.clone() * BigUint::from(release_ticks) == group_total_amount,
+            &period_unlock_amount * &BigUint::from(release_ticks) == group_total_amount,
             "The total number of tokens is invalid"
         );
 
