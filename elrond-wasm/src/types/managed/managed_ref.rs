@@ -32,6 +32,16 @@ where
         }
     }
 
+    /// Will completely disregard lifetimes, use with care.
+    #[doc(hidden)]
+    pub(super) unsafe fn wrap_handle(handle: Handle) -> Self {
+        Self {
+            _phantom_m: PhantomData,
+            _phantom_t: PhantomData,
+            handle,
+        }
+    }
+
     #[doc(hidden)]
     #[inline]
     pub fn get_raw_handle_of_ref(self) -> Handle {

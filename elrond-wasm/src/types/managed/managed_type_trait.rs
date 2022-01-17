@@ -1,6 +1,6 @@
 use crate::api::{Handle, ManagedTypeApi};
 
-use super::{ManagedReadonly, ManagedRef};
+use super::ManagedRef;
 
 /// Commonalities between all managed types.
 pub trait ManagedType<M: ManagedTypeApi>: Sized {
@@ -16,10 +16,6 @@ pub trait ManagedType<M: ManagedTypeApi>: Sized {
     /// For types that just wrap another managed type it is easier, call for the wrapped object.
     #[doc(hidden)]
     fn transmute_from_handle_ref(handle_ref: &Handle) -> &Self;
-
-    fn into_readonly(self) -> ManagedReadonly<M, Self> {
-        ManagedReadonly::from_raw_handle(self.get_raw_handle())
-    }
 
     fn as_ref(&self) -> ManagedRef<'_, M, Self> {
         ManagedRef::new(self)

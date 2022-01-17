@@ -167,9 +167,11 @@ pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
             &ManagedBuffer::new_from_bytes(b"getTotalValue"),
             &ManagedArgBuffer::new_empty(),
         );
-        let raw_value = call_result.get(0).unwrap_or_default();
-
-        BigUint::from(raw_value.parse_as_u64().unwrap_or_default())
+        if let Some(raw_value) = call_result.try_get(0) {
+            BigUint::from_bytes_be_buffer(&raw_value)
+        } else {
+            BigUint::zero()
+        }
     }
 
     #[endpoint]
