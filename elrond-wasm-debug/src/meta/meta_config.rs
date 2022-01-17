@@ -26,6 +26,7 @@ impl BuildArgs {
 }
 
 pub struct ContractMetadata {
+    pub location: EndpointLocationAbi,
     pub wasm_crate_name: String,
     pub wasm_crate_path: String,
     pub output_base_name: String,
@@ -96,6 +97,7 @@ impl MetaConfig {
         let main_contract_crate_name = main_contract_abi.get_crate_name();
 
         let main_contract = ContractMetadata {
+            location: EndpointLocationAbi::MainContract,
             wasm_crate_name: format!("{}-wasm", &main_contract_crate_name),
             wasm_crate_path: "../wasm".to_string(),
             output_base_name: main_contract_crate_name.to_string(),
@@ -107,6 +109,7 @@ impl MetaConfig {
                 let view_contract_abi =
                     original_contract_abi.secondary_contract(EndpointLocationAbi::ViewContract);
                 Some(ContractMetadata {
+                    location: EndpointLocationAbi::ViewContract,
                     wasm_crate_name: format!("{}-wasm", &main_contract_crate_name),
                     wasm_crate_path: "../wasm-view".to_string(),
                     output_base_name: format!("{}-view", main_contract_crate_name),

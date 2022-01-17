@@ -7,7 +7,6 @@
 elrond_wasm_node::wasm_endpoints! {
     vault
     (
-        init
         accept_funds
         accept_funds_echo_payment
         accept_funds_multi_transfer
@@ -20,6 +19,7 @@ elrond_wasm_node::wasm_endpoints! {
         just_accept_funds
         reject_funds
         retrieve_funds
+        retrieve_funds_with_transfer_exec
         retrieve_multi_funds_async
     )
 }

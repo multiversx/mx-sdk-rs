@@ -4,12 +4,12 @@ fn world() -> BlockchainMock {
     let mut blockchain = BlockchainMock::new();
     blockchain.register_contract_builder(
         "file:first-contract/output/first-contract.wasm",
-        first_contract::contract_builder,
+        first_contract::ContractBuilder,
     );
 
     blockchain.register_contract_builder(
         "file:second-contract/output/second-contract.wasm",
-        second_contract::contract_builder,
+        second_contract::ContractBuilder,
     );
     blockchain
 }

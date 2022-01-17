@@ -1,4 +1,4 @@
-use core::{marker::PhantomData, ops::Deref};
+use core::{borrow::Borrow, marker::PhantomData, ops::Deref};
 
 use elrond_codec::{EncodeError, NestedEncode, NestedEncodeOutput, TopEncode, TopEncodeOutput};
 
@@ -29,6 +29,16 @@ where
             _phantom_m: PhantomData,
             _phantom_t: PhantomData,
             handle: value.get_raw_handle(),
+        }
+    }
+
+    /// Will completely disregard lifetimes, use with care.
+    #[doc(hidden)]
+    pub(super) unsafe fn wrap_handle(handle: Handle) -> Self {
+        Self {
+            _phantom_m: PhantomData,
+            _phantom_t: PhantomData,
+            handle,
         }
     }
 
@@ -67,6 +77,17 @@ where
     #[inline]
     fn deref(&self) -> &Self::Target {
         Self::Target::transmute_from_handle_ref(&self.handle)
+    }
+}
+
+impl<'a, M, T> Borrow<T> for ManagedRef<'a, M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedType<M>,
+{
+    #[inline]
+    fn borrow(&self) -> &T {
+        self.deref()
     }
 }
 

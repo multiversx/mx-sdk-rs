@@ -1,3 +1,5 @@
+#![feature(generic_associated_types)]
+
 use elrond_wasm::elrond_codec::test_util::{check_dep_encode_decode, check_top_encode_decode};
 use elrond_wasm_debug::DebugApi;
 

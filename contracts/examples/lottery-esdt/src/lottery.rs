@@ -139,7 +139,7 @@ pub trait Lottery {
                     "Invalid burn percentage!"
                 );
                 self.burn_percentage_for_lottery(&lottery_name)
-                    .set(&burn_percentage);
+                    .set(burn_percentage);
             },
             OptionalArg::None => {},
         }

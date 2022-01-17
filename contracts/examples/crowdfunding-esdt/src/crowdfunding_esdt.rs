@@ -20,19 +20,19 @@ pub trait Crowdfunding {
         token_identifier: TokenIdentifier,
     ) -> SCResult<()> {
         require!(target > 0, "Target must be more than 0");
-        self.target().set(&target);
+        self.target().set(target);
 
         require!(
             deadline > self.get_current_time(),
             "Deadline can't be in the past"
         );
-        self.deadline().set(&deadline);
+        self.deadline().set(deadline);
 
         require!(
             token_identifier.is_egld() || token_identifier.is_valid_esdt_identifier(),
             "Invalid token provided"
         );
-        self.cf_token_identifier().set(&token_identifier);
+        self.cf_token_identifier().set(token_identifier);
 
         Ok(())
     }

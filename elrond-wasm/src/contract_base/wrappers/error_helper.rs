@@ -2,6 +2,7 @@ use core::marker::PhantomData;
 
 use crate::{api::ManagedTypeApi, types::ManagedSCError};
 
+#[derive(Default)]
 pub struct ErrorHelper<M: ManagedTypeApi> {
     _phantom: PhantomData<M>,
 }

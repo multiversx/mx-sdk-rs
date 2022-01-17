@@ -6,7 +6,7 @@ fn world() -> BlockchainMock {
 
     blockchain.register_contract_builder(
         "file:output/linked-list-repeat.wasm",
-        linked_list_repeat::contract_builder,
+        linked_list_repeat::ContractBuilder,
     );
     blockchain
 }

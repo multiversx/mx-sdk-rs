@@ -6,7 +6,7 @@ use std::{collections::HashMap, path::PathBuf, rc::Rc};
 
 use crate::{
     tx_mock::{BlockchainUpdate, TxCache},
-    ContractMap, DebugApi,
+    ContractMap,
 };
 
 use super::{AccountData, BlockInfo};
@@ -19,7 +19,7 @@ pub struct BlockchainMock {
     pub new_addresses: HashMap<(Address, u64), Address>,
     pub previous_block_info: BlockInfo,
     pub current_block_info: BlockInfo,
-    pub contract_map: ContractMap<DebugApi>,
+    pub contract_map: ContractMap,
     pub current_dir: PathBuf,
 }
 

@@ -173,7 +173,7 @@ pub trait NftModule {
         let mut serialized_attributes = Vec::new();
         attributes.top_encode(&mut serialized_attributes)?;
 
-        let attributes_hash = self.crypto().sha256(&serialized_attributes);
+        let attributes_hash = self.crypto().sha256_legacy(&serialized_attributes);
         let hash_buffer = ManagedBuffer::from(attributes_hash.as_bytes());
 
         let mut uris = ManagedVec::new();
