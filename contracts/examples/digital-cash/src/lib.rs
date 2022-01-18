@@ -23,7 +23,7 @@ pub trait DigitalCash {
         #[payment] payment: BigUint,
         #[payment_token] token: TokenIdentifier,
         address: ManagedAddress,
-        valability: u64
+        valability: u64,
     ) -> SCResult<()> {
         require!(payment > BigUint::zero(), "amount must be greater than 0");
         require!(self.deposit(&address).is_empty(), "key already used");
@@ -67,10 +67,7 @@ pub trait DigitalCash {
 
     #[endpoint]
     fn claim(&self, address: ManagedAddress, signature: ManagedBuffer) -> SCResult<()> {
-        require!(
-            !self.deposit(&address).is_empty(), 
-            "non-existent key"
-        );
+        require!(!self.deposit(&address).is_empty(), "non-existent key");
 
         let deposit = self.deposit(&address).get();
         let caller_address = self.blockchain().get_caller();
