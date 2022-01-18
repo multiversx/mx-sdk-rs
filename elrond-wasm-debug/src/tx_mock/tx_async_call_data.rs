@@ -15,6 +15,7 @@ pub struct AsyncCallTxData {
     pub call_value: BigUint,
     pub endpoint_name: Vec<u8>,
     pub arguments: Vec<Vec<u8>>,
+    pub promises: Vec<Vec<u8>>,
     pub tx_hash: H256,
 }
 
@@ -26,6 +27,7 @@ pub fn async_call_tx_input(async_data: &AsyncCallTxData) -> TxInput {
         esdt_values: Vec::new(),
         func_name: async_data.endpoint_name.clone(),
         args: async_data.arguments.clone(),
+        promises: async_data.promises.clone(),
         gas_limit: 1000,
         gas_price: 0,
         tx_hash: async_data.tx_hash.clone(),
@@ -48,6 +50,7 @@ pub fn async_callback_tx_input(async_data: &AsyncCallTxData, async_result: &TxRe
         esdt_values: Vec::new(),
         func_name: b"callBack".to_vec(),
         args,
+        promises: async_data.promises.clone(),
         gas_limit: 1000,
         gas_price: 0,
         tx_hash: async_data.tx_hash.clone(),

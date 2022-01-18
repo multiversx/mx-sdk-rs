@@ -36,6 +36,7 @@ pub fn execute_upgrade_contract(
         esdt_values: Vec::new(),
         func_name: b"init".to_vec(),
         args,
+        promises: tx_input.promises,
         gas_limit: tx_input.gas_limit,
         gas_price: tx_input.gas_price,
         tx_hash: tx_input.tx_hash,

@@ -16,6 +16,7 @@ pub fn execute(state: &mut Rc<BlockchainMock>, tx_transfer: &TxTransfer) {
         esdt_values: tx_esdt_transfers_from_mandos(tx_transfer.esdt_value.as_slice()),
         func_name: Vec::new(),
         args: Vec::new(),
+        promises: Vec::new(),
         gas_limit: tx_transfer.gas_limit.value,
         gas_price: tx_transfer.gas_price.value,
         tx_hash: H256::zero(),

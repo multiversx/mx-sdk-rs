@@ -8,6 +8,7 @@ pub struct ScCallMandos {
     pub(crate) esdt: Vec<TxInputESDT>,
     pub(crate) function: String,
     pub(crate) arguments: Vec<Vec<u8>>,
+    pub(crate) promises: Vec<Vec<u8>>,
     pub(crate) gas_limit: u64,
     pub(crate) gas_price: u64,
 }
@@ -21,6 +22,7 @@ impl ScCallMandos {
             esdt: Vec::new(),
             function: function.to_owned(),
             arguments: Vec::new(),
+            promises: Vec::new(),
             gas_limit: u64::MAX,
             gas_price: 0,
         }
@@ -63,6 +65,7 @@ pub struct ScQueryMandos {
     pub(crate) to: Address,
     pub(crate) function: String,
     pub(crate) arguments: Vec<Vec<u8>>,
+    pub(crate) promises: Vec<Vec<u8>>,
 }
 
 impl ScQueryMandos {
@@ -71,6 +74,7 @@ impl ScQueryMandos {
             to: to.clone(),
             function: function.to_owned(),
             arguments: Vec::new(),
+            promises: Vec::new(),
         }
     }
 

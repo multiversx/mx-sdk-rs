@@ -61,6 +61,7 @@ impl DebugApi {
             esdt_values: Vec::new(),
             func_name,
             args,
+            promises: Vec::new(),
             gas_limit: 1000,
             gas_price: 0,
             tx_hash,
@@ -96,6 +97,7 @@ impl DebugApi {
             esdt_values: Vec::new(),
             func_name: Vec::new(),
             args,
+            promises: Vec::new(),
             gas_limit: 1000,
             gas_price: 0,
             tx_hash,
@@ -152,6 +154,7 @@ impl DebugApi {
             call_value,
             endpoint_name: UPGRADE_CONTRACT_FUNC_NAME.to_vec(),
             arguments,
+            promises: Vec::new(),
             tx_hash,
         };
         self.perform_async_call(call)
@@ -342,22 +345,44 @@ impl SendApiImpl for DebugApi {
             endpoint_name: endpoint_name.to_boxed_bytes().into_vec(),
             arguments: arg_buffer.to_raw_args_vec(),
             tx_hash,
+            promises: Vec::new(),
         };
         self.perform_async_call(call)
     }
 
     fn create_async_call_raw<M: ManagedTypeApi>(
         &self,
-        _to: &ManagedAddress<M>,
-        _amount: &BigUint<M>,
-        _endpoint_name: &ManagedBuffer<M>,
-        _success: &'static [u8],
-        _error: &'static [u8],
+        to: &ManagedAddress<M>,
+        amount: &BigUint<M>,
+        endpoint_name: &ManagedBuffer<M>,
+        success: &'static [u8],
+        error: &'static [u8],
         _gas: u64,
         _extra_gas_for_callback: u64,
-        _arg_buffer: &ManagedArgBuffer<M>,
+        arg_buffer: &ManagedArgBuffer<M>,
     ) -> Result<(), &'static [u8]> {
-        panic!("create_async_call_raw not implemented yet!");
+        let amount_value = self.big_uint_handle_to_value(amount.get_raw_handle());
+        let contract_address = self.input_ref().to.clone();
+        let recipient = to.to_address();
+        let tx_hash = self.get_tx_hash_legacy();
+        let mut promises = Vec::new();
+        promises.push(success.to_vec());
+        promises.push(error.to_vec());
+        let call = AsyncCallTxData {
+            from: contract_address,
+            to: recipient,
+            call_value: amount_value,
+            endpoint_name: endpoint_name.to_boxed_bytes().into_vec(),
+            arguments: arg_buffer.to_raw_args_vec(),
+            tx_hash,
+            promises,
+        };
+        let mut tx_result = self.extract_result();
+        tx_result.result_calls.async_call = Some(call);
+        if tx_result.result_status == 0 {
+        } else {
+        }
+        Ok(())
     }
 
     fn deploy_contract<M: ManagedTypeApi>(

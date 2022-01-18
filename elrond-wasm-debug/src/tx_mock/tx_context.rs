@@ -56,6 +56,7 @@ impl TxContext {
             esdt_values: Vec::new(),
             func_name: Vec::new(),
             args: Vec::new(),
+            promises: Vec::new(),
             gas_limit: 0,
             gas_price: 0,
             tx_hash: b"dummy...........................".into(),
