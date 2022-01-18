@@ -4,7 +4,7 @@ fn world() -> BlockchainMock {
     let mut blockchain = BlockchainMock::new();
     blockchain.register_contract_builder(
         "file:output/kitty-genetic-alg.wasm",
-        kitty_genetic_alg::contract_builder,
+        kitty_genetic_alg::ContractBuilder,
     );
     blockchain
 }

@@ -6,7 +6,7 @@ fn world() -> BlockchainMock {
 
     blockchain.register_contract_builder(
         "file:output/queue-repeat.wasm",
-        queue_repeat::contract_builder,
+        queue_repeat::ContractBuilder,
     );
     blockchain
 }

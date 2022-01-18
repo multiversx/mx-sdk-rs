@@ -4,11 +4,11 @@ fn world() -> BlockchainMock {
     let mut blockchain = BlockchainMock::new();
     blockchain.register_contract_builder(
         "file:output/erc1155-marketplace.wasm",
-        erc1155_marketplace::contract_builder,
+        erc1155_marketplace::ContractBuilder,
     );
     blockchain.register_contract_builder(
         "file:../erc1155/output/erc1155.wasm",
-        erc1155::contract_builder,
+        erc1155::ContractBuilder,
     );
 
     blockchain
