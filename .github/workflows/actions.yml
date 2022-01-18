@@ -21,7 +21,7 @@ jobs:
           source .github/workflows/env
           pip3 install erdpy
           mkdir $HOME/elrondsdk
-          erdpy config set dependencies.vmtools.tag v1.4.34
+          erdpy config set dependencies.vmtools.tag v1.4.35
           erdpy deps install vmtools
       - name: Build the wasm contracts
         run: |
