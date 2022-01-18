@@ -15,7 +15,7 @@ jobs:
       - uses: actions-rs/toolchain@v1
         with:
           default: true
-          toolchain: nightly-2021-01-17
+          toolchain: nightly-2022-01-17
       - name: Install erdpy and vmtools
         run: |
           source .github/workflows/env
