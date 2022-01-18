@@ -10,6 +10,7 @@ elrond_wasm_node::wasm_endpoints! {
         dynamic_message
         dynamic_message_ascii
         dynamic_message_multiple
+        print_message
         static_message
     )
 }
