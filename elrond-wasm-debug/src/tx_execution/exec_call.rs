@@ -80,12 +80,20 @@ pub fn sc_call_with_async_and_callback(
             }
         }
 
-        for te_call in result_calls.transfer_execute {
-            let te_input = async_call_tx_input(&te_call);
+        for pr_call in result_calls.transfer_execute {
+            let pr_input = async_call_tx_input(&pr_call);
 
-            let te_result = sc_call(te_input, state, false);
+            let pr_result = sc_call_with_async_and_callback(pr_input, state, false);
 
-            tx_result = merge_results(tx_result, te_result.clone());
+            tx_result = merge_results(tx_result, pr_result.clone());
+        }
+
+        for promises_call in result_calls.promises {
+            let promises_input = async_call_tx_input(promises_call.get_tx_data());
+
+            let promises_result = sc_call_with_async_and_callback(promises_input, state, false);
+
+            tx_result = merge_results(tx_result, promises_result.clone());
         }
     }
 

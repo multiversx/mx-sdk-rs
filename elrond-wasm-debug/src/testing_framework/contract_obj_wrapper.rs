@@ -696,6 +696,7 @@ fn build_tx_input(
         esdt_values,
         func_name: Vec::new(),
         args: Vec::new(),
+        promises: Vec::new(),
         gas_limit: u64::MAX,
         gas_price: 0,
         tx_hash: H256::zero(),

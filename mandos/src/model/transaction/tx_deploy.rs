@@ -12,6 +12,7 @@ pub struct TxDeploy {
     pub egld_value: BigUintValue,
     pub contract_code: BytesValue,
     pub arguments: Vec<BytesValue>,
+    pub promises: Vec<BytesValue>,
     pub gas_limit: U64Value,
     pub gas_price: U64Value,
 }
@@ -24,6 +25,11 @@ impl InterpretableFrom<TxDeployRaw> for TxDeploy {
             contract_code: BytesValue::interpret_from(from.contract_code, context),
             arguments: from
                 .arguments
+                .into_iter()
+                .map(|t| BytesValue::interpret_from(t, context))
+                .collect(),
+            promises: from
+                .promises
                 .into_iter()
                 .map(|t| BytesValue::interpret_from(t, context))
                 .collect(),

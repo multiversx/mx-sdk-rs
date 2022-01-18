@@ -28,6 +28,11 @@ pub fn execute(
             .iter()
             .map(|scen_arg| scen_arg.value.clone())
             .collect(),
+        promises: tx
+            .promises
+            .iter()
+            .map(|callback| callback.value.clone())
+            .collect(),
         gas_limit: tx.gas_limit.value,
         gas_price: tx.gas_price.value,
         tx_hash: generate_tx_hash_dummy(tx_id),

@@ -9,4 +9,7 @@ pub struct TxQueryRaw {
 
     #[serde(default)]
     pub arguments: Vec<ValueSubTree>,
+
+    #[serde(default)]
+    pub promises: Vec<ValueSubTree>,
 }

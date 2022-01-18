@@ -109,6 +109,12 @@ pub(crate) fn tx_call_as_raw(tx_call: &ScCallMandos) -> TxCallRaw {
         all_esdt_raw.push(esdt_raw);
     }
 
+    let mut promises_raw = Vec::with_capacity(tx_call.promises.len());
+    for arg in tx_call.promises.iter() {
+        let arg_raw = bytes_as_raw(arg);
+        promises_raw.push(arg_raw);
+    }
+
     let mut arguments_raw = Vec::with_capacity(tx_call.arguments.len());
     for arg in tx_call.arguments.iter() {
         let arg_raw = bytes_as_raw(arg);
@@ -125,6 +131,7 @@ pub(crate) fn tx_call_as_raw(tx_call: &ScCallMandos) -> TxCallRaw {
         arguments: arguments_raw,
         gas_limit: u64_as_raw(tx_call.gas_limit),
         gas_price: u64_as_raw(tx_call.gas_price),
+        promises: promises_raw,
     }
 }
 
@@ -135,10 +142,17 @@ pub(crate) fn tx_query_as_raw(tx_query: &ScQueryMandos) -> TxQueryRaw {
         arguments_raw.push(arg_raw);
     }
 
+    let mut promises_raw = Vec::with_capacity(tx_query.promises.len());
+    for callback in tx_query.promises.iter() {
+        let callback_raw = bytes_as_raw(callback);
+        promises_raw.push(callback_raw);
+    }
+
     TxQueryRaw {
         to: address_as_raw(&tx_query.to),
         function: tx_query.function.clone(),
         arguments: arguments_raw,
+        promises: promises_raw,
     }
 }
 
