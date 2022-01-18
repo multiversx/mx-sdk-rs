@@ -60,6 +60,8 @@ members = [
   "contracts/examples/proxy-pause/meta",
   "contracts/examples/ping-pong-egld",
   "contracts/examples/ping-pong-egld/meta",
+  "contracts/examples/token-release",
+  "contracts/examples/token-release/meta",
 
   "contracts/feature-tests/abi-tester",
   "contracts/feature-tests/abi-tester/meta",
