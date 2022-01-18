@@ -2,10 +2,10 @@ use elrond_wasm_debug::*;
 
 fn world() -> BlockchainMock {
     let mut blockchain = BlockchainMock::new();
-    blockchain.register_contract_builder("file:output/erc1155.wasm", erc1155::contract_builder);
+    blockchain.register_contract_builder("file:output/erc1155.wasm", erc1155::ContractBuilder);
     blockchain.register_contract_builder(
         "file:../erc1155-user-mock/output/erc1155-user-mock.wasm",
-        erc1155_user_mock::contract_builder,
+        erc1155_user_mock::ContractBuilder,
     );
 
     blockchain

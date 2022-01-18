@@ -7,7 +7,6 @@
 elrond_wasm_node::wasm_endpoints! {
     linked_list_repeat
     (
-        init
         add
         add_struct
         bench

@@ -7,7 +7,6 @@
             "tx": {
                 "from": "address:bob",
                 "to": "sc:multisig",
-                "value": "0",
                 "function": "sign",
                 "arguments": [
                     "1"
@@ -30,7 +29,6 @@
             "tx": {
                 "from": "address:bob",
                 "to": "sc:multisig",
-                "value": "0",
                 "function": "unsign",
                 "arguments": [
                     "1"
@@ -53,7 +51,6 @@
             "tx": {
                 "from": "address:bob",
                 "to": "sc:multisig",
-                "value": "0",
                 "function": "sign",
                 "arguments": [
                     "1000"
@@ -76,7 +73,6 @@
             "tx": {
                 "from": "address:bob",
                 "to": "sc:multisig",
-                "value": "0",
                 "function": "unsign",
                 "arguments": [
                     "1000"

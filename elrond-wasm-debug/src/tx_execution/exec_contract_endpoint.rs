@@ -54,7 +54,7 @@ fn get_contract_identifier(tx_context: &TxContext) -> Vec<u8> {
 
 /// The actual execution and the extraction/wrapping of results.
 fn execute_contract_instance_endpoint(
-    contract_instance: Box<dyn CallableContract<DebugApi>>,
+    contract_instance: Box<dyn CallableContract>,
     endpoint_name: &[u8],
 ) -> TxResult {
     let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {

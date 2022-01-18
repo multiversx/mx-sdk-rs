@@ -7,7 +7,6 @@
 elrond_wasm_node::wasm_endpoints! {
     erc1155_user_mock
     (
-        init
         onERC1155BatchReceived
         onERC1155Received
     )

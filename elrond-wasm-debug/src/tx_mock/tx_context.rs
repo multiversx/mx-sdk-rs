@@ -10,7 +10,9 @@ use std::{
     rc::Rc,
 };
 
-use super::{BlockchainRng, BlockchainUpdate, TxCache, TxInput, TxManagedTypes, TxResult};
+use super::{
+    BlockchainRng, BlockchainUpdate, TxCache, TxInput, TxManagedTypes, TxResult, TxStaticVars,
+};
 
 #[derive(Debug)]
 pub struct TxContext {
@@ -18,6 +20,7 @@ pub struct TxContext {
     pub tx_cache: Rc<TxCache>,
     pub managed_types: RefCell<TxManagedTypes>,
     pub lockable_static_buffer_cell: RefCell<LockableStaticBuffer>,
+    pub static_vars_cell: RefCell<TxStaticVars>,
     pub tx_result_cell: RefCell<TxResult>,
     pub b_rng: RefCell<BlockchainRng>,
 }
@@ -30,6 +33,7 @@ impl TxContext {
             tx_cache: Rc::new(tx_cache),
             managed_types: RefCell::new(TxManagedTypes::new()),
             lockable_static_buffer_cell: RefCell::new(LockableStaticBuffer::new()),
+            static_vars_cell: RefCell::new(TxStaticVars::default()),
             tx_result_cell: RefCell::new(TxResult::empty()),
             b_rng,
         }
@@ -68,6 +72,7 @@ impl TxContext {
             tx_cache: Rc::new(tx_cache),
             managed_types: RefCell::new(TxManagedTypes::new()),
             lockable_static_buffer_cell: RefCell::new(LockableStaticBuffer::new()),
+            static_vars_cell: RefCell::new(TxStaticVars::default()),
             tx_result_cell: RefCell::new(TxResult::empty()),
             b_rng,
         }
