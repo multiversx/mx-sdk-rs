@@ -24,7 +24,7 @@ macro_rules! imports {
             io::*,
             non_zero_usize,
             non_zero_util::*,
-            only_owner, require, sc_error,
+            only_owner, require, sc_error, signal_error,
             storage::mappers::*,
             types::{
                 SCResult::{Err, Ok},
@@ -55,6 +55,19 @@ macro_rules! derive_imports {
 macro_rules! sc_error {
     ($s:expr) => {
         elrond_wasm::types::SCResult::Err(elrond_wasm::types::StaticSCError::from($s)).into()
+    };
+}
+
+#[macro_export]
+macro_rules! signal_error {
+    ($msg:tt, $($arg:expr),+) => {{
+        let mut ___buffer___ =
+            elrond_wasm::types::ManagedBufferCachedBuilder::<Self::Api>::new_from_slice(&[]);
+        elrond_wasm::derive::format_receiver_args!(___buffer___, $msg, $($arg),+);
+        Self::Api::error_api_impl().signal_error_from_buffer(___buffer___.into_managed_buffer().get_raw_handle());
+    }};
+    ($msg:tt) => {
+        Self::Api::error_api_impl().signal_error($msg.as_bytes());
     };
 }
 

@@ -7,7 +7,6 @@
 elrond_wasm_node::wasm_endpoints! {
     lottery_erc20
     (
-        init
         callBack
         buy_ticket
         createLotteryPool

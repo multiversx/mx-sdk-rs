@@ -1,5 +1,7 @@
 use crate::types::LockableStaticBuffer;
 
+use super::Handle;
+
 pub trait StaticVarApi {
     type StaticVarApiImpl: StaticVarApiImpl;
 
@@ -11,4 +13,8 @@ pub trait StaticVarApi {
 /// - in debug mode on the thread local context
 pub trait StaticVarApiImpl {
     fn with_lockable_static_buffer<R, F: FnOnce(&mut LockableStaticBuffer) -> R>(&self, f: F) -> R;
+
+    fn set_external_view_target_address_handle(&self, handle: Handle);
+
+    fn get_external_view_target_address_handle(&self) -> Handle;
 }

@@ -6,25 +6,25 @@ fn world() -> BlockchainMock {
 
     blockchain.register_contract_builder(
         "file:forwarder/output/forwarder.wasm",
-        forwarder::contract_builder,
+        forwarder::ContractBuilder,
     );
     blockchain.register_contract_builder(
         "file:forwarder-raw/output/forwarder-raw.wasm",
-        forwarder_raw::contract_builder,
+        forwarder_raw::ContractBuilder,
     );
     blockchain.register_contract_builder(
         "file:proxy-test-first/output/proxy-test-first.wasm",
-        proxy_test_first::contract_builder,
+        proxy_test_first::ContractBuilder,
     );
     blockchain.register_contract_builder(
         "file:proxy-test-second/output/proxy-test-second.wasm",
-        proxy_test_second::contract_builder,
+        proxy_test_second::ContractBuilder,
     );
     blockchain.register_contract_builder(
         "file:recursive-caller/output/recursive-caller.wasm",
-        recursive_caller::contract_builder,
+        recursive_caller::ContractBuilder,
     );
-    blockchain.register_contract_builder("file:vault/output/vault.wasm", vault::contract_builder);
+    blockchain.register_contract_builder("file:vault/output/vault.wasm", vault::ContractBuilder);
     blockchain
 }
 
@@ -274,6 +274,14 @@ fn forwarder_call_sync_accept_then_read_esdt_rs() {
 fn forwarder_call_sync_accept_then_read_nft_rs() {
     elrond_wasm_debug::mandos_rs(
         "mandos/forwarder_call_sync_accept_then_read_nft.scen.json",
+        world(),
+    );
+}
+
+#[test]
+fn forwarder_retrieve_funds_with_accept_func_rs() {
+    elrond_wasm_debug::mandos_rs(
+        "mandos/forwarder_retrieve_funds_with_accept_func.scen.json",
         world(),
     );
 }

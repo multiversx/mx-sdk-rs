@@ -7,7 +7,7 @@
 elrond_wasm_node::wasm_endpoints! {
     multi_contract_features
     (
-        init
+        sample_value
     )
 }
 

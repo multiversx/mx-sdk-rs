@@ -1,15 +1,11 @@
-use crate::types::BigUint;
-
-use super::ManagedTypeApi;
+use super::{Handle, ManagedTypeApi};
 
 pub trait PrintApi: ManagedTypeApi {
-    type PrintApiImpl: PrintApiImpl<ManagedTypeApi = Self>;
+    type PrintApiImpl: PrintApiImpl;
 
     fn print_api_impl() -> Self::PrintApiImpl;
 }
 
 pub trait PrintApiImpl {
-    type ManagedTypeApi: ManagedTypeApi;
-
-    fn print_biguint(&self, biguint: &BigUint<Self::ManagedTypeApi>);
+    fn print_biguint(&self, bu_handle: Handle);
 }

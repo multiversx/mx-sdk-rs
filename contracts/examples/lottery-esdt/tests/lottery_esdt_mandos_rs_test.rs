@@ -6,7 +6,7 @@ fn world() -> BlockchainMock {
 
     blockchain.register_contract_builder(
         "file:output/lottery-esdt.wasm",
-        lottery_esdt::contract_builder,
+        lottery_esdt::ContractBuilder,
     );
     blockchain
 }

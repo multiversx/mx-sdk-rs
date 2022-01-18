@@ -39,7 +39,7 @@ fn payable_single_snippet_for_metadata(
             let token_init = egld_token_init(payment_token_arg);
             let nonce_init = zero_nonce_init(payment_nonce_arg);
             quote! {
-                let #payment_var_name = elrond_wasm::api::CallValueApiImpl::require_egld(&Self::Api::call_value_api_impl());
+                let #payment_var_name = elrond_wasm::contract_base::CallValueWrapper::<Self::Api>::new().require_egld();
                 #token_init
                 #nonce_init
             }
@@ -58,7 +58,7 @@ fn payable_single_snippet_for_metadata(
             let nonce_init = nonce_getter_init(payment_nonce_arg);
 
             quote! {
-                let #payment_var_name = elrond_wasm::api::CallValueApiImpl::require_esdt(&Self::Api::call_value_api_impl(), #token_literal);
+                let #payment_var_name = elrond_wasm::contract_base::CallValueWrapper::<Self::Api>::new().require_esdt(#token_literal);
                 #token_init
                 #nonce_init
             }
@@ -72,7 +72,7 @@ fn payable_single_snippet_for_metadata(
                 let token_var_name = var_name_or_underscore(payment_token_arg);
 
                 quote! {
-                    let (#payment_var_name, #token_var_name) = elrond_wasm::api::CallValueApiImpl::payment_token_pair(&Self::Api::call_value_api_impl());
+                    let (#payment_var_name, #token_var_name) = elrond_wasm::contract_base::CallValueWrapper::<Self::Api>::new().payment_token_pair();
                     #nonce_init
                 }
             }

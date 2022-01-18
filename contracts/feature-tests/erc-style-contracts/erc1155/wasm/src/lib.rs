@@ -7,7 +7,6 @@
 elrond_wasm_node::wasm_endpoints! {
     erc1155
     (
-        init
         callBack
         balanceOf
         balanceOfBatch

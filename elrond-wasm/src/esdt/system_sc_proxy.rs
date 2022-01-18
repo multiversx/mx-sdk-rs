@@ -20,6 +20,7 @@ const ISSUE_FUNGIBLE_ENDPOINT_NAME: &[u8] = b"issue";
 const ISSUE_NON_FUNGIBLE_ENDPOINT_NAME: &[u8] = b"issueNonFungible";
 const ISSUE_SEMI_FUNGIBLE_ENDPOINT_NAME: &[u8] = b"issueSemiFungible";
 const REGISTER_META_ESDT_ENDPOINT_NAME: &[u8] = b"registerMetaESDT";
+const ISSUE_AND_SET_ALL_ROLES_ENDPOINT_NAME: &[u8] = b"registerAndSetAllRoles";
 
 /// Proxy for the ESDT system smart contract.
 /// Unlike other contract proxies, this one has a fixed address,
@@ -156,6 +157,38 @@ where
                 can_add_special_roles: properties.can_add_special_roles,
             },
         )
+    }
+
+    pub fn issue_and_set_all_roles(
+        self,
+        issue_cost: BigUint<SA>,
+        token_display_name: ManagedBuffer<SA>,
+        token_ticker: ManagedBuffer<SA>,
+        token_type: EsdtTokenType,
+        num_decimals: usize,
+    ) -> ContractCall<SA, ()> {
+        let esdt_system_sc_address = self.esdt_system_sc_address();
+
+        let mut contract_call = ContractCall::new(
+            esdt_system_sc_address,
+            ManagedBuffer::new_from_bytes(ISSUE_AND_SET_ALL_ROLES_ENDPOINT_NAME),
+        )
+        .with_egld_transfer(issue_cost);
+
+        contract_call.push_endpoint_arg(token_display_name);
+        contract_call.push_endpoint_arg(token_ticker);
+
+        let token_type_name = match token_type {
+            EsdtTokenType::Fungible => &b"FNG"[..],
+            EsdtTokenType::NonFungible => &b"NFT"[..],
+            EsdtTokenType::SemiFungible => &b"SFT"[..],
+            EsdtTokenType::Meta => &b"META"[..],
+            EsdtTokenType::Invalid => &[],
+        };
+        contract_call.push_endpoint_arg(token_type_name);
+        contract_call.push_endpoint_arg(num_decimals);
+
+        contract_call
     }
 
     /// Deduplicates code from all the possible issue functions
