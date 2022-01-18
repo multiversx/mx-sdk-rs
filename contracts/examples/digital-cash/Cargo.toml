@@ -6,7 +6,7 @@ edition = "2018"
 publish = false
 
 [lib]
-path = "src/lib.rs"
+path = "src/digital_cash.rs"
 
 [dependencies.elrond-wasm]
 version = "0.25.0"
