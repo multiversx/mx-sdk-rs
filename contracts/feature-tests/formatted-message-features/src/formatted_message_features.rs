@@ -48,4 +48,10 @@ pub trait FormattedMessageFeatures {
             amount
         );
     }
+
+    /// TODO: figure out a way to test this.
+    #[endpoint]
+    fn print_message(&self, x: i32) {
+        sc_print!("Printing x: {:x}", x);
+    }
 }

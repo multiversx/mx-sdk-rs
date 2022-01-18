@@ -7,5 +7,9 @@ pub trait PrintApi: ManagedTypeApi {
 }
 
 pub trait PrintApiImpl {
-    fn print_biguint(&self, bu_handle: Handle);
+    #[inline]
+    fn print_biguint(&self, _bu_handle: Handle) {}
+
+    #[inline]
+    fn print_managed_buffer(&self, _mb_handle: Handle) {}
 }
