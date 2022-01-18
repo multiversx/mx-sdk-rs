@@ -11,5 +11,5 @@ pub struct DepositInfo<M: ManagedTypeApi> {
     pub depositor_address: ManagedAddress<M>,
     pub expiration_round: u64,
     pub token_name: TokenIdentifier<M>,
-    pub nonce: u64
+    pub nonce: u64,
 }
