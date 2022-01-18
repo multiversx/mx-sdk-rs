@@ -24,7 +24,7 @@ macro_rules! imports {
             io::*,
             non_zero_usize,
             non_zero_util::*,
-            only_owner, require, sc_error, signal_error,
+            only_owner, require, sc_error, signal_error, sc_print,
             storage::mappers::*,
             types::{
                 SCResult::{Err, Ok},
@@ -64,11 +64,21 @@ macro_rules! signal_error {
         let mut ___buffer___ =
             elrond_wasm::types::ManagedBufferCachedBuilder::<Self::Api>::new_from_slice(&[]);
         elrond_wasm::derive::format_receiver_args!(___buffer___, $msg, $($arg),+);
-        Self::Api::error_api_impl().signal_error_from_buffer(___buffer___.into_managed_buffer().get_raw_handle());
+        <Self::Api as elrond_wasm::api::ErrorApi>::error_api_impl().signal_error_from_buffer(___buffer___.into_managed_buffer().get_raw_handle());
     }};
     ($msg:tt) => {
-        Self::Api::error_api_impl().signal_error($msg.as_bytes());
+        <Self::Api as elrond_wasm::api::ErrorApi>::error_api_impl().signal_error($msg.as_bytes());
     };
+}
+
+#[macro_export]
+macro_rules! sc_print {
+    ($msg:tt, $($arg:expr),*) => {{
+        let mut ___buffer___ =
+            elrond_wasm::types::ManagedBufferCachedBuilder::<Self::Api>::new_from_slice(&[]);
+        elrond_wasm::derive::format_receiver_args!(___buffer___, $msg, $($arg),*);
+        <Self::Api as elrond_wasm::api::PrintApi>::print_api_impl().print_managed_buffer(___buffer___.into_managed_buffer().get_raw_handle());
+    }};
 }
 
 /// Equivalent to the `?` operator for SCResult.
