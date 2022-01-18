@@ -1,6 +1,9 @@
 use elrond_codec::{EncodeError, NestedEncodeOutput, TryStaticCast};
 
-use crate::{api::ManagedTypeApi, types::StaticBufferRef};
+use crate::{
+    api::ManagedTypeApi, contract_base::ManagedSerializer, formatter::FormatReceiver,
+    types::StaticBufferRef,
+};
 
 use super::{BigInt, BigUint, ManagedBuffer, ManagedBufferSizeContext};
 
@@ -119,5 +122,30 @@ impl<M: ManagedTypeApi> NestedEncodeOutput for ManagedBufferCachedBuilder<M> {
         } else {
             else_serialization(self)
         }
+    }
+}
+
+impl<M> FormatReceiver for ManagedBufferCachedBuilder<M>
+where
+    M: ManagedTypeApi,
+{
+    fn push_static_ascii(&mut self, arg: &'static [u8]) {
+        self.append_bytes(arg);
+    }
+
+    fn push_top_encode_bytes<T>(&mut self, item: &T)
+    where
+        T: elrond_codec::TopEncode,
+    {
+        let mb = ManagedSerializer::<M>::new().top_encode_to_managed_buffer(item);
+        self.append_managed_buffer(&mb);
+    }
+
+    fn push_top_encode_hex<T>(&mut self, item: &T)
+    where
+        T: elrond_codec::TopEncode,
+    {
+        let mb = ManagedSerializer::<M>::new().top_encode_to_managed_buffer(item);
+        crate::hex_util::add_arg_as_hex_to_buffer(self, &mb);
     }
 }

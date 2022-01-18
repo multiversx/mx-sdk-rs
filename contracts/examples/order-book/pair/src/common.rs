@@ -68,6 +68,7 @@ impl<M: ManagedTypeApi> FeeConfig<M> {
 }
 
 impl DealConfig {
+    #[allow(dead_code)]
     pub fn new() -> Self {
         Default::default()
     }

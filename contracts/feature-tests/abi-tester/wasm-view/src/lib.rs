@@ -4,10 +4,9 @@
 
 #![no_std]
 
-elrond_wasm_node::wasm_endpoints! {
+elrond_wasm_node::external_view_wasm_endpoints! {
     abi_tester
     (
-        init
         external_view
     )
 }

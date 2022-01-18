@@ -1,3 +1,5 @@
+#![feature(generic_associated_types)]
+
 use elrond_wasm::{
     api::ManagedTypeApi,
     derive::ManagedVecItem,

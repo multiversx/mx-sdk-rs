@@ -6,7 +6,7 @@ fn world() -> BlockchainMock {
 
     blockchain.register_contract_builder(
         "file:output/digital-cash.wasm",
-        digital_cash::contract_builder,
+        digital_cash::ContractBuilder,
     );
     blockchain
 }

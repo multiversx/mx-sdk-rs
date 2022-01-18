@@ -31,13 +31,16 @@ pub fn new_contract_object_fn() -> proc_macro2::TokenStream {
             }
         }
 
-        pub fn contract_builder<A>() -> elrond_wasm::Box<dyn elrond_wasm::contract_base::CallableContract<A>>
-        where
-            A: elrond_wasm::api::VMApi,
-        {
-            elrond_wasm::Box::new(ContractObj {
-                _phantom: core::marker::PhantomData,
-            })
+        pub struct ContractBuilder;
+
+        impl elrond_wasm::contract_base::CallableContractBuilder for self::ContractBuilder {
+            fn new_contract_obj<A: elrond_wasm::api::VMApi>(
+                &self,
+            ) -> elrond_wasm::Box<dyn elrond_wasm::contract_base::CallableContract> {
+                elrond_wasm::Box::new(ContractObj::<A> {
+                    _phantom: core::marker::PhantomData,
+                })
+            }
         }
     }
 }
@@ -59,7 +62,7 @@ pub fn impl_auto_impl() -> proc_macro2::TokenStream {
 
 pub fn impl_callable_contract() -> proc_macro2::TokenStream {
     quote! {
-        impl<A> elrond_wasm::contract_base::CallableContract<A> for ContractObj<A>
+        impl<A> elrond_wasm::contract_base::CallableContract for ContractObj<A>
         where
             A: elrond_wasm::api::VMApi,
         {
@@ -67,8 +70,10 @@ pub fn impl_callable_contract() -> proc_macro2::TokenStream {
                 EndpointWrappers::call(self, fn_name)
             }
 
-            fn clone_obj(&self) -> elrond_wasm::Box<dyn elrond_wasm::contract_base::CallableContract<A>> {
-                self::contract_builder()
+            fn clone_obj(&self) -> elrond_wasm::Box<dyn elrond_wasm::contract_base::CallableContract> {
+                elrond_wasm::Box::new(ContractObj::<A> {
+                    _phantom: core::marker::PhantomData,
+                })
             }
         }
     }
@@ -130,5 +135,11 @@ pub fn callback_proxy_object_def() -> proc_macro2::TokenStream {
                 }
             }
         }
+    }
+}
+
+pub fn call_method_api_static_init() -> proc_macro2::TokenStream {
+    quote! {
+        <Self::Api as elrond_wasm::api::VMApi>::init_static();
     }
 }
