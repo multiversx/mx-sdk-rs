@@ -5,13 +5,13 @@
 #![no_std]
 
 elrond_wasm_node::wasm_endpoints! {
-    formatted_message_features
+    digital_cash
     (
-        dynamic_message
-        dynamic_message_ascii
-        dynamic_message_multiple
-        print_message
-        static_message
+        amount
+        claim
+        deposit
+        fund
+        withdraw
     )
 }
 
