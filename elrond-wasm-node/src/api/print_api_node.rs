@@ -10,6 +10,4 @@ impl PrintApi for VmApiImpl {
 }
 
 impl PrintApiImpl for VmApiImpl {
-    #[inline]
-    fn print_biguint(&self, _bu_handle: Handle) {}
 }
