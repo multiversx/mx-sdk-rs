@@ -9,12 +9,12 @@ pub trait FormattedMessageFeatures {
 
     #[endpoint]
     fn static_message(&self) {
-        signal_error!("Static error");
+        sc_panic!("Static error");
     }
 
     #[endpoint]
     fn dynamic_message(&self, bytes: ManagedBuffer) {
-        signal_error!("Got this buffer: {:x}. I don't like it, ERROR!", bytes);
+        sc_panic!("Got this buffer: {:x}. I don't like it, ERROR!", bytes);
     }
 
     #[payable("*")]
@@ -25,7 +25,7 @@ pub trait FormattedMessageFeatures {
         #[payment_nonce] nonce: u64,
         #[payment_amount] amount: BigUint,
     ) {
-        signal_error!(
+        sc_panic!(
             "Got token {:x}, with nonce {:x}, amount {:x}. I prefer EGLD. ERROR!",
             token_id,
             nonce,
@@ -41,7 +41,7 @@ pub trait FormattedMessageFeatures {
         #[payment_nonce] nonce: u64,
         #[payment_amount] amount: BigUint,
     ) {
-        signal_error!(
+        sc_panic!(
             "Got token {}, with nonce {:x}, amount {:x}. I prefer EGLD. ERROR!",
             token_id,
             nonce,
