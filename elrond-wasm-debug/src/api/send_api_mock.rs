@@ -365,7 +365,7 @@ impl SendApiImpl for DebugApi {
         let contract_address = self.input_ref().to.clone();
         let recipient = to.to_address();
         let tx_hash = self.get_tx_hash_legacy();
-        let mut promises = Vec::new();
+        let mut promises = vec![];
         promises.push(success.to_vec());
         promises.push(error.to_vec());
         let call = AsyncCallTxData {
@@ -379,8 +379,8 @@ impl SendApiImpl for DebugApi {
         };
         let mut tx_result = self.extract_result();
         tx_result.result_calls.async_call = Some(call);
-        if tx_result.result_status == 0 {
-        } else {
+        if tx_result.result_status != 0 {
+            std::panic::panic_any(tx_result)
         }
         Ok(())
     }
