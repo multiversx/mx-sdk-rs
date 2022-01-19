@@ -9,10 +9,12 @@ name = "erdpy-snippet-generator"
 path = "src/erdpy_snippet_generator.rs"
 
 [dependencies.elrond-wasm]
-version = "0.25.0"
+version = "0.26.0"
+path = "../../elrond-wasm"
 
 [dependencies.elrond-wasm-debug]
-version = "0.25.0"
+version = "0.26.0"
+path = "../../elrond-wasm-debug"
 
 [dependencies]
 bech32 = "0.8.1"
