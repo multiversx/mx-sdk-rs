@@ -11,19 +11,15 @@ pub trait NftStoragePrepay {
 
     // endpoints - owner-only
 
+    #[only_owner]
     #[endpoint(setCostPerByte)]
-    fn set_cost_per_byte(&self, cost_per_byte: BigUint) -> SCResult<()> {
-        only_owner!(self, "Only owner may call this function");
-
+    fn set_cost_per_byte(&self, cost_per_byte: BigUint) {
         self.cost_per_byte().set(&cost_per_byte);
-
-        Ok(())
     }
 
+    #[only_owner]
     #[endpoint(reserveFunds)]
-    fn reserve_funds(&self, address: ManagedAddress, file_size: BigUint) -> SCResult<()> {
-        only_owner!(self, "Only owner may call this function");
-
+    fn reserve_funds(&self, address: ManagedAddress, file_size: BigUint) {
         let storage_cost = self.get_cost_for_size(file_size);
         let mut user_deposit = self.deposit(&address).get();
         require!(
@@ -35,23 +31,17 @@ pub trait NftStoragePrepay {
         self.deposit(&address).set(&user_deposit);
         self.total_reserved()
             .update(|reserved| *reserved += storage_cost);
-
-        Ok(())
     }
 
     #[endpoint]
-    fn claim(&self) -> SCResult<()> {
-        only_owner!(self, "Only owner may call this function");
-
+    fn claim(&self) {
         let total_reserved = self.total_reserved().get();
-        require!(total_reserved > 0, "Nothing to claim");
+        require!(total_reserved > 0u32, "Nothing to claim");
 
         self.total_reserved().clear();
 
         let owner = self.blockchain().get_caller();
         self.send().direct_egld(&owner, &total_reserved, &[]);
-
-        Ok(())
     }
 
     // endpoints
