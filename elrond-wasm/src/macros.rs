@@ -24,7 +24,7 @@ macro_rules! imports {
             io::*,
             non_zero_usize,
             non_zero_util::*,
-            only_owner, require, sc_error, signal_error, sc_print,
+            only_owner, require, sc_error, sc_panic, sc_print,
             storage::mappers::*,
             types::{
                 SCResult::{Err, Ok},
@@ -59,7 +59,7 @@ macro_rules! sc_error {
 }
 
 #[macro_export]
-macro_rules! signal_error {
+macro_rules! sc_panic {
     ($msg:tt, $($arg:expr),+) => {{
         let mut ___buffer___ =
             elrond_wasm::types::ManagedBufferCachedBuilder::<Self::Api>::new_from_slice(&[]);
