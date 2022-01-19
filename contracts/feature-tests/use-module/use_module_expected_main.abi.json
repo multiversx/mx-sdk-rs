@@ -88,6 +88,7 @@
         },
         {
             "name": "dnsRegister",
+            "onlyOwner": true,
             "mutability": "mutable",
             "payableInTokens": [
                 "EGLD"
@@ -106,6 +107,7 @@
         },
         {
             "name": "issueToken",
+            "onlyOwner": true,
             "mutability": "mutable",
             "payableInTokens": [
                 "EGLD"
@@ -131,6 +133,7 @@
                 "optional address to set roles for. Defaults to SC's address."
             ],
             "name": "setLocalRoles",
+            "onlyOwner": true,
             "mutability": "mutable",
             "inputs": [
                 {
@@ -365,6 +368,7 @@
                 "to not modify parameters manually"
             ],
             "name": "initGovernanceModule",
+            "onlyOwner": true,
             "mutability": "mutable",
             "inputs": [
                 {

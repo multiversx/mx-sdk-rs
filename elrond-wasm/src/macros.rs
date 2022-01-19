@@ -24,7 +24,7 @@ macro_rules! imports {
             io::*,
             non_zero_usize,
             non_zero_util::*,
-            only_owner, require, require_old, sc_error, sc_panic, sc_print,
+            require, require_old, sc_error, sc_panic, sc_print,
             storage::mappers::*,
             types::{
                 SCResult::{Err, Ok},
@@ -174,6 +174,10 @@ macro_rules! sc_try {
 /// }
 /// # }
 /// ```
+#[deprecated(
+    since = "0.26.0",
+    note = "Replace with the `#[only_owner]` attribute that can be placed on an endpoint. That one is more compact and shows up in the ABI."
+)]
 #[macro_export]
 macro_rules! only_owner {
     ($trait_self: expr, $error_msg:expr) => {
