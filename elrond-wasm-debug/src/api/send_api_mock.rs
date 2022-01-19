@@ -365,9 +365,7 @@ impl SendApiImpl for DebugApi {
         let contract_address = self.input_ref().to.clone();
         let recipient = to.to_address();
         let tx_hash = self.get_tx_hash_legacy();
-        let mut promises = vec![];
-        promises.push(success.to_vec());
-        promises.push(error.to_vec());
+        let promises = vec![success.to_vec(), error.to_vec()];
         let call = AsyncCallTxData {
             from: contract_address,
             to: recipient,
