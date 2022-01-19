@@ -95,21 +95,4 @@ sleep 15
 cd elrond-wasm-modules
 cargo publish
 cd ..
-
-### These ones are deprecated, we will stop publishing them soon:
-
-cd contracts/modules-legacy/elrond-wasm-module-dns
-cargo publish
-cd ../../..
-
-cd contracts/modules-legacy/elrond-wasm-module-features
-cargo publish
-cd ../../..
-
-cd contracts/modules-legacy/elrond-wasm-module-pause
-cargo publish
-cd ../../..
-
-cd contracts/modules-legacy/elrond-wasm-module-users
-cargo publish
-cd ../../..
+sleep 15
