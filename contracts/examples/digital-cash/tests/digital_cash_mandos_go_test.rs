@@ -29,4 +29,3 @@ fn withdraw_egld_go() {
 fn withdraw_esdt_go() {
     elrond_wasm_debug::mandos_go("mandos/withdraw-esdt.scen.json");
 }
-

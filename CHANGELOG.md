@@ -4,6 +4,22 @@ There are several crates in this repo, this changelog will keep track of all of 
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [elrond-wasm 0.26.0] - 2022-01-19
+- Major VM API trait refactoring. All API methods can be accessed from a static context. Removed api instance variables from all objects.
+- External view contracts
+	- Annotating one or more endpoints with `#[external_view]` triggers the framework to create a second "external view" contract where all these endpoints are placed. This is primarily to reduce the main contract size.
+	- General `meta` crate functionality refactor to allow multiple contract generation.
+- `ManagedRef` type
+	- Provided as a more efficient alternative to regular references to managed types
+	- Has `Copy` semantics
+	- `ManagedVec` iterators made safer by the proper use of lifetimes
+	- `ManagedVec` `get_mut` offers a safe mutable reference, using lifetimes
+	- Some initial optimizations in storage mappers
+- First version of a message formatter based on `ManagedBuffer`s
+	- `sc_print!` macro
+	- `sc_panic!` macro
+- Random number generator wrapper over randomness source from the VM
+
 ## [elrond-wasm 0.25.0] - 2021-12-14
 - Rust testing framework - mandos generation fixes and some more getters
 - Standard modules moved to `elrond-wasm-modules` crates

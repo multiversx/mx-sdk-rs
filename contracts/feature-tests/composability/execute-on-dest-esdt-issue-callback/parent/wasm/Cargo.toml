@@ -19,11 +19,11 @@ panic = "abort"
 path = ".."
 
 [dependencies.elrond-wasm-node]
-version = "0.25.0"
+version = "0.26.0"
 path = "../../../../../../elrond-wasm-node"
 
 [dependencies.elrond-wasm-output]
-version = "0.25.0"
+version = "0.26.0"
 path = "../../../../../../elrond-wasm-output"
 features = ["wasm-output-mode"]
 
