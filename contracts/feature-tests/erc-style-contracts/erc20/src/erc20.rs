@@ -53,20 +53,13 @@ pub trait SimpleErc20Token {
     }
 
     /// This method is private, deduplicates logic from transfer and transferFrom.
-    fn perform_transfer(
-        &self,
-        sender: ManagedAddress,
-        recipient: ManagedAddress,
-        amount: BigUint,
-    ) -> SCResult<()> {
+    fn perform_transfer(&self, sender: ManagedAddress, recipient: ManagedAddress, amount: BigUint) {
         // check if enough funds & decrease sender balance
         self.token_balance(&sender).update(|balance| {
-            require!(amount <= *balance, &b"insufficient funds"[..]);
+            require!(amount <= *balance, "insufficient funds");
 
             *balance -= &amount;
-
-            Ok(())
-        })?;
+        });
 
         // increase recipient balance
         self.token_balance(&recipient)
@@ -74,8 +67,6 @@ pub trait SimpleErc20Token {
 
         // log operation
         self.transfer_event(&sender, &recipient, &amount);
-
-        Ok(())
     }
 
     /// Transfer token to a specified address from sender.
@@ -85,7 +76,7 @@ pub trait SimpleErc20Token {
     /// * `to` The address to transfer to.
     ///
     #[endpoint]
-    fn transfer(&self, to: ManagedAddress, amount: BigUint) -> SCResult<()> {
+    fn transfer(&self, to: ManagedAddress, amount: BigUint) {
         // the sender is the caller
         let sender = self.blockchain().get_caller();
         self.perform_transfer(sender, to, amount)
@@ -100,22 +91,15 @@ pub trait SimpleErc20Token {
     /// * `amount` the amount of tokens to be transferred.
     ///
     #[endpoint(transferFrom)]
-    fn transfer_from(
-        &self,
-        sender: ManagedAddress,
-        recipient: ManagedAddress,
-        amount: BigUint,
-    ) -> SCResult<()> {
+    fn transfer_from(&self, sender: ManagedAddress, recipient: ManagedAddress, amount: BigUint) {
         // get caller
         let caller = self.blockchain().get_caller();
 
         self.allowance(&sender, &caller).update(|allowance| {
-            require!(amount <= *allowance, &b"allowance exceeded"[..]);
+            require!(amount <= *allowance, "allowance exceeded");
 
             *allowance -= &amount;
-
-            Ok(())
-        })?;
+        });
 
         // transfer
         self.perform_transfer(sender, recipient, amount)
