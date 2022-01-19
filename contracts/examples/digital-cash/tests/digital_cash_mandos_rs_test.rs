@@ -42,4 +42,3 @@ fn withdraw_egld_rs() {
 fn withdraw_esdt_rs() {
     elrond_wasm_debug::mandos_rs("mandos/withdraw-esdt.scen.json", world());
 }
-
