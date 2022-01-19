@@ -126,6 +126,7 @@
                 "egldValue": "1000",
                 "function": "fund",
                 "arguments": [],
+                "promises": [],
                 "gasLimit": "18446744073709551615",
                 "gasPrice": "0"
             },

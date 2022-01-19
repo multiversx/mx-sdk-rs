@@ -14,7 +14,6 @@ pub struct TxCall {
     pub esdt_value: Vec<TxESDT>,
     pub function: String,
     pub arguments: Vec<BytesValue>,
-    pub promises: Vec<BytesValue>,
     pub gas_limit: U64Value,
     pub gas_price: U64Value,
 }
@@ -33,11 +32,6 @@ impl InterpretableFrom<TxCallRaw> for TxCall {
             function: from.function,
             arguments: from
                 .arguments
-                .into_iter()
-                .map(|t| BytesValue::interpret_from(t, context))
-                .collect(),
-            promises: from
-                .promises
                 .into_iter()
                 .map(|t| BytesValue::interpret_from(t, context))
                 .collect(),

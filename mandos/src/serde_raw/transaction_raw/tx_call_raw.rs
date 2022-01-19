@@ -27,9 +27,6 @@ pub struct TxCallRaw {
     #[serde(default)]
     pub arguments: Vec<ValueSubTree>,
 
-    #[serde(default)]
-    pub promises: Vec<ValueSubTree>,
-
     pub gas_limit: ValueSubTree,
     pub gas_price: ValueSubTree,
 }
