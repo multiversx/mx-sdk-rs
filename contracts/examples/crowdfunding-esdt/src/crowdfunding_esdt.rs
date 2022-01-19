@@ -19,16 +19,16 @@ pub trait Crowdfunding {
         deadline: u64,
         token_identifier: TokenIdentifier,
     ) -> SCResult<()> {
-        require!(target > 0, "Target must be more than 0");
+        require_old!(target > 0, "Target must be more than 0");
         self.target().set(target);
 
-        require!(
+        require_old!(
             deadline > self.get_current_time(),
             "Deadline can't be in the past"
         );
         self.deadline().set(deadline);
 
-        require!(
+        require_old!(
             token_identifier.is_egld() || token_identifier.is_valid_esdt_identifier(),
             "Invalid token provided"
         );
@@ -44,11 +44,11 @@ pub trait Crowdfunding {
         #[payment_token] token: TokenIdentifier,
         #[payment] payment: BigUint,
     ) -> SCResult<()> {
-        require!(
+        require_old!(
             self.status() == Status::FundingPeriod,
             "cannot fund after deadline"
         );
-        require!(token == self.cf_token_identifier().get(), "wrong token");
+        require_old!(token == self.cf_token_identifier().get(), "wrong token");
 
         let caller = self.blockchain().get_caller();
         self.deposit(&caller).update(|deposit| *deposit += payment);
@@ -80,7 +80,7 @@ pub trait Crowdfunding {
             Status::FundingPeriod => sc_error!("cannot claim before deadline"),
             Status::Successful => {
                 let caller = self.blockchain().get_caller();
-                require!(
+                require_old!(
                     caller == self.blockchain().get_owner_address(),
                     "only owner can claim successful funding"
                 );

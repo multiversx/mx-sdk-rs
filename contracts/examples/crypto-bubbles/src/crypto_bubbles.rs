@@ -29,7 +29,7 @@ pub trait CryptoBubbles {
     /// server calls withdraw on behalf of the player
     fn transfer_back_to_player_wallet(&self, player: &Address, amount: &BigUint) -> SCResult<()> {
         self.player_balance(player).update(|balance| {
-            require!(
+            require_old!(
                 amount <= balance,
                 "amount to withdraw must be less or equal to balance"
             );
@@ -55,7 +55,7 @@ pub trait CryptoBubbles {
         bet: &BigUint,
     ) -> SCResult<()> {
         self.player_balance(player).update(|balance| {
-            require!(bet <= balance, "insufficient funds to join game");
+            require_old!(bet <= balance, "insufficient funds to join game");
 
             *balance -= bet;
 

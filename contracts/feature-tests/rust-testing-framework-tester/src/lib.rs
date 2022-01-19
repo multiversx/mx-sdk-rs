@@ -30,7 +30,7 @@ pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
 
     #[endpoint]
     fn sum_sc_result(&self, first: BigUint, second: BigUint) -> SCResult<BigUint> {
-        require!(first > 0 && second > 0, "Non-zero required");
+        require_old!(first > 0 && second > 0, "Non-zero required");
         Ok(first + second)
     }
 
