@@ -47,61 +47,50 @@ pub fn sc_call_with_async_and_callback(
     let contract_address = tx_input.to.clone();
     let mut tx_result = sc_call(tx_input, state, increase_nonce);
     let result_calls = std::mem::replace(&mut tx_result.result_calls, TxResultCalls::empty());
-    match tx_result.result_status {
-        0 => {
-            if let Some(async_data) = result_calls.async_call {
-                if state.accounts.contains_key(&async_data.to) {
-                    let async_input = async_call_tx_input(&async_data);
+    if tx_result.result_status == 0 {
+        if let Some(async_data) = result_calls.async_call {
+            if state.accounts.contains_key(&async_data.to) {
+                let async_input = async_call_tx_input(&async_data);
 
-                    let async_result = sc_call_with_async_and_callback(async_input, state, false);
+                let async_result = sc_call_with_async_and_callback(async_input, state, false);
 
-                    tx_result = merge_results(tx_result, async_result.clone());
+                tx_result = merge_results(tx_result, async_result.clone());
 
-                    let callback_input = async_callback_tx_input(&async_data, &async_result);
-                    let callback_result = sc_call(callback_input, state, false);
-                    assert!(
-                        tx_result.result_calls.async_call.is_none(),
-                        "successive asyncs currently not supported"
-                    );
-                    tx_result = merge_results(tx_result, callback_result);
-                } else {
-                    let tx_cache = TxCache::new(state.clone());
-                    tx_cache.subtract_egld_balance(&contract_address, &async_data.call_value);
-                    tx_cache.insert_account(AccountData {
-                        address: async_data.to.clone(),
-                        nonce: 0,
-                        egld_balance: async_data.call_value,
-                        esdt: AccountEsdt::default(),
-                        username: Vec::new(),
-                        storage: HashMap::new(),
-                        contract_path: None,
-                        contract_owner: None,
-                    });
-                    state.commit_tx_cache(tx_cache);
-                }
+                let callback_input = async_callback_tx_input(&async_data, &async_result);
+                let callback_result = sc_call(callback_input, state, false);
+                assert!(
+                    tx_result.result_calls.async_call.is_none(),
+                    "successive asyncs currently not supported"
+                );
+                tx_result = merge_results(tx_result, callback_result);
+            } else {
+                let tx_cache = TxCache::new(state.clone());
+                tx_cache.subtract_egld_balance(&contract_address, &async_data.call_value);
+                tx_cache.insert_account(AccountData {
+                    address: async_data.to.clone(),
+                    nonce: 0,
+                    egld_balance: async_data.call_value,
+                    esdt: AccountEsdt::default(),
+                    username: Vec::new(),
+                    storage: HashMap::new(),
+                    contract_path: None,
+                    contract_owner: None,
+                });
+                state.commit_tx_cache(tx_cache);
             }
+        }
 
-            for pr_call in result_calls.transfer_execute {
-                let pr_input = async_call_tx_input(&pr_call);
+        for te_call in result_calls.transfer_execute {
+            let te_input = async_call_tx_input(&te_call);
+            let te_result = sc_call(te_input, state, false);
+            tx_result = merge_results(tx_result, te_result.clone());
+        }
+    }
 
-                let pr_result = sc_call_with_async_and_callback(pr_input, state, false);
-
-                tx_result = merge_results(tx_result, pr_result.clone());
-            }
-
-            if let Some(callback) = result_calls.success_callback {
-                let promises_input = async_call_tx_input(callback.get_tx_data());
-                let promises_result = sc_call_with_async_and_callback(promises_input, state, false);
-                tx_result = merge_results(tx_result, promises_result.clone());
-            }
-        },
-        _default => {
-            if let Some(callback) = result_calls.error_callback {
-                let promises_input = async_call_tx_input(callback.get_tx_data());
-                let promises_result = sc_call_with_async_and_callback(promises_input, state, false);
-                tx_result = merge_results(tx_result, promises_result.clone());
-            }
-        },
+    for callback in result_calls.promises {
+        let promises_input = async_call_tx_input(callback.get_tx_data());
+        let promises_result = sc_call(promises_input, state, false);
+        tx_result = merge_results(tx_result, promises_result.clone());
     }
 
     tx_result

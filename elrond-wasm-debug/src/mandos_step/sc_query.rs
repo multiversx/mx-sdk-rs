@@ -23,11 +23,6 @@ pub fn execute(state: Rc<BlockchainMock>, tx_id: &str, tx: &TxQuery, expect: &Op
             .iter()
             .map(|scen_arg| scen_arg.value.clone())
             .collect(),
-        promises: tx
-            .promises
-            .iter()
-            .map(|callback| callback.value.clone())
-            .collect(),
         gas_limit: u64::MAX,
         gas_price: 0u64,
         tx_hash: generate_tx_hash_dummy(tx_id),

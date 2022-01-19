@@ -61,7 +61,6 @@ impl DebugApi {
             esdt_values: Vec::new(),
             func_name,
             args,
-            promises: Vec::new(),
             gas_limit: 1000,
             gas_price: 0,
             tx_hash,
@@ -97,7 +96,6 @@ impl DebugApi {
             esdt_values: Vec::new(),
             func_name: Vec::new(),
             args,
-            promises: Vec::new(),
             gas_limit: 1000,
             gas_price: 0,
             tx_hash,
@@ -154,7 +152,6 @@ impl DebugApi {
             call_value,
             endpoint_name: UPGRADE_CONTRACT_FUNC_NAME.to_vec(),
             arguments,
-            promises: Vec::new(),
             tx_hash,
         };
         self.perform_async_call(call)
@@ -345,7 +342,6 @@ impl SendApiImpl for DebugApi {
             endpoint_name: endpoint_name.to_boxed_bytes().into_vec(),
             arguments: arg_buffer.to_raw_args_vec(),
             tx_hash,
-            promises: Vec::new(),
         };
         self.perform_async_call(call)
     }
@@ -365,7 +361,6 @@ impl SendApiImpl for DebugApi {
         let contract_address = self.input_ref().to.clone();
         let recipient = to.to_address();
         let tx_hash = self.get_tx_hash_legacy();
-        let promises = vec![success.to_vec(), error.to_vec()];
         let call = AsyncCallTxData {
             from: contract_address,
             to: recipient,
@@ -373,7 +368,6 @@ impl SendApiImpl for DebugApi {
             endpoint_name: endpoint_name.to_boxed_bytes().into_vec(),
             arguments: arg_buffer.to_raw_args_vec(),
             tx_hash,
-            promises,
         };
         let mut tx_result = self.extract_result();
         tx_result.result_calls.async_call = Some(call);

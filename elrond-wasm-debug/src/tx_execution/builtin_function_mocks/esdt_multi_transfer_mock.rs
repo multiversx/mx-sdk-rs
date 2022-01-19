@@ -78,7 +78,6 @@ pub fn execute_esdt_multi_transfer(
         esdt_values,
         func_name,
         args,
-        promises: tx_input.promises,
         gas_limit: tx_input.gas_limit,
         gas_price: tx_input.gas_price,
         tx_hash: tx_input.tx_hash,

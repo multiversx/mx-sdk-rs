@@ -9,7 +9,6 @@ pub struct TxQuery {
     pub to: AddressValue,
     pub function: String,
     pub arguments: Vec<BytesValue>,
-    pub promises: Vec<BytesValue>,
 }
 
 impl InterpretableFrom<TxQueryRaw> for TxQuery {
@@ -19,11 +18,6 @@ impl InterpretableFrom<TxQueryRaw> for TxQuery {
             function: from.function,
             arguments: from
                 .arguments
-                .into_iter()
-                .map(|t| BytesValue::interpret_from(t, context))
-                .collect(),
-            promises: from
-                .promises
                 .into_iter()
                 .map(|t| BytesValue::interpret_from(t, context))
                 .collect(),
