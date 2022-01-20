@@ -5,6 +5,7 @@ use std::fmt;
 use super::{TxLog, TxPanic, TxResultCalls};
 
 #[derive(Clone, Default, Debug)]
+#[must_use]
 pub struct TxResult {
     pub result_status: u64,
     pub result_message: String,
@@ -90,5 +91,37 @@ impl TxResult {
             );
             self.result_calls.async_call = Some(sync_result_async.clone());
         }
+    }
+
+    pub fn assert_ok(&self) {
+        assert!(
+            self.result_status == 0,
+            "Tx success expected, but failed. Status: {}, message: \"{}\"",
+            self.result_status,
+            self.result_message.as_str()
+        );
+    }
+
+    pub fn assert_error(&self, expected_status: u64, expected_message: &str) {
+        assert!(
+            self.result_message.as_str() == expected_message,
+            "Tx error message mismatch. Want status {}, message \"{}\". Have status {}, message \"{}\"",
+            expected_status,
+            expected_message,
+            self.result_status,
+            self.result_message.as_str()
+        );
+        assert!(
+            self.result_status == expected_status,
+            "Tx error status mismatch. Want status {}, message \"{}\". Have status {}, message \"{}\"",
+            expected_status,
+            expected_message,
+            self.result_status,
+            self.result_message.as_str()
+        );
+    }
+
+    pub fn assert_user_error(&self, expected_message: &str) {
+        self.assert_error(4, expected_message);
     }
 }

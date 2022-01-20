@@ -13,47 +13,34 @@ pub enum Status {
 #[elrond_wasm::contract]
 pub trait Crowdfunding {
     #[init]
-    fn init(
-        &self,
-        target: BigUint,
-        deadline: u64,
-        token_identifier: TokenIdentifier,
-    ) -> SCResult<()> {
-        require_old!(target > 0, "Target must be more than 0");
+    fn init(&self, target: BigUint, deadline: u64, token_identifier: TokenIdentifier) {
+        require!(target > 0, "Target must be more than 0");
         self.target().set(target);
 
-        require_old!(
+        require!(
             deadline > self.get_current_time(),
             "Deadline can't be in the past"
         );
         self.deadline().set(deadline);
 
-        require_old!(
+        require!(
             token_identifier.is_egld() || token_identifier.is_valid_esdt_identifier(),
             "Invalid token provided"
         );
         self.cf_token_identifier().set(token_identifier);
-
-        Ok(())
     }
 
     #[endpoint]
     #[payable("*")]
-    fn fund(
-        &self,
-        #[payment_token] token: TokenIdentifier,
-        #[payment] payment: BigUint,
-    ) -> SCResult<()> {
-        require_old!(
+    fn fund(&self, #[payment_token] token: TokenIdentifier, #[payment] payment: BigUint) {
+        require!(
             self.status() == Status::FundingPeriod,
             "cannot fund after deadline"
         );
-        require_old!(token == self.cf_token_identifier().get(), "wrong token");
+        require!(token == self.cf_token_identifier().get(), "wrong token");
 
         let caller = self.blockchain().get_caller();
         self.deposit(&caller).update(|deposit| *deposit += payment);
-
-        Ok(())
     }
 
     #[view]
@@ -75,12 +62,12 @@ pub trait Crowdfunding {
     }
 
     #[endpoint]
-    fn claim(&self) -> SCResult<()> {
+    fn claim(&self) {
         match self.status() {
-            Status::FundingPeriod => sc_error!("cannot claim before deadline"),
+            Status::FundingPeriod => sc_panic!("cannot claim before deadline"),
             Status::Successful => {
                 let caller = self.blockchain().get_caller();
-                require_old!(
+                require!(
                     caller == self.blockchain().get_owner_address(),
                     "only owner can claim successful funding"
                 );
@@ -90,22 +77,18 @@ pub trait Crowdfunding {
 
                 self.send()
                     .direct(&caller, &token_identifier, 0, &sc_balance, &[]);
-
-                Ok(())
             },
             Status::Failed => {
                 let caller = self.blockchain().get_caller();
                 let deposit = self.deposit(&caller).get();
 
-                if deposit > 0 {
+                if deposit > 0u32 {
                     let token_identifier = self.cf_token_identifier().get();
 
                     self.deposit(&caller).clear();
                     self.send()
                         .direct(&caller, &token_identifier, 0, &deposit, &[]);
                 }
-
-                Ok(())
             },
         }
     }

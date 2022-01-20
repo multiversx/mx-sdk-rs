@@ -1,8 +1,5 @@
 use crowdfunding_esdt::*;
-use elrond_wasm::{
-    sc_error,
-    types::{Address, SCResult},
-};
+use elrond_wasm::types::Address;
 use elrond_wasm_debug::{
     managed_address, managed_biguint, managed_token_id, rust_biguint, testing_framework::*,
     DebugApi,
@@ -45,13 +42,11 @@ where
     blockchain_wrapper.set_esdt_balance(&first_user_address, CF_TOKEN_ID, &rust_biguint!(1_000));
     blockchain_wrapper.set_esdt_balance(&second_user_address, CF_TOKEN_ID, &rust_biguint!(1_000));
 
-    blockchain_wrapper.execute_tx(&owner_address, &cf_wrapper, &rust_zero, |sc| {
+    let _ = blockchain_wrapper.execute_tx(&owner_address, &cf_wrapper, &rust_zero, |sc| {
         let target = managed_biguint!(2_000);
         let token_id = managed_token_id!(CF_TOKEN_ID);
 
-        let result = sc.init(target, CF_DEADLINE, token_id);
-        assert_eq!(result, SCResult::Ok(()));
-
+        sc.init(target, CF_DEADLINE, token_id);
         StateChange::Commit
     });
     blockchain_wrapper.add_mandos_set_account(cf_wrapper.address_ref());
@@ -79,15 +74,14 @@ fn fund_test() {
     let b_wrapper = &mut cf_setup.blockchain_wrapper;
     let user_addr = &cf_setup.first_user_address;
 
-    b_wrapper.execute_esdt_transfer(
+    let _ = b_wrapper.execute_esdt_transfer(
         user_addr,
         &cf_setup.cf_wrapper,
         CF_TOKEN_ID,
         0,
         &rust_biguint!(1_000),
         |sc| {
-            let result = sc.fund(managed_token_id!(CF_TOKEN_ID), managed_biguint!(1_000));
-            assert_eq!(result, SCResult::Ok(()));
+            sc.fund(managed_token_id!(CF_TOKEN_ID), managed_biguint!(1_000));
 
             let user_deposit = sc.deposit(&managed_address!(user_addr)).get();
             let expected_deposit = managed_biguint!(1_000);
@@ -113,7 +107,7 @@ fn status_test() {
     let mut cf_setup = setup_crowdfunding(crowdfunding_esdt::contract_obj);
     let b_wrapper = &mut cf_setup.blockchain_wrapper;
 
-    b_wrapper.execute_query(&cf_setup.cf_wrapper, |sc| {
+    let _ = b_wrapper.execute_query(&cf_setup.cf_wrapper, |sc| {
         let status = sc.status();
         assert_eq!(status, Status::FundingPeriod);
     });
@@ -137,21 +131,28 @@ fn test_sc_error() {
 
     b_wrapper.set_egld_balance(user_addr, &rust_biguint!(1_000));
 
-    b_wrapper.execute_tx(
-        user_addr,
-        &cf_setup.cf_wrapper,
-        &rust_biguint!(1_000),
-        |sc| {
-            let result = sc.fund(managed_token_id!(b""), managed_biguint!(1_000));
-            assert_eq!(result, sc_error!("wrong token"));
+    b_wrapper
+        .execute_tx(
+            user_addr,
+            &cf_setup.cf_wrapper,
+            &rust_biguint!(1_000),
+            |sc| {
+                let _ = sc.fund(managed_token_id!(b""), managed_biguint!(1_000));
+                // assert_eq!(result, sc_error!("wrong token"));
+                StateChange::Commit
+            },
+        )
+        .assert_user_error("wrong token");
 
+    b_wrapper
+        .execute_tx(user_addr, &cf_setup.cf_wrapper, &rust_biguint!(0), |sc| {
             let user_deposit = sc.deposit(&managed_address!(user_addr)).get();
             let expected_deposit = managed_biguint!(0);
             assert_eq!(user_deposit, expected_deposit);
 
             StateChange::Revert
-        },
-    );
+        })
+        .assert_ok();
 
     let mut sc_call = ScCallMandos::new(user_addr, cf_setup.cf_wrapper.address_ref(), "fund");
     sc_call.add_egld_value(&rust_biguint!(1_000));
@@ -175,67 +176,73 @@ fn test_successful_cf() {
     let second_user = &cf_setup.second_user_address;
 
     // first user fund
-    b_wrapper.execute_esdt_transfer(
-        first_user,
-        &cf_setup.cf_wrapper,
-        CF_TOKEN_ID,
-        0,
-        &rust_biguint!(1_000),
-        |sc| {
-            let result = sc.fund(managed_token_id!(CF_TOKEN_ID), managed_biguint!(1_000));
-            assert_eq!(result, SCResult::Ok(()));
+    b_wrapper
+        .execute_esdt_transfer(
+            first_user,
+            &cf_setup.cf_wrapper,
+            CF_TOKEN_ID,
+            0,
+            &rust_biguint!(1_000),
+            |sc| {
+                sc.fund(managed_token_id!(CF_TOKEN_ID), managed_biguint!(1_000));
 
-            let user_deposit = sc.deposit(&managed_address!(first_user)).get();
-            let expected_deposit = managed_biguint!(1_000);
-            assert_eq!(user_deposit, expected_deposit);
+                let user_deposit = sc.deposit(&managed_address!(first_user)).get();
+                let expected_deposit = managed_biguint!(1_000);
+                assert_eq!(user_deposit, expected_deposit);
 
-            StateChange::Commit
-        },
-    );
+                StateChange::Commit
+            },
+        )
+        .assert_ok();
 
     // second user fund
-    b_wrapper.execute_esdt_transfer(
-        second_user,
-        &cf_setup.cf_wrapper,
-        CF_TOKEN_ID,
-        0,
-        &rust_biguint!(1_000),
-        |sc| {
-            let result = sc.fund(managed_token_id!(CF_TOKEN_ID), managed_biguint!(1_000));
-            assert_eq!(result, SCResult::Ok(()));
+    b_wrapper
+        .execute_esdt_transfer(
+            second_user,
+            &cf_setup.cf_wrapper,
+            CF_TOKEN_ID,
+            0,
+            &rust_biguint!(1_000),
+            |sc| {
+                sc.fund(managed_token_id!(CF_TOKEN_ID), managed_biguint!(1_000));
 
-            let user_deposit = sc.deposit(&managed_address!(second_user)).get();
-            let expected_deposit = managed_biguint!(1_000);
-            assert_eq!(user_deposit, expected_deposit);
+                let user_deposit = sc.deposit(&managed_address!(second_user)).get();
+                let expected_deposit = managed_biguint!(1_000);
+                assert_eq!(user_deposit, expected_deposit);
 
-            StateChange::Commit
-        },
-    );
+                StateChange::Commit
+            },
+        )
+        .assert_ok();
 
     // set block timestamp after deadline
     b_wrapper.set_block_timestamp(CF_DEADLINE + 1);
 
     // check status
-    b_wrapper.execute_query(&cf_setup.cf_wrapper, |sc| {
-        let status = sc.status();
-        assert_eq!(status, Status::Successful);
-    });
+    b_wrapper
+        .execute_query(&cf_setup.cf_wrapper, |sc| {
+            let status = sc.status();
+            assert_eq!(status, Status::Successful);
+        })
+        .assert_ok();
 
     // user try claim
-    b_wrapper.execute_tx(first_user, &cf_setup.cf_wrapper, &rust_biguint!(0), |sc| {
-        let result = sc.claim();
-        assert_eq!(result, sc_error!("only owner can claim successful funding"));
+    b_wrapper
+        .execute_tx(first_user, &cf_setup.cf_wrapper, &rust_biguint!(0), |sc| {
+            sc.claim();
 
-        StateChange::Revert
-    });
+            StateChange::Revert
+        })
+        .assert_user_error("only owner can claim successful funding");
 
     // owner claim
-    b_wrapper.execute_tx(owner, &cf_setup.cf_wrapper, &rust_biguint!(0), |sc| {
-        let result = sc.claim();
-        assert_eq!(result, SCResult::Ok(()));
+    b_wrapper
+        .execute_tx(owner, &cf_setup.cf_wrapper, &rust_biguint!(0), |sc| {
+            sc.claim();
 
-        StateChange::Commit
-    });
+            StateChange::Commit
+        })
+        .assert_ok();
 
     b_wrapper.check_esdt_balance(owner, CF_TOKEN_ID, &rust_biguint!(2_000));
     b_wrapper.check_esdt_balance(first_user, CF_TOKEN_ID, &rust_biguint!(0));
@@ -251,67 +258,71 @@ fn test_failed_cf() {
     let second_user = &cf_setup.second_user_address;
 
     // first user fund
-    b_wrapper.execute_esdt_transfer(
-        first_user,
-        &cf_setup.cf_wrapper,
-        CF_TOKEN_ID,
-        0,
-        &rust_biguint!(300),
-        |sc| {
-            let result = sc.fund(managed_token_id!(CF_TOKEN_ID), managed_biguint!(300));
-            assert_eq!(result, SCResult::Ok(()));
+    b_wrapper
+        .execute_esdt_transfer(
+            first_user,
+            &cf_setup.cf_wrapper,
+            CF_TOKEN_ID,
+            0,
+            &rust_biguint!(300),
+            |sc| {
+                sc.fund(managed_token_id!(CF_TOKEN_ID), managed_biguint!(300));
 
-            let user_deposit = sc.deposit(&managed_address!(first_user)).get();
-            let expected_deposit = managed_biguint!(300);
-            assert_eq!(user_deposit, expected_deposit);
+                let user_deposit = sc.deposit(&managed_address!(first_user)).get();
+                let expected_deposit = managed_biguint!(300);
+                assert_eq!(user_deposit, expected_deposit);
 
-            StateChange::Commit
-        },
-    );
+                StateChange::Commit
+            },
+        )
+        .assert_ok();
 
     // second user fund
-    b_wrapper.execute_esdt_transfer(
-        second_user,
-        &cf_setup.cf_wrapper,
-        CF_TOKEN_ID,
-        0,
-        &rust_biguint!(600),
-        |sc| {
-            let result = sc.fund(managed_token_id!(CF_TOKEN_ID), managed_biguint!(600));
-            assert_eq!(result, SCResult::Ok(()));
+    b_wrapper
+        .execute_esdt_transfer(
+            second_user,
+            &cf_setup.cf_wrapper,
+            CF_TOKEN_ID,
+            0,
+            &rust_biguint!(600),
+            |sc| {
+                sc.fund(managed_token_id!(CF_TOKEN_ID), managed_biguint!(600));
 
-            let user_deposit = sc.deposit(&managed_address!(second_user)).get();
-            let expected_deposit = managed_biguint!(600);
-            assert_eq!(user_deposit, expected_deposit);
+                let user_deposit = sc.deposit(&managed_address!(second_user)).get();
+                let expected_deposit = managed_biguint!(600);
+                assert_eq!(user_deposit, expected_deposit);
 
-            StateChange::Commit
-        },
-    );
+                StateChange::Commit
+            },
+        )
+        .assert_ok();
 
     // set block timestamp after deadline
     b_wrapper.set_block_timestamp(CF_DEADLINE + 1);
 
     // check status
-    b_wrapper.execute_query(&cf_setup.cf_wrapper, |sc| {
-        let status = sc.status();
-        assert_eq!(status, Status::Failed);
-    });
+    b_wrapper
+        .execute_query(&cf_setup.cf_wrapper, |sc| {
+            let status = sc.status();
+            assert_eq!(status, Status::Failed);
+        })
+        .assert_ok();
 
     // first user claim
-    b_wrapper.execute_tx(first_user, &cf_setup.cf_wrapper, &rust_biguint!(0), |sc| {
-        let result = sc.claim();
-        assert_eq!(result, SCResult::Ok(()));
-
-        StateChange::Commit
-    });
+    b_wrapper
+        .execute_tx(first_user, &cf_setup.cf_wrapper, &rust_biguint!(0), |sc| {
+            sc.claim();
+            StateChange::Commit
+        })
+        .assert_ok();
 
     // second user claim
-    b_wrapper.execute_tx(second_user, &cf_setup.cf_wrapper, &rust_biguint!(0), |sc| {
-        let result = sc.claim();
-        assert_eq!(result, SCResult::Ok(()));
-
-        StateChange::Commit
-    });
+    b_wrapper
+        .execute_tx(second_user, &cf_setup.cf_wrapper, &rust_biguint!(0), |sc| {
+            sc.claim();
+            StateChange::Commit
+        })
+        .assert_ok();
 
     b_wrapper.check_esdt_balance(owner, CF_TOKEN_ID, &rust_biguint!(0));
     b_wrapper.check_esdt_balance(first_user, CF_TOKEN_ID, &rust_biguint!(1_000));
