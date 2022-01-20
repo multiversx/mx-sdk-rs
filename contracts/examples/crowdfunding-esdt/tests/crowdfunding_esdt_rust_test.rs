@@ -42,13 +42,16 @@ where
     blockchain_wrapper.set_esdt_balance(&first_user_address, CF_TOKEN_ID, &rust_biguint!(1_000));
     blockchain_wrapper.set_esdt_balance(&second_user_address, CF_TOKEN_ID, &rust_biguint!(1_000));
 
-    let _ = blockchain_wrapper.execute_tx(&owner_address, &cf_wrapper, &rust_zero, |sc| {
-        let target = managed_biguint!(2_000);
-        let token_id = managed_token_id!(CF_TOKEN_ID);
+    blockchain_wrapper
+        .execute_tx(&owner_address, &cf_wrapper, &rust_zero, |sc| {
+            let target = managed_biguint!(2_000);
+            let token_id = managed_token_id!(CF_TOKEN_ID);
 
-        sc.init(target, CF_DEADLINE, token_id);
-        StateChange::Commit
-    });
+            sc.init(target, CF_DEADLINE, token_id);
+            StateChange::Commit
+        })
+        .assert_ok();
+
     blockchain_wrapper.add_mandos_set_account(cf_wrapper.address_ref());
 
     CrowdfundingSetup {
@@ -74,22 +77,24 @@ fn fund_test() {
     let b_wrapper = &mut cf_setup.blockchain_wrapper;
     let user_addr = &cf_setup.first_user_address;
 
-    let _ = b_wrapper.execute_esdt_transfer(
-        user_addr,
-        &cf_setup.cf_wrapper,
-        CF_TOKEN_ID,
-        0,
-        &rust_biguint!(1_000),
-        |sc| {
-            sc.fund(managed_token_id!(CF_TOKEN_ID), managed_biguint!(1_000));
+    b_wrapper
+        .execute_esdt_transfer(
+            user_addr,
+            &cf_setup.cf_wrapper,
+            CF_TOKEN_ID,
+            0,
+            &rust_biguint!(1_000),
+            |sc| {
+                sc.fund(managed_token_id!(CF_TOKEN_ID), managed_biguint!(1_000));
 
-            let user_deposit = sc.deposit(&managed_address!(user_addr)).get();
-            let expected_deposit = managed_biguint!(1_000);
-            assert_eq!(user_deposit, expected_deposit);
+                let user_deposit = sc.deposit(&managed_address!(user_addr)).get();
+                let expected_deposit = managed_biguint!(1_000);
+                assert_eq!(user_deposit, expected_deposit);
 
-            StateChange::Commit
-        },
-    );
+                StateChange::Commit
+            },
+        )
+        .assert_ok();
 
     let mut sc_call = ScCallMandos::new(user_addr, cf_setup.cf_wrapper.address_ref(), "fund");
     sc_call.add_esdt_transfer(CF_TOKEN_ID, 0, &rust_biguint!(1_000));
@@ -107,10 +112,12 @@ fn status_test() {
     let mut cf_setup = setup_crowdfunding(crowdfunding_esdt::contract_obj);
     let b_wrapper = &mut cf_setup.blockchain_wrapper;
 
-    let _ = b_wrapper.execute_query(&cf_setup.cf_wrapper, |sc| {
-        let status = sc.status();
-        assert_eq!(status, Status::FundingPeriod);
-    });
+    b_wrapper
+        .execute_query(&cf_setup.cf_wrapper, |sc| {
+            let status = sc.status();
+            assert_eq!(status, Status::FundingPeriod);
+        })
+        .assert_ok();
 
     let sc_query = ScQueryMandos::new(cf_setup.cf_wrapper.address_ref(), "status");
     let mut expect = TxExpectMandos::new(0);
@@ -137,8 +144,7 @@ fn test_sc_error() {
             &cf_setup.cf_wrapper,
             &rust_biguint!(1_000),
             |sc| {
-                let _ = sc.fund(managed_token_id!(b""), managed_biguint!(1_000));
-                // assert_eq!(result, sc_error!("wrong token"));
+                sc.fund(managed_token_id!(b""), managed_biguint!(1_000));
                 StateChange::Commit
             },
         )
