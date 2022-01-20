@@ -1,14 +1,12 @@
-// TODO: uncomment after upgrading to VM 1.4.35
-// #[test]
-// fn claim_egld_go() {
-//     elrond_wasm_debug::mandos_go("mandos/claim-egld.scen.json");
-// }
+#[test]
+fn claim_egld_go() {
+    elrond_wasm_debug::mandos_go("mandos/claim-egld.scen.json");
+}
 
-// TODO: uncomment after upgrading to VM 1.4.35
-// #[test]
-// fn claim_esdt_go() {
-//     elrond_wasm_debug::mandos_go("mandos/claim-esdt.scen.json");
-// }
+#[test]
+fn claim_esdt_go() {
+    elrond_wasm_debug::mandos_go("mandos/claim-esdt.scen.json");
+}
 
 #[test]
 fn fund_egld_and_esdt_go() {
