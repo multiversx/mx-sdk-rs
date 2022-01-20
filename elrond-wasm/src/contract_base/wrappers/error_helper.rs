@@ -23,35 +23,33 @@ impl<M: ManagedTypeApi> ErrorHelper<M> {
 
     pub fn signal_error_with_message<T>(message: T) -> !
     where
-        T: IntoSignalErrorMessage<M>,
+        T: IntoSignalError<M>,
     {
         message.signal_error_with_message()
     }
-
-    pub fn signal_error_with_buffer_handle<T>(handle: i32) -> ! {
-        M::error_api_impl().signal_error_from_buffer(handle)
-    }
 }
 
-pub trait IntoSignalErrorMessage<M: ManagedTypeApi> {
+/// Indicates how an object can be used as the basis for performing `signal_error` with itself as message.
+pub trait IntoSignalError<M: ManagedTypeApi> {
     fn signal_error_with_message(self) -> !;
 }
 
-impl<M: ManagedTypeApi> IntoSignalErrorMessage<M> for &str {
+impl<M: ManagedTypeApi> IntoSignalError<M> for &str {
     #[inline]
     fn signal_error_with_message(self) -> ! {
         M::error_api_impl().signal_error(self.as_bytes())
     }
 }
 
-impl<M: ManagedTypeApi> IntoSignalErrorMessage<M> for &[u8] {
+impl<M: ManagedTypeApi> IntoSignalError<M> for &[u8] {
     #[inline]
     fn signal_error_with_message(self) -> ! {
         M::error_api_impl().signal_error(self)
     }
 }
 
-impl<M, B> IntoSignalErrorMessage<M> for B
+// Handles `ManagedBuffer`, `&ManagedBuffer` and `ManagedRef<ManagedBuffer>`.
+impl<M, B> IntoSignalError<M> for B
 where
     M: ManagedTypeApi,
     B: Borrow<ManagedBuffer<M>>,
