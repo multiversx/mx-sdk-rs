@@ -24,7 +24,7 @@ pub trait EgldEsdtSwap {
         token_ticker: ManagedBuffer,
         initial_supply: BigUint,
         #[payment] issue_cost: BigUint,
-    ) -> SCResult<AsyncCall> {
+    ) -> AsyncCall {
         require!(
             self.wrapped_egld_token_id().is_empty(),
             "wrapped egld was already issued"
@@ -34,8 +34,7 @@ pub trait EgldEsdtSwap {
 
         self.issue_started_event(&caller, &token_ticker, &initial_supply);
 
-        Ok(self
-            .send()
+        self.send()
             .esdt_system_sc_proxy()
             .issue_fungible(
                 issue_cost,
@@ -55,7 +54,7 @@ pub trait EgldEsdtSwap {
                 },
             )
             .async_call()
-            .with_callback(self.callbacks().esdt_issue_callback(&caller)))
+            .with_callback(self.callbacks().esdt_issue_callback(&caller))
     }
 
     #[callback]
@@ -88,7 +87,7 @@ pub trait EgldEsdtSwap {
 
     #[only_owner]
     #[endpoint(mintWrappedEgld)]
-    fn mint_wrapped_egld(&self, amount: BigUint) -> SCResult<AsyncCall> {
+    fn mint_wrapped_egld(&self, amount: BigUint) -> AsyncCall {
         require!(
             !self.wrapped_egld_token_id().is_empty(),
             "Wrapped EGLD was not issued yet"
@@ -98,12 +97,11 @@ pub trait EgldEsdtSwap {
         let caller = self.blockchain().get_caller();
         self.mint_started_event(&caller, &amount);
 
-        Ok(self
-            .send()
+        self.send()
             .esdt_system_sc_proxy()
             .mint(&wrapped_egld_token_id, &amount)
             .async_call()
-            .with_callback(self.callbacks().esdt_mint_callback(&caller, &amount)))
+            .with_callback(self.callbacks().esdt_mint_callback(&caller, &amount))
     }
 
     #[callback]
@@ -129,8 +127,8 @@ pub trait EgldEsdtSwap {
 
     #[payable("EGLD")]
     #[endpoint(wrapEgld)]
-    fn wrap_egld(&self, #[payment] payment: BigUint) -> SCResult<()> {
-        require!(payment > 0, "Payment must be more than 0");
+    fn wrap_egld(&self, #[payment] payment: BigUint) {
+        require!(payment > 0u32, "Payment must be more than 0");
         require!(
             !self.wrapped_egld_token_id().is_empty(),
             "Wrapped EGLD was not issued yet"
@@ -143,9 +141,7 @@ pub trait EgldEsdtSwap {
             );
 
             *unused_wrapped_egld -= &payment;
-
-            Ok(())
-        })?;
+        });
 
         let caller = self.blockchain().get_caller();
         self.send().direct(
@@ -157,8 +153,6 @@ pub trait EgldEsdtSwap {
         );
 
         self.wrap_egld_event(&caller, &payment);
-
-        Ok(())
     }
 
     #[payable("*")]
@@ -167,7 +161,7 @@ pub trait EgldEsdtSwap {
         &self,
         #[payment] wrapped_egld_payment: BigUint,
         #[payment_token] token_identifier: TokenIdentifier,
-    ) -> SCResult<()> {
+    ) {
         require!(
             !self.wrapped_egld_token_id().is_empty(),
             "Wrapped EGLD was not issued yet"
@@ -179,7 +173,7 @@ pub trait EgldEsdtSwap {
             "Wrong esdt token"
         );
 
-        require!(wrapped_egld_payment > 0, "Must pay more than 0 tokens!");
+        require!(wrapped_egld_payment > 0u32, "Must pay more than 0 tokens!");
         // this should never happen, but we'll check anyway
         require!(
             wrapped_egld_payment
@@ -198,8 +192,6 @@ pub trait EgldEsdtSwap {
             .direct_egld(&caller, &wrapped_egld_payment, b"unwrapping");
 
         self.unwrap_egld_event(&caller, &wrapped_egld_payment);
-
-        Ok(())
     }
 
     #[view(getLockedEgldBalance)]

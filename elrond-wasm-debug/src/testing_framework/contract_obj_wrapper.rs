@@ -8,7 +8,8 @@ use elrond_wasm::{
 
 use crate::{
     rust_biguint,
-    tx_mock::{TxCache, TxContext, TxContextStack, TxInput, TxInputESDT},
+    tx_execution::interpret_panic_as_tx_result,
+    tx_mock::{TxCache, TxContext, TxContextStack, TxInput, TxInputESDT, TxResult},
     world_mock::{AccountData, AccountEsdt, EsdtInstanceMetadata},
     BlockchainMock, DebugApi,
 };
@@ -69,6 +70,10 @@ impl BlockchainStateWrapper {
             mandos_generator: MandosGenerator::new(),
             workspace_path: current_dir,
         }
+    }
+
+    pub fn get_mut_state(&mut self) -> &mut Rc<BlockchainMock> {
+        &mut self.rc_b_mock
     }
 
     pub fn write_mandos_output(self, file_name: &str) {
@@ -499,20 +504,22 @@ impl BlockchainStateWrapper {
 }
 
 impl BlockchainStateWrapper {
-    pub fn execute_tx<CB, ContractObjBuilder, TxFn: FnOnce(CB) -> StateChange>(
+    pub fn execute_tx<CB, ContractObjBuilder, TxFn>(
         &mut self,
         caller: &Address,
         sc_wrapper: &ContractObjWrapper<CB, ContractObjBuilder>,
         egld_payment: &num_bigint::BigUint,
         tx_fn: TxFn,
-    ) where
+    ) -> TxResult
+    where
         CB: ContractBase<Api = DebugApi> + CallableContract + 'static,
         ContractObjBuilder: 'static + Copy + Fn() -> CB,
+        TxFn: FnOnce(CB) -> StateChange,
     {
-        self.execute_tx_any(caller, sc_wrapper, egld_payment, Vec::new(), tx_fn);
+        self.execute_tx_any(caller, sc_wrapper, egld_payment, Vec::new(), tx_fn)
     }
 
-    pub fn execute_esdt_transfer<CB, ContractObjBuilder, TxFn: FnOnce(CB) -> StateChange>(
+    pub fn execute_esdt_transfer<CB, ContractObjBuilder, TxFn>(
         &mut self,
         caller: &Address,
         sc_wrapper: &ContractObjWrapper<CB, ContractObjBuilder>,
@@ -520,16 +527,18 @@ impl BlockchainStateWrapper {
         esdt_nonce: u64,
         esdt_amount: &num_bigint::BigUint,
         tx_fn: TxFn,
-    ) where
+    ) -> TxResult
+    where
         CB: ContractBase<Api = DebugApi> + CallableContract + 'static,
         ContractObjBuilder: 'static + Copy + Fn() -> CB,
+        TxFn: FnOnce(CB) -> StateChange,
     {
         let esdt_transfer = vec![TxInputESDT {
             token_identifier: token_id.to_vec(),
             nonce: esdt_nonce,
             value: esdt_amount.clone(),
         }];
-        self.execute_tx_any(caller, sc_wrapper, &rust_biguint!(0), esdt_transfer, tx_fn);
+        self.execute_tx_any(caller, sc_wrapper, &rust_biguint!(0), esdt_transfer, tx_fn)
     }
 
     pub fn execute_esdt_multi_transfer<CB, ContractObjBuilder, TxFn: FnOnce(CB) -> StateChange>(
@@ -538,7 +547,8 @@ impl BlockchainStateWrapper {
         sc_wrapper: &ContractObjWrapper<CB, ContractObjBuilder>,
         esdt_transfers: &[TxInputESDT],
         tx_fn: TxFn,
-    ) where
+    ) -> TxResult
+    where
         CB: ContractBase<Api = DebugApi> + CallableContract + 'static,
         ContractObjBuilder: 'static + Copy + Fn() -> CB,
     {
@@ -548,14 +558,15 @@ impl BlockchainStateWrapper {
             &rust_biguint!(0),
             esdt_transfers.to_vec(),
             tx_fn,
-        );
+        )
     }
 
     pub fn execute_query<CB, ContractObjBuilder, TxFn: FnOnce(CB)>(
         &mut self,
         sc_wrapper: &ContractObjWrapper<CB, ContractObjBuilder>,
         query_fn: TxFn,
-    ) where
+    ) -> TxResult
+    where
         CB: ContractBase<Api = DebugApi> + CallableContract + 'static,
         ContractObjBuilder: 'static + Copy + Fn() -> CB,
     {
@@ -567,7 +578,7 @@ impl BlockchainStateWrapper {
                 query_fn(sc);
                 StateChange::Revert
             },
-        );
+        )
     }
 
     // deduplicates code for execution
@@ -578,7 +589,8 @@ impl BlockchainStateWrapper {
         egld_payment: &num_bigint::BigUint,
         esdt_payments: Vec<TxInputESDT>,
         tx_fn: TxFn,
-    ) where
+    ) -> TxResult
+    where
         CB: ContractBase<Api = DebugApi> + CallableContract + 'static,
         ContractObjBuilder: 'static + Copy + Fn() -> CB,
     {
@@ -614,17 +626,20 @@ impl BlockchainStateWrapper {
         TxContextStack::static_push(tx_context_rc);
 
         let sc = (sc_wrapper.obj_builder)();
-        let state_change = tx_fn(sc);
+        let result_state_change =
+            std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| tx_fn(sc)));
 
         let api_after_exec = Rc::try_unwrap(TxContextStack::static_pop()).unwrap();
         let updates = api_after_exec.into_blockchain_updates();
 
         let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
-        match state_change {
-            StateChange::Commit => {
+        match result_state_change {
+            Ok(StateChange::Commit) => {
                 updates.apply(b_mock_ref);
+                TxResult::empty()
             },
-            StateChange::Revert => {},
+            Ok(StateChange::Revert) => TxResult::empty(),
+            Err(panic_any) => interpret_panic_as_tx_result(panic_any),
         }
     }
 

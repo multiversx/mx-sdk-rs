@@ -14,10 +14,14 @@ pub fn format_receiver_args_macro(input: proc_macro::TokenStream) -> proc_macro:
     let mut tokens_iter = tokens.into_iter();
 
     let accumulator_expr = tokens_iter.next().unwrap();
-    let format_string = if let proc_macro::TokenTree::Literal(lit) = tokens_iter.next().unwrap() {
+    let format_string_token = tokens_iter.next().unwrap();
+    let format_string = if let proc_macro::TokenTree::Literal(lit) = format_string_token {
         lit.to_string()
     } else {
-        panic!("First argument should be the format string");
+        panic!(
+            "Formatting requires that the first argument is a string. Found: {}",
+            format_string_token
+        );
     };
 
     let format_str_parts = parse_format_string(&format_string);

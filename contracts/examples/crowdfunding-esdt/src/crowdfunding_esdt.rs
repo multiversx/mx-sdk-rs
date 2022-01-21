@@ -13,12 +13,7 @@ pub enum Status {
 #[elrond_wasm::contract]
 pub trait Crowdfunding {
     #[init]
-    fn init(
-        &self,
-        target: BigUint,
-        deadline: u64,
-        token_identifier: TokenIdentifier,
-    ) -> SCResult<()> {
+    fn init(&self, target: BigUint, deadline: u64, token_identifier: TokenIdentifier) {
         require!(target > 0, "Target must be more than 0");
         self.target().set(target);
 
@@ -33,17 +28,11 @@ pub trait Crowdfunding {
             "Invalid token provided"
         );
         self.cf_token_identifier().set(token_identifier);
-
-        Ok(())
     }
 
     #[endpoint]
     #[payable("*")]
-    fn fund(
-        &self,
-        #[payment_token] token: TokenIdentifier,
-        #[payment] payment: BigUint,
-    ) -> SCResult<()> {
+    fn fund(&self, #[payment_token] token: TokenIdentifier, #[payment] payment: BigUint) {
         require!(
             self.status() == Status::FundingPeriod,
             "cannot fund after deadline"
@@ -52,8 +41,6 @@ pub trait Crowdfunding {
 
         let caller = self.blockchain().get_caller();
         self.deposit(&caller).update(|deposit| *deposit += payment);
-
-        Ok(())
     }
 
     #[view]
@@ -75,9 +62,9 @@ pub trait Crowdfunding {
     }
 
     #[endpoint]
-    fn claim(&self) -> SCResult<()> {
+    fn claim(&self) {
         match self.status() {
-            Status::FundingPeriod => sc_error!("cannot claim before deadline"),
+            Status::FundingPeriod => sc_panic!("cannot claim before deadline"),
             Status::Successful => {
                 let caller = self.blockchain().get_caller();
                 require!(
@@ -90,22 +77,18 @@ pub trait Crowdfunding {
 
                 self.send()
                     .direct(&caller, &token_identifier, 0, &sc_balance, &[]);
-
-                Ok(())
             },
             Status::Failed => {
                 let caller = self.blockchain().get_caller();
                 let deposit = self.deposit(&caller).get();
 
-                if deposit > 0 {
+                if deposit > 0u32 {
                     let token_identifier = self.cf_token_identifier().get();
 
                     self.deposit(&caller).clear();
                     self.send()
                         .direct(&caller, &token_identifier, 0, &deposit, &[]);
                 }
-
-                Ok(())
             },
         }
     }

@@ -5,9 +5,10 @@ use elrond_wasm::String;
 /// Various macros provided by elrond-wasm.
 #[elrond_wasm::module]
 pub trait Macros {
+    #[allow(deprecated)]
     #[view]
     fn only_owner_legacy(&self) -> SCResult<()> {
-        only_owner!(self, "Caller must be owner");
+        elrond_wasm::only_owner!(self, "Caller must be owner");
         Ok(())
     }
 
