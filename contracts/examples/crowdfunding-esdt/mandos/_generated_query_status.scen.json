@@ -102,8 +102,7 @@
             "tx": {
                 "to": "0x0000000000000000d720a08b839a004c2e6386f5aecc19ec74807d1920cb6aeb",
                 "function": "status",
-                "arguments": [],
-                "promises": []
+                "arguments": []
             },
             "expect": {
                 "out": [
