@@ -7,7 +7,8 @@ use elrond_wasm::types::{
 };
 use elrond_wasm_debug::{
     assert_values_eq, managed_address, managed_biguint, managed_buffer, managed_token_id,
-    rust_biguint, testing_framework::*, tx_mock::TxInputESDT, DebugApi,
+    rust_biguint, testing_framework::*, tx_execution::execute_async_call_and_callback,
+    tx_mock::TxInputESDT, DebugApi,
 };
 use rust_testing_framework_tester::{dummy_module::DummyModule, *};
 
@@ -127,7 +128,9 @@ fn test_sc_result_err() {
         .assert_user_error("Non-zero required");
 }
 
-#[should_panic(expected = "Non-zero required")]
+#[should_panic(
+    expected = "Tx success expected, but failed. Status: 4, message: \"Non-zero required\""
+)]
 #[test]
 fn test_sc_result_err_unwrap() {
     let mut wrapper = BlockchainStateWrapper::new();
@@ -1086,8 +1089,6 @@ fn test_multiple_contracts() {
     wrapper.write_mandos_output(TEST_MULTIPLE_SC_OUTPUT_PATH);
 }
 
-// TODO: Fix async calls
-#[should_panic]
 #[test]
 fn test_async_call() {
     let rust_zero = rust_biguint!(0);
@@ -1102,15 +1103,20 @@ fn test_async_call() {
     let adder_wrapper =
         wrapper.create_sc_account(&rust_zero, None, adder::contract_obj, ADDER_WASM_PATH);
 
-    wrapper
-        .execute_tx(&user_addr, &sc_wrapper, &rust_zero, |sc| {
-            let adder_address = managed_address!(adder_wrapper.address_ref());
-            let value_to_add = managed_biguint!(10);
-            sc.call_other_contract_add_async_call(adder_address, value_to_add);
+    let tx_result = wrapper.execute_tx(&user_addr, &sc_wrapper, &rust_zero, |sc| {
+        let adder_address = managed_address!(adder_wrapper.address_ref());
+        let value_to_add = managed_biguint!(10);
+        sc.call_other_contract_add_async_call(adder_address, value_to_add);
 
-            StateChange::Commit
-        })
-        .assert_ok();
+        StateChange::Commit
+    });
+    tx_result.assert_ok();
+
+    let async_data = tx_result.result_calls.async_call.unwrap();
+    let (async_result, callback_result) =
+        execute_async_call_and_callback(async_data, wrapper.get_mut_state());
+    async_result.assert_ok();
+    callback_result.assert_ok();
 
     wrapper
         .execute_query(&sc_wrapper, |sc| {
