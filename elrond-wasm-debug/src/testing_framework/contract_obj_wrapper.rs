@@ -72,6 +72,10 @@ impl BlockchainStateWrapper {
         }
     }
 
+    pub fn get_mut_state(&mut self) -> &mut Rc<BlockchainMock> {
+        &mut self.rc_b_mock
+    }
+
     pub fn write_mandos_output(self, file_name: &str) {
         let mut full_path = self.workspace_path;
         full_path.push(file_name);
