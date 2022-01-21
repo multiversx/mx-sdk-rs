@@ -1,17 +1,8 @@
 use super::AsyncCallTxData;
 
-#[derive(Debug, Clone)]
-pub enum TxCallbackSelector {
-    Success(AsyncCallTxData),
-    Error(AsyncCallTxData),
-}
-
-impl TxCallbackSelector {
-    pub fn get_tx_data(&self) -> &AsyncCallTxData {
-        match &self {
-            TxCallbackSelector::Success(callback) => callback,
-
-            TxCallbackSelector::Error(callback) => callback,
-        }
-    }
+#[derive(Clone, Debug)]
+pub struct Promise {
+    pub endpoint: AsyncCallTxData,
+    pub success_callback: &'static [u8],
+    pub error_callback: &'static [u8],
 }

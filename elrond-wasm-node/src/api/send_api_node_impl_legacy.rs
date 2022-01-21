@@ -205,7 +205,7 @@ impl SendApiImpl for VmApiImpl {
         gas: u64,
         extra_gas_for_callback: u64,
         arg_buffer: &ManagedArgBuffer<M>,
-    ) -> Result<(), &'static [u8]> {
+    ) {
         unreachable!()
     }
 

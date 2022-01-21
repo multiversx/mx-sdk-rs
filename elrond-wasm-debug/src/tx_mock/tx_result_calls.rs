@@ -1,10 +1,10 @@
-use super::{AsyncCallTxData, TxCallbackSelector};
+use super::{AsyncCallTxData, Promise};
 
 #[derive(Clone, Default, Debug)]
 pub struct TxResultCalls {
     pub async_call: Option<AsyncCallTxData>,
     pub transfer_execute: Vec<AsyncCallTxData>,
-    pub promises: Vec<TxCallbackSelector>,
+    pub promises: Vec<Promise>,
 }
 
 impl TxResultCalls {

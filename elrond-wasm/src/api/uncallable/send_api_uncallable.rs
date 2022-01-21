@@ -92,7 +92,7 @@ impl SendApiImpl for UncallableApi {
         _gas: u64,
         _extra_gas_for_callback: u64,
         _arg_buffer: &ManagedArgBuffer<M>,
-    ) -> Result<(), &'static [u8]> {
+    ) {
         unreachable!()
     }
 

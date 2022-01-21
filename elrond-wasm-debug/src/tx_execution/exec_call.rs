@@ -2,8 +2,8 @@ use std::{collections::HashMap, rc::Rc};
 
 use crate::{
     tx_mock::{
-        async_call_tx_input, async_callback_tx_input, merge_results, TxCache, TxContext, TxInput,
-        TxResult, TxResultCalls,
+        async_call_tx_input, async_callback_tx_input, async_promise_tx_input, merge_results,
+        TxCache, TxContext, TxInput, TxResult, TxResultCalls,
     },
     world_mock::{AccountData, AccountEsdt, BlockchainMock},
 };
@@ -88,9 +88,34 @@ pub fn sc_call_with_async_and_callback(
     }
 
     for callback in result_calls.promises {
-        let promises_input = async_call_tx_input(callback.get_tx_data());
-        let promises_result = sc_call(promises_input, state, false);
-        tx_result = merge_results(tx_result, promises_result.clone());
+        if state.accounts.contains_key(&callback.endpoint.to) {
+            let async_input = async_call_tx_input(&callback.endpoint);
+            let async_result = sc_call_with_async_and_callback(async_input, state, false);
+            tx_result = merge_results(tx_result, async_result.clone());
+
+            let callback_input =
+                async_promise_tx_input(&contract_address, &callback, &async_result);
+            let callback_result = sc_call(callback_input, state, false);
+            assert!(
+                tx_result.result_calls.promises.is_empty(),
+                "successive promises currently not supported"
+            );
+            tx_result = merge_results(tx_result, callback_result);
+        } else {
+            let tx_cache = TxCache::new(state.clone());
+            tx_cache.subtract_egld_balance(&contract_address, &callback.endpoint.call_value);
+            tx_cache.insert_account(AccountData {
+                address: callback.endpoint.to.clone(),
+                nonce: 0,
+                egld_balance: callback.endpoint.call_value,
+                esdt: AccountEsdt::default(),
+                username: Vec::new(),
+                storage: HashMap::new(),
+                contract_path: None,
+                contract_owner: None,
+            });
+            state.commit_tx_cache(tx_cache);
+        }
     }
 
     tx_result
