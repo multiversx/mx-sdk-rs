@@ -1,6 +1,6 @@
 use crate::{
     tx_execution::{deploy_contract, execute_builtin_function_or_default},
-    tx_mock::{AsyncCallTxData, BlockchainUpdate, TxCache, TxInput, TxPanic, TxResult},
+    tx_mock::{AsyncCallTxData, BlockchainUpdate, Promise, TxCache, TxInput, TxPanic, TxResult},
     DebugApi,
 };
 use elrond_wasm::{
@@ -351,16 +351,17 @@ impl SendApiImpl for DebugApi {
         to: &ManagedAddress<M>,
         amount: &BigUint<M>,
         endpoint_name: &ManagedBuffer<M>,
-        success: &'static [u8],
-        error: &'static [u8],
+        success_callback: &'static [u8],
+        error_callback: &'static [u8],
         _gas: u64,
         _extra_gas_for_callback: u64,
         arg_buffer: &ManagedArgBuffer<M>,
-    ) -> Result<(), &'static [u8]> {
+    ) {
         let amount_value = self.big_uint_handle_to_value(amount.get_raw_handle());
         let contract_address = self.input_ref().to.clone();
         let recipient = to.to_address();
         let tx_hash = self.get_tx_hash_legacy();
+
         let call = AsyncCallTxData {
             from: contract_address,
             to: recipient,
@@ -369,12 +370,15 @@ impl SendApiImpl for DebugApi {
             arguments: arg_buffer.to_raw_args_vec(),
             tx_hash,
         };
-        let mut tx_result = self.extract_result();
-        tx_result.result_calls.async_call = Some(call);
-        if tx_result.result_status != 0 {
-            std::panic::panic_any(tx_result)
-        }
-        Ok(())
+
+        let promise = Promise {
+            endpoint: call,
+            success_callback,
+            error_callback,
+        };
+
+        let mut tx_result = self.result_borrow_mut();
+        tx_result.result_calls.promises.push(promise);
     }
 
     fn deploy_contract<M: ManagedTypeApi>(

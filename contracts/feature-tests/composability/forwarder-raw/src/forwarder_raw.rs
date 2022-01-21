@@ -63,25 +63,21 @@ pub trait ForwarderRaw {
     }
 
     #[endpoint]
+    #[payable("*")]
     fn forward_create_async_call(
         &self,
         to: ManagedAddress,
+        #[payment_token] token: TokenIdentifier,
+        #[payment] payment: BigUint,
         endpoint_name: ManagedBuffer,
-        gas: u64,
         extra_gas_for_callback: u64,
         #[var_args] args: ManagedVarArgs<ManagedBuffer>,
     ) -> SCResult<()> {
-        let amount = BigUint::from(0u64);
-        let _ = Self::Api::send_api_impl().create_async_call_raw(
-            &to,
-            &amount,
-            &endpoint_name,
-            b"success_callback",
-            b"error_callback",
-            gas,
-            extra_gas_for_callback,
-            &args.to_arg_buffer(),
-        );
+        self.forward_contract_call(to, token, payment, endpoint_name, args)
+            .with_extra_gas_for_callback(extra_gas_for_callback)
+            .with_success_callback(b"success_callback")
+            .with_error_callback(b"error_callback")
+            .register_promise();
         Ok(())
     }
 

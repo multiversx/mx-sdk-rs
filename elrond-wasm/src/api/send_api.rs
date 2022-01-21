@@ -86,7 +86,7 @@ pub trait SendApiImpl {
         gas: u64,
         extra_gas_for_callback: u64,
         arg_buffer: &ManagedArgBuffer<M>,
-    ) -> Result<(), &'static [u8]>;
+    );
     /// Deploys a new contract in the same shard.
     /// Unlike `async_call_raw`, the deployment is synchronous and tx execution continues afterwards.
     /// Also unlike `async_call_raw`, it uses an argument buffer to pass arguments

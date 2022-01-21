@@ -252,9 +252,9 @@ impl SendApiImpl for VmApiImpl {
         gas: u64,
         extra_gas_for_callback: u64,
         arg_buffer: &ManagedArgBuffer<M>,
-    ) -> Result<(), &'static [u8]> {
+    ) {
         unsafe {
-            let result = managedCreateAsyncCall(
+            let _ = managedCreateAsyncCall(
                 to.get_raw_handle(),
                 amount.get_raw_handle(),
                 endpoint_name.get_raw_handle(),
@@ -266,11 +266,7 @@ impl SendApiImpl for VmApiImpl {
                 gas as i64,
                 extra_gas_for_callback as i64,
             );
-            if result != 0 {
-                error_hook::signal_error(b"register async call failed")
-            }
         }
-        Ok(())
     }
 
     fn deploy_contract<M: ManagedTypeApi>(
