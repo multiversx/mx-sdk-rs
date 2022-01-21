@@ -24,7 +24,7 @@ macro_rules! imports {
             io::*,
             non_zero_usize,
             non_zero_util::*,
-            only_owner, require, sc_error, sc_panic, sc_print,
+            require, require_old, sc_error, sc_panic, sc_print,
             storage::mappers::*,
             types::{
                 SCResult::{Err, Ok},
@@ -58,16 +58,76 @@ macro_rules! sc_error {
     };
 }
 
+/// Allows us to write Solidity style `require!(<condition>, <error_msg>)` and avoid if statements.
+///
+/// It can only be used in a function that returns `SCResult<_>` where _ can be any type.
+///
+/// Example:
+///
+/// ```rust
+/// # use elrond_wasm::require_old;
+/// # use elrond_wasm::types::{*, SCResult::Ok};
+/// # pub trait ExampleContract: elrond_wasm::contract_base::ContractBase
+/// # {
+/// fn only_accept_positive_old(&self, x: i32) -> SCResult<()> {
+///     require_old!(x > 0, "only positive values accepted");
+///     Ok(())
+/// }
+/// # }
+/// ```
+#[macro_export]
+macro_rules! require_old {
+    ($expression:expr, $error_msg:expr) => {
+        if (!($expression)) {
+            return elrond_wasm::sc_error!($error_msg);
+        }
+    };
+}
+
 #[macro_export]
 macro_rules! sc_panic {
     ($msg:tt, $($arg:expr),+) => {{
         let mut ___buffer___ =
             elrond_wasm::types::ManagedBufferCachedBuilder::<Self::Api>::new_from_slice(&[]);
         elrond_wasm::derive::format_receiver_args!(___buffer___, $msg, $($arg),+);
-        <Self::Api as elrond_wasm::api::ErrorApi>::error_api_impl().signal_error_from_buffer(___buffer___.into_managed_buffer().get_raw_handle());
+        elrond_wasm::contract_base::ErrorHelper::<Self::Api>::signal_error_with_message(___buffer___.into_managed_buffer());
     }};
     ($msg:tt) => {
-        <Self::Api as elrond_wasm::api::ErrorApi>::error_api_impl().signal_error($msg.as_bytes());
+        elrond_wasm::contract_base::ErrorHelper::<Self::Api>::signal_error_with_message($msg);
+    };
+}
+
+/// Allows us to write Solidity style `require!(<condition>, <error_msg>)` and avoid if statements.
+///
+/// The most common way to use it is to provide a string message with optional format arguments.
+///
+/// It is also possible to give the error as a variable of types such as `&str`, `&[u8]` or `ManagedBuffer`.
+///
+/// Examples:
+///
+/// ```rust
+/// # use elrond_wasm::{types::ManagedBuffer, require};
+/// # pub trait ExampleContract: elrond_wasm::contract_base::ContractBase
+/// # {
+/// fn only_accept_positive(&self, x: i32) {
+///     require!(x > 0, "only positive values accepted");
+/// }
+///
+/// fn only_accept_negative(&self, x: i32) {
+///     require!(x < 0, "only negative values accepted, {:x} is not negative", x);
+/// }
+///
+/// fn only_accept_zero(&self, x: i32, message: &ManagedBuffer<Self::Api>) {
+///     require!(x == 0, message);
+/// }
+/// # }
+/// ```
+#[macro_export]
+macro_rules! require {
+    ($expression:expr, $($msg_tokens:tt),+) => {
+        if (!($expression)) {
+            elrond_wasm::sc_panic!($($msg_tokens),+);
+        }
     };
 }
 
@@ -98,31 +158,6 @@ macro_rules! sc_try {
     };
 }
 
-/// Allows us to write Solidity style `require!(<condition>, <error_msg>)` and avoid if statements.
-///
-/// It can only be used in a function that returns `SCResult<_>` where _ can be any type.
-///
-/// ```rust
-/// # use elrond_wasm::*;
-/// # use elrond_wasm::api::BlockchainApi;
-/// # use elrond_wasm::types::{*, SCResult::Ok};
-/// # pub trait ExampleContract: elrond_wasm::contract_base::ContractBase
-/// # {
-/// fn only_callable_by_owner(&self) -> SCResult<()> {
-///     require!(self.blockchain().get_caller() == self.blockchain().get_owner_address(), "Caller must be owner");
-///     Ok(())
-/// }
-/// # }
-/// ```
-#[macro_export]
-macro_rules! require {
-    ($expression:expr, $error_msg:expr) => {
-        if (!($expression)) {
-            return sc_error!($error_msg);
-        }
-    };
-}
-
 /// Very compact way of not allowing anyone but the owner to call a function.
 ///
 /// It can only be used in a function that returns `SCResult<_>` where _ can be any type.
@@ -139,6 +174,10 @@ macro_rules! require {
 /// }
 /// # }
 /// ```
+#[deprecated(
+    since = "0.26.0",
+    note = "Replace with the `#[only_owner]` attribute that can be placed on an endpoint. That one is more compact and shows up in the ABI."
+)]
 #[macro_export]
 macro_rules! only_owner {
     ($trait_self: expr, $error_msg:expr) => {

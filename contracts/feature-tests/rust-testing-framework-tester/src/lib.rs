@@ -29,9 +29,9 @@ pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
     }
 
     #[endpoint]
-    fn sum_sc_result(&self, first: BigUint, second: BigUint) -> SCResult<BigUint> {
+    fn sum_sc_result(&self, first: BigUint, second: BigUint) -> BigUint {
         require!(first > 0 && second > 0, "Non-zero required");
-        Ok(first + second)
+        first + second
     }
 
     #[endpoint]
@@ -188,7 +188,7 @@ pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
     }
 
     #[callback_raw]
-    fn callback_raw(&self) {
+    fn callback_raw(&self, #[var_args] _ignore: IgnoreVarArgs) {
         self.callback_executed().set(&true);
     }
 
