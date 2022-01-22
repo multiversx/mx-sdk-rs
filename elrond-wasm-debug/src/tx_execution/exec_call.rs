@@ -86,8 +86,8 @@ pub fn sc_call_with_async_and_callback(
             let (async_result, callback_result) =
                 execute_async_call_and_callback(async_data, state);
 
-            tx_result = merge_results(tx_result, async_result.clone());
-            tx_result = merge_results(tx_result, callback_result.clone());
+            tx_result = merge_results(tx_result, async_result);
+            tx_result = merge_results(tx_result, callback_result);
         }
 
         for te_call in result_calls.transfer_execute {
