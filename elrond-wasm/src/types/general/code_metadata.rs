@@ -30,6 +30,11 @@ impl CodeMetadata {
     pub fn is_readable(&self) -> bool {
         *self & CodeMetadata::READABLE != CodeMetadata::DEFAULT
     }
+
+    #[inline]
+    pub fn to_byte_array(&self) -> [u8; 2] {
+        self.bits().to_be_bytes()
+    }
 }
 
 impl From<[u8; 2]> for CodeMetadata {
