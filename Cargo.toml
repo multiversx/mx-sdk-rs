@@ -44,6 +44,8 @@ members = [
   "contracts/examples/digital-cash/meta",
   "contracts/examples/egld-esdt-swap",
   "contracts/examples/egld-esdt-swap/meta",
+  "contracts/examples/empty",
+  "contracts/examples/empty/meta",
   "contracts/examples/factorial",
   "contracts/examples/factorial/meta",
   "contracts/examples/lottery-esdt",
