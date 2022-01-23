@@ -23,22 +23,12 @@ impl CodeMetadata {
         *self & CodeMetadata::PAYABLE != CodeMetadata::DEFAULT
     }
 
-    pub fn is_readable(&self) -> bool {
-        *self & CodeMetadata::READABLE != CodeMetadata::DEFAULT
+    pub fn is_payable_by_sc(&self) -> bool {
+        *self & CodeMetadata::PAYABLE_BY_SC != CodeMetadata::DEFAULT
     }
 
-    pub fn from_flags(upgradeable: bool, payable: bool, readable: bool) -> CodeMetadata {
-        let mut code_metadata = CodeMetadata::DEFAULT;
-        if upgradeable {
-            code_metadata |= CodeMetadata::UPGRADEABLE;
-        }
-        if payable {
-            code_metadata |= CodeMetadata::PAYABLE;
-        }
-        if readable {
-            code_metadata |= CodeMetadata::READABLE;
-        }
-        code_metadata
+    pub fn is_readable(&self) -> bool {
+        *self & CodeMetadata::READABLE != CodeMetadata::DEFAULT
     }
 }
 
@@ -135,20 +125,42 @@ mod tests {
     }
 
     #[test]
-    fn test_const() {
-        assert!(CodeMetadata::UPGRADEABLE.is_upgradeable());
-        assert!(CodeMetadata::PAYABLE.is_payable());
-        assert!(CodeMetadata::READABLE.is_readable());
+    fn test_all() {
+        let all = CodeMetadata::UPGRADEABLE
+            | CodeMetadata::PAYABLE
+            | CodeMetadata::PAYABLE_BY_SC
+            | CodeMetadata::READABLE;
+        assert!(all.is_upgradeable());
+        assert!(all.is_payable());
+        assert!(all.is_payable_by_sc());
+        assert!(all.is_readable());
+
+        assert_eq!(all.bits(), 0x0506);
+
+        assert_eq!(CodeMetadata::from_bits_truncate(0xffff), all);
     }
 
     #[test]
-    fn test_all() {
-        let all = CodeMetadata::UPGRADEABLE | CodeMetadata::PAYABLE | CodeMetadata::READABLE;
-        assert!(all.is_upgradeable());
-        assert!(all.is_payable());
-        assert!(all.is_readable());
+    fn test_each() {
+        assert!(CodeMetadata::UPGRADEABLE.is_upgradeable());
+        assert!(!CodeMetadata::PAYABLE.is_upgradeable());
+        assert!(!CodeMetadata::PAYABLE_BY_SC.is_upgradeable());
+        assert!(!CodeMetadata::READABLE.is_upgradeable());
 
-        assert_eq!(all.bits(), 0x0502);
+        assert!(!CodeMetadata::UPGRADEABLE.is_payable());
+        assert!(CodeMetadata::PAYABLE.is_payable());
+        assert!(!CodeMetadata::PAYABLE_BY_SC.is_payable());
+        assert!(!CodeMetadata::READABLE.is_payable());
+
+        assert!(!CodeMetadata::UPGRADEABLE.is_payable_by_sc());
+        assert!(!CodeMetadata::PAYABLE.is_payable_by_sc());
+        assert!(CodeMetadata::PAYABLE_BY_SC.is_payable_by_sc());
+        assert!(!CodeMetadata::READABLE.is_payable_by_sc());
+
+        assert!(!CodeMetadata::UPGRADEABLE.is_readable());
+        assert!(!CodeMetadata::PAYABLE.is_readable());
+        assert!(!CodeMetadata::PAYABLE_BY_SC.is_readable());
+        assert!(CodeMetadata::READABLE.is_readable());
     }
 
     /// Translated from vm-wasm.
@@ -162,17 +174,5 @@ mod tests {
         assert!(!CodeMetadata::from([0, 0]).is_upgradeable());
         assert!(!CodeMetadata::from([0, 0]).is_payable());
         assert!(!CodeMetadata::from([0, 0]).is_readable());
-    }
-
-    #[test]
-    fn test_from_flags() {
-        assert!(CodeMetadata::from_flags(true, false, false).is_upgradeable());
-        assert!(CodeMetadata::from_flags(false, true, false).is_payable());
-        assert!(CodeMetadata::from_flags(false, false, true).is_readable());
-        assert!(!CodeMetadata::from_flags(false, false, false).is_upgradeable());
-        assert!(!CodeMetadata::from_flags(false, false, false).is_payable());
-        assert!(!CodeMetadata::from_flags(false, false, false).is_readable());
-
-        assert_eq!(CodeMetadata::from_flags(true, true, true).bits(), 0x0502);
     }
 }
