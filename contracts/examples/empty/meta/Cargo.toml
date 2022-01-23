@@ -1,0 +1,16 @@
+[package]
+name = "empty-meta"
+version = "0.0.0"
+edition = "2018"
+publish = false
+
+[dependencies.empty]
+path = ".."
+
+[dependencies.elrond-wasm]
+version = "0.26.0"
+path = "../../../../elrond-wasm"
+
+[dependencies.elrond-wasm-debug]
+version = "0.26.0"
+path = "../../../../elrond-wasm-debug"
