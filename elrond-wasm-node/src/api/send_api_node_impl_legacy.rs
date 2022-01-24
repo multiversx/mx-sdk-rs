@@ -383,12 +383,13 @@ impl SendApiImpl for VmApiImpl {
 
             let amount_bytes32_ptr = unsafe_buffer_load_be_pad_right(amount.get_raw_handle(), 32);
             let legacy_arg_buffer = arg_buffer.to_legacy_arg_buffer();
+            let code_metadata_bytes = code_metadata.to_byte_array();
             let code_bytes = code.to_boxed_bytes();
             let _ = createContract(
                 gas as i64,
                 amount_bytes32_ptr,
                 code_bytes.as_ptr(),
-                code_metadata.as_ptr(),
+                code_metadata_bytes.as_ptr(),
                 code_bytes.len() as i32,
                 new_address.as_mut_ptr(),
                 legacy_arg_buffer.num_args() as i32,
@@ -417,13 +418,14 @@ impl SendApiImpl for VmApiImpl {
             let num_return_data_before = getNumReturnData();
 
             let amount_bytes32_ptr = unsafe_buffer_load_be_pad_right(amount.get_raw_handle(), 32);
+            let code_metadata_bytes = code_metadata.to_byte_array();
             let legacy_arg_buffer = arg_buffer.to_legacy_arg_buffer();
             let source_contract_address_bytes = source_contract_address.to_address();
             let _ = deployFromSourceContract(
                 gas as i64,
                 amount_bytes32_ptr,
                 source_contract_address_bytes.as_ptr(),
-                code_metadata.as_ptr(),
+                code_metadata_bytes.as_ptr(),
                 new_address.as_mut_ptr(),
                 legacy_arg_buffer.num_args() as i32,
                 legacy_arg_buffer.arg_lengths_bytes_ptr(),
@@ -449,6 +451,7 @@ impl SendApiImpl for VmApiImpl {
     ) {
         unsafe {
             let amount_bytes32_ptr = unsafe_buffer_load_be_pad_right(amount.get_raw_handle(), 32);
+            let code_metadata_bytes = code_metadata.to_byte_array();
             let legacy_arg_buffer = arg_buffer.to_legacy_arg_buffer();
             let source_contract_address_bytes = source_contract_address.to_address();
             let sc_address_bytes = sc_address.to_address();
@@ -458,7 +461,7 @@ impl SendApiImpl for VmApiImpl {
                 gas as i64,
                 amount_bytes32_ptr,
                 source_contract_address_bytes.as_ptr(),
-                code_metadata.as_ptr(),
+                code_metadata_bytes.as_ptr(),
                 legacy_arg_buffer.num_args() as i32,
                 legacy_arg_buffer.arg_lengths_bytes_ptr(),
                 legacy_arg_buffer.arg_data_ptr(),
@@ -477,6 +480,7 @@ impl SendApiImpl for VmApiImpl {
     ) {
         unsafe {
             let amount_bytes32_ptr = unsafe_buffer_load_be_pad_right(amount.get_raw_handle(), 32);
+            let code_metadata_bytes = code_metadata.to_byte_array();
             let legacy_arg_buffer = arg_buffer.to_legacy_arg_buffer();
             let sc_address_bytes = sc_address.to_address();
             let code_bytes = code.to_boxed_bytes();
@@ -485,7 +489,7 @@ impl SendApiImpl for VmApiImpl {
                 gas as i64,
                 amount_bytes32_ptr,
                 code_bytes.as_ptr(),
-                code_metadata.as_ptr(),
+                code_metadata_bytes.as_ptr(),
                 code_bytes.len() as i32,
                 legacy_arg_buffer.num_args() as i32,
                 legacy_arg_buffer.arg_lengths_bytes_ptr(),
