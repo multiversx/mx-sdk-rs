@@ -64,7 +64,7 @@ pub fn check_tx_output(tx_id: &str, tx_expect: &TxExpect, tx_result: &TxResult) 
 					address_hex(&actual_log.address),
 					bytes_to_string(&actual_log.endpoint),
 					actual_log.topics.iter().map(|topic| verbose_hex(topic)).collect::<String>(),
-					bytes_to_string(&actual_log.data),
+					verbose_hex(&actual_log.data),
 				);
             }
         },
