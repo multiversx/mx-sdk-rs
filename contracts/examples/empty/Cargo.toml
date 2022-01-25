@@ -15,3 +15,6 @@ path = "../../../elrond-wasm"
 [dev-dependencies.elrond-wasm-debug]
 version = "0.26.0"
 path = "../../../elrond-wasm-debug"
+
+[dev-dependencies]
+num-bigint = "0.4.2"
