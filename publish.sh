@@ -54,45 +54,44 @@
 
 cd elrond-codec-derive
 cargo publish
-sleep 15
 cd ..
+
+sleep 20
 
 cd elrond-codec
 cargo publish
-sleep 15
 cd ..
 
 cd mandos
 cargo publish
-sleep 15
 cd ..
+
+sleep 20
 
 cd elrond-wasm-derive
 cargo publish
 cd ..
-sleep 15
+
+sleep 20
 
 cd elrond-wasm
 cargo publish
 cd ..
-sleep 15
+
+sleep 20
 
 cd elrond-wasm-node
 cargo publish
 cd ..
-sleep 15
 
 cd elrond-wasm-debug
 cargo publish
 cd ..
-sleep 15
 
 cd elrond-wasm-output
 cargo publish
 cd ..
-sleep 15
 
 cd elrond-wasm-modules
 cargo publish
 cd ..
-sleep 15
