@@ -30,33 +30,25 @@
                 "function": "forward_create_async_call",
                 "arguments": [
                     "sc:vault",
-                    "str:echo_arguments",
-                    "5,000,000",
-                    "1",
-                    "2"
+                    "str:panic_on_purpose",
+                    "5,000"
                 ],
                 "gasLimit": "500,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [
-                    "1",
-                    "2"
-                ],
+                "out": [],
                 "status": "0",
                 "logs": [
                     {
                         "address": "sc:forwarder",
-                        "endpoint": "str:success_callback",
+                        "endpoint": "str:error_callback",
                         "topics": [
                             "str:async_call_event_callback"
                         ],
                         "data": {
-                            "0-status": "biguint:0",
-                            "1-echoed-args": [
-                                "biguint:1",
-                                "biguint:2"
-                            ]
+                            "0-status": "biguint:4",
+                            "1-message": "nested:str:panic on purpose"
                         }
                     }
                 ],
@@ -74,16 +66,14 @@
                 "sc:vault": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {
-                        "str:call_counts|nested:str:echo_arguments": "1"
-                    },
+                    "storage": {},
                     "code": "file:../vault/output/vault.wasm"
                 },
                 "sc:forwarder": {
                     "nonce": "0",
                     "balance": "1000",
                     "storage": {
-                        "str:async_call_callback_data": "true"
+                        "str:async_call_callback_data": "false"
                     },
                     "code": "file:../forwarder-raw/output/forwarder-raw.wasm"
                 }
@@ -100,7 +90,7 @@
                 "arguments": [
                     "sc:vault",
                     "str:echo_arguments",
-                    "5,000",
+                    "5,000,000",
                     "1",
                     "2"
                 ],
@@ -144,7 +134,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "str:call_counts|nested:str:echo_arguments": "2"
+                        "str:call_counts|nested:str:echo_arguments": "1"
                     },
                     "code": "file:../vault/output/vault.wasm"
                 },
