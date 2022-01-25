@@ -95,11 +95,19 @@ impl<T: TypeAbi> TypeAbi for &[T] {
         repr.push('>');
         repr
     }
+
+    fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
+        T::provide_type_descriptions(accumulator);
+    }
 }
 
 impl<T: TypeAbi> TypeAbi for Vec<T> {
     fn type_name() -> String {
         <&[T]>::type_name()
+    }
+
+    fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
+        T::provide_type_descriptions(accumulator);
     }
 }
 
@@ -107,11 +115,19 @@ impl<T: TypeAbi, const CAP: usize> TypeAbi for ArrayVec<T, CAP> {
     fn type_name() -> String {
         <&[T]>::type_name()
     }
+
+    fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
+        T::provide_type_descriptions(accumulator);
+    }
 }
 
 impl<T: TypeAbi> TypeAbi for Box<[T]> {
     fn type_name() -> String {
         <&[T]>::type_name()
+    }
+
+    fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
+        T::provide_type_descriptions(accumulator);
     }
 }
 
