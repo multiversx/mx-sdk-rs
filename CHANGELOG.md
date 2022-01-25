@@ -4,6 +4,18 @@ There are several crates in this repo, this changelog will keep track of all of 
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [elrond-wasm 0.27.0] - 2022-01-25
+- Fixed certain compilation error messages. The previous implementation of the macro preprocessor would have concealed the location of many issues.
+- Changed implementation of `require!`:
+	- `require!` no longer returns a `SCResult` type, when the condition is false it now stops the transaction immediately, via `signal_error`;
+	- `require!` now accepts message formatting;
+	- `require_old!` gives access to the old implementation.
+- The Rust testing framework can now handle panics and async calls.
+- ABI bugfix - an issue regarding nested types.
+- `meta` crate build also attempts to call `wasm-opt` after building the contracts.
+- Refactored `CodeMetadata` and added "payable by SC" field.
+- Empty contract template.
+
 ## [elrond-wasm 0.26.0] - 2022-01-19
 - Major VM API trait refactoring. All API methods can be accessed from a static context. Removed api instance variables from all objects.
 - External view contracts
@@ -15,10 +27,10 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 	- `ManagedVec` iterators made safer by the proper use of lifetimes
 	- `ManagedVec` `get_mut` offers a safe mutable reference, using lifetimes
 	- Some initial optimizations in storage mappers
-- First version of a message formatter based on `ManagedBuffer`s
+- First version of a message formatter based on `ManagedBuffer`s:
 	- `sc_print!` macro
 	- `sc_panic!` macro
-- Random number generator wrapper over randomness source from the VM
+- Random number generator wrapper over randomness source from the VM.
 
 ## [elrond-wasm 0.25.0] - 2021-12-14
 - Rust testing framework - mandos generation fixes and some more getters

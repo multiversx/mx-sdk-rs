@@ -9,9 +9,9 @@ publish = false
 path = "src/erc20.rs"
 
 [dependencies.elrond-wasm]
-version = "0.26.0"
+version = "0.27.0"
 path = "../../../../elrond-wasm"
 
 [dev-dependencies.elrond-wasm-debug]
-version = "0.26.0"
+version = "0.27.0"
 path = "../../../../elrond-wasm-debug"
