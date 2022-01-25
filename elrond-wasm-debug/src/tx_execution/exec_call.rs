@@ -89,14 +89,6 @@ pub fn sc_call_with_async_and_callback(
             tx_result = merge_results(tx_result, async_result);
             tx_result = merge_results(tx_result, callback_result);
         }
-
-        for te_call in result_calls.transfer_execute {
-            let te_input = async_call_tx_input(&te_call);
-
-            let te_result = sc_call(te_input, state, false);
-
-            tx_result = merge_results(tx_result, te_result.clone());
-        }
     }
 
     tx_result
