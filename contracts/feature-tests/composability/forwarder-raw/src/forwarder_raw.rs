@@ -183,7 +183,7 @@ pub trait ForwarderRaw {
     #[callback_raw]
     fn callback_raw(&self, #[var_args] args: ManagedVarArgs<ManagedBuffer>) {
         let payments = self.call_value().all_esdt_transfers();
-        if payments.len() == 0 {
+        if payments.is_empty() {
             let egld_value = self.call_value().egld_value();
             if egld_value > 0 {
                 let _ = self
