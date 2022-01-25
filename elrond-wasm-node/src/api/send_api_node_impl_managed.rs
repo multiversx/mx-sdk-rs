@@ -110,7 +110,7 @@ extern "C" {
 }
 
 unsafe fn code_metadata_to_buffer_handle(code_metadata: CodeMetadata) -> Handle {
-    let code_metadata_bytes = code_metadata.into_bytes();
+    let code_metadata_bytes = code_metadata.to_byte_array();
     mBufferNewFromBytes(
         code_metadata_bytes.as_ptr(),
         code_metadata_bytes.len() as i32,

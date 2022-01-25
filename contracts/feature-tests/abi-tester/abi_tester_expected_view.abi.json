@@ -84,6 +84,42 @@
                 }
             ]
         },
+        "AbiManagedType": {
+            "type": "struct",
+            "docs": [
+                "Its only purpose is to test that the ABI generator works fine."
+            ],
+            "fields": [
+                {
+                    "name": "big_uint",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "integer",
+                    "type": "i32"
+                },
+                {
+                    "name": "managed_buffer",
+                    "type": "bytes"
+                }
+            ]
+        },
+        "AbiManagedVecItem": {
+            "type": "struct",
+            "docs": [
+                "Its only purpose is to test that the ABI generator works fine."
+            ],
+            "fields": [
+                {
+                    "name": "value1",
+                    "type": "u32"
+                },
+                {
+                    "name": "value2",
+                    "type": "u32"
+                }
+            ]
+        },
         "AbiTestType": {
             "type": "struct",
             "docs": [
@@ -290,7 +326,55 @@
                 "Tests that the ABI generator also fetches types that only appear as fields."
             ]
         },
-        "OnlyShowsUpAsNested10": {
+        "OnlyShowsUpAsNestedInArray": {
+            "type": "struct",
+            "docs": [
+                "Tests that the ABI generator also fetches types that only appear as fields."
+            ]
+        },
+        "OnlyShowsUpAsNestedInArrayVec": {
+            "type": "struct",
+            "docs": [
+                "Tests that the ABI generator also fetches types that only appear as fields."
+            ]
+        },
+        "OnlyShowsUpAsNestedInBox": {
+            "type": "struct",
+            "docs": [
+                "Tests that the ABI generator also fetches types that only appear as fields."
+            ]
+        },
+        "OnlyShowsUpAsNestedInBoxedSlice": {
+            "type": "struct",
+            "docs": [
+                "Tests that the ABI generator also fetches types that only appear as fields."
+            ]
+        },
+        "OnlyShowsUpAsNestedInOption": {
+            "type": "struct",
+            "docs": [
+                "Tests that the ABI generator also fetches types that only appear as fields."
+            ]
+        },
+        "OnlyShowsUpAsNestedInRef": {
+            "type": "struct",
+            "docs": [
+                "Tests that the ABI generator also fetches types that only appear as fields."
+            ]
+        },
+        "OnlyShowsUpAsNestedInSingleValueMapper": {
+            "type": "struct",
+            "docs": [
+                "Tests that the ABI generator also fetches types that only appear as fields."
+            ]
+        },
+        "OnlyShowsUpAsNestedInSlice": {
+            "type": "struct",
+            "docs": [
+                "Tests that the ABI generator also fetches types that only appear as fields."
+            ]
+        },
+        "OnlyShowsUpAsNestedInVec": {
             "type": "struct",
             "docs": [
                 "Tests that the ABI generator also fetches types that only appear as fields."
