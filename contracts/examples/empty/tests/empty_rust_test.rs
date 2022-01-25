@@ -4,20 +4,20 @@ use empty::*;
 
 const WASM_PATH: &'static str = "output/empty.wasm";
 
-struct CrowdfundingSetup<CrowdfundingObjBuilder>
+struct ContractSetup<ContractObjBuilder>
 where
-    CrowdfundingObjBuilder: 'static + Copy + Fn() -> empty::ContractObj<DebugApi>,
+    ContractObjBuilder: 'static + Copy + Fn() -> empty::ContractObj<DebugApi>,
 {
     pub blockchain_wrapper: BlockchainStateWrapper,
     pub owner_address: Address,
-    pub contract_wrapper: ContractObjWrapper<empty::ContractObj<DebugApi>, CrowdfundingObjBuilder>,
+    pub contract_wrapper: ContractObjWrapper<empty::ContractObj<DebugApi>, ContractObjBuilder>,
 }
 
-fn setup_contract<CrowdfundingObjBuilder>(
-    cf_builder: CrowdfundingObjBuilder,
-) -> CrowdfundingSetup<CrowdfundingObjBuilder>
+fn setup_contract<ContractObjBuilder>(
+    cf_builder: ContractObjBuilder,
+) -> ContractSetup<ContractObjBuilder>
 where
-    CrowdfundingObjBuilder: 'static + Copy + Fn() -> empty::ContractObj<DebugApi>,
+    ContractObjBuilder: 'static + Copy + Fn() -> empty::ContractObj<DebugApi>,
 {
     let rust_zero = rust_biguint!(0u64);
     let mut blockchain_wrapper = BlockchainStateWrapper::new();
@@ -38,7 +38,7 @@ where
 
     blockchain_wrapper.add_mandos_set_account(cf_wrapper.address_ref());
 
-    CrowdfundingSetup {
+    ContractSetup {
         blockchain_wrapper,
         owner_address,
         contract_wrapper: cf_wrapper,
