@@ -264,7 +264,7 @@ pub trait TokenRelease {
 
     // private functions
 
-    fn calculate_claimable_tokens(&self, address: &ManagedAddress) -> (BigUint) {
+    fn calculate_claimable_tokens(&self, address: &ManagedAddress) -> BigUint {
         let starting_timestamp = self.activation_timestamp().get();
         let current_timestamp = self.blockchain().get_block_timestamp();
         let address_groups = self.user_groups(address).get();

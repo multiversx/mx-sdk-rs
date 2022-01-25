@@ -28,10 +28,12 @@ pub(super) fn perform_substitutions(
         if let Some(tt) = tt_iter.next() {
             match tt {
                 TokenTree::Group(g) => {
-                    result.push(TokenTree::Group(Group::new(
+                    let mut substituted_group = TokenTree::Group(Group::new(
                         g.delimiter(),
                         perform_substitutions(g.stream(), substitutions),
-                    )));
+                    ));
+                    substituted_group.set_span(g.span());
+                    result.push(substituted_group);
                     continue;
                 },
                 _ => result.push(tt),

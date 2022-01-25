@@ -9,7 +9,11 @@ pub fn substitutions() -> SubstitutionsMap {
     substitutions
 }
 
+#[rustfmt::skip]
 fn add_managed_type(substitutions: &mut SubstitutionsMap, type_name: &proc_macro2::TokenStream) {
+    substitutions.add_substitution(
+        quote!(#type_name<Self::Api>), 
+        quote!(#type_name<Self::Api>));
     substitutions.add_substitution(
         quote!(#type_name::),
         quote!(elrond_wasm::types::#type_name::<Self::Api>::),
