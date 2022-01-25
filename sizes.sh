@@ -5,6 +5,7 @@
 stat --printf="examples/adder %s\n" contracts/examples/adder/output/adder.wasm
 stat --printf="examples/crypto-bubbles %s\n" contracts/examples/crypto-bubbles/output/crypto-bubbles.wasm
 stat --printf="examples/crowdfunding-esdt %s\n" contracts/examples/crowdfunding-esdt/output/crowdfunding-esdt.wasm
+stat --printf="examples/empty %s\n" contracts/examples/empty/output/empty.wasm
 stat --printf="examples/factorial %s\n" contracts/examples/factorial/output/factorial.wasm
 stat --printf="examples/lottery-esdt %s\n" contracts/examples/lottery-esdt/output/lottery-esdt.wasm
 stat --printf="examples/multisig %s\n" contracts/examples/multisig/output/multisig.wasm
