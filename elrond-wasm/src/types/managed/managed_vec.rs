@@ -1,6 +1,6 @@
 use super::{ManagedBuffer, ManagedType, ManagedVecItem, ManagedVecRef, ManagedVecRefIterator};
 use crate::{
-    abi::TypeAbi,
+    abi::{TypeAbi, TypeDescriptionContainer},
     api::{ErrorApiImpl, Handle, InvalidSliceError, ManagedTypeApi},
     types::{ArgBuffer, BoxedBytes, ManagedBufferNestedDecodeInput},
 };
@@ -364,6 +364,10 @@ where
     /// It is semantically equivalent to any list of `T`.
     fn type_name() -> String {
         <&[T] as TypeAbi>::type_name()
+    }
+
+    fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
+        T::provide_type_descriptions(accumulator);
     }
 }
 
