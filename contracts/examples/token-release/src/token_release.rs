@@ -247,8 +247,7 @@ pub trait TokenRelease {
 
     #[view]
     fn verify_address_change(&self, address: &ManagedAddress) -> ManagedAddress {
-        let new_address = self.address_change_request(address).get();
-        new_address
+        self.address_change_request(address).get()
     }
 
     #[view]

@@ -83,7 +83,7 @@ pub trait Lottery {
         let timestamp = self.blockchain().get_block_timestamp();
 
         let total_tickets = opt_total_tickets.unwrap_or(u32::MAX);
-        let deadline = opt_deadline.unwrap_or_else(|| timestamp + THIRTY_DAYS_IN_SECONDS);
+        let deadline = opt_deadline.unwrap_or(timestamp + THIRTY_DAYS_IN_SECONDS);
         let max_entries_per_user = opt_max_entries_per_user.unwrap_or(u32::MAX);
         let prize_distribution =
             opt_prize_distribution.unwrap_or_else(|| [PERCENTAGE_TOTAL as u8].to_vec());
