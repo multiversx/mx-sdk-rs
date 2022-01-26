@@ -3,12 +3,14 @@ use bitflags::bitflags;
 
 bitflags! {
     pub struct EsdtLocalRoleFlags: u64 {
-        const NONE             = 0b00000000;
-        const MINT             = 0b00000001;
-        const BURN             = 0b00000010;
-        const NFT_CREATE       = 0b00000100;
-        const NFT_ADD_QUANTITY = 0b00001000;
-        const NFT_BURN         = 0b00010000;
+        const NONE                  = 0b00000000;
+        const MINT                  = 0b00000001;
+        const BURN                  = 0b00000010;
+        const NFT_CREATE            = 0b00000100;
+        const NFT_ADD_QUANTITY      = 0b00001000;
+        const NFT_BURN              = 0b00010000;
+        const NFT_ADD_URI           = 0b00100000;
+        const NFT_UPDATE_ATTRIBUTES = 0b01000000;
     }
 }
 
