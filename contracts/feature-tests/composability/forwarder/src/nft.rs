@@ -162,6 +162,28 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
     }
 
     #[endpoint]
+    fn nft_add_uris(
+        &self,
+        token_identifier: TokenIdentifier,
+        nonce: u64,
+        #[var_args] uris: ManagedVarArgs<ManagedBuffer>,
+    ) {
+        self.send()
+            .nft_add_multiple_uri(&token_identifier, nonce, &uris.to_vec());
+    }
+
+    #[endpoint]
+    fn nft_update_attributes(
+        &self,
+        token_identifier: TokenIdentifier,
+        nonce: u64,
+        new_attributes: Color,
+    ) {
+        self.send()
+            .nft_update_attributes(&token_identifier, nonce, &new_attributes);
+    }
+
+    #[endpoint]
     fn nft_decode_complex_attributes(
         &self,
         token_identifier: TokenIdentifier,
