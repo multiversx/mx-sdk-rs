@@ -27,6 +27,7 @@ pub mod storage_mapper_set;
 pub mod storage_mapper_single;
 pub mod storage_mapper_token_attributes;
 pub mod storage_mapper_vec;
+pub mod struct_eq;
 pub mod token_identifier_features;
 pub mod type_features;
 pub mod types;
@@ -57,6 +58,7 @@ pub trait BasicFeatures:
     + storage_mapper_single::SingleValueMapperFeatures
     + storage_mapper_vec::VecMapperFeatures
     + storage_mapper_token_attributes::TokenAttributesMapperFeatures
+    + struct_eq::StructEquals
     + token_identifier_features::TokenIdentifierFeatures
     + type_features::TypeFeatures
 {
