@@ -458,3 +458,8 @@ fn storage_usize_bad_rs() {
 fn storage_vec_u8_rs() {
     elrond_wasm_debug::mandos_rs("mandos/storage_vec_u8.scen.json", world());
 }
+
+#[test]
+fn struct_eq_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/struct_eq.scen.json", world());
+}
