@@ -130,3 +130,11 @@ impl<A: VMApi> VMApi for ExternalViewApi<A> {
         location == EndpointLocationAbi::ViewContract
     }
 }
+
+impl<A: VMApi> PartialEq for ExternalViewApi<A> {
+    fn eq(&self, _: &Self) -> bool {
+        true
+    }
+}
+
+impl<A: VMApi> Eq for ExternalViewApi<A> {}

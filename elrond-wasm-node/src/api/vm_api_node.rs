@@ -9,8 +9,6 @@ impl CallTypeApi for VmApiImpl {}
 
 impl StorageMapperApi for VmApiImpl {}
 
-impl VMApi for VmApiImpl {}
-
 /// Should be no-op. The API implementation is zero-sized.
 impl Clone for VmApiImpl {
     #[inline]
@@ -18,3 +16,13 @@ impl Clone for VmApiImpl {
         VmApiImpl {}
     }
 }
+
+impl PartialEq for VmApiImpl {
+    fn eq(&self, _: &Self) -> bool {
+        true
+    }
+}
+
+impl Eq for VmApiImpl {}
+
+impl VMApi for VmApiImpl {}

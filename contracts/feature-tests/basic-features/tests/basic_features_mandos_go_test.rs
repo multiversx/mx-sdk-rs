@@ -434,3 +434,8 @@ fn storage_usize_bad_go() {
 fn storage_vec_u8_go() {
     elrond_wasm_debug::mandos_go("mandos/storage_vec_u8.scen.json");
 }
+
+#[test]
+fn struct_eq_go() {
+    elrond_wasm_debug::mandos_go("mandos/struct_eq.scen.json");
+}
