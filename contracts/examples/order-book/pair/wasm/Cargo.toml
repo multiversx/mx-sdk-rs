@@ -23,10 +23,10 @@ panic = "abort"
 path = ".."
 
 [dependencies.elrond-wasm-node]
-version = "0.27.0"
+version = "0.27.1"
 path = "../../../../../elrond-wasm-node"
 
 [dependencies.elrond-wasm-output]
-version = "0.27.0"
+version = "0.27.1"
 path = "../../../../../elrond-wasm-output"
 features = ["wasm-output-mode"]
