@@ -22,6 +22,8 @@ pub trait VMApi:
     + CallTypeApi
     + StorageMapperApi
     + Clone // TODO: remove
+    + PartialEq // for helping derive PartialEq for managed types
+    + Eq
 {
     fn has_location(location: EndpointLocationAbi) -> bool {
         location == EndpointLocationAbi::MainContract
