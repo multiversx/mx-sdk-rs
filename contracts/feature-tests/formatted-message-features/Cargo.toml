@@ -9,9 +9,9 @@ publish = false
 path = "src/formatted_message_features.rs"
 
 [dependencies.elrond-wasm]
-version = "0.26.0"
+version = "0.27.1"
 path = "../../../elrond-wasm"
 
 [dev-dependencies.elrond-wasm-debug]
-version = "0.26.0"
+version = "0.27.1"
 path = "../../../elrond-wasm-debug"
