@@ -190,7 +190,10 @@ impl<M: ManagedTypeApi> NestedEncode for BigUint<M> {
 
 impl<M: ManagedTypeApi> NestedDecode for BigUint<M> {
     fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
-        input.read_specialized((), |_| Err(DecodeError::UNSUPPORTED_OPERATION))
+        input.read_specialized((), |input| {
+            let boxed_bytes = BoxedBytes::dep_decode(input)?;
+            Ok(Self::from_bytes_be(boxed_bytes.as_slice()))
+        })
     }
 
     fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
@@ -198,15 +201,19 @@ impl<M: ManagedTypeApi> NestedDecode for BigUint<M> {
         c: ExitCtx,
         exit: fn(ExitCtx, DecodeError) -> !,
     ) -> Self {
-        input.read_specialized_or_exit((), c, exit, |_, c| {
-            exit(c, DecodeError::UNSUPPORTED_OPERATION)
+        input.read_specialized_or_exit((), c, exit, |input, c| {
+            let boxed_bytes = BoxedBytes::dep_decode_or_exit(input, c, exit);
+            Self::from_bytes_be(boxed_bytes.as_slice())
         })
     }
 }
 
 impl<M: ManagedTypeApi> TopDecode for BigUint<M> {
     fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
-        input.into_specialized(|_| Err(DecodeError::UNSUPPORTED_OPERATION))
+        input.into_specialized(|input| {
+            let boxed_bytes = BoxedBytes::top_decode(input)?;
+            Ok(Self::from_bytes_be(boxed_bytes.as_slice()))
+        })
     }
 }
 

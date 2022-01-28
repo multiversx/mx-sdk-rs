@@ -1,6 +1,6 @@
 use elrond_wasm::{
     contract_base::ManagedSerializer,
-    elrond_codec::{test_util::check_top_encode, DecodeError, TopDecode, TopEncode},
+    elrond_codec::{test_util::check_top_encode, TopDecode, TopEncode},
     types::{BoxedBytes, ManagedBuffer},
 };
 
@@ -28,8 +28,6 @@ pub fn check_managed_top_encode<T: TopEncode>(_api: DebugApi, obj: &T) -> BoxedB
 
 /// Uses the managed types api to test encoding.
 /// Can be used on any type, but managed types are especially relevant.
-/// Also works on types that have no un-managed decoding,
-/// by allowing DecodeError::UNSUPPORTED_OPERATION result.
 pub fn check_managed_top_decode<T: TopDecode + PartialEq + Debug>(
     _api: DebugApi,
     bytes: &[u8],
@@ -43,9 +41,6 @@ pub fn check_managed_top_decode<T: TopDecode + PartialEq + Debug>(
     match T::top_decode(bytes) {
         Ok(from_unmanaged) => {
             assert_eq!(from_unmanaged, from_mb);
-        },
-        Err(DecodeError::UNSUPPORTED_OPERATION) => {
-            // Ok
         },
         Err(err) => {
             panic!(
