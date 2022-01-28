@@ -115,7 +115,7 @@ pub fn execute_promise_call_and_callback(
         let async_input = async_call_tx_input(&promise.endpoint);
         let async_result = sc_call_with_async_and_callback(async_input, state, false);
 
-        let callback_input = async_promise_tx_input(&address, &promise, &async_result);
+        let callback_input = async_promise_tx_input(address, promise, &async_result);
         let callback_result = sc_call(callback_input, state, false);
         assert!(
             callback_result.result_calls.promises.is_empty(),
@@ -124,7 +124,7 @@ pub fn execute_promise_call_and_callback(
         (async_result, callback_result)
     } else {
         let tx_cache = TxCache::new(state.clone());
-        tx_cache.subtract_egld_balance(&address, &promise.endpoint.call_value);
+        tx_cache.subtract_egld_balance(address, &promise.endpoint.call_value);
         tx_cache.insert_account(AccountData {
             address: promise.endpoint.to.clone(),
             nonce: 0,

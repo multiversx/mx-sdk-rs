@@ -2,7 +2,7 @@ use super::{AsyncCallTxData, Promise};
 
 #[derive(Clone, Default, Debug)]
 pub struct TxResultCalls {
-    pub async_call: Option<AsyncCallTxData>,a>,
+    pub async_call: Option<AsyncCallTxData>,
     pub promises: Vec<Promise>,
 }
 
