@@ -2,7 +2,7 @@ use crate::{abi::TypeAbi, types::BoxedBytes};
 use alloc::{boxed::Box, string::String, vec::Vec};
 use core::fmt::Debug;
 
-const ERR_BAD_H256_LENGTH: &[u8] = b"bad H256 length";
+const ERR_BAD_H256_LENGTH: &str = "bad H256 length";
 const ZERO_32: &[u8] = &[0u8; 32];
 
 /// Type that holds 32 bytes of data.
