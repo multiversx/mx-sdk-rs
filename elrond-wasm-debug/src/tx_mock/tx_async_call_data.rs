@@ -63,15 +63,14 @@ pub fn async_promise_tx_input(
 ) -> TxInput {
     let mut args: Vec<Vec<u8>> = Vec::new();
     let serialized_bytes = top_encode_to_vec_u8(&async_result.result_status).unwrap();
-    let callback: Vec<u8>;
     args.push(serialized_bytes);
-    if async_result.result_status == 0 {
+    let callback: Vec<u8> = if async_result.result_status == 0 {
         args.extend_from_slice(async_result.result_values.as_slice());
-        callback = promise.success_callback.to_vec();
+        promise.success_callback.to_vec()
     } else {
         args.push(async_result.result_message.clone().into_bytes());
-        callback = promise.error_callback.to_vec();
-    }
+        promise.error_callback.to_vec()
+    };
 
     TxInput {
         from: promise.endpoint.from.clone(),
