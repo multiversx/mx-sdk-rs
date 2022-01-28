@@ -9,25 +9,25 @@ publish = false
 path = "src/use_module.rs"
 
 [dependencies.elrond-wasm-modules]
-version = "0.26.0"
+version = "0.27.1"
 path = "../../../elrond-wasm-modules"
 
 [dependencies.elrond-wasm-module-dns]
-version = "0.26.0"
+version = "0.27.1"
 path = "../../modules-legacy/elrond-wasm-module-dns"
 
 [dependencies.elrond-wasm-module-features]
-version = "0.26.0"
+version = "0.27.1"
 path = "../../modules-legacy/elrond-wasm-module-features"
 
 [dependencies.elrond-wasm-module-pause]
-version = "0.26.0"
+version = "0.27.1"
 path = "../../modules-legacy/elrond-wasm-module-pause"
 
 [dependencies.elrond-wasm]
-version = "0.26.0"
+version = "0.27.1"
 path = "../../../elrond-wasm"
 
 [dev-dependencies.elrond-wasm-debug]
-version = "0.26.0"
+version = "0.27.1"
 path = "../../../elrond-wasm-debug"

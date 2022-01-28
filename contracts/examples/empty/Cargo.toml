@@ -1,0 +1,20 @@
+[package]
+name = "empty"
+version = "0.0.0"
+authors = ["you"]
+edition = "2018"
+publish = false
+
+[lib]
+path = "src/empty.rs"
+
+[dependencies.elrond-wasm]
+version = "0.27.1"
+path = "../../../elrond-wasm"
+
+[dev-dependencies.elrond-wasm-debug]
+version = "0.27.1"
+path = "../../../elrond-wasm-debug"
+
+[dev-dependencies]
+num-bigint = "0.4.2"

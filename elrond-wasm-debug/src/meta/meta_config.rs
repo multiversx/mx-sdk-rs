@@ -2,11 +2,23 @@ use std::{fs::create_dir_all, path::PathBuf};
 
 use elrond_wasm::abi::{ContractAbi, EndpointLocationAbi};
 
-#[derive(Default, Debug)]
+#[derive(Debug)]
 pub struct BuildArgs {
     pub debug_symbols: bool,
     pub wasm_name_override: Option<String>,
     pub wasm_name_suffix: Option<String>,
+    pub wasm_opt: bool,
+}
+
+impl Default for BuildArgs {
+    fn default() -> Self {
+        BuildArgs {
+            debug_symbols: false,
+            wasm_name_override: None,
+            wasm_name_suffix: None,
+            wasm_opt: true,
+        }
+    }
 }
 
 impl BuildArgs {
@@ -83,9 +95,13 @@ pub fn process_args(args: &[String]) -> BuildArgs {
                     .expect("argument `--wasm-suffix` must be followed by the desired suffix");
                 result.wasm_name_suffix = Some(suffix.clone());
             },
+            "--no-wasm-opt" => {
+                result.wasm_opt = false;
+            },
             _ => {},
         }
     }
+
     result
 }
 

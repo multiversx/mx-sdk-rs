@@ -140,9 +140,7 @@ pub trait Vault {
         #[var_args] opt_receive_func: OptionalArg<ManagedBuffer>,
     ) -> SCResult<()> {
         let caller = self.blockchain().get_caller();
-        let func_name = opt_receive_func
-            .into_option()
-            .unwrap_or(ManagedBuffer::new());
+        let func_name = opt_receive_func.into_option().unwrap_or_default();
 
         Self::Api::send_api_impl()
             .direct_esdt_execute(
