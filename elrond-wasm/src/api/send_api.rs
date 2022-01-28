@@ -76,6 +76,7 @@ pub trait SendApiImpl {
         arg_buffer: &ManagedArgBuffer<M>,
     ) -> !;
 
+    #[allow(clippy::too_many_arguments)]
     fn create_async_call_raw<M: ManagedTypeApi>(
         &self,
         to: &ManagedAddress<M>,
