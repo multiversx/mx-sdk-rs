@@ -171,9 +171,10 @@ where
     M: ManagedTypeApi,
 {
     fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
-        let buffer: ManagedBuffer<M> = input
-            .read_specialized(ManagedBufferSizeContext(N), |_| {
-                Err(DecodeError::UNSUPPORTED_OPERATION)
+        let buffer: ManagedBuffer<M> =
+            input.read_specialized(ManagedBufferSizeContext(N), |input| {
+                let byte_array = <[u8; N]>::dep_decode(input)?;
+                Ok(byte_array.as_ref().into())
             })?;
         Ok(ManagedByteArray { buffer })
     }
