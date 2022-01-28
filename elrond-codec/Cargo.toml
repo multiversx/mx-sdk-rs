@@ -1,6 +1,6 @@
 [package]
 name = "elrond-codec"
-version = "0.8.3"
+version = "0.8.4"
 edition = "2018"
 
 authors = ["Andrei Marinica <andrei.marinica@elrond.com>", "Elrond Network <contact@elrond.com>"]
@@ -18,7 +18,7 @@ derive = ["elrond-codec-derive"]
 
 [dependencies.elrond-codec-derive]
 path = "../elrond-codec-derive"
-version = "=0.8.3"
+version = "=0.8.4"
 optional = true
 
 [dependencies]
@@ -27,4 +27,4 @@ arrayvec = { version = "0.7.1", default-features = false }
 
 [dev-dependencies.elrond-codec-derive]
 path = "../elrond-codec-derive"
-version = "=0.8.3"
+version = "=0.8.4"

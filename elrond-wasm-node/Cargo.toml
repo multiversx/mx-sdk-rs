@@ -1,6 +1,6 @@
 [package]
 name = "elrond-wasm-node"
-version = "0.27.1"
+version = "0.27.2"
 edition = "2018"
 
 authors = ["Andrei Marinica <andrei.marinica@elrond.com>", "Elrond Network <contact@elrond.com>"]
@@ -19,5 +19,5 @@ vm-validate-token-identifier = []
 vm-esdt-local-roles = []
 
 [dependencies.elrond-wasm]
-version = "=0.27.1"
+version = "=0.27.2"
 path = "../elrond-wasm"
