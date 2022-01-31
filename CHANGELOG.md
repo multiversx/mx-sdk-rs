@@ -4,6 +4,12 @@ There are several crates in this repo, this changelog will keep track of all of 
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [elrond-wasm 0.27.2, elrond-codec 0.8.4] - 2022-01-27
+- Added missing non-specialized decode implementations for managed types.
+
+## [elrond-wasm 0.27.1] - 2022-01-27
+- Deriving `PartialEq` now works on structs that contain managed types.
+
 ## [elrond-wasm 0.27.0] - 2022-01-25
 - Fixed certain compilation error messages. The previous implementation of the macro preprocessor would have concealed the location of many issues.
 - Changed implementation of `require!`:
