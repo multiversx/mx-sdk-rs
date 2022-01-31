@@ -4,6 +4,11 @@ There are several crates in this repo, this changelog will keep track of all of 
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [elrond-wasm 0.27.3] - 2022-01-31
+- Backwards compatibility fix.
+- Trailing commas are allowed in `sc_panic!`, `require!` and `sc_print!`.
+- EsdtTokenData `decode_attributes_or_exit` for easier error handling.
+
 ## [elrond-wasm 0.27.2, elrond-codec 0.8.4] - 2022-01-27
 - Added missing non-specialized decode implementations for managed types.
 
