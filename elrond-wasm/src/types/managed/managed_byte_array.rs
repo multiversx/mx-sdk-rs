@@ -12,7 +12,7 @@ use elrond_codec::{
     TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, TryStaticCast,
 };
 
-const DECODE_ERROR_BAD_LENGTH: &[u8] = b"bad array length";
+const DECODE_ERROR_BAD_LENGTH: &str = "bad array length";
 
 /// A list of items that lives inside a managed buffer.
 /// Items can be either stored there in full (e.g. `u32`),
@@ -171,9 +171,10 @@ where
     M: ManagedTypeApi,
 {
     fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
-        let buffer: ManagedBuffer<M> = input
-            .read_specialized(ManagedBufferSizeContext(N), |_| {
-                Err(DecodeError::UNSUPPORTED_OPERATION)
+        let buffer: ManagedBuffer<M> =
+            input.read_specialized(ManagedBufferSizeContext(N), |input| {
+                let byte_array = <[u8; N]>::dep_decode(input)?;
+                Ok(byte_array.as_ref().into())
             })?;
         Ok(ManagedByteArray { buffer })
     }

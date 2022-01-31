@@ -193,6 +193,7 @@ elrond_wasm_node::wasm_endpoints! {
         managed_address_eq
         managed_address_from
         managed_address_zero
+        managed_struct_eq
         managed_vec_address_push
         managed_vec_biguint_eq
         managed_vec_biguint_push
