@@ -30,7 +30,7 @@ impl fmt::Display for AccountData {
         for key in &storage_keys {
             let value = self.storage.get(key).unwrap();
             write!(
-                &mut storage_buf,
+                storage_buf,
                 "\n\t\t\t{} -> 0x{}",
                 key_hex(key.as_slice()),
                 hex::encode(value.as_slice())

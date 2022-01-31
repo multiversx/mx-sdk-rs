@@ -49,6 +49,11 @@ pub trait FormattedMessageFeatures {
         );
     }
 
+    #[endpoint]
+    fn decode_error_message(&self) {
+        sc_panic!(DecodeError::UNSUPPORTED_OPERATION);
+    }
+
     /// TODO: figure out a way to test this.
     #[endpoint]
     fn print_message(&self, x: i32) {
