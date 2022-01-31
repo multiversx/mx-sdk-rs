@@ -9,11 +9,11 @@ publish = false
 path = "src/crowdfunding_esdt.rs"
 
 [dependencies.elrond-wasm]
-version = "0.27.2"
+version = "0.27.3"
 path = "../../../elrond-wasm"
 
 [dev-dependencies.elrond-wasm-debug]
-version = "0.27.2"
+version = "0.27.3"
 path = "../../../elrond-wasm-debug"
 
 [dev-dependencies]
