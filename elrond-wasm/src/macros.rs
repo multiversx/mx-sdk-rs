@@ -92,7 +92,7 @@ macro_rules! sc_panic {
         elrond_wasm::derive::format_receiver_args!(___buffer___, $msg, $($arg),+);
         elrond_wasm::contract_base::ErrorHelper::<Self::Api>::signal_error_with_message(___buffer___.into_managed_buffer());
     }};
-    ($msg:tt) => {
+    ($msg:expr) => {
         elrond_wasm::contract_base::ErrorHelper::<Self::Api>::signal_error_with_message($msg);
     };
 }
