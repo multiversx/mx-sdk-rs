@@ -205,7 +205,7 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
             token_nonce,
         );
 
-        let decoded_attr = token_info.decode_attributes::<ComplexAttributes<Self::Api>>()?;
+        let decoded_attr = token_info.decode_attributes_or_exit::<ComplexAttributes<Self::Api>>();
 
         require!(
             orig_attr.biguint == decoded_attr.biguint
