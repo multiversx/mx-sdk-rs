@@ -9,14 +9,14 @@ path = "src/lib.rs"
 
 
 [dependencies.elrond-wasm]
-version = "0.27.2"
+version = "0.27.3"
 path = "../../../../elrond-wasm"
 
 [dependencies.elrond-wasm-node]
-version = "0.27.2"
+version = "0.27.3"
 optional = true
 path = "../../../../elrond-wasm-node"
 
 [dev-dependencies.elrond-wasm-debug]
-version = "0.27.2"
+version = "0.27.3"
 path = "../../../../elrond-wasm-debug"
