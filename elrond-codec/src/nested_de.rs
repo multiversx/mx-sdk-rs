@@ -1,6 +1,8 @@
 // use core::ops::Try;
 
-use crate::{codec_err::DecodeError, nested_de_input::NestedDecodeInput, TypeInfo};
+use crate::{
+    codec_err::DecodeError, nested_de_input::NestedDecodeInput, DecodeErrorHandler, TypeInfo,
+};
 
 // pub enum EarlyExit{}
 
@@ -52,6 +54,17 @@ pub trait NestedDecode: Sized {
         match Self::dep_decode(input) {
             Ok(v) => Ok(v),
             Err(e) => Err(err_closure(e)),
+        }
+    }
+
+    fn dep_decode_or_handle_err<I, H>(input: &mut I, err_handler: H) -> Result<Self, H::HandledErr>
+    where
+        I: NestedDecodeInput,
+        H: DecodeErrorHandler,
+    {
+        match Self::dep_decode(input) {
+            Ok(v) => Ok(v),
+            Err(e) => Err(err_handler.handle_error(e)),
         }
     }
 }

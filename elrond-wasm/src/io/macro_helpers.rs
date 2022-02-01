@@ -9,10 +9,9 @@ where
     T: TopDecode,
     AA: ManagedTypeApi + EndpointArgumentApi + ErrorApi,
 {
-    let input = ArgDecodeInput::<AA>::new(index);
-    let result = T::top_decode_or_err(input, |de_err| -> ! {
-        signal_arg_de_error::<AA>(arg_id, de_err)
-    });
+    let arg_input = ArgDecodeInput::<AA>::new(index);
+    let err_handler = ArgErrorHandler::<AA>::from(arg_id);
+    let result = T::top_decode_or_handle_err(arg_input, err_handler);
     let Ok(value) = result;
     value
 }
