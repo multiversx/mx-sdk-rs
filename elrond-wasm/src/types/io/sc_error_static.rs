@@ -1,6 +1,6 @@
 use elrond_codec::{DecodeError, EncodeError};
 
-use crate::api::EndpointFinishApi;
+use crate::api::{EndpointFinishApi, ErrorApiImpl};
 
 use super::SCError;
 
@@ -12,8 +12,8 @@ use super::SCError;
 pub struct StaticSCError(&'static [u8]);
 
 impl SCError for StaticSCError {
-    fn finish_err<FA: EndpointFinishApi>(&self, api: FA) -> ! {
-        api.signal_error(self.0)
+    fn finish_err<FA: EndpointFinishApi>(&self) -> ! {
+        FA::error_api_impl().signal_error(self.0)
     }
 }
 

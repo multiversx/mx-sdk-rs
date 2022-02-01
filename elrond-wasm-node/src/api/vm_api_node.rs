@@ -1,13 +1,13 @@
-use elrond_wasm::{api::VMApi, elrond_codec::TryStaticCast};
+use elrond_wasm::api::{CallTypeApi, StorageMapperApi, VMApi};
 
 /// The reference to the API implementation based on Arwen hooks.
 /// It continas no data, can be embedded at no cost.
 /// Cloning it is a no-op.
 pub struct VmApiImpl {}
 
-impl TryStaticCast for VmApiImpl {}
+impl CallTypeApi for VmApiImpl {}
 
-impl VMApi for VmApiImpl {}
+impl StorageMapperApi for VmApiImpl {}
 
 /// Should be no-op. The API implementation is zero-sized.
 impl Clone for VmApiImpl {
@@ -16,3 +16,13 @@ impl Clone for VmApiImpl {
         VmApiImpl {}
     }
 }
+
+impl PartialEq for VmApiImpl {
+    fn eq(&self, _: &Self) -> bool {
+        true
+    }
+}
+
+impl Eq for VmApiImpl {}
+
+impl VMApi for VmApiImpl {}

@@ -2,7 +2,7 @@
 #![allow(clippy::type_complexity)]
 
 mod call_async;
-mod call_sync;
+pub mod call_sync;
 mod call_transf_exec;
 mod contract_change_owner;
 mod contract_deploy;

@@ -55,6 +55,24 @@ impl ViewAttribute {
 }
 
 #[derive(Clone, Debug)]
+pub struct ExternalViewAttribute {
+    pub view_name: Option<syn::Ident>,
+}
+
+impl ExternalViewAttribute {
+    pub fn parse(attr: &syn::Attribute) -> Option<ExternalViewAttribute> {
+        match is_attr_with_one_opt_token_tree_arg(attr, ATTR_EXTERNAL_VIEW) {
+            None => None,
+            Some(Some(proc_macro2::TokenTree::Ident(ident))) => Some(ExternalViewAttribute {
+                view_name: Some(ident),
+            }),
+            Some(None) => Some(ExternalViewAttribute { view_name: None }),
+            _ => panic!("unexpected external view argument tokens"),
+        }
+    }
+}
+
+#[derive(Clone, Debug)]
 pub struct CallbackAttribute {
     pub callback_name: Option<syn::Ident>,
 }

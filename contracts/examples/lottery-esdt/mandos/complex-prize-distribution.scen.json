@@ -126,27 +126,27 @@
                 },
                 "address:acc1": {
                     "nonce": "0",
-                    "balance": "15175",
+                    "balance": "3,035",
                     "storage": {}
                 },
                 "address:acc2": {
                     "nonce": "0",
-                    "balance": "6070",
+                    "balance": "607",
                     "storage": {}
                 },
                 "address:acc3": {
                     "nonce": "0",
-                    "balance": "3035",
+                    "balance": "607",
                     "storage": {}
                 },
                 "address:acc4": {
                     "nonce": "0",
-                    "balance": "3035",
+                    "balance": "15,175",
                     "storage": {}
                 },
                 "address:acc5": {
                     "nonce": "0",
-                    "balance": "607",
+                    "balance": "6,070",
                     "storage": {}
                 },
                 "address:acc6": {
@@ -161,7 +161,7 @@
                 },
                 "address:acc8": {
                     "nonce": "0",
-                    "balance": "607",
+                    "balance": "30,350",
                     "storage": {}
                 },
                 "address:acc9": {
@@ -171,7 +171,7 @@
                 },
                 "address:acc10": {
                     "nonce": "0",
-                    "balance": "30350",
+                    "balance": "3,035",
                     "storage": {}
                 },
                 "sc:lottery": {

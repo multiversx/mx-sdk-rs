@@ -1,3 +1,5 @@
+#![feature(generic_associated_types)]
+
 use elrond_wasm::{
     api::ManagedTypeApi,
     derive::ManagedVecItem,
@@ -96,11 +98,6 @@ fn struct_from_bytes_reader() {
                 );
             },
         );
-    assert_eq!(s.num, struct_from_bytes.num);
-    assert_eq!(
-        s.token.token_identifier,
-        struct_from_bytes.token.token_identifier
-    );
-    assert_eq!(s.token.token_nonce, struct_from_bytes.token.token_nonce);
-    assert_eq!(s.token.amount, struct_from_bytes.token.amount);
+
+    assert_eq!(s, struct_from_bytes);
 }

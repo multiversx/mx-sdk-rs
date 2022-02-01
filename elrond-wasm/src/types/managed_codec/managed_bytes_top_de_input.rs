@@ -1,3 +1,5 @@
+use core::marker::PhantomData;
+
 use alloc::boxed::Box;
 use elrond_codec::{try_execute_then_cast, DecodeError, TopDecodeInput, TryStaticCast};
 
@@ -10,12 +12,15 @@ use super::ManagedBytesNestedDecodeInput;
 
 pub struct ManagedBytesTopDecodeInput<M: ManagedTypeApi> {
     bytes: BoxedBytes,
-    api: M,
+    _phantom: PhantomData<M>,
 }
 
 impl<M: ManagedTypeApi> ManagedBytesTopDecodeInput<M> {
-    pub fn new(api: M, bytes: BoxedBytes) -> Self {
-        ManagedBytesTopDecodeInput { bytes, api }
+    pub fn new(bytes: BoxedBytes) -> Self {
+        ManagedBytesTopDecodeInput {
+            bytes,
+            _phantom: PhantomData,
+        }
     }
 }
 
@@ -56,6 +61,6 @@ where
     }
 
     fn into_nested_buffer(self) -> Self::NestedBuffer {
-        ManagedBytesNestedDecodeInput::new(self.api, self.bytes.into_box())
+        ManagedBytesNestedDecodeInput::new(self.bytes.into_box())
     }
 }

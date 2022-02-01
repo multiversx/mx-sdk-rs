@@ -33,10 +33,18 @@ impl<M: ManagedTypeApi> EsdtTokenPaymentMultiArg<M> {
 impl<M: ManagedTypeApi> ManagedVecItem for EsdtTokenPaymentMultiArg<M> {
     const PAYLOAD_SIZE: usize = EsdtTokenPayment::<M>::PAYLOAD_SIZE;
     const SKIPS_RESERIALIZATION: bool = EsdtTokenPayment::<M>::SKIPS_RESERIALIZATION;
+    type Ref<'a> = Self;
 
     #[inline]
     fn from_byte_reader<Reader: FnMut(&mut [u8])>(reader: Reader) -> Self {
         EsdtTokenPayment::from_byte_reader(reader).into()
+    }
+
+    #[inline]
+    unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
+        reader: Reader,
+    ) -> Self::Ref<'a> {
+        Self::from_byte_reader(reader)
     }
 
     #[inline]
@@ -64,13 +72,13 @@ where
     type DecodeAs = EsdtTokenPaymentMultiArg<M>;
 
     #[inline]
-    fn finish<FA>(&self, api: FA)
+    fn finish<FA>(&self)
     where
-        FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static,
+        FA: ManagedTypeApi + EndpointFinishApi,
     {
-        self.obj.token_identifier.finish(api.clone());
-        self.obj.token_nonce.finish(api.clone());
-        self.obj.amount.finish(api);
+        self.obj.token_identifier.finish::<FA>();
+        self.obj.token_nonce.finish::<FA>();
+        self.obj.amount.finish::<FA>();
     }
 }
 
@@ -90,7 +98,7 @@ where
     M: ManagedTypeApi,
 {
     fn push_dyn_arg<O: DynArgOutput>(&self, output: &mut O) {
-        (&self).push_dyn_arg(output)
+        ContractCallArg::push_dyn_arg(&self, output)
     }
 }
 

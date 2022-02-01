@@ -36,11 +36,11 @@ impl EndpointResult for OperationCompletionStatus {
     type DecodeAs = BoxedBytes;
 
     #[inline]
-    fn finish<FA>(&self, api: FA)
+    fn finish<FA>(&self)
     where
-        FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static,
+        FA: ManagedTypeApi + EndpointFinishApi,
     {
-        self.output_bytes().finish(api);
+        self.output_bytes().finish::<FA>();
     }
 }
 

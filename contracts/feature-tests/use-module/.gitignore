@@ -7,4 +7,5 @@
 output
 
 # Used for debugging the ABI generator test
-use_module_generated.abi.json
+use_module_generated_main.abi.json
+use_module_generated_view.abi.json

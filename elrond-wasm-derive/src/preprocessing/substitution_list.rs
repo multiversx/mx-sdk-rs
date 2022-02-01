@@ -4,13 +4,16 @@ pub fn substitutions() -> SubstitutionsMap {
     let mut substitutions = SubstitutionsMap::new();
 
     add_managed_types(&mut substitutions);
-    add_special_methods(&mut substitutions);
     add_storage_mappers(&mut substitutions);
 
     substitutions
 }
 
+#[rustfmt::skip]
 fn add_managed_type(substitutions: &mut SubstitutionsMap, type_name: &proc_macro2::TokenStream) {
+    substitutions.add_substitution(
+        quote!(#type_name<Self::Api>), 
+        quote!(#type_name<Self::Api>));
     substitutions.add_substitution(
         quote!(#type_name::),
         quote!(elrond_wasm::types::#type_name::<Self::Api>::),
@@ -44,19 +47,12 @@ fn add_managed_types(substitutions: &mut SubstitutionsMap) {
     add_managed_type(substitutions, &quote!(ManagedAsyncCallError));
 
     add_managed_type_with_generics(substitutions, &quote!(ManagedVec));
-    add_managed_type_with_generics(substitutions, &quote!(ManagedVecIterator));
+    add_managed_type_with_generics(substitutions, &quote!(ManagedVecOwnedIterator));
     add_managed_type_with_generics(substitutions, &quote!(ManagedVarArgs));
     add_managed_type_with_generics(substitutions, &quote!(ManagedMultiResultVec));
     add_managed_type_with_generics(substitutions, &quote!(ManagedAsyncCallResult));
     add_managed_type_with_generics(substitutions, &quote!(ManagedCountedVarArgs));
     add_managed_type_with_generics(substitutions, &quote!(ManagedCountedMultiResultVec));
-}
-
-fn add_special_methods(substitutions: &mut SubstitutionsMap) {
-    substitutions.add_substitution(
-        quote!(.unwrap_or_signal_error()),
-        quote!(.unwrap_or_signal_error(self.raw_vm_api())),
-    );
 }
 
 fn add_storage_mapper_single_generic_arg(

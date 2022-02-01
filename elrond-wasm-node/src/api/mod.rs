@@ -7,14 +7,15 @@ mod error_api_node;
 mod log_api_node;
 mod managed_types;
 mod print_api_node;
+mod send_api_node;
 mod storage_api_node;
 mod unsafe_buffer;
 mod vm_api_node;
 
 #[cfg(not(feature = "unmanaged-ei"))]
-mod send_api_node_managed;
+mod send_api_node_impl_managed;
 
 #[cfg(feature = "unmanaged-ei")]
-mod send_api_node_legacy;
+mod send_api_node_impl_legacy;
 
 pub use vm_api_node::VmApiImpl;

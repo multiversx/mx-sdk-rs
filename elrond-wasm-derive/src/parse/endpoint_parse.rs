@@ -1,12 +1,12 @@
 use crate::model::{
-    CallbackMetadata, EndpointMetadata, EndpointMutabilityMetadata, InitMetadata, Method,
-    PublicRole,
+    CallbackMetadata, EndpointLocationMetadata, EndpointMetadata, EndpointMutabilityMetadata,
+    InitMetadata, Method, PublicRole,
 };
 
 use super::{
     attributes::{
         is_callback_raw, is_init, is_only_owner, CallbackAttribute, EndpointAttribute,
-        OutputNameAttribute, ViewAttribute,
+        ExternalViewAttribute, OutputNameAttribute, ViewAttribute,
     },
     MethodAttributesPass1,
 };
@@ -61,6 +61,7 @@ pub fn process_endpoint_attribute(
                 payable: pass_1_data.payable.clone(),
                 only_owner: pass_1_data.only_owner,
                 mutability: EndpointMutabilityMetadata::Mutable,
+                location: EndpointLocationMetadata::MainContract,
             });
         })
         .is_some()
@@ -83,6 +84,30 @@ pub fn process_view_attribute(
                 payable: pass_1_data.payable.clone(),
                 only_owner: pass_1_data.only_owner,
                 mutability: EndpointMutabilityMetadata::Readonly,
+                location: EndpointLocationMetadata::MainContract,
+            });
+        })
+        .is_some()
+}
+
+pub fn process_external_view_attribute(
+    attr: &syn::Attribute,
+    pass_1_data: &MethodAttributesPass1,
+    method: &mut Method,
+) -> bool {
+    ExternalViewAttribute::parse(attr)
+        .map(|external_view_attribute| {
+            check_single_role(&*method);
+            let view_ident = match external_view_attribute.view_name {
+                Some(ident) => ident,
+                None => method.name.clone(),
+            };
+            method.public_role = PublicRole::Endpoint(EndpointMetadata {
+                public_name: view_ident,
+                payable: pass_1_data.payable.clone(),
+                only_owner: pass_1_data.only_owner,
+                mutability: EndpointMutabilityMetadata::Readonly,
+                location: EndpointLocationMetadata::ViewContract,
             });
         })
         .is_some()

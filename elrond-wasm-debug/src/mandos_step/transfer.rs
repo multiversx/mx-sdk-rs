@@ -20,5 +20,5 @@ pub fn execute(state: &mut Rc<BlockchainMock>, tx_transfer: &TxTransfer) {
         gas_price: tx_transfer.gas_price.value,
         tx_hash: H256::zero(),
     };
-    sc_call(tx_input, state, true);
+    sc_call(tx_input, state, true).assert_ok();
 }

@@ -4,14 +4,14 @@ use crate::{
 };
 use elrond_codec::*;
 
-pub fn load_single_arg<AA, T>(api: AA, index: i32, arg_id: ArgId) -> T
+pub fn load_single_arg<AA, T>(index: i32, arg_id: ArgId) -> T
 where
     T: TopDecode,
     AA: ManagedTypeApi + EndpointArgumentApi + ErrorApi,
 {
-    let input = ArgDecodeInput::new(api.clone(), index);
-    let result = T::top_decode_or_err(input, |e| -> ! {
-        signal_arg_de_error(api.clone(), arg_id, e)
+    let input = ArgDecodeInput::<AA>::new(index);
+    let result = T::top_decode_or_err(input, |de_err| -> ! {
+        signal_arg_de_error::<AA>(arg_id, de_err)
     });
     let Ok(value) = result;
     value

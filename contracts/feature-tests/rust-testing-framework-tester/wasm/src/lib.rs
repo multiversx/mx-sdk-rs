@@ -7,7 +7,6 @@
 elrond_wasm_node::wasm_endpoints! {
     rust_testing_framework_tester
     (
-        init
         callBack
         addValue
         burn_esdt
@@ -22,6 +21,8 @@ elrond_wasm_node::wasm_endpoints! {
         get_caller_legacy
         get_egld_balance
         get_esdt_balance
+        get_random_buffer_once
+        get_random_buffer_twice
         mint_esdt
         receive_egld
         receive_esdt

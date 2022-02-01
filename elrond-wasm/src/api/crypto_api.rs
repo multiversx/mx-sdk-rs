@@ -1,23 +1,35 @@
-use crate::types::{BoxedBytes, ManagedBuffer, ManagedByteArray, MessageHashType, H256};
+use crate::types::{BoxedBytes, MessageHashType, H256};
 use alloc::boxed::Box;
 
-use super::ManagedTypeApi;
+use super::{Handle, ManagedTypeApi, ManagedTypeApiImpl};
 
 pub trait CryptoApi: ManagedTypeApi {
+    type CryptoApiImpl: CryptoApiImpl;
+
+    fn crypto_api_impl() -> Self::CryptoApiImpl;
+}
+
+pub trait CryptoApiImpl: ManagedTypeApiImpl {
     fn sha256_legacy(&self, data: &[u8]) -> H256;
 
-    fn sha256(&self, data: &ManagedBuffer<Self>) -> ManagedByteArray<Self, 32> {
-        self.sha256_legacy(data.to_boxed_bytes().as_slice())
-            .as_array()
-            .into()
+    fn sha256(&self, data_handle: Handle) -> Handle {
+        // default implementation used in debugger
+        // the VM has a dedicated hook
+        self.mb_new_from_bytes(
+            self.sha256_legacy(self.mb_to_boxed_bytes(data_handle).as_slice())
+                .as_array(),
+        )
     }
 
     fn keccak256_legacy(&self, data: &[u8]) -> H256;
 
-    fn keccak256(&self, data: &ManagedBuffer<Self>) -> ManagedByteArray<Self, 32> {
-        self.keccak256_legacy(data.to_boxed_bytes().as_slice())
-            .as_array()
-            .into()
+    fn keccak256(&self, data_handle: Handle) -> Handle {
+        // default implementation used in debugger
+        // the VM has a dedicated hook
+        self.mb_new_from_bytes(
+            self.keccak256_legacy(self.mb_to_boxed_bytes(data_handle).as_slice())
+                .as_array(),
+        )
     }
 
     fn ripemd160(&self, data: &[u8]) -> Box<[u8; 20]>;

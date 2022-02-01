@@ -1,12 +1,14 @@
+use core::marker::PhantomData;
+
 pub use super::vec_mapper::Iter;
 use super::{StorageClearable, StorageMapper, VecMapper};
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
-    api::{EndpointFinishApi, ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi},
+    api::{EndpointFinishApi, ManagedTypeApi, StorageMapperApi},
     finish_all,
     storage::StorageKey,
     storage_clear, storage_get, storage_set,
-    types::MultiResultVec,
+    types::{ManagedType, MultiResultVec},
     EndpointResult,
 };
 use elrond_codec::{NestedDecode, NestedEncode, TopDecode, TopEncode};
@@ -16,31 +18,31 @@ const NULL_ENTRY: usize = 0;
 
 pub struct UnorderedSetMapper<SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    SA: StorageMapperApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
 {
-    api: SA,
+    _phantom_api: PhantomData<SA>,
     base_key: StorageKey<SA>,
     vec_mapper: VecMapper<SA, T>,
 }
 
 impl<SA, T> StorageMapper<SA> for UnorderedSetMapper<SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    SA: StorageMapperApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode,
 {
-    fn new(api: SA, base_key: StorageKey<SA>) -> Self {
+    fn new(base_key: StorageKey<SA>) -> Self {
         UnorderedSetMapper {
-            api: api.clone(),
+            _phantom_api: PhantomData,
             base_key: base_key.clone(),
-            vec_mapper: VecMapper::<SA, T>::new(api, base_key),
+            vec_mapper: VecMapper::<SA, T>::new(base_key),
         }
     }
 }
 
 impl<SA, T> StorageClearable for UnorderedSetMapper<SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    SA: StorageMapperApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode,
 {
     fn clear(&mut self) {
@@ -53,7 +55,7 @@ where
 
 impl<SA, T> UnorderedSetMapper<SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    SA: StorageMapperApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode,
 {
     fn item_index_key(&self, value: &T) -> StorageKey<SA> {
@@ -64,15 +66,15 @@ where
     }
 
     pub fn get_index(&self, value: &T) -> usize {
-        storage_get(self.api.clone(), &self.item_index_key(value))
+        storage_get(self.item_index_key(value).as_ref())
     }
 
     fn set_index(&self, value: &T, index: usize) {
-        storage_set(self.api.clone(), &self.item_index_key(value), &index);
+        storage_set(self.item_index_key(value).as_ref(), &index);
     }
 
     fn clear_index(&self, value: &T) {
-        storage_clear(self.api.clone(), &self.item_index_key(value));
+        storage_clear(self.item_index_key(value).as_ref());
     }
 
     /// Returns `true` if the set contains no elements.
@@ -128,23 +130,23 @@ where
 /// Behaves like a MultiResultVec when an endpoint result.
 impl<SA, T> EndpointResult for UnorderedSetMapper<SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    SA: StorageMapperApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + EndpointResult,
 {
     type DecodeAs = MultiResultVec<T::DecodeAs>;
 
-    fn finish<FA>(&self, api: FA)
+    fn finish<FA>(&self)
     where
-        FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static,
+        FA: ManagedTypeApi + EndpointFinishApi,
     {
-        finish_all(api, self.iter());
+        finish_all::<FA, _, _>(self.iter());
     }
 }
 
 /// Behaves like a MultiResultVec when an endpoint result.
 impl<SA, T> TypeAbi for UnorderedSetMapper<SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    SA: StorageMapperApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + TypeAbi,
 {
     fn type_name() -> TypeName {

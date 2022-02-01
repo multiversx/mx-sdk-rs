@@ -18,7 +18,7 @@ pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
     fn gas_for_transfer_exec(&self) -> u64 {
         let gas_left = self.blockchain().get_gas_left();
         if gas_left <= PERFORM_ACTION_FINISH_GAS {
-            self.raw_vm_api().signal_error(b"insufficient gas for call");
+            Self::Api::error_api_impl().signal_error(b"insufficient gas for call");
         }
         gas_left - PERFORM_ACTION_FINISH_GAS
     }
@@ -136,11 +136,11 @@ pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
                     new_quorum <= self.num_board_members().get(),
                     "quorum cannot exceed board size"
                 );
-                self.quorum().set(&new_quorum);
+                self.quorum().set(new_quorum);
                 Ok(PerformActionResult::Nothing)
             },
             Action::SendTransferExecute(call_data) => {
-                let result = self.raw_vm_api().direct_egld_execute(
+                let result = Self::Api::send_api_impl().direct_egld_execute(
                     &call_data.to,
                     &call_data.egld_amount,
                     self.gas_for_transfer_exec(),
@@ -148,7 +148,7 @@ pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
                     &call_data.arguments.into(),
                 );
                 if let Result::Err(e) = result {
-                    self.raw_vm_api().signal_error(e);
+                    Self::Api::error_api_impl().signal_error(e);
                 }
                 Ok(PerformActionResult::Nothing)
             },
@@ -172,7 +172,7 @@ pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
                 arguments,
             } => {
                 let gas_left = self.blockchain().get_gas_left();
-                let (new_address, _) = self.raw_vm_api().deploy_from_source_contract(
+                let (new_address, _) = Self::Api::send_api_impl().deploy_from_source_contract(
                     gas_left,
                     &amount,
                     &source,
@@ -189,7 +189,7 @@ pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
                 arguments,
             } => {
                 let gas_left = self.blockchain().get_gas_left();
-                self.raw_vm_api().upgrade_from_source_contract(
+                Self::Api::send_api_impl().upgrade_from_source_contract(
                     &sc_address,
                     gas_left,
                     &amount,

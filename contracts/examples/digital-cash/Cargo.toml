@@ -1,0 +1,17 @@
+[package]
+name = "digital-cash"
+version = "0.0.0"
+authors = [ "Valentin Craciun"]
+edition = "2018"
+publish = false
+
+[lib]
+path = "src/digital_cash.rs"
+
+[dependencies.elrond-wasm]
+version = "0.27.3"
+path = "../../../elrond-wasm"
+
+[dev-dependencies.elrond-wasm-debug]
+version = "0.27.3"
+path = "../../../elrond-wasm-debug"
