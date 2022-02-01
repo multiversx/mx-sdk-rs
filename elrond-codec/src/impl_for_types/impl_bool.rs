@@ -10,7 +10,7 @@ use crate::{
     top_encode_from_no_err,
     top_ser::{TopEncode, TopEncodeNoErr},
     top_ser_output::TopEncodeOutput,
-    TypeInfo,
+    DecodeErrorHandler, TypeInfo,
 };
 
 impl TopEncodeNoErr for bool {
@@ -81,6 +81,18 @@ impl NestedDecode for bool {
             0 => Ok(false),
             1 => Ok(true),
             _ => Err(err_closure(DecodeError::INVALID_VALUE)),
+        }
+    }
+
+    fn dep_decode_or_handle_err<I, H>(input: &mut I, err_handler: H) -> Result<Self, H::HandledErr>
+    where
+        I: NestedDecodeInput,
+        H: DecodeErrorHandler,
+    {
+        match input.read_byte_or_handle_err(err_handler.clone())? {
+            0 => Ok(false),
+            1 => Ok(true),
+            _ => Err(err_handler.handle_error(DecodeError::INVALID_VALUE)),
         }
     }
 }

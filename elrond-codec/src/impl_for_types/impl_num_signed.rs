@@ -1,8 +1,8 @@
 use crate::{
     dep_encode_from_no_err, dep_encode_num_mimic, num_conv::bytes_to_number,
-    top_encode_from_no_err, top_ser::TopEncodeNoErr, DecodeError, EncodeError, NestedDecode,
-    NestedDecodeInput, NestedEncode, NestedEncodeNoErr, NestedEncodeOutput, TopDecode,
-    TopDecodeInput, TopEncode, TopEncodeOutput, TypeInfo,
+    top_encode_from_no_err, top_ser::TopEncodeNoErr, DecodeError, DecodeErrorHandler, EncodeError,
+    NestedDecode, NestedDecodeInput, NestedEncode, NestedEncodeNoErr, NestedEncodeOutput,
+    TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, TypeInfo,
 };
 
 macro_rules! top_encode_num_signed {
@@ -52,6 +52,20 @@ macro_rules! dep_decode_num_signed {
                 let num = bytes_to_number(&bytes[..], true) as $ty;
                 num
             }
+
+            fn dep_decode_or_handle_err<I, H>(
+                input: &mut I,
+                err_handler: H,
+            ) -> Result<Self, H::HandledErr>
+            where
+                I: NestedDecodeInput,
+                H: DecodeErrorHandler,
+            {
+                let mut bytes = [0u8; $num_bytes];
+                input.read_into_or_handle_err(&mut bytes[..], err_handler)?;
+                let num = bytes_to_number(&bytes[..], true) as $ty;
+                Ok(num)
+            }
         }
     };
 }
@@ -90,6 +104,24 @@ macro_rules! top_decode_num_signed {
                     exit(c, DecodeError::INPUT_OUT_OF_RANGE)
                 } else {
                     arg_i64 as $ty
+                }
+            }
+
+            fn top_decode_or_handle_err<I, H>(
+                input: I,
+                err_handler: H,
+            ) -> Result<Self, H::HandledErr>
+            where
+                I: TopDecodeInput,
+                H: DecodeErrorHandler,
+            {
+                let arg_i64 = input.into_i64();
+                let min = <$bounds_ty>::MIN as i64;
+                let max = <$bounds_ty>::MAX as i64;
+                if arg_i64 < min || arg_i64 > max {
+                    Err(err_handler.handle_error(DecodeError::INPUT_OUT_OF_RANGE))
+                } else {
+                    Ok(arg_i64 as $ty)
                 }
             }
         }

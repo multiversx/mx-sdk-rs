@@ -8,6 +8,7 @@ use crate::{
     top_de_input::TopDecodeInput,
     top_ser::TopEncode,
     top_ser_output::TopEncodeOutput,
+    DecodeErrorHandler,
 };
 
 impl<T: NestedEncode> NestedEncode for Option<T> {
@@ -178,6 +179,29 @@ impl<T: NestedDecode> TopDecode for Option<T> {
                 }
             } else {
                 Err(err_closure(DecodeError::INVALID_VALUE))
+            }
+        }
+    }
+
+    fn top_decode_or_handle_err<I, H>(input: I, err_handler: H) -> Result<Self, H::HandledErr>
+    where
+        I: TopDecodeInput,
+        H: DecodeErrorHandler,
+    {
+        let mut buffer = input.into_nested_buffer();
+        if buffer.is_depleted() {
+            Ok(None)
+        } else {
+            let first_byte = buffer.read_byte_or_handle_err(err_handler.clone())?;
+            if first_byte == 1 {
+                let item = T::dep_decode_or_handle_err(&mut buffer, err_handler.clone())?;
+                if buffer.is_depleted() {
+                    Ok(Some(item))
+                } else {
+                    Err(err_handler.handle_error(DecodeError::INPUT_TOO_LONG))
+                }
+            } else {
+                Err(err_handler.handle_error(DecodeError::INVALID_VALUE))
             }
         }
     }

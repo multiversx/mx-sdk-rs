@@ -1,8 +1,8 @@
 use crate::{
     dep_encode_from_no_err, dep_encode_num_mimic, num_conv::bytes_to_number,
-    top_encode_from_no_err, top_ser::TopEncodeNoErr, DecodeError, EncodeError, NestedDecode,
-    NestedDecodeInput, NestedEncode, NestedEncodeNoErr, NestedEncodeOutput, TopDecode,
-    TopDecodeInput, TopEncode, TopEncodeOutput, TypeInfo,
+    top_encode_from_no_err, top_ser::TopEncodeNoErr, DecodeError, DecodeErrorHandler, EncodeError,
+    NestedDecode, NestedDecodeInput, NestedEncode, NestedEncodeNoErr, NestedEncodeOutput,
+    TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, TypeInfo,
 };
 
 // No reversing needed for u8, because it is a single byte.
@@ -123,6 +123,23 @@ macro_rules! top_decode_num_unsigned {
                     exit(c, DecodeError::INPUT_TOO_LONG)
                 } else {
                     arg_u64 as $ty
+                }
+            }
+
+            fn top_decode_or_handle_err<I, H>(
+                input: I,
+                err_handler: H,
+            ) -> Result<Self, H::HandledErr>
+            where
+                I: TopDecodeInput,
+                H: DecodeErrorHandler,
+            {
+                let arg_u64 = input.into_u64();
+                let max = <$bounds_ty>::MAX as u64;
+                if arg_u64 > max {
+                    Err(err_handler.handle_error(DecodeError::INPUT_TOO_LONG))
+                } else {
+                    Ok(arg_u64 as $ty)
                 }
             }
         }

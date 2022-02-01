@@ -2,6 +2,7 @@
 #![feature(try_trait_v2)]
 #![feature(never_type)]
 #![feature(exhaustive_patterns)]
+#![allow(unused_imports)] // TODO: TEMP
 
 extern crate alloc;
 
@@ -17,6 +18,7 @@ pub use arrayvec;
 // TODO: group into smaller sub-modules
 
 mod codec_err;
+mod codec_err_handler;
 mod default_traits;
 mod impl_for_types;
 mod nested_de;
@@ -43,6 +45,7 @@ pub use crate::{
     },
 };
 pub use codec_err::{DecodeError, EncodeError};
+pub use codec_err_handler::*;
 pub use default_traits::{DecodeDefault, EncodeDefault};
 pub use nested_de::NestedDecode;
 pub use nested_de_input_owned::OwnedBytesNestedDecodeInput;
