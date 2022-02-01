@@ -34,8 +34,13 @@ fn forw_raw_async_accept_egld_rs() {
 }
 
 #[test]
-fn forw_raw_create_async_call_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/forw_raw_create_async_call.scen.json", world());
+fn forw_raw_register_promise_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/forw_raw_register_promise.scen.json", world());
+}
+
+#[test]
+fn forw_raw_promise_multi_transfer_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/forw_raw_promise_multi_transfer.scen.json", world());
 }
 
 #[test]

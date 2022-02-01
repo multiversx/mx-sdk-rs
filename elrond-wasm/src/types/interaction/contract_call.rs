@@ -198,9 +198,6 @@ where
                 let zero = BigUint::zero();
                 let endpoint_name = ManagedBuffer::new_from_bytes(ESDT_TRANSFER_FUNC_NAME);
 
-                let success_callback = b"";
-                let error_callback = b"";
-
                 ContractCall {
                     _phantom: PhantomData,
                     to: self.to,
@@ -211,8 +208,8 @@ where
                     endpoint_name,
                     arg_buffer: new_arg_buffer.concat(self.arg_buffer),
                     _return_type: PhantomData,
-                    success_callback,
-                    error_callback,
+                    success_callback: self.success_callback,
+                    error_callback: self.error_callback,
                 }
             } else {
                 let payments = self.no_payments();
@@ -237,9 +234,6 @@ where
                 let zero = BigUint::zero();
                 let endpoint_name = ManagedBuffer::new_from_bytes(ESDT_NFT_TRANSFER_FUNC_NAME);
 
-                let success_callback = b"";
-                let error_callback = b"";
-
                 ContractCall {
                     _phantom: PhantomData,
                     to: recipient_addr,
@@ -250,8 +244,8 @@ where
                     endpoint_name,
                     arg_buffer: new_arg_buffer.concat(self.arg_buffer),
                     _return_type: PhantomData,
-                    success_callback,
-                    error_callback,
+                    success_callback: self.success_callback,
+                    error_callback: self.error_callback,
                 }
             }
         } else {
@@ -279,9 +273,6 @@ where
         let zero = BigUint::zero();
         let endpoint_name = ManagedBuffer::new_from_bytes(ESDT_MULTI_TRANSFER_FUNC_NAME);
 
-        let success_callback = b"";
-        let error_callback = b"";
-
         ContractCall {
             _phantom: PhantomData,
             to: recipient_addr,
@@ -292,8 +283,8 @@ where
             endpoint_name,
             arg_buffer: new_arg_buffer.concat(self.arg_buffer),
             _return_type: PhantomData,
-            success_callback,
-            error_callback,
+            success_callback: self.success_callback,
+            error_callback: self.error_callback,
         }
     }
 
@@ -317,7 +308,8 @@ where
         }
     }
 
-    pub fn register_promise(self) {
+    pub fn register_promise(mut self) {
+        self = self.convert_to_esdt_transfer_call();
         SA::send_api_impl().create_async_call_raw(
             &self.to,
             &self.egld_payment,

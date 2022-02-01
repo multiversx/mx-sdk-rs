@@ -22,13 +22,14 @@ elrond_wasm_node::wasm_endpoints! {
         forward_async_call
         forward_async_call_half_payment
         forward_async_retrieve_multi_transfer_funds
-        forward_create_async_call
         forward_direct_esdt_via_transf_exec
         forward_payment
+        forward_register_promse
         forward_transf_exec
         forward_transf_exec_egld
         forward_transf_exec_esdt
         forwarder_async_send_and_retrieve_multi_transfer_funds
+        forwarder_multi_transfer_via_promise
         success_callback
         upgrade
         upgrade_from_source
