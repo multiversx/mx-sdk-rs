@@ -1,9 +1,11 @@
 use std::{collections::HashMap, rc::Rc};
 
+use elrond_wasm::types::Address;
+
 use crate::{
     tx_mock::{
-        async_call_tx_input, async_callback_tx_input, merge_results, AsyncCallTxData, TxCache,
-        TxContext, TxInput, TxResult, TxResultCalls,
+        async_call_tx_input, async_callback_tx_input, async_promise_tx_input, merge_results,
+        AsyncCallTxData, Promise, TxCache, TxContext, TxInput, TxResult, TxResultCalls,
     },
     world_mock::{AccountData, AccountEsdt, BlockchainMock},
 };
@@ -79,6 +81,8 @@ pub fn sc_call_with_async_and_callback(
     state: &mut Rc<BlockchainMock>,
     increase_nonce: bool,
 ) -> TxResult {
+    let contract_address = tx_input.to.clone();
+
     let mut tx_result = sc_call(tx_input, state, increase_nonce);
     let result_calls = std::mem::replace(&mut tx_result.result_calls, TxResultCalls::empty());
     if tx_result.result_status == 0 {
@@ -91,5 +95,47 @@ pub fn sc_call_with_async_and_callback(
         }
     }
 
+    for callback in result_calls.promises {
+        let (async_result, callback_result) =
+            execute_promise_call_and_callback(&contract_address, &callback, state);
+
+        tx_result = merge_results(tx_result, async_result.clone());
+        tx_result = merge_results(tx_result, callback_result.clone());
+    }
+
     tx_result
+}
+
+pub fn execute_promise_call_and_callback(
+    address: &Address,
+    promise: &Promise,
+    state: &mut Rc<BlockchainMock>,
+) -> (TxResult, TxResult) {
+    if state.accounts.contains_key(&promise.endpoint.to) {
+        let async_input = async_call_tx_input(&promise.endpoint);
+        let async_result = sc_call_with_async_and_callback(async_input, state, false);
+
+        let callback_input = async_promise_tx_input(address, promise, &async_result);
+        let callback_result = sc_call(callback_input, state, false);
+        assert!(
+            callback_result.result_calls.promises.is_empty(),
+            "successive promises currently not supported"
+        );
+        (async_result, callback_result)
+    } else {
+        let tx_cache = TxCache::new(state.clone());
+        tx_cache.subtract_egld_balance(address, &promise.endpoint.call_value);
+        tx_cache.insert_account(AccountData {
+            address: promise.endpoint.to.clone(),
+            nonce: 0,
+            egld_balance: promise.endpoint.call_value.clone(),
+            esdt: AccountEsdt::default(),
+            username: Vec::new(),
+            storage: HashMap::new(),
+            contract_path: None,
+            contract_owner: None,
+        });
+        state.commit_tx_cache(tx_cache);
+        (TxResult::empty(), TxResult::empty())
+    }
 }
