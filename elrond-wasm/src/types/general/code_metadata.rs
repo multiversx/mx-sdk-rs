@@ -1,116 +1,59 @@
 use crate::abi::TypeAbi;
 use alloc::string::String;
-use core::ops::{BitOr, BitOrAssign};
+use bitflags::bitflags;
 use elrond_codec::*;
 
-/// Flags concerning smart contract creation and upgrade.
-/// Currently always represented as a 2-byte bitfield.
-#[derive(Clone, Copy, PartialEq)]
-pub struct CodeMetadata([u8; 2]);
-
-const METADATA_UPGRADEABLE_BYTE: usize = 0;
-const METADATA_UPGRADEABLE_MASK: u8 = 1;
-const METADATA_PAYABLE_BYTE: usize = 1;
-const METADATA_PAYABLE_MASK: u8 = 2;
-const METADATA_READABLE_BYTE: usize = 0;
-const METADATA_READABLE_MASK: u8 = 4;
+bitflags! {
+    #[derive(Default)]
+    pub struct CodeMetadata: u16 {
+        const DEFAULT = 0;
+        const UPGRADEABLE = 0b0000_0001_0000_0000; // LSB of first byte
+        const READABLE = 0b0000_0100_0000_0000; // 3rd LSB of first byte
+        const PAYABLE = 0b0000_0000_0000_0010; // 2nd LSB of second byte
+        const PAYABLE_BY_SC = 0b0000_0000_0000_0100; // 3rd LSB of second byte
+    }
+}
 
 impl CodeMetadata {
-    pub const DEFAULT: CodeMetadata = CodeMetadata([0, 0]);
-    pub const UPGRADEABLE: CodeMetadata = CodeMetadata([METADATA_UPGRADEABLE_MASK, 0]);
-    pub const PAYABLE: CodeMetadata = CodeMetadata([0, METADATA_PAYABLE_MASK]);
-    pub const READABLE: CodeMetadata = CodeMetadata([METADATA_READABLE_MASK, 0]);
-
     pub fn is_upgradeable(&self) -> bool {
-        self.0[METADATA_UPGRADEABLE_BYTE] & METADATA_UPGRADEABLE_MASK > 0
+        *self & CodeMetadata::UPGRADEABLE != CodeMetadata::DEFAULT
     }
 
     pub fn is_payable(&self) -> bool {
-        self.0[METADATA_PAYABLE_BYTE] & METADATA_PAYABLE_MASK > 0
+        *self & CodeMetadata::PAYABLE != CodeMetadata::DEFAULT
+    }
+
+    pub fn is_payable_by_sc(&self) -> bool {
+        *self & CodeMetadata::PAYABLE_BY_SC != CodeMetadata::DEFAULT
     }
 
     pub fn is_readable(&self) -> bool {
-        self.0[METADATA_READABLE_BYTE] & METADATA_READABLE_MASK > 0
-    }
-
-    pub fn from_flags(upgradeable: bool, payable: bool, readable: bool) -> CodeMetadata {
-        let mut code_metadata = CodeMetadata::DEFAULT;
-        if upgradeable {
-            code_metadata |= CodeMetadata::UPGRADEABLE;
-        }
-        if payable {
-            code_metadata |= CodeMetadata::PAYABLE;
-        }
-        if readable {
-            code_metadata |= CodeMetadata::READABLE;
-        }
-        code_metadata
+        *self & CodeMetadata::READABLE != CodeMetadata::DEFAULT
     }
 
     #[inline]
-    pub fn as_ptr(&self) -> *const u8 {
-        self.0[..].as_ptr()
-    }
-
-    #[inline]
-    pub fn into_bytes(self) -> [u8; 2] {
-        self.0
-    }
-
-    pub fn to_u16(&self) -> u16 {
-        u16::from_be_bytes(self.0)
+    pub fn to_byte_array(&self) -> [u8; 2] {
+        self.bits().to_be_bytes()
     }
 }
 
 impl From<[u8; 2]> for CodeMetadata {
     #[inline]
     fn from(arr: [u8; 2]) -> Self {
-        CodeMetadata(arr)
+        CodeMetadata::from(u16::from_be_bytes(arr))
     }
 }
 
 impl From<u16> for CodeMetadata {
     #[inline]
     fn from(value: u16) -> Self {
-        CodeMetadata(value.to_be_bytes())
-    }
-}
-
-impl BitOr for CodeMetadata {
-    type Output = CodeMetadata;
-
-    fn bitor(self, other: CodeMetadata) -> CodeMetadata {
-        CodeMetadata([self.0[0] | other.0[0], self.0[1] | other.0[1]])
-    }
-}
-
-impl<'a, 'b> BitOr<&'b CodeMetadata> for &'a CodeMetadata {
-    type Output = CodeMetadata;
-
-    fn bitor(self, other: &CodeMetadata) -> CodeMetadata {
-        CodeMetadata([self.0[0] | other.0[0], self.0[1] | other.0[1]])
-    }
-}
-
-impl BitOrAssign<CodeMetadata> for CodeMetadata {
-    #[inline]
-    fn bitor_assign(&mut self, other: Self) {
-        self.0[0] |= other.0[0];
-        self.0[1] |= other.0[1];
-    }
-}
-
-impl BitOrAssign<&CodeMetadata> for CodeMetadata {
-    #[inline]
-    fn bitor_assign(&mut self, other: &CodeMetadata) {
-        self.0[0] |= other.0[0];
-        self.0[1] |= other.0[1];
+        CodeMetadata::from_bits_truncate(value)
     }
 }
 
 impl NestedEncode for CodeMetadata {
     fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
-        self.to_u16().dep_encode(dest)?;
+        self.bits().dep_encode(dest)?;
         Ok(())
     }
 
@@ -120,7 +63,7 @@ impl NestedEncode for CodeMetadata {
         c: ExitCtx,
         exit: fn(ExitCtx, EncodeError) -> !,
     ) {
-        self.to_u16().dep_encode_or_exit(dest, c, exit);
+        self.bits().dep_encode_or_exit(dest, c, exit);
     }
 }
 
@@ -187,18 +130,42 @@ mod tests {
     }
 
     #[test]
-    fn test_const() {
-        assert!(CodeMetadata::UPGRADEABLE.is_upgradeable());
-        assert!(CodeMetadata::PAYABLE.is_payable());
-        assert!(CodeMetadata::READABLE.is_readable());
+    fn test_all() {
+        let all = CodeMetadata::UPGRADEABLE
+            | CodeMetadata::PAYABLE
+            | CodeMetadata::PAYABLE_BY_SC
+            | CodeMetadata::READABLE;
+        assert!(all.is_upgradeable());
+        assert!(all.is_payable());
+        assert!(all.is_payable_by_sc());
+        assert!(all.is_readable());
+
+        assert_eq!(all.bits(), 0x0506);
+
+        assert_eq!(CodeMetadata::from_bits_truncate(0xffff), all);
     }
 
     #[test]
-    fn test_all() {
-        let all = CodeMetadata::UPGRADEABLE | CodeMetadata::PAYABLE | CodeMetadata::READABLE;
-        assert!(all.is_upgradeable());
-        assert!(all.is_payable());
-        assert!(all.is_readable());
+    fn test_each() {
+        assert!(CodeMetadata::UPGRADEABLE.is_upgradeable());
+        assert!(!CodeMetadata::PAYABLE.is_upgradeable());
+        assert!(!CodeMetadata::PAYABLE_BY_SC.is_upgradeable());
+        assert!(!CodeMetadata::READABLE.is_upgradeable());
+
+        assert!(!CodeMetadata::UPGRADEABLE.is_payable());
+        assert!(CodeMetadata::PAYABLE.is_payable());
+        assert!(!CodeMetadata::PAYABLE_BY_SC.is_payable());
+        assert!(!CodeMetadata::READABLE.is_payable());
+
+        assert!(!CodeMetadata::UPGRADEABLE.is_payable_by_sc());
+        assert!(!CodeMetadata::PAYABLE.is_payable_by_sc());
+        assert!(CodeMetadata::PAYABLE_BY_SC.is_payable_by_sc());
+        assert!(!CodeMetadata::READABLE.is_payable_by_sc());
+
+        assert!(!CodeMetadata::UPGRADEABLE.is_readable());
+        assert!(!CodeMetadata::PAYABLE.is_readable());
+        assert!(!CodeMetadata::PAYABLE_BY_SC.is_readable());
+        assert!(CodeMetadata::READABLE.is_readable());
     }
 
     /// Translated from vm-wasm.
@@ -212,17 +179,5 @@ mod tests {
         assert!(!CodeMetadata::from([0, 0]).is_upgradeable());
         assert!(!CodeMetadata::from([0, 0]).is_payable());
         assert!(!CodeMetadata::from([0, 0]).is_readable());
-    }
-
-    #[test]
-    fn test_from_flags() {
-        assert!(CodeMetadata::from_flags(true, false, false).is_upgradeable());
-        assert!(CodeMetadata::from_flags(false, true, false).is_payable());
-        assert!(CodeMetadata::from_flags(false, false, true).is_readable());
-        assert!(!CodeMetadata::from_flags(false, false, false).is_upgradeable());
-        assert!(!CodeMetadata::from_flags(false, false, false).is_payable());
-        assert!(!CodeMetadata::from_flags(false, false, false).is_readable());
-
-        assert_eq!(CodeMetadata::from_flags(true, true, true).to_u16(), 0x0502);
     }
 }

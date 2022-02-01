@@ -1,4 +1,5 @@
 #![no_std]
+#![feature(generic_associated_types)]
 
 elrond_wasm::imports!();
 
@@ -35,6 +36,10 @@ pub trait AbiTester {
     fn echo_enum(&self, e: AbiEnum) -> AbiEnum {
         e
     }
+
+    #[endpoint]
+    #[only_owner]
+    fn take_managed_type(&self, _arg: AbiManagedType<Self::Api>) {}
 
     #[endpoint]
     #[output_name("multi-result-1")]
@@ -109,7 +114,46 @@ pub trait AbiTester {
 
     #[view]
     #[storage_mapper("sample_storage_mapper")]
-    fn sample_storage_mapper(&self) -> SingleValueMapper<OnlyShowsUpAsNested10>;
+    fn sample_storage_mapper(&self) -> SingleValueMapper<OnlyShowsUpAsNestedInSingleValueMapper>;
+
+    #[view]
+    fn item_for_vec(&self) -> Vec<OnlyShowsUpAsNestedInVec> {
+        Vec::new()
+    }
+
+    #[view]
+    fn item_for_array_vec(&self) -> ArrayVec<OnlyShowsUpAsNestedInArrayVec, 3> {
+        ArrayVec::new()
+    }
+
+    #[view]
+    fn item_for_managed_vec(&self) -> ManagedVec<AbiManagedVecItem> {
+        ManagedVec::new()
+    }
+
+    #[view]
+    fn item_for_array(&self, _array: &[OnlyShowsUpAsNestedInArray; 5]) {}
+
+    #[view]
+    fn item_for_box(&self) -> Box<OnlyShowsUpAsNestedInBox> {
+        Box::new(OnlyShowsUpAsNestedInBox)
+    }
+
+    #[view]
+    fn item_for_boxed_slice(&self) -> Box<[OnlyShowsUpAsNestedInBoxedSlice]> {
+        Vec::new().into_boxed_slice()
+    }
+
+    #[view]
+    fn item_for_ref(&self, _ref: &OnlyShowsUpAsNestedInRef) {}
+
+    #[view]
+    fn item_for_slice(&self, _ref: &[OnlyShowsUpAsNestedInSlice]) {}
+
+    #[view]
+    fn item_for_option(&self) -> Option<OnlyShowsUpAsNestedInOption> {
+        None
+    }
 
     #[endpoint]
     #[payable("EGLD")]
@@ -133,4 +177,7 @@ pub trait AbiTester {
         #[payment_token] _token: TokenIdentifier,
     ) {
     }
+
+    #[external_view]
+    fn external_view(&self) {}
 }

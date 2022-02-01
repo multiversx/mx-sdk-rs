@@ -1,21 +1,29 @@
+use core::marker::PhantomData;
+
 use crate::{
-    api::{BlockchainApi, ManagedTypeApi, PrintApi},
-    types::BigUint,
+    api::{ManagedTypeApi, PrintApi, PrintApiImpl},
+    types::{BigUint, ManagedType},
 };
 
-pub struct PrintHelper<M: ManagedTypeApi> {
-    api: M,
+#[derive(Default)]
+pub struct PrintHelper<A>
+where
+    A: PrintApi + ManagedTypeApi,
+{
+    _phantom: PhantomData<A>,
 }
 
-impl<M: ManagedTypeApi> PrintHelper<M>
+impl<A> PrintHelper<A>
 where
-    M: PrintApi + ManagedTypeApi + BlockchainApi,
+    A: PrintApi + ManagedTypeApi,
 {
-    pub(crate) fn new(api: M) -> Self {
-        PrintHelper { api }
+    pub(crate) fn new() -> Self {
+        PrintHelper {
+            _phantom: PhantomData,
+        }
     }
 
-    pub fn print_biguint(&self, biguint: &BigUint<M>) {
-        self.api.print_biguint(biguint);
+    pub fn print_biguint(&self, biguint: &BigUint<A>) {
+        A::print_api_impl().print_biguint(biguint.get_raw_handle());
     }
 }

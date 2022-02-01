@@ -1,8 +1,10 @@
+use core::marker::PhantomData;
+
 use super::properties::*;
 use hex_literal::hex;
 
 use crate::{
-    api::SendApi,
+    api::{CallTypeApi, SendApi},
     types::{
         Address, BigUint, ContractCall, EsdtLocalRole, EsdtTokenType, ManagedAddress,
         ManagedBuffer, TokenIdentifier,
@@ -18,6 +20,7 @@ const ISSUE_FUNGIBLE_ENDPOINT_NAME: &[u8] = b"issue";
 const ISSUE_NON_FUNGIBLE_ENDPOINT_NAME: &[u8] = b"issueNonFungible";
 const ISSUE_SEMI_FUNGIBLE_ENDPOINT_NAME: &[u8] = b"issueSemiFungible";
 const REGISTER_META_ESDT_ENDPOINT_NAME: &[u8] = b"registerMetaESDT";
+const ISSUE_AND_SET_ALL_ROLES_ENDPOINT_NAME: &[u8] = b"registerAndSetAllRoles";
 
 /// Proxy for the ESDT system smart contract.
 /// Unlike other contract proxies, this one has a fixed address,
@@ -26,7 +29,7 @@ pub struct ESDTSystemSmartContractProxy<SA>
 where
     SA: SendApi + 'static,
 {
-    pub api: SA,
+    _phantom: PhantomData<SA>,
 }
 
 impl<SA> ESDTSystemSmartContractProxy<SA>
@@ -35,14 +38,16 @@ where
 {
     /// Constructor.
     /// TODO: consider moving this to a new Proxy contructor trait (bonus: better proxy constructor syntax).
-    pub fn new_proxy_obj(api: SA) -> Self {
-        ESDTSystemSmartContractProxy { api }
+    pub fn new_proxy_obj() -> Self {
+        ESDTSystemSmartContractProxy {
+            _phantom: PhantomData,
+        }
     }
 }
 
 impl<SA> ESDTSystemSmartContractProxy<SA>
 where
-    SA: SendApi + 'static,
+    SA: CallTypeApi + 'static,
 {
     /// Produces a contract call to the ESDT system SC,
     /// which causes it to issue a new fungible ESDT token.
@@ -154,6 +159,38 @@ where
         )
     }
 
+    pub fn issue_and_set_all_roles(
+        self,
+        issue_cost: BigUint<SA>,
+        token_display_name: ManagedBuffer<SA>,
+        token_ticker: ManagedBuffer<SA>,
+        token_type: EsdtTokenType,
+        num_decimals: usize,
+    ) -> ContractCall<SA, ()> {
+        let esdt_system_sc_address = self.esdt_system_sc_address();
+
+        let mut contract_call = ContractCall::new(
+            esdt_system_sc_address,
+            ManagedBuffer::new_from_bytes(ISSUE_AND_SET_ALL_ROLES_ENDPOINT_NAME),
+        )
+        .with_egld_transfer(issue_cost);
+
+        contract_call.push_endpoint_arg(token_display_name);
+        contract_call.push_endpoint_arg(token_ticker);
+
+        let token_type_name = match token_type {
+            EsdtTokenType::Fungible => &b"FNG"[..],
+            EsdtTokenType::NonFungible => &b"NFT"[..],
+            EsdtTokenType::SemiFungible => &b"SFT"[..],
+            EsdtTokenType::Meta => &b"META"[..],
+            EsdtTokenType::Invalid => &[],
+        };
+        contract_call.push_endpoint_arg(token_type_name);
+        contract_call.push_endpoint_arg(num_decimals);
+
+        contract_call
+    }
+
     /// Deduplicates code from all the possible issue functions
     fn issue(
         self,
@@ -175,7 +212,6 @@ where
         };
 
         let mut contract_call = ContractCall::new(
-            self.api,
             esdt_system_sc_address,
             ManagedBuffer::new_from_bytes(endpoint_name),
         )
@@ -412,7 +448,6 @@ where
     fn esdt_system_sc_call_no_args(self, endpoint_name: &[u8]) -> ContractCall<SA, ()> {
         let esdt_system_sc_address = self.esdt_system_sc_address();
         ContractCall::new(
-            self.api,
             esdt_system_sc_address,
             ManagedBuffer::new_from_bytes(endpoint_name),
         )
@@ -432,7 +467,7 @@ fn bool_name_bytes(b: bool) -> &'static [u8] {
 
 fn set_token_property<SA, R>(contract_call: &mut ContractCall<SA, R>, name: &[u8], value: bool)
 where
-    SA: SendApi + 'static,
+    SA: CallTypeApi + 'static,
 {
     contract_call.push_argument_raw_bytes(name);
     contract_call.push_argument_raw_bytes(bool_name_bytes(value));

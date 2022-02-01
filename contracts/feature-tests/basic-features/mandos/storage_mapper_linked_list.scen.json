@@ -141,6 +141,94 @@
             }
         },
         {
+            "step": "scCall",
+            "txId": "set-node-value",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "listMapperSetValue",
+                "arguments": [
+                    "1",
+                    "500"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "check-list-after-set-value",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "getListMapper",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "500",
+                    "111"
+                ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "set-node-value-by-id",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "listMapperSetValueById",
+                "arguments": [
+                    "1",
+                    "123"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "check-list-after-set-value-back-to-original",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "getListMapper",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "123",
+                    "111"
+                ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
             "step": "checkState",
             "accounts": {
                 "sc:basic-features": {

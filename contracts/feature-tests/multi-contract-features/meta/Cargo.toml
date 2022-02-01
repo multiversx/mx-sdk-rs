@@ -1,0 +1,17 @@
+[package]
+name = "multi-contract-features-meta"
+version = "0.0.0"
+authors = ["Andrei Marinica <andrei.marinica@elrond.com>"]
+edition = "2018"
+publish = false
+
+[dependencies.multi-contract-features]
+path = ".."
+
+[dependencies.elrond-wasm]
+version = "0.27.3"
+path = "../../../../elrond-wasm"
+
+[dependencies.elrond-wasm-debug]
+version = "0.27.3"
+path = "../../../../elrond-wasm-debug"

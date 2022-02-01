@@ -111,6 +111,15 @@ impl ManagedBufferApi for DebugApi {
         }
     }
 
+    fn mb_set_random(&self, dest_handle: Handle, length: usize) {
+        let mut managed_types = self.m_types_borrow_mut();
+        let bytes = managed_types.managed_buffer_map.get_mut(dest_handle);
+        bytes.resize(length, 0);
+
+        let mut rng = self.rng_borrow_mut();
+        rng.fill(&mut bytes[..]);
+    }
+
     fn mb_append(&self, accumulator_handle: Handle, data_handle: Handle) {
         let mut managed_types = self.m_types_borrow_mut();
         let mut data = managed_types.managed_buffer_map.get(data_handle).clone();

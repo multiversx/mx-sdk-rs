@@ -130,6 +130,30 @@ pub trait Vault {
         sc_error!("reject_funds")
     }
 
+    #[payable("*")]
+    #[endpoint]
+    fn retrieve_funds_with_transfer_exec(
+        &self,
+        #[payment_multi] _payments: ManagedVec<EsdtTokenPayment<Self::Api>>,
+        token: TokenIdentifier,
+        amount: BigUint,
+        #[var_args] opt_receive_func: OptionalArg<ManagedBuffer>,
+    ) -> SCResult<()> {
+        let caller = self.blockchain().get_caller();
+        let func_name = opt_receive_func.into_option().unwrap_or_default();
+
+        Self::Api::send_api_impl()
+            .direct_esdt_execute(
+                &caller,
+                &token,
+                &amount,
+                50_000_000,
+                &func_name,
+                &ManagedArgBuffer::new_empty(),
+            )
+            .into()
+    }
+
     #[endpoint]
     fn retrieve_funds(
         &self,

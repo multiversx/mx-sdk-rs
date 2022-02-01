@@ -1,3 +1,5 @@
+#![feature(generic_associated_types)]
+
 use elrond_wasm::{
     api::ManagedTypeApi,
     derive::ManagedVecItem,
@@ -66,6 +68,5 @@ fn managed_struct_from_bytes_reader() {
                             ..<ManagedStructWithBigUint::<DebugApi> as elrond_wasm::types::ManagedVecItem>::PAYLOAD_SIZE],
                 );
     });
-    assert_eq!(s.num, struct_from_bytes.num);
-    assert_eq!(s.big_uint, struct_from_bytes.big_uint);
+    assert_eq!(s, struct_from_bytes);
 }

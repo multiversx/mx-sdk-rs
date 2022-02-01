@@ -4,19 +4,17 @@ fn world() -> BlockchainMock {
     let mut blockchain = BlockchainMock::new();
     blockchain.set_current_dir_from_workspace("contracts/examples/multisig");
 
-    blockchain.register_contract(
-        "file:output/multisig.wasm",
-        Box::new(|context| Box::new(multisig::contract_obj(context))),
+    blockchain.register_contract_builder("file:output/multisig.wasm", multisig::ContractBuilder);
+    blockchain.register_external_view_contract_builder(
+        "file:output/multisig-view.wasm",
+        multisig::ContractBuilder,
     );
 
-    blockchain.register_contract(
-        "file:test-contracts/adder.wasm",
-        Box::new(|context| Box::new(adder::contract_obj(context))),
-    );
+    blockchain.register_contract_builder("file:test-contracts/adder.wasm", adder::ContractBuilder);
 
-    blockchain.register_contract(
+    blockchain.register_contract_builder(
         "file:test-contracts/factorial.wasm",
-        Box::new(|context| Box::new(factorial::contract_obj(context))),
+        factorial::ContractBuilder,
     );
 
     blockchain

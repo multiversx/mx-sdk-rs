@@ -54,7 +54,7 @@ fn get_contract_identifier(tx_context: &TxContext) -> Vec<u8> {
 
 /// The actual execution and the extraction/wrapping of results.
 fn execute_contract_instance_endpoint(
-    contract_instance: Box<dyn CallableContract<DebugApi>>,
+    contract_instance: Box<dyn CallableContract>,
     endpoint_name: &[u8],
 ) -> TxResult {
     let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
@@ -65,16 +65,19 @@ fn execute_contract_instance_endpoint(
                 message: b"invalid function (not found)".to_vec(),
             });
         }
-        let debug_api = contract_instance.into_api();
-        debug_api.into_tx_result()
+        DebugApi::new_from_static().into_tx_result()
     }));
     match result {
         Ok(tx_output) => tx_output,
-        Err(panic_any) => panic_result(panic_any),
+        Err(panic_any) => interpret_panic_as_tx_result(panic_any),
     }
 }
 
-fn panic_result(panic_any: Box<dyn std::any::Any + std::marker::Send>) -> TxResult {
+/// Interprets a panic thrown during execution as a tx failure.
+/// Note: specific tx outcomes from the debugger are signalled via specific panic objects.
+pub fn interpret_panic_as_tx_result(
+    panic_any: Box<dyn std::any::Any + std::marker::Send>,
+) -> TxResult {
     if panic_any.downcast_ref::<TxResult>().is_some() {
         // async calls panic with the tx output directly
         // it is not a failure, simply a way to kill the execution

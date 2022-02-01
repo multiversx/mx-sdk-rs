@@ -6,17 +6,23 @@ edition = "2018"
 publish = false
 
 [dependencies.elrond-wasm]
-version = "0.25.0"
+version = "0.27.3"
 path = "../../../elrond-wasm"
 
 [dependencies.adder]
 path = "../../examples/adder"
 
 [dev-dependencies.elrond-wasm-debug]
-version = "0.25.0"
+version = "0.27.3"
 path = "../../../elrond-wasm-debug"
 
-[dependencies]
+[dev-dependencies]
 num-bigint = "0.4.2"
 num-traits = "0.2"
 hex = "0.4"
+
+[dev-dependencies.forwarder]
+path = "../composability/forwarder"
+
+[dev-dependencies.vault]
+path = "../composability/vault"

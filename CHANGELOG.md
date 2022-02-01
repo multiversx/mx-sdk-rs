@@ -4,6 +4,45 @@ There are several crates in this repo, this changelog will keep track of all of 
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [elrond-wasm 0.27.3] - 2022-01-31
+- Backwards compatibility fix.
+- Trailing commas are allowed in `sc_panic!`, `require!` and `sc_print!`.
+- EsdtTokenData `decode_attributes_or_exit` for easier error handling.
+
+## [elrond-wasm 0.27.2, elrond-codec 0.8.4] - 2022-01-27
+- Added missing non-specialized decode implementations for managed types.
+
+## [elrond-wasm 0.27.1] - 2022-01-27
+- Deriving `PartialEq` now works on structs that contain managed types.
+
+## [elrond-wasm 0.27.0] - 2022-01-25
+- Fixed certain compilation error messages. The previous implementation of the macro preprocessor would have concealed the location of many issues.
+- Changed implementation of `require!`:
+	- `require!` no longer returns a `SCResult` type, when the condition is false it now stops the transaction immediately, via `signal_error`;
+	- `require!` now accepts message formatting;
+	- `require_old!` gives access to the old implementation.
+- The Rust testing framework can now handle panics and async calls.
+- ABI bugfix - an issue regarding nested types.
+- `meta` crate build also attempts to call `wasm-opt` after building the contracts.
+- Refactored `CodeMetadata` and added "payable by SC" field.
+- Empty contract template.
+
+## [elrond-wasm 0.26.0] - 2022-01-19
+- Major VM API trait refactoring. All API methods can be accessed from a static context. Removed api instance variables from all objects.
+- External view contracts
+	- Annotating one or more endpoints with `#[external_view]` triggers the framework to create a second "external view" contract where all these endpoints are placed. This is primarily to reduce the main contract size.
+	- General `meta` crate functionality refactor to allow multiple contract generation.
+- `ManagedRef` type
+	- Provided as a more efficient alternative to regular references to managed types
+	- Has `Copy` semantics
+	- `ManagedVec` iterators made safer by the proper use of lifetimes
+	- `ManagedVec` `get_mut` offers a safe mutable reference, using lifetimes
+	- Some initial optimizations in storage mappers
+- First version of a message formatter based on `ManagedBuffer`s:
+	- `sc_print!` macro
+	- `sc_panic!` macro
+- Random number generator wrapper over randomness source from the VM.
+
 ## [elrond-wasm 0.25.0] - 2021-12-14
 - Rust testing framework - mandos generation fixes and some more getters
 - Standard modules moved to `elrond-wasm-modules` crates

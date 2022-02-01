@@ -1,4 +1,4 @@
-use crate::{signal_arg_de_error, ArgId, DynArgInput};
+use crate::{api::ManagedTypeApi, signal_arg_de_error, ArgId, DynArgInput};
 use elrond_codec::*;
 
 /// Any type that is used as an endpoint argument must implement this trait.
@@ -18,11 +18,10 @@ where
             return cast_unit;
         }
 
-        let dyn_arg_vm_api = loader.dyn_arg_vm_api();
         let arg_input = loader.next_arg_input();
 
         let result = T::top_decode_or_err(arg_input, |e| -> ! {
-            signal_arg_de_error(dyn_arg_vm_api.clone(), arg_id, e)
+            signal_arg_de_error::<I::ManagedTypeErrorApi>(arg_id, e)
         });
         let Ok(value) = result;
         value

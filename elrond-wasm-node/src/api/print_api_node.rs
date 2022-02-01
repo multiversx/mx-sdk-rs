@@ -1,7 +1,12 @@
 use crate::VmApiImpl;
-use elrond_wasm::{api::PrintApi, types::BigUint};
+use elrond_wasm::api::{PrintApi, PrintApiImpl};
 
 impl PrintApi for VmApiImpl {
-    #[inline(always)]
-    fn print_biguint(&self, _biguint: &BigUint<Self>) {}
+    type PrintApiImpl = VmApiImpl;
+
+    fn print_api_impl() -> Self::PrintApiImpl {
+        VmApiImpl {}
+    }
 }
+
+impl PrintApiImpl for VmApiImpl {}

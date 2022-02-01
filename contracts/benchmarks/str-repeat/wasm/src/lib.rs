@@ -7,7 +7,6 @@
 elrond_wasm_node::wasm_endpoints! {
     str_repeat
     (
-        init
         getByteArray
         getByteArrayLength
         repeat

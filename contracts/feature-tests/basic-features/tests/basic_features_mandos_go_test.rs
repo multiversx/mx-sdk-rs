@@ -261,6 +261,11 @@ fn managed_buffer_slice_2_go() {
 }
 
 #[test]
+fn managed_buffer_random_go() {
+    elrond_wasm_debug::mandos_go("mandos/managed_buffer_set_random.scen.json");
+}
+
+#[test]
 fn managed_vec_address_push_go() {
     elrond_wasm_debug::mandos_go("mandos/managed_vec_address_push.scen.json");
 }
@@ -328,6 +333,11 @@ fn storage_clear_go() {
 #[test]
 fn storage_i64_go() {
     elrond_wasm_debug::mandos_go("mandos/storage_i64.scen.json");
+}
+
+#[test]
+fn storage_load_from_address_go() {
+    elrond_wasm_debug::mandos_go("mandos/storage_load_from_address.scen.json");
 }
 
 #[test]
@@ -423,4 +433,9 @@ fn storage_usize_bad_go() {
 #[test]
 fn storage_vec_u8_go() {
     elrond_wasm_debug::mandos_go("mandos/storage_vec_u8.scen.json");
+}
+
+#[test]
+fn struct_eq_go() {
+    elrond_wasm_debug::mandos_go("mandos/struct_eq.scen.json");
 }

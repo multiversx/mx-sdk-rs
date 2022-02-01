@@ -17,6 +17,7 @@ pub trait EsdtModule {
     fn token_id(&self) -> SingleValueMapper<TokenIdentifier>;
 
     #[payable("EGLD")]
+    #[only_owner]
     #[endpoint(issueToken)]
     fn issue_token(
         &self,
@@ -24,14 +25,12 @@ pub trait EsdtModule {
         token_ticker: ManagedBuffer,
         num_decimals: usize,
         #[payment] issue_cost: BigUint,
-    ) -> SCResult<AsyncCall> {
-        only_owner!(self, "only owner can issue token");
+    ) -> AsyncCall {
         require!(self.token_id().is_empty(), "Token already issued");
 
         let initial_supply = BigUint::from(1u32);
 
-        Ok(self
-            .send()
+        self.send()
             .esdt_system_sc_proxy()
             .issue_fungible(
                 issue_cost,
@@ -51,17 +50,16 @@ pub trait EsdtModule {
                 },
             )
             .async_call()
-            .with_callback(self.callbacks().issue_callback()))
+            .with_callback(self.callbacks().issue_callback())
     }
 
     /// optional address to set roles for. Defaults to SC's address.
+    #[only_owner]
     #[endpoint(setLocalRoles)]
     fn set_local_roles(
         &self,
         #[var_args] opt_dest_address: OptionalArg<ManagedAddress>,
-    ) -> SCResult<AsyncCall> {
-        only_owner!(self, "only owner can set roles");
-
+    ) -> AsyncCall {
         let dest_address = match opt_dest_address {
             OptionalArg::Some(addr) => addr,
             OptionalArg::None => self.blockchain().get_sc_address(),
@@ -69,11 +67,10 @@ pub trait EsdtModule {
         let token_id = self.token_id().get();
         let roles = [EsdtLocalRole::Mint, EsdtLocalRole::Burn];
 
-        Ok(self
-            .send()
+        self.send()
             .esdt_system_sc_proxy()
-            .set_special_roles(&dest_address, &token_id, (&roles[..]).into_iter().cloned())
-            .async_call())
+            .set_special_roles(&dest_address, &token_id, roles[..].iter().cloned())
+            .async_call()
     }
 
     #[callback]

@@ -1,7 +1,7 @@
 use crate::world_mock::{AccountData, AccountEsdt, BlockchainMock};
 use alloc::vec::Vec;
 use core::cell::RefCell;
-use elrond_wasm::types::Address;
+use elrond_wasm::types::{Address, LockableStaticBuffer};
 use num_bigint::BigUint;
 use num_traits::Zero;
 use std::{
@@ -10,23 +10,32 @@ use std::{
     rc::Rc,
 };
 
-use super::{BlockchainUpdate, TxCache, TxInput, TxManagedTypes, TxResult};
+use super::{
+    BlockchainRng, BlockchainUpdate, TxCache, TxInput, TxManagedTypes, TxResult, TxStaticVars,
+};
 
 #[derive(Debug)]
 pub struct TxContext {
     pub tx_input_box: Box<TxInput>,
     pub tx_cache: Rc<TxCache>,
     pub managed_types: RefCell<TxManagedTypes>,
+    pub lockable_static_buffer_cell: RefCell<LockableStaticBuffer>,
+    pub static_vars_cell: RefCell<TxStaticVars>,
     pub tx_result_cell: RefCell<TxResult>,
+    pub b_rng: RefCell<BlockchainRng>,
 }
 
 impl TxContext {
     pub fn new(tx_input: TxInput, tx_cache: TxCache) -> Self {
+        let b_rng = RefCell::new(BlockchainRng::new(&tx_input, &tx_cache));
         TxContext {
             tx_input_box: Box::new(tx_input),
             tx_cache: Rc::new(tx_cache),
             managed_types: RefCell::new(TxManagedTypes::new()),
+            lockable_static_buffer_cell: RefCell::new(LockableStaticBuffer::new()),
+            static_vars_cell: RefCell::new(TxStaticVars::default()),
             tx_result_cell: RefCell::new(TxResult::empty()),
+            b_rng,
         }
     }
 
@@ -43,21 +52,28 @@ impl TxContext {
             contract_path: None,
             contract_owner: None,
         });
+
+        let tx_input = TxInput {
+            from: contract_address.clone(),
+            to: contract_address,
+            egld_value: 0u32.into(),
+            esdt_values: Vec::new(),
+            func_name: Vec::new(),
+            args: Vec::new(),
+            gas_limit: 0,
+            gas_price: 0,
+            tx_hash: b"dummy...........................".into(),
+        };
+
+        let b_rng = RefCell::new(BlockchainRng::new(&tx_input, &tx_cache));
         TxContext {
-            tx_input_box: Box::new(TxInput {
-                from: contract_address.clone(),
-                to: contract_address,
-                egld_value: 0u32.into(),
-                esdt_values: Vec::new(),
-                func_name: Vec::new(),
-                args: Vec::new(),
-                gas_limit: 0,
-                gas_price: 0,
-                tx_hash: b"dummy...........................".into(),
-            }),
+            tx_input_box: Box::new(tx_input),
             tx_cache: Rc::new(tx_cache),
             managed_types: RefCell::new(TxManagedTypes::new()),
+            lockable_static_buffer_cell: RefCell::new(LockableStaticBuffer::new()),
+            static_vars_cell: RefCell::new(TxStaticVars::default()),
             tx_result_cell: RefCell::new(TxResult::empty()),
+            b_rng,
         }
     }
 
@@ -119,6 +135,10 @@ impl TxContext {
 
     pub fn extract_result(&self) -> TxResult {
         self.tx_result_cell.replace(TxResult::empty())
+    }
+
+    pub fn rng_borrow_mut(&self) -> RefMut<BlockchainRng> {
+        self.b_rng.borrow_mut()
     }
 
     pub fn create_new_contract(

@@ -5,9 +5,10 @@ use elrond_wasm::String;
 /// Various macros provided by elrond-wasm.
 #[elrond_wasm::module]
 pub trait Macros {
+    #[allow(deprecated)]
     #[view]
     fn only_owner_legacy(&self) -> SCResult<()> {
-        only_owner!(self, "Caller must be owner");
+        elrond_wasm::only_owner!(self, "Caller must be owner");
         Ok(())
     }
 
@@ -74,6 +75,6 @@ pub trait Macros {
     #[endpoint]
     fn result_echo_3(&self, arg: Option<String>) -> String {
         let result: SCResult<String> = arg.ok_or("option argument is none").into();
-        result.unwrap_or_signal_error()
+        result.unwrap_or_signal_error::<Self::Api>()
     }
 }

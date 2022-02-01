@@ -1,0 +1,23 @@
+[package]
+name = "erdpy-snippet-generator"
+version = "0.0.0"
+authors = ["Dorin Marian Iancu <dorin.iancu@elrond.com>"]
+edition = "2018"
+
+[[bin]]
+name = "erdpy-snippet-generator"
+path = "src/erdpy_snippet_generator.rs"
+
+[dependencies.elrond-wasm]
+version = "0.27.3"
+path = "../../elrond-wasm"
+
+[dependencies.elrond-wasm-debug]
+version = "0.27.3"
+path = "../../elrond-wasm-debug"
+
+[dependencies]
+bech32 = "0.8.1"
+num-bigint = "0.4.2"
+num-traits = "0.2"
+hex = "0.4"

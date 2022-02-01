@@ -1,14 +1,10 @@
-use elrond_wasm::*;
 use elrond_wasm_debug::*;
 
 fn world() -> BlockchainMock {
     let mut blockchain = BlockchainMock::new();
     blockchain.set_current_dir_from_workspace("contracts/feature-tests/erc-style-contracts/erc20");
 
-    blockchain.register_contract(
-        "file:output/erc20.wasm",
-        Box::new(|context| Box::new(erc20::contract_obj(context))),
-    );
+    blockchain.register_contract_builder("file:output/erc20.wasm", erc20::ContractBuilder);
     blockchain
 }
 

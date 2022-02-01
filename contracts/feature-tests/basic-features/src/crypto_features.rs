@@ -5,22 +5,22 @@ elrond_wasm::imports!();
 pub trait CryptoFeatures {
     #[endpoint]
     fn compute_sha256_legacy(&self, input: Vec<u8>) -> H256 {
-        self.raw_vm_api().sha256_legacy(&input)
+        self.crypto().sha256_legacy(&input)
     }
 
     #[endpoint]
     fn compute_sha256(&self, input: ManagedBuffer) -> ManagedByteArray<Self::Api, 32> {
-        self.raw_vm_api().sha256(&input)
+        self.crypto().sha256(&input)
     }
 
     #[endpoint]
     fn compute_keccak256_legacy(&self, input: Vec<u8>) -> H256 {
-        self.raw_vm_api().keccak256_legacy(&input)
+        self.crypto().keccak256_legacy(&input)
     }
 
     #[endpoint]
     fn compute_keccak256(&self, input: ManagedBuffer) -> ManagedByteArray<Self::Api, 32> {
-        self.raw_vm_api().keccak256(&input)
+        self.crypto().keccak256(&input)
     }
 
     #[endpoint]

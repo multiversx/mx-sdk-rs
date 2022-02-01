@@ -1,34 +1,30 @@
-use elrond_wasm::*;
 use elrond_wasm_debug::*;
 
 fn world() -> BlockchainMock {
     let mut blockchain = BlockchainMock::new();
     blockchain.set_current_dir_from_workspace("contracts/feature-tests/composability");
 
-    blockchain.register_contract(
+    blockchain.register_contract_builder(
         "file:forwarder/output/forwarder.wasm",
-        Box::new(|context| Box::new(forwarder::contract_obj(context))),
+        forwarder::ContractBuilder,
     );
-    blockchain.register_contract(
+    blockchain.register_contract_builder(
         "file:forwarder-raw/output/forwarder-raw.wasm",
-        Box::new(|context| Box::new(forwarder_raw::contract_obj(context))),
+        forwarder_raw::ContractBuilder,
     );
-    blockchain.register_contract(
+    blockchain.register_contract_builder(
         "file:proxy-test-first/output/proxy-test-first.wasm",
-        Box::new(|context| Box::new(proxy_test_first::contract_obj(context))),
+        proxy_test_first::ContractBuilder,
     );
-    blockchain.register_contract(
+    blockchain.register_contract_builder(
         "file:proxy-test-second/output/proxy-test-second.wasm",
-        Box::new(|context| Box::new(proxy_test_second::contract_obj(context))),
+        proxy_test_second::ContractBuilder,
     );
-    blockchain.register_contract(
+    blockchain.register_contract_builder(
         "file:recursive-caller/output/recursive-caller.wasm",
-        Box::new(|context| Box::new(recursive_caller::contract_obj(context))),
+        recursive_caller::ContractBuilder,
     );
-    blockchain.register_contract(
-        "file:vault/output/vault.wasm",
-        Box::new(|context| Box::new(vault::contract_obj(context))),
-    );
+    blockchain.register_contract_builder("file:vault/output/vault.wasm", vault::ContractBuilder);
     blockchain
 }
 
@@ -278,6 +274,14 @@ fn forwarder_call_sync_accept_then_read_esdt_rs() {
 fn forwarder_call_sync_accept_then_read_nft_rs() {
     elrond_wasm_debug::mandos_rs(
         "mandos/forwarder_call_sync_accept_then_read_nft.scen.json",
+        world(),
+    );
+}
+
+#[test]
+fn forwarder_retrieve_funds_with_accept_func_rs() {
+    elrond_wasm_debug::mandos_rs(
+        "mandos/forwarder_retrieve_funds_with_accept_func.scen.json",
         world(),
     );
 }

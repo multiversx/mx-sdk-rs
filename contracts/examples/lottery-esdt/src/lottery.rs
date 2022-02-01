@@ -3,11 +3,9 @@
 elrond_wasm::imports!();
 
 mod lottery_info;
-mod random;
 mod status;
 
 use lottery_info::LotteryInfo;
-use random::Random;
 use status::Status;
 
 const PERCENTAGE_TOTAL: u32 = 100;
@@ -88,7 +86,7 @@ pub trait Lottery {
 
         let timestamp = self.blockchain().get_block_timestamp();
         let total_tickets = opt_total_tickets.unwrap_or(MAX_TICKETS);
-        let deadline = opt_deadline.unwrap_or_else(|| timestamp + THIRTY_DAYS_IN_SECONDS);
+        let deadline = opt_deadline.unwrap_or(timestamp + THIRTY_DAYS_IN_SECONDS);
         let max_entries_per_user = opt_max_entries_per_user.unwrap_or(MAX_TICKETS);
         let prize_distribution =
             opt_prize_distribution.unwrap_or_else(|| [PERCENTAGE_TOTAL as u8].to_vec());
@@ -141,7 +139,7 @@ pub trait Lottery {
                     "Invalid burn percentage!"
                 );
                 self.burn_percentage_for_lottery(&lottery_name)
-                    .set(&burn_percentage);
+                    .set(burn_percentage);
             },
             OptionalArg::None => {},
         }
@@ -339,11 +337,10 @@ pub trait Lottery {
     fn get_distinct_random(&self, min: usize, max: usize, amount: usize) -> Vec<usize> {
         let mut rand_numbers: Vec<usize> = (min..=max).collect();
         let total_numbers = rand_numbers.len();
-        let seed = self.blockchain().get_block_random_seed_legacy();
-        let mut rand = Random::new(*seed);
+        let mut rand = RandomnessSource::<Self::Api>::new();
 
         for i in 0..amount {
-            let rand_index = (rand.next() as usize) % total_numbers;
+            let rand_index = rand.next_usize_in_range(0, total_numbers);
             rand_numbers.swap(i, rand_index);
         }
 

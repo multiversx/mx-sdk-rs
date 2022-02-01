@@ -1,16 +1,15 @@
-use elrond_wasm::*;
 use elrond_wasm_debug::*;
 
 fn world() -> BlockchainMock {
     let mut blockchain = BlockchainMock::new();
 
-    blockchain.register_contract(
+    blockchain.register_contract_builder(
         "file:../kitty-genetic-alg/output/kitty-genetic-alg.wasm",
-        Box::new(|context| Box::new(kitty_genetic_alg::contract_obj(context))),
+        kitty_genetic_alg::ContractBuilder,
     );
-    blockchain.register_contract(
+    blockchain.register_contract_builder(
         "file:output/kitty-ownership.wasm",
-        Box::new(|context| Box::new(kitty_ownership::contract_obj(context))),
+        kitty_ownership::ContractBuilder,
     );
 
     blockchain

@@ -1,46 +1,49 @@
+use core::{borrow::Borrow, marker::PhantomData};
+
 use super::StorageMapper;
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
-    api::{EndpointFinishApi, ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi},
+    api::{EndpointFinishApi, ManagedTypeApi, StorageMapperApi},
     io::EndpointResult,
     storage::{storage_clear, storage_get, storage_get_len, storage_set, StorageKey},
+    types::ManagedType,
 };
-use core::marker::PhantomData;
 use elrond_codec::{TopDecode, TopEncode};
 
 /// Manages a single serializable item in storage.
 pub struct SingleValueMapper<SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    SA: StorageMapperApi,
     T: TopEncode + TopDecode + 'static,
 {
-    api: SA,
     key: StorageKey<SA>,
-    _phantom: core::marker::PhantomData<T>,
+    _phantom_api: PhantomData<SA>,
+    _phantom_item: PhantomData<T>,
 }
 
 impl<SA, T> StorageMapper<SA> for SingleValueMapper<SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    SA: StorageMapperApi,
     T: TopEncode + TopDecode,
 {
-    fn new(api: SA, base_key: StorageKey<SA>) -> Self {
+    #[inline]
+    fn new(base_key: StorageKey<SA>) -> Self {
         SingleValueMapper {
-            api,
             key: base_key,
-            _phantom: PhantomData,
+            _phantom_api: PhantomData,
+            _phantom_item: PhantomData,
         }
     }
 }
 
 impl<SA, T> SingleValueMapper<SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    SA: StorageMapperApi,
     T: TopEncode + TopDecode,
 {
     /// Retrieves current value from storage.
     pub fn get(&self) -> T {
-        storage_get(self.api.clone(), &self.key)
+        storage_get(self.key.as_ref())
     }
 
     /// Returns whether the storage managed by this mapper is empty.
@@ -49,8 +52,14 @@ where
     }
 
     /// Saves argument to storage.
-    pub fn set(&self, new_value: &T) {
-        storage_set(self.api.clone(), &self.key, new_value);
+    ///
+    /// Accepts owned item of type `T`, or any borrowed form of it, such as `&T`.
+    #[inline]
+    pub fn set<BT>(&self, new_value: BT)
+    where
+        BT: Borrow<T>,
+    {
+        storage_set(self.key.as_ref(), new_value.borrow());
     }
 
     /// Saves argument to storage only if the storage is empty.
@@ -63,7 +72,7 @@ where
 
     /// Clears the storage for this mapper.
     pub fn clear(&self) {
-        storage_clear(self.api.clone(), &self.key);
+        storage_clear(self.key.as_ref());
     }
 
     /// Syntactic sugar, to more compactly express a get, update and set in one line.
@@ -72,33 +81,33 @@ where
     pub fn update<R, F: FnOnce(&mut T) -> R>(&self, f: F) -> R {
         let mut value = self.get();
         let result = f(&mut value);
-        self.set(&value);
+        self.set(value);
         result
     }
 
     pub fn raw_byte_length(&self) -> usize {
-        storage_get_len(self.api.clone(), &self.key)
+        storage_get_len(self.key.as_ref())
     }
 }
 
 impl<SA, T> EndpointResult for SingleValueMapper<SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    SA: StorageMapperApi,
     T: TopEncode + TopDecode + EndpointResult,
 {
     type DecodeAs = T::DecodeAs;
 
-    fn finish<FA>(&self, api: FA)
+    fn finish<FA>(&self)
     where
-        FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static,
+        FA: ManagedTypeApi + EndpointFinishApi,
     {
-        self.get().finish(api);
+        self.get().finish::<FA>();
     }
 }
 
 impl<SA, T> TypeAbi for SingleValueMapper<SA, T>
 where
-    SA: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + Clone + 'static,
+    SA: StorageMapperApi,
     T: TopEncode + TopDecode + TypeAbi,
 {
     fn type_name() -> TypeName {
