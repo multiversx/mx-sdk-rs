@@ -26,8 +26,7 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "egldValue": "1000",
-                "function": "forward_create_async_call",
+                "function": "forward_register_promise",
                 "arguments": [
                     "sc:vault",
                     "str:panic_on_purpose",
@@ -61,7 +60,7 @@
             "accounts": {
                 "address:a_user": {
                     "nonce": "1",
-                    "balance": "1000"
+                    "balance": "2000"
                 },
                 "sc:vault": {
                     "nonce": "0",
@@ -71,7 +70,7 @@
                 },
                 "sc:forwarder": {
                     "nonce": "0",
-                    "balance": "1000",
+                    "balance": "",
                     "storage": {
                         "str:async_call_callback_data": "false"
                     },
@@ -85,8 +84,7 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "egldValue": "1000",
-                "function": "forward_create_async_call",
+                "function": "forward_register_promise",
                 "arguments": [
                     "sc:vault",
                     "str:echo_arguments",
@@ -128,7 +126,7 @@
             "accounts": {
                 "address:a_user": {
                     "nonce": "2",
-                    "balance": "0"
+                    "balance": "2000"
                 },
                 "sc:vault": {
                     "nonce": "0",
@@ -140,7 +138,7 @@
                 },
                 "sc:forwarder": {
                     "nonce": "0",
-                    "balance": "2000",
+                    "balance": "0",
                     "storage": {
                         "str:async_call_callback_data": "true"
                     },
