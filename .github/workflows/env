@@ -1,1 +1,1 @@
-export PATH=$HOME/.local/bin:$HOME/elrondsdk/vmtools:$PATH
+export PATH=$HOME/.local/bin:$HOME/elrondsdk/vmtools:$HOME/elrondsdk/erdpy-venv/bin:$PATH
