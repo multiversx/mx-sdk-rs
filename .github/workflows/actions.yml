@@ -19,7 +19,8 @@ jobs:
       - name: Install erdpy, vmtools and wasm-opt
         run: |
           source .github/workflows/env
-          pip3 install erdpy
+          wget -O erdpy-up.py https://raw.githubusercontent.com/ElrondNetwork/elrond-sdk-erdpy/master/erdpy-up.py
+          python3 erdpy-up.py --from-branch development
           mkdir $HOME/elrondsdk
           erdpy config set dependencies.vmtools.tag v1.4.36
           erdpy deps install vmtools
