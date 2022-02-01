@@ -66,7 +66,7 @@ pub trait ForwarderRaw {
 
     #[endpoint]
     #[payable("*")]
-    fn forward_register_promse(
+    fn forward_register_promise(
         &self,
         to: ManagedAddress,
         #[payment_token] token: TokenIdentifier,
@@ -230,9 +230,8 @@ pub trait ForwarderRaw {
             arg_buffer.push_arg(amount);
         }
 
-        let data_buf: ManagedBuffer = endpoint_name.into();
-        if !data_buf.is_empty() {
-            arg_buffer.push_arg_raw(data_buf);
+        if !endpoint_name.is_empty() {
+            arg_buffer.push_arg_raw(endpoint_name);
         }
 
         Self::Api::send_api_impl().create_async_call_raw(

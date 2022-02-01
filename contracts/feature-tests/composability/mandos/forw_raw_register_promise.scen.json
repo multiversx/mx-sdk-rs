@@ -26,7 +26,7 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "function": "forward_register_promse",
+                "function": "forward_register_promise",
                 "arguments": [
                     "sc:vault",
                     "str:panic_on_purpose",
@@ -84,7 +84,7 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "function": "forward_register_promse",
+                "function": "forward_register_promise",
                 "arguments": [
                     "sc:vault",
                     "str:echo_arguments",
