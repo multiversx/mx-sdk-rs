@@ -34,6 +34,11 @@ fn forw_raw_async_accept_egld_rs() {
 }
 
 #[test]
+fn forw_raw_create_async_call_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/forw_raw_create_async_call.scen.json", world());
+}
+
+#[test]
 fn forw_raw_async_accept_esdt_rs() {
     elrond_wasm_debug::mandos_rs("mandos/forw_raw_async_accept_esdt.scen.json", world());
 }

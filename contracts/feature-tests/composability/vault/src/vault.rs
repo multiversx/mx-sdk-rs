@@ -275,4 +275,9 @@ pub trait Vault {
     #[view]
     #[storage_mapper("call_counts")]
     fn call_counts(&self, endpoint: &[u8]) -> SingleValueMapper<usize>;
+
+    #[endpoint]
+    fn panic_on_purpose(&self) -> SCResult<()> {
+        sc_error!("panic on purpose")
+    }
 }

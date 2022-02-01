@@ -64,6 +64,46 @@ pub trait ForwarderRaw {
 
     #[endpoint]
     #[payable("*")]
+    fn forward_create_async_call(
+        &self,
+        to: ManagedAddress,
+        #[payment_token] token: TokenIdentifier,
+        #[payment] payment: BigUint,
+        endpoint_name: ManagedBuffer,
+        extra_gas_for_callback: u64,
+        #[var_args] args: ManagedVarArgs<ManagedBuffer>,
+    ) -> SCResult<()> {
+        self.forward_contract_call(to, token, payment, endpoint_name, args)
+            .with_extra_gas_for_callback(extra_gas_for_callback)
+            .with_success_callback(b"success_callback")
+            .with_error_callback(b"error_callback")
+            .register_promise();
+        Ok(())
+    }
+
+    #[endpoint]
+    fn success_callback(&self, #[var_args] args: ManagedVarArgs<ManagedBuffer>) {
+        self.async_call_callback_data().set(true);
+        let args_as_vec = args.into_vec_of_buffers();
+        self.async_call_event_callback(&args_as_vec);
+    }
+
+    #[endpoint]
+    fn error_callback(&self, #[var_args] args: ManagedVarArgs<ManagedBuffer>) {
+        self.async_call_callback_data().set(false);
+        let args_as_vec = args.into_vec_of_buffers();
+        self.async_call_event_callback(&args_as_vec);
+    }
+
+    #[view]
+    #[storage_mapper("async_call_callback_data")]
+    fn async_call_callback_data(&self) -> SingleValueMapper<bool>;
+
+    #[event("async_call_event_callback")]
+    fn async_call_event_callback(&self, arguments: &ManagedVec<Self::Api, ManagedBuffer>);
+
+    #[endpoint]
+    #[payable("*")]
     fn forward_async_call_half_payment(
         &self,
         to: ManagedAddress,
