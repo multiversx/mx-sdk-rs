@@ -16,6 +16,7 @@ pub use arrayvec;
 mod codec_err;
 mod default_traits;
 mod impl_for_types;
+mod multi;
 mod nested_de;
 mod nested_de_input;
 mod nested_de_input_owned;
@@ -41,6 +42,7 @@ pub use crate::{
 };
 pub use codec_err::{DecodeError, EncodeError};
 pub use default_traits::{DecodeDefault, EncodeDefault};
+pub use multi::*;
 pub use nested_de::NestedDecode;
 pub use nested_de_input_owned::OwnedBytesNestedDecodeInput;
 pub use nested_de_input_slice::{dep_decode_from_byte_slice, dep_decode_from_byte_slice_or_exit};
