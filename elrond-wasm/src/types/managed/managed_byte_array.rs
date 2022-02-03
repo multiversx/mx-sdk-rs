@@ -8,8 +8,8 @@ use crate::{
 };
 use alloc::string::String;
 use elrond_codec::{
-    DecodeError, EncodeError, NestedDecode, NestedDecodeInput, NestedEncode, NestedEncodeOutput,
-    TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, TryStaticCast,
+    DecodeError, DecodeErrorHandler, EncodeError, NestedDecode, NestedDecodeInput, NestedEncode,
+    NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, TryStaticCast,
 };
 
 const DECODE_ERROR_BAD_LENGTH: &str = "bad array length";
@@ -170,12 +170,17 @@ impl<M, const N: usize> NestedDecode for ManagedByteArray<M, N>
 where
     M: ManagedTypeApi,
 {
-    fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
-        let buffer: ManagedBuffer<M> =
-            input.read_specialized(ManagedBufferSizeContext(N), |input| {
-                let byte_array = <[u8; N]>::dep_decode(input)?;
-                Ok(byte_array.as_ref().into())
-            })?;
+    fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: NestedDecodeInput,
+        H: DecodeErrorHandler,
+    {
+        let buffer = if I::supports_specialized_type::<ManagedBuffer<M>>() {
+            input.read_specialized_or_handle_err(ManagedBufferSizeContext(N), h)?
+        } else {
+            let byte_array = <[u8; N]>::dep_decode_or_handle_err(input, h)?;
+            byte_array.as_ref().into()
+        };
         Ok(ManagedByteArray { buffer })
     }
 }

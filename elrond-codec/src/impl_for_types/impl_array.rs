@@ -8,7 +8,7 @@ use crate::{
     top_de_input::TopDecodeInput,
     top_ser::TopEncode,
     top_ser_output::TopEncodeOutput,
-    TypeInfo,
+    DecodeErrorHandler, TypeInfo,
 };
 use alloc::boxed::Box;
 use arrayvec::ArrayVec;
@@ -50,34 +50,20 @@ impl<T: NestedEncode, const N: usize> TopEncode for [T; N] {
 
 impl<T: NestedDecode, const N: usize> NestedDecode for [T; N] {
     #[allow(clippy::reversed_empty_ranges)]
-    fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
+    fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: NestedDecodeInput,
+        H: DecodeErrorHandler,
+    {
         let mut r = ArrayVec::new();
         for _ in 0..N {
-            r.push(T::dep_decode(input)?);
+            r.push(T::dep_decode_or_handle_err(input, h.clone())?);
         }
         let i = r.into_inner();
 
         match i {
             Ok(a) => Ok(a),
-            Err(_) => Err(DecodeError::ARRAY_DECODE_ERROR),
-        }
-    }
-
-    #[allow(clippy::reversed_empty_ranges)]
-    fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
-        input: &mut I,
-        c: ExitCtx,
-        exit: fn(ExitCtx, DecodeError) -> !,
-    ) -> Self {
-        let mut r = ArrayVec::new();
-        for _ in 0..N {
-            r.push(T::dep_decode_or_exit(input, c.clone(), exit));
-        }
-        let i = r.into_inner();
-
-        match i {
-            Ok(a) => a,
-            Err(_) => exit(c, DecodeError::ARRAY_DECODE_ERROR),
+            Err(_) => Err(h.handle_error(DecodeError::ARRAY_DECODE_ERROR)),
         }
     }
 }

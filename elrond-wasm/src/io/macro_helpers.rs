@@ -10,8 +10,8 @@ where
     AA: ManagedTypeApi + EndpointArgumentApi + ErrorApi,
 {
     let arg_input = ArgDecodeInput::<AA>::new(index);
-    let err_handler = ArgErrorHandler::<AA>::from(arg_id);
-    let result = T::top_decode_or_handle_err(arg_input, err_handler);
+    let h = ArgErrorHandler::<AA>::from(arg_id);
+    let result = T::top_decode_or_handle_err(arg_input, h);
     let Ok(value) = result;
     value
 }

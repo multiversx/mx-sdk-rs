@@ -1,7 +1,7 @@
 use crate::DecodeError;
 
 pub trait DecodeErrorHandler: Clone {
-    type HandledErr;
+    type HandledErr: 'static;
 
     fn handle_error(&self, err: DecodeError) -> Self::HandledErr;
 }

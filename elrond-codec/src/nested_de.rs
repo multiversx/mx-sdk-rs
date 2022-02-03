@@ -1,7 +1,8 @@
 // use core::ops::Try;
 
 use crate::{
-    codec_err::DecodeError, nested_de_input::NestedDecodeInput, DecodeErrorHandler, TypeInfo,
+    codec_err::DecodeError, nested_de_input::NestedDecodeInput, DecodeErrorHandler,
+    DefaultDecodeErrorHandler, TypeInfo,
 };
 
 // pub enum EarlyExit{}
@@ -27,7 +28,7 @@ pub trait NestedDecode: Sized {
     /// using the format of an object nested inside another structure.
     /// In case of success returns the deserialized value and the number of bytes consumed during the operation.
     fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
-        Self::dep_decode_or_err(input, |e| e)
+        Self::dep_decode_or_handle_err(input, DefaultDecodeErrorHandler)
     }
 
     /// Version of `top_decode` that exits quickly in case of error.
@@ -38,33 +39,20 @@ pub trait NestedDecode: Sized {
         c: ExitCtx,
         exit: fn(ExitCtx, DecodeError) -> !,
     ) -> Self {
-        let result = Self::dep_decode_or_err(input, |e| exit(c.clone(), e));
-        if let Ok(t) = result {
-            t
-        } else {
-            unreachable!()
-        }
-    }
-
-    fn dep_decode_or_err<I, EC, Err>(input: &mut I, err_closure: EC) -> Result<Self, Err>
-    where
-        I: NestedDecodeInput,
-        EC: Fn(DecodeError) -> Err + Clone,
-    {
         match Self::dep_decode(input) {
-            Ok(v) => Ok(v),
-            Err(e) => Err(err_closure(e)),
+            Ok(v) => v,
+            Err(e) => exit(c, e),
         }
     }
 
-    fn dep_decode_or_handle_err<I, H>(input: &mut I, err_handler: H) -> Result<Self, H::HandledErr>
+    fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
     where
         I: NestedDecodeInput,
         H: DecodeErrorHandler,
     {
         match Self::dep_decode(input) {
             Ok(v) => Ok(v),
-            Err(e) => Err(err_handler.handle_error(e)),
+            Err(e) => Err(h.handle_error(e)),
         }
     }
 }

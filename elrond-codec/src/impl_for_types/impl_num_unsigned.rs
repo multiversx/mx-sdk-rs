@@ -53,16 +53,12 @@ top_encode_num_unsigned! {u8, 8, TypeInfo::U8}
 impl NestedDecode for u8 {
     const TYPE_INFO: TypeInfo = TypeInfo::U8;
 
-    fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
-        input.read_byte()
-    }
-
-    fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
-        input: &mut I,
-        c: ExitCtx,
-        exit: fn(ExitCtx, DecodeError) -> !,
-    ) -> Self {
-        input.read_byte_or_exit(c, exit)
+    fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: NestedDecodeInput,
+        H: DecodeErrorHandler,
+    {
+        input.read_byte_or_handle_err(h)
     }
 }
 
@@ -71,22 +67,15 @@ macro_rules! dep_decode_num_unsigned {
         impl NestedDecode for $ty {
             const TYPE_INFO: TypeInfo = $type_info;
 
-            fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
+            fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
+            where
+                I: NestedDecodeInput,
+                H: DecodeErrorHandler,
+            {
                 let mut bytes = [0u8; $num_bytes];
-                input.read_into(&mut bytes[..])?;
+                input.read_into_or_handle_err(&mut bytes[..], h)?;
                 let num = bytes_to_number(&bytes[..], false) as $ty;
                 Ok(num)
-            }
-
-            fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
-                input: &mut I,
-                c: ExitCtx,
-                exit: fn(ExitCtx, DecodeError) -> !,
-            ) -> Self {
-                let mut bytes = [0u8; $num_bytes];
-                input.read_into_or_exit(&mut bytes[..], c, exit);
-                let num = bytes_to_number(&bytes[..], false) as $ty;
-                num
             }
         }
     };
@@ -126,10 +115,7 @@ macro_rules! top_decode_num_unsigned {
                 }
             }
 
-            fn top_decode_or_handle_err<I, H>(
-                input: I,
-                err_handler: H,
-            ) -> Result<Self, H::HandledErr>
+            fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
             where
                 I: TopDecodeInput,
                 H: DecodeErrorHandler,
@@ -137,7 +123,7 @@ macro_rules! top_decode_num_unsigned {
                 let arg_u64 = input.into_u64();
                 let max = <$bounds_ty>::MAX as u64;
                 if arg_u64 > max {
-                    Err(err_handler.handle_error(DecodeError::INPUT_TOO_LONG))
+                    Err(h.handle_error(DecodeError::INPUT_TOO_LONG))
                 } else {
                     Ok(arg_u64 as $ty)
                 }

@@ -8,8 +8,8 @@ use crate::{
 };
 use alloc::string::String;
 use elrond_codec::{
-    DecodeError, EncodeError, NestedDecode, NestedDecodeInput, NestedEncode, NestedEncodeOutput,
-    TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, TryStaticCast,
+    DecodeError, DecodeErrorHandler, EncodeError, NestedDecode, NestedDecodeInput, NestedEncode,
+    NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, TryStaticCast,
 };
 
 #[repr(transparent)]
@@ -185,22 +185,17 @@ impl<M: ManagedTypeApi> NestedEncode for BigInt<M> {
 }
 
 impl<M: ManagedTypeApi> NestedDecode for BigInt<M> {
-    fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
-        input.read_specialized((), |input| {
-            let boxed_bytes = BoxedBytes::dep_decode(input)?;
+    fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: NestedDecodeInput,
+        H: DecodeErrorHandler,
+    {
+        if I::supports_specialized_type::<Self>() {
+            input.read_specialized_or_handle_err((), h)
+        } else {
+            let boxed_bytes = BoxedBytes::dep_decode_or_handle_err(input, h)?;
             Ok(Self::from_signed_bytes_be(boxed_bytes.as_slice()))
-        })
-    }
-
-    fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
-        input: &mut I,
-        c: ExitCtx,
-        exit: fn(ExitCtx, DecodeError) -> !,
-    ) -> Self {
-        input.read_specialized_or_exit((), c, exit, |input, c| {
-            let boxed_bytes = BoxedBytes::dep_decode_or_exit(input, c, exit);
-            Self::from_signed_bytes_be(boxed_bytes.as_slice())
-        })
+        }
     }
 }
 

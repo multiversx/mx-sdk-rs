@@ -178,16 +178,12 @@ impl TopEncode for Address {
 }
 
 impl NestedDecode for Address {
-    fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
-        Ok(Address(H256::dep_decode(input)?))
-    }
-
-    fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
-        input: &mut I,
-        c: ExitCtx,
-        exit: fn(ExitCtx, DecodeError) -> !,
-    ) -> Self {
-        Address(H256::dep_decode_or_exit(input, c, exit))
+    fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: NestedDecodeInput,
+        H: DecodeErrorHandler,
+    {
+        Ok(Address(H256::dep_decode_or_handle_err(input, h)?))
     }
 }
 
