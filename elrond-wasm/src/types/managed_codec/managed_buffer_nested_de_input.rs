@@ -47,7 +47,7 @@ where
     fn read_managed_buffer_of_size<H>(
         &mut self,
         size: usize,
-        h: &H,
+        h: H,
     ) -> Result<ManagedBuffer<M>, H::HandledErr>
     where
         H: DecodeErrorHandler,
@@ -60,19 +60,19 @@ where
         }
     }
 
-    fn read_managed_buffer<H>(&mut self, h: &H) -> Result<ManagedBuffer<M>, H::HandledErr>
+    fn read_managed_buffer<H>(&mut self, h: H) -> Result<ManagedBuffer<M>, H::HandledErr>
     where
         H: DecodeErrorHandler,
     {
-        let size = usize::dep_decode_or_handle_err(self, h.clone())?;
+        let size = usize::dep_decode_or_handle_err(self, h)?;
         self.read_managed_buffer_of_size(size, h)
     }
 
-    fn read_big_uint<H: DecodeErrorHandler>(&mut self, h: &H) -> Result<BigUint<M>, H::HandledErr> {
+    fn read_big_uint<H: DecodeErrorHandler>(&mut self, h: H) -> Result<BigUint<M>, H::HandledErr> {
         Ok(BigUint::from_bytes_be_buffer(&self.read_managed_buffer(h)?))
     }
 
-    fn read_big_int<H: DecodeErrorHandler>(&mut self, h: &H) -> Result<BigInt<M>, H::HandledErr> {
+    fn read_big_int<H: DecodeErrorHandler>(&mut self, h: H) -> Result<BigInt<M>, H::HandledErr> {
         Ok(BigInt::from_signed_bytes_be_buffer(
             &self.read_managed_buffer(h)?,
         ))
@@ -126,15 +126,15 @@ where
     {
         if let Some(result) = try_execute_then_cast(|| {
             if let Some(mb_context) = context.try_cast_ref::<ManagedBufferSizeContext>() {
-                self.read_managed_buffer_of_size(mb_context.0, &h)
+                self.read_managed_buffer_of_size(mb_context.0, h)
             } else {
-                self.read_managed_buffer(&h)
+                self.read_managed_buffer(h)
             }
         }) {
             result
-        } else if let Some(result) = try_execute_then_cast(|| self.read_big_uint(&h)) {
+        } else if let Some(result) = try_execute_then_cast(|| self.read_big_uint(h)) {
             result
-        } else if let Some(result) = try_execute_then_cast(|| self.read_big_int(&h)) {
+        } else if let Some(result) = try_execute_then_cast(|| self.read_big_int(h)) {
             result
         } else {
             Err(h.handle_error(DecodeError::UNSUPPORTED_OPERATION))

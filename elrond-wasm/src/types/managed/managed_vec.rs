@@ -351,10 +351,10 @@ where
         I: NestedDecodeInput,
         H: DecodeErrorHandler,
     {
-        let size = usize::dep_decode_or_handle_err(input, h.clone())?;
+        let size = usize::dep_decode_or_handle_err(input, h)?;
         let mut result = ManagedVec::new();
         for _ in 0..size {
-            result.push(T::dep_decode_or_handle_err(input, h.clone())?);
+            result.push(T::dep_decode_or_handle_err(input, h)?);
         }
         Ok(result)
     }

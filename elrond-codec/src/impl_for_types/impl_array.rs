@@ -57,7 +57,7 @@ impl<T: NestedDecode, const N: usize> NestedDecode for [T; N] {
     {
         let mut r = ArrayVec::new();
         for _ in 0..N {
-            r.push(T::dep_decode_or_handle_err(input, h.clone())?);
+            r.push(T::dep_decode_or_handle_err(input, h)?);
         }
         let i = r.into_inner();
 

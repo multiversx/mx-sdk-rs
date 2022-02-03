@@ -78,15 +78,15 @@ impl NestedDecode for E {
         I: NestedDecodeInput,
         H: DecodeErrorHandler,
     {
-        match u32::dep_decode_or_handle_err(input, h.clone())? {
+        match u32::dep_decode_or_handle_err(input, h)? {
             0 => Ok(E::Unit),
-            1 => Ok(E::Newtype(u32::dep_decode_or_handle_err(input, h.clone())?)),
+            1 => Ok(E::Newtype(u32::dep_decode_or_handle_err(input, h)?)),
             2 => Ok(E::Tuple(
-                u32::dep_decode_or_handle_err(input, h.clone())?,
-                u32::dep_decode_or_handle_err(input, h.clone())?,
+                u32::dep_decode_or_handle_err(input, h)?,
+                u32::dep_decode_or_handle_err(input, h)?,
             )),
             3 => Ok(E::Struct {
-                a: u32::dep_decode_or_handle_err(input, h.clone())?,
+                a: u32::dep_decode_or_handle_err(input, h)?,
             }),
             _ => Err(h.handle_error(DecodeError::INVALID_VALUE)),
         }
