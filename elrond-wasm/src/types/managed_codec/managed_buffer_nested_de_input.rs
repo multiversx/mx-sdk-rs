@@ -97,19 +97,6 @@ where
         }
     }
 
-    fn read_into_or_exit<ExitCtx: Clone>(
-        &mut self,
-        into: &mut [u8],
-        c: ExitCtx,
-        exit: fn(ExitCtx, DecodeError) -> !,
-    ) {
-        let err_result = self.buffer.load_slice(self.decode_index, into);
-        if err_result.is_err() {
-            exit(c, DecodeError::INPUT_TOO_SHORT);
-        }
-        self.decode_index += into.len();
-    }
-
     fn supports_specialized_type<T: TryStaticCast>() -> bool {
         T::type_eq::<ManagedBuffer<M>>() || T::type_eq::<BigUint<M>>() || T::type_eq::<BigInt<M>>()
     }

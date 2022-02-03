@@ -35,16 +35,4 @@ impl NestedDecodeInput for OwnedBytesNestedDecodeInput {
         self.perform_read_into(into);
         Ok(())
     }
-
-    fn read_into_or_exit<ExitCtx: Clone>(
-        &mut self,
-        into: &mut [u8],
-        c: ExitCtx,
-        exit: fn(ExitCtx, DecodeError) -> !,
-    ) {
-        if into.len() > self.remaining_len() {
-            exit(c, DecodeError::INPUT_TOO_SHORT);
-        }
-        self.perform_read_into(into);
-    }
 }
