@@ -7,7 +7,7 @@ use crate::{
     top_de_input::TopDecodeInput,
     top_ser::TopEncode,
     top_ser_output::TopEncodeOutput,
-    vec_into_boxed_slice, TypeInfo,
+    vec_into_boxed_slice, DecodeErrorHandler, TypeInfo,
 };
 use alloc::{boxed::Box, vec::Vec};
 
@@ -128,30 +128,18 @@ impl<T: NestedEncode> TopEncode for Box<[T]> {
 
 // Allowed to implement this because [T] cannot implement NestedDecode, being ?Sized.
 impl<T: NestedDecode> TopDecode for Box<[T]> {
-    fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
+    fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: TopDecodeInput,
+        H: DecodeErrorHandler,
+    {
         if let TypeInfo::U8 = T::TYPE_INFO {
             let bytes = input.into_boxed_slice_u8();
             let cast_bytes: Box<[T]> = unsafe { core::mem::transmute(bytes) };
             Ok(cast_bytes)
         } else {
-            let vec = Vec::<T>::top_decode(input)?;
+            let vec = Vec::<T>::top_decode_or_handle_err(input, h)?;
             Ok(vec_into_boxed_slice(vec))
-        }
-    }
-
-    /// Quick exit for any of the contained types
-    fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
-        input: I,
-        c: ExitCtx,
-        exit: fn(ExitCtx, DecodeError) -> !,
-    ) -> Self {
-        if let TypeInfo::U8 = T::TYPE_INFO {
-            let bytes = input.into_boxed_slice_u8();
-            let cast_bytes: Box<[T]> = unsafe { core::mem::transmute(bytes) };
-            cast_bytes
-        } else {
-            let vec = Vec::<T>::top_decode_or_exit(input, c, exit);
-            vec_into_boxed_slice(vec)
         }
     }
 }

@@ -49,9 +49,9 @@ pub use codec_err_handler::*;
 pub use default_traits::{DecodeDefault, EncodeDefault};
 pub use nested_de::NestedDecode;
 pub use nested_de_input_owned::OwnedBytesNestedDecodeInput;
-pub use nested_de_input_slice::{dep_decode_from_byte_slice, dep_decode_from_byte_slice_or_exit};
+pub use nested_de_input_slice::dep_decode_from_byte_slice;
 pub use nested_ser::{dep_encode_to_vec, NestedEncode, NestedEncodeNoErr};
-pub use top_de::{top_decode_from_nested, top_decode_from_nested_or_exit, TopDecode};
+pub use top_de::{top_decode_from_nested, top_decode_from_nested_or_handle_err, TopDecode};
 pub use top_de_input::TopDecodeInput;
 pub use top_ser::{
     top_encode_from_nested, top_encode_from_nested_or_exit, top_encode_no_err,

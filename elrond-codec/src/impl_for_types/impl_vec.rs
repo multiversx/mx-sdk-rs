@@ -31,7 +31,12 @@ impl<T: NestedEncode> TopEncode for Vec<T> {
 }
 
 impl<T: NestedDecode> TopDecode for Vec<T> {
-    fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
+    fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: TopDecodeInput,
+        H: DecodeErrorHandler,
+    {
+        // TODO: use specialized getter, get rid of TypeInfo
         if let TypeInfo::U8 = T::TYPE_INFO {
             let bytes = input.into_boxed_slice_u8();
             let bytes_vec = boxed_slice_into_vec(bytes);
@@ -41,35 +46,12 @@ impl<T: NestedDecode> TopDecode for Vec<T> {
             let mut result: Vec<T> = Vec::new();
             let mut nested_buffer = input.into_nested_buffer();
             while !nested_buffer.is_depleted() {
-                result.push(T::dep_decode(&mut nested_buffer)?);
+                result.push(T::dep_decode_or_handle_err(&mut nested_buffer, h)?);
             }
             if !nested_buffer.is_depleted() {
-                return Err(DecodeError::INPUT_TOO_LONG);
+                return Err(h.handle_error(DecodeError::INPUT_TOO_LONG));
             }
             Ok(result)
-        }
-    }
-
-    fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
-        input: I,
-        c: ExitCtx,
-        exit: fn(ExitCtx, DecodeError) -> !,
-    ) -> Self {
-        if let TypeInfo::U8 = T::TYPE_INFO {
-            let bytes = input.into_boxed_slice_u8();
-            let bytes_vec = boxed_slice_into_vec(bytes);
-            let cast_vec: Vec<T> = unsafe { core::mem::transmute(bytes_vec) };
-            cast_vec
-        } else {
-            let mut result: Vec<T> = Vec::new();
-            let mut nested_buffer = input.into_nested_buffer();
-            while !nested_buffer.is_depleted() {
-                result.push(T::dep_decode_or_exit(&mut nested_buffer, c.clone(), exit));
-            }
-            if !nested_buffer.is_depleted() {
-                exit(c, DecodeError::INPUT_TOO_LONG);
-            }
-            result
         }
     }
 }

@@ -1,4 +1,4 @@
-use core::convert::{TryFrom, TryInto};
+use core::convert::TryFrom;
 
 use super::{ManagedBuffer, ManagedType};
 use crate::{
@@ -142,9 +142,16 @@ impl<M, const N: usize> TopDecode for ManagedByteArray<M, N>
 where
     M: ManagedTypeApi,
 {
-    fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
-        let buffer = ManagedBuffer::top_decode(input)?;
-        buffer.try_into()
+    fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: TopDecodeInput,
+        H: DecodeErrorHandler,
+    {
+        let buffer = ManagedBuffer::top_decode_or_handle_err(input, h)?;
+        if buffer.len() != N {
+            return Err(h.handle_error(DecodeError::from(DECODE_ERROR_BAD_LENGTH)));
+        }
+        Ok(ManagedByteArray { buffer })
     }
 }
 

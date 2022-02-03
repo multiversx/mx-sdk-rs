@@ -91,30 +91,6 @@ macro_rules! top_decode_num_unsigned {
         impl TopDecode for $ty {
             const TYPE_INFO: TypeInfo = $type_info;
 
-            fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
-                let arg_u64 = input.into_u64();
-                let max = <$bounds_ty>::MAX as u64;
-                if arg_u64 > max {
-                    Err(DecodeError::INPUT_TOO_LONG)
-                } else {
-                    Ok(arg_u64 as $ty)
-                }
-            }
-
-            fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
-                input: I,
-                c: ExitCtx,
-                exit: fn(ExitCtx, DecodeError) -> !,
-            ) -> Self {
-                let arg_u64 = input.into_u64();
-                let max = <$bounds_ty>::MAX as u64;
-                if arg_u64 > max {
-                    exit(c, DecodeError::INPUT_TOO_LONG)
-                } else {
-                    arg_u64 as $ty
-                }
-            }
-
             fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
             where
                 I: TopDecodeInput,

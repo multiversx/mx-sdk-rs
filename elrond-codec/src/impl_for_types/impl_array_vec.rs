@@ -38,35 +38,24 @@ impl<T> From<arrayvec::CapacityError<T>> for DecodeError {
 }
 
 impl<T: NestedDecode, const CAP: usize> TopDecode for ArrayVec<T, CAP> {
-    fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
+    fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: TopDecodeInput,
+        H: DecodeErrorHandler,
+    {
         let mut result: ArrayVec<T, CAP> = ArrayVec::new();
         let mut nested_buffer = input.into_nested_buffer();
         while !nested_buffer.is_depleted() {
-            result.try_push(T::dep_decode(&mut nested_buffer)?)?;
-        }
-        if !nested_buffer.is_depleted() {
-            return Err(DecodeError::INPUT_TOO_LONG);
-        }
-        Ok(result)
-    }
-
-    fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
-        input: I,
-        c: ExitCtx,
-        exit: fn(ExitCtx, DecodeError) -> !,
-    ) -> Self {
-        let mut result: ArrayVec<T, CAP> = ArrayVec::new();
-        let mut nested_buffer = input.into_nested_buffer();
-        while !nested_buffer.is_depleted() {
-            let elem = T::dep_decode_or_exit(&mut nested_buffer, c.clone(), exit);
-            if result.try_push(elem).is_err() {
-                exit(c, DecodeError::CAPACITY_EXCEEDED_ERROR)
+            if let Err(capacity_error) =
+                result.try_push(T::dep_decode_or_handle_err(&mut nested_buffer, h)?)
+            {
+                return Err(h.handle_error(DecodeError::from(capacity_error)));
             }
         }
         if !nested_buffer.is_depleted() {
-            exit(c, DecodeError::INPUT_TOO_LONG);
+            return Err(h.handle_error(DecodeError::INPUT_TOO_LONG));
         }
-        result
+        Ok(result)
     }
 }
 
@@ -110,8 +99,7 @@ impl<T: NestedDecode, const CAP: usize> NestedDecode for ArrayVec<T, CAP> {
 #[cfg(test)]
 pub mod tests {
     use crate::{
-        test_util::{check_top_encode_decode, top_decode_from_byte_slice_or_panic},
-        DecodeError, TopDecode,
+        test_util::check_top_encode_decode, DecodeError, PanicDecodeErrorHandler, TopDecode,
     };
     use arrayvec::ArrayVec;
 
@@ -136,7 +124,7 @@ pub mod tests {
     #[test]
     #[should_panic]
     fn test_top_arrayvec_capacity_exceeded_panic() {
-        let _ = top_decode_from_byte_slice_or_panic::<ArrayVec<i32, 2>>(TOP_BYTES);
+        let _ = <ArrayVec<i32, 2>>::top_decode_or_handle_err(TOP_BYTES, PanicDecodeErrorHandler);
     }
 
     #[test]
@@ -154,6 +142,9 @@ pub mod tests {
     #[test]
     #[should_panic]
     fn test_nested_arrayvec_capacity_exceeded_panic() {
-        let _ = top_decode_from_byte_slice_or_panic::<Option<ArrayVec<i32, 2>>>(NESTED_BYTES);
+        let _ = Option::<ArrayVec<i32, 2>>::top_decode_or_handle_err(
+            NESTED_BYTES,
+            PanicDecodeErrorHandler,
+        );
     }
 }

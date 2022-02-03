@@ -124,15 +124,11 @@ impl NestedDecode for EsdtTokenType {
 }
 
 impl TopDecode for EsdtTokenType {
-    fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
-        Ok(Self::from(u8::top_decode(input)?))
-    }
-
-    fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
-        input: I,
-        c: ExitCtx,
-        exit: fn(ExitCtx, DecodeError) -> !,
-    ) -> Self {
-        Self::from(u8::top_decode_or_exit(input, c, exit))
+    fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: TopDecodeInput,
+        H: DecodeErrorHandler,
+    {
+        Ok(Self::from(u8::top_decode_or_handle_err(input, h)?))
     }
 }

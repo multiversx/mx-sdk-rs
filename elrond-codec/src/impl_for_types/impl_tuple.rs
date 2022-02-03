@@ -4,7 +4,7 @@ use crate::{
     nested_de_input::NestedDecodeInput,
     nested_ser::NestedEncode,
     nested_ser_output::NestedEncodeOutput,
-    top_de::{top_decode_from_nested, top_decode_from_nested_or_exit, TopDecode},
+    top_de::{top_decode_from_nested_or_handle_err, TopDecode},
     top_de_input::TopDecodeInput,
     top_ser::TopEncode,
     top_ser_output::TopEncodeOutput,
@@ -35,18 +35,20 @@ macro_rules! tuple_impls {
 					output.finalize_nested_encode(buffer);
 				}
             }
+
             impl<$($name),+> TopDecode for ($($name,)+)
             where
                 $($name: NestedDecode,)+
             {
-                fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
-                    top_decode_from_nested(input)
-                }
-
-                fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(input: I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
-                    top_decode_from_nested_or_exit(input, c, exit)
+                fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
+                where
+                    I: TopDecodeInput,
+                    H: DecodeErrorHandler,
+                {
+                    top_decode_from_nested_or_handle_err(input, h)
                 }
             }
+
             impl<$($name),+> NestedEncode for ($($name,)+)
             where
                 $($name: NestedEncode,)+
@@ -64,15 +66,16 @@ macro_rules! tuple_impls {
                     )+
 				}
             }
+
             impl<$($name),+> NestedDecode for ($($name,)+)
             where
                 $($name: NestedDecode,)+
             {
                 fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
-            where
-                I: NestedDecodeInput,
-                H: DecodeErrorHandler,
-            {
+                where
+                    I: NestedDecodeInput,
+                    H: DecodeErrorHandler,
+                {
                     Ok((
                         $(
                             $name::dep_decode_or_handle_err(input, h)?,

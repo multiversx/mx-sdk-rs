@@ -33,29 +33,17 @@ pub trait TopDecodeInput: Sized {
     }
 
     #[inline]
-    fn into_specialized<T, F>(self, else_deser: F) -> Result<T, DecodeError>
-    where
-        T: TryStaticCast,
-        F: FnOnce(Self) -> Result<T, DecodeError>,
-    {
-        else_deser(self)
+    fn supports_specialized_type<T: TryStaticCast>() -> bool {
+        false
     }
 
-    // /// Note: currently not in use.
-    // #[inline]
-    // fn into_specialized_or_handle_err<T, H, F>(
-    //     self,
-    //     h: H,
-    //     else_deser: F,
-    // ) -> Result<T, H::HandledErr>
-    // where
-    //     T: TryStaticCast,
-    //     H: DecodeErrorHandler,
-    //     for<H1:DecodeErrorHandler> F: FnOnce(Self, H1) -> Result<T, H1::HandledErr>,
-    // {
-    //     let result = self.into_specialized(|s| else_deser(s, DefaultDecodeErrorHandler));
-    //     result.map_err(|err| h.handle_error(err))
-    // }
+    fn into_specialized_or_handle_err<T, H>(self, h: H) -> Result<T, H::HandledErr>
+    where
+        T: TryStaticCast,
+        H: DecodeErrorHandler,
+    {
+        Err(h.handle_error(DecodeError::UNSUPPORTED_OPERATION))
+    }
 
     fn into_nested_buffer(self) -> Self::NestedBuffer;
 }

@@ -7,7 +7,7 @@ use crate::{
     BytesArgLoader,
 };
 use alloc::vec::Vec;
-use elrond_codec::{DecodeError, NestedDecode, TopDecode, TopDecodeInput};
+use elrond_codec::{DecodeErrorHandler, NestedDecode, TopDecode, TopDecodeInput};
 
 use super::CallbackClosureMatcher;
 
@@ -53,13 +53,17 @@ impl<M: ManagedTypeApi> CallbackClosureUnmanagedArgs<M> {
 }
 
 impl<M: ManagedTypeApi> TopDecode for CallbackClosureUnmanagedArgs<M> {
-    fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
-        let managed_buffer: ManagedBuffer<M> = ManagedBuffer::top_decode(input)?;
+    fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: TopDecodeInput,
+        H: DecodeErrorHandler,
+    {
+        let managed_buffer: ManagedBuffer<M> = ManagedBuffer::top_decode_or_handle_err(input, h)?;
 
         let mut nested_buffer =
             ManagedBytesNestedDecodeInput::<M>::new(managed_buffer.to_boxed_bytes().into_box());
-        let callback_name = BoxedBytes::dep_decode(&mut nested_buffer)?;
-        let closure_args = Vec::<BoxedBytes>::dep_decode(&mut nested_buffer)?;
+        let callback_name = BoxedBytes::dep_decode_or_handle_err(&mut nested_buffer, h)?;
+        let closure_args = Vec::<BoxedBytes>::dep_decode_or_handle_err(&mut nested_buffer, h)?;
         Ok(CallbackClosureUnmanagedArgs {
             callback_name,
             closure_args,
