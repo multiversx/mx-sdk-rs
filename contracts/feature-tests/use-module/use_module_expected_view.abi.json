@@ -13,7 +13,7 @@
         },
         "framework": {
             "name": "elrond-wasm",
-            "version": "0.27.3"
+            "version": "0.27.4"
         }
     },
     "docs": [
@@ -42,6 +42,31 @@
     ],
     "hasCallback": false,
     "types": {
+        "EsdtTokenType": {
+            "type": "enum",
+            "variants": [
+                {
+                    "name": "Fungible",
+                    "discriminant": 0
+                },
+                {
+                    "name": "NonFungible",
+                    "discriminant": 1
+                },
+                {
+                    "name": "SemiFungible",
+                    "discriminant": 2
+                },
+                {
+                    "name": "Meta",
+                    "discriminant": 3
+                },
+                {
+                    "name": "Invalid",
+                    "discriminant": 4
+                }
+            ]
+        },
         "GovernanceProposalStatus": {
             "type": "enum",
             "variants": [
