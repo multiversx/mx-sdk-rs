@@ -90,7 +90,7 @@ pub trait EsdtModule {
 
         self.send().esdt_nft_create(
             &token_id,
-            &amount,
+            amount,
             &empty_buffer,
             &BigUint::zero(),
             &empty_buffer,
