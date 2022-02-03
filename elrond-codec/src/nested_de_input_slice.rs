@@ -15,20 +15,6 @@ impl<'a> NestedDecodeInput for &'a [u8] {
         *self = &self[len..];
         Ok(())
     }
-
-    fn read_into_or_exit<ExitCtx: Clone>(
-        &mut self,
-        into: &mut [u8],
-        c: ExitCtx,
-        exit: fn(ExitCtx, DecodeError) -> !,
-    ) {
-        if into.len() > self.len() {
-            exit(c, DecodeError::INPUT_TOO_SHORT);
-        }
-        let len = into.len();
-        into.copy_from_slice(&self[..len]);
-        *self = &self[len..];
-    }
 }
 
 /// Convenience method, to avoid having to specify type when calling `dep_decode`.

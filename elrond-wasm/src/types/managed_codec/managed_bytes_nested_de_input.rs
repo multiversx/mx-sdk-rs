@@ -28,13 +28,4 @@ impl<M: ManagedTypeApi> NestedDecodeInput for ManagedBytesNestedDecodeInput<M> {
     fn read_into(&mut self, into: &mut [u8]) -> Result<(), DecodeError> {
         self.bytes_input.read_into(into)
     }
-
-    fn read_into_or_exit<ExitCtx: Clone>(
-        &mut self,
-        into: &mut [u8],
-        c: ExitCtx,
-        exit: fn(ExitCtx, DecodeError) -> !,
-    ) {
-        self.bytes_input.read_into_or_exit(into, c, exit);
-    }
 }

@@ -1,8 +1,8 @@
 use elrond_wasm::{
     derive::TypeAbi,
     elrond_codec::{
-        DecodeError, EncodeError, NestedDecode, NestedDecodeInput, NestedEncode,
-        NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
+        DecodeError, DecodeErrorHandler, EncodeError, NestedDecode, NestedDecodeInput,
+        NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
     },
 };
 
@@ -24,7 +24,7 @@ impl NestedEncode for CodecErrorTestType {
 }
 
 impl TopDecode for CodecErrorTestType {
-    fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
+    fn top_decode_or_handle_err<I, H>(_input: I, h: H) -> Result<Self, H::HandledErr>
     where
         I: TopDecodeInput,
         H: DecodeErrorHandler,
@@ -34,7 +34,7 @@ impl TopDecode for CodecErrorTestType {
 }
 
 impl NestedDecode for CodecErrorTestType {
-    fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
+    fn dep_decode_or_handle_err<I, H>(_input: &mut I, h: H) -> Result<Self, H::HandledErr>
     where
         I: NestedDecodeInput,
         H: DecodeErrorHandler,

@@ -211,7 +211,7 @@ impl H256 {
     where
         H: DecodeErrorHandler,
     {
-        if input.len() != 32 {
+        if input.len() == 32 {
             let raw = Box::into_raw(input);
             let array_box = unsafe { Box::<[u8; 32]>::from_raw(raw as *mut [u8; 32]) };
             Ok(H256(array_box))
