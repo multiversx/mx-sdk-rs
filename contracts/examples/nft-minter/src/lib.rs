@@ -60,6 +60,9 @@ pub trait NftMinter: nft_module::NftModule {
         )
     }
 
+    // The marketplace SC will send the funds directly to the initial caller, i.e. the owner
+    // The caller has to know which tokens they have to claim,
+    // by giving the correct token ID and token nonce
     #[only_owner]
     #[endpoint(claimRoyaltiesFromMarketplace)]
     fn claim_royalties_from_marketplace(
