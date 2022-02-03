@@ -7,7 +7,7 @@ use crate::{
 use alloc::{string::String, vec::Vec};
 use core::marker::PhantomData;
 use elrond_codec::{
-    DecodeError, DecodeErrorHandler, EncodeError, NestedDecode, NestedDecodeInput, NestedEncode,
+    DecodeErrorHandler, EncodeError, NestedDecode, NestedDecodeInput, NestedEncode,
     NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
 };
 
@@ -326,15 +326,19 @@ where
     M: ManagedTypeApi,
     T: ManagedVecItem + NestedDecode,
 {
-    fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
-        let buffer = ManagedBuffer::top_decode(input)?;
+    fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: TopDecodeInput,
+        H: DecodeErrorHandler,
+    {
+        let buffer = ManagedBuffer::top_decode_or_handle_err(input, h)?;
         if T::SKIPS_RESERIALIZATION {
             Ok(ManagedVec::new_from_raw_buffer(buffer))
         } else {
             let mut result = ManagedVec::new();
             let mut nested_de_input = ManagedBufferNestedDecodeInput::new(buffer);
             while nested_de_input.remaining_len() > 0 {
-                result.push(T::dep_decode(&mut nested_de_input)?);
+                result.push(T::dep_decode_or_handle_err(&mut nested_de_input, h)?);
             }
             Ok(result)
         }

@@ -29,23 +29,15 @@ impl TopEncode for NonZeroUsize {
 }
 
 impl TopDecode for NonZeroUsize {
-    fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
-        if let Some(nz) = NonZeroUsize::new(usize::top_decode(input)?) {
+    fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: TopDecodeInput,
+        H: DecodeErrorHandler,
+    {
+        if let Some(nz) = NonZeroUsize::new(usize::top_decode_or_handle_err(input, h)?) {
             Ok(nz)
         } else {
-            Err(DecodeError::INVALID_VALUE)
-        }
-    }
-
-    fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
-        input: I,
-        c: ExitCtx,
-        exit: fn(ExitCtx, DecodeError) -> !,
-    ) -> Self {
-        if let Some(nz) = NonZeroUsize::new(usize::top_decode_or_exit(input, c.clone(), exit)) {
-            nz
-        } else {
-            exit(c, DecodeError::INVALID_VALUE)
+            Err(h.handle_error(DecodeError::INVALID_VALUE))
         }
     }
 }

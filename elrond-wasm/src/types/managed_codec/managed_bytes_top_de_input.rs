@@ -1,12 +1,9 @@
 use core::marker::PhantomData;
 
 use alloc::boxed::Box;
-use elrond_codec::{try_execute_then_cast, DecodeError, TopDecodeInput, TryStaticCast};
+use elrond_codec::TopDecodeInput;
 
-use crate::{
-    api::ManagedTypeApi,
-    types::{BigInt, BigUint, BoxedBytes, ManagedBuffer},
-};
+use crate::{api::ManagedTypeApi, types::BoxedBytes};
 
 use super::ManagedBytesNestedDecodeInput;
 
@@ -38,27 +35,27 @@ where
         self.bytes.into_box()
     }
 
-    fn into_specialized<T, F>(self, else_deser: F) -> Result<T, DecodeError>
-    where
-        T: TryStaticCast,
-        F: FnOnce(Self) -> Result<T, DecodeError>,
-    {
-        if let Some(result) =
-            try_execute_then_cast(|| ManagedBuffer::<M>::new_from_bytes(self.bytes.as_slice()))
-        {
-            Ok(result)
-        } else if let Some(result) =
-            try_execute_then_cast(|| BigUint::<M>::from_bytes_be(self.bytes.as_slice()))
-        {
-            Ok(result)
-        } else if let Some(result) =
-            try_execute_then_cast(|| BigInt::<M>::from_signed_bytes_be(self.bytes.as_slice()))
-        {
-            Ok(result)
-        } else {
-            else_deser(self)
-        }
-    }
+    // fn into_specialized<T, F>(self, else_deser: F) -> Result<T, DecodeError>
+    // where
+    //     T: TryStaticCast,
+    //     F: FnOnce(Self) -> Result<T, DecodeError>,
+    // {
+    //     if let Some(result) =
+    //         try_execute_then_cast(|| ManagedBuffer::<M>::new_from_bytes(self.bytes.as_slice()))
+    //     {
+    //         Ok(result)
+    //     } else if let Some(result) =
+    //         try_execute_then_cast(|| BigUint::<M>::from_bytes_be(self.bytes.as_slice()))
+    //     {
+    //         Ok(result)
+    //     } else if let Some(result) =
+    //         try_execute_then_cast(|| BigInt::<M>::from_signed_bytes_be(self.bytes.as_slice()))
+    //     {
+    //         Ok(result)
+    //     } else {
+    //         else_deser(self)
+    //     }
+    // }
 
     fn into_nested_buffer(self) -> Self::NestedBuffer {
         ManagedBytesNestedDecodeInput::new(self.bytes.into_box())

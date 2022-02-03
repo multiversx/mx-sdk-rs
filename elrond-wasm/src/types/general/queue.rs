@@ -133,22 +133,15 @@ impl<T: NestedDecode> NestedDecode for Queue<T> {
 
 /// Deserializes like a Vec.
 impl<T: NestedDecode> TopDecode for Queue<T> {
-    fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
+    fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: TopDecodeInput,
+        H: DecodeErrorHandler,
+    {
         Ok(Queue {
-            vec: Vec::<T>::top_decode(input)?,
+            vec: Vec::<T>::top_decode_or_handle_err(input, h)?,
             start: 0,
         })
-    }
-
-    fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
-        input: I,
-        c: ExitCtx,
-        exit: fn(ExitCtx, DecodeError) -> !,
-    ) -> Self {
-        Queue {
-            vec: Vec::<T>::top_decode_or_exit(input, c, exit),
-            start: 0,
-        }
     }
 }
 

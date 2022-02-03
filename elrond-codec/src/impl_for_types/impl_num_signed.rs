@@ -60,32 +60,6 @@ macro_rules! top_decode_num_signed {
         impl TopDecode for $ty {
             const TYPE_INFO: TypeInfo = $type_info;
 
-            fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
-                let arg_i64 = input.into_i64();
-                let min = <$bounds_ty>::MIN as i64;
-                let max = <$bounds_ty>::MAX as i64;
-                if arg_i64 < min || arg_i64 > max {
-                    Err(DecodeError::INPUT_OUT_OF_RANGE)
-                } else {
-                    Ok(arg_i64 as $ty)
-                }
-            }
-
-            fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
-                input: I,
-                c: ExitCtx,
-                exit: fn(ExitCtx, DecodeError) -> !,
-            ) -> Self {
-                let arg_i64 = input.into_i64();
-                let min = <$bounds_ty>::MIN as i64;
-                let max = <$bounds_ty>::MAX as i64;
-                if arg_i64 < min || arg_i64 > max {
-                    exit(c, DecodeError::INPUT_OUT_OF_RANGE)
-                } else {
-                    arg_i64 as $ty
-                }
-            }
-
             fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
             where
                 I: TopDecodeInput,

@@ -243,16 +243,12 @@ impl NestedDecode for BoxedBytes {
 }
 
 impl TopDecode for BoxedBytes {
-    fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
+    fn top_decode_or_handle_err<I, H>(input: I, _h: H) -> Result<Self, H::HandledErr>
+    where
+        I: TopDecodeInput,
+        H: DecodeErrorHandler,
+    {
         Ok(BoxedBytes(input.into_boxed_slice_u8()))
-    }
-
-    fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
-        input: I,
-        _: ExitCtx,
-        _: fn(ExitCtx, DecodeError) -> !,
-    ) -> Self {
-        BoxedBytes(input.into_boxed_slice_u8())
     }
 }
 

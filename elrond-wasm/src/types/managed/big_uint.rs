@@ -8,7 +8,7 @@ use crate::{
 };
 use alloc::string::String;
 use elrond_codec::{
-    DecodeError, DecodeErrorHandler, EncodeError, NestedDecode, NestedDecodeInput, NestedEncode,
+    DecodeErrorHandler, EncodeError, NestedDecode, NestedDecodeInput, NestedEncode,
     NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, TryStaticCast,
 };
 
@@ -204,11 +204,17 @@ impl<M: ManagedTypeApi> NestedDecode for BigUint<M> {
 }
 
 impl<M: ManagedTypeApi> TopDecode for BigUint<M> {
-    fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
-        input.into_specialized(|input| {
-            let boxed_bytes = BoxedBytes::top_decode(input)?;
+    fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: TopDecodeInput,
+        H: DecodeErrorHandler,
+    {
+        if I::supports_specialized_type::<Self>() {
+            input.into_specialized_or_handle_err(h)
+        } else {
+            let boxed_bytes = BoxedBytes::top_decode_or_handle_err(input, h)?;
             Ok(Self::from_bytes_be(boxed_bytes.as_slice()))
-        })
+        }
     }
 }
 

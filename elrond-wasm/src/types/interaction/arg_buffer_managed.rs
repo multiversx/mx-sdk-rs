@@ -7,7 +7,7 @@ use crate::{
 };
 use alloc::vec::Vec;
 use elrond_codec::{
-    DecodeError, DecodeErrorHandler, EncodeError, NestedDecode, NestedDecodeInput, NestedEncode,
+    DecodeErrorHandler, EncodeError, NestedDecode, NestedDecodeInput, NestedEncode,
     NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
 };
 
@@ -183,8 +183,12 @@ impl<M> TopDecode for ManagedArgBuffer<M>
 where
     M: ManagedTypeApi,
 {
-    fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
-        Ok(ManagedVec::top_decode(input)?.into())
+    fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: TopDecodeInput,
+        H: DecodeErrorHandler,
+    {
+        Ok(ManagedVec::top_decode_or_handle_err(input, h)?.into())
     }
 }
 

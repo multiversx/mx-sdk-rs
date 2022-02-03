@@ -17,15 +17,16 @@ top_encode_from_no_err! {(), TypeInfo::Unit}
 impl TopDecode for () {
     const TYPE_INFO: TypeInfo = TypeInfo::Unit;
 
-    fn top_decode<I: TopDecodeInput>(_: I) -> Result<Self, DecodeError> {
-        Ok(())
-    }
-
-    fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
-        _: I,
-        _: ExitCtx,
-        _: fn(ExitCtx, DecodeError) -> !,
-    ) -> Self {
+    fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: TopDecodeInput,
+        H: DecodeErrorHandler,
+    {
+        if input.byte_len() == 0 {
+            Ok(())
+        } else {
+            Err(h.handle_error(DecodeError::INPUT_TOO_LONG))
+        }
     }
 }
 

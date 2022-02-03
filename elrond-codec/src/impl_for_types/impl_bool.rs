@@ -26,23 +26,15 @@ top_encode_from_no_err! {bool, TypeInfo::Bool}
 impl TopDecode for bool {
     const TYPE_INFO: TypeInfo = TypeInfo::Bool;
 
-    fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
+    fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: TopDecodeInput,
+        H: DecodeErrorHandler,
+    {
         match input.into_u64() {
             0 => Ok(false),
             1 => Ok(true),
-            _ => Err(DecodeError::INPUT_OUT_OF_RANGE),
-        }
-    }
-
-    fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
-        input: I,
-        c: ExitCtx,
-        exit: fn(ExitCtx, DecodeError) -> !,
-    ) -> Self {
-        match input.into_u64() {
-            0 => false,
-            1 => true,
-            _ => exit(c, DecodeError::INPUT_OUT_OF_RANGE),
+            _ => Err(h.handle_error(DecodeError::INPUT_OUT_OF_RANGE)),
         }
     }
 }

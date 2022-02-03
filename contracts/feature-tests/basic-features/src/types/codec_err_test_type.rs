@@ -24,13 +24,21 @@ impl NestedEncode for CodecErrorTestType {
 }
 
 impl TopDecode for CodecErrorTestType {
-    fn top_decode<I: TopDecodeInput>(_input: I) -> Result<Self, DecodeError> {
-        Err(DecodeError::from("deliberate top decode error"))
+    fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: TopDecodeInput,
+        H: DecodeErrorHandler,
+    {
+        Err(h.handle_error(DecodeError::from("deliberate top decode error")))
     }
 }
 
 impl NestedDecode for CodecErrorTestType {
-    fn dep_decode<I: NestedDecodeInput>(_input: &mut I) -> Result<Self, DecodeError> {
-        Err(DecodeError::from("deliberate nested decode error"))
+    fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: NestedDecodeInput,
+        H: DecodeErrorHandler,
+    {
+        Err(h.handle_error(DecodeError::from("deliberate top decode error")))
     }
 }

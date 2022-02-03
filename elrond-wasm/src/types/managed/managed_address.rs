@@ -170,9 +170,13 @@ impl<M> TopDecode for ManagedAddress<M>
 where
     M: ManagedTypeApi,
 {
-    fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
+    fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: TopDecodeInput,
+        H: DecodeErrorHandler,
+    {
         Ok(ManagedAddress {
-            bytes: ManagedByteArray::top_decode(input)?,
+            bytes: ManagedByteArray::top_decode_or_handle_err(input, h)?,
         })
     }
 }

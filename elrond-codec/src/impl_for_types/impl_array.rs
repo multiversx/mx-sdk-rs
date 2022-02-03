@@ -4,7 +4,7 @@ use crate::{
     nested_de_input::NestedDecodeInput,
     nested_ser::NestedEncode,
     nested_ser_output::NestedEncodeOutput,
-    top_de::{top_decode_from_nested, top_decode_from_nested_or_exit, TopDecode},
+    top_de::{top_decode_from_nested_or_handle_err, TopDecode},
     top_de_input::TopDecodeInput,
     top_ser::TopEncode,
     top_ser_output::TopEncodeOutput,
@@ -69,48 +69,30 @@ impl<T: NestedDecode, const N: usize> NestedDecode for [T; N] {
 }
 
 impl<T: NestedDecode, const N: usize> TopDecode for [T; N] {
-    fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
-        top_decode_from_nested(input)
+    fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: TopDecodeInput,
+        H: DecodeErrorHandler,
+    {
+        top_decode_from_nested_or_handle_err(input, h)
     }
 
-    fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
-        input: I,
-        c: ExitCtx,
-        exit: fn(ExitCtx, DecodeError) -> !,
-    ) -> Self {
-        top_decode_from_nested_or_exit(input, c, exit)
-    }
-
-    fn top_decode_boxed<I: TopDecodeInput>(input: I) -> Result<Box<Self>, DecodeError> {
+    fn top_decode_boxed_or_handle_err<I, H>(input: I, h: H) -> Result<Box<Self>, H::HandledErr>
+    where
+        I: TopDecodeInput,
+        H: DecodeErrorHandler,
+    {
         if let TypeInfo::U8 = T::TYPE_INFO {
             // transmute directly
             let bs = input.into_boxed_slice_u8();
             if bs.len() != N {
-                return Err(DecodeError::ARRAY_DECODE_ERROR);
+                return Err(h.handle_error(DecodeError::ARRAY_DECODE_ERROR));
             }
             let raw = Box::into_raw(bs);
             let array_box = unsafe { Box::<[T; N]>::from_raw(raw as *mut [T; N]) };
             Ok(array_box)
         } else {
-            Ok(Box::new(Self::top_decode(input)?))
-        }
-    }
-
-    fn top_decode_boxed_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
-        input: I,
-        c: ExitCtx,
-        exit: fn(ExitCtx, DecodeError) -> !,
-    ) -> Box<Self> {
-        if let TypeInfo::U8 = T::TYPE_INFO {
-            // transmute directly
-            let bs = input.into_boxed_slice_u8();
-            if bs.len() != N {
-                exit(c, DecodeError::ARRAY_DECODE_ERROR);
-            }
-            let raw = Box::into_raw(bs);
-            unsafe { Box::<[T; N]>::from_raw(raw as *mut [T; N]) }
-        } else {
-            Box::new(Self::top_decode_or_exit(input, c, exit))
+            Ok(Box::new(Self::top_decode_or_handle_err(input, h)?))
         }
     }
 }

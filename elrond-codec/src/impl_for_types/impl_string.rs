@@ -63,38 +63,26 @@ impl TopEncode for Box<str> {
 }
 
 impl TopDecode for String {
-    fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
-        let raw = Vec::<u8>::top_decode(input)?;
+    fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: TopDecodeInput,
+        H: DecodeErrorHandler,
+    {
+        let raw = Vec::<u8>::top_decode_or_handle_err(input, h)?;
         match String::from_utf8(raw) {
             Ok(s) => Ok(s),
-            Err(_) => Err(DecodeError::UTF8_DECODE_ERROR),
-        }
-    }
-
-    fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
-        input: I,
-        c: ExitCtx,
-        exit: fn(ExitCtx, DecodeError) -> !,
-    ) -> Self {
-        let raw = Vec::<u8>::top_decode_or_exit(input, c.clone(), exit);
-        match String::from_utf8(raw) {
-            Ok(s) => s,
-            Err(_) => exit(c, DecodeError::UTF8_DECODE_ERROR),
+            Err(_) => Err(h.handle_error(DecodeError::UTF8_DECODE_ERROR)),
         }
     }
 }
 
 impl TopDecode for Box<str> {
-    fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
-        Ok(String::top_decode(input)?.into_boxed_str())
-    }
-
-    fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
-        input: I,
-        c: ExitCtx,
-        exit: fn(ExitCtx, DecodeError) -> !,
-    ) -> Self {
-        String::top_decode_or_exit(input, c, exit).into_boxed_str()
+    fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: TopDecodeInput,
+        H: DecodeErrorHandler,
+    {
+        Ok(String::top_decode_or_handle_err(input, h)?.into_boxed_str())
     }
 }
 

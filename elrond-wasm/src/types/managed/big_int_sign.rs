@@ -1,6 +1,6 @@
 use alloc::string::String;
 use elrond_codec::{
-    DecodeError, DecodeErrorHandler, EncodeError, NestedDecode, NestedDecodeInput, NestedEncode,
+    DecodeErrorHandler, EncodeError, NestedDecode, NestedDecodeInput, NestedEncode,
     NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
 };
 
@@ -61,8 +61,12 @@ impl NestedDecode for Sign {
 
 impl TopDecode for Sign {
     #[inline]
-    fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
-        Ok(Sign::from_int(i8::top_decode(input)?))
+    fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: TopDecodeInput,
+        H: DecodeErrorHandler,
+    {
+        Ok(Sign::from_int(i8::top_decode_or_handle_err(input, h)?))
     }
 }
 

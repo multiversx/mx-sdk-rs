@@ -98,48 +98,6 @@ impl<T: NestedEncode> TopEncode for Option<T> {
 }
 
 impl<T: NestedDecode> TopDecode for Option<T> {
-    fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
-        let mut buffer = input.into_nested_buffer();
-        if buffer.is_depleted() {
-            Ok(None)
-        } else {
-            let first_byte = buffer.read_byte()?;
-            if first_byte == 1 {
-                let item = T::dep_decode(&mut buffer)?;
-                if buffer.is_depleted() {
-                    Ok(Some(item))
-                } else {
-                    Err(DecodeError::INPUT_TOO_LONG)
-                }
-            } else {
-                Err(DecodeError::INVALID_VALUE)
-            }
-        }
-    }
-
-    fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
-        input: I,
-        c: ExitCtx,
-        exit: fn(ExitCtx, DecodeError) -> !,
-    ) -> Self {
-        let mut buffer = input.into_nested_buffer();
-        if buffer.is_depleted() {
-            None
-        } else {
-            let first_byte = buffer.read_byte_or_exit(c.clone(), exit);
-            if first_byte == 1 {
-                let item = T::dep_decode_or_exit(&mut buffer, c.clone(), exit);
-                if buffer.is_depleted() {
-                    Some(item)
-                } else {
-                    exit(c, DecodeError::INPUT_TOO_LONG)
-                }
-            } else {
-                exit(c, DecodeError::INVALID_VALUE)
-            }
-        }
-    }
-
     fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
     where
         I: TopDecodeInput,

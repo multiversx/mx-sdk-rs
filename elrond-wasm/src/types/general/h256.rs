@@ -204,34 +204,30 @@ impl H256 {
     // Transmutes directly from a (variable-sized) boxed byte slice.
     // Will exit early if the input length is not 32.
     // Designed to be used especially in deserializer implementations.
-    pub fn decode_from_boxed_bytes_or_exit<ExitCtx: Clone>(
+    fn decode_from_boxed_bytes_or_handle_err<H>(
         input: Box<[u8]>,
-        c: ExitCtx,
-        exit: fn(ExitCtx, DecodeError) -> !,
-    ) -> Self {
+        h: H,
+    ) -> Result<Self, H::HandledErr>
+    where
+        H: DecodeErrorHandler,
+    {
         if input.len() != 32 {
-            exit(c, DecodeError::from(ERR_BAD_H256_LENGTH));
+            let raw = Box::into_raw(input);
+            let array_box = unsafe { Box::<[u8; 32]>::from_raw(raw as *mut [u8; 32]) };
+            Ok(H256(array_box))
+        } else {
+            Err(h.handle_error(DecodeError::from(ERR_BAD_H256_LENGTH)))
         }
-        let raw = Box::into_raw(input);
-        let array_box = unsafe { Box::<[u8; 32]>::from_raw(raw as *mut [u8; 32]) };
-        H256(array_box)
     }
 }
 
 impl TopDecode for H256 {
-    fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
-        match <[u8; 32]>::top_decode_boxed(input) {
-            Ok(array_box) => Ok(H256(array_box)),
-            Err(_) => Err(DecodeError::from(ERR_BAD_H256_LENGTH)),
-        }
-    }
-
-    fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
-        input: I,
-        c: ExitCtx,
-        exit: fn(ExitCtx, DecodeError) -> !,
-    ) -> Self {
-        H256::decode_from_boxed_bytes_or_exit(input.into_boxed_slice_u8(), c, exit)
+    fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: TopDecodeInput,
+        H: DecodeErrorHandler,
+    {
+        Self::decode_from_boxed_bytes_or_handle_err(input.into_boxed_slice_u8(), h)
     }
 }
 
