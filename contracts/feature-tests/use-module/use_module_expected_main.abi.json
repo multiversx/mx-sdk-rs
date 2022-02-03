@@ -122,23 +122,12 @@
                     "type": "bytes"
                 },
                 {
-                    "name": "num_decimals",
-                    "type": "u32"
-                }
-            ],
-            "outputs": []
-        },
-        {
-            "docs": [
-                "optional address to set roles for. Defaults to SC's address."
-            ],
-            "name": "setLocalRoles",
-            "onlyOwner": true,
-            "mutability": "mutable",
-            "inputs": [
+                    "name": "token_type",
+                    "type": "EsdtTokenType"
+                },
                 {
-                    "name": "opt_dest_address",
-                    "type": "optional<Address>",
+                    "name": "opt_num_decimals",
+                    "type": "optional<u32>",
                     "multi_arg": true
                 }
             ],
@@ -563,6 +552,31 @@
     ],
     "hasCallback": true,
     "types": {
+        "EsdtTokenType": {
+            "type": "enum",
+            "variants": [
+                {
+                    "name": "Fungible",
+                    "discriminant": 0
+                },
+                {
+                    "name": "NonFungible",
+                    "discriminant": 1
+                },
+                {
+                    "name": "SemiFungible",
+                    "discriminant": 2
+                },
+                {
+                    "name": "Meta",
+                    "discriminant": 3
+                },
+                {
+                    "name": "Invalid",
+                    "discriminant": 4
+                }
+            ]
+        },
         "GovernanceProposalStatus": {
             "type": "enum",
             "variants": [
