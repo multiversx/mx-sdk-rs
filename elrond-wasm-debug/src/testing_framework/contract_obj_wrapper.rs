@@ -52,11 +52,6 @@ pub struct BlockchainStateWrapper {
     workspace_path: PathBuf,
 }
 
-pub enum StateChange {
-    Commit,
-    Revert,
-}
-
 impl BlockchainStateWrapper {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
@@ -549,7 +544,7 @@ impl BlockchainStateWrapper {
     where
         CB: ContractBase<Api = DebugApi> + CallableContract + 'static,
         ContractObjBuilder: 'static + Copy + Fn() -> CB,
-        TxFn: FnOnce(CB) -> StateChange,
+        TxFn: FnOnce(CB),
     {
         self.execute_tx_any(caller, sc_wrapper, egld_payment, Vec::new(), tx_fn)
     }
@@ -566,7 +561,7 @@ impl BlockchainStateWrapper {
     where
         CB: ContractBase<Api = DebugApi> + CallableContract + 'static,
         ContractObjBuilder: 'static + Copy + Fn() -> CB,
-        TxFn: FnOnce(CB) -> StateChange,
+        TxFn: FnOnce(CB),
     {
         let esdt_transfer = vec![TxInputESDT {
             token_identifier: token_id.to_vec(),
@@ -576,7 +571,7 @@ impl BlockchainStateWrapper {
         self.execute_tx_any(caller, sc_wrapper, &rust_biguint!(0), esdt_transfer, tx_fn)
     }
 
-    pub fn execute_esdt_multi_transfer<CB, ContractObjBuilder, TxFn: FnOnce(CB) -> StateChange>(
+    pub fn execute_esdt_multi_transfer<CB, ContractObjBuilder, TxFn: FnOnce(CB)>(
         &mut self,
         caller: &Address,
         sc_wrapper: &ContractObjWrapper<CB, ContractObjBuilder>,
@@ -609,15 +604,12 @@ impl BlockchainStateWrapper {
             sc_wrapper.address_ref(),
             sc_wrapper,
             &rust_biguint!(0),
-            |sc| {
-                query_fn(sc);
-                StateChange::Revert
-            },
+            query_fn,
         )
     }
 
     // deduplicates code for execution
-    fn execute_tx_any<CB, ContractObjBuilder, TxFn: FnOnce(CB) -> StateChange>(
+    fn execute_tx_any<CB, ContractObjBuilder, TxFn: FnOnce(CB)>(
         &mut self,
         caller: &Address,
         sc_wrapper: &ContractObjWrapper<CB, ContractObjBuilder>,
@@ -661,19 +653,21 @@ impl BlockchainStateWrapper {
         TxContextStack::static_push(tx_context_rc);
 
         let sc = (sc_wrapper.obj_builder)();
-        let result_state_change =
-            std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| tx_fn(sc)));
+        let exec_result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| tx_fn(sc)));
 
         let api_after_exec = Rc::try_unwrap(TxContextStack::static_pop()).unwrap();
         let updates = api_after_exec.into_blockchain_updates();
 
         let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
-        match result_state_change {
-            Ok(StateChange::Commit) => {
-                updates.apply(b_mock_ref);
+        match exec_result {
+            Ok(()) => {
+                // do not commit changes for SC Query (caller == SC in that case)
+                if caller != sc_wrapper.address_ref() {
+                    updates.apply(b_mock_ref);
+                }
+
                 TxResult::empty()
             },
-            Ok(StateChange::Revert) => TxResult::empty(),
             Err(panic_any) => interpret_panic_as_tx_result(panic_any),
         }
     }
