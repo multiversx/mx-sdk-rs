@@ -17,9 +17,7 @@ pub trait Adder {
 
     /// Add desired amount to the storage variable.
     #[endpoint]
-    fn add(&self, value: BigInt) -> SCResult<()> {
+    fn add(&self, value: BigInt) {
         self.sum().update(|sum| *sum += value);
-
-        Ok(())
     }
 }
