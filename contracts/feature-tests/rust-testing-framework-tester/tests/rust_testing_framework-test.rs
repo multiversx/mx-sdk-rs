@@ -3,7 +3,7 @@ use forwarder::call_sync::*;
 use num_traits::ToPrimitive;
 
 use elrond_wasm::types::{
-    BigInt, EsdtLocalRole, EsdtTokenPayment, EsdtTokenType, ManagedBuffer, ManagedVec,
+    Address, BigInt, EsdtLocalRole, EsdtTokenPayment, EsdtTokenType, ManagedBuffer, ManagedVec,
 };
 use elrond_wasm_debug::{
     assert_values_eq, managed_address, managed_biguint, managed_buffer, managed_token_id,
@@ -1171,6 +1171,31 @@ fn test_wrapper_getters() {
     assert_eq!(esdt_balance, actual_esdt_balance);
     assert_eq!(nft_balance, actual_nft_balance);
     assert_eq!(nft_attributes, actual_attributes);
+}
+
+#[test]
+fn fixed_address_account_creation_test() {
+    let mut wrapper = BlockchainStateWrapper::new();
+    wrapper
+        .create_user_account_fixed_address(&Address::from_slice(&[1u8; 32][..]), &rust_biguint!(0));
+}
+
+#[should_panic(
+    expected = "Invalid SC Address: \"0202020202020202020202020202020202020202020202020202020202020202\""
+)]
+#[test]
+fn fixed_address_invalid_sc_test() {
+    let mut wrapper = BlockchainStateWrapper::new();
+    let user_addr = Address::from_slice(&[1u8; 32][..]);
+
+    wrapper.create_user_account_fixed_address(&user_addr, &rust_biguint!(0));
+    wrapper.create_sc_account_fixed_address(
+        &Address::from_slice(&[2u8; 32][..]),
+        &rust_biguint!(0),
+        Some(&user_addr),
+        rust_testing_framework_tester::contract_obj,
+        SC_WASM_PATH,
+    );
 }
 
 #[test]

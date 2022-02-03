@@ -10,7 +10,7 @@ use crate::{
     rust_biguint,
     tx_execution::interpret_panic_as_tx_result,
     tx_mock::{TxCache, TxContext, TxContextStack, TxInput, TxInputESDT, TxResult},
-    world_mock::{AccountData, AccountEsdt, EsdtInstanceMetadata},
+    world_mock::{is_smart_contract_address, AccountData, AccountEsdt, EsdtInstanceMetadata},
     BlockchainMock, DebugApi,
 };
 
@@ -176,6 +176,14 @@ impl BlockchainStateWrapper {
         address
     }
 
+    pub fn create_user_account_fixed_address(
+        &mut self,
+        address: &Address,
+        egld_balance: &num_bigint::BigUint,
+    ) {
+        self.create_account_raw(address, egld_balance, None, None, None);
+    }
+
     pub fn create_sc_account<CB, ContractObjBuilder>(
         &mut self,
         egld_balance: &num_bigint::BigUint,
@@ -188,6 +196,30 @@ impl BlockchainStateWrapper {
         ContractObjBuilder: 'static + Copy + Fn() -> CB,
     {
         let address = self.address_factory.new_sc_address();
+        self.create_sc_account_fixed_address(
+            &address,
+            egld_balance,
+            owner,
+            obj_builder,
+            contract_wasm_path,
+        )
+    }
+
+    pub fn create_sc_account_fixed_address<CB, ContractObjBuilder>(
+        &mut self,
+        address: &Address,
+        egld_balance: &num_bigint::BigUint,
+        owner: Option<&Address>,
+        obj_builder: ContractObjBuilder,
+        contract_wasm_path: &str,
+    ) -> ContractObjWrapper<CB, ContractObjBuilder>
+    where
+        CB: ContractBase<Api = DebugApi> + CallableContract + 'static,
+        ContractObjBuilder: 'static + Copy + Fn() -> CB,
+    {
+        if !is_smart_contract_address(address) {
+            panic!("Invalid SC Address: {:?}", address_to_hex(address))
+        }
 
         let mut wasm_full_path = std::env::current_dir().unwrap();
         wasm_full_path.push(PathBuf::from_str(contract_wasm_path).unwrap());
@@ -209,7 +241,7 @@ impl BlockchainStateWrapper {
             .insert(address.clone(), was_relative_path_expr_bytes.clone());
 
         self.create_account_raw(
-            &address,
+            address,
             egld_balance,
             owner,
             Some(contract_bytes),
@@ -220,11 +252,10 @@ impl BlockchainStateWrapper {
             let contract_obj = create_contract_obj_box(obj_builder);
 
             let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
-            // let contract_obj = closure(DebugApi::new_from_static());
             b_mock_ref.register_contract_obj(&wasm_full_path_as_expr, contract_obj);
         }
 
-        ContractObjWrapper::new(address, obj_builder)
+        ContractObjWrapper::new(address.clone(), obj_builder)
     }
 
     pub fn create_account_raw(
@@ -235,6 +266,10 @@ impl BlockchainStateWrapper {
         sc_identifier: Option<Vec<u8>>,
         sc_mandos_path_expr: Option<Vec<u8>>,
     ) {
+        if self.rc_b_mock.account_exists(address) {
+            panic!("Address already used: {:?}", address_to_hex(address));
+        }
+
         let acc_data = AccountData {
             address: address.clone(),
             nonce: 0,
