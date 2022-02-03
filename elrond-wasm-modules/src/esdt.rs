@@ -1,3 +1,5 @@
+use elrond_wasm::elrond_codec::TopEncode;
+
 elrond_wasm::imports!();
 
 /// Standard smart contract module for managing a single ESDT.
@@ -13,64 +15,44 @@ elrond_wasm::imports!();
 ///
 #[elrond_wasm::module]
 pub trait EsdtModule {
-    #[storage_mapper("token_id")]
-    fn token_id(&self) -> SingleValueMapper<TokenIdentifier>;
+    /*
+        EsdtTokenType is an enum (u8):
+        0 - Fungible,
+        1 - NonFungible,
+        2 - SemiFungible,
+        3 - Meta,
 
+        Note: Only Fungible and Meta tokens have decimals
+    */
     #[payable("EGLD")]
     #[only_owner]
     #[endpoint(issueToken)]
     fn issue_token(
         &self,
+        #[payment_amount] issue_cost: BigUint,
         token_display_name: ManagedBuffer,
         token_ticker: ManagedBuffer,
-        num_decimals: usize,
-        #[payment] issue_cost: BigUint,
+        token_type: EsdtTokenType,
+        #[var_args] opt_num_decimals: OptionalArg<usize>,
     ) -> AsyncCall {
         require!(self.token_id().is_empty(), "Token already issued");
 
-        let initial_supply = BigUint::from(1u32);
+        let num_decimals = match opt_num_decimals {
+            OptionalArg::Some(d) => d,
+            OptionalArg::None => 0,
+        };
 
         self.send()
             .esdt_system_sc_proxy()
-            .issue_fungible(
+            .issue_and_set_all_roles(
                 issue_cost,
-                &token_display_name,
-                &token_ticker,
-                &initial_supply,
-                FungibleTokenProperties {
-                    can_burn: false,
-                    can_mint: false,
-                    num_decimals,
-                    can_freeze: true,
-                    can_wipe: true,
-                    can_pause: true,
-                    can_change_owner: false,
-                    can_upgrade: false,
-                    can_add_special_roles: true,
-                },
+                token_display_name,
+                token_ticker,
+                token_type,
+                num_decimals,
             )
             .async_call()
             .with_callback(self.callbacks().issue_callback())
-    }
-
-    /// optional address to set roles for. Defaults to SC's address.
-    #[only_owner]
-    #[endpoint(setLocalRoles)]
-    fn set_local_roles(
-        &self,
-        #[var_args] opt_dest_address: OptionalArg<ManagedAddress>,
-    ) -> AsyncCall {
-        let dest_address = match opt_dest_address {
-            OptionalArg::Some(addr) => addr,
-            OptionalArg::None => self.blockchain().get_sc_address(),
-        };
-        let token_id = self.token_id().get();
-        let roles = [EsdtLocalRole::Mint, EsdtLocalRole::Burn];
-
-        self.send()
-            .esdt_system_sc_proxy()
-            .set_special_roles(&dest_address, &token_id, roles[..].iter().cloned())
-            .async_call()
     }
 
     #[callback]
@@ -91,35 +73,47 @@ pub trait EsdtModule {
         }
     }
 
-    fn mint(&self, amount: &BigUint) -> SCResult<()> {
+    fn mint(&self, token_nonce: u64, amount: &BigUint) {
         let token_id = self.token_id().get();
-
-        self.require_local_roles_set(&token_id)?;
-        self.send().esdt_local_mint(&token_id, 0, amount);
-
-        Ok(())
+        self.send().esdt_local_mint(&token_id, token_nonce, amount);
     }
 
-    fn burn(&self, amount: &BigUint) -> SCResult<()> {
+    fn burn(&self, token_nonce: u64, amount: &BigUint) {
         let token_id = self.token_id().get();
-
-        self.require_local_roles_set(&token_id)?;
-        self.send().esdt_local_burn(&token_id, 0, amount);
-
-        Ok(())
+        self.send().esdt_local_burn(&token_id, token_nonce, amount);
     }
 
-    fn require_token_issued(&self) -> SCResult<()> {
+    fn nft_create<T: TopEncode>(&self, amount: &BigUint, attributes: &T) -> u64 {
+        let token_id = self.token_id().get();
+        let empty_buffer = ManagedBuffer::new();
+        let empty_vec = ManagedVec::from_raw_handle(empty_buffer.get_raw_handle());
+
+        self.send().esdt_nft_create(
+            &token_id,
+            &amount,
+            &empty_buffer,
+            &BigUint::zero(),
+            &empty_buffer,
+            &attributes,
+            &empty_vec,
+        )
+    }
+
+    fn get_token_attributes<T: TopDecode>(&self, token_nonce: u64) -> T {
+        let own_sc_address = self.blockchain().get_sc_address();
+        let token_id = self.token_id().get();
+        let token_data =
+            self.blockchain()
+                .get_esdt_token_data(&own_sc_address, &token_id, token_nonce);
+
+        token_data.decode_attributes_or_exit()
+    }
+
+    fn require_token_issued(&self) {
         require!(!self.token_id().is_empty(), "Token must be issued first");
-        Ok(())
     }
 
-    fn require_local_roles_set(&self, token_id: &TokenIdentifier) -> SCResult<()> {
-        let roles = self.blockchain().get_esdt_local_roles(token_id);
-        require!(
-            roles.has_role(&EsdtLocalRole::Mint) && roles.has_role(&EsdtLocalRole::Burn),
-            "Must set local roles first"
-        );
-        Ok(())
-    }
+    // Note: to issue another token, you have to clear this storage
+    #[storage_mapper("token_id")]
+    fn token_id(&self) -> SingleValueMapper<TokenIdentifier>;
 }
