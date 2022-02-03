@@ -59,9 +59,9 @@ impl NestedDecode for S {
         H: DecodeErrorHandler,
     {
         Ok(S {
-            int: u16::dep_decode_or_handle_err(input, h.clone())?,
-            seq: Vec::<u8>::dep_decode_or_handle_err(input, h.clone())?,
-            another_byte: u8::dep_decode_or_handle_err(input, h.clone())?,
+            int: u16::dep_decode_or_handle_err(input, h)?,
+            seq: Vec::<u8>::dep_decode_or_handle_err(input, h)?,
+            another_byte: u8::dep_decode_or_handle_err(input, h)?,
         })
     }
 }

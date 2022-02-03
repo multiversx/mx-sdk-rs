@@ -233,7 +233,7 @@ impl NestedDecode for BoxedBytes {
         I: NestedDecodeInput,
         H: DecodeErrorHandler,
     {
-        let size = usize::dep_decode_or_handle_err(input, h.clone())?;
+        let size = usize::dep_decode_or_handle_err(input, h)?;
         unsafe {
             let mut result = BoxedBytes::allocate(size);
             input.read_into_or_handle_err(result.as_mut_slice(), h)?;

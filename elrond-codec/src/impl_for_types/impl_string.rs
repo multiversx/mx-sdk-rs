@@ -153,7 +153,7 @@ impl NestedDecode for String {
         I: NestedDecodeInput,
         H: DecodeErrorHandler,
     {
-        let raw = Vec::<u8>::dep_decode_or_handle_err(input, h.clone())?;
+        let raw = Vec::<u8>::dep_decode_or_handle_err(input, h)?;
         match String::from_utf8(raw) {
             Ok(s) => Ok(s),
             Err(_) => Err(h.handle_error(DecodeError::UTF8_DECODE_ERROR)),

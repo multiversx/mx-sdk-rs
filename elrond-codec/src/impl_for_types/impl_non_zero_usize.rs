@@ -73,7 +73,7 @@ impl NestedDecode for NonZeroUsize {
         I: NestedDecodeInput,
         H: DecodeErrorHandler,
     {
-        if let Some(nz) = NonZeroUsize::new(usize::dep_decode_or_handle_err(input, h.clone())?) {
+        if let Some(nz) = NonZeroUsize::new(usize::dep_decode_or_handle_err(input, h)?) {
             Ok(nz)
         } else {
             Err(h.handle_error(DecodeError::INVALID_VALUE))

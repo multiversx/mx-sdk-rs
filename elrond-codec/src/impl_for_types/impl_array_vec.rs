@@ -93,14 +93,14 @@ impl<T: NestedDecode, const CAP: usize> NestedDecode for ArrayVec<T, CAP> {
         I: NestedDecodeInput,
         H: DecodeErrorHandler,
     {
-        let size = usize::dep_decode_or_handle_err(input, h.clone())?;
+        let size = usize::dep_decode_or_handle_err(input, h)?;
         if size > CAP {
             return Err(h.handle_error(DecodeError::CAPACITY_EXCEEDED_ERROR));
         }
         let mut result: ArrayVec<T, CAP> = ArrayVec::new();
         for _ in 0..size {
             unsafe {
-                result.push_unchecked(T::dep_decode_or_handle_err(input, h.clone())?);
+                result.push_unchecked(T::dep_decode_or_handle_err(input, h)?);
             }
         }
         Ok(result)

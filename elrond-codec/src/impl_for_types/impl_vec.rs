@@ -97,7 +97,7 @@ impl<T: NestedDecode> NestedDecode for Vec<T> {
         I: NestedDecodeInput,
         H: DecodeErrorHandler,
     {
-        let size = usize::dep_decode_or_handle_err(input, h.clone())?;
+        let size = usize::dep_decode_or_handle_err(input, h)?;
         match T::TYPE_INFO {
             TypeInfo::U8 => {
                 let mut vec_u8: Vec<u8> = alloc::vec![0; size];
@@ -108,7 +108,7 @@ impl<T: NestedDecode> NestedDecode for Vec<T> {
             _ => {
                 let mut result: Vec<T> = Vec::with_capacity(size);
                 for _ in 0..size {
-                    result.push(T::dep_decode_or_handle_err(input, h.clone())?);
+                    result.push(T::dep_decode_or_handle_err(input, h)?);
                 }
                 Ok(result)
             },

@@ -1,12 +1,12 @@
 use crate::DecodeError;
 
-pub trait DecodeErrorHandler: Clone {
+pub trait DecodeErrorHandler: Copy {
     type HandledErr: 'static;
 
     fn handle_error(&self, err: DecodeError) -> Self::HandledErr;
 }
 
-#[derive(Clone)]
+#[derive(Clone, Copy)]
 pub struct DefaultDecodeErrorHandler;
 
 impl DecodeErrorHandler for DefaultDecodeErrorHandler {
@@ -18,7 +18,7 @@ impl DecodeErrorHandler for DefaultDecodeErrorHandler {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Copy)]
 pub struct PanicDecodeErrorHandler;
 
 impl DecodeErrorHandler for PanicDecodeErrorHandler {

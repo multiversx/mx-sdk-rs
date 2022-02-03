@@ -49,7 +49,7 @@ impl<T: NestedDecode> NestedDecode for Option<T> {
         I: NestedDecodeInput,
         H: DecodeErrorHandler,
     {
-        match input.read_byte_or_handle_err(h.clone())? {
+        match input.read_byte_or_handle_err(h)? {
             0 => Ok(None),
             1 => Ok(Some(T::dep_decode_or_handle_err(input, h)?)),
             _ => Err(h.handle_error(DecodeError::INVALID_VALUE)),
@@ -149,9 +149,9 @@ impl<T: NestedDecode> TopDecode for Option<T> {
         if buffer.is_depleted() {
             Ok(None)
         } else {
-            let first_byte = buffer.read_byte_or_handle_err(h.clone())?;
+            let first_byte = buffer.read_byte_or_handle_err(h)?;
             if first_byte == 1 {
-                let item = T::dep_decode_or_handle_err(&mut buffer, h.clone())?;
+                let item = T::dep_decode_or_handle_err(&mut buffer, h)?;
                 if buffer.is_depleted() {
                     Ok(Some(item))
                 } else {

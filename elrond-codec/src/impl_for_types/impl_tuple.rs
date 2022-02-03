@@ -75,7 +75,7 @@ macro_rules! tuple_impls {
             {
                     Ok((
                         $(
-                            $name::dep_decode_or_handle_err(input, h.clone())?,
+                            $name::dep_decode_or_handle_err(input, h)?,
                         )+
                     ))
                 }

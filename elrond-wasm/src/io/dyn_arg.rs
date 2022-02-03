@@ -41,6 +41,8 @@ where
     pub arg_id: ArgId,
 }
 
+impl<M> Copy for ArgErrorHandler<M> where M: ManagedTypeApi + ErrorApi {}
+
 impl<M> From<ArgId> for ArgErrorHandler<M>
 where
     M: ManagedTypeApi + ErrorApi,
