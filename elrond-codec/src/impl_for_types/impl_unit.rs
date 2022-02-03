@@ -1,8 +1,8 @@
 use crate::{
     dep_encode_from_no_err, nested_ser::NestedEncodeNoErr, top_encode_from_no_err,
-    top_ser::TopEncodeNoErr, DecodeError, EncodeError, NestedDecode, NestedDecodeInput,
-    NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
-    TypeInfo,
+    top_ser::TopEncodeNoErr, DecodeError, DecodeErrorHandler, EncodeError, NestedDecode,
+    NestedDecodeInput, NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode,
+    TopEncodeOutput, TypeInfo,
 };
 
 impl TopEncodeNoErr for () {
@@ -38,14 +38,11 @@ dep_encode_from_no_err! {(), TypeInfo::Unit}
 impl NestedDecode for () {
     const TYPE_INFO: TypeInfo = TypeInfo::Unit;
 
-    fn dep_decode<I: NestedDecodeInput>(_: &mut I) -> Result<(), DecodeError> {
+    fn dep_decode_or_handle_err<I, H>(_input: &mut I, _h: H) -> Result<Self, H::HandledErr>
+    where
+        I: NestedDecodeInput,
+        H: DecodeErrorHandler,
+    {
         Ok(())
-    }
-
-    fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
-        _: &mut I,
-        _: ExitCtx,
-        _: fn(ExitCtx, DecodeError) -> !,
-    ) -> Self {
     }
 }

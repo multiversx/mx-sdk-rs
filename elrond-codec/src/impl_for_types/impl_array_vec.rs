@@ -8,6 +8,7 @@ use crate::{
     top_de_input::TopDecodeInput,
     top_ser::TopEncode,
     top_ser_output::TopEncodeOutput,
+    DecodeErrorHandler,
 };
 use arrayvec::ArrayVec;
 
@@ -87,36 +88,22 @@ impl<T: NestedEncode, const CAP: usize> NestedEncode for ArrayVec<T, CAP> {
 }
 
 impl<T: NestedDecode, const CAP: usize> NestedDecode for ArrayVec<T, CAP> {
-    fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
-        let size = usize::dep_decode(input)?;
+    fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: NestedDecodeInput,
+        H: DecodeErrorHandler,
+    {
+        let size = usize::dep_decode_or_handle_err(input, h.clone())?;
         if size > CAP {
-            return Err(DecodeError::CAPACITY_EXCEEDED_ERROR);
+            return Err(h.handle_error(DecodeError::CAPACITY_EXCEEDED_ERROR));
         }
         let mut result: ArrayVec<T, CAP> = ArrayVec::new();
         for _ in 0..size {
             unsafe {
-                result.push_unchecked(T::dep_decode(input)?);
+                result.push_unchecked(T::dep_decode_or_handle_err(input, h.clone())?);
             }
         }
         Ok(result)
-    }
-
-    fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
-        input: &mut I,
-        c: ExitCtx,
-        exit: fn(ExitCtx, DecodeError) -> !,
-    ) -> Self {
-        let size = usize::dep_decode_or_exit(input, c.clone(), exit);
-        if size > CAP {
-            exit(c, DecodeError::CAPACITY_EXCEEDED_ERROR);
-        }
-        let mut result: ArrayVec<T, CAP> = ArrayVec::new();
-        for _ in 0..size {
-            unsafe {
-                result.push_unchecked(T::dep_decode_or_exit(input, c.clone(), exit));
-            }
-        }
-        result
     }
 }
 

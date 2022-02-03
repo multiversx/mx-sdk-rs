@@ -166,16 +166,14 @@ impl<M: ManagedTypeApi> TopEncode for TokenIdentifier<M> {
 }
 
 impl<M: ManagedTypeApi> NestedDecode for TokenIdentifier<M> {
-    fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
-        Ok(TokenIdentifier::from(ManagedBuffer::dep_decode(input)?))
-    }
-
-    fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
-        input: &mut I,
-        c: ExitCtx,
-        exit: fn(ExitCtx, DecodeError) -> !,
-    ) -> Self {
-        TokenIdentifier::from(ManagedBuffer::dep_decode_or_exit(input, c, exit))
+    fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: NestedDecodeInput,
+        H: DecodeErrorHandler,
+    {
+        Ok(TokenIdentifier::from(
+            ManagedBuffer::dep_decode_or_handle_err(input, h)?,
+        ))
     }
 }
 

@@ -1,9 +1,9 @@
 use elrond_codec::{
     test_util::{check_dep_encode_decode, check_top_encode_decode},
     top_decode_from_nested, top_decode_from_nested_or_exit, top_encode_from_nested,
-    top_encode_from_nested_or_exit, DecodeError, EncodeError, NestedDecode, NestedDecodeInput,
-    NestedEncode, NestedEncodeNoErr, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode,
-    TopEncodeOutput,
+    top_encode_from_nested_or_exit, DecodeError, DecodeErrorHandler, EncodeError, NestedDecode,
+    NestedDecodeInput, NestedEncode, NestedEncodeNoErr, NestedEncodeOutput, TopDecode,
+    TopDecodeInput, TopEncode, TopEncodeOutput,
 };
 
 #[derive(PartialEq, Clone, Debug)]
@@ -73,34 +73,22 @@ impl TopEncode for E {
 }
 
 impl NestedDecode for E {
-    fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
-        match u32::dep_decode(input)? {
+    fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: NestedDecodeInput,
+        H: DecodeErrorHandler,
+    {
+        match u32::dep_decode_or_handle_err(input, h.clone())? {
             0 => Ok(E::Unit),
-            1 => Ok(E::Newtype(u32::dep_decode(input)?)),
-            2 => Ok(E::Tuple(u32::dep_decode(input)?, u32::dep_decode(input)?)),
+            1 => Ok(E::Newtype(u32::dep_decode_or_handle_err(input, h.clone())?)),
+            2 => Ok(E::Tuple(
+                u32::dep_decode_or_handle_err(input, h.clone())?,
+                u32::dep_decode_or_handle_err(input, h.clone())?,
+            )),
             3 => Ok(E::Struct {
-                a: u32::dep_decode(input)?,
+                a: u32::dep_decode_or_handle_err(input, h.clone())?,
             }),
-            _ => Err(DecodeError::INVALID_VALUE),
-        }
-    }
-
-    fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
-        input: &mut I,
-        c: ExitCtx,
-        exit: fn(ExitCtx, DecodeError) -> !,
-    ) -> Self {
-        match u32::dep_decode_or_exit(input, c.clone(), exit) {
-            0 => E::Unit,
-            1 => E::Newtype(u32::dep_decode_or_exit(input, c.clone(), exit)),
-            2 => E::Tuple(
-                u32::dep_decode_or_exit(input, c.clone(), exit),
-                u32::dep_decode_or_exit(input, c.clone(), exit),
-            ),
-            3 => E::Struct {
-                a: u32::dep_decode_or_exit(input, c.clone(), exit),
-            },
-            _ => exit(c.clone(), DecodeError::INVALID_VALUE),
+            _ => Err(h.handle_error(DecodeError::INVALID_VALUE)),
         }
     }
 }

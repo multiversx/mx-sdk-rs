@@ -8,6 +8,7 @@ use crate::{
     top_de_input::TopDecodeInput,
     top_ser::TopEncode,
     top_ser_output::TopEncodeOutput,
+    DecodeErrorHandler,
 };
 use alloc::{boxed::Box, string::String, vec::Vec};
 
@@ -147,40 +148,27 @@ impl NestedEncode for Box<str> {
 }
 
 impl NestedDecode for String {
-    fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
-        let raw = Vec::<u8>::dep_decode(input)?;
+    fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: NestedDecodeInput,
+        H: DecodeErrorHandler,
+    {
+        let raw = Vec::<u8>::dep_decode_or_handle_err(input, h.clone())?;
         match String::from_utf8(raw) {
             Ok(s) => Ok(s),
-            Err(_) => Err(DecodeError::UTF8_DECODE_ERROR),
-        }
-    }
-
-    fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
-        input: &mut I,
-        c: ExitCtx,
-        exit: fn(ExitCtx, DecodeError) -> !,
-    ) -> Self {
-        let raw = Vec::<u8>::dep_decode_or_exit(input, c.clone(), exit);
-        match String::from_utf8(raw) {
-            Ok(s) => s,
-            Err(_) => exit(c, DecodeError::UTF8_DECODE_ERROR),
+            Err(_) => Err(h.handle_error(DecodeError::UTF8_DECODE_ERROR)),
         }
     }
 }
 
 impl NestedDecode for Box<str> {
     #[inline]
-    fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
-        Ok(String::dep_decode(input)?.into_boxed_str())
-    }
-
-    #[inline]
-    fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
-        input: &mut I,
-        c: ExitCtx,
-        exit: fn(ExitCtx, DecodeError) -> !,
-    ) -> Self {
-        String::dep_decode_or_exit(input, c, exit).into_boxed_str()
+    fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: NestedDecodeInput,
+        H: DecodeErrorHandler,
+    {
+        Ok(String::dep_decode_or_handle_err(input, h)?.into_boxed_str())
     }
 }
 

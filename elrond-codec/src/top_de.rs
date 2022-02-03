@@ -40,25 +40,14 @@ pub trait TopDecode: Sized {
         }
     }
 
-    fn top_decode_or_err<I, EC, Err>(input: I, err_closure: EC) -> Result<Self, Err>
-    where
-        I: TopDecodeInput,
-        EC: Fn(DecodeError) -> Err + Clone,
-    {
-        match Self::top_decode(input) {
-            Ok(v) => Ok(v),
-            Err(e) => Err(err_closure(e)),
-        }
-    }
-
-    fn top_decode_or_handle_err<I, H>(input: I, err_handler: H) -> Result<Self, H::HandledErr>
+    fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
     where
         I: TopDecodeInput,
         H: DecodeErrorHandler,
     {
         match Self::top_decode(input) {
             Ok(v) => Ok(v),
-            Err(e) => Err(err_handler.handle_error(e)),
+            Err(e) => Err(h.handle_error(e)),
         }
     }
 

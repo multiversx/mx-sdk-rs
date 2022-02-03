@@ -3,8 +3,9 @@ use core::fmt::Debug;
 use elrond_codec::{
     test_util::{check_dep_encode_decode, check_top_encode_decode},
     top_decode_from_nested, top_decode_from_nested_or_exit, top_encode_from_nested,
-    top_encode_from_nested_or_exit, DecodeError, EncodeError, NestedDecode, NestedDecodeInput,
-    NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
+    top_encode_from_nested_or_exit, DecodeError, DecodeErrorHandler, EncodeError, NestedDecode,
+    NestedDecodeInput, NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode,
+    TopEncodeOutput,
 };
 
 #[derive(PartialEq, Debug, Clone)]
@@ -52,24 +53,16 @@ impl TopEncode for S {
 }
 
 impl NestedDecode for S {
-    fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
+    fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: NestedDecodeInput,
+        H: DecodeErrorHandler,
+    {
         Ok(S {
-            int: u16::dep_decode(input)?,
-            seq: Vec::<u8>::dep_decode(input)?,
-            another_byte: u8::dep_decode(input)?,
+            int: u16::dep_decode_or_handle_err(input, h.clone())?,
+            seq: Vec::<u8>::dep_decode_or_handle_err(input, h.clone())?,
+            another_byte: u8::dep_decode_or_handle_err(input, h.clone())?,
         })
-    }
-
-    fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
-        input: &mut I,
-        c: ExitCtx,
-        exit: fn(ExitCtx, DecodeError) -> !,
-    ) -> Self {
-        S {
-            int: u16::dep_decode_or_exit(input, c.clone(), exit),
-            seq: Vec::<u8>::dep_decode_or_exit(input, c.clone(), exit),
-            another_byte: u8::dep_decode_or_exit(input, c.clone(), exit),
-        }
     }
 }
 

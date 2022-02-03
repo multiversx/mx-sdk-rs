@@ -1,7 +1,7 @@
 use elrond_codec::{
     test_util::check_top_encode_decode, top_decode_from_nested, top_decode_from_nested_or_exit,
-    DecodeError, EncodeError, NestedDecode, NestedDecodeInput, NestedEncode, NestedEncodeOutput,
-    TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
+    DecodeError, DecodeErrorHandler, EncodeError, NestedDecode, NestedDecodeInput, NestedEncode,
+    NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
 };
 
 #[derive(PartialEq, Debug, Clone, Copy)]
@@ -40,20 +40,14 @@ impl TopEncode for WrappedArray {
 }
 
 impl NestedDecode for WrappedArray {
-    fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
+    fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: NestedDecodeInput,
+        H: DecodeErrorHandler,
+    {
         let mut arr = [0u8; 5];
-        input.read_into(&mut arr)?;
+        input.read_into_or_handle_err(&mut arr, h)?;
         Ok(WrappedArray(arr))
-    }
-
-    fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
-        input: &mut I,
-        c: ExitCtx,
-        exit: fn(ExitCtx, DecodeError) -> !,
-    ) -> Self {
-        let mut arr = [0u8; 5];
-        input.read_into_or_exit(&mut arr, c, exit);
-        WrappedArray(arr)
     }
 }
 

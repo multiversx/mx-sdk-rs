@@ -35,34 +35,13 @@ macro_rules! dep_decode_num_signed {
         impl NestedDecode for $ty {
             const TYPE_INFO: TypeInfo = $type_info;
 
-            fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
-                let mut bytes = [0u8; $num_bytes];
-                input.read_into(&mut bytes[..])?;
-                let num = bytes_to_number(&bytes[..], true) as $ty;
-                Ok(num)
-            }
-
-            fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
-                input: &mut I,
-                c: ExitCtx,
-                exit: fn(ExitCtx, DecodeError) -> !,
-            ) -> Self {
-                let mut bytes = [0u8; $num_bytes];
-                input.read_into_or_exit(&mut bytes[..], c, exit);
-                let num = bytes_to_number(&bytes[..], true) as $ty;
-                num
-            }
-
-            fn dep_decode_or_handle_err<I, H>(
-                input: &mut I,
-                err_handler: H,
-            ) -> Result<Self, H::HandledErr>
+            fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
             where
                 I: NestedDecodeInput,
                 H: DecodeErrorHandler,
             {
                 let mut bytes = [0u8; $num_bytes];
-                input.read_into_or_handle_err(&mut bytes[..], err_handler)?;
+                input.read_into_or_handle_err(&mut bytes[..], h)?;
                 let num = bytes_to_number(&bytes[..], true) as $ty;
                 Ok(num)
             }
@@ -107,10 +86,7 @@ macro_rules! top_decode_num_signed {
                 }
             }
 
-            fn top_decode_or_handle_err<I, H>(
-                input: I,
-                err_handler: H,
-            ) -> Result<Self, H::HandledErr>
+            fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
             where
                 I: TopDecodeInput,
                 H: DecodeErrorHandler,
@@ -119,7 +95,7 @@ macro_rules! top_decode_num_signed {
                 let min = <$bounds_ty>::MIN as i64;
                 let max = <$bounds_ty>::MAX as i64;
                 if arg_i64 < min || arg_i64 > max {
-                    Err(err_handler.handle_error(DecodeError::INPUT_OUT_OF_RANGE))
+                    Err(h.handle_error(DecodeError::INPUT_OUT_OF_RANGE))
                 } else {
                     Ok(arg_i64 as $ty)
                 }

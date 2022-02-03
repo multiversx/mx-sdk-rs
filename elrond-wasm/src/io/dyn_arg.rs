@@ -25,8 +25,8 @@ where
 
         let arg_input = loader.next_arg_input();
 
-        let err_handler = ArgErrorHandler::<I::ManagedTypeErrorApi>::from(arg_id);
-        let result = T::top_decode_or_handle_err(arg_input, err_handler);
+        let h = ArgErrorHandler::<I::ManagedTypeErrorApi>::from(arg_id);
+        let result = T::top_decode_or_handle_err(arg_input, h);
         let Ok(value) = result;
         value
     }

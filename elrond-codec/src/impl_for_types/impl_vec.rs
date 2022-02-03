@@ -9,7 +9,7 @@ use crate::{
     top_de_input::TopDecodeInput,
     top_ser::TopEncode,
     top_ser_output::TopEncodeOutput,
-    TypeInfo,
+    DecodeErrorHandler, TypeInfo,
 };
 use alloc::vec::Vec;
 
@@ -92,44 +92,25 @@ impl<T: NestedEncode> NestedEncode for Vec<T> {
 }
 
 impl<T: NestedDecode> NestedDecode for Vec<T> {
-    fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
-        let size = usize::dep_decode(input)?;
+    fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: NestedDecodeInput,
+        H: DecodeErrorHandler,
+    {
+        let size = usize::dep_decode_or_handle_err(input, h.clone())?;
         match T::TYPE_INFO {
             TypeInfo::U8 => {
                 let mut vec_u8: Vec<u8> = alloc::vec![0; size];
-                input.read_into(vec_u8.as_mut_slice())?;
+                input.read_into_or_handle_err(vec_u8.as_mut_slice(), h)?;
                 let cast_vec: Vec<T> = unsafe { core::mem::transmute(vec_u8) };
                 Ok(cast_vec)
             },
             _ => {
                 let mut result: Vec<T> = Vec::with_capacity(size);
                 for _ in 0..size {
-                    result.push(T::dep_decode(input)?);
+                    result.push(T::dep_decode_or_handle_err(input, h.clone())?);
                 }
                 Ok(result)
-            },
-        }
-    }
-
-    fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
-        input: &mut I,
-        c: ExitCtx,
-        exit: fn(ExitCtx, DecodeError) -> !,
-    ) -> Self {
-        let size = usize::dep_decode_or_exit(input, c.clone(), exit);
-        match T::TYPE_INFO {
-            TypeInfo::U8 => {
-                let mut vec_u8: Vec<u8> = alloc::vec![0; size];
-                input.read_into_or_exit(vec_u8.as_mut_slice(), c, exit);
-                let cast_vec: Vec<T> = unsafe { core::mem::transmute(vec_u8) };
-                cast_vec
-            },
-            _ => {
-                let mut result: Vec<T> = Vec::with_capacity(size);
-                for _ in 0..size {
-                    result.push(T::dep_decode_or_exit(input, c.clone(), exit));
-                }
-                result
             },
         }
     }

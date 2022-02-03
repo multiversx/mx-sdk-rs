@@ -189,20 +189,14 @@ impl TopEncode for H256 {
 }
 
 impl NestedDecode for H256 {
-    fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
+    fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: NestedDecodeInput,
+        H: DecodeErrorHandler,
+    {
         let mut res = H256::zero();
-        input.read_into(res.as_mut())?;
+        input.read_into_or_handle_err(res.as_mut(), h)?;
         Ok(res)
-    }
-
-    fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
-        input: &mut I,
-        c: ExitCtx,
-        exit: fn(ExitCtx, DecodeError) -> !,
-    ) -> Self {
-        let mut res = H256::zero();
-        input.read_into_or_exit(res.as_mut(), c, exit);
-        res
     }
 }
 

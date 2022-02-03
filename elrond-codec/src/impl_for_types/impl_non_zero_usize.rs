@@ -10,6 +10,7 @@ use crate::{
     top_de_input::TopDecodeInput,
     top_ser::TopEncode,
     top_ser_output::TopEncodeOutput,
+    DecodeErrorHandler,
 };
 
 impl TopEncode for NonZeroUsize {
@@ -67,23 +68,15 @@ impl NestedEncode for NonZeroUsize {
 }
 
 impl NestedDecode for NonZeroUsize {
-    fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
-        if let Some(nz) = NonZeroUsize::new(usize::dep_decode(input)?) {
+    fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: NestedDecodeInput,
+        H: DecodeErrorHandler,
+    {
+        if let Some(nz) = NonZeroUsize::new(usize::dep_decode_or_handle_err(input, h.clone())?) {
             Ok(nz)
         } else {
-            Err(DecodeError::INVALID_VALUE)
-        }
-    }
-
-    fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
-        input: &mut I,
-        c: ExitCtx,
-        exit: fn(ExitCtx, DecodeError) -> !,
-    ) -> Self {
-        if let Some(nz) = NonZeroUsize::new(usize::dep_decode_or_exit(input, c.clone(), exit)) {
-            nz
-        } else {
-            exit(c, DecodeError::INVALID_VALUE)
+            Err(h.handle_error(DecodeError::INVALID_VALUE))
         }
     }
 }
