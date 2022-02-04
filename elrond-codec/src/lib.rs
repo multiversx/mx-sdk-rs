@@ -53,7 +53,10 @@ pub use nested_de_input_slice::dep_decode_from_byte_slice;
 pub use nested_ser::{dep_encode_to_vec, NestedEncode, NestedEncodeNoErr};
 pub use top_de::{top_decode_from_nested, top_decode_from_nested_or_handle_err, TopDecode};
 pub use top_de_input::TopDecodeInput;
-pub use top_ser::{top_encode_from_nested, top_encode_no_err, top_encode_to_vec_u8, TopEncode};
+pub use top_ser::{
+    top_encode_from_nested, top_encode_no_err, top_encode_to_vec_u8, top_encode_to_vec_u8_or_panic,
+    TopEncode,
+};
 pub use top_ser_output::TopEncodeOutput;
 pub use transmute::{boxed_slice_into_vec, vec_into_boxed_slice};
 
