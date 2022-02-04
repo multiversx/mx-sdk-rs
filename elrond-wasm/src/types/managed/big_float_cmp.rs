@@ -1,13 +1,13 @@
 use core::cmp::Ordering;
 
-use crate::api::ManagedTypeApi;
+use crate::api::{BigFloatApi, ManagedTypeApi};
 
 use super::{BigFloat, BigInt};
 
 impl<M: ManagedTypeApi> PartialEq for BigFloat<M> {
     #[inline]
     fn eq(&self, other: &Self) -> bool {
-        let api = M::instance();
+        let api = M::managed_type_impl();
         api.bf_cmp(self.handle, other.handle).is_eq()
     }
 }
@@ -24,13 +24,13 @@ impl<M: ManagedTypeApi> PartialOrd for BigFloat<M> {
 impl<M: ManagedTypeApi> Ord for BigFloat<M> {
     #[inline]
     fn cmp(&self, other: &Self) -> Ordering {
-        let api = M::instance();
+        let api = M::managed_type_impl();
         api.bf_cmp(self.handle, other.handle)
     }
 }
 
 fn cmp_i64<M: ManagedTypeApi>(bf: &BigFloat<M>, other: i64) -> Ordering {
-    let api = M::instance();
+    let api = M::managed_type_impl();
     if other == 0 {
         match api.bf_sign(bf.handle) {
             crate::api::Sign::Plus => Ordering::Greater,
@@ -45,7 +45,7 @@ fn cmp_i64<M: ManagedTypeApi>(bf: &BigFloat<M>, other: i64) -> Ordering {
 }
 
 fn cmp_bi<M: ManagedTypeApi>(bf: &BigFloat<M>, other: &BigInt<M>) -> Ordering {
-    let api = M::instance();
+    let api = M::managed_type_impl();
     let new_bf_handle = api.bf_new_zero();
     api.bf_set_bi(new_bf_handle, other.handle);
     api.bf_cmp(bf.handle, new_bf_handle)
