@@ -754,6 +754,44 @@
         },
         {
             "step": "scCall",
+            "txId": "BigFloatAdd - 3",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "add_big_float",
+                "arguments": [
+                    "0x010a000000350000003a001f1c1a96fe0e2d",
+                    "0x010b0000003500000034ded4316c407a6b64"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "status": "10",
+                "message": "str:this big Float operation is not permitted while doing float.Add"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "BigFloatAdd - 4",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "add_big_float",
+                "arguments": [
+                    "0x010a00000035000100139c9920182fea6800",
+                    "0x010b0000003500000034ded4316c407a6b64"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "status": "10",
+                "message": "str:exponent is either too small or too big"
+            }
+        },
+        {
+            "step": "scCall",
             "txId": "BigFloatAddRef - 1",
             "tx": {
                 "from": "address:an_account",
@@ -830,6 +868,25 @@
                 "out": [
                     "-4.0"
                 ]
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "BigFloatSub - 3",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "sub_big_float",
+                "arguments": [
+                    "0x010a000000350000003a001f1c1a96fe0e2d",
+                    "0x010a0000003500000034ded4316c407a6b64"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "status": "10",
+                "message": "str:this big Float operation is not permitted while doing float.Sub"
             }
         },
         {
