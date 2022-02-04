@@ -9,10 +9,9 @@ elrond_wasm_node::wasm_endpoints! {
     (
         callBack
         getLockedEgldBalance
-        getUnusedWrappedEgld
         getWrappedEgldTokenIdentifier
         issueWrappedEgld
-        mintWrappedEgld
+        setLocalRoles
         unwrapEgld
         wrapEgld
     )
