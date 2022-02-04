@@ -2,7 +2,7 @@ use alloc::boxed::Box;
 
 use crate::{
     codec_err::DecodeError, nested_de::*, top_de_input::TopDecodeInput, DecodeErrorHandler,
-    DefaultDecodeErrorHandler, NestedDecodeInput, TypeInfo,
+    DefaultErrorHandler, NestedDecodeInput, TypeInfo,
 };
 
 /// Trait that allows zero-copy read of values from an underlying API in big endian format.
@@ -24,7 +24,7 @@ pub trait TopDecode: Sized {
 
     /// Attempt to deserialize the value from input.
     fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
-        Self::top_decode_or_handle_err(input, DefaultDecodeErrorHandler)
+        Self::top_decode_or_handle_err(input, DefaultErrorHandler)
     }
 
     /// Version of `top_decode` that can handle errors as soon as they occur.
@@ -77,5 +77,5 @@ where
     I: TopDecodeInput,
     T: NestedDecode,
 {
-    top_decode_from_nested_or_handle_err(input, DefaultDecodeErrorHandler)
+    top_decode_from_nested_or_handle_err(input, DefaultErrorHandler)
 }

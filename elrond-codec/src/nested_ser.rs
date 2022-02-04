@@ -1,5 +1,5 @@
 use crate::{
-    codec_err::EncodeError, nested_ser_output::NestedEncodeOutput, DefaultEncodeErrorHandler,
+    codec_err::EncodeError, nested_ser_output::NestedEncodeOutput, DefaultErrorHandler,
     EncodeErrorHandler, TypeInfo,
 };
 use alloc::vec::Vec;
@@ -24,7 +24,7 @@ pub trait NestedEncode: Sized {
     /// NestedEncode to output, using the format of an object nested inside another structure.
     /// Does not provide compact version.
     fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
-        self.dep_encode_or_handle_err(dest, DefaultEncodeErrorHandler)
+        self.dep_encode_or_handle_err(dest, DefaultErrorHandler)
     }
 
     /// Version of `dep_encode` that can handle errors as soon as they occur.

@@ -1,6 +1,6 @@
 use crate::{
     codec_err::EncodeError, nested_ser::NestedEncode, top_ser_output::TopEncodeOutput,
-    DefaultEncodeErrorHandler, EncodeErrorHandler, TypeInfo,
+    DefaultErrorHandler, EncodeErrorHandler, TypeInfo,
 };
 use alloc::vec::Vec;
 
@@ -25,7 +25,7 @@ pub trait TopEncode: Sized {
 
     /// Attempt to serialize the value to ouput.
     fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
-        self.top_encode_or_handle_err(output, DefaultEncodeErrorHandler)
+        self.top_encode_or_handle_err(output, DefaultErrorHandler)
     }
 
     /// Version of `top_encode` that can handle errors as soon as they occur.
