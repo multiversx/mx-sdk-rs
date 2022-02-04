@@ -3,7 +3,7 @@ use forwarder::call_sync::*;
 use num_traits::ToPrimitive;
 
 use elrond_wasm::types::{
-    Address, BigInt, EsdtLocalRole, EsdtTokenPayment, EsdtTokenType, ManagedBuffer, ManagedVec,
+    Address, BigUint, EsdtLocalRole, EsdtTokenPayment, EsdtTokenType, ManagedBuffer, ManagedVec,
 };
 use elrond_wasm_debug::{
     assert_values_eq, managed_address, managed_biguint, managed_buffer, managed_token_id,
@@ -1079,7 +1079,7 @@ fn test_async_call() {
     wrapper
         .execute_query(&adder_wrapper, |sc| {
             let current_sum = sc.sum().get();
-            let expected_sum = BigInt::from(10);
+            let expected_sum = BigUint::from(10u32);
             assert_eq!(current_sum, expected_sum);
         })
         .assert_ok();
