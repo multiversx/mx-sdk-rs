@@ -26,19 +26,13 @@ impl<T: NestedEncode, const N: usize> NestedEncode for [T; N] {
 
 impl<T: NestedEncode, const N: usize> TopEncode for [T; N] {
     #[inline]
-    fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
+    fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: TopEncodeOutput,
+        H: EncodeErrorHandler,
+    {
         // the top encoded slice does not serialize its length, so just like the array
-        (&self[..]).top_encode(output)
-    }
-
-    #[inline]
-    fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
-        &self,
-        output: O,
-        c: ExitCtx,
-        exit: fn(ExitCtx, EncodeError) -> !,
-    ) {
-        (&self[..]).top_encode_or_exit(output, c, exit);
+        (&self[..]).top_encode_or_handle_err(output, h)
     }
 }
 

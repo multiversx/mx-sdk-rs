@@ -7,8 +7,8 @@ use crate::{
 use alloc::{string::String, vec::Vec};
 use core::marker::PhantomData;
 use elrond_codec::{
-    DecodeErrorHandler, EncodeError, EncodeErrorHandler, NestedDecode, NestedDecodeInput,
-    NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
+    DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode,
+    NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
 };
 
 pub(crate) const INDEX_OUT_OF_RANGE_MSG: &[u8] = b"ManagedVec index out of range";
@@ -293,13 +293,17 @@ where
     T: ManagedVecItem + NestedEncode,
 {
     #[inline]
-    fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
+    fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: TopEncodeOutput,
+        H: EncodeErrorHandler,
+    {
         if T::SKIPS_RESERIALIZATION {
-            self.buffer.top_encode(output)
+            self.buffer.top_encode_or_handle_err(output, h)
         } else {
             let mut nested_buffer = output.start_nested_encode();
             for item in self {
-                item.dep_encode(&mut nested_buffer)?;
+                item.dep_encode_or_handle_err(&mut nested_buffer, h)?;
             }
             output.finalize_nested_encode(nested_buffer);
             Ok(())

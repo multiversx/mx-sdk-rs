@@ -1,9 +1,8 @@
 use elrond_codec::{
     test_util::{check_dep_encode_decode, check_top_encode_decode},
-    top_decode_from_nested_or_handle_err, top_encode_from_nested, top_encode_from_nested_or_exit,
-    DecodeError, DecodeErrorHandler, EncodeError, EncodeErrorHandler, NestedDecode,
-    NestedDecodeInput, NestedEncode, NestedEncodeNoErr, NestedEncodeOutput, TopDecode,
-    TopDecodeInput, TopEncode, TopEncodeOutput,
+    top_decode_from_nested_or_handle_err, top_encode_from_nested, DecodeError, DecodeErrorHandler,
+    EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode, NestedEncodeNoErr,
+    NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
 };
 
 #[derive(PartialEq, Clone, Debug)]
@@ -51,18 +50,12 @@ impl NestedEncode for E {
 
 impl TopEncode for E {
     #[inline]
-    fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
-        top_encode_from_nested(self, output)
-    }
-
-    #[inline]
-    fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
-        &self,
-        output: O,
-        c: ExitCtx,
-        exit: fn(ExitCtx, EncodeError) -> !,
-    ) {
-        top_encode_from_nested_or_exit(self, output, c, exit);
+    fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: TopEncodeOutput,
+        H: EncodeErrorHandler,
+    {
+        top_encode_from_nested(self, output, h)
     }
 }
 

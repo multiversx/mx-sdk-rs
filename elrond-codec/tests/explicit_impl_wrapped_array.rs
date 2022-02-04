@@ -19,18 +19,13 @@ impl NestedEncode for WrappedArray {
 }
 
 impl TopEncode for WrappedArray {
-    fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
+    fn top_encode_or_handle_err<O, H>(&self, output: O, _h: H) -> Result<(), H::HandledErr>
+    where
+        O: TopEncodeOutput,
+        H: EncodeErrorHandler,
+    {
         output.set_slice_u8(&self.0[..]);
         Ok(())
-    }
-
-    fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
-        &self,
-        output: O,
-        _: ExitCtx,
-        _: fn(ExitCtx, EncodeError) -> !,
-    ) {
-        output.set_slice_u8(&self.0[..]);
     }
 }
 

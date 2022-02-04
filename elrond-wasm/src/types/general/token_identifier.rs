@@ -160,11 +160,15 @@ impl<M: ManagedTypeApi> NestedEncode for TokenIdentifier<M> {
 
 impl<M: ManagedTypeApi> TopEncode for TokenIdentifier<M> {
     #[inline]
-    fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
+    fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: TopEncodeOutput,
+        H: EncodeErrorHandler,
+    {
         if self.is_empty() {
-            (&Self::EGLD_REPRESENTATION[..]).top_encode(output)
+            (&Self::EGLD_REPRESENTATION[..]).top_encode_or_handle_err(output, h)
         } else {
-            self.buffer.top_encode(output)
+            self.buffer.top_encode_or_handle_err(output, h)
         }
     }
 }

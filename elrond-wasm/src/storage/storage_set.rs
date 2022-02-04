@@ -54,10 +54,15 @@ where
     }
 
     #[inline]
-    fn set_specialized<T, F>(self, value: &T, else_serialization: F) -> Result<(), EncodeError>
+    fn supports_specialized_type<T: TryStaticCast>() -> bool {
+        T::type_eq::<ManagedBuffer<A>>() || T::type_eq::<BigUint<A>>() || T::type_eq::<BigInt<A>>()
+    }
+
+    #[inline]
+    fn set_specialized<T, H>(self, value: &T, h: H) -> Result<(), H::HandledErr>
     where
         T: TryStaticCast,
-        F: FnOnce(Self) -> Result<(), EncodeError>,
+        H: EncodeErrorHandler,
     {
         if let Some(managed_buffer) = value.try_cast_ref::<ManagedBuffer<A>>() {
             self.set_managed_buffer(managed_buffer);
@@ -69,7 +74,7 @@ where
             self.set_managed_buffer(&big_int.to_signed_bytes_be_buffer());
             Ok(())
         } else {
-            else_serialization(self)
+            Err(h.handle_error(EncodeError::UNSUPPORTED_OPERATION))
         }
     }
 

@@ -7,35 +7,23 @@ use alloc::boxed::Box;
 
 impl<T: TopEncode> TopEncode for &T {
     #[inline]
-    fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
-        (*self).top_encode(output)
-    }
-
-    #[inline]
-    fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
-        &self,
-        output: O,
-        c: ExitCtx,
-        exit: fn(ExitCtx, EncodeError) -> !,
-    ) {
-        (*self).top_encode_or_exit(output, c, exit);
+    fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: TopEncodeOutput,
+        H: EncodeErrorHandler,
+    {
+        (*self).top_encode_or_handle_err(output, h)
     }
 }
 
 impl<T: TopEncode> TopEncode for Box<T> {
     #[inline]
-    fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
-        self.as_ref().top_encode(output)
-    }
-
-    #[inline]
-    fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
-        &self,
-        output: O,
-        c: ExitCtx,
-        exit: fn(ExitCtx, EncodeError) -> !,
-    ) {
-        self.as_ref().top_encode_or_exit(output, c, exit);
+    fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: TopEncodeOutput,
+        H: EncodeErrorHandler,
+    {
+        self.as_ref().top_encode_or_handle_err(output, h)
     }
 }
 

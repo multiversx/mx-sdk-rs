@@ -1,5 +1,6 @@
 use crate::{
-    codec_err::EncodeError, nested_ser::NestedEncode, top_ser_output::TopEncodeOutput, TypeInfo,
+    codec_err::EncodeError, nested_ser::NestedEncode, top_ser_output::TopEncodeOutput,
+    DefaultEncodeErrorHandler, EncodeErrorHandler, TypeInfo,
 };
 use alloc::vec::Vec;
 
@@ -23,7 +24,9 @@ pub trait TopEncode: Sized {
     const TYPE_INFO: TypeInfo = TypeInfo::Unknown;
 
     /// Attempt to serialize the value to ouput.
-    fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError>;
+    fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
+        self.top_encode_or_handle_err(output, DefaultEncodeErrorHandler)
+    }
 
     /// Version of `top_decode` that exits quickly in case of error.
     /// Its purpose is to create smaller bytecode implementations
@@ -39,32 +42,29 @@ pub trait TopEncode: Sized {
             Err(e) => exit(c, e),
         }
     }
+
+    fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: TopEncodeOutput,
+        H: EncodeErrorHandler,
+    {
+        match self.top_encode(output) {
+            Ok(()) => Ok(()),
+            Err(e) => Err(h.handle_error(e)),
+        }
+    }
 }
 
-pub fn top_encode_from_nested<T, O>(obj: &T, output: O) -> Result<(), EncodeError>
+pub fn top_encode_from_nested<T, O, H>(obj: &T, output: O, h: H) -> Result<(), H::HandledErr>
 where
     O: TopEncodeOutput,
     T: NestedEncode,
+    H: EncodeErrorHandler,
 {
     let mut nested_buffer = output.start_nested_encode();
-    obj.dep_encode(&mut nested_buffer)?;
+    obj.dep_encode_or_handle_err(&mut nested_buffer, h)?;
     output.finalize_nested_encode(nested_buffer);
     Ok(())
-}
-
-pub fn top_encode_from_nested_or_exit<T, O, ExitCtx>(
-    obj: &T,
-    output: O,
-    c: ExitCtx,
-    exit: fn(ExitCtx, EncodeError) -> !,
-) where
-    O: TopEncodeOutput,
-    T: NestedEncode,
-    ExitCtx: Clone,
-{
-    let mut nested_buffer = output.start_nested_encode();
-    obj.dep_encode_or_exit(&mut nested_buffer, c, exit);
-    output.finalize_nested_encode(nested_buffer);
 }
 
 pub fn top_encode_to_vec_u8<T: TopEncode>(obj: &T) -> Result<Vec<u8>, EncodeError> {

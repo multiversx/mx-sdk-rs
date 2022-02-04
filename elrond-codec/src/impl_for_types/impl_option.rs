@@ -47,12 +47,16 @@ impl<T: NestedDecode> NestedDecode for Option<T> {
 impl<T: NestedEncode> TopEncode for Option<T> {
     /// Allow None to be serialized to empty bytes, but leave the leading "1" for Some,
     /// to allow disambiguation between e.g. Some(0) and None.
-    fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
+    fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: TopEncodeOutput,
+        H: EncodeErrorHandler,
+    {
         match self {
             Some(v) => {
                 let mut buffer = output.start_nested_encode();
                 buffer.push_byte(1u8);
-                v.dep_encode(&mut buffer)?;
+                v.dep_encode_or_handle_err(&mut buffer, h)?;
                 output.finalize_nested_encode(buffer);
             },
             None => {
@@ -60,27 +64,6 @@ impl<T: NestedEncode> TopEncode for Option<T> {
             },
         }
         Ok(())
-    }
-
-    /// Allow None to be serialized to empty bytes, but leave the leading "1" for Some,
-    /// to allow disambiguation between e.g. Some(0) and None.
-    fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
-        &self,
-        output: O,
-        c: ExitCtx,
-        exit: fn(ExitCtx, EncodeError) -> !,
-    ) {
-        match self {
-            Some(v) => {
-                let mut buffer = output.start_nested_encode();
-                buffer.push_byte(1u8);
-                v.dep_encode_or_exit(&mut buffer, c, exit);
-                output.finalize_nested_encode(buffer);
-            },
-            None => {
-                output.set_slice_u8(&[]);
-            },
-        }
     }
 }
 

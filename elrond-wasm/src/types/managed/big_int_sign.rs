@@ -1,7 +1,7 @@
 use alloc::string::String;
 use elrond_codec::{
-    DecodeErrorHandler, EncodeError, EncodeErrorHandler, NestedDecode, NestedDecodeInput,
-    NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
+    DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode,
+    NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
 };
 
 // BigInt sign.
@@ -38,8 +38,12 @@ impl Sign {
 
 impl TopEncode for Sign {
     #[inline]
-    fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
-        self.to_int().top_encode(output)
+    fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: TopEncodeOutput,
+        H: EncodeErrorHandler,
+    {
+        self.to_int().top_encode_or_handle_err(output, h)
     }
 }
 

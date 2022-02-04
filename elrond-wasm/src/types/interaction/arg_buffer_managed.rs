@@ -164,8 +164,12 @@ where
     M: ManagedTypeApi,
 {
     #[inline]
-    fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
-        self.data.top_encode(output)
+    fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: TopEncodeOutput,
+        H: EncodeErrorHandler,
+    {
+        self.data.top_encode_or_handle_err(output, h)
     }
 }
 
