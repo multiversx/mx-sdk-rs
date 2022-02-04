@@ -218,7 +218,7 @@ impl<M: ManagedTypeApi> TopDecode for BigInt<M> {
         H: DecodeErrorHandler,
     {
         if I::supports_specialized_type::<Self>() {
-            input.into_specialized_or_handle_err(h)
+            input.into_specialized(h)
         } else {
             let boxed_bytes = BoxedBytes::top_decode_or_handle_err(input, h)?;
             Ok(Self::from_signed_bytes_be(boxed_bytes.as_slice()))

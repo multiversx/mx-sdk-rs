@@ -37,7 +37,7 @@ pub trait TopDecodeInput: Sized {
         false
     }
 
-    fn into_specialized_or_handle_err<T, H>(self, h: H) -> Result<T, H::HandledErr>
+    fn into_specialized<T, H>(self, h: H) -> Result<T, H::HandledErr>
     where
         T: TryStaticCast,
         H: DecodeErrorHandler,
