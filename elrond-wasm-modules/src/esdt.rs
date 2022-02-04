@@ -106,7 +106,7 @@ pub trait EsdtModule {
             self.blockchain()
                 .get_esdt_token_data(&own_sc_address, &token_id, token_nonce);
 
-        token_data.decode_attributes_or_exit()
+        token_data.decode_attributes()
     }
 
     fn require_token_issued(&self) {

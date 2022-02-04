@@ -28,11 +28,11 @@ pub struct EsdtTokenData<M: ManagedTypeApi> {
 }
 
 impl<M: ManagedTypeApi> EsdtTokenData<M> {
-    pub fn decode_attributes<T: TopDecode>(&self) -> Result<T, DecodeError> {
+    pub fn try_decode_attributes<T: TopDecode>(&self) -> Result<T, DecodeError> {
         T::top_decode(self.attributes.clone()) // TODO: remove clone
     }
 
-    pub fn decode_attributes_or_exit<T: TopDecode>(&self) -> T {
+    pub fn decode_attributes<T: TopDecode>(&self) -> T {
         let Ok(value) = T::top_decode_or_handle_err(
             self.attributes.clone(), // TODO: remove clone
             ExitCodecErrorHandler::<M>::from(DECODE_ATTRIBUTE_ERROR_PREFIX),
