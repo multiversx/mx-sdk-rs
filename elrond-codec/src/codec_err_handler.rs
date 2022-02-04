@@ -1,45 +1,18 @@
 use crate::{DecodeError, EncodeError};
 
-pub trait DecodeErrorHandler: Copy {
-    type HandledErr: 'static;
-
-    fn handle_error(&self, err: DecodeError) -> Self::HandledErr;
-}
-
-#[derive(Clone, Copy)]
-pub struct DefaultDecodeErrorHandler;
-
-impl DecodeErrorHandler for DefaultDecodeErrorHandler {
-    type HandledErr = DecodeError;
-
-    #[inline]
-    fn handle_error(&self, err: DecodeError) -> Self::HandledErr {
-        err
-    }
-}
-
-#[derive(Clone, Copy)]
-pub struct PanicDecodeErrorHandler;
-
-impl DecodeErrorHandler for PanicDecodeErrorHandler {
-    type HandledErr = !;
-
-    #[inline]
-    fn handle_error(&self, err: DecodeError) -> Self::HandledErr {
-        panic!("Decode error occured: {}", err.message_str())
-    }
-}
-
 pub trait EncodeErrorHandler: Copy {
     type HandledErr: 'static;
 
     fn handle_error(&self, err: EncodeError) -> Self::HandledErr;
 }
 
-#[derive(Clone, Copy)]
-pub struct DefaultEncodeErrorHandler;
+pub trait DecodeErrorHandler: Copy {
+    type HandledErr: 'static;
 
-impl EncodeErrorHandler for DefaultEncodeErrorHandler {
+    fn handle_error(&self, err: DecodeError) -> Self::HandledErr;
+}
+
+impl EncodeErrorHandler for DefaultErrorHandler {
     type HandledErr = EncodeError;
 
     #[inline]
@@ -48,14 +21,37 @@ impl EncodeErrorHandler for DefaultEncodeErrorHandler {
     }
 }
 
+/// The simplest error handler, it simply passes the error on.
 #[derive(Clone, Copy)]
-pub struct PanicEncodeErrorHandler;
+pub struct DefaultErrorHandler;
 
-impl EncodeErrorHandler for PanicEncodeErrorHandler {
+impl DecodeErrorHandler for DefaultErrorHandler {
+    type HandledErr = DecodeError;
+
+    #[inline]
+    fn handle_error(&self, err: DecodeError) -> Self::HandledErr {
+        err
+    }
+}
+
+/// An error handler that panics immediately, instead of returning a `Result`.
+#[derive(Clone, Copy)]
+pub struct PanicErrorHandler;
+
+impl EncodeErrorHandler for PanicErrorHandler {
     type HandledErr = !;
 
     #[inline]
     fn handle_error(&self, err: EncodeError) -> Self::HandledErr {
         panic!("Encode error occured: {}", err.message_str())
+    }
+}
+
+impl DecodeErrorHandler for PanicErrorHandler {
+    type HandledErr = !;
+
+    #[inline]
+    fn handle_error(&self, err: DecodeError) -> Self::HandledErr {
+        panic!("Decode error occured: {}", err.message_str())
     }
 }

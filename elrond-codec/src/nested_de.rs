@@ -2,7 +2,7 @@
 
 use crate::{
     codec_err::DecodeError, nested_de_input::NestedDecodeInput, DecodeErrorHandler,
-    DefaultDecodeErrorHandler, TypeInfo,
+    DefaultErrorHandler, TypeInfo,
 };
 
 /// Trait that allows zero-copy read of value-references from slices in LE format.
@@ -16,7 +16,7 @@ pub trait NestedDecode: Sized {
     /// using the format of an object nested inside another structure.
     /// In case of success returns the deserialized value and the number of bytes consumed during the operation.
     fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
-        Self::dep_decode_or_handle_err(input, DefaultDecodeErrorHandler)
+        Self::dep_decode_or_handle_err(input, DefaultErrorHandler)
     }
 
     /// Version of `dep_decode` that can handle errors as soon as they occur.

@@ -7,8 +7,7 @@ use crate::{
     top_de_input::TopDecodeInput,
     top_ser::TopEncode,
     top_ser_output::TopEncodeOutput,
-    vec_into_boxed_slice, DecodeErrorHandler, DefaultEncodeErrorHandler, EncodeErrorHandler,
-    TypeInfo,
+    vec_into_boxed_slice, DecodeErrorHandler, DefaultErrorHandler, EncodeErrorHandler, TypeInfo,
 };
 use alloc::{boxed::Box, vec::Vec};
 

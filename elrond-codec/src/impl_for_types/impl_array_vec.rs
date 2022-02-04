@@ -86,9 +86,7 @@ impl<T: NestedDecode, const CAP: usize> NestedDecode for ArrayVec<T, CAP> {
 
 #[cfg(test)]
 pub mod tests {
-    use crate::{
-        test_util::check_top_encode_decode, DecodeError, PanicDecodeErrorHandler, TopDecode,
-    };
+    use crate::{test_util::check_top_encode_decode, DecodeError, PanicErrorHandler, TopDecode};
     use arrayvec::ArrayVec;
 
     /// [1, 2, 3]
@@ -112,7 +110,7 @@ pub mod tests {
     #[test]
     #[should_panic]
     fn test_top_arrayvec_capacity_exceeded_panic() {
-        let _ = <ArrayVec<i32, 2>>::top_decode_or_handle_err(TOP_BYTES, PanicDecodeErrorHandler);
+        let _ = <ArrayVec<i32, 2>>::top_decode_or_handle_err(TOP_BYTES, PanicErrorHandler);
     }
 
     #[test]
@@ -130,9 +128,7 @@ pub mod tests {
     #[test]
     #[should_panic]
     fn test_nested_arrayvec_capacity_exceeded_panic() {
-        let _ = Option::<ArrayVec<i32, 2>>::top_decode_or_handle_err(
-            NESTED_BYTES,
-            PanicDecodeErrorHandler,
-        );
+        let _ =
+            Option::<ArrayVec<i32, 2>>::top_decode_or_handle_err(NESTED_BYTES, PanicErrorHandler);
     }
 }
