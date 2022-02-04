@@ -8,8 +8,9 @@ use crate::{
 };
 use alloc::string::String;
 use elrond_codec::{
-    DecodeError, DecodeErrorHandler, EncodeError, NestedDecode, NestedDecodeInput, NestedEncode,
-    NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, TryStaticCast,
+    DecodeError, DecodeErrorHandler, EncodeError, EncodeErrorHandler, NestedDecode,
+    NestedDecodeInput, NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode,
+    TopEncodeOutput, TryStaticCast,
 };
 
 const DECODE_ERROR_BAD_LENGTH: &str = "bad array length";
@@ -165,11 +166,17 @@ where
     M: ManagedTypeApi,
 {
     #[inline]
-    fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
-        dest.push_specialized(ManagedBufferSizeContext(N), &self.buffer, |else_output| {
-            else_output.write(self.buffer.to_boxed_bytes().as_slice());
+    fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: NestedEncodeOutput,
+        H: EncodeErrorHandler,
+    {
+        if O::supports_specialized_type::<ManagedBuffer<M>>() {
+            dest.push_specialized(ManagedBufferSizeContext(N), &self.buffer, h)
+        } else {
+            dest.write(self.buffer.to_boxed_bytes().as_slice());
             Ok(())
-        })
+        }
     }
 }
 

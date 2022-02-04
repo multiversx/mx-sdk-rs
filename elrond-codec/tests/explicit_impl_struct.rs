@@ -3,8 +3,8 @@ use core::fmt::Debug;
 use elrond_codec::{
     test_util::{check_dep_encode_decode, check_top_encode_decode},
     top_decode_from_nested_or_handle_err, top_encode_from_nested, top_encode_from_nested_or_exit,
-    DecodeErrorHandler, EncodeError, NestedDecode, NestedDecodeInput, NestedEncode,
-    NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
+    DecodeErrorHandler, EncodeError, EncodeErrorHandler, NestedDecode, NestedDecodeInput,
+    NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
 };
 
 #[derive(PartialEq, Debug, Clone)]
@@ -15,22 +15,15 @@ pub struct S {
 }
 
 impl NestedEncode for S {
-    fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
-        self.int.dep_encode(dest)?;
-        self.seq.dep_encode(dest)?;
-        self.another_byte.dep_encode(dest)?;
+    fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: NestedEncodeOutput,
+        H: EncodeErrorHandler,
+    {
+        self.int.dep_encode_or_handle_err(dest, h)?;
+        self.seq.dep_encode_or_handle_err(dest, h)?;
+        self.another_byte.dep_encode_or_handle_err(dest, h)?;
         Ok(())
-    }
-
-    fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(
-        &self,
-        dest: &mut O,
-        c: ExitCtx,
-        exit: fn(ExitCtx, EncodeError) -> !,
-    ) {
-        self.int.dep_encode_or_exit(dest, c.clone(), exit);
-        self.seq.dep_encode_or_exit(dest, c.clone(), exit);
-        self.another_byte.dep_encode_or_exit(dest, c.clone(), exit);
     }
 }
 

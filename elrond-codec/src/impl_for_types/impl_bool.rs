@@ -10,7 +10,7 @@ use crate::{
     top_encode_from_no_err,
     top_ser::{TopEncode, TopEncodeNoErr},
     top_ser_output::TopEncodeOutput,
-    DecodeErrorHandler, TypeInfo,
+    DecodeErrorHandler, EncodeErrorHandler, TypeInfo,
 };
 
 impl TopEncodeNoErr for bool {

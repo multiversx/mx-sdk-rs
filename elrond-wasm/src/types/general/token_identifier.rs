@@ -145,11 +145,15 @@ impl<M: ManagedTypeApi> Eq for TokenIdentifier<M> {}
 
 impl<M: ManagedTypeApi> NestedEncode for TokenIdentifier<M> {
     #[inline]
-    fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
+    fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: NestedEncodeOutput,
+        H: EncodeErrorHandler,
+    {
         if self.is_empty() {
-            (&Self::EGLD_REPRESENTATION[..]).dep_encode(dest)
+            (&Self::EGLD_REPRESENTATION[..]).dep_encode_or_handle_err(dest, h)
         } else {
-            self.buffer.dep_encode(dest)
+            self.buffer.dep_encode_or_handle_err(dest, h)
         }
     }
 }

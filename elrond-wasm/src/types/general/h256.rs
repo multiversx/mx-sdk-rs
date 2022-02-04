@@ -157,18 +157,13 @@ impl H256 {
 use elrond_codec::*;
 
 impl NestedEncode for H256 {
-    fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
+    fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, _h: H) -> Result<(), H::HandledErr>
+    where
+        O: NestedEncodeOutput,
+        H: EncodeErrorHandler,
+    {
         dest.write(&self.0[..]);
         Ok(())
-    }
-
-    fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(
-        &self,
-        dest: &mut O,
-        _: ExitCtx,
-        _: fn(ExitCtx, EncodeError) -> !,
-    ) {
-        dest.write(&self.0[..]);
     }
 }
 

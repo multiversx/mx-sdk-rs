@@ -1,6 +1,7 @@
 use crate::{
-    DecodeError, DecodeErrorHandler, EncodeError, NestedDecode, NestedDecodeInput, NestedEncode,
-    NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
+    DecodeError, DecodeErrorHandler, EncodeError, EncodeErrorHandler, NestedDecode,
+    NestedDecodeInput, NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode,
+    TopEncodeOutput,
 };
 use alloc::boxed::Box;
 
@@ -50,32 +51,22 @@ impl<T: TopDecode> TopDecode for Box<T> {
 
 impl<T: NestedEncode> NestedEncode for &T {
     #[inline]
-    fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
-        (*self).dep_encode(dest)
-    }
-
-    fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(
-        &self,
-        dest: &mut O,
-        c: ExitCtx,
-        exit: fn(ExitCtx, EncodeError) -> !,
-    ) {
-        (*self).dep_encode_or_exit(dest, c, exit);
+    fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: NestedEncodeOutput,
+        H: EncodeErrorHandler,
+    {
+        (*self).dep_encode_or_handle_err(dest, h)
     }
 }
 
 impl<T: NestedEncode> NestedEncode for Box<T> {
-    fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
-        self.as_ref().dep_encode(dest)
-    }
-
-    fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(
-        &self,
-        dest: &mut O,
-        c: ExitCtx,
-        exit: fn(ExitCtx, EncodeError) -> !,
-    ) {
-        self.as_ref().dep_encode_or_exit(dest, c, exit);
+    fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: NestedEncodeOutput,
+        H: EncodeErrorHandler,
+    {
+        self.as_ref().dep_encode_or_handle_err(dest, h)
     }
 }
 

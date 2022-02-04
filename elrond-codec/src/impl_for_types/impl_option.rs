@@ -8,36 +8,23 @@ use crate::{
     top_de_input::TopDecodeInput,
     top_ser::TopEncode,
     top_ser_output::TopEncodeOutput,
-    DecodeErrorHandler,
+    DecodeErrorHandler, EncodeErrorHandler,
 };
 
 impl<T: NestedEncode> NestedEncode for Option<T> {
-    fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
+    fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: NestedEncodeOutput,
+        H: EncodeErrorHandler,
+    {
         match self {
             Some(v) => {
                 dest.push_byte(1u8);
-                v.dep_encode(dest)
+                v.dep_encode_or_handle_err(dest, h)
             },
             None => {
                 dest.push_byte(0u8);
                 Ok(())
-            },
-        }
-    }
-
-    fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(
-        &self,
-        dest: &mut O,
-        c: ExitCtx,
-        exit: fn(ExitCtx, EncodeError) -> !,
-    ) {
-        match self {
-            Some(v) => {
-                dest.push_byte(1u8);
-                v.dep_encode_or_exit(dest, c, exit);
-            },
-            None => {
-                dest.push_byte(0u8);
             },
         }
     }

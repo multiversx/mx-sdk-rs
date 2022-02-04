@@ -20,19 +20,17 @@ macro_rules! dep_encode_from_no_err {
             const TYPE_INFO: TypeInfo = $type_info;
 
             #[inline]
-            fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
-                self.dep_encode_no_err(dest);
-                Ok(())
-            }
-
-            #[inline]
-            fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(
+            fn dep_encode_or_handle_err<O, H>(
                 &self,
                 dest: &mut O,
-                _: ExitCtx,
-                _: fn(ExitCtx, EncodeError) -> !,
-            ) {
+                _h: H,
+            ) -> Result<(), H::HandledErr>
+            where
+                O: NestedEncodeOutput,
+                H: EncodeErrorHandler,
+            {
                 self.dep_encode_no_err(dest);
+                Ok(())
             }
         }
     };
