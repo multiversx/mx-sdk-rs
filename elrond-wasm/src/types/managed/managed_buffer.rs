@@ -295,7 +295,7 @@ impl<M: ManagedTypeApi> NestedDecode for ManagedBuffer<M> {
         H: DecodeErrorHandler,
     {
         if I::supports_specialized_type::<Self>() {
-            input.read_specialized_or_handle_err((), h)
+            input.read_specialized((), h)
         } else {
             let boxed_bytes = BoxedBytes::dep_decode_or_handle_err(input, h)?;
             Ok(Self::new_from_bytes(boxed_bytes.as_slice()))

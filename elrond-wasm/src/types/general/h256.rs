@@ -185,7 +185,7 @@ impl NestedDecode for H256 {
         H: DecodeErrorHandler,
     {
         let mut res = H256::zero();
-        input.read_into_or_handle_err(res.as_mut(), h)?;
+        input.read_into(res.as_mut(), h)?;
         Ok(res)
     }
 }

@@ -41,7 +41,7 @@ macro_rules! dep_decode_num_signed {
                 H: DecodeErrorHandler,
             {
                 let mut bytes = [0u8; $num_bytes];
-                input.read_into_or_handle_err(&mut bytes[..], h)?;
+                input.read_into(&mut bytes[..], h)?;
                 let num = bytes_to_number(&bytes[..], true) as $ty;
                 Ok(num)
             }

@@ -87,13 +87,16 @@ where
         self.buffer_len - self.decode_index
     }
 
-    fn read_into(&mut self, into: &mut [u8]) -> Result<(), DecodeError> {
+    fn read_into<H>(&mut self, into: &mut [u8], h: H) -> Result<(), H::HandledErr>
+    where
+        H: DecodeErrorHandler,
+    {
         let err_result = self.buffer.load_slice(self.decode_index, into);
         if err_result.is_ok() {
             self.decode_index += into.len();
             Ok(())
         } else {
-            Err(DecodeError::INPUT_TOO_SHORT)
+            Err(h.handle_error(DecodeError::INPUT_TOO_SHORT))
         }
     }
 
@@ -101,11 +104,7 @@ where
         T::type_eq::<ManagedBuffer<M>>() || T::type_eq::<BigUint<M>>() || T::type_eq::<BigInt<M>>()
     }
 
-    fn read_specialized_or_handle_err<T, C, H>(
-        &mut self,
-        context: C,
-        h: H,
-    ) -> Result<T, H::HandledErr>
+    fn read_specialized<T, C, H>(&mut self, context: C, h: H) -> Result<T, H::HandledErr>
     where
         T: TryStaticCast,
         C: TryStaticCast,

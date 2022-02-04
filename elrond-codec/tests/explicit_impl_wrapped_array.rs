@@ -36,7 +36,7 @@ impl NestedDecode for WrappedArray {
         H: DecodeErrorHandler,
     {
         let mut arr = [0u8; 5];
-        input.read_into_or_handle_err(&mut arr, h)?;
+        input.read_into(&mut arr, h)?;
         Ok(WrappedArray(arr))
     }
 }

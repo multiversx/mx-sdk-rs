@@ -194,7 +194,7 @@ where
         H: DecodeErrorHandler,
     {
         let buffer = if I::supports_specialized_type::<ManagedBuffer<M>>() {
-            input.read_specialized_or_handle_err(ManagedBufferSizeContext(N), h)?
+            input.read_specialized(ManagedBufferSizeContext(N), h)?
         } else {
             let byte_array = <[u8; N]>::dep_decode_or_handle_err(input, h)?;
             byte_array.as_ref().into()

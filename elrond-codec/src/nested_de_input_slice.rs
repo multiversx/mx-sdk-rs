@@ -6,9 +6,12 @@ impl<'a> NestedDecodeInput for &'a [u8] {
         self.len()
     }
 
-    fn read_into(&mut self, into: &mut [u8]) -> Result<(), DecodeError> {
+    fn read_into<H>(&mut self, into: &mut [u8], h: H) -> Result<(), H::HandledErr>
+    where
+        H: DecodeErrorHandler,
+    {
         if into.len() > self.len() {
-            return Err(DecodeError::INPUT_TOO_SHORT);
+            return Err(h.handle_error(DecodeError::INPUT_TOO_SHORT));
         }
         let len = into.len();
         into.copy_from_slice(&self[..len]);

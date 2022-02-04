@@ -71,7 +71,7 @@ impl<T: NestedDecode> NestedDecode for Vec<T> {
         match T::TYPE_INFO {
             TypeInfo::U8 => {
                 let mut vec_u8: Vec<u8> = alloc::vec![0; size];
-                input.read_into_or_handle_err(vec_u8.as_mut_slice(), h)?;
+                input.read_into(vec_u8.as_mut_slice(), h)?;
                 let cast_vec: Vec<T> = unsafe { core::mem::transmute(vec_u8) };
                 Ok(cast_vec)
             },
