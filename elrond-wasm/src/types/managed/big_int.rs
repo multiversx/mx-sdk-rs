@@ -8,9 +8,8 @@ use crate::{
 };
 use alloc::string::String;
 use elrond_codec::{
-    DecodeErrorHandler, EncodeError, EncodeErrorHandler, NestedDecode, NestedDecodeInput,
-    NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
-    TryStaticCast,
+    DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode,
+    NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, TryStaticCast,
 };
 
 #[repr(transparent)]
@@ -169,11 +168,17 @@ impl<M: ManagedTypeApi> TryStaticCast for BigInt<M> {}
 
 impl<M: ManagedTypeApi> TopEncode for BigInt<M> {
     #[inline]
-    fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
-        output.set_specialized(self, |else_output| {
-            else_output.set_slice_u8(self.to_signed_bytes_be().as_slice());
+    fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: TopEncodeOutput,
+        H: EncodeErrorHandler,
+    {
+        if O::supports_specialized_type::<Self>() {
+            output.set_specialized(self, h)
+        } else {
+            output.set_slice_u8(self.to_signed_bytes_be().as_slice());
             Ok(())
-        })
+        }
     }
 }
 

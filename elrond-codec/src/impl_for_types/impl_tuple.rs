@@ -18,21 +18,17 @@ macro_rules! tuple_impls {
             where
                 $($name: NestedEncode,)+
             {
-				fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
+				fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
+                where
+                    O: TopEncodeOutput,
+                    H: EncodeErrorHandler,
+                {
 					let mut buffer = output.start_nested_encode();
 					$(
-                        self.$n.dep_encode(&mut buffer)?;
+                        self.$n.dep_encode_or_handle_err(&mut buffer, h)?;
                     )+
 					output.finalize_nested_encode(buffer);
 					Ok(())
-				}
-
-				fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(&self, output: O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
-					let mut buffer = output.start_nested_encode();
-					$(
-                        self.$n.dep_encode_or_exit(&mut buffer, c.clone(), exit);
-                    )+
-					output.finalize_nested_encode(buffer);
 				}
             }
 

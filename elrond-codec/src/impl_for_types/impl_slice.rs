@@ -42,7 +42,11 @@ where
 }
 
 impl<T: NestedEncode> TopEncode for &[T] {
-    fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
+    fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: TopEncodeOutput,
+        H: EncodeErrorHandler,
+    {
         match T::TYPE_INFO {
             TypeInfo::U8 => {
                 // transmute to &[u8]
@@ -56,55 +60,22 @@ impl<T: NestedEncode> TopEncode for &[T] {
                 // because it always appends to the buffer,
                 // which is not necessary above
                 let mut buffer = output.start_nested_encode();
-                dep_encode_slice_contents(self, &mut buffer, DefaultEncodeErrorHandler)?;
+                dep_encode_slice_contents(self, &mut buffer, h)?;
                 output.finalize_nested_encode(buffer);
             },
         }
         Ok(())
     }
-
-    fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
-        &self,
-        output: O,
-        c: ExitCtx,
-        exit: fn(ExitCtx, EncodeError) -> !,
-    ) {
-        match T::TYPE_INFO {
-            TypeInfo::U8 => {
-                // transmute to &[u8]
-                // save directly, without passing through the buffer
-                let slice: &[u8] =
-                    unsafe { core::slice::from_raw_parts(self.as_ptr() as *const u8, self.len()) };
-                output.set_slice_u8(slice);
-            },
-            _ => {
-                // only using `dep_encode_slice_contents` for non-u8,
-                // because it always appends to the buffer,
-                // which is not necessary above
-                let mut buffer = output.start_nested_encode();
-                for x in *self {
-                    x.dep_encode_or_exit(&mut buffer, c.clone(), exit);
-                }
-                output.finalize_nested_encode(buffer);
-            },
-        }
-    }
 }
 
 impl<T: NestedEncode> TopEncode for Box<[T]> {
     #[inline]
-    fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
-        self.as_ref().top_encode(output)
-    }
-
-    #[inline]
-    fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
-        &self,
-        output: O,
-        c: ExitCtx,
-        exit: fn(ExitCtx, EncodeError) -> !,
-    ) {
-        self.as_ref().top_encode_or_exit(output, c, exit);
+    fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: TopEncodeOutput,
+        H: EncodeErrorHandler,
+    {
+        self.as_ref().top_encode_or_handle_err(output, h)
     }
 }
 

@@ -1,6 +1,6 @@
 use core::marker::PhantomData;
 
-use elrond_codec::TryStaticCast;
+use elrond_codec::{EncodeErrorHandler, TryStaticCast};
 
 use crate::{
     api::{EndpointFinishApi, EndpointFinishApiImpl, ErrorApi, ErrorApiImpl, ManagedTypeApi},
@@ -52,10 +52,17 @@ where
     }
 
     #[inline]
-    fn set_specialized<T, F>(self, value: &T, else_serialization: F) -> Result<(), EncodeError>
+    fn supports_specialized_type<T: TryStaticCast>() -> bool {
+        T::type_eq::<ManagedBuffer<FA>>()
+            || T::type_eq::<BigUint<FA>>()
+            || T::type_eq::<BigInt<FA>>()
+    }
+
+    #[inline]
+    fn set_specialized<T, H>(self, value: &T, h: H) -> Result<(), H::HandledErr>
     where
         T: TryStaticCast,
-        F: FnOnce(Self) -> Result<(), EncodeError>,
+        H: EncodeErrorHandler,
     {
         if let Some(managed_buffer) = value.try_cast_ref::<ManagedBuffer<FA>>() {
             FA::finish_api_impl().finish_managed_buffer_raw(managed_buffer.handle);
@@ -67,7 +74,7 @@ where
             FA::finish_api_impl().finish_big_int_raw(big_int.handle);
             Ok(())
         } else {
-            else_serialization(self)
+            Err(h.handle_error(EncodeError::UNSUPPORTED_OPERATION))
         }
     }
 

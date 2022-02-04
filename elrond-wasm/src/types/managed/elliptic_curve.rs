@@ -243,17 +243,12 @@ impl<M: ManagedTypeApi> NestedEncode for EllipticCurve<M> {
 }
 
 impl<M: ManagedTypeApi> TopEncode for EllipticCurve<M> {
-    fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
-        top_encode_from_nested(self, output)
-    }
-
-    fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
-        &self,
-        output: O,
-        c: ExitCtx,
-        exit: fn(ExitCtx, EncodeError) -> !,
-    ) {
-        top_encode_from_nested_or_exit(self, output, c, exit);
+    fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: TopEncodeOutput,
+        H: EncodeErrorHandler,
+    {
+        top_encode_from_nested(self, output, h)
     }
 }
 
