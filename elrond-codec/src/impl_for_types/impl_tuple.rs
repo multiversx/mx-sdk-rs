@@ -8,7 +8,7 @@ use crate::{
     top_de_input::TopDecodeInput,
     top_ser::TopEncode,
     top_ser_output::TopEncodeOutput,
-    DecodeErrorHandler,
+    DecodeErrorHandler, EncodeErrorHandler,
 };
 
 macro_rules! tuple_impls {
@@ -53,17 +53,15 @@ macro_rules! tuple_impls {
             where
                 $($name: NestedEncode,)+
             {
-				fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
+				fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>
+                where
+                    O: NestedEncodeOutput,
+                    H: EncodeErrorHandler,
+                {
 					$(
-                        self.$n.dep_encode(dest)?;
+                        self.$n.dep_encode_or_handle_err(dest, h)?;
                     )+
 					Ok(())
-				}
-
-				fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(&self, dest: &mut O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
-					$(
-                        self.$n.dep_encode_or_exit(dest, c.clone(), exit);
-                    )+
 				}
             }
 

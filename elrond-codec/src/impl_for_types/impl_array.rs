@@ -8,25 +8,19 @@ use crate::{
     top_de_input::TopDecodeInput,
     top_ser::TopEncode,
     top_ser_output::TopEncodeOutput,
-    DecodeErrorHandler, TypeInfo,
+    DecodeErrorHandler, EncodeErrorHandler, TypeInfo,
 };
 use alloc::boxed::Box;
 use arrayvec::ArrayVec;
 
 impl<T: NestedEncode, const N: usize> NestedEncode for [T; N] {
     #[inline]
-    fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
-        super::impl_slice::dep_encode_slice_contents(&self[..], dest)
-    }
-
-    #[inline]
-    fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(
-        &self,
-        dest: &mut O,
-        c: ExitCtx,
-        exit: fn(ExitCtx, EncodeError) -> !,
-    ) {
-        super::impl_slice::dep_encode_slice_contents_or_exit(&self[..], dest, c, exit);
+    fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: NestedEncodeOutput,
+        H: EncodeErrorHandler,
+    {
+        super::impl_slice::dep_encode_slice_contents(&self[..], dest, h)
     }
 }
 

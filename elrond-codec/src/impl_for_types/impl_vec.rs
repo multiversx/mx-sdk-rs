@@ -9,7 +9,7 @@ use crate::{
     top_de_input::TopDecodeInput,
     top_ser::TopEncode,
     top_ser_output::TopEncodeOutput,
-    DecodeErrorHandler, TypeInfo,
+    DecodeErrorHandler, EncodeErrorHandler, TypeInfo,
 };
 use alloc::vec::Vec;
 
@@ -58,18 +58,12 @@ impl<T: NestedDecode> TopDecode for Vec<T> {
 
 impl<T: NestedEncode> NestedEncode for Vec<T> {
     #[inline]
-    fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
-        self.as_slice().dep_encode(dest)
-    }
-
-    #[inline]
-    fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(
-        &self,
-        dest: &mut O,
-        c: ExitCtx,
-        exit: fn(ExitCtx, EncodeError) -> !,
-    ) {
-        self.as_slice().dep_encode_or_exit(dest, c, exit);
+    fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: NestedEncodeOutput,
+        H: EncodeErrorHandler,
+    {
+        self.as_slice().dep_encode_or_handle_err(dest, h)
     }
 }
 

@@ -52,18 +52,13 @@ impl From<u16> for CodeMetadata {
 }
 
 impl NestedEncode for CodeMetadata {
-    fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
-        self.bits().dep_encode(dest)?;
+    fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: NestedEncodeOutput,
+        H: EncodeErrorHandler,
+    {
+        self.bits().dep_encode_or_handle_err(dest, h)?;
         Ok(())
-    }
-
-    fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(
-        &self,
-        dest: &mut O,
-        c: ExitCtx,
-        exit: fn(ExitCtx, EncodeError) -> !,
-    ) {
-        self.bits().dep_encode_or_exit(dest, c, exit);
     }
 }
 

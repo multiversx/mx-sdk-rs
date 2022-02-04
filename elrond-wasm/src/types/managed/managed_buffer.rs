@@ -8,8 +8,9 @@ use crate::{
 };
 use alloc::string::String;
 use elrond_codec::{
-    DecodeErrorHandler, EncodeError, NestedDecode, NestedDecodeInput, NestedEncode,
-    NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, TryStaticCast, Vec,
+    DecodeErrorHandler, EncodeError, EncodeErrorHandler, NestedDecode, NestedDecodeInput,
+    NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
+    TryStaticCast, Vec,
 };
 
 /// A byte buffer managed by an external API.
@@ -255,10 +256,16 @@ impl<M: ManagedTypeApi> TopEncode for ManagedBuffer<M> {
 }
 
 impl<M: ManagedTypeApi> NestedEncode for ManagedBuffer<M> {
-    fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
-        dest.push_specialized((), self, |else_output| {
-            self.to_boxed_bytes().dep_encode(else_output)
-        })
+    fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: NestedEncodeOutput,
+        H: EncodeErrorHandler,
+    {
+        if O::supports_specialized_type::<Self>() {
+            dest.push_specialized((), self, h)
+        } else {
+            self.to_boxed_bytes().dep_encode_or_handle_err(dest, h)
+        }
     }
 }
 

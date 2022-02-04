@@ -1,8 +1,9 @@
 use elrond_codec::{
     test_util::{check_dep_encode_decode, check_top_encode_decode},
     top_decode_from_nested_or_handle_err, top_encode_from_nested, top_encode_from_nested_or_exit,
-    DecodeError, DecodeErrorHandler, EncodeError, NestedDecode, NestedDecodeInput, NestedEncode,
-    NestedEncodeNoErr, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
+    DecodeError, DecodeErrorHandler, EncodeError, EncodeErrorHandler, NestedDecode,
+    NestedDecodeInput, NestedEncode, NestedEncodeNoErr, NestedEncodeOutput, TopDecode,
+    TopDecodeInput, TopEncode, TopEncodeOutput,
 };
 
 #[derive(PartialEq, Clone, Debug)]
@@ -38,19 +39,13 @@ impl NestedEncodeNoErr for E {
 
 impl NestedEncode for E {
     #[inline]
-    fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
+    fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, _h: H) -> Result<(), H::HandledErr>
+    where
+        O: NestedEncodeOutput,
+        H: EncodeErrorHandler,
+    {
         self.dep_encode_no_err(dest);
         Ok(())
-    }
-
-    #[inline]
-    fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(
-        &self,
-        dest: &mut O,
-        _: ExitCtx,
-        _: fn(ExitCtx, EncodeError) -> !,
-    ) {
-        self.dep_encode_no_err(dest);
     }
 }
 

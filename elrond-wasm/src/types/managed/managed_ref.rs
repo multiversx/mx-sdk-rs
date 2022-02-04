@@ -1,6 +1,8 @@
 use core::{borrow::Borrow, marker::PhantomData, ops::Deref};
 
-use elrond_codec::{EncodeError, NestedEncode, NestedEncodeOutput, TopEncode, TopEncodeOutput};
+use elrond_codec::{
+    EncodeError, EncodeErrorHandler, NestedEncode, NestedEncodeOutput, TopEncode, TopEncodeOutput,
+};
 
 use crate::api::{Handle, ManagedTypeApi};
 
@@ -136,8 +138,13 @@ where
     M: ManagedTypeApi,
     T: ManagedType<M> + NestedEncode,
 {
-    fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
-        self.deref().dep_encode(dest)
+    #[inline]
+    fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: NestedEncodeOutput,
+        H: EncodeErrorHandler,
+    {
+        self.deref().dep_encode_or_handle_err(dest, h)
     }
 }
 

@@ -1,25 +1,20 @@
 use elrond_codec::{
     test_util::check_top_encode_decode, top_decode_from_nested_or_handle_err, DecodeErrorHandler,
-    EncodeError, NestedDecode, NestedDecodeInput, NestedEncode, NestedEncodeOutput, TopDecode,
-    TopDecodeInput, TopEncode, TopEncodeOutput,
+    EncodeError, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode,
+    NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
 };
 
 #[derive(PartialEq, Debug, Clone, Copy)]
 pub struct WrappedArray(pub [u8; 5]);
 
 impl NestedEncode for WrappedArray {
-    fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
+    fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, _h: H) -> Result<(), H::HandledErr>
+    where
+        O: NestedEncodeOutput,
+        H: EncodeErrorHandler,
+    {
         dest.write(&self.0[..]);
         Ok(())
-    }
-
-    fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(
-        &self,
-        dest: &mut O,
-        _: ExitCtx,
-        _: fn(ExitCtx, EncodeError) -> !,
-    ) {
-        dest.write(&self.0[..]);
     }
 }
 
