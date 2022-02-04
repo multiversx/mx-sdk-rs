@@ -32,10 +32,10 @@ impl<M: ManagedTypeApi> Auction<M> {
     ) -> Self {
         Auction {
             auction_type,
-            starting_price: starting_price,
-            ending_price: ending_price,
+            starting_price,
+            ending_price,
             deadline,
-            kitty_owner: kitty_owner,
+            kitty_owner,
             current_bid: BigUint::zero(),
             current_winner: ManagedAddress::zero(),
         }
