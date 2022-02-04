@@ -1,11 +1,11 @@
 use core::marker::PhantomData;
 
-use alloc::vec::Vec;
+use alloc::{boxed::Box, vec::Vec};
 
 use crate::{
     api::{ErrorApi, ErrorApiImpl, ManagedTypeApi},
     err_msg,
-    types::{BoxedBytes, ManagedBytesTopDecodeInput},
+    types::BoxedBytes,
     DynArgInput,
 };
 
@@ -36,7 +36,7 @@ impl<A> DynArgInput for BytesArgLoader<A>
 where
     A: ManagedTypeApi + ErrorApi,
 {
-    type ItemInput = ManagedBytesTopDecodeInput<A>;
+    type ItemInput = Box<[u8]>;
 
     type ManagedTypeErrorApi = A;
 
@@ -45,7 +45,7 @@ where
         self.next_index < self.bytes_vec.len()
     }
 
-    fn next_arg_input(&mut self) -> ManagedBytesTopDecodeInput<A> {
+    fn next_arg_input(&mut self) -> Box<[u8]> {
         if !self.has_next() {
             A::error_api_impl().signal_error(err_msg::ARG_WRONG_NUMBER);
         }
@@ -56,6 +56,6 @@ where
         let boxed_bytes =
             core::mem::replace(&mut self.bytes_vec[self.next_index], BoxedBytes::empty());
         self.next_index += 1;
-        ManagedBytesTopDecodeInput::new(boxed_bytes)
+        boxed_bytes.into_box()
     }
 }
