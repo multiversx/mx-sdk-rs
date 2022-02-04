@@ -1,7 +1,7 @@
 use elrond_codec::{
     test_util::check_top_encode_decode, top_decode_from_nested_or_handle_err, DecodeErrorHandler,
-    EncodeError, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode,
-    NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
+    EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode, NestedEncodeOutput,
+    TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
 };
 
 #[derive(PartialEq, Debug, Clone, Copy)]
