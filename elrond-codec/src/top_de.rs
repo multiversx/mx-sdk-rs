@@ -27,21 +27,9 @@ pub trait TopDecode: Sized {
         Self::top_decode_or_handle_err(input, DefaultDecodeErrorHandler)
     }
 
-    /// Version of `top_decode` that exits quickly in case of error.
-    /// Its purpose is to create smaller implementations
-    /// in cases where the application is supposed to exit directly on decode error.
-    #[inline]
-    fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
-        input: I,
-        c: ExitCtx,
-        exit: fn(ExitCtx, DecodeError) -> !,
-    ) -> Self {
-        match Self::top_decode(input) {
-            Ok(v) => v,
-            Err(e) => exit(c, e),
-        }
-    }
-
+    /// Version of `top_decode` that can handle errors as soon as they occur.
+    /// For instance in can exit immediately and make sure that if it returns, it is a success.
+    /// By not deferring error handling, this can lead to somewhat smaller bytecode.
     fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
     where
         I: TopDecodeInput,

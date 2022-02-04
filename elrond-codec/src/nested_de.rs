@@ -5,18 +5,6 @@ use crate::{
     DefaultDecodeErrorHandler, TypeInfo,
 };
 
-// pub enum EarlyExit{}
-
-// pub trait ResultProvider {
-//     type Res: Try;
-
-//     fn result_ok(&self, v: <Self::Res as Try>::Output) -> <Self::Res as Try>::Output;
-
-//     fn result_err(&self, e: <Self::Res as Try>::Residual) -> <Self::Res as Try>::Residual;
-// }
-
-// pub struct DefaultResultProvider;
-
 /// Trait that allows zero-copy read of value-references from slices in LE format.
 pub trait NestedDecode: Sized {
     // !INTERNAL USE ONLY!
@@ -31,20 +19,9 @@ pub trait NestedDecode: Sized {
         Self::dep_decode_or_handle_err(input, DefaultDecodeErrorHandler)
     }
 
-    /// Version of `top_decode` that exits quickly in case of error.
-    /// Its purpose is to create smaller implementations
-    /// in cases where the application is supposed to exit directly on decode error.
-    fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
-        input: &mut I,
-        c: ExitCtx,
-        exit: fn(ExitCtx, DecodeError) -> !,
-    ) -> Self {
-        match Self::dep_decode(input) {
-            Ok(v) => v,
-            Err(e) => exit(c, e),
-        }
-    }
-
+    /// Version of `dep_decode` that can handle errors as soon as they occur.
+    /// For instance in can exit immediately and make sure that if it returns, it is a success.
+    /// By not deferring error handling, this can lead to somewhat smaller bytecode.
     fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
     where
         I: NestedDecodeInput,
