@@ -1,7 +1,7 @@
 use super::VmApiImpl;
 use alloc::vec::Vec;
 use elrond_wasm::{
-    api::{Handle, StorageReadApi, StorageWriteApi},
+    api::{Handle, StorageReadApi, StorageReadApiImpl, StorageWriteApi, StorageWriteApiImpl},
     types::BoxedBytes,
 };
 
@@ -27,10 +27,20 @@ extern "C" {
     fn mBufferNew() -> i32;
     fn mBufferStorageStore(keyHandle: i32, mBufferHandle: i32) -> i32;
     fn mBufferStorageLoad(keyHandle: i32, mBufferHandle: i32) -> i32;
+    fn mBufferStorageLoadFromAddress(addressHandle: i32, keyHandle: i32, mBufferHandle: i32);
     fn mBufferGetLength(mBufferHandle: i32) -> i32;
 }
 
 impl StorageReadApi for VmApiImpl {
+    type StorageReadApiImpl = VmApiImpl;
+
+    #[inline]
+    fn storage_read_api_impl() -> Self::StorageReadApiImpl {
+        VmApiImpl {}
+    }
+}
+
+impl StorageReadApiImpl for VmApiImpl {
     #[inline]
     fn storage_load_len(&self, key: &[u8]) -> usize {
         unsafe { storageLoadLength(key.as_ref().as_ptr(), key.len() as i32) as usize }
@@ -94,9 +104,27 @@ impl StorageReadApi for VmApiImpl {
     fn storage_load_i64(&self, key: &[u8]) -> i64 {
         unsafe { smallIntStorageLoadSigned(key.as_ref().as_ptr(), key.len() as i32) }
     }
+
+    #[inline]
+    fn storage_load_from_address(&self, address_handle: Handle, key_handle: Handle) -> Handle {
+        unsafe {
+            let value_handle = mBufferNew();
+            mBufferStorageLoadFromAddress(address_handle, key_handle, value_handle);
+            value_handle
+        }
+    }
 }
 
 impl StorageWriteApi for VmApiImpl {
+    type StorageWriteApiImpl = VmApiImpl;
+
+    #[inline]
+    fn storage_write_api_impl() -> Self::StorageWriteApiImpl {
+        VmApiImpl {}
+    }
+}
+
+impl StorageWriteApiImpl for VmApiImpl {
     fn storage_store_slice_u8(&self, key: &[u8], value: &[u8]) {
         unsafe {
             storageStore(

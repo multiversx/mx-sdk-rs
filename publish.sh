@@ -54,62 +54,44 @@
 
 cd elrond-codec-derive
 cargo publish
-sleep 15
 cd ..
+
+sleep 20
 
 cd elrond-codec
 cargo publish
-sleep 15
 cd ..
 
 cd mandos
 cargo publish
-sleep 15
 cd ..
+
+sleep 20
 
 cd elrond-wasm-derive
 cargo publish
 cd ..
-sleep 15
+
+sleep 20
 
 cd elrond-wasm
 cargo publish
 cd ..
-sleep 15
+
+sleep 20
 
 cd elrond-wasm-node
 cargo publish
 cd ..
-sleep 15
 
 cd elrond-wasm-debug
 cargo publish
 cd ..
-sleep 15
 
 cd elrond-wasm-output
 cargo publish
 cd ..
-sleep 15
 
 cd elrond-wasm-modules
 cargo publish
 cd ..
-
-### These ones are deprecated, we will stop publishing them soon:
-
-cd contracts/modules-legacy/elrond-wasm-module-dns
-cargo publish
-cd ../../..
-
-cd contracts/modules-legacy/elrond-wasm-module-features
-cargo publish
-cd ../../..
-
-cd contracts/modules-legacy/elrond-wasm-module-pause
-cargo publish
-cd ../../..
-
-cd contracts/modules-legacy/elrond-wasm-module-users
-cargo publish
-cd ../../..

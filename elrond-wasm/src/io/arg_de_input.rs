@@ -1,5 +1,7 @@
+use core::marker::PhantomData;
+
 use crate::{
-    api::{EndpointArgumentApi, ManagedTypeApi},
+    api::{EndpointArgumentApi, EndpointArgumentApiImpl, ManagedTypeApi},
     types::{BigInt, BigUint, ManagedBuffer, ManagedBufferNestedDecodeInput, ManagedType},
     Box,
 };
@@ -18,7 +20,7 @@ pub struct ArgDecodeInput<AA>
 where
     AA: ManagedTypeApi + EndpointArgumentApi,
 {
-    api: AA,
+    _phantom: PhantomData<AA>,
     arg_index: i32,
 }
 
@@ -27,25 +29,28 @@ where
     AA: ManagedTypeApi + EndpointArgumentApi,
 {
     #[inline]
-    pub fn new(api: AA, arg_index: i32) -> Self {
-        ArgDecodeInput { api, arg_index }
+    pub fn new(arg_index: i32) -> Self {
+        ArgDecodeInput {
+            _phantom: PhantomData,
+            arg_index,
+        }
     }
 
     #[inline]
     fn to_managed_buffer(&self) -> ManagedBuffer<AA> {
-        let mbuf_handle = self.api.get_argument_managed_buffer_raw(self.arg_index);
+        let mbuf_handle = AA::argument_api_impl().get_argument_managed_buffer_raw(self.arg_index);
         ManagedBuffer::from_raw_handle(mbuf_handle)
     }
 
     #[inline]
     fn to_big_int(&self) -> BigInt<AA> {
-        let bi_handle = self.api.get_argument_big_int_raw(self.arg_index);
+        let bi_handle = AA::argument_api_impl().get_argument_big_int_raw(self.arg_index);
         BigInt::from_raw_handle(bi_handle)
     }
 
     #[inline]
     fn to_big_uint(&self) -> BigUint<AA> {
-        let bi_handle = self.api.get_argument_big_uint_raw(self.arg_index);
+        let bi_handle = AA::argument_api_impl().get_argument_big_uint_raw(self.arg_index);
         BigUint::from_raw_handle(bi_handle)
     }
 }
@@ -58,22 +63,24 @@ where
 
     #[inline]
     fn byte_len(&self) -> usize {
-        self.api.get_argument_len(self.arg_index)
+        AA::argument_api_impl().get_argument_len(self.arg_index)
     }
 
     #[inline]
     fn into_boxed_slice_u8(self) -> Box<[u8]> {
-        self.api.get_argument_boxed_bytes(self.arg_index).into_box()
+        AA::argument_api_impl()
+            .get_argument_boxed_bytes(self.arg_index)
+            .into_box()
     }
 
     #[inline]
     fn into_u64(self) -> u64 {
-        self.api.get_argument_u64(self.arg_index)
+        AA::argument_api_impl().get_argument_u64(self.arg_index)
     }
 
     #[inline]
     fn into_i64(self) -> i64 {
-        self.api.get_argument_i64(self.arg_index)
+        AA::argument_api_impl().get_argument_i64(self.arg_index)
     }
 
     #[inline]

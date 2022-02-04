@@ -130,9 +130,8 @@ pub fn generate_proxy_endpoint(m: &Method, endpoint_name: String) -> proc_macro2
         #[allow(clippy::too_many_arguments)]
         #[allow(clippy::type_complexity)]
         #msig {
-            let (___api___, ___address___) = self.into_fields();
+            let ___address___ = self.into_fields();
             let mut ___contract_call___ = elrond_wasm::types::new_contract_call(
-                ___api___.clone(),
                 ___address___,
                 #endpoint_name_literal,
                 ManagedVec::<Self::Api, EsdtTokenPayment<Self::Api>>::new(),
@@ -203,10 +202,8 @@ pub fn generate_proxy_deploy(init_method: &Method) -> proc_macro2::TokenStream {
         #[allow(clippy::too_many_arguments)]
         #[allow(clippy::type_complexity)]
         #msig {
-            let (___api___, ___address___) =
-                self.into_fields();
-            let mut ___contract_deploy___ = elrond_wasm::types::new_contract_deploy(
-                ___api___.clone(),
+            let ___address___ = self.into_fields();
+            let mut ___contract_deploy___ = elrond_wasm::types::new_contract_deploy::<Self::Api>(
                 ___address___,
             );
             #(#arg_push_snippets)*

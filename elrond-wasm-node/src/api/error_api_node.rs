@@ -1,5 +1,5 @@
 use crate::{error_hook, VmApiImpl};
-use elrond_wasm::api::{ErrorApi, Handle};
+use elrond_wasm::api::{ErrorApi, ErrorApiImpl, Handle};
 
 extern "C" {
     #[cfg(not(feature = "unmanaged-ei"))]
@@ -7,6 +7,15 @@ extern "C" {
 }
 
 impl ErrorApi for VmApiImpl {
+    type ErrorApiImpl = VmApiImpl;
+
+    #[inline]
+    fn error_api_impl() -> Self {
+        VmApiImpl {}
+    }
+}
+
+impl ErrorApiImpl for VmApiImpl {
     #[inline(always)]
     fn signal_error(&self, message: &[u8]) -> ! {
         error_hook::signal_error(message)

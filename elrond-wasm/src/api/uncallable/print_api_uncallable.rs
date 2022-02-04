@@ -1,7 +1,13 @@
-use crate::{api::PrintApi, types::BigUint};
+use crate::api::{PrintApi, PrintApiImpl};
 
-impl PrintApi for super::UncallableApi {
-    fn print_biguint(&self, _amount: &BigUint<Self>) {
-        unreachable!();
+use super::UncallableApi;
+
+impl PrintApi for UncallableApi {
+    type PrintApiImpl = UncallableApi;
+
+    fn print_api_impl() -> Self::PrintApiImpl {
+        unreachable!()
     }
 }
+
+impl PrintApiImpl for UncallableApi {}

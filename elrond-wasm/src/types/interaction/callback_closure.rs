@@ -1,9 +1,11 @@
 use crate::{
-    api::{BlockchainApi, ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi},
+    api::{
+        BlockchainApi, BlockchainApiImpl, ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi,
+    },
     contract_base::ManagedSerializer,
     storage::StorageKey,
     storage_clear, storage_get, storage_set,
-    types::ManagedBuffer,
+    types::{ManagedBuffer, ManagedType},
     ContractCallArg, ManagedResultArgLoader,
 };
 use elrond_codec::elrond_codec_derive::{TopDecode, TopEncode};
@@ -13,14 +15,14 @@ use super::ManagedArgBuffer;
 pub const CALLBACK_CLOSURE_STORAGE_BASE_KEY: &[u8] = b"CB_CLOSURE";
 
 #[derive(TopEncode, TopDecode)]
-pub struct CallbackClosure<M: ManagedTypeApi> {
+pub struct CallbackClosure<M: ManagedTypeApi + ErrorApi> {
     callback_name: ManagedBuffer<M>,
     closure_args: ManagedArgBuffer<M>,
 }
 
 /// Syntactical sugar to help macros to generate code easier.
 /// Unlike calling `CallbackClosure::<SA, R>::new`, here types can be inferred from the context.
-pub fn new_callback_call<A>(_api: A, callback_name_slice: &'static [u8]) -> CallbackClosure<A>
+pub fn new_callback_call<A>(callback_name_slice: &'static [u8]) -> CallbackClosure<A>
 where
     A: ManagedTypeApi + ErrorApi,
 {
@@ -28,7 +30,7 @@ where
     CallbackClosure::new(callback_name)
 }
 
-impl<M: ManagedTypeApi> CallbackClosure<M> {
+impl<M: ManagedTypeApi + ErrorApi> CallbackClosure<M> {
     pub fn new(callback_name: ManagedBuffer<M>) -> Self {
         let arg_buffer = ManagedArgBuffer::new_empty();
         CallbackClosure {
@@ -39,7 +41,7 @@ impl<M: ManagedTypeApi> CallbackClosure<M> {
 
     /// Used by callback_raw.
     /// TODO: avoid creating any new managed buffers.
-    pub fn new_empty(_api: M) -> Self {
+    pub fn new_empty() -> Self {
         CallbackClosure {
             callback_name: ManagedBuffer::new(),
             closure_args: ManagedArgBuffer::new_empty(),
@@ -50,20 +52,19 @@ impl<M: ManagedTypeApi> CallbackClosure<M> {
         endpoint_arg.push_dyn_arg(&mut self.closure_args);
     }
 
-    pub fn save_to_storage<A: BlockchainApi + StorageWriteApi>(&self, api: A) {
-        let storage_key = cb_closure_storage_key(api.clone());
-        storage_set(api, &storage_key, self);
+    pub fn save_to_storage<A: BlockchainApi + StorageWriteApi>(&self) {
+        let storage_key = cb_closure_storage_key::<A>();
+        storage_set(storage_key.as_ref(), self);
     }
 
     pub fn storage_load_and_clear<A: BlockchainApi + StorageReadApi + StorageWriteApi>(
-        api: A,
     ) -> Option<Self> {
-        let storage_key = cb_closure_storage_key(api.clone());
-        let storage_value_raw: ManagedBuffer<A> = storage_get(api.clone(), &storage_key);
+        let storage_key = cb_closure_storage_key::<A>();
+        let storage_value_raw: ManagedBuffer<A> = storage_get(storage_key.as_ref());
         if !storage_value_raw.is_empty() {
-            let serializer = ManagedSerializer::new(api.clone());
+            let serializer = ManagedSerializer::<A>::new();
             let closure = serializer.top_decode_from_managed_buffer(&storage_value_raw);
-            storage_clear(api, &storage_key);
+            storage_clear(storage_key.as_ref());
             Some(closure)
         } else {
             None
@@ -81,9 +82,9 @@ impl<M: ManagedTypeApi> CallbackClosure<M> {
     }
 }
 
-pub(super) fn cb_closure_storage_key<A: BlockchainApi>(api: A) -> StorageKey<A> {
-    let tx_hash = api.get_tx_hash();
-    let mut storage_key = StorageKey::new(api, CALLBACK_CLOSURE_STORAGE_BASE_KEY);
+pub(super) fn cb_closure_storage_key<A: BlockchainApi>() -> StorageKey<A> {
+    let tx_hash = A::blockchain_api_impl().get_tx_hash::<A>();
+    let mut storage_key = StorageKey::new(CALLBACK_CLOSURE_STORAGE_BASE_KEY);
     storage_key.append_managed_buffer(tx_hash.as_managed_buffer());
     storage_key
 }
@@ -97,7 +98,7 @@ pub struct CallbackClosureMatcher<const CB_NAME_MAX_LENGTH: usize> {
 }
 
 impl<const CB_NAME_MAX_LENGTH: usize> CallbackClosureMatcher<CB_NAME_MAX_LENGTH> {
-    pub fn new<M: ManagedTypeApi>(callback_name: &ManagedBuffer<M>) -> Self {
+    pub fn new<M: ManagedTypeApi + ErrorApi>(callback_name: &ManagedBuffer<M>) -> Self {
         let mut compare_buffer = [0u8; CB_NAME_MAX_LENGTH];
         let name_len = callback_name.len();
         let _ = callback_name.load_slice(0, &mut compare_buffer[..name_len]);

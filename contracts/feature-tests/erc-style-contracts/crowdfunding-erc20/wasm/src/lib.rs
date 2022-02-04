@@ -7,7 +7,6 @@
 elrond_wasm_node::wasm_endpoints! {
     crowdfunding_erc20
     (
-        init
         callBack
         claim
         fund

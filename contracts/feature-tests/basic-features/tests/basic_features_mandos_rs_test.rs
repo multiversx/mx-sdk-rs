@@ -1,13 +1,12 @@
-use elrond_wasm::*;
 use elrond_wasm_debug::*;
 
 fn world() -> BlockchainMock {
     let mut blockchain = BlockchainMock::new();
     blockchain.set_current_dir_from_workspace("contracts/feature-tests/basic-features");
 
-    blockchain.register_contract(
+    blockchain.register_contract_builder(
         "file:output/basic-features.wasm",
-        Box::new(|context| Box::new(basic_features::contract_obj(context))),
+        basic_features::ContractBuilder,
     );
     blockchain
 }
@@ -361,6 +360,11 @@ fn storage_i64_rs() {
 }
 
 #[test]
+fn storage_load_from_address_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/storage_load_from_address.scen.json", world());
+}
+
+#[test]
 fn storage_i64_bad_rs() {
     elrond_wasm_debug::mandos_rs("mandos/storage_i64_bad.scen.json", world());
 }
@@ -453,4 +457,9 @@ fn storage_usize_bad_rs() {
 #[test]
 fn storage_vec_u8_rs() {
     elrond_wasm_debug::mandos_rs("mandos/storage_vec_u8.scen.json", world());
+}
+
+#[test]
+fn struct_eq_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/struct_eq.scen.json", world());
 }

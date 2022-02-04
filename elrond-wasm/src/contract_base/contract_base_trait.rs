@@ -13,55 +13,45 @@ use crate::api::VMApi;
 pub trait ContractBase: Sized {
     type Api: VMApi;
 
-    /// Grants direct access to the underlying VM API.
-    /// Avoid using it directly.
-    fn raw_vm_api(&self) -> Self::Api;
-
     /// Gateway into the call value retrieval functionality.
     /// The payment annotations should normally be the ones to handle this,
     /// but the developer is also given direct access to the API.
     fn call_value(&self) -> CallValueWrapper<Self::Api> {
-        CallValueWrapper::new(self.raw_vm_api())
+        CallValueWrapper::new()
     }
 
     /// Gateway to the functionality related to sending transactions from the current contract.
     #[inline]
     fn send(&self) -> SendWrapper<Self::Api> {
-        SendWrapper::new(self.raw_vm_api())
-    }
-
-    /// Managed types API. Required to create new instances of managed types.
-    #[inline]
-    fn type_manager(&self) -> Self::Api {
-        self.raw_vm_api()
+        SendWrapper::new()
     }
 
     /// Gateway blockchain info related to the current transaction and to accounts.
     #[inline]
     fn blockchain(&self) -> BlockchainWrapper<Self::Api> {
-        BlockchainWrapper::new(self.raw_vm_api())
+        BlockchainWrapper::<Self::Api>::new()
     }
 
     /// Stateless crypto functions provided by the Arwen VM.
     #[inline]
     fn crypto(&self) -> CryptoWrapper<Self::Api> {
-        CryptoWrapper::new(self.raw_vm_api())
+        CryptoWrapper::new()
     }
 
     /// Component that provides contract developers access
     /// to highly optimized manual serialization and deserialization.
     #[inline]
     fn serializer(&self) -> ManagedSerializer<Self::Api> {
-        ManagedSerializer::new(self.raw_vm_api())
+        ManagedSerializer::new()
     }
 
     #[inline]
     fn error(&self) -> ErrorHelper<Self::Api> {
-        ErrorHelper::new_instance(self.raw_vm_api())
+        ErrorHelper::new_instance()
     }
 
     #[inline]
     fn print(&self) -> PrintHelper<Self::Api> {
-        PrintHelper::new(self.raw_vm_api())
+        PrintHelper::new()
     }
 }

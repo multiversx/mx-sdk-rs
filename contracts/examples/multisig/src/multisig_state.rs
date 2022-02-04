@@ -46,14 +46,14 @@ pub trait MultisigStateModule {
                 if !new_user {
                     duplicates = true;
                 }
-                self.user_id_to_role(user_id).set(&UserRole::BoardMember);
+                self.user_id_to_role(user_id).set(UserRole::BoardMember);
             },
         );
         require!(!duplicates, "duplicate board member");
 
         let num_board_members_mapper = self.num_board_members();
         let new_num_board_members = num_board_members_mapper.get() + new_board_members.len();
-        num_board_members_mapper.set(&new_num_board_members);
+        num_board_members_mapper.set(new_num_board_members);
         Ok(new_num_board_members)
     }
 
@@ -68,7 +68,7 @@ pub trait MultisigStateModule {
     }
 
     /// Serialized action data of an action with index.
-    #[view(getActionData)]
+    #[external_view(getActionData)]
     fn get_action_data(&self, action_id: usize) -> Action<Self::Api> {
         self.action_mapper().get(action_id)
     }
@@ -79,7 +79,7 @@ pub trait MultisigStateModule {
     /// Gets addresses of all users who signed an action.
     /// Does not check if those users are still board members or not,
     /// so the result may contain invalid signers.
-    #[view(getActionSigners)]
+    #[external_view(getActionSigners)]
     fn get_action_signers(&self, action_id: usize) -> ManagedVec<ManagedAddress> {
         let signer_ids = self.action_signer_ids(action_id);
         let mut signers = ManagedVec::new();
@@ -91,7 +91,7 @@ pub trait MultisigStateModule {
 
     /// Gets addresses of all users who signed an action and are still board members.
     /// All these signatures are currently valid.
-    #[view(getActionSignerCount)]
+    #[external_view(getActionSignerCount)]
     fn get_action_signer_count(&self, action_id: usize) -> usize {
         self.action_signer_ids(action_id).len()
     }
@@ -101,7 +101,7 @@ pub trait MultisigStateModule {
     /// therefore the contract needs to re-check every time when actions are performed.
     /// This function is used to validate the signers before performing an action.
     /// It also makes it easy to check before performing an action.
-    #[view(getActionValidSignerCount)]
+    #[external_view(getActionValidSignerCount)]
     fn get_action_valid_signer_count(&self, action_id: usize) -> usize {
         let signer_ids = self.action_signer_ids(action_id);
         signer_ids

@@ -12,7 +12,7 @@ pub trait SingleValueRepeat: benchmark_common::BenchmarkCommon {
     #[endpoint]
     fn add(&self, num_repeats: usize, key: ManagedBuffer, value: ManagedBuffer) {
         for i in 0..num_repeats {
-            self.item_at(&key, i).set(&value);
+            self.item_at(&key, i).set(value.as_ref());
         }
     }
 

@@ -3,6 +3,8 @@ use std::{
     io::Write,
 };
 
+use elrond_wasm::abi::EndpointLocationAbi;
+
 use super::meta_config::{ContractMetadata, MetaConfig};
 
 const WASM_LIB_PATH: &str = "../wasm/src/lib.rs";
@@ -17,13 +19,14 @@ const PRELUDE: &str = "////////////////////////////////////////////////////
 ";
 
 fn write_endpoints_macro<'a, I>(
+    full_macro_name: &str,
     wasm_lib_file: &mut File,
     contract_module_name: &str,
     endpoint_names: I,
 ) where
     I: Iterator<Item = &'a String>,
 {
-    writeln!(wasm_lib_file, "elrond_wasm_node::wasm_endpoints! {{").unwrap();
+    writeln!(wasm_lib_file, "{} {{", full_macro_name).unwrap();
     writeln!(wasm_lib_file, "    {}", contract_module_name).unwrap();
     writeln!(wasm_lib_file, "    (").unwrap();
     for endpoint_name in endpoint_names {
@@ -52,12 +55,18 @@ fn write_wasm_src_lib(contract_metadata: &ContractMetadata) {
         .collect();
     endpoint_names.sort();
 
-    let mut mandatory_endpoints = vec!["init".to_string()];
+    let full_macro_name = match contract_metadata.location {
+        EndpointLocationAbi::MainContract => "elrond_wasm_node::wasm_endpoints!",
+        EndpointLocationAbi::ViewContract => "elrond_wasm_node::external_view_wasm_endpoints!",
+    };
+    let mut mandatory_endpoints = Vec::new();
     if contract_metadata.abi.has_callback {
         mandatory_endpoints.push("callBack".to_string());
     }
     let all_endpoint_names = mandatory_endpoints.iter().chain(endpoint_names.iter());
+
     write_endpoints_macro(
+        full_macro_name,
         &mut wasm_lib_file,
         &contract_module_name,
         all_endpoint_names,

@@ -1,4 +1,3 @@
-// use super::{ErrorApi, ManagedTypeApi, SendApi, StorageReadApi, StorageWriteApi};
 use crate::{abi::ContractAbi, api::VMApi};
 
 /// Required by contract ABI generators.

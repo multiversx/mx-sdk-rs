@@ -1,6 +1,9 @@
 use std::path::{Path, PathBuf};
 
-use elrond_wasm::contract_base::CallableContract;
+use elrond_wasm::{
+    api::ExternalViewApi,
+    contract_base::{CallableContract, CallableContractBuilder},
+};
 use mandos::{interpret_trait::InterpreterContext, value_interpreter::interpret_string};
 
 use crate::DebugApi;
@@ -32,16 +35,35 @@ impl BlockchainMock {
         self.current_dir = path;
     }
 
-    pub fn register_contract(
+    pub fn register_contract_obj(
         &mut self,
         expression: &str,
-        new_contract_closure: Box<dyn Fn(DebugApi) -> Box<dyn CallableContract<DebugApi>>>,
+        new_contract_obj: Box<dyn CallableContract>,
     ) {
         let contract_bytes = interpret_string(
             expression,
             &InterpreterContext::new(self.current_dir.clone()),
         );
         self.contract_map
-            .register_contract(contract_bytes, new_contract_closure);
+            .register_contract(contract_bytes, new_contract_obj);
+    }
+
+    pub fn register_contract_builder<B: CallableContractBuilder>(
+        &mut self,
+        expression: &str,
+        contract_builder: B,
+    ) {
+        self.register_contract_obj(expression, contract_builder.new_contract_obj::<DebugApi>())
+    }
+
+    pub fn register_external_view_contract_builder<B: CallableContractBuilder>(
+        &mut self,
+        expression: &str,
+        contract_builder: B,
+    ) {
+        self.register_contract_obj(
+            expression,
+            contract_builder.new_contract_obj::<ExternalViewApi<DebugApi>>(),
+        )
     }
 }

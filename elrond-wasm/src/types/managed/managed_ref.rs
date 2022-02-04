@@ -1,195 +1,152 @@
-use core::{marker::PhantomData, ops::Deref};
+use core::{borrow::Borrow, marker::PhantomData, ops::Deref};
 
-use alloc::boxed::Box;
-use elrond_codec::{
-    DecodeError, EncodeError, NestedDecode, NestedDecodeInput, NestedEncode, NestedEncodeOutput,
-    TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, TryStaticCast,
-};
+use elrond_codec::{EncodeError, NestedEncode, NestedEncodeOutput, TopEncode, TopEncodeOutput};
 
 use crate::api::{Handle, ManagedTypeApi};
 
 use super::ManagedType;
 
-pub struct ManagedRef<M, T>
+/// A very efficient reference to a managed type, with copy semantics.
+///
+/// It copies the handle and knows how to deref back.
+pub struct ManagedRef<'a, M, T>
 where
     M: ManagedTypeApi,
     T: ManagedType<M>,
 {
-    _phantom: PhantomData<M>,
-    value: T,
+    pub(super) _phantom_m: PhantomData<M>,
+    pub(super) _phantom_t: PhantomData<&'a T>,
+    pub(super) handle: Handle,
 }
 
-impl<M, T> ManagedRef<M, T>
+impl<'a, M, T> ManagedRef<'a, M, T>
 where
     M: ManagedTypeApi,
     T: ManagedType<M>,
 {
-    pub fn new(value: T) -> Self {
+    pub fn new(value: &'a T) -> Self {
         Self {
-            _phantom: PhantomData,
-            value,
+            _phantom_m: PhantomData,
+            _phantom_t: PhantomData,
+            handle: value.get_raw_handle(),
         }
+    }
+
+    /// Will completely disregard lifetimes, use with care.
+    #[doc(hidden)]
+    pub(super) unsafe fn wrap_handle(handle: Handle) -> Self {
+        Self {
+            _phantom_m: PhantomData,
+            _phantom_t: PhantomData,
+            handle,
+        }
+    }
+
+    #[doc(hidden)]
+    #[inline]
+    pub fn get_raw_handle_of_ref(self) -> Handle {
+        self.handle
     }
 }
 
-impl<M, T> Deref for ManagedRef<M, T>
+impl<'a, M, T> Copy for ManagedRef<'a, M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedType<M>,
+{
+}
+
+impl<'a, M, T> Clone for ManagedRef<'a, M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedType<M>,
+{
+    #[inline]
+    fn clone(&self) -> Self {
+        *self
+    }
+}
+
+impl<'a, M, T> Deref for ManagedRef<'a, M, T>
 where
     M: ManagedTypeApi,
     T: ManagedType<M>,
 {
     type Target = T;
 
+    #[inline]
     fn deref(&self) -> &Self::Target {
-        &self.value
+        Self::Target::transmute_from_handle_ref(&self.handle)
     }
 }
 
-impl<M, T> ManagedType<M> for ManagedRef<M, T>
+impl<'a, M, T> Borrow<T> for ManagedRef<'a, M, T>
 where
     M: ManagedTypeApi,
     T: ManagedType<M>,
 {
-    fn from_raw_handle(handle: Handle) -> Self {
-        Self::new(T::from_raw_handle(handle))
-    }
-
-    fn get_raw_handle(&self) -> Handle {
-        self.value.get_raw_handle()
-    }
-
-    fn type_manager(&self) -> M {
-        self.value.type_manager()
+    #[inline]
+    fn borrow(&self) -> &T {
+        self.deref()
     }
 }
 
-impl<M, T> Clone for ManagedRef<M, T>
+impl<'a, M, T> From<&'a T> for ManagedRef<'a, M, T>
 where
     M: ManagedTypeApi,
     T: ManagedType<M>,
 {
-    fn clone(&self) -> Self {
-        Self::from_raw_handle(self.get_raw_handle())
+    #[inline]
+    fn from(value_ref: &'a T) -> Self {
+        Self::new(value_ref)
     }
 }
 
-impl<M, T> From<T> for ManagedRef<M, T>
+impl<'a, M, T> PartialEq for ManagedRef<'a, M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedType<M>,
+    T: ManagedType<M> + PartialEq,
 {
-    fn from(value: T) -> Self {
-        Self::new(value)
+    #[inline]
+    fn eq(&self, other: &Self) -> bool {
+        self.deref() == other.deref()
     }
 }
 
-impl<'a, M, T> From<&T> for ManagedRef<M, T>
+impl<'a, M, T> Eq for ManagedRef<'a, M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedType<M>,
+    T: ManagedType<M> + PartialEq,
 {
-    fn from(value: &T) -> Self {
-        Self::new(T::from_raw_handle(value.get_raw_handle()))
-    }
 }
 
-pub trait AsManagedRef<M, T>
-where
-    M: ManagedTypeApi,
-    T: ManagedType<M>,
-{
-    fn as_managed_ref(&self) -> ManagedRef<M, T>;
-}
-
-impl<M, T> AsManagedRef<M, T> for T
-where
-    M: ManagedTypeApi,
-    T: ManagedType<M>,
-{
-    fn as_managed_ref(&self) -> ManagedRef<M, T> {
-        self.into()
-    }
-}
-
-impl<M: ManagedTypeApi, T: ManagedType<M> + 'static> TryStaticCast for ManagedRef<M, T> {}
-
-impl<M, T> TopEncode for ManagedRef<M, T>
+impl<'a, M, T> TopEncode for ManagedRef<'a, M, T>
 where
     M: ManagedTypeApi,
     T: ManagedType<M> + TopEncode,
 {
     #[inline]
     fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
-        self.value.top_encode(output)
+        self.deref().top_encode(output)
     }
 }
 
-impl<M, T> NestedEncode for ManagedRef<M, T>
+impl<'a, M, T> NestedEncode for ManagedRef<'a, M, T>
 where
     M: ManagedTypeApi,
     T: ManagedType<M> + NestedEncode,
 {
     fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
-        self.value.dep_encode(dest)
+        self.deref().dep_encode(dest)
     }
 }
 
-impl<M, T> TopDecode for ManagedRef<M, T>
+impl<'a, M, T> core::fmt::Debug for ManagedRef<'a, M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedType<M> + TopDecode,
+    T: ManagedType<M> + core::fmt::Debug,
 {
-    fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
-        T::top_decode(input).map(|value| value.into())
-    }
-}
-
-impl<M, T> NestedDecode for ManagedRef<M, T>
-where
-    M: ManagedTypeApi,
-    T: ManagedType<M> + NestedDecode,
-{
-    fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
-        T::dep_decode(input).map(|value| value.into())
-    }
-
-    fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
-        input: &mut I,
-        c: ExitCtx,
-        exit: fn(ExitCtx, DecodeError) -> !,
-    ) -> Self {
-        T::dep_decode_or_exit(input, c, exit).into()
-    }
-}
-
-impl<M, T> TopDecodeInput for ManagedRef<M, T>
-where
-    M: ManagedTypeApi,
-    T: ManagedType<M> + TopDecodeInput,
-{
-    type NestedBuffer = T::NestedBuffer;
-
-    fn byte_len(&self) -> usize {
-        self.value.byte_len()
-    }
-
-    fn into_boxed_slice_u8(self) -> Box<[u8]> {
-        self.value.into_boxed_slice_u8()
-    }
-
-    fn into_u64(self) -> u64 {
-        self.value.into_u64()
-    }
-
-    fn into_specialized<TSC, F>(self, else_deser: F) -> Result<TSC, DecodeError>
-    where
-        TSC: TryStaticCast,
-        F: FnOnce(Self) -> Result<TSC, DecodeError>,
-    {
-        self.value
-            .into_specialized(|value| else_deser(value.into()))
-    }
-
-    fn into_nested_buffer(self) -> Self::NestedBuffer {
-        self.value.into_nested_buffer()
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        f.debug_tuple("ManagedRef").field(self.deref()).finish()
     }
 }

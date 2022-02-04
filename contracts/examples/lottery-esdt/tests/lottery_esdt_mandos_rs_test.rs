@@ -1,14 +1,12 @@
-use elrond_wasm::*;
 use elrond_wasm_debug::*;
 
-#[allow(dead_code)]
 fn world() -> BlockchainMock {
     let mut blockchain = BlockchainMock::new();
     blockchain.set_current_dir_from_workspace("contracts/examples/lottery-esdt");
 
-    blockchain.register_contract(
+    blockchain.register_contract_builder(
         "file:output/lottery-esdt.wasm",
-        Box::new(|context| Box::new(lottery_esdt::contract_obj(context))),
+        lottery_esdt::ContractBuilder,
     );
     blockchain
 }

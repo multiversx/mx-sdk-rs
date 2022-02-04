@@ -1,6 +1,6 @@
 use elrond_wasm::{
     contract_base::ManagedSerializer,
-    elrond_codec::{test_util::check_top_encode, DecodeError, TopDecode, TopEncode},
+    elrond_codec::{test_util::check_top_encode, TopDecode, TopEncode},
     types::{BoxedBytes, ManagedBuffer},
 };
 
@@ -10,8 +10,8 @@ use crate::DebugApi;
 
 /// Uses the managed types api to test encoding.
 /// Can be used on any type, but managed types are especially relevant.
-pub fn check_managed_top_encode<T: TopEncode>(api: DebugApi, obj: &T) -> BoxedBytes {
-    let serializer = ManagedSerializer::new(api);
+pub fn check_managed_top_encode<T: TopEncode>(_api: DebugApi, obj: &T) -> BoxedBytes {
+    let serializer = ManagedSerializer::<DebugApi>::new();
     let as_mb = serializer.top_encode_to_managed_buffer(obj);
     let as_bb = serializer.top_encode_to_boxed_bytes(obj);
     assert_eq!(as_mb.to_boxed_bytes(), as_bb);
@@ -28,13 +28,11 @@ pub fn check_managed_top_encode<T: TopEncode>(api: DebugApi, obj: &T) -> BoxedBy
 
 /// Uses the managed types api to test encoding.
 /// Can be used on any type, but managed types are especially relevant.
-/// Also works on types that have no un-managed decoding,
-/// by allowing DecodeError::UNSUPPORTED_OPERATION result.
 pub fn check_managed_top_decode<T: TopDecode + PartialEq + Debug>(
-    api: DebugApi,
+    _api: DebugApi,
     bytes: &[u8],
 ) -> T {
-    let serializer = ManagedSerializer::new(api);
+    let serializer = ManagedSerializer::<DebugApi>::new();
     let mb = ManagedBuffer::new_from_bytes(bytes);
     let from_mb: T = serializer.top_decode_from_managed_buffer(&mb);
     let from_slice: T = serializer.top_decode_from_byte_slice(bytes);
@@ -43,9 +41,6 @@ pub fn check_managed_top_decode<T: TopDecode + PartialEq + Debug>(
     match T::top_decode(bytes) {
         Ok(from_unmanaged) => {
             assert_eq!(from_unmanaged, from_mb);
-        },
-        Err(DecodeError::UNSUPPORTED_OPERATION) => {
-            // Ok
         },
         Err(err) => {
             panic!(
