@@ -223,9 +223,8 @@ pub trait KittyOwnership {
             self.blockchain().get_tx_hash_legacy().as_bytes(),
         );
         let genes = KittyGenes::get_random(&mut random);
-        let kitty_id = self.create_new_gen_zero_kitty(&genes);
 
-        kitty_id
+        self.create_new_gen_zero_kitty(&genes)
     }
 
     // views - Kitty Breeding
