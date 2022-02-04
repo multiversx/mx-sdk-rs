@@ -8,8 +8,9 @@ use elrond_wasm::{
 
 use crate::{
     rust_biguint,
-    tx_mock::{TxCache, TxContext, TxContextStack, TxInput, TxInputESDT},
-    world_mock::{AccountData, AccountEsdt, EsdtInstanceMetadata},
+    tx_execution::interpret_panic_as_tx_result,
+    tx_mock::{TxCache, TxContext, TxContextStack, TxInput, TxInputESDT, TxResult},
+    world_mock::{is_smart_contract_address, AccountData, AccountEsdt, EsdtInstanceMetadata},
     BlockchainMock, DebugApi,
 };
 
@@ -19,8 +20,8 @@ use super::{
 };
 
 pub struct ContractObjWrapper<
-    CB: ContractBase<Api = DebugApi> + CallableContract<DebugApi> + 'static,
-    ContractObjBuilder: 'static + Copy + Fn(DebugApi) -> CB,
+    CB: ContractBase<Api = DebugApi> + CallableContract + 'static,
+    ContractObjBuilder: 'static + Copy + Fn() -> CB,
 > {
     pub(crate) address: Address,
     pub(crate) obj_builder: ContractObjBuilder,
@@ -28,8 +29,8 @@ pub struct ContractObjWrapper<
 
 impl<CB, ContractObjBuilder> ContractObjWrapper<CB, ContractObjBuilder>
 where
-    CB: ContractBase<Api = DebugApi> + CallableContract<DebugApi> + 'static,
-    ContractObjBuilder: 'static + Copy + Fn(DebugApi) -> CB,
+    CB: ContractBase<Api = DebugApi> + CallableContract + 'static,
+    ContractObjBuilder: 'static + Copy + Fn() -> CB,
 {
     pub(crate) fn new(address: Address, obj_builder: ContractObjBuilder) -> Self {
         ContractObjWrapper {
@@ -51,11 +52,6 @@ pub struct BlockchainStateWrapper {
     workspace_path: PathBuf,
 }
 
-pub enum StateChange {
-    Commit,
-    Revert,
-}
-
 impl BlockchainStateWrapper {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
@@ -69,6 +65,10 @@ impl BlockchainStateWrapper {
             mandos_generator: MandosGenerator::new(),
             workspace_path: current_dir,
         }
+    }
+
+    pub fn get_mut_state(&mut self) -> &mut Rc<BlockchainMock> {
+        &mut self.rc_b_mock
     }
 
     pub fn write_mandos_output(self, file_name: &str) {
@@ -85,10 +85,9 @@ impl BlockchainStateWrapper {
             None => rust_biguint!(0),
         };
 
-        assert_eq!(
-            expected_balance,
-            &actual_balance,
-            "EGLD balance mismatch for address {}. Expected: {}, have {}",
+        assert!(
+            expected_balance == &actual_balance,
+            "EGLD balance mismatch for address {}\n Expected: {}\n Have: {}\n",
             address_to_hex(address),
             expected_balance,
             actual_balance
@@ -106,11 +105,11 @@ impl BlockchainStateWrapper {
             None => rust_biguint!(0),
         };
 
-        assert_eq!(
-            expected_balance,
-            &actual_balance,
-            "ESDT balance mismatch for address {}. Expected: {}, have {}",
+        assert!(
+            expected_balance == &actual_balance,
+            "ESDT balance mismatch for address {}\n Token: {}\n Expected: {}\n Have: {}\n",
             address_to_hex(address),
+            String::from_utf8(token_id.to_vec()).unwrap(),
             expected_balance,
             actual_balance
         );
@@ -133,11 +132,12 @@ impl BlockchainStateWrapper {
 
                 match opt_instance {
                     Some(instance) => {
-                        assert_eq!(
-                            expected_balance,
-                            &instance.balance,
-                            "ESDT NFT balance mismatch for address {}. Expected: {}, have {}",
+                        assert!(
+                            expected_balance == &instance.balance,
+                            "ESDT NFT balance mismatch for address {}\n Token: {}, nonce: {}\n Expected: {}\n Have: {}\n",
                             address_to_hex(address),
+                            String::from_utf8(token_id.to_vec()).unwrap(),
+                            nonce,
                             expected_balance,
                             instance.balance
                         );
@@ -151,11 +151,12 @@ impl BlockchainStateWrapper {
         };
 
         let actual_attributes = T::top_decode(actual_attributes_serialized).unwrap();
-        assert_eq!(
-            expected_attributes,
-            &actual_attributes,
-            "ESDT NFT attributes mismatch for address {}. Expected: {:?}, have {:?}",
+        assert!(
+            expected_attributes == &actual_attributes,
+            "ESDT NFT attributes mismatch for address {}\n Token: {}, nonce: {}\n Expected: {:?}\n Have: {:?}\n",
             address_to_hex(address),
+            String::from_utf8(token_id.to_vec()).unwrap(),
+            nonce,
             expected_attributes,
             actual_attributes,
         );
@@ -170,6 +171,14 @@ impl BlockchainStateWrapper {
         address
     }
 
+    pub fn create_user_account_fixed_address(
+        &mut self,
+        address: &Address,
+        egld_balance: &num_bigint::BigUint,
+    ) {
+        self.create_account_raw(address, egld_balance, None, None, None);
+    }
+
     pub fn create_sc_account<CB, ContractObjBuilder>(
         &mut self,
         egld_balance: &num_bigint::BigUint,
@@ -178,10 +187,34 @@ impl BlockchainStateWrapper {
         contract_wasm_path: &str,
     ) -> ContractObjWrapper<CB, ContractObjBuilder>
     where
-        CB: ContractBase<Api = DebugApi> + CallableContract<DebugApi> + 'static,
-        ContractObjBuilder: 'static + Copy + Fn(DebugApi) -> CB,
+        CB: ContractBase<Api = DebugApi> + CallableContract + 'static,
+        ContractObjBuilder: 'static + Copy + Fn() -> CB,
     {
         let address = self.address_factory.new_sc_address();
+        self.create_sc_account_fixed_address(
+            &address,
+            egld_balance,
+            owner,
+            obj_builder,
+            contract_wasm_path,
+        )
+    }
+
+    pub fn create_sc_account_fixed_address<CB, ContractObjBuilder>(
+        &mut self,
+        address: &Address,
+        egld_balance: &num_bigint::BigUint,
+        owner: Option<&Address>,
+        obj_builder: ContractObjBuilder,
+        contract_wasm_path: &str,
+    ) -> ContractObjWrapper<CB, ContractObjBuilder>
+    where
+        CB: ContractBase<Api = DebugApi> + CallableContract + 'static,
+        ContractObjBuilder: 'static + Copy + Fn() -> CB,
+    {
+        if !is_smart_contract_address(address) {
+            panic!("Invalid SC Address: {:?}", address_to_hex(address))
+        }
 
         let mut wasm_full_path = std::env::current_dir().unwrap();
         wasm_full_path.push(PathBuf::from_str(contract_wasm_path).unwrap());
@@ -203,7 +236,7 @@ impl BlockchainStateWrapper {
             .insert(address.clone(), was_relative_path_expr_bytes.clone());
 
         self.create_account_raw(
-            &address,
+            address,
             egld_balance,
             owner,
             Some(contract_bytes),
@@ -211,13 +244,13 @@ impl BlockchainStateWrapper {
         );
 
         if !self.rc_b_mock.contains_contract(&wasm_full_path_as_expr) {
-            let closure = convert_full_fn(obj_builder);
+            let contract_obj = create_contract_obj_box(obj_builder);
 
             let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
-            b_mock_ref.register_contract(&wasm_full_path_as_expr, closure);
+            b_mock_ref.register_contract_obj(&wasm_full_path_as_expr, contract_obj);
         }
 
-        ContractObjWrapper::new(address, obj_builder)
+        ContractObjWrapper::new(address.clone(), obj_builder)
     }
 
     pub fn create_account_raw(
@@ -228,6 +261,10 @@ impl BlockchainStateWrapper {
         sc_identifier: Option<Vec<u8>>,
         sc_mandos_path_expr: Option<Vec<u8>>,
     ) {
+        if self.rc_b_mock.account_exists(address) {
+            panic!("Address already used: {:?}", address_to_hex(address));
+        }
+
         let acc_data = AccountData {
             address: address.clone(),
             nonce: 0,
@@ -497,20 +534,22 @@ impl BlockchainStateWrapper {
 }
 
 impl BlockchainStateWrapper {
-    pub fn execute_tx<CB, ContractObjBuilder, TxFn: FnOnce(CB) -> StateChange>(
+    pub fn execute_tx<CB, ContractObjBuilder, TxFn>(
         &mut self,
         caller: &Address,
         sc_wrapper: &ContractObjWrapper<CB, ContractObjBuilder>,
         egld_payment: &num_bigint::BigUint,
         tx_fn: TxFn,
-    ) where
-        CB: ContractBase<Api = DebugApi> + CallableContract<DebugApi> + 'static,
-        ContractObjBuilder: 'static + Copy + Fn(DebugApi) -> CB,
+    ) -> TxResult
+    where
+        CB: ContractBase<Api = DebugApi> + CallableContract + 'static,
+        ContractObjBuilder: 'static + Copy + Fn() -> CB,
+        TxFn: FnOnce(CB),
     {
-        self.execute_tx_any(caller, sc_wrapper, egld_payment, Vec::new(), tx_fn);
+        self.execute_tx_any(caller, sc_wrapper, egld_payment, Vec::new(), tx_fn)
     }
 
-    pub fn execute_esdt_transfer<CB, ContractObjBuilder, TxFn: FnOnce(CB) -> StateChange>(
+    pub fn execute_esdt_transfer<CB, ContractObjBuilder, TxFn>(
         &mut self,
         caller: &Address,
         sc_wrapper: &ContractObjWrapper<CB, ContractObjBuilder>,
@@ -518,27 +557,30 @@ impl BlockchainStateWrapper {
         esdt_nonce: u64,
         esdt_amount: &num_bigint::BigUint,
         tx_fn: TxFn,
-    ) where
-        CB: ContractBase<Api = DebugApi> + CallableContract<DebugApi> + 'static,
-        ContractObjBuilder: 'static + Copy + Fn(DebugApi) -> CB,
+    ) -> TxResult
+    where
+        CB: ContractBase<Api = DebugApi> + CallableContract + 'static,
+        ContractObjBuilder: 'static + Copy + Fn() -> CB,
+        TxFn: FnOnce(CB),
     {
         let esdt_transfer = vec![TxInputESDT {
             token_identifier: token_id.to_vec(),
             nonce: esdt_nonce,
             value: esdt_amount.clone(),
         }];
-        self.execute_tx_any(caller, sc_wrapper, &rust_biguint!(0), esdt_transfer, tx_fn);
+        self.execute_tx_any(caller, sc_wrapper, &rust_biguint!(0), esdt_transfer, tx_fn)
     }
 
-    pub fn execute_esdt_multi_transfer<CB, ContractObjBuilder, TxFn: FnOnce(CB) -> StateChange>(
+    pub fn execute_esdt_multi_transfer<CB, ContractObjBuilder, TxFn: FnOnce(CB)>(
         &mut self,
         caller: &Address,
         sc_wrapper: &ContractObjWrapper<CB, ContractObjBuilder>,
         esdt_transfers: &[TxInputESDT],
         tx_fn: TxFn,
-    ) where
-        CB: ContractBase<Api = DebugApi> + CallableContract<DebugApi> + 'static,
-        ContractObjBuilder: 'static + Copy + Fn(DebugApi) -> CB,
+    ) -> TxResult
+    where
+        CB: ContractBase<Api = DebugApi> + CallableContract + 'static,
+        ContractObjBuilder: 'static + Copy + Fn() -> CB,
     {
         self.execute_tx_any(
             caller,
@@ -546,39 +588,38 @@ impl BlockchainStateWrapper {
             &rust_biguint!(0),
             esdt_transfers.to_vec(),
             tx_fn,
-        );
+        )
     }
 
     pub fn execute_query<CB, ContractObjBuilder, TxFn: FnOnce(CB)>(
         &mut self,
         sc_wrapper: &ContractObjWrapper<CB, ContractObjBuilder>,
         query_fn: TxFn,
-    ) where
-        CB: ContractBase<Api = DebugApi> + CallableContract<DebugApi> + 'static,
-        ContractObjBuilder: 'static + Copy + Fn(DebugApi) -> CB,
+    ) -> TxResult
+    where
+        CB: ContractBase<Api = DebugApi> + CallableContract + 'static,
+        ContractObjBuilder: 'static + Copy + Fn() -> CB,
     {
         self.execute_tx(
             sc_wrapper.address_ref(),
             sc_wrapper,
             &rust_biguint!(0),
-            |sc| {
-                query_fn(sc);
-                StateChange::Revert
-            },
-        );
+            query_fn,
+        )
     }
 
     // deduplicates code for execution
-    fn execute_tx_any<CB, ContractObjBuilder, TxFn: FnOnce(CB) -> StateChange>(
+    fn execute_tx_any<CB, ContractObjBuilder, TxFn: FnOnce(CB)>(
         &mut self,
         caller: &Address,
         sc_wrapper: &ContractObjWrapper<CB, ContractObjBuilder>,
         egld_payment: &num_bigint::BigUint,
         esdt_payments: Vec<TxInputESDT>,
         tx_fn: TxFn,
-    ) where
-        CB: ContractBase<Api = DebugApi> + CallableContract<DebugApi> + 'static,
-        ContractObjBuilder: 'static + Copy + Fn(DebugApi) -> CB,
+    ) -> TxResult
+    where
+        CB: ContractBase<Api = DebugApi> + CallableContract + 'static,
+        ContractObjBuilder: 'static + Copy + Fn() -> CB,
     {
         let sc_address = sc_wrapper.address_ref();
         let tx_cache = TxCache::new(self.rc_b_mock.clone());
@@ -609,22 +650,25 @@ impl BlockchainStateWrapper {
 
         let tx_input = build_tx_input(caller, sc_address, egld_payment, esdt_payments);
         let tx_context_rc = Rc::new(TxContext::new(tx_input, tx_cache));
-        TxContextStack::static_push(tx_context_rc.clone());
+        TxContextStack::static_push(tx_context_rc);
 
-        let debug_api = DebugApi::new(tx_context_rc);
-        let sc = (sc_wrapper.obj_builder)(debug_api);
-
-        let state_change = tx_fn(sc);
+        let sc = (sc_wrapper.obj_builder)();
+        let exec_result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| tx_fn(sc)));
 
         let api_after_exec = Rc::try_unwrap(TxContextStack::static_pop()).unwrap();
         let updates = api_after_exec.into_blockchain_updates();
 
         let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
-        match state_change {
-            StateChange::Commit => {
-                updates.apply(b_mock_ref);
+        match exec_result {
+            Ok(()) => {
+                // do not commit changes for SC Query (caller == SC in that case)
+                if caller != sc_wrapper.address_ref() {
+                    updates.apply(b_mock_ref);
+                }
+
+                TxResult::empty()
             },
-            StateChange::Revert => {},
+            Err(panic_any) => interpret_panic_as_tx_result(panic_any),
         }
     }
 
@@ -715,21 +759,13 @@ fn serialize_attributes<T: TopEncode>(attributes: &T) -> Vec<u8> {
     serialized_attributes
 }
 
-fn convert_full_fn<CB, ContractObjBuilder>(
+fn create_contract_obj_box<CB, ContractObjBuilder>(
     func: ContractObjBuilder,
-) -> Box<dyn Fn(DebugApi) -> Box<dyn CallableContract<DebugApi>>>
+) -> Box<dyn CallableContract>
 where
-    CB: ContractBase<Api = DebugApi> + CallableContract<DebugApi> + 'static,
-    ContractObjBuilder: 'static + Fn(DebugApi) -> CB,
+    CB: ContractBase<Api = DebugApi> + CallableContract + 'static,
+    ContractObjBuilder: 'static + Fn() -> CB,
 {
-    let raw_closure = move |context| convert_part(func(context));
-
-    Box::new(raw_closure)
-}
-
-fn convert_part<CB>(c_base: CB) -> Box<dyn CallableContract<DebugApi>>
-where
-    CB: ContractBase<Api = DebugApi> + CallableContract<DebugApi> + 'static,
-{
+    let c_base = func();
     Box::new(c_base)
 }

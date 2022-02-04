@@ -2,7 +2,7 @@ use core::marker::PhantomData;
 
 use super::{ManagedBuffer, ManagedType};
 use crate::{
-    api::{Handle, ManagedTypeApi},
+    api::{BigIntApi, Handle, ManagedBufferApi, ManagedTypeApi, ManagedTypeApiImpl},
     hex_util::encode_bytes_as_hex,
     types::BoxedBytes,
 };
@@ -12,6 +12,7 @@ use elrond_codec::{
     TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, TryStaticCast,
 };
 
+#[repr(transparent)]
 pub struct BigUint<M: ManagedTypeApi> {
     pub(crate) handle: Handle,
     _phantom: PhantomData<M>,
@@ -29,6 +30,10 @@ impl<M: ManagedTypeApi> ManagedType<M> for BigUint<M> {
     #[doc(hidden)]
     fn get_raw_handle(&self) -> Handle {
         self.handle
+    }
+
+    fn transmute_from_handle_ref(handle_ref: &Handle) -> &Self {
+        unsafe { core::mem::transmute(handle_ref) }
     }
 }
 
@@ -51,7 +56,7 @@ macro_rules! big_uint_conv_num {
         impl<M: ManagedTypeApi> From<$num_ty> for BigUint<M> {
             #[inline]
             fn from(value: $num_ty) -> Self {
-                BigUint::from_raw_handle(M::instance().bi_new(value as i64))
+                BigUint::from_raw_handle(M::managed_type_impl().bi_new(value as i64))
             }
         }
     };
@@ -74,19 +79,18 @@ impl<M: ManagedTypeApi> Default for BigUint<M> {
 impl<M: ManagedTypeApi> BigUint<M> {
     #[inline]
     pub fn zero() -> Self {
-        BigUint::from_raw_handle(M::instance().bi_new_zero())
+        BigUint::from_raw_handle(M::managed_type_impl().bi_new_zero())
     }
 
     #[inline]
     pub fn to_u64(&self) -> Option<u64> {
-        self.type_manager()
-            .bi_to_i64(self.handle)
-            .map(|bi| bi as u64)
+        let api = M::managed_type_impl();
+        api.bi_to_i64(self.handle).map(|bi| bi as u64)
     }
 
     #[inline]
     pub fn from_bytes_be(bytes: &[u8]) -> Self {
-        let api = M::instance();
+        let api = M::managed_type_impl();
         let handle = api.bi_new(0);
         api.bi_set_unsigned_bytes(handle, bytes);
         BigUint {
@@ -97,23 +101,26 @@ impl<M: ManagedTypeApi> BigUint<M> {
 
     #[inline]
     pub fn to_bytes_be(&self) -> BoxedBytes {
-        self.type_manager().bi_get_unsigned_bytes(self.handle)
+        let api = M::managed_type_impl();
+        api.bi_get_unsigned_bytes(self.handle)
     }
 
     #[inline]
     pub fn from_bytes_be_buffer(managed_buffer: &ManagedBuffer<M>) -> Self {
-        BigUint::from_raw_handle(M::instance().mb_to_big_int_unsigned(managed_buffer.handle))
+        BigUint::from_raw_handle(
+            M::managed_type_impl().mb_to_big_int_unsigned(managed_buffer.handle),
+        )
     }
 
     #[inline]
     pub fn to_bytes_be_buffer(&self) -> ManagedBuffer<M> {
-        ManagedBuffer::from_raw_handle(M::instance().mb_from_big_int_unsigned(self.handle))
+        ManagedBuffer::from_raw_handle(M::managed_type_impl().mb_from_big_int_unsigned(self.handle))
     }
 
     pub fn copy_to_array_big_endian_pad_right(&self, target: &mut [u8; 32]) {
-        let mb_handle = self.type_manager().mb_from_big_int_unsigned(self.handle);
-        self.type_manager()
-            .mb_copy_to_slice_pad_right(mb_handle, &mut target[..]);
+        let api = M::managed_type_impl();
+        let mb_handle = api.mb_from_big_int_unsigned(self.handle);
+        api.mb_copy_to_slice_pad_right(mb_handle, &mut target[..]);
     }
 }
 
@@ -121,8 +128,9 @@ impl<M: ManagedTypeApi> BigUint<M> {
     #[inline]
     #[must_use]
     pub fn sqrt(&self) -> Self {
-        let handle = self.type_manager().bi_new_zero();
-        self.type_manager().bi_sqrt(handle, self.handle);
+        let api = M::managed_type_impl();
+        let handle = api.bi_new_zero();
+        api.bi_sqrt(handle, self.handle);
         BigUint {
             handle,
             _phantom: PhantomData,
@@ -131,9 +139,10 @@ impl<M: ManagedTypeApi> BigUint<M> {
 
     #[must_use]
     pub fn pow(&self, exp: u32) -> Self {
-        let handle = self.type_manager().bi_new_zero();
-        let exp_handle = self.type_manager().bi_new(exp as i64);
-        self.type_manager().bi_pow(handle, self.handle, exp_handle);
+        let api = M::managed_type_impl();
+        let handle = api.bi_new_zero();
+        let exp_handle = api.bi_new(exp as i64);
+        api.bi_pow(handle, self.handle, exp_handle);
         BigUint {
             handle,
             _phantom: PhantomData,
@@ -142,15 +151,16 @@ impl<M: ManagedTypeApi> BigUint<M> {
 
     #[inline]
     pub fn log2(&self) -> u32 {
-        self.type_manager().bi_log2(self.handle)
+        let api = M::managed_type_impl();
+        api.bi_log2(self.handle)
     }
 }
 
 impl<M: ManagedTypeApi> Clone for BigUint<M> {
     fn clone(&self) -> Self {
-        let clone_handle = self.type_manager().bi_new_zero();
-        self.type_manager()
-            .bi_add(clone_handle, clone_handle, self.handle);
+        let api = M::managed_type_impl();
+        let clone_handle = api.bi_new_zero();
+        api.bi_add(clone_handle, clone_handle, self.handle);
         BigUint {
             handle: clone_handle,
             _phantom: PhantomData,
@@ -180,7 +190,10 @@ impl<M: ManagedTypeApi> NestedEncode for BigUint<M> {
 
 impl<M: ManagedTypeApi> NestedDecode for BigUint<M> {
     fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
-        input.read_specialized((), |_| Err(DecodeError::UNSUPPORTED_OPERATION))
+        input.read_specialized((), |input| {
+            let boxed_bytes = BoxedBytes::dep_decode(input)?;
+            Ok(Self::from_bytes_be(boxed_bytes.as_slice()))
+        })
     }
 
     fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
@@ -188,15 +201,19 @@ impl<M: ManagedTypeApi> NestedDecode for BigUint<M> {
         c: ExitCtx,
         exit: fn(ExitCtx, DecodeError) -> !,
     ) -> Self {
-        input.read_specialized_or_exit((), c, exit, |_, c| {
-            exit(c, DecodeError::UNSUPPORTED_OPERATION)
+        input.read_specialized_or_exit((), c, exit, |input, c| {
+            let boxed_bytes = BoxedBytes::dep_decode_or_exit(input, c, exit);
+            Self::from_bytes_be(boxed_bytes.as_slice())
         })
     }
 }
 
 impl<M: ManagedTypeApi> TopDecode for BigUint<M> {
     fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
-        input.into_specialized(|_| Err(DecodeError::UNSUPPORTED_OPERATION))
+        input.into_specialized(|input| {
+            let boxed_bytes = BoxedBytes::top_decode(input)?;
+            Ok(Self::from_bytes_be(boxed_bytes.as_slice()))
+        })
     }
 }
 

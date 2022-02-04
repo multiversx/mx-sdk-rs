@@ -4,9 +4,9 @@ fn world() -> BlockchainMock {
     let mut blockchain = BlockchainMock::new();
     blockchain.set_current_dir_from_workspace("contracts/benchmarks/mappers/linked-list-repeat");
 
-    blockchain.register_contract(
+    blockchain.register_contract_builder(
         "file:output/linked-list-repeat.wasm",
-        Box::new(|context| Box::new(linked_list_repeat::contract_obj(context))),
+        linked_list_repeat::ContractBuilder,
     );
     blockchain
 }

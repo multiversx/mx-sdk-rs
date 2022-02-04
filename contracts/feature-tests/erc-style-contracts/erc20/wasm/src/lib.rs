@@ -7,7 +7,6 @@
 elrond_wasm_node::wasm_endpoints! {
     erc20
     (
-        init
         allowance
         approve
         balanceOf

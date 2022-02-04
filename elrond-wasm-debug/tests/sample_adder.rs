@@ -50,14 +50,14 @@ mod module_1 {
     pub trait EndpointWrappers: VersionModule + elrond_wasm::contract_base::ContractBase {
         #[inline]
         fn call_version(&self) {
-            elrond_wasm::api::CallValueApi::check_not_payable(&self.raw_vm_api());
+            elrond_wasm::api::CallValueApiImpl::check_not_payable(&Self::Api::call_value_api_impl());
             let result = self.version();
-            elrond_wasm::io::EndpointResult::finish(&result, self.raw_vm_api())
+            elrond_wasm::io::EndpointResult::finish::<Self::Api>(&result)
         }
 
         fn call_some_async(&self) {
             let result = self.some_async();
-            elrond_wasm::io::EndpointResult::finish(&result, self.raw_vm_api())
+            elrond_wasm::io::EndpointResult::finish::<Self::Api>(&result)
         }
 
         fn call(&self, fn_name: &[u8]) -> bool {
@@ -92,9 +92,8 @@ mod module_1 {
             self,
         ) -> ContractCall<Self::Api, <BigInt<Self::Api> as elrond_wasm::io::EndpointResult>::DecodeAs>
         {
-            let (___api___, ___address___) = self.into_fields();
+            let ___address___ = self.into_fields();
             let mut ___contract_call___ = elrond_wasm::types::new_contract_call(
-                ___api___.clone(),
                 ___address___,
                 &b"version"[..],
                 ManagedVec::<Self::Api, EsdtTokenPayment<Self::Api>>::new(),
@@ -143,18 +142,16 @@ mod sample_adder {
         C: AutoImpl + super::module_1::AutoImpl,
     {
         fn get_sum(&self) -> BigInt<Self::Api> {
-            let mut ___key___ =
-                elrond_wasm::storage::StorageKey::<Self::Api>::new(self.raw_vm_api(), &b"sum"[..]);
-            elrond_wasm::storage_get(self.raw_vm_api(), &___key___)
+            let mut ___key___ = elrond_wasm::storage::StorageKey::<Self::Api>::new(&b"sum"[..]);
+            elrond_wasm::storage_get(elrond_wasm::types::ManagedRef::new(&___key___))
         }
         fn set_sum(&self, sum: &BigInt<Self::Api>) {
-            let mut ___key___ =
-                elrond_wasm::storage::StorageKey::<Self::Api>::new(self.raw_vm_api(), &b"sum"[..]);
-            elrond_wasm::storage_set(self.raw_vm_api(), &___key___, &sum);
+            let mut ___key___ = elrond_wasm::storage::StorageKey::<Self::Api>::new(&b"sum"[..]);
+            elrond_wasm::storage_set(elrond_wasm::types::ManagedRef::new(&___key___), &sum);
         }
         fn callback(&self) {}
         fn callbacks(&self) -> self::CallbackProxyObj<Self::Api> {
-            <self::CallbackProxyObj::<Self::Api> as elrond_wasm::contract_base::CallbackProxyObjBase>::new_cb_proxy_obj(self.raw_vm_api())
+            <self::CallbackProxyObj::<Self::Api> as elrond_wasm::contract_base::CallbackProxyObjBase>::new_cb_proxy_obj()
         }
     }
 
@@ -163,17 +160,22 @@ mod sample_adder {
     {
         #[inline]
         fn call_get_sum(&self) {
-            elrond_wasm::api::CallValueApi::check_not_payable(&self.raw_vm_api());
-            elrond_wasm::api::EndpointArgumentApi::check_num_arguments(&self.raw_vm_api(), 0i32);
+            elrond_wasm::api::CallValueApiImpl::check_not_payable(&Self::Api::call_value_api_impl());
+            elrond_wasm::api::EndpointArgumentApiImpl::check_num_arguments(
+                &<Self::Api as elrond_wasm::api::EndpointArgumentApi>::argument_api_impl(),
+                0i32,
+            );
             let result = self.get_sum();
-            elrond_wasm::io::EndpointResult::finish(&result, self.raw_vm_api());
+            elrond_wasm::io::EndpointResult::finish::<Self::Api>(&result);
         }
         #[inline]
         fn call_init(&self) {
-            elrond_wasm::api::CallValueApi::check_not_payable(&self.raw_vm_api());
-            elrond_wasm::api::EndpointArgumentApi::check_num_arguments(&self.raw_vm_api(), 1i32);
+            elrond_wasm::api::CallValueApiImpl::check_not_payable(&Self::Api::call_value_api_impl());
+            elrond_wasm::api::EndpointArgumentApiImpl::check_num_arguments(
+                &<Self::Api as elrond_wasm::api::EndpointArgumentApi>::argument_api_impl(),
+                1i32,
+            );
             let initial_value = elrond_wasm::load_single_arg::<Self::Api, BigInt<Self::Api>>(
-                self.raw_vm_api(),
                 0i32,
                 ArgId::from(&b"initial_value"[..]),
             );
@@ -181,15 +183,17 @@ mod sample_adder {
         }
         #[inline]
         fn call_add(&self) {
-            elrond_wasm::api::CallValueApi::check_not_payable(&self.raw_vm_api());
-            elrond_wasm::api::EndpointArgumentApi::check_num_arguments(&self.raw_vm_api(), 1i32);
+            elrond_wasm::api::CallValueApiImpl::check_not_payable(&Self::Api::call_value_api_impl());
+            elrond_wasm::api::EndpointArgumentApiImpl::check_num_arguments(
+                &<Self::Api as elrond_wasm::api::EndpointArgumentApi>::argument_api_impl(),
+                1i32,
+            );
             let value = elrond_wasm::load_single_arg::<Self::Api, BigInt<Self::Api>>(
-                self.raw_vm_api(),
                 0i32,
                 ArgId::from(&b"value"[..]),
             );
             let result = self.add(value);
-            elrond_wasm::io::EndpointResult::finish(&result, self.raw_vm_api());
+            elrond_wasm::io::EndpointResult::finish::<Self::Api>(&result);
         }
 
         fn call(&self, fn_name: &[u8]) -> bool {
@@ -230,9 +234,8 @@ mod sample_adder {
             Self::Api,
             <BigInt<Self::Api> as elrond_wasm::io::EndpointResult>::DecodeAs,
         > {
-            let (___api___, ___address___) = self.into_fields();
+            let ___address___ = self.into_fields();
             let mut ___contract_call___ = elrond_wasm::types::new_contract_call(
-                ___api___.clone(),
                 ___address___,
                 &b"get_sum"[..],
                 ManagedVec::<Self::Api, EsdtTokenPayment<Self::Api>>::new(),
@@ -244,9 +247,8 @@ mod sample_adder {
             amount: &BigInt<Self::Api>,
         ) -> ContractCall<Self::Api, <SCResult<()> as elrond_wasm::io::EndpointResult>::DecodeAs>
         {
-            let (___api___, ___address___) = self.into_fields();
+            let ___address___ = self.into_fields();
             let mut ___contract_call___ = elrond_wasm::types::new_contract_call(
-                ___api___.clone(),
                 ___address___,
                 &b"add"[..],
                 ManagedVec::<Self::Api, EsdtTokenPayment<Self::Api>>::new(),
@@ -261,9 +263,9 @@ mod sample_adder {
     /////////////////////////////////////////////////////////////////////////////////////////////////
     pub struct ContractObj<A>
     where
-        A: elrond_wasm::api::VMApi + Clone + 'static,
+        A: elrond_wasm::api::VMApi,
     {
-        api: A,
+        _phantom: core::marker::PhantomData<A>,
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -271,38 +273,43 @@ mod sample_adder {
     /////////////////////////////////////////////////////////////////////////////////////////////////
     impl<A> elrond_wasm::contract_base::ContractBase for ContractObj<A>
     where
-        A: elrond_wasm::api::VMApi + Clone + 'static,
+        A: elrond_wasm::api::VMApi,
     {
         type Api = A;
-
-        fn raw_vm_api(&self) -> Self::Api {
-            self.api.clone()
-        }
     }
 
-    impl<A> super::module_1::AutoImpl for ContractObj<A> where
-        A: elrond_wasm::api::VMApi + Clone + 'static
-    {
-    }
+    impl<A> super::module_1::AutoImpl for ContractObj<A> where A: elrond_wasm::api::VMApi {}
 
-    impl<A> AutoImpl for ContractObj<A> where A: elrond_wasm::api::VMApi + Clone + 'static {}
+    impl<A> AutoImpl for ContractObj<A> where A: elrond_wasm::api::VMApi {}
 
-    impl<A> super::module_1::EndpointWrappers for ContractObj<A> where
-        A: elrond_wasm::api::VMApi + Clone + 'static
-    {
-    }
+    impl<A> super::module_1::EndpointWrappers for ContractObj<A> where A: elrond_wasm::api::VMApi {}
 
-    impl<A> EndpointWrappers for ContractObj<A> where A: elrond_wasm::api::VMApi + Clone + 'static {}
+    impl<A> EndpointWrappers for ContractObj<A> where A: elrond_wasm::api::VMApi {}
 
-    impl<A> elrond_wasm::contract_base::CallableContract<A> for ContractObj<A>
+    impl<A> elrond_wasm::contract_base::CallableContract for ContractObj<A>
     where
-        A: elrond_wasm::api::VMApi + Clone + 'static,
+        A: elrond_wasm::api::VMApi,
     {
         fn call(&self, fn_name: &[u8]) -> bool {
             EndpointWrappers::call(self, fn_name)
         }
-        fn into_api(self: Box<Self>) -> A {
-            self.api
+
+        fn clone_obj(&self) -> elrond_wasm::Box<dyn elrond_wasm::contract_base::CallableContract> {
+            elrond_wasm::Box::new(ContractObj::<A> {
+                _phantom: core::marker::PhantomData,
+            })
+        }
+    }
+
+    pub struct ContractBuilder;
+
+    impl elrond_wasm::contract_base::CallableContractBuilder for ContractBuilder {
+        fn new_contract_obj<A: elrond_wasm::api::VMApi>(
+            &self,
+        ) -> elrond_wasm::Box<dyn elrond_wasm::contract_base::CallableContract> {
+            elrond_wasm::Box::new(ContractObj::<A> {
+                _phantom: core::marker::PhantomData,
+            })
         }
     }
 
@@ -316,18 +323,19 @@ mod sample_adder {
         }
     }
 
-    pub fn contract_obj<A>(api: A) -> ContractObj<A>
+    pub fn contract_obj<A>() -> ContractObj<A>
     where
-        A: elrond_wasm::api::VMApi + Clone + 'static,
+        A: elrond_wasm::api::VMApi,
     {
-        ContractObj { api }
+        ContractObj {
+            _phantom: core::marker::PhantomData,
+        }
     }
 
     pub struct Proxy<A>
     where
         A: elrond_wasm::api::VMApi + 'static,
     {
-        pub api: A,
         pub address: elrond_wasm::types::ManagedAddress<A>,
     }
 
@@ -337,10 +345,9 @@ mod sample_adder {
     {
         type Api = A;
 
-        fn new_proxy_obj(api: A) -> Self {
+        fn new_proxy_obj() -> Self {
             let zero_address = ManagedAddress::zero();
             Proxy {
-                api,
                 address: zero_address,
             }
         }
@@ -351,8 +358,8 @@ mod sample_adder {
         }
 
         #[inline]
-        fn into_fields(self) -> (Self::Api, ManagedAddress<Self::Api>) {
-            (self.api, self.address)
+        fn into_fields(self) -> ManagedAddress<Self::Api> {
+            self.address
         }
     }
 
@@ -364,7 +371,7 @@ mod sample_adder {
     where
         A: elrond_wasm::api::VMApi + 'static,
     {
-        pub api: A,
+        _phantom: core::marker::PhantomData<A>,
     }
 
     impl<A> elrond_wasm::contract_base::CallbackProxyObjBase for CallbackProxyObj<A>
@@ -373,18 +380,17 @@ mod sample_adder {
     {
         type Api = A;
 
-        fn new_cb_proxy_obj(api: A) -> Self {
-            CallbackProxyObj { api }
-        }
-        fn cb_call_api(self) -> Self::Api {
-            self.api.clone()
+        fn new_cb_proxy_obj() -> Self {
+            CallbackProxyObj {
+                _phantom: core::marker::PhantomData,
+            }
         }
     }
 
     pub trait CallbackProxy: elrond_wasm::contract_base::CallbackProxyObjBase + Sized {
         fn my_callback(self, caller: &Address) -> elrond_wasm::types::CallbackClosure<Self::Api> {
             let mut ___callback_call___ =
-                elrond_wasm::types::new_callback_call(self.cb_call_api(), &b"my_callback"[..]);
+                elrond_wasm::types::new_callback_call::<Self::Api>(&b"my_callback"[..]);
             ___callback_call___.push_endpoint_arg(caller);
             ___callback_call___
         }
@@ -397,9 +403,9 @@ fn test_add() {
     use elrond_wasm_debug::DebugApi;
     use sample_adder::{Adder, EndpointWrappers, ProxyTrait};
 
-    let tx_context = DebugApi::dummy();
+    let _ = DebugApi::dummy();
 
-    let adder = sample_adder::contract_obj(tx_context.clone());
+    let adder = sample_adder::contract_obj::<DebugApi>();
 
     adder.init(&BigInt::from(5));
     assert_eq!(BigInt::from(5), adder.get_sum());
@@ -420,7 +426,7 @@ fn test_add() {
     assert!(adder.call(b"version"));
 
     let own_proxy =
-        sample_adder::Proxy::new_proxy_obj(tx_context.clone()).contract(ManagedAddress::zero());
+        sample_adder::Proxy::<DebugApi>::new_proxy_obj().contract(ManagedAddress::zero());
     let _ = own_proxy.get_sum();
 
     let _ = elrond_wasm_debug::abi_json::contract_abi::<sample_adder::AbiProvider>();
@@ -428,9 +434,9 @@ fn test_add() {
 
 fn world() -> elrond_wasm_debug::BlockchainMock {
     let mut blockchain = elrond_wasm_debug::BlockchainMock::new();
-    blockchain.register_contract(
+    blockchain.register_contract_builder(
         "file:../contracts/examples/adder/output/adder.wasm",
-        Box::new(|context| Box::new(sample_adder::contract_obj(context))),
+        sample_adder::ContractBuilder,
     );
     blockchain
 }

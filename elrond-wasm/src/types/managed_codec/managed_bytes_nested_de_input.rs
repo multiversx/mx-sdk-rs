@@ -1,3 +1,5 @@
+use core::marker::PhantomData;
+
 use alloc::boxed::Box;
 use elrond_codec::{
     try_execute_then_cast, DecodeError, NestedDecode, NestedDecodeInput,
@@ -11,14 +13,14 @@ use crate::{
 
 pub struct ManagedBytesNestedDecodeInput<M: ManagedTypeApi> {
     bytes_input: OwnedBytesNestedDecodeInput,
-    api: M,
+    _phantom: PhantomData<M>,
 }
 
 impl<M: ManagedTypeApi> ManagedBytesNestedDecodeInput<M> {
-    pub fn new(api: M, bytes: Box<[u8]>) -> Self {
+    pub fn new(bytes: Box<[u8]>) -> Self {
         ManagedBytesNestedDecodeInput {
             bytes_input: OwnedBytesNestedDecodeInput::new(bytes),
-            api,
+            _phantom: PhantomData,
         }
     }
 
@@ -119,9 +121,7 @@ impl<M: ManagedTypeApi> NestedDecodeInput for ManagedBytesNestedDecodeInput<M> {
         C: TryStaticCast,
         F: FnOnce(&mut Self) -> Result<T, DecodeError>,
     {
-        if let Some(result) = self.api.try_cast_ref::<T>() {
-            Ok(result.clone())
-        } else if let Some(result) = try_execute_then_cast(|| {
+        if let Some(result) = try_execute_then_cast(|| {
             if let Some(mb_context) = context.try_cast_ref::<ManagedBufferSizeContext>() {
                 self.read_managed_buffer_of_size(mb_context.0)
             } else {
@@ -152,9 +152,7 @@ impl<M: ManagedTypeApi> NestedDecodeInput for ManagedBytesNestedDecodeInput<M> {
         F: FnOnce(&mut Self, ExitCtx) -> T,
         ExitCtx: Clone,
     {
-        if let Some(result) = self.api.try_cast_ref::<T>() {
-            result.clone()
-        } else if let Some(result) = try_execute_then_cast(|| {
+        if let Some(result) = try_execute_then_cast(|| {
             if let Some(mb_context) = context.try_cast_ref::<ManagedBufferSizeContext>() {
                 self.read_managed_buffer_of_size_or_exit(mb_context.0, c.clone(), exit)
             } else {

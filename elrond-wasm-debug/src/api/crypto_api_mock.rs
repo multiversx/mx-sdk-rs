@@ -1,12 +1,20 @@
 use crate::DebugApi;
 use elrond_wasm::{
-    api::CryptoApi,
+    api::{CryptoApi, CryptoApiImpl},
     types::{BoxedBytes, MessageHashType, H256},
 };
 use sha2::Sha256;
 use sha3::{Digest, Keccak256};
 
 impl CryptoApi for DebugApi {
+    type CryptoApiImpl = DebugApi;
+
+    fn crypto_api_impl() -> Self::CryptoApiImpl {
+        DebugApi::new_from_static()
+    }
+}
+
+impl CryptoApiImpl for DebugApi {
     fn sha256_legacy(&self, data: &[u8]) -> H256 {
         let mut hasher = Sha256::new();
         hasher.update(data);

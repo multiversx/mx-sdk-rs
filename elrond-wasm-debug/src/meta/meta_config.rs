@@ -2,11 +2,23 @@ use std::{fs::create_dir_all, path::PathBuf};
 
 use elrond_wasm::abi::{ContractAbi, EndpointLocationAbi};
 
-#[derive(Default, Debug)]
+#[derive(Debug)]
 pub struct BuildArgs {
     pub debug_symbols: bool,
     pub wasm_name_override: Option<String>,
     pub wasm_name_suffix: Option<String>,
+    pub wasm_opt: bool,
+}
+
+impl Default for BuildArgs {
+    fn default() -> Self {
+        BuildArgs {
+            debug_symbols: false,
+            wasm_name_override: None,
+            wasm_name_suffix: None,
+            wasm_opt: true,
+        }
+    }
 }
 
 impl BuildArgs {
@@ -26,6 +38,7 @@ impl BuildArgs {
 }
 
 pub struct ContractMetadata {
+    pub location: EndpointLocationAbi,
     pub wasm_crate_name: String,
     pub wasm_crate_path: String,
     pub output_base_name: String,
@@ -82,9 +95,13 @@ pub fn process_args(args: &[String]) -> BuildArgs {
                     .expect("argument `--wasm-suffix` must be followed by the desired suffix");
                 result.wasm_name_suffix = Some(suffix.clone());
             },
+            "--no-wasm-opt" => {
+                result.wasm_opt = false;
+            },
             _ => {},
         }
     }
+
     result
 }
 
@@ -96,6 +113,7 @@ impl MetaConfig {
         let main_contract_crate_name = main_contract_abi.get_crate_name();
 
         let main_contract = ContractMetadata {
+            location: EndpointLocationAbi::MainContract,
             wasm_crate_name: format!("{}-wasm", &main_contract_crate_name),
             wasm_crate_path: "../wasm".to_string(),
             output_base_name: main_contract_crate_name.to_string(),
@@ -107,6 +125,7 @@ impl MetaConfig {
                 let view_contract_abi =
                     original_contract_abi.secondary_contract(EndpointLocationAbi::ViewContract);
                 Some(ContractMetadata {
+                    location: EndpointLocationAbi::ViewContract,
                     wasm_crate_name: format!("{}-wasm", &main_contract_crate_name),
                     wasm_crate_path: "../wasm-view".to_string(),
                     output_base_name: format!("{}-view", main_contract_crate_name),

@@ -33,6 +33,7 @@ pub trait GovernanceConfigurablePropertiesModule {
 
     /// The module can't protect its storage from the main SC, so it's the developers responsibility
     /// to not modify parameters manually
+    #[only_owner]
     #[endpoint(initGovernanceModule)]
     fn init_governance_module(
         &self,
@@ -44,7 +45,6 @@ pub trait GovernanceConfigurablePropertiesModule {
         voting_period_in_blocks: u64,
         lock_time_after_voting_ends_in_blocks: u64,
     ) -> SCResult<()> {
-        only_owner!(self, "Only owner may initialize governance module");
         require!(
             governance_token_id.is_valid_esdt_identifier(),
             "Invalid ESDT token ID provided for governance_token_id"

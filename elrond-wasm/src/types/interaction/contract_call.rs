@@ -1,11 +1,12 @@
 use crate::{
     api::{
-        SendApi, ESDT_MULTI_TRANSFER_FUNC_NAME, ESDT_NFT_TRANSFER_FUNC_NAME,
-        ESDT_TRANSFER_FUNC_NAME,
+        BlockchainApiImpl, CallTypeApi, ErrorApiImpl, SendApiImpl, ESDT_MULTI_TRANSFER_FUNC_NAME,
+        ESDT_NFT_TRANSFER_FUNC_NAME, ESDT_TRANSFER_FUNC_NAME,
     },
+    contract_base::BlockchainWrapper,
     types::{
         AsyncCall, BigUint, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer,
-        ManagedVec, TokenIdentifier,
+        ManagedType, ManagedVec, TokenIdentifier,
     },
     ArgId, ContractCallArg, DynArg, ManagedResultArgLoader,
 };
@@ -24,9 +25,9 @@ const TRANSFER_EXECUTE_DEFAULT_LEFTOVER: u64 = 100_000;
 #[must_use]
 pub struct ContractCall<SA, R>
 where
-    SA: SendApi + 'static,
+    SA: CallTypeApi + 'static,
 {
-    api: SA,
+    _phantom: PhantomData<SA>,
     to: ManagedAddress<SA>,
     egld_payment: BigUint<SA>,
     payments: ManagedVec<SA, EsdtTokenPayment<SA>>,
@@ -39,30 +40,28 @@ where
 /// Syntactical sugar to help macros to generate code easier.
 /// Unlike calling `ContractCall::<SA, R>::new`, here types can be inferred from the context.
 pub fn new_contract_call<SA, R>(
-    api: SA,
     to: ManagedAddress<SA>,
     endpoint_name_slice: &'static [u8],
     payments: ManagedVec<SA, EsdtTokenPayment<SA>>,
 ) -> ContractCall<SA, R>
 where
-    SA: SendApi + 'static,
+    SA: CallTypeApi + 'static,
 {
     let endpoint_name = ManagedBuffer::new_from_bytes(endpoint_name_slice);
-    ContractCall::<SA, R>::new_with_esdt_payment(api, to, endpoint_name, payments)
+    ContractCall::<SA, R>::new_with_esdt_payment(to, endpoint_name, payments)
 }
 
 #[allow(clippy::return_self_not_must_use)]
 impl<SA, R> ContractCall<SA, R>
 where
-    SA: SendApi + 'static,
+    SA: CallTypeApi + 'static,
 {
-    pub fn new(api: SA, to: ManagedAddress<SA>, endpoint_name: ManagedBuffer<SA>) -> Self {
+    pub fn new(to: ManagedAddress<SA>, endpoint_name: ManagedBuffer<SA>) -> Self {
         let payments = ManagedVec::new();
-        Self::new_with_esdt_payment(api, to, endpoint_name, payments)
+        Self::new_with_esdt_payment(to, endpoint_name, payments)
     }
 
     pub fn new_with_esdt_payment(
-        api: SA,
         to: ManagedAddress<SA>,
         endpoint_name: ManagedBuffer<SA>,
         payments: ManagedVec<SA, EsdtTokenPayment<SA>>,
@@ -70,7 +69,7 @@ where
         let arg_buffer = ManagedArgBuffer::new_empty();
         let egld_payment = BigUint::zero();
         ContractCall {
-            api,
+            _phantom: PhantomData,
             to,
             egld_payment,
             payments,
@@ -156,7 +155,7 @@ where
     }
 
     fn convert_to_single_transfer_esdt_call(mut self) -> Self {
-        if let Some(payment) = self.payments.get(0) {
+        if let Some(payment) = self.payments.try_get(0) {
             if payment.token_identifier.is_egld() {
                 self.egld_payment = payment.amount;
                 self.payments.clear();
@@ -174,7 +173,7 @@ where
                 let endpoint_name = ManagedBuffer::new_from_bytes(ESDT_TRANSFER_FUNC_NAME);
 
                 ContractCall {
-                    api: self.api.clone(),
+                    _phantom: PhantomData,
                     to: self.to,
                     egld_payment: zero,
                     payments: no_payments,
@@ -200,12 +199,14 @@ where
                 new_arg_buffer.push_arg(&self.endpoint_name);
 
                 // nft transfer is sent to self, sender = receiver
-                let recipient_addr = self.api.get_sc_address();
+                let recipient_addr = ManagedAddress::from_raw_handle(
+                    SA::blockchain_api_impl().get_sc_address_handle(),
+                );
                 let zero = BigUint::zero();
                 let endpoint_name = ManagedBuffer::new_from_bytes(ESDT_NFT_TRANSFER_FUNC_NAME);
 
                 ContractCall {
-                    api: self.api,
+                    _phantom: PhantomData,
                     to: recipient_addr,
                     egld_payment: zero,
                     payments,
@@ -236,12 +237,12 @@ where
         new_arg_buffer.push_arg(self.endpoint_name);
 
         // multi transfer is sent to self, sender = receiver
-        let recipient_addr = self.api.get_sc_address();
+        let recipient_addr = BlockchainWrapper::<SA>::new().get_sc_address();
         let zero = BigUint::zero();
         let endpoint_name = ManagedBuffer::new_from_bytes(ESDT_MULTI_TRANSFER_FUNC_NAME);
 
         ContractCall {
-            api: self.api,
+            _phantom: PhantomData,
             to: recipient_addr,
             egld_payment: zero,
             payments,
@@ -254,7 +255,7 @@ where
 
     fn resolve_gas_limit(&self) -> u64 {
         if self.explicit_gas_limit == UNSPECIFIED_GAS_LIMIT {
-            self.api.get_gas_left()
+            SA::blockchain_api_impl().get_gas_left()
         } else {
             self.explicit_gas_limit
         }
@@ -263,7 +264,7 @@ where
     pub fn async_call(mut self) -> AsyncCall<SA> {
         self = self.convert_to_esdt_transfer_call();
         AsyncCall {
-            api: self.api,
+            _phantom: PhantomData,
             to: self.to,
             egld_payment: self.egld_payment,
             endpoint_name: self.endpoint_name,
@@ -275,14 +276,14 @@ where
 
 impl<SA, R> ContractCall<SA, R>
 where
-    SA: SendApi + 'static,
+    SA: CallTypeApi + 'static,
     R: DynArg,
 {
     /// Executes immediately, synchronously, and returns contract call result.
     /// Only works if the target contract is in the same shard.
     pub fn execute_on_dest_context(mut self) -> R {
         self = self.convert_to_esdt_transfer_call();
-        let raw_result = self.api.execute_on_dest_context_raw(
+        let raw_result = SA::send_api_impl().execute_on_dest_context_raw(
             self.resolve_gas_limit(),
             &self.to,
             &self.egld_payment,
@@ -306,7 +307,7 @@ where
         F: FnOnce(usize, usize) -> (usize, usize),
     {
         self = self.convert_to_esdt_transfer_call();
-        let raw_result = self.api.execute_on_dest_context_raw_custom_result_range(
+        let raw_result = SA::send_api_impl().execute_on_dest_context_raw_custom_result_range(
             self.resolve_gas_limit(),
             &self.to,
             &self.egld_payment,
@@ -321,7 +322,7 @@ where
 
     pub fn execute_on_dest_context_readonly(mut self) -> R {
         self = self.convert_to_esdt_transfer_call();
-        let raw_result = self.api.execute_on_dest_context_readonly_raw(
+        let raw_result = SA::send_api_impl().execute_on_dest_context_readonly_raw(
             self.resolve_gas_limit(),
             &self.to,
             &self.endpoint_name,
@@ -335,14 +336,14 @@ where
 
 impl<SA, R> ContractCall<SA, R>
 where
-    SA: SendApi + 'static,
+    SA: CallTypeApi + 'static,
 {
     /// Executes immediately, synchronously.
     /// The result (if any) is ignored.
     /// Only works if the target contract is in the same shard.
     pub fn execute_on_dest_context_ignore_result(mut self) {
         self = self.convert_to_esdt_transfer_call();
-        let _ = self.api.execute_on_dest_context_raw(
+        let _ = SA::send_api_impl().execute_on_dest_context_raw(
             self.resolve_gas_limit(),
             &self.to,
             &self.egld_payment,
@@ -353,7 +354,7 @@ where
 
     pub fn execute_on_same_context(mut self) {
         self = self.convert_to_esdt_transfer_call();
-        let _ = self.api.execute_on_same_context_raw(
+        let _ = SA::send_api_impl().execute_on_same_context_raw(
             self.resolve_gas_limit(),
             &self.to,
             &self.egld_payment,
@@ -364,7 +365,7 @@ where
 
     fn resolve_gas_limit_with_leftover(&self) -> u64 {
         if self.explicit_gas_limit == UNSPECIFIED_GAS_LIMIT {
-            let mut gas_left = self.api.get_gas_left();
+            let mut gas_left = SA::blockchain_api_impl().get_gas_left();
             if gas_left > TRANSFER_EXECUTE_DEFAULT_LEFTOVER {
                 gas_left -= TRANSFER_EXECUTE_DEFAULT_LEFTOVER;
             }
@@ -388,7 +389,7 @@ where
     fn no_payment_transfer_execute(&self) {
         let gas_limit = self.resolve_gas_limit_with_leftover();
 
-        let _ = self.api.direct_egld_execute(
+        let _ = SA::send_api_impl().direct_egld_execute(
             &self.to,
             &BigUint::zero(),
             gas_limit,
@@ -399,10 +400,10 @@ where
 
     fn single_transfer_execute(self) {
         let gas_limit = self.resolve_gas_limit_with_leftover();
-        let payment = &self.payments.get(0).unwrap();
+        let payment = &self.payments.try_get(0).unwrap();
 
         if payment.token_identifier.is_egld() {
-            let _ = self.api.direct_egld_execute(
+            let _ = SA::send_api_impl().direct_egld_execute(
                 &self.to,
                 &payment.amount,
                 gas_limit,
@@ -411,7 +412,7 @@ where
             );
         } else if payment.token_nonce == 0 {
             // fungible ESDT
-            let _ = self.api.direct_esdt_execute(
+            let _ = SA::send_api_impl().direct_esdt_execute(
                 &self.to,
                 &payment.token_identifier,
                 &payment.amount,
@@ -421,7 +422,7 @@ where
             );
         } else {
             // non-fungible/semi-fungible ESDT
-            let _ = self.api.direct_esdt_nft_execute(
+            let _ = SA::send_api_impl().direct_esdt_nft_execute(
                 &self.to,
                 &payment.token_identifier,
                 payment.token_nonce,
@@ -435,7 +436,7 @@ where
 
     fn multi_transfer_execute(self) {
         let gas_limit = self.resolve_gas_limit_with_leftover();
-        let result = self.api.direct_multi_esdt_transfer_execute(
+        let result = SA::send_api_impl().direct_multi_esdt_transfer_execute(
             &self.to,
             &self.payments,
             gas_limit,
@@ -444,7 +445,7 @@ where
         );
 
         if let Err(e) = result {
-            self.api.signal_error(e);
+            SA::error_api_impl().signal_error(e);
         }
     }
 }

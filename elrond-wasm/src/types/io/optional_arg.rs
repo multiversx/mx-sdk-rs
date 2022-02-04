@@ -63,12 +63,12 @@ where
     type DecodeAs = OptionalArg<T::DecodeAs>;
 
     #[inline]
-    fn finish<FA>(&self, api: FA)
+    fn finish<FA>(&self)
     where
-        FA: ManagedTypeApi + EndpointFinishApi + Clone + 'static,
+        FA: ManagedTypeApi + EndpointFinishApi,
     {
         if let OptionalResult::Some(t) = self {
-            t.finish(api);
+            t.finish::<FA>();
         }
     }
 }
@@ -90,7 +90,7 @@ where
     T: ContractCallArg,
 {
     fn push_dyn_arg<O: DynArgOutput>(&self, output: &mut O) {
-        (&self).push_dyn_arg(output)
+        ContractCallArg::push_dyn_arg(&self, output)
     }
 }
 

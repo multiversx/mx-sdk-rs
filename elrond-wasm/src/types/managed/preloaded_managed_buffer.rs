@@ -3,7 +3,7 @@ use crate::{
     types::StaticBufferRef,
 };
 
-use super::{ManagedBuffer, ManagedType};
+use super::ManagedBuffer;
 
 pub(crate) struct PreloadedManagedBuffer<M>
 where
@@ -31,7 +31,11 @@ where
         if self.static_cache.is_some() {
             return;
         }
-        self.static_cache = StaticBufferRef::try_from_managed_buffer(&self.managed_buffer);
+
+        self.static_cache =
+            StaticBufferRef::try_new_from_copy_bytes(self.managed_buffer.len(), |dest_slice| {
+                let _ = self.managed_buffer.load_slice(0, dest_slice);
+            });
     }
 
     pub fn load_slice(
@@ -54,9 +58,5 @@ where
         slice_len: usize,
     ) -> Option<ManagedBuffer<M>> {
         self.managed_buffer.copy_slice(starting_position, slice_len)
-    }
-
-    pub fn type_manager(&self) -> M {
-        self.managed_buffer.type_manager()
     }
 }

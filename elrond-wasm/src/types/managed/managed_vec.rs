@@ -1,7 +1,7 @@
-use super::{ManagedBuffer, ManagedType, ManagedVecItem, ManagedVecRefIterator};
+use super::{ManagedBuffer, ManagedType, ManagedVecItem, ManagedVecRef, ManagedVecRefIterator};
 use crate::{
-    abi::TypeAbi,
-    api::{Handle, InvalidSliceError, ManagedTypeApi},
+    abi::{TypeAbi, TypeDescriptionContainer},
+    api::{ErrorApiImpl, Handle, InvalidSliceError, ManagedTypeApi},
     types::{ArgBuffer, BoxedBytes, ManagedBufferNestedDecodeInput},
 };
 use alloc::{string::String, vec::Vec};
@@ -11,9 +11,12 @@ use elrond_codec::{
     TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
 };
 
+pub(crate) const INDEX_OUT_OF_RANGE_MSG: &[u8] = b"ManagedVec index out of range";
+
 /// A list of items that lives inside a managed buffer.
 /// Items can be either stored there in full (e.g. `u32`),
 /// or just via handle (e.g. `BigUint<M>`).
+#[repr(transparent)]
 pub struct ManagedVec<M, T>
 where
     M: ManagedTypeApi,
@@ -39,6 +42,11 @@ where
     #[doc(hidden)]
     fn get_raw_handle(&self) -> Handle {
         self.buffer.get_raw_handle()
+    }
+
+    #[doc(hidden)]
+    fn transmute_from_handle_ref(handle_ref: &Handle) -> &Self {
+        unsafe { core::mem::transmute(handle_ref) }
     }
 }
 
@@ -112,18 +120,43 @@ where
         self.byte_len() == 0
     }
 
+    pub fn try_get(&self, index: usize) -> Option<T::Ref<'_>> {
+        let byte_index = index * T::PAYLOAD_SIZE;
+        let mut load_result = Ok(());
+        let result = unsafe {
+            T::from_byte_reader_as_borrow(|dest_slice| {
+                load_result = self.buffer.load_slice(byte_index, dest_slice);
+            })
+        };
+        match load_result {
+            Ok(_) => Some(result),
+            Err(_) => None,
+        }
+    }
+
     /// Retrieves element at index, if the index is valid.
-    /// Warning! Ownership around this method is murky, managed items are copied without respecting ownership.
-    /// TODO: Find a way to fix it by returning some kind of reference to the item, not the owned type.
-    pub fn get(&self, index: usize) -> Option<T> {
+    /// Otherwise, signals an error and terminates execution.
+    pub fn get(&self, index: usize) -> T::Ref<'_> {
+        match self.try_get(index) {
+            Some(result) => result,
+            None => M::error_api_impl().signal_error(INDEX_OUT_OF_RANGE_MSG),
+        }
+    }
+
+    pub fn get_mut(&mut self, index: usize) -> ManagedVecRef<M, T> {
+        ManagedVecRef::new(self.get_raw_handle(), index)
+    }
+
+    pub(super) unsafe fn get_unsafe(&self, index: usize) -> T {
         let byte_index = index * T::PAYLOAD_SIZE;
         let mut load_result = Ok(());
         let result = T::from_byte_reader(|dest_slice| {
             load_result = self.buffer.load_slice(byte_index, dest_slice);
         });
+
         match load_result {
-            Ok(_) => Some(result),
-            Err(_) => None,
+            Ok(_) => result,
+            Err(_) => M::error_api_impl().signal_error(INDEX_OUT_OF_RANGE_MSG),
         }
     }
 
@@ -332,6 +365,10 @@ where
     fn type_name() -> String {
         <&[T] as TypeAbi>::type_name()
     }
+
+    fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
+        T::provide_type_descriptions(accumulator);
+    }
 }
 
 /// For compatibility with the older Arwen EI.
@@ -346,7 +383,6 @@ pub fn managed_vec_of_buffers_to_arg_buffer<M: ManagedTypeApi>(
 }
 
 pub fn managed_vec_from_slice_of_boxed_bytes<M: ManagedTypeApi>(
-    _api: M,
     data: &[BoxedBytes],
 ) -> ManagedVec<M, ManagedBuffer<M>> {
     let mut result = ManagedVec::new();

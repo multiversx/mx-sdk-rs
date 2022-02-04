@@ -32,10 +32,14 @@ impl CmdBuilder {
         self.cmd += flag_name;
     }
 
-    pub fn add_standalone_argument<T: TopEncode>(&mut self, arg: &T) {
+    pub fn to_hex<T: TopEncode>(arg: &T) -> String {
         let mut arg_bytes = Vec::new();
         arg.top_encode(&mut arg_bytes).unwrap();
-        let arg_as_hex = hex::encode(&arg_bytes);
+        hex::encode(&arg_bytes)
+    }
+
+    pub fn add_standalone_argument<T: TopEncode>(&mut self, arg: &T) {
+        let arg_as_hex = Self::to_hex(arg);
 
         self.add_space();
         self.cmd += HEX_PREFIX;

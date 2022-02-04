@@ -2,9 +2,9 @@ pub fn contract_object_def() -> proc_macro2::TokenStream {
     quote! {
         pub struct ContractObj<A>
         where
-            A: elrond_wasm::api::VMApi + Clone + 'static,
+            A: elrond_wasm::api::VMApi,
         {
-            api: A,
+            _phantom: core::marker::PhantomData<A>,
         }
     }
 }
@@ -13,24 +13,34 @@ pub fn impl_contract_base() -> proc_macro2::TokenStream {
     quote! {
         impl<A> elrond_wasm::contract_base::ContractBase for ContractObj<A>
         where
-            A: elrond_wasm::api::VMApi + Clone + 'static
+            A: elrond_wasm::api::VMApi,
         {
             type Api = A;
-
-            fn raw_vm_api(&self) -> Self::Api {
-                self.api.clone()
-            }
         }
     }
 }
 
 pub fn new_contract_object_fn() -> proc_macro2::TokenStream {
     quote! {
-        pub fn contract_obj<A>(api: A) -> ContractObj<A>
+        pub fn contract_obj<A>() -> ContractObj<A>
         where
-            A: elrond_wasm::api::VMApi + Clone + 'static,
+            A: elrond_wasm::api::VMApi,
         {
-            ContractObj { api }
+            ContractObj {
+                _phantom: core::marker::PhantomData,
+            }
+        }
+
+        pub struct ContractBuilder;
+
+        impl elrond_wasm::contract_base::CallableContractBuilder for self::ContractBuilder {
+            fn new_contract_obj<A: elrond_wasm::api::VMApi>(
+                &self,
+            ) -> elrond_wasm::Box<dyn elrond_wasm::contract_base::CallableContract> {
+                elrond_wasm::Box::new(ContractObj::<A> {
+                    _phantom: core::marker::PhantomData,
+                })
+            }
         }
     }
 }
@@ -45,8 +55,6 @@ pub fn impl_auto_impl() -> proc_macro2::TokenStream {
                 + elrond_wasm::api::EndpointArgumentApi
                 + elrond_wasm::api::EndpointFinishApi
                 + elrond_wasm::api::ManagedTypeApi
-                + Clone
-                + 'static
         {
         }
     }
@@ -54,15 +62,18 @@ pub fn impl_auto_impl() -> proc_macro2::TokenStream {
 
 pub fn impl_callable_contract() -> proc_macro2::TokenStream {
     quote! {
-        impl<A> elrond_wasm::contract_base::CallableContract<A> for ContractObj<A>
+        impl<A> elrond_wasm::contract_base::CallableContract for ContractObj<A>
         where
-            A: elrond_wasm::api::VMApi + Clone + 'static
+            A: elrond_wasm::api::VMApi,
         {
             fn call(&self, fn_name: &[u8]) -> bool {
                 EndpointWrappers::call(self, fn_name)
             }
-            fn into_api(self: Box<Self>) -> A {
-                self.api
+
+            fn clone_obj(&self) -> elrond_wasm::Box<dyn elrond_wasm::contract_base::CallableContract> {
+                elrond_wasm::Box::new(ContractObj::<A> {
+                    _phantom: core::marker::PhantomData,
+                })
             }
         }
     }
@@ -74,7 +85,6 @@ pub fn proxy_object_def() -> proc_macro2::TokenStream {
         where
             A: elrond_wasm::api::VMApi + 'static,
         {
-            pub api: A,
             pub address: elrond_wasm::types::ManagedAddress<A>,
         }
 
@@ -84,10 +94,9 @@ pub fn proxy_object_def() -> proc_macro2::TokenStream {
         {
             type Api = A;
 
-            fn new_proxy_obj(api: A) -> Self {
+            fn new_proxy_obj() -> Self {
                 let zero_address = ManagedAddress::zero();
                 Proxy {
-                    api,
                     address: zero_address,
                 }
             }
@@ -98,8 +107,8 @@ pub fn proxy_object_def() -> proc_macro2::TokenStream {
             }
 
             #[inline]
-            fn into_fields(self) -> (Self::Api, ManagedAddress<Self::Api>) {
-                (self.api, self.address)
+            fn into_fields(self) -> ManagedAddress<Self::Api> {
+                self.address
             }
         }
     }
@@ -111,7 +120,7 @@ pub fn callback_proxy_object_def() -> proc_macro2::TokenStream {
         where
             A: elrond_wasm::api::VMApi + 'static,
         {
-            pub api: A,
+            _phantom: core::marker::PhantomData<A>,
         }
 
         impl<A> elrond_wasm::contract_base::CallbackProxyObjBase for CallbackProxyObj<A>
@@ -120,12 +129,17 @@ pub fn callback_proxy_object_def() -> proc_macro2::TokenStream {
         {
             type Api = A;
 
-            fn new_cb_proxy_obj(api: A) -> Self {
-                CallbackProxyObj { api }
-            }
-            fn cb_call_api(self) -> Self::Api {
-                self.api.clone()
+            fn new_cb_proxy_obj() -> Self {
+                CallbackProxyObj {
+                    _phantom: core::marker::PhantomData,
+                }
             }
         }
+    }
+}
+
+pub fn call_method_api_static_init() -> proc_macro2::TokenStream {
+    quote! {
+        <Self::Api as elrond_wasm::api::VMApi>::init_static();
     }
 }

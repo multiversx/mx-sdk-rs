@@ -7,7 +7,6 @@
 elrond_wasm_node::wasm_endpoints! {
     basic_features
     (
-        init
         //add_assign_big_float
         //add_assign_big_float_ref
         add_assign_big_int
@@ -183,10 +182,13 @@ elrond_wasm_node::wasm_endpoints! {
         listMapperPushFront
         listMapperRemoveNode
         listMapperRemoveNodeById
+        listMapperSetValue
+        listMapperSetValueById
         load_addr
         load_big_int
         load_big_uint
         load_bool
+        load_from_address_raw
         load_i64
         load_map1
         load_map2
@@ -208,6 +210,7 @@ elrond_wasm_node::wasm_endpoints! {
         managed_address_eq
         managed_address_from
         managed_address_zero
+        managed_struct_eq
         managed_vec_address_push
         managed_vec_biguint_eq
         managed_vec_biguint_push

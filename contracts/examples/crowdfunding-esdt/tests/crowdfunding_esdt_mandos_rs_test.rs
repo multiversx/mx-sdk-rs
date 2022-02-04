@@ -1,13 +1,12 @@
-use elrond_wasm::*;
 use elrond_wasm_debug::*;
 
 fn world() -> BlockchainMock {
     let mut blockchain = BlockchainMock::new();
     blockchain.set_current_dir_from_workspace("contracts/examples/crowdfunding-esdt");
 
-    blockchain.register_contract(
+    blockchain.register_contract_builder(
         "file:output/crowdfunding-esdt.wasm",
-        Box::new(|context| Box::new(crowdfunding_esdt::contract_obj(context))),
+        crowdfunding_esdt::ContractBuilder,
     );
     blockchain
 }

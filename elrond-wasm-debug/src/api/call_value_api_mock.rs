@@ -1,8 +1,8 @@
 use crate::{tx_mock::TxPanic, DebugApi};
 use elrond_wasm::{
-    api::CallValueApi,
+    api::{CallValueApi, CallValueApiImpl, Handle},
     err_msg,
-    types::{BigUint, EsdtTokenType, TokenIdentifier},
+    types::{BigUint, EsdtTokenType, ManagedType},
 };
 
 impl DebugApi {
@@ -17,14 +17,22 @@ impl DebugApi {
 }
 
 impl CallValueApi for DebugApi {
+    type CallValueApiImpl = DebugApi;
+
+    fn call_value_api_impl() -> Self::CallValueApiImpl {
+        DebugApi::new_from_static()
+    }
+}
+
+impl CallValueApiImpl for DebugApi {
     fn check_not_payable(&self) {
-        if self.egld_value() > 0 {
+        if BigUint::<DebugApi>::from_raw_handle(self.egld_value()) > 0u32 {
             std::panic::panic_any(TxPanic {
                 status: 10,
                 message: err_msg::NON_PAYABLE_FUNC_EGLD.to_vec(),
             });
         }
-        if self.esdt_value() > 0 {
+        if self.esdt_num_transfers() > 0 {
             std::panic::panic_any(TxPanic {
                 status: 10,
                 message: err_msg::NON_PAYABLE_FUNC_ESDT.to_vec(),
@@ -33,18 +41,18 @@ impl CallValueApi for DebugApi {
     }
 
     #[inline]
-    fn egld_value(&self) -> BigUint<Self> {
+    fn egld_value(&self) -> Handle {
         self.insert_new_big_uint(self.input_ref().egld_value.clone())
     }
 
     #[inline]
-    fn esdt_value(&self) -> BigUint<Self> {
+    fn esdt_value(&self) -> Handle {
         self.fail_if_more_than_one_esdt_transfer();
         self.esdt_value_by_index(0)
     }
 
     #[inline]
-    fn token(&self) -> TokenIdentifier<Self> {
+    fn token(&self) -> Handle {
         self.fail_if_more_than_one_esdt_transfer();
         self.token_by_index(0)
     }
@@ -67,7 +75,7 @@ impl CallValueApi for DebugApi {
     }
 
     #[inline]
-    fn esdt_value_by_index(&self, index: usize) -> BigUint<Self> {
+    fn esdt_value_by_index(&self, index: usize) -> Handle {
         if let Some(esdt_value) = self.input_ref().esdt_values.get(index) {
             self.insert_new_big_uint(esdt_value.value.clone())
         } else {
@@ -76,13 +84,11 @@ impl CallValueApi for DebugApi {
     }
 
     #[inline]
-    fn token_by_index(&self, index: usize) -> TokenIdentifier<Self> {
+    fn token_by_index(&self, index: usize) -> Handle {
         if let Some(esdt_value) = self.input_ref().esdt_values.get(index) {
-            TokenIdentifier::from(
-                self.insert_new_managed_buffer(esdt_value.token_identifier.clone()),
-            )
+            self.insert_new_managed_buffer(esdt_value.token_identifier.clone())
         } else {
-            TokenIdentifier::egld()
+            self.insert_new_managed_buffer(Vec::new())
         }
     }
 

@@ -1,8 +1,11 @@
 use elrond_codec::{EncodeError, NestedEncodeOutput, TryStaticCast};
 
-use crate::{api::ManagedTypeApi, types::StaticBufferRef};
+use crate::{
+    api::ManagedTypeApi, contract_base::ManagedSerializer, formatter::FormatReceiver,
+    types::StaticBufferRef,
+};
 
-use super::{BigInt, BigUint, ManagedBuffer, ManagedBufferSizeContext, ManagedType};
+use super::{BigInt, BigUint, ManagedBuffer, ManagedBufferSizeContext};
 
 pub struct ManagedBufferCachedBuilder<M>
 where
@@ -42,17 +45,17 @@ where
 
     fn flush_to_managed_buffer(&mut self) {
         let old_static_cache = core::mem::replace(&mut self.static_cache, None);
-        if let Some(_static_cache) = &old_static_cache {
-            // TODO: encapsulate
-            self.managed_buffer
-                .type_manager()
-                .append_static_buffer_to_mb(self.managed_buffer.get_raw_handle());
+        if let Some(static_cache) = &old_static_cache {
+            static_cache.with_buffer_contents(|bytes| {
+                self.managed_buffer.append_bytes(bytes);
+            });
         }
     }
 
     pub fn append_bytes(&mut self, bytes: &[u8]) {
         if let Some(static_cache) = &mut self.static_cache {
-            if !static_cache.try_extend_from_slice(bytes) {
+            let success = static_cache.try_extend_from_slice(bytes);
+            if !success {
                 self.flush_to_managed_buffer();
                 self.managed_buffer.append_bytes(bytes);
             }
@@ -62,19 +65,19 @@ where
     }
 
     pub fn append_managed_buffer(&mut self, item: &ManagedBuffer<M>) {
-        if let Some(_static_cache) = &mut self.static_cache {
-            // TODO: encapsulate
-            if !self
-                .managed_buffer
-                .type_manager()
-                .append_mb_to_static_buffer(item.get_raw_handle())
-            {
+        let mut static_cache_mut = core::mem::replace(&mut self.static_cache, None);
+        if let Some(static_cache) = &mut static_cache_mut {
+            let success = static_cache.try_extend_from_copy_bytes(item.len(), |dest_slice| {
+                let _ = item.load_slice(0, dest_slice);
+            });
+            if !success {
                 self.flush_to_managed_buffer();
                 self.managed_buffer.append(item);
             }
         } else {
             self.managed_buffer.append(item);
         }
+        let _ = core::mem::replace(&mut self.static_cache, static_cache_mut);
     }
 
     #[inline]
@@ -119,5 +122,30 @@ impl<M: ManagedTypeApi> NestedEncodeOutput for ManagedBufferCachedBuilder<M> {
         } else {
             else_serialization(self)
         }
+    }
+}
+
+impl<M> FormatReceiver for ManagedBufferCachedBuilder<M>
+where
+    M: ManagedTypeApi,
+{
+    fn push_static_ascii(&mut self, arg: &'static [u8]) {
+        self.append_bytes(arg);
+    }
+
+    fn push_top_encode_bytes<T>(&mut self, item: &T)
+    where
+        T: elrond_codec::TopEncode,
+    {
+        let mb = ManagedSerializer::<M>::new().top_encode_to_managed_buffer(item);
+        self.append_managed_buffer(&mb);
+    }
+
+    fn push_top_encode_hex<T>(&mut self, item: &T)
+    where
+        T: elrond_codec::TopEncode,
+    {
+        let mb = ManagedSerializer::<M>::new().top_encode_to_managed_buffer(item);
+        crate::hex_util::add_arg_as_hex_to_buffer(self, &mb);
     }
 }

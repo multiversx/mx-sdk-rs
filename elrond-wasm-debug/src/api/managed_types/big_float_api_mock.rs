@@ -5,7 +5,7 @@ use core::{
 };
 
 use elrond_wasm::{
-    api::{BigFloatApi, BigIntApi, ErrorApi, Handle, Sign},
+    api::{BigFloatApi, BigIntApi, ErrorApiImpl, Handle, Sign},
     err_msg,
 };
 use num_traits::{Signed, ToPrimitive};
