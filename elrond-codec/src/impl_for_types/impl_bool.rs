@@ -49,7 +49,7 @@ impl NestedDecode for bool {
         I: NestedDecodeInput,
         H: DecodeErrorHandler,
     {
-        match input.read_byte_or_handle_err(h)? {
+        match input.read_byte(h)? {
             0 => Ok(false),
             1 => Ok(true),
             _ => Err(h.handle_error(DecodeError::INVALID_VALUE)),

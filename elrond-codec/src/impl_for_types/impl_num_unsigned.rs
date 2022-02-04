@@ -58,7 +58,7 @@ impl NestedDecode for u8 {
         I: NestedDecodeInput,
         H: DecodeErrorHandler,
     {
-        input.read_byte_or_handle_err(h)
+        input.read_byte(h)
     }
 }
 
@@ -73,7 +73,7 @@ macro_rules! dep_decode_num_unsigned {
                 H: DecodeErrorHandler,
             {
                 let mut bytes = [0u8; $num_bytes];
-                input.read_into_or_handle_err(&mut bytes[..], h)?;
+                input.read_into(&mut bytes[..], h)?;
                 let num = bytes_to_number(&bytes[..], false) as $ty;
                 Ok(num)
             }

@@ -12,39 +12,16 @@ pub trait NestedDecodeInput {
     }
 
     /// Read the exact number of bytes required to fill the given buffer.
-    fn read_into(&mut self, into: &mut [u8]) -> Result<(), DecodeError>;
-
-    /// Read the exact number of bytes required to fill the given buffer.
-    fn read_into_or_err<EC, Err>(&mut self, into: &mut [u8], err_closure: EC) -> Result<(), Err>
+    fn read_into<H>(&mut self, into: &mut [u8], h: H) -> Result<(), H::HandledErr>
     where
-        EC: Fn(DecodeError) -> Err,
-    {
-        match self.read_into(into) {
-            Ok(()) => Ok(()),
-            Err(e) => Err(err_closure(e)),
-        }
-    }
-
-    fn read_into_or_handle_err<H>(&mut self, into: &mut [u8], h: H) -> Result<(), H::HandledErr>
-    where
-        H: DecodeErrorHandler,
-    {
-        match self.read_into(into) {
-            Ok(()) => Ok(()),
-            Err(e) => Err(h.handle_error(e)),
-        }
-    }
+        H: DecodeErrorHandler;
 
     #[inline]
     fn supports_specialized_type<T: TryStaticCast>() -> bool {
         false
     }
 
-    fn read_specialized_or_handle_err<T, C, H>(
-        &mut self,
-        _context: C,
-        h: H,
-    ) -> Result<T, H::HandledErr>
+    fn read_specialized<T, C, H>(&mut self, _context: C, h: H) -> Result<T, H::HandledErr>
     where
         T: TryStaticCast,
         C: TryStaticCast,
@@ -54,18 +31,12 @@ pub trait NestedDecodeInput {
     }
 
     /// Read a single byte from the input.
-    fn read_byte(&mut self) -> Result<u8, DecodeError> {
-        let mut buf = [0u8];
-        self.read_into(&mut buf[..])?;
-        Ok(buf[0])
-    }
-
-    fn read_byte_or_handle_err<H>(&mut self, h: H) -> Result<u8, H::HandledErr>
+    fn read_byte<H>(&mut self, h: H) -> Result<u8, H::HandledErr>
     where
         H: DecodeErrorHandler,
     {
         let mut buf = [0u8];
-        self.read_into_or_handle_err(&mut buf[..], h)?;
+        self.read_into(&mut buf[..], h)?;
         Ok(buf[0])
     }
 }
