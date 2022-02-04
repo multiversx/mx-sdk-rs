@@ -3,7 +3,7 @@ use core::marker::PhantomData;
 use crate::{
     api::{BlockchainApi, ManagedTypeApi, StorageReadApi, StorageWriteApi},
     storage_clear, storage_get, storage_get_len,
-    types::{BoxedBytes, ManagedBuffer, ManagedBytesNestedDecodeInput, ManagedType},
+    types::{BoxedBytes, ManagedBuffer, ManagedType},
     BytesArgLoader,
 };
 use alloc::vec::Vec;
@@ -59,11 +59,11 @@ impl<M: ManagedTypeApi> TopDecode for CallbackClosureUnmanagedArgs<M> {
         H: DecodeErrorHandler,
     {
         let managed_buffer: ManagedBuffer<M> = ManagedBuffer::top_decode_or_handle_err(input, h)?;
+        let bytes_buffer = managed_buffer.to_boxed_bytes();
+        let mut bytes_slice = bytes_buffer.as_slice();
 
-        let mut nested_buffer =
-            ManagedBytesNestedDecodeInput::<M>::new(managed_buffer.to_boxed_bytes().into_box());
-        let callback_name = BoxedBytes::dep_decode_or_handle_err(&mut nested_buffer, h)?;
-        let closure_args = Vec::<BoxedBytes>::dep_decode_or_handle_err(&mut nested_buffer, h)?;
+        let callback_name = BoxedBytes::dep_decode_or_handle_err(&mut bytes_slice, h)?;
+        let closure_args = Vec::<BoxedBytes>::dep_decode_or_handle_err(&mut bytes_slice, h)?;
         Ok(CallbackClosureUnmanagedArgs {
             callback_name,
             closure_args,
