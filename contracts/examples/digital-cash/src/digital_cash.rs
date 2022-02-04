@@ -18,13 +18,8 @@ pub trait DigitalCash {
 
     #[endpoint]
     #[payable("*")]
-    fn fund(
-        &self,
-        #[payment] payment: BigUint,
-        #[payment_token] token: TokenIdentifier,
-        address: ManagedAddress,
-        valability: u64,
-    ) -> SCResult<()> {
+    fn fund(&self, address: ManagedAddress, valability: u64) {
+        let (payment, token) = self.call_value().payment_token_pair();
         require!(payment > BigUint::zero(), "amount must be greater than 0");
         require!(self.deposit(&address).is_empty(), "key already used");
 
@@ -39,12 +34,10 @@ pub trait DigitalCash {
         };
 
         self.deposit(&address).set(deposit);
-
-        Ok(())
     }
 
     #[endpoint]
-    fn withdraw(&self, address: ManagedAddress) -> SCResult<()> {
+    fn withdraw(&self, address: ManagedAddress) {
         require!(!self.deposit(&address).is_empty(), "non-existent key");
 
         let deposit = self.deposit(&address).get();
@@ -61,12 +54,10 @@ pub trait DigitalCash {
             b"successful withdrawal",
         );
         self.deposit(&address).clear();
-
-        Ok(())
     }
 
     #[endpoint]
-    fn claim(&self, address: ManagedAddress, signature: ManagedBuffer) -> SCResult<()> {
+    fn claim(&self, address: ManagedAddress, signature: ManagedBuffer) {
         require!(!self.deposit(&address).is_empty(), "non-existent key");
 
         let deposit = self.deposit(&address).get();
@@ -93,19 +84,16 @@ pub trait DigitalCash {
             b"successful claim",
         );
         self.deposit(&address).clear();
-
-        Ok(())
     }
 
     //views
 
     #[view(amount)]
-    fn get_amount(&self, address: ManagedAddress) -> SCResult<BigUint> {
+    fn get_amount(&self, address: ManagedAddress) -> BigUint {
         require!(!self.deposit(&address).is_empty(), "non-existent key");
 
         let data = self.deposit(&address).get();
-
-        Ok(data.amount)
+        data.amount
     }
 
     //private functions
