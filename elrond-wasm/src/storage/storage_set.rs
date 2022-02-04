@@ -1,5 +1,6 @@
 use crate::{
-    api::{ErrorApi, ErrorApiImpl, ManagedTypeApi, StorageWriteApi, StorageWriteApiImpl},
+    api::{ErrorApi, ManagedTypeApi, StorageWriteApi, StorageWriteApiImpl},
+    contract_base::ExitCodecErrorHandler,
     err_msg,
     types::{BigInt, BigUint, ManagedBuffer, ManagedBufferCachedBuilder, ManagedRef, ManagedType},
 };
@@ -93,7 +94,10 @@ where
     T: TopEncode,
     A: StorageWriteApi + ManagedTypeApi + ErrorApi,
 {
-    value.top_encode_or_exit(StorageSetOutput::new(key), (), storage_set_exit::<A>);
+    let Ok(()) = value.top_encode_or_handle_err(
+        StorageSetOutput::new(key),
+        ExitCodecErrorHandler::<A>::from(err_msg::STORAGE_ENCODE_ERROR),
+    );
 }
 
 /// Useful for storage mappers.
@@ -103,14 +107,4 @@ where
     A: StorageWriteApi + ManagedTypeApi + ErrorApi,
 {
     A::storage_write_api_impl().storage_store_managed_buffer_clear(key.get_raw_handle());
-}
-
-#[inline(always)]
-fn storage_set_exit<A>(_: (), encode_err: EncodeError) -> !
-where
-    A: StorageWriteApi + ManagedTypeApi + ErrorApi + 'static,
-{
-    let mut message_buffer = ManagedBuffer::<A>::new_from_bytes(err_msg::STORAGE_ENCODE_ERROR);
-    message_buffer.append_bytes(encode_err.message_bytes());
-    A::error_api_impl().signal_error_from_buffer(message_buffer.get_raw_handle())
 }

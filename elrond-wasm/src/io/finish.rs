@@ -3,7 +3,8 @@ use core::marker::PhantomData;
 use elrond_codec::{EncodeErrorHandler, TryStaticCast};
 
 use crate::{
-    api::{EndpointFinishApi, EndpointFinishApiImpl, ErrorApi, ErrorApiImpl, ManagedTypeApi},
+    api::{EndpointFinishApi, EndpointFinishApiImpl, ManagedTypeApi},
+    contract_base::ExitCodecErrorHandler,
     elrond_codec::{EncodeError, TopEncode, TopEncodeOutput},
     err_msg,
     types::{BigInt, BigUint, ManagedBuffer, ManagedBufferCachedBuilder, ManagedType},
@@ -120,16 +121,9 @@ where
     where
         FA: ManagedTypeApi + EndpointFinishApi,
     {
-        self.top_encode_or_exit(ApiOutputAdapter::<FA>::new(), (), finish_exit::<FA>);
+        let Ok(()) = self.top_encode_or_handle_err(
+            ApiOutputAdapter::<FA>::new(),
+            ExitCodecErrorHandler::<FA>::from(err_msg::FINISH_ENCODE_ERROR),
+        );
     }
-}
-
-#[inline(always)]
-fn finish_exit<FA>(_: (), encode_err: EncodeError) -> !
-where
-    FA: ManagedTypeApi + EndpointFinishApi + ErrorApi + 'static,
-{
-    let mut message_buffer = ManagedBuffer::<FA>::new_from_bytes(err_msg::FINISH_ENCODE_ERROR);
-    message_buffer.append_bytes(encode_err.message_bytes());
-    FA::error_api_impl().signal_error_from_buffer(message_buffer.get_raw_handle())
 }
