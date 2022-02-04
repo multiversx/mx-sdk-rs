@@ -1,6 +1,6 @@
 use crate::{
     codec_err::EncodeError, nested_ser::NestedEncode, top_ser_output::TopEncodeOutput,
-    DefaultErrorHandler, EncodeErrorHandler, TypeInfo,
+    DefaultErrorHandler, EncodeErrorHandler, PanicErrorHandler, TypeInfo,
 };
 use alloc::vec::Vec;
 
@@ -59,4 +59,10 @@ pub fn top_encode_to_vec_u8<T: TopEncode>(obj: &T) -> Result<Vec<u8>, EncodeErro
     let mut bytes = Vec::<u8>::new();
     obj.top_encode(&mut bytes)?;
     Ok(bytes)
+}
+
+pub fn top_encode_to_vec_u8_or_panic<T: TopEncode>(obj: &T) -> Vec<u8> {
+    let mut bytes = Vec::<u8>::new();
+    let Ok(()) = obj.top_encode_or_handle_err(&mut bytes, PanicErrorHandler);
+    bytes
 }

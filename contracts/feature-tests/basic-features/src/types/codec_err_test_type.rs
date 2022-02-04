@@ -12,9 +12,12 @@ use elrond_wasm::{
 pub struct CodecErrorTestType;
 
 impl TopEncode for CodecErrorTestType {
-    #[inline]
-    fn top_encode<O: TopEncodeOutput>(&self, _output: O) -> Result<(), EncodeError> {
-        Err(EncodeError::from("deliberate top encode error"))
+    fn top_encode_or_handle_err<O, H>(&self, _output: O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: TopEncodeOutput,
+        H: EncodeErrorHandler,
+    {
+        Err(h.handle_error(EncodeError::from("deliberate top encode error")))
     }
 }
 
