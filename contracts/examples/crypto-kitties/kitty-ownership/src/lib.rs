@@ -285,10 +285,11 @@ pub trait KittyOwnership {
 
     #[payable("EGLD")]
     #[endpoint(breedWith)]
-    fn breed_with(&self, #[payment] payment: BigUint, matron_id: u32, sire_id: u32) {
+    fn breed_with(&self, matron_id: u32, sire_id: u32) {
         require!(self.is_valid_id(matron_id), "Invalid matron id!");
         require!(self.is_valid_id(sire_id), "Invalid sire id!");
 
+        let payment = self.call_value().egld_value();
         let auto_birth_fee = self.birth_fee().get();
         let caller = self.blockchain().get_caller();
 
