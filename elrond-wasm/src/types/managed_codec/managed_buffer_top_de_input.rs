@@ -33,7 +33,12 @@ where
     }
 
     #[inline]
-    fn into_specialized_or_handle_err<T, H>(self, h: H) -> Result<T, H::HandledErr>
+    fn supports_specialized_type<T: TryStaticCast>() -> bool {
+        T::type_eq::<ManagedBuffer<M>>() || T::type_eq::<BigUint<M>>() || T::type_eq::<BigInt<M>>()
+    }
+
+    #[inline]
+    fn into_specialized<T, H>(self, h: H) -> Result<T, H::HandledErr>
     where
         T: TryStaticCast,
         H: DecodeErrorHandler,

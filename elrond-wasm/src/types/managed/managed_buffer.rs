@@ -281,7 +281,7 @@ impl<M: ManagedTypeApi> TopDecode for ManagedBuffer<M> {
         H: DecodeErrorHandler,
     {
         if I::supports_specialized_type::<Self>() {
-            input.into_specialized_or_handle_err(h)
+            input.into_specialized(h)
         } else {
             Ok(ManagedBuffer::new_from_bytes(&input.into_boxed_slice_u8()))
         }
