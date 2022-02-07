@@ -1,9 +1,10 @@
 use core::marker::PhantomData;
 
-use elrond_codec::TryStaticCast;
+use elrond_codec::{EncodeErrorHandler, TryStaticCast};
 
 use crate::{
-    api::{EndpointFinishApi, EndpointFinishApiImpl, ErrorApi, ErrorApiImpl, ManagedTypeApi},
+    api::{EndpointFinishApi, EndpointFinishApiImpl, ManagedTypeApi},
+    contract_base::ExitCodecErrorHandler,
     elrond_codec::{EncodeError, TopEncode, TopEncodeOutput},
     err_msg,
     types::{BigInt, BigUint, ManagedBuffer, ManagedBufferCachedBuilder, ManagedType},
@@ -52,10 +53,17 @@ where
     }
 
     #[inline]
-    fn set_specialized<T, F>(self, value: &T, else_serialization: F) -> Result<(), EncodeError>
+    fn supports_specialized_type<T: TryStaticCast>() -> bool {
+        T::type_eq::<ManagedBuffer<FA>>()
+            || T::type_eq::<BigUint<FA>>()
+            || T::type_eq::<BigInt<FA>>()
+    }
+
+    #[inline]
+    fn set_specialized<T, H>(self, value: &T, h: H) -> Result<(), H::HandledErr>
     where
         T: TryStaticCast,
-        F: FnOnce(Self) -> Result<(), EncodeError>,
+        H: EncodeErrorHandler,
     {
         if let Some(managed_buffer) = value.try_cast_ref::<ManagedBuffer<FA>>() {
             FA::finish_api_impl().finish_managed_buffer_raw(managed_buffer.handle);
@@ -67,7 +75,7 @@ where
             FA::finish_api_impl().finish_big_int_raw(big_int.handle);
             Ok(())
         } else {
-            else_serialization(self)
+            Err(h.handle_error(EncodeError::UNSUPPORTED_OPERATION))
         }
     }
 
@@ -113,16 +121,9 @@ where
     where
         FA: ManagedTypeApi + EndpointFinishApi,
     {
-        self.top_encode_or_exit(ApiOutputAdapter::<FA>::new(), (), finish_exit::<FA>);
+        let Ok(()) = self.top_encode_or_handle_err(
+            ApiOutputAdapter::<FA>::new(),
+            ExitCodecErrorHandler::<FA>::from(err_msg::FINISH_ENCODE_ERROR),
+        );
     }
-}
-
-#[inline(always)]
-fn finish_exit<FA>(_: (), encode_err: EncodeError) -> !
-where
-    FA: ManagedTypeApi + EndpointFinishApi + ErrorApi + 'static,
-{
-    let mut message_buffer = ManagedBuffer::<FA>::new_from_bytes(err_msg::FINISH_ENCODE_ERROR);
-    message_buffer.append_bytes(encode_err.message_bytes());
-    FA::error_api_impl().signal_error_from_buffer(message_buffer.get_raw_handle())
 }

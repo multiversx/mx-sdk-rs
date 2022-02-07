@@ -1,4 +1,7 @@
 #![no_std]
+#![feature(try_trait_v2)]
+#![feature(never_type)]
+#![feature(exhaustive_patterns)]
 
 extern crate alloc;
 
@@ -14,6 +17,7 @@ pub use arrayvec;
 // TODO: group into smaller sub-modules
 
 mod codec_err;
+mod codec_err_handler;
 mod default_traits;
 mod impl_for_types;
 mod multi;
@@ -41,17 +45,18 @@ pub use crate::{
     },
 };
 pub use codec_err::{DecodeError, EncodeError};
+pub use codec_err_handler::*;
 pub use default_traits::{DecodeDefault, EncodeDefault};
 pub use multi::*;
 pub use nested_de::NestedDecode;
 pub use nested_de_input_owned::OwnedBytesNestedDecodeInput;
-pub use nested_de_input_slice::{dep_decode_from_byte_slice, dep_decode_from_byte_slice_or_exit};
+pub use nested_de_input_slice::dep_decode_from_byte_slice;
 pub use nested_ser::{dep_encode_to_vec, NestedEncode, NestedEncodeNoErr};
-pub use top_de::{top_decode_from_nested, top_decode_from_nested_or_exit, TopDecode};
+pub use top_de::{top_decode_from_nested, top_decode_from_nested_or_handle_err, TopDecode};
 pub use top_de_input::TopDecodeInput;
 pub use top_ser::{
-    top_encode_from_nested, top_encode_from_nested_or_exit, top_encode_no_err,
-    top_encode_to_vec_u8, TopEncode,
+    top_encode_from_nested, top_encode_no_err, top_encode_to_vec_u8, top_encode_to_vec_u8_or_panic,
+    TopEncode, TopEncodeNoErr,
 };
 pub use top_ser_output::TopEncodeOutput;
 pub use transmute::{boxed_slice_into_vec, vec_into_boxed_slice};

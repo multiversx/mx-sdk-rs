@@ -7,8 +7,8 @@ use crate::{
 use alloc::{string::String, vec::Vec};
 use core::marker::PhantomData;
 use elrond_codec::{
-    DecodeError, EncodeError, NestedDecode, NestedDecodeInput, NestedEncode, NestedEncodeOutput,
-    TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
+    DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode,
+    NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
 };
 
 pub(crate) const INDEX_OUT_OF_RANGE_MSG: &[u8] = b"ManagedVec index out of range";
@@ -293,13 +293,17 @@ where
     T: ManagedVecItem + NestedEncode,
 {
     #[inline]
-    fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
+    fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: TopEncodeOutput,
+        H: EncodeErrorHandler,
+    {
         if T::SKIPS_RESERIALIZATION {
-            self.buffer.top_encode(output)
+            self.buffer.top_encode_or_handle_err(output, h)
         } else {
             let mut nested_buffer = output.start_nested_encode();
             for item in self {
-                item.dep_encode(&mut nested_buffer)?;
+                item.dep_encode_or_handle_err(&mut nested_buffer, h)?;
             }
             output.finalize_nested_encode(nested_buffer);
             Ok(())
@@ -312,10 +316,14 @@ where
     M: ManagedTypeApi,
     T: ManagedVecItem + NestedEncode,
 {
-    fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
-        self.len().dep_encode(dest)?;
+    fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: NestedEncodeOutput,
+        H: EncodeErrorHandler,
+    {
+        self.len().dep_encode_or_handle_err(dest, h)?;
         for item in self {
-            item.dep_encode(dest)?;
+            item.dep_encode_or_handle_err(dest, h)?;
         }
         Ok(())
     }
@@ -326,15 +334,19 @@ where
     M: ManagedTypeApi,
     T: ManagedVecItem + NestedDecode,
 {
-    fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
-        let buffer = ManagedBuffer::top_decode(input)?;
+    fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: TopDecodeInput,
+        H: DecodeErrorHandler,
+    {
+        let buffer = ManagedBuffer::top_decode_or_handle_err(input, h)?;
         if T::SKIPS_RESERIALIZATION {
             Ok(ManagedVec::new_from_raw_buffer(buffer))
         } else {
             let mut result = ManagedVec::new();
             let mut nested_de_input = ManagedBufferNestedDecodeInput::new(buffer);
             while nested_de_input.remaining_len() > 0 {
-                result.push(T::dep_decode(&mut nested_de_input)?);
+                result.push(T::dep_decode_or_handle_err(&mut nested_de_input, h)?);
             }
             Ok(result)
         }
@@ -346,11 +358,15 @@ where
     M: ManagedTypeApi,
     T: ManagedVecItem + NestedDecode,
 {
-    fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
-        let size = usize::dep_decode(input)?;
+    fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: NestedDecodeInput,
+        H: DecodeErrorHandler,
+    {
+        let size = usize::dep_decode_or_handle_err(input, h)?;
         let mut result = ManagedVec::new();
         for _ in 0..size {
-            result.push(T::dep_decode(input)?);
+            result.push(T::dep_decode_or_handle_err(input, h)?);
         }
         Ok(result)
     }

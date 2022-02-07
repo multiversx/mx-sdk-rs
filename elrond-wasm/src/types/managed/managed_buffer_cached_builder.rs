@@ -1,4 +1,4 @@
-use elrond_codec::{EncodeError, NestedEncodeOutput, TryStaticCast};
+use elrond_codec::{EncodeError, EncodeErrorHandler, NestedEncodeOutput, TryStaticCast};
 
 use crate::{
     api::ManagedTypeApi, contract_base::ManagedSerializer, formatter::FormatReceiver,
@@ -94,16 +94,21 @@ impl<M: ManagedTypeApi> NestedEncodeOutput for ManagedBufferCachedBuilder<M> {
     }
 
     #[inline]
-    fn push_specialized<T, C, F>(
+    fn supports_specialized_type<T: TryStaticCast>() -> bool {
+        T::type_eq::<ManagedBuffer<M>>() || T::type_eq::<BigUint<M>>() || T::type_eq::<BigInt<M>>()
+    }
+
+    #[inline]
+    fn push_specialized<T, C, H>(
         &mut self,
         context: C,
         value: &T,
-        else_serialization: F,
-    ) -> Result<(), EncodeError>
+        h: H,
+    ) -> Result<(), H::HandledErr>
     where
         T: TryStaticCast,
         C: TryStaticCast,
-        F: FnOnce(&mut Self) -> Result<(), EncodeError>,
+        H: EncodeErrorHandler,
     {
         if let Some(managed_buffer) = value.try_cast_ref::<ManagedBuffer<M>>() {
             if context.try_cast_ref::<ManagedBufferSizeContext>().is_some() {
@@ -120,7 +125,7 @@ impl<M: ManagedTypeApi> NestedEncodeOutput for ManagedBufferCachedBuilder<M> {
             self.push_nested_managed_buffer(&big_int.to_signed_bytes_be_buffer());
             Ok(())
         } else {
-            else_serialization(self)
+            Err(h.handle_error(EncodeError::UNSUPPORTED_OPERATION))
         }
     }
 }
