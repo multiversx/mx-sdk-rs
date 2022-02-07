@@ -154,26 +154,24 @@ pub trait NftModule {
         token_used_as_payment_nonce: u64,
     ) -> u64 {
         self.require_token_issued();
-        self.require_local_roles_set();
         require!(royalties <= ROYALTIES_MAX, "Royalties cannot exceed 100%");
 
         let nft_token_id = self.nft_token_id().get();
 
-        let mut serialized_attributes = Vec::new();
+        let mut serialized_attributes = ManagedBuffer::new();
         if let core::result::Result::Err(err) = attributes.top_encode(&mut serialized_attributes) {
             sc_panic!("Attributes encode error: {}", err.message_bytes());
         }
 
-        let attributes_hash = self.crypto().sha256_legacy(&serialized_attributes);
-        let hash_buffer = ManagedBuffer::from(attributes_hash.as_bytes());
+        let attributes_hash: ManagedByteArray<Self::Api, 32> =
+            self.crypto().sha256(&serialized_attributes);
         let uris = ManagedVec::from_single_item(uri);
-
         let nft_nonce = self.send().esdt_nft_create(
             &nft_token_id,
             &BigUint::from(NFT_AMOUNT),
             &name,
             &royalties,
-            &hash_buffer,
+            attributes_hash.as_managed_buffer(),
             &attributes,
             &uris,
         );
@@ -189,16 +187,6 @@ pub trait NftModule {
 
     fn require_token_issued(&self) {
         require!(!self.nft_token_id().is_empty(), "Token not issued");
-    }
-
-    fn require_local_roles_set(&self) {
-        let nft_token_id = self.nft_token_id().get();
-        let roles = self.blockchain().get_esdt_local_roles(&nft_token_id);
-
-        require!(
-            roles.has_role(&EsdtLocalRole::NftCreate),
-            "NFTCreate role not set"
-        );
     }
 
     // storage
