@@ -1,21 +1,18 @@
 use crate::{
-    codec_err::{DecodeError, EncodeError},
-    nested_de::NestedDecode,
-    nested_de_input::NestedDecodeInput,
-    nested_ser::NestedEncode,
-    nested_ser_output::NestedEncodeOutput,
-    top_de::TopDecode,
-    top_de_input::TopDecodeInput,
-    top_ser::TopEncode,
-    top_ser_output::TopEncodeOutput,
+    DecodeError, DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput,
+    NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
 };
 
 impl<T: NestedEncode> NestedEncode for Option<T> {
-    fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
+    fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: NestedEncodeOutput,
+        H: EncodeErrorHandler,
+    {
         match self {
             Some(v) => {
                 dest.push_byte(1u8);
-                v.dep_encode(dest)
+                v.dep_encode_or_handle_err(dest, h)
             },
             None => {
                 dest.push_byte(0u8);
@@ -23,43 +20,18 @@ impl<T: NestedEncode> NestedEncode for Option<T> {
             },
         }
     }
-
-    fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(
-        &self,
-        dest: &mut O,
-        c: ExitCtx,
-        exit: fn(ExitCtx, EncodeError) -> !,
-    ) {
-        match self {
-            Some(v) => {
-                dest.push_byte(1u8);
-                v.dep_encode_or_exit(dest, c, exit);
-            },
-            None => {
-                dest.push_byte(0u8);
-            },
-        }
-    }
 }
 
 impl<T: NestedDecode> NestedDecode for Option<T> {
-    fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
-        match input.read_byte()? {
+    fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: NestedDecodeInput,
+        H: DecodeErrorHandler,
+    {
+        match input.read_byte(h)? {
             0 => Ok(None),
-            1 => Ok(Some(T::dep_decode(input)?)),
-            _ => Err(DecodeError::INVALID_VALUE),
-        }
-    }
-
-    fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
-        input: &mut I,
-        c: ExitCtx,
-        exit: fn(ExitCtx, DecodeError) -> !,
-    ) -> Self {
-        match input.read_byte_or_exit(c.clone(), exit) {
-            0 => None,
-            1 => Some(T::dep_decode_or_exit(input, c, exit)),
-            _ => exit(c, DecodeError::INVALID_VALUE),
+            1 => Ok(Some(T::dep_decode_or_handle_err(input, h)?)),
+            _ => Err(h.handle_error(DecodeError::INVALID_VALUE)),
         }
     }
 }
@@ -67,12 +39,16 @@ impl<T: NestedDecode> NestedDecode for Option<T> {
 impl<T: NestedEncode> TopEncode for Option<T> {
     /// Allow None to be serialized to empty bytes, but leave the leading "1" for Some,
     /// to allow disambiguation between e.g. Some(0) and None.
-    fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
+    fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: TopEncodeOutput,
+        H: EncodeErrorHandler,
+    {
         match self {
             Some(v) => {
                 let mut buffer = output.start_nested_encode();
                 buffer.push_byte(1u8);
-                v.dep_encode(&mut buffer)?;
+                v.dep_encode_or_handle_err(&mut buffer, h)?;
                 output.finalize_nested_encode(buffer);
             },
             None => {
@@ -81,68 +57,28 @@ impl<T: NestedEncode> TopEncode for Option<T> {
         }
         Ok(())
     }
-
-    /// Allow None to be serialized to empty bytes, but leave the leading "1" for Some,
-    /// to allow disambiguation between e.g. Some(0) and None.
-    fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
-        &self,
-        output: O,
-        c: ExitCtx,
-        exit: fn(ExitCtx, EncodeError) -> !,
-    ) {
-        match self {
-            Some(v) => {
-                let mut buffer = output.start_nested_encode();
-                buffer.push_byte(1u8);
-                v.dep_encode_or_exit(&mut buffer, c, exit);
-                output.finalize_nested_encode(buffer);
-            },
-            None => {
-                output.set_slice_u8(&[]);
-            },
-        }
-    }
 }
 
 impl<T: NestedDecode> TopDecode for Option<T> {
-    fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
+    fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: TopDecodeInput,
+        H: DecodeErrorHandler,
+    {
         let mut buffer = input.into_nested_buffer();
         if buffer.is_depleted() {
             Ok(None)
         } else {
-            let first_byte = buffer.read_byte()?;
+            let first_byte = buffer.read_byte(h)?;
             if first_byte == 1 {
-                let item = T::dep_decode(&mut buffer)?;
+                let item = T::dep_decode_or_handle_err(&mut buffer, h)?;
                 if buffer.is_depleted() {
                     Ok(Some(item))
                 } else {
-                    Err(DecodeError::INPUT_TOO_LONG)
+                    Err(h.handle_error(DecodeError::INPUT_TOO_LONG))
                 }
             } else {
-                Err(DecodeError::INVALID_VALUE)
-            }
-        }
-    }
-
-    fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
-        input: I,
-        c: ExitCtx,
-        exit: fn(ExitCtx, DecodeError) -> !,
-    ) -> Self {
-        let mut buffer = input.into_nested_buffer();
-        if buffer.is_depleted() {
-            None
-        } else {
-            let first_byte = buffer.read_byte_or_exit(c.clone(), exit);
-            if first_byte == 1 {
-                let item = T::dep_decode_or_exit(&mut buffer, c.clone(), exit);
-                if buffer.is_depleted() {
-                    Some(item)
-                } else {
-                    exit(c, DecodeError::INPUT_TOO_LONG)
-                }
-            } else {
-                exit(c, DecodeError::INVALID_VALUE)
+                Err(h.handle_error(DecodeError::INVALID_VALUE))
             }
         }
     }
