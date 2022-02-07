@@ -1,6 +1,6 @@
 use crate::{
     num_conv::bytes_to_number, transmute::vec_into_boxed_slice, DecodeError, DecodeErrorHandler,
-    DefaultErrorHandler, NestedDecodeInput, OwnedBytesNestedDecodeInput, TryStaticCast,
+    NestedDecodeInput, OwnedBytesNestedDecodeInput, TryStaticCast,
 };
 use alloc::{boxed::Box, vec::Vec};
 
