@@ -1,6 +1,6 @@
 use alloc::vec::Vec;
 
-use crate::{EncodeError, TryStaticCast};
+use crate::{EncodeError, EncodeErrorHandler, TryStaticCast};
 
 /// Trait that allows appending bytes.
 /// Used especially by the NestedEncode trait to output data.
@@ -18,18 +18,23 @@ pub trait NestedEncodeOutput {
     }
 
     #[inline]
-    fn push_specialized<T, C, F>(
+    fn supports_specialized_type<T: TryStaticCast>() -> bool {
+        false
+    }
+
+    #[inline]
+    fn push_specialized<T, C, H>(
         &mut self,
         _context: C,
         _value: &T,
-        else_serialization: F,
-    ) -> Result<(), EncodeError>
+        h: H,
+    ) -> Result<(), H::HandledErr>
     where
         T: TryStaticCast,
         C: TryStaticCast,
-        F: FnOnce(&mut Self) -> Result<(), EncodeError>,
+        H: EncodeErrorHandler,
     {
-        else_serialization(self)
+        Err(h.handle_error(EncodeError::UNSUPPORTED_OPERATION))
     }
 }
 
