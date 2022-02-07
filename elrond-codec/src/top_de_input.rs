@@ -1,6 +1,6 @@
 use crate::{
-    num_conv::bytes_to_number, transmute::vec_into_boxed_slice, DecodeError, NestedDecodeInput,
-    OwnedBytesNestedDecodeInput, TryStaticCast,
+    num_conv::bytes_to_number, transmute::vec_into_boxed_slice, DecodeError, DecodeErrorHandler,
+    NestedDecodeInput, OwnedBytesNestedDecodeInput, TryStaticCast,
 };
 use alloc::{boxed::Box, vec::Vec};
 
@@ -33,28 +33,16 @@ pub trait TopDecodeInput: Sized {
     }
 
     #[inline]
-    fn into_specialized<T, F>(self, else_deser: F) -> Result<T, DecodeError>
-    where
-        T: TryStaticCast,
-        F: FnOnce(Self) -> Result<T, DecodeError>,
-    {
-        else_deser(self)
+    fn supports_specialized_type<T: TryStaticCast>() -> bool {
+        false
     }
 
-    /// Note: currently not in use.
-    #[inline]
-    fn into_specialized_or_exit<T, F, ExitCtx>(
-        self,
-        c: ExitCtx,
-        exit: fn(ExitCtx, DecodeError) -> !,
-        else_deser: F,
-    ) -> T
+    fn into_specialized<T, H>(self, h: H) -> Result<T, H::HandledErr>
     where
         T: TryStaticCast,
-        ExitCtx: Clone,
-        F: FnOnce(Self, ExitCtx, fn(ExitCtx, DecodeError) -> !) -> T,
+        H: DecodeErrorHandler,
     {
-        else_deser(self, c, exit)
+        Err(h.handle_error(DecodeError::UNSUPPORTED_OPERATION))
     }
 
     fn into_nested_buffer(self) -> Self::NestedBuffer;

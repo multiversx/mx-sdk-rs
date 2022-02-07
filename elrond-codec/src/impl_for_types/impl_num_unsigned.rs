@@ -1,8 +1,8 @@
 use crate::{
     dep_encode_from_no_err, dep_encode_num_mimic, num_conv::bytes_to_number,
-    top_encode_from_no_err, top_ser::TopEncodeNoErr, DecodeError, EncodeError, NestedDecode,
+    top_encode_from_no_err, DecodeError, DecodeErrorHandler, EncodeErrorHandler, NestedDecode,
     NestedDecodeInput, NestedEncode, NestedEncodeNoErr, NestedEncodeOutput, TopDecode,
-    TopDecodeInput, TopEncode, TopEncodeOutput, TypeInfo,
+    TopDecodeInput, TopEncode, TopEncodeNoErr, TopEncodeOutput, TypeInfo,
 };
 
 // No reversing needed for u8, because it is a single byte.
@@ -53,16 +53,12 @@ top_encode_num_unsigned! {u8, 8, TypeInfo::U8}
 impl NestedDecode for u8 {
     const TYPE_INFO: TypeInfo = TypeInfo::U8;
 
-    fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
-        input.read_byte()
-    }
-
-    fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
-        input: &mut I,
-        c: ExitCtx,
-        exit: fn(ExitCtx, DecodeError) -> !,
-    ) -> Self {
-        input.read_byte_or_exit(c, exit)
+    fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: NestedDecodeInput,
+        H: DecodeErrorHandler,
+    {
+        input.read_byte(h)
     }
 }
 
@@ -71,22 +67,15 @@ macro_rules! dep_decode_num_unsigned {
         impl NestedDecode for $ty {
             const TYPE_INFO: TypeInfo = $type_info;
 
-            fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
+            fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
+            where
+                I: NestedDecodeInput,
+                H: DecodeErrorHandler,
+            {
                 let mut bytes = [0u8; $num_bytes];
-                input.read_into(&mut bytes[..])?;
+                input.read_into(&mut bytes[..], h)?;
                 let num = bytes_to_number(&bytes[..], false) as $ty;
                 Ok(num)
-            }
-
-            fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
-                input: &mut I,
-                c: ExitCtx,
-                exit: fn(ExitCtx, DecodeError) -> !,
-            ) -> Self {
-                let mut bytes = [0u8; $num_bytes];
-                input.read_into_or_exit(&mut bytes[..], c, exit);
-                let num = bytes_to_number(&bytes[..], false) as $ty;
-                num
             }
         }
     };
@@ -102,27 +91,17 @@ macro_rules! top_decode_num_unsigned {
         impl TopDecode for $ty {
             const TYPE_INFO: TypeInfo = $type_info;
 
-            fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
+            fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
+            where
+                I: TopDecodeInput,
+                H: DecodeErrorHandler,
+            {
                 let arg_u64 = input.into_u64();
                 let max = <$bounds_ty>::MAX as u64;
                 if arg_u64 > max {
-                    Err(DecodeError::INPUT_TOO_LONG)
+                    Err(h.handle_error(DecodeError::INPUT_TOO_LONG))
                 } else {
                     Ok(arg_u64 as $ty)
-                }
-            }
-
-            fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
-                input: I,
-                c: ExitCtx,
-                exit: fn(ExitCtx, DecodeError) -> !,
-            ) -> Self {
-                let arg_u64 = input.into_u64();
-                let max = <$bounds_ty>::MAX as u64;
-                if arg_u64 > max {
-                    exit(c, DecodeError::INPUT_TOO_LONG)
-                } else {
-                    arg_u64 as $ty
                 }
             }
         }

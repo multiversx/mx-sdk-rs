@@ -1,130 +1,79 @@
 use crate::{
-    codec_err::{DecodeError, EncodeError},
-    nested_de::NestedDecode,
-    nested_de_input::NestedDecodeInput,
-    nested_ser::NestedEncode,
-    nested_ser_output::NestedEncodeOutput,
-    top_de::{top_decode_from_nested, top_decode_from_nested_or_exit, TopDecode},
-    top_de_input::TopDecodeInput,
-    top_ser::TopEncode,
-    top_ser_output::TopEncodeOutput,
-    TypeInfo,
+    top_decode_from_nested_or_handle_err, DecodeError, DecodeErrorHandler, EncodeErrorHandler,
+    NestedDecode, NestedDecodeInput, NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput,
+    TopEncode, TopEncodeOutput, TypeInfo,
 };
 use alloc::boxed::Box;
 use arrayvec::ArrayVec;
 
 impl<T: NestedEncode, const N: usize> NestedEncode for [T; N] {
     #[inline]
-    fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
-        super::impl_slice::dep_encode_slice_contents(&self[..], dest)
-    }
-
-    #[inline]
-    fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(
-        &self,
-        dest: &mut O,
-        c: ExitCtx,
-        exit: fn(ExitCtx, EncodeError) -> !,
-    ) {
-        super::impl_slice::dep_encode_slice_contents_or_exit(&self[..], dest, c, exit);
+    fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: NestedEncodeOutput,
+        H: EncodeErrorHandler,
+    {
+        super::impl_slice::dep_encode_slice_contents(&self[..], dest, h)
     }
 }
 
 impl<T: NestedEncode, const N: usize> TopEncode for [T; N] {
     #[inline]
-    fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
+    fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: TopEncodeOutput,
+        H: EncodeErrorHandler,
+    {
         // the top encoded slice does not serialize its length, so just like the array
-        (&self[..]).top_encode(output)
-    }
-
-    #[inline]
-    fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
-        &self,
-        output: O,
-        c: ExitCtx,
-        exit: fn(ExitCtx, EncodeError) -> !,
-    ) {
-        (&self[..]).top_encode_or_exit(output, c, exit);
+        (&self[..]).top_encode_or_handle_err(output, h)
     }
 }
 
 impl<T: NestedDecode, const N: usize> NestedDecode for [T; N] {
     #[allow(clippy::reversed_empty_ranges)]
-    fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
+    fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: NestedDecodeInput,
+        H: DecodeErrorHandler,
+    {
         let mut r = ArrayVec::new();
         for _ in 0..N {
-            r.push(T::dep_decode(input)?);
+            r.push(T::dep_decode_or_handle_err(input, h)?);
         }
         let i = r.into_inner();
 
         match i {
             Ok(a) => Ok(a),
-            Err(_) => Err(DecodeError::ARRAY_DECODE_ERROR),
-        }
-    }
-
-    #[allow(clippy::reversed_empty_ranges)]
-    fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
-        input: &mut I,
-        c: ExitCtx,
-        exit: fn(ExitCtx, DecodeError) -> !,
-    ) -> Self {
-        let mut r = ArrayVec::new();
-        for _ in 0..N {
-            r.push(T::dep_decode_or_exit(input, c.clone(), exit));
-        }
-        let i = r.into_inner();
-
-        match i {
-            Ok(a) => a,
-            Err(_) => exit(c, DecodeError::ARRAY_DECODE_ERROR),
+            Err(_) => Err(h.handle_error(DecodeError::ARRAY_DECODE_ERROR)),
         }
     }
 }
 
 impl<T: NestedDecode, const N: usize> TopDecode for [T; N] {
-    fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
-        top_decode_from_nested(input)
+    fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: TopDecodeInput,
+        H: DecodeErrorHandler,
+    {
+        top_decode_from_nested_or_handle_err(input, h)
     }
 
-    fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
-        input: I,
-        c: ExitCtx,
-        exit: fn(ExitCtx, DecodeError) -> !,
-    ) -> Self {
-        top_decode_from_nested_or_exit(input, c, exit)
-    }
-
-    fn top_decode_boxed<I: TopDecodeInput>(input: I) -> Result<Box<Self>, DecodeError> {
+    fn top_decode_boxed_or_handle_err<I, H>(input: I, h: H) -> Result<Box<Self>, H::HandledErr>
+    where
+        I: TopDecodeInput,
+        H: DecodeErrorHandler,
+    {
         if let TypeInfo::U8 = T::TYPE_INFO {
             // transmute directly
             let bs = input.into_boxed_slice_u8();
             if bs.len() != N {
-                return Err(DecodeError::ARRAY_DECODE_ERROR);
+                return Err(h.handle_error(DecodeError::ARRAY_DECODE_ERROR));
             }
             let raw = Box::into_raw(bs);
             let array_box = unsafe { Box::<[T; N]>::from_raw(raw as *mut [T; N]) };
             Ok(array_box)
         } else {
-            Ok(Box::new(Self::top_decode(input)?))
-        }
-    }
-
-    fn top_decode_boxed_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
-        input: I,
-        c: ExitCtx,
-        exit: fn(ExitCtx, DecodeError) -> !,
-    ) -> Box<Self> {
-        if let TypeInfo::U8 = T::TYPE_INFO {
-            // transmute directly
-            let bs = input.into_boxed_slice_u8();
-            if bs.len() != N {
-                exit(c, DecodeError::ARRAY_DECODE_ERROR);
-            }
-            let raw = Box::into_raw(bs);
-            unsafe { Box::<[T; N]>::from_raw(raw as *mut [T; N]) }
-        } else {
-            Box::new(Self::top_decode_or_exit(input, c, exit))
+            Ok(Box::new(Self::top_decode_or_handle_err(input, h)?))
         }
     }
 }
