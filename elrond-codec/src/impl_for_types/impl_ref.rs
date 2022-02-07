@@ -1,7 +1,6 @@
 use crate::{
-    DecodeError, DecodeErrorHandler, EncodeError, EncodeErrorHandler, NestedDecode,
-    NestedDecodeInput, NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode,
-    TopEncodeOutput,
+    DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode,
+    NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
 };
 use alloc::boxed::Box;
 

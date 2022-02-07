@@ -2,7 +2,6 @@
 #![feature(try_trait_v2)]
 #![feature(never_type)]
 #![feature(exhaustive_patterns)]
-#![allow(unused_imports)] // TODO: TEMP
 
 extern crate alloc;
 
@@ -55,7 +54,7 @@ pub use top_de::{top_decode_from_nested, top_decode_from_nested_or_handle_err, T
 pub use top_de_input::TopDecodeInput;
 pub use top_ser::{
     top_encode_from_nested, top_encode_no_err, top_encode_to_vec_u8, top_encode_to_vec_u8_or_panic,
-    TopEncode,
+    TopEncode, TopEncodeNoErr,
 };
 pub use top_ser_output::TopEncodeOutput;
 pub use transmute::{boxed_slice_into_vec, vec_into_boxed_slice};
