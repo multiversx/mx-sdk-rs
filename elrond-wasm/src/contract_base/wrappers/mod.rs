@@ -12,4 +12,4 @@ pub use crypto_wrapper::CryptoWrapper;
 pub use error_helper::ErrorHelper;
 pub use print_helper::PrintHelper;
 pub use send_wrapper::SendWrapper;
-pub use serializer::ManagedSerializer;
+pub use serializer::{ExitCodecErrorHandler, ManagedSerializer};
