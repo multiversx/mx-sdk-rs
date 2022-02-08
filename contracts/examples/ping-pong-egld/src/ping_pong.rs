@@ -96,24 +96,21 @@ pub trait PingPong {
         }
     }
 
-    fn pong_by_user_id(&self, user_id: usize) {
+    fn pong_by_user_id(&self, user_id: usize) -> Result<(), &'static str> {
         let user_status = self.user_status(user_id).get();
         match user_status {
-            UserStatus::New => {
-                sc_panic!("can't pong, never pinged")
-            },
+            UserStatus::New => Result::Err("can't pong, never pinged"),
             UserStatus::Registered => {
                 self.user_status(user_id).set(UserStatus::Withdrawn);
                 if let Some(user_address) = self.user_mapper().get_user_address(user_id) {
                     self.send()
                         .direct_egld(&user_address, &self.ping_amount().get(), b"pong");
+                    Result::Ok(())
                 } else {
-                    sc_panic!("unknown user")
+                    Result::Err("unknown user")
                 }
             },
-            UserStatus::Withdrawn => {
-                sc_panic!("already withdrawn")
-            },
+            UserStatus::Withdrawn => Result::Err("already withdrawn"),
         }
     }
 
@@ -128,7 +125,10 @@ pub trait PingPong {
 
         let caller = self.blockchain().get_caller();
         let user_id = self.user_mapper().get_user_id(&caller);
-        self.pong_by_user_id(user_id);
+        let pong_result = self.pong_by_user_id(user_id);
+        if let Result::Err(message) = pong_result {
+            sc_panic!(message);
+        }
     }
 
     /// Send back funds to all users who pinged.
@@ -159,6 +159,8 @@ pub trait PingPong {
             }
 
             pong_all_last_user += 1;
+
+            // in case of error just ignore the error and skip
             let _ = self.pong_by_user_id(pong_all_last_user);
         }
     }
