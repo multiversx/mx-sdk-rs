@@ -349,7 +349,7 @@ where
     }
 
     /// Creates an NFT on behalf of the caller. This will set the "creator" field to the caller's address
-    /// NOT activated on devnet/mainnet yet. 
+    /// NOT activated on devnet/mainnet yet.
     #[allow(clippy::too_many_arguments)]
     pub fn esdt_nft_create_as_caller<T: elrond_codec::TopEncode>(
         &self,

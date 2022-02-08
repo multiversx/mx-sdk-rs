@@ -37,7 +37,9 @@ macro_rules! managed_token_id {
 macro_rules! assert_sc_error {
     ($sc_result:expr, $expected_string:expr) => {{
         match $sc_result {
-            elrond_wasm::types::SCResult::Ok(t) => panic!("Expected SCError, but got SCResult::Ok: {:?}", t),
+            elrond_wasm::types::SCResult::Ok(t) => {
+                panic!("Expected SCError, but got SCResult::Ok: {:?}", t)
+            },
             elrond_wasm::types::SCResult::Err(err) => {
                 let as_str = String::from_utf8(err.as_bytes().to_vec()).unwrap();
                 assert_eq!(as_str, $expected_string);
