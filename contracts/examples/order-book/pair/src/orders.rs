@@ -20,11 +20,11 @@ pub trait OrdersModule:
         payment: Payment<Self::Api>,
         params: OrderInputParams<Self::Api>,
         order_type: OrderType,
-    ) -> SCResult<()> {
+    ) {
         let caller = &self.blockchain().get_caller();
 
         let mut address_order_ids = self.get_address_order_ids(caller).into_vec();
-        self.require_not_max_size(&address_order_ids)?;
+        self.require_not_max_size(&address_order_ids);
 
         let new_order_id = self.get_and_increase_order_id_counter();
         let order = self.new_order(new_order_id, payment, params, order_type);
@@ -34,26 +34,24 @@ pub trait OrdersModule:
         self.address_order_ids(caller).set(&address_order_ids);
 
         self.emit_order_event(order);
-        Ok(())
     }
 
-    fn match_orders(&self, order_ids: Vec<u64>) -> SCResult<()> {
+    fn match_orders(&self, order_ids: Vec<u64>) {
         let orders = self.load_orders(&order_ids);
         require!(
             orders.len() == order_ids.len(),
             "Order vectors len mismatch"
         );
-        self.require_match_provider_empty_or_caller(&orders)?;
+        self.require_match_provider_empty_or_caller(&orders);
 
-        let transfers = self.create_transfers(&orders)?;
+        let transfers = self.create_transfers(&orders);
         self.clear_orders(&order_ids);
         self.execute_transfers(transfers);
 
         self.emit_match_order_events(orders);
-        Ok(())
     }
 
-    fn cancel_all_orders(&self) -> SCResult<()> {
+    fn cancel_all_orders(&self) {
         let caller = &self.blockchain().get_caller();
         let address_order_ids = self.get_address_order_ids(caller).into_vec();
 
@@ -63,13 +61,13 @@ pub trait OrdersModule:
             .copied()
             .collect::<Vec<u64>>();
 
-        self.cancel_orders(order_ids_not_empty)
+        self.cancel_orders(order_ids_not_empty);
     }
 
-    fn cancel_orders(&self, order_ids: Vec<u64>) -> SCResult<()> {
+    fn cancel_orders(&self, order_ids: Vec<u64>) {
         let caller = &self.blockchain().get_caller();
         let mut address_order_ids = self.get_address_order_ids(caller).into_vec();
-        self.require_contains_all(&address_order_ids, &order_ids)?;
+        self.require_contains_all(&address_order_ids, &order_ids);
 
         let first_token_id = &self.first_token_id().get();
         let second_token_id = &self.second_token_id().get();
@@ -83,21 +81,19 @@ pub trait OrdersModule:
 
         let mut orders = Vec::new();
         for &order_id in order_ids_not_empty.iter() {
-            let order =
-                self.cancel_order(order_id, caller, first_token_id, second_token_id, epoch)?;
+            let order = self.cancel_order(order_id, caller, first_token_id, second_token_id, epoch);
             address_order_ids.remove(order_id as usize);
             orders.push(order);
         }
         self.address_order_ids(caller).set(&address_order_ids);
 
         self.emit_cancel_order_events(orders);
-        Ok(())
     }
 
-    fn free_orders(&self, order_ids: Vec<u64>) -> SCResult<()> {
+    fn free_orders(&self, order_ids: Vec<u64>) {
         let caller = &self.blockchain().get_caller();
         let address_order_ids = self.get_address_order_ids(caller).into_vec();
-        self.require_contains_none(&address_order_ids, &order_ids)?;
+        self.require_contains_none(&address_order_ids, &order_ids);
 
         let first_token_id = &self.first_token_id().get();
         let second_token_id = &self.second_token_id().get();
@@ -111,13 +107,11 @@ pub trait OrdersModule:
 
         let mut orders = Vec::new();
         for &order_id in order_ids_not_empty.iter() {
-            let order =
-                self.free_order(order_id, caller, first_token_id, second_token_id, epoch)?;
+            let order = self.free_order(order_id, caller, first_token_id, second_token_id, epoch);
             orders.push(order);
         }
 
         self.emit_free_order_events(orders);
-        Ok(())
     }
 
     fn free_order(
@@ -127,7 +121,7 @@ pub trait OrdersModule:
         first_token_id: &TokenIdentifier,
         second_token_id: &TokenIdentifier,
         epoch: u64,
-    ) -> SCResult<Order<Self::Api>> {
+    ) -> Order<Self::Api> {
         let order = self.orders(order_id).get();
 
         let token_id = match &order.order_type {
@@ -167,7 +161,7 @@ pub trait OrdersModule:
         self.orders(order_id).clear();
         self.execute_transfers([creator_transfer, caller_transfer].to_vec());
 
-        Ok(order)
+        order
     }
 
     fn cancel_order(
@@ -177,7 +171,7 @@ pub trait OrdersModule:
         first_token_id: &TokenIdentifier,
         second_token_id: &TokenIdentifier,
         epoch: u64,
-    ) -> SCResult<Order<Self::Api>> {
+    ) -> Order<Self::Api> {
         let order = self.orders(order_id).get();
 
         let token_id = match &order.order_type {
@@ -202,7 +196,7 @@ pub trait OrdersModule:
         self.orders(order_id).clear();
         self.execute_transfers([transfer].to_vec());
 
-        Ok(order)
+        order
     }
 
     fn load_orders(&self, order_ids: &[u64]) -> Vec<Order<Self::Api>> {
@@ -213,7 +207,7 @@ pub trait OrdersModule:
             .collect()
     }
 
-    fn create_transfers(&self, orders: &[Order<Self::Api>]) -> SCResult<Vec<Transfer<Self::Api>>> {
+    fn create_transfers(&self, orders: &[Order<Self::Api>]) -> Vec<Transfer<Self::Api>> {
         let mut transfers = Vec::new();
         let first_token_id = self.first_token_id().get();
         let second_token_id = self.second_token_id().get();
@@ -251,7 +245,7 @@ pub trait OrdersModule:
         );
         transfers.append(&mut sellers_transfers);
 
-        Ok(transfers)
+        transfers
     }
 
     fn get_orders_with_type(

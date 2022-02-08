@@ -25,17 +25,17 @@ pub struct Auction<M: ManagedTypeApi> {
 impl<M: ManagedTypeApi> Auction<M> {
     pub fn new(
         auction_type: AuctionType,
-        starting_price: &BigUint<M>,
-        ending_price: &BigUint<M>,
+        starting_price: BigUint<M>,
+        ending_price: BigUint<M>,
         deadline: u64,
-        kitty_owner: &ManagedAddress<M>,
+        kitty_owner: ManagedAddress<M>,
     ) -> Self {
         Auction {
             auction_type,
-            starting_price: starting_price.clone(), // TODO: pass owned objects and let the caller clone if needed
-            ending_price: ending_price.clone(), // TODO: pass owned objects and let the caller clone if needed
+            starting_price,
+            ending_price,
             deadline,
-            kitty_owner: kitty_owner.clone(), // TODO: pass owned objects and let the caller clone if needed
+            kitty_owner,
             current_bid: BigUint::zero(),
             current_winner: ManagedAddress::zero(),
         }
