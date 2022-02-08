@@ -27,7 +27,7 @@ pub trait NftMinter: nft_module::NftModule {
         selling_price: BigUint,
         #[var_args] opt_token_used_as_payment: OptionalArg<TokenIdentifier>,
         #[var_args] opt_token_used_as_payment_nonce: OptionalArg<u64>,
-    ) -> u64 {
+    ) {
         let token_used_as_payment = match opt_token_used_as_payment {
             OptionalArg::Some(token) => token,
             OptionalArg::None => TokenIdentifier::egld(),
@@ -57,7 +57,7 @@ pub trait NftMinter: nft_module::NftModule {
             selling_price,
             token_used_as_payment,
             token_used_as_payment_nonce,
-        )
+        );
     }
 
     // The marketplace SC will send the funds directly to the initial caller, i.e. the owner
