@@ -1,8 +1,8 @@
 use crate::{
     dep_encode_from_no_err, dep_encode_num_mimic, num_conv::bytes_to_number,
-    top_encode_from_no_err, top_ser::TopEncodeNoErr, DecodeError, EncodeError, NestedDecode,
+    top_encode_from_no_err, DecodeError, DecodeErrorHandler, EncodeErrorHandler, NestedDecode,
     NestedDecodeInput, NestedEncode, NestedEncodeNoErr, NestedEncodeOutput, TopDecode,
-    TopDecodeInput, TopEncode, TopEncodeOutput, TypeInfo,
+    TopDecodeInput, TopEncode, TopEncodeNoErr, TopEncodeOutput, TypeInfo,
 };
 
 macro_rules! top_encode_num_signed {
@@ -35,22 +35,15 @@ macro_rules! dep_decode_num_signed {
         impl NestedDecode for $ty {
             const TYPE_INFO: TypeInfo = $type_info;
 
-            fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
+            fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
+            where
+                I: NestedDecodeInput,
+                H: DecodeErrorHandler,
+            {
                 let mut bytes = [0u8; $num_bytes];
-                input.read_into(&mut bytes[..])?;
+                input.read_into(&mut bytes[..], h)?;
                 let num = bytes_to_number(&bytes[..], true) as $ty;
                 Ok(num)
-            }
-
-            fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
-                input: &mut I,
-                c: ExitCtx,
-                exit: fn(ExitCtx, DecodeError) -> !,
-            ) -> Self {
-                let mut bytes = [0u8; $num_bytes];
-                input.read_into_or_exit(&mut bytes[..], c, exit);
-                let num = bytes_to_number(&bytes[..], true) as $ty;
-                num
             }
         }
     };
@@ -67,29 +60,18 @@ macro_rules! top_decode_num_signed {
         impl TopDecode for $ty {
             const TYPE_INFO: TypeInfo = $type_info;
 
-            fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
+            fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
+            where
+                I: TopDecodeInput,
+                H: DecodeErrorHandler,
+            {
                 let arg_i64 = input.into_i64();
                 let min = <$bounds_ty>::MIN as i64;
                 let max = <$bounds_ty>::MAX as i64;
                 if arg_i64 < min || arg_i64 > max {
-                    Err(DecodeError::INPUT_OUT_OF_RANGE)
+                    Err(h.handle_error(DecodeError::INPUT_OUT_OF_RANGE))
                 } else {
                     Ok(arg_i64 as $ty)
-                }
-            }
-
-            fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
-                input: I,
-                c: ExitCtx,
-                exit: fn(ExitCtx, DecodeError) -> !,
-            ) -> Self {
-                let arg_i64 = input.into_i64();
-                let min = <$bounds_ty>::MIN as i64;
-                let max = <$bounds_ty>::MAX as i64;
-                if arg_i64 < min || arg_i64 > max {
-                    exit(c, DecodeError::INPUT_OUT_OF_RANGE)
-                } else {
-                    arg_i64 as $ty
                 }
             }
         }

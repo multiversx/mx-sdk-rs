@@ -1,7 +1,7 @@
 use crate::{
-    dep_encode_from_no_err, nested_ser::NestedEncodeNoErr, top_encode_from_no_err,
-    top_ser::TopEncodeNoErr, DecodeError, EncodeError, NestedDecode, NestedDecodeInput,
-    NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
+    dep_encode_from_no_err, top_encode_from_no_err, DecodeError, DecodeErrorHandler,
+    EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode, NestedEncodeNoErr,
+    NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeNoErr, TopEncodeOutput,
     TypeInfo,
 };
 
@@ -17,15 +17,16 @@ top_encode_from_no_err! {(), TypeInfo::Unit}
 impl TopDecode for () {
     const TYPE_INFO: TypeInfo = TypeInfo::Unit;
 
-    fn top_decode<I: TopDecodeInput>(_: I) -> Result<Self, DecodeError> {
-        Ok(())
-    }
-
-    fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
-        _: I,
-        _: ExitCtx,
-        _: fn(ExitCtx, DecodeError) -> !,
-    ) -> Self {
+    fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: TopDecodeInput,
+        H: DecodeErrorHandler,
+    {
+        if input.byte_len() == 0 {
+            Ok(())
+        } else {
+            Err(h.handle_error(DecodeError::INPUT_TOO_LONG))
+        }
     }
 }
 
@@ -38,14 +39,11 @@ dep_encode_from_no_err! {(), TypeInfo::Unit}
 impl NestedDecode for () {
     const TYPE_INFO: TypeInfo = TypeInfo::Unit;
 
-    fn dep_decode<I: NestedDecodeInput>(_: &mut I) -> Result<(), DecodeError> {
+    fn dep_decode_or_handle_err<I, H>(_input: &mut I, _h: H) -> Result<Self, H::HandledErr>
+    where
+        I: NestedDecodeInput,
+        H: DecodeErrorHandler,
+    {
         Ok(())
-    }
-
-    fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
-        _: &mut I,
-        _: ExitCtx,
-        _: fn(ExitCtx, DecodeError) -> !,
-    ) -> Self {
     }
 }
