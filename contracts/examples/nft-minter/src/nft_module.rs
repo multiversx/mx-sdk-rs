@@ -63,8 +63,7 @@ pub trait NftModule {
     #[payable("*")]
     #[endpoint(buyNft)]
     fn buy_nft(&self, nft_nonce: u64) {
-        let (payment_amount, payment_token) = self.call_value().payment_token_pair();
-        let payment_nonce = self.call_value().esdt_token_nonce();
+        let payment: EsdtTokenPayment<Self::Api> = self.call_value().payment();
 
         self.require_token_issued();
         require!(
@@ -74,15 +73,15 @@ pub trait NftModule {
 
         let price_tag = self.price_tag(nft_nonce).get();
         require!(
-            payment_token == price_tag.token,
+            payment.token_identifier == price_tag.token,
             "Invalid token used as payment"
         );
         require!(
-            payment_nonce == price_tag.nonce,
+            payment.token_nonce == price_tag.nonce,
             "Invalid nonce for payment token"
         );
         require!(
-            payment_amount == price_tag.amount,
+            payment.amount == price_tag.amount,
             "Invalid amount as payment"
         );
 
@@ -99,8 +98,13 @@ pub trait NftModule {
         );
 
         let owner = self.blockchain().get_owner_address();
-        self.send()
-            .direct(&owner, &payment_token, payment_nonce, &payment_amount, &[]);
+        self.send().direct(
+            &owner,
+            &payment.token_identifier,
+            payment.token_nonce,
+            &payment.amount,
+            &[],
+        );
     }
 
     // views
