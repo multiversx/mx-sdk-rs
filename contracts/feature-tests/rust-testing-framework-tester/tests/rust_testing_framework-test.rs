@@ -3,7 +3,7 @@ use forwarder::call_sync::*;
 use num_traits::ToPrimitive;
 
 use elrond_wasm::types::{
-    Address, BigInt, EsdtLocalRole, EsdtTokenPayment, EsdtTokenType, ManagedVec,
+    Address, BigUint, EsdtLocalRole, EsdtTokenPayment, EsdtTokenType, ManagedVec,
 };
 use elrond_wasm_debug::{
     assert_values_eq, managed_address, managed_biguint, managed_buffer, managed_token_id,
