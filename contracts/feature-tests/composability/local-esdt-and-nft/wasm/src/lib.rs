@@ -19,6 +19,7 @@ elrond_wasm_node::wasm_endpoints! {
         nftAddQuantity
         nftBurn
         nftCreate
+        nftCreateCompact
         nftIssue
         setLocalRoles
         sftIssue

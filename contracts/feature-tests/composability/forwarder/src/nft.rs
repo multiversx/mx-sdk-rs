@@ -137,6 +137,12 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
     }
 
     #[endpoint]
+    fn nft_create_compact(&self, token_identifier: TokenIdentifier, amount: BigUint, color: Color) {
+        self.send()
+            .esdt_nft_create_compact(&token_identifier, &amount, &color);
+    }
+
+    #[endpoint]
     fn nft_create_on_caller_behalf(
         &self,
         token_identifier: TokenIdentifier,
