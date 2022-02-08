@@ -1,5 +1,6 @@
 {
     "name": "wrap egld",
+    "gasSchedule": "v4",
     "steps": [
         {
             "step": "setState",
@@ -8,15 +9,25 @@
                     "nonce": "0",
                     "balance": "1000"
                 },
-                "sc:egld-esdt-swap": {
+                "sc:egld_esdt_swap": {
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
-                        "str:WEGLD-abcdef": "2000"
+                        "str:EGLD-abcdef": {
+                            "instances": [
+                                {
+                                    "nonce": "",
+                                    "balance": "1"
+                                }
+                            ],
+                            "roles": [
+                                "ESDTRoleLocalMint",
+                                "ESDTRoleLocalBurn"
+                            ]
+                        }
                     },
                     "storage": {
-                        "str:wrapped_egld_token_id": "str:WEGLD-abcdef",
-                        "str:unused_wrapped_egld": "2000"
+                        "str:wrappedEgldTokenId": "str:EGLD-abcdef"
                     },
                     "code": "file:../output/egld-esdt-swap.wasm"
                 }
@@ -27,39 +38,17 @@
             "txId": "wrap-egld",
             "tx": {
                 "from": "address:user",
-                "to": "sc:egld-esdt-swap",
+                "to": "sc:egld_esdt_swap",
                 "egldValue": "500",
                 "function": "wrapEgld",
                 "arguments": [],
-                "gasLimit": "100,000,000",
+                "gasLimit": "5,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [],
                 "status": "0",
                 "message": "",
-                "logs": [
-                    {
-                        "address": "sc:egld-esdt-swap",
-                        "endpoint": "str:ESDTTransfer",
-                        "topics": [
-                            "str:WEGLD-abcdef",
-                            "",
-                            "500",
-                            "address:user"
-                        ],
-                        "data": ""
-                    },
-                    {
-                        "address": "sc:egld-esdt-swap",
-                        "endpoint": "str:wrapEgld",
-                        "topics": [
-                            "str:wrap-egld",
-                            "address:user"
-                        ],
-                        "data": "500"
-                    }
-                ],
                 "gas": "*",
                 "refund": "*"
             }
@@ -71,19 +60,29 @@
                     "nonce": "1",
                     "balance": "500",
                     "esdt": {
-                        "str:WEGLD-abcdef": "500"
+                        "str:EGLD-abcdef": "500"
                     },
                     "storage": {}
                 },
-                "sc:egld-esdt-swap": {
+                "sc:egld_esdt_swap": {
                     "nonce": "0",
                     "balance": "500",
                     "esdt": {
-                        "str:WEGLD-abcdef": "1500"
+                        "str:EGLD-abcdef": {
+                            "instances": [
+                                {
+                                    "nonce": "",
+                                    "balance": "1"
+                                }
+                            ],
+                            "roles": [
+                                "ESDTRoleLocalMint",
+                                "ESDTRoleLocalBurn"
+                            ]
+                        }
                     },
                     "storage": {
-                        "str:wrapped_egld_token_id": "str:WEGLD-abcdef",
-                        "str:unused_wrapped_egld": "1500"
+                        "str:wrappedEgldTokenId": "str:EGLD-abcdef"
                     },
                     "code": "file:../output/egld-esdt-swap.wasm"
                 }

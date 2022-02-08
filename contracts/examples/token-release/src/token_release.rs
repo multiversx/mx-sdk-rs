@@ -14,14 +14,13 @@ pub trait TokenRelease {
     // The SC initializes with the setup period started. After the initial setup, the SC offers a function that ends the setup period.
     // There is no function to start the setup period back on, so once the setup period is ended, it cannot be changed.
     #[init]
-    fn init(&self, token_identifier: TokenIdentifier) -> SCResult<()> {
+    fn init(&self, token_identifier: TokenIdentifier) {
         require!(
             token_identifier.is_valid_esdt_identifier(),
             "Invalid token provided"
         );
         self.token_identifier().set(&token_identifier);
         self.setup_period_status().set(&true);
-        Ok(())
     }
 
     // endpoints
@@ -37,8 +36,8 @@ pub trait TokenRelease {
         period_unlock_amount: BigUint,
         release_period: u64,
         release_ticks: u64,
-    ) -> SCResult<()> {
-        self.require_setup_period_live()?;
+    ) {
+        self.require_setup_period_live();
         require!(
             self.group_schedule(&group_identifier).is_empty(),
             "The group already exists"
@@ -68,8 +67,6 @@ pub trait TokenRelease {
             unlock_type,
         };
         self.group_schedule(&group_identifier).set(&new_schedule);
-
-        Ok(())
     }
 
     #[only_owner]
@@ -81,8 +78,8 @@ pub trait TokenRelease {
         period_unlock_percentage: u8,
         release_period: u64,
         release_ticks: u64,
-    ) -> SCResult<()> {
-        self.require_setup_period_live()?;
+    ) {
+        self.require_setup_period_live();
         require!(
             self.group_schedule(&group_identifier).is_empty(),
             "The group already exists"
@@ -112,14 +109,12 @@ pub trait TokenRelease {
             unlock_type,
         };
         self.group_schedule(&group_identifier).set(&new_schedule);
-
-        Ok(())
     }
 
     #[only_owner]
     #[endpoint(removeGroup)]
-    fn remove_group(&self, group_identifier: ManagedBuffer) -> SCResult<()> {
-        self.require_setup_period_live()?;
+    fn remove_group(&self, group_identifier: ManagedBuffer) {
+        self.require_setup_period_live();
         require!(
             !self.group_schedule(&group_identifier).is_empty(),
             "The group does not exist"
@@ -130,17 +125,12 @@ pub trait TokenRelease {
             .update(|total| *total -= &schedule.group_total_amount);
         self.group_schedule(&group_identifier).clear();
         self.users_in_group(&group_identifier).clear();
-        Ok(())
     }
 
     #[only_owner]
     #[endpoint(addUserGroup)]
-    fn add_user_group(
-        &self,
-        address: ManagedAddress,
-        group_identifier: ManagedBuffer,
-    ) -> SCResult<()> {
-        self.require_setup_period_live()?;
+    fn add_user_group(&self, address: ManagedAddress, group_identifier: ManagedBuffer) {
+        self.require_setup_period_live();
         require!(
             !self.group_schedule(&group_identifier).is_empty(),
             "The group does not exist"
@@ -153,14 +143,12 @@ pub trait TokenRelease {
                 groups.push(group_identifier);
             }
         });
-
-        Ok(())
     }
 
     #[only_owner]
     #[endpoint(removeUser)]
-    fn remove_user(&self, address: ManagedAddress) -> SCResult<()> {
-        self.require_setup_period_live()?;
+    fn remove_user(&self, address: ManagedAddress) {
+        self.require_setup_period_live();
         require!(
             !self.user_groups(&address).is_empty(),
             "The address is not defined"
@@ -172,22 +160,20 @@ pub trait TokenRelease {
         }
         self.user_groups(&address).clear();
         self.claimed_balance(&address).clear();
-        Ok(())
     }
 
     //To change a receiving address, the user registers a request, which is afterwards accepted or not by the owner
     #[endpoint(requestAddressChange)]
-    fn request_address_change(&self, new_address: ManagedAddress) -> SCResult<()> {
-        self.require_setup_period_ended()?;
+    fn request_address_change(&self, new_address: ManagedAddress) {
+        self.require_setup_period_ended();
         let user_address = self.blockchain().get_caller();
         self.address_change_request(&user_address).set(&new_address);
-        Ok(())
     }
 
     #[only_owner]
     #[endpoint(approveAddressChange)]
-    fn approve_address_change(&self, user_address: ManagedAddress) -> SCResult<()> {
-        self.require_setup_period_ended()?;
+    fn approve_address_change(&self, user_address: ManagedAddress) {
+        self.require_setup_period_ended();
         require!(
             !self.address_change_request(&user_address).is_empty(),
             "The address does not have a change request"
@@ -209,25 +195,22 @@ pub trait TokenRelease {
 
         // Delete the change request
         self.address_change_request(&user_address).clear();
-
-        Ok(())
     }
 
     #[only_owner]
     #[endpoint(endSetupPeriod)]
-    fn end_setup_period(&self) -> SCResult<()> {
+    fn end_setup_period(&self) {
         let token_identifier = self.token_identifier().get();
         let total_mint_tokens = self.token_total_supply().get();
         self.mint_all_tokens(&token_identifier, &total_mint_tokens);
         let activation_timestamp = self.blockchain().get_block_timestamp();
         self.activation_timestamp().set(&activation_timestamp);
         self.setup_period_status().set(false);
-        Ok(())
     }
 
     #[endpoint(claimTokens)]
-    fn claim_tokens(&self) -> SCResult<BigUint> {
-        self.require_setup_period_ended()?;
+    fn claim_tokens(&self) -> BigUint {
+        self.require_setup_period_ended();
         let token_identifier = self.token_identifier().get();
         let caller = self.blockchain().get_caller();
         let current_claimable_amount = self.get_claimable_tokens(&caller);
@@ -240,7 +223,7 @@ pub trait TokenRelease {
         self.claimed_balance(&caller)
             .update(|current_balance| *current_balance += &current_claimable_amount);
 
-        Ok(current_claimable_amount)
+        current_claimable_amount
     }
 
     // views
@@ -330,17 +313,15 @@ pub trait TokenRelease {
         self.send().esdt_local_mint(token_identifier, 0, amount);
     }
 
-    fn require_setup_period_live(&self) -> SCResult<()> {
+    fn require_setup_period_live(&self) {
         require!(self.setup_period_status().get(), "Setup period has ended");
-        Ok(())
     }
 
-    fn require_setup_period_ended(&self) -> SCResult<()> {
+    fn require_setup_period_ended(&self) {
         require!(
             !(self.setup_period_status().get()),
             "Setup period is still active"
         );
-        Ok(())
     }
 
     // storage

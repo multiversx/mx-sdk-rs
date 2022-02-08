@@ -32,7 +32,9 @@ pub trait Crowdfunding {
 
     #[endpoint]
     #[payable("*")]
-    fn fund(&self, #[payment_token] token: TokenIdentifier, #[payment] payment: BigUint) {
+    fn fund(&self) {
+        let (payment, token) = self.call_value().payment_token_pair();
+
         require!(
             self.status() == Status::FundingPeriod,
             "cannot fund after deadline"

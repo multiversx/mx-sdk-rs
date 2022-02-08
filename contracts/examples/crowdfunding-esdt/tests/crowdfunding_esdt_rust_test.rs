@@ -84,7 +84,7 @@ fn fund_test() {
             0,
             &rust_biguint!(1_000),
             |sc| {
-                sc.fund(managed_token_id!(CF_TOKEN_ID), managed_biguint!(1_000));
+                sc.fund();
 
                 let user_deposit = sc.deposit(&managed_address!(user_addr)).get();
                 let expected_deposit = managed_biguint!(1_000);
@@ -141,7 +141,7 @@ fn test_sc_error() {
             &cf_setup.cf_wrapper,
             &rust_biguint!(1_000),
             |sc| {
-                sc.fund(managed_token_id!(b""), managed_biguint!(1_000));
+                sc.fund();
             },
         )
         .assert_user_error("wrong token");
@@ -184,7 +184,7 @@ fn test_successful_cf() {
             0,
             &rust_biguint!(1_000),
             |sc| {
-                sc.fund(managed_token_id!(CF_TOKEN_ID), managed_biguint!(1_000));
+                sc.fund();
 
                 let user_deposit = sc.deposit(&managed_address!(first_user)).get();
                 let expected_deposit = managed_biguint!(1_000);
@@ -202,7 +202,7 @@ fn test_successful_cf() {
             0,
             &rust_biguint!(1_000),
             |sc| {
-                sc.fund(managed_token_id!(CF_TOKEN_ID), managed_biguint!(1_000));
+                sc.fund();
 
                 let user_deposit = sc.deposit(&managed_address!(second_user)).get();
                 let expected_deposit = managed_biguint!(1_000);
@@ -258,7 +258,7 @@ fn test_failed_cf() {
             0,
             &rust_biguint!(300),
             |sc| {
-                sc.fund(managed_token_id!(CF_TOKEN_ID), managed_biguint!(300));
+                sc.fund();
 
                 let user_deposit = sc.deposit(&managed_address!(first_user)).get();
                 let expected_deposit = managed_biguint!(300);
@@ -276,7 +276,7 @@ fn test_failed_cf() {
             0,
             &rust_biguint!(600),
             |sc| {
-                sc.fund(managed_token_id!(CF_TOKEN_ID), managed_biguint!(600));
+                sc.fund();
 
                 let user_deposit = sc.deposit(&managed_address!(second_user)).get();
                 let expected_deposit = managed_biguint!(600);

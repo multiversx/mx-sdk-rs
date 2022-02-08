@@ -23,34 +23,27 @@ pub trait PauseProxy {
     }
 
     #[endpoint(addContracts)]
-    fn add_contracts(&self, #[var_args] contracts: ManagedVarArgs<ManagedAddress>) -> SCResult<()> {
-        self.require_owner()?;
+    fn add_contracts(&self, #[var_args] contracts: ManagedVarArgs<ManagedAddress>) {
+        self.require_owner();
         self.contracts().extend(contracts);
-        Ok(())
     }
 
     #[endpoint(removeContracts)]
-    fn remove_contracts(
-        &self,
-        #[var_args] contracts: ManagedVarArgs<ManagedAddress>,
-    ) -> SCResult<()> {
-        self.require_owner()?;
+    fn remove_contracts(&self, #[var_args] contracts: ManagedVarArgs<ManagedAddress>) {
+        self.require_owner();
         self.contracts().remove_all(contracts);
-        Ok(())
     }
 
     #[endpoint(addOwners)]
-    fn add_owners(&self, #[var_args] owners: ManagedVarArgs<ManagedAddress>) -> SCResult<()> {
-        self.require_owner()?;
+    fn add_owners(&self, #[var_args] owners: ManagedVarArgs<ManagedAddress>) {
+        self.require_owner();
         self.owners().extend(owners);
-        Ok(())
     }
 
     #[endpoint(removeOwners)]
-    fn remove_owners(&self, #[var_args] owners: ManagedVarArgs<ManagedAddress>) -> SCResult<()> {
-        self.require_owner()?;
+    fn remove_owners(&self, #[var_args] owners: ManagedVarArgs<ManagedAddress>) {
+        self.require_owner();
         self.owners().remove_all(owners);
-        Ok(())
     }
 
     fn for_each_contract<F>(&self, f: F)
@@ -63,25 +56,22 @@ pub trait PauseProxy {
     }
 
     #[endpoint]
-    fn pause(&self) -> SCResult<()> {
-        self.require_owner()?;
+    fn pause(&self) {
+        self.require_owner();
         self.for_each_contract(|contract| contract.pause().execute_on_dest_context());
-        Ok(())
     }
 
     #[endpoint]
-    fn unpause(&self) -> SCResult<()> {
-        self.require_owner()?;
+    fn unpause(&self) {
+        self.require_owner();
         self.for_each_contract(|contract| contract.unpause().execute_on_dest_context());
-        Ok(())
     }
 
-    fn require_owner(&self) -> SCResult<()> {
+    fn require_owner(&self) {
         require!(
             self.owners().contains(&self.blockchain().get_caller()),
             "caller is not an owner"
         );
-        Ok(())
     }
 
     #[view]
