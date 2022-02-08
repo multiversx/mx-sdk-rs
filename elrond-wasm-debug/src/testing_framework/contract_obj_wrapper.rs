@@ -672,10 +672,12 @@ impl BlockchainStateWrapper {
         }
     }
 
-    pub fn execute_in_managed_environment<Func: FnOnce()>(&self, f: Func) {
+    pub fn execute_in_managed_environment<T, Func: FnOnce() -> T>(&self, f: Func) -> T {
         let _ = DebugApi::dummy();
-        f();
+        let result = f();
         let _ = TxContextStack::static_pop();
+
+        result
     }
 }
 
