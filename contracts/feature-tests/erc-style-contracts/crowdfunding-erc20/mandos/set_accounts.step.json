@@ -6,23 +6,19 @@
             "accounts": {
                 "address:acc1": {
                     "nonce": "0",
-                    "balance": "1,000,000",
-                    "storage": {}
+                    "balance": "1,000,000"
                 },
                 "address:acc2": {
                     "nonce": "0",
-                    "balance": "1,000,000",
-                    "storage": {}
+                    "balance": "1,000,000"
                 },
                 "address:erc20_owner": {
                     "nonce": "1",
-                    "balance": "0",
-                    "storage": {}
+                    "balance": "0"
                 },
                 "address:crowdfunding_owner": {
                     "nonce": "1",
-                    "balance": "0",
-                    "storage": {}
+                    "balance": "0"
                 },
                 "sc:erc20": {
                     "nonce": "0",

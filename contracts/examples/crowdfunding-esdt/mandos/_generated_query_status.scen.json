@@ -109,8 +109,8 @@
                     "0x"
                 ],
                 "status": "0",
-                "logs": "*",
                 "message": "str:",
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
