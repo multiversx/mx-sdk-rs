@@ -12,17 +12,19 @@
             "tx": {
                 "from": "address:user",
                 "to": "sc:egld_esdt_swap",
-                "value": "0",
-                "esdt": {
-                    "tokenIdentifier": "str:EGLD-abcdef",
-                    "value": "300"
-                },
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:EGLD-abcdef",
+                        "value": "300"
+                    }
+                ],
                 "function": "unwrapEgld",
                 "arguments": [],
                 "gasLimit": "5,000,000",
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "0",
                 "message": "",
                 "gas": "*",
@@ -45,7 +47,12 @@
                     "balance": "200",
                     "esdt": {
                         "str:EGLD-abcdef": {
-                            "balance": "1",
+                            "instances": [
+                                {
+                                    "nonce": "",
+                                    "balance": "1"
+                                }
+                            ],
                             "roles": [
                                 "ESDTRoleLocalMint",
                                 "ESDTRoleLocalBurn"
