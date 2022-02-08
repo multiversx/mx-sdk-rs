@@ -16,7 +16,6 @@
             "txId": "deploy-router",
             "tx": {
                 "from": "address:owner",
-                "value": "0",
                 "contractCode": "file:../../output/order-book-pair.wasm",
                 "arguments": [
                     "str:WEGLD-abcdef",

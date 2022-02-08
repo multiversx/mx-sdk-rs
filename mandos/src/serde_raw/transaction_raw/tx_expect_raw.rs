@@ -11,12 +11,12 @@ pub struct TxExpectRaw {
     pub status: CheckBytesValueRaw,
 
     #[serde(default)]
-    #[serde(skip_serializing_if = "CheckLogsRaw::is_default")]
-    pub logs: CheckLogsRaw,
-
-    #[serde(default)]
     #[serde(skip_serializing_if = "CheckBytesValueRaw::is_unspecified")]
     pub message: CheckBytesValueRaw,
+
+    #[serde(default)]
+    #[serde(skip_serializing_if = "CheckLogsRaw::is_default")]
+    pub logs: CheckLogsRaw,
 
     #[serde(default)]
     #[serde(skip_serializing_if = "CheckBytesValueRaw::is_unspecified")]

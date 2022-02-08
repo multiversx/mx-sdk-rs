@@ -65,13 +65,14 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:msg-features",
-                "function": "dynamic_message_multiple",
                 "esdtValue": [
                     {
                         "tokenIdentifier": "str:TOKEN-123456",
                         "value": "1,000"
                     }
                 ],
+                "function": "dynamic_message_multiple",
+                "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
@@ -90,13 +91,14 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:msg-features",
-                "function": "dynamic_message_ascii",
                 "esdtValue": [
                     {
                         "tokenIdentifier": "str:TOKEN-123456",
                         "value": "1,000"
                     }
                 ],
+                "function": "dynamic_message_ascii",
+                "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
