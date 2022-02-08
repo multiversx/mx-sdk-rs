@@ -1152,12 +1152,11 @@ fn fixed_address_invalid_sc_test() {
 #[test]
 fn managed_environment_test() {
     let wrapper = BlockchainStateWrapper::new();
-    wrapper.execute_in_managed_environment(|| {
-        let _my_struct = StructWithManagedTypes::<DebugApi> {
+    let _my_struct =
+        wrapper.execute_in_managed_environment(|| StructWithManagedTypes::<DebugApi> {
             big_uint: managed_biguint!(500),
             buffer: managed_buffer!(b"MyBuffer"),
-        };
-    })
+        });
 }
 
 #[should_panic]
