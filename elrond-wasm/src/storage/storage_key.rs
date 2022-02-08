@@ -1,5 +1,6 @@
 use crate::{
-    api::{ErrorApi, ErrorApiImpl, Handle, ManagedTypeApi},
+    api::{ErrorApi, Handle, ManagedTypeApi},
+    contract_base::ExitCodecErrorHandler,
     types::{BoxedBytes, ManagedBuffer, ManagedByteArray, ManagedType},
     *,
 };
@@ -58,7 +59,10 @@ where
     where
         T: NestedEncode,
     {
-        item.dep_encode_or_exit(&mut self.buffer, (), storage_key_append_exit::<A>);
+        let Ok(()) = item.dep_encode_or_handle_err(
+            &mut self.buffer,
+            ExitCodecErrorHandler::<A>::from(err_msg::STORAGE_KEY_ENCODE_ERROR),
+        );
     }
 
     #[inline]
@@ -90,14 +94,4 @@ impl<M: ManagedTypeApi> Clone for StorageKey<M> {
             buffer: self.buffer.clone(),
         }
     }
-}
-
-#[inline(always)]
-fn storage_key_append_exit<A>(_: (), encode_err: EncodeError) -> !
-where
-    A: ManagedTypeApi + ErrorApi + 'static,
-{
-    let mut message_buffer = ManagedBuffer::<A>::new_from_bytes(err_msg::STORAGE_KEY_ENCODE_ERROR);
-    message_buffer.append_bytes(encode_err.message_bytes());
-    A::error_api_impl().signal_error_from_buffer(message_buffer.get_raw_handle())
 }

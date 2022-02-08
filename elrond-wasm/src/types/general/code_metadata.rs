@@ -52,63 +52,44 @@ impl From<u16> for CodeMetadata {
 }
 
 impl NestedEncode for CodeMetadata {
-    fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
-        self.bits().dep_encode(dest)?;
+    fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: NestedEncodeOutput,
+        H: EncodeErrorHandler,
+    {
+        self.bits().dep_encode_or_handle_err(dest, h)?;
         Ok(())
-    }
-
-    fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(
-        &self,
-        dest: &mut O,
-        c: ExitCtx,
-        exit: fn(ExitCtx, EncodeError) -> !,
-    ) {
-        self.bits().dep_encode_or_exit(dest, c, exit);
     }
 }
 
 impl TopEncode for CodeMetadata {
     #[inline]
-    fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
-        top_encode_from_nested(self, output)
-    }
-
-    #[inline]
-    fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
-        &self,
-        output: O,
-        c: ExitCtx,
-        exit: fn(ExitCtx, EncodeError) -> !,
-    ) {
-        top_encode_from_nested_or_exit(self, output, c, exit);
+    fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: TopEncodeOutput,
+        H: EncodeErrorHandler,
+    {
+        top_encode_from_nested(self, output, h)
     }
 }
 
 impl NestedDecode for CodeMetadata {
-    fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
-        Ok(CodeMetadata::from(u16::dep_decode(input)?))
-    }
-
-    fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
-        input: &mut I,
-        c: ExitCtx,
-        exit: fn(ExitCtx, DecodeError) -> !,
-    ) -> Self {
-        CodeMetadata::from(u16::dep_decode_or_exit(input, c, exit))
+    fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: NestedDecodeInput,
+        H: DecodeErrorHandler,
+    {
+        Ok(CodeMetadata::from(u16::dep_decode_or_handle_err(input, h)?))
     }
 }
 
 impl TopDecode for CodeMetadata {
-    fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
-        top_decode_from_nested(input)
-    }
-
-    fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
-        input: I,
-        c: ExitCtx,
-        exit: fn(ExitCtx, DecodeError) -> !,
-    ) -> Self {
-        top_decode_from_nested_or_exit(input, c, exit)
+    fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: TopDecodeInput,
+        H: DecodeErrorHandler,
+    {
+        top_decode_from_nested_or_handle_err(input, h)
     }
 }
 
