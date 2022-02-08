@@ -20,19 +20,17 @@ macro_rules! dep_encode_from_no_err {
             const TYPE_INFO: TypeInfo = $type_info;
 
             #[inline]
-            fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
-                self.dep_encode_no_err(dest);
-                Ok(())
-            }
-
-            #[inline]
-            fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(
+            fn dep_encode_or_handle_err<O, H>(
                 &self,
                 dest: &mut O,
-                _: ExitCtx,
-                _: fn(ExitCtx, EncodeError) -> !,
-            ) {
+                _h: H,
+            ) -> Result<(), H::HandledErr>
+            where
+                O: NestedEncodeOutput,
+                H: EncodeErrorHandler,
+            {
                 self.dep_encode_no_err(dest);
+                Ok(())
             }
         }
     };
@@ -45,19 +43,13 @@ macro_rules! top_encode_from_no_err {
             const TYPE_INFO: TypeInfo = $type_info;
 
             #[inline]
-            fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
+            fn top_encode_or_handle_err<O, H>(&self, output: O, _h: H) -> Result<(), H::HandledErr>
+            where
+                O: TopEncodeOutput,
+                H: EncodeErrorHandler,
+            {
                 self.top_encode_no_err(output);
                 Ok(())
-            }
-
-            #[inline]
-            fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
-                &self,
-                output: O,
-                _: ExitCtx,
-                _: fn(ExitCtx, EncodeError) -> !,
-            ) {
-                self.top_encode_no_err(output);
             }
         }
     };
