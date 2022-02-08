@@ -41,6 +41,7 @@
                 ]
             },
             "expect": {
+                "out": [],
                 "status": "4",
                 "message": "str:bad array length"
             }
