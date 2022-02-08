@@ -19,21 +19,22 @@ pub trait DigitalCash {
     #[endpoint]
     #[payable("*")]
     fn fund(&self, address: ManagedAddress, valability: u64) {
-        let (payment, token) = self.call_value().payment_token_pair();
-        require!(payment > BigUint::zero(), "amount must be greater than 0");
+        let payment: EsdtTokenPayment<Self::Api> = self.call_value().payment();
+        require!(
+            payment.amount > BigUint::zero(),
+            "amount must be greater than 0"
+        );
         require!(self.deposit(&address).is_empty(), "key already used");
 
-        let nft_nonce = self.call_value().esdt_token_nonce();
-
-        let deposit = &DepositInfo {
-            amount: payment,
+        let deposit = DepositInfo {
+            amount: payment.amount,
             depositor_address: self.blockchain().get_caller(),
             expiration_round: self.get_expiration_round(valability),
-            token_name: token,
-            nonce: nft_nonce,
+            token_name: payment.token_identifier,
+            nonce: payment.token_nonce,
         };
 
-        self.deposit(&address).set(deposit);
+        self.deposit(&address).set(&deposit);
     }
 
     #[endpoint]

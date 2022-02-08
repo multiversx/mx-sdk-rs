@@ -28,10 +28,7 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [
-                    "1",
-                    "1"
-                ],
+                "out": [ "1" ],
                 "status": "0",
                 "message": "",
                 "gas": "*",
@@ -63,10 +60,7 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [
-                    "2",
-                    "2"
-                ],
+                "out": [ "2" ],
                 "status": "0",
                 "message": "",
                 "gas": "*",
