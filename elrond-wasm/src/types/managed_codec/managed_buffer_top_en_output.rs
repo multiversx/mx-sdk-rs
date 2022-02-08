@@ -1,4 +1,6 @@
-use elrond_codec::{top_encode_number_to_output, EncodeError, TopEncodeOutput, TryStaticCast};
+use elrond_codec::{
+    top_encode_number_to_output, EncodeError, EncodeErrorHandler, TopEncodeOutput, TryStaticCast,
+};
 
 use crate::{
     api::ManagedTypeApi,
@@ -27,10 +29,15 @@ impl<M: ManagedTypeApi> TopEncodeOutput for &mut ManagedBuffer<M> {
     }
 
     #[inline]
-    fn set_specialized<T, F>(self, value: &T, else_serialization: F) -> Result<(), EncodeError>
+    fn supports_specialized_type<T: TryStaticCast>() -> bool {
+        T::type_eq::<ManagedBuffer<M>>() || T::type_eq::<BigUint<M>>() || T::type_eq::<BigInt<M>>()
+    }
+
+    #[inline]
+    fn set_specialized<T, H>(self, value: &T, h: H) -> Result<(), H::HandledErr>
     where
         T: TryStaticCast,
-        F: FnOnce(Self) -> Result<(), EncodeError>,
+        H: EncodeErrorHandler,
     {
         if let Some(managed_buffer) = value.try_cast_ref::<ManagedBuffer<M>>() {
             *self = managed_buffer.clone();
@@ -42,7 +49,7 @@ impl<M: ManagedTypeApi> TopEncodeOutput for &mut ManagedBuffer<M> {
             *self = big_int.to_signed_bytes_be_buffer();
             Ok(())
         } else {
-            else_serialization(self)
+            Err(h.handle_error(EncodeError::UNSUPPORTED_OPERATION))
         }
     }
 

@@ -1,6 +1,6 @@
 use alloc::boxed::Box;
 
-use crate::{DecodeError, NestedDecodeInput};
+use crate::{DecodeError, DecodeErrorHandler, NestedDecodeInput};
 
 /// A nested decode buffer that owns its data.
 pub struct OwnedBytesNestedDecodeInput {
@@ -28,23 +28,14 @@ impl NestedDecodeInput for OwnedBytesNestedDecodeInput {
         self.bytes.len() - self.decode_index
     }
 
-    fn read_into(&mut self, into: &mut [u8]) -> Result<(), DecodeError> {
+    fn read_into<H>(&mut self, into: &mut [u8], h: H) -> Result<(), H::HandledErr>
+    where
+        H: DecodeErrorHandler,
+    {
         if into.len() > self.remaining_len() {
-            return Err(DecodeError::INPUT_TOO_SHORT);
+            return Err(h.handle_error(DecodeError::INPUT_TOO_SHORT));
         }
         self.perform_read_into(into);
         Ok(())
-    }
-
-    fn read_into_or_exit<ExitCtx: Clone>(
-        &mut self,
-        into: &mut [u8],
-        c: ExitCtx,
-        exit: fn(ExitCtx, DecodeError) -> !,
-    ) {
-        if into.len() > self.remaining_len() {
-            exit(c, DecodeError::INPUT_TOO_SHORT);
-        }
-        self.perform_read_into(into);
     }
 }
