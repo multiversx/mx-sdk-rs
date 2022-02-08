@@ -1,5 +1,6 @@
 use crate::{
-    num_conv::top_encode_number_to_output, EncodeError, NestedEncodeOutput, TryStaticCast,
+    num_conv::top_encode_number_to_output, EncodeError, EncodeErrorHandler, NestedEncodeOutput,
+    TryStaticCast,
 };
 use alloc::{boxed::Box, vec::Vec};
 
@@ -45,17 +46,22 @@ pub trait TopEncodeOutput: Sized {
         self.set_slice_u8(&[]);
     }
 
+    #[inline]
+    fn supports_specialized_type<T: TryStaticCast>() -> bool {
+        false
+    }
+
     /// Allows special handling of special types.
     /// Also requires an alternative serialization, in case the special handling is not covered.
     /// The alternative serialization, `else_serialization` is only called when necessary and
     /// is normally compiled out via monomorphization.
     #[inline]
-    fn set_specialized<T, F>(self, _value: &T, else_serialization: F) -> Result<(), EncodeError>
+    fn set_specialized<T, H>(self, _value: &T, h: H) -> Result<(), H::HandledErr>
     where
         T: TryStaticCast,
-        F: FnOnce(Self) -> Result<(), EncodeError>,
+        H: EncodeErrorHandler,
     {
-        else_serialization(self)
+        Err(h.handle_error(EncodeError::UNSUPPORTED_OPERATION))
     }
 
     fn start_nested_encode(&self) -> Self::NestedBuffer;
