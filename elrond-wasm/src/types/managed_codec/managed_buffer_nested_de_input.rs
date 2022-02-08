@@ -1,7 +1,8 @@
 use core::marker::PhantomData;
 
 use elrond_codec::{
-    try_execute_then_cast, DecodeError, NestedDecode, NestedDecodeInput, TryStaticCast,
+    try_execute_then_cast, DecodeError, DecodeErrorHandler, NestedDecode, NestedDecodeInput,
+    TryStaticCast,
 };
 
 use crate::{
@@ -43,70 +44,38 @@ where
         }
     }
 
-    fn read_managed_buffer(&mut self) -> Result<ManagedBuffer<M>, DecodeError> {
-        let size = usize::dep_decode(self)?;
-        self.read_managed_buffer_of_size(size)
-    }
-
-    fn read_managed_buffer_of_size(
+    fn read_managed_buffer_of_size<H>(
         &mut self,
         size: usize,
-    ) -> Result<ManagedBuffer<M>, DecodeError> {
+        h: H,
+    ) -> Result<ManagedBuffer<M>, H::HandledErr>
+    where
+        H: DecodeErrorHandler,
+    {
         if let Some(managed_buffer) = self.buffer.copy_slice(self.decode_index, size) {
             self.decode_index += size;
             Ok(managed_buffer)
         } else {
-            Err(DecodeError::INPUT_TOO_SHORT)
+            Err(h.handle_error(DecodeError::INPUT_TOO_SHORT))
         }
     }
 
-    fn read_managed_buffer_or_exit<ExitCtx: Clone>(
-        &mut self,
-        c: ExitCtx,
-        exit: fn(ExitCtx, DecodeError) -> !,
-    ) -> ManagedBuffer<M> {
-        let size = usize::dep_decode_or_exit(self, c.clone(), exit);
-        self.read_managed_buffer_of_size_or_exit(size, c, exit)
+    fn read_managed_buffer<H>(&mut self, h: H) -> Result<ManagedBuffer<M>, H::HandledErr>
+    where
+        H: DecodeErrorHandler,
+    {
+        let size = usize::dep_decode_or_handle_err(self, h)?;
+        self.read_managed_buffer_of_size(size, h)
     }
 
-    fn read_managed_buffer_of_size_or_exit<ExitCtx: Clone>(
-        &mut self,
-        size: usize,
-        c: ExitCtx,
-        exit: fn(ExitCtx, DecodeError) -> !,
-    ) -> ManagedBuffer<M> {
-        if let Some(managed_buffer) = self.buffer.copy_slice(self.decode_index, size) {
-            self.decode_index += size;
-            managed_buffer
-        } else {
-            exit(c, DecodeError::INPUT_TOO_SHORT)
-        }
+    fn read_big_uint<H: DecodeErrorHandler>(&mut self, h: H) -> Result<BigUint<M>, H::HandledErr> {
+        Ok(BigUint::from_bytes_be_buffer(&self.read_managed_buffer(h)?))
     }
 
-    fn read_big_uint(&mut self) -> Result<BigUint<M>, DecodeError> {
-        Ok(BigUint::from_bytes_be_buffer(&self.read_managed_buffer()?))
-    }
-
-    fn read_big_uint_or_exit<ExitCtx: Clone>(
-        &mut self,
-        c: ExitCtx,
-        exit: fn(ExitCtx, DecodeError) -> !,
-    ) -> BigUint<M> {
-        BigUint::from_bytes_be_buffer(&self.read_managed_buffer_or_exit(c, exit))
-    }
-
-    fn read_big_int(&mut self) -> Result<BigInt<M>, DecodeError> {
+    fn read_big_int<H: DecodeErrorHandler>(&mut self, h: H) -> Result<BigInt<M>, H::HandledErr> {
         Ok(BigInt::from_signed_bytes_be_buffer(
-            &self.read_managed_buffer()?,
+            &self.read_managed_buffer(h)?,
         ))
-    }
-
-    fn read_big_int_or_exit<ExitCtx: Clone>(
-        &mut self,
-        c: ExitCtx,
-        exit: fn(ExitCtx, DecodeError) -> !,
-    ) -> BigInt<M> {
-        BigInt::from_signed_bytes_be_buffer(&self.read_managed_buffer_or_exit(c, exit))
     }
 }
 
@@ -118,85 +87,43 @@ where
         self.buffer_len - self.decode_index
     }
 
-    fn read_into(&mut self, into: &mut [u8]) -> Result<(), DecodeError> {
+    fn read_into<H>(&mut self, into: &mut [u8], h: H) -> Result<(), H::HandledErr>
+    where
+        H: DecodeErrorHandler,
+    {
         let err_result = self.buffer.load_slice(self.decode_index, into);
         if err_result.is_ok() {
             self.decode_index += into.len();
             Ok(())
         } else {
-            Err(DecodeError::INPUT_TOO_SHORT)
+            Err(h.handle_error(DecodeError::INPUT_TOO_SHORT))
         }
     }
 
-    fn read_into_or_exit<ExitCtx: Clone>(
-        &mut self,
-        into: &mut [u8],
-        c: ExitCtx,
-        exit: fn(ExitCtx, DecodeError) -> !,
-    ) {
-        let err_result = self.buffer.load_slice(self.decode_index, into);
-        if err_result.is_err() {
-            exit(c, DecodeError::INPUT_TOO_SHORT);
-        }
-        self.decode_index += into.len();
+    fn supports_specialized_type<T: TryStaticCast>() -> bool {
+        T::type_eq::<ManagedBuffer<M>>() || T::type_eq::<BigUint<M>>() || T::type_eq::<BigInt<M>>()
     }
 
-    #[inline]
-    fn read_specialized<T, C, F>(&mut self, context: C, else_deser: F) -> Result<T, DecodeError>
+    fn read_specialized<T, C, H>(&mut self, context: C, h: H) -> Result<T, H::HandledErr>
     where
         T: TryStaticCast,
         C: TryStaticCast,
-        F: FnOnce(&mut Self) -> Result<T, DecodeError>,
+        H: DecodeErrorHandler,
     {
         if let Some(result) = try_execute_then_cast(|| {
             if let Some(mb_context) = context.try_cast_ref::<ManagedBufferSizeContext>() {
-                self.read_managed_buffer_of_size(mb_context.0)
+                self.read_managed_buffer_of_size(mb_context.0, h)
             } else {
-                self.read_managed_buffer()
+                self.read_managed_buffer(h)
             }
         }) {
             result
-        } else if let Some(result) = try_execute_then_cast(|| self.read_big_uint()) {
+        } else if let Some(result) = try_execute_then_cast(|| self.read_big_uint(h)) {
             result
-        } else if let Some(result) = try_execute_then_cast(|| self.read_big_int()) {
-            result
-        } else {
-            else_deser(self)
-        }
-    }
-
-    #[inline]
-    fn read_specialized_or_exit<T, C, ExitCtx, F>(
-        &mut self,
-        context: C,
-        c: ExitCtx,
-        exit: fn(ExitCtx, DecodeError) -> !,
-        else_deser: F,
-    ) -> T
-    where
-        T: TryStaticCast,
-        C: TryStaticCast,
-        F: FnOnce(&mut Self, ExitCtx) -> T,
-        ExitCtx: Clone,
-    {
-        if let Some(result) = try_execute_then_cast(|| {
-            if let Some(mb_context) = context.try_cast_ref::<ManagedBufferSizeContext>() {
-                self.read_managed_buffer_of_size_or_exit(mb_context.0, c.clone(), exit)
-            } else {
-                self.read_managed_buffer_or_exit(c.clone(), exit)
-            }
-        }) {
-            result
-        } else if let Some(result) =
-            try_execute_then_cast(|| self.read_big_uint_or_exit(c.clone(), exit))
-        {
-            result
-        } else if let Some(result) =
-            try_execute_then_cast(|| self.read_big_int_or_exit(c.clone(), exit))
-        {
+        } else if let Some(result) = try_execute_then_cast(|| self.read_big_int(h)) {
             result
         } else {
-            else_deser(self, c)
+            Err(h.handle_error(DecodeError::UNSUPPORTED_OPERATION))
         }
     }
 }

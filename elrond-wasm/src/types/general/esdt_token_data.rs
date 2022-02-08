@@ -1,6 +1,7 @@
 use crate::{
-    api::{ErrorApiImpl, ManagedTypeApi},
-    types::{BigUint, ManagedAddress, ManagedBuffer, ManagedType, ManagedVec},
+    api::ManagedTypeApi,
+    contract_base::ExitCodecErrorHandler,
+    types::{BigUint, ManagedAddress, ManagedBuffer, ManagedVec},
 };
 use elrond_codec::*;
 
@@ -27,15 +28,15 @@ pub struct EsdtTokenData<M: ManagedTypeApi> {
 }
 
 impl<M: ManagedTypeApi> EsdtTokenData<M> {
-    pub fn decode_attributes<T: TopDecode>(&self) -> Result<T, DecodeError> {
+    pub fn try_decode_attributes<T: TopDecode>(&self) -> Result<T, DecodeError> {
         T::top_decode(self.attributes.clone()) // TODO: remove clone
     }
 
-    pub fn decode_attributes_or_exit<T: TopDecode>(&self) -> T {
-        self.decode_attributes().unwrap_or_else(|err| {
-            let mut message = ManagedBuffer::<M>::new_from_bytes(DECODE_ATTRIBUTE_ERROR_PREFIX);
-            message.append_bytes(err.message_bytes());
-            M::error_api_impl().signal_error_from_buffer(message.get_raw_handle())
-        })
+    pub fn decode_attributes<T: TopDecode>(&self) -> T {
+        let Ok(value) = T::top_decode_or_handle_err(
+            self.attributes.clone(), // TODO: remove clone
+            ExitCodecErrorHandler::<M>::from(DECODE_ATTRIBUTE_ERROR_PREFIX),
+        );
+        value
     }
 }

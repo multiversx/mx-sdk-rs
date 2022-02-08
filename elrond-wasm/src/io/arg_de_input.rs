@@ -5,7 +5,9 @@ use crate::{
     types::{BigInt, BigUint, ManagedBuffer, ManagedBufferNestedDecodeInput, ManagedType},
     Box,
 };
-use elrond_codec::{try_execute_then_cast, DecodeError, TopDecodeInput, TryStaticCast};
+use elrond_codec::{
+    try_execute_then_cast, DecodeError, DecodeErrorHandler, TopDecodeInput, TryStaticCast,
+};
 
 /// Adapter from the API to the TopDecodeInput trait.
 /// Allows objects to be deserialized directly from the API as arguments.
@@ -84,10 +86,17 @@ where
     }
 
     #[inline]
-    fn into_specialized<T, F>(self, else_deser: F) -> Result<T, DecodeError>
+    fn supports_specialized_type<T: TryStaticCast>() -> bool {
+        T::type_eq::<ManagedBuffer<AA>>()
+            || T::type_eq::<BigUint<AA>>()
+            || T::type_eq::<BigInt<AA>>()
+    }
+
+    #[inline]
+    fn into_specialized<T, H>(self, h: H) -> Result<T, H::HandledErr>
     where
         T: TryStaticCast,
-        F: FnOnce(Self) -> Result<T, DecodeError>,
+        H: DecodeErrorHandler,
     {
         if let Some(result) = try_execute_then_cast(|| self.to_managed_buffer()) {
             Ok(result)
@@ -96,7 +105,7 @@ where
         } else if let Some(result) = try_execute_then_cast(|| self.to_big_int()) {
             Ok(result)
         } else {
-            else_deser(self)
+            Err(h.handle_error(DecodeError::UNSUPPORTED_OPERATION))
         }
     }
 
