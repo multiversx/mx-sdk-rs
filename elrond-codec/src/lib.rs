@@ -20,6 +20,7 @@ mod codec_err;
 mod codec_err_handler;
 mod default_traits;
 mod impl_for_types;
+mod impl_multi;
 mod multi;
 mod nested_de;
 mod nested_de_input;
@@ -47,6 +48,7 @@ pub use crate::{
 pub use codec_err::{DecodeError, EncodeError};
 pub use codec_err_handler::*;
 pub use default_traits::{DecodeDefault, EncodeDefault};
+pub use impl_multi::*;
 pub use multi::*;
 pub use nested_de::NestedDecode;
 pub use nested_de_input_owned::OwnedBytesNestedDecodeInput;

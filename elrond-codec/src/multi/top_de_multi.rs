@@ -1,38 +1,35 @@
-use crate::{DecodeError, TopDecodeMultiInput};
+use crate::{DecodeError, DecodeErrorHandler, DefaultErrorHandler, TopDecode, TopDecodeMultiInput};
 
 pub trait TopDecodeMulti: Sized {
-    /// Attempt to deserialize the value from input.
-    fn multi_decode<I: TopDecodeMultiInput>(input: I) -> Result<Self, DecodeError>;
+    fn multi_decode<I>(input: &mut I) -> Result<Self, DecodeError>
+    where
+        I: TopDecodeMultiInput,
+    {
+        Self::multi_decode_or_handle_err(input, DefaultErrorHandler)
+    }
 
-    /// Version of `multi_decode` that exits quickly in case of error.
-    /// Its purpose is to create smaller implementations
-    /// in cases where the application is supposed to exit directly on decode error.
-    #[inline]
-    fn multi_decode_or_exit<I: TopDecodeMultiInput, ExitCtx: Clone>(
-        input: I,
-        c: ExitCtx,
-        exit: fn(ExitCtx, DecodeError) -> !,
-    ) -> Self {
+    fn multi_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: TopDecodeMultiInput,
+        H: DecodeErrorHandler,
+    {
         match Self::multi_decode(input) {
-            Ok(v) => v,
-            Err(e) => exit(c, e),
+            Ok(v) => Ok(v),
+            Err(e) => Err(h.handle_error(e)),
         }
     }
 }
 
-/// All top-deserializable types can be endpoint arguments.
+/// All single top decode types also work as multi-value decode types.
 impl<T> TopDecodeMulti for T
 where
     T: TopDecode,
 {
-    fn dyn_load<I: DynArgInput>(loader: &mut I, arg_id: ArgId) -> Self {
-        if let TypeInfo::Unit = <T as TopDecode>::TYPE_INFO {
-            // unit type returns without loading anything
-            let cast_unit: T = unsafe { core::mem::transmute_copy(&()) };
-            return cast_unit;
-        }
-
-        let arg_input = loader.next_arg_input();
-        T::top_decode_or_exit(arg_input, arg_id, dyn_load_exit::<I::ManagedTypeErrorApi>)
+    fn multi_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: TopDecodeMultiInput,
+        H: DecodeErrorHandler,
+    {
+        input.next_value(h)
     }
 }
