@@ -191,77 +191,51 @@ impl TopEncodeOutput for &mut BoxedBytes {
 
 impl NestedEncode for BoxedBytes {
     #[inline]
-    fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
-        self.len().dep_encode(dest)?;
+    fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: NestedEncodeOutput,
+        H: EncodeErrorHandler,
+    {
+        self.len().dep_encode_or_handle_err(dest, h)?;
         dest.write(self.as_ref());
         Ok(())
-    }
-
-    #[inline]
-    fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(
-        &self,
-        dest: &mut O,
-        c: ExitCtx,
-        exit: fn(ExitCtx, EncodeError) -> !,
-    ) {
-        self.len().dep_encode_or_exit(dest, c, exit);
-        dest.write(self.as_ref());
     }
 }
 
 impl TopEncode for BoxedBytes {
     #[inline]
-    fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
+    fn top_encode_or_handle_err<O, H>(&self, output: O, _h: H) -> Result<(), H::HandledErr>
+    where
+        O: TopEncodeOutput,
+        H: EncodeErrorHandler,
+    {
         output.set_slice_u8(self.as_ref());
         Ok(())
-    }
-
-    #[inline]
-    fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
-        &self,
-        output: O,
-        _: ExitCtx,
-        _: fn(ExitCtx, EncodeError) -> !,
-    ) {
-        output.set_slice_u8(self.as_ref());
     }
 }
 
 impl NestedDecode for BoxedBytes {
-    fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
-        let size = usize::dep_decode(input)?;
+    fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: NestedDecodeInput,
+        H: DecodeErrorHandler,
+    {
+        let size = usize::dep_decode_or_handle_err(input, h)?;
         unsafe {
             let mut result = BoxedBytes::allocate(size);
-            input.read_into(result.as_mut_slice())?;
+            input.read_into(result.as_mut_slice(), h)?;
             Ok(result)
-        }
-    }
-
-    fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
-        input: &mut I,
-        c: ExitCtx,
-        exit: fn(ExitCtx, DecodeError) -> !,
-    ) -> Self {
-        let size = usize::dep_decode_or_exit(input, c.clone(), exit);
-        unsafe {
-            let mut result = BoxedBytes::allocate(size);
-            input.read_into_or_exit(result.as_mut_slice(), c, exit);
-            result
         }
     }
 }
 
 impl TopDecode for BoxedBytes {
-    fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
+    fn top_decode_or_handle_err<I, H>(input: I, _h: H) -> Result<Self, H::HandledErr>
+    where
+        I: TopDecodeInput,
+        H: DecodeErrorHandler,
+    {
         Ok(BoxedBytes(input.into_boxed_slice_u8()))
-    }
-
-    fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
-        input: I,
-        _: ExitCtx,
-        _: fn(ExitCtx, DecodeError) -> !,
-    ) -> Self {
-        BoxedBytes(input.into_boxed_slice_u8())
     }
 }
 

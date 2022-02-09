@@ -328,7 +328,29 @@ where
         }
     }
 
-    // Creates an NFT on behalf of the caller. This will set the "creator" field to the caller's address
+    pub fn esdt_nft_create_compact<T: elrond_codec::TopEncode>(
+        &self,
+        token: &TokenIdentifier<A>,
+        amount: &BigUint<A>,
+        attributes: &T,
+    ) -> u64 {
+        let big_zero = BigUint::zero();
+        let empty_buffer = ManagedBuffer::new();
+        let empty_vec = ManagedVec::from_raw_handle(empty_buffer.get_raw_handle());
+
+        self.esdt_nft_create(
+            token,
+            amount,
+            &empty_buffer,
+            &big_zero,
+            &empty_buffer,
+            attributes,
+            &empty_vec,
+        )
+    }
+
+    /// Creates an NFT on behalf of the caller. This will set the "creator" field to the caller's address
+    /// NOT activated on devnet/mainnet yet.
     #[allow(clippy::too_many_arguments)]
     pub fn esdt_nft_create_as_caller<T: elrond_codec::TopEncode>(
         &self,

@@ -4,7 +4,7 @@ use elrond_codec_derive::*;
 use elrond_codec::test_util::{check_dep_encode_decode, check_top_encode_decode};
 
 // to test, run the following command in elrond-codec folder:
-// cargo expand --test struct_derive_test > expanded.rs
+// cargo expand --test derive_struct_test > expanded.rs
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, PartialEq, Clone, Debug)]
 pub struct Struct {

@@ -225,50 +225,30 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
 }
 
 impl<M: ManagedTypeApi> NestedEncode for EllipticCurve<M> {
-    fn dep_encode<O: NestedEncodeOutput>(
-        &self,
-        dest: &mut O,
-    ) -> core::result::Result<(), EncodeError> {
+    fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: NestedEncodeOutput,
+        H: EncodeErrorHandler,
+    {
         let (field_order, base_point_order, eq_constant, x_base_point, y_base_point, size_of_field) =
             self.get_values();
-        NestedEncode::dep_encode(&field_order, dest)?;
-        NestedEncode::dep_encode(&base_point_order, dest)?;
-        NestedEncode::dep_encode(&eq_constant, dest)?;
-        NestedEncode::dep_encode(&x_base_point, dest)?;
-        NestedEncode::dep_encode(&y_base_point, dest)?;
-        NestedEncode::dep_encode(&size_of_field, dest)?;
+        NestedEncode::dep_encode_or_handle_err(&field_order, dest, h)?;
+        NestedEncode::dep_encode_or_handle_err(&base_point_order, dest, h)?;
+        NestedEncode::dep_encode_or_handle_err(&eq_constant, dest, h)?;
+        NestedEncode::dep_encode_or_handle_err(&x_base_point, dest, h)?;
+        NestedEncode::dep_encode_or_handle_err(&y_base_point, dest, h)?;
+        NestedEncode::dep_encode_or_handle_err(&size_of_field, dest, h)?;
         Ok(())
-    }
-
-    fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(
-        &self,
-        dest: &mut O,
-        c: ExitCtx,
-        exit: fn(ExitCtx, EncodeError) -> !,
-    ) {
-        let (field_order, base_point_order, eq_constant, x_base_point, y_base_point, size_of_field) =
-            self.get_values();
-        NestedEncode::dep_encode_or_exit(&field_order, dest, c.clone(), exit);
-        NestedEncode::dep_encode_or_exit(&base_point_order, dest, c.clone(), exit);
-        NestedEncode::dep_encode_or_exit(&eq_constant, dest, c.clone(), exit);
-        NestedEncode::dep_encode_or_exit(&x_base_point, dest, c.clone(), exit);
-        NestedEncode::dep_encode_or_exit(&y_base_point, dest, c.clone(), exit);
-        NestedEncode::dep_encode_or_exit(&size_of_field, dest, c, exit);
     }
 }
 
 impl<M: ManagedTypeApi> TopEncode for EllipticCurve<M> {
-    fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
-        top_encode_from_nested(self, output)
-    }
-
-    fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
-        &self,
-        output: O,
-        c: ExitCtx,
-        exit: fn(ExitCtx, EncodeError) -> !,
-    ) {
-        top_encode_from_nested_or_exit(self, output, c, exit);
+    fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: TopEncodeOutput,
+        H: EncodeErrorHandler,
+    {
+        top_encode_from_nested(self, output, h)
     }
 }
 

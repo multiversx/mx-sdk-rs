@@ -223,8 +223,7 @@
                             "3-deadline": "u64:123,456",
                             "4-max_entries_per_user": "u32:1",
                             "5-prize_distribution": "u32:2|u8:75|u8:25",
-                            "6-whitelist": "u32:5|address:acc1|address:acc2|address:acc3|address:acc4|address:acc5",
-                            "7-prize_pool": "biguint:500"
+                            "6-prize_pool": "biguint:500"
                         },
                         "str:ticketHolder|nested:str:lottery_name|str:.len": "5",
                         "str:ticketHolder|nested:str:lottery_name|str:.item|u32:1": "address:acc1",
@@ -236,7 +235,8 @@
                         "str:numberOfEntriesForUser|u32:12|str:lottery_name|address:acc2": "1",
                         "str:numberOfEntriesForUser|u32:12|str:lottery_name|address:acc3": "1",
                         "str:numberOfEntriesForUser|u32:12|str:lottery_name|address:acc4": "1",
-                        "str:numberOfEntriesForUser|u32:12|str:lottery_name|address:acc5": "1"
+                        "str:numberOfEntriesForUser|u32:12|str:lottery_name|address:acc5": "1",
+                        "+": ""
                     },
                     "code": "file:../output/lottery-esdt.wasm"
                 }

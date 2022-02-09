@@ -17,7 +17,7 @@ pub trait Factory {
     }
 
     #[endpoint(createPair)]
-    fn create_pair(&self, token_id_pair: TokenIdPair<Self::Api>) -> SCResult<ManagedAddress> {
+    fn create_pair(&self, token_id_pair: TokenIdPair<Self::Api>) -> ManagedAddress {
         require!(self.get_pair(&token_id_pair).is_none(), "Already has pair");
 
         let mut arguments = ManagedArgBuffer::new_empty();
@@ -31,22 +31,22 @@ pub trait Factory {
             CodeMetadata::DEFAULT,
             &arguments,
         );
-
         self.pairs().insert(token_id_pair, pair_address.clone());
-        Ok(pair_address)
+
+        pair_address
     }
 
     #[view(getPair)]
     fn get_pair(&self, token_id_pair: &TokenIdPair<Self::Api>) -> Option<ManagedAddress> {
-        let address = self.pairs().get(token_id_pair);
+        let opt_address = self.pairs().get(token_id_pair);
 
-        if address.is_none() {
+        if opt_address.is_none() {
             self.pairs().get(&TokenIdPair {
                 first_token_id: token_id_pair.second_token_id.clone(),
                 second_token_id: token_id_pair.first_token_id.clone(),
             })
         } else {
-            address
+            opt_address
         }
     }
 

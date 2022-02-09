@@ -1,4 +1,4 @@
-use elrond_wasm::elrond_codec::TopEncode;
+use elrond_wasm::elrond_codec::{top_encode_to_vec_u8_or_panic, TopEncode};
 
 const FLAG_PREFIX: &str = "--";
 const HEX_PREFIX: &str = "0x";
@@ -33,9 +33,7 @@ impl CmdBuilder {
     }
 
     pub fn to_hex<T: TopEncode>(arg: &T) -> String {
-        let mut arg_bytes = Vec::new();
-        arg.top_encode(&mut arg_bytes).unwrap();
-        hex::encode(&arg_bytes)
+        hex::encode(top_encode_to_vec_u8_or_panic(arg))
     }
 
     pub fn add_standalone_argument<T: TopEncode>(&mut self, arg: &T) {
