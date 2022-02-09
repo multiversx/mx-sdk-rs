@@ -23,12 +23,15 @@ pub trait TopDecode: Sized {
     const TYPE_INFO: TypeInfo = TypeInfo::Unknown;
 
     /// Attempt to deserialize the value from input.
-    fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
+    fn top_decode<I>(input: I) -> Result<Self, DecodeError>
+    where
+        I: TopDecodeInput,
+    {
         Self::top_decode_or_handle_err(input, DefaultErrorHandler)
     }
 
     /// Version of `top_decode` that can handle errors as soon as they occur.
-    /// For instance in can exit immediately and make sure that if it returns, it is a success.
+    /// For instance it can exit immediately and make sure that if it returns, it is a success.
     /// By not deferring error handling, this can lead to somewhat smaller bytecode.
     fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
     where
