@@ -1,5 +1,5 @@
 use adder::*;
-use elrond_wasm::types::BigInt;
+use elrond_wasm::types::BigUint;
 use elrond_wasm_debug::DebugApi;
 
 #[test]
@@ -8,12 +8,12 @@ fn test_add() {
 
     let adder = adder::contract_obj::<DebugApi>();
 
-    adder.init(BigInt::from(5));
-    assert_eq!(BigInt::from(5), adder.sum().get());
+    adder.init(BigUint::from(5u32));
+    assert_eq!(BigUint::from(5u32), adder.sum().get());
 
-    let _ = adder.add(BigInt::from(7));
-    assert_eq!(BigInt::from(12), adder.sum().get());
+    let _ = adder.add(BigUint::from(7u32));
+    assert_eq!(BigUint::from(12u32), adder.sum().get());
 
-    let _ = adder.add(BigInt::from(1));
-    assert_eq!(BigInt::from(13), adder.sum().get());
+    let _ = adder.add(BigUint::from(1u32));
+    assert_eq!(BigUint::from(13u32), adder.sum().get());
 }

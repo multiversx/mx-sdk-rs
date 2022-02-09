@@ -1,14 +1,15 @@
 use super::ArgBuffer;
 use crate::{
-    api::{ErrorApi, ErrorApiImpl, Handle, ManagedTypeApi},
+    api::{ErrorApi, Handle, ManagedTypeApi},
+    contract_base::ExitCodecErrorHandler,
     err_msg,
     types::{ManagedBuffer, ManagedType, ManagedVec, ManagedVecRefIterator},
     DynArgOutput,
 };
 use alloc::vec::Vec;
 use elrond_codec::{
-    DecodeError, EncodeError, NestedDecode, NestedDecodeInput, NestedEncode, NestedEncodeOutput,
-    TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
+    DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode,
+    NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
 };
 
 #[derive(Debug)]
@@ -114,20 +115,12 @@ where
 {
     pub fn push_arg<T: TopEncode>(&mut self, arg: T) {
         let mut encoded_buffer = ManagedBuffer::new();
-        arg.top_encode_or_exit(&mut encoded_buffer, (), managed_arg_buffer_push_exit::<M>);
+        let Ok(()) = arg.top_encode_or_handle_err(
+            &mut encoded_buffer,
+            ExitCodecErrorHandler::<M>::from(err_msg::CONTRACT_CALL_ENCODE_ERROR),
+        );
         self.push_arg_raw(encoded_buffer);
     }
-}
-
-#[inline(always)]
-fn managed_arg_buffer_push_exit<A>(_: (), encode_err: EncodeError) -> !
-where
-    A: ManagedTypeApi + ErrorApi + 'static,
-{
-    let mut message_buffer =
-        ManagedBuffer::<A>::new_from_bytes(err_msg::CONTRACT_CALL_ENCODE_ERROR);
-    message_buffer.append_bytes(encode_err.message_bytes());
-    A::error_api_impl().signal_error_from_buffer(message_buffer.get_raw_handle())
 }
 
 impl<M: ManagedTypeApi> ManagedArgBuffer<M>
@@ -164,8 +157,12 @@ where
     M: ManagedTypeApi,
 {
     #[inline]
-    fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
-        self.data.top_encode(output)
+    fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: TopEncodeOutput,
+        H: EncodeErrorHandler,
+    {
+        self.data.top_encode_or_handle_err(output, h)
     }
 }
 
@@ -174,8 +171,12 @@ where
     M: ManagedTypeApi,
 {
     #[inline]
-    fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
-        self.data.dep_encode(dest)
+    fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: NestedEncodeOutput,
+        H: EncodeErrorHandler,
+    {
+        self.data.dep_encode_or_handle_err(dest, h)
     }
 }
 
@@ -183,8 +184,12 @@ impl<M> TopDecode for ManagedArgBuffer<M>
 where
     M: ManagedTypeApi,
 {
-    fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
-        Ok(ManagedVec::top_decode(input)?.into())
+    fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: TopDecodeInput,
+        H: DecodeErrorHandler,
+    {
+        Ok(ManagedVec::top_decode_or_handle_err(input, h)?.into())
     }
 }
 
@@ -192,7 +197,11 @@ impl<M> NestedDecode for ManagedArgBuffer<M>
 where
     M: ManagedTypeApi,
 {
-    fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
-        Ok(ManagedVec::dep_decode(input)?.into())
+    fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: NestedDecodeInput,
+        H: DecodeErrorHandler,
+    {
+        Ok(ManagedVec::dep_decode_or_handle_err(input, h)?.into())
     }
 }

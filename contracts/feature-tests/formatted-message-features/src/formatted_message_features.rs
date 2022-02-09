@@ -45,13 +45,18 @@ pub trait FormattedMessageFeatures {
             "Got token {}, with nonce {:x}, amount {:x}. I prefer EGLD. ERROR!",
             token_id,
             nonce,
-            amount
+            amount, // trailing comma allowed
         );
+    }
+
+    #[endpoint]
+    fn decode_error_message(&self) {
+        sc_panic!(DecodeError::UNSUPPORTED_OPERATION,);
     }
 
     /// TODO: figure out a way to test this.
     #[endpoint]
     fn print_message(&self, x: i32) {
-        sc_print!("Printing x: {:x}", x);
+        sc_print!("Printing x: {:x}", x,);
     }
 }

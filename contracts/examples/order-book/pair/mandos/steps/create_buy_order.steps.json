@@ -7,11 +7,12 @@
             "tx": {
                 "from": "address:user1",
                 "to": "sc:pair",
-                "value": "0",
-                "esdt": {
-                    "tokenIdentifier": "str:BUSD-abcdef",
-                    "value": "2,000,000"
-                },
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:BUSD-abcdef",
+                        "value": "2,000,000"
+                    }
+                ],
                 "function": "createBuyOrder",
                 "arguments": [
                     "biguint:200000|0x01|address:match_provider|0x00|biguint:1000|u64:1000"

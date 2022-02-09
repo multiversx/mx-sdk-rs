@@ -164,7 +164,7 @@ where
     T: ManagedVecItem + ContractCallArg + TopEncode,
 {
     fn push_dyn_arg<O: DynArgOutput>(&self, output: &mut O) {
-        (&self).push_dyn_arg(output)
+        ContractCallArg::push_dyn_arg(&self, output)
     }
 }
 

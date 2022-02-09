@@ -136,7 +136,7 @@ impl fmt::Display for EsdtData {
     fn fmt(&self, _f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut esdt_buf = String::new();
         write!(
-            &mut esdt_buf,
+            esdt_buf,
             "{{
                 token_identifier: {},
                 instances: [{}],
@@ -161,12 +161,7 @@ impl fmt::Display for AccountEsdt {
 
         for key in &esdt_keys {
             let value = self.0.get(key).unwrap();
-            write!(
-                &mut esdt_buf,
-                "\n\t\t\t{} -> {}",
-                key_hex(key.as_slice()),
-                value
-            )?;
+            write!(esdt_buf, "\n\t\t\t{} -> {}", key_hex(key.as_slice()), value)?;
         }
         Ok(())
     }

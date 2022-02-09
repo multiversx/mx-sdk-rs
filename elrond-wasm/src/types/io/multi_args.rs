@@ -64,7 +64,7 @@ macro_rules! multi_arg_impls {
                 $($name: ContractCallArg,)+
             {
                 fn push_dyn_arg<O: DynArgOutput>(&self, output: &mut O) {
-                    (&self).push_dyn_arg(output)
+                    ContractCallArg::push_dyn_arg(&self, output)
                 }
             }
 

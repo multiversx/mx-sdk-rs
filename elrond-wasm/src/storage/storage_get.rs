@@ -1,3 +1,5 @@
+use core::marker::PhantomData;
+
 use crate::{
     api::{ErrorApi, ErrorApiImpl, ManagedTypeApi, StorageReadApi, StorageReadApiImpl},
     err_msg,
@@ -67,7 +69,7 @@ where
         if let Some(num) = mb.parse_as_u64() {
             num
         } else {
-            storage_get_exit::<A>((), DecodeError::INPUT_TOO_LONG)
+            StorageGetErrorHandler::<A>::default().handle_error(DecodeError::INPUT_TOO_LONG)
         }
     }
 
@@ -76,10 +78,16 @@ where
         A::storage_read_api_impl().storage_load_i64(key_bytes.as_slice())
     }
 
-    fn into_specialized<T, F>(self, else_deser: F) -> Result<T, DecodeError>
+    #[inline]
+    fn supports_specialized_type<T: TryStaticCast>() -> bool {
+        T::type_eq::<ManagedBuffer<A>>() || T::type_eq::<BigUint<A>>() || T::type_eq::<BigInt<A>>()
+    }
+
+    #[inline]
+    fn into_specialized<T, H>(self, h: H) -> Result<T, H::HandledErr>
     where
         T: TryStaticCast,
-        F: FnOnce(Self) -> Result<T, DecodeError>,
+        H: DecodeErrorHandler,
     {
         if let Some(result) = try_execute_then_cast(|| self.to_managed_buffer()) {
             Ok(result)
@@ -88,7 +96,7 @@ where
         } else if let Some(result) = try_execute_then_cast(|| self.to_big_int()) {
             Ok(result)
         } else {
-            else_deser(self)
+            Err(h.handle_error(DecodeError::UNSUPPORTED_OPERATION))
         }
     }
 
@@ -102,7 +110,11 @@ where
     T: TopDecode,
     A: StorageReadApi + ManagedTypeApi + ErrorApi,
 {
-    T::top_decode_or_exit(StorageGetInput::new(key), (), storage_get_exit::<A>)
+    let Ok(value) = T::top_decode_or_handle_err(
+        StorageGetInput::new(key),
+        StorageGetErrorHandler::<A>::default(),
+    );
+    value
 }
 
 /// Useful for storage mappers.
@@ -114,12 +126,39 @@ where
     A::storage_read_api_impl().storage_load_managed_buffer_len(key.get_raw_handle())
 }
 
-#[inline(always)]
-fn storage_get_exit<A>(_: (), de_err: DecodeError) -> !
+/// Will immediately end the execution when encountering the first decode error, via `signal_error`.
+/// Because its handled error type is the never type, when compiled,
+/// the codec will return the value directly, without wrapping it in a Result.
+#[derive(Clone)]
+struct StorageGetErrorHandler<M>
 where
-    A: StorageReadApi + ManagedTypeApi + ErrorApi + 'static,
+    M: ManagedTypeApi + ErrorApi,
 {
-    let mut message_buffer = ManagedBuffer::<A>::new_from_bytes(err_msg::STORAGE_DECODE_ERROR);
-    message_buffer.append_bytes(de_err.message_bytes());
-    A::error_api_impl().signal_error_from_buffer(message_buffer.get_raw_handle())
+    _phantom: PhantomData<M>,
+}
+
+impl<M> Copy for StorageGetErrorHandler<M> where M: ManagedTypeApi + ErrorApi {}
+
+impl<M> Default for StorageGetErrorHandler<M>
+where
+    M: ManagedTypeApi + ErrorApi,
+{
+    fn default() -> Self {
+        Self {
+            _phantom: PhantomData,
+        }
+    }
+}
+
+impl<M> DecodeErrorHandler for StorageGetErrorHandler<M>
+where
+    M: ManagedTypeApi + ErrorApi,
+{
+    type HandledErr = !;
+
+    fn handle_error(&self, err: DecodeError) -> Self::HandledErr {
+        let mut message_buffer = ManagedBuffer::<M>::new_from_bytes(err_msg::STORAGE_DECODE_ERROR);
+        message_buffer.append_bytes(err.message_bytes());
+        M::error_api_impl().signal_error_from_buffer(message_buffer.get_raw_handle())
+    }
 }
