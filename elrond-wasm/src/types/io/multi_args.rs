@@ -22,6 +22,8 @@ macro_rules! multi_arg_impls {
             where
                 $($name: TopEncodeMulti,)+
             {
+                type DecodeAs = Self; // TODO: reassemble from component DecodeAs
+
                 fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
                 where
                     O: TopEncodeMultiOutput,

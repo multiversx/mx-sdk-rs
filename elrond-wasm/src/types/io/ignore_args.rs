@@ -16,6 +16,8 @@ use elrond_codec::{
 pub struct IgnoreVarArgs;
 
 impl TopEncodeMulti for IgnoreVarArgs {
+    type DecodeAs = Self;
+
     fn multi_encode_or_handle_err<O, H>(&self, _output: &mut O, _h: H) -> Result<(), H::HandledErr>
     where
         O: TopEncodeMultiOutput,

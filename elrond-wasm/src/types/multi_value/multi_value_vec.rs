@@ -66,6 +66,8 @@ impl<T> TopEncodeMulti for MultiValueVec<T>
 where
     T: TopEncodeMulti,
 {
+    type DecodeAs = Self;
+
     fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
     where
         O: TopEncodeMultiOutput,
