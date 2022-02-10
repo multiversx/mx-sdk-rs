@@ -1,6 +1,10 @@
 use crate::{
     abi::{OutputAbi, TypeAbi, TypeDescriptionContainer},
     api::{EndpointFinishApi, ManagedTypeApi},
+    elrond_codec::{
+        DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti, TopDecodeMultiInput,
+        TopEncodeMulti, TopEncodeMultiOutput,
+    },
     io::{ArgId, ContractCallArg, DynArg, DynArgInput, DynArgOutput},
     EndpointResult,
 };
@@ -13,6 +17,39 @@ macro_rules! multi_arg_impls {
             pub struct $marg_struct<$($name,)+>(pub ($($name,)+));
 
             pub type $mres_struct<$($name,)+> = $marg_struct<$($name,)+>;
+
+            impl<$($name),+ > TopEncodeMulti for $marg_struct<$($name,)+>
+            where
+                $($name: TopEncodeMulti,)+
+            {
+                fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
+                where
+                    O: TopEncodeMultiOutput,
+                    H: EncodeErrorHandler,
+                {
+                    $(
+                        (self.0).$n.multi_encode_or_handle_err(output, h)?;
+                    )+
+                    Ok(())
+                }
+            }
+
+            impl<$($name),+ > TopDecodeMulti for $marg_struct<$($name,)+>
+            where
+                $($name: TopDecodeMulti,)+
+            {
+                fn multi_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
+                where
+                    I: TopDecodeMultiInput,
+                    H: DecodeErrorHandler,
+                {
+                    Ok(Self((
+                        $(
+                            $name::multi_decode_or_handle_err(input, h)?
+                        ),+
+                    )))
+                }
+            }
 
             impl<$($name),+ > DynArg for $marg_struct<$($name,)+>
             where

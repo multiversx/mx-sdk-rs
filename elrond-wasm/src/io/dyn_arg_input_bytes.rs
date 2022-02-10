@@ -47,7 +47,7 @@ where
 
     fn next_arg_input(&mut self) -> Box<[u8]> {
         if !self.has_next() {
-            A::error_api_impl().signal_error(err_msg::ARG_WRONG_NUMBER);
+            A::error_api_impl().signal_error(err_msg::ARG_WRONG_NUMBER.as_bytes());
         }
 
         // consume from the vector, get owned bytes

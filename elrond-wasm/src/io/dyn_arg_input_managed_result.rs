@@ -1,3 +1,5 @@
+use elrond_codec::{DecodeError, DecodeErrorHandler, TopDecodeMultiInput};
+
 use crate::{
     api::{ErrorApi, ErrorApiImpl, ManagedTypeApi},
     err_msg,
@@ -46,7 +48,30 @@ where
             self.next_index += 1;
             (*buffer).clone()
         } else {
-            A::error_api_impl().signal_error(err_msg::ARG_WRONG_NUMBER)
+            A::error_api_impl().signal_error(err_msg::ARG_WRONG_NUMBER.as_bytes())
+        }
+    }
+}
+
+impl<A> TopDecodeMultiInput for ManagedResultArgLoader<A>
+where
+    A: ManagedTypeApi + ErrorApi,
+{
+    type ValueInput = ManagedBuffer<A>;
+
+    fn has_next(&self) -> bool {
+        self.next_index < self.data_len
+    }
+
+    fn next_value_input<H>(&mut self, h: H) -> Result<Self::ValueInput, H::HandledErr>
+    where
+        H: DecodeErrorHandler,
+    {
+        if let Some(buffer) = self.data.try_get(self.next_index) {
+            self.next_index += 1;
+            Ok((*buffer).clone())
+        } else {
+            Err(h.handle_error(DecodeError::from(err_msg::ARG_WRONG_NUMBER)))
         }
     }
 }

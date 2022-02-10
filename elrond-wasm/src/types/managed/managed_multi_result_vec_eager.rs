@@ -1,12 +1,14 @@
 use core::borrow::Borrow;
 
-use alloc::string::String;
-use elrond_codec::{TopEncode, Vec};
-
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer},
     api::{EndpointFinishApi, ManagedTypeApi},
     ArgId, ContractCallArg, DynArg, DynArgInput, DynArgOutput, EndpointResult,
+};
+use alloc::string::String;
+use elrond_codec::{
+    DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti, TopDecodeMultiInput, TopEncode,
+    TopEncodeMulti, TopEncodeMultiOutput, Vec,
 };
 
 use super::{ManagedVec, ManagedVecItem, ManagedVecRefIterator};
@@ -115,6 +117,48 @@ where
         result
     }
 }
+
+impl<M, T> TopEncodeMulti for ManagedMultiResultVecEager<M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedVecItem + TopEncodeMulti,
+{
+    fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: TopEncodeMultiOutput,
+        H: EncodeErrorHandler,
+    {
+        for elem in self.0.into_iter() {
+            elem.multi_encode_or_handle_err(output, h)?;
+        }
+        Ok(())
+    }
+}
+
+impl<M, T> TopDecodeMulti for ManagedMultiResultVecEager<M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedVecItem + TopDecodeMulti,
+{
+    fn multi_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: TopDecodeMultiInput,
+        H: DecodeErrorHandler,
+    {
+        let mut result_vec: ManagedVec<M, T> = ManagedVec::new();
+        while input.has_next() {
+            result_vec.push(T::multi_decode_or_handle_err(input, h)?);
+        }
+        Ok(ManagedMultiResultVecEager(result_vec))
+
+        // let mut raw_buffers = ManagedVec::new();
+        // while input.has_next() {
+        //     raw_buffers.push(T::multi_decode_or_handle_err(input, h)?);
+        // }
+        // Ok(ManagedMultiResultVecEager(result_vec))
+    }
+}
+
 impl<M, T> DynArg for ManagedMultiResultVecEager<M, T>
 where
     M: ManagedTypeApi,

@@ -61,12 +61,12 @@ pub fn generate_load_dyn_arg(
             );
             let referenced_type = &*type_reference.elem;
             quote! {
-                let #pat: & #referenced_type = &elrond_wasm::load_dyn_arg(#loader_expr, #arg_name_expr);
+                let #pat: & #referenced_type = &elrond_wasm::load_dyn_arg::<Self::Api, _, _>(#loader_expr, #arg_name_expr);
             }
         },
         _ => {
             quote! {
-                let #pat: #arg_ty = elrond_wasm::load_dyn_arg(#loader_expr, #arg_name_expr);
+                let #pat: #arg_ty = elrond_wasm::load_dyn_arg::<Self::Api, _, _>(#loader_expr, #arg_name_expr);
             }
         },
     }

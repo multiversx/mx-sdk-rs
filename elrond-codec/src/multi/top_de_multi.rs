@@ -1,4 +1,6 @@
-use crate::{DecodeError, DecodeErrorHandler, DefaultErrorHandler, TopDecode, TopDecodeMultiInput};
+use crate::{
+    DecodeError, DecodeErrorHandler, DefaultErrorHandler, TopDecode, TopDecodeMultiInput, TypeInfo,
+};
 
 pub trait TopDecodeMulti: Sized {
     fn multi_decode<I>(input: &mut I) -> Result<Self, DecodeError>
@@ -30,6 +32,13 @@ where
         I: TopDecodeMultiInput,
         H: DecodeErrorHandler,
     {
+        // const TYPE_INFO: TypeInfo = TypeInfo::Unknown;
+        if Self::TYPE_INFO == TypeInfo::Unit {
+            // unit type returns without loading anything
+            let cast_unit: T = unsafe { core::mem::transmute_copy(&()) };
+            return Ok(cast_unit);
+        }
+
         input.next_value(h)
     }
 }
