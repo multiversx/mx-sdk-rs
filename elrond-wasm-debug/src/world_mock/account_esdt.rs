@@ -35,6 +35,10 @@ impl EsdtData {
 pub struct AccountEsdt(HashMap<Vec<u8>, EsdtData>);
 
 impl AccountEsdt {
+    pub fn is_empty(&self) -> bool {
+        self.0.is_empty()
+    }
+
     pub fn get_by_identifier(&self, identifier: &[u8]) -> Option<&EsdtData> {
         self.0.get(identifier)
     }
