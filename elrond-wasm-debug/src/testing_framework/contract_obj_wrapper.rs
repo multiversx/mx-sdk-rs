@@ -8,6 +8,7 @@ use elrond_wasm::{
 
 use crate::{
     rust_biguint,
+    testing_framework::raw_converter::bytes_to_hex,
     tx_execution::interpret_panic_as_tx_result,
     tx_mock::{TxCache, TxContext, TxContextStack, TxInput, TxInputESDT, TxResult},
     world_mock::{is_smart_contract_address, AccountData, AccountEsdt, EsdtInstanceMetadata},
@@ -727,6 +728,79 @@ impl BlockchainStateWrapper {
             ),
         }
     }
+
+    pub fn dump_state(&self) {
+        for addr in self.rc_b_mock.accounts.keys() {
+            self.dump_state_for_account_hex_attributes(addr);
+            println!();
+        }
+    }
+
+    #[inline]
+    /// Prints the state for the account, with any token attributes as hex
+    pub fn dump_state_for_account_hex_attributes(&self, address: &Address) {
+        self.dump_state_for_account::<Vec<u8>>(address)
+    }
+
+    /// Prints the state for the account, with token attributes decoded as the provided type, if possible
+    pub fn dump_state_for_account<AttributesType: 'static + TopDecode + core::fmt::Debug>(
+        &self,
+        address: &Address,
+    ) {
+        let account = match self.rc_b_mock.accounts.get(address) {
+            Some(acc) => acc,
+            None => panic!(
+                "dump_state_for_account: Account {:?} does not exist",
+                address_to_hex(address)
+            ),
+        };
+
+        println!("State for account: {:?}", address_to_hex(address));
+        println!("EGLD: {}", account.egld_balance);
+
+        if !account.esdt.is_empty() {
+            println!("ESDT Tokens:");
+        }
+        for (token_id, acc_esdt) in account.esdt.iter() {
+            let token_id_str = String::from_utf8(token_id.to_vec()).unwrap();
+            println!("  Token: {}", token_id_str);
+
+            for (token_nonce, instance) in acc_esdt.instances.get_instances() {
+                if std::any::TypeId::of::<AttributesType>() == std::any::TypeId::of::<Vec<u8>>() {
+                    print_token_balance_raw(
+                        *token_nonce,
+                        &instance.balance,
+                        &instance.metadata.attributes,
+                    );
+                } else {
+                    match AttributesType::top_decode(&instance.metadata.attributes[..]) {
+                        core::result::Result::Ok(attr) => {
+                            print_token_balance_specialized(*token_nonce, &instance.balance, &attr)
+                        },
+                        core::result::Result::Err(_) => print_token_balance_raw(
+                            *token_nonce,
+                            &instance.balance,
+                            &instance.metadata.attributes,
+                        ),
+                    }
+                }
+            }
+        }
+
+        if !account.storage.is_empty() {
+            println!();
+            println!("Storage: ");
+        }
+        for (key, value) in &account.storage {
+            let key_str = match String::from_utf8(key.to_vec()) {
+                core::result::Result::Ok(s) => s,
+                core::result::Result::Err(_) => bytes_to_hex(key),
+            };
+            let value_str = bytes_to_hex(value);
+
+            println!("  {}: {}", key_str, value_str);
+        }
+    }
 }
 
 fn build_tx_input(
@@ -759,6 +833,30 @@ fn serialize_attributes<T: TopEncode>(attributes: &T) -> Vec<u8> {
     }
 
     serialized_attributes
+}
+
+fn print_token_balance_raw(
+    token_nonce: u64,
+    token_balance: &num_bigint::BigUint,
+    attributes: &[u8],
+) {
+    println!(
+        "      Nonce {}, balance: {}, attributes: {}",
+        token_nonce,
+        token_balance,
+        bytes_to_hex(attributes)
+    );
+}
+
+fn print_token_balance_specialized<T: core::fmt::Debug>(
+    token_nonce: u64,
+    token_balance: &num_bigint::BigUint,
+    attributes: &T,
+) {
+    println!(
+        "      Nonce {}, balance: {}, attributes: {:?}",
+        token_nonce, token_balance, attributes
+    );
 }
 
 fn create_contract_obj_box<CB, ContractObjBuilder>(
