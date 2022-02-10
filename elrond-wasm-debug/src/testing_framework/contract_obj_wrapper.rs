@@ -798,7 +798,7 @@ impl BlockchainStateWrapper {
             };
             let value_str = bytes_to_hex(value);
 
-            println!("{}: {}", key_str, value_str);
+            println!("  {}: {}", key_str, value_str);
         }
     }
 }
