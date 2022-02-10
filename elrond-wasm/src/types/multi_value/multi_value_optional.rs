@@ -1,6 +1,6 @@
-use crate::{
-    DecodeErrorHandler, EncodeErrorHandler, TopDecode, TopDecodeMulti, TopDecodeMultiInput,
-    TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
+use crate::elrond_codec::{
+    DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti, TopDecodeMultiInput, TopEncodeMulti,
+    TopEncodeMultiOutput,
 };
 
 /// A smart contract argument or result that can be missing.
@@ -37,7 +37,7 @@ impl<T> OptionalValue<T> {
 
 impl<T> TopEncodeMulti for OptionalValue<T>
 where
-    T: TopEncode,
+    T: TopEncodeMulti,
 {
     fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
     where
@@ -45,7 +45,7 @@ where
         H: EncodeErrorHandler,
     {
         if let OptionalValue::Some(t) = self {
-            output.push_single_value(&t, h)?;
+            t.multi_encode_or_handle_err(output, h)?;
         }
         Ok(())
     }
@@ -53,15 +53,17 @@ where
 
 impl<T> TopDecodeMulti for OptionalValue<T>
 where
-    T: TopDecode,
+    T: TopDecodeMulti,
 {
     fn multi_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
     where
-        I: TopDecodeMultiInput, 
+        I: TopDecodeMultiInput,
         H: DecodeErrorHandler,
     {
         if input.has_next() {
-            Ok(OptionalValue::Some(input.next_value(h)?))
+            Ok(OptionalValue::Some(T::multi_decode_or_handle_err(
+                input, h,
+            )?))
         } else {
             Ok(OptionalValue::None)
         }

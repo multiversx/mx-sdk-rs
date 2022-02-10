@@ -9,7 +9,10 @@ use crate::{
 };
 use alloc::string::String;
 use core::marker::PhantomData;
-use elrond_codec::{try_cast_execute_or_else, TopDecode, TopEncode};
+use elrond_codec::{
+    try_cast_execute_or_else, DecodeErrorHandler, EncodeErrorHandler, TopDecode, TopDecodeMulti,
+    TopDecodeMultiInput, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
+};
 
 #[derive(Clone, Default)]
 pub struct ManagedMultiResultVec<M, T>
@@ -124,6 +127,44 @@ where
             result.push(serializer.top_decode_from_managed_buffer(&item));
         }
         result
+    }
+}
+
+impl<M, T> TopEncodeMulti for ManagedMultiResultVec<M, T>
+where
+    M: ManagedTypeApi + ErrorApi,
+    T: TopEncodeMulti,
+{
+    fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: TopEncodeMultiOutput,
+        H: EncodeErrorHandler,
+    {
+        for elem in self.raw_buffers.into_iter() {
+            elem.multi_encode_or_handle_err(output, h)?;
+        }
+        Ok(())
+    }
+}
+
+impl<M, T> TopDecodeMulti for ManagedMultiResultVec<M, T>
+where
+    M: ManagedTypeApi + ErrorApi,
+    T: TopDecodeMulti,
+{
+    fn multi_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: TopDecodeMultiInput,
+        H: DecodeErrorHandler,
+    {
+        let mut raw_buffers = ManagedVec::new();
+        while input.has_next() {
+            raw_buffers.push(input.next_value(h)?);
+        }
+        Ok(Self {
+            raw_buffers,
+            _phantom: PhantomData,
+        })
     }
 }
 

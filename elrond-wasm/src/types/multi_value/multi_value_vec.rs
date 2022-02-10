@@ -1,9 +1,9 @@
+use crate::elrond_codec::{
+    DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti, TopDecodeMultiInput, TopEncodeMulti,
+    TopEncodeMultiOutput,
+};
 use alloc::vec::Vec;
 use core::iter::FromIterator;
-use crate::{
-    DecodeErrorHandler, EncodeErrorHandler, TopDecode, TopDecodeMulti, TopDecodeMultiInput,
-    TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
-};
 
 /// Structure that allows taking a variable number of arguments
 /// or returning a variable number of results in a smart contract endpoint.
@@ -64,7 +64,7 @@ impl<T> FromIterator<T> for MultiValueVec<T> {
 
 impl<T> TopEncodeMulti for MultiValueVec<T>
 where
-    T: TopEncode,
+    T: TopEncodeMulti,
 {
     fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
     where
@@ -72,7 +72,7 @@ where
         H: EncodeErrorHandler,
     {
         for elem in self.0.iter() {
-            output.push_single_value(&elem, h)?;
+            elem.multi_encode_or_handle_err(output, h)?;
         }
         Ok(())
     }
@@ -80,7 +80,7 @@ where
 
 impl<T> TopDecodeMulti for MultiValueVec<T>
 where
-    T: TopDecode,
+    T: TopDecodeMulti,
 {
     fn multi_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
     where
@@ -89,9 +89,9 @@ where
     {
         let mut result_vec: Vec<T> = Vec::new();
         while input.has_next() {
-            result_vec.push(input.next_value(h)?);
+            result_vec.push(T::multi_decode_or_handle_err(input, h)?);
         }
-        Ok(MultiValueVec(result_vec))
+        Ok(Self(result_vec))
     }
 }
 

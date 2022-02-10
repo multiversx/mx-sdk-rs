@@ -6,6 +6,7 @@ use crate::{
     ContractCallArg, DynArgOutput,
 };
 use alloc::string::String;
+use elrond_codec::{DecodeErrorHandler, TopDecodeMulti, TopDecodeMultiInput};
 
 pub struct ManagedAsyncCallError<M>
 where
@@ -35,6 +36,33 @@ where
     #[inline]
     pub fn is_err(&self) -> bool {
         !self.is_ok()
+    }
+}
+
+impl<M, T> TopDecodeMulti for ManagedAsyncCallResult<M, T>
+where
+    M: ManagedTypeApi,
+    T: TopDecodeMulti,
+{
+    fn multi_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: TopDecodeMultiInput,
+        H: DecodeErrorHandler,
+    {
+        let err_code: u32 = input.next_value(h)?;
+        if err_code == 0 {
+            Ok(Self::Ok(T::multi_decode_or_handle_err(input, h)?))
+        } else {
+            let err_msg = if input.has_next() {
+                input.next_value(h)?
+            } else {
+                // temporary fix, until a problem involving missing error messages in the protocol gets fixed
+                // can be removed after the protocol is patched
+                // error messages should not normally be missing
+                ManagedBuffer::new()
+            };
+            Ok(Self::Err(ManagedAsyncCallError { err_code, err_msg }))
+        }
     }
 }
 

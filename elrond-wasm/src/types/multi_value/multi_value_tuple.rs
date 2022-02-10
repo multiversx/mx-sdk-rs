@@ -1,6 +1,6 @@
-use crate::{
-    DecodeErrorHandler, EncodeErrorHandler, TopDecode, TopDecodeMulti, TopDecodeMultiInput,
-    TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
+use crate::elrond_codec::{
+    DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti, TopDecodeMultiInput, TopEncodeMulti,
+    TopEncodeMultiOutput,
 };
 
 macro_rules! multi_value_impls {
@@ -25,7 +25,7 @@ macro_rules! multi_value_impls {
 
             impl<$($name),+ > TopEncodeMulti for $mv_struct<$($name,)+>
             where
-                $($name: TopEncode,)+
+                $($name: TopEncodeMulti,)+
             {
                 fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
                 where
@@ -33,7 +33,7 @@ macro_rules! multi_value_impls {
                     H: EncodeErrorHandler,
                 {
                     $(
-                        output.push_single_value(&((self.0).$n), h)?;
+                        (self.0).$n.multi_encode_or_handle_err(output, h)?;
                     )+
                     Ok(())
                 }
@@ -41,7 +41,7 @@ macro_rules! multi_value_impls {
 
             impl<$($name),+ > TopDecodeMulti for $mv_struct<$($name,)+>
             where
-                $($name: TopDecode,)+
+                $($name: TopDecodeMulti,)+
             {
                 fn multi_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
                 where
@@ -50,7 +50,7 @@ macro_rules! multi_value_impls {
                 {
                     Ok($mv_struct((
                         $(
-                            input.next_value::<$name, H>(h)?
+                            $name::multi_decode_or_handle_err(input, h)?
                         ),+
                     )))
                 }
@@ -152,7 +152,7 @@ macro_rules! multi_value_impls {
             //     }
             // }
 
-            
+
         )+
     }
 }

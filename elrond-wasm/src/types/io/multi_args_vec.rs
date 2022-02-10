@@ -6,6 +6,10 @@ use crate::{
 };
 use alloc::{string::String, vec::Vec};
 use core::iter::FromIterator;
+use elrond_codec::{
+    DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti, TopDecodeMultiInput, TopEncodeMulti,
+    TopEncodeMultiOutput,
+};
 
 /// Structure that allows taking a variable number of arguments
 /// or returning a variable number of results in a smart contract endpoint.
@@ -76,6 +80,39 @@ impl<T> FromIterator<T> for MultiArgVec<T> {
     fn from_iter<I: IntoIterator<Item = T>>(iter: I) -> Self {
         let v = Vec::<T>::from_iter(iter);
         MultiArgVec(v)
+    }
+}
+
+impl<T> TopEncodeMulti for MultiArgVec<T>
+where
+    T: TopEncodeMulti,
+{
+    fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: TopEncodeMultiOutput,
+        H: EncodeErrorHandler,
+    {
+        for elem in self.0.iter() {
+            elem.multi_encode_or_handle_err(output, h)?;
+        }
+        Ok(())
+    }
+}
+
+impl<T> TopDecodeMulti for MultiArgVec<T>
+where
+    T: TopDecodeMulti,
+{
+    fn multi_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: TopDecodeMultiInput,
+        H: DecodeErrorHandler,
+    {
+        let mut result_vec: Vec<T> = Vec::new();
+        while input.has_next() {
+            result_vec.push(T::multi_decode_or_handle_err(input, h)?);
+        }
+        Ok(Self(result_vec))
     }
 }
 

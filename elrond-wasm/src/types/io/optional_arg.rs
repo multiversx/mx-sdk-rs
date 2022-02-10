@@ -1,6 +1,10 @@
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer},
     api::{EndpointFinishApi, ManagedTypeApi},
+    elrond_codec::{
+        DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti, TopDecodeMultiInput,
+        TopEncodeMulti, TopEncodeMultiOutput,
+    },
     io::{ArgId, ContractCallArg, DynArg, DynArgInput, DynArgOutput},
     EndpointResult,
 };
@@ -39,6 +43,39 @@ impl<T> OptionalArg<T> {
         match self {
             OptionalArg::Some(arg) => Some(arg),
             OptionalArg::None => None,
+        }
+    }
+}
+
+impl<T> TopEncodeMulti for OptionalArg<T>
+where
+    T: TopEncodeMulti,
+{
+    fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: TopEncodeMultiOutput,
+        H: EncodeErrorHandler,
+    {
+        if let OptionalArg::Some(t) = self {
+            t.multi_encode_or_handle_err(output, h)?;
+        }
+        Ok(())
+    }
+}
+
+impl<T> TopDecodeMulti for OptionalArg<T>
+where
+    T: TopDecodeMulti,
+{
+    fn multi_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: TopDecodeMultiInput,
+        H: DecodeErrorHandler,
+    {
+        if input.has_next() {
+            Ok(OptionalArg::Some(T::multi_decode_or_handle_err(input, h)?))
+        } else {
+            Ok(OptionalArg::None)
         }
     }
 }

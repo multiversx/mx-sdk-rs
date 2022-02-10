@@ -1,5 +1,6 @@
-use crate::{DefaultErrorHandler, EncodeError, EncodeErrorHandler, TopEncode, TopEncodeMultiOutput};
-
+use crate::{
+    DefaultErrorHandler, EncodeError, EncodeErrorHandler, TopEncode, TopEncodeMultiOutput, TypeInfo,
+};
 
 pub trait TopEncodeMulti: Sized {
     /// Attempt to serialize the value to ouput.
@@ -35,6 +36,11 @@ where
         O: TopEncodeMultiOutput,
         H: EncodeErrorHandler,
     {
+        if Self::TYPE_INFO == TypeInfo::Unit {
+            // unit specialization: nothing gets encoded
+            return Ok(());
+        }
+
         output.push_single_value(self, h)
     }
 }

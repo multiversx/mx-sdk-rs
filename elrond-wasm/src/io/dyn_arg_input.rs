@@ -38,7 +38,8 @@ pub trait DynArgInput {
     /// Called after retrieving all arguments to validate that extra arguments were not provided.
     fn assert_no_more_args(&self) {
         if self.has_next() {
-            Self::ManagedTypeErrorApi::error_api_impl().signal_error(err_msg::ARG_WRONG_NUMBER);
+            Self::ManagedTypeErrorApi::error_api_impl()
+                .signal_error(err_msg::ARG_WRONG_NUMBER.as_bytes());
         }
     }
 

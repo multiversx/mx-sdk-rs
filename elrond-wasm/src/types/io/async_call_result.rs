@@ -5,6 +5,7 @@ use crate::{
     ContractCallArg, DynArgOutput,
 };
 use alloc::string::String;
+use elrond_codec::{DecodeErrorHandler, TopDecodeMulti, TopDecodeMultiInput};
 
 pub struct AsyncCallError {
     pub err_code: u32,
@@ -25,6 +26,32 @@ impl<T> AsyncCallResult<T> {
     #[inline]
     pub fn is_err(&self) -> bool {
         !self.is_ok()
+    }
+}
+
+impl<T> TopDecodeMulti for AsyncCallResult<T>
+where
+    T: TopDecodeMulti,
+{
+    fn multi_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: TopDecodeMultiInput,
+        H: DecodeErrorHandler,
+    {
+        let err_code: u32 = input.next_value(h)?;
+        if err_code == 0 {
+            Ok(Self::Ok(T::multi_decode_or_handle_err(input, h)?))
+        } else {
+            let err_msg = if input.has_next() {
+                input.next_value(h)?
+            } else {
+                // temporary fix, until a problem involving missing error messages in the protocol gets fixed
+                // can be removed after the protocol is patched
+                // error messages should not normally be missing
+                BoxedBytes::empty()
+            };
+            Ok(Self::Err(AsyncCallError { err_code, err_msg }))
+        }
     }
 }
 
