@@ -34,7 +34,7 @@
                     "0x79f901da2609f020adadbf2e5f68a16c8c3f7d57"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -57,7 +57,7 @@
                     "0xc9883eece7dca619b830dc9d87e82c38478111c0"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
