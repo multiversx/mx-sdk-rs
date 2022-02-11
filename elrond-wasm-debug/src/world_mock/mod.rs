@@ -9,6 +9,7 @@ mod esdt_instance;
 mod esdt_instance_metadata;
 mod esdt_instances;
 mod esdt_roles;
+mod instance_uris;
 
 pub use account_data::*;
 pub use account_esdt::*;
@@ -20,3 +21,4 @@ pub use esdt_instance::*;
 pub use esdt_instance_metadata::*;
 pub use esdt_instances::*;
 pub use esdt_roles::*;
+pub use instance_uris::*;

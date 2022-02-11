@@ -122,14 +122,7 @@ impl fmt::Display for EsdtInstances {
                         .unwrap_or(&Vec::new())
                         .as_slice()
                 ),
-                hex::encode(
-                    value
-                        .metadata
-                        .uri
-                        .as_ref()
-                        .unwrap_or(&Vec::new())
-                        .as_slice()
-                ),
+                value.metadata.uri,
                 hex::encode(value.metadata.attributes.as_slice())
             )?;
         }

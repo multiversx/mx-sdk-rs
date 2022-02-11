@@ -24,8 +24,8 @@ pub struct CheckEsdtInstanceRaw {
     pub hash: CheckBytesValueRaw,
 
     #[serde(default)]
-    #[serde(skip_serializing_if = "CheckBytesValueRaw::is_unspecified")]
-    pub uri: CheckBytesValueRaw,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub uri: Vec<String>,
 
     #[serde(default)]
     #[serde(skip_serializing_if = "CheckBytesValueRaw::is_unspecified")]

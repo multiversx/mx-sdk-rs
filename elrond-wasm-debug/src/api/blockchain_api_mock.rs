@@ -203,9 +203,14 @@ impl DebugApi {
         };
 
         let mut uris = ManagedVec::new();
-        if let Some(uri) = &instance.metadata.uri {
-            uris.push(ManagedBuffer::new_from_bytes(uri.as_slice()));
-        }
+        uris.push(ManagedBuffer::new_from_bytes(
+            instance
+                .metadata
+                .uri
+                .get()
+                .into_iter()
+                .map(|uri| uri.as_slice()),
+        ));
 
         EsdtTokenData {
             token_type: EsdtTokenType::based_on_token_nonce(nonce),
