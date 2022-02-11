@@ -6,15 +6,13 @@
             "accounts": {
                 "address:a_user": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {}
+                    "balance": "0"
                 },
                 "sc:forwarder": {
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
                         "str:NFT-000001": {
-                            "instances": [],
                             "lastNonce": "0",
                             "roles": [
                                 "ESDTRoleNFTCreate"
@@ -47,7 +45,7 @@
             },
             "expect": {
                 "out": [
-                    "1", 
+                    "1",
                     "1"
                 ],
                 "status": "0",

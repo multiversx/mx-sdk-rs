@@ -1,9 +1,12 @@
-use crate::{codec_err::EncodeError, nested_ser_output::NestedEncodeOutput, TypeInfo};
+use crate::{
+    codec_err::EncodeError, nested_ser_output::NestedEncodeOutput, DefaultErrorHandler,
+    EncodeErrorHandler, TypeInfo,
+};
 use alloc::vec::Vec;
 
 /// Most types will be encoded without any possibility of error.
 /// The trait is used to provide these implementations.
-/// This is currently not a substitute for implementing a proper TopEncode.
+/// This is currently not a substitute for implementing a proper NestedEncode.
 pub trait NestedEncodeNoErr: Sized {
     fn dep_encode_no_err<O: NestedEncodeOutput>(&self, dest: &mut O);
 }
@@ -20,20 +23,21 @@ pub trait NestedEncode: Sized {
 
     /// NestedEncode to output, using the format of an object nested inside another structure.
     /// Does not provide compact version.
-    fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError>;
+    fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
+        self.dep_encode_or_handle_err(dest, DefaultErrorHandler)
+    }
 
-    /// Version of `top_decode` that exits quickly in case of error.
-    /// Its purpose is to create smaller implementations
-    /// in cases where the application is supposed to exit directly on decode error.
-    fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(
-        &self,
-        dest: &mut O,
-        c: ExitCtx,
-        exit: fn(ExitCtx, EncodeError) -> !,
-    ) {
+    /// Version of `dep_encode` that can handle errors as soon as they occur.
+    /// For instance in can exit immediately and make sure that if it returns, it is a success.
+    /// By not deferring error handling, this can lead to somewhat smaller bytecode.
+    fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: NestedEncodeOutput,
+        H: EncodeErrorHandler,
+    {
         match self.dep_encode(dest) {
-            Ok(v) => v,
-            Err(e) => exit(c, e),
+            Ok(()) => Ok(()),
+            Err(e) => Err(h.handle_error(e)),
         }
     }
 }

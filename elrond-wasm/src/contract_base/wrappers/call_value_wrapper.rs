@@ -87,4 +87,11 @@ where
             TokenIdentifier::from_raw_handle(token_handle),
         )
     }
+
+    pub fn payment(&self) -> EsdtTokenPayment<A> {
+        let (amount, token) = self.payment_token_pair();
+        let nonce = self.esdt_token_nonce();
+
+        EsdtTokenPayment::new(token, nonce, amount)
+    }
 }

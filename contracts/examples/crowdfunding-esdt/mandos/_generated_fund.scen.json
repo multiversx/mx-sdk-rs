@@ -102,7 +102,6 @@
             "tx": {
                 "from": "0x2b32db6c2c0a6235fb1397e8225ea85e0f0e6e8c7b126d0016ccbde0e667151e",
                 "to": "0x0000000000000000d720a08b839a004c2e6386f5aecc19ec74807d1920cb6aeb",
-                "egldValue": "0",
                 "esdtValue": [
                     {
                         "tokenIdentifier": "str:CROWD-123456",
@@ -118,8 +117,8 @@
             "expect": {
                 "out": [],
                 "status": "0",
-                "logs": "*",
                 "message": "str:",
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }

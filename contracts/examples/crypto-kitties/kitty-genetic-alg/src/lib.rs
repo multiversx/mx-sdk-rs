@@ -13,7 +13,7 @@ pub trait KittyGeneticAlg {
     // endpoints
 
     #[endpoint(generateKittyGenes)]
-    fn generate_kitty_genes(&self, matron: Kitty, sire: Kitty) -> SCResult<KittyGenes> {
+    fn generate_kitty_genes(&self, matron: Kitty, sire: Kitty) -> KittyGenes {
         let mut random = Random::new(
             *self.blockchain().get_block_random_seed_legacy(),
             self.blockchain().get_tx_hash_legacy().as_bytes(),
@@ -39,10 +39,10 @@ pub trait KittyGeneticAlg {
 
         let kitty_meow_power = matron.get_meow_power() / 2 + sire.get_meow_power() / 2;
 
-        Ok(KittyGenes {
+        KittyGenes {
             fur_color: kitty_fur_color,
             eye_color: kitty_eye_color,
             meow_power: kitty_meow_power,
-        })
+        }
     }
 }

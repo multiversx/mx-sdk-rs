@@ -86,13 +86,13 @@ macro_rules! require_old {
 
 #[macro_export]
 macro_rules! sc_panic {
-    ($msg:tt, $($arg:expr),+) => {{
+    ($msg:tt, $($arg:expr),+ $(,)?) => {{
         let mut ___buffer___ =
             elrond_wasm::types::ManagedBufferCachedBuilder::<Self::Api>::new_from_slice(&[]);
         elrond_wasm::derive::format_receiver_args!(___buffer___, $msg, $($arg),+);
         elrond_wasm::contract_base::ErrorHelper::<Self::Api>::signal_error_with_message(___buffer___.into_managed_buffer());
     }};
-    ($msg:tt) => {
+    ($msg:expr $(,)?) => {
         elrond_wasm::contract_base::ErrorHelper::<Self::Api>::signal_error_with_message($msg);
     };
 }
@@ -118,13 +118,13 @@ macro_rules! sc_panic {
 /// }
 ///
 /// fn only_accept_zero(&self, x: i32, message: &ManagedBuffer<Self::Api>) {
-///     require!(x == 0, message);
+///     require!(x == 0, message,);
 /// }
 /// # }
 /// ```
 #[macro_export]
 macro_rules! require {
-    ($expression:expr, $($msg_tokens:tt),+) => {
+    ($expression:expr, $($msg_tokens:tt),+  $(,)?) => {
         if (!($expression)) {
             elrond_wasm::sc_panic!($($msg_tokens),+);
         }
@@ -133,7 +133,7 @@ macro_rules! require {
 
 #[macro_export]
 macro_rules! sc_print {
-    ($msg:tt, $($arg:expr),*) => {{
+    ($msg:tt, $($arg:expr),* $(,)?) => {{
         let mut ___buffer___ =
             elrond_wasm::types::ManagedBufferCachedBuilder::<Self::Api>::new_from_slice(&[]);
         elrond_wasm::derive::format_receiver_args!(___buffer___, $msg, $($arg),*);

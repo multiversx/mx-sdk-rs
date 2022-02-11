@@ -1,4 +1,9 @@
-use crate::{api::ManagedTypeApi, signal_arg_de_error, ArgId, DynArgInput};
+use core::marker::PhantomData;
+
+use crate::{
+    api::{ErrorApi, ManagedTypeApi},
+    signal_arg_de_error, ArgId, DynArgInput,
+};
 use elrond_codec::*;
 
 /// Any type that is used as an endpoint argument must implement this trait.
@@ -19,14 +24,45 @@ where
         }
 
         let arg_input = loader.next_arg_input();
-        T::top_decode_or_exit(arg_input, arg_id, dyn_load_exit::<I::ManagedTypeErrorApi>)
+
+        let h = ArgErrorHandler::<I::ManagedTypeErrorApi>::from(arg_id);
+        let result = T::top_decode_or_handle_err(arg_input, h);
+        let Ok(value) = result;
+        value
     }
 }
 
-#[inline(always)]
-fn dyn_load_exit<EA>(arg_id: ArgId, de_err: DecodeError) -> !
+#[derive(Clone)]
+pub struct ArgErrorHandler<M>
 where
-    EA: ManagedTypeApi,
+    M: ManagedTypeApi + ErrorApi,
 {
-    signal_arg_de_error::<EA>(arg_id, de_err)
+    _phantom: PhantomData<M>,
+    pub arg_id: ArgId,
+}
+
+impl<M> Copy for ArgErrorHandler<M> where M: ManagedTypeApi + ErrorApi {}
+
+impl<M> From<ArgId> for ArgErrorHandler<M>
+where
+    M: ManagedTypeApi + ErrorApi,
+{
+    fn from(arg_id: ArgId) -> Self {
+        ArgErrorHandler {
+            _phantom: PhantomData,
+            arg_id,
+        }
+    }
+}
+
+impl<M> DecodeErrorHandler for ArgErrorHandler<M>
+where
+    M: ManagedTypeApi + ErrorApi,
+{
+    type HandledErr = !;
+
+    #[inline(always)]
+    fn handle_error(&self, err: DecodeError) -> Self::HandledErr {
+        signal_arg_de_error::<M>(self.arg_id, err)
+    }
 }
