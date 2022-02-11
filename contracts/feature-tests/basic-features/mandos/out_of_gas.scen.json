@@ -34,7 +34,7 @@
                 "out": [],
                 "status": "5",
                 "message": "str:not enough gas",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }

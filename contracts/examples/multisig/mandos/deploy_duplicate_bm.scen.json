@@ -23,7 +23,7 @@
                 "out": [],
                 "status": "4",
                 "message": "str:duplicate board member",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }

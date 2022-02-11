@@ -37,7 +37,7 @@
                     "str:EGLD"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -60,7 +60,7 @@
                     "str:EGLD"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -88,7 +88,7 @@
                     "str:PAYABLE-FEATURES-TOKEN"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }

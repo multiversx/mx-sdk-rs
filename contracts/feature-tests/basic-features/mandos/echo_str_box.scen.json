@@ -35,7 +35,7 @@
                     "0x01"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -59,7 +59,7 @@
                     "8"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -81,7 +81,7 @@
                 "out": [],
                 "status": "4",
                 "message": "str:argument decode error (s): utf-8 decode error",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
