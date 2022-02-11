@@ -6,7 +6,7 @@ use num_bigint::BigUint;
 
 use crate::{
     tx_mock::{BlockchainUpdate, TxCache, TxInput, TxLog, TxResult, TxResultCalls},
-    world_mock::{EsdtInstance, EsdtInstanceMetadata},
+    world_mock::{EsdtInstance, EsdtInstanceMetadata, InstanceUris},
 };
 
 pub fn execute_esdt_nft_create(
@@ -44,7 +44,7 @@ pub fn execute_esdt_nft_create(
                 creator: Some(tx_input.from.clone()),
                 royalties,
                 hash: Some(hash),
-                uri: Some(uri),
+                uri: InstanceUris::new(uri),
                 attributes,
             },
         });

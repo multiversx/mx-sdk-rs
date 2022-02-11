@@ -10,7 +10,7 @@ use crate::{
     rust_biguint,
     tx_execution::interpret_panic_as_tx_result,
     tx_mock::{TxCache, TxContext, TxContextStack, TxInput, TxInputESDT, TxResult},
-    world_mock::{AccountData, AccountEsdt, EsdtInstanceMetadata},
+    world_mock::{AccountData, AccountEsdt, EsdtInstanceMetadata, InstanceUris},
     BlockchainMock, DebugApi,
 };
 
@@ -302,7 +302,16 @@ impl BlockchainStateWrapper {
         attributes: &T,
     ) {
         self.set_nft_balance_all_properties(
-            address, token_id, nonce, balance, attributes, 0, None, None, None, None,
+            address,
+            token_id,
+            nonce,
+            balance,
+            attributes,
+            0,
+            None,
+            None,
+            None,
+            &[],
         );
     }
 
@@ -318,9 +327,15 @@ impl BlockchainStateWrapper {
         creator: Option<&Address>,
         name: Option<&[u8]>,
         hash: Option<&[u8]>,
-        uri: Option<&[u8]>,
+        uris: &[String],
     ) {
         let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
+
+        let mut uris_raw = Vec::new();
+        for uri in uris {
+            uris_raw.push(uri.as_bytes().to_vec());
+        }
+
         match b_mock_ref.accounts.get_mut(address) {
             Some(acc) => {
                 acc.esdt.set_esdt_balance(
@@ -333,7 +348,7 @@ impl BlockchainStateWrapper {
                         royalties,
                         name: name.unwrap_or_default().to_vec(),
                         hash: hash.map(|h| h.to_vec()),
-                        uri: uri.map(|u| u.to_vec()),
+                        uri: InstanceUris::new(uris_raw),
                     },
                 );
 
