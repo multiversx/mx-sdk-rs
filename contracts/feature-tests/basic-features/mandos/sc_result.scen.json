@@ -32,7 +32,7 @@
                 "out": [],
                 "status": "4",
                 "message": "str:return_sc_error",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -52,7 +52,7 @@
                 "out": [],
                 "status": "0",
                 "message": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -74,7 +74,7 @@
                 "out": [],
                 "status": "4",
                 "message": "str:test error message",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -96,7 +96,7 @@
                 "out": [],
                 "status": "4",
                 "message": "str:test error message",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -118,7 +118,7 @@
                 "out": [],
                 "status": "4",
                 "message": "str:test error message",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -140,7 +140,7 @@
                 "out": [],
                 "status": "4",
                 "message": "str:test error message",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -162,7 +162,7 @@
                 "out": [],
                 "status": "4",
                 "message": "str:test error message",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -185,7 +185,7 @@
                 "out": [],
                 "status": "4",
                 "message": "str:test argument is false",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -208,7 +208,7 @@
                 "out": [],
                 "status": "4",
                 "message": "str:option argument is none",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -233,7 +233,7 @@
                 ],
                 "status": "0",
                 "message": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -255,7 +255,7 @@
                 "out": [],
                 "status": "4",
                 "message": "str:option argument is none",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -279,7 +279,7 @@
                 ],
                 "status": "0",
                 "message": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -301,7 +301,7 @@
                 "out": [],
                 "status": "4",
                 "message": "str:option argument is none",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -325,7 +325,7 @@
                 ],
                 "status": "0",
                 "message": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }

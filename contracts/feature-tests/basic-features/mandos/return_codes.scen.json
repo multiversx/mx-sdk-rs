@@ -30,7 +30,7 @@
                 "out": [],
                 "status": "1",
                 "message": "str:invalid function (not found)",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }

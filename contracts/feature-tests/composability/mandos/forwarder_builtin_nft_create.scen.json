@@ -48,7 +48,8 @@
                                     "balance": "1"
                                 }
                             ],
-                            "lastNonce": "1"
+                            "lastNonce": "1",
+                            "roles": []
                         }
                     },
                     "code": "file:../forwarder/output/forwarder.wasm"
@@ -198,7 +199,8 @@
                                     "balance": "1"
                                 }
                             ],
-                            "lastNonce": "1"
+                            "lastNonce": "1",
+                            "roles": []
                         }
                     },
                     "code": "file:../forwarder/output/forwarder.wasm"

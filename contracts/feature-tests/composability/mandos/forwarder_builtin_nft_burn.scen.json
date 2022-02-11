@@ -48,7 +48,8 @@
                                     "balance": "1305"
                                 }
                             ],
-                            "lastNonce": "1"
+                            "lastNonce": "1",
+                            "roles": []
                         }
                     },
                     "code": "file:../forwarder/output/forwarder.wasm"
@@ -105,7 +106,6 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [],
                 "status": "10",
                 "message": "str:action is not allowed",
                 "gas": "*",
@@ -162,7 +162,8 @@
                                     "balance": "1305"
                                 }
                             ],
-                            "lastNonce": "1"
+                            "lastNonce": "1",
+                            "roles": []
                         }
                     },
                     "storage": {},
