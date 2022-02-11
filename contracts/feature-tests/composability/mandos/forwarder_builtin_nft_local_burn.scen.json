@@ -33,7 +33,8 @@
                                     "nonce": "0",
                                     "balance": "2501"
                                 }
-                            ]
+                            ],
+                            "roles": []
                         }
                     },
                     "code": "file:../forwarder/output/forwarder.wasm"
@@ -130,7 +131,8 @@
                                     "nonce": "0",
                                     "balance": "2501"
                                 }
-                            ]
+                            ],
+                            "roles": []
                         }
                     },
                     "code": "file:../forwarder/output/forwarder.wasm"

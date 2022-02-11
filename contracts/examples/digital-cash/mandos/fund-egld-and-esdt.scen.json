@@ -1,7 +1,6 @@
 {
     "name": "fund-egld-esdt",
-    "steps": [
-        {
+    "steps": [{
             "step": "externalSteps",
             "path": "set-accounts.scen.json"
         },
@@ -11,7 +10,7 @@
             "tx": {
                 "from": "address:acc1",
                 "to": "sc:the_digital_cash_contract",
-                "egldValue": "1,000,000",
+                "value": "1,000,000",
                 "function": "fund",
                 "arguments": [
                     "0x558fd9b0dd9fed3d3bed883d3b92907743362c56b9728392f84b261f1cc5ae0a",
@@ -21,12 +20,11 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [],
                 "status": "0",
-                "message": "",
-                "logs": "*",
                 "gas": "*",
-                "refund": "*"
+                "refund": "*",
+                "logs": "*",
+                "message": ""
             }
         },
         {
@@ -45,6 +43,7 @@
                         }
                     },
                     "code": "file:../output/digital-cash.wasm"
+
                 },
                 "address:acc1": {
                     "nonce": "1",
@@ -54,16 +53,17 @@
                 "address:acc2": {
                     "nonce": "0",
                     "balance": "1,000,000",
+                    "storage": {},
                     "esdt": {
                         "str:CASHTOKEN-123456": "100"
-                    },
-                    "storage": {}
+                    }
                 },
                 "address:digital_cash_owner_address": {
                     "nonce": "1",
                     "balance": "0",
                     "storage": {}
                 }
+
             }
         },
         {
@@ -87,11 +87,10 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [],
                 "status": "",
-                "message": "",
                 "gas": "*",
-                "refund": "*"
+                "refund": "*",
+                "message": ""
             }
         },
         {
@@ -120,6 +119,7 @@
                         }
                     },
                     "code": "file:../output/digital-cash.wasm"
+
                 },
                 "address:acc1": {
                     "nonce": "1",
@@ -129,16 +129,17 @@
                 "address:acc2": {
                     "nonce": "1",
                     "balance": "1,000,000",
+                    "storage": {},
                     "esdt": {
                         "str:CASHTOKEN-123456": "50"
-                    },
-                    "storage": {}
+                    }
                 },
                 "address:digital_cash_owner_address": {
                     "nonce": "1",
                     "balance": "0",
                     "storage": {}
                 }
+
             }
         }
     ]

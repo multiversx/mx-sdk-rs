@@ -34,7 +34,7 @@
                 "out": [],
                 "status": "*",
                 "message": "str:storage value out of range",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
