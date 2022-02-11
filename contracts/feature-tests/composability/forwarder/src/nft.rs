@@ -33,26 +33,17 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
 
     #[payable("*")]
     #[endpoint]
-    fn buy_nft(
-        &self,
-        //#[payment_token] payment_token: TokenIdentifier,
-        //#[payment_nonce] payment_nonce: u64,
-        //#[payment_amount] payment_amount: BigUint,
-        nft_id: TokenIdentifier,
-        nft_nonce: u64,
-        nft_amount: BigUint,
-    ) -> BigUint {
-        let (payment_amount, payment_token) = self.call_value().payment_token_pair();
-        let payment_nonce = self.call_value().esdt_token_nonce();
+    fn buy_nft(&self, nft_id: TokenIdentifier, nft_nonce: u64, nft_amount: BigUint) -> BigUint {
+        let payment: EsdtTokenPayment<Self::Api> = self.call_value().payment();
 
         self.send().sell_nft(
             &nft_id,
             nft_nonce,
             &nft_amount,
             &self.blockchain().get_caller(),
-            &payment_token,
-            payment_nonce,
-            &payment_amount,
+            &payment.token_identifier,
+            payment.token_nonce,
+            &payment.amount,
         )
     }
 
@@ -134,6 +125,12 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
         self.create_event(&token_identifier, token_nonce, &amount);
 
         token_nonce
+    }
+
+    #[endpoint]
+    fn nft_create_compact(&self, token_identifier: TokenIdentifier, amount: BigUint, color: Color) {
+        self.send()
+            .esdt_nft_create_compact(&token_identifier, &amount, &color);
     }
 
     #[endpoint]
@@ -227,7 +224,7 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
             token_nonce,
         );
 
-        let decoded_attr = token_info.decode_attributes::<ComplexAttributes<Self::Api>>()?;
+        let decoded_attr = token_info.decode_attributes::<ComplexAttributes<Self::Api>>();
 
         require!(
             orig_attr.biguint == decoded_attr.biguint

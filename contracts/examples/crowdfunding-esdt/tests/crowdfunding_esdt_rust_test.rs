@@ -48,7 +48,6 @@ where
             let token_id = managed_token_id!(CF_TOKEN_ID);
 
             sc.init(target, CF_DEADLINE, token_id);
-            StateChange::Commit
         })
         .assert_ok();
 
@@ -85,13 +84,11 @@ fn fund_test() {
             0,
             &rust_biguint!(1_000),
             |sc| {
-                sc.fund(managed_token_id!(CF_TOKEN_ID), managed_biguint!(1_000));
+                sc.fund();
 
                 let user_deposit = sc.deposit(&managed_address!(user_addr)).get();
                 let expected_deposit = managed_biguint!(1_000);
                 assert_eq!(user_deposit, expected_deposit);
-
-                StateChange::Commit
             },
         )
         .assert_ok();
@@ -144,8 +141,7 @@ fn test_sc_error() {
             &cf_setup.cf_wrapper,
             &rust_biguint!(1_000),
             |sc| {
-                sc.fund(managed_token_id!(b""), managed_biguint!(1_000));
-                StateChange::Commit
+                sc.fund();
             },
         )
         .assert_user_error("wrong token");
@@ -155,8 +151,6 @@ fn test_sc_error() {
             let user_deposit = sc.deposit(&managed_address!(user_addr)).get();
             let expected_deposit = managed_biguint!(0);
             assert_eq!(user_deposit, expected_deposit);
-
-            StateChange::Revert
         })
         .assert_ok();
 
@@ -190,13 +184,11 @@ fn test_successful_cf() {
             0,
             &rust_biguint!(1_000),
             |sc| {
-                sc.fund(managed_token_id!(CF_TOKEN_ID), managed_biguint!(1_000));
+                sc.fund();
 
                 let user_deposit = sc.deposit(&managed_address!(first_user)).get();
                 let expected_deposit = managed_biguint!(1_000);
                 assert_eq!(user_deposit, expected_deposit);
-
-                StateChange::Commit
             },
         )
         .assert_ok();
@@ -210,13 +202,11 @@ fn test_successful_cf() {
             0,
             &rust_biguint!(1_000),
             |sc| {
-                sc.fund(managed_token_id!(CF_TOKEN_ID), managed_biguint!(1_000));
+                sc.fund();
 
                 let user_deposit = sc.deposit(&managed_address!(second_user)).get();
                 let expected_deposit = managed_biguint!(1_000);
                 assert_eq!(user_deposit, expected_deposit);
-
-                StateChange::Commit
             },
         )
         .assert_ok();
@@ -236,8 +226,6 @@ fn test_successful_cf() {
     b_wrapper
         .execute_tx(first_user, &cf_setup.cf_wrapper, &rust_biguint!(0), |sc| {
             sc.claim();
-
-            StateChange::Revert
         })
         .assert_user_error("only owner can claim successful funding");
 
@@ -245,8 +233,6 @@ fn test_successful_cf() {
     b_wrapper
         .execute_tx(owner, &cf_setup.cf_wrapper, &rust_biguint!(0), |sc| {
             sc.claim();
-
-            StateChange::Commit
         })
         .assert_ok();
 
@@ -272,13 +258,11 @@ fn test_failed_cf() {
             0,
             &rust_biguint!(300),
             |sc| {
-                sc.fund(managed_token_id!(CF_TOKEN_ID), managed_biguint!(300));
+                sc.fund();
 
                 let user_deposit = sc.deposit(&managed_address!(first_user)).get();
                 let expected_deposit = managed_biguint!(300);
                 assert_eq!(user_deposit, expected_deposit);
-
-                StateChange::Commit
             },
         )
         .assert_ok();
@@ -292,13 +276,11 @@ fn test_failed_cf() {
             0,
             &rust_biguint!(600),
             |sc| {
-                sc.fund(managed_token_id!(CF_TOKEN_ID), managed_biguint!(600));
+                sc.fund();
 
                 let user_deposit = sc.deposit(&managed_address!(second_user)).get();
                 let expected_deposit = managed_biguint!(600);
                 assert_eq!(user_deposit, expected_deposit);
-
-                StateChange::Commit
             },
         )
         .assert_ok();
@@ -318,7 +300,6 @@ fn test_failed_cf() {
     b_wrapper
         .execute_tx(first_user, &cf_setup.cf_wrapper, &rust_biguint!(0), |sc| {
             sc.claim();
-            StateChange::Commit
         })
         .assert_ok();
 
@@ -326,7 +307,6 @@ fn test_failed_cf() {
     b_wrapper
         .execute_tx(second_user, &cf_setup.cf_wrapper, &rust_biguint!(0), |sc| {
             sc.claim();
-            StateChange::Commit
         })
         .assert_ok();
 

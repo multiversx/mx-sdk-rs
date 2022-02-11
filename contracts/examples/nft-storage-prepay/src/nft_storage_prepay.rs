@@ -48,14 +48,15 @@ pub trait NftStoragePrepay {
 
     #[payable("EGLD")]
     #[endpoint(depositPaymentForStorage)]
-    fn deposit_payment_for_storage(&self, #[payment] payment: BigUint) {
+    fn deposit_payment_for_storage(&self) {
+        let payment = self.call_value().egld_value();
         let caller = self.blockchain().get_caller();
         self.deposit(&caller).update(|deposit| *deposit += payment);
     }
 
     /// defaults to max amount
     #[endpoint(withdraw)]
-    fn withdraw(&self, #[var_args] opt_amount: OptionalArg<BigUint>) -> SCResult<()> {
+    fn withdraw(&self, #[var_args] opt_amount: OptionalArg<BigUint>) {
         let caller = self.blockchain().get_caller();
         let mut user_deposit = self.deposit(&caller).get();
         let amount = match opt_amount {
@@ -69,8 +70,6 @@ pub trait NftStoragePrepay {
         self.deposit(&caller).set(&user_deposit);
 
         self.send().direct_egld(&caller, &amount, &[]);
-
-        Ok(())
     }
 
     // views

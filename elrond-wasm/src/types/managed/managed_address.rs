@@ -9,8 +9,9 @@ use crate::{
 };
 use alloc::string::String;
 use elrond_codec::{
-    DecodeError, EncodeError, NestedDecode, NestedDecodeInput, NestedEncode, NestedEncodeOutput,
-    TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, TryStaticCast,
+    DecodeError, DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput,
+    NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
+    TryStaticCast,
 };
 
 #[repr(transparent)]
@@ -161,8 +162,12 @@ where
     M: ManagedTypeApi,
 {
     #[inline]
-    fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
-        self.bytes.top_encode(output)
+    fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: TopEncodeOutput,
+        H: EncodeErrorHandler,
+    {
+        self.bytes.top_encode_or_handle_err(output, h)
     }
 }
 
@@ -170,9 +175,13 @@ impl<M> TopDecode for ManagedAddress<M>
 where
     M: ManagedTypeApi,
 {
-    fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
+    fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: TopDecodeInput,
+        H: DecodeErrorHandler,
+    {
         Ok(ManagedAddress {
-            bytes: ManagedByteArray::top_decode(input)?,
+            bytes: ManagedByteArray::top_decode_or_handle_err(input, h)?,
         })
     }
 }
@@ -187,8 +196,12 @@ where
     M: ManagedTypeApi,
 {
     #[inline]
-    fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
-        self.bytes.dep_encode(dest)
+    fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: NestedEncodeOutput,
+        H: EncodeErrorHandler,
+    {
+        self.bytes.dep_encode_or_handle_err(dest, h)
     }
 }
 
@@ -196,9 +209,13 @@ impl<M> NestedDecode for ManagedAddress<M>
 where
     M: ManagedTypeApi,
 {
-    fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
+    fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: NestedDecodeInput,
+        H: DecodeErrorHandler,
+    {
         Ok(ManagedAddress {
-            bytes: ManagedByteArray::dep_decode(input)?,
+            bytes: ManagedByteArray::dep_decode_or_handle_err(input, h)?,
         })
     }
 }

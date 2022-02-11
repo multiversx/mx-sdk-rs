@@ -157,52 +157,36 @@ impl H256 {
 use elrond_codec::*;
 
 impl NestedEncode for H256 {
-    fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
+    fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, _h: H) -> Result<(), H::HandledErr>
+    where
+        O: NestedEncodeOutput,
+        H: EncodeErrorHandler,
+    {
         dest.write(&self.0[..]);
         Ok(())
-    }
-
-    fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(
-        &self,
-        dest: &mut O,
-        _: ExitCtx,
-        _: fn(ExitCtx, EncodeError) -> !,
-    ) {
-        dest.write(&self.0[..]);
     }
 }
 
 impl TopEncode for H256 {
-    fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
+    fn top_encode_or_handle_err<O, H>(&self, output: O, _h: H) -> Result<(), H::HandledErr>
+    where
+        O: TopEncodeOutput,
+        H: EncodeErrorHandler,
+    {
         output.set_slice_u8(&self.0[..]);
         Ok(())
-    }
-
-    fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
-        &self,
-        output: O,
-        _: ExitCtx,
-        _: fn(ExitCtx, EncodeError) -> !,
-    ) {
-        output.set_slice_u8(&self.0[..]);
     }
 }
 
 impl NestedDecode for H256 {
-    fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
+    fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: NestedDecodeInput,
+        H: DecodeErrorHandler,
+    {
         let mut res = H256::zero();
-        input.read_into(res.as_mut())?;
+        input.read_into(res.as_mut(), h)?;
         Ok(res)
-    }
-
-    fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
-        input: &mut I,
-        c: ExitCtx,
-        exit: fn(ExitCtx, DecodeError) -> !,
-    ) -> Self {
-        let mut res = H256::zero();
-        input.read_into_or_exit(res.as_mut(), c, exit);
-        res
     }
 }
 
@@ -210,34 +194,30 @@ impl H256 {
     // Transmutes directly from a (variable-sized) boxed byte slice.
     // Will exit early if the input length is not 32.
     // Designed to be used especially in deserializer implementations.
-    pub fn decode_from_boxed_bytes_or_exit<ExitCtx: Clone>(
+    fn decode_from_boxed_bytes_or_handle_err<H>(
         input: Box<[u8]>,
-        c: ExitCtx,
-        exit: fn(ExitCtx, DecodeError) -> !,
-    ) -> Self {
-        if input.len() != 32 {
-            exit(c, DecodeError::from(ERR_BAD_H256_LENGTH));
+        h: H,
+    ) -> Result<Self, H::HandledErr>
+    where
+        H: DecodeErrorHandler,
+    {
+        if input.len() == 32 {
+            let raw = Box::into_raw(input);
+            let array_box = unsafe { Box::<[u8; 32]>::from_raw(raw as *mut [u8; 32]) };
+            Ok(H256(array_box))
+        } else {
+            Err(h.handle_error(DecodeError::from(ERR_BAD_H256_LENGTH)))
         }
-        let raw = Box::into_raw(input);
-        let array_box = unsafe { Box::<[u8; 32]>::from_raw(raw as *mut [u8; 32]) };
-        H256(array_box)
     }
 }
 
 impl TopDecode for H256 {
-    fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
-        match <[u8; 32]>::top_decode_boxed(input) {
-            Ok(array_box) => Ok(H256(array_box)),
-            Err(_) => Err(DecodeError::from(ERR_BAD_H256_LENGTH)),
-        }
-    }
-
-    fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
-        input: I,
-        c: ExitCtx,
-        exit: fn(ExitCtx, DecodeError) -> !,
-    ) -> Self {
-        H256::decode_from_boxed_bytes_or_exit(input.into_boxed_slice_u8(), c, exit)
+    fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: TopDecodeInput,
+        H: DecodeErrorHandler,
+    {
+        Self::decode_from_boxed_bytes_or_handle_err(input.into_boxed_slice_u8(), h)
     }
 }
 

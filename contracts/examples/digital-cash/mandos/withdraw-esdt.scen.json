@@ -1,6 +1,7 @@
 {
     "name": "withdraw-esdt",
-    "steps": [{
+    "steps": [
+        {
             "step": "externalSteps",
             "path": "fund-egld-and-esdt.scen.json"
         },
@@ -20,7 +21,6 @@
             "tx": {
                 "from": "address:acc2",
                 "to": "sc:the_digital_cash_contract",
-                "value": "0",
                 "function": "withdraw",
                 "arguments": [
                     "0xe868c2baab2a20b612f1351da5945c52c60f5321c6cde572149db90c9e8fbfc8"
@@ -29,11 +29,12 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "4",
-                "gas": "*",
-                "refund": "*",
+                "message": "str:withdrawal has not been available yet",
                 "logs": "*",
-                "message": "str:withdrawal has not been available yet"
+                "gas": "*",
+                "refund": "*"
             }
         },
         {
@@ -62,7 +63,6 @@
                         }
                     },
                     "code": "file:../output/digital-cash.wasm"
-
                 },
                 "address:acc1": {
                     "nonce": "1",
@@ -72,17 +72,16 @@
                 "address:acc2": {
                     "nonce": "2",
                     "balance": "1,000,000",
-                    "storage": {},
                     "esdt": {
                         "str:CASHTOKEN-123456": "50"
-                    }
+                    },
+                    "storage": {}
                 },
                 "address:digital_cash_owner_address": {
                     "nonce": "1",
                     "balance": "0",
                     "storage": {}
                 }
-
             }
         },
         {
@@ -91,7 +90,6 @@
             "tx": {
                 "from": "address:acc2",
                 "to": "sc:the_digital_cash_contract",
-                "value": "0",
                 "function": "withdraw",
                 "arguments": [
                     "0xe868c2baab2a20b612f1351da5945c52c60f5321c6cde572149db90c9e8fbfc7"
@@ -100,11 +98,12 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "4",
-                "gas": "*",
-                "refund": "*",
+                "message": "str:non-existent key",
                 "logs": "*",
-                "message": "str:non-existent key"
+                "gas": "*",
+                "refund": "*"
             }
         },
         {
@@ -123,7 +122,6 @@
             "tx": {
                 "from": "address:acc2",
                 "to": "sc:the_digital_cash_contract",
-                "value": "0",
                 "function": "withdraw",
                 "arguments": [
                     "0xe868c2baab2a20b612f1351da5945c52c60f5321c6cde572149db90c9e8fbfc8"
@@ -132,11 +130,12 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "0",
-                "gas": "*",
-                "refund": "*",
+                "message": "",
                 "logs": "*",
-                "message": ""
+                "gas": "*",
+                "refund": "*"
             }
         },
         {
@@ -158,7 +157,6 @@
                         }
                     },
                     "code": "file:../output/digital-cash.wasm"
-
                 },
                 "address:acc1": {
                     "nonce": "1",
@@ -168,10 +166,10 @@
                 "address:acc2": {
                     "nonce": "4",
                     "balance": "1,000,000",
-                    "storage": {},
                     "esdt": {
                         "str:CASHTOKEN-123456": "100"
-                    }
+                    },
+                    "storage": {}
                 },
                 "address:digital_cash_owner_address": {
                     "nonce": "1",
@@ -180,7 +178,5 @@
                 }
             }
         }
-
-
     ]
 }

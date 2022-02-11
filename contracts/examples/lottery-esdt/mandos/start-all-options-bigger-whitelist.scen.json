@@ -94,9 +94,9 @@
                             "3-deadline": "u64:123,456",
                             "4-max_entries_per_user": "u32:1",
                             "5-prize_distribution": "u32:2|u8:75|u8:25",
-                            "6-whitelist": "u32:5|address:acc1|address:acc2|address:acc3|address:acc4|address:acc5",
-                            "7-prize_pool": "biguint:0"
-                        }
+                            "6-prize_pool": "biguint:0"
+                        },
+                        "+": ""
                     },
                     "code": "file:../output/lottery-esdt.wasm"
                 }

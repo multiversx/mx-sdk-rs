@@ -23,7 +23,6 @@
             "txId": "deploy",
             "tx": {
                 "from": "address:owner",
-                "value": "0",
                 "contractCode": "file:../output/multi-contract-features.wasm",
                 "arguments": [
                     "123"
@@ -44,7 +43,6 @@
             "txId": "deploy",
             "tx": {
                 "from": "address:owner",
-                "value": "0",
                 "contractCode": "file:../output/multi-contract-features-view.wasm",
                 "arguments": [
                     "sc:multi-contract-features"

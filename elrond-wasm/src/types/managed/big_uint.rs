@@ -8,8 +8,8 @@ use crate::{
 };
 use alloc::string::String;
 use elrond_codec::{
-    DecodeError, EncodeError, NestedDecode, NestedDecodeInput, NestedEncode, NestedEncodeOutput,
-    TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, TryStaticCast,
+    DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode,
+    NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, TryStaticCast,
 };
 
 #[repr(transparent)]
@@ -172,48 +172,61 @@ impl<M: ManagedTypeApi> TryStaticCast for BigUint<M> {}
 
 impl<M: ManagedTypeApi> TopEncode for BigUint<M> {
     #[inline]
-    fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
-        output.set_specialized(self, |else_output| {
-            else_output.set_slice_u8(self.to_bytes_be().as_slice());
+    fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: TopEncodeOutput,
+        H: EncodeErrorHandler,
+    {
+        if O::supports_specialized_type::<Self>() {
+            output.set_specialized(self, h)
+        } else {
+            output.set_slice_u8(self.to_bytes_be().as_slice());
             Ok(())
-        })
+        }
     }
 }
 
 impl<M: ManagedTypeApi> NestedEncode for BigUint<M> {
-    fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
-        dest.push_specialized((), self, |else_output| {
-            self.to_bytes_be().as_slice().dep_encode(else_output)
-        })
+    fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: NestedEncodeOutput,
+        H: EncodeErrorHandler,
+    {
+        if O::supports_specialized_type::<Self>() {
+            dest.push_specialized((), self, h)
+        } else {
+            self.to_bytes_be().dep_encode_or_handle_err(dest, h)
+        }
     }
 }
 
 impl<M: ManagedTypeApi> NestedDecode for BigUint<M> {
-    fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
-        input.read_specialized((), |input| {
-            let boxed_bytes = BoxedBytes::dep_decode(input)?;
+    fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: NestedDecodeInput,
+        H: DecodeErrorHandler,
+    {
+        if I::supports_specialized_type::<Self>() {
+            input.read_specialized((), h)
+        } else {
+            let boxed_bytes = BoxedBytes::dep_decode_or_handle_err(input, h)?;
             Ok(Self::from_bytes_be(boxed_bytes.as_slice()))
-        })
-    }
-
-    fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
-        input: &mut I,
-        c: ExitCtx,
-        exit: fn(ExitCtx, DecodeError) -> !,
-    ) -> Self {
-        input.read_specialized_or_exit((), c, exit, |input, c| {
-            let boxed_bytes = BoxedBytes::dep_decode_or_exit(input, c, exit);
-            Self::from_bytes_be(boxed_bytes.as_slice())
-        })
+        }
     }
 }
 
 impl<M: ManagedTypeApi> TopDecode for BigUint<M> {
-    fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
-        input.into_specialized(|input| {
-            let boxed_bytes = BoxedBytes::top_decode(input)?;
+    fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: TopDecodeInput,
+        H: DecodeErrorHandler,
+    {
+        if I::supports_specialized_type::<Self>() {
+            input.into_specialized(h)
+        } else {
+            let boxed_bytes = BoxedBytes::top_decode_or_handle_err(input, h)?;
             Ok(Self::from_bytes_be(boxed_bytes.as_slice()))
-        })
+        }
     }
 }
 
