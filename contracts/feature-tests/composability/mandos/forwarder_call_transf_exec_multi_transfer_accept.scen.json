@@ -46,7 +46,7 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "function": "forward_transf_exec_accept_funds_multi_transfer",
+                "function": "transf_exec_multi_accept_funds",
                 "arguments": [
                     "sc:vault",
                     "str:FWD-TOKEN",
@@ -121,7 +121,7 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "function": "forward_transf_exec_accept_funds_multi_transfer",
+                "function": "transf_exec_multi_accept_funds",
                 "arguments": [
                     "sc:vault",
                     "str:FWD-TOKEN",

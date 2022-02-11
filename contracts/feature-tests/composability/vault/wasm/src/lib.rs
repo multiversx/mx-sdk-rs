@@ -16,7 +16,6 @@ elrond_wasm_node::wasm_endpoints! {
         echo_arguments
         echo_caller
         get_owner_address
-        just_accept_funds
         reject_funds
         retrieve_funds
         retrieve_funds_with_transfer_exec
