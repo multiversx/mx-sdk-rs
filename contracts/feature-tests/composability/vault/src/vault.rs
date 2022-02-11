@@ -15,12 +15,6 @@ pub trait Vault {
         opt_arg_to_echo
     }
 
-    #[payable("*")]
-    #[endpoint]
-    fn just_accept_funds(&self) {
-        self.call_counts(b"accept_funds").update(|c| *c += 1);
-    }
-
     #[endpoint]
     fn echo_arguments(
         &self,
@@ -123,10 +117,8 @@ pub trait Vault {
     #[endpoint]
     fn reject_funds(
         &self,
-        #[payment_token] token: TokenIdentifier,
-        #[payment] payment: BigUint,
     ) -> SCResult<()> {
-        self.reject_funds_event(&token, &payment);
+        self.reject_funds_event();
         sc_error!("reject_funds")
     }
 
@@ -255,7 +247,7 @@ pub trait Vault {
     );
 
     #[event("reject_funds")]
-    fn reject_funds_event(&self, #[indexed] token: &TokenIdentifier, #[indexed] payment: &BigUint);
+    fn reject_funds_event(&self);
 
     #[event("retrieve_funds")]
     fn retrieve_funds_event(

@@ -89,7 +89,7 @@ pub trait ForwarderTransferExecuteModule {
     }
 
     #[endpoint]
-    fn forward_transf_exec_accept_funds_multi_transfer(
+    fn transf_exec_multi_accept_funds(
         &self,
         to: ManagedAddress,
         #[var_args] token_payments: ManagedVarArgs<MultiArg3<TokenIdentifier, u64, BigUint>>,
@@ -106,6 +106,28 @@ pub trait ForwarderTransferExecuteModule {
         self.vault_proxy()
             .contract(to)
             .accept_funds_multi_transfer()
+            .with_multi_token_transfer(all_token_payments)
+            .transfer_execute()
+    }
+
+    #[endpoint]
+    fn transf_exec_multi_reject_funds(
+        &self,
+        to: ManagedAddress,
+        #[var_args] token_payments: ManagedVarArgs<MultiArg3<TokenIdentifier, u64, BigUint>>,
+    ) {
+        let mut all_token_payments = ManagedVec::new();
+
+        for multi_arg in token_payments.into_iter() {
+            let (token_identifier, token_nonce, amount) = multi_arg.into_tuple();
+            let payment = EsdtTokenPayment::new(token_identifier, token_nonce, amount);
+
+            all_token_payments.push(payment);
+        }
+
+        self.vault_proxy()
+            .contract(to)
+            .reject_funds()
             .with_multi_token_transfer(all_token_payments)
             .transfer_execute()
     }
