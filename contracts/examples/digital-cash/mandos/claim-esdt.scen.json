@@ -180,7 +180,7 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "status": "4",
+                "status": "10",
                 "gas": "*",
                 "refund": "*",
                 "logs": "*",
