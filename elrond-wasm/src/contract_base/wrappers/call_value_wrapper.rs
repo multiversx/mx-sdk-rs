@@ -50,14 +50,24 @@ where
     /// but the EGLD TokenIdentifier is serialized as `EGLD`.
     /// Warning, not tested with multi transfer, use `all_esdt_transfers` instead!
     pub fn token(&self) -> TokenIdentifier<A> {
-        TokenIdentifier::from_raw_handle(A::call_value_api_impl().token())
+        let call_value_api = A::call_value_api_impl();
+        if call_value_api.esdt_num_transfers() == 0 {
+            TokenIdentifier::egld()
+        } else {
+            TokenIdentifier::from_raw_handle(call_value_api.token())
+        }
     }
 
     /// Returns the nonce of the received ESDT token.
     /// Will return 0 in case of EGLD or fungible ESDT transfer.
     /// Warning, not tested with multi transfer, use `all_esdt_transfers` instead!
     pub fn esdt_token_nonce(&self) -> u64 {
-        A::call_value_api_impl().esdt_token_nonce()
+        let call_value_api = A::call_value_api_impl();
+        if call_value_api.esdt_num_transfers() > 0 {
+            call_value_api.esdt_token_nonce()
+        } else {
+            0
+        }
     }
 
     /// Returns the ESDT token type.
@@ -89,9 +99,11 @@ where
     }
 
     pub fn payment(&self) -> EsdtTokenPayment<A> {
-        let (amount, token) = self.payment_token_pair();
-        let nonce = self.esdt_token_nonce();
-
-        EsdtTokenPayment::new(token, nonce, amount)
+        let api = A::call_value_api_impl();
+        if api.esdt_num_transfers() == 0 {
+            EsdtTokenPayment::new(TokenIdentifier::egld(), 0, self.egld_value())
+        } else {
+            EsdtTokenPayment::new(self.token(), self.esdt_token_nonce(), self.esdt_value())
+        }
     }
 }
