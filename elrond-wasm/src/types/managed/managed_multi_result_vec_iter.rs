@@ -1,10 +1,10 @@
 use core::marker::PhantomData;
 
-use elrond_codec::TopDecodeMulti;
+use elrond_codec::{TopDecodeMulti, TopDecodeMultiInput};
 
 use crate::{
     api::{ErrorApi, ManagedTypeApi},
-    ArgErrorHandler, ArgId, DynArgInput, ManagedResultArgLoader,
+    ArgErrorHandler, ArgId, ManagedResultArgLoader,
 };
 
 use super::ManagedMultiResultVec;
