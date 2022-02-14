@@ -1,9 +1,5 @@
 use crate::{
-    abi::TypeAbi,
-    api::ManagedTypeApi,
-    io::{ArgId, DynArg, DynArgInput},
-    types::ManagedBuffer,
-    ContractCallArg, DynArgOutput,
+    abi::TypeAbi, api::ManagedTypeApi, types::ManagedBuffer, ContractCallArg, DynArgOutput,
 };
 use alloc::string::String;
 use elrond_codec::{DecodeErrorHandler, TopDecodeMulti, TopDecodeMultiInput};
@@ -62,30 +58,6 @@ where
                 ManagedBuffer::new()
             };
             Ok(Self::Err(ManagedAsyncCallError { err_code, err_msg }))
-        }
-    }
-}
-
-impl<M, T> DynArg for ManagedAsyncCallResult<M, T>
-where
-    M: ManagedTypeApi,
-    T: DynArg,
-{
-    fn dyn_load<I: DynArgInput>(loader: &mut I, arg_id: ArgId) -> Self {
-        let err_code = u32::dyn_load(loader, arg_id);
-        if err_code == 0 {
-            let arg = T::dyn_load(loader, arg_id);
-            ManagedAsyncCallResult::Ok(arg)
-        } else {
-            let err_msg = if loader.has_next() {
-                ManagedBuffer::dyn_load(loader, arg_id)
-            } else {
-                // error messages should not normally be missing
-                // but there was a problem with Arwen in the past,
-                // so we are keeping this a little longer, for safety
-                ManagedBuffer::new()
-            };
-            ManagedAsyncCallResult::Err(ManagedAsyncCallError { err_code, err_msg })
         }
     }
 }

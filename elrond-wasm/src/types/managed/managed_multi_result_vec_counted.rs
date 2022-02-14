@@ -4,7 +4,7 @@ use super::{ManagedVec, ManagedVecItem};
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer},
     api::ManagedTypeApi,
-    ArgId, ContractCallArg, DynArg, DynArgInput, DynArgOutput,
+    ContractCallArg, DynArgOutput,
 };
 use alloc::string::String;
 use elrond_codec::{
@@ -119,21 +119,6 @@ where
             result.push(T::multi_decode_or_handle_err(input, h)?);
         }
         Ok(result)
-    }
-}
-
-impl<M, T> DynArg for ManagedCountedMultiResultVec<M, T>
-where
-    M: ManagedTypeApi,
-    T: ManagedVecItem + DynArg,
-{
-    fn dyn_load<I: DynArgInput>(loader: &mut I, arg_id: ArgId) -> Self {
-        let mut result = ManagedCountedMultiResultVec::new();
-        let count = usize::dyn_load(loader, arg_id);
-        for _ in 0..count {
-            result.contents.push(T::dyn_load(loader, arg_id));
-        }
-        result
     }
 }
 

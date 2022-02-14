@@ -1,9 +1,4 @@
-use crate::{
-    abi::TypeAbi,
-    io::{ArgId, DynArg, DynArgInput},
-    types::BoxedBytes,
-    ContractCallArg, DynArgOutput,
-};
+use crate::{abi::TypeAbi, types::BoxedBytes, ContractCallArg, DynArgOutput};
 use alloc::string::String;
 use elrond_codec::{DecodeErrorHandler, TopDecodeMulti, TopDecodeMultiInput};
 
@@ -51,29 +46,6 @@ where
                 BoxedBytes::empty()
             };
             Ok(Self::Err(AsyncCallError { err_code, err_msg }))
-        }
-    }
-}
-
-impl<T> DynArg for AsyncCallResult<T>
-where
-    T: DynArg,
-{
-    fn dyn_load<I: DynArgInput>(loader: &mut I, arg_id: ArgId) -> Self {
-        let err_code = u32::dyn_load(loader, arg_id);
-        if err_code == 0 {
-            let arg = T::dyn_load(loader, arg_id);
-            AsyncCallResult::Ok(arg)
-        } else {
-            let err_msg = if loader.has_next() {
-                BoxedBytes::dyn_load(loader, arg_id)
-            } else {
-                // temporary fix, until a problem involving missing error messages in the protocol gets fixed
-                // can be removed after the protocol is patched
-                // error messages should not normally be missing
-                BoxedBytes::empty()
-            };
-            AsyncCallResult::Err(AsyncCallError { err_code, err_msg })
         }
     }
 }
