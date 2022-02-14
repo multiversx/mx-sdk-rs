@@ -3,7 +3,7 @@ use core::any::TypeId;
 /// Use to transfer objects from one generic type to another,
 /// without the compiler being able to determine whether or not the two types are the same.
 /// The cast is statically dispatched.
-pub trait TryStaticCast: Clone + 'static {
+pub trait TryStaticCast: Sized + 'static {
     fn type_eq<U: TryStaticCast>() -> bool {
         TypeId::of::<Self>() == TypeId::of::<U>()
     }

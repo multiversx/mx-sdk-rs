@@ -25,9 +25,9 @@ pub trait Vault {
     fn echo_arguments(
         &self,
         #[var_args] args: ManagedVarArgs<ManagedBuffer>,
-    ) -> SCResult<ManagedMultiResultVec<ManagedBuffer>> {
+    ) -> ManagedMultiResultVec<ManagedBuffer> {
         self.call_counts(b"echo_arguments").update(|c| *c += 1);
-        Ok(args)
+        args
     }
 
     #[endpoint]
@@ -97,7 +97,7 @@ pub trait Vault {
         #[payment_token] token_identifier: TokenIdentifier,
         #[payment_amount] token_payment: BigUint,
         #[payment_nonce] token_nonce: u64,
-    ) -> SCResult<MultiResult4<TokenIdentifier, ManagedBuffer, BigUint, u64>> {
+    ) -> MultiResult4<TokenIdentifier, ManagedBuffer, BigUint, u64> {
         let token_type = self.call_value().esdt_token_type();
 
         self.accept_funds_event(
@@ -110,24 +110,20 @@ pub trait Vault {
         self.call_counts(b"accept_funds_echo_payment")
             .update(|c| *c += 1);
 
-        Ok((
+        (
             token_identifier,
             token_type.as_type_name().into(),
             token_payment,
             token_nonce,
         )
-            .into())
+            .into()
     }
 
     #[payable("*")]
     #[endpoint]
-    fn reject_funds(
-        &self,
-        #[payment_token] token: TokenIdentifier,
-        #[payment] payment: BigUint,
-    ) -> SCResult<()> {
+    fn reject_funds(&self, #[payment_token] token: TokenIdentifier, #[payment] payment: BigUint) {
         self.reject_funds_event(&token, &payment);
-        sc_error!("reject_funds")
+        sc_panic!("reject_funds")
     }
 
     #[payable("*")]
@@ -138,7 +134,7 @@ pub trait Vault {
         token: TokenIdentifier,
         amount: BigUint,
         #[var_args] opt_receive_func: OptionalArg<ManagedBuffer>,
-    ) -> SCResult<()> {
+    ) {
         let caller = self.blockchain().get_caller();
         let func_name = opt_receive_func.into_option().unwrap_or_default();
 
@@ -151,7 +147,7 @@ pub trait Vault {
                 &func_name,
                 &ManagedArgBuffer::new_empty(),
             )
-            .into()
+            .unwrap_or_else(|_| sc_panic!("ESDT transfer failed"));
     }
 
     #[endpoint]

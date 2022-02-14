@@ -7,7 +7,10 @@ use crate::{
     contract_base::ExitCodecErrorHandler,
     elrond_codec::{EncodeError, TopEncode, TopEncodeOutput},
     err_msg,
-    types::{BigInt, BigUint, ManagedBuffer, ManagedBufferCachedBuilder, ManagedType},
+    types::{
+        BigInt, BigUint, ManagedBuffer, ManagedBufferCachedBuilder, ManagedSCError, ManagedType,
+        SCError, StaticSCError,
+    },
 };
 
 #[derive(Clone)]
@@ -101,6 +104,20 @@ where
         H: EncodeErrorHandler,
     {
         arg.top_encode_or_handle_err(self.clone(), h)
+    }
+
+    fn push_multi_specialized<T, H>(&mut self, arg: &T, h: H) -> Result<(), H::HandledErr>
+    where
+        T: TryStaticCast,
+        H: EncodeErrorHandler,
+    {
+        if let Some(static_err) = arg.try_cast_ref::<StaticSCError>() {
+            static_err.finish_err::<FA>()
+        } else if let Some(managed_err) = arg.try_cast_ref::<ManagedSCError<FA>>() {
+            managed_err.finish_err::<FA>()
+        } else {
+            Err(h.handle_error(EncodeError::UNSUPPORTED_OPERATION))
+        }
     }
 }
 
