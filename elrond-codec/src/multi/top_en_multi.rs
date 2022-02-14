@@ -52,3 +52,20 @@ where
         output.push_single_value(self, h)
     }
 }
+
+pub fn multi_encode_iter_or_handle_err<T, Iter, O, H>(
+    iterator: Iter,
+    output: &mut O,
+    h: H,
+) -> Result<(), H::HandledErr>
+where
+    T: TopEncodeMulti,
+    Iter: Iterator<Item = T>,
+    O: TopEncodeMultiOutput,
+    H: EncodeErrorHandler,
+{
+    for item in iterator {
+        item.multi_encode_or_handle_err(output, h)?;
+    }
+    Ok(())
+}

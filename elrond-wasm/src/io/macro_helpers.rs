@@ -1,5 +1,6 @@
 use crate::{
-    api::{EndpointArgumentApi, ErrorApi, ManagedTypeApi},
+    api::{EndpointArgumentApi, EndpointFinishApi, ErrorApi, ManagedTypeApi},
+    contract_base::ExitCodecErrorHandler,
     *,
 };
 use elrond_codec::*;
@@ -30,4 +31,16 @@ where
     value
 
     // T::dyn_load(loader, arg_id)
+}
+
+/// Currently unused, will be possible to use once EndpointResult is eliminated.
+/// This is not yet possible.
+pub fn finish_multi<FA, T>(item: &T)
+where
+    FA: ManagedTypeApi + EndpointFinishApi,
+    T: TopEncodeMulti,
+{
+    let h = ExitCodecErrorHandler::<FA>::from(err_msg::FINISH_ENCODE_ERROR);
+    let mut output = ApiOutputAdapter::<FA>::default();
+    let Ok(()) = item.multi_encode_or_handle_err(&mut output, h);
 }

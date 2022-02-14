@@ -1,8 +1,7 @@
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer},
-    api::{EndpointFinishApi, ManagedTypeApi},
     io::{ArgId, ContractCallArg, DynArg, DynArgInput},
-    DynArgOutput, EndpointResult,
+    DynArgOutput,
 };
 use alloc::{string::String, vec::Vec};
 use core::iter::FromIterator;
@@ -128,23 +127,6 @@ where
             result_vec.push(T::dyn_load(loader, arg_id));
         }
         MultiArgVec(result_vec)
-    }
-}
-
-impl<T> EndpointResult for MultiArgVec<T>
-where
-    T: EndpointResult,
-{
-    type DecodeAs = MultiArgVec<T::DecodeAs>;
-
-    #[inline]
-    fn finish<FA>(&self)
-    where
-        FA: ManagedTypeApi + EndpointFinishApi,
-    {
-        for elem in self.0.iter() {
-            elem.finish::<FA>();
-        }
     }
 }
 

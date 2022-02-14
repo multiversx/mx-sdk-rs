@@ -74,23 +74,6 @@ macro_rules! multi_value_impls {
             //     }
             // }
 
-            // impl<$($name),+> EndpointResult for $mv_struct<$($name,)+>
-            // where
-            //     $($name: EndpointResult,)+
-            // {
-            //     type DecodeAs = Self; // TODO: reassemble from component DecodeAs
-
-            //     #[inline]
-			// 	fn finish<FA>(&self)
-            //     where
-            //         FA: ManagedTypeApi + EndpointFinishApi ,
-            //     {
-            //         $(
-            //             (self.0).$n.finish::<FA>();
-            //         )+
-            //     }
-            // }
-
             // impl<$($name),+> ContractCallArg for &$mv_struct<$($name,)+>
             // where
             //     $($name: ContractCallArg,)+

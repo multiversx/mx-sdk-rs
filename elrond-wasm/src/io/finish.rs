@@ -1,6 +1,6 @@
 use core::marker::PhantomData;
 
-use elrond_codec::{EncodeErrorHandler, TryStaticCast};
+use elrond_codec::{EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput, TryStaticCast};
 
 use crate::{
     api::{EndpointFinishApi, EndpointFinishApiImpl, ManagedTypeApi},
@@ -10,19 +10,20 @@ use crate::{
     types::{BigInt, BigUint, ManagedBuffer, ManagedBufferCachedBuilder, ManagedType},
 };
 
-struct ApiOutputAdapter<FA>
+#[derive(Clone)]
+pub struct ApiOutputAdapter<FA>
 where
     FA: ManagedTypeApi + EndpointFinishApi,
 {
     _phantom: PhantomData<FA>,
 }
 
-impl<FA> ApiOutputAdapter<FA>
+impl<FA> Default for ApiOutputAdapter<FA>
 where
     FA: ManagedTypeApi + EndpointFinishApi,
 {
     #[inline]
-    fn new() -> Self {
+    fn default() -> Self {
         ApiOutputAdapter {
             _phantom: PhantomData,
         }
@@ -88,6 +89,21 @@ where
     }
 }
 
+impl<FA> TopEncodeMultiOutput for ApiOutputAdapter<FA>
+where
+    FA: ManagedTypeApi + EndpointFinishApi,
+{
+    type ValueOutput = Self;
+
+    fn push_single_value<T, H>(&mut self, arg: &T, h: H) -> Result<(), H::HandledErr>
+    where
+        T: TopEncode,
+        H: EncodeErrorHandler,
+    {
+        arg.top_encode_or_handle_err(self.clone(), h)
+    }
+}
+
 /// All types that are returned from endpoints need to implement this trait.
 pub trait EndpointResult: Sized {
     /// Indicates how the result of the endpoint can be interpreted when called via proxy.
@@ -113,7 +129,7 @@ where
 /// All serializable objects can be used as smart contract function result.
 impl<T> EndpointResult for T
 where
-    T: TopEncode,
+    T: TopEncodeMulti,
 {
     type DecodeAs = Self;
 
@@ -121,8 +137,8 @@ where
     where
         FA: ManagedTypeApi + EndpointFinishApi,
     {
-        let Ok(()) = self.top_encode_or_handle_err(
-            ApiOutputAdapter::<FA>::new(),
+        let Ok(()) = self.multi_encode_or_handle_err(
+            &mut ApiOutputAdapter::<FA>::default(),
             ExitCodecErrorHandler::<FA>::from(err_msg::FINISH_ENCODE_ERROR),
         );
     }

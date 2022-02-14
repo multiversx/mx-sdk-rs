@@ -1,10 +1,11 @@
 use alloc::string::String;
+use elrond_codec::{EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput};
 
 use crate::{
     abi::TypeAbi,
-    api::{EndpointFinishApi, ManagedTypeApi},
+    api::ManagedTypeApi,
     types::{BigUint, ManagedVecItem},
-    ArgId, ContractCallArg, DynArg, DynArgInput, DynArgOutput, EndpointResult,
+    ArgId, ContractCallArg, DynArg, DynArgInput, DynArgOutput,
 };
 
 use super::{EsdtTokenPayment, TokenIdentifier};
@@ -65,20 +66,21 @@ where
     }
 }
 
-impl<M> EndpointResult for EsdtTokenPaymentMultiArg<M>
+impl<M> TopEncodeMulti for EsdtTokenPaymentMultiArg<M>
 where
     M: ManagedTypeApi,
 {
-    type DecodeAs = EsdtTokenPaymentMultiArg<M>;
+    type DecodeAs = Self;
 
-    #[inline]
-    fn finish<FA>(&self)
+    fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
     where
-        FA: ManagedTypeApi + EndpointFinishApi,
+        O: TopEncodeMultiOutput,
+        H: EncodeErrorHandler,
     {
-        self.obj.token_identifier.finish::<FA>();
-        self.obj.token_nonce.finish::<FA>();
-        self.obj.amount.finish::<FA>();
+        output.push_single_value(&self.obj.token_identifier, h)?;
+        output.push_single_value(&self.obj.token_nonce, h)?;
+        output.push_single_value(&self.obj.amount, h)?;
+        Ok(())
     }
 }
 

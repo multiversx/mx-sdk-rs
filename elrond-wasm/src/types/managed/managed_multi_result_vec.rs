@@ -1,11 +1,10 @@
 use super::{ManagedBuffer, ManagedType, ManagedVec, ManagedVecItem};
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer},
-    api::{EndpointFinishApi, ErrorApi, ManagedTypeApi},
+    api::{ErrorApi, ManagedTypeApi},
     contract_base::ManagedSerializer,
-    finish_all,
     types::{ManagedArgBuffer, MultiResultVec},
-    ArgId, ContractCallArg, DynArg, DynArgInput, DynArgOutput, EndpointResult,
+    ArgId, ContractCallArg, DynArg, DynArgInput, DynArgOutput,
 };
 use alloc::string::String;
 use core::marker::PhantomData;
@@ -196,22 +195,6 @@ where
         let serializer = ManagedSerializer::<M>::new();
         self.raw_buffers
             .push(serializer.top_encode_to_managed_buffer(&item));
-    }
-}
-
-impl<M, T> EndpointResult for ManagedMultiResultVec<M, T>
-where
-    M: ManagedTypeApi,
-    T: EndpointResult,
-{
-    type DecodeAs = ManagedMultiResultVec<M, T::DecodeAs>;
-
-    #[inline]
-    fn finish<FA>(&self)
-    where
-        FA: ManagedTypeApi + EndpointFinishApi,
-    {
-        finish_all::<FA, _, _>(self.raw_buffers.into_iter());
     }
 }
 
