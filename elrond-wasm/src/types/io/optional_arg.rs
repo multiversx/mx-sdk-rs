@@ -4,7 +4,7 @@ use crate::{
         DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti, TopDecodeMultiInput,
         TopEncodeMulti, TopEncodeMultiOutput,
     },
-    io::{ArgId, ContractCallArg, DynArg, DynArgInput, DynArgOutput},
+    io::{ContractCallArg, DynArgOutput},
 };
 use alloc::string::String;
 
@@ -76,19 +76,6 @@ where
             Ok(OptionalArg::Some(T::multi_decode_or_handle_err(input, h)?))
         } else {
             Ok(OptionalArg::None)
-        }
-    }
-}
-
-impl<T> DynArg for OptionalArg<T>
-where
-    T: DynArg,
-{
-    fn dyn_load<I: DynArgInput>(loader: &mut I, arg_id: ArgId) -> Self {
-        if loader.has_next() {
-            OptionalArg::Some(T::dyn_load(loader, arg_id))
-        } else {
-            OptionalArg::None
         }
     }
 }

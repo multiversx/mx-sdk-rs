@@ -1,11 +1,14 @@
 use alloc::string::String;
-use elrond_codec::{EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput};
+use elrond_codec::{
+    DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti, TopDecodeMultiInput, TopEncodeMulti,
+    TopEncodeMultiOutput,
+};
 
 use crate::{
     abi::TypeAbi,
     api::ManagedTypeApi,
     types::{BigUint, ManagedVecItem},
-    ArgId, ContractCallArg, DynArg, DynArgInput, DynArgOutput,
+    ContractCallArg, DynArgOutput,
 };
 
 use super::{EsdtTokenPayment, TokenIdentifier};
@@ -54,18 +57,6 @@ impl<M: ManagedTypeApi> ManagedVecItem for EsdtTokenPaymentMultiArg<M> {
     }
 }
 
-impl<M> DynArg for EsdtTokenPaymentMultiArg<M>
-where
-    M: ManagedTypeApi,
-{
-    fn dyn_load<I: DynArgInput>(loader: &mut I, arg_id: ArgId) -> Self {
-        let token_identifier = TokenIdentifier::dyn_load(loader, arg_id);
-        let token_nonce = u64::dyn_load(loader, arg_id);
-        let amount = BigUint::dyn_load(loader, arg_id);
-        EsdtTokenPayment::new(token_identifier, token_nonce, amount).into()
-    }
-}
-
 impl<M> TopEncodeMulti for EsdtTokenPaymentMultiArg<M>
 where
     M: ManagedTypeApi,
@@ -81,6 +72,22 @@ where
         output.push_single_value(&self.obj.token_nonce, h)?;
         output.push_single_value(&self.obj.amount, h)?;
         Ok(())
+    }
+}
+
+impl<M> TopDecodeMulti for EsdtTokenPaymentMultiArg<M>
+where
+    M: ManagedTypeApi,
+{
+    fn multi_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: TopDecodeMultiInput,
+        H: DecodeErrorHandler,
+    {
+        let token_identifier = TokenIdentifier::multi_decode_or_handle_err(input, h)?;
+        let token_nonce = u64::multi_decode_or_handle_err(input, h)?;
+        let amount = BigUint::multi_decode_or_handle_err(input, h)?;
+        Ok(EsdtTokenPayment::new(token_identifier, token_nonce, amount).into())
     }
 }
 

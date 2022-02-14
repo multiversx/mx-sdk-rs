@@ -1,8 +1,4 @@
-use crate::{
-    abi::TypeAbi,
-    io::{ArgId, ContractCallArg, DynArg, DynArgInput},
-    DynArgOutput,
-};
+use crate::{abi::TypeAbi, io::ContractCallArg, DynArgOutput};
 use alloc::string::String;
 use elrond_codec::{
     DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti, TopDecodeMultiInput, TopEncodeMulti,
@@ -34,13 +30,6 @@ impl TopDecodeMulti for IgnoreVarArgs {
     {
         input.flush_ignore(h)?;
         Ok(IgnoreVarArgs)
-    }
-}
-
-impl DynArg for IgnoreVarArgs {
-    fn dyn_load<I: DynArgInput>(loader: &mut I, _arg_id: ArgId) -> Self {
-        loader.flush_ignore();
-        IgnoreVarArgs
     }
 }
 

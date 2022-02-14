@@ -4,7 +4,7 @@ use crate::{
     api::{ErrorApi, ManagedTypeApi},
     contract_base::ManagedSerializer,
     types::{ManagedArgBuffer, MultiResultVec},
-    ArgId, ContractCallArg, DynArg, DynArgInput, DynArgOutput,
+    ContractCallArg, DynArgOutput,
 };
 use alloc::string::String;
 use core::marker::PhantomData;
@@ -166,23 +166,6 @@ where
             raw_buffers,
             _phantom: PhantomData,
         })
-    }
-}
-
-impl<M, T> DynArg for ManagedMultiResultVec<M, T>
-where
-    M: ManagedTypeApi,
-    T: DynArg,
-{
-    fn dyn_load<I: DynArgInput>(loader: &mut I, arg_id: ArgId) -> Self {
-        let mut raw_buffers = ManagedVec::new();
-        while loader.has_next() {
-            raw_buffers.push(ManagedBuffer::dyn_load(loader, arg_id));
-        }
-        ManagedMultiResultVec {
-            raw_buffers,
-            _phantom: PhantomData,
-        }
     }
 }
 

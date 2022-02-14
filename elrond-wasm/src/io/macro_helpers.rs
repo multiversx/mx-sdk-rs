@@ -17,7 +17,7 @@ where
     value
 }
 
-/// It's easier to generate code from macros using this function, instead of the DynArg method.
+/// Inserted everywhere an endpoint has a `#[var_args]` annotation.
 pub fn load_dyn_arg<AA, I, T>(arg_input: &mut I, arg_id: ArgId) -> T
 where
     AA: ManagedTypeApi + EndpointArgumentApi + ErrorApi,
@@ -29,8 +29,6 @@ where
     let result = T::multi_decode_or_handle_err(arg_input, h);
     let Ok(value) = result;
     value
-
-    // T::dyn_load(loader, arg_id)
 }
 
 pub fn finish_multi<FA, T>(item: &T)

@@ -1,3 +1,5 @@
+use elrond_codec::TopDecodeMulti;
+
 use crate::{
     api::{
         BlockchainApiImpl, CallTypeApi, ErrorApiImpl, SendApiImpl, ESDT_MULTI_TRANSFER_FUNC_NAME,
@@ -8,7 +10,7 @@ use crate::{
         AsyncCall, BigUint, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer,
         ManagedType, ManagedVec, TokenIdentifier,
     },
-    ArgId, ContractCallArg, DynArg, ManagedResultArgLoader,
+    ArgErrorHandler, ArgId, ContractCallArg, ManagedResultArgLoader,
 };
 use core::marker::PhantomData;
 
@@ -277,8 +279,16 @@ where
 impl<SA, R> ContractCall<SA, R>
 where
     SA: CallTypeApi + 'static,
-    R: DynArg,
+    R: TopDecodeMulti,
 {
+    fn decode_result(raw_result: ManagedVec<SA, ManagedBuffer<SA>>) -> R {
+        let mut loader = ManagedResultArgLoader::new(raw_result);
+        let arg_id = ArgId::from(&b"sync result"[..]);
+        let h = ArgErrorHandler::<SA>::from(arg_id);
+        let Ok(result) = R::multi_decode_or_handle_err(&mut loader, h);
+        result
+    }
+
     /// Executes immediately, synchronously, and returns contract call result.
     /// Only works if the target contract is in the same shard.
     pub fn execute_on_dest_context(mut self) -> R {
@@ -291,8 +301,7 @@ where
             &self.arg_buffer,
         );
 
-        let mut loader = ManagedResultArgLoader::new(raw_result);
-        R::dyn_load(&mut loader, ArgId::from(&b"sync result"[..]))
+        Self::decode_result(raw_result)
     }
 
     /// Executes immediately, synchronously, and returns contract call result.
@@ -316,8 +325,7 @@ where
             range_closure,
         );
 
-        let mut loader = ManagedResultArgLoader::new(raw_result);
-        R::dyn_load(&mut loader, ArgId::from(&b"sync result"[..]))
+        Self::decode_result(raw_result)
     }
 
     pub fn execute_on_dest_context_readonly(mut self) -> R {
@@ -329,8 +337,7 @@ where
             &self.arg_buffer,
         );
 
-        let mut loader = ManagedResultArgLoader::new(raw_result);
-        R::dyn_load(&mut loader, ArgId::from(&b"sync result"[..]))
+        Self::decode_result(raw_result)
     }
 }
 

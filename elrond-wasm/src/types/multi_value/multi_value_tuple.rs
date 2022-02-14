@@ -58,22 +58,6 @@ macro_rules! multi_value_impls {
                 }
             }
 
-            // impl<$($name),+ > DynArg for $mv_struct<$($name,)+>
-            // where
-            //     $($name: DynArg,)+
-            // {
-            //     fn dyn_load<I>(loader: &mut I, arg_id: ArgId) -> Self
-            //     where
-            //         I: DynArgInput,
-            //     {
-            //         $mv_struct((
-            //             $(
-            //                 $name::dyn_load(loader, arg_id)
-            //             ),+
-            //         ))
-            //     }
-            // }
-
             // impl<$($name),+> ContractCallArg for &$mv_struct<$($name,)+>
             // where
             //     $($name: ContractCallArg,)+

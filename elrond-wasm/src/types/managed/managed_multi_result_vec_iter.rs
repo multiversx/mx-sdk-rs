@@ -1,8 +1,10 @@
 use core::marker::PhantomData;
 
+use elrond_codec::TopDecodeMulti;
+
 use crate::{
     api::{ErrorApi, ManagedTypeApi},
-    ArgId, DynArg, DynArgInput, ManagedResultArgLoader,
+    ArgErrorHandler, ArgId, DynArgInput, ManagedResultArgLoader,
 };
 
 use super::ManagedMultiResultVec;
@@ -10,7 +12,7 @@ use super::ManagedMultiResultVec;
 impl<M, T> IntoIterator for ManagedMultiResultVec<M, T>
 where
     M: ManagedTypeApi + ErrorApi,
-    T: DynArg,
+    T: TopDecodeMulti,
 {
     type Item = T;
     type IntoIter = ManagedMultiResultVecIterator<M, T>;
@@ -22,7 +24,7 @@ where
 pub struct ManagedMultiResultVecIterator<M, T>
 where
     M: ManagedTypeApi + ErrorApi,
-    T: DynArg,
+    T: TopDecodeMulti,
 {
     data_loader: ManagedResultArgLoader<M>,
     _phantom: PhantomData<T>,
@@ -31,7 +33,7 @@ where
 impl<M, T> ManagedMultiResultVecIterator<M, T>
 where
     M: ManagedTypeApi + ErrorApi,
-    T: DynArg,
+    T: TopDecodeMulti,
 {
     pub(crate) fn new(obj: ManagedMultiResultVec<M, T>) -> Self {
         ManagedMultiResultVecIterator {
@@ -44,14 +46,16 @@ where
 impl<M, T> Iterator for ManagedMultiResultVecIterator<M, T>
 where
     M: ManagedTypeApi + ErrorApi,
-    T: DynArg,
+    T: TopDecodeMulti,
 {
     type Item = T;
 
     fn next(&mut self) -> Option<T> {
         if self.data_loader.has_next() {
             let arg_id = ArgId::from(&b"var args"[..]);
-            Some(T::dyn_load(&mut self.data_loader, arg_id))
+            let h = ArgErrorHandler::<M>::from(arg_id);
+            let Ok(result) = T::multi_decode_or_handle_err(&mut self.data_loader, h);
+            Some(result)
         } else {
             None
         }

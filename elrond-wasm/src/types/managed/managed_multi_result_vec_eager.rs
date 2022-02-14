@@ -3,7 +3,7 @@ use core::borrow::Borrow;
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer},
     api::ManagedTypeApi,
-    ArgId, ContractCallArg, DynArg, DynArgInput, DynArgOutput,
+    ContractCallArg, DynArgOutput,
 };
 use alloc::string::String;
 use elrond_codec::{
@@ -152,20 +152,6 @@ where
             result_vec.push(T::multi_decode_or_handle_err(input, h)?);
         }
         Ok(ManagedMultiResultVecEager(result_vec))
-    }
-}
-
-impl<M, T> DynArg for ManagedMultiResultVecEager<M, T>
-where
-    M: ManagedTypeApi,
-    T: ManagedVecItem + DynArg,
-{
-    fn dyn_load<I: DynArgInput>(loader: &mut I, arg_id: ArgId) -> Self {
-        let mut result_vec: ManagedVec<M, T> = ManagedVec::new();
-        while loader.has_next() {
-            result_vec.push(T::dyn_load(loader, arg_id));
-        }
-        ManagedMultiResultVecEager(result_vec)
     }
 }
 

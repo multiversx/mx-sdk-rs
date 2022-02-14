@@ -1,6 +1,6 @@
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer},
-    io::{ArgId, ContractCallArg, DynArg, DynArgInput},
+    io::ContractCallArg,
     DynArgOutput,
 };
 use alloc::{string::String, vec::Vec};
@@ -114,19 +114,6 @@ where
             result_vec.push(T::multi_decode_or_handle_err(input, h)?);
         }
         Ok(Self(result_vec))
-    }
-}
-
-impl<T> DynArg for MultiArgVec<T>
-where
-    T: DynArg,
-{
-    fn dyn_load<I: DynArgInput>(loader: &mut I, arg_id: ArgId) -> Self {
-        let mut result_vec: Vec<T> = Vec::new();
-        while loader.has_next() {
-            result_vec.push(T::dyn_load(loader, arg_id));
-        }
-        MultiArgVec(result_vec)
     }
 }
 
