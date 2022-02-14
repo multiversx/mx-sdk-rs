@@ -1,12 +1,12 @@
 use core::marker::PhantomData;
 
 use alloc::{boxed::Box, vec::Vec};
+use elrond_codec::{DecodeError, DecodeErrorHandler, TopDecodeMultiInput};
 
 use crate::{
-    api::{ErrorApi, ErrorApiImpl, ManagedTypeApi},
+    api::{ErrorApi, ManagedTypeApi},
     err_msg,
     types::BoxedBytes,
-    DynArgInput,
 };
 
 /// Consumes a vector of `BoxedBytes` and deserializes from the vector one by one.
@@ -32,30 +32,46 @@ where
     }
 }
 
-impl<A> DynArgInput for BytesArgLoader<A>
+impl<A> TopDecodeMultiInput for BytesArgLoader<A>
 where
     A: ManagedTypeApi + ErrorApi,
 {
-    type ItemInput = Box<[u8]>;
+    type ValueInput = Box<[u8]>;
 
-    type ManagedTypeErrorApi = A;
-
-    #[inline]
     fn has_next(&self) -> bool {
         self.next_index < self.bytes_vec.len()
     }
 
-    fn next_arg_input(&mut self) -> Box<[u8]> {
-        if !self.has_next() {
-            A::error_api_impl().signal_error(err_msg::ARG_WRONG_NUMBER.as_bytes());
+    fn next_value_input<H>(&mut self, h: H) -> Result<Self::ValueInput, H::HandledErr>
+    where
+        H: DecodeErrorHandler,
+    {
+        if self.has_next() {
+            // consume from the vector, get owned bytes
+            // no clone
+            // no vector resize
+            let boxed_bytes =
+                core::mem::replace(&mut self.bytes_vec[self.next_index], BoxedBytes::empty());
+            self.next_index += 1;
+            Ok(boxed_bytes.into_box())
+        } else {
+            Err(h.handle_error(DecodeError::from(err_msg::ARG_WRONG_NUMBER)))
         }
 
-        // consume from the vector, get owned bytes
-        // no clone
-        // no vector resize
-        let boxed_bytes =
-            core::mem::replace(&mut self.bytes_vec[self.next_index], BoxedBytes::empty());
-        self.next_index += 1;
-        boxed_bytes.into_box()
+        // if self.current_index >= self.num_arguments {
+        //     Err(h.handle_error(DecodeError::from(err_msg::ARG_WRONG_NUMBER)))
+        // } else {
+        //     let arg_input = ArgDecodeInput::new(self.current_index);
+        //     self.current_index += 1;
+        //     Ok(arg_input)
+        // }
+    }
+
+    fn flush_ignore<H>(&mut self, _h: H) -> Result<(), H::HandledErr>
+    where
+        H: DecodeErrorHandler,
+    {
+        self.next_index = self.bytes_vec.len();
+        Ok(())
     }
 }

@@ -3,8 +3,8 @@ use core::marker::PhantomData;
 use elrond_codec::{DecodeError, DecodeErrorHandler, TopDecodeMultiInput};
 
 use crate::{
-    api::{EndpointArgumentApi, EndpointArgumentApiImpl, ErrorApi, ErrorApiImpl, ManagedTypeApi},
-    err_msg, ArgDecodeInput, DynArgInput,
+    api::{EndpointArgumentApi, EndpointArgumentApiImpl, ErrorApi, ManagedTypeApi},
+    err_msg, ArgDecodeInput,
 };
 
 #[derive(Default)]
@@ -28,33 +28,6 @@ where
             current_index: 0,
             num_arguments,
         }
-    }
-}
-
-impl<AA> DynArgInput for EndpointDynArgLoader<AA>
-where
-    AA: ManagedTypeApi + ErrorApi + EndpointArgumentApi,
-{
-    type ItemInput = ArgDecodeInput<AA>;
-
-    type ManagedTypeErrorApi = AA;
-
-    fn has_next(&self) -> bool {
-        self.current_index < self.num_arguments
-    }
-
-    fn next_arg_input(&mut self) -> ArgDecodeInput<AA> {
-        if self.current_index >= self.num_arguments {
-            AA::error_api_impl().signal_error(err_msg::ARG_WRONG_NUMBER.as_bytes())
-        } else {
-            let arg_input = ArgDecodeInput::new(self.current_index);
-            self.current_index += 1;
-            arg_input
-        }
-    }
-
-    fn flush_ignore(&mut self) {
-        self.current_index = self.num_arguments;
     }
 }
 

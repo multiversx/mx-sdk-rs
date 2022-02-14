@@ -40,3 +40,12 @@ where
     let mut output = ApiOutputAdapter::<FA>::default();
     let Ok(()) = item.multi_encode_or_handle_err(&mut output, h);
 }
+
+pub fn assert_no_more_args<A, I>(input: &I)
+where
+    A: ManagedTypeApi + ErrorApi,
+    I: TopDecodeMultiInput,
+{
+    let h = ExitCodecErrorHandler::<A>::from(&[][..]);
+    let Ok(()) = input.assert_no_more_args(h);
+}
