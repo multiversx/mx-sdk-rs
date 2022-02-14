@@ -1,12 +1,10 @@
 use core::marker::PhantomData;
 
-use elrond_codec::{EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput, TryStaticCast};
+use elrond_codec::{EncodeErrorHandler, TopEncodeMultiOutput, TryStaticCast};
 
 use crate::{
     api::{EndpointFinishApi, EndpointFinishApiImpl, ManagedTypeApi},
-    contract_base::ExitCodecErrorHandler,
     elrond_codec::{EncodeError, TopEncode, TopEncodeOutput},
-    err_msg,
     types::{
         BigInt, BigUint, ManagedBuffer, ManagedBufferCachedBuilder, ManagedSCError, ManagedType,
         SCError, StaticSCError,
@@ -118,45 +116,5 @@ where
         } else {
             Err(h.handle_error(EncodeError::UNSUPPORTED_OPERATION))
         }
-    }
-}
-
-/// All types that are returned from endpoints need to implement this trait.
-pub trait EndpointResult: Sized {
-    /// Indicates how the result of the endpoint can be interpreted when called via proxy.
-    /// `Self` for most types.
-    type DecodeAs;
-
-    fn finish<FA>(&self)
-    where
-        FA: ManagedTypeApi + EndpointFinishApi;
-}
-
-pub fn finish_all<FA, I, T>(items: I)
-where
-    FA: ManagedTypeApi + EndpointFinishApi,
-    I: Iterator<Item = T>,
-    T: EndpointResult,
-{
-    for item in items {
-        item.finish::<FA>();
-    }
-}
-
-/// All serializable objects can be used as smart contract function result.
-impl<T> EndpointResult for T
-where
-    T: TopEncodeMulti,
-{
-    type DecodeAs = Self;
-
-    fn finish<FA>(&self)
-    where
-        FA: ManagedTypeApi + EndpointFinishApi,
-    {
-        let Ok(()) = self.multi_encode_or_handle_err(
-            &mut ApiOutputAdapter::<FA>::default(),
-            ExitCodecErrorHandler::<FA>::from(err_msg::FINISH_ENCODE_ERROR),
-        );
     }
 }

@@ -33,8 +33,6 @@ where
     // T::dyn_load(loader, arg_id)
 }
 
-/// Currently unused, will be possible to use once EndpointResult is eliminated.
-/// This is not yet possible.
 pub fn finish_multi<FA, T>(item: &T)
 where
     FA: ManagedTypeApi + EndpointFinishApi,
