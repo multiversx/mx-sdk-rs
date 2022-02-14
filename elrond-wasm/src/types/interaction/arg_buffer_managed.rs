@@ -4,7 +4,6 @@ use crate::{
     contract_base::ExitCodecErrorHandler,
     err_msg,
     types::{ManagedBuffer, ManagedType, ManagedVec, ManagedVecRefIterator},
-    DynArgOutput,
 };
 use alloc::vec::Vec;
 use elrond_codec::{
@@ -143,13 +142,6 @@ where
 {
     pub fn raw_arg_iter(&self) -> ManagedVecRefIterator<M, ManagedBuffer<M>> {
         self.data.iter()
-    }
-}
-
-impl<M: ManagedTypeApi> DynArgOutput for ManagedArgBuffer<M> {
-    #[inline]
-    fn push_single_arg<T: TopEncode>(&mut self, arg: T) {
-        self.push_arg(arg)
     }
 }
 
