@@ -58,7 +58,7 @@ pub fn generate_proxy_endpoint(m: &Method, endpoint_name: String) -> proc_macro2
             ArgPaymentMetadata::NotPayment => {
                 let pat = &arg.pat;
                 quote! {
-                    ___contract_call___.push_endpoint_arg(#pat);
+                    ___contract_call___.push_endpoint_arg(&#pat);
                 }
             },
             ArgPaymentMetadata::PaymentToken => {
@@ -161,7 +161,7 @@ pub fn generate_proxy_deploy(init_method: &Method) -> proc_macro2::TokenStream {
             ArgPaymentMetadata::NotPayment => {
                 let pat = &arg.pat;
                 quote! {
-                    ___contract_deploy___.push_endpoint_arg(#pat);
+                    ___contract_deploy___.push_endpoint_arg(&#pat);
                 }
             },
             ArgPaymentMetadata::PaymentToken => {

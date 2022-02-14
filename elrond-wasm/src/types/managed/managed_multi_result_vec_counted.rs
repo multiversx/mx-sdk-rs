@@ -1,15 +1,12 @@
-use core::borrow::Borrow;
-
 use super::{ManagedVec, ManagedVecItem};
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer},
     api::ManagedTypeApi,
-    ContractCallArg, DynArgOutput,
 };
 use alloc::string::String;
 use elrond_codec::{
-    DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti, TopDecodeMultiInput, TopEncode,
-    TopEncodeMulti, TopEncodeMultiOutput,
+    DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti, TopDecodeMultiInput, TopEncodeMulti,
+    TopEncodeMultiOutput,
 };
 
 /// Argument or result that is made up of the argument count, followed by the arguments themselves.
@@ -119,29 +116,6 @@ where
             result.push(T::multi_decode_or_handle_err(input, h)?);
         }
         Ok(result)
-    }
-}
-
-impl<M, T> ContractCallArg for &ManagedCountedMultiResultVec<M, T>
-where
-    M: ManagedTypeApi,
-    T: ManagedVecItem + ContractCallArg + TopEncode,
-{
-    fn push_dyn_arg<O: DynArgOutput>(&self, output: &mut O) {
-        self.len().push_dyn_arg(output);
-        for item in self.contents.iter() {
-            item.borrow().push_dyn_arg(output);
-        }
-    }
-}
-
-impl<M, T> ContractCallArg for ManagedCountedMultiResultVec<M, T>
-where
-    M: ManagedTypeApi,
-    T: ManagedVecItem + ContractCallArg + TopEncode,
-{
-    fn push_dyn_arg<O: DynArgOutput>(&self, output: &mut O) {
-        ContractCallArg::push_dyn_arg(&self, output)
     }
 }
 

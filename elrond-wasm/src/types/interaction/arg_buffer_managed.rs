@@ -9,7 +9,8 @@ use crate::{
 use alloc::vec::Vec;
 use elrond_codec::{
     DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode,
-    NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
+    NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeMultiOutput,
+    TopEncodeOutput,
 };
 
 #[derive(Debug)]
@@ -149,6 +150,20 @@ impl<M: ManagedTypeApi> DynArgOutput for ManagedArgBuffer<M> {
     #[inline]
     fn push_single_arg<T: TopEncode>(&mut self, arg: T) {
         self.push_arg(arg)
+    }
+}
+
+impl<M> TopEncodeMultiOutput for ManagedArgBuffer<M>
+where
+    M: ManagedTypeApi,
+{
+    #[inline]
+    fn push_single_value<T, H>(&mut self, arg: &T, h: H) -> Result<(), H::HandledErr>
+    where
+        T: TopEncode,
+        H: EncodeErrorHandler,
+    {
+        self.data.push_single_value(arg, h)
     }
 }
 

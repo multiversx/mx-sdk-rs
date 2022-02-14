@@ -1,6 +1,5 @@
 mod arg_de_input;
 mod arg_id;
-mod contract_call_arg;
 mod dyn_arg;
 mod dyn_arg_input_bytes;
 mod dyn_arg_input_endpoint;
@@ -12,7 +11,6 @@ mod signal_error;
 
 pub use arg_de_input::*;
 pub use arg_id::ArgId;
-pub use contract_call_arg::*;
 pub use dyn_arg::*;
 pub use dyn_arg_input_bytes::*;
 pub use dyn_arg_input_endpoint::*;

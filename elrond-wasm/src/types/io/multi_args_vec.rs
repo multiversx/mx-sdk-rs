@@ -1,8 +1,4 @@
-use crate::{
-    abi::{TypeAbi, TypeDescriptionContainer},
-    io::ContractCallArg,
-    DynArgOutput,
-};
+use crate::abi::{TypeAbi, TypeDescriptionContainer};
 use alloc::{string::String, vec::Vec};
 use core::iter::FromIterator;
 use elrond_codec::{
@@ -114,26 +110,6 @@ where
             result_vec.push(T::multi_decode_or_handle_err(input, h)?);
         }
         Ok(Self(result_vec))
-    }
-}
-
-impl<T> ContractCallArg for &MultiArgVec<T>
-where
-    T: ContractCallArg,
-{
-    fn push_dyn_arg<O: DynArgOutput>(&self, output: &mut O) {
-        for elem in self.0.iter() {
-            elem.push_dyn_arg(output);
-        }
-    }
-}
-
-impl<T> ContractCallArg for MultiArgVec<T>
-where
-    T: ContractCallArg,
-{
-    fn push_dyn_arg<O: DynArgOutput>(&self, output: &mut O) {
-        ContractCallArg::push_dyn_arg(&self, output)
     }
 }
 

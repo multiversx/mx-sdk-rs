@@ -2,9 +2,9 @@ use super::{ManagedBuffer, ManagedType, ManagedVec, ManagedVecItem};
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer},
     api::{ErrorApi, ManagedTypeApi},
-    contract_base::ManagedSerializer,
+    contract_base::{ExitCodecErrorHandler, ManagedSerializer},
+    err_msg,
     types::{ManagedArgBuffer, MultiResultVec},
-    ContractCallArg, DynArgOutput,
 };
 use alloc::string::String;
 use core::marker::PhantomData;
@@ -45,10 +45,13 @@ where
 impl<M, T> ManagedMultiResultVec<M, T>
 where
     M: ManagedTypeApi + ErrorApi,
-    T: ContractCallArg,
+    T: TopEncodeMulti,
 {
     pub fn push(&mut self, item: T) {
-        item.push_dyn_arg(self);
+        let Ok(()) = item.multi_encode_or_handle_err(
+            &mut self.raw_buffers,
+            ExitCodecErrorHandler::<M>::from(err_msg::SERIALIZER_ENCODE_ERROR),
+        );
     }
 }
 
@@ -166,40 +169,6 @@ where
             raw_buffers,
             _phantom: PhantomData,
         })
-    }
-}
-
-impl<M, T> DynArgOutput for ManagedMultiResultVec<M, T>
-where
-    M: ManagedTypeApi,
-    T: ContractCallArg,
-{
-    fn push_single_arg<I: TopEncode>(&mut self, item: I) {
-        let serializer = ManagedSerializer::<M>::new();
-        self.raw_buffers
-            .push(serializer.top_encode_to_managed_buffer(&item));
-    }
-}
-
-impl<M, T> ContractCallArg for &ManagedMultiResultVec<M, T>
-where
-    M: ManagedTypeApi,
-    T: ContractCallArg,
-{
-    fn push_dyn_arg<O: DynArgOutput>(&self, output: &mut O) {
-        for elem in self.raw_buffers.into_iter() {
-            elem.push_dyn_arg(output);
-        }
-    }
-}
-
-impl<M, T> ContractCallArg for ManagedMultiResultVec<M, T>
-where
-    M: ManagedTypeApi,
-    T: ContractCallArg,
-{
-    fn push_dyn_arg<O: DynArgOutput>(&self, output: &mut O) {
-        ContractCallArg::push_dyn_arg(&self, output)
     }
 }
 
