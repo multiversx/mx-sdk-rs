@@ -1,8 +1,7 @@
 use crate::{
     abi::TypeAbi,
-    api::{EndpointFinishApi, ManagedTypeApi},
     io::{ArgId, ContractCallArg, DynArg, DynArgInput},
-    DynArgOutput, EndpointResult,
+    DynArgOutput,
 };
 use alloc::string::String;
 use elrond_codec::{
@@ -42,17 +41,6 @@ impl DynArg for IgnoreVarArgs {
     fn dyn_load<I: DynArgInput>(loader: &mut I, _arg_id: ArgId) -> Self {
         loader.flush_ignore();
         IgnoreVarArgs
-    }
-}
-
-impl EndpointResult for IgnoreVarArgs {
-    type DecodeAs = IgnoreVarArgs;
-
-    #[inline]
-    fn finish<FA>(&self)
-    where
-        FA: ManagedTypeApi + EndpointFinishApi,
-    {
     }
 }
 

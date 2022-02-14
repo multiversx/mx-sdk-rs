@@ -3,11 +3,14 @@ use core::borrow::Borrow;
 use super::{ManagedVec, ManagedVecItem};
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer},
-    api::{EndpointFinishApi, ManagedTypeApi},
-    finish_all, ArgId, ContractCallArg, DynArg, DynArgInput, DynArgOutput, EndpointResult,
+    api::ManagedTypeApi,
+    ArgId, ContractCallArg, DynArg, DynArgInput, DynArgOutput,
 };
 use alloc::string::String;
-use elrond_codec::TopEncode;
+use elrond_codec::{
+    DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti, TopDecodeMultiInput, TopEncode,
+    TopEncodeMulti, TopEncodeMultiOutput,
+};
 
 /// Argument or result that is made up of the argument count, followed by the arguments themselves.
 /// Think of it as a `VarArgs` preceded by the count.
@@ -80,6 +83,45 @@ where
     }
 }
 
+impl<M, T> TopEncodeMulti for ManagedCountedMultiResultVec<M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedVecItem + TopEncodeMulti,
+{
+    type DecodeAs = Self;
+
+    fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: TopEncodeMultiOutput,
+        H: EncodeErrorHandler,
+    {
+        self.len().multi_encode_or_handle_err(output, h)?;
+        for elem in self.contents.into_iter() {
+            elem.multi_encode_or_handle_err(output, h)?;
+        }
+        Ok(())
+    }
+}
+
+impl<M, T> TopDecodeMulti for ManagedCountedMultiResultVec<M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedVecItem + TopDecodeMulti,
+{
+    fn multi_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: TopDecodeMultiInput,
+        H: DecodeErrorHandler,
+    {
+        let count = usize::multi_decode_or_handle_err(input, h)?;
+        let mut result = ManagedCountedMultiResultVec::new();
+        for _ in 0..count {
+            result.push(T::multi_decode_or_handle_err(input, h)?);
+        }
+        Ok(result)
+    }
+}
+
 impl<M, T> DynArg for ManagedCountedMultiResultVec<M, T>
 where
     M: ManagedTypeApi,
@@ -92,23 +134,6 @@ where
             result.contents.push(T::dyn_load(loader, arg_id));
         }
         result
-    }
-}
-
-impl<M, T> EndpointResult for ManagedCountedMultiResultVec<M, T>
-where
-    M: ManagedTypeApi,
-    T: ManagedVecItem + EndpointResult,
-{
-    type DecodeAs = ManagedCountedMultiResultVec<M, T>;
-
-    #[inline]
-    fn finish<FA>(&self)
-    where
-        FA: ManagedTypeApi + EndpointFinishApi,
-    {
-        self.len().finish::<FA>();
-        finish_all::<FA, _, _>(self.contents.into_iter());
     }
 }
 

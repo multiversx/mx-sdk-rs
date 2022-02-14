@@ -1,12 +1,10 @@
 use crate::{
     abi::{OutputAbi, TypeAbi, TypeDescriptionContainer},
-    api::{EndpointFinishApi, ManagedTypeApi},
     elrond_codec::{
         DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti, TopDecodeMultiInput,
         TopEncodeMulti, TopEncodeMultiOutput,
     },
     io::{ArgId, ContractCallArg, DynArg, DynArgInput, DynArgOutput},
-    EndpointResult,
 };
 use alloc::{string::String, vec::Vec};
 
@@ -66,23 +64,6 @@ macro_rules! multi_arg_impls {
                             $name::dyn_load(loader, arg_id)
                         ),+
                     ))
-                }
-            }
-
-            impl<$($name),+> EndpointResult for $marg_struct<$($name,)+>
-            where
-                $($name: EndpointResult,)+
-            {
-                type DecodeAs = Self; // TODO: reassemble from component DecodeAs
-
-                #[inline]
-				fn finish<FA>(&self)
-                where
-                    FA: ManagedTypeApi + EndpointFinishApi ,
-                {
-                    $(
-                        (self.0).$n.finish::<FA>();
-                    )+
                 }
             }
 

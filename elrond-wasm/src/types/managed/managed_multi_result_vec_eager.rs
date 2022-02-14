@@ -2,8 +2,8 @@ use core::borrow::Borrow;
 
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer},
-    api::{EndpointFinishApi, ManagedTypeApi},
-    ArgId, ContractCallArg, DynArg, DynArgInput, DynArgOutput, EndpointResult,
+    api::ManagedTypeApi,
+    ArgId, ContractCallArg, DynArg, DynArgInput, DynArgOutput,
 };
 use alloc::string::String;
 use elrond_codec::{
@@ -152,12 +152,6 @@ where
             result_vec.push(T::multi_decode_or_handle_err(input, h)?);
         }
         Ok(ManagedMultiResultVecEager(result_vec))
-
-        // let mut raw_buffers = ManagedVec::new();
-        // while input.has_next() {
-        //     raw_buffers.push(T::multi_decode_or_handle_err(input, h)?);
-        // }
-        // Ok(ManagedMultiResultVecEager(result_vec))
     }
 }
 
@@ -175,23 +169,6 @@ where
     }
 }
 
-impl<M, T> EndpointResult for ManagedMultiResultVecEager<M, T>
-where
-    M: ManagedTypeApi,
-    T: ManagedVecItem + EndpointResult + TopEncode,
-{
-    type DecodeAs = ManagedMultiResultVecEager<M, T>;
-
-    #[inline]
-    fn finish<FA>(&self)
-    where
-        FA: ManagedTypeApi + EndpointFinishApi,
-    {
-        for elem in self.0.iter() {
-            elem.borrow().finish::<FA>();
-        }
-    }
-}
 impl<M, T> ContractCallArg for &ManagedMultiResultVecEager<M, T>
 where
     M: ManagedTypeApi,

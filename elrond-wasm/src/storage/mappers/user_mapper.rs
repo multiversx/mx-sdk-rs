@@ -1,11 +1,13 @@
 use core::marker::PhantomData;
 
+use elrond_codec::{
+    multi_encode_iter_or_handle_err, EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput,
+};
+
 use super::StorageMapper;
 use crate::{
     abi::{TypeAbi, TypeName},
-    api::{EndpointFinishApi, ManagedTypeApi, StorageMapperApi},
-    finish_all,
-    io::EndpointResult,
+    api::StorageMapperApi,
     storage::{storage_get, storage_get_len, storage_set, StorageKey},
     types::{ManagedAddress, ManagedType, ManagedVec, MultiResultVec},
 };
@@ -175,18 +177,19 @@ where
 
 /// Behaves like a MultiResultVec<Address> when an endpoint result,
 /// and lists all users addresses.
-impl<SA> EndpointResult for UserMapper<SA>
+impl<SA> TopEncodeMulti for UserMapper<SA>
 where
     SA: StorageMapperApi,
 {
     type DecodeAs = MultiResultVec<ManagedAddress<SA>>;
 
-    fn finish<FA>(&self)
+    fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
     where
-        FA: ManagedTypeApi + EndpointFinishApi,
+        O: TopEncodeMultiOutput,
+        H: EncodeErrorHandler,
     {
         let all_addresses = self.get_all_addresses();
-        finish_all::<FA, _, _>(all_addresses.into_iter());
+        multi_encode_iter_or_handle_err(all_addresses.into_iter(), output, h)
     }
 }
 

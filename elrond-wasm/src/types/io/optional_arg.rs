@@ -1,12 +1,10 @@
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer},
-    api::{EndpointFinishApi, ManagedTypeApi},
     elrond_codec::{
         DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti, TopDecodeMultiInput,
         TopEncodeMulti, TopEncodeMultiOutput,
     },
     io::{ArgId, ContractCallArg, DynArg, DynArgInput, DynArgOutput},
-    EndpointResult,
 };
 use alloc::string::String;
 
@@ -91,23 +89,6 @@ where
             OptionalArg::Some(T::dyn_load(loader, arg_id))
         } else {
             OptionalArg::None
-        }
-    }
-}
-
-impl<T> EndpointResult for OptionalArg<T>
-where
-    T: EndpointResult,
-{
-    type DecodeAs = OptionalArg<T::DecodeAs>;
-
-    #[inline]
-    fn finish<FA>(&self)
-    where
-        FA: ManagedTypeApi + EndpointFinishApi,
-    {
-        if let OptionalResult::Some(t) = self {
-            t.finish::<FA>();
         }
     }
 }
