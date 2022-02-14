@@ -34,7 +34,7 @@
                 "out": [],
                 "status": "4",
                 "message": "str:storage decode error: input too long",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }

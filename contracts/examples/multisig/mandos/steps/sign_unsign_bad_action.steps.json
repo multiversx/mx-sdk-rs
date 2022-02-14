@@ -18,7 +18,7 @@
                 "out": [],
                 "status": "4",
                 "message": "str:action does not exist",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -40,7 +40,7 @@
                 "out": [],
                 "status": "4",
                 "message": "str:action does not exist",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -62,7 +62,7 @@
                 "out": [],
                 "status": "4",
                 "message": "str:action does not exist",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -84,7 +84,7 @@
                 "out": [],
                 "status": "4",
                 "message": "str:action does not exist",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }

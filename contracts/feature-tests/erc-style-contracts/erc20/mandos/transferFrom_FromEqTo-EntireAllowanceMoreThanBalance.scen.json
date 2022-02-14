@@ -40,7 +40,7 @@
                 "out": [],
                 "status": "0x04",
                 "message": "str:insufficient funds",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }

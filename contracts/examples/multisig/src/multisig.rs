@@ -21,14 +21,9 @@ pub trait Multisig:
     + multisig_perform::MultisigPerformModule
 {
     #[init]
-    fn init(
-        &self,
-        quorum: usize,
-        #[var_args] board: ManagedVarArgs<ManagedAddress>,
-    ) -> SCResult<()> {
+    fn init(&self, quorum: usize, #[var_args] board: ManagedVarArgs<ManagedAddress>) {
         let board_vec = board.to_vec();
-
-        let new_num_board_members = self.add_multiple_board_members(board_vec)?;
+        let new_num_board_members = self.add_multiple_board_members(board_vec);
 
         let num_proposers = self.num_proposers().get();
         require!(
@@ -41,8 +36,6 @@ pub trait Multisig:
             "quorum cannot exceed board size"
         );
         self.quorum().set(quorum);
-
-        Ok(())
     }
 
     /// Allows the contract to receive funds even if it is marked as unpayable in the protocol.
@@ -126,7 +119,7 @@ pub trait Multisig:
 
     /// Used by board members to sign actions.
     #[endpoint]
-    fn sign(&self, action_id: usize) -> SCResult<()> {
+    fn sign(&self, action_id: usize) {
         require!(
             !self.action_mapper().item_is_empty_unchecked(action_id),
             "action does not exist"
@@ -138,14 +131,12 @@ pub trait Multisig:
         if !self.action_signer_ids(action_id).contains(&caller_id) {
             self.action_signer_ids(action_id).insert(caller_id);
         }
-
-        Ok(())
     }
 
     /// Board members can withdraw their signatures if they no longer desire for the action to be executed.
     /// Actions that are left with no valid signatures can be then deleted to free up storage.
     #[endpoint]
-    fn unsign(&self, action_id: usize) -> SCResult<()> {
+    fn unsign(&self, action_id: usize) {
         require!(
             !self.action_mapper().item_is_empty_unchecked(action_id),
             "action does not exist"
@@ -155,14 +146,13 @@ pub trait Multisig:
         require!(caller_role.can_sign(), "only board members can un-sign");
 
         self.action_signer_ids(action_id).swap_remove(&caller_id);
-        Ok(())
     }
 
     /// Clears storage pertaining to an action that is no longer supposed to be executed.
     /// Any signatures that the action received must first be removed, via `unsign`.
     /// Otherwise this endpoint would be prone to abuse.
     #[endpoint(discardAction)]
-    fn discard_action(&self, action_id: usize) -> SCResult<()> {
+    fn discard_action(&self, action_id: usize) {
         let (_, caller_role) = self.get_caller_id_and_role();
         require!(
             caller_role.can_discard_action(),
@@ -174,6 +164,5 @@ pub trait Multisig:
         );
 
         self.clear_action(action_id);
-        Ok(())
     }
 }

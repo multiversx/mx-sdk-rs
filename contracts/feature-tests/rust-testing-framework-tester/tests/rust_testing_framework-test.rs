@@ -3,7 +3,7 @@ use forwarder::call_sync::*;
 use num_traits::ToPrimitive;
 
 use elrond_wasm::types::{
-    Address, BigInt, EsdtLocalRole, EsdtTokenPayment, EsdtTokenType, ManagedBuffer, ManagedVec,
+    Address, BigUint, EsdtLocalRole, EsdtTokenPayment, EsdtTokenType, ManagedVec,
 };
 use elrond_wasm_debug::{
     assert_values_eq, managed_address, managed_biguint, managed_buffer, managed_token_id,
@@ -1079,7 +1079,7 @@ fn test_async_call() {
     wrapper
         .execute_query(&adder_wrapper, |sc| {
             let current_sum = sc.sum().get();
-            let expected_sum = BigInt::from(10);
+            let expected_sum = BigUint::from(10u32);
             assert_eq!(current_sum, expected_sum);
         })
         .assert_ok();
@@ -1152,12 +1152,11 @@ fn fixed_address_invalid_sc_test() {
 #[test]
 fn managed_environment_test() {
     let wrapper = BlockchainStateWrapper::new();
-    wrapper.execute_in_managed_environment(|| {
-        let _my_struct = StructWithManagedTypes::<DebugApi> {
+    let _my_struct =
+        wrapper.execute_in_managed_environment(|| StructWithManagedTypes::<DebugApi> {
             big_uint: managed_biguint!(500),
             buffer: managed_buffer!(b"MyBuffer"),
-        };
-    })
+        });
 }
 
 #[should_panic]
@@ -1305,4 +1304,146 @@ fn test_back_and_forth_transfers() {
         &third_token_id[..],
         &third_token_amount,
     );
+}
+
+#[test]
+fn dump_state_single_test() {
+    let mut wrapper = BlockchainStateWrapper::new();
+    let sc_wrapper = wrapper.create_sc_account(
+        &rust_biguint!(0),
+        None,
+        rust_testing_framework_tester::contract_obj,
+        SC_WASM_PATH,
+    );
+    let fungible_token_id = &b"COOL-123456"[..];
+    let semi_fungible_token_id = &b"NOTCOOL-123456"[..];
+    let sft_attributes_first = NftDummyAttributes {
+        creation_epoch: 2,
+        cool_factor: 100,
+    };
+    let sft_attributes_second = NftDummyAttributes {
+        creation_epoch: 5,
+        cool_factor: 255,
+    };
+
+    wrapper.set_egld_balance(sc_wrapper.address_ref(), &rust_biguint!(444));
+    wrapper.set_esdt_balance(
+        sc_wrapper.address_ref(),
+        fungible_token_id,
+        &rust_biguint!(1_000),
+    );
+    wrapper.set_nft_balance(
+        sc_wrapper.address_ref(),
+        semi_fungible_token_id,
+        5,
+        &rust_biguint!(200),
+        &sft_attributes_first,
+    );
+    wrapper.set_nft_balance(
+        sc_wrapper.address_ref(),
+        semi_fungible_token_id,
+        10,
+        &rust_biguint!(300),
+        &sft_attributes_second,
+    );
+
+    wrapper.dump_state_for_account::<NftDummyAttributes>(sc_wrapper.address_ref());
+}
+
+#[test]
+fn dump_state_raw_attributes_test() {
+    let mut wrapper = BlockchainStateWrapper::new();
+    let sc_wrapper = wrapper.create_sc_account(
+        &rust_biguint!(0),
+        None,
+        rust_testing_framework_tester::contract_obj,
+        SC_WASM_PATH,
+    );
+    let fungible_token_id = &b"COOL-123456"[..];
+    let semi_fungible_token_id = &b"NOTCOOL-123456"[..];
+    let sft_attributes_first = NftDummyAttributes {
+        creation_epoch: 2,
+        cool_factor: 100,
+    };
+    let sft_attributes_second = NftDummyAttributes {
+        creation_epoch: 5,
+        cool_factor: 255,
+    };
+
+    wrapper.set_egld_balance(sc_wrapper.address_ref(), &rust_biguint!(444));
+    wrapper.set_esdt_balance(
+        sc_wrapper.address_ref(),
+        fungible_token_id,
+        &rust_biguint!(1_000),
+    );
+    wrapper.set_nft_balance(
+        sc_wrapper.address_ref(),
+        semi_fungible_token_id,
+        5,
+        &rust_biguint!(200),
+        &sft_attributes_first,
+    );
+    wrapper.set_nft_balance(
+        sc_wrapper.address_ref(),
+        semi_fungible_token_id,
+        10,
+        &rust_biguint!(300),
+        &sft_attributes_second,
+    );
+
+    wrapper.dump_state_for_account_hex_attributes(sc_wrapper.address_ref());
+}
+
+#[test]
+fn dump_state_all_test() {
+    let mut wrapper = BlockchainStateWrapper::new();
+    let user_addr = wrapper.create_user_account(&rust_biguint!(333));
+    let sc_wrapper = wrapper.create_sc_account(
+        &rust_biguint!(0),
+        None,
+        rust_testing_framework_tester::contract_obj,
+        SC_WASM_PATH,
+    );
+    let fungible_token_id = &b"COOL-123456"[..];
+    let semi_fungible_token_id = &b"NOTCOOL-123456"[..];
+    let sft_attributes_first = NftDummyAttributes {
+        creation_epoch: 2,
+        cool_factor: 100,
+    };
+    let sft_attributes_second = NftDummyAttributes {
+        creation_epoch: 5,
+        cool_factor: 255,
+    };
+
+    wrapper.set_egld_balance(sc_wrapper.address_ref(), &rust_biguint!(444));
+    wrapper.set_esdt_balance(
+        sc_wrapper.address_ref(),
+        fungible_token_id,
+        &rust_biguint!(1_000),
+    );
+    wrapper.set_nft_balance(
+        sc_wrapper.address_ref(),
+        semi_fungible_token_id,
+        5,
+        &rust_biguint!(200),
+        &sft_attributes_first,
+    );
+    wrapper.set_nft_balance(
+        sc_wrapper.address_ref(),
+        semi_fungible_token_id,
+        10,
+        &rust_biguint!(300),
+        &sft_attributes_second,
+    );
+
+    wrapper
+        .execute_tx(&user_addr, &sc_wrapper, &rust_biguint!(0), |sc| {
+            sc.total_value().set(&managed_biguint!(1_000_000));
+            sc.value_per_caller(&managed_address!(&user_addr))
+                .set(&managed_biguint!(2_000_000));
+            sc.callback_executed().set(&true);
+        })
+        .assert_ok();
+
+    wrapper.dump_state();
 }

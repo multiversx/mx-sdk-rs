@@ -27,52 +27,51 @@ pub trait Pair:
 
     #[payable("*")]
     #[endpoint(createBuyOrder)]
-    fn create_buy_order_endpoint(&self, params: OrderInputParams<Self::Api>) -> SCResult<()> {
-        self.require_global_op_not_ongoing()?;
-        self.require_valid_order_input_params(&params)?;
-        let payment = self.require_valid_buy_payment()?;
+    fn create_buy_order_endpoint(&self, params: OrderInputParams<Self::Api>) {
+        self.require_global_op_not_ongoing();
+        self.require_valid_order_input_params(&params);
+        let payment = self.require_valid_buy_payment();
 
-        self.create_order(payment, params, common::OrderType::Buy)
+        self.create_order(payment, params, common::OrderType::Buy);
     }
 
     #[payable("*")]
     #[endpoint(createSellOrder)]
-    fn create_sell_order_endpoint(&self, params: OrderInputParams<Self::Api>) -> SCResult<()> {
-        self.require_global_op_not_ongoing()?;
-        self.require_valid_order_input_params(&params)?;
-        let payment = self.require_valid_sell_payment()?;
+    fn create_sell_order_endpoint(&self, params: OrderInputParams<Self::Api>) {
+        self.require_global_op_not_ongoing();
+        self.require_valid_order_input_params(&params);
+        let payment = self.require_valid_sell_payment();
 
-        self.create_order(payment, params, common::OrderType::Sell)
+        self.create_order(payment, params, common::OrderType::Sell);
     }
 
     #[endpoint(matchOrders)]
-    fn match_orders_endpoint(&self, order_ids: Vec<u64>) -> SCResult<()> {
-        self.require_global_op_not_ongoing()?;
-        self.require_valid_match_input_order_ids(&order_ids)?;
+    fn match_orders_endpoint(&self, order_ids: Vec<u64>) {
+        self.require_global_op_not_ongoing();
+        self.require_valid_match_input_order_ids(&order_ids);
 
-        self.match_orders(order_ids)
+        self.match_orders(order_ids);
     }
 
     #[endpoint(cancelOrders)]
-    fn cancel_orders_endpoint(&self, order_ids: Vec<u64>) -> SCResult<()> {
-        self.require_global_op_not_ongoing()?;
-        self.require_order_ids_not_empty(&order_ids)?;
+    fn cancel_orders_endpoint(&self, order_ids: Vec<u64>) {
+        self.require_global_op_not_ongoing();
+        self.require_order_ids_not_empty(&order_ids);
 
-        self.cancel_orders(order_ids)
+        self.cancel_orders(order_ids);
     }
 
     #[endpoint(cancelAllOrders)]
-    fn cancel_all_orders_endpoint(&self) -> SCResult<()> {
-        self.require_global_op_not_ongoing()?;
-
-        self.cancel_all_orders()
+    fn cancel_all_orders_endpoint(&self) {
+        self.require_global_op_not_ongoing();
+        self.cancel_all_orders();
     }
 
     #[endpoint(freeOrders)]
-    fn free_orders_endpoint(&self, order_ids: Vec<u64>) -> SCResult<()> {
-        self.require_global_op_not_ongoing()?;
-        self.require_order_ids_not_empty(&order_ids)?;
+    fn free_orders_endpoint(&self, order_ids: Vec<u64>) {
+        self.require_global_op_not_ongoing();
+        self.require_order_ids_not_empty(&order_ids);
 
-        self.free_orders(order_ids)
+        self.free_orders(order_ids);
     }
 }

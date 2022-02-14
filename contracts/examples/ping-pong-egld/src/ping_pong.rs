@@ -50,11 +50,9 @@ pub trait PingPong {
     /// Optional `_data` argument is ignored.
     #[payable("EGLD")]
     #[endpoint]
-    fn ping(
-        &self,
-        #[payment] payment: BigUint,
-        #[var_args] _data: OptionalArg<BoxedBytes>,
-    ) -> SCResult<()> {
+    fn ping(&self, #[var_args] _data: OptionalArg<ManagedBuffer>) {
+        let payment = self.call_value().egld_value();
+
         require!(
             payment == self.ping_amount().get(),
             "the payment must match the fixed sum"
@@ -88,43 +86,38 @@ pub trait PingPong {
         match user_status {
             UserStatus::New => {
                 self.user_status(user_id).set(UserStatus::Registered);
-                Ok(())
             },
             UserStatus::Registered => {
-                sc_error!("can only ping once")
+                sc_panic!("can only ping once")
             },
             UserStatus::Withdrawn => {
-                sc_error!("already withdrawn")
+                sc_panic!("already withdrawn")
             },
         }
     }
 
-    fn pong_by_user_id(&self, user_id: usize) -> SCResult<()> {
+    fn pong_by_user_id(&self, user_id: usize) -> Result<(), &'static str> {
         let user_status = self.user_status(user_id).get();
         match user_status {
-            UserStatus::New => {
-                sc_error!("can't pong, never pinged")
-            },
+            UserStatus::New => Result::Err("can't pong, never pinged"),
             UserStatus::Registered => {
                 self.user_status(user_id).set(UserStatus::Withdrawn);
                 if let Some(user_address) = self.user_mapper().get_user_address(user_id) {
                     self.send()
                         .direct_egld(&user_address, &self.ping_amount().get(), b"pong");
-                    Ok(())
+                    Result::Ok(())
                 } else {
-                    sc_error!("unknown user")
+                    Result::Err("unknown user")
                 }
             },
-            UserStatus::Withdrawn => {
-                sc_error!("already withdrawn")
-            },
+            UserStatus::Withdrawn => Result::Err("already withdrawn"),
         }
     }
 
     /// User can take back funds from the contract.
     /// Can only be called after expiration.
     #[endpoint]
-    fn pong(&self) -> SCResult<()> {
+    fn pong(&self) {
         require!(
             self.blockchain().get_block_timestamp() >= self.deadline().get(),
             "can't withdraw before deadline"
@@ -132,7 +125,10 @@ pub trait PingPong {
 
         let caller = self.blockchain().get_caller();
         let user_id = self.user_mapper().get_user_id(&caller);
-        self.pong_by_user_id(user_id)
+        let pong_result = self.pong_by_user_id(user_id);
+        if let Result::Err(message) = pong_result {
+            sc_panic!(message);
+        }
     }
 
     /// Send back funds to all users who pinged.
@@ -141,7 +137,7 @@ pub trait PingPong {
     /// - `interrupted` if run out of gas midway.
     /// Can only be called after expiration.
     #[endpoint(pongAll)]
-    fn pong_all(&self) -> SCResult<OperationCompletionStatus> {
+    fn pong_all(&self) -> OperationCompletionStatus {
         require!(
             self.blockchain().get_block_timestamp() >= self.deadline().get(),
             "can't withdraw before deadline"
@@ -154,15 +150,17 @@ pub trait PingPong {
                 // clear field and reset to 0
                 pong_all_last_user = 0;
                 self.pong_all_last_user().set(pong_all_last_user);
-                return Ok(OperationCompletionStatus::Completed);
+                return OperationCompletionStatus::Completed;
             }
 
             if self.blockchain().get_gas_left() < PONG_ALL_LOW_GAS_LIMIT {
                 self.pong_all_last_user().set(pong_all_last_user);
-                return Ok(OperationCompletionStatus::InterruptedBeforeOutOfGas);
+                return OperationCompletionStatus::InterruptedBeforeOutOfGas;
             }
 
             pong_all_last_user += 1;
+
+            // in case of error just ignore the error and skip
             let _ = self.pong_by_user_id(pong_all_last_user);
         }
     }
