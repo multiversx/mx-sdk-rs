@@ -1,4 +1,4 @@
-use crate::{abi::TypeAbi, io::ContractCallArg, DynArgOutput};
+use crate::abi::TypeAbi;
 use alloc::string::String;
 use elrond_codec::{
     DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti, TopDecodeMultiInput, TopEncodeMulti,
@@ -31,14 +31,6 @@ impl TopDecodeMulti for IgnoreVarArgs {
         input.flush_ignore(h)?;
         Ok(IgnoreVarArgs)
     }
-}
-
-impl ContractCallArg for &IgnoreVarArgs {
-    fn push_dyn_arg<O: DynArgOutput>(&self, _output: &mut O) {}
-}
-
-impl ContractCallArg for IgnoreVarArgs {
-    fn push_dyn_arg<O: DynArgOutput>(&self, _output: &mut O) {}
 }
 
 impl TypeAbi for IgnoreVarArgs {

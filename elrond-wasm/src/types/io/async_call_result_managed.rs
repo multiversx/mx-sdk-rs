@@ -1,8 +1,9 @@
-use crate::{
-    abi::TypeAbi, api::ManagedTypeApi, types::ManagedBuffer, ContractCallArg, DynArgOutput,
-};
+use crate::{abi::TypeAbi, api::ManagedTypeApi, types::ManagedBuffer};
 use alloc::string::String;
-use elrond_codec::{DecodeErrorHandler, TopDecodeMulti, TopDecodeMultiInput};
+use elrond_codec::{
+    DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti, TopDecodeMultiInput, TopEncodeMulti,
+    TopEncodeMultiOutput,
+};
 
 pub struct ManagedAsyncCallError<M>
 where
@@ -62,32 +63,33 @@ where
     }
 }
 
-impl<M, T> ContractCallArg for &ManagedAsyncCallResult<M, T>
+impl<M, T> TopEncodeMulti for ManagedAsyncCallResult<M, T>
 where
     M: ManagedTypeApi,
-    T: ContractCallArg,
+    T: TopEncodeMulti,
 {
-    fn push_dyn_arg<O: DynArgOutput>(&self, output: &mut O) {
+    type DecodeAs = Self;
+
+    fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: TopEncodeMultiOutput,
+        H: EncodeErrorHandler,
+    {
         match self {
             ManagedAsyncCallResult::Ok(result) => {
-                0u32.push_dyn_arg(output);
-                result.push_dyn_arg(output);
+                0u32.multi_encode_or_handle_err(output, h)?;
+                result.multi_encode_or_handle_err(output, h)?;
             },
             ManagedAsyncCallResult::Err(error_message) => {
-                error_message.err_code.push_dyn_arg(output);
-                error_message.err_msg.push_dyn_arg(output);
+                error_message
+                    .err_code
+                    .multi_encode_or_handle_err(output, h)?;
+                error_message
+                    .err_msg
+                    .multi_encode_or_handle_err(output, h)?;
             },
         }
-    }
-}
-
-impl<M, T> ContractCallArg for ManagedAsyncCallResult<M, T>
-where
-    M: ManagedTypeApi,
-    T: ContractCallArg,
-{
-    fn push_dyn_arg<O: DynArgOutput>(&self, output: &mut O) {
-        ContractCallArg::push_dyn_arg(&self, output)
+        Ok(())
     }
 }
 

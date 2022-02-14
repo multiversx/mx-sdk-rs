@@ -4,7 +4,6 @@ use crate::{
         DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti, TopDecodeMultiInput,
         TopEncodeMulti, TopEncodeMultiOutput,
     },
-    io::{ContractCallArg, DynArgOutput},
 };
 use alloc::{string::String, vec::Vec};
 
@@ -48,27 +47,6 @@ macro_rules! multi_arg_impls {
                             $name::multi_decode_or_handle_err(input, h)?
                         ),+
                     )))
-                }
-            }
-
-            impl<$($name),+> ContractCallArg for &$marg_struct<$($name,)+>
-            where
-                $($name: ContractCallArg,)+
-            {
-                #[inline]
-                fn push_dyn_arg<O: DynArgOutput>(&self, output: &mut O) {
-                    $(
-                        (self.0).$n.push_dyn_arg(output);
-                    )+
-                }
-            }
-
-            impl<$($name),+> ContractCallArg for $marg_struct<$($name,)+>
-            where
-                $($name: ContractCallArg,)+
-            {
-                fn push_dyn_arg<O: DynArgOutput>(&self, output: &mut O) {
-                    ContractCallArg::push_dyn_arg(&self, output)
                 }
             }
 

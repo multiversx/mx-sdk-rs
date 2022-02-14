@@ -8,7 +8,6 @@ use crate::{
     abi::TypeAbi,
     api::ManagedTypeApi,
     types::{BigUint, ManagedVecItem},
-    ContractCallArg, DynArgOutput,
 };
 
 use super::{EsdtTokenPayment, TokenIdentifier};
@@ -88,26 +87,6 @@ where
         let token_nonce = u64::multi_decode_or_handle_err(input, h)?;
         let amount = BigUint::multi_decode_or_handle_err(input, h)?;
         Ok(EsdtTokenPayment::new(token_identifier, token_nonce, amount).into())
-    }
-}
-
-impl<M> ContractCallArg for &EsdtTokenPaymentMultiArg<M>
-where
-    M: ManagedTypeApi,
-{
-    fn push_dyn_arg<O: DynArgOutput>(&self, output: &mut O) {
-        self.obj.token_identifier.push_dyn_arg(output);
-        self.obj.token_nonce.push_dyn_arg(output);
-        self.obj.amount.push_dyn_arg(output);
-    }
-}
-
-impl<M> ContractCallArg for EsdtTokenPaymentMultiArg<M>
-where
-    M: ManagedTypeApi,
-{
-    fn push_dyn_arg<O: DynArgOutput>(&self, output: &mut O) {
-        ContractCallArg::push_dyn_arg(&self, output)
     }
 }
 

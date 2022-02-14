@@ -94,8 +94,6 @@ impl<FA> TopEncodeMultiOutput for ApiOutputAdapter<FA>
 where
     FA: ManagedTypeApi + EndpointFinishApi,
 {
-    type ValueOutput = Self;
-
     fn push_single_value<T, H>(&mut self, arg: &T, h: H) -> Result<(), H::HandledErr>
     where
         T: TopEncode,

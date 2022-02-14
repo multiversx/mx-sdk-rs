@@ -4,7 +4,6 @@ use crate::{
         DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti, TopDecodeMultiInput,
         TopEncodeMulti, TopEncodeMultiOutput,
     },
-    io::{ContractCallArg, DynArgOutput},
 };
 use alloc::string::String;
 
@@ -77,27 +76,6 @@ where
         } else {
             Ok(OptionalArg::None)
         }
-    }
-}
-
-impl<T> ContractCallArg for &OptionalArg<T>
-where
-    T: ContractCallArg,
-{
-    #[inline]
-    fn push_dyn_arg<O: DynArgOutput>(&self, output: &mut O) {
-        if let OptionalArg::Some(t) = self {
-            t.push_dyn_arg(output);
-        }
-    }
-}
-
-impl<T> ContractCallArg for OptionalArg<T>
-where
-    T: ContractCallArg,
-{
-    fn push_dyn_arg<O: DynArgOutput>(&self, output: &mut O) {
-        ContractCallArg::push_dyn_arg(&self, output)
     }
 }
 

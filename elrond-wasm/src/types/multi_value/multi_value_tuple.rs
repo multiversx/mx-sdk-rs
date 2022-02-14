@@ -58,27 +58,6 @@ macro_rules! multi_value_impls {
                 }
             }
 
-            // impl<$($name),+> ContractCallArg for &$mv_struct<$($name,)+>
-            // where
-            //     $($name: ContractCallArg,)+
-            // {
-            //     #[inline]
-            //     fn push_dyn_arg<O: DynArgOutput>(&self, output: &mut O) {
-            //         $(
-            //             (self.0).$n.push_dyn_arg(output);
-            //         )+
-            //     }
-            // }
-
-            // impl<$($name),+> ContractCallArg for $mv_struct<$($name,)+>
-            // where
-            //     $($name: ContractCallArg,)+
-            // {
-            //     fn push_dyn_arg<O: DynArgOutput>(&self, output: &mut O) {
-            //         ContractCallArg::push_dyn_arg(&self, output)
-            //     }
-            // }
-
             // impl<$($name),+ > TypeAbi for $mv_struct<$($name,)+>
             // where
             //     $($name: TypeAbi,)+
