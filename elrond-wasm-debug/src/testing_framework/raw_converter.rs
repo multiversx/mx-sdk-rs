@@ -8,6 +8,7 @@ use mandos::serde_raw::{
     CheckEsdtMapRaw, CheckEsdtRaw, CheckLogsRaw, CheckStorageDetailsRaw, CheckStorageRaw,
     EsdtFullRaw, EsdtRaw, InstanceRaw, TxCallRaw, TxESDTRaw, TxExpectRaw, TxQueryRaw, ValueSubTree,
 };
+use num_traits::Zero;
 
 use super::{ScCallMandos, ScQueryMandos, TxExpectMandos};
 
@@ -119,7 +120,7 @@ pub(crate) fn tx_call_as_raw(tx_call: &ScCallMandos) -> TxCallRaw {
         from: address_as_raw(&tx_call.from),
         to: address_as_raw(&tx_call.to),
         value: None, // this is the old "value" field, which is now "egld_value". Only kept for backwards compatibility
-        egld_value: Some(rust_biguint_as_raw(&tx_call.egld_value)),
+        egld_value: rust_biguint_as_opt_raw(&tx_call.egld_value),
         esdt_value: all_esdt_raw,
         function: tx_call.function.clone(),
         arguments: arguments_raw,
@@ -271,6 +272,14 @@ pub(crate) fn bytes_to_mandos_string_or_hex(bytes: &[u8]) -> String {
 
 pub(crate) fn rust_biguint_as_raw(big_uint: &num_bigint::BigUint) -> ValueSubTree {
     ValueSubTree::Str(big_uint.to_string())
+}
+
+pub(crate) fn rust_biguint_as_opt_raw(big_uint: &num_bigint::BigUint) -> Option<ValueSubTree> {
+    if big_uint > &num_bigint::BigUint::zero() {
+        Some(rust_biguint_as_raw(big_uint))
+    } else {
+        None
+    }
 }
 
 pub(crate) fn address_as_raw(address: &Address) -> ValueSubTree {

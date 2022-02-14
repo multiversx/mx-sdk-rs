@@ -38,7 +38,7 @@
                 "out": [],
                 "status": "*",
                 "message": "str:insufficient funds",
-                "logs": []
+                "logs": "*"
             }
         },
         {
