@@ -1,4 +1,4 @@
-use crate::{EncodeErrorHandler, TopEncode, TopEncodeOutput};
+use crate::{EncodeError, EncodeErrorHandler, TopEncode, TopEncodeOutput, TryStaticCast};
 
 pub trait TopEncodeMultiOutput {
     type ValueOutput: TopEncodeOutput;
@@ -7,4 +7,13 @@ pub trait TopEncodeMultiOutput {
     where
         T: TopEncode,
         H: EncodeErrorHandler;
+
+    /// This is temporary, will remove after we get rid of SCResult for good.
+    fn push_multi_specialized<T, H>(&mut self, _arg: &T, h: H) -> Result<(), H::HandledErr>
+    where
+        T: TryStaticCast,
+        H: EncodeErrorHandler,
+    {
+        Err(h.handle_error(EncodeError::UNSUPPORTED_OPERATION))
+    }
 }

@@ -22,7 +22,7 @@ mod module_1 {
     pub trait VersionModule: elrond_wasm::contract_base::ContractBase + Sized {
         fn version(&self) -> BigInt<Self::Api>;
 
-        fn some_async(&self) -> AsyncCall<Self::Api>;
+        fn some_async(&self);
 
         fn callback(&self);
     }
@@ -40,7 +40,7 @@ mod module_1 {
             BigInt::from(100)
         }
 
-        fn some_async(&self) -> AsyncCall<Self::Api> {
+        fn some_async(&self) {
             panic!("wooo")
         }
 
