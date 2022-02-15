@@ -84,7 +84,7 @@
             "expect": {
                 "out": [],
                 "status": "4",
-                "message": "str:argument decode error (var args): wrong number of arguments",
+                "message": "str:argument decode error (var args): too few arguments",
                 "logs": "*",
                 "gas": "*",
                 "refund": "*"

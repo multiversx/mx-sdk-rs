@@ -113,7 +113,7 @@ impl<'a> TopDecodeMultiInput for HexCallDataDeserializer<'a> {
     {
         match self.next_argument() {
             Ok(Some(arg_bytes)) => Ok(arg_bytes.into_boxed_slice()),
-            Ok(None) => Err(h.handle_error(DecodeError::from(err_msg::ARG_WRONG_NUMBER))),
+            Ok(None) => Err(h.handle_error(DecodeError::MULTI_TOO_FEW_ARGS)),
             Err(sc_err) => Err(h.handle_error(DecodeError::from(sc_err))),
         }
     }

@@ -5,7 +5,6 @@ use elrond_codec::{DecodeError, DecodeErrorHandler, TopDecodeMultiInput};
 
 use crate::{
     api::{ErrorApi, ManagedTypeApi},
-    err_msg,
     types::BoxedBytes,
 };
 
@@ -55,7 +54,7 @@ where
             self.next_index += 1;
             Ok(boxed_bytes.into_box())
         } else {
-            Err(h.handle_error(DecodeError::from(err_msg::ARG_WRONG_NUMBER)))
+            Err(h.handle_error(DecodeError::MULTI_TOO_FEW_ARGS))
         }
     }
 
