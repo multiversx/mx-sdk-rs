@@ -1,3 +1,5 @@
+#![allow(clippy::transmute_undefined_repr)]
+
 use crate::{
     boxed_slice_into_vec, DecodeError, DecodeErrorHandler, EncodeErrorHandler, NestedDecode,
     NestedDecodeInput, NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode,
