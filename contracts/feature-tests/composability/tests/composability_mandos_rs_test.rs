@@ -396,10 +396,10 @@ fn forwarder_nft_create_and_send_rs() {
     elrond_wasm_debug::mandos_rs("mandos/forwarder_nft_create_and_send.scen.json", world());
 }
 
-#[test]
-fn forwarder_nft_add_uri_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/forwarder_nft_add_uri.scen.json", world());
-}
+// #[test]
+// fn forwarder_nft_add_uri_rs() {
+//     elrond_wasm_debug::mandos_rs("mandos/forwarder_nft_add_uri.scen.json", world());
+// }
 
 #[test]
 fn forwarder_nft_current_nonce_rs() {

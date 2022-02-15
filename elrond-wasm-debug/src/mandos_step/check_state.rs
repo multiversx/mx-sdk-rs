@@ -298,17 +298,16 @@ pub fn check_token_instance(
         ))
     }
 
-    let actual_uri = actual_value.metadata.uri.clone();
-    for uri in actual_uri.get() {
-        if !expected_value.uri.check(&uri) {
-            errors.push(format!(
-                "bad esdt uri. Address: {}. Token {}. Nonce {}. Want: {}. Have: {}",
-                address,
-                token,
-                expected_value.nonce.value,
-                expected_value.uri,
-                verbose_hex(&uri),
-            ))
-        }
+    let actual_uri = actual_value.metadata.uri.get().concat();
+
+    if !expected_value.uri.check(&actual_uri) {
+        errors.push(format!(
+            "bad esdt uri. Address: {}. Token {}. Nonce {}. Want: {}. Have: {}",
+            address,
+            token,
+            expected_value.nonce.value,
+            expected_value.uri,
+            verbose_hex(&actual_uri),
+        ))
     }
 }
