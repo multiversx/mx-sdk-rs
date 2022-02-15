@@ -31,9 +31,6 @@ pub trait ForwarderRaw {
                 ManagedBuffer::new(),
             );
         }
-
-        // self.send().direct()
-        // SendToken::new(to, token, payment, ManagedBuffer::new())
     }
 
     #[endpoint]

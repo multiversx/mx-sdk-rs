@@ -1,4 +1,4 @@
-use crate::elrond_codec::{
+use crate::{
     DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti, TopDecodeMultiInput, TopEncodeMulti,
     TopEncodeMultiOutput,
 };
@@ -96,20 +96,3 @@ where
         Ok(Self(result_vec))
     }
 }
-
-// impl<T: TypeAbi> TypeAbi for MultiValueVec<T> {
-//     fn type_name() -> String {
-//         let mut repr = String::from("variadic<");
-//         repr.push_str(T::type_name().as_str());
-//         repr.push('>');
-//         repr
-//     }
-
-//     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
-//         T::provide_type_descriptions(accumulator);
-//     }
-
-//     fn is_multi_arg_or_result() -> bool {
-//         true
-//     }
-// }

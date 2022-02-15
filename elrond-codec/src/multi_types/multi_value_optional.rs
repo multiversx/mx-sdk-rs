@@ -1,4 +1,4 @@
-use crate::elrond_codec::{
+use crate::{
     DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti, TopDecodeMultiInput, TopEncodeMulti,
     TopEncodeMultiOutput,
 };
