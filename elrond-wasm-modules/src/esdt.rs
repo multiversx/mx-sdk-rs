@@ -33,13 +33,13 @@ pub trait EsdtModule {
         token_display_name: ManagedBuffer,
         token_ticker: ManagedBuffer,
         token_type: EsdtTokenType,
-        #[var_args] opt_num_decimals: OptionalArg<usize>,
+        #[var_args] opt_num_decimals: OptionalValue<usize>,
     ) {
         require!(self.token_id().is_empty(), "Token already issued");
 
         let num_decimals = match opt_num_decimals {
-            OptionalArg::Some(d) => d,
-            OptionalArg::None => 0,
+            OptionalValue::Some(d) => d,
+            OptionalValue::None => 0,
         };
 
         self.send()

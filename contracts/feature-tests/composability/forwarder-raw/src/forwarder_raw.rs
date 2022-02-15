@@ -135,7 +135,7 @@ pub trait ForwarderRaw {
     fn forward_async_retrieve_multi_transfer_funds(
         &self,
         to: ManagedAddress,
-        #[var_args] token_payments: ManagedVarArgs<MultiArg3<TokenIdentifier, u64, BigUint>>,
+        #[var_args] token_payments: ManagedVarArgs<MultiValue3<TokenIdentifier, u64, BigUint>>,
     ) {
         let mut arg_buffer = ManagedArgBuffer::new_empty();
         for multi_arg in token_payments.into_iter() {
@@ -158,7 +158,7 @@ pub trait ForwarderRaw {
     fn forwarder_async_send_and_retrieve_multi_transfer_funds(
         &self,
         to: ManagedAddress,
-        #[var_args] token_payments: ManagedVarArgs<MultiArg3<TokenIdentifier, u64, BigUint>>,
+        #[var_args] token_payments: ManagedVarArgs<MultiValue3<TokenIdentifier, u64, BigUint>>,
     ) {
         let mut all_payments = Vec::new();
         for multi_arg in token_payments.into_iter() {
@@ -346,7 +346,7 @@ pub trait ForwarderRaw {
         &self,
         code: ManagedBuffer,
         #[var_args] args: ManagedVarArgs<ManagedBuffer>,
-    ) -> MultiResult2<ManagedAddress, ManagedVec<Self::Api, ManagedBuffer>> {
+    ) -> MultiValue2<ManagedAddress, ManagedVec<Self::Api, ManagedBuffer>> {
         Self::Api::send_api_impl()
             .deploy_contract(
                 self.blockchain().get_gas_left(),

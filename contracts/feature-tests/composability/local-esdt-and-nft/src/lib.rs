@@ -154,7 +154,7 @@ pub trait LocalEsdtAndEsdtNft {
         nonce: u64,
         amount: BigUint,
         function: ManagedBuffer,
-        #[var_args] arguments: VarArgs<ManagedBuffer>,
+        #[var_args] arguments: MultiValueVec<ManagedBuffer>,
     ) {
         let mut arg_buffer = ManagedArgBuffer::new_empty();
         for arg in arguments.into_vec() {
