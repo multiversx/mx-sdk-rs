@@ -3,8 +3,8 @@ const TICKER_MAX_LENGTH: usize = 10;
 const ADDITIONAL_RANDOM_CHARS_LENGTH: usize = 6;
 
 // +1 because of the '-' (dash) between ticker and the random chars
-const IDENTIFIER_MIN_LENGTH: usize = TICKER_MIN_LENGTH + ADDITIONAL_RANDOM_CHARS_LENGTH + 1;
-const IDENTIFIER_MAX_LENGTH: usize = TICKER_MAX_LENGTH + ADDITIONAL_RANDOM_CHARS_LENGTH + 1;
+pub const IDENTIFIER_MIN_LENGTH: usize = TICKER_MIN_LENGTH + ADDITIONAL_RANDOM_CHARS_LENGTH + 1;
+pub const IDENTIFIER_MAX_LENGTH: usize = TICKER_MAX_LENGTH + ADDITIONAL_RANDOM_CHARS_LENGTH + 1;
 
 const DASH_CHARACTER: u8 = b'-';
 
@@ -19,9 +19,9 @@ pub fn validate_token_identifier(token_id_slice: &[u8]) -> bool {
         return false;
     }
 
-    let lowercase_letter_range = &b'a'..=&b'z';
-    let uppercase_letter_range = &b'A'..=&b'Z';
-    let number_range = &b'0'..=&b'9';
+    let lowercase_letter_range = b'a'..=b'z';
+    let uppercase_letter_range = b'A'..=b'Z';
+    let number_range = b'0'..=b'9';
 
     // ticker must be all uppercase alphanumeric
     let ticker_len = length - ADDITIONAL_RANDOM_CHARS_LENGTH - 1;
