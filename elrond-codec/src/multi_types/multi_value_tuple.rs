@@ -1,4 +1,4 @@
-use crate::elrond_codec::{
+use crate::{
     DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti, TopDecodeMultiInput, TopEncodeMulti,
     TopEncodeMultiOutput,
 };
@@ -57,50 +57,6 @@ macro_rules! multi_value_impls {
                     )))
                 }
             }
-
-            // impl<$($name),+ > TypeAbi for $mv_struct<$($name,)+>
-            // where
-            //     $($name: TypeAbi,)+
-            // {
-            //     fn type_name() -> String {
-            //         let mut repr = String::from("multi");
-            //         repr.push('<');
-            //         $(
-            //             if $n > 0 {
-            //                 repr.push(',');
-            //             }
-            //             repr.push_str($name::type_name().as_str());
-            //         )+
-            //         repr.push('>');
-            //         repr
-            //     }
-
-            //     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
-			// 		$(
-			// 			$name::provide_type_descriptions(accumulator);
-            //         )+
-            //     }
-
-            //     fn is_multi_arg_or_result() -> bool {
-            //         true
-            //     }
-
-            //     fn output_abis(output_names: &[&'static str]) -> Vec<OutputAbi> {
-            //         let mut result = Vec::new();
-            //         $(
-            //             if output_names.len() > $n {
-            //                 result.append(&mut $name::output_abis(&[output_names[$n]]));
-
-            //             } else {
-            //                 result.append(&mut $name::output_abis(&[]));
-            //             }
-
-            //         )+
-            //         result
-            //     }
-            // }
-
-
         )+
     }
 }

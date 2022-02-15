@@ -1,8 +1,11 @@
 #![feature(exhaustive_patterns)]
 
 use elrond_wasm::{
-    elrond_codec::{PanicErrorHandler, TopDecodeMulti, TopDecodeMultiInput},
-    types::{AsyncCallResult, BigUint, MultiValue2, MultiValueVec, OptionalValue},
+    elrond_codec::{
+        multi_types::{MultiValue2, MultiValueVec, OptionalValue},
+        PanicErrorHandler, TopDecodeMulti, TopDecodeMultiInput,
+    },
+    types::{AsyncCallResult, BigUint},
     HexCallDataDeserializer,
 };
 use elrond_wasm_debug::DebugApi;
