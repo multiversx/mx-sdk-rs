@@ -24,7 +24,6 @@ where
     I: TopDecodeMultiInput,
     T: TopDecodeMulti,
 {
-    // let arg_input = ArgDecodeInput::<AA>::new(index);
     let h = ArgErrorHandler::<AA>::from(arg_id);
     let result = T::multi_decode_or_handle_err(arg_input, h);
     let Ok(value) = result;

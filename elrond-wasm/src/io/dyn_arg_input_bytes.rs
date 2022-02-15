@@ -57,14 +57,6 @@ where
         } else {
             Err(h.handle_error(DecodeError::from(err_msg::ARG_WRONG_NUMBER)))
         }
-
-        // if self.current_index >= self.num_arguments {
-        //     Err(h.handle_error(DecodeError::from(err_msg::ARG_WRONG_NUMBER)))
-        // } else {
-        //     let arg_input = ArgDecodeInput::new(self.current_index);
-        //     self.current_index += 1;
-        //     Ok(arg_input)
-        // }
     }
 
     fn flush_ignore<H>(&mut self, _h: H) -> Result<(), H::HandledErr>
