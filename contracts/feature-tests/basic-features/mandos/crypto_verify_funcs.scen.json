@@ -37,7 +37,7 @@
                     "0x01"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -62,7 +62,7 @@
                     "0x01"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -87,7 +87,7 @@
                     "0x01"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -112,7 +112,7 @@
                     "0x01"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -136,7 +136,7 @@
                     "0x304502210090f27b8b488db00b00606796d2987f6a5f59ae62ea05effe84fef5b8b0e5499802204a691139ad57a3f0b906637673aa2f63d1f55cb1a69199d4009eea23ceaddc93"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -162,7 +162,7 @@
                     "0x01"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
