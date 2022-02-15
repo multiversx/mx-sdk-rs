@@ -37,7 +37,7 @@
                     "3"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -58,7 +58,7 @@
             "expect": {
                 "out": [],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -79,7 +79,7 @@
             "expect": {
                 "out": [],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -111,7 +111,7 @@
                 "out": [],
                 "status": "10",
                 "message": "str:error signalled by smartcontract",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }

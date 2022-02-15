@@ -8,6 +8,7 @@
                 "sc:payable-features": {
                     "nonce": "0",
                     "balance": "0",
+                    "storage": {},
                     "code": "file:../output/payable-features.wasm"
                 },
                 "address:an-account": {
@@ -24,7 +25,9 @@
                                 }
                             ]
                         }
-                    }
+                    },
+                    "storage": {},
+                    "code": ""
                 }
             }
         },
@@ -50,7 +53,6 @@
                     }
                 ],
                 "function": "payment_multiple",
-                "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
@@ -59,7 +61,7 @@
                     "u8:0|nested:str:TOK-123456|u64:0|biguint:100|u8:0|nested:str:OTHERTOK-123456|u64:0|biguint:400|u8:2|nested:str:SFT-123|u64:5|biguint:10"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
