@@ -43,7 +43,7 @@ pub trait BigIntMethods {
     }
 
     #[endpoint]
-    fn big_uint_to_u64(&self, bu: &BigUint) -> OptionalResult<u64> {
+    fn big_uint_to_u64(&self, bu: &BigUint) -> OptionalValue<u64> {
         bu.to_u64().into()
     }
 
@@ -88,12 +88,12 @@ pub trait BigIntMethods {
     }
 
     #[endpoint]
-    fn big_int_to_i64(&self, bi: &BigInt) -> OptionalResult<i64> {
+    fn big_int_to_i64(&self, bi: &BigInt) -> OptionalValue<i64> {
         bi.to_i64().into()
     }
 
     #[endpoint]
-    fn big_int_to_parts(&self, bi: BigInt) -> MultiResult2<Sign, BigUint> {
+    fn big_int_to_parts(&self, bi: BigInt) -> MultiValue2<Sign, BigUint> {
         bi.to_parts().into()
     }
 

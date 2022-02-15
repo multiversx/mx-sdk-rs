@@ -78,7 +78,7 @@ pub trait ForwarderAsyncCallModule {
     ) {
         self.vault_proxy()
             .contract(to)
-            .retrieve_funds(token, token_nonce, amount, OptionalArg::None)
+            .retrieve_funds(token, token_nonce, amount, OptionalValue::None)
             .async_call()
             .with_callback(self.callbacks().retrieve_funds_callback())
             .call_and_exit()
@@ -146,7 +146,7 @@ pub trait ForwarderAsyncCallModule {
     fn multi_transfer_via_async(
         &self,
         to: ManagedAddress,
-        #[var_args] token_payments: ManagedVarArgs<MultiArg3<TokenIdentifier, u64, BigUint>>,
+        #[var_args] token_payments: ManagedVarArgs<MultiValue3<TokenIdentifier, u64, BigUint>>,
     ) {
         let mut all_token_payments = ManagedVec::new();
 
@@ -177,7 +177,7 @@ pub trait ForwarderAsyncCallModule {
     fn callback_data_at_index(
         &self,
         index: usize,
-    ) -> MultiResult5<
+    ) -> MultiValue5<
         ManagedBuffer,
         TokenIdentifier,
         u64,

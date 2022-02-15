@@ -168,7 +168,7 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
         royalties: BigUint,
         hash: ManagedBuffer,
         uri: ManagedBuffer,
-        #[var_args] attrs_arg: MultiArg5<
+        #[var_args] attrs_arg: MultiValue5<
             BigUint,
             ManagedBuffer,
             TokenIdentifier,

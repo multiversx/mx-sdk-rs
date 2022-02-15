@@ -13,7 +13,7 @@ pub trait KittyAuction {
         gen_zero_kitty_starting_price: BigUint,
         gen_zero_kitty_ending_price: BigUint,
         gen_zero_kitty_auction_duration: u64,
-        #[var_args] opt_kitty_ownership_contract_address: OptionalArg<ManagedAddress>,
+        #[var_args] opt_kitty_ownership_contract_address: OptionalValue<ManagedAddress>,
     ) {
         self.gen_zero_kitty_starting_price()
             .set(gen_zero_kitty_starting_price);
@@ -22,7 +22,7 @@ pub trait KittyAuction {
         self.gen_zero_kitty_auction_duration()
             .set(gen_zero_kitty_auction_duration);
 
-        if let OptionalArg::Some(addr) = opt_kitty_ownership_contract_address {
+        if let OptionalValue::Some(addr) = opt_kitty_ownership_contract_address {
             self.kitty_ownership_contract_address().set(addr)
         }
     }
