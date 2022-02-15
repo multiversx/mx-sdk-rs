@@ -4,7 +4,7 @@ use elrond_codec::{DecodeError, DecodeErrorHandler, TopDecodeMultiInput};
 
 use crate::{
     api::{EndpointArgumentApi, EndpointArgumentApiImpl, ErrorApi, ManagedTypeApi},
-    err_msg, ArgDecodeInput,
+    ArgDecodeInput,
 };
 
 #[derive(Default)]
@@ -46,7 +46,7 @@ where
         H: DecodeErrorHandler,
     {
         if self.current_index >= self.num_arguments {
-            Err(h.handle_error(DecodeError::from(err_msg::ARG_WRONG_NUMBER)))
+            Err(h.handle_error(DecodeError::MULTI_TOO_FEW_ARGS))
         } else {
             let arg_input = ArgDecodeInput::new(self.current_index);
             self.current_index += 1;
