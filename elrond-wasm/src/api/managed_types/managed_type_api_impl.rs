@@ -17,6 +17,10 @@ pub trait ManagedTypeApiImpl: BigIntApi + EllipticCurveApi + ManagedBufferApi + 
 
     fn validate_token_identifier(&self, token_id_handle: Handle) -> bool {
         let token_id_len = self.mb_len(token_id_handle);
+        if token_id_len > IDENTIFIER_MAX_LENGTH {
+            return false;
+        }
+
         let mut static_buffer = [0u8; IDENTIFIER_MAX_LENGTH];
         let static_buffer_slice = &mut static_buffer[..token_id_len];
 
