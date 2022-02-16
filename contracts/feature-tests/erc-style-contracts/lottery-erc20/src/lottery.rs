@@ -136,36 +136,34 @@ pub trait Lottery {
     }
 
     #[endpoint]
-    fn buy_ticket(&self, lottery_name: BoxedBytes, token_amount: BigUint) -> SCResult<AsyncCall> {
+    fn buy_ticket(&self, lottery_name: BoxedBytes, token_amount: BigUint) {
         match self.status(&lottery_name) {
-            Status::Inactive => sc_error!("Lottery is currently inactive."),
+            Status::Inactive => sc_panic!("Lottery is currently inactive."),
             Status::Running => self.update_after_buy_ticket(&lottery_name, token_amount),
             Status::Ended => {
-                sc_error!("Lottery entry period has ended! Awaiting winner announcement.")
+                sc_panic!("Lottery entry period has ended! Awaiting winner announcement.")
             },
             Status::DistributingPrizes => {
-                sc_error!("Prizes are currently being distributed. Can't buy tickets!")
+                sc_panic!("Prizes are currently being distributed. Can't buy tickets!")
             },
         }
     }
 
     #[endpoint]
-    fn determine_winner(&self, lottery_name: BoxedBytes) -> SCResult<OptionalResult<AsyncCall>> {
+    fn determine_winner(&self, lottery_name: BoxedBytes) {
         match self.status(&lottery_name) {
-            Status::Inactive => sc_error!("Lottery is inactive!"),
-            Status::Running => sc_error!("Lottery is still running!"),
+            Status::Inactive => sc_panic!("Lottery is inactive!"),
+            Status::Running => sc_panic!("Lottery is still running!"),
             Status::Ended => {
                 let info = self.get_lottery_info(&lottery_name);
 
                 if info.queued_tickets > 0 {
-                    return sc_error!(
-                        "There are still tickets being processed. Please try again later."
-                    );
+                    sc_panic!("There are still tickets being processed. Please try again later.");
                 }
 
-                Ok(self.distribute_prizes(&lottery_name))
+                self.distribute_prizes(&lottery_name);
             },
-            Status::DistributingPrizes => sc_error!("Prizes are currently being distributed!"),
+            Status::DistributingPrizes => sc_panic!("Prizes are currently being distributed!"),
         }
     }
 
@@ -190,11 +188,7 @@ pub trait Lottery {
         Status::Running
     }
 
-    fn update_after_buy_ticket(
-        &self,
-        lottery_name: &BoxedBytes,
-        token_amount: BigUint,
-    ) -> SCResult<AsyncCall> {
+    fn update_after_buy_ticket(&self, lottery_name: &BoxedBytes, token_amount: BigUint) {
         let info = self.get_lottery_info(lottery_name);
         let caller = self.blockchain().get_caller();
 
@@ -217,14 +211,14 @@ pub trait Lottery {
 
         let erc20_address = self.get_erc20_contract_address();
         let lottery_contract_address = self.blockchain().get_sc_address();
-        Ok(self
-            .erc20_proxy(erc20_address)
+        self.erc20_proxy(erc20_address)
             .transfer_from(caller.clone(), lottery_contract_address, token_amount)
             .async_call()
             .with_callback(
                 self.callbacks()
                     .transfer_from_callback(lottery_name, &caller),
-            ))
+            )
+            .call_and_exit()
     }
 
     fn reserve_ticket(&self, lottery_name: &BoxedBytes) {
@@ -243,7 +237,7 @@ pub trait Lottery {
         self.set_lottery_info(lottery_name, &info);
     }
 
-    fn distribute_prizes(&self, lottery_name: &BoxedBytes) -> OptionalResult<AsyncCall> {
+    fn distribute_prizes(&self, lottery_name: &BoxedBytes) {
         let info = self.get_lottery_info(lottery_name);
 
         let total_tickets = info.current_ticket_number;
@@ -255,7 +249,7 @@ pub trait Lottery {
         if winners_left == 0 {
             self.clear_storage(lottery_name);
 
-            return OptionalResult::None;
+            return;
         }
 
         // less tickets purchased than total winning tickets
@@ -286,12 +280,12 @@ pub trait Lottery {
         self.set_lottery_info(lottery_name, &info);
 
         let erc20_address = self.get_erc20_contract_address();
-        OptionalResult::Some(
-            self.erc20_proxy(erc20_address)
-                .transfer(winner_address, prize)
-                .async_call()
-                .with_callback(self.callbacks().distribute_prizes_callback(lottery_name)),
-        )
+
+        self.erc20_proxy(erc20_address)
+            .transfer(winner_address, prize)
+            .async_call()
+            .with_callback(self.callbacks().distribute_prizes_callback(lottery_name))
+            .call_and_exit()
     }
 
     fn get_random_winning_ticket_id(&self, prev_winners: &[u32], total_tickets: u32) -> u32 {
@@ -370,12 +364,11 @@ pub trait Lottery {
         &self,
         #[call_result] result: ManagedAsyncCallResult<()>,
         cb_lottery_name: &BoxedBytes,
-    ) -> OptionalResult<AsyncCall> {
+    ) {
         match result {
             ManagedAsyncCallResult::Ok(()) => self.distribute_prizes(cb_lottery_name),
             ManagedAsyncCallResult::Err(_) => {
                 // nothing we can do if an error occurs in the erc20 contract
-                OptionalResult::None
             },
         }
     }

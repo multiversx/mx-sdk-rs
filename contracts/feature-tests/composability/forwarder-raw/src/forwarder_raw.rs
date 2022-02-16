@@ -19,8 +19,18 @@ pub trait ForwarderRaw {
         to: ManagedAddress,
         #[payment_token] token: TokenIdentifier,
         #[payment] payment: BigUint,
-    ) -> SendToken<Self::Api> {
-        SendToken::new(to, token, payment, ManagedBuffer::new())
+    ) {
+        if token.is_egld() {
+            self.send().direct_egld(&to, &payment, ManagedBuffer::new());
+        } else {
+            self.send().transfer_esdt_via_async_call(
+                &to,
+                &token,
+                0,
+                &payment,
+                ManagedBuffer::new(),
+            );
+        }
     }
 
     #[endpoint]
@@ -57,9 +67,10 @@ pub trait ForwarderRaw {
         #[payment] payment: BigUint,
         endpoint_name: ManagedBuffer,
         #[var_args] args: ManagedVarArgs<ManagedBuffer>,
-    ) -> AsyncCall {
+    ) {
         self.forward_contract_call(to, token, payment, endpoint_name, args)
             .async_call()
+            .call_and_exit()
     }
 
     #[endpoint]
@@ -71,7 +82,7 @@ pub trait ForwarderRaw {
         #[payment] payment: BigUint,
         endpoint_name: ManagedBuffer,
         #[var_args] args: ManagedVarArgs<ManagedBuffer>,
-    ) -> AsyncCall {
+    ) {
         let half_payment = payment / 2u32;
         self.forward_async_call(to, token, half_payment, endpoint_name, args)
     }

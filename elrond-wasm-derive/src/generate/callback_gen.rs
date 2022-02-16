@@ -117,7 +117,7 @@ fn match_arms(methods: &[Method]) -> Vec<proc_macro2::TokenStream> {
                 let call = generate_call_to_method_expr(m);
                 let call_result_assert_no_more_args = if has_call_result {
                     quote! {
-                        ___call_result_loader___.assert_no_more_args();
+                        elrond_wasm::io::assert_no_more_args::<Self::Api, _>(&___call_result_loader___);
                     }
                 } else {
                     quote! {}
@@ -129,7 +129,7 @@ fn match_arms(methods: &[Method]) -> Vec<proc_macro2::TokenStream> {
                         #payable_snippet
                         let mut ___cb_arg_loader___ = ___cb_closure___.into_arg_loader();
                         #(#arg_init_snippets)*
-                        ___cb_arg_loader___.assert_no_more_args();
+                        elrond_wasm::io::assert_no_more_args::<Self::Api, _>(&___cb_arg_loader___);
                         #call_result_assert_no_more_args
                         #body_with_result ;
                         return elrond_wasm::types::CallbackSelectorResult::Processed;

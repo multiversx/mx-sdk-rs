@@ -8,7 +8,8 @@ use alloc::{string::String, vec::Vec};
 use core::marker::PhantomData;
 use elrond_codec::{
     DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode,
-    NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
+    NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeMultiOutput,
+    TopEncodeOutput,
 };
 
 pub(crate) const INDEX_OUT_OF_RANGE_MSG: &[u8] = b"ManagedVec index out of range";
@@ -419,5 +420,21 @@ where
             dbg_list.entry(&item);
         }
         dbg_list.finish()
+    }
+}
+
+impl<M> TopEncodeMultiOutput for ManagedVec<M, ManagedBuffer<M>>
+where
+    M: ManagedTypeApi,
+{
+    fn push_single_value<T, H>(&mut self, arg: &T, h: H) -> Result<(), H::HandledErr>
+    where
+        T: TopEncode,
+        H: EncodeErrorHandler,
+    {
+        let mut result = ManagedBuffer::new();
+        arg.top_encode_or_handle_err(&mut result, h)?;
+        self.push(result);
+        Ok(())
     }
 }

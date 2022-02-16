@@ -1,10 +1,9 @@
-use crate::{
-    abi::TypeAbi,
-    io::{ArgId, DynArg, DynArgInput},
-    types::BoxedBytes,
-    ContractCallArg, DynArgOutput,
-};
+use crate::{abi::TypeAbi, types::BoxedBytes};
 use alloc::string::String;
+use elrond_codec::{
+    DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti, TopDecodeMultiInput, TopEncodeMulti,
+    TopEncodeMultiOutput,
+};
 
 pub struct AsyncCallError {
     pub err_code: u32,
@@ -28,53 +27,58 @@ impl<T> AsyncCallResult<T> {
     }
 }
 
-impl<T> DynArg for AsyncCallResult<T>
+impl<T> TopDecodeMulti for AsyncCallResult<T>
 where
-    T: DynArg,
+    T: TopDecodeMulti,
 {
-    fn dyn_load<I: DynArgInput>(loader: &mut I, arg_id: ArgId) -> Self {
-        let err_code = u32::dyn_load(loader, arg_id);
+    fn multi_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: TopDecodeMultiInput,
+        H: DecodeErrorHandler,
+    {
+        let err_code: u32 = input.next_value(h)?;
         if err_code == 0 {
-            let arg = T::dyn_load(loader, arg_id);
-            AsyncCallResult::Ok(arg)
+            Ok(Self::Ok(T::multi_decode_or_handle_err(input, h)?))
         } else {
-            let err_msg = if loader.has_next() {
-                BoxedBytes::dyn_load(loader, arg_id)
+            let err_msg = if input.has_next() {
+                input.next_value(h)?
             } else {
                 // temporary fix, until a problem involving missing error messages in the protocol gets fixed
                 // can be removed after the protocol is patched
                 // error messages should not normally be missing
                 BoxedBytes::empty()
             };
-            AsyncCallResult::Err(AsyncCallError { err_code, err_msg })
+            Ok(Self::Err(AsyncCallError { err_code, err_msg }))
         }
     }
 }
 
-impl<T> ContractCallArg for &AsyncCallResult<T>
+impl<T> TopEncodeMulti for AsyncCallResult<T>
 where
-    T: ContractCallArg,
+    T: TopEncodeMulti,
 {
-    fn push_dyn_arg<O: DynArgOutput>(&self, output: &mut O) {
+    type DecodeAs = Self;
+
+    fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: TopEncodeMultiOutput,
+        H: EncodeErrorHandler,
+    {
         match self {
             AsyncCallResult::Ok(result) => {
-                0u32.push_dyn_arg(output);
-                result.push_dyn_arg(output);
+                0u32.multi_encode_or_handle_err(output, h)?;
+                result.multi_encode_or_handle_err(output, h)?;
             },
             AsyncCallResult::Err(error_message) => {
-                error_message.err_code.push_dyn_arg(output);
-                error_message.err_msg.push_dyn_arg(output);
+                error_message
+                    .err_code
+                    .multi_encode_or_handle_err(output, h)?;
+                error_message
+                    .err_msg
+                    .multi_encode_or_handle_err(output, h)?;
             },
         }
-    }
-}
-
-impl<T> ContractCallArg for AsyncCallResult<T>
-where
-    T: ContractCallArg,
-{
-    fn push_dyn_arg<O: DynArgOutput>(&self, output: &mut O) {
-        ContractCallArg::push_dyn_arg(&self, output)
+        Ok(())
     }
 }
 
