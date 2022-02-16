@@ -29,9 +29,10 @@ pub trait DnsModule {
         dns_address: ManagedAddress,
         name: BoxedBytes,
         #[payment] payment: BigUint,
-    ) -> AsyncCall {
+    ) {
         self.dns_proxy(dns_address)
             .register(name, payment)
             .async_call()
+            .call_and_exit()
     }
 }

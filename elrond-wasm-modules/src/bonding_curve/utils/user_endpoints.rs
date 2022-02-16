@@ -193,7 +193,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
         let mut availability = Vec::new();
 
         for current_check_nonce in token_nonces {
-            availability.push(MultiArg2((
+            availability.push(MultiValue2((
                 current_check_nonce,
                 self.nonce_amount(&identifier, current_check_nonce).get(),
             )));

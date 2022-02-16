@@ -1,10 +1,13 @@
 use alloc::string::String;
+use elrond_codec::{
+    DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti, TopDecodeMultiInput, TopEncodeMulti,
+    TopEncodeMultiOutput,
+};
 
 use crate::{
     abi::TypeAbi,
-    api::{EndpointFinishApi, ManagedTypeApi},
+    api::ManagedTypeApi,
     types::{BigUint, ManagedVecItem},
-    ArgId, ContractCallArg, DynArg, DynArgInput, DynArgOutput, EndpointResult,
 };
 
 use super::{EsdtTokenPayment, TokenIdentifier};
@@ -53,52 +56,37 @@ impl<M: ManagedTypeApi> ManagedVecItem for EsdtTokenPaymentMultiArg<M> {
     }
 }
 
-impl<M> DynArg for EsdtTokenPaymentMultiArg<M>
+impl<M> TopEncodeMulti for EsdtTokenPaymentMultiArg<M>
 where
     M: ManagedTypeApi,
 {
-    fn dyn_load<I: DynArgInput>(loader: &mut I, arg_id: ArgId) -> Self {
-        let token_identifier = TokenIdentifier::dyn_load(loader, arg_id);
-        let token_nonce = u64::dyn_load(loader, arg_id);
-        let amount = BigUint::dyn_load(loader, arg_id);
-        EsdtTokenPayment::new(token_identifier, token_nonce, amount).into()
-    }
-}
+    type DecodeAs = Self;
 
-impl<M> EndpointResult for EsdtTokenPaymentMultiArg<M>
-where
-    M: ManagedTypeApi,
-{
-    type DecodeAs = EsdtTokenPaymentMultiArg<M>;
-
-    #[inline]
-    fn finish<FA>(&self)
+    fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
     where
-        FA: ManagedTypeApi + EndpointFinishApi,
+        O: TopEncodeMultiOutput,
+        H: EncodeErrorHandler,
     {
-        self.obj.token_identifier.finish::<FA>();
-        self.obj.token_nonce.finish::<FA>();
-        self.obj.amount.finish::<FA>();
+        output.push_single_value(&self.obj.token_identifier, h)?;
+        output.push_single_value(&self.obj.token_nonce, h)?;
+        output.push_single_value(&self.obj.amount, h)?;
+        Ok(())
     }
 }
 
-impl<M> ContractCallArg for &EsdtTokenPaymentMultiArg<M>
+impl<M> TopDecodeMulti for EsdtTokenPaymentMultiArg<M>
 where
     M: ManagedTypeApi,
 {
-    fn push_dyn_arg<O: DynArgOutput>(&self, output: &mut O) {
-        self.obj.token_identifier.push_dyn_arg(output);
-        self.obj.token_nonce.push_dyn_arg(output);
-        self.obj.amount.push_dyn_arg(output);
-    }
-}
-
-impl<M> ContractCallArg for EsdtTokenPaymentMultiArg<M>
-where
-    M: ManagedTypeApi,
-{
-    fn push_dyn_arg<O: DynArgOutput>(&self, output: &mut O) {
-        ContractCallArg::push_dyn_arg(&self, output)
+    fn multi_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: TopDecodeMultiInput,
+        H: DecodeErrorHandler,
+    {
+        let token_identifier = TokenIdentifier::multi_decode_or_handle_err(input, h)?;
+        let token_nonce = u64::multi_decode_or_handle_err(input, h)?;
+        let amount = BigUint::multi_decode_or_handle_err(input, h)?;
+        Ok(EsdtTokenPayment::new(token_identifier, token_nonce, amount).into())
     }
 }
 

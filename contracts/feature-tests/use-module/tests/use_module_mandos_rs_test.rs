@@ -18,11 +18,12 @@ mod dns_mock {
 
         #[payable("EGLD")]
         #[endpoint]
-        fn register(&self, name: BoxedBytes, #[payment] _payment: BigUint) -> AsyncCall {
+        fn register(&self, name: BoxedBytes, #[payment] _payment: BigUint) {
             let address = self.blockchain().get_caller();
             self.user_builtin_proxy(address)
                 .set_user_name(&name)
                 .async_call()
+                .call_and_exit()
         }
     }
 }

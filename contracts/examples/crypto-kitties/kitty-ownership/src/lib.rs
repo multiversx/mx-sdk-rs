@@ -322,7 +322,7 @@ pub trait KittyOwnership {
     }
 
     #[endpoint(giveBirth)]
-    fn give_birth(&self, matron_id: u32) -> AsyncCall {
+    fn give_birth(&self, matron_id: u32) {
         require!(self.is_valid_id(matron_id), "Invalid kitty id!");
 
         let matron = self.kitty_by_id(matron_id).get();
@@ -344,6 +344,7 @@ pub trait KittyOwnership {
                     self.callbacks()
                         .generate_kitty_genes_callback(matron_id, self.blockchain().get_caller()),
                 )
+                .call_and_exit()
         } else {
             sc_panic!("Gene science contract address not set!")
         }

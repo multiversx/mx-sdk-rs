@@ -175,8 +175,8 @@ where
         )
         .with_egld_transfer(issue_cost);
 
-        contract_call.push_endpoint_arg(token_display_name);
-        contract_call.push_endpoint_arg(token_ticker);
+        contract_call.push_endpoint_arg(&token_display_name);
+        contract_call.push_endpoint_arg(&token_ticker);
 
         let token_type_name = match token_type {
             EsdtTokenType::Fungible => &b"FNG"[..],
@@ -185,8 +185,8 @@ where
             EsdtTokenType::Meta => &b"META"[..],
             EsdtTokenType::Invalid => &[],
         };
-        contract_call.push_endpoint_arg(token_type_name);
-        contract_call.push_endpoint_arg(num_decimals);
+        contract_call.push_endpoint_arg(&token_type_name);
+        contract_call.push_endpoint_arg(&num_decimals);
 
         contract_call
     }
@@ -361,8 +361,8 @@ where
     ) -> ContractCall<SA, ()> {
         let mut contract_call = self.esdt_system_sc_call_no_args(b"changeSFTToMetaESDT");
 
-        contract_call.push_endpoint_arg(token_identifier);
-        contract_call.push_endpoint_arg(num_decimals);
+        contract_call.push_endpoint_arg(&token_identifier);
+        contract_call.push_endpoint_arg(&num_decimals);
 
         contract_call
     }

@@ -1,8 +1,10 @@
 use core::marker::PhantomData;
 
+use elrond_codec::{DecodeError, DecodeErrorHandler, TopDecodeMultiInput};
+
 use crate::{
-    api::{EndpointArgumentApi, EndpointArgumentApiImpl, ErrorApi, ErrorApiImpl, ManagedTypeApi},
-    err_msg, ArgDecodeInput, DynArgInput,
+    api::{EndpointArgumentApi, EndpointArgumentApiImpl, ErrorApi, ManagedTypeApi},
+    ArgDecodeInput,
 };
 
 #[derive(Default)]
@@ -29,29 +31,34 @@ where
     }
 }
 
-impl<AA> DynArgInput for EndpointDynArgLoader<AA>
+impl<AA> TopDecodeMultiInput for EndpointDynArgLoader<AA>
 where
     AA: ManagedTypeApi + ErrorApi + EndpointArgumentApi,
 {
-    type ItemInput = ArgDecodeInput<AA>;
-
-    type ManagedTypeErrorApi = AA;
+    type ValueInput = ArgDecodeInput<AA>;
 
     fn has_next(&self) -> bool {
         self.current_index < self.num_arguments
     }
 
-    fn next_arg_input(&mut self) -> ArgDecodeInput<AA> {
+    fn next_value_input<H>(&mut self, h: H) -> Result<Self::ValueInput, H::HandledErr>
+    where
+        H: DecodeErrorHandler,
+    {
         if self.current_index >= self.num_arguments {
-            AA::error_api_impl().signal_error(err_msg::ARG_WRONG_NUMBER)
+            Err(h.handle_error(DecodeError::MULTI_TOO_FEW_ARGS))
         } else {
             let arg_input = ArgDecodeInput::new(self.current_index);
             self.current_index += 1;
-            arg_input
+            Ok(arg_input)
         }
     }
 
-    fn flush_ignore(&mut self) {
+    fn flush_ignore<H>(&mut self, _h: H) -> Result<(), H::HandledErr>
+    where
+        H: DecodeErrorHandler,
+    {
         self.current_index = self.num_arguments;
+        Ok(())
     }
 }

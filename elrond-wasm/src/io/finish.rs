@@ -1,28 +1,30 @@
 use core::marker::PhantomData;
 
-use elrond_codec::{EncodeErrorHandler, TryStaticCast};
+use elrond_codec::{EncodeErrorHandler, TopEncodeMultiOutput, TryStaticCast};
 
 use crate::{
     api::{EndpointFinishApi, EndpointFinishApiImpl, ManagedTypeApi},
-    contract_base::ExitCodecErrorHandler,
     elrond_codec::{EncodeError, TopEncode, TopEncodeOutput},
-    err_msg,
-    types::{BigInt, BigUint, ManagedBuffer, ManagedBufferCachedBuilder, ManagedType},
+    types::{
+        BigInt, BigUint, ManagedBuffer, ManagedBufferCachedBuilder, ManagedSCError, ManagedType,
+        SCError, StaticSCError,
+    },
 };
 
-struct ApiOutputAdapter<FA>
+#[derive(Clone)]
+pub struct ApiOutputAdapter<FA>
 where
     FA: ManagedTypeApi + EndpointFinishApi,
 {
     _phantom: PhantomData<FA>,
 }
 
-impl<FA> ApiOutputAdapter<FA>
+impl<FA> Default for ApiOutputAdapter<FA>
 where
     FA: ManagedTypeApi + EndpointFinishApi,
 {
     #[inline]
-    fn new() -> Self {
+    fn default() -> Self {
         ApiOutputAdapter {
             _phantom: PhantomData,
         }
@@ -88,42 +90,29 @@ where
     }
 }
 
-/// All types that are returned from endpoints need to implement this trait.
-pub trait EndpointResult: Sized {
-    /// Indicates how the result of the endpoint can be interpreted when called via proxy.
-    /// `Self` for most types.
-    type DecodeAs;
-
-    fn finish<FA>(&self)
-    where
-        FA: ManagedTypeApi + EndpointFinishApi;
-}
-
-pub fn finish_all<FA, I, T>(items: I)
+impl<FA> TopEncodeMultiOutput for ApiOutputAdapter<FA>
 where
     FA: ManagedTypeApi + EndpointFinishApi,
-    I: Iterator<Item = T>,
-    T: EndpointResult,
 {
-    for item in items {
-        item.finish::<FA>();
-    }
-}
-
-/// All serializable objects can be used as smart contract function result.
-impl<T> EndpointResult for T
-where
-    T: TopEncode,
-{
-    type DecodeAs = Self;
-
-    fn finish<FA>(&self)
+    fn push_single_value<T, H>(&mut self, arg: &T, h: H) -> Result<(), H::HandledErr>
     where
-        FA: ManagedTypeApi + EndpointFinishApi,
+        T: TopEncode,
+        H: EncodeErrorHandler,
     {
-        let Ok(()) = self.top_encode_or_handle_err(
-            ApiOutputAdapter::<FA>::new(),
-            ExitCodecErrorHandler::<FA>::from(err_msg::FINISH_ENCODE_ERROR),
-        );
+        arg.top_encode_or_handle_err(self.clone(), h)
+    }
+
+    fn push_multi_specialized<T, H>(&mut self, arg: &T, h: H) -> Result<(), H::HandledErr>
+    where
+        T: TryStaticCast,
+        H: EncodeErrorHandler,
+    {
+        if let Some(static_err) = arg.try_cast_ref::<StaticSCError>() {
+            static_err.finish_err::<FA>()
+        } else if let Some(managed_err) = arg.try_cast_ref::<ManagedSCError<FA>>() {
+            managed_err.finish_err::<FA>()
+        } else {
+            Err(h.handle_error(EncodeError::UNSUPPORTED_OPERATION))
+        }
     }
 }
