@@ -34,7 +34,7 @@ pub trait EsdtModule {
         token_ticker: ManagedBuffer,
         token_type: EsdtTokenType,
         #[var_args] opt_num_decimals: OptionalArg<usize>,
-    ) -> AsyncCall {
+    ) {
         require!(self.token_id().is_empty(), "Token already issued");
 
         let num_decimals = match opt_num_decimals {
@@ -53,6 +53,7 @@ pub trait EsdtModule {
             )
             .async_call()
             .with_callback(self.callbacks().issue_callback())
+            .call_and_exit()
     }
 
     #[callback]

@@ -83,8 +83,8 @@
             "expect": {
                 "out": [],
                 "status": "4",
-                "message": "str:wrong number of arguments",
-                "logs": "*",
+                "message": "str:argument decode error (m): too few arguments",
+                "logs": [],
                 "gas": "*",
                 "refund": "*"
             }

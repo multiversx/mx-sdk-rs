@@ -1,12 +1,11 @@
-use core::borrow::Borrow;
-
-use alloc::string::String;
-use elrond_codec::{TopEncode, Vec};
-
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer},
-    api::{EndpointFinishApi, ManagedTypeApi},
-    ArgId, ContractCallArg, DynArg, DynArgInput, DynArgOutput, EndpointResult,
+    api::ManagedTypeApi,
+};
+use alloc::string::String;
+use elrond_codec::{
+    DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti, TopDecodeMultiInput, TopEncodeMulti,
+    TopEncodeMultiOutput, Vec,
 };
 
 use super::{ManagedVec, ManagedVecItem, ManagedVecRefIterator};
@@ -115,56 +114,41 @@ where
         result
     }
 }
-impl<M, T> DynArg for ManagedMultiResultVecEager<M, T>
+
+impl<M, T> TopEncodeMulti for ManagedMultiResultVecEager<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem + DynArg,
+    T: ManagedVecItem + TopEncodeMulti,
 {
-    fn dyn_load<I: DynArgInput>(loader: &mut I, arg_id: ArgId) -> Self {
-        let mut result_vec: ManagedVec<M, T> = ManagedVec::new();
-        while loader.has_next() {
-            result_vec.push(T::dyn_load(loader, arg_id));
-        }
-        ManagedMultiResultVecEager(result_vec)
-    }
-}
+    type DecodeAs = Self;
 
-impl<M, T> EndpointResult for ManagedMultiResultVecEager<M, T>
-where
-    M: ManagedTypeApi,
-    T: ManagedVecItem + EndpointResult + TopEncode,
-{
-    type DecodeAs = ManagedMultiResultVecEager<M, T>;
-
-    #[inline]
-    fn finish<FA>(&self)
+    fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
     where
-        FA: ManagedTypeApi + EndpointFinishApi,
+        O: TopEncodeMultiOutput,
+        H: EncodeErrorHandler,
     {
-        for elem in self.0.iter() {
-            elem.borrow().finish::<FA>();
+        for elem in self.0.into_iter() {
+            elem.multi_encode_or_handle_err(output, h)?;
         }
-    }
-}
-impl<M, T> ContractCallArg for &ManagedMultiResultVecEager<M, T>
-where
-    M: ManagedTypeApi,
-    T: ManagedVecItem + ContractCallArg + TopEncode,
-{
-    fn push_dyn_arg<O: DynArgOutput>(&self, output: &mut O) {
-        for elem in self.0.iter() {
-            elem.borrow().push_dyn_arg(output);
-        }
+        Ok(())
     }
 }
 
-impl<M, T> ContractCallArg for ManagedMultiResultVecEager<M, T>
+impl<M, T> TopDecodeMulti for ManagedMultiResultVecEager<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem + ContractCallArg + TopEncode,
+    T: ManagedVecItem + TopDecodeMulti,
 {
-    fn push_dyn_arg<O: DynArgOutput>(&self, output: &mut O) {
-        ContractCallArg::push_dyn_arg(&self, output)
+    fn multi_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: TopDecodeMultiInput,
+        H: DecodeErrorHandler,
+    {
+        let mut result_vec: ManagedVec<M, T> = ManagedVec::new();
+        while input.has_next() {
+            result_vec.push(T::multi_decode_or_handle_err(input, h)?);
+        }
+        Ok(ManagedMultiResultVecEager(result_vec))
     }
 }
 
