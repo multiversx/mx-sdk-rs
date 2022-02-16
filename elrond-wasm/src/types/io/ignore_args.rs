@@ -1,41 +1,10 @@
-use crate::{
-    abi::TypeAbi,
-    api::{EndpointFinishApi, ManagedTypeApi},
-    io::{ArgId, ContractCallArg, DynArg, DynArgInput},
-    DynArgOutput, EndpointResult,
-};
+use crate::abi::TypeAbi;
 use alloc::string::String;
+use elrond_codec::multi_types::IgnoreValue;
 
 /// Structure that allows taking a variable number of arguments,
 /// but does nothing with them, not even deserialization.
-#[derive(Default, Clone)]
-pub struct IgnoreVarArgs;
-
-impl DynArg for IgnoreVarArgs {
-    fn dyn_load<I: DynArgInput>(loader: &mut I, _arg_id: ArgId) -> Self {
-        loader.flush_ignore();
-        IgnoreVarArgs
-    }
-}
-
-impl EndpointResult for IgnoreVarArgs {
-    type DecodeAs = IgnoreVarArgs;
-
-    #[inline]
-    fn finish<FA>(&self)
-    where
-        FA: ManagedTypeApi + EndpointFinishApi,
-    {
-    }
-}
-
-impl ContractCallArg for &IgnoreVarArgs {
-    fn push_dyn_arg<O: DynArgOutput>(&self, _output: &mut O) {}
-}
-
-impl ContractCallArg for IgnoreVarArgs {
-    fn push_dyn_arg<O: DynArgOutput>(&self, _output: &mut O) {}
-}
+pub type IgnoreVarArgs = IgnoreValue;
 
 impl TypeAbi for IgnoreVarArgs {
     fn type_name() -> String {

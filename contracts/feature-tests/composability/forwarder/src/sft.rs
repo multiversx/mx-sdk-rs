@@ -11,7 +11,7 @@ pub trait ForwarderSftModule: storage::ForwarderStorageModule {
         #[payment] issue_cost: BigUint,
         token_display_name: ManagedBuffer,
         token_ticker: ManagedBuffer,
-    ) -> AsyncCall {
+    ) {
         let caller = self.blockchain().get_caller();
 
         self.send()
@@ -31,6 +31,7 @@ pub trait ForwarderSftModule: storage::ForwarderStorageModule {
             )
             .async_call()
             .with_callback(self.callbacks().sft_issue_callback(&caller))
+            .call_and_exit()
     }
 
     #[callback]

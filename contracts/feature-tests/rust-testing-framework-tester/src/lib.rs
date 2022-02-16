@@ -194,7 +194,7 @@ pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
     }
 
     #[callback_raw]
-    fn callback_raw(&self, #[var_args] _ignore: IgnoreVarArgs) {
+    fn callback_raw(&self, #[var_args] _ignore: IgnoreValue) {
         self.callback_executed().set(&true);
     }
 
