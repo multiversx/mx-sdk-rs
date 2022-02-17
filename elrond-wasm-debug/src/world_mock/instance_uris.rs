@@ -4,8 +4,8 @@ use std::fmt::{self, Write};
 pub struct InstanceUris(Vec<Vec<u8>>);
 
 impl InstanceUris {
-    pub fn new(roles: Vec<Vec<u8>>) -> Self {
-        InstanceUris(roles)
+    pub fn new(uris: Vec<Vec<u8>>) -> Self {
+        InstanceUris(uris)
     }
 
     pub fn new_from_slice(roles: &[u8]) -> Self {
@@ -33,6 +33,10 @@ impl InstanceUris {
 
     pub fn get_as_slice_vec(&self) -> Vec<&[u8]> {
         self.0.iter().map(|elem| elem.as_slice()).collect()
+    }
+
+    pub fn add_uris(&mut self, mut uris: Vec<Vec<u8>>) {
+        self.0.append(&mut uris);
     }
 }
 
