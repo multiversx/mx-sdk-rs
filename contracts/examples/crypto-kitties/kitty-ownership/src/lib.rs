@@ -14,19 +14,19 @@ pub trait KittyOwnership {
     fn init(
         &self,
         birth_fee: BigUint,
-        #[var_args] opt_gene_science_contract_address: OptionalArg<ManagedAddress>,
-        #[var_args] opt_kitty_auction_contract_address: OptionalArg<ManagedAddress>,
+        #[var_args] opt_gene_science_contract_address: OptionalValue<ManagedAddress>,
+        #[var_args] opt_kitty_auction_contract_address: OptionalValue<ManagedAddress>,
     ) {
         self.birth_fee().set(birth_fee);
 
         match opt_gene_science_contract_address {
-            OptionalArg::Some(addr) => self.gene_science_contract_address().set(&addr),
-            OptionalArg::None => {},
+            OptionalValue::Some(addr) => self.gene_science_contract_address().set(&addr),
+            OptionalValue::None => {},
         };
 
         match opt_kitty_auction_contract_address {
-            OptionalArg::Some(addr) => self.kitty_auction_contract_address().set(&addr),
-            OptionalArg::None => {},
+            OptionalValue::Some(addr) => self.kitty_auction_contract_address().set(&addr),
+            OptionalValue::None => {},
         };
 
         self.create_genesis_kitty();

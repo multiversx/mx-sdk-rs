@@ -87,7 +87,7 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
         #[payment] amount: BigUint,
         #[payment_token] identifier: TokenIdentifier,
         #[payment_nonce] nonce: u64,
-        #[var_args] payment_token: OptionalArg<TokenIdentifier>,
+        #[var_args] payment_token: OptionalValue<TokenIdentifier>,
     ) -> SCResult<()> {
         let caller = self.blockchain().get_caller();
         let mut set_payment = TokenIdentifier::egld();

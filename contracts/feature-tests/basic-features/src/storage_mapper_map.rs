@@ -7,12 +7,12 @@ pub trait MapMapperFeatures {
     fn map_mapper(&self) -> MapMapper<u32, u32>;
 
     #[view]
-    fn map_mapper_keys(&self) -> MultiResultVec<u32> {
+    fn map_mapper_keys(&self) -> MultiValueVec<u32> {
         self.map_mapper().keys().collect()
     }
 
     #[view]
-    fn map_mapper_values(&self) -> MultiResultVec<u32> {
+    fn map_mapper_values(&self) -> MultiValueVec<u32> {
         self.map_mapper().values().collect()
     }
 

@@ -52,7 +52,7 @@ pub trait EchoManagedTypes {
         &self,
         addr: ManagedAddress,
         vec: ManagedVec<Self::Api, ManagedBuffer>,
-    ) -> MultiResult2<ManagedAddress, ManagedVec<Self::Api, ManagedBuffer>> {
+    ) -> MultiValue2<ManagedAddress, ManagedVec<Self::Api, ManagedBuffer>> {
         (addr, vec).into()
     }
 
@@ -87,7 +87,7 @@ pub trait EchoManagedTypes {
     fn echo_varags_managed_eager(
         &self,
         #[var_args] m: ManagedVarArgsEager<Self::Api, u32>,
-    ) -> MultiResult2<usize, ManagedMultiResultVecEager<Self::Api, u32>> {
+    ) -> MultiValue2<usize, ManagedMultiResultVecEager<Self::Api, u32>> {
         let v = m.into_vec();
         (v.len(), v.into()).into()
     }
@@ -95,8 +95,8 @@ pub trait EchoManagedTypes {
     #[endpoint]
     fn echo_varags_managed_sum(
         &self,
-        #[var_args] m: ManagedVarArgs<MultiArg2<u32, u32>>,
-    ) -> ManagedMultiResultVec<MultiResult3<u32, u32, u32>> {
+        #[var_args] m: ManagedVarArgs<MultiValue2<u32, u32>>,
+    ) -> ManagedMultiResultVec<MultiValue3<u32, u32, u32>> {
         let mut result = ManagedMultiResultVec::new();
         for arg in m.into_iter() {
             let (x, y) = arg.into_tuple();
