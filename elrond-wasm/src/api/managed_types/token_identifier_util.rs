@@ -27,8 +27,8 @@ pub fn validate_token_identifier(token_id_slice: &[u8]) -> bool {
     let ticker_len = length - ADDITIONAL_RANDOM_CHARS_LENGTH - 1;
     let ticker = &token_id_slice[..ticker_len];
     for ticker_char in ticker {
-        let is_uppercase_letter = uppercase_letter_range.contains(&ticker_char);
-        let is_number = number_range.contains(&ticker_char);
+        let is_uppercase_letter = uppercase_letter_range.contains(ticker_char);
+        let is_number = number_range.contains(ticker_char);
 
         if !is_uppercase_letter && !is_number {
             return false;
@@ -43,8 +43,8 @@ pub fn validate_token_identifier(token_id_slice: &[u8]) -> bool {
     // random chars are alphanumeric lowercase
     let random_chars = &token_id_slice[(length - ADDITIONAL_RANDOM_CHARS_LENGTH)..];
     for rand_char in random_chars {
-        let is_lowercase_letter = lowercase_letter_range.contains(&rand_char);
-        let is_number = number_range.contains(&rand_char);
+        let is_lowercase_letter = lowercase_letter_range.contains(rand_char);
+        let is_number = number_range.contains(rand_char);
 
         if !is_lowercase_letter && !is_number {
             return false;
