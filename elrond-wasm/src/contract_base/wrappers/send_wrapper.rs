@@ -122,6 +122,23 @@ where
         }
     }
 
+    pub fn direct_multi<D>(
+        &self,
+        to: &ManagedAddress<A>,
+        payments: &ManagedVec<A, EsdtTokenPayment<A>>,
+        data: D,
+    ) where
+        D: Into<ManagedBuffer<A>>,
+    {
+        let _ = A::send_api_impl().direct_multi_esdt_transfer_execute(
+            to,
+            payments,
+            0,
+            &data.into(),
+            &ManagedArgBuffer::new_empty(),
+        );
+    }
+
     /// Performs a simple ESDT/NFT transfer, but via async call.  
     /// As with any async call, this immediately terminates the execution of the current call.  
     /// So only use as the last call in your endpoint.  
