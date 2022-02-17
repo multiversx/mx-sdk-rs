@@ -18,11 +18,7 @@ pub trait EgldEsdtSwap {
     #[only_owner]
     #[payable("EGLD")]
     #[endpoint(issueWrappedEgld)]
-    fn issue_wrapped_egld(
-        &self,
-        token_display_name: ManagedBuffer,
-        token_ticker: ManagedBuffer,
-    ) -> AsyncCall {
+    fn issue_wrapped_egld(&self, token_display_name: ManagedBuffer, token_ticker: ManagedBuffer) {
         require!(
             self.wrapped_egld_token_id().is_empty(),
             "wrapped egld was already issued"
@@ -55,6 +51,7 @@ pub trait EgldEsdtSwap {
             )
             .async_call()
             .with_callback(self.callbacks().esdt_issue_callback(&caller))
+            .call_and_exit()
     }
 
     #[callback]
@@ -86,7 +83,7 @@ pub trait EgldEsdtSwap {
 
     #[only_owner]
     #[endpoint(setLocalRoles)]
-    fn set_local_roles(&self) -> AsyncCall {
+    fn set_local_roles(&self) {
         require!(
             !self.wrapped_egld_token_id().is_empty(),
             "Must issue token first"
@@ -101,6 +98,7 @@ pub trait EgldEsdtSwap {
                 roles[..].iter().cloned(),
             )
             .async_call()
+            .call_and_exit()
     }
 
     // endpoints

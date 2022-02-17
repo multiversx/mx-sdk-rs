@@ -3,7 +3,6 @@ use core::marker::PhantomData;
 use crate::{
     abi::{OutputAbi, TypeAbi, TypeDescriptionContainer},
     api::{CallTypeApi, SendApiImpl, StorageWriteApi},
-    io::EndpointResult,
     types::{BigUint, CallbackClosure, ManagedAddress, ManagedArgBuffer, ManagedBuffer},
 };
 use alloc::{string::String, vec::Vec};
@@ -34,14 +33,11 @@ where
     }
 }
 
-impl<SA> EndpointResult for AsyncCall<SA>
+impl<SA> AsyncCall<SA>
 where
-    SA: CallTypeApi + StorageWriteApi + 'static,
+    SA: CallTypeApi + StorageWriteApi,
 {
-    type DecodeAs = ();
-
-    #[inline]
-    fn finish<FA>(&self) {
+    pub fn call_and_exit(&self) -> ! {
         // first, save the callback closure
         if let Some(callback_call) = &self.callback_call {
             callback_call.save_to_storage::<SA>();
@@ -53,7 +49,7 @@ where
             &self.egld_payment,
             &self.endpoint_name,
             &self.arg_buffer,
-        );
+        )
     }
 }
 

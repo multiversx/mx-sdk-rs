@@ -62,7 +62,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
         #[payment_token] offered_token: TokenIdentifier,
         requested_amount: BigUint,
         requested_token: TokenIdentifier,
-        #[var_args] requested_nonce: OptionalArg<u64>,
+        #[var_args] requested_nonce: OptionalValue<u64>,
     ) -> SCResult<()> {
         let payment_token =
             self.check_owned_return_payment_token(&requested_token, &requested_amount)?;
@@ -90,7 +90,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
         let caller = self.blockchain().get_caller();
 
         match requested_nonce {
-            OptionalArg::Some(nonce) => {
+            OptionalValue::Some(nonce) => {
                 self.send().direct(
                     &caller,
                     &requested_token,
@@ -107,7 +107,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
                         .update(|details| details.remove_nonce(nonce))?;
                 }
             },
-            OptionalArg::None => {
+            OptionalValue::None => {
                 self.send_bought_tokens(&caller, requested_token, requested_amount)?;
             },
         };
@@ -188,12 +188,12 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
     fn get_token_availability(
         &self,
         identifier: TokenIdentifier,
-    ) -> MultiResultVec<MultiResult2<u64, BigUint>> {
+    ) -> MultiValueVec<MultiValue2<u64, BigUint>> {
         let token_nonces = self.token_details(&identifier).get().token_nonces;
         let mut availability = Vec::new();
 
         for current_check_nonce in token_nonces {
-            availability.push(MultiArg2((
+            availability.push(MultiValue2((
                 current_check_nonce,
                 self.nonce_amount(&identifier, current_check_nonce).get(),
             )));

@@ -1,10 +1,6 @@
-use crate::{
-    abi::TypeAbi,
-    api::{EndpointFinishApi, ManagedTypeApi},
-    types::BoxedBytes,
-    EndpointResult,
-};
+use crate::{abi::TypeAbi, types::BoxedBytes};
 use alloc::string::String;
+use elrond_codec::{EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput};
 
 /// Standard way of signalling that an operation was interrupted early, before running out of gas.
 /// An endpoint that performs a longer operation can check from time to time if it is running low
@@ -32,15 +28,15 @@ impl OperationCompletionStatus {
     }
 }
 
-impl EndpointResult for OperationCompletionStatus {
+impl TopEncodeMulti for OperationCompletionStatus {
     type DecodeAs = BoxedBytes;
 
-    #[inline]
-    fn finish<FA>(&self)
+    fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
     where
-        FA: ManagedTypeApi + EndpointFinishApi,
+        O: TopEncodeMultiOutput,
+        H: EncodeErrorHandler,
     {
-        self.output_bytes().finish::<FA>();
+        output.push_single_value(&self.output_bytes(), h)
     }
 }
 

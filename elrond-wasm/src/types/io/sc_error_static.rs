@@ -1,4 +1,4 @@
-use elrond_codec::{DecodeError, EncodeError};
+use elrond_codec::{DecodeError, EncodeError, TopEncodeMulti, TryStaticCast};
 
 use crate::api::{EndpointFinishApi, ErrorApiImpl};
 
@@ -16,6 +16,8 @@ impl SCError for StaticSCError {
         FA::error_api_impl().signal_error(self.0)
     }
 }
+
+impl TryStaticCast for StaticSCError {}
 
 impl StaticSCError {
     #[inline]
@@ -55,5 +57,17 @@ impl From<DecodeError> for StaticSCError {
 impl From<!> for StaticSCError {
     fn from(_: !) -> Self {
         unreachable!()
+    }
+}
+
+impl TopEncodeMulti for StaticSCError {
+    type DecodeAs = Self;
+
+    fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: elrond_codec::TopEncodeMultiOutput,
+        H: elrond_codec::EncodeErrorHandler,
+    {
+        output.push_multi_specialized(self, h)
     }
 }

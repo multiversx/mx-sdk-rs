@@ -22,7 +22,7 @@ mod module_1 {
     pub trait VersionModule: elrond_wasm::contract_base::ContractBase + Sized {
         fn version(&self) -> BigInt<Self::Api>;
 
-        fn some_async(&self) -> AsyncCall<Self::Api>;
+        fn some_async(&self);
 
         fn callback(&self);
     }
@@ -40,7 +40,7 @@ mod module_1 {
             BigInt::from(100)
         }
 
-        fn some_async(&self) -> AsyncCall<Self::Api> {
+        fn some_async(&self) {
             panic!("wooo")
         }
 
@@ -52,12 +52,12 @@ mod module_1 {
         fn call_version(&self) {
             elrond_wasm::api::CallValueApiImpl::check_not_payable(&Self::Api::call_value_api_impl());
             let result = self.version();
-            elrond_wasm::io::EndpointResult::finish::<Self::Api>(&result)
+            elrond_wasm::io::finish_multi::<Self::Api, _>(&result)
         }
 
         fn call_some_async(&self) {
             let result = self.some_async();
-            elrond_wasm::io::EndpointResult::finish::<Self::Api>(&result)
+            elrond_wasm::io::finish_multi::<Self::Api, _>(&result)
         }
 
         fn call(&self, fn_name: &[u8]) -> bool {
@@ -90,8 +90,10 @@ mod module_1 {
     pub trait ProxyTrait: elrond_wasm::contract_base::ProxyObjBase + Sized {
         fn version(
             self,
-        ) -> ContractCall<Self::Api, <BigInt<Self::Api> as elrond_wasm::io::EndpointResult>::DecodeAs>
-        {
+        ) -> ContractCall<
+            Self::Api,
+            <BigInt<Self::Api> as elrond_wasm::elrond_codec::TopEncodeMulti>::DecodeAs,
+        > {
             let ___address___ = self.into_fields();
             let mut ___contract_call___ = elrond_wasm::types::new_contract_call(
                 ___address___,
@@ -166,7 +168,7 @@ mod sample_adder {
                 0i32,
             );
             let result = self.get_sum();
-            elrond_wasm::io::EndpointResult::finish::<Self::Api>(&result);
+            elrond_wasm::io::finish_multi::<Self::Api, _>(&result);
         }
         #[inline]
         fn call_init(&self) {
@@ -193,7 +195,7 @@ mod sample_adder {
                 ArgId::from(&b"value"[..]),
             );
             let result = self.add(value);
-            elrond_wasm::io::EndpointResult::finish::<Self::Api>(&result);
+            elrond_wasm::io::finish_multi::<Self::Api, _>(&result);
         }
 
         fn call(&self, fn_name: &[u8]) -> bool {
@@ -232,7 +234,7 @@ mod sample_adder {
             self,
         ) -> elrond_wasm::types::ContractCall<
             Self::Api,
-            <BigInt<Self::Api> as elrond_wasm::io::EndpointResult>::DecodeAs,
+            <BigInt<Self::Api> as elrond_wasm::elrond_codec::TopEncodeMulti>::DecodeAs,
         > {
             let ___address___ = self.into_fields();
             let mut ___contract_call___ = elrond_wasm::types::new_contract_call(
@@ -245,8 +247,10 @@ mod sample_adder {
         fn add(
             self,
             amount: &BigInt<Self::Api>,
-        ) -> ContractCall<Self::Api, <SCResult<()> as elrond_wasm::io::EndpointResult>::DecodeAs>
-        {
+        ) -> ContractCall<
+            Self::Api,
+            <SCResult<()> as elrond_wasm::elrond_codec::TopEncodeMulti>::DecodeAs,
+        > {
             let ___address___ = self.into_fields();
             let mut ___contract_call___ = elrond_wasm::types::new_contract_call(
                 ___address___,
