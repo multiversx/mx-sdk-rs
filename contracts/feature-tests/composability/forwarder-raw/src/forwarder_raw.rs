@@ -44,6 +44,13 @@ pub trait ForwarderRaw {
         let _ = self.send().direct(&to, &token, 0, &payment, &[]);
     }
 
+    #[endpoint]
+    #[payable("*")]
+    fn forward_direct_esdt_multi(&self, to: ManagedAddress) {
+        let payments = self.call_value().all_esdt_transfers();
+        self.send().direct_multi(&to, &payments, &[]);
+    }
+
     fn forward_contract_call(
         &self,
         to: ManagedAddress,
