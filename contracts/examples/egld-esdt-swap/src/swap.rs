@@ -89,14 +89,13 @@ pub trait EgldEsdtSwap {
             "Must issue token first"
         );
 
+        let roles = [EsdtLocalRole::Mint, EsdtLocalRole::Burn];
         self.send()
             .esdt_system_sc_proxy()
             .set_special_roles(
                 &self.blockchain().get_sc_address(),
                 &self.wrapped_egld_token_id().get(),
-                [EsdtLocalRole::Mint, EsdtLocalRole::Burn][..]
-                    .iter()
-                    .cloned(),
+                roles[..].iter().cloned(),
             )
             .async_call()
             .call_and_exit()
