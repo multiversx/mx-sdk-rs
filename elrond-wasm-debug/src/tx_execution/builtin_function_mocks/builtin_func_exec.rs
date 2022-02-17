@@ -6,7 +6,8 @@ use crate::{
 use super::{
     change_owner_mock::execute_change_owner, esdt_local_burn::execute_local_burn,
     esdt_local_mint::execute_local_mint, esdt_multi_transfer_mock::execute_esdt_multi_transfer,
-    esdt_nft_add_quantity_mock::execute_nft_add_quantity, esdt_nft_burn_mock::execute_nft_burn,
+    esdt_nft_add_quantity_mock::execute_nft_add_quantity,
+    esdt_nft_add_uri_mock::execute_nft_add_uri, esdt_nft_burn_mock::execute_nft_burn,
     esdt_nft_create_mock::execute_esdt_nft_create,
     esdt_nft_transfer_mock::execute_esdt_nft_transfer, esdt_transfer_mock::execute_esdt_transfer,
     set_username_mock::execute_set_username, upgrade_contract::execute_upgrade_contract,
@@ -14,9 +15,9 @@ use super::{
 
 use elrond_wasm::api::{
     CHANGE_OWNER_BUILTIN_FUNC_NAME, ESDT_LOCAL_BURN_FUNC_NAME, ESDT_LOCAL_MINT_FUNC_NAME,
-    ESDT_MULTI_TRANSFER_FUNC_NAME, ESDT_NFT_ADD_QUANTITY_FUNC_NAME, ESDT_NFT_BURN_FUNC_NAME,
-    ESDT_NFT_CREATE_FUNC_NAME, ESDT_NFT_TRANSFER_FUNC_NAME, ESDT_TRANSFER_FUNC_NAME,
-    SET_USERNAME_FUNC_NAME, UPGRADE_CONTRACT_FUNC_NAME,
+    ESDT_MULTI_TRANSFER_FUNC_NAME, ESDT_NFT_ADD_QUANTITY_FUNC_NAME, ESDT_NFT_ADD_URI_FUNC_NAME,
+    ESDT_NFT_BURN_FUNC_NAME, ESDT_NFT_CREATE_FUNC_NAME, ESDT_NFT_TRANSFER_FUNC_NAME,
+    ESDT_TRANSFER_FUNC_NAME, SET_USERNAME_FUNC_NAME, UPGRADE_CONTRACT_FUNC_NAME,
 };
 
 const ESDT_ROLE_LOCAL_MINT: &[u8] = b"ESDTRoleLocalMint";
@@ -24,6 +25,7 @@ const ESDT_ROLE_LOCAL_BURN: &[u8] = b"ESDTRoleLocalBurn";
 const ESDT_ROLE_NFT_CREATE: &[u8] = b"ESDTRoleNFTCreate";
 const ESDT_ROLE_NFT_ADD_QUANTITY: &[u8] = b"ESDTRoleNFTAddQuantity";
 const ESDT_ROLE_NFT_BURN: &[u8] = b"ESDTRoleNFTBurn";
+const ESDT_ROLE_NFT_ADD_URI: &[u8] = b"ESDTRoleNFTAddURI";
 
 pub fn execute_builtin_function_or_default(
     tx_input: TxInput,
@@ -61,6 +63,12 @@ pub fn execute_builtin_function_or_default(
             tx_input,
             tx_cache,
             &execute_nft_burn,
+        ),
+        ESDT_NFT_ADD_URI_FUNC_NAME => check_and_execute_builtin_function(
+            ESDT_ROLE_NFT_ADD_URI,
+            tx_input,
+            tx_cache,
+            &execute_nft_add_uri,
         ),
 
         ESDT_TRANSFER_FUNC_NAME => execute_esdt_transfer(tx_input, tx_cache),

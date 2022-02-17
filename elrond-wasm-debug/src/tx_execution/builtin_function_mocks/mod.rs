@@ -4,6 +4,7 @@ mod esdt_local_burn;
 mod esdt_local_mint;
 mod esdt_multi_transfer_mock;
 mod esdt_nft_add_quantity_mock;
+mod esdt_nft_add_uri_mock;
 mod esdt_nft_burn_mock;
 mod esdt_nft_create_mock;
 mod esdt_nft_transfer_mock;
