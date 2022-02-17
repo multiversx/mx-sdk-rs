@@ -40,15 +40,16 @@ pub trait KittyAuction {
     fn create_and_auction_gen_zero_kitty(&self) {
         let kitty_ownership_contract_address =
             self.get_kitty_ownership_contract_address_or_default();
-        if !kitty_ownership_contract_address.is_zero() {
-            self.kitty_ownership_proxy(kitty_ownership_contract_address)
-                .create_gen_zero_kitty()
-                .async_call()
-                .with_callback(self.callbacks().create_gen_zero_kitty_callback())
-                .call_and_exit()
-        } else {
-            sc_panic!("Kitty Ownership contract address not set!")
-        }
+        require!(
+            !kitty_ownership_contract_address.is_zero(),
+            "Kitty Ownership contract address not set!"
+        );
+        
+        self.kitty_ownership_proxy(kitty_ownership_contract_address)
+            .create_gen_zero_kitty()
+            .async_call()
+            .with_callback(self.callbacks().create_gen_zero_kitty_callback())
+            .call_and_exit()
     }
 
     // views

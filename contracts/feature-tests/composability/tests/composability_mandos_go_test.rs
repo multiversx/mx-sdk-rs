@@ -66,6 +66,11 @@ fn forw_raw_direct_esdt_go() {
 }
 
 #[test]
+fn forw_raw_direct_multi_rs() {
+    elrond_wasm_debug::mandos_go("mandos/forw_raw_direct_multi_esdt.scen.json");
+}
+
+#[test]
 fn forw_raw_sync_echo_go() {
     elrond_wasm_debug::mandos_go("mandos/forw_raw_sync_echo.scen.json");
 }
