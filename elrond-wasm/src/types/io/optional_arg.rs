@@ -9,11 +9,19 @@ use elrond_codec::multi_types::OptionalValue;
 ///
 /// As a principle, optional arguments or results should come last,
 /// otherwise there is ambiguity as to how to interpret what comes after.
+#[deprecated(
+    since = "0.28.0",
+    note = "Alias kept for backwards compatibility. Replace with `OptionalValue`"
+)]
 pub type OptionalArg<T> = OptionalValue<T>;
 
 /// It is just an alias for `OptionalArg`.
 /// In general we use `OptionalArg` for arguments and `OptionalResult` for results,
 /// but it is the same implementation for both.
+#[deprecated(
+    since = "0.28.0",
+    note = "Alias kept for backwards compatibility. Replace with `OptionalValue`"
+)]
 pub type OptionalResult<T> = OptionalArg<T>;
 
 impl<T: TypeAbi> TypeAbi for OptionalValue<T> {

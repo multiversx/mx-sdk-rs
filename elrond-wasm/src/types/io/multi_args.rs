@@ -4,8 +4,16 @@ use alloc::{string::String, vec::Vec};
 macro_rules! multi_arg_impls {
     ($(($mval_struct:ident $marg_struct:ident $mres_struct:ident $($n:tt $name:ident)+) )+) => {
         $(
+            #[deprecated(
+                since = "0.28.0",
+                note = "Alias kept for backwards compatibility. Replace with `MultiValue*`"
+            )]
             pub type $marg_struct<$($name,)+> = elrond_codec::multi_types::$mval_struct<$($name,)+>;
 
+            #[deprecated(
+                since = "0.28.0",
+                note = "Alias kept for backwards compatibility. Replace with `MultiValue*`"
+            )]
             pub type $mres_struct<$($name,)+> = elrond_codec::multi_types::$mval_struct<$($name,)+>;
 
             impl<$($name),+ > TypeAbi for elrond_codec::multi_types::$mval_struct<$($name,)+>
