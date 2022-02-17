@@ -1,9 +1,12 @@
 use core::marker::PhantomData;
 
+use elrond_codec::TopEncodeMulti;
+
 use crate::{
     api::{BlockchainApiImpl, SendApi, SendApiImpl},
+    contract_base::ExitCodecErrorHandler,
+    err_msg,
     types::{BigUint, CodeMetadata, ManagedAddress, ManagedBuffer, ManagedVec},
-    ContractCallArg,
 };
 
 use super::ManagedArgBuffer;
@@ -73,8 +76,9 @@ where
         self
     }
 
-    pub fn push_endpoint_arg<D: ContractCallArg>(&mut self, endpoint_arg: D) {
-        endpoint_arg.push_dyn_arg(&mut self.arg_buffer);
+    pub fn push_endpoint_arg<T: TopEncodeMulti>(&mut self, endpoint_arg: &T) {
+        let h = ExitCodecErrorHandler::<SA>::from(err_msg::CONTRACT_CALL_ENCODE_ERROR);
+        let Ok(()) = endpoint_arg.multi_encode_or_handle_err(&mut self.arg_buffer, h);
     }
 
     // pub fn get_mut_arg_buffer(&mut self) -> &mut ArgBuffer {

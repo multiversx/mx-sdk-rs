@@ -12,7 +12,12 @@ pub trait EventFeatures {
     fn event_a(&self, data: &BigUint);
 
     #[endpoint(logEventB)]
-    fn log_event_b(&self, arg1: &BigUint, arg2: &Address, #[var_args] data: VarArgs<BoxedBytes>) {
+    fn log_event_b(
+        &self,
+        arg1: &BigUint,
+        arg2: &Address,
+        #[var_args] data: MultiValueVec<BoxedBytes>,
+    ) {
         self.event_b(arg1, arg2, data.as_slice());
     }
 

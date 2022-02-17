@@ -14,15 +14,15 @@ pub trait KittyOwnership {
     fn init(
         &self,
         birth_fee: BigUint,
-        #[var_args] opt_gene_science_contract_address: OptionalArg<ManagedAddress>,
-        #[var_args] opt_kitty_auction_contract_address: OptionalArg<ManagedAddress>,
+        #[var_args] opt_gene_science_contract_address: OptionalValue<ManagedAddress>,
+        #[var_args] opt_kitty_auction_contract_address: OptionalValue<ManagedAddress>,
     ) {
         self.birth_fee().set(birth_fee);
 
-        if let OptionalArg::Some(addr) = opt_gene_science_contract_address {
+        if let OptionalValue::Some(addr) = opt_gene_science_contract_address {
             self.gene_science_contract_address().set(&addr);
         }
-        if let OptionalArg::Some(addr) = opt_kitty_auction_contract_address {
+        if let OptionalValue::Some(addr) = opt_kitty_auction_contract_address {
             self.kitty_auction_contract_address().set(&addr);
         }
 
@@ -319,7 +319,7 @@ pub trait KittyOwnership {
     }
 
     #[endpoint(giveBirth)]
-    fn give_birth(&self, matron_id: u32) -> AsyncCall {
+    fn give_birth(&self, matron_id: u32) {
         require!(self.is_valid_id(matron_id), "Invalid kitty id!");
 
         let matron = self.kitty_by_id(matron_id).get();
@@ -341,6 +341,7 @@ pub trait KittyOwnership {
                     self.callbacks()
                         .generate_kitty_genes_callback(matron_id, self.blockchain().get_caller()),
                 )
+                .call_and_exit()
         } else {
             sc_panic!("Gene science contract address not set!")
         }

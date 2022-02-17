@@ -1,7 +1,9 @@
+use alloc::string::String;
+use elrond_codec::{EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput, Vec};
+
 use crate::{
     abi::{OutputAbi, TypeAbi, TypeDescriptionContainer},
-    api::{EndpointFinishApi, ManagedTypeApi},
-    EndpointResult, *,
+    api::EndpointFinishApi,
 };
 use core::{
     convert,
@@ -105,27 +107,23 @@ where
     }
 }
 
-impl<T, E> EndpointResult for SCResult<T, E>
+impl<T, E> TopEncodeMulti for SCResult<T, E>
 where
-    T: EndpointResult,
-    E: SCError,
+    T: TopEncodeMulti,
+    E: TopEncodeMulti,
 {
     /// Error implies the transaction fails, so if there is a result,
     /// it is of type `T`.
     type DecodeAs = T::DecodeAs;
 
-    #[inline]
-    fn finish<FA>(&self)
+    fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
     where
-        FA: ManagedTypeApi + EndpointFinishApi,
+        O: TopEncodeMultiOutput,
+        H: EncodeErrorHandler,
     {
         match self {
-            SCResult::Ok(t) => {
-                t.finish::<FA>();
-            },
-            SCResult::Err(e) => {
-                e.finish_err::<FA>();
-            },
+            SCResult::Ok(t) => t.multi_encode_or_handle_err(output, h),
+            SCResult::Err(e) => e.multi_encode_or_handle_err(output, h),
         }
     }
 }

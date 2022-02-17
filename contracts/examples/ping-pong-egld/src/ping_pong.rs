@@ -35,7 +35,7 @@ pub trait PingPong {
         ping_amount: &BigUint,
         duration_in_seconds: u64,
         opt_activation_timestamp: Option<u64>,
-        #[var_args] max_funds: OptionalArg<BigUint>,
+        #[var_args] max_funds: OptionalValue<BigUint>,
     ) {
         self.ping_amount().set(ping_amount);
         let activation_timestamp =
@@ -50,7 +50,7 @@ pub trait PingPong {
     /// Optional `_data` argument is ignored.
     #[payable("EGLD")]
     #[endpoint]
-    fn ping(&self, #[var_args] _data: OptionalArg<ManagedBuffer>) {
+    fn ping(&self, #[var_args] _data: OptionalValue<ManagedBuffer>) {
         let payment = self.call_value().egld_value();
 
         require!(

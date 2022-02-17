@@ -22,7 +22,7 @@ pub trait Erc1155 {
         type_id: BigUint,
         value: BigUint,
         data: &[u8],
-    ) -> SCResult<OptionalResult<AsyncCall>> {
+    ) {
         let caller = self.blockchain().get_caller();
 
         require!(!to.is_zero(), "Can't transfer to address zero");
@@ -48,18 +48,14 @@ pub trait Erc1155 {
         type_id: BigUint,
         amount: BigUint,
         data: &[u8],
-    ) -> SCResult<OptionalResult<AsyncCall>> {
-        self.try_reserve_fungible(&from, &type_id, &amount)?;
+    ) {
+        self.try_reserve_fungible(&from, &type_id, &amount);
 
-        Ok(if self.blockchain().is_smart_contract(&to) {
-            OptionalResult::Some(
-                self.peform_async_call_single_transfer(from, to, type_id, amount, data),
-            )
+        if self.blockchain().is_smart_contract(&to) {
+            self.peform_async_call_single_transfer(from, to, type_id, amount, data);
         } else {
             self.increase_balance(&to, &type_id, &amount);
-
-            OptionalResult::None
-        })
+        }
     }
 
     fn safe_transfer_from_non_fungible(
@@ -69,20 +65,16 @@ pub trait Erc1155 {
         type_id: BigUint,
         nft_id: BigUint,
         data: &[u8],
-    ) -> SCResult<OptionalResult<AsyncCall>> {
-        self.try_reserve_non_fungible(&from, &type_id, &nft_id)?;
+    ) {
+        self.try_reserve_non_fungible(&from, &type_id, &nft_id);
 
-        Ok(if self.blockchain().is_smart_contract(&to) {
-            OptionalResult::Some(
-                self.peform_async_call_single_transfer(from, to, type_id, nft_id, data),
-            )
+        if self.blockchain().is_smart_contract(&to) {
+            self.peform_async_call_single_transfer(from, to, type_id, nft_id, data);
         } else {
             let amount = BigUint::from(1u32);
             self.increase_balance(&to, &type_id, &amount);
             self.token_owner(&type_id, &nft_id).set(&to);
-
-            OptionalResult::None
-        })
+        }
     }
 
     /// `value` is amount for fungible, nft_id for non-fungible
@@ -94,7 +86,7 @@ pub trait Erc1155 {
         type_ids: &[BigUint],
         values: &[BigUint],
         data: &[u8],
-    ) -> SCResult<OptionalResult<AsyncCall>> {
+    ) {
         let caller = self.blockchain().get_caller();
         let is_receiver_smart_contract = self.blockchain().is_smart_contract(&to);
 
@@ -122,7 +114,7 @@ pub trait Erc1155 {
                     &to,
                     type_id,
                     value,
-                )?;
+                );
             } else {
                 self.safe_batch_item_transfer_from_non_fungible(
                     is_receiver_smart_contract,
@@ -130,17 +122,13 @@ pub trait Erc1155 {
                     &to,
                     type_id,
                     value,
-                )?;
+                );
             }
         }
 
-        Ok(if is_receiver_smart_contract {
-            OptionalResult::Some(
-                self.peform_async_call_batch_transfer(from, to, type_ids, values, data),
-            )
-        } else {
-            OptionalResult::None
-        })
+        if is_receiver_smart_contract {
+            self.peform_async_call_batch_transfer(from, to, type_ids, values, data);
+        }
     }
 
     fn safe_batch_item_transfer_from_fungible(
@@ -150,12 +138,11 @@ pub trait Erc1155 {
         to: &ManagedAddress,
         type_id: &BigUint,
         amount: &BigUint,
-    ) -> SCResult<()> {
-        self.try_reserve_fungible(from, type_id, amount)?;
+    ) {
+        self.try_reserve_fungible(from, type_id, amount);
         if !is_receiver_smart_contract {
             self.increase_balance(to, type_id, amount);
         }
-        Ok(())
     }
 
     fn safe_batch_item_transfer_from_non_fungible(
@@ -165,8 +152,8 @@ pub trait Erc1155 {
         to: &ManagedAddress,
         type_id: &BigUint,
         nft_id: &BigUint,
-    ) -> SCResult<()> {
-        self.try_reserve_non_fungible(from, type_id, nft_id)?;
+    ) {
+        self.try_reserve_non_fungible(from, type_id, nft_id);
         if !is_receiver_smart_contract {
             let amount = BigUint::from(1u32);
             self.increase_balance(to, type_id, &amount);
@@ -175,7 +162,6 @@ pub trait Erc1155 {
             self.token_owner(type_id, nft_id)
                 .set(&ManagedAddress::zero());
         }
-        Ok(())
     }
 
     #[endpoint(setApprovalForAll)]
@@ -270,8 +256,8 @@ pub trait Erc1155 {
     #[view(balanceOfBatch)]
     fn balance_of_batch(
         &self,
-        #[var_args] owner_type_id_pairs: VarArgs<MultiArg2<ManagedAddress, BigUint>>,
-    ) -> MultiResultVec<BigUint> {
+        #[var_args] owner_type_id_pairs: MultiValueVec<MultiValue2<ManagedAddress, BigUint>>,
+    ) -> MultiValueVec<BigUint> {
         let mut batch_balance = Vec::new();
         for multi_arg in owner_type_id_pairs.into_vec() {
             let (owner, type_id) = multi_arg.into_tuple();
@@ -311,20 +297,13 @@ pub trait Erc1155 {
         balance_mapper.insert(type_id.clone(), amount.clone());
     }
 
-    fn try_reserve_fungible(
-        &self,
-        owner: &ManagedAddress,
-        type_id: &BigUint,
-        amount: &BigUint,
-    ) -> SCResult<()> {
+    fn try_reserve_fungible(&self, owner: &ManagedAddress, type_id: &BigUint, amount: &BigUint) {
         let balance = self.balance_of(owner, type_id);
 
-        require!(amount > &0, "Must transfer more than 0");
+        require!(amount > &0u32, "Must transfer more than 0");
         require!(amount <= &balance, "Not enough balance for id");
 
         self.decrease_balance(owner, type_id, amount);
-
-        Ok(())
     }
 
     fn try_reserve_non_fungible(
@@ -332,7 +311,7 @@ pub trait Erc1155 {
         owner: &ManagedAddress,
         type_id: &BigUint,
         nft_id: &BigUint,
-    ) -> SCResult<()> {
+    ) {
         require!(
             self.is_valid_nft_id(type_id, nft_id),
             "Token type-id pair is not valid"
@@ -346,8 +325,6 @@ pub trait Erc1155 {
         self.decrease_balance(owner, type_id, &amount);
         self.token_owner(type_id, nft_id)
             .set(&ManagedAddress::zero());
-
-        Ok(())
     }
 
     /// Range is inclusive for both `start` and `end`
@@ -374,7 +351,7 @@ pub trait Erc1155 {
         type_id: BigUint,
         value: BigUint,
         data: &[u8],
-    ) -> AsyncCall {
+    ) {
         let caller = self.blockchain().get_caller();
 
         self.erc1155_user_proxy(to.clone())
@@ -386,6 +363,7 @@ pub trait Erc1155 {
                 [type_id].to_vec(),
                 [value].to_vec(),
             ))
+            .call_and_exit()
     }
 
     fn peform_async_call_batch_transfer(
@@ -395,7 +373,7 @@ pub trait Erc1155 {
         type_ids: &[BigUint],
         values: &[BigUint],
         data: &[u8],
-    ) -> AsyncCall {
+    ) {
         let caller = self.blockchain().get_caller();
 
         self.erc1155_user_proxy(to.clone())
@@ -413,6 +391,7 @@ pub trait Erc1155 {
                 type_ids.to_vec(),
                 values.to_vec(),
             ))
+            .call_and_exit()
     }
 
     // callbacks
