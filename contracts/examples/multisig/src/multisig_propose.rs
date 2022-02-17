@@ -51,12 +51,12 @@ pub trait MultisigProposeModule: crate::multisig_state::MultisigStateModule {
         &self,
         to: ManagedAddress,
         egld_amount: BigUint,
-        opt_function: OptionalArg<ManagedBuffer>,
+        opt_function: OptionalValue<ManagedBuffer>,
         arguments: ManagedVarArgs<ManagedBuffer>,
     ) -> CallActionData<Self::Api> {
         let endpoint_name = match opt_function {
-            OptionalArg::Some(data) => data,
-            OptionalArg::None => ManagedBuffer::new(),
+            OptionalValue::Some(data) => data,
+            OptionalValue::None => ManagedBuffer::new(),
         };
         CallActionData {
             to,
@@ -75,7 +75,7 @@ pub trait MultisigProposeModule: crate::multisig_state::MultisigStateModule {
         &self,
         to: ManagedAddress,
         egld_amount: BigUint,
-        #[var_args] opt_function: OptionalArg<ManagedBuffer>,
+        #[var_args] opt_function: OptionalValue<ManagedBuffer>,
         #[var_args] arguments: ManagedVarArgs<ManagedBuffer>,
     ) -> usize {
         let call_data = self.prepare_call_data(to, egld_amount, opt_function, arguments);
@@ -92,7 +92,7 @@ pub trait MultisigProposeModule: crate::multisig_state::MultisigStateModule {
         &self,
         to: ManagedAddress,
         egld_amount: BigUint,
-        #[var_args] opt_function: OptionalArg<ManagedBuffer>,
+        #[var_args] opt_function: OptionalValue<ManagedBuffer>,
         #[var_args] arguments: ManagedVarArgs<ManagedBuffer>,
     ) -> usize {
         let call_data = self.prepare_call_data(to, egld_amount, opt_function, arguments);

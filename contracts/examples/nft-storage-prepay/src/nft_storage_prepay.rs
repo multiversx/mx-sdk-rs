@@ -56,12 +56,12 @@ pub trait NftStoragePrepay {
 
     /// defaults to max amount
     #[endpoint(withdraw)]
-    fn withdraw(&self, #[var_args] opt_amount: OptionalArg<BigUint>) {
+    fn withdraw(&self, #[var_args] opt_amount: OptionalValue<BigUint>) {
         let caller = self.blockchain().get_caller();
         let mut user_deposit = self.deposit(&caller).get();
         let amount = match opt_amount {
-            OptionalArg::Some(amt) => amt,
-            OptionalArg::None => user_deposit.clone(),
+            OptionalValue::Some(amt) => amt,
+            OptionalValue::None => user_deposit.clone(),
         };
 
         require!(user_deposit >= amount, "Can't withdraw more than deposit");

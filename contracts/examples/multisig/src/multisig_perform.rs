@@ -73,7 +73,7 @@ pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
 
     /// Proposers and board members use this to launch signed actions.
     #[endpoint(performAction)]
-    fn perform_action_endpoint(&self, action_id: usize) -> OptionalResult<ManagedAddress> {
+    fn perform_action_endpoint(&self, action_id: usize) -> OptionalValue<ManagedAddress> {
         let (_, caller_role) = self.get_caller_id_and_role();
         require!(
             caller_role.can_perform_action(),
@@ -87,7 +87,7 @@ pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
         self.perform_action(action_id)
     }
 
-    fn perform_action(&self, action_id: usize) -> OptionalResult<ManagedAddress> {
+    fn perform_action(&self, action_id: usize) -> OptionalValue<ManagedAddress> {
         let action = self.action_mapper().get(action_id);
 
         // clean up storage
@@ -96,10 +96,10 @@ pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
         self.clear_action(action_id);
 
         match action {
-            Action::Nothing => OptionalResult::None,
+            Action::Nothing => OptionalValue::None,
             Action::AddBoardMember(board_member_address) => {
                 self.change_user_role(board_member_address, UserRole::BoardMember);
-                OptionalResult::None
+                OptionalValue::None
             },
             Action::AddProposer(proposer_address) => {
                 self.change_user_role(proposer_address, UserRole::Proposer);
@@ -109,7 +109,7 @@ pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
                     self.quorum().get() <= self.num_board_members().get(),
                     "quorum cannot exceed board size"
                 );
-                OptionalResult::None
+                OptionalValue::None
             },
             Action::RemoveUser(user_address) => {
                 self.change_user_role(user_address, UserRole::None);
@@ -123,7 +123,7 @@ pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
                     self.quorum().get() <= num_board_members,
                     "quorum cannot exceed board size"
                 );
-                OptionalResult::None
+                OptionalValue::None
             },
             Action::ChangeQuorum(new_quorum) => {
                 require!(
@@ -131,7 +131,7 @@ pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
                     "quorum cannot exceed board size"
                 );
                 self.quorum().set(new_quorum);
-                OptionalResult::None
+                OptionalValue::None
             },
             Action::SendTransferExecute(call_data) => {
                 let result = Self::Api::send_api_impl().direct_egld_execute(
@@ -144,7 +144,7 @@ pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
                 if let Result::Err(e) = result {
                     Self::Api::error_api_impl().signal_error(e);
                 }
-                OptionalResult::None
+                OptionalValue::None
             },
             Action::SendAsyncCall(call_data) => self
                 .send()
@@ -167,7 +167,7 @@ pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
                     code_metadata,
                     &arguments.into(),
                 );
-                OptionalResult::Some(new_address)
+                OptionalValue::Some(new_address)
             },
             Action::SCUpgradeFromSource {
                 sc_address,
@@ -185,7 +185,7 @@ pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
                     code_metadata,
                     &arguments.into(),
                 );
-                OptionalResult::None
+                OptionalValue::None
             },
         }
     }

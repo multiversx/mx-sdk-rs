@@ -61,7 +61,7 @@ pub trait GovernanceModule:
         &self,
         #[payment_amount] payment_amount: BigUint,
         description: BoxedBytes,
-        #[var_args] actions: VarArgs<GovernanceActionAsMultiArg<Self::Api>>,
+        #[var_args] actions: MultiValueVec<GovernanceActionAsMultiArg<Self::Api>>,
     ) -> SCResult<usize> {
         self.require_payment_token_governance_token()?;
         require!(
@@ -315,20 +315,20 @@ pub trait GovernanceModule:
     }
 
     #[view(getProposer)]
-    fn get_proposer(&self, proposal_id: usize) -> OptionalArg<ManagedAddress> {
+    fn get_proposer(&self, proposal_id: usize) -> OptionalValue<ManagedAddress> {
         if !self.proposal_exists(proposal_id) {
-            OptionalArg::None
+            OptionalValue::None
         } else {
-            OptionalArg::Some(self.proposals().get(proposal_id).proposer)
+            OptionalValue::Some(self.proposals().get(proposal_id).proposer)
         }
     }
 
     #[view(getProposalDescription)]
-    fn get_proposal_description(&self, proposal_id: usize) -> OptionalArg<BoxedBytes> {
+    fn get_proposal_description(&self, proposal_id: usize) -> OptionalValue<BoxedBytes> {
         if !self.proposal_exists(proposal_id) {
-            OptionalArg::None
+            OptionalValue::None
         } else {
-            OptionalArg::Some(self.proposals().get(proposal_id).description)
+            OptionalValue::Some(self.proposals().get(proposal_id).description)
         }
     }
 
@@ -336,9 +336,9 @@ pub trait GovernanceModule:
     fn get_proposal_actions(
         &self,
         proposal_id: usize,
-    ) -> MultiResultVec<GovernanceActionAsMultiArg<Self::Api>> {
+    ) -> MultiValueVec<GovernanceActionAsMultiArg<Self::Api>> {
         if !self.proposal_exists(proposal_id) {
-            return MultiResultVec::new();
+            return MultiValueVec::new();
         }
 
         let actions = self.proposals().get(proposal_id).actions;

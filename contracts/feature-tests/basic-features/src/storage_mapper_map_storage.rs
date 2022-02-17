@@ -32,7 +32,7 @@ pub trait MapStorageMapperFeatures {
     }
 
     #[endpoint]
-    fn map_storage_mapper_get(&self, item: u32) -> SCResult<MultiResultVec<u32>> {
+    fn map_storage_mapper_get(&self, item: u32) -> SCResult<MultiValueVec<u32>> {
         let map_storage_mapper = self.map_storage_mapper();
         if let Some(map) = map_storage_mapper.get(&item) {
             let mut vec = Vec::new();
@@ -40,7 +40,7 @@ pub trait MapStorageMapperFeatures {
                 vec.push(key);
                 vec.push(value);
             }
-            return Ok(MultiResultVec::from(vec));
+            return Ok(MultiValueVec::from(vec));
         }
         sc_error!("No storage!")
     }
