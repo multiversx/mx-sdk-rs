@@ -21,7 +21,7 @@ jobs:
           source .github/workflows/env
           pip3 install erdpy
           mkdir $HOME/elrondsdk
-          erdpy config set dependencies.vmtools.tag v1.4.36
+          erdpy config set dependencies.vmtools.tag v1.4.41
           erdpy deps install vmtools
           erdpy deps install nodejs
           erdpy deps install wasm-opt

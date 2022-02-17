@@ -101,7 +101,7 @@ fn forw_raw_direct_esdt_rs() {
 }
 
 #[test]
-fn forw_raw_direct_multi_rs() {
+fn forw_raw_direct_multi_esdt_rs() {
     elrond_wasm_debug::mandos_rs("mandos/forw_raw_direct_multi_esdt.scen.json", world());
 }
 
@@ -192,14 +192,6 @@ fn forwarder_call_async_accept_nft_rs() {
 }
 
 #[test]
-fn forwarder_validate_token_identifier_rs() {
-    elrond_wasm_debug::mandos_rs(
-        "mandos/forwarder_validate_token_identifier.scen.json",
-        world(),
-    );
-}
-
-#[test]
 fn forwarder_call_async_multi_transfer_rs() {
     elrond_wasm_debug::mandos_rs(
         "mandos/forwarder_call_async_multi_transfer.scen.json",
@@ -274,14 +266,6 @@ fn forwarder_call_sync_accept_then_read_esdt_rs() {
 fn forwarder_call_sync_accept_then_read_nft_rs() {
     elrond_wasm_debug::mandos_rs(
         "mandos/forwarder_call_sync_accept_then_read_nft.scen.json",
-        world(),
-    );
-}
-
-#[test]
-fn forwarder_retrieve_funds_with_accept_func_rs() {
-    elrond_wasm_debug::mandos_rs(
-        "mandos/forwarder_retrieve_funds_with_accept_func.scen.json",
         world(),
     );
 }
@@ -440,6 +424,14 @@ fn forwarder_no_endpoint_rs() {
 }
 
 #[test]
+fn forwarder_retrieve_funds_with_accept_func_rs() {
+    elrond_wasm_debug::mandos_rs(
+        "mandos/forwarder_retrieve_funds_with_accept_func.scen.json",
+        world(),
+    );
+}
+
+#[test]
 fn forwarder_send_esdt_multi_transfer_rs() {
     elrond_wasm_debug::mandos_rs(
         "mandos/forwarder_send_esdt_multi_transfer.scen.json",
@@ -470,6 +462,14 @@ fn forwarder_sync_echo_range_rs() {
 #[test]
 fn forwarder_tranfer_esdt_with_fees_rs() {
     elrond_wasm_debug::mandos_rs("mandos/forwarder_tranfer_esdt_with_fees.scen.json", world());
+}
+
+#[test]
+fn forwarder_validate_token_identifier_rs() {
+    elrond_wasm_debug::mandos_rs(
+        "mandos/forwarder_validate_token_identifier.scen.json",
+        world(),
+    );
 }
 
 #[test]
