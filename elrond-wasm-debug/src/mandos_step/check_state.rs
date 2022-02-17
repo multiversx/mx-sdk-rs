@@ -310,4 +310,18 @@ pub fn check_token_instance(
             verbose_hex(&actual_uri),
         ))
     }
+
+    if !expected_value
+        .attributes
+        .check(&actual_value.metadata.attributes)
+    {
+        errors.push(format!(
+            "bad esdt attributes. Address: {}. Token {}. Nonce {}. Want: {}. Have: {}",
+            address,
+            token,
+            expected_value.nonce.value,
+            expected_value.attributes,
+            verbose_hex(&actual_value.metadata.attributes),
+        ))
+    }
 }

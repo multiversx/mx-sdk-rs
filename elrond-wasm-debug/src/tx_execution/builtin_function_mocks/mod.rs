@@ -8,6 +8,7 @@ mod esdt_nft_add_uri_mock;
 mod esdt_nft_burn_mock;
 mod esdt_nft_create_mock;
 mod esdt_nft_transfer_mock;
+mod esdt_nft_update_attriutes_mock;
 mod esdt_transfer_mock;
 mod set_username_mock;
 mod upgrade_contract;

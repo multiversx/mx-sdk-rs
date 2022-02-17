@@ -56,7 +56,19 @@
             "expect": {
                 "out": [],
                 "status": "0",
-                "logs": "*",
+                "logs": [
+                    {
+                        "address": "sc:forwarder",
+                        "endpoint": "str:ESDTNFTUpdateAttributes",
+                        "topics": [
+                            "str:NFT-000001",
+                            "1",
+                            "",
+                            "0x808080"
+                        ],
+                        "data": ""
+                    }
+                ],
                 "gas": "*",
                 "refund": "*"
             }
@@ -105,7 +117,7 @@
         },
         {
             "step": "scCall",
-            "txId": "1",
+            "txId": "2",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
@@ -121,7 +133,19 @@
             "expect": {
                 "out": [],
                 "status": "0",
-                "logs": "*",
+                "logs": [
+                    {
+                        "address": "sc:forwarder",
+                        "endpoint": "str:ESDTNFTUpdateAttributes",
+                        "topics": [
+                            "str:NFT-000001",
+                            "1",
+                            "",
+                            "0x909090"
+                        ],
+                        "data": ""
+                    }
+                ],
                 "gas": "*",
                 "refund": "*"
             }
