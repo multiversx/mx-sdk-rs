@@ -75,7 +75,7 @@ pub trait ForwarderTransferExecuteModule {
         #[payment_token] token: TokenIdentifier,
         #[payment_amount] payment: BigUint,
         #[payment_nonce] token_nonce: u64,
-    ) -> MultiResult4<u64, u64, BigUint, TokenIdentifier> {
+    ) -> MultiValue4<u64, u64, BigUint, TokenIdentifier> {
         let gas_left_before = self.blockchain().get_gas_left();
 
         self.vault_proxy()
@@ -92,7 +92,7 @@ pub trait ForwarderTransferExecuteModule {
     fn forward_transf_exec_accept_funds_multi_transfer(
         &self,
         to: ManagedAddress,
-        #[var_args] token_payments: ManagedVarArgs<MultiArg3<TokenIdentifier, u64, BigUint>>,
+        #[var_args] token_payments: ManagedVarArgs<MultiValue3<TokenIdentifier, u64, BigUint>>,
     ) {
         let mut all_token_payments = ManagedVec::new();
 

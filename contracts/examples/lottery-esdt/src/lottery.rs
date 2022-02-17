@@ -28,7 +28,7 @@ pub trait Lottery {
         opt_max_entries_per_user: Option<u32>,
         opt_prize_distribution: Option<ManagedVec<u8>>,
         opt_whitelist: Option<ManagedVec<ManagedAddress>>,
-        #[var_args] opt_burn_percentage: OptionalArg<BigUint>,
+        #[var_args] opt_burn_percentage: OptionalValue<BigUint>,
     ) {
         self.start_lottery(
             lottery_name,
@@ -54,7 +54,7 @@ pub trait Lottery {
         opt_max_entries_per_user: Option<u32>,
         opt_prize_distribution: Option<ManagedVec<u8>>,
         opt_whitelist: Option<ManagedVec<ManagedAddress>>,
-        #[var_args] opt_burn_percentage: OptionalArg<BigUint>,
+        #[var_args] opt_burn_percentage: OptionalValue<BigUint>,
     ) {
         self.start_lottery(
             lottery_name,
@@ -80,7 +80,7 @@ pub trait Lottery {
         opt_max_entries_per_user: Option<u32>,
         opt_prize_distribution: Option<ManagedVec<u8>>,
         opt_whitelist: Option<ManagedVec<ManagedAddress>>,
-        #[var_args] opt_burn_percentage: OptionalArg<BigUint>,
+        #[var_args] opt_burn_percentage: OptionalValue<BigUint>,
     ) {
         require!(!lottery_name.is_empty(), "Name can't be empty!");
 
@@ -124,7 +124,7 @@ pub trait Lottery {
         );
 
         match opt_burn_percentage {
-            OptionalArg::Some(burn_percentage) => {
+            OptionalValue::Some(burn_percentage) => {
                 require!(!token_identifier.is_egld(), "EGLD can't be burned!");
 
                 let roles = self.blockchain().get_esdt_local_roles(&token_identifier);
@@ -140,7 +140,7 @@ pub trait Lottery {
                 self.burn_percentage_for_lottery(&lottery_name)
                     .set(burn_percentage);
             },
-            OptionalArg::None => {},
+            OptionalValue::None => {},
         }
 
         if let Some(whitelist) = opt_whitelist {
