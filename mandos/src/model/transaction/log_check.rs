@@ -1,6 +1,6 @@
 use crate::{
     interpret_trait::{InterpretableFrom, InterpreterContext},
-    model::{BytesValue, CheckValue},
+    model::{BytesValue, CheckValue, CheckValueList},
     serde_raw::CheckLogRaw,
 };
 
@@ -8,7 +8,7 @@ use crate::{
 pub struct CheckLog {
     pub address: BytesValue,
     pub endpoint: CheckValue<BytesValue>,
-    pub topics: Vec<CheckValue<BytesValue>>,
+    pub topics: CheckValueList,
     pub data: CheckValue<BytesValue>,
 }
 
@@ -17,11 +17,7 @@ impl InterpretableFrom<CheckLogRaw> for CheckLog {
         CheckLog {
             address: BytesValue::interpret_from(from.address, context),
             endpoint: CheckValue::<BytesValue>::interpret_from(from.endpoint, context),
-            topics: from
-                .topics
-                .into_iter()
-                .map(|t| CheckValue::<BytesValue>::interpret_from(t, context))
-                .collect(),
+            topics: CheckValueList::interpret_from(from.topics, context),
             data: CheckValue::<BytesValue>::interpret_from(from.data, context),
         }
     }

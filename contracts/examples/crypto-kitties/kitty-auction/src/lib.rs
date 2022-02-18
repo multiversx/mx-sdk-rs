@@ -44,7 +44,7 @@ pub trait KittyAuction {
             !kitty_ownership_contract_address.is_zero(),
             "Kitty Ownership contract address not set!"
         );
-        
+
         self.kitty_ownership_proxy(kitty_ownership_contract_address)
             .create_gen_zero_kitty()
             .async_call()

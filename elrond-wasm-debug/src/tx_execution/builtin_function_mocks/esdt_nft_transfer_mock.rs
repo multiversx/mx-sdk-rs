@@ -38,6 +38,7 @@ pub fn execute_esdt_nft_transfer(
             tx_input.args[0].clone(),
             tx_input.args[1].clone(),
             tx_input.args[2].clone(),
+            tx_input.args[3].clone(),
         ],
         data: vec![],
     };
