@@ -31,6 +31,7 @@ pub trait UseModule:
     + elrond_wasm_modules::governance::GovernanceModule
     + elrond_wasm_modules::governance::governance_configurable::GovernanceConfigurablePropertiesModule
     + elrond_wasm_module_pause::PauseModule
+    + elrond_wasm_modules::default_issue_callbacks::DefaultIssueCallbacksModule
 {
     /// Validates that the "featureName" feature is on.
     /// Uses the `feature_guard!` macro.
