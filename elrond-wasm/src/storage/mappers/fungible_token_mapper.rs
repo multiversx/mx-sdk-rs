@@ -204,6 +204,10 @@ where
         O: TopEncodeMultiOutput,
         H: EncodeErrorHandler,
     {
-        output.push_single_value(&self.get_token_id(), h)
+        if self.is_empty() {
+            output.push_single_value(&ManagedBuffer::<SA>::new(), h)
+        } else {
+            output.push_single_value(&self.get_token_id(), h)
+        }
     }
 }
