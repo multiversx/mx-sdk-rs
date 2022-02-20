@@ -31,7 +31,7 @@
                 "out": [],
                 "status": "0x04",
                 "message": "str:panic occurred: example panic message",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
