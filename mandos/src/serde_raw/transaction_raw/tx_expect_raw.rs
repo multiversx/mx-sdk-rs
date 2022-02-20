@@ -1,11 +1,11 @@
-use crate::serde_raw::{CheckBytesValueRaw, CheckLogsRaw};
+use crate::serde_raw::{CheckBytesValueRaw, CheckLogsRaw, CheckValueListRaw};
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct TxExpectRaw {
     #[serde(default)]
-    pub out: Vec<CheckBytesValueRaw>,
+    pub out: CheckValueListRaw,
 
     #[serde(default)]
     pub status: CheckBytesValueRaw,

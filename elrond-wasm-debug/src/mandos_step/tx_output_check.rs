@@ -13,24 +13,13 @@ pub fn check_tx_output(tx_id: &str, tx_expect: &TxExpect, tx_result: &TxResult) 
         have_str,
     );
 
-    assert_eq!(
-        tx_expect.out.len(),
-        tx_result.result_values.len(),
+    assert!(
+        tx_expect.out.check(tx_result.result_values.as_slice()),
         "bad out value. Tx id: {}. Want: {:?}. Have: {:?}",
         tx_id,
         tx_expect.out,
         tx_result.result_values
     );
-    for (i, expected_out) in tx_expect.out.iter().enumerate() {
-        let actual_value = &tx_result.result_values[i];
-        assert!(
-            expected_out.check(actual_value.as_slice()),
-            "bad out value. Tx id: {}. Want: {}. Have: {}",
-            tx_id,
-            expected_out,
-            verbose_hex(actual_value.as_slice())
-        );
-    }
 
     assert!(
         tx_expect.message.check(tx_result.result_message.as_bytes()),
@@ -59,11 +48,11 @@ pub fn check_tx_output(tx_id: &str, tx_expect: &TxExpect, tx_result: &TxResult) 
 					tx_id,
 					verbose_hex(&expected_log.address.value),
 					&expected_log.endpoint,
-					expected_log.topics.iter().map(|topic| topic.to_string()).collect::<String>(),
+					&expected_log.topics.pretty_str(),
 					&expected_log.data,
 					address_hex(&actual_log.address),
 					bytes_to_string(&actual_log.endpoint),
-					actual_log.topics.iter().map(|topic| verbose_hex(topic)).collect::<String>(),
+					actual_log.topics_pretty(),
 					verbose_hex(&actual_log.data),
 				);
             }
