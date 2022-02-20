@@ -73,7 +73,7 @@
                 "out": [],
                 "status": "4",
                 "message": "str:Endpoint can only be called by owner",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
