@@ -9,6 +9,11 @@ use elrond_codec::NestedEncode;
 
 type FlagMapper<SA> = SingleValueMapper<SA, bool>;
 
+const ITEM_NOT_WHITELISTED_ERR_MSG: &[u8] = b"Item not whitelisted";
+
+/// A non-iterable whitelist mapper.
+/// Very efficient for storing a whitelist, as each item requires only one storage key.
+/// If you need to iterate over the keys, use UnorderedSetMapper or SetMapper instead.
 pub struct WhitelistMapper<SA, T>
 where
     SA: StorageMapperApi,
@@ -36,11 +41,6 @@ where
     SA: StorageMapperApi,
     T: NestedEncode + 'static,
 {
-    pub fn contains(&self, item: &T) -> bool {
-        let mapper = self.build_mapper_for_item(item);
-        !mapper.is_empty()
-    }
-
     pub fn add(&self, item: &T) {
         let mapper = self.build_mapper_for_item(item);
         mapper.set(&true);
@@ -51,9 +51,14 @@ where
         mapper.clear();
     }
 
+    pub fn contains(&self, item: &T) -> bool {
+        let mapper = self.build_mapper_for_item(item);
+        !mapper.is_empty()
+    }
+
     pub fn require_whitelisted(&self, item: &T) {
         if !self.contains(item) {
-            SA::error_api_impl().signal_error(b"Item not whitelisted");
+            SA::error_api_impl().signal_error(ITEM_NOT_WHITELISTED_ERR_MSG);
         }
     }
 

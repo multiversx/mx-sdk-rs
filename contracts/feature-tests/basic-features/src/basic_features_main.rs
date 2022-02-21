@@ -27,6 +27,7 @@ pub mod storage_mapper_set;
 pub mod storage_mapper_single;
 pub mod storage_mapper_token_attributes;
 pub mod storage_mapper_vec;
+pub mod storage_mapper_whitelist;
 pub mod struct_eq;
 pub mod token_identifier_features;
 pub mod type_features;
@@ -58,9 +59,11 @@ pub trait BasicFeatures:
     + storage_mapper_single::SingleValueMapperFeatures
     + storage_mapper_vec::VecMapperFeatures
     + storage_mapper_token_attributes::TokenAttributesMapperFeatures
+    + storage_mapper_whitelist::StorageMapperWhitelistFeatures
     + struct_eq::StructEquals
     + token_identifier_features::TokenIdentifierFeatures
     + type_features::TypeFeatures
+    + elrond_wasm_modules::default_issue_callbacks::DefaultIssueCallbacksModule
 {
     #[init]
     fn init(&self) {}
