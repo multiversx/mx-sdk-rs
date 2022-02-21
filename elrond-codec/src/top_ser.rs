@@ -24,7 +24,10 @@ pub trait TopEncode: Sized {
     const TYPE_INFO: TypeInfo = TypeInfo::Unknown;
 
     /// Attempt to serialize the value to ouput.
-    fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
+    fn top_encode<O>(&self, output: O) -> Result<(), EncodeError>
+    where
+        O: TopEncodeOutput,
+    {
         self.top_encode_or_handle_err(output, DefaultErrorHandler)
     }
 

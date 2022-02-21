@@ -54,7 +54,7 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
         #[payment] issue_cost: BigUint,
         token_display_name: ManagedBuffer,
         token_ticker: ManagedBuffer,
-    ) -> AsyncCall {
+    ) {
         let caller = self.blockchain().get_caller();
 
         self.send()
@@ -74,6 +74,7 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
             )
             .async_call()
             .with_callback(self.callbacks().nft_issue_callback(&caller))
+            .call_and_exit()
     }
 
     #[callback]
@@ -167,7 +168,7 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
         royalties: BigUint,
         hash: ManagedBuffer,
         uri: ManagedBuffer,
-        #[var_args] attrs_arg: MultiArg5<
+        #[var_args] attrs_arg: MultiValue5<
             BigUint,
             ManagedBuffer,
             TokenIdentifier,

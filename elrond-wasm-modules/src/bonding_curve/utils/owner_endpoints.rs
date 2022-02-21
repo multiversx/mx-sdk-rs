@@ -19,12 +19,13 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
         address: ManagedAddress,
         token_identifier: TokenIdentifier,
         #[var_args] roles: ManagedVarArgs<EsdtLocalRole>,
-    ) -> AsyncCall {
+    ) {
         self.send()
             .esdt_system_sc_proxy()
             .set_special_roles(&address, &token_identifier, roles.into_iter())
             .async_call()
             .with_callback(OwnerEndpointsModule::callbacks(self).change_roles_callback())
+            .call_and_exit()
     }
 
     #[endpoint(unsetLocalRoles)]
@@ -33,12 +34,13 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
         address: ManagedAddress,
         token_identifier: TokenIdentifier,
         #[var_args] roles: ManagedVarArgs<EsdtLocalRole>,
-    ) -> AsyncCall {
+    ) {
         self.send()
             .esdt_system_sc_proxy()
             .unset_special_roles(&address, &token_identifier, roles.into_iter())
             .async_call()
             .with_callback(OwnerEndpointsModule::callbacks(self).change_roles_callback())
+            .call_and_exit()
     }
 
     #[callback]
@@ -85,7 +87,7 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
         #[payment] amount: BigUint,
         #[payment_token] identifier: TokenIdentifier,
         #[payment_nonce] nonce: u64,
-        #[var_args] payment_token: OptionalArg<TokenIdentifier>,
+        #[var_args] payment_token: OptionalValue<TokenIdentifier>,
     ) -> SCResult<()> {
         let caller = self.blockchain().get_caller();
         let mut set_payment = TokenIdentifier::egld();

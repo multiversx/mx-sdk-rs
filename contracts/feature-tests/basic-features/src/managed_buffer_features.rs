@@ -44,15 +44,15 @@ pub trait ManagedBufferFeatures {
         mb: ManagedBuffer,
         starting_position: usize,
         slice_len: usize,
-    ) -> OptionalResult<BoxedBytes> {
+    ) -> OptionalValue<BoxedBytes> {
         let mut result = BoxedBytes::zeros(slice_len);
         if mb
             .load_slice(starting_position, result.as_mut_slice())
             .is_ok()
         {
-            OptionalResult::Some(result)
+            OptionalValue::Some(result)
         } else {
-            OptionalResult::None
+            OptionalValue::None
         }
     }
 
@@ -76,7 +76,7 @@ pub trait ManagedBufferFeatures {
         mb: ManagedBuffer,
         starting_position: usize,
         slice_len: usize,
-    ) -> OptionalResult<ManagedBuffer> {
+    ) -> OptionalValue<ManagedBuffer> {
         mb.copy_slice(starting_position, slice_len).into()
     }
 
