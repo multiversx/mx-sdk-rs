@@ -1,5 +1,4 @@
 {
-    "name": "test external steps resolution",
     "comment": "tests mandos validatorReward, no SC",
     "steps": [
         {

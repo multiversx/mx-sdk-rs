@@ -11,7 +11,7 @@ pub struct Instance {
     pub creator: Option<BytesValue>,
     pub royalties: Option<U64Value>,
     pub hash: Option<BytesValue>,
-    pub uri: Option<BytesValue>,
+    pub uri: Vec<BytesValue>,
     pub attributes: Option<BytesValue>,
 }
 
@@ -25,7 +25,11 @@ impl InterpretableFrom<InstanceRaw> for Instance {
             creator: from.creator.map(|b| BytesValue::interpret_from(b, context)),
             royalties: from.royalties.map(|b| U64Value::interpret_from(b, context)),
             hash: from.hash.map(|b| BytesValue::interpret_from(b, context)),
-            uri: from.uri.map(|b| BytesValue::interpret_from(b, context)),
+            uri: from
+                .uri
+                .into_iter()
+                .map(|b| BytesValue::interpret_from(b, context))
+                .collect(),
             attributes: from
                 .attributes
                 .map(|b| BytesValue::interpret_from(b, context)),

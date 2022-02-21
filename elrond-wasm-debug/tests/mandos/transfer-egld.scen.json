@@ -1,5 +1,4 @@
 {
-    "name": "test external steps resolution",
     "comment": "simple EGLD transfer, no SC",
     "steps": [
         {
