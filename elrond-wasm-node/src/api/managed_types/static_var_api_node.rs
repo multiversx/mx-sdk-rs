@@ -8,6 +8,7 @@ use crate::VmApiImpl;
 static mut STATIC_BUFFER: LockableStaticBuffer = LockableStaticBuffer::new();
 
 static mut EXTERNAL_VIEW_TARGET_ADDRESS_HANDLE: i32 = 0;
+static mut NEXT_BIG_INT_HANDLE: i32 = StaticVarApi::BIG_INT_HANDLE_START_FROM;
 
 impl StaticVarApi for VmApiImpl {
     type StaticVarApiImpl = VmApiImpl;
@@ -30,5 +31,10 @@ impl StaticVarApiImpl for VmApiImpl {
 
     fn get_external_view_target_address_handle(&self) -> Handle {
         unsafe { EXTERNAL_VIEW_TARGET_ADDRESS_HANDLE }
+    }
+
+    fn get_next_bigint_handle(&self) -> Handle {
+        NEXT_BIG_INT_HANDLE += 1;
+        unsafe { NEXT_BIG_INT_HANDLE }
     }
 }

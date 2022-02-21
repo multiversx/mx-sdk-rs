@@ -28,4 +28,8 @@ impl StaticVarApiImpl for UncallableApi {
     fn get_external_view_target_address_handle(&self) -> Handle {
         unreachable!()
     }
+
+    fn get_next_bigint_handle(&self) -> Handle {
+        unreachable!()
+    }
 }

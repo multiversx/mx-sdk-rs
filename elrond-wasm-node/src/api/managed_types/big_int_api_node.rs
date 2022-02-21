@@ -71,6 +71,11 @@ impl BigIntApi for crate::VmApiImpl {
     }
 
     #[inline]
+    fn bi_new_handle(&self, value: i64) -> Handle {
+        unsafe { bigIntNew(value) }
+    }
+
+    #[inline]
     fn bi_unsigned_byte_length(&self, x: Handle) -> usize {
         unsafe { bigIntUnsignedByteLength(x) as usize }
     }
