@@ -33,28 +33,41 @@ pub fn check_tx_output(tx_id: &str, tx_expect: &TxExpect, tx_result: &TxResult) 
         CheckLogs::Star => {},
         CheckLogs::List(expected_logs) => {
             assert!(
-                expected_logs.len() == tx_result.result_logs.len(),
-                "Log amounts do not match. Tx id: {}. Want: {}. Have: {}",
+                tx_result.result_logs.len() >= expected_logs.list.len(),
+                "Too few logs. Tx id: {}. Want: {}. Have: {}",
                 tx_id,
-                expected_logs.len(),
+                expected_logs.list.len(),
                 tx_result.result_logs.len()
             );
 
-            for (expected_log, actual_log) in expected_logs.iter().zip(tx_result.result_logs.iter())
-            {
-                assert!(
-					actual_log.mandos_check(expected_log),
-					"Logs do not match. Tx id: {}.\nWant: Address: {}, Endpoint: {}, Topics: {:?}, Data: {}\nHave: Address: {}, Endpoint: {}, Topics: {:?}, Data: {}",
-					tx_id,
-					verbose_hex(&expected_log.address.value),
-					&expected_log.endpoint,
-					&expected_log.topics.pretty_str(),
-					&expected_log.data,
-					address_hex(&actual_log.address),
-					bytes_to_string(&actual_log.endpoint),
-					actual_log.topics_pretty(),
-					verbose_hex(&actual_log.data),
-				);
+            for (i, actual_log) in tx_result.result_logs.iter().enumerate() {
+                if i < expected_logs.list.len() {
+                    let expected_log = &expected_logs.list[i];
+                    assert!(
+                        actual_log.mandos_check(expected_log),
+                        "Logs do not match. Tx id: {}. Index: {}.\nWant: Address: {}, Endpoint: {}, Topics: {:?}, Data: {}\nHave: Address: {}, Endpoint: {}, Topics: {:?}, Data: {}",
+                        tx_id,
+                        i,
+                        verbose_hex(&expected_log.address.value),
+                        &expected_log.endpoint,
+                        &expected_log.topics.pretty_str(),
+                        &expected_log.data,
+                        address_hex(&actual_log.address),
+                        bytes_to_string(&actual_log.endpoint),
+                        actual_log.topics_pretty(),
+                        verbose_hex(&actual_log.data),
+                    );
+                } else if !expected_logs.more_allowed_at_end {
+                    panic!(
+                        "Unexpected log. Tx id: {}. Index: {}.\nAddress: {}, Endpoint: {}, Topics: {:?}, Data: {}",
+                        tx_id,
+                        i,
+                        address_hex(&actual_log.address),
+                        bytes_to_string(&actual_log.endpoint),
+                        actual_log.topics_pretty(),
+                        verbose_hex(&actual_log.data),
+                    )
+                }
             }
         },
     }

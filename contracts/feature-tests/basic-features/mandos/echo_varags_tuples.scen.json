@@ -84,7 +84,7 @@
                 "out": [],
                 "status": "4",
                 "message": "str:argument decode error (m): too few arguments",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
