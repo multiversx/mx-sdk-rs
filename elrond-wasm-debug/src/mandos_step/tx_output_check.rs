@@ -1,6 +1,6 @@
 use mandos::model::{CheckLogs, Checkable, TxExpect};
 
-use crate::{address_hex, bytes_to_string, tx_mock::TxResult, verbose_hex};
+use crate::{address_hex, bytes_to_string, tx_mock::TxResult, verbose_hex, verbose_hex_list};
 
 pub fn check_tx_output(tx_id: &str, tx_expect: &TxExpect, tx_result: &TxResult) {
     let have_str = tx_result.result_message.as_str();
@@ -54,7 +54,7 @@ pub fn check_tx_output(tx_id: &str, tx_expect: &TxExpect, tx_result: &TxResult) 
                         &expected_log.data,
                         address_hex(&actual_log.address),
                         bytes_to_string(&actual_log.endpoint),
-                        actual_log.topics_pretty(),
+                        verbose_hex_list(actual_log.topics.as_slice()),
                         verbose_hex(&actual_log.data),
                     );
                 } else if !expected_logs.more_allowed_at_end {
@@ -64,7 +64,7 @@ pub fn check_tx_output(tx_id: &str, tx_expect: &TxExpect, tx_result: &TxResult) 
                         i,
                         address_hex(&actual_log.address),
                         bytes_to_string(&actual_log.endpoint),
-                        actual_log.topics_pretty(),
+                        verbose_hex_list(actual_log.topics.as_slice()),
                         verbose_hex(&actual_log.data),
                     )
                 }

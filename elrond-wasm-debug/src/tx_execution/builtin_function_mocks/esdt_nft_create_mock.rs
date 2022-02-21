@@ -6,7 +6,7 @@ use num_bigint::BigUint;
 
 use crate::{
     tx_mock::{BlockchainUpdate, TxCache, TxInput, TxLog, TxResult, TxResultCalls},
-    world_mock::{EsdtInstance, EsdtInstanceMetadata, InstanceUris},
+    world_mock::{EsdtInstance, EsdtInstanceMetadata},
 };
 
 pub fn execute_esdt_nft_create(
@@ -28,7 +28,7 @@ pub fn execute_esdt_nft_create(
     let royalties = u64::top_decode(tx_input.args[3].as_slice()).unwrap();
     let hash = tx_input.args[4].clone();
     let attributes = tx_input.args[5].clone();
-    let uri = tx_input.args[6].as_slice();
+    let uri = tx_input.args[6].clone();
 
     let new_nonce = tx_cache.with_account_mut(&tx_input.to, |account| {
         let esdt_data = account
@@ -44,7 +44,7 @@ pub fn execute_esdt_nft_create(
                 creator: Some(tx_input.from.clone()),
                 royalties,
                 hash: Some(hash),
-                uri: InstanceUris::new_from_slice(uri),
+                uri: vec![uri],
                 attributes,
             },
         });
