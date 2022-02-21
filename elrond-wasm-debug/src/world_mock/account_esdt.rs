@@ -131,7 +131,7 @@ impl AccountEsdt {
         }
     }
 
-    pub fn add_uris(&mut self, token_identifier: &[u8], nonce: u64, new_uris: Vec<Vec<u8>>) {
+    pub fn add_uris(&mut self, token_identifier: &[u8], nonce: u64, mut new_uris: Vec<Vec<u8>>) {
         self.0
             .get_mut(token_identifier)
             .unwrap_or_else(|| panic!("invalid token"))
@@ -140,7 +140,7 @@ impl AccountEsdt {
             .unwrap_or_else(|| panic!("invalid token nonce"))
             .metadata
             .uri
-            .add_uris(new_uris);
+            .append(&mut new_uris);
     }
 
     pub fn update_attributes(

@@ -72,14 +72,7 @@ pub(crate) fn esdt_data_as_raw(esdt: &EsdtData) -> EsdtRaw {
             hash: inst.metadata.hash.as_ref().map(|h| bytes_as_raw(h)),
             nonce: Some(u64_as_raw(inst.nonce)),
             royalties: Some(u64_as_raw(inst.metadata.royalties)),
-            uri: Some(ValueSubTree::List(
-                inst.metadata
-                    .uri
-                    .get()
-                    .iter()
-                    .map(|uri| bytes_as_raw(uri))
-                    .collect(),
-            )),
+            uri: inst.metadata.uri.iter().map(|u| bytes_as_raw(u)).collect(),
         };
 
         instances_raw.push(inst_raw);
@@ -201,7 +194,13 @@ pub(crate) fn account_as_check_state_raw(acc: &AccountData) -> CheckAccountsRaw 
                     .clone()
                     .unwrap_or_else(|| ValueSubTree::Str("0".to_owned())),
                 royalties: opt_raw_value_to_check_raw(&inst_raw.royalties),
-                uri: opt_raw_value_to_check_raw(&inst_raw.uri),
+                uri: CheckValueListRaw::CheckList(
+                    inst_raw
+                        .uri
+                        .iter()
+                        .map(|v| CheckBytesValueRaw::Equal(v.clone()))
+                        .collect(),
+                ),
             };
 
             esdt_instances_check_raw.push(inst_check_raw);

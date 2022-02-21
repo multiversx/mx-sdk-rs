@@ -6,7 +6,7 @@ use elrond_wasm::{
     api::{BlockchainApi, BlockchainApiImpl, Handle, ManagedBufferApi, ManagedTypeApi},
     types::{
         Address, BigUint, EsdtLocalRole, EsdtLocalRoleFlags, EsdtTokenData, EsdtTokenType,
-        ManagedAddress, ManagedBuffer, ManagedType, TokenIdentifier, H256,
+        ManagedAddress, ManagedBuffer, ManagedType, ManagedVec, TokenIdentifier, H256,
     },
 };
 
@@ -202,7 +202,10 @@ impl DebugApi {
             ManagedAddress::zero()
         };
 
-        let uris = instance.metadata.uri.get_as_slice_vec().into();
+        let mut uris = ManagedVec::new();
+        for uri in &instance.metadata.uri {
+            uris.push(ManagedBuffer::new_from_bytes(uri.as_slice()));
+        }
 
         EsdtTokenData {
             token_type: EsdtTokenType::based_on_token_nonce(nonce),
