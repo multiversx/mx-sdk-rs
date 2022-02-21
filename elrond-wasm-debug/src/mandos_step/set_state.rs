@@ -161,7 +161,11 @@ fn convert_mandos_esdt_instance_to_world_mock(
                 .map(|royalties| royalties.value)
                 .unwrap_or_default(),
             hash: mandos_esdt.hash.as_ref().map(|hash| hash.value.clone()),
-            uri: mandos_esdt.uri.as_ref().map(|uri| uri.value.clone()),
+            uri: mandos_esdt
+                .uri
+                .iter()
+                .map(|uri| uri.value.clone())
+                .collect(),
             attributes: mandos_esdt
                 .attributes
                 .as_ref()
