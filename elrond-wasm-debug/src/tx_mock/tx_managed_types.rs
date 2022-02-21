@@ -1,7 +1,9 @@
 use std::collections::HashMap;
 
-use elrond_wasm::api::Handle;
+use elrond_wasm::api::{Handle, StaticVarApi};
 use num_bigint::BigInt;
+
+use crate::DebugApi;
 
 type ManagedBufferImpl = Vec<u8>;
 
@@ -68,8 +70,20 @@ impl Default for TxManagedTypes {
     }
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct TxStaticVars {
     pub(crate) external_view_target_address_handle: Handle,
     pub(crate) next_big_int_handle: Handle,
+    pub(crate) next_managed_buffer_handle: Handle,
+}
+
+impl Default for TxStaticVars {
+    fn default() -> Self {
+        TxStaticVars {
+            external_view_target_address_handle: 0,
+            next_big_int_handle: <DebugApi as StaticVarApi>::BIG_INT_HANDLE_START_FROM,
+            next_managed_buffer_handle:
+                <DebugApi as StaticVarApi>::MANAGED_BUFFER_HANDLE_START_FROM,
+        }
+    }
 }

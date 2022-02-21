@@ -33,4 +33,8 @@ impl StaticVarApiImpl for DebugApi {
     fn get_next_bigint_handle(&self) -> Handle {
         self.static_vars_cell.borrow().next_big_int_handle
     }
+
+    fn get_next_managed_buffer_handle(&self) -> Handle {
+        self.static_vars_cell.borrow().next_managed_buffer_handle
+    }
 }
