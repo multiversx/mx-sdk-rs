@@ -32,4 +32,8 @@ impl StaticVarApiImpl for UncallableApi {
     fn get_next_bigint_handle(&self) -> Handle {
         unreachable!()
     }
+
+    fn get_next_managed_buffer_handle(&self) -> Handle {
+        unreachable!()
+    }
 }

@@ -1,5 +1,5 @@
 use elrond_wasm::{
-    api::{Handle, InvalidSliceError, ManagedBufferApi},
+    api::{Handle, InvalidSliceError, ManagedBufferApi, StaticVarApiImpl},
     types::BoxedBytes,
 };
 
@@ -25,16 +25,18 @@ impl DebugApi {
 impl ManagedBufferApi for DebugApi {
     fn mb_new_empty(&self) -> Handle {
         let mut managed_types = self.m_types_borrow_mut();
-        managed_types
-            .managed_buffer_map
-            .insert_new_handle(Vec::new())
+        let handle = self.get_next_managed_buffer_handle();
+        managed_types.managed_buffer_map.insert(handle, Vec::new());
+        handle
     }
 
     fn mb_new_from_bytes(&self, bytes: &[u8]) -> Handle {
         let mut managed_types = self.m_types_borrow_mut();
+        let handle = self.get_next_managed_buffer_handle();
         managed_types
             .managed_buffer_map
-            .insert_new_handle(Vec::from(bytes))
+            .insert(handle, Vec::from(bytes));
+        handle
     }
 
     fn mb_len(&self, handle: Handle) -> usize {
