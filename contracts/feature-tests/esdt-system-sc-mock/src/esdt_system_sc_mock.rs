@@ -1,0 +1,99 @@
+#![no_std]
+
+elrond_wasm::imports!();
+
+const ZERO_ASCII: u8 = b'0';
+const DASH: u8 = b'-';
+const RAND_CHARS_LEN: usize = 6;
+
+#[elrond_wasm::contract]
+pub trait PayableFeatures {
+    #[init]
+    fn init(&self) {}
+
+    #[payable("EGLD")]
+    #[endpoint(issue)]
+    fn issue_fungible(
+        &self,
+        _token_display_name: ManagedBuffer,
+        token_ticker: ManagedBuffer,
+        initial_supply: BigUint,
+        _num_decimals: usize,
+        #[var_args] _token_properties: ManagedVarArgs<MultiValue2<ManagedBuffer, bool>>,
+    ) -> TokenIdentifier {
+        let new_token_id = self.create_new_token_id(token_ticker);
+        require!(new_token_id.is_valid_esdt_identifier(), "Invalid token ID");
+
+        if initial_supply > 0 {
+            let caller = self.blockchain().get_caller();
+
+            self.send()
+                .esdt_local_mint(&new_token_id, 0, &initial_supply);
+            self.send().transfer_esdt_via_async_call(
+                &caller,
+                &new_token_id,
+                0,
+                &initial_supply,
+                &[],
+            );
+        }
+
+        new_token_id
+    }
+
+    #[payable("EGLD")]
+    #[endpoint(issueNonFungible)]
+    fn issue_non_fungible(
+        &self,
+        _token_display_name: ManagedBuffer,
+        token_ticker: ManagedBuffer,
+        #[var_args] _token_properties: ManagedVarArgs<MultiValue2<ManagedBuffer, bool>>,
+    ) -> TokenIdentifier {
+        self.create_new_token_id(token_ticker)
+    }
+
+    #[payable("EGLD")]
+    #[endpoint(issueSemiFungible)]
+    fn issue_semi_fungible(
+        &self,
+        _token_display_name: ManagedBuffer,
+        token_ticker: ManagedBuffer,
+        #[var_args] _token_properties: ManagedVarArgs<MultiValue2<ManagedBuffer, bool>>,
+    ) -> TokenIdentifier {
+        self.create_new_token_id(token_ticker)
+    }
+
+    #[payable("EGLD")]
+    #[endpoint(registerMetaESDT)]
+    fn issue_meta_esdt(
+        &self,
+        _token_display_name: ManagedBuffer,
+        token_ticker: ManagedBuffer,
+        _num_decimals: usize,
+        #[var_args] _token_properties: ManagedVarArgs<MultiValue2<ManagedBuffer, bool>>,
+    ) -> TokenIdentifier {
+        self.create_new_token_id(token_ticker)
+    }
+
+    #[endpoint(setSpecialRole)]
+    fn set_special_roles(&self, #[var_args] _roles: ManagedVarArgs<EsdtLocalRole>) {}
+
+    fn create_new_token_id(&self, token_ticker: ManagedBuffer) -> TokenIdentifier {
+        let nr_issued_tokens = self.nr_issued_tokens().get();
+        let mut rand_chars = [ZERO_ASCII; RAND_CHARS_LEN];
+        for c in &mut rand_chars {
+            *c += nr_issued_tokens;
+        }
+
+        self.nr_issued_tokens().update(|nr| *nr += 1);
+
+        let mut token_id = token_ticker;
+        token_id.append_bytes(&[DASH][..]);
+        token_id.append_bytes(&rand_chars);
+
+        token_id.into()
+    }
+
+    #[storage_mapper("nrIssuedTokens")]
+    fn nr_issued_tokens(&self) -> SingleValueMapper<u8>;
+}
