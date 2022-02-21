@@ -21,7 +21,6 @@
             "step": "checkState",
             "accounts": {
                 "sc:contract-address": {
-                    "storage": {},
                     "code": "file:set-check-esdt.scen.json"
                 }
             }
@@ -30,7 +29,6 @@
             "step": "checkState",
             "accounts": {
                 "sc:contract-address": {
-                    "storage": {},
                     "code": "*"
                 }
             }

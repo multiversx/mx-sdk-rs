@@ -6,7 +6,7 @@ use num_bigint::BigUint;
 use num_traits::Zero;
 
 use crate::{
-    bytes_to_string, verbose_hex,
+    bytes_to_string, verbose_hex, verbose_hex_list,
     world_mock::{AccountEsdt, BlockchainMock, EsdtData, EsdtInstance, EsdtInstances},
 };
 
@@ -298,15 +298,15 @@ pub fn check_token_instance(
         ))
     }
 
-    let actual_uri = actual_value.metadata.uri.clone().unwrap_or_default();
-    if !expected_value.uri.check(&actual_uri) {
+    let actual_uri = actual_value.metadata.uri.as_slice();
+    if !expected_value.uri.check(actual_uri) {
         errors.push(format!(
             "bad esdt uri. Address: {}. Token {}. Nonce {}. Want: {}. Have: {}",
             address,
             token,
             expected_value.nonce.value,
-            expected_value.uri,
-            verbose_hex(&actual_uri),
+            expected_value.uri.pretty_str(),
+            verbose_hex_list(actual_uri),
         ))
     }
 }

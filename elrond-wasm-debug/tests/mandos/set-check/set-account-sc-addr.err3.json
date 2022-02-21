@@ -3,7 +3,7 @@
     "steps": [
         {
             "step": "setState",
-            "comment": "newAddress should have SC format",
+            "comment": "sc addresses should contain code",
             "newAddresses": [
                 {
                     "creatorAddress": "address:creator",
