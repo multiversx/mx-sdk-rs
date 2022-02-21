@@ -7,6 +7,7 @@
 elrond_wasm_node::wasm_endpoints! {
     basic_features
     (
+        callBack
         add_assign_big_int
         add_assign_big_int_ref
         add_assign_big_uint
@@ -15,6 +16,7 @@ elrond_wasm_node::wasm_endpoints! {
         add_big_int_ref
         add_big_uint
         add_big_uint_ref
+        add_to_whitelist
         big_int_from_biguint
         big_int_from_i64_1
         big_int_from_i64_2
@@ -42,6 +44,7 @@ elrond_wasm_node::wasm_endpoints! {
         boxed_bytes_concat_2
         boxed_bytes_split
         boxed_bytes_zeros
+        check_contains
         clear_single_value_mapper
         clear_storage_value
         codec_err_contract_call
@@ -266,6 +269,8 @@ elrond_wasm_node::wasm_endpoints! {
         rem_big_int_ref
         rem_big_uint
         rem_big_uint_ref
+        remove_from_whitelist
+        require_contains
         require_equals
         result_echo
         result_echo_2
@@ -338,5 +343,3 @@ elrond_wasm_node::wasm_endpoints! {
         verify_secp256k1_signature
     )
 }
-
-elrond_wasm_node::wasm_empty_callback! {}
