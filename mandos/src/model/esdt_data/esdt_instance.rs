@@ -5,7 +5,7 @@ use crate::{
 };
 
 #[derive(Debug, Default)]
-pub struct Instance {
+pub struct EsdtInstance {
     pub nonce: Option<U64Value>,
     pub balance: Option<BigUintValue>,
     pub creator: Option<BytesValue>,
@@ -15,9 +15,9 @@ pub struct Instance {
     pub attributes: Option<BytesValue>,
 }
 
-impl InterpretableFrom<InstanceRaw> for Instance {
+impl InterpretableFrom<InstanceRaw> for EsdtInstance {
     fn interpret_from(from: InstanceRaw, context: &InterpreterContext) -> Self {
-        Instance {
+        EsdtInstance {
             nonce: from.nonce.map(|n| U64Value::interpret_from(n, context)),
             balance: from
                 .balance
