@@ -41,7 +41,7 @@ pub trait StorageLoadFeatures {
     fn get_opt_addr(&self) -> Option<Address>;
 
     #[endpoint]
-    fn load_opt_addr(&self) -> OptionalResult<Address> {
+    fn load_opt_addr(&self) -> OptionalValue<Address> {
         self.get_opt_addr().into()
     }
 

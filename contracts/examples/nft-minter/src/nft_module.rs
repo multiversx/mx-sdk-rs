@@ -20,7 +20,7 @@ pub trait NftModule {
     #[only_owner]
     #[payable("EGLD")]
     #[endpoint(issueToken)]
-    fn issue_token(&self, token_name: ManagedBuffer, token_ticker: ManagedBuffer) -> AsyncCall {
+    fn issue_token(&self, token_name: ManagedBuffer, token_ticker: ManagedBuffer) {
         require!(self.nft_token_id().is_empty(), "Token already issued");
 
         let payment_amount = self.call_value().egld_value();
@@ -41,11 +41,12 @@ pub trait NftModule {
             )
             .async_call()
             .with_callback(self.callbacks().issue_callback())
+            .call_and_exit()
     }
 
     #[only_owner]
     #[endpoint(setLocalRoles)]
-    fn set_local_roles(&self) -> AsyncCall {
+    fn set_local_roles(&self) {
         self.require_token_issued();
 
         self.send()
@@ -56,6 +57,7 @@ pub trait NftModule {
                 [EsdtLocalRole::NftCreate][..].iter().cloned(),
             )
             .async_call()
+            .call_and_exit()
     }
 
     // endpoints
@@ -114,14 +116,14 @@ pub trait NftModule {
     fn get_nft_price(
         &self,
         nft_nonce: u64,
-    ) -> OptionalResult<MultiResult3<TokenIdentifier, u64, BigUint>> {
+    ) -> OptionalValue<MultiValue3<TokenIdentifier, u64, BigUint>> {
         if self.price_tag(nft_nonce).is_empty() {
             // NFT was already sold
-            OptionalResult::None
+            OptionalValue::None
         } else {
             let price_tag = self.price_tag(nft_nonce).get();
 
-            OptionalResult::Some((price_tag.token, price_tag.nonce, price_tag.amount).into())
+            OptionalValue::Some((price_tag.token, price_tag.nonce, price_tag.amount).into())
         }
     }
 

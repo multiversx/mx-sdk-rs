@@ -6,7 +6,8 @@ use mandos::serde_raw::{
     AccountRaw, BlockInfoRaw, CheckAccountRaw, CheckAccountsRaw, CheckBytesValueRaw,
     CheckEsdtDataRaw, CheckEsdtInstanceRaw, CheckEsdtInstancesRaw, CheckEsdtMapContentsRaw,
     CheckEsdtMapRaw, CheckEsdtRaw, CheckLogsRaw, CheckStorageDetailsRaw, CheckStorageRaw,
-    EsdtFullRaw, EsdtRaw, InstanceRaw, TxCallRaw, TxESDTRaw, TxExpectRaw, TxQueryRaw, ValueSubTree,
+    CheckValueListRaw, EsdtFullRaw, EsdtRaw, InstanceRaw, TxCallRaw, TxESDTRaw, TxExpectRaw,
+    TxQueryRaw, ValueSubTree,
 };
 use num_traits::Zero;
 
@@ -163,7 +164,7 @@ pub(crate) fn tx_expect_as_raw(tx_expect: &TxExpectMandos) -> TxExpectRaw {
     };
 
     TxExpectRaw {
-        out: out_values_raw,
+        out: CheckValueListRaw::CheckList(out_values_raw),
         status: CheckBytesValueRaw::Equal(u64_as_raw(tx_expect.status)),
         message: msg_raw,
         logs: CheckLogsRaw::Star,

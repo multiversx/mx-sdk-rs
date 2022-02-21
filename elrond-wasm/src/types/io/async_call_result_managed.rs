@@ -1,11 +1,9 @@
-use crate::{
-    abi::TypeAbi,
-    api::ManagedTypeApi,
-    io::{ArgId, DynArg, DynArgInput},
-    types::ManagedBuffer,
-    ContractCallArg, DynArgOutput,
-};
+use crate::{abi::TypeAbi, api::ManagedTypeApi, types::ManagedBuffer};
 use alloc::string::String;
+use elrond_codec::{
+    DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti, TopDecodeMultiInput, TopEncodeMulti,
+    TopEncodeMultiOutput,
+};
 
 pub struct ManagedAsyncCallError<M>
 where
@@ -38,56 +36,60 @@ where
     }
 }
 
-impl<M, T> DynArg for ManagedAsyncCallResult<M, T>
+impl<M, T> TopDecodeMulti for ManagedAsyncCallResult<M, T>
 where
     M: ManagedTypeApi,
-    T: DynArg,
+    T: TopDecodeMulti,
 {
-    fn dyn_load<I: DynArgInput>(loader: &mut I, arg_id: ArgId) -> Self {
-        let err_code = u32::dyn_load(loader, arg_id);
+    fn multi_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: TopDecodeMultiInput,
+        H: DecodeErrorHandler,
+    {
+        let err_code: u32 = input.next_value(h)?;
         if err_code == 0 {
-            let arg = T::dyn_load(loader, arg_id);
-            ManagedAsyncCallResult::Ok(arg)
+            Ok(Self::Ok(T::multi_decode_or_handle_err(input, h)?))
         } else {
-            let err_msg = if loader.has_next() {
-                ManagedBuffer::dyn_load(loader, arg_id)
+            let err_msg = if input.has_next() {
+                input.next_value(h)?
             } else {
+                // temporary fix, until a problem involving missing error messages in the protocol gets fixed
+                // can be removed after the protocol is patched
                 // error messages should not normally be missing
-                // but there was a problem with Arwen in the past,
-                // so we are keeping this a little longer, for safety
                 ManagedBuffer::new()
             };
-            ManagedAsyncCallResult::Err(ManagedAsyncCallError { err_code, err_msg })
+            Ok(Self::Err(ManagedAsyncCallError { err_code, err_msg }))
         }
     }
 }
 
-impl<M, T> ContractCallArg for &ManagedAsyncCallResult<M, T>
+impl<M, T> TopEncodeMulti for ManagedAsyncCallResult<M, T>
 where
     M: ManagedTypeApi,
-    T: ContractCallArg,
+    T: TopEncodeMulti,
 {
-    fn push_dyn_arg<O: DynArgOutput>(&self, output: &mut O) {
+    type DecodeAs = Self;
+
+    fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: TopEncodeMultiOutput,
+        H: EncodeErrorHandler,
+    {
         match self {
             ManagedAsyncCallResult::Ok(result) => {
-                0u32.push_dyn_arg(output);
-                result.push_dyn_arg(output);
+                0u32.multi_encode_or_handle_err(output, h)?;
+                result.multi_encode_or_handle_err(output, h)?;
             },
             ManagedAsyncCallResult::Err(error_message) => {
-                error_message.err_code.push_dyn_arg(output);
-                error_message.err_msg.push_dyn_arg(output);
+                error_message
+                    .err_code
+                    .multi_encode_or_handle_err(output, h)?;
+                error_message
+                    .err_msg
+                    .multi_encode_or_handle_err(output, h)?;
             },
         }
-    }
-}
-
-impl<M, T> ContractCallArg for ManagedAsyncCallResult<M, T>
-where
-    M: ManagedTypeApi,
-    T: ContractCallArg,
-{
-    fn push_dyn_arg<O: DynArgOutput>(&self, output: &mut O) {
-        ContractCallArg::push_dyn_arg(&self, output)
+        Ok(())
     }
 }
 
