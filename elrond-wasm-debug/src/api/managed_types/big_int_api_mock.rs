@@ -66,6 +66,13 @@ impl BigIntApi for DebugApi {
             .insert_new_handle(BigInt::from(value))
     }
 
+    fn bi_new_handle(&self, value: i64) -> Handle {
+        let mut managed_types = self.m_types_borrow_mut();
+        managed_types
+            .big_int_map
+            .insert_new_handle(BigInt::from(value))
+    }
+
     fn bi_unsigned_byte_length(&self, handle: Handle) -> usize {
         self.bi_get_unsigned_bytes(handle).len()
     }

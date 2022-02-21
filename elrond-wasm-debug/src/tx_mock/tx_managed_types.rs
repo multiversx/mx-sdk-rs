@@ -71,4 +71,5 @@ impl Default for TxManagedTypes {
 #[derive(Debug, Default)]
 pub struct TxStaticVars {
     pub(crate) external_view_target_address_handle: Handle,
+    pub(crate) next_big_int_handle: Handle,
 }
