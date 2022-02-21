@@ -91,7 +91,7 @@
                 "out": [],
                 "status": "4",
                 "message": "str:featureName currently disabled",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
