@@ -12,7 +12,8 @@ use crate::{
 
 pub(crate) const TOKEN_ID_ALREADY_SET_ERR_MSG: &[u8] = b"Token ID already set";
 pub(crate) const MUST_SET_TOKEN_ID_ERR_MSG: &[u8] = b"Must issue or set token ID first";
-pub(crate) const INVALID_TOKEN_ID: &[u8] = b"Invalid token ID";
+pub(crate) const INVALID_TOKEN_ID_ERR_MSG: &[u8] = b"Invalid token ID";
+pub(crate) const INVALID_PAYMENT_TOKEN_ERR_MSG: &[u8] = b"Invalid payment token";
 
 pub trait StorageTokenWrapper<SA>
 where
@@ -33,7 +34,7 @@ where
             SA::error_api_impl().signal_error(TOKEN_ID_ALREADY_SET_ERR_MSG);
         }
         if !token_id.is_valid_esdt_identifier() {
-            SA::error_api_impl().signal_error(INVALID_TOKEN_ID);
+            SA::error_api_impl().signal_error(INVALID_TOKEN_ID_ERR_MSG);
         }
 
         storage_set(self.get_storage_key(), token_id);
@@ -42,7 +43,7 @@ where
     fn require_same_token(&self, expected_token_id: &TokenIdentifier<SA>) {
         let actual_token_id = self.get_token_id();
         if &actual_token_id != expected_token_id {
-            SA::error_api_impl().signal_error(INVALID_TOKEN_ID);
+            SA::error_api_impl().signal_error(INVALID_PAYMENT_TOKEN_ERR_MSG);
         }
     }
 
@@ -50,7 +51,7 @@ where
         let actual_token_id = self.get_token_id();
         for p in payments {
             if actual_token_id != p.token_identifier {
-                SA::error_api_impl().signal_error(INVALID_TOKEN_ID);
+                SA::error_api_impl().signal_error(INVALID_PAYMENT_TOKEN_ERR_MSG);
             }
         }
     }
