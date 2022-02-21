@@ -1,10 +1,10 @@
-use elrond_wasm::api::{Handle, ManagedTypeApi, ManagedTypeApiImpl};
-
 use crate::VmApiImpl;
+use elrond_wasm::api::{Handle, ManagedTypeApi, ManagedTypeApiImpl, StaticVarApiImpl};
 
 #[allow(dead_code)]
 extern "C" {
     fn mBufferNew() -> i32;
+    #[allow(dead_code)]
     fn bigIntNew(value: i64) -> i32;
 
     fn mBufferToBigIntUnsigned(mBufferHandle: i32, bigIntHandle: i32) -> i32;

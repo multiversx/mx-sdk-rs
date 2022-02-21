@@ -41,7 +41,7 @@ macro_rules! binary_operator {
             type Output = BigUint<M>;
 
             fn $method(self, other: u32) -> BigUint<M> {
-                let other_handle = M::managed_type_impl().bi_new(other as i64);
+                let other_handle = M::managed_type_impl().bi_new_handle(other as i64);
                 M::managed_type_impl().$api_func(self.handle, self.handle, other_handle);
                 BigUint::from_raw_handle(self.handle)
             }
@@ -51,7 +51,7 @@ macro_rules! binary_operator {
             type Output = BigUint<M>;
 
             fn $method(self, other: u32) -> BigUint<M> {
-                let other_handle = M::managed_type_impl().bi_new(other as i64);
+                let other_handle = M::managed_type_impl().bi_new_handle(other as i64);
                 let result = M::managed_type_impl().bi_new_zero();
                 M::managed_type_impl().$api_func(result, self.handle, other_handle);
                 BigUint::from_raw_handle(result)
@@ -62,7 +62,7 @@ macro_rules! binary_operator {
             type Output = BigUint<M>;
 
             fn $method(self, other: u64) -> BigUint<M> {
-                let other_handle = M::managed_type_impl().bi_new(other as i64);
+                let other_handle = M::managed_type_impl().bi_new_handle(other as i64);
                 M::managed_type_impl().$api_func(self.handle, self.handle, other_handle);
                 BigUint::from_raw_handle(self.handle)
             }
@@ -72,7 +72,7 @@ macro_rules! binary_operator {
             type Output = BigUint<M>;
 
             fn $method(self, other: u64) -> BigUint<M> {
-                let other_handle = M::managed_type_impl().bi_new(other as i64);
+                let other_handle = M::managed_type_impl().bi_new_handle(other as i64);
                 let result = M::managed_type_impl().bi_new_zero();
                 M::managed_type_impl().$api_func(result, self.handle, other_handle);
                 BigUint::from_raw_handle(result)
@@ -108,14 +108,14 @@ macro_rules! binary_assign_operator {
 
         impl<M: ManagedTypeApi> $trait<u32> for BigUint<M> {
             fn $method(&mut self, other: u32) {
-                let other_handle = M::managed_type_impl().bi_new(other as i64);
+                let other_handle = M::managed_type_impl().bi_new_handle(other as i64);
                 M::managed_type_impl().$api_func(self.handle, self.handle, other_handle);
             }
         }
 
         impl<M: ManagedTypeApi> $trait<u64> for BigUint<M> {
             fn $method(&mut self, other: u64) {
-                let other_handle = M::managed_type_impl().bi_new(other as i64);
+                let other_handle = M::managed_type_impl().bi_new_handle(other as i64);
                 M::managed_type_impl().$api_func(self.handle, self.handle, other_handle);
             }
         }

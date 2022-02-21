@@ -13,11 +13,12 @@ pub enum Sign {
 
 /// Definition of the BigInt type required by the API.
 pub trait BigIntApi {
+    #[allow(dead_code)]
     fn bi_new(&self, value: i64) -> Handle;
     fn bi_new_handle(&self, value: i64) -> Handle;
 
     fn bi_new_zero(&self) -> Handle {
-        self.bi_new(0)
+        self.bi_new_handle(0)
     }
 
     fn bi_unsigned_byte_length(&self, handle: Handle) -> usize;

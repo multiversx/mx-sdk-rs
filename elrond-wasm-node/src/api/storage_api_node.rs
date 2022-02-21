@@ -1,7 +1,10 @@
 use super::VmApiImpl;
 use alloc::vec::Vec;
 use elrond_wasm::{
-    api::{Handle, StorageReadApi, StorageReadApiImpl, StorageWriteApi, StorageWriteApiImpl},
+    api::{
+        Handle, StaticVarApiImpl, StorageReadApi, StorageReadApiImpl, StorageWriteApi,
+        StorageWriteApiImpl,
+    },
     types::BoxedBytes,
 };
 
@@ -13,6 +16,7 @@ extern "C" {
 	fn storageLoad(keyOffset: *const u8, keyLength: i32, dataOffset: *mut u8) -> i32;
 
 	// big int API
+    #[allow(dead_code)]
 	fn bigIntNew(value: i64) -> i32;
 	fn bigIntStorageStoreUnsigned(keyOffset: *const u8, keyLength: i32, source: i32) -> i32;
 	fn bigIntStorageLoadUnsigned(keyOffset: *const u8, keyLength: i32, destination: i32) -> i32;
