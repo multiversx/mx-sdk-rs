@@ -1,12 +1,13 @@
 use super::VmApiImpl;
 use elrond_wasm::{
-    api::{CallValueApi, CallValueApiImpl, Handle},
+    api::{CallValueApi, CallValueApiImpl, Handle, StaticVarApiImpl},
     types::{EsdtTokenType, ManagedType, TokenIdentifier},
 };
 
 const MAX_POSSIBLE_TOKEN_IDENTIFIER_LENGTH: usize = 32;
 
 extern "C" {
+    #[allow(dead_code)]
     fn bigIntNew(value: i64) -> i32;
     #[cfg(not(feature = "unmanaged-ei"))]
     fn mBufferNew() -> i32;

@@ -1,7 +1,7 @@
 use crate::{error_hook, VmApiImpl};
 use alloc::vec::Vec;
 use elrond_wasm::{
-    api::{EndpointArgumentApi, EndpointArgumentApiImpl, Handle},
+    api::{EndpointArgumentApi, EndpointArgumentApiImpl, Handle, StaticVarApiImpl},
     err_msg,
     types::BoxedBytes,
 };
@@ -12,6 +12,7 @@ extern "C" {
     fn getArgument(id: i32, dstOffset: *mut u8) -> i32;
 
     // big int API
+    #[allow(dead_code)]
     fn bigIntNew(value: i64) -> i32;
     fn bigIntGetUnsignedArgument(arg_id: i32, dest: i32);
     fn bigIntGetSignedArgument(arg_id: i32, dest: i32);

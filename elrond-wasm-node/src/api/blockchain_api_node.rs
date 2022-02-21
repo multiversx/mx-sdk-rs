@@ -5,7 +5,7 @@ use crate::{
     VmApiImpl,
 };
 use elrond_wasm::{
-    api::{BlockchainApi, BlockchainApiImpl, Handle, ManagedTypeApi},
+    api::{BlockchainApi, BlockchainApiImpl, Handle, ManagedTypeApi, StaticVarApiImpl},
     types::{
         Address, BigUint, Box, EsdtTokenData, EsdtTokenType, ManagedAddress, ManagedBuffer,
         ManagedType, ManagedVec, TokenIdentifier, H256,
@@ -68,6 +68,7 @@ extern "C" {
     fn managedGetOriginalTxHash(resultHandle: i32);
 
     // big int API
+    #[allow(dead_code)]
     fn bigIntNew(value: i64) -> i32;
     fn bigIntGetExternalBalance(address_ptr: *const u8, dest: i32);
     fn bigIntGetESDTExternalBalance(

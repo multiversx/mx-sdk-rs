@@ -56,7 +56,7 @@ macro_rules! big_uint_conv_num {
         impl<M: ManagedTypeApi> From<$num_ty> for BigUint<M> {
             #[inline]
             fn from(value: $num_ty) -> Self {
-                BigUint::from_raw_handle(M::managed_type_impl().bi_new(value as i64))
+                BigUint::from_raw_handle(M::managed_type_impl().bi_new_handle(value as i64))
             }
         }
     };
@@ -91,7 +91,7 @@ impl<M: ManagedTypeApi> BigUint<M> {
     #[inline]
     pub fn from_bytes_be(bytes: &[u8]) -> Self {
         let api = M::managed_type_impl();
-        let handle = api.bi_new(0);
+        let handle = api.bi_new_handle(0);
         api.bi_set_unsigned_bytes(handle, bytes);
         BigUint {
             handle,
@@ -141,7 +141,7 @@ impl<M: ManagedTypeApi> BigUint<M> {
     pub fn pow(&self, exp: u32) -> Self {
         let api = M::managed_type_impl();
         let handle = api.bi_new_zero();
-        let exp_handle = api.bi_new(exp as i64);
+        let exp_handle = api.bi_new_handle(exp as i64);
         api.bi_pow(handle, self.handle, exp_handle);
         BigUint {
             handle,

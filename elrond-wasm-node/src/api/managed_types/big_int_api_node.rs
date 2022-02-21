@@ -9,6 +9,7 @@ use elrond_wasm::{
 };
 
 extern "C" {
+    #[allow(dead_code)]
     fn bigIntNew(value: i64) -> i32;
 
     fn bigIntUnsignedByteLength(x: i32) -> i32;
@@ -66,6 +67,7 @@ macro_rules! unary_op_wrapper {
 
 impl BigIntApi for crate::VmApiImpl {
     #[inline]
+    #[allow(dead_code)]
     fn bi_new(&self, value: i64) -> Handle {
         unsafe { bigIntNew(value) }
     }
