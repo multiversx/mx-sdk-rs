@@ -136,7 +136,7 @@ fn convert_mandos_esdt_to_world_mock(
 }
 
 fn convert_mandos_esdt_instance_to_world_mock(
-    mandos_esdt: &mandos::model::Instance,
+    mandos_esdt: &mandos::model::EsdtInstance,
 ) -> EsdtInstance {
     EsdtInstance {
         nonce: mandos_esdt
