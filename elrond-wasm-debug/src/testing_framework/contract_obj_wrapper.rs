@@ -358,9 +358,10 @@ impl BlockchainStateWrapper {
         creator: Option<&Address>,
         name: Option<&[u8]>,
         hash: Option<&[u8]>,
-        uri: &[Vec<u8>],
+        uris: &[Vec<u8>],
     ) {
         let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
+
         match b_mock_ref.accounts.get_mut(address) {
             Some(acc) => {
                 acc.esdt.set_esdt_balance(
@@ -373,7 +374,7 @@ impl BlockchainStateWrapper {
                         royalties,
                         name: name.unwrap_or_default().to_vec(),
                         hash: hash.map(|h| h.to_vec()),
-                        uri: uri.to_vec(),
+                        uri: uris.to_vec(),
                     },
                 );
 
