@@ -82,7 +82,7 @@ impl EndpointArgumentApiImpl for VmApiImpl {
     #[inline]
     fn get_argument_big_uint_raw(&self, arg_id: i32) -> i32 {
         unsafe {
-            let handle = bigIntNew(0);
+            let handle = self.get_next_bigint_handle();
             bigIntGetUnsignedArgument(arg_id, handle);
             handle
         }
@@ -91,7 +91,7 @@ impl EndpointArgumentApiImpl for VmApiImpl {
     #[inline]
     fn get_argument_big_int_raw(&self, arg_id: i32) -> i32 {
         unsafe {
-            let handle = bigIntNew(0);
+            let handle = self.get_next_bigint_handle();
             bigIntGetSignedArgument(arg_id, handle);
             handle
         }

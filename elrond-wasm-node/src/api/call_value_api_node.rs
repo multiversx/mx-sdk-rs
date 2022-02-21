@@ -52,7 +52,7 @@ impl CallValueApiImpl for VmApiImpl {
 
     fn egld_value(&self) -> Handle {
         unsafe {
-            let value_handle = bigIntNew(0);
+            let value_handle = self.get_next_bigint_handle();
             bigIntGetCallValue(value_handle);
             value_handle
         }
@@ -60,7 +60,7 @@ impl CallValueApiImpl for VmApiImpl {
 
     fn esdt_value(&self) -> Handle {
         unsafe {
-            let value_handle = bigIntNew(0);
+            let value_handle = self.get_next_bigint_handle();
             bigIntGetESDTCallValue(value_handle);
             value_handle
         }
@@ -93,7 +93,7 @@ impl CallValueApiImpl for VmApiImpl {
 
     fn esdt_value_by_index(&self, index: usize) -> Handle {
         unsafe {
-            let value_handle = bigIntNew(0);
+            let value_handle = self.get_next_bigint_handle();
             bigIntGetESDTCallValueByIndex(value_handle, index as i32);
             value_handle
         }
