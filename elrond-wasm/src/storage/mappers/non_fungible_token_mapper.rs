@@ -229,6 +229,14 @@ where
         b_wrapper.get_esdt_token_data(&own_sc_address, &token_id, token_nonce)
     }
 
+    pub fn get_balance(&self, token_nonce: u64) -> BigUint<SA> {
+        let b_wrapper = BlockchainWrapper::new();
+        let own_sc_address = Self::get_sc_address();
+        let token_id = self.get_token_id();
+
+        b_wrapper.get_esdt_balance(&own_sc_address, &token_id, token_nonce)
+    }
+
     pub fn get_token_attributes<T: TopDecode>(&self, token_nonce: u64) -> T {
         let token_data = self.get_all_token_data(token_nonce);
         token_data.decode_attributes()

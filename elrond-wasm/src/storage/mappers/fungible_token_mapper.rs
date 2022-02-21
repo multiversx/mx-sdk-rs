@@ -6,7 +6,7 @@ use super::{
 };
 use crate::{
     api::{BlockchainApiImpl, CallTypeApi, ErrorApiImpl, StorageMapperApi},
-    contract_base::SendWrapper,
+    contract_base::{BlockchainWrapper, SendWrapper},
     esdt::{ESDTSystemSmartContractProxy, FungibleTokenProperties},
     storage::StorageKey,
     types::{
@@ -134,6 +134,14 @@ where
         let token_id = self.get_token_id();
 
         send_wrapper.esdt_local_burn(&token_id, 0, &amount);
+    }
+
+    pub fn get_balance(&self) -> BigUint<SA> {
+        let b_wrapper = BlockchainWrapper::new();
+        let own_sc_address = Self::get_sc_address();
+        let token_id = self.get_token_id();
+
+        b_wrapper.get_esdt_balance(&own_sc_address, &token_id, 0)
     }
 
     fn send_payment(&self, to: &ManagedAddress<SA>, payment: &EsdtTokenPayment<SA>) {
