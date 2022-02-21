@@ -4,7 +4,7 @@ elrond_wasm::imports!();
 #[elrond_wasm::module]
 pub trait DefaultIssueCallbacksModule {
     #[callback]
-    fn default_fungible_issue_cb(
+    fn default_issue_cb(
         &self,
         initial_caller: ManagedAddress,
         storage_key: ManagedBuffer,
@@ -12,8 +12,9 @@ pub trait DefaultIssueCallbacksModule {
     ) {
         match result {
             ManagedAsyncCallResult::Ok(token_id) => {
-                let token_mapper = FungibleTokenMapper::new(storage_key.into());
-                token_mapper.set_token_id(&token_id);
+                let mapper =
+                    SingleValueMapper::<Self::Api, TokenIdentifier>::new(storage_key.into());
+                mapper.set(&token_id);
             },
             ManagedAsyncCallResult::Err(_) => {
                 self.return_failed_issue_funds(initial_caller);
@@ -22,7 +23,7 @@ pub trait DefaultIssueCallbacksModule {
     }
 
     #[callback]
-    fn default_fungible_init_supply_cb(
+    fn default_issue_init_supply_cb(
         &self,
         initial_caller: ManagedAddress,
         storage_key: ManagedBuffer,
@@ -31,8 +32,9 @@ pub trait DefaultIssueCallbacksModule {
         match result {
             ManagedAsyncCallResult::Ok(()) => {
                 let token_id = self.call_value().token();
-                let token_mapper = FungibleTokenMapper::new(storage_key.into());
-                token_mapper.set_token_id(&token_id);
+                let mapper =
+                    SingleValueMapper::<Self::Api, TokenIdentifier>::new(storage_key.into());
+                mapper.set(&token_id);
             },
             ManagedAsyncCallResult::Err(_) => {
                 self.return_failed_issue_funds(initial_caller);
