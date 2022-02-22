@@ -37,14 +37,14 @@ impl StaticVarApiImpl for VmApiImpl {
     fn get_next_bigint_handle(&self) -> Handle {
         unsafe {
             NEXT_BIG_INT_HANDLE += 1;
-            NEXT_BIG_INT_HANDLE - 1
+            NEXT_BIG_INT_HANDLE
         }
     }
 
     fn get_next_managed_buffer_handle(&self) -> Handle {
         unsafe {
             NEXT_MANAGED_BUFFER_HANDLE += 1;
-            NEXT_MANAGED_BUFFER_HANDLE - 1
+            NEXT_MANAGED_BUFFER_HANDLE
         }
     }
 }

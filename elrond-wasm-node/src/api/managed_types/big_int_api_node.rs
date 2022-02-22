@@ -3,7 +3,7 @@ use core::cmp::Ordering;
 use crate::{api::unsafe_buffer, error_hook};
 
 use elrond_wasm::{
-    api::{BigIntApi, Handle, Sign},
+    api::{BigIntApi, Handle, Sign, StaticVarApiImpl},
     err_msg,
     types::BoxedBytes,
 };
@@ -74,7 +74,9 @@ impl BigIntApi for crate::VmApiImpl {
 
     #[inline]
     fn bi_new_handle(&self, value: i64) -> Handle {
-        unsafe { bigIntNew(value) }
+        let handle = self.get_next_bigint_handle();
+        self.bi_set_signed_bytes(handle, &value.to_be_bytes());
+        handle
     }
 
     #[inline]
