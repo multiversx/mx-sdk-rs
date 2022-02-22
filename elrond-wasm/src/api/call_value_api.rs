@@ -49,8 +49,13 @@ pub trait CallValueApiImpl: ErrorApiImpl + ManagedTypeApiImpl {
     /// Will return the ESDT call value,
     /// but also fail with an error if EGLD or the wrong ESDT token is sent.
     /// Especially used in the auto-generated call value processing.
+    ///
+    /// TODO: rename to `require_single_esdt`.
     fn require_esdt(&self, token: &[u8]) -> Handle {
         let want = self.mb_new_from_bytes(token);
+        if self.esdt_num_transfers() != 1 {
+            self.signal_error(err_msg::SINGLE_ESDT_EXPECTED);
+        }
         if !self.mb_eq(self.token(), want) {
             self.signal_error(err_msg::BAD_TOKEN_PROVIDED);
         }
@@ -62,11 +67,10 @@ pub trait CallValueApiImpl: ErrorApiImpl + ManagedTypeApiImpl {
     /// The method might seem redundant, but there is such a hook in Arwen
     /// that might be used in this scenario in the future.
     fn payment_token_pair(&self) -> (Handle, Handle) {
-        let token = self.token();
         if self.esdt_num_transfers() == 0 {
-            (self.egld_value(), token)
+            (self.egld_value(), self.mb_new_empty())
         } else {
-            (self.esdt_value(), token)
+            (self.esdt_value(), self.token())
         }
     }
 

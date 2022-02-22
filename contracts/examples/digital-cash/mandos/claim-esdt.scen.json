@@ -182,9 +182,9 @@
                 "out": [],
                 "status": "4",
                 "message": "str:invalid signature",
-                "logs": "*",
                 "gas": "*",
-                "refund": "*"
+                "refund": "*",
+                "logs": "*"
             }
         },
         {
