@@ -32,7 +32,7 @@
                 "out": [],
                 "status": "4",
                 "message": "str:Static error",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -54,7 +54,7 @@
                 "out": [],
                 "status": "4",
                 "message": "str:Got this buffer: 0x61626364. I don't like it, ERROR!",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -80,7 +80,7 @@
                 "out": [],
                 "status": "4",
                 "message": "str:Got token 0x544f4b454e2d313233343536, with nonce 0x, amount 0x03e8. I prefer EGLD. ERROR!",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -106,7 +106,7 @@
                 "out": [],
                 "status": "4",
                 "message": "str:Got token TOKEN-123456, with nonce 0x, amount 0x03e8. I prefer EGLD. ERROR!",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }

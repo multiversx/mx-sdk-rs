@@ -30,7 +30,7 @@ pub trait TypeFeatures {
     }
 
     #[endpoint]
-    fn boxed_bytes_split(&self, bb: BoxedBytes, at: usize) -> MultiResult2<BoxedBytes, BoxedBytes> {
+    fn boxed_bytes_split(&self, bb: BoxedBytes, at: usize) -> MultiValue2<BoxedBytes, BoxedBytes> {
         bb.split(at).into()
     }
 
@@ -46,7 +46,7 @@ pub trait TypeFeatures {
     // NON ZERO EXTRA
 
     #[view]
-    fn non_zero_usize_iter(&self, how_many: usize) -> MultiResultVec<NonZeroUsize> {
+    fn non_zero_usize_iter(&self, how_many: usize) -> MultiValueVec<NonZeroUsize> {
         let mut result = Vec::<NonZeroUsize>::new();
         for nz in NonZeroUsizeIterator::from_1_to_n(how_many) {
             result.push(nz);

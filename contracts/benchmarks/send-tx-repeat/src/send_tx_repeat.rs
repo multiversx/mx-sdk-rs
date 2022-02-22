@@ -14,11 +14,11 @@ pub trait SendTxRepeat {
         to: ManagedAddress,
         amount: BigUint,
         times: usize,
-        #[var_args] opt_data: OptionalArg<BoxedBytes>,
+        #[var_args] opt_data: OptionalValue<BoxedBytes>,
     ) {
         let data = match opt_data {
-            OptionalArg::Some(d) => d,
-            OptionalArg::None => BoxedBytes::empty(),
+            OptionalValue::Some(d) => d,
+            OptionalValue::None => BoxedBytes::empty(),
         };
         for _ in 0..times {
             self.send().direct_egld(&to, &amount, data.as_slice());

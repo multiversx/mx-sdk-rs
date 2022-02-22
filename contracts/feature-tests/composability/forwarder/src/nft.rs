@@ -54,7 +54,7 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
         #[payment] issue_cost: BigUint,
         token_display_name: ManagedBuffer,
         token_ticker: ManagedBuffer,
-    ) -> AsyncCall {
+    ) {
         let caller = self.blockchain().get_caller();
 
         self.send()
@@ -74,6 +74,7 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
             )
             .async_call()
             .with_callback(self.callbacks().nft_issue_callback(&caller))
+            .call_and_exit()
     }
 
     #[callback]
@@ -159,6 +160,28 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
     }
 
     #[endpoint]
+    fn nft_add_uris(
+        &self,
+        token_identifier: TokenIdentifier,
+        nonce: u64,
+        #[var_args] uris: ManagedVarArgs<ManagedBuffer>,
+    ) {
+        self.send()
+            .nft_add_multiple_uri(&token_identifier, nonce, &uris.to_vec());
+    }
+
+    #[endpoint]
+    fn nft_update_attributes(
+        &self,
+        token_identifier: TokenIdentifier,
+        nonce: u64,
+        new_attributes: Color,
+    ) {
+        self.send()
+            .nft_update_attributes(&token_identifier, nonce, &new_attributes);
+    }
+
+    #[endpoint]
     fn nft_decode_complex_attributes(
         &self,
         token_identifier: TokenIdentifier,
@@ -167,7 +190,7 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
         royalties: BigUint,
         hash: ManagedBuffer,
         uri: ManagedBuffer,
-        #[var_args] attrs_arg: MultiArg5<
+        #[var_args] attrs_arg: MultiValue5<
             BigUint,
             ManagedBuffer,
             TokenIdentifier,

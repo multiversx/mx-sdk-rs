@@ -80,37 +80,37 @@ pub trait EchoTypes {
     }
 
     #[endpoint]
-    fn echo_boxed_bytes(&self, arg: BoxedBytes) -> MultiResult2<BoxedBytes, usize> {
+    fn echo_boxed_bytes(&self, arg: BoxedBytes) -> MultiValue2<BoxedBytes, usize> {
         let l = arg.len();
         (arg, l).into()
     }
 
     #[endpoint]
-    fn echo_slice_u8<'s>(&self, slice: &'s [u8]) -> MultiResult2<&'s [u8], usize> {
+    fn echo_slice_u8<'s>(&self, slice: &'s [u8]) -> MultiValue2<&'s [u8], usize> {
         let l = slice.len();
         (slice, l).into()
     }
 
     #[endpoint]
-    fn echo_vec_u8(&self, arg: Vec<u8>) -> MultiResult2<Vec<u8>, usize> {
+    fn echo_vec_u8(&self, arg: Vec<u8>) -> MultiValue2<Vec<u8>, usize> {
         let l = arg.len();
         (arg, l).into()
     }
 
     #[endpoint]
-    fn echo_string(&self, s: String) -> MultiResult2<String, usize> {
+    fn echo_string(&self, s: String) -> MultiValue2<String, usize> {
         let l = s.len();
         (s, l).into()
     }
 
     #[endpoint]
-    fn echo_str<'s>(&self, s: &'s str) -> MultiResult2<&'s str, usize> {
+    fn echo_str<'s>(&self, s: &'s str) -> MultiValue2<&'s str, usize> {
         let l = s.len();
         (s, l).into()
     }
 
     #[endpoint]
-    fn echo_str_box(&self, s: Box<str>) -> MultiResult2<Box<str>, usize> {
+    fn echo_str_box(&self, s: Box<str>) -> MultiValue2<Box<str>, usize> {
         let l = s.len();
         (s, l).into()
     }
@@ -118,29 +118,32 @@ pub trait EchoTypes {
     #[endpoint]
     fn echo_varags_u32(
         &self,
-        #[var_args] m: VarArgs<u32>,
-    ) -> MultiResult2<usize, MultiResultVec<u32>> {
+        #[var_args] m: MultiValueVec<u32>,
+    ) -> MultiValue2<usize, MultiValueVec<u32>> {
         let v = m.into_vec();
         (v.len(), v.into()).into()
     }
 
     #[endpoint]
-    fn take_varags_u32(&self, #[var_args] m: VarArgs<u32>) -> usize {
+    fn take_varags_u32(&self, #[var_args] m: MultiValueVec<u32>) -> usize {
         let v = m.into_vec();
         v.len()
     }
 
     #[endpoint]
-    fn echo_varags_big_uint(&self, #[var_args] m: VarArgs<BigUint>) -> MultiResultVec<BigUint> {
+    fn echo_varags_big_uint(
+        &self,
+        #[var_args] m: MultiValueVec<BigUint>,
+    ) -> MultiValueVec<BigUint> {
         m.into_vec().into()
     }
 
     #[endpoint]
     fn echo_varags_tuples(
         &self,
-        #[var_args] m: VarArgs<MultiArg2<isize, Vec<u8>>>,
-    ) -> MultiResultVec<MultiResult2<isize, Vec<u8>>> {
-        let mut result: Vec<MultiResult2<isize, Vec<u8>>> = Vec::new();
+        #[var_args] m: MultiValueVec<MultiValue2<isize, Vec<u8>>>,
+    ) -> MultiValueVec<MultiValue2<isize, Vec<u8>>> {
+        let mut result: Vec<MultiValue2<isize, Vec<u8>>> = Vec::new();
         for m_arg in m.into_vec().into_iter() {
             result.push(m_arg.into_tuple().into())
         }
@@ -202,9 +205,9 @@ pub trait EchoTypes {
     fn echo_some_args_ignore_others(
         &self,
         i: i32,
-        #[var_args] opt: OptionalArg<i32>,
-        #[var_args] _ignore: IgnoreVarArgs,
-    ) -> MultiResult2<i32, OptionalResult<i32>> {
+        #[var_args] opt: OptionalValue<i32>,
+        #[var_args] _ignore: IgnoreValue,
+    ) -> MultiValue2<i32, OptionalValue<i32>> {
         (i, opt).into()
     }
 

@@ -20,7 +20,7 @@ pub trait Crowdfunding {
     }
 
     #[endpoint]
-    fn fund(&self, token_amount: BigUint) -> SCResult<AsyncCall> {
+    fn fund(&self, token_amount: BigUint) {
         require!(
             self.blockchain().get_block_nonce() <= self.deadline().get(),
             "cannot fund after deadline"
@@ -30,14 +30,14 @@ pub trait Crowdfunding {
         let erc20_address = self.erc20_contract_address().get();
         let cf_contract_address = self.blockchain().get_sc_address();
 
-        Ok(self
-            .erc20_proxy(erc20_address)
+        self.erc20_proxy(erc20_address)
             .transfer_from(caller.clone(), cf_contract_address, token_amount.clone())
             .async_call()
             .with_callback(
                 self.callbacks()
                     .transfer_from_callback(caller, token_amount),
-            ))
+            )
+            .call_and_exit()
     }
 
     #[view]
@@ -56,24 +56,24 @@ pub trait Crowdfunding {
     }
 
     #[endpoint]
-    fn claim(&self) -> SCResult<OptionalResult<AsyncCall>> {
+    fn claim(&self) {
         match self.status() {
-            Status::FundingPeriod => sc_error!("cannot claim before deadline"),
+            Status::FundingPeriod => sc_panic!("cannot claim before deadline"),
             Status::Successful => {
                 let caller = self.blockchain().get_caller();
                 if caller != self.blockchain().get_owner_address() {
-                    return sc_error!("only owner can claim successful funding");
+                    sc_panic!("only owner can claim successful funding");
                 }
 
                 let balance = self.total_balance().get();
                 self.total_balance().clear();
 
                 let erc20_address = self.erc20_contract_address().get();
-                Ok(OptionalResult::Some(
-                    self.erc20_proxy(erc20_address)
-                        .transfer(caller, balance)
-                        .async_call(),
-                ))
+
+                self.erc20_proxy(erc20_address)
+                    .transfer(caller, balance)
+                    .async_call()
+                    .call_and_exit()
             },
             Status::Failed => {
                 let caller = self.blockchain().get_caller();
@@ -83,13 +83,11 @@ pub trait Crowdfunding {
                     self.deposit(&caller).clear();
 
                     let erc20_address = self.erc20_contract_address().get();
-                    Ok(OptionalResult::Some(
-                        self.erc20_proxy(erc20_address)
-                            .transfer(caller, deposit)
-                            .async_call(),
-                    ))
-                } else {
-                    Ok(OptionalResult::None)
+
+                    self.erc20_proxy(erc20_address)
+                        .transfer(caller, deposit)
+                        .async_call()
+                        .call_and_exit()
                 }
             },
         }
@@ -101,26 +99,24 @@ pub trait Crowdfunding {
         #[call_result] result: ManagedAsyncCallResult<()>,
         cb_sender: ManagedAddress,
         cb_amount: BigUint,
-    ) -> OptionalResult<AsyncCall> {
+    ) {
         match result {
             ManagedAsyncCallResult::Ok(()) => {
                 // transaction started before deadline, ended after -> refund
                 if self.blockchain().get_block_nonce() > self.deadline().get() {
                     let erc20_address = self.erc20_contract_address().get();
-                    return OptionalResult::Some(
-                        self.erc20_proxy(erc20_address)
-                            .transfer(cb_sender, cb_amount)
-                            .async_call(),
-                    );
+
+                    self.erc20_proxy(erc20_address)
+                        .transfer(cb_sender, cb_amount)
+                        .async_call()
+                        .call_and_exit();
                 }
 
                 self.deposit(&cb_sender)
                     .update(|deposit| *deposit += &cb_amount);
                 self.total_balance().update(|balance| *balance += cb_amount);
-
-                OptionalResult::None
             },
-            ManagedAsyncCallResult::Err(_) => OptionalResult::None,
+            ManagedAsyncCallResult::Err(_) => {},
         }
     }
 

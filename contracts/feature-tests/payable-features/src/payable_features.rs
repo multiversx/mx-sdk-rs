@@ -14,7 +14,7 @@ pub trait PayableFeatures {
     #[payable("*")]
     fn echo_call_value(
         &self,
-    ) -> MultiResult2<BigUint, ManagedVec<Self::Api, EsdtTokenPayment<Self::Api>>> {
+    ) -> MultiValue2<BigUint, ManagedVec<Self::Api, EsdtTokenPayment<Self::Api>>> {
         (
             self.call_value().egld_value(),
             self.call_value().all_esdt_transfers(),
@@ -37,13 +37,13 @@ pub trait PayableFeatures {
         &self,
         #[payment] payment: BigUint,
         #[payment_token] token: TokenIdentifier,
-    ) -> MultiResult2<BigUint, TokenIdentifier> {
+    ) -> MultiValue2<BigUint, TokenIdentifier> {
         (payment, token).into()
     }
 
     #[endpoint]
     #[payable("*")]
-    fn payable_any_2(&self, #[payment] payment: BigUint) -> MultiResult2<BigUint, TokenIdentifier> {
+    fn payable_any_2(&self, #[payment] payment: BigUint) -> MultiValue2<BigUint, TokenIdentifier> {
         let token = self.call_value().token();
         (payment, token).into()
     }
@@ -53,14 +53,14 @@ pub trait PayableFeatures {
     fn payable_any_3(
         &self,
         #[payment_token] token: TokenIdentifier,
-    ) -> MultiResult2<BigUint, TokenIdentifier> {
+    ) -> MultiValue2<BigUint, TokenIdentifier> {
         let (payment, _) = self.call_value().payment_token_pair();
         (payment, token).into()
     }
 
     #[endpoint]
     #[payable("*")]
-    fn payable_any_4(&self) -> MultiResult2<BigUint, TokenIdentifier> {
+    fn payable_any_4(&self) -> MultiValue2<BigUint, TokenIdentifier> {
         self.call_value().payment_token_pair().into()
     }
 
@@ -69,17 +69,14 @@ pub trait PayableFeatures {
     fn payable_egld_1(
         &self,
         #[payment_token] token: TokenIdentifier,
-    ) -> MultiResult2<BigUint, TokenIdentifier> {
+    ) -> MultiValue2<BigUint, TokenIdentifier> {
         let payment = self.call_value().egld_value();
         (payment, token).into()
     }
 
     #[endpoint]
     #[payable("EGLD")]
-    fn payable_egld_2(
-        &self,
-        #[payment] payment: BigUint,
-    ) -> MultiResult2<BigUint, TokenIdentifier> {
+    fn payable_egld_2(&self, #[payment] payment: BigUint) -> MultiValue2<BigUint, TokenIdentifier> {
         let token = self.call_value().token();
         (payment, token).into()
     }
@@ -89,14 +86,14 @@ pub trait PayableFeatures {
     fn payable_egld_3(
         &self,
         #[payment_token] token: TokenIdentifier,
-    ) -> MultiResult2<BigUint, TokenIdentifier> {
+    ) -> MultiValue2<BigUint, TokenIdentifier> {
         let payment = self.call_value().egld_value();
         (payment, token).into()
     }
 
     #[endpoint]
     #[payable("EGLD")]
-    fn payable_egld_4(&self) -> MultiResult2<BigUint, TokenIdentifier> {
+    fn payable_egld_4(&self) -> MultiValue2<BigUint, TokenIdentifier> {
         let payment = self.call_value().egld_value();
         let token = self.call_value().token();
         (payment, token).into()
@@ -108,7 +105,7 @@ pub trait PayableFeatures {
         &self,
         #[payment] payment: BigUint,
         #[payment_token] token: TokenIdentifier,
-    ) -> MultiResult2<BigUint, TokenIdentifier> {
+    ) -> MultiValue2<BigUint, TokenIdentifier> {
         (payment, token).into()
     }
 
@@ -117,7 +114,7 @@ pub trait PayableFeatures {
     fn payable_token_2(
         &self,
         #[payment] payment: BigUint,
-    ) -> MultiResult2<BigUint, TokenIdentifier> {
+    ) -> MultiValue2<BigUint, TokenIdentifier> {
         let token = self.call_value().token();
         (payment, token).into()
     }
@@ -127,14 +124,14 @@ pub trait PayableFeatures {
     fn payable_token_3(
         &self,
         #[payment_token] token: TokenIdentifier,
-    ) -> MultiResult2<BigUint, TokenIdentifier> {
+    ) -> MultiValue2<BigUint, TokenIdentifier> {
         let payment = self.call_value().esdt_value();
         (payment, token).into()
     }
 
     #[endpoint]
     #[payable("PAYABLE-FEATURES-TOKEN")]
-    fn payable_token_4(&self) -> MultiResult2<BigUint, TokenIdentifier> {
+    fn payable_token_4(&self) -> MultiValue2<BigUint, TokenIdentifier> {
         let payment = self.call_value().esdt_value();
         let token = self.call_value().token();
         (payment, token).into()

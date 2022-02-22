@@ -10,6 +10,8 @@ const ESDT_ROLE_LOCAL_BURN: &[u8] = b"ESDTRoleLocalBurn";
 const ESDT_ROLE_NFT_CREATE: &[u8] = b"ESDTRoleNFTCreate";
 const ESDT_ROLE_NFT_ADD_QUANTITY: &[u8] = b"ESDTRoleNFTAddQuantity";
 const ESDT_ROLE_NFT_BURN: &[u8] = b"ESDTRoleNFTBurn";
+const ESDT_ROLE_NFT_ADD_URI: &[u8] = b"ESDTRoleNFTAddURI";
+const ESDT_ROLE_NFT_UPDATE_ATTRIBUTES: &[u8] = b"ESDTRoleNFTUpdateAttributes";
 
 #[derive(
     TopDecode, TopEncode, NestedDecode, NestedEncode, TypeAbi, Clone, PartialEq, Debug, Copy,
@@ -21,6 +23,8 @@ pub enum EsdtLocalRole {
     NftCreate,
     NftAddQuantity,
     NftBurn,
+    NftAddUri,
+    NftUpdateAttributes,
 }
 
 impl EsdtLocalRole {
@@ -32,6 +36,8 @@ impl EsdtLocalRole {
             Self::NftCreate => 3,
             Self::NftAddQuantity => 4,
             Self::NftBurn => 5,
+            Self::NftAddUri => 6,
+            Self::NftUpdateAttributes => 7,
         }
     }
 
@@ -43,6 +49,8 @@ impl EsdtLocalRole {
             Self::NftCreate => ESDT_ROLE_NFT_CREATE,
             Self::NftAddQuantity => ESDT_ROLE_NFT_ADD_QUANTITY,
             Self::NftBurn => ESDT_ROLE_NFT_BURN,
+            Self::NftAddUri => ESDT_ROLE_NFT_ADD_URI,
+            Self::NftUpdateAttributes => ESDT_ROLE_NFT_UPDATE_ATTRIBUTES,
         }
     }
 
@@ -54,18 +62,22 @@ impl EsdtLocalRole {
             Self::NftCreate => EsdtLocalRoleFlags::NFT_CREATE,
             Self::NftAddQuantity => EsdtLocalRoleFlags::NFT_ADD_QUANTITY,
             Self::NftBurn => EsdtLocalRoleFlags::NFT_BURN,
+            Self::NftAddUri => EsdtLocalRoleFlags::NFT_ADD_URI,
+            Self::NftUpdateAttributes => EsdtLocalRoleFlags::NFT_UPDATE_ATTRIBUTES,
         }
     }
 }
 
 // TODO: can be done with macros, but I didn't find a public library that does it and is no_std
 // we can implement it, it's easy
-const ALL_ROLES: [EsdtLocalRole; 5] = [
+const ALL_ROLES: [EsdtLocalRole; 7] = [
     EsdtLocalRole::Mint,
     EsdtLocalRole::Burn,
     EsdtLocalRole::NftCreate,
     EsdtLocalRole::NftAddQuantity,
     EsdtLocalRole::NftBurn,
+    EsdtLocalRole::NftAddUri,
+    EsdtLocalRole::NftUpdateAttributes,
 ];
 
 impl EsdtLocalRole {

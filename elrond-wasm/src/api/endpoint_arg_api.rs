@@ -17,7 +17,7 @@ pub trait EndpointArgumentApiImpl: ErrorApiImpl {
     fn check_num_arguments(&self, expected: i32) {
         let nr_args = self.get_num_arguments();
         if nr_args != expected {
-            self.signal_error(err_msg::ARG_WRONG_NUMBER);
+            self.signal_error(err_msg::ARG_WRONG_NUMBER.as_bytes());
         }
     }
 

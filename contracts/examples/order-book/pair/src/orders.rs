@@ -343,8 +343,8 @@ pub trait OrdersModule:
     }
 
     #[view(getAddressOrderIds)]
-    fn get_address_order_ids(&self, address: &ManagedAddress) -> MultiResultVec<u64> {
-        MultiResultVec::from_iter(
+    fn get_address_order_ids(&self, address: &ManagedAddress) -> MultiValueVec<u64> {
+        MultiValueVec::from_iter(
             self.address_order_ids(address)
                 .get()
                 .iter()

@@ -38,11 +38,11 @@ pub trait Forwarder:
         &self,
         to: &ManagedAddress,
         amount: &BigUint,
-        #[var_args] opt_data: OptionalArg<ManagedBuffer>,
+        #[var_args] opt_data: OptionalValue<ManagedBuffer>,
     ) {
         let data = match opt_data {
-            OptionalArg::Some(data) => data,
-            OptionalArg::None => ManagedBuffer::new(),
+            OptionalValue::Some(data) => data,
+            OptionalValue::None => ManagedBuffer::new(),
         };
         self.send().direct_egld(to, amount, data);
     }

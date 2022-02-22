@@ -5,9 +5,7 @@
             "step": "setState",
             "comment": "sc addresses should contain code",
             "accounts": {
-                "sc:should-be-sc": {
-                    "code": ""
-                }
+                "sc:should-be-sc": {}
             }
         }
     ]
