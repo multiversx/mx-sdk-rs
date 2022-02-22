@@ -19,6 +19,7 @@ pub mod managed_buffer_features;
 pub mod managed_vec_features;
 pub mod storage_direct_load;
 pub mod storage_direct_store;
+pub mod storage_mapper_fungible_token;
 pub mod storage_mapper_linked_list;
 pub mod storage_mapper_map;
 pub mod storage_mapper_map_storage;
@@ -60,6 +61,7 @@ pub trait BasicFeatures:
     + storage_mapper_vec::VecMapperFeatures
     + storage_mapper_token_attributes::TokenAttributesMapperFeatures
     + storage_mapper_whitelist::StorageMapperWhitelistFeatures
+    + storage_mapper_fungible_token::FungibleTokenMapperFeatures
     + struct_eq::StructEquals
     + token_identifier_features::TokenIdentifierFeatures
     + type_features::TypeFeatures

@@ -8,6 +8,7 @@ use super::{
     StorageMapper,
 };
 use crate::{
+    abi::{TypeAbi, TypeName},
     api::{BlockchainApiImpl, CallTypeApi, ErrorApiImpl, StorageMapperApi},
     contract_base::{BlockchainWrapper, SendWrapper},
     esdt::{
@@ -113,14 +114,7 @@ where
             issue_cost,
             &token_display_name,
             &token_ticker,
-            NonFungibleTokenProperties {
-                can_freeze: true,
-                can_wipe: true,
-                can_pause: true,
-                can_change_owner: true,
-                can_upgrade: true,
-                can_add_special_roles: true,
-            },
+            NonFungibleTokenProperties::default(),
         )
     }
 
@@ -134,14 +128,7 @@ where
             issue_cost,
             &token_display_name,
             &token_ticker,
-            SemiFungibleTokenProperties {
-                can_freeze: true,
-                can_wipe: true,
-                can_pause: true,
-                can_change_owner: true,
-                can_upgrade: true,
-                can_add_special_roles: true,
-            },
+            SemiFungibleTokenProperties::default(),
         )
     }
 
@@ -152,19 +139,14 @@ where
         num_decimals: usize,
     ) -> ContractCall<SA, ()> {
         let system_sc_proxy = ESDTSystemSmartContractProxy::<SA>::new_proxy_obj();
+        let mut properties = MetaTokenProperties::default();
+        properties.num_decimals = num_decimals;
+
         system_sc_proxy.register_meta_esdt(
             issue_cost,
             &token_display_name,
             &token_ticker,
-            MetaTokenProperties {
-                num_decimals,
-                can_freeze: true,
-                can_wipe: true,
-                can_pause: true,
-                can_change_owner: true,
-                can_upgrade: true,
-                can_add_special_roles: true,
-            },
+            properties,
         )
     }
 
@@ -270,5 +252,22 @@ where
         } else {
             output.push_single_value(&self.get_token_id(), h)
         }
+    }
+}
+
+impl<SA> TypeAbi for NonFungibleTokenMapper<SA>
+where
+    SA: StorageMapperApi + CallTypeApi,
+{
+    fn type_name() -> TypeName {
+        TokenIdentifier::<SA>::type_name()
+    }
+
+    fn provide_type_descriptions<TDC: crate::abi::TypeDescriptionContainer>(accumulator: &mut TDC) {
+        TokenIdentifier::<SA>::provide_type_descriptions(accumulator);
+    }
+
+    fn is_multi_arg_or_result() -> bool {
+        false
     }
 }

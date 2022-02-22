@@ -44,6 +44,7 @@ elrond_wasm_node::wasm_endpoints! {
         boxed_bytes_concat_2
         boxed_bytes_split
         boxed_bytes_zeros
+        burn_fungible
         check_contains
         clear_single_value_mapper
         clear_storage_value
@@ -133,7 +134,9 @@ elrond_wasm_node::wasm_endpoints! {
         echo_vec_of_managed_buffer
         echo_vec_u8
         finish_simple_enum_variant_1
+        getFungibleTokenId
         getListMapper
+        get_balance_fungible
         get_block_epoch
         get_block_nonce
         get_block_random_seed
@@ -156,6 +159,8 @@ elrond_wasm_node::wasm_endpoints! {
         is_empty_opt_addr
         is_empty_single_value_mapper
         is_smart_contract
+        issue_fungible_custom_callback
+        issue_fungible_default_callback
         listMapperBack
         listMapperFront
         listMapperIterateByHand
@@ -235,6 +240,8 @@ elrond_wasm_node::wasm_endpoints! {
         mbuffer_overwrite
         mbuffer_set_random
         mbuffer_set_slice
+        mint_and_send_fungible
+        mint_fungible
         mul_assign_big_int
         mul_assign_big_int_ref
         mul_assign_big_uint
@@ -270,8 +277,10 @@ elrond_wasm_node::wasm_endpoints! {
         rem_big_uint
         rem_big_uint_ref
         remove_from_whitelist
+        require_all_same_token_fungible
         require_contains
         require_equals
+        require_same_token_fungible
         result_echo
         result_echo_2
         result_echo_3
@@ -282,6 +291,7 @@ elrond_wasm_node::wasm_endpoints! {
         result_err_from_string
         result_ok
         return_sc_error
+        set_local_roles_fungible
         set_mapper
         set_mapper_contains
         set_mapper_insert
