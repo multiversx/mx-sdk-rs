@@ -715,6 +715,23 @@
                 "gas": "*",
                 "refund": "*"
             }
+        },
+        {
+            "step": "scQuery",
+            "txId": "get-fungible-token-id",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "getFungibleTokenId",
+                "arguments": []
+            },
+            "expect": {
+                "out": [
+                    "str:TICKER-333333"
+                ],
+                "status": "0",
+                "message": "",
+                "logs": "*"
+            }
         }
     ]
 }
