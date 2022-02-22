@@ -227,7 +227,7 @@ impl BlockchainApiImpl for VmApiImpl {
 
     fn get_balance_legacy(&self, address: &Address) -> Handle {
         unsafe {
-            let balance_handle = self.get_next_bigint_handle();
+            let balance_handle = self.next_bigint_handle();
             bigIntGetExternalBalance(address.as_ref().as_ptr(), balance_handle);
             balance_handle
         }
@@ -235,7 +235,7 @@ impl BlockchainApiImpl for VmApiImpl {
 
     fn get_balance_handle(&self, address_handle: Handle) -> Handle {
         unsafe {
-            let balance_handle = self.get_next_bigint_handle();
+            let balance_handle = self.next_bigint_handle();
             bigIntGetExternalBalance(unsafe_buffer_load_address(address_handle), balance_handle);
             balance_handle
         }
@@ -390,7 +390,7 @@ impl BlockchainApiImpl for VmApiImpl {
         nonce: u64,
     ) -> BigUint<M> {
         unsafe {
-            let balance_handle = self.get_next_bigint_handle();
+            let balance_handle = self.next_bigint_handle();
             bigIntGetESDTExternalBalance(
                 unsafe_buffer_load_address(address.get_raw_handle()),
                 unsafe_buffer_load_token_identifier(token.get_raw_handle()),
@@ -413,7 +413,7 @@ impl BlockchainApiImpl for VmApiImpl {
         use elrond_wasm::types::BoxedBytes;
         let address = m_address.to_address();
         unsafe {
-            let value_handle = self.get_next_bigint_handle();
+            let value_handle = self.next_bigint_handle();
             let mut properties = [0u8; 2]; // always 2 bytes
             let mut hash = BoxedBytes::allocate(128);
 
@@ -445,7 +445,7 @@ impl BlockchainApiImpl for VmApiImpl {
             let mut uri_bytes = BoxedBytes::allocate(uris_len);
 
             let mut creator = Address::zero();
-            let royalties_handle = self.get_next_bigint_handle();
+            let royalties_handle = self.next_bigint_handle();
 
             getESDTTokenData(
                 address.as_ref().as_ptr(),
@@ -503,13 +503,13 @@ impl BlockchainApiImpl for VmApiImpl {
     ) -> EsdtTokenData<M> {
         let managed_token_id = token.as_managed_buffer();
         unsafe {
-            let value_handle = self.get_next_bigint_handle();
+            let value_handle = self.next_bigint_handle();
             let properties_handle = mBufferNew();
             let hash_handle = mBufferNew();
             let name_handle = mBufferNew();
             let attributes_handle = mBufferNew();
             let creator_handle = mBufferNew();
-            let royalties_handle = self.get_next_bigint_handle();
+            let royalties_handle = self.next_bigint_handle();
             let uris_handle = mBufferNew();
 
             managedGetESDTTokenData(

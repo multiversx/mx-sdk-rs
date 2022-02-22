@@ -22,7 +22,7 @@ pub trait StaticVarApiImpl {
 
     fn get_external_view_target_address_handle(&self) -> Handle;
 
-    fn get_next_bigint_handle(&self) -> Handle;
+    fn next_bigint_handle(&self) -> Handle;
 
     fn get_next_managed_buffer_handle(&self) -> Handle;
 }
