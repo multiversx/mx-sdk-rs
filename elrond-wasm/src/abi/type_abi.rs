@@ -28,7 +28,7 @@ pub trait TypeAbi {
     }
 
     #[doc(hidden)]
-    fn is_multi_arg_or_result() -> bool {
+    fn is_variadic() -> bool {
         false
     }
 
@@ -50,7 +50,7 @@ pub trait TypeAbi {
         result.push(OutputAbi {
             output_name,
             type_name: Self::type_name(),
-            multi_result: Self::is_multi_arg_or_result(),
+            multi_result: Self::is_variadic(),
         });
         result
     }
