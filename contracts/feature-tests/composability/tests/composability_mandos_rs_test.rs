@@ -43,11 +43,6 @@ fn forw_raw_async_echo_rs() {
     elrond_wasm_debug::mandos_rs("mandos/forw_raw_async_echo.scen.json", world());
 }
 
-#[test]
-fn forwarder_get_esdt_local_roles_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/forwarder_get_esdt_local_roles.scen.json", world());
-}
-
 // #[test]
 // fn forw_raw_async_send_and_retrieve_multi_transfer_funds_rs() {
 //     elrond_wasm_debug::mandos_rs(
@@ -106,7 +101,7 @@ fn forw_raw_direct_esdt_rs() {
 }
 
 #[test]
-fn forw_raw_direct_multi_rs() {
+fn forw_raw_direct_multi_esdt_rs() {
     elrond_wasm_debug::mandos_rs("mandos/forw_raw_direct_multi_esdt.scen.json", world());
 }
 
@@ -197,14 +192,6 @@ fn forwarder_call_async_accept_nft_rs() {
 }
 
 #[test]
-fn forwarder_validate_token_identifier_rs() {
-    elrond_wasm_debug::mandos_rs(
-        "mandos/forwarder_validate_token_identifier.scen.json",
-        world(),
-    );
-}
-
-#[test]
 fn forwarder_call_async_multi_transfer_rs() {
     elrond_wasm_debug::mandos_rs(
         "mandos/forwarder_call_async_multi_transfer.scen.json",
@@ -279,14 +266,6 @@ fn forwarder_call_sync_accept_then_read_esdt_rs() {
 fn forwarder_call_sync_accept_then_read_nft_rs() {
     elrond_wasm_debug::mandos_rs(
         "mandos/forwarder_call_sync_accept_then_read_nft.scen.json",
-        world(),
-    );
-}
-
-#[test]
-fn forwarder_retrieve_funds_with_accept_func_rs() {
-    elrond_wasm_debug::mandos_rs(
-        "mandos/forwarder_retrieve_funds_with_accept_func.scen.json",
         world(),
     );
 }
@@ -392,6 +371,16 @@ fn forwarder_contract_upgrade_rs() {
 }
 
 #[test]
+fn forwarder_get_esdt_local_roles_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/forwarder_get_esdt_local_roles.scen.json", world());
+}
+
+#[test]
+fn forwarder_nft_add_uri_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/forwarder_nft_add_uri.scen.json", world());
+}
+
+#[test]
 fn forwarder_nft_create_rs() {
     elrond_wasm_debug::mandos_rs("mandos/forwarder_nft_create.scen.json", world());
 }
@@ -425,8 +414,21 @@ fn forwarder_nft_transfer_exec_rs() {
 }
 
 #[test]
+fn forwarder_nft_update_attributes_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/forwarder_nft_update_attributes.scen.json", world());
+}
+
+#[test]
 fn forwarder_no_endpoint_rs() {
     elrond_wasm_debug::mandos_rs("mandos/forwarder_no_endpoint.scen.json", world());
+}
+
+#[test]
+fn forwarder_retrieve_funds_with_accept_func_rs() {
+    elrond_wasm_debug::mandos_rs(
+        "mandos/forwarder_retrieve_funds_with_accept_func.scen.json",
+        world(),
+    );
 }
 
 #[test]
@@ -460,6 +462,14 @@ fn forwarder_sync_echo_range_rs() {
 #[test]
 fn forwarder_tranfer_esdt_with_fees_rs() {
     elrond_wasm_debug::mandos_rs("mandos/forwarder_tranfer_esdt_with_fees.scen.json", world());
+}
+
+#[test]
+fn forwarder_validate_token_identifier_rs() {
+    elrond_wasm_debug::mandos_rs(
+        "mandos/forwarder_validate_token_identifier.scen.json",
+        world(),
+    );
 }
 
 #[test]
