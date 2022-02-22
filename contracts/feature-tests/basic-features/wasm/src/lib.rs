@@ -136,6 +136,7 @@ elrond_wasm_node::wasm_endpoints! {
         finish_simple_enum_variant_1
         getFungibleTokenId
         getListMapper
+        getNonFungibleTokenId
         get_balance_fungible
         get_block_epoch
         get_block_nonce
@@ -229,6 +230,14 @@ elrond_wasm_node::wasm_endpoints! {
         map_storage_mapper_insert_value
         map_storage_mapper_remove
         map_storage_mapper_view
+        mapper_get_token_attributes
+        mapper_nft_add_quantity
+        mapper_nft_add_quantity_and_send
+        mapper_nft_burn
+        mapper_nft_create
+        mapper_nft_create_and_send
+        mapper_nft_get_balance
+        mapper_nft_set_token_id
         mbuffer_concat_1
         mbuffer_concat_2
         mbuffer_copy_slice
