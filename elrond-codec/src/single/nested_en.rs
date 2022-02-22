@@ -1,6 +1,5 @@
 use crate::{
-    codec_err::EncodeError, nested_ser_output::NestedEncodeOutput, DefaultErrorHandler,
-    EncodeErrorHandler, TypeInfo,
+    codec_err::EncodeError, DefaultErrorHandler, EncodeErrorHandler, NestedEncodeOutput, TypeInfo,
 };
 use alloc::vec::Vec;
 
