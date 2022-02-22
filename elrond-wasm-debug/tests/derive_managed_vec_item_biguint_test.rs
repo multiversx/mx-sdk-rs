@@ -47,7 +47,7 @@ fn managed_struct_to_bytes_writer() {
         |bytes| {
             arr[0..<ManagedStructWithBigUint::<DebugApi> as elrond_wasm::types::ManagedVecItem>::PAYLOAD_SIZE].copy_from_slice(bytes);
 
-            assert_eq!(arr, [0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x23, 0x45]);
+            assert_eq!(arr, [0x00, 0x00, 0x00, 0x0a, 0x00, 0x01, 0x23, 0x45]);
         },
     );
 }
@@ -59,7 +59,7 @@ fn managed_struct_from_bytes_reader() {
         big_uint: BigUint::from(42u64),
         num: 0x12345,
     };
-    let arr: [u8; 8] = [0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x23, 0x45];
+    let arr: [u8; 8] = [0x00, 0x00, 0x00, 0x0a, 0x00, 0x01, 0x23, 0x45];
 
     let struct_from_bytes = <ManagedStructWithBigUint<DebugApi> as elrond_wasm::types::ManagedVecItem>::from_byte_reader( |bytes| {
         bytes.copy_from_slice(
