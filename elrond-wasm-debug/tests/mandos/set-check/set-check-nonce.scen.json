@@ -13,8 +13,7 @@
             "step": "checkState",
             "accounts": {
                 "address:the-address": {
-                    "nonce": "125",
-                    "storage": {}
+                    "nonce": "125"
                 }
             }
         },
@@ -22,8 +21,7 @@
             "step": "checkState",
             "accounts": {
                 "address:the-address": {
-                    "nonce": "*",
-                    "storage": {}
+                    "nonce": "*"
                 }
             }
         }

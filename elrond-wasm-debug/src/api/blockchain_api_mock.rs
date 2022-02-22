@@ -203,7 +203,7 @@ impl DebugApi {
         };
 
         let mut uris = ManagedVec::new();
-        if let Some(uri) = &instance.metadata.uri {
+        for uri in &instance.metadata.uri {
             uris.push(ManagedBuffer::new_from_bytes(uri.as_slice()));
         }
 

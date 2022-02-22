@@ -194,6 +194,7 @@ elrond_wasm_node::wasm_endpoints! {
         log2_big_uint
         log2_big_uint_ref
         logEventA
+        logEventARepeat
         logEventB
         logLegacyEventA
         logLegacyEventB

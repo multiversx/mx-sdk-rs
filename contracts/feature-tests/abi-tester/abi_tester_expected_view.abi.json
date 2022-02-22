@@ -176,6 +176,14 @@
                 {
                     "name": "NftBurn",
                     "discriminant": 5
+                },
+                {
+                    "name": "NftAddUri",
+                    "discriminant": 6
+                },
+                {
+                    "name": "NftUpdateAttributes",
+                    "discriminant": 7
                 }
             ]
         },
