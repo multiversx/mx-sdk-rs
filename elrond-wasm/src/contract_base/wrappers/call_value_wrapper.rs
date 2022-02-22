@@ -74,7 +74,12 @@ where
     /// Will return "Fungible" for EGLD.
     /// Warning, not tested with multi transfer, use `all_esdt_transfers` instead!
     pub fn esdt_token_type(&self) -> EsdtTokenType {
-        A::call_value_api_impl().esdt_token_type()
+        let call_value_api = A::call_value_api_impl();
+        if call_value_api.esdt_num_transfers() > 0 {
+            A::call_value_api_impl().esdt_token_type()
+        } else {
+            EsdtTokenType::Fungible
+        }
     }
 
     pub fn require_egld(&self) -> BigUint<A> {
