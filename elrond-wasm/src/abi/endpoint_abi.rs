@@ -45,7 +45,7 @@ impl EndpointAbi {
         self.inputs.push(InputAbi {
             arg_name,
             type_name: T::type_name(),
-            multi_arg: T::is_multi_arg_or_result(),
+            multi_arg: T::is_variadic(),
         });
     }
 

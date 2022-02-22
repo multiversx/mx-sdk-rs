@@ -15,7 +15,7 @@ impl TypeAbi for IgnoreVarArgs {
         String::from("ignore")
     }
 
-    fn is_multi_arg_or_result() -> bool {
+    fn is_variadic() -> bool {
         true
     }
 }
