@@ -8,6 +8,11 @@ fn world() -> BlockchainMock {
         "file:output/basic-features.wasm",
         basic_features::ContractBuilder,
     );
+    blockchain.register_contract_builder(
+        "file:../esdt-system-sc-mock/output/esdt-system-sc-mock.wasm",
+        esdt_system_sc_mock::ContractBuilder,
+    );
+
     blockchain
 }
 
@@ -384,10 +389,12 @@ fn storage_map3_rs() {
     elrond_wasm_debug::mandos_rs("mandos/storage_map3.scen.json", world());
 }
 
+/*
 #[test]
 fn storage_mapper_fungible_token_rs() {
     elrond_wasm_debug::mandos_rs("mandos/storage_mapper_fungible_token.scen.json", world());
 }
+*/
 
 #[test]
 fn storage_mapper_linked_list_rs() {
@@ -404,10 +411,15 @@ fn storage_mapper_map_storage_rs() {
     elrond_wasm_debug::mandos_rs("mandos/storage_mapper_map_storage.scen.json", world());
 }
 
+/*
 #[test]
 fn storage_mapper_non_fungible_token_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/storage_mapper_non_fungible_token.scen.json", world());
+    elrond_wasm_debug::mandos_rs(
+        "mandos/storage_mapper_non_fungible_token.scen.json",
+        world(),
+    );
 }
+*/
 
 #[test]
 fn storage_mapper_queue_rs() {
