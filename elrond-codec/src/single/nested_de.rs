@@ -1,8 +1,7 @@
 // use core::ops::Try;
 
 use crate::{
-    codec_err::DecodeError, nested_de_input::NestedDecodeInput, DecodeErrorHandler,
-    DefaultErrorHandler, TypeInfo,
+    codec_err::DecodeError, DecodeErrorHandler, DefaultErrorHandler, NestedDecodeInput, TypeInfo,
 };
 
 /// Trait that allows zero-copy read of value-references from slices in LE format.
