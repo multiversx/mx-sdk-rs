@@ -70,8 +70,10 @@ where
             Some(cb) => cb,
             None => self.default_callback_closure_obj(&initial_supply),
         };
-        let mut properties = FungibleTokenProperties::default();
-        properties.num_decimals = num_decimals;
+        let properties = FungibleTokenProperties {
+            num_decimals,
+            ..Default::default()
+        };
 
         system_sc_proxy
             .issue_fungible(
@@ -126,7 +128,7 @@ where
         let send_wrapper = SendWrapper::<SA>::new();
         let token_id = self.get_token_id();
 
-        send_wrapper.esdt_local_burn(&token_id, 0, &amount);
+        send_wrapper.esdt_local_burn(&token_id, 0, amount);
     }
 
     pub fn get_balance(&self) -> BigUint<SA> {

@@ -43,10 +43,11 @@ fn crypto_elliptic_curves_go() {
     elrond_wasm_debug::mandos_go("mandos/crypto_elliptic_curves.scen.json");
 }
 
-#[test]
-fn crypto_keccak256_go() {
-    elrond_wasm_debug::mandos_go("mandos/crypto_keccak256.scen.json");
-}
+// TODO: enable after new VM release is out.
+// #[test]
+// fn crypto_keccak256_go() {
+//     elrond_wasm_debug::mandos_go("mandos/crypto_keccak256.scen.json");
+// }
 
 #[test]
 fn crypto_keccak256_legacy_go() {
@@ -58,10 +59,11 @@ fn crypto_ripemd160_go() {
     elrond_wasm_debug::mandos_go("mandos/crypto_ripemd160.scen.json");
 }
 
-#[test]
-fn crypto_sha256_go() {
-    elrond_wasm_debug::mandos_go("mandos/crypto_sha256.scen.json");
-}
+// TODO: enable after new VM release is out.
+// #[test]
+// fn crypto_sha256_go() {
+//     elrond_wasm_debug::mandos_go("mandos/crypto_sha256.scen.json");
+// }
 
 #[test]
 fn crypto_sha256_legacy_go() {
