@@ -51,10 +51,10 @@ fn count_ones_rs() {
     elrond_wasm_debug::mandos_rs("mandos/count_ones.scen.json", world());
 }
 
-#[test]
-fn crypto_elliptic_curves_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/crypto_elliptic_curves.scen.json", world());
-}
+// #[test]
+// fn crypto_elliptic_curves_rs() {
+//     elrond_wasm_debug::mandos_rs("mandos/crypto_elliptic_curves.scen.json", world());
+// }
 
 #[test]
 fn crypto_keccak256_rs() {
@@ -66,10 +66,10 @@ fn crypto_keccak256_legacy_rs() {
     elrond_wasm_debug::mandos_rs("mandos/crypto_keccak256_legacy.scen.json", world());
 }
 
-#[test]
-fn crypto_ripemd160_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/crypto_ripemd160.scen.json", world());
-}
+// #[test]
+// fn crypto_ripemd160_rs() {
+//     elrond_wasm_debug::mandos_rs("mandos/crypto_ripemd160.scen.json", world());
+// }
 
 #[test]
 fn crypto_sha256_rs() {
@@ -81,10 +81,10 @@ fn crypto_sha256_legacy_rs() {
     elrond_wasm_debug::mandos_rs("mandos/crypto_sha256_legacy.scen.json", world());
 }
 
-#[test]
-fn crypto_verify_funcs_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/crypto_verify_funcs.scen.json", world());
-}
+// #[test]
+// fn crypto_verify_funcs_rs() {
+//     elrond_wasm_debug::mandos_rs("mandos/crypto_verify_funcs.scen.json", world());
+// }
 
 #[test]
 fn echo_array_u8_rs() {
@@ -271,10 +271,12 @@ fn managed_buffer_overwrite_rs() {
     elrond_wasm_debug::mandos_rs("mandos/managed_buffer_overwrite.scen.json", world());
 }
 
+/*
 #[test]
-fn managed_buffer_set_random_rs() {
+fn managed_buffer_random_rs() {
     elrond_wasm_debug::mandos_rs("mandos/managed_buffer_set_random.scen.json", world());
 }
+*/
 
 #[test]
 fn managed_buffer_slice_1_rs() {
@@ -301,10 +303,11 @@ fn only_owner_rs() {
     elrond_wasm_debug::mandos_rs("mandos/only_owner.scen.json", world());
 }
 
-#[test]
-fn out_of_gas_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/out_of_gas.scen.json", world());
-}
+// Will never run in mandos-rs.
+// #[test]
+// fn out_of_gas_rs() {
+//     elrond_wasm_debug::mandos_rs("mandos/out_of_gas.scen.json", world());
+// }
 
 #[test]
 fn panic_rs() {

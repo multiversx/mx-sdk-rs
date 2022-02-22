@@ -139,8 +139,10 @@ where
         num_decimals: usize,
     ) -> ContractCall<SA, ()> {
         let system_sc_proxy = ESDTSystemSmartContractProxy::<SA>::new_proxy_obj();
-        let mut properties = MetaTokenProperties::default();
-        properties.num_decimals = num_decimals;
+        let properties = MetaTokenProperties {
+            num_decimals,
+            ..Default::default()
+        };
 
         system_sc_proxy.register_meta_esdt(
             issue_cost,
@@ -200,7 +202,7 @@ where
         let send_wrapper = SendWrapper::<SA>::new();
         let token_id = self.get_token_id();
 
-        send_wrapper.esdt_local_burn(&token_id, token_nonce, &amount);
+        send_wrapper.esdt_local_burn(&token_id, token_nonce, amount);
     }
 
     pub fn get_all_token_data(&self, token_nonce: u64) -> EsdtTokenData<SA> {
