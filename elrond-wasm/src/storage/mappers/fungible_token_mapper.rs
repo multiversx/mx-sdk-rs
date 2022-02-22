@@ -5,6 +5,7 @@ use super::{
     StorageMapper,
 };
 use crate::{
+    abi::{TypeAbi, TypeName},
     api::{BlockchainApiImpl, CallTypeApi, ErrorApiImpl, StorageMapperApi},
     contract_base::{BlockchainWrapper, SendWrapper},
     esdt::{ESDTSystemSmartContractProxy, FungibleTokenProperties},
@@ -69,6 +70,8 @@ where
             Some(cb) => cb,
             None => self.default_callback_closure_obj(&initial_supply),
         };
+        let mut properties = FungibleTokenProperties::default();
+        properties.num_decimals = num_decimals;
 
         system_sc_proxy
             .issue_fungible(
@@ -76,17 +79,7 @@ where
                 &token_display_name,
                 &token_ticker,
                 &initial_supply,
-                FungibleTokenProperties {
-                    num_decimals,
-                    can_freeze: true,
-                    can_wipe: true,
-                    can_pause: true,
-                    can_mint: false,
-                    can_burn: false,
-                    can_change_owner: true,
-                    can_upgrade: true,
-                    can_add_special_roles: true,
-                },
+                properties,
             )
             .async_call()
             .with_callback(callback)
@@ -166,5 +159,22 @@ where
         } else {
             output.push_single_value(&self.get_token_id(), h)
         }
+    }
+}
+
+impl<SA> TypeAbi for FungibleTokenMapper<SA>
+where
+    SA: StorageMapperApi + CallTypeApi,
+{
+    fn type_name() -> TypeName {
+        TokenIdentifier::<SA>::type_name()
+    }
+
+    fn provide_type_descriptions<TDC: crate::abi::TypeDescriptionContainer>(accumulator: &mut TDC) {
+        TokenIdentifier::<SA>::provide_type_descriptions(accumulator);
+    }
+
+    fn is_multi_arg_or_result() -> bool {
+        false
     }
 }

@@ -76,7 +76,13 @@ pub trait PayableFeatures {
     }
 
     #[endpoint(setSpecialRole)]
-    fn set_special_roles(&self, #[var_args] _roles: ManagedVarArgs<EsdtLocalRole>) {}
+    fn set_special_roles(
+        &self,
+        _token_id: TokenIdentifier,
+        _address: ManagedAddress,
+        #[var_args] _roles: ManagedVarArgs<EsdtLocalRole>,
+    ) {
+    }
 
     fn create_new_token_id(&self, token_ticker: ManagedBuffer) -> TokenIdentifier {
         let nr_issued_tokens = self.nr_issued_tokens().get();
