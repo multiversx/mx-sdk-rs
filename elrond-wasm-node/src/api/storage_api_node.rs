@@ -74,7 +74,7 @@ impl StorageReadApiImpl for VmApiImpl {
     #[inline]
     fn storage_load_big_uint_raw(&self, key: &[u8]) -> i32 {
         unsafe {
-            let handle = self.get_next_bigint_handle();
+            let handle = self.next_bigint_handle();
             bigIntStorageLoadUnsigned(key.as_ref().as_ptr(), key.len() as i32, handle);
             handle
         }

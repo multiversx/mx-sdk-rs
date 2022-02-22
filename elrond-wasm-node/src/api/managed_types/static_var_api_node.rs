@@ -34,7 +34,7 @@ impl StaticVarApiImpl for VmApiImpl {
         unsafe { EXTERNAL_VIEW_TARGET_ADDRESS_HANDLE }
     }
 
-    fn get_next_bigint_handle(&self) -> Handle {
+    fn next_bigint_handle(&self) -> Handle {
         unsafe {
             NEXT_BIG_INT_HANDLE += 1;
             NEXT_BIG_INT_HANDLE

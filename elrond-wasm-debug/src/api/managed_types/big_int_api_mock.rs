@@ -69,7 +69,7 @@ impl BigIntApi for DebugApi {
 
     fn bi_new_handle(&self, value: i64) -> Handle {
         let mut managed_types = self.m_types_borrow_mut();
-        let handle = self.get_next_bigint_handle();
+        let handle = self.next_bigint_handle();
         managed_types
             .big_int_map
             .insert(handle, BigInt::from(value));

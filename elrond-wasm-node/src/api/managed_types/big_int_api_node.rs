@@ -74,7 +74,7 @@ impl BigIntApi for crate::VmApiImpl {
 
     #[inline]
     fn bi_new_handle(&self, value: i64) -> Handle {
-        let handle = self.get_next_bigint_handle();
+        let handle = self.next_bigint_handle();
         self.bi_set_signed_bytes(handle, &value.to_be_bytes());
         handle
     }
