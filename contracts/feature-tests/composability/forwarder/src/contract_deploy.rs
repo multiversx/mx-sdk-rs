@@ -9,8 +9,8 @@ pub trait DeployContractModule {
     fn deploy_contract(
         &self,
         code: ManagedBuffer,
-        #[var_args] opt_arg: OptionalArg<ManagedBuffer>,
-    ) -> MultiResult2<ManagedAddress, ManagedVec<Self::Api, ManagedBuffer>> {
+        #[var_args] opt_arg: OptionalValue<ManagedBuffer>,
+    ) -> MultiValue2<ManagedAddress, ManagedVec<Self::Api, ManagedBuffer>> {
         self.deploy_vault(&code, opt_arg)
     }
 
@@ -18,11 +18,11 @@ pub trait DeployContractModule {
     fn deploy_two_contracts(
         &self,
         code: ManagedBuffer,
-    ) -> MultiResult2<ManagedAddress, ManagedAddress> {
+    ) -> MultiValue2<ManagedAddress, ManagedAddress> {
         let (first_deployed_contract_address, _) =
-            self.deploy_vault(&code, OptionalArg::None).into_tuple();
+            self.deploy_vault(&code, OptionalValue::None).into_tuple();
         let (second_deployed_contract_address, _) =
-            self.deploy_vault(&code, OptionalArg::None).into_tuple();
+            self.deploy_vault(&code, OptionalValue::None).into_tuple();
 
         (
             first_deployed_contract_address,
@@ -34,8 +34,8 @@ pub trait DeployContractModule {
     fn deploy_vault(
         &self,
         code: &ManagedBuffer,
-        #[var_args] opt_arg: OptionalArg<ManagedBuffer>,
-    ) -> MultiResult2<ManagedAddress, ManagedVec<Self::Api, ManagedBuffer>> {
+        #[var_args] opt_arg: OptionalValue<ManagedBuffer>,
+    ) -> MultiValue2<ManagedAddress, ManagedVec<Self::Api, ManagedBuffer>> {
         self.vault_proxy()
             .init(opt_arg)
             .deploy_contract(code, CodeMetadata::DEFAULT)
@@ -46,8 +46,8 @@ pub trait DeployContractModule {
     fn deploy_vault_from_source(
         &self,
         source_address: ManagedAddress,
-        #[var_args] opt_arg: OptionalArg<ManagedBuffer>,
-    ) -> MultiResult2<ManagedAddress, ManagedVec<Self::Api, ManagedBuffer>> {
+        #[var_args] opt_arg: OptionalValue<ManagedBuffer>,
+    ) -> MultiValue2<ManagedAddress, ManagedVec<Self::Api, ManagedBuffer>> {
         self.vault_proxy()
             .init(opt_arg)
             .deploy_from_source(&source_address, CodeMetadata::DEFAULT)

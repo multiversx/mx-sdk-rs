@@ -6,7 +6,8 @@ use mandos::serde_raw::{
     AccountRaw, BlockInfoRaw, CheckAccountRaw, CheckAccountsRaw, CheckBytesValueRaw,
     CheckEsdtDataRaw, CheckEsdtInstanceRaw, CheckEsdtInstancesRaw, CheckEsdtMapContentsRaw,
     CheckEsdtMapRaw, CheckEsdtRaw, CheckLogsRaw, CheckStorageDetailsRaw, CheckStorageRaw,
-    EsdtFullRaw, EsdtRaw, InstanceRaw, TxCallRaw, TxESDTRaw, TxExpectRaw, TxQueryRaw, ValueSubTree,
+    CheckValueListRaw, EsdtFullRaw, EsdtRaw, InstanceRaw, TxCallRaw, TxESDTRaw, TxExpectRaw,
+    TxQueryRaw, ValueSubTree,
 };
 use num_traits::Zero;
 
@@ -71,7 +72,7 @@ pub(crate) fn esdt_data_as_raw(esdt: &EsdtData) -> EsdtRaw {
             hash: inst.metadata.hash.as_ref().map(|h| bytes_as_raw(h)),
             nonce: Some(u64_as_raw(inst.nonce)),
             royalties: Some(u64_as_raw(inst.metadata.royalties)),
-            uri: inst.metadata.uri.as_ref().map(|u| bytes_as_raw(u)),
+            uri: inst.metadata.uri.iter().map(|u| bytes_as_raw(u)).collect(),
         };
 
         instances_raw.push(inst_raw);
@@ -163,7 +164,7 @@ pub(crate) fn tx_expect_as_raw(tx_expect: &TxExpectMandos) -> TxExpectRaw {
     };
 
     TxExpectRaw {
-        out: out_values_raw,
+        out: CheckValueListRaw::CheckList(out_values_raw),
         status: CheckBytesValueRaw::Equal(u64_as_raw(tx_expect.status)),
         message: msg_raw,
         logs: CheckLogsRaw::Star,
@@ -193,7 +194,13 @@ pub(crate) fn account_as_check_state_raw(acc: &AccountData) -> CheckAccountsRaw 
                     .clone()
                     .unwrap_or_else(|| ValueSubTree::Str("0".to_owned())),
                 royalties: opt_raw_value_to_check_raw(&inst_raw.royalties),
-                uri: opt_raw_value_to_check_raw(&inst_raw.uri),
+                uri: CheckValueListRaw::CheckList(
+                    inst_raw
+                        .uri
+                        .iter()
+                        .map(|v| CheckBytesValueRaw::Equal(v.clone()))
+                        .collect(),
+                ),
             };
 
             esdt_instances_check_raw.push(inst_check_raw);

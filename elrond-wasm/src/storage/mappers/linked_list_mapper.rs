@@ -3,9 +3,7 @@ use core::marker::PhantomData;
 use super::{StorageClearable, StorageMapper};
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
-    api::{EndpointFinishApi, ManagedTypeApi, StorageMapperApi},
-    finish_all,
-    io::EndpointResult,
+    api::StorageMapperApi,
     storage::{storage_get, storage_set, StorageKey},
     types::{BoxedBytes, ManagedType, MultiResultVec},
 };
@@ -14,7 +12,8 @@ use elrond_codec::{
     elrond_codec_derive::{
         NestedDecode, NestedEncode, TopDecode, TopDecodeOrDefault, TopEncode, TopEncodeOrDefault,
     },
-    DecodeDefault, EncodeDefault, NestedDecode, NestedEncode, TopDecode, TopEncode,
+    DecodeDefault, EncodeDefault, EncodeErrorHandler, NestedDecode, NestedEncode, TopDecode,
+    TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
 };
 use storage_get::storage_get_len;
 
@@ -545,19 +544,22 @@ where
     }
 }
 
-impl<SA, T> EndpointResult for LinkedListMapper<SA, T>
+impl<SA, T> TopEncodeMulti for LinkedListMapper<SA, T>
 where
     SA: StorageMapperApi,
-    T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + EndpointResult,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone,
 {
-    type DecodeAs = MultiResultVec<T::DecodeAs>;
+    type DecodeAs = MultiResultVec<T>;
 
-    fn finish<FA>(&self)
+    fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
     where
-        FA: ManagedTypeApi + EndpointFinishApi,
+        O: TopEncodeMultiOutput,
+        H: EncodeErrorHandler,
     {
-        let values_iter = self.iter().map(|x| x.into_value());
-        finish_all::<FA, _, _>(values_iter);
+        for elem in self.iter() {
+            elem.into_value().multi_encode_or_handle_err(output, h)?;
+        }
+        Ok(())
     }
 }
 

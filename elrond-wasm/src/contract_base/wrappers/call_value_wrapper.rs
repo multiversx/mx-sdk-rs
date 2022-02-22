@@ -106,4 +106,11 @@ where
             EsdtTokenPayment::new(self.token(), self.esdt_token_nonce(), self.esdt_value())
         }
     }
+
+    pub fn payment_as_tuple(&self) -> (TokenIdentifier<A>, u64, BigUint<A>) {
+        let (amount, token) = self.payment_token_pair();
+        let nonce = self.esdt_token_nonce();
+
+        (token, nonce, amount)
+    }
 }

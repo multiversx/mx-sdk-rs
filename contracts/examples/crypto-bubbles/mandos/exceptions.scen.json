@@ -36,7 +36,7 @@
                 "out": [],
                 "status": "0x04",
                 "message": "str:argument decode error (winner): bad H256 length",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -58,7 +58,7 @@
                 "out": [],
                 "status": "0x04",
                 "message": "str:argument decode error (player): bad H256 length",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }

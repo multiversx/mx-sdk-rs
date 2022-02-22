@@ -24,7 +24,7 @@
                 "out": [],
                 "status": "4",
                 "message": "str:Only fungible tokens can be burned",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }

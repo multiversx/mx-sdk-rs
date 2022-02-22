@@ -216,7 +216,7 @@ pub trait Erc1155Marketplace {
     }
 
     #[endpoint(endAuction)]
-    fn end_auction(&self, type_id: BigUint, nft_id: BigUint) -> SCResult<AsyncCall> {
+    fn end_auction(&self, type_id: BigUint, nft_id: BigUint) {
         require!(
             self.is_up_for_auction(&type_id, &nft_id),
             "Token is not up for auction"
@@ -250,10 +250,10 @@ pub trait Erc1155Marketplace {
             );
 
             // send token to winner
-            Ok(self.async_transfer_token(type_id, nft_id, auction.current_winner))
+            self.async_transfer_token(type_id, nft_id, auction.current_winner);
         } else {
             // return to original owner
-            Ok(self.async_transfer_token(type_id, nft_id, auction.original_owner))
+            self.async_transfer_token(type_id, nft_id, auction.original_owner);
         }
     }
 
@@ -340,18 +340,14 @@ pub trait Erc1155Marketplace {
         Ok(())
     }
 
-    fn async_transfer_token(
-        &self,
-        type_id: BigUint,
-        nft_id: BigUint,
-        to: ManagedAddress,
-    ) -> AsyncCall {
+    fn async_transfer_token(&self, type_id: BigUint, nft_id: BigUint, to: ManagedAddress) {
         let sc_own_address = self.blockchain().get_sc_address();
         let token_ownership_contract_address = self.token_ownership_contract_address().get();
 
         self.erc1155_proxy(token_ownership_contract_address)
             .safe_transfer_from(sc_own_address, to, type_id, nft_id, &[])
             .async_call()
+            .call_and_exit()
     }
 
     fn calculate_cut_amount(&self, total_amount: &BigUint, cut_percentage: u8) -> BigUint {

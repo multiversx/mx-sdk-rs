@@ -3,12 +3,13 @@ use core::{borrow::Borrow, marker::PhantomData};
 use super::StorageMapper;
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
-    api::{EndpointFinishApi, ManagedTypeApi, StorageMapperApi},
-    io::EndpointResult,
+    api::StorageMapperApi,
     storage::{storage_clear, storage_get, storage_get_len, storage_set, StorageKey},
     types::ManagedType,
 };
-use elrond_codec::{TopDecode, TopEncode};
+use elrond_codec::{
+    EncodeErrorHandler, TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
+};
 
 /// Manages a single serializable item in storage.
 pub struct SingleValueMapper<SA, T>
@@ -90,18 +91,19 @@ where
     }
 }
 
-impl<SA, T> EndpointResult for SingleValueMapper<SA, T>
+impl<SA, T> TopEncodeMulti for SingleValueMapper<SA, T>
 where
     SA: StorageMapperApi,
-    T: TopEncode + TopDecode + EndpointResult,
+    T: TopEncode + TopDecode,
 {
-    type DecodeAs = T::DecodeAs;
+    type DecodeAs = T;
 
-    fn finish<FA>(&self)
+    fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
     where
-        FA: ManagedTypeApi + EndpointFinishApi,
+        O: TopEncodeMultiOutput,
+        H: EncodeErrorHandler,
     {
-        self.get().finish::<FA>();
+        output.push_single_value(&self.get(), h)
     }
 }
 
