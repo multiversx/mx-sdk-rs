@@ -25,12 +25,12 @@ pub trait UseModule:
     + internal_mod_init::InternalModuleInit
     + only_owner_mod::OnlyOwnerModule
     + only_owner_derived_mod::OnlyOwnerDerivedModule
-    + elrond_wasm_module_dns::DnsModule
+    + elrond_wasm_modules::dns::DnsModule
     + elrond_wasm_modules::esdt::EsdtModule
-    + elrond_wasm_module_features::FeaturesModule
+    + elrond_wasm_modules::features::FeaturesModule
     + elrond_wasm_modules::governance::GovernanceModule
     + elrond_wasm_modules::governance::governance_configurable::GovernanceConfigurablePropertiesModule
-    + elrond_wasm_module_pause::PauseModule
+    + elrond_wasm_modules::pause::PauseModule
     + elrond_wasm_modules::default_issue_callbacks::DefaultIssueCallbacksModule
 {
     /// Validates that the "featureName" feature is on.
