@@ -202,7 +202,7 @@ where
         crate::types::MultiResultVec::<ManagedAddress<SA>>::type_name()
     }
 
-    fn is_multi_arg_or_result() -> bool {
+    fn is_variadic() -> bool {
         true
     }
 }
