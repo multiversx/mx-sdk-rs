@@ -41,6 +41,7 @@
                 ]
             },
             "expect": {
+                "out": [],
                 "status": "4",
                 "message": "str:argument decode error (array): input too long"
             }

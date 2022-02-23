@@ -98,7 +98,7 @@ where
         crate::types::MultiArg3::<TokenIdentifier<M>, u64, BigUint<M>>::type_name()
     }
 
-    fn is_multi_arg_or_result() -> bool {
+    fn is_variadic() -> bool {
         true
     }
 }

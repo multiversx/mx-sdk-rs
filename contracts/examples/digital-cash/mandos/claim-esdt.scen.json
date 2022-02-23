@@ -1,6 +1,7 @@
 {
     "name": "claim-esdt",
-    "steps": [{
+    "steps": [
+        {
             "step": "externalSteps",
             "path": "set-accounts.scen.json"
         },
@@ -19,8 +20,7 @@
             "accounts": {
                 "0xebfd923cd251f857ed7639e87143ac83f12f423827abc4a0cdde0119c3e37915": {
                     "nonce": "0",
-                    "balance": "1,000,000",
-                    "storage": {}
+                    "balance": "1,000,000"
                 }
             }
         },
@@ -45,11 +45,12 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "0",
-                "gas": "*",
-                "refund": "*",
+                "message": "",
                 "logs": "*",
-                "message": ""
+                "gas": "*",
+                "refund": "*"
             }
         },
         {
@@ -80,10 +81,10 @@
                 "address:acc2": {
                     "nonce": "1",
                     "balance": "1,000,000",
-                    "storage": {},
                     "esdt": {
                         "str:CASHTOKEN-123456": "50"
-                    }
+                    },
+                    "storage": {}
                 },
                 "0xebfd923cd251f857ed7639e87143ac83f12f423827abc4a0cdde0119c3e37915": {
                     "nonce": "0",
@@ -95,7 +96,6 @@
                     "balance": "0",
                     "storage": {}
                 }
-
             }
         },
         {
@@ -104,7 +104,6 @@
             "tx": {
                 "from": "0xebfd923cd251f857ed7639e87143ac83f12f423827abc4a0cdde0119c3e37915",
                 "to": "sc:the_digital_cash_contract",
-                "value": "0",
                 "function": "claim",
                 "arguments": [
                     "0xdfc7efc43c36853ab160e783ad65766043734e30ce46188a448c44e2bbab9d81",
@@ -114,11 +113,12 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "4",
-                "gas": "*",
-                "refund": "*",
+                "message": "str:non-existent key",
                 "logs": "*",
-                "message": "str:non-existent key"
+                "gas": "*",
+                "refund": "*"
             }
         },
         {
@@ -137,7 +137,6 @@
             "tx": {
                 "from": "0xebfd923cd251f857ed7639e87143ac83f12f423827abc4a0cdde0119c3e37915",
                 "to": "sc:the_digital_cash_contract",
-                "value": "0",
                 "function": "claim",
                 "arguments": [
                     "0xdfc7efc43c36853ab160e783ad65766043734e30ce46188a448c44e2bbab9d91",
@@ -147,11 +146,12 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "4",
-                "gas": "*",
-                "refund": "*",
+                "message": "str:deposit expired",
                 "logs": "*",
-                "message": "str:deposit expired"
+                "gas": "*",
+                "refund": "*"
             }
         },
         {
@@ -170,7 +170,6 @@
             "tx": {
                 "from": "0xebfd923cd251f857ed7639e87143ac83f12f423827abc4a0cdde0119c3e37915",
                 "to": "sc:the_digital_cash_contract",
-                "value": "0",
                 "function": "claim",
                 "arguments": [
                     "0xdfc7efc43c36853ab160e783ad65766043734e30ce46188a448c44e2bbab9d91",
@@ -180,11 +179,12 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "4",
+                "message": "str:invalid signature",
                 "gas": "*",
                 "refund": "*",
-                "logs": "*",
-                "message": "str:invalid signature"
+                "logs": "*"
             }
         },
         {
@@ -193,7 +193,6 @@
             "tx": {
                 "from": "0xebfd923cd251f857ed7639e87143ac83f12f423827abc4a0cdde0119c3e37915",
                 "to": "sc:the_digital_cash_contract",
-                "value": "0",
                 "function": "claim",
                 "arguments": [
                     "0xdfc7efc43c36853ab160e783ad65766043734e30ce46188a448c44e2bbab9d91",
@@ -203,11 +202,12 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "0",
-                "gas": "*",
-                "refund": "*",
+                "message": "",
                 "logs": "*",
-                "message": ""
+                "gas": "*",
+                "refund": "*"
             }
         },
         {
@@ -227,12 +227,11 @@
                 "address:acc2": {
                     "nonce": "1",
                     "balance": "1,000,000",
-                    "storage": {},
                     "esdt": {
                         "str:CASHTOKEN-123456": "50"
-                    }
+                    },
+                    "storage": {}
                 },
-
                 "0xebfd923cd251f857ed7639e87143ac83f12f423827abc4a0cdde0119c3e37915": {
                     "nonce": "4",
                     "balance": "1,000,000",
@@ -241,15 +240,12 @@
                     },
                     "storage": {}
                 },
-
                 "address:digital_cash_owner_address": {
                     "nonce": "1",
                     "balance": "0",
                     "storage": {}
                 }
-
             }
         }
-
     ]
 }
