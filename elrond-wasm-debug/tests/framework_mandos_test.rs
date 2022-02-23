@@ -3,7 +3,9 @@ use elrond_wasm_debug::*;
 // These tests don't really test any contract, but the testing framework itslef.
 
 fn world() -> BlockchainMock {
-    BlockchainMock::new()
+    let mut blockchain = BlockchainMock::new();
+    blockchain.set_current_dir_from_workspace("elrond-wasm-debug");
+    blockchain
 }
 
 /// Checks that externalSteps work fine.

@@ -4,6 +4,17 @@ There are several crates in this repo, this changelog will keep track of all of 
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [elrond-wasm 0.28.0, elrond-codec 0.9.0, mandos 0.12.0] - 2022-02-22
+- Major elrond-codec refactor:
+	- Redesigned the error handling for single value encoding
+	- Introduced multi-value encoding, which replaces the previous endpoint argument and result mechanisms
+- Mandos improvements:
+	- Multi-values: out, topics, ESDT uri
+	- Logs "+" wildcard
+- Builtin function mocks: `ESDTNFTUpdateAttributes`, `ESDTNFTAddURI`
+- New storage mappers: `FungibleTokenMapper`, `NonFungibleTokenMapper`, `WhitelistMapper`
+- Call value wrapper avoids using invalid token index in requests
+
 ## [elrond-wasm 0.27.4, elrond-codec 0.8.5] - 2022-02-02
 - Backwards compatibility fix.
 
