@@ -123,11 +123,6 @@ members = [
   "contracts/feature-tests/use-module",
   "contracts/feature-tests/use-module/meta",
 
-  "contracts/modules-legacy/elrond-wasm-module-dns",
-  "contracts/modules-legacy/elrond-wasm-module-features",
-  "contracts/modules-legacy/elrond-wasm-module-pause",
-  "contracts/modules-legacy/elrond-wasm-module-users",
-
   "tools/test-gen",
   "tools/erdpy-snippet-generator",
 ]
