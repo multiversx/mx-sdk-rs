@@ -131,6 +131,34 @@ impl AccountEsdt {
         }
     }
 
+    pub fn add_uris(&mut self, token_identifier: &[u8], nonce: u64, mut new_uris: Vec<Vec<u8>>) {
+        self.0
+            .get_mut(token_identifier)
+            .unwrap_or_else(|| panic!("invalid token"))
+            .instances
+            .get_mut_by_nonce(nonce)
+            .unwrap_or_else(|| panic!("invalid token nonce"))
+            .metadata
+            .uri
+            .append(&mut new_uris);
+    }
+
+    pub fn update_attributes(
+        &mut self,
+        token_identifier: &[u8],
+        nonce: u64,
+        new_attribute_bytes: Vec<u8>,
+    ) {
+        self.0
+            .get_mut(token_identifier)
+            .unwrap_or_else(|| panic!("invalid token"))
+            .instances
+            .get_mut_by_nonce(nonce)
+            .unwrap_or_else(|| panic!("invalid token nonce"))
+            .metadata
+            .attributes = new_attribute_bytes;
+    }
+
     pub fn iter(&self) -> Iter<Vec<u8>, EsdtData> {
         self.0.iter()
     }

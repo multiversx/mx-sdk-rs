@@ -36,7 +36,7 @@ impl<T: TypeAbi> TypeAbi for OptionalValue<T> {
         T::provide_type_descriptions(accumulator);
     }
 
-    fn is_multi_arg_or_result() -> bool {
+    fn is_variadic() -> bool {
         true
     }
 }
