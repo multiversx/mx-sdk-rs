@@ -1,6 +1,6 @@
 [package]
 name = "elrond-wasm-module-features"
-version = "0.27.4"
+version = "0.28.0"
 edition = "2018"
 
 authors = ["Andrei Marinica <andrei.marinica@elrond.com>", "Elrond Network <contact@elrond.com>"]
@@ -14,13 +14,13 @@ keywords = ["elrond", "wasm", "webassembly", "blockchain", "contract"]
 categories = ["no-std", "wasm", "cryptography::cryptocurrencies"]
 
 [dependencies.elrond-wasm]
-version = "0.27.4"
+version = "0.28.0"
 path = "../../../elrond-wasm"
 
 [dependencies.elrond-wasm-modules]
-version = "0.27.4"
+version = "0.28.0"
 path = "../../../elrond-wasm-modules"
 
 [dev-dependencies.elrond-wasm-debug]
-version = "0.27.4"
+version = "0.28.0"
 path = "../../../elrond-wasm-debug"
