@@ -188,11 +188,8 @@ impl<M: ManagedTypeApi> NestedEncode for BigInt<M> {
         O: NestedEncodeOutput,
         H: EncodeErrorHandler,
     {
-        if O::supports_specialized_type::<Self>() {
-            dest.push_specialized((), self, h)
-        } else {
-            self.to_signed_bytes_be().dep_encode_or_handle_err(dest, h)
-        }
+        self.to_signed_bytes_be_buffer()
+            .dep_encode_or_handle_err(dest, h)
     }
 }
 

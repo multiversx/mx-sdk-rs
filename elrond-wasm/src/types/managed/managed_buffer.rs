@@ -267,6 +267,8 @@ impl<M: ManagedTypeApi> NestedEncode for ManagedBuffer<M> {
         H: EncodeErrorHandler,
     {
         if O::supports_specialized_type::<Self>() {
+            let len_bytes = (self.len() as u32).to_be_bytes();
+            dest.write(&len_bytes[..]);
             dest.push_specialized((), self, h)
         } else {
             self.to_boxed_bytes().dep_encode_or_handle_err(dest, h)
