@@ -1,11 +1,11 @@
+use crate::{
+    api::{BigIntApi, ManagedTypeApi},
+    types::{BigUint, ManagedType},
+};
 use core::ops::{
     Add, AddAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Div, DivAssign,
     Mul, MulAssign, Rem, RemAssign, Shl, ShlAssign, Shr, ShrAssign, Sub, SubAssign,
 };
-
-use crate::api::{BigIntApi, ManagedTypeApi};
-
-use super::{BigUint, ManagedType};
 
 macro_rules! binary_operator {
     ($trait:ident, $method:ident, $api_func:ident) => {

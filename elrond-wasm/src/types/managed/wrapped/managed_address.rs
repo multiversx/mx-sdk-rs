@@ -1,11 +1,10 @@
 use core::convert::{TryFrom, TryInto};
 
-use super::{ManagedBuffer, ManagedByteArray, ManagedType};
 use crate::{
     abi::TypeAbi,
     api::{Handle, ManagedTypeApi},
     hex_util::encode_bytes_as_hex,
-    types::Address,
+    types::{Address, ManagedBuffer, ManagedByteArray, ManagedType},
 };
 use alloc::string::String;
 use elrond_codec::{

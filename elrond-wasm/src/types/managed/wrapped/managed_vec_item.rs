@@ -2,12 +2,10 @@ use core::borrow::Borrow;
 
 use crate::{
     api::{Handle, ManagedTypeApi},
-    types::TokenIdentifier,
-};
-
-use super::{
-    BigInt, BigUint, EllipticCurve, ManagedAddress, ManagedBuffer, ManagedByteArray, ManagedRef,
-    ManagedType, ManagedVec,
+    types::{
+        BigInt, BigUint, EllipticCurve, ManagedAddress, ManagedBuffer, ManagedByteArray,
+        ManagedRef, ManagedType, ManagedVec, TokenIdentifier,
+    },
 };
 
 /// Types that implement this trait can be items inside a `ManagedVec`.

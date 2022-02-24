@@ -1,7 +1,7 @@
-use super::{ManagedVec, ManagedVecItem};
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer},
     api::ManagedTypeApi,
+    types::{ManagedVec, ManagedVecItem},
 };
 use alloc::string::String;
 use elrond_codec::{

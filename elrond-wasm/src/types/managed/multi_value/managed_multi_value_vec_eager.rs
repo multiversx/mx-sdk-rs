@@ -8,7 +8,7 @@ use elrond_codec::{
     TopEncodeMultiOutput, Vec,
 };
 
-use super::{ManagedVec, ManagedVecItem, ManagedVecRefIterator};
+use crate::types::{ManagedVec, ManagedVecItem, ManagedVecRefIterator};
 
 #[derive(Clone, Default)]
 pub struct ManagedMultiResultVecEager<M: ManagedTypeApi, T: ManagedVecItem>(ManagedVec<M, T>);
