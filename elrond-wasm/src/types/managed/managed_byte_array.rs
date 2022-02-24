@@ -176,7 +176,7 @@ where
         H: EncodeErrorHandler,
     {
         if O::supports_specialized_type::<ManagedBuffer<M>>() {
-            dest.push_specialized(ManagedBufferSizeContext(N), &self.buffer, h)
+            dest.push_specialized((), &self.buffer, h)
         } else {
             dest.write(self.buffer.to_boxed_bytes().as_slice());
             Ok(())
