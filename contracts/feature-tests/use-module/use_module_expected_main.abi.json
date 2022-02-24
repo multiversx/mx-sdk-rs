@@ -540,12 +540,14 @@
         },
         {
             "name": "pause",
+            "onlyOwner": true,
             "mutability": "mutable",
             "inputs": [],
             "outputs": []
         },
         {
             "name": "unpause",
+            "onlyOwner": true,
             "mutability": "mutable",
             "inputs": [],
             "outputs": []
