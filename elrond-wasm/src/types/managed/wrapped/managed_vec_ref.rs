@@ -1,10 +1,10 @@
-use core::{
-    marker::PhantomData,
-    ops::{Deref, DerefMut},
-};
 use crate::{
     api::{Handle, ManagedTypeApi},
     types::{ManagedType, ManagedVec, ManagedVecItem},
+};
+use core::{
+    marker::PhantomData,
+    ops::{Deref, DerefMut},
 };
 
 pub struct ManagedVecRef<'a, M, T>
