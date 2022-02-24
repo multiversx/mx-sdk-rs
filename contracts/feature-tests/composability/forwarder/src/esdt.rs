@@ -71,7 +71,7 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
     fn send_esdt_direct_multi_transfer(
         &self,
         to: ManagedAddress,
-        #[var_args] token_payments: ManagedMultiValue<MultiValue3<TokenIdentifier, u64, BigUint>>,
+        #[var_args] token_payments: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>>,
     ) {
         let mut all_token_payments = ManagedVec::new();
 
@@ -168,9 +168,9 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
     }
 
     #[endpoint]
-    fn get_esdt_local_roles(&self, token_id: TokenIdentifier) -> ManagedMultiValue<ManagedBuffer> {
+    fn get_esdt_local_roles(&self, token_id: TokenIdentifier) -> MultiValueEncoded<ManagedBuffer> {
         let roles = self.blockchain().get_esdt_local_roles(&token_id);
-        let mut result = ManagedMultiValue::new();
+        let mut result = MultiValueEncoded::new();
         for role in roles.iter_roles() {
             result.push(role.as_role_name().into());
         }

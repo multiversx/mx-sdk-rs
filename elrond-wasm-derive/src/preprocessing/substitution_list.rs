@@ -52,6 +52,9 @@ fn add_managed_types(substitutions: &mut SubstitutionsMap) {
     add_managed_type_with_generics(substitutions, &quote!(ManagedVarArgs));
     add_managed_type_with_generics(substitutions, &quote!(ManagedMultiResultVec));
     add_managed_type_with_generics(substitutions, &quote!(ManagedAsyncCallResult));
+    add_managed_type_with_generics(substitutions, &quote!(MultiValueEncoded));
+    add_managed_type_with_generics(substitutions, &quote!(MultiValueManagedVec));
+    add_managed_type_with_generics(substitutions, &quote!(MultiValueManagedVecCounted));
     add_managed_type_with_generics(substitutions, &quote!(ManagedCountedVarArgs));
     add_managed_type_with_generics(substitutions, &quote!(ManagedCountedMultiResultVec));
 }
