@@ -24,8 +24,8 @@ pub trait Vault {
     #[endpoint]
     fn echo_arguments(
         &self,
-        #[var_args] args: ManagedVarArgs<ManagedBuffer>,
-    ) -> ManagedMultiResultVec<ManagedBuffer> {
+        #[var_args] args: ManagedMultiValue<ManagedBuffer>,
+    ) -> ManagedMultiValue<ManagedBuffer> {
         self.call_counts(b"echo_arguments").update(|c| *c += 1);
         args
     }
@@ -72,9 +72,9 @@ pub trait Vault {
     #[endpoint]
     fn accept_multi_funds_echo(
         &self,
-    ) -> ManagedMultiResultVec<MultiValue3<TokenIdentifier, u64, BigUint>> {
+    ) -> ManagedMultiValue<MultiValue3<TokenIdentifier, u64, BigUint>> {
         let payments = self.call_value().all_esdt_transfers();
-        let mut result = ManagedMultiResultVec::new();
+        let mut result = ManagedMultiValue::new();
 
         for payment in payments.into_iter() {
             result.push(
@@ -177,7 +177,7 @@ pub trait Vault {
     #[endpoint]
     fn retrieve_multi_funds_async(
         &self,
-        #[var_args] token_payments: ManagedVarArgs<MultiValue3<TokenIdentifier, u64, BigUint>>,
+        #[var_args] token_payments: ManagedMultiValue<MultiValue3<TokenIdentifier, u64, BigUint>>,
     ) {
         let caller = self.blockchain().get_caller();
         let mut all_payments = ManagedVec::new();

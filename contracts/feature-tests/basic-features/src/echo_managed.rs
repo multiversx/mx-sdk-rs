@@ -95,9 +95,9 @@ pub trait EchoManagedTypes {
     #[endpoint]
     fn echo_varags_managed_sum(
         &self,
-        #[var_args] m: ManagedVarArgs<MultiValue2<u32, u32>>,
-    ) -> ManagedMultiResultVec<MultiValue3<u32, u32, u32>> {
-        let mut result = ManagedMultiResultVec::new();
+        #[var_args] m: ManagedMultiValue<MultiValue2<u32, u32>>,
+    ) -> ManagedMultiValue<MultiValue3<u32, u32, u32>> {
+        let mut result = ManagedMultiValue::new();
         for arg in m.into_iter() {
             let (x, y) = arg.into_tuple();
             result.push((x, y, x + y).into())
