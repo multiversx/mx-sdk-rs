@@ -135,6 +135,7 @@
         },
         {
             "name": "setFeatureFlag",
+            "onlyOwner": true,
             "mutability": "mutable",
             "inputs": [
                 {
