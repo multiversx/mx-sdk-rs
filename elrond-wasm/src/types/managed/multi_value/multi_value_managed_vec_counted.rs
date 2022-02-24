@@ -13,7 +13,7 @@ use elrond_codec::{
 /// Think of it as a `VarArgs` preceded by the count.
 /// Unlike `ManagedMultiValue` it deserializes eagerly.
 #[derive(Clone, Default)]
-pub struct ManagedCountedMultiResultVec<M, T>
+pub struct MultiValueManagedVecCounted<M, T>
 where
     M: ManagedTypeApi,
     T: ManagedVecItem,
@@ -21,20 +21,30 @@ where
     pub(super) contents: ManagedVec<M, T>,
 }
 
-pub type ManagedCountedVarArgs<M, T> = ManagedCountedMultiResultVec<M, T>;
+#[deprecated(
+    since = "0.29.0",
+    note = "Alias kept for backwards compatibility. Replace with `MultiValueManagedVecCounted`"
+)]
+pub type ManagedCountedVarArgs<M, T> = MultiValueManagedVecCounted<M, T>;
 
-impl<M, T> ManagedCountedMultiResultVec<M, T>
+#[deprecated(
+    since = "0.29.0",
+    note = "Alias kept for backwards compatibility. Replace with `MultiValueManagedVecCounted`"
+)]
+pub type ManagedCountedMultiResultVec<M, T> = MultiValueManagedVecCounted<M, T>;
+
+impl<M, T> MultiValueManagedVecCounted<M, T>
 where
     M: ManagedTypeApi,
     T: ManagedVecItem,
 {
     #[inline]
     pub fn new() -> Self {
-        ManagedCountedMultiResultVec::from(ManagedVec::new())
+        MultiValueManagedVecCounted::from(ManagedVec::new())
     }
 }
 
-impl<M, T> ManagedCountedMultiResultVec<M, T>
+impl<M, T> MultiValueManagedVecCounted<M, T>
 where
     M: ManagedTypeApi,
     T: ManagedVecItem,
@@ -50,7 +60,7 @@ where
     }
 }
 
-impl<M, T> ManagedCountedMultiResultVec<M, T>
+impl<M, T> MultiValueManagedVecCounted<M, T>
 where
     M: ManagedTypeApi,
     T: ManagedVecItem,
@@ -66,7 +76,7 @@ where
     }
 }
 
-impl<M, T> From<ManagedVec<M, T>> for ManagedCountedMultiResultVec<M, T>
+impl<M, T> From<ManagedVec<M, T>> for MultiValueManagedVecCounted<M, T>
 where
     M: ManagedTypeApi,
     T: ManagedVecItem,
@@ -74,13 +84,13 @@ where
     #[inline]
     #[rustfmt::skip]
     fn from(v: ManagedVec<M, T>) -> Self {
-        ManagedCountedMultiResultVec {
+        MultiValueManagedVecCounted {
             contents: v,
         }
     }
 }
 
-impl<M, T> TopEncodeMulti for ManagedCountedMultiResultVec<M, T>
+impl<M, T> TopEncodeMulti for MultiValueManagedVecCounted<M, T>
 where
     M: ManagedTypeApi,
     T: ManagedVecItem + TopEncodeMulti,
@@ -100,7 +110,7 @@ where
     }
 }
 
-impl<M, T> TopDecodeMulti for ManagedCountedMultiResultVec<M, T>
+impl<M, T> TopDecodeMulti for MultiValueManagedVecCounted<M, T>
 where
     M: ManagedTypeApi,
     T: ManagedVecItem + TopDecodeMulti,
@@ -111,7 +121,7 @@ where
         H: DecodeErrorHandler,
     {
         let count = usize::multi_decode_or_handle_err(input, h)?;
-        let mut result = ManagedCountedMultiResultVec::new();
+        let mut result = MultiValueManagedVecCounted::new();
         for _ in 0..count {
             result.push(T::multi_decode_or_handle_err(input, h)?);
         }
@@ -119,7 +129,7 @@ where
     }
 }
 
-impl<M, T> TypeAbi for ManagedCountedMultiResultVec<M, T>
+impl<M, T> TypeAbi for MultiValueManagedVecCounted<M, T>
 where
     M: ManagedTypeApi,
     T: ManagedVecItem + TypeAbi,

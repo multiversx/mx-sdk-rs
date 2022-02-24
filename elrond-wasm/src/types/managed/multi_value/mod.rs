@@ -1,9 +1,13 @@
-mod managed_multi_value;
-mod managed_multi_value_counted;
-mod managed_multi_value_eager;
-mod managed_multi_value_iter;
+mod multi_value_encoded;
+mod multi_value_encoded_iter;
+mod multi_value_managed_vec;
+mod multi_value_managed_vec_counted;
 
-pub use managed_multi_value::{ManagedMultiResultVec, ManagedMultiValue, ManagedVarArgs};
-pub use managed_multi_value_counted::{ManagedCountedMultiResultVec, ManagedCountedVarArgs};
-pub use managed_multi_value_eager::{ManagedMultiResultVecEager, ManagedVarArgsEager};
-pub use managed_multi_value_iter::ManagedMultiValueIterator;
+pub use multi_value_encoded::{ManagedMultiResultVec, ManagedVarArgs, MultiValueEncoded};
+pub use multi_value_encoded_iter::MultiValueEncodedIterator;
+pub use multi_value_managed_vec::{
+    ManagedMultiResultVecEager, ManagedVarArgsEager, MultiValueManagedVec,
+};
+pub use multi_value_managed_vec_counted::{
+    ManagedCountedMultiResultVec, ManagedCountedVarArgs, MultiValueManagedVecCounted,
+};
