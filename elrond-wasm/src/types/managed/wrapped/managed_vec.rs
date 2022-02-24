@@ -1,8 +1,10 @@
-use super::{ManagedBuffer, ManagedType, ManagedVecItem, ManagedVecRef, ManagedVecRefIterator};
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer},
     api::{ErrorApiImpl, Handle, InvalidSliceError, ManagedTypeApi},
-    types::{ArgBuffer, BoxedBytes, ManagedBufferNestedDecodeInput},
+    types::{
+        ArgBuffer, BoxedBytes, ManagedBuffer, ManagedBufferNestedDecodeInput, ManagedType,
+        ManagedVecItem, ManagedVecRef, ManagedVecRefIterator,
+    },
 };
 use alloc::{string::String, vec::Vec};
 use core::marker::PhantomData;

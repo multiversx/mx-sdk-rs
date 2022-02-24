@@ -1,10 +1,11 @@
-use super::{ManagedBuffer, ManagedType, ManagedVec, ManagedVecItem};
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer},
     api::{ErrorApi, ManagedTypeApi},
     contract_base::{ExitCodecErrorHandler, ManagedSerializer},
     err_msg,
-    types::{ManagedArgBuffer, MultiResultVec},
+    types::{
+        ManagedArgBuffer, ManagedBuffer, ManagedType, ManagedVec, ManagedVecItem, MultiResultVec,
+    },
 };
 use alloc::string::String;
 use core::marker::PhantomData;
