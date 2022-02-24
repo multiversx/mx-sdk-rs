@@ -22,27 +22,17 @@ pub trait PauseModule {
     #[storage_set("pause_module:paused")]
     fn set_paused(&self, paused: bool);
 
+    #[only_owner]
     #[endpoint(pause)]
-    fn pause_endpoint(&self) -> SCResult<()> {
-        require!(
-            self.blockchain().get_caller() == self.blockchain().get_owner_address(),
-            "only owner allowed to pause contract"
-        );
-
+    fn pause_endpoint(&self) {
         self.set_paused(true);
         // TODO: event
-        Ok(())
     }
 
+    #[only_owner]
     #[endpoint(unpause)]
-    fn unpause_endpoint(&self) -> SCResult<()> {
-        require!(
-            self.blockchain().get_caller() == self.blockchain().get_owner_address(),
-            "only owner allowed to unpause contract"
-        );
-
+    fn unpause_endpoint(&self) {
         self.set_paused(false);
         // TODO: event
-        Ok(())
     }
 }
