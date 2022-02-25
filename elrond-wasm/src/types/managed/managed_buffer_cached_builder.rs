@@ -5,7 +5,7 @@ use crate::{
     types::StaticBufferRef,
 };
 
-use super::{BigInt, BigUint, ManagedBuffer, ManagedBufferSizeContext};
+use super::{BigInt, BigUint, ManagedBuffer};
 
 pub struct ManagedBufferCachedBuilder<M>
 where
@@ -79,13 +79,6 @@ where
         }
         let _ = core::mem::replace(&mut self.static_cache, static_cache_mut);
     }
-
-    #[inline]
-    fn push_nested_managed_buffer(&mut self, item: &ManagedBuffer<M>) {
-        let len_bytes = (item.len() as u32).to_be_bytes();
-        self.append_bytes(&len_bytes[..]);
-        self.append_managed_buffer(item);
-    }
 }
 
 impl<M: ManagedTypeApi> NestedEncodeOutput for ManagedBufferCachedBuilder<M> {
@@ -101,7 +94,7 @@ impl<M: ManagedTypeApi> NestedEncodeOutput for ManagedBufferCachedBuilder<M> {
     #[inline]
     fn push_specialized<T, C, H>(
         &mut self,
-        context: C,
+        _context: C,
         value: &T,
         h: H,
     ) -> Result<(), H::HandledErr>
@@ -111,18 +104,7 @@ impl<M: ManagedTypeApi> NestedEncodeOutput for ManagedBufferCachedBuilder<M> {
         H: EncodeErrorHandler,
     {
         if let Some(managed_buffer) = value.try_cast_ref::<ManagedBuffer<M>>() {
-            if context.try_cast_ref::<ManagedBufferSizeContext>().is_some() {
-                // managed buffers originating from fixed-length types don't need to serialize the length
-                self.append_managed_buffer(managed_buffer);
-            } else {
-                self.push_nested_managed_buffer(managed_buffer);
-            }
-            Ok(())
-        } else if let Some(big_uint) = value.try_cast_ref::<BigUint<M>>() {
-            self.push_nested_managed_buffer(&big_uint.to_bytes_be_buffer());
-            Ok(())
-        } else if let Some(big_int) = value.try_cast_ref::<BigInt<M>>() {
-            self.push_nested_managed_buffer(&big_int.to_signed_bytes_be_buffer());
+            self.append_managed_buffer(managed_buffer);
             Ok(())
         } else {
             Err(h.handle_error(EncodeError::UNSUPPORTED_OPERATION))
