@@ -11,6 +11,6 @@ pub trait ManagedAddressFeatures {
 
     #[endpoint]
     fn maddress_from_managed_buffer(&self, managed_buffer: ManagedBuffer) -> ManagedAddress {
-        ManagedAddress::try_from(managed_buffer).unwrap()
+        ManagedAddress::try_from(managed_buffer).unwrap_or_else(|err| sc_panic!(err))
     }
 }
