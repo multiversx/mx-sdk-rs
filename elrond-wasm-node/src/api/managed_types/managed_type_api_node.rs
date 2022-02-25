@@ -6,6 +6,7 @@ extern "C" {
     fn mBufferNew() -> i32;
     #[allow(dead_code)]
     fn bigIntNew(value: i64) -> i32;
+    fn bigIntSetInt64(destination: i32, value: i64);
 
     fn mBufferToBigIntUnsigned(mBufferHandle: i32, bigIntHandle: i32) -> i32;
     fn mBufferToBigIntSigned(mBufferHandle: i32, bigIntHandle: i32) -> i32;
