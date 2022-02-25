@@ -11,6 +11,7 @@ pub struct BuildInfoAbi {
 pub struct ContractCrateBuildAbi {
     pub name: &'static str,
     pub version: &'static str,
+    pub git_version: &'static str,
 }
 
 /// Gives the elrond-wasm metadata.
