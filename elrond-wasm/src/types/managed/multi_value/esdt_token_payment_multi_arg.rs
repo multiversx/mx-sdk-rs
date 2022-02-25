@@ -1,7 +1,7 @@
 use alloc::string::String;
 use elrond_codec::{
-    DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti, TopDecodeMultiInput, TopEncodeMulti,
-    TopEncodeMultiOutput,
+    multi_types::MultiValue3, DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti,
+    TopDecodeMultiInput, TopEncodeMulti, TopEncodeMultiOutput,
 };
 
 use crate::{
@@ -93,7 +93,7 @@ where
     M: ManagedTypeApi,
 {
     fn type_name() -> String {
-        crate::types::MultiArg3::<TokenIdentifier<M>, u64, BigUint<M>>::type_name()
+        MultiValue3::<TokenIdentifier<M>, u64, BigUint<M>>::type_name()
     }
 
     fn is_variadic() -> bool {
