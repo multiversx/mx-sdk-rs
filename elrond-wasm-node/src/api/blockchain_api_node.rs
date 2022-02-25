@@ -70,6 +70,7 @@ extern "C" {
     // big int API
     #[allow(dead_code)]
     fn bigIntNew(value: i64) -> i32;
+    fn bigIntSetInt64(destination: i32, value: i64);
     fn bigIntGetExternalBalance(address_ptr: *const u8, dest: i32);
     fn bigIntGetESDTExternalBalance(
         address_ptr: *const u8,
