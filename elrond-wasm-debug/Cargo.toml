@@ -31,6 +31,7 @@ pathdiff = "0.2.1"
 
 [features]
 mandos-go-tests = []
+alloc = ["elrond-wasm/alloc"]
 
 [dependencies.elrond-wasm]
 version = "=0.28.0"

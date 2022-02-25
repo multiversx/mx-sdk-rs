@@ -9,6 +9,7 @@ extern "C" {
     // managed buffer API
     fn mBufferNew() -> i32;
 
+    #[cfg(feature = "alloc")]
     fn sha256(dataOffset: *const u8, length: i32, resultOffset: *mut u8) -> i32;
 
     fn managedSha256(inputHandle: i32, outputHandle: i32) -> i32;
@@ -70,19 +71,20 @@ impl CryptoApi for VmApiImpl {
 }
 
 impl CryptoApiImpl for VmApiImpl {
-    fn sha256(&self, data_handle: Handle) -> Handle {
-        unsafe {
-            let result_handle = mBufferNew();
-            managedSha256(data_handle, result_handle);
-            result_handle
-        }
-    }
-
+    #[cfg(feature = "alloc")]
     fn sha256_legacy(&self, data: &[u8]) -> H256 {
         unsafe {
             let mut res = H256::zero();
             sha256(data.as_ptr(), data.len() as i32, res.as_mut_ptr());
             res
+        }
+    }
+
+    fn sha256(&self, data_handle: Handle) -> Handle {
+        unsafe {
+            let result_handle = mBufferNew();
+            managedSha256(data_handle, result_handle);
+            result_handle
         }
     }
 

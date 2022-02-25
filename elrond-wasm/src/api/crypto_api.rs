@@ -10,16 +10,10 @@ pub trait CryptoApi: ManagedTypeApi {
 }
 
 pub trait CryptoApiImpl: ManagedTypeApiImpl {
+    #[cfg(feature = "alloc")]
     fn sha256_legacy(&self, data: &[u8]) -> H256;
 
-    fn sha256(&self, data_handle: Handle) -> Handle {
-        // default implementation used in debugger
-        // the VM has a dedicated hook
-        self.mb_new_from_bytes(
-            self.sha256_legacy(self.mb_to_boxed_bytes(data_handle).as_slice())
-                .as_array(),
-        )
-    }
+    fn sha256(&self, data_handle: Handle) -> Handle;
 
     fn keccak256_legacy(&self, data: &[u8]) -> H256;
 

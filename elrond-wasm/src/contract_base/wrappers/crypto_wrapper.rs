@@ -24,6 +24,7 @@ where
         }
     }
 
+    #[cfg(feature = "alloc")]
     pub fn sha256_legacy(&self, data: &[u8]) -> H256 {
         A::crypto_api_impl().sha256_legacy(data)
     }

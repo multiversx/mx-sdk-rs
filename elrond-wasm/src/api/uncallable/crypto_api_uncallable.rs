@@ -1,6 +1,6 @@
 use super::UncallableApi;
 use crate::{
-    api::{CryptoApi, CryptoApiImpl},
+    api::{CryptoApi, CryptoApiImpl, Handle},
     types::{BoxedBytes, MessageHashType, H256},
 };
 use alloc::boxed::Box;
@@ -14,7 +14,12 @@ impl CryptoApi for UncallableApi {
 }
 
 impl CryptoApiImpl for UncallableApi {
+    #[cfg(feature = "alloc")]
     fn sha256_legacy(&self, _data: &[u8]) -> H256 {
+        unreachable!()
+    }
+
+    fn sha256(&self, _data_handle: Handle) -> Handle {
         unreachable!()
     }
 
