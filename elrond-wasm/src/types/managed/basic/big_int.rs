@@ -1,10 +1,9 @@
 use core::marker::PhantomData;
 
-use super::{BigUint, ManagedBuffer, ManagedType, Sign};
 use crate::{
     api::{BigIntApi, Handle, ManagedTypeApi, ManagedTypeApiImpl},
     hex_util::encode_bytes_as_hex,
-    types::BoxedBytes,
+    types::{BigUint, BoxedBytes, ManagedBuffer, ManagedType, Sign},
 };
 use alloc::string::String;
 use elrond_codec::{

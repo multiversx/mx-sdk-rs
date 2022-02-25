@@ -168,7 +168,7 @@ pub trait PingPong {
     /// Lists the addresses of all users that have `ping`-ed,
     /// in the order they have `ping`-ed
     #[view(getUserAddresses)]
-    fn get_user_addresses(&self) -> ManagedMultiResultVec<ManagedAddress> {
+    fn get_user_addresses(&self) -> MultiValueEncoded<ManagedAddress> {
         self.user_mapper().get_all_addresses().into()
     }
 

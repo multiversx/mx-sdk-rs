@@ -7,21 +7,21 @@ use crate::{
     ArgErrorHandler, ArgId, ManagedResultArgLoader,
 };
 
-use super::ManagedMultiResultVec;
+use super::MultiValueEncoded;
 
-impl<M, T> IntoIterator for ManagedMultiResultVec<M, T>
+impl<M, T> IntoIterator for MultiValueEncoded<M, T>
 where
     M: ManagedTypeApi + ErrorApi,
     T: TopDecodeMulti,
 {
     type Item = T;
-    type IntoIter = ManagedMultiResultVecIterator<M, T>;
+    type IntoIter = MultiValueEncodedIterator<M, T>;
     fn into_iter(self) -> Self::IntoIter {
-        ManagedMultiResultVecIterator::new(self)
+        MultiValueEncodedIterator::new(self)
     }
 }
 
-pub struct ManagedMultiResultVecIterator<M, T>
+pub struct MultiValueEncodedIterator<M, T>
 where
     M: ManagedTypeApi + ErrorApi,
     T: TopDecodeMulti,
@@ -30,20 +30,20 @@ where
     _phantom: PhantomData<T>,
 }
 
-impl<M, T> ManagedMultiResultVecIterator<M, T>
+impl<M, T> MultiValueEncodedIterator<M, T>
 where
     M: ManagedTypeApi + ErrorApi,
     T: TopDecodeMulti,
 {
-    pub(crate) fn new(obj: ManagedMultiResultVec<M, T>) -> Self {
-        ManagedMultiResultVecIterator {
+    pub(crate) fn new(obj: MultiValueEncoded<M, T>) -> Self {
+        MultiValueEncodedIterator {
             data_loader: ManagedResultArgLoader::new(obj.raw_buffers),
             _phantom: PhantomData,
         }
     }
 }
 
-impl<M, T> Iterator for ManagedMultiResultVecIterator<M, T>
+impl<M, T> Iterator for MultiValueEncodedIterator<M, T>
 where
     M: ManagedTypeApi + ErrorApi,
     T: TopDecodeMulti,
