@@ -5,7 +5,7 @@ use core::{
     ops::{Add, BitAnd, BitOr, BitXor, Div, Mul, Neg, Rem, Shl, Shr, Sub},
 };
 use elrond_wasm::{
-    api::{BigIntApi, ErrorApiImpl, Handle, StaticVarApiImpl},
+    api::{BigIntApi, ErrorApiImpl, Handle},
     err_msg,
     types::BoxedBytes,
 };
@@ -62,11 +62,16 @@ impl BigIntApi for DebugApi {
     #[allow(dead_code)]
     fn bi_new(&self, value: i64) -> Handle {
         let mut managed_types = self.m_types_borrow_mut();
-        let handle = self.next_bigint_handle();
         managed_types
             .big_int_map
-            .insert(handle, BigInt::from(value));
-        handle
+            .insert_new_handle(BigInt::from(value))
+    }
+
+    fn bi_set_int64(&self, destination: Handle, value: i64) {
+        let mut managed_types = self.m_types_borrow_mut();
+        managed_types
+            .big_int_map
+            .insert(destination, BigInt::from(value));
     }
 
     fn bi_unsigned_byte_length(&self, handle: Handle) -> usize {

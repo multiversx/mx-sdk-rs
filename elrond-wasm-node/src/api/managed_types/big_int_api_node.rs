@@ -12,6 +12,7 @@ extern "C" {
     #[allow(dead_code)]
     fn bigIntNew(value: i64) -> i32;
 
+    fn bigIntSetInt64(destination: i32, value: i64);
     fn bigIntUnsignedByteLength(x: i32) -> i32;
     fn bigIntGetUnsignedBytes(reference: i32, byte_ptr: *mut u8) -> i32;
     fn bigIntSetUnsignedBytes(destination: i32, byte_ptr: *const u8, byte_len: i32);
@@ -67,11 +68,15 @@ macro_rules! unary_op_wrapper {
 
 impl BigIntApi for crate::VmApiImpl {
     #[inline]
-    #[allow(dead_code)]
     fn bi_new(&self, value: i64) -> Handle {
-        let handle = self.next_bigint_handle();
-        self.bi_set_signed_bytes(handle, &value.to_be_bytes());
-        handle
+        unsafe { bigIntNew(value) }
+    }
+
+    #[inline]
+    fn bi_set_int64(&self, destination: Handle, value: i64) {
+        unsafe {
+            self.bigIntSetInt64(destination, value);
+        }
     }
 
     #[inline]

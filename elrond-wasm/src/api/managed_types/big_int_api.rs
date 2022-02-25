@@ -15,10 +15,8 @@ pub enum Sign {
 pub trait BigIntApi {
     #[allow(dead_code)]
     fn bi_new(&self, value: i64) -> Handle;
-    fn bi_new_zero(&self) -> Handle {
-        self.bi_new(0)
-    }
 
+    fn bi_set_int64(&self, destination: Handle, value: i64);
     fn bi_unsigned_byte_length(&self, handle: Handle) -> usize;
     fn bi_get_unsigned_bytes(&self, handle: Handle) -> BoxedBytes;
     fn bi_set_unsigned_bytes(&self, destination: Handle, bytes: &[u8]);
