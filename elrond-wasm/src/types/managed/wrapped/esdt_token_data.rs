@@ -1,11 +1,9 @@
 use crate::{
     api::ManagedTypeApi,
     contract_base::ExitCodecErrorHandler,
-    types::{BigUint, ManagedAddress, ManagedBuffer, ManagedVec},
+    types::{BigUint, EsdtTokenType, ManagedAddress, ManagedBuffer, ManagedVec},
 };
 use elrond_codec::*;
-
-use super::EsdtTokenType;
 
 use elrond_codec::elrond_codec_derive::{NestedDecode, NestedEncode, TopDecode, TopEncode};
 

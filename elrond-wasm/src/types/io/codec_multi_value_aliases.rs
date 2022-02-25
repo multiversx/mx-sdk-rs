@@ -1,5 +1,58 @@
-use crate::abi::{OutputAbi, TypeAbi, TypeDescriptionContainer};
-use alloc::{string::String, vec::Vec};
+use elrond_codec::multi_types::{IgnoreValue, MultiValueVec, OptionalValue};
+
+/// Structure that allows taking a variable number of arguments
+/// or returning a variable number of results in a smart contract endpoint.
+#[deprecated(
+    since = "0.28.0",
+    note = "Alias kept for backwards compatibility. Replace with `MultiValueVec`"
+)]
+pub type MultiArgVec<T> = MultiValueVec<T>;
+
+/// Used for taking a variable number of arguments in an endpoint,
+/// it is synonymous with `MultiResultVec`/`MultiArgVec`.
+#[deprecated(
+    since = "0.28.0",
+    note = "Alias kept for backwards compatibility. Replace with `MultiValueVec`"
+)]
+pub type VarArgs<T> = MultiArgVec<T>;
+
+/// Used for returning a variable number of results from an endpoint,
+/// it is synonymous with `MultiResult`.
+#[deprecated(
+    since = "0.28.0",
+    note = "Alias kept for backwards compatibility. Replace with `MultiValueVec`"
+)]
+pub type MultiResultVec<T> = VarArgs<T>;
+
+/// Structure that allows taking a variable number of arguments,
+/// but does nothing with them, not even deserialization.
+#[deprecated(
+    since = "0.28.0",
+    note = "Alias kept for backwards compatibility. Replace with `IgnoreValue`"
+)]
+pub type IgnoreVarArgs = IgnoreValue;
+
+/// A smart contract argument or result that can be missing.
+///
+/// If arguments stop before this argument, None will be returned.
+/// As an endpoint result, the contract decides if it produces it or not.
+///
+/// As a principle, optional arguments or results should come last,
+/// otherwise there is ambiguity as to how to interpret what comes after.
+#[deprecated(
+    since = "0.28.0",
+    note = "Alias kept for backwards compatibility. Replace with `OptionalValue`"
+)]
+pub type OptionalArg<T> = OptionalValue<T>;
+
+/// It is just an alias for `OptionalArg`.
+/// In general we use `OptionalArg` for arguments and `OptionalResult` for results,
+/// but it is the same implementation for both.
+#[deprecated(
+    since = "0.28.0",
+    note = "Alias kept for backwards compatibility. Replace with `OptionalValue`"
+)]
+pub type OptionalResult<T> = OptionalArg<T>;
 
 macro_rules! multi_arg_impls {
     ($(($mval_struct:ident $marg_struct:ident $mres_struct:ident $($n:tt $name:ident)+) )+) => {
@@ -15,48 +68,6 @@ macro_rules! multi_arg_impls {
                 note = "Alias kept for backwards compatibility. Replace with `MultiValue*`"
             )]
             pub type $mres_struct<$($name,)+> = elrond_codec::multi_types::$mval_struct<$($name,)+>;
-
-            impl<$($name),+ > TypeAbi for elrond_codec::multi_types::$mval_struct<$($name,)+>
-            where
-                $($name: TypeAbi,)+
-            {
-                fn type_name() -> String {
-                    let mut repr = String::from("multi");
-                    repr.push('<');
-                    $(
-                        if $n > 0 {
-                            repr.push(',');
-                        }
-                        repr.push_str($name::type_name().as_str());
-                    )+
-                    repr.push('>');
-                    repr
-                }
-
-                fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
-					$(
-						$name::provide_type_descriptions(accumulator);
-                    )+
-                }
-
-                fn is_variadic() -> bool {
-                    true
-                }
-
-                fn output_abis(output_names: &[&'static str]) -> Vec<OutputAbi> {
-                    let mut result = Vec::new();
-                    $(
-                        if output_names.len() > $n {
-                            result.append(&mut $name::output_abis(&[output_names[$n]]));
-
-                        } else {
-                            result.append(&mut $name::output_abis(&[]));
-                        }
-
-                    )+
-                    result
-                }
-            }
         )+
     }
 }

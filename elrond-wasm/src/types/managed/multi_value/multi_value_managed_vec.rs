@@ -8,32 +8,42 @@ use elrond_codec::{
     TopEncodeMultiOutput, Vec,
 };
 
-use super::{ManagedVec, ManagedVecItem, ManagedVecRefIterator};
+use crate::types::{ManagedVec, ManagedVecItem, ManagedVecRefIterator};
 
 #[derive(Clone, Default)]
-pub struct ManagedMultiResultVecEager<M: ManagedTypeApi, T: ManagedVecItem>(ManagedVec<M, T>);
+pub struct MultiValueManagedVec<M: ManagedTypeApi, T: ManagedVecItem>(ManagedVec<M, T>);
 
-pub type ManagedVarArgsEager<M, T> = ManagedMultiResultVecEager<M, T>;
+#[deprecated(
+    since = "0.29.0",
+    note = "Alias kept for backwards compatibility. Replace with `MultiValueManagedVec`"
+)]
+pub type ManagedVarArgsEager<M, T> = MultiValueManagedVec<M, T>;
 
-impl<M, T> From<ManagedVec<M, T>> for ManagedMultiResultVecEager<M, T>
+#[deprecated(
+    since = "0.29.0",
+    note = "Alias kept for backwards compatibility. Replace with `MultiValueManagedVec`"
+)]
+pub type ManagedMultiResultVecEager<M, T> = MultiValueManagedVec<M, T>;
+
+impl<M, T> From<ManagedVec<M, T>> for MultiValueManagedVec<M, T>
 where
     M: ManagedTypeApi,
     T: ManagedVecItem,
 {
     #[inline]
     fn from(managed_vec: ManagedVec<M, T>) -> Self {
-        ManagedMultiResultVecEager(managed_vec)
+        MultiValueManagedVec(managed_vec)
     }
 }
 
-impl<M, T> ManagedMultiResultVecEager<M, T>
+impl<M, T> MultiValueManagedVec<M, T>
 where
     M: ManagedTypeApi,
     T: ManagedVecItem,
 {
     #[inline]
     pub fn new() -> Self {
-        ManagedMultiResultVecEager(ManagedVec::new())
+        MultiValueManagedVec(ManagedVec::new())
     }
 
     #[inline]
@@ -67,7 +77,7 @@ where
     }
 
     pub fn from_single_item(item: T) -> Self {
-        let mut result = ManagedMultiResultVecEager::new();
+        let mut result = MultiValueManagedVec::new();
         result.push(item);
         result
     }
@@ -76,7 +86,7 @@ where
         self.0.overwrite_with_single_item(item)
     }
 
-    pub fn append_vec(&mut self, item: ManagedMultiResultVecEager<M, T>) {
+    pub fn append_vec(&mut self, item: MultiValueManagedVec<M, T>) {
         self.0.append_vec(item.0)
     }
 
@@ -100,7 +110,7 @@ where
     }
 }
 
-impl<M, T, I> From<Vec<I>> for ManagedMultiResultVecEager<M, T>
+impl<M, T, I> From<Vec<I>> for MultiValueManagedVec<M, T>
 where
     M: ManagedTypeApi,
     T: ManagedVecItem,
@@ -115,7 +125,7 @@ where
     }
 }
 
-impl<M, T> TopEncodeMulti for ManagedMultiResultVecEager<M, T>
+impl<M, T> TopEncodeMulti for MultiValueManagedVec<M, T>
 where
     M: ManagedTypeApi,
     T: ManagedVecItem + TopEncodeMulti,
@@ -134,7 +144,7 @@ where
     }
 }
 
-impl<M, T> TopDecodeMulti for ManagedMultiResultVecEager<M, T>
+impl<M, T> TopDecodeMulti for MultiValueManagedVec<M, T>
 where
     M: ManagedTypeApi,
     T: ManagedVecItem + TopDecodeMulti,
@@ -148,11 +158,11 @@ where
         while input.has_next() {
             result_vec.push(T::multi_decode_or_handle_err(input, h)?);
         }
-        Ok(ManagedMultiResultVecEager(result_vec))
+        Ok(MultiValueManagedVec(result_vec))
     }
 }
 
-impl<M, T: TypeAbi> TypeAbi for ManagedMultiResultVecEager<M, T>
+impl<M, T: TypeAbi> TypeAbi for MultiValueManagedVec<M, T>
 where
     M: ManagedTypeApi,
     T: ManagedVecItem,

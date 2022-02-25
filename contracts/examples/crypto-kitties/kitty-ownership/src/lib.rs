@@ -131,7 +131,7 @@ pub trait KittyOwnership {
     }
 
     #[view(tokensOfOwner)]
-    fn tokens_of_owner(&self, address: ManagedAddress) -> ManagedMultiResultVec<u32> {
+    fn tokens_of_owner(&self, address: ManagedAddress) -> MultiValueEncoded<u32> {
         let nr_owned_kitties = self.nr_owned_kitties(&address).get();
         let total_kitties = self.total_kitties().get();
         let mut kitty_list = ManagedVec::new();
