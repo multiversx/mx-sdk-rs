@@ -201,7 +201,7 @@ pub trait Erc1155 {
     }
 
     #[endpoint]
-    fn mint(&self, type_id: BigUint, amount: BigUint) -> SCResult<()> {
+    fn mint(&self, type_id: BigUint, amount: BigUint) {
         let creator = self.token_type_creator(&type_id).get();
 
         require!(
@@ -222,12 +222,10 @@ pub trait Erc1155 {
         }
 
         // self.transfer_single_event(&caller, &from, &to, &id, &amount);
-
-        Ok(())
     }
 
     #[endpoint]
-    fn burn(&self, type_id: BigUint, amount: BigUint) -> SCResult<()> {
+    fn burn(&self, type_id: BigUint, amount: BigUint) {
         require!(
             self.is_fungible(&type_id).get(),
             "Only fungible tokens can be burned"
@@ -239,8 +237,6 @@ pub trait Erc1155 {
         require!(balance >= amount, "Not enough tokens to burn");
 
         self.decrease_balance(&caller, &type_id, &amount);
-
-        Ok(())
     }
 
     // views

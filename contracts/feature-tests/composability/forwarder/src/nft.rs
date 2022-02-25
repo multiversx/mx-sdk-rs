@@ -197,7 +197,7 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
             bool,
             ManagedBuffer,
         >,
-    ) -> SCResult<()> {
+    ) {
         let attrs_pieces = attrs_arg.into_tuple();
         let orig_attr = ComplexAttributes {
             biguint: attrs_pieces.0,
@@ -235,7 +235,6 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
                 && orig_attr.boxed_bytes == decoded_attr.boxed_bytes,
             "orig_attr != decoded_attr"
         );
-        Ok(())
     }
 
     #[endpoint]

@@ -151,13 +151,9 @@ pub trait EchoTypes {
     }
 
     #[endpoint]
-    fn echo_async_result_empty(
-        &self,
-        #[var_args] a: AsyncCallResult<()>,
-    ) -> SCResult<(), ManagedSCError> {
-        match a {
-            AsyncCallResult::Ok(()) => Ok(()),
-            AsyncCallResult::Err(msg) => Err(msg.err_msg.into()),
+    fn echo_async_result_empty(&self, #[var_args] a: AsyncCallResult<()>) {
+        if let AsyncCallResult::Err(msg) = a {
+            sc_panic!(msg.err_msg.as_slice());
         }
     }
 

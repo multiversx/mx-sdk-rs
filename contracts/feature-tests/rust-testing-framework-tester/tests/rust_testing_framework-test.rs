@@ -170,7 +170,7 @@ fn test_assert_err_with_ok() {
             let second = managed_biguint!(2000);
 
             let _ = sc.sum_sc_result(first, second);
-            // assert_sc_error!(actual_result, "Non-zero required");
+            // assert_sc_panic!(actual_result, "Non-zero required");
         })
         .assert_user_error("Non-zero required");
 }

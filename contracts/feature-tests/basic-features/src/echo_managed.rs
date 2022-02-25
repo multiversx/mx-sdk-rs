@@ -73,13 +73,9 @@ pub trait EchoManagedTypes {
     }
 
     #[endpoint]
-    fn echo_managed_async_result_empty(
-        &self,
-        #[var_args] a: ManagedAsyncCallResult<()>,
-    ) -> SCResult<(), ManagedSCError> {
-        match a {
-            ManagedAsyncCallResult::Ok(()) => Ok(()),
-            ManagedAsyncCallResult::Err(msg) => Err(msg.err_msg.into()),
+    fn echo_managed_async_result_empty(&self, #[var_args] a: ManagedAsyncCallResult<()>) {
+        if let ManagedAsyncCallResult::Err(msg) = a {
+            sc_panic!(msg.err_msg)
         }
     }
 
