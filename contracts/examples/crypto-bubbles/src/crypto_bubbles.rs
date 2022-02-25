@@ -22,29 +22,25 @@ pub trait CryptoBubbles {
 
     /// player withdraws funds
     #[endpoint]
-    fn withdraw(&self, amount: &BigUint) -> SCResult<()> {
+    fn withdraw(&self, amount: &BigUint) {
         self.transfer_back_to_player_wallet(&self.blockchain().get_caller_legacy(), amount)
     }
 
     /// server calls withdraw on behalf of the player
-    fn transfer_back_to_player_wallet(&self, player: &Address, amount: &BigUint) -> SCResult<()> {
+    fn transfer_back_to_player_wallet(&self, player: &Address, amount: &BigUint) {
         self.player_balance(player).update(|balance| {
-            require_old!(
+            require!(
                 amount <= balance,
                 "amount to withdraw must be less or equal to balance"
             );
 
             *balance -= amount;
-
-            Ok(())
-        })?;
+        });
 
         self.send()
             .direct_egld(&player.into(), amount, b"crypto bubbles");
 
         self.withdraw_event(player, amount);
-
-        Ok(())
     }
 
     /// player joins game
@@ -53,24 +49,20 @@ pub trait CryptoBubbles {
         game_index: &BigUint,
         player: &Address,
         bet: &BigUint,
-    ) -> SCResult<()> {
+    ) {
         self.player_balance(player).update(|balance| {
-            require_old!(bet <= balance, "insufficient funds to join game");
+            require!(bet <= balance, "insufficient funds to join game");
 
             *balance -= bet;
-
-            Ok(())
-        })?;
+        });
 
         self.player_joins_game_event(game_index, player, bet);
-
-        Ok(())
     }
 
     // player tops up + joins a game
     #[payable("EGLD")]
     #[endpoint(joinGame)]
-    fn join_game(&self, game_index: BigUint, #[payment] bet: BigUint) -> SCResult<()> {
+    fn join_game(&self, game_index: BigUint, #[payment] bet: BigUint) {
         let player = self.blockchain().get_caller_legacy();
         self.top_up(bet.clone());
         self.add_player_to_game_state_change(&game_index, &player, &bet)
@@ -79,31 +71,18 @@ pub trait CryptoBubbles {
     // owner transfers prize into winner SC account
     #[only_owner]
     #[endpoint(rewardWinner)]
-    fn reward_winner(
-        &self,
-        game_index: &BigUint,
-        winner: &Address,
-        prize: &BigUint,
-    ) -> SCResult<()> {
+    fn reward_winner(&self, game_index: &BigUint, winner: &Address, prize: &BigUint) {
         self.player_balance(winner)
             .update(|balance| *balance += prize);
 
         self.reward_winner_event(game_index, winner, prize);
-
-        Ok(())
     }
 
     // owner transfers prize into winner SC account, then transfers funds to player wallet
     #[endpoint(rewardAndSendToWallet)]
-    fn reward_and_send_to_wallet(
-        &self,
-        game_index: &BigUint,
-        winner: &Address,
-        prize: &BigUint,
-    ) -> SCResult<()> {
-        self.reward_winner(game_index, winner, prize)?;
-        self.transfer_back_to_player_wallet(winner, prize)?;
-        Ok(())
+    fn reward_and_send_to_wallet(&self, game_index: &BigUint, winner: &Address, prize: &BigUint) {
+        self.reward_winner(game_index, winner, prize);
+        self.transfer_back_to_player_wallet(winner, prize);
     }
 
     // Storage
