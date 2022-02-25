@@ -19,7 +19,7 @@ pub trait PayableFeatures {
         token_ticker: ManagedBuffer,
         initial_supply: BigUint,
         _num_decimals: usize,
-        #[var_args] _token_properties: ManagedVarArgs<MultiValue2<ManagedBuffer, bool>>,
+        #[var_args] _token_properties: MultiValueEncoded<MultiValue2<ManagedBuffer, bool>>,
     ) -> TokenIdentifier {
         let new_token_id = self.create_new_token_id(token_ticker);
         require!(new_token_id.is_valid_esdt_identifier(), "Invalid token ID");
@@ -47,7 +47,7 @@ pub trait PayableFeatures {
         &self,
         _token_display_name: ManagedBuffer,
         token_ticker: ManagedBuffer,
-        #[var_args] _token_properties: ManagedVarArgs<MultiValue2<ManagedBuffer, bool>>,
+        #[var_args] _token_properties: MultiValueEncoded<MultiValue2<ManagedBuffer, bool>>,
     ) -> TokenIdentifier {
         self.create_new_token_id(token_ticker)
     }
@@ -58,7 +58,7 @@ pub trait PayableFeatures {
         &self,
         _token_display_name: ManagedBuffer,
         token_ticker: ManagedBuffer,
-        #[var_args] _token_properties: ManagedVarArgs<MultiValue2<ManagedBuffer, bool>>,
+        #[var_args] _token_properties: MultiValueEncoded<MultiValue2<ManagedBuffer, bool>>,
     ) -> TokenIdentifier {
         self.create_new_token_id(token_ticker)
     }
@@ -70,7 +70,7 @@ pub trait PayableFeatures {
         _token_display_name: ManagedBuffer,
         token_ticker: ManagedBuffer,
         _num_decimals: usize,
-        #[var_args] _token_properties: ManagedVarArgs<MultiValue2<ManagedBuffer, bool>>,
+        #[var_args] _token_properties: MultiValueEncoded<MultiValue2<ManagedBuffer, bool>>,
     ) -> TokenIdentifier {
         self.create_new_token_id(token_ticker)
     }
@@ -80,7 +80,7 @@ pub trait PayableFeatures {
         &self,
         _token_id: TokenIdentifier,
         _address: ManagedAddress,
-        #[var_args] _roles: ManagedVarArgs<EsdtLocalRole>,
+        #[var_args] _roles: MultiValueEncoded<EsdtLocalRole>,
     ) {
     }
 

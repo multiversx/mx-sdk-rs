@@ -1,9 +1,7 @@
 use crate::{
     api::{InvalidSliceError, ManagedTypeApi},
-    types::StaticBufferRef,
+    types::{ManagedBuffer, StaticBufferRef},
 };
-
-use super::ManagedBuffer;
 
 pub(crate) struct PreloadedManagedBuffer<M>
 where

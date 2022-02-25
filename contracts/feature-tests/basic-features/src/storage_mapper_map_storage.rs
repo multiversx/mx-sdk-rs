@@ -7,8 +7,8 @@ pub trait MapStorageMapperFeatures {
     fn map_storage_mapper(&self) -> MapStorageMapper<u32, MapMapper<u32, u32>>;
 
     #[view]
-    fn map_storage_mapper_view(&self) -> ManagedMultiResultVec<u32> {
-        let mut result = ManagedMultiResultVec::new();
+    fn map_storage_mapper_view(&self) -> MultiValueEncoded<u32> {
+        let mut result = MultiValueEncoded::new();
         for (key1, map) in self.map_storage_mapper().iter() {
             for (key2, value) in map.iter() {
                 result.push(key1);

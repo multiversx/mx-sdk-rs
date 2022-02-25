@@ -211,7 +211,7 @@ pub trait LocalEsdtAndEsdtNft {
         &self,
         address: ManagedAddress,
         token_identifier: TokenIdentifier,
-        #[var_args] roles: ManagedVarArgs<EsdtLocalRole>,
+        #[var_args] roles: MultiValueEncoded<EsdtLocalRole>,
     ) {
         self.send()
             .esdt_system_sc_proxy()
@@ -226,7 +226,7 @@ pub trait LocalEsdtAndEsdtNft {
         &self,
         address: ManagedAddress,
         token_identifier: TokenIdentifier,
-        #[var_args] roles: ManagedVarArgs<EsdtLocalRole>,
+        #[var_args] roles: MultiValueEncoded<EsdtLocalRole>,
     ) {
         self.send()
             .esdt_system_sc_proxy()

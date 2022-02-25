@@ -146,7 +146,7 @@ pub trait ForwarderAsyncCallModule {
     fn multi_transfer_via_async(
         &self,
         to: ManagedAddress,
-        #[var_args] token_payments: ManagedVarArgs<MultiValue3<TokenIdentifier, u64, BigUint>>,
+        #[var_args] token_payments: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>>,
     ) {
         let mut all_token_payments = ManagedVec::new();
 
@@ -182,7 +182,7 @@ pub trait ForwarderAsyncCallModule {
         TokenIdentifier,
         u64,
         BigUint,
-        ManagedMultiResultVecEager<Self::Api, ManagedBuffer>,
+        MultiValueManagedVec<Self::Api, ManagedBuffer>,
     > {
         let cb_data = self.callback_data().get(index);
         (
