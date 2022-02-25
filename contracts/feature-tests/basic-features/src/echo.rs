@@ -153,7 +153,7 @@ pub trait EchoTypes {
     #[endpoint]
     fn echo_async_result_empty(&self, #[var_args] a: AsyncCallResult<()>) {
         if let AsyncCallResult::Err(msg) = a {
-            sc_panic!(msg.err_msg.as_slice());
+            sc_panic!(msg.err_msg);
         }
     }
 
