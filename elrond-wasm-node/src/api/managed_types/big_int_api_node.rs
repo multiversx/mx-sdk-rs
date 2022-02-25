@@ -69,11 +69,6 @@ impl BigIntApi for crate::VmApiImpl {
     #[inline]
     #[allow(dead_code)]
     fn bi_new(&self, value: i64) -> Handle {
-        unsafe { bigIntNew(value) }
-    }
-
-    #[inline]
-    fn bi_new_handle(&self, value: i64) -> Handle {
         let handle = self.next_bigint_handle();
         self.bi_set_signed_bytes(handle, &value.to_be_bytes());
         handle

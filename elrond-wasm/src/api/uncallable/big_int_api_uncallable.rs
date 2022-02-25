@@ -10,10 +10,6 @@ impl BigIntApi for super::UncallableApi {
         unreachable!()
     }
 
-    fn bi_new_handle(&self, _value: i64) -> Handle {
-        unreachable!()
-    }
-
     fn bi_unsigned_byte_length(&self, _x: Handle) -> usize {
         unreachable!()
     }
