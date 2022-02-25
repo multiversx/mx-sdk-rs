@@ -9,7 +9,7 @@ pub trait ForwarderRolesModule: storage::ForwarderStorageModule {
         &self,
         address: ManagedAddress,
         token_identifier: TokenIdentifier,
-        #[var_args] roles: ManagedVarArgs<EsdtLocalRole>,
+        #[var_args] roles: MultiValueEncoded<EsdtLocalRole>,
     ) {
         self.send()
             .esdt_system_sc_proxy()
@@ -24,7 +24,7 @@ pub trait ForwarderRolesModule: storage::ForwarderStorageModule {
         &self,
         address: ManagedAddress,
         token_identifier: TokenIdentifier,
-        #[var_args] roles: ManagedVarArgs<EsdtLocalRole>,
+        #[var_args] roles: MultiValueEncoded<EsdtLocalRole>,
     ) {
         self.send()
             .esdt_system_sc_proxy()

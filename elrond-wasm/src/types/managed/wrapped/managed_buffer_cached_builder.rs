@@ -1,11 +1,11 @@
 use elrond_codec::{EncodeError, EncodeErrorHandler, NestedEncodeOutput, TryStaticCast};
 
 use crate::{
-    api::ManagedTypeApi, contract_base::ManagedSerializer, formatter::FormatReceiver,
-    types::StaticBufferRef,
+    api::ManagedTypeApi,
+    contract_base::ManagedSerializer,
+    formatter::FormatReceiver,
+    types::{BigInt, BigUint, ManagedBuffer, StaticBufferRef},
 };
-
-use super::{BigInt, BigUint, ManagedBuffer};
 
 pub struct ManagedBufferCachedBuilder<M>
 where

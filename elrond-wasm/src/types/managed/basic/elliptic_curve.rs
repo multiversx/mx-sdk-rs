@@ -8,9 +8,7 @@ use crate::{
 };
 use elrond_codec::*;
 
-use crate::types::BoxedBytes;
-
-use super::{BigUint, ManagedType};
+use crate::types::{BigUint, BoxedBytes, ManagedType};
 
 pub type EllipticCurveComponents<M> = (
     BigUint<M>,
