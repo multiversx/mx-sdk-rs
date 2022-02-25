@@ -10,10 +10,7 @@ pub trait ManagedAddressFeatures {
     }
 
     #[endpoint]
-    fn maddress_from_managed_buffer(
-        &self,
-        managed_buffer: ManagedBuffer,
-    ) -> SCResult<ManagedAddress> {
-        managed_buffer.try_into().into()
+    fn maddress_from_managed_buffer(&self, managed_buffer: ManagedBuffer) -> ManagedAddress {
+        managed_buffer.try_into().unwrap()
     }
 }
