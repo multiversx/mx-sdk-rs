@@ -43,7 +43,7 @@
             "expect": {
                 "out": [],
                 "status": "4",
-                "message": "str:panic occurred"
+                "message": "str:bad array length"
             }
         }
     ]
