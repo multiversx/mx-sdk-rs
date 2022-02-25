@@ -2,6 +2,7 @@ mod build_info_abi;
 mod contract_abi;
 mod endpoint_abi;
 mod type_abi;
+mod type_abi_impl_basic;
 mod type_abi_impl_codec_multi;
 mod type_description;
 mod type_description_container;
