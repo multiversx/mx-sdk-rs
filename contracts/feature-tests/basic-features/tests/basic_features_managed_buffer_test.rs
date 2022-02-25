@@ -12,14 +12,21 @@ fn test_managed_buffer_new_empty() {
 }
 
 #[test]
+#[should_panic]
+fn test_managed_buffer_set_slice_should_panic() {
+    let _ = DebugApi::dummy();
+    let bf = basic_features::contract_obj::<DebugApi>();
+    let buffer = bf.mbuffer_from_slice(&[1, 2, 3][..]);
+    let _ = bf.mbuffer_set_slice(buffer.clone(), 4, &[5]);
+}
+
+#[test]
 fn test_managed_buffer_set_slice() {
     let _ = DebugApi::dummy();
     let bf = basic_features::contract_obj::<DebugApi>();
     let buffer = bf.mbuffer_from_slice(&[1, 2, 3][..]);
-    let result = bf.mbuffer_set_slice(buffer.clone(), 4, &[5]);
-    assert!(result.is_err());
 
-    let set_result = bf.mbuffer_set_slice(buffer, 1, &[5][..]).unwrap();
+    let set_result = bf.mbuffer_set_slice(buffer, 1, &[5][..]);
     let expected_set_result = bf.mbuffer_from_slice(&[1, 5, 3][..]);
     assert_eq!(expected_set_result, set_result);
 }
