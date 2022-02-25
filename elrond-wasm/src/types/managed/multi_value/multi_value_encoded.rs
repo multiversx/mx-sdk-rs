@@ -36,13 +36,13 @@ where
 
 #[deprecated(
     since = "0.29.0",
-    note = "Alias kept for backwards compatibility. Replace with `ManagedMultiValue`"
+    note = "Alias kept for backwards compatibility. Replace with `MultiValueEncoded`"
 )]
 pub type ManagedVarArgs<M, T> = MultiValueEncoded<M, T>;
 
 #[deprecated(
     since = "0.29.0",
-    note = "Alias kept for backwards compatibility. Replace with `ManagedMultiValue`"
+    note = "Alias kept for backwards compatibility. Replace with `MultiValueEncoded`"
 )]
 pub type ManagedMultiResultVec<M, T> = MultiValueEncoded<M, T>;
 

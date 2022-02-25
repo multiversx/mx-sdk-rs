@@ -7,10 +7,8 @@ use elrond_codec::{
 use crate::{
     abi::TypeAbi,
     api::ManagedTypeApi,
-    types::{BigUint, ManagedVecItem},
+    types::{BigUint, EsdtTokenPayment, ManagedVecItem, TokenIdentifier},
 };
-
-use super::{EsdtTokenPayment, TokenIdentifier};
 
 /// Thin wrapper around EsdtTokenPayment, which has different I/O behaviour:
 /// - as input, is built from 3 arguments instead of 1: token identifier, nonce, value

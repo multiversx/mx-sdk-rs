@@ -1,9 +1,7 @@
 use crate::{
     api::ManagedTypeApi,
-    types::{BigUint, ManagedVecItem},
+    types::{BigUint, EsdtTokenType, ManagedVecItem, TokenIdentifier},
 };
-
-use super::{EsdtTokenType, TokenIdentifier};
 
 use elrond_codec::elrond_codec_derive::{NestedDecode, NestedEncode, TopDecode, TopEncode};
 
