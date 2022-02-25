@@ -1,4 +1,4 @@
-use elrond_codec::multi_types::{IgnoreValue, MultiValueVec, OptionalValue};
+use elrond_codec::multi_types::{IgnoreValue, OptionalValue};
 
 /// Structure that allows taking a variable number of arguments
 /// or returning a variable number of results in a smart contract endpoint.
@@ -6,7 +6,8 @@ use elrond_codec::multi_types::{IgnoreValue, MultiValueVec, OptionalValue};
     since = "0.28.0",
     note = "Alias kept for backwards compatibility. Replace with `MultiValueVec`"
 )]
-pub type MultiArgVec<T> = MultiValueVec<T>;
+#[cfg(feature = "alloc")]
+pub type MultiArgVec<T> = elrond_codec::multi_types::MultiValueVec<T>;
 
 /// Used for taking a variable number of arguments in an endpoint,
 /// it is synonymous with `MultiResultVec`/`MultiArgVec`.
@@ -14,7 +15,8 @@ pub type MultiArgVec<T> = MultiValueVec<T>;
     since = "0.28.0",
     note = "Alias kept for backwards compatibility. Replace with `MultiValueVec`"
 )]
-pub type VarArgs<T> = MultiArgVec<T>;
+#[cfg(feature = "alloc")]
+pub type VarArgs<T> = elrond_codec::multi_types::MultiValueVec<T>;
 
 /// Used for returning a variable number of results from an endpoint,
 /// it is synonymous with `MultiResult`.
@@ -22,7 +24,8 @@ pub type VarArgs<T> = MultiArgVec<T>;
     since = "0.28.0",
     note = "Alias kept for backwards compatibility. Replace with `MultiValueVec`"
 )]
-pub type MultiResultVec<T> = VarArgs<T>;
+#[cfg(feature = "alloc")]
+pub type MultiResultVec<T> = elrond_codec::multi_types::MultiValueVec<T>;
 
 /// Structure that allows taking a variable number of arguments,
 /// but does nothing with them, not even deserialization.

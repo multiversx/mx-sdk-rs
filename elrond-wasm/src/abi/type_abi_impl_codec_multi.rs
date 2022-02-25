@@ -1,13 +1,11 @@
 use crate::abi::{OutputAbi, TypeAbi, TypeDescriptionContainer};
 use alloc::{string::String, vec::Vec};
-use elrond_codec::multi_types::{IgnoreValue, MultiValueVec, OptionalValue};
+use elrond_codec::multi_types::{IgnoreValue, OptionalValue};
 
-impl<T: TypeAbi> TypeAbi for MultiValueVec<T> {
+#[cfg(feature = "alloc")]
+impl<T: TypeAbi> TypeAbi for elrond_codec::multi_types::MultiValueVec<T> {
     fn type_name() -> String {
-        let mut repr = String::from("variadic<");
-        repr.push_str(T::type_name().as_str());
-        repr.push('>');
-        repr
+        super::type_name_variadic::<T>()
     }
 
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
@@ -31,10 +29,7 @@ impl TypeAbi for IgnoreValue {
 
 impl<T: TypeAbi> TypeAbi for OptionalValue<T> {
     fn type_name() -> String {
-        let mut repr = String::from("optional<");
-        repr.push_str(T::type_name().as_str());
-        repr.push('>');
-        repr
+        super::type_name_optional::<T>()
     }
 
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {

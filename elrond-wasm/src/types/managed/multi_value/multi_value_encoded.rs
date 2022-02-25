@@ -3,9 +3,7 @@ use crate::{
     api::{ErrorApi, ManagedTypeApi},
     contract_base::{ExitCodecErrorHandler, ManagedSerializer},
     err_msg,
-    types::{
-        ManagedArgBuffer, ManagedBuffer, ManagedType, ManagedVec, ManagedVecItem, MultiResultVec,
-    },
+    types::{ManagedArgBuffer, ManagedBuffer, ManagedType, ManagedVec, ManagedVecItem},
 };
 use alloc::string::String;
 use core::marker::PhantomData;
@@ -218,7 +216,7 @@ where
     T: TypeAbi,
 {
     fn type_name() -> String {
-        MultiResultVec::<T>::type_name()
+        crate::abi::type_name_variadic::<T>()
     }
 
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {

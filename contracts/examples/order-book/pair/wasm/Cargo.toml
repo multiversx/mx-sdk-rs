@@ -25,6 +25,7 @@ path = ".."
 [dependencies.elrond-wasm-node]
 version = "0.28.0"
 path = "../../../../../elrond-wasm-node"
+features = ["alloc"]
 
 [dependencies.elrond-wasm-output]
 version = "0.28.0"
