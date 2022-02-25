@@ -1,6 +1,6 @@
 use crate::DebugApi;
 use elrond_wasm::{
-    api::{CryptoApi, CryptoApiImpl},
+    api::{CryptoApi, CryptoApiImpl, Handle, ManagedBufferApi},
     types::{BoxedBytes, MessageHashType, H256},
 };
 use sha2::Sha256;
@@ -14,12 +14,23 @@ impl CryptoApi for DebugApi {
     }
 }
 
-impl CryptoApiImpl for DebugApi {
-    fn sha256_legacy(&self, data: &[u8]) -> H256 {
+impl DebugApi {
+    fn sha256_value(&self, data: &[u8]) -> [u8; 32] {
         let mut hasher = Sha256::new();
         hasher.update(data);
-        let hash: [u8; 32] = hasher.finalize().into();
-        hash.into()
+        hasher.finalize().into()
+    }
+}
+
+impl CryptoApiImpl for DebugApi {
+    #[cfg(feature = "alloc")]
+    fn sha256_legacy(&self, data: &[u8]) -> H256 {
+        self.sha256_value(data).into()
+    }
+
+    fn sha256(&self, data_handle: Handle) -> Handle {
+        let value = self.sha256_value(self.mb_to_boxed_bytes(data_handle).as_slice());
+        self.mb_new_from_bytes(&value[..])
     }
 
     fn keccak256_legacy(&self, data: &[u8]) -> H256 {
