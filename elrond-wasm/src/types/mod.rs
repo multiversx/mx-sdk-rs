@@ -1,5 +1,5 @@
 mod crypto;
-mod general;
+mod flags;
 mod heap;
 mod interaction;
 mod io;
@@ -8,7 +8,7 @@ mod static_buffer;
 
 pub use super::{Box, Vec};
 pub use crypto::*;
-pub use general::*;
+pub use flags::*;
 pub use heap::*;
 pub use interaction::*;
 pub use io::*;
