@@ -33,7 +33,7 @@ pub trait Lottery {
         opt_max_entries_per_user: Option<u32>,
         opt_prize_distribution: Option<Vec<u8>>,
         opt_whitelist: Option<Vec<ManagedAddress>>,
-    ) -> SCResult<()> {
+    ) {
         self.start_lottery(
             lottery_name,
             ticket_price,
@@ -55,7 +55,7 @@ pub trait Lottery {
         opt_max_entries_per_user: Option<u32>,
         opt_prize_distribution: Option<Vec<u8>>,
         opt_whitelist: Option<Vec<ManagedAddress>>,
-    ) -> SCResult<()> {
+    ) {
         self.start_lottery(
             lottery_name,
             ticket_price,
@@ -77,7 +77,7 @@ pub trait Lottery {
         opt_max_entries_per_user: Option<u32>,
         opt_prize_distribution: Option<Vec<u8>>,
         opt_whitelist: Option<Vec<ManagedAddress>>,
-    ) -> SCResult<()> {
+    ) {
         require!(!lottery_name.is_empty(), "Name can't be empty!");
 
         let timestamp = self.blockchain().get_block_timestamp();
@@ -131,8 +131,6 @@ pub trait Lottery {
         };
 
         self.set_lottery_info(&lottery_name, &info);
-
-        Ok(())
     }
 
     #[endpoint]

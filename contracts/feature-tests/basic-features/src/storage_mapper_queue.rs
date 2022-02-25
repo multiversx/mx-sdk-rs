@@ -24,6 +24,6 @@ pub trait QueueMapperFeatures {
         if let Some(front) = self.queue_mapper().front() {
             return Ok(front);
         }
-        sc_error!("Queue empty!")
+        sc_panic!("Queue empty!")
     }
 }

@@ -40,12 +40,12 @@ pub trait ManagedVecFeatures {
         mv: ManagedVec<BigUint>,
         index: usize,
         item: &BigUint,
-    ) -> SCResult<ManagedVec<BigUint>> {
+    ) -> ManagedVec<BigUint> {
         let mut result = mv;
         if result.set(index, item).is_ok() {
-            Ok(result)
+            result
         } else {
-            Err("index out of bounds".into())
+            sc_panic!("index out of bounds")
         }
     }
 }
