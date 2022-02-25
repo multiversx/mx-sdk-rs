@@ -10,10 +10,6 @@ authors = [ "you",]
 [dependencies.formatted-message-features]
 path = ".."
 
-[dependencies.elrond-wasm]
-version = "0.28.0"
-path = "../../../../elrond-wasm"
-
 [dependencies.elrond-wasm-debug]
 version = "0.28.0"
 path = "../../../../elrond-wasm-debug"
