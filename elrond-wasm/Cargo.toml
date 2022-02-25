@@ -15,6 +15,7 @@ categories = ["no-std", "wasm", "cryptography::cryptocurrencies", "development-t
 
 [features]
 cb_closure_managed_deser = []
+alloc = ["elrond-codec/alloc"]
 
 [dependencies]
 wee_alloc = "0.4"
