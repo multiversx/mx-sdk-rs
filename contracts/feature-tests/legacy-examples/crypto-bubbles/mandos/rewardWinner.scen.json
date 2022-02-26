@@ -1,0 +1,79 @@
+{
+    "name": "rewardWinner",
+    "gasSchedule": "dummy",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:crypto_bubbles_owner": {
+                    "nonce": "0",
+                    "balance": "0x10000000"
+                },
+                "sc:crypto_bubbles": {
+                    "nonce": "0",
+                    "balance": "0x100",
+                    "storage": {
+                        "str:playerBalance|address:acc1": "0x100",
+                        "str:playerBalance|address:acc2": "0x100"
+                    },
+                    "code": "file:../output/crypto-bubbles.wasm",
+                    "owner": "address:crypto_bubbles_owner"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "2",
+            "tx": {
+                "from": "address:crypto_bubbles_owner",
+                "to": "sc:crypto_bubbles",
+                "function": "rewardWinner",
+                "arguments": [
+                    "0x12",
+                    "address:acc1",
+                    "0x200"
+                ],
+                "gasLimit": "0x100000",
+                "gasPrice": "0x01"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": [
+                    {
+                        "address": "sc:crypto_bubbles",
+                        "endpoint": "str:rewardWinner",
+                        "topics": [
+                            "0x1000000000000000000000000000000000000000000000000000000000000004",
+                            "0x0000000000000000000000000000000000000000000000000000000000000012",
+                            "address:acc1"
+                        ],
+                        "data": "0x200"
+                    }
+                ],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:crypto_bubbles_owner": {
+                    "nonce": "1",
+                    "balance": "0xff00000",
+                    "storage": {},
+                    "code": ""
+                },
+                "sc:crypto_bubbles": {
+                    "nonce": "0",
+                    "balance": "0x100",
+                    "storage": {
+                        "str:playerBalance|address:acc1": "0x300",
+                        "str:playerBalance|address:acc2": "0x100"
+                    },
+                    "code": "file:../output/crypto-bubbles.wasm"
+                }
+            }
+        }
+    ]
+}
