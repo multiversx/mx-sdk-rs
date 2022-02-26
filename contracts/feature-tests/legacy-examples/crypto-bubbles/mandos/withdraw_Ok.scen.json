@@ -1,0 +1,84 @@
+{
+    "name": "withdraw_Ok",
+    "gasSchedule": "dummy",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:crypto_bubbles_owner": {
+                    "nonce": "0",
+                    "balance": "0"
+                },
+                "sc:crypto_bubbles": {
+                    "nonce": "0",
+                    "balance": "0x100",
+                    "storage": {
+                        "str:playerBalance|address:acc1": "0x100"
+                    },
+                    "code": "file:../output/crypto-bubbles.wasm"
+                },
+                "address:acc1": {
+                    "nonce": "0",
+                    "balance": "0x200000"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "1",
+            "tx": {
+                "from": "address:acc1",
+                "to": "sc:crypto_bubbles",
+                "function": "withdraw",
+                "arguments": [
+                    "0x10"
+                ],
+                "gasLimit": "0x200000",
+                "gasPrice": "0x01"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": [
+                    {
+                        "address": "sc:crypto_bubbles",
+                        "endpoint": "str:withdraw",
+                        "topics": [
+                            "0x1000000000000000000000000000000000000000000000000000000000000002",
+                            "address:acc1"
+                        ],
+                        "data": "0x10"
+                    }
+                ],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:crypto_bubbles_owner": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": ""
+                },
+                "sc:crypto_bubbles": {
+                    "nonce": "0",
+                    "balance": "0xf0",
+                    "storage": {
+                        "str:playerBalance|address:acc1": "0xf0"
+                    },
+                    "code": "file:../output/crypto-bubbles.wasm"
+                },
+                "address:acc1": {
+                    "nonce": "1",
+                    "balance": "0x10",
+                    "storage": {},
+                    "code": "",
+                    "asyncCallData": "str:crypto bubbles"
+                }
+            }
+        }
+    ]
+}
