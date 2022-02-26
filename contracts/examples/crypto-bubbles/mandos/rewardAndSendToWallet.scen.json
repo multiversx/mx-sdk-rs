@@ -48,8 +48,8 @@
                         "address": "sc:crypto_bubbles",
                         "endpoint": "str:rewardAndSendToWallet",
                         "topics": [
-                            "0x1000000000000000000000000000000000000000000000000000000000000004",
-                            "0x0000000000000000000000000000000000000000000000000000000000000012",
+                            "str:reward_winner",
+                            "0x12",
                             "address:acc1"
                         ],
                         "data": "0x200"
@@ -58,7 +58,7 @@
                         "address": "sc:crypto_bubbles",
                         "endpoint": "str:rewardAndSendToWallet",
                         "topics": [
-                            "0x1000000000000000000000000000000000000000000000000000000000000002",
+                            "str:withdraw",
                             "address:acc1"
                         ],
                         "data": "0x200"
