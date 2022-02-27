@@ -1,5 +1,5 @@
 {
-    "name": "topUp_ok",
+    "name": "topUp_withdraw",
     "gasSchedule": "dummy",
     "steps": [
         {
@@ -12,15 +12,11 @@
                 "sc:crypto_bubbles": {
                     "nonce": "0",
                     "balance": "0",
-                    "code": "file:../output/crypto-bubbles.wasm"
+                    "code": "file:../output/crypto-bubbles-legacy.wasm"
                 },
                 "address:acc1": {
                     "nonce": "0",
-                    "balance": "0x100800"
-                },
-                "address:acc2": {
-                    "nonce": "0",
-                    "balance": "0x100800"
+                    "balance": "0x7200000"
                 }
             }
         },
@@ -30,7 +26,7 @@
             "tx": {
                 "from": "address:acc1",
                 "to": "sc:crypto_bubbles",
-                "egldValue": "0x100",
+                "egldValue": "0x4000000",
                 "function": "topUp",
                 "arguments": [],
                 "gasLimit": "0x100000",
@@ -47,7 +43,7 @@
                             "0x1000000000000000000000000000000000000000000000000000000000000001",
                             "address:acc1"
                         ],
-                        "data": "0x0100"
+                        "data": "0x4000000"
                     }
                 ],
                 "gas": "*",
@@ -58,11 +54,12 @@
             "step": "scCall",
             "txId": "2",
             "tx": {
-                "from": "address:acc2",
+                "from": "address:acc1",
                 "to": "sc:crypto_bubbles",
-                "egldValue": "0x100",
-                "function": "topUp",
-                "arguments": [],
+                "function": "withdraw",
+                "arguments": [
+                    "0x4000000"
+                ],
                 "gasLimit": "0x100000",
                 "gasPrice": "0x01"
             },
@@ -72,12 +69,12 @@
                 "logs": [
                     {
                         "address": "sc:crypto_bubbles",
-                        "endpoint": "str:topUp",
+                        "endpoint": "str:withdraw",
                         "topics": [
-                            "0x1000000000000000000000000000000000000000000000000000000000000001",
-                            "address:acc2"
+                            "0x1000000000000000000000000000000000000000000000000000000000000002",
+                            "address:acc1"
                         ],
-                        "data": "0x0100"
+                        "data": "0x4000000"
                     }
                 ],
                 "gas": "*",
@@ -95,24 +92,16 @@
                 },
                 "sc:crypto_bubbles": {
                     "nonce": "0",
-                    "balance": "0x200",
-                    "storage": {
-                        "str:playerBalance|address:acc1": "0x100",
-                        "str:playerBalance|address:acc2": "0x100"
-                    },
-                    "code": "file:../output/crypto-bubbles.wasm"
+                    "balance": "0",
+                    "storage": {},
+                    "code": "file:../output/crypto-bubbles-legacy.wasm"
                 },
                 "address:acc1": {
-                    "nonce": "1",
-                    "balance": "0x700",
+                    "nonce": "2",
+                    "balance": "0x7000000",
                     "storage": {},
-                    "code": ""
-                },
-                "address:acc2": {
-                    "nonce": "1",
-                    "balance": "0x700",
-                    "storage": {},
-                    "code": ""
+                    "code": "",
+                    "asyncCallData": "str:crypto bubbles"
                 }
             }
         }
