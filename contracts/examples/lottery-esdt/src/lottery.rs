@@ -5,12 +5,14 @@ elrond_wasm::imports!();
 mod lottery_info;
 mod status;
 
+use core::convert::TryInto;
+
 use lottery_info::LotteryInfo;
 use status::Status;
 
 const PERCENTAGE_TOTAL: u32 = 100;
 const THIRTY_DAYS_IN_SECONDS: u64 = 60 * 60 * 24 * 30;
-const MAX_TICKETS: u32 = 800;
+const MAX_TICKETS: usize = 800;
 
 #[elrond_wasm::contract]
 pub trait Lottery {
@@ -84,10 +86,11 @@ pub trait Lottery {
     ) {
         require!(!lottery_name.is_empty(), "Name can't be empty!");
 
+        let max_tickets = MAX_TICKETS.try_into().unwrap();
         let timestamp = self.blockchain().get_block_timestamp();
-        let total_tickets = opt_total_tickets.unwrap_or(MAX_TICKETS);
+        let total_tickets = opt_total_tickets.unwrap_or(max_tickets);
         let deadline = opt_deadline.unwrap_or(timestamp + THIRTY_DAYS_IN_SECONDS);
-        let max_entries_per_user = opt_max_entries_per_user.unwrap_or(MAX_TICKETS);
+        let max_entries_per_user = opt_max_entries_per_user.unwrap_or(max_tickets);
         let prize_distribution = opt_prize_distribution
             .unwrap_or_else(|| ManagedVec::from_single_item(PERCENTAGE_TOTAL as u8));
 
@@ -106,7 +109,7 @@ pub trait Lottery {
             "Must have more than 0 tickets available!"
         );
         require!(
-            total_tickets <= MAX_TICKETS,
+            total_tickets <= max_tickets,
             "Only 800 or less total tickets per lottery are allowed!"
         );
         require!(deadline > timestamp, "Deadline can't be in the past!");
@@ -337,8 +340,18 @@ pub trait Lottery {
     // Normally, we recommend managed types, like ManagedVec > Vec, ManagedBuffer > BoxedBytes, etc.
     // But in this case, ManagedVec would need too many API calls for this algorithm
     /// does not check if max - min >= amount, that is the caller's job
-    fn get_distinct_random(&self, min: usize, max: usize, amount: usize) -> Vec<usize> {
-        let mut rand_numbers: Vec<usize> = (min..=max).collect();
+    fn get_distinct_random(
+        &self,
+        min: usize,
+        max: usize,
+        amount: usize,
+    ) -> ArrayVec<usize, MAX_TICKETS> {
+        let mut rand_numbers = ArrayVec::new();
+
+        for num in min..=max {
+            rand_numbers.push(num);
+        }
+
         let total_numbers = rand_numbers.len();
         let mut rand = RandomnessSource::<Self::Api>::new();
 
