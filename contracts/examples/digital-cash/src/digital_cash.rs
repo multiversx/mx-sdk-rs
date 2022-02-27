@@ -9,6 +9,15 @@ use deposit_info::DepositInfo;
 
 pub const SECONDS_PER_ROUND: u64 = 6;
 
+extern "C" {
+    fn verifyEd25519(
+        keyOffset: *const u8,
+        messageOffset: *const u8,
+        messageLength: i32,
+        sigOffset: *const u8,
+    ) -> i32;
+}
+
 #[elrond_wasm::contract]
 pub trait DigitalCash {
     #[init]
@@ -54,6 +63,7 @@ pub trait DigitalCash {
             &deposit.amount,
             b"successful withdrawal",
         );
+
         self.deposit(&address).clear();
     }
 
@@ -68,14 +78,34 @@ pub trait DigitalCash {
             deposit.expiration_round >= self.blockchain().get_block_round(),
             "deposit expired"
         );
+
+        const HASH_DATA_BUFFER_LEN: usize = 1024;
+
+        let sig_len = signature.len();
         require!(
-            self.crypto().verify_ed25519(
-                &address.to_byte_array()[..],
-                &caller_address.to_byte_array()[..],
-                signature.to_boxed_bytes().as_slice()
-            ),
-            "invalid signature"
+            sig_len <= HASH_DATA_BUFFER_LEN,
+            "Attributes too long, cannot copy into static buffer"
         );
+
+        let mut signature_buffer = [0u8; HASH_DATA_BUFFER_LEN];
+
+        let signature_buffer_slice = &mut signature_buffer[..sig_len];
+        let load_result = signature.load_slice(0, signature_buffer_slice);
+        require!(load_result.is_ok(), "Failed to load attributes into buffer");
+
+        unsafe {
+            let key = &address.to_byte_array()[..];
+            let message = &caller_address.to_byte_array()[..];
+            require!(
+                verifyEd25519(
+                    key.as_ptr(),
+                    message.as_ptr(),
+                    message.len() as i32,
+                    signature_buffer_slice.as_ptr(),
+                ) == 0,
+                "invalid signature"
+            );
+        }
 
         self.send().direct(
             &caller_address,
