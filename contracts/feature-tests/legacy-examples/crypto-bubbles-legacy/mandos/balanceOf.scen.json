@@ -1,5 +1,5 @@
 {
-    "name": "withdraw_Ok",
+    "name": "balanceOf",
     "gasSchedule": "dummy",
     "steps": [
         {
@@ -9,17 +9,17 @@
                     "nonce": "0",
                     "balance": "0"
                 },
-                "sc:crypto_bubbles": {
+                "sc:crypto_bubbles_legacy": {
                     "nonce": "0",
                     "balance": "0x100",
                     "storage": {
-                        "str:playerBalance|address:acc1": "0x100"
+                        "str:playerBalance|address:acc2": "0x100"
                     },
                     "code": "file:../output/crypto-bubbles.wasm"
                 },
                 "address:acc1": {
                     "nonce": "0",
-                    "balance": "0x200000"
+                    "balance": "0x300abc"
                 }
             }
         },
@@ -28,28 +28,43 @@
             "txId": "1",
             "tx": {
                 "from": "address:acc1",
-                "to": "sc:crypto_bubbles",
-                "function": "withdraw",
+                "to": "sc:crypto_bubbles_legacy",
+                "function": "balanceOf",
                 "arguments": [
-                    "0x10"
+                    "address:acc2"
                 ],
-                "gasLimit": "0x200000",
+                "gasLimit": "0x100000",
                 "gasPrice": "0x01"
             },
             "expect": {
-                "out": [],
-                "status": "",
-                "logs": [
-                    {
-                        "address": "sc:crypto_bubbles",
-                        "endpoint": "str:withdraw",
-                        "topics": [
-                            "0x1000000000000000000000000000000000000000000000000000000000000002",
-                            "address:acc1"
-                        ],
-                        "data": "0x10"
-                    }
+                "out": [
+                    "0x100"
                 ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "2",
+            "tx": {
+                "from": "address:acc1",
+                "to": "sc:crypto_bubbles_legacy",
+                "function": "balanceOf",
+                "arguments": [
+                    "address:acc3"
+                ],
+                "gasLimit": "0x100000",
+                "gasPrice": "0x01"
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ],
+                "status": "",
+                "logs": [],
                 "gas": "*",
                 "refund": "*"
             }
@@ -63,20 +78,19 @@
                     "storage": {},
                     "code": ""
                 },
-                "sc:crypto_bubbles": {
+                "sc:crypto_bubbles_legacy": {
                     "nonce": "0",
-                    "balance": "0xf0",
+                    "balance": "0x100",
                     "storage": {
-                        "str:playerBalance|address:acc1": "0xf0"
+                        "str:playerBalance|address:acc2": "0x100"
                     },
                     "code": "file:../output/crypto-bubbles.wasm"
                 },
                 "address:acc1": {
-                    "nonce": "1",
-                    "balance": "0x10",
+                    "nonce": "2",
+                    "balance": "0x100abc",
                     "storage": {},
-                    "code": "",
-                    "asyncCallData": "str:crypto bubbles"
+                    "code": ""
                 }
             }
         }

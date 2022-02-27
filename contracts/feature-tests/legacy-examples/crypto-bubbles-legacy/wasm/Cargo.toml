@@ -1,5 +1,5 @@
 [package]
-name = "crypto-bubbles-wasm"
+name = "crypto-bubbles-legacy/wasm"
 version = "0.0.0"
 authors = ["Andrei Marinica <andrei.marinica@elrond.com>"]
 edition = "2018"
@@ -15,16 +15,16 @@ lto = true
 debug = false
 panic = "abort"
 
-[dependencies.crypto-bubbles]
+[dependencies.crypto-bubbles-legacy]
 path = ".."
 
 [dependencies.elrond-wasm-node]
 version = "0.28.0"
-path = "../../../../elrond-wasm-node"
+path = "../../../../../elrond-wasm-node"
 
 [dependencies.elrond-wasm-output]
 version = "0.28.0"
-path = "../../../../elrond-wasm-output"
+path = "../../../../../elrond-wasm-output"
 features = ["wasm-output-mode"]
 
 [workspace]

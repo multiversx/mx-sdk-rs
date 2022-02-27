@@ -9,7 +9,7 @@
                     "nonce": "0",
                     "balance": "0x10000000"
                 },
-                "sc:crypto_bubbles": {
+                "sc:crypto_bubbles_legacy": {
                     "nonce": "0",
                     "balance": "0x100",
                     "storage": {
@@ -33,7 +33,7 @@
             "txId": "1",
             "tx": {
                 "from": "address:acc1",
-                "to": "sc:crypto_bubbles",
+                "to": "sc:crypto_bubbles_legacy",
                 "egldValue": "0x200",
                 "function": "joinGame",
                 "arguments": [
@@ -47,7 +47,7 @@
                 "status": "",
                 "logs": [
                     {
-                        "address": "sc:crypto_bubbles",
+                        "address": "sc:crypto_bubbles_legacy",
                         "endpoint": "str:joinGame",
                         "topics": [
                             "0x1000000000000000000000000000000000000000000000000000000000000001",
@@ -56,7 +56,7 @@
                         "data": "0x0200"
                     },
                     {
-                        "address": "sc:crypto_bubbles",
+                        "address": "sc:crypto_bubbles_legacy",
                         "endpoint": "str:joinGame",
                         "topics": [
                             "0x1000000000000000000000000000000000000000000000000000000000000003",
@@ -75,7 +75,7 @@
             "txId": "2",
             "tx": {
                 "from": "address:acc2",
-                "to": "sc:crypto_bubbles",
+                "to": "sc:crypto_bubbles_legacy",
                 "egldValue": "0x150",
                 "function": "joinGame",
                 "arguments": [
@@ -89,7 +89,7 @@
                 "status": "",
                 "logs": [
                     {
-                        "address": "sc:crypto_bubbles",
+                        "address": "sc:crypto_bubbles_legacy",
                         "endpoint": "str:joinGame",
                         "topics": [
                             "0x1000000000000000000000000000000000000000000000000000000000000001",
@@ -98,7 +98,7 @@
                         "data": "0x150"
                     },
                     {
-                        "address": "sc:crypto_bubbles",
+                        "address": "sc:crypto_bubbles_legacy",
                         "endpoint": "str:joinGame",
                         "topics": [
                             "0x1000000000000000000000000000000000000000000000000000000000000003",
@@ -117,7 +117,7 @@
             "txId": "3",
             "tx": {
                 "from": "address:acc2",
-                "to": "sc:crypto_bubbles",
+                "to": "sc:crypto_bubbles_legacy",
                 "egldValue": "0x2000",
                 "function": "joinGame",
                 "arguments": [
@@ -131,7 +131,7 @@
                 "status": "",
                 "logs": [
                     {
-                        "address": "sc:crypto_bubbles",
+                        "address": "sc:crypto_bubbles_legacy",
                         "endpoint": "str:joinGame",
                         "topics": [
                             "0x1000000000000000000000000000000000000000000000000000000000000001",
@@ -140,7 +140,7 @@
                         "data": "0x2000"
                     },
                     {
-                        "address": "sc:crypto_bubbles",
+                        "address": "sc:crypto_bubbles_legacy",
                         "endpoint": "str:joinGame",
                         "topics": [
                             "0x1000000000000000000000000000000000000000000000000000000000000003",
@@ -163,7 +163,7 @@
                     "storage": {},
                     "code": ""
                 },
-                "sc:crypto_bubbles": {
+                "sc:crypto_bubbles_legacy": {
                     "nonce": "0",
                     "balance": "0x2450",
                     "storage": {

@@ -9,7 +9,7 @@
                     "nonce": "0",
                     "balance": "0x1000000"
                 },
-                "sc:crypto_bubbles": {
+                "sc:crypto_bubbles_legacy": {
                     "nonce": "0",
                     "balance": "0x1300",
                     "code": "file:../output/crypto-bubbles.wasm",
@@ -22,7 +22,7 @@
             "txId": "1",
             "tx": {
                 "from": "address:crypto_bubbles_owner",
-                "to": "sc:crypto_bubbles",
+                "to": "sc:crypto_bubbles_legacy",
                 "function": "rewardWinner",
                 "arguments": [
                     "0x12",
@@ -46,7 +46,7 @@
             "txId": "2",
             "tx": {
                 "from": "address:crypto_bubbles_owner",
-                "to": "sc:crypto_bubbles",
+                "to": "sc:crypto_bubbles_legacy",
                 "function": "balanceOf",
                 "arguments": [
                     "0x22acc1000000000000000000000000000000000000000000000000000000000000"
@@ -72,7 +72,7 @@
                     "storage": {},
                     "code": ""
                 },
-                "sc:crypto_bubbles": {
+                "sc:crypto_bubbles_legacy": {
                     "nonce": "0",
                     "balance": "0x1300",
                     "storage": {},

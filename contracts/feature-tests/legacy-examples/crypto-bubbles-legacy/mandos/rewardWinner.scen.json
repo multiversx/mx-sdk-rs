@@ -1,5 +1,5 @@
 {
-    "name": "rewardAndSendToWallet",
+    "name": "rewardWinner",
     "gasSchedule": "dummy",
     "steps": [
         {
@@ -9,29 +9,25 @@
                     "nonce": "0",
                     "balance": "0x10000000"
                 },
-                "sc:crypto_bubbles": {
+                "sc:crypto_bubbles_legacy": {
                     "nonce": "0",
-                    "balance": "0x1000",
+                    "balance": "0x100",
                     "storage": {
                         "str:playerBalance|address:acc1": "0x100",
                         "str:playerBalance|address:acc2": "0x100"
                     },
                     "code": "file:../output/crypto-bubbles.wasm",
                     "owner": "address:crypto_bubbles_owner"
-                },
-                "address:acc1": {
-                    "nonce": "0",
-                    "balance": "0"
                 }
             }
         },
         {
             "step": "scCall",
-            "txId": "1",
+            "txId": "2",
             "tx": {
                 "from": "address:crypto_bubbles_owner",
-                "to": "sc:crypto_bubbles",
-                "function": "rewardAndSendToWallet",
+                "to": "sc:crypto_bubbles_legacy",
+                "function": "rewardWinner",
                 "arguments": [
                     "0x12",
                     "address:acc1",
@@ -45,20 +41,11 @@
                 "status": "",
                 "logs": [
                     {
-                        "address": "sc:crypto_bubbles",
-                        "endpoint": "str:rewardAndSendToWallet",
+                        "address": "sc:crypto_bubbles_legacy",
+                        "endpoint": "str:rewardWinner",
                         "topics": [
                             "0x1000000000000000000000000000000000000000000000000000000000000004",
                             "0x0000000000000000000000000000000000000000000000000000000000000012",
-                            "address:acc1"
-                        ],
-                        "data": "0x200"
-                    },
-                    {
-                        "address": "sc:crypto_bubbles",
-                        "endpoint": "str:rewardAndSendToWallet",
-                        "topics": [
-                            "0x1000000000000000000000000000000000000000000000000000000000000002",
                             "address:acc1"
                         ],
                         "data": "0x200"
@@ -77,21 +64,14 @@
                     "storage": {},
                     "code": ""
                 },
-                "sc:crypto_bubbles": {
+                "sc:crypto_bubbles_legacy": {
                     "nonce": "0",
-                    "balance": "0xe00",
+                    "balance": "0x100",
                     "storage": {
-                        "str:playerBalance|address:acc1": "0x100",
+                        "str:playerBalance|address:acc1": "0x300",
                         "str:playerBalance|address:acc2": "0x100"
                     },
                     "code": "file:../output/crypto-bubbles.wasm"
-                },
-                "address:acc1": {
-                    "nonce": "0",
-                    "balance": "0x200",
-                    "storage": {},
-                    "code": "",
-                    "asyncCallData": "str:crypto bubbles"
                 }
             }
         }
