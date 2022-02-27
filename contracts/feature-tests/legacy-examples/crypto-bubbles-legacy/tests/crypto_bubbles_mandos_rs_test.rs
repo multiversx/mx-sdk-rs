@@ -2,11 +2,11 @@ use elrond_wasm_debug::*;
 
 fn world() -> BlockchainMock {
     let mut blockchain = BlockchainMock::new();
-    blockchain.set_current_dir_from_workspace("contracts/examples/crypto-bubbles");
+    blockchain.set_current_dir_from_workspace("contracts/feature-tests/legacy-examples/crypto-bubbles-legacy");
 
     blockchain.register_contract_builder(
-        "file:output/crypto-bubbles.wasm",
-        crypto_bubbles::ContractBuilder,
+        "file:output/crypto-bubbles-legacy.wasm",
+        crypto_bubbles_legacy::ContractBuilder,
     );
     blockchain
 }

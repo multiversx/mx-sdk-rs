@@ -66,6 +66,7 @@ members = [
   "contracts/examples/ping-pong-egld/meta",
   "contracts/examples/token-release",
   "contracts/examples/token-release/meta",
+
   "contracts/feature-tests/abi-tester",
   "contracts/feature-tests/abi-tester/meta",
   "contracts/feature-tests/basic-features",
@@ -112,6 +113,8 @@ members = [
   "contracts/feature-tests/esdt-system-sc-mock/meta",
   "contracts/feature-tests/formatted-message-features",
   "contracts/feature-tests/formatted-message-features/meta",
+  "contracts/feature-tests/legacy-examples/crypto-bubbles-legacy",
+  "contracts/feature-tests/legacy-examples/crypto-bubbles-legacy/meta",
   "contracts/feature-tests/multi-contract-features",
   "contracts/feature-tests/multi-contract-features/meta",
   "contracts/feature-tests/panic-message-features",
