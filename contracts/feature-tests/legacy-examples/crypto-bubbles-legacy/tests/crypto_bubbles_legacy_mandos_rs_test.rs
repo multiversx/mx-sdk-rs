@@ -6,7 +6,7 @@ fn world() -> BlockchainMock {
 
     blockchain.register_contract_builder(
         "file:output/crypto-bubbles.wasm",
-        crypto_bubbles::ContractBuilder,
+        crypto_bubbles_legacy::ContractBuilder,
     );
     blockchain
 }
