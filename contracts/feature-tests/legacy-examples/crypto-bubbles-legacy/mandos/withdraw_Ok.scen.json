@@ -15,7 +15,7 @@
                     "storage": {
                         "str:playerBalance|address:acc1": "0x100"
                     },
-                    "code": "file:../output/crypto-bubbles.wasm"
+                    "code": "file:../output/crypto-bubbles-legacy.wasm"
                 },
                 "address:acc1": {
                     "nonce": "0",
@@ -69,7 +69,7 @@
                     "storage": {
                         "str:playerBalance|address:acc1": "0xf0"
                     },
-                    "code": "file:../output/crypto-bubbles.wasm"
+                    "code": "file:../output/crypto-bubbles-legacy.wasm"
                 },
                 "address:acc1": {
                     "nonce": "1",
