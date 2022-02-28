@@ -132,6 +132,23 @@
                     "biguint:1|biguint:2"
                 ]
             }
+        },
+        {
+            "step": "scQuery",
+            "txId": "7",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "managed_vec_remove",
+                "arguments": [
+                    "biguint:1|biguint:2|biguint:3",
+                    "3"
+                ]
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:ManagedVec index out of range"
+            }
         }
     ]
 }
