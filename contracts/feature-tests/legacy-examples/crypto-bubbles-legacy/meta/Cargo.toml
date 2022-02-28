@@ -1,7 +1,6 @@
 [package]
 name = "crypto-bubbles-legacy-meta"
 version = "0.0.0"
-authors = ["Andrei Marinica <andrei.marinica@elrond.com>"]
 edition = "2018"
 publish = false
 
@@ -12,6 +11,6 @@ path = ".."
 version = "0.28.0"
 path = "../../../../../elrond-wasm"
 
-[dependencies.elrond-wasm-debug]
+[dev-dependencies.elrond-wasm-debug]
 version = "0.28.0"
 path = "../../../../../elrond-wasm-debug"

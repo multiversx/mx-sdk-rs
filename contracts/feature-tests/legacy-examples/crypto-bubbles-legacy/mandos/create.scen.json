@@ -14,7 +14,7 @@
                 {
                     "creatorAddress": "address:crypto_bubbles_owner",
                     "creatorNonce": "0",
-                    "newAddress": "sc:crypto_bubbles"
+                    "newAddress": "sc:crypto_bubbles_legacy"
                 }
             ]
         },
@@ -45,7 +45,7 @@
                     "storage": {},
                     "code": ""
                 },
-                "sc:crypto_bubbles": {
+                "sc:crypto_bubbles_legacy": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},

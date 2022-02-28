@@ -8,15 +8,7 @@ mod deposit_info;
 use deposit_info::DepositInfo;
 
 pub const SECONDS_PER_ROUND: u64 = 6;
-
-extern "C" {
-    fn verifyEd25519(
-        keyOffset: *const u8,
-        messageOffset: *const u8,
-        messageLength: i32,
-        sigOffset: *const u8,
-    ) -> i32;
-}
+pub use elrond_wasm::api::{ED25519_KEY_BYTE_LEN, ED25519_SIGNATURE_BYTE_LEN};
 
 #[elrond_wasm::contract]
 pub trait DigitalCash {
@@ -68,7 +60,11 @@ pub trait DigitalCash {
     }
 
     #[endpoint]
-    fn claim(&self, address: ManagedAddress, signature: ManagedBuffer) {
+    fn claim(
+        &self,
+        address: ManagedAddress,
+        signature: ManagedByteArray<Self::Api, ED25519_SIGNATURE_BYTE_LEN>,
+    ) {
         require!(!self.deposit(&address).is_empty(), "non-existent key");
 
         let deposit = self.deposit(&address).get();
@@ -79,33 +75,13 @@ pub trait DigitalCash {
             "deposit expired"
         );
 
-        const HASH_DATA_BUFFER_LEN: usize = 1024;
-
-        let sig_len = signature.len();
+        let key = address.as_managed_byte_array();
+        let message = caller_address.as_managed_buffer();
         require!(
-            sig_len <= HASH_DATA_BUFFER_LEN,
-            "Attributes too long, cannot copy into static buffer"
+            self.crypto()
+                .verify_ed25519_managed::<32>(key, message, &signature),
+            "invalid signature"
         );
-
-        let mut signature_buffer = [0u8; HASH_DATA_BUFFER_LEN];
-
-        let signature_buffer_slice = &mut signature_buffer[..sig_len];
-        let load_result = signature.load_slice(0, signature_buffer_slice);
-        require!(load_result.is_ok(), "Failed to load attributes into buffer");
-
-        unsafe {
-            let key = &address.to_byte_array()[..];
-            let message = &caller_address.to_byte_array()[..];
-            require!(
-                verifyEd25519(
-                    key.as_ptr(),
-                    message.as_ptr(),
-                    message.len() as i32,
-                    signature_buffer_slice.as_ptr(),
-                ) == 0,
-                "invalid signature"
-            );
-        }
 
         self.send().direct(
             &caller_address,
