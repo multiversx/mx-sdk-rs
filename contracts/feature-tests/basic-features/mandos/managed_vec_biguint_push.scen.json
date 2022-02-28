@@ -81,6 +81,57 @@
                     "biguint:0"
                 ]
             }
+        },
+        {
+            "step": "scQuery",
+            "txId": "5",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "managed_vec_remove",
+                "arguments": [
+                    "biguint:1|biguint:2|biguint:3",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "biguint:2|biguint:3"
+                ]
+            }
+        },
+        {
+            "step": "scQuery",
+            "txId": "5",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "managed_vec_remove",
+                "arguments": [
+                    "biguint:1|biguint:2|biguint:3",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "biguint:1|biguint:3"
+                ]
+            }
+        },
+        {
+            "step": "scQuery",
+            "txId": "5",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "managed_vec_remove",
+                "arguments": [
+                    "biguint:1|biguint:2|biguint:3",
+                    "2"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "biguint:1|biguint:2"
+                ]
+            }
         }
     ]
 }
