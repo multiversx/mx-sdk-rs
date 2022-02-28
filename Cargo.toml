@@ -66,6 +66,7 @@ members = [
   "contracts/examples/ping-pong-egld/meta",
   "contracts/examples/token-release",
   "contracts/examples/token-release/meta",
+
   "contracts/feature-tests/abi-tester",
   "contracts/feature-tests/abi-tester/meta",
   "contracts/feature-tests/basic-features",
