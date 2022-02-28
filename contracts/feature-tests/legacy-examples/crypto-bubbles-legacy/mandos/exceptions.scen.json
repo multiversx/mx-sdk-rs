@@ -9,10 +9,10 @@
                     "nonce": "0",
                     "balance": "0x1000000"
                 },
-                "sc:crypto_bubbles": {
+                "sc:crypto_bubbles_legacy": {
                     "nonce": "0",
                     "balance": "0x1300",
-                    "code": "file:../output/crypto-bubbles.wasm",
+                    "code": "file:../output/crypto-bubbles-legacy.wasm",
                     "owner": "address:crypto_bubbles_owner"
                 }
             }
@@ -22,7 +22,7 @@
             "txId": "1",
             "tx": {
                 "from": "address:crypto_bubbles_owner",
-                "to": "sc:crypto_bubbles",
+                "to": "sc:crypto_bubbles_legacy",
                 "function": "rewardWinner",
                 "arguments": [
                     "0x12",
@@ -35,7 +35,7 @@
             "expect": {
                 "out": [],
                 "status": "0x04",
-                "message": "str:argument decode error (winner): bad array length",
+                "message": "str:argument decode error (winner): bad H256 length",
                 "logs": "*",
                 "gas": "*",
                 "refund": "*"
@@ -46,7 +46,7 @@
             "txId": "2",
             "tx": {
                 "from": "address:crypto_bubbles_owner",
-                "to": "sc:crypto_bubbles",
+                "to": "sc:crypto_bubbles_legacy",
                 "function": "balanceOf",
                 "arguments": [
                     "0x22acc1000000000000000000000000000000000000000000000000000000000000"
@@ -57,7 +57,7 @@
             "expect": {
                 "out": [],
                 "status": "0x04",
-                "message": "str:argument decode error (player): bad array length",
+                "message": "str:argument decode error (player): bad H256 length",
                 "logs": "*",
                 "gas": "*",
                 "refund": "*"
@@ -72,11 +72,11 @@
                     "storage": {},
                     "code": ""
                 },
-                "sc:crypto_bubbles": {
+                "sc:crypto_bubbles_legacy": {
                     "nonce": "0",
                     "balance": "0x1300",
                     "storage": {},
-                    "code": "file:../output/crypto-bubbles.wasm"
+                    "code": "file:../output/crypto-bubbles-legacy.wasm"
                 }
             }
         }

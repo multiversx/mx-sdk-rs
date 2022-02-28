@@ -9,14 +9,14 @@
                     "nonce": "0",
                     "balance": "0x10000000"
                 },
-                "sc:crypto_bubbles": {
+                "sc:crypto_bubbles_legacy": {
                     "nonce": "0",
                     "balance": "0x100",
                     "storage": {
                         "str:playerBalance|address:acc1": "0x100",
                         "str:playerBalance|address:acc2": "0x100"
                     },
-                    "code": "file:../output/crypto-bubbles.wasm",
+                    "code": "file:../output/crypto-bubbles-legacy.wasm",
                     "owner": "address:crypto_bubbles_owner"
                 }
             }
@@ -26,7 +26,7 @@
             "txId": "2",
             "tx": {
                 "from": "address:crypto_bubbles_owner",
-                "to": "sc:crypto_bubbles",
+                "to": "sc:crypto_bubbles_legacy",
                 "function": "rewardWinner",
                 "arguments": [
                     "0x12",
@@ -41,11 +41,11 @@
                 "status": "",
                 "logs": [
                     {
-                        "address": "sc:crypto_bubbles",
+                        "address": "sc:crypto_bubbles_legacy",
                         "endpoint": "str:rewardWinner",
                         "topics": [
-                            "str:reward_winner",
-                            "0x12",
+                            "0x1000000000000000000000000000000000000000000000000000000000000004",
+                            "0x0000000000000000000000000000000000000000000000000000000000000012",
                             "address:acc1"
                         ],
                         "data": "0x200"
@@ -64,14 +64,14 @@
                     "storage": {},
                     "code": ""
                 },
-                "sc:crypto_bubbles": {
+                "sc:crypto_bubbles_legacy": {
                     "nonce": "0",
                     "balance": "0x100",
                     "storage": {
                         "str:playerBalance|address:acc1": "0x300",
                         "str:playerBalance|address:acc2": "0x100"
                     },
-                    "code": "file:../output/crypto-bubbles.wasm"
+                    "code": "file:../output/crypto-bubbles-legacy.wasm"
                 }
             }
         }
