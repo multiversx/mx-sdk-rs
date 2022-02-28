@@ -71,13 +71,14 @@ where
         A::crypto_api_impl().verify_ed25519(&key_bytes[..], message_byte_slice, &sig_bytes[..])
     }
 
-    pub fn sha256_managed<const SHA256_HASH_DATA_BUFFER_LEN: usize>(
+    pub fn sha256_managed<const SHA256_MAX_INPUT_LEN: usize>(
         &self,
         attributes: &ManagedBuffer<A>,
     ) -> ManagedByteArray<A, SHA256_RESULT_LEN> {
         let attr_len = attributes.len();
-        let mut attributes_buffer = [0u8; SHA256_HASH_DATA_BUFFER_LEN];
+        let mut attributes_buffer = [0u8; SHA256_MAX_INPUT_LEN];
         let attributes_buffer_slice = &mut attributes_buffer[..attr_len];
+        let _load_results = attributes.load_slice(0, attributes_buffer_slice);
 
         ManagedByteArray::new_from_bytes(&A::crypto_api_impl().sha256_legacy(&attributes_buffer_slice))
     }

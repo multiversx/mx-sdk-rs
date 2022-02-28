@@ -5,7 +5,7 @@ use super::{Handle, ManagedTypeApi, ManagedTypeApiImpl};
 
 pub const ED25519_KEY_BYTE_LEN: usize = 32;
 pub const ED25519_SIGNATURE_BYTE_LEN: usize = 64;
-pub const SHA256_HASH_DATA_BUFFER_LEN: usize = 1024;
+pub const SHA256_MAX_INPUT_LEN: usize = 1024;
 pub const SHA256_RESULT_LEN: usize = 32;
 
 pub trait CryptoApi: ManagedTypeApi {
