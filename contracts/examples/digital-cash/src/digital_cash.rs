@@ -8,6 +8,7 @@ mod deposit_info;
 use deposit_info::DepositInfo;
 
 pub const SECONDS_PER_ROUND: u64 = 6;
+pub use elrond_wasm::api::{ED25519_KEY_BYTE_LEN, ED25519_SIGNATURE_BYTE_LEN};
 
 #[elrond_wasm::contract]
 pub trait DigitalCash {
@@ -54,11 +55,16 @@ pub trait DigitalCash {
             &deposit.amount,
             b"successful withdrawal",
         );
+
         self.deposit(&address).clear();
     }
 
     #[endpoint]
-    fn claim(&self, address: ManagedAddress, signature: ManagedBuffer) {
+    fn claim(
+        &self,
+        address: ManagedAddress,
+        signature: ManagedByteArray<Self::Api, ED25519_SIGNATURE_BYTE_LEN>,
+    ) {
         require!(!self.deposit(&address).is_empty(), "non-existent key");
 
         let deposit = self.deposit(&address).get();
@@ -68,12 +74,12 @@ pub trait DigitalCash {
             deposit.expiration_round >= self.blockchain().get_block_round(),
             "deposit expired"
         );
+
+        let key = address.as_managed_byte_array();
+        let message = caller_address.as_managed_buffer();
         require!(
-            self.crypto().verify_ed25519(
-                &address.to_byte_array()[..],
-                &caller_address.to_byte_array()[..],
-                signature.to_boxed_bytes().as_slice()
-            ),
+            self.crypto()
+                .verify_ed25519_managed::<32>(key, message, &signature),
             "invalid signature"
         );
 
