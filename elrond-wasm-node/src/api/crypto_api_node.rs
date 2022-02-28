@@ -70,14 +70,7 @@ impl CryptoApi for VmApiImpl {
 }
 
 impl CryptoApiImpl for VmApiImpl {
-    fn sha256(&self, data_handle: Handle) -> Handle {
-        unsafe {
-            let result_handle = mBufferNew();
-            managedSha256(data_handle, result_handle);
-            result_handle
-        }
-    }
-
+    #[inline]
     fn sha256_legacy(&self, data: &[u8]) -> [u8; 32] {
         unsafe {
             let mut res = [0u8; 32];
@@ -86,6 +79,15 @@ impl CryptoApiImpl for VmApiImpl {
         }
     }
 
+    fn sha256(&self, data_handle: Handle) -> Handle {
+        unsafe {
+            let result_handle = mBufferNew();
+            managedSha256(data_handle, result_handle);
+            result_handle
+        }
+    }
+
+    #[inline]
     fn keccak256_legacy(&self, data: &[u8]) -> H256 {
         unsafe {
             let mut res = H256::zero();

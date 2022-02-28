@@ -1,7 +1,7 @@
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
-use elrond_wasm::{elrond_codec::TopEncode};
+use elrond_wasm::elrond_codec::TopEncode;
 
 const NFT_AMOUNT: u32 = 1;
 const ROYALTIES_MAX: u32 = 10_000;
@@ -169,7 +169,9 @@ pub trait NftModule {
             sc_panic!("Attributes encode error: {}", err.message_bytes());
         }
 
-        let attributes_sha256 = self.crypto().sha256_managed::<1000>(&serialized_attributes);
+        let attributes_sha256 = self
+            .crypto()
+            .sha256_legacy_managed::<1000>(&serialized_attributes);
         let attributes_hash = attributes_sha256.as_managed_buffer();
         let uris = ManagedVec::from_single_item(uri);
         let nft_nonce = self.send().esdt_nft_create(

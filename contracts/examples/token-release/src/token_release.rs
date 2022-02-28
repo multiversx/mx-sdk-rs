@@ -135,7 +135,7 @@ pub trait TokenRelease {
             !self.group_schedule(&group_identifier).is_empty(),
             "The group does not exist"
         );
-        
+
         self.user_groups(&address).update(|groups| {
             let mut group_exists = false;
             for group in groups.iter() {
@@ -357,7 +357,8 @@ pub trait TokenRelease {
     ) -> SingleValueMapper<Schedule<Self::Api>>;
 
     #[storage_mapper("userGroups")]
-    fn user_groups(&self, address: &ManagedAddress) -> SingleValueMapper<ManagedVec<ManagedBuffer>>;
+    fn user_groups(&self, address: &ManagedAddress)
+        -> SingleValueMapper<ManagedVec<ManagedBuffer>>;
 
     #[storage_mapper("usersInGroup")]
     fn users_in_group(&self, group_identifier: &ManagedBuffer) -> SingleValueMapper<u64>;
