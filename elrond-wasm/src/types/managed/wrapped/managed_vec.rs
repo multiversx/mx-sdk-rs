@@ -181,6 +181,33 @@ where
         });
     }
 
+    pub fn remove(&mut self, index: usize) {
+        let len = self.len();
+        if index >= len {
+            M::error_api_impl().signal_error(INDEX_OUT_OF_RANGE_MSG);
+        }
+
+        let part_before = if index > 0 {
+            match self.slice(0, index) {
+                Some(s) => s,
+                None => M::error_api_impl().signal_error(INDEX_OUT_OF_RANGE_MSG),
+            }
+        } else {
+            ManagedVec::new()
+        };
+        let part_after = if index < len {
+            match self.slice(index + 1, len) {
+                Some(s) => s,
+                None => M::error_api_impl().signal_error(INDEX_OUT_OF_RANGE_MSG),
+            }
+        } else {
+            ManagedVec::new()
+        };
+
+        self.buffer = part_before.buffer;
+        self.buffer.append(&part_after.buffer);
+    }
+
     /// New `ManagedVec` instance with 1 element in it.
     pub fn from_single_item(item: T) -> Self {
         let mut result = ManagedVec::new();

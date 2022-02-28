@@ -48,4 +48,12 @@ pub trait ManagedVecFeatures {
             sc_panic!("index out of bounds")
         }
     }
+
+    #[endpoint]
+    fn managed_vec_remove(&self, mv: ManagedVec<BigUint>, index: usize) -> ManagedVec<BigUint> {
+        let mut result = mv;
+        result.remove(index);
+
+        result
+    }
 }
