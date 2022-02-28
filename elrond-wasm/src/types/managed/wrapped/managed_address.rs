@@ -57,6 +57,11 @@ where
     }
 
     #[inline]
+    pub fn as_managed_byte_array(&self) -> &ManagedByteArray<M, 32> {
+        &self.bytes
+    }
+
+    #[inline]
     pub fn to_byte_array(&self) -> [u8; 32] {
         self.bytes.to_byte_array()
     }
