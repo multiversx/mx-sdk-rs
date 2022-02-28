@@ -1,5 +1,5 @@
 {
-    "name": "topUp_withdraw",
+    "name": "topUp_ok",
     "gasSchedule": "dummy",
     "steps": [
         {
@@ -9,14 +9,18 @@
                     "nonce": "0",
                     "balance": "0"
                 },
-                "sc:crypto_bubbles": {
+                "sc:crypto_bubbles_legacy": {
                     "nonce": "0",
                     "balance": "0",
-                    "code": "file:../output/crypto-bubbles.wasm"
+                    "code": "file:../output/crypto-bubbles-legacy.wasm"
                 },
                 "address:acc1": {
                     "nonce": "0",
-                    "balance": "0x7200000"
+                    "balance": "0x100800"
+                },
+                "address:acc2": {
+                    "nonce": "0",
+                    "balance": "0x100800"
                 }
             }
         },
@@ -25,8 +29,8 @@
             "txId": "1",
             "tx": {
                 "from": "address:acc1",
-                "to": "sc:crypto_bubbles",
-                "egldValue": "0x4000000",
+                "to": "sc:crypto_bubbles_legacy",
+                "egldValue": "0x100",
                 "function": "topUp",
                 "arguments": [],
                 "gasLimit": "0x100000",
@@ -37,13 +41,13 @@
                 "status": "",
                 "logs": [
                     {
-                        "address": "sc:crypto_bubbles",
+                        "address": "sc:crypto_bubbles_legacy",
                         "endpoint": "str:topUp",
                         "topics": [
-                            "str:top_up",
+                            "0x1000000000000000000000000000000000000000000000000000000000000001",
                             "address:acc1"
                         ],
-                        "data": "0x4000000"
+                        "data": "0x0100"
                     }
                 ],
                 "gas": "*",
@@ -54,12 +58,11 @@
             "step": "scCall",
             "txId": "2",
             "tx": {
-                "from": "address:acc1",
-                "to": "sc:crypto_bubbles",
-                "function": "withdraw",
-                "arguments": [
-                    "0x4000000"
-                ],
+                "from": "address:acc2",
+                "to": "sc:crypto_bubbles_legacy",
+                "egldValue": "0x100",
+                "function": "topUp",
+                "arguments": [],
                 "gasLimit": "0x100000",
                 "gasPrice": "0x01"
             },
@@ -68,13 +71,13 @@
                 "status": "",
                 "logs": [
                     {
-                        "address": "sc:crypto_bubbles",
-                        "endpoint": "str:withdraw",
+                        "address": "sc:crypto_bubbles_legacy",
+                        "endpoint": "str:topUp",
                         "topics": [
-                            "str:withdraw",
-                            "address:acc1"
+                            "0x1000000000000000000000000000000000000000000000000000000000000001",
+                            "address:acc2"
                         ],
-                        "data": "0x4000000"
+                        "data": "0x0100"
                     }
                 ],
                 "gas": "*",
@@ -90,18 +93,26 @@
                     "storage": {},
                     "code": ""
                 },
-                "sc:crypto_bubbles": {
+                "sc:crypto_bubbles_legacy": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {},
-                    "code": "file:../output/crypto-bubbles.wasm"
+                    "balance": "0x200",
+                    "storage": {
+                        "str:playerBalance|address:acc1": "0x100",
+                        "str:playerBalance|address:acc2": "0x100"
+                    },
+                    "code": "file:../output/crypto-bubbles-legacy.wasm"
                 },
                 "address:acc1": {
-                    "nonce": "2",
-                    "balance": "0x7000000",
+                    "nonce": "1",
+                    "balance": "0x700",
                     "storage": {},
-                    "code": "",
-                    "asyncCallData": "str:crypto bubbles"
+                    "code": ""
+                },
+                "address:acc2": {
+                    "nonce": "1",
+                    "balance": "0x700",
+                    "storage": {},
+                    "code": ""
                 }
             }
         }

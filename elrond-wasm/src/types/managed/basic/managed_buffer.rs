@@ -1,7 +1,7 @@
 use core::marker::PhantomData;
 
 use crate::{
-    api::{Handle, InvalidSliceError, ManagedBufferApi, ManagedTypeApi},
+    api::{ErrorApiImpl, Handle, InvalidSliceError, ManagedBufferApi, ManagedTypeApi},
     hex_util::encode_bytes_as_hex,
     types::{BoxedBytes, ManagedType},
 };
@@ -145,6 +145,16 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
         } else {
             None
         }
+    }
+
+    pub fn load_to_byte_array<'a, const N: usize>(&self, array: &'a mut [u8; N]) -> &'a [u8] {
+        let len = self.len();
+        if len > N {
+            M::error_api_impl().signal_error(&b"failed to load to byte array"[..]);
+        }
+        let byte_slice = &mut array[..len];
+        let _ = self.load_slice(0, byte_slice);
+        byte_slice
     }
 
     #[inline]
