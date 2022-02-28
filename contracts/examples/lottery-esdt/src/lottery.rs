@@ -5,8 +5,6 @@ elrond_wasm::imports!();
 mod lottery_info;
 mod status;
 
-use core::convert::TryInto;
-
 use lottery_info::LotteryInfo;
 use status::Status;
 
@@ -25,9 +23,9 @@ pub trait Lottery {
         lottery_name: ManagedBuffer,
         token_identifier: TokenIdentifier,
         ticket_price: BigUint,
-        opt_total_tickets: Option<u32>,
+        opt_total_tickets: Option<usize>,
         opt_deadline: Option<u64>,
-        opt_max_entries_per_user: Option<u32>,
+        opt_max_entries_per_user: Option<usize>,
         opt_prize_distribution: Option<ManagedVec<u8>>,
         opt_whitelist: Option<ManagedVec<ManagedAddress>>,
         #[var_args] opt_burn_percentage: OptionalValue<BigUint>,
@@ -51,9 +49,9 @@ pub trait Lottery {
         lottery_name: ManagedBuffer,
         token_identifier: TokenIdentifier,
         ticket_price: BigUint,
-        opt_total_tickets: Option<u32>,
+        opt_total_tickets: Option<usize>,
         opt_deadline: Option<u64>,
-        opt_max_entries_per_user: Option<u32>,
+        opt_max_entries_per_user: Option<usize>,
         opt_prize_distribution: Option<ManagedVec<u8>>,
         opt_whitelist: Option<ManagedVec<ManagedAddress>>,
         #[var_args] opt_burn_percentage: OptionalValue<BigUint>,
@@ -77,20 +75,19 @@ pub trait Lottery {
         lottery_name: ManagedBuffer,
         token_identifier: TokenIdentifier,
         ticket_price: BigUint,
-        opt_total_tickets: Option<u32>,
+        opt_total_tickets: Option<usize>,
         opt_deadline: Option<u64>,
-        opt_max_entries_per_user: Option<u32>,
+        opt_max_entries_per_user: Option<usize>,
         opt_prize_distribution: Option<ManagedVec<u8>>,
         opt_whitelist: Option<ManagedVec<ManagedAddress>>,
         #[var_args] opt_burn_percentage: OptionalValue<BigUint>,
     ) {
         require!(!lottery_name.is_empty(), "Name can't be empty!");
 
-        let max_tickets = MAX_TICKETS.try_into().unwrap();
         let timestamp = self.blockchain().get_block_timestamp();
-        let total_tickets = opt_total_tickets.unwrap_or(max_tickets);
+        let total_tickets = opt_total_tickets.unwrap_or(MAX_TICKETS);
         let deadline = opt_deadline.unwrap_or(timestamp + THIRTY_DAYS_IN_SECONDS);
-        let max_entries_per_user = opt_max_entries_per_user.unwrap_or(max_tickets);
+        let max_entries_per_user = opt_max_entries_per_user.unwrap_or(MAX_TICKETS);
         let prize_distribution = opt_prize_distribution
             .unwrap_or_else(|| ManagedVec::from_single_item(PERCENTAGE_TOTAL as u8));
 
@@ -109,7 +106,7 @@ pub trait Lottery {
             "Must have more than 0 tickets available!"
         );
         require!(
-            total_tickets <= max_tickets,
+            total_tickets <= MAX_TICKETS,
             "Only 800 or less total tickets per lottery are allowed!"
         );
         require!(deadline > timestamp, "Deadline can't be in the past!");
@@ -389,7 +386,7 @@ pub trait Lottery {
         &self,
         lottery_name: &ManagedBuffer,
         user: &ManagedAddress,
-    ) -> SingleValueMapper<u32>;
+    ) -> SingleValueMapper<usize>;
 
     #[storage_mapper("burnPercentageForLottery")]
     fn burn_percentage_for_lottery(
