@@ -78,9 +78,9 @@ impl CryptoApiImpl for VmApiImpl {
         }
     }
 
-    fn sha256_legacy(&self, data: &[u8]) -> H256 {
+    fn sha256_legacy(&self, data: &[u8]) -> [u8; 32] {
         unsafe {
-            let mut res = H256::zero();
+            let mut res = [0u8; 32];
             sha256(data.as_ptr(), data.len() as i32, res.as_mut_ptr());
             res
         }

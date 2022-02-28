@@ -14,7 +14,7 @@ impl CryptoApi for UncallableApi {
 }
 
 impl CryptoApiImpl for UncallableApi {
-    fn sha256_legacy(&self, _data: &[u8]) -> H256 {
+    fn sha256_legacy(&self, _data: &[u8]) -> [u8; 32] {
         unreachable!()
     }
 

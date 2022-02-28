@@ -1,7 +1,7 @@
 use core::{borrow::Borrow, marker::PhantomData};
 
 use crate::{
-    api::{CryptoApi, CryptoApiImpl, ED25519_KEY_BYTE_LEN, ED25519_SIGNATURE_BYTE_LEN},
+    api::{CryptoApi, CryptoApiImpl, ED25519_KEY_BYTE_LEN, ED25519_SIGNATURE_BYTE_LEN, SHA256_RESULT_LEN},
     types::{BoxedBytes, ManagedBuffer, ManagedByteArray, ManagedType, MessageHashType, H256},
 };
 use alloc::boxed::Box;
@@ -24,15 +24,16 @@ where
         }
     }
 
-    pub fn sha256_legacy(&self, data: &[u8]) -> H256 {
+    pub fn sha256_legacy(&self, data: &[u8]) -> [u8; SHA256_RESULT_LEN] {
         A::crypto_api_impl().sha256_legacy(data)
     }
 
-    pub fn sha256<B: Borrow<ManagedBuffer<A>>>(&self, data: B) -> ManagedByteArray<A, 32> {
+    pub fn sha256<B: Borrow<ManagedBuffer<A>>>(&self, data: B) -> ManagedByteArray<A, SHA256_RESULT_LEN> {
         ManagedByteArray::from_raw_handle(
             A::crypto_api_impl().sha256(data.borrow().get_raw_handle()),
         )
     }
+
 
     pub fn keccak256_legacy(&self, data: &[u8]) -> H256 {
         A::crypto_api_impl().keccak256_legacy(data)
@@ -68,6 +69,17 @@ where
         let sig_bytes = signature.to_byte_array();
 
         A::crypto_api_impl().verify_ed25519(&key_bytes[..], message_byte_slice, &sig_bytes[..])
+    }
+
+    pub fn sha256_managed<const SHA256_HASH_DATA_BUFFER_LEN: usize>(
+        &self,
+        attributes: &ManagedBuffer<A>,
+    ) -> ManagedByteArray<A, SHA256_RESULT_LEN> {
+        let attr_len = attributes.len();
+        let mut attributes_buffer = [0u8; SHA256_HASH_DATA_BUFFER_LEN];
+        let attributes_buffer_slice = &mut attributes_buffer[..attr_len];
+
+        ManagedByteArray::new_from_bytes(&A::crypto_api_impl().sha256_legacy(&attributes_buffer_slice))
     }
 
     /// Note: the signature is minimum 2 bytes in length,

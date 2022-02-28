@@ -1,11 +1,7 @@
-extern "C" {
-    fn sha256(dataOffset: *const u8, length: i32, resultOffset: *mut u8) -> i32;
-}
-
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
-use elrond_wasm::elrond_codec::TopEncode;
+use elrond_wasm::{elrond_codec::TopEncode, api::SHA256_HASH_DATA_BUFFER_LEN};
 
 const NFT_AMOUNT: u32 = 1;
 const ROYALTIES_MAX: u32 = 10_000;
@@ -173,7 +169,8 @@ pub trait NftModule {
             sc_panic!("Attributes encode error: {}", err.message_bytes());
         }
 
-        let attributes_hash = self.hash_attributes(&serialized_attributes);
+        let attributes_sha256 = self.crypto().sha256_managed::<SHA256_HASH_DATA_BUFFER_LEN>(&serialized_attributes);
+        let attributes_hash = attributes_sha256.as_managed_buffer();
         let uris = ManagedVec::from_single_item(uri);
         let nft_nonce = self.send().esdt_nft_create(
             &nft_token_id,
@@ -192,35 +189,6 @@ pub trait NftModule {
         });
 
         nft_nonce
-    }
-
-    fn hash_attributes(&self, attributes: &ManagedBuffer) -> ManagedBuffer {
-        const HASH_DATA_BUFFER_LEN: usize = 1024;
-        const HASH_LEN: usize = 32;
-
-        let attr_len = attributes.len();
-        require!(
-            attr_len <= HASH_DATA_BUFFER_LEN,
-            "Attributes too long, cannot copy into static buffer"
-        );
-
-        let mut attributes_buffer = [0u8; HASH_DATA_BUFFER_LEN];
-        let mut hash_buffer = [0u8; HASH_LEN];
-
-        let attributes_buffer_slice = &mut attributes_buffer[..attr_len];
-        let load_result = attributes.load_slice(0, attributes_buffer_slice);
-        require!(load_result.is_ok(), "Failed to load attributes into buffer");
-
-        unsafe {
-            let hash_result = sha256(
-                attributes_buffer_slice.as_ptr(),
-                attr_len as i32,
-                hash_buffer.as_mut_ptr(),
-            );
-            require!(hash_result == 0, "Failed hashing attributes");
-        }
-
-        ManagedBuffer::new_from_bytes(&hash_buffer[..])
     }
 
     fn require_token_issued(&self) {
