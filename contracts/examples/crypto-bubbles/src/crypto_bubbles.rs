@@ -37,7 +37,8 @@ pub trait CryptoBubbles {
             *balance -= amount;
         });
 
-        self.send().direct_egld(&player, amount, b"crypto bubbles");
+        self.send()
+            .direct_egld(player, amount, &b"crypto bubbles"[..]);
 
         self.withdraw_event(player, amount);
     }
