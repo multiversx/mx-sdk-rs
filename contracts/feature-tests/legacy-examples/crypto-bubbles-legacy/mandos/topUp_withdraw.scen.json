@@ -9,10 +9,10 @@
                     "nonce": "0",
                     "balance": "0"
                 },
-                "sc:crypto_bubbles": {
+                "sc:crypto_bubbles_legacy": {
                     "nonce": "0",
                     "balance": "0",
-                    "code": "file:../output/crypto-bubbles.wasm"
+                    "code": "file:../output/crypto-bubbles-legacy.wasm"
                 },
                 "address:acc1": {
                     "nonce": "0",
@@ -25,7 +25,7 @@
             "txId": "1",
             "tx": {
                 "from": "address:acc1",
-                "to": "sc:crypto_bubbles",
+                "to": "sc:crypto_bubbles_legacy",
                 "egldValue": "0x4000000",
                 "function": "topUp",
                 "arguments": [],
@@ -37,10 +37,10 @@
                 "status": "",
                 "logs": [
                     {
-                        "address": "sc:crypto_bubbles",
+                        "address": "sc:crypto_bubbles_legacy",
                         "endpoint": "str:topUp",
                         "topics": [
-                            "str:top_up",
+                            "0x1000000000000000000000000000000000000000000000000000000000000001",
                             "address:acc1"
                         ],
                         "data": "0x4000000"
@@ -55,7 +55,7 @@
             "txId": "2",
             "tx": {
                 "from": "address:acc1",
-                "to": "sc:crypto_bubbles",
+                "to": "sc:crypto_bubbles_legacy",
                 "function": "withdraw",
                 "arguments": [
                     "0x4000000"
@@ -68,10 +68,10 @@
                 "status": "",
                 "logs": [
                     {
-                        "address": "sc:crypto_bubbles",
+                        "address": "sc:crypto_bubbles_legacy",
                         "endpoint": "str:withdraw",
                         "topics": [
-                            "str:withdraw",
+                            "0x1000000000000000000000000000000000000000000000000000000000000002",
                             "address:acc1"
                         ],
                         "data": "0x4000000"
@@ -90,11 +90,11 @@
                     "storage": {},
                     "code": ""
                 },
-                "sc:crypto_bubbles": {
+                "sc:crypto_bubbles_legacy": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
-                    "code": "file:../output/crypto-bubbles.wasm"
+                    "code": "file:../output/crypto-bubbles-legacy.wasm"
                 },
                 "address:acc1": {
                     "nonce": "2",

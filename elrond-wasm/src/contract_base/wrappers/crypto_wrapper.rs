@@ -1,7 +1,7 @@
 use core::{borrow::Borrow, marker::PhantomData};
 
 use crate::{
-    api::{CryptoApi, CryptoApiImpl},
+    api::{CryptoApi, CryptoApiImpl, ED25519_KEY_BYTE_LEN, ED25519_SIGNATURE_BYTE_LEN},
     types::{BoxedBytes, ManagedBuffer, ManagedByteArray, ManagedType, MessageHashType, H256},
 };
 use alloc::boxed::Box;
@@ -54,6 +54,20 @@ where
 
     pub fn verify_ed25519(&self, key: &[u8], message: &[u8], signature: &[u8]) -> bool {
         A::crypto_api_impl().verify_ed25519(key, message, signature)
+    }
+
+    pub fn verify_ed25519_managed<const MAX_MESSAGE_LEN: usize>(
+        &self,
+        key: &ManagedByteArray<A, ED25519_KEY_BYTE_LEN>,
+        message: &ManagedBuffer<A>,
+        signature: &ManagedByteArray<A, ED25519_SIGNATURE_BYTE_LEN>,
+    ) -> bool {
+        let key_bytes = key.to_byte_array();
+        let mut message_byte_buffer = [0u8; MAX_MESSAGE_LEN];
+        let message_byte_slice = message.load_to_byte_array(&mut message_byte_buffer);
+        let sig_bytes = signature.to_byte_array();
+
+        A::crypto_api_impl().verify_ed25519(&key_bytes[..], message_byte_slice, &sig_bytes[..])
     }
 
     /// Note: the signature is minimum 2 bytes in length,
