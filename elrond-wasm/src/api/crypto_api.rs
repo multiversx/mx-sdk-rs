@@ -5,6 +5,8 @@ use super::{Handle, ManagedTypeApi, ManagedTypeApiImpl};
 
 pub const ED25519_KEY_BYTE_LEN: usize = 32;
 pub const ED25519_SIGNATURE_BYTE_LEN: usize = 64;
+pub const SHA256_HASH_DATA_BUFFER_LEN: usize = 1024;
+pub const SHA256_RESULT_LEN: usize = 32;
 
 pub trait CryptoApi: ManagedTypeApi {
     type CryptoApiImpl: CryptoApiImpl;
@@ -13,14 +15,13 @@ pub trait CryptoApi: ManagedTypeApi {
 }
 
 pub trait CryptoApiImpl: ManagedTypeApiImpl {
-    fn sha256_legacy(&self, data: &[u8]) -> H256;
+    fn sha256_legacy(&self, data: &[u8]) -> [u8; SHA256_RESULT_LEN];
 
     fn sha256(&self, data_handle: Handle) -> Handle {
         // default implementation used in debugger
         // the VM has a dedicated hook
         self.mb_new_from_bytes(
-            self.sha256_legacy(self.mb_to_boxed_bytes(data_handle).as_slice())
-                .as_array(),
+            &self.sha256_legacy(self.mb_to_boxed_bytes(data_handle).as_slice())
         )
     }
 

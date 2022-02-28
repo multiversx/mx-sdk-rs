@@ -15,7 +15,7 @@ impl CryptoApi for DebugApi {
 }
 
 impl CryptoApiImpl for DebugApi {
-    fn sha256_legacy(&self, data: &[u8]) -> H256 {
+    fn sha256_legacy(&self, data: &[u8]) -> [u8; 32] {
         let mut hasher = Sha256::new();
         hasher.update(data);
         let hash: [u8; 32] = hasher.finalize().into();
