@@ -3,6 +3,9 @@ use alloc::boxed::Box;
 
 use super::{Handle, ManagedTypeApi, ManagedTypeApiImpl};
 
+pub const ED25519_KEY_BYTE_LEN: usize = 32;
+pub const ED25519_SIGNATURE_BYTE_LEN: usize = 64;
+
 pub trait CryptoApi: ManagedTypeApi {
     type CryptoApiImpl: CryptoApiImpl;
 
