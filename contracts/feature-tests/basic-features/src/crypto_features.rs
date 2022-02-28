@@ -4,8 +4,8 @@ elrond_wasm::imports!();
 #[elrond_wasm::module]
 pub trait CryptoFeatures {
     #[endpoint]
-    fn compute_sha256_legacy(&self, input: Vec<u8>) -> [u8; 32] {
-        self.crypto().sha256_legacy(&input)
+    fn compute_sha256_legacy(&self, input: Vec<u8>) -> H256 {
+        self.crypto().sha256_legacy_alloc(&input)
     }
 
     #[endpoint]
@@ -15,7 +15,7 @@ pub trait CryptoFeatures {
 
     #[endpoint]
     fn compute_keccak256_legacy(&self, input: Vec<u8>) -> H256 {
-        self.crypto().keccak256_legacy(&input)
+        self.crypto().keccak256_legacy_alloc(&input)
     }
 
     #[endpoint]
