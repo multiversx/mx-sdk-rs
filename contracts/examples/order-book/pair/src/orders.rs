@@ -29,7 +29,7 @@ pub trait OrdersModule:
         let order = self.new_order(new_order_id, payment, params, order_type);
         self.orders(order.id).set(&order);
 
-        let mut address_orders:ManagedVec<u64> = ManagedVec::new();
+        let mut address_orders: ManagedVec<u64> = ManagedVec::new();
         address_orders.push(order.id);
         self.address_order_ids(caller).set(&address_orders);
 
@@ -74,23 +74,33 @@ pub trait OrdersModule:
         let second_token_id = &self.second_token_id().get();
         let epoch = self.blockchain().get_block_epoch();
 
-            let mut order_ids_not_empty: MultiValueManagedVec<Self::Api, u64> = MultiValueManagedVec::new();
-            for order in order_ids.iter() {
-                if !self.orders(order).is_empty() {
-                    order_ids_not_empty.push(order);
-                }
+        let mut order_ids_not_empty: MultiValueManagedVec<Self::Api, u64> =
+            MultiValueManagedVec::new();
+        for order in order_ids.iter() {
+            if !self.orders(order).is_empty() {
+                order_ids_not_empty.push(order);
             }
+        }
 
-        let mut orders= MultiValueManagedVec::new();
+        let mut orders = MultiValueManagedVec::new();
+        let mut final_caller_orders: ManagedVec<Self::Api, u64> = ManagedVec::new();
         for order_id in order_ids_not_empty.iter() {
             let order = self.cancel_order(order_id, caller, first_token_id, second_token_id, epoch);
-            
-            //TODO check this line
-            //address_order_ids.into_vec().remove(order_id as usize);
+
+            let mut check_order_to_delete = false;
+            for check_order in address_order_ids.iter() {
+                if check_order == order_id {
+                    check_order_to_delete = true;
+                }
+            }
+            if !check_order_to_delete {
+                final_caller_orders.push(order_id);
+            }
+
             orders.push(order);
         }
-        self.address_order_ids(caller).clear();
 
+        self.address_order_ids(caller).set(&final_caller_orders);
         self.emit_cancel_order_events(orders);
     }
 
@@ -103,12 +113,13 @@ pub trait OrdersModule:
         let second_token_id = &self.second_token_id().get();
         let epoch = self.blockchain().get_block_epoch();
 
-            let mut order_ids_not_empty: MultiValueManagedVec<Self::Api, u64> = MultiValueManagedVec::new();
-            for order in order_ids.iter() {
-                if !self.orders(order).is_empty() {
-                    order_ids_not_empty.push(order);
-                }
+        let mut order_ids_not_empty: MultiValueManagedVec<Self::Api, u64> =
+            MultiValueManagedVec::new();
+        for order in order_ids.iter() {
+            if !self.orders(order).is_empty() {
+                order_ids_not_empty.push(order);
             }
+        }
 
         let mut orders = ManagedVec::new();
         for order_id in order_ids_not_empty.iter() {
@@ -279,7 +290,10 @@ pub trait OrdersModule:
         orders_vec
     }
 
-    fn get_orders_sum_up(&self, orders: &MultiValueManagedVec<Order<Self::Api>>) -> (BigUint, BigUint) {
+    fn get_orders_sum_up(
+        &self,
+        orders: &MultiValueManagedVec<Order<Self::Api>>,
+    ) -> (BigUint, BigUint) {
         let mut amount_paid = BigUint::zero();
         let mut amount_requested = BigUint::zero();
 
@@ -290,7 +304,6 @@ pub trait OrdersModule:
 
         (amount_paid, amount_requested)
     }
-
 
     fn calculate_transfers(
         &self,
