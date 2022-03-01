@@ -7,7 +7,7 @@ use crate::{
     },
 };
 use alloc::{string::String, vec::Vec};
-use core::marker::PhantomData;
+use core::{borrow::Borrow, marker::PhantomData};
 use elrond_codec::{
     DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode,
     NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeMultiOutput,
@@ -356,6 +356,31 @@ where
             item.dep_encode_or_handle_err(dest, h)?;
         }
         Ok(())
+    }
+}
+
+impl<M, T> ManagedVec<M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedVecItem + PartialEq,
+{
+    /// This can be very costly for big collections.
+    /// It needs to deserialize and compare every single item in the worst case.
+    pub fn find(&self, item: &T) -> Option<usize> {
+        for (i, item_in_vec) in self.iter().enumerate() {
+            if item_in_vec.borrow() == item.borrow() {
+                return Some(i);
+            }
+        }
+
+        None
+    }
+
+    /// This can be very costly for big collections.
+    /// It needs to iterate, deserialize, and compare every single item in the worst case.
+    #[inline]
+    pub fn contains(&self, item: &T) -> bool {
+        self.find(item).is_some()
     }
 }
 

@@ -56,4 +56,14 @@ pub trait ManagedVecFeatures {
 
         result
     }
+
+    #[endpoint]
+    fn managed_vec_find(&self, mv: ManagedVec<BigUint>, item: BigUint) -> Option<usize> {
+        mv.find(&item)
+    }
+
+    #[endpoint]
+    fn managed_vec_contains(&self, mv: ManagedVec<BigUint>, item: BigUint) -> bool {
+        mv.contains(&item)
+    }
 }
