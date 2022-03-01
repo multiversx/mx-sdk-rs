@@ -368,7 +368,7 @@ where
     /// It needs to deserialize and compare every single item in the worst case.
     pub fn find(&self, item: &T) -> Option<usize> {
         for (i, item_in_vec) in self.iter().enumerate() {
-            if item_in_vec.borrow() == item.borrow() {
+            if item_in_vec.borrow() == item {
                 return Some(i);
             }
         }
