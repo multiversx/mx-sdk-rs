@@ -11,7 +11,6 @@ path = "src/forwarder_raw.rs"
 [dependencies.elrond-wasm]
 version = "0.28.0"
 path = "../../../../elrond-wasm"
-features = ["cb_closure_managed_deser"]
 
 [dependencies.elrond-wasm-node]
 version = "0.28.0"
