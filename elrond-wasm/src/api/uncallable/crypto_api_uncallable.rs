@@ -1,9 +1,11 @@
 use super::UncallableApi;
 use crate::{
-    api::{CryptoApi, CryptoApiImpl},
-    types::{BoxedBytes, MessageHashType, H256},
+    api::{
+        CryptoApi, CryptoApiImpl, Handle, KECCAK256_RESULT_LEN, RIPEMD_RESULT_LEN,
+        SHA256_RESULT_LEN,
+    },
+    types::{BoxedBytes, MessageHashType},
 };
-use alloc::boxed::Box;
 
 impl CryptoApi for UncallableApi {
     type CryptoApiImpl = UncallableApi;
@@ -14,15 +16,23 @@ impl CryptoApi for UncallableApi {
 }
 
 impl CryptoApiImpl for UncallableApi {
-    fn sha256_legacy(&self, _data: &[u8]) -> H256 {
+    fn sha256_legacy(&self, _data: &[u8]) -> [u8; SHA256_RESULT_LEN] {
         unreachable!()
     }
 
-    fn keccak256_legacy(&self, _data: &[u8]) -> H256 {
+    fn sha256(&self, _data_handle: Handle) -> Handle {
         unreachable!()
     }
 
-    fn ripemd160(&self, _data: &[u8]) -> Box<[u8; 20]> {
+    fn keccak256_legacy(&self, _data: &[u8]) -> [u8; KECCAK256_RESULT_LEN] {
+        unreachable!()
+    }
+
+    fn keccak256(&self, _data_handle: Handle) -> Handle {
+        unreachable!()
+    }
+
+    fn ripemd160(&self, _data: &[u8]) -> [u8; RIPEMD_RESULT_LEN] {
         unreachable!()
     }
 
