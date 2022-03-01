@@ -179,7 +179,7 @@ pub trait NftModule {
             &BigUint::from(NFT_AMOUNT),
             &name,
             &royalties,
-            &attributes_hash,
+            attributes_hash,
             &attributes,
             &uris,
         );

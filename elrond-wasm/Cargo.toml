@@ -14,7 +14,7 @@ keywords = ["elrond", "wasm", "webassembly", "blockchain", "contract"]
 categories = ["no-std", "wasm", "cryptography::cryptocurrencies", "development-tools"]
 
 [features]
-cb_closure_managed_deser = []
+cb_closure_unmanaged_deser = []
 
 [dependencies]
 wee_alloc = "0.4"
