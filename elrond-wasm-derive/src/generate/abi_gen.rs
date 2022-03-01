@@ -142,7 +142,7 @@ fn generate_abi_method_body(
                 contract_crate: elrond_wasm::abi::ContractCrateBuildAbi {
                     name: env!("CARGO_PKG_NAME"),
                     version: env!("CARGO_PKG_VERSION"),
-                    git_version: elrond_wasm::abi::git_version!(),
+                    git_version: "N/A",
                 },
                 framework: elrond_wasm::abi::FrameworkBuildAbi::create(),
             },

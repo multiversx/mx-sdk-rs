@@ -46,6 +46,7 @@ impl RustcAbiJson {
 pub struct ContractCrateBuildAbiJson {
     pub name: String,
     pub version: String,
+    #[serde(skip_serializing)]
     pub git_version: String,
 }
 

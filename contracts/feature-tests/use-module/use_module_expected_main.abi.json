@@ -9,8 +9,7 @@
         },
         "contractCrate": {
             "name": "use-module",
-            "version": "0.0.0",
-            "git_version": "<git version here>"
+            "version": "0.0.0"
         },
         "framework": {
             "name": "elrond-wasm",
