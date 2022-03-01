@@ -13,9 +13,9 @@ path = "src/lib.rs"
 path = "../erc1155"
 
 [dependencies.elrond-wasm]
-version = "0.28.0"
+version = "0.29.0"
 path = "../../../../elrond-wasm"
 
 [dev-dependencies.elrond-wasm-debug]
-version = "0.28.0"
+version = "0.29.0"
 path = "../../../../elrond-wasm-debug"
