@@ -19,7 +19,6 @@ path = "../kitty-ownership"
 [dependencies.elrond-wasm]
 version = "0.28.0"
 path = "../../../../elrond-wasm"
-features = ["cb_closure_managed_deser"]
 
 [dev-dependencies.elrond-wasm-debug]
 version = "0.28.0"
