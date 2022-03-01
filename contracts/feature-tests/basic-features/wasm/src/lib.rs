@@ -207,6 +207,8 @@ elrond_wasm_node::wasm_endpoints! {
         managed_vec_address_push
         managed_vec_biguint_eq
         managed_vec_biguint_push
+        managed_vec_contains
+        managed_vec_find
         managed_vec_new
         managed_vec_remove
         managed_vec_set
