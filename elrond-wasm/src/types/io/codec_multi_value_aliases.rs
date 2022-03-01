@@ -3,7 +3,7 @@ use elrond_codec::multi_types::{IgnoreValue, MultiValueVec, OptionalValue};
 /// Structure that allows taking a variable number of arguments
 /// or returning a variable number of results in a smart contract endpoint.
 #[deprecated(
-    since = "0.28.0",
+    since = "0.29.0",
     note = "Alias kept for backwards compatibility. Replace with `MultiValueVec`"
 )]
 pub type MultiArgVec<T> = MultiValueVec<T>;
@@ -11,7 +11,7 @@ pub type MultiArgVec<T> = MultiValueVec<T>;
 /// Used for taking a variable number of arguments in an endpoint,
 /// it is synonymous with `MultiResultVec`/`MultiArgVec`.
 #[deprecated(
-    since = "0.28.0",
+    since = "0.29.0",
     note = "Alias kept for backwards compatibility. Replace with `MultiValueVec`"
 )]
 pub type VarArgs<T> = MultiArgVec<T>;
@@ -19,7 +19,7 @@ pub type VarArgs<T> = MultiArgVec<T>;
 /// Used for returning a variable number of results from an endpoint,
 /// it is synonymous with `MultiResult`.
 #[deprecated(
-    since = "0.28.0",
+    since = "0.29.0",
     note = "Alias kept for backwards compatibility. Replace with `MultiValueVec`"
 )]
 pub type MultiResultVec<T> = VarArgs<T>;
@@ -27,7 +27,7 @@ pub type MultiResultVec<T> = VarArgs<T>;
 /// Structure that allows taking a variable number of arguments,
 /// but does nothing with them, not even deserialization.
 #[deprecated(
-    since = "0.28.0",
+    since = "0.29.0",
     note = "Alias kept for backwards compatibility. Replace with `IgnoreValue`"
 )]
 pub type IgnoreVarArgs = IgnoreValue;
@@ -40,7 +40,7 @@ pub type IgnoreVarArgs = IgnoreValue;
 /// As a principle, optional arguments or results should come last,
 /// otherwise there is ambiguity as to how to interpret what comes after.
 #[deprecated(
-    since = "0.28.0",
+    since = "0.29.0",
     note = "Alias kept for backwards compatibility. Replace with `OptionalValue`"
 )]
 pub type OptionalArg<T> = OptionalValue<T>;
@@ -49,7 +49,7 @@ pub type OptionalArg<T> = OptionalValue<T>;
 /// In general we use `OptionalArg` for arguments and `OptionalResult` for results,
 /// but it is the same implementation for both.
 #[deprecated(
-    since = "0.28.0",
+    since = "0.29.0",
     note = "Alias kept for backwards compatibility. Replace with `OptionalValue`"
 )]
 pub type OptionalResult<T> = OptionalArg<T>;
@@ -58,13 +58,13 @@ macro_rules! multi_arg_impls {
     ($(($mval_struct:ident $marg_struct:ident $mres_struct:ident $($n:tt $name:ident)+) )+) => {
         $(
             #[deprecated(
-                since = "0.28.0",
+                since = "0.29.0",
                 note = "Alias kept for backwards compatibility. Replace with `MultiValue*`"
             )]
             pub type $marg_struct<$($name,)+> = elrond_codec::multi_types::$mval_struct<$($name,)+>;
 
             #[deprecated(
-                since = "0.28.0",
+                since = "0.29.0",
                 note = "Alias kept for backwards compatibility. Replace with `MultiValue*`"
             )]
             pub type $mres_struct<$($name,)+> = elrond_codec::multi_types::$mval_struct<$($name,)+>;
