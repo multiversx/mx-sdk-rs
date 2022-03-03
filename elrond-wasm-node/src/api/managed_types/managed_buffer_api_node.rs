@@ -180,13 +180,9 @@ impl ManagedBufferApi for crate::VmApiImpl {
             }
         }
 
-        if starting_position > 0 {
-            let copy_result = self.mb_copy_slice(dest_handle, 0, starting_position, dest_handle);
-            if copy_result.is_err() {
-                return copy_result;
-            }
-        } else {
-            self.mb_overwrite(dest_handle, &[]);
+        let copy_result = self.mb_copy_slice(dest_handle, 0, starting_position, dest_handle);
+        if copy_result.is_err() {
+            return copy_result;
         }
 
         self.mb_append_bytes(dest_handle, source_slice);
