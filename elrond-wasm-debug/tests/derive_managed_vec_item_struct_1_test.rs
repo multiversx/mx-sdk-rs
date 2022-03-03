@@ -6,7 +6,7 @@ use elrond_wasm_debug::DebugApi;
 elrond_wasm::derive_imports!();
 
 // to test, run the following command in elrond-wasm-debug folder:
-// cargo expand --test derive_managed_vec_item_numbers_test > expanded.rs
+// cargo expand --test derive_managed_vec_item_struct_1_test > expanded.rs
 
 #[derive(
     ManagedVecItem, NestedEncode, NestedDecode, TopEncode, TopDecode, PartialEq, Clone, Debug,
