@@ -5,7 +5,7 @@ use elrond_wasm_debug::DebugApi;
 elrond_wasm::derive_imports!();
 
 // to test, run the following command in elrond-wasm-debug folder:
-// cargo expand --test derive_managed_vec_item_numbers_test > expanded.rs
+// cargo expand --test derive_managed_vec_item_struct_2_test > expanded.rs
 
 #[derive(
     ManagedVecItem, NestedEncode, NestedDecode, TopEncode, TopDecode, PartialEq, Clone, Debug,
@@ -75,11 +75,6 @@ fn struct_2_from_bytes_reader() {
 		/* bool */ 0x00,
         /* opt  */ 0x01, 0x05,
 	];
-
-    // let arr: [u8; 16] = [
-    //     0x01, 0x00, 0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04,
-    //     0x00,
-    // ];
 
     let struct_from_bytes =
         <Struct2 as elrond_wasm::types::ManagedVecItem>::from_byte_reader(|bytes| {
