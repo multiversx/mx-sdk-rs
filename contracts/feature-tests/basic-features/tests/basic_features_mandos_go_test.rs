@@ -276,6 +276,11 @@ fn managed_buffer_slice_2_go() {
 }
 
 #[test]
+fn managed_buffer_slice_3_go() {
+    elrond_wasm_debug::mandos_go("mandos/managed_buffer_slice_3.scen.json");
+}
+
+#[test]
 fn managed_vec_address_push_go() {
     elrond_wasm_debug::mandos_go("mandos/managed_vec_address_push.scen.json");
 }
