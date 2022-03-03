@@ -8,6 +8,11 @@ use crate::{
     },
 };
 
+/// We assume that no payloads will exceed this value.
+/// This limit cannot be determined at compile-time for types with generics, due to current Rust compiler contraints.
+/// TODO: find a way to validate this assumption, if possible at compile time.
+const MAX_PAYLOAD_SIZE: usize = 200;
+
 /// Types that implement this trait can be items inside a `ManagedVec`.
 /// All these types need a payload, i.e a representation that gets stored
 /// in the underlying managed buffer.
@@ -119,6 +124,46 @@ impl ManagedVecItem for bool {
     fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, writer: Writer) -> R {
         let u8_value = if *self { 1u8 } else { 0u8 };
         <u8 as ManagedVecItem>::to_byte_writer(&u8_value, writer)
+    }
+}
+
+impl<T> ManagedVecItem for Option<T>
+where
+    T: ManagedVecItem,
+{
+    const PAYLOAD_SIZE: usize = u8::PAYLOAD_SIZE + T::PAYLOAD_SIZE;
+    const SKIPS_RESERIALIZATION: bool = false;
+    type Ref<'a> = Self;
+
+    fn from_byte_reader<Reader: FnMut(&mut [u8])>(mut reader: Reader) -> Self {
+        let mut arr: [u8; MAX_PAYLOAD_SIZE] = [0u8; MAX_PAYLOAD_SIZE];
+        let slice = &mut arr[..Self::PAYLOAD_SIZE];
+        reader(slice);
+        if slice[0] == 0 {
+            None
+        } else {
+            Some(T::from_byte_reader(|bytes| {
+                bytes.copy_from_slice(&slice[1..]);
+            }))
+        }
+    }
+
+    unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
+        reader: Reader,
+    ) -> Self::Ref<'a> {
+        Self::from_byte_reader(reader)
+    }
+
+    fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, mut writer: Writer) -> R {
+        let mut arr: [u8; MAX_PAYLOAD_SIZE] = [0u8; MAX_PAYLOAD_SIZE];
+        let slice = &mut arr[..Self::PAYLOAD_SIZE];
+        if let Some(t) = self {
+            slice[0] = 1;
+            T::to_byte_writer(t, |bytes| {
+                slice[1..].copy_from_slice(bytes);
+            });
+        }
+        writer(slice)
     }
 }
 

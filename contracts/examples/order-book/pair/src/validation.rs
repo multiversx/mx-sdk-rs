@@ -18,7 +18,7 @@ pub trait ValidationModule: common::CommonModule {
         require!(
             self.calculate_fee_amount(
                 &params.amount,
-                &FeeConfig{
+                &FeeConfig {
                     fee_type: FeeConfigEnum::Percent,
                     fixed_fee: BigUint::zero(),
                     percent_fee: FEE_PENALTY_INCREASE_PERCENT,
@@ -38,7 +38,10 @@ pub trait ValidationModule: common::CommonModule {
     fn require_valid_order_input_fee_config(&self, params: &OrderInputParams<Self::Api>) {
         match params.fee_config.fee_type.clone() {
             FeeConfigEnum::Fixed => {
-                require!(params.fee_config.fixed_fee < params.amount, "Invalid fee config fixed amount");
+                require!(
+                    params.fee_config.fixed_fee < params.amount,
+                    "Invalid fee config fixed amount"
+                );
             },
             FeeConfigEnum::Percent => {
                 require!(
@@ -114,20 +117,29 @@ pub trait ValidationModule: common::CommonModule {
         require!(!order_ids.is_empty(), "Order ids vec is empty");
     }
 
-    fn require_match_provider_empty_or_caller(&self, orders: &MultiValueManagedVec<Order<Self::Api>>) {
+    fn require_match_provider_empty_or_caller(
+        &self,
+        orders: &MultiValueManagedVec<Order<Self::Api>>,
+    ) {
         let caller = &self.blockchain().get_caller();
 
         for order in orders.iter() {
-            if order.match_provider != ManagedAddress::zero(){
-                require!(&order.match_provider == caller, "Caller is not matched order id");
-            }
-            else {
+            if order.match_provider != ManagedAddress::zero() {
+                require!(
+                    &order.match_provider == caller,
+                    "Caller is not matched order id"
+                );
+            } else {
                 {}
             }
         }
     }
 
-    fn require_contains_all(&self, vec_base: &MultiValueManagedVec<u64>, items: &MultiValueManagedVec<u64>) {
+    fn require_contains_all(
+        &self,
+        vec_base: &MultiValueManagedVec<u64>,
+        items: &MultiValueManagedVec<u64>,
+    ) {
         for item in items.iter() {
             let mut check_item = false;
             for base in vec_base.iter() {
@@ -140,7 +152,11 @@ pub trait ValidationModule: common::CommonModule {
         }
     }
 
-    fn require_contains_none(&self, vec_base: &MultiValueManagedVec<u64>, items: &MultiValueManagedVec<u64>) {
+    fn require_contains_none(
+        &self,
+        vec_base: &MultiValueManagedVec<u64>,
+        items: &MultiValueManagedVec<u64>,
+    ) {
         for item in items.iter() {
             let mut check_item = false;
             for base in vec_base.iter() {
