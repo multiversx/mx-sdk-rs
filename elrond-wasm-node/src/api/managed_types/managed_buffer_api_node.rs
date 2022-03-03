@@ -160,6 +160,10 @@ impl ManagedBufferApi for crate::VmApiImpl {
         source_slice: &[u8],
     ) -> Result<(), InvalidSliceError> {
         let dest_buffer_len = self.mb_len(dest_handle);
+        let slice_len = source_slice.len();
+        if starting_position + slice_len > dest_buffer_len {
+            return Err(InvalidSliceError);
+        }
 
         let part_before_handle = self.mb_new_empty();
         if starting_position > 0 {
@@ -170,25 +174,25 @@ impl ManagedBufferApi for crate::VmApiImpl {
             }
         }
 
-        self.mb_overwrite(dest_handle, &[]);
-        self.mb_append(dest_handle, part_before_handle);
-        self.mb_append_bytes(dest_handle, source_slice);
-
-        if starting_position < dest_buffer_len - 1 {
-            let part_after_handle = self.mb_new_empty();
-            let part_after_len = dest_buffer_len - starting_position;
+        let part_after_handle = self.mb_new_empty();
+        let part_after_start = starting_position + slice_len;
+        let nr_leftover_bytes_after = dest_buffer_len - part_after_start - 1;
+        if nr_leftover_bytes_after > 0 {
             let copy_result = self.mb_copy_slice(
                 dest_handle,
                 starting_position,
-                part_after_len,
+                nr_leftover_bytes_after,
                 part_after_handle,
             );
             if copy_result.is_err() {
                 return copy_result;
             }
-
-            self.mb_append(dest_handle, part_after_handle);
         }
+
+        self.mb_overwrite(dest_handle, &[]);
+        self.mb_append(dest_handle, part_before_handle);
+        self.mb_append_bytes(dest_handle, source_slice);
+        self.mb_append(dest_handle, part_after_handle);
 
         Ok(())
     }
