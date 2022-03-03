@@ -4,6 +4,10 @@ There are several crates in this repo, this changelog will keep track of all of 
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [elrond-wasm 0.29.3] - 2022-03-03
+- `ManagedVec` backwards compatible implementation for `set`.
+- Implemented `ManagedVecItem` for `Option<T>`.
+
 ## [elrond-wasm 0.29.2] - 2022-03-01
 - Disabled git tag/commit info in ABI due to issue in standard modules.
 
