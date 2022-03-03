@@ -167,11 +167,11 @@ impl ManagedBufferApi for crate::VmApiImpl {
 
         let part_after_handle = self.mb_new_empty();
         let part_after_start = starting_position + slice_len;
-        let nr_leftover_bytes_after = dest_buffer_len - part_after_start - 1;
+        let nr_leftover_bytes_after = dest_buffer_len - part_after_start;
         if nr_leftover_bytes_after > 0 {
             let copy_result = self.mb_copy_slice(
                 dest_handle,
-                starting_position,
+                part_after_start,
                 nr_leftover_bytes_after,
                 part_after_handle,
             );
