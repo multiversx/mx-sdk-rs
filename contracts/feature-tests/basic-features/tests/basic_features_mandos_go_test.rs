@@ -43,11 +43,6 @@ fn crypto_elliptic_curves_go() {
     elrond_wasm_debug::mandos_go("mandos/crypto_elliptic_curves.scen.json");
 }
 
-#[test]
-fn crypto_keccak256_legacy_go() {
-    elrond_wasm_debug::mandos_go("mandos/crypto_keccak256_legacy.scen.json");
-}
-
 // TODO: enable after new VM release is out.
 // #[test]
 // fn crypto_keccak256_go() {
@@ -55,13 +50,13 @@ fn crypto_keccak256_legacy_go() {
 // }
 
 #[test]
-fn crypto_ripemd160_go() {
-    elrond_wasm_debug::mandos_go("mandos/crypto_ripemd160.scen.json");
+fn crypto_keccak256_legacy_go() {
+    elrond_wasm_debug::mandos_go("mandos/crypto_keccak256_legacy.scen.json");
 }
 
 #[test]
-fn crypto_sha256_legacy_go() {
-    elrond_wasm_debug::mandos_go("mandos/crypto_sha256_legacy.scen.json");
+fn crypto_ripemd160_go() {
+    elrond_wasm_debug::mandos_go("mandos/crypto_ripemd160.scen.json");
 }
 
 // TODO: enable after new VM release is out.
@@ -69,6 +64,11 @@ fn crypto_sha256_legacy_go() {
 // fn crypto_sha256_go() {
 //     elrond_wasm_debug::mandos_go("mandos/crypto_sha256.scen.json");
 // }
+
+#[test]
+fn crypto_sha256_legacy_go() {
+    elrond_wasm_debug::mandos_go("mandos/crypto_sha256_legacy.scen.json");
+}
 
 #[test]
 fn crypto_verify_funcs_go() {
@@ -186,6 +186,11 @@ fn echo_usize_go() {
 }
 
 #[test]
+fn echo_varags_tuples_go() {
+    elrond_wasm_debug::mandos_go("mandos/echo_varags_tuples.scen.json");
+}
+
+#[test]
 fn echo_varargs_managed_eager_go() {
     elrond_wasm_debug::mandos_go("mandos/echo_varargs_managed_eager.scen.json");
 }
@@ -193,11 +198,6 @@ fn echo_varargs_managed_eager_go() {
 #[test]
 fn echo_varargs_managed_sum_go() {
     elrond_wasm_debug::mandos_go("mandos/echo_varargs_managed_sum.scen.json");
-}
-
-#[test]
-fn echo_varags_tuples_go() {
-    elrond_wasm_debug::mandos_go("mandos/echo_varags_tuples.scen.json");
 }
 
 #[test]
@@ -231,6 +231,16 @@ fn get_cumulated_validator_rewards_go() {
 }
 
 #[test]
+fn managed_address_array_go() {
+    elrond_wasm_debug::mandos_go("mandos/managed_address_array.scen.json");
+}
+
+#[test]
+fn managed_address_managed_buffer_go() {
+    elrond_wasm_debug::mandos_go("mandos/managed_address_managed_buffer.scen.json");
+}
+
+#[test]
 fn managed_buffer_concat_1_go() {
     elrond_wasm_debug::mandos_go("mandos/managed_buffer_concat_1.scen.json");
 }
@@ -251,6 +261,11 @@ fn managed_buffer_overwrite_go() {
 }
 
 #[test]
+fn managed_buffer_set_random_go() {
+    elrond_wasm_debug::mandos_go("mandos/managed_buffer_set_random.scen.json");
+}
+
+#[test]
 fn managed_buffer_slice_1_go() {
     elrond_wasm_debug::mandos_go("mandos/managed_buffer_slice_1.scen.json");
 }
@@ -261,8 +276,8 @@ fn managed_buffer_slice_2_go() {
 }
 
 #[test]
-fn managed_buffer_random_go() {
-    elrond_wasm_debug::mandos_go("mandos/managed_buffer_set_random.scen.json");
+fn managed_buffer_slice_3_go() {
+    elrond_wasm_debug::mandos_go("mandos/managed_buffer_slice_3.scen.json");
 }
 
 #[test]
@@ -336,13 +351,13 @@ fn storage_i64_go() {
 }
 
 #[test]
-fn storage_load_from_address_go() {
-    elrond_wasm_debug::mandos_go("mandos/storage_load_from_address.scen.json");
+fn storage_i64_bad_go() {
+    elrond_wasm_debug::mandos_go("mandos/storage_i64_bad.scen.json");
 }
 
 #[test]
-fn storage_i64_bad_go() {
-    elrond_wasm_debug::mandos_go("mandos/storage_i64_bad.scen.json");
+fn storage_load_from_address_go() {
+    elrond_wasm_debug::mandos_go("mandos/storage_load_from_address.scen.json");
 }
 
 #[test]
@@ -361,6 +376,11 @@ fn storage_map3_go() {
 }
 
 #[test]
+fn storage_mapper_fungible_token_go() {
+    elrond_wasm_debug::mandos_go("mandos/storage_mapper_fungible_token.scen.json");
+}
+
+#[test]
 fn storage_mapper_linked_list_go() {
     elrond_wasm_debug::mandos_go("mandos/storage_mapper_linked_list.scen.json");
 }
@@ -373,6 +393,11 @@ fn storage_mapper_map_go() {
 #[test]
 fn storage_mapper_map_storage_go() {
     elrond_wasm_debug::mandos_go("mandos/storage_mapper_map_storage.scen.json");
+}
+
+#[test]
+fn storage_mapper_non_fungible_token_go() {
+    elrond_wasm_debug::mandos_go("mandos/storage_mapper_non_fungible_token.scen.json");
 }
 
 #[test]
@@ -398,6 +423,11 @@ fn storage_mapper_token_attributes_go() {
 #[test]
 fn storage_mapper_vec_go() {
     elrond_wasm_debug::mandos_go("mandos/storage_mapper_vec.scen.json");
+}
+
+#[test]
+fn storage_mapper_whitelist_go() {
+    elrond_wasm_debug::mandos_go("mandos/storage_mapper_whitelist.scen.json");
 }
 
 #[test]

@@ -15,8 +15,7 @@ pub trait Erc1155UserMock {
         _type_id: BigUint,
         _value: BigUint,
         _data: &[u8],
-    ) -> SCResult<()> {
-        Ok(())
+    ) {
     }
 
     #[endpoint(onERC1155BatchReceived)]
@@ -27,7 +26,6 @@ pub trait Erc1155UserMock {
         _type_ids: Vec<BigUint>,
         _values: Vec<BigUint>,
         _data: &[u8],
-    ) -> SCResult<()> {
-        Ok(())
+    ) {
     }
 }

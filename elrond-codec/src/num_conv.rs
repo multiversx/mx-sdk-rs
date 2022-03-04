@@ -1,4 +1,4 @@
-use crate::nested_ser_output::NestedEncodeOutput;
+use crate::NestedEncodeOutput;
 
 /// Adds number to output buffer.
 /// No argument generics here, because we want the executable binary as small as possible.

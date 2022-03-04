@@ -14,20 +14,17 @@ pub trait KittyOwnership {
     fn init(
         &self,
         birth_fee: BigUint,
-        #[var_args] opt_gene_science_contract_address: OptionalArg<ManagedAddress>,
-        #[var_args] opt_kitty_auction_contract_address: OptionalArg<ManagedAddress>,
+        #[var_args] opt_gene_science_contract_address: OptionalValue<ManagedAddress>,
+        #[var_args] opt_kitty_auction_contract_address: OptionalValue<ManagedAddress>,
     ) {
         self.birth_fee().set(birth_fee);
 
-        match opt_gene_science_contract_address {
-            OptionalArg::Some(addr) => self.gene_science_contract_address().set(&addr),
-            OptionalArg::None => {},
-        };
-
-        match opt_kitty_auction_contract_address {
-            OptionalArg::Some(addr) => self.kitty_auction_contract_address().set(&addr),
-            OptionalArg::None => {},
-        };
+        if let OptionalValue::Some(addr) = opt_gene_science_contract_address {
+            self.gene_science_contract_address().set(&addr);
+        }
+        if let OptionalValue::Some(addr) = opt_kitty_auction_contract_address {
+            self.kitty_auction_contract_address().set(&addr);
+        }
 
         self.create_genesis_kitty();
     }
@@ -134,7 +131,7 @@ pub trait KittyOwnership {
     }
 
     #[view(tokensOfOwner)]
-    fn tokens_of_owner(&self, address: ManagedAddress) -> ManagedMultiResultVec<u32> {
+    fn tokens_of_owner(&self, address: ManagedAddress) -> MultiValueEncoded<u32> {
         let nr_owned_kitties = self.nr_owned_kitties(&address).get();
         let total_kitties = self.total_kitties().get();
         let mut kitty_list = ManagedVec::new();
@@ -219,12 +216,12 @@ pub trait KittyOwnership {
         );
 
         let mut random = Random::new(
-            *self.blockchain().get_block_random_seed_legacy(),
-            self.blockchain().get_tx_hash_legacy().as_bytes(),
+            self.blockchain().get_block_random_seed(),
+            self.blockchain().get_tx_hash(),
         );
         let genes = KittyGenes::get_random(&mut random);
 
-        self.create_new_gen_zero_kitty(&genes)
+        self.create_new_gen_zero_kitty(genes)
     }
 
     // views - Kitty Breeding
@@ -322,7 +319,7 @@ pub trait KittyOwnership {
     }
 
     #[endpoint(giveBirth)]
-    fn give_birth(&self, matron_id: u32) -> AsyncCall {
+    fn give_birth(&self, matron_id: u32) {
         require!(self.is_valid_id(matron_id), "Invalid kitty id!");
 
         let matron = self.kitty_by_id(matron_id).get();
@@ -344,6 +341,7 @@ pub trait KittyOwnership {
                     self.callbacks()
                         .generate_kitty_genes_callback(matron_id, self.blockchain().get_caller()),
                 )
+                .call_and_exit()
         } else {
             sc_panic!("Gene science contract address not set!")
         }
@@ -381,7 +379,7 @@ pub trait KittyOwnership {
         matron_id: u32,
         sire_id: u32,
         generation: u16,
-        genes: &KittyGenes,
+        genes: KittyGenes,
         owner: &ManagedAddress,
     ) -> u32 {
         let mut total_kitties = self.total_kitties().get();
@@ -403,7 +401,7 @@ pub trait KittyOwnership {
         new_kitty_id
     }
 
-    fn create_new_gen_zero_kitty(&self, genes: &KittyGenes) -> u32 {
+    fn create_new_gen_zero_kitty(&self, genes: KittyGenes) -> u32 {
         let kitty_auction_addr = self.kitty_auction_contract_address().get();
         self.create_new_kitty(0, 0, 0, genes, &kitty_auction_addr)
     }
@@ -415,7 +413,7 @@ pub trait KittyOwnership {
             genesis_kitty.matron_id,
             genesis_kitty.sire_id,
             genesis_kitty.generation,
-            &genesis_kitty.genes,
+            genesis_kitty.genes,
             &ManagedAddress::zero(),
         );
     }
@@ -555,7 +553,7 @@ pub trait KittyOwnership {
                     matron_id,
                     sire_id,
                     new_kitty_generation,
-                    &genes,
+                    genes,
                     &new_kitty_owner,
                 );
 

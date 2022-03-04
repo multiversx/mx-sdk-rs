@@ -38,7 +38,7 @@
                         "topics": [
                             "str:event_a"
                         ],
-                        "data": ""
+                        "data": "0"
                     }
                 ],
                 "gas": "*",
@@ -47,13 +47,13 @@
         },
         {
             "step": "scCall",
-            "txId": "A2",
+            "txId": "logEventARepeat",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "logEventA",
+                "function": "logEventARepeat",
                 "arguments": [
-                    "0x1234abc"
+                    "3"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
@@ -64,12 +64,59 @@
                 "logs": [
                     {
                         "address": "sc:basic-features",
-                        "endpoint": "str:logEventA",
+                        "endpoint": "str:logEventARepeat",
                         "topics": [
                             "str:event_a"
                         ],
-                        "data": "0x1234abc"
+                        "data": "0"
+                    },
+                    {
+                        "address": "sc:basic-features",
+                        "endpoint": "str:logEventARepeat",
+                        "topics": [
+                            "str:event_a"
+                        ],
+                        "data": "1"
+                    },
+                    {
+                        "address": "sc:basic-features",
+                        "endpoint": "str:logEventARepeat",
+                        "topics": [
+                            "str:event_a"
+                        ],
+                        "data": "2"
                     }
+                ],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "logEventARepeat",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "logEventARepeat",
+                "arguments": [
+                    "3"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": [
+                    {
+                        "address": "sc:basic-features",
+                        "endpoint": "str:logEventARepeat",
+                        "topics": [
+                            "str:event_a"
+                        ],
+                        "data": "0"
+                    },
+                    "+"
                 ],
                 "gas": "*",
                 "refund": "*"

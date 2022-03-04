@@ -51,12 +51,12 @@ pub trait MultisigProposeModule: crate::multisig_state::MultisigStateModule {
         &self,
         to: ManagedAddress,
         egld_amount: BigUint,
-        opt_function: OptionalArg<ManagedBuffer>,
-        arguments: ManagedVarArgs<ManagedBuffer>,
+        opt_function: OptionalValue<ManagedBuffer>,
+        arguments: MultiValueEncoded<ManagedBuffer>,
     ) -> CallActionData<Self::Api> {
         let endpoint_name = match opt_function {
-            OptionalArg::Some(data) => data,
-            OptionalArg::None => ManagedBuffer::new(),
+            OptionalValue::Some(data) => data,
+            OptionalValue::None => ManagedBuffer::new(),
         };
         CallActionData {
             to,
@@ -75,8 +75,8 @@ pub trait MultisigProposeModule: crate::multisig_state::MultisigStateModule {
         &self,
         to: ManagedAddress,
         egld_amount: BigUint,
-        #[var_args] opt_function: OptionalArg<ManagedBuffer>,
-        #[var_args] arguments: ManagedVarArgs<ManagedBuffer>,
+        #[var_args] opt_function: OptionalValue<ManagedBuffer>,
+        #[var_args] arguments: MultiValueEncoded<ManagedBuffer>,
     ) -> usize {
         let call_data = self.prepare_call_data(to, egld_amount, opt_function, arguments);
         self.propose_action(Action::SendTransferExecute(call_data))
@@ -92,8 +92,8 @@ pub trait MultisigProposeModule: crate::multisig_state::MultisigStateModule {
         &self,
         to: ManagedAddress,
         egld_amount: BigUint,
-        #[var_args] opt_function: OptionalArg<ManagedBuffer>,
-        #[var_args] arguments: ManagedVarArgs<ManagedBuffer>,
+        #[var_args] opt_function: OptionalValue<ManagedBuffer>,
+        #[var_args] arguments: MultiValueEncoded<ManagedBuffer>,
     ) -> usize {
         let call_data = self.prepare_call_data(to, egld_amount, opt_function, arguments);
         self.propose_action(Action::SendAsyncCall(call_data))
@@ -105,7 +105,7 @@ pub trait MultisigProposeModule: crate::multisig_state::MultisigStateModule {
         amount: BigUint,
         source: ManagedAddress,
         code_metadata: CodeMetadata,
-        #[var_args] arguments: ManagedVarArgs<ManagedBuffer>,
+        #[var_args] arguments: MultiValueEncoded<ManagedBuffer>,
     ) -> usize {
         self.propose_action(Action::SCDeployFromSource {
             amount,
@@ -122,7 +122,7 @@ pub trait MultisigProposeModule: crate::multisig_state::MultisigStateModule {
         amount: BigUint,
         source: ManagedAddress,
         code_metadata: CodeMetadata,
-        #[var_args] arguments: ManagedVarArgs<ManagedBuffer>,
+        #[var_args] arguments: MultiValueEncoded<ManagedBuffer>,
     ) -> usize {
         self.propose_action(Action::SCUpgradeFromSource {
             sc_address,

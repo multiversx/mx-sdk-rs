@@ -10,18 +10,18 @@ pub trait Vault {
     #[init]
     fn init(
         &self,
-        #[var_args] opt_arg_to_echo: OptionalArg<ManagedBuffer>,
-    ) -> OptionalResult<ManagedBuffer> {
+        #[var_args] opt_arg_to_echo: OptionalValue<ManagedBuffer>,
+    ) -> OptionalValue<ManagedBuffer> {
         opt_arg_to_echo
     }
 
     #[endpoint]
     fn echo_arguments(
         &self,
-        #[var_args] args: ManagedVarArgs<ManagedBuffer>,
-    ) -> SCResult<ManagedMultiResultVec<ManagedBuffer>> {
+        #[var_args] args: MultiValueEncoded<ManagedBuffer>,
+    ) -> MultiValueEncoded<ManagedBuffer> {
         self.call_counts(b"echo_arguments").update(|c| *c += 1);
-        Ok(args)
+        args
     }
 
     #[endpoint]
@@ -66,9 +66,9 @@ pub trait Vault {
     #[endpoint]
     fn accept_multi_funds_echo(
         &self,
-    ) -> ManagedMultiResultVec<MultiArg3<TokenIdentifier, u64, BigUint>> {
+    ) -> MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>> {
         let payments = self.call_value().all_esdt_transfers();
-        let mut result = ManagedMultiResultVec::new();
+        let mut result = MultiValueEncoded::new();
 
         for payment in payments.into_iter() {
             result.push(
@@ -91,7 +91,7 @@ pub trait Vault {
         #[payment_token] token_identifier: TokenIdentifier,
         #[payment_amount] token_payment: BigUint,
         #[payment_nonce] token_nonce: u64,
-    ) -> SCResult<MultiResult4<TokenIdentifier, ManagedBuffer, BigUint, u64>> {
+    ) -> MultiValue4<TokenIdentifier, ManagedBuffer, BigUint, u64> {
         let token_type = self.call_value().esdt_token_type();
 
         self.accept_funds_event(
@@ -104,13 +104,13 @@ pub trait Vault {
         self.call_counts(b"accept_funds_echo_payment")
             .update(|c| *c += 1);
 
-        Ok((
+        (
             token_identifier,
             token_type.as_type_name().into(),
             token_payment,
             token_nonce,
         )
-            .into())
+            .into()
     }
 
     #[payable("*")]
@@ -129,8 +129,8 @@ pub trait Vault {
         #[payment_multi] _payments: ManagedVec<EsdtTokenPayment<Self::Api>>,
         token: TokenIdentifier,
         amount: BigUint,
-        #[var_args] opt_receive_func: OptionalArg<ManagedBuffer>,
-    ) -> SCResult<()> {
+        #[var_args] opt_receive_func: OptionalValue<ManagedBuffer>,
+    ) {
         let caller = self.blockchain().get_caller();
         let func_name = opt_receive_func.into_option().unwrap_or_default();
 
@@ -143,7 +143,7 @@ pub trait Vault {
                 &func_name,
                 &ManagedArgBuffer::new_empty(),
             )
-            .into()
+            .unwrap_or_else(|_| sc_panic!("ESDT transfer failed"));
     }
 
     #[endpoint]
@@ -152,14 +152,14 @@ pub trait Vault {
         token: TokenIdentifier,
         nonce: u64,
         amount: BigUint,
-        #[var_args] return_message: OptionalArg<ManagedBuffer>,
+        #[var_args] return_message: OptionalValue<ManagedBuffer>,
     ) {
         self.retrieve_funds_event(&token, nonce, &amount);
 
         let caller = self.blockchain().get_caller();
         let data = match return_message {
-            OptionalArg::Some(data) => data,
-            OptionalArg::None => ManagedBuffer::new(),
+            OptionalValue::Some(data) => data,
+            OptionalValue::None => ManagedBuffer::new(),
         };
 
         if token.is_egld() {
@@ -173,7 +173,7 @@ pub trait Vault {
     #[endpoint]
     fn retrieve_multi_funds_async(
         &self,
-        #[var_args] token_payments: ManagedVarArgs<MultiArg3<TokenIdentifier, u64, BigUint>>,
+        #[var_args] token_payments: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>>,
     ) {
         let caller = self.blockchain().get_caller();
         let mut all_payments = ManagedVec::new();

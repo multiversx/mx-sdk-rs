@@ -7,6 +7,7 @@
 elrond_wasm_node::wasm_endpoints! {
     basic_features
     (
+        callBack
         add_assign_big_int
         add_assign_big_int_ref
         add_assign_big_uint
@@ -15,6 +16,7 @@ elrond_wasm_node::wasm_endpoints! {
         add_big_int_ref
         add_big_uint
         add_big_uint_ref
+        add_to_whitelist
         big_int_from_biguint
         big_int_from_i64_1
         big_int_from_i64_2
@@ -42,6 +44,8 @@ elrond_wasm_node::wasm_endpoints! {
         boxed_bytes_concat_2
         boxed_bytes_split
         boxed_bytes_zeros
+        burn_fungible
+        check_contains
         clear_single_value_mapper
         clear_storage_value
         codec_err_contract_call
@@ -130,7 +134,10 @@ elrond_wasm_node::wasm_endpoints! {
         echo_vec_of_managed_buffer
         echo_vec_u8
         finish_simple_enum_variant_1
+        getFungibleTokenId
         getListMapper
+        getNonFungibleTokenId
+        get_balance_fungible
         get_block_epoch
         get_block_nonce
         get_block_random_seed
@@ -153,6 +160,8 @@ elrond_wasm_node::wasm_endpoints! {
         is_empty_opt_addr
         is_empty_single_value_mapper
         is_smart_contract
+        issue_fungible_custom_callback
+        issue_fungible_default_callback
         listMapperBack
         listMapperFront
         listMapperIterateByHand
@@ -185,6 +194,7 @@ elrond_wasm_node::wasm_endpoints! {
         log2_big_uint
         log2_big_uint_ref
         logEventA
+        logEventARepeat
         logEventB
         logLegacyEventA
         logLegacyEventB
@@ -197,7 +207,10 @@ elrond_wasm_node::wasm_endpoints! {
         managed_vec_address_push
         managed_vec_biguint_eq
         managed_vec_biguint_push
+        managed_vec_contains
+        managed_vec_find
         managed_vec_new
+        managed_vec_remove
         managed_vec_set
         map_mapper_contains_key
         map_mapper_entry_and_modify
@@ -221,6 +234,14 @@ elrond_wasm_node::wasm_endpoints! {
         map_storage_mapper_insert_value
         map_storage_mapper_remove
         map_storage_mapper_view
+        mapper_get_token_attributes
+        mapper_nft_add_quantity
+        mapper_nft_add_quantity_and_send
+        mapper_nft_burn
+        mapper_nft_create
+        mapper_nft_create_and_send
+        mapper_nft_get_balance
+        mapper_nft_set_token_id
         mbuffer_concat_1
         mbuffer_concat_2
         mbuffer_copy_slice
@@ -232,6 +253,8 @@ elrond_wasm_node::wasm_endpoints! {
         mbuffer_overwrite
         mbuffer_set_random
         mbuffer_set_slice
+        mint_and_send_fungible
+        mint_fungible
         mul_assign_big_int
         mul_assign_big_int_ref
         mul_assign_big_uint
@@ -266,7 +289,11 @@ elrond_wasm_node::wasm_endpoints! {
         rem_big_int_ref
         rem_big_uint
         rem_big_uint_ref
+        remove_from_whitelist
+        require_all_same_token_fungible
+        require_contains
         require_equals
+        require_same_token_fungible
         result_echo
         result_echo_2
         result_echo_3
@@ -277,6 +304,7 @@ elrond_wasm_node::wasm_endpoints! {
         result_err_from_string
         result_ok
         return_sc_error
+        set_local_roles_fungible
         set_mapper
         set_mapper_contains
         set_mapper_insert
@@ -338,5 +366,3 @@ elrond_wasm_node::wasm_endpoints! {
         verify_secp256k1_signature
     )
 }
-
-elrond_wasm_node::wasm_empty_callback! {}

@@ -4,14 +4,15 @@ pub use super::vec_mapper::Iter;
 use super::{StorageClearable, StorageMapper, VecMapper};
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
-    api::{EndpointFinishApi, ManagedTypeApi, StorageMapperApi},
-    finish_all,
+    api::StorageMapperApi,
     storage::StorageKey,
     storage_clear, storage_get, storage_set,
     types::{ManagedType, MultiResultVec},
-    EndpointResult,
 };
-use elrond_codec::{NestedDecode, NestedEncode, TopDecode, TopEncode};
+use elrond_codec::{
+    multi_encode_iter_or_handle_err, EncodeErrorHandler, NestedDecode, NestedEncode, TopDecode,
+    TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
+};
 
 const ITEM_INDEX: &[u8] = b".index";
 const NULL_ENTRY: usize = 0;
@@ -128,18 +129,19 @@ where
 }
 
 /// Behaves like a MultiResultVec when an endpoint result.
-impl<SA, T> EndpointResult for UnorderedSetMapper<SA, T>
+impl<SA, T> TopEncodeMulti for UnorderedSetMapper<SA, T>
 where
     SA: StorageMapperApi,
-    T: TopEncode + TopDecode + NestedEncode + NestedDecode + EndpointResult,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
 {
-    type DecodeAs = MultiResultVec<T::DecodeAs>;
+    type DecodeAs = MultiResultVec<T>;
 
-    fn finish<FA>(&self)
+    fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
     where
-        FA: ManagedTypeApi + EndpointFinishApi,
+        O: TopEncodeMultiOutput,
+        H: EncodeErrorHandler,
     {
-        finish_all::<FA, _, _>(self.iter());
+        multi_encode_iter_or_handle_err(self.iter(), output, h)
     }
 }
 
@@ -157,7 +159,7 @@ where
         T::provide_type_descriptions(accumulator);
     }
 
-    fn is_multi_arg_or_result() -> bool {
+    fn is_variadic() -> bool {
         true
     }
 }

@@ -17,7 +17,7 @@ pub trait Child {
         token_ticker: ManagedBuffer,
         initial_supply: BigUint,
         #[payment] issue_cost: BigUint,
-    ) -> AsyncCall {
+    ) {
         self.send()
             .esdt_system_sc_proxy()
             .issue_fungible(
@@ -39,6 +39,7 @@ pub trait Child {
             )
             .async_call()
             .with_callback(self.callbacks().esdt_issue_callback())
+            .call_and_exit()
     }
 
     // callbacks

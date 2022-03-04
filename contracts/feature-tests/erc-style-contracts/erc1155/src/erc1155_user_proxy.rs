@@ -10,7 +10,7 @@ pub trait Erc1155UserProxy {
         type_id: BigUint,
         value: BigUint,
         data: &[u8],
-    ) -> SCResult<()>;
+    );
 
     #[endpoint(onERC1155BatchReceived)]
     fn on_erc1155_batch_received(
@@ -20,5 +20,5 @@ pub trait Erc1155UserProxy {
         type_ids: Vec<BigUint>,
         values: Vec<BigUint>,
         data: &[u8],
-    ) -> SCResult<()>;
+    );
 }

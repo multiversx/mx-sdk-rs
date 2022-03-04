@@ -1,8 +1,7 @@
 use super::VmApiImpl;
 use elrond_wasm::{
     api::{CryptoApi, CryptoApiImpl, Handle},
-    types::{BoxedBytes, MessageHashType, H256},
-    Box,
+    types::{BoxedBytes, MessageHashType},
 };
 
 extern "C" {
@@ -70,6 +69,15 @@ impl CryptoApi for VmApiImpl {
 }
 
 impl CryptoApiImpl for VmApiImpl {
+    #[inline]
+    fn sha256_legacy(&self, data: &[u8]) -> [u8; 32] {
+        unsafe {
+            let mut res = [0u8; 32];
+            sha256(data.as_ptr(), data.len() as i32, res.as_mut_ptr());
+            res
+        }
+    }
+
     fn sha256(&self, data_handle: Handle) -> Handle {
         unsafe {
             let result_handle = mBufferNew();
@@ -78,17 +86,10 @@ impl CryptoApiImpl for VmApiImpl {
         }
     }
 
-    fn sha256_legacy(&self, data: &[u8]) -> H256 {
+    #[inline]
+    fn keccak256_legacy(&self, data: &[u8]) -> [u8; 32] {
         unsafe {
-            let mut res = H256::zero();
-            sha256(data.as_ptr(), data.len() as i32, res.as_mut_ptr());
-            res
-        }
-    }
-
-    fn keccak256_legacy(&self, data: &[u8]) -> H256 {
-        unsafe {
-            let mut res = H256::zero();
+            let mut res = [0u8; 32];
             keccak256(data.as_ptr(), data.len() as i32, res.as_mut_ptr());
             res
         }
@@ -102,11 +103,12 @@ impl CryptoApiImpl for VmApiImpl {
         }
     }
 
-    fn ripemd160(&self, data: &[u8]) -> Box<[u8; 20]> {
+    #[inline]
+    fn ripemd160(&self, data: &[u8]) -> [u8; 20] {
         unsafe {
             let mut res = [0u8; 20];
             ripemd160(data.as_ptr(), data.len() as i32, res.as_mut_ptr());
-            Box::new(res)
+            res
         }
     }
 

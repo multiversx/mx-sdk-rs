@@ -1,12 +1,12 @@
 use crate::{
     interpret_trait::{InterpretableFrom, InterpreterContext},
-    model::{BytesValue, CheckLogs, CheckValue, U64Value},
+    model::{BytesValue, CheckLogs, CheckValue, CheckValueList, U64Value},
     serde_raw::{CheckBytesValueRaw, TxExpectRaw},
 };
 
 #[derive(Debug)]
 pub struct TxExpect {
-    pub out: Vec<CheckValue<BytesValue>>,
+    pub out: CheckValueList,
     pub status: CheckValue<U64Value>,
     pub message: CheckValue<BytesValue>,
     pub logs: CheckLogs,
@@ -17,11 +17,7 @@ pub struct TxExpect {
 impl InterpretableFrom<TxExpectRaw> for TxExpect {
     fn interpret_from(from: TxExpectRaw, context: &InterpreterContext) -> Self {
         TxExpect {
-            out: from
-                .out
-                .into_iter()
-                .map(|t| CheckValue::<BytesValue>::interpret_from(t, context))
-                .collect(),
+            out: CheckValueList::interpret_from(from.out, context),
             status: CheckValue::<U64Value>::interpret_from(from.status, context),
             logs: CheckLogs::interpret_from(from.logs, context),
             message: CheckValue::<BytesValue>::interpret_from(from.message, context),
