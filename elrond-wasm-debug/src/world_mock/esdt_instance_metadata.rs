@@ -7,6 +7,6 @@ pub struct EsdtInstanceMetadata {
     pub creator: Option<Address>,
     pub royalties: u64,
     pub hash: Option<Vec<u8>>,
-    pub uri: Option<Vec<u8>>,
+    pub uri: Vec<Vec<u8>>,
     pub attributes: Vec<u8>,
 }

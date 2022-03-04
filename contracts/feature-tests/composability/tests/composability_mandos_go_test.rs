@@ -9,11 +9,6 @@ fn forw_raw_async_accept_esdt_go() {
 }
 
 #[test]
-fn forwarder_get_esdt_local_roles_go() {
-    elrond_wasm_debug::mandos_go("mandos/forwarder_get_esdt_local_roles.scen.json");
-}
-
-#[test]
 fn forw_raw_async_echo_go() {
     elrond_wasm_debug::mandos_go("mandos/forw_raw_async_echo.scen.json");
 }
@@ -63,6 +58,11 @@ fn forw_raw_direct_egld_go() {
 #[test]
 fn forw_raw_direct_esdt_go() {
     elrond_wasm_debug::mandos_go("mandos/forw_raw_direct_esdt.scen.json");
+}
+
+#[test]
+fn forw_raw_direct_multi_esdt_go() {
+    elrond_wasm_debug::mandos_go("mandos/forw_raw_direct_multi_esdt.scen.json");
 }
 
 #[test]
@@ -146,11 +146,6 @@ fn forwarder_call_async_accept_nft_go() {
 }
 
 #[test]
-fn forwarder_validate_token_identifier_go() {
-    elrond_wasm_debug::mandos_go("mandos/forwarder_validate_token_identifier.scen.json");
-}
-
-#[test]
 fn forwarder_call_async_multi_transfer_go() {
     elrond_wasm_debug::mandos_go("mandos/forwarder_call_async_multi_transfer.scen.json");
 }
@@ -203,11 +198,6 @@ fn forwarder_call_sync_accept_then_read_esdt_go() {
 #[test]
 fn forwarder_call_sync_accept_then_read_nft_go() {
     elrond_wasm_debug::mandos_go("mandos/forwarder_call_sync_accept_then_read_nft.scen.json");
-}
-
-#[test]
-fn forwarder_retrieve_funds_with_accept_func_go() {
-    elrond_wasm_debug::mandos_go("mandos/forwarder_retrieve_funds_with_accept_func.scen.json");
 }
 
 #[test]
@@ -283,6 +273,16 @@ fn forwarder_contract_upgrade_go() {
 }
 
 #[test]
+fn forwarder_get_esdt_local_roles_go() {
+    elrond_wasm_debug::mandos_go("mandos/forwarder_get_esdt_local_roles.scen.json");
+}
+
+#[test]
+fn forwarder_nft_add_uri_go() {
+    elrond_wasm_debug::mandos_go("mandos/forwarder_nft_add_uri.scen.json");
+}
+
+#[test]
 fn forwarder_nft_create_go() {
     elrond_wasm_debug::mandos_go("mandos/forwarder_nft_create.scen.json");
 }
@@ -313,8 +313,18 @@ fn forwarder_nft_transfer_exec_go() {
 }
 
 #[test]
+fn forwarder_nft_update_attributes_go() {
+    elrond_wasm_debug::mandos_go("mandos/forwarder_nft_update_attributes.scen.json");
+}
+
+#[test]
 fn forwarder_no_endpoint_go() {
     elrond_wasm_debug::mandos_go("mandos/forwarder_no_endpoint.scen.json");
+}
+
+#[test]
+fn forwarder_retrieve_funds_with_accept_func_go() {
+    elrond_wasm_debug::mandos_go("mandos/forwarder_retrieve_funds_with_accept_func.scen.json");
 }
 
 #[test]
@@ -345,6 +355,11 @@ fn forwarder_sync_echo_range_go() {
 #[test]
 fn forwarder_tranfer_esdt_with_fees_go() {
     elrond_wasm_debug::mandos_go("mandos/forwarder_tranfer_esdt_with_fees.scen.json");
+}
+
+#[test]
+fn forwarder_validate_token_identifier_go() {
+    elrond_wasm_debug::mandos_go("mandos/forwarder_validate_token_identifier.scen.json");
 }
 
 #[test]

@@ -25,12 +25,12 @@ pub trait NftMinter: nft_module::NftModule {
         royalties: BigUint,
         uri: ManagedBuffer,
         selling_price: BigUint,
-        #[var_args] opt_token_used_as_payment: OptionalArg<TokenIdentifier>,
-        #[var_args] opt_token_used_as_payment_nonce: OptionalArg<u64>,
+        #[var_args] opt_token_used_as_payment: OptionalValue<TokenIdentifier>,
+        #[var_args] opt_token_used_as_payment_nonce: OptionalValue<u64>,
     ) {
         let token_used_as_payment = match opt_token_used_as_payment {
-            OptionalArg::Some(token) => token,
-            OptionalArg::None => TokenIdentifier::egld(),
+            OptionalValue::Some(token) => token,
+            OptionalValue::None => TokenIdentifier::egld(),
         };
         require!(
             token_used_as_payment.is_egld() || token_used_as_payment.is_valid_esdt_identifier(),
@@ -41,8 +41,8 @@ pub trait NftMinter: nft_module::NftModule {
             0
         } else {
             match opt_token_used_as_payment_nonce {
-                OptionalArg::Some(nonce) => nonce,
-                OptionalArg::None => 0,
+                OptionalValue::Some(nonce) => nonce,
+                OptionalValue::None => 0,
             }
         };
 
@@ -70,11 +70,12 @@ pub trait NftMinter: nft_module::NftModule {
         marketplace_address: ManagedAddress,
         token_id: TokenIdentifier,
         token_nonce: u64,
-    ) -> AsyncCall {
+    ) {
         let caller = self.blockchain().get_caller();
         self.marketplace_proxy(marketplace_address)
             .claim_tokens(token_id, token_nonce, caller)
             .async_call()
+            .call_and_exit()
     }
 
     #[proxy]

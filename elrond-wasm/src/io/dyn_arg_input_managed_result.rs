@@ -1,8 +1,8 @@
+use elrond_codec::{DecodeError, DecodeErrorHandler, TopDecodeMultiInput};
+
 use crate::{
-    api::{ErrorApi, ErrorApiImpl, ManagedTypeApi},
-    err_msg,
+    api::{ErrorApi, ManagedTypeApi},
     types::{ManagedBuffer, ManagedVec},
-    DynArgInput,
 };
 
 pub struct ManagedResultArgLoader<A>
@@ -28,25 +28,25 @@ where
     }
 }
 
-impl<A> DynArgInput for ManagedResultArgLoader<A>
+impl<A> TopDecodeMultiInput for ManagedResultArgLoader<A>
 where
     A: ManagedTypeApi + ErrorApi,
 {
-    type ItemInput = ManagedBuffer<A>;
+    type ValueInput = ManagedBuffer<A>;
 
-    type ManagedTypeErrorApi = A;
-
-    #[inline]
     fn has_next(&self) -> bool {
         self.next_index < self.data_len
     }
 
-    fn next_arg_input(&mut self) -> Self::ItemInput {
+    fn next_value_input<H>(&mut self, h: H) -> Result<Self::ValueInput, H::HandledErr>
+    where
+        H: DecodeErrorHandler,
+    {
         if let Some(buffer) = self.data.try_get(self.next_index) {
             self.next_index += 1;
-            (*buffer).clone()
+            Ok((*buffer).clone())
         } else {
-            A::error_api_impl().signal_error(err_msg::ARG_WRONG_NUMBER)
+            Err(h.handle_error(DecodeError::MULTI_TOO_FEW_ARGS))
         }
     }
 }

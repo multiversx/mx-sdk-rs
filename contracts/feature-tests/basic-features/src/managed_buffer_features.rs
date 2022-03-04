@@ -44,30 +44,25 @@ pub trait ManagedBufferFeatures {
         mb: ManagedBuffer,
         starting_position: usize,
         slice_len: usize,
-    ) -> OptionalResult<BoxedBytes> {
+    ) -> OptionalValue<BoxedBytes> {
         let mut result = BoxedBytes::zeros(slice_len);
         if mb
             .load_slice(starting_position, result.as_mut_slice())
             .is_ok()
         {
-            OptionalResult::Some(result)
+            OptionalValue::Some(result)
         } else {
-            OptionalResult::None
+            OptionalValue::None
         }
     }
 
     #[endpoint]
-    fn mbuffer_set_slice(
-        &self,
-        mb: ManagedBuffer,
-        index: usize,
-        item: &[u8],
-    ) -> SCResult<ManagedBuffer> {
+    fn mbuffer_set_slice(&self, mb: ManagedBuffer, index: usize, item: &[u8]) -> ManagedBuffer {
         let mut result = mb;
+        if result.set_slice(index, item).is_err() {
+            sc_panic!("index out of bounds");
+        }
         result
-            .set_slice(index, item)
-            .map_err(|_| "index out of bounds")?;
-        Ok(result)
     }
 
     #[endpoint]
@@ -76,7 +71,7 @@ pub trait ManagedBufferFeatures {
         mb: ManagedBuffer,
         starting_position: usize,
         slice_len: usize,
-    ) -> OptionalResult<ManagedBuffer> {
+    ) -> OptionalValue<ManagedBuffer> {
         mb.copy_slice(starting_position, slice_len).into()
     }
 

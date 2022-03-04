@@ -18,7 +18,7 @@ macro_rules! imports {
             },
             arrayvec::ArrayVec,
             contract_base::{ContractBase, ProxyObjBase},
-            elrond_codec::{DecodeError, NestedDecode, NestedEncode, TopDecode},
+            elrond_codec::{multi_types::*, DecodeError, NestedDecode, NestedEncode, TopDecode},
             err_msg,
             esdt::*,
             io::*,

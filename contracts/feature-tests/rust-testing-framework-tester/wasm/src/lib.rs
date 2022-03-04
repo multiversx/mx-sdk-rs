@@ -24,11 +24,13 @@ elrond_wasm_node::wasm_endpoints! {
         get_random_buffer_once
         get_random_buffer_twice
         mint_esdt
+        panic
         receive_egld
         receive_esdt
         receive_esdt_half
         receive_multi_esdt
         recieve_egld_half
+        reject_payment
         send_nft
         sum
         sum_sc_result

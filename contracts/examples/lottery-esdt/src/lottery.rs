@@ -10,7 +10,7 @@ use status::Status;
 
 const PERCENTAGE_TOTAL: u32 = 100;
 const THIRTY_DAYS_IN_SECONDS: u64 = 60 * 60 * 24 * 30;
-const MAX_TICKETS: u32 = 800;
+const MAX_TICKETS: usize = 800;
 
 #[elrond_wasm::contract]
 pub trait Lottery {
@@ -23,12 +23,12 @@ pub trait Lottery {
         lottery_name: ManagedBuffer,
         token_identifier: TokenIdentifier,
         ticket_price: BigUint,
-        opt_total_tickets: Option<u32>,
+        opt_total_tickets: Option<usize>,
         opt_deadline: Option<u64>,
-        opt_max_entries_per_user: Option<u32>,
+        opt_max_entries_per_user: Option<usize>,
         opt_prize_distribution: Option<ManagedVec<u8>>,
         opt_whitelist: Option<ManagedVec<ManagedAddress>>,
-        #[var_args] opt_burn_percentage: OptionalArg<BigUint>,
+        #[var_args] opt_burn_percentage: OptionalValue<BigUint>,
     ) {
         self.start_lottery(
             lottery_name,
@@ -49,12 +49,12 @@ pub trait Lottery {
         lottery_name: ManagedBuffer,
         token_identifier: TokenIdentifier,
         ticket_price: BigUint,
-        opt_total_tickets: Option<u32>,
+        opt_total_tickets: Option<usize>,
         opt_deadline: Option<u64>,
-        opt_max_entries_per_user: Option<u32>,
+        opt_max_entries_per_user: Option<usize>,
         opt_prize_distribution: Option<ManagedVec<u8>>,
         opt_whitelist: Option<ManagedVec<ManagedAddress>>,
-        #[var_args] opt_burn_percentage: OptionalArg<BigUint>,
+        #[var_args] opt_burn_percentage: OptionalValue<BigUint>,
     ) {
         self.start_lottery(
             lottery_name,
@@ -75,12 +75,12 @@ pub trait Lottery {
         lottery_name: ManagedBuffer,
         token_identifier: TokenIdentifier,
         ticket_price: BigUint,
-        opt_total_tickets: Option<u32>,
+        opt_total_tickets: Option<usize>,
         opt_deadline: Option<u64>,
-        opt_max_entries_per_user: Option<u32>,
+        opt_max_entries_per_user: Option<usize>,
         opt_prize_distribution: Option<ManagedVec<u8>>,
         opt_whitelist: Option<ManagedVec<ManagedAddress>>,
-        #[var_args] opt_burn_percentage: OptionalArg<BigUint>,
+        #[var_args] opt_burn_percentage: OptionalValue<BigUint>,
     ) {
         require!(!lottery_name.is_empty(), "Name can't be empty!");
 
@@ -124,7 +124,7 @@ pub trait Lottery {
         );
 
         match opt_burn_percentage {
-            OptionalArg::Some(burn_percentage) => {
+            OptionalValue::Some(burn_percentage) => {
                 require!(!token_identifier.is_egld(), "EGLD can't be burned!");
 
                 let roles = self.blockchain().get_esdt_local_roles(&token_identifier);
@@ -140,7 +140,7 @@ pub trait Lottery {
                 self.burn_percentage_for_lottery(&lottery_name)
                     .set(burn_percentage);
             },
-            OptionalArg::None => {},
+            OptionalValue::None => {},
         }
 
         if let Some(whitelist) = opt_whitelist {
@@ -337,8 +337,18 @@ pub trait Lottery {
     // Normally, we recommend managed types, like ManagedVec > Vec, ManagedBuffer > BoxedBytes, etc.
     // But in this case, ManagedVec would need too many API calls for this algorithm
     /// does not check if max - min >= amount, that is the caller's job
-    fn get_distinct_random(&self, min: usize, max: usize, amount: usize) -> Vec<usize> {
-        let mut rand_numbers: Vec<usize> = (min..=max).collect();
+    fn get_distinct_random(
+        &self,
+        min: usize,
+        max: usize,
+        amount: usize,
+    ) -> ArrayVec<usize, MAX_TICKETS> {
+        let mut rand_numbers = ArrayVec::new();
+
+        for num in min..=max {
+            rand_numbers.push(num);
+        }
+
         let total_numbers = rand_numbers.len();
         let mut rand = RandomnessSource::<Self::Api>::new();
 
@@ -376,7 +386,7 @@ pub trait Lottery {
         &self,
         lottery_name: &ManagedBuffer,
         user: &ManagedAddress,
-    ) -> SingleValueMapper<u32>;
+    ) -> SingleValueMapper<usize>;
 
     #[storage_mapper("burnPercentageForLottery")]
     fn burn_percentage_for_lottery(

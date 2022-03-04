@@ -8,17 +8,17 @@ fn world() -> BlockchainMock {
         "file:output/basic-features.wasm",
         basic_features::ContractBuilder,
     );
+    blockchain.register_contract_builder(
+        "file:../esdt-system-sc-mock/output/esdt-system-sc-mock.wasm",
+        esdt_system_sc_mock::ContractBuilder,
+    );
+
     blockchain
 }
 
 #[test]
 fn big_int_to_i64_rs() {
     elrond_wasm_debug::mandos_rs("mandos/big_int_to_i64.scen.json", world());
-}
-
-#[test]
-fn echo_ignore_go() {
-    elrond_wasm_debug::mandos_rs("mandos/echo_ignore.scen.json", world());
 }
 
 #[test]
@@ -62,13 +62,13 @@ fn count_ones_rs() {
 // }
 
 #[test]
-fn crypto_keccak256_legacy_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/crypto_keccak256_legacy.scen.json", world());
+fn crypto_keccak256_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/crypto_keccak256.scen.json", world());
 }
 
 #[test]
-fn crypto_keccak256_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/crypto_keccak256.scen.json", world());
+fn crypto_keccak256_legacy_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/crypto_keccak256_legacy.scen.json", world());
 }
 
 // #[test]
@@ -77,13 +77,13 @@ fn crypto_keccak256_rs() {
 // }
 
 #[test]
-fn crypto_sha256_legacy_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/crypto_sha256_legacy.scen.json", world());
+fn crypto_sha256_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/crypto_sha256.scen.json", world());
 }
 
 #[test]
-fn crypto_sha256_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/crypto_sha256.scen.json", world());
+fn crypto_sha256_legacy_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/crypto_sha256_legacy.scen.json", world());
 }
 
 // #[test]
@@ -142,6 +142,11 @@ fn echo_i64_rs() {
 }
 
 #[test]
+fn echo_ignore_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/echo_ignore.scen.json", world());
+}
+
+#[test]
 fn echo_managed_bytes_rs() {
     elrond_wasm_debug::mandos_rs("mandos/echo_managed_bytes.scen.json", world());
 }
@@ -197,6 +202,11 @@ fn echo_usize_rs() {
 }
 
 #[test]
+fn echo_varags_tuples_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/echo_varags_tuples.scen.json", world());
+}
+
+#[test]
 fn echo_varargs_managed_eager_rs() {
     elrond_wasm_debug::mandos_rs("mandos/echo_varargs_managed_eager.scen.json", world());
 }
@@ -204,11 +214,6 @@ fn echo_varargs_managed_eager_rs() {
 #[test]
 fn echo_varargs_managed_sum_rs() {
     elrond_wasm_debug::mandos_rs("mandos/echo_varargs_managed_sum.scen.json", world());
-}
-
-#[test]
-fn echo_varags_tuples_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/echo_varags_tuples.scen.json", world());
 }
 
 #[test]
@@ -271,6 +276,13 @@ fn managed_buffer_overwrite_rs() {
     elrond_wasm_debug::mandos_rs("mandos/managed_buffer_overwrite.scen.json", world());
 }
 
+/*
+#[test]
+fn managed_buffer_random_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/managed_buffer_set_random.scen.json", world());
+}
+*/
+
 #[test]
 fn managed_buffer_slice_1_rs() {
     elrond_wasm_debug::mandos_rs("mandos/managed_buffer_slice_1.scen.json", world());
@@ -281,12 +293,10 @@ fn managed_buffer_slice_2_rs() {
     elrond_wasm_debug::mandos_rs("mandos/managed_buffer_slice_2.scen.json", world());
 }
 
-/*
 #[test]
-fn managed_buffer_random_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/managed_buffer_set_random.scen.json", world());
+fn managed_buffer_slice_3_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/managed_buffer_slice_3.scen.json", world());
 }
-*/
 
 #[test]
 fn managed_vec_address_push_rs() {
@@ -360,13 +370,13 @@ fn storage_i64_rs() {
 }
 
 #[test]
-fn storage_load_from_address_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/storage_load_from_address.scen.json", world());
+fn storage_i64_bad_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/storage_i64_bad.scen.json", world());
 }
 
 #[test]
-fn storage_i64_bad_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/storage_i64_bad.scen.json", world());
+fn storage_load_from_address_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/storage_load_from_address.scen.json", world());
 }
 
 #[test]
@@ -384,14 +394,16 @@ fn storage_map3_rs() {
     elrond_wasm_debug::mandos_rs("mandos/storage_map3.scen.json", world());
 }
 
+/*
+#[test]
+fn storage_mapper_fungible_token_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/storage_mapper_fungible_token.scen.json", world());
+}
+*/
+
 #[test]
 fn storage_mapper_linked_list_rs() {
     elrond_wasm_debug::mandos_rs("mandos/storage_mapper_linked_list.scen.json", world());
-}
-
-#[test]
-fn storage_mapper_queue_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/storage_mapper_queue.scen.json", world());
 }
 
 #[test]
@@ -402,6 +414,21 @@ fn storage_mapper_map_rs() {
 #[test]
 fn storage_mapper_map_storage_rs() {
     elrond_wasm_debug::mandos_rs("mandos/storage_mapper_map_storage.scen.json", world());
+}
+
+/*
+#[test]
+fn storage_mapper_non_fungible_token_rs() {
+    elrond_wasm_debug::mandos_rs(
+        "mandos/storage_mapper_non_fungible_token.scen.json",
+        world(),
+    );
+}
+*/
+
+#[test]
+fn storage_mapper_queue_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/storage_mapper_queue.scen.json", world());
 }
 
 #[test]
@@ -422,6 +449,11 @@ fn storage_mapper_token_attributes_rs() {
 #[test]
 fn storage_mapper_vec_rs() {
     elrond_wasm_debug::mandos_rs("mandos/storage_mapper_vec.scen.json", world());
+}
+
+#[test]
+fn storage_mapper_whitelist_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/storage_mapper_whitelist.scen.json", world());
 }
 
 #[test]

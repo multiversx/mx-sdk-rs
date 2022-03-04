@@ -8,8 +8,8 @@
                     "nonce": "0",
                     "balance": "0x1000000000",
                     "esdt": {
-                        "str:TOK-123000": "150",
-                        "str:OTHERTOK-123777": "500",
+                        "str:TOK-123456": "150",
+                        "str:OTHERTOK-123456": "500",
                         "str:NFT-123456": {
                             "instances": [
                                 {
@@ -34,11 +34,11 @@
                 "to": "address:B",
                 "esdtValue": [
                     {
-                        "tokenIdentifier": "str:TOK-123000",
+                        "tokenIdentifier": "str:TOK-123456",
                         "value": "100"
                     },
                     {
-                        "tokenIdentifier": "str:OTHERTOK-123777",
+                        "tokenIdentifier": "str:OTHERTOK-123456",
                         "value": "400"
                     },
                     {
@@ -59,8 +59,8 @@
                     "nonce": "1",
                     "balance": "0xf00000000",
                     "esdt": {
-                        "str:TOK-123000": "50",
-                        "str:OTHERTOK-123777": "100",
+                        "str:TOK-123456": "50",
+                        "str:OTHERTOK-123456": "100",
                         "str:NFT-123456": {
                             "instances": [
                                 {
@@ -76,8 +76,8 @@
                 "address:B": {
                     "nonce": "0",
                     "esdt": {
-                        "str:TOK-123000": "100",
-                        "str:OTHERTOK-123777": "400",
+                        "str:TOK-123456": "100",
+                        "str:OTHERTOK-123456": "400",
                         "str:NFT-123456": {
                             "instances": [
                                 {
