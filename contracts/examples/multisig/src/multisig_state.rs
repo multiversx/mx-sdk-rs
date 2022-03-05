@@ -17,7 +17,7 @@ pub trait MultisigStateModule {
     fn user_id_to_role(&self, user_id: usize) -> SingleValueMapper<UserRole>;
 
     #[storage_mapper("user_weight")]
-    fn user_id_to_weight(&self, user_id: usize) -> SingleValueMapper<u8>;
+    fn user_id_to_weight(&self, user_id: usize) -> SingleValueMapper<usize>;
 
     fn get_caller_id_and_role(&self) -> (usize, UserRole) {
         let caller_address = self.blockchain().get_caller();
@@ -112,5 +112,20 @@ pub trait MultisigStateModule {
                 signer_role.can_sign()
             })
             .count()
+    }
+
+    /// Similar to get_action_valid_signer_count, but it returns the weighted sum of all
+    /// the signers.
+    #[external_view(getActionValidSignerWeight)]
+    fn get_action_valid_signer_weight(&self, action_id: usize) -> usize {
+        let mut total_weight = 0;
+        let signer_ids = self.action_signer_ids(action_id);
+        for signer_id in signer_ids.iter() {
+            let signer_role = self.user_id_to_role(signer_id).get();
+            if signer_role.can_sign() {
+                total_weight += self.user_id_to_weight(signer_id).get();
+            }
+        }
+        total_weight
     }
 }

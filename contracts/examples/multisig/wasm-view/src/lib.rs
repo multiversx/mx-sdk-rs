@@ -11,6 +11,7 @@ elrond_wasm_node::external_view_wasm_endpoints! {
         getActionSignerCount
         getActionSigners
         getActionValidSignerCount
+        getActionValidSignerWeight
         getAllBoardMembers
         getAllProposers
         getPendingActionFullInfo
