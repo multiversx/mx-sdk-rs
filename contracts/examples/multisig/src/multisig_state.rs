@@ -16,6 +16,9 @@ pub trait MultisigStateModule {
     #[storage_mapper("user_role")]
     fn user_id_to_role(&self, user_id: usize) -> SingleValueMapper<UserRole>;
 
+    #[storage_mapper("user_weight")]
+    fn user_id_to_weight(&self, user_id: usize) -> SingleValueMapper<u8>;
+
     fn get_caller_id_and_role(&self) -> (usize, UserRole) {
         let caller_address = self.blockchain().get_caller();
         let caller_id = self.user_mapper().get_user_id(&caller_address);
