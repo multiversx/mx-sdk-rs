@@ -187,6 +187,14 @@ pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
                 );
                 OptionalValue::None
             },
+            Action::AddWeightToBoardMember {
+                board_member_address,
+                weight,
+            } => {
+                let user_id = self.user_mapper().get_user_id(&board_member_address);
+                self.user_id_to_weight(user_id).set_if_empty(&weight);
+                OptionalValue::None
+            },
         }
     }
 }
