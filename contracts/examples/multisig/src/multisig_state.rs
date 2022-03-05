@@ -123,7 +123,11 @@ pub trait MultisigStateModule {
         for signer_id in signer_ids.iter() {
             let signer_role = self.user_id_to_role(signer_id).get();
             if signer_role.can_sign() {
-                total_weight += self.user_id_to_weight(signer_id).get();
+                if self.user_id_to_weight(signer_id).is_empty() {
+                    total_weight += 1;
+                } else {
+                    total_weight += self.user_id_to_weight(signer_id).get();
+                }
             }
         }
         total_weight
