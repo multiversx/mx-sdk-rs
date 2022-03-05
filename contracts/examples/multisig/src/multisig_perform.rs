@@ -192,6 +192,10 @@ pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
                 new_weight,
             } => {
                 let user_id = self.user_mapper().get_user_id(&board_member_address);
+                require!(
+                    self.user_id_to_role(user_id).get() == UserRole::BoardMember,
+                    "user is not a board member"
+                );
                 self.user_id_to_weight(user_id).set(&new_weight);
                 OptionalValue::None
             },
