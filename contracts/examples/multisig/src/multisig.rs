@@ -25,9 +25,8 @@ pub trait Multisig:
         let board_vec = board.to_vec();
         let new_num_board_members = self.add_multiple_board_members(board_vec);
 
-        let num_proposers = self.num_proposers().get();
         require!(
-            new_num_board_members + num_proposers > 0,
+            new_num_board_members > 0,
             "board cannot be empty on init, no-one would be able to propose"
         );
 
