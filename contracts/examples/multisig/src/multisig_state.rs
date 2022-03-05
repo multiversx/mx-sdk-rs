@@ -124,8 +124,10 @@ pub trait MultisigStateModule {
             let signer_role = self.user_id_to_role(signer_id).get();
             if signer_role.can_sign() {
                 if self.user_id_to_weight(signer_id).is_empty() {
+                    // it means that the user has regular voting power
                     total_weight += 1;
                 } else {
+                    // it means that the user has weighted voting power
                     total_weight += self.user_id_to_weight(signer_id).get();
                 }
             }
