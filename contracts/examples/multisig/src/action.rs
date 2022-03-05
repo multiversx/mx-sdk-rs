@@ -35,9 +35,9 @@ pub enum Action<M: ManagedTypeApi> {
         code_metadata: CodeMetadata,
         arguments: ManagedVec<M, ManagedBuffer<M>>,
     },
-    AddWeightToBoardMember {
+    ChangeWeightForBoardMember {
         board_member_address: ManagedAddress<M>,
-        weight: usize,
+        new_weight: usize,
     },
 }
 

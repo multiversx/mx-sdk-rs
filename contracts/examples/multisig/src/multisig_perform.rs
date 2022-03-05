@@ -187,12 +187,12 @@ pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
                 );
                 OptionalValue::None
             },
-            Action::AddWeightToBoardMember {
+            Action::ChangeWeightForBoardMember {
                 board_member_address,
-                weight,
+                new_weight,
             } => {
                 let user_id = self.user_mapper().get_user_id(&board_member_address);
-                self.user_id_to_weight(user_id).set_if_empty(&weight);
+                self.user_id_to_weight(user_id).set(&new_weight);
                 OptionalValue::None
             },
         }
