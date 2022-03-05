@@ -62,7 +62,7 @@ pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
     #[view(quorumReached)]
     fn quorum_reached(&self, action_id: usize) -> bool {
         let quorum = self.quorum().get();
-        let valid_signers_count = self.get_action_valid_signer_count(action_id);
+        let valid_signers_count = self.get_action_valid_signer_weight(action_id);
         valid_signers_count >= quorum
     }
 

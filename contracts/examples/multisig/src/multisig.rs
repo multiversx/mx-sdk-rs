@@ -158,7 +158,7 @@ pub trait Multisig:
             "only board members and proposers can discard actions"
         );
         require!(
-            self.get_action_valid_signer_count(action_id) == 0,
+            self.get_action_valid_signer_weight(action_id) == 0,
             "cannot discard action with valid signatures"
         );
 
