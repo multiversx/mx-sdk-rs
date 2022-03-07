@@ -2,11 +2,15 @@ use core::marker::PhantomData;
 
 use super::{set_mapper, SetMapper, StorageClearable, StorageMapper};
 use crate::{
+    abi::{TypeAbi, TypeDescriptionContainer, TypeName},
     api::StorageMapperApi,
     storage::{storage_clear, storage_get, storage_set, StorageKey},
-    types::ManagedType,
+    types::{ManagedType, MultiResultVec},
 };
-use elrond_codec::{NestedDecode, NestedEncode, TopDecode, TopEncode};
+use elrond_codec::{
+    multi_encode_iter_or_handle_err, multi_types::MultiValue2, EncodeErrorHandler, NestedDecode,
+    NestedEncode, TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
+};
 
 const MAPPED_VALUE_IDENTIFIER: &[u8] = b".mapped";
 type Keys<'a, SA, T> = set_mapper::Iter<'a, SA, T>;
@@ -430,5 +434,45 @@ where
     /// Takes the value of the entry out of the map, and returns it.
     pub fn remove(self) -> V {
         self.map.remove(&self.key).unwrap()
+    }
+}
+
+/// Behaves like a MultiResultVec<MultiValue2<K, V>> when an endpoint result.
+impl<SA, K, V> TopEncodeMulti for MapMapper<SA, K, V>
+where
+    SA: StorageMapperApi,
+    K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
+    V: TopEncode + TopDecode + 'static,
+{
+    type DecodeAs = MultiResultVec<MultiValue2<K, V>>;
+
+    fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: TopEncodeMultiOutput,
+        H: EncodeErrorHandler,
+    {
+        let iter = self.iter().map(MultiValue2::<K, V>::from);
+        multi_encode_iter_or_handle_err(iter, output, h)
+    }
+}
+
+/// Behaves like a MultiResultVec<MultiValue<K, V>> when an endpoint result.
+impl<SA, K, V> TypeAbi for MapMapper<SA, K, V>
+where
+    SA: StorageMapperApi,
+    K: TopEncode + TopDecode + NestedEncode + NestedDecode + TypeAbi + 'static,
+    V: TopEncode + TopDecode + TypeAbi + 'static,
+{
+    fn type_name() -> TypeName {
+        MultiResultVec::<MultiValue2<K, V>>::type_name()
+    }
+
+    fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
+        K::provide_type_descriptions(accumulator);
+        V::provide_type_descriptions(accumulator);
+    }
+
+    fn is_variadic() -> bool {
+        true
     }
 }
