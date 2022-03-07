@@ -46,7 +46,7 @@ pub trait EgldEsdtSwap {
                     can_burn: false,
                     can_change_owner: true,
                     can_upgrade: true,
-                    can_add_special_roles: false,
+                    can_add_special_roles: true,
                 },
             )
             .async_call()
