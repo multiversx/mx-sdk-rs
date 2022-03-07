@@ -14,24 +14,30 @@ use crate::{
 /// - as input, is built from 3 arguments instead of 1: token identifier, nonce, value
 /// - as output, it becomes 3 results instead of 1: token identifier, nonce, value
 #[derive(Clone, PartialEq, Debug)]
-pub struct EsdtTokenPaymentMultiArg<M: ManagedTypeApi> {
+pub struct EsdtTokenPaymentMultiValue<M: ManagedTypeApi> {
     obj: EsdtTokenPayment<M>,
 }
 
-impl<M: ManagedTypeApi> From<EsdtTokenPayment<M>> for EsdtTokenPaymentMultiArg<M> {
+#[deprecated(
+    since = "0.29.3",
+    note = "Alias kept for backwards compatibility. Replace with `EsdtTokenPaymentMultiValue`"
+)]
+pub type EsdtTokenPaymentMultiArg<M> = EsdtTokenPaymentMultiValue<M>;
+
+impl<M: ManagedTypeApi> From<EsdtTokenPayment<M>> for EsdtTokenPaymentMultiValue<M> {
     #[inline]
     fn from(obj: EsdtTokenPayment<M>) -> Self {
-        EsdtTokenPaymentMultiArg { obj }
+        EsdtTokenPaymentMultiValue { obj }
     }
 }
 
-impl<M: ManagedTypeApi> EsdtTokenPaymentMultiArg<M> {
+impl<M: ManagedTypeApi> EsdtTokenPaymentMultiValue<M> {
     pub fn into_esdt_token_payment(self) -> EsdtTokenPayment<M> {
         self.obj
     }
 }
 
-impl<M: ManagedTypeApi> ManagedVecItem for EsdtTokenPaymentMultiArg<M> {
+impl<M: ManagedTypeApi> ManagedVecItem for EsdtTokenPaymentMultiValue<M> {
     const PAYLOAD_SIZE: usize = EsdtTokenPayment::<M>::PAYLOAD_SIZE;
     const SKIPS_RESERIALIZATION: bool = EsdtTokenPayment::<M>::SKIPS_RESERIALIZATION;
     type Ref<'a> = Self;
@@ -54,7 +60,7 @@ impl<M: ManagedTypeApi> ManagedVecItem for EsdtTokenPaymentMultiArg<M> {
     }
 }
 
-impl<M> TopEncodeMulti for EsdtTokenPaymentMultiArg<M>
+impl<M> TopEncodeMulti for EsdtTokenPaymentMultiValue<M>
 where
     M: ManagedTypeApi,
 {
@@ -72,7 +78,7 @@ where
     }
 }
 
-impl<M> TopDecodeMulti for EsdtTokenPaymentMultiArg<M>
+impl<M> TopDecodeMulti for EsdtTokenPaymentMultiValue<M>
 where
     M: ManagedTypeApi,
 {
@@ -88,7 +94,7 @@ where
     }
 }
 
-impl<M> TypeAbi for EsdtTokenPaymentMultiArg<M>
+impl<M> TypeAbi for EsdtTokenPaymentMultiValue<M>
 where
     M: ManagedTypeApi,
 {

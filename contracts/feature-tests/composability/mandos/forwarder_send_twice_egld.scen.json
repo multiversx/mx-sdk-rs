@@ -44,10 +44,7 @@
                         "endpoint": "str:accept_funds",
                         "topics": [
                             "str:accept_funds",
-                            "str:EGLD",
-                            "str:FungibleESDT",
-                            "1",
-                            "0"
+                            "1"
                         ],
                         "data": ""
                     },
@@ -56,10 +53,7 @@
                         "endpoint": "str:accept_funds",
                         "topics": [
                             "str:accept_funds",
-                            "str:EGLD",
-                            "str:FungibleESDT",
-                            "1",
-                            "0"
+                            "1"
                         ],
                         "data": ""
                     }
