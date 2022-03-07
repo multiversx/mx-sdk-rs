@@ -47,7 +47,7 @@ impl TxResult {
     pub fn from_panic_obj(panic_obj: &TxPanic) -> Self {
         TxResult {
             result_status: panic_obj.status,
-            result_message: String::from_utf8(panic_obj.message.clone()).unwrap(),
+            result_message: panic_obj.message.clone(),
             result_values: Vec::new(),
             result_logs: Vec::new(),
             result_calls: TxResultCalls::empty(),

@@ -45,7 +45,6 @@ elrond_wasm_node::wasm_endpoints! {
         lastIssuedToken
         local_burn
         local_mint
-        multi_transfer_via_async
         nft_add_quantity
         nft_add_uris
         nft_burn
@@ -55,6 +54,7 @@ elrond_wasm_node::wasm_endpoints! {
         nft_decode_complex_attributes
         nft_issue
         nft_update_attributes
+        send_async_accept_multi_transfer
         send_egld
         send_esdt
         send_esdt_direct_multi_transfer
