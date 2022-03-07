@@ -83,7 +83,7 @@
                         "str:FWD-TOKEN": "300"
                     },
                     "storage": {
-                        "str:call_counts|nested:str:accept_funds_multi_transfer": "1"
+                        "str:call_counts|nested:str:accept_funds": "1"
                     },
                     "code": "file:../vault/output/vault.wasm"
                 },
@@ -177,7 +177,7 @@
                         }
                     },
                     "storage": {
-                        "str:call_counts|nested:str:accept_funds_multi_transfer": "2"
+                        "str:call_counts|nested:str:accept_funds": "2"
                     },
                     "code": "file:../vault/output/vault.wasm"
                 },

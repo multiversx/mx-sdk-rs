@@ -9,8 +9,6 @@ elrond_wasm_node::wasm_endpoints! {
     (
         accept_funds
         accept_funds_echo_payment
-        accept_funds_multi_transfer
-        accept_multi_funds_echo
         burn_and_create_retrive_async
         call_counts
         echo_arguments

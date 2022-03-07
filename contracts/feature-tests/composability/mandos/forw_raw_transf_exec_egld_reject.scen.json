@@ -37,7 +37,8 @@
             },
             "expect": {
                 "out": [],
-                "status": "",
+                "status": "10",
+                "message": "str:error signalled by smartcontract",
                 "logs": "*",
                 "gas": "*",
                 "refund": "*"

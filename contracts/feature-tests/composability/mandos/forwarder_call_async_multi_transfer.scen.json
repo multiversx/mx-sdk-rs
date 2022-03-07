@@ -60,14 +60,7 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [
-                    "str:FWD-TOKEN",
-                    "0",
-                    "100",
-                    "str:FWD-TOKEN",
-                    "0",
-                    "200"
-                ],
+                "out": [],
                 "status": "0",
                 "message": "",
                 "gas": "*",
@@ -89,7 +82,9 @@
                     "esdt": {
                         "str:FWD-TOKEN": "300"
                     },
-                    "storage": {},
+                    "storage": {
+                        "str:call_counts|nested:str:accept_funds": "1"
+                    },
                     "code": "file:../vault/output/vault.wasm"
                 },
                 "sc:forwarder": {
@@ -143,17 +138,7 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [
-                    "str:FWD-TOKEN",
-                    "0",
-                    "500",
-                    "str:NFT-123456",
-                    "1",
-                    "1",
-                    "str:SFT-456789",
-                    "3",
-                    "6"
-                ],
+                "out": [],
                 "status": "0",
                 "message": "",
                 "gas": "*",
@@ -191,7 +176,9 @@
                             ]
                         }
                     },
-                    "storage": {},
+                    "storage": {
+                        "str:call_counts|nested:str:accept_funds": "2"
+                    },
                     "code": "file:../vault/output/vault.wasm"
                 },
                 "sc:forwarder": {

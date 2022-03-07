@@ -34,6 +34,7 @@ elrond_wasm_node::wasm_endpoints! {
         forward_transf_exec_accept_funds
         forward_transf_exec_accept_funds_return_values
         forward_transf_exec_accept_funds_twice
+        forward_transf_exec_reject_funds_multi_transfer
         forward_transf_execu_accept_funds_with_fees
         getCurrentNftNonce
         getFungibleEsdtBalance

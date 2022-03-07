@@ -29,96 +29,44 @@ pub trait Vault {
         self.blockchain().get_caller()
     }
 
+    fn esdt_transfers_multi(&self) -> MultiValueEncoded<EsdtTokenPaymentMultiValue> {
+        let esdt_transfers = self.call_value().all_esdt_transfers();
+        let mut esdt_transfers_multi = MultiValueEncoded::new();
+        for esdt_transfer in esdt_transfers.into_iter() {
+            esdt_transfers_multi.push(esdt_transfer.into_multi_value());
+        }
+        esdt_transfers_multi
+    }
+
     #[payable("*")]
     #[endpoint]
-    fn accept_funds(
-        &self,
-        #[payment_token] token: TokenIdentifier,
-        #[payment_nonce] nonce: u64,
-        #[payment_amount] payment: BigUint,
-    ) {
-        let token_type = self.call_value().esdt_token_type();
-
-        self.accept_funds_event(&token, token_type.as_type_name(), &payment, nonce);
+    fn accept_funds(&self) {
+        let esdt_transfers_multi = self.esdt_transfers_multi();
+        self.accept_funds_event(&self.call_value().egld_value(), &esdt_transfers_multi);
 
         self.call_counts(b"accept_funds").update(|c| *c += 1);
     }
 
     #[payable("*")]
     #[endpoint]
-    fn accept_funds_multi_transfer(&self) {
-        let payments = self.call_value().all_esdt_transfers();
-
-        for payment in payments.into_iter() {
-            self.accept_funds_event(
-                &payment.token_identifier,
-                payment.token_type.as_type_name(),
-                &payment.amount,
-                payment.token_nonce,
-            );
-        }
-
-        self.call_counts(b"accept_funds_multi_transfer")
-            .update(|c| *c += 1);
-    }
-
-    #[payable("*")]
-    #[endpoint]
-    fn accept_multi_funds_echo(
-        &self,
-    ) -> MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>> {
-        let payments = self.call_value().all_esdt_transfers();
-        let mut result = MultiValueEncoded::new();
-
-        for payment in payments.into_iter() {
-            result.push(
-                (
-                    payment.token_identifier,
-                    payment.token_nonce,
-                    payment.amount,
-                )
-                    .into(),
-            );
-        }
-
-        result
-    }
-
-    #[payable("*")]
-    #[endpoint]
     fn accept_funds_echo_payment(
         &self,
-        #[payment_token] token_identifier: TokenIdentifier,
-        #[payment_amount] token_payment: BigUint,
-        #[payment_nonce] token_nonce: u64,
-    ) -> MultiValue4<TokenIdentifier, ManagedBuffer, BigUint, u64> {
-        let token_type = self.call_value().esdt_token_type();
-
-        self.accept_funds_event(
-            &token_identifier,
-            token_type.as_type_name(),
-            &token_payment,
-            token_nonce,
-        );
+    ) -> MultiValue2<BigUint, MultiValueEncoded<EsdtTokenPaymentMultiValue>> {
+        let egld_value = self.call_value().egld_value();
+        let esdt_transfers_multi = self.esdt_transfers_multi();
+        self.accept_funds_event(&egld_value, &esdt_transfers_multi);
 
         self.call_counts(b"accept_funds_echo_payment")
             .update(|c| *c += 1);
 
-        (
-            token_identifier,
-            token_type.as_type_name().into(),
-            token_payment,
-            token_nonce,
-        )
-            .into()
+        (egld_value, esdt_transfers_multi).into()
     }
 
     #[payable("*")]
     #[endpoint]
-    fn reject_funds(
-        &self,
-    ) -> SCResult<()> {
-        self.reject_funds_event();
+    fn reject_funds(&self) -> SCResult<()> {
+        let esdt_transfers_multi = self.esdt_transfers_multi();
+        self.reject_funds_event(&self.call_value().egld_value(), &esdt_transfers_multi);
         sc_error!("reject_funds")
     }
 
@@ -240,14 +188,16 @@ pub trait Vault {
     #[event("accept_funds")]
     fn accept_funds_event(
         &self,
-        #[indexed] token_identifier: &TokenIdentifier,
-        #[indexed] token_type: &[u8],
-        #[indexed] token_payment: &BigUint,
-        #[indexed] token_nonce: u64,
+        #[indexed] egld_value: &BigUint,
+        #[indexed] multi_esdt: &MultiValueEncoded<EsdtTokenPaymentMultiValue>,
     );
 
     #[event("reject_funds")]
-    fn reject_funds_event(&self);
+    fn reject_funds_event(
+        &self,
+        #[indexed] egld_value: &BigUint,
+        #[indexed] multi_esdt: &MultiValueEncoded<EsdtTokenPaymentMultiValue>,
+    );
 
     #[event("retrieve_funds")]
     fn retrieve_funds_event(
