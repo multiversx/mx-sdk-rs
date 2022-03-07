@@ -148,7 +148,7 @@ pub trait ForwarderAsyncCallModule {
     }
 
     #[endpoint]
-    fn multi_transfer_via_async(
+    fn send_async_accept_multi_transfer(
         &self,
         to: ManagedAddress,
         #[var_args] token_payments: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>>,
