@@ -46,7 +46,7 @@ pub trait EgldEsdtSwap {
                     can_burn: false,
                     can_change_owner: true,
                     can_upgrade: true,
-                    can_add_special_roles: false,
+                    can_add_special_roles: true,
                 },
             )
             .async_call()
@@ -58,18 +58,15 @@ pub trait EgldEsdtSwap {
     fn esdt_issue_callback(
         &self,
         caller: &ManagedAddress,
-        #[call_result] result: ManagedAsyncCallResult<()>,
+        #[call_result] result: ManagedAsyncCallResult<TokenIdentifier>,
     ) {
-        let (returned_tokens, token_identifier) = self.call_value().payment_token_pair();
-
-        // callback is called with ESDTTransfer of the newly issued token, with the amount requested,
-        // so we can get the token identifier and amount from the call data
         match result {
-            ManagedAsyncCallResult::Ok(()) => {
-                self.issue_success_event(caller, &token_identifier, &returned_tokens);
+            ManagedAsyncCallResult::Ok(token_identifier) => {
+                self.issue_success_event(caller, &token_identifier, &BigUint::zero());
                 self.wrapped_egld_token_id().set(&token_identifier);
             },
             ManagedAsyncCallResult::Err(message) => {
+                let (returned_tokens, token_identifier) = self.call_value().payment_token_pair();
                 self.issue_failure_event(caller, &message.err_msg);
 
                 // return issue cost to the owner

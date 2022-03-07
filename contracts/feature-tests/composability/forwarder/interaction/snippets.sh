@@ -21,8 +21,8 @@ deploy() {
         --outfile="deploy-testnet.interaction.json" \
          || return
 
-    TRANSACTION=$(erdpy data parse --file="deploy-testnet.interaction.json" --expression="data['emitted_tx']['hash']")
-    ADDRESS=$(erdpy data parse --file="deploy-testnet.interaction.json" --expression="data['emitted_tx']['address']")
+    TRANSACTION=$(erdpy data parse --file="deploy-testnet.interaction.json" --expression="data['emittedTransactionHash']")
+    ADDRESS=$(erdpy data parse --file="deploy-testnet.interaction.json" --expression="data['contractAddress']")
 
     erdpy data store --key=address-testnet --value=${ADDRESS}
     erdpy data store --key=deployTransaction-testnet --value=${TRANSACTION}
