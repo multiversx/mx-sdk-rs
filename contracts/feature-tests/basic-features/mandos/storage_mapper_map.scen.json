@@ -220,6 +220,24 @@
             }
         },
         {
+            "step": "scQuery",
+            "txId": "check-map-key-value-pairs",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "map_mapper",
+                "arguments": []
+            },
+            "expect": {
+                "out": [
+                    "123",
+                    "456",
+                    "111",
+                    "222"
+                ],
+                "status": ""
+            }
+        },
+        {
             "step": "scCall",
             "txId": "check-contains-after-second-insert",
             "tx": {
