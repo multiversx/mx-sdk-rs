@@ -26,12 +26,15 @@ extern "C" {
     #[cfg(not(feature = "unmanaged-ei"))]
     fn mBufferEq(handle1: i32, handle2: i32) -> i32;
     fn mBufferSetBytes(mBufferHandle: i32, byte_ptr: *const u8, byte_len: i32) -> i32;
+
+    #[cfg(feature = "ei-1-1")]
     fn mBufferSetByteSlice(
         mBufferHandle: i32,
         startingPosition: i32,
         dataLength: i32,
         dataOffset: *const u8,
     ) -> i32;
+    
     fn mBufferSetRandom(destinationHandle: i32, length: i32) -> i32;
     fn mBufferAppend(accumulatorHandle: i32, dataHandle: i32) -> i32;
     fn mBufferAppendBytes(accumulatorHandle: i32, byte_ptr: *const u8, byte_len: i32) -> i32;
@@ -128,7 +131,7 @@ impl ManagedBufferApi for crate::VmApiImpl {
         }
     }
 
-    #[cfg(feature = "new-mbuffer-set-slice-impl")]
+    #[cfg(feature = "ei-1-1")]
     #[inline]
     fn mb_set_slice(
         &self,
@@ -149,46 +152,6 @@ impl ManagedBufferApi for crate::VmApiImpl {
                 Err(InvalidSliceError)
             }
         }
-    }
-
-    #[cfg(not(feature = "new-mbuffer-set-slice-impl"))]
-    #[inline]
-    fn mb_set_slice(
-        &self,
-        dest_handle: Handle,
-        starting_position: usize,
-        source_slice: &[u8],
-    ) -> Result<(), InvalidSliceError> {
-        let dest_buffer_len = self.mb_len(dest_handle);
-        let slice_len = source_slice.len();
-        if starting_position + slice_len > dest_buffer_len {
-            return Err(InvalidSliceError);
-        }
-
-        let part_after_handle = self.mb_new_empty();
-        let part_after_start = starting_position + slice_len;
-        let nr_leftover_bytes_after = dest_buffer_len - part_after_start;
-        if nr_leftover_bytes_after > 0 {
-            let copy_result = self.mb_copy_slice(
-                dest_handle,
-                part_after_start,
-                nr_leftover_bytes_after,
-                part_after_handle,
-            );
-            if copy_result.is_err() {
-                return copy_result;
-            }
-        }
-
-        let copy_result = self.mb_copy_slice(dest_handle, 0, starting_position, dest_handle);
-        if copy_result.is_err() {
-            return copy_result;
-        }
-
-        self.mb_append_bytes(dest_handle, source_slice);
-        self.mb_append(dest_handle, part_after_handle);
-
-        Ok(())
     }
 
     #[inline]

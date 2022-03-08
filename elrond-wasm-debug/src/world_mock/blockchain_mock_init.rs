@@ -1,9 +1,6 @@
 use std::path::{Path, PathBuf};
 
-use elrond_wasm::{
-    api::ExternalViewApi,
-    contract_base::{CallableContract, CallableContractBuilder},
-};
+use elrond_wasm::contract_base::{CallableContract, CallableContractBuilder};
 use mandos::{interpret_trait::InterpreterContext, value_interpreter::interpret_string};
 
 use crate::DebugApi;
@@ -56,6 +53,7 @@ impl BlockchainMock {
         self.register_contract_obj(expression, contract_builder.new_contract_obj::<DebugApi>())
     }
 
+    #[cfg(feature = "ei-1-1")]
     pub fn register_external_view_contract_builder<B: CallableContractBuilder>(
         &mut self,
         expression: &str,
@@ -63,7 +61,7 @@ impl BlockchainMock {
     ) {
         self.register_contract_obj(
             expression,
-            contract_builder.new_contract_obj::<ExternalViewApi<DebugApi>>(),
+            contract_builder.new_contract_obj::<elrond_wasm::api::ExternalViewApi<DebugApi>>(),
         )
     }
 }

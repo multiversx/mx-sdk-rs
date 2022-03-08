@@ -1,11 +1,11 @@
-use core::{borrow::Borrow, marker::PhantomData};
+use core::marker::PhantomData;
 
 use crate::{
     api::{
         CryptoApi, CryptoApiImpl, ED25519_KEY_BYTE_LEN, ED25519_SIGNATURE_BYTE_LEN,
         SHA256_RESULT_LEN,
     },
-    types::{BoxedBytes, ManagedBuffer, ManagedByteArray, ManagedType, MessageHashType, H256},
+    types::{BoxedBytes, ManagedBuffer, ManagedByteArray, MessageHashType, H256},
 };
 use alloc::boxed::Box;
 
@@ -27,10 +27,12 @@ where
         }
     }
 
-    pub fn sha256<B: Borrow<ManagedBuffer<A>>>(
+    #[cfg(feature = "ei-1-1")]
+    pub fn sha256<B: core::borrow::Borrow<ManagedBuffer<A>>>(
         &self,
         data: B,
     ) -> ManagedByteArray<A, SHA256_RESULT_LEN> {
+        use crate::types::ManagedType;
         ManagedByteArray::from_raw_handle(
             A::crypto_api_impl().sha256(data.borrow().get_raw_handle()),
         )
@@ -49,7 +51,12 @@ where
         ManagedByteArray::new_from_bytes(&A::crypto_api_impl().sha256_legacy(data_buffer_slice))
     }
 
-    pub fn keccak256<B: Borrow<ManagedBuffer<A>>>(&self, data: B) -> ManagedByteArray<A, 32> {
+    #[cfg(feature = "ei-1-1")]
+    pub fn keccak256<B: core::borrow::Borrow<ManagedBuffer<A>>>(
+        &self,
+        data: B,
+    ) -> ManagedByteArray<A, 32> {
+        use crate::types::ManagedType;
         ManagedByteArray::from_raw_handle(
             A::crypto_api_impl().keccak256(data.borrow().get_raw_handle()),
         )

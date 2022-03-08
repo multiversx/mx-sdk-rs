@@ -15,6 +15,7 @@ categories = ["no-std", "wasm", "cryptography::cryptocurrencies", "development-t
 
 [features]
 cb_closure_unmanaged_deser = []
+ei-1-1 = []
 
 [dependencies]
 wee_alloc = "0.4"
