@@ -551,7 +551,7 @@ impl BlockchainApiImpl for VmApiImpl {
         }
     }
 
-    #[cfg(not(feature = "vm-esdt-local-roles"))]
+    #[cfg(not(feature = "ei-1-1"))]
     fn get_esdt_local_roles<M: ManagedTypeApi>(
         &self,
         token_id: &TokenIdentifier<M>,
@@ -598,7 +598,7 @@ impl BlockchainApiImpl for VmApiImpl {
         result
     }
 
-    #[cfg(feature = "vm-esdt-local-roles")]
+    #[cfg(feature = "ei-1-1")]
     fn get_esdt_local_roles<M: ManagedTypeApi>(
         &self,
         token_id: &TokenIdentifier<M>,
