@@ -10,6 +10,7 @@ use elrond_wasm::{
         ESDT_TRANSFER_FUNC_NAME, UPGRADE_CONTRACT_FUNC_NAME,
     },
     elrond_codec::top_encode_to_vec_u8,
+    err_msg,
     types::{
         Address, BigUint, CodeMetadata, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer,
         ManagedBuffer, ManagedType, ManagedVec, TokenIdentifier,
@@ -45,16 +46,16 @@ impl DebugApi {
         tx_result.result_values
     }
 
-    fn perform_execute_on_dest_context(
+    fn prepare_execute_on_dest_context_input(
         &self,
         to: Address,
         egld_value: num_bigint::BigUint,
         func_name: Vec<u8>,
         args: Vec<Vec<u8>>,
-    ) -> Vec<Vec<u8>> {
+    ) -> TxInput {
         let contract_address = &self.input_ref().to;
         let tx_hash = self.get_tx_hash_legacy();
-        let tx_input = TxInput {
+        TxInput {
             from: contract_address.clone(),
             to,
             egld_value,
@@ -64,8 +65,17 @@ impl DebugApi {
             gas_limit: 1000,
             gas_price: 0,
             tx_hash,
-        };
+        }
+    }
 
+    fn perform_execute_on_dest_context(
+        &self,
+        to: Address,
+        egld_value: num_bigint::BigUint,
+        func_name: Vec<u8>,
+        args: Vec<Vec<u8>>,
+    ) -> Vec<Vec<u8>> {
+        let tx_input = self.prepare_execute_on_dest_context_input(to, egld_value, func_name, args);
         let tx_cache = TxCache::new(self.blockchain_cache_rc());
         let (tx_result, blockchain_updates) =
             execute_builtin_function_or_default(tx_input, tx_cache);
@@ -76,7 +86,30 @@ impl DebugApi {
             // also kill current execution
             std::panic::panic_any(TxPanic {
                 status: tx_result.result_status,
-                message: tx_result.result_message.into_bytes(),
+                message: tx_result.result_message.clone(),
+            })
+        }
+    }
+
+    fn perform_transfer_execute(
+        &self,
+        to: Address,
+        egld_value: num_bigint::BigUint,
+        func_name: Vec<u8>,
+        args: Vec<Vec<u8>>,
+    ) -> Vec<Vec<u8>> {
+        let tx_input = self.prepare_execute_on_dest_context_input(to, egld_value, func_name, args);
+        let tx_cache = TxCache::new(self.blockchain_cache_rc());
+        let (tx_result, blockchain_updates) =
+            execute_builtin_function_or_default(tx_input, tx_cache);
+
+        if tx_result.result_status == 0 {
+            self.sync_call_post_processing(tx_result, blockchain_updates)
+        } else {
+            // also kill current execution
+            std::panic::panic_any(TxPanic {
+                status: 10,
+                message: err_msg::ERROR_SIGNALLED_BY_SMARTCONTRACT.to_string(),
             })
         }
     }
@@ -115,7 +148,7 @@ impl DebugApi {
             // also kill current execution
             std::panic::panic_any(TxPanic {
                 status: 10,
-                message: b"error signalled by smartcontract".to_vec(),
+                message: err_msg::ERROR_SIGNALLED_BY_SMARTCONTRACT.to_string(),
             })
         }
     }
@@ -184,7 +217,7 @@ impl SendApiImpl for DebugApi {
         if amount_value > available_egld_balance {
             std::panic::panic_any(TxPanic {
                 status: 10,
-                message: b"failed transfer (insufficient funds)".to_vec(),
+                message: "failed transfer (insufficient funds)".to_string(),
             });
         }
 
@@ -208,7 +241,7 @@ impl SendApiImpl for DebugApi {
         let egld_value = self.big_uint_handle_to_value(amount.get_raw_handle());
         let recipient = to.to_address();
 
-        let _ = self.perform_execute_on_dest_context(
+        let _ = self.perform_transfer_execute(
             recipient,
             egld_value,
             endpoint_name.to_boxed_bytes().into_vec(),
@@ -234,7 +267,7 @@ impl SendApiImpl for DebugApi {
         let mut args = vec![token_bytes, amount_bytes];
         Self::append_endpoint_name_and_args(&mut args, endpoint_name, arg_buffer);
 
-        let _ = self.perform_execute_on_dest_context(
+        let _ = self.perform_transfer_execute(
             recipient,
             num_bigint::BigUint::zero(),
             ESDT_TRANSFER_FUNC_NAME.to_vec(),
@@ -270,7 +303,7 @@ impl SendApiImpl for DebugApi {
 
         Self::append_endpoint_name_and_args(&mut args, endpoint_name, arg_buffer);
 
-        let _ = self.perform_execute_on_dest_context(
+        let _ = self.perform_transfer_execute(
             contract_address,
             num_bigint::BigUint::zero(),
             ESDT_NFT_TRANSFER_FUNC_NAME.to_vec(),
@@ -314,7 +347,7 @@ impl SendApiImpl for DebugApi {
             );
         }
 
-        let _ = self.perform_execute_on_dest_context(
+        let _ = self.perform_transfer_execute(
             contract_address,
             num_bigint::BigUint::zero(),
             ESDT_MULTI_TRANSFER_FUNC_NAME.to_vec(),
