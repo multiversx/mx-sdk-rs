@@ -170,6 +170,25 @@ where
     }
 }
 
+impl<M, T> TopEncodeMulti for &MultiValueEncoded<M, T>
+where
+    M: ManagedTypeApi + ErrorApi,
+    T: TopEncodeMulti,
+{
+    type DecodeAs = MultiValueEncoded<M, T>;
+
+    fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: TopEncodeMultiOutput,
+        H: EncodeErrorHandler,
+    {
+        for elem in self.raw_buffers.into_iter() {
+            elem.multi_encode_or_handle_err(output, h)?;
+        }
+        Ok(())
+    }
+}
+
 impl<M, T> TopEncodeMulti for MultiValueEncoded<M, T>
 where
     M: ManagedTypeApi + ErrorApi,
@@ -182,10 +201,7 @@ where
         O: TopEncodeMultiOutput,
         H: EncodeErrorHandler,
     {
-        for elem in self.raw_buffers.into_iter() {
-            elem.multi_encode_or_handle_err(output, h)?;
-        }
-        Ok(())
+        (&self).multi_encode_or_handle_err(output, h)
     }
 }
 

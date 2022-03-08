@@ -15,7 +15,7 @@
                 ],
                 "function": "createSellOrder",
                 "arguments": [
-                    "biguint:2000000|0x01|address:match_provider|0x00|biguint:10000|u64:1000"
+                    "biguint:2000000|address:match_provider|0x00|biguint:10000|u64:0|u64:1000"
                 ],
                 "gasLimit": "100,000,000",
                 "gasPrice": "0"

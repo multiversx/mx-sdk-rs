@@ -46,7 +46,7 @@
                     "str:TICKER",
                     "1000"
                 ],
-                "gasLimit": "50,000,000",
+                "gasLimit": "100,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -127,7 +127,7 @@
                     "str:TICKER",
                     "0"
                 ],
-                "gasLimit": "50,000,000",
+                "gasLimit": "100,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -210,7 +210,7 @@
                     "str:TICKER",
                     "2000"
                 ],
-                "gasLimit": "50,000,000",
+                "gasLimit": "100,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -293,7 +293,7 @@
                     "str:TICKER",
                     "0"
                 ],
-                "gasLimit": "50,000,000",
+                "gasLimit": "100,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -374,7 +374,7 @@
                 "to": "sc:basic-features",
                 "function": "set_local_roles_fungible",
                 "arguments": [],
-                "gasLimit": "50,000,000",
+                "gasLimit": "100,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -437,7 +437,7 @@
                 "arguments": [
                     "1000"
                 ],
-                "gasLimit": "50,000,000",
+                "gasLimit": "100,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -485,7 +485,7 @@
                     "address:an_account",
                     "2000"
                 ],
-                "gasLimit": "50,000,000",
+                "gasLimit": "100,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -539,7 +539,7 @@
                 "arguments": [
                     "1000"
                 ],
-                "gasLimit": "50,000,000",
+                "gasLimit": "100,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -582,7 +582,7 @@
                 "to": "sc:basic-features",
                 "function": "get_balance_fungible",
                 "arguments": [],
-                "gasLimit": "50,000,000",
+                "gasLimit": "100,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -605,7 +605,7 @@
                 "arguments": [
                     "3000"
                 ],
-                "gasLimit": "50,000,000",
+                "gasLimit": "100,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -624,7 +624,7 @@
                 "to": "sc:basic-features",
                 "function": "get_balance_fungible",
                 "arguments": [],
-                "gasLimit": "50,000,000",
+                "gasLimit": "100,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -651,7 +651,7 @@
                 ],
                 "function": "require_same_token_fungible",
                 "arguments": [],
-                "gasLimit": "50,000,000",
+                "gasLimit": "100,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -671,7 +671,7 @@
                 "egldValue": "100",
                 "function": "require_same_token_fungible",
                 "arguments": [],
-                "gasLimit": "50,000,000",
+                "gasLimit": "100,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -705,7 +705,7 @@
                 ],
                 "function": "require_all_same_token_fungible",
                 "arguments": [],
-                "gasLimit": "50,000,000",
+                "gasLimit": "100,000,000",
                 "gasPrice": "0"
             },
             "expect": {

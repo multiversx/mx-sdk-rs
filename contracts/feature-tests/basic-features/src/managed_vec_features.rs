@@ -48,4 +48,22 @@ pub trait ManagedVecFeatures {
             sc_panic!("index out of bounds")
         }
     }
+
+    #[endpoint]
+    fn managed_vec_remove(&self, mv: ManagedVec<BigUint>, index: usize) -> ManagedVec<BigUint> {
+        let mut result = mv;
+        result.remove(index);
+
+        result
+    }
+
+    #[endpoint]
+    fn managed_vec_find(&self, mv: ManagedVec<BigUint>, item: BigUint) -> Option<usize> {
+        mv.find(&item)
+    }
+
+    #[endpoint]
+    fn managed_vec_contains(&self, mv: ManagedVec<BigUint>, item: BigUint) -> bool {
+        mv.contains(&item)
+    }
 }

@@ -1,7 +1,10 @@
 use crate::DebugApi;
 use elrond_wasm::{
-    api::{CryptoApi, CryptoApiImpl, Handle, ManagedBufferApi},
-    types::{BoxedBytes, MessageHashType, H256},
+    api::{
+        CryptoApi, CryptoApiImpl, Handle, ManagedBufferApi, KECCAK256_RESULT_LEN,
+        RIPEMD_RESULT_LEN, SHA256_RESULT_LEN,
+    },
+    types::{BoxedBytes, MessageHashType},
 };
 use sha2::Sha256;
 use sha3::{Digest, Keccak256};
@@ -14,33 +17,34 @@ impl CryptoApi for DebugApi {
     }
 }
 
-impl DebugApi {
-    fn sha256_value(&self, data: &[u8]) -> [u8; 32] {
+impl CryptoApiImpl for DebugApi {
+    fn sha256_legacy(&self, data: &[u8]) -> [u8; SHA256_RESULT_LEN] {
         let mut hasher = Sha256::new();
         hasher.update(data);
         hasher.finalize().into()
     }
-}
-
-impl CryptoApiImpl for DebugApi {
-    #[cfg(feature = "alloc")]
-    fn sha256_legacy(&self, data: &[u8]) -> H256 {
-        self.sha256_value(data).into()
-    }
 
     fn sha256(&self, data_handle: Handle) -> Handle {
-        let value = self.sha256_value(self.mb_to_boxed_bytes(data_handle).as_slice());
-        self.mb_new_from_bytes(&value[..])
+        // default implementation used in debugger
+        // the VM has a dedicated hook
+        let result_bytes = self.sha256_legacy(self.mb_to_boxed_bytes(data_handle).as_slice());
+        self.mb_new_from_bytes(&result_bytes[..])
     }
 
-    fn keccak256_legacy(&self, data: &[u8]) -> H256 {
+    fn keccak256_legacy(&self, data: &[u8]) -> [u8; KECCAK256_RESULT_LEN] {
         let mut hasher = Keccak256::new();
         hasher.update(data);
-        let hash: [u8; 32] = hasher.finalize().into();
-        hash.into()
+        hasher.finalize().into()
     }
 
-    fn ripemd160(&self, _data: &[u8]) -> Box<[u8; 20]> {
+    fn keccak256(&self, data_handle: Handle) -> Handle {
+        // default implementation used in debugger
+        // the VM has a dedicated hook
+        let result_bytes = self.keccak256_legacy(self.mb_to_boxed_bytes(data_handle).as_slice());
+        self.mb_new_from_bytes(&result_bytes[..])
+    }
+
+    fn ripemd160(&self, _data: &[u8]) -> [u8; RIPEMD_RESULT_LEN] {
         panic!("ripemd160 not implemented yet!")
     }
 

@@ -41,7 +41,7 @@ pub trait CallValueApiImpl: ErrorApiImpl + ManagedTypeApiImpl {
     /// Especially used in the auto-generated call value processing.
     fn require_egld(&self) -> Handle {
         if self.esdt_num_transfers() > 0 {
-            self.signal_error(err_msg::NON_PAYABLE_FUNC_ESDT);
+            self.signal_error(err_msg::NON_PAYABLE_FUNC_ESDT.as_bytes());
         }
         self.egld_value()
     }
@@ -54,10 +54,10 @@ pub trait CallValueApiImpl: ErrorApiImpl + ManagedTypeApiImpl {
     fn require_esdt(&self, token: &[u8]) -> Handle {
         let want = self.mb_new_from_bytes(token);
         if self.esdt_num_transfers() != 1 {
-            self.signal_error(err_msg::SINGLE_ESDT_EXPECTED);
+            self.signal_error(err_msg::SINGLE_ESDT_EXPECTED.as_bytes());
         }
         if !self.mb_eq(self.token(), want) {
-            self.signal_error(err_msg::BAD_TOKEN_PROVIDED);
+            self.signal_error(err_msg::BAD_TOKEN_PROVIDED.as_bytes());
         }
         self.esdt_value()
     }

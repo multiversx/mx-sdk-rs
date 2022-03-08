@@ -57,7 +57,7 @@ impl StorageReadApiImpl for DebugApi {
         } else {
             std::panic::panic_any(TxPanic {
                 status: 10,
-                message: b"storage value out of range".to_vec(),
+                message: "storage value out of range".to_string(),
             })
         }
     }
@@ -70,7 +70,7 @@ impl StorageReadApiImpl for DebugApi {
         } else {
             std::panic::panic_any(TxPanic {
                 status: 10,
-                message: b"storage value out of range".to_vec(),
+                message: "storage value out of range".to_string(),
             })
         }
     }
@@ -101,7 +101,7 @@ impl StorageWriteApiImpl for DebugApi {
         if key.starts_with(&b"ELROND"[..]) {
             std::panic::panic_any(TxPanic {
                 status: 10,
-                message: b"cannot write to storage under Elrond reserved key".to_vec(),
+                message: "cannot write to storage under Elrond reserved key".to_string(),
             });
         }
 

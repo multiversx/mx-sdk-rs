@@ -9,16 +9,16 @@ publish = false
 path = "src/use_module.rs"
 
 [dependencies.elrond-wasm-modules]
-version = "0.28.0"
+version = "0.29.3"
 path = "../../../elrond-wasm-modules"
 features = ["alloc"]
 
 [dependencies.elrond-wasm]
-version = "0.28.0"
+version = "0.29.3"
 path = "../../../elrond-wasm"
-features = ["cb_closure_managed_deser", "alloc"]
+features = [ "alloc" ]
 
 [dev-dependencies.elrond-wasm-debug]
-version = "0.28.0"
+version = "0.29.3"
 path = "../../../elrond-wasm-debug"
 features = ["alloc"]

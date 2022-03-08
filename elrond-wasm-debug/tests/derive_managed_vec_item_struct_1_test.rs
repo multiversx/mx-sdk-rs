@@ -6,12 +6,12 @@ use elrond_wasm_debug::DebugApi;
 elrond_wasm::derive_imports!();
 
 // to test, run the following command in elrond-wasm-debug folder:
-// cargo expand --test derive_managed_vec_item_numbers_test > expanded.rs
+// cargo expand --test derive_managed_vec_item_struct_1_test > expanded.rs
 
 #[derive(
     ManagedVecItem, NestedEncode, NestedDecode, TopEncode, TopDecode, PartialEq, Clone, Debug,
 )]
-pub struct StructWithNumbers {
+pub struct Struct1 {
     pub u_8: u8,
     pub u_16: u16,
     pub u_32: u32,
@@ -20,17 +20,19 @@ pub struct StructWithNumbers {
 }
 
 #[test]
-fn struct_with_numbers_static() {
+fn struct_1_static() {
     assert_eq!(
-        <StructWithNumbers as elrond_wasm::types::ManagedVecItem>::PAYLOAD_SIZE,
+        <Struct1 as elrond_wasm::types::ManagedVecItem>::PAYLOAD_SIZE,
         16
     );
-    assert!(<StructWithNumbers as elrond_wasm::types::ManagedVecItem>::SKIPS_RESERIALIZATION);
+    assert!(<Struct1 as elrond_wasm::types::ManagedVecItem>::SKIPS_RESERIALIZATION);
 }
 
+/// The reason we are including a codec test here is that because of the SKIPS_RESERIALIZATION flag,
+/// serialization uses the payload as-is.
 #[test]
-fn struct_named_fields_test() {
-    let s = StructWithNumbers {
+fn struct_1_encode_decode_skips_reserialization() {
+    let s = Struct1 {
         u_8: 1u8,
         u_16: 2u16,
         u_32: 3u32,
@@ -52,19 +54,18 @@ fn struct_named_fields_test() {
 }
 
 #[test]
-fn struct_to_bytes_writer() {
-    let s = StructWithNumbers {
+fn struct_1_to_bytes_writer() {
+    let s = Struct1 {
         u_8: 1u8,
         u_16: 2u16,
         u_32: 3u32,
         u_64: 4u64,
         bool_field: true,
     };
-    let mut arr: [u8; 16] =
-        [0u8; <StructWithNumbers as elrond_wasm::types::ManagedVecItem>::PAYLOAD_SIZE];
+    let mut arr: [u8; 16] = [0u8; <Struct1 as elrond_wasm::types::ManagedVecItem>::PAYLOAD_SIZE];
 
-    <StructWithNumbers as elrond_wasm::types::ManagedVecItem>::to_byte_writer(&s, |bytes| {
-        arr[0..<StructWithNumbers as elrond_wasm::types::ManagedVecItem>::PAYLOAD_SIZE]
+    <Struct1 as elrond_wasm::types::ManagedVecItem>::to_byte_writer(&s, |bytes| {
+        arr[0..<Struct1 as elrond_wasm::types::ManagedVecItem>::PAYLOAD_SIZE]
             .copy_from_slice(bytes);
         assert_eq!(
             arr,
@@ -77,9 +78,9 @@ fn struct_to_bytes_writer() {
 }
 
 #[test]
-fn struct_from_bytes_reader() {
+fn struct_1_from_bytes_reader() {
     let _ = DebugApi::dummy();
-    let s = StructWithNumbers {
+    let s = Struct1 {
         u_8: 1u8,
         u_16: 2u16,
         u_32: 3u32,
@@ -92,9 +93,9 @@ fn struct_from_bytes_reader() {
     ];
 
     let struct_from_bytes =
-        <StructWithNumbers as elrond_wasm::types::ManagedVecItem>::from_byte_reader(|bytes| {
+        <Struct1 as elrond_wasm::types::ManagedVecItem>::from_byte_reader(|bytes| {
             bytes.copy_from_slice(
-                &arr[0..<StructWithNumbers as elrond_wasm::types::ManagedVecItem>::PAYLOAD_SIZE],
+                &arr[0..<Struct1 as elrond_wasm::types::ManagedVecItem>::PAYLOAD_SIZE],
             );
         });
     assert_eq!(s, struct_from_bytes);

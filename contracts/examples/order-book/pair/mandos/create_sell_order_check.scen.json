@@ -24,7 +24,7 @@
             },
             "expect": {
                 "out": [
-                    "u64:0|address:user2|0x01|address:match_provider|biguint:200000|biguint:2000000|0x00|biguint:10000|u64:1000|u64:0|0x01"
+                    "u64:0|address:user2|address:match_provider|biguint:200000|biguint:2000000|0x00|biguint:10000|u64:0|u64:1000|u64:0|0x01"
                 ],
                 "status": "",
                 "gas": "*",

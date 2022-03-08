@@ -12,10 +12,10 @@ path = "src/crowdfunding_erc20.rs"
 path = "../erc20"
 
 [dependencies.elrond-wasm]
-version = "0.28.0"
+version = "0.29.3"
 path = "../../../../elrond-wasm"
 
 [dev-dependencies.elrond-wasm-debug]
-version = "0.28.0"
+version = "0.29.3"
 path = "../../../../elrond-wasm-debug"
 

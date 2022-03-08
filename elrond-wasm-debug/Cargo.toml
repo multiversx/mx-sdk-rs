@@ -1,6 +1,6 @@
 [package]
 name = "elrond-wasm-debug"
-version = "0.28.0"
+version = "0.29.3"
 edition = "2018"
 
 authors = ["Andrei Marinica <andrei.marinica@elrond.com>", "Elrond Network <contact@elrond.com>"]
@@ -34,7 +34,7 @@ mandos-go-tests = []
 alloc = ["elrond-wasm/alloc"]
 
 [dependencies.elrond-wasm]
-version = "=0.28.0"
+version = "=0.29.3"
 path = "../elrond-wasm"
 
 [dependencies.mandos]

@@ -74,7 +74,7 @@ impl EndpointArgumentApiImpl for DebugApi {
         } else {
             std::panic::panic_any(TxPanic {
                 status: 10,
-                message: b"argument out of range".to_vec(),
+                message: "argument out of range".to_string(),
             })
         }
     }
@@ -87,7 +87,7 @@ impl EndpointArgumentApiImpl for DebugApi {
         } else {
             std::panic::panic_any(TxPanic {
                 status: 10,
-                message: b"argument out of range".to_vec(),
+                message: "argument out of range".to_string(),
             })
         }
     }
