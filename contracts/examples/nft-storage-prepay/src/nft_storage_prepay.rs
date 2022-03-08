@@ -33,6 +33,7 @@ pub trait NftStoragePrepay {
             .update(|reserved| *reserved += storage_cost);
     }
 
+    #[only_owner]
     #[endpoint]
     fn claim(&self) {
         let total_reserved = self.total_reserved().get();
