@@ -17,7 +17,6 @@ impl<T: NestedEncode> TopEncode for Vec<T> {
 }
 
 impl<T: NestedDecode> TopDecode for Vec<T> {
-    #[allow(clippy::transmute_undefined_repr)]
     fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
     where
         I: TopDecodeInput,
@@ -55,7 +54,6 @@ impl<T: NestedEncode> NestedEncode for Vec<T> {
 }
 
 impl<T: NestedDecode> NestedDecode for Vec<T> {
-    #[allow(clippy::transmute_undefined_repr)]
     fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
     where
         I: NestedDecodeInput,

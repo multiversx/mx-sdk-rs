@@ -86,7 +86,7 @@ impl DebugApi {
             // also kill current execution
             std::panic::panic_any(TxPanic {
                 status: tx_result.result_status,
-                message: tx_result.result_message.clone(),
+                message: tx_result.result_message,
             })
         }
     }
