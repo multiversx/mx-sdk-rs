@@ -1,0 +1,199 @@
+{
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "steps/init_accounts.steps.json"
+        },
+        {
+            "step": "externalSteps",
+            "path": "steps/deploy.steps.json"
+        },
+        {
+            "step": "externalSteps",
+            "path": "steps/add_prop.steps.json"
+        },
+        {
+            "step": "externalSteps",
+            "path": "steps/add_bm.steps.json"
+        },
+        {
+            "step": "scCall",
+            "txId": "proposeSCDeploy",
+            "tx": {
+                "from": "address:paul",
+                "to": "sc:multisig",
+                "function": "proposeSCDeployFromSource",
+                "arguments": [
+                    "0",
+                    "sc:factorial-code",
+                    "0x0000"
+                ],
+                "gasLimit": "200,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "3"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:multisig": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:user_count": "5",
+                        "str:user_address_to_id|address:alice": "1",
+                        "str:user_address_to_id|address:bob": "2",
+                        "str:user_address_to_id|address:charlie": "3",
+                        "str:user_address_to_id|address:paul": "4",
+                        "str:user_address_to_id|address:dan": "5",
+                        "str:user_id_to_address|u32:1": "address:alice",
+                        "str:user_id_to_address|u32:2": "address:bob",
+                        "str:user_id_to_address|u32:3": "address:charlie",
+                        "str:user_id_to_address|u32:4": "address:paul",
+                        "str:user_id_to_address|u32:5": "address:dan",
+                        "str:user_role|u32:1": "2",
+                        "str:user_role|u32:2": "2",
+                        "str:user_role|u32:3": "2",
+                        "str:user_role|u32:4": "1",
+                        "str:user_role|u32:5": "2",
+                        "str:num_board_members": "4",
+                        "str:num_proposers": "1",
+                        "str:quorum": "2",
+                        "str:action_data.len": "3",
+                        "str:action_data.item|u32:3": {
+                            "1-discriminant": "0x07",
+                            "2-amount": "u32:0",
+                            "3-code_source": "sc:factorial-code",
+                            "4-code_metadata": "0x0000",
+                            "5-arguments": "u32:0"
+                        }
+                    },
+                    "code": "file:../output/multisig.wasm"
+                },
+                "+": ""
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "sc-deploy-sign-alice",
+            "tx": {
+                "from": "address:alice",
+                "to": "sc:multisig",
+                "function": "sign",
+                "arguments": [
+                    "3"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "sc-deploy-sign-bob",
+            "tx": {
+                "from": "address:bob",
+                "to": "sc:multisig",
+                "function": "sign",
+                "arguments": [
+                    "3"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "setState",
+            "newAddresses": [
+                {
+                    "creatorAddress": "sc:multisig",
+                    "creatorNonce": "0",
+                    "newAddress": "sc:factorial"
+                }
+            ]
+        },
+        {
+            "step": "scCall",
+            "txId": "sc-deploy-perform",
+            "tx": {
+                "from": "address:paul",
+                "to": "sc:multisig",
+                "function": "performAction",
+                "arguments": [
+                    "3"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "sc:factorial"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:multisig": {
+                    "nonce": "1",
+                    "balance": "0",
+                    "storage": {
+                        "str:user_count": "5",
+                        "str:user_address_to_id|address:alice": "1",
+                        "str:user_address_to_id|address:bob": "2",
+                        "str:user_address_to_id|address:charlie": "3",
+                        "str:user_address_to_id|address:paul": "4",
+                        "str:user_address_to_id|address:dan": "5",
+                        "str:user_id_to_address|u32:1": "address:alice",
+                        "str:user_id_to_address|u32:2": "address:bob",
+                        "str:user_id_to_address|u32:3": "address:charlie",
+                        "str:user_id_to_address|u32:4": "address:paul",
+                        "str:user_id_to_address|u32:5": "address:dan",
+                        "str:user_role|u32:1": "2",
+                        "str:user_role|u32:2": "2",
+                        "str:user_role|u32:3": "2",
+                        "str:user_role|u32:4": "1",
+                        "str:user_role|u32:5": "2",
+                        "str:num_board_members": "4",
+                        "str:num_proposers": "1",
+                        "str:quorum": "2",
+                        "str:action_data.len": "3"
+                    },
+                    "code": "file:../output/multisig.wasm"
+                },
+                "sc:factorial": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "file:../test-contracts/factorial.wasm"
+                },
+                "+": ""
+            }
+        }
+    ]
+}
