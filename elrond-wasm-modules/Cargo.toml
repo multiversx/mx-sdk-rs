@@ -1,6 +1,6 @@
 [package]
 name = "elrond-wasm-modules"
-version = "0.28.0"
+version = "0.29.3"
 edition = "2018"
 
 authors = ["Elrond Network <contact@elrond.com>"]
@@ -17,5 +17,5 @@ categories = ["no-std", "wasm", "cryptography::cryptocurrencies"]
 alloc = ["elrond-wasm/alloc"]
 
 [dependencies.elrond-wasm]
-version = "0.28.0"
+version = "0.29.3"
 path = "../elrond-wasm"

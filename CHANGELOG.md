@@ -4,6 +4,22 @@ There are several crates in this repo, this changelog will keep track of all of 
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [elrond-wasm 0.29.3] - 2022-03-03
+- `ManagedVec` backwards compatible implementation for `set`.
+- Implemented `ManagedVecItem` for `Option<T>`.
+
+## [elrond-wasm 0.29.2] - 2022-03-01
+- Disabled git tag/commit info in ABI due to issue in standard modules.
+
+## [elrond-wasm 0.29.0] - 2022-03-01
+- Cleaned up allocator from modules: `DnsModule`, `EsdtModule`, `FeaturesModule`, `PauseModule`, `UsersModule`.
+- Crypto API managed wrapper over legacy VM endpoints.
+- Managed multi-value types refactor and rename.
+- `ManagedVec` - `remove`, `contains`, `find`.
+- `ManagedVecItem` derive for simple enums.
+- Feature `cb_closure_managed_deser` replaced by `cb_closure_unmanaged_deser`, managed implementation is now the default.
+- Git tag/commit info in ABI.
+
 ## [elrond-wasm 0.28.0, elrond-codec 0.9.0, mandos 0.12.0] - 2022-02-22
 - Major elrond-codec refactor:
 	- Redesigned the error handling for single value encoding

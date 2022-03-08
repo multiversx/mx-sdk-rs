@@ -1,6 +1,6 @@
 [package]
 name = "elrond-wasm"
-version = "0.28.0"
+version = "0.29.3"
 edition = "2018"
 
 authors = ["Andrei Marinica <andrei.marinica@elrond.com>", "Elrond Network <contact@elrond.com>"]
@@ -14,7 +14,7 @@ keywords = ["elrond", "wasm", "webassembly", "blockchain", "contract"]
 categories = ["no-std", "wasm", "cryptography::cryptocurrencies", "development-tools"]
 
 [features]
-cb_closure_managed_deser = []
+cb_closure_unmanaged_deser = [ "alloc" ]
 alloc = ["elrond-codec/alloc"]
 
 [dependencies]
@@ -22,10 +22,10 @@ wee_alloc = "0.4"
 hashbrown = "0.11.2"
 hex-literal = "0.3.1"
 bitflags = "1.3.2"
-git-version = "0.3.5"
+# git-version = "0.3.5"
 
 [dependencies.elrond-wasm-derive]
-version = "=0.28.0"
+version = "=0.29.3"
 path = "../elrond-wasm-derive"
 
 [dependencies.elrond-codec]

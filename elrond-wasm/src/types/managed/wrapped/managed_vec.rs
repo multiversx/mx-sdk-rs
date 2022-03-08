@@ -7,7 +7,7 @@ use crate::{
     },
 };
 use alloc::{string::String, vec::Vec};
-use core::marker::PhantomData;
+use core::{borrow::Borrow, marker::PhantomData};
 use elrond_codec::{
     DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode,
     NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeMultiOutput,
@@ -181,6 +181,33 @@ where
         });
     }
 
+    pub fn remove(&mut self, index: usize) {
+        let len = self.len();
+        if index >= len {
+            M::error_api_impl().signal_error(INDEX_OUT_OF_RANGE_MSG);
+        }
+
+        let part_before = if index > 0 {
+            match self.slice(0, index) {
+                Some(s) => s,
+                None => M::error_api_impl().signal_error(INDEX_OUT_OF_RANGE_MSG),
+            }
+        } else {
+            ManagedVec::new()
+        };
+        let part_after = if index < len {
+            match self.slice(index + 1, len) {
+                Some(s) => s,
+                None => M::error_api_impl().signal_error(INDEX_OUT_OF_RANGE_MSG),
+            }
+        } else {
+            ManagedVec::new()
+        };
+
+        self.buffer = part_before.buffer;
+        self.buffer.append(&part_after.buffer);
+    }
+
     /// New `ManagedVec` instance with 1 element in it.
     pub fn from_single_item(item: T) -> Self {
         let mut result = ManagedVec::new();
@@ -329,6 +356,31 @@ where
             item.dep_encode_or_handle_err(dest, h)?;
         }
         Ok(())
+    }
+}
+
+impl<M, T> ManagedVec<M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedVecItem + PartialEq,
+{
+    /// This can be very costly for big collections.
+    /// It needs to deserialize and compare every single item in the worst case.
+    pub fn find(&self, item: &T) -> Option<usize> {
+        for (i, item_in_vec) in self.iter().enumerate() {
+            if item_in_vec.borrow() == item {
+                return Some(i);
+            }
+        }
+
+        None
+    }
+
+    /// This can be very costly for big collections.
+    /// It needs to iterate, deserialize, and compare every single item in the worst case.
+    #[inline]
+    pub fn contains(&self, item: &T) -> bool {
+        self.find(item).is_some()
     }
 }
 

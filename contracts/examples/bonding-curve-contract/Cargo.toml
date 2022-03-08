@@ -9,17 +9,17 @@ publish = false
 path = "src/bonding_curve_contract.rs"
 
 [dependencies.elrond-wasm]
-version = "0.28.0"
+version = "0.29.3"
 path = "../../../elrond-wasm"
 features = ["alloc"]
 
 [dependencies.elrond-wasm-modules]
-version = "0.28.0"
+version = "0.29.3"
 path = "../../../elrond-wasm-modules"
 features = ["alloc"]
 
 [dev-dependencies.elrond-wasm-debug]
-version = "0.28.0"
+version = "0.29.3"
 path = "../../../elrond-wasm-debug"
 features = ["alloc"]
 

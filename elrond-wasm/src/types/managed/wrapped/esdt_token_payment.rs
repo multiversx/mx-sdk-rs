@@ -1,6 +1,6 @@
 use crate::{
     api::ManagedTypeApi,
-    types::{BigUint, EsdtTokenType, ManagedVecItem, TokenIdentifier},
+    types::{BigUint, EsdtTokenPaymentMultiValue, EsdtTokenType, ManagedVecItem, TokenIdentifier},
 };
 
 use elrond_codec::elrond_codec_derive::{NestedDecode, NestedEncode, TopDecode, TopEncode};
@@ -45,6 +45,11 @@ impl<M: ManagedTypeApi> EsdtTokenPayment<M> {
             token_nonce,
             amount,
         }
+    }
+
+    #[inline]
+    pub fn into_multi_value(self) -> EsdtTokenPaymentMultiValue<M> {
+        self.into()
     }
 }
 

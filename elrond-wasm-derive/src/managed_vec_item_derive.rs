@@ -1,6 +1,14 @@
 use proc_macro::TokenStream;
 use quote::quote;
 
+pub fn managed_vec_item_derive(ast: &syn::DeriveInput) -> TokenStream {
+    match &ast.data {
+        syn::Data::Struct(data_struct) => struct_derive(data_struct, ast),
+        syn::Data::Enum(data_enum) => enum_derive(data_enum, ast),
+        syn::Data::Union(_) => panic!("Union not supported!"),
+    }
+}
+
 fn type_payload_size(type_name: &syn::Type) -> proc_macro2::TokenStream {
     quote! {
         <#type_name as elrond_wasm::types::ManagedVecItem>::PAYLOAD_SIZE
@@ -97,23 +105,67 @@ fn generate_array_init_snippet(ast: &syn::DeriveInput) -> proc_macro2::TokenStre
     }
 }
 
-pub fn managed_vec_item_derive(ast: &syn::DeriveInput) -> TokenStream {
+fn enum_derive(data_enum: &syn::DataEnum, ast: &syn::DeriveInput) -> TokenStream {
     let name = &ast.ident;
     let (impl_generics, ty_generics, where_clause) = &ast.generics.split_for_impl();
 
-    let payload_snippets: Vec<proc_macro2::TokenStream>;
-    let skips_reserialization_snippets: Vec<proc_macro2::TokenStream>;
-    let from_byte_reader_snippets: Vec<proc_macro2::TokenStream>;
-    let to_byte_writer_snippets: Vec<proc_macro2::TokenStream>;
-    if let syn::Data::Struct(data_struct) = &ast.data {
-        payload_snippets = generate_payload_snippets(&data_struct.fields);
-        skips_reserialization_snippets =
-            generate_skips_reserialization_snippets(&data_struct.fields);
-        from_byte_reader_snippets = generate_from_byte_reader_snippets(&data_struct.fields);
-        to_byte_writer_snippets = generate_to_byte_writer_snippets(&data_struct.fields);
-    } else {
-        panic!("ManagedVecItem can only be implemented for struct")
+    let mut reader_match_arms = Vec::<proc_macro2::TokenStream>::new();
+    let mut writer_match_arms = Vec::<proc_macro2::TokenStream>::new();
+    for (variant_index, variant) in data_enum.variants.iter().enumerate() {
+        let variant_index_u8 = variant_index as u8;
+        let variant_ident = &variant.ident;
+        assert!(variant.fields.is_empty(), "Only fieldless enums supported");
+        reader_match_arms.push(quote! {
+            #variant_index_u8 => #name::#variant_ident,
+        });
+        writer_match_arms.push(quote! {
+            #name::#variant_ident => #variant_index_u8,
+        });
     }
+
+    let first_variant_ident = &data_enum.variants[0];
+    reader_match_arms.push(quote! {
+        _ => #name::#first_variant_ident,
+    });
+
+    let gen = quote! {
+        impl #impl_generics elrond_wasm::types::ManagedVecItem for #name #ty_generics #where_clause {
+            const PAYLOAD_SIZE: usize = 1;
+            const SKIPS_RESERIALIZATION: bool = true;
+            type Ref<'a> = Self;
+
+            fn from_byte_reader<Reader: FnMut(&mut [u8])>(mut reader: Reader) -> Self {
+                let mut arr: [u8; 1] = [0u8; 1];
+                reader(&mut arr[..]);
+                match arr[0] {
+                    #(#reader_match_arms)*
+                }
+            }
+
+            unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(reader: Reader) -> Self::Ref<'a> {
+                Self::from_byte_reader(reader)
+            }
+
+            fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, mut writer: Writer) -> R {
+                let mut arr: [u8; 1] = [0u8; 1];
+                arr[0] = match self {
+                    #(#writer_match_arms)*
+                };
+                writer(&arr[..])
+            }
+        }
+    };
+    gen.into()
+}
+
+fn struct_derive(data_struct: &syn::DataStruct, ast: &syn::DeriveInput) -> TokenStream {
+    let name = &ast.ident;
+    let (impl_generics, ty_generics, where_clause) = &ast.generics.split_for_impl();
+    let payload_snippets = generate_payload_snippets(&data_struct.fields);
+    let skips_reserialization_snippets =
+        generate_skips_reserialization_snippets(&data_struct.fields);
+    let from_byte_reader_snippets = generate_from_byte_reader_snippets(&data_struct.fields);
+    let to_byte_writer_snippets = generate_to_byte_writer_snippets(&data_struct.fields);
 
     let array_init_snippet = generate_array_init_snippet(ast);
 

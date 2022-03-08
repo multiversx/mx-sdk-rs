@@ -16,8 +16,8 @@ pub use callback_selector_result::CallbackSelectorResult;
 pub use contract_call::{new_contract_call, ContractCall};
 pub use contract_deploy::{new_contract_deploy, ContractDeploy};
 
-#[cfg(feature = "cb_closure_managed_deser")]
+#[cfg(not(feature = "cb_closure_unmanaged_deser"))]
 pub type CallbackClosureForDeser<M> = CallbackClosure<M>;
 
-#[cfg(not(feature = "cb_closure_managed_deser"))]
+#[cfg(feature = "cb_closure_unmanaged_deser")]
 pub type CallbackClosureForDeser<M> = CallbackClosureUnmanagedArgs<M>;
