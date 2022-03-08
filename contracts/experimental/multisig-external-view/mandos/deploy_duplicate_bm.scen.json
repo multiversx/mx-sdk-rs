@@ -1,0 +1,32 @@
+{
+    "comment": "add then check",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "steps/init_accounts.steps.json"
+        },
+        {
+            "step": "scDeploy",
+            "txId": "multisig-deploy",
+            "tx": {
+                "from": "address:owner",
+                "contractCode": "file:../output/multisig.wasm",
+                "arguments": [
+                    "2",
+                    "address:alice",
+                    "address:alice"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:duplicate board member",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}
