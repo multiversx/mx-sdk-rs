@@ -22,7 +22,7 @@ path = ".."
 version = "0.29.3"
 path = "../../../../../elrond-wasm-node"
 features = [
-    "unmanaged-ei",
+    "ei-unmanaged",
     "ei-1-1",
 ]
 
