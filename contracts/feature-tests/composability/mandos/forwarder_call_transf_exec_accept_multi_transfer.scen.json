@@ -46,7 +46,7 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "function": "send_async_accept_multi_transfer",
+                "function": "transf_exec_multi_accept_funds",
                 "arguments": [
                     "sc:vault",
                     "str:FWD-TOKEN",
@@ -56,7 +56,7 @@
                     "0",
                     "200"
                 ],
-                "gasLimit": "80,000,000",
+                "gasLimit": "1,400,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -116,12 +116,12 @@
         },
         {
             "step": "scCall",
-            "txId": "2",
+            "txId": "1",
             "comment": "send all types",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "function": "send_async_accept_multi_transfer",
+                "function": "transf_exec_multi_accept_funds",
                 "arguments": [
                     "sc:vault",
                     "str:FWD-TOKEN",
@@ -134,7 +134,7 @@
                     "3",
                     "6"
                 ],
-                "gasLimit": "80,000,000",
+                "gasLimit": "1,400,000,000",
                 "gasPrice": "0"
             },
             "expect": {

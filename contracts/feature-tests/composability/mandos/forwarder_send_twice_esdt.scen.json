@@ -58,10 +58,10 @@
                         "endpoint": "str:accept_funds",
                         "topics": [
                             "str:accept_funds",
+                            "0",
                             "str:FWD-TOKEN",
-                            "str:FungibleESDT",
-                            "1",
-                            "0"
+                            "0",
+                            "1"
                         ],
                         "data": ""
                     },
@@ -81,10 +81,10 @@
                         "endpoint": "str:accept_funds",
                         "topics": [
                             "str:accept_funds",
+                            "0",
                             "str:FWD-TOKEN",
-                            "str:FungibleESDT",
-                            "1",
-                            "0"
+                            "0",
+                            "1"
                         ],
                         "data": ""
                     }
