@@ -41,11 +41,6 @@
                     "creatorAddress": "address:owner",
                     "creatorNonce": "0",
                     "newAddress": "sc:multisig"
-                },
-                {
-                    "creatorAddress": "address:owner",
-                    "creatorNonce": "1",
-                    "newAddress": "sc:multisig-view"
                 }
             ]
         }
