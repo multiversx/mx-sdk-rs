@@ -5,11 +5,11 @@ fn world() -> BlockchainMock {
     blockchain.set_current_dir_from_workspace("contracts/experimental/multisig-external-view");
 
     blockchain.register_contract_builder(
-        "file:output/multisig.wasm",
+        "file:output/multisig-external-view.wasm",
         multisig_external_view::ContractBuilder,
     );
     blockchain.register_external_view_contract_builder(
-        "file:output/multisig-view.wasm",
+        "file:output/multisig-external-view-view.wasm",
         multisig_external_view::ContractBuilder,
     );
 
