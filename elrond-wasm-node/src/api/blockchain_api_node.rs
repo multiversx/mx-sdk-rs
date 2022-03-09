@@ -19,15 +19,15 @@ extern "C" {
 
     // address utils
     fn getSCAddress(resultOffset: *mut u8);
-    #[cfg(not(feature = "unmanaged-ei"))]
+    #[cfg(not(feature = "ei-unmanaged"))]
     fn managedSCAddress(resultHandle: i32);
 
     fn getOwnerAddress(resultOffset: *mut u8);
-    #[cfg(not(feature = "unmanaged-ei"))]
+    #[cfg(not(feature = "ei-unmanaged"))]
     fn managedOwnerAddress(resultHandle: i32);
 
     fn getCaller(resultOffset: *mut u8);
-    #[cfg(not(feature = "unmanaged-ei"))]
+    #[cfg(not(feature = "ei-unmanaged"))]
     fn managedCaller(resultHandle: i32);
 
     fn getShardOfAddress(address_ptr: *const u8) -> i32;
@@ -58,13 +58,13 @@ extern "C" {
     fn getOriginalTxHash(resultOffset: *const u8);
 
     // Managed versions of the above
-    #[cfg(not(feature = "unmanaged-ei"))]
+    #[cfg(not(feature = "ei-unmanaged"))]
     fn managedGetPrevBlockRandomSeed(resultHandle: i32);
-    #[cfg(not(feature = "unmanaged-ei"))]
+    #[cfg(not(feature = "ei-unmanaged"))]
     fn managedGetBlockRandomSeed(resultHandle: i32);
-    #[cfg(not(feature = "unmanaged-ei"))]
+    #[cfg(not(feature = "ei-unmanaged"))]
     fn managedGetStateRootHash(resultHandle: i32);
-    #[cfg(not(feature = "unmanaged-ei"))]
+    #[cfg(not(feature = "ei-unmanaged"))]
     fn managedGetOriginalTxHash(resultHandle: i32);
 
     // big int API
@@ -121,7 +121,7 @@ extern "C" {
 
     fn getESDTLocalRoles(tokenhandle: i32) -> i64;
 
-    #[cfg(not(feature = "unmanaged-ei"))]
+    #[cfg(not(feature = "ei-unmanaged"))]
     fn managedGetESDTTokenData(
         addressHandle: i32,
         tokenIDHandle: i32,
@@ -157,7 +157,7 @@ impl BlockchainApiImpl for VmApiImpl {
     }
 
     #[inline]
-    #[cfg(not(feature = "unmanaged-ei"))]
+    #[cfg(not(feature = "ei-unmanaged"))]
     fn get_sc_address_handle(&self) -> Handle {
         unsafe {
             let handle = mBufferNew();
@@ -176,7 +176,7 @@ impl BlockchainApiImpl for VmApiImpl {
     }
 
     #[inline]
-    #[cfg(not(feature = "unmanaged-ei"))]
+    #[cfg(not(feature = "ei-unmanaged"))]
     fn get_owner_address_handle(&self) -> Handle {
         unsafe {
             let handle = mBufferNew();
@@ -215,7 +215,7 @@ impl BlockchainApiImpl for VmApiImpl {
     }
 
     #[inline]
-    #[cfg(not(feature = "unmanaged-ei"))]
+    #[cfg(not(feature = "ei-unmanaged"))]
     fn get_caller_handle(&self) -> Handle {
         unsafe {
             let handle = mBufferNew();
@@ -250,7 +250,7 @@ impl BlockchainApiImpl for VmApiImpl {
     }
 
     #[inline]
-    #[cfg(not(feature = "unmanaged-ei"))]
+    #[cfg(not(feature = "ei-unmanaged"))]
     fn get_state_root_hash<M: ManagedTypeApi>(
         &self,
     ) -> elrond_wasm::types::ManagedByteArray<M, 32> {
@@ -271,7 +271,7 @@ impl BlockchainApiImpl for VmApiImpl {
     }
 
     #[inline]
-    #[cfg(not(feature = "unmanaged-ei"))]
+    #[cfg(not(feature = "ei-unmanaged"))]
     fn get_tx_hash<M: ManagedTypeApi>(&self) -> elrond_wasm::types::ManagedByteArray<M, 32> {
         unsafe {
             let result_handle = mBufferNew();
@@ -315,7 +315,7 @@ impl BlockchainApiImpl for VmApiImpl {
     }
 
     #[inline]
-    #[cfg(not(feature = "unmanaged-ei"))]
+    #[cfg(not(feature = "ei-unmanaged"))]
     fn get_block_random_seed<M: ManagedTypeApi>(
         &self,
     ) -> elrond_wasm::types::ManagedByteArray<M, 48> {
@@ -356,7 +356,7 @@ impl BlockchainApiImpl for VmApiImpl {
     }
 
     #[inline]
-    #[cfg(not(feature = "unmanaged-ei"))]
+    #[cfg(not(feature = "ei-unmanaged"))]
     fn get_prev_block_random_seed<M: ManagedTypeApi>(
         &self,
     ) -> elrond_wasm::types::ManagedByteArray<M, 48> {
@@ -402,7 +402,7 @@ impl BlockchainApiImpl for VmApiImpl {
         }
     }
 
-    #[cfg(feature = "unmanaged-ei")]
+    #[cfg(feature = "ei-unmanaged")]
     fn get_esdt_token_data<M: ManagedTypeApi>(
         &self,
         m_address: &ManagedAddress<M>,
@@ -493,7 +493,7 @@ impl BlockchainApiImpl for VmApiImpl {
         }
     }
 
-    #[cfg(not(feature = "unmanaged-ei"))]
+    #[cfg(not(feature = "ei-unmanaged"))]
     fn get_esdt_token_data<M: ManagedTypeApi>(
         &self,
         address: &ManagedAddress<M>,
