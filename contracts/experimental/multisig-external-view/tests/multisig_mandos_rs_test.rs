@@ -2,9 +2,12 @@ use elrond_wasm_debug::*;
 
 fn world() -> BlockchainMock {
     let mut blockchain = BlockchainMock::new();
-    blockchain.set_current_dir_from_workspace("contracts/examples/multisig");
+    blockchain.set_current_dir_from_workspace("contracts/experimental/multisig-external-view");
 
-    blockchain.register_contract_builder("file:output/multisig.wasm", multisig_external_view::ContractBuilder);
+    blockchain.register_contract_builder(
+        "file:output/multisig.wasm",
+        multisig_external_view::ContractBuilder,
+    );
     blockchain.register_external_view_contract_builder(
         "file:output/multisig-view.wasm",
         multisig_external_view::ContractBuilder,
