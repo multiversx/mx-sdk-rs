@@ -56,18 +56,6 @@ impl EndpointArgumentApiImpl for VmApiImpl {
         }
     }
 
-    fn get_argument_vec_u8(&self, arg_index: i32) -> Vec<u8> {
-        let len = self.get_argument_len(arg_index);
-        let mut res = Vec::with_capacity(len);
-        if len > 0 {
-            unsafe {
-                res.set_len(len);
-                getArgument(arg_index, res.as_mut_ptr());
-            }
-        }
-        res
-    }
-
     fn get_argument_boxed_bytes(&self, arg_index: i32) -> BoxedBytes {
         let len = self.get_argument_len(arg_index);
         unsafe {
