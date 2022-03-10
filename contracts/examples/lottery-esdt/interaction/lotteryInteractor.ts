@@ -1,4 +1,4 @@
-import { Address, BigUIntType, BigUIntValue, BytesValue, Code, GasLimit, Interaction, OptionalType, OptionalValue, OptionValue, Token, TokenIdentifierValue, U32Type, U32Value } from "@elrondnetwork/erdjs";
+import { Address, Balance, BigUIntType, BigUIntValue, BytesValue, Code, EnumValue, GasLimit, Interaction, OptionalType, OptionalValue, OptionValue, Struct, Token, TokenIdentifierValue, U32Type, U32Value } from "@elrondnetwork/erdjs";
 import { createSmartContract, DefaultInteractor, ITestSession, IUser } from "@elrondnetwork/erdjs-snippets";
 import path from "path";
 
@@ -27,7 +27,7 @@ export class LotteryInteractor extends DefaultInteractor {
                 new BigUIntValue(price),
                 OptionValue.newMissing(),
                 OptionValue.newMissing(),
-                new OptionValue(new U32Type(), new U32Value(1)),
+                OptionValue.newProvided(new U32Value(1)),
                 OptionValue.newMissing(),
                 OptionValue.newMissing(),
                 new OptionalValue(new OptionalType(new BigUIntType()))
@@ -35,5 +35,34 @@ export class LotteryInteractor extends DefaultInteractor {
             .withGasLimit(new GasLimit(10000000));
 
         await this.runInteraction(owner, interaction);
+    }
+
+    async buyTicket(user: IUser, lotteryName: string, amount: Balance): Promise<void> {
+        console.log(`buyTicket: address = ${user.address}, amount = ${amount.toCurrencyString()}`);
+
+        let interaction = <Interaction>this.contract.methods
+            .buy_ticket([
+                BytesValue.fromUTF8(lotteryName)
+            ])
+            .withGasLimit(new GasLimit(50000000))
+            .withSingleESDTTransfer(amount);
+
+        await this.runInteraction(user, interaction);
+    }
+
+    async getLotteryInfo(caller: IUser, lotteryName: string): Promise<any> {
+        let interaction = <Interaction>this.contract.methods.getLotteryInfo([
+            BytesValue.fromUTF8(lotteryName)
+        ]);
+        let { firstValue: result } = await this.runQuery(caller, interaction);
+        return (<Struct>result).valueOf();
+    }
+
+    async getStatus(caller: IUser, lotteryName: string): Promise<any> {
+        let interaction = <Interaction>this.contract.methods.status([
+            BytesValue.fromUTF8(lotteryName)
+        ]);
+        let { firstValue: result } = await this.runQuery(caller, interaction);
+        return (<EnumValue>result).valueOf().name;
     }
 }
