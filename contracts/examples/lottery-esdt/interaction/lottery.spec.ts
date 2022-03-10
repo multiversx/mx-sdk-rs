@@ -1,10 +1,12 @@
-import { Address, Balance, GasLimit, Nonce, NumericalType, NumericalValue, Token, TokenType, Transaction, U8Type } from "@elrondnetwork/erdjs";
-import { AirdropService, BunchOfUsers, createTokenAmount, ESDTInteractor, ITestSession, IUser, TestSession } from "@elrondnetwork/erdjs-snippets";
+import { Balance, Token, TokenType } from "@elrondnetwork/erdjs";
+import { AirdropService, createTokenAmount, ESDTInteractor, ITestSession, IUser, TestSession } from "@elrondnetwork/erdjs-snippets";
 import { assert } from "chai";
 import { LotteryInteractor } from "./lotteryInteractor";
 
 describe("lottery snippet", async function () {
     this.bail(true);
+
+    const LotteryName = "fooLottery";
 
     let suite = this;
     let session: ITestSession;
@@ -63,7 +65,34 @@ describe("lottery snippet", async function () {
         let contractAddress = await session.loadAddress("contractAddress");
         let lotteryToken = await session.loadToken("lotteryToken");
         let interactor = await LotteryInteractor.create(session, contractAddress);
-        await interactor.start(owner, "fooLottery", lotteryToken, 1);
+        await interactor.start(owner, LotteryName, lotteryToken, 1);
+    });
+
+    it("get lottery info and status", async function () {
+        let contractAddress = await session.loadAddress("contractAddress");
+        let lotteryToken = await session.loadToken("lotteryToken");
+        let interactor = await LotteryInteractor.create(session, contractAddress);
+        let lotteryInfo = await interactor.getLotteryInfo(owner, LotteryName);
+        let lotteryStatus = await interactor.getStatus(owner, LotteryName);
+        console.log("Info:", lotteryInfo);
+        console.log("Prize pool:", lotteryInfo.prize_pool.toString());
+        console.log("Status:", lotteryStatus);
+
+        assert.equal(lotteryInfo.token_identifier.toString(), lotteryToken.identifier);
+        assert.equal(lotteryStatus, "Running");
+    });
+
+    it("friends buy tickets", async function () {
+        session.expectLongInteraction(this);
+
+        await session.syncAllUsers();
+
+        let contractAddress = await session.loadAddress("contractAddress");
+        let lotteryToken = await session.loadToken("lotteryToken");
+        let interactor = await LotteryInteractor.create(session, contractAddress);
+        
+        let buyAmount = createTokenAmount(lotteryToken, "1");
+        let buyPromises = session.users.getFriends().map(friend => interactor.buyTicket(friend, LotteryName, buyAmount));
+        await Promise.all(buyPromises);
     });
 });
-
