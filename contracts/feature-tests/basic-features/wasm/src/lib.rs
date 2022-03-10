@@ -212,6 +212,7 @@ elrond_wasm_node::wasm_endpoints! {
         managed_vec_new
         managed_vec_remove
         managed_vec_set
+        map_mapper
         map_mapper_contains_key
         map_mapper_entry_and_modify
         map_mapper_entry_or_default_update_increment
