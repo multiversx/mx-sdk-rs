@@ -17,9 +17,9 @@ fn test_token_identifier_egld() {
 fn test_token_identifier_is_valid() {
     let _ = DebugApi::dummy();
     let bf = basic_features::contract_obj::<DebugApi>();
-    let result = bf.token_identifier_is_valid_1(&b"ALC-6258d2"[..]);
+    let result = bf.token_identifier_is_valid_1(TokenIdentifier::from(&b"ALC-6258d2"[..]));
     assert!(result);
-    let result = bf.token_identifier_is_valid_1(&b"AL-C6258d2"[..]);
+    let result = bf.token_identifier_is_valid_1(TokenIdentifier::from(&b"AL-C6258d2"[..]));
     assert!(!result);
     let result = bf.token_identifier_is_valid_2(ManagedBuffer::from(&b"12345-6258d2"[..]));
     assert!(result);
