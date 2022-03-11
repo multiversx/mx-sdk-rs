@@ -11,12 +11,12 @@ pub mod codec_err_test;
 pub mod crypto_features;
 pub mod echo;
 pub mod echo_managed;
-pub mod elliptic_curve_features;
 pub mod event_features;
 pub mod macro_features;
 pub mod managed_address_features;
 pub mod managed_buffer_features;
 pub mod managed_vec_features;
+pub mod non_zero_features;
 pub mod storage_direct_load;
 pub mod storage_direct_store;
 pub mod storage_mapper_fungible_token;
@@ -32,14 +32,12 @@ pub mod storage_mapper_vec;
 pub mod storage_mapper_whitelist;
 pub mod struct_eq;
 pub mod token_identifier_features;
-pub mod type_features;
 pub mod types;
 
 #[elrond_wasm::contract]
 pub trait BasicFeatures:
     big_num_methods::BigIntMethods
     + big_num_operators::BigIntOperators
-    + elliptic_curve_features::EllipticCurveFeatures
     + block_info_features::BlockInfoFeatures
     + blockchain_api_features::BlockchainApiFeatures
     + codec_err_test::CodecErrorTest
@@ -66,7 +64,7 @@ pub trait BasicFeatures:
     + storage_mapper_non_fungible_token::NonFungibleTokenMapperFeatures
     + struct_eq::StructEquals
     + token_identifier_features::TokenIdentifierFeatures
-    + type_features::TypeFeatures
+    + non_zero_features::TypeFeatures
     + elrond_wasm_modules::default_issue_callbacks::DefaultIssueCallbacksModule
 {
     #[init]
