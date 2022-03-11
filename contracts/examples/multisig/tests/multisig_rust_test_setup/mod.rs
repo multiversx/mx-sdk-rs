@@ -1,9 +1,12 @@
-use elrond_wasm::types::{Address, ManagedVec};
+use elrond_wasm::{
+    elrond_codec::multi_types::OptionalValue,
+    types::{Address, ManagedVec},
+};
 use elrond_wasm_debug::{
     managed_address, managed_biguint, managed_token_id, rust_biguint, testing_framework::*,
     tx_mock::TxResult, DebugApi,
 };
-use multisig::*;
+use multisig::{action::Action, multisig_propose::MultisigProposeModule, Multisig};
 
 const MULTISIG_WASM_PATH: &'static str = "multisig/output/multisig.wasm";
 const QUORUM_SIZE: usize = 1;
@@ -78,5 +81,84 @@ where
         }
     }
 
-    pub fn call_propose(&mut self, proposer: &Address) {}
+    pub fn call_propose(
+        &mut self,
+        proposer: &Address,
+        action: Action<DebugApi>,
+    ) -> (usize, TxResult) {
+        let egld_amount = match &action {
+            Action::SendTransferExecute(call_data) => call_data.egld_amount.clone(),
+            Action::SendAsyncCall(call_data) => call_data.egld_amount.clone(),
+            Action::SCDeployFromSource { amount, .. } => amount.clone(),
+            Action::SCUpgradeFromSource { amount, .. } => amount.clone(),
+            _ => managed_biguint!(0),
+        };
+        let amount_bytes = egld_amount.to_bytes_be();
+        let amount_rust_biguint = num_bigint::BigUint::from_bytes_be(amount_bytes.as_slice());
+
+        let mut action_id = 0;
+        let tx_result =
+            self.b_mock
+                .execute_tx(proposer, &self.ms_wrapper, &amount_rust_biguint, |sc| {
+                    action_id = match action {
+                        Action::Nothing => 0,
+                        Action::AddBoardMember(addr) => sc.propose_add_board_member(addr),
+                        Action::AddProposer(addr) => sc.propose_add_proposer(addr),
+                        Action::RemoveUser(addr) => sc.propose_remove_user(addr),
+                        Action::ChangeQuorum(new_size) => sc.propose_change_quorum(new_size),
+                        Action::SendTransferExecute(call_data) => {
+                            let opt_endpoint = if call_data.endpoint_name.is_empty() {
+                                OptionalValue::None
+                            } else {
+                                OptionalValue::Some(call_data.endpoint_name)
+                            };
+                            sc.propose_transfer_execute(
+                                call_data.to,
+                                call_data.egld_amount,
+                                opt_endpoint,
+                                call_data.arguments.into(),
+                            )
+                        },
+                        Action::SendAsyncCall(call_data) => {
+                            let opt_endpoint = if call_data.endpoint_name.is_empty() {
+                                OptionalValue::None
+                            } else {
+                                OptionalValue::Some(call_data.endpoint_name)
+                            };
+                            sc.propose_async_call(
+                                call_data.to,
+                                call_data.egld_amount,
+                                opt_endpoint,
+                                call_data.arguments.into(),
+                            )
+                        },
+                        Action::SCDeployFromSource {
+                            amount,
+                            source,
+                            code_metadata,
+                            arguments,
+                        } => sc.propose_sc_deploy_from_source(
+                            amount,
+                            source,
+                            code_metadata,
+                            arguments.into(),
+                        ),
+                        Action::SCUpgradeFromSource {
+                            sc_address,
+                            amount,
+                            source,
+                            code_metadata,
+                            arguments,
+                        } => sc.propose_sc_upgrade_from_source(
+                            sc_address,
+                            amount,
+                            source,
+                            code_metadata,
+                            arguments.into(),
+                        ),
+                    }
+                });
+
+        (action_id, tx_result)
+    }
 }
