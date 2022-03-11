@@ -3,6 +3,7 @@ elrond_wasm::imports!();
 /// Storage mapper test.
 #[elrond_wasm::module]
 pub trait MapMapperFeatures {
+    #[view]
     #[storage_mapper("map_mapper")]
     fn map_mapper(&self) -> MapMapper<u32, u32>;
 

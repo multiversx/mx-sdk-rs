@@ -59,7 +59,7 @@ impl ManagedTypeApiImpl for VmApiImpl {
         }
     }
 
-    #[cfg(feature = "vm-validate-token-identifier")]
+    #[cfg(feature = "ei-1-1")]
     fn validate_token_identifier(&self, token_id_handle: Handle) -> bool {
         unsafe { validateTokenIdentifier(token_id_handle) != 0 }
     }

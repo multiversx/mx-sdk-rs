@@ -1,4 +1,4 @@
-use elrond_codec::TopEncode;
+use elrond_codec::{TopEncode, TopEncodeMulti};
 
 use crate::{
     api::{ErrorApi, LogApi, LogApiImpl, ManagedTypeApi},
@@ -19,14 +19,12 @@ where
 pub fn serialize_event_topic<A, T>(accumulator: &mut ManagedVec<A, ManagedBuffer<A>>, topic: T)
 where
     A: ErrorApi + ManagedTypeApi,
-    T: TopEncode,
+    T: TopEncodeMulti,
 {
-    let mut topic_buffer = ManagedBuffer::new();
-    let Ok(()) = topic.top_encode_or_handle_err(
-        &mut topic_buffer,
+    let Ok(()) = topic.multi_encode_or_handle_err(
+        accumulator,
         ExitCodecErrorHandler::<A>::from(err_msg::LOG_TOPIC_ENCODE_ERROR),
     );
-    accumulator.push(topic_buffer);
 }
 
 pub fn serialize_log_data<T, A>(data: T) -> ManagedBuffer<A>

@@ -1,11 +1,8 @@
 use crate::{tx_mock::TxPanic, DebugApi};
 use alloc::vec::Vec;
-use elrond_wasm::{
-    api::{
-        BigIntApi, Handle, ManagedBufferApi, StorageReadApi, StorageReadApiImpl, StorageWriteApi,
-        StorageWriteApiImpl,
-    },
-    types::Address,
+use elrond_wasm::api::{
+    BigIntApi, Handle, ManagedBufferApi, StorageReadApi, StorageReadApiImpl, StorageWriteApi,
+    StorageWriteApiImpl,
 };
 use num_bigint::{BigInt, BigUint, Sign};
 use num_traits::ToPrimitive;
@@ -57,7 +54,7 @@ impl StorageReadApiImpl for DebugApi {
         } else {
             std::panic::panic_any(TxPanic {
                 status: 10,
-                message: b"storage value out of range".to_vec(),
+                message: "storage value out of range".to_string(),
             })
         }
     }
@@ -70,13 +67,16 @@ impl StorageReadApiImpl for DebugApi {
         } else {
             std::panic::panic_any(TxPanic {
                 status: 10,
-                message: b"storage value out of range".to_vec(),
+                message: "storage value out of range".to_string(),
             })
         }
     }
 
+    #[cfg(feature = "ei-1-1")]
     fn storage_load_from_address(&self, address_handle: Handle, key_handle: Handle) -> Handle {
-        let address = Address::from_slice(self.mb_to_boxed_bytes(address_handle).as_slice());
+        let address = elrond_wasm::types::Address::from_slice(
+            self.mb_to_boxed_bytes(address_handle).as_slice(),
+        );
         let key_bytes = self.mb_to_boxed_bytes(key_handle);
         self.with_account(&address, |account| {
             match account.storage.get(key_bytes.as_slice()) {
@@ -101,7 +101,7 @@ impl StorageWriteApiImpl for DebugApi {
         if key.starts_with(&b"ELROND"[..]) {
             std::panic::panic_any(TxPanic {
                 status: 10,
-                message: b"cannot write to storage under Elrond reserved key".to_vec(),
+                message: "cannot write to storage under Elrond reserved key".to_string(),
             });
         }
 

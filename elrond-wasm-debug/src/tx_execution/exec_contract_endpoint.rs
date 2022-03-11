@@ -62,7 +62,7 @@ fn execute_contract_instance_endpoint(
         if !call_successful {
             std::panic::panic_any(TxPanic {
                 status: 1,
-                message: b"invalid function (not found)".to_vec(),
+                message: "invalid function (not found)".to_string(),
             });
         }
         DebugApi::new_from_static().into_tx_result()
