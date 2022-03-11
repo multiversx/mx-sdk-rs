@@ -77,10 +77,10 @@
                         "endpoint": "str:accept_funds",
                         "topics": [
                             "str:accept_funds",
+                            "0",
                             "str:NFT-000001",
-                            "str:NonFungibleESDT",
-                            "1",
-                            "5"
+                            "5",
+                            "1"
                         ],
                         "data": ""
                     }

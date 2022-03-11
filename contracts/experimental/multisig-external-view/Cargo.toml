@@ -1,0 +1,25 @@
+[package]
+name = "multisig-external-view"
+version = "1.0.0"
+authors = ["Andrei Marinica <andrei.marinica@elrond.com>"]
+edition = "2018"
+publish = false
+
+[lib]
+path = "src/multisig_external_view.rs"
+
+[dependencies.elrond-wasm]
+version = "0.29.3"
+path = "../../../elrond-wasm"
+features = [ "ei-1-1" ]
+
+[dev-dependencies.elrond-wasm-debug]
+version = "0.29.3"
+path = "../../../elrond-wasm-debug"
+features = [ "ei-1-1" ]
+
+[dev-dependencies.adder]
+path = "../../examples/adder"
+
+[dev-dependencies.factorial]
+path = "../../examples/factorial"

@@ -71,10 +71,10 @@
                         "endpoint": "str:accept_funds",
                         "topics": [
                             "str:accept_funds",
+                            "0",
                             "str:REC-TOKEN",
-                            "str:FungibleESDT",
-                            "1",
-                            "0"
+                            "0",
+                            "1"
                         ],
                         "data": ""
                     },
