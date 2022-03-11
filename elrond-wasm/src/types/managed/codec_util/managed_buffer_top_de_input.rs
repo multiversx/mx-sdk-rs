@@ -32,6 +32,14 @@ where
         }
     }
 
+    fn into_i64(self) -> i64 {
+        if let Some(num) = self.parse_as_i64() {
+            num
+        } else {
+            M::error_api_impl().signal_error(DecodeError::INPUT_TOO_LONG.message_bytes())
+        }
+    }
+
     #[inline]
     fn supports_specialized_type<T: TryStaticCast>() -> bool {
         T::type_eq::<ManagedBuffer<M>>() || T::type_eq::<BigUint<M>>() || T::type_eq::<BigInt<M>>()
