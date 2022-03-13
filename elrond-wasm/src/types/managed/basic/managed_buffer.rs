@@ -7,9 +7,9 @@ use crate::{
 };
 use alloc::string::String;
 use elrond_codec::{
-    bytes_to_number, DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput,
-    NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
-    TryStaticCast, Vec,
+    universal_decode_number, DecodeErrorHandler, EncodeErrorHandler, NestedDecode,
+    NestedDecodeInput, NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode,
+    TopEncodeOutput, TryStaticCast, Vec,
 };
 
 /// A byte buffer managed by an external API.
@@ -278,7 +278,7 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
         {
             None
         } else {
-            Some(bytes_to_number(bytes_slice, true) as i64)
+            Some(universal_decode_number(bytes_slice, true) as i64)
         }
     }
 }
