@@ -1,6 +1,6 @@
 use crate::{
-    num_conv::bytes_to_number, transmute::vec_into_boxed_slice, DecodeError, DecodeErrorHandler,
-    NestedDecodeInput, OwnedBytesNestedDecodeInput, TryStaticCast,
+    num_conv::universal_decode_number, transmute::vec_into_boxed_slice, DecodeError,
+    DecodeErrorHandler, NestedDecodeInput, OwnedBytesNestedDecodeInput, TryStaticCast,
 };
 use alloc::{boxed::Box, vec::Vec};
 
@@ -21,7 +21,7 @@ pub trait TopDecodeInput: Sized {
     ///
     /// Consumes the input object in the process.
     fn into_u64(self) -> u64 {
-        bytes_to_number(&*self.into_boxed_slice_u8(), false)
+        universal_decode_number(&*self.into_boxed_slice_u8(), false)
     }
 
     /// Retrieves the underlying data as a pre-parsed i64.
@@ -29,7 +29,7 @@ pub trait TopDecodeInput: Sized {
     ///
     /// Consumes the input object in the process.
     fn into_i64(self) -> i64 {
-        bytes_to_number(&*self.into_boxed_slice_u8(), true) as i64
+        universal_decode_number(&*self.into_boxed_slice_u8(), true) as i64
     }
 
     #[inline]
@@ -88,11 +88,11 @@ impl<'a> TopDecodeInput for &'a [u8] {
     }
 
     fn into_u64(self) -> u64 {
-        bytes_to_number(self, false)
+        universal_decode_number(self, false)
     }
 
     fn into_i64(self) -> i64 {
-        bytes_to_number(self, true) as i64
+        universal_decode_number(self, true) as i64
     }
 
     fn into_boxed_slice_u8(self) -> Box<[u8]> {

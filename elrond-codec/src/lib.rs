@@ -29,7 +29,7 @@ mod transmute;
 mod try_static_cast;
 
 pub use crate::{
-    num_conv::{bytes_to_number, top_encode_number_to_output, using_encoded_number},
+    num_conv::{top_encode_number, universal_decode_number},
     try_static_cast::{
         try_cast_execute_or_else, try_cast_ref, try_execute_then_cast, TryStaticCast,
     },
