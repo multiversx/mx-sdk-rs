@@ -15,6 +15,7 @@ stat --printf="examples/erc20 %s\n" contracts/feature-tests/erc-style-contracts/
 stat --printf="examples/crowdfunding-erc20 %s\n" contracts/feature-tests/erc-style-contracts/crowdfunding-erc20/output/crowdfunding-erc20.wasm
 stat --printf="examples/lottery-erc20 %s\n" contracts/feature-tests/erc-style-contracts/lottery-erc20/output/lottery-erc20.wasm
 
+stat --printf="tests/alloc-features %s\n" contracts/feature-tests/alloc-features/output/alloc-features.wasm
 stat --printf="tests/basic-features %s\n" contracts/feature-tests/basic-features/output/basic-features.wasm
 stat --printf="tests/forwarder %s\n" contracts/feature-tests/composability/forwarder/output/forwarder.wasm
 stat --printf="tests/forwarder-raw %s\n" contracts/feature-tests/composability/forwarder-raw/output/forwarder-raw.wasm

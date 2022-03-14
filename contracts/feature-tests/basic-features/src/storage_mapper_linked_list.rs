@@ -118,8 +118,8 @@ pub trait LinkedListMapperFeatures {
     }
 
     #[endpoint(listMapperIterateByHand)]
-    fn list_mapper_iterate_by_hand(&self, node_id: u32) -> MultiValueVec<u32> {
-        let mut result = Vec::new();
+    fn list_mapper_iterate_by_hand(&self, node_id: u32) -> MultiValueEncoded<u32> {
+        let mut result = MultiValueEncoded::new();
 
         let mut node_opt = self.list_mapper().get_node_by_id(node_id);
         while node_opt.is_some() {
@@ -130,17 +130,17 @@ pub trait LinkedListMapperFeatures {
             node_opt = self.list_mapper().get_node_by_id(node.get_next_node_id());
         }
 
-        result.into()
+        result
     }
 
     #[endpoint(listMapperIterateByIter)]
-    fn list_mapper_iterate_by_iter(&self, node_id: u32) -> MultiValueVec<u32> {
-        let mut result = Vec::new();
+    fn list_mapper_iterate_by_iter(&self, node_id: u32) -> MultiValueEncoded<u32> {
+        let mut result = MultiValueEncoded::new();
 
         for value in self.list_mapper().iter_from_node_id(node_id) {
             result.push(value.into_value());
         }
 
-        result.into()
+        result
     }
 }
