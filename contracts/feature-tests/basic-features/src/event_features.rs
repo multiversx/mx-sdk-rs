@@ -20,33 +20,20 @@ pub trait EventFeatures {
     }
 
     #[event("event_b")]
-    fn event_b(&self, #[indexed] arg1: &BigUint, #[indexed] arg2: &Address, data: &[BoxedBytes]);
+    fn event_b(
+        &self,
+        #[indexed] arg1: &BigUint,
+        #[indexed] arg2: &ManagedAddress,
+        data: ManagedVec<ManagedBuffer>,
+    );
 
     #[endpoint(logEventB)]
     fn log_event_b(
         &self,
         arg1: &BigUint,
-        arg2: &Address,
-        #[var_args] data: MultiValueVec<BoxedBytes>,
+        arg2: &ManagedAddress,
+        #[var_args] data: MultiValueManagedVec<ManagedBuffer>,
     ) {
-        self.event_b(arg1, arg2, data.as_slice());
+        self.event_b(arg1, arg2, data.into_vec());
     }
-
-    // Legacy:
-
-    #[endpoint(logLegacyEventA)]
-    fn log_legacy_event_a(&self, data: &BigUint) {
-        self.legacy_event_a(data);
-    }
-
-    #[endpoint(logLegacyEventB)]
-    fn log_legacy_event_b(&self, arg1: &BigUint, arg2: &Address, data: &BigUint) {
-        self.legacy_event_b(arg1, arg2, data);
-    }
-
-    #[legacy_event("0x0123456789abcdef0123456789abcdef0123456789abcdef000000000000000a")]
-    fn legacy_event_a(&self, data: &BigUint);
-
-    #[legacy_event("0x0123456789abcdef0123456789abcdef0123456789abcdef000000000000000b")]
-    fn legacy_event_b(&self, arg1: &BigUint, arg2: &Address, data: &BigUint);
 }

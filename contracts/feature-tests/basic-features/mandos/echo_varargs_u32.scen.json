@@ -21,7 +21,7 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "echo_varags_u32",
+                "function": "echo_multi_value_u32",
                 "arguments": [
                     "10",
                     "20",
@@ -49,7 +49,7 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "echo_varags_u32",
+                "function": "echo_multi_value_u32",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
