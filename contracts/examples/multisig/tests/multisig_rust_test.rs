@@ -7,6 +7,7 @@ use multisig_rust_test_setup::{CallActionDataRaw, MultisigSetup};
 
 mod multisig_rust_test_setup;
 use adder::Adder;
+use factorial::Factorial;
 use multisig::Multisig;
 
 use crate::multisig_rust_test_setup::{ActionRaw, EGLD_TOKEN_ID};
@@ -316,11 +317,11 @@ fn async_call_to_sc_test() {
 }
 
 #[test]
-fn deploy_from_source_test() {
+fn deploy_and_upgrade_from_source_test() {
     let rust_zero = rust_biguint!(0);
     let mut ms_setup = MultisigSetup::new(multisig::contract_obj);
 
-    // init source SC
+    // init deploy source SC
     let adder_owner = ms_setup.b_mock.create_user_account(&rust_zero);
     let adder_wrapper = ms_setup.b_mock.create_sc_account(
         &rust_zero,
@@ -363,7 +364,7 @@ fn deploy_from_source_test() {
     let (action_id, tx_result) =
         ms_setup.call_propose(ActionRaw::SendTransferExecute(CallActionDataRaw {
             to: new_adder_wrapper.address_ref().clone(),
-            egld_amount: rust_zero,
+            egld_amount: rust_zero.clone(),
             endpoint_name: BoxedBytes::from(&b"add"[..]),
             arguments: vec![BoxedBytes::from(&[5u8][..])],
         }));
@@ -380,13 +381,43 @@ fn deploy_from_source_test() {
             assert_eq!(actual_sum, expected_sum);
         })
         .assert_ok();
-}
 
-/*
-    Upgrade does not work either
-    TODO: Find a way to specify new contract builder function for a SC
-#[test]
-fn upgrade_from_source_test() {
+    // init upgrade source SC
+    let fact_owner = ms_setup.b_mock.create_user_account(&rust_zero);
+    let fact_wrapper = ms_setup.b_mock.create_sc_account(
+        &rust_zero,
+        Some(&fact_owner),
+        factorial::contract_obj,
+        "path222",
+    );
 
+    // upgrade adder to factorial
+    let (upgrade_action_id, tx_result) = ms_setup.call_propose(ActionRaw::SCUpgradeFromSource {
+        source: fact_wrapper.address_ref().clone(),
+        amount: rust_zero.clone(),
+        code_metadata: CodeMetadata::all(),
+        arguments: Vec::new(),
+        sc_address: adder_wrapper.address_ref().clone(),
+    });
+    tx_result.assert_ok();
+
+    ms_setup.call_sign(upgrade_action_id).assert_ok();
+    ms_setup.call_perform_action(upgrade_action_id).assert_ok();
+
+    tx_result.assert_ok();
+
+    let after_upgrade_wrapper = ms_setup
+        .b_mock
+        .upgrade_wrapper(adder_wrapper, factorial::contract_obj);
+
+    // call SC after upgrade
+
+    ms_setup
+        .b_mock
+        .execute_query(&after_upgrade_wrapper, |sc| {
+            let actual_fact = sc.factorial(managed_biguint!(5));
+            let expected_fact = managed_biguint!(120);
+            assert_eq!(actual_fact, expected_fact);
+        })
+        .assert_ok();
 }
-*/

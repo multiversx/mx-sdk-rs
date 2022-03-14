@@ -303,6 +303,20 @@ impl BlockchainStateWrapper {
         ContractObjWrapper::new(new_sc_address, obj_builder)
     }
 
+    pub fn upgrade_wrapper<OldCB, OldContractObjBuilder, NewCB, NewContractObjBuilder>(
+        &self,
+        old_wrapper: ContractObjWrapper<OldCB, OldContractObjBuilder>,
+        new_builder: NewContractObjBuilder,
+    ) -> ContractObjWrapper<NewCB, NewContractObjBuilder>
+    where
+        OldCB: ContractBase<Api = DebugApi> + CallableContract + 'static,
+        OldContractObjBuilder: 'static + Copy + Fn() -> OldCB,
+        NewCB: ContractBase<Api = DebugApi> + CallableContract + 'static,
+        NewContractObjBuilder: 'static + Copy + Fn() -> NewCB,
+    {
+        ContractObjWrapper::new(old_wrapper.address, new_builder)
+    }
+
     pub fn set_egld_balance(&mut self, address: &Address, balance: &num_bigint::BigUint) {
         let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
         match b_mock_ref.accounts.get_mut(address) {
