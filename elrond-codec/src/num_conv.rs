@@ -2,9 +2,9 @@
 ///
 /// Smaller types need to be converted to u64 before using this function.
 ///
-/// No generics here, we avoid monomorphization to make executable binary as small as possible
-pub fn top_encode_number(x: u64, signed: bool, bytes_be: &mut [u8; 8]) -> &[u8] {
-    *bytes_be = x.to_be_bytes();
+/// No generics here, we avoid monomorphization to make the SC binary as small as possible.
+pub fn top_encode_number(x: u64, signed: bool, buffer: &mut [u8; 8]) -> &[u8] {
+    *buffer = x.to_be_bytes();
     if x == 0 {
         // 0 is a special case
         return &[];
@@ -13,33 +13,33 @@ pub fn top_encode_number(x: u64, signed: bool, bytes_be: &mut [u8; 8]) -> &[u8] 
     if signed && x == u64::MAX {
         // -1 is a special case
         // will return a single 0xFF byte
-        return &bytes_be[7..];
+        return &buffer[7..];
     }
 
     let negative = signed &&  // only possible when signed flag
-		bytes_be[0] > 0x7fu8; // most significant bit is 1
+		buffer[0] > 0x7fu8; // most significant bit is 1
 
     let irrelevant_byte = if negative { 0xffu8 } else { 0x00u8 };
 
     let mut offset = 0usize;
-    while bytes_be[offset] == irrelevant_byte {
+    while buffer[offset] == irrelevant_byte {
         debug_assert!(offset < 7);
         offset += 1;
     }
 
-    if signed && bytes_be[offset] >> 7 != negative as u8 {
+    if signed && buffer[offset] >> 7 != negative as u8 {
         debug_assert!(offset > 0);
         offset -= 1;
     }
 
-    &bytes_be[offset..]
+    &buffer[offset..]
 }
 
-/// Handles both top-encode and neste-encode, signed and unsigned, of any length.
+/// Handles both top-encoding and nested-encoding, signed and unsigned, of any length.
 ///
 /// The result needs to be validated to not exceed limits and then cast to the desired type.
 ///
-/// No generics here, we avoid monomorphization to make executable binary as small as possible
+/// No generics here, we avoid monomorphization to make the SC binary as small as possible.
 pub fn universal_decode_number(bytes: &[u8], signed: bool) -> u64 {
     if bytes.is_empty() {
         return 0;
