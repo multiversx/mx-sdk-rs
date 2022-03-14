@@ -21,3 +21,8 @@ path = "../adder"
 
 [dev-dependencies.factorial]
 path = "../factorial"
+
+[dev-dependencies]
+num-bigint = "0.4.2"
+num-traits = "0.2"
+hex = "0.4"
