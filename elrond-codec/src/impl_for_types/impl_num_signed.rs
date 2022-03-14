@@ -65,7 +65,7 @@ macro_rules! top_decode_num_signed {
                 I: TopDecodeInput,
                 H: DecodeErrorHandler,
             {
-                let arg_i64 = input.into_i64();
+                let arg_i64 = input.into_i64(h)?;
                 let min = <$bounds_ty>::MIN as i64;
                 let max = <$bounds_ty>::MAX as i64;
                 if arg_i64 < min || arg_i64 > max {

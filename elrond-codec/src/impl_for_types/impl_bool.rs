@@ -23,7 +23,7 @@ impl TopDecode for bool {
         I: TopDecodeInput,
         H: DecodeErrorHandler,
     {
-        match input.into_u64() {
+        match input.into_u64(h)? {
             0 => Ok(false),
             1 => Ok(true),
             _ => Err(h.handle_error(DecodeError::INPUT_OUT_OF_RANGE)),
