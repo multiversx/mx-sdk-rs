@@ -1,4 +1,5 @@
 use crate::DebugApi;
+use ed25519_dalek::*;
 use elrond_wasm::{
     api::{CryptoApi, CryptoApiImpl, KECCAK256_RESULT_LEN, RIPEMD_RESULT_LEN, SHA256_RESULT_LEN},
     types::{BoxedBytes, MessageHashType},
@@ -53,8 +54,18 @@ impl CryptoApiImpl for DebugApi {
         panic!("verify_bls not implemented yet!")
     }
 
-    fn verify_ed25519(&self, _key: &[u8], _message: &[u8], _signature: &[u8]) -> bool {
-        panic!("verify_ed25519 not implemented yet!")
+    fn verify_ed25519(&self, key: &[u8], message: &[u8], signature: &[u8]) -> bool {
+        let public = PublicKey::from_bytes(key);
+        if public.is_err() {
+            return false;
+        }
+
+        let sig = Signature::from_bytes(signature);
+        if sig.is_err() {
+            return false;
+        }
+
+        public.unwrap().verify(message, &sig.unwrap()).is_ok()
     }
 
     fn verify_secp256k1(&self, _key: &[u8], _message: &[u8], _signature: &[u8]) -> bool {
