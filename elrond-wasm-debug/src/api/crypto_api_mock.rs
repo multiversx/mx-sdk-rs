@@ -65,8 +65,7 @@ impl CryptoApiImpl for DebugApi {
             return false;
         }
 
-        let public = public.unwrap();
-        public.verify(message, &sig.unwrap()).is_ok()
+        public.unwrap().verify(message, &sig.unwrap()).is_ok()
     }
 
     fn verify_secp256k1(&self, _key: &[u8], _message: &[u8], _signature: &[u8]) -> bool {
