@@ -231,17 +231,17 @@ impl BlockchainStateWrapper {
         );
 
         let wasm_relative_path_expr = "file:".to_owned() + path_str;
-        let was_relative_path_expr_bytes = wasm_relative_path_expr.as_bytes().to_vec();
+        let wasm_relative_path_expr_bytes = wasm_relative_path_expr.as_bytes().to_vec();
 
         self.address_to_code_path
-            .insert(address.clone(), was_relative_path_expr_bytes.clone());
+            .insert(address.clone(), wasm_relative_path_expr_bytes.clone());
 
         self.create_account_raw(
             address,
             egld_balance,
             owner,
             Some(contract_bytes),
-            Some(was_relative_path_expr_bytes),
+            Some(wasm_relative_path_expr_bytes),
         );
 
         if !self.rc_b_mock.contains_contract(&wasm_full_path_as_expr) {
@@ -281,6 +281,26 @@ impl BlockchainStateWrapper {
 
         let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
         b_mock_ref.add_account(acc_data);
+    }
+
+    // Has to be used before perfoming a deploy from a SC
+    // The returned SC wrapper cannot be used before the deploy is actually executed
+    pub fn prepare_deploy_from_sc<CB, ContractObjBuilder>(
+        &mut self,
+        deployer: &Address,
+        obj_builder: ContractObjBuilder,
+    ) -> ContractObjWrapper<CB, ContractObjBuilder>
+    where
+        CB: ContractBase<Api = DebugApi> + CallableContract + 'static,
+        ContractObjBuilder: 'static + Copy + Fn() -> CB,
+    {
+        let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
+        let deployer_acc = b_mock_ref.accounts.get(deployer).unwrap().clone();
+
+        let new_sc_address = self.address_factory.new_sc_address();
+        b_mock_ref.put_new_address(deployer.clone(), deployer_acc.nonce, new_sc_address.clone());
+
+        ContractObjWrapper::new(new_sc_address, obj_builder)
     }
 
     pub fn set_egld_balance(&mut self, address: &Address, balance: &num_bigint::BigUint) {
