@@ -64,18 +64,16 @@ where
             .into_box()
     }
 
-    fn into_u64(self) -> u64 {
-        let mb = self.to_managed_buffer();
-        mb.parse_as_u64().unwrap_or_else(|| {
-            StorageGetErrorHandler::<A>::default().handle_error(DecodeError::INPUT_TOO_LONG)
-        })
-    }
-
-    fn into_i64(self) -> i64 {
-        let mb = self.to_managed_buffer();
-        mb.parse_as_i64().unwrap_or_else(|| {
-            StorageGetErrorHandler::<A>::default().handle_error(DecodeError::INPUT_TOO_LONG)
-        })
+    #[inline]
+    fn into_max_size_buffer<H, const MAX_LEN: usize>(
+        self,
+        buffer: &mut [u8; MAX_LEN],
+        h: H,
+    ) -> Result<&[u8], H::HandledErr>
+    where
+        H: DecodeErrorHandler,
+    {
+        self.to_managed_buffer().into_max_size_buffer(buffer, h)
     }
 
     #[inline]
