@@ -24,8 +24,18 @@ fn crypto_sha256_legacy_alloc_go() {
 }
 
 #[test]
-fn crypto_verify_funcs_go() {
-    elrond_wasm_debug::mandos_go("mandos/crypto_verify_funcs.scen.json");
+fn crypto_verify_bls_go() {
+    elrond_wasm_debug::mandos_go("mandos/crypto_verify_bls.scen.json");
+}
+
+#[test]
+fn crypto_verify_ed25519_go() {
+    elrond_wasm_debug::mandos_go("mandos/crypto_verify_ed25519.scen.json");
+}
+
+#[test]
+fn crypto_verify_secp256k1_go() {
+    elrond_wasm_debug::mandos_go("mandos/crypto_verify_secp256k1.scen.json");
 }
 
 #[test]
