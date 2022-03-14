@@ -66,16 +66,16 @@ where
 
     fn into_u64(self) -> u64 {
         let mb = self.to_managed_buffer();
-        if let Some(num) = mb.parse_as_u64() {
-            num
-        } else {
+        mb.parse_as_u64().unwrap_or_else(|| {
             StorageGetErrorHandler::<A>::default().handle_error(DecodeError::INPUT_TOO_LONG)
-        }
+        })
     }
 
     fn into_i64(self) -> i64 {
-        let key_bytes = self.key.to_boxed_bytes();
-        A::storage_read_api_impl().storage_load_i64(key_bytes.as_slice())
+        let mb = self.to_managed_buffer();
+        mb.parse_as_i64().unwrap_or_else(|| {
+            StorageGetErrorHandler::<A>::default().handle_error(DecodeError::INPUT_TOO_LONG)
+        })
     }
 
     #[inline]

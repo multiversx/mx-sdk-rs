@@ -191,10 +191,6 @@ macro_rules! only_owner {
 #[macro_export]
 macro_rules! non_zero_usize {
     ($input: expr, $error_msg:expr) => {
-        if let Some(nz) = NonZeroUsize::new($input) {
-            nz
-        } else {
-            return sc_error!($error_msg);
-        }
+        NonZeroUsize::new($input).unwrap_or_else(|| sc_panic!($error_msg))
     };
 }

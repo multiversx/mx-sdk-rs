@@ -7,8 +7,9 @@ use crate::{
 };
 use alloc::string::String;
 use elrond_codec::{
-    DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode,
-    NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, TryStaticCast, Vec,
+    bytes_to_number, DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput,
+    NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
+    TryStaticCast, Vec,
 };
 
 /// A byte buffer managed by an external API.
@@ -260,6 +261,24 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
             None
         } else {
             Some(u64::from_be_bytes(bytes))
+        }
+    }
+
+    pub fn parse_as_i64(&self) -> Option<i64> {
+        const U64_NUM_BYTES: usize = 8;
+        let l = self.len();
+        if l > U64_NUM_BYTES {
+            return None;
+        }
+        let mut bytes_buf = [0u8; U64_NUM_BYTES];
+        let bytes_slice = &mut bytes_buf[..l];
+        if M::managed_type_impl()
+            .mb_load_slice(self.handle, 0, bytes_slice)
+            .is_err()
+        {
+            None
+        } else {
+            Some(bytes_to_number(bytes_slice, true) as i64)
         }
     }
 }
