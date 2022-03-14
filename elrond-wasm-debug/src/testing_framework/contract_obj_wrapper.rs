@@ -9,7 +9,7 @@ use elrond_wasm::{
 use crate::{
     rust_biguint,
     testing_framework::raw_converter::bytes_to_hex,
-    tx_execution::interpret_panic_as_tx_result,
+    tx_execution::{execute_async_call_and_callback, interpret_panic_as_tx_result},
     tx_mock::{TxCache, TxContext, TxContextStack, TxInput, TxInputESDT, TxResult},
     world_mock::{is_smart_contract_address, AccountData, AccountEsdt, EsdtInstanceMetadata},
     BlockchainMock, DebugApi,
@@ -668,25 +668,40 @@ impl BlockchainStateWrapper {
 
         let api_after_exec = Rc::try_unwrap(TxContextStack::static_pop()).unwrap();
         let updates = api_after_exec.into_blockchain_updates();
-
-        let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
-        match exec_result {
-            Ok(()) => {
-                // do not commit changes for SC Query (caller == SC in that case)
-                if caller != sc_wrapper.address_ref() {
-                    updates.apply(b_mock_ref);
-                }
-
-                TxResult::empty()
-            },
+        let tx_result = match exec_result {
+            Ok(()) => TxResult::empty(),
             Err(panic_any) => interpret_panic_as_tx_result(panic_any),
+        };
+
+        // only commit for successful non-query calls (caller == SC for queries)
+        let is_successful_tx = tx_result.result_status == 0 && caller != sc_wrapper.address_ref();
+
+        // need two different scopes, so b_mock_ref is destroyed
+        if is_successful_tx {
+            let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
+            updates.apply(b_mock_ref);
         }
+        if is_successful_tx {
+            if let Some(async_data) = &tx_result.result_calls.async_call {
+                let _ = execute_async_call_and_callback(async_data.clone(), &mut self.rc_b_mock);
+            }
+        }
+
+        tx_result
     }
 
-    pub fn execute_in_managed_environment<T, Func: FnOnce() -> T>(&self, f: Func) -> T {
-        let _ = DebugApi::dummy();
+    pub fn execute_in_managed_environment<T, Func: FnOnce() -> T>(&mut self, f: Func) -> T {
+        let tx_cache = TxCache::new(self.rc_b_mock.clone());
+        let tx_input = TxInput::dummy();
+        let tx_context_rc = Rc::new(TxContext::new(tx_input, tx_cache));
+        TxContextStack::static_push(tx_context_rc);
+
         let result = f();
-        let _ = TxContextStack::static_pop();
+
+        let api_after_exec = Rc::try_unwrap(TxContextStack::static_pop()).unwrap();
+        let updates = api_after_exec.into_blockchain_updates();
+        let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
+        updates.apply(b_mock_ref);
 
         result
     }

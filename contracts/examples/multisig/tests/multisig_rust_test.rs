@@ -1,10 +1,7 @@
 use std::borrow::Borrow;
 
 use elrond_wasm::types::{BoxedBytes, ManagedAddress};
-use elrond_wasm_debug::{
-    managed_address, managed_biguint, rust_biguint, tx_execution::execute_async_call_and_callback,
-    DebugApi,
-};
+use elrond_wasm_debug::{managed_address, managed_biguint, rust_biguint, DebugApi};
 use multisig::user_role::UserRole;
 use multisig_rust_test_setup::{CallActionDataRaw, MultisigSetup};
 
@@ -307,12 +304,6 @@ fn async_call_to_sc_test() {
 
     let perform_action_result = ms_setup.call_perform_action(action_id);
     perform_action_result.assert_ok();
-
-    let async_data = perform_action_result.result_calls.async_call.unwrap();
-    let (async_result, callback_result) =
-        execute_async_call_and_callback(async_data, ms_setup.b_mock.get_mut_state());
-    async_result.assert_ok();
-    callback_result.assert_ok();
 
     ms_setup
         .b_mock
