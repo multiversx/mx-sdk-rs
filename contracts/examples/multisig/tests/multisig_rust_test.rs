@@ -1,6 +1,6 @@
 use std::borrow::Borrow;
 
-use elrond_wasm::types::{BoxedBytes, ManagedAddress};
+use elrond_wasm::types::{BoxedBytes, CodeMetadata, ManagedAddress};
 use elrond_wasm_debug::{managed_address, managed_biguint, rust_biguint, DebugApi};
 use multisig::user_role::UserRole;
 use multisig_rust_test_setup::{CallActionDataRaw, MultisigSetup};
@@ -315,10 +315,6 @@ fn async_call_to_sc_test() {
         .assert_ok();
 }
 
-/*
-    Doesn't work yet
-    TODO: Fix new address generation
-
 #[test]
 fn deploy_from_source_test() {
     let rust_zero = rust_biguint!(0);
@@ -342,6 +338,11 @@ fn deploy_from_source_test() {
 
     // deploy from source
 
+    let ms_addr = ms_setup.ms_wrapper.address_ref().clone();
+    let new_adder_wrapper = ms_setup
+        .b_mock
+        .prepare_deploy_from_sc(&ms_addr, adder::contract_obj);
+
     let (deploy_action_id, tx_result) = ms_setup.call_propose(ActionRaw::SCDeployFromSource {
         source: adder_wrapper.address_ref().clone(),
         amount: rust_zero.clone(),
@@ -351,18 +352,11 @@ fn deploy_from_source_test() {
     tx_result.assert_ok();
 
     ms_setup.call_sign(deploy_action_id).assert_ok();
-    let (tx_result, new_adder_addr) = ms_setup.call_perform_action_with_result(deploy_action_id);
+    let (tx_result, new_adder_addr_from_result) =
+        ms_setup.call_perform_action_with_result(deploy_action_id);
     tx_result.assert_ok();
 
-    // init the new SC into the framework
-
-    let new_adder_wrapper = ms_setup.b_mock.create_sc_account_fixed_address(
-        &new_adder_addr,
-        &rust_zero,
-        Some(ms_setup.ms_wrapper.address_ref()),
-        adder::contract_obj,
-        "some path",
-    );
+    assert_eq!(new_adder_wrapper.address_ref(), &new_adder_addr_from_result);
 
     // call the new SC
 
@@ -388,6 +382,7 @@ fn deploy_from_source_test() {
         .assert_ok();
 }
 
+/*
     Upgrade does not work either
     TODO: Find a way to specify new contract builder function for a SC
 #[test]
