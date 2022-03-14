@@ -56,17 +56,17 @@ impl CryptoApiImpl for DebugApi {
 
     fn verify_ed25519(&self, key: &[u8], message: &[u8], signature: &[u8]) -> bool {
         let public = PublicKey::from_bytes(key);
-        if !public.is_ok() {
+        if public.is_err() {
             return false;
         }
 
-        let sig = Signature::from_bytes(&signature);
-        if !sig.is_ok() {
+        let sig = Signature::from_bytes(signature);
+        if sig.is_err() {
             return false;
         }
 
         let public = public.unwrap();
-        public.verify(&message, &sig.unwrap()).is_ok()
+        public.verify(message, &sig.unwrap()).is_ok()
     }
 
     fn verify_secp256k1(&self, _key: &[u8], _message: &[u8], _signature: &[u8]) -> bool {
