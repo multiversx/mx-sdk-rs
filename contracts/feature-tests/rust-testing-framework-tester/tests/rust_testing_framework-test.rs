@@ -7,8 +7,7 @@ use elrond_wasm::types::{
 };
 use elrond_wasm_debug::{
     assert_values_eq, managed_address, managed_biguint, managed_buffer, managed_token_id,
-    rust_biguint, testing_framework::*, tx_execution::execute_async_call_and_callback,
-    tx_mock::TxInputESDT, DebugApi,
+    rust_biguint, testing_framework::*, tx_mock::TxInputESDT, DebugApi,
 };
 use rust_testing_framework_tester::{dummy_module::DummyModule, *};
 
@@ -1063,12 +1062,6 @@ fn test_async_call() {
     });
     tx_result.assert_ok();
 
-    let async_data = tx_result.result_calls.async_call.unwrap();
-    let (async_result, callback_result) =
-        execute_async_call_and_callback(async_data, wrapper.get_mut_state());
-    async_result.assert_ok();
-    callback_result.assert_ok();
-
     wrapper
         .execute_query(&sc_wrapper, |sc| {
             let callback_executed = sc.callback_executed().get();
@@ -1151,7 +1144,7 @@ fn fixed_address_invalid_sc_test() {
 
 #[test]
 fn managed_environment_test() {
-    let wrapper = BlockchainStateWrapper::new();
+    let mut wrapper = BlockchainStateWrapper::new();
     let _my_struct =
         wrapper.execute_in_managed_environment(|| StructWithManagedTypes::<DebugApi> {
             big_uint: managed_biguint!(500),
