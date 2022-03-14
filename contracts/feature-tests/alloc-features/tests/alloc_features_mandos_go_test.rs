@@ -23,20 +23,20 @@ fn crypto_sha256_legacy_alloc_go() {
     elrond_wasm_debug::mandos_go("mandos/crypto_sha256_legacy_alloc.scen.json");
 }
 
-// #[test]
-// fn crypto_verify_bls_go() {
-//     elrond_wasm_debug::mandos_go("mandos/crypto_verify_bls.scen.json");
-// }
+#[test]
+fn crypto_verify_bls_go() {
+    elrond_wasm_debug::mandos_go("mandos/crypto_verify_bls.scen.json");
+}
 
 #[test]
 fn crypto_verify_ed25519_go() {
     elrond_wasm_debug::mandos_go("mandos/crypto_verify_ed25519.scen.json");
 }
 
-// #[test]
-// fn crypto_verify_secp256k1_go() {
-//     elrond_wasm_debug::mandos_go("mandos/crypto_verify_secp256k1.scen.json");
-// }
+#[test]
+fn crypto_verify_secp256k1_go() {
+    elrond_wasm_debug::mandos_go("mandos/crypto_verify_secp256k1.scen.json");
+}
 
 #[test]
 fn echo_async_result_empty_go() {
