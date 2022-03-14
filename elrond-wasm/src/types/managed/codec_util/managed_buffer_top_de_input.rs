@@ -4,7 +4,7 @@ use elrond_codec::{
 };
 
 use crate::{
-    api::{ErrorApiImpl, ManagedTypeApi},
+    api::ManagedTypeApi,
     types::{BigInt, BigUint, ManagedBuffer},
 };
 
@@ -24,20 +24,21 @@ where
         self.to_boxed_bytes().into_box()
     }
 
-    fn into_u64(self) -> u64 {
-        if let Some(num) = self.parse_as_u64() {
-            num
-        } else {
-            M::error_api_impl().signal_error(DecodeError::INPUT_TOO_LONG.message_bytes())
+    fn into_max_size_buffer<H, const MAX_LEN: usize>(
+        self,
+        buffer: &mut [u8; MAX_LEN],
+        h: H,
+    ) -> Result<&[u8], H::HandledErr>
+    where
+        H: DecodeErrorHandler,
+    {
+        let len = self.len();
+        if len > MAX_LEN {
+            return Err(h.handle_error(DecodeError::INPUT_TOO_LONG));
         }
-    }
-
-    fn into_i64(self) -> i64 {
-        if let Some(num) = self.parse_as_i64() {
-            num
-        } else {
-            M::error_api_impl().signal_error(DecodeError::INPUT_TOO_LONG.message_bytes())
-        }
+        let byte_slice = &mut buffer[..len];
+        let _ = self.load_slice(0, byte_slice);
+        Ok(byte_slice)
     }
 
     #[inline]

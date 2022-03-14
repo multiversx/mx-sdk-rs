@@ -96,7 +96,7 @@ macro_rules! top_decode_num_unsigned {
                 I: TopDecodeInput,
                 H: DecodeErrorHandler,
             {
-                let arg_u64 = input.into_u64();
+                let arg_u64 = input.into_u64(h)?;
                 let max = <$bounds_ty>::MAX as u64;
                 if arg_u64 > max {
                     Err(h.handle_error(DecodeError::INPUT_TOO_LONG))
