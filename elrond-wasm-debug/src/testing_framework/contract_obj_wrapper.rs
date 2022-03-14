@@ -690,18 +690,10 @@ impl BlockchainStateWrapper {
         tx_result
     }
 
-    pub fn execute_in_managed_environment<T, Func: FnOnce() -> T>(&mut self, f: Func) -> T {
-        let tx_cache = TxCache::new(self.rc_b_mock.clone());
-        let tx_input = TxInput::dummy();
-        let tx_context_rc = Rc::new(TxContext::new(tx_input, tx_cache));
-        TxContextStack::static_push(tx_context_rc);
-
+    pub fn execute_in_managed_environment<T, Func: FnOnce() -> T>(&self, f: Func) -> T {
+        let _ = DebugApi::dummy();
         let result = f();
-
-        let api_after_exec = Rc::try_unwrap(TxContextStack::static_pop()).unwrap();
-        let updates = api_after_exec.into_blockchain_updates();
-        let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
-        updates.apply(b_mock_ref);
+        TxContextStack::static_pop();
 
         result
     }

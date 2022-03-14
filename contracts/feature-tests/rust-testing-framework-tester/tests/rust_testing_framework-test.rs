@@ -1144,13 +1144,36 @@ fn fixed_address_invalid_sc_test() {
 
 #[test]
 fn managed_environment_test() {
-    let mut wrapper = BlockchainStateWrapper::new();
+    let wrapper = BlockchainStateWrapper::new();
     let _my_struct =
         wrapper.execute_in_managed_environment(|| StructWithManagedTypes::<DebugApi> {
             big_uint: managed_biguint!(500),
             buffer: managed_buffer!(b"MyBuffer"),
         });
 }
+
+/* Doesn't work due to API instance inconsistency
+#[test]
+fn managed_environment_consistency_test() {
+    let mut wrapper = BlockchainStateWrapper::new();
+    let adder_wrapper = wrapper.create_sc_account(
+        &rust_biguint!(0),
+        None,
+        adder::contract_obj,
+        ADDER_WASM_PATH,
+    );
+
+    let first_var = wrapper.execute_in_managed_environment(|| BigUint::<DebugApi>::from(1u32));
+    wrapper
+        .execute_query(&adder_wrapper, |_sc| {
+            let second_var = BigUint::from(2u32);
+            let third_var = BigUint::from(3u32);
+            let sum = first_var + second_var;
+            assert_eq!(sum, third_var);
+        })
+        .assert_ok();
+}
+*/
 
 #[should_panic]
 #[test]
