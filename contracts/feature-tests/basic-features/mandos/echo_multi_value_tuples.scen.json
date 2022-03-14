@@ -66,7 +66,7 @@
         },
         {
             "step": "scCall",
-            "txId": "1",
+            "txId": "3",
             "comment": "only even number of arguments possible",
             "tx": {
                 "from": "address:an_account",
@@ -83,7 +83,7 @@
             "expect": {
                 "out": [],
                 "status": "4",
-                "message": "str:argument decode error (m): too few arguments",
+                "message": "str:argument decode error (var args): too few arguments",
                 "logs": "*",
                 "gas": "*",
                 "refund": "*"

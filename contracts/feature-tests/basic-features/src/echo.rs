@@ -78,13 +78,13 @@ pub trait EchoTypes {
     #[endpoint]
     fn echo_multi_value_tuples(
         &self,
-        #[var_args] m: MultiValueVec<MultiValue2<isize, Vec<u8>>>,
-    ) -> MultiValueVec<MultiValue2<isize, Vec<u8>>> {
-        let mut result: Vec<MultiValue2<isize, Vec<u8>>> = Vec::new();
-        for m_arg in m.into_vec().into_iter() {
-            result.push(m_arg.into_tuple().into())
+        #[var_args] m: MultiValueEncoded<MultiValue2<isize, ManagedBuffer>>,
+    ) -> MultiValueEncoded<MultiValue2<isize, ManagedBuffer>> {
+        let mut result = MultiValueEncoded::new();
+        for multi2 in m.into_iter() {
+            result.push(multi2.into_tuple().into())
         }
-        result.into()
+        result
     }
 
     #[endpoint]
