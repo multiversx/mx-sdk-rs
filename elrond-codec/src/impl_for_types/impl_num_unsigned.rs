@@ -1,5 +1,5 @@
 use crate::{
-    dep_encode_from_no_err, dep_encode_num_mimic, num_conv::bytes_to_number,
+    dep_encode_from_no_err, dep_encode_num_mimic, num_conv::universal_decode_number,
     top_encode_from_no_err, DecodeError, DecodeErrorHandler, EncodeErrorHandler, NestedDecode,
     NestedDecodeInput, NestedEncode, NestedEncodeNoErr, NestedEncodeOutput, TopDecode,
     TopDecodeInput, TopEncode, TopEncodeNoErr, TopEncodeOutput, TypeInfo,
@@ -74,7 +74,7 @@ macro_rules! dep_decode_num_unsigned {
             {
                 let mut bytes = [0u8; $num_bytes];
                 input.read_into(&mut bytes[..], h)?;
-                let num = bytes_to_number(&bytes[..], false) as $ty;
+                let num = universal_decode_number(&bytes[..], false) as $ty;
                 Ok(num)
             }
         }
@@ -96,7 +96,7 @@ macro_rules! top_decode_num_unsigned {
                 I: TopDecodeInput,
                 H: DecodeErrorHandler,
             {
-                let arg_u64 = input.into_u64();
+                let arg_u64 = input.into_u64(h)?;
                 let max = <$bounds_ty>::MAX as u64;
                 if arg_u64 > max {
                     Err(h.handle_error(DecodeError::INPUT_TOO_LONG))
