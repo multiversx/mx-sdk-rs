@@ -22,7 +22,7 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "echo_big_int_vec",
+                "function": "echo_big_int_managed_vec",
                 "arguments": [
                     "nested:+3|nested:+5"
                 ],
