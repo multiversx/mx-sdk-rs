@@ -1,14 +1,54 @@
+use quote::ToTokens;
+
 use super::{method_gen::*, util::*};
 use crate::{
-    generate::{snippets, supertrait_gen},
-    model::{ArgPaymentMetadata, ContractTrait, Method, PublicRole},
+    generate::{arg_regular::convert_to_owned_type, snippets, supertrait_gen},
+    model::{ArgPaymentMetadata, ContractTrait, Method, MethodArgument, PublicRole},
 };
+
+pub fn proxy_arg_gen(
+    method_args: &[MethodArgument],
+    generics: &mut syn::Generics,
+) -> Vec<proc_macro2::TokenStream> {
+    let mut args_decl = Vec::new();
+    for (arg_index, arg) in method_args.iter().enumerate() {
+        let unprocessed_attributes = &arg.unprocessed_attributes;
+        let pat = &arg.pat;
+        if arg.is_endpoint_arg() {
+            // let ty = &arg.ty;
+            let mut bounds = syn::punctuated::Punctuated::new();
+            bounds.push(syn::TypeParamBound::Trait(syn::TraitBound {
+                paren_token: None,
+                modifier: syn::TraitBoundModifier::None,
+                lifetimes: None,
+                path: equivalent_encode_path_gen(&arg.ty),
+            }));
+            let arg_type_generated_ident = generate_proxy_type_generic(arg_index);
+            generics
+                .params
+                .push(syn::GenericParam::Type(syn::TypeParam {
+                    attrs: Vec::new(),
+                    ident: arg_type_generated_ident.clone(),
+                    colon_token: Some(syn::token::Colon(proc_macro2::Span::call_site())),
+                    bounds,
+                    eq_token: None,
+                    default: None,
+                }));
+            args_decl.push(quote! { #(#unprocessed_attributes)* #pat : #arg_type_generated_ident });
+        } else {
+            let ty = &arg.ty;
+            args_decl.push(quote! { #(#unprocessed_attributes)* #pat : #ty });
+        }
+    }
+
+    args_decl
+}
 
 pub fn generate_proxy_endpoint_sig(method: &Method) -> proc_macro2::TokenStream {
     let method_name = &method.name;
-    let generics = &method.generics;
+    let mut generics = method.generics.clone();
     let generics_where = &method.generics.where_clause;
-    let arg_decl = arg_declarations(&method.method_args);
+    let arg_decl = proxy_arg_gen(&method.method_args, &mut generics);
     let ret_tok = match &method.return_type {
         syn::ReturnType::Default => quote! { () },
         syn::ReturnType::Type(_, ty) => quote! { #ty },
@@ -17,7 +57,7 @@ pub fn generate_proxy_endpoint_sig(method: &Method) -> proc_macro2::TokenStream 
         fn #method_name #generics (
             self,
             #(#arg_decl),*
-        ) -> elrond_wasm::types::ContractCall<Self::Api, <#ret_tok as elrond_wasm::elrond_codec::TopEncodeMulti>::DecodeAs>
+        ) -> elrond_wasm::types::ContractCall<Self::Api, #ret_tok>
         #generics_where
     };
     result
@@ -253,4 +293,16 @@ pub fn proxy_obj_code(contract: &ContractTrait) -> proc_macro2::TokenStream {
 
         #(#impl_all_proxy_traits)*
     }
+}
+
+fn equivalent_encode_path_gen(ty: &syn::Type) -> syn::Path {
+    let owned_type = convert_to_owned_type(ty);
+    syn::parse_str(
+        format!(
+            "elrond_wasm::elrond_codec::EquivalentArgument<{}>",
+            owned_type.to_token_stream()
+        )
+        .as_str(),
+    )
+    .unwrap()
 }

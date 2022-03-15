@@ -14,7 +14,7 @@ pub trait Erc1155UserMock {
         _from: ManagedAddress,
         _type_id: BigUint,
         _value: BigUint,
-        _data: &[u8],
+        _data: &ManagedBuffer,
     ) {
     }
 

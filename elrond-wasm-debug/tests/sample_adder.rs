@@ -88,12 +88,7 @@ mod module_1 {
     }
 
     pub trait ProxyTrait: elrond_wasm::contract_base::ProxyObjBase + Sized {
-        fn version(
-            self,
-        ) -> ContractCall<
-            Self::Api,
-            <BigInt<Self::Api> as elrond_wasm::elrond_codec::TopEncodeMulti>::DecodeAs,
-        > {
+        fn version(self) -> ContractCall<Self::Api, BigInt<Self::Api>> {
             let ___address___ = self.into_fields();
             let mut ___contract_call___ = elrond_wasm::types::new_contract_call(
                 ___address___,
@@ -230,12 +225,7 @@ mod sample_adder {
     pub trait ProxyTrait:
         elrond_wasm::contract_base::ProxyObjBase + super::module_1::ProxyTrait
     {
-        fn get_sum(
-            self,
-        ) -> elrond_wasm::types::ContractCall<
-            Self::Api,
-            <BigInt<Self::Api> as elrond_wasm::elrond_codec::TopEncodeMulti>::DecodeAs,
-        > {
+        fn get_sum(self) -> elrond_wasm::types::ContractCall<Self::Api, BigInt<Self::Api>> {
             let ___address___ = self.into_fields();
             let mut ___contract_call___ = elrond_wasm::types::new_contract_call(
                 ___address___,
@@ -244,13 +234,7 @@ mod sample_adder {
             );
             ___contract_call___
         }
-        fn add(
-            self,
-            amount: &BigInt<Self::Api>,
-        ) -> ContractCall<
-            Self::Api,
-            <SCResult<()> as elrond_wasm::elrond_codec::TopEncodeMulti>::DecodeAs,
-        > {
+        fn add(self, amount: &BigInt<Self::Api>) -> ContractCall<Self::Api, ()> {
             let ___address___ = self.into_fields();
             let mut ___contract_call___ = elrond_wasm::types::new_contract_call(
                 ___address___,

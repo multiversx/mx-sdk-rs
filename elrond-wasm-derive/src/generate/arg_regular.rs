@@ -1,48 +1,49 @@
 use super::util::*;
 use crate::model::MethodArgument;
 
+/// I now consider this a hack, a proper solution should be using traits somehow.
+///
+/// We basically change the type in the macro until then, to make things easier for now.
+///
+/// TODO: investigate something along the lines of IntoOwned.
+pub fn convert_to_owned_type(ty: &syn::Type) -> proc_macro2::TokenStream {
+    if let syn::Type::Reference(type_reference) = &ty {
+        assert!(
+            type_reference.mutability.is_none(),
+            "Mutable references not supported as contract method arguments"
+        );
+        if let syn::Type::Slice(slice_type) = &*type_reference.elem {
+            // deserialize as boxed slice, so we have an owned object that we can reference
+            let slice_elem = &slice_type.elem;
+            return quote! {
+                elrond_wasm::Box<[#slice_elem]>
+            };
+        } else if let syn::Type::Path(syn::TypePath { path, .. }) = &*type_reference.elem {
+            if let Some(ident) = path.get_ident() {
+                if *ident == "str" {
+                    // TODO: generalize for all unsized types using Box
+                    return quote! {
+                        elrond_wasm::Box<str>
+                    };
+                }
+            }
+        }
+
+        let referenced_type = &*type_reference.elem;
+        return quote! { #referenced_type };
+    }
+
+    quote! { #ty }
+}
+
 pub fn generate_load_single_arg(
     arg: &MethodArgument,
     arg_index_expr: &proc_macro2::TokenStream,
 ) -> proc_macro2::TokenStream {
-    let arg_ty = &arg.ty;
     let arg_name_expr = arg_id_literal(&arg.pat);
-    match &arg.ty {
-        syn::Type::Reference(type_reference) => {
-            assert!(
-                type_reference.mutability.is_none(),
-                "Mutable references not supported as contract method arguments"
-            );
-            if let syn::Type::Slice(slice_type) = &*type_reference.elem {
-                // deserialize as boxed slice, so we have an owned object that we can reference
-                let slice_elem = &slice_type.elem;
-                quote! {
-                    elrond_wasm::load_single_arg::<Self::Api, Box<[#slice_elem]>>(#arg_index_expr, #arg_name_expr)
-                }
-            } else {
-                // deserialize as owned object, so we can then have a reference to it
-                let referenced_type = &*type_reference.elem;
-                if let syn::Type::Path(syn::TypePath { path, .. }) = referenced_type {
-                    if let Some(ident) = path.get_ident() {
-                        if *ident == "str" {
-                            // TODO: generalize for all unsized types using Box
-                            return quote! {
-                                elrond_wasm::load_single_arg::<Self::Api, Box<str>>(#arg_index_expr, #arg_name_expr)
-                            };
-                        }
-                    }
-                }
-
-                quote! {
-                    elrond_wasm::load_single_arg::<Self::Api, #referenced_type>(#arg_index_expr, #arg_name_expr)
-                }
-            }
-        },
-        _ => {
-            quote! {
-                elrond_wasm::load_single_arg::<Self::Api, #arg_ty>(#arg_index_expr, #arg_name_expr)
-            }
-        },
+    let owned_type = convert_to_owned_type(&arg.ty);
+    quote! {
+        elrond_wasm::load_single_arg::<Self::Api, #owned_type>(#arg_index_expr, #arg_name_expr)
     }
 }
 
