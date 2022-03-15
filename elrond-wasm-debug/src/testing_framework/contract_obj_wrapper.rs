@@ -122,7 +122,7 @@ impl BlockchainStateWrapper {
         token_id: &[u8],
         nonce: u64,
         expected_balance: &num_bigint::BigUint,
-        expected_attributes: &T,
+        opt_expected_attributes: Option<&T>,
     ) where
         T: TopEncode + TopDecode + PartialEq + core::fmt::Debug,
     {
@@ -151,8 +151,9 @@ impl BlockchainStateWrapper {
             None => Vec::new(),
         };
 
-        let actual_attributes = T::top_decode(actual_attributes_serialized).unwrap();
-        assert!(
+        if let Some(expected_attributes) = opt_expected_attributes {
+            let actual_attributes = T::top_decode(actual_attributes_serialized).unwrap();
+            assert!(
             expected_attributes == &actual_attributes,
             "ESDT NFT attributes mismatch for address {}\n Token: {}, nonce: {}\n Expected: {:?}\n Have: {:?}\n",
             address_to_hex(address),
@@ -161,6 +162,7 @@ impl BlockchainStateWrapper {
             expected_attributes,
             actual_attributes,
         );
+        }
     }
 }
 
