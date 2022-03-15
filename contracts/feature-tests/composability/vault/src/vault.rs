@@ -20,7 +20,8 @@ pub trait Vault {
         &self,
         #[var_args] args: MultiValueEncoded<ManagedBuffer>,
     ) -> MultiValueEncoded<ManagedBuffer> {
-        self.call_counts(b"echo_arguments").update(|c| *c += 1);
+        self.call_counts(ManagedBuffer::from(b"echo_arguments"))
+            .update(|c| *c += 1);
         args
     }
 
@@ -44,7 +45,8 @@ pub trait Vault {
         let esdt_transfers_multi = self.esdt_transfers_multi();
         self.accept_funds_event(&self.call_value().egld_value(), &esdt_transfers_multi);
 
-        self.call_counts(b"accept_funds").update(|c| *c += 1);
+        self.call_counts(ManagedBuffer::from(b"accept_funds"))
+            .update(|c| *c += 1);
     }
 
     #[payable("*")]
@@ -56,7 +58,7 @@ pub trait Vault {
         let esdt_transfers_multi = self.esdt_transfers_multi();
         self.accept_funds_event(&egld_value, &esdt_transfers_multi);
 
-        self.call_counts(b"accept_funds_echo_payment")
+        self.call_counts(ManagedBuffer::from(b"accept_funds_echo_payment"))
             .update(|c| *c += 1);
 
         (egld_value, esdt_transfers_multi).into()
@@ -216,5 +218,5 @@ pub trait Vault {
     /// this additional counter has the role of showing that storage also gets saved correctly.
     #[view]
     #[storage_mapper("call_counts")]
-    fn call_counts(&self, endpoint: &[u8]) -> SingleValueMapper<usize>;
+    fn call_counts(&self, endpoint: ManagedBuffer) -> SingleValueMapper<usize>;
 }

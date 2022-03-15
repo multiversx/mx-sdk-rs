@@ -7,8 +7,9 @@ use crate::{
 };
 use alloc::string::String;
 use elrond_codec::{
-    DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode,
-    NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, TryStaticCast, Vec,
+    DecodeErrorHandler, EncodeErrorHandler, EquivalentArgument, NestedDecode, NestedDecodeInput,
+    NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
+    TryStaticCast, Vec,
 };
 
 /// A byte buffer managed by an external API.
@@ -307,22 +308,6 @@ impl<M: ManagedTypeApi> PartialEq<[u8]> for ManagedBuffer<M> {
 
 impl<M: ManagedTypeApi> TryStaticCast for ManagedBuffer<M> {}
 
-impl<M: ManagedTypeApi> TopEncode for ManagedBuffer<M> {
-    #[inline]
-    fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
-    where
-        O: TopEncodeOutput,
-        H: EncodeErrorHandler,
-    {
-        if O::supports_specialized_type::<Self>() {
-            output.set_specialized(self, h)
-        } else {
-            output.set_slice_u8(self.to_boxed_bytes().as_slice());
-            Ok(())
-        }
-    }
-}
-
 impl<M: ManagedTypeApi> NestedEncode for ManagedBuffer<M> {
     fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>
     where
@@ -339,19 +324,24 @@ impl<M: ManagedTypeApi> NestedEncode for ManagedBuffer<M> {
     }
 }
 
-impl<M: ManagedTypeApi> TopDecode for ManagedBuffer<M> {
-    fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
+impl<M: ManagedTypeApi> TopEncode for ManagedBuffer<M> {
+    #[inline]
+    fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
     where
-        I: TopDecodeInput,
-        H: DecodeErrorHandler,
+        O: TopEncodeOutput,
+        H: EncodeErrorHandler,
     {
-        if I::supports_specialized_type::<Self>() {
-            input.into_specialized(h)
+        if O::supports_specialized_type::<Self>() {
+            output.set_specialized(self, h)
         } else {
-            Ok(ManagedBuffer::new_from_bytes(&input.into_boxed_slice_u8()))
+            output.set_slice_u8(self.to_boxed_bytes().as_slice());
+            Ok(())
         }
     }
 }
+
+impl<M: ManagedTypeApi> EquivalentArgument<ManagedBuffer<M>> for &[u8] {}
+impl<M: ManagedTypeApi> EquivalentArgument<ManagedBuffer<M>> for &[u8; 0] {}
 
 impl<M: ManagedTypeApi> NestedDecode for ManagedBuffer<M> {
     fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
@@ -364,6 +354,20 @@ impl<M: ManagedTypeApi> NestedDecode for ManagedBuffer<M> {
         } else {
             let boxed_bytes = BoxedBytes::dep_decode_or_handle_err(input, h)?;
             Ok(Self::new_from_bytes(boxed_bytes.as_slice()))
+        }
+    }
+}
+
+impl<M: ManagedTypeApi> TopDecode for ManagedBuffer<M> {
+    fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: TopDecodeInput,
+        H: DecodeErrorHandler,
+    {
+        if I::supports_specialized_type::<Self>() {
+            input.into_specialized(h)
+        } else {
+            Ok(ManagedBuffer::new_from_bytes(&input.into_boxed_slice_u8()))
         }
     }
 }

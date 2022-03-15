@@ -14,6 +14,10 @@ pub fn generate_endpoints_mod_alias(index: usize) -> proc_macro2::Ident {
     syn::Ident::new(&format!("__endpoints_{}__", index), Span::call_site())
 }
 
+pub fn generate_proxy_type_generic(index: usize) -> proc_macro2::Ident {
+    syn::Ident::new(&format!("Arg{}", index), Span::call_site())
+}
+
 pub fn array_literal(bytes: &[u8]) -> proc_macro2::TokenStream {
     quote! { [ #(#bytes),* ] }
 }
