@@ -371,7 +371,7 @@ fn test_nft_balance() {
         token_id,
         nft_nonce,
         &nft_balance,
-        &nft_attributes,
+        Some(&nft_attributes),
     );
 
     wrapper
@@ -415,7 +415,7 @@ fn test_sc_send_nft_to_user() {
         token_id,
         nft_nonce,
         &nft_balance,
-        &nft_attributes,
+        Some(&nft_attributes),
     );
 
     wrapper
@@ -432,14 +432,14 @@ fn test_sc_send_nft_to_user() {
         token_id,
         nft_nonce,
         &rust_biguint!(400),
-        &nft_attributes,
+        Some(&nft_attributes),
     );
     wrapper.check_nft_balance(
         sc_wrapper.address_ref(),
         token_id,
         nft_nonce,
         &rust_biguint!(600),
-        &nft_attributes,
+        Some(&nft_attributes),
     );
 }
 
@@ -530,14 +530,14 @@ fn test_sc_nft() {
         token_id,
         1,
         &rust_biguint!(100),
-        &nft_attributes,
+        Some(&nft_attributes),
     );
     wrapper.check_nft_balance(
         sc_wrapper.address_ref(),
         token_id,
         2,
         &rust_biguint!(100),
-        &nft_attributes,
+        Some(&nft_attributes),
     );
 
     wrapper
@@ -553,14 +553,14 @@ fn test_sc_nft() {
         token_id,
         1,
         &rust_biguint!(200),
-        &nft_attributes,
+        Some(&nft_attributes),
     );
     wrapper.check_nft_balance(
         sc_wrapper.address_ref(),
         token_id,
         2,
         &rust_biguint!(100),
-        &nft_attributes,
+        Some(&nft_attributes),
     );
 
     wrapper
@@ -576,14 +576,14 @@ fn test_sc_nft() {
         token_id,
         1,
         &rust_biguint!(200),
-        &nft_attributes,
+        Some(&nft_attributes),
     );
     wrapper.check_nft_balance(
         sc_wrapper.address_ref(),
         token_id,
         2,
         &rust_biguint!(50),
-        &nft_attributes,
+        Some(&nft_attributes),
     );
 }
 
@@ -655,12 +655,12 @@ fn test_esdt_multi_transfer() {
         .assert_ok();
 
     wrapper.check_esdt_balance(sc_wrapper.address_ref(), token_id_1, &rust_biguint!(100));
-    wrapper.check_nft_balance(
+    wrapper.check_nft_balance::<()>(
         sc_wrapper.address_ref(),
         token_id_2,
         nft_nonce,
         &rust_biguint!(1),
-        &(),
+        None,
     );
 }
 
