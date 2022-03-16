@@ -232,6 +232,7 @@ where
         self.buffer.overwrite(&[]);
     }
 
+    #[cfg(feature = "alloc")]
     pub fn into_vec(self) -> Vec<T> {
         let mut v = Vec::new();
         for item in self.into_iter() {
@@ -242,6 +243,7 @@ where
 
     /// Temporarily converts self to a `Vec<T>`.
     /// All operations performed on the temporary vector get saved back to the underlying buffer.
+    #[cfg(feature = "alloc")]
     pub fn with_self_as_vec<R, F>(&mut self, f: F) -> R
     where
         F: FnOnce(&mut Vec<T>) -> R,

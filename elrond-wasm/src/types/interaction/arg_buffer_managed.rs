@@ -1,4 +1,3 @@
-use super::ArgBuffer;
 use crate::{
     api::{ErrorApi, Handle, ManagedTypeApi},
     contract_base::ExitCodecErrorHandler,
@@ -100,6 +99,7 @@ where
         self
     }
 
+    #[cfg(feature = "alloc")]
     pub fn to_raw_args_vec(&self) -> Vec<Vec<u8>> {
         let mut v = Vec::new();
         for item in self.data.into_iter() {
@@ -127,8 +127,9 @@ impl<M: ManagedTypeApi> ManagedArgBuffer<M>
 where
     M: ManagedTypeApi + 'static,
 {
-    pub fn to_legacy_arg_buffer(&self) -> ArgBuffer {
-        let mut result = ArgBuffer::new();
+    #[cfg(feature = "alloc")]
+    pub fn to_legacy_arg_buffer(&self) -> crate::types::heap::ArgBuffer {
+        let mut result = crate::types::heap::ArgBuffer::new();
         for m_arg in self.data.into_iter() {
             result.push_argument_bytes(m_arg.to_boxed_bytes().as_slice());
         }
