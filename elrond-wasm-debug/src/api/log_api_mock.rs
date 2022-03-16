@@ -1,7 +1,7 @@
 use elrond_wasm::{
     api::{Handle, LogApi, LogApiImpl},
     types::{
-        managed_vec_of_buffers_to_arg_buffer, ArgBuffer, ManagedBuffer, ManagedType, ManagedVec,
+        managed_vec_of_buffers_to_arg_buffer, heap::ArgBuffer, ManagedBuffer, ManagedType, ManagedVec,
     },
 };
 

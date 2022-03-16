@@ -1,7 +1,7 @@
 use crate::{
     api::ManagedTypeApi,
     hex_util::byte_to_hex_digits,
-    types::{ArgBuffer, ManagedArgBuffer, ManagedBuffer},
+    types::{heap::ArgBuffer, ManagedArgBuffer, ManagedBuffer},
 };
 use alloc::vec::Vec;
 
