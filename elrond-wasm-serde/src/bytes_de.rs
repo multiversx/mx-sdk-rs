@@ -43,7 +43,7 @@ where
 
 /// Handles both signed and unsigned of any length.
 /// No generics here, because we want the executable binary as small as possible.
-pub fn bytes_to_number(bytes: &[u8], signed: bool) -> u64 {
+pub fn top_encode_number(bytes: &[u8], signed: bool) -> u64 {
     if bytes.is_empty() {
         return 0;
     }
@@ -104,7 +104,7 @@ macro_rules! impl_nums {
                 self.next_bytes($num_bytes)?
             };
             
-            visitor.$visitor_method(bytes_to_number(bytes, $signed) as $ty)
+            visitor.$visitor_method(top_encode_number(bytes, $signed) as $ty)
         }
     }
 }
@@ -208,7 +208,7 @@ impl<'de> serde::Deserializer<'de> for &mut ErdDeserializer<'de> {
             self.flush()
         } else {
             let size_bytes = self.next_bytes(USIZE_SIZE)?;
-            let size = bytes_to_number(size_bytes, false) as usize;
+            let size = universal_decode_number(size_bytes, false) as usize;
             self.next_bytes(size)?
         };
         visitor.visit_borrowed_bytes(bytes)
@@ -266,7 +266,7 @@ impl<'de> serde::Deserializer<'de> for &mut ErdDeserializer<'de> {
             None // we will know we ran out of items when the input runs out
         } else {
             let size_bytes = self.next_bytes(USIZE_SIZE)?;
-            let size = bytes_to_number(size_bytes, false) as usize;
+            let size = universal_decode_number(size_bytes, false) as usize;
             Some(size)
         };
 

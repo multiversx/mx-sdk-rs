@@ -1,0 +1,72 @@
+{
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:alloc-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../output/alloc-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            }
+        },
+        {
+            "step": "scQuery",
+            "txId": "1",
+            "tx": {
+                "to": "sc:alloc-features",
+                "function": "mbuffer_set_slice",
+                "arguments": [
+                    "str:abcdef",
+                    "1",
+                    "str:hhh"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "str:ahhhef"
+                ]
+            }
+        },
+        {
+            "step": "scQuery",
+            "txId": "2",
+            "tx": {
+                "to": "sc:alloc-features",
+                "function": "mbuffer_set_slice",
+                "arguments": [
+                    "str:abcdef",
+                    "0",
+                    "str:hhh"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "str:hhhdef"
+                ]
+            }
+        },
+        {
+            "step": "scQuery",
+            "txId": "3",
+            "tx": {
+                "to": "sc:alloc-features",
+                "function": "mbuffer_set_slice",
+                "arguments": [
+                    "str:abcdef",
+                    "3",
+                    "str:hhh"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "str:abchhh"
+                ]
+            }
+        }
+    ]
+}

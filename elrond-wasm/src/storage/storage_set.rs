@@ -42,18 +42,6 @@ where
         self.set_managed_buffer(&bytes.into())
     }
 
-    fn set_u64(self, value: u64) {
-        using_encoded_number(value, 64, false, true, |bytes| {
-            self.set_managed_buffer(&bytes.into())
-        });
-    }
-
-    fn set_i64(self, value: i64) {
-        using_encoded_number(value as u64, 64, true, true, |bytes| {
-            self.set_managed_buffer(&bytes.into())
-        });
-    }
-
     #[inline]
     fn supports_specialized_type<T: TryStaticCast>() -> bool {
         T::type_eq::<ManagedBuffer<A>>() || T::type_eq::<BigUint<A>>() || T::type_eq::<BigInt<A>>()
