@@ -2,8 +2,8 @@ import { Address, Balance, BigUIntType, BigUIntValue, BytesValue, Code, EnumValu
 import { createSmartContract, DefaultInteractor, ITestSession, IUser } from "@elrondnetwork/erdjs-snippets";
 import path from "path";
 
-const PathToWasm = path.resolve(__dirname, "..", "output", "lottery-esdt.wasm");
-const PathToAbi = path.resolve(__dirname, "..", "output", "lottery-esdt.abi.json");
+const PathToWasm = path.resolve(__dirname, "..", "lottery-esdt", "output", "lottery-esdt.wasm");
+const PathToAbi = path.resolve(__dirname, "..", "lottery-esdt", "output", "lottery-esdt.abi.json");
 
 export class LotteryInteractor extends DefaultInteractor {
     static async create(session: ITestSession, address?: Address) {
