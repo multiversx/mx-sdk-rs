@@ -1,8 +1,7 @@
 use crate::{
-    num_conv::top_encode_number_to_output, EncodeError, EncodeErrorHandler, NestedEncodeOutput,
-    TryStaticCast,
+    num_conv::top_encode_number, EncodeError, EncodeErrorHandler, NestedEncodeOutput, TryStaticCast,
 };
-use alloc::{boxed::Box, vec::Vec};
+use alloc::vec::Vec;
 
 /// Specifies objects that can receive the result of a TopEncode computation.
 
@@ -20,22 +19,16 @@ pub trait TopEncodeOutput: Sized {
 
     fn set_slice_u8(self, bytes: &[u8]);
 
-    #[inline]
-    #[allow(clippy::boxed_local)]
-    fn set_boxed_bytes(self, bytes: Box<[u8]>) {
-        self.set_slice_u8(&*bytes);
-    }
-
     fn set_u64(self, value: u64) {
-        let mut buffer = Vec::<u8>::with_capacity(8);
-        top_encode_number_to_output(&mut buffer, value, false);
-        self.set_slice_u8(&buffer[..]);
+        let mut buffer = [0u8; 8];
+        let slice = top_encode_number(value, false, &mut buffer);
+        self.set_slice_u8(slice);
     }
 
     fn set_i64(self, value: i64) {
-        let mut buffer = Vec::<u8>::with_capacity(8);
-        top_encode_number_to_output(&mut buffer, value as u64, true);
-        self.set_slice_u8(&buffer[..]);
+        let mut buffer = [0u8; 8];
+        let slice = top_encode_number(value as u64, true, &mut buffer);
+        self.set_slice_u8(slice);
     }
 
     /// The unit type `()` is serializable, but some TopEncodeOutput implementations might want to treat it differently.

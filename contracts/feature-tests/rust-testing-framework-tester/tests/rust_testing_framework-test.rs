@@ -7,8 +7,7 @@ use elrond_wasm::types::{
 };
 use elrond_wasm_debug::{
     assert_values_eq, managed_address, managed_biguint, managed_buffer, managed_token_id,
-    rust_biguint, testing_framework::*, tx_execution::execute_async_call_and_callback,
-    tx_mock::TxInputESDT, DebugApi,
+    rust_biguint, testing_framework::*, tx_mock::TxInputESDT, DebugApi,
 };
 use rust_testing_framework_tester::{dummy_module::DummyModule, *};
 
@@ -372,7 +371,7 @@ fn test_nft_balance() {
         token_id,
         nft_nonce,
         &nft_balance,
-        &nft_attributes,
+        Some(&nft_attributes),
     );
 
     wrapper
@@ -416,7 +415,7 @@ fn test_sc_send_nft_to_user() {
         token_id,
         nft_nonce,
         &nft_balance,
-        &nft_attributes,
+        Some(&nft_attributes),
     );
 
     wrapper
@@ -433,14 +432,14 @@ fn test_sc_send_nft_to_user() {
         token_id,
         nft_nonce,
         &rust_biguint!(400),
-        &nft_attributes,
+        Some(&nft_attributes),
     );
     wrapper.check_nft_balance(
         sc_wrapper.address_ref(),
         token_id,
         nft_nonce,
         &rust_biguint!(600),
-        &nft_attributes,
+        Some(&nft_attributes),
     );
 }
 
@@ -531,14 +530,14 @@ fn test_sc_nft() {
         token_id,
         1,
         &rust_biguint!(100),
-        &nft_attributes,
+        Some(&nft_attributes),
     );
     wrapper.check_nft_balance(
         sc_wrapper.address_ref(),
         token_id,
         2,
         &rust_biguint!(100),
-        &nft_attributes,
+        Some(&nft_attributes),
     );
 
     wrapper
@@ -554,14 +553,14 @@ fn test_sc_nft() {
         token_id,
         1,
         &rust_biguint!(200),
-        &nft_attributes,
+        Some(&nft_attributes),
     );
     wrapper.check_nft_balance(
         sc_wrapper.address_ref(),
         token_id,
         2,
         &rust_biguint!(100),
-        &nft_attributes,
+        Some(&nft_attributes),
     );
 
     wrapper
@@ -577,14 +576,14 @@ fn test_sc_nft() {
         token_id,
         1,
         &rust_biguint!(200),
-        &nft_attributes,
+        Some(&nft_attributes),
     );
     wrapper.check_nft_balance(
         sc_wrapper.address_ref(),
         token_id,
         2,
         &rust_biguint!(50),
-        &nft_attributes,
+        Some(&nft_attributes),
     );
 }
 
@@ -656,12 +655,12 @@ fn test_esdt_multi_transfer() {
         .assert_ok();
 
     wrapper.check_esdt_balance(sc_wrapper.address_ref(), token_id_1, &rust_biguint!(100));
-    wrapper.check_nft_balance(
+    wrapper.check_nft_balance::<()>(
         sc_wrapper.address_ref(),
         token_id_2,
         nft_nonce,
         &rust_biguint!(1),
-        &(),
+        None,
     );
 }
 
@@ -1063,12 +1062,6 @@ fn test_async_call() {
     });
     tx_result.assert_ok();
 
-    let async_data = tx_result.result_calls.async_call.unwrap();
-    let (async_result, callback_result) =
-        execute_async_call_and_callback(async_data, wrapper.get_mut_state());
-    async_result.assert_ok();
-    callback_result.assert_ok();
-
     wrapper
         .execute_query(&sc_wrapper, |sc| {
             let callback_executed = sc.callback_executed().get();
@@ -1158,6 +1151,29 @@ fn managed_environment_test() {
             buffer: managed_buffer!(b"MyBuffer"),
         });
 }
+
+/* Doesn't work due to API instance inconsistency
+#[test]
+fn managed_environment_consistency_test() {
+    let mut wrapper = BlockchainStateWrapper::new();
+    let adder_wrapper = wrapper.create_sc_account(
+        &rust_biguint!(0),
+        None,
+        adder::contract_obj,
+        ADDER_WASM_PATH,
+    );
+
+    let first_var = wrapper.execute_in_managed_environment(|| BigUint::<DebugApi>::from(1u32));
+    wrapper
+        .execute_query(&adder_wrapper, |_sc| {
+            let second_var = BigUint::from(2u32);
+            let third_var = BigUint::from(3u32);
+            let sum = first_var + second_var;
+            assert_eq!(sum, third_var);
+        })
+        .assert_ok();
+}
+*/
 
 #[should_panic]
 #[test]
