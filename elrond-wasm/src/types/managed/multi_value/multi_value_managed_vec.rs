@@ -98,6 +98,7 @@ where
         self.0
     }
 
+    #[cfg(feature = "alloc")]
     pub fn with_self_as_vec<F>(&mut self, f: F)
     where
         F: FnOnce(&mut Vec<T>),

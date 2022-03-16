@@ -5,7 +5,6 @@ use crate::{
     storage::{storage_clear, storage_get, storage_get_len, storage_set, StorageKey},
     types::{ManagedType, MultiValueEncoded},
 };
-use alloc::vec::Vec;
 use core::{marker::PhantomData, usize};
 use elrond_codec::{
     multi_encode_iter_or_handle_err, EncodeErrorHandler, TopDecode, TopEncode, TopEncodeMulti,
@@ -210,7 +209,7 @@ where
     /// Loads all items from storage and places them in a Vec.
     /// Can easily consume a lot of gas.
     #[cfg(feature = "alloc")]
-    pub fn load_as_vec(&self) -> Vec<T> {
+    pub fn load_as_vec(&self) -> alloc::vec::Vec<T> {
         self.iter().collect()
     }
 

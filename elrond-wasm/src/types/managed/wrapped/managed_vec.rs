@@ -2,7 +2,7 @@ use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
     api::{ErrorApiImpl, Handle, InvalidSliceError, ManagedTypeApi},
     types::{
-        heap::BoxedBytes, ArgBuffer, ManagedBuffer, ManagedBufferNestedDecodeInput, ManagedType,
+        heap::BoxedBytes, heap::ArgBuffer, ManagedBuffer, ManagedBufferNestedDecodeInput, ManagedType,
         ManagedVecItem, ManagedVecRef, ManagedVecRefIterator,
     },
 };
