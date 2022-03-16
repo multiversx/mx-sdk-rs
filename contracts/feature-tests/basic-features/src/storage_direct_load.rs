@@ -30,18 +30,14 @@ pub trait StorageLoadFeatures {
     fn load_bool(&self) -> bool;
 
     #[endpoint]
-    #[storage_get("vec_u8")]
-    fn load_vec_u8(&self) -> Vec<u8>;
-
-    #[endpoint]
     #[storage_get("addr")]
-    fn load_addr(&self) -> Address;
+    fn load_addr(&self) -> ManagedAddress;
 
     #[storage_get("opt_addr")]
-    fn get_opt_addr(&self) -> Option<Address>;
+    fn get_opt_addr(&self) -> Option<ManagedAddress>;
 
     #[endpoint]
-    fn load_opt_addr(&self) -> OptionalValue<Address> {
+    fn load_opt_addr(&self) -> OptionalValue<ManagedAddress> {
         self.get_opt_addr().into()
     }
 
@@ -58,20 +54,16 @@ pub trait StorageLoadFeatures {
     fn clear_storage_value(&self);
 
     #[endpoint]
-    #[storage_get("ser_1")]
-    fn load_ser_1(&self) -> SerExample1;
-
-    #[endpoint]
     #[storage_get("ser_2")]
-    fn load_ser_2(&self) -> SerExample2;
+    fn load_ser_2(&self) -> ExampleEnumWithFields;
 
     #[endpoint]
     #[storage_get("map1")]
-    fn load_map1(&self, addr: Address) -> BigUint;
+    fn load_map1(&self, addr: ManagedAddress) -> BigUint;
 
     #[endpoint]
     #[storage_get("map2")]
-    fn load_map2(&self, addr1: &Address, addr2: &Address) -> BigUint;
+    fn load_map2(&self, addr1: &ManagedAddress, addr2: &ManagedAddress) -> BigUint;
 
     #[endpoint]
     #[storage_get("map3")]

@@ -1,5 +1,4 @@
 use crate::{error_hook, VmApiImpl};
-use alloc::vec::Vec;
 use elrond_wasm::{
     api::{EndpointArgumentApi, EndpointArgumentApiImpl, Handle},
     err_msg,

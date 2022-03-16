@@ -32,15 +32,15 @@ pub trait MapStorageMapperFeatures {
     }
 
     #[endpoint]
-    fn map_storage_mapper_get(&self, item: u32) -> MultiValueVec<u32> {
+    fn map_storage_mapper_get(&self, item: u32) -> MultiValueEncoded<u32> {
         let map_storage_mapper = self.map_storage_mapper();
         if let Some(map) = map_storage_mapper.get(&item) {
-            let mut vec = Vec::new();
+            let mut result = MultiValueEncoded::new();
             for (key, value) in map.iter() {
-                vec.push(key);
-                vec.push(value);
+                result.push(key);
+                result.push(value);
             }
-            return MultiValueVec::from(vec);
+            return result;
         }
         sc_panic!("No storage!")
     }

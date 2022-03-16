@@ -16,9 +16,9 @@ features = ["alloc"]
 [dependencies.elrond-wasm]
 version = "0.29.3"
 path = "../../../elrond-wasm"
-features = [ "alloc" ]
+features = [ "alloc", "ei-1-1" ]
 
 [dev-dependencies.elrond-wasm-debug]
 version = "0.29.3"
 path = "../../../elrond-wasm-debug"
-features = ["alloc"]
+features = [ "alloc", "ei-1-1" ]

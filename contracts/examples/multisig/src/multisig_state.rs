@@ -66,7 +66,7 @@ pub trait MultisigStateModule {
     }
 
     /// Serialized action data of an action with index.
-    #[external_view(getActionData)]
+    #[view(getActionData)]
     fn get_action_data(&self, action_id: usize) -> Action<Self::Api> {
         self.action_mapper().get(action_id)
     }
@@ -77,7 +77,7 @@ pub trait MultisigStateModule {
     /// Gets addresses of all users who signed an action.
     /// Does not check if those users are still board members or not,
     /// so the result may contain invalid signers.
-    #[external_view(getActionSigners)]
+    #[view(getActionSigners)]
     fn get_action_signers(&self, action_id: usize) -> ManagedVec<ManagedAddress> {
         let signer_ids = self.action_signer_ids(action_id);
         let mut signers = ManagedVec::new();
@@ -89,7 +89,7 @@ pub trait MultisigStateModule {
 
     /// Gets addresses of all users who signed an action and are still board members.
     /// All these signatures are currently valid.
-    #[external_view(getActionSignerCount)]
+    #[view(getActionSignerCount)]
     fn get_action_signer_count(&self, action_id: usize) -> usize {
         self.action_signer_ids(action_id).len()
     }
@@ -99,7 +99,7 @@ pub trait MultisigStateModule {
     /// therefore the contract needs to re-check every time when actions are performed.
     /// This function is used to validate the signers before performing an action.
     /// It also makes it easy to check before performing an action.
-    #[external_view(getActionValidSignerCount)]
+    #[view(getActionValidSignerCount)]
     fn get_action_valid_signer_count(&self, action_id: usize) -> usize {
         let signer_ids = self.action_signer_ids(action_id);
         signer_ids

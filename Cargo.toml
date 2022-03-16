@@ -69,8 +69,13 @@ members = [
   "contracts/examples/token-release",
   "contracts/examples/token-release/meta",
 
+  "contracts/experimental/multisig-external-view",
+  "contracts/experimental/multisig-external-view/meta",
+
   "contracts/feature-tests/abi-tester",
   "contracts/feature-tests/abi-tester/meta",
+  "contracts/feature-tests/alloc-features",
+  "contracts/feature-tests/alloc-features/meta",
   "contracts/feature-tests/basic-features",
   "contracts/feature-tests/basic-features/meta",
   "contracts/feature-tests/composability",
