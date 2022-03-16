@@ -15,16 +15,22 @@ impl StorageReadApi for DebugApi {
     }
 }
 
-impl StorageReadApiImpl for DebugApi {
-    fn storage_load_len(&self, key: &[u8]) -> usize {
-        self.storage_load_vec_u8(key).len()
-    }
-
+impl DebugApi {
     fn storage_load_vec_u8(&self, key: &[u8]) -> Vec<u8> {
         self.with_contract_account(|account| match account.storage.get(&key.to_vec()) {
             None => Vec::with_capacity(0),
             Some(value) => value.clone(),
         })
+    }
+}
+
+impl StorageReadApiImpl for DebugApi {
+    fn storage_load_len(&self, key: &[u8]) -> usize {
+        self.storage_load_vec_u8(key).len()
+    }
+
+    fn storage_load_to_heap(&self, key: &[u8]) -> Box<[u8]> {
+        self.storage_load_vec_u8(key).into_boxed_slice()
     }
 
     fn storage_load_big_uint_raw(&self, key: &[u8]) -> Handle {
