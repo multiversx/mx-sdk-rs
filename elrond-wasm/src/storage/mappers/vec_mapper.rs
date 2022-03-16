@@ -209,6 +209,7 @@ where
 
     /// Loads all items from storage and places them in a Vec.
     /// Can easily consume a lot of gas.
+    #[cfg(feature = "alloc")]
     pub fn load_as_vec(&self) -> Vec<T> {
         self.iter().collect()
     }
