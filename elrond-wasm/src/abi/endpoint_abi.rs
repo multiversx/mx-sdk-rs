@@ -15,6 +15,8 @@ pub struct OutputAbi {
     pub multi_result: bool,
 }
 
+pub type OutputAbis = Vec<OutputAbi>;
+
 #[derive(Clone, Debug)]
 pub enum EndpointMutabilityAbi {
     Mutable,
@@ -37,7 +39,7 @@ pub struct EndpointAbi {
     pub location: EndpointLocationAbi,
     pub payable_in_tokens: &'static [&'static str],
     pub inputs: Vec<InputAbi>,
-    pub outputs: Vec<OutputAbi>,
+    pub outputs: OutputAbis,
 }
 
 impl EndpointAbi {

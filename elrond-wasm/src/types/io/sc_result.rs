@@ -1,7 +1,7 @@
-use elrond_codec::{EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput, Vec};
+use elrond_codec::{EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput};
 
 use crate::{
-    abi::{OutputAbi, TypeAbi, TypeDescriptionContainer, TypeName},
+    abi::{OutputAbis, TypeAbi, TypeDescriptionContainer, TypeName},
     api::EndpointFinishApi,
 };
 use core::{
@@ -136,7 +136,7 @@ impl<T: TypeAbi, E> TypeAbi for SCResult<T, E> {
     /// just like `()`.
     /// It is also possible to have `SCResult<MultiResultX<...>>`,
     /// so this gives the MultiResult to dissolve into its multiple output ABIs.
-    fn output_abis(output_names: &[&'static str]) -> Vec<OutputAbi> {
+    fn output_abis(output_names: &[&'static str]) -> OutputAbis {
         T::output_abis(output_names)
     }
 
