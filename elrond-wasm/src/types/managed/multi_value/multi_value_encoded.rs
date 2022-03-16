@@ -1,11 +1,10 @@
 use crate::{
-    abi::{TypeAbi, TypeDescriptionContainer},
+    abi::{TypeAbi, TypeDescriptionContainer, TypeName},
     api::{ErrorApi, ManagedTypeApi},
     contract_base::{ExitCodecErrorHandler, ManagedSerializer},
     err_msg,
     types::{ManagedArgBuffer, ManagedBuffer, ManagedType, ManagedVec, ManagedVecItem},
 };
-use alloc::string::String;
 use core::marker::PhantomData;
 use elrond_codec::{
     try_cast_execute_or_else, DecodeErrorHandler, EncodeErrorHandler, TopDecode, TopDecodeMulti,
@@ -231,7 +230,7 @@ where
     M: ManagedTypeApi,
     T: TypeAbi,
 {
-    fn type_name() -> String {
+    fn type_name() -> TypeName {
         crate::abi::type_name_variadic::<T>()
     }
 

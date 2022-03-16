@@ -4,7 +4,7 @@ use elrond_codec::{DecodeError, EncodeError};
 
 use crate::{
     api::{ErrorApiImpl, ManagedTypeApi},
-    types::{BoxedBytes, ManagedBuffer, ManagedSCError, ManagedType},
+    types::{heap::BoxedBytes, ManagedBuffer, ManagedSCError, ManagedType},
 };
 
 #[derive(Default)]

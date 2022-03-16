@@ -5,7 +5,7 @@ use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
     api::StorageMapperApi,
     storage::{storage_get, storage_set, StorageKey},
-    types::{BoxedBytes, ManagedType, MultiValueEncoded},
+    types::{heap::BoxedBytes, ManagedType, MultiValueEncoded},
 };
 use alloc::vec::Vec;
 use elrond_codec::{

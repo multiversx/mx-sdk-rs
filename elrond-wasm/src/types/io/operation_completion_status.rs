@@ -1,4 +1,7 @@
-use crate::{abi::TypeAbi, types::BoxedBytes};
+use crate::{
+    abi::{TypeAbi, TypeName},
+    types::heap::BoxedBytes,
+};
 use alloc::string::String;
 use elrond_codec::{EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput};
 
@@ -41,7 +44,7 @@ impl TopEncodeMulti for OperationCompletionStatus {
 }
 
 impl TypeAbi for OperationCompletionStatus {
-    fn type_name() -> String {
+    fn type_name() -> TypeName {
         String::from("OperationCompletionStatus")
     }
 }

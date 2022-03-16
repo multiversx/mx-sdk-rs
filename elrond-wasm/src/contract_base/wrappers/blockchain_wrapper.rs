@@ -7,8 +7,9 @@ use crate::{
     },
     storage::{self},
     types::{
-        Address, BigUint, EsdtLocalRoleFlags, EsdtTokenData, ManagedAddress, ManagedByteArray,
-        ManagedType, TokenIdentifier, H256,
+        heap::{Address, H256},
+        BigUint, EsdtLocalRoleFlags, EsdtTokenData, ManagedAddress, ManagedByteArray, ManagedType,
+        TokenIdentifier,
     },
 };
 use alloc::boxed::Box;

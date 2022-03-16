@@ -1,4 +1,8 @@
-use crate::{abi::TypeAbi, api::ManagedTypeApi, types::ManagedBuffer};
+use crate::{
+    abi::{TypeAbi, TypeName},
+    api::ManagedTypeApi,
+    types::ManagedBuffer,
+};
 use alloc::string::String;
 use elrond_codec::{
     DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti, TopDecodeMultiInput, TopEncodeMulti,
@@ -98,7 +102,7 @@ where
     M: ManagedTypeApi,
     T: TypeAbi,
 {
-    fn type_name() -> String {
+    fn type_name() -> TypeName {
         let mut repr = String::from("AsyncCallResult<");
         repr.push_str(T::type_name().as_str());
         repr.push('>');

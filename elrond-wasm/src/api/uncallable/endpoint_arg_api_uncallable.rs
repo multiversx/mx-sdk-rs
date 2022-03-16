@@ -1,6 +1,6 @@
 use crate::{
     api::{endpoint_arg_api::EndpointArgumentApiImpl, EndpointArgumentApi, Handle},
-    types::BoxedBytes,
+    types::heap::BoxedBytes,
 };
 
 use super::UncallableApi;

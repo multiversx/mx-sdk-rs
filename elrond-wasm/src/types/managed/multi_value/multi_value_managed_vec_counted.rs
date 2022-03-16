@@ -1,5 +1,5 @@
 use crate::{
-    abi::{TypeAbi, TypeDescriptionContainer},
+    abi::{TypeAbi, TypeDescriptionContainer, TypeName},
     api::ManagedTypeApi,
     types::{ManagedVec, ManagedVecItem},
 };
@@ -134,7 +134,7 @@ where
     M: ManagedTypeApi,
     T: ManagedVecItem + TypeAbi,
 {
-    fn type_name() -> String {
+    fn type_name() -> TypeName {
         let mut repr = String::from("counted-variadic<");
         repr.push_str(T::type_name().as_str());
         repr.push('>');

@@ -5,7 +5,7 @@ use crate::{
         CryptoApi, CryptoApiImpl, ED25519_KEY_BYTE_LEN, ED25519_SIGNATURE_BYTE_LEN,
         SHA256_RESULT_LEN,
     },
-    types::{BoxedBytes, ManagedBuffer, ManagedByteArray, MessageHashType},
+    types::{heap::BoxedBytes, ManagedBuffer, ManagedByteArray, MessageHashType},
 };
 use alloc::boxed::Box;
 

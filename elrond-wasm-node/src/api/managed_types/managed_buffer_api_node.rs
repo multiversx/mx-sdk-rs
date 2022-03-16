@@ -2,7 +2,7 @@ use crate::{api::unsafe_buffer, error_hook};
 use elrond_wasm::{
     api::{Handle, InvalidSliceError, ManagedBufferApi},
     err_msg,
-    types::BoxedBytes,
+    types::heap::BoxedBytes,
 };
 
 #[allow(dead_code)]

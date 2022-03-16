@@ -2,7 +2,7 @@ use crate::{error_hook, VmApiImpl};
 use elrond_wasm::{
     api::{EndpointArgumentApi, EndpointArgumentApiImpl, Handle},
     err_msg,
-    types::BoxedBytes,
+    types::heap::BoxedBytes,
 };
 
 extern "C" {

@@ -409,7 +409,7 @@ impl BlockchainApiImpl for VmApiImpl {
         token: &TokenIdentifier<M>,
         nonce: u64,
     ) -> EsdtTokenData<M> {
-        use elrond_wasm::types::BoxedBytes;
+        use elrond_wasm::types::heap::BoxedBytes;
         let address = m_address.to_address();
         unsafe {
             let value_handle = bigIntNew(0);

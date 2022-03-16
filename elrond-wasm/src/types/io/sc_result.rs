@@ -1,8 +1,7 @@
-use alloc::string::String;
 use elrond_codec::{EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput, Vec};
 
 use crate::{
-    abi::{OutputAbi, TypeAbi, TypeDescriptionContainer},
+    abi::{OutputAbi, TypeAbi, TypeDescriptionContainer, TypeName},
     api::EndpointFinishApi,
 };
 use core::{
@@ -129,7 +128,7 @@ where
 }
 
 impl<T: TypeAbi, E> TypeAbi for SCResult<T, E> {
-    fn type_name() -> String {
+    fn type_name() -> TypeName {
         T::type_name()
     }
 

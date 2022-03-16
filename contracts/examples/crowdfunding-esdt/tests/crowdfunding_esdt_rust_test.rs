@@ -1,5 +1,5 @@
 use crowdfunding_esdt::*;
-use elrond_wasm::types::Address;
+use elrond_wasm::types::heap::Address;
 use elrond_wasm_debug::{
     managed_address, managed_biguint, managed_token_id, rust_biguint, testing_framework::*,
     DebugApi,

@@ -1,5 +1,5 @@
 use crate::{
-    abi::{TypeAbi, TypeDescriptionContainer},
+    abi::{TypeAbi, TypeDescriptionContainer, TypeName},
     api::ManagedTypeApi,
 };
 use alloc::string::String;
@@ -167,7 +167,7 @@ where
     M: ManagedTypeApi,
     T: ManagedVecItem,
 {
-    fn type_name() -> String {
+    fn type_name() -> TypeName {
         let mut repr = String::from("variadic<");
         repr.push_str(T::type_name().as_str());
         repr.push('>');

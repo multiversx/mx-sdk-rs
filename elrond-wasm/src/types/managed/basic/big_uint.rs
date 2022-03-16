@@ -1,9 +1,10 @@
 use core::marker::PhantomData;
 
 use crate::{
+    abi::TypeName,
     api::{BigIntApi, Handle, ManagedBufferApi, ManagedTypeApi, ManagedTypeApiImpl},
     hex_util::encode_bytes_as_hex,
-    types::{BoxedBytes, ManagedBuffer, ManagedType},
+    types::{heap::BoxedBytes, ManagedBuffer, ManagedType},
 };
 use alloc::string::String;
 use elrond_codec::{
@@ -226,7 +227,7 @@ impl<M: ManagedTypeApi> TopDecode for BigUint<M> {
 }
 
 impl<M: ManagedTypeApi> crate::abi::TypeAbi for BigUint<M> {
-    fn type_name() -> String {
+    fn type_name() -> TypeName {
         String::from("BigUint")
     }
 }

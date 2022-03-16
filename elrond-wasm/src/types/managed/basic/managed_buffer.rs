@@ -1,11 +1,11 @@
 use core::marker::PhantomData;
 
 use crate::{
+    abi::TypeName,
     api::{ErrorApiImpl, Handle, InvalidSliceError, ManagedBufferApi, ManagedTypeApi},
     hex_util::encode_bytes_as_hex,
-    types::{BoxedBytes, ManagedType},
+    types::{heap::BoxedBytes, ManagedType},
 };
-use alloc::string::String;
 use elrond_codec::{
     DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode,
     NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, TryStaticCast, Vec,
@@ -369,7 +369,7 @@ impl<M: ManagedTypeApi> NestedDecode for ManagedBuffer<M> {
 }
 
 impl<M: ManagedTypeApi> crate::abi::TypeAbi for ManagedBuffer<M> {
-    fn type_name() -> String {
+    fn type_name() -> TypeName {
         "bytes".into()
     }
 }
