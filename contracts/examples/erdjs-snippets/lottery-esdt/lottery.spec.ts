@@ -1,7 +1,7 @@
 import { Balance, Token, TokenType } from "@elrondnetwork/erdjs";
 import { AirdropService, createTokenAmount, ESDTInteractor, ITestSession, IUser, TestSession } from "@elrondnetwork/erdjs-snippets";
 import { assert } from "chai";
-import { LotteryInteractor } from "./lottery.interactor";
+import { LotteryInteractor } from "./lotteryInteractor";
 
 describe("lottery snippet", async function () {
     this.bail(true);
