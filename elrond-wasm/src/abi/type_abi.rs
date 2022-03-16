@@ -35,7 +35,7 @@ pub trait TypeAbi {
     /// Should only be overridden by framework types.
     /// Output names are optionally provided in contracts via the `output_name` method attribute.
     #[doc(hidden)]
-    fn output_abis(output_names: &[&'static str]) -> Vec<OutputAbi> {
+    fn output_abis(output_names: &[&'static str]) -> OutputAbis {
         let mut result = Vec::with_capacity(1);
         let output_name = if !output_names.is_empty() {
             output_names[0]

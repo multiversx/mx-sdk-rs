@@ -2,8 +2,9 @@ use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
     api::{ErrorApiImpl, Handle, InvalidSliceError, ManagedTypeApi},
     types::{
-        heap::BoxedBytes, heap::ArgBuffer, ManagedBuffer, ManagedBufferNestedDecodeInput, ManagedType,
-        ManagedVecItem, ManagedVecRef, ManagedVecRefIterator,
+        heap::{ArgBuffer, BoxedBytes},
+        ManagedBuffer, ManagedBufferNestedDecodeInput, ManagedType, ManagedVecItem, ManagedVecRef,
+        ManagedVecRefIterator,
     },
 };
 use alloc::vec::Vec;
@@ -444,7 +445,8 @@ where
     }
 }
 
-/// For compatibility with the older Arwen EI.
+/// For compatibility with the older VM EI.
+#[doc(hidden)]
 pub fn managed_vec_of_buffers_to_arg_buffer<M: ManagedTypeApi>(
     managed_vec: ManagedVec<M, ManagedBuffer<M>>,
 ) -> ArgBuffer {
@@ -455,6 +457,8 @@ pub fn managed_vec_of_buffers_to_arg_buffer<M: ManagedTypeApi>(
     arg_buffer
 }
 
+/// For compatibility with the older VM EI.
+#[doc(hidden)]
 pub fn managed_vec_from_slice_of_boxed_bytes<M: ManagedTypeApi>(
     data: &[BoxedBytes],
 ) -> ManagedVec<M, ManagedBuffer<M>> {

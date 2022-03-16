@@ -9,7 +9,7 @@ use alloc::{
 impl TypeAbi for () {
     /// No another exception from the 1-type-1-output-abi rule:
     /// the unit type produces no output.
-    fn output_abis(_output_names: &[&'static str]) -> Vec<OutputAbi> {
+    fn output_abis(_output_names: &[&'static str]) -> OutputAbis {
         Vec::new()
     }
 }
@@ -145,7 +145,7 @@ impl<T: TypeAbi, E> TypeAbi for Result<T, E> {
     }
 
     /// Similar to the SCResult implementation.
-    fn output_abis(output_names: &[&'static str]) -> Vec<OutputAbi> {
+    fn output_abis(output_names: &[&'static str]) -> OutputAbis {
         T::output_abis(output_names)
     }
 

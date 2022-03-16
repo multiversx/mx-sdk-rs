@@ -1,5 +1,4 @@
-use crate::abi::{OutputAbi, TypeAbi, TypeDescriptionContainer, TypeName};
-use alloc::{string::String, vec::Vec};
+use crate::abi::{OutputAbis, TypeAbi, TypeDescriptionContainer, TypeName};
 use elrond_codec::multi_types::{IgnoreValue, OptionalValue};
 
 #[cfg(feature = "alloc")]
@@ -19,7 +18,7 @@ impl<T: TypeAbi> TypeAbi for elrond_codec::multi_types::MultiValueVec<T> {
 
 impl TypeAbi for IgnoreValue {
     fn type_name() -> TypeName {
-        String::from("ignore")
+        TypeName::from("ignore")
     }
 
     fn is_variadic() -> bool {
@@ -49,7 +48,7 @@ macro_rules! multi_arg_impls {
                 $($name: TypeAbi,)+
             {
                 fn type_name() -> TypeName {
-                    let mut repr = String::from("multi");
+                    let mut repr = TypeName::from("multi");
                     repr.push('<');
                     $(
                         if $n > 0 {
@@ -71,8 +70,8 @@ macro_rules! multi_arg_impls {
                     true
                 }
 
-                fn output_abis(output_names: &[&'static str]) -> Vec<OutputAbi> {
-                    let mut result = Vec::new();
+                fn output_abis(output_names: &[&'static str]) -> OutputAbis {
+                    let mut result = OutputAbis::new();
                     $(
                         if output_names.len() > $n {
                             result.append(&mut $name::output_abis(&[output_names[$n]]));
