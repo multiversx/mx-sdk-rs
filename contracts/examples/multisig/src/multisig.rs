@@ -1,10 +1,10 @@
 #![no_std]
 
-mod action;
-mod multisig_perform;
-mod multisig_propose;
-mod multisig_state;
-mod user_role;
+pub mod action;
+pub mod multisig_perform;
+pub mod multisig_propose;
+pub mod multisig_state;
+pub mod user_role;
 
 use action::ActionFullInfo;
 use user_role::UserRole;

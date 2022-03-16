@@ -246,6 +246,9 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
         M::managed_type_impl().mb_append_bytes(self.handle, &item.to_be_bytes()[..]);
     }
 
+    /// Convenience method for quickly getting a top-decoded u64 from the managed buffer.
+    ///
+    /// TODO: remove this method once TopDecodeInput is implemented for ManagedBuffer reference.
     pub fn parse_as_u64(&self) -> Option<u64> {
         const U64_NUM_BYTES: usize = 8;
         let l = self.len();

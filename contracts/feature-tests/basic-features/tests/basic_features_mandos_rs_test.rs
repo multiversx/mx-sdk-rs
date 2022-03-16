@@ -42,11 +42,6 @@ fn block_info_rs() {
 }
 
 #[test]
-fn boxed_bytes_zeros_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/boxed_bytes_zeros.scen.json", world());
-}
-
-#[test]
 fn codec_err_rs() {
     elrond_wasm_debug::mandos_rs("mandos/codec_err.scen.json", world());
 }
@@ -56,25 +51,15 @@ fn count_ones_rs() {
     elrond_wasm_debug::mandos_rs("mandos/count_ones.scen.json", world());
 }
 
-// #[test]
-// fn crypto_elliptic_curves_rs() {
-//     elrond_wasm_debug::mandos_rs("mandos/crypto_elliptic_curves.scen.json", world());
-// }
-
 #[test]
 fn crypto_keccak256_rs() {
     elrond_wasm_debug::mandos_rs("mandos/crypto_keccak256.scen.json", world());
 }
 
 #[test]
-fn crypto_keccak256_legacy_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/crypto_keccak256_legacy.scen.json", world());
+fn crypto_keccak256_legacy_managed_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/crypto_keccak256_legacy_managed.scen.json", world());
 }
-
-// #[test]
-// fn crypto_ripemd160_rs() {
-//     elrond_wasm_debug::mandos_rs("mandos/crypto_ripemd160.scen.json", world());
-// }
 
 #[test]
 fn crypto_sha256_rs() {
@@ -82,14 +67,9 @@ fn crypto_sha256_rs() {
 }
 
 #[test]
-fn crypto_sha256_legacy_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/crypto_sha256_legacy.scen.json", world());
+fn crypto_sha256_legacy_managed_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/crypto_sha256_legacy_managed.scen.json", world());
 }
-
-// #[test]
-// fn crypto_verify_funcs_rs() {
-//     elrond_wasm_debug::mandos_rs("mandos/crypto_verify_funcs.scen.json", world());
-// }
 
 #[test]
 fn echo_array_u8_rs() {
@@ -99,16 +79,6 @@ fn echo_array_u8_rs() {
 #[test]
 fn echo_arrayvec_rs() {
     elrond_wasm_debug::mandos_rs("mandos/echo_arrayvec.scen.json", world());
-}
-
-#[test]
-fn echo_async_result_empty_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/echo_async_result_empty.scen.json", world());
-}
-
-#[test]
-fn echo_async_result_empty_managed_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/echo_async_result_empty_managed.scen.json", world());
 }
 
 #[test]
@@ -127,11 +97,6 @@ fn echo_big_uint_rs() {
 }
 
 #[test]
-fn echo_boxed_bytes_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/echo_boxed_bytes.scen.json", world());
-}
-
-#[test]
 fn echo_i32_rs() {
     elrond_wasm_debug::mandos_rs("mandos/echo_i32.scen.json", world());
 }
@@ -147,6 +112,11 @@ fn echo_ignore_rs() {
 }
 
 #[test]
+fn echo_managed_async_result_empty_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/echo_managed_async_result_empty.scen.json", world());
+}
+
+#[test]
 fn echo_managed_bytes_rs() {
     elrond_wasm_debug::mandos_rs("mandos/echo_managed_bytes.scen.json", world());
 }
@@ -157,33 +127,13 @@ fn echo_managed_vec_rs() {
 }
 
 #[test]
+fn echo_multi_value_tuples_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/echo_multi_value_tuples.scen.json", world());
+}
+
+#[test]
 fn echo_nothing_rs() {
     elrond_wasm_debug::mandos_rs("mandos/echo_nothing.scen.json", world());
-}
-
-#[test]
-fn echo_ser_ex_1_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/echo_ser_ex_1.scen.json", world());
-}
-
-#[test]
-fn echo_slice_u8_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/echo_slice_u8.scen.json", world());
-}
-
-#[test]
-fn echo_str_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/echo_str.scen.json", world());
-}
-
-#[test]
-fn echo_str_box_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/echo_str_box.scen.json", world());
-}
-
-#[test]
-fn echo_string_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/echo_string.scen.json", world());
 }
 
 #[test]
@@ -202,11 +152,6 @@ fn echo_usize_rs() {
 }
 
 #[test]
-fn echo_varags_tuples_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/echo_varags_tuples.scen.json", world());
-}
-
-#[test]
 fn echo_varargs_managed_eager_rs() {
     elrond_wasm_debug::mandos_rs("mandos/echo_varargs_managed_eager.scen.json", world());
 }
@@ -222,18 +167,8 @@ fn echo_varargs_u32_rs() {
 }
 
 #[test]
-fn echo_vec_u8_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/echo_vec_u8.scen.json", world());
-}
-
-#[test]
 fn events_rs() {
     elrond_wasm_debug::mandos_rs("mandos/events.scen.json", world());
-}
-
-#[test]
-fn events_legacy_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/events_legacy.scen.json", world());
 }
 
 #[test]
@@ -257,13 +192,13 @@ fn managed_address_managed_buffer_rs() {
 }
 
 #[test]
-fn managed_buffer_concat_1_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/managed_buffer_concat_1.scen.json", world());
+fn managed_buffer_concat_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/managed_buffer_concat.scen.json", world());
 }
 
 #[test]
-fn managed_buffer_concat_2_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/managed_buffer_concat_2.scen.json", world());
+fn managed_buffer_copy_slice_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/managed_buffer_copy_slice.scen.json", world());
 }
 
 #[test]
@@ -271,32 +206,10 @@ fn managed_buffer_eq_rs() {
     elrond_wasm_debug::mandos_rs("mandos/managed_buffer_eq.scen.json", world());
 }
 
-#[test]
-fn managed_buffer_overwrite_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/managed_buffer_overwrite.scen.json", world());
-}
-
-/*
-#[test]
-fn managed_buffer_random_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/managed_buffer_set_random.scen.json", world());
-}
-*/
-
-#[test]
-fn managed_buffer_slice_1_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/managed_buffer_slice_1.scen.json", world());
-}
-
-#[test]
-fn managed_buffer_slice_2_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/managed_buffer_slice_2.scen.json", world());
-}
-
-#[test]
-fn managed_buffer_slice_3_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/managed_buffer_slice_3.scen.json", world());
-}
+// #[test]
+// fn managed_buffer_set_random_rs() {
+//     elrond_wasm_debug::mandos_rs("mandos/managed_buffer_set_random.scen.json", world());
+// }
 
 #[test]
 fn managed_vec_address_push_rs() {
@@ -335,16 +248,6 @@ fn sc_properties_rs() {
 }
 
 #[test]
-fn sc_result_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/sc_result.scen.json", world());
-}
-
-#[test]
-fn storage_addr_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/storage_addr.scen.json", world());
-}
-
-#[test]
 fn storage_big_int_rs() {
     elrond_wasm_debug::mandos_rs("mandos/storage_big_int.scen.json", world());
 }
@@ -380,6 +283,11 @@ fn storage_load_from_address_rs() {
 }
 
 #[test]
+fn storage_managed_address_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/storage_managed_address.scen.json", world());
+}
+
+#[test]
 fn storage_map1_rs() {
     elrond_wasm_debug::mandos_rs("mandos/storage_map1.scen.json", world());
 }
@@ -394,12 +302,10 @@ fn storage_map3_rs() {
     elrond_wasm_debug::mandos_rs("mandos/storage_map3.scen.json", world());
 }
 
-/*
-#[test]
-fn storage_mapper_fungible_token_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/storage_mapper_fungible_token.scen.json", world());
-}
-*/
+// #[test]
+// fn storage_mapper_fungible_token_rs() {
+//     elrond_wasm_debug::mandos_rs("mandos/storage_mapper_fungible_token.scen.json", world());
+// }
 
 #[test]
 fn storage_mapper_linked_list_rs() {
@@ -416,15 +322,13 @@ fn storage_mapper_map_storage_rs() {
     elrond_wasm_debug::mandos_rs("mandos/storage_mapper_map_storage.scen.json", world());
 }
 
-/*
-#[test]
-fn storage_mapper_non_fungible_token_rs() {
-    elrond_wasm_debug::mandos_rs(
-        "mandos/storage_mapper_non_fungible_token.scen.json",
-        world(),
-    );
-}
-*/
+// #[test]
+// fn storage_mapper_non_fungible_token_rs() {
+//     elrond_wasm_debug::mandos_rs(
+//         "mandos/storage_mapper_non_fungible_token.scen.json",
+//         world(),
+//     );
+// }
 
 #[test]
 fn storage_mapper_queue_rs() {
@@ -457,8 +361,8 @@ fn storage_mapper_whitelist_rs() {
 }
 
 #[test]
-fn storage_opt_addr_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/storage_opt_addr.scen.json", world());
+fn storage_opt_managed_addr_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/storage_opt_managed_addr.scen.json", world());
 }
 
 #[test]
@@ -484,11 +388,6 @@ fn storage_usize_rs() {
 #[test]
 fn storage_usize_bad_rs() {
     elrond_wasm_debug::mandos_rs("mandos/storage_usize_bad.scen.json", world());
-}
-
-#[test]
-fn storage_vec_u8_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/storage_vec_u8.scen.json", world());
 }
 
 #[test]

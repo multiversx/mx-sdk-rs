@@ -23,15 +23,9 @@ pub trait EchoManagedTypes {
         ma
     }
 
-    /// This tests that nested serialization of managed buffers within unmanaged types works.
-    #[endpoint]
-    fn echo_vec_of_managed_buffer(&self, mb: Vec<ManagedBuffer>) -> Vec<ManagedBuffer> {
-        mb
-    }
-
     /// This tests that nested serialization of big ints within unmanaged types works.
     #[endpoint]
-    fn echo_big_int_vec(&self, x: Vec<BigInt>) -> Vec<BigInt> {
+    fn echo_big_int_managed_vec(&self, x: ManagedVec<BigInt>) -> ManagedVec<BigInt> {
         x
     }
 
