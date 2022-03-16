@@ -1,8 +1,7 @@
 use super::VmApiImpl;
 use elrond_wasm::{
     api::{Handle, StorageReadApi, StorageReadApiImpl, StorageWriteApi, StorageWriteApiImpl},
-    types::heap::BoxedBytes,
-    Box,
+    types::heap::{Box, BoxedBytes},
 };
 
 #[rustfmt::skip]
