@@ -16,7 +16,6 @@ path = "../../examples/adder"
 [dev-dependencies.elrond-wasm-debug]
 version = "0.29.3"
 path = "../../../elrond-wasm-debug"
-features = [ "alloc" ]
 
 [dev-dependencies]
 num-bigint = "0.4.2"

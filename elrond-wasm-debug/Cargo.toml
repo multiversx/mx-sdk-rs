@@ -3,7 +3,10 @@ name = "elrond-wasm-debug"
 version = "0.29.3"
 edition = "2018"
 
-authors = ["Andrei Marinica <andrei.marinica@elrond.com>", "Elrond Network <contact@elrond.com>"]
+authors = [
+    "Andrei Marinica <andrei.marinica@elrond.com>",
+    "Elrond Network <contact@elrond.com>",
+]
 license = "GPL-3.0-only"
 readme = "README.md"
 repository = "https://github.com/ElrondNetwork/elrond-wasm-rs"
@@ -32,18 +35,13 @@ ed25519-dalek = "1.0.1"
 
 [features]
 mandos-go-tests = []
-alloc = ["elrond-wasm/alloc"]
-ei-1-1 = [ "elrond-wasm/ei-1-1" ]
+ei-1-1 = ["elrond-wasm/ei-1-1"]
 
 [dependencies.elrond-wasm]
 version = "=0.29.3"
 path = "../elrond-wasm"
+features = ["alloc"]
 
 [dependencies.mandos]
 version = "0.12.0"
 path = "../mandos"
-
-[dev-dependencies.elrond-wasm]
-version = "=0.29.3"
-path = "../elrond-wasm"
-features = [ "alloc" ]
