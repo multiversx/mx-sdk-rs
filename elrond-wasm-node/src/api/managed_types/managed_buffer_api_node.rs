@@ -34,7 +34,7 @@ extern "C" {
         dataLength: i32,
         dataOffset: *const u8,
     ) -> i32;
-    
+
     fn mBufferSetRandom(destinationHandle: i32, length: i32) -> i32;
     fn mBufferAppend(accumulatorHandle: i32, dataHandle: i32) -> i32;
     fn mBufferAppendBytes(accumulatorHandle: i32, byte_ptr: *const u8, byte_len: i32) -> i32;

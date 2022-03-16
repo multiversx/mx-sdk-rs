@@ -55,8 +55,8 @@ fn generate_endpoint_snippet(
             mutability: #mutability_tokens,
             location: #location_tokens,
             payable_in_tokens: &[ #(#payable_in_tokens),* ],
-            inputs: Vec::new(),
-            outputs: Vec::new(),
+            inputs: elrond_wasm::types::heap::Vec::new(),
+            outputs: elrond_wasm::types::heap::Vec::new(),
         };
         #(#input_snippets)*
         #output_snippet
@@ -148,8 +148,8 @@ fn generate_abi_method_body(
             },
             docs: &[ #(#contract_docs),* ],
             name: #contract_name,
-            constructors: Vec::new(),
-            endpoints: Vec::new(),
+            constructors: elrond_wasm::types::heap::Vec::new(),
+            endpoints: elrond_wasm::types::heap::Vec::new(),
             has_callback: #has_callbacks,
             type_descriptions: <elrond_wasm::abi::TypeDescriptionContainerImpl as elrond_wasm::abi::TypeDescriptionContainer>::new(),
         };
