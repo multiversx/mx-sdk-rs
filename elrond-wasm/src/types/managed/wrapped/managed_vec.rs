@@ -1,12 +1,12 @@
 use crate::{
-    abi::{TypeAbi, TypeDescriptionContainer},
+    abi::{TypeAbi, TypeDescriptionContainer, TypeName},
     api::{ErrorApiImpl, Handle, InvalidSliceError, ManagedTypeApi},
     types::{
-        ArgBuffer, BoxedBytes, ManagedBuffer, ManagedBufferNestedDecodeInput, ManagedType,
+        heap::BoxedBytes, ArgBuffer, ManagedBuffer, ManagedBufferNestedDecodeInput, ManagedType,
         ManagedVecItem, ManagedVecRef, ManagedVecRefIterator,
     },
 };
-use alloc::{string::String, vec::Vec};
+use alloc::vec::Vec;
 use core::{borrow::Borrow, marker::PhantomData};
 use elrond_codec::{
     DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode,
@@ -433,7 +433,7 @@ where
     T: ManagedVecItem + TypeAbi,
 {
     /// It is semantically equivalent to any list of `T`.
-    fn type_name() -> String {
+    fn type_name() -> TypeName {
         <&[T] as TypeAbi>::type_name()
     }
 

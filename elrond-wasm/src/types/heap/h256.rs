@@ -1,5 +1,8 @@
-use crate::{abi::TypeAbi, types::BoxedBytes};
-use alloc::{boxed::Box, string::String, vec::Vec};
+use crate::{
+    abi::{TypeAbi, TypeName},
+    types::heap::BoxedBytes,
+};
+use alloc::{boxed::Box, vec::Vec};
 use core::fmt::Debug;
 
 const ERR_BAD_H256_LENGTH: &str = "bad H256 length";
@@ -222,7 +225,7 @@ impl TopDecode for H256 {
 }
 
 impl TypeAbi for H256 {
-    fn type_name() -> String {
+    fn type_name() -> TypeName {
         "H256".into()
     }
 }

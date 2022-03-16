@@ -2,7 +2,10 @@ use alloc::boxed::Box;
 
 use crate::{
     api::{BlockchainApi, BlockchainApiImpl, Handle, ManagedTypeApi},
-    types::{Address, BigUint, EsdtTokenData, ManagedAddress, TokenIdentifier, H256},
+    types::{
+        heap::{Address, H256},
+        BigUint, EsdtTokenData, ManagedAddress, TokenIdentifier,
+    },
 };
 
 use super::UncallableApi;

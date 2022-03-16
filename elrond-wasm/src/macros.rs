@@ -30,7 +30,6 @@ macro_rules! imports {
                 SCResult::{Err, Ok},
                 *,
             },
-            Box, Vec,
         };
     };
 }

@@ -15,7 +15,7 @@ impl TypeAbi for () {
 }
 
 impl<T: TypeAbi> TypeAbi for &T {
-    fn type_name() -> String {
+    fn type_name() -> TypeName {
         T::type_name()
     }
 
@@ -25,7 +25,7 @@ impl<T: TypeAbi> TypeAbi for &T {
 }
 
 impl<T: TypeAbi> TypeAbi for Box<T> {
-    fn type_name() -> String {
+    fn type_name() -> TypeName {
         T::type_name()
     }
 
@@ -35,7 +35,7 @@ impl<T: TypeAbi> TypeAbi for Box<T> {
 }
 
 impl<T: TypeAbi> TypeAbi for &[T] {
-    fn type_name() -> String {
+    fn type_name() -> TypeName {
         let t_name = T::type_name();
         if t_name == "u8" {
             return "bytes".into();
@@ -52,7 +52,7 @@ impl<T: TypeAbi> TypeAbi for &[T] {
 }
 
 impl<T: TypeAbi> TypeAbi for Vec<T> {
-    fn type_name() -> String {
+    fn type_name() -> TypeName {
         <&[T]>::type_name()
     }
 
@@ -62,7 +62,7 @@ impl<T: TypeAbi> TypeAbi for Vec<T> {
 }
 
 impl<T: TypeAbi, const CAP: usize> TypeAbi for ArrayVec<T, CAP> {
-    fn type_name() -> String {
+    fn type_name() -> TypeName {
         <&[T]>::type_name()
     }
 
@@ -72,7 +72,7 @@ impl<T: TypeAbi, const CAP: usize> TypeAbi for ArrayVec<T, CAP> {
 }
 
 impl<T: TypeAbi> TypeAbi for Box<[T]> {
-    fn type_name() -> String {
+    fn type_name() -> TypeName {
         <&[T]>::type_name()
     }
 
@@ -82,19 +82,19 @@ impl<T: TypeAbi> TypeAbi for Box<[T]> {
 }
 
 impl TypeAbi for String {
-    fn type_name() -> String {
+    fn type_name() -> TypeName {
         "utf-8 string".into()
     }
 }
 
 impl TypeAbi for &str {
-    fn type_name() -> String {
+    fn type_name() -> TypeName {
         String::type_name()
     }
 }
 
 impl TypeAbi for Box<str> {
-    fn type_name() -> String {
+    fn type_name() -> TypeName {
         String::type_name()
     }
 }
@@ -102,7 +102,7 @@ impl TypeAbi for Box<str> {
 macro_rules! type_abi_name_only {
     ($ty:ty, $name:expr) => {
         impl TypeAbi for $ty {
-            fn type_name() -> String {
+            fn type_name() -> TypeName {
                 String::from($name)
             }
 
@@ -127,7 +127,7 @@ type_abi_name_only!(core::num::NonZeroUsize, "NonZeroUsize");
 type_abi_name_only!(bool, "bool");
 
 impl<T: TypeAbi> TypeAbi for Option<T> {
-    fn type_name() -> String {
+    fn type_name() -> TypeName {
         let mut repr = String::from("Option<");
         repr.push_str(T::type_name().as_str());
         repr.push('>');
@@ -140,7 +140,7 @@ impl<T: TypeAbi> TypeAbi for Option<T> {
 }
 
 impl<T: TypeAbi, E> TypeAbi for Result<T, E> {
-    fn type_name() -> String {
+    fn type_name() -> TypeName {
         T::type_name()
     }
 
@@ -161,7 +161,7 @@ macro_rules! tuple_impls {
             where
                 $($name: TypeAbi,)+
             {
-				fn type_name() -> String {
+				fn type_name() -> TypeName {
 					let mut repr = String::from("tuple");
 					repr.push_str("<");
 					$(
@@ -204,7 +204,7 @@ tuple_impls! {
 }
 
 impl<T: TypeAbi, const N: usize> TypeAbi for [T; N] {
-    fn type_name() -> String {
+    fn type_name() -> TypeName {
         let mut repr = String::from("array");
         repr.push_str(N.to_string().as_str());
         repr.push('<');

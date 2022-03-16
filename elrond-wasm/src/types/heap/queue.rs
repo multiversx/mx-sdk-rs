@@ -1,4 +1,4 @@
-use crate::abi::TypeAbi;
+use crate::abi::{TypeAbi, TypeName};
 use alloc::{string::String, vec::Vec};
 use elrond_codec::*;
 
@@ -135,7 +135,7 @@ impl<T: NestedDecode> TopDecode for Queue<T> {
 }
 
 impl<T: TypeAbi> TypeAbi for Queue<T> {
-    fn type_name() -> String {
+    fn type_name() -> TypeName {
         let mut repr = String::from("Queue<");
         repr.push_str(T::type_name().as_str());
         repr.push('>');

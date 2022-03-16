@@ -12,7 +12,7 @@ use elrond_wasm::{
     elrond_codec::top_encode_to_vec_u8,
     err_msg,
     types::{
-        Address, BigUint, CodeMetadata, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer,
+        heap::Address, BigUint, CodeMetadata, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer,
         ManagedBuffer, ManagedType, ManagedVec, TokenIdentifier,
     },
 };

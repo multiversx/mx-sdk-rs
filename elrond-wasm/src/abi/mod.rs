@@ -17,4 +17,4 @@ pub use type_description_container::*;
 /// Used in generating the ABI.
 // pub use git_version::git_version;
 
-pub type TypeName = crate::String;
+pub type TypeName = alloc::string::String;

@@ -3,12 +3,12 @@ use core::marker::PhantomData;
 use alloc::string::String;
 
 use crate::{
-    abi::TypeAbi,
+    abi::{TypeAbi, TypeName},
     api::{BigIntApi, EllipticCurveApi, Handle, ManagedTypeApi},
 };
 use elrond_codec::*;
 
-use crate::types::{BigUint, BoxedBytes, ManagedType};
+use crate::types::{heap::BoxedBytes, BigUint, ManagedType};
 
 pub type EllipticCurveComponents<M> = (
     BigUint<M>,
@@ -251,7 +251,7 @@ impl<M: ManagedTypeApi> TopEncode for EllipticCurve<M> {
 }
 
 impl<M: ManagedTypeApi> TypeAbi for EllipticCurve<M> {
-    fn type_name() -> String {
+    fn type_name() -> TypeName {
         String::from("EllipticCurve")
     }
 }

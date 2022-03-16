@@ -1,6 +1,6 @@
 elrond_wasm::imports!();
 
-use elrond_wasm::String;
+use elrond_wasm::types::heap::String;
 
 /// Legacy, deprecated macros. Will b removed once they get removed.
 ///

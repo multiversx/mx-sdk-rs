@@ -1,4 +1,4 @@
-use elrond_wasm::types::Address;
+use elrond_wasm::types::heap::Address;
 use elrond_wasm_debug::{rust_biguint, testing_framework::*, DebugApi};
 use empty::*;
 

@@ -1,4 +1,4 @@
-use crate::{err_msg, types::BoxedBytes};
+use crate::{err_msg, types::heap::BoxedBytes};
 
 use super::{ErrorApiImpl, Handle};
 

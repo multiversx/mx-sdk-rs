@@ -1,7 +1,7 @@
 use crate::world_mock::{AccountData, AccountEsdt, BlockchainMock};
 use alloc::vec::Vec;
 use core::cell::RefCell;
-use elrond_wasm::types::{Address, LockableStaticBuffer};
+use elrond_wasm::types::{heap::Address, LockableStaticBuffer};
 use num_bigint::BigUint;
 use num_traits::Zero;
 use std::{
