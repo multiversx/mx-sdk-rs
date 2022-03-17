@@ -1,6 +1,4 @@
 [workspace]
-resolver = "2"
-
 members = [
   "elrond-wasm",
   "elrond-wasm-debug",
