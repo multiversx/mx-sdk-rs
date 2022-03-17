@@ -4,6 +4,15 @@ There are several crates in this repo, this changelog will keep track of all of 
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [elrond-wasm 0.30.0, elrond-codec 0.10.0] - 2022-03-17
+- Feature flags in `elrond-wasm`:
+	- `alloc` allows contracts to use the heap allocator. It is not a hard restriction, there is still access to the implementations of the heap-allocated types, but they are not imported. Some methods are only available with this flag.
+	- `ei-1-1` allows contracts to use VM endpoints that are not yet available on the mainnet.
+- Fixes with async calls, smart contract deploy & upgrade.
+- Refactoring regarding small number types in the API.
+- Rust testing framework: Allow checking NFT balance without also checking attributes.
+- View for `MapMapper`.
+
 ## [elrond-wasm 0.29.3] - 2022-03-03
 - `ManagedVec` backwards compatible implementation for `set`.
 - Implemented `ManagedVecItem` for `Option<T>`.
