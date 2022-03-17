@@ -38,6 +38,7 @@ where
         }
     }
 
+    #[cfg(feature = "alloc")]
     #[inline]
     pub fn get_caller_legacy(&self) -> Address {
         A::blockchain_api_impl().get_caller_legacy()
@@ -48,6 +49,7 @@ where
         ManagedAddress::from_raw_handle(A::blockchain_api_impl().get_caller_handle())
     }
 
+    #[cfg(feature = "alloc")]
     #[inline]
     pub fn get_sc_address_legacy(&self) -> Address {
         A::blockchain_api_impl().get_sc_address_legacy()
@@ -58,6 +60,7 @@ where
         ManagedAddress::from_raw_handle(A::blockchain_api_impl().get_sc_address_handle())
     }
 
+    #[cfg(feature = "alloc")]
     #[inline]
     pub fn get_owner_address_legacy(&self) -> Address {
         A::blockchain_api_impl().get_owner_address_legacy()
@@ -74,6 +77,7 @@ where
         }
     }
 
+    #[cfg(feature = "alloc")]
     #[inline]
     pub fn get_shard_of_address_legacy(&self, address: &Address) -> u32 {
         A::blockchain_api_impl().get_shard_of_address_legacy(address)
@@ -84,6 +88,7 @@ where
         A::blockchain_api_impl().get_shard_of_address(address.get_raw_handle())
     }
 
+    #[cfg(feature = "alloc")]
     #[inline]
     pub fn is_smart_contract_legacy(&self, address: &Address) -> bool {
         A::blockchain_api_impl().is_smart_contract_legacy(address)
@@ -94,6 +99,7 @@ where
         A::blockchain_api_impl().is_smart_contract(address.get_raw_handle())
     }
 
+    #[cfg(feature = "alloc")]
     #[inline]
     pub fn get_balance_legacy(&self, address: &Address) -> BigUint<A> {
         BigUint::from_raw_handle(A::blockchain_api_impl().get_balance_legacy(address))
@@ -115,6 +121,7 @@ where
         }
     }
 
+    #[cfg(feature = "alloc")]
     #[inline]
     pub fn get_state_root_hash_legacy(&self) -> H256 {
         A::blockchain_api_impl().get_state_root_hash_legacy()
@@ -125,6 +132,7 @@ where
         A::blockchain_api_impl().get_state_root_hash()
     }
 
+    #[cfg(feature = "alloc")]
     #[inline]
     pub fn get_tx_hash_legacy(&self) -> H256 {
         A::blockchain_api_impl().get_tx_hash_legacy()

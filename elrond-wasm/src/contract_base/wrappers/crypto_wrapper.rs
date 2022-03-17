@@ -77,6 +77,7 @@ where
         ManagedByteArray::new_from_bytes(&A::crypto_api_impl().keccak256_legacy(data_buffer_slice))
     }
 
+    #[cfg(feature = "alloc")]
     pub fn ripemd160(&self, data: &[u8]) -> Box<[u8; 20]> {
         Box::new(A::crypto_api_impl().ripemd160(data))
     }
@@ -119,6 +120,7 @@ where
         A::crypto_api_impl().verify_custom_secp256k1(key, message, signature, hash_type)
     }
 
+    #[cfg(feature = "alloc")]
     pub fn encode_secp256k1_der_signature(&self, r: &[u8], s: &[u8]) -> BoxedBytes {
         A::crypto_api_impl().encode_secp256k1_der_signature(r, s)
     }
