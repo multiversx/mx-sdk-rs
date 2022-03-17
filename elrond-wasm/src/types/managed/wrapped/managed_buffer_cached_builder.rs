@@ -120,19 +120,32 @@ where
         self.append_bytes(arg);
     }
 
-    fn push_top_encode_bytes<T>(&mut self, item: &T)
-    where
-        T: elrond_codec::TopEncode,
-    {
-        let mb = ManagedSerializer::<M>::new().top_encode_to_managed_buffer(item);
+    fn push_bytes(&mut self, item: &mut ManagedFormatter<M>) {
+        let mb = ManagedSerializer::<M>::new().top_encode_to_managed_buffer(item); // std::fmt::Formatter custom type that builds a ManagedBuffer
         self.append_managed_buffer(&mb);
     }
 
-    fn push_top_encode_hex<T>(&mut self, item: &T)
-    where
-        T: elrond_codec::TopEncode,
-    {
-        let mb = ManagedSerializer::<M>::new().top_encode_to_managed_buffer(item);
+    fn push_lower_hex(&mut self, item: &mut ManagedFormatter<M>) {
+        let mb = ManagedSerializer::<M>::new().top_encode_to_managed_buffer(item); // lower hex
         crate::hex_util::add_arg_as_hex_to_buffer(self, &mb);
+    }
+}
+
+pub struct ManagedFormatter<M: ManagedTypeApi>(ManagedBuffer<M>);
+
+impl<M> ManagedFormatter<M>
+where
+    M: ManagedTypeApi,
+{
+    fn new() -> Self {
+        Self(ManagedBuffer::new())
+    }
+
+    fn append_bytes(&mut self, bytes: &[u8]) {
+        self.0.append_bytes(bytes);
+    }
+
+    fn into_buffer(self) -> ManagedBuffer<M> {
+        self.0
     }
 }
