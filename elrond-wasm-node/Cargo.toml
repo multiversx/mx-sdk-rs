@@ -16,7 +16,6 @@ categories = ["no-std", "wasm", "cryptography::cryptocurrencies", "development-t
 [features]
 vm-validate-token-identifier = []
 vm-esdt-local-roles = []
-alloc = ["elrond-wasm/alloc"]
 ei-unmanaged = []
 ei-1-1 = [ "elrond-wasm/ei-1-1" ]
 
