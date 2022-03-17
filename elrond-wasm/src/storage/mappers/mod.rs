@@ -22,7 +22,7 @@ pub use mapper::{StorageClearable, StorageMapper};
 pub use non_fungible_token_mapper::NonFungibleTokenMapper;
 pub use queue_mapper::QueueMapper;
 pub use set_mapper::SetMapper;
-pub use single_value_mapper::SingleValueMapper;
+pub use single_value_mapper::{SingleValue, SingleValueMapper};
 pub use token_attributes_mapper::TokenAttributesMapper;
 pub use token_mapper::StorageTokenWrapper;
 pub use unordered_set_mapper::UnorderedSetMapper;
