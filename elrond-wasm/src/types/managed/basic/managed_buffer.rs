@@ -7,7 +7,7 @@ use crate::{
 };
 use alloc::string::String;
 use elrond_codec::{
-    DecodeErrorHandler, EncodeErrorHandler, EquivalentArgument, NestedDecode, NestedDecodeInput,
+    CodecInto, DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput,
     NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
     TryStaticCast, Vec,
 };
@@ -340,8 +340,8 @@ impl<M: ManagedTypeApi> TopEncode for ManagedBuffer<M> {
     }
 }
 
-impl<M: ManagedTypeApi> EquivalentArgument<ManagedBuffer<M>> for &[u8] {}
-impl<M: ManagedTypeApi> EquivalentArgument<ManagedBuffer<M>> for &[u8; 0] {}
+impl<M: ManagedTypeApi> CodecInto<ManagedBuffer<M>> for &[u8] {}
+impl<M: ManagedTypeApi> CodecInto<ManagedBuffer<M>> for &[u8; 0] {}
 
 impl<M: ManagedTypeApi> NestedDecode for ManagedBuffer<M> {
     fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>

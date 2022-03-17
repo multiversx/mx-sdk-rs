@@ -1,3 +1,5 @@
+use alloc::vec::Vec;
+
 use crate::{EncodeError, EncodeErrorHandler, TopEncode, TryStaticCast};
 
 pub trait TopEncodeMultiOutput {
@@ -13,5 +15,18 @@ pub trait TopEncodeMultiOutput {
         H: EncodeErrorHandler,
     {
         Err(h.handle_error(EncodeError::UNSUPPORTED_OPERATION))
+    }
+}
+
+impl TopEncodeMultiOutput for Vec<Vec<u8>> {
+    fn push_single_value<T, H>(&mut self, arg: &T, h: H) -> Result<(), H::HandledErr>
+    where
+        T: TopEncode,
+        H: EncodeErrorHandler,
+    {
+        let mut result = Vec::new();
+        arg.top_encode_or_handle_err(&mut result, h)?;
+        self.push(result);
+        Ok(())
     }
 }

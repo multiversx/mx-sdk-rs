@@ -8,8 +8,7 @@ use crate::{
     types::ManagedType,
 };
 use elrond_codec::{
-    EncodeErrorHandler, EquivalentResult, TopDecode, TopEncode, TopEncodeMulti,
-    TopEncodeMultiOutput,
+    CodecFrom, EncodeErrorHandler, TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
 };
 
 /// Manages a single serializable item in storage.
@@ -108,7 +107,7 @@ where
     }
 }
 
-impl<SA, T> EquivalentResult<SingleValueMapper<SA, T>> for usize
+impl<SA, T> CodecFrom<SingleValueMapper<SA, T>> for usize
 where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode,

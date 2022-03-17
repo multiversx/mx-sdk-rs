@@ -299,7 +299,7 @@ fn equivalent_encode_path_gen(ty: &syn::Type) -> syn::Path {
     let owned_type = convert_to_owned_type(ty);
     syn::parse_str(
         format!(
-            "elrond_wasm::elrond_codec::EquivalentArgument<{}>",
+            "elrond_wasm::elrond_codec::CodecInto<{}>",
             owned_type.to_token_stream()
         )
         .as_str(),
