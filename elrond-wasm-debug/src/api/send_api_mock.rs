@@ -12,7 +12,7 @@ use elrond_wasm::{
     elrond_codec::top_encode_to_vec_u8,
     err_msg,
     types::{
-        Address, BigUint, CodeMetadata, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer,
+        heap::Address, BigUint, CodeMetadata, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer,
         ManagedBuffer, ManagedType, ManagedVec, TokenIdentifier,
     },
 };
@@ -534,8 +534,8 @@ impl SendApiImpl for DebugApi {
 
     fn storage_load_tx_hash_key<M: ManagedTypeApi>(&self) -> ManagedBuffer<M> {
         let tx_hash = self.get_tx_hash_legacy();
-        let bytes = self.storage_load_boxed_bytes(tx_hash.as_bytes());
-        ManagedBuffer::new_from_bytes(bytes.as_slice())
+        let bytes = self.storage_load_to_heap(tx_hash.as_bytes());
+        ManagedBuffer::new_from_bytes(&*bytes)
     }
 
     fn call_local_esdt_built_in_function<M: ManagedTypeApi>(

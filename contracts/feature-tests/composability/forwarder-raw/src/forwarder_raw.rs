@@ -167,7 +167,7 @@ pub trait ForwarderRaw {
         to: ManagedAddress,
         #[var_args] token_payments: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>>,
     ) {
-        let mut all_payments = Vec::new();
+        let mut all_payments = ManagedVec::new();
         for multi_arg in token_payments.into_iter() {
             let (token_identifier, token_nonce, amount) = multi_arg.into_tuple();
 
@@ -181,7 +181,7 @@ pub trait ForwarderRaw {
 
         self.send().transfer_multiple_esdt_via_async_call(
             &to,
-            &all_payments.into(),
+            &all_payments,
             &b"burn_and_create_retrive_async"[..],
         );
     }

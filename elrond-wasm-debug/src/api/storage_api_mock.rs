@@ -15,16 +15,22 @@ impl StorageReadApi for DebugApi {
     }
 }
 
-impl StorageReadApiImpl for DebugApi {
-    fn storage_load_len(&self, key: &[u8]) -> usize {
-        self.storage_load_vec_u8(key).len()
-    }
-
+impl DebugApi {
     fn storage_load_vec_u8(&self, key: &[u8]) -> Vec<u8> {
         self.with_contract_account(|account| match account.storage.get(&key.to_vec()) {
             None => Vec::with_capacity(0),
             Some(value) => value.clone(),
         })
+    }
+}
+
+impl StorageReadApiImpl for DebugApi {
+    fn storage_load_len(&self, key: &[u8]) -> usize {
+        self.storage_load_vec_u8(key).len()
+    }
+
+    fn storage_load_to_heap(&self, key: &[u8]) -> Box<[u8]> {
+        self.storage_load_vec_u8(key).into_boxed_slice()
     }
 
     fn storage_load_big_uint_raw(&self, key: &[u8]) -> Handle {
@@ -74,7 +80,7 @@ impl StorageReadApiImpl for DebugApi {
 
     #[cfg(feature = "ei-1-1")]
     fn storage_load_from_address(&self, address_handle: Handle, key_handle: Handle) -> Handle {
-        let address = elrond_wasm::types::Address::from_slice(
+        let address = elrond_wasm::types::heap::Address::from_slice(
             self.mb_to_boxed_bytes(address_handle).as_slice(),
         );
         let key_bytes = self.mb_to_boxed_bytes(key_handle);

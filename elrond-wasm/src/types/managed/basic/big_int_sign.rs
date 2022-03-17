@@ -1,8 +1,9 @@
-use alloc::string::String;
 use elrond_codec::{
     DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode,
     NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
 };
+
+use crate::abi::TypeName;
 
 // BigInt sign.
 #[allow(clippy::enum_variant_names)]
@@ -79,7 +80,7 @@ impl TopDecode for Sign {
 }
 
 impl crate::abi::TypeAbi for Sign {
-    fn type_name() -> String {
-        String::from("Sign")
+    fn type_name() -> TypeName {
+        TypeName::from("Sign")
     }
 }

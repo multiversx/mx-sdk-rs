@@ -1,5 +1,5 @@
 use bech32::FromBase32;
-use elrond_wasm::types::Address;
+use elrond_wasm::types::heap::Address;
 
 use crate::constants::*;
 

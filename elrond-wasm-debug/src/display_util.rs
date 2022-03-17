@@ -1,7 +1,10 @@
 use alloc::string::String;
 use elrond_wasm::{
     api::ManagedTypeApi,
-    types::{Address, BigUint, BoxedBytes, ManagedType},
+    types::{
+        heap::{Address, BoxedBytes},
+        BigUint, ManagedType,
+    },
 };
 use num_bigint::BigInt;
 use std::fmt;

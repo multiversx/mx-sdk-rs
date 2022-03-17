@@ -1,5 +1,4 @@
-use crate::abi::TypeAbi;
-use alloc::string::String;
+use crate::abi::{TypeAbi, TypeName};
 use bitflags::bitflags;
 use elrond_codec::*;
 
@@ -94,7 +93,7 @@ impl TopDecode for CodeMetadata {
 }
 
 impl TypeAbi for CodeMetadata {
-    fn type_name() -> String {
+    fn type_name() -> TypeName {
         "CodeMetadata".into()
     }
 }
