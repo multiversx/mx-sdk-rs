@@ -8,6 +8,7 @@ publish = false
 [dependencies.elrond-wasm]
 version = "0.29.3"
 path = "../../../elrond-wasm"
+features = [ "alloc" ]
 
 [dependencies.adder]
 path = "../../examples/adder"

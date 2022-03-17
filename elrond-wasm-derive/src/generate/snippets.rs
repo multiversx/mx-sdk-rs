@@ -36,8 +36,8 @@ pub fn new_contract_object_fn() -> proc_macro2::TokenStream {
         impl elrond_wasm::contract_base::CallableContractBuilder for self::ContractBuilder {
             fn new_contract_obj<A: elrond_wasm::api::VMApi>(
                 &self,
-            ) -> elrond_wasm::Box<dyn elrond_wasm::contract_base::CallableContract> {
-                elrond_wasm::Box::new(ContractObj::<A> {
+            ) -> elrond_wasm::types::heap::Box<dyn elrond_wasm::contract_base::CallableContract> {
+                elrond_wasm::types::heap::Box::new(ContractObj::<A> {
                     _phantom: core::marker::PhantomData,
                 })
             }
@@ -70,8 +70,8 @@ pub fn impl_callable_contract() -> proc_macro2::TokenStream {
                 EndpointWrappers::call(self, fn_name)
             }
 
-            fn clone_obj(&self) -> elrond_wasm::Box<dyn elrond_wasm::contract_base::CallableContract> {
-                elrond_wasm::Box::new(ContractObj::<A> {
+            fn clone_obj(&self) -> elrond_wasm::types::heap::Box<dyn elrond_wasm::contract_base::CallableContract> {
+                elrond_wasm::types::heap::Box::new(ContractObj::<A> {
                     _phantom: core::marker::PhantomData,
                 })
             }

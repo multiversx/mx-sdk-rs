@@ -1,4 +1,6 @@
-use elrond_wasm::{api::ESDT_MULTI_TRANSFER_FUNC_NAME, elrond_codec::TopDecode, types::Address};
+use elrond_wasm::{
+    api::ESDT_MULTI_TRANSFER_FUNC_NAME, elrond_codec::TopDecode, types::heap::Address,
+};
 use num_bigint::BigUint;
 use num_traits::Zero;
 

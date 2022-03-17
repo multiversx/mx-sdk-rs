@@ -1,4 +1,4 @@
-use crate::types::BoxedBytes;
+use crate::types::heap::BoxedBytes;
 
 use super::Handle;
 

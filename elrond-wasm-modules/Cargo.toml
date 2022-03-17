@@ -13,6 +13,9 @@ description = "Elrond WebAssembly standard smart contract modules"
 keywords = ["elrond", "wasm", "webassembly", "blockchain", "contract"]
 categories = ["no-std", "wasm", "cryptography::cryptocurrencies"]
 
+[features]
+alloc = ["elrond-wasm/alloc"]
+
 [dependencies.elrond-wasm]
 version = "0.29.3"
 path = "../elrond-wasm"
