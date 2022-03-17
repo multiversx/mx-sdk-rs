@@ -3,7 +3,7 @@ use core::marker::PhantomData;
 use crate::{
     api::{
         CryptoApi, CryptoApiImpl, ED25519_KEY_BYTE_LEN, ED25519_SIGNATURE_BYTE_LEN,
-        SHA256_RESULT_LEN,
+        KECCAK256_RESULT_LEN, SHA256_RESULT_LEN,
     },
     types::{ManagedBuffer, ManagedByteArray, MessageHashType},
 };
@@ -70,7 +70,7 @@ where
     pub fn keccak256_legacy_managed<const MAX_INPUT_LEN: usize>(
         &self,
         data: &ManagedBuffer<A>,
-    ) -> ManagedByteArray<A, SHA256_RESULT_LEN> {
+    ) -> ManagedByteArray<A, KECCAK256_RESULT_LEN> {
         let mut data_buffer = [0u8; MAX_INPUT_LEN];
         let data_buffer_slice = data.load_to_byte_array(&mut data_buffer);
         ManagedByteArray::new_from_bytes(&A::crypto_api_impl().keccak256_legacy(data_buffer_slice))
