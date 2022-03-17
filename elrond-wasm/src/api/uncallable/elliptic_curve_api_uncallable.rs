@@ -1,6 +1,6 @@
 use crate::{
     api::{EllipticCurveApi, Handle},
-    types::BoxedBytes,
+    types::heap::BoxedBytes,
 };
 
 impl EllipticCurveApi for super::UncallableApi {

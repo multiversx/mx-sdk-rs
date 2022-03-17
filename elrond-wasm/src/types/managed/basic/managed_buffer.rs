@@ -1,16 +1,12 @@
 use core::marker::PhantomData;
 
 use crate::{
+    abi::TypeName,
     api::{ErrorApiImpl, Handle, InvalidSliceError, ManagedBufferApi, ManagedTypeApi},
     hex_util::encode_bytes_as_hex,
-    types::{BoxedBytes, ManagedType},
+    types::{heap::BoxedBytes, ManagedType},
 };
-use alloc::string::String;
-use elrond_codec::{
-    CodecInto, DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput,
-    NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
-    TryStaticCast, Vec,
-};
+use elrond_codec::{CodecFrom, DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, TryStaticCast};
 
 /// A byte buffer managed by an external API.
 #[repr(transparent)]
@@ -89,12 +85,12 @@ where
     }
 }
 
-impl<M> From<Vec<u8>> for ManagedBuffer<M>
+impl<M> From<crate::types::heap::Vec<u8>> for ManagedBuffer<M>
 where
     M: ManagedTypeApi,
 {
     #[inline]
-    fn from(bytes: Vec<u8>) -> Self {
+    fn from(bytes: crate::types::heap::Vec<u8>) -> Self {
         Self::new_from_bytes(bytes.as_slice())
     }
 }
@@ -340,8 +336,14 @@ impl<M: ManagedTypeApi> TopEncode for ManagedBuffer<M> {
     }
 }
 
-impl<M: ManagedTypeApi> CodecInto<ManagedBuffer<M>> for &[u8] {}
-impl<M: ManagedTypeApi> CodecInto<ManagedBuffer<M>> for &[u8; 0] {}
+impl<M: ManagedTypeApi> CodecFrom<&[u8]> for  ManagedBuffer<M> {}
+impl<M: ManagedTypeApi, const N: usize> CodecFrom<&[u8; N]> for ManagedBuffer<M> {}
+impl<M: ManagedTypeApi> CodecFrom<crate::types::heap::Vec<u8>> for ManagedBuffer<M> {}
+impl<M: ManagedTypeApi> CodecFrom<&crate::types::heap::Vec<u8>> for ManagedBuffer<M> {}
+impl<M: ManagedTypeApi> CodecFrom<crate::types::heap::BoxedBytes> for ManagedBuffer<M> {}
+impl<M: ManagedTypeApi> CodecFrom<&crate::types::heap::BoxedBytes> for ManagedBuffer<M> {}
+impl<M: ManagedTypeApi> CodecFrom<crate::types::heap::Box<[u8]>> for ManagedBuffer<M> {}
+impl<M: ManagedTypeApi> CodecFrom<&crate::types::heap::Box<[u8]>> for ManagedBuffer<M> {}
 
 impl<M: ManagedTypeApi> NestedDecode for ManagedBuffer<M> {
     fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
@@ -373,7 +375,7 @@ impl<M: ManagedTypeApi> TopDecode for ManagedBuffer<M> {
 }
 
 impl<M: ManagedTypeApi> crate::abi::TypeAbi for ManagedBuffer<M> {
-    fn type_name() -> String {
+    fn type_name() -> TypeName {
         "bytes".into()
     }
 }

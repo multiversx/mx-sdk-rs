@@ -252,16 +252,16 @@ pub trait Erc1155 {
     #[view(balanceOfBatch)]
     fn balance_of_batch(
         &self,
-        #[var_args] owner_type_id_pairs: MultiValueVec<MultiValue2<ManagedAddress, BigUint>>,
-    ) -> MultiValueVec<BigUint> {
-        let mut batch_balance = Vec::new();
-        for multi_arg in owner_type_id_pairs.into_vec() {
+        #[var_args] owner_type_id_pairs: MultiValueEncoded<MultiValue2<ManagedAddress, BigUint>>,
+    ) -> MultiValueEncoded<BigUint> {
+        let mut batch_balance = MultiValueEncoded::new();
+        for multi_arg in owner_type_id_pairs.into_iter() {
             let (owner, type_id) = multi_arg.into_tuple();
 
             batch_balance.push(self.balance_of(&owner, &type_id));
         }
 
-        batch_balance.into()
+        batch_balance
     }
 
     // private

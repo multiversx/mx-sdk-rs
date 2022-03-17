@@ -9,13 +9,13 @@ use alloc::{
 impl TypeAbi for () {
     /// No another exception from the 1-type-1-output-abi rule:
     /// the unit type produces no output.
-    fn output_abis(_output_names: &[&'static str]) -> Vec<OutputAbi> {
+    fn output_abis(_output_names: &[&'static str]) -> OutputAbis {
         Vec::new()
     }
 }
 
 impl<T: TypeAbi> TypeAbi for &T {
-    fn type_name() -> String {
+    fn type_name() -> TypeName {
         T::type_name()
     }
 
@@ -25,7 +25,7 @@ impl<T: TypeAbi> TypeAbi for &T {
 }
 
 impl<T: TypeAbi> TypeAbi for Box<T> {
-    fn type_name() -> String {
+    fn type_name() -> TypeName {
         T::type_name()
     }
 
@@ -35,12 +35,12 @@ impl<T: TypeAbi> TypeAbi for Box<T> {
 }
 
 impl<T: TypeAbi> TypeAbi for &[T] {
-    fn type_name() -> String {
+    fn type_name() -> TypeName {
         let t_name = T::type_name();
         if t_name == "u8" {
             return "bytes".into();
         }
-        let mut repr = String::from("List<");
+        let mut repr = TypeName::from("List<");
         repr.push_str(t_name.as_str());
         repr.push('>');
         repr
@@ -52,7 +52,7 @@ impl<T: TypeAbi> TypeAbi for &[T] {
 }
 
 impl<T: TypeAbi> TypeAbi for Vec<T> {
-    fn type_name() -> String {
+    fn type_name() -> TypeName {
         <&[T]>::type_name()
     }
 
@@ -62,7 +62,7 @@ impl<T: TypeAbi> TypeAbi for Vec<T> {
 }
 
 impl<T: TypeAbi, const CAP: usize> TypeAbi for ArrayVec<T, CAP> {
-    fn type_name() -> String {
+    fn type_name() -> TypeName {
         <&[T]>::type_name()
     }
 
@@ -72,7 +72,7 @@ impl<T: TypeAbi, const CAP: usize> TypeAbi for ArrayVec<T, CAP> {
 }
 
 impl<T: TypeAbi> TypeAbi for Box<[T]> {
-    fn type_name() -> String {
+    fn type_name() -> TypeName {
         <&[T]>::type_name()
     }
 
@@ -82,28 +82,28 @@ impl<T: TypeAbi> TypeAbi for Box<[T]> {
 }
 
 impl TypeAbi for String {
-    fn type_name() -> String {
+    fn type_name() -> TypeName {
         "utf-8 string".into()
     }
 }
 
 impl TypeAbi for &str {
-    fn type_name() -> String {
-        String::type_name()
+    fn type_name() -> TypeName {
+        TypeName::type_name()
     }
 }
 
 impl TypeAbi for Box<str> {
-    fn type_name() -> String {
-        String::type_name()
+    fn type_name() -> TypeName {
+        TypeName::type_name()
     }
 }
 
 macro_rules! type_abi_name_only {
     ($ty:ty, $name:expr) => {
         impl TypeAbi for $ty {
-            fn type_name() -> String {
-                String::from($name)
+            fn type_name() -> TypeName {
+                TypeName::from($name)
             }
 
             fn provide_type_descriptions<TDC: TypeDescriptionContainer>(_: &mut TDC) {}
@@ -127,8 +127,8 @@ type_abi_name_only!(core::num::NonZeroUsize, "NonZeroUsize");
 type_abi_name_only!(bool, "bool");
 
 impl<T: TypeAbi> TypeAbi for Option<T> {
-    fn type_name() -> String {
-        let mut repr = String::from("Option<");
+    fn type_name() -> TypeName {
+        let mut repr = TypeName::from("Option<");
         repr.push_str(T::type_name().as_str());
         repr.push('>');
         repr
@@ -140,12 +140,12 @@ impl<T: TypeAbi> TypeAbi for Option<T> {
 }
 
 impl<T: TypeAbi, E> TypeAbi for Result<T, E> {
-    fn type_name() -> String {
+    fn type_name() -> TypeName {
         T::type_name()
     }
 
     /// Similar to the SCResult implementation.
-    fn output_abis(output_names: &[&'static str]) -> Vec<OutputAbi> {
+    fn output_abis(output_names: &[&'static str]) -> OutputAbis {
         T::output_abis(output_names)
     }
 
@@ -161,8 +161,8 @@ macro_rules! tuple_impls {
             where
                 $($name: TypeAbi,)+
             {
-				fn type_name() -> String {
-					let mut repr = String::from("tuple");
+				fn type_name() -> TypeName {
+					let mut repr = TypeName::from("tuple");
 					repr.push_str("<");
 					$(
 						if $n > 0 {
@@ -204,8 +204,8 @@ tuple_impls! {
 }
 
 impl<T: TypeAbi, const N: usize> TypeAbi for [T; N] {
-    fn type_name() -> String {
-        let mut repr = String::from("array");
+    fn type_name() -> TypeName {
+        let mut repr = TypeName::from("array");
         repr.push_str(N.to_string().as_str());
         repr.push('<');
         repr.push_str(T::type_name().as_str());

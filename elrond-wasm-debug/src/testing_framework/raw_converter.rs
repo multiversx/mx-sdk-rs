@@ -1,7 +1,7 @@
 use std::collections::BTreeMap;
 
 use crate::world_mock::{AccountData, BlockInfo, EsdtData};
-use elrond_wasm::types::Address;
+use elrond_wasm::types::heap::Address;
 use mandos::serde_raw::{
     AccountRaw, BlockInfoRaw, CheckAccountRaw, CheckAccountsRaw, CheckBytesValueRaw,
     CheckEsdtDataRaw, CheckEsdtInstanceRaw, CheckEsdtInstancesRaw, CheckEsdtMapContentsRaw,

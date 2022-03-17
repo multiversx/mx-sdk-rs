@@ -66,10 +66,10 @@ pub trait Vault {
 
     #[payable("*")]
     #[endpoint]
-    fn reject_funds(&self) -> SCResult<()> {
+    fn reject_funds(&self) {
         let esdt_transfers_multi = self.esdt_transfers_multi();
         self.reject_funds_event(&self.call_value().egld_value(), &esdt_transfers_multi);
-        sc_error!("reject_funds")
+        sc_panic!("reject_funds");
     }
 
     #[payable("*")]

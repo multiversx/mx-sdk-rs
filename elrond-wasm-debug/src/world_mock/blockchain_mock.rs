@@ -1,4 +1,4 @@
-use elrond_wasm::types::Address;
+use elrond_wasm::types::heap::Address;
 use mandos::{interpret_trait::InterpreterContext, value_interpreter::interpret_string};
 use num_bigint::BigUint;
 use num_traits::Zero;

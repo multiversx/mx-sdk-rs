@@ -2,7 +2,7 @@ use std::cmp::Ordering;
 
 use elrond_wasm::{
     api::{Handle, ManagedBufferApi},
-    types::{Address, ManagedBuffer, ManagedType},
+    types::{heap::Address, ManagedBuffer, ManagedType},
 };
 use num_bigint::Sign;
 use num_traits::Zero;

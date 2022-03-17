@@ -1,10 +1,12 @@
-use crate::{PanicErrorHandler, TopDecodeMultiInput, TopEncodeMulti, TopEncodeMultiOutput};
+use crate::{
+    CodecFrom, PanicErrorHandler, TopDecodeMultiInput, TopEncodeMulti,
+    TopEncodeMultiOutput,
+};
 
 pub fn codec_convert_or_panic<From, To, Medium>(from: From) -> To
 where
     From: TopEncodeMulti,
     To: CodecFrom<From>,
-    From: CodecInto<To>,
     Medium: Default + TopDecodeMultiInput + TopEncodeMultiOutput,
 {
     let mut medium: Medium = Default::default();
@@ -29,8 +31,10 @@ mod test {
 
     fn convert_add<T1, T2, R>(x: T1, y: T2) -> R
     where
-        T1: CodecInto<u32>,
-        T2: CodecInto<u32>,
+        T1: TopEncodeMulti,
+        T2: TopEncodeMulti,
+        u32: CodecFrom<T1>,
+        u32: CodecFrom<T2>,
         R: CodecFrom<u32>,
     {
         let conv_x = codec_convert_or_panic::<T1, u32, Vec<Vec<u8>>>(x);

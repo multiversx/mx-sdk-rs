@@ -1,12 +1,11 @@
 use core::convert::TryFrom;
 
 use crate::{
-    abi::TypeAbi,
+    abi::{TypeAbi, TypeName},
     api::{Handle, ManagedTypeApi},
     hex_util::encode_bytes_as_hex,
     types::{ManagedBuffer, ManagedType},
 };
-use alloc::string::String;
 use elrond_codec::{
     DecodeError, DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput,
     NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
@@ -208,7 +207,7 @@ where
     M: ManagedTypeApi,
 {
     /// It is semantically equivalent to `[u8; N]`.
-    fn type_name() -> String {
+    fn type_name() -> TypeName {
         <&[u8; N] as TypeAbi>::type_name()
     }
 }
