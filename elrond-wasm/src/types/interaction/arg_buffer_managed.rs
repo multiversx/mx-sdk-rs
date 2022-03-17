@@ -127,20 +127,6 @@ impl<M: ManagedTypeApi> ManagedArgBuffer<M>
 where
     M: ManagedTypeApi + 'static,
 {
-    #[cfg(feature = "alloc")]
-    pub fn to_legacy_arg_buffer(&self) -> crate::types::heap::ArgBuffer {
-        let mut result = crate::types::heap::ArgBuffer::new();
-        for m_arg in self.data.into_iter() {
-            result.push_argument_bytes(m_arg.to_boxed_bytes().as_slice());
-        }
-        result
-    }
-}
-
-impl<M: ManagedTypeApi> ManagedArgBuffer<M>
-where
-    M: ManagedTypeApi + 'static,
-{
     pub fn raw_arg_iter(&self) -> ManagedVecRefIterator<M, ManagedBuffer<M>> {
         self.data.iter()
     }

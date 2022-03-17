@@ -1,4 +1,7 @@
-use crate::types::heap::BoxedBytes;
+use crate::{
+    api::ManagedTypeApi,
+    types::{heap::BoxedBytes, ManagedArgBuffer},
+};
 use alloc::vec::Vec;
 use elrond_codec::TopEncodeOutput;
 
@@ -77,6 +80,19 @@ impl From<&[BoxedBytes]> for ArgBuffer {
             arg_buffer.push_argument_bytes(bytes.as_slice());
         }
         arg_buffer
+    }
+}
+
+impl<M: ManagedTypeApi> From<&ManagedArgBuffer<M>> for ArgBuffer
+where
+    M: ManagedTypeApi + 'static,
+{
+    fn from(managed_arg_buffer: &ManagedArgBuffer<M>) -> Self {
+        let mut result = Self::new();
+        for m_arg in managed_arg_buffer.data.into_iter() {
+            result.push_argument_bytes(m_arg.to_boxed_bytes().as_slice());
+        }
+        result
     }
 }
 
