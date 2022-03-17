@@ -1,4 +1,3 @@
-use alloc::string::String;
 use elrond_codec::{
     DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode,
     NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
@@ -82,6 +81,6 @@ impl TopDecode for Sign {
 
 impl crate::abi::TypeAbi for Sign {
     fn type_name() -> TypeName {
-        String::from("Sign")
+        TypeName::from("Sign")
     }
 }

@@ -1,7 +1,5 @@
 use core::marker::PhantomData;
 
-use alloc::string::String;
-
 use crate::{
     abi::{TypeAbi, TypeName},
     api::{BigIntApi, EllipticCurveApi, Handle, ManagedTypeApi},
@@ -252,6 +250,6 @@ impl<M: ManagedTypeApi> TopEncode for EllipticCurve<M> {
 
 impl<M: ManagedTypeApi> TypeAbi for EllipticCurve<M> {
     fn type_name() -> TypeName {
-        String::from("EllipticCurve")
+        TypeName::from("EllipticCurve")
     }
 }

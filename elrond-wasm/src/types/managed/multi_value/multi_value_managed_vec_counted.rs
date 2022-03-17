@@ -3,7 +3,6 @@ use crate::{
     api::ManagedTypeApi,
     types::{ManagedVec, ManagedVecItem},
 };
-use alloc::string::String;
 use elrond_codec::{
     DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti, TopDecodeMultiInput, TopEncodeMulti,
     TopEncodeMultiOutput,
@@ -135,7 +134,7 @@ where
     T: ManagedVecItem + TypeAbi,
 {
     fn type_name() -> TypeName {
-        let mut repr = String::from("counted-variadic<");
+        let mut repr = TypeName::from("counted-variadic<");
         repr.push_str(T::type_name().as_str());
         repr.push('>');
         repr

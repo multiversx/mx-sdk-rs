@@ -1,5 +1,5 @@
 use crate::abi::{TypeAbi, TypeName};
-use alloc::{string::String, vec::Vec};
+use alloc::vec::Vec;
 use elrond_codec::*;
 
 /// A simple queue struct that is able to push and pop without moving elements.
@@ -136,7 +136,7 @@ impl<T: NestedDecode> TopDecode for Queue<T> {
 
 impl<T: TypeAbi> TypeAbi for Queue<T> {
     fn type_name() -> TypeName {
-        let mut repr = String::from("Queue<");
+        let mut repr = TypeName::from("Queue<");
         repr.push_str(T::type_name().as_str());
         repr.push('>');
         repr

@@ -1,17 +1,17 @@
 use super::*;
-use alloc::{string::String, vec::Vec};
+use alloc::vec::Vec;
 
 #[derive(Clone, Debug)]
 pub struct InputAbi {
     pub arg_name: &'static str,
-    pub type_name: String,
+    pub type_name: TypeName,
     pub multi_arg: bool,
 }
 
 #[derive(Clone, Debug)]
 pub struct OutputAbi {
     pub output_name: &'static str,
-    pub type_name: String,
+    pub type_name: TypeName,
     pub multi_result: bool,
 }
 

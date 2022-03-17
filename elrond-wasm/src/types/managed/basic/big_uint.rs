@@ -6,7 +6,6 @@ use crate::{
     hex_util::encode_bytes_as_hex,
     types::{heap::BoxedBytes, ManagedBuffer, ManagedType},
 };
-use alloc::string::String;
 use elrond_codec::{
     DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode,
     NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, TryStaticCast,
@@ -228,7 +227,7 @@ impl<M: ManagedTypeApi> TopDecode for BigUint<M> {
 
 impl<M: ManagedTypeApi> crate::abi::TypeAbi for BigUint<M> {
     fn type_name() -> TypeName {
-        String::from("BigUint")
+        TypeName::from("BigUint")
     }
 }
 
