@@ -7,8 +7,9 @@ use crate::{
     types::{heap::BoxedBytes, ManagedBuffer, ManagedType},
 };
 use elrond_codec::{
-    DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode,
-    NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, TryStaticCast,
+    CodecFrom, DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput,
+    NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
+    TryStaticCast,
 };
 
 #[repr(transparent)]
@@ -58,6 +59,8 @@ macro_rules! big_uint_conv_num {
                 BigUint::from_raw_handle(M::managed_type_impl().bi_new(value as i64))
             }
         }
+
+        impl<M: ManagedTypeApi> CodecFrom<$num_ty> for BigUint<M> {}
     };
 }
 
