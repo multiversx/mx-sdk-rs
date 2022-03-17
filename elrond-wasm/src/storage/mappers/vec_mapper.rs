@@ -3,9 +3,8 @@ use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
     api::{ErrorApiImpl, StorageMapperApi},
     storage::{storage_clear, storage_get, storage_get_len, storage_set, StorageKey},
-    types::{ManagedType, MultiResultVec},
+    types::{ManagedType, MultiValueEncoded},
 };
-use alloc::vec::Vec;
 use core::{marker::PhantomData, usize};
 use elrond_codec::{
     multi_encode_iter_or_handle_err, EncodeErrorHandler, TopDecode, TopEncode, TopEncodeMulti,
@@ -209,7 +208,8 @@ where
 
     /// Loads all items from storage and places them in a Vec.
     /// Can easily consume a lot of gas.
-    pub fn load_as_vec(&self) -> Vec<T> {
+    #[cfg(feature = "alloc")]
+    pub fn load_as_vec(&self) -> alloc::vec::Vec<T> {
         self.iter().collect()
     }
 
@@ -281,7 +281,7 @@ where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode,
 {
-    type DecodeAs = MultiResultVec<T>;
+    type DecodeAs = MultiValueEncoded<SA, T>;
 
     fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
     where
@@ -299,7 +299,7 @@ where
     T: TopEncode + TopDecode + TypeAbi,
 {
     fn type_name() -> TypeName {
-        crate::types::MultiResultVec::<T>::type_name()
+        crate::abi::type_name_variadic::<T>()
     }
 
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {

@@ -1,7 +1,7 @@
 use super::UncallableApi;
 use crate::{
     api::{CryptoApi, CryptoApiImpl, KECCAK256_RESULT_LEN, RIPEMD_RESULT_LEN, SHA256_RESULT_LEN},
-    types::{BoxedBytes, MessageHashType},
+    types::{heap::BoxedBytes, MessageHashType},
 };
 
 impl CryptoApi for UncallableApi {

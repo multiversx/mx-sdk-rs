@@ -15,6 +15,7 @@ categories = ["no-std", "wasm", "cryptography::cryptocurrencies", "development-t
 
 [features]
 derive = ["elrond-codec-derive"]
+alloc = []
 
 [dependencies.elrond-codec-derive]
 path = "../elrond-codec-derive"

@@ -5,7 +5,7 @@ use std::{
     rc::Rc,
 };
 
-use elrond_wasm::types::Address;
+use elrond_wasm::types::heap::Address;
 
 use crate::{
     address_hex,

@@ -7,8 +7,9 @@ use crate::{
 use elrond_wasm::{
     api::{BlockchainApi, BlockchainApiImpl, Handle, ManagedTypeApi},
     types::{
-        Address, BigUint, Box, EsdtTokenData, EsdtTokenType, ManagedAddress, ManagedBuffer,
-        ManagedType, ManagedVec, TokenIdentifier, H256,
+        heap::{Address, Box, H256},
+        BigUint, EsdtTokenData, EsdtTokenType, ManagedAddress, ManagedBuffer, ManagedType,
+        ManagedVec, TokenIdentifier,
     },
 };
 
@@ -409,7 +410,7 @@ impl BlockchainApiImpl for VmApiImpl {
         token: &TokenIdentifier<M>,
         nonce: u64,
     ) -> EsdtTokenData<M> {
-        use elrond_wasm::types::BoxedBytes;
+        use elrond_wasm::types::heap::BoxedBytes;
         let address = m_address.to_address();
         unsafe {
             let value_handle = bigIntNew(0);

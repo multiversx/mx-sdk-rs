@@ -1,7 +1,7 @@
 use crate::{
     api::{ErrorApi, Handle, ManagedTypeApi},
     contract_base::ExitCodecErrorHandler,
-    types::{BoxedBytes, ManagedBuffer, ManagedByteArray, ManagedType},
+    types::{heap::BoxedBytes, ManagedBuffer, ManagedByteArray, ManagedType},
     *,
 };
 use elrond_codec::*;

@@ -14,6 +14,8 @@ keywords = ["elrond", "wasm", "webassembly", "blockchain", "contract"]
 categories = ["no-std", "wasm", "cryptography::cryptocurrencies", "development-tools::ffi"]
 
 [features]
+vm-validate-token-identifier = []
+vm-esdt-local-roles = []
 ei-unmanaged = []
 ei-1-1 = [ "elrond-wasm/ei-1-1" ]
 

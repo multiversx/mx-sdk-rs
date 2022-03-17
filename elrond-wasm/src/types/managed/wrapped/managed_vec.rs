@@ -1,12 +1,13 @@
 use crate::{
-    abi::{TypeAbi, TypeDescriptionContainer},
+    abi::{TypeAbi, TypeDescriptionContainer, TypeName},
     api::{ErrorApiImpl, Handle, InvalidSliceError, ManagedTypeApi},
     types::{
-        ArgBuffer, BoxedBytes, ManagedBuffer, ManagedBufferNestedDecodeInput, ManagedType,
-        ManagedVecItem, ManagedVecRef, ManagedVecRefIterator,
+        heap::{ArgBuffer, BoxedBytes},
+        ManagedBuffer, ManagedBufferNestedDecodeInput, ManagedType, ManagedVecItem, ManagedVecRef,
+        ManagedVecRefIterator,
     },
 };
-use alloc::{string::String, vec::Vec};
+use alloc::vec::Vec;
 use core::{borrow::Borrow, marker::PhantomData};
 use elrond_codec::{
     DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode,
@@ -232,6 +233,7 @@ where
         self.buffer.overwrite(&[]);
     }
 
+    #[cfg(feature = "alloc")]
     pub fn into_vec(self) -> Vec<T> {
         let mut v = Vec::new();
         for item in self.into_iter() {
@@ -242,6 +244,7 @@ where
 
     /// Temporarily converts self to a `Vec<T>`.
     /// All operations performed on the temporary vector get saved back to the underlying buffer.
+    #[cfg(feature = "alloc")]
     pub fn with_self_as_vec<R, F>(&mut self, f: F) -> R
     where
         F: FnOnce(&mut Vec<T>) -> R,
@@ -433,7 +436,7 @@ where
     T: ManagedVecItem + TypeAbi,
 {
     /// It is semantically equivalent to any list of `T`.
-    fn type_name() -> String {
+    fn type_name() -> TypeName {
         <&[T] as TypeAbi>::type_name()
     }
 
@@ -442,7 +445,8 @@ where
     }
 }
 
-/// For compatibility with the older Arwen EI.
+/// For compatibility with the older VM EI.
+#[doc(hidden)]
 pub fn managed_vec_of_buffers_to_arg_buffer<M: ManagedTypeApi>(
     managed_vec: ManagedVec<M, ManagedBuffer<M>>,
 ) -> ArgBuffer {
@@ -453,6 +457,8 @@ pub fn managed_vec_of_buffers_to_arg_buffer<M: ManagedTypeApi>(
     arg_buffer
 }
 
+/// For compatibility with the older VM EI.
+#[doc(hidden)]
 pub fn managed_vec_from_slice_of_boxed_bytes<M: ManagedTypeApi>(
     data: &[BoxedBytes],
 ) -> ManagedVec<M, ManagedBuffer<M>> {

@@ -5,7 +5,7 @@ use elrond_codec::{DecodeError, DecodeErrorHandler, TopDecodeMultiInput};
 
 use crate::{
     api::{ErrorApi, ManagedTypeApi},
-    types::BoxedBytes,
+    types::heap::BoxedBytes,
 };
 
 /// Consumes a vector of `BoxedBytes` and deserializes from the vector one by one.

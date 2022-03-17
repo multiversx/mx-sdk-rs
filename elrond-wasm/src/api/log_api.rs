@@ -1,4 +1,4 @@
-use crate::types::ArgBuffer;
+use crate::types::heap::ArgBuffer;
 
 use super::Handle;
 
