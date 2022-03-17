@@ -7,12 +7,10 @@ use crate::{
     },
     storage::{self},
     types::{
-        heap::{Address, H256},
         BigUint, EsdtLocalRoleFlags, EsdtTokenData, ManagedAddress, ManagedByteArray, ManagedType,
         TokenIdentifier,
     },
 };
-use alloc::boxed::Box;
 
 /// Interface to be used by the actual smart contract code.
 ///
@@ -40,7 +38,7 @@ where
 
     #[cfg(feature = "alloc")]
     #[inline]
-    pub fn get_caller_legacy(&self) -> Address {
+    pub fn get_caller_legacy(&self) -> crate::types::Address {
         A::blockchain_api_impl().get_caller_legacy()
     }
 
@@ -51,7 +49,7 @@ where
 
     #[cfg(feature = "alloc")]
     #[inline]
-    pub fn get_sc_address_legacy(&self) -> Address {
+    pub fn get_sc_address_legacy(&self) -> crate::types::Address {
         A::blockchain_api_impl().get_sc_address_legacy()
     }
 
@@ -62,7 +60,7 @@ where
 
     #[cfg(feature = "alloc")]
     #[inline]
-    pub fn get_owner_address_legacy(&self) -> Address {
+    pub fn get_owner_address_legacy(&self) -> crate::types::Address {
         A::blockchain_api_impl().get_owner_address_legacy()
     }
 
@@ -79,7 +77,7 @@ where
 
     #[cfg(feature = "alloc")]
     #[inline]
-    pub fn get_shard_of_address_legacy(&self, address: &Address) -> u32 {
+    pub fn get_shard_of_address_legacy(&self, address: &crate::types::Address) -> u32 {
         A::blockchain_api_impl().get_shard_of_address_legacy(address)
     }
 
@@ -90,7 +88,7 @@ where
 
     #[cfg(feature = "alloc")]
     #[inline]
-    pub fn is_smart_contract_legacy(&self, address: &Address) -> bool {
+    pub fn is_smart_contract_legacy(&self, address: &crate::types::Address) -> bool {
         A::blockchain_api_impl().is_smart_contract_legacy(address)
     }
 
@@ -101,7 +99,7 @@ where
 
     #[cfg(feature = "alloc")]
     #[inline]
-    pub fn get_balance_legacy(&self, address: &Address) -> BigUint<A> {
+    pub fn get_balance_legacy(&self, address: &crate::types::Address) -> BigUint<A> {
         BigUint::from_raw_handle(A::blockchain_api_impl().get_balance_legacy(address))
     }
 
@@ -123,7 +121,7 @@ where
 
     #[cfg(feature = "alloc")]
     #[inline]
-    pub fn get_state_root_hash_legacy(&self) -> H256 {
+    pub fn get_state_root_hash_legacy(&self) -> crate::types::H256 {
         A::blockchain_api_impl().get_state_root_hash_legacy()
     }
 
@@ -134,7 +132,7 @@ where
 
     #[cfg(feature = "alloc")]
     #[inline]
-    pub fn get_tx_hash_legacy(&self) -> H256 {
+    pub fn get_tx_hash_legacy(&self) -> crate::types::H256 {
         A::blockchain_api_impl().get_tx_hash_legacy()
     }
 
@@ -168,8 +166,9 @@ where
         A::blockchain_api_impl().get_block_epoch()
     }
 
+    #[cfg(feature = "alloc")]
     #[inline]
-    pub fn get_block_random_seed_legacy(&self) -> Box<[u8; 48]> {
+    pub fn get_block_random_seed_legacy(&self) -> crate::types::Box<[u8; 48]> {
         A::blockchain_api_impl().get_block_random_seed_legacy()
     }
 
@@ -198,8 +197,9 @@ where
         A::blockchain_api_impl().get_prev_block_epoch()
     }
 
+    #[cfg(feature = "alloc")]
     #[inline]
-    pub fn get_prev_block_random_seed_legacy(&self) -> Box<[u8; 48]> {
+    pub fn get_prev_block_random_seed_legacy(&self) -> crate::types::Box<[u8; 48]> {
         A::blockchain_api_impl().get_prev_block_random_seed_legacy()
     }
 
