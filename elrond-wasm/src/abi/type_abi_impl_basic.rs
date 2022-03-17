@@ -40,7 +40,7 @@ impl<T: TypeAbi> TypeAbi for &[T] {
         if t_name == "u8" {
             return "bytes".into();
         }
-        let mut repr = String::from("List<");
+        let mut repr = TypeName::from("List<");
         repr.push_str(t_name.as_str());
         repr.push('>');
         repr
@@ -89,13 +89,13 @@ impl TypeAbi for String {
 
 impl TypeAbi for &str {
     fn type_name() -> TypeName {
-        String::type_name()
+        TypeName::type_name()
     }
 }
 
 impl TypeAbi for Box<str> {
     fn type_name() -> TypeName {
-        String::type_name()
+        TypeName::type_name()
     }
 }
 
@@ -103,7 +103,7 @@ macro_rules! type_abi_name_only {
     ($ty:ty, $name:expr) => {
         impl TypeAbi for $ty {
             fn type_name() -> TypeName {
-                String::from($name)
+                TypeName::from($name)
             }
 
             fn provide_type_descriptions<TDC: TypeDescriptionContainer>(_: &mut TDC) {}
@@ -128,7 +128,7 @@ type_abi_name_only!(bool, "bool");
 
 impl<T: TypeAbi> TypeAbi for Option<T> {
     fn type_name() -> TypeName {
-        let mut repr = String::from("Option<");
+        let mut repr = TypeName::from("Option<");
         repr.push_str(T::type_name().as_str());
         repr.push('>');
         repr
@@ -162,7 +162,7 @@ macro_rules! tuple_impls {
                 $($name: TypeAbi,)+
             {
 				fn type_name() -> TypeName {
-					let mut repr = String::from("tuple");
+					let mut repr = TypeName::from("tuple");
 					repr.push_str("<");
 					$(
 						if $n > 0 {
@@ -205,7 +205,7 @@ tuple_impls! {
 
 impl<T: TypeAbi, const N: usize> TypeAbi for [T; N] {
     fn type_name() -> TypeName {
-        let mut repr = String::from("array");
+        let mut repr = TypeName::from("array");
         repr.push_str(N.to_string().as_str());
         repr.push('<');
         repr.push_str(T::type_name().as_str());

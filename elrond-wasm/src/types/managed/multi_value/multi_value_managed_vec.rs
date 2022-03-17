@@ -2,7 +2,6 @@ use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
     api::ManagedTypeApi,
 };
-use alloc::string::String;
 use elrond_codec::{
     DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti, TopDecodeMultiInput, TopEncodeMulti,
     TopEncodeMultiOutput, Vec,
@@ -169,7 +168,7 @@ where
     T: ManagedVecItem,
 {
     fn type_name() -> TypeName {
-        let mut repr = String::from("variadic<");
+        let mut repr = TypeName::from("variadic<");
         repr.push_str(T::type_name().as_str());
         repr.push('>');
         repr

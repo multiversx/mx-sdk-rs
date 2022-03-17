@@ -2,7 +2,6 @@ use crate::{
     abi::{TypeAbi, TypeName},
     types::heap::BoxedBytes,
 };
-use alloc::string::String;
 use elrond_codec::{
     DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti, TopDecodeMultiInput, TopEncodeMulti,
     TopEncodeMultiOutput,
@@ -87,7 +86,7 @@ where
 
 impl<T: TypeAbi> TypeAbi for AsyncCallResult<T> {
     fn type_name() -> TypeName {
-        let mut repr = String::from("AsyncCallResult<");
+        let mut repr = TypeName::from("AsyncCallResult<");
         repr.push_str(T::type_name().as_str());
         repr.push('>');
         repr
