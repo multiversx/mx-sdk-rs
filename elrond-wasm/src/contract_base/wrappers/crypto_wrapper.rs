@@ -5,9 +5,8 @@ use crate::{
         CryptoApi, CryptoApiImpl, ED25519_KEY_BYTE_LEN, ED25519_SIGNATURE_BYTE_LEN,
         SHA256_RESULT_LEN,
     },
-    types::{heap::BoxedBytes, ManagedBuffer, ManagedByteArray, MessageHashType},
+    types::{ManagedBuffer, ManagedByteArray, MessageHashType},
 };
-use alloc::boxed::Box;
 
 #[derive(Default)]
 pub struct CryptoWrapper<A>
@@ -78,8 +77,8 @@ where
     }
 
     #[cfg(feature = "alloc")]
-    pub fn ripemd160(&self, data: &[u8]) -> Box<[u8; 20]> {
-        Box::new(A::crypto_api_impl().ripemd160(data))
+    pub fn ripemd160(&self, data: &[u8]) -> crate::types::Box<[u8; 20]> {
+        crate::types::Box::new(A::crypto_api_impl().ripemd160(data))
     }
 
     pub fn verify_bls(&self, key: &[u8], message: &[u8], signature: &[u8]) -> bool {
@@ -121,7 +120,7 @@ where
     }
 
     #[cfg(feature = "alloc")]
-    pub fn encode_secp256k1_der_signature(&self, r: &[u8], s: &[u8]) -> BoxedBytes {
+    pub fn encode_secp256k1_der_signature(&self, r: &[u8], s: &[u8]) -> crate::types::BoxedBytes {
         A::crypto_api_impl().encode_secp256k1_der_signature(r, s)
     }
 }
