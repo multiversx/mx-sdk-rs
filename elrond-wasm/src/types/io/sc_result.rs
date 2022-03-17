@@ -111,10 +111,6 @@ where
     T: TopEncodeMulti,
     E: TopEncodeMulti,
 {
-    /// Error implies the transaction fails, so if there is a result,
-    /// it is of type `T`.
-    type DecodeAs = T::DecodeAs;
-
     fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
     where
         O: TopEncodeMultiOutput,

@@ -147,7 +147,8 @@ pub trait ForwarderSyncCallModule {
         self.vault_proxy()
             .contract(to)
             .call_counts(b"accept_funds")
-            .execute_on_dest_context::<usize>()
+            .execute_on_dest_context::<SingleValue<usize>>()
+            .into()
     }
 
     #[endpoint]
