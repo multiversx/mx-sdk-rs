@@ -1,4 +1,4 @@
-use elrond_codec::{EquivalentResult, TopEncodeMulti};
+use elrond_codec::{CodecFrom, TopEncodeMulti};
 
 use crate::{
     api::{
@@ -287,7 +287,7 @@ where
         raw_result: ManagedVec<SA, ManagedBuffer<SA>>,
     ) -> RequestedResult
     where
-        RequestedResult: EquivalentResult<OriginalResult>,
+        RequestedResult: CodecFrom<OriginalResult>,
     {
         let mut loader = ManagedResultArgLoader::new(raw_result);
         let arg_id = ArgId::from(&b"sync result"[..]);
@@ -300,7 +300,7 @@ where
     /// Only works if the target contract is in the same shard.
     pub fn execute_on_dest_context<RequestedResult>(mut self) -> RequestedResult
     where
-        RequestedResult: EquivalentResult<OriginalResult>,
+        RequestedResult: CodecFrom<OriginalResult>,
     {
         self = self.convert_to_esdt_transfer_call();
         let raw_result = SA::send_api_impl().execute_on_dest_context_raw(
@@ -327,7 +327,7 @@ where
     ) -> RequestedResult
     where
         F: FnOnce(usize, usize) -> (usize, usize),
-        RequestedResult: EquivalentResult<OriginalResult>,
+        RequestedResult: CodecFrom<OriginalResult>,
     {
         self = self.convert_to_esdt_transfer_call();
         let raw_result = SA::send_api_impl().execute_on_dest_context_raw_custom_result_range(
@@ -344,7 +344,7 @@ where
 
     pub fn execute_on_dest_context_readonly<RequestedResult>(mut self) -> RequestedResult
     where
-        RequestedResult: EquivalentResult<OriginalResult>,
+        RequestedResult: CodecFrom<OriginalResult>,
     {
         self = self.convert_to_esdt_transfer_call();
         let raw_result = SA::send_api_impl().execute_on_dest_context_readonly_raw(
