@@ -1,6 +1,5 @@
 use crate::{
-    CodecFrom, PanicErrorHandler, TopDecodeMultiInput, TopEncodeMulti,
-    TopEncodeMultiOutput,
+    CodecFrom, PanicErrorHandler, TopDecodeMultiInput, TopEncodeMulti, TopEncodeMultiOutput,
 };
 
 pub fn codec_convert_or_panic<From, To, Medium>(from: From) -> To

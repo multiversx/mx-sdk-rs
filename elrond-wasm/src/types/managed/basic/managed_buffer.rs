@@ -6,7 +6,11 @@ use crate::{
     hex_util::encode_bytes_as_hex,
     types::{heap::BoxedBytes, ManagedType},
 };
-use elrond_codec::{CodecFrom, DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, TryStaticCast};
+use elrond_codec::{
+    CodecFrom, DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput,
+    NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
+    TryStaticCast,
+};
 
 /// A byte buffer managed by an external API.
 #[repr(transparent)]
@@ -336,14 +340,20 @@ impl<M: ManagedTypeApi> TopEncode for ManagedBuffer<M> {
     }
 }
 
-impl<M: ManagedTypeApi> CodecFrom<&[u8]> for  ManagedBuffer<M> {}
+impl<M: ManagedTypeApi> CodecFrom<&[u8]> for ManagedBuffer<M> {}
 impl<M: ManagedTypeApi, const N: usize> CodecFrom<&[u8; N]> for ManagedBuffer<M> {}
-impl<M: ManagedTypeApi> CodecFrom<crate::types::heap::Vec<u8>> for ManagedBuffer<M> {}
-impl<M: ManagedTypeApi> CodecFrom<&crate::types::heap::Vec<u8>> for ManagedBuffer<M> {}
-impl<M: ManagedTypeApi> CodecFrom<crate::types::heap::BoxedBytes> for ManagedBuffer<M> {}
-impl<M: ManagedTypeApi> CodecFrom<&crate::types::heap::BoxedBytes> for ManagedBuffer<M> {}
-impl<M: ManagedTypeApi> CodecFrom<crate::types::heap::Box<[u8]>> for ManagedBuffer<M> {}
-impl<M: ManagedTypeApi> CodecFrom<&crate::types::heap::Box<[u8]>> for ManagedBuffer<M> {}
+
+macro_rules! managed_buffer_codec_from_impl_bi_di {
+    ($other_ty:ty) => {
+        impl<M: ManagedTypeApi> CodecFrom<$other_ty> for ManagedBuffer<M> {}
+        impl<M: ManagedTypeApi> CodecFrom<&$other_ty> for ManagedBuffer<M> {}
+        impl<M: ManagedTypeApi> CodecFrom<ManagedBuffer<M>> for $other_ty {}
+        impl<M: ManagedTypeApi> CodecFrom<&ManagedBuffer<M>> for $other_ty {}
+    };
+}
+
+managed_buffer_codec_from_impl_bi_di! {crate::types::heap::Vec<u8>}
+managed_buffer_codec_from_impl_bi_di! {crate::types::heap::BoxedBytes}
 
 impl<M: ManagedTypeApi> NestedDecode for ManagedBuffer<M> {
     fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
