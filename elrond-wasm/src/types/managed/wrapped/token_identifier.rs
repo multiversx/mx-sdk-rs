@@ -1,6 +1,7 @@
 use crate::{
     abi::TypeAbi,
     api::{Handle, ManagedTypeApi, ManagedTypeApiImpl},
+    formatter::{FormatByteReceiver, SCDisplay, SCLowerHex},
     types::{BoxedBytes, ManagedBuffer, ManagedType},
 };
 use alloc::string::String;
@@ -199,5 +200,27 @@ impl<M: ManagedTypeApi> TopDecode for TokenIdentifier<M> {
 impl<M: ManagedTypeApi> TypeAbi for TokenIdentifier<M> {
     fn type_name() -> String {
         "TokenIdentifier".into()
+    }
+}
+
+impl<M: ManagedTypeApi> SCDisplay for TokenIdentifier<M> {
+    fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
+        if self.is_egld() {
+            f.append_bytes(Self::EGLD_REPRESENTATION);
+        } else {
+            f.append_managed_buffer(&self.buffer);
+        }
+    }
+}
+
+const EGLD_REPRESENTATION_HEX: &[u8] = b"45474C44";
+
+impl<M: ManagedTypeApi> SCLowerHex for TokenIdentifier<M> {
+    fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
+        if self.is_egld() {
+            f.append_bytes(EGLD_REPRESENTATION_HEX);
+        } else {
+            f.append_managed_buffer_lower_hex(&self.buffer);
+        }
     }
 }

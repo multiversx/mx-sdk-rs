@@ -26,7 +26,6 @@ pub mod esdt;
 pub mod external_view_contract;
 pub mod formatter;
 pub mod hex_call_data;
-pub mod hex_util;
 pub mod io;
 pub mod log_util;
 mod macros;

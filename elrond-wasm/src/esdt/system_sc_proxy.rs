@@ -6,8 +6,8 @@ use hex_literal::hex;
 use crate::{
     api::{CallTypeApi, SendApi},
     types::{
-        BigUint, ContractCall, EsdtLocalRole, EsdtTokenType, ManagedAddress,
-        ManagedBuffer, TokenIdentifier,
+        BigUint, ContractCall, EsdtLocalRole, EsdtTokenType, ManagedAddress, ManagedBuffer,
+        TokenIdentifier,
     },
 };
 

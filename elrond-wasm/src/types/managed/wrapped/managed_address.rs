@@ -3,7 +3,7 @@ use core::convert::{TryFrom, TryInto};
 use crate::{
     abi::TypeAbi,
     api::{Handle, ManagedTypeApi},
-    hex_util::encode_bytes_as_hex,
+    formatter::{hex_util::encode_bytes_as_hex, FormatByteReceiver, SCLowerHex},
     types::{Address, ManagedBuffer, ManagedByteArray, ManagedType},
 };
 use alloc::string::String;
@@ -231,6 +231,12 @@ where
     /// `"Address"` instead of `"array32<u8>"`.
     fn type_name() -> String {
         Address::type_name()
+    }
+}
+
+impl<M: ManagedTypeApi> SCLowerHex for ManagedAddress<M> {
+    fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
+        SCLowerHex::fmt(&self.bytes, f)
     }
 }
 
