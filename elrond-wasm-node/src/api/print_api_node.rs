@@ -13,5 +13,5 @@ impl PrintApi for VmApiImpl {
 }
 
 impl PrintApiImpl for VmApiImpl {
-    type PrintFormatBuffer = FormatBufferIgnore;
+    type Buffer = FormatBufferIgnore;
 }

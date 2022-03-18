@@ -14,5 +14,5 @@ impl PrintApi for UncallableApi {
 }
 
 impl PrintApiImpl for UncallableApi {
-    type PrintFormatBuffer = FormatBufferIgnore;
+    type Buffer = FormatBufferIgnore;
 }
