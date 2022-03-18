@@ -1,6 +1,6 @@
 use std::collections::BTreeMap;
 
-use elrond_wasm::types::Address;
+use elrond_wasm::types::heap::Address;
 use mandos::model::{Account, AddressKey, BlockInfo, NewAddress};
 use num_bigint::BigUint;
 

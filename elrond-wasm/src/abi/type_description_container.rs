@@ -1,5 +1,4 @@
 use super::*;
-use alloc::string::String;
 use hashbrown::HashMap;
 
 pub trait TypeDescriptionContainer {
@@ -9,17 +8,17 @@ pub trait TypeDescriptionContainer {
 
     // A placeholder gets inserted while computing field descriptions for a type,
     // to avoid an infinite loop for recursive types (if the same type appears again lower in the tree).
-    fn reserve_type_name(&mut self, type_name: String) {
+    fn reserve_type_name(&mut self, type_name: TypeName) {
         self.insert(type_name, TypeDescription::PLACEHOLDER);
     }
 
-    fn insert(&mut self, type_name: String, type_description: TypeDescription);
+    fn insert(&mut self, type_name: TypeName, type_description: TypeDescription);
 
     fn insert_all(&mut self, other: &Self);
 }
 
 #[derive(Clone, Default, Debug)]
-pub struct TypeDescriptionContainerImpl(pub HashMap<String, TypeDescription>);
+pub struct TypeDescriptionContainerImpl(pub HashMap<TypeName, TypeDescription>);
 
 impl TypeDescriptionContainer for TypeDescriptionContainerImpl {
     fn new() -> Self {
@@ -30,7 +29,7 @@ impl TypeDescriptionContainer for TypeDescriptionContainerImpl {
         self.0.contains_key(type_name)
     }
 
-    fn insert(&mut self, type_name: String, type_description: TypeDescription) {
+    fn insert(&mut self, type_name: TypeName, type_description: TypeDescription) {
         self.0.insert(type_name, type_description);
     }
 

@@ -1,7 +1,7 @@
 use super::VmApiImpl;
 use elrond_wasm::{
     api::{Handle, LogApi, LogApiImpl},
-    types::ArgBuffer,
+    types::heap::ArgBuffer,
 };
 
 extern "C" {

@@ -1,5 +1,7 @@
-use crate::{abi::TypeAbi, types::BoxedBytes};
-use alloc::string::String;
+use crate::{
+    abi::{TypeAbi, TypeName},
+    types::heap::BoxedBytes,
+};
 use elrond_codec::{EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput};
 
 /// Standard way of signalling that an operation was interrupted early, before running out of gas.
@@ -41,8 +43,8 @@ impl TopEncodeMulti for OperationCompletionStatus {
 }
 
 impl TypeAbi for OperationCompletionStatus {
-    fn type_name() -> String {
-        String::from("OperationCompletionStatus")
+    fn type_name() -> TypeName {
+        TypeName::from("OperationCompletionStatus")
     }
 }
 

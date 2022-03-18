@@ -1,8 +1,8 @@
 use super::*;
-use alloc::{string::String, vec::Vec};
+use alloc::vec::Vec;
 
 pub trait TypeAbi {
-    fn type_name() -> String {
+    fn type_name() -> TypeName {
         core::any::type_name::<Self>().into()
     }
 
@@ -35,7 +35,7 @@ pub trait TypeAbi {
     /// Should only be overridden by framework types.
     /// Output names are optionally provided in contracts via the `output_name` method attribute.
     #[doc(hidden)]
-    fn output_abis(output_names: &[&'static str]) -> Vec<OutputAbi> {
+    fn output_abis(output_names: &[&'static str]) -> OutputAbis {
         let mut result = Vec::with_capacity(1);
         let output_name = if !output_names.is_empty() {
             output_names[0]
@@ -49,4 +49,18 @@ pub trait TypeAbi {
         });
         result
     }
+}
+
+pub fn type_name_variadic<T: TypeAbi>() -> TypeName {
+    let mut repr = TypeName::from("variadic<");
+    repr.push_str(T::type_name().as_str());
+    repr.push('>');
+    repr
+}
+
+pub fn type_name_optional<T: TypeAbi>() -> TypeName {
+    let mut repr = TypeName::from("optional<");
+    repr.push_str(T::type_name().as_str());
+    repr.push('>');
+    repr
 }

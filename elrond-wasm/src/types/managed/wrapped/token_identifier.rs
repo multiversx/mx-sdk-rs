@@ -1,10 +1,9 @@
 use crate::{
-    abi::TypeAbi,
+    abi::{TypeAbi, TypeName},
     api::{Handle, ManagedTypeApi, ManagedTypeApiImpl},
     formatter::{FormatByteReceiver, SCDisplay, SCLowerHex},
-    types::{BoxedBytes, ManagedBuffer, ManagedType},
+    types::{heap::BoxedBytes, ManagedBuffer, ManagedType},
 };
-use alloc::string::String;
 use elrond_codec::*;
 
 /// Specialized type for handling token identifiers.
@@ -198,7 +197,7 @@ impl<M: ManagedTypeApi> TopDecode for TokenIdentifier<M> {
 }
 
 impl<M: ManagedTypeApi> TypeAbi for TokenIdentifier<M> {
-    fn type_name() -> String {
+    fn type_name() -> TypeName {
         "TokenIdentifier".into()
     }
 }

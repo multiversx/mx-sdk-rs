@@ -1,4 +1,4 @@
-use elrond_wasm::{api::ESDT_TRANSFER_FUNC_NAME, types::Address};
+use elrond_wasm::{api::ESDT_TRANSFER_FUNC_NAME, types::heap::Address};
 use num_bigint::BigUint;
 use num_traits::Zero;
 

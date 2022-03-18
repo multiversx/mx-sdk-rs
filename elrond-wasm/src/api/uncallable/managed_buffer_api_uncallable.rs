@@ -1,6 +1,6 @@
 use crate::{
     api::{Handle, InvalidSliceError, ManagedBufferApi},
-    types::BoxedBytes,
+    types::heap::BoxedBytes,
 };
 
 impl ManagedBufferApi for super::UncallableApi {

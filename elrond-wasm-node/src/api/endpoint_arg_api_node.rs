@@ -1,9 +1,8 @@
 use crate::{error_hook, VmApiImpl};
-use alloc::vec::Vec;
 use elrond_wasm::{
     api::{EndpointArgumentApi, EndpointArgumentApiImpl, Handle},
     err_msg,
-    types::BoxedBytes,
+    types::heap::BoxedBytes,
 };
 
 extern "C" {
@@ -54,18 +53,6 @@ impl EndpointArgumentApiImpl for VmApiImpl {
                 error_hook::signal_error(err_msg::ARG_BAD_LENGTH);
             }
         }
-    }
-
-    fn get_argument_vec_u8(&self, arg_index: i32) -> Vec<u8> {
-        let len = self.get_argument_len(arg_index);
-        let mut res = Vec::with_capacity(len);
-        if len > 0 {
-            unsafe {
-                res.set_len(len);
-                getArgument(arg_index, res.as_mut_ptr());
-            }
-        }
-        res
     }
 
     fn get_argument_boxed_bytes(&self, arg_index: i32) -> BoxedBytes {

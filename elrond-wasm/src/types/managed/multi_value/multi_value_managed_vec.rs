@@ -1,8 +1,7 @@
 use crate::{
-    abi::{TypeAbi, TypeDescriptionContainer},
+    abi::{TypeAbi, TypeDescriptionContainer, TypeName},
     api::ManagedTypeApi,
 };
-use alloc::string::String;
 use elrond_codec::{
     DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti, TopDecodeMultiInput, TopEncodeMulti,
     TopEncodeMultiOutput, Vec,
@@ -98,6 +97,7 @@ where
         self.0
     }
 
+    #[cfg(feature = "alloc")]
     pub fn with_self_as_vec<F>(&mut self, f: F)
     where
         F: FnOnce(&mut Vec<T>),
@@ -167,8 +167,8 @@ where
     M: ManagedTypeApi,
     T: ManagedVecItem,
 {
-    fn type_name() -> String {
-        let mut repr = String::from("variadic<");
+    fn type_name() -> TypeName {
+        let mut repr = TypeName::from("variadic<");
         repr.push_str(T::type_name().as_str());
         repr.push('>');
         repr
