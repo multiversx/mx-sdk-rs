@@ -3,7 +3,7 @@ use core::convert::TryFrom;
 use crate::{
     abi::TypeAbi,
     api::{Handle, ManagedTypeApi},
-    hex_util::encode_bytes_as_hex,
+    formatter::{hex_util::encode_bytes_as_hex, FormatByteReceiver, SCLowerHex},
     types::{ManagedBuffer, ManagedType},
 };
 use alloc::string::String;
@@ -210,6 +210,15 @@ where
     /// It is semantically equivalent to `[u8; N]`.
     fn type_name() -> String {
         <&[u8; N] as TypeAbi>::type_name()
+    }
+}
+
+impl<M, const N: usize> SCLowerHex for ManagedByteArray<M, N>
+where
+    M: ManagedTypeApi,
+{
+    fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
+        SCLowerHex::fmt(&self.buffer, f)
     }
 }
 

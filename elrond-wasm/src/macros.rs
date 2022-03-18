@@ -114,7 +114,7 @@ macro_rules! sc_panic {
 /// }
 ///
 /// fn only_accept_negative(&self, x: i32) {
-///     require!(x < 0, "only negative values accepted, {:x} is not negative", x);
+///     require!(x < 0, "only negative values accepted, {} is not negative", x);
 /// }
 ///
 /// fn only_accept_zero(&self, x: i32, message: &ManagedBuffer<Self::Api>) {

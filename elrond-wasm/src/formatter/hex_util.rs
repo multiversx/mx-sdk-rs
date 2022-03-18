@@ -5,7 +5,6 @@ use crate::{
     types::{ManagedBuffer, ManagedBufferCachedBuilder},
 };
 
-const HEX_VALUE_PREFIX: &[u8] = b"0x";
 const STATIC_BUFFER_LEN: usize = 10;
 
 fn half_byte_to_hex_digit(num: u8) -> u8 {
@@ -16,18 +15,18 @@ fn half_byte_to_hex_digit(num: u8) -> u8 {
     }
 }
 
-pub fn byte_to_hex_digits(byte: u8) -> (u8, u8) {
+pub fn byte_to_hex_digits(byte: u8) -> [u8; 2] {
     let digit1 = half_byte_to_hex_digit(byte >> 4);
     let digit2 = half_byte_to_hex_digit(byte & 0x0f);
-    (digit1, digit2)
+    [digit1, digit2]
 }
 
 pub fn encode_bytes_as_hex(input: &[u8]) -> String {
     let mut result = String::new();
     for &byte in input {
-        let (first_byte, second_byte) = byte_to_hex_digits(byte);
-        result.push(first_byte as char);
-        result.push(second_byte as char);
+        let bytes = byte_to_hex_digits(byte);
+        result.push(bytes[0] as char);
+        result.push(bytes[1] as char);
     }
     result
 }
@@ -64,8 +63,6 @@ pub fn add_arg_as_hex_to_buffer<M: ManagedTypeApi>(
     buffer: &mut ManagedBufferCachedBuilder<M>,
     arg: &ManagedBuffer<M>,
 ) {
-    buffer.append_bytes(HEX_VALUE_PREFIX);
-
     let arg_len = arg.len();
     if arg_len == 0 {
         return;
@@ -83,9 +80,9 @@ pub fn add_arg_as_hex_to_buffer<M: ManagedTypeApi>(
         let _ = arg.load_slice(current_arg_index, slice);
 
         for i in 0..bytes_to_load {
-            let (hex1, hex2) = byte_to_hex_digits(slice[i]);
-            hex_bytes_buffer[i * 2] = hex1;
-            hex_bytes_buffer[i * 2 + 1] = hex2;
+            let digits = byte_to_hex_digits(slice[i]);
+            hex_bytes_buffer[i * 2] = digits[0];
+            hex_bytes_buffer[i * 2 + 1] = digits[1];
         }
 
         let hex_slice = &hex_bytes_buffer[0..(bytes_to_load * 2)];

@@ -2,9 +2,8 @@ use elrond_codec::{EncodeError, EncodeErrorHandler, NestedEncodeOutput, TryStati
 
 use crate::{
     api::ManagedTypeApi,
-    contract_base::ManagedSerializer,
-    formatter::FormatReceiver,
-    types::{BigInt, BigUint, ManagedBuffer, StaticBufferRef},
+    formatter::{FormatBuffer, FormatByteReceiver, SCDisplay, SCLowerHex},
+    types::{BigInt, BigUint, ManagedBuffer, ManagedType, StaticBufferRef},
 };
 
 pub struct ManagedBufferCachedBuilder<M>
@@ -37,7 +36,22 @@ where
             }
         }
     }
+}
 
+impl<M> Default for ManagedBufferCachedBuilder<M>
+where
+    M: ManagedTypeApi,
+{
+    #[inline]
+    fn default() -> Self {
+        Self::new_from_slice(&[])
+    }
+}
+
+impl<M> ManagedBufferCachedBuilder<M>
+where
+    M: ManagedTypeApi,
+{
     pub fn into_managed_buffer(mut self) -> ManagedBuffer<M> {
         self.flush_to_managed_buffer();
         self.managed_buffer
@@ -112,40 +126,39 @@ impl<M: ManagedTypeApi> NestedEncodeOutput for ManagedBufferCachedBuilder<M> {
     }
 }
 
-impl<M> FormatReceiver for ManagedBufferCachedBuilder<M>
+impl<M> FormatByteReceiver for ManagedBufferCachedBuilder<M>
 where
     M: ManagedTypeApi,
 {
-    fn push_static_ascii(&mut self, arg: &'static [u8]) {
-        self.append_bytes(arg);
+    fn append_bytes(&mut self, bytes: &[u8]) {
+        self.append_bytes(bytes)
     }
 
-    fn push_bytes(&mut self, item: &mut ManagedFormatter<M>) {
-        let mb = ManagedSerializer::<M>::new().top_encode_to_managed_buffer(item); // std::fmt::Formatter custom type that builds a ManagedBuffer
-        self.append_managed_buffer(&mb);
+    fn append_managed_buffer<A: ManagedTypeApi>(&mut self, item: &ManagedBuffer<A>) {
+        self.append_managed_buffer(&ManagedBuffer::from_raw_handle(item.get_raw_handle()))
     }
 
-    fn push_lower_hex(&mut self, item: &mut ManagedFormatter<M>) {
-        let mb = ManagedSerializer::<M>::new().top_encode_to_managed_buffer(item); // lower hex
-        crate::hex_util::add_arg_as_hex_to_buffer(self, &mb);
+    fn append_managed_buffer_lower_hex<A: ManagedTypeApi>(&mut self, item: &ManagedBuffer<A>) {
+        crate::formatter::hex_util::add_arg_as_hex_to_buffer(
+            self,
+            &ManagedBuffer::from_raw_handle(item.get_raw_handle()),
+        );
     }
 }
 
-pub struct ManagedFormatter<M: ManagedTypeApi>(ManagedBuffer<M>);
-
-impl<M> ManagedFormatter<M>
+impl<M> FormatBuffer for ManagedBufferCachedBuilder<M>
 where
     M: ManagedTypeApi,
 {
-    fn new() -> Self {
-        Self(ManagedBuffer::new())
+    fn append_ascii(&mut self, ascii: &[u8]) {
+        self.append_bytes(ascii)
     }
 
-    fn append_bytes(&mut self, bytes: &[u8]) {
-        self.0.append_bytes(bytes);
+    fn append_display<T: SCDisplay>(&mut self, item: &T) {
+        item.fmt(self);
     }
 
-    fn into_buffer(self) -> ManagedBuffer<M> {
-        self.0
+    fn append_lower_hex<T: SCLowerHex>(&mut self, item: &T) {
+        item.fmt(self);
     }
 }

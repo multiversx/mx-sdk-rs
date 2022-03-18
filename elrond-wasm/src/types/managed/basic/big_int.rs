@@ -2,7 +2,7 @@ use core::marker::PhantomData;
 
 use crate::{
     api::{BigIntApi, Handle, ManagedTypeApi, ManagedTypeApiImpl},
-    hex_util::encode_bytes_as_hex,
+    formatter::hex_util::encode_bytes_as_hex,
     types::{BigUint, BoxedBytes, ManagedBuffer, ManagedType, Sign},
 };
 use alloc::string::String;

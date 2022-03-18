@@ -1,3 +1,5 @@
+use crate::formatter::FormatBuffer;
+
 use super::{Handle, ManagedTypeApi};
 
 pub trait PrintApi: ManagedTypeApi {
@@ -7,7 +9,8 @@ pub trait PrintApi: ManagedTypeApi {
 }
 
 pub trait PrintApiImpl {
-    type Buffer;
+    /// Buffer used for printing only.
+    type PrintFormatBuffer: FormatBuffer;
 
     #[inline]
     fn print_biguint(&self, _bu_handle: Handle) {}
@@ -15,7 +18,5 @@ pub trait PrintApiImpl {
     #[inline]
     fn print_managed_buffer(&self, _mb_handle: Handle) {}
 
-    fn new_buffer() -> Self::Buffer;
-
-    fn print_buffer(buffer: Self::Buffer);
+    fn print_buffer(&self, _buffer: Self::PrintFormatBuffer) {}
 }
