@@ -2,9 +2,13 @@ use elrond_codec::{EncodeError, EncodeErrorHandler, NestedEncodeOutput, TryStati
 
 use crate::{
     api::ManagedTypeApi,
-    formatter::{FormatBuffer, FormatByteReceiver, SCDisplay, SCLowerHex},
+    formatter::{
+        hex_util::byte_to_hex_digits, FormatBuffer, FormatByteReceiver, SCDisplay, SCLowerHex,
+    },
     types::{BigInt, BigUint, ManagedBuffer, ManagedType, StaticBufferRef},
 };
+
+const HEX_CONVERSION_BUFFER_LEN: usize = 32;
 
 pub struct ManagedBufferCachedBuilder<M>
 where
@@ -93,6 +97,39 @@ where
         }
         let _ = core::mem::replace(&mut self.static_cache, static_cache_mut);
     }
+
+    /// Converts the input to hex and adds it to the current buffer.
+    ///
+    /// TODO: hex conversion should be part of the VM.
+    pub fn append_managed_buffer_hex(&mut self, item: &ManagedBuffer<M>) {
+        let arg_len = item.len();
+        if arg_len == 0 {
+            return;
+        }
+
+        let mut static_buffer = [0u8; HEX_CONVERSION_BUFFER_LEN];
+        let mut hex_bytes_buffer = [0u8; HEX_CONVERSION_BUFFER_LEN * 2];
+
+        let mut current_arg_index = 0;
+        while current_arg_index < arg_len {
+            let bytes_remaining = arg_len - current_arg_index;
+            let bytes_to_load = core::cmp::min(bytes_remaining, HEX_CONVERSION_BUFFER_LEN);
+
+            let slice = &mut static_buffer[0..bytes_to_load];
+            let _ = item.load_slice(current_arg_index, slice);
+
+            for i in 0..bytes_to_load {
+                let digits = byte_to_hex_digits(slice[i]);
+                hex_bytes_buffer[i * 2] = digits[0];
+                hex_bytes_buffer[i * 2 + 1] = digits[1];
+            }
+
+            let hex_slice = &hex_bytes_buffer[0..(bytes_to_load * 2)];
+            self.append_bytes(hex_slice);
+
+            current_arg_index += HEX_CONVERSION_BUFFER_LEN;
+        }
+    }
 }
 
 impl<M: ManagedTypeApi> NestedEncodeOutput for ManagedBufferCachedBuilder<M> {
@@ -139,10 +176,7 @@ where
     }
 
     fn append_managed_buffer_lower_hex<A: ManagedTypeApi>(&mut self, item: &ManagedBuffer<A>) {
-        crate::formatter::hex_util::add_arg_as_hex_to_buffer(
-            self,
-            &ManagedBuffer::from_raw_handle(item.get_raw_handle()),
-        );
+        self.append_managed_buffer_hex(&ManagedBuffer::from_raw_handle(item.get_raw_handle()))
     }
 }
 
