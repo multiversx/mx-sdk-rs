@@ -9,5 +9,11 @@ fn test_print() {
 
     fmf.print_message(5);
 
-    // TODO: also test print output
+    let printed = DebugApi::new_from_static().printed_messages();
+    assert_eq!(printed, vec!["Printing x: 5"]);
+
+    fmf.print_message(7);
+
+    let printed = DebugApi::new_from_static().printed_messages();
+    assert_eq!(printed, vec!["Printing x: 5", "Printing x: 7"]);
 }

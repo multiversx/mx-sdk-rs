@@ -1,6 +1,6 @@
 use crate::{BigUintPrinter, DebugApi};
 use elrond_wasm::{
-    api::{Handle, ManagedBufferApi, PrintApi, PrintApiImpl},
+    api::{Handle, PrintApi, PrintApiImpl},
     types::{BigUint, ManagedBufferCachedBuilder, ManagedType},
 };
 
@@ -24,13 +24,10 @@ impl PrintApiImpl for DebugApi {
         );
     }
 
-    fn print_managed_buffer(&self, mb_handle: Handle) {
-        let bytes = self.mb_to_boxed_bytes(mb_handle);
-        let s = String::from_utf8_lossy(bytes.as_slice());
-        println!("{:?}", s);
-    }
-
     fn print_buffer(&self, buffer: Self::PrintFormatBuffer) {
-        self.print_managed_buffer(buffer.into_managed_buffer().get_raw_handle())
+        let bytes = buffer.into_managed_buffer().to_boxed_bytes();
+        let s = String::from_utf8_lossy(bytes.as_slice());
+        println!("{:?}", &s);
+        self.printed_messages.borrow_mut().push(s.into_owned());
     }
 }
