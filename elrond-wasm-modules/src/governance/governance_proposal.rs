@@ -1,8 +1,7 @@
 use elrond_wasm::{
     api::ManagedTypeApi,
     elrond_codec::multi_types::MultiValue7,
-    types::{BigUint, BoxedBytes, ManagedAddress, ManagedBuffer, TokenIdentifier},
-    Vec,
+    types::{BigUint, BoxedBytes, ManagedAddress, ManagedBuffer, TokenIdentifier, Vec},
 };
 
 elrond_wasm::derive_imports!();

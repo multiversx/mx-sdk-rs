@@ -9,7 +9,7 @@ use crate::{
     abi::{TypeAbi, TypeName},
     api::StorageMapperApi,
     storage::{storage_get, storage_get_len, storage_set, StorageKey},
-    types::{ManagedAddress, ManagedType, ManagedVec, MultiResultVec},
+    types::{ManagedAddress, ManagedType, ManagedVec, MultiValueEncoded},
 };
 
 const ADDRESS_TO_ID_SUFFIX: &[u8] = b"_address_to_id";
@@ -181,7 +181,7 @@ impl<SA> TopEncodeMulti for UserMapper<SA>
 where
     SA: StorageMapperApi,
 {
-    type DecodeAs = MultiResultVec<ManagedAddress<SA>>;
+    type DecodeAs = MultiValueEncoded<SA, ManagedAddress<SA>>;
 
     fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
     where
@@ -199,7 +199,7 @@ where
     SA: StorageMapperApi,
 {
     fn type_name() -> TypeName {
-        crate::types::MultiResultVec::<ManagedAddress<SA>>::type_name()
+        crate::abi::type_name_variadic::<ManagedAddress<SA>>()
     }
 
     fn is_variadic() -> bool {

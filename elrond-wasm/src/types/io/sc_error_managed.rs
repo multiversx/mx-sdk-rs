@@ -3,7 +3,7 @@ use elrond_codec::{EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput, Try
 
 use crate::{
     api::{EndpointFinishApi, ErrorApi, ErrorApiImpl, ManagedTypeApi},
-    types::{BoxedBytes, ManagedBuffer, ManagedType},
+    types::{heap::BoxedBytes, ManagedBuffer, ManagedType},
 };
 
 use super::SCError;

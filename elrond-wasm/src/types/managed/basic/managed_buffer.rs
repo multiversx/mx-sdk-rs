@@ -1,16 +1,16 @@
 use core::marker::PhantomData;
 
 use crate::{
+    abi::TypeName,
     api::{ErrorApiImpl, Handle, InvalidSliceError, ManagedBufferApi, ManagedTypeApi},
     formatter::{
         hex_util::encode_bytes_as_hex, FormatByteReceiver, SCDisplay, SCLowerHex, HEX_VALUE_PREFIX,
     },
-    types::{BoxedBytes, ManagedType},
+    types::{heap::BoxedBytes, ManagedType},
 };
-use alloc::string::String;
 use elrond_codec::{
     DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode,
-    NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, TryStaticCast, Vec,
+    NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, TryStaticCast,
 };
 
 /// A byte buffer managed by an external API.
@@ -90,12 +90,12 @@ where
     }
 }
 
-impl<M> From<Vec<u8>> for ManagedBuffer<M>
+impl<M> From<crate::types::heap::Vec<u8>> for ManagedBuffer<M>
 where
     M: ManagedTypeApi,
 {
     #[inline]
-    fn from(bytes: Vec<u8>) -> Self {
+    fn from(bytes: crate::types::heap::Vec<u8>) -> Self {
         Self::new_from_bytes(bytes.as_slice())
     }
 }
@@ -371,7 +371,7 @@ impl<M: ManagedTypeApi> NestedDecode for ManagedBuffer<M> {
 }
 
 impl<M: ManagedTypeApi> crate::abi::TypeAbi for ManagedBuffer<M> {
-    fn type_name() -> String {
+    fn type_name() -> TypeName {
         "bytes".into()
     }
 }

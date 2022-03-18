@@ -1,4 +1,4 @@
-use elrond_wasm::types::Address;
+use elrond_wasm::types::heap::Address;
 
 use crate::{
     tx_mock::{BlockchainUpdate, TxCache, TxContext, TxInput, TxResult},

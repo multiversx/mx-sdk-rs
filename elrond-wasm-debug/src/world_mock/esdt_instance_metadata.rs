@@ -1,4 +1,4 @@
-use elrond_wasm::types::Address;
+use elrond_wasm::types::heap::Address;
 
 /// Holds the data for a Elrond standard digital token transaction
 #[derive(Clone, Default, Debug)]

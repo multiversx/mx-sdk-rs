@@ -298,8 +298,11 @@ mod sample_adder {
             EndpointWrappers::call(self, fn_name)
         }
 
-        fn clone_obj(&self) -> elrond_wasm::Box<dyn elrond_wasm::contract_base::CallableContract> {
-            elrond_wasm::Box::new(ContractObj::<A> {
+        fn clone_obj(
+            &self,
+        ) -> elrond_wasm::types::heap::Box<dyn elrond_wasm::contract_base::CallableContract>
+        {
+            elrond_wasm::types::heap::Box::new(ContractObj::<A> {
                 _phantom: core::marker::PhantomData,
             })
         }
@@ -310,8 +313,9 @@ mod sample_adder {
     impl elrond_wasm::contract_base::CallableContractBuilder for ContractBuilder {
         fn new_contract_obj<A: elrond_wasm::api::VMApi>(
             &self,
-        ) -> elrond_wasm::Box<dyn elrond_wasm::contract_base::CallableContract> {
-            elrond_wasm::Box::new(ContractObj::<A> {
+        ) -> elrond_wasm::types::heap::Box<dyn elrond_wasm::contract_base::CallableContract>
+        {
+            elrond_wasm::types::heap::Box::new(ContractObj::<A> {
                 _phantom: core::marker::PhantomData,
             })
         }

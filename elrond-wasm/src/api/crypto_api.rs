@@ -1,4 +1,4 @@
-use crate::types::{BoxedBytes, MessageHashType};
+use crate::types::{heap::BoxedBytes, MessageHashType};
 
 use super::{ManagedTypeApi, ManagedTypeApiImpl};
 
