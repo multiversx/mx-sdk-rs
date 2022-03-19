@@ -23,6 +23,7 @@ pub struct TxContext {
     pub static_vars_cell: RefCell<TxStaticVars>,
     pub tx_result_cell: RefCell<TxResult>,
     pub b_rng: RefCell<BlockchainRng>,
+    pub printed_messages: RefCell<Vec<String>>,
 }
 
 impl TxContext {
@@ -36,6 +37,7 @@ impl TxContext {
             static_vars_cell: RefCell::new(TxStaticVars::default()),
             tx_result_cell: RefCell::new(TxResult::empty()),
             b_rng,
+            printed_messages: RefCell::new(Vec::new()),
         }
     }
 
@@ -74,6 +76,7 @@ impl TxContext {
             static_vars_cell: RefCell::new(TxStaticVars::default()),
             tx_result_cell: RefCell::new(TxResult::empty()),
             b_rng,
+            printed_messages: RefCell::new(Vec::new()),
         }
     }
 

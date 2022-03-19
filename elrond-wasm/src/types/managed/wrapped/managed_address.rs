@@ -3,7 +3,7 @@ use core::convert::{TryFrom, TryInto};
 use crate::{
     abi::{TypeAbi, TypeName},
     api::{Handle, ManagedTypeApi},
-    hex_util::encode_bytes_as_hex,
+    formatter::{hex_util::encode_bytes_as_hex, FormatByteReceiver, SCLowerHex},
     types::{heap::Address, ManagedBuffer, ManagedByteArray, ManagedType},
 };
 use elrond_codec::{
@@ -230,6 +230,12 @@ where
     /// `"Address"` instead of `"array32<u8>"`.
     fn type_name() -> TypeName {
         Address::type_name()
+    }
+}
+
+impl<M: ManagedTypeApi> SCLowerHex for ManagedAddress<M> {
+    fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
+        SCLowerHex::fmt(&self.bytes, f)
     }
 }
 

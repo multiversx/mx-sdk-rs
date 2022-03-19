@@ -3,7 +3,7 @@ use core::marker::PhantomData;
 use crate::{
     abi::TypeName,
     api::{BigIntApi, Handle, ManagedBufferApi, ManagedTypeApi, ManagedTypeApiImpl},
-    hex_util::encode_bytes_as_hex,
+    formatter::{hex_util::encode_bytes_as_hex, FormatByteReceiver, SCDisplay},
     types::{heap::BoxedBytes, ManagedBuffer, ManagedType},
 };
 use elrond_codec::{
@@ -228,6 +228,33 @@ impl<M: ManagedTypeApi> TopDecode for BigUint<M> {
 impl<M: ManagedTypeApi> crate::abi::TypeAbi for BigUint<M> {
     fn type_name() -> TypeName {
         TypeName::from("BigUint")
+    }
+}
+
+// TODO: should become part of the VM
+fn format_big_uint_rec<M, F>(mut num: BigUint<M>, base: &BigUint<M>, f: &mut F)
+where
+    M: ManagedTypeApi,
+    F: FormatByteReceiver,
+{
+    if num > 0 {
+        let last_digit: BigUint<M> = &num % base;
+        if let Some(last_digit_u64) = last_digit.to_u64() {
+            num /= base;
+            format_big_uint_rec(num, base, f);
+            let ascii_last_digit = b'0' + last_digit_u64 as u8;
+            f.append_bytes(&[ascii_last_digit][..]);
+        }
+    }
+}
+
+impl<M: ManagedTypeApi> SCDisplay for BigUint<M> {
+    fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
+        if self == &0 {
+            f.append_bytes(&b"0"[..]);
+        } else {
+            format_big_uint_rec(self.clone(), &10u64.into(), f);
+        }
     }
 }
 
