@@ -1,8 +1,7 @@
-use crate::abi::TypeAbi;
+use crate::abi::{TypeAbi, TypeName};
 use alloc::{
     alloc::{alloc, alloc_zeroed, realloc, Layout},
     boxed::Box,
-    string::String,
     vec::Vec,
 };
 use elrond_codec::*;
@@ -240,7 +239,7 @@ impl TopDecode for BoxedBytes {
 }
 
 impl TypeAbi for BoxedBytes {
-    fn type_name() -> String {
+    fn type_name() -> TypeName {
         "bytes".into()
     }
 }

@@ -1,6 +1,6 @@
 use crate::{
     api::{Handle, LogApi, LogApiImpl},
-    types::ArgBuffer,
+    types::heap::ArgBuffer,
 };
 
 use super::UncallableApi;

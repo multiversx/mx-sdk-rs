@@ -1,11 +1,10 @@
-use alloc::string::String;
 use elrond_codec::{
     multi_types::MultiValue3, DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti,
     TopDecodeMultiInput, TopEncodeMulti, TopEncodeMultiOutput,
 };
 
 use crate::{
-    abi::TypeAbi,
+    abi::{TypeAbi, TypeName},
     api::ManagedTypeApi,
     types::{BigUint, EsdtTokenPayment, ManagedVecItem, TokenIdentifier},
 };
@@ -98,7 +97,7 @@ impl<M> TypeAbi for EsdtTokenPaymentMultiValue<M>
 where
     M: ManagedTypeApi,
 {
-    fn type_name() -> String {
+    fn type_name() -> TypeName {
         MultiValue3::<TokenIdentifier<M>, u64, BigUint<M>>::type_name()
     }
 

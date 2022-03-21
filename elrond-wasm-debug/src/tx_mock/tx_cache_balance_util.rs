@@ -1,4 +1,4 @@
-use elrond_wasm::types::Address;
+use elrond_wasm::types::heap::Address;
 use num_bigint::BigUint;
 
 use crate::{tx_mock::TxPanic, world_mock::EsdtInstanceMetadata};

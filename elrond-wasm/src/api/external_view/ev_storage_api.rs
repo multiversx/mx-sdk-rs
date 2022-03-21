@@ -4,7 +4,7 @@ use crate::api::{
 };
 
 use super::ExternalViewApi;
-use alloc::vec::Vec;
+use alloc::boxed::Box;
 
 pub const EXTERNAL_VIEW_TARGET_ADRESS_KEY: &[u8] = b"external-view-target-address";
 
@@ -33,12 +33,12 @@ impl<A: VMApi> StorageReadApiImpl for ExternalViewApi<A> {
         self.storage_load_managed_buffer_len(key_handle)
     }
 
-    fn storage_load_vec_u8(&self, key: &[u8]) -> Vec<u8> {
+    fn storage_load_to_heap(&self, key: &[u8]) -> Box<[u8]> {
         let key_handle = A::managed_type_impl().mb_new_from_bytes(key);
         let value_handle = self.storage_load_managed_buffer_raw(key_handle);
         A::managed_type_impl()
             .mb_to_boxed_bytes(value_handle)
-            .into_vec()
+            .into_box()
     }
 
     fn storage_load_big_uint_raw(&self, key: &[u8]) -> Handle {

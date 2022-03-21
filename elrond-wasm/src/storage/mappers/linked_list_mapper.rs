@@ -5,7 +5,7 @@ use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
     api::StorageMapperApi,
     storage::{storage_get, storage_set, StorageKey},
-    types::{BoxedBytes, ManagedType, MultiResultVec},
+    types::{heap::BoxedBytes, ManagedType, MultiValueEncoded},
 };
 use alloc::vec::Vec;
 use elrond_codec::{
@@ -549,7 +549,7 @@ where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone,
 {
-    type DecodeAs = MultiResultVec<T>;
+    type DecodeAs = MultiValueEncoded<SA, T>;
 
     fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
     where
@@ -569,7 +569,7 @@ where
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + TypeAbi,
 {
     fn type_name() -> TypeName {
-        crate::types::MultiResultVec::<T>::type_name()
+        crate::abi::type_name_variadic::<T>()
     }
 
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {

@@ -1,12 +1,11 @@
 use core::convert::{TryFrom, TryInto};
 
 use crate::{
-    abi::TypeAbi,
+    abi::{TypeAbi, TypeName},
     api::{Handle, ManagedTypeApi},
-    hex_util::encode_bytes_as_hex,
-    types::{Address, ManagedBuffer, ManagedByteArray, ManagedType},
+    formatter::{hex_util::encode_bytes_as_hex, FormatByteReceiver, SCLowerHex},
+    types::{heap::Address, ManagedBuffer, ManagedByteArray, ManagedType},
 };
-use alloc::string::String;
 use elrond_codec::{
     DecodeError, DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput,
     NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
@@ -229,8 +228,14 @@ where
     M: ManagedTypeApi,
 {
     /// `"Address"` instead of `"array32<u8>"`.
-    fn type_name() -> String {
+    fn type_name() -> TypeName {
         Address::type_name()
+    }
+}
+
+impl<M: ManagedTypeApi> SCLowerHex for ManagedAddress<M> {
+    fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
+        SCLowerHex::fmt(&self.bytes, f)
     }
 }
 

@@ -30,7 +30,6 @@ macro_rules! imports {
                 SCResult::{Err, Ok},
                 *,
             },
-            Box, Vec,
         };
     };
 }
@@ -114,7 +113,7 @@ macro_rules! sc_panic {
 /// }
 ///
 /// fn only_accept_negative(&self, x: i32) {
-///     require!(x < 0, "only negative values accepted, {:x} is not negative", x);
+///     require!(x < 0, "only negative values accepted, {} is not negative", x);
 /// }
 ///
 /// fn only_accept_zero(&self, x: i32, message: &ManagedBuffer<Self::Api>) {
@@ -135,9 +134,12 @@ macro_rules! require {
 macro_rules! sc_print {
     ($msg:tt, $($arg:expr),* $(,)?) => {{
         let mut ___buffer___ =
-            elrond_wasm::types::ManagedBufferCachedBuilder::<Self::Api>::new_from_slice(&[]);
+            <<Self::Api as elrond_wasm::api::PrintApi>::PrintApiImpl as elrond_wasm::api::PrintApiImpl>::Buffer::default();
         elrond_wasm::derive::format_receiver_args!(___buffer___, $msg, $($arg),*);
-        <Self::Api as elrond_wasm::api::PrintApi>::print_api_impl().print_managed_buffer(___buffer___.into_managed_buffer().get_raw_handle());
+        <<Self::Api as elrond_wasm::api::PrintApi>::PrintApiImpl as elrond_wasm::api::PrintApiImpl>::print_buffer(
+            &<Self::Api as elrond_wasm::api::PrintApi>::print_api_impl(),
+            ___buffer___,
+        );
     }};
 }
 

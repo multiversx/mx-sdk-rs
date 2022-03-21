@@ -2,7 +2,7 @@ use crate::DebugApi;
 use ed25519_dalek::*;
 use elrond_wasm::{
     api::{CryptoApi, CryptoApiImpl, KECCAK256_RESULT_LEN, RIPEMD_RESULT_LEN, SHA256_RESULT_LEN},
-    types::{BoxedBytes, MessageHashType},
+    types::{heap::BoxedBytes, MessageHashType},
 };
 use sha2::Sha256;
 use sha3::{Digest, Keccak256};

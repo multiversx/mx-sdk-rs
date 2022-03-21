@@ -1,13 +1,10 @@
-use crate::abi::{OutputAbi, TypeAbi, TypeDescriptionContainer};
-use alloc::{string::String, vec::Vec};
-use elrond_codec::multi_types::{IgnoreValue, MultiValueVec, OptionalValue};
+use crate::abi::{OutputAbis, TypeAbi, TypeDescriptionContainer, TypeName};
+use elrond_codec::multi_types::{IgnoreValue, OptionalValue};
 
-impl<T: TypeAbi> TypeAbi for MultiValueVec<T> {
-    fn type_name() -> String {
-        let mut repr = String::from("variadic<");
-        repr.push_str(T::type_name().as_str());
-        repr.push('>');
-        repr
+#[cfg(feature = "alloc")]
+impl<T: TypeAbi> TypeAbi for elrond_codec::multi_types::MultiValueVec<T> {
+    fn type_name() -> TypeName {
+        super::type_name_variadic::<T>()
     }
 
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
@@ -20,8 +17,8 @@ impl<T: TypeAbi> TypeAbi for MultiValueVec<T> {
 }
 
 impl TypeAbi for IgnoreValue {
-    fn type_name() -> String {
-        String::from("ignore")
+    fn type_name() -> TypeName {
+        TypeName::from("ignore")
     }
 
     fn is_variadic() -> bool {
@@ -30,11 +27,8 @@ impl TypeAbi for IgnoreValue {
 }
 
 impl<T: TypeAbi> TypeAbi for OptionalValue<T> {
-    fn type_name() -> String {
-        let mut repr = String::from("optional<");
-        repr.push_str(T::type_name().as_str());
-        repr.push('>');
-        repr
+    fn type_name() -> TypeName {
+        super::type_name_optional::<T>()
     }
 
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
@@ -53,8 +47,8 @@ macro_rules! multi_arg_impls {
             where
                 $($name: TypeAbi,)+
             {
-                fn type_name() -> String {
-                    let mut repr = String::from("multi");
+                fn type_name() -> TypeName {
+                    let mut repr = TypeName::from("multi");
                     repr.push('<');
                     $(
                         if $n > 0 {
@@ -76,8 +70,8 @@ macro_rules! multi_arg_impls {
                     true
                 }
 
-                fn output_abis(output_names: &[&'static str]) -> Vec<OutputAbi> {
-                    let mut result = Vec::new();
+                fn output_abis(output_names: &[&'static str]) -> OutputAbis {
+                    let mut result = OutputAbis::new();
                     $(
                         if output_names.len() > $n {
                             result.append(&mut $name::output_abis(&[output_names[$n]]));

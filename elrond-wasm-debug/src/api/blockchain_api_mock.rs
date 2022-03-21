@@ -5,8 +5,9 @@ use crate::{
 use elrond_wasm::{
     api::{BlockchainApi, BlockchainApiImpl, Handle, ManagedBufferApi, ManagedTypeApi},
     types::{
-        Address, BigUint, EsdtLocalRole, EsdtLocalRoleFlags, EsdtTokenData, EsdtTokenType,
-        ManagedAddress, ManagedBuffer, ManagedType, ManagedVec, TokenIdentifier, H256,
+        heap::{Address, H256},
+        BigUint, EsdtLocalRole, EsdtLocalRoleFlags, EsdtTokenData, EsdtTokenType, ManagedAddress,
+        ManagedBuffer, ManagedType, ManagedVec, TokenIdentifier,
     },
 };
 
