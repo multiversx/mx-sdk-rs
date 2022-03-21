@@ -1,5 +1,7 @@
-use crate::api::{endpoint_arg_api::EndpointArgumentApiImpl, EndpointArgumentApi, Handle};
-use alloc::vec::Vec;
+use crate::{
+    api::{endpoint_arg_api::EndpointArgumentApiImpl, EndpointArgumentApi, Handle},
+    types::heap::BoxedBytes,
+};
 
 use super::UncallableApi;
 
@@ -24,7 +26,7 @@ impl EndpointArgumentApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn get_argument_vec_u8(&self, _arg_index: i32) -> Vec<u8> {
+    fn get_argument_boxed_bytes(&self, _arg_index: i32) -> BoxedBytes {
         unreachable!()
     }
 

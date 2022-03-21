@@ -1,5 +1,5 @@
 use alloc::vec::Vec;
-use elrond_wasm::types::Address;
+use elrond_wasm::types::heap::Address;
 use num_bigint::BigUint;
 use std::{collections::HashMap, fmt, fmt::Write};
 

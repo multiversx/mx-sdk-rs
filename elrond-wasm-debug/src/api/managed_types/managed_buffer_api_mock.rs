@@ -1,6 +1,6 @@
 use elrond_wasm::{
     api::{Handle, InvalidSliceError, ManagedBufferApi},
-    types::BoxedBytes,
+    types::heap::BoxedBytes,
 };
 
 use crate::DebugApi;

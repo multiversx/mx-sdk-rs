@@ -7,7 +7,7 @@ use elrond_codec::{
 use crate::{
     api::{ErrorApi, ErrorApiImpl, ManagedTypeApi},
     err_msg,
-    types::{BoxedBytes, ManagedBuffer, ManagedType},
+    types::{heap::BoxedBytes, ManagedBuffer, ManagedType},
 };
 
 #[derive(Default)]

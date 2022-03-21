@@ -3,7 +3,7 @@ use core::marker::PhantomData;
 use crate::{
     api::{BlockchainApi, ManagedTypeApi, StorageReadApi, StorageWriteApi},
     storage_clear, storage_get, storage_get_len,
-    types::{BoxedBytes, ManagedBuffer, ManagedType},
+    types::{heap::BoxedBytes, ManagedBuffer, ManagedType},
     BytesArgLoader,
 };
 use alloc::vec::Vec;

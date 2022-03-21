@@ -1,6 +1,6 @@
 [package]
 name = "elrond-codec"
-version = "0.9.0"
+version = "0.10.0"
 edition = "2018"
 
 authors = ["Andrei Marinica <andrei.marinica@elrond.com>", "Elrond Network <contact@elrond.com>"]
@@ -15,10 +15,11 @@ categories = ["no-std", "wasm", "cryptography::cryptocurrencies", "development-t
 
 [features]
 derive = ["elrond-codec-derive"]
+alloc = []
 
 [dependencies.elrond-codec-derive]
 path = "../elrond-codec-derive"
-version = "=0.9.0"
+version = "=0.10.0"
 optional = true
 
 [dependencies]
@@ -27,4 +28,4 @@ arrayvec = { version = "0.7.1", default-features = false }
 
 [dev-dependencies.elrond-codec-derive]
 path = "../elrond-codec-derive"
-version = "=0.9.0"
+version = "=0.10.0"

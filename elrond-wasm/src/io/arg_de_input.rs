@@ -2,8 +2,9 @@ use core::marker::PhantomData;
 
 use crate::{
     api::{EndpointArgumentApi, EndpointArgumentApiImpl, ManagedTypeApi},
-    types::{BigInt, BigUint, ManagedBuffer, ManagedBufferNestedDecodeInput, ManagedType},
-    Box,
+    types::{
+        heap::Box, BigInt, BigUint, ManagedBuffer, ManagedBufferNestedDecodeInput, ManagedType,
+    },
 };
 use elrond_codec::{
     try_execute_then_cast, DecodeError, DecodeErrorHandler, TopDecodeInput, TryStaticCast,

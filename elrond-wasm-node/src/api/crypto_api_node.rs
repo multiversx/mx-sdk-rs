@@ -1,7 +1,7 @@
 use super::VmApiImpl;
 use elrond_wasm::{
     api::{CryptoApi, CryptoApiImpl},
-    types::{BoxedBytes, MessageHashType},
+    types::{heap::BoxedBytes, MessageHashType},
 };
 
 extern "C" {

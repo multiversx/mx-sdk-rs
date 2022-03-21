@@ -1,8 +1,7 @@
 use crate::only_nested::*;
 use elrond_wasm::{
     api::ManagedTypeApi,
-    types::{BigUint, ManagedBuffer},
-    Box,
+    types::{BigUint, Box, ManagedBuffer},
 };
 elrond_wasm::derive_imports!();
 

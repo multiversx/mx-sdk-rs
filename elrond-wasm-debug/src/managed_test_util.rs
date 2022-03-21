@@ -1,7 +1,7 @@
 use elrond_wasm::{
     contract_base::ManagedSerializer,
     elrond_codec::{test_util::check_top_encode, TopDecode, TopEncode},
-    types::{BoxedBytes, ManagedBuffer},
+    types::{heap::BoxedBytes, ManagedBuffer},
 };
 
 use core::fmt::Debug;

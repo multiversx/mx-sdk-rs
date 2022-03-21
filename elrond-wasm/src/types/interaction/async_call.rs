@@ -1,11 +1,9 @@
 use core::marker::PhantomData;
 
 use crate::{
-    abi::{OutputAbi, TypeAbi, TypeDescriptionContainer},
     api::{CallTypeApi, SendApiImpl, StorageWriteApi},
     types::{BigUint, CallbackClosure, ManagedAddress, ManagedArgBuffer, ManagedBuffer},
 };
-use alloc::{string::String, vec::Vec};
 
 #[must_use]
 pub struct AsyncCall<SA>
@@ -51,20 +49,4 @@ where
             &self.arg_buffer,
         )
     }
-}
-
-impl<SA> TypeAbi for AsyncCall<SA>
-where
-    SA: CallTypeApi + 'static,
-{
-    fn type_name() -> String {
-        "AsyncCall".into()
-    }
-
-    /// No ABI output.
-    fn output_abis(_: &[&'static str]) -> Vec<OutputAbi> {
-        Vec::new()
-    }
-
-    fn provide_type_descriptions<TDC: TypeDescriptionContainer>(_: &mut TDC) {}
 }

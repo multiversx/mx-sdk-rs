@@ -1,4 +1,3 @@
-mod arg_buffer;
 mod arg_buffer_managed;
 mod async_call;
 mod callback_closure;
@@ -7,7 +6,6 @@ mod callback_selector_result;
 mod contract_call;
 mod contract_deploy;
 
-pub use arg_buffer::ArgBuffer;
 pub use arg_buffer_managed::ManagedArgBuffer;
 pub use async_call::AsyncCall;
 pub use callback_closure::{new_callback_call, CallbackClosure, CallbackClosureMatcher};

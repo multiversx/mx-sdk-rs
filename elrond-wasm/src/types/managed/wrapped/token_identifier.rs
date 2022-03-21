@@ -1,9 +1,9 @@
 use crate::{
-    abi::TypeAbi,
+    abi::{TypeAbi, TypeName},
     api::{Handle, ManagedTypeApi, ManagedTypeApiImpl},
-    types::{BoxedBytes, ManagedBuffer, ManagedType},
+    formatter::{FormatByteReceiver, SCDisplay, SCLowerHex},
+    types::{heap::BoxedBytes, ManagedBuffer, ManagedType},
 };
-use alloc::string::String;
 use elrond_codec::*;
 
 /// Specialized type for handling token identifiers.
@@ -197,7 +197,29 @@ impl<M: ManagedTypeApi> TopDecode for TokenIdentifier<M> {
 }
 
 impl<M: ManagedTypeApi> TypeAbi for TokenIdentifier<M> {
-    fn type_name() -> String {
+    fn type_name() -> TypeName {
         "TokenIdentifier".into()
+    }
+}
+
+impl<M: ManagedTypeApi> SCDisplay for TokenIdentifier<M> {
+    fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
+        if self.is_egld() {
+            f.append_bytes(Self::EGLD_REPRESENTATION);
+        } else {
+            f.append_managed_buffer(&self.buffer);
+        }
+    }
+}
+
+const EGLD_REPRESENTATION_HEX: &[u8] = b"45474C44";
+
+impl<M: ManagedTypeApi> SCLowerHex for TokenIdentifier<M> {
+    fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
+        if self.is_egld() {
+            f.append_bytes(EGLD_REPRESENTATION_HEX);
+        } else {
+            f.append_managed_buffer_lower_hex(&self.buffer);
+        }
     }
 }

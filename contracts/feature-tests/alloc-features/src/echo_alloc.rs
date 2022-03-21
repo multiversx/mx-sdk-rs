@@ -3,7 +3,7 @@ elrond_wasm::imports!();
 use crate::types::*;
 
 // String is not part of the standard imports because we want to discourage its use
-use elrond_wasm::String;
+use elrond_wasm::types::String;
 
 /// Test serialization for heap-allocated types.
 #[elrond_wasm::module]
