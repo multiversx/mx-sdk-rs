@@ -50,7 +50,7 @@ export class AdderInteractor {
         let address = this.contract.getAddress();
 
         // Let's broadcast the transaction (and await for its execution), via the controller.
-        let { bundle: { returnCode } } = await this.controller.deploy(transaction)
+        let { bundle: { returnCode } } = await this.controller.deploy(transaction);
 
         console.log(`AdderInteractor.deploy(): contract = ${address}`);
         return { address, returnCode };

@@ -32,7 +32,7 @@ describe("lottery snippet", async function () {
         session.expectLongInteraction(this);
 
         let interactor = await ESDTInteractor.create(session);
-        let token = new Token({ name: "FOO", ticker: "FOO", decimals: 0, supply: "100000000", type: TokenType.Fungible })
+        let token = new Token({ name: "FOO", ticker: "FOO", decimals: 0, supply: "100000000", type: TokenType.Fungible });
         await session.syncUsers([owner]);
         await interactor.issueToken(owner, token);
         await session.saveToken("lotteryToken", token);

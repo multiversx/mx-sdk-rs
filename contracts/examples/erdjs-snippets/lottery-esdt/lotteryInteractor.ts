@@ -50,7 +50,7 @@ export class LotteryInteractor {
         let address = this.contract.getAddress();
 
         // Let's broadcast the transaction (and await for its execution), via the controller.
-        let { bundle: { returnCode } } = await this.controller.deploy(transaction)
+        let { bundle: { returnCode } } = await this.controller.deploy(transaction);
 
         console.log(`LotteryInteractor.deploy(): contract = ${address}`);
         return { address, returnCode };
@@ -121,7 +121,7 @@ export class LotteryInteractor {
         return firstValueAsStruct.valueOf();
     }
 
-    async getStatus(lotteryName: string): Promise<any> {
+    async getStatus(lotteryName: string): Promise<string> {
         // Prepare the interaction
         let interaction = <Interaction>this.contract.methods.status([
             BytesValue.fromUTF8(lotteryName)
@@ -132,6 +132,6 @@ export class LotteryInteractor {
 
         // Now let's interpret the results.
         let firstValueAsEnum = <EnumValue>firstValue;
-        return firstValueAsEnum.valueOf().name;
+        return firstValueAsEnum.name;
     }
 }
