@@ -1,19 +1,23 @@
-import path from "path";
-import { AbiRegistry, Address, Balance, BigUIntType, BigUIntValue, BytesValue, Code, CodeMetadata, DefaultSmartContractController, EnumValue, GasLimit, Interaction, ISmartContractController, OptionalType, OptionalValue, OptionValue, ReturnCode, SmartContract, SmartContractAbi, Struct, Token, TokenIdentifierValue, U32Type, U32Value } from "@elrondnetwork/erdjs";
-import { ITestSession, IUser } from "@elrondnetwork/erdjs-snippets";
-
-const PathToWasm = path.resolve(__dirname, "..", "..", "lottery-esdt", "output", "lottery-esdt.wasm");
-const PathToAbi = path.resolve(__dirname, "..", "..", "lottery-esdt", "output", "lottery-esdt.abi.json");
-
+// lotteryInteractor.ts
 /**
- * Creates a contract interactor for a test session. The code within this function is usable in production, as well.
- * Make sure you do not depend on the test session, though.
+ * The code in this file is partially usable as production code, as well.
+ * Note: in production code, make sure you do not depend on {@link ITestUser}.
+ * Note: in production code, make sure you DO NOT reference the package "erdjs-snippets".
+ * Note: in dApps, make sure you use a proper wallet provider to sign the transaction.
+ * @module
  */
- export async function createInteractor(session: ITestSession, address?: Address): Promise<LotteryInteractor> {
+import { AbiRegistry, Address, Balance, BigUIntValue, BytesValue, Code, CodeMetadata, createListOfAddresses, DefaultSmartContractController, EnumValue, GasLimit, Interaction, IProvider, ISmartContractController, OptionalValue, OptionValue, ReturnCode, SmartContract, SmartContractAbi, Struct, Token, TokenIdentifierValue, U32Value, VariadicValue } from "@elrondnetwork/erdjs";
+import path from "path";
+import { ITestUser } from "@elrondnetwork/erdjs-snippets";
+
+const PathToWasm = path.resolve(__dirname, "lottery-esdt.wasm");
+const PathToAbi = path.resolve(__dirname, "lottery-esdt.abi.json");
+
+export async function createInteractor(provider: IProvider, address?: Address): Promise<LotteryInteractor> {
     let registry = await AbiRegistry.load({ files: [PathToAbi] });
     let abi = new SmartContractAbi(registry, ["Lottery"]);
     let contract = new SmartContract({ address: address, abi: abi });
-    let controller = new DefaultSmartContractController(abi, session.proxy);
+    let controller = new DefaultSmartContractController(abi, provider);
     let interactor = new LotteryInteractor(contract, controller);
     return interactor;
 }
@@ -27,7 +31,7 @@ export class LotteryInteractor {
         this.controller = controller;
     }
     
-    async deploy(deployer: IUser): Promise<{ address: Address, returnCode: ReturnCode }> {
+    async deploy(deployer: ITestUser): Promise<{ address: Address, returnCode: ReturnCode }> {
          // Load the bytecode from a file.
          let code = await Code.fromFile(PathToWasm);
 
@@ -56,21 +60,21 @@ export class LotteryInteractor {
         return { address, returnCode };
     }
 
-    async start(owner: IUser, lotteryName: string, token: Token, price: number): Promise<ReturnCode> {
+    async start(owner: ITestUser, lotteryName: string, token: Token, price: number, whitelist: Address[]): Promise<ReturnCode> {
         // Prepare the interaction
         let interaction = <Interaction>this.contract.methods
             .start([
                 BytesValue.fromUTF8(lotteryName),
-                new TokenIdentifierValue(Buffer.from(token.identifier)),
+                new TokenIdentifierValue(token.identifier),
                 new BigUIntValue(price),
                 OptionValue.newMissing(),
                 OptionValue.newMissing(),
                 OptionValue.newProvided(new U32Value(1)),
                 OptionValue.newMissing(),
-                OptionValue.newMissing(),
-                new OptionalValue(new OptionalType(new BigUIntType()))
+                OptionValue.newProvided(createListOfAddresses(whitelist)),
+                OptionalValue.newMissing()
             ])
-            .withGasLimit(new GasLimit(10000000))
+            .withGasLimit(new GasLimit(20000000))
             .withNonce(owner.account.getNonceThenIncrement());
 
         // Let's build the transaction object.
@@ -84,7 +88,7 @@ export class LotteryInteractor {
         return returnCode;
     }
 
-    async buyTicket(user: IUser, lotteryName: string, amount: Balance): Promise<ReturnCode> {
+    async buyTicket(user: ITestUser, lotteryName: string, amount: Balance): Promise<ReturnCode> {
         console.log(`buyTicket: address = ${user.address}, amount = ${amount.toCurrencyString()}`);
 
         // Prepare the interaction
@@ -107,7 +111,7 @@ export class LotteryInteractor {
          return returnCode;
     }
 
-    async getLotteryInfo(lotteryName: string): Promise<any> {
+    async getLotteryInfo(lotteryName: string): Promise<Struct> {
         // Prepare the interaction
         let interaction = <Interaction>this.contract.methods.getLotteryInfo([
             BytesValue.fromUTF8(lotteryName)
@@ -118,7 +122,21 @@ export class LotteryInteractor {
 
         // Now let's interpret the results.
         let firstValueAsStruct = <Struct>firstValue;
-        return firstValueAsStruct.valueOf();
+        return firstValueAsStruct;
+    }
+
+    async getWhitelist(lotteryName: string): Promise<Address[]> {
+        // Prepare the interaction
+        let interaction = <Interaction>this.contract.methods.getLotteryWhitelist([
+            BytesValue.fromUTF8(lotteryName)
+        ]);
+
+        // Let's perform the interaction via the controller.
+        let { firstValue } = await this.controller.query(interaction);
+
+        // Now let's interpret the results.
+        let firstValueAsVariadic = <VariadicValue>firstValue;
+        return firstValueAsVariadic.valueOf();
     }
 
     async getStatus(lotteryName: string): Promise<string> {
