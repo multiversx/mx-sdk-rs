@@ -59,4 +59,16 @@ pub trait FormattedMessageFeatures {
     fn print_message(&self, x: i32) {
         sc_print!("Printing x: {}", x,);
     }
+
+    #[endpoint]
+    fn format_message_one_argument(&self) -> ManagedBuffer {
+        let message = sc_format!("Test");
+        message
+    }
+
+    #[endpoint]
+    fn format_message_multiple_arguments(&self, x: i32) -> ManagedBuffer {
+        let message = sc_format!("Hello {} world", x);
+        message
+    }
 }

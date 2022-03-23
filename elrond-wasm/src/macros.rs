@@ -24,7 +24,7 @@ macro_rules! imports {
             io::*,
             non_zero_usize,
             non_zero_util::*,
-            require, require_old, sc_error, sc_panic, sc_print,
+            require, require_old, sc_error, sc_format, sc_panic, sc_print,
             storage::mappers::*,
             types::{
                 SCResult::{Err, Ok},
@@ -140,6 +140,19 @@ macro_rules! sc_print {
             &<Self::Api as elrond_wasm::api::PrintApi>::print_api_impl(),
             ___buffer___,
         );
+    }};
+}
+
+#[macro_export]
+macro_rules! sc_format {
+    ($msg:tt, $($arg:expr),+ $(,)?) => {{
+        let mut ___buffer___ =
+            elrond_wasm::types::ManagedBufferCachedBuilder::<Self::Api>::new_from_slice(&[]);
+        elrond_wasm::derive::format_receiver_args!(___buffer___, $msg, $($arg),+);
+        ___buffer___.into_managed_buffer()
+    }};
+    ($msg:expr $(,)?) => {{
+        elrond_wasm::types::ManagedBuffer::new_from_bytes($msg.as_bytes())
     }};
 }
 
