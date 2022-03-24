@@ -1,19 +1,23 @@
-import path from "path";
-import { AbiRegistry, Address, BigUIntValue, Code, CodeMetadata, DefaultSmartContractController, GasLimit, Interaction, ISmartContractController, ReturnCode, SmartContract, SmartContractAbi } from "@elrondnetwork/erdjs";
-import { ITestSession, IUser } from "@elrondnetwork/erdjs-snippets";
-
-const PathToWasm = path.resolve(__dirname, "..", "..", "adder", "output", "adder.wasm");
-const PathToAbi = path.resolve(__dirname, "..", "..", "adder", "output", "adder.abi.json");
-
+// adderInteractor.ts
 /**
- * Creates a contract interactor for a test session. The code within this function is usable in production, as well.
- * Make sure you do not depend on the test session, though.
+ * The code in this file is partially usable as production code, as well.
+ * Note: in production code, make sure you do not depend on {@link ITestUser}.
+ * Note: in production code, make sure you DO NOT reference the package "erdjs-snippets".
+ * Note: in dApps, make sure you use a proper wallet provider to sign the transaction.
+ * @module
  */
-export async function createInteractor(session: ITestSession, address?: Address): Promise<AdderInteractor> {
+import path from "path";
+import { AbiRegistry, Address, BigUIntValue, Code, CodeMetadata, DefaultSmartContractController, GasLimit, Interaction, IProvider, ISmartContractController, ReturnCode, SmartContract, SmartContractAbi } from "@elrondnetwork/erdjs";
+import { ITestUser } from "@elrondnetwork/erdjs-snippets";
+
+const PathToWasm = path.resolve(__dirname, "adder.wasm");
+const PathToAbi = path.resolve(__dirname, "adder.abi.json");
+
+export async function createInteractor(provider: IProvider, address?: Address): Promise<AdderInteractor> {
     let registry = await AbiRegistry.load({ files: [PathToAbi] });
     let abi = new SmartContractAbi(registry, ["Adder"]);
     let contract = new SmartContract({ address: address, abi: abi });
-    let controller = new DefaultSmartContractController(abi, session.proxy);
+    let controller = new DefaultSmartContractController(abi, provider);
     let interactor = new AdderInteractor(contract, controller);
     return interactor;
 }
@@ -27,7 +31,7 @@ export class AdderInteractor {
         this.controller = controller;
     }
 
-    async deploy(deployer: IUser, initialValue: number): Promise<{ address: Address, returnCode: ReturnCode }> {
+    async deploy(deployer: ITestUser, initialValue: number): Promise<{ address: Address, returnCode: ReturnCode }> {
         // Load the bytecode from a file.
         let code = await Code.fromFile(PathToWasm);
 
@@ -56,7 +60,7 @@ export class AdderInteractor {
         return { address, returnCode };
     }
 
-    async add(caller: IUser, value: number): Promise<ReturnCode> {
+    async add(caller: ITestUser, value: number): Promise<ReturnCode> {
         // Prepare the interaction
         let interaction = <Interaction>this.contract.methods
             .add([new BigUIntValue(value)])

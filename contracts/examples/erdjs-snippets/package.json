@@ -7,8 +7,8 @@
         "compile": "tsc -p tsconfig.json"
     },
     "dependencies": {
-        "@elrondnetwork/erdjs": "^10.0.0-alpha.2",
-        "@elrondnetwork/erdjs-snippets": "^2.0.0-alpha.0",
+        "@elrondnetwork/erdjs": "^10.0.0-alpha.4",
+        "@elrondnetwork/erdjs-snippets": "^2.0.0-alpha.1",
         "bignumber.js": "9.0.2"
     },
     "devDependencies": {
@@ -22,7 +22,9 @@
         "ts-node": "9.1.1"
     },
     "mocha": {
-        "extension": ["ts"],
+        "extension": [
+            "ts"
+        ],
         "require": "ts-node/register",
         "spec": "**/*.spec.ts"
     }

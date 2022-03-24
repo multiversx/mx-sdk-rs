@@ -1,5 +1,5 @@
-import { Balance, ReturnCode, Token, TokenType } from "@elrondnetwork/erdjs";
-import { AirdropService, createTokenAmount, ESDTInteractor, ITestSession, IUser, TestSession } from "@elrondnetwork/erdjs-snippets";
+import { Balance, IProvider, ReturnCode, Token, TokenType } from "@elrondnetwork/erdjs";
+import { AirdropService, createTokenAmount, ESDTInteractor, ITestSession, ITestUser, TestSession } from "@elrondnetwork/erdjs-snippets";
 import { assert } from "chai";
 import { createInteractor } from "./lotteryInteractor";
 
@@ -10,11 +10,13 @@ describe("lottery snippet", async function () {
 
     let suite = this;
     let session: ITestSession;
-    let whale: IUser;
-    let owner: IUser;
+    let provider: IProvider;
+    let whale: ITestUser;
+    let owner: ITestUser;
 
     this.beforeAll(async function () {
         session = await TestSession.loadOnSuite("default", suite);
+        provider = session.provider;
         whale = session.users.whale;
         owner = session.users.alice;
         await session.syncNetworkConfig();
@@ -52,7 +54,7 @@ describe("lottery snippet", async function () {
 
         await session.syncUsers([owner]);
 
-        let interactor = await createInteractor(session);
+        let interactor = await createInteractor(provider);
         let { address, returnCode } = await interactor.deploy(owner);
 
         assert.isTrue(returnCode.isSuccess());
@@ -67,23 +69,33 @@ describe("lottery snippet", async function () {
 
         let contractAddress = await session.loadAddress("contractAddress");
         let lotteryToken = await session.loadToken("lotteryToken");
-        let interactor = await createInteractor(session, contractAddress);
-        let returnCode = await interactor.start(owner, LotteryName, lotteryToken, 1);
+        let interactor = await createInteractor(provider, contractAddress);
+        let whitelist = session.users.getAddressesOfFriends();
+        let returnCode = await interactor.start(owner, LotteryName, lotteryToken, 1, whitelist);
         assert.isTrue(returnCode.isSuccess());
     });
 
     it("get lottery info and status", async function () {
         let contractAddress = await session.loadAddress("contractAddress");
         let lotteryToken = await session.loadToken("lotteryToken");
-        let interactor = await createInteractor(session, contractAddress);
+        let interactor = await createInteractor(provider, contractAddress);
         let lotteryInfo = await interactor.getLotteryInfo(LotteryName);
         let lotteryStatus = await interactor.getStatus(LotteryName);
-        console.log("Info:", lotteryInfo);
-        console.log("Prize pool:", lotteryInfo.prize_pool.toString());
+        console.log("Info:", lotteryInfo.valueOf());
+        console.log("Prize pool:", lotteryInfo.getFieldValue("prize_pool").toString());
         console.log("Status:", lotteryStatus);
 
-        assert.equal(lotteryInfo.token_identifier.toString(), lotteryToken.identifier);
+        assert.equal(lotteryInfo.getFieldValue("token_identifier"), lotteryToken.identifier);
         assert.equal(lotteryStatus, "Running");
+    });
+
+    it("get whitelist", async function () {
+        let contractAddress = await session.loadAddress("contractAddress");
+        let interactor = await createInteractor(provider, contractAddress);
+        let whitelist = await interactor.getWhitelist(LotteryName);
+        console.log("Whitelist:", whitelist);
+        
+        assert.deepEqual(whitelist, session.users.getAddressesOfFriends());
     });
 
     it("friends buy tickets", async function () {
@@ -93,7 +105,7 @@ describe("lottery snippet", async function () {
 
         let contractAddress = await session.loadAddress("contractAddress");
         let lotteryToken = await session.loadToken("lotteryToken");
-        let interactor = await createInteractor(session, contractAddress);
+        let interactor = await createInteractor(provider, contractAddress);
 
         let buyAmount = createTokenAmount(lotteryToken, "1");
         let buyPromises = session.users.getFriends().map(friend => interactor.buyTicket(friend, LotteryName, buyAmount));
