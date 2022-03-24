@@ -145,7 +145,7 @@ pub trait ForwarderSyncCallModule {
 
         self.vault_proxy()
             .contract(to)
-            .call_counts(b"accept_funds")
+            .call_counts(&ManagedBuffer::from(b"accept_funds"))
             .execute_on_dest_context()
     }
 

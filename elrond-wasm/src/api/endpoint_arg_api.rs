@@ -1,5 +1,4 @@
-use crate::{err_msg, types::BoxedBytes};
-use alloc::vec::Vec;
+use crate::{err_msg, types::heap::BoxedBytes};
 
 use super::{ErrorApiImpl, Handle};
 
@@ -25,11 +24,7 @@ pub trait EndpointArgumentApiImpl: ErrorApiImpl {
 
     fn copy_argument_to_slice(&self, arg_index: i32, slice: &mut [u8]);
 
-    fn get_argument_vec_u8(&self, arg_index: i32) -> Vec<u8>;
-
-    fn get_argument_boxed_bytes(&self, arg_index: i32) -> BoxedBytes {
-        self.get_argument_vec_u8(arg_index).into()
-    }
+    fn get_argument_boxed_bytes(&self, arg_index: i32) -> BoxedBytes;
 
     fn get_argument_big_int_raw(&self, arg_id: i32) -> Handle;
 

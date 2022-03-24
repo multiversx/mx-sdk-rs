@@ -1,0 +1,4 @@
+{
+    "proxyUrl": "https://testnet-gateway.elrond.com",
+    "whalePem": "~/elrondsdk/testwallets/latest/users/alice.pem"
+}

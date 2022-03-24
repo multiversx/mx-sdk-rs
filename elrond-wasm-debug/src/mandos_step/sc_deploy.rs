@@ -1,6 +1,6 @@
 use std::rc::Rc;
 
-use elrond_wasm::types::Address;
+use elrond_wasm::types::heap::Address;
 use mandos::model::{TxDeploy, TxExpect};
 
 use crate::{

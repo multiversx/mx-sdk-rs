@@ -1,6 +1,6 @@
 use std::rc::Rc;
 
-use elrond_wasm::types::H256;
+use elrond_wasm::types::heap::H256;
 use mandos::model::TxTransfer;
 
 use crate::{

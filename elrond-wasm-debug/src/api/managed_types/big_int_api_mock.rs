@@ -7,7 +7,7 @@ use core::{
 use elrond_wasm::{
     api::{BigIntApi, ErrorApiImpl, Handle},
     err_msg,
-    types::BoxedBytes,
+    types::heap::BoxedBytes,
 };
 use num_bigint::BigInt;
 use num_traits::{pow, sign::Signed, Zero};
