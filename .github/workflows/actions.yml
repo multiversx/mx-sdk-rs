@@ -11,6 +11,8 @@ jobs:
     name: Contracts
     uses: ElrondNetwork/elrond-actions/.github/workflows/contracts.yml@contract-actions
     with:
-      extra-build-args: "--ignore-eei-checks"
+      rust-toolchain: nightly-2022-01-17
+      vmtools-version: v1.4.43
+      extra-build-args: --ignore-eei-checks
     secrets:
       token: ${{ secrets.GITHUB_TOKEN }}
