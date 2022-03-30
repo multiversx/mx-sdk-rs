@@ -2,13 +2,17 @@ use elrond_wasm_debug::{mandos::model::*, *};
 
 fn world() -> BlockchainMock {
     let mut blockchain = BlockchainMock::new();
+    blockchain.set_current_dir_from_workspace("contracts/examples/adder");
+
     blockchain.register_contract_builder("file:output/adder.wasm", adder::ContractBuilder);
     blockchain
 }
 
 #[test]
 fn adder_mandos_constructed() {
-    let _ = world()
+    let world = world();
+    let intp_context = world.interpreter_context();
+    let _ = world
         .mandos_set_state(
             SetStateStep::new()
                 .put_account("address:owner", Account::new().nonce(1))
@@ -17,7 +21,7 @@ fn adder_mandos_constructed() {
         .mandos_sc_deploy(
             ScDeployStep::new()
                 .from("address:owner")
-                .contract_code("file:output/adder.wasm")
+                .contract_code("file:output/adder.wasm", &intp_context)
                 .argument("5")
                 .gas_limit("5,000,000")
                 .expect(TxExpect::ok().no_result()),
