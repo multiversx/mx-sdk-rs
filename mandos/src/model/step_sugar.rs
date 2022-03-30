@@ -59,8 +59,8 @@ impl ScDeployStep {
         self
     }
 
-    pub fn contract_code(mut self, expr: &str) -> Self {
-        self.tx.contract_code = BytesValue::interpret_from(expr, &InterpreterContext::default());
+    pub fn contract_code(mut self, expr: &str, context: &InterpreterContext) -> Self {
+        self.tx.contract_code = BytesValue::interpret_from(expr, context);
         self
     }
 
