@@ -122,7 +122,7 @@ fn convert_mandos_esdt_to_world_mock(
                 full_esdt
                     .roles
                     .iter()
-                    .map(|role| role.value.clone())
+                    .map(|role| role.as_bytes().to_vec())
                     .collect(),
             ),
             frozen: if let Some(u64_value) = &full_esdt.frozen {
