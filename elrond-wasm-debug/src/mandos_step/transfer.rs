@@ -8,7 +8,13 @@ use crate::{
     world_mock::BlockchainMock,
 };
 
-pub fn execute(state: &mut Rc<BlockchainMock>, tx_transfer: &TxTransfer) {
+pub fn execute(state: BlockchainMock, tx_transfer: &TxTransfer) -> BlockchainMock {
+    let mut state_rc = Rc::new(state);
+    execute_rc(&mut state_rc, tx_transfer);
+    Rc::try_unwrap(state_rc).unwrap()
+}
+
+pub fn execute_rc(state: &mut Rc<BlockchainMock>, tx_transfer: &TxTransfer) {
     let tx_input = TxInput {
         from: tx_transfer.from.value.into(),
         to: tx_transfer.to.value.into(),
