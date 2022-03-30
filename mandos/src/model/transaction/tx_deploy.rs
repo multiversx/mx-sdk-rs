@@ -6,7 +6,7 @@ use crate::{
 
 use super::tx_interpret_util::interpret_egld_value;
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct TxDeploy {
     pub from: AddressValue,
     pub egld_value: BigUintValue,
