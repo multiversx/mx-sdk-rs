@@ -4,6 +4,7 @@ mod esdt_data;
 mod new_address;
 mod scenario;
 mod step;
+mod step_sugar;
 mod storage_check;
 mod storage_details_check;
 mod transaction;
