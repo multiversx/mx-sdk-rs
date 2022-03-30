@@ -1,7 +1,5 @@
-use std::collections::BTreeMap;
-
 use elrond_wasm::types::heap::Address;
-use mandos::model::{Account, AddressKey, BlockInfo, NewAddress};
+use mandos::model::SetStateStep;
 use num_bigint::BigUint;
 
 use crate::world_mock::{
@@ -9,14 +7,8 @@ use crate::world_mock::{
     BlockchainMock, EsdtData, EsdtInstance, EsdtInstanceMetadata, EsdtInstances, EsdtRoles,
 };
 
-pub fn execute(
-    state: &mut BlockchainMock,
-    accounts: &BTreeMap<AddressKey, Account>,
-    new_addresses: &[NewAddress],
-    previous_block_info: &Option<BlockInfo>,
-    current_block_info: &Option<BlockInfo>,
-) {
-    for (address, account) in accounts.iter() {
+pub fn execute(state: &mut BlockchainMock, set_state_step: &SetStateStep) {
+    for (address, account) in set_state_step.accounts.iter() {
         let storage = account
             .storage
             .iter()
@@ -64,7 +56,7 @@ pub fn execute(
                 .map(|address_value| address_value.value.into()),
         });
     }
-    for new_address in new_addresses.iter() {
+    for new_address in set_state_step.new_addresses.iter() {
         assert!(
             is_smart_contract_address(&new_address.new_address.value.into()),
             "field should have SC format"
@@ -75,10 +67,10 @@ pub fn execute(
             new_address.new_address.value.into(),
         )
     }
-    if let Some(block_info_obj) = &*previous_block_info {
+    if let Some(block_info_obj) = &*set_state_step.previous_block_info {
         update_block_info(&mut state.previous_block_info, block_info_obj);
     }
-    if let Some(block_info_obj) = &*current_block_info {
+    if let Some(block_info_obj) = &*set_state_step.current_block_info {
         update_block_info(&mut state.current_block_info, block_info_obj);
     }
 }
