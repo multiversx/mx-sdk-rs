@@ -1,6 +1,6 @@
 use std::rc::Rc;
 
-use mandos::model::{ScCallStep, TxESDT};
+use mandos::model::{ScCallStep, Step, TxESDT};
 
 use crate::{
     tx_execution::sc_call_with_async_and_callback,
@@ -10,10 +10,14 @@ use crate::{
 
 use super::check_tx_output;
 
-pub fn execute(state: BlockchainMock, sc_call_step: &ScCallStep) -> BlockchainMock {
-    let mut state_rc = Rc::new(state);
-    execute_rc(&mut state_rc, sc_call_step);
-    Rc::try_unwrap(state_rc).unwrap()
+impl BlockchainMock {
+    pub fn mandos_sc_call(mut self, sc_call_step: ScCallStep) -> BlockchainMock {
+        let mut state_rc = Rc::new(self);
+        execute_rc(&mut state_rc, &sc_call_step);
+        self = Rc::try_unwrap(state_rc).unwrap();
+        self.mandos_trace.steps.push(Step::ScCall(sc_call_step));
+        self
+    }
 }
 
 fn execute_rc(state: &mut Rc<BlockchainMock>, sc_call_step: &ScCallStep) {

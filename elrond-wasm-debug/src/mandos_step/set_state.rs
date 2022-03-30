@@ -7,7 +7,14 @@ use crate::world_mock::{
     BlockchainMock, EsdtData, EsdtInstance, EsdtInstanceMetadata, EsdtInstances, EsdtRoles,
 };
 
-pub fn execute(state: &mut BlockchainMock, set_state_step: &SetStateStep) {
+impl BlockchainMock {
+    pub fn mandos_set_state(mut self, set_state_step: SetStateStep) -> BlockchainMock {
+        execute(&mut self, &set_state_step);
+        self
+    }
+}
+
+fn execute(state: &mut BlockchainMock, set_state_step: &SetStateStep) {
     for (address, account) in set_state_step.accounts.iter() {
         let storage = account
             .storage

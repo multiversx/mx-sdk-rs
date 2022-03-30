@@ -11,10 +11,12 @@ use crate::{
 
 use super::check_tx_output;
 
-pub fn execute(state: BlockchainMock, sc_query_step: &ScQueryStep) -> BlockchainMock {
-    let state_rc = Rc::new(state);
-    execute_rc(state_rc.clone(), sc_query_step);
-    Rc::try_unwrap(state_rc).unwrap()
+impl BlockchainMock {
+    pub fn mandos_sc_query(self, sc_query_step: ScQueryStep) -> BlockchainMock {
+        let state_rc = Rc::new(self);
+        execute_rc(state_rc.clone(), &sc_query_step);
+        Rc::try_unwrap(state_rc).unwrap()
+    }
 }
 
 fn execute_rc(state: Rc<BlockchainMock>, sc_query_step: &ScQueryStep) {
