@@ -10,7 +10,13 @@ use crate::{
 
 use super::check_tx_output;
 
-pub fn execute(state: &mut Rc<BlockchainMock>, sc_call_step: &ScCallStep) {
+pub fn execute(state: BlockchainMock, sc_call_step: &ScCallStep) -> BlockchainMock {
+    let mut state_rc = Rc::new(state);
+    execute_rc(&mut state_rc, sc_call_step);
+    Rc::try_unwrap(state_rc).unwrap()
+}
+
+fn execute_rc(state: &mut Rc<BlockchainMock>, sc_call_step: &ScCallStep) {
     let tx = &sc_call_step.tx;
     let tx_input = TxInput {
         from: tx.from.value.into(),
