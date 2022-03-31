@@ -91,7 +91,7 @@ pub trait ForwarderRaw {
         #[payment] payment: BigUint,
         endpoint_name: ManagedBuffer,
         extra_gas_for_callback: u64,
-        #[var_args] args: ManagedVarArgs<ManagedBuffer>,
+        #[var_args] args: MultiValueEncoded<ManagedBuffer>,
     ) -> SCResult<()> {
         self.forward_contract_call(to, token, payment, endpoint_name, args)
             .with_extra_gas_for_callback(extra_gas_for_callback)
@@ -102,14 +102,14 @@ pub trait ForwarderRaw {
     }
 
     #[endpoint]
-    fn success_callback(&self, #[var_args] args: ManagedVarArgs<ManagedBuffer>) {
+    fn success_callback(&self, #[var_args] args: MultiValueEncoded<ManagedBuffer>) {
         self.async_call_callback_data().set(true);
         let args_as_vec = args.into_vec_of_buffers();
         self.async_call_event_callback(&args_as_vec);
     }
 
     #[endpoint]
-    fn error_callback(&self, #[var_args] args: ManagedVarArgs<ManagedBuffer>) {
+    fn error_callback(&self, #[var_args] args: MultiValueEncoded<ManagedBuffer>) {
         self.async_call_callback_data().set(false);
         let args_as_vec = args.into_vec_of_buffers();
         self.async_call_event_callback(&args_as_vec);
@@ -234,11 +234,11 @@ pub trait ForwarderRaw {
         to: ManagedAddress,
         endpoint_name: ManagedBuffer,
         extra_gas_for_callback: u64,
-        #[var_args] token_payments: ManagedVarArgs<MultiArg3<TokenIdentifier, u64, BigUint>>,
+        #[var_args] token_payments: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>>,
     ) {
         let mut arg_buffer = ManagedArgBuffer::new_empty();
         arg_buffer.push_arg(to);
-        arg_buffer.push_arg(token_payments.len() / 3);
+        arg_buffer.push_arg(token_payments.raw_len() / 3);
 
         for multi_arg in token_payments.into_iter() {
             let (token_identifier, token_nonce, amount) = multi_arg.into_tuple();
