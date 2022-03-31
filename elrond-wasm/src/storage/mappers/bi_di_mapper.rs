@@ -13,6 +13,8 @@ use crate::{
     types::{ManagedAddress, ManagedType, ManagedVec, ManagedVecItem, MultiResultVec},
 };
 
+const VALUE_SUFIX: &[u8] = b"_value";
+const ID_SUFIX: &[u8] = b"_id";
 const VALUE_TO_ID_SUFFIX: &[u8] = b"_value_to_id";
 const ID_TO_VALUE_SUFFIX: &[u8] = b"_id_to_value";
 
@@ -68,10 +70,15 @@ where
         + ManagedVecItem,
 {
     fn new(base_key: StorageKey<SA>) -> Self {
+        let mut id_key = base_key.clone();
+        id_key.append_bytes(ID_SUFIX);
+
+        let mut value_key = base_key.clone();
+        value_key.append_bytes(VALUE_SUFIX);
         BiDiMapper {
             _phantom_api: PhantomData,
-            id_set_mapper: SetMapper::<SA, K>::new(base_key.clone()),
-            value_set_mapper: SetMapper::<SA, V>::new(base_key.clone()),
+            id_set_mapper: SetMapper::<SA, K>::new(id_key),
+            value_set_mapper: SetMapper::<SA, V>::new(value_key),
             base_key,
         }
     }
@@ -119,15 +126,8 @@ where
         storage_set(self.get_id_key(value).as_ref(), id);
     }
 
-    pub fn get_value(&self, id: &K) -> Option<V> {
-        let key = self.get_value_key(id);
-        // TODO: optimize, storage_load_managed_buffer_len is currently called twice
-
-        if storage_get_len(key.as_ref()) > 0 {
-            Some(storage_get(key.as_ref()))
-        } else {
-            None
-        }
+    pub fn get_value(&self, id: &K) -> V {
+        storage_get(self.get_value_key(id).as_ref())
     }
 
     pub fn get_value_unchecked(&self, id: &K) -> V {

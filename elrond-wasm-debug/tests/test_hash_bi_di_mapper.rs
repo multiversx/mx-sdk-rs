@@ -27,16 +27,18 @@ fn test_hash_set_simple() {
     check_set(&set, vec![], vec![]);
 
     assert_eq!(set.insert(42, 43), true);
+    check_set(&set, vec![42], vec![43]);
     assert_eq!(set.insert(42, 44), false);
     assert_eq!(set.insert(44, 43), false);
 
-    // check_set(&set, vec![42]);
-    // set.insert(43);
-    // check_set(&set, vec![42, 43]);
-    // set.insert(44);
-    // check_set(&set, vec![42, 43, 44]);
-    // assert_eq!(set.contains(&42), true);
-    // assert_eq!(set.contains(&50), false);
+    assert_eq!(set.insert(1, 101), true);
+    assert_eq!(set.insert(2, 102), true);
+    assert_eq!(set.insert(3, 103), true);
+    assert_eq!(set.insert(4, 104), true);
+    check_set(&set, vec![42, 1, 2, 3, 4], vec![43, 101, 102, 103, 104]);
+
+    assert_eq!(set.get_id(&101), 1);
+    assert_eq!(set.get_value(&4), 104);
 }
 
 // #[test]
