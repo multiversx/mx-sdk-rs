@@ -8,7 +8,7 @@ use crate::{
 
 use super::CheckAccount;
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct CheckAccounts {
     pub other_accounts_allowed: bool,
     pub accounts: BTreeMap<AddressKey, CheckAccount>,

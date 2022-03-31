@@ -15,7 +15,7 @@ pub struct ExternalStepsStep {
     pub path: String,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct SetStateStep {
     pub comment: Option<String>,
     pub accounts: BTreeMap<AddressKey, Account>,
@@ -25,7 +25,7 @@ pub struct SetStateStep {
     pub current_block_info: Box<Option<BlockInfo>>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct ScCallStep {
     pub tx_id: String,
     pub comment: Option<String>,
@@ -33,7 +33,7 @@ pub struct ScCallStep {
     pub expect: Option<TxExpect>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct ScQueryStep {
     pub tx_id: String,
     pub comment: Option<String>,
@@ -41,7 +41,7 @@ pub struct ScQueryStep {
     pub expect: Option<TxExpect>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct ScDeployStep {
     pub tx_id: String,
     pub comment: Option<String>,
@@ -63,13 +63,13 @@ pub struct ValidatorRewardStep {
     pub tx: Box<TxValidatorReward>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct CheckStateStep {
     pub comment: Option<String>,
     pub accounts: CheckAccounts,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct DumpStateStep {
     pub comment: Option<String>,
 }
