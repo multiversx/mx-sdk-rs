@@ -20,53 +20,37 @@ fn parse_execute_mandos_steps(steps_path: &Path, state: &mut Rc<BlockchainMock>)
 
     for step in scenario.steps.iter() {
         match step {
-            Step::ExternalSteps { path } => {
+            Step::ExternalSteps(external_steps_step) => {
                 let parent_path = steps_path.parent().unwrap();
-                let new_path = parent_path.join(path);
+                let new_path = parent_path.join(&external_steps_step.path);
                 parse_execute_mandos_steps(new_path.as_path(), state);
             },
-            Step::SetState {
-                comment,
-                accounts,
-                new_addresses,
-                block_hashes,
-                previous_block_info,
-                current_block_info,
-            } => mandos_step::set_state::execute(
-                Rc::get_mut(state).unwrap(),
-                accounts,
-                new_addresses,
-                previous_block_info,
-                current_block_info,
-            ),
-            Step::ScCall {
-                tx_id,
-                comment,
-                tx,
-                expect,
-            } => mandos_step::sc_call::execute(state, tx_id, tx, expect),
-            Step::ScQuery {
-                tx_id,
-                comment,
-                tx,
-                expect,
-            } => mandos_step::sc_query::execute(state.clone(), tx_id, tx, expect),
-            Step::ScDeploy {
-                tx_id,
-                comment,
-                tx,
-                expect,
-            } => mandos_step::sc_deploy::execute(state, tx_id, tx, expect),
-            Step::Transfer { tx_id, comment, tx } => mandos_step::transfer::execute(state, tx),
-            Step::ValidatorReward { tx_id, comment, tx } => {
-                Rc::get_mut(state)
-                    .unwrap()
-                    .increase_validator_reward(&tx.to.value.into(), &tx.egld_value.value);
+            Step::SetState(set_state_step) => {
+                mandos_step::set_state::execute(Rc::get_mut(state).unwrap(), set_state_step)
             },
-            Step::CheckState { comment, accounts } => {
-                mandos_step::check_state::execute(accounts, Rc::get_mut(state).unwrap());
+            Step::ScCall(sc_call_step) => mandos_step::sc_call::execute(state, sc_call_step),
+            Step::ScQuery(sc_query_step) => {
+                mandos_step::sc_query::execute(state.clone(), sc_query_step)
             },
-            Step::DumpState { .. } => {
+            Step::ScDeploy(sc_deploy_step) => {
+                mandos_step::sc_deploy::execute(state, sc_deploy_step)
+            },
+            Step::Transfer(transfer_step) => {
+                mandos_step::transfer::execute(state, &transfer_step.tx)
+            },
+            Step::ValidatorReward(validator_reward) => {
+                Rc::get_mut(state).unwrap().increase_validator_reward(
+                    &validator_reward.tx.to.value.into(),
+                    &validator_reward.tx.egld_value.value,
+                );
+            },
+            Step::CheckState(check_state_step) => {
+                mandos_step::check_state::execute(
+                    &check_state_step.accounts,
+                    Rc::get_mut(state).unwrap(),
+                );
+            },
+            Step::DumpState(_) => {
                 state.print_accounts();
             },
         }
