@@ -40,7 +40,7 @@ impl InterpretableFrom<ValueSubTree> for AddressValue {
 
 impl InterpretableFrom<&str> for AddressValue {
     fn interpret_from(from: &str, context: &InterpreterContext) -> Self {
-        let bytes = interpret_string(&from, context);
+        let bytes = interpret_string(from, context);
         AddressValue {
             value: value_from_slice(bytes.as_slice()),
             original: ValueSubTree::Str(from.to_string()),
