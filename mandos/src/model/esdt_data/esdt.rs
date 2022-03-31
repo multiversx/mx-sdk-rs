@@ -30,11 +30,7 @@ impl InterpretableFrom<EsdtRaw> for Esdt {
                 last_nonce: full_esdt
                     .last_nonce
                     .map(|b| U64Value::interpret_from(b, context)),
-                roles: full_esdt
-                    .roles
-                    .into_iter()
-                    .map(|role| BytesValue::interpret_from(role, context))
-                    .collect(),
+                roles: full_esdt.roles,
                 frozen: full_esdt
                     .frozen
                     .map(|b| U64Value::interpret_from(b, context)),

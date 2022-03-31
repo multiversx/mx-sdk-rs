@@ -5,7 +5,7 @@ use crate::{
 
 use super::Step;
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct Scenario {
     pub name: Option<String>,
     pub comment: Option<String>,

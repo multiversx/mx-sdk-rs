@@ -14,6 +14,37 @@ pub struct TxExpect {
     pub refund: CheckValue<U64Value>,
 }
 
+impl TxExpect {
+    pub fn ok() -> Self {
+        TxExpect {
+            out: CheckValue::Star,
+            status: CheckValue::Equal(U64Value::zero()),
+            message: CheckValue::Star,
+            logs: CheckLogs::Star,
+            gas: None,
+            refund: CheckValue::Star,
+        }
+    }
+
+    pub fn no_result(mut self) -> Self {
+        self.out = CheckValue::Equal(Vec::new());
+        self
+    }
+
+    pub fn result(mut self, value: &str) -> Self {
+        let mut check_results = match self.out {
+            CheckValue::Star => Vec::new(),
+            CheckValue::Equal(check_results) => check_results,
+        };
+        check_results.push(CheckValue::Equal(BytesValue::interpret_from(
+            value,
+            &InterpreterContext::default(),
+        )));
+        self.out = CheckValue::Equal(check_results);
+        self
+    }
+}
+
 impl InterpretableFrom<TxExpectRaw> for TxExpect {
     fn interpret_from(from: TxExpectRaw, context: &InterpreterContext) -> Self {
         TxExpect {

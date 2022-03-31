@@ -7,6 +7,6 @@ pub struct EsdtObject {
     pub token_identifier: Option<BytesValue>,
     pub instances: Vec<EsdtInstance>,
     pub last_nonce: Option<U64Value>,
-    pub roles: Vec<BytesValue>,
+    pub roles: Vec<String>,
     pub frozen: Option<U64Value>,
 }

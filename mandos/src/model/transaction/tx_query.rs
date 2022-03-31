@@ -4,7 +4,7 @@ use crate::{
     serde_raw::TxQueryRaw,
 };
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct TxQuery {
     pub to: AddressValue,
     pub function: String,
