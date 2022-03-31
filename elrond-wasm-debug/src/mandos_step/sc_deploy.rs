@@ -11,7 +11,15 @@ use crate::{
 
 use super::check_tx_output;
 
-pub fn execute(state: &mut Rc<BlockchainMock>, sc_deploy_step: &ScDeployStep) {
+impl BlockchainMock {
+    pub fn mandos_sc_deploy(self, sc_deploy_step: ScDeployStep) -> BlockchainMock {
+        let mut state_rc = Rc::new(self);
+        execute_rc(&mut state_rc, &sc_deploy_step);
+        Rc::try_unwrap(state_rc).unwrap()
+    }
+}
+
+fn execute_rc(state: &mut Rc<BlockchainMock>, sc_deploy_step: &ScDeployStep) {
     let tx = &sc_deploy_step.tx;
     let tx_input = TxInput {
         from: tx.from.value.into(),

@@ -1,7 +1,7 @@
 use crate::{
     interpret_trait::{InterpretableFrom, InterpreterContext},
     serde_raw::ValueSubTree,
-    value_interpreter::interpret_subtree,
+    value_interpreter::{interpret_string, interpret_subtree},
 };
 
 use num_bigint::BigUint;
@@ -19,6 +19,16 @@ impl InterpretableFrom<ValueSubTree> for BigUintValue {
         BigUintValue {
             value: BigUint::from_bytes_be(&bytes),
             original: from,
+        }
+    }
+}
+
+impl InterpretableFrom<&str> for BigUintValue {
+    fn interpret_from(from: &str, context: &InterpreterContext) -> Self {
+        let bytes = interpret_string(from, context);
+        BigUintValue {
+            value: BigUint::from_bytes_be(&bytes),
+            original: ValueSubTree::Str(from.to_string()),
         }
     }
 }

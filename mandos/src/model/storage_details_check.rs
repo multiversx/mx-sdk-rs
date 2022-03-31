@@ -8,7 +8,7 @@ use std::collections::BTreeMap;
 
 use super::BytesKey;
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct CheckStorageDetails {
     pub storages: BTreeMap<BytesKey, CheckValue<BytesValue>>,
     pub other_storages_allowed: bool,

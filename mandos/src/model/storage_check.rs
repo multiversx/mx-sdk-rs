@@ -11,6 +11,12 @@ pub enum CheckStorage {
     Equal(CheckStorageDetails),
 }
 
+impl Default for CheckStorage {
+    fn default() -> Self {
+        CheckStorage::Star
+    }
+}
+
 impl CheckStorage {
     pub fn is_star(&self) -> bool {
         matches!(self, CheckStorage::Star)
