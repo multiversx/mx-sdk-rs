@@ -5,7 +5,7 @@ use elrond_codec::{
     TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
 };
 
-use super::{SetMapper, StorageMapper};
+use super::{StorageMapper, UnorderedSetMapper};
 use crate::{
     abi::{TypeAbi, TypeName},
     api::StorageMapperApi,
@@ -45,8 +45,8 @@ where
         + ManagedVecItem,
 {
     _phantom_api: PhantomData<SA>,
-    id_set_mapper: SetMapper<SA, K>,
-    value_set_mapper: SetMapper<SA, V>,
+    id_set_mapper: UnorderedSetMapper<SA, K>,
+    value_set_mapper: UnorderedSetMapper<SA, V>,
     base_key: StorageKey<SA>,
 }
 
@@ -78,8 +78,8 @@ where
         value_key.append_bytes(VALUE_SUFIX);
         BiDiMapper {
             _phantom_api: PhantomData,
-            id_set_mapper: SetMapper::<SA, K>::new(id_key),
-            value_set_mapper: SetMapper::<SA, V>::new(value_key),
+            id_set_mapper: UnorderedSetMapper::<SA, K>::new(id_key),
+            value_set_mapper: UnorderedSetMapper::<SA, V>::new(value_key),
             base_key,
         }
     }
@@ -148,21 +148,21 @@ where
     }
 
     pub fn remove_by_id(&mut self, id: &K) -> bool {
-        if self.id_set_mapper.remove(id) {
+        if self.id_set_mapper.swap_remove(id) {
             let value = self.get_value(id);
             storage_clear(self.get_id_key(&value).as_ref());
             storage_clear(self.get_value_key(id).as_ref());
-            self.value_set_mapper.remove(&value);
+            self.value_set_mapper.swap_remove(&value);
             return true;
         }
         false
     }
     pub fn remove_by_value(&mut self, value: &V) -> bool {
-        if self.value_set_mapper.remove(value) {
+        if self.value_set_mapper.swap_remove(value) {
             let id = self.get_id(value);
             storage_clear(self.get_id_key(value).as_ref());
             storage_clear(self.get_value_key(&id).as_ref());
-            self.id_set_mapper.remove(&id);
+            self.id_set_mapper.swap_remove(&id);
             return true;
         }
         false
