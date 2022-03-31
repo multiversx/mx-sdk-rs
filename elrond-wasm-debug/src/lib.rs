@@ -25,6 +25,9 @@ pub use mandos_rs_runner::mandos_rs;
 pub use tx_mock::DebugApi;
 pub use world_mock::BlockchainMock;
 
+// Re-exporting the whole mandos crate for easier use in tests.
+pub use mandos;
+
 #[macro_use]
 extern crate alloc;
 pub use alloc::{boxed::Box, vec::Vec};

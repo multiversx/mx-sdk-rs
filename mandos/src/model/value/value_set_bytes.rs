@@ -1,7 +1,7 @@
 use crate::{
     interpret_trait::{InterpretableFrom, InterpreterContext},
     serde_raw::ValueSubTree,
-    value_interpreter::interpret_subtree,
+    value_interpreter::{interpret_string, interpret_subtree},
 };
 
 use std::fmt;
@@ -39,10 +39,19 @@ impl InterpretableFrom<ValueSubTree> for BytesValue {
     }
 }
 
-impl InterpretableFrom<String> for BytesValue {
-    fn interpret_from(from: String, _context: &InterpreterContext) -> Self {
+impl InterpretableFrom<&str> for BytesValue {
+    fn interpret_from(from: &str, context: &InterpreterContext) -> Self {
         BytesValue {
-            value: from.clone().into_bytes(),
+            value: interpret_string(from, context),
+            original: ValueSubTree::Str(from.to_string()),
+        }
+    }
+}
+
+impl InterpretableFrom<String> for BytesValue {
+    fn interpret_from(from: String, context: &InterpreterContext) -> Self {
+        BytesValue {
+            value: interpret_string(from.as_str(), context),
             original: ValueSubTree::Str(from),
         }
     }

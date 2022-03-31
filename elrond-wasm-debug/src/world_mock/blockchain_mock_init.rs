@@ -24,6 +24,10 @@ pub fn find_workspace() -> PathBuf {
 }
 
 impl BlockchainMock {
+    pub fn interpreter_context(&self) -> InterpreterContext {
+        InterpreterContext::new(self.current_dir.clone())
+    }
+
     /// Tells the tests where the crate lies relative to the workspace.
     /// This ensures that the paths are set correctly, including in debug mode.
     pub fn set_current_dir_from_workspace(&mut self, relative_path: &str) {
@@ -37,10 +41,8 @@ impl BlockchainMock {
         expression: &str,
         new_contract_obj: Box<dyn CallableContract>,
     ) {
-        let contract_bytes = interpret_string(
-            expression,
-            &InterpreterContext::new(self.current_dir.clone()),
-        );
+        let contract_bytes = interpret_string(expression, &self.interpreter_context());
+        // panic!("{}", String::from_utf8(contract_bytes).unwrap());
         self.contract_map
             .register_contract(contract_bytes, new_contract_obj);
     }

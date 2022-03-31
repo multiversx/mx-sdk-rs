@@ -1,6 +1,6 @@
 use mandos::model::{
     AddressKey, BytesValue, CheckEsdt, CheckEsdtData, CheckEsdtInstance, CheckEsdtInstances,
-    CheckEsdtMap, CheckStorage, CheckValue, Checkable,
+    CheckEsdtMap, CheckStateStep, CheckStorage, CheckValue, Checkable,
 };
 use num_bigint::BigUint;
 use num_traits::Zero;
@@ -10,7 +10,19 @@ use crate::{
     world_mock::{AccountEsdt, BlockchainMock, EsdtData, EsdtInstance, EsdtInstances},
 };
 
-pub fn execute(accounts: &mandos::model::CheckAccounts, state: &mut BlockchainMock) {
+impl BlockchainMock {
+    pub fn mandos_check_state(mut self, check_state_step: CheckStateStep) -> BlockchainMock {
+        execute(&mut self, &check_state_step.accounts);
+        self
+    }
+
+    pub fn mandos_dump_state(self) -> BlockchainMock {
+        self.print_accounts();
+        self
+    }
+}
+
+fn execute(state: &mut BlockchainMock, accounts: &mandos::model::CheckAccounts) {
     for (expected_address, expected_account) in accounts.accounts.iter() {
         if let Some(account) = state.accounts.get(&expected_address.value.into()) {
             assert!(
