@@ -6,7 +6,7 @@ use crate::{
 
 use std::collections::BTreeMap;
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct Account {
     pub comment: Option<String>,
     pub nonce: Option<U64Value>,
@@ -16,6 +16,34 @@ pub struct Account {
     pub storage: BTreeMap<BytesKey, BytesValue>,
     pub code: Option<BytesValue>,
     pub owner: Option<AddressValue>,
+}
+
+impl Account {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn nonce<V>(mut self, nonce: V) -> Self
+    where
+        U64Value: InterpretableFrom<V>,
+    {
+        self.nonce = Some(U64Value::interpret_from(
+            nonce,
+            &InterpreterContext::default(),
+        ));
+        self
+    }
+
+    pub fn balance<V>(mut self, balance_expr: V) -> Self
+    where
+        BigUintValue: InterpretableFrom<V>,
+    {
+        self.balance = Some(BigUintValue::interpret_from(
+            balance_expr,
+            &InterpreterContext::default(),
+        ));
+        self
+    }
 }
 
 impl InterpretableFrom<AccountRaw> for Account {

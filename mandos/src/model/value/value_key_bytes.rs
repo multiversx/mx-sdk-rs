@@ -43,6 +43,16 @@ impl Ord for BytesKey {
     }
 }
 
+impl InterpretableFrom<&str> for BytesKey {
+    fn interpret_from(from: &str, context: &InterpreterContext) -> Self {
+        let bytes = interpret_string(from, context);
+        BytesKey {
+            value: bytes,
+            original: from.to_string(),
+        }
+    }
+}
+
 impl InterpretableFrom<String> for BytesKey {
     fn interpret_from(from: String, context: &InterpreterContext) -> Self {
         let bytes = interpret_string(&from, context);
