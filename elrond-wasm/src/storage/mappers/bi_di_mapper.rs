@@ -5,219 +5,232 @@ use elrond_codec::{
     TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
 };
 
-use super::{QueueMapper, StorageMapper};
+use super::{SetMapper, StorageMapper};
 use crate::{
     abi::{TypeAbi, TypeName},
     api::StorageMapperApi,
     storage::{storage_get, storage_get_len, storage_set, StorageKey},
-    types::{ManagedAddress, ManagedType, ManagedVec, MultiResultVec},
+    types::{ManagedAddress, ManagedType, ManagedVec, ManagedVecItem, MultiResultVec},
 };
 
-const VALUE_TO_KEY_SUFFIX: &[u8] = b"_value_to_key";
-const KEY_TO_VALUE_SUFFIX: &[u8] = b"_key_to_value";
-const COUNT_SUFFIX: &[u8] = b"_count";
+const VALUE_TO_ID_SUFFIX: &[u8] = b"_value_to_id";
+const ID_TO_VALUE_SUFFIX: &[u8] = b"_id_to_value";
 
-/// Very widely used mapper, that manages the users of a smart contract.
-/// It holds a bi-directional map, from addresses to ids and viceversa.
+/// A bi-directional map, from value to ids and viceversa.
 /// This is so we can easily iterate over all users, using their ids.
 /// Also holds the user count in sync. This is also necessary for iteration.
 ///
-/// This particular implementation of a user mapper doesn't contain any additional
-/// user data other than address/id.
-///
-/// It also doesn't allow removing users. Once in, their ids are reserved forever.
-pub struct BiDiMapper<SA>
+/// It also doesn't allow removing values. Once in, their ids are reserved forever.
+pub struct BiDiMapper<SA, K, V>
 where
     SA: StorageMapperApi,
+    K: TopEncode
+        + TopDecode
+        + NestedEncode
+        + NestedDecode
+        + 'static
+        + Default
+        + PartialEq
+        + ManagedVecItem,
+    V: TopEncode
+        + TopDecode
+        + NestedEncode
+        + NestedDecode
+        + 'static
+        + Default
+        + PartialEq
+        + ManagedVecItem,
 {
     _phantom_api: PhantomData<SA>,
+    id_set_mapper: SetMapper<SA, K>,
+    value_set_mapper: SetMapper<SA, V>,
     base_key: StorageKey<SA>,
 }
 
-impl<SA> StorageMapper<SA> for BiDiMapper<SA>
+impl<SA, K, V> StorageMapper<SA> for BiDiMapper<SA, K, V>
 where
     SA: StorageMapperApi,
+    K: TopEncode
+        + TopDecode
+        + NestedEncode
+        + NestedDecode
+        + 'static
+        + Default
+        + PartialEq
+        + ManagedVecItem,
+    V: TopEncode
+        + TopDecode
+        + NestedEncode
+        + NestedDecode
+        + 'static
+        + Default
+        + PartialEq
+        + ManagedVecItem,
 {
     fn new(base_key: StorageKey<SA>) -> Self {
         BiDiMapper {
             _phantom_api: PhantomData,
+            id_set_mapper: SetMapper::<SA, K>::new(base_key.clone()),
+            value_set_mapper: SetMapper::<SA, V>::new(base_key.clone()),
             base_key,
         }
     }
 }
 
-impl<SA> BiDiMapper<SA>
+impl<SA, K, V> BiDiMapper<SA, K, V>
 where
     SA: StorageMapperApi,
+    K: TopEncode
+        + TopDecode
+        + NestedEncode
+        + NestedDecode
+        + 'static
+        + Default
+        + PartialEq
+        + ManagedVecItem,
+    V: TopEncode
+        + TopDecode
+        + NestedEncode
+        + NestedDecode
+        + 'static
+        + Default
+        + PartialEq
+        + ManagedVecItem,
 {
-    fn get_key_skey<T>(&self, value: &T) -> StorageKey<SA>
-    where
-        T: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
-    {
+    fn get_id_key(&self, value: &V) -> StorageKey<SA> {
         let mut key = self.base_key.clone();
-        key.append_bytes(VALUE_TO_KEY_SUFFIX);
+        key.append_bytes(VALUE_TO_ID_SUFFIX);
         key.append_item(value);
         key
     }
 
-    fn get_value_skey<T>(&self, key: &T) -> StorageKey<SA>
-    where
-        T: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
-    {
+    fn get_value_key(&self, key: &K) -> StorageKey<SA> {
         let mut value = self.base_key.clone();
-        value.append_bytes(KEY_TO_VALUE_SUFFIX);
+        value.append_bytes(ID_TO_VALUE_SUFFIX);
         value.append_item(&key);
         value
     }
 
-    fn get_count_skey(&self) -> StorageKey<SA> {
-        let mut user_count_key = self.base_key.clone();
-        user_count_key.append_bytes(COUNT_SUFFIX);
-        user_count_key
+    pub fn get_id(&self, value: &V) -> K {
+        storage_get(self.get_id_key(value).as_ref())
     }
 
-    /// Yields the user id for a given address.
-    /// Will return 0 if the address is not known to the contract.
-    pub fn get_key<T>(&self, value: &T) -> usize
-    where
-        T: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
-    {
-        storage_get(self.get_key_skey(value).as_ref())
+    fn set_id(&mut self, value: &V, id: &K) {
+        storage_set(self.get_id_key(value).as_ref(), id);
     }
 
-    fn set_key<T>(&self, value: &T, id: usize)
-    where
-        T: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
-    {
-        storage_set(self.get_key_skey(value).as_ref(), &id);
-    }
-
-    /// Yields the user address for a given id, if the id is valid.
-    pub fn get_value<T>(&self, key: &T) -> Option<ManagedAddress<SA>>
-    where
-        T: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
-    {
-        let skey = self.get_key_skey(key);
+    pub fn get_value(&self, id: &K) -> Option<V> {
+        let key = self.get_value_key(id);
         // TODO: optimize, storage_load_managed_buffer_len is currently called twice
 
-        if storage_get_len(skey.as_ref()) > 0 {
-            Some(storage_get(skey.as_ref()))
+        if storage_get_len(key.as_ref()) > 0 {
+            Some(storage_get(key.as_ref()))
         } else {
             None
         }
     }
 
-    /// Yields the user address for a given id.
-    /// Will cause a deserialization error if the id is invalid.
-    pub fn get_value_unchecked<T>(&self, key: &T) -> T
-    where
-        T: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
-    {
-        storage_get(self.get_value_skey(key).as_ref())
+    pub fn get_value_unchecked(&self, id: &K) -> V {
+        storage_get(self.get_value_key(id).as_ref())
     }
 
-    /// Yields the user address for a given id, if the id is valid.
-    /// Otherwise returns the zero address (0x000...)
-    pub fn get_value_or_zero<T>(&self, key: &T) -> T
-    where
-        T: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
-    {
-        let skey = self.get_value_skey(key);
-        // TODO: optimize, storage_load_managed_buffer_len is currently called twice
-        if storage_get_len(skey.as_ref()) > 0 {
-            storage_get(skey.as_ref())
+    pub fn get_value_or_zero(&self, id: &K) -> V {
+        let key = self.get_value_key(id);
+        if storage_get_len(key.as_ref()) > 0 {
+            storage_get(key.as_ref())
         } else {
+            V::default()
         }
     }
 
-    fn set_user_address(&self, id: usize, address: &ManagedAddress<SA>) {
-        storage_set(self.get_value_skey(id).as_ref(), address);
+    fn set_value(&mut self, id: &K, value: &V) {
+        storage_set(self.get_value_key(id).as_ref(), value);
     }
 
-    /// Number of users.
-    pub fn get_user_count(&self) -> usize {
-        storage_get(self.get_value_skey().as_ref())
-    }
-
-    fn set_user_count(&self, user_count: usize) {
-        storage_set(self.get_user_count_key().as_ref(), &user_count);
-    }
-
-    /// Yields the user id for a given address, or creates a new user id if there isn't one.
-    /// Will safely keep the user count in sync.
-    pub fn get_or_create_user(&self, address: &ManagedAddress<SA>) -> usize {
-        let mut user_id = self.get_user_id(address);
-        if user_id == 0 {
-            let mut user_count = self.get_user_count();
-            user_count += 1;
-            self.set_user_count(user_count);
-            user_id = user_count;
-            self.set_user_id(address, user_id);
-            self.set_user_address(user_id, address);
+    pub fn insert(&mut self, id: K, value: V) -> bool {
+        if self.id_set_mapper.contains(&id) || self.value_set_mapper.contains(&value) {
+            return false;
         }
-        user_id
+        self.set_id(&value, &id);
+        self.set_value(&id, &value);
+
+        self.id_set_mapper.insert(id);
+        self.value_set_mapper.insert(value);
+        true
     }
 
-    /// Tries to insert a number of addresses.
-    /// Calls a lambda function for each, with the new user id and whether of nor the user was already present.
-    pub fn get_or_create_users<AddressIter, F>(
-        &self,
-        address_iter: AddressIter,
-        mut user_id_lambda: F,
-    ) where
-        AddressIter: Iterator<Item = ManagedAddress<SA>>,
-        F: FnMut(usize, bool),
-    {
-        let mut user_count = self.get_user_count();
-        for address in address_iter {
-            let mut user_id = self.get_user_id(&address);
-            if user_id > 0 {
-                user_id_lambda(user_id, false);
-            } else {
-                user_count += 1;
-                user_id = user_count;
-                self.set_user_id(&address, user_id);
-                self.set_user_address(user_id, &address);
-                user_id_lambda(user_id, true);
-            }
-        }
-        self.set_user_count(user_count);
-    }
-
-    /// Loads all addresses from storage and places them in a ManagedVec.
-    /// Can easily consume a lot of gas.
-    pub fn get_all_addresses(&self) -> ManagedVec<SA, ManagedAddress<SA>> {
-        let user_count = self.get_user_count();
+    pub fn get_all_values(&self) -> ManagedVec<SA, V> {
         let mut result = ManagedVec::new();
-        for i in 1..=user_count {
-            result.push(self.get_user_address_or_zero(i));
+        for value in self.value_set_mapper.iter() {
+            result.push(value);
         }
         result
     }
+
+    pub fn get_all_ids(&self) -> ManagedVec<SA, K> {
+        let mut result = ManagedVec::new();
+        for id in self.id_set_mapper.iter() {
+            result.push(id);
+        }
+        result
+    }
+
+    pub fn len(&self) -> usize {
+        self.value_set_mapper.len()
+    }
 }
 
-/// Behaves like a MultiResultVec<Address> when an endpoint result,
-/// and lists all users addresses.
-impl<SA> TopEncodeMulti for BiDiMapper<SA>
+impl<SA, K, V> TopEncodeMulti for BiDiMapper<SA, K, V>
 where
     SA: StorageMapperApi,
+    K: TopEncode
+        + TopDecode
+        + NestedEncode
+        + NestedDecode
+        + 'static
+        + Default
+        + PartialEq
+        + ManagedVecItem,
+    V: TopEncode
+        + TopDecode
+        + NestedEncode
+        + NestedDecode
+        + 'static
+        + Default
+        + PartialEq
+        + ManagedVecItem,
 {
-    type DecodeAs = MultiResultVec<ManagedAddress<SA>>;
+    type DecodeAs = MultiResultVec<V>;
 
     fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
     where
         O: TopEncodeMultiOutput,
         H: EncodeErrorHandler,
     {
-        let all_addresses = self.get_all_addresses();
-        multi_encode_iter_or_handle_err(all_addresses.into_iter(), output, h)
+        let all_values = self.get_all_values();
+        multi_encode_iter_or_handle_err(all_values.into_iter(), output, h)
     }
 }
 
-/// Behaves like a MultiResultVec when an endpoint result.
-impl<SA> TypeAbi for BiDiMapper<SA>
+impl<SA, K, V> TypeAbi for BiDiMapper<SA, K, V>
 where
     SA: StorageMapperApi,
+    K: TopEncode
+        + TopDecode
+        + NestedEncode
+        + NestedDecode
+        + 'static
+        + Default
+        + PartialEq
+        + ManagedVecItem,
+    V: TopEncode
+        + TopDecode
+        + NestedEncode
+        + NestedDecode
+        + 'static
+        + Default
+        + PartialEq
+        + ManagedVecItem,
 {
     fn type_name() -> TypeName {
         crate::types::MultiResultVec::<ManagedAddress<SA>>::type_name()
