@@ -6,7 +6,7 @@ use crate::{
 
 use super::{tx_interpret_util::interpret_egld_value, TxESDT};
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct TxCall {
     pub from: AddressValue,
     pub to: AddressValue,

@@ -2,7 +2,7 @@ use core::cmp::Ordering;
 
 use crate::{
     api::{BigIntApi, Handle, Sign},
-    types::BoxedBytes,
+    types::heap::BoxedBytes,
 };
 
 impl BigIntApi for super::UncallableApi {

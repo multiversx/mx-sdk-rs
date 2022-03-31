@@ -8,10 +8,10 @@ publish = false
 path = "src/lib.rs"
 
 [dependencies.elrond-wasm]
-version = "0.27.1"
+version = "0.30.0"
 path = "../../../../elrond-wasm"
 
 [dev-dependencies.elrond-wasm-debug]
-version = "0.27.1"
+version = "0.30.0"
 path = "../../../../elrond-wasm-debug"
 

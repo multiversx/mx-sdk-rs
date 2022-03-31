@@ -9,11 +9,6 @@ fn forw_raw_async_accept_esdt_go() {
 }
 
 #[test]
-fn forwarder_get_esdt_local_roles_go() {
-    elrond_wasm_debug::mandos_go("mandos/forwarder_get_esdt_local_roles.scen.json");
-}
-
-#[test]
 fn forw_raw_async_echo_go() {
     elrond_wasm_debug::mandos_go("mandos/forw_raw_async_echo.scen.json");
 }
@@ -66,6 +61,11 @@ fn forw_raw_direct_esdt_go() {
 }
 
 #[test]
+fn forw_raw_direct_multi_esdt_go() {
+    elrond_wasm_debug::mandos_go("mandos/forw_raw_direct_multi_esdt.scen.json");
+}
+
+#[test]
 fn forw_raw_sync_echo_go() {
     elrond_wasm_debug::mandos_go("mandos/forw_raw_sync_echo.scen.json");
 }
@@ -96,8 +96,13 @@ fn forw_raw_sync_same_context_egld_go() {
 }
 
 #[test]
-fn forw_raw_transf_exec_egld_go() {
-    elrond_wasm_debug::mandos_go("mandos/forw_raw_transf_exec_egld.scen.json");
+fn forw_raw_transf_exec_accept_egld_go() {
+    elrond_wasm_debug::mandos_go("mandos/forw_raw_transf_exec_accept_egld.scen.json");
+}
+
+#[test]
+fn forw_raw_transf_exec_reject_egld_go() {
+    elrond_wasm_debug::mandos_go("mandos/forw_raw_transf_exec_reject_egld.scen.json");
 }
 
 #[test]
@@ -143,11 +148,6 @@ fn forwarder_call_async_accept_esdt_go() {
 #[test]
 fn forwarder_call_async_accept_nft_go() {
     elrond_wasm_debug::mandos_go("mandos/forwarder_call_async_accept_nft.scen.json");
-}
-
-#[test]
-fn forwarder_validate_token_identifier_go() {
-    elrond_wasm_debug::mandos_go("mandos/forwarder_validate_token_identifier.scen.json");
 }
 
 #[test]
@@ -206,11 +206,6 @@ fn forwarder_call_sync_accept_then_read_nft_go() {
 }
 
 #[test]
-fn forwarder_retrieve_funds_with_accept_func_go() {
-    elrond_wasm_debug::mandos_go("mandos/forwarder_retrieve_funds_with_accept_func.scen.json");
-}
-
-#[test]
 fn forwarder_call_sync_retrieve_egld_go() {
     elrond_wasm_debug::mandos_go("mandos/forwarder_call_sync_retrieve_egld.scen.json");
 }
@@ -246,6 +241,13 @@ fn forwarder_call_transf_exec_accept_esdt_twice_go() {
 }
 
 #[test]
+fn forwarder_call_transf_exec_accept_multi_transfer_go() {
+    elrond_wasm_debug::mandos_go(
+        "mandos/forwarder_call_transf_exec_accept_multi_transfer.scen.json",
+    );
+}
+
+#[test]
 fn forwarder_call_transf_exec_accept_nft_go() {
     elrond_wasm_debug::mandos_go("mandos/forwarder_call_transf_exec_accept_nft.scen.json");
 }
@@ -263,8 +265,15 @@ fn forwarder_call_transf_exec_accept_sft_twice_go() {
 }
 
 #[test]
-fn forwarder_call_transf_exec_multi_transfer_esdt_go() {
-    elrond_wasm_debug::mandos_go("mandos/forwarder_call_transf_exec_multi_transfer_esdt.scen.json");
+fn forwarder_call_transf_exec_reject_multi_transfer_go() {
+    elrond_wasm_debug::mandos_go(
+        "mandos/forwarder_call_transf_exec_reject_multi_transfer.scen.json",
+    );
+}
+
+#[test]
+fn forwarder_call_transf_exec_reject_nft_go() {
+    elrond_wasm_debug::mandos_go("mandos/forwarder_call_transf_exec_reject_nft.scen.json");
 }
 
 #[test]
@@ -280,6 +289,16 @@ fn forwarder_contract_deploy_go() {
 #[test]
 fn forwarder_contract_upgrade_go() {
     elrond_wasm_debug::mandos_go("mandos/forwarder_contract_upgrade.scen.json");
+}
+
+#[test]
+fn forwarder_get_esdt_local_roles_go() {
+    elrond_wasm_debug::mandos_go("mandos/forwarder_get_esdt_local_roles.scen.json");
+}
+
+#[test]
+fn forwarder_nft_add_uri_go() {
+    elrond_wasm_debug::mandos_go("mandos/forwarder_nft_add_uri.scen.json");
 }
 
 #[test]
@@ -313,8 +332,18 @@ fn forwarder_nft_transfer_exec_go() {
 }
 
 #[test]
+fn forwarder_nft_update_attributes_go() {
+    elrond_wasm_debug::mandos_go("mandos/forwarder_nft_update_attributes.scen.json");
+}
+
+#[test]
 fn forwarder_no_endpoint_go() {
     elrond_wasm_debug::mandos_go("mandos/forwarder_no_endpoint.scen.json");
+}
+
+#[test]
+fn forwarder_retrieve_funds_with_accept_func_go() {
+    elrond_wasm_debug::mandos_go("mandos/forwarder_retrieve_funds_with_accept_func.scen.json");
 }
 
 #[test]
@@ -345,6 +374,11 @@ fn forwarder_sync_echo_range_go() {
 #[test]
 fn forwarder_tranfer_esdt_with_fees_go() {
     elrond_wasm_debug::mandos_go("mandos/forwarder_tranfer_esdt_with_fees.scen.json");
+}
+
+#[test]
+fn forwarder_validate_token_identifier_go() {
+    elrond_wasm_debug::mandos_go("mandos/forwarder_validate_token_identifier.scen.json");
 }
 
 #[test]

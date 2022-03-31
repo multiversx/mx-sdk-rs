@@ -7,8 +7,8 @@ pub trait MapStorageMapperFeatures {
     fn map_storage_mapper(&self) -> MapStorageMapper<u32, MapMapper<u32, u32>>;
 
     #[view]
-    fn map_storage_mapper_view(&self) -> ManagedMultiResultVec<u32> {
-        let mut result = ManagedMultiResultVec::new();
+    fn map_storage_mapper_view(&self) -> MultiValueEncoded<u32> {
+        let mut result = MultiValueEncoded::new();
         for (key1, map) in self.map_storage_mapper().iter() {
             for (key2, value) in map.iter() {
                 result.push(key1);
@@ -32,17 +32,17 @@ pub trait MapStorageMapperFeatures {
     }
 
     #[endpoint]
-    fn map_storage_mapper_get(&self, item: u32) -> SCResult<MultiResultVec<u32>> {
+    fn map_storage_mapper_get(&self, item: u32) -> MultiValueEncoded<u32> {
         let map_storage_mapper = self.map_storage_mapper();
         if let Some(map) = map_storage_mapper.get(&item) {
-            let mut vec = Vec::new();
+            let mut result = MultiValueEncoded::new();
             for (key, value) in map.iter() {
-                vec.push(key);
-                vec.push(value);
+                result.push(key);
+                result.push(value);
             }
-            return Ok(MultiResultVec::from(vec));
+            return result;
         }
-        sc_error!("No storage!")
+        sc_panic!("No storage!")
     }
 
     #[endpoint]
@@ -56,7 +56,7 @@ pub trait MapStorageMapperFeatures {
         if let Some(mut map) = map_storage_mapper.get(&item) {
             return Ok(map.insert(key, value));
         }
-        sc_error!("No storage!")
+        sc_panic!("No storage!")
     }
 
     #[endpoint]
@@ -65,7 +65,7 @@ pub trait MapStorageMapperFeatures {
         if let Some(map) = map_storage_mapper.get(&item) {
             return Ok(map.get(&key));
         }
-        sc_error!("No storage!")
+        sc_panic!("No storage!")
     }
 
     #[endpoint]

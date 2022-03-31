@@ -24,7 +24,7 @@ pub trait FirstContract {
         &self,
         #[payment] esdt_value: BigUint,
         #[payment_token] actual_token_identifier: TokenIdentifier,
-    ) -> SCResult<()> {
+    ) {
         let expected_token_identifier = self.get_contract_esdt_token_identifier();
 
         require!(esdt_value > 0, "no esdt transfered!");
@@ -40,8 +40,6 @@ pub trait FirstContract {
             &ManagedBuffer::from(SECOND_CONTRACT_ACCEPT_ESDT_PAYMENT),
             &ManagedVec::new(),
         );
-
-        Ok(())
     }
 
     #[payable("*")]
@@ -50,7 +48,7 @@ pub trait FirstContract {
         &self,
         #[payment] esdt_value: BigUint,
         #[payment_token] actual_token_identifier: TokenIdentifier,
-    ) -> SCResult<()> {
+    ) {
         let expected_token_identifier = self.get_contract_esdt_token_identifier();
 
         require!(esdt_value > 0, "no esdt transfered!");
@@ -66,8 +64,6 @@ pub trait FirstContract {
             &ManagedBuffer::from(SECOND_CONTRACT_ACCEPT_ESDT_PAYMENT),
             &ManagedVec::new(),
         );
-
-        Ok(())
     }
 
     #[payable("*")]
@@ -76,7 +72,7 @@ pub trait FirstContract {
         &self,
         #[payment] esdt_value: BigUint,
         #[payment_token] actual_token_identifier: TokenIdentifier,
-    ) -> SCResult<()> {
+    ) {
         let expected_token_identifier = self.get_contract_esdt_token_identifier();
 
         require!(esdt_value > 0, "no esdt transfered!");
@@ -92,8 +88,6 @@ pub trait FirstContract {
             &ManagedBuffer::from(SECOND_CONTRACT_REJECT_ESDT_PAYMENT),
             &ManagedVec::new(),
         );
-
-        Ok(())
     }
 
     #[payable("*")]
@@ -102,7 +96,7 @@ pub trait FirstContract {
         &self,
         #[payment] esdt_value: BigUint,
         #[payment_token] actual_token_identifier: TokenIdentifier,
-    ) -> SCResult<()> {
+    ) {
         let second_contract_address = self.get_second_contract_address();
         let expected_token_identifier = self.get_contract_esdt_token_identifier();
 
@@ -120,8 +114,6 @@ pub trait FirstContract {
             &ManagedBuffer::from(SECOND_CONTRACT_REJECT_ESDT_PAYMENT),
             &ManagedArgBuffer::new_empty(),
         );
-
-        Ok(())
     }
 
     #[payable("*")]
@@ -130,7 +122,7 @@ pub trait FirstContract {
         &self,
         #[payment] esdt_value: BigUint,
         #[payment_token] actual_token_identifier: TokenIdentifier,
-    ) -> SCResult<()> {
+    ) {
         let second_contract_address = self.get_second_contract_address();
         let expected_token_identifier = self.get_contract_esdt_token_identifier();
 
@@ -148,8 +140,6 @@ pub trait FirstContract {
             &ManagedBuffer::from(SECOND_CONTRACT_ACCEPT_ESDT_PAYMENT),
             &ManagedArgBuffer::new_empty(),
         );
-
-        Ok(())
     }
 
     fn call_esdt_second_contract(

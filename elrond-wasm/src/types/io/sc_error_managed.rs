@@ -1,8 +1,9 @@
 use alloc::{string::String, vec::Vec};
+use elrond_codec::{EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput, TryStaticCast};
 
 use crate::{
     api::{EndpointFinishApi, ErrorApi, ErrorApiImpl, ManagedTypeApi},
-    types::{BoxedBytes, ManagedBuffer, ManagedType},
+    types::{heap::BoxedBytes, ManagedBuffer, ManagedType},
 };
 
 use super::SCError;
@@ -24,6 +25,8 @@ where
         M::error_api_impl().signal_error_from_buffer(self.buffer.get_raw_handle())
     }
 }
+
+impl<M> TryStaticCast for ManagedSCError<M> where M: ManagedTypeApi + ErrorApi {}
 
 impl<M> ManagedSCError<M>
 where
@@ -111,5 +114,20 @@ where
     #[inline]
     fn from(message: ManagedBuffer<M>) -> Self {
         ManagedSCError { buffer: message }
+    }
+}
+
+impl<M> TopEncodeMulti for ManagedSCError<M>
+where
+    M: ManagedTypeApi + ErrorApi,
+{
+    type DecodeAs = Self;
+
+    fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: TopEncodeMultiOutput,
+        H: EncodeErrorHandler,
+    {
+        output.push_multi_specialized(self, h)
     }
 }

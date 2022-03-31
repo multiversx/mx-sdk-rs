@@ -1,6 +1,6 @@
 use std::rc::Rc;
 
-use mandos::model::{TxCall, TxESDT, TxExpect};
+use mandos::model::{ScCallStep, Step, TxESDT};
 
 use crate::{
     tx_execution::sc_call_with_async_and_callback,
@@ -10,12 +10,18 @@ use crate::{
 
 use super::check_tx_output;
 
-pub fn execute(
-    state: &mut Rc<BlockchainMock>,
-    tx_id: &str,
-    tx: &TxCall,
-    expect: &Option<TxExpect>,
-) {
+impl BlockchainMock {
+    pub fn mandos_sc_call(mut self, sc_call_step: ScCallStep) -> BlockchainMock {
+        let mut state_rc = Rc::new(self);
+        execute_rc(&mut state_rc, &sc_call_step);
+        self = Rc::try_unwrap(state_rc).unwrap();
+        self.mandos_trace.steps.push(Step::ScCall(sc_call_step));
+        self
+    }
+}
+
+fn execute_rc(state: &mut Rc<BlockchainMock>, sc_call_step: &ScCallStep) {
+    let tx = &sc_call_step.tx;
     let tx_input = TxInput {
         from: tx.from.value.into(),
         to: tx.to.value.into(),
@@ -29,11 +35,11 @@ pub fn execute(
             .collect(),
         gas_limit: tx.gas_limit.value,
         gas_price: tx.gas_price.value,
-        tx_hash: generate_tx_hash_dummy(tx_id),
+        tx_hash: generate_tx_hash_dummy(&sc_call_step.tx_id),
     };
     let tx_result = sc_call_with_async_and_callback(tx_input, state, true);
-    if let Some(tx_expect) = expect {
-        check_tx_output(tx_id, tx_expect, &tx_result);
+    if let Some(tx_expect) = &sc_call_step.expect {
+        check_tx_output(&sc_call_step.tx_id, tx_expect, &tx_result);
     }
 }
 

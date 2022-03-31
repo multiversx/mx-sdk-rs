@@ -81,6 +81,176 @@
                     "biguint:0"
                 ]
             }
+        },
+        {
+            "step": "scQuery",
+            "txId": "5",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "managed_vec_remove",
+                "arguments": [
+                    "biguint:1|biguint:2|biguint:3",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "biguint:2|biguint:3"
+                ]
+            }
+        },
+        {
+            "step": "scQuery",
+            "txId": "6",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "managed_vec_remove",
+                "arguments": [
+                    "biguint:1|biguint:2|biguint:3",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "biguint:1|biguint:3"
+                ]
+            }
+        },
+        {
+            "step": "scQuery",
+            "txId": "7",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "managed_vec_remove",
+                "arguments": [
+                    "biguint:1|biguint:2|biguint:3",
+                    "2"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "biguint:1|biguint:2"
+                ]
+            }
+        },
+        {
+            "step": "scQuery",
+            "txId": "8",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "managed_vec_remove",
+                "arguments": [
+                    "biguint:1|biguint:2|biguint:3",
+                    "3"
+                ]
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:ManagedVec index out of range"
+            }
+        },
+        {
+            "step": "scQuery",
+            "txId": "9",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "managed_vec_find",
+                "arguments": [
+                    "biguint:1|biguint:2|biguint:3",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "u8:1|u32:0"
+                ]
+            }
+        },
+        {
+            "step": "scQuery",
+            "txId": "10",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "managed_vec_find",
+                "arguments": [
+                    "biguint:1|biguint:2|biguint:3",
+                    "2"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "u8:1|u32:1"
+                ]
+            }
+        },
+        {
+            "step": "scQuery",
+            "txId": "11",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "managed_vec_find",
+                "arguments": [
+                    "biguint:1|biguint:2|biguint:3",
+                    "3"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "u8:1|u32:2"
+                ]
+            }
+        },
+        {
+            "step": "scQuery",
+            "txId": "12",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "managed_vec_find",
+                "arguments": [
+                    "biguint:1|biguint:2|biguint:3",
+                    "4"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "0x"
+                ]
+            }
+        },
+        {
+            "step": "scQuery",
+            "txId": "13",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "managed_vec_contains",
+                "arguments": [
+                    "biguint:1|biguint:2|biguint:3",
+                    "3"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "true"
+                ]
+            }
+        },
+        {
+            "step": "scQuery",
+            "txId": "14",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "managed_vec_contains",
+                "arguments": [
+                    "biguint:1|biguint:2|biguint:3",
+                    "4"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "false"
+                ]
+            }
         }
     ]
 }

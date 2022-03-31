@@ -29,7 +29,6 @@
             },
             "expect": {
                 "out": [
-                    "1",
                     "1"
                 ],
                 "status": "0",
@@ -64,7 +63,6 @@
             },
             "expect": {
                 "out": [
-                    "2",
                     "2"
                 ],
                 "status": "0",
@@ -87,7 +85,9 @@
                                     "balance": "1",
                                     "creator": "sc:nft-minter",
                                     "royalties": "5000",
-                                    "uri": "str:www.mycoolnft.com/nft1.jpg",
+                                    "uri": [
+                                        "str:www.mycoolnft.com/nft1.jpg"
+                                    ],
                                     "attributes": "u64:100,000"
                                 },
                                 {
@@ -95,7 +95,9 @@
                                     "balance": "1",
                                     "creator": "sc:nft-minter",
                                     "royalties": "5000",
-                                    "uri": "str:www.mycoolnft.com/nft2.jpg",
+                                    "uri": [
+                                        "str:www.mycoolnft.com/nft2.jpg"
+                                    ],
                                     "attributes": "u64:200,000"
                                 }
                             ],

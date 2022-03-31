@@ -4,7 +4,7 @@ use crate::{
     serde_raw::EsdtRaw,
 };
 
-use super::{EsdtObject, Instance};
+use super::{EsdtInstance, EsdtObject};
 
 #[derive(Debug)]
 pub enum Esdt {
@@ -25,16 +25,12 @@ impl InterpretableFrom<EsdtRaw> for Esdt {
                 instances: full_esdt
                     .instances
                     .into_iter()
-                    .map(|instance| Instance::interpret_from(instance, context))
+                    .map(|instance| EsdtInstance::interpret_from(instance, context))
                     .collect(),
                 last_nonce: full_esdt
                     .last_nonce
                     .map(|b| U64Value::interpret_from(b, context)),
-                roles: full_esdt
-                    .roles
-                    .into_iter()
-                    .map(|role| BytesValue::interpret_from(role, context))
-                    .collect(),
+                roles: full_esdt.roles,
                 frozen: full_esdt
                     .frozen
                     .map(|b| U64Value::interpret_from(b, context)),

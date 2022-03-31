@@ -16,13 +16,15 @@ jobs:
         with:
           default: true
           toolchain: nightly-2022-01-17
-      - name: Install erdpy and vmtools
+      - name: Install erdpy, vmtools and wasm-opt
         run: |
           source .github/workflows/env
           pip3 install erdpy
           mkdir $HOME/elrondsdk
-          erdpy config set dependencies.vmtools.tag v1.4.36
+          erdpy config set dependencies.vmtools.tag v1.4.43
           erdpy deps install vmtools
+          erdpy deps install nodejs
+          erdpy deps install wasm-opt
       - name: Build the wasm contracts
         run: |
           source .github/workflows/env

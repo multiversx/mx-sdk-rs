@@ -1,5 +1,7 @@
-use elrond_wasm::types::Address;
-use mandos::{interpret_trait::InterpreterContext, value_interpreter::interpret_string};
+use elrond_wasm::types::heap::Address;
+use mandos::{
+    interpret_trait::InterpreterContext, model::Scenario, value_interpreter::interpret_string,
+};
 use num_bigint::BigUint;
 use num_traits::Zero;
 use std::{collections::HashMap, path::PathBuf, rc::Rc};
@@ -21,6 +23,7 @@ pub struct BlockchainMock {
     pub current_block_info: BlockInfo,
     pub contract_map: ContractMap,
     pub current_dir: PathBuf,
+    pub mandos_trace: Scenario, // can be printed later - TODO: write the actual print
 }
 
 impl BlockchainMock {
@@ -32,6 +35,7 @@ impl BlockchainMock {
             current_block_info: BlockInfo::new(),
             contract_map: ContractMap::default(),
             current_dir: std::env::current_dir().unwrap(),
+            mandos_trace: Scenario::default(),
         }
     }
 }

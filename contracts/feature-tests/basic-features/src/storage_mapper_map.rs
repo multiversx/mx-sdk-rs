@@ -3,17 +3,28 @@ elrond_wasm::imports!();
 /// Storage mapper test.
 #[elrond_wasm::module]
 pub trait MapMapperFeatures {
+    #[view]
     #[storage_mapper("map_mapper")]
     fn map_mapper(&self) -> MapMapper<u32, u32>;
 
     #[view]
-    fn map_mapper_keys(&self) -> MultiResultVec<u32> {
-        self.map_mapper().keys().collect()
+    fn map_mapper_keys(&self) -> MultiValueManagedVec<u32> {
+        // TODO: implement FromIterator and make this more compact
+        let mut result = MultiValueManagedVec::new();
+        for key in self.map_mapper().keys() {
+            result.push(key);
+        }
+        result
     }
 
     #[view]
-    fn map_mapper_values(&self) -> MultiResultVec<u32> {
-        self.map_mapper().values().collect()
+    fn map_mapper_values(&self) -> MultiValueManagedVec<u32> {
+        // TODO: implement FromIterator and make this more compact
+        let mut result = MultiValueManagedVec::new();
+        for value in self.map_mapper().values() {
+            result.push(value);
+        }
+        result
     }
 
     #[endpoint]

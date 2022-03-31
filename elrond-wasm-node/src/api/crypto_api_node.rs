@@ -1,20 +1,22 @@
 use super::VmApiImpl;
 use elrond_wasm::{
-    api::{CryptoApi, CryptoApiImpl, Handle},
-    types::{BoxedBytes, MessageHashType, H256},
-    Box,
+    api::{CryptoApi, CryptoApiImpl},
+    types::{heap::BoxedBytes, MessageHashType},
 };
 
 extern "C" {
     // managed buffer API
+    #[cfg(feature = "ei-1-1")]
     fn mBufferNew() -> i32;
 
     fn sha256(dataOffset: *const u8, length: i32, resultOffset: *mut u8) -> i32;
 
+    #[cfg(feature = "ei-1-1")]
     fn managedSha256(inputHandle: i32, outputHandle: i32) -> i32;
 
     fn keccak256(dataOffset: *const u8, length: i32, resultOffset: *mut u8) -> i32;
 
+    #[cfg(feature = "ei-1-1")]
     fn managedKeccak256(inputHandle: i32, outputHandle: i32) -> i32;
 
     fn ripemd160(dataOffset: *const u8, length: i32, resultOffset: *mut u8) -> i32;
@@ -70,7 +72,17 @@ impl CryptoApi for VmApiImpl {
 }
 
 impl CryptoApiImpl for VmApiImpl {
-    fn sha256(&self, data_handle: Handle) -> Handle {
+    #[inline]
+    fn sha256_legacy(&self, data: &[u8]) -> [u8; 32] {
+        unsafe {
+            let mut res = [0u8; 32];
+            sha256(data.as_ptr(), data.len() as i32, res.as_mut_ptr());
+            res
+        }
+    }
+
+    #[cfg(feature = "ei-1-1")]
+    fn sha256(&self, data_handle: elrond_wasm::api::Handle) -> elrond_wasm::api::Handle {
         unsafe {
             let result_handle = mBufferNew();
             managedSha256(data_handle, result_handle);
@@ -78,23 +90,17 @@ impl CryptoApiImpl for VmApiImpl {
         }
     }
 
-    fn sha256_legacy(&self, data: &[u8]) -> H256 {
+    #[inline]
+    fn keccak256_legacy(&self, data: &[u8]) -> [u8; 32] {
         unsafe {
-            let mut res = H256::zero();
-            sha256(data.as_ptr(), data.len() as i32, res.as_mut_ptr());
-            res
-        }
-    }
-
-    fn keccak256_legacy(&self, data: &[u8]) -> H256 {
-        unsafe {
-            let mut res = H256::zero();
+            let mut res = [0u8; 32];
             keccak256(data.as_ptr(), data.len() as i32, res.as_mut_ptr());
             res
         }
     }
 
-    fn keccak256(&self, data_handle: Handle) -> Handle {
+    #[cfg(feature = "ei-1-1")]
+    fn keccak256(&self, data_handle: elrond_wasm::api::Handle) -> elrond_wasm::api::Handle {
         unsafe {
             let result_handle = mBufferNew();
             managedKeccak256(data_handle, result_handle);
@@ -102,11 +108,12 @@ impl CryptoApiImpl for VmApiImpl {
         }
     }
 
-    fn ripemd160(&self, data: &[u8]) -> Box<[u8; 20]> {
+    #[inline]
+    fn ripemd160(&self, data: &[u8]) -> [u8; 20] {
         unsafe {
             let mut res = [0u8; 20];
             ripemd160(data.as_ptr(), data.len() as i32, res.as_mut_ptr());
-            Box::new(res)
+            res
         }
     }
 

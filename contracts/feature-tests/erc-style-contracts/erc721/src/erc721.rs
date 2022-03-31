@@ -16,16 +16,14 @@ pub trait NonFungibleTokens {
     /// Only the contract owner may call this function.
     #[only_owner]
     #[endpoint]
-    fn mint(&self, count: u64, new_token_owner: ManagedAddress) -> SCResult<()> {
+    fn mint(&self, count: u64, new_token_owner: ManagedAddress) {
         self.perform_mint(count, &new_token_owner);
-
-        Ok(())
     }
 
     /// Approves an account to transfer the token on behalf of its owner.<br>
     /// Only the owner of the token may call this function.
     #[endpoint]
-    fn approve(&self, token_id: u64, approved_address: ManagedAddress) -> SCResult<()> {
+    fn approve(&self, token_id: u64, approved_address: ManagedAddress) {
         require!(
             token_id < self.total_minted().get(),
             "Token does not exist!"
@@ -36,14 +34,12 @@ pub trait NonFungibleTokens {
         );
 
         self.approval(token_id).set(&approved_address);
-
-        Ok(())
     }
 
     /// Revokes approval for the token.<br>  
     /// Only the owner of the token may call this function.
     #[endpoint]
-    fn revoke(&self, token_id: u64) -> SCResult<()> {
+    fn revoke(&self, token_id: u64) {
         require!(
             token_id < self.total_minted().get(),
             "Token does not exist!"
@@ -54,13 +50,11 @@ pub trait NonFungibleTokens {
         );
 
         self.approval(token_id).clear();
-
-        Ok(())
     }
 
     /// Transfer ownership of the token to a new account.
     #[endpoint]
-    fn transfer(&self, token_id: u64, to: ManagedAddress) -> SCResult<()> {
+    fn transfer(&self, token_id: u64, to: ManagedAddress) {
         require!(
             token_id < self.total_minted().get(),
             "Token does not exist!"
@@ -72,18 +66,18 @@ pub trait NonFungibleTokens {
         if caller == token_owner {
             self.perform_transfer(token_id, &token_owner, &to);
 
-            return Ok(());
+            return;
         } else if !self.approval(token_id).is_empty() {
             let approved_address = self.approval(token_id).get();
 
             if caller == approved_address {
                 self.perform_transfer(token_id, &token_owner, &to);
 
-                return Ok(());
+                return;
             }
         }
 
-        sc_error!("Only the owner or the approved account may transfer the token!")
+        sc_panic!("Only the owner or the approved account may transfer the token!")
     }
 
     // private methods

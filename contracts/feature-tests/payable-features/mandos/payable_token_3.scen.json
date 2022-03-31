@@ -34,8 +34,8 @@
             "expect": {
                 "out": [],
                 "status": "4",
-                "message": "str:bad call value token provided",
-                "logs": [],
+                "message": "str:function expects single ESDT payment",
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -55,8 +55,8 @@
             "expect": {
                 "out": [],
                 "status": "4",
-                "message": "str:bad call value token provided",
-                "logs": [],
+                "message": "str:function expects single ESDT payment",
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -84,7 +84,7 @@
                     "str:PAYABLE-FEATURES-TOKEN"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -110,7 +110,7 @@
                 "out": [],
                 "status": "4",
                 "message": "str:bad call value token provided",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }

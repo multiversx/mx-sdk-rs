@@ -44,7 +44,7 @@
                 "out": [],
                 "status": "10",
                 "message": "str:function does not accept ESDT payment",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -72,7 +72,7 @@
                 "out": [],
                 "status": "10",
                 "message": "str:function does not accept ESDT payment",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -101,7 +101,7 @@
                 "out": [],
                 "status": "10",
                 "message": "str:function does not accept ESDT payment",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -130,7 +130,7 @@
                 "out": [],
                 "status": "10",
                 "message": "str:function does not accept ESDT payment",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -159,7 +159,7 @@
                 "out": [],
                 "status": "10",
                 "message": "str:function does not accept ESDT payment",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -189,7 +189,7 @@
                 "out": [],
                 "status": "10",
                 "message": "str:function does not accept ESDT payment",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }

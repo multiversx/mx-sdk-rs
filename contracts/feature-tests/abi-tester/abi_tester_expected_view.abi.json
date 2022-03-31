@@ -13,7 +13,7 @@
         },
         "framework": {
             "name": "elrond-wasm",
-            "version": "0.27.1"
+            "version": "0.30.0"
         }
     },
     "docs": [
@@ -176,6 +176,14 @@
                 {
                     "name": "NftBurn",
                     "discriminant": 5
+                },
+                {
+                    "name": "NftAddUri",
+                    "discriminant": 6
+                },
+                {
+                    "name": "NftUpdateAttributes",
+                    "discriminant": 7
                 }
             ]
         },

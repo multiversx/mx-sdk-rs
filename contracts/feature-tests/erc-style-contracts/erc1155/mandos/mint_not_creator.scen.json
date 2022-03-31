@@ -24,7 +24,7 @@
                 "out": [],
                 "status": "4",
                 "message": "str:Only the token creator may mint more tokens",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
