@@ -10,7 +10,7 @@ use crate::{
     abi::{TypeAbi, TypeName},
     api::StorageMapperApi,
     storage::{storage_get, storage_get_len, storage_set, StorageKey},
-    types::{ManagedAddress, ManagedType, ManagedVec, ManagedVecItem, MultiResultVec},
+    types::{ManagedAddress, ManagedType, ManagedVec, ManagedVecItem, MultiValueEncoded},
 };
 
 const VALUE_SUFIX: &[u8] = b"_value";
@@ -200,7 +200,7 @@ where
         + PartialEq
         + ManagedVecItem,
 {
-    type DecodeAs = MultiResultVec<V>;
+    type DecodeAs = MultiValueEncoded<SA, V>;
 
     fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
     where
