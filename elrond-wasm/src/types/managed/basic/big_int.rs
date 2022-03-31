@@ -3,7 +3,7 @@ use core::marker::PhantomData;
 use crate::{
     abi::TypeName,
     api::{BigIntApi, Handle, ManagedTypeApi, ManagedTypeApiImpl},
-    hex_util::encode_bytes_as_hex,
+    formatter::hex_util::encode_bytes_as_hex,
     types::{heap::BoxedBytes, BigUint, ManagedBuffer, ManagedType, Sign},
 };
 use elrond_codec::{

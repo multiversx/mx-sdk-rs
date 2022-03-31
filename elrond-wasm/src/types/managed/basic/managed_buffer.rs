@@ -3,7 +3,9 @@ use core::marker::PhantomData;
 use crate::{
     abi::TypeName,
     api::{ErrorApiImpl, Handle, InvalidSliceError, ManagedBufferApi, ManagedTypeApi},
-    hex_util::encode_bytes_as_hex,
+    formatter::{
+        hex_util::encode_bytes_as_hex, FormatByteReceiver, SCDisplay, SCLowerHex, HEX_VALUE_PREFIX,
+    },
     types::{heap::BoxedBytes, ManagedType},
 };
 use elrond_codec::{
@@ -387,6 +389,19 @@ impl<M: ManagedTypeApi> TopDecode for ManagedBuffer<M> {
 impl<M: ManagedTypeApi> crate::abi::TypeAbi for ManagedBuffer<M> {
     fn type_name() -> TypeName {
         "bytes".into()
+    }
+}
+
+impl<M: ManagedTypeApi> SCDisplay for ManagedBuffer<M> {
+    fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
+        f.append_managed_buffer(self);
+    }
+}
+
+impl<M: ManagedTypeApi> SCLowerHex for ManagedBuffer<M> {
+    fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
+        f.append_bytes(HEX_VALUE_PREFIX); // TODO: in Rust thr `0x` prefix appears only when writing "{:#x}", not "{:x}"
+        f.append_managed_buffer_lower_hex(self);
     }
 }
 

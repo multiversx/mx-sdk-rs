@@ -1,6 +1,6 @@
 use crate::{
     api::ManagedTypeApi,
-    hex_util::byte_to_hex_digits,
+    formatter::hex_util::byte_to_hex_digits,
     types::{heap::ArgBuffer, ManagedArgBuffer, ManagedBuffer},
 };
 use alloc::vec::Vec;
@@ -53,9 +53,9 @@ impl HexCallDataSerializer {
     }
 
     fn push_byte(&mut self, byte: u8) {
-        let (digit1, digit2) = byte_to_hex_digits(byte);
-        self.0.push(digit1);
-        self.0.push(digit2);
+        let digits = byte_to_hex_digits(byte);
+        self.0.push(digits[0]);
+        self.0.push(digits[1]);
     }
 
     pub fn push_argument_bytes(&mut self, bytes: &[u8]) {
