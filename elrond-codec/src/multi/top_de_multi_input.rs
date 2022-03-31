@@ -53,7 +53,7 @@ impl TopDecodeMultiInput for Vec<Vec<u8>> {
     type ValueInput = Box<[u8]>;
 
     fn has_next(&self) -> bool {
-        self.len() > 0
+        !self.is_empty()
     }
 
     fn next_value_input<H>(&mut self, h: H) -> Result<Self::ValueInput, H::HandledErr>
