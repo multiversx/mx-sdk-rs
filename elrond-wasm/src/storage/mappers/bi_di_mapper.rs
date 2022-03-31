@@ -19,11 +19,8 @@ const ID_SUFIX: &[u8] = b"_id";
 const VALUE_TO_ID_SUFFIX: &[u8] = b"_value_to_id";
 const ID_TO_VALUE_SUFFIX: &[u8] = b"_id_to_value";
 
-/// A bi-directional map, from value to ids and viceversa.
-/// This is so we can easily iterate over all users, using their ids.
-/// Also holds the user count in sync. This is also necessary for iteration.
-///
-/// It also doesn't allow removing values. Once in, their ids are reserved forever.
+/// A bi-directional map, from values to ids and viceversa.
+/// The mapper is based on UnorderedSetMapper, reason why the remove is done by swap_remove
 pub struct BiDiMapper<SA, K, V>
 where
     SA: StorageMapperApi,
