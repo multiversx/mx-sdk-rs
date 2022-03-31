@@ -49,7 +49,7 @@ impl InterpretableFrom<ValueSubTree> for U64Value {
 
 impl InterpretableFrom<&str> for U64Value {
     fn interpret_from(from: &str, context: &InterpreterContext) -> Self {
-        let bytes = interpret_string(&from, context);
+        let bytes = interpret_string(from, context);
         let bu = BigUint::from_bytes_be(&bytes);
         U64Value {
             value: bu.to_u64().unwrap(),

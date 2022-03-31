@@ -25,7 +25,7 @@ impl InterpretableFrom<ValueSubTree> for BigUintValue {
 
 impl InterpretableFrom<&str> for BigUintValue {
     fn interpret_from(from: &str, context: &InterpreterContext) -> Self {
-        let bytes = interpret_string(&from, context);
+        let bytes = interpret_string(from, context);
         BigUintValue {
             value: BigUint::from_bytes_be(&bytes),
             original: ValueSubTree::Str(from.to_string()),
