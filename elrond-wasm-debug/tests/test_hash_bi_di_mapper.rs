@@ -40,3 +40,55 @@ fn test_hash_set_simple_1() {
     assert_eq!(set.get_id(&101), 1);
     assert_eq!(set.get_value(&4), 104);
 }
+
+#[test]
+fn test_set_removal_by_id() {
+    let mut set = create_set_1();
+    check_set_1(&set, vec![], vec![]);
+
+    assert_eq!(set.insert(42, 43), true);
+    check_set_1(&set, vec![42], vec![43]);
+    assert_eq!(set.insert(42, 44), false);
+    assert_eq!(set.insert(44, 43), false);
+
+    assert_eq!(set.insert(1, 101), true);
+    assert_eq!(set.insert(2, 102), true);
+    assert_eq!(set.insert(3, 103), true);
+    assert_eq!(set.insert(4, 104), true);
+    check_set_1(&set, vec![42, 1, 2, 3, 4], vec![43, 101, 102, 103, 104]);
+
+    assert_eq!(set.remove_by_id(&42), true);
+    check_set_1(&set, vec![1, 2, 3, 4], vec![101, 102, 103, 104]);
+    assert_eq!(set.get_id(&101), 1);
+    assert_eq!(set.get_value(&4), 104);
+    assert_eq!(set.remove_by_id(&42), false);
+
+    set.remove_all_by_ids([2, 4]);
+    check_set_1(&set, vec![1, 3], vec![101, 103]);
+}
+
+#[test]
+fn test_set_removal_by_value() {
+    let mut set = create_set_1();
+    check_set_1(&set, vec![], vec![]);
+
+    assert_eq!(set.insert(42, 43), true);
+    check_set_1(&set, vec![42], vec![43]);
+    assert_eq!(set.insert(42, 44), false);
+    assert_eq!(set.insert(44, 43), false);
+
+    assert_eq!(set.insert(1, 101), true);
+    assert_eq!(set.insert(2, 102), true);
+    assert_eq!(set.insert(3, 103), true);
+    assert_eq!(set.insert(4, 104), true);
+    check_set_1(&set, vec![42, 1, 2, 3, 4], vec![43, 101, 102, 103, 104]);
+
+    assert_eq!(set.remove_by_value(&43), true);
+    check_set_1(&set, vec![1, 2, 3, 4], vec![101, 102, 103, 104]);
+    assert_eq!(set.get_id(&101), 1);
+    assert_eq!(set.get_value(&4), 104);
+    assert_eq!(set.remove_by_value(&43), false);
+
+    set.remove_all_by_values([102, 104]);
+    check_set_1(&set, vec![1, 3], vec![101, 103]);
+}

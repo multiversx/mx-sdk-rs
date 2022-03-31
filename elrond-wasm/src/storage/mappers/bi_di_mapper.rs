@@ -9,7 +9,8 @@ use super::{SetMapper, StorageMapper};
 use crate::{
     abi::{TypeAbi, TypeName},
     api::StorageMapperApi,
-    storage::{storage_get, storage_get_len, storage_set, StorageKey},
+    storage::{storage_get, storage_set, StorageKey},
+    storage_clear,
     types::{ManagedAddress, ManagedType, ManagedVec, ManagedVecItem, MultiValueEncoded},
 };
 
@@ -130,19 +131,6 @@ where
         storage_get(self.get_value_key(id).as_ref())
     }
 
-    pub fn get_value_unchecked(&self, id: &K) -> V {
-        storage_get(self.get_value_key(id).as_ref())
-    }
-
-    pub fn get_value_or_zero(&self, id: &K) -> V {
-        let key = self.get_value_key(id);
-        if storage_get_len(key.as_ref()) > 0 {
-            storage_get(key.as_ref())
-        } else {
-            V::default()
-        }
-    }
-
     fn set_value(&mut self, id: &K, value: &V) {
         storage_set(self.get_value_key(id).as_ref(), value);
     }
@@ -157,6 +145,45 @@ where
         self.id_set_mapper.insert(id);
         self.value_set_mapper.insert(value);
         true
+    }
+
+    pub fn remove_by_id(&mut self, id: &K) -> bool {
+        if self.id_set_mapper.remove(id) {
+            let value = self.get_value(id);
+            storage_clear(self.get_id_key(&value).as_ref());
+            storage_clear(self.get_value_key(id).as_ref());
+            self.value_set_mapper.remove(&value);
+            return true;
+        }
+        false
+    }
+    pub fn remove_by_value(&mut self, value: &V) -> bool {
+        if self.value_set_mapper.remove(value) {
+            let id = self.get_id(value);
+            storage_clear(self.get_id_key(value).as_ref());
+            storage_clear(self.get_value_key(&id).as_ref());
+            self.id_set_mapper.remove(&id);
+            return true;
+        }
+        false
+    }
+
+    pub fn remove_all_by_ids<I>(&mut self, iter: I)
+    where
+        I: IntoIterator<Item = K>,
+    {
+        for item in iter {
+            self.remove_by_id(&item);
+        }
+    }
+
+    pub fn remove_all_by_values<I>(&mut self, iter: I)
+    where
+        I: IntoIterator<Item = V>,
+    {
+        for item in iter {
+            self.remove_by_value(&item);
+        }
     }
 
     pub fn get_all_values(&self) -> ManagedVec<SA, V> {
@@ -233,7 +260,7 @@ where
         + ManagedVecItem,
 {
     fn type_name() -> TypeName {
-        crate::types::MultiResultVec::<ManagedAddress<SA>>::type_name()
+        crate::abi::type_name_variadic::<ManagedAddress<SA>>()
     }
 
     fn is_variadic() -> bool {
