@@ -13,7 +13,7 @@ rm -f ${CONTRACT_PATH}/output/${CONTRACT_NAME}-dbg.wat
 
 cd ${CONTRACT_PATH}/meta
 cargo run build
-cargo run build --wasm-symbols --wasm-suffix "dbg"
+cargo run build --wasm-symbols --wasm-suffix "dbg" --no-wasm-opt
 
 cd ../output
 wasm2wat \

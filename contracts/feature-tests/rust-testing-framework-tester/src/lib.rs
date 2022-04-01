@@ -76,6 +76,12 @@ pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
 
     #[payable("*")]
     #[endpoint]
+    fn reject_payment(&self) {
+        sc_panic!("No payment allowed!");
+    }
+
+    #[payable("*")]
+    #[endpoint]
     fn receive_esdt_half(&self) {
         let caller = self.blockchain().get_caller();
         let token_id = self.call_value().token();
@@ -188,7 +194,7 @@ pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
     }
 
     #[callback_raw]
-    fn callback_raw(&self, #[var_args] _ignore: IgnoreVarArgs) {
+    fn callback_raw(&self, #[var_args] _ignore: IgnoreValue) {
         self.callback_executed().set(&true);
     }
 
@@ -217,6 +223,11 @@ pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
 
         self.total_value().update(|val| *val += &value);
         self.value_per_caller(&caller).update(|val| *val += value);
+    }
+
+    #[endpoint]
+    fn panic(&self) {
+        sc_panic!("Oh no!");
     }
 
     fn get_val(&self) -> BigUint {

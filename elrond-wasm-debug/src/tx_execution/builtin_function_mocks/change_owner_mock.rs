@@ -1,4 +1,4 @@
-use elrond_wasm::{elrond_codec::TopDecode, types::Address};
+use elrond_wasm::{elrond_codec::TopDecode, types::heap::Address};
 
 use crate::tx_mock::{BlockchainUpdate, TxCache, TxInput, TxResult};
 

@@ -32,9 +32,9 @@ elrond_wasm_node::wasm_endpoints! {
         forward_sync_retrieve_funds
         forward_sync_retrieve_funds_with_accept_func
         forward_transf_exec_accept_funds
-        forward_transf_exec_accept_funds_multi_transfer
         forward_transf_exec_accept_funds_return_values
         forward_transf_exec_accept_funds_twice
+        forward_transf_exec_reject_funds_multi_transfer
         forward_transf_execu_accept_funds_with_fees
         getCurrentNftNonce
         getFungibleEsdtBalance
@@ -45,13 +45,16 @@ elrond_wasm_node::wasm_endpoints! {
         lastIssuedToken
         local_burn
         local_mint
-        multi_transfer_via_async
         nft_add_quantity
+        nft_add_uris
         nft_burn
         nft_create
+        nft_create_compact
         nft_create_on_caller_behalf
         nft_decode_complex_attributes
         nft_issue
+        nft_update_attributes
+        send_async_accept_multi_transfer
         send_egld
         send_esdt
         send_esdt_direct_multi_transfer
@@ -60,6 +63,8 @@ elrond_wasm_node::wasm_endpoints! {
         send_funds_twice
         setLocalRoles
         sft_issue
+        transf_exec_multi_accept_funds
+        transf_exec_multi_reject_funds
         transfer_nft_and_execute
         transfer_nft_via_async_call
         unsetLocalRoles

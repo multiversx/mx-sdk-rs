@@ -1,5 +1,5 @@
 use alloc::vec::Vec;
-use elrond_wasm::types::Address;
+use elrond_wasm::types::heap::Address;
 
 use std::fmt::Write;
 
@@ -24,13 +24,7 @@ impl BlockchainMock {
     pub fn print_accounts(&self) {
         let mut accounts_buf = String::new();
         for (address, account) in &self.accounts {
-            write!(
-                &mut accounts_buf,
-                "\n\t{} -> {}",
-                address_hex(address),
-                account
-            )
-            .unwrap();
+            write!(accounts_buf, "\n\t{} -> {}", address_hex(address), account).unwrap();
         }
         println!("Accounts: {}", &accounts_buf);
     }

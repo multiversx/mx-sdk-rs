@@ -1,7 +1,8 @@
-use elrond_codec::{EncodeError, TopEncode};
+use elrond_codec::{TopEncode, TopEncodeMulti};
 
 use crate::{
-    api::{ErrorApi, ErrorApiImpl, LogApi, LogApiImpl, ManagedTypeApi},
+    api::{ErrorApi, LogApi, LogApiImpl, ManagedTypeApi},
+    contract_base::ExitCodecErrorHandler,
     err_msg,
     types::{ManagedBuffer, ManagedType, ManagedVec},
 };
@@ -18,21 +19,12 @@ where
 pub fn serialize_event_topic<A, T>(accumulator: &mut ManagedVec<A, ManagedBuffer<A>>, topic: T)
 where
     A: ErrorApi + ManagedTypeApi,
-    T: TopEncode,
+    T: TopEncodeMulti,
 {
-    let mut topic_buffer = ManagedBuffer::new();
-    topic.top_encode_or_exit(&mut topic_buffer, (), serialize_log_topic_exit::<A>);
-    accumulator.push(topic_buffer);
-}
-
-#[inline(always)]
-fn serialize_log_topic_exit<A>(_: (), encode_err: EncodeError) -> !
-where
-    A: ErrorApi + ManagedTypeApi,
-{
-    let mut message_buffer = ManagedBuffer::<A>::new_from_bytes(err_msg::LOG_TOPIC_ENCODE_ERROR);
-    message_buffer.append_bytes(encode_err.message_bytes());
-    A::error_api_impl().signal_error_from_buffer(message_buffer.get_raw_handle())
+    let Ok(()) = topic.multi_encode_or_handle_err(
+        accumulator,
+        ExitCodecErrorHandler::<A>::from(err_msg::LOG_TOPIC_ENCODE_ERROR),
+    );
 }
 
 pub fn serialize_log_data<T, A>(data: T) -> ManagedBuffer<A>
@@ -41,18 +33,11 @@ where
     A: ErrorApi + ManagedTypeApi,
 {
     let mut data_buffer = ManagedBuffer::new();
-    data.top_encode_or_exit(&mut data_buffer, (), serialize_log_data_exit::<A>);
+    let Ok(()) = data.top_encode_or_handle_err(
+        &mut data_buffer,
+        ExitCodecErrorHandler::<A>::from(err_msg::LOG_DATA_ENCODE_ERROR),
+    );
     data_buffer
-}
-
-#[inline(always)]
-fn serialize_log_data_exit<A>(_: (), encode_err: EncodeError) -> !
-where
-    A: ErrorApi + ManagedTypeApi,
-{
-    let mut message_buffer = ManagedBuffer::<A>::new_from_bytes(err_msg::LOG_DATA_ENCODE_ERROR);
-    message_buffer.append_bytes(encode_err.message_bytes());
-    A::error_api_impl().signal_error_from_buffer(message_buffer.get_raw_handle())
 }
 
 pub fn write_log<A>(topics: &ManagedVec<A, ManagedBuffer<A>>, data: &ManagedBuffer<A>)

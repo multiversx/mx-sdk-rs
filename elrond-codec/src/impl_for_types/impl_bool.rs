@@ -1,16 +1,8 @@
 use crate::{
-    codec_err::{DecodeError, EncodeError},
-    dep_encode_from_no_err, dep_encode_num_mimic,
-    nested_de::NestedDecode,
-    nested_de_input::NestedDecodeInput,
-    nested_ser::{NestedEncode, NestedEncodeNoErr},
-    nested_ser_output::NestedEncodeOutput,
-    top_de::TopDecode,
-    top_de_input::TopDecodeInput,
-    top_encode_from_no_err,
-    top_ser::{TopEncode, TopEncodeNoErr},
-    top_ser_output::TopEncodeOutput,
-    TypeInfo,
+    dep_encode_from_no_err, dep_encode_num_mimic, top_encode_from_no_err, DecodeError,
+    DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode,
+    NestedEncodeNoErr, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeNoErr,
+    TopEncodeOutput, TypeInfo,
 };
 
 impl TopEncodeNoErr for bool {
@@ -26,23 +18,15 @@ top_encode_from_no_err! {bool, TypeInfo::Bool}
 impl TopDecode for bool {
     const TYPE_INFO: TypeInfo = TypeInfo::Bool;
 
-    fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
-        match input.into_u64() {
+    fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: TopDecodeInput,
+        H: DecodeErrorHandler,
+    {
+        match input.into_u64(h)? {
             0 => Ok(false),
             1 => Ok(true),
-            _ => Err(DecodeError::INPUT_OUT_OF_RANGE),
-        }
-    }
-
-    fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
-        input: I,
-        c: ExitCtx,
-        exit: fn(ExitCtx, DecodeError) -> !,
-    ) -> Self {
-        match input.into_u64() {
-            0 => false,
-            1 => true,
-            _ => exit(c, DecodeError::INPUT_OUT_OF_RANGE),
+            _ => Err(h.handle_error(DecodeError::INPUT_OUT_OF_RANGE)),
         }
     }
 }
@@ -52,23 +36,15 @@ dep_encode_num_mimic! {bool, u8, TypeInfo::Bool}
 impl NestedDecode for bool {
     const TYPE_INFO: TypeInfo = TypeInfo::Bool;
 
-    fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
-        match input.read_byte()? {
+    fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: NestedDecodeInput,
+        H: DecodeErrorHandler,
+    {
+        match input.read_byte(h)? {
             0 => Ok(false),
             1 => Ok(true),
-            _ => Err(DecodeError::INVALID_VALUE),
-        }
-    }
-
-    fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
-        input: &mut I,
-        c: ExitCtx,
-        exit: fn(ExitCtx, DecodeError) -> !,
-    ) -> Self {
-        match input.read_byte_or_exit(c.clone(), exit) {
-            0 => false,
-            1 => true,
-            _ => exit(c, DecodeError::INVALID_VALUE),
+            _ => Err(h.handle_error(DecodeError::INVALID_VALUE)),
         }
     }
 }

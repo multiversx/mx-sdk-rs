@@ -222,7 +222,8 @@
                             "0x1234123400000000000000000000000000000000000000000000000000000004"
                         ],
                         "data": "0x00"
-                    }
+                    },
+                    "+"
                 ],
                 "gas": "0x1234",
                 "refund": "*"
@@ -261,7 +262,7 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [],
+                "out": "*",
                 "status": "",
                 "logs": "*"
             }
@@ -303,7 +304,7 @@
             "expect": {
                 "out": [],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "5"
             }
@@ -403,11 +404,12 @@
                         "str:5-SeveralNFTs": {
                             "instances": [
                                 {
-                                    "nonce": "*"
+                                    "nonce": "0"
                                 },
                                 {
                                     "nonce": "1",
-                                    "balance": "3"
+                                    "balance": "3",
+                                    "uri": "*"
                                 }
                             ],
                             "lastNonce": "*",
@@ -420,6 +422,7 @@
                             ],
                             "frozen": "false"
                         },
+                        "str:6-ZERO": "0",
                         "+": ""
                     },
                     "username": "str:check.elrond",
@@ -479,11 +482,11 @@
                 "to": "address:B",
                 "esdtValue": [
                     {
-                        "tokenIdentifier": "str:TOK-123000",
+                        "tokenIdentifier": "str:TOK-123456",
                         "value": "100"
                     },
                     {
-                        "tokenIdentifier": "str:OTHERTOK-123777",
+                        "tokenIdentifier": "str:OTHERTOK-123456",
                         "value": "1000"
                     },
                     {

@@ -34,7 +34,7 @@
                     "0x0102030405"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -56,7 +56,7 @@
                 "out": [],
                 "status": "4",
                 "message": "str:argument decode error (s): input too short",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }

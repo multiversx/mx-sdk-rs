@@ -1,0 +1,13 @@
+[package]
+name = "esdt-system-sc-mock-meta"
+version = "0.0.0"
+authors = ["Dorin Marian Iancu <dorin.iancu@elrond.com>"]
+edition = "2018"
+publish = false
+
+[dependencies.esdt-system-sc-mock]
+path = ".."
+
+[dependencies.elrond-wasm-debug]
+version = "0.30.0"
+path = "../../../../elrond-wasm-debug"

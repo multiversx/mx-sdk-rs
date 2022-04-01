@@ -7,10 +7,6 @@ publish = false
 [dependencies.recursive-caller]
 path = ".."
 
-[dependencies.elrond-wasm]
-version = "0.27.1"
-path = "../../../../../elrond-wasm"
-
 [dependencies.elrond-wasm-debug]
-version = "0.27.1"
+version = "0.30.0"
 path = "../../../../../elrond-wasm-debug"

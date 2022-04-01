@@ -35,6 +35,10 @@ impl EsdtData {
 pub struct AccountEsdt(HashMap<Vec<u8>, EsdtData>);
 
 impl AccountEsdt {
+    pub fn is_empty(&self) -> bool {
+        self.0.is_empty()
+    }
+
     pub fn get_by_identifier(&self, identifier: &[u8]) -> Option<&EsdtData> {
         self.0.get(identifier)
     }
@@ -127,6 +131,34 @@ impl AccountEsdt {
         }
     }
 
+    pub fn add_uris(&mut self, token_identifier: &[u8], nonce: u64, mut new_uris: Vec<Vec<u8>>) {
+        self.0
+            .get_mut(token_identifier)
+            .unwrap_or_else(|| panic!("invalid token"))
+            .instances
+            .get_mut_by_nonce(nonce)
+            .unwrap_or_else(|| panic!("invalid token nonce"))
+            .metadata
+            .uri
+            .append(&mut new_uris);
+    }
+
+    pub fn update_attributes(
+        &mut self,
+        token_identifier: &[u8],
+        nonce: u64,
+        new_attribute_bytes: Vec<u8>,
+    ) {
+        self.0
+            .get_mut(token_identifier)
+            .unwrap_or_else(|| panic!("invalid token"))
+            .instances
+            .get_mut_by_nonce(nonce)
+            .unwrap_or_else(|| panic!("invalid token nonce"))
+            .metadata
+            .attributes = new_attribute_bytes;
+    }
+
     pub fn iter(&self) -> Iter<Vec<u8>, EsdtData> {
         self.0.iter()
     }
@@ -136,7 +168,7 @@ impl fmt::Display for EsdtData {
     fn fmt(&self, _f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut esdt_buf = String::new();
         write!(
-            &mut esdt_buf,
+            esdt_buf,
             "{{
                 token_identifier: {},
                 instances: [{}],
@@ -161,12 +193,7 @@ impl fmt::Display for AccountEsdt {
 
         for key in &esdt_keys {
             let value = self.0.get(key).unwrap();
-            write!(
-                &mut esdt_buf,
-                "\n\t\t\t{} -> {}",
-                key_hex(key.as_slice()),
-                value
-            )?;
+            write!(esdt_buf, "\n\t\t\t{} -> {}", key_hex(key.as_slice()), value)?;
         }
         Ok(())
     }

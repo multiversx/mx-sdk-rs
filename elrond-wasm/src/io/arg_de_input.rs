@@ -2,10 +2,13 @@ use core::marker::PhantomData;
 
 use crate::{
     api::{EndpointArgumentApi, EndpointArgumentApiImpl, ManagedTypeApi},
-    types::{BigInt, BigUint, ManagedBuffer, ManagedBufferNestedDecodeInput, ManagedType},
-    Box,
+    types::{
+        heap::Box, BigInt, BigUint, ManagedBuffer, ManagedBufferNestedDecodeInput, ManagedType,
+    },
 };
-use elrond_codec::{try_execute_then_cast, DecodeError, TopDecodeInput, TryStaticCast};
+use elrond_codec::{
+    try_execute_then_cast, DecodeError, DecodeErrorHandler, TopDecodeInput, TryStaticCast,
+};
 
 /// Adapter from the API to the TopDecodeInput trait.
 /// Allows objects to be deserialized directly from the API as arguments.
@@ -74,20 +77,45 @@ where
     }
 
     #[inline]
-    fn into_u64(self) -> u64 {
-        AA::argument_api_impl().get_argument_u64(self.arg_index)
+    fn into_max_size_buffer<H, const MAX_LEN: usize>(
+        self,
+        buffer: &mut [u8; MAX_LEN],
+        h: H,
+    ) -> Result<&[u8], H::HandledErr>
+    where
+        H: DecodeErrorHandler,
+    {
+        self.to_managed_buffer().into_max_size_buffer(buffer, h)
     }
 
     #[inline]
-    fn into_i64(self) -> i64 {
-        AA::argument_api_impl().get_argument_i64(self.arg_index)
+    fn into_u64<H>(self, _h: H) -> Result<u64, H::HandledErr>
+    where
+        H: DecodeErrorHandler,
+    {
+        Ok(AA::argument_api_impl().get_argument_u64(self.arg_index))
     }
 
     #[inline]
-    fn into_specialized<T, F>(self, else_deser: F) -> Result<T, DecodeError>
+    fn into_i64<H>(self, _h: H) -> Result<i64, H::HandledErr>
+    where
+        H: DecodeErrorHandler,
+    {
+        Ok(AA::argument_api_impl().get_argument_i64(self.arg_index))
+    }
+
+    #[inline]
+    fn supports_specialized_type<T: TryStaticCast>() -> bool {
+        T::type_eq::<ManagedBuffer<AA>>()
+            || T::type_eq::<BigUint<AA>>()
+            || T::type_eq::<BigInt<AA>>()
+    }
+
+    #[inline]
+    fn into_specialized<T, H>(self, h: H) -> Result<T, H::HandledErr>
     where
         T: TryStaticCast,
-        F: FnOnce(Self) -> Result<T, DecodeError>,
+        H: DecodeErrorHandler,
     {
         if let Some(result) = try_execute_then_cast(|| self.to_managed_buffer()) {
             Ok(result)
@@ -96,7 +124,7 @@ where
         } else if let Some(result) = try_execute_then_cast(|| self.to_big_int()) {
             Ok(result)
         } else {
-            else_deser(self)
+            Err(h.handle_error(DecodeError::UNSUPPORTED_OPERATION))
         }
     }
 

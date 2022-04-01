@@ -9,7 +9,6 @@ use super::common::{
     Order, OrderInputParams, OrderType, Payment, Transfer, FREE_ORDER_FROM_STORAGE_MIN_PENALTIES,
     PERCENT_BASE_POINTS,
 };
-use core::iter::FromIterator;
 
 #[elrond_wasm::module]
 pub trait OrdersModule:
@@ -20,104 +19,115 @@ pub trait OrdersModule:
         payment: Payment<Self::Api>,
         params: OrderInputParams<Self::Api>,
         order_type: OrderType,
-    ) -> SCResult<()> {
+    ) {
         let caller = &self.blockchain().get_caller();
 
-        let mut address_order_ids = self.get_address_order_ids(caller).into_vec();
-        self.require_not_max_size(&address_order_ids)?;
+        let address_order_ids = self.get_address_order_ids(caller);
+        self.require_not_max_size(&address_order_ids);
 
         let new_order_id = self.get_and_increase_order_id_counter();
         let order = self.new_order(new_order_id, payment, params, order_type);
         self.orders(order.id).set(&order);
 
-        address_order_ids.push(order.id);
-        self.address_order_ids(caller).set(&address_order_ids);
+        let mut address_orders: ManagedVec<u64> = ManagedVec::new();
+        address_orders.push(order.id);
+        self.address_order_ids(caller).set(&address_orders);
 
         self.emit_order_event(order);
-        Ok(())
     }
 
-    fn match_orders(&self, order_ids: Vec<u64>) -> SCResult<()> {
+    fn match_orders(&self, order_ids: ManagedVec<u64>) {
         let orders = self.load_orders(&order_ids);
         require!(
             orders.len() == order_ids.len(),
             "Order vectors len mismatch"
         );
-        self.require_match_provider_empty_or_caller(&orders)?;
+        self.require_match_provider_empty_or_caller(&orders);
 
-        let transfers = self.create_transfers(&orders)?;
+        let transfers = self.create_transfers(&orders);
         self.clear_orders(&order_ids);
         self.execute_transfers(transfers);
 
         self.emit_match_order_events(orders);
-        Ok(())
     }
 
-    fn cancel_all_orders(&self) -> SCResult<()> {
+    fn cancel_all_orders(&self) {
         let caller = &self.blockchain().get_caller();
-        let address_order_ids = self.get_address_order_ids(caller).into_vec();
+        let address_order_ids = self.get_address_order_ids(caller);
 
-        let order_ids_not_empty = address_order_ids
-            .iter()
-            .filter(|&&x| !self.orders(x).is_empty())
-            .copied()
-            .collect::<Vec<u64>>();
+        let mut order_ids_not_empty = MultiValueManagedVec::new();
+        for order in address_order_ids.iter() {
+            if !self.orders(order).is_empty() {
+                order_ids_not_empty.push(order);
+            }
+        }
 
-        self.cancel_orders(order_ids_not_empty)
+        self.cancel_orders(order_ids_not_empty);
     }
 
-    fn cancel_orders(&self, order_ids: Vec<u64>) -> SCResult<()> {
+    fn cancel_orders(&self, order_ids: MultiValueManagedVec<u64>) {
         let caller = &self.blockchain().get_caller();
-        let mut address_order_ids = self.get_address_order_ids(caller).into_vec();
-        self.require_contains_all(&address_order_ids, &order_ids)?;
+        let address_order_ids = self.get_address_order_ids(caller);
+        self.require_contains_all(&address_order_ids, &order_ids);
 
         let first_token_id = &self.first_token_id().get();
         let second_token_id = &self.second_token_id().get();
         let epoch = self.blockchain().get_block_epoch();
 
-        let order_ids_not_empty = order_ids
-            .iter()
-            .filter(|&&x| !self.orders(x).is_empty())
-            .copied()
-            .collect::<Vec<u64>>();
+        let mut order_ids_not_empty: MultiValueManagedVec<Self::Api, u64> =
+            MultiValueManagedVec::new();
+        for order in order_ids.iter() {
+            if !self.orders(order).is_empty() {
+                order_ids_not_empty.push(order);
+            }
+        }
 
-        let mut orders = Vec::new();
-        for &order_id in order_ids_not_empty.iter() {
-            let order =
-                self.cancel_order(order_id, caller, first_token_id, second_token_id, epoch)?;
-            address_order_ids.remove(order_id as usize);
+        let mut orders = MultiValueManagedVec::new();
+        let mut final_caller_orders: ManagedVec<Self::Api, u64> = ManagedVec::new();
+        for order_id in order_ids_not_empty.iter() {
+            let order = self.cancel_order(order_id, caller, first_token_id, second_token_id, epoch);
+
+            let mut check_order_to_delete = false;
+            for check_order in address_order_ids.iter() {
+                if check_order == order_id {
+                    check_order_to_delete = true;
+                }
+            }
+            if !check_order_to_delete {
+                final_caller_orders.push(order_id);
+            }
+
             orders.push(order);
         }
-        self.address_order_ids(caller).set(&address_order_ids);
 
+        self.address_order_ids(caller).set(&final_caller_orders);
         self.emit_cancel_order_events(orders);
-        Ok(())
     }
 
-    fn free_orders(&self, order_ids: Vec<u64>) -> SCResult<()> {
+    fn free_orders(&self, order_ids: MultiValueManagedVec<u64>) {
         let caller = &self.blockchain().get_caller();
-        let address_order_ids = self.get_address_order_ids(caller).into_vec();
-        self.require_contains_none(&address_order_ids, &order_ids)?;
+        let address_order_ids = self.get_address_order_ids(caller);
+        self.require_contains_none(&address_order_ids, &order_ids);
 
         let first_token_id = &self.first_token_id().get();
         let second_token_id = &self.second_token_id().get();
         let epoch = self.blockchain().get_block_epoch();
 
-        let order_ids_not_empty = order_ids
-            .iter()
-            .filter(|&&x| !self.orders(x).is_empty())
-            .copied()
-            .collect::<Vec<u64>>();
+        let mut order_ids_not_empty: MultiValueManagedVec<Self::Api, u64> =
+            MultiValueManagedVec::new();
+        for order in order_ids.iter() {
+            if !self.orders(order).is_empty() {
+                order_ids_not_empty.push(order);
+            }
+        }
 
-        let mut orders = Vec::new();
-        for &order_id in order_ids_not_empty.iter() {
-            let order =
-                self.free_order(order_id, caller, first_token_id, second_token_id, epoch)?;
+        let mut orders = ManagedVec::new();
+        for order_id in order_ids_not_empty.iter() {
+            let order = self.free_order(order_id, caller, first_token_id, second_token_id, epoch);
             orders.push(order);
         }
 
         self.emit_free_order_events(orders);
-        Ok(())
     }
 
     fn free_order(
@@ -127,7 +137,7 @@ pub trait OrdersModule:
         first_token_id: &TokenIdentifier,
         second_token_id: &TokenIdentifier,
         epoch: u64,
-    ) -> SCResult<Order<Self::Api>> {
+    ) -> Order<Self::Api> {
         let order = self.orders(order_id).get();
 
         let token_id = match &order.order_type {
@@ -165,9 +175,12 @@ pub trait OrdersModule:
         };
 
         self.orders(order_id).clear();
-        self.execute_transfers([creator_transfer, caller_transfer].to_vec());
+        let mut transfers = ManagedVec::new();
+        transfers.push(creator_transfer);
+        transfers.push(caller_transfer);
+        self.execute_transfers(transfers);
 
-        Ok(order)
+        order
     }
 
     fn cancel_order(
@@ -177,7 +190,7 @@ pub trait OrdersModule:
         first_token_id: &TokenIdentifier,
         second_token_id: &TokenIdentifier,
         epoch: u64,
-    ) -> SCResult<Order<Self::Api>> {
+    ) -> Order<Self::Api> {
         let order = self.orders(order_id).get();
 
         let token_id = match &order.order_type {
@@ -200,21 +213,29 @@ pub trait OrdersModule:
         };
 
         self.orders(order_id).clear();
-        self.execute_transfers([transfer].to_vec());
+        let mut transfers = ManagedVec::new();
+        transfers.push(transfer);
+        self.execute_transfers(transfers);
 
-        Ok(order)
+        order
     }
 
-    fn load_orders(&self, order_ids: &[u64]) -> Vec<Order<Self::Api>> {
-        order_ids
-            .iter()
-            .filter(|&x| !self.orders(*x).is_empty())
-            .map(|&x| self.orders(x).get())
-            .collect()
+    fn load_orders(&self, order_ids: &ManagedVec<u64>) -> MultiValueManagedVec<Order<Self::Api>> {
+        let mut orders_vec = MultiValueManagedVec::new();
+        for order in order_ids.iter() {
+            if !self.orders(order).is_empty() {
+                orders_vec.push(self.orders(order).get());
+            }
+        }
+
+        orders_vec
     }
 
-    fn create_transfers(&self, orders: &[Order<Self::Api>]) -> SCResult<Vec<Transfer<Self::Api>>> {
-        let mut transfers = Vec::new();
+    fn create_transfers(
+        &self,
+        orders: &MultiValueManagedVec<Order<Self::Api>>,
+    ) -> ManagedVec<Transfer<Self::Api>> {
+        let mut transfers: ManagedVec<Self::Api, Transfer<Self::Api>> = ManagedVec::new();
         let first_token_id = self.first_token_id().get();
         let second_token_id = self.second_token_id().get();
 
@@ -235,38 +256,44 @@ pub trait OrdersModule:
         let first_token_leftover = &first_token_paid - &first_token_requested;
         let second_token_leftover = &second_token_paid - &second_token_requested;
 
-        let mut buyers_transfers = self.calculate_transfers(
+        let buyers_transfers = self.calculate_transfers(
             buy_orders,
             second_token_paid,
             first_token_id,
             first_token_leftover,
         );
-        transfers.append(&mut buyers_transfers);
+        transfers.append_vec(buyers_transfers);
 
-        let mut sellers_transfers = self.calculate_transfers(
+        let sellers_transfers = self.calculate_transfers(
             sell_orders,
             first_token_paid,
             second_token_id,
             second_token_leftover,
         );
-        transfers.append(&mut sellers_transfers);
+        transfers.append_vec(sellers_transfers);
 
-        Ok(transfers)
+        transfers
     }
 
     fn get_orders_with_type(
         &self,
-        orders: &[Order<Self::Api>],
+        orders: &MultiValueManagedVec<Order<Self::Api>>,
         order_type: OrderType,
-    ) -> Vec<Order<Self::Api>> {
-        orders
-            .iter()
-            .filter(|&x| x.order_type == order_type)
-            .cloned()
-            .collect()
+    ) -> MultiValueManagedVec<Order<Self::Api>> {
+        let mut orders_vec = MultiValueManagedVec::new();
+        for order in orders.iter() {
+            if order.order_type == order_type {
+                orders_vec.push(order);
+            }
+        }
+
+        orders_vec
     }
 
-    fn get_orders_sum_up(&self, orders: &[Order<Self::Api>]) -> (BigUint, BigUint) {
+    fn get_orders_sum_up(
+        &self,
+        orders: &MultiValueManagedVec<Order<Self::Api>>,
+    ) -> (BigUint, BigUint) {
         let mut amount_paid = BigUint::zero();
         let mut amount_requested = BigUint::zero();
 
@@ -280,12 +307,12 @@ pub trait OrdersModule:
 
     fn calculate_transfers(
         &self,
-        orders: Vec<Order<Self::Api>>,
+        orders: MultiValueManagedVec<Order<Self::Api>>,
         total_paid: BigUint,
         token_requested: TokenIdentifier,
         leftover: BigUint,
-    ) -> Vec<Transfer<Self::Api>> {
-        let mut transfers = Vec::new();
+    ) -> ManagedVec<Transfer<Self::Api>> {
+        let mut transfers: ManagedVec<Self::Api, Transfer<Self::Api>> = ManagedVec::new();
 
         let mut match_provider_transfer = Transfer {
             to: self.blockchain().get_caller(),
@@ -324,8 +351,8 @@ pub trait OrdersModule:
         transfers
     }
 
-    fn execute_transfers(&self, transfers: Vec<Transfer<Self::Api>>) {
-        for transfer in transfers {
+    fn execute_transfers(&self, transfers: ManagedVec<Transfer<Self::Api>>) {
+        for transfer in &transfers {
             if transfer.payment.amount > 0 {
                 self.send().direct(
                     &transfer.to,
@@ -338,8 +365,8 @@ pub trait OrdersModule:
         }
     }
 
-    fn clear_orders(&self, order_ids: &[u64]) {
-        order_ids.iter().for_each(|&x| self.orders(x).clear())
+    fn clear_orders(&self, order_ids: &ManagedVec<u64>) {
+        order_ids.iter().for_each(|x| self.orders(x).clear())
     }
 
     fn get_and_increase_order_id_counter(&self) -> u64 {
@@ -349,15 +376,15 @@ pub trait OrdersModule:
     }
 
     #[view(getAddressOrderIds)]
-    fn get_address_order_ids(&self, address: &ManagedAddress) -> MultiResultVec<u64> {
-        MultiResultVec::from_iter(
-            self.address_order_ids(address)
-                .get()
-                .iter()
-                .filter(|&&x| !self.orders(x).is_empty())
-                .copied()
-                .collect::<Vec<u64>>(),
-        )
+    fn get_address_order_ids(&self, address: &ManagedAddress) -> MultiValueManagedVec<u64> {
+        let mut orders_vec = MultiValueManagedVec::new();
+        for order in self.address_order_ids(address).get().iter() {
+            if !self.orders(order).is_empty() {
+                orders_vec.push(order);
+            }
+        }
+
+        orders_vec
     }
 
     #[view(getOrderIdCounter)]
@@ -369,5 +396,5 @@ pub trait OrdersModule:
     fn orders(&self, id: u64) -> SingleValueMapper<Order<Self::Api>>;
 
     #[storage_mapper("address_order_ids")]
-    fn address_order_ids(&self, address: &ManagedAddress) -> SingleValueMapper<Vec<u64>>;
+    fn address_order_ids(&self, address: &ManagedAddress) -> SingleValueMapper<ManagedVec<u64>>;
 }

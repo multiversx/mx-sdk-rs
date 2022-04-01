@@ -41,7 +41,7 @@
                     "90"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -60,7 +60,7 @@
             "expect": {
                 "out": [],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -84,8 +84,8 @@
             "expect": {
                 "out": [],
                 "status": "4",
-                "message": "str:wrong number of arguments",
-                "logs": [],
+                "message": "str:argument decode error (var args): too few arguments",
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }

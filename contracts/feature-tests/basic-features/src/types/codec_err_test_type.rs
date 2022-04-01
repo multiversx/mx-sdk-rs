@@ -1,8 +1,9 @@
 use elrond_wasm::{
     derive::TypeAbi,
     elrond_codec::{
-        DecodeError, EncodeError, NestedDecode, NestedDecodeInput, NestedEncode,
-        NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
+        DecodeError, DecodeErrorHandler, EncodeError, EncodeErrorHandler, NestedDecode,
+        NestedDecodeInput, NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode,
+        TopEncodeOutput,
     },
 };
 
@@ -11,26 +12,41 @@ use elrond_wasm::{
 pub struct CodecErrorTestType;
 
 impl TopEncode for CodecErrorTestType {
-    #[inline]
-    fn top_encode<O: TopEncodeOutput>(&self, _output: O) -> Result<(), EncodeError> {
-        Err(EncodeError::from(&b"deliberate top encode error"[..]))
+    fn top_encode_or_handle_err<O, H>(&self, _output: O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: TopEncodeOutput,
+        H: EncodeErrorHandler,
+    {
+        Err(h.handle_error(EncodeError::from("deliberate top encode error")))
     }
 }
 
 impl NestedEncode for CodecErrorTestType {
-    fn dep_encode<O: NestedEncodeOutput>(&self, _dest: &mut O) -> Result<(), EncodeError> {
-        Err(EncodeError::from(&b"deliberate nested encode error"[..]))
+    fn dep_encode_or_handle_err<O, H>(&self, _dest: &mut O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: NestedEncodeOutput,
+        H: EncodeErrorHandler,
+    {
+        Err(h.handle_error(EncodeError::from("deliberate nested encode error")))
     }
 }
 
 impl TopDecode for CodecErrorTestType {
-    fn top_decode<I: TopDecodeInput>(_input: I) -> Result<Self, DecodeError> {
-        Err(DecodeError::from(&b"deliberate top decode error"[..]))
+    fn top_decode_or_handle_err<I, H>(_input: I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: TopDecodeInput,
+        H: DecodeErrorHandler,
+    {
+        Err(h.handle_error(DecodeError::from("deliberate top decode error")))
     }
 }
 
 impl NestedDecode for CodecErrorTestType {
-    fn dep_decode<I: NestedDecodeInput>(_input: &mut I) -> Result<Self, DecodeError> {
-        Err(DecodeError::from(&b"deliberate nested decode error"[..]))
+    fn dep_decode_or_handle_err<I, H>(_input: &mut I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: NestedDecodeInput,
+        H: DecodeErrorHandler,
+    {
+        Err(h.handle_error(DecodeError::from("deliberate top decode error")))
     }
 }

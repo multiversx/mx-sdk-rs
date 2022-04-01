@@ -48,7 +48,7 @@ pub fn type_abi_derive(ast: &syn::DeriveInput) -> TokenStream {
                     let type_name = Self::type_name();
                     if !accumulator.contains_type(&type_name) {
                         accumulator.reserve_type_name(type_name.clone());
-                        let mut field_descriptions = elrond_wasm::Vec::new();
+                        let mut field_descriptions = elrond_wasm::types::heap::Vec::new();
                         #(#struct_field_snippets)*
                         accumulator.insert(
                             type_name.clone(),
@@ -72,7 +72,7 @@ pub fn type_abi_derive(ast: &syn::DeriveInput) -> TokenStream {
                     let variant_name_str = variant.ident.to_string();
                     let variant_field_snippets = fields_snippets(&variant.fields);
                     quote! {
-                        let mut field_descriptions = elrond_wasm::Vec::new();
+                        let mut field_descriptions = elrond_wasm::types::heap::Vec::new();
                         #(#variant_field_snippets)*
                         variant_descriptions.push(elrond_wasm::abi::EnumVariantDescription {
                             docs: &[ #(#variant_docs),* ],
@@ -88,7 +88,7 @@ pub fn type_abi_derive(ast: &syn::DeriveInput) -> TokenStream {
                     let type_name = Self::type_name();
                     if !accumulator.contains_type(&type_name) {
                         accumulator.reserve_type_name(type_name.clone());
-                        let mut variant_descriptions = elrond_wasm::Vec::new();
+                        let mut variant_descriptions = elrond_wasm::types::heap::Vec::new();
                         #(#enum_variant_snippets)*
                         accumulator.insert(
                             type_name.clone(),
@@ -110,7 +110,7 @@ pub fn type_abi_derive(ast: &syn::DeriveInput) -> TokenStream {
     let (impl_generics, ty_generics, where_clause) = &ast.generics.split_for_impl();
     let type_abi_impl = quote! {
         impl #impl_generics elrond_wasm::abi::TypeAbi for #name #ty_generics #where_clause {
-            fn type_name() -> elrond_wasm::String {
+            fn type_name() -> elrond_wasm::abi::TypeName {
                 #name_str.into()
             }
 

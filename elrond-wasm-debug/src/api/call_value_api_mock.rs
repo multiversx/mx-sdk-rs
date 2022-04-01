@@ -10,7 +10,7 @@ impl DebugApi {
         if self.esdt_num_transfers() > 1 {
             std::panic::panic_any(TxPanic {
                 status: 10,
-                message: err_msg::TOO_MANY_ESDT_TRANSFERS.to_vec(),
+                message: err_msg::TOO_MANY_ESDT_TRANSFERS.to_string(),
             });
         }
     }
@@ -29,13 +29,13 @@ impl CallValueApiImpl for DebugApi {
         if BigUint::<DebugApi>::from_raw_handle(self.egld_value()) > 0u32 {
             std::panic::panic_any(TxPanic {
                 status: 10,
-                message: err_msg::NON_PAYABLE_FUNC_EGLD.to_vec(),
+                message: err_msg::NON_PAYABLE_FUNC_EGLD.to_string(),
             });
         }
         if self.esdt_num_transfers() > 0 {
             std::panic::panic_any(TxPanic {
                 status: 10,
-                message: err_msg::NON_PAYABLE_FUNC_ESDT.to_vec(),
+                message: err_msg::NON_PAYABLE_FUNC_ESDT.to_string(),
             });
         }
     }
@@ -79,7 +79,10 @@ impl CallValueApiImpl for DebugApi {
         if let Some(esdt_value) = self.input_ref().esdt_values.get(index) {
             self.insert_new_big_uint(esdt_value.value.clone())
         } else {
-            self.insert_new_big_uint_zero()
+            std::panic::panic_any(TxPanic {
+                status: 10,
+                message: err_msg::ESDT_INVALID_TOKEN_INDEX.to_string(),
+            });
         }
     }
 
@@ -88,7 +91,10 @@ impl CallValueApiImpl for DebugApi {
         if let Some(esdt_value) = self.input_ref().esdt_values.get(index) {
             self.insert_new_managed_buffer(esdt_value.token_identifier.clone())
         } else {
-            self.insert_new_managed_buffer(Vec::new())
+            std::panic::panic_any(TxPanic {
+                status: 10,
+                message: err_msg::ESDT_INVALID_TOKEN_INDEX.to_string(),
+            });
         }
     }
 
@@ -97,7 +103,10 @@ impl CallValueApiImpl for DebugApi {
         if let Some(esdt_value) = self.input_ref().esdt_values.get(index) {
             esdt_value.nonce
         } else {
-            0
+            std::panic::panic_any(TxPanic {
+                status: 10,
+                message: err_msg::ESDT_INVALID_TOKEN_INDEX.to_string(),
+            });
         }
     }
 
