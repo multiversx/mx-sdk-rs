@@ -66,6 +66,19 @@ pub trait FungibleTokenMapperFeatures:
         }
     }
 
+    #[payable("EGLD")]
+    #[endpoint]
+    fn issue_and_set_all_roles_fungible(&self, token_ticker: ManagedBuffer) {
+        let payment = self.call_value().egld_value();
+        self.fungible_token_mapper().issue_and_set_all_roles(
+            payment,
+            ManagedBuffer::new(),
+            token_ticker,
+            0,
+            None,
+        );
+    }
+
     #[endpoint]
     fn set_local_roles_fungible(&self) {
         let roles = [EsdtLocalRole::Mint, EsdtLocalRole::Burn];
