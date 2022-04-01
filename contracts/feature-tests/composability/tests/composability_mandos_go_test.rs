@@ -1,104 +1,106 @@
-#[test]
-fn forw_raw_async_accept_egld_go() {
-    elrond_wasm_debug::mandos_go("mandos/forw_raw_async_accept_egld.scen.json");
-}
+// forwarder-raw tests temporarily disabled on `feat/promises` branch
 
-#[test]
-fn forw_raw_async_accept_esdt_go() {
-    elrond_wasm_debug::mandos_go("mandos/forw_raw_async_accept_esdt.scen.json");
-}
+// #[test]
+// fn forw_raw_async_accept_egld_go() {
+//     elrond_wasm_debug::mandos_go("mandos/forw_raw_async_accept_egld.scen.json");
+// }
 
-#[test]
-fn forwarder_get_esdt_local_roles_go() {
-    elrond_wasm_debug::mandos_go("mandos/forwarder_get_esdt_local_roles.scen.json");
-}
+// #[test]
+// fn forw_raw_async_accept_esdt_go() {
+//     elrond_wasm_debug::mandos_go("mandos/forw_raw_async_accept_esdt.scen.json");
+// }
 
-#[test]
-fn forw_raw_async_echo_go() {
-    elrond_wasm_debug::mandos_go("mandos/forw_raw_async_echo.scen.json");
-}
+// #[test]
+// fn forwarder_get_esdt_local_roles_go() {
+//     elrond_wasm_debug::mandos_go("mandos/forwarder_get_esdt_local_roles.scen.json");
+// }
 
-#[test]
-fn forw_raw_async_send_and_retrieve_multi_transfer_funds_go() {
-    elrond_wasm_debug::mandos_go(
-        "mandos/forw_raw_async_send_and_retrieve_multi_transfer_funds.scen.json",
-    );
-}
+// #[test]
+// fn forw_raw_async_echo_go() {
+//     elrond_wasm_debug::mandos_go("mandos/forw_raw_async_echo.scen.json");
+// }
 
-#[test]
-fn forw_raw_builtin_nft_local_mint_via_async_call_go() {
-    elrond_wasm_debug::mandos_go("mandos/forw_raw_builtin_nft_local_mint_via_async_call.scen.json");
-}
+// #[test]
+// fn forw_raw_async_send_and_retrieve_multi_transfer_funds_go() {
+//     elrond_wasm_debug::mandos_go(
+//         "mandos/forw_raw_async_send_and_retrieve_multi_transfer_funds.scen.json",
+//     );
+// }
 
-#[test]
-fn forw_raw_builtin_nft_local_mint_via_sync_call_go() {
-    elrond_wasm_debug::mandos_go("mandos/forw_raw_builtin_nft_local_mint_via_sync_call.scen.json");
-}
+// #[test]
+// fn forw_raw_builtin_nft_local_mint_via_async_call_go() {
+//     elrond_wasm_debug::mandos_go("mandos/forw_raw_builtin_nft_local_mint_via_async_call.scen.json");
+// }
 
-#[test]
-fn forw_raw_call_async_retrieve_multi_transfer_go() {
-    elrond_wasm_debug::mandos_go("mandos/forw_raw_call_async_retrieve_multi_transfer.scen.json");
-}
+// #[test]
+// fn forw_raw_builtin_nft_local_mint_via_sync_call_go() {
+//     elrond_wasm_debug::mandos_go("mandos/forw_raw_builtin_nft_local_mint_via_sync_call.scen.json");
+// }
 
-#[test]
-fn forw_raw_contract_deploy_go() {
-    elrond_wasm_debug::mandos_go("mandos/forw_raw_contract_deploy.scen.json");
-}
+// #[test]
+// fn forw_raw_call_async_retrieve_multi_transfer_go() {
+//     elrond_wasm_debug::mandos_go("mandos/forw_raw_call_async_retrieve_multi_transfer.scen.json");
+// }
 
-#[test]
-fn forw_raw_contract_upgrade_go() {
-    elrond_wasm_debug::mandos_go("mandos/forw_raw_contract_upgrade.scen.json");
-}
+// #[test]
+// fn forw_raw_contract_deploy_go() {
+//     elrond_wasm_debug::mandos_go("mandos/forw_raw_contract_deploy.scen.json");
+// }
 
-#[test]
-fn forw_raw_contract_upgrade_self_go() {
-    elrond_wasm_debug::mandos_go("mandos/forw_raw_contract_upgrade_self.scen.json");
-}
+// #[test]
+// fn forw_raw_contract_upgrade_go() {
+//     elrond_wasm_debug::mandos_go("mandos/forw_raw_contract_upgrade.scen.json");
+// }
 
-#[test]
-fn forw_raw_direct_egld_go() {
-    elrond_wasm_debug::mandos_go("mandos/forw_raw_direct_egld.scen.json");
-}
+// #[test]
+// fn forw_raw_contract_upgrade_self_go() {
+//     elrond_wasm_debug::mandos_go("mandos/forw_raw_contract_upgrade_self.scen.json");
+// }
 
-#[test]
-fn forw_raw_direct_esdt_go() {
-    elrond_wasm_debug::mandos_go("mandos/forw_raw_direct_esdt.scen.json");
-}
+// #[test]
+// fn forw_raw_direct_egld_go() {
+//     elrond_wasm_debug::mandos_go("mandos/forw_raw_direct_egld.scen.json");
+// }
 
-#[test]
-fn forw_raw_sync_echo_go() {
-    elrond_wasm_debug::mandos_go("mandos/forw_raw_sync_echo.scen.json");
-}
+// #[test]
+// fn forw_raw_direct_esdt_go() {
+//     elrond_wasm_debug::mandos_go("mandos/forw_raw_direct_esdt.scen.json");
+// }
 
-#[test]
-fn forw_raw_sync_echo_caller_go() {
-    elrond_wasm_debug::mandos_go("mandos/forw_raw_sync_echo_caller.scen.json");
-}
+// #[test]
+// fn forw_raw_sync_echo_go() {
+//     elrond_wasm_debug::mandos_go("mandos/forw_raw_sync_echo.scen.json");
+// }
 
-#[test]
-fn forw_raw_sync_egld_go() {
-    elrond_wasm_debug::mandos_go("mandos/forw_raw_sync_egld.scen.json");
-}
+// #[test]
+// fn forw_raw_sync_echo_caller_go() {
+//     elrond_wasm_debug::mandos_go("mandos/forw_raw_sync_echo_caller.scen.json");
+// }
 
-#[test]
-fn forw_raw_sync_readonly_go() {
-    elrond_wasm_debug::mandos_go("mandos/forw_raw_sync_readonly.scen.json");
-}
+// #[test]
+// fn forw_raw_sync_egld_go() {
+//     elrond_wasm_debug::mandos_go("mandos/forw_raw_sync_egld.scen.json");
+// }
 
-#[test]
-fn forw_raw_sync_same_context_go() {
-    elrond_wasm_debug::mandos_go("mandos/forw_raw_sync_same_context.scen.json");
-}
+// #[test]
+// fn forw_raw_sync_readonly_go() {
+//     elrond_wasm_debug::mandos_go("mandos/forw_raw_sync_readonly.scen.json");
+// }
 
-#[test]
-fn forw_raw_sync_same_context_egld_go() {
-    elrond_wasm_debug::mandos_go("mandos/forw_raw_sync_same_context_egld.scen.json");
-}
+// #[test]
+// fn forw_raw_sync_same_context_go() {
+//     elrond_wasm_debug::mandos_go("mandos/forw_raw_sync_same_context.scen.json");
+// }
 
-#[test]
-fn forw_raw_transf_exec_egld_go() {
-    elrond_wasm_debug::mandos_go("mandos/forw_raw_transf_exec_egld.scen.json");
-}
+// #[test]
+// fn forw_raw_sync_same_context_egld_go() {
+//     elrond_wasm_debug::mandos_go("mandos/forw_raw_sync_same_context_egld.scen.json");
+// }
+
+// #[test]
+// fn forw_raw_transf_exec_egld_go() {
+//     elrond_wasm_debug::mandos_go("mandos/forw_raw_transf_exec_egld.scen.json");
+// }
 
 #[test]
 fn forwarder_builtin_nft_add_quantity_go() {
