@@ -320,7 +320,7 @@ where
             &self.endpoint_name,
             self.success_callback,
             self.error_callback,
-            self.explicit_gas_limit,
+            self.resolve_gas_limit(),
             self.extra_gas_for_callback,
             &self.arg_buffer,
         )

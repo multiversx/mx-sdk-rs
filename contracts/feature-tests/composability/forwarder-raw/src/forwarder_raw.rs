@@ -259,7 +259,7 @@ pub trait ForwarderRaw {
             &ManagedBuffer::new_from_bytes(ESDT_MULTI_TRANSFER_FUNC_NAME),
             b"success_callback",
             b"error_callback",
-            0u64,
+            self.blockchain().get_gas_left(),
             extra_gas_for_callback,
             &arg_buffer,
         );
