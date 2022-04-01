@@ -48,7 +48,7 @@
                 "function": "forwarder_multi_transfer_via_promise",
                 "arguments": [
                     "sc:vault",
-                    "str:accept_multi_funds_echo",
+                    "str:accept_funds_echo_payment",
                     "5,000",
                     "str:FWD-TOKEN",
                     "0",
@@ -60,11 +60,12 @@
                     "3",
                     "6"
                 ],
-                "gasLimit": "70,000,000",
+                "gasLimit": "100,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
+                    "0",
                     "str:FWD-TOKEN",
                     "0",
                     "500",
@@ -112,7 +113,9 @@
                             ]
                         }
                     },
-                    "storage": {},
+                    "storage": {
+                        "str:call_counts|nested:str:accept_funds_echo_payment": "1"
+                    },
                     "code": "file:../vault/output/vault.wasm"
                 },
                 "sc:forwarder": {

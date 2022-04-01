@@ -221,7 +221,7 @@ pub trait Vault {
     fn call_counts(&self, endpoint: &ManagedBuffer) -> SingleValueMapper<usize>;
 
     #[endpoint]
-    fn panic_on_purpose(&self) -> SCResult<()> {
-        sc_error!("panic on purpose")
+    fn panic_on_purpose(&self) {
+        sc_panic!("panic on purpose")
     }
 }

@@ -92,13 +92,12 @@ pub trait ForwarderRaw {
         endpoint_name: ManagedBuffer,
         extra_gas_for_callback: u64,
         #[var_args] args: MultiValueEncoded<ManagedBuffer>,
-    ) -> SCResult<()> {
+    ) {
         self.forward_contract_call(to, token, payment, endpoint_name, args)
             .with_extra_gas_for_callback(extra_gas_for_callback)
             .with_success_callback(b"success_callback")
             .with_error_callback(b"error_callback")
             .register_promise();
-        Ok(())
     }
 
     #[endpoint]
