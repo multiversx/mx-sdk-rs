@@ -1,19 +1,21 @@
 use super::*;
-use alloc::{string::String, vec::Vec};
+use alloc::vec::Vec;
 
 #[derive(Clone, Debug)]
 pub struct InputAbi {
     pub arg_name: &'static str,
-    pub type_name: String,
+    pub type_name: TypeName,
     pub multi_arg: bool,
 }
 
 #[derive(Clone, Debug)]
 pub struct OutputAbi {
     pub output_name: &'static str,
-    pub type_name: String,
+    pub type_name: TypeName,
     pub multi_result: bool,
 }
+
+pub type OutputAbis = Vec<OutputAbi>;
 
 #[derive(Clone, Debug)]
 pub enum EndpointMutabilityAbi {
@@ -37,7 +39,7 @@ pub struct EndpointAbi {
     pub location: EndpointLocationAbi,
     pub payable_in_tokens: &'static [&'static str],
     pub inputs: Vec<InputAbi>,
-    pub outputs: Vec<OutputAbi>,
+    pub outputs: OutputAbis,
 }
 
 impl EndpointAbi {
@@ -45,7 +47,7 @@ impl EndpointAbi {
         self.inputs.push(InputAbi {
             arg_name,
             type_name: T::type_name(),
-            multi_arg: T::is_multi_arg_or_result(),
+            multi_arg: T::is_variadic(),
         });
     }
 

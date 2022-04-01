@@ -6,7 +6,7 @@ mod bytes_de;
 mod bytes_err;
 mod bytes_ser;
 
-pub use bytes_de::{bytes_to_number, from_bytes};
+pub use bytes_de::{top_encode_number, from_bytes};
 pub use bytes_err::SDError;
 pub use bytes_ser::{to_bytes, u64_to_bytes};
 

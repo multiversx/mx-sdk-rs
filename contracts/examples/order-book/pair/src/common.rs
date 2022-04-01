@@ -7,31 +7,42 @@ pub const FEE_PENALTY_INCREASE_EPOCHS: u64 = 5;
 pub const FEE_PENALTY_INCREASE_PERCENT: u64 = 1_000;
 pub const FREE_ORDER_FROM_STORAGE_MIN_PENALTIES: u64 = 6;
 
-#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, PartialEq, TypeAbi, Clone)]
+#[derive(
+    ManagedVecItem, TopEncode, TopDecode, NestedEncode, NestedDecode, PartialEq, TypeAbi, Clone,
+)]
 pub enum OrderType {
     Buy,
     Sell,
 }
 
-#[derive(Clone)]
+#[derive(ManagedVecItem, Clone)]
 pub struct Payment<M: ManagedTypeApi> {
     pub token_id: TokenIdentifier<M>,
     pub amount: BigUint<M>,
 }
 
-#[derive(Clone)]
+#[derive(ManagedVecItem, Clone)]
 pub struct Transfer<M: ManagedTypeApi> {
     pub to: ManagedAddress<M>,
     pub payment: Payment<M>,
 }
 
-#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, Clone)]
-pub enum FeeConfig<M: ManagedTypeApi> {
-    Fixed(BigUint<M>),
-    Percent(u64),
+#[derive(ManagedVecItem, TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, Clone)]
+pub enum FeeConfigEnum {
+    Fixed,
+    Percent,
 }
 
-#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, Clone, Default)]
+#[derive(ManagedVecItem, TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, Clone)]
+pub struct FeeConfig<M: ManagedTypeApi> {
+    pub fee_type: FeeConfigEnum,
+    pub fixed_fee: BigUint<M>,
+    pub percent_fee: u64,
+}
+
+#[derive(
+    ManagedVecItem, TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, Clone, Default,
+)]
 pub struct DealConfig {
     pub match_provider_percent: u64,
 }
@@ -39,32 +50,22 @@ pub struct DealConfig {
 #[derive(TopEncode, TopDecode, TypeAbi, Clone)]
 pub struct OrderInputParams<M: ManagedTypeApi> {
     pub amount: BigUint<M>,
-    pub match_provider: Option<ManagedAddress<M>>,
+    pub match_provider: ManagedAddress<M>,
     pub fee_config: FeeConfig<M>,
     pub deal_config: DealConfig,
 }
 
-#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, Clone)]
+#[derive(ManagedVecItem, TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, Clone)]
 pub struct Order<M: ManagedTypeApi> {
     pub id: u64,
     pub creator: ManagedAddress<M>,
-    pub match_provider: Option<ManagedAddress<M>>,
+    pub match_provider: ManagedAddress<M>,
     pub input_amount: BigUint<M>,
     pub output_amount: BigUint<M>,
     pub fee_config: FeeConfig<M>,
     pub deal_config: DealConfig,
     pub create_epoch: u64,
     pub order_type: OrderType,
-}
-
-impl<M: ManagedTypeApi> FeeConfig<M> {
-    pub fn is_fixed(&self) -> bool {
-        matches!(*self, FeeConfig::Fixed(_))
-    }
-
-    pub fn is_percent(&self) -> bool {
-        matches!(*self, FeeConfig::Percent(_))
-    }
 }
 
 impl DealConfig {
@@ -101,9 +102,9 @@ pub trait CommonModule {
     }
 
     fn calculate_fee_amount(&self, amount: &BigUint, fee_config: &FeeConfig<Self::Api>) -> BigUint {
-        match fee_config.clone() {
-            FeeConfig::Fixed(fee_amount) => fee_amount,
-            FeeConfig::Percent(fee_percent) => amount * fee_percent / PERCENT_BASE_POINTS,
+        match fee_config.fee_type {
+            FeeConfigEnum::Fixed => fee_config.fixed_fee.clone(),
+            FeeConfigEnum::Percent => amount * fee_config.percent_fee / PERCENT_BASE_POINTS,
         }
     }
 

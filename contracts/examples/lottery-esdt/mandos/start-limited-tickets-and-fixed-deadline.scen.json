@@ -62,8 +62,7 @@
                             "3-deadline": "u64:123,456",
                             "4-max_entries_per_user": "u32:800",
                             "5-prize_distribution": "nested:u8:100",
-                            "6-whitelist": "nested:",
-                            "7-prize_pool": "biguint:0"
+                            "6-prize_pool": "biguint:0"
                         }
                     },
                     "code": "file:../output/lottery-esdt.wasm"

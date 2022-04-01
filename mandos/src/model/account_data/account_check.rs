@@ -1,10 +1,13 @@
 use crate::{
     interpret_trait::{InterpretableFrom, InterpreterContext},
-    model::{BigUintValue, BytesValue, CheckEsdtMap, CheckStorage, CheckValue, U64Value},
+    model::{
+        BigUintValue, BytesKey, BytesValue, CheckEsdtMap, CheckStorage, CheckStorageDetails,
+        CheckValue, U64Value,
+    },
     serde_raw::CheckAccountRaw,
 };
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct CheckAccount {
     pub comment: Option<String>,
     pub nonce: CheckValue<U64Value>,
@@ -14,6 +17,50 @@ pub struct CheckAccount {
     pub storage: CheckStorage,
     pub code: CheckValue<BytesValue>,
     pub async_call_data: CheckValue<BytesValue>,
+}
+
+impl CheckAccount {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn nonce<V>(mut self, nonce: V) -> Self
+    where
+        U64Value: InterpretableFrom<V>,
+    {
+        self.nonce = CheckValue::Equal(U64Value::interpret_from(
+            nonce,
+            &InterpreterContext::default(),
+        ));
+        self
+    }
+
+    pub fn balance<V>(mut self, balance_expr: V) -> Self
+    where
+        BigUintValue: InterpretableFrom<V>,
+    {
+        self.balance = CheckValue::Equal(BigUintValue::interpret_from(
+            balance_expr,
+            &InterpreterContext::default(),
+        ));
+        self
+    }
+
+    pub fn check_storage(mut self, key: &str, value: &str) -> Self {
+        let mut details = match self.storage {
+            CheckStorage::Star => CheckStorageDetails::default(),
+            CheckStorage::Equal(details) => details,
+        };
+        details.storages.insert(
+            BytesKey::interpret_from(key, &InterpreterContext::default()),
+            CheckValue::Equal(BytesValue::interpret_from(
+                value,
+                &InterpreterContext::default(),
+            )),
+        );
+        self.storage = CheckStorage::Equal(details);
+        self
+    }
 }
 
 impl InterpretableFrom<Box<CheckAccountRaw>> for CheckAccount {

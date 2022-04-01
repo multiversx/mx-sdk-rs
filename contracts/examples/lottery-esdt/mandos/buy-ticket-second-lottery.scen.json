@@ -76,8 +76,7 @@
                             "3-deadline": "u64:123,456",
                             "4-max_entries_per_user": "u32:800",
                             "5-prize_distribution": "nested:u8:100",
-                            "6-whitelist": "nested:",
-                            "7-prize_pool": "biguint:0"
+                            "6-prize_pool": "biguint:0"
                         },
                         "str:lotteryInfo|nested:str:lottery_$$$$": {
                             "0-token_identifier": "nested:str:LOTTO-123456",
@@ -86,8 +85,7 @@
                             "3-deadline": "u64:234,567",
                             "4-max_entries_per_user": "u32:800",
                             "5-prize_distribution": "nested:u8:100",
-                            "6-whitelist": "nested:",
-                            "7-prize_pool": "biguint:500"
+                            "6-prize_pool": "biguint:500"
                         },
                         "str:ticketHolder|nested:str:lottery_$$$$|str:.len": "1",
                         "str:ticketHolder|nested:str:lottery_$$$$|str:.item|u32:1": "address:acc1",

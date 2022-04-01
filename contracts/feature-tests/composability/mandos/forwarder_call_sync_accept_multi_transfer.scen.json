@@ -130,61 +130,25 @@
                     },
                     {
                         "address": "sc:vault",
-                        "endpoint": "str:accept_funds_multi_transfer",
+                        "endpoint": "str:accept_funds",
                         "topics": [
                             "str:accept_funds",
+                            "0",
                             "str:FWD-TOKEN",
-                            "str:FungibleESDT",
+                            "0",
                             "100",
-                            "0"
-                        ],
-                        "data": ""
-                    },
-                    {
-                        "address": "sc:vault",
-                        "endpoint": "str:accept_funds_multi_transfer",
-                        "topics": [
-                            "str:accept_funds",
                             "str:FWD-TOKEN",
-                            "str:FungibleESDT",
+                            "0",
                             "200",
-                            "0"
-                        ],
-                        "data": ""
-                    },
-                    {
-                        "address": "sc:vault",
-                        "endpoint": "str:accept_funds_multi_transfer",
-                        "topics": [
-                            "str:accept_funds",
                             "str:NFT-123456",
-                            "str:SemiFungibleESDT",
                             "1",
-                            "1"
-                        ],
-                        "data": ""
-                    },
-                    {
-                        "address": "sc:vault",
-                        "endpoint": "str:accept_funds_multi_transfer",
-                        "topics": [
-                            "str:accept_funds",
+                            "1",
                             "str:SFT-456789",
-                            "str:SemiFungibleESDT",
                             "3",
-                            "3"
-                        ],
-                        "data": ""
-                    },
-                    {
-                        "address": "sc:vault",
-                        "endpoint": "str:accept_funds_multi_transfer",
-                        "topics": [
-                            "str:accept_funds",
+                            "3",
                             "str:SFT-456789",
-                            "str:SemiFungibleESDT",
-                            "4",
-                            "3"
+                            "3",
+                            "4"
                         ],
                         "data": ""
                     }
@@ -225,7 +189,7 @@
                         }
                     },
                     "storage": {
-                        "str:call_counts|nested:str:accept_funds_multi_transfer": "1"
+                        "str:call_counts|nested:str:accept_funds": "1"
                     },
                     "code": "file:../vault/output/vault.wasm"
                 },

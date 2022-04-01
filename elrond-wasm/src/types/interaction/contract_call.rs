@@ -1,14 +1,17 @@
+use elrond_codec::{TopDecodeMulti, TopEncodeMulti};
+
 use crate::{
     api::{
         BlockchainApiImpl, CallTypeApi, ErrorApiImpl, SendApiImpl, ESDT_MULTI_TRANSFER_FUNC_NAME,
         ESDT_NFT_TRANSFER_FUNC_NAME, ESDT_TRANSFER_FUNC_NAME,
     },
-    contract_base::BlockchainWrapper,
+    contract_base::{BlockchainWrapper, ExitCodecErrorHandler},
+    err_msg,
     types::{
         AsyncCall, BigUint, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer,
         ManagedType, ManagedVec, TokenIdentifier,
     },
-    ArgId, ContractCallArg, DynArg, ManagedResultArgLoader,
+    ArgErrorHandler, ArgId, ManagedResultArgLoader,
 };
 use core::marker::PhantomData;
 
@@ -162,8 +165,9 @@ where
             .push_arg_raw(ManagedBuffer::new_from_bytes(bytes));
     }
 
-    pub fn push_endpoint_arg<D: ContractCallArg>(&mut self, endpoint_arg: D) {
-        endpoint_arg.push_dyn_arg(&mut self.arg_buffer);
+    pub fn push_endpoint_arg<T: TopEncodeMulti>(&mut self, endpoint_arg: &T) {
+        let h = ExitCodecErrorHandler::<SA>::from(err_msg::CONTRACT_CALL_ENCODE_ERROR);
+        let Ok(()) = endpoint_arg.multi_encode_or_handle_err(&mut self.arg_buffer, h);
     }
 
     fn no_payments(&self) -> ManagedVec<SA, EsdtTokenPayment<SA>> {
@@ -326,8 +330,16 @@ where
 impl<SA, R> ContractCall<SA, R>
 where
     SA: CallTypeApi + 'static,
-    R: DynArg,
+    R: TopDecodeMulti,
 {
+    fn decode_result(raw_result: ManagedVec<SA, ManagedBuffer<SA>>) -> R {
+        let mut loader = ManagedResultArgLoader::new(raw_result);
+        let arg_id = ArgId::from(&b"sync result"[..]);
+        let h = ArgErrorHandler::<SA>::from(arg_id);
+        let Ok(result) = R::multi_decode_or_handle_err(&mut loader, h);
+        result
+    }
+
     /// Executes immediately, synchronously, and returns contract call result.
     /// Only works if the target contract is in the same shard.
     pub fn execute_on_dest_context(mut self) -> R {
@@ -340,8 +352,7 @@ where
             &self.arg_buffer,
         );
 
-        let mut loader = ManagedResultArgLoader::new(raw_result);
-        R::dyn_load(&mut loader, ArgId::from(&b"sync result"[..]))
+        Self::decode_result(raw_result)
     }
 
     /// Executes immediately, synchronously, and returns contract call result.
@@ -365,8 +376,7 @@ where
             range_closure,
         );
 
-        let mut loader = ManagedResultArgLoader::new(raw_result);
-        R::dyn_load(&mut loader, ArgId::from(&b"sync result"[..]))
+        Self::decode_result(raw_result)
     }
 
     pub fn execute_on_dest_context_readonly(mut self) -> R {
@@ -378,8 +388,7 @@ where
             &self.arg_buffer,
         );
 
-        let mut loader = ManagedResultArgLoader::new(raw_result);
-        R::dyn_load(&mut loader, ArgId::from(&b"sync result"[..]))
+        Self::decode_result(raw_result)
     }
 }
 

@@ -1,16 +1,28 @@
 use mandos::model::{
     AddressKey, BytesValue, CheckEsdt, CheckEsdtData, CheckEsdtInstance, CheckEsdtInstances,
-    CheckEsdtMap, CheckStorage, CheckValue, Checkable,
+    CheckEsdtMap, CheckStateStep, CheckStorage, CheckValue, Checkable,
 };
 use num_bigint::BigUint;
 use num_traits::Zero;
 
 use crate::{
-    bytes_to_string, verbose_hex,
+    bytes_to_string, verbose_hex, verbose_hex_list,
     world_mock::{AccountEsdt, BlockchainMock, EsdtData, EsdtInstance, EsdtInstances},
 };
 
-pub fn execute(accounts: &mandos::model::CheckAccounts, state: &mut BlockchainMock) {
+impl BlockchainMock {
+    pub fn mandos_check_state(mut self, check_state_step: CheckStateStep) -> BlockchainMock {
+        execute(&mut self, &check_state_step.accounts);
+        self
+    }
+
+    pub fn mandos_dump_state(self) -> BlockchainMock {
+        self.print_accounts();
+        self
+    }
+}
+
+fn execute(state: &mut BlockchainMock, accounts: &mandos::model::CheckAccounts) {
     for (expected_address, expected_account) in accounts.accounts.iter() {
         if let Some(account) = state.accounts.get(&expected_address.value.into()) {
             assert!(
@@ -298,15 +310,29 @@ pub fn check_token_instance(
         ))
     }
 
-    let actual_uri = actual_value.metadata.uri.clone().unwrap_or_default();
-    if !expected_value.uri.check(&actual_uri) {
+    let actual_uri = actual_value.metadata.uri.as_slice();
+    if !expected_value.uri.check(actual_uri) {
         errors.push(format!(
             "bad esdt uri. Address: {}. Token {}. Nonce {}. Want: {}. Have: {}",
             address,
             token,
             expected_value.nonce.value,
-            expected_value.uri,
-            verbose_hex(&actual_uri),
+            expected_value.uri.pretty_str(),
+            verbose_hex_list(actual_uri),
+        ))
+    }
+
+    if !expected_value
+        .attributes
+        .check(&actual_value.metadata.attributes)
+    {
+        errors.push(format!(
+            "bad esdt attributes. Address: {}. Token {}. Nonce {}. Want: {}. Have: {}",
+            address,
+            token,
+            expected_value.nonce.value,
+            expected_value.attributes,
+            verbose_hex(&actual_value.metadata.attributes),
         ))
     }
 }

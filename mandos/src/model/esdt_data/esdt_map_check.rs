@@ -12,6 +12,12 @@ pub enum CheckEsdtMap {
     Equal(CheckEsdtMapContents),
 }
 
+impl Default for CheckEsdtMap {
+    fn default() -> Self {
+        CheckEsdtMap::Unspecified
+    }
+}
+
 impl InterpretableFrom<CheckEsdtMapRaw> for CheckEsdtMap {
     fn interpret_from(from: CheckEsdtMapRaw, context: &InterpreterContext) -> Self {
         match from {

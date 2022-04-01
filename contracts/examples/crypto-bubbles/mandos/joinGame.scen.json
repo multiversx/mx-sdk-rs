@@ -50,7 +50,7 @@
                         "address": "sc:crypto_bubbles",
                         "endpoint": "str:joinGame",
                         "topics": [
-                            "0x1000000000000000000000000000000000000000000000000000000000000001",
+                            "str:top_up",
                             "address:acc1"
                         ],
                         "data": "0x0200"
@@ -59,8 +59,8 @@
                         "address": "sc:crypto_bubbles",
                         "endpoint": "str:joinGame",
                         "topics": [
-                            "0x1000000000000000000000000000000000000000000000000000000000000003",
-                            "0x0000000000000000000000000000000000000000000000000000000000000012",
+                            "str:player_joins_game",
+                            "0x12",
                             "address:acc1"
                         ],
                         "data": "0x200"
@@ -92,7 +92,7 @@
                         "address": "sc:crypto_bubbles",
                         "endpoint": "str:joinGame",
                         "topics": [
-                            "0x1000000000000000000000000000000000000000000000000000000000000001",
+                            "str:top_up",
                             "address:acc2"
                         ],
                         "data": "0x150"
@@ -101,8 +101,8 @@
                         "address": "sc:crypto_bubbles",
                         "endpoint": "str:joinGame",
                         "topics": [
-                            "0x1000000000000000000000000000000000000000000000000000000000000003",
-                            "0x0000000000000000000000000000000000000000000000000000000000000012",
+                            "str:player_joins_game",
+                            "0x12",
                             "address:acc2"
                         ],
                         "data": "0x150"
@@ -134,7 +134,7 @@
                         "address": "sc:crypto_bubbles",
                         "endpoint": "str:joinGame",
                         "topics": [
-                            "0x1000000000000000000000000000000000000000000000000000000000000001",
+                            "str:top_up",
                             "address:acc2"
                         ],
                         "data": "0x2000"
@@ -143,8 +143,8 @@
                         "address": "sc:crypto_bubbles",
                         "endpoint": "str:joinGame",
                         "topics": [
-                            "0x1000000000000000000000000000000000000000000000000000000000000003",
-                            "0x0000000000000000000000000000000000000000000000000000000000000012",
+                            "str:player_joins_game",
+                            "0x12",
                             "address:acc2"
                         ],
                         "data": "0x2000"

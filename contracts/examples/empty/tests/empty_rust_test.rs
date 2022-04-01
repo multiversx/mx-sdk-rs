@@ -32,7 +32,6 @@ where
     blockchain_wrapper
         .execute_tx(&owner_address, &cf_wrapper, &rust_zero, |sc| {
             sc.init();
-            StateChange::Commit
         })
         .assert_ok();
 
@@ -58,7 +57,6 @@ fn deploy_test() {
             &rust_biguint!(0u64),
             |sc| {
                 sc.init();
-                StateChange::Commit
             },
         )
         .assert_ok();

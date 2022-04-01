@@ -1,16 +1,14 @@
 {
-    "gasSchedule": "v4",
     "name": "set-repeat",
     "traceGas": true,
+    "gasSchedule": "v4",
     "steps": [
         {
             "step": "setState",
             "accounts": {
                 "address:owner": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 }
             },
             "newAddresses": [
@@ -26,7 +24,6 @@
             "txId": "deploy",
             "tx": {
                 "from": "address:owner",
-                "value": "0",
                 "contractCode": "file:../output/set-repeat.wasm",
                 "arguments": [],
                 "gasLimit": "20,000,000",
@@ -46,7 +43,6 @@
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
-                "value": "0",
                 "function": "add",
                 "arguments": [
                     "1000",
@@ -69,7 +65,6 @@
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
-                "value": "0",
                 "function": "count",
                 "arguments": [
                     "str:testing---testing---|u32:500"
@@ -93,7 +88,6 @@
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
-                "value": "0",
                 "function": "remove",
                 "arguments": [
                     "1000",

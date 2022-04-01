@@ -20,7 +20,7 @@
                     "storage": {
                         "str:registration_cost": "1000"
                     },
-                    "code": "file:../test-wasm/dns.wasm"
+                    "code": "file:../test-wasm/elrond-wasm-sc-dns.wasm"
                 }
             }
         },
@@ -42,7 +42,7 @@
             "expect": {
                 "out": [],
                 "status": "0",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }

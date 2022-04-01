@@ -1,6 +1,6 @@
 use elrond_wasm::{
     api::{Handle, InvalidSliceError, ManagedBufferApi},
-    types::BoxedBytes,
+    types::heap::BoxedBytes,
 };
 
 use crate::DebugApi;
@@ -94,6 +94,7 @@ impl ManagedBufferApi for DebugApi {
             .insert(handle, value.into());
     }
 
+    #[cfg(feature = "ei-1-1")]
     fn mb_set_slice(
         &self,
         dest_handle: Handle,

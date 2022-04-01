@@ -1,5 +1,8 @@
 use crate::{rust_biguint, tx_mock::TxInputESDT};
-use elrond_wasm::{elrond_codec::TopEncode, types::Address};
+use elrond_wasm::{
+    elrond_codec::{top_encode_to_vec_u8_or_panic, TopEncode},
+    types::heap::Address,
+};
 
 pub struct ScCallMandos {
     pub(crate) from: Address,
@@ -44,10 +47,7 @@ impl ScCallMandos {
     }
 
     pub fn add_argument<T: TopEncode>(&mut self, arg: &T) {
-        let mut arg_raw = Vec::new();
-        let _ = arg.top_encode(&mut arg_raw);
-
-        self.arguments.push(arg_raw);
+        self.arguments.push(top_encode_to_vec_u8_or_panic(arg));
     }
 
     pub fn set_gas_limit(&mut self, gas_limit: u64) {
@@ -75,10 +75,7 @@ impl ScQueryMandos {
     }
 
     pub fn add_argument<T: TopEncode>(&mut self, arg: &T) {
-        let mut arg_raw = Vec::new();
-        let _ = arg.top_encode(&mut arg_raw);
-
-        self.arguments.push(arg_raw);
+        self.arguments.push(top_encode_to_vec_u8_or_panic(arg));
     }
 }
 
@@ -99,10 +96,7 @@ impl TxExpectMandos {
     }
 
     pub fn add_out_value<T: TopEncode>(&mut self, out_val: &T) {
-        let mut out_raw = Vec::new();
-        let _ = out_val.top_encode(&mut out_raw);
-
-        self.out.push(out_raw);
+        self.out.push(top_encode_to_vec_u8_or_panic(out_val));
     }
 
     pub fn set_message(&mut self, msg: &str) {

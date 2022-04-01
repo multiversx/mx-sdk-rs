@@ -36,7 +36,7 @@
                 "out": [],
                 "status": "10",
                 "message": "str:function does not accept EGLD payment",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -59,7 +59,7 @@
                 "out": [],
                 "status": "10",
                 "message": "str:function does not accept EGLD payment",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -83,7 +83,7 @@
                 "out": [],
                 "status": "10",
                 "message": "str:function does not accept EGLD payment",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -107,7 +107,7 @@
                 "out": [],
                 "status": "10",
                 "message": "str:function does not accept EGLD payment",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -131,7 +131,7 @@
                 "out": [],
                 "status": "10",
                 "message": "str:function does not accept EGLD payment",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -156,7 +156,7 @@
                 "out": [],
                 "status": "10",
                 "message": "str:function does not accept EGLD payment",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }

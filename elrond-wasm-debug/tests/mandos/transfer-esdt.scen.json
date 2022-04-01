@@ -1,5 +1,4 @@
 {
-    "name": "test external steps resolution",
     "comment": "simple ESDT transfer, no SC",
     "steps": [
         {
@@ -9,7 +8,7 @@
                     "nonce": "0",
                     "balance": "0x1000000000",
                     "esdt": {
-                        "str:TOK-123000": "150"
+                        "str:TOK-123456": "150"
                     }
                 },
                 "address:B": {
@@ -26,12 +25,12 @@
                 "to": "address:B",
                 "esdtValue": [
                     {
-                        "tokenIdentifier": "str:TOK-123000",
+                        "tokenIdentifier": "str:TOK-123456",
                         "value": "100"
                     }
                 ],
                 "gasLimit": "0x100000000",
-                "gasPrice": "1"
+                "gasPrice": "0x01"
             }
         },
         {
@@ -42,7 +41,7 @@
                     "nonce": "1",
                     "balance": "0xf00000000",
                     "esdt": {
-                        "str:TOK-123000": "50"
+                        "str:TOK-123456": "50"
                     },
                     "storage": {},
                     "code": ""
@@ -50,7 +49,7 @@
                 "address:B": {
                     "nonce": "0",
                     "esdt": {
-                        "str:TOK-123000": "100"
+                        "str:TOK-123456": "100"
                     },
                     "storage": {},
                     "code": ""
@@ -65,7 +64,7 @@
                 "to": "address:B",
                 "esdtValue": [
                     {
-                        "tokenIdentifier": "str:TOK-123000",
+                        "tokenIdentifier": "str:TOK-123456",
                         "value": "50"
                     }
                 ],
@@ -81,7 +80,7 @@
                     "nonce": "2",
                     "balance": "0xe00000000",
                     "esdt": {
-                        "str:TOK-123000": "0"
+                        "str:TOK-123456": "0"
                     },
                     "storage": {},
                     "code": ""
@@ -89,7 +88,7 @@
                 "address:B": {
                     "nonce": "0",
                     "esdt": {
-                        "str:TOK-123000": "150"
+                        "str:TOK-123456": "150"
                     },
                     "storage": {},
                     "code": ""

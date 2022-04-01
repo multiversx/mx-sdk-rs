@@ -1,8 +1,10 @@
 use core::{borrow::Borrow, marker::PhantomData};
 
+use elrond_codec::{DecodeError, EncodeError};
+
 use crate::{
     api::{ErrorApiImpl, ManagedTypeApi},
-    types::{ManagedBuffer, ManagedSCError, ManagedType},
+    types::{heap::BoxedBytes, ManagedBuffer, ManagedSCError, ManagedType},
 };
 
 #[derive(Default)]
@@ -45,6 +47,27 @@ impl<M: ManagedTypeApi> IntoSignalError<M> for &[u8] {
     #[inline]
     fn signal_error_with_message(self) -> ! {
         M::error_api_impl().signal_error(self)
+    }
+}
+
+impl<M: ManagedTypeApi> IntoSignalError<M> for BoxedBytes {
+    #[inline]
+    fn signal_error_with_message(self) -> ! {
+        M::error_api_impl().signal_error(self.as_slice())
+    }
+}
+
+impl<M: ManagedTypeApi> IntoSignalError<M> for EncodeError {
+    #[inline]
+    fn signal_error_with_message(self) -> ! {
+        M::error_api_impl().signal_error(self.message_bytes())
+    }
+}
+
+impl<M: ManagedTypeApi> IntoSignalError<M> for DecodeError {
+    #[inline]
+    fn signal_error_with_message(self) -> ! {
+        M::error_api_impl().signal_error(self.message_bytes())
     }
 }
 

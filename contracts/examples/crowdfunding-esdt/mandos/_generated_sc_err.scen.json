@@ -132,8 +132,8 @@
             "expect": {
                 "out": [],
                 "status": "4",
-                "logs": "*",
                 "message": "str:wrong token",
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }

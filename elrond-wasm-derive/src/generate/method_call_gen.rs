@@ -106,7 +106,7 @@ fn generate_call_method_body_variable_nr_args(m: &Method) -> proc_macro2::TokenS
 
         #(#arg_init_snippets)*
 
-        ___arg_loader.assert_no_more_args();
+        elrond_wasm::io::assert_no_more_args::<Self::Api, _>(&___arg_loader);
 
         #body_with_result
     }
@@ -123,7 +123,7 @@ pub fn generate_body_with_result(
         syn::ReturnType::Type(_, _) => {
             quote! {
                 let result = #mbody;
-                elrond_wasm::io::EndpointResult::finish::<Self::Api>(&result);
+                elrond_wasm::io::finish_multi::<Self::Api, _>(&result);
             }
         },
     }

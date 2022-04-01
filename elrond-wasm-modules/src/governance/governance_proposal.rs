@@ -1,12 +1,12 @@
 use elrond_wasm::{
     api::ManagedTypeApi,
-    types::{BigUint, BoxedBytes, ManagedAddress, ManagedBuffer, MultiArg7, TokenIdentifier},
-    Vec,
+    elrond_codec::multi_types::MultiValue7,
+    types::{BigUint, BoxedBytes, ManagedAddress, ManagedBuffer, TokenIdentifier, Vec},
 };
 
 elrond_wasm::derive_imports!();
 
-pub type GovernanceActionAsMultiArg<M> = MultiArg7<
+pub type GovernanceActionAsMultiArg<M> = MultiValue7<
     u64,
     ManagedAddress<M>,
     TokenIdentifier<M>,

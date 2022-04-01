@@ -20,19 +20,14 @@ pub trait NftModule {
     #[only_owner]
     #[payable("EGLD")]
     #[endpoint(issueToken)]
-    fn issue_token(
-        &self,
-        #[payment] issue_cost: BigUint,
-        token_name: ManagedBuffer,
-        token_ticker: ManagedBuffer,
-    ) -> SCResult<AsyncCall> {
+    fn issue_token(&self, token_name: ManagedBuffer, token_ticker: ManagedBuffer) {
         require!(self.nft_token_id().is_empty(), "Token already issued");
 
-        Ok(self
-            .send()
+        let payment_amount = self.call_value().egld_value();
+        self.send()
             .esdt_system_sc_proxy()
             .issue_non_fungible(
-                issue_cost,
+                payment_amount,
                 &token_name,
                 &token_ticker,
                 NonFungibleTokenProperties {
@@ -45,37 +40,34 @@ pub trait NftModule {
                 },
             )
             .async_call()
-            .with_callback(self.callbacks().issue_callback()))
+            .with_callback(self.callbacks().issue_callback())
+            .call_and_exit()
     }
 
     #[only_owner]
     #[endpoint(setLocalRoles)]
-    fn set_local_roles(&self) -> SCResult<AsyncCall> {
-        self.require_token_issued()?;
+    fn set_local_roles(&self) {
+        self.require_token_issued();
 
-        Ok(self
-            .send()
+        self.send()
             .esdt_system_sc_proxy()
             .set_special_roles(
                 &self.blockchain().get_sc_address(),
                 &self.nft_token_id().get(),
-                (&[EsdtLocalRole::NftCreate][..]).iter().cloned(),
+                [EsdtLocalRole::NftCreate][..].iter().cloned(),
             )
-            .async_call())
+            .async_call()
+            .call_and_exit()
     }
 
     // endpoints
 
     #[payable("*")]
     #[endpoint(buyNft)]
-    fn buy_nft(
-        &self,
-        #[payment_token] payment_token: TokenIdentifier,
-        #[payment_nonce] payment_nonce: u64,
-        #[payment_amount] payment_amount: BigUint,
-        nft_nonce: u64,
-    ) -> SCResult<()> {
-        self.require_token_issued()?;
+    fn buy_nft(&self, nft_nonce: u64) {
+        let payment: EsdtTokenPayment<Self::Api> = self.call_value().payment();
+
+        self.require_token_issued();
         require!(
             !self.price_tag(nft_nonce).is_empty(),
             "Invalid nonce or NFT was already sold"
@@ -83,15 +75,15 @@ pub trait NftModule {
 
         let price_tag = self.price_tag(nft_nonce).get();
         require!(
-            payment_token == price_tag.token,
+            payment.token_identifier == price_tag.token,
             "Invalid token used as payment"
         );
         require!(
-            payment_nonce == price_tag.nonce,
+            payment.token_nonce == price_tag.nonce,
             "Invalid nonce for payment token"
         );
         require!(
-            payment_amount == price_tag.amount,
+            payment.amount == price_tag.amount,
             "Invalid amount as payment"
         );
 
@@ -108,10 +100,13 @@ pub trait NftModule {
         );
 
         let owner = self.blockchain().get_owner_address();
-        self.send()
-            .direct(&owner, &payment_token, payment_nonce, &payment_amount, &[]);
-
-        Ok(())
+        self.send().direct(
+            &owner,
+            &payment.token_identifier,
+            payment.token_nonce,
+            &payment.amount,
+            &[],
+        );
     }
 
     // views
@@ -121,14 +116,14 @@ pub trait NftModule {
     fn get_nft_price(
         &self,
         nft_nonce: u64,
-    ) -> OptionalResult<MultiResult3<TokenIdentifier, u64, BigUint>> {
+    ) -> OptionalValue<MultiValue3<TokenIdentifier, u64, BigUint>> {
         if self.price_tag(nft_nonce).is_empty() {
             // NFT was already sold
-            OptionalResult::None
+            OptionalValue::None
         } else {
             let price_tag = self.price_tag(nft_nonce).get();
 
-            OptionalResult::Some((price_tag.token, price_tag.nonce, price_tag.amount).into())
+            OptionalValue::Some((price_tag.token, price_tag.nonce, price_tag.amount).into())
         }
     }
 
@@ -163,28 +158,28 @@ pub trait NftModule {
         selling_price: BigUint,
         token_used_as_payment: TokenIdentifier,
         token_used_as_payment_nonce: u64,
-    ) -> SCResult<u64> {
-        self.require_token_issued()?;
-        self.require_local_roles_set()?;
+    ) -> u64 {
+        self.require_token_issued();
         require!(royalties <= ROYALTIES_MAX, "Royalties cannot exceed 100%");
 
         let nft_token_id = self.nft_token_id().get();
 
-        let mut serialized_attributes = Vec::new();
-        attributes.top_encode(&mut serialized_attributes)?;
+        let mut serialized_attributes = ManagedBuffer::new();
+        if let core::result::Result::Err(err) = attributes.top_encode(&mut serialized_attributes) {
+            sc_panic!("Attributes encode error: {}", err.message_bytes());
+        }
 
-        let attributes_hash = self.crypto().sha256_legacy(&serialized_attributes);
-        let hash_buffer = ManagedBuffer::from(attributes_hash.as_bytes());
-
-        let mut uris = ManagedVec::new();
-        uris.push(uri);
-
+        let attributes_sha256 = self
+            .crypto()
+            .sha256_legacy_managed::<1000>(&serialized_attributes);
+        let attributes_hash = attributes_sha256.as_managed_buffer();
+        let uris = ManagedVec::from_single_item(uri);
         let nft_nonce = self.send().esdt_nft_create(
             &nft_token_id,
             &BigUint::from(NFT_AMOUNT),
             &name,
             &royalties,
-            &hash_buffer,
+            attributes_hash,
             &attributes,
             &uris,
         );
@@ -195,24 +190,11 @@ pub trait NftModule {
             amount: selling_price,
         });
 
-        Ok(nft_nonce)
+        nft_nonce
     }
 
-    fn require_token_issued(&self) -> SCResult<()> {
+    fn require_token_issued(&self) {
         require!(!self.nft_token_id().is_empty(), "Token not issued");
-        Ok(())
-    }
-
-    fn require_local_roles_set(&self) -> SCResult<()> {
-        let nft_token_id = self.nft_token_id().get();
-        let roles = self.blockchain().get_esdt_local_roles(&nft_token_id);
-
-        require!(
-            roles.has_role(&EsdtLocalRole::NftCreate),
-            "NFTCreate role not set"
-        );
-
-        Ok(())
     }
 
     // storage

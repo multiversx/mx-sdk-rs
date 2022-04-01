@@ -1,0 +1,12 @@
+[package]
+name = "crypto-bubbles-legacy-meta"
+version = "0.0.0"
+edition = "2018"
+publish = false
+
+[dependencies.crypto-bubbles-legacy]
+path = ".."
+
+[dependencies.elrond-wasm-debug]
+version = "0.30.0"
+path = "../../../../../elrond-wasm-debug"

@@ -68,7 +68,7 @@ The contract has only one function:
 
 ```
 #[endpoint(generateKittyGenes)]
-fn generate_kitty_genes(matron: Kitty, sire: Kitty) -> SCResult<KittyGenes>
+fn generate_kitty_genes(matron: Kitty, sire: Kitty) -> KittyGenes
 ```
 
 It takes two kitties, the matron and the sire, and generates a *KittyGenes* instance. In the current implementation, this simply combines their `fur_color` and `eye_color` using a random percentage of each, and the average of their `meow_power`s.
@@ -123,7 +123,7 @@ The last argument is the address of the `Kitty Ownership` contract, which can ei
 
 ## Owner-only
 
-The following throw an error if the caller isn't the contract owner, so we will omit the `SCResult`.
+The following throw an error if the caller isn't the contract owner.
 
 `#[endpoint(setKittyOwnershipContractAddress)]`  
 `fn set_kitty_ownership_contract_address_endpoint(address: Address)`
@@ -147,12 +147,12 @@ Owner claims funds.
 Returns `true` if the kitty is up for auction, `false` otherwise.
 
 `#[view(getAuctionStatus)]`  
-`fn get_auction_status(kitty_id: u32) -> SCResult<Auction>`
+`fn get_auction_status(kitty_id: u32) -> Auction`
 
 Returns the relevant `Auction` struct (described above) if it exists, throws an error otherwise.
 
 `#[view(getCurrentWinningBid)]`  
-`fn get_current_winning_bid(kitty_id: u32) -> SCResult<BigUint>`
+`fn get_current_winning_bid(kitty_id: u32) -> BigUint`
 
 Returns the current winning bid for a kitty's auction if it exists, throws an error otherwise. Cheaper version of `get_auction_status` is you're only interested in the winning bid.
 
@@ -165,7 +165,7 @@ fn create_sale_auction(
 	starting_price: BigUint,
 	ending_price: BigUint,
 	duration: u64,
-) -> SCResult<()>
+)
 ```
 
 Puts the kitty up for a sale auction. Only the owner of the kitty may call this function,
@@ -177,12 +177,12 @@ fn create_siring_auction(
 	starting_price: BigUint,
 	ending_price: BigUint,
 	duration: u64,
-) -> SCResult<()>
+)
 ```
 
 Puts the kitty up for siring auction. Only the owner of the kitty may call this function.
 
-`fn bid(kitty_id: u32) -> SCResult<()>`
+`fn bid(kitty_id: u32)`
 
 Payable function. Bid must abide the following rule:
 `current_bid < payment <= ending_price`
@@ -193,7 +193,7 @@ If this is the first bid in the auction, the rule changes to:
 If the bid is valid, the `current_bid` is sent back to the `current_winner`, `current_bid` is set to `payment`, and `current_winner` is set to the caller's address.
 
 `#[endpoint(endAuction)]`  
-`fn end_auction(kitty_id: u32) -> SCResult<()>`
+`fn end_auction(kitty_id: u32)`
 
 This function ends the auction for the kitty if one of the end conditions has been met:
 1) `deadline` has passed
@@ -216,9 +216,9 @@ Kitty Ownership also implements the ERC721 interface. We won't be going over the
 `fn total_supply() -> u32`  
 `fn balance_of(address: Address) -> u32`  
 `fn owner_of(kitty_id: u32) -> Address`  
-`fn approve(to: Address, kitty_id: u32) -> SCResult<()>`  
-`fn transfer(to: Address, kitty_id: u32) -> SCResult<()>`  
-`fn transfer_from(from: Address, to: Address, kitty_id: u32) -> SCResult<()>`  
+`fn approve(to: Address, kitty_id: u32) `  
+`fn transfer(to: Address, kitty_id: u32) `  
+`fn transfer_from(from: Address, to: Address, kitty_id: u32) `  
 `fn tokens_of_owner(address: Address) -> Vec<u32>`  
 
 ## Deployment
@@ -242,22 +242,22 @@ The next two arguments are the addresses of the other two contracts: the kitty-a
 The following throw an error if the kitty does not exist.
 
 `#[view(getKittyById)]`  
-`fn get_kitty_by_id_endpoint(kitty_id: u32) -> SCResult<Kitty>`
+`fn get_kitty_by_id_endpoint(kitty_id: u32) -> Kitty`
 
 Gets a kitty by id.
 
 `#[view(isReadyToBreed)]`  
-`fn is_ready_to_breed(kitty_id: u32) -> SCResult<bool>`
+`fn is_ready_to_breed(kitty_id: u32) -> bool`
 
 Checks if the kitty is ready to breed by checking if `siring_with_id` is 0 and cooldown period has passed.
 
 `#[view(isPregnant)]`  
-`fn is_pregnant(kitty_id: u32) -> SCResult<bool>`
+`fn is_pregnant(kitty_id: u32) -> bool`
 
 Checks if the kitty is pregnant by checking if `siring_with_id` is not 0.
 
 `#[view(canBreedWith)]`  
-`fn can_breed_with(matron_id: u32, sire_id: u32) -> SCResult<bool>`
+`fn can_breed_with(matron_id: u32, sire_id: u32) -> bool`
 
 Checks if the matron can breed with the sire. Kitties can't breed with themselves, their parents, nor their siblings/half-siblings.
 
@@ -269,7 +269,7 @@ Gets the `birth_fee` set by the owner.
 ## Endpoints
 
 `#[endpoint(approveSiring)]`  
-`fn approve_siring(&self, address: Address, kitty_id: u32) -> SCResult<()>`
+`fn approve_siring(&self, address: Address, kitty_id: u32) `
 
 Approves an address to use the kitty as a sire. Only the owner of `kitty_id` may call this function, and it may not override an already existing approved address.
 
@@ -277,10 +277,9 @@ Approves an address to use the kitty as a sire. Only the owner of `kitty_id` may
 #[payable("EGLD")]
 #[endpoint(breedWith)]
 fn breed_with(
-	#[payment] payment: BigUint,
 	matron_id: u32,
 	sire_id: u32,
-) -> SCResult<()>
+)
 ```
 
 Breeds `matron_id` with `sire_id`. The `payment` must be equal to the `birth_fee` set by the contract owner. Only the owner of the `matron` may call this function, and the `sire` must either be owned the by the same account that owns the `matron` OR the caller must be the `sire_allowed_address` for the sire.
@@ -288,7 +287,7 @@ Breeds `matron_id` with `sire_id`. The `payment` must be equal to the `birth_fee
 If the call is successful, the `cooldown` period is triggered and the `sire_allowed_address` is reset for both kitties.
 
 `#[endpoint(giveBirth)]`  
-`fn give_birth(matron_id: u32) -> SCResult<()>`
+`fn give_birth(matron_id: u32)`
 
 If the kitty is pregant and the gestation period has passed, a new kitty is created by the `Kitty Genetic Alg` contract and its ownership is given to the `matron`'s owner. Anyone may call this function.
 

@@ -5,6 +5,8 @@ use std::{
     fmt::{self, Write},
 };
 
+use crate::verbose_hex_list;
+
 use super::{EsdtInstance, EsdtInstanceMetadata};
 
 #[derive(Clone, Debug, Default)]
@@ -100,7 +102,7 @@ impl fmt::Display for EsdtInstances {
                 "".to_string()
             };
             write!(
-                &mut instance_buf,
+                instance_buf,
                 "{{
                     nonce: {},
                     balance: {},
@@ -122,14 +124,7 @@ impl fmt::Display for EsdtInstances {
                         .unwrap_or(&Vec::new())
                         .as_slice()
                 ),
-                hex::encode(
-                    value
-                        .metadata
-                        .uri
-                        .as_ref()
-                        .unwrap_or(&Vec::new())
-                        .as_slice()
-                ),
+                verbose_hex_list(value.metadata.uri.as_slice()),
                 hex::encode(value.metadata.attributes.as_slice())
             )?;
         }
