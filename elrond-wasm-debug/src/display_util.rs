@@ -1,8 +1,7 @@
+use crate::{num_bigint, num_bigint::BigInt};
 use alloc::string::String;
 use elrond_wasm::{
     api::ManagedTypeApi,
-    num_bigint,
-    num_bigint::BigInt,
     types::{
         heap::{Address, BoxedBytes},
         BigUint, ManagedType,

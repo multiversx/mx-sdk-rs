@@ -17,9 +17,6 @@ pub use elrond_codec::arrayvec;
 
 pub use elrond_codec;
 
-/// Reexported for convenience. Importing from the codec to make sure we are using the same version.
-pub use elrond_codec::num_bigint;
-
 pub mod abi;
 pub mod api;
 pub mod contract_base;
