@@ -1,12 +1,13 @@
 use alloc::string::String;
 use elrond_wasm::{
     api::ManagedTypeApi,
+    num_bigint,
+    num_bigint::BigInt,
     types::{
         heap::{Address, BoxedBytes},
         BigUint, ManagedType,
     },
 };
-use num_bigint::BigInt;
 use std::fmt;
 
 pub struct BigUintPrinter<M: ManagedTypeApi> {

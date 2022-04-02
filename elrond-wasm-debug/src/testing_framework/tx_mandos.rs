@@ -1,6 +1,7 @@
 use crate::{rust_biguint, tx_mock::TxInputESDT};
 use elrond_wasm::{
     elrond_codec::{top_encode_to_vec_u8_or_panic, TopEncode},
+    num_bigint,
     types::heap::Address,
 };
 
