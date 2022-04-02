@@ -8,6 +8,8 @@ mod impl_num_signed;
 mod impl_num_unsigned;
 mod impl_option;
 mod impl_ref;
+mod impl_rust_big_int;
+mod impl_rust_big_uint;
 mod impl_slice;
 mod impl_string;
 mod impl_tuple;
