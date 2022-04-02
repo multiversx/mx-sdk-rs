@@ -1,4 +1,5 @@
 use crate::{
+    num_bigint,
     tx_execution::{deploy_contract, execute_builtin_function_or_default},
     tx_mock::{AsyncCallTxData, BlockchainUpdate, TxCache, TxInput, TxPanic, TxResult},
     DebugApi,
@@ -10,7 +11,7 @@ use elrond_wasm::{
         ESDT_TRANSFER_FUNC_NAME, UPGRADE_CONTRACT_FUNC_NAME,
     },
     elrond_codec::top_encode_to_vec_u8,
-    err_msg, num_bigint,
+    err_msg,
     types::{
         heap::Address, BigUint, CodeMetadata, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer,
         ManagedBuffer, ManagedType, ManagedVec, TokenIdentifier,

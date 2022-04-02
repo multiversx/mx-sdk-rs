@@ -14,6 +14,7 @@ keywords = ["elrond", "wasm", "webassembly", "blockchain", "contract"]
 categories = ["no-std", "wasm", "cryptography::cryptocurrencies", "development-tools"]
 
 [features]
+num-bigint = ["elrond-codec/num-bigint"]
 cb_closure_unmanaged_deser = []
 alloc = ["elrond-codec/alloc"]
 ei-1-1 = []
