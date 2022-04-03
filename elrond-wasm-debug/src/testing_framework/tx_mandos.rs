@@ -1,8 +1,9 @@
-use crate::{rust_biguint, tx_mock::TxInputESDT};
+use crate::{num_bigint, tx_mock::TxInputESDT};
 use elrond_wasm::{
     elrond_codec::{top_encode_to_vec_u8_or_panic, TopEncode},
     types::heap::Address,
 };
+use num_traits::Zero;
 
 pub struct ScCallMandos {
     pub(crate) from: Address,
@@ -20,7 +21,7 @@ impl ScCallMandos {
         ScCallMandos {
             from: from.clone(),
             to: to.clone(),
-            egld_value: rust_biguint!(0),
+            egld_value: num_bigint::BigUint::zero(),
             esdt: Vec::new(),
             function: function.to_owned(),
             arguments: Vec::new(),

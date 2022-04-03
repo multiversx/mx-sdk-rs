@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
+use crate::num_bigint::BigInt;
 use elrond_wasm::api::Handle;
-use num_bigint::BigInt;
 
 type ManagedBufferImpl = Vec<u8>;
 

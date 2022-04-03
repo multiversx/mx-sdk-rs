@@ -1,3 +1,4 @@
+use crate::{num_bigint, num_bigint::BigInt};
 use alloc::string::String;
 use elrond_wasm::{
     api::ManagedTypeApi,
@@ -6,7 +7,6 @@ use elrond_wasm::{
         BigUint, ManagedType,
     },
 };
-use num_bigint::BigInt;
 use std::fmt;
 
 pub struct BigUintPrinter<M: ManagedTypeApi> {

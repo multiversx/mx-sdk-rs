@@ -1,7 +1,7 @@
 #[macro_export]
 macro_rules! rust_biguint {
     ($value:expr) => {{
-        num_bigint::BigUint::from($value as u64)
+        elrond_wasm_debug::num_bigint::BigUint::from($value as u64)
     }};
 }
 

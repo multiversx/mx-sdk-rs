@@ -1,7 +1,6 @@
-use crate::display_util::*;
+use crate::{display_util::*, num_bigint::BigUint};
 use alloc::vec::Vec;
 use elrond_wasm::types::heap::{Address, H256};
-use num_bigint::BigUint;
 use num_traits::Zero;
 use std::fmt;
 
