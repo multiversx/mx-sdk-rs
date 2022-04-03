@@ -1,6 +1,6 @@
+use crate::num_bigint::BigUint;
 use elrond_wasm::types::heap::Address;
 use mandos::model::SetStateStep;
-use num_bigint::BigUint;
 
 use crate::world_mock::{
     is_smart_contract_address, AccountData, AccountEsdt, BlockInfo as CrateBlockInfo,

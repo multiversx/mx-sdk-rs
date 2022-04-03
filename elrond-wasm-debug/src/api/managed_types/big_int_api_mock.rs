@@ -1,5 +1,6 @@
 use crate::DebugApi;
 
+use crate::num_bigint;
 use core::{
     cmp::Ordering,
     ops::{Add, BitAnd, BitOr, BitXor, Div, Mul, Neg, Rem, Shl, Shr, Sub},
@@ -9,12 +10,11 @@ use elrond_wasm::{
     err_msg,
     types::heap::BoxedBytes,
 };
-use num_bigint::BigInt;
 use num_traits::{pow, sign::Signed, Zero};
 
 use super::big_int_util::big_int_to_i64;
 
-fn assert_positive(bi: &BigInt) {
+fn assert_positive(bi: &num_bigint::BigInt) {
     assert!(
         bi.sign() == num_bigint::Sign::Minus,
         "bitwise operations only allowed on positive integers"
@@ -63,7 +63,7 @@ impl BigIntApi for DebugApi {
         let mut managed_types = self.m_types_borrow_mut();
         managed_types
             .big_int_map
-            .insert_new_handle(BigInt::from(value))
+            .insert_new_handle(num_bigint::BigInt::from(value))
     }
 
     fn bi_unsigned_byte_length(&self, handle: Handle) -> usize {
@@ -83,7 +83,7 @@ impl BigIntApi for DebugApi {
 
     fn bi_set_unsigned_bytes(&self, dest: Handle, bytes: &[u8]) {
         let mut managed_types = self.m_types_borrow_mut();
-        let result = BigInt::from_bytes_be(num_bigint::Sign::Plus, bytes);
+        let result = num_bigint::BigInt::from_bytes_be(num_bigint::Sign::Plus, bytes);
         managed_types.big_int_map.insert(dest, result);
     }
 
@@ -103,7 +103,7 @@ impl BigIntApi for DebugApi {
 
     fn bi_set_signed_bytes(&self, dest: Handle, bytes: &[u8]) {
         let mut managed_types = self.m_types_borrow_mut();
-        let result = BigInt::from_signed_bytes_be(bytes);
+        let result = num_bigint::BigInt::from_signed_bytes_be(bytes);
         managed_types.big_int_map.insert(dest, result);
     }
 

@@ -1,8 +1,8 @@
+use crate::num_bigint::BigUint;
 use mandos::model::{
     AddressKey, BytesValue, CheckEsdt, CheckEsdtData, CheckEsdtInstance, CheckEsdtInstances,
     CheckEsdtMap, CheckStateStep, CheckStorage, CheckValue, Checkable,
 };
-use num_bigint::BigUint;
 use num_traits::Zero;
 
 use crate::{
