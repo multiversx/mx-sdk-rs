@@ -1,13 +1,11 @@
-use std::rc::Rc;
-
-use mandos::model::ScQueryStep;
-use num_bigint::BigUint;
-
 use crate::{
+    num_bigint::BigUint,
     tx_execution::sc_query,
     tx_mock::{generate_tx_hash_dummy, TxInput},
     world_mock::BlockchainMock,
 };
+use mandos::model::ScQueryStep;
+use std::rc::Rc;
 
 use super::check_tx_output;
 

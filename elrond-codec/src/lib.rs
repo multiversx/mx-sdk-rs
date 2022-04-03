@@ -14,6 +14,10 @@ pub use alloc::vec::Vec;
 /// Reexported for convenience.
 pub use arrayvec;
 
+/// Reexported for convenience.
+#[cfg(feature = "num-bigint")]
+pub use num_bigint;
+
 // TODO: group into smaller sub-modules
 
 mod codec_err;
