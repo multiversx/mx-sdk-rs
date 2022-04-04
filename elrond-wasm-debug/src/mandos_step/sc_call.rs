@@ -16,20 +16,20 @@ use crate::{
 use super::check_tx_output;
 
 impl BlockchainMock {
-    pub fn mandos_sc_call(mut self, sc_call_step: ScCallStep) -> BlockchainMock {
-        let mut state_rc = Rc::new(self);
-        execute_rc(&mut state_rc, &sc_call_step);
-        self = Rc::try_unwrap(state_rc).unwrap();
+    pub fn mandos_sc_call(&mut self, sc_call_step: ScCallStep) -> &mut Self {
+        self.with_borrowed_rc(|rc| {
+            execute_rc(rc, &sc_call_step);
+        });
         self.mandos_trace.steps.push(Step::ScCall(sc_call_step));
         self
     }
 
     /// TODO: REFACTOR!
     pub fn quick_call<OriginalResult, RequestedResult>(
-        self,
+        &mut self,
         from: Address,
         contract_call: ContractCall<DebugApi, OriginalResult>,
-    ) -> (BlockchainMock, RequestedResult)
+    ) -> RequestedResult
     where
         OriginalResult: TopEncodeMulti,
         RequestedResult: CodecFrom<OriginalResult>,
@@ -46,13 +46,11 @@ impl BlockchainMock {
             tx_hash: H256::zero(),
         };
 
-        let mut state_rc = Rc::new(self);
-        let tx_result = sc_call_with_async_and_callback(tx_input, &mut state_rc, true);
+        let tx_result =
+            self.with_borrowed_rc(|rc| sc_call_with_async_and_callback(tx_input, rc, true));
         let mut raw_result = tx_result.result_values;
-        let result =
-            RequestedResult::multi_decode_or_handle_err(&mut raw_result, PanicErrorHandler)
-                .unwrap();
-        (Rc::try_unwrap(state_rc).unwrap(), result)
+
+        RequestedResult::multi_decode_or_handle_err(&mut raw_result, PanicErrorHandler).unwrap()
     }
 }
 

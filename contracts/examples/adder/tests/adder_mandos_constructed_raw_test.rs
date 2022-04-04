@@ -10,9 +10,9 @@ fn world() -> BlockchainMock {
 
 #[test]
 fn adder_mandos_constructed_raw() {
-    let world = world();
-    let intp_context = world.interpreter_context();
-    let _ = world
+    let mut world = world();
+    let ic = world.interpreter_context();
+    world
         .mandos_set_state(
             SetStateStep::new()
                 .put_account("address:owner", Account::new().nonce(1))
@@ -21,7 +21,7 @@ fn adder_mandos_constructed_raw() {
         .mandos_sc_deploy(
             ScDeployStep::new()
                 .from("address:owner")
-                .contract_code("file:output/adder.wasm", &intp_context)
+                .contract_code("file:output/adder.wasm", &ic)
                 .argument("5")
                 .gas_limit("5,000,000")
                 .expect(TxExpect::ok().no_result()),
