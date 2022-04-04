@@ -1,4 +1,5 @@
 use crate::{
+    num_bigint,
     tx_execution::{deploy_contract, execute_builtin_function_or_default},
     tx_mock::{AsyncCallTxData, BlockchainUpdate, TxCache, TxInput, TxPanic, TxResult},
     DebugApi,

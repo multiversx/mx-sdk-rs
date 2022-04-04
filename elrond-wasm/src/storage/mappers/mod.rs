@@ -1,3 +1,4 @@
+mod bi_di_mapper;
 mod fungible_token_mapper;
 mod linked_list_mapper;
 mod map_mapper;
@@ -14,6 +15,7 @@ mod user_mapper;
 mod vec_mapper;
 mod whitelist_mapper;
 
+pub use bi_di_mapper::BiDiMapper;
 pub use fungible_token_mapper::FungibleTokenMapper;
 pub use linked_list_mapper::{LinkedListMapper, LinkedListNode};
 pub use map_mapper::MapMapper;

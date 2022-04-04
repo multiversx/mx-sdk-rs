@@ -1,4 +1,5 @@
 use crate::{
+    num_bigint,
     world_mock::{is_smart_contract_address, EsdtInstance},
     DebugApi,
 };

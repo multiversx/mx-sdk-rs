@@ -1,5 +1,5 @@
+use crate::num_bigint::BigUint;
 use elrond_wasm::{api::ESDT_TRANSFER_FUNC_NAME, types::heap::Address};
-use num_bigint::BigUint;
 use num_traits::Zero;
 
 use crate::{
