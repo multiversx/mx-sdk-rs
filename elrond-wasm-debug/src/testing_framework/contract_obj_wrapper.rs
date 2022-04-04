@@ -8,9 +8,10 @@ use elrond_wasm::{
         EsdtLocalRole,
     },
 };
+use num_traits::Zero;
 
 use crate::{
-    rust_biguint,
+    num_bigint,
     testing_framework::raw_converter::bytes_to_hex,
     tx_execution::{execute_async_call_and_callback, interpret_panic_as_tx_result},
     tx_mock::{TxCache, TxContext, TxContextStack, TxInput, TxInputESDT, TxResult},
@@ -86,7 +87,7 @@ impl BlockchainStateWrapper {
     pub fn check_egld_balance(&self, address: &Address, expected_balance: &num_bigint::BigUint) {
         let actual_balance = match &self.rc_b_mock.accounts.get(address) {
             Some(acc) => acc.egld_balance.clone(),
-            None => rust_biguint!(0),
+            None => num_bigint::BigUint::zero(),
         };
 
         assert!(
@@ -106,7 +107,7 @@ impl BlockchainStateWrapper {
     ) {
         let actual_balance = match &self.rc_b_mock.accounts.get(address) {
             Some(acc) => acc.esdt.get_esdt_balance(token_id, 0),
-            None => rust_biguint!(0),
+            None => num_bigint::BigUint::zero(),
         };
 
         assert!(
@@ -618,7 +619,13 @@ impl BlockchainStateWrapper {
             nonce: esdt_nonce,
             value: esdt_amount.clone(),
         }];
-        self.execute_tx_any(caller, sc_wrapper, &rust_biguint!(0), esdt_transfer, tx_fn)
+        self.execute_tx_any(
+            caller,
+            sc_wrapper,
+            &num_bigint::BigUint::zero(),
+            esdt_transfer,
+            tx_fn,
+        )
     }
 
     pub fn execute_esdt_multi_transfer<CB, ContractObjBuilder, TxFn: FnOnce(CB)>(
@@ -635,7 +642,7 @@ impl BlockchainStateWrapper {
         self.execute_tx_any(
             caller,
             sc_wrapper,
-            &rust_biguint!(0),
+            &num_bigint::BigUint::zero(),
             esdt_transfers.to_vec(),
             tx_fn,
         )
@@ -653,7 +660,7 @@ impl BlockchainStateWrapper {
         self.execute_tx(
             sc_wrapper.address_ref(),
             sc_wrapper,
-            &rust_biguint!(0),
+            &num_bigint::BigUint::zero(),
             query_fn,
         )
     }
@@ -673,7 +680,7 @@ impl BlockchainStateWrapper {
     {
         let sc_address = sc_wrapper.address_ref();
         let tx_cache = TxCache::new(self.rc_b_mock.clone());
-        let rust_zero = rust_biguint!(0);
+        let rust_zero = num_bigint::BigUint::zero();
 
         if egld_payment > &rust_zero {
             tx_cache.subtract_egld_balance(caller, egld_payment);

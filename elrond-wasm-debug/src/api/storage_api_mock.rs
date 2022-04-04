@@ -1,10 +1,13 @@
-use crate::{tx_mock::TxPanic, DebugApi};
+use crate::{
+    num_bigint::{BigInt, BigUint, Sign},
+    tx_mock::TxPanic,
+    DebugApi,
+};
 use alloc::vec::Vec;
 use elrond_wasm::api::{
     BigIntApi, Handle, ManagedBufferApi, StorageReadApi, StorageReadApiImpl, StorageWriteApi,
     StorageWriteApiImpl,
 };
-use num_bigint::{BigInt, BigUint, Sign};
 use num_traits::ToPrimitive;
 
 impl StorageReadApi for DebugApi {
