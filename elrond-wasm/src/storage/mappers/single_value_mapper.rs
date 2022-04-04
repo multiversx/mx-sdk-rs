@@ -128,10 +128,11 @@ impl<T: TopDecode> SingleValue<T> {
     }
 }
 
-impl<SA, T> CodecFrom<SingleValueMapper<SA, T>> for SingleValue<T>
+impl<SA, T, R> CodecFrom<SingleValueMapper<SA, T>> for SingleValue<R>
 where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode,
+    R: TopDecode + CodecFrom<T>,
 {
 }
 

@@ -70,6 +70,11 @@ big_uint_conv_num! {usize}
 big_uint_conv_num! {u16}
 big_uint_conv_num! {u8}
 
+#[cfg(feature = "num-bigint")]
+impl<M: ManagedTypeApi> CodecFrom<elrond_codec::num_bigint::BigUint> for BigUint<M> {}
+#[cfg(feature = "num-bigint")]
+impl<M: ManagedTypeApi> CodecFrom<BigUint<M>> for elrond_codec::num_bigint::BigUint {}
+
 impl<M: ManagedTypeApi> Default for BigUint<M> {
     #[inline]
     fn default() -> Self {
