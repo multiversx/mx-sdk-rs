@@ -8,7 +8,8 @@ use crate::{
     types::ManagedType,
 };
 use elrond_codec::{
-    EncodeErrorHandler, TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
+    CodecFrom, DecodeErrorHandler, EncodeErrorHandler, TopDecode, TopDecodeInput, TopEncode,
+    TopEncodeMulti, TopEncodeMultiOutput,
 };
 
 /// Manages a single serializable item in storage.
@@ -96,8 +97,6 @@ where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode,
 {
-    type DecodeAs = T;
-
     fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
     where
         O: TopEncodeMultiOutput,
@@ -105,6 +104,35 @@ where
     {
         output.push_single_value(&self.get(), h)
     }
+}
+
+/// Intermediary type for deserializing the result of an endpoint that returns a `SingleValueMapper`.
+///
+/// Necessary because we cannot implement `CodecFrom` directly on `T`.
+pub struct SingleValue<T: TopDecode>(T);
+
+impl<T: TopDecode> TopDecode for SingleValue<T> {
+    fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: TopDecodeInput,
+        H: DecodeErrorHandler,
+    {
+        Ok(SingleValue(T::top_decode_or_handle_err(input, h)?))
+    }
+}
+
+impl<T: TopDecode> SingleValue<T> {
+    #[inline]
+    pub fn into(self) -> T {
+        self.0
+    }
+}
+
+impl<SA, T> CodecFrom<SingleValueMapper<SA, T>> for SingleValue<T>
+where
+    SA: StorageMapperApi,
+    T: TopEncode + TopDecode,
+{
 }
 
 impl<SA, T> TypeAbi for SingleValueMapper<SA, T>

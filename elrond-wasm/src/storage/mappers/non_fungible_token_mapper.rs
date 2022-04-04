@@ -1,5 +1,5 @@
 use elrond_codec::{
-    EncodeErrorHandler, TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
+    CodecFrom, EncodeErrorHandler, TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
 };
 
 use super::{
@@ -280,8 +280,6 @@ impl<SA> TopEncodeMulti for NonFungibleTokenMapper<SA>
 where
     SA: StorageMapperApi + CallTypeApi,
 {
-    type DecodeAs = TokenIdentifier<SA>;
-
     fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
     where
         O: TopEncodeMultiOutput,
@@ -293,6 +291,11 @@ where
             output.push_single_value(&self.get_token_id(), h)
         }
     }
+}
+
+impl<SA> CodecFrom<NonFungibleTokenMapper<SA>> for TokenIdentifier<SA> where
+    SA: StorageMapperApi + CallTypeApi
+{
 }
 
 impl<SA> TypeAbi for NonFungibleTokenMapper<SA>

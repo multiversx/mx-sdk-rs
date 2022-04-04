@@ -8,8 +8,8 @@ use crate::{
     types::{ManagedType, MultiValueEncoded},
 };
 use elrond_codec::{
-    multi_encode_iter_or_handle_err, multi_types::MultiValue2, EncodeErrorHandler, NestedDecode,
-    NestedEncode, TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
+    multi_encode_iter_or_handle_err, multi_types::MultiValue2, CodecFrom, EncodeErrorHandler,
+    NestedDecode, NestedEncode, TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
 };
 
 const MAPPED_VALUE_IDENTIFIER: &[u8] = b".mapped";
@@ -444,8 +444,6 @@ where
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
     V: TopEncode + TopDecode + 'static,
 {
-    type DecodeAs = MultiValueEncoded<SA, MultiValue2<K, V>>;
-
     fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
     where
         O: TopEncodeMultiOutput,
@@ -454,6 +452,14 @@ where
         let iter = self.iter().map(MultiValue2::<K, V>::from);
         multi_encode_iter_or_handle_err(iter, output, h)
     }
+}
+
+impl<SA, K, V> CodecFrom<MapMapper<SA, K, V>> for MultiValueEncoded<SA, MultiValue2<K, V>>
+where
+    SA: StorageMapperApi,
+    K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
+    V: TopEncode + TopDecode + 'static,
+{
 }
 
 /// Behaves like a MultiResultVec<MultiValue<K, V>> when an endpoint result.

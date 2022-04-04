@@ -1,4 +1,4 @@
-use elrond_codec::{EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput};
+use elrond_codec::{CodecFrom, EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput};
 
 use super::{
     token_mapper::{StorageTokenWrapper, TOKEN_ID_ALREADY_SET_ERR_MSG},
@@ -183,8 +183,6 @@ impl<SA> TopEncodeMulti for FungibleTokenMapper<SA>
 where
     SA: StorageMapperApi + CallTypeApi,
 {
-    type DecodeAs = TokenIdentifier<SA>;
-
     fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
     where
         O: TopEncodeMultiOutput,
@@ -196,6 +194,11 @@ where
             output.push_single_value(&self.get_token_id(), h)
         }
     }
+}
+
+impl<SA> CodecFrom<FungibleTokenMapper<SA>> for TokenIdentifier<SA> where
+    SA: StorageMapperApi + CallTypeApi
+{
 }
 
 impl<SA> TypeAbi for FungibleTokenMapper<SA>

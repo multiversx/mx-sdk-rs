@@ -1,8 +1,8 @@
 use core::marker::PhantomData;
 
 use elrond_codec::{
-    multi_encode_iter_or_handle_err, multi_types::MultiValue2, EncodeErrorHandler, NestedDecode,
-    NestedEncode, TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
+    multi_encode_iter_or_handle_err, multi_types::MultiValue2, CodecFrom, EncodeErrorHandler,
+    NestedDecode, NestedEncode, TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
 };
 
 use super::{unordered_set_mapper, StorageMapper, UnorderedSetMapper};
@@ -220,8 +220,6 @@ where
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static + Default + PartialEq,
     V: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static + Default + PartialEq,
 {
-    type DecodeAs = MultiValueEncoded<SA, MultiValue2<K, V>>;
-
     fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
     where
         O: TopEncodeMultiOutput,
@@ -230,6 +228,14 @@ where
         let iter = self.iter().map(MultiValue2::<K, V>::from);
         multi_encode_iter_or_handle_err(iter, output, h)
     }
+}
+
+impl<SA, K, V> CodecFrom<BiDiMapper<SA, K, V>> for MultiValueEncoded<SA, MultiValue2<K, V>>
+where
+    SA: StorageMapperApi,
+    K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static + Default + PartialEq,
+    V: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static + Default + PartialEq,
+{
 }
 
 impl<SA, K, V> TypeAbi for BiDiMapper<SA, K, V>
