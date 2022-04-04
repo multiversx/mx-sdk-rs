@@ -90,10 +90,12 @@ pub trait ForwarderRaw {
         #[payment_token] token: TokenIdentifier,
         #[payment] payment: BigUint,
         endpoint_name: ManagedBuffer,
+        gas_limit: u64,
         extra_gas_for_callback: u64,
         #[var_args] args: MultiValueEncoded<ManagedBuffer>,
     ) {
         self.forward_contract_call(to, token, payment, endpoint_name, args)
+            .with_gas_limit(gas_limit)
             .with_extra_gas_for_callback(extra_gas_for_callback)
             .with_success_callback(b"success_callback")
             .with_error_callback(b"error_callback")
