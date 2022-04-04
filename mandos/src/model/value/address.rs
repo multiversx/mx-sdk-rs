@@ -5,6 +5,8 @@ use crate::{
 
 use std::{cmp::Ordering, fmt};
 
+use super::{value_from_slice, AddressValue};
+
 #[derive(Debug, Eq, Default)]
 pub struct AddressKey {
     pub value: [u8; 32],
@@ -35,18 +37,27 @@ impl fmt::Display for AddressKey {
     }
 }
 
+impl InterpretableFrom<&str> for AddressKey {
+    fn interpret_from(from: &str, context: &InterpreterContext) -> Self {
+        let bytes = interpret_string(from, context);
+        AddressKey {
+            value: value_from_slice(bytes.as_slice()),
+            original: from.to_string(),
+        }
+    }
+}
+
 impl InterpretableFrom<String> for AddressKey {
     fn interpret_from(from: String, context: &InterpreterContext) -> Self {
-        let bytes = interpret_string(from.as_str(), context);
-        let mut value = [0u8; 32];
-        if bytes.len() == 32 {
-            value.copy_from_slice(&bytes[..]);
-        } else {
-            panic!("account address is not 32 bytes in length");
-        }
+        AddressKey::interpret_from(from.as_str(), context)
+    }
+}
+
+impl InterpretableFrom<&AddressValue> for AddressKey {
+    fn interpret_from(from: &AddressValue, _context: &InterpreterContext) -> Self {
         AddressKey {
-            value,
-            original: from,
+            value: from.value.clone(),
+            original: from.original.to_string(),
         }
     }
 }
