@@ -1,15 +1,14 @@
+use crate::{
+    num_bigint::BigUint,
+    tx_mock::{BlockchainUpdate, TxCache},
+    ContractMap,
+};
 use elrond_wasm::types::heap::Address;
 use mandos::{
     interpret_trait::InterpreterContext, model::Scenario, value_interpreter::interpret_string,
 };
-use num_bigint::BigUint;
 use num_traits::Zero;
 use std::{collections::HashMap, path::PathBuf, rc::Rc};
-
-use crate::{
-    tx_mock::{BlockchainUpdate, TxCache},
-    ContractMap,
-};
 
 use super::{AccountData, BlockInfo};
 
