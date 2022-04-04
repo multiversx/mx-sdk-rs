@@ -31,7 +31,7 @@
                     "sc:vault",
                     "str:panic_on_purpose",
                     "5,000",
-                    "100,000,000"
+                    "5,000"
                 ],
                 "gasLimit": "500,000,000",
                 "gasPrice": "0"
@@ -89,6 +89,7 @@
                 "arguments": [
                     "sc:vault",
                     "str:echo_arguments",
+                    "5,000,000",
                     "5,000,000",
                     "1",
                     "2"
