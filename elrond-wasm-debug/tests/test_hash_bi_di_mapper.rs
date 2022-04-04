@@ -14,8 +14,8 @@ fn check_set_1(set: &BiDiMapper<DebugApi, u64, u32>, ids: Vec<u64>, values: Vec<
     assert_eq!(values.len(), ids.len());
     assert_eq!(set.len(), ids.len());
 
-    let actual_ids: Vec<u64> = set.get_all_ids().into_vec();
-    let actual_values: Vec<u32> = set.get_all_values().into_vec();
+    let actual_ids: Vec<u64> = set.get_all_ids().map(|res| res).collect();
+    let actual_values: Vec<u32> = set.get_all_values().map(|res| res).collect();
 
     for id in ids.clone() {
         assert_eq!(actual_ids.contains(&id), true);

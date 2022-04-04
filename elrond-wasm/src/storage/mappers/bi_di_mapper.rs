@@ -1,17 +1,17 @@
 use core::marker::PhantomData;
 
 use elrond_codec::{
-    multi_encode_iter_or_handle_err, EncodeErrorHandler, NestedDecode, NestedEncode, TopDecode,
-    TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
+    multi_encode_iter_or_handle_err, multi_types::MultiValue2, EncodeErrorHandler, NestedDecode,
+    NestedEncode, TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
 };
 
-use super::{StorageMapper, UnorderedSetMapper};
+use super::{unordered_set_mapper, StorageMapper, UnorderedSetMapper};
 use crate::{
     abi::{TypeAbi, TypeName},
     api::StorageMapperApi,
     storage::{storage_get, storage_set, StorageKey},
     storage_clear,
-    types::{ManagedAddress, ManagedType, ManagedVec, ManagedVecItem, MultiValueEncoded},
+    types::{ManagedAddress, ManagedType, MultiValueEncoded},
 };
 
 const VALUE_SUFIX: &[u8] = b"_value";
@@ -19,27 +19,15 @@ const ID_SUFIX: &[u8] = b"_id";
 const VALUE_TO_ID_SUFFIX: &[u8] = b"_value_to_id";
 const ID_TO_VALUE_SUFFIX: &[u8] = b"_id_to_value";
 
+type Keys<'a, SA, T> = unordered_set_mapper::Iter<'a, SA, T>;
+
 /// A bi-directional map, from values to ids and viceversa.
 /// The mapper is based on UnorderedSetMapper, reason why the remove is done by swap_remove
 pub struct BiDiMapper<SA, K, V>
 where
     SA: StorageMapperApi,
-    K: TopEncode
-        + TopDecode
-        + NestedEncode
-        + NestedDecode
-        + 'static
-        + Default
-        + PartialEq
-        + ManagedVecItem,
-    V: TopEncode
-        + TopDecode
-        + NestedEncode
-        + NestedDecode
-        + 'static
-        + Default
-        + PartialEq
-        + ManagedVecItem,
+    K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static + Default + PartialEq,
+    V: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static + Default + PartialEq,
 {
     _phantom_api: PhantomData<SA>,
     id_set_mapper: UnorderedSetMapper<SA, K>,
@@ -50,22 +38,8 @@ where
 impl<SA, K, V> StorageMapper<SA> for BiDiMapper<SA, K, V>
 where
     SA: StorageMapperApi,
-    K: TopEncode
-        + TopDecode
-        + NestedEncode
-        + NestedDecode
-        + 'static
-        + Default
-        + PartialEq
-        + ManagedVecItem,
-    V: TopEncode
-        + TopDecode
-        + NestedEncode
-        + NestedDecode
-        + 'static
-        + Default
-        + PartialEq
-        + ManagedVecItem,
+    K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static + Default + PartialEq,
+    V: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static + Default + PartialEq,
 {
     fn new(base_key: StorageKey<SA>) -> Self {
         let mut id_key = base_key.clone();
@@ -85,22 +59,8 @@ where
 impl<SA, K, V> BiDiMapper<SA, K, V>
 where
     SA: StorageMapperApi,
-    K: TopEncode
-        + TopDecode
-        + NestedEncode
-        + NestedDecode
-        + 'static
-        + Default
-        + PartialEq
-        + ManagedVecItem,
-    V: TopEncode
-        + TopDecode
-        + NestedEncode
-        + NestedDecode
-        + 'static
-        + Default
-        + PartialEq
-        + ManagedVecItem,
+    K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static + Default + PartialEq,
+    V: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static + Default + PartialEq,
 {
     fn get_id_key(&self, value: &V) -> StorageKey<SA> {
         let mut key = self.base_key.clone();
@@ -132,6 +92,13 @@ where
         storage_set(self.get_value_key(id).as_ref(), value);
     }
 
+    fn clear_id_by_value(&self, value: &V) {
+        storage_clear(self.get_id_key(value).as_ref());
+    }
+    fn clear_value_by_id(&self, id: &K) {
+        storage_clear(self.get_value_key(id).as_ref());
+    }
+
     pub fn insert(&mut self, id: K, value: V) -> bool {
         if self.id_set_mapper.contains(&id) || self.value_set_mapper.contains(&value) {
             return false;
@@ -147,7 +114,8 @@ where
     pub fn remove_by_id(&mut self, id: &K) -> bool {
         if self.id_set_mapper.swap_remove(id) {
             let value = self.get_value(id);
-            storage_clear(self.get_id_key(&value).as_ref());
+            self.clear_id_by_value(&value);
+            self.clear_value_by_id(id);
             storage_clear(self.get_value_key(id).as_ref());
             self.value_set_mapper.swap_remove(&value);
             return true;
@@ -157,8 +125,8 @@ where
     pub fn remove_by_value(&mut self, value: &V) -> bool {
         if self.value_set_mapper.swap_remove(value) {
             let id = self.get_id(value);
-            storage_clear(self.get_id_key(value).as_ref());
-            storage_clear(self.get_value_key(&id).as_ref());
+            self.clear_id_by_value(value);
+            self.clear_value_by_id(&id);
             self.id_set_mapper.swap_remove(&id);
             return true;
         }
@@ -183,20 +151,20 @@ where
         }
     }
 
-    pub fn get_all_values(&self) -> ManagedVec<SA, V> {
-        let mut result = ManagedVec::new();
-        for value in self.value_set_mapper.iter() {
-            result.push(value);
-        }
-        result
+    pub fn get_all_values(&self) -> unordered_set_mapper::Iter<SA, V> {
+        self.value_set_mapper.iter()
     }
 
-    pub fn get_all_ids(&self) -> ManagedVec<SA, K> {
-        let mut result = ManagedVec::new();
-        for id in self.id_set_mapper.iter() {
-            result.push(id);
-        }
-        result
+    pub fn get_all_ids(&self) -> unordered_set_mapper::Iter<SA, K> {
+        self.id_set_mapper.iter()
+    }
+
+    pub fn iter(&self) -> Iter<SA, K, V> {
+        Iter::new(self)
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.value_set_mapper.is_empty()
     }
 
     pub fn len(&self) -> usize {
@@ -204,57 +172,71 @@ where
     }
 }
 
+pub struct Iter<'a, SA, K, V>
+where
+    SA: StorageMapperApi,
+    K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static + Default + PartialEq,
+    V: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static + Default + PartialEq,
+{
+    key_iter: Keys<'a, SA, K>,
+    hash_map: &'a BiDiMapper<SA, K, V>,
+}
+
+impl<'a, SA, K, V> Iter<'a, SA, K, V>
+where
+    SA: StorageMapperApi,
+    K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static + Default + PartialEq,
+    V: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static + Default + PartialEq,
+{
+    fn new(hash_map: &'a BiDiMapper<SA, K, V>) -> Iter<'a, SA, K, V> {
+        Iter {
+            key_iter: hash_map.get_all_ids(),
+            hash_map,
+        }
+    }
+}
+
+impl<'a, SA, K, V> Iterator for Iter<'a, SA, K, V>
+where
+    SA: StorageMapperApi,
+    K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static + Default + PartialEq,
+    V: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static + Default + PartialEq,
+{
+    type Item = (K, V);
+
+    #[inline]
+    fn next(&mut self) -> Option<(K, V)> {
+        if let Some(key) = self.key_iter.next() {
+            let value = self.hash_map.get_value(&key);
+            return Some((key, value));
+        }
+        None
+    }
+}
+
 impl<SA, K, V> TopEncodeMulti for BiDiMapper<SA, K, V>
 where
     SA: StorageMapperApi,
-    K: TopEncode
-        + TopDecode
-        + NestedEncode
-        + NestedDecode
-        + 'static
-        + Default
-        + PartialEq
-        + ManagedVecItem,
-    V: TopEncode
-        + TopDecode
-        + NestedEncode
-        + NestedDecode
-        + 'static
-        + Default
-        + PartialEq
-        + ManagedVecItem,
+    K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static + Default + PartialEq,
+    V: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static + Default + PartialEq,
 {
-    type DecodeAs = MultiValueEncoded<SA, V>;
+    type DecodeAs = MultiValueEncoded<SA, MultiValue2<K, V>>;
 
     fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
     where
         O: TopEncodeMultiOutput,
         H: EncodeErrorHandler,
     {
-        let all_values = self.get_all_values();
-        multi_encode_iter_or_handle_err(all_values.into_iter(), output, h)
+        let iter = self.iter().map(MultiValue2::<K, V>::from);
+        multi_encode_iter_or_handle_err(iter, output, h)
     }
 }
 
 impl<SA, K, V> TypeAbi for BiDiMapper<SA, K, V>
 where
     SA: StorageMapperApi,
-    K: TopEncode
-        + TopDecode
-        + NestedEncode
-        + NestedDecode
-        + 'static
-        + Default
-        + PartialEq
-        + ManagedVecItem,
-    V: TopEncode
-        + TopDecode
-        + NestedEncode
-        + NestedDecode
-        + 'static
-        + Default
-        + PartialEq
-        + ManagedVecItem,
+    K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static + Default + PartialEq,
+    V: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static + Default + PartialEq,
 {
     fn type_name() -> TypeName {
         crate::abi::type_name_variadic::<ManagedAddress<SA>>()
