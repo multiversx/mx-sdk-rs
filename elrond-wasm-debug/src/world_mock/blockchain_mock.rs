@@ -113,4 +113,15 @@ impl BlockchainMock {
             .storage
             .insert(ELROND_REWARD_KEY.to_vec(), storage_v_rew.to_bytes_be());
     }
+
+    pub(crate) fn with_borrowed_rc<F, R>(&mut self, f: F) -> R
+    where
+        F: FnOnce(&mut Rc<Self>) -> R,
+    {
+        let obj = std::mem::replace(self, Self::new());
+        let mut state_rc = Rc::new(obj);
+        let result = f(&mut state_rc);
+        *self = Rc::try_unwrap(state_rc).unwrap();
+        result
+    }
 }

@@ -9,23 +9,25 @@ use elrond_wasm::{
     elrond_codec::{CodecFrom, PanicErrorHandler, TopEncodeMulti},
     types::{ContractCall, H256},
 };
-use mandos::model::ScQueryStep;
+use mandos::model::{ScQueryStep, Step};
 use std::rc::Rc;
 
 use super::check_tx_output;
 
 impl BlockchainMock {
-    pub fn mandos_sc_query(self, sc_query_step: ScQueryStep) -> BlockchainMock {
-        let state_rc = Rc::new(self);
-        execute_rc(state_rc.clone(), &sc_query_step);
-        Rc::try_unwrap(state_rc).unwrap()
+    pub fn mandos_sc_query(&mut self, sc_query_step: ScQueryStep) -> &mut Self {
+        self.with_borrowed_rc(|rc| {
+            execute_rc(rc.clone(), &sc_query_step);
+        });
+        self.mandos_trace.steps.push(Step::ScQuery(sc_query_step));
+        self
     }
 
     /// TODO: REFACTOR!
     pub fn quick_query<OriginalResult, RequestedResult>(
-        self,
+        &mut self,
         contract_call: ContractCall<DebugApi, OriginalResult>,
-    ) -> (BlockchainMock, RequestedResult)
+    ) -> RequestedResult
     where
         OriginalResult: TopEncodeMulti,
         RequestedResult: CodecFrom<OriginalResult>,
@@ -42,19 +44,15 @@ impl BlockchainMock {
             tx_hash: H256::zero(),
         };
 
-        let state_rc = Rc::new(self);
-
-        let tx_result = sc_query(tx_input, state_rc.clone());
+        let tx_result = self.with_borrowed_rc(|rc| sc_query(tx_input, rc.clone()));
         assert!(tx_result.result_status == 0, "quick query failed"); // TODO: print more
         assert!(
             tx_result.result_status != 0 || tx_result.result_calls.is_empty(),
             "Can't query a view function that performs an async call"
         );
         let mut raw_result = tx_result.result_values;
-        let result =
-            RequestedResult::multi_decode_or_handle_err(&mut raw_result, PanicErrorHandler)
-                .unwrap();
-        (Rc::try_unwrap(state_rc).unwrap(), result)
+
+        RequestedResult::multi_decode_or_handle_err(&mut raw_result, PanicErrorHandler).unwrap()
     }
 }
 
