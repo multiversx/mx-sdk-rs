@@ -253,6 +253,8 @@ pub trait ForwarderRaw {
             arg_buffer.push_arg_raw(endpoint_name);
         }
 
+        let gas_limit = (self.blockchain().get_gas_left() - extra_gas_for_callback) * 9 / 10;
+
         Self::Api::send_api_impl().create_async_call_raw(
             &ManagedAddress::from_raw_handle(
                 Self::Api::blockchain_api_impl().get_sc_address_handle(),
@@ -261,7 +263,7 @@ pub trait ForwarderRaw {
             &ManagedBuffer::new_from_bytes(ESDT_MULTI_TRANSFER_FUNC_NAME),
             b"success_callback",
             b"error_callback",
-            self.blockchain().get_gas_left(),
+            gas_limit,
             extra_gas_for_callback,
             &arg_buffer,
         );
