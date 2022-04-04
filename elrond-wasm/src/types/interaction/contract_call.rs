@@ -300,14 +300,6 @@ where
         }
     }
 
-    fn resolve_gas_limit_for_promises(&self) -> u64 {
-        if self.explicit_gas_limit == UNSPECIFIED_GAS_LIMIT {
-            SA::blockchain_api_impl().get_gas_left() * 9 / 10
-        } else {
-            self.explicit_gas_limit
-        }
-    }
-
     pub fn async_call(mut self) -> AsyncCall<SA> {
         self = self.convert_to_esdt_transfer_call();
         AsyncCall {
@@ -328,7 +320,7 @@ where
             &self.endpoint_name,
             self.success_callback,
             self.error_callback,
-            self.resolve_gas_limit_for_promises(),
+            self.explicit_gas_limit,
             self.extra_gas_for_callback,
             &self.arg_buffer,
         )
