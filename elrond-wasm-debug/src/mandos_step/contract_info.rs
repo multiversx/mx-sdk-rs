@@ -81,7 +81,7 @@ impl BlockchainMock {
             .function(function.as_str());
 
         for arg in contract_call.arg_buffer.to_raw_args_vec() {
-            let arg_str = format!("0x{}", hex::encode(arg.to_vec()));
+            let arg_str = format!("0x{}", hex::encode(&arg));
             sc_query_step = sc_query_step.argument(arg_str.as_str());
         }
 
@@ -115,7 +115,7 @@ impl BlockchainMock {
             .function(function.as_str());
 
         for arg in contract_call.arg_buffer.to_raw_args_vec() {
-            let arg_str = format!("0x{}", hex::encode(arg.to_vec()));
+            let arg_str = format!("0x{}", hex::encode(&arg));
             sc_call_step = sc_call_step.argument(arg_str.as_str());
         }
 
