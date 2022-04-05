@@ -64,7 +64,7 @@ impl BlockchainMock {
         };
 
         let tx_result =
-            self.with_borrowed_rc(|rc| sc_call_with_async_and_callback(tx_input, rc, true));
+            self.with_borrowed(|rc| sc_call_with_async_and_callback(tx_input, rc, true));
         let mut raw_result = tx_result.result_values;
 
         RequestedResult::multi_decode_or_handle_err(&mut raw_result, PanicErrorHandler).unwrap()
