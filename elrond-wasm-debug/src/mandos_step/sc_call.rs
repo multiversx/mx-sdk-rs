@@ -10,13 +10,13 @@ use super::check_tx_output;
 
 impl BlockchainMock {
     pub fn mandos_sc_call(&mut self, sc_call_step: ScCallStep) -> &mut Self {
-        self.with_borrowed(|rc| ((), execute(rc, &sc_call_step)));
+        self.with_borrowed(|state| ((), execute(state, &sc_call_step)));
         self.mandos_trace.steps.push(Step::ScCall(sc_call_step));
         self
     }
 }
 
-fn execute(state: BlockchainMock, sc_call_step: &ScCallStep) -> BlockchainMock {
+fn execute(mut state: BlockchainMock, sc_call_step: &ScCallStep) -> BlockchainMock {
     let tx = &sc_call_step.tx;
     let tx_input = TxInput {
         from: tx.from.value.into(),
@@ -33,7 +33,11 @@ fn execute(state: BlockchainMock, sc_call_step: &ScCallStep) -> BlockchainMock {
         gas_price: tx.gas_price.value,
         tx_hash: generate_tx_hash_dummy(&sc_call_step.tx_id),
     };
-    let (tx_result, state) = sc_call_with_async_and_callback(tx_input, state, true);
+
+    // nonce gets increased irrespective of whether the tx fails or not
+    state.increase_account_nonce(&tx_input.from);
+
+    let (tx_result, state) = sc_call_with_async_and_callback(tx_input, state);
     if let Some(tx_expect) = &sc_call_step.expect {
         check_tx_output(&sc_call_step.tx_id, tx_expect, &tx_result);
     }
