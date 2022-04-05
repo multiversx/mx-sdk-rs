@@ -8,7 +8,7 @@ use crate::{
 
 impl BlockchainMock {
     pub fn mandos_transfer(&mut self, transfer_step: TransferStep) -> &mut Self {
-        self.with_borrowed(|rc| ((), execute(rc, &transfer_step.tx)));
+        self.with_borrowed(|state| ((), execute(state, &transfer_step.tx)));
         self.mandos_trace.steps.push(Step::Transfer(transfer_step));
         self
     }
@@ -28,7 +28,7 @@ impl BlockchainMock {
     }
 }
 
-fn execute(state: BlockchainMock, tx_transfer: &TxTransfer) -> BlockchainMock {
+fn execute(mut state: BlockchainMock, tx_transfer: &TxTransfer) -> BlockchainMock {
     let tx_input = TxInput {
         from: tx_transfer.from.value.into(),
         to: tx_transfer.to.value.into(),
@@ -40,7 +40,11 @@ fn execute(state: BlockchainMock, tx_transfer: &TxTransfer) -> BlockchainMock {
         gas_price: tx_transfer.gas_price.value,
         tx_hash: H256::zero(),
     };
-    let (tx_result, state) = sc_call(tx_input, state, true);
+
+    // nonce gets increased irrespective of whether the tx fails or not
+    state.increase_account_nonce(&tx_input.from);
+
+    let (tx_result, state) = sc_call(tx_input, state);
     tx_result.assert_ok();
     state
 }
