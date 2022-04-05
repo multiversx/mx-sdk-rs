@@ -20,43 +20,46 @@ pub fn sc_query(tx_input: TxInput, state: BlockchainMock) -> (TxResult, Blockcha
 
 pub fn sc_call(
     tx_input: TxInput,
-    state: &mut Rc<BlockchainMock>,
+    mut state: BlockchainMock,
     increase_nonce: bool, // TODO: flag = code smell, refactor!
-) -> TxResult {
+) -> (TxResult, BlockchainMock) {
     if increase_nonce {
         // nonce gets increased irrespective of whether the tx fails or not
         state.increase_account_nonce(&tx_input.from);
     }
     state.subtract_tx_gas(&tx_input.from, tx_input.gas_limit, tx_input.gas_price);
 
-    let tx_cache = TxCache::new(state.clone());
+    let state_rc = Rc::new(state);
+    let tx_cache = TxCache::new(state_rc.clone());
     let (tx_result, blockchain_updates) = execute_builtin_function_or_default(tx_input, tx_cache);
 
+    let mut state = Rc::try_unwrap(state_rc).unwrap();
     if tx_result.result_status == 0 {
-        blockchain_updates.apply(Rc::get_mut(state).unwrap());
+        blockchain_updates.apply(&mut state);
     }
 
-    tx_result
+    (tx_result, state)
 }
 
 pub fn execute_async_call_and_callback(
     async_data: AsyncCallTxData,
-    state: &mut Rc<BlockchainMock>,
-) -> (TxResult, TxResult) {
+    state: BlockchainMock,
+) -> (TxResult, TxResult, BlockchainMock) {
     if state.accounts.contains_key(&async_data.to) {
         let async_input = async_call_tx_input(&async_data);
 
-        let async_result = sc_call_with_async_and_callback(async_input, state, false);
+        let (async_result, state) = sc_call_with_async_and_callback(async_input, state, false);
 
         let callback_input = async_callback_tx_input(&async_data, &async_result);
-        let callback_result = sc_call(callback_input, state, false);
+        let (callback_result, state) = sc_call(callback_input, state, false);
         assert!(
             callback_result.result_calls.async_call.is_none(),
             "successive asyncs currently not supported"
         );
-        (async_result, callback_result)
+        (async_result, callback_result, state)
     } else {
-        let tx_cache = TxCache::new(state.clone());
+        let state_rc = Rc::new(state);
+        let tx_cache = TxCache::new(state_rc.clone());
         tx_cache.subtract_egld_balance(&async_data.from, &async_data.call_value);
         tx_cache.insert_account(AccountData {
             address: async_data.to.clone(),
@@ -68,29 +71,33 @@ pub fn execute_async_call_and_callback(
             contract_path: None,
             contract_owner: None,
         });
-        state.commit_tx_cache(tx_cache);
+        let blockchain_updates = tx_cache.into_blockchain_updates();
+        let mut state = Rc::try_unwrap(state_rc).unwrap();
+        state.commit_updates(blockchain_updates);
 
-        (TxResult::empty(), TxResult::empty())
+        (TxResult::empty(), TxResult::empty(), state)
     }
 }
 
 // TODO: refactor
 pub fn sc_call_with_async_and_callback(
     tx_input: TxInput,
-    state: &mut Rc<BlockchainMock>,
+    state: BlockchainMock,
     increase_nonce: bool,
-) -> TxResult {
-    let mut tx_result = sc_call(tx_input, state, increase_nonce);
+) -> (TxResult, BlockchainMock) {
+    let (mut tx_result, state) = sc_call(tx_input, state, increase_nonce);
     let result_calls = std::mem::replace(&mut tx_result.result_calls, TxResultCalls::empty());
     if tx_result.result_status == 0 {
         if let Some(async_data) = result_calls.async_call {
-            let (async_result, callback_result) =
+            let (async_result, callback_result, state) =
                 execute_async_call_and_callback(async_data, state);
 
             tx_result = merge_results(tx_result, async_result);
             tx_result = merge_results(tx_result, callback_result);
+
+            return (tx_result, state);
         }
     }
 
-    tx_result
+    (tx_result, state)
 }

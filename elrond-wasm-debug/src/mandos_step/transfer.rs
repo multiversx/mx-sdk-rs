@@ -1,5 +1,3 @@
-use std::rc::Rc;
-
 use elrond_wasm::types::heap::H256;
 use mandos::model::{Step, TransferStep, TxTransfer, ValidatorRewardStep};
 
@@ -10,9 +8,7 @@ use crate::{
 
 impl BlockchainMock {
     pub fn mandos_transfer(&mut self, transfer_step: TransferStep) -> &mut Self {
-        self.with_borrowed_rc(|rc| {
-            execute_rc(rc, &transfer_step.tx);
-        });
+        self.with_borrowed(|rc| ((), execute(rc, &transfer_step.tx)));
         self.mandos_trace.steps.push(Step::Transfer(transfer_step));
         self
     }
@@ -32,7 +28,7 @@ impl BlockchainMock {
     }
 }
 
-pub fn execute_rc(state: &mut Rc<BlockchainMock>, tx_transfer: &TxTransfer) {
+fn execute(state: BlockchainMock, tx_transfer: &TxTransfer) -> BlockchainMock {
     let tx_input = TxInput {
         from: tx_transfer.from.value.into(),
         to: tx_transfer.to.value.into(),
@@ -44,5 +40,7 @@ pub fn execute_rc(state: &mut Rc<BlockchainMock>, tx_transfer: &TxTransfer) {
         gas_price: tx_transfer.gas_price.value,
         tx_hash: H256::zero(),
     };
-    sc_call(tx_input, state, true).assert_ok();
+    let (tx_result, state) = sc_call(tx_input, state, true);
+    tx_result.assert_ok();
+    state
 }
