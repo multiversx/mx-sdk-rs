@@ -90,10 +90,12 @@ pub trait ForwarderRaw {
         #[payment_token] token: TokenIdentifier,
         #[payment] payment: BigUint,
         endpoint_name: ManagedBuffer,
+        gas_limit: u64,
         extra_gas_for_callback: u64,
         #[var_args] args: MultiValueEncoded<ManagedBuffer>,
     ) {
         self.forward_contract_call(to, token, payment, endpoint_name, args)
+            .with_gas_limit(gas_limit)
             .with_extra_gas_for_callback(extra_gas_for_callback)
             .with_success_callback(b"success_callback")
             .with_error_callback(b"error_callback")
@@ -251,6 +253,8 @@ pub trait ForwarderRaw {
             arg_buffer.push_arg_raw(endpoint_name);
         }
 
+        let gas_limit = (self.blockchain().get_gas_left() - extra_gas_for_callback) * 9 / 10;
+
         Self::Api::send_api_impl().create_async_call_raw(
             &ManagedAddress::from_raw_handle(
                 Self::Api::blockchain_api_impl().get_sc_address_handle(),
@@ -259,7 +263,7 @@ pub trait ForwarderRaw {
             &ManagedBuffer::new_from_bytes(ESDT_MULTI_TRANSFER_FUNC_NAME),
             b"success_callback",
             b"error_callback",
-            0u64,
+            gas_limit,
             extra_gas_for_callback,
             &arg_buffer,
         );
