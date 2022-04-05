@@ -4,16 +4,18 @@ use crate::{
     tx_mock::{generate_tx_hash_dummy, TxInput},
     world_mock::BlockchainMock,
 };
-use mandos::model::ScQueryStep;
+use mandos::model::{ScQueryStep, Step};
 use std::rc::Rc;
 
 use super::check_tx_output;
 
 impl BlockchainMock {
-    pub fn mandos_sc_query(self, sc_query_step: ScQueryStep) -> BlockchainMock {
-        let state_rc = Rc::new(self);
-        execute_rc(state_rc.clone(), &sc_query_step);
-        Rc::try_unwrap(state_rc).unwrap()
+    pub fn mandos_sc_query(&mut self, sc_query_step: ScQueryStep) -> &mut Self {
+        self.with_borrowed_rc(|rc| {
+            execute_rc(rc.clone(), &sc_query_step);
+        });
+        self.mandos_trace.steps.push(Step::ScQuery(sc_query_step));
+        self
     }
 }
 
@@ -37,7 +39,7 @@ fn execute_rc(state: Rc<BlockchainMock>, sc_query_step: &ScQueryStep) {
 
     let tx_result = sc_query(tx_input, state);
     assert!(
-        tx_result.result_status != 0 || tx_result.result_calls.is_empty(),
+        tx_result.result_calls.is_empty(),
         "Can't query a view function that performs an async call"
     );
     if let Some(tx_expect) = &sc_query_step.expect {

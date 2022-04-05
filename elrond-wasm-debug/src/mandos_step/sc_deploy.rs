@@ -1,7 +1,7 @@
 use std::rc::Rc;
 
 use elrond_wasm::types::heap::Address;
-use mandos::model::ScDeployStep;
+use mandos::model::{ScDeployStep, Step};
 
 use crate::{
     tx_execution::sc_create,
@@ -12,10 +12,12 @@ use crate::{
 use super::check_tx_output;
 
 impl BlockchainMock {
-    pub fn mandos_sc_deploy(self, sc_deploy_step: ScDeployStep) -> BlockchainMock {
-        let mut state_rc = Rc::new(self);
-        execute_rc(&mut state_rc, &sc_deploy_step);
-        Rc::try_unwrap(state_rc).unwrap()
+    pub fn mandos_sc_deploy(&mut self, sc_deploy_step: ScDeployStep) -> &mut Self {
+        self.with_borrowed_rc(|rc| {
+            execute_rc(rc, &sc_deploy_step);
+        });
+        self.mandos_trace.steps.push(Step::ScDeploy(sc_deploy_step));
+        self
     }
 }
 

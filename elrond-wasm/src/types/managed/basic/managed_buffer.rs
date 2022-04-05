@@ -183,6 +183,7 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
     /// Alternate implementation that uses copies and appends to achieve the slice replacement.
     /// Should be used until EI version 1.1 is shipped to mainnet.
     #[cfg(not(feature = "ei-1-1"))]
+    #[allow(clippy::collapsible_if)]
     pub fn set_slice(
         &mut self,
         starting_position: usize,

@@ -31,12 +31,12 @@ where
     SA: CallTypeApi + 'static,
 {
     _phantom: PhantomData<SA>,
-    to: ManagedAddress<SA>,
-    egld_payment: BigUint<SA>,
-    payments: ManagedVec<SA, EsdtTokenPayment<SA>>,
-    endpoint_name: ManagedBuffer<SA>,
-    explicit_gas_limit: u64,
-    arg_buffer: ManagedArgBuffer<SA>,
+    pub to: ManagedAddress<SA>,
+    pub egld_payment: BigUint<SA>,
+    pub payments: ManagedVec<SA, EsdtTokenPayment<SA>>,
+    pub endpoint_name: ManagedBuffer<SA>,
+    pub explicit_gas_limit: u64,
+    pub arg_buffer: ManagedArgBuffer<SA>,
     _return_type: PhantomData<OriginalResult>,
 }
 
@@ -257,7 +257,7 @@ where
         }
     }
 
-    fn resolve_gas_limit(&self) -> u64 {
+    pub fn resolve_gas_limit(&self) -> u64 {
         if self.explicit_gas_limit == UNSPECIFIED_GAS_LIMIT {
             SA::blockchain_api_impl().get_gas_left()
         } else {
