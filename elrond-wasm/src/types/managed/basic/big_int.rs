@@ -78,6 +78,11 @@ big_int_conv_num! {isize}
 big_int_conv_num! {i16}
 big_int_conv_num! {i8}
 
+#[cfg(feature = "num-bigint")]
+impl<M: ManagedTypeApi> CodecFrom<elrond_codec::num_bigint::BigInt> for BigInt<M> {}
+#[cfg(feature = "num-bigint")]
+impl<M: ManagedTypeApi> CodecFrom<BigInt<M>> for elrond_codec::num_bigint::BigInt {}
+
 impl<M: ManagedTypeApi> BigInt<M> {
     #[inline]
     pub fn zero() -> Self {
