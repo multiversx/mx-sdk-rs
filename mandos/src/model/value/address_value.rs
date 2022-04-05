@@ -53,7 +53,7 @@ impl InterpretableFrom<&str> for AddressValue {
 impl InterpretableFrom<&AddressKey> for AddressValue {
     fn interpret_from(from: &AddressKey, _context: &InterpreterContext) -> Self {
         AddressValue {
-            value: from.value.clone(),
+            value: from.value,
             original: ValueSubTree::Str(from.original.clone()),
         }
     }
