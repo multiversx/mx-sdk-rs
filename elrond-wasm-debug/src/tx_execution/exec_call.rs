@@ -10,7 +10,7 @@ use crate::{
 
 use super::{execute_builtin_function_or_default, execute_tx_context};
 
-pub fn sc_query(tx_input: TxInput, state: BlockchainMock) -> (TxResult, BlockchainMock) {
+pub fn execute_sc_query(tx_input: TxInput, state: BlockchainMock) -> (TxResult, BlockchainMock) {
     let state_rc = Rc::new(state);
     let tx_cache = TxCache::new(state_rc.clone());
     let tx_context = TxContext::new(tx_input, tx_cache);
@@ -18,7 +18,7 @@ pub fn sc_query(tx_input: TxInput, state: BlockchainMock) -> (TxResult, Blockcha
     (tx_result, Rc::try_unwrap(state_rc).unwrap())
 }
 
-pub fn sc_call(tx_input: TxInput, mut state: BlockchainMock) -> (TxResult, BlockchainMock) {
+pub fn execute_sc_call(tx_input: TxInput, mut state: BlockchainMock) -> (TxResult, BlockchainMock) {
     state.subtract_tx_gas(&tx_input.from, tx_input.gas_limit, tx_input.gas_price);
 
     let state_rc = Rc::new(state);
@@ -43,7 +43,7 @@ pub fn execute_async_call_and_callback(
         let (async_result, state) = sc_call_with_async_and_callback(async_input, state);
 
         let callback_input = async_callback_tx_input(&async_data, &async_result);
-        let (callback_result, state) = sc_call(callback_input, state);
+        let (callback_result, state) = execute_sc_call(callback_input, state);
         assert!(
             callback_result.result_calls.async_call.is_none(),
             "successive asyncs currently not supported"
@@ -76,7 +76,7 @@ pub fn sc_call_with_async_and_callback(
     tx_input: TxInput,
     state: BlockchainMock,
 ) -> (TxResult, BlockchainMock) {
-    let (mut tx_result, state) = sc_call(tx_input, state);
+    let (mut tx_result, state) = execute_sc_call(tx_input, state);
     let result_calls = std::mem::replace(&mut tx_result.result_calls, TxResultCalls::empty());
     if tx_result.result_status == 0 {
         if let Some(async_data) = result_calls.async_call {

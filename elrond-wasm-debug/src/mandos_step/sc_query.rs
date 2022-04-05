@@ -1,6 +1,6 @@
 use crate::{
     num_bigint::BigUint,
-    tx_execution::sc_query,
+    tx_execution::execute_sc_query,
     tx_mock::{generate_tx_hash_dummy, TxInput},
     world_mock::BlockchainMock,
 };
@@ -34,7 +34,7 @@ fn execute(state: BlockchainMock, sc_query_step: &ScQueryStep) -> BlockchainMock
         tx_hash: generate_tx_hash_dummy(&sc_query_step.tx_id),
     };
 
-    let (tx_result, state) = sc_query(tx_input, state);
+    let (tx_result, state) = execute_sc_query(tx_input, state);
     assert!(
         tx_result.result_calls.is_empty(),
         "Can't query a view function that performs an async call"

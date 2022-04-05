@@ -1,6 +1,6 @@
 use crate::{
     num_bigint::BigUint,
-    tx_execution::{sc_call_with_async_and_callback, sc_query},
+    tx_execution::{execute_sc_query, sc_call_with_async_and_callback},
     tx_mock::TxInput,
     world_mock::BlockchainMock,
     DebugApi,
@@ -11,7 +11,10 @@ use elrond_wasm::{
 };
 
 impl BlockchainMock {
-    pub fn quick_query<OriginalResult, RequestedResult>(
+    /// Performs a SC query to a contract, leaves a mandos trace behind.
+    ///
+    /// TODO: de-duplicate code.
+    pub fn sc_query<OriginalResult, RequestedResult>(
         &mut self,
         contract_call: ContractCall<DebugApi, OriginalResult>,
     ) -> RequestedResult
@@ -31,7 +34,7 @@ impl BlockchainMock {
             tx_hash: H256::zero(),
         };
 
-        let tx_result = self.with_borrowed(|state| sc_query(tx_input, state));
+        let tx_result = self.with_borrowed(|state| execute_sc_query(tx_input, state));
         assert!(tx_result.result_status == 0, "quick query failed"); // TODO: print more
         assert!(
             tx_result.result_calls.is_empty(),
@@ -42,7 +45,10 @@ impl BlockchainMock {
         RequestedResult::multi_decode_or_handle_err(&mut raw_result, PanicErrorHandler).unwrap()
     }
 
-    pub fn quick_call<OriginalResult, RequestedResult>(
+    /// Performs a SC query to a contract, leaves a mandos trace behind.
+    ///
+    /// TODO: de-duplicate code.
+    pub fn sc_call<OriginalResult, RequestedResult>(
         &mut self,
         from: Address,
         contract_call: ContractCall<DebugApi, OriginalResult>,
