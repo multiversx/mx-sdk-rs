@@ -7,7 +7,7 @@ use std::{cmp::Ordering, fmt};
 
 use super::{value_from_slice, AddressValue};
 
-#[derive(Debug, Eq, Default)]
+#[derive(Debug, Clone, Eq, Default)]
 pub struct AddressKey {
     pub value: [u8; 32],
     pub original: String,

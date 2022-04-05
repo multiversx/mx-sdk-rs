@@ -6,6 +6,8 @@ use crate::{
     value_interpreter::{interpret_string, interpret_subtree},
 };
 
+use super::AddressKey;
+
 #[derive(PartialEq, Clone, Debug, Default)]
 pub struct AddressValue {
     pub value: [u8; 32],
@@ -44,6 +46,15 @@ impl InterpretableFrom<&str> for AddressValue {
         AddressValue {
             value: value_from_slice(bytes.as_slice()),
             original: ValueSubTree::Str(from.to_string()),
+        }
+    }
+}
+
+impl InterpretableFrom<&AddressKey> for AddressValue {
+    fn interpret_from(from: &AddressKey, _context: &InterpreterContext) -> Self {
+        AddressValue {
+            value: from.value.clone(),
+            original: ValueSubTree::Str(from.original.clone()),
         }
     }
 }

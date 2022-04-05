@@ -1,10 +1,11 @@
 mod check_state;
+pub mod contract_info;
 pub mod sc_call;
 mod sc_deploy;
-mod sc_query;
+pub mod sc_query;
 mod set_state;
 mod transfer;
 mod tx_output_check;
-mod via_contract_call;
 
+pub use contract_info::*;
 use tx_output_check::*;
