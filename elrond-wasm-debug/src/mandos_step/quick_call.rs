@@ -31,7 +31,7 @@ impl BlockchainMock {
             tx_hash: H256::zero(),
         };
 
-        let tx_result = self.with_borrowed_rc(|rc| sc_query(tx_input, rc.clone()));
+        let tx_result = self.with_borrowed(|state| sc_query(tx_input, state));
         assert!(tx_result.result_status == 0, "quick query failed"); // TODO: print more
         assert!(
             tx_result.result_status != 0 || tx_result.result_calls.is_empty(),
