@@ -34,7 +34,7 @@ impl BlockchainMock {
         let tx_result = self.with_borrowed_rc(|rc| sc_query(tx_input, rc.clone()));
         assert!(tx_result.result_status == 0, "quick query failed"); // TODO: print more
         assert!(
-            tx_result.result_status != 0 || tx_result.result_calls.is_empty(),
+            tx_result.result_calls.is_empty(),
             "Can't query a view function that performs an async call"
         );
         let mut raw_result = tx_result.result_values;
