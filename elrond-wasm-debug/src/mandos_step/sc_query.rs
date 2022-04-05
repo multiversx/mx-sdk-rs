@@ -1,7 +1,7 @@
 use crate::{
     num_bigint::BigUint,
     tx_execution::execute_sc_query,
-    tx_mock::{generate_tx_hash_dummy, TxInput},
+    tx_mock::{generate_tx_hash_dummy, TxInput, TxResult},
     world_mock::BlockchainMock,
 };
 use mandos::model::{ScQueryStep, Step};
@@ -10,13 +10,16 @@ use super::check_tx_output;
 
 impl BlockchainMock {
     pub fn mandos_sc_query(&mut self, sc_query_step: ScQueryStep) -> &mut Self {
-        self.with_borrowed(|state| ((), execute(state, &sc_query_step)));
+        self.with_borrowed(|state| ((), execute_and_check(state, &sc_query_step)));
         self.mandos_trace.steps.push(Step::ScQuery(sc_query_step));
         self
     }
 }
 
-fn execute(state: BlockchainMock, sc_query_step: &ScQueryStep) -> BlockchainMock {
+pub(crate) fn execute(
+    state: BlockchainMock,
+    sc_query_step: &ScQueryStep,
+) -> (TxResult, BlockchainMock) {
     let tx_input = TxInput {
         from: sc_query_step.tx.to.value.into(),
         to: sc_query_step.tx.to.value.into(),
@@ -39,6 +42,11 @@ fn execute(state: BlockchainMock, sc_query_step: &ScQueryStep) -> BlockchainMock
         tx_result.result_calls.is_empty(),
         "Can't query a view function that performs an async call"
     );
+    (tx_result, state)
+}
+
+fn execute_and_check(state: BlockchainMock, sc_query_step: &ScQueryStep) -> BlockchainMock {
+    let (tx_result, state) = execute(state, sc_query_step);
     if let Some(tx_expect) = &sc_query_step.expect {
         check_tx_output(&sc_query_step.tx_id, tx_expect, &tx_result);
     }

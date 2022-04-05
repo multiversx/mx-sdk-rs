@@ -129,13 +129,16 @@ impl ScCallStep {
         Self::default()
     }
 
-    pub fn from(mut self, expr: &str) -> Self {
-        self.tx.from = AddressValue::interpret_from(expr, &InterpreterContext::default());
+    pub fn from<A>(mut self, address: A) -> Self
+    where
+        AddressValue: InterpretableFrom<A>,
+    {
+        self.tx.from = AddressValue::interpret_from(address, &InterpreterContext::default());
         self
     }
 
-    pub fn to(mut self, expr: &str) -> Self {
-        self.tx.to = AddressValue::interpret_from(expr, &InterpreterContext::default());
+    pub fn to(mut self, address: &str) -> Self {
+        self.tx.to = AddressValue::interpret_from(address, &InterpreterContext::default());
         self
     }
 
