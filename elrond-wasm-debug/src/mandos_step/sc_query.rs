@@ -39,7 +39,7 @@ fn execute_rc(state: Rc<BlockchainMock>, sc_query_step: &ScQueryStep) {
 
     let tx_result = sc_query(tx_input, state);
     assert!(
-        tx_result.result_status != 0 || tx_result.result_calls.is_empty(),
+        tx_result.result_calls.is_empty(),
         "Can't query a view function that performs an async call"
     );
     if let Some(tx_expect) = &sc_query_step.expect {
