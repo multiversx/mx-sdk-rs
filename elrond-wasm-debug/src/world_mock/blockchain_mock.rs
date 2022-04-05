@@ -124,4 +124,14 @@ impl BlockchainMock {
         *self = Rc::try_unwrap(state_rc).unwrap();
         result
     }
+
+    pub(crate) fn with_borrowed<F, R>(&mut self, f: F) -> R
+    where
+        F: FnOnce(Self) -> (R, Self),
+    {
+        let obj = std::mem::replace(self, Self::new());
+        let (result, obj) = f(obj);
+        *self = obj;
+        result
+    }
 }

@@ -10,11 +10,12 @@ use crate::{
 
 use super::{execute_builtin_function_or_default, execute_tx_context};
 
-pub fn sc_query(tx_input: TxInput, state: Rc<BlockchainMock>) -> TxResult {
-    let tx_cache = TxCache::new(state);
+pub fn sc_query(tx_input: TxInput, state: BlockchainMock) -> (TxResult, BlockchainMock) {
+    let state_rc = Rc::new(state);
+    let tx_cache = TxCache::new(state_rc.clone());
     let tx_context = TxContext::new(tx_input, tx_cache);
     let (_, tx_result) = execute_tx_context(tx_context);
-    tx_result
+    (tx_result, Rc::try_unwrap(state_rc).unwrap())
 }
 
 pub fn sc_call(
