@@ -2,7 +2,7 @@ use elrond_wasm::types::heap::H256;
 use mandos::model::{Step, TransferStep, TxTransfer, ValidatorRewardStep};
 
 use crate::{
-    sc_call::tx_esdt_transfers_from_mandos, tx_execution::sc_call, tx_mock::TxInput,
+    sc_call::tx_esdt_transfers_from_mandos, tx_execution::execute_sc_call, tx_mock::TxInput,
     world_mock::BlockchainMock,
 };
 
@@ -44,7 +44,7 @@ fn execute(mut state: BlockchainMock, tx_transfer: &TxTransfer) -> BlockchainMoc
     // nonce gets increased irrespective of whether the tx fails or not
     state.increase_account_nonce(&tx_input.from);
 
-    let (tx_result, state) = sc_call(tx_input, state);
+    let (tx_result, state) = execute_sc_call(tx_input, state);
     tx_result.assert_ok();
     state
 }

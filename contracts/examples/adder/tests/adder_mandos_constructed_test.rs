@@ -38,14 +38,14 @@ fn adder_mandos_constructed() {
                 .expect(TxExpect::ok().no_result()),
         );
 
-    let result: SingleValue<BigUint> = world.quick_query(
+    let result: SingleValue<BigUint> = world.sc_query(
         adder::Proxy::new_proxy_obj()
             .contract(adder_address.value.into())
             .sum(),
     );
     assert_eq!(result.into(), BigUint::from(5u32));
 
-    let () = world.quick_call(
+    let () = world.sc_call(
         owner_address.value.into(),
         adder::Proxy::new_proxy_obj()
             .contract(adder_address.value.into())
