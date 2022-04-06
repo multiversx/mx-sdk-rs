@@ -1,20 +1,20 @@
 use std::ops::{Deref, DerefMut};
 
-use crate::{sc_call, sc_query, world_mock::BlockchainMock, DebugApi};
+use crate::{sc_call, sc_deploy, sc_query, world_mock::BlockchainMock, DebugApi};
 use elrond_wasm::{
     contract_base::ProxyObjBase,
     elrond_codec::{CodecFrom, PanicErrorHandler, TopEncodeMulti},
-    types::ContractCall,
+    types::{Address, ContractCall, ContractDeploy},
 };
 use mandos::{
     interpret_trait::{InterpretableFrom, InterpreterContext},
-    model::{AddressKey, AddressValue, ScCallStep, ScQueryStep, Step},
+    model::{AddressKey, AddressValue, BytesValue, ScCallStep, ScDeployStep, ScQueryStep, Step},
 };
 
 /// Bundles a mandos representation of a contract with the contract proxy,
 /// so that it can be easily called in the context of a blockchain mock.
 pub struct ContractInfo<P: ProxyObjBase> {
-    mandos_address_expr: AddressKey,
+    pub mandos_address_expr: AddressKey,
     proxy_inst: P,
 }
 
@@ -124,5 +124,33 @@ impl BlockchainMock {
 
         let mut raw_result = tx_result.result_values;
         RequestedResult::multi_decode_or_handle_err(&mut raw_result, PanicErrorHandler).unwrap()
+    }
+
+    /// Deploys a contract, leaves a mandos trace behind.
+    pub fn sc_deploy<AE>(
+        &mut self,
+        from: AE,
+        contract_code: BytesValue,
+        contract_deploy: ContractDeploy<DebugApi>,
+    ) -> (Address, Vec<Vec<u8>>)
+    where
+        AddressValue: InterpretableFrom<AE>,
+    {
+        let mut sc_deploy_step = ScDeployStep::new().from(from);
+        sc_deploy_step.tx.contract_code = contract_code;
+
+        for arg in contract_deploy.arg_buffer.to_raw_args_vec() {
+            let arg_str = format!("0x{}", hex::encode(&arg));
+            sc_deploy_step = sc_deploy_step.argument(arg_str.as_str());
+        }
+
+        let (tx_result, new_address) = self.with_borrowed(|state| {
+            let (tx_result, new_address, state) = sc_deploy::execute(state, &sc_deploy_step);
+            ((tx_result, new_address), state)
+        });
+        self.mandos_trace.steps.push(Step::ScDeploy(sc_deploy_step));
+
+        // TODO: deserialize results
+        (new_address, tx_result.result_values)
     }
 }

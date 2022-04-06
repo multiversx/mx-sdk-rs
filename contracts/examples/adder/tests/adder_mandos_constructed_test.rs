@@ -23,24 +23,29 @@ fn adder_mandos_constructed() {
     let owner_address = AddressValue::interpret_from("address:owner", &ic);
     let mut adder_contract = ContractInfo::<adder::Proxy<DebugApi>>::new("sc:adder", &ic);
 
-    world
-        .mandos_set_state(
-            SetStateStep::new()
-                .put_account(&owner_address, Account::new().nonce(1))
-                .new_address(&owner_address, 1, &adder_contract),
-        )
-        .mandos_sc_deploy(
-            ScDeployStep::new()
-                .from(&owner_address)
-                .contract_code("file:output/adder.wasm", &ic)
-                .argument("5")
-                .gas_limit("5,000,000")
-                .expect(TxExpect::ok().no_result()),
-        );
+    world.mandos_set_state(
+        SetStateStep::new()
+            .put_account(&owner_address, Account::new().nonce(1))
+            .new_address(&owner_address, 1, &adder_contract),
+    );
 
+    // deploy
+    let (new_address, result) = world.sc_deploy(
+        &owner_address,
+        BytesValue::interpret_from("file:output/adder.wasm", &ic),
+        adder_contract.init(5u32),
+    );
+    assert_eq!(
+        new_address.as_bytes(),
+        adder_contract.mandos_address_expr.value
+    );
+    assert!(result.is_empty());
+
+    // query
     let result: SingleValue<BigUint> = world.sc_query(adder_contract.sum());
     assert_eq!(result.into(), BigUint::from(5u32));
 
+    // call
     let () = world.sc_call(&owner_address, adder_contract.add(3u32));
 
     world.mandos_check_state(
