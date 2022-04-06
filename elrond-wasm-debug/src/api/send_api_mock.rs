@@ -137,7 +137,7 @@ impl DebugApi {
 
         let tx_cache = TxCache::new(self.blockchain_cache_rc());
         tx_cache.increase_acount_nonce(contract_address);
-        let (tx_result, blockchain_updates, new_address) =
+        let (tx_result, new_address, blockchain_updates) =
             deploy_contract(tx_input, contract_code, tx_cache);
 
         if tx_result.result_status == 0 {

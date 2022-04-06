@@ -22,10 +22,10 @@ where
     SA: SendApi + 'static,
 {
     _phantom: PhantomData<SA>,
-    to: Option<ManagedAddress<SA>>, // only used for Upgrade, ignored for Deploy
-    egld_payment: BigUint<SA>,
-    explicit_gas_limit: u64,
-    arg_buffer: ManagedArgBuffer<SA>,
+    pub to: Option<ManagedAddress<SA>>, // only used for Upgrade, ignored for Deploy
+    pub egld_payment: BigUint<SA>,
+    pub explicit_gas_limit: u64,
+    pub arg_buffer: ManagedArgBuffer<SA>,
 }
 
 /// Syntactical sugar to help macros to generate code easier.

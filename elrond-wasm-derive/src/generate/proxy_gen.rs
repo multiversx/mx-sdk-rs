@@ -1,6 +1,6 @@
 use quote::ToTokens;
 
-use super::{method_gen::*, util::*};
+use super::util::*;
 use crate::{
     generate::{arg_regular::convert_to_owned_type, snippets, supertrait_gen},
     model::{ArgPaymentMetadata, ContractTrait, Method, MethodArgument, PublicRole},
@@ -65,9 +65,9 @@ pub fn generate_proxy_endpoint_sig(method: &Method) -> proc_macro2::TokenStream 
 
 pub fn generate_proxy_deploy_sig(method: &Method) -> proc_macro2::TokenStream {
     let method_name = &method.name;
-    let generics = &method.generics;
+    let mut generics = method.generics.clone();
     let generics_where = &method.generics.where_clause;
-    let arg_decl = arg_declarations(&method.method_args);
+    let arg_decl = proxy_arg_gen(&method.method_args, &mut generics);
     let result = quote! {
         fn #method_name #generics (
             &mut self,

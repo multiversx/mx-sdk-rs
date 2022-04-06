@@ -1,7 +1,7 @@
 mod check_state;
 pub mod contract_info;
 pub mod sc_call;
-mod sc_deploy;
+pub mod sc_deploy;
 pub mod sc_query;
 mod set_state;
 mod transfer;
