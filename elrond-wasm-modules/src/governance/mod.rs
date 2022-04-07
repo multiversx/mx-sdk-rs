@@ -31,8 +31,8 @@ pub trait GovernanceModule:
 
     // Used to withdraw the tokens after the action was executed or cancelled
     #[endpoint(withdrawGovernanceTokens)]
-    fn withdraw_governance_tokens(&self, proposal_id: usize) -> SCResult<()> {
-        self.require_valid_proposal_id(proposal_id)?;
+    fn withdraw_governance_tokens(&self, proposal_id: usize) {
+        self.require_valid_proposal_id(proposal_id);
         require!(
             self.get_proposal_status(proposal_id) == GovernanceProposalStatus::None,
             "Proposal has to be executed or canceled first"
@@ -51,8 +51,6 @@ pub trait GovernanceModule:
             self.send()
                 .direct(&caller, &governance_token_id, 0, &total_tokens, &[]);
         }
-
-        Ok(())
     }
 
     #[payable("*")]
@@ -62,8 +60,8 @@ pub trait GovernanceModule:
         #[payment_amount] payment_amount: BigUint,
         description: BoxedBytes,
         #[var_args] actions: MultiValueVec<GovernanceActionAsMultiArg<Self::Api>>,
-    ) -> SCResult<usize> {
-        self.require_payment_token_governance_token()?;
+    ) -> usize {
+        self.require_payment_token_governance_token();
         require!(
             payment_amount >= self.min_token_balance_for_proposing().get(),
             "Not enough tokens for proposing action"
@@ -125,14 +123,14 @@ pub trait GovernanceModule:
         self.total_votes(proposal_id).set(&payment_amount);
         self.votes(proposal_id).insert(proposer, payment_amount);
 
-        Ok(proposal_id)
+        proposal_id
     }
 
     #[payable("*")]
     #[endpoint]
-    fn vote(&self, #[payment_amount] payment_amount: BigUint, proposal_id: usize) -> SCResult<()> {
-        self.require_payment_token_governance_token()?;
-        self.require_valid_proposal_id(proposal_id)?;
+    fn vote(&self, #[payment_amount] payment_amount: BigUint, proposal_id: usize) {
+        self.require_payment_token_governance_token();
+        self.require_valid_proposal_id(proposal_id);
         require!(
             self.get_proposal_status(proposal_id) == GovernanceProposalStatus::Active,
             "Proposal is not active"
@@ -148,19 +146,13 @@ pub trait GovernanceModule:
             .entry(voter)
             .and_modify(|nr_votes| *nr_votes += &payment_amount)
             .or_insert(payment_amount);
-
-        Ok(())
     }
 
     #[payable("*")]
     #[endpoint]
-    fn downvote(
-        &self,
-        #[payment_amount] payment_amount: BigUint,
-        proposal_id: usize,
-    ) -> SCResult<()> {
-        self.require_payment_token_governance_token()?;
-        self.require_valid_proposal_id(proposal_id)?;
+    fn downvote(&self, #[payment_amount] payment_amount: BigUint, proposal_id: usize) {
+        self.require_payment_token_governance_token();
+        self.require_valid_proposal_id(proposal_id);
         require!(
             self.get_proposal_status(proposal_id) == GovernanceProposalStatus::Active,
             "Proposal is not active"
@@ -176,12 +168,10 @@ pub trait GovernanceModule:
             .entry(downvoter)
             .and_modify(|nr_downvotes| *nr_downvotes += &payment_amount)
             .or_insert(payment_amount);
-
-        Ok(())
     }
 
     #[endpoint]
-    fn queue(&self, proposal_id: usize) -> SCResult<()> {
+    fn queue(&self, proposal_id: usize) {
         require!(
             self.get_proposal_status(proposal_id) == GovernanceProposalStatus::Succeeded,
             "Can only queue succeeded proposals"
@@ -191,12 +181,10 @@ pub trait GovernanceModule:
         self.proposal_queue_block(proposal_id).set(&current_block);
 
         self.proposal_queued_event(proposal_id, current_block);
-
-        Ok(())
     }
 
     #[endpoint]
-    fn execute(&self, proposal_id: usize) -> SCResult<()> {
+    fn execute(&self, proposal_id: usize) {
         require!(
             self.get_proposal_status(proposal_id) == GovernanceProposalStatus::Queued,
             "Can only execute queued proposals"
@@ -246,15 +234,13 @@ pub trait GovernanceModule:
         self.clear_proposal(proposal_id);
 
         self.proposal_executed_event(proposal_id);
-
-        Ok(())
     }
 
     #[endpoint]
-    fn cancel(&self, proposal_id: usize) -> SCResult<()> {
+    fn cancel(&self, proposal_id: usize) {
         match self.get_proposal_status(proposal_id) {
             GovernanceProposalStatus::None => {
-                return sc_error!("Proposal does not exist");
+                sc_panic!("Proposal does not exist");
             },
             GovernanceProposalStatus::Defeated => {},
             _ => {
@@ -271,8 +257,6 @@ pub trait GovernanceModule:
         self.clear_proposal(proposal_id);
 
         self.proposal_canceled_event(proposal_id);
-
-        Ok(())
     }
 
     // views
@@ -353,20 +337,18 @@ pub trait GovernanceModule:
 
     // private
 
-    fn require_payment_token_governance_token(&self) -> SCResult<()> {
+    fn require_payment_token_governance_token(&self) {
         require!(
             self.call_value().token() == self.governance_token_id().get(),
             "Only Governance token accepted as payment"
         );
-        Ok(())
     }
 
-    fn require_valid_proposal_id(&self, proposal_id: usize) -> SCResult<()> {
+    fn require_valid_proposal_id(&self, proposal_id: usize) {
         require!(
             self.is_valid_proposal_id(proposal_id),
             "Invalid proposal ID"
         );
-        Ok(())
     }
 
     fn is_valid_proposal_id(&self, proposal_id: usize) -> bool {

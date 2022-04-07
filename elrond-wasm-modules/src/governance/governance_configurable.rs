@@ -44,7 +44,7 @@ pub trait GovernanceConfigurablePropertiesModule {
         voting_delay_in_blocks: u64,
         voting_period_in_blocks: u64,
         lock_time_after_voting_ends_in_blocks: u64,
-    ) -> SCResult<()> {
+    ) {
         require!(
             governance_token_id.is_valid_esdt_identifier(),
             "Invalid ESDT token ID provided for governance_token_id"
@@ -53,78 +53,64 @@ pub trait GovernanceConfigurablePropertiesModule {
         self.governance_token_id()
             .set_if_empty(&governance_token_id);
 
-        self.try_change_quorum(quorum)?;
-        self.try_change_min_token_balance_for_proposing(min_token_balance_for_proposal)?;
-        self.try_change_max_actions_per_proposal(max_actions_per_proposal)?;
-        self.try_change_voting_delay_in_blocks(voting_delay_in_blocks)?;
-        self.try_change_voting_period_in_blocks(voting_period_in_blocks)?;
+        self.try_change_quorum(quorum);
+        self.try_change_min_token_balance_for_proposing(min_token_balance_for_proposal);
+        self.try_change_max_actions_per_proposal(max_actions_per_proposal);
+        self.try_change_voting_delay_in_blocks(voting_delay_in_blocks);
+        self.try_change_voting_period_in_blocks(voting_period_in_blocks);
         self.try_change_lock_time_after_voting_ends_in_blocks(
             lock_time_after_voting_ends_in_blocks,
-        )?;
-
-        Ok(())
+        );
     }
 
     // endpoints - these can only be called by the SC itself.
     // i.e. only by proposing and executing an action with the SC as dest and the respective func name
 
     #[endpoint(changeQuorum)]
-    fn change_quorum(&self, new_value: BigUint) -> SCResult<()> {
-        self.require_caller_self()?;
+    fn change_quorum(&self, new_value: BigUint) {
+        self.require_caller_self();
 
-        self.try_change_quorum(new_value)?;
-
-        Ok(())
+        self.try_change_quorum(new_value);
     }
 
     #[endpoint(changeMinTokenBalanceForProposing)]
-    fn change_min_token_balance_for_proposing(&self, new_value: BigUint) -> SCResult<()> {
-        self.require_caller_self()?;
+    fn change_min_token_balance_for_proposing(&self, new_value: BigUint) {
+        self.require_caller_self();
 
-        self.try_change_min_token_balance_for_proposing(new_value)?;
-
-        Ok(())
+        self.try_change_min_token_balance_for_proposing(new_value);
     }
 
     #[endpoint(changeMaxActionsPerProposal)]
-    fn change_max_actions_per_proposal(&self, new_value: usize) -> SCResult<()> {
-        self.require_caller_self()?;
+    fn change_max_actions_per_proposal(&self, new_value: usize) {
+        self.require_caller_self();
 
-        self.try_change_max_actions_per_proposal(new_value)?;
-
-        Ok(())
+        self.try_change_max_actions_per_proposal(new_value);
     }
 
     #[endpoint(changeVotingDelayInBlocks)]
-    fn change_voting_delay_in_blocks(&self, new_value: u64) -> SCResult<()> {
-        self.require_caller_self()?;
+    fn change_voting_delay_in_blocks(&self, new_value: u64) {
+        self.require_caller_self();
 
-        self.try_change_voting_delay_in_blocks(new_value)?;
-
-        Ok(())
+        self.try_change_voting_delay_in_blocks(new_value);
     }
 
     #[endpoint(changeVotingPeriodInBlocks)]
-    fn change_voting_period_in_blocks(&self, new_value: u64) -> SCResult<()> {
-        self.require_caller_self()?;
+    fn change_voting_period_in_blocks(&self, new_value: u64) {
+        self.require_caller_self();
 
-        self.try_change_voting_period_in_blocks(new_value)?;
-
-        Ok(())
+        self.try_change_voting_period_in_blocks(new_value);
     }
 
     #[endpoint(changeLockTimeAfterVotingEndsInBlocks)]
-    fn change_lock_time_after_voting_ends_in_blocks(&self, new_value: u64) -> SCResult<()> {
-        self.require_caller_self()?;
+    fn change_lock_time_after_voting_ends_in_blocks(&self, new_value: u64) {
+        self.require_caller_self();
 
-        self.try_change_lock_time_after_voting_ends_in_blocks(new_value)?;
-
-        Ok(())
+        self.try_change_lock_time_after_voting_ends_in_blocks(new_value);
     }
 
     // private
 
-    fn require_caller_self(&self) -> SCResult<()> {
+    fn require_caller_self(&self) {
         let caller = self.blockchain().get_caller();
         let sc_address = self.blockchain().get_sc_address();
 
@@ -132,65 +118,51 @@ pub trait GovernanceConfigurablePropertiesModule {
             caller == sc_address,
             "Only the SC itself may call this function"
         );
-
-        Ok(())
     }
 
-    fn try_change_quorum(&self, new_value: BigUint) -> SCResult<()> {
+    fn try_change_quorum(&self, new_value: BigUint) {
         require!(new_value != 0, "Quorum can't be set to 0");
 
         self.quorum().set(&new_value);
-
-        Ok(())
     }
 
-    fn try_change_min_token_balance_for_proposing(&self, new_value: BigUint) -> SCResult<()> {
+    fn try_change_min_token_balance_for_proposing(&self, new_value: BigUint) {
         require!(
             new_value != 0,
             "Min token balance for proposing can't be set to 0"
         );
 
         self.min_token_balance_for_proposing().set(&new_value);
-
-        Ok(())
     }
 
-    fn try_change_max_actions_per_proposal(&self, new_value: usize) -> SCResult<()> {
+    fn try_change_max_actions_per_proposal(&self, new_value: usize) {
         require!(new_value != 0, "Max actions per proposal can't be set to 0");
 
         self.max_actions_per_proposal().set(&new_value);
-
-        Ok(())
     }
 
-    fn try_change_voting_delay_in_blocks(&self, new_value: u64) -> SCResult<()> {
+    fn try_change_voting_delay_in_blocks(&self, new_value: u64) {
         require!(new_value != 0, "Voting delay in blocks can't be set to 0");
 
         self.voting_delay_in_blocks().set(&new_value);
-
-        Ok(())
     }
 
-    fn try_change_voting_period_in_blocks(&self, new_value: u64) -> SCResult<()> {
+    fn try_change_voting_period_in_blocks(&self, new_value: u64) {
         require!(
             new_value != 0,
             "Voting period (in blocks) can't be set to 0"
         );
 
         self.voting_period_in_blocks().set(&new_value);
-
-        Ok(())
     }
 
-    fn try_change_lock_time_after_voting_ends_in_blocks(&self, new_value: u64) -> SCResult<()> {
+    fn try_change_lock_time_after_voting_ends_in_blocks(&self, new_value: u64) {
         require!(
             new_value != 0,
             "Lock time after voting ends (in blocks) can't be set to 0"
         );
 
         self.lock_time_after_voting_ends_in_blocks().set(&new_value);
-
-        Ok(())
     }
 
     // storage - fixed parameters
