@@ -3,7 +3,7 @@ use core::marker::PhantomData;
 use elrond_codec::TopEncodeMulti;
 
 use crate::{
-    api::{BlockchainApiImpl, SendApi, SendApiImpl},
+    api::{BlockchainApiImpl, ErrorApiImpl, SendApi, SendApiImpl},
     contract_base::ExitCodecErrorHandler,
     err_msg,
     types::{BigUint, CodeMetadata, ManagedAddress, ManagedBuffer, ManagedVec},
@@ -22,15 +22,15 @@ where
     SA: SendApi + 'static,
 {
     _phantom: PhantomData<SA>,
-    to: ManagedAddress<SA>, // only used for Upgrade, ignored for Deploy
-    egld_payment: BigUint<SA>,
-    explicit_gas_limit: u64,
-    arg_buffer: ManagedArgBuffer<SA>,
+    pub to: Option<ManagedAddress<SA>>, // only used for Upgrade, ignored for Deploy
+    pub egld_payment: BigUint<SA>,
+    pub explicit_gas_limit: u64,
+    pub arg_buffer: ManagedArgBuffer<SA>,
 }
 
 /// Syntactical sugar to help macros to generate code easier.
 /// Unlike calling `ContractDeploy::<SA>::new`, here types can be inferred from the context.
-pub fn new_contract_deploy<SA>(to: ManagedAddress<SA>) -> ContractDeploy<SA>
+pub fn new_contract_deploy<SA>(to: Option<ManagedAddress<SA>>) -> ContractDeploy<SA>
 where
     SA: SendApi + 'static,
 {
@@ -45,11 +45,10 @@ where
 {
     fn default() -> Self {
         let zero = BigUint::zero();
-        let zero_address = ManagedAddress::zero();
         let arg_buffer = ManagedArgBuffer::new_empty();
         ContractDeploy {
             _phantom: PhantomData,
-            to: zero_address,
+            to: None,
             egld_payment: zero,
             explicit_gas_limit: UNSPECIFIED_GAS_LIMIT,
             arg_buffer,
@@ -80,15 +79,6 @@ where
         let h = ExitCodecErrorHandler::<SA>::from(err_msg::CONTRACT_CALL_ENCODE_ERROR);
         let Ok(()) = endpoint_arg.multi_encode_or_handle_err(&mut self.arg_buffer, h);
     }
-
-    // pub fn get_mut_arg_buffer(&mut self) -> &mut ArgBuffer {
-    //     &mut self.arg_buffer
-    // }
-
-    // /// Provided for cases where we build the contract deploy by hand.
-    // pub fn push_argument_raw_bytes(&mut self, bytes: &[u8]) {
-    //     self.arg_buffer.push_argument_bytes(bytes);
-    // }
 
     fn resolve_gas_limit(&self) -> u64 {
         if self.explicit_gas_limit == UNSPECIFIED_GAS_LIMIT {
@@ -138,8 +128,11 @@ where
         source_address: &ManagedAddress<SA>,
         code_metadata: CodeMetadata,
     ) {
+        let sc_address = &self.to.as_ref().unwrap_or_else(|| {
+            SA::error_api_impl().signal_error(err_msg::RECIPIENT_ADDRESS_NOT_SET)
+        });
         SA::send_api_impl().upgrade_from_source_contract(
-            &self.to,
+            sc_address,
             self.resolve_gas_limit(),
             &self.egld_payment,
             source_address,
@@ -149,8 +142,11 @@ where
     }
 
     pub fn upgrade_contract(self, code: &ManagedBuffer<SA>, code_metadata: CodeMetadata) {
+        let sc_address = self.to.as_ref().unwrap_or_else(|| {
+            SA::error_api_impl().signal_error(err_msg::RECIPIENT_ADDRESS_NOT_SET)
+        });
         SA::send_api_impl().upgrade_contract(
-            &self.to,
+            sc_address,
             self.resolve_gas_limit(),
             &self.egld_payment,
             code,

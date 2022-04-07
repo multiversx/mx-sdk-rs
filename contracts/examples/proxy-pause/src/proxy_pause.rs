@@ -58,13 +58,13 @@ pub trait PauseProxy {
     #[endpoint]
     fn pause(&self) {
         self.require_owner();
-        self.for_each_contract(|contract| contract.pause().execute_on_dest_context());
+        self.for_each_contract(|mut contract| contract.pause().execute_on_dest_context());
     }
 
     #[endpoint]
     fn unpause(&self) {
         self.require_owner();
-        self.for_each_contract(|contract| contract.unpause().execute_on_dest_context());
+        self.for_each_contract(|mut contract| contract.unpause().execute_on_dest_context());
     }
 
     fn require_owner(&self) {
