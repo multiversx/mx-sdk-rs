@@ -118,15 +118,6 @@ impl BlockchainMock {
     pub fn write_mandos_trace(&mut self, file_path: &str) {
         let mandos_trace = core::mem::replace(&mut self.mandos_trace, Scenario::default());
         let mandos_trace_raw = mandos_trace.into_raw();
-
-        let buf = Vec::new();
-        let formatter = serde_json::ser::PrettyFormatter::with_indent(b"    ");
-        let mut ser = serde_json::Serializer::with_formatter(buf, formatter);
-        mandos_trace_raw.serialize(&mut ser).unwrap();
-        let mut serialized = String::from_utf8(ser.into_inner()).unwrap();
-        serialized.push('\n');
-
-        let mut file = File::create(file_path).unwrap();
-        file.write_all(serialized.as_bytes()).unwrap();
+        mandos_trace_raw.save_to_file(file_path);
     }
 }

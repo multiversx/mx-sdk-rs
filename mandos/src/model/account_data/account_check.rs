@@ -1,10 +1,10 @@
 use crate::{
-    interpret_trait::{InterpretableFrom, InterpreterContext},
+    interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
     model::{
         BigUintValue, BytesKey, BytesValue, CheckEsdtMap, CheckStorage, CheckStorageDetails,
         CheckValue, U64Value,
     },
-    serde_raw::CheckAccountRaw,
+    serde_raw::{CheckAccountRaw, CheckBytesValueRaw},
 };
 
 #[derive(Debug, Default)]
@@ -77,6 +77,22 @@ impl InterpretableFrom<Box<CheckAccountRaw>> for CheckAccount {
                 from.async_call_data,
                 context,
             ),
+        }
+    }
+}
+
+impl IntoRaw<CheckAccountRaw> for CheckAccount {
+    fn into_raw(self) -> CheckAccountRaw {
+        CheckAccountRaw {
+            comment: self.comment,
+            nonce: self.nonce.into_raw(),
+            balance: self.balance.into_raw(),
+            esdt: self.esdt.into_raw(),
+            username: self.username.into_raw(),
+            storage: self.storage.into_raw(),
+            code: self.code.into_raw(),
+            owner: CheckBytesValueRaw::Unspecified,
+            async_call_data: self.async_call_data.into_raw(),
         }
     }
 }

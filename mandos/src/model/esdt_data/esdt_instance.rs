@@ -1,5 +1,5 @@
 use crate::{
-    interpret_trait::{InterpretableFrom, InterpreterContext},
+    interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
     model::{BigUintValue, BytesValue, U64Value},
     serde_raw::EsdtInstanceRaw,
 };
@@ -37,8 +37,8 @@ impl InterpretableFrom<EsdtInstanceRaw> for EsdtInstance {
     }
 }
 
-impl EsdtInstance {
-    pub fn into_raw(self) -> EsdtInstanceRaw {
+impl IntoRaw<EsdtInstanceRaw> for EsdtInstance {
+    fn into_raw(self) -> EsdtInstanceRaw {
         EsdtInstanceRaw {
             nonce: self.nonce.map(|n| n.original),
             balance: self.balance.map(|n| n.original),

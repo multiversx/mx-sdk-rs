@@ -1,5 +1,5 @@
 use crate::{
-    interpret_trait::{InterpretableFrom, InterpreterContext},
+    interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
     serde_raw::BlockInfoRaw,
 };
 
@@ -36,8 +36,8 @@ impl InterpretableFrom<BlockInfoRaw> for BlockInfo {
     }
 }
 
-impl BlockInfo {
-    pub fn into_raw(self) -> BlockInfoRaw {
+impl IntoRaw<BlockInfoRaw> for BlockInfo {
+    fn into_raw(self) -> BlockInfoRaw {
         BlockInfoRaw {
             block_timestamp: self.block_timestamp.map(|value| value.original),
             block_nonce: self.block_nonce.map(|value| value.original),

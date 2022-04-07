@@ -1,5 +1,5 @@
 use crate::{
-    interpret_trait::{InterpretableFrom, InterpreterContext},
+    interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
     serde_raw::StepRaw,
 };
 
@@ -183,8 +183,8 @@ impl InterpretableFrom<StepRaw> for Step {
     }
 }
 
-impl Step {
-    pub fn into_raw(self) -> StepRaw {
+impl IntoRaw<StepRaw> for Step {
+    fn into_raw(self) -> StepRaw {
         match self {
             // Step::ExternalSteps(external_steps_step) => {
             //     todo!()
@@ -220,9 +220,10 @@ impl Step {
             // Step::ValidatorReward(validator_reward_step) => {
             //     state.mandos_validator_reward(validator_reward_step);
             // },
-            // Step::CheckState(check_state_step) => {
-            //     state.mandos_check_state(check_state_step);
-            // },
+            Step::CheckState(s) => StepRaw::CheckState {
+                comment: s.comment,
+                accounts: s.accounts.into_raw(),
+            },
             _ => StepRaw::DumpState {
                 comment: Some("TEMP".to_string()),
             },

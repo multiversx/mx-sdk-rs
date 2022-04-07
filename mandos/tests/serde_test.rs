@@ -2,24 +2,34 @@ extern crate mandos;
 
 use std::{fs, fs::File, io::Write};
 
-use mandos::serde_raw::{ScenarioRaw, StepRaw};
-use serde::Serialize;
+use mandos::{
+    interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
+    model::Scenario,
+    serde_raw::ScenarioRaw,
+};
 
 #[test]
-fn test_scenario_raw_ser_de() {
+fn test_scenario_low_level_ser_de() {
     let contents = fs::read_to_string("./example.scen.json").unwrap();
+    let scenario_raw = ScenarioRaw::from_json_str(contents.as_str());
 
-    let scen: ScenarioRaw = serde_json::from_str(contents.as_str()).unwrap();
+    let serialized = scenario_raw.to_json_string();
 
-    // let serialized = serde_json::to_string_pretty(&scen).unwrap();
-    let buf = Vec::new();
-    let formatter = serde_json::ser::PrettyFormatter::with_indent(b"    ");
-    let mut ser = serde_json::Serializer::with_formatter(buf, formatter);
-    scen.serialize(&mut ser).unwrap();
-    let mut serialized = String::from_utf8(ser.into_inner()).unwrap();
-    serialized.push('\n');
+    let mut file = File::create("serialized_raw.scen.json").unwrap();
+    file.write_all(serialized.as_bytes()).unwrap();
+    assert_eq!(serialized, contents);
+}
+
+#[test]
+fn test_scenario_high_level_ser_de() {
+    let contents = fs::read_to_string("./example.scen.json").unwrap();
+    let scenario_raw = ScenarioRaw::from_json_str(contents.as_str());
+    let scenario = Scenario::interpret_from(scenario_raw, &InterpreterContext::default());
+
+    let scenario_raw_re = scenario.into_raw();
+    let serialized = scenario_raw_re.to_json_string();
 
     let mut file = File::create("serialized.scen.json").unwrap();
     file.write_all(serialized.as_bytes()).unwrap();
-    assert_eq!(serialized, contents);
+    // assert_eq!(serialized, contents);
 }
