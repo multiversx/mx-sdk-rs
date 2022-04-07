@@ -50,7 +50,7 @@ pub fn deploy_contract(
     mut tx_input: TxInput,
     contract_path: Vec<u8>,
     tx_cache: TxCache,
-) -> (TxResult, BlockchainUpdate, Address) {
+) -> (TxResult, Address, BlockchainUpdate) {
     let new_address = tx_cache.get_new_address(&tx_input.from);
     tx_input.to = new_address.clone();
     tx_input.func_name = b"init".to_vec();
@@ -68,5 +68,5 @@ pub fn deploy_contract(
     let (tx_context, tx_result) = execute_tx_context(tx_context);
     let blockchain_updates = tx_context.into_blockchain_updates();
 
-    (tx_result, blockchain_updates, new_address)
+    (tx_result, new_address, blockchain_updates)
 }
