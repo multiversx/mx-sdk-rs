@@ -171,7 +171,9 @@ where
                 let mut new_arg_buffer = ManagedArgBuffer::new_empty();
                 new_arg_buffer.push_arg(&payment.token_identifier);
                 new_arg_buffer.push_arg(&payment.amount);
-                new_arg_buffer.push_arg(&self.endpoint_name);
+                if !self.endpoint_name.is_empty() {
+                    new_arg_buffer.push_arg(&self.endpoint_name);
+                }
 
                 let zero = BigUint::zero();
                 let endpoint_name = ManagedBuffer::new_from_bytes(ESDT_TRANSFER_FUNC_NAME);
@@ -200,7 +202,9 @@ where
                 new_arg_buffer.push_arg(&payment.token_nonce);
                 new_arg_buffer.push_arg(&payment.amount);
                 new_arg_buffer.push_arg(&self.to);
-                new_arg_buffer.push_arg(&self.endpoint_name);
+                if !self.endpoint_name.is_empty() {
+                    new_arg_buffer.push_arg(&self.endpoint_name);
+                }
 
                 // nft transfer is sent to self, sender = receiver
                 let recipient_addr = ManagedAddress::from_raw_handle(
@@ -238,7 +242,9 @@ where
             new_arg_buffer.push_arg(payment.token_nonce);
             new_arg_buffer.push_arg(payment.amount);
         }
-        new_arg_buffer.push_arg(self.endpoint_name);
+        if !self.endpoint_name.is_empty() {
+            new_arg_buffer.push_arg(self.endpoint_name);
+        }
 
         // multi transfer is sent to self, sender = receiver
         let recipient_addr = BlockchainWrapper::<SA>::new().get_sc_address();
