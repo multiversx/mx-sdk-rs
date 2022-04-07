@@ -82,3 +82,26 @@ impl InterpretableFrom<AccountRaw> for Account {
         }
     }
 }
+
+impl Account {
+    pub fn into_raw(self) -> AccountRaw {
+        AccountRaw {
+            comment: self.comment,
+            nonce: self.nonce.map(|n| n.original),
+            balance: self.balance.map(|n| n.original),
+            esdt: self
+                .esdt
+                .into_iter()
+                .map(|(k, v)| (k.original, v.into_raw()))
+                .collect(),
+            username: self.username.map(|n| n.original),
+            storage: self
+                .storage
+                .into_iter()
+                .map(|(key, value)| (key.original, value.original))
+                .collect(),
+            code: self.code.map(|n| n.original),
+            owner: self.owner.map(|n| n.original),
+        }
+    }
+}

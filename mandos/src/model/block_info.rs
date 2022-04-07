@@ -35,3 +35,15 @@ impl InterpretableFrom<BlockInfoRaw> for BlockInfo {
         }
     }
 }
+
+impl BlockInfo {
+    pub fn into_raw(self) -> BlockInfoRaw {
+        BlockInfoRaw {
+            block_timestamp: self.block_timestamp.map(|value| value.original),
+            block_nonce: self.block_nonce.map(|value| value.original),
+            block_round: self.block_round.map(|value| value.original),
+            block_epoch: self.block_epoch.map(|value| value.original),
+            block_random_seed: self.block_random_seed.map(|value| value.original),
+        }
+    }
+}

@@ -65,3 +65,9 @@ impl InterpretableFrom<&AddressValue> for AddressValue {
         from.clone()
     }
 }
+
+impl AddressValue {
+    pub fn into_raw(self) -> ValueSubTree {
+        self.original
+    }
+}

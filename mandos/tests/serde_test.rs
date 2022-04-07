@@ -23,20 +23,3 @@ fn test_scenario_raw_ser_de() {
     file.write_all(serialized.as_bytes()).unwrap();
     assert_eq!(serialized, contents);
 }
-
-#[test]
-fn test_ser() {
-    let scen = ScenarioRaw {
-        name: None,
-        comment: Some("comment".to_string()),
-        check_gas: Some(false),
-        gas_schedule: Some("dummy".to_string()),
-        steps: vec![StepRaw::ExternalSteps {
-            comment: None,
-            path: "hello.txt".to_string(),
-        }],
-    };
-
-    let serialized = serde_json::to_string_pretty(&scen).unwrap();
-    println!("serialized = {}", serialized);
-}

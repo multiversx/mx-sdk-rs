@@ -61,3 +61,9 @@ impl InterpretableFrom<&AddressValue> for AddressKey {
         }
     }
 }
+
+impl AddressKey {
+    pub fn into_raw(self) -> String {
+        self.original
+    }
+}

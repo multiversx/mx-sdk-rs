@@ -4,7 +4,8 @@ use mandos::{
     interpret_trait::InterpreterContext, model::Scenario, value_interpreter::interpret_string,
 };
 use num_traits::Zero;
-use std::{collections::HashMap, path::PathBuf};
+use serde::Serialize;
+use std::{collections::HashMap, fs::File, io::Write, path::PathBuf};
 
 use super::{AccountData, BlockInfo};
 
@@ -112,5 +113,20 @@ impl BlockchainMock {
         let (result, obj) = f(obj);
         *self = obj;
         result
+    }
+
+    pub fn write_mandos_trace(&mut self, file_path: &str) {
+        let mandos_trace = core::mem::replace(&mut self.mandos_trace, Scenario::default());
+        let mandos_trace_raw = mandos_trace.into_raw();
+
+        let buf = Vec::new();
+        let formatter = serde_json::ser::PrettyFormatter::with_indent(b"    ");
+        let mut ser = serde_json::Serializer::with_formatter(buf, formatter);
+        mandos_trace_raw.serialize(&mut ser).unwrap();
+        let mut serialized = String::from_utf8(ser.into_inner()).unwrap();
+        serialized.push('\n');
+
+        let mut file = File::create(file_path).unwrap();
+        file.write_all(serialized.as_bytes()).unwrap();
     }
 }

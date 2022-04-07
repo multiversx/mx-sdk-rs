@@ -182,3 +182,50 @@ impl InterpretableFrom<StepRaw> for Step {
         }
     }
 }
+
+impl Step {
+    pub fn into_raw(self) -> StepRaw {
+        match self {
+            // Step::ExternalSteps(external_steps_step) => {
+            //     todo!()
+            // },
+            Step::SetState(s) => StepRaw::SetState {
+                comment: s.comment,
+                accounts: s
+                    .accounts
+                    .into_iter()
+                    .map(|(address, account)| (address.into_raw(), account.into_raw()))
+                    .collect(),
+                new_addresses: s
+                    .new_addresses
+                    .into_iter()
+                    .map(|na| na.into_raw())
+                    .collect(),
+                block_hashes: s.block_hashes.into_iter().map(|bh| bh.original).collect(),
+                previous_block_info: s.previous_block_info.map(|bi| bi.into_raw()),
+                current_block_info: s.current_block_info.map(|bi| bi.into_raw()),
+            },
+            // Step::ScCall(sc_call_step) => {
+            //     state.mandos_sc_call(sc_call_step);
+            // },
+            // Step::ScQuery(sc_query_step) => {
+            //     state.mandos_sc_query(sc_query_step);
+            // },
+            // Step::ScDeploy(sc_deploy_step) => {
+            //     state.mandos_sc_deploy(sc_deploy_step);
+            // },
+            // Step::Transfer(transfer_step) => {
+            //     state.mandos_transfer(transfer_step);
+            // },
+            // Step::ValidatorReward(validator_reward_step) => {
+            //     state.mandos_validator_reward(validator_reward_step);
+            // },
+            // Step::CheckState(check_state_step) => {
+            //     state.mandos_check_state(check_state_step);
+            // },
+            _ => StepRaw::DumpState {
+                comment: Some("TEMP".to_string()),
+            },
+        }
+    }
+}

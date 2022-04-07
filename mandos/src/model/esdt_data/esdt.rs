@@ -1,7 +1,7 @@
 use crate::{
     interpret_trait::{InterpretableFrom, InterpreterContext},
     model::{BytesKey, BytesValue, U64Value},
-    serde_raw::EsdtRaw,
+    serde_raw::{EsdtFullRaw, EsdtRaw},
 };
 
 use super::{EsdtInstance, EsdtObject};
@@ -34,6 +34,25 @@ impl InterpretableFrom<EsdtRaw> for Esdt {
                 frozen: full_esdt
                     .frozen
                     .map(|b| U64Value::interpret_from(b, context)),
+            }),
+        }
+    }
+}
+
+impl Esdt {
+    pub fn into_raw(self) -> EsdtRaw {
+        match self {
+            Esdt::Short(short) => EsdtRaw::Short(short.original),
+            Esdt::Full(eo) => EsdtRaw::Full(EsdtFullRaw {
+                token_identifier: eo.token_identifier.map(|ti| ti.original),
+                instances: eo
+                    .instances
+                    .into_iter()
+                    .map(|inst| inst.into_raw())
+                    .collect(),
+                last_nonce: eo.last_nonce.map(|ti| ti.original),
+                roles: eo.roles,
+                frozen: eo.frozen.map(|ti| ti.original),
             }),
         }
     }

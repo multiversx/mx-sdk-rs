@@ -56,4 +56,6 @@ fn adder_mandos_constructed() {
                 CheckAccount::new().check_storage("str:sum", "8"),
             ),
     );
+
+    world.write_mandos_trace("trace.scen.json");
 }
