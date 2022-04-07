@@ -1,5 +1,7 @@
 use elrond_wasm::types::{BoxedBytes, TokenIdentifier};
-use elrond_wasm_debug::{check_managed_top_decode, check_managed_top_encode_decode, DebugApi};
+use elrond_wasm_debug::{
+    check_managed_top_decode, check_managed_top_encode_decode, managed_token_id, DebugApi,
+};
 
 #[test]
 fn test_egld() {
@@ -71,4 +73,17 @@ fn test_is_valid_esdt_identifier() {
 
     // ticker too long
     assert!(!TokenIdentifier::<DebugApi>::from_esdt_bytes(&b"ALCCCCCCCCC-6258d2"[..]).is_valid_esdt_identifier());
+}
+
+#[test]
+fn test_managed_token_id_macro() {
+    let _ = DebugApi::dummy();
+    assert_eq!(
+        managed_token_id!(b"EGLD"),
+        TokenIdentifier::<DebugApi>::egld()
+    );
+    assert_eq!(
+        managed_token_id!(b"ALC-6258d2"),
+        TokenIdentifier::<DebugApi>::from_esdt_bytes(&b"ALC-6258d2"[..])
+    );
 }
