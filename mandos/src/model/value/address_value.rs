@@ -18,7 +18,7 @@ impl fmt::Display for AddressValue {
     }
 }
 
-fn value_from_slice(slice: &[u8]) -> [u8; 32] {
+pub(crate) fn value_from_slice(slice: &[u8]) -> [u8; 32] {
     let mut value = [0u8; 32];
     if slice.len() == 32 {
         value.copy_from_slice(slice);
@@ -45,5 +45,12 @@ impl InterpretableFrom<&str> for AddressValue {
             value: value_from_slice(bytes.as_slice()),
             original: ValueSubTree::Str(from.to_string()),
         }
+    }
+}
+
+/// TODO: generalize for all `Clone`-able?
+impl InterpretableFrom<&AddressValue> for AddressValue {
+    fn interpret_from(from: &AddressValue, _context: &InterpreterContext) -> Self {
+        from.clone()
     }
 }

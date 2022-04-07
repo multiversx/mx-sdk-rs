@@ -23,6 +23,7 @@ pub use num_bigint;
 mod codec_err;
 mod codec_err_handler;
 mod default_traits;
+mod equivalent;
 mod impl_for_types;
 mod multi;
 pub mod multi_types;
@@ -41,6 +42,7 @@ pub use crate::{
 pub use codec_err::{DecodeError, EncodeError};
 pub use codec_err_handler::*;
 pub use default_traits::{DecodeDefault, EncodeDefault};
+pub use equivalent::*;
 pub use multi::*;
 pub use single::*;
 

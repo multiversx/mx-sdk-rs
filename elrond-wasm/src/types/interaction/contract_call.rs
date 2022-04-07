@@ -1,4 +1,4 @@
-use elrond_codec::{TopDecodeMulti, TopEncodeMulti};
+use elrond_codec::{CodecFrom, TopEncodeMulti};
 
 use crate::{
     api::{
@@ -26,36 +26,36 @@ const TRANSFER_EXECUTE_DEFAULT_LEFTOVER: u64 = 100_000;
 /// Represents metadata for calling another contract.
 /// Can transform into either an async call, transfer call or other types of calls.
 #[must_use]
-pub struct ContractCall<SA, R>
+pub struct ContractCall<SA, OriginalResult>
 where
     SA: CallTypeApi + 'static,
 {
     _phantom: PhantomData<SA>,
-    to: ManagedAddress<SA>,
-    egld_payment: BigUint<SA>,
-    payments: ManagedVec<SA, EsdtTokenPayment<SA>>,
-    endpoint_name: ManagedBuffer<SA>,
-    explicit_gas_limit: u64,
-    arg_buffer: ManagedArgBuffer<SA>,
-    _return_type: PhantomData<R>,
+    pub to: ManagedAddress<SA>,
+    pub egld_payment: BigUint<SA>,
+    pub payments: ManagedVec<SA, EsdtTokenPayment<SA>>,
+    pub endpoint_name: ManagedBuffer<SA>,
+    pub explicit_gas_limit: u64,
+    pub arg_buffer: ManagedArgBuffer<SA>,
+    _return_type: PhantomData<OriginalResult>,
 }
 
 /// Syntactical sugar to help macros to generate code easier.
-/// Unlike calling `ContractCall::<SA, R>::new`, here types can be inferred from the context.
-pub fn new_contract_call<SA, R>(
+/// Unlike calling `ContractCall::<SA, OriginalResult>::new`, here types can be inferred from the context.
+pub fn new_contract_call<SA, OriginalResult>(
     to: ManagedAddress<SA>,
     endpoint_name_slice: &'static [u8],
     payments: ManagedVec<SA, EsdtTokenPayment<SA>>,
-) -> ContractCall<SA, R>
+) -> ContractCall<SA, OriginalResult>
 where
     SA: CallTypeApi + 'static,
 {
     let endpoint_name = ManagedBuffer::new_from_bytes(endpoint_name_slice);
-    ContractCall::<SA, R>::new_with_esdt_payment(to, endpoint_name, payments)
+    ContractCall::<SA, OriginalResult>::new_with_esdt_payment(to, endpoint_name, payments)
 }
 
 #[allow(clippy::return_self_not_must_use)]
-impl<SA, R> ContractCall<SA, R>
+impl<SA, OriginalResult> ContractCall<SA, OriginalResult>
 where
     SA: CallTypeApi + 'static,
 {
@@ -257,7 +257,7 @@ where
         }
     }
 
-    fn resolve_gas_limit(&self) -> u64 {
+    pub fn resolve_gas_limit(&self) -> u64 {
         if self.explicit_gas_limit == UNSPECIFIED_GAS_LIMIT {
             SA::blockchain_api_impl().get_gas_left()
         } else {
@@ -278,22 +278,30 @@ where
     }
 }
 
-impl<SA, R> ContractCall<SA, R>
+impl<SA, OriginalResult> ContractCall<SA, OriginalResult>
 where
     SA: CallTypeApi + 'static,
-    R: TopDecodeMulti,
+    OriginalResult: TopEncodeMulti,
 {
-    fn decode_result(raw_result: ManagedVec<SA, ManagedBuffer<SA>>) -> R {
+    fn decode_result<RequestedResult>(
+        raw_result: ManagedVec<SA, ManagedBuffer<SA>>,
+    ) -> RequestedResult
+    where
+        RequestedResult: CodecFrom<OriginalResult>,
+    {
         let mut loader = ManagedResultArgLoader::new(raw_result);
         let arg_id = ArgId::from(&b"sync result"[..]);
         let h = ArgErrorHandler::<SA>::from(arg_id);
-        let Ok(result) = R::multi_decode_or_handle_err(&mut loader, h);
+        let Ok(result) = RequestedResult::multi_decode_or_handle_err(&mut loader, h);
         result
     }
 
     /// Executes immediately, synchronously, and returns contract call result.
     /// Only works if the target contract is in the same shard.
-    pub fn execute_on_dest_context(mut self) -> R {
+    pub fn execute_on_dest_context<RequestedResult>(mut self) -> RequestedResult
+    where
+        RequestedResult: CodecFrom<OriginalResult>,
+    {
         self = self.convert_to_esdt_transfer_call();
         let raw_result = SA::send_api_impl().execute_on_dest_context_raw(
             self.resolve_gas_limit(),
@@ -313,9 +321,13 @@ where
     /// Will be eliminated after some future Arwen hook redesign.
     /// `range_closure` takes the number of results before, the number of results after,
     /// and is expected to return the start index (inclusive) and end index (exclusive).
-    pub fn execute_on_dest_context_custom_range<F>(mut self, range_closure: F) -> R
+    pub fn execute_on_dest_context_custom_range<F, RequestedResult>(
+        mut self,
+        range_closure: F,
+    ) -> RequestedResult
     where
         F: FnOnce(usize, usize) -> (usize, usize),
+        RequestedResult: CodecFrom<OriginalResult>,
     {
         self = self.convert_to_esdt_transfer_call();
         let raw_result = SA::send_api_impl().execute_on_dest_context_raw_custom_result_range(
@@ -330,7 +342,10 @@ where
         Self::decode_result(raw_result)
     }
 
-    pub fn execute_on_dest_context_readonly(mut self) -> R {
+    pub fn execute_on_dest_context_readonly<RequestedResult>(mut self) -> RequestedResult
+    where
+        RequestedResult: CodecFrom<OriginalResult>,
+    {
         self = self.convert_to_esdt_transfer_call();
         let raw_result = SA::send_api_impl().execute_on_dest_context_readonly_raw(
             self.resolve_gas_limit(),
@@ -343,7 +358,7 @@ where
     }
 }
 
-impl<SA, R> ContractCall<SA, R>
+impl<SA, OriginalResult> ContractCall<SA, OriginalResult>
 where
     SA: CallTypeApi + 'static,
 {

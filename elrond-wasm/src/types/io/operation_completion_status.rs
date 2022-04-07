@@ -1,8 +1,9 @@
 use crate::{
     abi::{TypeAbi, TypeName},
-    types::heap::BoxedBytes,
+    api::ManagedTypeApi,
+    types::ManagedBuffer,
 };
-use elrond_codec::{EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput};
+use elrond_codec::{CodecFrom, EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput};
 
 /// Standard way of signalling that an operation was interrupted early, before running out of gas.
 /// An endpoint that performs a longer operation can check from time to time if it is running low
@@ -31,8 +32,6 @@ impl OperationCompletionStatus {
 }
 
 impl TopEncodeMulti for OperationCompletionStatus {
-    type DecodeAs = BoxedBytes;
-
     fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
     where
         O: TopEncodeMultiOutput,
@@ -41,6 +40,10 @@ impl TopEncodeMulti for OperationCompletionStatus {
         output.push_single_value(&self.output_bytes(), h)
     }
 }
+
+impl<M: ManagedTypeApi> CodecFrom<OperationCompletionStatus> for ManagedBuffer<M> {}
+impl CodecFrom<OperationCompletionStatus> for crate::types::heap::BoxedBytes {}
+impl CodecFrom<OperationCompletionStatus> for crate::types::heap::Vec<u8> {}
 
 impl TypeAbi for OperationCompletionStatus {
     fn type_name() -> TypeName {
