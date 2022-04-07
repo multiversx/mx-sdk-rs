@@ -1,5 +1,5 @@
 use crate::{
-    interpret_trait::{InterpretableFrom, InterpreterContext},
+    interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
     serde_raw::ScenarioRaw,
 };
 
@@ -28,8 +28,8 @@ impl InterpretableFrom<ScenarioRaw> for Scenario {
     }
 }
 
-impl Scenario {
-    pub fn into_raw(self) -> ScenarioRaw {
+impl IntoRaw<ScenarioRaw> for Scenario {
+    fn into_raw(self) -> ScenarioRaw {
         ScenarioRaw {
             name: self.name,
             comment: self.comment,

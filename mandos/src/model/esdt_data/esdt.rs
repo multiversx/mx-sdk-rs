@@ -1,5 +1,5 @@
 use crate::{
-    interpret_trait::{InterpretableFrom, InterpreterContext},
+    interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
     model::{BytesKey, BytesValue, U64Value},
     serde_raw::{EsdtFullRaw, EsdtRaw},
 };
@@ -39,8 +39,8 @@ impl InterpretableFrom<EsdtRaw> for Esdt {
     }
 }
 
-impl Esdt {
-    pub fn into_raw(self) -> EsdtRaw {
+impl IntoRaw<EsdtRaw> for Esdt {
+    fn into_raw(self) -> EsdtRaw {
         match self {
             Esdt::Short(short) => EsdtRaw::Short(short.original),
             Esdt::Full(eo) => EsdtRaw::Full(EsdtFullRaw {

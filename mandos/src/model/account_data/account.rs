@@ -1,5 +1,5 @@
 use crate::{
-    interpret_trait::{InterpretableFrom, InterpreterContext},
+    interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
     model::{AddressValue, BigUintValue, BytesKey, BytesValue, Esdt, U64Value},
     serde_raw::AccountRaw,
 };
@@ -83,8 +83,8 @@ impl InterpretableFrom<AccountRaw> for Account {
     }
 }
 
-impl Account {
-    pub fn into_raw(self) -> AccountRaw {
+impl IntoRaw<AccountRaw> for Account {
+    fn into_raw(self) -> AccountRaw {
         AccountRaw {
             comment: self.comment,
             nonce: self.nonce.map(|n| n.original),
