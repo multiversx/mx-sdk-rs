@@ -87,8 +87,9 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
             };
         }
         if self.token_details(&identifier).is_empty() {
+            let nonces = ManagedVec::from_single_item(nonce);
             self.token_details(&identifier).set(&TokenOwnershipData {
-                token_nonces: [nonce].to_vec(),
+                token_nonces: nonces,
                 owner: caller.clone(),
             });
         } else {
@@ -118,7 +119,7 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
         );
         for token in self.owned_tokens(&caller).iter() {
             let nonces = self.token_details(&token).get().token_nonces;
-            for nonce in nonces {
+            for nonce in &nonces {
                 self.send().direct(
                     &caller,
                     &token,

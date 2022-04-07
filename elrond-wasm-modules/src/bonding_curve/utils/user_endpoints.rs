@@ -16,8 +16,8 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
         #[payment_amount] sell_amount: BigUint,
         #[payment_nonce] nonce: u64,
         #[payment_token] offered_token: TokenIdentifier,
-    ) -> SCResult<()> {
-        let _ = self.check_owned_return_payment_token(&offered_token, &sell_amount)?;
+    ) {
+        let _ = self.check_owned_return_payment_token(&offered_token, &sell_amount);
 
         let calculated_price = self.bonding_curve(&offered_token).update(|bonding_curve| {
             require!(
@@ -29,10 +29,10 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
                 sell_amount.clone(),
                 bonding_curve.arguments.clone(),
             );
-            bonding_curve.payment_amount -= price.clone()?;
+            bonding_curve.payment_amount -= price.clone();
             bonding_curve.arguments.balance += sell_amount.clone();
             price
-        })?;
+        });
 
         let caller = self.blockchain().get_caller();
 
@@ -50,8 +50,6 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
             .update(|details| details.add_nonce(nonce));
 
         self.sell_token_event(&caller, &calculated_price);
-
-        Ok(())
     }
 
     #[payable("*")]
@@ -63,9 +61,9 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
         requested_amount: BigUint,
         requested_token: TokenIdentifier,
         #[var_args] requested_nonce: OptionalValue<u64>,
-    ) -> SCResult<()> {
+    ) {
         let payment_token =
-            self.check_owned_return_payment_token(&requested_token, &requested_amount)?;
+            self.check_owned_return_payment_token(&requested_token, &requested_amount);
         self.check_given_token(&payment_token, &offered_token);
 
         let calculated_price = self
@@ -76,7 +74,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
                     requested_amount.clone(),
                     bonding_curve.arguments.clone(),
                 );
-                let price_clone = price.clone()?;
+                let price_clone = price.clone();
                 require!(
                     price_clone <= payment,
                     "The payment provided is not enough for the transaction"
@@ -85,7 +83,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
                 bonding_curve.arguments.balance -= &requested_amount;
 
                 price
-            })?;
+            });
 
         let caller = self.blockchain().get_caller();
 
@@ -104,11 +102,11 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
                 } else {
                     self.nonce_amount(&requested_token, nonce).clear();
                     self.token_details(&requested_token)
-                        .update(|details| details.remove_nonce(nonce))?;
+                        .update(|details| details.remove_nonce(nonce));
                 }
             },
             OptionalValue::None => {
-                self.send_bought_tokens(&caller, requested_token, requested_amount)?;
+                self.send_next_available_tokens(&caller, requested_token, requested_amount);
             },
         };
 
@@ -121,19 +119,19 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
         );
 
         self.buy_token_event(&caller, &calculated_price);
-        Ok(())
     }
 
-    fn send_bought_tokens(
+    fn send_next_available_tokens(
         &self,
         caller: &ManagedAddress,
         token: TokenIdentifier,
         amount: BigUint,
-    ) -> SCResult<()> {
+    ) {
         let mut nonces = self.token_details(&token).get().token_nonces;
         let mut total_amount = amount;
         loop {
-            let nonce = *nonces.first().ok_or("Requested nonce does not exist")?;
+            require!(nonces.len() > 0, "Insufficient balance");
+            let nonce = nonces.get(0);
             let available_amount = self.nonce_amount(&token, nonce).get();
 
             let amount_to_send: BigUint;
@@ -150,49 +148,47 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
             }
             self.send()
                 .direct(caller, &token, nonce, &amount_to_send, b"buying");
-            if total_amount == 0 {
+            if total_amount == BigUint::zero() {
                 break;
             }
         }
+
         self.token_details(&token)
             .update(|token_ownership| token_ownership.token_nonces = nonces);
-        Ok(())
     }
 
     #[view]
-    fn get_buy_price(&self, amount: BigUint, identifier: TokenIdentifier) -> SCResult<BigUint> {
-        self.check_token_exists(&identifier)?;
+    fn get_buy_price(&self, amount: BigUint, identifier: TokenIdentifier) -> BigUint {
+        self.check_token_exists(&identifier);
 
         let bonding_curve = self.bonding_curve(&identifier).get();
         self.compute_buy_price(&bonding_curve.curve, amount, bonding_curve.arguments)
     }
 
     #[view]
-    fn get_sell_price(&self, amount: BigUint, identifier: TokenIdentifier) -> SCResult<BigUint> {
-        self.check_token_exists(&identifier)?;
+    fn get_sell_price(&self, amount: BigUint, identifier: TokenIdentifier) -> BigUint {
+        self.check_token_exists(&identifier);
 
         let bonding_curve = self.bonding_curve(&identifier).get();
         self.compute_sell_price(&bonding_curve.curve, amount, bonding_curve.arguments)
     }
 
-    fn check_token_exists(&self, issued_token: &TokenIdentifier) -> SCResult<()> {
+    fn check_token_exists(&self, issued_token: &TokenIdentifier) {
         require!(
             !self.bonding_curve(issued_token).is_empty(),
             "Token is not issued yet!"
         );
-
-        Ok(())
     }
 
     #[view(getTokenAvailability)]
     fn get_token_availability(
         &self,
         identifier: TokenIdentifier,
-    ) -> MultiValueVec<MultiValue2<u64, BigUint>> {
+    ) -> MultiValueEncoded<MultiValue2<u64, BigUint>> {
         let token_nonces = self.token_details(&identifier).get().token_nonces;
-        let mut availability = Vec::new();
+        let mut availability = MultiValueEncoded::new();
 
-        for current_check_nonce in token_nonces {
+        for current_check_nonce in &token_nonces {
             availability.push(MultiValue2((
                 current_check_nonce,
                 self.nonce_amount(&identifier, current_check_nonce).get(),
@@ -205,8 +201,8 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
         &self,
         issued_token: &TokenIdentifier,
         amount: &BigUint,
-    ) -> SCResult<TokenIdentifier> {
-        self.check_token_exists(issued_token)?;
+    ) -> TokenIdentifier {
+        self.check_token_exists(issued_token);
 
         let bonding_curve = self.bonding_curve(issued_token).get();
 
@@ -215,7 +211,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
             "The token price was not set yet!"
         );
         require!(amount > &0, "Must pay more than 0 tokens!");
-        Ok(bonding_curve.payment_token)
+        bonding_curve.payment_token
     }
 
     fn check_given_token(&self, accepted_token: &TokenIdentifier, given_token: &TokenIdentifier) {
@@ -233,7 +229,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
         function_selector: &FunctionSelector<Self::Api>,
         amount: BigUint,
         arguments: CurveArguments<Self::Api>,
-    ) -> SCResult<BigUint> {
+    ) -> BigUint {
         let token_start = arguments.first_token_available();
         function_selector.calculate_price(&token_start, &amount, &arguments)
     }
@@ -243,7 +239,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
         function_selector: &FunctionSelector<Self::Api>,
         amount: BigUint,
         arguments: CurveArguments<Self::Api>,
-    ) -> SCResult<BigUint> {
+    ) -> BigUint {
         let token_start = &arguments.first_token_available() - &amount;
         function_selector.calculate_price(&token_start, &amount, &arguments)
     }
