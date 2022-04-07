@@ -1,10 +1,8 @@
-use std::rc::Rc;
-
 use mandos::model::{ScCallStep, Step, TxESDT};
 
 use crate::{
     tx_execution::sc_call_with_async_and_callback,
-    tx_mock::{generate_tx_hash_dummy, TxInput, TxInputESDT},
+    tx_mock::{generate_tx_hash_dummy, TxInput, TxInputESDT, TxResult},
     world_mock::BlockchainMock,
 };
 
@@ -12,15 +10,16 @@ use super::check_tx_output;
 
 impl BlockchainMock {
     pub fn mandos_sc_call(&mut self, sc_call_step: ScCallStep) -> &mut Self {
-        self.with_borrowed_rc(|rc| {
-            execute_rc(rc, &sc_call_step);
-        });
+        self.with_borrowed(|state| ((), execute_and_check(state, &sc_call_step)));
         self.mandos_trace.steps.push(Step::ScCall(sc_call_step));
         self
     }
 }
 
-fn execute_rc(state: &mut Rc<BlockchainMock>, sc_call_step: &ScCallStep) {
+pub(crate) fn execute(
+    mut state: BlockchainMock,
+    sc_call_step: &ScCallStep,
+) -> (TxResult, BlockchainMock) {
     let tx = &sc_call_step.tx;
     let tx_input = TxInput {
         from: tx.from.value.into(),
@@ -37,10 +36,19 @@ fn execute_rc(state: &mut Rc<BlockchainMock>, sc_call_step: &ScCallStep) {
         gas_price: tx.gas_price.value,
         tx_hash: generate_tx_hash_dummy(&sc_call_step.tx_id),
     };
-    let tx_result = sc_call_with_async_and_callback(tx_input, state, true);
+
+    // nonce gets increased irrespective of whether the tx fails or not
+    state.increase_account_nonce(&tx_input.from);
+
+    sc_call_with_async_and_callback(tx_input, state)
+}
+
+fn execute_and_check(state: BlockchainMock, sc_call_step: &ScCallStep) -> BlockchainMock {
+    let (tx_result, state) = execute(state, sc_call_step);
     if let Some(tx_expect) = &sc_call_step.expect {
         check_tx_output(&sc_call_step.tx_id, tx_expect, &tx_result);
     }
+    state
 }
 
 pub fn tx_esdt_transfers_from_mandos(mandos_transf_esdt: &[TxESDT]) -> Vec<TxInputESDT> {

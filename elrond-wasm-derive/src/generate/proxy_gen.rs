@@ -1,6 +1,6 @@
 use quote::ToTokens;
 
-use super::{method_gen::*, util::*};
+use super::util::*;
 use crate::{
     generate::{arg_regular::convert_to_owned_type, snippets, supertrait_gen},
     model::{ArgPaymentMetadata, ContractTrait, Method, MethodArgument, PublicRole},
@@ -55,7 +55,7 @@ pub fn generate_proxy_endpoint_sig(method: &Method) -> proc_macro2::TokenStream 
     };
     let result = quote! {
         fn #method_name #generics (
-            self,
+            &mut self,
             #(#arg_decl),*
         ) -> elrond_wasm::types::ContractCall<Self::Api, #ret_tok>
         #generics_where
@@ -65,12 +65,12 @@ pub fn generate_proxy_endpoint_sig(method: &Method) -> proc_macro2::TokenStream 
 
 pub fn generate_proxy_deploy_sig(method: &Method) -> proc_macro2::TokenStream {
     let method_name = &method.name;
-    let generics = &method.generics;
+    let mut generics = method.generics.clone();
     let generics_where = &method.generics.where_clause;
-    let arg_decl = arg_declarations(&method.method_args);
+    let arg_decl = proxy_arg_gen(&method.method_args, &mut generics);
     let result = quote! {
         fn #method_name #generics (
-            self,
+            &mut self,
             #(#arg_decl),*
         ) -> elrond_wasm::types::ContractDeploy<Self::Api>
         #generics_where
@@ -170,7 +170,7 @@ pub fn generate_proxy_endpoint(m: &Method, endpoint_name: String) -> proc_macro2
         #[allow(clippy::too_many_arguments)]
         #[allow(clippy::type_complexity)]
         #msig {
-            let ___address___ = self.into_fields();
+            let ___address___ = self.extract_address();
             let mut ___contract_call___ = elrond_wasm::types::new_contract_call(
                 ___address___,
                 #endpoint_name_literal,
@@ -242,9 +242,9 @@ pub fn generate_proxy_deploy(init_method: &Method) -> proc_macro2::TokenStream {
         #[allow(clippy::too_many_arguments)]
         #[allow(clippy::type_complexity)]
         #msig {
-            let ___address___ = self.into_fields();
+            let ___opt_address___ = self.extract_opt_address();
             let mut ___contract_deploy___ = elrond_wasm::types::new_contract_deploy::<Self::Api>(
-                ___address___,
+                ___opt_address___,
             );
             #(#arg_push_snippets)*
             ___contract_deploy___
