@@ -13,5 +13,4 @@ pub mod bonding_curve;
 #[cfg(feature = "alloc")]
 pub mod governance;
 
-#[cfg(feature = "alloc")]
 pub mod users;
