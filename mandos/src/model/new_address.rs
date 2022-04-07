@@ -21,3 +21,13 @@ impl InterpretableFrom<NewAddressRaw> for NewAddress {
         }
     }
 }
+
+impl NewAddress {
+    pub fn into_raw(self) -> NewAddressRaw {
+        NewAddressRaw {
+            creator_address: self.creator_address.original,
+            creator_nonce: self.creator_nonce.original,
+            new_address: self.new_address.original,
+        }
+    }
+}

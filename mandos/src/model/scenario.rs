@@ -27,3 +27,15 @@ impl InterpretableFrom<ScenarioRaw> for Scenario {
         }
     }
 }
+
+impl Scenario {
+    pub fn into_raw(self) -> ScenarioRaw {
+        ScenarioRaw {
+            name: self.name,
+            comment: self.comment,
+            check_gas: self.check_gas,
+            gas_schedule: None,
+            steps: self.steps.into_iter().map(Step::into_raw).collect(),
+        }
+    }
+}
