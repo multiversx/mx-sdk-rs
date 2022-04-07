@@ -29,7 +29,11 @@ macro_rules! managed_address {
 #[macro_export]
 macro_rules! managed_token_id {
     ($bytes:expr) => {{
-        elrond_wasm::types::TokenIdentifier::from_esdt_bytes($bytes)
+        if $bytes == &elrond_wasm::types::TokenIdentifier::<elrond_wasm_debug::DebugApi>::EGLD_REPRESENTATION[..] {
+            elrond_wasm::types::TokenIdentifier::egld()
+        } else {
+            elrond_wasm::types::TokenIdentifier::from_esdt_bytes($bytes)
+        }
     }};
 }
 
