@@ -72,7 +72,7 @@ pub trait GovernanceModule:
             "Exceeded max actions per proposal"
         );
 
-        let mut gov_actions: ArrayVec<GovernanceAction<Self::Api>, MAX_ACTIONS>;
+        let mut gov_actions = ArrayVec::new();
         for action in actions {
             let (gas_limit, dest_address, token_id, token_nonce, amount, function_name, arguments) =
                 action.into_tuple();
@@ -210,7 +210,7 @@ pub trait GovernanceModule:
             "Not enough gas to execute all proposals"
         );
 
-        for action in &proposal.actions {
+        for action in proposal.actions {
             let mut contract_call = self
                 .send()
                 .contract_call::<()>(action.dest_address, action.function_name)
@@ -326,9 +326,9 @@ pub trait GovernanceModule:
         }
 
         let actions = self.proposals().get(proposal_id).actions;
-        let mut actions_as_multiarg: MultiValueEncoded<GovernanceActionAsMultiArg<Self::Api>>;
+        let mut actions_as_multiarg = MultiValueEncoded::new();
 
-        for action in &actions {
+        for action in actions {
             actions_as_multiarg.push(action.into_multiarg());
         }
 
