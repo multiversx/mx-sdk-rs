@@ -10,7 +10,6 @@ pub mod pause;
 
 pub mod bonding_curve;
 
-#[cfg(feature = "alloc")]
 pub mod governance;
 
 pub mod users;
