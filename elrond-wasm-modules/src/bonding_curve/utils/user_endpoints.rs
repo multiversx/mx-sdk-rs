@@ -216,10 +216,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
 
     fn check_given_token(&self, accepted_token: &TokenIdentifier, given_token: &TokenIdentifier) {
         if given_token != accepted_token {
-            sc_panic!(
-                "Only {} tokens accepted",
-                accepted_token.as_managed_buffer()
-            );
+            sc_panic!("Only {} tokens accepted", accepted_token);
         }
     }
 
