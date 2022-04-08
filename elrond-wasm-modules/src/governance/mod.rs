@@ -68,7 +68,7 @@ pub trait GovernanceModule:
         );
         require!(!actions.is_empty(), "Proposal has no actions");
         require!(
-            actions.len() <= self.max_actions_per_proposal().get(),
+            actions.len() <= MAX_ACTIONS,
             "Exceeded max actions per proposal"
         );
 

@@ -40,7 +40,6 @@ pub trait GovernanceConfigurablePropertiesModule {
         governance_token_id: TokenIdentifier,
         quorum: BigUint,
         min_token_balance_for_proposal: BigUint,
-        max_actions_per_proposal: usize,
         voting_delay_in_blocks: u64,
         voting_period_in_blocks: u64,
         lock_time_after_voting_ends_in_blocks: u64,
@@ -55,7 +54,6 @@ pub trait GovernanceConfigurablePropertiesModule {
 
         self.try_change_quorum(quorum);
         self.try_change_min_token_balance_for_proposing(min_token_balance_for_proposal);
-        self.try_change_max_actions_per_proposal(max_actions_per_proposal);
         self.try_change_voting_delay_in_blocks(voting_delay_in_blocks);
         self.try_change_voting_period_in_blocks(voting_period_in_blocks);
         self.try_change_lock_time_after_voting_ends_in_blocks(
@@ -78,13 +76,6 @@ pub trait GovernanceConfigurablePropertiesModule {
         self.require_caller_self();
 
         self.try_change_min_token_balance_for_proposing(new_value);
-    }
-
-    #[endpoint(changeMaxActionsPerProposal)]
-    fn change_max_actions_per_proposal(&self, new_value: usize) {
-        self.require_caller_self();
-
-        self.try_change_max_actions_per_proposal(new_value);
     }
 
     #[endpoint(changeVotingDelayInBlocks)]
@@ -135,12 +126,6 @@ pub trait GovernanceConfigurablePropertiesModule {
         self.min_token_balance_for_proposing().set(&new_value);
     }
 
-    fn try_change_max_actions_per_proposal(&self, new_value: usize) {
-        require!(new_value != 0, "Max actions per proposal can't be set to 0");
-
-        self.max_actions_per_proposal().set(&new_value);
-    }
-
     fn try_change_voting_delay_in_blocks(&self, new_value: u64) {
         require!(new_value != 0, "Voting delay in blocks can't be set to 0");
 
@@ -180,10 +165,6 @@ pub trait GovernanceConfigurablePropertiesModule {
     #[view(getMinTokenBalanceForProposing)]
     #[storage_mapper("governance:minTokenBalanceForProposing")]
     fn min_token_balance_for_proposing(&self) -> SingleValueMapper<BigUint>;
-
-    #[view(getMaxActionsPerProposal)]
-    #[storage_mapper("governance:maxActionsPerProposal")]
-    fn max_actions_per_proposal(&self) -> SingleValueMapper<usize>;
 
     #[view(getVotingDelayInBlocks)]
     #[storage_mapper("governance:votingDelayInBlocks")]

@@ -80,10 +80,10 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
 
         if self.bonding_curve(&identifier).is_empty() {
             match payment_token {
+                OptionalValue::Some(token) => set_payment = token,
                 OptionalValue::None => {
                     sc_panic!("Expected provided accepted_payment for the token");
                 },
-                OptionalValue::Some(token) => set_payment = token,
             };
         }
         if self.token_details(&identifier).is_empty() {

@@ -74,12 +74,11 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
                     requested_amount.clone(),
                     bonding_curve.arguments.clone(),
                 );
-                let price_clone = price.clone();
                 require!(
-                    price_clone <= payment,
+                    price <= payment,
                     "The payment provided is not enough for the transaction"
                 );
-                bonding_curve.payment_amount += price_clone;
+                bonding_curve.payment_amount += &price;
                 bonding_curve.arguments.balance -= &requested_amount;
 
                 price
@@ -215,9 +214,11 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
     }
 
     fn check_given_token(&self, accepted_token: &TokenIdentifier, given_token: &TokenIdentifier) {
-        if given_token != accepted_token {
-            sc_panic!("Only {} tokens accepted", accepted_token);
-        }
+        require!(
+            given_token == accepted_token,
+            "Only {} tokens accepted",
+            accepted_token
+        );
     }
 
     fn compute_buy_price(

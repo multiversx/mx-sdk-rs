@@ -39,10 +39,9 @@ impl<M: ManagedTypeApi> TokenOwnershipData<M> {
     pub fn remove_nonce(&mut self, nonce: u64) {
         let index = self.token_nonces.iter().position(|n| n == nonce);
 
-        if let Some(value) = index {
-            self.token_nonces.remove(value)
-        } else {
-            M::error_api_impl().signal_error(b"Nonce requested is not available")
+        match index {
+            Some(value) => self.token_nonces.remove(value),
+            None => M::error_api_impl().signal_error(b"Nonce requested is not available"),
         };
     }
 }
