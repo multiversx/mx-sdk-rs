@@ -130,7 +130,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
         let mut nonces = self.token_details(&token).get().token_nonces;
         let mut total_amount = amount;
         loop {
-            require!(nonces.len() > 0, "Insufficient balance");
+            require!(!nonces.is_empty(), "Insufficient balance");
             let nonce = nonces.get(0);
             let available_amount = self.nonce_amount(&token, nonce).get();
 
@@ -194,7 +194,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
                 self.nonce_amount(&identifier, current_check_nonce).get(),
             )));
         }
-        availability.into()
+        availability
     }
 
     fn check_owned_return_payment_token(
