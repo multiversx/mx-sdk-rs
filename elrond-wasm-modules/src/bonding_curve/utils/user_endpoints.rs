@@ -216,11 +216,10 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
 
     fn check_given_token(&self, accepted_token: &TokenIdentifier, given_token: &TokenIdentifier) {
         if given_token != accepted_token {
-            let mut err = self.error().new_error();
-            err.append_bytes(&b"Only"[..]);
-            err.append_bytes(accepted_token.to_esdt_identifier().as_slice());
-            err.append_bytes(&b" tokens accepted"[..]);
-            err.exit_now()
+            sc_panic!(
+                "Only {} tokens accepted",
+                accepted_token.as_managed_buffer()
+            );
         }
     }
 

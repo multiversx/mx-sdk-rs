@@ -58,8 +58,8 @@ pub trait GovernanceModule:
     fn propose(
         &self,
         #[payment_amount] payment_amount: BigUint,
-        description: BoxedBytes,
-        #[var_args] actions: MultiValueVec<GovernanceActionAsMultiArg<Self::Api>>,
+        description: ManagedBuffer,
+        #[var_args] actions: MultiValueEncoded<GovernanceActionAsMultiArg<Self::Api>>,
     ) -> usize {
         self.require_payment_token_governance_token();
         require!(
@@ -308,7 +308,7 @@ pub trait GovernanceModule:
     }
 
     #[view(getProposalDescription)]
-    fn get_proposal_description(&self, proposal_id: usize) -> OptionalValue<BoxedBytes> {
+    fn get_proposal_description(&self, proposal_id: usize) -> OptionalValue<ManagedBuffer> {
         if !self.proposal_exists(proposal_id) {
             OptionalValue::None
         } else {
@@ -320,9 +320,9 @@ pub trait GovernanceModule:
     fn get_proposal_actions(
         &self,
         proposal_id: usize,
-    ) -> MultiValueVec<GovernanceActionAsMultiArg<Self::Api>> {
+    ) -> MultiValueEncoded<GovernanceActionAsMultiArg<Self::Api>> {
         if !self.proposal_exists(proposal_id) {
-            return MultiValueVec::new();
+            return MultiValueEncoded::new();
         }
 
         let actions = self.proposals().get(proposal_id).actions;
@@ -387,7 +387,7 @@ pub trait GovernanceModule:
         #[indexed] proposal_id: usize,
         #[indexed] proposer: &ManagedAddress,
         #[indexed] start_block: u64,
-        #[indexed] description: &BoxedBytes,
+        #[indexed] description: &ManagedBuffer,
         actions: &[GovernanceAction<Self::Api>],
     );
 
