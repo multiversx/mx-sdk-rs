@@ -4,7 +4,7 @@ use crate::{
         BigUintValue, BytesKey, BytesValue, CheckEsdtMap, CheckStorage, CheckStorageDetails,
         CheckValue, U64Value,
     },
-    serde_raw::{CheckAccountRaw, CheckBytesValueRaw},
+    serde_raw::CheckAccountRaw,
 };
 
 #[derive(Debug, Default)]
@@ -16,6 +16,7 @@ pub struct CheckAccount {
     pub username: CheckValue<BytesValue>,
     pub storage: CheckStorage,
     pub code: CheckValue<BytesValue>,
+    pub owner: CheckValue<BytesValue>, // WARNING! Not currently checked. TODO: implement check
     pub async_call_data: CheckValue<BytesValue>,
 }
 
@@ -73,6 +74,7 @@ impl InterpretableFrom<Box<CheckAccountRaw>> for CheckAccount {
             username: CheckValue::<BytesValue>::interpret_from(from.username, context),
             storage: CheckStorage::interpret_from(from.storage, context),
             code: CheckValue::<BytesValue>::interpret_from(from.code, context),
+            owner: CheckValue::<BytesValue>::interpret_from(from.owner, context),
             async_call_data: CheckValue::<BytesValue>::interpret_from(
                 from.async_call_data,
                 context,
@@ -91,7 +93,7 @@ impl IntoRaw<CheckAccountRaw> for CheckAccount {
             username: self.username.into_raw(),
             storage: self.storage.into_raw(),
             code: self.code.into_raw(),
-            owner: CheckBytesValueRaw::Unspecified,
+            owner: self.owner.into_raw(),
             async_call_data: self.async_call_data.into_raw(),
         }
     }

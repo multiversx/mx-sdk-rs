@@ -38,7 +38,7 @@ impl IntoRaw<CheckStorageDetailsRaw> for CheckStorageDetails {
             storages: self
                 .storages
                 .into_iter()
-                .map(|(k, v)| (k.into_raw(), v.into_raw()))
+                .map(|(k, v)| (k.into_raw(), v.into_raw_explicit()))
                 .collect(),
             other_storages_allowed: self.other_storages_allowed,
         }

@@ -60,7 +60,6 @@ fn execute(state: &BlockchainMock, accounts: &mandos::model::CheckAccounts) {
                 expected_account.code,
                 std::str::from_utf8(actual_code.as_slice()).unwrap()
             );
-
             if let CheckStorage::Equal(eq) = &expected_account.storage {
                 let default_value = &Vec::new();
                 for (expected_key, expected_value) in eq.storages.iter() {
