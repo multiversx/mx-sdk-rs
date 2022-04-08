@@ -24,7 +24,9 @@ pub trait TopDecodeMulti: Sized {
 }
 pub trait TopDecodeMultiLength {
     const LEN: usize;
-    fn get_len() -> usize;
+    fn get_len() -> usize {
+        Self::LEN
+    }
 }
 
 /// All single top decode types also work as multi-value decode types.
@@ -53,8 +55,4 @@ where
     T: TopEncode + TopDecode,
 {
     const LEN: usize = 1;
-
-    fn get_len() -> usize {
-        Self::LEN
-    }
 }

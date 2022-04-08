@@ -44,9 +44,6 @@ macro_rules! multi_value_impls {
                 $($name: TopDecodeMulti,)+
             {
                 const LEN: usize = $len;
-                fn get_len() -> usize {
-                    Self::LEN
-                }
             }
 
             impl<$($name),+ > TopDecodeMulti for $mv_struct<$($name,)+>
