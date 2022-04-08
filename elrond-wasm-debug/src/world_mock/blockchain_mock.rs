@@ -1,11 +1,12 @@
 use crate::{num_bigint::BigUint, tx_mock::BlockchainUpdate, ContractMap};
 use elrond_wasm::types::heap::Address;
 use mandos::{
-    interpret_trait::InterpreterContext, model::Scenario, value_interpreter::interpret_string,
+    interpret_trait::{InterpreterContext, IntoRaw},
+    model::Scenario,
+    value_interpreter::interpret_string,
 };
 use num_traits::Zero;
-use serde::Serialize;
-use std::{collections::HashMap, fs::File, io::Write, path::PathBuf};
+use std::{collections::HashMap, path::PathBuf};
 
 use super::{AccountData, BlockInfo};
 
@@ -19,7 +20,7 @@ pub struct BlockchainMock {
     pub current_block_info: BlockInfo,
     pub contract_map: ContractMap,
     pub current_dir: PathBuf,
-    pub mandos_trace: Scenario, // can be printed later - TODO: write the actual print
+    pub mandos_trace: Scenario,
 }
 
 impl BlockchainMock {
@@ -116,7 +117,7 @@ impl BlockchainMock {
     }
 
     pub fn write_mandos_trace(&mut self, file_path: &str) {
-        let mandos_trace = core::mem::replace(&mut self.mandos_trace, Scenario::default());
+        let mandos_trace = core::mem::take(&mut self.mandos_trace);
         let mandos_trace_raw = mandos_trace.into_raw();
         mandos_trace_raw.save_to_file(file_path);
     }

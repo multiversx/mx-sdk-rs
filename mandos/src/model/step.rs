@@ -12,6 +12,7 @@ use super::{
 
 #[derive(Debug)]
 pub struct ExternalStepsStep {
+    pub comment: Option<String>,
     pub path: String,
 }
 
@@ -90,8 +91,8 @@ pub enum Step {
 impl InterpretableFrom<StepRaw> for Step {
     fn interpret_from(from: StepRaw, context: &InterpreterContext) -> Self {
         match from {
-            StepRaw::ExternalSteps { comment: _, path } => {
-                Step::ExternalSteps(ExternalStepsStep { path })
+            StepRaw::ExternalSteps { comment, path } => {
+                Step::ExternalSteps(ExternalStepsStep { comment, path })
             },
             StepRaw::SetState {
                 comment,
@@ -186,9 +187,10 @@ impl InterpretableFrom<StepRaw> for Step {
 impl IntoRaw<StepRaw> for Step {
     fn into_raw(self) -> StepRaw {
         match self {
-            // Step::ExternalSteps(external_steps_step) => {
-            //     todo!()
-            // },
+            Step::ExternalSteps(s) => StepRaw::ExternalSteps {
+                comment: s.comment,
+                path: s.path,
+            },
             Step::SetState(s) => StepRaw::SetState {
                 comment: s.comment,
                 accounts: s
@@ -205,28 +207,42 @@ impl IntoRaw<StepRaw> for Step {
                 previous_block_info: s.previous_block_info.map(|bi| bi.into_raw()),
                 current_block_info: s.current_block_info.map(|bi| bi.into_raw()),
             },
-            // Step::ScCall(sc_call_step) => {
-            //     state.mandos_sc_call(sc_call_step);
-            // },
-            // Step::ScQuery(sc_query_step) => {
-            //     state.mandos_sc_query(sc_query_step);
-            // },
-            // Step::ScDeploy(sc_deploy_step) => {
-            //     state.mandos_sc_deploy(sc_deploy_step);
-            // },
-            // Step::Transfer(transfer_step) => {
-            //     state.mandos_transfer(transfer_step);
-            // },
-            // Step::ValidatorReward(validator_reward_step) => {
-            //     state.mandos_validator_reward(validator_reward_step);
-            // },
+            Step::ScCall(s) => StepRaw::ScCall {
+                tx_id: s.tx_id,
+                comment: s.comment,
+                display_logs: None,
+                tx: s.tx.into_raw(),
+                expect: s.expect.map(|expect| expect.into_raw()),
+            },
+            Step::ScQuery(s) => StepRaw::ScQuery {
+                tx_id: s.tx_id,
+                comment: s.comment,
+                display_logs: None,
+                tx: s.tx.into_raw(),
+                expect: s.expect.map(|expect| expect.into_raw()),
+            },
+            Step::ScDeploy(s) => StepRaw::ScDeploy {
+                tx_id: s.tx_id,
+                comment: s.comment,
+                display_logs: None,
+                tx: s.tx.into_raw(),
+                expect: s.expect.map(|expect| expect.into_raw()),
+            },
+            Step::Transfer(s) => StepRaw::Transfer {
+                tx_id: s.tx_id,
+                comment: s.comment,
+                tx: s.tx.into_raw(),
+            },
+            Step::ValidatorReward(s) => StepRaw::ValidatorReward {
+                tx_id: s.tx_id,
+                comment: s.comment,
+                tx: s.tx.into_raw(),
+            },
             Step::CheckState(s) => StepRaw::CheckState {
                 comment: s.comment,
                 accounts: s.accounts.into_raw(),
             },
-            _ => StepRaw::DumpState {
-                comment: Some("TEMP".to_string()),
-            },
+            Step::DumpState(s) => StepRaw::DumpState { comment: s.comment },
         }
     }
 }

@@ -29,6 +29,16 @@ impl IntoRaw<ValueSubTree> for BigUintValue {
     }
 }
 
+impl BigUintValue {
+    pub fn into_raw_opt(self) -> Option<ValueSubTree> {
+        if self.value == 0u32.into() {
+            None
+        } else {
+            Some(self.into_raw())
+        }
+    }
+}
+
 impl InterpretableFrom<&str> for BigUintValue {
     fn interpret_from(from: &str, context: &InterpreterContext) -> Self {
         let bytes = interpret_string(from, context);

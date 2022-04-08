@@ -53,6 +53,16 @@ impl IntoRaw<ValueSubTree> for U64Value {
     }
 }
 
+impl U64Value {
+    pub fn into_raw_opt(self) -> Option<ValueSubTree> {
+        if self.value > 0 {
+            Some(self.into_raw())
+        } else {
+            None
+        }
+    }
+}
+
 impl InterpretableFrom<&str> for U64Value {
     fn interpret_from(from: &str, context: &InterpreterContext) -> Self {
         let bytes = interpret_string(from, context);
