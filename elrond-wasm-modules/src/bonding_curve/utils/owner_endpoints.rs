@@ -24,7 +24,6 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
             .esdt_system_sc_proxy()
             .set_special_roles(&address, &token_identifier, roles.into_iter())
             .async_call()
-            .with_callback(OwnerEndpointsModule::callbacks(self).change_roles_callback())
             .call_and_exit()
     }
 
@@ -39,19 +38,7 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
             .esdt_system_sc_proxy()
             .unset_special_roles(&address, &token_identifier, roles.into_iter())
             .async_call()
-            .with_callback(OwnerEndpointsModule::callbacks(self).change_roles_callback())
             .call_and_exit()
-    }
-
-    #[callback]
-    fn change_roles_callback(
-        &self,
-        #[call_result] result: ManagedAsyncCallResult<()>,
-    ) -> SCResult<(), ManagedSCError> {
-        match result {
-            ManagedAsyncCallResult::Ok(()) => Ok(()),
-            ManagedAsyncCallResult::Err(message) => Err(message.err_msg.into()),
-        }
     }
 
     #[endpoint(setBondingCurve)]
@@ -60,7 +47,7 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
         identifier: TokenIdentifier,
         function: FunctionSelector<Self::Api>,
         sell_availability: bool,
-    ) -> SCResult<()> {
+    ) {
         require!(
             !self.token_details(&identifier).is_empty(),
             "Token is not issued yet!"
@@ -77,7 +64,6 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
             bonding_curve.curve = function;
             bonding_curve.sell_availability = sell_availability
         });
-        Ok(())
     }
 
     #[endpoint(deposit)]
@@ -88,17 +74,22 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
         #[payment_token] identifier: TokenIdentifier,
         #[payment_nonce] nonce: u64,
         #[var_args] payment_token: OptionalValue<TokenIdentifier>,
-    ) -> SCResult<()> {
+    ) {
         let caller = self.blockchain().get_caller();
-        let mut set_payment = TokenIdentifier::egld();
+        let mut set_payment: TokenIdentifier = TokenIdentifier::egld();
+
         if self.bonding_curve(&identifier).is_empty() {
-            set_payment = payment_token
-                .into_option()
-                .ok_or("Expected provided accepted_payment for the token")?;
+            match payment_token {
+                OptionalValue::Some(token) => set_payment = token,
+                OptionalValue::None => {
+                    sc_panic!("Expected provided accepted_payment for the token");
+                },
+            };
         }
         if self.token_details(&identifier).is_empty() {
+            let nonces = ManagedVec::from_single_item(nonce);
             self.token_details(&identifier).set(&TokenOwnershipData {
-                token_nonces: [nonce].to_vec(),
+                token_nonces: nonces,
                 owner: caller.clone(),
             });
         } else {
@@ -117,11 +108,10 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
         self.owned_tokens(&caller).insert(identifier.clone());
         self.nonce_amount(&identifier, nonce)
             .update(|current_amount| *current_amount += amount);
-        Ok(())
     }
 
     #[endpoint(claim)]
-    fn claim(&self) -> SCResult<()> {
+    fn claim(&self) {
         let caller = self.blockchain().get_caller();
         require!(
             !self.owned_tokens(&caller).is_empty(),
@@ -129,7 +119,7 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
         );
         for token in self.owned_tokens(&caller).iter() {
             let nonces = self.token_details(&token).get().token_nonces;
-            for nonce in nonces {
+            for nonce in &nonces {
                 self.send().direct(
                     &caller,
                     &token,
@@ -143,8 +133,6 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
             self.bonding_curve(&token).clear();
         }
         self.owned_tokens(&caller).clear();
-
-        Ok(())
     }
 
     fn set_curve_storage(
