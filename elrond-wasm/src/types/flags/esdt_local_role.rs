@@ -122,6 +122,12 @@ impl<'a> From<&'a [u8]> for EsdtLocalRole {
             Self::NftAddQuantity
         } else if byte_slice == ESDT_ROLE_NFT_BURN {
             Self::NftBurn
+        } else if byte_slice == ESDT_ROLE_NFT_ADD_URI {
+            Self::NftAddUri
+        } else if byte_slice == ESDT_ROLE_NFT_UPDATE_ATTRIBUTES {
+            Self::NftUpdateAttributes
+        } else if byte_slice == ESDT_ROLE_TRANSFER {
+            Self::Transfer
         } else {
             Self::None
         }
