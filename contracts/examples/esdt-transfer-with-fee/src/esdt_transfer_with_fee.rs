@@ -56,10 +56,7 @@ pub trait EsdtTransferWithFee {
                     );
 
                     self.paid_fees()
-                        .entry((
-                            payment.token_identifier.clone(),
-                            payment.token_nonce.clone(),
-                        ))
+                        .entry((payment.token_identifier.clone(), payment.token_nonce))
                         .and_modify(|value| *value += fee.amount.clone());
 
                     payment.amount -= fee.amount.clone();
@@ -75,7 +72,7 @@ pub trait EsdtTransferWithFee {
         if self.specific_fee(&payment.token_identifier).is_empty() {
             self.calculate_fee(self.general_fee().get(), payment)
         } else {
-            self.calculate_fee(self.general_fee().get(), payment)
+            self.calculate_fee(self.specific_fee(&payment.token_identifier).get(), payment)
         }
     }
 
