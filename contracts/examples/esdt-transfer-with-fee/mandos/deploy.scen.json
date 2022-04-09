@@ -22,7 +22,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
-                        "str:MFNFT-67890": {
+                        "str:MFNFT-567890": {
                             "instances": [
                                 {
                                     "nonce": "1",
@@ -88,7 +88,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
-                        "str:MFNFT-67890": {
+                        "str:MFNFT-567890": {
                             "instances": [
                                 {
                                     "nonce": "1",
