@@ -1,0 +1,241 @@
+{
+    "name": "setup fees & transfer",
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "deploy.scen.json"
+        },
+        {
+            "step": "scCall",
+            "txId": "2",
+            "tx": {
+                "from": "address:user1",
+                "to": "sc:esdt-transfer-with-fee",
+                "function": "transfer",
+                "esdt": {
+                    "tokenIdentifier": "str:WUSDC-abcdef",
+                    "value": "100"
+                },
+                "arguments": [
+                    "address:user2"
+                ],
+                "gasLimit": "5,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:Fees are not set yet",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "3",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:esdt-transfer-with-fee",
+                "function": "set_general_fee",
+                "arguments": [
+                    "u8:0|u8:0|nested:str:USDC-aaaaaa|u64:0|biguint:10"
+                ],
+                "gasLimit": "5,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "message": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "4",
+            "tx": {
+                "from": "address:user1",
+                "to": "sc:esdt-transfer-with-fee",
+                "function": "transfer",
+                "esdt": {
+                    "str:USDC-aaaaaa": {
+                        "balance": "100"
+                    }
+                },
+                "arguments": [
+                    "address:user2"
+                ],
+                "gasLimit": "5,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "message": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "5",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:esdt-transfer-with-fee",
+                "function": "set_fee_for_token",
+                "arguments": [
+                    "u8:1|u32:10",
+                    "str:USDC-aaaaaa"
+                ],
+                "gasLimit": "5,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "message": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "6",
+            "tx": {
+                "from": "address:user2",
+                "to": "sc:esdt-transfer-with-fee",
+                "function": "transfer",
+                "esdt": {
+                    "str:USDC-aaaaaa": {
+                        "balance": "10"
+                    }
+                },
+                "arguments": [
+                    "address:owner"
+                ],
+                "gasLimit": "5,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "message": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "7",
+            "tx": {
+                "from": "address:user2",
+                "to": "sc:esdt-transfer-with-fee",
+                "function": "transfer",
+                "esdt": {
+                    "str:MFNFT-67890": {
+                        "instances": [
+                            {
+                                "nonce": "1",
+                                "balance": "1"
+                            },
+                            {
+                                "nonce": "2",
+                                "balance": "1"
+                            }
+                        ]
+                    },
+                    "str:USDC-aaaaaa": {
+                        "balance": "30"
+                    }
+                },
+                "arguments": [
+                    "address:user1"
+                ],
+                "gasLimit": "5,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "message": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "4",
+                    "balance": "0",
+                    "esdt": {
+                        "str:USDC-aaaaaa": {
+                            "balance": "9"
+                        }
+                    },
+                    "storage": {}
+                },
+                "address:user1": {
+                    "nonce": "2",
+                    "balance": "0",
+                    "esdt": {
+                        "str:MFNFT-67890": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "1"
+                                },
+                                {
+                                    "nonce": "2",
+                                    "balance": "1"
+                                }
+                            ]
+                        },
+                        "str:USDC-aaaaaa": {
+                            "balance": "409"
+                        }
+                    }
+                },
+                "address:user2": {
+                    "nonce": "2",
+                    "balance": "0",
+                    "esdt": {
+                        "str:MFNFT-67890": {
+                            "instances": [
+                                {
+                                    "nonce": "3",
+                                    "balance": "1"
+                                }
+                            ]
+                        },
+                        "str:USDC-aaaaaa": {
+                            "balance": "50"
+                        }
+                    }
+                },
+                "sc:esdt-transfer-with-fee": {
+                    "nonce": "0",
+                    "esdt": {
+                        "str:USDC-aaaaaa": {
+                            "balance": "32"
+                        }
+                    },
+                    "storage": {
+                        "str:general_fee": "u8:0|u8:0|nested:str:USDC-aaaaaa|u64:0|biguint:10",
+                        "str:specific_fee|nested:str:USDC-aaaaaa": "u8:1|u32:10"
+                    },
+                    "code": "file:../output/esdt-transfer-with-fee.wasm",
+                    "owner": "address:owner"
+                }
+            }
+        }
+    ]
+}

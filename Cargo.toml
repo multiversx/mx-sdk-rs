@@ -30,6 +30,8 @@ members = [
 
   "contracts/examples/adder",
   "contracts/examples/adder/meta",
+  "contracts/examples/esdt-transfer-with-fee",
+  "contracts/examples/esdt-transfer-with-fee/meta",
   "contracts/examples/bonding-curve-contract",
   "contracts/examples/bonding-curve-contract/meta",
   "contracts/examples/crowdfunding-esdt",
