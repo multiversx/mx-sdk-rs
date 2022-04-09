@@ -21,6 +21,18 @@ pub trait EsdtTransferWithFee {
         self.specific_fee(&token).set(fee);
     }
 
+    #[only_owner]
+    #[endpoint]
+    fn claim_fees(&self) {
+        let mut fees = ManagedVec::new();
+        for ((token, nonce), amount) in self.paid_fees().iter() {
+            fees.push(EsdtTokenPayment::new(token, nonce, amount))
+        }
+
+        let caller = self.blockchain().get_caller();
+        self.send().direct_multi(&caller, &fees, &[]);
+    }
+
     #[payable("*")]
     #[endpoint]
     fn transfer(&self, address: ManagedAddress) {
@@ -42,8 +54,14 @@ pub trait EsdtTransferWithFee {
                         payment.amount >= fee.amount,
                         "Insufficient payments for covering fees"
                     );
-                    self.paid_fees(&payment.token_identifier)
-                        .update(|value| *value += fee.amount.clone());
+
+                    self.paid_fees()
+                        .entry((
+                            payment.token_identifier.clone(),
+                            payment.token_nonce.clone(),
+                        ))
+                        .and_modify(|value| *value += fee.amount.clone());
+
                     payment.amount -= fee.amount.clone();
                     break;
                 }
@@ -90,5 +108,5 @@ pub trait EsdtTransferWithFee {
 
     #[view(getPaidFees)]
     #[storage_mapper("paid_fees")]
-    fn paid_fees(&self, token: &TokenIdentifier) -> SingleValueMapper<BigUint>;
+    fn paid_fees(&self) -> MapMapper<(TokenIdentifier, u64), BigUint>;
 }
