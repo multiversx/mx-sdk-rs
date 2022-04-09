@@ -15,13 +15,11 @@ impl<M: ManagedTypeApi> CurveFunction<M> for LinearFunction<M> {
         token_start: &BigUint<M>,
         amount: &BigUint<M>,
         _arguments: &CurveArguments<M>,
-    ) -> SCResult<BigUint<M>> {
-        Ok(
-            &self.linear_coefficient * &sum_interval(amount, token_start)
-                + &self.initial_price * amount,
-        )
+    ) -> BigUint<M> {
+        &self.linear_coefficient * &sum_interval(amount, token_start) + &self.initial_price * amount
     }
 }
+
 fn sum_interval<M: ManagedTypeApi>(n: &BigUint<M>, x: &BigUint<M>) -> BigUint<M> {
     x * n + &(n - 1u32) * n / 2u32
 }

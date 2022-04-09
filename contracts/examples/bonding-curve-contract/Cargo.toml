@@ -11,12 +11,10 @@ path = "src/bonding_curve_contract.rs"
 [dependencies.elrond-wasm]
 version = "0.30.0"
 path = "../../../elrond-wasm"
-features = ["alloc"]
 
 [dependencies.elrond-wasm-modules]
 version = "0.30.0"
 path = "../../../elrond-wasm-modules"
-features = ["alloc"]
 
 [dev-dependencies.elrond-wasm-debug]
 version = "0.30.0"

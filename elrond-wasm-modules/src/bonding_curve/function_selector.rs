@@ -25,7 +25,7 @@ impl<M: ManagedTypeApi> CurveFunction<M> for FunctionSelector<M> {
         token_start: &BigUint<M>,
         amount: &BigUint<M>,
         arguments: &CurveArguments<M>,
-    ) -> SCResult<BigUint<M>> {
+    ) -> BigUint<M> {
         match &self {
             FunctionSelector::Linear(linear_function) => {
                 CurveFunction::calculate_price(linear_function, token_start, amount, arguments)
@@ -33,10 +33,11 @@ impl<M: ManagedTypeApi> CurveFunction<M> for FunctionSelector<M> {
 
             FunctionSelector::CustomExample(initial_cost) => {
                 let sum = token_start + amount;
-                let price = &(&sum * &sum * sum / 3u32) + &arguments.balance + initial_cost.clone();
-                Ok(price)
+                &(&sum * &sum * sum / 3u32) + &arguments.balance + initial_cost.clone()
             },
-            FunctionSelector::None => Err("Bonding Curve function is not assiged".into()),
+            FunctionSelector::None => {
+                M::error_api_impl().signal_error(b"Bonding Curve function is not assiged")
+            },
         }
     }
 }
