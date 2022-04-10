@@ -33,6 +33,58 @@ fn check_display<T: SCDisplay + Display>(item: T) {
     assert_eq!(receiver.0, expected);
 }
 
+/// Expects that the output from SCLowerHex is the same as the standard Rust display.
+fn check_lower_hex<T: SCLowerHex + Display + std::fmt::LowerHex>(item: T) {
+    let mut receiver = SimpleReceiver::default();
+    SCLowerHex::fmt(&item, &mut receiver);
+    let expected = format!("{:x}", item);
+    assert_eq!(receiver.0, expected);
+}
+
+#[test]
+fn test_lower_hex_usigned() {
+    check_lower_hex(0x0u8);
+    check_lower_hex(0x50u8);
+    check_lower_hex(0xFFu8);
+    check_lower_hex(0x0u16);
+    check_lower_hex(0x50u16);
+    check_lower_hex(0xFFFFu16);
+    check_lower_hex(0x0u32);
+    check_lower_hex(0x50u32);
+    check_lower_hex(0xFFFFFFFFu32);
+    check_lower_hex(0x50u32);
+    check_lower_hex(0x0u64);
+    check_lower_hex(0x5u64);
+    check_lower_hex(0x50u64);
+    check_lower_hex(u64::MAX);
+}
+
+#[test]
+fn test_lower_hex_signed() {
+    check_lower_hex(0xai32);
+    check_lower_hex(5i32);
+    check_lower_hex(50i32);
+    check_lower_hex(-2i32);
+    check_lower_hex(-1i16);
+    check_lower_hex(-50i32);
+    check_lower_hex(-100i32);
+    check_lower_hex(-0xFFi32);
+    check_lower_hex(-0xFFFFi32);
+    check_lower_hex(-0x01i64);
+    check_lower_hex(-0x50i64);
+    check_lower_hex(-0xFFi64);
+    check_lower_hex(-0xFFFFi64);
+    check_lower_hex(-0xFFFFFFFFi64);
+    check_lower_hex(i8::MAX);
+    check_lower_hex(i8::MIN);
+    check_lower_hex(i16::MAX);
+    check_lower_hex(i16::MIN);
+    check_lower_hex(i32::MAX);
+    check_lower_hex(i32::MIN);
+    check_lower_hex(i64::MAX);
+    check_lower_hex(i64::MIN);
+}
+
 #[test]
 fn test_display_usigned() {
     check_display(0u8);
