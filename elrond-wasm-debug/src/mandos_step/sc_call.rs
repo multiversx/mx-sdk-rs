@@ -1,18 +1,46 @@
+use elrond_wasm::{
+    elrond_codec::{CodecFrom, PanicErrorHandler, TopEncodeMulti},
+    types::ContractCall,
+};
 use mandos::model::{ScCallStep, Step, TxESDT};
 
 use crate::{
     tx_execution::sc_call_with_async_and_callback,
     tx_mock::{generate_tx_hash_dummy, TxInput, TxInputESDT, TxResult},
     world_mock::BlockchainMock,
+    CallBuilder, DebugApi,
 };
 
 use super::check_tx_output;
 
 impl BlockchainMock {
+    /// Adds a mandos SC call step, as specified in the `sc_call_step` argument, then executes it.
     pub fn mandos_sc_call(&mut self, sc_call_step: ScCallStep) -> &mut Self {
-        self.with_borrowed(|state| ((), execute_and_check(state, &sc_call_step)));
+        let _ = self.with_borrowed(|state| execute_and_check(state, &sc_call_step));
         self.mandos_trace.steps.push(Step::ScCall(sc_call_step));
         self
+    }
+
+    /// Adds a mandos SC call step, executes it and retrieves the transaction result ("out" field).
+    ///
+    /// The transaction is expected to complete successfully.
+    ///
+    /// It takes the `contract_call` argument separately from the SC call step,
+    /// so we can benefit from type inference in the result.
+    pub fn mandos_sc_call_get_result<OriginalResult, RequestedResult>(
+        &mut self,
+        contract_call: ContractCall<DebugApi, OriginalResult>,
+        mut sc_call_step: ScCallStep,
+    ) -> RequestedResult
+    where
+        OriginalResult: TopEncodeMulti,
+        RequestedResult: CodecFrom<OriginalResult>,
+    {
+        sc_call_step = sc_call_step.call(contract_call);
+        let tx_result = self.with_borrowed(|state| execute_and_check(state, &sc_call_step));
+        self.mandos_trace.steps.push(Step::ScCall(sc_call_step));
+        let mut raw_result = tx_result.result_values;
+        RequestedResult::multi_decode_or_handle_err(&mut raw_result, PanicErrorHandler).unwrap()
     }
 }
 
@@ -43,12 +71,15 @@ pub(crate) fn execute(
     sc_call_with_async_and_callback(tx_input, state)
 }
 
-fn execute_and_check(state: BlockchainMock, sc_call_step: &ScCallStep) -> BlockchainMock {
+fn execute_and_check(
+    state: BlockchainMock,
+    sc_call_step: &ScCallStep,
+) -> (TxResult, BlockchainMock) {
     let (tx_result, state) = execute(state, sc_call_step);
     if let Some(tx_expect) = &sc_call_step.expect {
         check_tx_output(&sc_call_step.tx_id, tx_expect, &tx_result);
     }
-    state
+    (tx_result, state)
 }
 
 pub fn tx_esdt_transfers_from_mandos(mandos_transf_esdt: &[TxESDT]) -> Vec<TxInputESDT> {
