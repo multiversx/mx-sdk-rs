@@ -11,6 +11,7 @@ bitflags! {
         const NFT_BURN              = 0b00010000;
         const NFT_ADD_URI           = 0b00100000;
         const NFT_UPDATE_ATTRIBUTES = 0b01000000;
+        const TRANSFER              = 0b10000000;
     }
 }
 

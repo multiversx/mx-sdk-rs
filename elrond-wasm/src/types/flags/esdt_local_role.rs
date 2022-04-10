@@ -12,6 +12,7 @@ const ESDT_ROLE_NFT_ADD_QUANTITY: &[u8] = b"ESDTRoleNFTAddQuantity";
 const ESDT_ROLE_NFT_BURN: &[u8] = b"ESDTRoleNFTBurn";
 const ESDT_ROLE_NFT_ADD_URI: &[u8] = b"ESDTRoleNFTAddURI";
 const ESDT_ROLE_NFT_UPDATE_ATTRIBUTES: &[u8] = b"ESDTRoleNFTUpdateAttributes";
+const ESDT_ROLE_TRANSFER: &[u8] = b"ESDTRoleTransfer";
 
 #[derive(
     TopDecode, TopEncode, NestedDecode, NestedEncode, TypeAbi, Clone, PartialEq, Debug, Copy,
@@ -25,10 +26,11 @@ pub enum EsdtLocalRole {
     NftBurn,
     NftAddUri,
     NftUpdateAttributes,
+    Transfer,
 }
 
 impl EsdtLocalRole {
-    pub fn as_u8(&self) -> u8 {
+    pub fn as_u16(&self) -> u16 {
         match self {
             Self::None => 0,
             Self::Mint => 1,
@@ -38,6 +40,7 @@ impl EsdtLocalRole {
             Self::NftBurn => 5,
             Self::NftAddUri => 6,
             Self::NftUpdateAttributes => 7,
+            Self::Transfer => 8,
         }
     }
 
@@ -51,6 +54,7 @@ impl EsdtLocalRole {
             Self::NftBurn => ESDT_ROLE_NFT_BURN,
             Self::NftAddUri => ESDT_ROLE_NFT_ADD_URI,
             Self::NftUpdateAttributes => ESDT_ROLE_NFT_UPDATE_ATTRIBUTES,
+            Self::Transfer => ESDT_ROLE_TRANSFER,
         }
     }
 
@@ -64,13 +68,14 @@ impl EsdtLocalRole {
             Self::NftBurn => EsdtLocalRoleFlags::NFT_BURN,
             Self::NftAddUri => EsdtLocalRoleFlags::NFT_ADD_URI,
             Self::NftUpdateAttributes => EsdtLocalRoleFlags::NFT_UPDATE_ATTRIBUTES,
+            Self::Transfer => EsdtLocalRoleFlags::TRANSFER,
         }
     }
 }
 
 // TODO: can be done with macros, but I didn't find a public library that does it and is no_std
 // we can implement it, it's easy
-const ALL_ROLES: [EsdtLocalRole; 7] = [
+const ALL_ROLES: [EsdtLocalRole; 8] = [
     EsdtLocalRole::Mint,
     EsdtLocalRole::Burn,
     EsdtLocalRole::NftCreate,
@@ -78,6 +83,7 @@ const ALL_ROLES: [EsdtLocalRole; 7] = [
     EsdtLocalRole::NftBurn,
     EsdtLocalRole::NftAddUri,
     EsdtLocalRole::NftUpdateAttributes,
+    EsdtLocalRole::Transfer,
 ];
 
 impl EsdtLocalRole {
@@ -86,15 +92,18 @@ impl EsdtLocalRole {
     }
 }
 
-impl From<u8> for EsdtLocalRole {
+impl From<u16> for EsdtLocalRole {
     #[inline]
-    fn from(value: u8) -> Self {
+    fn from(value: u16) -> Self {
         match value {
             1 => Self::Mint,
             2 => Self::Burn,
             3 => Self::NftCreate,
             4 => Self::NftAddQuantity,
             5 => Self::NftBurn,
+            6 => Self::NftAddUri,
+            7 => Self::NftUpdateAttributes,
+            8 => Self::Transfer,
             _ => Self::None,
         }
     }
@@ -113,6 +122,12 @@ impl<'a> From<&'a [u8]> for EsdtLocalRole {
             Self::NftAddQuantity
         } else if byte_slice == ESDT_ROLE_NFT_BURN {
             Self::NftBurn
+        } else if byte_slice == ESDT_ROLE_NFT_ADD_URI {
+            Self::NftAddUri
+        } else if byte_slice == ESDT_ROLE_NFT_UPDATE_ATTRIBUTES {
+            Self::NftUpdateAttributes
+        } else if byte_slice == ESDT_ROLE_TRANSFER {
+            Self::Transfer
         } else {
             Self::None
         }
@@ -125,7 +140,7 @@ impl ManagedVecItem for EsdtLocalRole {
     type Ref<'a> = Self;
 
     fn from_byte_reader<Reader: FnMut(&mut [u8])>(reader: Reader) -> Self {
-        u8::from_byte_reader(reader).into()
+        u16::from_byte_reader(reader).into()
     }
 
     unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
@@ -135,6 +150,6 @@ impl ManagedVecItem for EsdtLocalRole {
     }
 
     fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, writer: Writer) -> R {
-        <u8 as ManagedVecItem>::to_byte_writer(&self.as_u8(), writer)
+        <u16 as ManagedVecItem>::to_byte_writer(&self.as_u16(), writer)
     }
 }
