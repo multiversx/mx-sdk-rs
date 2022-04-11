@@ -44,7 +44,10 @@ pub fn proxy_arg_gen(
     args_decl
 }
 
-pub fn generate_proxy_endpoint_sig(method: &Method) -> proc_macro2::TokenStream {
+pub fn generate_proxy_method_sig(
+    method: &Method,
+    proxy_return_struct_path: proc_macro2::TokenStream,
+) -> proc_macro2::TokenStream {
     let method_name = &method.name;
     let mut generics = method.generics.clone();
     let generics_where = &method.generics.where_clause;
@@ -57,33 +60,14 @@ pub fn generate_proxy_endpoint_sig(method: &Method) -> proc_macro2::TokenStream 
         fn #method_name #generics (
             &mut self,
             #(#arg_decl),*
-        ) -> elrond_wasm::types::ContractCall<Self::Api, #ret_tok>
-        #generics_where
-    };
-    result
-}
-
-pub fn generate_proxy_deploy_sig(method: &Method) -> proc_macro2::TokenStream {
-    let method_name = &method.name;
-    let mut generics = method.generics.clone();
-    let generics_where = &method.generics.where_clause;
-    let arg_decl = proxy_arg_gen(&method.method_args, &mut generics);
-    let ret_tok = match &method.return_type {
-        syn::ReturnType::Default => quote! { () },
-        syn::ReturnType::Type(_, ty) => quote! { #ty },
-    };
-    let result = quote! {
-        fn #method_name #generics (
-            &mut self,
-            #(#arg_decl),*
-        ) -> elrond_wasm::types::ContractDeploy<Self::Api, #ret_tok>
+        ) -> #proxy_return_struct_path<Self::Api, #ret_tok>
         #generics_where
     };
     result
 }
 
 pub fn generate_proxy_endpoint(m: &Method, endpoint_name: String) -> proc_macro2::TokenStream {
-    let msig = generate_proxy_endpoint_sig(m);
+    let msig = generate_proxy_method_sig(m, quote! { elrond_wasm::types::ContractCall });
 
     let mut token_count = 0;
     let mut token_expr = quote! { elrond_wasm::types::TokenIdentifier::<Self::Api>::egld() };
@@ -191,7 +175,8 @@ pub fn generate_proxy_endpoint(m: &Method, endpoint_name: String) -> proc_macro2
 }
 
 pub fn generate_proxy_deploy(init_method: &Method) -> proc_macro2::TokenStream {
-    let msig = generate_proxy_deploy_sig(init_method);
+    let msig =
+        generate_proxy_method_sig(init_method, quote! { elrond_wasm::types::ContractDeploy });
 
     let mut payment_count = 0;
     let mut multi_count = 0;
