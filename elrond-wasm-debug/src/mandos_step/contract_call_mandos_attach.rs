@@ -86,8 +86,8 @@ where
     }
 }
 
-impl CallBuilder<ContractDeploy<DebugApi>> for ScDeployStep {
-    fn call(mut self, contract_deploy: ContractDeploy<DebugApi>) -> Self {
+impl<OriginalResult> CallBuilder<ContractDeploy<DebugApi, OriginalResult>> for ScDeployStep {
+    fn call(mut self, contract_deploy: ContractDeploy<DebugApi, OriginalResult>) -> Self {
         let (_, mandos_args) = process_contract_deploy(contract_deploy);
         for arg in mandos_args {
             self = self.argument(arg.as_str());
@@ -121,8 +121,8 @@ fn process_contract_call<OriginalResult>(
 /// Extracts
 /// - (optional) recipient (needed for contract upgrade, not yet used);
 /// - the arguments.
-fn process_contract_deploy(
-    contract_deploy: ContractDeploy<DebugApi>,
+fn process_contract_deploy<OriginalResult>(
+    contract_deploy: ContractDeploy<DebugApi, OriginalResult>,
 ) -> (Option<String>, Vec<String>) {
     let to_str = contract_deploy
         .to

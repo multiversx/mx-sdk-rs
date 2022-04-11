@@ -1,12 +1,13 @@
 use core::marker::PhantomData;
 
-use elrond_codec::TopEncodeMulti;
+use elrond_codec::{CodecFrom, TopEncodeMulti};
 
 use crate::{
     api::{BlockchainApiImpl, ErrorApiImpl, SendApi, SendApiImpl},
     contract_base::ExitCodecErrorHandler,
     err_msg,
     types::{BigUint, CodeMetadata, ManagedAddress, ManagedBuffer, ManagedVec},
+    ArgErrorHandler, ArgId, ManagedResultArgLoader,
 };
 
 use super::ManagedArgBuffer;
@@ -17,7 +18,7 @@ use super::ManagedArgBuffer;
 const UNSPECIFIED_GAS_LIMIT: u64 = u64::MAX;
 
 #[must_use]
-pub struct ContractDeploy<SA>
+pub struct ContractDeploy<SA, OriginalResult>
 where
     SA: SendApi + 'static,
 {
@@ -26,20 +27,23 @@ where
     pub egld_payment: BigUint<SA>,
     pub explicit_gas_limit: u64,
     pub arg_buffer: ManagedArgBuffer<SA>,
+    _return_type: PhantomData<OriginalResult>,
 }
 
 /// Syntactical sugar to help macros to generate code easier.
 /// Unlike calling `ContractDeploy::<SA>::new`, here types can be inferred from the context.
-pub fn new_contract_deploy<SA>(to: Option<ManagedAddress<SA>>) -> ContractDeploy<SA>
+pub fn new_contract_deploy<SA, OriginalResult>(
+    to: Option<ManagedAddress<SA>>,
+) -> ContractDeploy<SA, OriginalResult>
 where
     SA: SendApi + 'static,
 {
-    let mut contract_deploy = ContractDeploy::<SA>::new();
+    let mut contract_deploy = ContractDeploy::new();
     contract_deploy.to = to;
     contract_deploy
 }
 
-impl<SA> Default for ContractDeploy<SA>
+impl<SA, OriginalResult> Default for ContractDeploy<SA, OriginalResult>
 where
     SA: SendApi + 'static,
 {
@@ -52,12 +56,13 @@ where
             egld_payment: zero,
             explicit_gas_limit: UNSPECIFIED_GAS_LIMIT,
             arg_buffer,
+            _return_type: PhantomData,
         }
     }
 }
 
 #[allow(clippy::return_self_not_must_use)]
-impl<SA> ContractDeploy<SA>
+impl<SA, OriginalResult> ContractDeploy<SA, OriginalResult>
 where
     SA: SendApi + 'static,
 {
@@ -89,38 +94,60 @@ where
     }
 }
 
-impl<SA> ContractDeploy<SA>
+impl<SA, OriginalResult> ContractDeploy<SA, OriginalResult>
 where
     SA: SendApi + 'static,
+    OriginalResult: TopEncodeMulti,
 {
+    fn decode_result<RequestedResult>(
+        raw_result: ManagedVec<SA, ManagedBuffer<SA>>,
+    ) -> RequestedResult
+    where
+        RequestedResult: CodecFrom<OriginalResult>,
+    {
+        let mut loader = ManagedResultArgLoader::new(raw_result);
+        let arg_id = ArgId::from(&b"init result"[..]);
+        let h = ArgErrorHandler::<SA>::from(arg_id);
+        let Ok(result) = RequestedResult::multi_decode_or_handle_err(&mut loader, h);
+        result
+    }
+
     /// Executes immediately, synchronously, and returns Some(Address) of the deployed contract.  
     /// Will return None if the deploy fails.  
-    pub fn deploy_contract(
+    pub fn deploy_contract<RequestedResult>(
         self,
         code: &ManagedBuffer<SA>,
         code_metadata: CodeMetadata,
-    ) -> (ManagedAddress<SA>, ManagedVec<SA, ManagedBuffer<SA>>) {
-        SA::send_api_impl().deploy_contract(
+    ) -> (ManagedAddress<SA>, RequestedResult)
+    where
+        RequestedResult: CodecFrom<OriginalResult>,
+    {
+        let (address, raw_result) = SA::send_api_impl().deploy_contract(
             self.resolve_gas_limit(),
             &self.egld_payment,
             code,
             code_metadata,
             &self.arg_buffer,
-        )
+        );
+        (address, Self::decode_result(raw_result))
     }
 
-    pub fn deploy_from_source(
+    pub fn deploy_from_source<RequestedResult>(
         self,
         source_address: &ManagedAddress<SA>,
         code_metadata: CodeMetadata,
-    ) -> (ManagedAddress<SA>, ManagedVec<SA, ManagedBuffer<SA>>) {
-        SA::send_api_impl().deploy_from_source_contract(
+    ) -> (ManagedAddress<SA>, RequestedResult)
+    where
+        RequestedResult: CodecFrom<OriginalResult>,
+    {
+        let (address, raw_result) = SA::send_api_impl().deploy_from_source_contract(
             self.resolve_gas_limit(),
             &self.egld_payment,
             source_address,
             code_metadata,
             &self.arg_buffer,
-        )
+        );
+        (address, Self::decode_result(raw_result))
     }
 
     pub fn upgrade_from_source(
