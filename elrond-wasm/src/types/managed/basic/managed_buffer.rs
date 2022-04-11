@@ -357,6 +357,7 @@ macro_rules! managed_buffer_codec_from_impl_bi_di {
 
 managed_buffer_codec_from_impl_bi_di! {crate::types::heap::Vec<u8>}
 managed_buffer_codec_from_impl_bi_di! {crate::types::heap::BoxedBytes}
+managed_buffer_codec_from_impl_bi_di! {crate::types::heap::String}
 
 impl<M: ManagedTypeApi> NestedDecode for ManagedBuffer<M> {
     fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
