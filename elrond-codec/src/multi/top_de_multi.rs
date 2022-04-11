@@ -1,5 +1,6 @@
 use crate::{
-    DecodeError, DecodeErrorHandler, DefaultErrorHandler, TopDecode, TopDecodeMultiInput, TypeInfo,
+    DecodeError, DecodeErrorHandler, DefaultErrorHandler, TopDecode, TopDecodeMultiInput,
+    TopEncode, TypeInfo,
 };
 
 pub trait TopDecodeMulti: Sized {
@@ -19,6 +20,12 @@ pub trait TopDecodeMulti: Sized {
             Ok(v) => Ok(v),
             Err(e) => Err(h.handle_error(e)),
         }
+    }
+}
+pub trait TopDecodeMultiLength {
+    const LEN: usize;
+    fn get_len() -> usize {
+        Self::LEN
     }
 }
 
@@ -41,4 +48,11 @@ where
 
         input.next_value(h)
     }
+}
+
+impl<T> TopDecodeMultiLength for T
+where
+    T: TopEncode + TopDecode,
+{
+    const LEN: usize = 1;
 }
