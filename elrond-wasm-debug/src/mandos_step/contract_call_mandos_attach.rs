@@ -1,7 +1,7 @@
 use crate::DebugApi;
 use elrond_wasm::{
     elrond_codec::{CodecFrom, PanicErrorHandler, TopEncodeMulti},
-    types::{ContractCall, ContractDeploy},
+    types::{ContractCall, ContractDeploy, ManagedArgBuffer},
 };
 use mandos::model::{ScCallStep, ScDeployStep, ScQueryStep, TxExpect};
 
@@ -96,6 +96,14 @@ impl<OriginalResult> CallBuilder<ContractDeploy<DebugApi, OriginalResult>> for S
     }
 }
 
+pub fn convert_call_args(arg_buffer: &ManagedArgBuffer<DebugApi>) -> Vec<String> {
+    arg_buffer
+        .to_raw_args_vec()
+        .iter()
+        .map(|arg| format!("0x{}", hex::encode(&arg)))
+        .collect()
+}
+
 /// Extracts
 /// - recipient,
 /// - endpoint name,
@@ -109,12 +117,7 @@ fn process_contract_call<OriginalResult>(
     );
     let function =
         String::from_utf8(contract_call.endpoint_name.to_boxed_bytes().into_vec()).unwrap();
-    let mandos_args = contract_call
-        .arg_buffer
-        .to_raw_args_vec()
-        .iter()
-        .map(|arg| format!("0x{}", hex::encode(&arg)))
-        .collect();
+    let mandos_args = convert_call_args(&contract_call.arg_buffer);
     (to_str, function, mandos_args)
 }
 
@@ -127,12 +130,7 @@ fn process_contract_deploy<OriginalResult>(
     let to_str = contract_deploy
         .to
         .map(|to| format!("0x{}", hex::encode(to.to_address().as_bytes())));
-    let mandos_args = contract_deploy
-        .arg_buffer
-        .to_raw_args_vec()
-        .iter()
-        .map(|arg| format!("0x{}", hex::encode(&arg)))
-        .collect();
+    let mandos_args = convert_call_args(&contract_deploy.arg_buffer);
     (to_str, mandos_args)
 }
 
