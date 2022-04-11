@@ -5,9 +5,11 @@ use serde::{Deserialize, Serialize};
 #[serde(rename_all = "camelCase")]
 pub struct TxExpectRaw {
     #[serde(default)]
+    #[serde(skip_serializing_if = "CheckValueListRaw::is_unspecified")]
     pub out: CheckValueListRaw,
 
     #[serde(default)]
+    #[serde(skip_serializing_if = "CheckBytesValueRaw::is_unspecified")]
     pub status: CheckBytesValueRaw,
 
     #[serde(default)]

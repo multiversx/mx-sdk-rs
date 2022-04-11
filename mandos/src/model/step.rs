@@ -1,5 +1,5 @@
 use crate::{
-    interpret_trait::{InterpretableFrom, InterpreterContext},
+    interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
     serde_raw::StepRaw,
 };
 
@@ -12,6 +12,7 @@ use super::{
 
 #[derive(Debug)]
 pub struct ExternalStepsStep {
+    pub comment: Option<String>,
     pub path: String,
 }
 
@@ -90,8 +91,8 @@ pub enum Step {
 impl InterpretableFrom<StepRaw> for Step {
     fn interpret_from(from: StepRaw, context: &InterpreterContext) -> Self {
         match from {
-            StepRaw::ExternalSteps { comment: _, path } => {
-                Step::ExternalSteps(ExternalStepsStep { path })
+            StepRaw::ExternalSteps { comment, path } => {
+                Step::ExternalSteps(ExternalStepsStep { comment, path })
             },
             StepRaw::SetState {
                 comment,
@@ -179,6 +180,69 @@ impl InterpretableFrom<StepRaw> for Step {
                 accounts: CheckAccounts::interpret_from(accounts, context),
             }),
             StepRaw::DumpState { comment } => Step::DumpState(DumpStateStep { comment }),
+        }
+    }
+}
+
+impl IntoRaw<StepRaw> for Step {
+    fn into_raw(self) -> StepRaw {
+        match self {
+            Step::ExternalSteps(s) => StepRaw::ExternalSteps {
+                comment: s.comment,
+                path: s.path,
+            },
+            Step::SetState(s) => StepRaw::SetState {
+                comment: s.comment,
+                accounts: s
+                    .accounts
+                    .into_iter()
+                    .map(|(address, account)| (address.into_raw(), account.into_raw()))
+                    .collect(),
+                new_addresses: s
+                    .new_addresses
+                    .into_iter()
+                    .map(|na| na.into_raw())
+                    .collect(),
+                block_hashes: s.block_hashes.into_iter().map(|bh| bh.original).collect(),
+                previous_block_info: s.previous_block_info.map(|bi| bi.into_raw()),
+                current_block_info: s.current_block_info.map(|bi| bi.into_raw()),
+            },
+            Step::ScCall(s) => StepRaw::ScCall {
+                tx_id: s.tx_id,
+                comment: s.comment,
+                display_logs: None,
+                tx: s.tx.into_raw(),
+                expect: s.expect.map(|expect| expect.into_raw()),
+            },
+            Step::ScQuery(s) => StepRaw::ScQuery {
+                tx_id: s.tx_id,
+                comment: s.comment,
+                display_logs: None,
+                tx: s.tx.into_raw(),
+                expect: s.expect.map(|expect| expect.into_raw()),
+            },
+            Step::ScDeploy(s) => StepRaw::ScDeploy {
+                tx_id: s.tx_id,
+                comment: s.comment,
+                display_logs: None,
+                tx: s.tx.into_raw(),
+                expect: s.expect.map(|expect| expect.into_raw()),
+            },
+            Step::Transfer(s) => StepRaw::Transfer {
+                tx_id: s.tx_id,
+                comment: s.comment,
+                tx: s.tx.into_raw(),
+            },
+            Step::ValidatorReward(s) => StepRaw::ValidatorReward {
+                tx_id: s.tx_id,
+                comment: s.comment,
+                tx: s.tx.into_raw(),
+            },
+            Step::CheckState(s) => StepRaw::CheckState {
+                comment: s.comment,
+                accounts: s.accounts.into_raw(),
+            },
+            Step::DumpState(s) => StepRaw::DumpState { comment: s.comment },
         }
     }
 }
