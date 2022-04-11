@@ -100,8 +100,11 @@ impl ScQueryStep {
         Self::default()
     }
 
-    pub fn to(mut self, expr: &str) -> Self {
-        self.tx.to = AddressValue::interpret_from(expr, &InterpreterContext::default());
+    pub fn to<A>(mut self, address: A) -> Self
+    where
+        AddressValue: InterpretableFrom<A>,
+    {
+        self.tx.to = AddressValue::interpret_from(address, &InterpreterContext::default());
         self
     }
 
@@ -137,7 +140,10 @@ impl ScCallStep {
         self
     }
 
-    pub fn to(mut self, address: &str) -> Self {
+    pub fn to<A>(mut self, address: A) -> Self
+    where
+        AddressValue: InterpretableFrom<A>,
+    {
         self.tx.to = AddressValue::interpret_from(address, &InterpreterContext::default());
         self
     }
