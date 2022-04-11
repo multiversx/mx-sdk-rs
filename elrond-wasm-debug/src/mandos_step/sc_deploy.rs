@@ -1,4 +1,7 @@
-use elrond_wasm::types::{heap::Address, ContractDeploy};
+use elrond_wasm::{
+    elrond_codec::{CodecFrom, PanicErrorHandler, TopEncodeMulti},
+    types::{heap::Address, ContractDeploy},
+};
 use mandos::model::{ScDeployStep, Step};
 
 use crate::{
@@ -29,11 +32,15 @@ impl BlockchainMock {
     /// so we can benefit from type inference in the result (this is work in progress).
     ///
     /// TODO: deserialize result
-    pub fn mandos_sc_deploy_get_result(
+    pub fn mandos_sc_deploy_get_result<OriginalResult, RequestedResult>(
         &mut self,
-        contract_deploy: ContractDeploy<DebugApi>,
+        contract_deploy: ContractDeploy<DebugApi, OriginalResult>,
         mut sc_deploy_step: ScDeployStep,
-    ) -> (Address, Vec<Vec<u8>>) {
+    ) -> (Address, RequestedResult)
+    where
+        OriginalResult: TopEncodeMulti,
+        RequestedResult: CodecFrom<OriginalResult>,
+    {
         sc_deploy_step = sc_deploy_step.call(contract_deploy);
         let (tx_result, new_address) = self.with_borrowed(|state| {
             let (tx_result, new_address, state) = execute(state, &sc_deploy_step);
@@ -41,8 +48,12 @@ impl BlockchainMock {
         });
         self.mandos_trace.steps.push(Step::ScDeploy(sc_deploy_step));
 
-        // TODO: deserialize results
-        (new_address, tx_result.result_values)
+        let mut raw_result = tx_result.result_values;
+        let deser_result =
+            RequestedResult::multi_decode_or_handle_err(&mut raw_result, PanicErrorHandler)
+                .unwrap();
+
+        (new_address, deser_result)
     }
 }
 

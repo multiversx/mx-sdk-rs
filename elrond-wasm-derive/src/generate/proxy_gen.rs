@@ -68,11 +68,15 @@ pub fn generate_proxy_deploy_sig(method: &Method) -> proc_macro2::TokenStream {
     let mut generics = method.generics.clone();
     let generics_where = &method.generics.where_clause;
     let arg_decl = proxy_arg_gen(&method.method_args, &mut generics);
+    let ret_tok = match &method.return_type {
+        syn::ReturnType::Default => quote! { () },
+        syn::ReturnType::Type(_, ty) => quote! { #ty },
+    };
     let result = quote! {
         fn #method_name #generics (
             &mut self,
             #(#arg_decl),*
-        ) -> elrond_wasm::types::ContractDeploy<Self::Api>
+        ) -> elrond_wasm::types::ContractDeploy<Self::Api, #ret_tok>
         #generics_where
     };
     result
@@ -243,7 +247,7 @@ pub fn generate_proxy_deploy(init_method: &Method) -> proc_macro2::TokenStream {
         #[allow(clippy::type_complexity)]
         #msig {
             let ___opt_address___ = self.extract_opt_address();
-            let mut ___contract_deploy___ = elrond_wasm::types::new_contract_deploy::<Self::Api>(
+            let mut ___contract_deploy___ = elrond_wasm::types::new_contract_deploy(
                 ___opt_address___,
             );
             #(#arg_push_snippets)*
