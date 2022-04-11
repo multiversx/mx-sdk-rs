@@ -1,5 +1,5 @@
 use crate::{
-    interpret_trait::{InterpretableFrom, InterpreterContext},
+    interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
     serde_raw::ValueSubTree,
     value_interpreter::{interpret_string, interpret_subtree},
 };
@@ -43,6 +43,22 @@ impl InterpretableFrom<ValueSubTree> for U64Value {
         U64Value {
             value: bu.to_u64().unwrap(),
             original: from,
+        }
+    }
+}
+
+impl IntoRaw<ValueSubTree> for U64Value {
+    fn into_raw(self) -> ValueSubTree {
+        self.original
+    }
+}
+
+impl U64Value {
+    pub fn into_raw_opt(self) -> Option<ValueSubTree> {
+        if self.value > 0 {
+            Some(self.into_raw())
+        } else {
+            None
         }
     }
 }

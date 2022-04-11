@@ -1,7 +1,7 @@
 use std::fmt;
 
 use crate::{
-    interpret_trait::{InterpretableFrom, InterpreterContext},
+    interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
     serde_raw::ValueSubTree,
     value_interpreter::{interpret_string, interpret_subtree},
 };
@@ -63,5 +63,11 @@ impl InterpretableFrom<&AddressKey> for AddressValue {
 impl InterpretableFrom<&AddressValue> for AddressValue {
     fn interpret_from(from: &AddressValue, _context: &InterpreterContext) -> Self {
         from.clone()
+    }
+}
+
+impl IntoRaw<ValueSubTree> for AddressValue {
+    fn into_raw(self) -> ValueSubTree {
+        self.original
     }
 }

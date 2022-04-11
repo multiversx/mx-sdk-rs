@@ -1,5 +1,5 @@
 use crate::{
-    interpret_trait::{InterpretableFrom, InterpreterContext},
+    interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
     model::{
         BigUintValue, BytesKey, BytesValue, CheckEsdtMap, CheckStorage, CheckStorageDetails,
         CheckValue, U64Value,
@@ -16,6 +16,7 @@ pub struct CheckAccount {
     pub username: CheckValue<BytesValue>,
     pub storage: CheckStorage,
     pub code: CheckValue<BytesValue>,
+    pub owner: CheckValue<BytesValue>, // WARNING! Not currently checked. TODO: implement check
     pub async_call_data: CheckValue<BytesValue>,
 }
 
@@ -73,10 +74,27 @@ impl InterpretableFrom<Box<CheckAccountRaw>> for CheckAccount {
             username: CheckValue::<BytesValue>::interpret_from(from.username, context),
             storage: CheckStorage::interpret_from(from.storage, context),
             code: CheckValue::<BytesValue>::interpret_from(from.code, context),
+            owner: CheckValue::<BytesValue>::interpret_from(from.owner, context),
             async_call_data: CheckValue::<BytesValue>::interpret_from(
                 from.async_call_data,
                 context,
             ),
+        }
+    }
+}
+
+impl IntoRaw<CheckAccountRaw> for CheckAccount {
+    fn into_raw(self) -> CheckAccountRaw {
+        CheckAccountRaw {
+            comment: self.comment,
+            nonce: self.nonce.into_raw(),
+            balance: self.balance.into_raw(),
+            esdt: self.esdt.into_raw(),
+            username: self.username.into_raw(),
+            storage: self.storage.into_raw(),
+            code: self.code.into_raw(),
+            owner: self.owner.into_raw(),
+            async_call_data: self.async_call_data.into_raw(),
         }
     }
 }
