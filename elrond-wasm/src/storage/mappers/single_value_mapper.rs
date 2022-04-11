@@ -66,7 +66,10 @@ where
 
     /// Saves argument to storage only if the storage is empty.
     /// Does nothing otherwise.
-    pub fn set_if_empty(&self, value: &T) {
+    pub fn set_if_empty<BT>(&self, value: BT)
+    where
+        BT: Borrow<T>,
+    {
         if self.is_empty() {
             self.set(value);
         }
