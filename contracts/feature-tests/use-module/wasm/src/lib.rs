@@ -14,7 +14,6 @@ elrond_wasm_node::wasm_endpoints! {
         call_mod_c
         cancel
         changeLockTimeAfterVotingEndsInBlocks
-        changeMaxActionsPerProposal
         changeMinTokenBalanceForProposing
         changeQuorum
         changeVotingDelayInBlocks
@@ -27,7 +26,6 @@ elrond_wasm_node::wasm_endpoints! {
         execute
         getGovernanceTokenId
         getLockTimeAfterVotingEndsInBlocks
-        getMaxActionsPerProposal
         getMinTokenBalanceForProposing
         getProposalActions
         getProposalDescription
