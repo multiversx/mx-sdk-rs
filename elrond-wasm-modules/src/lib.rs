@@ -8,11 +8,8 @@ pub mod pause;
 
 // TODO: remove alloc feature from the following, after they have been cleaned
 
-#[cfg(feature = "alloc")]
 pub mod bonding_curve;
 
-#[cfg(feature = "alloc")]
 pub mod governance;
 
-#[cfg(feature = "alloc")]
 pub mod users;
