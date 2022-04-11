@@ -8,5 +8,5 @@ pub trait CurveFunction<M: ManagedTypeApi> {
         token_start: &BigUint<M>,
         amount: &BigUint<M>,
         arguments: &CurveArguments<M>,
-    ) -> SCResult<BigUint<M>>;
+    ) -> BigUint<M>;
 }

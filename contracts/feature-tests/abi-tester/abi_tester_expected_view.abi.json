@@ -184,6 +184,10 @@
                 {
                     "name": "NftUpdateAttributes",
                     "discriminant": 7
+                },
+                {
+                    "name": "Transfer",
+                    "discriminant": 8
                 }
             ]
         },

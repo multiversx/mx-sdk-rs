@@ -7,7 +7,6 @@
 elrond_wasm_node::wasm_endpoints! {
     bonding_curve_contract
     (
-        callBack
         buyToken
         claim
         deposit
@@ -20,3 +19,5 @@ elrond_wasm_node::wasm_endpoints! {
         unsetLocalRoles
     )
 }
+
+elrond_wasm_node::wasm_empty_callback! {}
