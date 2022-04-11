@@ -18,6 +18,29 @@ impl ValueSubTree {
             _ => false,
         }
     }
+
+    fn append_to_string(&self, accumulator: &mut String) {
+        match self {
+            ValueSubTree::Str(s) => accumulator.push_str(s.as_str()),
+            ValueSubTree::List(l) => {
+                for item in l {
+                    item.append_to_string(accumulator);
+                }
+            },
+            ValueSubTree::Map(m) => {
+                for value in m.values() {
+                    value.append_to_string(accumulator);
+                }
+            },
+        }
+    }
+
+    /// Concatenates all contained values into a String.
+    pub fn concat_to_string(&self) -> String {
+        let mut accumulator = String::new();
+        self.append_to_string(&mut accumulator);
+        accumulator
+    }
 }
 
 impl Default for ValueSubTree {
