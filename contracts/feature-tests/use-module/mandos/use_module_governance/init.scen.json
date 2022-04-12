@@ -61,7 +61,6 @@
                     "str:GOV-123456",
                     "1500",
                     "500",
-                    "2",
                     "10",
                     "20",
                     "30"
@@ -86,7 +85,6 @@
                         "str:governance:governanceTokenId": "str:GOV-123456",
                         "str:governance:quorum": "1500",
                         "str:governance:minTokenBalanceForProposing": "500",
-                        "str:governance:maxActionsPerProposal": "2",
                         "str:governance:votingDelayInBlocks": "10",
                         "str:governance:votingPeriodInBlocks": "20",
                         "str:governance:lockTimeAfterVotingEndsInBlocks": "30"

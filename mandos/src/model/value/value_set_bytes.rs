@@ -1,5 +1,5 @@
 use crate::{
-    interpret_trait::{InterpretableFrom, InterpreterContext},
+    interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
     serde_raw::ValueSubTree,
     value_interpreter::{interpret_string, interpret_subtree},
 };
@@ -36,6 +36,12 @@ impl InterpretableFrom<ValueSubTree> for BytesValue {
             value: interpret_subtree(&from, context),
             original: from,
         }
+    }
+}
+
+impl IntoRaw<ValueSubTree> for BytesValue {
+    fn into_raw(self) -> ValueSubTree {
+        self.original
     }
 }
 

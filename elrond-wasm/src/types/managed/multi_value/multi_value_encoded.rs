@@ -8,7 +8,7 @@ use crate::{
 use core::marker::PhantomData;
 use elrond_codec::{
     try_cast_execute_or_else, DecodeErrorHandler, EncodeErrorHandler, TopDecode, TopDecodeMulti,
-    TopDecodeMultiInput, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
+    TopDecodeMultiInput, TopDecodeMultiLength, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
 };
 
 /// A multi-value container, that keeps raw values as ManagedBuffer
@@ -145,12 +145,12 @@ where
 impl<M, T> MultiValueEncoded<M, T>
 where
     M: ManagedTypeApi + ErrorApi,
-    T: TopEncode + TopDecode,
+    T: TopDecodeMultiLength,
 {
-    /// Number of items. Only available for single-encode items.
+    /// Number of items. Only available for multi-encode items.
     #[inline]
     pub fn len(&self) -> usize {
-        self.raw_len()
+        self.raw_len() / T::get_len()
     }
 }
 
@@ -174,8 +174,6 @@ where
     M: ManagedTypeApi + ErrorApi,
     T: TopEncodeMulti,
 {
-    type DecodeAs = MultiValueEncoded<M, T>;
-
     fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
     where
         O: TopEncodeMultiOutput,
@@ -193,8 +191,6 @@ where
     M: ManagedTypeApi + ErrorApi,
     T: TopEncodeMulti,
 {
-    type DecodeAs = Self;
-
     fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
     where
         O: TopEncodeMultiOutput,

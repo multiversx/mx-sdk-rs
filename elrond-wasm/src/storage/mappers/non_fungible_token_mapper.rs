@@ -1,5 +1,5 @@
 use elrond_codec::{
-    EncodeErrorHandler, TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
+    CodecFrom, EncodeErrorHandler, TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
 };
 
 use super::{
@@ -87,6 +87,44 @@ where
         };
 
         contract_call
+            .async_call()
+            .with_callback(callback)
+            .call_and_exit();
+    }
+
+    /// Important: If you use custom callback, remember to save the token ID in the callback!
+    /// If you want to use default callbacks, import the default_issue_callbacks::DefaultIssueCallbacksModule from elrond-wasm-modules
+    /// and pass None for the opt_callback argument
+    pub fn issue_and_set_all_roles(
+        &self,
+        token_type: EsdtTokenType,
+        issue_cost: BigUint<SA>,
+        token_display_name: ManagedBuffer<SA>,
+        token_ticker: ManagedBuffer<SA>,
+        num_decimals: usize,
+        opt_callback: Option<CallbackClosure<SA>>,
+    ) -> ! {
+        if !self.is_empty() {
+            SA::error_api_impl().signal_error(TOKEN_ID_ALREADY_SET_ERR_MSG);
+        }
+        if token_type == EsdtTokenType::Fungible || token_type == EsdtTokenType::Invalid {
+            SA::error_api_impl().signal_error(INVALID_TOKEN_TYPE_ERR_MSG);
+        }
+
+        let system_sc_proxy = ESDTSystemSmartContractProxy::<SA>::new_proxy_obj();
+        let callback = match opt_callback {
+            Some(cb) => cb,
+            None => self.default_callback_closure_obj(),
+        };
+
+        system_sc_proxy
+            .issue_and_set_all_roles(
+                issue_cost,
+                token_display_name,
+                token_ticker,
+                token_type,
+                num_decimals,
+            )
             .async_call()
             .with_callback(callback)
             .call_and_exit();
@@ -242,8 +280,6 @@ impl<SA> TopEncodeMulti for NonFungibleTokenMapper<SA>
 where
     SA: StorageMapperApi + CallTypeApi,
 {
-    type DecodeAs = TokenIdentifier<SA>;
-
     fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
     where
         O: TopEncodeMultiOutput,
@@ -255,6 +291,11 @@ where
             output.push_single_value(&self.get_token_id(), h)
         }
     }
+}
+
+impl<SA> CodecFrom<NonFungibleTokenMapper<SA>> for TokenIdentifier<SA> where
+    SA: StorageMapperApi + CallTypeApi
+{
 }
 
 impl<SA> TypeAbi for NonFungibleTokenMapper<SA>

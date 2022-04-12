@@ -1,5 +1,5 @@
 use crate::{
-    interpret_trait::{InterpretableFrom, InterpreterContext},
+    interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
     value_interpreter::interpret_string,
 };
 
@@ -20,6 +20,12 @@ impl From<Vec<u8>> for BytesKey {
             value: v,
             original: String::default(),
         }
+    }
+}
+
+impl IntoRaw<String> for BytesKey {
+    fn into_raw(self) -> String {
+        self.original
     }
 }
 

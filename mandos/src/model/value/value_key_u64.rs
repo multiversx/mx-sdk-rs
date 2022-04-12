@@ -1,5 +1,5 @@
 use crate::{
-    interpret_trait::{InterpretableFrom, InterpreterContext},
+    interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
     value_interpreter::interpret_string,
 };
 
@@ -54,6 +54,12 @@ impl InterpretableFrom<String> for U64Key {
             value: bu.to_u64().unwrap(),
             original: from,
         }
+    }
+}
+
+impl IntoRaw<String> for U64Key {
+    fn into_raw(self) -> String {
+        self.original
     }
 }
 

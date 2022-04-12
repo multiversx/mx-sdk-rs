@@ -8,7 +8,8 @@ use crate::{
     types::ManagedType,
 };
 use elrond_codec::{
-    EncodeErrorHandler, TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
+    CodecFrom, DecodeErrorHandler, EncodeErrorHandler, TopDecode, TopDecodeInput, TopEncode,
+    TopEncodeMulti, TopEncodeMultiOutput, TopEncodeOutput,
 };
 
 /// Manages a single serializable item in storage.
@@ -65,7 +66,10 @@ where
 
     /// Saves argument to storage only if the storage is empty.
     /// Does nothing otherwise.
-    pub fn set_if_empty(&self, value: &T) {
+    pub fn set_if_empty<BT>(&self, value: BT)
+    where
+        BT: Borrow<T>,
+    {
         if self.is_empty() {
             self.set(value);
         }
@@ -96,8 +100,6 @@ where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode,
 {
-    type DecodeAs = T;
-
     fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
     where
         O: TopEncodeMultiOutput,
@@ -105,6 +107,52 @@ where
     {
         output.push_single_value(&self.get(), h)
     }
+}
+
+/// Intermediary type for deserializing the result of an endpoint that returns a `SingleValueMapper`.
+///
+/// Necessary because we cannot implement `CodecFrom` directly on `T`.
+pub struct SingleValue<T: TopDecode>(T);
+
+impl<T: TopEncode + TopDecode> TopEncode for SingleValue<T> {
+    fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: TopEncodeOutput,
+        H: EncodeErrorHandler,
+    {
+        self.0.top_encode_or_handle_err(output, h)
+    }
+}
+
+impl<T: TopDecode> TopDecode for SingleValue<T> {
+    fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: TopDecodeInput,
+        H: DecodeErrorHandler,
+    {
+        Ok(SingleValue(T::top_decode_or_handle_err(input, h)?))
+    }
+}
+
+impl<T: TopDecode> From<T> for SingleValue<T> {
+    fn from(value: T) -> Self {
+        SingleValue(value)
+    }
+}
+
+impl<T: TopDecode> SingleValue<T> {
+    #[inline]
+    pub fn into(self) -> T {
+        self.0
+    }
+}
+
+impl<SA, T, R> CodecFrom<SingleValueMapper<SA, T>> for SingleValue<R>
+where
+    SA: StorageMapperApi,
+    T: TopEncode + TopDecode,
+    R: TopDecode + CodecFrom<T>,
+{
 }
 
 impl<SA, T> TypeAbi for SingleValueMapper<SA, T>

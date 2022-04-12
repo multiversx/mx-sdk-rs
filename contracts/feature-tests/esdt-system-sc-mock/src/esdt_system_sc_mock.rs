@@ -84,6 +84,18 @@ pub trait PayableFeatures {
     ) {
     }
 
+    #[payable("EGLD")]
+    #[endpoint(registerAndSetAllRoles)]
+    fn register_and_set_all_roles(
+        &self,
+        _token_display_name: ManagedBuffer,
+        token_ticker: ManagedBuffer,
+        _token_type_name: ManagedBuffer,
+        _num_decimals: usize,
+    ) -> TokenIdentifier {
+        self.create_new_token_id(token_ticker)
+    }
+
     fn create_new_token_id(&self, token_ticker: ManagedBuffer) -> TokenIdentifier {
         let nr_issued_tokens = self.nr_issued_tokens().get();
         let mut rand_chars = [ZERO_ASCII; RAND_CHARS_LEN];

@@ -1,5 +1,5 @@
 use crate::{
-    interpret_trait::{InterpretableFrom, InterpreterContext},
+    interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
     model::{BytesValue, CheckValue, CheckValueList},
     serde_raw::CheckLogRaw,
 };
@@ -19,6 +19,17 @@ impl InterpretableFrom<CheckLogRaw> for CheckLog {
             endpoint: CheckValue::<BytesValue>::interpret_from(from.endpoint, context),
             topics: CheckValueList::interpret_from(from.topics, context),
             data: CheckValue::<BytesValue>::interpret_from(from.data, context),
+        }
+    }
+}
+
+impl IntoRaw<CheckLogRaw> for CheckLog {
+    fn into_raw(self) -> CheckLogRaw {
+        CheckLogRaw {
+            address: self.address.into_raw(),
+            endpoint: self.endpoint.into_raw(),
+            topics: self.topics.into_raw(),
+            data: self.data.into_raw(),
         }
     }
 }

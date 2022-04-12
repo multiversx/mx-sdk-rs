@@ -1,5 +1,6 @@
 #![feature(generic_associated_types)]
 #![allow(clippy::type_complexity)]
+#![feature(exhaustive_patterns)]
 
 pub mod abi_json;
 pub mod api;
@@ -27,6 +28,9 @@ pub use world_mock::BlockchainMock;
 
 // Re-exporting the whole mandos crate for easier use in tests.
 pub use mandos;
+
+// Re-exporting for convenience. Using the crate as imported in the codec to make sure the save version is used everywhere.
+pub use elrond_wasm::elrond_codec::num_bigint;
 
 #[macro_use]
 extern crate alloc;

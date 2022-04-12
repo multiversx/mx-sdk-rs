@@ -12,8 +12,8 @@ use elrond_codec::{
     elrond_codec_derive::{
         NestedDecode, NestedEncode, TopDecode, TopDecodeOrDefault, TopEncode, TopEncodeOrDefault,
     },
-    DecodeDefault, EncodeDefault, EncodeErrorHandler, NestedDecode, NestedEncode, TopDecode,
-    TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
+    CodecFrom, DecodeDefault, EncodeDefault, EncodeErrorHandler, NestedDecode, NestedEncode,
+    TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
 };
 use storage_get::storage_get_len;
 
@@ -549,8 +549,6 @@ where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone,
 {
-    type DecodeAs = MultiValueEncoded<SA, T>;
-
     fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
     where
         O: TopEncodeMultiOutput,
@@ -561,6 +559,13 @@ where
         }
         Ok(())
     }
+}
+
+impl<SA, T> CodecFrom<LinkedListMapper<SA, T>> for MultiValueEncoded<SA, T>
+where
+    SA: StorageMapperApi,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone,
+{
 }
 
 impl<SA, T> TypeAbi for LinkedListMapper<SA, T>

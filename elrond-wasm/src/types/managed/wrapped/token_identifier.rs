@@ -212,6 +212,12 @@ impl<M: ManagedTypeApi> SCDisplay for TokenIdentifier<M> {
     }
 }
 
+impl<M: ManagedTypeApi> SCDisplay for &TokenIdentifier<M> {
+    fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
+        SCDisplay::fmt(*self, f);
+    }
+}
+
 const EGLD_REPRESENTATION_HEX: &[u8] = b"45474C44";
 
 impl<M: ManagedTypeApi> SCLowerHex for TokenIdentifier<M> {

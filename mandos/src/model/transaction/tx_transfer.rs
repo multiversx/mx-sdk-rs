@@ -1,5 +1,5 @@
 use crate::{
-    interpret_trait::{InterpretableFrom, InterpreterContext},
+    interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
     model::{AddressValue, BigUintValue, U64Value},
     serde_raw::TxTransferRaw,
 };
@@ -29,6 +29,24 @@ impl InterpretableFrom<TxTransferRaw> for TxTransfer {
                 .collect(),
             gas_limit: U64Value::interpret_from(from.gas_limit.unwrap_or_default(), context),
             gas_price: U64Value::interpret_from(from.gas_price.unwrap_or_default(), context),
+        }
+    }
+}
+
+impl IntoRaw<TxTransferRaw> for TxTransfer {
+    fn into_raw(self) -> TxTransferRaw {
+        TxTransferRaw {
+            from: self.from.into_raw(),
+            to: self.to.into_raw(),
+            value: None,
+            egld_value: self.egld_value.into_raw_opt(),
+            esdt_value: self
+                .esdt_value
+                .into_iter()
+                .map(|esdt_value| esdt_value.into_raw())
+                .collect(),
+            gas_limit: self.gas_limit.into_raw_opt(),
+            gas_price: self.gas_price.into_raw_opt(),
         }
     }
 }

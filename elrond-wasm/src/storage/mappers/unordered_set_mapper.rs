@@ -10,8 +10,8 @@ use crate::{
     types::{ManagedType, MultiValueEncoded},
 };
 use elrond_codec::{
-    multi_encode_iter_or_handle_err, EncodeErrorHandler, NestedDecode, NestedEncode, TopDecode,
-    TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
+    multi_encode_iter_or_handle_err, CodecFrom, EncodeErrorHandler, NestedDecode, NestedEncode,
+    TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
 };
 
 const ITEM_INDEX: &[u8] = b".index";
@@ -134,8 +134,6 @@ where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
 {
-    type DecodeAs = MultiValueEncoded<SA, T>;
-
     fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
     where
         O: TopEncodeMultiOutput,
@@ -143,6 +141,13 @@ where
     {
         multi_encode_iter_or_handle_err(self.iter(), output, h)
     }
+}
+
+impl<SA, T> CodecFrom<UnorderedSetMapper<SA, T>> for MultiValueEncoded<SA, T>
+where
+    SA: StorageMapperApi,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
+{
 }
 
 /// Behaves like a MultiResultVec when an endpoint result.

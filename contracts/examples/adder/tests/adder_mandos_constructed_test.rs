@@ -10,7 +10,7 @@ fn world() -> BlockchainMock {
 
 #[test]
 fn adder_mandos_constructed() {
-    let world = world();
+    let mut world = world();
     let intp_context = world.interpreter_context();
     let _ = world
         .mandos_set_state(

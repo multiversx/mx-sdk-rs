@@ -7,8 +7,8 @@ use crate::{
 };
 use core::{marker::PhantomData, usize};
 use elrond_codec::{
-    multi_encode_iter_or_handle_err, EncodeErrorHandler, TopDecode, TopEncode, TopEncodeMulti,
-    TopEncodeMultiOutput,
+    multi_encode_iter_or_handle_err, CodecFrom, EncodeErrorHandler, TopDecode, TopEncode,
+    TopEncodeMulti, TopEncodeMultiOutput,
 };
 
 const ITEM_SUFFIX: &[u8] = b".item";
@@ -281,8 +281,6 @@ where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode,
 {
-    type DecodeAs = MultiValueEncoded<SA, T>;
-
     fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
     where
         O: TopEncodeMultiOutput,
@@ -290,6 +288,13 @@ where
     {
         multi_encode_iter_or_handle_err(self.iter(), output, h)
     }
+}
+
+impl<SA, T> CodecFrom<VecMapper<SA, T>> for MultiValueEncoded<SA, T>
+where
+    SA: StorageMapperApi,
+    T: TopEncode + TopDecode,
+{
 }
 
 /// Behaves like a MultiResultVec when an endpoint result.
