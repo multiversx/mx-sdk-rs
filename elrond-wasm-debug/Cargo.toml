@@ -31,6 +31,7 @@ toml = "0.5.8"
 cargo_toml = "0.10.1"
 pathdiff = "0.2.1"
 ed25519-dalek = "1.0.1"
+itertools = "0.10.3"
 
 [features]
 mandos-go-tests = []

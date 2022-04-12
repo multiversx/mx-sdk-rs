@@ -30,7 +30,7 @@ fn adder_mandos_constructed() {
     );
 
     // deploy
-    let (new_address, result) = world.mandos_sc_deploy_get_result(
+    let (new_address, ()) = world.mandos_sc_deploy_get_result(
         adder_contract.init(5u32),
         ScDeployStep::new()
             .from(&owner_address)
@@ -42,7 +42,6 @@ fn adder_mandos_constructed() {
         new_address.as_bytes(),
         adder_contract.mandos_address_expr.value
     );
-    assert!(result.is_empty());
 
     // mandos query, gets saved in the trace
     let result: SingleValue<BigUint> =

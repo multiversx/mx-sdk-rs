@@ -57,7 +57,7 @@ impl InterpretableFrom<&AddressValue> for AddressKey {
     fn interpret_from(from: &AddressValue, _context: &InterpreterContext) -> Self {
         AddressKey {
             value: from.value,
-            original: from.original.concat_to_string(),
+            original: from.original.to_concatenated_string(),
         }
     }
 }
