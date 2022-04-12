@@ -1,6 +1,15 @@
-use crate::abi::{TypeAbi, TypeName};
+use crate::{
+    abi::{TypeAbi, TypeName},
+    formatter::{FormatByteReceiver, SCDisplay},
+};
 use bitflags::bitflags;
 use elrond_codec::*;
+
+const UPGRADEABLE_STRING: &[u8] = b"Upgradeable";
+const READABLE_STRING: &[u8] = b"Readable";
+const PAYABLE_STRING: &[u8] = b"Payable";
+const PAYABLE_BY_SC_STRING: &[u8] = b"PayableBySC";
+const DEFAULT_STRING: &[u8] = b"Default";
 
 bitflags! {
     #[derive(Default)]
@@ -95,6 +104,44 @@ impl TopDecode for CodeMetadata {
 impl TypeAbi for CodeMetadata {
     fn type_name() -> TypeName {
         "CodeMetadata".into()
+    }
+}
+
+impl SCDisplay for CodeMetadata {
+    fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
+        let mut nothing_printed: bool = true;
+        verify_metadata_and_append(
+            self.is_upgradeable(),
+            f,
+            UPGRADEABLE_STRING,
+            &mut nothing_printed,
+        );
+        verify_metadata_and_append(self.is_readable(), f, READABLE_STRING, &mut nothing_printed);
+        verify_metadata_and_append(self.is_payable(), f, PAYABLE_STRING, &mut nothing_printed);
+        verify_metadata_and_append(
+            self.is_payable_by_sc(),
+            f,
+            PAYABLE_BY_SC_STRING,
+            &mut nothing_printed,
+        );
+        if nothing_printed {
+            f.append_bytes(DEFAULT_STRING);
+        }
+    }
+}
+
+fn verify_metadata_and_append<F: FormatByteReceiver>(
+    constraint: bool,
+    f: &mut F,
+    bytes_to_append: &[u8],
+    nothing_printed: &mut bool,
+) {
+    if constraint {
+        if !*nothing_printed {
+            f.append_bytes(b"|");
+        }
+        f.append_bytes(bytes_to_append);
+        *nothing_printed = false;
     }
 }
 
