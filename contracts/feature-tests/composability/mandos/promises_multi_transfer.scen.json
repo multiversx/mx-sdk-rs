@@ -8,7 +8,7 @@
                     "nonce": "0",
                     "balance": "2000"
                 },
-                "sc:forwarder": {
+                "sc:promises": {
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
@@ -30,7 +30,7 @@
                             ]
                         }
                     },
-                    "code": "file:../forwarder-raw/output/forwarder-raw.wasm"
+                    "code": "file:../promises-features/output/promises-features.wasm"
                 },
                 "sc:vault": {
                     "nonce": "0",
@@ -44,7 +44,7 @@
             "txId": "multi-transfer-through-promises",
             "tx": {
                 "from": "address:a_user",
-                "to": "sc:forwarder",
+                "to": "sc:promises",
                 "function": "forwarder_multi_transfer_via_promise",
                 "arguments": [
                     "sc:vault",
@@ -118,7 +118,7 @@
                     },
                     "code": "file:../vault/output/vault.wasm"
                 },
-                "sc:forwarder": {
+                "sc:promises": {
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
@@ -143,7 +143,7 @@
                     "storage": {
                         "str:async_call_callback_data": "true"
                     },
-                    "code": "file:../forwarder-raw/output/forwarder-raw.wasm"
+                    "code": "file:../promises-features/output/promises-features.wasm"
                 }
             }
         }
