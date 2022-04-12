@@ -203,6 +203,21 @@ where
         EsdtTokenPayment::new(token_id, token_nonce, amount)
     }
 
+    pub fn nft_create_named<T: TopEncode>(
+        &self,
+        amount: BigUint<SA>,
+        name: &ManagedBuffer<SA>,
+        attributes: &T,
+    ) -> EsdtTokenPayment<SA> {
+        let send_wrapper = SendWrapper::<SA>::new();
+        let token_id = self.get_token_id();
+
+        let token_nonce =
+            send_wrapper.esdt_nft_create_compact_named(&token_id, &amount, name, attributes);
+
+        EsdtTokenPayment::new(token_id, token_nonce, amount)
+    }
+
     pub fn nft_create_and_send<T: TopEncode>(
         &self,
         to: &ManagedAddress<SA>,
@@ -210,6 +225,19 @@ where
         attributes: &T,
     ) -> EsdtTokenPayment<SA> {
         let payment = self.nft_create(amount, attributes);
+        self.send_payment(to, &payment);
+
+        payment
+    }
+
+    pub fn nft_create_and_send_named<T: TopEncode>(
+        &self,
+        to: &ManagedAddress<SA>,
+        amount: BigUint<SA>,
+        name: &ManagedBuffer<SA>,
+        attributes: &T,
+    ) -> EsdtTokenPayment<SA> {
+        let payment = self.nft_create_named(amount, name, attributes);
         self.send_payment(to, &payment);
 
         payment
