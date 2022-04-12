@@ -94,6 +94,8 @@ members = [
   "contracts/feature-tests/composability/forwarder-raw/meta",
   "contracts/feature-tests/composability/local-esdt-and-nft",
   "contracts/feature-tests/composability/local-esdt-and-nft/meta",
+  "contracts/feature-tests/composability/promises-features",
+  "contracts/feature-tests/composability/promises-features/meta",
   "contracts/feature-tests/composability/proxy-test-first",
   "contracts/feature-tests/composability/proxy-test-first/meta",
   "contracts/feature-tests/composability/proxy-test-second",
