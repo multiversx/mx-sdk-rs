@@ -13,6 +13,10 @@ fn world() -> BlockchainMock {
         forwarder_raw::ContractBuilder,
     );
     blockchain.register_contract_builder(
+        "file:promises-features/output/promises-features.wasm",
+        promises_features::ContractBuilder,
+    );
+    blockchain.register_contract_builder(
         "file:proxy-test-first/output/proxy-test-first.wasm",
         proxy_test_first::ContractBuilder,
     );
@@ -31,16 +35,6 @@ fn world() -> BlockchainMock {
 #[test]
 fn forw_raw_async_accept_egld_rs() {
     elrond_wasm_debug::mandos_rs("mandos/forw_raw_async_accept_egld.scen.json", world());
-}
-
-#[test]
-fn forw_raw_register_promise_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/forw_raw_register_promise.scen.json", world());
-}
-
-#[test]
-fn forw_raw_promise_multi_transfer_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/forw_raw_promise_multi_transfer.scen.json", world());
 }
 
 #[test]
@@ -502,6 +496,16 @@ fn forwarder_validate_token_identifier_rs() {
         world(),
     );
 }
+
+#[test]
+fn promises_multi_transfer_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/promises_multi_transfer.scen.json", world());
+}
+
+// #[test]
+// fn promises_single_transfer_rs() {
+//     elrond_wasm_debug::mandos_rs("mandos/promises_single_transfer.scen.json", world());
+// }
 
 #[test]
 fn proxy_test_init_rs() {

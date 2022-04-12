@@ -1,5 +1,5 @@
 [package]
-name = "async"
+name = "composability-tests"
 version = "0.0.0"
 authors = ["Andrei Marinica <andrei.marinica@elrond.com>"]
 edition = "2018"
@@ -10,6 +10,9 @@ path = "forwarder"
 
 [dependencies.forwarder-raw]
 path = "forwarder-raw"
+
+[dependencies.promises-features]
+path = "promises-features"
 
 [dependencies.proxy-test-first]
 path = "proxy-test-first"
