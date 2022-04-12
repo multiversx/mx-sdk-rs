@@ -1,7 +1,7 @@
 use crate::DebugApi;
 use elrond_wasm::{
     elrond_codec::{CodecFrom, PanicErrorHandler, TopEncodeMulti},
-    types::{ContractCall, ContractDeploy},
+    types::{ContractCall, ContractDeploy, ManagedArgBuffer},
 };
 use mandos::model::{ScCallStep, ScDeployStep, ScQueryStep, TxExpect};
 
@@ -86,14 +86,22 @@ where
     }
 }
 
-impl CallBuilder<ContractDeploy<DebugApi>> for ScDeployStep {
-    fn call(mut self, contract_deploy: ContractDeploy<DebugApi>) -> Self {
+impl<OriginalResult> CallBuilder<ContractDeploy<DebugApi, OriginalResult>> for ScDeployStep {
+    fn call(mut self, contract_deploy: ContractDeploy<DebugApi, OriginalResult>) -> Self {
         let (_, mandos_args) = process_contract_deploy(contract_deploy);
         for arg in mandos_args {
             self = self.argument(arg.as_str());
         }
         self
     }
+}
+
+pub fn convert_call_args(arg_buffer: &ManagedArgBuffer<DebugApi>) -> Vec<String> {
+    arg_buffer
+        .to_raw_args_vec()
+        .iter()
+        .map(|arg| format!("0x{}", hex::encode(&arg)))
+        .collect()
 }
 
 /// Extracts
@@ -109,30 +117,20 @@ fn process_contract_call<OriginalResult>(
     );
     let function =
         String::from_utf8(contract_call.endpoint_name.to_boxed_bytes().into_vec()).unwrap();
-    let mandos_args = contract_call
-        .arg_buffer
-        .to_raw_args_vec()
-        .iter()
-        .map(|arg| format!("0x{}", hex::encode(&arg)))
-        .collect();
+    let mandos_args = convert_call_args(&contract_call.arg_buffer);
     (to_str, function, mandos_args)
 }
 
 /// Extracts
 /// - (optional) recipient (needed for contract upgrade, not yet used);
 /// - the arguments.
-fn process_contract_deploy(
-    contract_deploy: ContractDeploy<DebugApi>,
+fn process_contract_deploy<OriginalResult>(
+    contract_deploy: ContractDeploy<DebugApi, OriginalResult>,
 ) -> (Option<String>, Vec<String>) {
     let to_str = contract_deploy
         .to
         .map(|to| format!("0x{}", hex::encode(to.to_address().as_bytes())));
-    let mandos_args = contract_deploy
-        .arg_buffer
-        .to_raw_args_vec()
-        .iter()
-        .map(|arg| format!("0x{}", hex::encode(&arg)))
-        .collect();
+    let mandos_args = convert_call_args(&contract_deploy.arg_buffer);
     (to_str, mandos_args)
 }
 

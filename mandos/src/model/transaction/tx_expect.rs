@@ -70,3 +70,14 @@ impl IntoRaw<TxExpectRaw> for TxExpect {
         }
     }
 }
+
+impl TxExpect {
+    pub fn out_to_string(&self) -> String {
+        match &self.out {
+            CheckValue::Star => "*".to_string(),
+            CheckValue::Equal(list) => {
+                itertools::join(list.iter().map(|val| format!("{}", val)), ", ")
+            },
+        }
+    }
+}

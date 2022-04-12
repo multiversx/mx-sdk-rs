@@ -15,10 +15,10 @@ pub fn check_tx_output(tx_id: &str, tx_expect: &TxExpect, tx_result: &TxResult) 
 
     assert!(
         tx_expect.out.check(tx_result.result_values.as_slice()),
-        "bad out value. Tx id: {}. Want: {:?}. Have: {:?}",
+        "bad out value. Tx id: {}. Want: [{}]. Have: [{}]",
         tx_id,
-        tx_expect.out,
-        tx_result.result_values
+        tx_expect.out_to_string(),
+        tx_result.result_values_to_string()
     );
 
     assert!(
