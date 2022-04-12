@@ -4,7 +4,7 @@ use elrond_wasm::{
     types::heap::{Address, H256},
 };
 
-use num_bigint::BigUint;
+use crate::num_bigint::BigUint;
 
 use alloc::vec::Vec;
 

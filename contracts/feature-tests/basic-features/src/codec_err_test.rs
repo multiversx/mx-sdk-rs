@@ -79,6 +79,7 @@ pub trait CodecErrorTest {
     fn codec_err_contract_call(&self) {
         let _ = self
             .encode_err_proxy()
+            .contract(ManagedAddress::zero())
             .encode_error_method(CodecErrorTestType);
     }
 }

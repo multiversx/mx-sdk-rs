@@ -1,7 +1,8 @@
 use core::marker::PhantomData;
 
 use elrond_codec::{
-    multi_encode_iter_or_handle_err, EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput,
+    multi_encode_iter_or_handle_err, CodecFrom, EncodeErrorHandler, TopEncodeMulti,
+    TopEncodeMultiOutput,
 };
 
 use super::StorageMapper;
@@ -181,8 +182,6 @@ impl<SA> TopEncodeMulti for UserMapper<SA>
 where
     SA: StorageMapperApi,
 {
-    type DecodeAs = MultiValueEncoded<SA, ManagedAddress<SA>>;
-
     fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
     where
         O: TopEncodeMultiOutput,
@@ -191,6 +190,11 @@ where
         let all_addresses = self.get_all_addresses();
         multi_encode_iter_or_handle_err(all_addresses.into_iter(), output, h)
     }
+}
+
+impl<SA> CodecFrom<UserMapper<SA>> for MultiValueEncoded<SA, ManagedAddress<SA>> where
+    SA: StorageMapperApi
+{
 }
 
 /// Behaves like a MultiResultVec when an endpoint result.

@@ -11,6 +11,15 @@ pub trait ProxyObjBase {
     #[must_use]
     fn contract(self, address: ManagedAddress<Self::Api>) -> Self;
 
+    /// Extracts the address contained in the proxy object and replaces it with None.
+    ///
+    /// Will crash if no address was specified.
     #[doc(hidden)]
-    fn into_fields(self) -> ManagedAddress<Self::Api>;
+    fn extract_address(&mut self) -> ManagedAddress<Self::Api>;
+
+    /// Extracts the address contained in the proxy object and replaces it with None.
+    ///
+    /// Will just return None if no address was specified.
+    #[doc(hidden)]
+    fn extract_opt_address(&mut self) -> Option<ManagedAddress<Self::Api>>;
 }

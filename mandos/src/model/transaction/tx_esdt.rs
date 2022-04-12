@@ -1,5 +1,5 @@
 use crate::{
-    interpret_trait::{InterpretableFrom, InterpreterContext},
+    interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
     model::{BigUintValue, BytesValue, U64Value},
     serde_raw::{TxESDTRaw, ValueSubTree},
 };
@@ -17,6 +17,16 @@ impl InterpretableFrom<TxESDTRaw> for TxESDT {
             esdt_token_identifier: interpret_esdt_token_identifier(from.token_identifier, context),
             nonce: interpret_opt_u64(from.nonce, context),
             esdt_value: BigUintValue::interpret_from(from.value, context),
+        }
+    }
+}
+
+impl IntoRaw<TxESDTRaw> for TxESDT {
+    fn into_raw(self) -> TxESDTRaw {
+        TxESDTRaw {
+            token_identifier: Some(self.esdt_token_identifier.into_raw()),
+            nonce: self.nonce.into_raw_opt(),
+            value: self.esdt_value.into_raw(),
         }
     }
 }

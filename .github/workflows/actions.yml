@@ -1,4 +1,4 @@
-name: Builds and tests
+name: CI
 
 on:
   push:
@@ -7,102 +7,12 @@ on:
   pull_request:
 
 jobs:
-  wasm_test:
-    name: Wasm tests
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions-rs/toolchain@v1
-        with:
-          default: true
-          toolchain: nightly-2022-01-17
-      - name: Install erdpy, vmtools and wasm-opt
-        run: |
-          source .github/workflows/env
-          pip3 install erdpy
-          mkdir $HOME/elrondsdk
-          erdpy config set dependencies.vmtools.tag v1.4.43
-          erdpy deps install vmtools
-          erdpy deps install nodejs
-          erdpy deps install wasm-opt
-      - name: Build the wasm contracts
-        run: |
-          source .github/workflows/env
-          ./build-wasm.sh
-      - name: Run Arwen tests
-        run: |
-          source .github/workflows/env
-          cargo test --features elrond-wasm-debug/mandos-go-tests
-      - name: Generate file size report
-        run: |
-          source .github/workflows/env
-          ./sizes.sh > sizes.txt
-      - name: Upload file size report
-        uses: actions/upload-artifact@v2
-        with:
-          name: sizes
-          path: sizes.txt
-      - name: Download base report
-        uses: dawidd6/action-download-artifact@v2
-        if: ${{ github.event_name == 'pull_request' }}
-        continue-on-error: true
-        with:
-          workflow: actions.yml
-          name: sizes
-          commit: ${{github.event.pull_request.base.sha}}
-          path: base-sizes
-      - name: Generate report
-        id: sizes-report
-        if: ${{ github.event_name == 'pull_request' }}
-        run: |
-          source .github/workflows/env
-          python tools/size-report/size_report.py base-sizes/sizes.txt sizes.txt --allow-missing > report.md
-      - name: Render report
-        id: template
-        uses: chuhlomin/render-template@v1.2
-        if: ${{ github.event_name == 'pull_request' }}
-        with:
-          template: report.md
-          vars: |
-            base: ${{github.event.pull_request.base.sha}}
-            head: ${{github.event.pull_request.head.sha}}
-      - name: Find sizes report comment
-        id: fc
-        uses: peter-evans/find-comment@v1
-        if: ${{ github.event_name == 'pull_request' }}
-        with:
-          issue-number: ${{ github.event.pull_request.number }}
-          comment-author: 'github-actions[bot]'
-          body-includes: Contract file size comparison
-      - name: Create or update sizes report comment
-        uses: peter-evans/create-or-update-comment@v1
-        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
-        with:
-          comment-id: ${{ steps.fc.outputs.comment-id }}
-          issue-number: ${{ github.event.pull_request.number }}
-          body: ${{ steps.template.outputs.result }}
-          edit-mode: replace
-  rust_test:
-    name: Rust tests
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions-rs/toolchain@v1
-        with:
-          default: true
-          toolchain: nightly
-      - name: Run rust tests
-        run: cargo test
-  clippy_check:
-    name: Clippy linter check
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: nightly
-          components: clippy
-          default: true
-      - uses: actions-rs/clippy-check@v1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+  contracts:
+    name: Contracts
+    uses: ElrondNetwork/elrond-actions/.github/workflows/contracts.yml@v1
+    with:
+      rust-toolchain: nightly-2022-04-05
+      vmtools-version: v1.4.43
+      extra-build-args: --ignore-eei-checks
+    secrets:
+      token: ${{ secrets.GITHUB_TOKEN }}
