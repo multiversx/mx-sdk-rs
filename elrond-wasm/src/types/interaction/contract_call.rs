@@ -124,18 +124,21 @@ where
         self
     }
 
+    #[cfg(feature = "promises")]
     #[inline]
     pub fn with_success_callback(mut self, callback: &'static [u8]) -> Self {
         self.success_callback = callback;
         self
     }
 
+    #[cfg(feature = "promises")]
     #[inline]
     pub fn with_error_callback(mut self, callback: &'static [u8]) -> Self {
         self.error_callback = callback;
         self
     }
 
+    #[cfg(feature = "promises")]
     #[inline]
     pub fn with_extra_gas_for_callback(mut self, gas_limit: u64) -> Self {
         self.extra_gas_for_callback = gas_limit;
@@ -318,6 +321,7 @@ where
         }
     }
 
+    #[cfg(feature = "promises")]
     pub fn register_promise(mut self) {
         self = self.convert_to_esdt_transfer_call();
         SA::send_api_impl().create_async_call_raw(
@@ -371,9 +375,13 @@ where
 
     /// Executes immediately, synchronously, and returns contract call result.
     /// Only works if the target contract is in the same shard.
+    ///
     /// This is a workaround to handle nested sync calls.
+    ///
     /// Please do not use this method unless there is absolutely no other option.
+    ///
     /// Will be eliminated after some future Arwen hook redesign.
+    ///
     /// `range_closure` takes the number of results before, the number of results after,
     /// and is expected to return the start index (inclusive) and end index (exclusive).
     pub fn execute_on_dest_context_custom_range<F, RequestedResult>(
@@ -418,7 +426,9 @@ where
     SA: CallTypeApi + 'static,
 {
     /// Executes immediately, synchronously.
+    ///
     /// The result (if any) is ignored.
+    ///
     /// Only works if the target contract is in the same shard.
     pub fn execute_on_dest_context_ignore_result(mut self) {
         self = self.convert_to_esdt_transfer_call();
@@ -455,6 +465,7 @@ where
     }
 
     /// Immediately launches a transfer-execute call.
+    ///
     /// This is similar to an async call, but there is no callback
     /// and there can be more than one such call per transaction.
     pub fn transfer_execute(self) {
