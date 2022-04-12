@@ -1,6 +1,6 @@
 use core::fmt::Display;
 
-use elrond_wasm::formatter::*;
+use elrond_wasm::{formatter::*, types::CodeMetadata};
 
 #[derive(Default)]
 struct SimpleReceiver(String);
@@ -39,6 +39,12 @@ fn check_lower_hex<T: SCLowerHex + Display + std::fmt::LowerHex>(item: T) {
     SCLowerHex::fmt(&item, &mut receiver);
     let expected = format!("{:x}", item);
     assert_eq!(receiver.0, expected);
+}
+
+fn check_code_metadata_display<T: SCDisplay, D: Display>(item: T, expected: D) {
+    let mut receiver = SimpleReceiver::default();
+    SCDisplay::fmt(&item, &mut receiver);
+    assert_eq!(receiver.0, expected.to_string());
 }
 
 #[test]
@@ -116,4 +122,60 @@ fn test_format_signed() {
     check_display(i32::MIN);
     check_display(i64::MAX);
     check_display(i64::MIN);
+}
+
+#[test]
+fn test_display_code_metadata() {
+    check_code_metadata_display(CodeMetadata::UPGRADEABLE, "Upgradeable");
+    check_code_metadata_display(CodeMetadata::READABLE, "Readable");
+    check_code_metadata_display(CodeMetadata::PAYABLE, "Payable");
+    check_code_metadata_display(CodeMetadata::PAYABLE_BY_SC, "PayableBySC");
+    check_code_metadata_display(
+        CodeMetadata::UPGRADEABLE | CodeMetadata::READABLE,
+        "Upgradeable|Readable",
+    );
+    check_code_metadata_display(
+        CodeMetadata::UPGRADEABLE | CodeMetadata::PAYABLE,
+        "Upgradeable|Payable",
+    );
+    check_code_metadata_display(
+        CodeMetadata::UPGRADEABLE | CodeMetadata::PAYABLE_BY_SC,
+        "Upgradeable|PayableBySC",
+    );
+    check_code_metadata_display(
+        CodeMetadata::READABLE | CodeMetadata::PAYABLE,
+        "Readable|Payable",
+    );
+    check_code_metadata_display(
+        CodeMetadata::READABLE | CodeMetadata::PAYABLE_BY_SC,
+        "Readable|PayableBySC",
+    );
+    check_code_metadata_display(
+        CodeMetadata::PAYABLE | CodeMetadata::PAYABLE_BY_SC,
+        "Payable|PayableBySC",
+    );
+    check_code_metadata_display(
+        CodeMetadata::UPGRADEABLE | CodeMetadata::READABLE | CodeMetadata::PAYABLE,
+        "Upgradeable|Readable|Payable",
+    );
+    check_code_metadata_display(
+        CodeMetadata::UPGRADEABLE | CodeMetadata::READABLE | CodeMetadata::PAYABLE_BY_SC,
+        "Upgradeable|Readable|PayableBySC",
+    );
+    check_code_metadata_display(
+        CodeMetadata::UPGRADEABLE | CodeMetadata::PAYABLE | CodeMetadata::PAYABLE_BY_SC,
+        "Upgradeable|Payable|PayableBySC",
+    );
+    check_code_metadata_display(
+        CodeMetadata::READABLE | CodeMetadata::PAYABLE | CodeMetadata::PAYABLE_BY_SC,
+        "Readable|Payable|PayableBySC",
+    );
+    check_code_metadata_display(
+        CodeMetadata::UPGRADEABLE
+            | CodeMetadata::PAYABLE
+            | CodeMetadata::READABLE
+            | CodeMetadata::PAYABLE_BY_SC,
+        "Upgradeable|Readable|Payable|PayableBySC",
+    );
+    check_code_metadata_display(CodeMetadata::DEFAULT, "Default");
 }
