@@ -1,0 +1,194 @@
+{
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:a_user": {
+                    "nonce": "0",
+                    "balance": "1000"
+                },
+                "sc:vault": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../vault/output/vault.wasm"
+                },
+                "sc:promises": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../promises-features/output/promises-features.wasm"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "1",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:promises",
+                "function": "promise_single_token",
+                "arguments": [
+                    "sc:vault",
+                    "str:echo_arguments",
+                    "300,000",
+                    "500,000",
+                    "1",
+                    "2"
+                ],
+                "gasLimit": "800,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "5",
+                "message": "str:not enough gas",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:a_user": {
+                    "nonce": "1",
+                    "balance": "1000"
+                },
+                "sc:vault": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../vault/output/vault.wasm"
+                },
+                "sc:promises": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../promises-features/output/promises-features.wasm"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "2",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:promises",
+                "function": "promise_single_token",
+                "arguments": [
+                    "sc:vault",
+                    "str:echo_arguments",
+                    "3,000,000",
+                    "100,000,000",
+                    "1",
+                    "2"
+                ],
+                "gasLimit": "800,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "logs": [
+                    {
+                        "address": "sc:promises",
+                        "endpoint": "str:error_callback",
+                        "topics": [
+                            "str:async_call_event_callback"
+                        ],
+                        "data": {
+                            "0-status": "biguint:5",
+                            "1-message": "nested:str:not enough gas"
+                        }
+                    },
+                    "+"
+                ],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:a_user": {
+                    "nonce": "2",
+                    "balance": "1000"
+                },
+                "sc:vault": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../vault/output/vault.wasm"
+                },
+                "sc:promises": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../promises-features/output/promises-features.wasm"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "3",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:promises",
+                "function": "promise_single_token",
+                "arguments": [
+                    "sc:vault",
+                    "str:echo_arguments",
+                    "300,000,000",
+                    "100,000,000",
+                    "1",
+                    "2"
+                ],
+                "gasLimit": "500,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "1",
+                    "2"
+                ],
+                "status": "0",
+                "logs": [
+                    {
+                        "address": "sc:promises",
+                        "endpoint": "str:success_callback",
+                        "topics": [
+                            "str:async_call_event_callback"
+                        ],
+                        "data": {
+                            "0-status": "biguint:0",
+                            "1-echoed-args": [
+                                "biguint:1",
+                                "biguint:2"
+                            ]
+                        }
+                    }
+                ],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:a_user": {
+                    "nonce": "3",
+                    "balance": "1000"
+                },
+                "sc:vault": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../vault/output/vault.wasm"
+                },
+                "sc:promises": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:async_call_callback_data": "true"
+                    },
+                    "code": "file:../promises-features/output/promises-features.wasm"
+                }
+            }
+        }
+    ]
+}

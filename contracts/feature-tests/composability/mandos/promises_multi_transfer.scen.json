@@ -6,9 +6,9 @@
             "accounts": {
                 "address:a_user": {
                     "nonce": "0",
-                    "balance": "0"
+                    "balance": "2000"
                 },
-                "sc:forwarder": {
+                "sc:promises": {
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
@@ -30,7 +30,7 @@
                             ]
                         }
                     },
-                    "code": "file:../forwarder/output/forwarder.wasm"
+                    "code": "file:../promises-features/output/promises-features.wasm"
                 },
                 "sc:vault": {
                     "nonce": "0",
@@ -41,89 +41,15 @@
         },
         {
             "step": "scCall",
-            "txId": "1",
-            "comment": "send fungible twice",
+            "txId": "multi-transfer-through-promises",
             "tx": {
                 "from": "address:a_user",
-                "to": "sc:forwarder",
-                "function": "send_async_accept_multi_transfer",
+                "to": "sc:promises",
+                "function": "promise_multi_transfer",
                 "arguments": [
                     "sc:vault",
-                    "str:FWD-TOKEN",
-                    "0",
-                    "100",
-                    "str:FWD-TOKEN",
-                    "0",
-                    "200"
-                ],
-                "gasLimit": "80,000,000",
-                "gasPrice": "0"
-            },
-            "expect": {
-                "out": [],
-                "status": "0",
-                "message": "",
-                "gas": "*",
-                "refund": "*"
-            }
-        },
-        {
-            "step": "checkState",
-            "accounts": {
-                "address:a_user": {
-                    "nonce": "*",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
-                },
-                "sc:vault": {
-                    "nonce": "0",
-                    "balance": "0",
-                    "esdt": {
-                        "str:FWD-TOKEN": "300"
-                    },
-                    "storage": {
-                        "str:call_counts|nested:str:accept_funds": "1"
-                    },
-                    "code": "file:../vault/output/vault.wasm"
-                },
-                "sc:forwarder": {
-                    "nonce": "0",
-                    "balance": "0",
-                    "esdt": {
-                        "str:FWD-TOKEN": "700",
-                        "str:NFT-123456": {
-                            "instances": [
-                                {
-                                    "nonce": "1",
-                                    "balance": "1"
-                                }
-                            ]
-                        },
-                        "str:SFT-456789": {
-                            "instances": [
-                                {
-                                    "nonce": "3",
-                                    "balance": "10"
-                                }
-                            ]
-                        }
-                    },
-                    "storage": {},
-                    "code": "file:../forwarder/output/forwarder.wasm"
-                }
-            }
-        },
-        {
-            "step": "scCall",
-            "txId": "2",
-            "comment": "send all types",
-            "tx": {
-                "from": "address:a_user",
-                "to": "sc:forwarder",
-                "function": "send_async_accept_multi_transfer",
-                "arguments": [
-                    "sc:vault",
+                    "str:accept_funds_echo_payment",
+                    "5,000",
                     "str:FWD-TOKEN",
                     "0",
                     "500",
@@ -134,11 +60,22 @@
                     "3",
                     "6"
                 ],
-                "gasLimit": "80,000,000",
+                "gasLimit": "100,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [],
+                "out": [
+                    "0",
+                    "str:FWD-TOKEN",
+                    "0",
+                    "500",
+                    "str:NFT-123456",
+                    "1",
+                    "1",
+                    "str:SFT-456789",
+                    "3",
+                    "6"
+                ],
                 "status": "0",
                 "message": "",
                 "gas": "*",
@@ -150,7 +87,7 @@
             "accounts": {
                 "address:a_user": {
                     "nonce": "*",
-                    "balance": "0",
+                    "balance": "2000",
                     "storage": {},
                     "code": ""
                 },
@@ -158,7 +95,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
-                        "str:FWD-TOKEN": "800",
+                        "str:FWD-TOKEN": "500",
                         "str:NFT-123456": {
                             "instances": [
                                 {
@@ -177,15 +114,23 @@
                         }
                     },
                     "storage": {
-                        "str:call_counts|nested:str:accept_funds": "2"
+                        "str:call_counts|nested:str:accept_funds_echo_payment": "1"
                     },
                     "code": "file:../vault/output/vault.wasm"
                 },
-                "sc:forwarder": {
+                "sc:promises": {
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
-                        "str:FWD-TOKEN": "200",
+                        "str:FWD-TOKEN": "500",
+                        "str:NFT-123456": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "0"
+                                }
+                            ]
+                        },
                         "str:SFT-456789": {
                             "instances": [
                                 {
@@ -195,7 +140,10 @@
                             ]
                         }
                     },
-                    "code": "file:../forwarder/output/forwarder.wasm"
+                    "storage": {
+                        "str:async_call_callback_data": "true"
+                    },
+                    "code": "file:../promises-features/output/promises-features.wasm"
                 }
             }
         }
