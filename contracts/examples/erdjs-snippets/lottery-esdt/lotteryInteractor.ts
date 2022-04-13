@@ -6,9 +6,10 @@
  * Note: in dApps, make sure you use a proper wallet provider to sign the transaction.
  * @module
  */
-import { AbiRegistry, Address, Balance, BigUIntValue, BytesValue, Code, CodeMetadata, createListOfAddresses, DefaultSmartContractController, EnumValue, GasLimit, Interaction, IProvider, ISmartContractController, OptionalValue, OptionValue, ReturnCode, SmartContract, SmartContractAbi, Struct, Token, TokenIdentifierValue, U32Value, VariadicValue } from "@elrondnetwork/erdjs";
 import path from "path";
-import { ITestUser } from "@elrondnetwork/erdjs-snippets";
+import { CodeMetadata, EnumValue, GasLimit, IAddress, Interaction, ResultsParser, ReturnCode, SmartContract, SmartContractAbi, Struct, TokenPayment, TransactionWatcher, VariadicValue } from "@elrondnetwork/erdjs";
+import { INetworkProvider, ITestSession, ITestUser, loadAbiRegistry, loadCode } from "@elrondnetwork/erdjs-snippets";
+import { NetworkConfig } from "@elrondnetwork/erdjs-network-providers";
 
 const PathToWasm = path.resolve(__dirname, "lottery-esdt.wasm");
 const PathToAbi = path.resolve(__dirname, "lottery-esdt.abi.json");
@@ -72,14 +73,14 @@ export class LotteryInteractor {
         return { address, returnCode };
     }
 
-    async start(owner: ITestUser, lotteryName: string, token: Token, price: number, whitelist: IAddress[]): Promise<ReturnCode> {
+    async start(owner: ITestUser, lotteryName: string, tokenIdentifier: string, price: number, whitelist: IAddress[]): Promise<ReturnCode> {
         console.log(`LotteryInteractor.start(): lotteryName = ${lotteryName}`);
 
         // Prepare the interaction
         let interaction = <Interaction>this.contract.methods
             .start([
                 lotteryName,
-                token.identifier,
+                tokenIdentifier,
                 price,
                 null,
                 null,
@@ -107,8 +108,8 @@ export class LotteryInteractor {
         return returnCode;
     }
 
-    async buyTicket(user: ITestUser, lotteryName: string, amount: Balance): Promise<ReturnCode> {
-        console.log(`LotteryInteractor.buyTicket(): address = ${user.address}, amount = ${amount.toCurrencyString()}`);
+    async buyTicket(user: ITestUser, lotteryName: string, amount: TokenPayment): Promise<ReturnCode> {
+        console.log(`LotteryInteractor.buyTicket(): address = ${user.address}, amount = ${amount.toPrettyString()}`);
 
         // Prepare the interaction
         let interaction = <Interaction>this.contract.methods

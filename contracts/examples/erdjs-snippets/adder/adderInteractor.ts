@@ -7,8 +7,9 @@
  * @module
  */
 import path from "path";
-import { AbiRegistry, Address, BigUIntValue, Code, CodeMetadata, DefaultSmartContractController, GasLimit, Interaction, IProvider, ISmartContractController, ReturnCode, SmartContract, SmartContractAbi } from "@elrondnetwork/erdjs";
-import { ITestUser } from "@elrondnetwork/erdjs-snippets";
+import { BigUIntValue, CodeMetadata, GasLimit, IAddress, Interaction, ResultsParser, ReturnCode, SmartContract, SmartContractAbi, TransactionWatcher } from "@elrondnetwork/erdjs";
+import { INetworkProvider, ITestSession, ITestUser, loadAbiRegistry, loadCode } from "@elrondnetwork/erdjs-snippets";
+import { NetworkConfig } from "@elrondnetwork/erdjs-network-providers";
 
 const PathToWasm = path.resolve(__dirname, "adder.wasm");
 const PathToAbi = path.resolve(__dirname, "adder.abi.json");
