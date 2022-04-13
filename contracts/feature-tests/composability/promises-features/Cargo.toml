@@ -14,6 +14,7 @@ path = "../vault"
 [dependencies.elrond-wasm]
 version = "0.30.0"
 path = "../../../../elrond-wasm"
+features = ["promises"]
 
 [dependencies.elrond-wasm-node]
 version = "0.30.0"

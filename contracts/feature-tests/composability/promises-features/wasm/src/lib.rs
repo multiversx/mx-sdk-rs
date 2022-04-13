@@ -9,7 +9,7 @@ elrond_wasm_node::wasm_endpoints! {
     (
         async_call_callback_data
         error_callback
-        forwarder_multi_transfer_via_promise
+        promise_multi_transfer
         promise_single_token
         success_callback
     )
