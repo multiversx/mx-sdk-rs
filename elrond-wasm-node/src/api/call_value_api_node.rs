@@ -51,19 +51,15 @@ impl CallValueApiImpl for VmApiImpl {
         }
     }
 
-    fn egld_value(&self) -> Handle {
+    fn load_egld_value(&self, dest: Handle) {
         unsafe {
-            let value_handle = self.next_bigint_handle();
-            bigIntGetCallValue(value_handle);
-            value_handle
+            bigIntGetCallValue(dest);
         }
     }
 
-    fn esdt_value(&self) -> Handle {
+    fn load_single_esdt_value(&self, dest: Handle) {
         unsafe {
-            let value_handle = self.next_bigint_handle();
-            bigIntGetESDTCallValue(value_handle);
-            value_handle
+            bigIntGetESDTCallValue(dest);
         }
     }
 

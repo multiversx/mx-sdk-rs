@@ -1,5 +1,5 @@
 use elrond_wasm::{
-    api::{Handle, StaticVarApi, StaticVarApiImpl},
+    api::{const_handles, Handle, StaticVarApi, StaticVarApiImpl},
     types::LockableStaticBuffer,
 };
 
@@ -7,9 +7,8 @@ use crate::VmApiImpl;
 
 static mut STATIC_BUFFER: LockableStaticBuffer = LockableStaticBuffer::new();
 static mut EXTERNAL_VIEW_TARGET_ADDRESS_HANDLE: i32 = 0;
-static mut NEXT_BIG_INT_HANDLE: i32 = <VmApiImpl as StaticVarApi>::BIG_INT_HANDLE_START_FROM;
-static mut NEXT_MANAGED_BUFFER_HANDLE: i32 =
-    <VmApiImpl as StaticVarApi>::MANAGED_BUFFER_HANDLE_START_FROM;
+static mut NEXT_BIG_INT_HANDLE: i32 = const_handles::BIG_INT_START_FROM;
+static mut NEXT_MANAGED_BUFFER_HANDLE: i32 = const_handles::MANAGED_BUFFER_START_FROM;
 
 impl StaticVarApi for VmApiImpl {
     type StaticVarApiImpl = VmApiImpl;
@@ -41,7 +40,7 @@ impl StaticVarApiImpl for VmApiImpl {
         }
     }
 
-    fn get_next_managed_buffer_handle(&self) -> Handle {
+    fn next_managed_buffer_handle(&self) -> Handle {
         unsafe {
             NEXT_MANAGED_BUFFER_HANDLE -= 1;
             NEXT_MANAGED_BUFFER_HANDLE

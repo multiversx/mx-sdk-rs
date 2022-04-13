@@ -5,10 +5,6 @@ use super::Handle;
 pub trait StaticVarApi {
     type StaticVarApiImpl: StaticVarApiImpl;
 
-    const BIG_INT_HANDLE_ZERO: i32 = 0;
-    const BIG_INT_HANDLE_START_FROM: i32 = -10; // > -10 reserved for APIs
-    const MANAGED_BUFFER_HANDLE_START_FROM: i32 = -10; // > -10 reserved for APIs
-
     fn static_var_api_impl() -> Self::StaticVarApiImpl;
 }
 
@@ -24,5 +20,5 @@ pub trait StaticVarApiImpl {
 
     fn next_bigint_handle(&self) -> Handle;
 
-    fn get_next_managed_buffer_handle(&self) -> Handle;
+    fn next_managed_buffer_handle(&self) -> Handle;
 }

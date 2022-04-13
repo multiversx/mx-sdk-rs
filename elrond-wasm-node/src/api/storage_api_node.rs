@@ -1,6 +1,9 @@
 use super::VmApiImpl;
 use elrond_wasm::{
-    api::{Handle, StorageReadApi, StorageReadApiImpl, StorageWriteApi, StorageWriteApiImpl},
+    api::{
+        Handle, StaticVarApiImpl, StorageReadApi, StorageReadApiImpl, StorageWriteApi,
+        StorageWriteApiImpl,
+    },
     types::heap::{Box, BoxedBytes},
 };
 

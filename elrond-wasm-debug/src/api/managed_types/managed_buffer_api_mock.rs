@@ -24,14 +24,14 @@ impl DebugApi {
 impl ManagedBufferApi for DebugApi {
     fn mb_new_empty(&self) -> Handle {
         let mut managed_types = self.m_types_borrow_mut();
-        let handle = self.get_next_managed_buffer_handle();
+        let handle = self.next_managed_buffer_handle();
         managed_types.managed_buffer_map.insert(handle, Vec::new());
         handle
     }
 
     fn mb_new_from_bytes(&self, bytes: &[u8]) -> Handle {
         let mut managed_types = self.m_types_borrow_mut();
-        let handle = self.get_next_managed_buffer_handle();
+        let handle = self.next_managed_buffer_handle();
         managed_types
             .managed_buffer_map
             .insert(handle, Vec::from(bytes));

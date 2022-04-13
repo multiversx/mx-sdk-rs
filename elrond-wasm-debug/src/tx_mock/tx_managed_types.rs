@@ -1,5 +1,5 @@
-use crate::{num_bigint::BigInt, DebugApi};
-use elrond_wasm::api::{Handle, StaticVarApi};
+use crate::num_bigint::BigInt;
+use elrond_wasm::api::{const_handles, Handle};
 use std::collections::HashMap;
 
 type ManagedBufferImpl = Vec<u8>;
@@ -78,9 +78,8 @@ impl Default for TxStaticVars {
     fn default() -> Self {
         TxStaticVars {
             external_view_target_address_handle: 0,
-            next_big_int_handle: <DebugApi as StaticVarApi>::BIG_INT_HANDLE_START_FROM,
-            next_managed_buffer_handle:
-                <DebugApi as StaticVarApi>::MANAGED_BUFFER_HANDLE_START_FROM,
+            next_big_int_handle: const_handles::BIG_INT_START_FROM,
+            next_managed_buffer_handle: const_handles::MANAGED_BUFFER_START_FROM,
         }
     }
 }
