@@ -45,7 +45,7 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:promises",
-                "function": "forwarder_multi_transfer_via_promise",
+                "function": "promise_multi_transfer",
                 "arguments": [
                     "sc:vault",
                     "str:accept_funds_echo_payment",
