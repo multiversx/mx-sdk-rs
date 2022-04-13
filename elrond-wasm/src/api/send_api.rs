@@ -76,6 +76,18 @@ pub trait SendApiImpl {
         arg_buffer: &ManagedArgBuffer<M>,
     ) -> !;
 
+    #[allow(clippy::too_many_arguments)]
+    fn create_async_call_raw<M: ManagedTypeApi>(
+        &self,
+        to: &ManagedAddress<M>,
+        amount: &BigUint<M>,
+        endpoint_name: &ManagedBuffer<M>,
+        success: &'static [u8],
+        error: &'static [u8],
+        gas: u64,
+        extra_gas_for_callback: u64,
+        arg_buffer: &ManagedArgBuffer<M>,
+    );
     /// Deploys a new contract in the same shard.
     /// Unlike `async_call_raw`, the deployment is synchronous and tx execution continues afterwards.
     /// Also unlike `async_call_raw`, it uses an argument buffer to pass arguments

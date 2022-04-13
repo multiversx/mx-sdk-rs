@@ -1,6 +1,6 @@
 use elrond_codec::{
     multi_types::MultiValue3, DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti,
-    TopDecodeMultiInput, TopEncodeMulti, TopEncodeMultiOutput,
+    TopDecodeMultiInput, TopDecodeMultiLength, TopEncodeMulti, TopEncodeMultiOutput,
 };
 
 use crate::{
@@ -89,6 +89,13 @@ where
         let amount = BigUint::multi_decode_or_handle_err(input, h)?;
         Ok(EsdtTokenPayment::new(token_identifier, token_nonce, amount).into())
     }
+}
+
+impl<M> TopDecodeMultiLength for EsdtTokenPaymentMultiValue<M>
+where
+    M: ManagedTypeApi,
+{
+    const LEN: usize = 3;
 }
 
 impl<M> TypeAbi for EsdtTokenPaymentMultiValue<M>
