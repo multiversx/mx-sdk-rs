@@ -17,7 +17,6 @@ impl CryptoApiImpl for UncallableApi {
         unreachable!()
     }
 
-    #[cfg(feature = "ei-1-1")]
     fn sha256(&self, _data_handle: crate::api::Handle) -> crate::api::Handle {
         unreachable!()
     }
@@ -26,7 +25,6 @@ impl CryptoApiImpl for UncallableApi {
         unreachable!()
     }
 
-    #[cfg(feature = "ei-1-1")]
     fn keccak256(&self, _data_handle: crate::api::Handle) -> crate::api::Handle {
         unreachable!()
     }

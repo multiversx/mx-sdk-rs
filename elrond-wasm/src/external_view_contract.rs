@@ -2,7 +2,6 @@ use crate::api::VMApi;
 
 /// Implementation of external view contract constructors.
 /// They take 1 Address argument and save it to storage under key `external-view-target-address`.
-#[cfg(feature = "ei-1-1")]
 pub fn external_view_contract_constructor<A>()
 where
     A: VMApi,
@@ -26,11 +25,4 @@ where
     let key_handle = A::managed_type_impl().mb_new_from_bytes(EXTERNAL_VIEW_TARGET_ADRESS_KEY);
     A::storage_write_api_impl()
         .storage_store_managed_buffer_raw(key_handle, target_contract_address.get_raw_handle());
-}
-
-#[cfg(not(feature = "ei-1-1"))]
-pub fn external_view_contract_constructor<A>()
-where
-    A: VMApi,
-{
 }
