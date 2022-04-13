@@ -11,8 +11,8 @@ import { BigUIntValue, CodeMetadata, GasLimit, IAddress, Interaction, ResultsPar
 import { INetworkProvider, ITestSession, ITestUser, loadAbiRegistry, loadCode } from "@elrondnetwork/erdjs-snippets";
 import { NetworkConfig } from "@elrondnetwork/erdjs-network-providers";
 
-const PathToWasm = path.resolve(__dirname, "adder.wasm");
-const PathToAbi = path.resolve(__dirname, "adder.abi.json");
+const PathToWasm = path.resolve(__dirname, "..", "..", "adder", "output", "adder.wasm");
+const PathToAbi = path.resolve(__dirname, "..", "..", "adder", "output", "adder.abi.json");
 
 export async function createInteractor(session: ITestSession, contractAddress?: IAddress): Promise<AdderInteractor> {
     let registry = await loadAbiRegistry(PathToAbi);
@@ -61,11 +61,11 @@ export class AdderInteractor {
 
         // The contract address is deterministically computable:
         let address = SmartContract.computeAddress(transaction.getSender(), transaction.getNonce());
-        
+
         // Let's broadcast the transaction and await its completion:
         await this.networkProvider.sendTransaction(transaction);
         let transactionOnNetwork = await this.transactionWatcher.awaitCompleted(transaction);
-        
+
         // In the end, parse the results:
         let { returnCode } = this.resultsParser.parseUntypedOutcome(transactionOnNetwork);
 
