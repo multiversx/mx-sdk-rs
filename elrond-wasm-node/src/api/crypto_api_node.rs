@@ -100,11 +100,13 @@ impl CryptoApiImpl for VmApiImpl {
     }
 
     #[cfg(feature = "ei-1-1")]
-    fn keccak256(&self, data_handle: elrond_wasm::api::Handle) -> elrond_wasm::api::Handle {
+    fn keccak256(
+        &self,
+        result_handle: elrond_wasm::api::Handle,
+        data_handle: elrond_wasm::api::Handle,
+    ) {
         unsafe {
-            let result_handle = mBufferNew();
             managedKeccak256(data_handle, result_handle);
-            result_handle
         }
     }
 

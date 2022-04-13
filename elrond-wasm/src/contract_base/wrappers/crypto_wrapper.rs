@@ -56,10 +56,10 @@ where
         &self,
         data: B,
     ) -> ManagedByteArray<A, 32> {
-        use crate::types::ManagedType;
-        ManagedByteArray::from_raw_handle(
-            A::crypto_api_impl().keccak256(data.borrow().get_raw_handle()),
-        )
+        use crate::{api::StaticVarApiImpl, types::ManagedType};
+        let new_handle = A::static_var_api_impl().next_managed_buffer_handle();
+        A::crypto_api_impl().keccak256(new_handle, data.borrow().get_raw_handle());
+        ManagedByteArray::from_raw_handle(new_handle)
     }
 
     #[cfg(feature = "alloc")]

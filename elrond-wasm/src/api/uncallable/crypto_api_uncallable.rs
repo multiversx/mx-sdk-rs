@@ -27,7 +27,7 @@ impl CryptoApiImpl for UncallableApi {
     }
 
     #[cfg(feature = "ei-1-1")]
-    fn keccak256(&self, _data_handle: crate::api::Handle) -> crate::api::Handle {
+    fn keccak256(&self, _dest: crate::api::Handle, _data_handle: crate::api::Handle) {
         unreachable!()
     }
 

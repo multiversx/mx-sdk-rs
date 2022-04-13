@@ -38,12 +38,12 @@ impl CryptoApiImpl for DebugApi {
     }
 
     #[cfg(feature = "ei-1-1")]
-    fn keccak256(&self, data_handle: elrond_wasm::api::Handle) -> elrond_wasm::api::Handle {
+    fn keccak256(&self, dest: elrond_wasm::api::Handle, data_handle: elrond_wasm::api::Handle) {
         // default implementation used in debugger
         // the VM has a dedicated hook
         use elrond_wasm::api::ManagedBufferApi;
         let result_bytes = self.keccak256_legacy(self.mb_to_boxed_bytes(data_handle).as_slice());
-        self.mb_new_from_bytes(&result_bytes[..])
+        self.mb_overwrite(dest, &result_bytes[..]);
     }
 
     fn ripemd160(&self, _data: &[u8]) -> [u8; RIPEMD_RESULT_LEN] {
