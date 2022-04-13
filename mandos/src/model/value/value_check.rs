@@ -1,5 +1,5 @@
 use crate::{
-    interpret_trait::{InterpretableFrom, InterpreterContext},
+    interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
     serde_raw::{CheckBytesValueRaw, CheckValueListRaw, ValueSubTree},
 };
 
@@ -46,6 +46,30 @@ where
     }
 }
 
+impl<T> IntoRaw<CheckBytesValueRaw> for CheckValue<T>
+where
+    T: IntoRaw<ValueSubTree> + Default,
+{
+    fn into_raw(self) -> CheckBytesValueRaw {
+        match self {
+            CheckValue::Star => CheckBytesValueRaw::Unspecified,
+            CheckValue::Equal(eq) => CheckBytesValueRaw::Equal(eq.into_raw()),
+        }
+    }
+}
+
+impl<T> CheckValue<T>
+where
+    T: IntoRaw<ValueSubTree> + Default,
+{
+    pub fn into_raw_explicit(self) -> CheckBytesValueRaw {
+        match self {
+            CheckValue::Star => CheckBytesValueRaw::Star,
+            CheckValue::Equal(eq) => CheckBytesValueRaw::Equal(eq.into_raw()),
+        }
+    }
+}
+
 impl<T: fmt::Display + Default> fmt::Display for CheckValue<T> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
@@ -69,6 +93,17 @@ impl InterpretableFrom<CheckValueListRaw> for CheckValueList {
                     .into_iter()
                     .map(|check_raw| CheckValue::<BytesValue>::interpret_from(check_raw, context))
                     .collect(),
+            ),
+        }
+    }
+}
+
+impl IntoRaw<CheckValueListRaw> for CheckValueList {
+    fn into_raw(self) -> CheckValueListRaw {
+        match self {
+            CheckValue::Star => CheckValueListRaw::Unspecified,
+            CheckValue::Equal(list) => CheckValueListRaw::CheckList(
+                list.into_iter().map(|cv| cv.into_raw_explicit()).collect(),
             ),
         }
     }

@@ -53,8 +53,8 @@ pub trait UsersModule {
     }
 
     #[endpoint(updateUserAddress)]
-    fn update_user_address(&self, #[var_args] addresses: MultiValueVec<ManagedAddress>) {
-        for address in addresses.into_vec() {
+    fn update_user_address(&self, #[var_args] addresses: MultiValueEncoded<ManagedAddress>) {
+        for address in &addresses.to_vec() {
             let user_id = self.get_user_id(&address);
             require!(user_id > 0, "unknown address");
             self.set_user_address(user_id, &address);

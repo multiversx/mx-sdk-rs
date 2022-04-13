@@ -2,7 +2,7 @@ use std::{env, fs, fs::File, io::Write};
 
 /// Examples how to run:
 /// `cargo run ../../contracts/examples/multisig/mandos`
-/// `cargo run ../../contracts/feature-tests/composability/mandos`
+/// `cargo run ../../contracts/feature-tests/basic-features/mandos`
 fn main() {
     let args: Vec<String> = env::args().collect();
     let files_path = &args[1];

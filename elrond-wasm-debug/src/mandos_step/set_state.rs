@@ -1,6 +1,6 @@
+use crate::num_bigint::BigUint;
 use elrond_wasm::types::heap::Address;
-use mandos::model::SetStateStep;
-use num_bigint::BigUint;
+use mandos::model::{SetStateStep, Step};
 
 use crate::world_mock::{
     is_smart_contract_address, AccountData, AccountEsdt, BlockInfo as CrateBlockInfo,
@@ -8,8 +8,9 @@ use crate::world_mock::{
 };
 
 impl BlockchainMock {
-    pub fn mandos_set_state(mut self, set_state_step: SetStateStep) -> BlockchainMock {
-        execute(&mut self, &set_state_step);
+    pub fn mandos_set_state(&mut self, set_state_step: SetStateStep) -> &mut Self {
+        execute(self, &set_state_step);
+        self.mandos_trace.steps.push(Step::SetState(set_state_step));
         self
     }
 }
