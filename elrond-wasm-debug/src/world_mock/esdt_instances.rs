@@ -1,4 +1,4 @@
-use num_bigint::BigUint;
+use crate::num_bigint::BigUint;
 use num_traits::Zero;
 use std::{
     collections::BTreeMap,

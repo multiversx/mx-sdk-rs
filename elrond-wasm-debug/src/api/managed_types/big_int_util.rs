@@ -2,12 +2,11 @@ use std::cmp::Ordering;
 
 use elrond_wasm::{
     api::{Handle, ManagedBufferApi},
-    types::{Address, ManagedBuffer, ManagedType},
+    types::{heap::Address, ManagedBuffer, ManagedType},
 };
-use num_bigint::Sign;
 use num_traits::Zero;
 
-use crate::DebugApi;
+use crate::{num_bigint, num_bigint::Sign, DebugApi};
 
 impl DebugApi {
     pub fn insert_new_managed_buffer(&self, value: Vec<u8>) -> Handle {

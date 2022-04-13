@@ -8,10 +8,6 @@ publish = false
 [dependencies.erc721]
 path = ".."
 
-[dependencies.elrond-wasm]
-version = "0.28.0"
-path = "../../../../../elrond-wasm"
-
 [dependencies.elrond-wasm-debug]
-version = "0.28.0"
+version = "0.30.0"
 path = "../../../../../elrond-wasm-debug"

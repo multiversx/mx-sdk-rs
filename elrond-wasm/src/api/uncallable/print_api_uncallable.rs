@@ -1,4 +1,7 @@
-use crate::api::{PrintApi, PrintApiImpl};
+use crate::{
+    api::{PrintApi, PrintApiImpl},
+    formatter::FormatBufferIgnore,
+};
 
 use super::UncallableApi;
 
@@ -10,4 +13,6 @@ impl PrintApi for UncallableApi {
     }
 }
 
-impl PrintApiImpl for UncallableApi {}
+impl PrintApiImpl for UncallableApi {
+    type Buffer = FormatBufferIgnore;
+}

@@ -13,7 +13,7 @@
         },
         "framework": {
             "name": "elrond-wasm",
-            "version": "0.28.0"
+            "version": "0.30.0"
         }
     },
     "docs": [
@@ -542,6 +542,10 @@
                 {
                     "name": "NftUpdateAttributes",
                     "discriminant": 7
+                },
+                {
+                    "name": "Transfer",
+                    "discriminant": 8
                 }
             ]
         },

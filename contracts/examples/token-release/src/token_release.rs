@@ -43,7 +43,7 @@ pub trait TokenRelease {
             "The group already exists"
         );
         require!(
-            release_ticks > 0_u64,
+            release_ticks > 0u64,
             "The schedule must have at least 1 unlock period"
         );
         require!(
@@ -137,7 +137,14 @@ pub trait TokenRelease {
         );
 
         self.user_groups(&address).update(|groups| {
-            if !groups.contains(&group_identifier) {
+            let mut group_exists = false;
+            for group in groups.iter() {
+                if group == group_identifier.as_ref() {
+                    group_exists = true;
+                    break;
+                }
+            }
+            if !group_exists {
                 self.users_in_group(&group_identifier)
                     .update(|users_in_group_no| *users_in_group_no += 1);
                 groups.push(group_identifier);
@@ -155,7 +162,7 @@ pub trait TokenRelease {
         );
         let address_groups = self.user_groups(&address).get();
         for group_identifier in address_groups.iter() {
-            self.users_in_group(group_identifier)
+            self.users_in_group(&group_identifier)
                 .update(|users_in_group_no| *users_in_group_no -= 1);
         }
         self.user_groups(&address).clear();
@@ -255,8 +262,8 @@ pub trait TokenRelease {
 
         // Compute the total claimable amount at the time of the request, for all of the user groups
         for group_identifier in address_groups.iter() {
-            let schedule = self.group_schedule(group_identifier).get();
-            let users_in_group_no = self.users_in_group(group_identifier).get();
+            let schedule = self.group_schedule(&group_identifier).get();
+            let users_in_group_no = self.users_in_group(&group_identifier).get();
             let time_passed = current_timestamp - starting_timestamp;
 
             match schedule.unlock_type {
@@ -350,7 +357,8 @@ pub trait TokenRelease {
     ) -> SingleValueMapper<Schedule<Self::Api>>;
 
     #[storage_mapper("userGroups")]
-    fn user_groups(&self, address: &ManagedAddress) -> SingleValueMapper<Vec<ManagedBuffer>>;
+    fn user_groups(&self, address: &ManagedAddress)
+        -> SingleValueMapper<ManagedVec<ManagedBuffer>>;
 
     #[storage_mapper("usersInGroup")]
     fn users_in_group(&self, group_identifier: &ManagedBuffer) -> SingleValueMapper<u64>;

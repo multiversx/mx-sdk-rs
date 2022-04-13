@@ -11,22 +11,18 @@ pub trait SecondContract {
 
     #[payable("*")]
     #[endpoint(acceptEsdtPayment)]
-    fn accept_esdt_payment(
-        &self,
-        #[payment_token] actual_token_identifier: TokenIdentifier,
-    ) -> SCResult<()> {
+    fn accept_esdt_payment(&self, #[payment_token] actual_token_identifier: TokenIdentifier) {
         let expected_token_identifier = self.get_contract_esdt_token_identifier();
         require!(
             actual_token_identifier == expected_token_identifier,
             "Wrong esdt token"
         );
-        Ok(())
     }
 
     #[payable("*")]
     #[endpoint(rejectEsdtPayment)]
-    fn reject_esdt_payment(&self) -> SCResult<()> {
-        sc_error!("Rejected")
+    fn reject_esdt_payment(&self) {
+        sc_panic!("Rejected")
     }
 
     // storage

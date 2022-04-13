@@ -1,0 +1,14 @@
+[package]
+name = "alloc-features-meta"
+version = "0.0.0"
+authors = ["Andrei Marinica <andrei.marinica@elrond.com>"]
+edition = "2018"
+publish = false
+
+[dependencies.alloc-features]
+path = ".."
+
+[dependencies.elrond-wasm-debug]
+version = "0.30.0"
+path = "../../../../elrond-wasm-debug"
+features = ["ei-1-1"]

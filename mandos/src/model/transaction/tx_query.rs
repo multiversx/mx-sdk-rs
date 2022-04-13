@@ -1,10 +1,10 @@
 use crate::{
-    interpret_trait::{InterpretableFrom, InterpreterContext},
+    interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
     model::{AddressValue, BytesValue},
     serde_raw::TxQueryRaw,
 };
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct TxQuery {
     pub to: AddressValue,
     pub function: String,
@@ -20,6 +20,20 @@ impl InterpretableFrom<TxQueryRaw> for TxQuery {
                 .arguments
                 .into_iter()
                 .map(|t| BytesValue::interpret_from(t, context))
+                .collect(),
+        }
+    }
+}
+
+impl IntoRaw<TxQueryRaw> for TxQuery {
+    fn into_raw(self) -> TxQueryRaw {
+        TxQueryRaw {
+            to: self.to.into_raw(),
+            function: self.function,
+            arguments: self
+                .arguments
+                .into_iter()
+                .map(|arg| arg.into_raw())
                 .collect(),
         }
     }

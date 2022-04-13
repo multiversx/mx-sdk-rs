@@ -1,10 +1,13 @@
-use crate::{tx_mock::TxPanic, DebugApi};
+use crate::{
+    num_bigint::{BigInt, BigUint, Sign},
+    tx_mock::TxPanic,
+    DebugApi,
+};
 use alloc::vec::Vec;
 use elrond_wasm::{
     api::{EndpointArgumentApi, EndpointArgumentApiImpl, Handle},
-    types::BoxedBytes,
+    types::heap::BoxedBytes,
 };
-use num_bigint::{BigInt, BigUint, Sign};
 use num_traits::cast::ToPrimitive;
 
 impl EndpointArgumentApi for DebugApi {
@@ -12,6 +15,17 @@ impl EndpointArgumentApi for DebugApi {
 
     fn argument_api_impl() -> Self::EndpointArgumentApiImpl {
         DebugApi::new_from_static()
+    }
+}
+
+impl DebugApi {
+    fn get_argument_vec_u8(&self, arg_index: i32) -> Vec<u8> {
+        let arg_idx_usize = arg_index as usize;
+        assert!(
+            arg_idx_usize < self.input_ref().args.len(),
+            "Tx arg index out of range"
+        );
+        self.input_ref().args[arg_idx_usize].clone()
     }
 }
 
@@ -29,15 +43,6 @@ impl EndpointArgumentApiImpl for DebugApi {
 
     fn copy_argument_to_slice(&self, _arg_index: i32, _slice: &mut [u8]) {
         panic!("copy_argument_to_slice not yet implemented")
-    }
-
-    fn get_argument_vec_u8(&self, arg_index: i32) -> Vec<u8> {
-        let arg_idx_usize = arg_index as usize;
-        assert!(
-            arg_idx_usize < self.input_ref().args.len(),
-            "Tx arg index out of range"
-        );
-        self.input_ref().args[arg_idx_usize].clone()
     }
 
     fn get_argument_boxed_bytes(&self, arg_index: i32) -> BoxedBytes {
@@ -74,7 +79,7 @@ impl EndpointArgumentApiImpl for DebugApi {
         } else {
             std::panic::panic_any(TxPanic {
                 status: 10,
-                message: b"argument out of range".to_vec(),
+                message: "argument out of range".to_string(),
             })
         }
     }
@@ -87,7 +92,7 @@ impl EndpointArgumentApiImpl for DebugApi {
         } else {
             std::panic::panic_any(TxPanic {
                 status: 10,
-                message: b"argument out of range".to_vec(),
+                message: "argument out of range".to_string(),
             })
         }
     }

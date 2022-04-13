@@ -1,5 +1,5 @@
 use crate::{
-    interpret_trait::{InterpretableFrom, InterpreterContext},
+    interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
     model::{BigUintValue, BytesValue, CheckValue, CheckValueList, U64Value},
     serde_raw::CheckEsdtInstanceRaw,
 };
@@ -25,6 +25,20 @@ impl InterpretableFrom<CheckEsdtInstanceRaw> for CheckEsdtInstance {
             hash: CheckValue::<BytesValue>::interpret_from(from.hash, context),
             uri: CheckValueList::interpret_from(from.uri, context),
             attributes: CheckValue::<BytesValue>::interpret_from(from.attributes, context),
+        }
+    }
+}
+
+impl IntoRaw<CheckEsdtInstanceRaw> for CheckEsdtInstance {
+    fn into_raw(self) -> CheckEsdtInstanceRaw {
+        CheckEsdtInstanceRaw {
+            nonce: self.nonce.into_raw(),
+            balance: self.balance.into_raw(),
+            creator: self.creator.into_raw(),
+            royalties: self.royalties.into_raw(),
+            hash: self.hash.into_raw(),
+            uri: self.uri.into_raw(),
+            attributes: self.attributes.into_raw(),
         }
     }
 }

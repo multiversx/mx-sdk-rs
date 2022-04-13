@@ -1,8 +1,8 @@
+use crate::num_bigint::BigUint;
 use mandos::model::{
     AddressKey, BytesValue, CheckEsdt, CheckEsdtData, CheckEsdtInstance, CheckEsdtInstances,
-    CheckEsdtMap, CheckStorage, CheckValue, Checkable,
+    CheckEsdtMap, CheckStateStep, CheckStorage, CheckValue, Checkable, Step,
 };
-use num_bigint::BigUint;
 use num_traits::Zero;
 
 use crate::{
@@ -10,7 +10,22 @@ use crate::{
     world_mock::{AccountEsdt, BlockchainMock, EsdtData, EsdtInstance, EsdtInstances},
 };
 
-pub fn execute(accounts: &mandos::model::CheckAccounts, state: &mut BlockchainMock) {
+impl BlockchainMock {
+    pub fn mandos_check_state(&mut self, check_state_step: CheckStateStep) -> &mut Self {
+        execute(self, &check_state_step.accounts);
+        self.mandos_trace
+            .steps
+            .push(Step::CheckState(check_state_step));
+        self
+    }
+
+    pub fn mandos_dump_state(&mut self) -> &mut Self {
+        self.print_accounts();
+        self
+    }
+}
+
+fn execute(state: &BlockchainMock, accounts: &mandos::model::CheckAccounts) {
     for (expected_address, expected_account) in accounts.accounts.iter() {
         if let Some(account) = state.accounts.get(&expected_address.value.into()) {
             assert!(
@@ -45,7 +60,6 @@ pub fn execute(accounts: &mandos::model::CheckAccounts, state: &mut BlockchainMo
                 expected_account.code,
                 std::str::from_utf8(actual_code.as_slice()).unwrap()
             );
-
             if let CheckStorage::Equal(eq) = &expected_account.storage {
                 let default_value = &Vec::new();
                 for (expected_key, expected_value) in eq.storages.iter() {

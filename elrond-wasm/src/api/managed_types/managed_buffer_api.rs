@@ -1,4 +1,4 @@
-use crate::types::BoxedBytes;
+use crate::types::heap::BoxedBytes;
 
 use super::Handle;
 
@@ -38,6 +38,7 @@ pub trait ManagedBufferApi {
 
     fn mb_overwrite(&self, handle: Handle, value: &[u8]);
 
+    #[cfg(feature = "ei-1-1")]
     fn mb_set_slice(
         &self,
         dest_handle: Handle,

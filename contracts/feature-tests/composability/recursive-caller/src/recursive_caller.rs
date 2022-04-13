@@ -26,7 +26,8 @@ pub trait RecursiveCaller {
 
         self.vault_proxy()
             .contract(to.clone())
-            .accept_funds(token_identifier.clone(), 0, amount.clone())
+            .accept_funds()
+            .add_token_transfer(token_identifier.clone(), 0, amount.clone())
             .async_call()
             .with_callback(self.callbacks().recursive_send_funds_callback(
                 to,

@@ -1,3 +1,5 @@
+use alloc::{boxed::Box, vec::Vec};
+
 use crate::{DecodeError, DecodeErrorHandler, TopDecode, TopDecodeInput};
 
 pub trait TopDecodeMultiInput: Sized {
@@ -44,5 +46,27 @@ pub trait TopDecodeMultiInput: Sized {
             let _ = self.next_value_input(h)?;
         }
         Ok(())
+    }
+}
+
+impl TopDecodeMultiInput for Vec<Vec<u8>> {
+    type ValueInput = Box<[u8]>;
+
+    fn has_next(&self) -> bool {
+        !self.is_empty()
+    }
+
+    fn next_value_input<H>(&mut self, h: H) -> Result<Self::ValueInput, H::HandledErr>
+    where
+        H: DecodeErrorHandler,
+    {
+        if self.has_next() {
+            let first = core::mem::take(&mut self[0]);
+            let tail = self.split_off(1);
+            *self = tail;
+            Ok(first.into_boxed_slice())
+        } else {
+            Err(h.handle_error(DecodeError::MULTI_TOO_FEW_ARGS))
+        }
     }
 }

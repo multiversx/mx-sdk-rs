@@ -1,12 +1,15 @@
 use std::collections::BTreeMap;
 
-use crate::world_mock::{AccountData, BlockInfo, EsdtData};
-use elrond_wasm::types::Address;
+use crate::{
+    num_bigint,
+    world_mock::{AccountData, BlockInfo, EsdtData},
+};
+use elrond_wasm::types::heap::Address;
 use mandos::serde_raw::{
     AccountRaw, BlockInfoRaw, CheckAccountRaw, CheckAccountsRaw, CheckBytesValueRaw,
     CheckEsdtDataRaw, CheckEsdtInstanceRaw, CheckEsdtInstancesRaw, CheckEsdtMapContentsRaw,
     CheckEsdtMapRaw, CheckEsdtRaw, CheckLogsRaw, CheckStorageDetailsRaw, CheckStorageRaw,
-    CheckValueListRaw, EsdtFullRaw, EsdtRaw, InstanceRaw, TxCallRaw, TxESDTRaw, TxExpectRaw,
+    CheckValueListRaw, EsdtFullRaw, EsdtInstanceRaw, EsdtRaw, TxCallRaw, TxESDTRaw, TxExpectRaw,
     TxQueryRaw, ValueSubTree,
 };
 use num_traits::Zero;
@@ -65,7 +68,7 @@ pub(crate) fn esdt_data_as_raw(esdt: &EsdtData) -> EsdtRaw {
 
     let mut instances_raw = Vec::new();
     for inst in esdt.instances.get_instances().values() {
-        let inst_raw = InstanceRaw {
+        let inst_raw = EsdtInstanceRaw {
             attributes: Some(bytes_as_raw(&inst.metadata.attributes)),
             balance: Some(rust_biguint_as_raw(&inst.balance)),
             creator: inst.metadata.creator.as_ref().map(address_as_raw),

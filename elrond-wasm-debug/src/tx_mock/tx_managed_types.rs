@@ -1,9 +1,6 @@
-use std::collections::HashMap;
-
+use crate::{num_bigint::BigInt, DebugApi};
 use elrond_wasm::api::{Handle, StaticVarApi};
-use num_bigint::BigInt;
-
-use crate::DebugApi;
+use std::collections::HashMap;
 
 type ManagedBufferImpl = Vec<u8>;
 

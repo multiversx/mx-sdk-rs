@@ -1,5 +1,5 @@
 use crate::{
-    interpret_trait::{InterpretableFrom, InterpreterContext},
+    interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
     serde_raw::CheckEsdtMapRaw,
 };
 
@@ -10,6 +10,18 @@ pub enum CheckEsdtMap {
     Unspecified,
     Star,
     Equal(CheckEsdtMapContents),
+}
+
+impl Default for CheckEsdtMap {
+    fn default() -> Self {
+        CheckEsdtMap::Unspecified
+    }
+}
+
+impl CheckEsdtMap {
+    pub fn is_star(&self) -> bool {
+        matches!(self, CheckEsdtMap::Star)
+    }
 }
 
 impl InterpretableFrom<CheckEsdtMapRaw> for CheckEsdtMap {
@@ -24,8 +36,12 @@ impl InterpretableFrom<CheckEsdtMapRaw> for CheckEsdtMap {
     }
 }
 
-impl CheckEsdtMap {
-    pub fn is_star(&self) -> bool {
-        matches!(self, CheckEsdtMap::Star)
+impl IntoRaw<CheckEsdtMapRaw> for CheckEsdtMap {
+    fn into_raw(self) -> CheckEsdtMapRaw {
+        match self {
+            CheckEsdtMap::Unspecified => CheckEsdtMapRaw::Unspecified,
+            CheckEsdtMap::Star => CheckEsdtMapRaw::Star,
+            CheckEsdtMap::Equal(value) => CheckEsdtMapRaw::Equal(value.into_raw()),
+        }
     }
 }

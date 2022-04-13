@@ -96,8 +96,13 @@ fn forw_raw_sync_same_context_egld_go() {
 }
 
 #[test]
-fn forw_raw_transf_exec_egld_go() {
-    elrond_wasm_debug::mandos_go("mandos/forw_raw_transf_exec_egld.scen.json");
+fn forw_raw_transf_exec_accept_egld_go() {
+    elrond_wasm_debug::mandos_go("mandos/forw_raw_transf_exec_accept_egld.scen.json");
+}
+
+#[test]
+fn forw_raw_transf_exec_reject_egld_go() {
+    elrond_wasm_debug::mandos_go("mandos/forw_raw_transf_exec_reject_egld.scen.json");
 }
 
 #[test]
@@ -236,6 +241,13 @@ fn forwarder_call_transf_exec_accept_esdt_twice_go() {
 }
 
 #[test]
+fn forwarder_call_transf_exec_accept_multi_transfer_go() {
+    elrond_wasm_debug::mandos_go(
+        "mandos/forwarder_call_transf_exec_accept_multi_transfer.scen.json",
+    );
+}
+
+#[test]
 fn forwarder_call_transf_exec_accept_nft_go() {
     elrond_wasm_debug::mandos_go("mandos/forwarder_call_transf_exec_accept_nft.scen.json");
 }
@@ -253,8 +265,15 @@ fn forwarder_call_transf_exec_accept_sft_twice_go() {
 }
 
 #[test]
-fn forwarder_call_transf_exec_multi_transfer_esdt_go() {
-    elrond_wasm_debug::mandos_go("mandos/forwarder_call_transf_exec_multi_transfer_esdt.scen.json");
+fn forwarder_call_transf_exec_reject_multi_transfer_go() {
+    elrond_wasm_debug::mandos_go(
+        "mandos/forwarder_call_transf_exec_reject_multi_transfer.scen.json",
+    );
+}
+
+#[test]
+fn forwarder_call_transf_exec_reject_nft_go() {
+    elrond_wasm_debug::mandos_go("mandos/forwarder_call_transf_exec_reject_nft.scen.json");
 }
 
 #[test]

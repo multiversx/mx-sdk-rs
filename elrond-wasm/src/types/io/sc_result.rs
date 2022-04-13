@@ -1,8 +1,7 @@
-use alloc::string::String;
-use elrond_codec::{EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput, Vec};
+use elrond_codec::{EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput};
 
 use crate::{
-    abi::{OutputAbi, TypeAbi, TypeDescriptionContainer},
+    abi::{OutputAbis, TypeAbi, TypeDescriptionContainer, TypeName},
     api::EndpointFinishApi,
 };
 use core::{
@@ -112,10 +111,6 @@ where
     T: TopEncodeMulti,
     E: TopEncodeMulti,
 {
-    /// Error implies the transaction fails, so if there is a result,
-    /// it is of type `T`.
-    type DecodeAs = T::DecodeAs;
-
     fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
     where
         O: TopEncodeMultiOutput,
@@ -129,7 +124,7 @@ where
 }
 
 impl<T: TypeAbi, E> TypeAbi for SCResult<T, E> {
-    fn type_name() -> String {
+    fn type_name() -> TypeName {
         T::type_name()
     }
 
@@ -137,7 +132,7 @@ impl<T: TypeAbi, E> TypeAbi for SCResult<T, E> {
     /// just like `()`.
     /// It is also possible to have `SCResult<MultiResultX<...>>`,
     /// so this gives the MultiResult to dissolve into its multiple output ABIs.
-    fn output_abis(output_names: &[&'static str]) -> Vec<OutputAbi> {
+    fn output_abis(output_names: &[&'static str]) -> OutputAbis {
         T::output_abis(output_names)
     }
 

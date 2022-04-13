@@ -57,4 +57,9 @@ impl TxContextRef {
         // let tx_context = Rc::try_unwrap(self.0).unwrap();
         self.tx_result_cell.replace(TxResult::default())
     }
+
+    /// Will yield a copy of all messages printed on this context.
+    pub fn printed_messages(&self) -> Vec<String> {
+        self.0.printed_messages.borrow().clone()
+    }
 }

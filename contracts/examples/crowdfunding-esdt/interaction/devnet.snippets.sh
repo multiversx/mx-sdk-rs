@@ -15,8 +15,8 @@ deploy() {
           --arguments ${TARGET} ${DEADLINE_UNIX_TIMESTAMP} ${EGLD_TOKEN_ID} \
           --outfile="deploy-devnet.interaction.json" --send || return
 
-    TRANSACTION=$(erdpy data parse --file="deploy-devnet.interaction.json" --expression="data['emitted_tx']['hash']")
-    ADDRESS=$(erdpy data parse --file="deploy-devnet.interaction.json" --expression="data['emitted_tx']['address']")
+    TRANSACTION=$(erdpy data parse --file="deploy-devnet.interaction.json" --expression="data['emittedTransactionHash']")
+    ADDRESS=$(erdpy data parse --file="deploy-devnet.interaction.json" --expression="data['contractAddress']")
 
     erdpy data store --key=address-devnet --value=${ADDRESS}
     erdpy data store --key=deployTransaction-devnet --value=${TRANSACTION}
@@ -32,7 +32,7 @@ deploySimulate() {
           --outfile="simulate-devnet.interaction.json" --simulate || return
 
     TRANSACTION=$(erdpy data parse --file="simulate-devnet.interaction.json" --expression="data['result']['hash']")
-    ADDRESS=$(erdpy data parse --file="simulate-devnet.interaction.json" --expression="data['emitted_tx']['address']")
+    ADDRESS=$(erdpy data parse --file="simulate-devnet.interaction.json" --expression="data['contractAddress']")
     RETCODE=$(erdpy data parse --file="simulate-devnet.interaction.json" --expression="data['result']['returnCode']")
     RETMSG=$(erdpy data parse --file="simulate-devnet.interaction.json" --expression="data['result']['returnMessage']")
 

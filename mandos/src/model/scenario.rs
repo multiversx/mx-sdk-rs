@@ -1,11 +1,11 @@
 use crate::{
-    interpret_trait::{InterpretableFrom, InterpreterContext},
+    interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
     serde_raw::ScenarioRaw,
 };
 
 use super::Step;
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct Scenario {
     pub name: Option<String>,
     pub comment: Option<String>,
@@ -24,6 +24,18 @@ impl InterpretableFrom<ScenarioRaw> for Scenario {
                 .into_iter()
                 .map(|s| Step::interpret_from(s, context))
                 .collect(),
+        }
+    }
+}
+
+impl IntoRaw<ScenarioRaw> for Scenario {
+    fn into_raw(self) -> ScenarioRaw {
+        ScenarioRaw {
+            name: self.name,
+            comment: self.comment,
+            check_gas: self.check_gas,
+            gas_schedule: None,
+            steps: self.steps.into_iter().map(Step::into_raw).collect(),
         }
     }
 }

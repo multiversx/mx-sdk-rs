@@ -5,8 +5,8 @@ DEPLOY_TRANSACTION=$(erdpy data load --key=deployTransaction-devnet)
 deploy() {
     erdpy --verbose contract deploy --project=${PROJECT} --recall-nonce --pem=${ALICE} --gas-limit=50000000 --arguments 0 --send --outfile="deploy-devnet.interaction.json" || return
 
-    TRANSACTION=$(erdpy data parse --file="deploy-devnet.interaction.json" --expression="data['emitted_tx']['hash']")
-    ADDRESS=$(erdpy data parse --file="deploy-devnet.interaction.json" --expression="data['emitted_tx']['address']")
+    TRANSACTION=$(erdpy data parse --file="deploy-devnet.interaction.json" --expression="data['emittedTransactionHash']")
+    ADDRESS=$(erdpy data parse --file="deploy-devnet.interaction.json" --expression="data['contractAddress']")
 
     erdpy data store --key=address-devnet --value=${ADDRESS}
     erdpy data store --key=deployTransaction-devnet --value=${TRANSACTION}

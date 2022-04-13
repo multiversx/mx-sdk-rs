@@ -40,7 +40,7 @@
                         "address": "sc:crypto_bubbles",
                         "endpoint": "str:topUp",
                         "topics": [
-                            "0x1000000000000000000000000000000000000000000000000000000000000001",
+                            "str:top_up",
                             "address:acc1"
                         ],
                         "data": "0x4000000"
@@ -71,7 +71,7 @@
                         "address": "sc:crypto_bubbles",
                         "endpoint": "str:withdraw",
                         "topics": [
-                            "0x1000000000000000000000000000000000000000000000000000000000000002",
+                            "str:withdraw",
                             "address:acc1"
                         ],
                         "data": "0x4000000"

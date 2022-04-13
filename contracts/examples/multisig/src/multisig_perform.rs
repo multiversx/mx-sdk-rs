@@ -2,7 +2,7 @@ use crate::{action::Action, user_role::UserRole};
 
 elrond_wasm::imports!();
 
-/// Gas required to finsh transaction after transfer-execute.
+/// Gas required to finish transaction after transfer-execute.
 const PERFORM_ACTION_FINISH_GAS: u64 = 300_000;
 
 fn usize_add_isize(value: &mut usize, delta: isize) {

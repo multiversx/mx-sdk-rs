@@ -35,7 +35,10 @@ fn world() -> BlockchainMock {
     blockchain
         .register_contract_builder("file:output/use-module.wasm", use_module::ContractBuilder);
 
-    blockchain.register_contract_builder("file:test-wasm/dns.wasm", dns_mock::ContractBuilder);
+    blockchain.register_contract_builder(
+        "file:test-wasm/elrond-wasm-sc-dns.wasm",
+        dns_mock::ContractBuilder,
+    );
 
     blockchain
 }
