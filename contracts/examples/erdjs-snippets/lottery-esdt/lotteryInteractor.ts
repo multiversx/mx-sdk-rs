@@ -11,8 +11,8 @@ import { CodeMetadata, EnumValue, GasLimit, IAddress, Interaction, ResultsParser
 import { INetworkProvider, ITestSession, ITestUser, loadAbiRegistry, loadCode } from "@elrondnetwork/erdjs-snippets";
 import { NetworkConfig } from "@elrondnetwork/erdjs-network-providers";
 
-const PathToWasm = path.resolve(__dirname, "lottery-esdt.wasm");
-const PathToAbi = path.resolve(__dirname, "lottery-esdt.abi.json");
+const PathToWasm = path.resolve(__dirname, "..", "..", "lottery-esdt", "output", "lottery-esdt.wasm");
+const PathToAbi = path.resolve(__dirname, "..", "..", "lottery-esdt", "output", "lottery-esdt.abi.json");
 
 export async function createInteractor(session: ITestSession, contractAddress?: IAddress): Promise<LotteryInteractor> {
     let registry = await loadAbiRegistry(PathToAbi);
