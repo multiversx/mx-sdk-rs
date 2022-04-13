@@ -381,6 +381,16 @@ fn forwarder_validate_token_identifier_go() {
     elrond_wasm_debug::mandos_go("mandos/forwarder_validate_token_identifier.scen.json");
 }
 
+// #[test]
+// fn promises_multi_transfer_go() {
+//     elrond_wasm_debug::mandos_go("mandos/promises_multi_transfer.scen.json");
+// }
+
+// #[test]
+// fn promises_single_transfer_go() {
+//     elrond_wasm_debug::mandos_go("mandos/promises_single_transfer.scen.json");
+// }
+
 #[test]
 fn proxy_test_init_go() {
     elrond_wasm_debug::mandos_go("mandos/proxy_test_init.scen.json");
