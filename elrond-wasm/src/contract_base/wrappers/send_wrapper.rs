@@ -345,10 +345,21 @@ where
         }
     }
 
+    #[inline]
     pub fn esdt_nft_create_compact<T: elrond_codec::TopEncode>(
         &self,
         token: &TokenIdentifier<A>,
         amount: &BigUint<A>,
+        attributes: &T,
+    ) -> u64 {
+        self.esdt_nft_create_compact_named(token, amount, &ManagedBuffer::new(), attributes)
+    }
+
+    pub fn esdt_nft_create_compact_named<T: elrond_codec::TopEncode>(
+        &self,
+        token: &TokenIdentifier<A>,
+        amount: &BigUint<A>,
+        name: &ManagedBuffer<A>,
         attributes: &T,
     ) -> u64 {
         let big_zero = BigUint::zero();
@@ -358,7 +369,7 @@ where
         self.esdt_nft_create(
             token,
             amount,
-            &empty_buffer,
+            name,
             &big_zero,
             &empty_buffer,
             attributes,
