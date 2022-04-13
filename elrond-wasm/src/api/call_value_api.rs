@@ -1,7 +1,6 @@
 use super::{ErrorApiImpl, Handle, ManagedTypeApi, ManagedTypeApiImpl};
-use crate::{
-    err_msg,
-    types::{BigUint, EsdtTokenPayment, EsdtTokenType, ManagedType, ManagedVec, TokenIdentifier},
+use crate::types::{
+    BigUint, EsdtTokenPayment, EsdtTokenType, ManagedType, ManagedVec, TokenIdentifier,
 };
 
 pub trait CallValueApi {
@@ -15,11 +14,11 @@ pub trait CallValueApiImpl: ErrorApiImpl + ManagedTypeApiImpl {
 
     /// Retrieves the EGLD call value from the VM.
     /// Will return 0 in case of an ESDT transfer (cannot have both EGLD and ESDT transfer simultaneously).
-    fn egld_value(&self) -> Handle;
+    fn load_egld_value(&self, dest: Handle);
 
     /// Retrieves the ESDT call value from the VM.
     /// Will return 0 in case of an EGLD transfer (cannot have both EGLD and ESDT transfer simultaneously).
-    fn esdt_value(&self) -> Handle;
+    fn load_single_esdt_value(&self, dest: Handle);
 
     /// Returns the call value token identifier of the current call.
     /// The identifier is wrapped in a TokenIdentifier object, to hide underlying logic.
@@ -36,43 +35,34 @@ pub trait CallValueApiImpl: ErrorApiImpl + ManagedTypeApiImpl {
     /// Will return "Fungible" for EGLD.
     fn esdt_token_type(&self) -> EsdtTokenType;
 
-    /// Will return the EGLD call value,
-    /// but also fail with an error if ESDT is sent.
-    /// Especially used in the auto-generated call value processing.
-    fn require_egld(&self) -> Handle {
-        if self.esdt_num_transfers() > 0 {
-            self.signal_error(err_msg::NON_PAYABLE_FUNC_ESDT.as_bytes());
-        }
-        self.egld_value()
-    }
-
     /// Will return the ESDT call value,
     /// but also fail with an error if EGLD or the wrong ESDT token is sent.
     /// Especially used in the auto-generated call value processing.
     ///
     /// TODO: rename to `require_single_esdt`.
-    fn require_esdt(&self, token: &[u8]) -> Handle {
-        let want = self.mb_new_from_bytes(token);
-        if self.esdt_num_transfers() != 1 {
-            self.signal_error(err_msg::SINGLE_ESDT_EXPECTED.as_bytes());
-        }
-        if !self.mb_eq(self.token(), want) {
-            self.signal_error(err_msg::BAD_TOKEN_PROVIDED.as_bytes());
-        }
-        self.esdt_value()
-    }
+    // fn require_esdt(&self, token: &[u8]) -> Handle {
+    //     let want = self.mb_new_from_bytes(token);
+    //     if self.esdt_num_transfers() != 1 {
+    //         self.signal_error(err_msg::SINGLE_ESDT_EXPECTED.as_bytes());
+    //     }
+    //     if !self.mb_eq(self.token(), want) {
+    //         self.signal_error(err_msg::BAD_TOKEN_PROVIDED.as_bytes());
+    //     }
+    //     self.esdt_value(const_handles::CALL_VALUE_SINGLE_ESDT);
+    //     const_handles::CALL_VALUE_SINGLE_ESDT
+    // }
 
     /// Returns both the call value (either EGLD or ESDT) and the token identifier.
     /// Especially used in the `#[payable("*")] auto-generated snippets.
     /// The method might seem redundant, but there is such a hook in Arwen
     /// that might be used in this scenario in the future.
-    fn payment_token_pair(&self) -> (Handle, Handle) {
-        if self.esdt_num_transfers() == 0 {
-            (self.egld_value(), self.mb_new_empty())
-        } else {
-            (self.esdt_value(), self.token())
-        }
-    }
+    // fn payment_token_pair(&self) -> (Handle, Handle) {
+    //     if self.esdt_num_transfers() == 0 {
+    //         (self.egld_value(), self.mb_new_empty())
+    //     } else {
+    //         (self.esdt_value(), self.token())
+    //     }
+    // }
 
     fn esdt_num_transfers(&self) -> usize;
 

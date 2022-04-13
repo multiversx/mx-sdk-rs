@@ -33,7 +33,7 @@ impl StaticVarApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn get_next_managed_buffer_handle(&self) -> Handle {
+    fn next_managed_buffer_handle(&self) -> Handle {
         unreachable!()
     }
 }

@@ -37,7 +37,7 @@ impl StaticVarApiImpl for DebugApi {
         new_handle
     }
 
-    fn get_next_managed_buffer_handle(&self) -> Handle {
+    fn next_managed_buffer_handle(&self) -> Handle {
         let mut ref_tx_static_vars = self.static_vars_cell.borrow_mut();
         let new_handle = ref_tx_static_vars.next_managed_buffer_handle;
         ref_tx_static_vars.next_managed_buffer_handle -= 1;

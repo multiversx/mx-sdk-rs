@@ -32,6 +32,11 @@ impl DebugApi {
         managed_types.big_int_map.insert_new_handle(value.into())
     }
 
+    pub fn set_big_uint(&self, handle: Handle, value: num_bigint::BigUint) {
+        let mut managed_types = self.m_types_borrow_mut();
+        managed_types.big_int_map.insert(handle, value.into())
+    }
+
     pub fn insert_new_big_uint_old(
         &self,
         value: num_bigint::BigUint,
