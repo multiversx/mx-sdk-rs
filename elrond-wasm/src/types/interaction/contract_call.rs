@@ -35,8 +35,11 @@ where
     pub egld_payment: BigUint<SA>,
     pub payments: ManagedVec<SA, EsdtTokenPayment<SA>>,
     pub endpoint_name: ManagedBuffer<SA>,
+    pub extra_gas_for_callback: u64,
     pub explicit_gas_limit: u64,
     pub arg_buffer: ManagedArgBuffer<SA>,
+    pub success_callback: &'static [u8],
+    pub error_callback: &'static [u8],
     _return_type: PhantomData<OriginalResult>,
 }
 
@@ -71,15 +74,20 @@ where
     ) -> Self {
         let arg_buffer = ManagedArgBuffer::new_empty();
         let egld_payment = BigUint::zero();
+        let success_callback = b"";
+        let error_callback = b"";
         ContractCall {
             _phantom: PhantomData,
             to,
             egld_payment,
             payments,
             explicit_gas_limit: UNSPECIFIED_GAS_LIMIT,
+            extra_gas_for_callback: UNSPECIFIED_GAS_LIMIT,
             endpoint_name,
             arg_buffer,
             _return_type: PhantomData,
+            success_callback,
+            error_callback,
         }
     }
 
@@ -113,6 +121,27 @@ where
         payments: ManagedVec<SA, EsdtTokenPayment<SA>>,
     ) -> Self {
         self.payments = payments;
+        self
+    }
+
+    #[cfg(feature = "promises")]
+    #[inline]
+    pub fn with_success_callback(mut self, callback: &'static [u8]) -> Self {
+        self.success_callback = callback;
+        self
+    }
+
+    #[cfg(feature = "promises")]
+    #[inline]
+    pub fn with_error_callback(mut self, callback: &'static [u8]) -> Self {
+        self.error_callback = callback;
+        self
+    }
+
+    #[cfg(feature = "promises")]
+    #[inline]
+    pub fn with_extra_gas_for_callback(mut self, gas_limit: u64) -> Self {
+        self.extra_gas_for_callback = gas_limit;
         self
     }
 
@@ -184,9 +213,12 @@ where
                     egld_payment: zero,
                     payments: no_payments,
                     explicit_gas_limit: self.explicit_gas_limit,
+                    extra_gas_for_callback: self.extra_gas_for_callback,
                     endpoint_name,
                     arg_buffer: new_arg_buffer.concat(self.arg_buffer),
                     _return_type: PhantomData,
+                    success_callback: self.success_callback,
+                    error_callback: self.error_callback,
                 }
             } else {
                 let payments = self.no_payments();
@@ -219,9 +251,12 @@ where
                     egld_payment: zero,
                     payments,
                     explicit_gas_limit: self.explicit_gas_limit,
+                    extra_gas_for_callback: self.extra_gas_for_callback,
                     endpoint_name,
                     arg_buffer: new_arg_buffer.concat(self.arg_buffer),
                     _return_type: PhantomData,
+                    success_callback: self.success_callback,
+                    error_callback: self.error_callback,
                 }
             }
         } else {
@@ -257,9 +292,12 @@ where
             egld_payment: zero,
             payments,
             explicit_gas_limit: self.explicit_gas_limit,
+            extra_gas_for_callback: self.extra_gas_for_callback,
             endpoint_name,
             arg_buffer: new_arg_buffer.concat(self.arg_buffer),
             _return_type: PhantomData,
+            success_callback: self.success_callback,
+            error_callback: self.error_callback,
         }
     }
 
@@ -281,6 +319,21 @@ where
             arg_buffer: self.arg_buffer,
             callback_call: None,
         }
+    }
+
+    #[cfg(feature = "promises")]
+    pub fn register_promise(mut self) {
+        self = self.convert_to_esdt_transfer_call();
+        SA::send_api_impl().create_async_call_raw(
+            &self.to,
+            &self.egld_payment,
+            &self.endpoint_name,
+            self.success_callback,
+            self.error_callback,
+            self.explicit_gas_limit,
+            self.extra_gas_for_callback,
+            &self.arg_buffer,
+        )
     }
 }
 
@@ -322,9 +375,13 @@ where
 
     /// Executes immediately, synchronously, and returns contract call result.
     /// Only works if the target contract is in the same shard.
+    ///
     /// This is a workaround to handle nested sync calls.
+    ///
     /// Please do not use this method unless there is absolutely no other option.
+    ///
     /// Will be eliminated after some future Arwen hook redesign.
+    ///
     /// `range_closure` takes the number of results before, the number of results after,
     /// and is expected to return the start index (inclusive) and end index (exclusive).
     pub fn execute_on_dest_context_custom_range<F, RequestedResult>(
@@ -369,7 +426,9 @@ where
     SA: CallTypeApi + 'static,
 {
     /// Executes immediately, synchronously.
+    ///
     /// The result (if any) is ignored.
+    ///
     /// Only works if the target contract is in the same shard.
     pub fn execute_on_dest_context_ignore_result(mut self) {
         self = self.convert_to_esdt_transfer_call();
@@ -406,6 +465,7 @@ where
     }
 
     /// Immediately launches a transfer-execute call.
+    ///
     /// This is similar to an async call, but there is no callback
     /// and there can be more than one such call per transaction.
     pub fn transfer_execute(self) {

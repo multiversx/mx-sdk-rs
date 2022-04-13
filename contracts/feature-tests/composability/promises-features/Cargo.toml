@@ -1,0 +1,26 @@
+[package]
+name = "promises-features"
+version = "0.0.0"
+authors = ["Andrei Marinica <andrei.marinica@elrond.com>"]
+edition = "2018"
+publish = false
+
+[lib]
+path = "src/promises_features.rs"
+
+[dependencies.vault]
+path = "../vault"
+
+[dependencies.elrond-wasm]
+version = "0.30.0"
+path = "../../../../elrond-wasm"
+features = ["promises"]
+
+[dependencies.elrond-wasm-node]
+version = "0.30.0"
+path = "../../../../elrond-wasm-node"
+optional = true
+
+[dev-dependencies.elrond-wasm-debug]
+version = "0.30.0"
+path = "../../../../elrond-wasm-debug"

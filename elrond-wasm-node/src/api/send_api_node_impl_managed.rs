@@ -104,6 +104,19 @@ extern "C" {
         argumentsHandle: i32,
     ) -> !;
 
+    fn managedCreateAsyncCall(
+        dstHandle: i32,
+        valueHandle: i32,
+        functionHandle: i32,
+        argumentsHandle: i32,
+        successOffset: *const u8,
+        successLength: i32,
+        errorOffset: *const u8,
+        errorLength: i32,
+        gas: i64,
+        extraGasForCallback: i64,
+    ) -> i32;
+
     /// Allows us to filter results from nested sync call
     fn getNumReturnData() -> i32;
     fn managedGetReturnData(resultID: i32, resultHandle: i32);
@@ -226,6 +239,33 @@ impl SendApiImpl for VmApiImpl {
                 endpoint_name.get_raw_handle(),
                 arg_buffer.get_raw_handle(),
             )
+        }
+    }
+
+    fn create_async_call_raw<M: ManagedTypeApi>(
+        &self,
+        to: &ManagedAddress<M>,
+        amount: &BigUint<M>,
+        endpoint_name: &ManagedBuffer<M>,
+        success: &'static [u8],
+        error: &'static [u8],
+        gas: u64,
+        extra_gas_for_callback: u64,
+        arg_buffer: &ManagedArgBuffer<M>,
+    ) {
+        unsafe {
+            let _ = managedCreateAsyncCall(
+                to.get_raw_handle(),
+                amount.get_raw_handle(),
+                endpoint_name.get_raw_handle(),
+                arg_buffer.get_raw_handle(),
+                success.as_ptr(),
+                success.len() as i32,
+                error.as_ptr(),
+                error.len() as i32,
+                gas as i64,
+                extra_gas_for_callback as i64,
+            );
         }
     }
 
