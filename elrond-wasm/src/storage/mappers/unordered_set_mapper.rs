@@ -7,11 +7,11 @@ use crate::{
     api::StorageMapperApi,
     storage::StorageKey,
     storage_clear, storage_get, storage_set,
-    types::{ManagedType, MultiResultVec},
+    types::{ManagedType, MultiValueEncoded},
 };
 use elrond_codec::{
-    multi_encode_iter_or_handle_err, EncodeErrorHandler, NestedDecode, NestedEncode, TopDecode,
-    TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
+    multi_encode_iter_or_handle_err, CodecFrom, EncodeErrorHandler, NestedDecode, NestedEncode,
+    TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
 };
 
 const ITEM_INDEX: &[u8] = b".index";
@@ -134,8 +134,6 @@ where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
 {
-    type DecodeAs = MultiResultVec<T>;
-
     fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
     where
         O: TopEncodeMultiOutput,
@@ -145,6 +143,13 @@ where
     }
 }
 
+impl<SA, T> CodecFrom<UnorderedSetMapper<SA, T>> for MultiValueEncoded<SA, T>
+where
+    SA: StorageMapperApi,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
+{
+}
+
 /// Behaves like a MultiResultVec when an endpoint result.
 impl<SA, T> TypeAbi for UnorderedSetMapper<SA, T>
 where
@@ -152,7 +157,7 @@ where
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + TypeAbi,
 {
     fn type_name() -> TypeName {
-        crate::types::MultiResultVec::<T>::type_name()
+        crate::abi::type_name_variadic::<T>()
     }
 
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {

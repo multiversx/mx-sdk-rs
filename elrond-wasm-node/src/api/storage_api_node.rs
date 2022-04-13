@@ -1,11 +1,7 @@
 use super::VmApiImpl;
-use alloc::vec::Vec;
 use elrond_wasm::{
-    api::{
-        Handle, StaticVarApiImpl, StorageReadApi, StorageReadApiImpl, StorageWriteApi,
-        StorageWriteApiImpl,
-    },
-    types::BoxedBytes,
+    api::{Handle, StorageReadApi, StorageReadApiImpl, StorageWriteApi, StorageWriteApiImpl},
+    types::heap::{Box, BoxedBytes},
 };
 
 #[rustfmt::skip]
@@ -31,8 +27,10 @@ extern "C" {
     fn mBufferNew() -> i32;
     fn mBufferStorageStore(keyHandle: i32, mBufferHandle: i32) -> i32;
     fn mBufferStorageLoad(keyHandle: i32, mBufferHandle: i32) -> i32;
-    fn mBufferStorageLoadFromAddress(addressHandle: i32, keyHandle: i32, mBufferHandle: i32);
     fn mBufferGetLength(mBufferHandle: i32) -> i32;
+    
+    #[cfg(feature = "ei-1-1")]
+    fn mBufferStorageLoadFromAddress(addressHandle: i32, keyHandle: i32, mBufferHandle: i32);
 }
 
 impl StorageReadApi for VmApiImpl {
@@ -50,24 +48,14 @@ impl StorageReadApiImpl for VmApiImpl {
         unsafe { storageLoadLength(key.as_ref().as_ptr(), key.len() as i32) as usize }
     }
 
-    fn storage_load_vec_u8(&self, key: &[u8]) -> Vec<u8> {
-        unsafe {
-            let value_len = self.storage_load_len(key);
-            let mut res = Vec::with_capacity(value_len);
-            storageLoad(key.as_ref().as_ptr(), key.len() as i32, res.as_mut_ptr());
-            res.set_len(value_len);
-            res
-        }
-    }
-
-    fn storage_load_boxed_bytes(&self, key: &[u8]) -> BoxedBytes {
+    fn storage_load_to_heap(&self, key: &[u8]) -> Box<[u8]> {
         let len = self.storage_load_len(key);
         unsafe {
             let mut res = BoxedBytes::allocate(len);
             if len > 0 {
                 storageLoad(key.as_ref().as_ptr(), key.len() as i32, res.as_mut_ptr());
             }
-            res
+            res.into_box()
         }
     }
 
@@ -109,6 +97,7 @@ impl StorageReadApiImpl for VmApiImpl {
         unsafe { smallIntStorageLoadSigned(key.as_ref().as_ptr(), key.len() as i32) }
     }
 
+    #[cfg(feature = "ei-1-1")]
     #[inline]
     fn storage_load_from_address(&self, address_handle: Handle, key_handle: Handle) -> Handle {
         unsafe {

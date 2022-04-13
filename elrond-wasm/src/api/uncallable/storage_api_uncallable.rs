@@ -1,7 +1,7 @@
 use crate::api::{
     Handle, StorageReadApi, StorageReadApiImpl, StorageWriteApi, StorageWriteApiImpl,
 };
-use alloc::vec::Vec;
+use alloc::boxed::Box;
 
 use super::UncallableApi;
 
@@ -18,7 +18,7 @@ impl StorageReadApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn storage_load_vec_u8(&self, _key: &[u8]) -> Vec<u8> {
+    fn storage_load_to_heap(&self, _key: &[u8]) -> Box<[u8]> {
         unreachable!()
     }
 
@@ -42,6 +42,7 @@ impl StorageReadApiImpl for UncallableApi {
         unreachable!()
     }
 
+    #[cfg(feature = "ei-1-1")]
     fn storage_load_from_address(&self, _address_handle: Handle, _key_handle: Handle) -> Handle {
         unreachable!()
     }

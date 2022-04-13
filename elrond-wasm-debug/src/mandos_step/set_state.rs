@@ -1,22 +1,22 @@
-use std::collections::BTreeMap;
-
-use elrond_wasm::types::Address;
-use mandos::model::{Account, AddressKey, BlockInfo, NewAddress};
-use num_bigint::BigUint;
+use crate::num_bigint::BigUint;
+use elrond_wasm::types::heap::Address;
+use mandos::model::{SetStateStep, Step};
 
 use crate::world_mock::{
     is_smart_contract_address, AccountData, AccountEsdt, BlockInfo as CrateBlockInfo,
     BlockchainMock, EsdtData, EsdtInstance, EsdtInstanceMetadata, EsdtInstances, EsdtRoles,
 };
 
-pub fn execute(
-    state: &mut BlockchainMock,
-    accounts: &BTreeMap<AddressKey, Account>,
-    new_addresses: &[NewAddress],
-    previous_block_info: &Option<BlockInfo>,
-    current_block_info: &Option<BlockInfo>,
-) {
-    for (address, account) in accounts.iter() {
+impl BlockchainMock {
+    pub fn mandos_set_state(&mut self, set_state_step: SetStateStep) -> &mut Self {
+        execute(self, &set_state_step);
+        self.mandos_trace.steps.push(Step::SetState(set_state_step));
+        self
+    }
+}
+
+fn execute(state: &mut BlockchainMock, set_state_step: &SetStateStep) {
+    for (address, account) in set_state_step.accounts.iter() {
         let storage = account
             .storage
             .iter()
@@ -64,7 +64,7 @@ pub fn execute(
                 .map(|address_value| address_value.value.into()),
         });
     }
-    for new_address in new_addresses.iter() {
+    for new_address in set_state_step.new_addresses.iter() {
         assert!(
             is_smart_contract_address(&new_address.new_address.value.into()),
             "field should have SC format"
@@ -75,10 +75,10 @@ pub fn execute(
             new_address.new_address.value.into(),
         )
     }
-    if let Some(block_info_obj) = &*previous_block_info {
+    if let Some(block_info_obj) = &*set_state_step.previous_block_info {
         update_block_info(&mut state.previous_block_info, block_info_obj);
     }
-    if let Some(block_info_obj) = &*current_block_info {
+    if let Some(block_info_obj) = &*set_state_step.current_block_info {
         update_block_info(&mut state.current_block_info, block_info_obj);
     }
 }
@@ -123,7 +123,7 @@ fn convert_mandos_esdt_to_world_mock(
                 full_esdt
                     .roles
                     .iter()
-                    .map(|role| role.value.clone())
+                    .map(|role| role.as_bytes().to_vec())
                     .collect(),
             ),
             frozen: if let Some(u64_value) = &full_esdt.frozen {

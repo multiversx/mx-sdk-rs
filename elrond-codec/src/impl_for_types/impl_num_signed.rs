@@ -1,5 +1,5 @@
 use crate::{
-    dep_encode_from_no_err, dep_encode_num_mimic, num_conv::bytes_to_number,
+    dep_encode_from_no_err, dep_encode_num_mimic, num_conv::universal_decode_number,
     top_encode_from_no_err, DecodeError, DecodeErrorHandler, EncodeErrorHandler, NestedDecode,
     NestedDecodeInput, NestedEncode, NestedEncodeNoErr, NestedEncodeOutput, TopDecode,
     TopDecodeInput, TopEncode, TopEncodeNoErr, TopEncodeOutput, TypeInfo,
@@ -42,7 +42,7 @@ macro_rules! dep_decode_num_signed {
             {
                 let mut bytes = [0u8; $num_bytes];
                 input.read_into(&mut bytes[..], h)?;
-                let num = bytes_to_number(&bytes[..], true) as $ty;
+                let num = universal_decode_number(&bytes[..], true) as $ty;
                 Ok(num)
             }
         }
@@ -65,7 +65,7 @@ macro_rules! top_decode_num_signed {
                 I: TopDecodeInput,
                 H: DecodeErrorHandler,
             {
-                let arg_i64 = input.into_i64();
+                let arg_i64 = input.into_i64(h)?;
                 let min = <$bounds_ty>::MIN as i64;
                 let max = <$bounds_ty>::MAX as i64;
                 if arg_i64 < min || arg_i64 > max {

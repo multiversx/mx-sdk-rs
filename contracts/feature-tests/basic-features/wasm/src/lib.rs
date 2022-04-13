@@ -41,9 +41,6 @@ elrond_wasm_node::wasm_endpoints! {
         bit_xor_assign_big_uint_ref
         bit_xor_big_uint
         bit_xor_big_uint_ref
-        boxed_bytes_concat_2
-        boxed_bytes_split
-        boxed_bytes_zeros
         burn_fungible
         check_contains
         clear_single_value_mapper
@@ -56,27 +53,10 @@ elrond_wasm_node::wasm_endpoints! {
         codec_err_storage_get
         codec_err_storage_key
         codec_err_storage_set
-        compare_h256
-        compute_create_ec
-        compute_ec_add
-        compute_ec_double
-        compute_generate_key_ec
-        compute_get_ec_length
-        compute_get_priv_key_byte_length
-        compute_get_values
-        compute_is_on_curve_ec
         compute_keccak256
-        compute_keccak256_legacy
-        compute_marshal_compressed_ec
-        compute_marshal_ec
-        compute_ripemd160
-        compute_scalar_base_mult
-        compute_scalar_mult
-        compute_secp256k1_der_signature
+        compute_keccak256_legacy_managed
         compute_sha256
-        compute_sha256_legacy
-        compute_unmarshal_compressed_ec
-        compute_unmarshal_ec
+        compute_sha256_legacy_managed
         count_ones
         div_assign_big_int
         div_assign_big_int_ref
@@ -88,51 +68,36 @@ elrond_wasm_node::wasm_endpoints! {
         div_big_uint_ref
         echo_array_u8
         echo_arrayvec
-        echo_async_result_empty
         echo_big_int
+        echo_big_int_managed_vec
         echo_big_int_option
         echo_big_int_tuple
-        echo_big_int_vec
         echo_big_uint
         echo_bool
-        echo_boxed_array_u8
-        echo_boxed_bytes
-        echo_boxed_ser_example_1
-        echo_boxed_ser_example_2
-        echo_h256
         echo_i32
         echo_i64
         echo_i8
         echo_isize
-        echo_large_boxed_byte_array
         echo_managed_address
         echo_managed_async_result_empty
         echo_managed_buffer
         echo_managed_vec_of_managed_vec
         echo_managed_vec_of_token_identifier
+        echo_multi_value_tuples
+        echo_multi_value_u32
         echo_non_zero_usize
         echo_nothing
         echo_opt_bool
-        echo_ser_example_1
         echo_ser_example_2
         echo_simple_enum
-        echo_slice_u8
         echo_some_args_ignore_others
-        echo_str
-        echo_str_box
-        echo_string
         echo_tuple_into_multiresult
         echo_u32
         echo_u64
         echo_u8
         echo_usize
-        echo_varags_big_uint
         echo_varags_managed_eager
         echo_varags_managed_sum
-        echo_varags_tuples
-        echo_varags_u32
-        echo_vec_of_managed_buffer
-        echo_vec_u8
         finish_simple_enum_variant_1
         getFungibleTokenId
         getListMapper
@@ -156,10 +121,11 @@ elrond_wasm_node::wasm_endpoints! {
         get_shard_of_address
         get_state_root_hash_legacy
         get_tx_hash_legacy
-        h256_is_zero
         is_empty_opt_addr
         is_empty_single_value_mapper
         is_smart_contract
+        issue_and_set_all_roles_fungible
+        issue_and_set_all_roles_meta
         issue_fungible_custom_callback
         issue_fungible_default_callback
         listMapperBack
@@ -186,29 +152,28 @@ elrond_wasm_node::wasm_endpoints! {
         load_map2
         load_map3
         load_opt_addr
-        load_ser_1
         load_ser_2
         load_u64
         load_usize
-        load_vec_u8
         log2_big_uint
         log2_big_uint_ref
         logEventA
         logEventARepeat
         logEventB
-        logLegacyEventA
-        logLegacyEventB
         maddress_from_array
         maddress_from_managed_buffer
         managed_address_eq
-        managed_address_from
         managed_address_zero
         managed_struct_eq
         managed_vec_address_push
         managed_vec_biguint_eq
         managed_vec_biguint_push
+        managed_vec_contains
+        managed_vec_find
         managed_vec_new
+        managed_vec_remove
         managed_vec_set
+        map_mapper
         map_mapper_contains_key
         map_mapper_entry_and_modify
         map_mapper_entry_or_default_update_increment
@@ -239,17 +204,11 @@ elrond_wasm_node::wasm_endpoints! {
         mapper_nft_create_and_send
         mapper_nft_get_balance
         mapper_nft_set_token_id
-        mbuffer_concat_1
-        mbuffer_concat_2
+        mbuffer_concat
         mbuffer_copy_slice
         mbuffer_eq
-        mbuffer_from_boxed_bytes
-        mbuffer_from_slice
-        mbuffer_load_slice
         mbuffer_new
-        mbuffer_overwrite
         mbuffer_set_random
-        mbuffer_set_slice
         mint_and_send_fungible
         mint_fungible
         mul_assign_big_int
@@ -267,7 +226,6 @@ elrond_wasm_node::wasm_endpoints! {
         non_zero_usize_iter
         non_zero_usize_macro
         only_owner_endpoint
-        only_owner_legacy
         panicWithMessage
         pow_big_int
         pow_big_int_ref
@@ -291,16 +249,7 @@ elrond_wasm_node::wasm_endpoints! {
         require_contains
         require_equals
         require_same_token_fungible
-        result_echo
-        result_echo_2
-        result_echo_3
-        result_err_from_bytes_1
-        result_err_from_bytes_2
-        result_err_from_bytes_3
-        result_err_from_str
-        result_err_from_string
-        result_ok
-        return_sc_error
+        sc_panic
         set_local_roles_fungible
         set_mapper
         set_mapper_contains
@@ -329,11 +278,9 @@ elrond_wasm_node::wasm_endpoints! {
         store_reserved_big_uint
         store_reserved_i64
         store_reserved_vec_u8
-        store_ser_1
         store_ser_2
         store_u64
         store_usize
-        store_vec_u8
         sub_assign_big_int
         sub_assign_big_int_ref
         sub_assign_big_uint
@@ -342,7 +289,6 @@ elrond_wasm_node::wasm_endpoints! {
         sub_big_int_ref
         sub_big_uint
         sub_big_uint_ref
-        take_varags_u32
         token_attributes_clear
         token_attributes_get_attributes
         token_attributes_get_nonce
@@ -352,14 +298,9 @@ elrond_wasm_node::wasm_endpoints! {
         token_identifier_egld
         token_identifier_is_valid_1
         token_identifier_is_valid_2
-        vec_concat_const
         vec_mapper
         vec_mapper_get
         vec_mapper_len
         vec_mapper_push
-        verify_bls_signature
-        verify_custom_secp256k1_signature
-        verify_ed25519_signature
-        verify_secp256k1_signature
     )
 }

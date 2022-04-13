@@ -114,7 +114,7 @@ pub trait SimpleErc20Token {
     /// * `amount` The amount of tokens to be spent.
     ///
     #[endpoint]
-    fn approve(&self, spender: ManagedAddress, amount: BigUint) -> SCResult<()> {
+    fn approve(&self, spender: ManagedAddress, amount: BigUint) {
         // sender is the caller
         let caller = self.blockchain().get_caller();
 
@@ -123,7 +123,6 @@ pub trait SimpleErc20Token {
 
         // log operation
         self.approve_event(&caller, &spender, &amount);
-        Ok(())
     }
 
     // EVENTS

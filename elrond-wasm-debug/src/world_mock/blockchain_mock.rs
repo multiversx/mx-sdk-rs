@@ -1,13 +1,12 @@
-use elrond_wasm::types::Address;
-use mandos::{interpret_trait::InterpreterContext, value_interpreter::interpret_string};
-use num_bigint::BigUint;
-use num_traits::Zero;
-use std::{collections::HashMap, path::PathBuf, rc::Rc};
-
-use crate::{
-    tx_mock::{BlockchainUpdate, TxCache},
-    ContractMap,
+use crate::{num_bigint::BigUint, tx_mock::BlockchainUpdate, ContractMap};
+use elrond_wasm::types::heap::Address;
+use mandos::{
+    interpret_trait::{InterpreterContext, IntoRaw},
+    model::Scenario,
+    value_interpreter::interpret_string,
 };
+use num_traits::Zero;
+use std::{collections::HashMap, path::PathBuf};
 
 use super::{AccountData, BlockInfo};
 
@@ -21,6 +20,7 @@ pub struct BlockchainMock {
     pub current_block_info: BlockInfo,
     pub contract_map: ContractMap,
     pub current_dir: PathBuf,
+    pub mandos_trace: Scenario,
 }
 
 impl BlockchainMock {
@@ -32,6 +32,7 @@ impl BlockchainMock {
             current_block_info: BlockInfo::new(),
             contract_map: ContractMap::default(),
             current_dir: std::env::current_dir().unwrap(),
+            mandos_trace: Scenario::default(),
         }
     }
 }
@@ -56,17 +57,12 @@ impl BlockchainMock {
         self.contract_map.contains_contract(&contract_bytes)
     }
 
-    pub fn commit_updates(self: &mut Rc<Self>, updates: BlockchainUpdate) {
-        updates.apply(Rc::get_mut(self).unwrap());
+    pub fn commit_updates(&mut self, updates: BlockchainUpdate) {
+        updates.apply(self);
     }
 
-    pub fn commit_tx_cache(self: &mut Rc<Self>, tx_cache: TxCache) {
-        self.commit_updates(tx_cache.into_blockchain_updates())
-    }
-
-    pub fn increase_account_nonce(self: &mut Rc<Self>, address: &Address) {
-        let self_ref = Rc::get_mut(self).unwrap();
-        let account = self_ref.accounts.get_mut(address).unwrap_or_else(|| {
+    pub fn increase_account_nonce(&mut self, address: &Address) {
+        let account = self.accounts.get_mut(address).unwrap_or_else(|| {
             panic!(
                 "Account not found: {}",
                 &std::str::from_utf8(address.as_ref()).unwrap()
@@ -75,9 +71,8 @@ impl BlockchainMock {
         account.nonce += 1;
     }
 
-    pub fn subtract_tx_gas(self: &mut Rc<Self>, address: &Address, gas_limit: u64, gas_price: u64) {
-        let self_ref = Rc::get_mut(self).unwrap();
-        let account = self_ref.accounts.get_mut(address).unwrap_or_else(|| {
+    pub fn subtract_tx_gas(&mut self, address: &Address, gas_limit: u64, gas_price: u64) {
+        let account = self.accounts.get_mut(address).unwrap_or_else(|| {
             panic!(
                 "Account not found: {}",
                 &std::str::from_utf8(address.as_ref()).unwrap()
@@ -109,5 +104,21 @@ impl BlockchainMock {
         account
             .storage
             .insert(ELROND_REWARD_KEY.to_vec(), storage_v_rew.to_bytes_be());
+    }
+
+    pub(crate) fn with_borrowed<F, R>(&mut self, f: F) -> R
+    where
+        F: FnOnce(Self) -> (R, Self),
+    {
+        let obj = std::mem::replace(self, Self::new());
+        let (result, obj) = f(obj);
+        *self = obj;
+        result
+    }
+
+    pub fn write_mandos_trace(&mut self, file_path: &str) {
+        let mandos_trace = core::mem::take(&mut self.mandos_trace);
+        let mandos_trace_raw = mandos_trace.into_raw();
+        mandos_trace_raw.save_to_file(file_path);
     }
 }

@@ -5,7 +5,7 @@ use crate::{api::unsafe_buffer, error_hook};
 use elrond_wasm::{
     api::{BigIntApi, Handle, Sign},
     err_msg,
-    types::BoxedBytes,
+    types::heap::BoxedBytes,
 };
 
 extern "C" {

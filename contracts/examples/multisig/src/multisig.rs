@@ -1,10 +1,10 @@
 #![no_std]
 
-mod action;
-mod multisig_perform;
-mod multisig_propose;
-mod multisig_state;
-mod user_role;
+pub mod action;
+pub mod multisig_perform;
+pub mod multisig_propose;
+pub mod multisig_state;
+pub mod user_role;
 
 use action::ActionFullInfo;
 use user_role::UserRole;
@@ -21,7 +21,7 @@ pub trait Multisig:
     + multisig_perform::MultisigPerformModule
 {
     #[init]
-    fn init(&self, quorum: usize, #[var_args] board: ManagedVarArgs<ManagedAddress>) {
+    fn init(&self, quorum: usize, #[var_args] board: MultiValueEncoded<ManagedAddress>) {
         let board_vec = board.to_vec();
         let new_num_board_members = self.add_multiple_board_members(board_vec);
 
@@ -48,9 +48,9 @@ pub trait Multisig:
     /// - the action id
     /// - the serialized action data
     /// - (number of signers followed by) list of signer addresses.
-    #[external_view(getPendingActionFullInfo)]
-    fn get_pending_action_full_info(&self) -> ManagedMultiResultVec<ActionFullInfo<Self::Api>> {
-        let mut result = ManagedMultiResultVec::new();
+    #[view(getPendingActionFullInfo)]
+    fn get_pending_action_full_info(&self) -> MultiValueEncoded<ActionFullInfo<Self::Api>> {
+        let mut result = MultiValueEncoded::new();
         let action_last_index = self.get_action_last_index();
         let action_mapper = self.action_mapper();
         for action_id in 1..=action_last_index {
@@ -82,7 +82,7 @@ pub trait Multisig:
     /// `0` = no rights,
     /// `1` = can propose, but not sign,
     /// `2` = can propose and sign.
-    #[external_view(userRole)]
+    #[view(userRole)]
     fn user_role(&self, user: ManagedAddress) -> UserRole {
         let user_id = self.user_mapper().get_user_id(&user);
         if user_id == 0 {
@@ -93,19 +93,19 @@ pub trait Multisig:
     }
 
     /// Lists all users that can sign actions.
-    #[external_view(getAllBoardMembers)]
-    fn get_all_board_members(&self) -> ManagedMultiResultVec<ManagedAddress> {
+    #[view(getAllBoardMembers)]
+    fn get_all_board_members(&self) -> MultiValueEncoded<ManagedAddress> {
         self.get_all_users_with_role(UserRole::BoardMember)
     }
 
     /// Lists all proposers that are not board members.
-    #[external_view(getAllProposers)]
-    fn get_all_proposers(&self) -> ManagedMultiResultVec<ManagedAddress> {
+    #[view(getAllProposers)]
+    fn get_all_proposers(&self) -> MultiValueEncoded<ManagedAddress> {
         self.get_all_users_with_role(UserRole::Proposer)
     }
 
-    fn get_all_users_with_role(&self, role: UserRole) -> ManagedMultiResultVec<ManagedAddress> {
-        let mut result = ManagedMultiResultVec::new();
+    fn get_all_users_with_role(&self, role: UserRole) -> MultiValueEncoded<ManagedAddress> {
+        let mut result = MultiValueEncoded::new();
         let num_users = self.user_mapper().get_user_count();
         for user_id in 1..=num_users {
             if self.user_id_to_role(user_id).get() == role {

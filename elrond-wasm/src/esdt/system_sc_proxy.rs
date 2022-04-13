@@ -6,8 +6,8 @@ use hex_literal::hex;
 use crate::{
     api::{CallTypeApi, SendApi},
     types::{
-        Address, BigUint, ContractCall, EsdtLocalRole, EsdtTokenType, ManagedAddress,
-        ManagedBuffer, TokenIdentifier,
+        BigUint, ContractCall, EsdtLocalRole, EsdtTokenType, ManagedAddress, ManagedBuffer,
+        TokenIdentifier,
     },
 };
 
@@ -416,12 +416,12 @@ where
     pub fn transfer_ownership(
         self,
         token_identifier: &TokenIdentifier<SA>,
-        new_owner: &Address,
+        new_owner: &ManagedAddress<SA>,
     ) -> ContractCall<SA, ()> {
         let mut contract_call = self.esdt_system_sc_call_no_args(b"transferOwnership");
 
         contract_call.push_endpoint_arg(token_identifier);
-        contract_call.push_argument_raw_bytes(new_owner.as_bytes());
+        contract_call.push_endpoint_arg(new_owner);
 
         contract_call
     }
@@ -429,14 +429,14 @@ where
     pub fn transfer_nft_create_role(
         self,
         token_identifier: &TokenIdentifier<SA>,
-        old_creator: &Address,
-        new_creator: &Address,
+        old_creator: &ManagedAddress<SA>,
+        new_creator: &ManagedAddress<SA>,
     ) -> ContractCall<SA, ()> {
         let mut contract_call = self.esdt_system_sc_call_no_args(b"transferNFTCreateRole");
 
         contract_call.push_endpoint_arg(token_identifier);
-        contract_call.push_argument_raw_bytes(old_creator.as_bytes());
-        contract_call.push_argument_raw_bytes(new_creator.as_bytes());
+        contract_call.push_endpoint_arg(old_creator);
+        contract_call.push_endpoint_arg(new_creator);
 
         contract_call
     }

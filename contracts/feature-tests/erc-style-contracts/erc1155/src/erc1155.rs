@@ -21,7 +21,7 @@ pub trait Erc1155 {
         to: ManagedAddress,
         type_id: BigUint,
         value: BigUint,
-        data: &[u8],
+        data: &ManagedBuffer,
     ) {
         let caller = self.blockchain().get_caller();
 
@@ -47,7 +47,7 @@ pub trait Erc1155 {
         to: ManagedAddress,
         type_id: BigUint,
         amount: BigUint,
-        data: &[u8],
+        data: &ManagedBuffer,
     ) {
         self.try_reserve_fungible(&from, &type_id, &amount);
 
@@ -64,7 +64,7 @@ pub trait Erc1155 {
         to: ManagedAddress,
         type_id: BigUint,
         nft_id: BigUint,
-        data: &[u8],
+        data: &ManagedBuffer,
     ) {
         self.try_reserve_non_fungible(&from, &type_id, &nft_id);
 
@@ -85,7 +85,7 @@ pub trait Erc1155 {
         to: ManagedAddress,
         type_ids: &[BigUint],
         values: &[BigUint],
-        data: &[u8],
+        data: ManagedBuffer,
     ) {
         let caller = self.blockchain().get_caller();
         let is_receiver_smart_contract = self.blockchain().is_smart_contract(&to);
@@ -127,7 +127,7 @@ pub trait Erc1155 {
         }
 
         if is_receiver_smart_contract {
-            self.peform_async_call_batch_transfer(from, to, type_ids, values, data);
+            self.peform_async_call_batch_transfer(from, to, type_ids, values, &data);
         }
     }
 
@@ -201,7 +201,7 @@ pub trait Erc1155 {
     }
 
     #[endpoint]
-    fn mint(&self, type_id: BigUint, amount: BigUint) -> SCResult<()> {
+    fn mint(&self, type_id: BigUint, amount: BigUint) {
         let creator = self.token_type_creator(&type_id).get();
 
         require!(
@@ -222,12 +222,10 @@ pub trait Erc1155 {
         }
 
         // self.transfer_single_event(&caller, &from, &to, &id, &amount);
-
-        Ok(())
     }
 
     #[endpoint]
-    fn burn(&self, type_id: BigUint, amount: BigUint) -> SCResult<()> {
+    fn burn(&self, type_id: BigUint, amount: BigUint) {
         require!(
             self.is_fungible(&type_id).get(),
             "Only fungible tokens can be burned"
@@ -239,8 +237,6 @@ pub trait Erc1155 {
         require!(balance >= amount, "Not enough tokens to burn");
 
         self.decrease_balance(&caller, &type_id, &amount);
-
-        Ok(())
     }
 
     // views
@@ -256,16 +252,16 @@ pub trait Erc1155 {
     #[view(balanceOfBatch)]
     fn balance_of_batch(
         &self,
-        #[var_args] owner_type_id_pairs: MultiValueVec<MultiValue2<ManagedAddress, BigUint>>,
-    ) -> MultiValueVec<BigUint> {
-        let mut batch_balance = Vec::new();
-        for multi_arg in owner_type_id_pairs.into_vec() {
+        #[var_args] owner_type_id_pairs: MultiValueEncoded<MultiValue2<ManagedAddress, BigUint>>,
+    ) -> MultiValueEncoded<BigUint> {
+        let mut batch_balance = MultiValueEncoded::new();
+        for multi_arg in owner_type_id_pairs.into_iter() {
             let (owner, type_id) = multi_arg.into_tuple();
 
             batch_balance.push(self.balance_of(&owner, &type_id));
         }
 
-        batch_balance.into()
+        batch_balance
     }
 
     // private
@@ -350,7 +346,7 @@ pub trait Erc1155 {
         to: ManagedAddress,
         type_id: BigUint,
         value: BigUint,
-        data: &[u8],
+        data: &ManagedBuffer,
     ) {
         let caller = self.blockchain().get_caller();
 
@@ -372,7 +368,7 @@ pub trait Erc1155 {
         to: ManagedAddress,
         type_ids: &[BigUint],
         values: &[BigUint],
-        data: &[u8],
+        data: &ManagedBuffer,
     ) {
         let caller = self.blockchain().get_caller();
 

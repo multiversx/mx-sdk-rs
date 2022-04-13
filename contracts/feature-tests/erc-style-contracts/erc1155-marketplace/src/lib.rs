@@ -45,7 +45,7 @@ pub trait Erc1155Marketplace {
         type_id: BigUint,
         nft_id: BigUint,
         args: AuctionArgument<Self::Api>,
-    ) -> SCResult<()> {
+    ) {
         require!(
             self.blockchain().get_caller() == self.token_ownership_contract_address().get(),
             "Only the token ownership contract may call this function"
@@ -59,9 +59,7 @@ pub trait Erc1155Marketplace {
             &args.min_bid,
             &args.max_bid,
             args.deadline,
-        )?;
-
-        Ok(())
+        );
     }
 
     /// Same `AuctionArgument` is used for all tokens  
@@ -74,7 +72,7 @@ pub trait Erc1155Marketplace {
         type_ids: Vec<BigUint>,
         nft_ids: Vec<BigUint>,
         args: AuctionArgument<Self::Api>,
-    ) -> SCResult<()> {
+    ) {
         require!(
             self.blockchain().get_caller() == self.token_ownership_contract_address().get(),
             "Only the token ownership contract may call this function"
@@ -95,17 +93,15 @@ pub trait Erc1155Marketplace {
                 &args.min_bid,
                 &args.max_bid,
                 args.deadline,
-            )?;
+            );
         }
-
-        Ok(())
     }
 
     // endpoints - owner-only
 
     #[only_owner]
     #[endpoint]
-    fn claim(&self) -> SCResult<()> {
+    fn claim(&self) {
         let caller = self.blockchain().get_caller();
         let data = self.data_or_empty_if_sc(&caller, b"claim");
 
@@ -116,29 +112,22 @@ pub trait Erc1155Marketplace {
 
             self.clear_claimable_funds(&token_identifier);
         }
-
-        Ok(())
     }
 
     #[only_owner]
     #[endpoint(setCutPercentage)]
-    fn set_percentage_cut_endpoint(&self, new_cut_percentage: u8) -> SCResult<()> {
+    fn set_percentage_cut_endpoint(&self, new_cut_percentage: u8) {
         require!(
             new_cut_percentage > 0 && new_cut_percentage < PERCENTAGE_TOTAL,
             "Invalid percentage value, should be between 0 and 100"
         );
 
         self.percentage_cut().set(&new_cut_percentage);
-
-        Ok(())
     }
 
     #[only_owner]
     #[endpoint(setTokenOwnershipContractAddress)]
-    fn set_token_ownership_contract_address_endpoint(
-        &self,
-        new_address: ManagedAddress,
-    ) -> SCResult<()> {
+    fn set_token_ownership_contract_address_endpoint(&self, new_address: ManagedAddress) {
         require!(!new_address.is_zero(), "Cannot set to zero address");
         require!(
             self.blockchain().is_smart_contract(&new_address),
@@ -146,8 +135,6 @@ pub trait Erc1155Marketplace {
         );
 
         self.token_ownership_contract_address().set(&new_address);
-
-        Ok(())
     }
 
     // endpoints
@@ -160,7 +147,7 @@ pub trait Erc1155Marketplace {
         nft_id: BigUint,
         #[payment_token] payment_token: TokenIdentifier,
         #[payment] payment: BigUint,
-    ) -> SCResult<()> {
+    ) {
         require!(
             self.is_up_for_auction(&type_id, &nft_id),
             "Token is not up for auction"
@@ -211,8 +198,6 @@ pub trait Erc1155Marketplace {
         auction.current_bid = payment;
         auction.current_winner = caller;
         self.auction_for_token(&type_id, &nft_id).set(&auction);
-
-        Ok(())
     }
 
     #[endpoint(endAuction)]
@@ -265,40 +250,35 @@ pub trait Erc1155Marketplace {
     }
 
     #[view(getAuctionStatus)]
-    fn get_auction_status(
-        &self,
-        type_id: BigUint,
-        nft_id: BigUint,
-    ) -> SCResult<Auction<Self::Api>> {
+    fn get_auction_status(&self, type_id: BigUint, nft_id: BigUint) -> Auction<Self::Api> {
         require!(
             self.is_up_for_auction(&type_id, &nft_id),
             "Token is not up for auction"
         );
 
-        Ok(self.auction_for_token(&type_id, &nft_id).get())
+        self.auction_for_token(&type_id, &nft_id).get()
     }
 
     #[view(getCurrentWinningBid)]
-    fn get_current_winning_bid(&self, type_id: BigUint, nft_id: BigUint) -> SCResult<BigUint> {
+    fn get_current_winning_bid(&self, type_id: BigUint, nft_id: BigUint) -> BigUint {
         require!(
             self.is_up_for_auction(&type_id, &nft_id),
             "Token is not up for auction"
         );
 
-        Ok(self.auction_for_token(&type_id, &nft_id).get().current_bid)
+        self.auction_for_token(&type_id, &nft_id).get().current_bid
     }
 
     #[view(getCurrentWinner)]
-    fn get_current_winner(&self, type_id: BigUint, nft_id: BigUint) -> SCResult<ManagedAddress> {
+    fn get_current_winner(&self, type_id: BigUint, nft_id: BigUint) -> ManagedAddress {
         require!(
             self.is_up_for_auction(&type_id, &nft_id),
             "Token is not up for auction"
         );
 
-        Ok(self
-            .auction_for_token(&type_id, &nft_id)
+        self.auction_for_token(&type_id, &nft_id)
             .get()
-            .current_winner)
+            .current_winner
     }
 
     // private
@@ -313,7 +293,7 @@ pub trait Erc1155Marketplace {
         min_bid: &BigUint,
         max_bid: &BigUint,
         deadline: u64,
-    ) -> SCResult<()> {
+    ) {
         require!(
             !self.is_up_for_auction(type_id, nft_id),
             "There is already an auction for that token"
@@ -336,8 +316,6 @@ pub trait Erc1155Marketplace {
             current_bid: BigUint::zero(),
             current_winner: ManagedAddress::zero(),
         });
-
-        Ok(())
     }
 
     fn async_transfer_token(&self, type_id: BigUint, nft_id: BigUint, to: ManagedAddress) {

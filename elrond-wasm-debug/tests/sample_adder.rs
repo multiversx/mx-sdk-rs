@@ -88,13 +88,8 @@ mod module_1 {
     }
 
     pub trait ProxyTrait: elrond_wasm::contract_base::ProxyObjBase + Sized {
-        fn version(
-            self,
-        ) -> ContractCall<
-            Self::Api,
-            <BigInt<Self::Api> as elrond_wasm::elrond_codec::TopEncodeMulti>::DecodeAs,
-        > {
-            let ___address___ = self.into_fields();
+        fn version(&mut self) -> ContractCall<Self::Api, BigInt<Self::Api>> {
+            let ___address___ = self.extract_address();
             let mut ___contract_call___ = elrond_wasm::types::new_contract_call(
                 ___address___,
                 &b"version"[..],
@@ -230,13 +225,8 @@ mod sample_adder {
     pub trait ProxyTrait:
         elrond_wasm::contract_base::ProxyObjBase + super::module_1::ProxyTrait
     {
-        fn get_sum(
-            self,
-        ) -> elrond_wasm::types::ContractCall<
-            Self::Api,
-            <BigInt<Self::Api> as elrond_wasm::elrond_codec::TopEncodeMulti>::DecodeAs,
-        > {
-            let ___address___ = self.into_fields();
+        fn get_sum(&mut self) -> elrond_wasm::types::ContractCall<Self::Api, BigInt<Self::Api>> {
+            let ___address___ = self.extract_address();
             let mut ___contract_call___ = elrond_wasm::types::new_contract_call(
                 ___address___,
                 &b"get_sum"[..],
@@ -244,14 +234,8 @@ mod sample_adder {
             );
             ___contract_call___
         }
-        fn add(
-            self,
-            amount: &BigInt<Self::Api>,
-        ) -> ContractCall<
-            Self::Api,
-            <SCResult<()> as elrond_wasm::elrond_codec::TopEncodeMulti>::DecodeAs,
-        > {
-            let ___address___ = self.into_fields();
+        fn add(&mut self, amount: &BigInt<Self::Api>) -> ContractCall<Self::Api, ()> {
+            let ___address___ = self.extract_address();
             let mut ___contract_call___ = elrond_wasm::types::new_contract_call(
                 ___address___,
                 &b"add"[..],
@@ -298,8 +282,11 @@ mod sample_adder {
             EndpointWrappers::call(self, fn_name)
         }
 
-        fn clone_obj(&self) -> elrond_wasm::Box<dyn elrond_wasm::contract_base::CallableContract> {
-            elrond_wasm::Box::new(ContractObj::<A> {
+        fn clone_obj(
+            &self,
+        ) -> elrond_wasm::types::heap::Box<dyn elrond_wasm::contract_base::CallableContract>
+        {
+            elrond_wasm::types::heap::Box::new(ContractObj::<A> {
                 _phantom: core::marker::PhantomData,
             })
         }
@@ -310,8 +297,9 @@ mod sample_adder {
     impl elrond_wasm::contract_base::CallableContractBuilder for ContractBuilder {
         fn new_contract_obj<A: elrond_wasm::api::VMApi>(
             &self,
-        ) -> elrond_wasm::Box<dyn elrond_wasm::contract_base::CallableContract> {
-            elrond_wasm::Box::new(ContractObj::<A> {
+        ) -> elrond_wasm::types::heap::Box<dyn elrond_wasm::contract_base::CallableContract>
+        {
+            elrond_wasm::types::heap::Box::new(ContractObj::<A> {
                 _phantom: core::marker::PhantomData,
             })
         }
@@ -340,7 +328,7 @@ mod sample_adder {
     where
         A: elrond_wasm::api::VMApi + 'static,
     {
-        pub address: elrond_wasm::types::ManagedAddress<A>,
+        pub address: core::option::Option<elrond_wasm::types::ManagedAddress<A>>,
     }
 
     impl<A> elrond_wasm::contract_base::ProxyObjBase for Proxy<A>
@@ -350,20 +338,28 @@ mod sample_adder {
         type Api = A;
 
         fn new_proxy_obj() -> Self {
-            let zero_address = ManagedAddress::zero();
             Proxy {
-                address: zero_address,
+                address: core::option::Option::None,
             }
         }
 
         fn contract(mut self, address: ManagedAddress<Self::Api>) -> Self {
-            self.address = address;
+            self.address = Some(address);
             self
         }
 
-        #[inline]
-        fn into_fields(self) -> ManagedAddress<Self::Api> {
-            self.address
+        fn extract_address(&mut self) -> ManagedAddress<Self::Api> {
+            let address = core::mem::replace(&mut self.address, core::option::Option::None);
+            address.unwrap_or_else(|| {
+                elrond_wasm::api::ErrorApiImpl::signal_error(
+                    &A::error_api_impl(),
+                    elrond_wasm::err_msg::RECIPIENT_ADDRESS_NOT_SET,
+                )
+            })
+        }
+
+        fn extract_opt_address(&mut self) -> core::option::Option<ManagedAddress<Self::Api>> {
+            core::mem::replace(&mut self.address, core::option::Option::None)
         }
     }
 
@@ -429,7 +425,7 @@ fn test_add() {
 
     assert!(adder.call(b"version"));
 
-    let own_proxy =
+    let mut own_proxy =
         sample_adder::Proxy::<DebugApi>::new_proxy_obj().contract(ManagedAddress::zero());
     let _ = own_proxy.get_sum();
 

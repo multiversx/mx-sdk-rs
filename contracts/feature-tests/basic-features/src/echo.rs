@@ -3,9 +3,6 @@ elrond_wasm::imports!();
 use crate::types::*;
 use core::num::NonZeroUsize;
 
-// String is not part of the standard imports because we want to discourage its use
-use elrond_wasm::String;
-
 /// Test endpoint argument and result serialization.
 #[elrond_wasm::module]
 pub trait EchoTypes {
@@ -60,11 +57,6 @@ pub trait EchoTypes {
     }
 
     #[endpoint]
-    fn echo_h256(&self, h: H256) -> H256 {
-        h
-    }
-
-    #[endpoint]
     fn echo_nothing(&self, #[var_args] nothing: ()) -> () {
         nothing
     }
@@ -75,125 +67,39 @@ pub trait EchoTypes {
     }
 
     #[endpoint]
-    fn echo_boxed_array_u8(&self, s: Box<[u8; 128]>) -> Box<[u8; 128]> {
-        s
-    }
-
-    #[endpoint]
-    fn echo_boxed_bytes(&self, arg: BoxedBytes) -> MultiValue2<BoxedBytes, usize> {
-        let l = arg.len();
-        (arg, l).into()
-    }
-
-    #[endpoint]
-    fn echo_slice_u8<'s>(&self, slice: &'s [u8]) -> MultiValue2<&'s [u8], usize> {
-        let l = slice.len();
-        (slice, l).into()
-    }
-
-    #[endpoint]
-    fn echo_vec_u8(&self, arg: Vec<u8>) -> MultiValue2<Vec<u8>, usize> {
-        let l = arg.len();
-        (arg, l).into()
-    }
-
-    #[endpoint]
-    fn echo_string(&self, s: String) -> MultiValue2<String, usize> {
-        let l = s.len();
-        (s, l).into()
-    }
-
-    #[endpoint]
-    fn echo_str<'s>(&self, s: &'s str) -> MultiValue2<&'s str, usize> {
-        let l = s.len();
-        (s, l).into()
-    }
-
-    #[endpoint]
-    fn echo_str_box(&self, s: Box<str>) -> MultiValue2<Box<str>, usize> {
-        let l = s.len();
-        (s, l).into()
-    }
-
-    #[endpoint]
-    fn echo_varags_u32(
+    fn echo_multi_value_u32(
         &self,
-        #[var_args] m: MultiValueVec<u32>,
-    ) -> MultiValue2<usize, MultiValueVec<u32>> {
+        #[var_args] m: MultiValueManagedVec<u32>,
+    ) -> MultiValue2<usize, MultiValueManagedVec<u32>> {
         let v = m.into_vec();
         (v.len(), v.into()).into()
     }
 
     #[endpoint]
-    fn take_varags_u32(&self, #[var_args] m: MultiValueVec<u32>) -> usize {
-        let v = m.into_vec();
-        v.len()
-    }
-
-    #[endpoint]
-    fn echo_varags_big_uint(
+    fn echo_multi_value_tuples(
         &self,
-        #[var_args] m: MultiValueVec<BigUint>,
-    ) -> MultiValueVec<BigUint> {
-        m.into_vec().into()
-    }
-
-    #[endpoint]
-    fn echo_varags_tuples(
-        &self,
-        #[var_args] m: MultiValueVec<MultiValue2<isize, Vec<u8>>>,
-    ) -> MultiValueVec<MultiValue2<isize, Vec<u8>>> {
-        let mut result: Vec<MultiValue2<isize, Vec<u8>>> = Vec::new();
-        for m_arg in m.into_vec().into_iter() {
-            result.push(m_arg.into_tuple().into())
+        #[var_args] m: MultiValueEncoded<MultiValue2<isize, ManagedBuffer>>,
+    ) -> MultiValueEncoded<MultiValue2<isize, ManagedBuffer>> {
+        let mut result = MultiValueEncoded::new();
+        for multi2 in m.into_iter() {
+            result.push(multi2.into_tuple().into())
         }
-        result.into()
+        result
     }
 
     #[endpoint]
-    fn echo_async_result_empty(
-        &self,
-        #[var_args] a: AsyncCallResult<()>,
-    ) -> SCResult<(), ManagedSCError> {
-        match a {
-            AsyncCallResult::Ok(()) => Ok(()),
-            AsyncCallResult::Err(msg) => Err(msg.err_msg.into()),
-        }
-    }
-
-    #[endpoint]
-    fn echo_large_boxed_byte_array(&self, lbba: LargeBoxedByteArray) -> LargeBoxedByteArray {
-        lbba
-    }
-
-    #[endpoint]
-    fn echo_ser_example_1(&self, se: SerExample1) -> SerExample1 {
-        se
-    }
-
-    #[endpoint]
-    fn echo_boxed_ser_example_1(&self, se: Box<SerExample1>) -> Box<SerExample1> {
-        se
-    }
-
-    #[endpoint]
-    fn echo_ser_example_2(&self, se: SerExample2) -> SerExample2 {
-        se
-    }
-
-    #[endpoint]
-    fn echo_boxed_ser_example_2(&self, se: Box<SerExample2>) -> Box<SerExample2> {
+    fn echo_ser_example_2(&self, se: ExampleEnumWithFields) -> ExampleEnumWithFields {
         se
     }
 
     #[view]
-    fn echo_simple_enum(&self, se: SimpleEnum) -> SimpleEnum {
+    fn echo_simple_enum(&self, se: ExampleEnumSimple) -> ExampleEnumSimple {
         se
     }
 
     #[view]
-    fn finish_simple_enum_variant_1(&self) -> SimpleEnum {
-        SimpleEnum::Variant1
+    fn finish_simple_enum_variant_1(&self) -> ExampleEnumSimple {
+        ExampleEnumSimple::Variant1
     }
 
     #[view]

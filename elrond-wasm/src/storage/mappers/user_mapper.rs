@@ -1,7 +1,8 @@
 use core::marker::PhantomData;
 
 use elrond_codec::{
-    multi_encode_iter_or_handle_err, EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput,
+    multi_encode_iter_or_handle_err, CodecFrom, EncodeErrorHandler, TopEncodeMulti,
+    TopEncodeMultiOutput,
 };
 
 use super::StorageMapper;
@@ -9,7 +10,7 @@ use crate::{
     abi::{TypeAbi, TypeName},
     api::StorageMapperApi,
     storage::{storage_get, storage_get_len, storage_set, StorageKey},
-    types::{ManagedAddress, ManagedType, ManagedVec, MultiResultVec},
+    types::{ManagedAddress, ManagedType, ManagedVec, MultiValueEncoded},
 };
 
 const ADDRESS_TO_ID_SUFFIX: &[u8] = b"_address_to_id";
@@ -181,8 +182,6 @@ impl<SA> TopEncodeMulti for UserMapper<SA>
 where
     SA: StorageMapperApi,
 {
-    type DecodeAs = MultiResultVec<ManagedAddress<SA>>;
-
     fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
     where
         O: TopEncodeMultiOutput,
@@ -193,13 +192,18 @@ where
     }
 }
 
+impl<SA> CodecFrom<UserMapper<SA>> for MultiValueEncoded<SA, ManagedAddress<SA>> where
+    SA: StorageMapperApi
+{
+}
+
 /// Behaves like a MultiResultVec when an endpoint result.
 impl<SA> TypeAbi for UserMapper<SA>
 where
     SA: StorageMapperApi,
 {
     fn type_name() -> TypeName {
-        crate::types::MultiResultVec::<ManagedAddress<SA>>::type_name()
+        crate::abi::type_name_variadic::<ManagedAddress<SA>>()
     }
 
     fn is_variadic() -> bool {

@@ -59,23 +59,19 @@ where
 
     fn into_boxed_slice_u8(self) -> Box<[u8]> {
         let key_bytes = self.key.to_boxed_bytes();
-        A::storage_read_api_impl()
-            .storage_load_boxed_bytes(key_bytes.as_slice())
-            .into_box()
+        A::storage_read_api_impl().storage_load_to_heap(key_bytes.as_slice())
     }
 
-    fn into_u64(self) -> u64 {
-        let mb = self.to_managed_buffer();
-        if let Some(num) = mb.parse_as_u64() {
-            num
-        } else {
-            StorageGetErrorHandler::<A>::default().handle_error(DecodeError::INPUT_TOO_LONG)
-        }
-    }
-
-    fn into_i64(self) -> i64 {
-        let key_bytes = self.key.to_boxed_bytes();
-        A::storage_read_api_impl().storage_load_i64(key_bytes.as_slice())
+    #[inline]
+    fn into_max_size_buffer<H, const MAX_LEN: usize>(
+        self,
+        buffer: &mut [u8; MAX_LEN],
+        h: H,
+    ) -> Result<&[u8], H::HandledErr>
+    where
+        H: DecodeErrorHandler,
+    {
+        self.to_managed_buffer().into_max_size_buffer(buffer, h)
     }
 
     #[inline]

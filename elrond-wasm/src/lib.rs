@@ -11,7 +11,6 @@ pub use elrond_wasm_derive::{self as derive, contract, module, proxy};
 
 // re-export basic heap types
 extern crate alloc;
-pub use alloc::{boxed::Box, string::String, vec::Vec};
 
 /// Reexported for convenience.
 pub use elrond_codec::arrayvec;
@@ -26,7 +25,6 @@ pub mod esdt;
 pub mod external_view_contract;
 pub mod formatter;
 pub mod hex_call_data;
-pub mod hex_util;
 pub mod io;
 pub mod log_util;
 mod macros;

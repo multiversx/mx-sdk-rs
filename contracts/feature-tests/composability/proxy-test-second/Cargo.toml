@@ -9,9 +9,10 @@ publish = false
 path = "src/proxy-test-second.rs"
 
 [dependencies.elrond-wasm]
-version = "0.28.0"
+version = "0.30.0"
 path = "../../../../elrond-wasm"
+features = ["alloc"]
 
 [dev-dependencies.elrond-wasm-debug]
-version = "0.28.0"
+version = "0.30.0"
 path = "../../../../elrond-wasm-debug"

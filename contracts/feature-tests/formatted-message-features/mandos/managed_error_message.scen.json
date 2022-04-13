@@ -53,7 +53,7 @@
             "expect": {
                 "out": [],
                 "status": "4",
-                "message": "str:Got this buffer: 0x61626364. I don't like it, ERROR!",
+                "message": "str:Got this buffer: abcd. I don't like it, ERROR!",
                 "logs": "*",
                 "gas": "*",
                 "refund": "*"
@@ -79,7 +79,7 @@
             "expect": {
                 "out": [],
                 "status": "4",
-                "message": "str:Got token 0x544f4b454e2d313233343536, with nonce 0x, amount 0x03e8. I prefer EGLD. ERROR!",
+                "message": "str:Got token TOKEN-123456, with nonce 0, amount 1000. I prefer EGLD. ERROR!",
                 "logs": "*",
                 "gas": "*",
                 "refund": "*"
@@ -105,7 +105,27 @@
             "expect": {
                 "out": [],
                 "status": "4",
-                "message": "str:Got token TOKEN-123456, with nonce 0x, amount 0x03e8. I prefer EGLD. ERROR!",
+                "message": "str:Got token TOKEN-123456, with nonce 0, amount 1000. I prefer EGLD. ERROR!",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "4",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:msg-features",
+                "function": "decode_error_message",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:unsupported operation",
                 "logs": "*",
                 "gas": "*",
                 "refund": "*"

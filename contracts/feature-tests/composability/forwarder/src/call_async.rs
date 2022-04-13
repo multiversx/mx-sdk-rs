@@ -28,7 +28,8 @@ pub trait ForwarderAsyncCallModule {
     ) {
         self.vault_proxy()
             .contract(to)
-            .accept_funds(token, token_nonce, payment)
+            .accept_funds()
+            .add_token_transfer(token, token_nonce, payment)
             .async_call()
             .call_and_exit()
     }
@@ -44,7 +45,8 @@ pub trait ForwarderAsyncCallModule {
         let half_payment = payment / 2u32;
         self.vault_proxy()
             .contract(to)
-            .accept_funds(token, 0, half_payment)
+            .accept_funds()
+            .add_token_transfer(token, 0, half_payment)
             .async_call()
             .call_and_exit()
     }
@@ -63,7 +65,8 @@ pub trait ForwarderAsyncCallModule {
 
         self.vault_proxy()
             .contract(to)
-            .accept_funds(token_id, 0, amount_to_send)
+            .accept_funds()
+            .add_token_transfer(token_id, 0, amount_to_send)
             .async_call()
             .call_and_exit()
     }
@@ -119,7 +122,8 @@ pub trait ForwarderAsyncCallModule {
     ) {
         self.vault_proxy()
             .contract(to.clone())
-            .accept_funds(token_identifier.clone(), 0, amount.clone())
+            .accept_funds()
+            .add_token_transfer(token_identifier.clone(), 0, amount.clone())
             .async_call()
             .with_callback(
                 self.callbacks()
@@ -137,16 +141,17 @@ pub trait ForwarderAsyncCallModule {
     ) {
         self.vault_proxy()
             .contract(to.clone())
-            .accept_funds(token_identifier.clone(), 0, cb_amount.clone())
+            .accept_funds()
+            .add_token_transfer(token_identifier.clone(), 0, cb_amount.clone())
             .async_call()
             .call_and_exit()
     }
 
     #[endpoint]
-    fn multi_transfer_via_async(
+    fn send_async_accept_multi_transfer(
         &self,
         to: ManagedAddress,
-        #[var_args] token_payments: ManagedVarArgs<MultiValue3<TokenIdentifier, u64, BigUint>>,
+        #[var_args] token_payments: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>>,
     ) {
         let mut all_token_payments = ManagedVec::new();
 
@@ -162,10 +167,11 @@ pub trait ForwarderAsyncCallModule {
             all_token_payments.push(payment);
         }
 
+        // TODO: use proxy here
         self.send().transfer_multiple_esdt_via_async_call(
             &to,
             &all_token_payments,
-            b"accept_multi_funds_echo",
+            b"accept_funds",
         );
     }
 
@@ -182,7 +188,7 @@ pub trait ForwarderAsyncCallModule {
         TokenIdentifier,
         u64,
         BigUint,
-        ManagedMultiResultVecEager<Self::Api, ManagedBuffer>,
+        MultiValueManagedVec<Self::Api, ManagedBuffer>,
     > {
         let cb_data = self.callback_data().get(index);
         (

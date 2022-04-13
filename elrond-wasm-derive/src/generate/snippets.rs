@@ -36,8 +36,8 @@ pub fn new_contract_object_fn() -> proc_macro2::TokenStream {
         impl elrond_wasm::contract_base::CallableContractBuilder for self::ContractBuilder {
             fn new_contract_obj<A: elrond_wasm::api::VMApi>(
                 &self,
-            ) -> elrond_wasm::Box<dyn elrond_wasm::contract_base::CallableContract> {
-                elrond_wasm::Box::new(ContractObj::<A> {
+            ) -> elrond_wasm::types::heap::Box<dyn elrond_wasm::contract_base::CallableContract> {
+                elrond_wasm::types::heap::Box::new(ContractObj::<A> {
                     _phantom: core::marker::PhantomData,
                 })
             }
@@ -70,8 +70,8 @@ pub fn impl_callable_contract() -> proc_macro2::TokenStream {
                 EndpointWrappers::call(self, fn_name)
             }
 
-            fn clone_obj(&self) -> elrond_wasm::Box<dyn elrond_wasm::contract_base::CallableContract> {
-                elrond_wasm::Box::new(ContractObj::<A> {
+            fn clone_obj(&self) -> elrond_wasm::types::heap::Box<dyn elrond_wasm::contract_base::CallableContract> {
+                elrond_wasm::types::heap::Box::new(ContractObj::<A> {
                     _phantom: core::marker::PhantomData,
                 })
             }
@@ -85,7 +85,7 @@ pub fn proxy_object_def() -> proc_macro2::TokenStream {
         where
             A: elrond_wasm::api::VMApi + 'static,
         {
-            pub address: elrond_wasm::types::ManagedAddress<A>,
+            pub address: core::option::Option<elrond_wasm::types::ManagedAddress<A>>,
         }
 
         impl<A> elrond_wasm::contract_base::ProxyObjBase for Proxy<A>
@@ -95,20 +95,28 @@ pub fn proxy_object_def() -> proc_macro2::TokenStream {
             type Api = A;
 
             fn new_proxy_obj() -> Self {
-                let zero_address = ManagedAddress::zero();
                 Proxy {
-                    address: zero_address,
+                    address: core::option::Option::None,
                 }
             }
 
             fn contract(mut self, address: ManagedAddress<Self::Api>) -> Self {
-                self.address = address;
+                self.address = core::option::Option::Some(address);
                 self
             }
 
-            #[inline]
-            fn into_fields(self) -> ManagedAddress<Self::Api> {
-                self.address
+            fn extract_address(&mut self) -> ManagedAddress<Self::Api> {
+                let address = core::mem::replace(&mut self.address, core::option::Option::None);
+                address.unwrap_or_else(|| {
+                    elrond_wasm::api::ErrorApiImpl::signal_error(
+                        &A::error_api_impl(),
+                        elrond_wasm::err_msg::RECIPIENT_ADDRESS_NOT_SET,
+                    )
+                })
+            }
+
+            fn extract_opt_address(&mut self) -> core::option::Option<ManagedAddress<Self::Api>> {
+                core::mem::replace(&mut self.address, core::option::Option::None)
             }
         }
     }

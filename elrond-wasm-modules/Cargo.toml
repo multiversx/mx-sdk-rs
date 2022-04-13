@@ -1,6 +1,6 @@
 [package]
 name = "elrond-wasm-modules"
-version = "0.28.0"
+version = "0.30.0"
 edition = "2018"
 
 authors = ["Elrond Network <contact@elrond.com>"]
@@ -13,10 +13,9 @@ description = "Elrond WebAssembly standard smart contract modules"
 keywords = ["elrond", "wasm", "webassembly", "blockchain", "contract"]
 categories = ["no-std", "wasm", "cryptography::cryptocurrencies"]
 
-[dependencies.elrond-wasm]
-version = "0.28.0"
-path = "../elrond-wasm"
+[features]
+alloc = ["elrond-wasm/alloc"]
 
-[dev-dependencies.elrond-wasm-debug]
-version = "0.28.0"
-path = "../elrond-wasm-debug"
+[dependencies.elrond-wasm]
+version = "0.30.0"
+path = "../elrond-wasm"

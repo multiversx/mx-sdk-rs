@@ -1,10 +1,10 @@
 use crate::tx_mock::{TxInput, TxResult};
 use elrond_wasm::{
     elrond_codec::*,
-    types::{Address, H256},
+    types::heap::{Address, H256},
 };
 
-use num_bigint::BigUint;
+use crate::num_bigint::BigUint;
 
 use alloc::vec::Vec;
 

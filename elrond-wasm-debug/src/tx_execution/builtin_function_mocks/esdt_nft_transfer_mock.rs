@@ -1,5 +1,7 @@
-use elrond_wasm::{api::ESDT_NFT_TRANSFER_FUNC_NAME, elrond_codec::TopDecode, types::Address};
-use num_bigint::BigUint;
+use crate::num_bigint::BigUint;
+use elrond_wasm::{
+    api::ESDT_NFT_TRANSFER_FUNC_NAME, elrond_codec::TopDecode, types::heap::Address,
+};
 use num_traits::Zero;
 
 use crate::{

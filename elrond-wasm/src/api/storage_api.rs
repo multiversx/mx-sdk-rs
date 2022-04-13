@@ -1,5 +1,4 @@
-use crate::types::BoxedBytes;
-use alloc::vec::Vec;
+use alloc::boxed::Box;
 
 use super::Handle;
 
@@ -14,11 +13,7 @@ pub trait StorageReadApiImpl {
 
     fn storage_load_len(&self, key: &[u8]) -> usize;
 
-    fn storage_load_vec_u8(&self, key: &[u8]) -> Vec<u8>;
-
-    fn storage_load_boxed_bytes(&self, key: &[u8]) -> BoxedBytes {
-        self.storage_load_vec_u8(key).into()
-    }
+    fn storage_load_to_heap(&self, key: &[u8]) -> Box<[u8]>;
 
     fn storage_load_big_uint_raw(&self, key: &[u8]) -> Handle;
 
@@ -30,6 +25,7 @@ pub trait StorageReadApiImpl {
 
     fn storage_load_i64(&self, key: &[u8]) -> i64;
 
+    #[cfg(feature = "ei-1-1")]
     fn storage_load_from_address(&self, address_handle: Handle, key_handle: Handle) -> Handle;
 }
 

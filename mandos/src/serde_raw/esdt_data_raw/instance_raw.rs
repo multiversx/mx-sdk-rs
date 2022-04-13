@@ -4,7 +4,7 @@ use crate::serde_raw::ValueSubTree;
 
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct InstanceRaw {
+pub struct EsdtInstanceRaw {
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub nonce: Option<ValueSubTree>,
