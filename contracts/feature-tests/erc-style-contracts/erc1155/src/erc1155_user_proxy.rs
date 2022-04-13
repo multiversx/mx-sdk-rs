@@ -9,7 +9,7 @@ pub trait Erc1155UserProxy {
         from: ManagedAddress,
         type_id: BigUint,
         value: BigUint,
-        data: &[u8],
+        data: ManagedBuffer,
     );
 
     #[endpoint(onERC1155BatchReceived)]
@@ -19,6 +19,6 @@ pub trait Erc1155UserProxy {
         from: ManagedAddress,
         type_ids: Vec<BigUint>,
         values: Vec<BigUint>,
-        data: &[u8],
+        data: ManagedBuffer,
     );
 }

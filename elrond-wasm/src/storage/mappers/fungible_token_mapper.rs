@@ -1,4 +1,4 @@
-use elrond_codec::{EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput};
+use elrond_codec::{CodecFrom, EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput};
 
 use super::{
     token_mapper::{StorageTokenWrapper, TOKEN_ID_ALREADY_SET_ERR_MSG},
@@ -11,8 +11,8 @@ use crate::{
     esdt::{ESDTSystemSmartContractProxy, FungibleTokenProperties},
     storage::StorageKey,
     types::{
-        BigUint, CallbackClosure, EsdtTokenPayment, ManagedAddress, ManagedBuffer, ManagedRef,
-        ManagedType, TokenIdentifier,
+        BigUint, CallbackClosure, EsdtTokenPayment, EsdtTokenType, ManagedAddress, ManagedBuffer,
+        ManagedRef, ManagedType, TokenIdentifier,
     },
 };
 
@@ -88,6 +88,40 @@ where
             .call_and_exit();
     }
 
+    /// Important: If you use custom callback, remember to save the token ID in the callback!
+    /// If you want to use default callbacks, import the default_issue_callbacks::DefaultIssueCallbacksModule from elrond-wasm-modules
+    /// and pass None for the opt_callback argument
+    pub fn issue_and_set_all_roles(
+        &self,
+        issue_cost: BigUint<SA>,
+        token_display_name: ManagedBuffer<SA>,
+        token_ticker: ManagedBuffer<SA>,
+        num_decimals: usize,
+        opt_callback: Option<CallbackClosure<SA>>,
+    ) -> ! {
+        if !self.is_empty() {
+            SA::error_api_impl().signal_error(TOKEN_ID_ALREADY_SET_ERR_MSG);
+        }
+
+        let system_sc_proxy = ESDTSystemSmartContractProxy::<SA>::new_proxy_obj();
+        let callback = match opt_callback {
+            Some(cb) => cb,
+            None => self.default_callback_closure_obj(&BigUint::zero()),
+        };
+
+        system_sc_proxy
+            .issue_and_set_all_roles(
+                issue_cost,
+                token_display_name,
+                token_ticker,
+                EsdtTokenType::Fungible,
+                num_decimals,
+            )
+            .async_call()
+            .with_callback(callback)
+            .call_and_exit();
+    }
+
     fn default_callback_closure_obj(&self, initial_supply: &BigUint<SA>) -> CallbackClosure<SA> {
         let initial_caller =
             ManagedAddress::<SA>::from_raw_handle(SA::blockchain_api_impl().get_caller_handle());
@@ -149,8 +183,6 @@ impl<SA> TopEncodeMulti for FungibleTokenMapper<SA>
 where
     SA: StorageMapperApi + CallTypeApi,
 {
-    type DecodeAs = TokenIdentifier<SA>;
-
     fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
     where
         O: TopEncodeMultiOutput,
@@ -162,6 +194,11 @@ where
             output.push_single_value(&self.get_token_id(), h)
         }
     }
+}
+
+impl<SA> CodecFrom<FungibleTokenMapper<SA>> for TokenIdentifier<SA> where
+    SA: StorageMapperApi + CallTypeApi
+{
 }
 
 impl<SA> TypeAbi for FungibleTokenMapper<SA>

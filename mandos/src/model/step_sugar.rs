@@ -10,19 +10,25 @@ impl SetStateStep {
         Self::default()
     }
 
-    pub fn put_account(mut self, address_expr: &str, account: Account) -> Self {
-        let address_key =
-            AddressKey::interpret_from(address_expr.to_string(), &InterpreterContext::default());
+    pub fn put_account<A>(mut self, address_expr: A, account: Account) -> Self
+    where
+        AddressKey: InterpretableFrom<A>,
+    {
+        let address_key = AddressKey::interpret_from(address_expr, &InterpreterContext::default());
         self.accounts.insert(address_key, account);
         self
     }
 
-    pub fn new_address(
+    pub fn new_address<CA, NA>(
         mut self,
-        creator_address_expr: &str,
+        creator_address_expr: CA,
         creator_nonce_expr: u64,
-        new_address_expr: &str,
-    ) -> Self {
+        new_address_expr: NA,
+    ) -> Self
+    where
+        AddressValue: InterpretableFrom<CA>,
+        AddressValue: InterpretableFrom<NA>,
+    {
         self.new_addresses.push(NewAddress {
             creator_address: AddressValue::interpret_from(
                 creator_address_expr,
@@ -46,7 +52,10 @@ impl ScDeployStep {
         Self::default()
     }
 
-    pub fn from(mut self, expr: &str) -> Self {
+    pub fn from<V>(mut self, expr: V) -> Self
+    where
+        AddressValue: InterpretableFrom<V>,
+    {
         self.tx.from = AddressValue::interpret_from(expr, &InterpreterContext::default());
         self
     }
@@ -91,8 +100,11 @@ impl ScQueryStep {
         Self::default()
     }
 
-    pub fn to(mut self, expr: &str) -> Self {
-        self.tx.to = AddressValue::interpret_from(expr, &InterpreterContext::default());
+    pub fn to<A>(mut self, address: A) -> Self
+    where
+        AddressValue: InterpretableFrom<A>,
+    {
+        self.tx.to = AddressValue::interpret_from(address, &InterpreterContext::default());
         self
     }
 
@@ -120,13 +132,19 @@ impl ScCallStep {
         Self::default()
     }
 
-    pub fn from(mut self, expr: &str) -> Self {
-        self.tx.from = AddressValue::interpret_from(expr, &InterpreterContext::default());
+    pub fn from<A>(mut self, address: A) -> Self
+    where
+        AddressValue: InterpretableFrom<A>,
+    {
+        self.tx.from = AddressValue::interpret_from(address, &InterpreterContext::default());
         self
     }
 
-    pub fn to(mut self, expr: &str) -> Self {
-        self.tx.to = AddressValue::interpret_from(expr, &InterpreterContext::default());
+    pub fn to<A>(mut self, address: A) -> Self
+    where
+        AddressValue: InterpretableFrom<A>,
+    {
+        self.tx.to = AddressValue::interpret_from(address, &InterpreterContext::default());
         self
     }
 
@@ -162,9 +180,11 @@ impl CheckStateStep {
         Self::default()
     }
 
-    pub fn put_account(mut self, address_expr: &str, account: CheckAccount) -> Self {
-        let address_key =
-            AddressKey::interpret_from(address_expr.to_string(), &InterpreterContext::default());
+    pub fn put_account<A>(mut self, address_expr: A, account: CheckAccount) -> Self
+    where
+        AddressKey: InterpretableFrom<A>,
+    {
+        let address_key = AddressKey::interpret_from(address_expr, &InterpreterContext::default());
         self.accounts.accounts.insert(address_key, account);
         self
     }

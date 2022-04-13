@@ -1,5 +1,5 @@
 use crate::{
-    interpret_trait::{InterpretableFrom, InterpreterContext},
+    interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
     serde_raw::ValueSubTree,
     value_interpreter::{interpret_string, interpret_subtree},
 };
@@ -19,6 +19,22 @@ impl InterpretableFrom<ValueSubTree> for BigUintValue {
         BigUintValue {
             value: BigUint::from_bytes_be(&bytes),
             original: from,
+        }
+    }
+}
+
+impl IntoRaw<ValueSubTree> for BigUintValue {
+    fn into_raw(self) -> ValueSubTree {
+        self.original
+    }
+}
+
+impl BigUintValue {
+    pub fn into_raw_opt(self) -> Option<ValueSubTree> {
+        if self.value == 0u32.into() {
+            None
+        } else {
+            Some(self.into_raw())
         }
     }
 }

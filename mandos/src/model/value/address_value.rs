@@ -1,10 +1,12 @@
 use std::fmt;
 
 use crate::{
-    interpret_trait::{InterpretableFrom, InterpreterContext},
+    interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
     serde_raw::ValueSubTree,
     value_interpreter::{interpret_string, interpret_subtree},
 };
+
+use super::AddressKey;
 
 #[derive(PartialEq, Clone, Debug, Default)]
 pub struct AddressValue {
@@ -18,7 +20,7 @@ impl fmt::Display for AddressValue {
     }
 }
 
-fn value_from_slice(slice: &[u8]) -> [u8; 32] {
+pub(crate) fn value_from_slice(slice: &[u8]) -> [u8; 32] {
     let mut value = [0u8; 32];
     if slice.len() == 32 {
         value.copy_from_slice(slice);
@@ -45,5 +47,27 @@ impl InterpretableFrom<&str> for AddressValue {
             value: value_from_slice(bytes.as_slice()),
             original: ValueSubTree::Str(from.to_string()),
         }
+    }
+}
+
+impl InterpretableFrom<&AddressKey> for AddressValue {
+    fn interpret_from(from: &AddressKey, _context: &InterpreterContext) -> Self {
+        AddressValue {
+            value: from.value,
+            original: ValueSubTree::Str(from.original.clone()),
+        }
+    }
+}
+
+/// TODO: generalize for all `Clone`-able?
+impl InterpretableFrom<&AddressValue> for AddressValue {
+    fn interpret_from(from: &AddressValue, _context: &InterpreterContext) -> Self {
+        from.clone()
+    }
+}
+
+impl IntoRaw<ValueSubTree> for AddressValue {
+    fn into_raw(self) -> ValueSubTree {
+        self.original
     }
 }

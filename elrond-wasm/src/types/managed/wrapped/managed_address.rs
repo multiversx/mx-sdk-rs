@@ -96,6 +96,16 @@ where
     }
 }
 
+impl<M> From<[u8; 32]> for ManagedAddress<M>
+where
+    M: ManagedTypeApi,
+{
+    #[inline]
+    fn from(bytes: [u8; 32]) -> Self {
+        Self::new_from_bytes(&bytes)
+    }
+}
+
 impl<M> From<ManagedByteArray<M, 32>> for ManagedAddress<M>
 where
     M: ManagedTypeApi,

@@ -1,5 +1,5 @@
 use crate::{
-    interpret_trait::{InterpretableFrom, InterpreterContext},
+    interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
     model::{BytesValue, CheckValue},
     serde_raw::CheckStorageDetailsRaw,
 };
@@ -28,6 +28,19 @@ impl InterpretableFrom<CheckStorageDetailsRaw> for CheckStorageDetails {
                 })
                 .collect(),
             other_storages_allowed: from.other_storages_allowed,
+        }
+    }
+}
+
+impl IntoRaw<CheckStorageDetailsRaw> for CheckStorageDetails {
+    fn into_raw(self) -> CheckStorageDetailsRaw {
+        CheckStorageDetailsRaw {
+            storages: self
+                .storages
+                .into_iter()
+                .map(|(k, v)| (k.into_raw(), v.into_raw_explicit()))
+                .collect(),
+            other_storages_allowed: self.other_storages_allowed,
         }
     }
 }

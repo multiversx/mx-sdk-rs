@@ -103,7 +103,7 @@
             "step": "setState",
             "comment": "reset the token ID so we can issue again",
             "accounts": {
-            "sc:basic-features": {
+                "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
@@ -186,7 +186,7 @@
             "step": "setState",
             "comment": "reset the token ID so we can issue again",
             "accounts": {
-            "sc:basic-features": {
+                "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
@@ -268,7 +268,7 @@
             "step": "setState",
             "comment": "reset the token ID so we can issue again",
             "accounts": {
-            "sc:basic-features": {
+                "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
@@ -353,7 +353,7 @@
             "step": "setState",
             "comment": "set balance",
             "accounts": {
-            "sc:basic-features": {
+                "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
@@ -407,7 +407,7 @@
             "step": "setState",
             "comment": "actually set roles",
             "accounts": {
-            "sc:basic-features": {
+                "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
@@ -731,6 +731,47 @@
                 "status": "0",
                 "message": "",
                 "logs": "*"
+            }
+        },
+        {
+            "step": "setState",
+            "comment": "reset the token ID so we can issue again",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:TICKER-000000": "1000",
+                        "str:TICKER-222222": "2000"
+                    },
+                    "storage": {
+                        "str:fungibleTokenMapper": ""
+                    },
+                    "code": "file:../output/basic-features.wasm"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "issue-and-set-all-roles-fungible",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "issue_and_set_all_roles_fungible",
+                "arguments": [
+                    "str:TICKER"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "str:TICKER-444444"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
             }
         }
     ]

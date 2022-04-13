@@ -1,5 +1,5 @@
 use crate::{
-    interpret_trait::{InterpretableFrom, InterpreterContext},
+    interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
     model::{AddressValue, BigUintValue, BytesValue, U64Value},
     serde_raw::TxCallRaw,
 };
@@ -37,6 +37,30 @@ impl InterpretableFrom<TxCallRaw> for TxCall {
                 .collect(),
             gas_limit: U64Value::interpret_from(from.gas_limit, context),
             gas_price: U64Value::interpret_from(from.gas_price, context),
+        }
+    }
+}
+
+impl IntoRaw<TxCallRaw> for TxCall {
+    fn into_raw(self) -> TxCallRaw {
+        TxCallRaw {
+            from: self.from.into_raw(),
+            to: self.to.into_raw(),
+            value: None,
+            egld_value: self.egld_value.into_raw_opt(),
+            esdt_value: self
+                .esdt_value
+                .into_iter()
+                .map(|esdt_value| esdt_value.into_raw())
+                .collect(),
+            function: self.function,
+            arguments: self
+                .arguments
+                .into_iter()
+                .map(|arg| arg.into_raw())
+                .collect(),
+            gas_limit: self.gas_limit.into_raw(),
+            gas_price: self.gas_price.into_raw(),
         }
     }
 }
