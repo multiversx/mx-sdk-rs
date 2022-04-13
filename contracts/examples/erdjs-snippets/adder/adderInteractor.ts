@@ -7,40 +7,49 @@
  * @module
  */
 import path from "path";
-import { AbiRegistry, Address, BigUIntValue, Code, CodeMetadata, DefaultSmartContractController, GasLimit, Interaction, IProvider, ISmartContractController, ReturnCode, SmartContract, SmartContractAbi } from "@elrondnetwork/erdjs";
-import { ITestUser } from "@elrondnetwork/erdjs-snippets";
+import { BigUIntValue, CodeMetadata, GasLimit, IAddress, Interaction, ResultsParser, ReturnCode, SmartContract, SmartContractAbi, TransactionWatcher } from "@elrondnetwork/erdjs";
+import { INetworkProvider, ITestSession, ITestUser, loadAbiRegistry, loadCode } from "@elrondnetwork/erdjs-snippets";
+import { NetworkConfig } from "@elrondnetwork/erdjs-network-providers";
 
-const PathToWasm = path.resolve(__dirname, "adder.wasm");
-const PathToAbi = path.resolve(__dirname, "adder.abi.json");
+const PathToWasm = path.resolve(__dirname, "..", "..", "adder", "output", "adder.wasm");
+const PathToAbi = path.resolve(__dirname, "..", "..", "adder", "output", "adder.abi.json");
 
-export async function createInteractor(provider: IProvider, address?: Address): Promise<AdderInteractor> {
-    let registry = await AbiRegistry.load({ files: [PathToAbi] });
+export async function createInteractor(session: ITestSession, contractAddress?: IAddress): Promise<AdderInteractor> {
+    let registry = await loadAbiRegistry(PathToAbi);
     let abi = new SmartContractAbi(registry, ["Adder"]);
-    let contract = new SmartContract({ address: address, abi: abi });
-    let controller = new DefaultSmartContractController(abi, provider);
-    let interactor = new AdderInteractor(contract, controller);
+    let contract = new SmartContract({ address: contractAddress, abi: abi });
+    let networkProvider = session.networkProvider;
+    let networkConfig = session.getNetworkConfig();
+    let interactor = new AdderInteractor(contract, networkProvider, networkConfig);
     return interactor;
 }
 
 export class AdderInteractor {
     private readonly contract: SmartContract;
-    private readonly controller: ISmartContractController;
+    private readonly networkProvider: INetworkProvider;
+    private readonly networkConfig: NetworkConfig;
+    private readonly transactionWatcher: TransactionWatcher;
+    private readonly resultsParser: ResultsParser;
 
-    constructor(contract: SmartContract, controller: ISmartContractController) {
+    constructor(contract: SmartContract, networkProvider: INetworkProvider, networkConfig: NetworkConfig) {
         this.contract = contract;
-        this.controller = controller;
+        this.networkProvider = networkProvider;
+        this.networkConfig = networkConfig;
+        this.transactionWatcher = new TransactionWatcher(networkProvider);
+        this.resultsParser = new ResultsParser();
     }
 
-    async deploy(deployer: ITestUser, initialValue: number): Promise<{ address: Address, returnCode: ReturnCode }> {
-        // Load the bytecode from a file.
-        let code = await Code.fromFile(PathToWasm);
+    async deploy(deployer: ITestUser, initialValue: number): Promise<{ address: IAddress, returnCode: ReturnCode }> {
+        // Load the bytecode.
+        let code = await loadCode(PathToWasm);
 
         // Prepare the deploy transaction.
         let transaction = this.contract.deploy({
             code: code,
             codeMetadata: new CodeMetadata(),
             initArguments: [new BigUIntValue(initialValue)],
-            gasLimit: new GasLimit(20000000)
+            gasLimit: new GasLimit(20000000),
+            chainID: this.networkConfig.ChainID
         });
 
         // Set the transaction nonce. The account nonce must be synchronized beforehand.
@@ -50,11 +59,15 @@ export class AdderInteractor {
         // Let's sign the transaction. For dApps, use a wallet provider instead.
         await deployer.signer.sign(transaction);
 
-        // After signing the deployment transaction, the contract address (deterministically computable) is available:
-        let address = this.contract.getAddress();
+        // The contract address is deterministically computable:
+        let address = SmartContract.computeAddress(transaction.getSender(), transaction.getNonce());
 
-        // Let's broadcast the transaction (and await for its execution), via the controller.
-        let { bundle: { returnCode } } = await this.controller.deploy(transaction);
+        // Let's broadcast the transaction and await its completion:
+        await this.networkProvider.sendTransaction(transaction);
+        let transactionOnNetwork = await this.transactionWatcher.awaitCompleted(transaction);
+
+        // In the end, parse the results:
+        let { returnCode } = this.resultsParser.parseUntypedOutcome(transactionOnNetwork);
 
         console.log(`AdderInteractor.deploy(): contract = ${address}`);
         return { address, returnCode };
@@ -63,27 +76,34 @@ export class AdderInteractor {
     async add(caller: ITestUser, value: number): Promise<ReturnCode> {
         // Prepare the interaction
         let interaction = <Interaction>this.contract.methods
-            .add([new BigUIntValue(value)])
+            .add([value])
             .withGasLimit(new GasLimit(10000000))
-            .withNonce(caller.account.getNonceThenIncrement());
+            .withNonce(caller.account.getNonceThenIncrement())
+            .withChainID(this.networkConfig.ChainID);
 
-        // Let's build the transaction object.
-        let transaction = interaction.buildTransaction();
+        // Let's check the interaction, then build the transaction object.
+        let transaction = interaction.check().buildTransaction();
 
         // Let's sign the transaction. For dApps, use a wallet provider instead.
         await caller.signer.sign(transaction);
 
-        // Let's perform the interaction via the controller
-        let { bundle: { returnCode } } = await this.controller.execute(interaction, transaction);
+        // Let's broadcast the transaction and await its completion:
+        await this.networkProvider.sendTransaction(transaction);
+        let transactionOnNetwork = await this.transactionWatcher.awaitCompleted(transaction);
+
+        // In the end, parse the results:
+        let { returnCode } = this.resultsParser.parseOutcome(transactionOnNetwork, interaction.getEndpoint());
         return returnCode;
     }
 
     async getSum(): Promise<number> {
-        // Prepare the interaction
+        // Prepare the interaction, check it, then build the query:
         let interaction = <Interaction>this.contract.methods.getSum();
+        let query = interaction.check().buildQuery();
 
-        // Let's perform the interaction via the controller.
-        let { firstValue } = await this.controller.query(interaction);
+        // Let's run the query and parse the results:
+        let queryResponse = await this.networkProvider.queryContract(query);
+        let { firstValue } = this.resultsParser.parseQueryResponse(queryResponse, interaction.getEndpoint());
 
         // Now let's interpret the results.
         let firstValueAsBigUInt = <BigUIntValue>firstValue;
