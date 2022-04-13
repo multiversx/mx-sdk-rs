@@ -8,6 +8,8 @@ use crate::num_bigint::BigUint;
 
 use alloc::vec::Vec;
 
+use super::Promise;
+
 #[derive(Debug, Clone)]
 pub struct AsyncCallTxData {
     pub from: Address,
@@ -51,6 +53,35 @@ pub fn async_callback_tx_input(async_data: &AsyncCallTxData, async_result: &TxRe
         gas_limit: 1000,
         gas_price: 0,
         tx_hash: async_data.tx_hash.clone(),
+    }
+}
+
+pub fn async_promise_tx_input(
+    address: &Address,
+    promise: &Promise,
+    async_result: &TxResult,
+) -> TxInput {
+    let mut args: Vec<Vec<u8>> = Vec::new();
+    let serialized_bytes = top_encode_to_vec_u8(&async_result.result_status).unwrap();
+    args.push(serialized_bytes);
+    let callback: Vec<u8> = if async_result.result_status == 0 {
+        args.extend_from_slice(async_result.result_values.as_slice());
+        promise.success_callback.to_vec()
+    } else {
+        args.push(async_result.result_message.clone().into_bytes());
+        promise.error_callback.to_vec()
+    };
+
+    TxInput {
+        from: promise.endpoint.from.clone(),
+        to: address.clone(),
+        egld_value: 0u32.into(),
+        esdt_values: Vec::new(),
+        func_name: callback,
+        args,
+        gas_limit: 1000,
+        gas_price: 0,
+        tx_hash: promise.endpoint.tx_hash.clone(),
     }
 }
 
