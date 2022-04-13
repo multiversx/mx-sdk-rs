@@ -40,7 +40,7 @@ ei-1-1 = ["elrond-wasm/ei-1-1"]
 [dependencies.elrond-wasm]
 version = "=0.30.0"
 path = "../elrond-wasm"
-features = ["alloc", "num-bigint"]
+features = ["alloc", "num-bigint", "promises"]
 
 [dependencies.mandos]
 version = "0.12.0"

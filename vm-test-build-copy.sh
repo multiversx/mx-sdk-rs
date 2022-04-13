@@ -68,6 +68,9 @@ build_and_copy_composability recursive-caller
 erdpy --verbose contract build ./contracts/feature-tests/composability/vault || return 1
 cp -R contracts/feature-tests/composability/vault/output/vault.wasm \
    $VM_REPO_PATH/test/features/composability/vault/output/vault.wasm
+erdpy --verbose  contract build --skip-eei-checks ./contracts/feature-tests/composability/promises-features || return 1
+cp -R contracts/feature-tests/composability/promises-features/output/promises-features.wasm \
+   $VM_REPO_PATH/test/features/composability/promises-features/output/promises-features.wasm
 
 cp -R contracts/feature-tests/composability/mandos \
    $VM_REPO_PATH/test/features/composability
