@@ -6,17 +6,14 @@ use elrond_wasm::{
 
 extern "C" {
     // managed buffer API
-    #[cfg(feature = "ei-1-1")]
     fn mBufferNew() -> i32;
 
     fn sha256(dataOffset: *const u8, length: i32, resultOffset: *mut u8) -> i32;
 
-    #[cfg(feature = "ei-1-1")]
     fn managedSha256(inputHandle: i32, outputHandle: i32) -> i32;
 
     fn keccak256(dataOffset: *const u8, length: i32, resultOffset: *mut u8) -> i32;
 
-    #[cfg(feature = "ei-1-1")]
     fn managedKeccak256(inputHandle: i32, outputHandle: i32) -> i32;
 
     fn ripemd160(dataOffset: *const u8, length: i32, resultOffset: *mut u8) -> i32;
@@ -81,7 +78,6 @@ impl CryptoApiImpl for VmApiImpl {
         }
     }
 
-    #[cfg(feature = "ei-1-1")]
     fn sha256(&self, data_handle: elrond_wasm::api::Handle) -> elrond_wasm::api::Handle {
         unsafe {
             let result_handle = mBufferNew();
@@ -99,7 +95,6 @@ impl CryptoApiImpl for VmApiImpl {
         }
     }
 
-    #[cfg(feature = "ei-1-1")]
     fn keccak256(&self, data_handle: elrond_wasm::api::Handle) -> elrond_wasm::api::Handle {
         unsafe {
             let result_handle = mBufferNew();
