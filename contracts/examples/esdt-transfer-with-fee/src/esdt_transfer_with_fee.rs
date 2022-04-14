@@ -82,18 +82,16 @@ pub trait EsdtTransferWithFee {
         fee: Fee<Self::Api>,
         mut provided: EsdtTokenPayment<Self::Api>,
     ) -> EsdtTokenPayment<Self::Api> {
-        let calculated_fee;
         match fee {
-            Fee::ExactValue(requested) => calculated_fee = requested,
-
+            Fee::ExactValue(requested) => requested,
             Fee::Percentage(percentage) => {
                 let calculated_fee_amount =
-                    provided.amount.clone() * percentage / PERCENTAGE_DIVISOR;
+                    &provided.amount * &percentage / PERCENTAGE_DIVISOR;
                 provided.amount = calculated_fee_amount;
-                calculated_fee = provided;
+                
+                provided
             },
         }
-        calculated_fee
     }
 
     #[view(getTokenFee)]
