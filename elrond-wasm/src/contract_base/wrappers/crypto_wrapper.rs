@@ -26,7 +26,6 @@ where
         }
     }
 
-    #[cfg(feature = "ei-1-1")]
     pub fn sha256<B: core::borrow::Borrow<ManagedBuffer<A>>>(
         &self,
         data: B,
@@ -51,7 +50,6 @@ where
         ManagedByteArray::new_from_bytes(&A::crypto_api_impl().sha256_legacy(data_buffer_slice))
     }
 
-    #[cfg(feature = "ei-1-1")]
     pub fn keccak256<B: core::borrow::Borrow<ManagedBuffer<A>>>(
         &self,
         data: B,
