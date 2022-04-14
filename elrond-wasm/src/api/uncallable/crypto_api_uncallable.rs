@@ -1,6 +1,9 @@
 use super::UncallableApi;
 use crate::{
-    api::{CryptoApi, CryptoApiImpl, KECCAK256_RESULT_LEN, RIPEMD_RESULT_LEN, SHA256_RESULT_LEN},
+    api::{
+        CryptoApi, CryptoApiImpl, Handle, KECCAK256_RESULT_LEN, RIPEMD_RESULT_LEN,
+        SHA256_RESULT_LEN,
+    },
     types::{heap::BoxedBytes, MessageHashType},
 };
 
@@ -17,7 +20,7 @@ impl CryptoApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn sha256(&self, _data_handle: crate::api::Handle) -> crate::api::Handle {
+    fn sha256(&self, _dest: Handle, _data_handle: Handle) {
         unreachable!()
     }
 
@@ -25,7 +28,7 @@ impl CryptoApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn keccak256(&self, _dest: crate::api::Handle, _data_handle: crate::api::Handle) {
+    fn keccak256(&self, _dest: Handle, _data_handle: Handle) {
         unreachable!()
     }
 
