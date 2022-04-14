@@ -17,6 +17,11 @@ pub trait FormattedMessageFeatures {
         sc_panic!("Got this buffer: {}. I don't like it, ERROR!", bytes);
     }
 
+    #[endpoint]
+    fn dynamic_message_hex(&self, bytes: ManagedBuffer) {
+        sc_panic!("Got this buffer: {:x}. I don't like it, ERROR!", bytes);
+    }
+
     #[payable("*")]
     #[endpoint]
     fn dynamic_message_multiple(
@@ -58,6 +63,16 @@ pub trait FormattedMessageFeatures {
     #[endpoint]
     fn print_message(&self, x: i32) {
         sc_print!("Printing x: {}", x,);
+    }
+
+    #[endpoint]
+    fn print_message_hex(&self, x: u32) {
+        sc_print!("Printing x: {:x}", x,);
+    }
+
+    #[endpoint]
+    fn print_message_binary(&self, x: u32) {
+        sc_print!("Printing x: {:b}", x);
     }
 
     #[endpoint]

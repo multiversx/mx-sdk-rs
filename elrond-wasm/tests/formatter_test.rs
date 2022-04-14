@@ -23,6 +23,13 @@ impl FormatByteReceiver for SimpleReceiver {
     ) {
         unimplemented!()
     }
+
+    fn append_managed_buffer_binary<M: elrond_wasm::api::ManagedTypeApi>(
+        &mut self,
+        _item: &elrond_wasm::types::ManagedBuffer<M>,
+    ) {
+        unimplemented!()
+    }
 }
 
 /// Expects that the output from SCDisplay is the same as the standard Rust display.
