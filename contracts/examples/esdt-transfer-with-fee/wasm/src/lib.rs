@@ -7,12 +7,10 @@
 elrond_wasm_node::wasm_endpoints! {
     esdt_transfer_with_fee
     (
-        claim_fees
-        getGeneralFee
+        claimFees
         getPaidFees
-        getSpecificFee
-        set_fee_for_token
-        set_general_fee
+        getTokenFee
+        setFeeForToken
         transfer
     )
 }

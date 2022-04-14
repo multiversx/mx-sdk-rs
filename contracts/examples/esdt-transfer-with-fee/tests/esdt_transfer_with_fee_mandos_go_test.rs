@@ -7,3 +7,8 @@ fn deploy_go() {
 fn setup_fees_go() {
     elrond_wasm_debug::mandos_go("mandos/setup_fees_and_transfer.scen.json");
 }
+
+#[test]
+fn claim_go() {
+    elrond_wasm_debug::mandos_go("mandos/claim.scen.json");
+}

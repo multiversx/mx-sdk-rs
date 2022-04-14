@@ -13,15 +13,15 @@
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
-                        "str:USDC-aaaaaa": {
-                            "balance": "500"
-                        }
+                        "str:USDC-aaaaaa": "500",
+                        "str:WEGLD-012345": "500"
                     }
                 },
                 "address:user2": {
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
+                        "str:WEGLD-012345": "500",
                         "str:MFNFT-567890": {
                             "instances": [
                                 {
@@ -79,9 +79,8 @@
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
-                        "str:USDC-aaaaaa": {
-                            "balance": "500"
-                        }
+                        "str:USDC-aaaaaa": "500",
+                        "str:WEGLD-012345": "500"
                     }
                 },
                 "address:user2": {
@@ -103,7 +102,8 @@
                                     "balance": "1"
                                 }
                             ]
-                        }
+                        },
+                        "str:WEGLD-012345": "500"
                     }
                 },
                 "sc:esdt-transfer-with-fee": {

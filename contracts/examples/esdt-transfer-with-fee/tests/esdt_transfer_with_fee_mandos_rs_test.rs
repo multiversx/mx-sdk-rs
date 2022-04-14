@@ -20,3 +20,8 @@ fn deploy_rs() {
 fn setup_fees_rs() {
     elrond_wasm_debug::mandos_rs("mandos/setup_fees_and_transfer.scen.json", world());
 }
+
+#[test]
+fn claim_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/claim.scen.json", world());
+}

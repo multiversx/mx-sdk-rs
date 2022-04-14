@@ -4,50 +4,45 @@ mod fee;
 use fee::*;
 
 elrond_wasm::imports!();
-#[elrond_wasm::derive::contract]
+#[elrond_wasm::contract]
 pub trait EsdtTransferWithFee {
     #[init]
     fn init(&self) {}
 
     #[only_owner]
-    #[endpoint]
-    fn set_general_fee(&self, fee: Fee<Self::Api>) {
-        self.general_fee().set(fee);
-    }
-
-    #[only_owner]
-    #[endpoint]
+    #[endpoint(setFeeForToken)]
     fn set_fee_for_token(&self, fee: Fee<Self::Api>, token: TokenIdentifier) {
-        self.specific_fee(&token).set(fee);
+        self.token_fee(&token).set(fee);
     }
 
     #[only_owner]
-    #[endpoint]
+    #[endpoint(claimFees)]
     fn claim_fees(&self) {
         let mut fees = ManagedVec::new();
         for ((token, nonce), amount) in self.paid_fees().iter() {
             fees.push(EsdtTokenPayment::new(token, nonce, amount))
         }
+        self.paid_fees().clear();
 
         let caller = self.blockchain().get_caller();
         self.send().direct_multi(&caller, &fees, &[]);
     }
 
     #[payable("*")]
-    #[endpoint]
+    #[endpoint(transfer)]
     fn transfer(&self, address: ManagedAddress) {
-        require!(!self.general_fee().is_empty(), "Fees are not set yet");
         let payments = self.call_value().all_esdt_transfers();
-        if payments.is_empty() {
-            return;
-        }
 
         let mut fees = ManagedVec::<Self::Api, EsdtTokenPayment<Self::Api>>::new();
         for payment in &payments {
-            fees.push(self.get_fee(payment));
+            let calculated_fees = self.get_fee(payment);
+            if calculated_fees.amount > 0 {
+                fees.push(calculated_fees);
+            }
         }
 
-        for fee in &fees {
+        for fee in fees.iter() {
+            let mut perceived_tax = false;
             for mut payment in &payments {
                 if payment.token_identifier == fee.token_identifier {
                     require!(
@@ -57,22 +52,27 @@ pub trait EsdtTransferWithFee {
 
                     self.paid_fees()
                         .entry((payment.token_identifier.clone(), payment.token_nonce))
-                        .and_modify(|value| *value += fee.amount.clone());
+                        .or_insert(0u64.into())
+                        .update(|value| *value += fee.amount.clone());
 
                     payment.amount -= fee.amount.clone();
+                    perceived_tax = true;
                     break;
                 }
             }
+
+            require!(perceived_tax, "Fee payment missing");
         }
 
         self.send().direct_multi(&address, &payments, &[]);
     }
 
-    fn get_fee(&self, payment: EsdtTokenPayment<Self::Api>) -> EsdtTokenPayment<Self::Api> {
-        if self.specific_fee(&payment.token_identifier).is_empty() {
-            self.calculate_fee(self.general_fee().get(), payment)
+    fn get_fee(&self, mut payment: EsdtTokenPayment<Self::Api>) -> EsdtTokenPayment<Self::Api> {
+        if self.token_fee(&payment.token_identifier).is_empty() {
+            payment.amount = 0u64.into();
+            payment
         } else {
-            self.calculate_fee(self.specific_fee(&payment.token_identifier).get(), payment)
+            self.calculate_fee(self.token_fee(&payment.token_identifier).get(), payment)
         }
     }
 
@@ -95,13 +95,9 @@ pub trait EsdtTransferWithFee {
         calculated_fee
     }
 
-    #[view(getGeneralFee)]
-    #[storage_mapper("general_fee")]
-    fn general_fee(&self) -> SingleValueMapper<Fee<Self::Api>>;
-
-    #[view(getSpecificFee)]
-    #[storage_mapper("specific_fee")]
-    fn specific_fee(&self, token: &TokenIdentifier) -> SingleValueMapper<Fee<Self::Api>>;
+    #[view(getTokenFee)]
+    #[storage_mapper("token_fee")]
+    fn token_fee(&self, token: &TokenIdentifier) -> SingleValueMapper<Fee<Self::Api>>;
 
     #[view(getPaidFees)]
     #[storage_mapper("paid_fees")]
