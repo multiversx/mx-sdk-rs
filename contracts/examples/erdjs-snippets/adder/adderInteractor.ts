@@ -7,7 +7,7 @@
  * @module
  */
 import path from "path";
-import { BigUIntValue, CodeMetadata, GasLimit, IAddress, Interaction, ResultsParser, ReturnCode, SmartContract, SmartContractAbi, TransactionWatcher } from "@elrondnetwork/erdjs";
+import { BigUIntValue, CodeMetadata, IAddress, Interaction, ResultsParser, ReturnCode, SmartContract, SmartContractAbi, TransactionWatcher } from "@elrondnetwork/erdjs";
 import { INetworkProvider, ITestSession, ITestUser, loadAbiRegistry, loadCode } from "@elrondnetwork/erdjs-snippets";
 import { NetworkConfig } from "@elrondnetwork/erdjs-network-providers";
 
@@ -48,7 +48,7 @@ export class AdderInteractor {
             code: code,
             codeMetadata: new CodeMetadata(),
             initArguments: [new BigUIntValue(initialValue)],
-            gasLimit: new GasLimit(20000000),
+            gasLimit: 20000000,
             chainID: this.networkConfig.ChainID
         });
 
@@ -77,7 +77,7 @@ export class AdderInteractor {
         // Prepare the interaction
         let interaction = <Interaction>this.contract.methods
             .add([value])
-            .withGasLimit(new GasLimit(10000000))
+            .withGasLimit(10000000)
             .withNonce(caller.account.getNonceThenIncrement())
             .withChainID(this.networkConfig.ChainID);
 
