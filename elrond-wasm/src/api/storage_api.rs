@@ -25,7 +25,6 @@ pub trait StorageReadApiImpl {
 
     fn storage_load_i64(&self, key: &[u8]) -> i64;
 
-    #[cfg(feature = "ei-1-1")]
     fn storage_load_from_address(&self, address_handle: Handle, key_handle: Handle) -> Handle;
 }
 

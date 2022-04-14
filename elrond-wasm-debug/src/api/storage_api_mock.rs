@@ -81,7 +81,6 @@ impl StorageReadApiImpl for DebugApi {
         }
     }
 
-    #[cfg(feature = "ei-1-1")]
     fn storage_load_from_address(&self, address_handle: Handle, key_handle: Handle) -> Handle {
         let address = elrond_wasm::types::heap::Address::from_slice(
             self.mb_to_boxed_bytes(address_handle).as_slice(),

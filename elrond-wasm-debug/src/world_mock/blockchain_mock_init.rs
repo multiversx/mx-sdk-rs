@@ -55,7 +55,6 @@ impl BlockchainMock {
         self.register_contract_obj(expression, contract_builder.new_contract_obj::<DebugApi>())
     }
 
-    #[cfg(feature = "ei-1-1")]
     pub fn register_external_view_contract_builder<B: CallableContractBuilder>(
         &mut self,
         expression: &str,

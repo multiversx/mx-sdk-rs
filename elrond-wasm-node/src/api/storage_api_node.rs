@@ -32,7 +32,7 @@ extern "C" {
     fn mBufferStorageLoad(keyHandle: i32, mBufferHandle: i32) -> i32;
     fn mBufferGetLength(mBufferHandle: i32) -> i32;
     
-    #[cfg(feature = "ei-1-1")]
+    // from another account
     fn mBufferStorageLoadFromAddress(addressHandle: i32, keyHandle: i32, mBufferHandle: i32);
 }
 
@@ -100,7 +100,6 @@ impl StorageReadApiImpl for VmApiImpl {
         unsafe { smallIntStorageLoadSigned(key.as_ref().as_ptr(), key.len() as i32) }
     }
 
-    #[cfg(feature = "ei-1-1")]
     #[inline]
     fn storage_load_from_address(&self, address_handle: Handle, key_handle: Handle) -> Handle {
         unsafe {
