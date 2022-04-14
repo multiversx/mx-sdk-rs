@@ -1,5 +1,16 @@
 use alloc::string::String;
 
+pub fn byte_to_bin_digit(mut num: u8) -> [u8; 8] {
+    let mut result = [0u8; 8];
+    let mut i = 0;
+    while num > 0 {
+        result[i] += &(num % 2);
+        num /= 2;
+        i += 1;
+    }
+    result
+}
+
 fn half_byte_to_hex_digit(num: u8) -> u8 {
     if num < 10 {
         b'0' + num
