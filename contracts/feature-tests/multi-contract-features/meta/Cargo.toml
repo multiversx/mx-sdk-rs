@@ -11,4 +11,3 @@ path = ".."
 [dependencies.elrond-wasm-debug]
 version = "0.30.0"
 path = "../../../../elrond-wasm-debug"
-features = ["ei-1-1"]
