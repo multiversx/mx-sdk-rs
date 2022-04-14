@@ -22,7 +22,6 @@ impl CryptoApiImpl for DebugApi {
         hasher.finalize().into()
     }
 
-    #[cfg(feature = "ei-1-1")]
     fn sha256(&self, data_handle: elrond_wasm::api::Handle) -> elrond_wasm::api::Handle {
         // default implementation used in debugger
         // the VM has a dedicated hook
@@ -37,7 +36,6 @@ impl CryptoApiImpl for DebugApi {
         hasher.finalize().into()
     }
 
-    #[cfg(feature = "ei-1-1")]
     fn keccak256(&self, dest: elrond_wasm::api::Handle, data_handle: elrond_wasm::api::Handle) {
         // default implementation used in debugger
         // the VM has a dedicated hook

@@ -554,54 +554,6 @@ impl BlockchainApiImpl for VmApiImpl {
         }
     }
 
-    #[cfg(not(feature = "ei-1-1"))]
-    fn get_esdt_local_roles<M: ManagedTypeApi>(
-        &self,
-        token_id: &TokenIdentifier<M>,
-    ) -> elrond_wasm::types::EsdtLocalRoleFlags {
-        use elrond_wasm::{
-            api::{ErrorApiImpl, ManagedBufferApi, StorageReadApiImpl},
-            storage::StorageKey,
-            types::{EsdtLocalRole, EsdtLocalRoleFlags},
-        };
-
-        let mut key =
-            StorageKey::new(elrond_wasm::storage::protected_keys::ELROND_ESDT_LOCAL_ROLES_KEY);
-        key.append_managed_buffer(token_id.as_managed_buffer());
-        let value_handle = self.storage_load_managed_buffer_raw(key.get_raw_handle());
-        let value_len = self.mb_len(value_handle);
-        const DATA_MAX_LEN: usize = 300;
-        if value_len > DATA_MAX_LEN {
-            self.signal_error(elrond_wasm::err_msg::STORAGE_VALUE_EXCEEDS_BUFFER);
-        }
-        let mut data_buffer = [0u8; DATA_MAX_LEN];
-        // let _ = value_mb.load_slice(0, );
-        let _ = self.mb_load_slice(value_handle, 0, &mut data_buffer[..value_len]);
-
-        let mut current_index = 0;
-
-        let mut result = EsdtLocalRoleFlags::NONE;
-
-        while current_index < value_len {
-            // first character before each role is a \n, so we skip it
-            current_index += 1;
-
-            // next is the length of the role as string
-            let role_len = data_buffer[current_index];
-            current_index += 1;
-
-            // next is role's ASCII string representation
-            let end_index = current_index + role_len as usize;
-            let role_name = &data_buffer[current_index..end_index];
-            current_index = end_index;
-
-            result |= EsdtLocalRole::from(role_name).to_flag();
-        }
-
-        result
-    }
-
-    #[cfg(feature = "ei-1-1")]
     fn get_esdt_local_roles<M: ManagedTypeApi>(
         &self,
         token_id: &TokenIdentifier<M>,

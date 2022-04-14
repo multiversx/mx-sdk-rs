@@ -17,12 +17,10 @@ pub trait CryptoApi: ManagedTypeApi {
 pub trait CryptoApiImpl: ManagedTypeApiImpl {
     fn sha256_legacy(&self, data: &[u8]) -> [u8; SHA256_RESULT_LEN];
 
-    #[cfg(feature = "ei-1-1")]
     fn sha256(&self, data_handle: super::Handle) -> super::Handle;
 
     fn keccak256_legacy(&self, data: &[u8]) -> [u8; KECCAK256_RESULT_LEN];
 
-    #[cfg(feature = "ei-1-1")]
     fn keccak256(&self, dest: super::Handle, data_handle: super::Handle);
 
     fn ripemd160(&self, data: &[u8]) -> [u8; RIPEMD_RESULT_LEN];

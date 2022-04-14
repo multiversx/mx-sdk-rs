@@ -47,7 +47,6 @@ impl ManagedBufferApi for super::UncallableApi {
         unreachable!()
     }
 
-    #[cfg(feature = "ei-1-1")]
     fn mb_set_slice(
         &self,
         _dest_handle: Handle,
