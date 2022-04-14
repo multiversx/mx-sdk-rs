@@ -55,7 +55,7 @@ pub trait EsdtTransferWithFee {
                         .or_insert(0u64.into())
                         .update(|value| *value += &fee.amount);
 
-                    payment.amount -= fee.amount.clone();
+                    payment.amount -= &fee.amount;
                     perceived_tax = true;
                     break;
                 }
