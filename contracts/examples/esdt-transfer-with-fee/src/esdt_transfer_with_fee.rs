@@ -68,11 +68,12 @@ pub trait EsdtTransferWithFee {
     }
 
     fn get_fee(&self, mut payment: EsdtTokenPayment<Self::Api>) -> EsdtTokenPayment<Self::Api> {
-        if self.token_fee(&payment.token_identifier).is_empty() {
+        let fee_mapper = self.token_fee(&payment.token_identifier);
+        if fee_mapper.is_empty() {
             payment.amount = 0u64.into();
             payment
         } else {
-            self.calculate_fee(self.token_fee(&payment.token_identifier).get(), payment)
+            self.calculate_fee(fee_mapper.get(), payment)
         }
     }
 
