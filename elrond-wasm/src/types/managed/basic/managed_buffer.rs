@@ -4,7 +4,8 @@ use crate::{
     abi::TypeName,
     api::{ErrorApiImpl, Handle, InvalidSliceError, ManagedBufferApi, ManagedTypeApi},
     formatter::{
-        hex_util::encode_bytes_as_hex, FormatByteReceiver, SCDisplay, SCLowerHex, HEX_VALUE_PREFIX,
+        hex_util::encode_bytes_as_hex, FormatByteReceiver, SCBinary, SCDisplay, SCLowerHex,
+        BINARY_VALUE_PREFIX, HEX_VALUE_PREFIX,
     },
     types::{heap::BoxedBytes, ManagedType},
 };
@@ -354,6 +355,20 @@ impl<M: ManagedTypeApi> SCLowerHex for ManagedBuffer<M> {
         f.append_managed_buffer_lower_hex(self);
     }
 }
+
+impl<M: ManagedTypeApi> SCBinary for ManagedBuffer<M> {
+    fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
+        f.append_bytes(BINARY_VALUE_PREFIX); // TODO: in Rust thr `0b` prefix appears only when writing "{:#x}", not "{:x}"
+        f.append_managed_buffer_binary(self);
+    }
+}
+
+// impl<M: ManagedTypeApi> SCCodec for ManagedBuffer<M> {
+//     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
+//         f.append_bytes(HEX_VALUE_PREFIX); // TODO: in Rust thr `0x` prefix appears only when writing "{:#x}", not "{:x}"
+//         f.append_managed_buffer_codec(self);
+//     }
+// }
 
 impl<M: ManagedTypeApi> core::fmt::Debug for ManagedBuffer<M> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {

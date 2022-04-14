@@ -1,4 +1,4 @@
-use super::{hex_util::byte_to_hex_digits, SCDisplay, SCLowerHex};
+use super::{hex_util::byte_to_hex_digits, SCBinary, SCCodec, SCDisplay, SCLowerHex};
 
 const MINUS_SYMBOL: &[u8] = b"-";
 
@@ -44,6 +44,18 @@ macro_rules! formatter_unsigned {
             #[inline]
             fn fmt<F: super::FormatByteReceiver>(&self, f: &mut F) {
                 format_unsigned(*self as u64, f, 16);
+            }
+        }
+        impl SCBinary for $num_ty {
+            #[inline]
+            fn fmt<F: super::FormatByteReceiver>(&self, f: &mut F) {
+                format_unsigned(*self as u64, f, 2);
+            }
+        }
+        impl SCCodec for $num_ty {
+            #[inline]
+            fn fmt<F: super::FormatByteReceiver>(&self, f: &mut F) {
+                format_unsigned(*self as u64, f, 2);
             }
         }
     };
