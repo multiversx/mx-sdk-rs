@@ -10,14 +10,22 @@ pub trait EsdtTransferWithFee {
     fn init(&self) {}
 
     #[only_owner]
-    #[endpoint(setFeeForToken)]
-    fn set_fee_for_token(&self, fee: Fee<Self::Api>, token: TokenIdentifier) {
-        self.token_fee(&token).set(fee);
+    #[endpoint(setExactValueFee)]
+    fn set_exact_value_fee(&self, fee: EsdtTokenPayment<Self::Api>, token: TokenIdentifier) {
+        self.token_fee(&token).set(Fee::ExactValue(fee));
+    }
+
+    #[only_owner]
+    #[endpoint(setPercentageFee)]
+    fn set_percentage_fee(&self, fee: u32, token: TokenIdentifier) {
+        self.token_fee(&token).set(Fee::Percentage(fee));
     }
 
     #[only_owner]
     #[endpoint(claimFees)]
     fn claim_fees(&self) {
+        let paid_fees = self.paid_fees();
+        require!(!paid_fees.is_empty(), "There is nothing to claim");
         let mut fees = ManagedVec::new();
         for ((token, nonce), amount) in self.paid_fees().iter() {
             fees.push(EsdtTokenPayment::new(token, nonce, amount))
@@ -29,12 +37,16 @@ pub trait EsdtTransferWithFee {
     }
 
     #[payable("*")]
-    #[endpoint(transfer)]
+    #[endpoint]
     fn transfer(&self, address: ManagedAddress) {
         let payments = self.call_value().all_esdt_transfers();
 
         let mut fees = ManagedVec::<Self::Api, EsdtTokenPayment<Self::Api>>::new();
         for payment in &payments {
+            require!(
+                payment.token_identifier != TokenIdentifier::egld(),
+                "Token cannot be EGLD"
+            );
             let calculated_fees = self.get_fee(payment);
             if calculated_fees.amount > 0 {
                 fees.push(calculated_fees);
@@ -85,10 +97,9 @@ pub trait EsdtTransferWithFee {
         match fee {
             Fee::ExactValue(requested) => requested,
             Fee::Percentage(percentage) => {
-                let calculated_fee_amount =
-                    &provided.amount * &percentage / PERCENTAGE_DIVISOR;
+                let calculated_fee_amount = &provided.amount * percentage / PERCENTAGE_DIVISOR;
                 provided.amount = calculated_fee_amount;
-                
+
                 provided
             },
         }

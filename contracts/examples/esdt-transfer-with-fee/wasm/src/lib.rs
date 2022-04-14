@@ -10,7 +10,8 @@ elrond_wasm_node::wasm_endpoints! {
         claimFees
         getPaidFees
         getTokenFee
-        setFeeForToken
+        setExactValueFee
+        setPercentageFee
         transfer
     )
 }

@@ -40,9 +40,9 @@
             "tx": {
                 "from": "address:owner",
                 "to": "sc:esdt-transfer-with-fee",
-                "function": "setFeeForToken",
+                "function": "setPercentageFee",
                 "arguments": [
-                    "u8:1|u32:10",
+                    "u32:10",
                     "str:USDC-aaaaaa"
                 ],
                 "gasLimit": "5,000,000",
@@ -63,9 +63,9 @@
             "tx": {
                 "from": "address:owner",
                 "to": "sc:esdt-transfer-with-fee",
-                "function": "setFeeForToken",
+                "function": "setExactValueFee",
                 "arguments": [
-                    "u8:0|u8:0|nested:str:USDC-aaaaaa|u64:0|biguint:5",
+                    "u8:0|nested:str:USDC-aaaaaa|u64:0|biguint:5",
                     "str:MFNFT-567890"
                 ],
                 "gasLimit": "50,000,000",
@@ -118,9 +118,9 @@
             "tx": {
                 "from": "address:owner",
                 "to": "sc:esdt-transfer-with-fee",
-                "function": "setFeeForToken",
+                "function": "setExactValueFee",
                 "arguments": [
-                    "u8:0|u8:0|nested:str:USDC-aaaaaa|u64:0|biguint:10",
+                    "u8:0|nested:str:USDC-aaaaaa|u64:0|biguint:10",
                     "str:WEGLD-012345"
                 ],
                 "gasLimit": "50,000,000",
