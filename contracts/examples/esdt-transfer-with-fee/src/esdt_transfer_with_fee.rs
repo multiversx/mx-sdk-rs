@@ -53,7 +53,7 @@ pub trait EsdtTransferWithFee {
                     self.paid_fees()
                         .entry((payment.token_identifier.clone(), payment.token_nonce))
                         .or_insert(0u64.into())
-                        .update(|value| *value += fee.amount.clone());
+                        .update(|value| *value += &fee.amount);
 
                     payment.amount -= fee.amount.clone();
                     perceived_tax = true;
