@@ -195,7 +195,6 @@
                             ]
                         }
                     },
-                    "storage": {},
                     "code": "file:../forwarder/output/forwarder.wasm"
                 }
             }

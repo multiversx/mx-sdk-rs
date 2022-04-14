@@ -1,7 +1,7 @@
 use crate::{
     num_bigint,
     tx_execution::{deploy_contract, execute_builtin_function_or_default},
-    tx_mock::{AsyncCallTxData, BlockchainUpdate, TxCache, TxInput, TxPanic, TxResult},
+    tx_mock::{AsyncCallTxData, BlockchainUpdate, Promise, TxCache, TxInput, TxPanic, TxResult},
     DebugApi,
 };
 use elrond_wasm::{
@@ -378,6 +378,41 @@ impl SendApiImpl for DebugApi {
             tx_hash,
         };
         self.perform_async_call(call)
+    }
+
+    fn create_async_call_raw<M: ManagedTypeApi>(
+        &self,
+        to: &ManagedAddress<M>,
+        amount: &BigUint<M>,
+        endpoint_name: &ManagedBuffer<M>,
+        success_callback: &'static [u8],
+        error_callback: &'static [u8],
+        _gas: u64,
+        _extra_gas_for_callback: u64,
+        arg_buffer: &ManagedArgBuffer<M>,
+    ) {
+        let amount_value = self.big_uint_handle_to_value(amount.get_raw_handle());
+        let contract_address = self.input_ref().to.clone();
+        let recipient = to.to_address();
+        let tx_hash = self.get_tx_hash_legacy();
+
+        let call = AsyncCallTxData {
+            from: contract_address,
+            to: recipient,
+            call_value: amount_value,
+            endpoint_name: endpoint_name.to_boxed_bytes().into_vec(),
+            arguments: arg_buffer.to_raw_args_vec(),
+            tx_hash,
+        };
+
+        let promise = Promise {
+            endpoint: call,
+            success_callback,
+            error_callback,
+        };
+
+        let mut tx_result = self.result_borrow_mut();
+        tx_result.result_calls.promises.push(promise);
     }
 
     fn deploy_contract<M: ManagedTypeApi>(

@@ -27,9 +27,10 @@ pub trait ProxyTestSecond {
 
     #[init]
     #[payable("EGLD")]
-    fn init(&self, #[payment] payment: BigUint, init_arg: i32) {
+    fn init(&self, #[payment] payment: BigUint, init_arg: i32) -> i32 {
         self.set_last_payment(&payment);
         self.set_init_arg(init_arg);
+        init_arg + 1
     }
 
     #[payable("EGLD")]

@@ -94,7 +94,6 @@ impl ManagedBufferApi for DebugApi {
             .insert(handle, value.into());
     }
 
-    #[cfg(feature = "ei-1-1")]
     fn mb_set_slice(
         &self,
         dest_handle: Handle,

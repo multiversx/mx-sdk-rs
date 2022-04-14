@@ -29,7 +29,9 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [],
+                "out": [
+                    "457"
+                ],
                 "status": "0",
                 "message": "",
                 "gas": "*",

@@ -1,5 +1,5 @@
 use crate::{
-    interpret_trait::{InterpretableFrom, InterpreterContext},
+    interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
     value_interpreter::interpret_string,
 };
 
@@ -57,7 +57,13 @@ impl InterpretableFrom<&AddressValue> for AddressKey {
     fn interpret_from(from: &AddressValue, _context: &InterpreterContext) -> Self {
         AddressKey {
             value: from.value,
-            original: from.original.to_string(),
+            original: from.original.to_concatenated_string(),
         }
+    }
+}
+
+impl IntoRaw<String> for AddressKey {
+    fn into_raw(self) -> String {
+        self.original
     }
 }

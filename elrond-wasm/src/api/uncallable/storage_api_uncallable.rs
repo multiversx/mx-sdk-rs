@@ -42,7 +42,6 @@ impl StorageReadApiImpl for UncallableApi {
         unreachable!()
     }
 
-    #[cfg(feature = "ei-1-1")]
     fn storage_load_from_address(&self, _address_handle: Handle, _key_handle: Handle) -> Handle {
         unreachable!()
     }
