@@ -1,7 +1,9 @@
+use num_bigint::BigUint;
+
 use crate::{
     interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
-    model::{BytesKey, BytesValue, U64Value},
-    serde_raw::{EsdtFullRaw, EsdtRaw},
+    model::{BigUintValue, BytesKey, BytesValue, U64Value},
+    serde_raw::{EsdtFullRaw, EsdtRaw, ValueSubTree},
 };
 
 use super::{EsdtInstance, EsdtObject};
@@ -10,6 +12,43 @@ use super::{EsdtInstance, EsdtObject};
 pub enum Esdt {
     Short(BytesKey),
     Full(EsdtObject),
+}
+
+impl Esdt {
+    pub fn convert_to_full(&mut self) {
+        if let Esdt::Short(balance_bytes) = self {
+            let balance_obj = BigUintValue {
+                original: ValueSubTree::Str(balance_bytes.original.clone()),
+                value: BigUint::from_bytes_be(&balance_bytes.value),
+            };
+            let mut new_esdt_obj = EsdtObject::default();
+            new_esdt_obj.set_balance(0u64, balance_obj);
+
+            *self = Self::Full(new_esdt_obj);
+        }
+    }
+
+    pub fn set_balance<N, A>(&mut self, token_nonce_expr: N, amount_expr: A)
+    where
+        U64Value: InterpretableFrom<N>,
+        BigUintValue: InterpretableFrom<A>,
+    {
+        self.convert_to_full();
+
+        if let Esdt::Full(esdt_obj) = self {
+            esdt_obj.set_balance(token_nonce_expr, amount_expr);
+        }
+    }
+
+    pub fn get_mut_esdt_object(&mut self) -> &mut EsdtObject {
+        self.convert_to_full();
+
+        if let Esdt::Full(esdt_obj) = self {
+            return esdt_obj;
+        }
+
+        unreachable!()
+    }
 }
 
 impl InterpretableFrom<EsdtRaw> for Esdt {

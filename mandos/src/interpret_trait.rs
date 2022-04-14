@@ -15,6 +15,12 @@ pub trait InterpretableFrom<T> {
     fn interpret_from(from: T, context: &InterpreterContext) -> Self;
 }
 
+impl<T> InterpretableFrom<T> for T {
+    fn interpret_from(from: T, _context: &InterpreterContext) -> Self {
+        from
+    }
+}
+
 pub trait IntoRaw<R> {
     fn into_raw(self) -> R;
 }
