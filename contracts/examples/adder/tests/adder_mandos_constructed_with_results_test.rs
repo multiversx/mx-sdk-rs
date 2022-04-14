@@ -30,23 +30,31 @@ fn adder_mandos_constructed() {
     );
 
     // deploy
-    let (new_address, result) = world.sc_deploy(
-        &owner_address,
-        BytesValue::interpret_from("file:output/adder.wasm", &ic),
+    let (new_address, ()) = world.mandos_sc_deploy_get_result(
         adder_contract.init(5u32),
+        ScDeployStep::new()
+            .from(&owner_address)
+            .contract_code("file:output/adder.wasm", &ic)
+            .gas_limit("5,000,000")
+            .expect(TxExpect::ok().no_result()),
     );
     assert_eq!(
         new_address.as_bytes(),
         adder_contract.mandos_address_expr.value
     );
-    assert!(result.is_empty());
 
-    // query
-    let result: SingleValue<BigUint> = world.sc_query(adder_contract.sum());
+    // mandos query, gets saved in the trace
+    let result: SingleValue<BigUint> =
+        world.mandos_sc_query_expect_result(adder_contract.sum(), ScQueryStep::new());
     assert_eq!(result.into(), BigUint::from(5u32));
 
-    // call
-    let () = world.sc_call(&owner_address, adder_contract.add(3u32));
+    let () = world.mandos_sc_call_get_result(
+        adder_contract.add(3u32),
+        ScCallStep::new()
+            .from(&owner_address)
+            .gas_limit(5000000)
+            .expect(TxExpect::ok().no_result()),
+    );
 
     world.mandos_check_state(
         CheckStateStep::new()
@@ -56,4 +64,6 @@ fn adder_mandos_constructed() {
                 CheckAccount::new().check_storage("str:sum", "8"),
             ),
     );
+
+    world.write_mandos_trace("trace2.scen.json");
 }

@@ -1,5 +1,5 @@
 use crate::{
-    interpret_trait::{InterpretableFrom, InterpreterContext},
+    interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
     model::BytesKey,
     serde_raw::CheckEsdtMapContentsRaw,
 };
@@ -35,6 +35,19 @@ impl InterpretableFrom<CheckEsdtMapContentsRaw> for CheckEsdtMapContents {
                 })
                 .collect(),
             other_esdts_allowed: from.other_esdts_allowed,
+        }
+    }
+}
+
+impl IntoRaw<CheckEsdtMapContentsRaw> for CheckEsdtMapContents {
+    fn into_raw(self) -> CheckEsdtMapContentsRaw {
+        CheckEsdtMapContentsRaw {
+            contents: self
+                .contents
+                .into_iter()
+                .map(|(k, v)| (k.into_raw(), v.into_raw()))
+                .collect(),
+            other_esdts_allowed: self.other_esdts_allowed,
         }
     }
 }

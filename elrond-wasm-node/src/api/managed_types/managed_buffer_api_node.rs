@@ -27,7 +27,6 @@ extern "C" {
     fn mBufferEq(handle1: i32, handle2: i32) -> i32;
     fn mBufferSetBytes(mBufferHandle: i32, byte_ptr: *const u8, byte_len: i32) -> i32;
 
-    #[cfg(feature = "ei-1-1")]
     fn mBufferSetByteSlice(
         mBufferHandle: i32,
         startingPosition: i32,
@@ -131,7 +130,6 @@ impl ManagedBufferApi for crate::VmApiImpl {
         }
     }
 
-    #[cfg(feature = "ei-1-1")]
     #[inline]
     fn mb_set_slice(
         &self,
@@ -181,7 +179,6 @@ impl ManagedBufferApi for crate::VmApiImpl {
 
     #[cfg(feature = "ei-unmanaged")]
     fn mb_eq(&self, handle1: Handle, handle2: Handle) -> bool {
-        // TODO: might be worth adding a new hook to Arwen for this
         unsafe {
             let len1 = mBufferGetLength(handle1 as i32) as usize;
             let len2 = mBufferGetLength(handle2 as i32) as usize;

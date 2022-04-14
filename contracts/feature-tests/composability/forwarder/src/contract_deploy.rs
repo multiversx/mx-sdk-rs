@@ -10,8 +10,8 @@ pub trait DeployContractModule {
         &self,
         code: ManagedBuffer,
         #[var_args] opt_arg: OptionalValue<ManagedBuffer>,
-    ) -> MultiValue2<ManagedAddress, ManagedVec<Self::Api, ManagedBuffer>> {
-        self.deploy_vault(&code, opt_arg)
+    ) -> MultiValue2<ManagedAddress, OptionalValue<ManagedBuffer>> {
+        self.perform_deploy_vault(&code, opt_arg).into()
     }
 
     #[endpoint]
@@ -20,9 +20,9 @@ pub trait DeployContractModule {
         code: ManagedBuffer,
     ) -> MultiValue2<ManagedAddress, ManagedAddress> {
         let (first_deployed_contract_address, _) =
-            self.deploy_vault(&code, OptionalValue::None).into_tuple();
+            self.perform_deploy_vault(&code, OptionalValue::None);
         let (second_deployed_contract_address, _) =
-            self.deploy_vault(&code, OptionalValue::None).into_tuple();
+            self.perform_deploy_vault(&code, OptionalValue::None);
 
         (
             first_deployed_contract_address,
@@ -31,15 +31,14 @@ pub trait DeployContractModule {
             .into()
     }
 
-    fn deploy_vault(
+    fn perform_deploy_vault(
         &self,
         code: &ManagedBuffer,
         #[var_args] opt_arg: OptionalValue<ManagedBuffer>,
-    ) -> MultiValue2<ManagedAddress, ManagedVec<Self::Api, ManagedBuffer>> {
+    ) -> (ManagedAddress, OptionalValue<ManagedBuffer>) {
         self.vault_proxy()
             .init(opt_arg)
             .deploy_contract(code, CodeMetadata::DEFAULT)
-            .into()
     }
 
     #[endpoint]
@@ -47,7 +46,7 @@ pub trait DeployContractModule {
         &self,
         source_address: ManagedAddress,
         #[var_args] opt_arg: OptionalValue<ManagedBuffer>,
-    ) -> MultiValue2<ManagedAddress, ManagedVec<Self::Api, ManagedBuffer>> {
+    ) -> MultiValue2<ManagedAddress, OptionalValue<ManagedBuffer>> {
         self.vault_proxy()
             .init(opt_arg)
             .deploy_from_source(&source_address, CodeMetadata::DEFAULT)

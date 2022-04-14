@@ -6,6 +6,7 @@ mod crypto_api;
 mod endpoint_arg_api;
 mod endpoint_finish_api;
 mod error_api;
+mod external_view;
 mod log_api;
 mod managed_types;
 mod print_api;
@@ -22,15 +23,10 @@ pub use crypto_api::*;
 pub use endpoint_arg_api::*;
 pub use endpoint_finish_api::*;
 pub use error_api::*;
+pub use external_view::*;
 pub use log_api::*;
 pub use managed_types::*;
 pub use print_api::*;
 pub use send_api::*;
 pub use storage_api::*;
 pub use vm_api::VMApi;
-
-#[cfg(feature = "ei-1-1")]
-mod external_view;
-
-#[cfg(feature = "ei-1-1")]
-pub use external_view::*;

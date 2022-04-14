@@ -9,7 +9,7 @@ use crate::{
 };
 use elrond_codec::{
     CodecFrom, DecodeErrorHandler, EncodeErrorHandler, TopDecode, TopDecodeInput, TopEncode,
-    TopEncodeMulti, TopEncodeMultiOutput,
+    TopEncodeMulti, TopEncodeMultiOutput, TopEncodeOutput,
 };
 
 /// Manages a single serializable item in storage.
@@ -114,6 +114,16 @@ where
 /// Necessary because we cannot implement `CodecFrom` directly on `T`.
 pub struct SingleValue<T: TopDecode>(T);
 
+impl<T: TopEncode + TopDecode> TopEncode for SingleValue<T> {
+    fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: TopEncodeOutput,
+        H: EncodeErrorHandler,
+    {
+        self.0.top_encode_or_handle_err(output, h)
+    }
+}
+
 impl<T: TopDecode> TopDecode for SingleValue<T> {
     fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
     where
@@ -121,6 +131,12 @@ impl<T: TopDecode> TopDecode for SingleValue<T> {
         H: DecodeErrorHandler,
     {
         Ok(SingleValue(T::top_decode_or_handle_err(input, h)?))
+    }
+}
+
+impl<T: TopDecode> From<T> for SingleValue<T> {
+    fn from(value: T) -> Self {
+        SingleValue(value)
     }
 }
 

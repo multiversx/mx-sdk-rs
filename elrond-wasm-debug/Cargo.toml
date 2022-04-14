@@ -31,15 +31,15 @@ toml = "0.5.8"
 cargo_toml = "0.10.1"
 pathdiff = "0.2.1"
 ed25519-dalek = "1.0.1"
+itertools = "0.10.3"
 
 [features]
 mandos-go-tests = []
-ei-1-1 = ["elrond-wasm/ei-1-1"]
 
 [dependencies.elrond-wasm]
 version = "=0.30.0"
 path = "../elrond-wasm"
-features = ["alloc", "num-bigint"]
+features = ["alloc", "num-bigint", "promises"]
 
 [dependencies.mandos]
 version = "0.12.0"
