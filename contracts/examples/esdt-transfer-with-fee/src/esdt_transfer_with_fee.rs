@@ -11,8 +11,16 @@ pub trait EsdtTransferWithFee {
 
     #[only_owner]
     #[endpoint(setExactValueFee)]
-    fn set_exact_value_fee(&self, fee: EsdtTokenPayment<Self::Api>, token: TokenIdentifier) {
-        self.token_fee(&token).set(Fee::ExactValue(fee));
+    fn set_exact_value_fee(
+        &self,
+        fee_token: TokenIdentifier,
+        fee_amount: BigUint,
+        token: TokenIdentifier,
+    ) {
+        self.token_fee(&token)
+            .set(Fee::ExactValue(EsdtTokenPayment::new(
+                fee_token, 0, fee_amount,
+            )));
     }
 
     #[only_owner]
@@ -39,6 +47,10 @@ pub trait EsdtTransferWithFee {
     #[payable("*")]
     #[endpoint]
     fn transfer(&self, address: ManagedAddress) {
+        require!(
+            self.call_value().egld_value() == 0,
+            "EGLD transfers not allowed"
+        );
         let payments = self.call_value().all_esdt_transfers();
         let mut new_payments = ManagedVec::new();
 
@@ -57,7 +69,7 @@ pub trait EsdtTransferWithFee {
                     );
                     require!(
                         next_payment.amount == fee.amount,
-                        "Insufficient payments for covering fees"
+                        "Mismatching payment for covering fees"
                     );
                     let _ = self.get_payment_after_fees(fee_type, &next_payment);
                     new_payments.push(payment);

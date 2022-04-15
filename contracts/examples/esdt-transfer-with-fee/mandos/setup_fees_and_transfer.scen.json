@@ -65,7 +65,8 @@
                 "to": "sc:esdt-transfer-with-fee",
                 "function": "setExactValueFee",
                 "arguments": [
-                    "u8:0|nested:str:USDC-aaaaaa|u64:0|biguint:5",
+                    "str:USDC-aaaaaa",
+                    "5",
                     "str:MFNFT-567890"
                 ],
                 "gasLimit": "50,000,000",
@@ -120,7 +121,8 @@
                 "to": "sc:esdt-transfer-with-fee",
                 "function": "setExactValueFee",
                 "arguments": [
-                    "u8:0|nested:str:USDC-aaaaaa|u64:0|biguint:10",
+                    "str:USDC-aaaaaa",
+                    "10",
                     "str:WEGLD-012345"
                 ],
                 "gasLimit": "50,000,000",
@@ -189,7 +191,7 @@
             "expect": {
                 "out": [],
                 "status": "4",
-                "message": "str:Insufficient payments for covering fees",
+                "message": "str:Mismatching payment for covering fees",
                 "logs": "*",
                 "gas": "*",
                 "refund": "*"
