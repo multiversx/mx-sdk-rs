@@ -15,6 +15,17 @@ pub struct EsdtObject {
 }
 
 impl EsdtObject {
+    pub fn is_short_form(&self) -> bool {
+        let has_single_fungible_instance =
+            self.instances.len() == 1 && self.instances[0].is_simple_fungible();
+
+        has_single_fungible_instance
+            && self.token_identifier.is_none()
+            && self.last_nonce.is_none()
+            && self.roles.is_empty()
+            && self.frozen.is_none()
+    }
+
     pub fn set_balance<N, A>(&mut self, token_nonce_expr: N, amount_expr: A)
     where
         U64Value: InterpretableFrom<N>,
