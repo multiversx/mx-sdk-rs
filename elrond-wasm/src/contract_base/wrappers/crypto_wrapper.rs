@@ -31,7 +31,7 @@ where
         data: B,
     ) -> ManagedByteArray<A, SHA256_RESULT_LEN> {
         let new_handle = A::static_var_api_impl().next_managed_buffer_handle();
-        A::crypto_api_impl().sha256(new_handle, data.borrow().get_raw_handle());
+        A::crypto_api_impl().sha256_managed(new_handle, data.borrow().get_raw_handle());
         ManagedByteArray::from_raw_handle(new_handle)
     }
 
@@ -40,6 +40,10 @@ where
         crate::types::H256::from(A::crypto_api_impl().sha256_legacy(data))
     }
 
+    #[deprecated(
+        since = "0.31.0",
+        note = "Method no longer needed, use `sha256` instead, functionality is available on mainnet."
+    )]
     pub fn sha256_legacy_managed<const MAX_INPUT_LEN: usize>(
         &self,
         data: &ManagedBuffer<A>,
@@ -52,9 +56,9 @@ where
     pub fn keccak256<B: core::borrow::Borrow<ManagedBuffer<A>>>(
         &self,
         data: B,
-    ) -> ManagedByteArray<A, 32> {
+    ) -> ManagedByteArray<A, KECCAK256_RESULT_LEN> {
         let new_handle = A::static_var_api_impl().next_managed_buffer_handle();
-        A::crypto_api_impl().keccak256(new_handle, data.borrow().get_raw_handle());
+        A::crypto_api_impl().keccak256_managed(new_handle, data.borrow().get_raw_handle());
         ManagedByteArray::from_raw_handle(new_handle)
     }
 
@@ -63,6 +67,10 @@ where
         crate::types::H256::from(A::crypto_api_impl().keccak256_legacy(data))
     }
 
+    #[deprecated(
+        since = "0.31.0",
+        note = "Method no longer needed, use `keccak256` instead, functionality is available on mainnet."
+    )]
     pub fn keccak256_legacy_managed<const MAX_INPUT_LEN: usize>(
         &self,
         data: &ManagedBuffer<A>,

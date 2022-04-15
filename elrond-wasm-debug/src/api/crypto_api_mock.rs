@@ -25,7 +25,7 @@ impl CryptoApiImpl for DebugApi {
         hasher.finalize().into()
     }
 
-    fn sha256(&self, dest: Handle, data_handle: Handle) {
+    fn sha256_managed(&self, dest: Handle, data_handle: Handle) {
         // default implementation used in debugger
         // the VM has a dedicated hook
         let result_bytes = self.sha256_legacy(self.mb_to_boxed_bytes(data_handle).as_slice());
@@ -38,7 +38,7 @@ impl CryptoApiImpl for DebugApi {
         hasher.finalize().into()
     }
 
-    fn keccak256(&self, dest: Handle, data_handle: Handle) {
+    fn keccak256_managed(&self, dest: Handle, data_handle: Handle) {
         // default implementation used in debugger
         // the VM has a dedicated hook
         let result_bytes = self.keccak256_legacy(self.mb_to_boxed_bytes(data_handle).as_slice());
