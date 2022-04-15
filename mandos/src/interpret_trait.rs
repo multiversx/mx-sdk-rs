@@ -21,6 +21,12 @@ impl<T> InterpretableFrom<T> for T {
     }
 }
 
+impl<T: Clone> InterpretableFrom<&T> for T {
+    fn interpret_from(from: &T, _context: &InterpreterContext) -> Self {
+        from.clone()
+    }
+}
+
 pub trait IntoRaw<R> {
     fn into_raw(self) -> R;
 }

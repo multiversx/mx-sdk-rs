@@ -39,6 +39,26 @@ impl BigUintValue {
     }
 }
 
+impl InterpretableFrom<u32> for BigUintValue {
+    fn interpret_from(from: u32, _context: &InterpreterContext) -> Self {
+        let bytes = from.to_be_bytes().to_vec();
+        BigUintValue {
+            value: BigUint::from_bytes_be(&bytes),
+            original: ValueSubTree::Str(from.to_string()),
+        }
+    }
+}
+
+impl InterpretableFrom<u64> for BigUintValue {
+    fn interpret_from(from: u64, _context: &InterpreterContext) -> Self {
+        let bytes = from.to_be_bytes().to_vec();
+        BigUintValue {
+            value: BigUint::from_bytes_be(&bytes),
+            original: ValueSubTree::Str(from.to_string()),
+        }
+    }
+}
+
 impl InterpretableFrom<&str> for BigUintValue {
     fn interpret_from(from: &str, context: &InterpreterContext) -> Self {
         let bytes = interpret_string(from, context);
