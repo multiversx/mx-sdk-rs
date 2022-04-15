@@ -7,7 +7,7 @@ use crate::{
 use num_bigint::BigUint;
 use std::fmt;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct BigUintValue {
     pub value: BigUint,
     pub original: ValueSubTree,

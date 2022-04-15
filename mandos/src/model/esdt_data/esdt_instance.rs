@@ -15,6 +15,23 @@ pub struct EsdtInstance {
     pub attributes: Option<BytesValue>,
 }
 
+impl EsdtInstance {
+    pub fn is_simple_fungible(&self) -> bool {
+        let is_fungible = if let Some(nonce) = &self.nonce {
+            nonce.value == 0
+        } else {
+            true
+        };
+
+        is_fungible
+            && self.creator.is_none()
+            && self.royalties.is_none()
+            && self.hash.is_none()
+            && self.uri.is_empty()
+            && self.attributes.is_none()
+    }
+}
+
 impl InterpretableFrom<EsdtInstanceRaw> for EsdtInstance {
     fn interpret_from(from: EsdtInstanceRaw, context: &InterpreterContext) -> Self {
         EsdtInstance {
