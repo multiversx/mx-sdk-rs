@@ -29,7 +29,7 @@ describe("lottery snippet", async function () {
 
         let payment = TokenPayment.egldFromAmount(0.1);
         await session.syncUsers([whale]);
-        await createAirdropService(session).sendToEachUser(whale, friends, payment);
+        await createAirdropService(session).sendToEachUser(whale, friends, [payment]);
     });
 
     it("issue lottery token", async function () {
@@ -47,7 +47,7 @@ describe("lottery snippet", async function () {
         let lotteryToken = await session.loadToken("lotteryToken");
         let payment = TokenPayment.fungibleFromAmount(lotteryToken.identifier, "10", lotteryToken.decimals);
         await session.syncUsers([owner]);
-        await createAirdropService(session).sendToEachUser(owner, friends, payment);
+        await createAirdropService(session).sendToEachUser(owner, friends, [payment]);
     });
 
     it("setup", async function () {
