@@ -44,7 +44,7 @@ pub trait EsdtTransferWithFee {
 
         let mut payments_iter = payments.iter();
         while let Some(payment) = payments_iter.next() {
-            let fee_type = self.get_fee_type(&payment);
+            let fee_type = self.token_fee(&payment.token_identifier).get();
             match &fee_type {
                 Fee::ExactValue(fee) => {
                     let next_payment = payments_iter
@@ -59,13 +59,11 @@ pub trait EsdtTransferWithFee {
                         next_payment.amount == fee.amount,
                         "Insufficient payments for covering fees"
                     );
-
-                    self.get_payment_after_fees(fee_type, &next_payment);
+                    let _ = self.get_payment_after_fees(fee_type, &next_payment);
                     new_payments.push(payment);
                 },
                 Fee::Percentage(_) => {
-                    self.get_payment_after_fees(fee_type, &payment);
-                    new_payments.push(payment);
+                    new_payments.push(self.get_payment_after_fees(fee_type, &payment));
                 },
                 Fee::Unset => {
                     new_payments.push(payment);
@@ -93,15 +91,6 @@ pub trait EsdtTransferWithFee {
 
         new_payment.amount -= &fee_payment.amount;
         new_payment
-    }
-
-    fn get_fee_type(&self, payment: &EsdtTokenPayment<Self::Api>) -> Fee<Self::Api> {
-        let fee_mapper = self.token_fee(&payment.token_identifier);
-        if fee_mapper.is_empty() {
-            Fee::Unset
-        } else {
-            fee_mapper.get()
-        }
     }
 
     fn calculate_fee(

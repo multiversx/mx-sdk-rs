@@ -42,7 +42,7 @@
                 "to": "sc:esdt-transfer-with-fee",
                 "function": "setPercentageFee",
                 "arguments": [
-                    "u32:10",
+                    "u32:1000",
                     "str:USDC-aaaaaa"
                 ],
                 "gasLimit": "5,000,000",
@@ -248,7 +248,7 @@
                     "nonce": "5",
                     "balance": "0",
                     "esdt": {
-                        "str:USDC-aaaaaa": "10",
+                        "str:USDC-aaaaaa": "9",
                         "str:WEGLD-012345": "100"
                     },
                     "storage": {}
@@ -269,7 +269,7 @@
                                 }
                             ]
                         },
-                        "str:USDC-aaaaaa": "420",
+                        "str:USDC-aaaaaa": "418",
                         "str:WEGLD-012345": "500"
                     }
                 },
@@ -293,18 +293,18 @@
                     "nonce": "0",
                     "esdt": {
                         "str:USDC-aaaaaa": {
-                            "balance": "10"
+                            "balance": "13"
                         }
                     },
                     "storage": {
-                        "str:token_fee|nested:str:USDC-aaaaaa": "u8:2|u32:10",
+                        "str:token_fee|nested:str:USDC-aaaaaa": "u8:2|u32:1000",
                         "str:token_fee|nested:str:MFNFT-567890": "u8:1|u8:0|nested:str:USDC-aaaaaa|u64:0|biguint:5",
                         "str:token_fee|nested:str:WEGLD-012345": "u8:1|u8:0|nested:str:USDC-aaaaaa|u64:0|biguint:10",
                         "str:paid_fees.info": "u32:1|u32:1|u32:1|u32:1",
                         "str:paid_fees.node_links|u32:1": "u32:0|u32:0",
                         "str:paid_fees.node_id|nested:str:USDC-aaaaaa|u64:0": "1",
                         "str:paid_fees.value|u32:1": "nested:str:USDC-aaaaaa|u64:0",
-                        "str:paid_fees.mapped|nested:str:USDC-aaaaaa|u64:0": "10"
+                        "str:paid_fees.mapped|nested:str:USDC-aaaaaa|u64:0": "13"
                     },
                     "code": "file:../output/esdt-transfer-with-fee.wasm",
                     "owner": "address:owner"
