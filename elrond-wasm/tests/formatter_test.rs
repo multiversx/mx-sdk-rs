@@ -1,32 +1,31 @@
 use core::fmt::Display;
 
-use elrond_wasm::{formatter::*, types::CodeMetadata};
+use elrond_wasm::{api::uncallable::UncallableApi, formatter::*, types::CodeMetadata};
 
 #[derive(Default)]
 struct SimpleReceiver(String);
 
 impl FormatByteReceiver for SimpleReceiver {
+    type Api = UncallableApi;
+
     fn append_bytes(&mut self, bytes: &[u8]) {
         self.0.push_str(core::str::from_utf8(bytes).unwrap());
     }
 
-    fn append_managed_buffer<M: elrond_wasm::api::ManagedTypeApi>(
+    fn append_managed_buffer(&mut self, _item: &elrond_wasm::types::ManagedBuffer<UncallableApi>) {
+        unimplemented!()
+    }
+
+    fn append_managed_buffer_lower_hex(
         &mut self,
-        _item: &elrond_wasm::types::ManagedBuffer<M>,
+        _item: &elrond_wasm::types::ManagedBuffer<UncallableApi>,
     ) {
         unimplemented!()
     }
 
-    fn append_managed_buffer_lower_hex<M: elrond_wasm::api::ManagedTypeApi>(
+    fn append_managed_buffer_binary(
         &mut self,
-        _item: &elrond_wasm::types::ManagedBuffer<M>,
-    ) {
-        unimplemented!()
-    }
-
-    fn append_managed_buffer_binary<M: elrond_wasm::api::ManagedTypeApi>(
-        &mut self,
-        _item: &elrond_wasm::types::ManagedBuffer<M>,
+        _item: &elrond_wasm::types::ManagedBuffer<UncallableApi>,
     ) {
         unimplemented!()
     }
