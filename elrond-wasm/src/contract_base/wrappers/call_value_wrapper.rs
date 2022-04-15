@@ -31,14 +31,15 @@ where
     /// Will return 0 in case of an ESDT transfer (cannot have both EGLD and ESDT transfer simultaneously).
     pub fn egld_value(&self) -> BigUint<A> {
         A::call_value_api_impl().load_egld_value(const_handles::CALL_VALUE_EGLD);
-        BigUint::from_raw_handle(const_handles::CALL_VALUE_EGLD)
+        BigUint::from_raw_handle(const_handles::CALL_VALUE_EGLD) // unsafe, TODO: replace with ManagedRef<...>
     }
 
     /// Returns all ESDT transfers that accompany this SC call.
     /// Will return 0 results if nothing was transfered, or just EGLD.
     /// Fully managed underlying types, very efficient.
     pub fn all_esdt_transfers(&self) -> ManagedVec<A, EsdtTokenPayment<A>> {
-        A::call_value_api_impl().get_all_esdt_transfers()
+        A::call_value_api_impl().load_all_esdt_transfers(const_handles::CALL_VALUE_MULTI_ESDT);
+        ManagedVec::from_raw_handle(const_handles::CALL_VALUE_MULTI_ESDT) // unsafe, TODO: replace with ManagedRef<...>
     }
 
     /// Retrieves the ESDT call value from the VM.
