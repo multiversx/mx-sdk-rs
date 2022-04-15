@@ -8,6 +8,7 @@ pub enum Fee<M>
 where
     M: ManagedTypeApi,
 {
+    Unset,
     ExactValue(EsdtTokenPayment<M>),
     Percentage(u32),
 }

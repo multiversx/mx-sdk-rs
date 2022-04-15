@@ -40,66 +40,84 @@ pub trait EsdtTransferWithFee {
     #[endpoint]
     fn transfer(&self, address: ManagedAddress) {
         let payments = self.call_value().all_esdt_transfers();
+        let mut new_payments = ManagedVec::new();
 
-        let mut fees = ManagedVec::<Self::Api, EsdtTokenPayment<Self::Api>>::new();
-        for payment in &payments {
-            require!(
-                payment.token_identifier != TokenIdentifier::egld(),
-                "Token cannot be EGLD"
-            );
-            let calculated_fees = self.get_fee(payment);
-            if calculated_fees.amount > 0 {
-                fees.push(calculated_fees);
-            }
-        }
-
-        for fee in fees.iter() {
-            let mut perceived_tax = false;
-            for mut payment in &payments {
-                if payment.token_identifier == fee.token_identifier {
+        let mut payments_iter = payments.iter();
+        while let Some(payment) = payments_iter.next() {
+            let fee_type = self.get_fee_type(&payment);
+            match &fee_type {
+                Fee::ExactValue(fee) => {
+                    let next_payment = payments_iter
+                        .next()
+                        .unwrap_or_else(|| sc_panic!("Fee payment missing"));
                     require!(
-                        payment.amount >= fee.amount,
+                        next_payment.token_identifier == fee.token_identifier
+                            && next_payment.token_nonce == fee.token_nonce,
+                        "Fee payment missing"
+                    );
+                    require!(
+                        next_payment.amount == fee.amount,
                         "Insufficient payments for covering fees"
                     );
 
-                    self.paid_fees()
-                        .entry((payment.token_identifier.clone(), payment.token_nonce))
-                        .or_insert(0u64.into())
-                        .update(|value| *value += &fee.amount);
-
-                    payment.amount -= &fee.amount;
-                    perceived_tax = true;
-                    break;
-                }
+                    self.get_payment_after_fees(fee_type, &next_payment);
+                    new_payments.push(payment);
+                },
+                Fee::Percentage(_) => {
+                    self.get_payment_after_fees(fee_type, &payment);
+                    new_payments.push(payment);
+                },
+                Fee::Unset => {
+                    new_payments.push(payment);
+                },
             }
-
-            require!(perceived_tax, "Fee payment missing");
         }
-
-        self.send().direct_multi(&address, &payments, &[]);
+        self.send().direct_multi(&address, &new_payments, &[]);
     }
 
-    fn get_fee(&self, mut payment: EsdtTokenPayment<Self::Api>) -> EsdtTokenPayment<Self::Api> {
+    fn get_payment_after_fees(
+        &self,
+        fee: Fee<Self::Api>,
+        payment: &EsdtTokenPayment<Self::Api>,
+    ) -> EsdtTokenPayment<Self::Api> {
+        let mut new_payment = payment.clone();
+        let fee_payment = self.calculate_fee(&fee, payment.clone());
+
+        self.paid_fees()
+            .entry((
+                new_payment.token_identifier.clone(),
+                new_payment.token_nonce,
+            ))
+            .or_insert(0u64.into())
+            .update(|value| *value += &fee_payment.amount);
+
+        new_payment.amount -= &fee_payment.amount;
+        new_payment
+    }
+
+    fn get_fee_type(&self, payment: &EsdtTokenPayment<Self::Api>) -> Fee<Self::Api> {
         let fee_mapper = self.token_fee(&payment.token_identifier);
         if fee_mapper.is_empty() {
-            payment.amount = 0u64.into();
-            payment
+            Fee::Unset
         } else {
-            self.calculate_fee(fee_mapper.get(), payment)
+            fee_mapper.get()
         }
     }
 
     fn calculate_fee(
         &self,
-        fee: Fee<Self::Api>,
+        fee: &Fee<Self::Api>,
         mut provided: EsdtTokenPayment<Self::Api>,
     ) -> EsdtTokenPayment<Self::Api> {
         match fee {
-            Fee::ExactValue(requested) => requested,
+            Fee::ExactValue(requested) => requested.clone(),
             Fee::Percentage(percentage) => {
-                let calculated_fee_amount = &provided.amount * percentage / PERCENTAGE_DIVISOR;
+                let calculated_fee_amount = &provided.amount * *percentage / PERCENTAGE_DIVISOR;
                 provided.amount = calculated_fee_amount;
-
+                provided
+            },
+            Fee::Unset => {
+                provided.amount = BigUint::zero();
                 provided
             },
         }
