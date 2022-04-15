@@ -236,7 +236,7 @@ where
         item.fmt(self);
     }
 
-    fn append_bytes<T: SCBinary>(&mut self, item: &T) {
+    fn append_binary<T: SCBinary>(&mut self, item: &T) {
         item.fmt(self);
     }
 
