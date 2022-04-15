@@ -75,7 +75,7 @@ impl CryptoApiImpl for VmApiImpl {
         }
     }
 
-    fn sha256(&self, result_handle: Handle, data_handle: Handle) {
+    fn sha256_managed(&self, result_handle: Handle, data_handle: Handle) {
         unsafe {
             managedSha256(data_handle, result_handle);
         }
@@ -90,7 +90,7 @@ impl CryptoApiImpl for VmApiImpl {
         }
     }
 
-    fn keccak256(&self, result_handle: Handle, data_handle: Handle) {
+    fn keccak256_managed(&self, result_handle: Handle, data_handle: Handle) {
         unsafe {
             managedKeccak256(data_handle, result_handle);
         }

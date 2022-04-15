@@ -20,7 +20,7 @@ impl CryptoApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn sha256(&self, _dest: Handle, _data_handle: Handle) {
+    fn sha256_managed(&self, _dest: Handle, _data_handle: Handle) {
         unreachable!()
     }
 
@@ -28,7 +28,7 @@ impl CryptoApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn keccak256(&self, _dest: Handle, _data_handle: Handle) {
+    fn keccak256_managed(&self, _dest: Handle, _data_handle: Handle) {
         unreachable!()
     }
 
