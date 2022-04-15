@@ -5,7 +5,6 @@ use crate::{
     api::{ErrorApiImpl, Handle, InvalidSliceError, ManagedBufferApi, ManagedTypeApi},
     formatter::{
         hex_util::encode_bytes_as_hex, FormatByteReceiver, SCBinary, SCDisplay, SCLowerHex,
-        BINARY_VALUE_PREFIX, HEX_VALUE_PREFIX,
     },
     types::{heap::BoxedBytes, ManagedType},
 };
@@ -345,30 +344,23 @@ impl<M: ManagedTypeApi> crate::abi::TypeAbi for ManagedBuffer<M> {
 
 impl<M: ManagedTypeApi> SCDisplay for ManagedBuffer<M> {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
-        f.append_managed_buffer(self);
+        f.append_managed_buffer(&ManagedBuffer::from_raw_handle(self.get_raw_handle()));
     }
 }
 
 impl<M: ManagedTypeApi> SCLowerHex for ManagedBuffer<M> {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
-        f.append_bytes(HEX_VALUE_PREFIX); // TODO: in Rust thr `0x` prefix appears only when writing "{:#x}", not "{:x}"
-        f.append_managed_buffer_lower_hex(self);
+        // TODO: in Rust thr `0x` prefix appears only when writing "{:#x}", not "{:x}"
+        f.append_managed_buffer_lower_hex(&ManagedBuffer::from_raw_handle(self.get_raw_handle()));
     }
 }
 
 impl<M: ManagedTypeApi> SCBinary for ManagedBuffer<M> {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
-        f.append_bytes(BINARY_VALUE_PREFIX); // TODO: in Rust thr `0b` prefix appears only when writing "{:#x}", not "{:x}"
-        f.append_managed_buffer_binary(self);
+        // TODO: in Rust thr `0b` prefix appears only when writing "{:#x}", not "{:x}"
+        f.append_managed_buffer_binary(&ManagedBuffer::from_raw_handle(self.get_raw_handle()));
     }
 }
-
-// impl<M: ManagedTypeApi> SCCodec for ManagedBuffer<M> {
-//     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
-//         f.append_bytes(HEX_VALUE_PREFIX); // TODO: in Rust thr `0x` prefix appears only when writing "{:#x}", not "{:x}"
-//         f.append_managed_buffer_codec(self);
-//     }
-// }
 
 impl<M: ManagedTypeApi> core::fmt::Debug for ManagedBuffer<M> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {

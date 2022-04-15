@@ -66,13 +66,18 @@ pub trait FormattedMessageFeatures {
     }
 
     #[endpoint]
-    fn print_message_hex(&self, x: u32) {
+    fn print_message_hex(&self, x: i32) {
         sc_print!("Printing x: {:x}", x,);
     }
 
     #[endpoint]
     fn print_message_binary(&self, x: u32) {
         sc_print!("Printing x: {:b}", x);
+    }
+
+    #[endpoint]
+    fn print_message_codec(&self, x: i32) {
+        sc_print!("Printing x: {:c}", x);
     }
 
     #[endpoint]

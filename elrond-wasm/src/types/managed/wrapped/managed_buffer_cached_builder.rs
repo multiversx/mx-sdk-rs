@@ -6,7 +6,7 @@ use crate::{
         hex_util::{byte_to_bin_digit, byte_to_hex_digits},
         FormatBuffer, FormatByteReceiver, SCBinary, SCCodec, SCDisplay, SCLowerHex,
     },
-    types::{BigInt, BigUint, ManagedBuffer, ManagedType, StaticBufferRef},
+    types::{BigInt, BigUint, ManagedBuffer, StaticBufferRef},
 };
 
 const HEX_CONVERSION_BUFFER_LEN: usize = 32;
@@ -201,20 +201,22 @@ impl<M> FormatByteReceiver for ManagedBufferCachedBuilder<M>
 where
     M: ManagedTypeApi,
 {
+    type Api = M;
+
     fn append_bytes(&mut self, bytes: &[u8]) {
         self.append_bytes(bytes)
     }
 
-    fn append_managed_buffer<A: ManagedTypeApi>(&mut self, item: &ManagedBuffer<A>) {
-        self.append_managed_buffer(&ManagedBuffer::from_raw_handle(item.get_raw_handle()))
+    fn append_managed_buffer(&mut self, item: &ManagedBuffer<M>) {
+        self.append_managed_buffer(item)
     }
 
-    fn append_managed_buffer_lower_hex<A: ManagedTypeApi>(&mut self, item: &ManagedBuffer<A>) {
-        self.append_managed_buffer_hex(&ManagedBuffer::from_raw_handle(item.get_raw_handle()))
+    fn append_managed_buffer_lower_hex(&mut self, item: &ManagedBuffer<M>) {
+        self.append_managed_buffer_hex(item)
     }
 
-    fn append_managed_buffer_binary<A: ManagedTypeApi>(&mut self, item: &ManagedBuffer<A>) {
-        self.append_managed_buffer_binary(&ManagedBuffer::from_raw_handle(item.get_raw_handle()))
+    fn append_managed_buffer_binary(&mut self, item: &ManagedBuffer<M>) {
+        self.append_managed_buffer_binary(item)
     }
 }
 
