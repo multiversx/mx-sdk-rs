@@ -24,7 +24,7 @@ macro_rules! binary_operator {
 
             fn $method(self, other: &BigInt<M>) -> BigInt<M> {
                 let api = M::managed_type_impl();
-                let handle = M::static_var_api_impl().next_bigint_handle();
+                let handle = M::static_var_api_impl().next_handle();
                 M::managed_type_impl().bi_set_int64(handle, 0);
                 api.$api_func(handle, self.handle, other.handle);
                 BigInt::from_raw_handle(handle)
@@ -70,7 +70,7 @@ impl<M: ManagedTypeApi> Neg for BigInt<M> {
 
     fn neg(self) -> Self::Output {
         let api = M::managed_type_impl();
-        let handle = M::static_var_api_impl().next_bigint_handle();
+        let handle = M::static_var_api_impl().next_handle();
         M::managed_type_impl().bi_set_int64(handle, 0);
         api.bi_neg(handle, self.handle);
         BigInt::from_raw_handle(handle)

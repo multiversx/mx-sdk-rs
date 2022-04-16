@@ -30,17 +30,10 @@ impl StaticVarApiImpl for DebugApi {
             .external_view_target_address_handle
     }
 
-    fn next_bigint_handle(&self) -> Handle {
+    fn next_handle(&self) -> Handle {
         let mut ref_tx_static_vars = self.static_vars_cell.borrow_mut();
-        let new_handle = ref_tx_static_vars.next_big_int_handle;
-        ref_tx_static_vars.next_big_int_handle -= 1;
-        new_handle
-    }
-
-    fn next_managed_buffer_handle(&self) -> Handle {
-        let mut ref_tx_static_vars = self.static_vars_cell.borrow_mut();
-        let new_handle = ref_tx_static_vars.next_managed_buffer_handle;
-        ref_tx_static_vars.next_managed_buffer_handle -= 1;
+        let new_handle = ref_tx_static_vars.next_handle;
+        ref_tx_static_vars.next_handle -= 1;
         new_handle
     }
 }

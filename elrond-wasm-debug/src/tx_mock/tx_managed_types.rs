@@ -70,16 +70,14 @@ impl Default for TxManagedTypes {
 #[derive(Debug)]
 pub struct TxStaticVars {
     pub(crate) external_view_target_address_handle: Handle,
-    pub(crate) next_big_int_handle: Handle,
-    pub(crate) next_managed_buffer_handle: Handle,
+    pub(crate) next_handle: Handle,
 }
 
 impl Default for TxStaticVars {
     fn default() -> Self {
         TxStaticVars {
             external_view_target_address_handle: 0,
-            next_big_int_handle: const_handles::BIG_INT_START_FROM,
-            next_managed_buffer_handle: const_handles::MANAGED_BUFFER_START_FROM,
+            next_handle: const_handles::NEW_HANDLE_START_FROM,
         }
     }
 }

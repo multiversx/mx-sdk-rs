@@ -73,5 +73,5 @@ fn test_managed_vec_format() {
     mv.push(BigUint::from(1u32));
     mv.push(BigUint::from(2u32));
     let s = format!("{:?}", &mv);
-    assert_eq!("[BigUint { handle: -100, hex-value-be: \"01\" }, BigUint { handle: -101, hex-value-be: \"02\" }]", s);
+    assert_eq!("[BigUint { handle: -101, hex-value-be: \"01\" }, BigUint { handle: -102, hex-value-be: \"02\" }]", s);
 }

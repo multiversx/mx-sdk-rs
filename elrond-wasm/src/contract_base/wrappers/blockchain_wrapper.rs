@@ -44,7 +44,7 @@ where
 
     #[inline]
     pub fn get_caller(&self) -> ManagedAddress<A> {
-        let handle = A::static_var_api_impl().next_managed_buffer_handle();
+        let handle = A::static_var_api_impl().next_handle();
         A::blockchain_api_impl().load_caller_managed(handle);
         ManagedAddress::from_raw_handle(handle)
     }
@@ -57,7 +57,7 @@ where
 
     #[inline]
     pub fn get_sc_address(&self) -> ManagedAddress<A> {
-        let handle = A::static_var_api_impl().next_managed_buffer_handle();
+        let handle = A::static_var_api_impl().next_handle();
         A::blockchain_api_impl().load_sc_address_managed(handle);
         ManagedAddress::from_raw_handle(handle)
     }
@@ -70,7 +70,7 @@ where
 
     #[inline]
     pub fn get_owner_address(&self) -> ManagedAddress<A> {
-        let handle = A::static_var_api_impl().next_managed_buffer_handle();
+        let handle = A::static_var_api_impl().next_handle();
         A::blockchain_api_impl().load_owner_address_managed(handle);
         ManagedAddress::from_raw_handle(handle)
     }
@@ -106,14 +106,14 @@ where
     #[cfg(feature = "alloc")]
     #[inline]
     pub fn get_balance_legacy(&self, address: &crate::types::Address) -> BigUint<A> {
-        let handle = A::static_var_api_impl().next_bigint_handle();
+        let handle = A::static_var_api_impl().next_handle();
         A::blockchain_api_impl().load_balance_legacy(handle, address);
         BigUint::from_raw_handle(handle)
     }
 
     #[inline]
     pub fn get_balance(&self, address: &ManagedAddress<A>) -> BigUint<A> {
-        let handle = A::static_var_api_impl().next_bigint_handle();
+        let handle = A::static_var_api_impl().next_handle();
         A::blockchain_api_impl().load_balance(handle, address.get_raw_handle());
         BigUint::from_raw_handle(handle)
     }
@@ -187,7 +187,7 @@ where
 
     // #[inline]
     // pub fn get_block_random_seed(&self) -> ManagedByteArray<A, 48> {
-    //     let handle = A::static_var_api_impl().next_managed_buffer_handle();
+    //     let handle = A::static_var_api_impl().next_handle();
     //     A::blockchain_api_impl().load_block_random_seed(handle);
     //     ManagedByteArray::from_raw_handle(handle)
     // }

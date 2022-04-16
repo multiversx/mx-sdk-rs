@@ -30,7 +30,7 @@ where
         &self,
         data: B,
     ) -> ManagedByteArray<A, SHA256_RESULT_LEN> {
-        let new_handle = A::static_var_api_impl().next_managed_buffer_handle();
+        let new_handle = A::static_var_api_impl().next_handle();
         A::crypto_api_impl().sha256_managed(new_handle, data.borrow().get_raw_handle());
         ManagedByteArray::from_raw_handle(new_handle)
     }
@@ -57,7 +57,7 @@ where
         &self,
         data: B,
     ) -> ManagedByteArray<A, KECCAK256_RESULT_LEN> {
-        let new_handle = A::static_var_api_impl().next_managed_buffer_handle();
+        let new_handle = A::static_var_api_impl().next_handle();
         A::crypto_api_impl().keccak256_managed(new_handle, data.borrow().get_raw_handle());
         ManagedByteArray::from_raw_handle(new_handle)
     }

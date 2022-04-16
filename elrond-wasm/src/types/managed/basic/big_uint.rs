@@ -58,7 +58,7 @@ macro_rules! big_uint_conv_num {
         impl<M: ManagedTypeApi> From<$num_ty> for BigUint<M> {
             #[inline]
             fn from(value: $num_ty) -> Self {
-                let handle = M::static_var_api_impl().next_bigint_handle();
+                let handle = M::static_var_api_impl().next_handle();
                 M::managed_type_impl().bi_set_int64(handle, value as i64);
                 BigUint::from_raw_handle(handle)
             }
@@ -90,7 +90,7 @@ impl<M: ManagedTypeApi> Default for BigUint<M> {
 impl<M: ManagedTypeApi> BigUint<M> {
     #[inline]
     pub fn zero() -> Self {
-        let handle = M::static_var_api_impl().next_bigint_handle();
+        let handle = M::static_var_api_impl().next_handle();
         M::managed_type_impl().bi_set_int64(handle, 0);
         BigUint::from_raw_handle(handle)
     }
@@ -104,7 +104,7 @@ impl<M: ManagedTypeApi> BigUint<M> {
     #[inline]
     pub fn from_bytes_be(bytes: &[u8]) -> Self {
         let api = M::managed_type_impl();
-        let handle = M::static_var_api_impl().next_bigint_handle();
+        let handle = M::static_var_api_impl().next_handle();
         M::managed_type_impl().bi_set_int64(handle, 0);
         api.bi_set_unsigned_bytes(handle, bytes);
         BigUint {
@@ -143,7 +143,7 @@ impl<M: ManagedTypeApi> BigUint<M> {
     #[must_use]
     pub fn sqrt(&self) -> Self {
         let api = M::managed_type_impl();
-        let handle = M::static_var_api_impl().next_bigint_handle();
+        let handle = M::static_var_api_impl().next_handle();
         M::managed_type_impl().bi_set_int64(handle, 0);
         api.bi_sqrt(handle, self.handle);
         BigUint {
@@ -155,9 +155,9 @@ impl<M: ManagedTypeApi> BigUint<M> {
     #[must_use]
     pub fn pow(&self, exp: u32) -> Self {
         let api = M::managed_type_impl();
-        let handle = M::static_var_api_impl().next_bigint_handle();
+        let handle = M::static_var_api_impl().next_handle();
         M::managed_type_impl().bi_set_int64(handle, 0);
-        let exp_handle = M::static_var_api_impl().next_bigint_handle();
+        let exp_handle = M::static_var_api_impl().next_handle();
         M::managed_type_impl().bi_set_int64(handle, exp as i64);
         api.bi_pow(handle, self.handle, exp_handle);
         BigUint {
@@ -176,7 +176,7 @@ impl<M: ManagedTypeApi> BigUint<M> {
 impl<M: ManagedTypeApi> Clone for BigUint<M> {
     fn clone(&self) -> Self {
         let api = M::managed_type_impl();
-        let clone_handle = M::static_var_api_impl().next_bigint_handle();
+        let clone_handle = M::static_var_api_impl().next_handle();
         M::managed_type_impl().bi_set_int64(clone_handle, 0);
         api.bi_add(clone_handle, clone_handle, self.handle);
         BigUint {

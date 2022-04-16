@@ -14,5 +14,4 @@ pub const CALL_VALUE_SINGLE_ESDT_TOKEN_NAME: Handle = -22;
 pub const MBUF_TEMPORARY_1: Handle = -25;
 pub const MBUF_TEMPORARY_2: Handle = -26;
 
-pub const BIG_INT_START_FROM: Handle = -100; // > -100 reserved for APIs
-pub const MANAGED_BUFFER_START_FROM: Handle = BIG_INT_START_FROM;
+pub const NEW_HANDLE_START_FROM: Handle = -100; // > -100 reserved for APIs

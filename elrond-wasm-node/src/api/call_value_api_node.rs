@@ -95,7 +95,7 @@ impl CallValueApiImpl for VmApiImpl {
 
     fn esdt_value_by_index(&self, index: usize) -> Handle {
         unsafe {
-            let value_handle = self.next_bigint_handle();
+            let value_handle = self.next_handle();
             bigIntGetESDTCallValueByIndex(value_handle, index as i32);
             value_handle
         }
