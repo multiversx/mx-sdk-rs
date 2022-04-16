@@ -9,7 +9,7 @@ use crate::{
     err_msg,
     types::{
         AsyncCall, BigUint, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer,
-        ManagedType, ManagedVec, TokenIdentifier,
+        ManagedVec, TokenIdentifier,
     },
     ArgErrorHandler, ArgId, ManagedResultArgLoader,
 };
@@ -239,9 +239,7 @@ where
                 }
 
                 // nft transfer is sent to self, sender = receiver
-                let recipient_addr = ManagedAddress::from_raw_handle(
-                    SA::blockchain_api_impl().get_sc_address_handle(),
-                );
+                let recipient_addr = BlockchainWrapper::<SA>::new().get_sc_address();
                 let zero = BigUint::zero();
                 let endpoint_name = ManagedBuffer::new_from_bytes(ESDT_NFT_TRANSFER_FUNC_NAME);
 

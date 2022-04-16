@@ -151,6 +151,23 @@ impl BlockchainApi for VmApiImpl {
 
 impl BlockchainApiImpl for VmApiImpl {
     #[inline]
+    fn get_caller_legacy(&self) -> Address {
+        unsafe {
+            let mut res = Address::zero();
+            getCaller(res.as_mut_ptr());
+            res
+        }
+    }
+
+    #[inline]
+    #[cfg(not(feature = "ei-unmanaged"))]
+    fn load_caller_managed(&self, dest: Handle) {
+        unsafe {
+            managedCaller(dest);
+        }
+    }
+
+    #[inline]
     fn get_sc_address_legacy(&self) -> Address {
         unsafe {
             let mut res = Address::zero();
@@ -161,11 +178,9 @@ impl BlockchainApiImpl for VmApiImpl {
 
     #[inline]
     #[cfg(not(feature = "ei-unmanaged"))]
-    fn get_sc_address_handle(&self) -> Handle {
+    fn load_sc_address_managed(&self, dest: Handle) {
         unsafe {
-            let handle = mBufferNew();
-            managedSCAddress(handle);
-            handle
+            managedSCAddress(dest);
         }
     }
 
@@ -180,11 +195,9 @@ impl BlockchainApiImpl for VmApiImpl {
 
     #[inline]
     #[cfg(not(feature = "ei-unmanaged"))]
-    fn get_owner_address_handle(&self) -> Handle {
+    fn load_owner_address_managed(&self, dest: Handle) {
         unsafe {
-            let handle = mBufferNew();
-            managedOwnerAddress(handle);
-            handle
+            managedOwnerAddress(dest);
         }
     }
 
@@ -209,37 +222,16 @@ impl BlockchainApiImpl for VmApiImpl {
     }
 
     #[inline]
-    fn get_caller_legacy(&self) -> Address {
+    fn load_balance_legacy(&self, dest: Handle, address: &Address) {
         unsafe {
-            let mut res = Address::zero();
-            getCaller(res.as_mut_ptr());
-            res
+            bigIntGetExternalBalance(address.as_ref().as_ptr(), dest);
         }
     }
 
     #[inline]
-    #[cfg(not(feature = "ei-unmanaged"))]
-    fn get_caller_handle(&self) -> Handle {
+    fn load_balance(&self, dest: Handle, address_handle: Handle) {
         unsafe {
-            let handle = mBufferNew();
-            managedCaller(handle);
-            handle
-        }
-    }
-
-    fn get_balance_legacy(&self, address: &Address) -> Handle {
-        unsafe {
-            let balance_handle = self.next_bigint_handle();
-            bigIntGetExternalBalance(address.as_ref().as_ptr(), balance_handle);
-            balance_handle
-        }
-    }
-
-    fn get_balance_handle(&self, address_handle: Handle) -> Handle {
-        unsafe {
-            let balance_handle = self.next_bigint_handle();
-            bigIntGetExternalBalance(unsafe_buffer_load_address(address_handle), balance_handle);
-            balance_handle
+            bigIntGetExternalBalance(unsafe_buffer_load_address(address_handle), dest);
         }
     }
 

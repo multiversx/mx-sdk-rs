@@ -1,8 +1,8 @@
 use crate::{error_hook, VmApiImpl};
 use elrond_wasm::{
     api::{
-        BlockchainApi, BlockchainApiImpl, Handle, ManagedTypeApi, SendApiImpl, StorageReadApiImpl,
-        StorageWriteApiImpl,
+        const_handles, BlockchainApi, BlockchainApiImpl, Handle, ManagedTypeApi, SendApiImpl,
+        StorageReadApiImpl, StorageWriteApiImpl,
     },
     types::{
         BigUint, CodeMetadata, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer,
@@ -533,11 +533,12 @@ impl SendApiImpl for VmApiImpl {
         arg_buffer: &ManagedArgBuffer<M>,
     ) -> ManagedVec<M, ManagedBuffer<M>> {
         // account-level built-in function, so the destination address is the contract itself
-        let own_address = VmApiImpl::blockchain_api_impl().get_sc_address_handle();
+        let own_address_handle = const_handles::MBUF_TEMPORARY_1;
+        VmApiImpl::blockchain_api_impl().load_sc_address_managed(own_address_handle);
 
         self.execute_on_dest_context_raw(
             gas,
-            &ManagedAddress::from_raw_handle(own_address),
+            &ManagedAddress::from_raw_handle(own_address_handle),
             &BigUint::zero(),
             function_name,
             arg_buffer,
