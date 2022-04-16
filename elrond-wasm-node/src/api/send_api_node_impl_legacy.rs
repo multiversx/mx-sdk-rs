@@ -3,7 +3,7 @@ use alloc::vec::Vec;
 use elrond_wasm::{
     api::{
         const_handles, BlockchainApi, BlockchainApiImpl, ManagedTypeApi, SendApiImpl,
-        StorageReadApiImpl, StorageWriteApiImpl,
+        StaticVarApiImpl, StorageReadApiImpl, StorageWriteApiImpl,
     },
     types::{
         heap::{Address, ArgBuffer, BoxedBytes},
@@ -681,15 +681,15 @@ impl SendApiImpl for VmApiImpl {
     }
 
     fn storage_store_tx_hash_key<M: ManagedTypeApi>(&self, data: &ManagedBuffer<M>) {
-        let tx_hash = self.get_tx_hash::<M>();
-        self.storage_store_managed_buffer_raw(tx_hash.get_raw_handle(), data.get_raw_handle());
+        let tx_hash_handle = self.next_handle();
+        self.load_tx_hash_managed(tx_hash_handle);
+        self.storage_store_managed_buffer_raw(tx_hash_handle, data.get_raw_handle());
     }
 
     fn storage_load_tx_hash_key<M: ManagedTypeApi>(&self) -> ManagedBuffer<M> {
-        let tx_hash = self.get_tx_hash::<M>();
-        ManagedBuffer::from_raw_handle(
-            self.storage_load_managed_buffer_raw(tx_hash.get_raw_handle()),
-        )
+        let tx_hash_handle = self.next_handle();
+        self.load_tx_hash_managed(tx_hash_handle);
+        ManagedBuffer::from_raw_handle(self.storage_load_managed_buffer_raw(tx_hash_handle))
     }
 
     fn call_local_esdt_built_in_function<M: ManagedTypeApi>(

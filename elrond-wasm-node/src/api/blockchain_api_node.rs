@@ -246,13 +246,9 @@ impl BlockchainApiImpl for VmApiImpl {
 
     #[inline]
     #[cfg(not(feature = "ei-unmanaged"))]
-    fn get_state_root_hash<M: ManagedTypeApi>(
-        &self,
-    ) -> elrond_wasm::types::ManagedByteArray<M, 32> {
+    fn load_state_root_hash_managed(&self, dest: Handle) {
         unsafe {
-            let result_handle = mBufferNew();
-            managedGetStateRootHash(result_handle);
-            elrond_wasm::types::ManagedByteArray::from_raw_handle(result_handle)
+            managedGetStateRootHash(dest);
         }
     }
 
@@ -267,11 +263,9 @@ impl BlockchainApiImpl for VmApiImpl {
 
     #[inline]
     #[cfg(not(feature = "ei-unmanaged"))]
-    fn get_tx_hash<M: ManagedTypeApi>(&self) -> elrond_wasm::types::ManagedByteArray<M, 32> {
+    fn load_tx_hash_managed(&self, dest: Handle) {
         unsafe {
-            let result_handle = mBufferNew();
-            managedGetOriginalTxHash(result_handle);
-            elrond_wasm::types::ManagedByteArray::from_raw_handle(result_handle)
+            managedGetOriginalTxHash(dest);
         }
     }
 
@@ -311,13 +305,9 @@ impl BlockchainApiImpl for VmApiImpl {
 
     #[inline]
     #[cfg(not(feature = "ei-unmanaged"))]
-    fn get_block_random_seed<M: ManagedTypeApi>(
-        &self,
-    ) -> elrond_wasm::types::ManagedByteArray<M, 48> {
+    fn load_block_random_seed_managed(&self, dest: Handle) {
         unsafe {
-            let result_handle = mBufferNew();
-            managedGetBlockRandomSeed(result_handle);
-            elrond_wasm::types::ManagedByteArray::from_raw_handle(result_handle)
+            managedGetBlockRandomSeed(dest);
         }
     }
 
@@ -352,13 +342,9 @@ impl BlockchainApiImpl for VmApiImpl {
 
     #[inline]
     #[cfg(not(feature = "ei-unmanaged"))]
-    fn get_prev_block_random_seed<M: ManagedTypeApi>(
-        &self,
-    ) -> elrond_wasm::types::ManagedByteArray<M, 48> {
+    fn load_prev_block_random_seed_managed(&self, dest: Handle) {
         unsafe {
-            let result_handle = mBufferNew();
-            managedGetPrevBlockRandomSeed(result_handle);
-            elrond_wasm::types::ManagedByteArray::from_raw_handle(result_handle)
+            managedGetPrevBlockRandomSeed(dest);
         }
     }
 
