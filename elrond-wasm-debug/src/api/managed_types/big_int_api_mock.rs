@@ -56,6 +56,13 @@ macro_rules! unary_op_method {
     };
 }
 
+impl DebugApi {
+    pub(crate) fn bi_overwrite(&self, destination: Handle, value: num_bigint::BigInt) {
+        let mut managed_types = self.m_types_borrow_mut();
+        managed_types.big_int_map.insert(destination, value);
+    }
+}
+
 impl BigIntApi for DebugApi {
     #[allow(dead_code)]
     fn bi_new(&self, value: i64) -> Handle {
@@ -66,10 +73,7 @@ impl BigIntApi for DebugApi {
     }
 
     fn bi_set_int64(&self, destination: Handle, value: i64) {
-        let mut managed_types = self.m_types_borrow_mut();
-        managed_types
-            .big_int_map
-            .insert(destination, num_bigint::BigInt::from(value));
+        self.bi_overwrite(destination, num_bigint::BigInt::from(value))
     }
 
     fn bi_unsigned_byte_length(&self, handle: Handle) -> usize {

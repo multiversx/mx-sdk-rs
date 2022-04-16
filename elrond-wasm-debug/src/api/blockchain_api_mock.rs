@@ -4,7 +4,7 @@ use crate::{
     DebugApi,
 };
 use elrond_wasm::{
-    api::{BlockchainApi, BlockchainApiImpl, Handle, ManagedBufferApi, ManagedTypeApi},
+    api::{BlockchainApi, BlockchainApiImpl, Handle, ManagedTypeApi},
     types::{
         heap::{Address, H256},
         BigUint, EsdtLocalRole, EsdtLocalRoleFlags, EsdtTokenData, EsdtTokenType, ManagedAddress,
@@ -46,13 +46,13 @@ impl BlockchainApiImpl for DebugApi {
         is_smart_contract_address(address)
     }
 
-    fn get_balance_legacy(&self, address: &Address) -> Handle {
+    fn load_balance_legacy(&self, dest: Handle, address: &Address) {
         assert!(
             address == &self.get_sc_address_legacy(),
             "get balance not yet implemented for accounts other than the contract itself"
         );
         let egld_balance = self.with_contract_account(|account| account.egld_balance.clone());
-        self.insert_new_big_uint(egld_balance)
+        self.bi_overwrite(dest, egld_balance.into());
     }
 
     fn get_state_root_hash_legacy(&self) -> H256 {
@@ -119,7 +119,7 @@ impl BlockchainApiImpl for DebugApi {
         token: &TokenIdentifier<M>,
     ) -> u64 {
         assert!(
-            self.mb_eq(address.get_raw_handle(), self.get_sc_address_handle()),
+            address.to_address() == self.get_sc_address_legacy(),
             "get_current_esdt_nft_nonce not yet implemented for accounts other than the contract itself"
         );
 
@@ -138,7 +138,7 @@ impl BlockchainApiImpl for DebugApi {
         nonce: u64,
     ) -> BigUint<M> {
         assert!(
-            self.mb_eq(address.get_raw_handle(), self.get_sc_address_handle()),
+            address.to_address() == self.get_sc_address_legacy(),
             "get_esdt_balance not yet implemented for accounts other than the contract itself"
         );
 

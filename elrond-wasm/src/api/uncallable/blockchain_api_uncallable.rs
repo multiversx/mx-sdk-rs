@@ -39,7 +39,7 @@ impl BlockchainApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn get_balance_legacy(&self, _address: &Address) -> Handle {
+    fn load_balance_legacy(&self, _dest: Handle, _address: &Address) {
         unreachable!()
     }
 

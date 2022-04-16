@@ -19,20 +19,20 @@ pub trait BlockchainApi: ManagedTypeApi {
 pub trait BlockchainApiImpl: ManagedTypeApiImpl {
     fn get_caller_legacy(&self) -> Address;
 
-    fn get_caller_handle(&self) -> Handle {
-        self.mb_new_from_bytes(self.get_caller_legacy().as_bytes())
+    fn load_caller_managed(&self, dest: Handle) {
+        self.mb_overwrite(dest, self.get_caller_legacy().as_bytes());
     }
 
     fn get_sc_address_legacy(&self) -> Address;
 
-    fn get_sc_address_handle(&self) -> Handle {
-        self.mb_new_from_bytes(self.get_sc_address_legacy().as_bytes())
+    fn load_sc_address_managed(&self, dest: Handle) {
+        self.mb_overwrite(dest, self.get_sc_address_legacy().as_bytes())
     }
 
     fn get_owner_address_legacy(&self) -> Address;
 
-    fn get_owner_address_handle(&self) -> Handle {
-        self.mb_new_from_bytes(self.get_owner_address_legacy().as_bytes())
+    fn load_owner_address_managed(&self, dest: Handle) {
+        self.mb_overwrite(dest, self.get_owner_address_legacy().as_bytes())
     }
 
     fn get_shard_of_address_legacy(&self, address: &Address) -> u32;
@@ -51,12 +51,12 @@ pub trait BlockchainApiImpl: ManagedTypeApiImpl {
         self.is_smart_contract_legacy(&address)
     }
 
-    fn get_balance_legacy(&self, address: &Address) -> Handle;
+    fn load_balance_legacy(&self, dest: Handle, address: &Address);
 
-    fn get_balance_handle(&self, address_handle: Handle) -> Handle {
+    fn load_balance(&self, dest: Handle, address_handle: Handle) {
         let mut address = Address::zero();
         let _ = self.mb_load_slice(address_handle, 0, address.as_mut());
-        self.get_balance_legacy(&address)
+        self.load_balance_legacy(dest, &address);
     }
 
     fn get_state_root_hash_legacy(&self) -> H256;

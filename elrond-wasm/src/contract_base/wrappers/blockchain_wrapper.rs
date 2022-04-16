@@ -2,8 +2,8 @@ use core::marker::PhantomData;
 
 use crate::{
     api::{
-        BlockchainApi, BlockchainApiImpl, ErrorApi, ErrorApiImpl, ManagedTypeApi, StorageReadApi,
-        StorageReadApiImpl,
+        BlockchainApi, BlockchainApiImpl, ErrorApi, ErrorApiImpl, ManagedTypeApi, StaticVarApiImpl,
+        StorageReadApi, StorageReadApiImpl,
     },
     storage::{self},
     types::{
@@ -44,7 +44,9 @@ where
 
     #[inline]
     pub fn get_caller(&self) -> ManagedAddress<A> {
-        ManagedAddress::from_raw_handle(A::blockchain_api_impl().get_caller_handle())
+        let handle = A::static_var_api_impl().next_managed_buffer_handle();
+        A::blockchain_api_impl().load_caller_managed(handle);
+        ManagedAddress::from_raw_handle(handle)
     }
 
     #[cfg(feature = "alloc")]
@@ -55,7 +57,9 @@ where
 
     #[inline]
     pub fn get_sc_address(&self) -> ManagedAddress<A> {
-        ManagedAddress::from_raw_handle(A::blockchain_api_impl().get_sc_address_handle())
+        let handle = A::static_var_api_impl().next_managed_buffer_handle();
+        A::blockchain_api_impl().load_sc_address_managed(handle);
+        ManagedAddress::from_raw_handle(handle)
     }
 
     #[cfg(feature = "alloc")]
@@ -66,7 +70,9 @@ where
 
     #[inline]
     pub fn get_owner_address(&self) -> ManagedAddress<A> {
-        ManagedAddress::from_raw_handle(A::blockchain_api_impl().get_owner_address_handle())
+        let handle = A::static_var_api_impl().next_managed_buffer_handle();
+        A::blockchain_api_impl().load_owner_address_managed(handle);
+        ManagedAddress::from_raw_handle(handle)
     }
 
     pub fn check_caller_is_owner(&self) {
@@ -100,14 +106,16 @@ where
     #[cfg(feature = "alloc")]
     #[inline]
     pub fn get_balance_legacy(&self, address: &crate::types::Address) -> BigUint<A> {
-        BigUint::from_raw_handle(A::blockchain_api_impl().get_balance_legacy(address))
+        let handle = A::static_var_api_impl().next_bigint_handle();
+        A::blockchain_api_impl().load_balance_legacy(handle, address);
+        BigUint::from_raw_handle(handle)
     }
 
     #[inline]
     pub fn get_balance(&self, address: &ManagedAddress<A>) -> BigUint<A> {
-        BigUint::from_raw_handle(
-            A::blockchain_api_impl().get_balance_handle(address.get_raw_handle()),
-        )
+        let handle = A::static_var_api_impl().next_bigint_handle();
+        A::blockchain_api_impl().load_balance(handle, address.get_raw_handle());
+        BigUint::from_raw_handle(handle)
     }
 
     #[inline]
@@ -176,6 +184,13 @@ where
     pub fn get_block_random_seed(&self) -> ManagedByteArray<A, 48> {
         A::blockchain_api_impl().get_block_random_seed::<A>()
     }
+
+    // #[inline]
+    // pub fn get_block_random_seed(&self) -> ManagedByteArray<A, 48> {
+    //     let handle = A::static_var_api_impl().next_managed_buffer_handle();
+    //     A::blockchain_api_impl().load_block_random_seed(handle);
+    //     ManagedByteArray::from_raw_handle(handle)
+    // }
 
     #[inline]
     pub fn get_prev_block_timestamp(&self) -> u64 {
