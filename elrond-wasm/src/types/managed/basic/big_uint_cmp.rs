@@ -38,7 +38,7 @@ fn cmp_i64<M: ManagedTypeApi>(bi: &BigUint<M>, other: i64) -> Ordering {
             crate::api::Sign::Minus => Ordering::Less,
         }
     } else {
-        let handle = M::static_var_api_impl().next_bigint_handle();
+        let handle = M::static_var_api_impl().next_handle();
         M::managed_type_impl().bi_set_int64(handle, other as i64);
         api.bi_cmp(bi.handle, handle)
     }

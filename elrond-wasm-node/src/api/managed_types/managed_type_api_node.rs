@@ -27,7 +27,7 @@ impl ManagedTypeApiImpl for VmApiImpl {
     #[inline]
     fn mb_to_big_int_unsigned(&self, buffer_handle: Handle) -> Handle {
         unsafe {
-            let big_int_handle = self.next_bigint_handle();
+            let big_int_handle = self.next_handle();
             mBufferToBigIntUnsigned(buffer_handle, big_int_handle);
             big_int_handle
         }
@@ -36,7 +36,7 @@ impl ManagedTypeApiImpl for VmApiImpl {
     #[inline]
     fn mb_to_big_int_signed(&self, buffer_handle: Handle) -> Handle {
         unsafe {
-            let big_int_handle = self.next_bigint_handle();
+            let big_int_handle = self.next_handle();
             mBufferToBigIntSigned(buffer_handle, big_int_handle);
             big_int_handle
         }
