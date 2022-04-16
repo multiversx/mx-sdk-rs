@@ -1,7 +1,7 @@
 use super::{Handle, ManagedTypeApi, ManagedTypeApiImpl};
 use crate::types::{
     heap::{Address, Box, H256},
-    BigUint, EsdtLocalRoleFlags, EsdtTokenData, ManagedAddress, ManagedByteArray, TokenIdentifier,
+    BigUint, EsdtLocalRoleFlags, EsdtTokenData, ManagedAddress, TokenIdentifier,
 };
 
 pub trait BlockchainApi: ManagedTypeApi {
@@ -61,15 +61,14 @@ pub trait BlockchainApiImpl: ManagedTypeApiImpl {
 
     fn get_state_root_hash_legacy(&self) -> H256;
 
-    #[inline]
-    fn get_state_root_hash<M: ManagedTypeApi>(&self) -> ManagedByteArray<M, 32> {
-        ManagedByteArray::new_from_bytes(self.get_state_root_hash_legacy().as_array())
+    fn load_state_root_hash_managed(&self, dest: Handle) {
+        self.mb_overwrite(dest, self.get_state_root_hash_legacy().as_bytes());
     }
 
     fn get_tx_hash_legacy(&self) -> H256;
 
-    fn get_tx_hash<M: ManagedTypeApi>(&self) -> ManagedByteArray<M, 32> {
-        ManagedByteArray::new_from_bytes(self.get_tx_hash_legacy().as_array())
+    fn load_tx_hash_managed(&self, dest: Handle) {
+        self.mb_overwrite(dest, self.get_tx_hash_legacy().as_bytes());
     }
 
     fn get_gas_left(&self) -> u64;
@@ -84,8 +83,8 @@ pub trait BlockchainApiImpl: ManagedTypeApiImpl {
 
     fn get_block_random_seed_legacy(&self) -> Box<[u8; 48]>;
 
-    fn get_block_random_seed<M: ManagedTypeApi>(&self) -> ManagedByteArray<M, 48> {
-        ManagedByteArray::new_from_bytes(&*self.get_block_random_seed_legacy())
+    fn load_block_random_seed_managed(&self, dest: Handle) {
+        self.mb_overwrite(dest, &*self.get_block_random_seed_legacy());
     }
 
     fn get_prev_block_timestamp(&self) -> u64;
@@ -98,8 +97,8 @@ pub trait BlockchainApiImpl: ManagedTypeApiImpl {
 
     fn get_prev_block_random_seed_legacy(&self) -> Box<[u8; 48]>;
 
-    fn get_prev_block_random_seed<M: ManagedTypeApi>(&self) -> ManagedByteArray<M, 48> {
-        ManagedByteArray::new_from_bytes(&*self.get_prev_block_random_seed_legacy())
+    fn load_prev_block_random_seed_managed(&self, dest: Handle) {
+        self.mb_overwrite(dest, &*self.get_prev_block_random_seed_legacy());
     }
 
     fn get_current_esdt_nft_nonce<M: ManagedTypeApi>(

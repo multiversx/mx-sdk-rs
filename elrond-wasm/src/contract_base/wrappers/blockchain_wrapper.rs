@@ -135,7 +135,9 @@ where
 
     #[inline]
     pub fn get_state_root_hash(&self) -> ManagedByteArray<A, 32> {
-        A::blockchain_api_impl().get_state_root_hash()
+        let handle = A::static_var_api_impl().next_handle();
+        A::blockchain_api_impl().load_state_root_hash_managed(handle);
+        ManagedByteArray::from_raw_handle(handle)
     }
 
     #[cfg(feature = "alloc")]
@@ -146,7 +148,9 @@ where
 
     #[inline]
     pub fn get_tx_hash(&self) -> ManagedByteArray<A, 32> {
-        A::blockchain_api_impl().get_tx_hash::<A>()
+        let handle = A::static_var_api_impl().next_handle();
+        A::blockchain_api_impl().load_tx_hash_managed(handle);
+        ManagedByteArray::from_raw_handle(handle)
     }
 
     #[inline]
@@ -182,7 +186,9 @@ where
 
     #[inline]
     pub fn get_block_random_seed(&self) -> ManagedByteArray<A, 48> {
-        A::blockchain_api_impl().get_block_random_seed::<A>()
+        let handle = A::static_var_api_impl().next_handle();
+        A::blockchain_api_impl().load_block_random_seed_managed(handle);
+        ManagedByteArray::from_raw_handle(handle)
     }
 
     // #[inline]
@@ -220,7 +226,9 @@ where
 
     #[inline]
     pub fn get_prev_block_random_seed(&self) -> ManagedByteArray<A, 48> {
-        A::blockchain_api_impl().get_prev_block_random_seed::<A>()
+        let handle = A::static_var_api_impl().next_handle();
+        A::blockchain_api_impl().load_prev_block_random_seed_managed(handle);
+        ManagedByteArray::from_raw_handle(handle)
     }
 
     #[inline]
