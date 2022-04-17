@@ -1,6 +1,6 @@
 use crate::{error_hook, VmApiImpl};
 use elrond_wasm::{
-    api::{EndpointArgumentApi, EndpointArgumentApiImpl, Handle, StaticVarApiImpl},
+    api::{EndpointArgumentApi, EndpointArgumentApiImpl, Handle},
     err_msg,
     types::heap::BoxedBytes,
 };
@@ -13,15 +13,14 @@ extern "C" {
     // big int API
     #[allow(dead_code)]
     fn bigIntNew(value: i64) -> i32;
-    fn bigIntGetUnsignedArgument(arg_id: i32, dest: i32);
-    fn bigIntGetSignedArgument(arg_id: i32, dest: i32);
+    fn bigIntGetUnsignedArgument(arg_index: i32, dest: i32);
+    fn bigIntGetSignedArgument(arg_index: i32, dest: i32);
 
     // small int API
     fn smallIntGetUnsignedArgument(id: i32) -> i64;
     fn smallIntGetSignedArgument(id: i32) -> i64;
 
     // managed buffer API
-    fn mBufferNew() -> i32;
     fn mBufferGetArgument(argId: i32, mBufferHandle: i32) -> i32;
 }
 
@@ -68,39 +67,33 @@ impl EndpointArgumentApiImpl for VmApiImpl {
     }
 
     #[inline]
-    fn get_argument_big_uint_raw(&self, arg_id: i32) -> i32 {
+    fn get_argument_big_uint_raw(&self, arg_index: i32, dest: Handle) {
         unsafe {
-            let handle = self.next_handle();
-            bigIntGetUnsignedArgument(arg_id, handle);
-            handle
+            bigIntGetUnsignedArgument(arg_index, dest);
         }
     }
 
     #[inline]
-    fn get_argument_big_int_raw(&self, arg_id: i32) -> i32 {
+    fn get_argument_big_int_raw(&self, arg_index: i32, dest: Handle) {
         unsafe {
-            let handle = self.next_handle();
-            bigIntGetSignedArgument(arg_id, handle);
-            handle
+            bigIntGetSignedArgument(arg_index, dest);
         }
     }
 
     #[inline]
-    fn get_argument_managed_buffer_raw(&self, arg_id: i32) -> Handle {
+    fn get_argument_managed_buffer_raw(&self, arg_index: i32, dest: Handle) {
         unsafe {
-            let handle = mBufferNew();
-            mBufferGetArgument(arg_id, handle);
-            handle
+            mBufferGetArgument(arg_index, dest);
         }
     }
 
     #[inline]
-    fn get_argument_u64(&self, arg_id: i32) -> u64 {
-        unsafe { smallIntGetUnsignedArgument(arg_id) as u64 }
+    fn get_argument_u64(&self, arg_index: i32) -> u64 {
+        unsafe { smallIntGetUnsignedArgument(arg_index) as u64 }
     }
 
     #[inline]
-    fn get_argument_i64(&self, arg_id: i32) -> i64 {
-        unsafe { smallIntGetSignedArgument(arg_id) }
+    fn get_argument_i64(&self, arg_index: i32) -> i64 {
+        unsafe { smallIntGetSignedArgument(arg_index) }
     }
 }
