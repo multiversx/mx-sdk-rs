@@ -49,19 +49,19 @@ impl EndpointArgumentApiImpl for DebugApi {
         self.get_argument_vec_u8(arg_index).into()
     }
 
-    fn get_argument_big_uint_raw(&self, arg_index: i32, dest: Handle) {
+    fn load_argument_big_int_unsigned(&self, arg_index: i32, dest: Handle) {
         let arg_bytes = self.get_argument_boxed_bytes(arg_index);
         let value = BigInt::from_bytes_be(Sign::Plus, arg_bytes.as_slice());
         self.bi_overwrite(dest, value);
     }
 
-    fn get_argument_big_int_raw(&self, arg_index: i32, dest: Handle) {
+    fn load_argument_big_int_signed(&self, arg_index: i32, dest: Handle) {
         let arg_bytes = self.get_argument_boxed_bytes(arg_index);
         let value = BigInt::from_signed_bytes_be(arg_bytes.as_slice());
         self.bi_overwrite(dest, value);
     }
 
-    fn get_argument_managed_buffer_raw(&self, arg_index: i32, dest: Handle) {
+    fn load_argument_managed_buffer(&self, arg_index: i32, dest: Handle) {
         let arg_bytes = self.get_argument_boxed_bytes(arg_index);
         self.mb_overwrite(dest, arg_bytes.as_slice());
     }
