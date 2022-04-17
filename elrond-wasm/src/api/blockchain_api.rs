@@ -118,8 +118,5 @@ pub trait BlockchainApiImpl: ManagedTypeApiImpl {
         nonce: u64,
     ) -> EsdtTokenData<M>;
 
-    fn get_esdt_local_roles<M: ManagedTypeApi>(
-        &self,
-        token_id: &TokenIdentifier<M>,
-    ) -> EsdtLocalRoleFlags;
+    fn get_esdt_local_roles(&self, token_id_handle: Handle) -> EsdtLocalRoleFlags;
 }
