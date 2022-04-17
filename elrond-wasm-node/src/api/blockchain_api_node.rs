@@ -5,7 +5,10 @@ use crate::{
     VmApiImpl,
 };
 use elrond_wasm::{
-    api::{BlockchainApi, BlockchainApiImpl, Handle, ManagedTypeApi, StaticVarApiImpl},
+    api::{
+        BlockchainApi, BlockchainApiImpl, Handle, ManagedBufferApi, ManagedTypeApi,
+        StaticVarApiImpl,
+    },
     types::{
         heap::{Address, Box, H256},
         BigUint, EsdtTokenData, EsdtTokenType, ManagedAddress, ManagedBuffer, ManagedType,
@@ -349,37 +352,33 @@ impl BlockchainApiImpl for VmApiImpl {
     }
 
     #[inline]
-    fn get_current_esdt_nft_nonce<M: ManagedTypeApi>(
-        &self,
-        address: &ManagedAddress<M>,
-        token: &TokenIdentifier<M>,
-    ) -> u64 {
+    fn get_current_esdt_nft_nonce(&self, address_handle: Handle, token_id_handle: Handle) -> u64 {
         unsafe {
+            let token_identifier_len = self.mb_len(token_id_handle);
             getCurrentESDTNFTNonce(
-                unsafe_buffer_load_address(address.get_raw_handle()),
-                unsafe_buffer_load_token_identifier(token.get_raw_handle()),
-                token.len() as i32,
+                unsafe_buffer_load_address(address_handle),
+                unsafe_buffer_load_token_identifier(token_id_handle),
+                token_identifier_len as i32,
             ) as u64
         }
     }
 
-    fn get_esdt_balance<M: ManagedTypeApi>(
+    fn load_esdt_balance(
         &self,
-        address: &ManagedAddress<M>,
-        token: &TokenIdentifier<M>,
+        address_handle: Handle,
+        token_id_handle: Handle,
         nonce: u64,
-    ) -> BigUint<M> {
+        dest: Handle,
+    ) {
+        let token_identifier_len = self.mb_len(token_id_handle);
         unsafe {
-            let balance_handle = self.next_handle();
             bigIntGetESDTExternalBalance(
-                unsafe_buffer_load_address(address.get_raw_handle()),
-                unsafe_buffer_load_token_identifier(token.get_raw_handle()),
-                token.len() as i32,
+                unsafe_buffer_load_address(address_handle),
+                unsafe_buffer_load_token_identifier(token_id_handle),
+                token_identifier_len as i32,
                 nonce as i64,
-                balance_handle,
+                dest,
             );
-
-            BigUint::from_raw_handle(balance_handle)
         }
     }
 

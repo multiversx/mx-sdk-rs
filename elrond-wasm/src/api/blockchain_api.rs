@@ -1,7 +1,7 @@
 use super::{Handle, ManagedTypeApi, ManagedTypeApiImpl};
 use crate::types::{
     heap::{Address, Box, H256},
-    BigUint, EsdtLocalRoleFlags, EsdtTokenData, ManagedAddress, TokenIdentifier,
+    EsdtLocalRoleFlags, EsdtTokenData, ManagedAddress, TokenIdentifier,
 };
 
 pub trait BlockchainApi: ManagedTypeApi {
@@ -101,18 +101,15 @@ pub trait BlockchainApiImpl: ManagedTypeApiImpl {
         self.mb_overwrite(dest, &*self.get_prev_block_random_seed_legacy());
     }
 
-    fn get_current_esdt_nft_nonce<M: ManagedTypeApi>(
-        &self,
-        address: &ManagedAddress<M>,
-        token_id: &TokenIdentifier<M>,
-    ) -> u64;
+    fn get_current_esdt_nft_nonce(&self, address_handle: Handle, token_id_handle: Handle) -> u64;
 
-    fn get_esdt_balance<M: ManagedTypeApi>(
+    fn load_esdt_balance(
         &self,
-        address: &ManagedAddress<M>,
-        token_id: &TokenIdentifier<M>,
+        address_handle: Handle,
+        token_id_handle: Handle,
         nonce: u64,
-    ) -> BigUint<M>;
+        dest: Handle,
+    );
 
     fn get_esdt_token_data<M: ManagedTypeApi>(
         &self,

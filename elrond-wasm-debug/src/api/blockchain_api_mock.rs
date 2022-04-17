@@ -113,11 +113,8 @@ impl BlockchainApiImpl for DebugApi {
             .clone()
     }
 
-    fn get_current_esdt_nft_nonce<M: ManagedTypeApi>(
-        &self,
-        address: &ManagedAddress<M>,
-        token: &TokenIdentifier<M>,
-    ) -> u64 {
+    fn get_current_esdt_nft_nonce(&self, address_handle: Handle, token_id_handle: Handle) -> u64 {
+        let address = ManagedAddress::<DebugApi>::from_raw_handle(address_handle);
         assert!(
             address.to_address() == self.get_sc_address_legacy(),
             "get_current_esdt_nft_nonce not yet implemented for accounts other than the contract itself"
@@ -126,28 +123,37 @@ impl BlockchainApiImpl for DebugApi {
         self.with_contract_account(|account| {
             account
                 .esdt
-                .get_by_identifier_or_default(token.to_esdt_identifier().as_slice())
+                .get_by_identifier_or_default(
+                    TokenIdentifier::<DebugApi>::from_raw_handle(token_id_handle)
+                        .to_esdt_identifier()
+                        .as_slice(),
+                )
                 .last_nonce
         })
     }
 
-    fn get_esdt_balance<M: ManagedTypeApi>(
+    fn load_esdt_balance(
         &self,
-        address: &ManagedAddress<M>,
-        token: &TokenIdentifier<M>,
+        address_handle: Handle,
+        token_id_handle: Handle,
         nonce: u64,
-    ) -> BigUint<M> {
+        dest: Handle,
+    ) {
+        let address = ManagedAddress::<DebugApi>::from_raw_handle(address_handle);
         assert!(
             address.to_address() == self.get_sc_address_legacy(),
             "get_esdt_balance not yet implemented for accounts other than the contract itself"
         );
 
         let esdt_balance = self.with_contract_account(|account| {
-            account
-                .esdt
-                .get_esdt_balance(token.to_esdt_identifier().as_slice(), nonce)
+            account.esdt.get_esdt_balance(
+                TokenIdentifier::<DebugApi>::from_raw_handle(token_id_handle)
+                    .to_esdt_identifier()
+                    .as_slice(),
+                nonce,
+            )
         });
-        BigUint::from_raw_handle(self.insert_new_big_uint(esdt_balance))
+        self.bi_overwrite(dest, esdt_balance.into());
     }
 
     fn get_esdt_token_data<M: ManagedTypeApi>(

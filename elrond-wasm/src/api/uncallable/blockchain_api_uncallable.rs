@@ -4,7 +4,7 @@ use crate::{
     api::{BlockchainApi, BlockchainApiImpl, Handle, ManagedTypeApi},
     types::{
         heap::{Address, H256},
-        BigUint, EsdtTokenData, ManagedAddress, TokenIdentifier,
+        EsdtTokenData, ManagedAddress, TokenIdentifier,
     },
 };
 
@@ -95,20 +95,17 @@ impl BlockchainApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn get_current_esdt_nft_nonce<M: ManagedTypeApi>(
-        &self,
-        _address: &ManagedAddress<M>,
-        _token: &TokenIdentifier<M>,
-    ) -> u64 {
+    fn get_current_esdt_nft_nonce(&self, _address_handle: Handle, _token_id_handle: Handle) -> u64 {
         unreachable!()
     }
 
-    fn get_esdt_balance<M: ManagedTypeApi>(
+    fn load_esdt_balance(
         &self,
-        _address: &ManagedAddress<M>,
-        _token: &TokenIdentifier<M>,
+        _address_handle: Handle,
+        _token_id_handle: Handle,
         _nonce: u64,
-    ) -> BigUint<M> {
+        _dest: Handle,
+    ) {
         unreachable!()
     }
 
