@@ -531,14 +531,13 @@ impl BlockchainApiImpl for VmApiImpl {
         }
     }
 
-    fn get_esdt_local_roles<M: ManagedTypeApi>(
+    fn get_esdt_local_roles(
         &self,
-        token_id: &TokenIdentifier<M>,
+        token_id_handle: Handle,
     ) -> elrond_wasm::types::EsdtLocalRoleFlags {
-        let managed_token_id = token_id.as_managed_buffer();
         unsafe {
             elrond_wasm::types::EsdtLocalRoleFlags::from_bits_unchecked(getESDTLocalRoles(
-                managed_token_id.get_raw_handle(),
+                token_id_handle,
             ) as u64)
         }
     }

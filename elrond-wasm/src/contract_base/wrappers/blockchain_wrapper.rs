@@ -268,8 +268,9 @@ where
         A::blockchain_api_impl().get_esdt_token_data::<A>(address, token_id, nonce)
     }
 
+    #[inline]
     pub fn get_esdt_local_roles(&self, token_id: &TokenIdentifier<A>) -> EsdtLocalRoleFlags {
-        A::blockchain_api_impl().get_esdt_local_roles::<A>(token_id)
+        A::blockchain_api_impl().get_esdt_local_roles(token_id.get_raw_handle())
     }
 }
 

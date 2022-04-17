@@ -176,18 +176,16 @@ impl BlockchainApiImpl for DebugApi {
             })
     }
 
-    fn get_esdt_local_roles<M: ManagedTypeApi>(
-        &self,
-        token_id: &TokenIdentifier<M>,
-    ) -> EsdtLocalRoleFlags {
+    fn get_esdt_local_roles(&self, token_id_handle: Handle) -> EsdtLocalRoleFlags {
         let sc_address = self.input_ref().to.clone();
         self.blockchain_cache()
             .with_account(&sc_address, |account| {
                 let mut result = EsdtLocalRoleFlags::NONE;
-                if let Some(esdt_data) = account
-                    .esdt
-                    .get_by_identifier(token_id.to_esdt_identifier().as_slice())
-                {
+                if let Some(esdt_data) = account.esdt.get_by_identifier(
+                    TokenIdentifier::<DebugApi>::from_raw_handle(token_id_handle)
+                        .to_esdt_identifier()
+                        .as_slice(),
+                ) {
                     for role_name in esdt_data.roles.get() {
                         result |= EsdtLocalRole::from(role_name.as_slice()).to_flag();
                     }
