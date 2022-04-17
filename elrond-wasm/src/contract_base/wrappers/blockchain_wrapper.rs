@@ -237,7 +237,8 @@ where
         address: &ManagedAddress<A>,
         token_id: &TokenIdentifier<A>,
     ) -> u64 {
-        A::blockchain_api_impl().get_current_esdt_nft_nonce::<A>(address, token_id)
+        A::blockchain_api_impl()
+            .get_current_esdt_nft_nonce(address.get_raw_handle(), token_id.get_raw_handle())
     }
 
     #[inline]
@@ -247,7 +248,14 @@ where
         token_id: &TokenIdentifier<A>,
         nonce: u64,
     ) -> BigUint<A> {
-        A::blockchain_api_impl().get_esdt_balance::<A>(address, token_id, nonce)
+        let result_handle = A::static_var_api_impl().next_handle();
+        A::blockchain_api_impl().load_esdt_balance(
+            address.get_raw_handle(),
+            token_id.get_raw_handle(),
+            nonce,
+            result_handle,
+        );
+        BigUint::from_raw_handle(result_handle)
     }
 
     #[inline]

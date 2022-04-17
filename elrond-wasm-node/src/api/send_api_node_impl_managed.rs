@@ -523,9 +523,7 @@ impl SendApiImpl for VmApiImpl {
     fn storage_load_tx_hash_key<M: ManagedTypeApi>(&self) -> ManagedBuffer<M> {
         let tx_hash_handle = self.next_handle();
         self.load_tx_hash_managed(tx_hash_handle);
-        ManagedBuffer::from_raw_handle(
-            self.storage_load_managed_buffer_raw(tx_hash_handle),
-        )
+        ManagedBuffer::from_raw_handle(self.storage_load_managed_buffer_raw(tx_hash_handle))
     }
 
     fn call_local_esdt_built_in_function<M: ManagedTypeApi>(
