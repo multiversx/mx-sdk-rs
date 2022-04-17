@@ -41,19 +41,19 @@ where
 
     fn to_managed_buffer(&self) -> ManagedBuffer<AA> {
         let mbuf_handle = AA::static_var_api_impl().next_handle();
-        AA::argument_api_impl().get_argument_managed_buffer_raw(self.arg_index, mbuf_handle);
+        AA::argument_api_impl().load_argument_managed_buffer(self.arg_index, mbuf_handle);
         ManagedBuffer::from_raw_handle(mbuf_handle)
     }
 
     fn to_big_int(&self) -> BigInt<AA> {
         let bi_handle = AA::static_var_api_impl().next_handle();
-        AA::argument_api_impl().get_argument_big_int_raw(self.arg_index, bi_handle);
+        AA::argument_api_impl().load_argument_big_int_signed(self.arg_index, bi_handle);
         BigInt::from_raw_handle(bi_handle)
     }
 
     fn to_big_uint(&self) -> BigUint<AA> {
         let bi_handle = AA::static_var_api_impl().next_handle();
-        AA::argument_api_impl().get_argument_big_uint_raw(self.arg_index, bi_handle);
+        AA::argument_api_impl().load_argument_big_int_unsigned(self.arg_index, bi_handle);
         BigUint::from_raw_handle(bi_handle)
     }
 }
