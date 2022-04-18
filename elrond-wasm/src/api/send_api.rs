@@ -192,12 +192,6 @@ pub trait SendApiImpl {
         arg_buffer: &ManagedArgBuffer<M>,
     ) -> ManagedVec<M, ManagedBuffer<M>>;
 
-    /// Used to store data between async call and callback.
-    fn storage_store_tx_hash_key<M: ManagedTypeApi>(&self, data: &ManagedBuffer<M>);
-
-    /// Used to store data between async call and callback.
-    fn storage_load_tx_hash_key<M: ManagedTypeApi>(&self) -> ManagedBuffer<M>;
-
     /// Allows synchronously calling a local function by name. Execution is resumed afterwards.
     /// You should never have to call this function directly.
     /// Use the other specific methods instead.

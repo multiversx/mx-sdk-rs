@@ -3,7 +3,6 @@ use alloc::vec::Vec;
 use elrond_wasm::{
     api::{
         const_handles, BlockchainApi, BlockchainApiImpl, ManagedTypeApi, SendApiImpl,
-        StaticVarApiImpl, StorageReadApiImpl, StorageWriteApiImpl,
     },
     types::{
         heap::{Address, ArgBuffer, BoxedBytes},
@@ -678,23 +677,6 @@ impl SendApiImpl for VmApiImpl {
             let result_bytes = get_return_data_range(num_return_data_before, num_return_data_after);
             managed_vec_from_slice_of_boxed_bytes(result_bytes.as_slice())
         }
-    }
-
-    // TODO: extract somewhere else
-    fn storage_store_tx_hash_key<M: ManagedTypeApi>(&self, data: &ManagedBuffer<M>) {
-        self.load_tx_hash_managed(const_handles::MBUF_TEMPORARY_1);
-        self.storage_store_managed_buffer_raw(
-            const_handles::MBUF_TEMPORARY_1,
-            data.get_raw_handle(),
-        );
-    }
-
-    // TODO: extract somewhere else
-    fn storage_load_tx_hash_key<M: ManagedTypeApi>(&self) -> ManagedBuffer<M> {
-        self.load_tx_hash_managed(const_handles::MBUF_TEMPORARY_1);
-        let data_handle = self.next_handle();
-        self.storage_load_managed_buffer_raw(const_handles::MBUF_TEMPORARY_1, data_handle);
-        ManagedBuffer::from_raw_handle(data_handle)
     }
 
     fn call_local_esdt_built_in_function<M: ManagedTypeApi>(
