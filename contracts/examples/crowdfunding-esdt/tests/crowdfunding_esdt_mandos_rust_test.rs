@@ -102,11 +102,158 @@ fn crowdfunding_mandos_rust_test() {
                 ),
         );
 
-    // get status before & after
+    // get status before
+    let status: Status = world.mandos_sc_query_expect_result(
+        cf_sc.status(),
+        ScQueryStep::new().expect(TxExpect::ok().result("")),
+    );
+    assert_eq!(status, Status::FundingPeriod);
+
+    // deadline passed
+    world.mandos_set_state(SetStateStep::new().block_timestamp(deadline));
+
+    // get status after deadline
+    let status: Status = world.mandos_sc_query_expect_result(
+        cf_sc.status(),
+        ScQueryStep::new().expect(TxExpect::ok().result("2")),
+    );
+    assert_eq!(status, Status::Failed);
 
     // test failed campaign
 
+    // owner claim - failed campaign - nothing is transferred
+    world
+        .mandos_sc_call(
+            ScCallStep::new()
+                .from(&owner_addr)
+                .to(&cf_sc)
+                .call(cf_sc.claim())
+                .expect(TxExpect::ok().no_result()),
+        )
+        .mandos_check_state(
+            CheckStateStep::new()
+                .put_account(
+                    &owner_addr,
+                    CheckAccount::new().esdt_balance(&cf_token_id, 0u64),
+                )
+                .put_account(
+                    &cf_address,
+                    CheckAccount::new().esdt_balance(&cf_token_id, 1_500u64),
+                ),
+        );
+
+    // first user claim - failed campaign
+    world
+        .mandos_sc_call(
+            ScCallStep::new()
+                .from(&first_user_addr)
+                .to(&cf_sc)
+                .call(cf_sc.claim())
+                .expect(TxExpect::ok().no_result()),
+        )
+        .mandos_check_state(
+            CheckStateStep::new()
+                .put_account(
+                    &first_user_addr,
+                    CheckAccount::new().esdt_balance(&cf_token_id, 1_000u64),
+                )
+                .put_account(
+                    &cf_address,
+                    CheckAccount::new().esdt_balance(&cf_token_id, 500u64),
+                ),
+        );
+
+    // second user claim - failed campaign
+    world
+        .mandos_sc_call(
+            ScCallStep::new()
+                .from(&second_user_addr)
+                .to(&cf_sc)
+                .call(cf_sc.claim())
+                .expect(TxExpect::ok().no_result()),
+        )
+        .mandos_check_state(
+            CheckStateStep::new()
+                .put_account(
+                    &second_user_addr,
+                    CheckAccount::new().esdt_balance(&cf_token_id, 1_000u64),
+                )
+                .put_account(
+                    &cf_address,
+                    CheckAccount::new().esdt_balance(&cf_token_id, 0u64),
+                ),
+        );
+
     // test successful campaign
+
+    world.mandos_set_state(SetStateStep::new().block_timestamp(deadline / 2));
+
+    // first user deposit
+    world.mandos_sc_call(
+        ScCallStep::new()
+            .from(&first_user_addr)
+            .to(&cf_sc)
+            .esdt_transfer(&cf_token_id, 0u64, 1_000u64)
+            .call(cf_sc.fund())
+            .expect(TxExpect::ok().no_result()),
+    );
+
+    // second user deposit
+    world.mandos_sc_call(
+        ScCallStep::new()
+            .from(&second_user_addr)
+            .to(&cf_sc)
+            .esdt_transfer(&cf_token_id, 0u64, 1_000u64)
+            .call(cf_sc.fund())
+            .expect(TxExpect::ok().no_result()),
+    );
+
+    let status: Status = world.mandos_sc_query_expect_result(
+        cf_sc.status(),
+        ScQueryStep::new().expect(TxExpect::ok().result("")),
+    );
+    assert_eq!(status, Status::FundingPeriod);
+
+    world.mandos_set_state(SetStateStep::new().block_timestamp(deadline));
+
+    let status: Status = world.mandos_sc_query_expect_result(
+        cf_sc.status(),
+        ScQueryStep::new().expect(TxExpect::ok().result("1")),
+    );
+    assert_eq!(status, Status::Successful);
+
+    // first user try claim - successful campaign
+    world.mandos_sc_call(
+        ScCallStep::new()
+            .from(&first_user_addr)
+            .to(&cf_sc)
+            .call(cf_sc.claim())
+            .expect(TxExpect::err(
+                4,
+                "str:only owner can claim successful funding",
+            )),
+    );
+
+    // owner claim successful campaign
+    world
+        .mandos_sc_call(
+            ScCallStep::new()
+                .from(&owner_addr)
+                .to(&cf_sc)
+                .call(cf_sc.claim())
+                .expect(TxExpect::ok().no_result()),
+        )
+        .mandos_check_state(
+            CheckStateStep::new()
+                .put_account(
+                    &owner_addr,
+                    CheckAccount::new().esdt_balance(&cf_token_id, 2_000u64),
+                )
+                .put_account(
+                    &cf_address,
+                    CheckAccount::new().esdt_balance(&cf_token_id, 0u64),
+                ),
+        );
 
     world.write_mandos_trace("mandos/crowdfunding_rust.scen.json");
 }
