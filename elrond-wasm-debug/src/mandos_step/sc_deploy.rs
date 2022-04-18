@@ -14,7 +14,7 @@ use crate::{
 use super::check_tx_output;
 
 impl BlockchainMock {
-    /// Adds a mandos SC call step, as specified in the `sc_deploy_step` argument, then executes it.
+    /// Adds a mandos SC deploy step, as specified in the `sc_deploy_step` argument, then executes it.
     pub fn mandos_sc_deploy(&mut self, sc_deploy_step: ScDeployStep) -> &mut Self {
         self.with_borrowed(|state| {
             let (_, _, state) = execute_and_check(state, &sc_deploy_step);
@@ -24,14 +24,12 @@ impl BlockchainMock {
         self
     }
 
-    /// Adds a mandos SC call step, executes it and retrieves the transaction result ("out" field).
+    /// Adds a mandos SC deploy step, executes it and retrieves the transaction result ("out" field).
     ///
     /// The transaction is expected to complete successfully.
     ///
     /// It takes the `contract_call` argument separately from the SC call step,
-    /// so we can benefit from type inference in the result (this is work in progress).
-    ///
-    /// TODO: deserialize result
+    /// so we can benefit from type inference in the result.
     pub fn mandos_sc_deploy_get_result<OriginalResult, RequestedResult>(
         &mut self,
         contract_deploy: ContractDeploy<DebugApi, OriginalResult>,

@@ -1,4 +1,3 @@
-use crate::num_bigint::BigUint;
 use mandos::model::{
     AddressKey, BytesValue, CheckEsdt, CheckEsdtData, CheckEsdtInstance, CheckEsdtInstances,
     CheckEsdtMap, CheckStateStep, CheckStorage, CheckValue, Checkable, Step,
@@ -114,10 +113,8 @@ pub fn check_account_esdt(address: &AddressKey, expected: &CheckEsdtMap, actual:
             for (key, expected_value) in contents.contents.iter() {
                 let actual_value = actual.get_by_identifier_or_default(key.value.as_slice());
                 match expected_value {
-                    CheckEsdt::Short(expected_balance_bytes) => {
-                        let expected_balance =
-                            BigUint::from_bytes_be(expected_balance_bytes.value.as_slice());
-                        if expected_balance.is_zero() {
+                    CheckEsdt::Short(expected_balance) => {
+                        if expected_balance.value.is_zero() {
                             assert!(
                                 actual_value.is_empty(),
                                 "No balance expected for ESDT token address: {}. token name: {}. nonce: {}.",
@@ -138,8 +135,8 @@ pub fn check_account_esdt(address: &AddressKey, expected: &CheckEsdtMap, actual:
                                 .unwrap_or_else(|| panic!("Expected fungible ESDT with none 0"));
                             assert_eq!(
                                 single_instance.balance,
-                                expected_balance,
-                                "Unexpected fungible token balancefor address: {}. token name: {}.",
+                                expected_balance.value,
+                                "Unexpected fungible token balance for address: {}. token name: {}.",
                                 address,
                                 bytes_to_string(key.value.as_slice()),
                             );
