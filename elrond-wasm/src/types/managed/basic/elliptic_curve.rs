@@ -1,10 +1,12 @@
+use core::marker::PhantomData;
+
 use crate::{
     abi::{TypeAbi, TypeName},
-    api::{EllipticCurveApi, Handle, ManagedTypeApi, StaticVarApiImpl},
-    types::{heap::BoxedBytes, BigUint, ManagedType},
+    api::{BigIntApi, EllipticCurveApi, Handle, ManagedTypeApi},
 };
-use core::marker::PhantomData;
 use elrond_codec::*;
+
+use crate::types::{heap::BoxedBytes, BigUint, ManagedType};
 
 pub type EllipticCurveComponents<M> = (
     BigUint<M>,
@@ -59,11 +61,11 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
 
     pub fn get_values(&self) -> EllipticCurveComponents<M> {
         let api = M::managed_type_impl();
-        let field_order_handle = M::static_var_api_impl().next_handle();
-        let base_point_order_handle = M::static_var_api_impl().next_handle();
-        let eq_constant_handle = M::static_var_api_impl().next_handle();
-        let x_base_point_handle = M::static_var_api_impl().next_handle();
-        let y_base_point_handle = M::static_var_api_impl().next_handle();
+        let field_order_handle = api.bi_new_zero();
+        let base_point_order_handle = api.bi_new_zero();
+        let eq_constant_handle = api.bi_new_zero();
+        let x_base_point_handle = api.bi_new_zero();
+        let y_base_point_handle = api.bi_new_zero();
         api.ec_get_values(
             self.handle,
             field_order_handle,
@@ -100,8 +102,8 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
         y_second_point: BigUint<M>,
     ) -> (BigUint<M>, BigUint<M>) {
         let api = M::managed_type_impl();
-        let x_result_handle = M::static_var_api_impl().next_handle();
-        let y_result_handle = M::static_var_api_impl().next_handle();
+        let x_result_handle = api.bi_new_zero();
+        let y_result_handle = api.bi_new_zero();
         api.ec_add(
             x_result_handle,
             y_result_handle,
@@ -119,8 +121,8 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
 
     pub fn double(&self, x_point: BigUint<M>, y_point: BigUint<M>) -> (BigUint<M>, BigUint<M>) {
         let api = M::managed_type_impl();
-        let x_result_handle = M::static_var_api_impl().next_handle();
-        let y_result_handle = M::static_var_api_impl().next_handle();
+        let x_result_handle = api.bi_new_zero();
+        let y_result_handle = api.bi_new_zero();
         api.ec_double(
             x_result_handle,
             y_result_handle,
@@ -146,8 +148,8 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
         data: &[u8],
     ) -> (BigUint<M>, BigUint<M>) {
         let api = M::managed_type_impl();
-        let x_result_handle = M::static_var_api_impl().next_handle();
-        let y_result_handle = M::static_var_api_impl().next_handle();
+        let x_result_handle = api.bi_new_zero();
+        let y_result_handle = api.bi_new_zero();
         api.ec_scalar_mult(
             x_result_handle,
             y_result_handle,
@@ -164,8 +166,8 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
 
     pub fn scalar_base_mult(&self, data: &[u8]) -> (BigUint<M>, BigUint<M>) {
         let api = M::managed_type_impl();
-        let x_result_handle = M::static_var_api_impl().next_handle();
-        let y_result_handle = M::static_var_api_impl().next_handle();
+        let x_result_handle = api.bi_new_zero();
+        let y_result_handle = api.bi_new_zero();
         api.ec_scalar_base_mult(x_result_handle, y_result_handle, self.handle, data);
         (
             BigUint::from_raw_handle(x_result_handle),
@@ -185,8 +187,8 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
 
     pub fn unmarshal(&self, data: &[u8]) -> (BigUint<M>, BigUint<M>) {
         let api = M::managed_type_impl();
-        let x_pair_handle = M::static_var_api_impl().next_handle();
-        let y_pair_handle = M::static_var_api_impl().next_handle();
+        let x_pair_handle = api.bi_new_zero();
+        let y_pair_handle = api.bi_new_zero();
         api.ec_unmarshal(x_pair_handle, y_pair_handle, self.handle, data);
         (
             BigUint::from_raw_handle(x_pair_handle),
@@ -196,8 +198,8 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
 
     pub fn unmarshal_compressed(&self, data: &[u8]) -> (BigUint<M>, BigUint<M>) {
         let api = M::managed_type_impl();
-        let x_pair_handle = M::static_var_api_impl().next_handle();
-        let y_pair_handle = M::static_var_api_impl().next_handle();
+        let x_pair_handle = api.bi_new_zero();
+        let y_pair_handle = api.bi_new_zero();
         api.ec_unmarshal_compressed(x_pair_handle, y_pair_handle, self.handle, data);
         (
             BigUint::from_raw_handle(x_pair_handle),
@@ -207,8 +209,8 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
 
     pub fn generate_key(&self) -> (BigUint<M>, BigUint<M>, BoxedBytes) {
         let api = M::managed_type_impl();
-        let x_pub_key_handle = M::static_var_api_impl().next_handle();
-        let y_pub_key_handle = M::static_var_api_impl().next_handle();
+        let x_pub_key_handle = api.bi_new_zero();
+        let y_pub_key_handle = api.bi_new_zero();
         let private_key = api.ec_generate_key(x_pub_key_handle, y_pub_key_handle, self.handle);
         (
             BigUint::from_raw_handle(x_pub_key_handle),
