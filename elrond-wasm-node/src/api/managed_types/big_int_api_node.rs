@@ -9,7 +9,6 @@ use elrond_wasm::{
 };
 
 extern "C" {
-    #[allow(dead_code)]
     fn bigIntNew(value: i64) -> i32;
 
     fn bigIntSetInt64(destination: i32, value: i64);

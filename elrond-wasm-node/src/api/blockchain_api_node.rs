@@ -18,9 +18,6 @@ use elrond_wasm::{
 
 #[allow(unused)]
 extern "C" {
-    // managed buffer API
-    fn mBufferNew() -> i32;
-
     // address utils
     fn getSCAddress(resultOffset: *mut u8);
     #[cfg(not(feature = "ei-unmanaged"))]
@@ -72,8 +69,6 @@ extern "C" {
     fn managedGetOriginalTxHash(resultHandle: i32);
 
     // big int API
-    #[allow(dead_code)]
-    fn bigIntNew(value: i64) -> i32;
     fn bigIntSetInt64(destination: i32, value: i64);
     fn bigIntGetExternalBalance(address_ptr: *const u8, dest: i32);
     fn bigIntGetESDTExternalBalance(
@@ -480,16 +475,18 @@ impl BlockchainApiImpl for VmApiImpl {
         token: &TokenIdentifier<M>,
         nonce: u64,
     ) -> EsdtTokenData<M> {
+        use elrond_wasm::api::const_handles;
+
         let managed_token_id = token.as_managed_buffer();
         unsafe {
             let value_handle = self.next_handle();
-            let properties_handle = mBufferNew();
-            let hash_handle = mBufferNew();
-            let name_handle = mBufferNew();
-            let attributes_handle = mBufferNew();
-            let creator_handle = mBufferNew();
+            let properties_handle = const_handles::MBUF_TEMPORARY_1;
+            let hash_handle = self.next_handle();
+            let name_handle = self.next_handle();
+            let attributes_handle = self.next_handle();
+            let creator_handle = self.next_handle();
             let royalties_handle = self.next_handle();
-            let uris_handle = mBufferNew();
+            let uris_handle = self.next_handle();
 
             managedGetESDTTokenData(
                 address.get_raw_handle(),
@@ -512,9 +509,8 @@ impl BlockchainApiImpl for VmApiImpl {
             };
 
             // here we trust Arwen that it always gives us a properties buffer of length 2
-            let properties_buffer = ManagedBuffer::<Self>::from_raw_handle(properties_handle);
             let mut properties_bytes = [0u8; 2];
-            let _ = properties_buffer.load_slice(0, &mut properties_bytes[..]);
+            let _ = self.mb_load_slice(properties_handle, 0, &mut properties_bytes[..]);
             let frozen = properties_bytes[0] == 0 && properties_bytes[1] == 0; // token is frozen if properties are not 0
 
             EsdtTokenData {
