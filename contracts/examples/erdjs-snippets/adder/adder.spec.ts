@@ -3,7 +3,6 @@ import { TokenPayment } from "@elrondnetwork/erdjs";
 import { assert } from "chai";
 import { createInteractor } from "./adderInteractor";
 
-
 describe("adder snippet", async function () {
     this.bail(true);
 
@@ -27,7 +26,8 @@ describe("adder snippet", async function () {
         session.expectLongInteraction(this);
 
         await session.syncUsers([whale]);
-        await createAirdropService(session).sendToEachUser(whale, friends, TokenPayment.egldFromAmount(0.1));
+        let payment = TokenPayment.egldFromAmount(0.1);
+        await createAirdropService(session).sendToEachUser(whale, friends, [payment]);
     });
 
     it("setup", async function () {

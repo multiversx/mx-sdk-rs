@@ -7,7 +7,7 @@
  * @module
  */
 import path from "path";
-import { CodeMetadata, EnumValue, GasLimit, IAddress, Interaction, ResultsParser, ReturnCode, SmartContract, SmartContractAbi, Struct, TokenPayment, TransactionWatcher, VariadicValue } from "@elrondnetwork/erdjs";
+import { CodeMetadata, EnumValue, IAddress, Interaction, ResultsParser, ReturnCode, SmartContract, SmartContractAbi, Struct, TokenPayment, TransactionWatcher, VariadicValue } from "@elrondnetwork/erdjs";
 import { INetworkProvider, ITestSession, ITestUser, loadAbiRegistry, loadCode } from "@elrondnetwork/erdjs-snippets";
 import { NetworkConfig } from "@elrondnetwork/erdjs-network-providers";
 
@@ -48,7 +48,7 @@ export class LotteryInteractor {
             code: code,
             codeMetadata: new CodeMetadata(),
             initArguments: [],
-            gasLimit: new GasLimit(60000000),
+            gasLimit: 60000000,
             chainID: this.networkConfig.ChainID
         });
 
@@ -88,7 +88,7 @@ export class LotteryInteractor {
                 null,
                 whitelist
             ])
-            .withGasLimit(new GasLimit(20000000))
+            .withGasLimit(20000000)
             .withNonce(owner.account.getNonceThenIncrement())
             .withChainID(this.networkConfig.ChainID);
 
@@ -116,7 +116,7 @@ export class LotteryInteractor {
             .buy_ticket([
                 lotteryName
             ])
-            .withGasLimit(new GasLimit(50000000))
+            .withGasLimit(50000000)
             .withSingleESDTTransfer(amount)
             .withNonce(user.account.getNonceThenIncrement())
             .withChainID(this.networkConfig.ChainID);
