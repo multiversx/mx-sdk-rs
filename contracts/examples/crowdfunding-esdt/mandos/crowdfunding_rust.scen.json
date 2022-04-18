@@ -92,6 +92,47 @@
                     "storage": "*"
                 }
             }
+        },
+        {
+            "step": "scCall",
+            "txId": "",
+            "tx": {
+                "from": "address:user2",
+                "to": "0x000000000000000063726f776466756e64696e675f5f5f5f5f5f5f5f5f5f5f5f",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:CROWD-123456",
+                        "value": "500"
+                    }
+                ],
+                "function": "fund",
+                "arguments": [],
+                "gasLimit": "",
+                "gasPrice": ""
+            },
+            "expect": {
+                "out": [],
+                "status": "0"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:user2": {
+                    "esdt": {
+                        "str:CROWD-123456": "500",
+                        "+": ""
+                    },
+                    "storage": "*"
+                },
+                "sc:crowdfunding": {
+                    "esdt": {
+                        "str:CROWD-123456": "1500",
+                        "+": ""
+                    },
+                    "storage": "*"
+                }
+            }
         }
     ]
 }

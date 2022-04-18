@@ -80,5 +80,33 @@ fn crowdfunding_mandos_rust_test() {
                 ),
         );
 
+    // second user deposit
+    world
+        .mandos_sc_call(
+            ScCallStep::new()
+                .from(&second_user_addr)
+                .to(&cf_sc)
+                .esdt_transfer(&cf_token_id, 0u64, 500u64)
+                .call(cf_sc.fund())
+                .expect(TxExpect::ok().no_result()),
+        )
+        .mandos_check_state(
+            CheckStateStep::new()
+                .put_account(
+                    &second_user_addr,
+                    CheckAccount::new().esdt_balance(&cf_token_id, 500u64),
+                )
+                .put_account(
+                    &cf_address,
+                    CheckAccount::new().esdt_balance(&cf_token_id, 1_500u64),
+                ),
+        );
+
+    // get status before & after
+
+    // test failed campaign
+
+    // test successful campaign
+
     world.write_mandos_trace("mandos/crowdfunding_rust.scen.json");
 }
