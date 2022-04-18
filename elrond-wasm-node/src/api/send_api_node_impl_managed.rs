@@ -2,7 +2,6 @@ use crate::{error_hook, VmApiImpl};
 use elrond_wasm::{
     api::{
         const_handles, BlockchainApi, BlockchainApiImpl, Handle, ManagedTypeApi, SendApiImpl,
-        StaticVarApiImpl, StorageReadApiImpl, StorageWriteApiImpl,
     },
     types::{
         BigUint, CodeMetadata, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer,
@@ -512,23 +511,6 @@ impl SendApiImpl for VmApiImpl {
 
             ManagedVec::from_raw_handle(result_handle)
         }
-    }
-
-    // TODO: extract somewhere else
-    fn storage_store_tx_hash_key<M: ManagedTypeApi>(&self, data: &ManagedBuffer<M>) {
-        self.load_tx_hash_managed(const_handles::MBUF_TEMPORARY_1);
-        self.storage_store_managed_buffer_raw(
-            const_handles::MBUF_TEMPORARY_1,
-            data.get_raw_handle(),
-        );
-    }
-
-    // TODO: extract somewhere else
-    fn storage_load_tx_hash_key<M: ManagedTypeApi>(&self) -> ManagedBuffer<M> {
-        self.load_tx_hash_managed(const_handles::MBUF_TEMPORARY_1);
-        let data_handle = self.next_handle();
-        self.storage_load_managed_buffer_raw(const_handles::MBUF_TEMPORARY_1, data_handle);
-        ManagedBuffer::from_raw_handle(data_handle)
     }
 
     fn call_local_esdt_built_in_function<M: ManagedTypeApi>(
