@@ -125,12 +125,6 @@ where
         } else {
             (self.esdt_value(), self.token())
         }
-
-        // let (amount_handle, token_handle) = A::call_value_api_impl().payment_token_pair();
-        // (
-        //     BigUint::from_raw_handle(amount_handle),
-        //     TokenIdentifier::from_raw_handle(token_handle),
-        // )
     }
 
     pub fn payment(&self) -> EsdtTokenPayment<A> {
