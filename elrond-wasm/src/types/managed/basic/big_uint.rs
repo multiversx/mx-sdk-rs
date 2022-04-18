@@ -105,13 +105,9 @@ impl<M: ManagedTypeApi> BigUint<M> {
     #[inline]
     pub fn from_bytes_be(bytes: &[u8]) -> Self {
         let api = M::managed_type_impl();
-        let handle = M::static_var_api_impl().next_handle();
-        M::managed_type_impl().bi_set_int64(handle, 0);
-        api.bi_set_unsigned_bytes(handle, bytes);
-        BigUint {
-            handle,
-            _phantom: PhantomData,
-        }
+        let result_handle = M::static_var_api_impl().next_handle();
+        api.bi_set_unsigned_bytes(result_handle, bytes);
+        BigUint::from_raw_handle(result_handle)
     }
 
     #[inline]
@@ -146,27 +142,21 @@ impl<M: ManagedTypeApi> BigUint<M> {
     #[must_use]
     pub fn sqrt(&self) -> Self {
         let api = M::managed_type_impl();
-        let handle = M::static_var_api_impl().next_handle();
-        M::managed_type_impl().bi_set_int64(handle, 0);
-        api.bi_sqrt(handle, self.handle);
-        BigUint {
-            handle,
-            _phantom: PhantomData,
-        }
+        let result_handle = M::static_var_api_impl().next_handle();
+        api.bi_sqrt(result_handle, self.handle);
+        BigUint::from_raw_handle(result_handle)
     }
 
     #[must_use]
     pub fn pow(&self, exp: u32) -> Self {
-        let api = M::managed_type_impl();
-        let handle = M::static_var_api_impl().next_handle();
-        M::managed_type_impl().bi_set_int64(handle, 0);
-        let exp_handle = M::static_var_api_impl().next_handle();
-        M::managed_type_impl().bi_set_int64(handle, exp as i64);
-        api.bi_pow(handle, self.handle, exp_handle);
-        BigUint {
-            handle,
-            _phantom: PhantomData,
-        }
+        let result_handle = M::static_var_api_impl().next_handle();
+        M::managed_type_impl().bi_set_int64(const_handles::BIG_INT_TEMPORARY_1, exp as i64);
+        M::managed_type_impl().bi_pow(
+            result_handle,
+            self.handle,
+            const_handles::BIG_INT_TEMPORARY_1,
+        );
+        BigUint::from_raw_handle(result_handle)
     }
 
     #[inline]
@@ -182,10 +172,7 @@ impl<M: ManagedTypeApi> Clone for BigUint<M> {
         let clone_handle = M::static_var_api_impl().next_handle();
         M::managed_type_impl().bi_set_int64(clone_handle, 0);
         api.bi_add(clone_handle, clone_handle, self.handle);
-        BigUint {
-            handle: clone_handle,
-            _phantom: PhantomData,
-        }
+        BigUint::from_raw_handle(clone_handle)
     }
 }
 
