@@ -116,12 +116,16 @@ impl<M: ManagedTypeApi> BigInt<M> {
 
     #[inline]
     pub fn from_signed_bytes_be_buffer(managed_buffer: &ManagedBuffer<M>) -> Self {
-        BigInt::from_raw_handle(M::managed_type_impl().mb_to_big_int_signed(managed_buffer.handle))
+        let handle = M::static_var_api_impl().next_handle();
+        M::managed_type_impl().mb_to_big_int_signed(managed_buffer.handle, handle);
+        BigInt::from_raw_handle(handle)
     }
 
     #[inline]
     pub fn to_signed_bytes_be_buffer(&self) -> ManagedBuffer<M> {
-        ManagedBuffer::from_raw_handle(M::managed_type_impl().mb_from_big_int_signed(self.handle))
+        let mb_handle = M::static_var_api_impl().next_handle();
+        M::managed_type_impl().mb_from_big_int_signed(self.handle, mb_handle);
+        ManagedBuffer::from_raw_handle(mb_handle)
     }
 }
 

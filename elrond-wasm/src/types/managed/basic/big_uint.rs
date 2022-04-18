@@ -3,7 +3,8 @@ use core::marker::PhantomData;
 use crate::{
     abi::TypeName,
     api::{
-        BigIntApi, Handle, ManagedBufferApi, ManagedTypeApi, ManagedTypeApiImpl, StaticVarApiImpl,
+        const_handles, BigIntApi, Handle, ManagedBufferApi, ManagedTypeApi, ManagedTypeApiImpl,
+        StaticVarApiImpl,
     },
     formatter::{hex_util::encode_bytes_as_hex, FormatByteReceiver, SCDisplay},
     types::{heap::BoxedBytes, ManagedBuffer, ManagedType},
@@ -121,20 +122,22 @@ impl<M: ManagedTypeApi> BigUint<M> {
 
     #[inline]
     pub fn from_bytes_be_buffer(managed_buffer: &ManagedBuffer<M>) -> Self {
-        BigUint::from_raw_handle(
-            M::managed_type_impl().mb_to_big_int_unsigned(managed_buffer.handle),
-        )
+        let handle = M::static_var_api_impl().next_handle();
+        M::managed_type_impl().mb_to_big_int_unsigned(managed_buffer.handle, handle);
+        BigUint::from_raw_handle(handle)
     }
 
     #[inline]
     pub fn to_bytes_be_buffer(&self) -> ManagedBuffer<M> {
-        ManagedBuffer::from_raw_handle(M::managed_type_impl().mb_from_big_int_unsigned(self.handle))
+        let mb_handle = M::static_var_api_impl().next_handle();
+        M::managed_type_impl().mb_from_big_int_unsigned(self.handle, mb_handle);
+        ManagedBuffer::from_raw_handle(mb_handle)
     }
 
     pub fn copy_to_array_big_endian_pad_right(&self, target: &mut [u8; 32]) {
         let api = M::managed_type_impl();
-        let mb_handle = api.mb_from_big_int_unsigned(self.handle);
-        api.mb_copy_to_slice_pad_right(mb_handle, &mut target[..]);
+        api.mb_from_big_int_unsigned(self.handle, const_handles::MBUF_TEMPORARY_1);
+        api.mb_copy_to_slice_pad_right(const_handles::MBUF_TEMPORARY_1, &mut target[..]);
     }
 }
 

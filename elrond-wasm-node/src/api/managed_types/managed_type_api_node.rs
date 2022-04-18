@@ -1,13 +1,7 @@
 use crate::VmApiImpl;
-use elrond_wasm::api::{Handle, ManagedTypeApi, ManagedTypeApiImpl, StaticVarApiImpl};
+use elrond_wasm::api::{Handle, ManagedTypeApi, ManagedTypeApiImpl};
 
-#[allow(dead_code)]
 extern "C" {
-    fn mBufferNew() -> i32;
-    #[allow(dead_code)]
-    fn bigIntNew(value: i64) -> i32;
-    fn bigIntSetInt64(destination: i32, value: i64);
-
     fn mBufferToBigIntUnsigned(mBufferHandle: i32, bigIntHandle: i32) -> i32;
     fn mBufferToBigIntSigned(mBufferHandle: i32, bigIntHandle: i32) -> i32;
     fn mBufferFromBigIntUnsigned(mBufferHandle: i32, bigIntHandle: i32) -> i32;
@@ -25,38 +19,30 @@ impl ManagedTypeApi for VmApiImpl {
 
 impl ManagedTypeApiImpl for VmApiImpl {
     #[inline]
-    fn mb_to_big_int_unsigned(&self, buffer_handle: Handle) -> Handle {
+    fn mb_to_big_int_unsigned(&self, buffer_handle: Handle, big_int_handle: Handle) {
         unsafe {
-            let big_int_handle = self.next_handle();
             mBufferToBigIntUnsigned(buffer_handle, big_int_handle);
-            big_int_handle
         }
     }
 
     #[inline]
-    fn mb_to_big_int_signed(&self, buffer_handle: Handle) -> Handle {
+    fn mb_to_big_int_signed(&self, buffer_handle: Handle, big_int_handle: Handle) {
         unsafe {
-            let big_int_handle = self.next_handle();
             mBufferToBigIntSigned(buffer_handle, big_int_handle);
-            big_int_handle
         }
     }
 
     #[inline]
-    fn mb_from_big_int_unsigned(&self, big_int_handle: Handle) -> Handle {
+    fn mb_from_big_int_unsigned(&self, big_int_handle: Handle, buffer_handle: Handle) {
         unsafe {
-            let buffer_handle = mBufferNew();
             mBufferFromBigIntUnsigned(buffer_handle, big_int_handle);
-            buffer_handle
         }
     }
 
     #[inline]
-    fn mb_from_big_int_signed(&self, big_int_handle: Handle) -> Handle {
+    fn mb_from_big_int_signed(&self, big_int_handle: Handle, buffer_handle: Handle) {
         unsafe {
-            let buffer_handle = mBufferNew();
             mBufferFromBigIntSigned(buffer_handle, big_int_handle);
-            buffer_handle
         }
     }
 

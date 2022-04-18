@@ -514,16 +514,21 @@ impl SendApiImpl for VmApiImpl {
         }
     }
 
+    // TODO: extract somewhere else
     fn storage_store_tx_hash_key<M: ManagedTypeApi>(&self, data: &ManagedBuffer<M>) {
-        let tx_hash_handle = self.next_handle();
-        self.load_tx_hash_managed(tx_hash_handle);
-        self.storage_store_managed_buffer_raw(tx_hash_handle, data.get_raw_handle());
+        self.load_tx_hash_managed(const_handles::MBUF_TEMPORARY_1);
+        self.storage_store_managed_buffer_raw(
+            const_handles::MBUF_TEMPORARY_1,
+            data.get_raw_handle(),
+        );
     }
 
+    // TODO: extract somewhere else
     fn storage_load_tx_hash_key<M: ManagedTypeApi>(&self) -> ManagedBuffer<M> {
-        let tx_hash_handle = self.next_handle();
-        self.load_tx_hash_managed(tx_hash_handle);
-        ManagedBuffer::from_raw_handle(self.storage_load_managed_buffer_raw(tx_hash_handle))
+        self.load_tx_hash_managed(const_handles::MBUF_TEMPORARY_1);
+        let data_handle = self.next_handle();
+        self.storage_load_managed_buffer_raw(const_handles::MBUF_TEMPORARY_1, data_handle);
+        ManagedBuffer::from_raw_handle(data_handle)
     }
 
     fn call_local_esdt_built_in_function<M: ManagedTypeApi>(
