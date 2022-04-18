@@ -281,8 +281,9 @@ where
     /// Retrieves validator rewards, as set by the protocol.
     #[inline]
     pub fn get_cumulated_validator_rewards(&self) -> BigUint<A> {
-        let raw_handle = A::storage_read_api_impl()
-            .storage_load_big_uint_raw(storage::protected_keys::ELROND_REWARD_KEY);
-        BigUint::from_raw_handle(raw_handle)
+        let result_handle = A::static_var_api_impl().next_handle();
+        A::storage_read_api_impl()
+            .storage_load_big_uint_raw(storage::protected_keys::ELROND_REWARD_KEY, result_handle);
+        BigUint::from_raw_handle(result_handle)
     }
 }

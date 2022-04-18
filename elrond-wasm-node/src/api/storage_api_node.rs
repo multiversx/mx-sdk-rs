@@ -1,7 +1,7 @@
 use super::VmApiImpl;
 use elrond_wasm::{
     api::{
-        Handle, StaticVarApiImpl, StorageReadApi, StorageReadApiImpl, StorageWriteApi,
+        const_handles, Handle, StorageReadApi, StorageReadApiImpl, StorageWriteApi,
         StorageWriteApiImpl,
     },
     types::heap::{Box, BoxedBytes},
@@ -15,8 +15,6 @@ extern "C" {
 	fn storageLoad(keyOffset: *const u8, keyLength: i32, dataOffset: *mut u8) -> i32;
 
 	// big int API
-    #[allow(dead_code)]
-	fn bigIntNew(value: i64) -> i32;
 	fn bigIntStorageStoreUnsigned(keyOffset: *const u8, keyLength: i32, source: i32) -> i32;
 	fn bigIntStorageLoadUnsigned(keyOffset: *const u8, keyLength: i32, destination: i32) -> i32;
 
@@ -27,10 +25,8 @@ extern "C" {
 	fn smallIntStorageLoadSigned(keyOffset: *const u8, keyLength: i32) -> i64;
 
     // managed buffer API
-    fn mBufferNew() -> i32;
     fn mBufferStorageStore(keyHandle: i32, mBufferHandle: i32) -> i32;
     fn mBufferStorageLoad(keyHandle: i32, mBufferHandle: i32) -> i32;
-    fn mBufferGetLength(mBufferHandle: i32) -> i32;
     
     // from another account
     fn mBufferStorageLoadFromAddress(addressHandle: i32, keyHandle: i32, mBufferHandle: i32);
@@ -63,30 +59,16 @@ impl StorageReadApiImpl for VmApiImpl {
     }
 
     #[inline]
-    fn storage_load_big_uint_raw(&self, key: &[u8]) -> i32 {
+    fn storage_load_big_uint_raw(&self, key: &[u8], dest: Handle) {
         unsafe {
-            let handle = self.next_handle();
-            bigIntStorageLoadUnsigned(key.as_ref().as_ptr(), key.len() as i32, handle);
-            handle
+            bigIntStorageLoadUnsigned(key.as_ref().as_ptr(), key.len() as i32, dest);
         }
     }
 
     #[inline]
-    fn storage_load_managed_buffer_raw(&self, key_handle: Handle) -> Handle {
+    fn storage_load_managed_buffer_raw(&self, key_handle: Handle, dest: Handle) {
         unsafe {
-            let value_handle = mBufferNew();
-            mBufferStorageLoad(key_handle, value_handle);
-            value_handle
-        }
-    }
-
-    #[inline]
-    fn storage_load_managed_buffer_len(&self, key_handle: Handle) -> usize {
-        unsafe {
-            // TODO: use a temp handle
-            let value_handle = mBufferNew();
-            mBufferStorageLoad(key_handle, value_handle);
-            mBufferGetLength(value_handle) as usize
+            mBufferStorageLoad(key_handle, dest);
         }
     }
 
@@ -101,11 +83,9 @@ impl StorageReadApiImpl for VmApiImpl {
     }
 
     #[inline]
-    fn storage_load_from_address(&self, address_handle: Handle, key_handle: Handle) -> Handle {
+    fn storage_load_from_address(&self, address_handle: Handle, key_handle: Handle, dest: Handle) {
         unsafe {
-            let value_handle = mBufferNew();
-            mBufferStorageLoadFromAddress(address_handle, key_handle, value_handle);
-            value_handle
+            mBufferStorageLoadFromAddress(address_handle, key_handle, dest);
         }
     }
 }
@@ -132,9 +112,9 @@ impl StorageWriteApiImpl for VmApiImpl {
     }
 
     #[inline]
-    fn storage_store_big_uint_raw(&self, key: &[u8], handle: i32) {
+    fn storage_store_big_uint_raw(&self, key: &[u8], value_handle: Handle) {
         unsafe {
-            bigIntStorageStoreUnsigned(key.as_ref().as_ptr(), key.len() as i32, handle);
+            bigIntStorageStoreUnsigned(key.as_ref().as_ptr(), key.len() as i32, value_handle);
         }
     }
 
@@ -146,8 +126,7 @@ impl StorageWriteApiImpl for VmApiImpl {
 
     fn storage_store_managed_buffer_clear(&self, key_handle: Handle) {
         unsafe {
-            let value_handle = mBufferNew();
-            mBufferStorageStore(key_handle, value_handle);
+            mBufferStorageStore(key_handle, const_handles::MBUF_CONST_EMPTY);
         }
     }
 
