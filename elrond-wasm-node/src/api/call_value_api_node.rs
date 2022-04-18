@@ -7,9 +7,6 @@ use elrond_wasm::{
 const MAX_POSSIBLE_TOKEN_IDENTIFIER_LENGTH: usize = 32;
 
 extern "C" {
-    #[allow(dead_code)]
-    fn bigIntNew(value: i64) -> i32;
-
     fn checkNoPayment();
 
     fn bigIntGetCallValue(dest: i32);

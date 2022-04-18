@@ -2,6 +2,7 @@ use crate::{error_hook, VmApiImpl};
 use elrond_wasm::{
     api::{
         const_handles, BlockchainApi, BlockchainApiImpl, Handle, ManagedTypeApi, SendApiImpl,
+        StaticVarApiImpl,
     },
     types::{
         BigUint, CodeMetadata, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer,
@@ -137,14 +138,14 @@ impl SendApiImpl for VmApiImpl {
     {
         let data_buffer = data.into();
         unsafe {
-            let arguments_handle = mBufferNew();
+            let empty_arguments_handle = mBufferNew();
 
             let _ = managedTransferValueExecute(
                 to.get_raw_handle(),
                 amount.get_raw_handle(),
                 0,
                 data_buffer.get_raw_handle(),
-                arguments_handle,
+                empty_arguments_handle,
             );
         }
     }
@@ -278,8 +279,8 @@ impl SendApiImpl for VmApiImpl {
     ) -> (ManagedAddress<M>, ManagedVec<M, ManagedBuffer<M>>) {
         unsafe {
             let code_metadata_handle = code_metadata_to_buffer_handle(code_metadata);
-            let new_address_handle = mBufferNew();
-            let result_handle = mBufferNew();
+            let new_address_handle = self.next_handle();
+            let result_handle = self.next_handle();
             let _ = managedCreateContract(
                 gas as i64,
                 amount.get_raw_handle(),
@@ -307,8 +308,8 @@ impl SendApiImpl for VmApiImpl {
     ) -> (ManagedAddress<M>, ManagedVec<M, ManagedBuffer<M>>) {
         unsafe {
             let code_metadata_handle = code_metadata_to_buffer_handle(code_metadata);
-            let new_address_handle = mBufferNew();
-            let result_handle = mBufferNew();
+            let new_address_handle = self.next_handle();
+            let result_handle = self.next_handle();
             let _ = managedDeployFromSourceContract(
                 gas as i64,
                 amount.get_raw_handle(),
@@ -337,7 +338,7 @@ impl SendApiImpl for VmApiImpl {
     ) {
         unsafe {
             let code_metadata_handle = code_metadata_to_buffer_handle(code_metadata);
-            let result_handle = mBufferNew();
+            let unused_result_handle = const_handles::MBUF_TEMPORARY_1;
             managedUpgradeFromSourceContract(
                 sc_address.get_raw_handle(),
                 gas as i64,
@@ -345,7 +346,7 @@ impl SendApiImpl for VmApiImpl {
                 source_contract_address.get_raw_handle(),
                 code_metadata_handle,
                 arg_buffer.get_raw_handle(),
-                result_handle,
+                unused_result_handle,
             );
         }
     }
@@ -361,7 +362,7 @@ impl SendApiImpl for VmApiImpl {
     ) {
         unsafe {
             let code_metadata_handle = code_metadata_to_buffer_handle(code_metadata);
-            let unused_result_handle = mBufferNew();
+            let unused_result_handle = const_handles::MBUF_TEMPORARY_1;
             managedUpgradeContract(
                 sc_address.get_raw_handle(),
                 gas as i64,
@@ -386,7 +387,7 @@ impl SendApiImpl for VmApiImpl {
         arg_buffer: &ManagedArgBuffer<M>,
     ) -> ManagedVec<M, ManagedBuffer<M>> {
         unsafe {
-            let result_handle = mBufferNew();
+            let result_handle = self.next_handle();
 
             let _ = managedExecuteOnDestContext(
                 gas as i64,
@@ -416,7 +417,7 @@ impl SendApiImpl for VmApiImpl {
     {
         unsafe {
             let num_return_data_before = getNumReturnData() as usize;
-            let result_handle = mBufferNew();
+            let result_handle = self.next_handle();
 
             let _ = managedExecuteOnDestContext(
                 gas as i64,
@@ -452,7 +453,7 @@ impl SendApiImpl for VmApiImpl {
         arg_buffer: &ManagedArgBuffer<M>,
     ) -> ManagedVec<M, ManagedBuffer<M>> {
         unsafe {
-            let result_handle = mBufferNew();
+            let result_handle = self.next_handle();
 
             let _ = managedExecuteOnDestContextByCaller(
                 gas as i64,
@@ -476,7 +477,7 @@ impl SendApiImpl for VmApiImpl {
         arg_buffer: &ManagedArgBuffer<M>,
     ) -> ManagedVec<M, ManagedBuffer<M>> {
         unsafe {
-            let result_handle = mBufferNew();
+            let result_handle = self.next_handle();
 
             let _ = managedExecuteOnSameContext(
                 gas as i64,
@@ -499,7 +500,7 @@ impl SendApiImpl for VmApiImpl {
         arg_buffer: &ManagedArgBuffer<M>,
     ) -> ManagedVec<M, ManagedBuffer<M>> {
         unsafe {
-            let result_handle = mBufferNew();
+            let result_handle = self.next_handle();
 
             let _ = managedExecuteReadOnly(
                 gas as i64,

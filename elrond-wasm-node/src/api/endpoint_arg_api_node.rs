@@ -11,8 +11,6 @@ extern "C" {
     fn getArgument(id: i32, dstOffset: *mut u8) -> i32;
 
     // big int API
-    #[allow(dead_code)]
-    fn bigIntNew(value: i64) -> i32;
     fn bigIntGetUnsignedArgument(arg_index: i32, dest: i32);
     fn bigIntGetSignedArgument(arg_index: i32, dest: i32);
 

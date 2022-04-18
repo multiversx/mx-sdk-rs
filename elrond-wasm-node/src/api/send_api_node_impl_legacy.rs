@@ -1,9 +1,7 @@
 use crate::{api::managed_types::big_int_api_node::unsafe_buffer_load_be_pad_right, VmApiImpl};
 use alloc::vec::Vec;
 use elrond_wasm::{
-    api::{
-        const_handles, BlockchainApi, BlockchainApiImpl, ManagedTypeApi, SendApiImpl,
-    },
+    api::{const_handles, BlockchainApi, BlockchainApiImpl, ManagedTypeApi, SendApiImpl},
     types::{
         heap::{Address, ArgBuffer, BoxedBytes},
         managed_vec_from_slice_of_boxed_bytes, BigUint, CodeMetadata, EsdtTokenPayment,
