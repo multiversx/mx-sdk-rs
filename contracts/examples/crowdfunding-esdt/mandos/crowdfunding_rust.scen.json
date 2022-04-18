@@ -1,0 +1,97 @@
+{
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:owner": {}
+            },
+            "newAddresses": [
+                {
+                    "creatorAddress": "address:owner",
+                    "creatorNonce": "0",
+                    "newAddress": "sc:crowdfunding"
+                }
+            ]
+        },
+        {
+            "step": "scDeploy",
+            "txId": "",
+            "tx": {
+                "from": "address:owner",
+                "contractCode": "file:output/crowdfunding-esdt.wasm",
+                "arguments": [
+                    "0x07d0",
+                    "0x093a80",
+                    "0x43524f57442d313233343536"
+                ],
+                "gasLimit": "5,000,000",
+                "gasPrice": ""
+            },
+            "expect": {
+                "out": [],
+                "status": "0"
+            }
+        },
+        {
+            "step": "setState",
+            "accounts": {
+                "address:user1": {
+                    "esdt": {
+                        "str:CROWD-123456": "1000"
+                    }
+                }
+            }
+        },
+        {
+            "step": "setState",
+            "accounts": {
+                "address:user2": {
+                    "esdt": {
+                        "str:CROWD-123456": "1000"
+                    }
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "",
+            "tx": {
+                "from": "address:user1",
+                "to": "0x000000000000000063726f776466756e64696e675f5f5f5f5f5f5f5f5f5f5f5f",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:CROWD-123456",
+                        "value": "1000"
+                    }
+                ],
+                "function": "fund",
+                "arguments": [],
+                "gasLimit": "",
+                "gasPrice": ""
+            },
+            "expect": {
+                "out": [],
+                "status": "0"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:user1": {
+                    "esdt": {
+                        "str:CROWD-123456": "0",
+                        "+": ""
+                    },
+                    "storage": "*"
+                },
+                "sc:crowdfunding": {
+                    "esdt": {
+                        "str:CROWD-123456": "1000",
+                        "+": ""
+                    },
+                    "storage": "*"
+                }
+            }
+        }
+    ]
+}

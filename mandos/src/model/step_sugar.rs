@@ -2,7 +2,7 @@ use crate::interpret_trait::{InterpretableFrom, InterpreterContext};
 
 use super::{
     Account, AddressKey, AddressValue, BigUintValue, BytesValue, CheckAccount, CheckStateStep,
-    NewAddress, ScCallStep, ScDeployStep, ScQueryStep, SetStateStep, TxExpect, U64Value,
+    NewAddress, ScCallStep, ScDeployStep, ScQueryStep, SetStateStep, TxESDT, TxExpect, U64Value,
 };
 
 impl SetStateStep {
@@ -145,6 +145,38 @@ impl ScCallStep {
         AddressValue: InterpretableFrom<A>,
     {
         self.tx.to = AddressValue::interpret_from(address, &InterpreterContext::default());
+        self
+    }
+
+    pub fn egld_value<A>(mut self, amount: A) -> Self
+    where
+        BigUintValue: InterpretableFrom<A>,
+    {
+        if !self.tx.esdt_value.is_empty() {
+            panic!("Cannot transfer both EGLD and ESDT");
+        }
+
+        self.tx.egld_value = BigUintValue::interpret_from(amount, &InterpreterContext::default());
+        self
+    }
+
+    pub fn esdt_transfer<T, N, A>(mut self, token_id: T, token_nonce: N, amount: A) -> Self
+    where
+        BytesValue: InterpretableFrom<T>,
+        U64Value: InterpretableFrom<N>,
+        BigUintValue: InterpretableFrom<A>,
+    {
+        if self.tx.egld_value.value > 0u32.into() {
+            panic!("Cannot transfer both EGLD and ESDT");
+        }
+
+        let ctx = InterpreterContext::default();
+        self.tx.esdt_value.push(TxESDT {
+            esdt_token_identifier: BytesValue::interpret_from(token_id, &ctx),
+            nonce: U64Value::interpret_from(token_nonce, &ctx),
+            esdt_value: BigUintValue::interpret_from(amount, &ctx),
+        });
+
         self
     }
 
