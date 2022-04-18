@@ -1,11 +1,12 @@
 use crate::{
     interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
     model::{
-        BigUintValue, BytesKey, BytesValue, CheckEsdtMap, CheckStorage, CheckStorageDetails,
-        CheckValue, U64Value,
+        BigUintValue, BytesKey, BytesValue, CheckEsdt, CheckEsdtInstances, CheckEsdtMap,
+        CheckEsdtMapContents, CheckStorage, CheckStorageDetails, CheckValue, U64Value,
     },
     serde_raw::CheckAccountRaw,
 };
+use std::collections::BTreeMap;
 
 #[derive(Debug, Default)]
 pub struct CheckAccount {
@@ -44,6 +45,44 @@ impl CheckAccount {
             balance_expr,
             &InterpreterContext::default(),
         ));
+        self
+    }
+
+    pub fn esdt_balance<K, V>(mut self, token_id_expr: K, balance_expr: V) -> Self
+    where
+        BytesKey: InterpretableFrom<K>,
+        BigUintValue: InterpretableFrom<V>,
+    {
+        let ctx = InterpreterContext::default();
+        let token_id = BytesKey::interpret_from(token_id_expr, &ctx);
+        let balance = BigUintValue::interpret_from(balance_expr, &ctx);
+
+        match &mut self.esdt {
+            CheckEsdtMap::Unspecified | CheckEsdtMap::Star => {
+                let mut new_esdt_map = BTreeMap::new();
+                let _ = new_esdt_map.insert(token_id, CheckEsdt::Short(balance));
+
+                let new_check_esdt_map = CheckEsdtMapContents {
+                    contents: new_esdt_map,
+                    other_esdts_allowed: true,
+                };
+
+                self.esdt = CheckEsdtMap::Equal(new_check_esdt_map);
+            },
+            CheckEsdtMap::Equal(check_esdt_map) => {
+                if check_esdt_map.contents.contains_key(&token_id) {
+                    let prev_entry = check_esdt_map.contents.get_mut(&token_id).unwrap();
+                    match prev_entry {
+                        CheckEsdt::Short(prev_balance_check) => *prev_balance_check = balance,
+                        CheckEsdt::Full(prev_esdt_check) => match prev_esdt_check.instances {
+                            CheckEsdtInstances::Star => todo!(),
+                            CheckEsdtInstances::Equal(_) => todo!(),
+                        },
+                    }
+                }
+            },
+        }
+
         self
     }
 
