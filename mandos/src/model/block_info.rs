@@ -5,7 +5,7 @@ use crate::{
 
 use super::{BytesValue, U64Value};
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct BlockInfo {
     pub block_timestamp: Option<U64Value>,
     pub block_nonce: Option<U64Value>,

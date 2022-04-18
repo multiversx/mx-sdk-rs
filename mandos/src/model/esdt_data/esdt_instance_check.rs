@@ -15,6 +15,19 @@ pub struct CheckEsdtInstance {
     pub attributes: CheckValue<BytesValue>,
 }
 
+impl CheckEsdtInstance {
+    pub fn is_simple_fungible(&self) -> bool {
+        let is_uri_star = matches!(self.uri, CheckValue::Star);
+
+        self.nonce.value == 0
+            && self.creator.is_star()
+            && self.royalties.is_star()
+            && self.hash.is_star()
+            && is_uri_star
+            && self.attributes.is_star()
+    }
+}
+
 impl InterpretableFrom<CheckEsdtInstanceRaw> for CheckEsdtInstance {
     fn interpret_from(from: CheckEsdtInstanceRaw, context: &InterpreterContext) -> Self {
         CheckEsdtInstance {

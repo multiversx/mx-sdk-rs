@@ -1,6 +1,6 @@
 use crate::{
     interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
-    model::{BytesKey, BytesValue, U64Value},
+    model::{BigUintValue, BytesValue, U64Value},
     serde_raw::{EsdtFullRaw, EsdtRaw},
 };
 
@@ -8,15 +8,56 @@ use super::{EsdtInstance, EsdtObject};
 
 #[derive(Debug)]
 pub enum Esdt {
-    Short(BytesKey),
+    Short(BigUintValue),
     Full(EsdtObject),
+}
+
+impl Esdt {
+    pub fn convert_to_short_if_possible(&mut self) {
+        if let Esdt::Full(esdt_obj) = self {
+            if esdt_obj.is_short_form() {
+                *self = Self::Short(esdt_obj.instances[0].balance.clone().unwrap())
+            }
+        }
+    }
+
+    pub fn convert_to_full(&mut self) {
+        if let Esdt::Short(balance) = self {
+            let mut new_esdt_obj = EsdtObject::default();
+            new_esdt_obj.set_balance(0u64, balance.clone());
+
+            *self = Self::Full(new_esdt_obj);
+        }
+    }
+
+    pub fn set_balance<N, A>(&mut self, token_nonce_expr: N, amount_expr: A)
+    where
+        U64Value: InterpretableFrom<N>,
+        BigUintValue: InterpretableFrom<A>,
+    {
+        self.convert_to_full();
+
+        if let Esdt::Full(esdt_obj) = self {
+            esdt_obj.set_balance(token_nonce_expr, amount_expr);
+        }
+    }
+
+    pub fn get_mut_esdt_object(&mut self) -> &mut EsdtObject {
+        self.convert_to_full();
+
+        if let Esdt::Full(esdt_obj) = self {
+            return esdt_obj;
+        }
+
+        unreachable!()
+    }
 }
 
 impl InterpretableFrom<EsdtRaw> for Esdt {
     fn interpret_from(from: EsdtRaw, context: &InterpreterContext) -> Self {
         match from {
             EsdtRaw::Short(short_esdt) => {
-                Esdt::Short(BytesKey::interpret_from(short_esdt, context))
+                Esdt::Short(BigUintValue::interpret_from(short_esdt, context))
             },
             EsdtRaw::Full(full_esdt) => Esdt::Full(EsdtObject {
                 token_identifier: full_esdt
@@ -40,7 +81,9 @@ impl InterpretableFrom<EsdtRaw> for Esdt {
 }
 
 impl IntoRaw<EsdtRaw> for Esdt {
-    fn into_raw(self) -> EsdtRaw {
+    fn into_raw(mut self) -> EsdtRaw {
+        self.convert_to_short_if_possible();
+
         match self {
             Esdt::Short(short) => EsdtRaw::Short(short.original),
             Esdt::Full(eo) => EsdtRaw::Full(EsdtFullRaw {

@@ -6,6 +6,8 @@ use crate::{
 
 use std::fmt;
 
+use super::BytesKey;
+
 #[derive(Clone, Debug)]
 pub struct BytesValue {
     pub value: Vec<u8>,
@@ -59,6 +61,24 @@ impl InterpretableFrom<String> for BytesValue {
         BytesValue {
             value: interpret_string(from.as_str(), context),
             original: ValueSubTree::Str(from),
+        }
+    }
+}
+
+impl InterpretableFrom<BytesKey> for BytesValue {
+    fn interpret_from(from: BytesKey, _context: &InterpreterContext) -> Self {
+        BytesValue {
+            value: from.value,
+            original: ValueSubTree::Str(from.original),
+        }
+    }
+}
+
+impl InterpretableFrom<&BytesKey> for BytesValue {
+    fn interpret_from(from: &BytesKey, _context: &InterpreterContext) -> Self {
+        BytesValue {
+            value: from.value.clone(),
+            original: ValueSubTree::Str(from.original.clone()),
         }
     }
 }
