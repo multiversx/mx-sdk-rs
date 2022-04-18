@@ -46,11 +46,10 @@ impl CheckEsdt {
 
     pub fn convert_to_full(&mut self) {
         if let CheckEsdt::Short(prev_balance_check) = self {
-            let mut new_instances_check = Vec::new();
-            new_instances_check.push(CheckEsdtInstance {
+            let new_instances_check = vec![CheckEsdtInstance {
                 balance: CheckValue::Equal(prev_balance_check.clone()),
                 ..Default::default()
-            });
+            }];
 
             let new_esdt_check = CheckEsdtData {
                 instances: CheckEsdtInstances::Equal(new_instances_check),
@@ -74,12 +73,11 @@ impl CheckEsdt {
         if let CheckEsdt::Full(prev_esdt_check) = self {
             match &mut prev_esdt_check.instances {
                 CheckEsdtInstances::Star => {
-                    let mut new_instances_check = Vec::new();
-                    new_instances_check.push(CheckEsdtInstance {
+                    let new_instances_check = vec![CheckEsdtInstance {
                         nonce,
                         balance: CheckValue::Equal(balance),
                         ..Default::default()
-                    });
+                    }];
 
                     prev_esdt_check.instances = CheckEsdtInstances::Equal(new_instances_check);
                 },
