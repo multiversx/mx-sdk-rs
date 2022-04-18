@@ -1,8 +1,9 @@
 use crate::interpret_trait::{InterpretableFrom, InterpreterContext};
 
 use super::{
-    Account, AddressKey, AddressValue, BigUintValue, BytesValue, CheckAccount, CheckStateStep,
-    NewAddress, ScCallStep, ScDeployStep, ScQueryStep, SetStateStep, TxESDT, TxExpect, U64Value,
+    Account, AddressKey, AddressValue, BigUintValue, BlockInfo, BytesValue, CheckAccount,
+    CheckStateStep, NewAddress, ScCallStep, ScDeployStep, ScQueryStep, SetStateStep, TxESDT,
+    TxExpect, U64Value,
 };
 
 impl SetStateStep {
@@ -43,6 +44,101 @@ impl SetStateStep {
                 &InterpreterContext::default(),
             ),
         });
+        self
+    }
+
+    pub fn block_epoch<N>(mut self, block_epoch_expr: N) -> Self
+    where
+        U64Value: InterpretableFrom<N>,
+    {
+        let ctx = InterpreterContext::default();
+        let block_epoch = U64Value::interpret_from(block_epoch_expr, &ctx);
+
+        if let Some(block_info) = &mut *self.current_block_info {
+            block_info.block_epoch = Some(block_epoch);
+        } else {
+            *self.current_block_info = Some(BlockInfo {
+                block_epoch: Some(block_epoch),
+                ..Default::default()
+            });
+        }
+
+        self
+    }
+
+    pub fn block_nonce<N>(mut self, block_nonce_expr: N) -> Self
+    where
+        U64Value: InterpretableFrom<N>,
+    {
+        let ctx = InterpreterContext::default();
+        let block_nonce = U64Value::interpret_from(block_nonce_expr, &ctx);
+
+        if let Some(block_info) = &mut *self.current_block_info {
+            block_info.block_nonce = Some(block_nonce);
+        } else {
+            *self.current_block_info = Some(BlockInfo {
+                block_nonce: Some(block_nonce),
+                ..Default::default()
+            });
+        }
+
+        self
+    }
+
+    pub fn block_round<N>(mut self, block_round_expr: N) -> Self
+    where
+        U64Value: InterpretableFrom<N>,
+    {
+        let ctx = InterpreterContext::default();
+        let block_round = U64Value::interpret_from(block_round_expr, &ctx);
+
+        if let Some(block_info) = &mut *self.current_block_info {
+            block_info.block_round = Some(block_round);
+        } else {
+            *self.current_block_info = Some(BlockInfo {
+                block_round: Some(block_round),
+                ..Default::default()
+            });
+        }
+
+        self
+    }
+
+    pub fn block_timestamp<N>(mut self, block_timestamp_expr: N) -> Self
+    where
+        U64Value: InterpretableFrom<N>,
+    {
+        let ctx = InterpreterContext::default();
+        let block_timestamp = U64Value::interpret_from(block_timestamp_expr, &ctx);
+
+        if let Some(block_info) = &mut *self.current_block_info {
+            block_info.block_timestamp = Some(block_timestamp);
+        } else {
+            *self.current_block_info = Some(BlockInfo {
+                block_timestamp: Some(block_timestamp),
+                ..Default::default()
+            });
+        }
+
+        self
+    }
+
+    pub fn block_random_seed<B>(mut self, block_random_seed_expr: B) -> Self
+    where
+        BytesValue: InterpretableFrom<B>,
+    {
+        let ctx = InterpreterContext::default();
+        let block_random_seed = BytesValue::interpret_from(block_random_seed_expr, &ctx);
+
+        if let Some(block_info) = &mut *self.current_block_info {
+            block_info.block_random_seed = Some(block_random_seed);
+        } else {
+            *self.current_block_info = Some(BlockInfo {
+                block_random_seed: Some(block_random_seed),
+                ..Default::default()
+            });
+        }
+
         self
     }
 }
