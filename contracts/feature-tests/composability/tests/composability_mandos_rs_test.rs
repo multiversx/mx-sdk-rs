@@ -499,12 +499,12 @@ fn forwarder_validate_token_identifier_rs() {
 
 #[test]
 fn promises_multi_transfer_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/promises_multi_transfer.scen.json", world());
+    elrond_wasm_debug::mandos_rs("mandos-promises/promises_multi_transfer.scen.json", world());
 }
 
 // #[test]
 // fn promises_single_transfer_rs() {
-//     elrond_wasm_debug::mandos_rs("mandos/promises_single_transfer.scen.json", world());
+//     elrond_wasm_debug::mandos_rs("mandos-promises/promises_single_transfer.scen.json", world());
 // }
 
 #[test]

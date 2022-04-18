@@ -383,12 +383,12 @@ fn forwarder_validate_token_identifier_go() {
 
 // #[test]
 // fn promises_multi_transfer_go() {
-//     elrond_wasm_debug::mandos_go("mandos/promises_multi_transfer.scen.json");
+//     elrond_wasm_debug::mandos_go("mandos-promises/promises_multi_transfer.scen.json");
 // }
 
 // #[test]
 // fn promises_single_transfer_go() {
-//     elrond_wasm_debug::mandos_go("mandos/promises_single_transfer.scen.json");
+//     elrond_wasm_debug::mandos_go("mandos-promises/promises_single_transfer.scen.json");
 // }
 
 #[test]
