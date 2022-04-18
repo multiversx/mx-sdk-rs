@@ -99,17 +99,16 @@ where
     }
 
     pub fn require_esdt(&self, token: &[u8]) -> BigUint<A> {
-        // BigUint::from_raw_handle(A::call_value_api_impl().require_esdt(token))
-
         let m_api = A::managed_type_impl();
         let call_value_api = A::call_value_api_impl();
         let error_api = A::error_api_impl();
 
-        let want = m_api.mb_new_from_bytes(token);
+        let expected_token_handle = const_handles::MBUF_TEMPORARY_1;
+        m_api.mb_overwrite(expected_token_handle, token);
         if call_value_api.esdt_num_transfers() != 1 {
             error_api.signal_error(err_msg::SINGLE_ESDT_EXPECTED.as_bytes());
         }
-        if !m_api.mb_eq(call_value_api.token(), want) {
+        if !m_api.mb_eq(call_value_api.token(), expected_token_handle) {
             error_api.signal_error(err_msg::BAD_TOKEN_PROVIDED.as_bytes());
         }
         call_value_api.load_single_esdt_value(const_handles::CALL_VALUE_SINGLE_ESDT);

@@ -9,8 +9,10 @@ pub struct InvalidSliceError;
 
 /// A raw bytes buffer managed by Arwen.
 pub trait ManagedBufferApi {
+    /// Requests a new handle from the VM. No longer used extensively.
     fn mb_new_empty(&self) -> Handle;
 
+    /// Requests a new handle from the VM, initialized with some data. No longer used extensively.
     fn mb_new_from_bytes(&self, bytes: &[u8]) -> Handle;
 
     fn mb_len(&self, handle: Handle) -> usize;

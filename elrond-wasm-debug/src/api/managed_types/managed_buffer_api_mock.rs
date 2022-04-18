@@ -1,6 +1,6 @@
 use crate::DebugApi;
 use elrond_wasm::{
-    api::{Handle, InvalidSliceError, ManagedBufferApi, StaticVarApiImpl},
+    api::{Handle, InvalidSliceError, ManagedBufferApi},
     types::heap::BoxedBytes,
 };
 
@@ -24,18 +24,16 @@ impl DebugApi {
 impl ManagedBufferApi for DebugApi {
     fn mb_new_empty(&self) -> Handle {
         let mut managed_types = self.m_types_borrow_mut();
-        let handle = self.next_handle();
-        managed_types.managed_buffer_map.insert(handle, Vec::new());
-        handle
+        managed_types
+            .managed_buffer_map
+            .insert_new_handle(Vec::new())
     }
 
     fn mb_new_from_bytes(&self, bytes: &[u8]) -> Handle {
         let mut managed_types = self.m_types_borrow_mut();
-        let handle = self.next_handle();
         managed_types
             .managed_buffer_map
-            .insert(handle, Vec::from(bytes));
-        handle
+            .insert_new_handle(Vec::from(bytes))
     }
 
     fn mb_len(&self, handle: Handle) -> usize {
@@ -113,12 +111,11 @@ impl ManagedBufferApi for DebugApi {
     }
 
     fn mb_set_random(&self, dest_handle: Handle, length: usize) {
-        let mut managed_types = self.m_types_borrow_mut();
-        let bytes = managed_types.managed_buffer_map.get_mut(dest_handle);
+        let mut bytes = Vec::<u8>::new();
         bytes.resize(length, 0);
-
         let mut rng = self.rng_borrow_mut();
         rng.fill(&mut bytes[..]);
+        self.mb_overwrite(dest_handle, bytes.as_slice());
     }
 
     fn mb_append(&self, accumulator_handle: Handle, data_handle: Handle) {

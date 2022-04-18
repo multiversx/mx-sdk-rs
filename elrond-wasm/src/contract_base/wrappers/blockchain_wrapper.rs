@@ -191,13 +191,6 @@ where
         ManagedByteArray::from_raw_handle(handle)
     }
 
-    // #[inline]
-    // pub fn get_block_random_seed(&self) -> ManagedByteArray<A, 48> {
-    //     let handle = A::static_var_api_impl().next_handle();
-    //     A::blockchain_api_impl().load_block_random_seed(handle);
-    //     ManagedByteArray::from_raw_handle(handle)
-    // }
-
     #[inline]
     pub fn get_prev_block_timestamp(&self) -> u64 {
         A::blockchain_api_impl().get_prev_block_timestamp()

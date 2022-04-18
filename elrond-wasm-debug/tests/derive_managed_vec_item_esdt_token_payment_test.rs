@@ -57,9 +57,9 @@ fn struct_to_bytes_writer() {
     let handle3 = s.eth_address_1.get_raw_handle().to_be_bytes();
     let handle4 = s.eth_address_2.get_raw_handle().to_be_bytes();
     let expected = [
-        0xff, 0xff, 0xff, handle1[3], 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff,
-        0xff, handle2[3], 0x00, 0x01, 0x23, 0x45, 0xff, 0xff, 0xff, handle3[3], 0xff, 0xff, 0xff,
-        handle4[3],
+        handle1[0], handle1[1], handle1[2], handle1[3], 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, handle2[0], handle2[1], handle2[2], handle2[3], 0x00, 0x01, 0x23, 0x45, handle3[0],
+        handle3[1], handle3[2], handle3[3], handle4[0], handle4[1], handle4[2], handle4[3],
     ];
 
     <ManagedStructWithToken<DebugApi> as elrond_wasm::types::ManagedVecItem>::to_byte_writer(
@@ -92,9 +92,9 @@ fn struct_from_bytes_reader() {
     let handle3 = s.eth_address_1.get_raw_handle().to_be_bytes();
     let handle4 = s.eth_address_2.get_raw_handle().to_be_bytes();
     let arr: [u8; 28] = [
-        0xff, 0xff, 0xff, handle1[3], 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff,
-        0xff, handle2[3], 0x00, 0x01, 0x23, 0x45, 0xff, 0xff, 0xff, handle3[3], 0xff, 0xff, 0xff,
-        handle4[3],
+        handle1[0], handle1[1], handle1[2], handle1[3], 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, handle2[0], handle2[1], handle2[2], handle2[3], 0x00, 0x01, 0x23, 0x45, handle3[0],
+        handle3[1], handle3[2], handle3[3], handle4[0], handle4[1], handle4[2], handle4[3],
     ];
 
     let struct_from_bytes =
