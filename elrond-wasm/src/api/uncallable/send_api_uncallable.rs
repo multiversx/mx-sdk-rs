@@ -201,14 +201,6 @@ impl SendApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn storage_store_tx_hash_key<M: ManagedTypeApi>(&self, _data: &ManagedBuffer<M>) {
-        unreachable!()
-    }
-
-    fn storage_load_tx_hash_key<M: ManagedTypeApi>(&self) -> ManagedBuffer<M> {
-        unreachable!()
-    }
-
     fn call_local_esdt_built_in_function<M: ManagedTypeApi>(
         &self,
         _gas: u64,

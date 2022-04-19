@@ -1,7 +1,11 @@
 use core::marker::PhantomData;
 
 use crate::{
-    api::{CallValueApi, CallValueApiImpl, ErrorApi, ManagedTypeApi},
+    api::{
+        const_handles, CallValueApi, CallValueApiImpl, ErrorApi, ErrorApiImpl, ManagedBufferApi,
+        ManagedTypeApi,
+    },
+    err_msg,
     types::{BigUint, EsdtTokenPayment, EsdtTokenType, ManagedType, ManagedVec, TokenIdentifier},
 };
 
@@ -26,21 +30,24 @@ where
     /// Retrieves the EGLD call value from the VM.
     /// Will return 0 in case of an ESDT transfer (cannot have both EGLD and ESDT transfer simultaneously).
     pub fn egld_value(&self) -> BigUint<A> {
-        BigUint::from_raw_handle(A::call_value_api_impl().egld_value())
+        A::call_value_api_impl().load_egld_value(const_handles::CALL_VALUE_EGLD);
+        BigUint::from_raw_handle(const_handles::CALL_VALUE_EGLD) // unsafe, TODO: replace with ManagedRef<...>
     }
 
     /// Returns all ESDT transfers that accompany this SC call.
     /// Will return 0 results if nothing was transfered, or just EGLD.
     /// Fully managed underlying types, very efficient.
     pub fn all_esdt_transfers(&self) -> ManagedVec<A, EsdtTokenPayment<A>> {
-        A::call_value_api_impl().get_all_esdt_transfers()
+        A::call_value_api_impl().load_all_esdt_transfers(const_handles::CALL_VALUE_MULTI_ESDT);
+        ManagedVec::from_raw_handle(const_handles::CALL_VALUE_MULTI_ESDT) // unsafe, TODO: replace with ManagedRef<...>
     }
 
     /// Retrieves the ESDT call value from the VM.
     /// Will return 0 in case of an EGLD transfer (cannot have both EGLD and ESDT transfer simultaneously).
     /// Warning, not tested with multi transfer, use `all_esdt_transfers` instead!
     pub fn esdt_value(&self) -> BigUint<A> {
-        BigUint::from_raw_handle(A::call_value_api_impl().esdt_value())
+        A::call_value_api_impl().load_single_esdt_value(const_handles::CALL_VALUE_SINGLE_ESDT);
+        BigUint::from_raw_handle(const_handles::CALL_VALUE_SINGLE_ESDT)
     }
 
     /// Returns the call value token identifier of the current call.
@@ -83,24 +90,41 @@ where
     }
 
     pub fn require_egld(&self) -> BigUint<A> {
-        BigUint::from_raw_handle(A::call_value_api_impl().require_egld())
+        let call_value_api = A::call_value_api_impl();
+        if call_value_api.esdt_num_transfers() > 0 {
+            A::error_api_impl().signal_error(err_msg::NON_PAYABLE_FUNC_ESDT.as_bytes());
+        }
+
+        self.egld_value()
     }
 
     pub fn require_esdt(&self, token: &[u8]) -> BigUint<A> {
-        BigUint::from_raw_handle(A::call_value_api_impl().require_esdt(token))
+        let m_api = A::managed_type_impl();
+        let call_value_api = A::call_value_api_impl();
+        let error_api = A::error_api_impl();
+
+        let expected_token_handle = const_handles::MBUF_TEMPORARY_1;
+        m_api.mb_overwrite(expected_token_handle, token);
+        if call_value_api.esdt_num_transfers() != 1 {
+            error_api.signal_error(err_msg::SINGLE_ESDT_EXPECTED.as_bytes());
+        }
+        if !m_api.mb_eq(call_value_api.token(), expected_token_handle) {
+            error_api.signal_error(err_msg::BAD_TOKEN_PROVIDED.as_bytes());
+        }
+        call_value_api.load_single_esdt_value(const_handles::CALL_VALUE_SINGLE_ESDT);
+        BigUint::from_raw_handle(const_handles::CALL_VALUE_SINGLE_ESDT)
     }
 
     /// Returns both the call value (either EGLD or ESDT) and the token identifier.
     /// Especially used in the `#[payable("*")] auto-generated snippets.
-    /// The method might seem redundant, but there is such a hook in Arwen
-    /// that might be used in this scenario in the future.
     /// TODO: replace with multi transfer handling everywhere
     pub fn payment_token_pair(&self) -> (BigUint<A>, TokenIdentifier<A>) {
-        let (amount_handle, token_handle) = A::call_value_api_impl().payment_token_pair();
-        (
-            BigUint::from_raw_handle(amount_handle),
-            TokenIdentifier::from_raw_handle(token_handle),
-        )
+        let call_value_api = A::call_value_api_impl();
+        if call_value_api.esdt_num_transfers() == 0 {
+            (self.egld_value(), TokenIdentifier::egld())
+        } else {
+            (self.esdt_value(), self.token())
+        }
     }
 
     pub fn payment(&self) -> EsdtTokenPayment<A> {

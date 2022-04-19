@@ -6,7 +6,7 @@ use super::{
 };
 use crate::{
     abi::{TypeAbi, TypeName},
-    api::{BlockchainApiImpl, CallTypeApi, ErrorApiImpl, StorageMapperApi},
+    api::{CallTypeApi, ErrorApiImpl, StorageMapperApi},
     contract_base::{BlockchainWrapper, SendWrapper},
     esdt::{ESDTSystemSmartContractProxy, FungibleTokenProperties},
     storage::StorageKey,
@@ -123,8 +123,7 @@ where
     }
 
     fn default_callback_closure_obj(&self, initial_supply: &BigUint<SA>) -> CallbackClosure<SA> {
-        let initial_caller =
-            ManagedAddress::<SA>::from_raw_handle(SA::blockchain_api_impl().get_caller_handle());
+        let initial_caller = BlockchainWrapper::<SA>::new().get_caller();
         let cb_name = if initial_supply > &0 {
             DEFAULT_ISSUE_WITH_INIT_SUPPLY_CALLBACK_NAME
         } else {

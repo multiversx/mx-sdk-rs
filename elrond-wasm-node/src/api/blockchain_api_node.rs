@@ -5,7 +5,10 @@ use crate::{
     VmApiImpl,
 };
 use elrond_wasm::{
-    api::{BlockchainApi, BlockchainApiImpl, Handle, ManagedTypeApi},
+    api::{
+        BlockchainApi, BlockchainApiImpl, Handle, ManagedBufferApi, ManagedTypeApi,
+        StaticVarApiImpl,
+    },
     types::{
         heap::{Address, Box, H256},
         BigUint, EsdtTokenData, EsdtTokenType, ManagedAddress, ManagedBuffer, ManagedType,
@@ -15,9 +18,6 @@ use elrond_wasm::{
 
 #[allow(unused)]
 extern "C" {
-    // managed buffer API
-    fn mBufferNew() -> i32;
-
     // address utils
     fn getSCAddress(resultOffset: *mut u8);
     #[cfg(not(feature = "ei-unmanaged"))]
@@ -69,7 +69,7 @@ extern "C" {
     fn managedGetOriginalTxHash(resultHandle: i32);
 
     // big int API
-    fn bigIntNew(value: i64) -> i32;
+    fn bigIntSetInt64(destination: i32, value: i64);
     fn bigIntGetExternalBalance(address_ptr: *const u8, dest: i32);
     fn bigIntGetESDTExternalBalance(
         address_ptr: *const u8,
@@ -149,6 +149,23 @@ impl BlockchainApi for VmApiImpl {
 
 impl BlockchainApiImpl for VmApiImpl {
     #[inline]
+    fn get_caller_legacy(&self) -> Address {
+        unsafe {
+            let mut res = Address::zero();
+            getCaller(res.as_mut_ptr());
+            res
+        }
+    }
+
+    #[inline]
+    #[cfg(not(feature = "ei-unmanaged"))]
+    fn load_caller_managed(&self, dest: Handle) {
+        unsafe {
+            managedCaller(dest);
+        }
+    }
+
+    #[inline]
     fn get_sc_address_legacy(&self) -> Address {
         unsafe {
             let mut res = Address::zero();
@@ -159,11 +176,9 @@ impl BlockchainApiImpl for VmApiImpl {
 
     #[inline]
     #[cfg(not(feature = "ei-unmanaged"))]
-    fn get_sc_address_handle(&self) -> Handle {
+    fn load_sc_address_managed(&self, dest: Handle) {
         unsafe {
-            let handle = mBufferNew();
-            managedSCAddress(handle);
-            handle
+            managedSCAddress(dest);
         }
     }
 
@@ -178,11 +193,9 @@ impl BlockchainApiImpl for VmApiImpl {
 
     #[inline]
     #[cfg(not(feature = "ei-unmanaged"))]
-    fn get_owner_address_handle(&self) -> Handle {
+    fn load_owner_address_managed(&self, dest: Handle) {
         unsafe {
-            let handle = mBufferNew();
-            managedOwnerAddress(handle);
-            handle
+            managedOwnerAddress(dest);
         }
     }
 
@@ -207,37 +220,16 @@ impl BlockchainApiImpl for VmApiImpl {
     }
 
     #[inline]
-    fn get_caller_legacy(&self) -> Address {
+    fn load_balance_legacy(&self, dest: Handle, address: &Address) {
         unsafe {
-            let mut res = Address::zero();
-            getCaller(res.as_mut_ptr());
-            res
+            bigIntGetExternalBalance(address.as_ref().as_ptr(), dest);
         }
     }
 
     #[inline]
-    #[cfg(not(feature = "ei-unmanaged"))]
-    fn get_caller_handle(&self) -> Handle {
+    fn load_balance(&self, dest: Handle, address_handle: Handle) {
         unsafe {
-            let handle = mBufferNew();
-            managedCaller(handle);
-            handle
-        }
-    }
-
-    fn get_balance_legacy(&self, address: &Address) -> Handle {
-        unsafe {
-            let balance_handle = bigIntNew(0);
-            bigIntGetExternalBalance(address.as_ref().as_ptr(), balance_handle);
-            balance_handle
-        }
-    }
-
-    fn get_balance_handle(&self, address_handle: Handle) -> Handle {
-        unsafe {
-            let balance_handle = bigIntNew(0);
-            bigIntGetExternalBalance(unsafe_buffer_load_address(address_handle), balance_handle);
-            balance_handle
+            bigIntGetExternalBalance(unsafe_buffer_load_address(address_handle), dest);
         }
     }
 
@@ -252,13 +244,9 @@ impl BlockchainApiImpl for VmApiImpl {
 
     #[inline]
     #[cfg(not(feature = "ei-unmanaged"))]
-    fn get_state_root_hash<M: ManagedTypeApi>(
-        &self,
-    ) -> elrond_wasm::types::ManagedByteArray<M, 32> {
+    fn load_state_root_hash_managed(&self, dest: Handle) {
         unsafe {
-            let result_handle = mBufferNew();
-            managedGetStateRootHash(result_handle);
-            elrond_wasm::types::ManagedByteArray::from_raw_handle(result_handle)
+            managedGetStateRootHash(dest);
         }
     }
 
@@ -273,11 +261,9 @@ impl BlockchainApiImpl for VmApiImpl {
 
     #[inline]
     #[cfg(not(feature = "ei-unmanaged"))]
-    fn get_tx_hash<M: ManagedTypeApi>(&self) -> elrond_wasm::types::ManagedByteArray<M, 32> {
+    fn load_tx_hash_managed(&self, dest: Handle) {
         unsafe {
-            let result_handle = mBufferNew();
-            managedGetOriginalTxHash(result_handle);
-            elrond_wasm::types::ManagedByteArray::from_raw_handle(result_handle)
+            managedGetOriginalTxHash(dest);
         }
     }
 
@@ -317,13 +303,9 @@ impl BlockchainApiImpl for VmApiImpl {
 
     #[inline]
     #[cfg(not(feature = "ei-unmanaged"))]
-    fn get_block_random_seed<M: ManagedTypeApi>(
-        &self,
-    ) -> elrond_wasm::types::ManagedByteArray<M, 48> {
+    fn load_block_random_seed_managed(&self, dest: Handle) {
         unsafe {
-            let result_handle = mBufferNew();
-            managedGetBlockRandomSeed(result_handle);
-            elrond_wasm::types::ManagedByteArray::from_raw_handle(result_handle)
+            managedGetBlockRandomSeed(dest);
         }
     }
 
@@ -358,48 +340,40 @@ impl BlockchainApiImpl for VmApiImpl {
 
     #[inline]
     #[cfg(not(feature = "ei-unmanaged"))]
-    fn get_prev_block_random_seed<M: ManagedTypeApi>(
-        &self,
-    ) -> elrond_wasm::types::ManagedByteArray<M, 48> {
+    fn load_prev_block_random_seed_managed(&self, dest: Handle) {
         unsafe {
-            let result_handle = mBufferNew();
-            managedGetPrevBlockRandomSeed(result_handle);
-            elrond_wasm::types::ManagedByteArray::from_raw_handle(result_handle)
+            managedGetPrevBlockRandomSeed(dest);
         }
     }
 
     #[inline]
-    fn get_current_esdt_nft_nonce<M: ManagedTypeApi>(
-        &self,
-        address: &ManagedAddress<M>,
-        token: &TokenIdentifier<M>,
-    ) -> u64 {
+    fn get_current_esdt_nft_nonce(&self, address_handle: Handle, token_id_handle: Handle) -> u64 {
         unsafe {
+            let token_identifier_len = self.mb_len(token_id_handle);
             getCurrentESDTNFTNonce(
-                unsafe_buffer_load_address(address.get_raw_handle()),
-                unsafe_buffer_load_token_identifier(token.get_raw_handle()),
-                token.len() as i32,
+                unsafe_buffer_load_address(address_handle),
+                unsafe_buffer_load_token_identifier(token_id_handle),
+                token_identifier_len as i32,
             ) as u64
         }
     }
 
-    fn get_esdt_balance<M: ManagedTypeApi>(
+    fn load_esdt_balance(
         &self,
-        address: &ManagedAddress<M>,
-        token: &TokenIdentifier<M>,
+        address_handle: Handle,
+        token_id_handle: Handle,
         nonce: u64,
-    ) -> BigUint<M> {
+        dest: Handle,
+    ) {
+        let token_identifier_len = self.mb_len(token_id_handle);
         unsafe {
-            let balance_handle = bigIntNew(0);
             bigIntGetESDTExternalBalance(
-                unsafe_buffer_load_address(address.get_raw_handle()),
-                unsafe_buffer_load_token_identifier(token.get_raw_handle()),
-                token.len() as i32,
+                unsafe_buffer_load_address(address_handle),
+                unsafe_buffer_load_token_identifier(token_id_handle),
+                token_identifier_len as i32,
                 nonce as i64,
-                balance_handle,
+                dest,
             );
-
-            BigUint::from_raw_handle(balance_handle)
         }
     }
 
@@ -413,7 +387,7 @@ impl BlockchainApiImpl for VmApiImpl {
         use elrond_wasm::types::heap::BoxedBytes;
         let address = m_address.to_address();
         unsafe {
-            let value_handle = bigIntNew(0);
+            let value_handle = self.next_handle();
             let mut properties = [0u8; 2]; // always 2 bytes
             let mut hash = BoxedBytes::allocate(128);
 
@@ -445,7 +419,7 @@ impl BlockchainApiImpl for VmApiImpl {
             let mut uri_bytes = BoxedBytes::allocate(uris_len);
 
             let mut creator = Address::zero();
-            let royalties_handle = bigIntNew(0);
+            let royalties_handle = self.next_handle();
 
             getESDTTokenData(
                 address.as_ref().as_ptr(),
@@ -501,16 +475,18 @@ impl BlockchainApiImpl for VmApiImpl {
         token: &TokenIdentifier<M>,
         nonce: u64,
     ) -> EsdtTokenData<M> {
+        use elrond_wasm::api::const_handles;
+
         let managed_token_id = token.as_managed_buffer();
         unsafe {
-            let value_handle = bigIntNew(0);
-            let properties_handle = mBufferNew();
-            let hash_handle = mBufferNew();
-            let name_handle = mBufferNew();
-            let attributes_handle = mBufferNew();
-            let creator_handle = mBufferNew();
-            let royalties_handle = bigIntNew(0);
-            let uris_handle = mBufferNew();
+            let value_handle = self.next_handle();
+            let properties_handle = const_handles::MBUF_TEMPORARY_1;
+            let hash_handle = self.next_handle();
+            let name_handle = self.next_handle();
+            let attributes_handle = self.next_handle();
+            let creator_handle = self.next_handle();
+            let royalties_handle = self.next_handle();
+            let uris_handle = self.next_handle();
 
             managedGetESDTTokenData(
                 address.get_raw_handle(),
@@ -533,9 +509,8 @@ impl BlockchainApiImpl for VmApiImpl {
             };
 
             // here we trust Arwen that it always gives us a properties buffer of length 2
-            let properties_buffer = ManagedBuffer::<Self>::from_raw_handle(properties_handle);
             let mut properties_bytes = [0u8; 2];
-            let _ = properties_buffer.load_slice(0, &mut properties_bytes[..]);
+            let _ = self.mb_load_slice(properties_handle, 0, &mut properties_bytes[..]);
             let frozen = properties_bytes[0] == 0 && properties_bytes[1] == 0; // token is frozen if properties are not 0
 
             EsdtTokenData {
@@ -552,14 +527,13 @@ impl BlockchainApiImpl for VmApiImpl {
         }
     }
 
-    fn get_esdt_local_roles<M: ManagedTypeApi>(
+    fn get_esdt_local_roles(
         &self,
-        token_id: &TokenIdentifier<M>,
+        token_id_handle: Handle,
     ) -> elrond_wasm::types::EsdtLocalRoleFlags {
-        let managed_token_id = token_id.as_managed_buffer();
         unsafe {
             elrond_wasm::types::EsdtLocalRoleFlags::from_bits_unchecked(getESDTLocalRoles(
-                managed_token_id.get_raw_handle(),
+                token_id_handle,
             ) as u64)
         }
     }

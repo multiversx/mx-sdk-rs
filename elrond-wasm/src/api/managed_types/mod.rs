@@ -1,4 +1,5 @@
 mod big_int_api;
+pub mod const_handles;
 mod elliptic_curve_api;
 mod managed_buffer_api;
 mod managed_type_api;
