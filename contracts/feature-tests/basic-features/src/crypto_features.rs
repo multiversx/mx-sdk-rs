@@ -4,6 +4,7 @@ elrond_wasm::imports!();
 #[elrond_wasm::module]
 pub trait CryptoFeatures {
     #[endpoint]
+    #[allow(deprecated)]
     fn compute_sha256_legacy_managed(
         &self,
         input: ManagedBuffer,
@@ -17,6 +18,7 @@ pub trait CryptoFeatures {
     }
 
     #[endpoint]
+    #[allow(deprecated)]
     fn compute_keccak256_legacy_managed(
         &self,
         input: ManagedBuffer,

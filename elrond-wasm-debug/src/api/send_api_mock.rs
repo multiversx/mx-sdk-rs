@@ -6,9 +6,8 @@ use crate::{
 };
 use elrond_wasm::{
     api::{
-        BlockchainApiImpl, ManagedTypeApi, SendApi, SendApiImpl, StorageReadApiImpl,
-        StorageWriteApiImpl, ESDT_MULTI_TRANSFER_FUNC_NAME, ESDT_NFT_TRANSFER_FUNC_NAME,
-        ESDT_TRANSFER_FUNC_NAME, UPGRADE_CONTRACT_FUNC_NAME,
+        BlockchainApiImpl, ManagedTypeApi, SendApi, SendApiImpl, ESDT_MULTI_TRANSFER_FUNC_NAME,
+        ESDT_NFT_TRANSFER_FUNC_NAME, ESDT_TRANSFER_FUNC_NAME, UPGRADE_CONTRACT_FUNC_NAME,
     },
     elrond_codec::top_encode_to_vec_u8,
     err_msg,
@@ -561,17 +560,6 @@ impl SendApiImpl for DebugApi {
         _arg_buffer: &ManagedArgBuffer<M>,
     ) -> ManagedVec<M, ManagedBuffer<M>> {
         panic!("execute_on_dest_context_readonly_raw not implemented yet!");
-    }
-
-    fn storage_store_tx_hash_key<M: ManagedTypeApi>(&self, data: &ManagedBuffer<M>) {
-        let tx_hash = self.get_tx_hash_legacy();
-        self.storage_store_slice_u8(tx_hash.as_bytes(), data.to_boxed_bytes().as_slice());
-    }
-
-    fn storage_load_tx_hash_key<M: ManagedTypeApi>(&self) -> ManagedBuffer<M> {
-        let tx_hash = self.get_tx_hash_legacy();
-        let bytes = self.storage_load_to_heap(tx_hash.as_bytes());
-        ManagedBuffer::new_from_bytes(&*bytes)
     }
 
     fn call_local_esdt_built_in_function<M: ManagedTypeApi>(

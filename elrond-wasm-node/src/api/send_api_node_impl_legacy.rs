@@ -1,10 +1,7 @@
 use crate::{api::managed_types::big_int_api_node::unsafe_buffer_load_be_pad_right, VmApiImpl};
 use alloc::vec::Vec;
 use elrond_wasm::{
-    api::{
-        BlockchainApi, BlockchainApiImpl, ManagedTypeApi, SendApiImpl, StorageReadApiImpl,
-        StorageWriteApiImpl,
-    },
+    api::{const_handles, BlockchainApi, BlockchainApiImpl, ManagedTypeApi, SendApiImpl},
     types::{
         heap::{Address, ArgBuffer, BoxedBytes},
         managed_vec_from_slice_of_boxed_bytes, BigUint, CodeMetadata, EsdtTokenPayment,
@@ -680,18 +677,6 @@ impl SendApiImpl for VmApiImpl {
         }
     }
 
-    fn storage_store_tx_hash_key<M: ManagedTypeApi>(&self, data: &ManagedBuffer<M>) {
-        let tx_hash = self.get_tx_hash::<M>();
-        self.storage_store_managed_buffer_raw(tx_hash.get_raw_handle(), data.get_raw_handle());
-    }
-
-    fn storage_load_tx_hash_key<M: ManagedTypeApi>(&self) -> ManagedBuffer<M> {
-        let tx_hash = self.get_tx_hash::<M>();
-        ManagedBuffer::from_raw_handle(
-            self.storage_load_managed_buffer_raw(tx_hash.get_raw_handle()),
-        )
-    }
-
     fn call_local_esdt_built_in_function<M: ManagedTypeApi>(
         &self,
         gas: u64,
@@ -699,11 +684,12 @@ impl SendApiImpl for VmApiImpl {
         arg_buffer: &ManagedArgBuffer<M>,
     ) -> ManagedVec<M, ManagedBuffer<M>> {
         // account-level built-in function, so the destination address is the contract itself
-        let own_address = VmApiImpl::blockchain_api_impl().get_sc_address_handle();
+        let own_address_handle = const_handles::MBUF_TEMPORARY_1;
+        VmApiImpl::blockchain_api_impl().load_sc_address_managed(own_address_handle);
 
         self.execute_on_dest_context_raw(
             gas,
-            &ManagedAddress::from_raw_handle(own_address),
+            &ManagedAddress::from_raw_handle(own_address_handle),
             &BigUint::zero(),
             function_name,
             arg_buffer,

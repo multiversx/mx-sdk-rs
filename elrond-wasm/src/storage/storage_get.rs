@@ -1,7 +1,10 @@
 use core::marker::PhantomData;
 
 use crate::{
-    api::{ErrorApi, ErrorApiImpl, ManagedTypeApi, StorageReadApi, StorageReadApiImpl},
+    api::{
+        const_handles, ErrorApi, ErrorApiImpl, ManagedBufferApi, ManagedTypeApi, StaticVarApiImpl,
+        StorageReadApi, StorageReadApiImpl,
+    },
     err_msg,
     types::{
         BigInt, BigUint, ManagedBuffer, ManagedBufferNestedDecodeInput, ManagedRef, ManagedType,
@@ -29,8 +32,9 @@ where
     }
 
     fn to_managed_buffer(&self) -> ManagedBuffer<A> {
-        let mbuf_handle = A::storage_read_api_impl()
-            .storage_load_managed_buffer_raw(self.key.buffer.get_raw_handle());
+        let mbuf_handle = A::static_var_api_impl().next_handle();
+        A::storage_read_api_impl()
+            .storage_load_managed_buffer_raw(self.key.buffer.get_raw_handle(), mbuf_handle);
         ManagedBuffer::from_raw_handle(mbuf_handle)
     }
 
@@ -43,7 +47,10 @@ where
     }
 
     fn load_len_managed_buffer(&self) -> usize {
-        A::storage_read_api_impl().storage_load_managed_buffer_len(self.key.buffer.get_raw_handle())
+        let value_handle = const_handles::MBUF_TEMPORARY_1;
+        A::storage_read_api_impl()
+            .storage_load_managed_buffer_raw(self.key.buffer.get_raw_handle(), value_handle);
+        A::managed_type_impl().mb_len(value_handle)
     }
 }
 
@@ -119,7 +126,9 @@ pub fn storage_get_len<A>(key: ManagedRef<'_, A, StorageKey<A>>) -> usize
 where
     A: StorageReadApi + ManagedTypeApi + ErrorApi,
 {
-    A::storage_read_api_impl().storage_load_managed_buffer_len(key.get_raw_handle())
+    let value_handle = const_handles::MBUF_TEMPORARY_1;
+    A::storage_read_api_impl().storage_load_managed_buffer_raw(key.get_raw_handle(), value_handle);
+    A::managed_type_impl().mb_len(value_handle)
 }
 
 /// Will immediately end the execution when encountering the first decode error, via `signal_error`.

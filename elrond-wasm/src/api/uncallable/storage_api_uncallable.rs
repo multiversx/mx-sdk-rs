@@ -22,15 +22,11 @@ impl StorageReadApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn storage_load_big_uint_raw(&self, _key: &[u8]) -> Handle {
+    fn storage_load_big_uint_raw(&self, _key: &[u8], _dest: Handle) {
         unreachable!()
     }
 
-    fn storage_load_managed_buffer_raw(&self, _key_handle: Handle) -> Handle {
-        unreachable!()
-    }
-
-    fn storage_load_managed_buffer_len(&self, _key_handle: Handle) -> usize {
+    fn storage_load_managed_buffer_raw(&self, _key_handle: Handle, _dest: Handle) {
         unreachable!()
     }
 
@@ -42,7 +38,12 @@ impl StorageReadApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn storage_load_from_address(&self, _address_handle: Handle, _key_handle: Handle) -> Handle {
+    fn storage_load_from_address(
+        &self,
+        _address_handle: Handle,
+        _key_handle: Handle,
+        _dest: Handle,
+    ) {
         unreachable!()
     }
 }

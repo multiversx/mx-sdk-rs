@@ -9,7 +9,7 @@ use super::{
 };
 use crate::{
     abi::{TypeAbi, TypeName},
-    api::{BlockchainApiImpl, CallTypeApi, ErrorApiImpl, StorageMapperApi},
+    api::{CallTypeApi, ErrorApiImpl, StorageMapperApi},
     contract_base::{BlockchainWrapper, SendWrapper},
     esdt::{
         ESDTSystemSmartContractProxy, MetaTokenProperties, NonFungibleTokenProperties,
@@ -131,8 +131,7 @@ where
     }
 
     fn default_callback_closure_obj(&self) -> CallbackClosure<SA> {
-        let initial_caller =
-            ManagedAddress::<SA>::from_raw_handle(SA::blockchain_api_impl().get_caller_handle());
+        let initial_caller = BlockchainWrapper::<SA>::new().get_caller();
         let cb_name = DEFAULT_ISSUE_CALLBACK_NAME;
 
         let mut cb_closure = CallbackClosure::new(cb_name.into());

@@ -30,15 +30,15 @@ impl EndpointArgumentApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn get_argument_big_int_raw(&self, _arg_id: i32) -> Handle {
+    fn load_argument_big_int_signed(&self, _arg_id: i32, _dest: Handle) {
         unreachable!()
     }
 
-    fn get_argument_big_uint_raw(&self, _arg_id: i32) -> Handle {
+    fn load_argument_big_int_unsigned(&self, _arg_id: i32, _dest: Handle) {
         unreachable!()
     }
 
-    fn get_argument_managed_buffer_raw(&self, _arg_id: i32) -> Handle {
+    fn load_argument_managed_buffer(&self, _arg_id: i32, _dest: Handle) {
         unreachable!()
     }
 
