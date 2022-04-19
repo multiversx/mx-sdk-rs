@@ -59,7 +59,7 @@ fn optimize_contract(build_args: &BuildArgs, wasm_path: &str) {
     }
 
     let _ = Command::new(WASM_OPT_NAME)
-        .args([wasm_path, "-O4", "--output", wasm_path])
+        .args([wasm_path, "-Oz", "--output", wasm_path])
         .spawn()
         .expect("failed to spawn wasm-out process")
         .wait()
