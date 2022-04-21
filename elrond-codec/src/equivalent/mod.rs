@@ -3,5 +3,5 @@ mod codec_from;
 mod codec_into;
 
 pub use codec_convert::*;
-pub use codec_from::CodecFrom;
+pub use codec_from::{CodecFrom, CodecSelf};
 pub use codec_into::CodecInto;

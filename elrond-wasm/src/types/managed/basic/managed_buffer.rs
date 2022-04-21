@@ -11,7 +11,7 @@ use crate::{
     types::{heap::BoxedBytes, ManagedType},
 };
 use elrond_codec::{
-    CodecFrom, DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput,
+    CodecFrom, CodecSelf, DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput,
     NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
     TryStaticCast,
 };
@@ -296,6 +296,8 @@ impl<M: ManagedTypeApi> TopEncode for ManagedBuffer<M> {
         }
     }
 }
+
+impl<M> CodecSelf for ManagedBuffer<M> where M: ManagedTypeApi {}
 
 impl<M: ManagedTypeApi> CodecFrom<&[u8]> for ManagedBuffer<M> {}
 impl<M: ManagedTypeApi, const N: usize> CodecFrom<&[u8; N]> for ManagedBuffer<M> {}

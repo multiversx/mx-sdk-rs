@@ -62,6 +62,15 @@ impl InterpretableFrom<&AddressValue> for AddressKey {
     }
 }
 
+impl InterpretableFrom<&[u8; 32]> for AddressKey {
+    fn interpret_from(from: &[u8; 32], _context: &InterpreterContext) -> Self {
+        AddressKey {
+            value: from.clone(),
+            original: format!("0x{}", hex::encode(from)),
+        }
+    }
+}
+
 impl IntoRaw<String> for AddressKey {
     fn into_raw(self) -> String {
         self.original

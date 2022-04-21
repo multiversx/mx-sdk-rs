@@ -1,6 +1,6 @@
 use crate::{
-    DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti, TopDecodeMultiInput, TopEncodeMulti,
-    TopEncodeMultiOutput,
+    CodecFrom, CodecSelf, DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti,
+    TopDecodeMultiInput, TopEncodeMulti, TopEncodeMultiOutput,
 };
 
 /// A smart contract argument or result that can be missing.
@@ -68,4 +68,21 @@ where
             Ok(OptionalValue::None)
         }
     }
+}
+
+impl<T> !CodecSelf for OptionalValue<T> {}
+
+impl<T, U> CodecFrom<OptionalValue<U>> for OptionalValue<T>
+where
+    T: TopEncodeMulti + TopDecodeMulti,
+    U: CodecFrom<T>,
+    OptionalValue<U>: TopEncodeMulti,
+{
+}
+
+impl<T, U> CodecFrom<U> for OptionalValue<T>
+where
+    T: TopEncodeMulti + TopDecodeMulti,
+    U: CodecFrom<T> + CodecSelf + TopEncodeMulti + TopDecodeMulti,
+{
 }
