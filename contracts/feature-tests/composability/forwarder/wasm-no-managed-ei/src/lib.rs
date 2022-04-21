@@ -39,6 +39,7 @@ elrond_wasm_node::wasm_endpoints! {
         getCurrentNftNonce
         getFungibleEsdtBalance
         get_esdt_local_roles
+        get_esdt_token_data
         get_nft_balance
         issue_fungible_token
         lastErrorMessage

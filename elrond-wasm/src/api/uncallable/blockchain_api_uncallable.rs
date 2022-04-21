@@ -118,6 +118,15 @@ impl BlockchainApiImpl for UncallableApi {
         unreachable!()
     }
 
+    fn get_esdt_token_data_unmanaged<M: ManagedTypeApi>(
+        &self,
+        _address: &ManagedAddress<M>,
+        _token: &TokenIdentifier<M>,
+        _nonce: u64,
+    ) -> EsdtTokenData<M> {
+        unreachable!()
+    }
+
     fn get_esdt_local_roles(&self, _token_id_handle: Handle) -> crate::types::EsdtLocalRoleFlags {
         unreachable!()
     }
