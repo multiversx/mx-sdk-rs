@@ -62,7 +62,7 @@ impl InterpretableFrom<&AddressKey> for AddressValue {
 impl InterpretableFrom<&[u8; 32]> for AddressValue {
     fn interpret_from(from: &[u8; 32], _context: &InterpreterContext) -> Self {
         AddressValue {
-            value: from.clone(),
+            value: *from,
             original: ValueSubTree::Str(format!("0x{}", hex::encode(from))),
         }
     }
