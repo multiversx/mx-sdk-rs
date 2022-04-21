@@ -15,6 +15,6 @@ pub use type_description::*;
 pub use type_description_container::*;
 
 /// Used in generating the ABI.
-// pub use git_version::git_version;
+pub use git_version::git_version;
 
 pub type TypeName = alloc::string::String;
