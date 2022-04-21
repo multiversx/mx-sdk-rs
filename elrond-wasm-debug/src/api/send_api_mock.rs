@@ -427,8 +427,6 @@ impl SendApiImpl for DebugApi {
         let (new_address, result) =
             self.perform_deploy(contract_code, egld_value, arg_buffer.to_raw_args_vec());
 
-        self.clean_return_data();
-
         (ManagedAddress::from(new_address), ManagedVec::from(result))
     }
 
@@ -447,8 +445,6 @@ impl SendApiImpl for DebugApi {
             egld_value,
             arg_buffer.to_raw_args_vec(),
         );
-
-        self.clean_return_data();
 
         (ManagedAddress::from(new_address), ManagedVec::from(result))
     }
@@ -496,8 +492,6 @@ impl SendApiImpl for DebugApi {
             endpoint_name.to_boxed_bytes().into_vec(),
             arg_buffer.to_raw_args_vec(),
         );
-
-        self.clean_return_data();
 
         ManagedVec::from(result)
     }

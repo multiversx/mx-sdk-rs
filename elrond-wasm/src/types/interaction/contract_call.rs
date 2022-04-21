@@ -368,6 +368,8 @@ where
             &self.arg_buffer,
         );
 
+        SA::send_api_impl().clean_return_data();
+
         Self::decode_result(raw_result)
     }
 
@@ -382,6 +384,8 @@ where
             &self.endpoint_name,
             &self.arg_buffer,
         );
+
+        SA::send_api_impl().clean_return_data();
 
         Self::decode_result(raw_result)
     }
@@ -405,6 +409,8 @@ where
             &self.endpoint_name,
             &self.arg_buffer,
         );
+
+        SA::send_api_impl().clean_return_data();
     }
 
     pub fn execute_on_same_context(mut self) {
@@ -416,6 +422,8 @@ where
             &self.endpoint_name,
             &self.arg_buffer,
         );
+
+        SA::send_api_impl().clean_return_data();
     }
 
     fn resolve_gas_limit_with_leftover(&self) -> u64 {
