@@ -28,27 +28,6 @@ pub trait ForwarderSyncCallModule {
 
     #[endpoint]
     #[payable("*")]
-    fn echo_arguments_sync_range(
-        &self,
-        to: ManagedAddress,
-        start: usize,
-        end: usize,
-        #[var_args] args: MultiValueEncoded<ManagedBuffer>,
-    ) {
-        let half_gas = self.blockchain().get_gas_left() / 2;
-
-        let result: MultiValueEncoded<ManagedBuffer> = self
-            .vault_proxy()
-            .contract(to)
-            .echo_arguments(args)
-            .with_gas_limit(half_gas)
-            .execute_on_dest_context_custom_range(|_, _| (start, end));
-
-        self.execute_on_dest_context_result_event(&result.into_vec_of_buffers());
-    }
-
-    #[endpoint]
-    #[payable("*")]
     fn echo_arguments_sync_twice(
         &self,
         to: ManagedAddress,

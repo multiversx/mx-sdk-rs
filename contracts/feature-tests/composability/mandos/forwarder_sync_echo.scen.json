@@ -36,10 +36,7 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [
-                    "1",
-                    "2"
-                ],
+                "out": [],
                 "status": "0",
                 "logs": [
                     {
@@ -76,12 +73,7 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [
-                    "1",
-                    "2",
-                    "1",
-                    "2"
-                ],
+                "out": [],
                 "status": "0",
                 "logs": [
                     {
