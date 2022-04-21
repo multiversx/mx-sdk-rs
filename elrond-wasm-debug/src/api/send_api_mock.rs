@@ -427,6 +427,8 @@ impl SendApiImpl for DebugApi {
         let (new_address, result) =
             self.perform_deploy(contract_code, egld_value, arg_buffer.to_raw_args_vec());
 
+        self.clean_return_data();
+
         (ManagedAddress::from(new_address), ManagedVec::from(result))
     }
 
@@ -445,6 +447,8 @@ impl SendApiImpl for DebugApi {
             egld_value,
             arg_buffer.to_raw_args_vec(),
         );
+
+        self.clean_return_data();
 
         (ManagedAddress::from(new_address), ManagedVec::from(result))
     }
@@ -493,41 +497,9 @@ impl SendApiImpl for DebugApi {
             arg_buffer.to_raw_args_vec(),
         );
 
+        self.clean_return_data();
+
         ManagedVec::from(result)
-    }
-
-    fn execute_on_dest_context_raw_custom_result_range<M, F>(
-        &self,
-        _gas: u64,
-        to: &ManagedAddress<M>,
-        value: &BigUint<M>,
-        endpoint_name: &ManagedBuffer<M>,
-        arg_buffer: &ManagedArgBuffer<M>,
-        range_closure: F,
-    ) -> ManagedVec<M, ManagedBuffer<M>>
-    where
-        M: ManagedTypeApi,
-        F: FnOnce(usize, usize) -> (usize, usize),
-    {
-        let egld_value = self.big_uint_handle_to_value(value.get_raw_handle());
-        let recipient = to.to_address();
-
-        let num_return_data_before = self.result_borrow_mut().result_values.len();
-
-        let result = self.perform_execute_on_dest_context(
-            recipient,
-            egld_value,
-            endpoint_name.to_boxed_bytes().into_vec(),
-            arg_buffer.to_raw_args_vec(),
-        );
-
-        let num_return_data_after = result.len();
-        let (result_start_index, result_end_index) = range_closure(
-            num_return_data_before as usize,
-            num_return_data_after as usize,
-        );
-
-        ManagedVec::from(result[result_start_index..result_end_index].to_vec())
     }
 
     fn execute_on_dest_context_by_caller_raw<M: ManagedTypeApi>(
@@ -577,6 +549,22 @@ impl SendApiImpl for DebugApi {
             arg_buffer.to_raw_args_vec(),
         );
 
+        self.clean_return_data();
+
         ManagedVec::from(result)
+    }
+
+    fn clean_return_data(&self) {
+        let mut tx_result = self.result_borrow_mut();
+        tx_result.result_values.clear();
+    }
+
+    fn delete_from_return_data(&self, index: usize) {
+        let mut tx_result = self.result_borrow_mut();
+        if index > tx_result.result_values.len() {
+            return;
+        }
+
+        let _ = tx_result.result_values.remove(index);
     }
 }

@@ -66,11 +66,6 @@ fn forw_raw_direct_multi_esdt_go() {
 }
 
 #[test]
-fn forw_raw_sync_echo_go() {
-    elrond_wasm_debug::mandos_go("mandos/forw_raw_sync_echo.scen.json");
-}
-
-#[test]
 fn forw_raw_sync_echo_caller_go() {
     elrond_wasm_debug::mandos_go("mandos/forw_raw_sync_echo_caller.scen.json");
 }
@@ -359,16 +354,6 @@ fn forwarder_send_twice_egld_go() {
 #[test]
 fn forwarder_send_twice_esdt_go() {
     elrond_wasm_debug::mandos_go("mandos/forwarder_send_twice_esdt.scen.json");
-}
-
-#[test]
-fn forwarder_sync_echo_go() {
-    elrond_wasm_debug::mandos_go("mandos/forwarder_sync_echo.scen.json");
-}
-
-#[test]
-fn forwarder_sync_echo_range_go() {
-    elrond_wasm_debug::mandos_go("mandos/forwarder_sync_echo_range.scen.json");
 }
 
 #[test]

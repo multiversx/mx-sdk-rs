@@ -109,11 +109,6 @@ fn forw_raw_direct_multi_esdt_rs() {
     elrond_wasm_debug::mandos_rs("mandos/forw_raw_direct_multi_esdt.scen.json", world());
 }
 
-#[test]
-fn forw_raw_sync_echo_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/forw_raw_sync_echo.scen.json", world());
-}
-
 // #[test]
 // fn forw_raw_sync_echo_caller_rs() {
 //     elrond_wasm_debug::mandos_rs("mandos/forw_raw_sync_echo_caller.scen.json", world());
@@ -473,16 +468,6 @@ fn forwarder_send_esdt_multi_transfer_rs() {
 // fn forwarder_send_twice_esdt_rs() {
 //     elrond_wasm_debug::mandos_rs("mandos/forwarder_send_twice_esdt.scen.json", world());
 // }
-
-#[test]
-fn forwarder_sync_echo_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/forwarder_sync_echo.scen.json", world());
-}
-
-#[test]
-fn forwarder_sync_echo_range_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/forwarder_sync_echo_range.scen.json", world());
-}
 
 #[test]
 fn forwarder_tranfer_esdt_with_fees_rs() {
