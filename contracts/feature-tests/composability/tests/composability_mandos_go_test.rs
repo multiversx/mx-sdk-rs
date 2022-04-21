@@ -367,11 +367,6 @@ fn forwarder_sync_echo_go() {
 }
 
 #[test]
-fn forwarder_sync_echo_range_go() {
-    elrond_wasm_debug::mandos_go("mandos/forwarder_sync_echo_range.scen.json");
-}
-
-#[test]
 fn forwarder_tranfer_esdt_with_fees_go() {
     elrond_wasm_debug::mandos_go("mandos/forwarder_tranfer_esdt_with_fees.scen.json");
 }
