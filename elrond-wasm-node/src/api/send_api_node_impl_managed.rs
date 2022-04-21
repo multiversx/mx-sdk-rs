@@ -298,8 +298,6 @@ impl SendApiImpl for VmApiImpl {
             let new_managed_address = ManagedAddress::from_raw_handle(new_address_handle);
             let results = ManagedVec::from_raw_handle(result_handle);
 
-            self.clean_return_data();
-
             (new_managed_address, results)
         }
     }
@@ -328,8 +326,6 @@ impl SendApiImpl for VmApiImpl {
 
             let new_managed_address = ManagedAddress::from_raw_handle(new_address_handle);
             let results = ManagedVec::from_raw_handle(result_handle);
-
-            self.clean_return_data();
 
             (new_managed_address, results)
         }
@@ -406,8 +402,6 @@ impl SendApiImpl for VmApiImpl {
                 result_handle,
             );
 
-            self.clean_return_data();
-
             ManagedVec::from_raw_handle(result_handle)
         }
     }
@@ -431,8 +425,6 @@ impl SendApiImpl for VmApiImpl {
                 arg_buffer.get_raw_handle(),
                 result_handle,
             );
-
-            self.clean_return_data();
 
             ManagedVec::from_raw_handle(result_handle)
         }
@@ -458,8 +450,6 @@ impl SendApiImpl for VmApiImpl {
                 result_handle,
             );
 
-            self.clean_return_data();
-
             ManagedVec::from_raw_handle(result_handle)
         }
     }
@@ -482,8 +472,6 @@ impl SendApiImpl for VmApiImpl {
                 result_handle,
             );
 
-            self.clean_return_data();
-
             ManagedVec::from_raw_handle(result_handle)
         }
     }
@@ -498,13 +486,17 @@ impl SendApiImpl for VmApiImpl {
         let own_address_handle = const_handles::MBUF_TEMPORARY_1;
         VmApiImpl::blockchain_api_impl().load_sc_address_managed(own_address_handle);
 
-        self.execute_on_dest_context_raw(
+        let results = self.execute_on_dest_context_raw(
             gas,
             &ManagedAddress::from_raw_handle(own_address_handle),
             &BigUint::zero(),
             function_name,
             arg_buffer,
-        )
+        );
+
+        self.clean_return_data();
+
+        results
     }
 
     fn clean_return_data(&self) {
