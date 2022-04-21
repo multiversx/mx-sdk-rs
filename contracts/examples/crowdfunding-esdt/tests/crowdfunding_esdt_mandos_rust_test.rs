@@ -1,8 +1,6 @@
 use crowdfunding_esdt::*;
-use elrond_wasm::storage::mappers::SingleValue;
 use elrond_wasm_debug::{
     mandos::{interpret_trait::InterpretableFrom, model::*},
-    num_bigint::BigUint,
     *,
 };
 
