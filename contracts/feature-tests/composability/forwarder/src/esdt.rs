@@ -4,6 +4,18 @@ use super::storage;
 
 const PERCENTAGE_TOTAL: u64 = 10_000; // 100%
 
+pub type EsdtTokenDataMultiValue<M> = MultiValue9<
+    EsdtTokenType,
+    BigUint<M>,
+    bool,
+    ManagedBuffer<M>,
+    ManagedBuffer<M>,
+    ManagedBuffer<M>,
+    ManagedAddress<M>,
+    BigUint<M>,
+    ManagedVec<M, ManagedBuffer<M>>,
+>;
+
 #[elrond_wasm::module]
 pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
     #[view(getFungibleEsdtBalance)]
@@ -167,7 +179,7 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
         self.send().esdt_local_burn(&token_identifier, 0, &amount);
     }
 
-    #[endpoint]
+    #[view]
     fn get_esdt_local_roles(&self, token_id: TokenIdentifier) -> MultiValueEncoded<ManagedBuffer> {
         let roles = self.blockchain().get_esdt_local_roles(&token_id);
         let mut result = MultiValueEncoded::new();
@@ -177,7 +189,32 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
         result
     }
 
-    #[endpoint]
+    #[view]
+    fn get_esdt_token_data(
+        &self,
+        address: ManagedAddress,
+        token_id: TokenIdentifier,
+        nonce: u64,
+    ) -> EsdtTokenDataMultiValue<Self::Api> {
+        let token_data = self
+            .blockchain()
+            .get_esdt_token_data(&address, &token_id, nonce);
+
+        (
+            token_data.token_type,
+            token_data.amount,
+            token_data.frozen,
+            token_data.hash,
+            token_data.name,
+            token_data.attributes,
+            token_data.creator,
+            token_data.royalties,
+            token_data.uris,
+        )
+            .into()
+    }
+
+    #[view]
     fn validate_token_identifier(&self, token_id: TokenIdentifier) -> bool {
         token_id.is_valid_esdt_identifier()
     }
