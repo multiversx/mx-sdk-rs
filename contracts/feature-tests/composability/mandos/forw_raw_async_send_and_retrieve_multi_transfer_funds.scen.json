@@ -60,14 +60,11 @@
                     "2",
                     "1000"
                 ],
-                "gasLimit": "70,000,000",
+                "gasLimit": "80,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [
-                    "3",
-                    "4"
-                ],
+                "out": [],
                 "status": "0",
                 "message": "",
                 "gas": "*",
@@ -118,11 +115,7 @@
                     },
                     "storage": {
                         "str:callback_data.item|u32:1": {
-                            "1-return_code": "u32:0",
-                            "2-length_arg_1": "u32:1",
-                            "3-arg_1_first_nft_create_nonce": "u8:3",
-                            "4-lenght_arg_2": "u32:1",
-                            "5-arg_2_second_nft_create_nonce": "u8:4"
+                            "1-return_code": "u32:0"
                         },
                         "str:callback_data.len": "1",
                         "str:callback_payments.item|u32:1": {
