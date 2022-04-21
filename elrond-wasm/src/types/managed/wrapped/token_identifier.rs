@@ -196,6 +196,8 @@ impl<M: ManagedTypeApi> TopDecode for TokenIdentifier<M> {
     }
 }
 
+impl<M: ManagedTypeApi> CodecSelf for TokenIdentifier<M> {}
+
 impl<M: ManagedTypeApi> CodecFrom<&[u8]> for TokenIdentifier<M> {}
 
 impl<M: ManagedTypeApi> CodecFrom<Vec<u8>> for TokenIdentifier<M> {}

@@ -2,6 +2,8 @@
 #![feature(try_trait_v2)]
 #![feature(never_type)]
 #![feature(exhaustive_patterns)]
+#![feature(auto_traits)]
+#![feature(negative_impls)]
 
 extern crate alloc;
 

@@ -2,7 +2,7 @@ use crate::{
     api::{ErrorApi, Handle, ManagedTypeApi},
     contract_base::ExitCodecErrorHandler,
     err_msg,
-    types::{ManagedBuffer, ManagedType, ManagedVec, ManagedVecRefIterator},
+    types::{ManagedBuffer, ManagedType, ManagedVec, ManagedVecRefIterator, MultiValueEncoded},
 };
 use alloc::vec::Vec;
 use elrond_codec::{
@@ -106,6 +106,10 @@ where
             v.push(item.to_boxed_bytes().into_vec());
         }
         v
+    }
+
+    pub fn into_multi_value_encoded(self) -> MultiValueEncoded<M, ManagedBuffer<M>> {
+        self.data.into()
     }
 }
 
