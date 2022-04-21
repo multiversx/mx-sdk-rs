@@ -114,7 +114,6 @@
             },
             "expect": {
                 "out": [
-                    "1",
                     "u8:2|nested:str:TICKER-000000|u64:1|biguint:1000"
                 ],
                 "status": "",
@@ -140,7 +139,6 @@
             },
             "expect": {
                 "out": [
-                    "2",
                     "u8:2|nested:str:TICKER-000000|u64:2|biguint:2000"
                 ],
                 "status": "",

@@ -94,7 +94,6 @@
             },
             "expect": {
                 "out": [
-                    "str:some_argument",
                     "sc:child-with-arg",
                     "str:some_argument"
                 ],
@@ -177,7 +176,6 @@
             },
             "expect": {
                 "out": [
-                    "str:some_argument",
                     "sc:child-src-with-arg",
                     "str:some_argument"
                 ],

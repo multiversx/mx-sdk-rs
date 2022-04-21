@@ -245,7 +245,12 @@ where
         endpoint_name: &ManagedBuffer<A>,
         arg_buffer: &ManagedArgBuffer<A>,
     ) -> ManagedVec<A, ManagedBuffer<A>> {
-        A::send_api_impl().call_local_esdt_built_in_function(gas, endpoint_name, arg_buffer)
+        let results =
+            A::send_api_impl().call_local_esdt_built_in_function(gas, endpoint_name, arg_buffer);
+
+        A::send_api_impl().clean_return_data();
+
+        results
     }
 
     /// Allows synchronous minting of ESDT/SFT (depending on nonce). Execution is resumed afterwards.
