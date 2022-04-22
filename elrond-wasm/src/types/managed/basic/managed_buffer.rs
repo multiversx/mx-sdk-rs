@@ -6,7 +6,7 @@ use crate::{
         ErrorApiImpl, Handle, InvalidSliceError, ManagedBufferApi, ManagedTypeApi, StaticVarApiImpl,
     },
     formatter::{
-        hex_util::encode_bytes_as_hex, FormatByteReceiver, SCDisplay, SCLowerHex, HEX_VALUE_PREFIX,
+        hex_util::encode_bytes_as_hex, FormatByteReceiver, SCBinary, SCDisplay, SCLowerHex,
     },
     types::{heap::BoxedBytes, ManagedType},
 };
@@ -164,6 +164,21 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
         let byte_slice = &mut array[..len];
         let _ = self.load_slice(0, byte_slice);
         byte_slice
+    }
+
+    /// Loads all bytes of the managed buffer in batches, then applies given closure on each batch.
+    pub fn for_each_batch<const BATCH_SIZE: usize, F: FnMut(&[u8])>(&self, mut f: F) {
+        let mut buffer = [0u8; BATCH_SIZE];
+        let arg_len = self.len();
+        let mut current_arg_index = 0;
+        while current_arg_index < arg_len {
+            let bytes_remaining = arg_len - current_arg_index;
+            let bytes_to_load = core::cmp::min(bytes_remaining, BATCH_SIZE);
+            let loaded_slice = &mut buffer[0..bytes_to_load];
+            let _ = self.load_slice(current_arg_index, loaded_slice);
+            f(loaded_slice);
+            current_arg_index += BATCH_SIZE;
+        }
     }
 
     #[inline]
@@ -350,14 +365,21 @@ impl<M: ManagedTypeApi> crate::abi::TypeAbi for ManagedBuffer<M> {
 
 impl<M: ManagedTypeApi> SCDisplay for ManagedBuffer<M> {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
-        f.append_managed_buffer(self);
+        f.append_managed_buffer(&ManagedBuffer::from_raw_handle(self.get_raw_handle()));
     }
 }
 
 impl<M: ManagedTypeApi> SCLowerHex for ManagedBuffer<M> {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
-        f.append_bytes(HEX_VALUE_PREFIX); // TODO: in Rust thr `0x` prefix appears only when writing "{:#x}", not "{:x}"
-        f.append_managed_buffer_lower_hex(self);
+        // TODO: in Rust thr `0x` prefix appears only when writing "{:#x}", not "{:x}"
+        f.append_managed_buffer_lower_hex(&ManagedBuffer::from_raw_handle(self.get_raw_handle()));
+    }
+}
+
+impl<M: ManagedTypeApi> SCBinary for ManagedBuffer<M> {
+    fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
+        // TODO: in Rust thr `0b` prefix appears only when writing "{:#x}", not "{:x}"
+        f.append_managed_buffer_binary(&ManagedBuffer::from_raw_handle(self.get_raw_handle()));
     }
 }
 
