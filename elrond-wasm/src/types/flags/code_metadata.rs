@@ -1,6 +1,6 @@
 use crate::{
     abi::{TypeAbi, TypeName},
-    formatter::{FormatByteReceiver, SCDisplay},
+    formatter::{hex_util, FormatByteReceiver, SCBinary, SCDisplay, SCLowerHex},
 };
 use bitflags::bitflags;
 use elrond_codec::*;
@@ -127,6 +127,22 @@ impl SCDisplay for CodeMetadata {
         if nothing_printed {
             f.append_bytes(DEFAULT_STRING);
         }
+    }
+}
+
+impl SCLowerHex for CodeMetadata {
+    fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
+        let num = self.bits().to_be_bytes();
+        f.append_bytes(&hex_util::byte_to_hex_digits(num[0])[..]);
+        f.append_bytes(&hex_util::byte_to_hex_digits(num[1])[..]);
+    }
+}
+
+impl SCBinary for CodeMetadata {
+    fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
+        let num = self.bits().to_be_bytes();
+        f.append_bytes(&hex_util::byte_to_binary_digits(num[0])[..]);
+        f.append_bytes(&hex_util::byte_to_binary_digits(num[1])[..]);
     }
 }
 

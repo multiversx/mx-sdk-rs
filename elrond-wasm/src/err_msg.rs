@@ -25,6 +25,7 @@ pub const STORAGE_VALUE_EXCEEDS_BUFFER: &[u8] = b"storage value exceeds buffer";
 pub const FINISH_ENCODE_ERROR: &[u8] = b"endpoint result encode error: ";
 pub const SERIALIZER_DECODE_ERROR: &[u8] = b"serializer decode error: ";
 pub const SERIALIZER_ENCODE_ERROR: &[u8] = b"serializer encode error: ";
+pub const FORMATTER_ENCODE_ERROR: &[u8] = b"formatter encode error: ";
 pub const LOG_TOPIC_ENCODE_ERROR: &[u8] = b"log topic encode error: ";
 pub const LOG_DATA_ENCODE_ERROR: &[u8] = b"log data encode error: ";
 pub const CONTRACT_CALL_ENCODE_ERROR: &[u8] = b"contract call encode error: ";
