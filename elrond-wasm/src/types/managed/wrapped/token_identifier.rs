@@ -211,7 +211,9 @@ impl<M: ManagedTypeApi> SCDisplay for TokenIdentifier<M> {
         if self.is_egld() {
             f.append_bytes(Self::EGLD_REPRESENTATION);
         } else {
-            f.append_managed_buffer(&self.buffer);
+            f.append_managed_buffer(&ManagedBuffer::from_raw_handle(
+                self.buffer.get_raw_handle(),
+            ));
         }
     }
 }
@@ -229,7 +231,9 @@ impl<M: ManagedTypeApi> SCLowerHex for TokenIdentifier<M> {
         if self.is_egld() {
             f.append_bytes(EGLD_REPRESENTATION_HEX);
         } else {
-            f.append_managed_buffer_lower_hex(&self.buffer);
+            f.append_managed_buffer_lower_hex(&ManagedBuffer::from_raw_handle(
+                self.buffer.get_raw_handle(),
+            ));
         }
     }
 }
