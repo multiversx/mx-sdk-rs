@@ -51,3 +51,14 @@ pub fn hex_digits_to_byte(digit1: u8, digit2: u8) -> Option<u8> {
     };
     Some(result)
 }
+
+pub fn byte_to_binary_digits(mut num: u8) -> [u8; 8] {
+    let mut result = [b'0'; 8];
+    let mut i = 7i32;
+    while i >= 0 {
+        result[i as usize] += num % 2;
+        num /= 2;
+        i -= 1;
+    }
+    result
+}
