@@ -5,10 +5,7 @@ use crate::{
     VmApiImpl,
 };
 use elrond_wasm::{
-    api::{
-        BlockchainApi, BlockchainApiImpl, Handle, ManagedBufferApi, ManagedTypeApi,
-        StaticVarApiImpl,
-    },
+    api::{BlockchainApi, BlockchainApiImpl, Handle, ManagedBufferApi, ManagedTypeApi},
     types::{
         heap::{Address, Box, H256},
         BigUint, EsdtTokenData, EsdtTokenType, ManagedAddress, ManagedBuffer, ManagedType,
@@ -122,7 +119,6 @@ extern "C" {
 
     fn getESDTLocalRoles(tokenhandle: i32) -> i64;
 
-    #[cfg(not(feature = "ei-unmanaged"))]
     fn managedGetESDTTokenData(
         addressHandle: i32,
         tokenIDHandle: i32,
@@ -136,6 +132,10 @@ extern "C" {
         royaltiesHandle: i32,
         urisHandle: i32,
     );
+}
+
+fn esdt_is_frozen(properties_bytes: &[u8; 2]) -> bool {
+    properties_bytes[0] > 0 // token is frozen if the first byte is 1
 }
 
 impl BlockchainApi for VmApiImpl {
@@ -377,18 +377,18 @@ impl BlockchainApiImpl for VmApiImpl {
         }
     }
 
-    #[cfg(feature = "ei-unmanaged")]
-    fn get_esdt_token_data<M: ManagedTypeApi>(
+    fn get_esdt_token_data_unmanaged<M: ManagedTypeApi>(
         &self,
         m_address: &ManagedAddress<M>,
         token: &TokenIdentifier<M>,
         nonce: u64,
     ) -> EsdtTokenData<M> {
-        use elrond_wasm::types::heap::BoxedBytes;
+        use elrond_wasm::{api::BigIntApi, types::heap::BoxedBytes};
+
         let address = m_address.to_address();
         unsafe {
-            let value_handle = self.next_handle();
-            let mut properties = [0u8; 2]; // always 2 bytes
+            let value_handle = self.bi_new_zero();
+            let mut properties_bytes = [0u8; 2]; // always 2 bytes
             let mut hash = BoxedBytes::allocate(128);
 
             let name_len = getESDTNFTNameLength(
@@ -419,7 +419,7 @@ impl BlockchainApiImpl for VmApiImpl {
             let mut uri_bytes = BoxedBytes::allocate(uris_len);
 
             let mut creator = Address::zero();
-            let royalties_handle = self.next_handle();
+            let royalties_handle = self.bi_new_zero();
 
             getESDTTokenData(
                 address.as_ref().as_ptr(),
@@ -427,7 +427,7 @@ impl BlockchainApiImpl for VmApiImpl {
                 token.len() as i32,
                 nonce as i64,
                 value_handle,
-                properties.as_mut_ptr(),
+                properties_bytes.as_mut_ptr(),
                 hash.as_mut_ptr(),
                 name_bytes.as_mut_ptr(),
                 attr_bytes.as_mut_ptr(),
@@ -448,8 +448,7 @@ impl BlockchainApiImpl for VmApiImpl {
                 EsdtTokenType::NonFungible
             };
 
-            // Token is frozen if properties are not 0
-            let frozen = properties[0] == 0 && properties[1] == 0;
+            let frozen = esdt_is_frozen(&properties_bytes);
 
             let mut uris_vec = ManagedVec::new();
             uris_vec.push(ManagedBuffer::new_from_bytes(uri_bytes.as_slice()));
@@ -468,26 +467,29 @@ impl BlockchainApiImpl for VmApiImpl {
         }
     }
 
-    #[cfg(not(feature = "ei-unmanaged"))]
     fn get_esdt_token_data<M: ManagedTypeApi>(
         &self,
         address: &ManagedAddress<M>,
         token: &TokenIdentifier<M>,
         nonce: u64,
     ) -> EsdtTokenData<M> {
-        use elrond_wasm::api::const_handles;
+        use elrond_wasm::api::BigIntApi;
 
         let managed_token_id = token.as_managed_buffer();
-        unsafe {
-            let value_handle = self.next_handle();
-            let properties_handle = const_handles::MBUF_TEMPORARY_1;
-            let hash_handle = self.next_handle();
-            let name_handle = self.next_handle();
-            let attributes_handle = self.next_handle();
-            let creator_handle = self.next_handle();
-            let royalties_handle = self.next_handle();
-            let uris_handle = self.next_handle();
 
+        // initializing outputs
+        // the current version of VM does not set/overwrite them if the token is missing,
+        // which is why we need to initialize them explicitly
+        let value_handle = self.bi_new_zero();
+        let properties_handle = self.mb_new_empty(); // TODO: replace with const_handles::MBUF_TEMPORARY_1 after VM fix
+        let hash_handle = self.mb_new_empty();
+        let name_handle = self.mb_new_empty();
+        let attributes_handle = self.mb_new_empty();
+        let creator_handle = self.mb_new_empty();
+        let royalties_handle = self.bi_new_zero();
+        let uris_handle = self.mb_new_empty();
+
+        unsafe {
             managedGetESDTTokenData(
                 address.get_raw_handle(),
                 managed_token_id.get_raw_handle(),
@@ -501,29 +503,29 @@ impl BlockchainApiImpl for VmApiImpl {
                 royalties_handle,
                 uris_handle,
             );
+        }
 
-            let token_type = if nonce == 0 {
-                EsdtTokenType::Fungible
-            } else {
-                EsdtTokenType::NonFungible
-            };
+        let token_type = if nonce == 0 {
+            EsdtTokenType::Fungible
+        } else {
+            EsdtTokenType::NonFungible
+        };
 
-            // here we trust Arwen that it always gives us a properties buffer of length 2
-            let mut properties_bytes = [0u8; 2];
-            let _ = self.mb_load_slice(properties_handle, 0, &mut properties_bytes[..]);
-            let frozen = properties_bytes[0] == 0 && properties_bytes[1] == 0; // token is frozen if properties are not 0
+        // here we trust Arwen that it always gives us a properties buffer of length 2
+        let mut properties_bytes = [0u8; 2];
+        let _ = self.mb_load_slice(properties_handle, 0, &mut properties_bytes[..]);
+        let frozen = esdt_is_frozen(&properties_bytes);
 
-            EsdtTokenData {
-                token_type,
-                amount: BigUint::from_raw_handle(value_handle),
-                frozen,
-                hash: ManagedBuffer::from_raw_handle(hash_handle),
-                name: ManagedBuffer::from_raw_handle(name_handle),
-                attributes: ManagedBuffer::from_raw_handle(attributes_handle),
-                creator: ManagedAddress::from_raw_handle(creator_handle),
-                royalties: BigUint::from_raw_handle(royalties_handle),
-                uris: ManagedVec::from_raw_handle(uris_handle),
-            }
+        EsdtTokenData {
+            token_type,
+            amount: BigUint::from_raw_handle(value_handle),
+            frozen,
+            hash: ManagedBuffer::from_raw_handle(hash_handle),
+            name: ManagedBuffer::from_raw_handle(name_handle),
+            attributes: ManagedBuffer::from_raw_handle(attributes_handle),
+            creator: ManagedAddress::from_raw_handle(creator_handle),
+            royalties: BigUint::from_raw_handle(royalties_handle),
+            uris: ManagedVec::from_raw_handle(uris_handle),
         }
     }
 

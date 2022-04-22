@@ -118,5 +118,16 @@ pub trait BlockchainApiImpl: ManagedTypeApiImpl {
         nonce: u64,
     ) -> EsdtTokenData<M>;
 
+    #[deprecated(
+        since = "0.31.0",
+        note = "Only used for ;imited backwards compatibility tests. Never use! Use `get_esdt_token_data` instead."
+    )]
+    fn get_esdt_token_data_unmanaged<M: ManagedTypeApi>(
+        &self,
+        address: &ManagedAddress<M>,
+        token_id: &TokenIdentifier<M>,
+        nonce: u64,
+    ) -> EsdtTokenData<M>;
+
     fn get_esdt_local_roles(&self, token_id_handle: Handle) -> EsdtLocalRoleFlags;
 }
