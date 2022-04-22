@@ -166,6 +166,21 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
         byte_slice
     }
 
+    /// Loads all bytes of the managed buffer in batches, then applies given closure on each batch.
+    pub fn for_each_batch<const BATCH_SIZE: usize, F: FnMut(&[u8])>(&self, mut f: F) {
+        let mut buffer = [0u8; BATCH_SIZE];
+        let arg_len = self.len();
+        let mut current_arg_index = 0;
+        while current_arg_index < arg_len {
+            let bytes_remaining = arg_len - current_arg_index;
+            let bytes_to_load = core::cmp::min(bytes_remaining, BATCH_SIZE);
+            let loaded_slice = &mut buffer[0..bytes_to_load];
+            let _ = self.load_slice(current_arg_index, loaded_slice);
+            f(loaded_slice);
+            current_arg_index += BATCH_SIZE;
+        }
+    }
+
     #[inline]
     pub fn overwrite(&mut self, value: &[u8]) {
         M::managed_type_impl().mb_overwrite(self.handle, value);
