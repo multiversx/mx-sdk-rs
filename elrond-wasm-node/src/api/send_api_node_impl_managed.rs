@@ -1,4 +1,4 @@
-use crate::{error_hook, VmApiImpl};
+use crate::VmApiImpl;
 use elrond_wasm::{
     api::{
         const_handles, BlockchainApi, BlockchainApiImpl, Handle, ManagedTypeApi, SendApiImpl,
@@ -120,6 +120,10 @@ extern "C" {
     /// Allows us to filter results from nested sync call
     fn getNumReturnData() -> i32;
     fn managedGetReturnData(resultID: i32, resultHandle: i32);
+
+    /// Clears results propagated from nested sync calls
+    fn cleanReturnData();
+    fn deleteFromReturnData(resultID: i32);
 }
 
 unsafe fn code_metadata_to_buffer_handle(code_metadata: CodeMetadata) -> Handle {
@@ -402,48 +406,6 @@ impl SendApiImpl for VmApiImpl {
         }
     }
 
-    fn execute_on_dest_context_raw_custom_result_range<M, F>(
-        &self,
-        gas: u64,
-        to: &ManagedAddress<M>,
-        amount: &BigUint<M>,
-        endpoint_name: &ManagedBuffer<M>,
-        arg_buffer: &ManagedArgBuffer<M>,
-        range_closure: F,
-    ) -> ManagedVec<M, ManagedBuffer<M>>
-    where
-        M: ManagedTypeApi,
-        F: FnOnce(usize, usize) -> (usize, usize),
-    {
-        unsafe {
-            let num_return_data_before = getNumReturnData() as usize;
-            let result_handle = self.next_handle();
-
-            let _ = managedExecuteOnDestContext(
-                gas as i64,
-                to.get_raw_handle(),
-                amount.get_raw_handle(),
-                endpoint_name.get_raw_handle(),
-                arg_buffer.get_raw_handle(),
-                result_handle,
-            );
-
-            let result = ManagedVec::from_raw_handle(result_handle);
-
-            let num_return_data_after = num_return_data_before + result.len();
-            let (result_start_index, result_end_index) = range_closure(
-                num_return_data_before as usize,
-                num_return_data_after as usize,
-            );
-            result
-                .slice(
-                    result_start_index - num_return_data_before,
-                    result_end_index - num_return_data_before,
-                )
-                .unwrap_or_else(|| error_hook::signal_error(b"sync call range bad slicing"))
-        }
-    }
-
     fn execute_on_dest_context_by_caller_raw<M: ManagedTypeApi>(
         &self,
         gas: u64,
@@ -524,12 +486,28 @@ impl SendApiImpl for VmApiImpl {
         let own_address_handle = const_handles::MBUF_TEMPORARY_1;
         VmApiImpl::blockchain_api_impl().load_sc_address_managed(own_address_handle);
 
-        self.execute_on_dest_context_raw(
+        let results = self.execute_on_dest_context_raw(
             gas,
             &ManagedAddress::from_raw_handle(own_address_handle),
             &BigUint::zero(),
             function_name,
             arg_buffer,
-        )
+        );
+
+        self.clean_return_data();
+
+        results
+    }
+
+    fn clean_return_data(&self) {
+        unsafe {
+            cleanReturnData();
+        }
+    }
+
+    fn delete_from_return_data(&self, index: usize) {
+        unsafe {
+            deleteFromReturnData(index as i32);
+        }
     }
 }
