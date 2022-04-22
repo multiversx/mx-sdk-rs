@@ -176,6 +176,15 @@ impl BlockchainApiImpl for DebugApi {
             })
     }
 
+    fn get_esdt_token_data_unmanaged<M: ManagedTypeApi>(
+        &self,
+        _address: &ManagedAddress<M>,
+        _token: &TokenIdentifier<M>,
+        _nonce: u64,
+    ) -> EsdtTokenData<M> {
+        panic!("get_esdt_token_data_unmanaged is deprecated and should never be used in Rust tests")
+    }
+
     fn get_esdt_local_roles(&self, token_id_handle: Handle) -> EsdtLocalRoleFlags {
         let sc_address = self.input_ref().to.clone();
         self.blockchain_cache()
