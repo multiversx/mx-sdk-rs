@@ -1,4 +1,3 @@
-use crate::num_bigint::BigUint;
 use elrond_wasm::types::heap::Address;
 use mandos::model::{SetStateStep, Step};
 
@@ -89,7 +88,7 @@ fn convert_mandos_esdt_to_world_mock(
 ) -> EsdtData {
     match mandos_esdt {
         mandos::model::Esdt::Short(short_esdt) => {
-            let balance = BigUint::from_bytes_be(short_esdt.value.as_slice());
+            let balance = short_esdt.value.clone();
             let mut esdt_data = EsdtData {
                 token_identifier: token_identifier.to_vec(),
                 ..Default::default()

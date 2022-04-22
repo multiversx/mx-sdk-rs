@@ -1,13 +1,23 @@
 use elrond_wasm::{
-    api::{Handle, StaticVarApi, StaticVarApiImpl},
+    api::{const_handles, Handle, StaticVarApi, StaticVarApiImpl},
     types::LockableStaticBuffer,
 };
 
 use crate::VmApiImpl;
 
 static mut STATIC_BUFFER: LockableStaticBuffer = LockableStaticBuffer::new();
-
 static mut EXTERNAL_VIEW_TARGET_ADDRESS_HANDLE: i32 = 0;
+static mut NEXT_HANDLE: i32 = const_handles::NEW_HANDLE_START_FROM;
+
+// The compiler seems to enjoy inlining this method no matter how many times it shows up.
+// Hence the rather drastic directive.
+#[inline(never)]
+fn next_handle() -> Handle {
+    unsafe {
+        NEXT_HANDLE -= 1;
+        NEXT_HANDLE
+    }
+}
 
 impl StaticVarApi for VmApiImpl {
     type StaticVarApiImpl = VmApiImpl;
@@ -30,5 +40,9 @@ impl StaticVarApiImpl for VmApiImpl {
 
     fn get_external_view_target_address_handle(&self) -> Handle {
         unsafe { EXTERNAL_VIEW_TARGET_ADDRESS_HANDLE }
+    }
+
+    fn next_handle(&self) -> Handle {
+        next_handle()
     }
 }

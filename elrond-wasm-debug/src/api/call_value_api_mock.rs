@@ -1,9 +1,10 @@
-use crate::{tx_mock::TxPanic, DebugApi};
+use crate::{num_bigint, tx_mock::TxPanic, DebugApi};
 use elrond_wasm::{
     api::{CallValueApi, CallValueApiImpl, Handle},
     err_msg,
-    types::{BigUint, EsdtTokenType, ManagedType},
+    types::EsdtTokenType,
 };
+use num_traits::Zero;
 
 impl DebugApi {
     fn fail_if_more_than_one_esdt_transfer(&self) {
@@ -26,7 +27,7 @@ impl CallValueApi for DebugApi {
 
 impl CallValueApiImpl for DebugApi {
     fn check_not_payable(&self) {
-        if BigUint::<DebugApi>::from_raw_handle(self.egld_value()) > 0u32 {
+        if self.input_ref().egld_value > num_bigint::BigUint::zero() {
             std::panic::panic_any(TxPanic {
                 status: 10,
                 message: err_msg::NON_PAYABLE_FUNC_EGLD.to_string(),
@@ -41,14 +42,21 @@ impl CallValueApiImpl for DebugApi {
     }
 
     #[inline]
-    fn egld_value(&self) -> Handle {
-        self.insert_new_big_uint(self.input_ref().egld_value.clone())
+    fn load_egld_value(&self, dest: Handle) {
+        self.set_big_uint(dest, self.input_ref().egld_value.clone())
     }
 
     #[inline]
-    fn esdt_value(&self) -> Handle {
+    fn load_single_esdt_value(&self, dest: Handle) {
         self.fail_if_more_than_one_esdt_transfer();
-        self.esdt_value_by_index(0)
+        if let Some(esdt_value) = self.input_ref().esdt_values.get(0) {
+            self.set_big_uint(dest, esdt_value.value.clone());
+        } else {
+            std::panic::panic_any(TxPanic {
+                status: 10,
+                message: err_msg::ESDT_INVALID_TOKEN_INDEX.to_string(),
+            });
+        }
     }
 
     #[inline]

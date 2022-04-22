@@ -153,22 +153,6 @@ impl SendApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn execute_on_dest_context_raw_custom_result_range<M, F>(
-        &self,
-        _gas: u64,
-        _to: &ManagedAddress<M>,
-        _value: &BigUint<M>,
-        _endpoint_name: &ManagedBuffer<M>,
-        _arg_buffer: &ManagedArgBuffer<M>,
-        _range_closure: F,
-    ) -> ManagedVec<M, ManagedBuffer<M>>
-    where
-        M: ManagedTypeApi,
-        F: FnOnce(usize, usize) -> (usize, usize),
-    {
-        unreachable!()
-    }
-
     fn execute_on_dest_context_by_caller_raw<M: ManagedTypeApi>(
         &self,
         _gas: u64,
@@ -201,14 +185,6 @@ impl SendApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn storage_store_tx_hash_key<M: ManagedTypeApi>(&self, _data: &ManagedBuffer<M>) {
-        unreachable!()
-    }
-
-    fn storage_load_tx_hash_key<M: ManagedTypeApi>(&self) -> ManagedBuffer<M> {
-        unreachable!()
-    }
-
     fn call_local_esdt_built_in_function<M: ManagedTypeApi>(
         &self,
         _gas: u64,
@@ -216,5 +192,13 @@ impl SendApiImpl for UncallableApi {
         _arg_buffer: &ManagedArgBuffer<M>,
     ) -> ManagedVec<M, ManagedBuffer<M>> {
         unreachable!()
+    }
+
+    fn clean_return_data(&self) {
+        unreachable!();
+    }
+
+    fn delete_from_return_data(&self, _index: usize) {
+        unreachable!();
     }
 }

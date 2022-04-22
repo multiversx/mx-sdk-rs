@@ -5,7 +5,7 @@ use crate::{
 };
 use alloc::vec::Vec;
 use elrond_wasm::{
-    api::{EndpointArgumentApi, EndpointArgumentApiImpl, Handle},
+    api::{EndpointArgumentApi, EndpointArgumentApiImpl, Handle, ManagedBufferApi},
     types::heap::BoxedBytes,
 };
 use num_traits::cast::ToPrimitive;
@@ -49,26 +49,21 @@ impl EndpointArgumentApiImpl for DebugApi {
         self.get_argument_vec_u8(arg_index).into()
     }
 
-    fn get_argument_big_uint_raw(&self, arg_index: i32) -> Handle {
+    fn load_argument_big_int_unsigned(&self, arg_index: i32, dest: Handle) {
         let arg_bytes = self.get_argument_boxed_bytes(arg_index);
-        let mut managed_types = self.m_types_borrow_mut();
-        let result = BigInt::from_bytes_be(Sign::Plus, arg_bytes.as_slice());
-        managed_types.big_int_map.insert_new_handle(result)
+        let value = BigInt::from_bytes_be(Sign::Plus, arg_bytes.as_slice());
+        self.bi_overwrite(dest, value);
     }
 
-    fn get_argument_big_int_raw(&self, arg_index: i32) -> i32 {
+    fn load_argument_big_int_signed(&self, arg_index: i32, dest: Handle) {
         let arg_bytes = self.get_argument_boxed_bytes(arg_index);
-        let mut managed_types = self.m_types_borrow_mut();
-        let result = BigInt::from_signed_bytes_be(arg_bytes.as_slice());
-        managed_types.big_int_map.insert_new_handle(result)
+        let value = BigInt::from_signed_bytes_be(arg_bytes.as_slice());
+        self.bi_overwrite(dest, value);
     }
 
-    fn get_argument_managed_buffer_raw(&self, arg_index: i32) -> Handle {
+    fn load_argument_managed_buffer(&self, arg_index: i32, dest: Handle) {
         let arg_bytes = self.get_argument_boxed_bytes(arg_index);
-        let mut managed_types = self.m_types_borrow_mut();
-        managed_types
-            .managed_buffer_map
-            .insert_new_handle(arg_bytes.as_slice().into())
+        self.mb_overwrite(dest, arg_bytes.as_slice());
     }
 
     fn get_argument_i64(&self, arg_index: i32) -> i64 {

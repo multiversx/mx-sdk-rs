@@ -1,8 +1,6 @@
 use crate::{
-    api::{
-        BlockchainApi, BlockchainApiImpl, ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi,
-    },
-    contract_base::{ExitCodecErrorHandler, ManagedSerializer},
+    api::{BlockchainApi, ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi},
+    contract_base::{BlockchainWrapper, ExitCodecErrorHandler, ManagedSerializer},
     err_msg,
     storage::StorageKey,
     storage_clear, storage_get, storage_set,
@@ -88,7 +86,7 @@ impl<M: ManagedTypeApi + ErrorApi> CallbackClosure<M> {
 }
 
 pub(super) fn cb_closure_storage_key<A: BlockchainApi>() -> StorageKey<A> {
-    let tx_hash = A::blockchain_api_impl().get_tx_hash::<A>();
+    let tx_hash = BlockchainWrapper::<A>::new().get_tx_hash();
     let mut storage_key = StorageKey::new(CALLBACK_CLOSURE_STORAGE_BASE_KEY);
     storage_key.append_managed_buffer(tx_hash.as_managed_buffer());
     storage_key

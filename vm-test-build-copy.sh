@@ -10,7 +10,7 @@ build_and_copy() {
    contract_name=${contract_path##*/}
    vm_contract_path=$2
 
-   erdpy --verbose contract build $contract_path || return 1
+   erdpy --verbose contract build --skip-eei-checks $contract_path || return 1
    mkdir -p $vm_contract_path/output
    cp $contract_path/output/$contract_name.wasm \
       $vm_contract_path/output/$contract_name.wasm
@@ -34,13 +34,14 @@ build_and_copy ./contracts/feature-tests/alloc-features $VM_REPO_PATH/test/featu
 build_and_copy ./contracts/feature-tests/basic-features $VM_REPO_PATH/test/features/basic-features
 build_and_copy ./contracts/feature-tests/erc-style-contracts/erc20 $VM_REPO_PATH/test/erc20-rust
 build_and_copy ./contracts/feature-tests/payable-features $VM_REPO_PATH/test/features/payable-features
+build_and_copy ./contracts/feature-tests/esdt-system-sc-mock $VM_REPO_PATH/test/features/esdt-system-sc-mock
 
 build_and_copy_composability() {
    contract=$1
    contract_with_underscores="${contract//-/_}"
 
    # with managed-ei
-   erdpy --verbose contract build ./contracts/feature-tests/composability/$contract || return 1
+   erdpy --verbose contract build --skip-eei-checks ./contracts/feature-tests/composability/$contract || return 1
    cp -R contracts/feature-tests/composability/$contract/output/${contract}.wasm \
       $VM_REPO_PATH/test/features/composability/$contract/output/${contract}.wasm
 
@@ -65,12 +66,12 @@ build_and_copy_composability proxy-test-first
 build_and_copy_composability proxy-test-second
 build_and_copy_composability recursive-caller
 
-erdpy --verbose contract build ./contracts/feature-tests/composability/vault || return 1
+erdpy --verbose contract build --skip-eei-checks ./contracts/feature-tests/composability/vault || return 1
 cp -R contracts/feature-tests/composability/vault/output/vault.wasm \
    $VM_REPO_PATH/test/features/composability/vault/output/vault.wasm
-erdpy --verbose  contract build --skip-eei-checks ./contracts/feature-tests/composability/promises-features || return 1
-cp -R contracts/feature-tests/composability/promises-features/output/promises-features.wasm \
-   $VM_REPO_PATH/test/features/composability/promises-features/output/promises-features.wasm
+# erdpy --verbose  contract build --skip-eei-checks ./contracts/feature-tests/composability/promises-features || return 1
+# cp -R contracts/feature-tests/composability/promises-features/output/promises-features.wasm \
+#    $VM_REPO_PATH/test/features/composability/promises-features/output/promises-features.wasm
 
 cp -R contracts/feature-tests/composability/mandos \
    $VM_REPO_PATH/test/features/composability
