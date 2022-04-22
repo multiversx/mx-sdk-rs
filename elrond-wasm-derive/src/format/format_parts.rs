@@ -2,6 +2,8 @@ const OPEN_BRACE: u8 = b'{';
 const CLOSED_BRACE: u8 = b'}';
 const TWO_DOTS: u8 = b':';
 const X_LETTER: u8 = b'x';
+const B_LETTER: u8 = b'b';
+const C_LETTER: u8 = b'c';
 
 const UNMATCHED_BRACE_ERR_MSG: &str = "Unmatched `{` in the format string";
 
@@ -9,6 +11,8 @@ pub enum FormatPartType {
     StaticAscii(String),
     LowerHex,
     Display,
+    Codec,
+    Bytes,
 }
 
 pub fn parse_format_string(raw_string: &str) -> Vec<FormatPartType> {
@@ -19,6 +23,7 @@ pub fn parse_format_string(raw_string: &str) -> Vec<FormatPartType> {
     let ascii_bytes = raw_string.as_bytes();
     let mut parts = Vec::new();
     let mut start_index = 1;
+    let mut format_byte;
 
     // starting from 1 and up to len - 1 to skip the ""
     let str_len = ascii_bytes.len() - 1;
@@ -45,10 +50,11 @@ pub fn parse_format_string(raw_string: &str) -> Vec<FormatPartType> {
                 },
                 TWO_DOTS => {
                     match ascii_bytes.get(i + 2) {
-                        Some(x_letter) => {
-                            if *x_letter != X_LETTER {
+                        Some(letter) => {
+                            if *letter != X_LETTER && *letter != B_LETTER && *letter != C_LETTER {
                                 panic!("{}", UNMATCHED_BRACE_ERR_MSG);
                             }
+                            format_byte = letter;
                         },
                         None => panic!("{}", UNMATCHED_BRACE_ERR_MSG),
                     }
@@ -69,8 +75,13 @@ pub fn parse_format_string(raw_string: &str) -> Vec<FormatPartType> {
                             parts.push(FormatPartType::StaticAscii(as_str));
                         }
                     }
-
-                    parts.push(FormatPartType::LowerHex);
+                    if *format_byte == X_LETTER {
+                        parts.push(FormatPartType::LowerHex);
+                    } else if *format_byte == B_LETTER {
+                        parts.push(FormatPartType::Bytes);
+                    } else if *format_byte == C_LETTER {
+                        parts.push(FormatPartType::Codec);
+                    }
 
                     start_index = i + 4;
                 },
@@ -95,6 +106,8 @@ pub(crate) fn count_args(format_types: &[FormatPartType]) -> usize {
         match *f {
             FormatPartType::Display => nr_args += 1,
             FormatPartType::LowerHex => nr_args += 1,
+            FormatPartType::Codec => nr_args += 1,
+            FormatPartType::Bytes => nr_args += 1,
             FormatPartType::StaticAscii(_) => {},
         }
     }

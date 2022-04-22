@@ -3,12 +3,14 @@ use elrond_codec::{EncodeError, EncodeErrorHandler, NestedEncodeOutput, TryStati
 use crate::{
     api::ManagedTypeApi,
     formatter::{
-        hex_util::byte_to_hex_digits, FormatBuffer, FormatByteReceiver, SCDisplay, SCLowerHex,
+        hex_util::{byte_to_binary_digits, byte_to_hex_digits},
+        FormatBuffer, FormatByteReceiver, SCBinary, SCCodec, SCDisplay, SCLowerHex,
     },
-    types::{BigInt, BigUint, ManagedBuffer, ManagedType, StaticBufferRef},
+    types::{BigInt, BigUint, ManagedBuffer, StaticBufferRef},
 };
 
 const HEX_CONVERSION_BUFFER_LEN: usize = 32;
+const BIN_CONVERSION_BUFFER_LEN: usize = 32;
 
 pub struct ManagedBufferCachedBuilder<M>
 where
@@ -100,35 +102,28 @@ where
 
     /// Converts the input to hex and adds it to the current buffer.
     ///
-    /// TODO: hex conversion should be part of the VM.
+    /// TODO: consider making the hex conversion part of the VM
     pub fn append_managed_buffer_hex(&mut self, item: &ManagedBuffer<M>) {
-        let arg_len = item.len();
-        if arg_len == 0 {
-            return;
-        }
-
-        let mut static_buffer = [0u8; HEX_CONVERSION_BUFFER_LEN];
-        let mut hex_bytes_buffer = [0u8; HEX_CONVERSION_BUFFER_LEN * 2];
-
-        let mut current_arg_index = 0;
-        while current_arg_index < arg_len {
-            let bytes_remaining = arg_len - current_arg_index;
-            let bytes_to_load = core::cmp::min(bytes_remaining, HEX_CONVERSION_BUFFER_LEN);
-
-            let slice = &mut static_buffer[0..bytes_to_load];
-            let _ = item.load_slice(current_arg_index, slice);
-
-            for i in 0..bytes_to_load {
-                let digits = byte_to_hex_digits(slice[i]);
+        item.for_each_batch::<HEX_CONVERSION_BUFFER_LEN, _>(|batch| {
+            let mut hex_bytes_buffer = [0u8; HEX_CONVERSION_BUFFER_LEN * 2];
+            for (i, &byte) in batch.iter().enumerate() {
+                let digits = byte_to_hex_digits(byte);
                 hex_bytes_buffer[i * 2] = digits[0];
                 hex_bytes_buffer[i * 2 + 1] = digits[1];
             }
-
-            let hex_slice = &hex_bytes_buffer[0..(bytes_to_load * 2)];
+            let hex_slice = &hex_bytes_buffer[0..(batch.len() * 2)];
             self.append_bytes(hex_slice);
+        });
+    }
 
-            current_arg_index += HEX_CONVERSION_BUFFER_LEN;
-        }
+    /// Converts the input to binary ASCII and adds it to the current buffer.
+    pub fn append_managed_buffer_binary(&mut self, item: &ManagedBuffer<M>) {
+        item.for_each_batch::<BIN_CONVERSION_BUFFER_LEN, _>(|batch| {
+            for &byte in batch {
+                let ascii_bin_digit = byte_to_binary_digits(byte);
+                self.append_bytes(&ascii_bin_digit[..]);
+            }
+        });
     }
 }
 
@@ -167,16 +162,22 @@ impl<M> FormatByteReceiver for ManagedBufferCachedBuilder<M>
 where
     M: ManagedTypeApi,
 {
+    type Api = M;
+
     fn append_bytes(&mut self, bytes: &[u8]) {
         self.append_bytes(bytes)
     }
 
-    fn append_managed_buffer<A: ManagedTypeApi>(&mut self, item: &ManagedBuffer<A>) {
-        self.append_managed_buffer(&ManagedBuffer::from_raw_handle(item.get_raw_handle()))
+    fn append_managed_buffer(&mut self, item: &ManagedBuffer<M>) {
+        self.append_managed_buffer(item)
     }
 
-    fn append_managed_buffer_lower_hex<A: ManagedTypeApi>(&mut self, item: &ManagedBuffer<A>) {
-        self.append_managed_buffer_hex(&ManagedBuffer::from_raw_handle(item.get_raw_handle()))
+    fn append_managed_buffer_lower_hex(&mut self, item: &ManagedBuffer<M>) {
+        self.append_managed_buffer_hex(item)
+    }
+
+    fn append_managed_buffer_binary(&mut self, item: &ManagedBuffer<M>) {
+        self.append_managed_buffer_binary(item)
     }
 }
 
@@ -193,6 +194,14 @@ where
     }
 
     fn append_lower_hex<T: SCLowerHex>(&mut self, item: &T) {
+        item.fmt(self);
+    }
+
+    fn append_binary<T: SCBinary>(&mut self, item: &T) {
+        item.fmt(self);
+    }
+
+    fn append_codec<T: SCCodec>(&mut self, item: &T) {
         item.fmt(self);
     }
 }
