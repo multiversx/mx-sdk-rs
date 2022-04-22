@@ -1,36 +1,32 @@
 use super::VmApiImpl;
 use elrond_wasm::{
-    api::{CallValueApi, CallValueApiImpl, Handle},
+    api::{CallValueApi, CallValueApiImpl, Handle, StaticVarApiImpl},
     types::{EsdtTokenType, ManagedType, TokenIdentifier},
 };
 
 const MAX_POSSIBLE_TOKEN_IDENTIFIER_LENGTH: usize = 32;
 
 extern "C" {
-    fn bigIntNew(value: i64) -> i32;
-    #[cfg(not(feature = "ei-unmanaged"))]
-    fn mBufferNew() -> i32;
-
     fn checkNoPayment();
 
     fn bigIntGetCallValue(dest: i32);
+
+    #[cfg(not(feature = "ei-unmanaged"))]
+    fn managedGetMultiESDTCallValue(resultHandle: i32);
+
+    fn getNumESDTTransfers() -> i32;
+
+    // single ESDT transfer
     fn bigIntGetESDTCallValue(dest: i32);
     fn getESDTTokenName(resultOffset: *const u8) -> i32;
     fn getESDTTokenNonce() -> i64;
     fn getESDTTokenType() -> i32;
 
-    // multi-transfer API
-    fn getNumESDTTransfers() -> i32;
+    // ESDT by index
     fn bigIntGetESDTCallValueByIndex(dest: i32, index: i32);
     fn getESDTTokenNameByIndex(resultOffset: *const u8, index: i32) -> i32;
     fn getESDTTokenNonceByIndex(index: i32) -> i64;
     fn getESDTTokenTypeByIndex(index: i32) -> i32;
-    #[cfg(not(feature = "ei-unmanaged"))]
-    fn managedGetMultiESDTCallValue(resultHandle: i32);
-
-    /// TODO: decide if it is worth using or not
-    #[allow(dead_code)]
-    fn getCallValueTokenName(callValueOffset: *const u8, resultOffset: *const u8) -> i32;
 }
 
 impl CallValueApi for VmApiImpl {
@@ -50,19 +46,26 @@ impl CallValueApiImpl for VmApiImpl {
         }
     }
 
-    fn egld_value(&self) -> Handle {
+    fn load_egld_value(&self, dest: Handle) {
         unsafe {
-            let value_handle = bigIntNew(0);
-            bigIntGetCallValue(value_handle);
-            value_handle
+            bigIntGetCallValue(dest);
         }
     }
 
-    fn esdt_value(&self) -> Handle {
+    #[cfg(not(feature = "ei-unmanaged"))]
+    fn load_all_esdt_transfers(&self, dest_handle: Handle) {
         unsafe {
-            let value_handle = bigIntNew(0);
-            bigIntGetESDTCallValue(value_handle);
-            value_handle
+            managedGetMultiESDTCallValue(dest_handle);
+        }
+    }
+
+    fn esdt_num_transfers(&self) -> usize {
+        unsafe { getNumESDTTransfers() as usize }
+    }
+
+    fn load_single_esdt_value(&self, dest: Handle) {
+        unsafe {
+            bigIntGetESDTCallValue(dest);
         }
     }
 
@@ -87,13 +90,9 @@ impl CallValueApiImpl for VmApiImpl {
         unsafe { (getESDTTokenType() as u8).into() }
     }
 
-    fn esdt_num_transfers(&self) -> usize {
-        unsafe { getNumESDTTransfers() as usize }
-    }
-
     fn esdt_value_by_index(&self, index: usize) -> Handle {
         unsafe {
-            let value_handle = bigIntNew(0);
+            let value_handle = self.next_handle();
             bigIntGetESDTCallValueByIndex(value_handle, index as i32);
             value_handle
         }
@@ -118,16 +117,5 @@ impl CallValueApiImpl for VmApiImpl {
 
     fn esdt_token_type_by_index(&self, index: usize) -> EsdtTokenType {
         unsafe { (getESDTTokenTypeByIndex(index as i32) as u8).into() }
-    }
-
-    #[cfg(not(feature = "ei-unmanaged"))]
-    fn get_all_esdt_transfers<M: elrond_wasm::api::ManagedTypeApi>(
-        &self,
-    ) -> elrond_wasm::types::ManagedVec<M, elrond_wasm::types::EsdtTokenPayment<M>> {
-        unsafe {
-            let result_handle = mBufferNew();
-            managedGetMultiESDTCallValue(result_handle);
-            elrond_wasm::types::ManagedVec::from_raw_handle(result_handle)
-        }
     }
 }

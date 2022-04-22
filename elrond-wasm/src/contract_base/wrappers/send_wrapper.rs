@@ -15,6 +15,8 @@ use crate::{
     },
 };
 
+use super::BlockchainWrapper;
+
 const PERCENTAGE_TOTAL: u64 = 10_000;
 
 /// API that groups methods that either send EGLD or ESDT, or that call other contracts.
@@ -180,7 +182,7 @@ where
             }
 
             A::send_api_impl().async_call_raw(
-                &ManagedAddress::from_raw_handle(A::blockchain_api_impl().get_sc_address_handle()),
+                &BlockchainWrapper::<A>::new().get_sc_address(),
                 &BigUint::zero(),
                 &ManagedBuffer::new_from_bytes(ESDT_NFT_TRANSFER_FUNC_NAME),
                 &arg_buffer,
@@ -213,7 +215,7 @@ where
         }
 
         A::send_api_impl().async_call_raw(
-            &ManagedAddress::from_raw_handle(A::blockchain_api_impl().get_sc_address_handle()),
+            &BlockchainWrapper::<A>::new().get_sc_address(),
             &BigUint::zero(),
             &ManagedBuffer::new_from_bytes(ESDT_MULTI_TRANSFER_FUNC_NAME),
             &arg_buffer,
@@ -243,7 +245,12 @@ where
         endpoint_name: &ManagedBuffer<A>,
         arg_buffer: &ManagedArgBuffer<A>,
     ) -> ManagedVec<A, ManagedBuffer<A>> {
-        A::send_api_impl().call_local_esdt_built_in_function(gas, endpoint_name, arg_buffer)
+        let results =
+            A::send_api_impl().call_local_esdt_built_in_function(gas, endpoint_name, arg_buffer);
+
+        A::send_api_impl().clean_return_data();
+
+        results
     }
 
     /// Allows synchronous minting of ESDT/SFT (depending on nonce). Execution is resumed afterwards.
@@ -411,7 +418,7 @@ where
 
         let output = A::send_api_impl().execute_on_dest_context_by_caller_raw(
             A::blockchain_api_impl().get_gas_left(),
-            &ManagedAddress::from_raw_handle(A::blockchain_api_impl().get_caller_handle()),
+            &BlockchainWrapper::<A>::new().get_caller(),
             &BigUint::zero(),
             &ManagedBuffer::new_from_bytes(ESDT_NFT_CREATE_FUNC_NAME),
             &arg_buffer,
@@ -438,7 +445,7 @@ where
         payment_amount: &BigUint<A>,
     ) -> BigUint<A> {
         let nft_token_data = A::blockchain_api_impl().get_esdt_token_data::<A>(
-            &ManagedAddress::from_raw_handle(A::blockchain_api_impl().get_sc_address_handle()),
+            &BlockchainWrapper::<A>::new().get_sc_address(),
             nft_id,
             nft_nonce,
         );

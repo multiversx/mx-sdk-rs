@@ -18,11 +18,11 @@ impl CallValueApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn egld_value(&self) -> Handle {
+    fn load_egld_value(&self, _dest: Handle) {
         unreachable!()
     }
 
-    fn esdt_value(&self) -> Handle {
+    fn load_single_esdt_value(&self, _dest: Handle) {
         unreachable!()
     }
 

@@ -2,7 +2,9 @@ use core::marker::PhantomData;
 
 use crate::{
     abi::TypeName,
-    api::{ErrorApiImpl, Handle, InvalidSliceError, ManagedBufferApi, ManagedTypeApi},
+    api::{
+        ErrorApiImpl, Handle, InvalidSliceError, ManagedBufferApi, ManagedTypeApi, StaticVarApiImpl,
+    },
     formatter::{
         hex_util::encode_bytes_as_hex, FormatByteReceiver, SCBinary, SCDisplay, SCLowerHex,
     },
@@ -43,20 +45,24 @@ impl<M: ManagedTypeApi> ManagedType<M> for ManagedBuffer<M> {
 impl<M: ManagedTypeApi> ManagedBuffer<M> {
     #[inline]
     pub fn new() -> Self {
-        ManagedBuffer::from_raw_handle(M::managed_type_impl().mb_new_empty())
+        let new_handle = M::static_var_api_impl().next_handle();
+        // TODO: remove after VM no longer crashes with "unknown handle":
+        M::managed_type_impl().mb_overwrite(new_handle, &[]);
+        ManagedBuffer::from_raw_handle(new_handle)
     }
 
     #[inline]
     pub fn new_from_bytes(bytes: &[u8]) -> Self {
-        ManagedBuffer::from_raw_handle(M::managed_type_impl().mb_new_from_bytes(bytes))
+        let new_handle = M::static_var_api_impl().next_handle();
+        M::managed_type_impl().mb_overwrite(new_handle, bytes);
+        ManagedBuffer::from_raw_handle(new_handle)
     }
 
     #[inline]
     pub fn new_random(nr_bytes: usize) -> Self {
-        let handle = M::managed_type_impl().mb_new_empty();
-        M::managed_type_impl().mb_set_random(handle, nr_bytes);
-
-        ManagedBuffer::from_raw_handle(handle)
+        let new_handle = M::static_var_api_impl().next_handle();
+        M::managed_type_impl().mb_set_random(new_handle, nr_bytes);
+        ManagedBuffer::from_raw_handle(new_handle)
     }
 }
 

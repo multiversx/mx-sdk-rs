@@ -363,14 +363,7 @@
                     "balance": "0xe8d4951000",
                     "esdt": {
                         "str:1-MyToken": "400,000,000,000",
-                        "str:2-AnotherToken": {
-                            "instances": [
-                                {
-                                    "nonce": "0",
-                                    "balance": "400,000,000,000"
-                                }
-                            ]
-                        },
+                        "str:2-AnotherToken": "400,000,000,000",
                         "str:3-AnotherTokenThatIsFrozen": {
                             "instances": [
                                 {

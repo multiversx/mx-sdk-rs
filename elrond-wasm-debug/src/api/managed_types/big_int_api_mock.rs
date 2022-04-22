@@ -1,6 +1,4 @@
-use crate::DebugApi;
-
-use crate::num_bigint;
+use crate::{num_bigint, DebugApi};
 use core::{
     cmp::Ordering,
     ops::{Add, BitAnd, BitOr, BitXor, Div, Mul, Neg, Rem, Shl, Shr, Sub},
@@ -58,12 +56,24 @@ macro_rules! unary_op_method {
     };
 }
 
+impl DebugApi {
+    pub(crate) fn bi_overwrite(&self, destination: Handle, value: num_bigint::BigInt) {
+        let mut managed_types = self.m_types_borrow_mut();
+        managed_types.big_int_map.insert(destination, value);
+    }
+}
+
 impl BigIntApi for DebugApi {
+    #[allow(dead_code)]
     fn bi_new(&self, value: i64) -> Handle {
         let mut managed_types = self.m_types_borrow_mut();
         managed_types
             .big_int_map
             .insert_new_handle(num_bigint::BigInt::from(value))
+    }
+
+    fn bi_set_int64(&self, destination: Handle, value: i64) {
+        self.bi_overwrite(destination, num_bigint::BigInt::from(value))
     }
 
     fn bi_unsigned_byte_length(&self, handle: Handle) -> usize {

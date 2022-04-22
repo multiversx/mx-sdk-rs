@@ -480,11 +480,6 @@ fn forwarder_sync_echo_rs() {
 }
 
 #[test]
-fn forwarder_sync_echo_range_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/forwarder_sync_echo_range.scen.json", world());
-}
-
-#[test]
 fn forwarder_tranfer_esdt_with_fees_rs() {
     elrond_wasm_debug::mandos_rs("mandos/forwarder_tranfer_esdt_with_fees.scen.json", world());
 }
@@ -499,12 +494,12 @@ fn forwarder_validate_token_identifier_rs() {
 
 #[test]
 fn promises_multi_transfer_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/promises_multi_transfer.scen.json", world());
+    elrond_wasm_debug::mandos_rs("mandos-promises/promises_multi_transfer.scen.json", world());
 }
 
 // #[test]
 // fn promises_single_transfer_rs() {
-//     elrond_wasm_debug::mandos_rs("mandos/promises_single_transfer.scen.json", world());
+//     elrond_wasm_debug::mandos_rs("mandos-promises/promises_single_transfer.scen.json", world());
 // }
 
 #[test]

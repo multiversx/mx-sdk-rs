@@ -26,6 +26,25 @@ impl TxExpect {
         }
     }
 
+    pub fn err<S, E>(status_code_expr: S, err_msg_expr: E) -> Self
+    where
+        U64Value: InterpretableFrom<S>,
+        BytesValue: InterpretableFrom<E>,
+    {
+        let ctx = InterpreterContext::default();
+        let status_code = U64Value::interpret_from(status_code_expr, &ctx);
+        let err_msg = BytesValue::interpret_from(err_msg_expr, &ctx);
+
+        TxExpect {
+            out: CheckValue::Star,
+            status: CheckValue::Equal(status_code),
+            message: CheckValue::Equal(err_msg),
+            logs: CheckLogs::Star,
+            gas: CheckValue::Star,
+            refund: CheckValue::Star,
+        }
+    }
+
     pub fn no_result(mut self) -> Self {
         self.out = CheckValue::Equal(Vec::new());
         self

@@ -71,10 +71,16 @@ pub trait StorageLoadFeatures {
 
     #[endpoint]
     fn load_from_address_raw(&self, address: ManagedAddress, key: ManagedBuffer) -> ManagedBuffer {
-        use elrond_wasm::api::{StorageReadApi, StorageReadApiImpl};
-        ManagedBuffer::from_raw_handle(
-            Self::Api::storage_read_api_impl()
-                .storage_load_from_address(address.get_raw_handle(), key.get_raw_handle()),
-        )
+        // TODO: maybe wrap this kind of functionality in a StorageRawWrapper
+        use elrond_wasm::api::{
+            StaticVarApi, StaticVarApiImpl, StorageReadApi, StorageReadApiImpl,
+        };
+        let value_handle = Self::Api::static_var_api_impl().next_handle();
+        Self::Api::storage_read_api_impl().storage_load_from_address(
+            address.get_raw_handle(),
+            key.get_raw_handle(),
+            value_handle,
+        );
+        ManagedBuffer::from_raw_handle(value_handle)
     }
 }

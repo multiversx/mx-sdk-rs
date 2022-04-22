@@ -119,7 +119,7 @@ elrond_wasm_node::wasm_endpoints! {
         get_prev_block_round
         get_prev_block_timestamp
         get_shard_of_address
-        get_state_root_hash_legacy
+        get_state_root_hash
         get_tx_hash_legacy
         is_empty_opt_addr
         is_empty_single_value_mapper

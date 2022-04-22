@@ -1,6 +1,6 @@
 use crate::{
     interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
-    model::{AddressValue, BigUintValue, BytesKey, BytesValue, Esdt, U64Value},
+    model::{AddressValue, BigUintValue, BytesKey, BytesValue, Esdt, EsdtObject, U64Value},
     serde_raw::AccountRaw,
 };
 
@@ -43,6 +43,90 @@ impl Account {
             &InterpreterContext::default(),
         ));
         self
+    }
+
+    pub fn esdt_balance<K, V>(mut self, token_id_expr: K, balance_expr: V) -> Self
+    where
+        BytesKey: InterpretableFrom<K>,
+        BigUintValue: InterpretableFrom<V>,
+    {
+        let ctx = InterpreterContext::default();
+        let token_id = BytesKey::interpret_from(token_id_expr, &ctx);
+        let esdt_data_ref = self.get_esdt_data_or_create(&token_id);
+        esdt_data_ref.set_balance(0u64, balance_expr);
+
+        self
+    }
+
+    pub fn esdt_nft_balance<K, N, V, T>(
+        mut self,
+        token_id_expr: K,
+        nonce_expr: N,
+        balance_expr: V,
+        opt_attributes_expr: Option<T>,
+    ) -> Self
+    where
+        N: Clone,
+        BytesKey: InterpretableFrom<K>,
+        U64Value: InterpretableFrom<N>,
+        BigUintValue: InterpretableFrom<V>,
+        BytesValue: InterpretableFrom<T>,
+    {
+        let ctx = InterpreterContext::default();
+        let token_id = BytesKey::interpret_from(token_id_expr, &ctx);
+
+        let esdt_obj_ref = self
+            .get_esdt_data_or_create(&token_id)
+            .get_mut_esdt_object();
+        esdt_obj_ref.set_balance(nonce_expr.clone(), balance_expr);
+
+        if let Some(attributes_expr) = opt_attributes_expr {
+            esdt_obj_ref.set_token_attributes(nonce_expr, attributes_expr);
+        }
+
+        self
+    }
+
+    pub fn esdt_nft_last_nonce<K, N>(mut self, token_id_expr: K, last_nonce_expr: N) -> Self
+    where
+        BytesKey: InterpretableFrom<K>,
+        U64Value: InterpretableFrom<N>,
+    {
+        let ctx = InterpreterContext::default();
+        let token_id = BytesKey::interpret_from(token_id_expr, &ctx);
+
+        let esdt_obj_ref = self
+            .get_esdt_data_or_create(&token_id)
+            .get_mut_esdt_object();
+        esdt_obj_ref.set_last_nonce(last_nonce_expr);
+
+        self
+    }
+
+    // TODO: Find a better way to pass roles
+    pub fn esdt_roles<K>(mut self, token_id_expr: K, roles: Vec<String>) -> Self
+    where
+        BytesKey: InterpretableFrom<K>,
+    {
+        let ctx = InterpreterContext::default();
+        let token_id = BytesKey::interpret_from(token_id_expr, &ctx);
+
+        let esdt_obj_ref = self
+            .get_esdt_data_or_create(&token_id)
+            .get_mut_esdt_object();
+        esdt_obj_ref.set_roles(roles);
+
+        self
+    }
+
+    fn get_esdt_data_or_create(&mut self, token_id: &BytesKey) -> &mut Esdt {
+        if !self.esdt.contains_key(token_id) {
+            let _ = self
+                .esdt
+                .insert(token_id.clone(), Esdt::Full(EsdtObject::default()));
+        }
+
+        self.esdt.get_mut(token_id).unwrap()
     }
 }
 

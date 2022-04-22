@@ -4,7 +4,7 @@ use crate::{
     DebugApi,
 };
 use elrond_wasm::{
-    api::{BlockchainApi, BlockchainApiImpl, Handle, ManagedBufferApi, ManagedTypeApi},
+    api::{BlockchainApi, BlockchainApiImpl, Handle, ManagedTypeApi},
     types::{
         heap::{Address, H256},
         BigUint, EsdtLocalRole, EsdtLocalRoleFlags, EsdtTokenData, EsdtTokenType, ManagedAddress,
@@ -46,13 +46,13 @@ impl BlockchainApiImpl for DebugApi {
         is_smart_contract_address(address)
     }
 
-    fn get_balance_legacy(&self, address: &Address) -> Handle {
+    fn load_balance_legacy(&self, dest: Handle, address: &Address) {
         assert!(
             address == &self.get_sc_address_legacy(),
             "get balance not yet implemented for accounts other than the contract itself"
         );
         let egld_balance = self.with_contract_account(|account| account.egld_balance.clone());
-        self.insert_new_big_uint(egld_balance)
+        self.bi_overwrite(dest, egld_balance.into());
     }
 
     fn get_state_root_hash_legacy(&self) -> H256 {
@@ -113,41 +113,47 @@ impl BlockchainApiImpl for DebugApi {
             .clone()
     }
 
-    fn get_current_esdt_nft_nonce<M: ManagedTypeApi>(
-        &self,
-        address: &ManagedAddress<M>,
-        token: &TokenIdentifier<M>,
-    ) -> u64 {
+    fn get_current_esdt_nft_nonce(&self, address_handle: Handle, token_id_handle: Handle) -> u64 {
+        let address = ManagedAddress::<DebugApi>::from_raw_handle(address_handle);
         assert!(
-            self.mb_eq(address.get_raw_handle(), self.get_sc_address_handle()),
+            address.to_address() == self.get_sc_address_legacy(),
             "get_current_esdt_nft_nonce not yet implemented for accounts other than the contract itself"
         );
 
         self.with_contract_account(|account| {
             account
                 .esdt
-                .get_by_identifier_or_default(token.to_esdt_identifier().as_slice())
+                .get_by_identifier_or_default(
+                    TokenIdentifier::<DebugApi>::from_raw_handle(token_id_handle)
+                        .to_esdt_identifier()
+                        .as_slice(),
+                )
                 .last_nonce
         })
     }
 
-    fn get_esdt_balance<M: ManagedTypeApi>(
+    fn load_esdt_balance(
         &self,
-        address: &ManagedAddress<M>,
-        token: &TokenIdentifier<M>,
+        address_handle: Handle,
+        token_id_handle: Handle,
         nonce: u64,
-    ) -> BigUint<M> {
+        dest: Handle,
+    ) {
+        let address = ManagedAddress::<DebugApi>::from_raw_handle(address_handle);
         assert!(
-            self.mb_eq(address.get_raw_handle(), self.get_sc_address_handle()),
+            address.to_address() == self.get_sc_address_legacy(),
             "get_esdt_balance not yet implemented for accounts other than the contract itself"
         );
 
         let esdt_balance = self.with_contract_account(|account| {
-            account
-                .esdt
-                .get_esdt_balance(token.to_esdt_identifier().as_slice(), nonce)
+            account.esdt.get_esdt_balance(
+                TokenIdentifier::<DebugApi>::from_raw_handle(token_id_handle)
+                    .to_esdt_identifier()
+                    .as_slice(),
+                nonce,
+            )
         });
-        BigUint::from_raw_handle(self.insert_new_big_uint(esdt_balance))
+        self.bi_overwrite(dest, esdt_balance.into());
     }
 
     fn get_esdt_token_data<M: ManagedTypeApi>(
@@ -170,18 +176,16 @@ impl BlockchainApiImpl for DebugApi {
             })
     }
 
-    fn get_esdt_local_roles<M: ManagedTypeApi>(
-        &self,
-        token_id: &TokenIdentifier<M>,
-    ) -> EsdtLocalRoleFlags {
+    fn get_esdt_local_roles(&self, token_id_handle: Handle) -> EsdtLocalRoleFlags {
         let sc_address = self.input_ref().to.clone();
         self.blockchain_cache()
             .with_account(&sc_address, |account| {
                 let mut result = EsdtLocalRoleFlags::NONE;
-                if let Some(esdt_data) = account
-                    .esdt
-                    .get_by_identifier(token_id.to_esdt_identifier().as_slice())
-                {
+                if let Some(esdt_data) = account.esdt.get_by_identifier(
+                    TokenIdentifier::<DebugApi>::from_raw_handle(token_id_handle)
+                        .to_esdt_identifier()
+                        .as_slice(),
+                ) {
                     for role_name in esdt_data.roles.get() {
                         result |= EsdtLocalRole::from(role_name.as_slice()).to_flag();
                     }

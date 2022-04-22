@@ -3,7 +3,7 @@ use core::ops::{
 };
 
 use crate::{
-    api::{BigIntApi, ManagedTypeApi},
+    api::{BigIntApi, ManagedTypeApi, StaticVarApiImpl},
     types::{BigInt, ManagedType},
 };
 
@@ -24,9 +24,9 @@ macro_rules! binary_operator {
 
             fn $method(self, other: &BigInt<M>) -> BigInt<M> {
                 let api = M::managed_type_impl();
-                let result = api.bi_new_zero();
-                api.$api_func(result, self.handle, other.handle);
-                BigInt::from_raw_handle(result)
+                let result_handle = M::static_var_api_impl().next_handle();
+                api.$api_func(result_handle, self.handle, other.handle);
+                BigInt::from_raw_handle(result_handle)
             }
         }
     };
@@ -69,8 +69,8 @@ impl<M: ManagedTypeApi> Neg for BigInt<M> {
 
     fn neg(self) -> Self::Output {
         let api = M::managed_type_impl();
-        let result = api.bi_new_zero();
-        api.bi_neg(result, self.handle);
-        BigInt::from_raw_handle(result)
+        let result_handle = M::static_var_api_impl().next_handle();
+        api.bi_neg(result_handle, self.handle);
+        BigInt::from_raw_handle(result_handle)
     }
 }

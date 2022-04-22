@@ -5,7 +5,7 @@ use elrond_wasm::{
     derive::ManagedVecItem,
     elrond_codec,
     elrond_codec::elrond_codec_derive::{NestedDecode, NestedEncode, TopDecode, TopEncode},
-    types::{BigUint, EsdtTokenPayment, ManagedByteArray, TokenIdentifier},
+    types::{BigUint, EsdtTokenPayment, ManagedByteArray, ManagedType, TokenIdentifier},
 };
 use elrond_wasm_debug::DebugApi;
 
@@ -52,19 +52,22 @@ fn struct_to_bytes_writer() {
     let mut arr: [u8; 28] = [0u8;
         <ManagedStructWithToken<DebugApi> as elrond_wasm::types::ManagedVecItem>::PAYLOAD_SIZE];
 
+    let handle1 = s.token.token_identifier.get_raw_handle().to_be_bytes();
+    let handle2 = s.token.amount.get_raw_handle().to_be_bytes();
+    let handle3 = s.eth_address_1.get_raw_handle().to_be_bytes();
+    let handle4 = s.eth_address_2.get_raw_handle().to_be_bytes();
+    let expected = [
+        handle1[0], handle1[1], handle1[2], handle1[3], 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, handle2[0], handle2[1], handle2[2], handle2[3], 0x00, 0x01, 0x23, 0x45, handle3[0],
+        handle3[1], handle3[2], handle3[3], handle4[0], handle4[1], handle4[2], handle4[3],
+    ];
+
     <ManagedStructWithToken<DebugApi> as elrond_wasm::types::ManagedVecItem>::to_byte_writer(
         &s,
         |bytes| {
             arr[0..<ManagedStructWithToken::<DebugApi> as elrond_wasm::types::ManagedVecItem>::PAYLOAD_SIZE].copy_from_slice(bytes);
 
-            assert_eq!(
-                arr,
-                [
-                    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                    0x00, 0x00, 0x00, 0x00, 0x01, 0x23, 0x45, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00,
-                    0x00, 0x02,
-                ]
-            );
+            assert_eq!(arr, expected);
         },
     );
 }
@@ -83,9 +86,15 @@ fn struct_from_bytes_reader() {
         eth_address_1: ManagedByteArray::new_from_bytes(&[1u8; 20]),
         eth_address_2: ManagedByteArray::new_from_bytes(&[2u8; 20]),
     };
+
+    let handle1 = s.token.token_identifier.get_raw_handle().to_be_bytes();
+    let handle2 = s.token.amount.get_raw_handle().to_be_bytes();
+    let handle3 = s.eth_address_1.get_raw_handle().to_be_bytes();
+    let handle4 = s.eth_address_2.get_raw_handle().to_be_bytes();
     let arr: [u8; 28] = [
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x01, 0x23, 0x45, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02,
+        handle1[0], handle1[1], handle1[2], handle1[3], 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, handle2[0], handle2[1], handle2[2], handle2[3], 0x00, 0x01, 0x23, 0x45, handle3[0],
+        handle3[1], handle3[2], handle3[3], handle4[0], handle4[1], handle4[2], handle4[3],
     ];
 
     let struct_from_bytes =

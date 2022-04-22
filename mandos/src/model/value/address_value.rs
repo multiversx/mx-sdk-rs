@@ -59,13 +59,6 @@ impl InterpretableFrom<&AddressKey> for AddressValue {
     }
 }
 
-/// TODO: generalize for all `Clone`-able?
-impl InterpretableFrom<&AddressValue> for AddressValue {
-    fn interpret_from(from: &AddressValue, _context: &InterpreterContext) -> Self {
-        from.clone()
-    }
-}
-
 impl IntoRaw<ValueSubTree> for AddressValue {
     fn into_raw(self) -> ValueSubTree {
         self.original
