@@ -3,7 +3,7 @@ use elrond_codec::{EncodeError, EncodeErrorHandler, NestedEncodeOutput, TryStati
 use crate::{
     api::ManagedTypeApi,
     formatter::{
-        hex_util::{byte_to_bin_digit, byte_to_hex_digits},
+        hex_util::{byte_to_binary_digits, byte_to_hex_digits},
         FormatBuffer, FormatByteReceiver, SCBinary, SCCodec, SCDisplay, SCLowerHex,
     },
     types::{BigInt, BigUint, ManagedBuffer, StaticBufferRef},
@@ -120,7 +120,7 @@ where
     pub fn append_managed_buffer_binary(&mut self, item: &ManagedBuffer<M>) {
         item.for_each_batch::<BIN_CONVERSION_BUFFER_LEN, _>(|batch| {
             for &byte in batch {
-                let ascii_bin_digit = byte_to_bin_digit(byte);
+                let ascii_bin_digit = byte_to_binary_digits(byte);
                 self.append_bytes(&ascii_bin_digit[..]);
             }
         });
