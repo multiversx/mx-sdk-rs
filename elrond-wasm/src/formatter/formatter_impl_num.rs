@@ -3,7 +3,7 @@ use super::{hex_util::byte_to_hex_digits, SCBinary, SCDisplay, SCLowerHex};
 const MINUS_SYMBOL: &[u8] = b"-";
 
 /// u64::MAX is 18446744073709551615 in base 10, which is 20 digits. so 20 digits is enough
-const MAX_BASE_10_LEN: usize = 20;
+const MAX_BASE_10_LEN: usize = 64;
 
 fn format_unsigned_to_buffer(
     mut num: u64,

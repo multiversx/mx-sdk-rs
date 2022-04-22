@@ -26,7 +26,7 @@ pub trait FormatBuffer: Default {
 
     fn append_lower_hex<T: SCLowerHex>(&mut self, item: &T);
 
-    fn append_bytes<T: SCBinary>(&mut self, item: &T);
+    fn append_binary<T: SCBinary>(&mut self, item: &T);
 
     fn append_codec<T: SCCodec>(&mut self, item: &T);
 }
@@ -45,7 +45,7 @@ impl FormatBuffer for FormatBufferIgnore {
     fn append_lower_hex<T: SCLowerHex>(&mut self, _item: &T) {}
 
     #[inline]
-    fn append_bytes<T: SCBinary>(&mut self, _item: &T) {}
+    fn append_binary<T: SCBinary>(&mut self, _item: &T) {}
 
     #[inline]
     fn append_codec<T: SCCodec>(&mut self, _item: &T) {}
