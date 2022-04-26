@@ -1,5 +1,6 @@
 use super::{
-    arg_regular::*, method_gen::generate_arg_call_name, only_owner_gen::*, payable_gen::*, util::*,
+    convert_to_owned_type::*, method_gen::generate_arg_call_name, only_owner_gen::*,
+    payable_gen::*, util::*,
 };
 use crate::{
     generate::snippets,

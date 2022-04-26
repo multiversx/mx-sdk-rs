@@ -4,7 +4,7 @@ use elrond_codec::{DecodeError, DecodeErrorHandler, TopDecodeMultiInput};
 
 use crate::{
     api::{EndpointArgumentApi, EndpointArgumentApiImpl, ErrorApi, ManagedTypeApi},
-    ArgDecodeInput,
+    io::ArgDecodeInput,
 };
 
 #[derive(Default)]

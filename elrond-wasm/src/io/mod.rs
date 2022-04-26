@@ -6,7 +6,6 @@ mod arg_loader_single;
 mod arg_nested_tuple;
 mod bytes_arg_loader;
 mod finish;
-mod macro_helpers;
 mod managed_result_arg_loader;
 mod signal_error;
 
@@ -18,6 +17,5 @@ pub use arg_loader_single::*;
 pub use arg_nested_tuple::*;
 pub use bytes_arg_loader::*;
 pub use finish::*;
-pub use macro_helpers::*;
 pub use managed_result_arg_loader::*;
 pub use signal_error::*;
