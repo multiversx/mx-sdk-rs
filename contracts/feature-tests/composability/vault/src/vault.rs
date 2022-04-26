@@ -1,6 +1,8 @@
 #![no_std]
 #![allow(clippy::type_complexity)]
 
+use elrond_wasm::elrond_codec::Empty;
+
 elrond_wasm::imports!();
 
 /// General test contract.
@@ -167,7 +169,7 @@ pub trait Vault {
                 &ManagedBuffer::new(),
                 &BigUint::zero(),
                 &ManagedBuffer::new(),
-                &(),
+                &Empty,
                 &uris,
             );
 
