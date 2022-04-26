@@ -36,16 +36,16 @@ pub fn convert_to_owned_type(ty: &syn::Type) -> proc_macro2::TokenStream {
     quote! { #ty }
 }
 
-pub fn generate_load_single_arg(
-    arg: &MethodArgument,
-    arg_index_expr: &proc_macro2::TokenStream,
-) -> proc_macro2::TokenStream {
-    let arg_name_expr = arg_id_literal(&arg.pat);
-    let owned_type = convert_to_owned_type(&arg.ty);
-    quote! {
-        elrond_wasm::load_single_arg::<Self::Api, #owned_type>(#arg_index_expr, #arg_name_expr)
-    }
-}
+// pub fn generate_load_single_arg(
+//     arg: &MethodArgument,
+//     arg_index_expr: &proc_macro2::TokenStream,
+// ) -> proc_macro2::TokenStream {
+//     let arg_name_expr = arg_id_literal(&arg.pat);
+//     let owned_type = convert_to_owned_type(&arg.ty);
+//     quote! {
+//         elrond_wasm::load_single_arg::<Self::Api, #owned_type>(#arg_index_expr, #arg_name_expr)
+//     }
+// }
 
 pub fn generate_load_dyn_arg(
     arg: &MethodArgument,

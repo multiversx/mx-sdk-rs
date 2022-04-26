@@ -41,8 +41,12 @@ pub fn ident_str_literal(ident: &syn::Ident) -> proc_macro2::TokenStream {
     byte_str_slice_literal(ident.to_string().as_bytes())
 }
 
+pub fn pat_string(pat: &syn::Pat) -> String {
+    quote::ToTokens::to_token_stream(pat).to_string()
+}
+
 pub fn pat_literal(pat: &syn::Pat) -> proc_macro2::TokenStream {
-    let pat_str = quote::ToTokens::to_token_stream(pat).to_string();
+    let pat_str = pat_string(pat);
     byte_str_slice_literal(pat_str.as_bytes())
 }
 

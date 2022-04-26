@@ -4,6 +4,9 @@ use crate::{
 };
 
 pub trait TopDecodeMulti: Sized {
+    /// Used to optimize single value loading of endpoint arguments.
+    const IS_SINGLE_VALUE: bool = false;
+
     fn multi_decode<I>(input: &mut I) -> Result<Self, DecodeError>
     where
         I: TopDecodeMultiInput,
@@ -34,6 +37,8 @@ impl<T> TopDecodeMulti for T
 where
     T: TopDecode,
 {
+    const IS_SINGLE_VALUE: bool = true;
+
     fn multi_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
     where
         I: TopDecodeMultiInput,
