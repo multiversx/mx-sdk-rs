@@ -14,7 +14,7 @@ where
     A: VMApi,
 {
     A::call_value_api_impl().check_not_payable();
-    A::argument_api_impl().check_num_arguments(1);
+    A::argument_api_impl().check_num_arguments_eq(1);
     let (target_contract_address, ()) = load_endpoint_args::<
         A,
         (crate::types::ManagedAddress<A>, ()),
