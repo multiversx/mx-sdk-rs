@@ -1,5 +1,5 @@
 use crate::{
-    api::{EndpointArgumentApi, EndpointFinishApi, ErrorApi, ManagedTypeApi},
+    api::{EndpointArgumentApi, ErrorApi, ManagedTypeApi},
     contract_base::ExitCodecErrorHandler,
     *,
 };
@@ -28,16 +28,6 @@ where
     let result = T::multi_decode_or_handle_err(arg_input, h);
     let Ok(value) = result;
     value
-}
-
-pub fn finish_multi<FA, T>(item: &T)
-where
-    FA: ManagedTypeApi + EndpointFinishApi,
-    T: TopEncodeMulti,
-{
-    let h = ExitCodecErrorHandler::<FA>::from(err_msg::FINISH_ENCODE_ERROR);
-    let mut output = ApiOutputAdapter::<FA>::default();
-    let Ok(()) = item.multi_encode_or_handle_err(&mut output, h);
 }
 
 pub fn assert_no_more_args<A, I>(input: &I)
