@@ -1,5 +1,5 @@
-use super::util::*;
-use crate::model::MethodArgument;
+// use super::util::*;
+// use crate::model::MethodArgument;
 
 /// I now consider this a hack, a proper solution should be using traits somehow.
 ///
@@ -47,28 +47,28 @@ pub fn convert_to_owned_type(ty: &syn::Type) -> proc_macro2::TokenStream {
 //     }
 // }
 
-pub fn generate_load_dyn_arg(
-    arg: &MethodArgument,
-    loader_expr: &proc_macro2::TokenStream,
-) -> proc_macro2::TokenStream {
-    let pat = &arg.pat;
-    let arg_ty = &arg.ty;
-    let arg_name_expr = arg_id_literal(pat);
-    match &arg.ty {
-        syn::Type::Reference(type_reference) => {
-            assert!(
-                type_reference.mutability.is_none(),
-                "Mutable references not supported as contract method arguments"
-            );
-            let referenced_type = &*type_reference.elem;
-            quote! {
-                let #pat: & #referenced_type = &elrond_wasm::load_dyn_arg::<Self::Api, _, _>(#loader_expr, #arg_name_expr);
-            }
-        },
-        _ => {
-            quote! {
-                let #pat: #arg_ty = elrond_wasm::load_dyn_arg::<Self::Api, _, _>(#loader_expr, #arg_name_expr);
-            }
-        },
-    }
-}
+// pub fn generate_load_dyn_arg(
+//     arg: &MethodArgument,
+//     loader_expr: &proc_macro2::TokenStream,
+// ) -> proc_macro2::TokenStream {
+//     let pat = &arg.pat;
+//     let arg_ty = &arg.ty;
+//     let arg_name_expr = arg_id_literal(pat);
+//     match &arg.ty {
+//         syn::Type::Reference(type_reference) => {
+//             assert!(
+//                 type_reference.mutability.is_none(),
+//                 "Mutable references not supported as contract method arguments"
+//             );
+//             let referenced_type = &*type_reference.elem;
+//             quote! {
+//                 let #pat: & #referenced_type = &elrond_wasm::load_dyn_arg::<Self::Api, _, _>(#loader_expr, #arg_name_expr);
+//             }
+//         },
+//         _ => {
+//             quote! {
+//                 let #pat: #arg_ty = elrond_wasm::load_dyn_arg::<Self::Api, _, _>(#loader_expr, #arg_name_expr);
+//             }
+//         },
+//     }
+// }
