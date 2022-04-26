@@ -3,7 +3,7 @@ use elrond_codec::{DecodeError, TopDecodeMulti, TopDecodeMultiInput};
 use crate::{
     api::{EndpointArgumentApi, EndpointArgumentApiImpl, ErrorApi, ErrorApiImpl, ManagedTypeApi},
     contract_base::ExitCodecErrorHandler,
-    ArgErrorHandler, ArgId, EndpointDynArgLoader, EndpointSingleArgLoader,
+    io::{ArgErrorHandler, ArgId, EndpointDynArgLoader, EndpointSingleArgLoader},
 };
 
 pub trait ArgNestedTuple<AA>
