@@ -12,7 +12,6 @@ pub struct MethodArgument {
 #[derive(Clone, Debug)]
 pub struct ArgMetadata {
     pub payment: ArgPaymentMetadata,
-    pub var_args: bool,
     pub callback_call_result: bool,
     pub event_topic: bool,
 }
@@ -21,7 +20,6 @@ impl Default for ArgMetadata {
     fn default() -> Self {
         ArgMetadata {
             payment: ArgPaymentMetadata::NotPayment,
-            var_args: false,
             callback_call_result: false,
             event_topic: false,
         }
