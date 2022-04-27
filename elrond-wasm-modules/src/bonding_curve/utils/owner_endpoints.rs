@@ -18,7 +18,7 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
         &self,
         address: ManagedAddress,
         token_identifier: TokenIdentifier,
-        #[var_args] roles: MultiValueEncoded<EsdtLocalRole>,
+        roles: MultiValueEncoded<EsdtLocalRole>,
     ) {
         self.send()
             .esdt_system_sc_proxy()
@@ -32,7 +32,7 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
         &self,
         address: ManagedAddress,
         token_identifier: TokenIdentifier,
-        #[var_args] roles: MultiValueEncoded<EsdtLocalRole>,
+        roles: MultiValueEncoded<EsdtLocalRole>,
     ) {
         self.send()
             .esdt_system_sc_proxy()
@@ -73,7 +73,7 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
         #[payment] amount: BigUint,
         #[payment_token] identifier: TokenIdentifier,
         #[payment_nonce] nonce: u64,
-        #[var_args] payment_token: OptionalValue<TokenIdentifier>,
+        payment_token: OptionalValue<TokenIdentifier>,
     ) {
         let caller = self.blockchain().get_caller();
         let mut set_payment: TokenIdentifier = TokenIdentifier::egld();
