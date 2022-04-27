@@ -71,7 +71,6 @@ fn callback_selector_body(
     module_calls: Vec<proc_macro2::TokenStream>,
 ) -> proc_macro2::TokenStream {
     quote! {
-        let mut ___call_result_loader___ = elrond_wasm::io::EndpointDynArgLoader::<Self::Api>::new();
         let ___cb_closure_matcher___ = ___cb_closure___.matcher::<#CALLBACK_NAME_MAX_LENGTH>();
         if ___cb_closure_matcher___.matches_empty() {
             return elrond_wasm::types::CallbackSelectorResult::Processed;

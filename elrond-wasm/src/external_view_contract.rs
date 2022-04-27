@@ -1,7 +1,7 @@
 use crate::{
     api::{
-        const_handles, CallValueApiImpl, EndpointArgumentApiImpl, ManagedBufferApi,
-        StorageWriteApiImpl, VMApi, EXTERNAL_VIEW_TARGET_ADRESS_KEY,
+        const_handles, CallValueApiImpl, ManagedBufferApi, StorageWriteApiImpl, VMApi,
+        EXTERNAL_VIEW_TARGET_ADRESS_KEY,
     },
     io::load_endpoint_args,
     types::ManagedType,
@@ -14,7 +14,6 @@ where
     A: VMApi,
 {
     A::call_value_api_impl().check_not_payable();
-    A::argument_api_impl().check_num_arguments_eq(1);
     let (target_contract_address, ()) = load_endpoint_args::<
         A,
         (crate::types::ManagedAddress<A>, ()),

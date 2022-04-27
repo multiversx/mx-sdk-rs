@@ -3,18 +3,21 @@ use core::marker::PhantomData;
 use elrond_codec::{DecodeError, DecodeErrorHandler, TopDecodeMultiInput};
 
 use crate::{
-    api::{EndpointArgumentApi, EndpointArgumentApiImpl, ErrorApi, ManagedTypeApi},
+    api::{EndpointArgumentApi, ErrorApi, ManagedTypeApi, StaticVarApiImpl},
     io::ArgDecodeInput,
 };
 
+/// Does not keep the total number of arguments, it relies on it being saved statically,
+/// i.e. `init_arguments_static_data` to be called before.
+///
+/// Only used in `ArgNestedTuple`, do not use directly.
 #[derive(Default)]
-pub struct EndpointDynArgLoader<AA>
+pub(super) struct EndpointDynArgLoader<AA>
 where
     AA: ManagedTypeApi + ErrorApi + EndpointArgumentApi,
 {
     _phantom: PhantomData<AA>,
     current_index: i32,
-    num_arguments: i32,
 }
 
 impl<AA> EndpointDynArgLoader<AA>
@@ -22,24 +25,21 @@ where
     AA: ManagedTypeApi + ErrorApi + EndpointArgumentApi,
 {
     pub fn new_at_index(current_index: i32) -> Self {
-        let num_arguments = AA::argument_api_impl().get_num_arguments();
         EndpointDynArgLoader {
             _phantom: PhantomData,
             current_index,
-            num_arguments,
         }
     }
 
-    /// For backwards compatibility. TODO: remove.
-    pub fn new() -> Self {
-        Self::new_at_index(0)
+    fn num_arguments() -> i32 {
+        AA::static_var_api_impl().get_num_arguments()
     }
 
     fn check_current_index<H>(&self, h: H) -> Result<(), H::HandledErr>
     where
         H: DecodeErrorHandler,
     {
-        if self.current_index < self.num_arguments {
+        if self.current_index < Self::num_arguments() {
             Ok(())
         } else {
             Err(h.handle_error(DecodeError::MULTI_TOO_FEW_ARGS))
@@ -54,7 +54,7 @@ where
     type ValueInput = ArgDecodeInput<AA>;
 
     fn has_next(&self) -> bool {
-        self.current_index < self.num_arguments
+        self.current_index < Self::num_arguments()
     }
 
     fn next_value_input<H>(&mut self, h: H) -> Result<Self::ValueInput, H::HandledErr>
@@ -72,7 +72,7 @@ where
     where
         H: DecodeErrorHandler,
     {
-        self.current_index = self.num_arguments;
+        self.current_index = Self::num_arguments();
         Ok(())
     }
 }

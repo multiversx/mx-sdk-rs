@@ -32,4 +32,12 @@ impl StaticVarApiImpl for UncallableApi {
     fn next_handle(&self) -> Handle {
         unreachable!()
     }
+
+    fn set_num_arguments(&self, _num_arguments: i32) {
+        unreachable!()
+    }
+
+    fn get_num_arguments(&self) -> i32 {
+        unreachable!()
+    }
 }
