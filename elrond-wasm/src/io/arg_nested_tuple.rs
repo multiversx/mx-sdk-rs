@@ -21,11 +21,13 @@ where
 }
 
 /// Check that number of arguments is equal to value.
+///
+/// Since in this scenario this will be the only check, there is no need to load the argument count to static.
 fn check_num_arguments_eq<AA>(expected: i32)
 where
     AA: EndpointArgumentApi + ManagedTypeApi + ErrorApi,
 {
-    if AA::static_var_api_impl().get_num_arguments() != expected {
+    if AA::argument_api_impl().get_num_arguments() != expected {
         AA::error_api_impl().signal_error(err_msg::ARG_WRONG_NUMBER.as_bytes());
     }
 }
@@ -103,6 +105,9 @@ where
         if Head::IS_SINGLE_VALUE {
             Tail::check_num_single_args(index + 1);
         } else {
+            // both check_num_arguments_ge and EndpointDynArgLoader need it in the future
+            init_arguments_static_data::<AA>();
+
             check_num_arguments_ge::<AA>(index);
         }
     }
@@ -154,7 +159,6 @@ where
     AA: EndpointArgumentApi + ManagedTypeApi + ErrorApi,
     N: ArgNestedTuple<AA>,
 {
-    init_arguments_static_data::<AA>();
     N::check_num_single_args(0);
     N::next_single_arg(0, arg_names)
 }
