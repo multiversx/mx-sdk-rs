@@ -23,6 +23,9 @@ where
 /// Check that number of arguments is equal to value.
 ///
 /// Since in this scenario this will be the only check, there is no need to load the argument count to static.
+///
+/// Inline prevented following an investigation.
+#[inline(never)]
 fn check_num_arguments_eq<AA>(expected: i32)
 where
     AA: EndpointArgumentApi + ManagedTypeApi + ErrorApi,
@@ -35,6 +38,9 @@ where
 /// Check that number of arguments is greater or equal than value.
 ///
 /// Condition occurs when single args are followed by var-args.
+///
+/// Inline prevented following an investigation.
+#[inline(never)]
 fn check_num_arguments_ge<AA>(expected: i32)
 where
     AA: EndpointArgumentApi + ManagedTypeApi + ErrorApi,
@@ -81,6 +87,9 @@ where
     value
 }
 
+/// Models an argument tree of the form `(arg1, (arg2, ... (argn, ())))`, used for retrieving endpoint arguments.
+///
+/// It translates to a small algorithm determined at compile-time. That is why all methods are inlined.
 pub trait ArgNestedTuple<AA>
 where
     AA: EndpointArgumentApi + ManagedTypeApi + ErrorApi,
