@@ -151,7 +151,7 @@ pub trait ForwarderAsyncCallModule {
     fn send_async_accept_multi_transfer(
         &self,
         to: ManagedAddress,
-        #[var_args] token_payments: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>>,
+        token_payments: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>>,
     ) {
         let mut all_token_payments = ManagedVec::new();
 

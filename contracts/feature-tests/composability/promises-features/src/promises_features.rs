@@ -25,7 +25,7 @@ pub trait PromisesFeatures {
         endpoint_name: ManagedBuffer,
         gas_limit: u64,
         extra_gas_for_callback: u64,
-        #[var_args] args: MultiValueEncoded<ManagedBuffer>,
+        args: MultiValueEncoded<ManagedBuffer>,
     ) {
         self.send()
             .contract_call::<()>(to, endpoint_name)
@@ -44,7 +44,7 @@ pub trait PromisesFeatures {
         to: ManagedAddress,
         endpoint_name: ManagedBuffer,
         extra_gas_for_callback: u64,
-        #[var_args] token_payment_args: MultiValueEncoded<EsdtTokenPaymentMultiValue>,
+        token_payment_args: MultiValueEncoded<EsdtTokenPaymentMultiValue>,
     ) {
         let mut token_payments_vec = ManagedVec::new();
         for token_payment_arg in token_payment_args {
@@ -64,14 +64,14 @@ pub trait PromisesFeatures {
     }
 
     #[endpoint]
-    fn success_callback(&self, #[var_args] args: MultiValueEncoded<ManagedBuffer>) {
+    fn success_callback(&self, args: MultiValueEncoded<ManagedBuffer>) {
         self.async_call_callback_data().set(true);
         let args_as_vec = args.into_vec_of_buffers();
         self.async_call_event_callback(&args_as_vec);
     }
 
     #[endpoint]
-    fn error_callback(&self, #[var_args] args: MultiValueEncoded<ManagedBuffer>) {
+    fn error_callback(&self, args: MultiValueEncoded<ManagedBuffer>) {
         self.async_call_callback_data().set(false);
         let args_as_vec = args.into_vec_of_buffers();
         self.async_call_event_callback(&args_as_vec);
