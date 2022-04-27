@@ -36,4 +36,12 @@ impl StaticVarApiImpl for DebugApi {
         ref_tx_static_vars.next_handle -= 1;
         new_handle
     }
+
+    fn set_num_arguments(&self, num_arguments: i32) {
+        self.static_vars_cell.borrow_mut().num_arguments = num_arguments;
+    }
+
+    fn get_num_arguments(&self) -> i32 {
+        self.static_vars_cell.borrow().num_arguments
+    }
 }

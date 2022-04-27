@@ -1,6 +1,4 @@
-use elrond_codec::DecodeError;
-
-use crate::{err_msg, types::heap::BoxedBytes};
+use crate::types::heap::BoxedBytes;
 
 use super::{ErrorApiImpl, Handle};
 
@@ -14,22 +12,6 @@ pub trait EndpointArgumentApi {
 /// The smart contract code doesn't have access to these methods directly.
 pub trait EndpointArgumentApiImpl: ErrorApiImpl {
     fn get_num_arguments(&self) -> i32;
-
-    /// Check that number of arguments is equal to value.
-    fn check_num_arguments_eq(&self, expected: i32) {
-        let nr_args = self.get_num_arguments();
-        if nr_args != expected {
-            self.signal_error(err_msg::ARG_WRONG_NUMBER.as_bytes());
-        }
-    }
-
-    /// Check that number of arguments is greater or equal than value.
-    fn check_num_arguments_ge(&self, expected: i32) {
-        let nr_args = self.get_num_arguments();
-        if nr_args < expected {
-            self.signal_error(DecodeError::MULTI_TOO_FEW_ARGS.message_bytes());
-        }
-    }
 
     fn get_argument_len(&self, arg_index: i32) -> usize;
 

@@ -1,11 +1,60 @@
-use elrond_codec::{TopDecodeMulti, TopDecodeMultiInput};
-
+use super::{EndpointDynArgLoader, EndpointSingleArgLoader};
 use crate::{
-    api::{EndpointArgumentApi, EndpointArgumentApiImpl, ErrorApi, ManagedTypeApi},
-    contract_base::ExitCodecErrorHandler,
-    io::{ArgErrorHandler, ArgId, EndpointDynArgLoader, EndpointSingleArgLoader},
+    api::{
+        EndpointArgumentApi, EndpointArgumentApiImpl, ErrorApi, ErrorApiImpl, ManagedTypeApi,
+        StaticVarApiImpl,
+    },
+    err_msg,
+    io::{ArgErrorHandler, ArgId},
 };
+use elrond_codec::{DecodeError, TopDecodeMulti, TopDecodeMultiInput};
 
+/// Argument count cannot change during execution, and it can get queried multiple times,
+/// so it makes sense to save it statically.
+///
+/// Especially the `EndpointDynArgLoader` repeatedly needs this value, keeping statically means it is no longer carried around.
+fn init_arguments_static_data<AA>()
+where
+    AA: EndpointArgumentApi + ManagedTypeApi + ErrorApi,
+{
+    AA::static_var_api_impl().set_num_arguments(AA::argument_api_impl().get_num_arguments());
+}
+
+/// Check that number of arguments is equal to value.
+fn check_num_arguments_eq<AA>(expected: i32)
+where
+    AA: EndpointArgumentApi + ManagedTypeApi + ErrorApi,
+{
+    if AA::static_var_api_impl().get_num_arguments() != expected {
+        AA::error_api_impl().signal_error(err_msg::ARG_WRONG_NUMBER.as_bytes());
+    }
+}
+
+/// Check that number of arguments is greater or equal than value.
+///
+/// Condition occurs when single args are followed by var-args.
+fn check_num_arguments_ge<AA>(expected: i32)
+where
+    AA: EndpointArgumentApi + ManagedTypeApi + ErrorApi,
+{
+    if AA::static_var_api_impl().get_num_arguments() < expected {
+        AA::error_api_impl().signal_error(DecodeError::MULTI_TOO_FEW_ARGS.message_bytes());
+    }
+}
+
+/// Check that loader went through all existing arguments.
+#[inline(never)]
+fn check_no_more_args<AA, L>(loader: L)
+where
+    AA: EndpointArgumentApi + ManagedTypeApi + ErrorApi,
+    L: TopDecodeMultiInput,
+{
+    if loader.has_next() {
+        AA::error_api_impl().signal_error(DecodeError::MULTI_TOO_MANY_ARGS.message_bytes());
+    }
+}
+
+#[inline(never)]
 fn load_single_arg<AA, T>(index: i32, arg_id: ArgId) -> T
 where
     AA: EndpointArgumentApi + ManagedTypeApi + ErrorApi,
@@ -17,6 +66,7 @@ where
     value
 }
 
+#[inline(never)]
 fn load_multi_arg<AA, L, T>(loader: &mut L, arg_id: ArgId) -> T
 where
     AA: EndpointArgumentApi + ManagedTypeApi + ErrorApi,
@@ -53,7 +103,7 @@ where
         if Head::IS_SINGLE_VALUE {
             Tail::check_num_single_args(index + 1);
         } else {
-            AA::argument_api_impl().check_num_arguments_ge(index);
+            check_num_arguments_ge::<AA>(index);
         }
     }
 
@@ -85,31 +135,31 @@ where
 
     #[inline(always)]
     fn check_num_single_args(index: i32) {
-        AA::argument_api_impl().check_num_arguments_eq(index);
+        check_num_arguments_eq::<AA>(index);
     }
 
-    #[inline]
+    #[inline(always)]
     fn next_single_arg(_index: i32, _arg_names: Self::ArgNames) -> Self {}
 
-    #[inline]
+    #[inline(always)]
     fn next_multi_arg<L: TopDecodeMultiInput>(loader: L, _arg_names: Self::ArgNames) -> Self {
-        let h = ExitCodecErrorHandler::<AA>::from(&[][..]);
-        let Ok(()) = loader.assert_no_more_args(h);
+        check_no_more_args::<AA, L>(loader);
     }
 }
 
-/// Used for loading all regular endpoint arguments. Call to it gets generated for all endpoints and callbacks.
+/// Used for loading all regular endpoint arguments. A call to this gets generated for all endpoints and callbacks.
 #[inline(always)]
 pub fn load_endpoint_args<AA, N>(arg_names: N::ArgNames) -> N
 where
     AA: EndpointArgumentApi + ManagedTypeApi + ErrorApi,
     N: ArgNestedTuple<AA>,
 {
+    init_arguments_static_data::<AA>();
     N::check_num_single_args(0);
     N::next_single_arg(0, arg_names)
 }
 
-/// Currently used for the callback closure.
+/// Currently used for the callback closure. No distinction there for single values.
 #[inline(always)]
 pub fn load_multi_args_custom_loader<AA, L, N>(loader: L, arg_names: N::ArgNames) -> N
 where
@@ -117,5 +167,6 @@ where
     L: TopDecodeMultiInput,
     N: ArgNestedTuple<AA>,
 {
+    init_arguments_static_data::<AA>();
     N::next_multi_arg(loader, arg_names)
 }

@@ -7,8 +7,11 @@ use crate::{
     io::ArgDecodeInput,
 };
 
+/// Loads a single-value argument. Behaves as if only the argument at `current_index` exists, nothing after.
+///
+/// Only used in `ArgNestedTuple`, do not use directly.
 #[derive(Default)]
-pub struct EndpointSingleArgLoader<AA>
+pub(super) struct EndpointSingleArgLoader<AA>
 where
     AA: ManagedTypeApi + ErrorApi + EndpointArgumentApi,
 {
