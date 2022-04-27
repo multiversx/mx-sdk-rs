@@ -57,7 +57,7 @@ pub trait EchoTypes {
     }
 
     #[endpoint]
-    fn echo_nothing(&self, #[var_args] nothing: ()) -> () {
+    fn echo_nothing(&self, nothing: ()) -> () {
         nothing
     }
 
@@ -69,7 +69,7 @@ pub trait EchoTypes {
     #[endpoint]
     fn echo_multi_value_u32(
         &self,
-        #[var_args] m: MultiValueManagedVec<u32>,
+        m: MultiValueManagedVec<u32>,
     ) -> MultiValue2<usize, MultiValueManagedVec<u32>> {
         let v = m.into_vec();
         (v.len(), v.into()).into()
@@ -78,7 +78,7 @@ pub trait EchoTypes {
     #[endpoint]
     fn echo_multi_value_tuples(
         &self,
-        #[var_args] m: MultiValueEncoded<MultiValue2<isize, ManagedBuffer>>,
+        m: MultiValueEncoded<MultiValue2<isize, ManagedBuffer>>,
     ) -> MultiValueEncoded<MultiValue2<isize, ManagedBuffer>> {
         let mut result = MultiValueEncoded::new();
         for multi2 in m.into_iter() {
@@ -111,8 +111,8 @@ pub trait EchoTypes {
     fn echo_some_args_ignore_others(
         &self,
         i: i32,
-        #[var_args] opt: OptionalValue<i32>,
-        #[var_args] _ignore: IgnoreValue,
+        opt: OptionalValue<i32>,
+        _ignore: IgnoreValue,
     ) -> MultiValue2<i32, OptionalValue<i32>> {
         (i, opt).into()
     }
