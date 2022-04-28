@@ -48,15 +48,12 @@ impl AccountEsdt {
     }
 
     pub fn set_roles(&mut self, token_identifier: Vec<u8>, roles: Vec<Vec<u8>>) {
-        let esdt_data = self
-            .0
-            .entry(token_identifier)
-            .or_insert_with(|| EsdtData {
-                instances: EsdtInstances::new(),
-                last_nonce: 0,
-                roles: EsdtRoles::default(),
-                frozen: false,
-            });
+        let esdt_data = self.0.entry(token_identifier).or_insert_with(|| EsdtData {
+            instances: EsdtInstances::new(),
+            last_nonce: 0,
+            roles: EsdtRoles::default(),
+            frozen: false,
+        });
         esdt_data.roles = EsdtRoles::new(roles);
     }
 
@@ -84,15 +81,12 @@ impl AccountEsdt {
         value: &BigUint,
         metadata: EsdtInstanceMetadata,
     ) {
-        let esdt_data = self
-            .0
-            .entry(token_identifier)
-            .or_insert_with(|| EsdtData {
-                instances: EsdtInstances::new(),
-                last_nonce: nonce,
-                roles: EsdtRoles::default(),
-                frozen: false,
-            });
+        let esdt_data = self.0.entry(token_identifier).or_insert_with(|| EsdtData {
+            instances: EsdtInstances::new(),
+            last_nonce: nonce,
+            roles: EsdtRoles::default(),
+            frozen: false,
+        });
         esdt_data.instances.increase_balance(nonce, value, metadata);
     }
 
@@ -103,15 +97,12 @@ impl AccountEsdt {
         value: &BigUint,
         metadata: EsdtInstanceMetadata,
     ) {
-        let esdt_data = self
-            .0
-            .entry(token_identifier)
-            .or_insert_with(|| EsdtData {
-                instances: EsdtInstances::new(),
-                last_nonce: nonce,
-                roles: EsdtRoles::default(),
-                frozen: false,
-            });
+        let esdt_data = self.0.entry(token_identifier).or_insert_with(|| EsdtData {
+            instances: EsdtInstances::new(),
+            last_nonce: nonce,
+            roles: EsdtRoles::default(),
+            frozen: false,
+        });
         esdt_data.instances.set_balance(nonce, value, metadata);
     }
 
