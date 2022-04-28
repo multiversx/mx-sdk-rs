@@ -55,12 +55,30 @@ pub trait SCDisplay {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F);
 }
 
+impl<T: SCDisplay> SCDisplay for &T {
+    fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
+        SCDisplay::fmt(*self, f)
+    }
+}
+
 pub trait SCLowerHex {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F);
 }
 
+impl<T: SCLowerHex> SCLowerHex for &T {
+    fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
+        SCLowerHex::fmt(*self, f)
+    }
+}
+
 pub trait SCBinary {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F);
+}
+
+impl<T: SCBinary> SCBinary for &T {
+    fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
+        SCBinary::fmt(*self, f)
+    }
 }
 
 pub trait SCCodec {

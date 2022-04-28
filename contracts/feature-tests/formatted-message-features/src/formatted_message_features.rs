@@ -14,7 +14,7 @@ pub trait FormattedMessageFeatures {
 
     #[endpoint]
     fn dynamic_message(&self, bytes: ManagedBuffer) {
-        sc_panic!("Got this buffer: {}. I don't like it, ERROR!", bytes);
+        sc_panic!("Got this buffer: {}. I don't like it, ERROR!", &bytes);
     }
 
     #[endpoint]
@@ -32,9 +32,9 @@ pub trait FormattedMessageFeatures {
     ) {
         sc_panic!(
             "Got token {}, with nonce {}, amount {}. I prefer EGLD. ERROR!",
-            token_id,
+            &&token_id, // references are accepted
             nonce,
-            amount
+            &amount
         );
     }
 

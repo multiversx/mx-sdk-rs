@@ -24,7 +24,7 @@ impl EsdtTokenType {
         if token_nonce == 0 {
             EsdtTokenType::Fungible
         } else {
-            EsdtTokenType::SemiFungible
+            EsdtTokenType::NonFungible
         }
     }
 
