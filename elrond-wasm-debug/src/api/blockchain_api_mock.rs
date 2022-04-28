@@ -180,28 +180,14 @@ impl BlockchainApiImpl for DebugApi {
                         // missing nonce
                         EsdtTokenData {
                             token_type: EsdtTokenType::based_on_token_nonce(nonce),
-                            amount: BigUint::zero(),
-                            frozen: false,
-                            hash: ManagedBuffer::new(),
-                            name: ManagedBuffer::new(),
-                            attributes: ManagedBuffer::new(),
-                            creator: ManagedAddress::zero(),
-                            royalties: BigUint::zero(),
-                            uris: ManagedVec::new(),
+                            ..Default::default()
                         }
                     }
                 } else {
                     // missing token identifier
                     EsdtTokenData {
                         token_type: EsdtTokenType::Fungible,
-                        amount: BigUint::zero(),
-                        frozen: false,
-                        hash: ManagedBuffer::new(),
-                        name: ManagedBuffer::new(),
-                        attributes: ManagedBuffer::new(),
-                        creator: ManagedAddress::zero(),
-                        royalties: BigUint::zero(),
-                        uris: ManagedVec::new(),
+                        ..Default::default()
                     }
                 }
             })
