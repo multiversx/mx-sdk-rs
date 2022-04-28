@@ -9,7 +9,7 @@ pub trait DeployContractModule {
     fn deploy_contract(
         &self,
         code: ManagedBuffer,
-        #[var_args] opt_arg: OptionalValue<ManagedBuffer>,
+        opt_arg: OptionalValue<ManagedBuffer>,
     ) -> MultiValue2<ManagedAddress, OptionalValue<ManagedBuffer>> {
         self.perform_deploy_vault(&code, opt_arg).into()
     }
@@ -34,7 +34,7 @@ pub trait DeployContractModule {
     fn perform_deploy_vault(
         &self,
         code: &ManagedBuffer,
-        #[var_args] opt_arg: OptionalValue<ManagedBuffer>,
+        opt_arg: OptionalValue<ManagedBuffer>,
     ) -> (ManagedAddress, OptionalValue<ManagedBuffer>) {
         self.vault_proxy()
             .init(opt_arg)
@@ -45,7 +45,7 @@ pub trait DeployContractModule {
     fn deploy_vault_from_source(
         &self,
         source_address: ManagedAddress,
-        #[var_args] opt_arg: OptionalValue<ManagedBuffer>,
+        opt_arg: OptionalValue<ManagedBuffer>,
     ) -> MultiValue2<ManagedAddress, OptionalValue<ManagedBuffer>> {
         self.vault_proxy()
             .init(opt_arg)

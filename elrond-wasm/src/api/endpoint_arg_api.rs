@@ -1,4 +1,4 @@
-use crate::{err_msg, types::heap::BoxedBytes};
+use crate::types::heap::BoxedBytes;
 
 use super::{ErrorApiImpl, Handle};
 
@@ -12,13 +12,6 @@ pub trait EndpointArgumentApi {
 /// The smart contract code doesn't have access to these methods directly.
 pub trait EndpointArgumentApiImpl: ErrorApiImpl {
     fn get_num_arguments(&self) -> i32;
-
-    fn check_num_arguments(&self, expected: i32) {
-        let nr_args = self.get_num_arguments();
-        if nr_args != expected {
-            self.signal_error(err_msg::ARG_WRONG_NUMBER.as_bytes());
-        }
-    }
 
     fn get_argument_len(&self, arg_index: i32) -> usize;
 

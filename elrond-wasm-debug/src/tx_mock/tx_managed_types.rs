@@ -71,6 +71,7 @@ impl Default for TxManagedTypes {
 pub struct TxStaticVars {
     pub(crate) external_view_target_address_handle: Handle,
     pub(crate) next_handle: Handle,
+    pub(crate) num_arguments: i32,
 }
 
 impl Default for TxStaticVars {
@@ -78,6 +79,7 @@ impl Default for TxStaticVars {
         TxStaticVars {
             external_view_target_address_handle: 0,
             next_handle: const_handles::NEW_HANDLE_START_FROM,
+            num_arguments: -1,
         }
     }
 }

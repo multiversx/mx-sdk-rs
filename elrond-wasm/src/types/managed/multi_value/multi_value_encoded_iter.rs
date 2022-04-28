@@ -4,7 +4,7 @@ use elrond_codec::{TopDecodeMulti, TopDecodeMultiInput};
 
 use crate::{
     api::{ErrorApi, ManagedTypeApi},
-    ArgErrorHandler, ArgId, ManagedResultArgLoader,
+    io::{ArgErrorHandler, ArgId, ManagedResultArgLoader},
 };
 
 use super::MultiValueEncoded;

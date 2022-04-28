@@ -41,7 +41,7 @@ pub trait StorageStoreFeatures {
     fn set_opt_addr(&self, opt_addr: Option<ManagedAddress>);
 
     #[endpoint]
-    fn store_opt_addr(&self, #[var_args] opt_addr: OptionalValue<ManagedAddress>) {
+    fn store_opt_addr(&self, opt_addr: OptionalValue<ManagedAddress>) {
         self.set_opt_addr(opt_addr.into_option());
     }
 

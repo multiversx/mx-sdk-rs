@@ -1,5 +1,5 @@
 use crate::{
-    DefaultErrorHandler, EncodeError, EncodeErrorHandler, TopEncode, TopEncodeMultiOutput, TypeInfo,
+    DefaultErrorHandler, EncodeError, EncodeErrorHandler, TopEncode, TopEncodeMultiOutput,
 };
 
 pub trait TopEncodeMulti: Sized {
@@ -36,11 +36,6 @@ where
         O: TopEncodeMultiOutput,
         H: EncodeErrorHandler,
     {
-        if Self::TYPE_INFO == TypeInfo::Unit {
-            // unit specialization: nothing gets encoded
-            return Ok(());
-        }
-
         output.push_single_value(self, h)
     }
 }

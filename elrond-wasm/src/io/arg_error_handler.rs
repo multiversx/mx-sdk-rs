@@ -2,7 +2,7 @@ use core::marker::PhantomData;
 
 use crate::{
     api::{ErrorApi, ManagedTypeApi},
-    signal_arg_de_error, ArgId,
+    io::{signal_arg_de_error, ArgId},
 };
 use elrond_codec::*;
 
