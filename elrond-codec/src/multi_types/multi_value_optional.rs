@@ -1,5 +1,5 @@
 use crate::{
-    CodecFrom, CodecSelf, DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti,
+    CodecFrom, CodecFromSelf, DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti,
     TopDecodeMultiInput, TopEncodeMulti, TopEncodeMultiOutput,
 };
 
@@ -70,7 +70,7 @@ where
     }
 }
 
-impl<T> !CodecSelf for OptionalValue<T> {}
+impl<T> !CodecFromSelf for OptionalValue<T> {}
 
 impl<T, U> CodecFrom<OptionalValue<U>> for OptionalValue<T>
 where
@@ -83,6 +83,6 @@ where
 impl<T, U> CodecFrom<U> for OptionalValue<T>
 where
     T: TopEncodeMulti + TopDecodeMulti,
-    U: CodecFrom<T> + CodecSelf + TopEncodeMulti + TopDecodeMulti,
+    U: CodecFrom<T> + CodecFromSelf + TopEncodeMulti + TopDecodeMulti,
 {
 }

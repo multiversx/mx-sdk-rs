@@ -7,7 +7,7 @@ use crate::{
     types::{heap::Address, ManagedBuffer, ManagedByteArray, ManagedType},
 };
 use elrond_codec::{
-    CodecFrom, CodecSelf, DecodeError, DecodeErrorHandler, EncodeErrorHandler, NestedDecode,
+    CodecFrom, CodecFromSelf, DecodeError, DecodeErrorHandler, EncodeErrorHandler, NestedDecode,
     NestedDecodeInput, NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode,
     TopEncodeOutput, TryStaticCast,
 };
@@ -258,7 +258,7 @@ impl<M: ManagedTypeApi> core::fmt::Debug for ManagedAddress<M> {
     }
 }
 
-impl<M> CodecSelf for ManagedAddress<M> where M: ManagedTypeApi {}
+impl<M> CodecFromSelf for ManagedAddress<M> where M: ManagedTypeApi {}
 
 impl<M> CodecFrom<[u8; 32]> for ManagedAddress<M> where M: ManagedTypeApi {}
 
