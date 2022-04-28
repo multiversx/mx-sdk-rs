@@ -11,7 +11,6 @@ use super::{EsdtInstanceMetadata, EsdtInstances, EsdtRoles};
 
 #[derive(Clone, Default, Debug)]
 pub struct EsdtData {
-    pub token_identifier: Vec<u8>,
     pub instances: EsdtInstances,
     pub last_nonce: u64,
     pub roles: EsdtRoles,
@@ -51,9 +50,8 @@ impl AccountEsdt {
     pub fn set_roles(&mut self, token_identifier: Vec<u8>, roles: Vec<Vec<u8>>) {
         let esdt_data = self
             .0
-            .entry(token_identifier.clone())
+            .entry(token_identifier)
             .or_insert_with(|| EsdtData {
-                token_identifier,
                 instances: EsdtInstances::new(),
                 last_nonce: 0,
                 roles: EsdtRoles::default(),
@@ -88,9 +86,8 @@ impl AccountEsdt {
     ) {
         let esdt_data = self
             .0
-            .entry(token_identifier.clone())
+            .entry(token_identifier)
             .or_insert_with(|| EsdtData {
-                token_identifier,
                 instances: EsdtInstances::new(),
                 last_nonce: nonce,
                 roles: EsdtRoles::default(),
@@ -108,9 +105,8 @@ impl AccountEsdt {
     ) {
         let esdt_data = self
             .0
-            .entry(token_identifier.clone())
+            .entry(token_identifier)
             .or_insert_with(|| EsdtData {
-                token_identifier,
                 instances: EsdtInstances::new(),
                 last_nonce: nonce,
                 roles: EsdtRoles::default(),
@@ -170,17 +166,12 @@ impl fmt::Display for EsdtData {
         write!(
             esdt_buf,
             "{{
-                token_identifier: {},
                 instances: [{}],
                 last_nonce: {},
                 roles: [{}],
                 frozen: {},
             }}",
-            key_hex(self.token_identifier.as_slice()),
-            self.instances,
-            self.last_nonce,
-            self.roles,
-            self.frozen
+            self.instances, self.last_nonce, self.roles, self.frozen
         )?;
         Ok(())
     }

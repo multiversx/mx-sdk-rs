@@ -1,5 +1,5 @@
 mod account_data;
-mod account_esdt;
+mod esdt_data;
 mod block_info;
 mod blockchain_mock;
 mod blockchain_mock_account_util;
@@ -11,7 +11,7 @@ mod esdt_instances;
 mod esdt_roles;
 
 pub use account_data::*;
-pub use account_esdt::*;
+pub use esdt_data::*;
 pub use block_info::*;
 pub use blockchain_mock::*;
 pub use blockchain_mock_account_util::is_smart_contract_address;

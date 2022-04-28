@@ -164,12 +164,18 @@ impl BlockchainApiImpl for DebugApi {
     ) -> EsdtTokenData<M> {
         self.blockchain_cache()
             .with_account(&address.to_address(), |account| {
-                let opt_esdt_data = account
+                let token_identifier_value = token.to_esdt_identifier();
+                if let Some(esdt_data) = account
                     .esdt
-                    .get_by_identifier(token.to_esdt_identifier().as_slice());
-                if let Some(esdt_data) = opt_esdt_data {
+                    .get_by_identifier(token_identifier_value.as_slice())
+                {
                     if let Some(instance) = esdt_data.instances.get_by_nonce(nonce) {
-                        self.esdt_token_data_from_instance(esdt_data, nonce, instance)
+                        self.esdt_token_data_from_instance(
+                            token_identifier_value.into_vec(),
+                            esdt_data,
+                            nonce,
+                            instance,
+                        )
                     } else {
                         // missing nonce
                         EsdtTokenData {
@@ -233,6 +239,7 @@ impl BlockchainApiImpl for DebugApi {
 impl DebugApi {
     fn esdt_token_data_from_instance<M: ManagedTypeApi>(
         &self,
+        token_identifier_value: Vec<u8>,
         esdt_data: &EsdtData,
         nonce: u64,
         instance: &EsdtInstance,
@@ -256,7 +263,7 @@ impl DebugApi {
                 self.insert_new_managed_buffer(instance.metadata.hash.clone().unwrap_or_default()),
             ),
             name: ManagedBuffer::from_raw_handle(
-                self.insert_new_managed_buffer(esdt_data.token_identifier.clone()),
+                self.insert_new_managed_buffer(token_identifier_value),
             ),
             attributes: ManagedBuffer::from_raw_handle(
                 self.insert_new_managed_buffer(instance.metadata.attributes.clone()),
