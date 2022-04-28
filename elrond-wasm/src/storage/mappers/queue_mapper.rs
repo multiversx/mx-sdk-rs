@@ -148,7 +148,7 @@ where
         storage_set(
             self.build_node_id_named_key(NODE_IDENTIFIER, node_id)
                 .as_ref(),
-            &(),
+            &elrond_codec::Empty,
         );
     }
 
@@ -178,7 +178,7 @@ where
         storage_set(
             self.build_node_id_named_key(VALUE_IDENTIFIER, node_id)
                 .as_ref(),
-            &(),
+            &elrond_codec::Empty,
         )
     }
 
