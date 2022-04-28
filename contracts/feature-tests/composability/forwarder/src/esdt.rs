@@ -36,7 +36,7 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
         to: &ManagedAddress,
         token_id: TokenIdentifier,
         amount: &BigUint,
-        #[var_args] opt_data: OptionalValue<ManagedBuffer>,
+        opt_data: OptionalValue<ManagedBuffer>,
     ) {
         let data = match opt_data {
             OptionalValue::Some(data) => data,
@@ -67,7 +67,7 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
         token_id: TokenIdentifier,
         amount_first_time: &BigUint,
         amount_second_time: &BigUint,
-        #[var_args] opt_data: OptionalValue<ManagedBuffer>,
+        opt_data: OptionalValue<ManagedBuffer>,
     ) {
         let data = match opt_data {
             OptionalValue::Some(data) => data,
@@ -83,7 +83,7 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
     fn send_esdt_direct_multi_transfer(
         &self,
         to: ManagedAddress,
-        #[var_args] token_payments: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>>,
+        token_payments: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>>,
     ) {
         let mut all_token_payments = ManagedVec::new();
 
