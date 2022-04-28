@@ -2,10 +2,10 @@ use crate::{
     api::{BlockchainApi, ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi},
     contract_base::{BlockchainWrapper, ExitCodecErrorHandler, ManagedSerializer},
     err_msg,
+    io::ManagedResultArgLoader,
     storage::StorageKey,
     storage_clear, storage_get, storage_set,
     types::{ManagedBuffer, ManagedType},
-    ManagedResultArgLoader,
 };
 use elrond_codec::{
     elrond_codec_derive::{TopDecode, TopEncode},

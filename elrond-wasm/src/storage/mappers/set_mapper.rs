@@ -84,7 +84,7 @@ where
         storage_set(
             self.build_named_value_key(NODE_ID_IDENTIFIER, value)
                 .as_ref(),
-            &(),
+            &elrond_codec::Empty,
         );
     }
 

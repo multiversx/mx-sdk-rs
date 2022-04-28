@@ -1,6 +1,7 @@
 mod multi_value_ignore;
 mod multi_value_optional;
 mod multi_value_tuple;
+mod multi_value_unit;
 
 #[cfg(feature = "alloc")]
 mod multi_value_vec;

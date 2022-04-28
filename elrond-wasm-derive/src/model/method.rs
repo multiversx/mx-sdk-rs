@@ -91,8 +91,4 @@ impl Method {
             PublicRole::Private => MethodPayableMetadata::NotPayable,
         }
     }
-
-    pub fn has_variable_nr_args(&self) -> bool {
-        self.method_args.iter().any(|arg| arg.metadata.var_args)
-    }
 }
