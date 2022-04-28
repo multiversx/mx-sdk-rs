@@ -7,8 +7,9 @@ use crate::{
 };
 use core::marker::PhantomData;
 use elrond_codec::{
-    try_cast_execute_or_else, DecodeErrorHandler, EncodeErrorHandler, TopDecode, TopDecodeMulti,
-    TopDecodeMultiInput, TopDecodeMultiLength, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
+    try_cast_execute_or_else, CodecFromSelf, DecodeErrorHandler, EncodeErrorHandler, TopDecode,
+    TopDecodeMulti, TopDecodeMultiInput, TopDecodeMultiLength, TopEncode, TopEncodeMulti,
+    TopEncodeMultiOutput,
 };
 
 /// A multi-value container, that keeps raw values as ManagedBuffer
@@ -237,4 +238,27 @@ where
     fn is_variadic() -> bool {
         true
     }
+}
+
+impl<M, T> CodecFromSelf for MultiValueEncoded<M, T> where M: ManagedTypeApi {}
+
+#[cfg(feature = "alloc")]
+use elrond_codec::{multi_types::MultiValueVec, CodecFrom};
+
+#[cfg(feature = "alloc")]
+impl<M, T, U> CodecFrom<MultiValueVec<T>> for MultiValueEncoded<M, U>
+where
+    M: ManagedTypeApi + ErrorApi,
+    T: TopEncodeMulti + TopDecodeMulti,
+    U: CodecFrom<T>,
+{
+}
+
+#[cfg(feature = "alloc")]
+impl<M, T, U> CodecFrom<MultiValueEncoded<M, T>> for MultiValueVec<U>
+where
+    M: ManagedTypeApi + ErrorApi,
+    T: TopEncodeMulti + TopDecodeMulti,
+    U: CodecFrom<T>,
+{
 }
