@@ -1,6 +1,6 @@
 use crate::{
     num_bigint,
-    world_mock::{is_smart_contract_address, EsdtInstance},
+    world_mock::{is_smart_contract_address, EsdtData, EsdtInstance},
     DebugApi,
 };
 use elrond_wasm::{
@@ -164,15 +164,40 @@ impl BlockchainApiImpl for DebugApi {
     ) -> EsdtTokenData<M> {
         self.blockchain_cache()
             .with_account(&address.to_address(), |account| {
-                let instance = account
+                let opt_esdt_data = account
                     .esdt
-                    .get_by_identifier(token.to_esdt_identifier().as_slice())
-                    .unwrap()
-                    .instances
-                    .get_by_nonce(nonce)
-                    .unwrap();
-
-                self.esdt_token_data_from_instance(nonce, instance)
+                    .get_by_identifier(token.to_esdt_identifier().as_slice());
+                if let Some(esdt_data) = opt_esdt_data {
+                    if let Some(instance) = esdt_data.instances.get_by_nonce(nonce) {
+                        self.esdt_token_data_from_instance(esdt_data, nonce, instance)
+                    } else {
+                        // missing nonce
+                        EsdtTokenData {
+                            token_type: EsdtTokenType::based_on_token_nonce(nonce),
+                            amount: BigUint::zero(),
+                            frozen: false,
+                            hash: ManagedBuffer::new(),
+                            name: ManagedBuffer::new(),
+                            attributes: ManagedBuffer::new(),
+                            creator: ManagedAddress::zero(),
+                            royalties: BigUint::zero(),
+                            uris: ManagedVec::new(),
+                        }
+                    }
+                } else {
+                    // missing token identifier
+                    EsdtTokenData {
+                        token_type: EsdtTokenType::Fungible,
+                        amount: BigUint::zero(),
+                        frozen: false,
+                        hash: ManagedBuffer::new(),
+                        name: ManagedBuffer::new(),
+                        attributes: ManagedBuffer::new(),
+                        creator: ManagedAddress::zero(),
+                        royalties: BigUint::zero(),
+                        uris: ManagedVec::new(),
+                    }
+                }
             })
     }
 
@@ -208,6 +233,7 @@ impl BlockchainApiImpl for DebugApi {
 impl DebugApi {
     fn esdt_token_data_from_instance<M: ManagedTypeApi>(
         &self,
+        esdt_data: &EsdtData,
         nonce: u64,
         instance: &EsdtInstance,
     ) -> EsdtTokenData<M> {
@@ -225,12 +251,12 @@ impl DebugApi {
         EsdtTokenData {
             token_type: EsdtTokenType::based_on_token_nonce(nonce),
             amount: BigUint::from_raw_handle(self.insert_new_big_uint(instance.balance.clone())),
-            frozen: false,
+            frozen: esdt_data.frozen,
             hash: ManagedBuffer::from_raw_handle(
                 self.insert_new_managed_buffer(instance.metadata.hash.clone().unwrap_or_default()),
             ),
             name: ManagedBuffer::from_raw_handle(
-                self.insert_new_managed_buffer(instance.metadata.name.clone()),
+                self.insert_new_managed_buffer(esdt_data.token_identifier.clone()),
             ),
             attributes: ManagedBuffer::from_raw_handle(
                 self.insert_new_managed_buffer(instance.metadata.attributes.clone()),

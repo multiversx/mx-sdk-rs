@@ -97,11 +97,7 @@ fn convert_mandos_esdt_to_world_mock(
             esdt_data
         },
         mandos::model::Esdt::Full(full_esdt) => EsdtData {
-            token_identifier: full_esdt
-                .token_identifier
-                .as_ref()
-                .map(|token_identifier| token_identifier.value.clone())
-                .unwrap_or_default(),
+            token_identifier: token_identifier.to_vec(),
             instances: EsdtInstances::new_from_hash(
                 full_esdt
                     .instances

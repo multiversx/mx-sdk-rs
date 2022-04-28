@@ -511,6 +511,10 @@ impl BlockchainApiImpl for VmApiImpl {
             EsdtTokenType::NonFungible
         };
 
+        if self.mb_len(creator_handle) == 0 {
+            self.mb_overwrite(creator_handle, &[0u8; 32][..]);
+        }
+
         // here we trust Arwen that it always gives us a properties buffer of length 2
         let mut properties_bytes = [0u8; 2];
         let _ = self.mb_load_slice(properties_handle, 0, &mut properties_bytes[..]);
