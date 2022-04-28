@@ -45,6 +45,7 @@ pub use codec_err::{DecodeError, EncodeError};
 pub use codec_err_handler::*;
 pub use default_traits::{DecodeDefault, EncodeDefault};
 pub use equivalent::*;
+pub use impl_for_types::impl_empty::Empty;
 pub use multi::*;
 pub use single::*;
 

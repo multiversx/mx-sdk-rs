@@ -67,7 +67,7 @@ pub trait EchoManagedTypes {
     }
 
     #[endpoint]
-    fn echo_managed_async_result_empty(&self, #[var_args] a: ManagedAsyncCallResult<()>) {
+    fn echo_managed_async_result_empty(&self, a: ManagedAsyncCallResult<()>) {
         if let ManagedAsyncCallResult::Err(msg) = a {
             sc_panic!(msg.err_msg)
         }
@@ -76,7 +76,7 @@ pub trait EchoManagedTypes {
     #[endpoint]
     fn echo_varags_managed_eager(
         &self,
-        #[var_args] m: MultiValueManagedVec<Self::Api, u32>,
+        m: MultiValueManagedVec<Self::Api, u32>,
     ) -> MultiValue2<usize, MultiValueManagedVec<Self::Api, u32>> {
         let v = m.into_vec();
         (v.len(), v.into()).into()
@@ -85,7 +85,7 @@ pub trait EchoManagedTypes {
     #[endpoint]
     fn echo_varags_managed_sum(
         &self,
-        #[var_args] m: MultiValueEncoded<MultiValue2<u32, u32>>,
+        m: MultiValueEncoded<MultiValue2<u32, u32>>,
     ) -> MultiValueEncoded<MultiValue3<u32, u32, u32>> {
         let mut result = MultiValueEncoded::new();
         for arg in m.into_iter() {

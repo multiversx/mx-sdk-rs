@@ -2,7 +2,7 @@ mod impl_array;
 mod impl_array_vec;
 mod impl_bool;
 mod impl_bytes;
-mod impl_empty;
+pub mod impl_empty;
 mod impl_non_zero_usize;
 mod impl_num_signed;
 mod impl_num_unsigned;

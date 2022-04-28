@@ -330,7 +330,7 @@ where
 
         if uris.is_empty() {
             // at least one URI is required, so we push an empty one
-            arg_buffer.push_arg(());
+            arg_buffer.push_arg(elrond_codec::Empty);
         } else {
             // The API function has the last argument as variadic,
             // so we top-encode each and send as separate argument
@@ -407,7 +407,7 @@ where
 
         if uris.is_empty() {
             // at least one URI is required, so we push an empty one
-            arg_buffer.push_arg(&());
+            arg_buffer.push_arg(&elrond_codec::Empty);
         } else {
             // The API function has the last argument as variadic,
             // so we top-encode each and send as separate argument

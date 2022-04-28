@@ -171,6 +171,10 @@ extern "C" {
     fn getNumReturnData() -> i32;
     fn getReturnDataSize(result_index: i32) -> i32;
     fn getReturnData(result_index: i32, dataOffset: *const u8) -> i32;
+
+    /// Clears results propagated from nested sync calls
+    fn cleanReturnData();
+    fn deleteFromReturnData(resultID: i32);
 }
 
 impl SendApiImpl for VmApiImpl {
@@ -541,49 +545,6 @@ impl SendApiImpl for VmApiImpl {
         }
     }
 
-    fn execute_on_dest_context_raw_custom_result_range<M, F>(
-        &self,
-        gas: u64,
-        to: &ManagedAddress<M>,
-        amount: &BigUint<M>,
-        endpoint_name: &ManagedBuffer<M>,
-        arg_buffer: &ManagedArgBuffer<M>,
-        range_closure: F,
-    ) -> ManagedVec<M, ManagedBuffer<M>>
-    where
-        M: ManagedTypeApi,
-        F: FnOnce(usize, usize) -> (usize, usize),
-    {
-        unsafe {
-            let num_return_data_before = getNumReturnData();
-
-            let amount_bytes32_ptr = unsafe_buffer_load_be_pad_right(amount.get_raw_handle(), 32);
-            let function = endpoint_name.to_boxed_bytes();
-            let legacy_arg_buffer = ArgBuffer::from(arg_buffer);
-            let to_address = to.to_address();
-            let _ = executeOnDestContext(
-                gas as i64,
-                to_address.as_ptr(),
-                amount_bytes32_ptr,
-                function.as_ptr(),
-                function.len() as i32,
-                legacy_arg_buffer.num_args() as i32,
-                legacy_arg_buffer.arg_lengths_bytes_ptr(),
-                legacy_arg_buffer.arg_data_ptr(),
-            );
-
-            let num_return_data_after = getNumReturnData();
-            let (result_start_index, result_end_index) = range_closure(
-                num_return_data_before as usize,
-                num_return_data_after as usize,
-            );
-
-            let result_bytes =
-                get_return_data_range(result_start_index as i32, result_end_index as i32);
-            managed_vec_from_slice_of_boxed_bytes(result_bytes.as_slice())
-        }
-    }
-
     fn execute_on_dest_context_by_caller_raw<M: ManagedTypeApi>(
         &self,
         gas: u64,
@@ -694,6 +655,18 @@ impl SendApiImpl for VmApiImpl {
             function_name,
             arg_buffer,
         )
+    }
+
+    fn clean_return_data(&self) {
+        unsafe {
+            cleanReturnData();
+        }
+    }
+
+    fn delete_from_return_data(&self, index: usize) {
+        unsafe {
+            deleteFromReturnData(index as i32);
+        }
     }
 }
 

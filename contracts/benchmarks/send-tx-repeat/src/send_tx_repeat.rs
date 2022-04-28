@@ -14,7 +14,7 @@ pub trait SendTxRepeat {
         to: ManagedAddress,
         amount: BigUint,
         times: usize,
-        #[var_args] opt_data: OptionalValue<BoxedBytes>,
+        opt_data: OptionalValue<BoxedBytes>,
     ) {
         let data = match opt_data {
             OptionalValue::Some(d) => d,

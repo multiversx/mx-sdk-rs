@@ -28,7 +28,7 @@ pub trait Lottery {
         opt_max_entries_per_user: Option<usize>,
         opt_prize_distribution: Option<ManagedVec<u8>>,
         opt_whitelist: Option<ManagedVec<ManagedAddress>>,
-        #[var_args] opt_burn_percentage: OptionalValue<BigUint>,
+        opt_burn_percentage: OptionalValue<BigUint>,
     ) {
         self.start_lottery(
             lottery_name,
@@ -54,7 +54,7 @@ pub trait Lottery {
         opt_max_entries_per_user: Option<usize>,
         opt_prize_distribution: Option<ManagedVec<u8>>,
         opt_whitelist: Option<ManagedVec<ManagedAddress>>,
-        #[var_args] opt_burn_percentage: OptionalValue<BigUint>,
+        opt_burn_percentage: OptionalValue<BigUint>,
     ) {
         self.start_lottery(
             lottery_name,
@@ -80,7 +80,7 @@ pub trait Lottery {
         opt_max_entries_per_user: Option<usize>,
         opt_prize_distribution: Option<ManagedVec<u8>>,
         opt_whitelist: Option<ManagedVec<ManagedAddress>>,
-        #[var_args] opt_burn_percentage: OptionalValue<BigUint>,
+        opt_burn_percentage: OptionalValue<BigUint>,
     ) {
         require!(!lottery_name.is_empty(), "Name can't be empty!");
 
