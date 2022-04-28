@@ -3,7 +3,7 @@
 # copies wasm & mandos files to the Arwen test folder
 # expects 1 argument: the path to the Arwen repo root
 
-VM_REPO_PATH=$1
+VM_REPO_PATH=${1:?"Missing VM repo path!"}
 
 build_and_copy() {
    contract_path=$1

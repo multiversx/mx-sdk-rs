@@ -25,12 +25,7 @@ fn execute(state: &mut BlockchainMock, set_state_step: &SetStateStep) {
             account
                 .esdt
                 .iter()
-                .map(|(k, v)| {
-                    (
-                        k.value.clone(),
-                        convert_mandos_esdt_to_world_mock(k.value.as_slice(), v),
-                    )
-                })
+                .map(|(k, v)| (k.value.clone(), convert_mandos_esdt_to_world_mock(v)))
                 .collect(),
         );
 
@@ -82,26 +77,15 @@ fn execute(state: &mut BlockchainMock, set_state_step: &SetStateStep) {
     }
 }
 
-fn convert_mandos_esdt_to_world_mock(
-    token_identifier: &[u8],
-    mandos_esdt: &mandos::model::Esdt,
-) -> EsdtData {
+fn convert_mandos_esdt_to_world_mock(mandos_esdt: &mandos::model::Esdt) -> EsdtData {
     match mandos_esdt {
         mandos::model::Esdt::Short(short_esdt) => {
             let balance = short_esdt.value.clone();
-            let mut esdt_data = EsdtData {
-                token_identifier: token_identifier.to_vec(),
-                ..Default::default()
-            };
+            let mut esdt_data = EsdtData::default();
             esdt_data.instances.add(0, balance);
             esdt_data
         },
         mandos::model::Esdt::Full(full_esdt) => EsdtData {
-            token_identifier: full_esdt
-                .token_identifier
-                .as_ref()
-                .map(|token_identifier| token_identifier.value.clone())
-                .unwrap_or_default(),
             instances: EsdtInstances::new_from_hash(
                 full_esdt
                     .instances
