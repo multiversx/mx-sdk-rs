@@ -7,7 +7,7 @@ use crate::{
 };
 use core::marker::PhantomData;
 use elrond_codec::{
-    try_cast_execute_or_else, CodecSelf, DecodeErrorHandler, EncodeErrorHandler, TopDecode,
+    try_cast_execute_or_else, CodecFromSelf, DecodeErrorHandler, EncodeErrorHandler, TopDecode,
     TopDecodeMulti, TopDecodeMultiInput, TopDecodeMultiLength, TopEncode, TopEncodeMulti,
     TopEncodeMultiOutput,
 };
@@ -240,7 +240,7 @@ where
     }
 }
 
-impl<M, T> CodecSelf for MultiValueEncoded<M, T> where M: ManagedTypeApi {}
+impl<M, T> CodecFromSelf for MultiValueEncoded<M, T> where M: ManagedTypeApi {}
 
 #[cfg(feature = "alloc")]
 use elrond_codec::{multi_types::MultiValueVec, CodecFrom};

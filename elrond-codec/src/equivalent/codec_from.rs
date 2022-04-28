@@ -7,9 +7,9 @@ where
 {
 }
 
-pub auto trait CodecSelf {}
+pub auto trait CodecFromSelf {}
 
-impl<T> CodecFrom<T> for T where T: TopEncodeMulti + TopDecodeMulti + CodecSelf {}
+impl<T> CodecFrom<T> for T where T: TopEncodeMulti + TopDecodeMulti + CodecFromSelf {}
 
 impl<'a, T> CodecFrom<&'a T> for T
 where
