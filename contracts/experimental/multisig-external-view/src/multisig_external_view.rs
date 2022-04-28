@@ -21,7 +21,7 @@ pub trait Multisig:
     + multisig_perform::MultisigPerformModule
 {
     #[init]
-    fn init(&self, quorum: usize, #[var_args] board: MultiValueEncoded<ManagedAddress>) {
+    fn init(&self, quorum: usize, board: MultiValueEncoded<ManagedAddress>) {
         let board_vec = board.to_vec();
         let new_num_board_members = self.add_multiple_board_members(board_vec);
 

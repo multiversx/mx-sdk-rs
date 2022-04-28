@@ -59,7 +59,7 @@ pub trait GovernanceModule:
         &self,
         #[payment_amount] payment_amount: BigUint,
         description: ManagedBuffer,
-        #[var_args] actions: MultiValueEncoded<GovernanceActionAsMultiArg<Self::Api>>,
+        actions: MultiValueEncoded<GovernanceActionAsMultiArg<Self::Api>>,
     ) -> usize {
         self.require_payment_token_governance_token();
         require!(
