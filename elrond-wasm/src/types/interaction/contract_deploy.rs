@@ -6,8 +6,8 @@ use crate::{
     api::{BlockchainApiImpl, ErrorApiImpl, SendApi, SendApiImpl},
     contract_base::ExitCodecErrorHandler,
     err_msg,
+    io::{ArgErrorHandler, ArgId, ManagedResultArgLoader},
     types::{BigUint, CodeMetadata, ManagedAddress, ManagedBuffer, ManagedVec},
-    ArgErrorHandler, ArgId, ManagedResultArgLoader,
 };
 
 use super::ManagedArgBuffer;
@@ -129,6 +129,9 @@ where
             code_metadata,
             &self.arg_buffer,
         );
+
+        SA::send_api_impl().clean_return_data();
+
         (address, Self::decode_result(raw_result))
     }
 
@@ -147,6 +150,9 @@ where
             code_metadata,
             &self.arg_buffer,
         );
+
+        SA::send_api_impl().clean_return_data();
+
         (address, Self::decode_result(raw_result))
     }
 
@@ -165,7 +171,7 @@ where
             source_address,
             code_metadata,
             &self.arg_buffer,
-        )
+        );
     }
 
     pub fn upgrade_contract(self, code: &ManagedBuffer<SA>, code_metadata: CodeMetadata) {

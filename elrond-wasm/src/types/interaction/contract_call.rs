@@ -7,11 +7,11 @@ use crate::{
     },
     contract_base::{BlockchainWrapper, ExitCodecErrorHandler},
     err_msg,
+    io::{ArgErrorHandler, ArgId, ManagedResultArgLoader},
     types::{
         AsyncCall, BigUint, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer,
         ManagedVec, TokenIdentifier,
     },
-    ArgErrorHandler, ArgId, ManagedResultArgLoader,
 };
 use core::marker::PhantomData;
 
@@ -368,37 +368,7 @@ where
             &self.arg_buffer,
         );
 
-        Self::decode_result(raw_result)
-    }
-
-    /// Executes immediately, synchronously, and returns contract call result.
-    /// Only works if the target contract is in the same shard.
-    ///
-    /// This is a workaround to handle nested sync calls.
-    ///
-    /// Please do not use this method unless there is absolutely no other option.
-    ///
-    /// Will be eliminated after some future Arwen hook redesign.
-    ///
-    /// `range_closure` takes the number of results before, the number of results after,
-    /// and is expected to return the start index (inclusive) and end index (exclusive).
-    pub fn execute_on_dest_context_custom_range<F, RequestedResult>(
-        mut self,
-        range_closure: F,
-    ) -> RequestedResult
-    where
-        F: FnOnce(usize, usize) -> (usize, usize),
-        RequestedResult: CodecFrom<OriginalResult>,
-    {
-        self = self.convert_to_esdt_transfer_call();
-        let raw_result = SA::send_api_impl().execute_on_dest_context_raw_custom_result_range(
-            self.resolve_gas_limit(),
-            &self.to,
-            &self.egld_payment,
-            &self.endpoint_name,
-            &self.arg_buffer,
-            range_closure,
-        );
+        SA::send_api_impl().clean_return_data();
 
         Self::decode_result(raw_result)
     }
@@ -414,6 +384,8 @@ where
             &self.endpoint_name,
             &self.arg_buffer,
         );
+
+        SA::send_api_impl().clean_return_data();
 
         Self::decode_result(raw_result)
     }
@@ -437,6 +409,8 @@ where
             &self.endpoint_name,
             &self.arg_buffer,
         );
+
+        SA::send_api_impl().clean_return_data();
     }
 
     pub fn execute_on_same_context(mut self) {
@@ -448,6 +422,8 @@ where
             &self.endpoint_name,
             &self.arg_buffer,
         );
+
+        SA::send_api_impl().clean_return_data();
     }
 
     fn resolve_gas_limit_with_leftover(&self) -> u64 {

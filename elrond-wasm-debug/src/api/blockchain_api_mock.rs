@@ -1,6 +1,6 @@
 use crate::{
     num_bigint,
-    world_mock::{is_smart_contract_address, EsdtInstance},
+    world_mock::{is_smart_contract_address, EsdtData, EsdtInstance},
     DebugApi,
 };
 use elrond_wasm::{
@@ -164,16 +164,42 @@ impl BlockchainApiImpl for DebugApi {
     ) -> EsdtTokenData<M> {
         self.blockchain_cache()
             .with_account(&address.to_address(), |account| {
-                let instance = account
+                let token_identifier_value = token.to_esdt_identifier();
+                if let Some(esdt_data) = account
                     .esdt
-                    .get_by_identifier(token.to_esdt_identifier().as_slice())
-                    .unwrap()
-                    .instances
-                    .get_by_nonce(nonce)
-                    .unwrap();
-
-                self.esdt_token_data_from_instance(nonce, instance)
+                    .get_by_identifier(token_identifier_value.as_slice())
+                {
+                    if let Some(instance) = esdt_data.instances.get_by_nonce(nonce) {
+                        self.esdt_token_data_from_instance(
+                            token_identifier_value.into_vec(),
+                            esdt_data,
+                            nonce,
+                            instance,
+                        )
+                    } else {
+                        // missing nonce
+                        EsdtTokenData {
+                            token_type: EsdtTokenType::based_on_token_nonce(nonce),
+                            ..Default::default()
+                        }
+                    }
+                } else {
+                    // missing token identifier
+                    EsdtTokenData {
+                        token_type: EsdtTokenType::Fungible,
+                        ..Default::default()
+                    }
+                }
             })
+    }
+
+    fn get_esdt_token_data_unmanaged<M: ManagedTypeApi>(
+        &self,
+        _address: &ManagedAddress<M>,
+        _token: &TokenIdentifier<M>,
+        _nonce: u64,
+    ) -> EsdtTokenData<M> {
+        panic!("get_esdt_token_data_unmanaged is deprecated and should never be used in Rust tests")
     }
 
     fn get_esdt_local_roles(&self, token_id_handle: Handle) -> EsdtLocalRoleFlags {
@@ -199,6 +225,8 @@ impl BlockchainApiImpl for DebugApi {
 impl DebugApi {
     fn esdt_token_data_from_instance<M: ManagedTypeApi>(
         &self,
+        token_identifier_value: Vec<u8>,
+        esdt_data: &EsdtData,
         nonce: u64,
         instance: &EsdtInstance,
     ) -> EsdtTokenData<M> {
@@ -216,12 +244,12 @@ impl DebugApi {
         EsdtTokenData {
             token_type: EsdtTokenType::based_on_token_nonce(nonce),
             amount: BigUint::from_raw_handle(self.insert_new_big_uint(instance.balance.clone())),
-            frozen: false,
+            frozen: esdt_data.frozen,
             hash: ManagedBuffer::from_raw_handle(
                 self.insert_new_managed_buffer(instance.metadata.hash.clone().unwrap_or_default()),
             ),
             name: ManagedBuffer::from_raw_handle(
-                self.insert_new_managed_buffer(instance.metadata.name.clone()),
+                self.insert_new_managed_buffer(token_identifier_value),
             ),
             attributes: ManagedBuffer::from_raw_handle(
                 self.insert_new_managed_buffer(instance.metadata.attributes.clone()),

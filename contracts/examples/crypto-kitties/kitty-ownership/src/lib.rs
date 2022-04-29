@@ -14,8 +14,8 @@ pub trait KittyOwnership {
     fn init(
         &self,
         birth_fee: BigUint,
-        #[var_args] opt_gene_science_contract_address: OptionalValue<ManagedAddress>,
-        #[var_args] opt_kitty_auction_contract_address: OptionalValue<ManagedAddress>,
+        opt_gene_science_contract_address: OptionalValue<ManagedAddress>,
+        opt_kitty_auction_contract_address: OptionalValue<ManagedAddress>,
     ) {
         self.birth_fee().set(birth_fee);
 

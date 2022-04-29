@@ -25,6 +25,22 @@ pub struct EsdtTokenData<M: ManagedTypeApi> {
     pub uris: ManagedVec<M, ManagedBuffer<M>>,
 }
 
+impl<M: ManagedTypeApi> Default for EsdtTokenData<M> {
+    fn default() -> Self {
+        EsdtTokenData {
+            token_type: EsdtTokenType::Fungible,
+            amount: BigUint::zero(),
+            frozen: false,
+            hash: ManagedBuffer::new(),
+            name: ManagedBuffer::new(),
+            attributes: ManagedBuffer::new(),
+            creator: ManagedAddress::zero(),
+            royalties: BigUint::zero(),
+            uris: ManagedVec::new(),
+        }
+    }
+}
+
 impl<M: ManagedTypeApi> EsdtTokenData<M> {
     pub fn try_decode_attributes<T: TopDecode>(&self) -> Result<T, DecodeError> {
         T::top_decode(self.attributes.clone()) // TODO: remove clone

@@ -55,7 +55,7 @@ pub trait EchoAllocTypes {
     }
 
     #[endpoint]
-    fn echo_async_result_empty(&self, #[var_args] a: AsyncCallResult<()>) {
+    fn echo_async_result_empty(&self, a: AsyncCallResult<()>) {
         if let AsyncCallResult::Err(msg) = a {
             sc_panic!(msg.err_msg);
         }
@@ -74,7 +74,7 @@ pub trait EchoAllocTypes {
     #[endpoint]
     fn echo_multi_value_tuples(
         &self,
-        #[var_args] m: MultiValueVec<MultiValue2<isize, Vec<u8>>>,
+        m: MultiValueVec<MultiValue2<isize, Vec<u8>>>,
     ) -> MultiValueVec<MultiValue2<isize, Vec<u8>>> {
         let mut result: Vec<MultiValue2<isize, Vec<u8>>> = Vec::new();
         for m_arg in m.into_vec().into_iter() {

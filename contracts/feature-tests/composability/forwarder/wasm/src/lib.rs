@@ -19,7 +19,6 @@ elrond_wasm_node::wasm_endpoints! {
         deploy_two_contracts
         deploy_vault_from_source
         echo_arguments_sync
-        echo_arguments_sync_range
         echo_arguments_sync_twice
         forward_async_accept_funds
         forward_async_accept_funds_half_payment
@@ -39,6 +38,7 @@ elrond_wasm_node::wasm_endpoints! {
         getCurrentNftNonce
         getFungibleEsdtBalance
         get_esdt_local_roles
+        get_esdt_token_data
         get_nft_balance
         issue_fungible_token
         lastErrorMessage

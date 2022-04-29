@@ -401,6 +401,11 @@ fn forwarder_get_esdt_local_roles_rs() {
 }
 
 #[test]
+fn forwarder_get_esdt_token_data_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/forwarder_get_esdt_token_data.scen.json", world());
+}
+
+#[test]
 fn forwarder_nft_add_uri_rs() {
     elrond_wasm_debug::mandos_rs("mandos/forwarder_nft_add_uri.scen.json", world());
 }
@@ -477,11 +482,6 @@ fn forwarder_send_esdt_multi_transfer_rs() {
 #[test]
 fn forwarder_sync_echo_rs() {
     elrond_wasm_debug::mandos_rs("mandos/forwarder_sync_echo.scen.json", world());
-}
-
-#[test]
-fn forwarder_sync_echo_range_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/forwarder_sync_echo_range.scen.json", world());
 }
 
 #[test]

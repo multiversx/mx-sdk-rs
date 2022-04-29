@@ -1,9 +1,9 @@
-use super::{hex_util::byte_to_hex_digits, SCDisplay, SCLowerHex};
+use super::{hex_util::byte_to_hex_digits, SCBinary, SCDisplay, SCLowerHex};
 
 const MINUS_SYMBOL: &[u8] = b"-";
 
 /// u64::MAX is 18446744073709551615 in base 10, which is 20 digits. so 20 digits is enough
-const MAX_BASE_10_LEN: usize = 20;
+const MAX_BASE_10_LEN: usize = 64;
 
 fn format_unsigned_to_buffer(
     mut num: u64,
@@ -44,6 +44,12 @@ macro_rules! formatter_unsigned {
             #[inline]
             fn fmt<F: super::FormatByteReceiver>(&self, f: &mut F) {
                 format_unsigned(*self as u64, f, 16);
+            }
+        }
+        impl SCBinary for $num_ty {
+            #[inline]
+            fn fmt<F: super::FormatByteReceiver>(&self, f: &mut F) {
+                format_unsigned(*self as u64, f, 2);
             }
         }
     };
