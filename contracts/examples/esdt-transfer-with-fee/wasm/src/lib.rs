@@ -8,6 +8,7 @@ elrond_wasm_node::wasm_endpoints! {
     esdt_transfer_with_fee
     (
         claimFees
+        clearFee
         getPaidFees
         getTokenFee
         setExactValueFee

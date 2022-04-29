@@ -35,6 +35,34 @@
             }
         },
         {
+            "step": "setState",
+            "accounts": {
+                "sc:esdt-transfer-with-fee": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:USDC-aaaaaa": {
+                            "roles": [
+                                "ESDTRoleTransfer"
+                            ]
+                        },
+                        "str:MFNFT-567890": {
+                            "roles": [
+                                "ESDTRoleTransfer"
+                            ]
+                        },
+                        "str:WEGLD-012345": {
+                            "roles": [
+                                "ESDTRoleTransfer"
+                            ]
+                        }
+                    },
+                    "code": "file:../output/esdt-transfer-with-fee.wasm",
+                    "owner": "address:owner"
+                }
+            }
+        },
+        {
             "step": "scCall",
             "txId": "4",
             "tx": {
@@ -45,7 +73,7 @@
                     "u32:1000",
                     "str:USDC-aaaaaa"
                 ],
-                "gasLimit": "5,000,000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -295,7 +323,20 @@
                     "nonce": "0",
                     "esdt": {
                         "str:USDC-aaaaaa": {
-                            "balance": "13"
+                            "balance": "13",
+                            "roles": [
+                                "ESDTRoleTransfer"
+                            ]
+                        },
+                        "str:MFNFT-567890": {
+                            "roles": [
+                                "ESDTRoleTransfer"
+                            ]
+                        },
+                        "str:WEGLD-012345": {
+                            "roles": [
+                                "ESDTRoleTransfer"
+                            ]
                         }
                     },
                     "storage": {
@@ -310,7 +351,8 @@
                     },
                     "code": "file:../output/esdt-transfer-with-fee.wasm",
                     "owner": "address:owner"
-                }
+                },
+                "+": ""
             }
         }
     ]

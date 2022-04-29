@@ -76,7 +76,23 @@
                 },
                 "sc:esdt-transfer-with-fee": {
                     "nonce": "0",
-                    "esdt": {},
+                    "esdt": {
+                        "str:USDC-aaaaaa": {
+                            "roles": [
+                                "ESDTRoleTransfer"
+                            ]
+                        },
+                        "str:MFNFT-567890": {
+                            "roles": [
+                                "ESDTRoleTransfer"
+                            ]
+                        },
+                        "str:WEGLD-012345": {
+                            "roles": [
+                                "ESDTRoleTransfer"
+                            ]
+                        }
+                    },
                     "storage": {
                         "str:token_fee|nested:str:USDC-aaaaaa": "u8:2|u32:1000",
                         "str:token_fee|nested:str:MFNFT-567890": "u8:1|u8:0|nested:str:USDC-aaaaaa|u64:0|biguint:5",
@@ -84,7 +100,8 @@
                     },
                     "code": "file:../output/esdt-transfer-with-fee.wasm",
                     "owner": "address:owner"
-                }
+                },
+                "+": ""
             }
         }
     ]

@@ -21,12 +21,33 @@ pub trait EsdtTransferWithFee {
             .set(Fee::ExactValue(EsdtTokenPayment::new(
                 fee_token, 0, fee_amount,
             )));
+        self.set_transfer_role(token);
     }
 
     #[only_owner]
     #[endpoint(setPercentageFee)]
     fn set_percentage_fee(&self, fee: u32, token: TokenIdentifier) {
         self.token_fee(&token).set(Fee::Percentage(fee));
+        self.set_transfer_role(token);
+    }
+
+    fn set_transfer_role(&self, token: TokenIdentifier) {
+        self.send()
+            .esdt_system_sc_proxy()
+            .set_special_roles(
+                &self.blockchain().get_sc_address(),
+                &token,
+                [EsdtLocalRole::Transfer][..].iter().cloned(),
+            )
+            .async_call()
+            .call_and_exit()
+    }
+
+    #[only_owner]
+    #[endpoint(clearFee)]
+    fn clear_fee(&self, token: TokenIdentifier) {
+        self.token_fee(&token).clear();
+        self.set_transfer_role(token);
     }
 
     #[only_owner]
