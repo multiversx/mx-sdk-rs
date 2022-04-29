@@ -43,12 +43,7 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [
-                    "0",
-                    "str:TEST-TOKENA",
-                    "",
-                    "1000"
-                ],
+                "out": [],
                 "status": "0",
                 "logs": [
                     {

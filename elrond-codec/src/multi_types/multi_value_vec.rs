@@ -7,7 +7,7 @@ use core::iter::FromIterator;
 
 /// Structure that allows taking a variable number of arguments
 /// or returning a variable number of results in a smart contract endpoint.
-#[derive(Clone, Default)]
+#[derive(Clone, Default, Debug, PartialEq, Eq)]
 pub struct MultiValueVec<T>(pub Vec<T>);
 
 impl<T> From<Vec<T>> for MultiValueVec<T> {

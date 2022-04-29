@@ -30,6 +30,6 @@ pub trait VMApi:
     }
 
     fn init_static() {
-        Self::storage_read_api_impl().storage_read_api_init()
+        Self::storage_read_api_impl().storage_read_api_init();
     }
 }

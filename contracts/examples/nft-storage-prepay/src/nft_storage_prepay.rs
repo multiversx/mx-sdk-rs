@@ -57,7 +57,7 @@ pub trait NftStoragePrepay {
 
     /// defaults to max amount
     #[endpoint(withdraw)]
-    fn withdraw(&self, #[var_args] opt_amount: OptionalValue<BigUint>) {
+    fn withdraw(&self, opt_amount: OptionalValue<BigUint>) {
         let caller = self.blockchain().get_caller();
         let mut user_deposit = self.deposit(&caller).get();
         let amount = match opt_amount {

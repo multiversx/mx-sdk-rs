@@ -14,7 +14,12 @@ pub trait FormattedMessageFeatures {
 
     #[endpoint]
     fn dynamic_message(&self, bytes: ManagedBuffer) {
-        sc_panic!("Got this buffer: {}. I don't like it, ERROR!", bytes);
+        sc_panic!("Got this buffer: {}. I don't like it, ERROR!", &bytes);
+    }
+
+    #[endpoint]
+    fn dynamic_message_hex(&self, bytes: ManagedBuffer) {
+        sc_panic!("Got this buffer: {:x}. I don't like it, ERROR!", bytes);
     }
 
     #[payable("*")]
@@ -27,9 +32,9 @@ pub trait FormattedMessageFeatures {
     ) {
         sc_panic!(
             "Got token {}, with nonce {}, amount {}. I prefer EGLD. ERROR!",
-            token_id,
+            &&token_id, // references are accepted
             nonce,
-            amount
+            &amount
         );
     }
 
@@ -58,6 +63,21 @@ pub trait FormattedMessageFeatures {
     #[endpoint]
     fn print_message(&self, x: i32) {
         sc_print!("Printing x: {}", x,);
+    }
+
+    #[endpoint]
+    fn print_message_hex(&self, x: i32) {
+        sc_print!("Printing x: {:x}", x,);
+    }
+
+    #[endpoint]
+    fn print_message_binary(&self, x: u32) {
+        sc_print!("Printing x: {:b}", x);
+    }
+
+    #[endpoint]
+    fn print_message_codec(&self, x: i32) {
+        sc_print!("Printing x: {:c}", x);
     }
 
     #[endpoint]

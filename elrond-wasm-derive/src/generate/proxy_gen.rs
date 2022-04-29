@@ -2,7 +2,7 @@ use quote::ToTokens;
 
 use super::util::*;
 use crate::{
-    generate::{arg_regular::convert_to_owned_type, snippets, supertrait_gen},
+    generate::{convert_to_owned_type::convert_to_owned_type, snippets, supertrait_gen},
     model::{ArgPaymentMetadata, ContractTrait, Method, MethodArgument, PublicRole},
 };
 
