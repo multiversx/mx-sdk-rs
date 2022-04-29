@@ -4,6 +4,18 @@ use super::storage;
 
 const PERCENTAGE_TOTAL: u64 = 10_000; // 100%
 
+pub type EsdtTokenDataMultiValue<M> = MultiValue9<
+    EsdtTokenType,
+    BigUint<M>,
+    bool,
+    ManagedBuffer<M>,
+    ManagedBuffer<M>,
+    ManagedBuffer<M>,
+    ManagedAddress<M>,
+    BigUint<M>,
+    ManagedVec<M, ManagedBuffer<M>>,
+>;
+
 #[elrond_wasm::module]
 pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
     #[view(getFungibleEsdtBalance)]
@@ -24,7 +36,7 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
         to: &ManagedAddress,
         token_id: TokenIdentifier,
         amount: &BigUint,
-        #[var_args] opt_data: OptionalValue<ManagedBuffer>,
+        opt_data: OptionalValue<ManagedBuffer>,
     ) {
         let data = match opt_data {
             OptionalValue::Some(data) => data,
@@ -55,7 +67,7 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
         token_id: TokenIdentifier,
         amount_first_time: &BigUint,
         amount_second_time: &BigUint,
-        #[var_args] opt_data: OptionalValue<ManagedBuffer>,
+        opt_data: OptionalValue<ManagedBuffer>,
     ) {
         let data = match opt_data {
             OptionalValue::Some(data) => data,
@@ -71,7 +83,7 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
     fn send_esdt_direct_multi_transfer(
         &self,
         to: ManagedAddress,
-        #[var_args] token_payments: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>>,
+        token_payments: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>>,
     ) {
         let mut all_token_payments = ManagedVec::new();
 
@@ -167,7 +179,7 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
         self.send().esdt_local_burn(&token_identifier, 0, &amount);
     }
 
-    #[endpoint]
+    #[view]
     fn get_esdt_local_roles(&self, token_id: TokenIdentifier) -> MultiValueEncoded<ManagedBuffer> {
         let roles = self.blockchain().get_esdt_local_roles(&token_id);
         let mut result = MultiValueEncoded::new();
@@ -177,7 +189,32 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
         result
     }
 
-    #[endpoint]
+    #[view]
+    fn get_esdt_token_data(
+        &self,
+        address: ManagedAddress,
+        token_id: TokenIdentifier,
+        nonce: u64,
+    ) -> EsdtTokenDataMultiValue<Self::Api> {
+        let token_data = self
+            .blockchain()
+            .get_esdt_token_data(&address, &token_id, nonce);
+
+        (
+            token_data.token_type,
+            token_data.amount,
+            token_data.frozen,
+            token_data.hash,
+            token_data.name,
+            token_data.attributes,
+            token_data.creator,
+            token_data.royalties,
+            token_data.uris,
+        )
+            .into()
+    }
+
+    #[view]
     fn validate_token_identifier(&self, token_id: TokenIdentifier) -> bool {
         token_id.is_valid_esdt_identifier()
     }

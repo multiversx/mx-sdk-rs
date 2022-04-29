@@ -19,4 +19,8 @@ pub trait StaticVarApiImpl {
     fn get_external_view_target_address_handle(&self) -> Handle;
 
     fn next_handle(&self) -> Handle;
+
+    fn set_num_arguments(&self, num_arguments: i32);
+
+    fn get_num_arguments(&self) -> i32;
 }

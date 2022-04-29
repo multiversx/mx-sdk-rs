@@ -53,6 +53,18 @@ pub fn format_receiver_args_macro(input: proc_macro::TokenStream) -> proc_macro:
                     elrond_wasm::formatter::FormatBuffer::append_lower_hex(&mut $accumulator_expr, &$arg_expr);
                 )
             },
+            FormatPartType::Codec => {
+                let arg_expr = tokens_iter.next().unwrap();
+                quote! (
+                    elrond_wasm::formatter::FormatBuffer::append_codec(&mut $accumulator_expr, &$arg_expr);
+                )
+            },
+            FormatPartType::Bytes => {
+                let arg_expr = tokens_iter.next().unwrap();
+                quote! (
+                    elrond_wasm::formatter::FormatBuffer::append_binary(&mut $accumulator_expr, &$arg_expr);
+                )
+            },
         }
     }).collect()
 }

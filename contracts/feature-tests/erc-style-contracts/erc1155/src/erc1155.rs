@@ -252,7 +252,7 @@ pub trait Erc1155 {
     #[view(balanceOfBatch)]
     fn balance_of_batch(
         &self,
-        #[var_args] owner_type_id_pairs: MultiValueEncoded<MultiValue2<ManagedAddress, BigUint>>,
+        owner_type_id_pairs: MultiValueEncoded<MultiValue2<ManagedAddress, BigUint>>,
     ) -> MultiValueEncoded<BigUint> {
         let mut batch_balance = MultiValueEncoded::new();
         for multi_arg in owner_type_id_pairs.into_iter() {

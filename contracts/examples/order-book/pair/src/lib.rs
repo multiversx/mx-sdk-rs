@@ -55,7 +55,7 @@ pub trait Pair:
     }
 
     #[endpoint(cancelOrders)]
-    fn cancel_orders_endpoint(&self, #[var_args] order_ids: MultiValueManagedVec<u64>) {
+    fn cancel_orders_endpoint(&self, order_ids: MultiValueManagedVec<u64>) {
         self.require_global_op_not_ongoing();
         self.require_order_ids_not_empty(&order_ids);
 
@@ -69,7 +69,7 @@ pub trait Pair:
     }
 
     #[endpoint(freeOrders)]
-    fn free_orders_endpoint(&self, #[var_args] order_ids: MultiValueManagedVec<u64>) {
+    fn free_orders_endpoint(&self, order_ids: MultiValueManagedVec<u64>) {
         self.require_global_op_not_ongoing();
         self.require_order_ids_not_empty(&order_ids);
 

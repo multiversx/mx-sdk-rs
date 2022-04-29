@@ -10,7 +10,7 @@ pub trait UpgradeContractModule {
         &self,
         child_sc_address: ManagedAddress,
         new_code: ManagedBuffer,
-        #[var_args] opt_arg: OptionalValue<ManagedBuffer>,
+        opt_arg: OptionalValue<ManagedBuffer>,
     ) {
         self.vault_proxy(child_sc_address)
             .init(opt_arg)
@@ -22,7 +22,7 @@ pub trait UpgradeContractModule {
         &self,
         child_sc_address: ManagedAddress,
         source_address: ManagedAddress,
-        #[var_args] opt_arg: OptionalValue<ManagedBuffer>,
+        opt_arg: OptionalValue<ManagedBuffer>,
     ) {
         self.vault_proxy(child_sc_address)
             .init(opt_arg)
