@@ -18,7 +18,7 @@ impl BlockchainMock {
         validator_rewards_step: ValidatorRewardStep,
     ) -> &mut Self {
         self.increase_validator_reward(
-            &validator_rewards_step.tx.to.value.into(),
+            &validator_rewards_step.tx.to.to_address(),
             &validator_rewards_step.tx.egld_value.value,
         );
         self.mandos_trace
@@ -30,8 +30,8 @@ impl BlockchainMock {
 
 fn execute(mut state: BlockchainMock, tx_transfer: &TxTransfer) -> BlockchainMock {
     let tx_input = TxInput {
-        from: tx_transfer.from.value.into(),
-        to: tx_transfer.to.value.into(),
+        from: tx_transfer.from.value.clone(),
+        to: tx_transfer.to.value.clone(),
         egld_value: tx_transfer.egld_value.value.clone(),
         esdt_values: tx_esdt_transfers_from_mandos(tx_transfer.esdt_value.as_slice()),
         func_name: Vec::new(),
