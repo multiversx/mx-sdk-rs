@@ -30,7 +30,7 @@ fn execute(state: &mut BlockchainMock, set_state_step: &SetStateStep) {
         );
 
         state.validate_and_add_account(AccountData {
-            address: address.value.into(),
+            address: address.to_address(),
             nonce: account
                 .nonce
                 .as_ref()
@@ -55,18 +55,18 @@ fn execute(state: &mut BlockchainMock, set_state_step: &SetStateStep) {
             contract_owner: account
                 .owner
                 .as_ref()
-                .map(|address_value| address_value.value.into()),
+                .map(|address_value| address_value.value.clone()),
         });
     }
     for new_address in set_state_step.new_addresses.iter() {
         assert!(
-            is_smart_contract_address(&new_address.new_address.value.into()),
+            is_smart_contract_address(&new_address.new_address.value),
             "field should have SC format"
         );
         state.put_new_address(
-            new_address.creator_address.value.into(),
+            new_address.creator_address.value.clone(),
             new_address.creator_nonce.value,
-            new_address.new_address.value.into(),
+            new_address.new_address.value.clone(),
         )
     }
     if let Some(block_info_obj) = &*set_state_step.previous_block_info {

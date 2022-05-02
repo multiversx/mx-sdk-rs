@@ -75,8 +75,8 @@ pub(crate) fn execute(
     sc_query_step: &ScQueryStep,
 ) -> (TxResult, BlockchainMock) {
     let tx_input = TxInput {
-        from: sc_query_step.tx.to.value.into(),
-        to: sc_query_step.tx.to.value.into(),
+        from: sc_query_step.tx.to.to_address(),
+        to: sc_query_step.tx.to.to_address(),
         egld_value: BigUint::from(0u32),
         esdt_values: Vec::new(),
         func_name: sc_query_step.tx.function.as_bytes().to_vec(),
