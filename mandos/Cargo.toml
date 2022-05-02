@@ -21,3 +21,8 @@ num-traits = "0.2"
 hex = "0.4"
 sha3 = "0.9.1"
 itertools = "0.10.3"
+
+[dependencies.elrond-wasm]
+version = "=0.30.0"
+path = "../elrond-wasm"
+features = ["alloc", "num-bigint", "promises"]

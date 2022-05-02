@@ -1,16 +1,30 @@
+use super::{value_from_slice, AddressValue};
 use crate::{
     interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
     value_interpreter::interpret_string,
 };
-
+use elrond_wasm::types::Address;
 use std::{cmp::Ordering, fmt};
 
-use super::{value_from_slice, AddressValue};
-
-#[derive(Debug, Clone, Eq, Default)]
+#[derive(Debug, Clone, Eq)]
 pub struct AddressKey {
-    pub value: [u8; 32],
+    pub value: Address,
     pub original: String,
+}
+
+impl Default for AddressKey {
+    fn default() -> Self {
+        Self {
+            value: Address::zero(),
+            original: Default::default(),
+        }
+    }
+}
+
+impl AddressKey {
+    pub fn to_address(&self) -> Address {
+        self.value.clone()
+    }
 }
 
 impl Ord for AddressKey {
@@ -56,16 +70,22 @@ impl InterpretableFrom<String> for AddressKey {
 impl InterpretableFrom<&AddressValue> for AddressKey {
     fn interpret_from(from: &AddressValue, _context: &InterpreterContext) -> Self {
         AddressKey {
-            value: from.value,
+            value: from.to_address(),
             original: from.original.to_concatenated_string(),
         }
     }
 }
 
-impl InterpretableFrom<&[u8; 32]> for AddressKey {
-    fn interpret_from(from: &[u8; 32], _context: &InterpreterContext) -> Self {
+impl InterpretableFrom<AddressValue> for AddressKey {
+    fn interpret_from(from: AddressValue, context: &InterpreterContext) -> Self {
+        AddressKey::interpret_from(&from, context)
+    }
+}
+
+impl InterpretableFrom<&Address> for AddressKey {
+    fn interpret_from(from: &Address, _context: &InterpreterContext) -> Self {
         AddressKey {
-            value: *from,
+            value: from.clone(),
             original: format!("0x{}", hex::encode(from)),
         }
     }

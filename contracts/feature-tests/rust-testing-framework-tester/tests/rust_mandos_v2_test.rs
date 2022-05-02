@@ -42,10 +42,7 @@ fn tester_deploy_test() {
             .contract_code(WASM_PATH_EXPR, &ic)
             .gas_limit("5,000,000"),
     );
-    assert_eq!(
-        new_address.as_bytes(),
-        adder_contract.mandos_address_expr.value
-    );
+    assert_eq!(new_address, adder_contract.to_address());
     assert_eq!(result, "constructor-result");
 
     world.write_mandos_trace("mandos/trace-deploy.scen.json");
