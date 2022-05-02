@@ -6,7 +6,10 @@ use mandos::{
     value_interpreter::interpret_string,
 };
 use num_traits::Zero;
-use std::{collections::HashMap, path::PathBuf};
+use std::{
+    collections::HashMap,
+    path::{Path, PathBuf},
+};
 
 use super::{AccountData, BlockInfo};
 
@@ -116,7 +119,7 @@ impl BlockchainMock {
         result
     }
 
-    pub fn write_mandos_trace(&mut self, file_path: &str) {
+    pub fn write_mandos_trace<P: AsRef<Path>>(&mut self, file_path: P) {
         let mandos_trace = core::mem::take(&mut self.mandos_trace);
         let mandos_trace_raw = mandos_trace.into_raw();
         mandos_trace_raw.save_to_file(file_path);
