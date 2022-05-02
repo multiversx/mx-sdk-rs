@@ -266,4 +266,10 @@ impl<M> CodecFrom<[u8; 32]> for ManagedAddress<M> where M: ManagedTypeApi {}
 impl<M> CodecFrom<Address> for ManagedAddress<M> where M: ManagedTypeApi {}
 
 #[cfg(feature = "alloc")]
+impl<M> CodecFrom<&Address> for ManagedAddress<M> where M: ManagedTypeApi {}
+
+#[cfg(feature = "alloc")]
 impl<M> CodecFrom<ManagedAddress<M>> for Address where M: ManagedTypeApi {}
+
+#[cfg(feature = "alloc")]
+impl<M> CodecFrom<&ManagedAddress<M>> for Address where M: ManagedTypeApi {}

@@ -61,7 +61,7 @@ pub(crate) fn execute(
 ) -> (TxResult, Address, BlockchainMock) {
     let tx = &sc_deploy_step.tx;
     let tx_input = TxInput {
-        from: tx.from.value.into(),
+        from: tx.from.to_address(),
         to: Address::zero(),
         egld_value: tx.egld_value.value.clone(),
         esdt_values: Vec::new(),
