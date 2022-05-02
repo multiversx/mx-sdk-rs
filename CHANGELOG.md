@@ -12,7 +12,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 - Mandos Rust testing framework v2, which uses contract proxies for composing calls and is capable of building and exporting mandos scenarios.
 - Managed type handle management system in the contract, to reduce the number of API calls to the VM. General VM API refactor.
 - Eliminated `#[var_args]` annotation. The framework can now distinguish between single-values and multi-values solely based on type.
+- Contract cleans up return data after performing synchronous calls. Getting return data by range is no longer needed and the respective methods have been removed.
 - Fixed behavior of blockchain API `get_esdt_token_data`.
+- Git tag/commit info in ABI (fixed & reintroduced).
 
 ## [elrond-wasm 0.30.0, elrond-codec 0.10.0] - 2022-03-17
 - Feature flags in `elrond-wasm`:
