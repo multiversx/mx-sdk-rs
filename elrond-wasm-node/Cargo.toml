@@ -1,6 +1,6 @@
 [package]
 name = "elrond-wasm-node"
-version = "0.30.0"
+version = "0.31.0"
 edition = "2018"
 
 authors = ["Andrei Marinica <andrei.marinica@elrond.com>", "Elrond Network <contact@elrond.com>"]
@@ -19,5 +19,5 @@ vm-esdt-local-roles = []
 ei-unmanaged = []
 
 [dependencies.elrond-wasm]
-version = "=0.30.0"
+version = "=0.31.0"
 path = "../elrond-wasm"
