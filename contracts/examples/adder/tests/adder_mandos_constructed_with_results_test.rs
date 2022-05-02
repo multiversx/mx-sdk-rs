@@ -38,10 +38,7 @@ fn adder_mandos_constructed() {
             .gas_limit("5,000,000")
             .expect(TxExpect::ok().no_result()),
     );
-    assert_eq!(
-        new_address.as_bytes(),
-        adder_contract.mandos_address_expr.value
-    );
+    assert_eq!(new_address, adder_contract.to_address());
 
     // mandos query, gets saved in the trace
     let result: SingleValue<BigUint> =

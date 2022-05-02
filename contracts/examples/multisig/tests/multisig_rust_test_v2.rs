@@ -240,7 +240,7 @@ impl MultisigTestState {
         let adder_call = self.adder.add(number);
         self.world.mandos_sc_call_get_result(
             self.multisig.propose_transfer_execute(
-                &self.adder.mandos_address_expr.value,
+                &self.adder.to_address(),
                 0u32,
                 adder_call.endpoint_name,
                 adder_call.arg_buffer.into_multi_value_encoded(),
