@@ -7,6 +7,7 @@ const C_LETTER: u8 = b'c';
 
 const UNMATCHED_BRACE_ERR_MSG: &str = "Unmatched `{` in the format string";
 
+#[derive(Debug, PartialEq, Eq)]
 pub enum FormatPartType {
     StaticAscii(String),
     LowerHex,
@@ -37,7 +38,7 @@ pub fn parse_format_string(raw_string: &str) -> Vec<FormatPartType> {
                 CLOSED_BRACE => {
                     if i > 1 {
                         let end_index = i - 1;
-                        if start_index != end_index {
+                        if start_index <= end_index {
                             let static_part = &ascii_bytes[start_index..=end_index];
                             let as_str = String::from_utf8(static_part.to_vec()).unwrap();
                             parts.push(FormatPartType::StaticAscii(as_str));
@@ -113,4 +114,42 @@ pub(crate) fn count_args(format_types: &[FormatPartType]) -> usize {
     }
 
     nr_args
+}
+
+#[test]
+fn test_format_parts_single_char_delimiter() {
+    assert_eq!(
+        parse_format_string("\"test{}/{}.json\""),
+        vec![
+            FormatPartType::StaticAscii("test".to_string()),
+            FormatPartType::Display,
+            FormatPartType::StaticAscii("/".to_string()),
+            FormatPartType::Display,
+            FormatPartType::StaticAscii(".json".to_string())
+        ]
+    );
+}
+
+#[test]
+fn test_format_parts_no_delimiter() {
+    assert_eq!(
+        parse_format_string("\"{}{}.txt\""),
+        vec![
+            FormatPartType::Display,
+            FormatPartType::Display,
+            FormatPartType::StaticAscii(".txt".to_string())
+        ]
+    );
+}
+
+#[test]
+fn test_format_parts_multiple_chars_between_displays() {
+    assert_eq!(
+        parse_format_string("\"{}test{}\""),
+        vec![
+            FormatPartType::Display,
+            FormatPartType::StaticAscii("test".to_string()),
+            FormatPartType::Display
+        ]
+    );
 }
