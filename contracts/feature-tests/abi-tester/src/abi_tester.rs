@@ -61,7 +61,7 @@ pub trait AbiTester {
     fn var_args(
         &self,
         _simple_arg: u32,
-        #[var_args] _var_args: MultiValueVec<MultiValue2<OnlyShowsUpAsNested04, i32>>,
+        _var_args: MultiValueVec<MultiValue2<OnlyShowsUpAsNested04, i32>>,
     ) {
     }
 
@@ -71,12 +71,7 @@ pub trait AbiTester {
     }
 
     #[endpoint]
-    fn optional_arg(
-        &self,
-        _simple_arg: u32,
-        #[var_args] _opt_args: OptionalValue<OnlyShowsUpAsNested06>,
-    ) {
-    }
+    fn optional_arg(&self, _simple_arg: u32, _opt_args: OptionalValue<OnlyShowsUpAsNested06>) {}
 
     #[endpoint]
     fn optional_result(&self) -> OptionalValue<OnlyShowsUpAsNested07> {

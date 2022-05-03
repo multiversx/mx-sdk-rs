@@ -253,5 +253,5 @@ fn crowdfunding_mandos_rust_test() {
                 ),
         );
 
-    world.write_mandos_trace("mandos/crowdfunding_rust.scen.json");
+    world.write_mandos_trace("mandos-gen/crowdfunding_rust.scen.json");
 }

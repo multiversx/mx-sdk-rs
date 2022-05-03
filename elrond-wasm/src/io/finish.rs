@@ -1,15 +1,27 @@
 use core::marker::PhantomData;
 
-use elrond_codec::{EncodeErrorHandler, TopEncodeMultiOutput, TryStaticCast};
+use elrond_codec::{EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput, TryStaticCast};
 
 use crate::{
     api::{EndpointFinishApi, EndpointFinishApiImpl, ManagedTypeApi},
+    contract_base::ExitCodecErrorHandler,
     elrond_codec::{EncodeError, TopEncode, TopEncodeOutput},
+    err_msg,
     types::{
         BigInt, BigUint, ManagedBuffer, ManagedBufferCachedBuilder, ManagedSCError, ManagedType,
         SCError, StaticSCError,
     },
 };
+
+pub fn finish_multi<FA, T>(item: &T)
+where
+    FA: ManagedTypeApi + EndpointFinishApi,
+    T: TopEncodeMulti,
+{
+    let h = ExitCodecErrorHandler::<FA>::from(err_msg::FINISH_ENCODE_ERROR);
+    let mut output = ApiOutputAdapter::<FA>::default();
+    let Ok(()) = item.multi_encode_or_handle_err(&mut output, h);
+}
 
 #[derive(Clone)]
 pub struct ApiOutputAdapter<FA>

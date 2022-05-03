@@ -97,7 +97,7 @@ pub trait ForwarderTransferExecuteModule {
     fn transf_exec_multi_accept_funds(
         &self,
         to: ManagedAddress,
-        #[var_args] token_payments: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>>,
+        token_payments: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>>,
     ) {
         let mut all_token_payments = ManagedVec::new();
 
@@ -119,7 +119,7 @@ pub trait ForwarderTransferExecuteModule {
     fn forward_transf_exec_reject_funds_multi_transfer(
         &self,
         to: ManagedAddress,
-        #[var_args] token_payments: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>>,
+        token_payments: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>>,
     ) {
         let mut all_token_payments = ManagedVec::new();
 
@@ -141,7 +141,7 @@ pub trait ForwarderTransferExecuteModule {
     fn transf_exec_multi_reject_funds(
         &self,
         to: ManagedAddress,
-        #[var_args] token_payments: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>>,
+        token_payments: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>>,
     ) {
         let mut all_token_payments = ManagedVec::new();
 

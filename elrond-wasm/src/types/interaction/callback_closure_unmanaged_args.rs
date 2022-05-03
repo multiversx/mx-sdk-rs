@@ -2,9 +2,9 @@ use core::marker::PhantomData;
 
 use crate::{
     api::{BlockchainApi, ManagedTypeApi, StorageReadApi, StorageWriteApi},
+    io::BytesArgLoader,
     storage_clear, storage_get, storage_get_len,
     types::{heap::BoxedBytes, ManagedBuffer, ManagedType},
-    BytesArgLoader,
 };
 use alloc::vec::Vec;
 use elrond_codec::{DecodeErrorHandler, NestedDecode, TopDecode, TopDecodeInput};

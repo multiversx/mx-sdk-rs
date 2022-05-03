@@ -2,6 +2,8 @@
 #![feature(try_trait_v2)]
 #![feature(never_type)]
 #![feature(exhaustive_patterns)]
+#![feature(auto_traits)]
+#![feature(negative_impls)]
 
 extern crate alloc;
 
@@ -43,6 +45,7 @@ pub use codec_err::{DecodeError, EncodeError};
 pub use codec_err_handler::*;
 pub use default_traits::{DecodeDefault, EncodeDefault};
 pub use equivalent::*;
+pub use impl_for_types::impl_empty::Empty;
 pub use multi::*;
 pub use single::*;
 

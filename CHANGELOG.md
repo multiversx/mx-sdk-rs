@@ -4,6 +4,18 @@ There are several crates in this repo, this changelog will keep track of all of 
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [elrond-wasm 0.31.0, elrond-codec 0.11.0, mandos 0.13.0] - 2022-05-02
+- Improved formatter. Strings can be formatted similarly to the standard Rust ones, but without allocator, using managed buffers. Macros `require!`, `sc_panic!`, `sc_format!`, `sc_print!` use it.
+- Removed build flag `ei-1-1`, following mainnet updated and new VM endpoints being available. Among others, managed `sha256` and `keccak256` APIs can be used freely.
+- `CodecFrom` and `CodecInto` traits to define equivalent encodings and conversions via codec.
+- Generated smart contract proxies use the `CodecFrom`/`CodecInto` traits to accept a wider range of types.
+- Mandos Rust testing framework v2, which uses contract proxies for composing calls and is capable of building and exporting mandos scenarios.
+- Managed type handle management system in the contract, to reduce the number of API calls to the VM. General VM API refactor.
+- Eliminated `#[var_args]` annotation. The framework can now distinguish between single-values and multi-values solely based on type.
+- Contract cleans up return data after performing synchronous calls. Getting return data by range is no longer needed and the respective methods have been removed.
+- Fixed behavior of blockchain API `get_esdt_token_data`.
+- Git tag/commit info in ABI (fixed & reintroduced).
+
 ## [elrond-wasm 0.30.0, elrond-codec 0.10.0] - 2022-03-17
 - Feature flags in `elrond-wasm`:
 	- `alloc` allows contracts to use the heap allocator. It is not a hard restriction, there is still access to the implementations of the heap-allocated types, but they are not imported. Some methods are only available with this flag.

@@ -38,7 +38,7 @@ pub trait Forwarder:
         &self,
         to: &ManagedAddress,
         amount: &BigUint,
-        #[var_args] opt_data: OptionalValue<ManagedBuffer>,
+        opt_data: OptionalValue<ManagedBuffer>,
     ) {
         let data = match opt_data {
             OptionalValue::Some(data) => data,

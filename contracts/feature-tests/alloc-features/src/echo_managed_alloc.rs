@@ -16,19 +16,13 @@ pub trait EchoManagedTypesWithAlloc {
     }
 
     #[endpoint]
-    fn echo_varags_u32(
-        &self,
-        #[var_args] m: MultiValueVec<u32>,
-    ) -> MultiValue2<usize, MultiValueVec<u32>> {
+    fn echo_varags_u32(&self, m: MultiValueVec<u32>) -> MultiValue2<usize, MultiValueVec<u32>> {
         let v = m.into_vec();
         (v.len(), v.into()).into()
     }
 
     #[endpoint]
-    fn echo_varags_big_uint(
-        &self,
-        #[var_args] m: MultiValueVec<BigUint>,
-    ) -> MultiValueVec<BigUint> {
+    fn echo_varags_big_uint(&self, m: MultiValueVec<BigUint>) -> MultiValueVec<BigUint> {
         m.into_vec().into()
     }
 }

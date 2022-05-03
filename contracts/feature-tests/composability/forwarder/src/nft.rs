@@ -164,7 +164,7 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
         &self,
         token_identifier: TokenIdentifier,
         nonce: u64,
-        #[var_args] uris: MultiValueEncoded<ManagedBuffer>,
+        uris: MultiValueEncoded<ManagedBuffer>,
     ) {
         self.send()
             .nft_add_multiple_uri(&token_identifier, nonce, &uris.to_vec());
@@ -190,13 +190,7 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
         royalties: BigUint,
         hash: ManagedBuffer,
         uri: ManagedBuffer,
-        #[var_args] attrs_arg: MultiValue5<
-            BigUint,
-            ManagedBuffer,
-            TokenIdentifier,
-            bool,
-            ManagedBuffer,
-        >,
+        attrs_arg: MultiValue5<BigUint, ManagedBuffer, TokenIdentifier, bool, ManagedBuffer>,
     ) {
         let attrs_pieces = attrs_arg.into_tuple();
         let orig_attr = ComplexAttributes {
@@ -270,7 +264,7 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
         nonce: u64,
         amount: BigUint,
         function: ManagedBuffer,
-        #[var_args] arguments: MultiValueEncoded<ManagedBuffer>,
+        arguments: MultiValueEncoded<ManagedBuffer>,
     ) {
         let _ = Self::Api::send_api_impl().direct_esdt_nft_execute(
             &to,
