@@ -26,7 +26,7 @@ impl BlockchainMock {
 
 fn execute(state: &BlockchainMock, accounts: &mandos::model::CheckAccounts) {
     for (expected_address, expected_account) in accounts.accounts.iter() {
-        if let Some(account) = state.accounts.get(&expected_address.value.into()) {
+        if let Some(account) = state.accounts.get(&expected_address.value) {
             assert!(
                 expected_account.nonce.check(account.nonce),
                 "bad account nonce. Address: {}. Want: {}. Have: {}",

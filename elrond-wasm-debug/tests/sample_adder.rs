@@ -157,38 +157,30 @@ mod sample_adder {
     {
         #[inline]
         fn call_get_sum(&self) {
+            <Self::Api as elrond_wasm::api::VMApi>::init_static();
             elrond_wasm::api::CallValueApiImpl::check_not_payable(&Self::Api::call_value_api_impl());
-            elrond_wasm::api::EndpointArgumentApiImpl::check_num_arguments(
-                &<Self::Api as elrond_wasm::api::EndpointArgumentApi>::argument_api_impl(),
-                0i32,
-            );
+            let () = elrond_wasm::io::load_endpoint_args::<Self::Api, ()>(());
             let result = self.get_sum();
             elrond_wasm::io::finish_multi::<Self::Api, _>(&result);
         }
         #[inline]
         fn call_init(&self) {
+            <Self::Api as elrond_wasm::api::VMApi>::init_static();
             elrond_wasm::api::CallValueApiImpl::check_not_payable(&Self::Api::call_value_api_impl());
-            elrond_wasm::api::EndpointArgumentApiImpl::check_num_arguments(
-                &<Self::Api as elrond_wasm::api::EndpointArgumentApi>::argument_api_impl(),
-                1i32,
-            );
-            let initial_value = elrond_wasm::load_single_arg::<Self::Api, BigInt<Self::Api>>(
-                0i32,
-                ArgId::from(&b"initial_value"[..]),
-            );
+            let (initial_value, ()) = elrond_wasm::io::load_endpoint_args::<
+                Self::Api,
+                (elrond_wasm::types::BigInt<Self::Api>, ()),
+            >(("initial_value", ()));
             self.init(&initial_value);
         }
         #[inline]
         fn call_add(&self) {
+            <Self::Api as elrond_wasm::api::VMApi>::init_static();
             elrond_wasm::api::CallValueApiImpl::check_not_payable(&Self::Api::call_value_api_impl());
-            elrond_wasm::api::EndpointArgumentApiImpl::check_num_arguments(
-                &<Self::Api as elrond_wasm::api::EndpointArgumentApi>::argument_api_impl(),
-                1i32,
-            );
-            let value = elrond_wasm::load_single_arg::<Self::Api, BigInt<Self::Api>>(
-                0i32,
-                ArgId::from(&b"value"[..]),
-            );
+            let (value, ()) = elrond_wasm::io::load_endpoint_args::<
+                Self::Api,
+                (elrond_wasm::types::BigInt<Self::Api>, ()),
+            >(("value", ()));
             let result = self.add(value);
             elrond_wasm::io::finish_multi::<Self::Api, _>(&result);
         }

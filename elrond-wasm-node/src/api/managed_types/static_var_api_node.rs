@@ -8,6 +8,7 @@ use crate::VmApiImpl;
 static mut STATIC_BUFFER: LockableStaticBuffer = LockableStaticBuffer::new();
 static mut EXTERNAL_VIEW_TARGET_ADDRESS_HANDLE: i32 = 0;
 static mut NEXT_HANDLE: i32 = const_handles::NEW_HANDLE_START_FROM;
+static mut NUM_ARGUMENTS: i32 = 0;
 
 // The compiler seems to enjoy inlining this method no matter how many times it shows up.
 // Hence the rather drastic directive.
@@ -44,5 +45,15 @@ impl StaticVarApiImpl for VmApiImpl {
 
     fn next_handle(&self) -> Handle {
         next_handle()
+    }
+
+    fn set_num_arguments(&self, num_arguments: i32) {
+        unsafe {
+            NUM_ARGUMENTS = num_arguments;
+        }
+    }
+
+    fn get_num_arguments(&self) -> i32 {
+        unsafe { NUM_ARGUMENTS }
     }
 }

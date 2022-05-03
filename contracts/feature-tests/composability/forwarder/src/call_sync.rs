@@ -9,11 +9,7 @@ pub trait ForwarderSyncCallModule {
 
     #[endpoint]
     #[payable("*")]
-    fn echo_arguments_sync(
-        &self,
-        to: ManagedAddress,
-        #[var_args] args: MultiValueEncoded<ManagedBuffer>,
-    ) {
+    fn echo_arguments_sync(&self, to: ManagedAddress, args: MultiValueEncoded<ManagedBuffer>) {
         let half_gas = self.blockchain().get_gas_left() / 2;
 
         let result: MultiValueEncoded<ManagedBuffer> = self
@@ -31,7 +27,7 @@ pub trait ForwarderSyncCallModule {
     fn echo_arguments_sync_twice(
         &self,
         to: ManagedAddress,
-        #[var_args] args: MultiValueEncoded<ManagedBuffer>,
+        args: MultiValueEncoded<ManagedBuffer>,
     ) {
         let one_third_gas = self.blockchain().get_gas_left() / 3;
 
@@ -140,7 +136,12 @@ pub trait ForwarderSyncCallModule {
     ) {
         self.vault_proxy()
             .contract(to)
-            .retrieve_funds(token, token_nonce, amount, OptionalValue::None)
+            .retrieve_funds(
+                token,
+                token_nonce,
+                amount,
+                OptionalValue::<ManagedBuffer>::None,
+            )
             .execute_on_dest_context()
     }
 
@@ -159,7 +160,7 @@ pub trait ForwarderSyncCallModule {
                 payments,
                 token,
                 amount,
-                OptionalValue::Some(b"accept_funds_func".into()),
+                OptionalValue::<ManagedBuffer>::Some(b"accept_funds_func".into()),
             )
             .execute_on_dest_context::<()>();
     }
@@ -172,7 +173,7 @@ pub trait ForwarderSyncCallModule {
     fn forward_sync_accept_funds_multi_transfer(
         &self,
         to: ManagedAddress,
-        #[var_args] token_payments: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>>,
+        token_payments: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>>,
     ) {
         let mut all_token_payments = ManagedVec::new();
 

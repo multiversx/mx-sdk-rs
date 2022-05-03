@@ -196,6 +196,8 @@ impl<M: ManagedTypeApi> TopDecode for TokenIdentifier<M> {
     }
 }
 
+impl<M: ManagedTypeApi> CodecFromSelf for TokenIdentifier<M> {}
+
 impl<M: ManagedTypeApi> CodecFrom<&[u8]> for TokenIdentifier<M> {}
 
 impl<M: ManagedTypeApi> CodecFrom<Vec<u8>> for TokenIdentifier<M> {}
@@ -215,12 +217,6 @@ impl<M: ManagedTypeApi> SCDisplay for TokenIdentifier<M> {
                 self.buffer.get_raw_handle(),
             ));
         }
-    }
-}
-
-impl<M: ManagedTypeApi> SCDisplay for &TokenIdentifier<M> {
-    fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
-        SCDisplay::fmt(*self, f);
     }
 }
 

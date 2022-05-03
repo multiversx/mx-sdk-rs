@@ -60,7 +60,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
         #[payment_token] offered_token: TokenIdentifier,
         requested_amount: BigUint,
         requested_token: TokenIdentifier,
-        #[var_args] requested_nonce: OptionalValue<u64>,
+        requested_nonce: OptionalValue<u64>,
     ) {
         let payment_token =
             self.check_owned_return_payment_token(&requested_token, &requested_amount);

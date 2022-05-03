@@ -25,8 +25,8 @@ pub trait NftMinter: nft_module::NftModule {
         royalties: BigUint,
         uri: ManagedBuffer,
         selling_price: BigUint,
-        #[var_args] opt_token_used_as_payment: OptionalValue<TokenIdentifier>,
-        #[var_args] opt_token_used_as_payment_nonce: OptionalValue<u64>,
+        opt_token_used_as_payment: OptionalValue<TokenIdentifier>,
+        opt_token_used_as_payment_nonce: OptionalValue<u64>,
     ) {
         let token_used_as_payment = match opt_token_used_as_payment {
             OptionalValue::Some(token) => token,

@@ -7,11 +7,11 @@ use crate::{
     },
     contract_base::{BlockchainWrapper, ExitCodecErrorHandler},
     err_msg,
+    io::{ArgErrorHandler, ArgId, ManagedResultArgLoader},
     types::{
         AsyncCall, BigUint, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer,
         ManagedVec, TokenIdentifier,
     },
-    ArgErrorHandler, ArgId, ManagedResultArgLoader,
 };
 use core::marker::PhantomData;
 

@@ -6,8 +6,8 @@ use crate::{
     api::{BlockchainApiImpl, ErrorApiImpl, SendApi, SendApiImpl},
     contract_base::ExitCodecErrorHandler,
     err_msg,
+    io::{ArgErrorHandler, ArgId, ManagedResultArgLoader},
     types::{BigUint, CodeMetadata, ManagedAddress, ManagedBuffer, ManagedVec},
-    ArgErrorHandler, ArgId, ManagedResultArgLoader,
 };
 
 use super::ManagedArgBuffer;

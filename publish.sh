@@ -62,12 +62,6 @@ cd elrond-codec
 cargo publish
 cd ..
 
-cd mandos
-cargo publish
-cd ..
-
-sleep 20
-
 cd elrond-wasm-derive
 cargo publish
 cd ..
@@ -79,6 +73,10 @@ cargo publish
 cd ..
 
 sleep 20
+
+cd mandos
+cargo publish
+cd ..
 
 cd elrond-wasm-node
 cargo publish
