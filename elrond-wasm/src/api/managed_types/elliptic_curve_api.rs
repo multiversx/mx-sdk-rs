@@ -1,6 +1,6 @@
-use crate::types::heap::BoxedBytes;
+use crate::types::ManagedBuffer;
 
-use super::Handle;
+use super::{Handle, ManagedTypeApi};
 
 /// Wrapper around the EllipticCurve functionality provided by Arwen.
 pub trait EllipticCurveApi {
@@ -66,19 +66,19 @@ pub trait EllipticCurveApi {
         data: &[u8],
     );
 
-    fn ec_marshal(
+    fn ec_marshal<M: ManagedTypeApi>(
         &self,
         ec_handle: Handle,
         x_pair_handle: Handle,
         y_pair_handle: Handle,
-    ) -> BoxedBytes;
+    ) -> ManagedBuffer<M>;
 
-    fn ec_marshal_compressed(
+    fn ec_marshal_compressed<M: ManagedTypeApi>(
         &self,
         ec_handle: Handle,
         x_pair_handle: Handle,
         y_pair_handle: Handle,
-    ) -> BoxedBytes;
+    ) -> ManagedBuffer<M>;
 
     fn ec_unmarshal(
         &self,
@@ -96,10 +96,10 @@ pub trait EllipticCurveApi {
         data: &[u8],
     );
 
-    fn ec_generate_key(
+    fn ec_generate_key<M: ManagedTypeApi>(
         &self,
         x_pub_key_handle: Handle,
         y_pub_key_handle: Handle,
         ec_handle: Handle,
-    ) -> BoxedBytes;
+    ) -> ManagedBuffer<M>;
 }

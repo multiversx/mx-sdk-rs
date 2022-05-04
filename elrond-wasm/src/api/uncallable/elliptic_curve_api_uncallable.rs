@@ -1,6 +1,6 @@
 use crate::{
-    api::{EllipticCurveApi, Handle},
-    types::heap::BoxedBytes,
+    api::{EllipticCurveApi, Handle, ManagedTypeApi},
+    types::ManagedBuffer,
 };
 
 impl EllipticCurveApi for super::UncallableApi {
@@ -83,21 +83,21 @@ impl EllipticCurveApi for super::UncallableApi {
         unreachable!()
     }
 
-    fn ec_marshal(
+    fn ec_marshal<M: ManagedTypeApi>(
         &self,
         _ec_handle: Handle,
         _x_pair_handle: Handle,
         _y_pair_handle: Handle,
-    ) -> BoxedBytes {
+    ) -> ManagedBuffer<M> {
         unreachable!()
     }
 
-    fn ec_marshal_compressed(
+    fn ec_marshal_compressed<M: ManagedTypeApi>(
         &self,
         _ec_handle: Handle,
         _x_pair_handle: Handle,
         _y_pair_handle: Handle,
-    ) -> BoxedBytes {
+    ) -> ManagedBuffer<M> {
         unreachable!()
     }
 
@@ -121,12 +121,12 @@ impl EllipticCurveApi for super::UncallableApi {
         unreachable!()
     }
 
-    fn ec_generate_key(
+    fn ec_generate_key<M: ManagedTypeApi>(
         &self,
         _x_pub_key_handle: Handle,
         _y_pub_key_handle: Handle,
         _ec_handle: Handle,
-    ) -> BoxedBytes {
+    ) -> ManagedBuffer<M> {
         unreachable!()
     }
 }

@@ -1,7 +1,4 @@
-use elrond_wasm::{
-    api::{EllipticCurveApi, Handle},
-    types::heap::BoxedBytes,
-};
+use elrond_wasm::api::{EllipticCurveApi, Handle};
 
 extern "C" {
     fn createEC(dataOffset: i32, dataLength: i32) -> i32;
@@ -221,24 +218,24 @@ impl EllipticCurveApi for crate::VmApiImpl {
         ec_handle: Handle,
         x_pair_handle: Handle,
         y_pair_handle: Handle,
-    ) -> BoxedBytes {
+    ) -> ManagedBuffer<M> {
         unsafe {
             let byte_length = (getCurveLengthEC(ec_handle) + 7) / 8;
-            let mut result = BoxedBytes::allocate(1 + 2 * byte_length as usize);
+            let mut result = ManagedBuffer::new();
             marshalEC(x_pair_handle, y_pair_handle, ec_handle, result.as_mut_ptr());
             result
         }
     }
 
-    fn ec_marshal_compressed(
+    fn ec_marshal_compressed<M: ManagedTypeApi>(
         &self,
         ec_handle: Handle,
         x_pair_handle: Handle,
         y_pair_handle: Handle,
-    ) -> BoxedBytes {
+    ) -> ManagedBuffer<M> {
         unsafe {
             let byte_length = (getCurveLengthEC(ec_handle) + 7) / 8;
-            let mut result = BoxedBytes::allocate(1 + byte_length as usize);
+            let mut result = ManagedBuffer::new();
             marshalCompressedEC(x_pair_handle, y_pair_handle, ec_handle, result.as_mut_ptr());
             result
         }
@@ -280,15 +277,15 @@ impl EllipticCurveApi for crate::VmApiImpl {
         }
     }
 
-    fn ec_generate_key(
+    fn ec_generate_key<M: ManagedTypeApi>(
         &self,
         x_pub_key_handle: Handle,
         y_pub_key_handle: Handle,
         ec_handle: Handle,
-    ) -> BoxedBytes {
+    ) -> ManagedBuffer<M> {
         unsafe {
             let priv_key_length = getPrivKeyByteLengthEC(ec_handle);
-            let mut private_key = BoxedBytes::allocate(priv_key_length as usize);
+            let mut private_key = ManagedBuffer::new();
             generateKeyEC(
                 x_pub_key_handle,
                 y_pub_key_handle,

@@ -6,7 +6,9 @@ use crate::{
 };
 use elrond_codec::*;
 
-use crate::types::{heap::BoxedBytes, BigUint, ManagedType};
+use crate::types::{BigUint, ManagedType};
+
+use super::ManagedBuffer;
 
 pub type EllipticCurveComponents<M> = (
     BigUint<M>,
@@ -175,12 +177,12 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
         )
     }
 
-    pub fn marshal(&self, x_pair: BigUint<M>, y_pair: BigUint<M>) -> BoxedBytes {
+    pub fn marshal(&self, x_pair: BigUint<M>, y_pair: BigUint<M>) -> ManagedBuffer<M> {
         let api = M::managed_type_impl();
         api.ec_marshal(self.handle, x_pair.handle, y_pair.handle)
     }
 
-    pub fn marshal_compressed(&self, x_pair: BigUint<M>, y_pair: BigUint<M>) -> BoxedBytes {
+    pub fn marshal_compressed(&self, x_pair: BigUint<M>, y_pair: BigUint<M>) -> ManagedBuffer<M> {
         let api = M::managed_type_impl();
         api.ec_marshal_compressed(self.handle, x_pair.handle, y_pair.handle)
     }
@@ -207,7 +209,7 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
         )
     }
 
-    pub fn generate_key(&self) -> (BigUint<M>, BigUint<M>, BoxedBytes) {
+    pub fn generate_key(&self) -> (BigUint<M>, BigUint<M>, ManagedBuffer<M>) {
         let api = M::managed_type_impl();
         let x_pub_key_handle = api.bi_new_zero();
         let y_pub_key_handle = api.bi_new_zero();
