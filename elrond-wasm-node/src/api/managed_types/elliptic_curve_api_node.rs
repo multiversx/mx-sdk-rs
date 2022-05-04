@@ -221,7 +221,7 @@ impl EllipticCurveApi for crate::VmApiImpl {
         ec_handle: Handle,
         x_pair_handle: Handle,
         y_pair_handle: Handle,
-    ) -> ManagedBuffer<M> {
+    ) -> ManagedBuffer {
         unsafe {
             let byte_length = (getCurveLengthEC(ec_handle) + 7) / 8;
             let mut result = ManagedBuffer::new();
@@ -235,7 +235,7 @@ impl EllipticCurveApi for crate::VmApiImpl {
         ec_handle: Handle,
         x_pair_handle: Handle,
         y_pair_handle: Handle,
-    ) -> ManagedBuffer<M> {
+    ) -> ManagedBuffer {
         unsafe {
             let byte_length = (getCurveLengthEC(ec_handle) + 7) / 8;
             let mut result = ManagedBuffer::new();
@@ -280,12 +280,12 @@ impl EllipticCurveApi for crate::VmApiImpl {
         }
     }
 
-    fn ec_generate_key<M: ManagedTypeApi>(
+    fn ec_generate_key(
         &self,
         x_pub_key_handle: Handle,
         y_pub_key_handle: Handle,
         ec_handle: Handle,
-    ) -> ManagedBuffer<M> {
+    ) -> ManagedBuffer {
         unsafe {
             let priv_key_length = getPrivKeyByteLengthEC(ec_handle);
             let mut private_key = ManagedBuffer::new();
