@@ -9,14 +9,14 @@ publish = false
 path = "src/forwarder_raw.rs"
 
 [dependencies.elrond-wasm]
-version = "0.31.0"
+version = "0.31.1"
 path = "../../../../elrond-wasm"
 
 [dependencies.elrond-wasm-node]
-version = "0.31.0"
+version = "0.31.1"
 path = "../../../../elrond-wasm-node"
 optional = true
 
 [dev-dependencies.elrond-wasm-debug]
-version = "0.31.0"
+version = "0.31.1"
 path = "../../../../elrond-wasm-debug"
