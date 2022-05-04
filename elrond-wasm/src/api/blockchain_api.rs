@@ -119,7 +119,7 @@ pub trait BlockchainApiImpl: ManagedTypeApiImpl {
     ) -> EsdtTokenData<M>;
 
     #[deprecated(
-        since = "0.31.0",
+        since = "0.31.1",
         note = "Only used for ;imited backwards compatibility tests. Never use! Use `get_esdt_token_data` instead."
     )]
     fn get_esdt_token_data_unmanaged<M: ManagedTypeApi>(
