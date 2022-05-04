@@ -9,16 +9,16 @@ publish = false
 path = "src/alloc_features_main.rs"
 
 [dependencies.elrond-wasm]
-version = "0.31.0"
+version = "0.31.1"
 path = "../../../elrond-wasm"
 features = ["alloc"]
 
 [dev-dependencies.elrond-wasm-debug]
-version = "0.31.0"
+version = "0.31.1"
 path = "../../../elrond-wasm-debug"
 
 [dependencies.elrond-wasm-modules]
-version = "0.31.0"
+version = "0.31.1"
 path = "../../../elrond-wasm-modules"
 
 [dev-dependencies.esdt-system-sc-mock]

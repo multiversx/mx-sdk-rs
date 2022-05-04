@@ -41,7 +41,7 @@ where
     }
 
     #[deprecated(
-        since = "0.31.0",
+        since = "0.31.1",
         note = "Method no longer needed, use `sha256` instead, functionality is available on mainnet."
     )]
     pub fn sha256_legacy_managed<const MAX_INPUT_LEN: usize>(
@@ -68,7 +68,7 @@ where
     }
 
     #[deprecated(
-        since = "0.31.0",
+        since = "0.31.1",
         note = "Method no longer needed, use `keccak256` instead, functionality is available on mainnet."
     )]
     pub fn keccak256_legacy_managed<const MAX_INPUT_LEN: usize>(
