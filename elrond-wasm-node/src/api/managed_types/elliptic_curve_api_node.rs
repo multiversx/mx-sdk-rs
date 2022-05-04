@@ -1,4 +1,7 @@
-use elrond_wasm::api::{EllipticCurveApi, Handle};
+use elrond_wasm::{
+    api::{EllipticCurveApi, Handle},
+    types::ManagedBuffer,
+};
 
 extern "C" {
     fn createEC(dataOffset: i32, dataLength: i32) -> i32;
