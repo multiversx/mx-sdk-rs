@@ -9,10 +9,10 @@ publish = false
 path = "src/abi_tester.rs"
 
 [dependencies.elrond-wasm]
-version = "0.31.0"
+version = "0.31.1"
 path = "../../../elrond-wasm"
 features = ["alloc"]
 
 [dev-dependencies.elrond-wasm-debug]
-version = "0.31.0"
+version = "0.31.1"
 path = "../../../elrond-wasm-debug"

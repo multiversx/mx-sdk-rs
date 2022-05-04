@@ -4,6 +4,9 @@ There are several crates in this repo, this changelog will keep track of all of 
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [elrond-wasm 0.31.1, mandos 0.13.1] - 2022-05-04
+- Bugfix - formatter single char issue.
+
 ## [elrond-wasm 0.31.0, elrond-codec 0.11.0, mandos 0.13.0] - 2022-05-02
 - Improved formatter. Strings can be formatted similarly to the standard Rust ones, but without allocator, using managed buffers. Macros `require!`, `sc_panic!`, `sc_format!`, `sc_print!` use it.
 - Removed build flag `ei-1-1`, following mainnet updated and new VM endpoints being available. Among others, managed `sha256` and `keccak256` APIs can be used freely.
