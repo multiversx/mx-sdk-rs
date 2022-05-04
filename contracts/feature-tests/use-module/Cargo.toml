@@ -9,14 +9,14 @@ publish = false
 path = "src/use_module.rs"
 
 [dependencies.elrond-wasm-modules]
-version = "0.31.0"
+version = "0.31.1"
 path = "../../../elrond-wasm-modules"
 
 [dependencies.elrond-wasm]
-version = "0.31.0"
+version = "0.31.1"
 path = "../../../elrond-wasm"
 features = [ "alloc" ]
 
 [dev-dependencies.elrond-wasm-debug]
-version = "0.31.0"
+version = "0.31.1"
 path = "../../../elrond-wasm-debug"
