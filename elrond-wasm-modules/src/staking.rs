@@ -13,9 +13,9 @@ static NOT_ENOUGH_STAKE_ERR_MSG: &[u8] = b"Not enough stake";
 pub trait StakingModule {
     fn init_staking_module(
         &self,
-        staking_token: TokenIdentifier,
-        staking_amount: BigUint,
-        slash_amount: BigUint,
+        staking_token: &TokenIdentifier,
+        staking_amount: &BigUint,
+        slash_amount: &BigUint,
         slash_quorum: usize,
         user_whitelist: &ManagedVec<ManagedAddress>,
     ) {
@@ -26,7 +26,7 @@ pub trait StakingModule {
             "Quorum higher than total possible board members"
         );
         require!(
-            staking_amount > 0 && slash_amount > 0,
+            staking_amount > &0 && slash_amount > &0,
             "Staking and slash amount cannot be 0"
         );
         require!(
@@ -34,9 +34,9 @@ pub trait StakingModule {
             "Slash amount cannot be higher than required stake"
         );
 
-        self.staking_token().set(&staking_token);
-        self.required_stake_amount().set(&staking_amount);
-        self.slash_amount().set(&slash_amount);
+        self.staking_token().set(staking_token);
+        self.required_stake_amount().set(staking_amount);
+        self.slash_amount().set(slash_amount);
         self.slash_quorum().set(slash_quorum);
 
         for user in user_whitelist {
@@ -78,6 +78,8 @@ pub trait StakingModule {
             );
         }
 
+        staked_amount_mapper.set(&leftover_amount);
+
         let staking_token = self.staking_token().get();
         self.send()
             .direct(&caller, &staking_token, 0, &unstake_amount, &[]);
@@ -93,7 +95,7 @@ pub trait StakingModule {
         let caller = self.blockchain().get_caller();
         require!(
             self.is_staked_board_member(&caller),
-            "Only staked board members can vote"
+            NOT_ENOUGH_STAKE_ERR_MSG
         );
 
         let _ = self
@@ -142,6 +144,7 @@ pub trait StakingModule {
                 .slashing_proposal_voters(&board_member)
                 .swap_remove(user);
         }
+        self.slashing_proposal_voters(user).clear();
     }
 
     #[storage_mapper("staking_module:stakingToken")]
