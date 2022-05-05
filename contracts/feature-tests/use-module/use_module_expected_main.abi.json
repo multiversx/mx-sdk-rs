@@ -527,6 +527,48 @@
             "mutability": "mutable",
             "inputs": [],
             "outputs": []
+        },
+        {
+            "name": "stake",
+            "mutability": "mutable",
+            "payableInTokens": [
+                "*"
+            ],
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "unstake",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "unstake_amount",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "voteSlashMember",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "member_to_slash",
+                    "type": "Address"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "slashMember",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "member_to_slash",
+                    "type": "Address"
+                }
+            ],
+            "outputs": []
         }
     ],
     "hasCallback": true,
