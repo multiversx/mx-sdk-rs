@@ -1,5 +1,5 @@
 use elrond_wasm::{
-    api::{EllipticCurveApi, Handle},
+    api::{EllipticCurveApi, Handle, ManagedTypeApi},
     types::ManagedBuffer,
 };
 
@@ -216,16 +216,16 @@ impl EllipticCurveApi for crate::VmApiImpl {
         }
     }
 
-    fn ec_marshal(
+    fn ec_marshal<M: ManagedTypeApi>(
         &self,
         ec_handle: Handle,
         x_pair_handle: Handle,
         y_pair_handle: Handle,
-    ) -> ManagedBuffer {
+    ) -> ManagedBuffer<M> {
         unsafe {
             let byte_length = (getCurveLengthEC(ec_handle) + 7) / 8;
             let mut result = ManagedBuffer::new();
-            marshalEC(x_pair_handle, y_pair_handle, ec_handle, result.as_mut_ptr());
+            marshalEC(x_pair_handle, y_pair_handle, ec_handle, result);
             result
         }
     }
@@ -235,11 +235,11 @@ impl EllipticCurveApi for crate::VmApiImpl {
         ec_handle: Handle,
         x_pair_handle: Handle,
         y_pair_handle: Handle,
-    ) -> ManagedBuffer {
+    ) -> ManagedBuffer<M> {
         unsafe {
             let byte_length = (getCurveLengthEC(ec_handle) + 7) / 8;
             let mut result = ManagedBuffer::new();
-            marshalCompressedEC(x_pair_handle, y_pair_handle, ec_handle, result.as_mut_ptr());
+            marshalCompressedEC(x_pair_handle, y_pair_handle, ec_handle, result);
             result
         }
     }
@@ -280,21 +280,16 @@ impl EllipticCurveApi for crate::VmApiImpl {
         }
     }
 
-    fn ec_generate_key(
+    fn ec_generate_key<M: ManagedTypeApi>(
         &self,
         x_pub_key_handle: Handle,
         y_pub_key_handle: Handle,
         ec_handle: Handle,
-    ) -> ManagedBuffer {
+    ) -> ManagedBuffer<M> {
         unsafe {
             let priv_key_length = getPrivKeyByteLengthEC(ec_handle);
             let mut private_key = ManagedBuffer::new();
-            generateKeyEC(
-                x_pub_key_handle,
-                y_pub_key_handle,
-                ec_handle,
-                private_key.as_mut_ptr(),
-            );
+            generateKeyEC(x_pub_key_handle, y_pub_key_handle, ec_handle, private_key);
             private_key
         }
     }
