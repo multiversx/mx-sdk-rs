@@ -132,11 +132,11 @@ pub trait StakingModule {
 
     fn remove_board_member(&self, user: &ManagedAddress) {
         let mut whitelist_mapper = self.user_whitelist();
-        if !whitelist_mapper.contains(user) {
+
+        let was_whitelisted = whitelist_mapper.swap_remove(user);
+        if !was_whitelisted {
             return;
         }
-
-        let _ = whitelist_mapper.swap_remove(user);
 
         // remove user's votes as well
         for board_member in whitelist_mapper.iter() {
