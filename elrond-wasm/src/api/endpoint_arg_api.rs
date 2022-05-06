@@ -28,4 +28,15 @@ pub trait EndpointArgumentApiImpl: ErrorApiImpl {
     fn get_argument_u64(&self, arg_index: i32) -> u64;
 
     fn get_argument_i64(&self, arg_index: i32) -> i64;
+
+    fn get_num_callback_closure_items(&self) -> i32 {
+        // not yet implemented
+        0
+    }
+
+    /// To managed buffer handle
+    fn load_callback_closure_item(&self, arg_index: i32, dest: Handle) {
+        // not yet implemented
+        self.signal_error(b"no closure items can be accessed at the moment")
+    }
 }

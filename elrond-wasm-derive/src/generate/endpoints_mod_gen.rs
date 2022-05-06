@@ -69,6 +69,10 @@ fn generate_wasm_endpoints(contract_trait: &ContractTrait) -> Vec<proc_macro2::T
                 let endpoint_ident = &endpoint_metadata.public_name;
                 Some(generate_wasm_endpoint(m, &quote! { #endpoint_ident }))
             },
+            PublicRole::CallbackPromise(callback_metadata) => {
+                let callback_name = &callback_metadata.callback_name;
+                Some(generate_wasm_endpoint(m, &quote! { #callback_name }))
+            },
             _ => None,
         })
         .collect()

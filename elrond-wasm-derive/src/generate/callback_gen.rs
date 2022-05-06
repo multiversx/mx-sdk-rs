@@ -1,6 +1,6 @@
 use super::{
     method_call_gen::{
-        generate_body_with_result, generate_call_method_body, generate_call_to_method_expr,
+        generate_body_with_result, generate_endpoint_call_method_body, generate_call_to_method_expr,
     },
     payable_gen::*,
     util::*,
@@ -19,7 +19,7 @@ pub fn generate_callback_selector_and_main(
 ) -> (proc_macro2::TokenStream, proc_macro2::TokenStream) {
     let raw_decl = find_raw_callback(&contract.methods);
     if let Some(raw) = raw_decl {
-        let as_call_method = generate_call_method_body(&raw);
+        let as_call_method = generate_endpoint_call_method_body(&raw);
         let cb_selector_body = quote! {
             #as_call_method
             elrond_wasm::types::CallbackSelectorResult::Processed
