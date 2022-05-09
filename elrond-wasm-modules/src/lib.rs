@@ -5,6 +5,7 @@ pub mod dns;
 pub mod esdt;
 pub mod features;
 pub mod pause;
+pub mod staking;
 
 // TODO: remove alloc feature from the following, after they have been cleaned
 
