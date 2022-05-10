@@ -208,29 +208,29 @@ fn forwarder_call_async_multi_transfer_rs() {
     );
 }
 
-// #[test]
-// fn forwarder_call_async_retrieve_egld_rs() {
-//     elrond_wasm_debug::mandos_rs(
-//         "mandos/forwarder_call_async_retrieve_egld.scen.json",
-//         world(),
-//     );
-// }
+#[test]
+fn forwarder_call_async_retrieve_egld_rs() {
+    elrond_wasm_debug::mandos_rs(
+        "mandos/forwarder_call_async_retrieve_egld.scen.json",
+        world(),
+    );
+}
 
-// #[test]
-// fn forwarder_call_async_retrieve_esdt_rs() {
-//     elrond_wasm_debug::mandos_rs(
-//         "mandos/forwarder_call_async_retrieve_esdt.scen.json",
-//         world(),
-//     );
-// }
+#[test]
+fn forwarder_call_async_retrieve_esdt_rs() {
+    elrond_wasm_debug::mandos_rs(
+        "mandos/forwarder_call_async_retrieve_esdt.scen.json",
+        world(),
+    );
+}
 
-// #[test]
-// fn forwarder_call_async_retrieve_nft_rs() {
-//     elrond_wasm_debug::mandos_rs(
-//         "mandos/forwarder_call_async_retrieve_nft.scen.json",
-//         world(),
-//     );
-// }
+#[test]
+fn forwarder_call_async_retrieve_nft_rs() {
+    elrond_wasm_debug::mandos_rs(
+        "mandos/forwarder_call_async_retrieve_nft.scen.json",
+        world(),
+    );
+}
 
 #[test]
 fn forwarder_call_sync_accept_egld_rs() {

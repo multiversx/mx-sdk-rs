@@ -1,12 +1,10 @@
-use crate::num_bigint::BigUint;
-use elrond_wasm::{
-    api::ESDT_MULTI_TRANSFER_FUNC_NAME, elrond_codec::TopDecode, types::heap::Address,
-};
-use num_traits::Zero;
-
 use crate::{
     tx_execution::default_execution,
-    tx_mock::{BlockchainUpdate, TxCache, TxInput, TxInputESDT, TxLog, TxResult},
+    tx_mock::{BlockchainUpdate, TxCache, TxInput, TxLog, TxResult},
+};
+use elrond_wasm::{
+    api::ESDT_MULTI_TRANSFER_FUNC_NAME,
+    elrond_codec::{TopDecode, TopEncode},
 };
 
 pub fn execute_esdt_multi_transfer(
@@ -23,73 +21,37 @@ pub fn execute_esdt_multi_transfer(
         "MultiESDTNFTTransfer expects that to == from"
     );
 
-    let mut arg_index = 0;
-    let destination_bytes = tx_input.args[arg_index].as_slice();
-    let destination = Address::top_decode(destination_bytes).unwrap();
-    arg_index += 1;
-    let payments = usize::top_decode(tx_input.args[arg_index].as_slice()).unwrap();
-    arg_index += 1;
-
-    if tx_input.args.len() < 2 + payments * 3 {
+    let nr_payments = usize::top_decode(tx_input.args[1].as_slice()).unwrap();
+    if tx_input.args.len() < 2 + nr_payments * 3 {
         let err_result =
             TxResult::from_vm_error("MultiESDTNFTTransfer too few arguments".to_string());
         return (err_result, BlockchainUpdate::empty());
     }
 
-    let mut esdt_values = Vec::new();
-    let mut builtin_logs = Vec::new();
-    for _ in 0..payments {
-        let token_identifier = tx_input.args[arg_index].clone();
-        arg_index += 1;
-        let nonce_bytes = tx_input.args[arg_index].clone();
-        let nonce = u64::top_decode(nonce_bytes.as_slice()).unwrap();
-        arg_index += 1;
-        let value_bytes = tx_input.args[arg_index].clone();
-        let value = BigUint::from_bytes_be(value_bytes.as_slice());
-        arg_index += 1;
+    let exec_input = tx_input.convert_to_token_transfer();
+    let sender_addr = exec_input.from.clone();
+    let dest_addr_bytes = exec_input.to.to_vec();
 
-        esdt_values.push(TxInputESDT {
-            token_identifier: token_identifier.clone(),
-            nonce,
-            value: value.clone(),
-        });
+    let mut builtin_logs = Vec::new();
+    for esdt_transfer in &exec_input.esdt_values {
+        let mut nonce_bytes = Vec::new();
+        esdt_transfer.nonce.top_encode(&mut nonce_bytes).unwrap();
+
+        let mut value_bytes = Vec::new();
+        esdt_transfer.value.top_encode(&mut value_bytes).unwrap();
 
         builtin_logs.push(TxLog {
-            address: tx_input.from.clone(),
+            address: sender_addr.clone(),
             endpoint: ESDT_MULTI_TRANSFER_FUNC_NAME.to_vec(),
             topics: vec![
-                token_identifier,
+                esdt_transfer.token_identifier.clone(),
                 nonce_bytes,
                 value_bytes,
-                destination_bytes.to_vec(),
+                dest_addr_bytes.clone(),
             ],
             data: vec![],
         });
     }
-
-    let func_name = tx_input
-        .args
-        .get(arg_index)
-        .map(Vec::clone)
-        .unwrap_or_default();
-    arg_index += 1;
-    let args = if tx_input.args.len() > arg_index {
-        tx_input.args[arg_index..].to_vec()
-    } else {
-        Vec::new()
-    };
-
-    let exec_input = TxInput {
-        from: tx_input.from,
-        to: destination,
-        egld_value: BigUint::zero(),
-        esdt_values,
-        func_name,
-        args,
-        gas_limit: tx_input.gas_limit,
-        gas_price: tx_input.gas_price,
-        tx_hash: tx_input.tx_hash,
-    };
 
     let (mut tx_result, blockchain_updates) = default_execution(exec_input, tx_cache);
 

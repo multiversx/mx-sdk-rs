@@ -1,6 +1,10 @@
 use crate::{display_util::*, num_bigint::BigUint};
 use alloc::vec::Vec;
-use elrond_wasm::types::heap::{Address, H256};
+use elrond_wasm::{
+    api::{ESDT_MULTI_TRANSFER_FUNC_NAME, ESDT_NFT_TRANSFER_FUNC_NAME, ESDT_TRANSFER_FUNC_NAME},
+    elrond_codec::TopDecode,
+    types::heap::{Address, H256},
+};
 use num_traits::Zero;
 use std::fmt;
 
@@ -15,6 +19,126 @@ pub struct TxInput {
     pub gas_limit: u64,
     pub gas_price: u64,
     pub tx_hash: H256,
+}
+
+impl TxInput {
+    pub fn convert_to_token_transfer(self) -> Self {
+        match &self.func_name[..] {
+            ESDT_TRANSFER_FUNC_NAME => self.convert_to_esdt_transfer(),
+            ESDT_NFT_TRANSFER_FUNC_NAME => self.convert_to_nft_transfer(),
+            ESDT_MULTI_TRANSFER_FUNC_NAME => self.convert_to_esdt_multi_transfer(),
+            _ => self,
+        }
+    }
+
+    fn convert_to_esdt_transfer(self) -> Self {
+        let token_identifier = self.args[0].clone();
+        let value = BigUint::from_bytes_be(self.args[1].as_slice());
+
+        let esdt_values = vec![TxInputESDT {
+            token_identifier: token_identifier.clone(),
+            nonce: 0,
+            value: value.clone(),
+        }];
+
+        let func_name = self.args.get(2).map(Vec::clone).unwrap_or_default();
+        let args = if self.args.len() > 2 {
+            self.args[3..].to_vec()
+        } else {
+            Vec::new()
+        };
+
+        TxInput {
+            from: self.from,
+            to: self.to,
+            egld_value: BigUint::zero(),
+            esdt_values,
+            func_name,
+            args,
+            gas_limit: self.gas_limit,
+            gas_price: self.gas_price,
+            tx_hash: self.tx_hash,
+        }
+    }
+
+    fn convert_to_nft_transfer(self) -> Self {
+        let token_identifier = self.args[0].clone();
+        let nonce = u64::top_decode(self.args[1].as_slice()).unwrap();
+        let value = BigUint::from_bytes_be(self.args[2].as_slice());
+        let destination = Address::top_decode(self.args[3].as_slice()).unwrap();
+
+        let esdt_values = vec![TxInputESDT {
+            token_identifier,
+            nonce,
+            value,
+        }];
+
+        let func_name = self.args.get(4).map(Vec::clone).unwrap_or_default();
+        let args = if self.args.len() > 5 {
+            self.args[5..].to_vec()
+        } else {
+            Vec::new()
+        };
+
+        TxInput {
+            from: self.from,
+            to: destination,
+            egld_value: BigUint::zero(),
+            esdt_values,
+            func_name,
+            args,
+            gas_limit: self.gas_limit,
+            gas_price: self.gas_price,
+            tx_hash: self.tx_hash,
+        }
+    }
+
+    fn convert_to_esdt_multi_transfer(self) -> Self {
+        let mut arg_index = 0;
+        let destination_bytes = self.args[arg_index].as_slice();
+        let destination = Address::top_decode(destination_bytes).unwrap();
+        arg_index += 1;
+        let payments = usize::top_decode(self.args[arg_index].as_slice()).unwrap();
+        arg_index += 1;
+
+        let mut esdt_values = Vec::new();
+        for _ in 0..payments {
+            let token_identifier = self.args[arg_index].clone();
+            arg_index += 1;
+            let nonce_bytes = self.args[arg_index].clone();
+            let nonce = u64::top_decode(nonce_bytes.as_slice()).unwrap();
+            arg_index += 1;
+            let value_bytes = self.args[arg_index].clone();
+            let value = BigUint::from_bytes_be(value_bytes.as_slice());
+            arg_index += 1;
+
+            esdt_values.push(TxInputESDT {
+                token_identifier: token_identifier.clone(),
+                nonce,
+                value: value.clone(),
+            });
+        }
+
+        let func_name = self.args.get(arg_index).map(Vec::clone).unwrap_or_default();
+        arg_index += 1;
+        let args = if self.args.len() > arg_index {
+            self.args[arg_index..].to_vec()
+        } else {
+            Vec::new()
+        };
+
+        TxInput {
+            from: self.from,
+            to: destination,
+            egld_value: BigUint::zero(),
+            esdt_values,
+            func_name,
+            args,
+            gas_limit: self.gas_limit,
+            gas_price: self.gas_price,
+            tx_hash: self.tx_hash,
+        }
+    }
 }
 
 impl fmt::Display for TxInput {
