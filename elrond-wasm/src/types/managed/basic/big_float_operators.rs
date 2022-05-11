@@ -1,8 +1,9 @@
+use super::BigFloat;
+use crate::{
+    api::{BigFloatApi, ManagedTypeApi},
+    types::managed::managed_type_trait::ManagedType,
+};
 use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
-
-use crate::api::{BigFloatApi, ManagedTypeApi};
-
-use super::{BigFloat, ManagedType};
 
 macro_rules! binary_operator {
     ($trait:ident, $method:ident, $api_func:ident) => {
