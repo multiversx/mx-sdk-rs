@@ -1,14 +1,16 @@
 use crate::{
-    api::{
-        BlockchainApi, BlockchainApiImpl, ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi,
-    },
-    contract_base::ManagedSerializer,
+    api::{BlockchainApi, ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi},
+    contract_base::{BlockchainWrapper, ExitCodecErrorHandler, ManagedSerializer},
+    err_msg,
+    io::ManagedResultArgLoader,
     storage::StorageKey,
     storage_clear, storage_get, storage_set,
     types::{ManagedBuffer, ManagedType},
-    ContractCallArg, ManagedResultArgLoader,
 };
-use elrond_codec::elrond_codec_derive::{TopDecode, TopEncode};
+use elrond_codec::{
+    elrond_codec_derive::{TopDecode, TopEncode},
+    TopEncodeMulti,
+};
 
 use super::ManagedArgBuffer;
 
@@ -48,8 +50,9 @@ impl<M: ManagedTypeApi + ErrorApi> CallbackClosure<M> {
         }
     }
 
-    pub fn push_endpoint_arg<D: ContractCallArg>(&mut self, endpoint_arg: D) {
-        endpoint_arg.push_dyn_arg(&mut self.closure_args);
+    pub fn push_endpoint_arg<T: TopEncodeMulti>(&mut self, endpoint_arg: &T) {
+        let h = ExitCodecErrorHandler::<M>::from(err_msg::CONTRACT_CALL_ENCODE_ERROR);
+        let Ok(()) = endpoint_arg.multi_encode_or_handle_err(&mut self.closure_args, h);
     }
 
     pub fn save_to_storage<A: BlockchainApi + StorageWriteApi>(&self) {
@@ -83,7 +86,7 @@ impl<M: ManagedTypeApi + ErrorApi> CallbackClosure<M> {
 }
 
 pub(super) fn cb_closure_storage_key<A: BlockchainApi>() -> StorageKey<A> {
-    let tx_hash = A::blockchain_api_impl().get_tx_hash::<A>();
+    let tx_hash = BlockchainWrapper::<A>::new().get_tx_hash();
     let mut storage_key = StorageKey::new(CALLBACK_CLOSURE_STORAGE_BASE_KEY);
     storage_key.append_managed_buffer(tx_hash.as_managed_buffer());
     storage_key

@@ -1,0 +1,12 @@
+[package]
+name = "esdt-transfer-with-fee-meta"
+version = "0.0.0"
+edition = "2018"
+publish = false
+
+[dependencies.esdt-transfer-with-fee]
+path = ".."
+
+[dependencies.elrond-wasm-debug]
+version = "0.31.1"
+path = "../../../../elrond-wasm-debug"

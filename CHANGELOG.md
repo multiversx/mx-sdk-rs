@@ -4,6 +4,57 @@ There are several crates in this repo, this changelog will keep track of all of 
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [elrond-wasm 0.31.1, mandos 0.13.1] - 2022-05-04
+- Bugfix - formatter single char issue.
+
+## [elrond-wasm 0.31.0, elrond-codec 0.11.0, mandos 0.13.0] - 2022-05-02
+- Improved formatter. Strings can be formatted similarly to the standard Rust ones, but without allocator, using managed buffers. Macros `require!`, `sc_panic!`, `sc_format!`, `sc_print!` use it.
+- Removed build flag `ei-1-1`, following mainnet updated and new VM endpoints being available. Among others, managed `sha256` and `keccak256` APIs can be used freely.
+- `CodecFrom` and `CodecInto` traits to define equivalent encodings and conversions via codec.
+- Generated smart contract proxies use the `CodecFrom`/`CodecInto` traits to accept a wider range of types.
+- Mandos Rust testing framework v2, which uses contract proxies for composing calls and is capable of building and exporting mandos scenarios.
+- Managed type handle management system in the contract, to reduce the number of API calls to the VM. General VM API refactor.
+- Eliminated `#[var_args]` annotation. The framework can now distinguish between single-values and multi-values solely based on type.
+- Contract cleans up return data after performing synchronous calls. Getting return data by range is no longer needed and the respective methods have been removed.
+- Fixed behavior of blockchain API `get_esdt_token_data`.
+- Git tag/commit info in ABI (fixed & reintroduced).
+
+## [elrond-wasm 0.30.0, elrond-codec 0.10.0] - 2022-03-17
+- Feature flags in `elrond-wasm`:
+	- `alloc` allows contracts to use the heap allocator. It is not a hard restriction, there is still access to the implementations of the heap-allocated types, but they are not imported. Some methods are only available with this flag.
+	- `ei-1-1` allows contracts to use VM endpoints that are not yet available on the mainnet.
+- Fixes with async calls, smart contract deploy & upgrade.
+- Refactoring regarding small number types in the API.
+- Rust testing framework: Allow checking NFT balance without also checking attributes.
+- View for `MapMapper`.
+
+## [elrond-wasm 0.29.3] - 2022-03-03
+- `ManagedVec` backwards compatible implementation for `set`.
+- Implemented `ManagedVecItem` for `Option<T>`.
+
+## [elrond-wasm 0.29.2] - 2022-03-01
+- Disabled git tag/commit info in ABI due to issue in standard modules.
+
+## [elrond-wasm 0.29.0] - 2022-03-01
+- Cleaned up allocator from modules: `DnsModule`, `EsdtModule`, `FeaturesModule`, `PauseModule`, `UsersModule`.
+- Crypto API managed wrapper over legacy VM endpoints.
+- Managed multi-value types refactor and rename.
+- `ManagedVec` - `remove`, `contains`, `find`.
+- `ManagedVecItem` derive for simple enums.
+- Feature `cb_closure_managed_deser` replaced by `cb_closure_unmanaged_deser`, managed implementation is now the default.
+- Git tag/commit info in ABI.
+
+## [elrond-wasm 0.28.0, elrond-codec 0.9.0, mandos 0.12.0] - 2022-02-22
+- Major elrond-codec refactor:
+	- Redesigned the error handling for single value encoding
+	- Introduced multi-value encoding, which replaces the previous endpoint argument and result mechanisms
+- Mandos improvements:
+	- Multi-values: out, topics, ESDT uri
+	- Logs "+" wildcard
+- Builtin function mocks: `ESDTNFTUpdateAttributes`, `ESDTNFTAddURI`
+- New storage mappers: `FungibleTokenMapper`, `NonFungibleTokenMapper`, `WhitelistMapper`
+- Call value wrapper avoids using invalid token index in requests
+
 ## [elrond-wasm 0.27.4, elrond-codec 0.8.5] - 2022-02-02
 - Backwards compatibility fix.
 

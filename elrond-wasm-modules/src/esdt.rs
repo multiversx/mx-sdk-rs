@@ -33,13 +33,13 @@ pub trait EsdtModule {
         token_display_name: ManagedBuffer,
         token_ticker: ManagedBuffer,
         token_type: EsdtTokenType,
-        #[var_args] opt_num_decimals: OptionalArg<usize>,
-    ) -> AsyncCall {
+        opt_num_decimals: OptionalValue<usize>,
+    ) {
         require!(self.token_id().is_empty(), "Token already issued");
 
         let num_decimals = match opt_num_decimals {
-            OptionalArg::Some(d) => d,
-            OptionalArg::None => 0,
+            OptionalValue::Some(d) => d,
+            OptionalValue::None => 0,
         };
 
         self.send()
@@ -53,6 +53,7 @@ pub trait EsdtModule {
             )
             .async_call()
             .with_callback(self.callbacks().issue_callback())
+            .call_and_exit()
     }
 
     #[callback]
@@ -106,7 +107,7 @@ pub trait EsdtModule {
             self.blockchain()
                 .get_esdt_token_data(&own_sc_address, &token_id, token_nonce);
 
-        token_data.decode_attributes_or_exit()
+        token_data.decode_attributes()
     }
 
     fn require_token_issued(&self) {

@@ -2,12 +2,11 @@ use std::cmp::Ordering;
 
 use elrond_wasm::{
     api::{Handle, ManagedBufferApi},
-    types::{Address, ManagedBuffer, ManagedType},
+    types::{heap::Address, ManagedBuffer, ManagedType},
 };
-use num_bigint::Sign;
 use num_traits::Zero;
 
-use crate::DebugApi;
+use crate::{num_bigint, num_bigint::Sign, DebugApi};
 
 impl DebugApi {
     pub fn insert_new_managed_buffer(&self, value: Vec<u8>) -> Handle {
@@ -31,6 +30,11 @@ impl DebugApi {
     pub fn insert_new_big_uint(&self, value: num_bigint::BigUint) -> Handle {
         let mut managed_types = self.m_types_borrow_mut();
         managed_types.big_int_map.insert_new_handle(value.into())
+    }
+
+    pub fn set_big_uint(&self, handle: Handle, value: num_bigint::BigUint) {
+        let mut managed_types = self.m_types_borrow_mut();
+        managed_types.big_int_map.insert(handle, value.into())
     }
 
     pub fn insert_new_big_uint_old(

@@ -1,5 +1,5 @@
-use elrond_wasm::types::Address;
-use num_bigint::BigUint;
+use crate::num_bigint::BigUint;
+use elrond_wasm::types::heap::Address;
 
 use super::{AccountEsdt, BlockInfo, BlockchainMock};
 

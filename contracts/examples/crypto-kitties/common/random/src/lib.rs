@@ -1,6 +1,13 @@
 #![no_std]
 
+use elrond_wasm::{api::ManagedTypeApi, types::ManagedByteArray};
+
 const SEED_SIZE: usize = 48;
+const SALT_SIZE: usize = 32;
+const BYTE_MAX: u16 = u8::MAX as u16 + 1u16;
+
+static mut SEED_STATIC_BUFFER: [u8; SEED_SIZE] = [0u8; SEED_SIZE];
+static mut SALT_STATIC_BUFFER: [u8; SALT_SIZE] = [0u8; SALT_SIZE];
 
 pub struct Random {
     data: [u8; SEED_SIZE],
@@ -17,18 +24,30 @@ pub trait Randomizeable {
 
 impl Random {
     /// block random seed + salt creates a stronger randomness source
-    pub fn new(seed: [u8; SEED_SIZE], salt: &[u8]) -> Self {
-        let mut rand_source = [0u8; SEED_SIZE];
-        let salt_len = salt.len();
+    pub fn new<M: ManagedTypeApi>(
+        seed: ManagedByteArray<M, SEED_SIZE>,
+        salt: ManagedByteArray<M, SALT_SIZE>,
+    ) -> Self {
+        unsafe {
+            // it's more efficient to load all the data in static buffers
+            // instead of reading byte by byte
+            SEED_STATIC_BUFFER.copy_from_slice(&seed.to_byte_array());
+            SALT_STATIC_BUFFER.copy_from_slice(&salt.to_byte_array());
 
-        for i in 0..SEED_SIZE {
-            rand_source[i] =
-                (((seed[i] as u16) + (salt[i % salt_len] as u16)) % (u8::MAX as u16 + 1u16)) as u8;
-        }
+            let mut rand_source = [0u8; SEED_SIZE];
 
-        Random {
-            data: rand_source,
-            current_index: 0,
+            for i in 0..SEED_SIZE {
+                let seed_byte = SEED_STATIC_BUFFER[i];
+                let salt_byte = SALT_STATIC_BUFFER[i % SALT_SIZE];
+                let sum = (seed_byte as u16) + (salt_byte as u16);
+
+                rand_source[i] = (sum % BYTE_MAX) as u8;
+            }
+
+            Random {
+                data: rand_source,
+                current_index: 0,
+            }
         }
     }
 
@@ -38,6 +57,7 @@ impl Random {
         let third_byte = self.next_u8() as u32;
         let fourth_byte = self.next_u8() as u32;
 
+        // TODO: Fix, this only generates in u8 range
         first_byte | second_byte | third_byte | fourth_byte
     }
 

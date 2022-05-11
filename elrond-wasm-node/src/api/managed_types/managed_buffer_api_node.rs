@@ -2,10 +2,10 @@ use crate::{api::unsafe_buffer, error_hook};
 use elrond_wasm::{
     api::{Handle, InvalidSliceError, ManagedBufferApi},
     err_msg,
-    types::BoxedBytes,
+    types::heap::BoxedBytes,
 };
 
-// #[allow(dead_code)]
+#[allow(dead_code)]
 extern "C" {
     fn mBufferNew() -> i32;
     fn mBufferNewFromBytes(byte_ptr: *const u8, byte_len: i32) -> i32;
@@ -23,15 +23,17 @@ extern "C" {
         sliceLength: i32,
         destinationHandle: i32,
     ) -> i32;
-    #[cfg(not(feature = "unmanaged-ei"))]
+    #[cfg(not(feature = "ei-unmanaged"))]
     fn mBufferEq(handle1: i32, handle2: i32) -> i32;
     fn mBufferSetBytes(mBufferHandle: i32, byte_ptr: *const u8, byte_len: i32) -> i32;
+
     fn mBufferSetByteSlice(
         mBufferHandle: i32,
         startingPosition: i32,
         dataLength: i32,
         dataOffset: *const u8,
     ) -> i32;
+
     fn mBufferSetRandom(destinationHandle: i32, length: i32) -> i32;
     fn mBufferAppend(accumulatorHandle: i32, dataHandle: i32) -> i32;
     fn mBufferAppendBytes(accumulatorHandle: i32, byte_ptr: *const u8, byte_len: i32) -> i32;
@@ -175,9 +177,8 @@ impl ManagedBufferApi for crate::VmApiImpl {
         }
     }
 
-    #[cfg(feature = "unmanaged-ei")]
+    #[cfg(feature = "ei-unmanaged")]
     fn mb_eq(&self, handle1: Handle, handle2: Handle) -> bool {
-        // TODO: might be worth adding a new hook to Arwen for this
         unsafe {
             let len1 = mBufferGetLength(handle1 as i32) as usize;
             let len2 = mBufferGetLength(handle2 as i32) as usize;
@@ -195,7 +196,7 @@ impl ManagedBufferApi for crate::VmApiImpl {
         }
     }
 
-    #[cfg(not(feature = "unmanaged-ei"))]
+    #[cfg(not(feature = "ei-unmanaged"))]
     fn mb_eq(&self, handle1: Handle, handle2: Handle) -> bool {
         unsafe { mBufferEq(handle1, handle2) > 0 }
     }

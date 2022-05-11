@@ -1,7 +1,7 @@
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
-use crate::common::FeeConfig;
+use crate::common::{FeeConfig, FeeConfigEnum};
 
 use super::{
     common,
@@ -13,43 +13,39 @@ use super::{
 
 #[elrond_wasm::module]
 pub trait ValidationModule: common::CommonModule {
-    fn require_valid_order_input_amount(
-        &self,
-        params: &OrderInputParams<Self::Api>,
-    ) -> SCResult<()> {
-        require!(params.amount != 0, "Amout cannot be zero");
+    fn require_valid_order_input_amount(&self, params: &OrderInputParams<Self::Api>) {
+        require!(params.amount != BigUint::zero(), "Amout cannot be zero");
         require!(
             self.calculate_fee_amount(
                 &params.amount,
-                &FeeConfig::Percent(FEE_PENALTY_INCREASE_PERCENT)
-            ) != 0,
+                &FeeConfig {
+                    fee_type: FeeConfigEnum::Percent,
+                    fixed_fee: BigUint::zero(),
+                    percent_fee: FEE_PENALTY_INCREASE_PERCENT,
+                }
+            ) != BigUint::zero(),
             "Penalty increase amount cannot be zero"
         );
-        Ok(())
     }
 
-    fn require_valid_order_input_match_provider(
-        &self,
-        params: &OrderInputParams<Self::Api>,
-    ) -> SCResult<()> {
+    fn require_valid_order_input_match_provider(&self, params: &OrderInputParams<Self::Api>) {
         require!(
-            params.match_provider.is_none() || !params.match_provider.clone().unwrap().is_zero(),
+            !params.match_provider.clone().is_zero(),
             "Match address cannot be zero"
         );
-        Ok(())
     }
 
-    fn require_valid_order_input_fee_config(
-        &self,
-        params: &OrderInputParams<Self::Api>,
-    ) -> SCResult<()> {
-        match params.fee_config.clone() {
-            FeeConfig::Fixed(amount) => {
-                require!(amount < params.amount, "Invalid fee config fixed amount");
-            },
-            FeeConfig::Percent(percent) => {
+    fn require_valid_order_input_fee_config(&self, params: &OrderInputParams<Self::Api>) {
+        match params.fee_config.fee_type.clone() {
+            FeeConfigEnum::Fixed => {
                 require!(
-                    percent < PERCENT_BASE_POINTS,
+                    params.fee_config.fixed_fee < params.amount,
+                    "Invalid fee config fixed amount"
+                );
+            },
+            FeeConfigEnum::Percent => {
+                require!(
+                    params.fee_config.percent_fee < PERCENT_BASE_POINTS,
                     "Percent value above maximum value"
                 );
             },
@@ -57,33 +53,24 @@ pub trait ValidationModule: common::CommonModule {
 
         let amount_after_fee = self.calculate_amount_after_fee(&params.amount, &params.fee_config);
         require!(amount_after_fee != 0, "Amount after fee cannot be zero");
-        Ok(())
     }
 
-    fn require_valid_order_input_deal_config(
-        &self,
-        params: &OrderInputParams<Self::Api>,
-    ) -> SCResult<()> {
+    fn require_valid_order_input_deal_config(&self, params: &OrderInputParams<Self::Api>) {
         require!(
             params.deal_config.match_provider_percent < PERCENT_BASE_POINTS,
             "Bad deal config"
         );
-        Ok(())
     }
 
-    fn require_valid_order_input_params(
-        &self,
-        params: &OrderInputParams<Self::Api>,
-    ) -> SCResult<()> {
-        self.require_valid_order_input_amount(params)?;
-        self.require_valid_order_input_match_provider(params)?;
-        self.require_valid_order_input_fee_config(params)?;
-        self.require_valid_order_input_deal_config(params)?;
-        Ok(())
+    fn require_valid_order_input_params(&self, params: &OrderInputParams<Self::Api>) {
+        self.require_valid_order_input_amount(params);
+        self.require_valid_order_input_match_provider(params);
+        self.require_valid_order_input_fee_config(params);
+        self.require_valid_order_input_deal_config(params);
     }
 
-    fn require_valid_buy_payment(&self) -> SCResult<Payment<Self::Api>> {
-        self.require_fungible_input()?;
+    fn require_valid_buy_payment(&self) -> Payment<Self::Api> {
+        self.require_fungible_input();
         let second_token_id = self.second_token_id().get();
         let (amount, token_id) = self.call_value().payment_token_pair();
         require!(
@@ -91,11 +78,12 @@ pub trait ValidationModule: common::CommonModule {
             "Token in and second token id should be the same"
         );
         require!(amount != 0, "Input amount should not be zero");
-        Ok(Payment { token_id, amount })
+
+        Payment { token_id, amount }
     }
 
-    fn require_valid_sell_payment(&self) -> SCResult<Payment<Self::Api>> {
-        self.require_fungible_input()?;
+    fn require_valid_sell_payment(&self) -> Payment<Self::Api> {
+        self.require_fungible_input();
         let first_token_id = self.first_token_id().get();
         let (amount, token_id) = self.call_value().payment_token_pair();
         require!(
@@ -103,60 +91,81 @@ pub trait ValidationModule: common::CommonModule {
             "Token in and first token id should be the same"
         );
         require!(amount != 0, "Input amount should not be zero");
-        Ok(Payment { token_id, amount })
+
+        Payment { token_id, amount }
     }
 
-    fn require_valid_match_input_order_ids(&self, order_ids: &[u64]) -> SCResult<()> {
+    fn require_valid_match_input_order_ids(&self, order_ids: &ManagedVec<u64>) {
         require!(order_ids.len() >= 2, "Should be at least two order ids");
-        Ok(())
     }
 
-    fn require_fungible_input(&self) -> SCResult<()> {
+    fn require_fungible_input(&self) {
         require!(
             self.call_value().esdt_token_nonce() == 0,
             "Nonce is not zero"
         );
-        Ok(())
     }
 
-    fn require_not_max_size(&self, address_order_ids: &[u64]) -> SCResult<()> {
+    fn require_not_max_size(&self, address_order_ids: &MultiValueManagedVec<u64>) {
         require!(
             address_order_ids.len() < MAX_ORDERS_PER_USER,
             "Cannot place more orders"
         );
-        Ok(())
     }
 
-    fn require_order_ids_not_empty(&self, order_ids: &[u64]) -> SCResult<()> {
+    fn require_order_ids_not_empty(&self, order_ids: &MultiValueManagedVec<u64>) {
         require!(!order_ids.is_empty(), "Order ids vec is empty");
-        Ok(())
     }
 
-    fn require_match_provider_empty_or_caller(&self, orders: &[Order<Self::Api>]) -> SCResult<()> {
+    fn require_match_provider_empty_or_caller(
+        &self,
+        orders: &MultiValueManagedVec<Order<Self::Api>>,
+    ) {
         let caller = &self.blockchain().get_caller();
 
         for order in orders.iter() {
-            match &order.match_provider {
-                Some(address) => {
-                    require!(address == caller, "Caller is not matched order id");
-                },
-                None => {},
+            if order.match_provider != ManagedAddress::zero() {
+                require!(
+                    &order.match_provider == caller,
+                    "Caller is not matched order id"
+                );
+            } else {
+                {}
             }
         }
-        Ok(())
     }
 
-    fn require_contains_all(&self, vec_base: &[u64], items: &[u64]) -> SCResult<()> {
+    fn require_contains_all(
+        &self,
+        vec_base: &MultiValueManagedVec<u64>,
+        items: &MultiValueManagedVec<u64>,
+    ) {
         for item in items.iter() {
-            require!(vec_base.contains(item), "Base vec do not contain item");
+            let mut check_item = false;
+            for base in vec_base.iter() {
+                if item == base {
+                    check_item = true;
+                    break;
+                }
+            }
+            require!(check_item, "Base vec does not contain item");
         }
-        Ok(())
     }
 
-    fn require_contains_none(&self, vec_base: &[u64], items: &[u64]) -> SCResult<()> {
+    fn require_contains_none(
+        &self,
+        vec_base: &MultiValueManagedVec<u64>,
+        items: &MultiValueManagedVec<u64>,
+    ) {
         for item in items.iter() {
-            require!(!vec_base.contains(item), "Base vec contains item");
+            let mut check_item = false;
+            for base in vec_base.iter() {
+                if item == base {
+                    check_item = true;
+                    break;
+                }
+            }
+            require!(!check_item, "Base vec contains item");
         }
-        Ok(())
     }
 }

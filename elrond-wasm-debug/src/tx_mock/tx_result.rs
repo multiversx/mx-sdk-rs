@@ -14,21 +14,6 @@ pub struct TxResult {
     pub result_calls: TxResultCalls,
 }
 
-impl fmt::Display for TxResult {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let results_hex: Vec<String> = self
-            .result_values
-            .iter()
-            .map(|r| format!("0x{}", hex::encode(r)))
-            .collect();
-        write!(
-            f,
-            "TxResult {{\n\tresult_status: {},\n\tresult_values:{:?}\n}}",
-            self.result_status, results_hex
-        )
-    }
-}
-
 impl TxResult {
     pub fn empty() -> TxResult {
         TxResult {
@@ -47,7 +32,7 @@ impl TxResult {
     pub fn from_panic_obj(panic_obj: &TxPanic) -> Self {
         TxResult {
             result_status: panic_obj.status,
-            result_message: String::from_utf8(panic_obj.message.clone()).unwrap(),
+            result_message: panic_obj.message.clone(),
             result_values: Vec::new(),
             result_logs: Vec::new(),
             result_calls: TxResultCalls::empty(),
@@ -123,5 +108,31 @@ impl TxResult {
 
     pub fn assert_user_error(&self, expected_message: &str) {
         self.assert_error(4, expected_message);
+    }
+}
+
+impl fmt::Display for TxResult {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let results_hex: Vec<String> = self
+            .result_values
+            .iter()
+            .map(|r| format!("0x{}", hex::encode(r)))
+            .collect();
+        write!(
+            f,
+            "TxResult {{\n\tresult_status: {},\n\tresult_values:{:?}\n}}",
+            self.result_status, results_hex
+        )
+    }
+}
+
+impl TxResult {
+    pub fn result_values_to_string(&self) -> String {
+        itertools::join(
+            self.result_values
+                .iter()
+                .map(|val| format!("0x{}", hex::encode(val))),
+            ", ",
+        )
     }
 }

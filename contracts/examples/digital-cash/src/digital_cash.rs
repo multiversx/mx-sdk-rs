@@ -8,6 +8,7 @@ mod deposit_info;
 use deposit_info::DepositInfo;
 
 pub const SECONDS_PER_ROUND: u64 = 6;
+pub use elrond_wasm::api::{ED25519_KEY_BYTE_LEN, ED25519_SIGNATURE_BYTE_LEN};
 
 #[elrond_wasm::contract]
 pub trait DigitalCash {
@@ -18,33 +19,27 @@ pub trait DigitalCash {
 
     #[endpoint]
     #[payable("*")]
-    fn fund(
-        &self,
-        #[payment] payment: BigUint,
-        #[payment_token] token: TokenIdentifier,
-        address: ManagedAddress,
-        valability: u64,
-    ) -> SCResult<()> {
-        require!(payment > BigUint::zero(), "amount must be greater than 0");
+    fn fund(&self, address: ManagedAddress, valability: u64) {
+        let payment: EsdtTokenPayment<Self::Api> = self.call_value().payment();
+        require!(
+            payment.amount > BigUint::zero(),
+            "amount must be greater than 0"
+        );
         require!(self.deposit(&address).is_empty(), "key already used");
 
-        let nft_nonce = self.call_value().esdt_token_nonce();
-
-        let deposit = &DepositInfo {
-            amount: payment,
+        let deposit = DepositInfo {
+            amount: payment.amount,
             depositor_address: self.blockchain().get_caller(),
             expiration_round: self.get_expiration_round(valability),
-            token_name: token,
-            nonce: nft_nonce,
+            token_name: payment.token_identifier,
+            nonce: payment.token_nonce,
         };
 
-        self.deposit(&address).set(deposit);
-
-        Ok(())
+        self.deposit(&address).set(&deposit);
     }
 
     #[endpoint]
-    fn withdraw(&self, address: ManagedAddress) -> SCResult<()> {
+    fn withdraw(&self, address: ManagedAddress) {
         require!(!self.deposit(&address).is_empty(), "non-existent key");
 
         let deposit = self.deposit(&address).get();
@@ -60,13 +55,16 @@ pub trait DigitalCash {
             &deposit.amount,
             b"successful withdrawal",
         );
-        self.deposit(&address).clear();
 
-        Ok(())
+        self.deposit(&address).clear();
     }
 
     #[endpoint]
-    fn claim(&self, address: ManagedAddress, signature: ManagedBuffer) -> SCResult<()> {
+    fn claim(
+        &self,
+        address: ManagedAddress,
+        signature: ManagedByteArray<Self::Api, ED25519_SIGNATURE_BYTE_LEN>,
+    ) {
         require!(!self.deposit(&address).is_empty(), "non-existent key");
 
         let deposit = self.deposit(&address).get();
@@ -76,12 +74,12 @@ pub trait DigitalCash {
             deposit.expiration_round >= self.blockchain().get_block_round(),
             "deposit expired"
         );
+
+        let key = address.as_managed_byte_array();
+        let message = caller_address.as_managed_buffer();
         require!(
-            self.crypto().verify_ed25519(
-                &address.to_byte_array()[..],
-                &caller_address.to_byte_array()[..],
-                signature.to_boxed_bytes().as_slice()
-            ),
+            self.crypto()
+                .verify_ed25519_managed::<32>(key, message, &signature),
             "invalid signature"
         );
 
@@ -93,19 +91,16 @@ pub trait DigitalCash {
             b"successful claim",
         );
         self.deposit(&address).clear();
-
-        Ok(())
     }
 
     //views
 
     #[view(amount)]
-    fn get_amount(&self, address: ManagedAddress) -> SCResult<BigUint> {
+    fn get_amount(&self, address: ManagedAddress) -> BigUint {
         require!(!self.deposit(&address).is_empty(), "non-existent key");
 
         let data = self.deposit(&address).get();
-
-        Ok(data.amount)
+        data.amount
     }
 
     //private functions

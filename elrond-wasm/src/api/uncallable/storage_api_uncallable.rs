@@ -1,7 +1,7 @@
 use crate::api::{
     Handle, StorageReadApi, StorageReadApiImpl, StorageWriteApi, StorageWriteApiImpl,
 };
-use alloc::vec::Vec;
+use alloc::boxed::Box;
 
 use super::UncallableApi;
 
@@ -18,19 +18,15 @@ impl StorageReadApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn storage_load_vec_u8(&self, _key: &[u8]) -> Vec<u8> {
+    fn storage_load_to_heap(&self, _key: &[u8]) -> Box<[u8]> {
         unreachable!()
     }
 
-    fn storage_load_big_uint_raw(&self, _key: &[u8]) -> Handle {
+    fn storage_load_big_uint_raw(&self, _key: &[u8], _dest: Handle) {
         unreachable!()
     }
 
-    fn storage_load_managed_buffer_raw(&self, _key_handle: Handle) -> Handle {
-        unreachable!()
-    }
-
-    fn storage_load_managed_buffer_len(&self, _key_handle: Handle) -> usize {
+    fn storage_load_managed_buffer_raw(&self, _key_handle: Handle, _dest: Handle) {
         unreachable!()
     }
 
@@ -42,7 +38,12 @@ impl StorageReadApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn storage_load_from_address(&self, _address_handle: Handle, _key_handle: Handle) -> Handle {
+    fn storage_load_from_address(
+        &self,
+        _address_handle: Handle,
+        _key_handle: Handle,
+        _dest: Handle,
+    ) {
         unreachable!()
     }
 }

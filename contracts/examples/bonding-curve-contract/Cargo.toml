@@ -6,17 +6,17 @@ edition = "2018"
 publish = false
 
 [lib]
-path = "src/lib.rs"
+path = "src/bonding_curve_contract.rs"
 
 [dependencies.elrond-wasm]
-version = "0.27.4"
+version = "0.31.1"
 path = "../../../elrond-wasm"
 
 [dependencies.elrond-wasm-modules]
-version = "0.27.4"
+version = "0.31.1"
 path = "../../../elrond-wasm-modules"
 
 [dev-dependencies.elrond-wasm-debug]
-version = "0.27.4"
+version = "0.31.1"
 path = "../../../elrond-wasm-debug"
 

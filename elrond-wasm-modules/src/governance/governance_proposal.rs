@@ -1,19 +1,16 @@
-use elrond_wasm::{
-    api::ManagedTypeApi,
-    types::{BigUint, BoxedBytes, ManagedAddress, ManagedBuffer, MultiArg7, TokenIdentifier},
-    Vec,
-};
-
+elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
-pub type GovernanceActionAsMultiArg<M> = MultiArg7<
+pub(crate) const MAX_ACTIONS: usize = 20;
+
+pub type GovernanceActionAsMultiArg<M> = MultiValue7<
     u64,
     ManagedAddress<M>,
     TokenIdentifier<M>,
     u64,
     BigUint<M>,
     ManagedBuffer<M>,
-    Vec<BoxedBytes>,
+    ManagedVec<M, ManagedBuffer<M>>,
 >;
 
 #[derive(TypeAbi, TopEncode, TopDecode, PartialEq)]
@@ -34,7 +31,7 @@ pub struct GovernanceAction<M: ManagedTypeApi> {
     pub token_nonce: u64,
     pub amount: BigUint<M>,
     pub function_name: ManagedBuffer<M>,
-    pub arguments: Vec<BoxedBytes>,
+    pub arguments: ManagedVec<M, ManagedBuffer<M>>,
 }
 
 impl<M: ManagedTypeApi> GovernanceAction<M> {
@@ -55,6 +52,6 @@ impl<M: ManagedTypeApi> GovernanceAction<M> {
 #[derive(TypeAbi, TopEncode, TopDecode)]
 pub struct GovernanceProposal<M: ManagedTypeApi> {
     pub proposer: ManagedAddress<M>,
-    pub actions: Vec<GovernanceAction<M>>,
-    pub description: BoxedBytes,
+    pub actions: ArrayVec<GovernanceAction<M>, MAX_ACTIONS>,
+    pub description: ManagedBuffer<M>,
 }

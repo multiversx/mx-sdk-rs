@@ -1,14 +1,11 @@
 use crate::{api::managed_types::big_int_api_node::unsafe_buffer_load_be_pad_right, VmApiImpl};
 use alloc::vec::Vec;
 use elrond_wasm::{
-    api::{
-        BlockchainApi, BlockchainApiImpl, ManagedTypeApi, SendApiImpl, StorageReadApiImpl,
-        StorageWriteApiImpl,
-    },
+    api::{const_handles, BlockchainApi, BlockchainApiImpl, ManagedTypeApi, SendApiImpl},
     types::{
-        managed_vec_from_slice_of_boxed_bytes, Address, BigUint, BoxedBytes, CodeMetadata,
-        EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer, ManagedType, ManagedVec,
-        TokenIdentifier,
+        heap::{Address, ArgBuffer, BoxedBytes},
+        managed_vec_from_slice_of_boxed_bytes, BigUint, CodeMetadata, EsdtTokenPayment,
+        ManagedAddress, ManagedArgBuffer, ManagedBuffer, ManagedType, ManagedVec, TokenIdentifier,
     },
     HexCallDataSerializer,
 };
@@ -174,6 +171,10 @@ extern "C" {
     fn getNumReturnData() -> i32;
     fn getReturnDataSize(result_index: i32) -> i32;
     fn getReturnData(result_index: i32, dataOffset: *const u8) -> i32;
+
+    /// Clears results propagated from nested sync calls
+    fn cleanReturnData();
+    fn deleteFromReturnData(resultID: i32);
 }
 
 impl SendApiImpl for VmApiImpl {
@@ -195,6 +196,20 @@ impl SendApiImpl for VmApiImpl {
         }
     }
 
+    fn create_async_call_raw<M: ManagedTypeApi>(
+        &self,
+        _to: &ManagedAddress<M>,
+        _amount: &BigUint<M>,
+        _endpoint_name: &ManagedBuffer<M>,
+        _success: &'static [u8],
+        _error: &'static [u8],
+        _gas: u64,
+        _extra_gas_for_callback: u64,
+        _arg_buffer: &ManagedArgBuffer<M>,
+    ) {
+        unreachable!()
+    }
+
     fn direct_egld_execute<M: ManagedTypeApi>(
         &self,
         to: &ManagedAddress<M>,
@@ -205,7 +220,7 @@ impl SendApiImpl for VmApiImpl {
     ) -> Result<(), &'static [u8]> {
         let to_address = to.to_address();
         let function = endpoint_name.to_boxed_bytes();
-        let legacy_arg_buffer = arg_buffer.to_legacy_arg_buffer();
+        let legacy_arg_buffer = ArgBuffer::from(arg_buffer);
         unsafe {
             let amount_bytes32_ptr = unsafe_buffer_load_be_pad_right(amount.get_raw_handle(), 32);
             let result = transferValueExecute(
@@ -239,7 +254,7 @@ impl SendApiImpl for VmApiImpl {
         unsafe {
             let amount_bytes32_ptr = unsafe_buffer_load_be_pad_right(amount.get_raw_handle(), 32);
             let function = endpoint_name.to_boxed_bytes();
-            let legacy_arg_buffer = arg_buffer.to_legacy_arg_buffer();
+            let legacy_arg_buffer = ArgBuffer::from(arg_buffer);
             let result = transferESDTExecute(
                 to_address.as_ptr(),
                 token.to_esdt_identifier().as_ptr(),
@@ -274,7 +289,7 @@ impl SendApiImpl for VmApiImpl {
         unsafe {
             let amount_bytes32_ptr = unsafe_buffer_load_be_pad_right(amount.get_raw_handle(), 32);
             let function = endpoint_name.to_boxed_bytes();
-            let legacy_arg_buffer = arg_buffer.to_legacy_arg_buffer();
+            let legacy_arg_buffer = ArgBuffer::from(arg_buffer);
             let result = transferESDTNFTExecute(
                 to_address.as_ptr(),
                 token.to_esdt_identifier().as_ptr(),
@@ -325,7 +340,7 @@ impl SendApiImpl for VmApiImpl {
             }
 
             let function = endpoint_name.to_boxed_bytes();
-            let legacy_arg_buffer = arg_buffer.to_legacy_arg_buffer();
+            let legacy_arg_buffer = ArgBuffer::from(arg_buffer);
             let to_address = to.to_address();
             let result = multiTransferESDTNFTExecute(
                 to_address.as_ptr(),
@@ -382,7 +397,7 @@ impl SendApiImpl for VmApiImpl {
             let num_return_data_before = getNumReturnData();
 
             let amount_bytes32_ptr = unsafe_buffer_load_be_pad_right(amount.get_raw_handle(), 32);
-            let legacy_arg_buffer = arg_buffer.to_legacy_arg_buffer();
+            let legacy_arg_buffer = ArgBuffer::from(arg_buffer);
             let code_metadata_bytes = code_metadata.to_byte_array();
             let code_bytes = code.to_boxed_bytes();
             let _ = createContract(
@@ -419,7 +434,7 @@ impl SendApiImpl for VmApiImpl {
 
             let amount_bytes32_ptr = unsafe_buffer_load_be_pad_right(amount.get_raw_handle(), 32);
             let code_metadata_bytes = code_metadata.to_byte_array();
-            let legacy_arg_buffer = arg_buffer.to_legacy_arg_buffer();
+            let legacy_arg_buffer = ArgBuffer::from(arg_buffer);
             let source_contract_address_bytes = source_contract_address.to_address();
             let _ = deployFromSourceContract(
                 gas as i64,
@@ -452,7 +467,7 @@ impl SendApiImpl for VmApiImpl {
         unsafe {
             let amount_bytes32_ptr = unsafe_buffer_load_be_pad_right(amount.get_raw_handle(), 32);
             let code_metadata_bytes = code_metadata.to_byte_array();
-            let legacy_arg_buffer = arg_buffer.to_legacy_arg_buffer();
+            let legacy_arg_buffer = ArgBuffer::from(arg_buffer);
             let source_contract_address_bytes = source_contract_address.to_address();
             let sc_address_bytes = sc_address.to_address();
 
@@ -481,7 +496,7 @@ impl SendApiImpl for VmApiImpl {
         unsafe {
             let amount_bytes32_ptr = unsafe_buffer_load_be_pad_right(amount.get_raw_handle(), 32);
             let code_metadata_bytes = code_metadata.to_byte_array();
-            let legacy_arg_buffer = arg_buffer.to_legacy_arg_buffer();
+            let legacy_arg_buffer = ArgBuffer::from(arg_buffer);
             let sc_address_bytes = sc_address.to_address();
             let code_bytes = code.to_boxed_bytes();
             upgradeContract(
@@ -511,7 +526,7 @@ impl SendApiImpl for VmApiImpl {
 
             let amount_bytes32_ptr = unsafe_buffer_load_be_pad_right(amount.get_raw_handle(), 32);
             let function = endpoint_name.to_boxed_bytes();
-            let legacy_arg_buffer = arg_buffer.to_legacy_arg_buffer();
+            let legacy_arg_buffer = ArgBuffer::from(arg_buffer);
             let to_address = to.to_address();
             let _ = executeOnDestContext(
                 gas as i64,
@@ -530,49 +545,6 @@ impl SendApiImpl for VmApiImpl {
         }
     }
 
-    fn execute_on_dest_context_raw_custom_result_range<M, F>(
-        &self,
-        gas: u64,
-        to: &ManagedAddress<M>,
-        amount: &BigUint<M>,
-        endpoint_name: &ManagedBuffer<M>,
-        arg_buffer: &ManagedArgBuffer<M>,
-        range_closure: F,
-    ) -> ManagedVec<M, ManagedBuffer<M>>
-    where
-        M: ManagedTypeApi,
-        F: FnOnce(usize, usize) -> (usize, usize),
-    {
-        unsafe {
-            let num_return_data_before = getNumReturnData();
-
-            let amount_bytes32_ptr = unsafe_buffer_load_be_pad_right(amount.get_raw_handle(), 32);
-            let function = endpoint_name.to_boxed_bytes();
-            let legacy_arg_buffer = arg_buffer.to_legacy_arg_buffer();
-            let to_address = to.to_address();
-            let _ = executeOnDestContext(
-                gas as i64,
-                to_address.as_ptr(),
-                amount_bytes32_ptr,
-                function.as_ptr(),
-                function.len() as i32,
-                legacy_arg_buffer.num_args() as i32,
-                legacy_arg_buffer.arg_lengths_bytes_ptr(),
-                legacy_arg_buffer.arg_data_ptr(),
-            );
-
-            let num_return_data_after = getNumReturnData();
-            let (result_start_index, result_end_index) = range_closure(
-                num_return_data_before as usize,
-                num_return_data_after as usize,
-            );
-
-            let result_bytes =
-                get_return_data_range(result_start_index as i32, result_end_index as i32);
-            managed_vec_from_slice_of_boxed_bytes(result_bytes.as_slice())
-        }
-    }
-
     fn execute_on_dest_context_by_caller_raw<M: ManagedTypeApi>(
         &self,
         gas: u64,
@@ -586,7 +558,7 @@ impl SendApiImpl for VmApiImpl {
 
             let amount_bytes32_ptr = unsafe_buffer_load_be_pad_right(amount.get_raw_handle(), 32);
             let function = endpoint_name.to_boxed_bytes();
-            let legacy_arg_buffer = arg_buffer.to_legacy_arg_buffer();
+            let legacy_arg_buffer = ArgBuffer::from(arg_buffer);
             let to_address = to.to_address();
             let _ = executeOnDestContextByCaller(
                 gas as i64,
@@ -618,7 +590,7 @@ impl SendApiImpl for VmApiImpl {
 
             let amount_bytes32_ptr = unsafe_buffer_load_be_pad_right(amount.get_raw_handle(), 32);
             let function = endpoint_name.to_boxed_bytes();
-            let legacy_arg_buffer = arg_buffer.to_legacy_arg_buffer();
+            let legacy_arg_buffer = ArgBuffer::from(arg_buffer);
             let to_address = to.to_address();
             let _ = executeOnSameContext(
                 gas as i64,
@@ -648,7 +620,7 @@ impl SendApiImpl for VmApiImpl {
             let num_return_data_before = getNumReturnData();
 
             let function = endpoint_name.to_boxed_bytes();
-            let legacy_arg_buffer = arg_buffer.to_legacy_arg_buffer();
+            let legacy_arg_buffer = ArgBuffer::from(arg_buffer);
             let to_address = to.to_address();
             let _ = executeReadOnly(
                 gas as i64,
@@ -666,18 +638,6 @@ impl SendApiImpl for VmApiImpl {
         }
     }
 
-    fn storage_store_tx_hash_key<M: ManagedTypeApi>(&self, data: &ManagedBuffer<M>) {
-        let tx_hash = self.get_tx_hash::<M>();
-        self.storage_store_managed_buffer_raw(tx_hash.get_raw_handle(), data.get_raw_handle());
-    }
-
-    fn storage_load_tx_hash_key<M: ManagedTypeApi>(&self) -> ManagedBuffer<M> {
-        let tx_hash = self.get_tx_hash::<M>();
-        ManagedBuffer::from_raw_handle(
-            self.storage_load_managed_buffer_raw(tx_hash.get_raw_handle()),
-        )
-    }
-
     fn call_local_esdt_built_in_function<M: ManagedTypeApi>(
         &self,
         gas: u64,
@@ -685,15 +645,28 @@ impl SendApiImpl for VmApiImpl {
         arg_buffer: &ManagedArgBuffer<M>,
     ) -> ManagedVec<M, ManagedBuffer<M>> {
         // account-level built-in function, so the destination address is the contract itself
-        let own_address = VmApiImpl::blockchain_api_impl().get_sc_address_handle();
+        let own_address_handle = const_handles::MBUF_TEMPORARY_1;
+        VmApiImpl::blockchain_api_impl().load_sc_address_managed(own_address_handle);
 
         self.execute_on_dest_context_raw(
             gas,
-            &ManagedAddress::from_raw_handle(own_address),
+            &ManagedAddress::from_raw_handle(own_address_handle),
             &BigUint::zero(),
             function_name,
             arg_buffer,
         )
+    }
+
+    fn clean_return_data(&self) {
+        unsafe {
+            cleanReturnData();
+        }
+    }
+
+    fn delete_from_return_data(&self, index: usize) {
+        unsafe {
+            deleteFromReturnData(index as i32);
+        }
     }
 }
 

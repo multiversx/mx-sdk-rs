@@ -38,10 +38,10 @@
             },
             "expect": {
                 "out": [
-                    ""
+                    "125"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }

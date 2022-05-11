@@ -20,7 +20,7 @@
                     "1"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -29,7 +29,7 @@
             "step": "scQuery",
             "txId": "prop-signers-1",
             "tx": {
-                "to": "sc:multisig-view",
+                "to": "sc:multisig",
                 "function": "getActionSigners",
                 "arguments": [
                     "1"
@@ -58,7 +58,7 @@
             "expect": {
                 "out": [],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -67,7 +67,7 @@
             "step": "scQuery",
             "txId": "prop-signers-2",
             "tx": {
-                "to": "sc:multisig-view",
+                "to": "sc:multisig",
                 "function": "getActionSigners",
                 "arguments": [
                     "1"
@@ -97,7 +97,7 @@
                 "out": [],
                 "status": "4",
                 "message": "str:quorum has not been reached",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -118,7 +118,7 @@
             "expect": {
                 "out": [],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -127,7 +127,7 @@
             "step": "scQuery",
             "txId": "prop-signers-3",
             "tx": {
-                "to": "sc:multisig-view",
+                "to": "sc:multisig",
                 "function": "getActionSigners",
                 "arguments": [
                     "1"
@@ -143,7 +143,7 @@
             "step": "scQuery",
             "txId": "prop-signers-3-count",
             "tx": {
-                "to": "sc:multisig-view",
+                "to": "sc:multisig",
                 "function": "getActionSignerCount",
                 "arguments": [
                     "1"
@@ -172,7 +172,7 @@
             "expect": {
                 "out": [],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -181,7 +181,7 @@
             "step": "scQuery",
             "txId": "getAllProposers",
             "tx": {
-                "to": "sc:multisig-view",
+                "to": "sc:multisig",
                 "function": "getAllProposers",
                 "arguments": []
             },

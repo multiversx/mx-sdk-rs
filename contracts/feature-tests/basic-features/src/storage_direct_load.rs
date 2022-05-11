@@ -30,18 +30,14 @@ pub trait StorageLoadFeatures {
     fn load_bool(&self) -> bool;
 
     #[endpoint]
-    #[storage_get("vec_u8")]
-    fn load_vec_u8(&self) -> Vec<u8>;
-
-    #[endpoint]
     #[storage_get("addr")]
-    fn load_addr(&self) -> Address;
+    fn load_addr(&self) -> ManagedAddress;
 
     #[storage_get("opt_addr")]
-    fn get_opt_addr(&self) -> Option<Address>;
+    fn get_opt_addr(&self) -> Option<ManagedAddress>;
 
     #[endpoint]
-    fn load_opt_addr(&self) -> OptionalResult<Address> {
+    fn load_opt_addr(&self) -> OptionalValue<ManagedAddress> {
         self.get_opt_addr().into()
     }
 
@@ -58,20 +54,16 @@ pub trait StorageLoadFeatures {
     fn clear_storage_value(&self);
 
     #[endpoint]
-    #[storage_get("ser_1")]
-    fn load_ser_1(&self) -> SerExample1;
-
-    #[endpoint]
     #[storage_get("ser_2")]
-    fn load_ser_2(&self) -> SerExample2;
+    fn load_ser_2(&self) -> ExampleEnumWithFields;
 
     #[endpoint]
     #[storage_get("map1")]
-    fn load_map1(&self, addr: Address) -> BigUint;
+    fn load_map1(&self, addr: ManagedAddress) -> BigUint;
 
     #[endpoint]
     #[storage_get("map2")]
-    fn load_map2(&self, addr1: &Address, addr2: &Address) -> BigUint;
+    fn load_map2(&self, addr1: &ManagedAddress, addr2: &ManagedAddress) -> BigUint;
 
     #[endpoint]
     #[storage_get("map3")]
@@ -79,10 +71,16 @@ pub trait StorageLoadFeatures {
 
     #[endpoint]
     fn load_from_address_raw(&self, address: ManagedAddress, key: ManagedBuffer) -> ManagedBuffer {
-        use elrond_wasm::api::{StorageReadApi, StorageReadApiImpl};
-        ManagedBuffer::from_raw_handle(
-            Self::Api::storage_read_api_impl()
-                .storage_load_from_address(address.get_raw_handle(), key.get_raw_handle()),
-        )
+        // TODO: maybe wrap this kind of functionality in a StorageRawWrapper
+        use elrond_wasm::api::{
+            StaticVarApi, StaticVarApiImpl, StorageReadApi, StorageReadApiImpl,
+        };
+        let value_handle = Self::Api::static_var_api_impl().next_handle();
+        Self::Api::storage_read_api_impl().storage_load_from_address(
+            address.get_raw_handle(),
+            key.get_raw_handle(),
+            value_handle,
+        );
+        ManagedBuffer::from_raw_handle(value_handle)
     }
 }

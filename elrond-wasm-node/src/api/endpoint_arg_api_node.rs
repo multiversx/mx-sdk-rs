@@ -1,9 +1,8 @@
 use crate::{error_hook, VmApiImpl};
-use alloc::vec::Vec;
 use elrond_wasm::{
-    api::{EndpointArgumentApi, EndpointArgumentApiImpl, Handle},
+    api::{EndpointArgumentApi, EndpointArgumentApiImpl, Handle, ManagedBufferApi},
     err_msg,
-    types::BoxedBytes,
+    types::heap::BoxedBytes,
 };
 
 extern "C" {
@@ -12,9 +11,8 @@ extern "C" {
     fn getArgument(id: i32, dstOffset: *mut u8) -> i32;
 
     // big int API
-    fn bigIntNew(value: i64) -> i32;
-    fn bigIntGetUnsignedArgument(arg_id: i32, dest: i32);
-    fn bigIntGetSignedArgument(arg_id: i32, dest: i32);
+    fn bigIntGetUnsignedArgument(arg_index: i32, dest: i32);
+    fn bigIntGetSignedArgument(arg_index: i32, dest: i32);
 
     // big float API
     fn bigFloatNewFromFrac(numerator: i64, denominator: i64) -> i32;
@@ -24,7 +22,6 @@ extern "C" {
     fn smallIntGetSignedArgument(id: i32) -> i64;
 
     // managed buffer API
-    fn mBufferNew() -> i32;
     fn mBufferGetArgument(argId: i32, mBufferHandle: i32) -> i32;
     fn mBufferToBigFloat(mBufferHandle: i32, bigFloatHandle: i32) -> i32;
 }
@@ -60,18 +57,6 @@ impl EndpointArgumentApiImpl for VmApiImpl {
         }
     }
 
-    fn get_argument_vec_u8(&self, arg_index: i32) -> Vec<u8> {
-        let len = self.get_argument_len(arg_index);
-        let mut res = Vec::with_capacity(len);
-        if len > 0 {
-            unsafe {
-                res.set_len(len);
-                getArgument(arg_index, res.as_mut_ptr());
-            }
-        }
-        res
-    }
-
     fn get_argument_boxed_bytes(&self, arg_index: i32) -> BoxedBytes {
         let len = self.get_argument_len(arg_index);
         unsafe {
@@ -84,45 +69,39 @@ impl EndpointArgumentApiImpl for VmApiImpl {
     }
 
     #[inline]
-    fn get_argument_big_uint_raw(&self, arg_id: i32) -> i32 {
+    fn load_argument_big_int_unsigned(&self, arg_index: i32, dest: Handle) {
         unsafe {
-            let handle = bigIntNew(0);
-            bigIntGetUnsignedArgument(arg_id, handle);
-            handle
+            bigIntGetUnsignedArgument(arg_index, dest);
         }
     }
 
     #[inline]
-    fn get_argument_big_int_raw(&self, arg_id: i32) -> i32 {
+    fn load_argument_big_int_signed(&self, arg_index: i32, dest: Handle) {
         unsafe {
-            let handle = bigIntNew(0);
-            bigIntGetSignedArgument(arg_id, handle);
-            handle
+            bigIntGetSignedArgument(arg_index, dest);
         }
     }
 
     #[inline]
-    fn get_argument_managed_buffer_raw(&self, arg_id: i32) -> Handle {
+    fn load_argument_managed_buffer(&self, arg_index: i32, dest: Handle) {
         unsafe {
-            let handle = mBufferNew();
-            mBufferGetArgument(arg_id, handle);
-            handle
+            mBufferGetArgument(arg_index, dest);
         }
     }
 
     #[inline]
-    fn get_argument_u64(&self, arg_id: i32) -> u64 {
-        unsafe { smallIntGetUnsignedArgument(arg_id) as u64 }
+    fn get_argument_u64(&self, arg_index: i32) -> u64 {
+        unsafe { smallIntGetUnsignedArgument(arg_index) as u64 }
     }
 
     #[inline]
-    fn get_argument_i64(&self, arg_id: i32) -> i64 {
-        unsafe { smallIntGetSignedArgument(arg_id) }
+    fn get_argument_i64(&self, arg_index: i32) -> i64 {
+        unsafe { smallIntGetSignedArgument(arg_index) }
     }
 
     fn get_argument_big_float(&self, arg_id: i32) -> Handle {
         unsafe {
-            let buffer_new_handle = mBufferNew();
+            let buffer_new_handle = self.mb_new_empty();
             mBufferGetArgument(arg_id, buffer_new_handle);
             let big_float_new_handle = bigFloatNewFromFrac(0, 1);
             mBufferToBigFloat(buffer_new_handle, big_float_new_handle);

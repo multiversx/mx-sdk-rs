@@ -1,8 +1,8 @@
+use crate::num_bigint::BigUint;
 use elrond_wasm::{
     api::ESDT_NFT_CREATE_FUNC_NAME,
     elrond_codec::{top_encode_to_vec_u8, TopDecode},
 };
-use num_bigint::BigUint;
 
 use crate::{
     tx_mock::{BlockchainUpdate, TxCache, TxInput, TxLog, TxResult, TxResultCalls},
@@ -44,7 +44,7 @@ pub fn execute_esdt_nft_create(
                 creator: Some(tx_input.from.clone()),
                 royalties,
                 hash: Some(hash),
-                uri: Some(uri),
+                uri: vec![uri],
                 attributes,
             },
         });

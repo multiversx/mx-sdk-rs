@@ -26,7 +26,7 @@ pub trait LocalEsdtAndEsdtNft {
         token_display_name: ManagedBuffer,
         token_ticker: ManagedBuffer,
         initial_supply: BigUint,
-    ) -> AsyncCall {
+    ) {
         let caller = self.blockchain().get_caller();
 
         self.send()
@@ -50,6 +50,7 @@ pub trait LocalEsdtAndEsdtNft {
             )
             .async_call()
             .with_callback(self.callbacks().esdt_issue_callback(&caller))
+            .call_and_exit()
     }
 
     #[endpoint(localMint)]
@@ -71,7 +72,7 @@ pub trait LocalEsdtAndEsdtNft {
         #[payment] issue_cost: BigUint,
         token_display_name: ManagedBuffer,
         token_ticker: ManagedBuffer,
-    ) -> AsyncCall {
+    ) {
         let caller = self.blockchain().get_caller();
 
         self.send()
@@ -91,6 +92,7 @@ pub trait LocalEsdtAndEsdtNft {
             )
             .async_call()
             .with_callback(self.callbacks().nft_issue_callback(&caller))
+            .call_and_exit()
     }
 
     #[endpoint(nftCreate)]
@@ -152,10 +154,10 @@ pub trait LocalEsdtAndEsdtNft {
         nonce: u64,
         amount: BigUint,
         function: ManagedBuffer,
-        #[var_args] arguments: VarArgs<ManagedBuffer>,
+        arguments: MultiValueEncoded<ManagedBuffer>,
     ) {
         let mut arg_buffer = ManagedArgBuffer::new_empty();
-        for arg in arguments.into_vec() {
+        for arg in arguments.into_iter() {
             arg_buffer.push_arg_raw(arg);
         }
 
@@ -179,7 +181,7 @@ pub trait LocalEsdtAndEsdtNft {
         #[payment] issue_cost: BigUint,
         token_display_name: ManagedBuffer,
         token_ticker: ManagedBuffer,
-    ) -> AsyncCall {
+    ) {
         let caller = self.blockchain().get_caller();
 
         self.send()
@@ -199,6 +201,7 @@ pub trait LocalEsdtAndEsdtNft {
             )
             .async_call()
             .with_callback(self.callbacks().nft_issue_callback(&caller))
+            .call_and_exit()
     }
 
     // common
@@ -208,13 +211,14 @@ pub trait LocalEsdtAndEsdtNft {
         &self,
         address: ManagedAddress,
         token_identifier: TokenIdentifier,
-        #[var_args] roles: ManagedVarArgs<EsdtLocalRole>,
-    ) -> AsyncCall {
+        roles: MultiValueEncoded<EsdtLocalRole>,
+    ) {
         self.send()
             .esdt_system_sc_proxy()
             .set_special_roles(&address, &token_identifier, roles.into_iter())
             .async_call()
             .with_callback(self.callbacks().change_roles_callback())
+            .call_and_exit()
     }
 
     #[endpoint(unsetLocalRoles)]
@@ -222,13 +226,14 @@ pub trait LocalEsdtAndEsdtNft {
         &self,
         address: ManagedAddress,
         token_identifier: TokenIdentifier,
-        #[var_args] roles: ManagedVarArgs<EsdtLocalRole>,
-    ) -> AsyncCall {
+        roles: MultiValueEncoded<EsdtLocalRole>,
+    ) {
         self.send()
             .esdt_system_sc_proxy()
             .unset_special_roles(&address, &token_identifier, roles.into_iter())
             .async_call()
             .with_callback(self.callbacks().change_roles_callback())
+            .call_and_exit()
     }
 
     // views

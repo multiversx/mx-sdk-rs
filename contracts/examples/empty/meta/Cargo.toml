@@ -7,10 +7,6 @@ publish = false
 [dependencies.empty]
 path = ".."
 
-[dependencies.elrond-wasm]
-version = "0.27.4"
-path = "../../../../elrond-wasm"
-
 [dependencies.elrond-wasm-debug]
-version = "0.27.4"
+version = "0.31.1"
 path = "../../../../elrond-wasm-debug"

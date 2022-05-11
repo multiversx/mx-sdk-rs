@@ -1,14 +1,10 @@
 use super::VmApiImpl;
 use elrond_wasm::{
     api::{CryptoApi, CryptoApiImpl, Handle},
-    types::{BoxedBytes, MessageHashType, H256},
-    Box,
+    types::{heap::BoxedBytes, MessageHashType},
 };
 
 extern "C" {
-    // managed buffer API
-    fn mBufferNew() -> i32;
-
     fn sha256(dataOffset: *const u8, length: i32, resultOffset: *mut u8) -> i32;
 
     fn managedSha256(inputHandle: i32, outputHandle: i32) -> i32;
@@ -70,43 +66,42 @@ impl CryptoApi for VmApiImpl {
 }
 
 impl CryptoApiImpl for VmApiImpl {
-    fn sha256(&self, data_handle: Handle) -> Handle {
+    #[inline]
+    fn sha256_legacy(&self, data: &[u8]) -> [u8; 32] {
         unsafe {
-            let result_handle = mBufferNew();
-            managedSha256(data_handle, result_handle);
-            result_handle
-        }
-    }
-
-    fn sha256_legacy(&self, data: &[u8]) -> H256 {
-        unsafe {
-            let mut res = H256::zero();
+            let mut res = [0u8; 32];
             sha256(data.as_ptr(), data.len() as i32, res.as_mut_ptr());
             res
         }
     }
 
-    fn keccak256_legacy(&self, data: &[u8]) -> H256 {
+    fn sha256_managed(&self, result_handle: Handle, data_handle: Handle) {
         unsafe {
-            let mut res = H256::zero();
+            managedSha256(data_handle, result_handle);
+        }
+    }
+
+    #[inline]
+    fn keccak256_legacy(&self, data: &[u8]) -> [u8; 32] {
+        unsafe {
+            let mut res = [0u8; 32];
             keccak256(data.as_ptr(), data.len() as i32, res.as_mut_ptr());
             res
         }
     }
 
-    fn keccak256(&self, data_handle: Handle) -> Handle {
+    fn keccak256_managed(&self, result_handle: Handle, data_handle: Handle) {
         unsafe {
-            let result_handle = mBufferNew();
             managedKeccak256(data_handle, result_handle);
-            result_handle
         }
     }
 
-    fn ripemd160(&self, data: &[u8]) -> Box<[u8; 20]> {
+    #[inline]
+    fn ripemd160(&self, data: &[u8]) -> [u8; 20] {
         unsafe {
             let mut res = [0u8; 20];
             ripemd160(data.as_ptr(), data.len() as i32, res.as_mut_ptr());
-            Box::new(res)
+            res
         }
     }
 

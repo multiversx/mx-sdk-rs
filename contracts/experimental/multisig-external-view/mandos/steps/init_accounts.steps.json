@@ -1,0 +1,53 @@
+{
+    "name": "adder",
+    "comment": "add then check",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "0",
+                    "balance": "0"
+                },
+                "address:alice": {
+                    "nonce": "0",
+                    "balance": "0"
+                },
+                "address:bob": {
+                    "nonce": "0",
+                    "balance": "0"
+                },
+                "address:charlie": {
+                    "nonce": "0",
+                    "balance": "0"
+                },
+                "address:dan": {
+                    "nonce": "0",
+                    "balance": "0"
+                },
+                "address:paul": {
+                    "nonce": "0",
+                    "balance": "0"
+                },
+                "sc:adder-code": {
+                    "code": "file:../../test-contracts/adder.wasm"
+                },
+                "sc:factorial-code": {
+                    "code": "file:../../test-contracts/factorial.wasm"
+                }
+            },
+            "newAddresses": [
+                {
+                    "creatorAddress": "address:owner",
+                    "creatorNonce": "0",
+                    "newAddress": "sc:multisig"
+                },
+                {
+                    "creatorAddress": "address:owner",
+                    "creatorNonce": "1",
+                    "newAddress": "sc:multisig-view"
+                }
+            ]
+        }
+    ]
+}

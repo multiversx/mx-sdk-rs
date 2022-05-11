@@ -1,0 +1,64 @@
+{
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:msg-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../output/formatted-message-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "format_message_one_argument",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:msg-features",
+                "function": "format_message_one_argument",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "str:Test"
+                ],
+                "status": "0",
+                "message": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "format_message_multiple_arguments",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:msg-features",
+                "function": "format_message_multiple_arguments",
+                "arguments": [
+                    "123456789"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "str:Hello 123456789 world"
+                ],
+                "status": "0",
+                "message": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

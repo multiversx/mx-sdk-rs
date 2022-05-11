@@ -1,16 +1,17 @@
-use crate::{tx_mock::TxPanic, DebugApi};
+use crate::{num_bigint, tx_mock::TxPanic, DebugApi};
 use elrond_wasm::{
     api::{CallValueApi, CallValueApiImpl, Handle},
     err_msg,
-    types::{BigUint, EsdtTokenType, ManagedType},
+    types::EsdtTokenType,
 };
+use num_traits::Zero;
 
 impl DebugApi {
     fn fail_if_more_than_one_esdt_transfer(&self) {
         if self.esdt_num_transfers() > 1 {
             std::panic::panic_any(TxPanic {
                 status: 10,
-                message: err_msg::TOO_MANY_ESDT_TRANSFERS.to_vec(),
+                message: err_msg::TOO_MANY_ESDT_TRANSFERS.to_string(),
             });
         }
     }
@@ -26,29 +27,36 @@ impl CallValueApi for DebugApi {
 
 impl CallValueApiImpl for DebugApi {
     fn check_not_payable(&self) {
-        if BigUint::<DebugApi>::from_raw_handle(self.egld_value()) > 0u32 {
+        if self.input_ref().egld_value > num_bigint::BigUint::zero() {
             std::panic::panic_any(TxPanic {
                 status: 10,
-                message: err_msg::NON_PAYABLE_FUNC_EGLD.to_vec(),
+                message: err_msg::NON_PAYABLE_FUNC_EGLD.to_string(),
             });
         }
         if self.esdt_num_transfers() > 0 {
             std::panic::panic_any(TxPanic {
                 status: 10,
-                message: err_msg::NON_PAYABLE_FUNC_ESDT.to_vec(),
+                message: err_msg::NON_PAYABLE_FUNC_ESDT.to_string(),
             });
         }
     }
 
     #[inline]
-    fn egld_value(&self) -> Handle {
-        self.insert_new_big_uint(self.input_ref().egld_value.clone())
+    fn load_egld_value(&self, dest: Handle) {
+        self.set_big_uint(dest, self.input_ref().egld_value.clone())
     }
 
     #[inline]
-    fn esdt_value(&self) -> Handle {
+    fn load_single_esdt_value(&self, dest: Handle) {
         self.fail_if_more_than_one_esdt_transfer();
-        self.esdt_value_by_index(0)
+        if let Some(esdt_value) = self.input_ref().esdt_values.get(0) {
+            self.set_big_uint(dest, esdt_value.value.clone());
+        } else {
+            std::panic::panic_any(TxPanic {
+                status: 10,
+                message: err_msg::ESDT_INVALID_TOKEN_INDEX.to_string(),
+            });
+        }
     }
 
     #[inline]
@@ -79,7 +87,10 @@ impl CallValueApiImpl for DebugApi {
         if let Some(esdt_value) = self.input_ref().esdt_values.get(index) {
             self.insert_new_big_uint(esdt_value.value.clone())
         } else {
-            self.insert_new_big_uint_zero()
+            std::panic::panic_any(TxPanic {
+                status: 10,
+                message: err_msg::ESDT_INVALID_TOKEN_INDEX.to_string(),
+            });
         }
     }
 
@@ -88,7 +99,10 @@ impl CallValueApiImpl for DebugApi {
         if let Some(esdt_value) = self.input_ref().esdt_values.get(index) {
             self.insert_new_managed_buffer(esdt_value.token_identifier.clone())
         } else {
-            self.insert_new_managed_buffer(Vec::new())
+            std::panic::panic_any(TxPanic {
+                status: 10,
+                message: err_msg::ESDT_INVALID_TOKEN_INDEX.to_string(),
+            });
         }
     }
 
@@ -97,7 +111,10 @@ impl CallValueApiImpl for DebugApi {
         if let Some(esdt_value) = self.input_ref().esdt_values.get(index) {
             esdt_value.nonce
         } else {
-            0
+            std::panic::panic_any(TxPanic {
+                status: 10,
+                message: err_msg::ESDT_INVALID_TOKEN_INDEX.to_string(),
+            });
         }
     }
 

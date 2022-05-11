@@ -1,0 +1,12 @@
+[package]
+name = "promises-features-meta"
+version = "0.0.0"
+edition = "2018"
+publish = false
+
+[dependencies.promises-features]
+path = ".."
+
+[dependencies.elrond-wasm-debug]
+version = "0.31.1"
+path = "../../../../../elrond-wasm-debug"

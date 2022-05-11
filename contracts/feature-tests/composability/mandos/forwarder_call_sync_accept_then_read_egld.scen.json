@@ -36,7 +36,6 @@
             },
             "expect": {
                 "out": [
-                    "1",
                     "1"
                 ],
                 "status": "0",
@@ -46,10 +45,7 @@
                         "endpoint": "str:accept_funds",
                         "topics": [
                             "str:accept_funds",
-                            "str:EGLD",
-                            "str:FungibleESDT",
-                            "1000",
-                            "0"
+                            "1000"
                         ],
                         "data": ""
                     }

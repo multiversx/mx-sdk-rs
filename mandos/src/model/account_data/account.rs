@@ -1,12 +1,12 @@
 use crate::{
-    interpret_trait::{InterpretableFrom, InterpreterContext},
-    model::{AddressValue, BigUintValue, BytesKey, BytesValue, Esdt, U64Value},
+    interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
+    model::{AddressValue, BigUintValue, BytesKey, BytesValue, Esdt, EsdtObject, U64Value},
     serde_raw::AccountRaw,
 };
 
 use std::collections::BTreeMap;
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct Account {
     pub comment: Option<String>,
     pub nonce: Option<U64Value>,
@@ -16,6 +16,118 @@ pub struct Account {
     pub storage: BTreeMap<BytesKey, BytesValue>,
     pub code: Option<BytesValue>,
     pub owner: Option<AddressValue>,
+}
+
+impl Account {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn nonce<V>(mut self, nonce: V) -> Self
+    where
+        U64Value: InterpretableFrom<V>,
+    {
+        self.nonce = Some(U64Value::interpret_from(
+            nonce,
+            &InterpreterContext::default(),
+        ));
+        self
+    }
+
+    pub fn balance<V>(mut self, balance_expr: V) -> Self
+    where
+        BigUintValue: InterpretableFrom<V>,
+    {
+        self.balance = Some(BigUintValue::interpret_from(
+            balance_expr,
+            &InterpreterContext::default(),
+        ));
+        self
+    }
+
+    pub fn esdt_balance<K, V>(mut self, token_id_expr: K, balance_expr: V) -> Self
+    where
+        BytesKey: InterpretableFrom<K>,
+        BigUintValue: InterpretableFrom<V>,
+    {
+        let ctx = InterpreterContext::default();
+        let token_id = BytesKey::interpret_from(token_id_expr, &ctx);
+        let esdt_data_ref = self.get_esdt_data_or_create(&token_id);
+        esdt_data_ref.set_balance(0u64, balance_expr);
+
+        self
+    }
+
+    pub fn esdt_nft_balance<K, N, V, T>(
+        mut self,
+        token_id_expr: K,
+        nonce_expr: N,
+        balance_expr: V,
+        opt_attributes_expr: Option<T>,
+    ) -> Self
+    where
+        N: Clone,
+        BytesKey: InterpretableFrom<K>,
+        U64Value: InterpretableFrom<N>,
+        BigUintValue: InterpretableFrom<V>,
+        BytesValue: InterpretableFrom<T>,
+    {
+        let ctx = InterpreterContext::default();
+        let token_id = BytesKey::interpret_from(token_id_expr, &ctx);
+
+        let esdt_obj_ref = self
+            .get_esdt_data_or_create(&token_id)
+            .get_mut_esdt_object();
+        esdt_obj_ref.set_balance(nonce_expr.clone(), balance_expr);
+
+        if let Some(attributes_expr) = opt_attributes_expr {
+            esdt_obj_ref.set_token_attributes(nonce_expr, attributes_expr);
+        }
+
+        self
+    }
+
+    pub fn esdt_nft_last_nonce<K, N>(mut self, token_id_expr: K, last_nonce_expr: N) -> Self
+    where
+        BytesKey: InterpretableFrom<K>,
+        U64Value: InterpretableFrom<N>,
+    {
+        let ctx = InterpreterContext::default();
+        let token_id = BytesKey::interpret_from(token_id_expr, &ctx);
+
+        let esdt_obj_ref = self
+            .get_esdt_data_or_create(&token_id)
+            .get_mut_esdt_object();
+        esdt_obj_ref.set_last_nonce(last_nonce_expr);
+
+        self
+    }
+
+    // TODO: Find a better way to pass roles
+    pub fn esdt_roles<K>(mut self, token_id_expr: K, roles: Vec<String>) -> Self
+    where
+        BytesKey: InterpretableFrom<K>,
+    {
+        let ctx = InterpreterContext::default();
+        let token_id = BytesKey::interpret_from(token_id_expr, &ctx);
+
+        let esdt_obj_ref = self
+            .get_esdt_data_or_create(&token_id)
+            .get_mut_esdt_object();
+        esdt_obj_ref.set_roles(roles);
+
+        self
+    }
+
+    fn get_esdt_data_or_create(&mut self, token_id: &BytesKey) -> &mut Esdt {
+        if !self.esdt.contains_key(token_id) {
+            let _ = self
+                .esdt
+                .insert(token_id.clone(), Esdt::Full(EsdtObject::default()));
+        }
+
+        self.esdt.get_mut(token_id).unwrap()
+    }
 }
 
 impl InterpretableFrom<AccountRaw> for Account {
@@ -51,6 +163,29 @@ impl InterpretableFrom<AccountRaw> for Account {
                 .collect(),
             code: from.code.map(|c| BytesValue::interpret_from(c, context)),
             owner: from.owner.map(|v| AddressValue::interpret_from(v, context)),
+        }
+    }
+}
+
+impl IntoRaw<AccountRaw> for Account {
+    fn into_raw(self) -> AccountRaw {
+        AccountRaw {
+            comment: self.comment,
+            nonce: self.nonce.map(|n| n.original),
+            balance: self.balance.map(|n| n.original),
+            esdt: self
+                .esdt
+                .into_iter()
+                .map(|(k, v)| (k.original, v.into_raw()))
+                .collect(),
+            username: self.username.map(|n| n.original),
+            storage: self
+                .storage
+                .into_iter()
+                .map(|(key, value)| (key.original, value.original))
+                .collect(),
+            code: self.code.map(|n| n.original),
+            owner: self.owner.map(|n| n.original),
         }
     }
 }

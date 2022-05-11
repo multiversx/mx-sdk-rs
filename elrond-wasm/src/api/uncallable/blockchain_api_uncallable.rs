@@ -2,7 +2,10 @@ use alloc::boxed::Box;
 
 use crate::{
     api::{BlockchainApi, BlockchainApiImpl, Handle, ManagedTypeApi},
-    types::{Address, BigUint, EsdtTokenData, ManagedAddress, TokenIdentifier, H256},
+    types::{
+        heap::{Address, H256},
+        EsdtTokenData, ManagedAddress, TokenIdentifier,
+    },
 };
 
 use super::UncallableApi;
@@ -36,7 +39,7 @@ impl BlockchainApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn get_balance_legacy(&self, _address: &Address) -> Handle {
+    fn load_balance_legacy(&self, _dest: Handle, _address: &Address) {
         unreachable!()
     }
 
@@ -92,20 +95,17 @@ impl BlockchainApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn get_current_esdt_nft_nonce<M: ManagedTypeApi>(
-        &self,
-        _address: &ManagedAddress<M>,
-        _token: &TokenIdentifier<M>,
-    ) -> u64 {
+    fn get_current_esdt_nft_nonce(&self, _address_handle: Handle, _token_id_handle: Handle) -> u64 {
         unreachable!()
     }
 
-    fn get_esdt_balance<M: ManagedTypeApi>(
+    fn load_esdt_balance(
         &self,
-        _address: &ManagedAddress<M>,
-        _token: &TokenIdentifier<M>,
+        _address_handle: Handle,
+        _token_id_handle: Handle,
         _nonce: u64,
-    ) -> BigUint<M> {
+        _dest: Handle,
+    ) {
         unreachable!()
     }
 
@@ -118,10 +118,16 @@ impl BlockchainApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn get_esdt_local_roles<M: ManagedTypeApi>(
+    fn get_esdt_token_data_unmanaged<M: ManagedTypeApi>(
         &self,
-        _token_id: &TokenIdentifier<M>,
-    ) -> crate::types::EsdtLocalRoleFlags {
+        _address: &ManagedAddress<M>,
+        _token: &TokenIdentifier<M>,
+        _nonce: u64,
+    ) -> EsdtTokenData<M> {
+        unreachable!()
+    }
+
+    fn get_esdt_local_roles(&self, _token_id_handle: Handle) -> crate::types::EsdtLocalRoleFlags {
         unreachable!()
     }
 }
