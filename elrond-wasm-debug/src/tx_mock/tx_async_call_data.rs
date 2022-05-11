@@ -60,7 +60,7 @@ pub fn async_callback_tx_input(async_data: &AsyncCallTxData, async_result: &TxRe
             };
             let mut cb_input = result_async_input.convert_to_token_transfer();
             cb_input.func_name = b"callBack".to_vec();
-            cb_input.args.extend_from_slice(&args);
+            cb_input.args = args;
 
             cb_input
         },
