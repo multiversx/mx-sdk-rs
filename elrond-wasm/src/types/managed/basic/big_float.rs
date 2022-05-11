@@ -1,9 +1,9 @@
-use super::{ManagedBuffer, ManagedType};
+use super::ManagedBuffer;
 use core::marker::PhantomData;
 
 use crate::{
     api::{BigFloatApi, Handle, ManagedTypeApi, ManagedTypeApiImpl, Sign},
-    types::{BigInt, BigUint},
+    types::{BigInt, BigUint, ManagedType},
 };
 use alloc::string::String;
 
