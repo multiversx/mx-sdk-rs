@@ -12,7 +12,6 @@ extern "C" {
     fn mBufferToBigFloat(mBufferHandle: i32, bigFloatHandle: i32) -> i32;
     fn mBufferFromBigFloat(mBufferHandle: i32, bigFloatHandle: i32) -> i32;
 
-    #[cfg(feature = "vm-validate-token-identifier")]
     fn validateTokenIdentifier(token_id_handle: i32) -> i32;
 }
 
@@ -71,7 +70,7 @@ impl ManagedTypeApiImpl for VmApiImpl {
         }
     }
 
-    #[cfg(feature = "vm-validate-token-identifier")]
+    #[inline]
     fn validate_token_identifier(&self, token_id_handle: Handle) -> bool {
         unsafe { validateTokenIdentifier(token_id_handle) != 0 }
     }
