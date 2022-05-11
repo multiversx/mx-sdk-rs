@@ -1,6 +1,5 @@
 use crate::tx_mock::{TxInput, TxResult};
 use elrond_wasm::{
-    api::is_esdt_transfer_built_in_function,
     elrond_codec::*,
     types::heap::{Address, H256},
 };
@@ -45,39 +44,38 @@ pub fn async_callback_tx_input(async_data: &AsyncCallTxData, async_result: &TxRe
         args.push(async_result.result_message.clone().into_bytes());
     }
 
-    convert_callback_input_to_token_transfer(async_data, args)
-}
+    // for the cases when the callee SC also makes an async call towards the caller SC
+    match &async_result.result_calls.async_call {
+        Some(result_async_call) => {
+            let result_async_input = TxInput {
+                from: result_async_call.from.clone(),
+                to: result_async_call.to.clone(),
+                egld_value: result_async_call.call_value.clone(),
+                esdt_values: Vec::new(),
+                func_name: result_async_call.endpoint_name.clone(),
+                args: result_async_call.arguments.clone(),
+                gas_limit: 1000,
+                gas_price: 0,
+                tx_hash: result_async_call.tx_hash.clone(),
+            };
+            let mut cb_input = result_async_input.convert_to_token_transfer();
+            cb_input.func_name = b"callBack".to_vec();
+            cb_input.args.extend_from_slice(&args);
 
-fn convert_callback_input_to_token_transfer(
-    async_data: &AsyncCallTxData,
-    cb_args: Vec<Vec<u8>>,
-) -> TxInput {
-    let mut args = async_data.arguments.clone();
-
-    // if endpoint name is a transfer built-in function
-    // then we add a placeholder empty arg as endpoint name for the TxInput conversion step
-    // otherwise, one of the cb_args would be interpreted as endpoint name
-    //
-    // if is_esdt_transfer_built_in_function(&async_data.endpoint_name) {
-    //      args.push(Vec::new());
-    // }
-    args.extend_from_slice(&cb_args);
-
-    let raw_cb_input = TxInput {
-        from: async_data.to.clone(),
-        to: async_data.from.clone(),
-        egld_value: async_data.call_value.clone(),
-        esdt_values: Vec::new(),
-        func_name: async_data.endpoint_name.clone(),
-        args,
-        gas_limit: 1000,
-        gas_price: 0,
-        tx_hash: async_data.tx_hash.clone(),
-    };
-    let mut cb_input = raw_cb_input.convert_to_token_transfer();
-    cb_input.func_name = b"callBack".to_vec();
-
-    cb_input
+            cb_input
+        },
+        None => TxInput {
+            from: async_data.to.clone(),
+            to: async_data.from.clone(),
+            egld_value: 0u32.into(),
+            esdt_values: Vec::new(),
+            func_name: b"callBack".to_vec(),
+            args,
+            gas_limit: 1000,
+            gas_price: 0,
+            tx_hash: async_data.tx_hash.clone(),
+        },
+    }
 }
 
 pub fn async_promise_tx_input(
