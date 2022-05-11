@@ -13,11 +13,11 @@ pub trait EventsModule {
         self.order_event(caller, epoch, order_type, order);
     }
 
-    fn emit_cancel_order_events(&self, orders: Vec<Order<Self::Api>>) {
+    fn emit_cancel_order_events(&self, orders: MultiValueManagedVec<Order<Self::Api>>) {
         let caller = self.blockchain().get_caller();
         let epoch = self.blockchain().get_block_epoch();
 
-        for order in orders {
+        for order in orders.iter() {
             let order_type = order.order_type;
             let order_id = order.id;
 
@@ -25,11 +25,11 @@ pub trait EventsModule {
         }
     }
 
-    fn emit_match_order_events(&self, orders: Vec<Order<Self::Api>>) {
+    fn emit_match_order_events(&self, orders: MultiValueManagedVec<Order<Self::Api>>) {
         let caller = self.blockchain().get_caller();
         let epoch = self.blockchain().get_block_epoch();
 
-        for order in orders {
+        for order in orders.iter() {
             let order_type = order.order_type;
             let order_id = order.id;
             let order_creator = order.creator;
@@ -38,11 +38,11 @@ pub trait EventsModule {
         }
     }
 
-    fn emit_free_order_events(&self, orders: Vec<Order<Self::Api>>) {
+    fn emit_free_order_events(&self, orders: ManagedVec<Order<Self::Api>>) {
         let caller = self.blockchain().get_caller();
         let epoch = self.blockchain().get_block_epoch();
 
-        for order in orders {
+        for order in orders.iter() {
             let order_type = order.order_type;
             let order_id = order.id;
             let order_creator = order.creator;

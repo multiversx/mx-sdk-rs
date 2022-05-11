@@ -8,8 +8,8 @@ use crate::{
 use alloc::string::String;
 
 use elrond_codec::{
-    DecodeError, EncodeError, NestedDecode, NestedDecodeInput, NestedEncode, NestedEncodeOutput,
-    TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, TryStaticCast,
+    DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode,
+    NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, TryStaticCast,
 };
 
 #[derive(Debug)]
@@ -221,45 +221,46 @@ impl<M: ManagedTypeApi> Clone for BigFloat<M> {
 impl<M: ManagedTypeApi> TryStaticCast for BigFloat<M> {}
 
 impl<M: ManagedTypeApi> TopEncode for BigFloat<M> {
-    #[inline]
-    fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
-        self.to_buffer().top_encode(output)
+    fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: TopEncodeOutput,
+        H: EncodeErrorHandler,
+    {
+        self.to_buffer().top_encode_or_handle_err(output, h)
     }
 }
 
 impl<M: ManagedTypeApi> TopDecode for BigFloat<M> {
-    #[inline]
-    fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
-        Ok(BigFloat::from(ManagedBuffer::top_decode(input)?))
-    }
-
-    fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
-        input: I,
-        c: ExitCtx,
-        exit: fn(ExitCtx, DecodeError) -> !,
-    ) -> Self {
-        BigFloat::from(ManagedBuffer::top_decode_or_exit(input, c, exit))
+    fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: TopDecodeInput,
+        H: DecodeErrorHandler,
+    {
+        Ok(BigFloat::from(ManagedBuffer::top_decode_or_handle_err(
+            input, h,
+        )?))
     }
 }
 
 impl<M: ManagedTypeApi> NestedEncode for BigFloat<M> {
-    #[inline]
-    fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
-        self.to_buffer().dep_encode(dest)
+    fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: NestedEncodeOutput,
+        H: EncodeErrorHandler,
+    {
+        self.to_buffer().dep_encode_or_handle_err(dest, h)
     }
 }
 
 impl<M: ManagedTypeApi> NestedDecode for BigFloat<M> {
-    fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
-        Ok(BigFloat::from(ManagedBuffer::dep_decode(input)?))
-    }
-
-    fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
-        input: &mut I,
-        c: ExitCtx,
-        exit: fn(ExitCtx, DecodeError) -> !,
-    ) -> Self {
-        BigFloat::from(ManagedBuffer::dep_decode_or_exit(input, c, exit))
+    fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: NestedDecodeInput,
+        H: DecodeErrorHandler,
+    {
+        Ok(BigFloat::from(ManagedBuffer::dep_decode_or_handle_err(
+            input, h,
+        )?))
     }
 }
 

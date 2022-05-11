@@ -46,12 +46,17 @@ fn add_managed_types(substitutions: &mut SubstitutionsMap) {
     add_managed_type(substitutions, &quote!(ManagedSCError));
     add_managed_type(substitutions, &quote!(AsyncCall));
     add_managed_type(substitutions, &quote!(ManagedAsyncCallError));
+    add_managed_type(substitutions, &quote!(EsdtTokenPaymentMultiValue));
 
     add_managed_type_with_generics(substitutions, &quote!(ManagedVec));
     add_managed_type_with_generics(substitutions, &quote!(ManagedVecOwnedIterator));
+    add_managed_type_with_generics(substitutions, &quote!(ManagedMultiValue));
     add_managed_type_with_generics(substitutions, &quote!(ManagedVarArgs));
     add_managed_type_with_generics(substitutions, &quote!(ManagedMultiResultVec));
     add_managed_type_with_generics(substitutions, &quote!(ManagedAsyncCallResult));
+    add_managed_type_with_generics(substitutions, &quote!(MultiValueEncoded));
+    add_managed_type_with_generics(substitutions, &quote!(MultiValueManagedVec));
+    add_managed_type_with_generics(substitutions, &quote!(MultiValueManagedVecCounted));
     add_managed_type_with_generics(substitutions, &quote!(ManagedCountedVarArgs));
     add_managed_type_with_generics(substitutions, &quote!(ManagedCountedMultiResultVec));
 }

@@ -5,7 +5,7 @@ mod dns_proxy {
     pub trait Dns {
         #[payable("EGLD")]
         #[endpoint]
-        fn register(&self, name: BoxedBytes, #[payment] payment: BigUint);
+        fn register(&self, name: &ManagedBuffer);
     }
 }
 
@@ -27,11 +27,13 @@ pub trait DnsModule {
     fn dns_register(
         &self,
         dns_address: ManagedAddress,
-        name: BoxedBytes,
+        name: ManagedBuffer,
         #[payment] payment: BigUint,
-    ) -> AsyncCall {
+    ) {
         self.dns_proxy(dns_address)
-            .register(name, payment)
+            .register(&name)
+            .with_egld_transfer(payment)
             .async_call()
+            .call_and_exit()
     }
 }

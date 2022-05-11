@@ -1,13 +1,13 @@
-use crate::{tx_mock::TxPanic, DebugApi};
-use alloc::vec::Vec;
-use elrond_wasm::{
-    api::{
-        BigIntApi, Handle, ManagedBufferApi, StorageReadApi, StorageReadApiImpl, StorageWriteApi,
-        StorageWriteApiImpl,
-    },
-    types::Address,
+use crate::{
+    num_bigint::{BigInt, BigUint, Sign},
+    tx_mock::TxPanic,
+    DebugApi,
 };
-use num_bigint::{BigInt, BigUint, Sign};
+use alloc::vec::Vec;
+use elrond_wasm::api::{
+    BigIntApi, Handle, ManagedBufferApi, StorageReadApi, StorageReadApiImpl, StorageWriteApi,
+    StorageWriteApiImpl,
+};
 use num_traits::ToPrimitive;
 
 impl StorageReadApi for DebugApi {
@@ -18,35 +18,34 @@ impl StorageReadApi for DebugApi {
     }
 }
 
-impl StorageReadApiImpl for DebugApi {
-    fn storage_load_len(&self, key: &[u8]) -> usize {
-        self.storage_load_vec_u8(key).len()
-    }
-
+impl DebugApi {
     fn storage_load_vec_u8(&self, key: &[u8]) -> Vec<u8> {
         self.with_contract_account(|account| match account.storage.get(&key.to_vec()) {
             None => Vec::with_capacity(0),
             Some(value) => value.clone(),
         })
     }
+}
 
-    fn storage_load_big_uint_raw(&self, key: &[u8]) -> Handle {
+impl StorageReadApiImpl for DebugApi {
+    fn storage_load_len(&self, key: &[u8]) -> usize {
+        self.storage_load_vec_u8(key).len()
+    }
+
+    fn storage_load_to_heap(&self, key: &[u8]) -> Box<[u8]> {
+        self.storage_load_vec_u8(key).into_boxed_slice()
+    }
+
+    fn storage_load_big_uint_raw(&self, key: &[u8], dest: Handle) {
         let bytes = self.storage_load_vec_u8(key);
         let bi = BigInt::from_bytes_be(Sign::Plus, bytes.as_slice());
-        let mut managed_types = self.m_types_borrow_mut();
-        managed_types.big_int_map.insert_new_handle(bi)
+        self.bi_overwrite(dest, bi);
     }
 
-    fn storage_load_managed_buffer_raw(&self, key_handle: Handle) -> Handle {
+    fn storage_load_managed_buffer_raw(&self, key_handle: Handle, dest: Handle) {
         let key_bytes = self.mb_to_boxed_bytes(key_handle);
         let bytes = self.storage_load_vec_u8(key_bytes.as_slice());
-        self.mb_new_from_bytes(bytes.as_slice())
-    }
-
-    fn storage_load_managed_buffer_len(&self, key_handle: Handle) -> usize {
-        let key_bytes = self.mb_to_boxed_bytes(key_handle);
-        let bytes = self.storage_load_vec_u8(key_bytes.as_slice());
-        bytes.len()
+        self.mb_overwrite(dest, bytes.as_slice());
     }
 
     fn storage_load_u64(&self, key: &[u8]) -> u64 {
@@ -57,7 +56,7 @@ impl StorageReadApiImpl for DebugApi {
         } else {
             std::panic::panic_any(TxPanic {
                 status: 10,
-                message: b"storage value out of range".to_vec(),
+                message: "storage value out of range".to_string(),
             })
         }
     }
@@ -70,18 +69,20 @@ impl StorageReadApiImpl for DebugApi {
         } else {
             std::panic::panic_any(TxPanic {
                 status: 10,
-                message: b"storage value out of range".to_vec(),
+                message: "storage value out of range".to_string(),
             })
         }
     }
 
-    fn storage_load_from_address(&self, address_handle: Handle, key_handle: Handle) -> Handle {
-        let address = Address::from_slice(self.mb_to_boxed_bytes(address_handle).as_slice());
+    fn storage_load_from_address(&self, address_handle: Handle, key_handle: Handle, dest: Handle) {
+        let address = elrond_wasm::types::heap::Address::from_slice(
+            self.mb_to_boxed_bytes(address_handle).as_slice(),
+        );
         let key_bytes = self.mb_to_boxed_bytes(key_handle);
         self.with_account(&address, |account| {
             match account.storage.get(key_bytes.as_slice()) {
-                None => self.mb_new_from_bytes(&[]),
-                Some(value) => self.mb_new_from_bytes(value.as_slice()),
+                None => self.mb_overwrite(dest, &[]),
+                Some(value) => self.mb_overwrite(dest, value.as_slice()),
             }
         })
     }
@@ -101,7 +102,7 @@ impl StorageWriteApiImpl for DebugApi {
         if key.starts_with(&b"ELROND"[..]) {
             std::panic::panic_any(TxPanic {
                 status: 10,
-                message: b"cannot write to storage under Elrond reserved key".to_vec(),
+                message: "cannot write to storage under Elrond reserved key".to_string(),
             });
         }
 

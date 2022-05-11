@@ -29,6 +29,8 @@ fn execute_tx_context_rc(tx_context_rc: Rc<TxContext>) -> (Rc<TxContext>, TxResu
     let contract_identifier = get_contract_identifier(&tx_context_ref);
     let contract_map = &tx_context_rc.blockchain_ref().contract_map;
 
+    // Not redundant at all, func_name is borrowed from it...
+    #[allow(clippy::redundant_clone)]
     let contract_instance =
         contract_map.new_contract_instance(contract_identifier.as_slice(), tx_context_ref.clone());
 
@@ -62,7 +64,7 @@ fn execute_contract_instance_endpoint(
         if !call_successful {
             std::panic::panic_any(TxPanic {
                 status: 1,
-                message: b"invalid function (not found)".to_vec(),
+                message: "invalid function (not found)".to_string(),
             });
         }
         DebugApi::new_from_static().into_tx_result()

@@ -1,6 +1,6 @@
 use core::cmp::Ordering;
 
-use crate::types::BoxedBytes;
+use crate::types::heap::BoxedBytes;
 
 use super::Handle;
 
@@ -19,6 +19,7 @@ pub trait BigIntApi {
         self.bi_new(0)
     }
 
+    fn bi_set_int64(&self, destination: Handle, value: i64);
     fn bi_unsigned_byte_length(&self, handle: Handle) -> usize;
     fn bi_get_unsigned_bytes(&self, handle: Handle) -> BoxedBytes;
     fn bi_set_unsigned_bytes(&self, destination: Handle, bytes: &[u8]);

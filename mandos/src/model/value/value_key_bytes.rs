@@ -1,5 +1,5 @@
 use crate::{
-    interpret_trait::{InterpretableFrom, InterpreterContext},
+    interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
     value_interpreter::interpret_string,
 };
 
@@ -23,6 +23,12 @@ impl From<Vec<u8>> for BytesKey {
     }
 }
 
+impl IntoRaw<String> for BytesKey {
+    fn into_raw(self) -> String {
+        self.original
+    }
+}
+
 impl PartialEq for BytesKey {
     fn eq(&self, other: &Self) -> bool {
         self.value == other.value
@@ -40,6 +46,16 @@ impl PartialOrd for BytesKey {
 impl Ord for BytesKey {
     fn cmp(&self, other: &Self) -> Ordering {
         self.value.cmp(&other.value)
+    }
+}
+
+impl InterpretableFrom<&str> for BytesKey {
+    fn interpret_from(from: &str, context: &InterpreterContext) -> Self {
+        let bytes = interpret_string(from, context);
+        BytesKey {
+            value: bytes,
+            original: from.to_string(),
+        }
     }
 }
 

@@ -34,7 +34,7 @@
             "expect": {
                 "out": [ "100" ],
                 "status": "0",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }

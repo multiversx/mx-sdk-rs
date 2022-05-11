@@ -29,4 +29,19 @@ impl StaticVarApiImpl for DebugApi {
             .borrow()
             .external_view_target_address_handle
     }
+
+    fn next_handle(&self) -> Handle {
+        let mut ref_tx_static_vars = self.static_vars_cell.borrow_mut();
+        let new_handle = ref_tx_static_vars.next_handle;
+        ref_tx_static_vars.next_handle -= 1;
+        new_handle
+    }
+
+    fn set_num_arguments(&self, num_arguments: i32) {
+        self.static_vars_cell.borrow_mut().num_arguments = num_arguments;
+    }
+
+    fn get_num_arguments(&self) -> i32 {
+        self.static_vars_cell.borrow().num_arguments
+    }
 }

@@ -1,18 +1,32 @@
 use mandos::model::{
     AddressKey, BytesValue, CheckEsdt, CheckEsdtData, CheckEsdtInstance, CheckEsdtInstances,
-    CheckEsdtMap, CheckStorage, CheckValue, Checkable,
+    CheckEsdtMap, CheckStateStep, CheckStorage, CheckValue, Checkable, Step,
 };
-use num_bigint::BigUint;
 use num_traits::Zero;
 
 use crate::{
-    bytes_to_string, verbose_hex,
+    bytes_to_string, verbose_hex, verbose_hex_list,
     world_mock::{AccountEsdt, BlockchainMock, EsdtData, EsdtInstance, EsdtInstances},
 };
 
-pub fn execute(accounts: &mandos::model::CheckAccounts, state: &mut BlockchainMock) {
+impl BlockchainMock {
+    pub fn mandos_check_state(&mut self, check_state_step: CheckStateStep) -> &mut Self {
+        execute(self, &check_state_step.accounts);
+        self.mandos_trace
+            .steps
+            .push(Step::CheckState(check_state_step));
+        self
+    }
+
+    pub fn mandos_dump_state(&mut self) -> &mut Self {
+        self.print_accounts();
+        self
+    }
+}
+
+fn execute(state: &BlockchainMock, accounts: &mandos::model::CheckAccounts) {
     for (expected_address, expected_account) in accounts.accounts.iter() {
-        if let Some(account) = state.accounts.get(&expected_address.value.into()) {
+        if let Some(account) = state.accounts.get(&expected_address.value) {
             assert!(
                 expected_account.nonce.check(account.nonce),
                 "bad account nonce. Address: {}. Want: {}. Have: {}",
@@ -45,7 +59,6 @@ pub fn execute(accounts: &mandos::model::CheckAccounts, state: &mut BlockchainMo
                 expected_account.code,
                 std::str::from_utf8(actual_code.as_slice()).unwrap()
             );
-
             if let CheckStorage::Equal(eq) = &expected_account.storage {
                 let default_value = &Vec::new();
                 for (expected_key, expected_value) in eq.storages.iter() {
@@ -100,10 +113,8 @@ pub fn check_account_esdt(address: &AddressKey, expected: &CheckEsdtMap, actual:
             for (key, expected_value) in contents.contents.iter() {
                 let actual_value = actual.get_by_identifier_or_default(key.value.as_slice());
                 match expected_value {
-                    CheckEsdt::Short(expected_balance_bytes) => {
-                        let expected_balance =
-                            BigUint::from_bytes_be(expected_balance_bytes.value.as_slice());
-                        if expected_balance.is_zero() {
+                    CheckEsdt::Short(expected_balance) => {
+                        if expected_balance.value.is_zero() {
                             assert!(
                                 actual_value.is_empty(),
                                 "No balance expected for ESDT token address: {}. token name: {}. nonce: {}.",
@@ -124,8 +135,8 @@ pub fn check_account_esdt(address: &AddressKey, expected: &CheckEsdtMap, actual:
                                 .unwrap_or_else(|| panic!("Expected fungible ESDT with none 0"));
                             assert_eq!(
                                 single_instance.balance,
-                                expected_balance,
-                                "Unexpected fungible token balancefor address: {}. token name: {}.",
+                                expected_balance.value,
+                                "Unexpected fungible token balance for address: {}. token name: {}.",
                                 address,
                                 bytes_to_string(key.value.as_slice()),
                             );
@@ -298,15 +309,29 @@ pub fn check_token_instance(
         ))
     }
 
-    let actual_uri = actual_value.metadata.uri.clone().unwrap_or_default();
-    if !expected_value.uri.check(&actual_uri) {
+    let actual_uri = actual_value.metadata.uri.as_slice();
+    if !expected_value.uri.check(actual_uri) {
         errors.push(format!(
             "bad esdt uri. Address: {}. Token {}. Nonce {}. Want: {}. Have: {}",
             address,
             token,
             expected_value.nonce.value,
-            expected_value.uri,
-            verbose_hex(&actual_uri),
+            expected_value.uri.pretty_str(),
+            verbose_hex_list(actual_uri),
+        ))
+    }
+
+    if !expected_value
+        .attributes
+        .check(&actual_value.metadata.attributes)
+    {
+        errors.push(format!(
+            "bad esdt attributes. Address: {}. Token {}. Nonce {}. Want: {}. Have: {}",
+            address,
+            token,
+            expected_value.nonce.value,
+            expected_value.attributes,
+            verbose_hex(&actual_value.metadata.attributes),
         ))
     }
 }

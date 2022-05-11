@@ -1,0 +1,13 @@
+[package]
+name = "multisig-external-view-meta"
+version = "0.0.0"
+authors = ["Andrei Marinica <andrei.marinica@elrond.com>"]
+edition = "2018"
+publish = false
+
+[dependencies.multisig-external-view]
+path = ".."
+
+[dependencies.elrond-wasm-debug]
+version = "0.31.1"
+path = "../../../../elrond-wasm-debug"

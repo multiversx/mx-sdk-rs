@@ -19,8 +19,9 @@ pub struct StructWithManagedTypes<M: ManagedTypeApi> {
 #[elrond_wasm::contract]
 pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
     #[init]
-    fn init(&self) {
+    fn init(&self) -> ManagedBuffer {
         self.total_value().set(&BigUint::from(1u32));
+        b"constructor-result".into()
     }
 
     #[endpoint]
@@ -194,7 +195,7 @@ pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
     }
 
     #[callback_raw]
-    fn callback_raw(&self, #[var_args] _ignore: IgnoreVarArgs) {
+    fn callback_raw(&self, _ignore: IgnoreValue) {
         self.callback_executed().set(&true);
     }
 

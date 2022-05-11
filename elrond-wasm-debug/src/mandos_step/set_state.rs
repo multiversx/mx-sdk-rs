@@ -1,22 +1,21 @@
-use std::collections::BTreeMap;
-
-use elrond_wasm::types::Address;
-use mandos::model::{Account, AddressKey, BlockInfo, NewAddress};
-use num_bigint::BigUint;
+use elrond_wasm::types::heap::Address;
+use mandos::model::{SetStateStep, Step};
 
 use crate::world_mock::{
     is_smart_contract_address, AccountData, AccountEsdt, BlockInfo as CrateBlockInfo,
     BlockchainMock, EsdtData, EsdtInstance, EsdtInstanceMetadata, EsdtInstances, EsdtRoles,
 };
 
-pub fn execute(
-    state: &mut BlockchainMock,
-    accounts: &BTreeMap<AddressKey, Account>,
-    new_addresses: &[NewAddress],
-    previous_block_info: &Option<BlockInfo>,
-    current_block_info: &Option<BlockInfo>,
-) {
-    for (address, account) in accounts.iter() {
+impl BlockchainMock {
+    pub fn mandos_set_state(&mut self, set_state_step: SetStateStep) -> &mut Self {
+        execute(self, &set_state_step);
+        self.mandos_trace.steps.push(Step::SetState(set_state_step));
+        self
+    }
+}
+
+fn execute(state: &mut BlockchainMock, set_state_step: &SetStateStep) {
+    for (address, account) in set_state_step.accounts.iter() {
         let storage = account
             .storage
             .iter()
@@ -26,17 +25,12 @@ pub fn execute(
             account
                 .esdt
                 .iter()
-                .map(|(k, v)| {
-                    (
-                        k.value.clone(),
-                        convert_mandos_esdt_to_world_mock(k.value.as_slice(), v),
-                    )
-                })
+                .map(|(k, v)| (k.value.clone(), convert_mandos_esdt_to_world_mock(v)))
                 .collect(),
         );
 
         state.validate_and_add_account(AccountData {
-            address: address.value.into(),
+            address: address.to_address(),
             nonce: account
                 .nonce
                 .as_ref()
@@ -61,48 +55,37 @@ pub fn execute(
             contract_owner: account
                 .owner
                 .as_ref()
-                .map(|address_value| address_value.value.into()),
+                .map(|address_value| address_value.value.clone()),
         });
     }
-    for new_address in new_addresses.iter() {
+    for new_address in set_state_step.new_addresses.iter() {
         assert!(
-            is_smart_contract_address(&new_address.new_address.value.into()),
+            is_smart_contract_address(&new_address.new_address.value),
             "field should have SC format"
         );
         state.put_new_address(
-            new_address.creator_address.value.into(),
+            new_address.creator_address.value.clone(),
             new_address.creator_nonce.value,
-            new_address.new_address.value.into(),
+            new_address.new_address.value.clone(),
         )
     }
-    if let Some(block_info_obj) = &*previous_block_info {
+    if let Some(block_info_obj) = &*set_state_step.previous_block_info {
         update_block_info(&mut state.previous_block_info, block_info_obj);
     }
-    if let Some(block_info_obj) = &*current_block_info {
+    if let Some(block_info_obj) = &*set_state_step.current_block_info {
         update_block_info(&mut state.current_block_info, block_info_obj);
     }
 }
 
-fn convert_mandos_esdt_to_world_mock(
-    token_identifier: &[u8],
-    mandos_esdt: &mandos::model::Esdt,
-) -> EsdtData {
+fn convert_mandos_esdt_to_world_mock(mandos_esdt: &mandos::model::Esdt) -> EsdtData {
     match mandos_esdt {
         mandos::model::Esdt::Short(short_esdt) => {
-            let balance = BigUint::from_bytes_be(short_esdt.value.as_slice());
-            let mut esdt_data = EsdtData {
-                token_identifier: token_identifier.to_vec(),
-                ..Default::default()
-            };
+            let balance = short_esdt.value.clone();
+            let mut esdt_data = EsdtData::default();
             esdt_data.instances.add(0, balance);
             esdt_data
         },
         mandos::model::Esdt::Full(full_esdt) => EsdtData {
-            token_identifier: full_esdt
-                .token_identifier
-                .as_ref()
-                .map(|token_identifier| token_identifier.value.clone())
-                .unwrap_or_default(),
             instances: EsdtInstances::new_from_hash(
                 full_esdt
                     .instances
@@ -123,7 +106,7 @@ fn convert_mandos_esdt_to_world_mock(
                 full_esdt
                     .roles
                     .iter()
-                    .map(|role| role.value.clone())
+                    .map(|role| role.as_bytes().to_vec())
                     .collect(),
             ),
             frozen: if let Some(u64_value) = &full_esdt.frozen {
@@ -136,7 +119,7 @@ fn convert_mandos_esdt_to_world_mock(
 }
 
 fn convert_mandos_esdt_instance_to_world_mock(
-    mandos_esdt: &mandos::model::Instance,
+    mandos_esdt: &mandos::model::EsdtInstance,
 ) -> EsdtInstance {
     EsdtInstance {
         nonce: mandos_esdt
@@ -161,7 +144,11 @@ fn convert_mandos_esdt_instance_to_world_mock(
                 .map(|royalties| royalties.value)
                 .unwrap_or_default(),
             hash: mandos_esdt.hash.as_ref().map(|hash| hash.value.clone()),
-            uri: mandos_esdt.uri.as_ref().map(|uri| uri.value.clone()),
+            uri: mandos_esdt
+                .uri
+                .iter()
+                .map(|uri| uri.value.clone())
+                .collect(),
             attributes: mandos_esdt
                 .attributes
                 .as_ref()

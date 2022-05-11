@@ -1,6 +1,8 @@
 use core::{borrow::Borrow, marker::PhantomData, ops::Deref};
 
-use elrond_codec::{EncodeError, NestedEncode, NestedEncodeOutput, TopEncode, TopEncodeOutput};
+use elrond_codec::{
+    EncodeErrorHandler, NestedEncode, NestedEncodeOutput, TopEncode, TopEncodeOutput,
+};
 
 use crate::api::{Handle, ManagedTypeApi};
 
@@ -34,7 +36,7 @@ where
 
     /// Will completely disregard lifetimes, use with care.
     #[doc(hidden)]
-    pub(super) unsafe fn wrap_handle(handle: Handle) -> Self {
+    pub(crate) unsafe fn wrap_handle(handle: Handle) -> Self {
         Self {
             _phantom_m: PhantomData,
             _phantom_t: PhantomData,
@@ -126,8 +128,12 @@ where
     T: ManagedType<M> + TopEncode,
 {
     #[inline]
-    fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
-        self.deref().top_encode(output)
+    fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: TopEncodeOutput,
+        H: EncodeErrorHandler,
+    {
+        self.deref().top_encode_or_handle_err(output, h)
     }
 }
 
@@ -136,8 +142,13 @@ where
     M: ManagedTypeApi,
     T: ManagedType<M> + NestedEncode,
 {
-    fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
-        self.deref().dep_encode(dest)
+    #[inline]
+    fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: NestedEncodeOutput,
+        H: EncodeErrorHandler,
+    {
+        self.deref().dep_encode_or_handle_err(dest, h)
     }
 }
 

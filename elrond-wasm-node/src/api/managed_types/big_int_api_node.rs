@@ -5,12 +5,13 @@ use crate::{api::unsafe_buffer, error_hook};
 use elrond_wasm::{
     api::{BigIntApi, Handle, Sign},
     err_msg,
-    types::BoxedBytes,
+    types::heap::BoxedBytes,
 };
 
 extern "C" {
     fn bigIntNew(value: i64) -> i32;
 
+    fn bigIntSetInt64(destination: i32, value: i64);
     fn bigIntUnsignedByteLength(x: i32) -> i32;
     fn bigIntGetUnsignedBytes(reference: i32, byte_ptr: *mut u8) -> i32;
     fn bigIntSetUnsignedBytes(destination: i32, byte_ptr: *const u8, byte_len: i32);
@@ -68,6 +69,13 @@ impl BigIntApi for crate::VmApiImpl {
     #[inline]
     fn bi_new(&self, value: i64) -> Handle {
         unsafe { bigIntNew(value) }
+    }
+
+    #[inline]
+    fn bi_set_int64(&self, destination: Handle, value: i64) {
+        unsafe {
+            bigIntSetInt64(destination, value);
+        }
     }
 
     #[inline]

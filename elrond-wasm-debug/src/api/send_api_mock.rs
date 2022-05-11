@@ -1,17 +1,18 @@
 use crate::{
+    num_bigint,
     tx_execution::{deploy_contract, execute_builtin_function_or_default},
-    tx_mock::{AsyncCallTxData, BlockchainUpdate, TxCache, TxInput, TxPanic, TxResult},
+    tx_mock::{AsyncCallTxData, BlockchainUpdate, Promise, TxCache, TxInput, TxPanic, TxResult},
     DebugApi,
 };
 use elrond_wasm::{
     api::{
-        BlockchainApiImpl, ManagedTypeApi, SendApi, SendApiImpl, StorageReadApiImpl,
-        StorageWriteApiImpl, ESDT_MULTI_TRANSFER_FUNC_NAME, ESDT_NFT_TRANSFER_FUNC_NAME,
-        ESDT_TRANSFER_FUNC_NAME, UPGRADE_CONTRACT_FUNC_NAME,
+        BlockchainApiImpl, ManagedTypeApi, SendApi, SendApiImpl, ESDT_MULTI_TRANSFER_FUNC_NAME,
+        ESDT_NFT_TRANSFER_FUNC_NAME, ESDT_TRANSFER_FUNC_NAME, UPGRADE_CONTRACT_FUNC_NAME,
     },
     elrond_codec::top_encode_to_vec_u8,
+    err_msg,
     types::{
-        Address, BigUint, CodeMetadata, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer,
+        heap::Address, BigUint, CodeMetadata, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer,
         ManagedBuffer, ManagedType, ManagedVec, TokenIdentifier,
     },
 };
@@ -45,16 +46,16 @@ impl DebugApi {
         tx_result.result_values
     }
 
-    fn perform_execute_on_dest_context(
+    fn prepare_execute_on_dest_context_input(
         &self,
         to: Address,
         egld_value: num_bigint::BigUint,
         func_name: Vec<u8>,
         args: Vec<Vec<u8>>,
-    ) -> Vec<Vec<u8>> {
+    ) -> TxInput {
         let contract_address = &self.input_ref().to;
         let tx_hash = self.get_tx_hash_legacy();
-        let tx_input = TxInput {
+        TxInput {
             from: contract_address.clone(),
             to,
             egld_value,
@@ -64,8 +65,17 @@ impl DebugApi {
             gas_limit: 1000,
             gas_price: 0,
             tx_hash,
-        };
+        }
+    }
 
+    fn perform_execute_on_dest_context(
+        &self,
+        to: Address,
+        egld_value: num_bigint::BigUint,
+        func_name: Vec<u8>,
+        args: Vec<Vec<u8>>,
+    ) -> Vec<Vec<u8>> {
+        let tx_input = self.prepare_execute_on_dest_context_input(to, egld_value, func_name, args);
         let tx_cache = TxCache::new(self.blockchain_cache_rc());
         let (tx_result, blockchain_updates) =
             execute_builtin_function_or_default(tx_input, tx_cache);
@@ -76,7 +86,30 @@ impl DebugApi {
             // also kill current execution
             std::panic::panic_any(TxPanic {
                 status: tx_result.result_status,
-                message: tx_result.result_message.into_bytes(),
+                message: tx_result.result_message,
+            })
+        }
+    }
+
+    fn perform_transfer_execute(
+        &self,
+        to: Address,
+        egld_value: num_bigint::BigUint,
+        func_name: Vec<u8>,
+        args: Vec<Vec<u8>>,
+    ) -> Vec<Vec<u8>> {
+        let tx_input = self.prepare_execute_on_dest_context_input(to, egld_value, func_name, args);
+        let tx_cache = TxCache::new(self.blockchain_cache_rc());
+        let (tx_result, blockchain_updates) =
+            execute_builtin_function_or_default(tx_input, tx_cache);
+
+        if tx_result.result_status == 0 {
+            self.sync_call_post_processing(tx_result, blockchain_updates)
+        } else {
+            // also kill current execution
+            std::panic::panic_any(TxPanic {
+                status: 10,
+                message: err_msg::ERROR_SIGNALLED_BY_SMARTCONTRACT.to_string(),
             })
         }
     }
@@ -103,7 +136,7 @@ impl DebugApi {
 
         let tx_cache = TxCache::new(self.blockchain_cache_rc());
         tx_cache.increase_acount_nonce(contract_address);
-        let (tx_result, blockchain_updates, new_address) =
+        let (tx_result, new_address, blockchain_updates) =
             deploy_contract(tx_input, contract_code, tx_cache);
 
         if tx_result.result_status == 0 {
@@ -115,7 +148,7 @@ impl DebugApi {
             // also kill current execution
             std::panic::panic_any(TxPanic {
                 status: 10,
-                message: b"error signalled by smartcontract".to_vec(),
+                message: err_msg::ERROR_SIGNALLED_BY_SMARTCONTRACT.to_string(),
             })
         }
     }
@@ -184,7 +217,7 @@ impl SendApiImpl for DebugApi {
         if amount_value > available_egld_balance {
             std::panic::panic_any(TxPanic {
                 status: 10,
-                message: b"failed transfer (insufficient funds)".to_vec(),
+                message: "failed transfer (insufficient funds)".to_string(),
             });
         }
 
@@ -208,7 +241,7 @@ impl SendApiImpl for DebugApi {
         let egld_value = self.big_uint_handle_to_value(amount.get_raw_handle());
         let recipient = to.to_address();
 
-        let _ = self.perform_execute_on_dest_context(
+        let _ = self.perform_transfer_execute(
             recipient,
             egld_value,
             endpoint_name.to_boxed_bytes().into_vec(),
@@ -234,7 +267,7 @@ impl SendApiImpl for DebugApi {
         let mut args = vec![token_bytes, amount_bytes];
         Self::append_endpoint_name_and_args(&mut args, endpoint_name, arg_buffer);
 
-        let _ = self.perform_execute_on_dest_context(
+        let _ = self.perform_transfer_execute(
             recipient,
             num_bigint::BigUint::zero(),
             ESDT_TRANSFER_FUNC_NAME.to_vec(),
@@ -270,7 +303,7 @@ impl SendApiImpl for DebugApi {
 
         Self::append_endpoint_name_and_args(&mut args, endpoint_name, arg_buffer);
 
-        let _ = self.perform_execute_on_dest_context(
+        let _ = self.perform_transfer_execute(
             contract_address,
             num_bigint::BigUint::zero(),
             ESDT_NFT_TRANSFER_FUNC_NAME.to_vec(),
@@ -314,7 +347,7 @@ impl SendApiImpl for DebugApi {
             );
         }
 
-        let _ = self.perform_execute_on_dest_context(
+        let _ = self.perform_transfer_execute(
             contract_address,
             num_bigint::BigUint::zero(),
             ESDT_MULTI_TRANSFER_FUNC_NAME.to_vec(),
@@ -344,6 +377,41 @@ impl SendApiImpl for DebugApi {
             tx_hash,
         };
         self.perform_async_call(call)
+    }
+
+    fn create_async_call_raw<M: ManagedTypeApi>(
+        &self,
+        to: &ManagedAddress<M>,
+        amount: &BigUint<M>,
+        endpoint_name: &ManagedBuffer<M>,
+        success_callback: &'static [u8],
+        error_callback: &'static [u8],
+        _gas: u64,
+        _extra_gas_for_callback: u64,
+        arg_buffer: &ManagedArgBuffer<M>,
+    ) {
+        let amount_value = self.big_uint_handle_to_value(amount.get_raw_handle());
+        let contract_address = self.input_ref().to.clone();
+        let recipient = to.to_address();
+        let tx_hash = self.get_tx_hash_legacy();
+
+        let call = AsyncCallTxData {
+            from: contract_address,
+            to: recipient,
+            call_value: amount_value,
+            endpoint_name: endpoint_name.to_boxed_bytes().into_vec(),
+            arguments: arg_buffer.to_raw_args_vec(),
+            tx_hash,
+        };
+
+        let promise = Promise {
+            endpoint: call,
+            success_callback,
+            error_callback,
+        };
+
+        let mut tx_result = self.result_borrow_mut();
+        tx_result.result_calls.promises.push(promise);
     }
 
     fn deploy_contract<M: ManagedTypeApi>(
@@ -428,40 +496,6 @@ impl SendApiImpl for DebugApi {
         ManagedVec::from(result)
     }
 
-    fn execute_on_dest_context_raw_custom_result_range<M, F>(
-        &self,
-        _gas: u64,
-        to: &ManagedAddress<M>,
-        value: &BigUint<M>,
-        endpoint_name: &ManagedBuffer<M>,
-        arg_buffer: &ManagedArgBuffer<M>,
-        range_closure: F,
-    ) -> ManagedVec<M, ManagedBuffer<M>>
-    where
-        M: ManagedTypeApi,
-        F: FnOnce(usize, usize) -> (usize, usize),
-    {
-        let egld_value = self.big_uint_handle_to_value(value.get_raw_handle());
-        let recipient = to.to_address();
-
-        let num_return_data_before = self.result_borrow_mut().result_values.len();
-
-        let result = self.perform_execute_on_dest_context(
-            recipient,
-            egld_value,
-            endpoint_name.to_boxed_bytes().into_vec(),
-            arg_buffer.to_raw_args_vec(),
-        );
-
-        let num_return_data_after = result.len();
-        let (result_start_index, result_end_index) = range_closure(
-            num_return_data_before as usize,
-            num_return_data_after as usize,
-        );
-
-        ManagedVec::from(result[result_start_index..result_end_index].to_vec())
-    }
-
     fn execute_on_dest_context_by_caller_raw<M: ManagedTypeApi>(
         &self,
         _gas: u64,
@@ -494,17 +528,6 @@ impl SendApiImpl for DebugApi {
         panic!("execute_on_dest_context_readonly_raw not implemented yet!");
     }
 
-    fn storage_store_tx_hash_key<M: ManagedTypeApi>(&self, data: &ManagedBuffer<M>) {
-        let tx_hash = self.get_tx_hash_legacy();
-        self.storage_store_slice_u8(tx_hash.as_bytes(), data.to_boxed_bytes().as_slice());
-    }
-
-    fn storage_load_tx_hash_key<M: ManagedTypeApi>(&self) -> ManagedBuffer<M> {
-        let tx_hash = self.get_tx_hash_legacy();
-        let bytes = self.storage_load_boxed_bytes(tx_hash.as_bytes());
-        ManagedBuffer::new_from_bytes(bytes.as_slice())
-    }
-
     fn call_local_esdt_built_in_function<M: ManagedTypeApi>(
         &self,
         _gas: u64,
@@ -520,6 +543,22 @@ impl SendApiImpl for DebugApi {
             arg_buffer.to_raw_args_vec(),
         );
 
+        self.clean_return_data();
+
         ManagedVec::from(result)
+    }
+
+    fn clean_return_data(&self) {
+        let mut tx_result = self.result_borrow_mut();
+        tx_result.result_values.clear();
+    }
+
+    fn delete_from_return_data(&self, index: usize) {
+        let mut tx_result = self.result_borrow_mut();
+        if index > tx_result.result_values.len() {
+            return;
+        }
+
+        let _ = tx_result.result_values.remove(index);
     }
 }

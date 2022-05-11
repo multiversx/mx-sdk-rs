@@ -1,5 +1,7 @@
-use elrond_wasm::{api::ESDT_MULTI_TRANSFER_FUNC_NAME, elrond_codec::TopDecode, types::Address};
-use num_bigint::BigUint;
+use crate::num_bigint::BigUint;
+use elrond_wasm::{
+    api::ESDT_MULTI_TRANSFER_FUNC_NAME, elrond_codec::TopDecode, types::heap::Address,
+};
 use num_traits::Zero;
 
 use crate::{
@@ -22,7 +24,8 @@ pub fn execute_esdt_multi_transfer(
     );
 
     let mut arg_index = 0;
-    let destination = Address::top_decode(tx_input.args[arg_index].as_slice()).unwrap();
+    let destination_bytes = tx_input.args[arg_index].as_slice();
+    let destination = Address::top_decode(destination_bytes).unwrap();
     arg_index += 1;
     let payments = usize::top_decode(tx_input.args[arg_index].as_slice()).unwrap();
     arg_index += 1;
@@ -54,7 +57,12 @@ pub fn execute_esdt_multi_transfer(
         builtin_logs.push(TxLog {
             address: tx_input.from.clone(),
             endpoint: ESDT_MULTI_TRANSFER_FUNC_NAME.to_vec(),
-            topics: vec![token_identifier, nonce_bytes, value_bytes],
+            topics: vec![
+                token_identifier,
+                nonce_bytes,
+                value_bytes,
+                destination_bytes.to_vec(),
+            ],
             data: vec![],
         });
     }

@@ -1,12 +1,15 @@
 use std::convert::TryInto;
 
-use crate::{tx_mock::TxPanic, DebugApi};
+use crate::{
+    num_bigint::{BigInt, BigUint, Sign},
+    tx_mock::TxPanic,
+    DebugApi,
+};
 use alloc::vec::Vec;
 use elrond_wasm::{
-    api::{EndpointArgumentApi, EndpointArgumentApiImpl, Handle},
-    types::BoxedBytes,
+    api::{EndpointArgumentApi, EndpointArgumentApiImpl, Handle, ManagedBufferApi},
+    types::heap::BoxedBytes,
 };
-use num_bigint::{BigInt, BigUint, Sign};
 use num_traits::cast::ToPrimitive;
 
 impl EndpointArgumentApi for DebugApi {
@@ -14,6 +17,17 @@ impl EndpointArgumentApi for DebugApi {
 
     fn argument_api_impl() -> Self::EndpointArgumentApiImpl {
         DebugApi::new_from_static()
+    }
+}
+
+impl DebugApi {
+    fn get_argument_vec_u8(&self, arg_index: i32) -> Vec<u8> {
+        let arg_idx_usize = arg_index as usize;
+        assert!(
+            arg_idx_usize < self.input_ref().args.len(),
+            "Tx arg index out of range"
+        );
+        self.input_ref().args[arg_idx_usize].clone()
     }
 }
 
@@ -33,39 +47,25 @@ impl EndpointArgumentApiImpl for DebugApi {
         panic!("copy_argument_to_slice not yet implemented")
     }
 
-    fn get_argument_vec_u8(&self, arg_index: i32) -> Vec<u8> {
-        let arg_idx_usize = arg_index as usize;
-        assert!(
-            arg_idx_usize < self.input_ref().args.len(),
-            "Tx arg index out of range"
-        );
-        self.input_ref().args[arg_idx_usize].clone()
-    }
-
     fn get_argument_boxed_bytes(&self, arg_index: i32) -> BoxedBytes {
         self.get_argument_vec_u8(arg_index).into()
     }
 
-    fn get_argument_big_uint_raw(&self, arg_index: i32) -> Handle {
+    fn load_argument_big_int_unsigned(&self, arg_index: i32, dest: Handle) {
         let arg_bytes = self.get_argument_boxed_bytes(arg_index);
-        let mut managed_types = self.m_types_borrow_mut();
-        let result = BigInt::from_bytes_be(Sign::Plus, arg_bytes.as_slice());
-        managed_types.big_int_map.insert_new_handle(result)
+        let value = BigInt::from_bytes_be(Sign::Plus, arg_bytes.as_slice());
+        self.bi_overwrite(dest, value);
     }
 
-    fn get_argument_big_int_raw(&self, arg_index: i32) -> i32 {
+    fn load_argument_big_int_signed(&self, arg_index: i32, dest: Handle) {
         let arg_bytes = self.get_argument_boxed_bytes(arg_index);
-        let mut managed_types = self.m_types_borrow_mut();
-        let result = BigInt::from_signed_bytes_be(arg_bytes.as_slice());
-        managed_types.big_int_map.insert_new_handle(result)
+        let value = BigInt::from_signed_bytes_be(arg_bytes.as_slice());
+        self.bi_overwrite(dest, value);
     }
 
-    fn get_argument_managed_buffer_raw(&self, arg_index: i32) -> Handle {
+    fn load_argument_managed_buffer(&self, arg_index: i32, dest: Handle) {
         let arg_bytes = self.get_argument_boxed_bytes(arg_index);
-        let mut managed_types = self.m_types_borrow_mut();
-        managed_types
-            .managed_buffer_map
-            .insert_new_handle(arg_bytes.as_slice().into())
+        self.mb_overwrite(dest, arg_bytes.as_slice());
     }
 
     fn get_argument_i64(&self, arg_index: i32) -> i64 {
@@ -76,7 +76,7 @@ impl EndpointArgumentApiImpl for DebugApi {
         } else {
             std::panic::panic_any(TxPanic {
                 status: 10,
-                message: b"argument out of range".to_vec(),
+                message: "argument out of range".to_string(),
             })
         }
     }
@@ -89,7 +89,7 @@ impl EndpointArgumentApiImpl for DebugApi {
         } else {
             std::panic::panic_any(TxPanic {
                 status: 10,
-                message: b"argument out of range".to_vec(),
+                message: "argument out of range".to_string(),
             })
         }
     }

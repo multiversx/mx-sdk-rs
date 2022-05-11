@@ -1,5 +1,7 @@
-use elrond_wasm::{api::ESDT_NFT_TRANSFER_FUNC_NAME, elrond_codec::TopDecode, types::Address};
-use num_bigint::BigUint;
+use crate::num_bigint::BigUint;
+use elrond_wasm::{
+    api::ESDT_NFT_TRANSFER_FUNC_NAME, elrond_codec::TopDecode, types::heap::Address,
+};
 use num_traits::Zero;
 
 use crate::{
@@ -38,6 +40,7 @@ pub fn execute_esdt_nft_transfer(
             tx_input.args[0].clone(),
             tx_input.args[1].clone(),
             tx_input.args[2].clone(),
+            tx_input.args[3].clone(),
         ],
         data: vec![],
     };

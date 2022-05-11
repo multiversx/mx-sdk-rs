@@ -17,7 +17,7 @@ impl ErrorApiImpl for DebugApi {
 
         std::panic::panic_any(TxPanic {
             status: 4,
-            message: message.to_vec(),
+            message: String::from_utf8(message.to_vec()).unwrap(),
         })
     }
 

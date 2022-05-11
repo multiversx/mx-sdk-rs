@@ -1,11 +1,8 @@
-use crate::{
-    action::{Action, PerformActionResult},
-    user_role::UserRole,
-};
+use crate::{action::Action, user_role::UserRole};
 
 elrond_wasm::imports!();
 
-/// Gas required to finsh transaction after transfer-execute.
+/// Gas required to finish transaction after transfer-execute.
 const PERFORM_ACTION_FINISH_GAS: u64 = 300_000;
 
 fn usize_add_isize(value: &mut usize, delta: isize) {
@@ -76,10 +73,7 @@ pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
 
     /// Proposers and board members use this to launch signed actions.
     #[endpoint(performAction)]
-    fn perform_action_endpoint(
-        &self,
-        action_id: usize,
-    ) -> SCResult<PerformActionResult<Self::Api>> {
+    fn perform_action_endpoint(&self, action_id: usize) -> OptionalValue<ManagedAddress> {
         let (_, caller_role) = self.get_caller_id_and_role();
         require!(
             caller_role.can_perform_action(),
@@ -93,7 +87,7 @@ pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
         self.perform_action(action_id)
     }
 
-    fn perform_action(&self, action_id: usize) -> SCResult<PerformActionResult<Self::Api>> {
+    fn perform_action(&self, action_id: usize) -> OptionalValue<ManagedAddress> {
         let action = self.action_mapper().get(action_id);
 
         // clean up storage
@@ -102,10 +96,10 @@ pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
         self.clear_action(action_id);
 
         match action {
-            Action::Nothing => Ok(PerformActionResult::Nothing),
+            Action::Nothing => OptionalValue::None,
             Action::AddBoardMember(board_member_address) => {
                 self.change_user_role(board_member_address, UserRole::BoardMember);
-                Ok(PerformActionResult::Nothing)
+                OptionalValue::None
             },
             Action::AddProposer(proposer_address) => {
                 self.change_user_role(proposer_address, UserRole::Proposer);
@@ -115,7 +109,7 @@ pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
                     self.quorum().get() <= self.num_board_members().get(),
                     "quorum cannot exceed board size"
                 );
-                Ok(PerformActionResult::Nothing)
+                OptionalValue::None
             },
             Action::RemoveUser(user_address) => {
                 self.change_user_role(user_address, UserRole::None);
@@ -129,7 +123,7 @@ pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
                     self.quorum().get() <= num_board_members,
                     "quorum cannot exceed board size"
                 );
-                Ok(PerformActionResult::Nothing)
+                OptionalValue::None
             },
             Action::ChangeQuorum(new_quorum) => {
                 require!(
@@ -137,7 +131,7 @@ pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
                     "quorum cannot exceed board size"
                 );
                 self.quorum().set(new_quorum);
-                Ok(PerformActionResult::Nothing)
+                OptionalValue::None
             },
             Action::SendTransferExecute(call_data) => {
                 let result = Self::Api::send_api_impl().direct_egld_execute(
@@ -150,21 +144,15 @@ pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
                 if let Result::Err(e) = result {
                     Self::Api::error_api_impl().signal_error(e);
                 }
-                Ok(PerformActionResult::Nothing)
+                OptionalValue::None
             },
-            Action::SendAsyncCall(call_data) => {
-                let contract_call_raw = self
-                    .send()
-                    .contract_call::<()>(call_data.to, call_data.endpoint_name)
-                    .with_egld_transfer(call_data.egld_amount)
-                    .with_arguments_raw(call_data.arguments.into());
-                // for arg in arguments {
-                //     contract_call_raw.push_argument_raw_bytes(arg.as_slice());
-                // }
-                Ok(PerformActionResult::SendAsyncCall(
-                    contract_call_raw.async_call(),
-                ))
-            },
+            Action::SendAsyncCall(call_data) => self
+                .send()
+                .contract_call::<()>(call_data.to, call_data.endpoint_name)
+                .with_egld_transfer(call_data.egld_amount)
+                .with_arguments_raw(call_data.arguments.into())
+                .async_call()
+                .call_and_exit(),
             Action::SCDeployFromSource {
                 amount,
                 source,
@@ -179,7 +167,7 @@ pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
                     code_metadata,
                     &arguments.into(),
                 );
-                Ok(PerformActionResult::DeployResult(new_address))
+                OptionalValue::Some(new_address)
             },
             Action::SCUpgradeFromSource {
                 sc_address,
@@ -197,7 +185,7 @@ pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
                     code_metadata,
                     &arguments.into(),
                 );
-                Ok(PerformActionResult::Nothing)
+                OptionalValue::None
             },
         }
     }

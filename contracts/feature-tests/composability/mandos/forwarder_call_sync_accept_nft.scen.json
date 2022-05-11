@@ -55,12 +55,7 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [
-                    "str:NFT-000001",
-                    "str:NonFungibleESDT",
-                    "1",
-                    "5"
-                ],
+                "out": [],
                 "status": "0",
                 "logs": [
                     {
@@ -69,7 +64,7 @@
                         "topics": [
                             "str:NFT-000001",
                             "5",
-                            "01",
+                            "1",
                             "sc:vault"
                         ],
                         "data": ""
@@ -79,10 +74,10 @@
                         "endpoint": "str:accept_funds_echo_payment",
                         "topics": [
                             "str:accept_funds",
+                            "0",
                             "str:NFT-000001",
-                            "str:NonFungibleESDT",
-                            "1",
-                            "5"
+                            "5",
+                            "1"
                         ],
                         "data": ""
                     },
@@ -91,10 +86,10 @@
                         "endpoint": "str:forward_sync_accept_funds",
                         "topics": [
                             "str:accept_funds_sync_result",
+                            "0",
                             "str:NFT-000001",
-                            "str:NonFungibleESDT",
-                            "1",
-                            "5"
+                            "5",
+                            "1"
                         ],
                         "data": ""
                     }

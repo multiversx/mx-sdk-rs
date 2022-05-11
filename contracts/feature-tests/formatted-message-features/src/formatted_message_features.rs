@@ -14,6 +14,11 @@ pub trait FormattedMessageFeatures {
 
     #[endpoint]
     fn dynamic_message(&self, bytes: ManagedBuffer) {
+        sc_panic!("Got this buffer: {}. I don't like it, ERROR!", &bytes);
+    }
+
+    #[endpoint]
+    fn dynamic_message_hex(&self, bytes: ManagedBuffer) {
         sc_panic!("Got this buffer: {:x}. I don't like it, ERROR!", bytes);
     }
 
@@ -26,10 +31,10 @@ pub trait FormattedMessageFeatures {
         #[payment_amount] amount: BigUint,
     ) {
         sc_panic!(
-            "Got token {:x}, with nonce {:x}, amount {:x}. I prefer EGLD. ERROR!",
-            token_id,
+            "Got token {}, with nonce {}, amount {}. I prefer EGLD. ERROR!",
+            &&token_id, // references are accepted
             nonce,
-            amount
+            &amount
         );
     }
 
@@ -42,7 +47,7 @@ pub trait FormattedMessageFeatures {
         #[payment_amount] amount: BigUint,
     ) {
         sc_panic!(
-            "Got token {}, with nonce {:x}, amount {:x}. I prefer EGLD. ERROR!",
+            "Got token {}, with nonce {}, amount {}. I prefer EGLD. ERROR!",
             token_id,
             nonce,
             amount, // trailing comma allowed
@@ -57,6 +62,33 @@ pub trait FormattedMessageFeatures {
     /// TODO: figure out a way to test this.
     #[endpoint]
     fn print_message(&self, x: i32) {
+        sc_print!("Printing x: {}", x,);
+    }
+
+    #[endpoint]
+    fn print_message_hex(&self, x: i32) {
         sc_print!("Printing x: {:x}", x,);
+    }
+
+    #[endpoint]
+    fn print_message_binary(&self, x: u32) {
+        sc_print!("Printing x: {:b}", x);
+    }
+
+    #[endpoint]
+    fn print_message_codec(&self, x: i32) {
+        sc_print!("Printing x: {:c}", x);
+    }
+
+    #[endpoint]
+    fn format_message_one_argument(&self) -> ManagedBuffer {
+        let message = sc_format!("Test");
+        message
+    }
+
+    #[endpoint]
+    fn format_message_multiple_arguments(&self, x: i32) -> ManagedBuffer {
+        let message = sc_format!("Hello {} world", x);
+        message
     }
 }

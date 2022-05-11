@@ -69,6 +69,9 @@ impl DecodeError {
     pub const ARRAY_DECODE_ERROR: DecodeError = DecodeError("array decode error");
     pub const UTF8_DECODE_ERROR: DecodeError = DecodeError("utf-8 decode error");
     pub const CAPACITY_EXCEEDED_ERROR: DecodeError = DecodeError("capacity exceeded");
+
+    pub const MULTI_TOO_FEW_ARGS: DecodeError = DecodeError("too few arguments");
+    pub const MULTI_TOO_MANY_ARGS: DecodeError = DecodeError("too many arguments");
 }
 
 #[cfg(test)]

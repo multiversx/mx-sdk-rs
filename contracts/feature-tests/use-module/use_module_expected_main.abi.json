@@ -9,11 +9,12 @@
         },
         "contractCrate": {
             "name": "use-module",
-            "version": "0.0.0"
+            "version": "0.0.0",
+            "git_version": "<git version here>"
         },
         "framework": {
             "name": "elrond-wasm",
-            "version": "0.27.4"
+            "version": "0.31.1"
         }
     },
     "docs": [
@@ -135,6 +136,7 @@
         },
         {
             "name": "setFeatureFlag",
+            "onlyOwner": true,
             "mutability": "mutable",
             "inputs": [
                 {
@@ -373,10 +375,6 @@
                     "type": "BigUint"
                 },
                 {
-                    "name": "max_actions_per_proposal",
-                    "type": "u32"
-                },
-                {
                     "name": "voting_delay_in_blocks",
                     "type": "u64"
                 },
@@ -409,17 +407,6 @@
                 {
                     "name": "new_value",
                     "type": "BigUint"
-                }
-            ],
-            "outputs": []
-        },
-        {
-            "name": "changeMaxActionsPerProposal",
-            "mutability": "mutable",
-            "inputs": [
-                {
-                    "name": "new_value",
-                    "type": "u32"
                 }
             ],
             "outputs": []
@@ -488,16 +475,6 @@
             ]
         },
         {
-            "name": "getMaxActionsPerProposal",
-            "mutability": "readonly",
-            "inputs": [],
-            "outputs": [
-                {
-                    "type": "u32"
-                }
-            ]
-        },
-        {
             "name": "getVotingDelayInBlocks",
             "mutability": "readonly",
             "inputs": [],
@@ -539,14 +516,58 @@
         },
         {
             "name": "pause",
+            "onlyOwner": true,
             "mutability": "mutable",
             "inputs": [],
             "outputs": []
         },
         {
             "name": "unpause",
+            "onlyOwner": true,
             "mutability": "mutable",
             "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "stake",
+            "mutability": "mutable",
+            "payableInTokens": [
+                "*"
+            ],
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "unstake",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "unstake_amount",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "voteSlashMember",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "member_to_slash",
+                    "type": "Address"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "slashMember",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "member_to_slash",
+                    "type": "Address"
+                }
+            ],
             "outputs": []
         }
     ],

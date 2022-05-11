@@ -33,7 +33,7 @@
                 "out": [],
                 "status": "*",
                 "message": "str:cannot write to storage under Elrond reserved key",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -55,7 +55,7 @@
                 "out": [],
                 "status": "*",
                 "message": "str:cannot write to storage under Elrond reserved key",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -77,7 +77,7 @@
                 "out": [],
                 "status": "*",
                 "message": "str:cannot write to storage under Elrond reserved key",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }

@@ -2,16 +2,15 @@ use core::marker::PhantomData;
 
 use crate::{
     api::{
-        BlockchainApi, BlockchainApiImpl, ErrorApi, ErrorApiImpl, ManagedTypeApi, StorageReadApi,
-        StorageReadApiImpl,
+        BlockchainApi, BlockchainApiImpl, ErrorApi, ErrorApiImpl, ManagedTypeApi, StaticVarApiImpl,
+        StorageReadApi, StorageReadApiImpl,
     },
     storage::{self},
     types::{
-        Address, BigUint, EsdtLocalRoleFlags, EsdtTokenData, ManagedAddress, ManagedByteArray,
-        ManagedType, TokenIdentifier, H256,
+        BigUint, EsdtLocalRoleFlags, EsdtTokenData, ManagedAddress, ManagedByteArray, ManagedType,
+        TokenIdentifier,
     },
 };
-use alloc::boxed::Box;
 
 /// Interface to be used by the actual smart contract code.
 ///
@@ -37,34 +36,43 @@ where
         }
     }
 
+    #[cfg(feature = "alloc")]
     #[inline]
-    pub fn get_caller_legacy(&self) -> Address {
+    pub fn get_caller_legacy(&self) -> crate::types::Address {
         A::blockchain_api_impl().get_caller_legacy()
     }
 
     #[inline]
     pub fn get_caller(&self) -> ManagedAddress<A> {
-        ManagedAddress::from_raw_handle(A::blockchain_api_impl().get_caller_handle())
+        let handle = A::static_var_api_impl().next_handle();
+        A::blockchain_api_impl().load_caller_managed(handle);
+        ManagedAddress::from_raw_handle(handle)
     }
 
+    #[cfg(feature = "alloc")]
     #[inline]
-    pub fn get_sc_address_legacy(&self) -> Address {
+    pub fn get_sc_address_legacy(&self) -> crate::types::Address {
         A::blockchain_api_impl().get_sc_address_legacy()
     }
 
     #[inline]
     pub fn get_sc_address(&self) -> ManagedAddress<A> {
-        ManagedAddress::from_raw_handle(A::blockchain_api_impl().get_sc_address_handle())
+        let handle = A::static_var_api_impl().next_handle();
+        A::blockchain_api_impl().load_sc_address_managed(handle);
+        ManagedAddress::from_raw_handle(handle)
     }
 
+    #[cfg(feature = "alloc")]
     #[inline]
-    pub fn get_owner_address_legacy(&self) -> Address {
+    pub fn get_owner_address_legacy(&self) -> crate::types::Address {
         A::blockchain_api_impl().get_owner_address_legacy()
     }
 
     #[inline]
     pub fn get_owner_address(&self) -> ManagedAddress<A> {
-        ManagedAddress::from_raw_handle(A::blockchain_api_impl().get_owner_address_handle())
+        let handle = A::static_var_api_impl().next_handle();
+        A::blockchain_api_impl().load_owner_address_managed(handle);
+        ManagedAddress::from_raw_handle(handle)
     }
 
     pub fn check_caller_is_owner(&self) {
@@ -73,8 +81,9 @@ where
         }
     }
 
+    #[cfg(feature = "alloc")]
     #[inline]
-    pub fn get_shard_of_address_legacy(&self, address: &Address) -> u32 {
+    pub fn get_shard_of_address_legacy(&self, address: &crate::types::Address) -> u32 {
         A::blockchain_api_impl().get_shard_of_address_legacy(address)
     }
 
@@ -83,8 +92,9 @@ where
         A::blockchain_api_impl().get_shard_of_address(address.get_raw_handle())
     }
 
+    #[cfg(feature = "alloc")]
     #[inline]
-    pub fn is_smart_contract_legacy(&self, address: &Address) -> bool {
+    pub fn is_smart_contract_legacy(&self, address: &crate::types::Address) -> bool {
         A::blockchain_api_impl().is_smart_contract_legacy(address)
     }
 
@@ -93,16 +103,19 @@ where
         A::blockchain_api_impl().is_smart_contract(address.get_raw_handle())
     }
 
+    #[cfg(feature = "alloc")]
     #[inline]
-    pub fn get_balance_legacy(&self, address: &Address) -> BigUint<A> {
-        BigUint::from_raw_handle(A::blockchain_api_impl().get_balance_legacy(address))
+    pub fn get_balance_legacy(&self, address: &crate::types::Address) -> BigUint<A> {
+        let handle = A::static_var_api_impl().next_handle();
+        A::blockchain_api_impl().load_balance_legacy(handle, address);
+        BigUint::from_raw_handle(handle)
     }
 
     #[inline]
     pub fn get_balance(&self, address: &ManagedAddress<A>) -> BigUint<A> {
-        BigUint::from_raw_handle(
-            A::blockchain_api_impl().get_balance_handle(address.get_raw_handle()),
-        )
+        let handle = A::static_var_api_impl().next_handle();
+        A::blockchain_api_impl().load_balance(handle, address.get_raw_handle());
+        BigUint::from_raw_handle(handle)
     }
 
     #[inline]
@@ -114,24 +127,30 @@ where
         }
     }
 
+    #[cfg(feature = "alloc")]
     #[inline]
-    pub fn get_state_root_hash_legacy(&self) -> H256 {
+    pub fn get_state_root_hash_legacy(&self) -> crate::types::H256 {
         A::blockchain_api_impl().get_state_root_hash_legacy()
     }
 
     #[inline]
     pub fn get_state_root_hash(&self) -> ManagedByteArray<A, 32> {
-        A::blockchain_api_impl().get_state_root_hash()
+        let handle = A::static_var_api_impl().next_handle();
+        A::blockchain_api_impl().load_state_root_hash_managed(handle);
+        ManagedByteArray::from_raw_handle(handle)
     }
 
+    #[cfg(feature = "alloc")]
     #[inline]
-    pub fn get_tx_hash_legacy(&self) -> H256 {
+    pub fn get_tx_hash_legacy(&self) -> crate::types::H256 {
         A::blockchain_api_impl().get_tx_hash_legacy()
     }
 
     #[inline]
     pub fn get_tx_hash(&self) -> ManagedByteArray<A, 32> {
-        A::blockchain_api_impl().get_tx_hash::<A>()
+        let handle = A::static_var_api_impl().next_handle();
+        A::blockchain_api_impl().load_tx_hash_managed(handle);
+        ManagedByteArray::from_raw_handle(handle)
     }
 
     #[inline]
@@ -159,14 +178,17 @@ where
         A::blockchain_api_impl().get_block_epoch()
     }
 
+    #[cfg(feature = "alloc")]
     #[inline]
-    pub fn get_block_random_seed_legacy(&self) -> Box<[u8; 48]> {
+    pub fn get_block_random_seed_legacy(&self) -> crate::types::Box<[u8; 48]> {
         A::blockchain_api_impl().get_block_random_seed_legacy()
     }
 
     #[inline]
     pub fn get_block_random_seed(&self) -> ManagedByteArray<A, 48> {
-        A::blockchain_api_impl().get_block_random_seed::<A>()
+        let handle = A::static_var_api_impl().next_handle();
+        A::blockchain_api_impl().load_block_random_seed_managed(handle);
+        ManagedByteArray::from_raw_handle(handle)
     }
 
     #[inline]
@@ -189,14 +211,17 @@ where
         A::blockchain_api_impl().get_prev_block_epoch()
     }
 
+    #[cfg(feature = "alloc")]
     #[inline]
-    pub fn get_prev_block_random_seed_legacy(&self) -> Box<[u8; 48]> {
+    pub fn get_prev_block_random_seed_legacy(&self) -> crate::types::Box<[u8; 48]> {
         A::blockchain_api_impl().get_prev_block_random_seed_legacy()
     }
 
     #[inline]
     pub fn get_prev_block_random_seed(&self) -> ManagedByteArray<A, 48> {
-        A::blockchain_api_impl().get_prev_block_random_seed::<A>()
+        let handle = A::static_var_api_impl().next_handle();
+        A::blockchain_api_impl().load_prev_block_random_seed_managed(handle);
+        ManagedByteArray::from_raw_handle(handle)
     }
 
     #[inline]
@@ -205,7 +230,8 @@ where
         address: &ManagedAddress<A>,
         token_id: &TokenIdentifier<A>,
     ) -> u64 {
-        A::blockchain_api_impl().get_current_esdt_nft_nonce::<A>(address, token_id)
+        A::blockchain_api_impl()
+            .get_current_esdt_nft_nonce(address.get_raw_handle(), token_id.get_raw_handle())
     }
 
     #[inline]
@@ -215,7 +241,14 @@ where
         token_id: &TokenIdentifier<A>,
         nonce: u64,
     ) -> BigUint<A> {
-        A::blockchain_api_impl().get_esdt_balance::<A>(address, token_id, nonce)
+        let result_handle = A::static_var_api_impl().next_handle();
+        A::blockchain_api_impl().load_esdt_balance(
+            address.get_raw_handle(),
+            token_id.get_raw_handle(),
+            nonce,
+            result_handle,
+        );
+        BigUint::from_raw_handle(result_handle)
     }
 
     #[inline]
@@ -228,8 +261,9 @@ where
         A::blockchain_api_impl().get_esdt_token_data::<A>(address, token_id, nonce)
     }
 
+    #[inline]
     pub fn get_esdt_local_roles(&self, token_id: &TokenIdentifier<A>) -> EsdtLocalRoleFlags {
-        A::blockchain_api_impl().get_esdt_local_roles::<A>(token_id)
+        A::blockchain_api_impl().get_esdt_local_roles(token_id.get_raw_handle())
     }
 }
 
@@ -240,8 +274,9 @@ where
     /// Retrieves validator rewards, as set by the protocol.
     #[inline]
     pub fn get_cumulated_validator_rewards(&self) -> BigUint<A> {
-        let raw_handle = A::storage_read_api_impl()
-            .storage_load_big_uint_raw(storage::protected_keys::ELROND_REWARD_KEY);
-        BigUint::from_raw_handle(raw_handle)
+        let result_handle = A::static_var_api_impl().next_handle();
+        A::storage_read_api_impl()
+            .storage_load_big_uint_raw(storage::protected_keys::ELROND_REWARD_KEY, result_handle);
+        BigUint::from_raw_handle(result_handle)
     }
 }

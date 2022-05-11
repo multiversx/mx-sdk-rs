@@ -9,11 +9,12 @@
         },
         "contractCrate": {
             "name": "use-module",
-            "version": "0.0.0"
+            "version": "0.0.0",
+            "git_version": "<git version here>"
         },
         "framework": {
             "name": "elrond-wasm",
-            "version": "0.27.4"
+            "version": "0.31.1"
         }
     },
     "docs": [

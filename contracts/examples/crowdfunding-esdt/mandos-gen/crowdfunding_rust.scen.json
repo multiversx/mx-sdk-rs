@@ -1,0 +1,416 @@
+{
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:owner": {}
+            },
+            "newAddresses": [
+                {
+                    "creatorAddress": "address:owner",
+                    "creatorNonce": "0",
+                    "newAddress": "sc:crowdfunding"
+                }
+            ]
+        },
+        {
+            "step": "scDeploy",
+            "txId": "",
+            "tx": {
+                "from": "address:owner",
+                "contractCode": "file:output/crowdfunding-esdt.wasm",
+                "arguments": [
+                    "0x07d0",
+                    "0x093a80",
+                    "0x43524f57442d313233343536"
+                ],
+                "gasLimit": "5,000,000",
+                "gasPrice": ""
+            },
+            "expect": {
+                "out": [],
+                "status": "0"
+            }
+        },
+        {
+            "step": "setState",
+            "accounts": {
+                "address:user1": {
+                    "esdt": {
+                        "str:CROWD-123456": "1000"
+                    }
+                }
+            }
+        },
+        {
+            "step": "setState",
+            "accounts": {
+                "address:user2": {
+                    "esdt": {
+                        "str:CROWD-123456": "1000"
+                    }
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "",
+            "tx": {
+                "from": "address:user1",
+                "to": "0x000000000000000063726f776466756e64696e675f5f5f5f5f5f5f5f5f5f5f5f",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:CROWD-123456",
+                        "value": "1000"
+                    }
+                ],
+                "function": "fund",
+                "arguments": [],
+                "gasLimit": "",
+                "gasPrice": ""
+            },
+            "expect": {
+                "out": [],
+                "status": "0"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:user1": {
+                    "esdt": {
+                        "str:CROWD-123456": "0",
+                        "+": ""
+                    },
+                    "storage": "*"
+                },
+                "sc:crowdfunding": {
+                    "esdt": {
+                        "str:CROWD-123456": "1000",
+                        "+": ""
+                    },
+                    "storage": "*"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "",
+            "tx": {
+                "from": "address:user2",
+                "to": "0x000000000000000063726f776466756e64696e675f5f5f5f5f5f5f5f5f5f5f5f",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:CROWD-123456",
+                        "value": "500"
+                    }
+                ],
+                "function": "fund",
+                "arguments": [],
+                "gasLimit": "",
+                "gasPrice": ""
+            },
+            "expect": {
+                "out": [],
+                "status": "0"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:user2": {
+                    "esdt": {
+                        "str:CROWD-123456": "500",
+                        "+": ""
+                    },
+                    "storage": "*"
+                },
+                "sc:crowdfunding": {
+                    "esdt": {
+                        "str:CROWD-123456": "1500",
+                        "+": ""
+                    },
+                    "storage": "*"
+                }
+            }
+        },
+        {
+            "step": "scQuery",
+            "txId": "",
+            "tx": {
+                "to": "0x000000000000000063726f776466756e64696e675f5f5f5f5f5f5f5f5f5f5f5f",
+                "function": "status",
+                "arguments": []
+            },
+            "expect": {
+                "out": [
+                    "0x"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "setState",
+            "currentBlockInfo": {
+                "blockTimestamp": "604800"
+            }
+        },
+        {
+            "step": "scQuery",
+            "txId": "",
+            "tx": {
+                "to": "0x000000000000000063726f776466756e64696e675f5f5f5f5f5f5f5f5f5f5f5f",
+                "function": "status",
+                "arguments": []
+            },
+            "expect": {
+                "out": [
+                    "0x02"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "",
+            "tx": {
+                "from": "address:owner",
+                "to": "0x000000000000000063726f776466756e64696e675f5f5f5f5f5f5f5f5f5f5f5f",
+                "function": "claim",
+                "arguments": [],
+                "gasLimit": "",
+                "gasPrice": ""
+            },
+            "expect": {
+                "out": [],
+                "status": "0"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:owner": {
+                    "esdt": {
+                        "str:CROWD-123456": "0",
+                        "+": ""
+                    },
+                    "storage": "*"
+                },
+                "sc:crowdfunding": {
+                    "esdt": {
+                        "str:CROWD-123456": "1500",
+                        "+": ""
+                    },
+                    "storage": "*"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "",
+            "tx": {
+                "from": "address:user1",
+                "to": "0x000000000000000063726f776466756e64696e675f5f5f5f5f5f5f5f5f5f5f5f",
+                "function": "claim",
+                "arguments": [],
+                "gasLimit": "",
+                "gasPrice": ""
+            },
+            "expect": {
+                "out": [],
+                "status": "0"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:user1": {
+                    "esdt": {
+                        "str:CROWD-123456": "1000",
+                        "+": ""
+                    },
+                    "storage": "*"
+                },
+                "sc:crowdfunding": {
+                    "esdt": {
+                        "str:CROWD-123456": "500",
+                        "+": ""
+                    },
+                    "storage": "*"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "",
+            "tx": {
+                "from": "address:user2",
+                "to": "0x000000000000000063726f776466756e64696e675f5f5f5f5f5f5f5f5f5f5f5f",
+                "function": "claim",
+                "arguments": [],
+                "gasLimit": "",
+                "gasPrice": ""
+            },
+            "expect": {
+                "out": [],
+                "status": "0"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:user2": {
+                    "esdt": {
+                        "str:CROWD-123456": "1000",
+                        "+": ""
+                    },
+                    "storage": "*"
+                },
+                "sc:crowdfunding": {
+                    "esdt": {
+                        "str:CROWD-123456": "0",
+                        "+": ""
+                    },
+                    "storage": "*"
+                }
+            }
+        },
+        {
+            "step": "setState",
+            "currentBlockInfo": {
+                "blockTimestamp": "302400"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "",
+            "tx": {
+                "from": "address:user1",
+                "to": "0x000000000000000063726f776466756e64696e675f5f5f5f5f5f5f5f5f5f5f5f",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:CROWD-123456",
+                        "value": "1000"
+                    }
+                ],
+                "function": "fund",
+                "arguments": [],
+                "gasLimit": "",
+                "gasPrice": ""
+            },
+            "expect": {
+                "out": [],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "",
+            "tx": {
+                "from": "address:user2",
+                "to": "0x000000000000000063726f776466756e64696e675f5f5f5f5f5f5f5f5f5f5f5f",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:CROWD-123456",
+                        "value": "1000"
+                    }
+                ],
+                "function": "fund",
+                "arguments": [],
+                "gasLimit": "",
+                "gasPrice": ""
+            },
+            "expect": {
+                "out": [],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "txId": "",
+            "tx": {
+                "to": "0x000000000000000063726f776466756e64696e675f5f5f5f5f5f5f5f5f5f5f5f",
+                "function": "status",
+                "arguments": []
+            },
+            "expect": {
+                "out": [
+                    "0x"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "setState",
+            "currentBlockInfo": {
+                "blockTimestamp": "604800"
+            }
+        },
+        {
+            "step": "scQuery",
+            "txId": "",
+            "tx": {
+                "to": "0x000000000000000063726f776466756e64696e675f5f5f5f5f5f5f5f5f5f5f5f",
+                "function": "status",
+                "arguments": []
+            },
+            "expect": {
+                "out": [
+                    "0x01"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "",
+            "tx": {
+                "from": "address:user1",
+                "to": "0x000000000000000063726f776466756e64696e675f5f5f5f5f5f5f5f5f5f5f5f",
+                "function": "claim",
+                "arguments": [],
+                "gasLimit": "",
+                "gasPrice": ""
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:only owner can claim successful funding"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "",
+            "tx": {
+                "from": "address:owner",
+                "to": "0x000000000000000063726f776466756e64696e675f5f5f5f5f5f5f5f5f5f5f5f",
+                "function": "claim",
+                "arguments": [],
+                "gasLimit": "",
+                "gasPrice": ""
+            },
+            "expect": {
+                "out": [],
+                "status": "0"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:owner": {
+                    "esdt": {
+                        "str:CROWD-123456": "2000",
+                        "+": ""
+                    },
+                    "storage": "*"
+                },
+                "sc:crowdfunding": {
+                    "esdt": {
+                        "str:CROWD-123456": "0",
+                        "+": ""
+                    },
+                    "storage": "*"
+                }
+            }
+        }
+    ]
+}

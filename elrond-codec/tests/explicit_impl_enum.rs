@@ -1,9 +1,8 @@
 use elrond_codec::{
     test_util::{check_dep_encode_decode, check_top_encode_decode},
-    top_decode_from_nested, top_decode_from_nested_or_exit, top_encode_from_nested,
-    top_encode_from_nested_or_exit, DecodeError, EncodeError, NestedDecode, NestedDecodeInput,
-    NestedEncode, NestedEncodeNoErr, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode,
-    TopEncodeOutput,
+    top_decode_from_nested_or_handle_err, top_encode_from_nested, DecodeError, DecodeErrorHandler,
+    EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode, NestedEncodeNoErr,
+    NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
 };
 
 #[derive(PartialEq, Clone, Debug)]
@@ -39,83 +38,55 @@ impl NestedEncodeNoErr for E {
 
 impl NestedEncode for E {
     #[inline]
-    fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
+    fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, _h: H) -> Result<(), H::HandledErr>
+    where
+        O: NestedEncodeOutput,
+        H: EncodeErrorHandler,
+    {
         self.dep_encode_no_err(dest);
         Ok(())
-    }
-
-    #[inline]
-    fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(
-        &self,
-        dest: &mut O,
-        _: ExitCtx,
-        _: fn(ExitCtx, EncodeError) -> !,
-    ) {
-        self.dep_encode_no_err(dest);
     }
 }
 
 impl TopEncode for E {
     #[inline]
-    fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
-        top_encode_from_nested(self, output)
-    }
-
-    #[inline]
-    fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
-        &self,
-        output: O,
-        c: ExitCtx,
-        exit: fn(ExitCtx, EncodeError) -> !,
-    ) {
-        top_encode_from_nested_or_exit(self, output, c, exit);
+    fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: TopEncodeOutput,
+        H: EncodeErrorHandler,
+    {
+        top_encode_from_nested(self, output, h)
     }
 }
 
 impl NestedDecode for E {
-    fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
-        match u32::dep_decode(input)? {
+    fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: NestedDecodeInput,
+        H: DecodeErrorHandler,
+    {
+        match u32::dep_decode_or_handle_err(input, h)? {
             0 => Ok(E::Unit),
-            1 => Ok(E::Newtype(u32::dep_decode(input)?)),
-            2 => Ok(E::Tuple(u32::dep_decode(input)?, u32::dep_decode(input)?)),
+            1 => Ok(E::Newtype(u32::dep_decode_or_handle_err(input, h)?)),
+            2 => Ok(E::Tuple(
+                u32::dep_decode_or_handle_err(input, h)?,
+                u32::dep_decode_or_handle_err(input, h)?,
+            )),
             3 => Ok(E::Struct {
-                a: u32::dep_decode(input)?,
+                a: u32::dep_decode_or_handle_err(input, h)?,
             }),
-            _ => Err(DecodeError::INVALID_VALUE),
-        }
-    }
-
-    fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
-        input: &mut I,
-        c: ExitCtx,
-        exit: fn(ExitCtx, DecodeError) -> !,
-    ) -> Self {
-        match u32::dep_decode_or_exit(input, c.clone(), exit) {
-            0 => E::Unit,
-            1 => E::Newtype(u32::dep_decode_or_exit(input, c.clone(), exit)),
-            2 => E::Tuple(
-                u32::dep_decode_or_exit(input, c.clone(), exit),
-                u32::dep_decode_or_exit(input, c.clone(), exit),
-            ),
-            3 => E::Struct {
-                a: u32::dep_decode_or_exit(input, c.clone(), exit),
-            },
-            _ => exit(c.clone(), DecodeError::INVALID_VALUE),
+            _ => Err(h.handle_error(DecodeError::INVALID_VALUE)),
         }
     }
 }
 
 impl TopDecode for E {
-    fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
-        top_decode_from_nested(input)
-    }
-
-    fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
-        input: I,
-        c: ExitCtx,
-        exit: fn(ExitCtx, DecodeError) -> !,
-    ) -> Self {
-        top_decode_from_nested_or_exit(input, c, exit)
+    fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: TopDecodeInput,
+        H: DecodeErrorHandler,
+    {
+        top_decode_from_nested_or_handle_err(input, h)
     }
 }
 

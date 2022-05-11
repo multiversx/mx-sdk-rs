@@ -34,16 +34,13 @@ use crate::Result::{Err, Ok};
 
 // Also adding all public functions exposed by elrond-codec.
 // They are not used in the derive, but just to make sure:
-fn bytes_to_number() {}
-fn top_encode_number_to_output() {}
-fn using_encoded_number() {}
+fn top_encode_number() {}
+fn universal_decode_number() {}
 fn dep_decode_from_byte_slice() {}
-fn dep_decode_from_byte_slice_or_exit() {}
 fn dep_encode_to_vec() {}
+fn top_decode_from_nested_or_handle_err() {}
 fn top_decode_from_nested() {}
-fn top_decode_from_nested_or_exit() {}
 fn top_encode_from_nested() {}
-fn top_encode_from_nested_or_exit() {}
 fn top_encode_to_vec_u8() {}
 fn boxed_slice_into_vec() {}
 fn vec_into_boxed_slice() {}

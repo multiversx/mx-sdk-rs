@@ -24,11 +24,6 @@ fn block_info_go() {
 }
 
 #[test]
-fn boxed_bytes_zeros_go() {
-    elrond_wasm_debug::mandos_go("mandos/boxed_bytes_zeros.scen.json");
-}
-
-#[test]
 fn codec_err_go() {
     elrond_wasm_debug::mandos_go("mandos/codec_err.scen.json");
 }
@@ -39,40 +34,23 @@ fn count_ones_go() {
 }
 
 #[test]
-fn crypto_elliptic_curves_go() {
-    elrond_wasm_debug::mandos_go("mandos/crypto_elliptic_curves.scen.json");
+fn crypto_keccak256_go() {
+    elrond_wasm_debug::mandos_go("mandos/crypto_keccak256.scen.json");
 }
 
 #[test]
-fn crypto_keccak256_legacy_go() {
-    elrond_wasm_debug::mandos_go("mandos/crypto_keccak256_legacy.scen.json");
-}
-
-// TODO: enable after new VM release is out.
-// #[test]
-// fn crypto_keccak256_go() {
-//     elrond_wasm_debug::mandos_go("mandos/crypto_keccak256.scen.json");
-// }
-
-#[test]
-fn crypto_ripemd160_go() {
-    elrond_wasm_debug::mandos_go("mandos/crypto_ripemd160.scen.json");
+fn crypto_keccak256_legacy_managed_go() {
+    elrond_wasm_debug::mandos_go("mandos/crypto_keccak256_legacy_managed.scen.json");
 }
 
 #[test]
-fn crypto_sha256_legacy_go() {
-    elrond_wasm_debug::mandos_go("mandos/crypto_sha256_legacy.scen.json");
+fn crypto_sha256_go() {
+    elrond_wasm_debug::mandos_go("mandos/crypto_sha256.scen.json");
 }
 
-// TODO: enable after new VM release is out.
-// #[test]
-// fn crypto_sha256_go() {
-//     elrond_wasm_debug::mandos_go("mandos/crypto_sha256.scen.json");
-// }
-
 #[test]
-fn crypto_verify_funcs_go() {
-    elrond_wasm_debug::mandos_go("mandos/crypto_verify_funcs.scen.json");
+fn crypto_sha256_legacy_managed_go() {
+    elrond_wasm_debug::mandos_go("mandos/crypto_sha256_legacy_managed.scen.json");
 }
 
 #[test]
@@ -83,16 +61,6 @@ fn echo_array_u8_go() {
 #[test]
 fn echo_arrayvec_go() {
     elrond_wasm_debug::mandos_go("mandos/echo_arrayvec.scen.json");
-}
-
-#[test]
-fn echo_async_result_empty_go() {
-    elrond_wasm_debug::mandos_go("mandos/echo_async_result_empty.scen.json");
-}
-
-#[test]
-fn echo_async_result_empty_managed_go() {
-    elrond_wasm_debug::mandos_go("mandos/echo_async_result_empty_managed.scen.json");
 }
 
 #[test]
@@ -111,11 +79,6 @@ fn echo_big_uint_go() {
 }
 
 #[test]
-fn echo_boxed_bytes_go() {
-    elrond_wasm_debug::mandos_go("mandos/echo_boxed_bytes.scen.json");
-}
-
-#[test]
 fn echo_i32_go() {
     elrond_wasm_debug::mandos_go("mandos/echo_i32.scen.json");
 }
@@ -131,6 +94,11 @@ fn echo_ignore_go() {
 }
 
 #[test]
+fn echo_managed_async_result_empty_go() {
+    elrond_wasm_debug::mandos_go("mandos/echo_managed_async_result_empty.scen.json");
+}
+
+#[test]
 fn echo_managed_bytes_go() {
     elrond_wasm_debug::mandos_go("mandos/echo_managed_bytes.scen.json");
 }
@@ -141,33 +109,13 @@ fn echo_managed_vec_go() {
 }
 
 #[test]
+fn echo_multi_value_tuples_go() {
+    elrond_wasm_debug::mandos_go("mandos/echo_multi_value_tuples.scen.json");
+}
+
+#[test]
 fn echo_nothing_go() {
     elrond_wasm_debug::mandos_go("mandos/echo_nothing.scen.json");
-}
-
-#[test]
-fn echo_ser_ex_1_go() {
-    elrond_wasm_debug::mandos_go("mandos/echo_ser_ex_1.scen.json");
-}
-
-#[test]
-fn echo_slice_u8_go() {
-    elrond_wasm_debug::mandos_go("mandos/echo_slice_u8.scen.json");
-}
-
-#[test]
-fn echo_str_go() {
-    elrond_wasm_debug::mandos_go("mandos/echo_str.scen.json");
-}
-
-#[test]
-fn echo_str_box_go() {
-    elrond_wasm_debug::mandos_go("mandos/echo_str_box.scen.json");
-}
-
-#[test]
-fn echo_string_go() {
-    elrond_wasm_debug::mandos_go("mandos/echo_string.scen.json");
 }
 
 #[test]
@@ -196,28 +144,13 @@ fn echo_varargs_managed_sum_go() {
 }
 
 #[test]
-fn echo_varags_tuples_go() {
-    elrond_wasm_debug::mandos_go("mandos/echo_varags_tuples.scen.json");
-}
-
-#[test]
 fn echo_varargs_u32_go() {
     elrond_wasm_debug::mandos_go("mandos/echo_varargs_u32.scen.json");
 }
 
 #[test]
-fn echo_vec_u8_go() {
-    elrond_wasm_debug::mandos_go("mandos/echo_vec_u8.scen.json");
-}
-
-#[test]
 fn events_go() {
     elrond_wasm_debug::mandos_go("mandos/events.scen.json");
-}
-
-#[test]
-fn events_legacy_go() {
-    elrond_wasm_debug::mandos_go("mandos/events_legacy.scen.json");
 }
 
 #[test]
@@ -231,13 +164,23 @@ fn get_cumulated_validator_rewards_go() {
 }
 
 #[test]
-fn managed_buffer_concat_1_go() {
-    elrond_wasm_debug::mandos_go("mandos/managed_buffer_concat_1.scen.json");
+fn managed_address_array_go() {
+    elrond_wasm_debug::mandos_go("mandos/managed_address_array.scen.json");
 }
 
 #[test]
-fn managed_buffer_concat_2_go() {
-    elrond_wasm_debug::mandos_go("mandos/managed_buffer_concat_2.scen.json");
+fn managed_address_managed_buffer_go() {
+    elrond_wasm_debug::mandos_go("mandos/managed_address_managed_buffer.scen.json");
+}
+
+#[test]
+fn managed_buffer_concat_go() {
+    elrond_wasm_debug::mandos_go("mandos/managed_buffer_concat.scen.json");
+}
+
+#[test]
+fn managed_buffer_copy_slice_go() {
+    elrond_wasm_debug::mandos_go("mandos/managed_buffer_copy_slice.scen.json");
 }
 
 #[test]
@@ -246,22 +189,7 @@ fn managed_buffer_eq_go() {
 }
 
 #[test]
-fn managed_buffer_overwrite_go() {
-    elrond_wasm_debug::mandos_go("mandos/managed_buffer_overwrite.scen.json");
-}
-
-#[test]
-fn managed_buffer_slice_1_go() {
-    elrond_wasm_debug::mandos_go("mandos/managed_buffer_slice_1.scen.json");
-}
-
-#[test]
-fn managed_buffer_slice_2_go() {
-    elrond_wasm_debug::mandos_go("mandos/managed_buffer_slice_2.scen.json");
-}
-
-#[test]
-fn managed_buffer_random_go() {
+fn managed_buffer_set_random_go() {
     elrond_wasm_debug::mandos_go("mandos/managed_buffer_set_random.scen.json");
 }
 
@@ -301,16 +229,6 @@ fn sc_properties_go() {
 }
 
 #[test]
-fn sc_result_go() {
-    elrond_wasm_debug::mandos_go("mandos/sc_result.scen.json");
-}
-
-#[test]
-fn storage_addr_go() {
-    elrond_wasm_debug::mandos_go("mandos/storage_addr.scen.json");
-}
-
-#[test]
 fn storage_big_int_go() {
     elrond_wasm_debug::mandos_go("mandos/storage_big_int.scen.json");
 }
@@ -336,13 +254,18 @@ fn storage_i64_go() {
 }
 
 #[test]
+fn storage_i64_bad_go() {
+    elrond_wasm_debug::mandos_go("mandos/storage_i64_bad.scen.json");
+}
+
+#[test]
 fn storage_load_from_address_go() {
     elrond_wasm_debug::mandos_go("mandos/storage_load_from_address.scen.json");
 }
 
 #[test]
-fn storage_i64_bad_go() {
-    elrond_wasm_debug::mandos_go("mandos/storage_i64_bad.scen.json");
+fn storage_managed_address_go() {
+    elrond_wasm_debug::mandos_go("mandos/storage_managed_address.scen.json");
 }
 
 #[test]
@@ -361,6 +284,11 @@ fn storage_map3_go() {
 }
 
 #[test]
+fn storage_mapper_fungible_token_go() {
+    elrond_wasm_debug::mandos_go("mandos/storage_mapper_fungible_token.scen.json");
+}
+
+#[test]
 fn storage_mapper_linked_list_go() {
     elrond_wasm_debug::mandos_go("mandos/storage_mapper_linked_list.scen.json");
 }
@@ -373,6 +301,11 @@ fn storage_mapper_map_go() {
 #[test]
 fn storage_mapper_map_storage_go() {
     elrond_wasm_debug::mandos_go("mandos/storage_mapper_map_storage.scen.json");
+}
+
+#[test]
+fn storage_mapper_non_fungible_token_go() {
+    elrond_wasm_debug::mandos_go("mandos/storage_mapper_non_fungible_token.scen.json");
 }
 
 #[test]
@@ -401,8 +334,13 @@ fn storage_mapper_vec_go() {
 }
 
 #[test]
-fn storage_opt_addr_go() {
-    elrond_wasm_debug::mandos_go("mandos/storage_opt_addr.scen.json");
+fn storage_mapper_whitelist_go() {
+    elrond_wasm_debug::mandos_go("mandos/storage_mapper_whitelist.scen.json");
+}
+
+#[test]
+fn storage_opt_managed_addr_go() {
+    elrond_wasm_debug::mandos_go("mandos/storage_opt_managed_addr.scen.json");
 }
 
 #[test]
@@ -428,11 +366,6 @@ fn storage_usize_go() {
 #[test]
 fn storage_usize_bad_go() {
     elrond_wasm_debug::mandos_go("mandos/storage_usize_bad.scen.json");
-}
-
-#[test]
-fn storage_vec_u8_go() {
-    elrond_wasm_debug::mandos_go("mandos/storage_vec_u8.scen.json");
 }
 
 #[test]

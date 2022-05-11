@@ -1,5 +1,6 @@
 {
     "name": "unwrap egld",
+    "gasSchedule": "v4",
     "steps": [
         {
             "step": "externalSteps",
@@ -10,33 +11,22 @@
             "txId": "unwrap-egld",
             "tx": {
                 "from": "address:user",
-                "to": "sc:egld-esdt-swap",
+                "to": "sc:egld_esdt_swap",
                 "esdtValue": [
                     {
-                        "tokenIdentifier": "str:WEGLD-abcdef",
+                        "tokenIdentifier": "str:EGLD-abcdef",
                         "value": "300"
                     }
                 ],
                 "function": "unwrapEgld",
                 "arguments": [],
-                "gasLimit": "100,000,000",
+                "gasLimit": "5,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [],
                 "status": "0",
                 "message": "",
-                "logs": [
-                    {
-                        "address": "sc:egld-esdt-swap",
-                        "endpoint": "str:unwrapEgld",
-                        "topics": [
-                            "str:unwrap-egld",
-                            "address:user"
-                        ],
-                        "data": "300"
-                    }
-                ],
                 "gas": "*",
                 "refund": "*"
             }
@@ -48,19 +38,29 @@
                     "nonce": "2",
                     "balance": "800",
                     "esdt": {
-                        "str:WEGLD-abcdef": "200"
+                        "str:EGLD-abcdef": "200"
                     },
                     "storage": {}
                 },
-                "sc:egld-esdt-swap": {
+                "sc:egld_esdt_swap": {
                     "nonce": "0",
                     "balance": "200",
                     "esdt": {
-                        "str:WEGLD-abcdef": "1800"
+                        "str:EGLD-abcdef": {
+                            "instances": [
+                                {
+                                    "nonce": "",
+                                    "balance": "1"
+                                }
+                            ],
+                            "roles": [
+                                "ESDTRoleLocalMint",
+                                "ESDTRoleLocalBurn"
+                            ]
+                        }
                     },
                     "storage": {
-                        "str:wrapped_egld_token_id": "str:WEGLD-abcdef",
-                        "str:unused_wrapped_egld": "1800"
+                        "str:wrappedEgldTokenId": "str:EGLD-abcdef"
                     },
                     "code": "file:../output/egld-esdt-swap.wasm"
                 }

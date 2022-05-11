@@ -1,0 +1,25 @@
+[package]
+name = "alloc-features"
+version = "0.0.0"
+authors = ["Andrei Marinica <andrei.marinica@elrond.com>"]
+edition = "2018"
+publish = false
+
+[lib]
+path = "src/alloc_features_main.rs"
+
+[dependencies.elrond-wasm]
+version = "0.31.1"
+path = "../../../elrond-wasm"
+features = ["alloc"]
+
+[dev-dependencies.elrond-wasm-debug]
+version = "0.31.1"
+path = "../../../elrond-wasm-debug"
+
+[dependencies.elrond-wasm-modules]
+version = "0.31.1"
+path = "../../../elrond-wasm-modules"
+
+[dev-dependencies.esdt-system-sc-mock]
+path = "../esdt-system-sc-mock"

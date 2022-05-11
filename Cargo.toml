@@ -1,4 +1,6 @@
 [workspace]
+resolver = "2"
+
 members = [
   "elrond-wasm",
   "elrond-wasm-debug",
@@ -28,6 +30,8 @@ members = [
 
   "contracts/examples/adder",
   "contracts/examples/adder/meta",
+  "contracts/examples/esdt-transfer-with-fee",
+  "contracts/examples/esdt-transfer-with-fee/meta",
   "contracts/examples/bonding-curve-contract",
   "contracts/examples/bonding-curve-contract/meta",
   "contracts/examples/crowdfunding-esdt",
@@ -66,8 +70,14 @@ members = [
   "contracts/examples/ping-pong-egld/meta",
   "contracts/examples/token-release",
   "contracts/examples/token-release/meta",
+
+  "contracts/experimental/multisig-external-view",
+  "contracts/experimental/multisig-external-view/meta",
+
   "contracts/feature-tests/abi-tester",
   "contracts/feature-tests/abi-tester/meta",
+  "contracts/feature-tests/alloc-features",
+  "contracts/feature-tests/alloc-features/meta",
   "contracts/feature-tests/basic-features",
   "contracts/feature-tests/basic-features/meta",
   "contracts/feature-tests/composability",
@@ -86,6 +96,8 @@ members = [
   "contracts/feature-tests/composability/forwarder-raw/meta",
   "contracts/feature-tests/composability/local-esdt-and-nft",
   "contracts/feature-tests/composability/local-esdt-and-nft/meta",
+  "contracts/feature-tests/composability/promises-features",
+  "contracts/feature-tests/composability/promises-features/meta",
   "contracts/feature-tests/composability/proxy-test-first",
   "contracts/feature-tests/composability/proxy-test-first/meta",
   "contracts/feature-tests/composability/proxy-test-second",
@@ -108,8 +120,12 @@ members = [
   "contracts/feature-tests/erc-style-contracts/erc1155-user-mock/meta",
   "contracts/feature-tests/erc-style-contracts/lottery-erc20",
   "contracts/feature-tests/erc-style-contracts/lottery-erc20/meta",
+  "contracts/feature-tests/esdt-system-sc-mock",
+  "contracts/feature-tests/esdt-system-sc-mock/meta",
   "contracts/feature-tests/formatted-message-features",
   "contracts/feature-tests/formatted-message-features/meta",
+  "contracts/feature-tests/legacy-examples/crypto-bubbles-legacy",
+  "contracts/feature-tests/legacy-examples/crypto-bubbles-legacy/meta",
   "contracts/feature-tests/multi-contract-features",
   "contracts/feature-tests/multi-contract-features/meta",
   "contracts/feature-tests/panic-message-features",
@@ -120,11 +136,6 @@ members = [
   "contracts/feature-tests/rust-testing-framework-tester/meta",
   "contracts/feature-tests/use-module",
   "contracts/feature-tests/use-module/meta",
-
-  "contracts/modules-legacy/elrond-wasm-module-dns",
-  "contracts/modules-legacy/elrond-wasm-module-features",
-  "contracts/modules-legacy/elrond-wasm-module-pause",
-  "contracts/modules-legacy/elrond-wasm-module-users",
 
   "tools/test-gen",
   "tools/erdpy-snippet-generator",

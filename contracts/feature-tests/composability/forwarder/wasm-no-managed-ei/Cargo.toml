@@ -19,16 +19,12 @@ panic = "abort"
 path = ".."
 
 [dependencies.elrond-wasm-node]
-version = "0.27.4"
+version = "0.31.1"
 path = "../../../../../elrond-wasm-node"
-features = [
-    "unmanaged-ei",
-    "vm-validate-token-identifier",
-    "vm-esdt-local-roles",
-]
+features = ["ei-unmanaged"]
 
 [dependencies.elrond-wasm-output]
-version = "0.27.4"
+version = "0.31.1"
 path = "../../../../../elrond-wasm-output"
 features = ["wasm-output-mode"]
 

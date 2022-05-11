@@ -34,7 +34,6 @@
             },
             "expect": {
                 "out": [
-                    "address:new_owner",
                     "address:new_owner"
                 ]
             }

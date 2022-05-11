@@ -76,6 +76,18 @@ pub trait SendApiImpl {
         arg_buffer: &ManagedArgBuffer<M>,
     ) -> !;
 
+    #[allow(clippy::too_many_arguments)]
+    fn create_async_call_raw<M: ManagedTypeApi>(
+        &self,
+        to: &ManagedAddress<M>,
+        amount: &BigUint<M>,
+        endpoint_name: &ManagedBuffer<M>,
+        success: &'static [u8],
+        error: &'static [u8],
+        gas: u64,
+        extra_gas_for_callback: u64,
+        arg_buffer: &ManagedArgBuffer<M>,
+    );
     /// Deploys a new contract in the same shard.
     /// Unlike `async_call_raw`, the deployment is synchronous and tx execution continues afterwards.
     /// Also unlike `async_call_raw`, it uses an argument buffer to pass arguments
@@ -134,26 +146,6 @@ pub trait SendApiImpl {
         arg_buffer: &ManagedArgBuffer<M>,
     ) -> ManagedVec<M, ManagedBuffer<M>>;
 
-    /// Same shard, in-line execution of another contract.
-    /// Allows the contract to specify which result range to extract as sync call result.
-    /// This is a workaround to handle nested sync calls.
-    /// Please do not use this method unless there is absolutely no other option.
-    /// Will be eliminated after some future Arwen hook redesign.
-    /// `range_closure` takes the number of results before, the number of results after,
-    /// and is expected to return the start index (inclusive) and end index (exclusive).
-    fn execute_on_dest_context_raw_custom_result_range<M, F>(
-        &self,
-        gas: u64,
-        address: &ManagedAddress<M>,
-        value: &BigUint<M>,
-        endpoint_name: &ManagedBuffer<M>,
-        arg_buffer: &ManagedArgBuffer<M>,
-        range_closure: F,
-    ) -> ManagedVec<M, ManagedBuffer<M>>
-    where
-        M: ManagedTypeApi,
-        F: FnOnce(usize, usize) -> (usize, usize);
-
     fn execute_on_dest_context_by_caller_raw<M: ManagedTypeApi>(
         &self,
         gas: u64,
@@ -180,12 +172,6 @@ pub trait SendApiImpl {
         arg_buffer: &ManagedArgBuffer<M>,
     ) -> ManagedVec<M, ManagedBuffer<M>>;
 
-    /// Used to store data between async call and callback.
-    fn storage_store_tx_hash_key<M: ManagedTypeApi>(&self, data: &ManagedBuffer<M>);
-
-    /// Used to store data between async call and callback.
-    fn storage_load_tx_hash_key<M: ManagedTypeApi>(&self) -> ManagedBuffer<M>;
-
     /// Allows synchronously calling a local function by name. Execution is resumed afterwards.
     /// You should never have to call this function directly.
     /// Use the other specific methods instead.
@@ -195,4 +181,8 @@ pub trait SendApiImpl {
         endpoint_name: &ManagedBuffer<M>,
         arg_buffer: &ManagedArgBuffer<M>,
     ) -> ManagedVec<M, ManagedBuffer<M>>;
+
+    fn clean_return_data(&self);
+
+    fn delete_from_return_data(&self, index: usize);
 }

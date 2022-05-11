@@ -1,5 +1,4 @@
-use crate::DebugApi;
-
+use crate::{num_bigint, DebugApi};
 use core::{
     cmp::Ordering,
     ops::{Add, BitAnd, BitOr, BitXor, Div, Mul, Neg, Rem, Shl, Shr, Sub},
@@ -7,14 +6,13 @@ use core::{
 use elrond_wasm::{
     api::{BigIntApi, ErrorApiImpl, Handle},
     err_msg,
-    types::BoxedBytes,
+    types::heap::BoxedBytes,
 };
-use num_bigint::BigInt;
 use num_traits::{pow, sign::Signed, Zero};
 
 use super::big_int_util::big_int_to_i64;
 
-fn assert_positive(bi: &BigInt) {
+fn assert_positive(bi: &num_bigint::BigInt) {
     assert!(
         bi.sign() == num_bigint::Sign::Minus,
         "bitwise operations only allowed on positive integers"
@@ -58,12 +56,24 @@ macro_rules! unary_op_method {
     };
 }
 
+impl DebugApi {
+    pub(crate) fn bi_overwrite(&self, destination: Handle, value: num_bigint::BigInt) {
+        let mut managed_types = self.m_types_borrow_mut();
+        managed_types.big_int_map.insert(destination, value);
+    }
+}
+
 impl BigIntApi for DebugApi {
+    #[allow(dead_code)]
     fn bi_new(&self, value: i64) -> Handle {
         let mut managed_types = self.m_types_borrow_mut();
         managed_types
             .big_int_map
-            .insert_new_handle(BigInt::from(value))
+            .insert_new_handle(num_bigint::BigInt::from(value))
+    }
+
+    fn bi_set_int64(&self, destination: Handle, value: i64) {
+        self.bi_overwrite(destination, num_bigint::BigInt::from(value))
     }
 
     fn bi_unsigned_byte_length(&self, handle: Handle) -> usize {
@@ -83,7 +93,7 @@ impl BigIntApi for DebugApi {
 
     fn bi_set_unsigned_bytes(&self, dest: Handle, bytes: &[u8]) {
         let mut managed_types = self.m_types_borrow_mut();
-        let result = BigInt::from_bytes_be(num_bigint::Sign::Plus, bytes);
+        let result = num_bigint::BigInt::from_bytes_be(num_bigint::Sign::Plus, bytes);
         managed_types.big_int_map.insert(dest, result);
     }
 
@@ -103,7 +113,7 @@ impl BigIntApi for DebugApi {
 
     fn bi_set_signed_bytes(&self, dest: Handle, bytes: &[u8]) {
         let mut managed_types = self.m_types_borrow_mut();
-        let result = BigInt::from_signed_bytes_be(bytes);
+        let result = num_bigint::BigInt::from_signed_bytes_be(bytes);
         managed_types.big_int_map.insert(dest, result);
     }
 
