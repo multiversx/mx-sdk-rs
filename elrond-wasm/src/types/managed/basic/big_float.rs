@@ -2,7 +2,7 @@ use super::ManagedBuffer;
 use core::marker::PhantomData;
 
 use crate::{
-    api::{BigFloatApi, Handle, ManagedTypeApi, ManagedTypeApiImpl, Sign},
+    api::{BigFloatApi, Handle, ManagedTypeApi, ManagedTypeApiImpl, Sign, StaticVarApiImpl},
     types::{BigInt, BigUint, ManagedType},
 };
 use alloc::string::String;
@@ -153,23 +153,20 @@ impl<M: ManagedTypeApi> BigFloat<M> {
         BigFloat::from_raw_handle(M::managed_type_impl().bf_new_zero())
     }
 
-    #[inline]
     pub fn from_buffer(managed_buffer: &ManagedBuffer<M>) -> Self {
-        let api = M::managed_type_impl();
-        let new_bf_handle = api.mb_to_big_float(managed_buffer.handle);
+        let new_bf_handle = M::managed_type_impl().bf_new_zero();
+        M::managed_type_impl().mb_to_big_float(managed_buffer.handle, new_bf_handle);
         BigFloat::from_raw_handle(new_bf_handle)
     }
 
-    #[inline]
     pub fn to_buffer(&self) -> ManagedBuffer<M> {
-        let api = M::managed_type_impl();
-        let new_man_buf_handle = api.mb_from_big_float(self.handle);
+        let new_man_buf_handle = M::static_var_api_impl().next_handle();
+        M::managed_type_impl().mb_from_big_float(self.handle, new_man_buf_handle);
         ManagedBuffer::from_raw_handle(new_man_buf_handle)
     }
 }
 
 impl<M: ManagedTypeApi> BigFloat<M> {
-    #[inline]
     pub fn sqrt(&self) -> Self {
         let api = M::managed_type_impl();
         let new_handle = api.bf_new_zero();

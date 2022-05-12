@@ -2,9 +2,6 @@ use crate::VmApiImpl;
 use elrond_wasm::api::{Handle, ManagedTypeApi, ManagedTypeApiImpl};
 
 extern "C" {
-    fn mBufferNew() -> i32;
-    fn bigFloatNewFromFrac(numeratorValue: i64, denominatorValue: i64) -> i32;
-
     fn mBufferToBigIntUnsigned(mBufferHandle: i32, bigIntHandle: i32) -> i32;
     fn mBufferToBigIntSigned(mBufferHandle: i32, bigIntHandle: i32) -> i32;
     fn mBufferFromBigIntUnsigned(mBufferHandle: i32, bigIntHandle: i32) -> i32;
@@ -53,20 +50,16 @@ impl ManagedTypeApiImpl for VmApiImpl {
     }
 
     #[inline]
-    fn mb_to_big_float(&self, buffer_handle: Handle) -> Handle {
+    fn mb_to_big_float(&self, buffer_handle: Handle, big_float_handle: Handle) {
         unsafe {
-            let big_float_handle = bigFloatNewFromFrac(0, 1);
             mBufferToBigFloat(buffer_handle, big_float_handle);
-            big_float_handle
         }
     }
 
     #[inline]
-    fn mb_from_big_float(&self, big_float_handle: Handle) -> Handle {
+    fn mb_from_big_float(&self, big_float_handle: Handle, buffer_handle: Handle) {
         unsafe {
-            let buffer_handle = mBufferNew();
             mBufferFromBigFloat(buffer_handle, big_float_handle);
-            buffer_handle
         }
     }
 
