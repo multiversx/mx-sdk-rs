@@ -391,7 +391,37 @@
             "outputs": []
         }
     ],
-    "events": [],
+    "events": [
+        {
+            "identifier": "payable-event",
+            "inputs": [
+                {
+                    "name": "token",
+                    "type": "TokenIdentifier",
+                    "indexed": true
+                },
+                {
+                    "name": "amount",
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "identifier": "address-h256-event",
+            "inputs": [
+                {
+                    "name": "address",
+                    "type": "Address",
+                    "indexed": true
+                },
+                {
+                    "name": "h256",
+                    "type": "H256",
+                    "indexed": true
+                }
+            ]
+        }
+    ],
     "hasCallback": false,
     "types": {
         "AbiEnum": {
