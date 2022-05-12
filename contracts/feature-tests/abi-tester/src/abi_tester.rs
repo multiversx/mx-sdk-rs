@@ -80,6 +80,7 @@ pub trait AbiTester {
 
     #[endpoint]
     fn address_vs_h256(&self, address: Address, h256: H256) -> MultiValue2<Address, H256> {
+        self.address_h256_event(&address, &h256);
         (address, h256).into()
     }
 
@@ -159,9 +160,10 @@ pub trait AbiTester {
     #[payable("TOKEN-FOR-ABI")]
     fn payable_some_token(
         &self,
-        #[payment] _payment: BigUint,
-        #[payment_token] _token: TokenIdentifier,
+        #[payment] payment: BigUint,
+        #[payment_token] token: TokenIdentifier,
     ) {
+        self.payable_event(&token, &payment);
     }
 
     #[endpoint]
@@ -175,4 +177,10 @@ pub trait AbiTester {
 
     #[external_view]
     fn external_view(&self) {}
+
+    #[event("payable-event")]
+    fn payable_event(&self, #[indexed] token: &TokenIdentifier, amount: &BigUint);
+
+    #[event("address-h256-event")]
+    fn address_h256_event(&self, #[indexed] address: &Address, #[indexed] h256: &H256);
 }
