@@ -1,0 +1,13 @@
+[package]
+name = "big-float-features-meta"
+version = "0.0.0"
+authors = ["Andrei Marinica <andrei.marinica@elrond.com>"]
+edition = "2018"
+publish = false
+
+[dependencies.big-float-features]
+path = ".."
+
+[dependencies.elrond-wasm-debug]
+version = "0.31.1"
+path = "../../../../elrond-wasm-debug"

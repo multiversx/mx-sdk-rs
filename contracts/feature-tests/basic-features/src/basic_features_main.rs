@@ -3,8 +3,6 @@
 
 elrond_wasm::imports!();
 
-pub mod big_float_methods;
-pub mod big_float_operators;
 pub mod big_num_methods;
 pub mod big_num_operators;
 pub mod block_info_features;
@@ -30,6 +28,7 @@ pub mod storage_mapper_queue;
 pub mod storage_mapper_set;
 pub mod storage_mapper_single;
 pub mod storage_mapper_token_attributes;
+
 pub mod storage_mapper_vec;
 pub mod storage_mapper_whitelist;
 pub mod struct_eq;
@@ -38,9 +37,7 @@ pub mod types;
 
 #[elrond_wasm::contract]
 pub trait BasicFeatures:
-    big_float_methods::BigFloatMethods
-    + big_float_operators::BigFloatOperators
-    + big_num_methods::BigIntMethods
+    big_num_methods::BigIntMethods
     + big_num_operators::BigIntOperators
     + block_info_features::BlockInfoFeatures
     + blockchain_api_features::BlockchainApiFeatures
