@@ -9,34 +9,36 @@
 import path from "path";
 import { CodeMetadata, EnumValue, IAddress, Interaction, ResultsParser, ReturnCode, SmartContract, SmartContractAbi, Struct, TokenPayment, TransactionWatcher, VariadicValue } from "@elrondnetwork/erdjs";
 import { INetworkProvider, ITestSession, ITestUser, loadAbiRegistry, loadCode } from "@elrondnetwork/erdjs-snippets";
-import { NetworkConfig } from "@elrondnetwork/erdjs-network-providers";
 
 const PathToWasm = path.resolve(__dirname, "..", "..", "lottery-esdt", "output", "lottery-esdt.wasm");
 const PathToAbi = path.resolve(__dirname, "..", "..", "lottery-esdt", "output", "lottery-esdt.abi.json");
 
 export async function createInteractor(session: ITestSession, contractAddress?: IAddress): Promise<LotteryInteractor> {
-    let registry = await loadAbiRegistry(PathToAbi);
-    let abi = new SmartContractAbi(registry, ["Lottery"]);
-    let contract = new SmartContract({ address: contractAddress, abi: abi });
-    let networkProvider = session.networkProvider;
-    let networkConfig = session.getNetworkConfig();
-    let interactor = new LotteryInteractor(contract, networkProvider, networkConfig);
+    const registry = await loadAbiRegistry(PathToAbi);
+    const abi = new SmartContractAbi(registry);
+    const contract = new SmartContract({ address: contractAddress, abi: abi });
+    const networkProvider = session.networkProvider;
+    const networkConfig = session.getNetworkConfig();
+    const audit = session.audit;
+    const interactor = new LotteryInteractor(contract, networkProvider, networkConfig, audit);
     return interactor;
 }
 
 export class LotteryInteractor {
     private readonly contract: SmartContract;
     private readonly networkProvider: INetworkProvider;
-    private readonly networkConfig: NetworkConfig;
+    private readonly networkConfig: INetworkConfig;
     private readonly transactionWatcher: TransactionWatcher;
     private readonly resultsParser: ResultsParser;
+    private readonly audit: IAudit;
 
-    constructor(contract: SmartContract, networkProvider: INetworkProvider, networkConfig: NetworkConfig) {
+    constructor(contract: SmartContract, networkProvider: INetworkProvider, networkConfig: INetworkConfig, audit: IAudit) {
         this.contract = contract;
         this.networkProvider = networkProvider;
         this.networkConfig = networkConfig;
         this.transactionWatcher = new TransactionWatcher(networkProvider);
         this.resultsParser = new ResultsParser();
+        this.audit = audit;
     }
 
     async deploy(deployer: ITestUser): Promise<{ address: IAddress, returnCode: ReturnCode }> {
@@ -63,8 +65,11 @@ export class LotteryInteractor {
         let address = SmartContract.computeAddress(transaction.getSender(), transaction.getNonce());
 
         // Let's broadcast the transaction and await its completion:
-        await this.networkProvider.sendTransaction(transaction);
+        const transactionHash = await this.networkProvider.sendTransaction(transaction);
+        await this.audit.onContractDeploymentSent({ transactionHash: transactionHash, contractAddress: address });
+
         let transactionOnNetwork = await this.transactionWatcher.awaitCompleted(transaction);
+        await this.audit.onTransactionCompleted({ transactionHash: transactionHash, transaction: transactionOnNetwork });
 
         // In the end, parse the results:
         let { returnCode } = this.resultsParser.parseUntypedOutcome(transactionOnNetwork);
@@ -99,8 +104,11 @@ export class LotteryInteractor {
         await owner.signer.sign(transaction);
 
         // Let's broadcast the transaction and await its completion:
-        await this.networkProvider.sendTransaction(transaction);
+        const transactionHash = await this.networkProvider.sendTransaction(transaction);
+        await this.audit.onTransactionSent({ action: "start", args: [lotteryName, tokenIdentifier], transactionHash: transactionHash });
+
         let transactionOnNetwork = await this.transactionWatcher.awaitCompleted(transaction);
+        await this.audit.onTransactionCompleted({ transactionHash: transactionHash, transaction: transactionOnNetwork });
 
         // In the end, parse the results:
         let { returnCode, returnMessage } = this.resultsParser.parseOutcome(transactionOnNetwork, interaction.getEndpoint());
@@ -128,8 +136,11 @@ export class LotteryInteractor {
         await user.signer.sign(transaction);
 
         // Let's broadcast the transaction and await its completion:
-        await this.networkProvider.sendTransaction(transaction);
-        let transactionOnNetwork = await this.transactionWatcher.awaitCompleted(transaction);
+        const transactionHash = await this.networkProvider.sendTransaction(transaction);
+        await this.audit.onTransactionSent({ action: "buyTicket", args: [lotteryName, amount.toPrettyString()], transactionHash: transactionHash });
+
+        const transactionOnNetwork = await this.transactionWatcher.awaitCompleted(transaction);
+        await this.audit.onTransactionCompleted({ transactionHash: transactionHash, transaction: transactionOnNetwork });
 
         // In the end, parse the results:
         let { returnCode } = this.resultsParser.parseOutcome(transactionOnNetwork, interaction.getEndpoint());
