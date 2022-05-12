@@ -11,6 +11,7 @@ path = "src/big_float_main.rs"
 [dependencies.elrond-wasm]
 version = "0.31.1"
 path = "../../../elrond-wasm"
+features = ["big-float"]
 
 [dev-dependencies.elrond-wasm-debug]
 version = "0.31.1"

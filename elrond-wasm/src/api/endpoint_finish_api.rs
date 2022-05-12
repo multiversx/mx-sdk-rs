@@ -20,6 +20,4 @@ pub trait EndpointFinishApiImpl {
     fn finish_u64(&self, value: u64);
 
     fn finish_i64(&self, value: i64);
-
-    fn finish_big_float(&self, handle: Handle);
 }

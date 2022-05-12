@@ -13,8 +13,6 @@ extern "C" {
     fn smallIntFinishSigned(value: i64);
 
     // managed buffer API
-    fn mBufferNew() -> i32;
-    fn mBufferFromBigFloat(mBufferHandle: i32, bigFloatHandle: i32) -> i32;
     fn mBufferFinish(mBufferHandle: i32) -> i32;
 }
 
@@ -69,15 +67,6 @@ impl EndpointFinishApiImpl for VmApiImpl {
     fn finish_i64(&self, value: i64) {
         unsafe {
             smallIntFinishSigned(value);
-        }
-    }
-
-    #[inline]
-    fn finish_big_float(&self, big_float_handle: Handle) {
-        unsafe {
-            let new_buffer_handle = mBufferNew();
-            mBufferFromBigFloat(new_buffer_handle, big_float_handle);
-            mBufferFinish(new_buffer_handle);
         }
     }
 }
