@@ -23,23 +23,6 @@ impl From<&EventInputAbi> for EventInputAbiJson {
     }
 }
 
-/// Same as EventAbiJson but ignores the name
-#[derive(Serialize, Deserialize)]
-pub struct ConstructorEventAbiJson {
-    #[serde(skip_serializing_if = "Vec::is_empty")]
-    pub docs: Vec<String>,
-    pub inputs: Vec<EventInputAbiJson>,
-}
-
-impl From<&EventAbi> for ConstructorEventAbiJson {
-    fn from(abi: &EventAbi) -> Self {
-        ConstructorEventAbiJson {
-            docs: abi.docs.iter().map(|d| d.to_string()).collect(),
-            inputs: abi.inputs.iter().map(EventInputAbiJson::from).collect(),
-        }
-    }
-}
-
 #[derive(Serialize, Deserialize)]
 pub struct EventAbiJson {
     #[serde(skip_serializing_if = "Vec::is_empty")]

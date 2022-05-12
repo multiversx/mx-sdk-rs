@@ -1,4 +1,4 @@
-use crate::model::{AutoImpl, EventMetadata, Method, MethodImpl, PublicRole};
+use crate::model::{AutoImpl, Method, MethodImpl};
 
 use super::attributes::*;
 
@@ -37,7 +37,6 @@ pub fn process_event_attribute(attr: &syn::Attribute, method: &mut Method) -> bo
             method.implementation = MethodImpl::Generated(AutoImpl::Event {
                 identifier: event_identifier.clone(),
             });
-            method.public_role = PublicRole::Event(EventMetadata { event_identifier });
         })
         .is_some()
 }

@@ -1,6 +1,7 @@
 use super::util::*;
 use crate::model::{
-    ContractTrait, EndpointLocationMetadata, EndpointMutabilityMetadata, Method, PublicRole,
+    AutoImpl, ContractTrait, EndpointLocationMetadata, EndpointMutabilityMetadata, Method,
+    MethodImpl, PublicRole,
 };
 
 fn generate_endpoint_snippet(
@@ -132,16 +133,16 @@ fn generate_event_snippets(contract: &ContractTrait) -> Vec<proc_macro2::TokenSt
     contract
         .methods
         .iter()
-        .filter_map(|m| match &m.public_role {
-            PublicRole::Event(event_metadata) => {
-                let event_name_str = &event_metadata.event_identifier;
-                let event_def = generate_event_snippet(m, &event_name_str);
+        .filter_map(|m| {
+            if let MethodImpl::Generated(AutoImpl::Event { identifier }) = &m.implementation {
+                let event_def = generate_event_snippet(m, &identifier.to_string());
                 Some(quote! {
                     #event_def
                     contract_abi.events.push(event_abi);
                 })
-            },
-            _ => None,
+            } else {
+                None
+            }
         })
         .collect()
 }
