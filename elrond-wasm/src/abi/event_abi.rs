@@ -11,7 +11,7 @@ pub struct EventInputAbi {
 #[derive(Clone, Debug)]
 pub struct EventAbi {
     pub docs: &'static [&'static str],
-    pub name: &'static str,
+    pub identifier: &'static str,
     pub inputs: Vec<EventInputAbi>,
 }
 

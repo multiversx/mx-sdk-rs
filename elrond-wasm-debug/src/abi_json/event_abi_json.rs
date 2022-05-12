@@ -44,7 +44,7 @@ impl From<&EventAbi> for ConstructorEventAbiJson {
 pub struct EventAbiJson {
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub docs: Vec<String>,
-    pub name: String,
+    pub identifier: String,
     pub inputs: Vec<EventInputAbiJson>,
 }
 
@@ -52,7 +52,7 @@ impl From<&EventAbi> for EventAbiJson {
     fn from(abi: &EventAbi) -> Self {
         EventAbiJson {
             docs: abi.docs.iter().map(|d| d.to_string()).collect(),
-            name: abi.name.to_string(),
+            identifier: abi.identifier.to_string(),
             inputs: abi.inputs.iter().map(EventInputAbiJson::from).collect(),
         }
     }

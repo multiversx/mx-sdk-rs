@@ -121,7 +121,7 @@ fn generate_event_snippet(m: &Method, event_name: &str) -> proc_macro2::TokenStr
     quote! {
         let mut event_abi = elrond_wasm::abi::EventAbi{
             docs: &[ #(#event_docs),* ],
-            name: #event_name,
+            identifier: #event_name,
             inputs: elrond_wasm::types::heap::Vec::new(),
         };
         #(#input_snippets)*
