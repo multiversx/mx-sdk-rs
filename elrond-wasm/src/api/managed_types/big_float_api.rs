@@ -8,7 +8,9 @@ pub trait BigFloatApi {
     fn bf_from_frac(&self, numerator: i64, denominator: i64) -> Handle;
     fn bf_from_sci(&self, significand: i64, exponent: i64) -> Handle;
 
-    fn bf_new_zero(&self) -> Handle;
+    fn bf_new_zero(&self) -> Handle {
+        self.bf_from_frac(0, 1)
+    }
 
     fn bf_add(&self, dest: Handle, x: Handle, y: Handle);
     fn bf_sub(&self, dest: Handle, x: Handle, y: Handle);

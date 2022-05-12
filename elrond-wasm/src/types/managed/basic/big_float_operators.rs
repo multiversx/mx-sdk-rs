@@ -1,6 +1,6 @@
 use super::BigFloat;
 use crate::{
-    api::{BigFloatApi, ManagedTypeApi},
+    api::{BigFloatApi, ManagedTypeApi, StaticVarApiImpl},
     types::managed::managed_type_trait::ManagedType,
 };
 use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
@@ -11,8 +11,7 @@ macro_rules! binary_operator {
             type Output = BigFloat<M>;
 
             fn $method(self, other: BigFloat<M>) -> BigFloat<M> {
-                let api = M::managed_type_impl();
-                api.$api_func(self.handle, self.handle, other.handle);
+                M::managed_type_impl().$api_func(self.handle, self.handle, other.handle);
                 BigFloat::from_raw_handle(self.handle)
             }
         }
@@ -21,10 +20,9 @@ macro_rules! binary_operator {
             type Output = BigFloat<M>;
 
             fn $method(self, other: &BigFloat<M>) -> BigFloat<M> {
-                let api = M::managed_type_impl();
-                let result = api.bf_new_zero();
-                api.$api_func(result, self.handle, other.handle);
-                BigFloat::from_raw_handle(result)
+                let result_handle = M::static_var_api_impl().next_handle();
+                M::managed_type_impl().$api_func(result_handle, self.handle, other.handle);
+                BigFloat::from_raw_handle(result_handle)
             }
         }
     };
@@ -64,9 +62,8 @@ impl<M: ManagedTypeApi> Neg for BigFloat<M> {
     type Output = BigFloat<M>;
 
     fn neg(self) -> Self::Output {
-        let api = M::managed_type_impl();
-        let result = api.bf_new_zero();
-        api.bf_neg(result, self.handle);
-        BigFloat::from_raw_handle(result)
+        let result_handle = M::static_var_api_impl().next_handle();
+        M::managed_type_impl().bf_neg(result_handle, self.handle);
+        BigFloat::from_raw_handle(result_handle)
     }
 }

@@ -13,10 +13,6 @@ impl BigFloatApi for super::UncallableApi {
         unreachable!()
     }
 
-    fn bf_new_zero(&self) -> Handle {
-        unreachable!()
-    }
-
     fn bf_add(&self, _dest: Handle, _x: Handle, _y: Handle) {
         unreachable!()
     }

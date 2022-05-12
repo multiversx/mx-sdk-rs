@@ -1,14 +1,15 @@
 use core::cmp::Ordering;
 
-use crate::api::{BigFloatApi, ManagedTypeApi};
+use crate::api::{BigFloatApi, ManagedTypeApi, StaticVarApiImpl};
 
 use super::{BigFloat, BigInt};
 
 impl<M: ManagedTypeApi> PartialEq for BigFloat<M> {
     #[inline]
     fn eq(&self, other: &Self) -> bool {
-        let api = M::managed_type_impl();
-        api.bf_cmp(self.handle, other.handle).is_eq()
+        M::managed_type_impl()
+            .bf_cmp(self.handle, other.handle)
+            .is_eq()
     }
 }
 
@@ -24,31 +25,28 @@ impl<M: ManagedTypeApi> PartialOrd for BigFloat<M> {
 impl<M: ManagedTypeApi> Ord for BigFloat<M> {
     #[inline]
     fn cmp(&self, other: &Self) -> Ordering {
-        let api = M::managed_type_impl();
-        api.bf_cmp(self.handle, other.handle)
+        M::managed_type_impl().bf_cmp(self.handle, other.handle)
     }
 }
 
 fn cmp_i64<M: ManagedTypeApi>(bf: &BigFloat<M>, other: i64) -> Ordering {
-    let api = M::managed_type_impl();
     if other == 0 {
-        match api.bf_sign(bf.handle) {
+        match M::managed_type_impl().bf_sign(bf.handle) {
             crate::api::Sign::Plus => Ordering::Greater,
             crate::api::Sign::NoSign => Ordering::Equal,
             crate::api::Sign::Minus => Ordering::Less,
         }
     } else {
-        let new_bf_handle = api.bf_new_zero();
-        api.bf_set_i64(new_bf_handle, other);
-        api.bf_cmp(bf.handle, new_bf_handle)
+        let new_bf_handle = M::static_var_api_impl().next_handle();
+        M::managed_type_impl().bf_set_i64(new_bf_handle, other);
+        M::managed_type_impl().bf_cmp(bf.handle, new_bf_handle)
     }
 }
 
 fn cmp_bi<M: ManagedTypeApi>(bf: &BigFloat<M>, other: &BigInt<M>) -> Ordering {
-    let api = M::managed_type_impl();
-    let new_bf_handle = api.bf_new_zero();
-    api.bf_set_bi(new_bf_handle, other.handle);
-    api.bf_cmp(bf.handle, new_bf_handle)
+    let new_bf_handle = M::static_var_api_impl().next_handle();
+    M::managed_type_impl().bf_set_bi(new_bf_handle, other.handle);
+    M::managed_type_impl().bf_cmp(bf.handle, new_bf_handle)
 }
 
 impl<M: ManagedTypeApi> PartialEq<i64> for BigFloat<M> {
