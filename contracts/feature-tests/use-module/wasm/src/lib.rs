@@ -44,8 +44,12 @@ elrond_wasm_node::wasm_endpoints! {
         propose
         queue
         setFeatureFlag
+        slashMember
+        stake
         unpause
+        unstake
         vote
+        voteSlashMember
         withdrawGovernanceTokens
     )
 }
