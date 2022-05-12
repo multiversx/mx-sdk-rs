@@ -135,7 +135,7 @@ fn generate_event_snippets(contract: &ContractTrait) -> Vec<proc_macro2::TokenSt
         .iter()
         .filter_map(|m| {
             if let MethodImpl::Generated(AutoImpl::Event { identifier }) = &m.implementation {
-                let event_def = generate_event_snippet(m, &identifier.to_string());
+                let event_def = generate_event_snippet(m, &identifier);
                 Some(quote! {
                     #event_def
                     contract_abi.events.push(event_abi);
