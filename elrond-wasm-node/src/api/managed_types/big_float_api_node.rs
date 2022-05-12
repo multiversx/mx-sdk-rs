@@ -73,11 +73,6 @@ impl BigFloatApi for crate::VmApiImpl {
         unsafe { bigFloatNewFromSci(significand_value, exponent_value) }
     }
 
-    #[inline]
-    fn bf_new_zero(&self) -> Handle {
-        self.bf_from_frac(0, 1)
-    }
-
     binary_op_wrapper! {bf_add, bigFloatAdd}
     binary_op_wrapper! {bf_sub, bigFloatSub}
     binary_op_wrapper! {bf_mul, bigFloatMul}

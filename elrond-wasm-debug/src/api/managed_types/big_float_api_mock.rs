@@ -90,11 +90,6 @@ impl BigFloatApi for DebugApi {
         managed_types.big_float_map.insert_new_handle(value)
     }
 
-    fn bf_new_zero(&self) -> Handle {
-        let mut managed_types = self.m_types_borrow_mut();
-        managed_types.big_float_map.insert_new_handle(0_f64)
-    }
-
     binary_op_method!(bf_add, add);
     binary_op_method!(bf_sub, sub);
     binary_op_method!(bf_mul, mul);
