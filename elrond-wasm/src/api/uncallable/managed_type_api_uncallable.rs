@@ -27,11 +27,11 @@ impl ManagedTypeApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn mb_to_big_float(&self, _buffer_handle: Handle) -> Handle {
+    fn mb_to_big_float(&self, _buffer_handle: Handle, _dest: Handle) {
         unreachable!()
     }
 
-    fn mb_from_big_float(&self, _big_float_handle: Handle) -> Handle {
+    fn mb_from_big_float(&self, _big_float_handle: Handle, _dest: Handle) {
         unreachable!()
     }
 }

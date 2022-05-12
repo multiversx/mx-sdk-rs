@@ -10,14 +10,25 @@ use elrond_wasm::{
 };
 use num_traits::{Signed, ToPrimitive};
 
+impl DebugApi {
+    pub(crate) fn bf_get_f64(&self, handle: Handle) -> f64 {
+        let managed_types = self.m_types_borrow_mut();
+        *managed_types.big_float_map.get(handle)
+    }
+
+    pub(crate) fn bf_overwrite(&self, handle: Handle, value: f64) {
+        let mut managed_types = self.m_types_borrow_mut();
+        managed_types.big_float_map.insert(handle, value);
+    }
+}
+
 macro_rules! binary_op_method {
     ($method_name:ident, $rust_op_name:ident) => {
         fn $method_name(&self, dest: Handle, x: Handle, y: Handle) {
-            let mut managed_types = self.m_types_borrow_mut();
-            let bf_x = managed_types.big_float_map.get(x);
-            let bf_y = managed_types.big_float_map.get(y);
+            let bf_x = self.bf_get_f64(x);
+            let bf_y = self.bf_get_f64(y);
             let result = bf_x.$rust_op_name(bf_y);
-            managed_types.big_float_map.insert(dest, result);
+            self.bf_overwrite(dest, result);
         }
     };
 }
@@ -25,10 +36,9 @@ macro_rules! binary_op_method {
 macro_rules! unary_op_method {
     ($method_name:ident, $rust_op_name:ident) => {
         fn $method_name(&self, dest: Handle, x: Handle) {
-            let mut managed_types = self.m_types_borrow_mut();
-            let bf_x = managed_types.big_float_map.get(x);
+            let bf_x = self.bf_get_f64(x);
             let result = bf_x.$rust_op_name();
-            managed_types.big_float_map.insert(dest, result);
+            self.bf_overwrite(dest, result);
         }
     };
 }
@@ -119,17 +129,15 @@ impl BigFloatApi for DebugApi {
     }
 
     fn bf_clone(&self, dest: Handle, x: Handle) {
-        let mut managed_types = self.m_types_borrow_mut();
-        let bf_x = *managed_types.big_float_map.get(x);
-        managed_types.big_float_map.insert(dest, bf_x);
+        let value = self.bf_get_f64(x);
+        self.bf_overwrite(dest, value);
     }
 
     unary_op_method!(bf_sqrt, sqrt);
 
     fn bf_pow(&self, dest: Handle, x: Handle, exp: i32) {
-        let mut managed_types = self.m_types_borrow_mut();
-        let bf_x = *managed_types.big_float_map.get(x);
-        managed_types.big_float_map.insert(dest, bf_x.powi(exp))
+        let value = self.bf_get_f64(x);
+        self.bf_overwrite(dest, value.powi(exp));
     }
 
     unary_op_method!(bf_floor, floor);
@@ -148,35 +156,24 @@ impl BigFloatApi for DebugApi {
     }
 
     fn bf_set_i64(&self, dest: Handle, value: i64) {
-        let mut managed_types = self.m_types_borrow_mut();
-
-        managed_types
-            .big_float_map
-            .insert(dest, value.to_f64().unwrap_or_default());
+        let f64_value = value.to_f64().unwrap_or_default();
+        self.bf_overwrite(dest, f64_value);
     }
 
     fn bf_set_bi(&self, dest: Handle, bi: Handle) {
-        let mut managed_types = self.m_types_borrow_mut();
-        managed_types.big_float_map.insert(
-            dest,
-            self.bi_to_i64(bi)
-                .unwrap_or_default()
-                .to_f64()
-                .unwrap_or_default(),
-        )
+        let f64_value = self
+            .bi_to_i64(bi)
+            .unwrap_or_default()
+            .to_f64()
+            .unwrap_or_default();
+        self.bf_overwrite(dest, f64_value);
     }
 
     fn bf_get_const_pi(&self, dest: Handle) {
-        let mut managed_types = self.m_types_borrow_mut();
-        managed_types
-            .big_float_map
-            .insert(dest, std::f64::consts::PI)
+        self.bf_overwrite(dest, std::f64::consts::PI);
     }
 
     fn bf_get_const_e(&self, dest: Handle) {
-        let mut managed_types = self.m_types_borrow_mut();
-        managed_types
-            .big_float_map
-            .insert(dest, std::f64::consts::E)
+        self.bf_overwrite(dest, std::f64::consts::E);
     }
 }
