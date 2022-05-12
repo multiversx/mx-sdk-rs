@@ -15,11 +15,6 @@ pub struct EndpointMetadata {
 }
 
 #[derive(Clone, Debug)]
-pub struct EventMetadata {
-    pub event_identifier: String,
-}
-
-#[derive(Clone, Debug)]
 pub struct CallbackMetadata {
     pub callback_name: syn::Ident,
 }
