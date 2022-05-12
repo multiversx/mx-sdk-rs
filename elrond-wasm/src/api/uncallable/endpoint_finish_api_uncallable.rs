@@ -34,8 +34,4 @@ impl EndpointFinishApiImpl for UncallableApi {
     fn finish_i64(&self, _value: i64) {
         unreachable!()
     }
-
-    fn finish_big_float(&self, _handle: Handle) {
-        unreachable!()
-    }
 }

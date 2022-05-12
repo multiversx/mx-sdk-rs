@@ -8,8 +8,8 @@ use crate::{
     elrond_codec::{EncodeError, TopEncode, TopEncodeOutput},
     err_msg,
     types::{
-        BigFloat, BigInt, BigUint, ManagedBuffer, ManagedBufferCachedBuilder, ManagedSCError,
-        ManagedType, SCError, StaticSCError,
+        BigInt, BigUint, ManagedBuffer, ManagedBufferCachedBuilder, ManagedSCError, ManagedType,
+        SCError, StaticSCError,
     },
 };
 
@@ -87,9 +87,6 @@ where
             Ok(())
         } else if let Some(big_int) = value.try_cast_ref::<BigInt<FA>>() {
             FA::finish_api_impl().finish_big_int_raw(big_int.handle);
-            Ok(())
-        } else if let Some(big_float) = value.try_cast_ref::<BigFloat<FA>>() {
-            FA::finish_api_impl().finish_big_float(big_float.handle);
             Ok(())
         } else {
             Err(h.handle_error(EncodeError::UNSUPPORTED_OPERATION))
