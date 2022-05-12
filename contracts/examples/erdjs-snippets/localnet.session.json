@@ -1,7 +1,8 @@
 {
     "networkProvider": {
         "type": "ProxyNetworkProvider",
-        "url": "http://localhost:7950"
+        "url": "http://localhost:7950",
+        "timeout": 5000
     },
     "users": {
         "individuals": [
