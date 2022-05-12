@@ -15,6 +15,11 @@ pub struct EndpointMetadata {
 }
 
 #[derive(Clone, Debug)]
+pub struct EventMetadata {
+    pub event_identifier: String,
+}
+
+#[derive(Clone, Debug)]
 pub struct CallbackMetadata {
     pub callback_name: syn::Ident,
 }
@@ -33,5 +38,6 @@ pub enum PublicRole {
     CallbackRaw,
 
     /// Can only called from within the smart contract.
+    Event(EventMetadata),
     Private,
 }
