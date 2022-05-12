@@ -391,6 +391,7 @@
             "outputs": []
         }
     ],
+    "events": [],
     "hasCallback": false,
     "types": {
         "AbiEnum": {
