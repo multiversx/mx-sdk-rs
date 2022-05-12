@@ -12,8 +12,6 @@ elrond_wasm_node::wasm_endpoints! {
         add_assign_big_int_ref
         add_assign_big_uint
         add_assign_big_uint_ref
-        add_big_float
-        add_big_float_ref
         add_big_int
         add_big_int_ref
         add_big_uint
@@ -60,14 +58,10 @@ elrond_wasm_node::wasm_endpoints! {
         compute_sha256
         compute_sha256_legacy_managed
         count_ones
-        div_assign_big_float
-        div_assign_big_float_ref
         div_assign_big_int
         div_assign_big_int_ref
         div_assign_big_uint
         div_assign_big_uint_ref
-        div_big_float
-        div_big_float_ref
         div_big_int
         div_big_int_ref
         div_big_uint
@@ -221,8 +215,6 @@ elrond_wasm_node::wasm_endpoints! {
         mul_assign_big_int_ref
         mul_assign_big_uint
         mul_assign_big_uint_ref
-        mul_big_float
-        mul_big_float_ref
         mul_big_int
         mul_big_int_ref
         mul_big_uint
@@ -231,15 +223,10 @@ elrond_wasm_node::wasm_endpoints! {
         my_single_value_mapper_increment_2
         my_single_value_mapper_set_if_empty
         my_single_value_mapper_subtract_with_require
-        new_from_frac_big_float
-        new_from_parts_big_float
-        new_from_sci_big_float
         non_zero_usize_iter
         non_zero_usize_macro
         only_owner_endpoint
         panicWithMessage
-        pow_big_float
-        pow_big_float_ref
         pow_big_int
         pow_big_int_ref
         pow_big_uint
@@ -276,8 +263,6 @@ elrond_wasm_node::wasm_endpoints! {
         shr_assign_big_uint_ref
         shr_big_uint
         shr_big_uint_ref
-        sqrt_big_float
-        sqrt_big_float_ref
         sqrt_big_uint
         sqrt_big_uint_ref
         store_addr
@@ -300,8 +285,6 @@ elrond_wasm_node::wasm_endpoints! {
         sub_assign_big_int_ref
         sub_assign_big_uint
         sub_assign_big_uint_ref
-        sub_big_float
-        sub_big_float_ref
         sub_big_int
         sub_big_int_ref
         sub_big_uint
