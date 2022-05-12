@@ -61,11 +61,11 @@ build_and_copy_composability() {
       $VM_REPO_PATH/test/features/composability/$contract/output/${contract}-unmanaged.wasm
 }
 
-# build_and_copy_composability forwarder
-# build_and_copy_composability forwarder-raw
-# build_and_copy_composability proxy-test-first
-# build_and_copy_composability proxy-test-second
-# build_and_copy_composability recursive-caller
+build_and_copy_composability forwarder
+build_and_copy_composability forwarder-raw
+build_and_copy_composability proxy-test-first
+build_and_copy_composability proxy-test-second
+build_and_copy_composability recursive-caller
 
 erdpy --verbose contract build --skip-eei-checks ./contracts/feature-tests/composability/vault || return 1
 cp -R contracts/feature-tests/composability/vault/output/vault.wasm \
