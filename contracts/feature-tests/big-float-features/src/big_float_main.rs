@@ -1,5 +1,4 @@
 #![no_std]
-#![feature(never_type)]
 
 elrond_wasm::imports!();
 
