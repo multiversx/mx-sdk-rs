@@ -13,3 +13,12 @@ pub use big_int_sign::Sign;
 pub use big_uint::BigUint;
 pub use elliptic_curve::{EllipticCurve, EllipticCurveComponents};
 pub use managed_buffer::ManagedBuffer;
+
+#[cfg(feature = "big-float")]
+mod big_float;
+#[cfg(feature = "big-float")]
+mod big_float_cmp;
+#[cfg(feature = "big-float")]
+mod big_float_operators;
+#[cfg(feature = "big-float")]
+pub use big_float::BigFloat;

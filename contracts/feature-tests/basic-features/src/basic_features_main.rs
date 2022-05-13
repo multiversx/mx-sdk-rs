@@ -28,6 +28,7 @@ pub mod storage_mapper_queue;
 pub mod storage_mapper_set;
 pub mod storage_mapper_single;
 pub mod storage_mapper_token_attributes;
+
 pub mod storage_mapper_vec;
 pub mod storage_mapper_whitelist;
 pub mod struct_eq;

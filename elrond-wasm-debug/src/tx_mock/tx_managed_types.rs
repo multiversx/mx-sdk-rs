@@ -49,6 +49,7 @@ impl<V> HandleMap<V> {
 #[derive(Debug)]
 pub struct TxManagedTypes {
     pub(crate) big_int_map: HandleMap<BigInt>,
+    pub(crate) big_float_map: HandleMap<f64>,
     pub(crate) managed_buffer_map: HandleMap<ManagedBufferImpl>,
 }
 
@@ -56,6 +57,7 @@ impl TxManagedTypes {
     pub fn new() -> Self {
         TxManagedTypes {
             big_int_map: HandleMap::new(),
+            big_float_map: HandleMap::new(),
             managed_buffer_map: HandleMap::new(),
         }
     }

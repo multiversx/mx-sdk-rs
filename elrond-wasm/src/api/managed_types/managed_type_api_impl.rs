@@ -1,12 +1,15 @@
 use crate::api::ErrorApi;
 
 use super::{
-    token_identifier_util::IDENTIFIER_MAX_LENGTH, BigIntApi, EllipticCurveApi, ManagedBufferApi,
+    token_identifier_util::IDENTIFIER_MAX_LENGTH, BigFloatApi, BigIntApi, EllipticCurveApi,
+    ManagedBufferApi,
 };
 
 pub type Handle = i32;
 
-pub trait ManagedTypeApiImpl: BigIntApi + EllipticCurveApi + ManagedBufferApi + ErrorApi {
+pub trait ManagedTypeApiImpl:
+    BigIntApi + BigFloatApi + EllipticCurveApi + ManagedBufferApi + ErrorApi
+{
     fn mb_to_big_int_unsigned(&self, buffer_handle: Handle, dest: Handle);
 
     fn mb_to_big_int_signed(&self, buffer_handle: Handle, dest: Handle);
@@ -14,6 +17,10 @@ pub trait ManagedTypeApiImpl: BigIntApi + EllipticCurveApi + ManagedBufferApi + 
     fn mb_from_big_int_unsigned(&self, big_int_handle: Handle, dest: Handle);
 
     fn mb_from_big_int_signed(&self, big_int_handle: Handle, dest: Handle);
+
+    fn mb_to_big_float(&self, buffer_handle: Handle, dest: Handle);
+
+    fn mb_from_big_float(&self, big_float_handle: Handle, dest: Handle);
 
     fn validate_token_identifier(&self, token_id_handle: Handle) -> bool {
         let token_id_len = self.mb_len(token_id_handle);
