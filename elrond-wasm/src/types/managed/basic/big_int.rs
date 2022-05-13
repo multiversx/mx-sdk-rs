@@ -19,7 +19,6 @@ pub struct BigInt<M: ManagedTypeApi> {
 }
 
 impl<M: ManagedTypeApi> ManagedType<M> for BigInt<M> {
-    #[doc(hidden)]
     fn from_raw_handle(handle: Handle) -> Self {
         BigInt {
             handle,
@@ -27,7 +26,6 @@ impl<M: ManagedTypeApi> ManagedType<M> for BigInt<M> {
         }
     }
 
-    #[doc(hidden)]
     fn get_raw_handle(&self) -> Handle {
         self.handle
     }
