@@ -79,7 +79,7 @@ pub trait DigitalCash {
         let message = caller_address.as_managed_buffer();
         require!(
             self.crypto()
-                .verify_ed25519_managed::<32>(key, message, &signature),
+                .verify_ed25519_legacy_managed::<32>(key, message, &signature),
             "invalid signature"
         );
 

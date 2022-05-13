@@ -37,18 +37,18 @@ fn crypto_sha256_legacy_alloc_rs() {
 }
 
 // #[test]
-// fn crypto_verify_bls_rs() {
-//     elrond_wasm_debug::mandos_rs("mandos/crypto_verify_bls.scen.json", world());
+// fn crypto_verify_bls_legacy_rs() {
+//     elrond_wasm_debug::mandos_rs("mandos/crypto_verify_bls_legacy.scen.json", world());
 // }
 
 #[test]
-fn crypto_verify_ed25519_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/crypto_verify_ed25519.scen.json", world());
+fn crypto_verify_ed25519_legacy_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/crypto_verify_ed25519_legacy.scen.json", world());
 }
 
 // #[test]
-// fn crypto_verify_secp256k1_rs() {
-//     elrond_wasm_debug::mandos_rs("mandos/crypto_verify_secp256k1.scen.json", world());
+// fn crypto_verify_secp256k1_legacy_rs() {
+//     elrond_wasm_debug::mandos_rs("mandos/crypto_verify_secp256k1_legacy.scen.json", world());
 // }
 
 #[test]

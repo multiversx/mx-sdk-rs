@@ -32,23 +32,39 @@ impl CryptoApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn ripemd160(&self, _data: &[u8]) -> [u8; RIPEMD_RESULT_LEN] {
+    fn ripemd160_legacy(&self, _data: &[u8]) -> [u8; RIPEMD_RESULT_LEN] {
         unreachable!()
     }
 
-    fn verify_bls(&self, _key: &[u8], _message: &[u8], _signature: &[u8]) -> bool {
+    fn ripemd160_managed(&self, _dest: Handle, _data_handle: Handle) {
         unreachable!()
     }
 
-    fn verify_ed25519(&self, _key: &[u8], _message: &[u8], _signature: &[u8]) -> bool {
+    fn verify_bls_legacy(&self, _key: &[u8], _message: &[u8], _signature: &[u8]) -> bool {
         unreachable!()
     }
 
-    fn verify_secp256k1(&self, _key: &[u8], _message: &[u8], _signature: &[u8]) -> bool {
+    fn verify_bls_managed(&self, _key: Handle, _message: Handle, _signature: Handle) -> bool {
         unreachable!()
     }
 
-    fn verify_custom_secp256k1(
+    fn verify_ed25519_legacy(&self, _key: &[u8], _message: &[u8], _signature: &[u8]) -> bool {
+        unreachable!()
+    }
+
+    fn verify_ed25519_managed(&self, _key: Handle, _message: Handle, _signature: Handle) -> bool {
+        unreachable!()
+    }
+
+    fn verify_secp256k1_legacy(&self, _key: &[u8], _message: &[u8], _signature: &[u8]) -> bool {
+        unreachable!()
+    }
+
+    fn verify_secp256k1_managed(&self, _key: Handle, _message: Handle, _signature: Handle) -> bool {
+        unreachable!()
+    }
+
+    fn verify_custom_secp256k1_legacy(
         &self,
         _key: &[u8],
         _message: &[u8],
@@ -58,7 +74,21 @@ impl CryptoApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn encode_secp256k1_der_signature(&self, _r: &[u8], _s: &[u8]) -> BoxedBytes {
+    fn verify_custom_secp256k1_managed(
+        &self,
+        _key: Handle,
+        _message: Handle,
+        _signature: Handle,
+        _hash_type: MessageHashType,
+    ) -> bool {
+        unreachable!()
+    }
+
+    fn encode_secp256k1_der_signature_legacy(&self, _r: &[u8], _s: &[u8]) -> BoxedBytes {
+        unreachable!()
+    }
+
+    fn encode_secp256k1_der_signature_managed(&self, _r: Handle, _s: Handle, _dest: Handle) {
         unreachable!()
     }
 }

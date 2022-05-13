@@ -45,15 +45,23 @@ impl CryptoApiImpl for DebugApi {
         self.mb_overwrite(dest, &result_bytes[..]);
     }
 
-    fn ripemd160(&self, _data: &[u8]) -> [u8; RIPEMD_RESULT_LEN] {
+    fn ripemd160_legacy(&self, _data: &[u8]) -> [u8; RIPEMD_RESULT_LEN] {
         panic!("ripemd160 not implemented yet!")
     }
 
-    fn verify_bls(&self, _key: &[u8], _message: &[u8], _signature: &[u8]) -> bool {
+    fn ripemd160_managed(&self, _dest: Handle, _data_handle: Handle) {
+        panic!("ripemd160 not implemented yet!")
+    }
+
+    fn verify_bls_legacy(&self, _key: &[u8], _message: &[u8], _signature: &[u8]) -> bool {
         panic!("verify_bls not implemented yet!")
     }
 
-    fn verify_ed25519(&self, key: &[u8], message: &[u8], signature: &[u8]) -> bool {
+    fn verify_bls_managed(&self, _key: Handle, _message: Handle, _signature: Handle) -> bool {
+        panic!("verify_bls not implemented yet!")
+    }
+
+    fn verify_ed25519_legacy(&self, key: &[u8], message: &[u8], signature: &[u8]) -> bool {
         let public = PublicKey::from_bytes(key);
         if public.is_err() {
             return false;
@@ -67,11 +75,23 @@ impl CryptoApiImpl for DebugApi {
         public.unwrap().verify(message, &sig.unwrap()).is_ok()
     }
 
-    fn verify_secp256k1(&self, _key: &[u8], _message: &[u8], _signature: &[u8]) -> bool {
+    fn verify_ed25519_managed(&self, key: Handle, message: Handle, signature: Handle) -> bool {
+        self.verify_ed25519_legacy(
+            self.mb_to_boxed_bytes(key).as_slice(),
+            self.mb_to_boxed_bytes(message).as_slice(),
+            self.mb_to_boxed_bytes(signature).as_slice(),
+        )
+    }
+
+    fn verify_secp256k1_legacy(&self, _key: &[u8], _message: &[u8], _signature: &[u8]) -> bool {
         panic!("verify_secp256k1 not implemented yet!")
     }
 
-    fn verify_custom_secp256k1(
+    fn verify_secp256k1_managed(&self, _key: Handle, _message: Handle, _signature: Handle) -> bool {
+        panic!("verify_secp256k1 not implemented yet!")
+    }
+
+    fn verify_custom_secp256k1_legacy(
         &self,
         _key: &[u8],
         _message: &[u8],
@@ -81,7 +101,21 @@ impl CryptoApiImpl for DebugApi {
         panic!("verify_custom_secp256k1 not implemented yet!")
     }
 
-    fn encode_secp256k1_der_signature(&self, _r: &[u8], _s: &[u8]) -> BoxedBytes {
+    fn verify_custom_secp256k1_managed(
+        &self,
+        _key: Handle,
+        _message: Handle,
+        _signature: Handle,
+        _hash_type: MessageHashType,
+    ) -> bool {
+        panic!("verify_custom_secp256k1 not implemented yet!")
+    }
+
+    fn encode_secp256k1_der_signature_legacy(&self, _r: &[u8], _s: &[u8]) -> BoxedBytes {
+        panic!("encode_secp256k1_signature not implemented yet!")
+    }
+
+    fn encode_secp256k1_der_signature_managed(&self, _r: Handle, _s: Handle, _dest: Handle) {
         panic!("encode_secp256k1_signature not implemented yet!")
     }
 }

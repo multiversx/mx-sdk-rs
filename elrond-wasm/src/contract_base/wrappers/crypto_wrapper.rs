@@ -81,19 +81,43 @@ where
     }
 
     #[cfg(feature = "alloc")]
-    pub fn ripemd160(&self, data: &[u8]) -> crate::types::Box<[u8; 20]> {
-        crate::types::Box::new(A::crypto_api_impl().ripemd160(data))
+    pub fn ripemd160_legacy(&self, data: &[u8]) -> crate::types::Box<[u8; 20]> {
+        crate::types::Box::new(A::crypto_api_impl().ripemd160_legacy(data))
     }
 
-    pub fn verify_bls(&self, key: &[u8], message: &[u8], signature: &[u8]) -> bool {
-        A::crypto_api_impl().verify_bls(key, message, signature)
+    #[cfg(feature = "ei-1-2")]
+    pub fn ripemd160<B: core::borrow::Borrow<ManagedBuffer<A>>>(
+        &self,
+        data: B,
+    ) -> ManagedByteArray<A, { crate::api::RIPEMD_RESULT_LEN }> {
+        let new_handle = A::static_var_api_impl().next_handle();
+        A::crypto_api_impl().ripemd160_managed(new_handle, data.borrow().get_raw_handle());
+        ManagedByteArray::from_raw_handle(new_handle)
     }
 
-    pub fn verify_ed25519(&self, key: &[u8], message: &[u8], signature: &[u8]) -> bool {
-        A::crypto_api_impl().verify_ed25519(key, message, signature)
+    pub fn verify_bls_legacy(&self, key: &[u8], message: &[u8], signature: &[u8]) -> bool {
+        A::crypto_api_impl().verify_bls_legacy(key, message, signature)
     }
 
-    pub fn verify_ed25519_managed<const MAX_MESSAGE_LEN: usize>(
+    #[cfg(feature = "ei-1-2")]
+    pub fn verify_bls(
+        &self,
+        key: &ManagedBuffer<A>,
+        message: &ManagedBuffer<A>,
+        signature: &ManagedBuffer<A>,
+    ) -> bool {
+        A::crypto_api_impl().verify_bls_managed(
+            key.get_raw_handle(),
+            message.get_raw_handle(),
+            signature.get_raw_handle(),
+        )
+    }
+
+    pub fn verify_ed25519_legacy(&self, key: &[u8], message: &[u8], signature: &[u8]) -> bool {
+        A::crypto_api_impl().verify_ed25519_legacy(key, message, signature)
+    }
+
+    pub fn verify_ed25519_legacy_managed<const MAX_MESSAGE_LEN: usize>(
         &self,
         key: &ManagedByteArray<A, ED25519_KEY_BYTE_LEN>,
         message: &ManagedBuffer<A>,
@@ -104,27 +128,94 @@ where
         let message_byte_slice = message.load_to_byte_array(&mut message_byte_buffer);
         let sig_bytes = signature.to_byte_array();
 
-        A::crypto_api_impl().verify_ed25519(&key_bytes[..], message_byte_slice, &sig_bytes[..])
+        A::crypto_api_impl().verify_ed25519_legacy(
+            &key_bytes[..],
+            message_byte_slice,
+            &sig_bytes[..],
+        )
+    }
+
+    #[cfg(feature = "ei-1-2")]
+    pub fn verify_ed25519(
+        &self,
+        key: &ManagedBuffer<A>,
+        message: &ManagedBuffer<A>,
+        signature: &ManagedBuffer<A>,
+    ) -> bool {
+        A::crypto_api_impl().verify_ed25519_managed(
+            key.get_raw_handle(),
+            message.get_raw_handle(),
+            signature.get_raw_handle(),
+        )
     }
 
     /// Note: the signature is minimum 2 bytes in length,
     /// the second byte encodes the length of the remaining signature bytes.
-    pub fn verify_secp256k1(&self, key: &[u8], message: &[u8], signature: &[u8]) -> bool {
-        A::crypto_api_impl().verify_secp256k1(key, message, signature)
+    pub fn verify_secp256k1_legacy(&self, key: &[u8], message: &[u8], signature: &[u8]) -> bool {
+        A::crypto_api_impl().verify_secp256k1_legacy(key, message, signature)
     }
 
-    pub fn verify_custom_secp256k1(
+    #[cfg(feature = "ei-1-2")]
+    pub fn verify_secp256k1(
+        &self,
+        key: &ManagedBuffer<A>,
+        message: &ManagedBuffer<A>,
+        signature: &ManagedBuffer<A>,
+    ) -> bool {
+        A::crypto_api_impl().verify_secp256k1_managed(
+            key.get_raw_handle(),
+            message.get_raw_handle(),
+            signature.get_raw_handle(),
+        )
+    }
+
+    pub fn verify_custom_secp256k1_legacy(
         &self,
         key: &[u8],
         message: &[u8],
         signature: &[u8],
         hash_type: MessageHashType,
     ) -> bool {
-        A::crypto_api_impl().verify_custom_secp256k1(key, message, signature, hash_type)
+        A::crypto_api_impl().verify_custom_secp256k1_legacy(key, message, signature, hash_type)
+    }
+
+    #[cfg(feature = "ei-1-2")]
+    pub fn verify_custom_secp256k1(
+        &self,
+        key: &ManagedBuffer<A>,
+        message: &ManagedBuffer<A>,
+        signature: &ManagedBuffer<A>,
+        hash_type: MessageHashType,
+    ) -> bool {
+        A::crypto_api_impl().verify_custom_secp256k1_managed(
+            key.get_raw_handle(),
+            message.get_raw_handle(),
+            signature.get_raw_handle(),
+            hash_type,
+        )
     }
 
     #[cfg(feature = "alloc")]
-    pub fn encode_secp256k1_der_signature(&self, r: &[u8], s: &[u8]) -> crate::types::BoxedBytes {
-        A::crypto_api_impl().encode_secp256k1_der_signature(r, s)
+    pub fn encode_secp256k1_der_signature_legacy(
+        &self,
+        r: &[u8],
+        s: &[u8],
+    ) -> crate::types::BoxedBytes {
+        A::crypto_api_impl().encode_secp256k1_der_signature_legacy(r, s)
+    }
+
+    #[cfg(feature = "ei-1-2")]
+    pub fn encode_secp256k1_der_signature(
+        &self,
+        r: &ManagedBuffer<A>,
+        s: &ManagedBuffer<A>,
+    ) -> ManagedBuffer<A> {
+        let new_handle = A::static_var_api_impl().next_handle();
+        A::crypto_api_impl().encode_secp256k1_der_signature_managed(
+            r.get_raw_handle(),
+            s.get_raw_handle(),
+            new_handle,
+        );
+        ManagedBuffer::from_raw_handle(new_handle)
     }
 }
