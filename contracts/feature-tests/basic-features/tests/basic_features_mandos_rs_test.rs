@@ -61,6 +61,11 @@ fn crypto_keccak256_legacy_managed_rs() {
     elrond_wasm_debug::mandos_rs("mandos/crypto_keccak256_legacy_managed.scen.json", world());
 }
 
+// #[test]
+// fn crypto_ripemd160_rs() {
+//     elrond_wasm_debug::mandos_rs("mandos/crypto_ripemd160.scen.json", world());
+// }
+
 #[test]
 fn crypto_sha256_rs() {
     elrond_wasm_debug::mandos_rs("mandos/crypto_sha256.scen.json", world());
@@ -70,6 +75,21 @@ fn crypto_sha256_rs() {
 fn crypto_sha256_legacy_managed_rs() {
     elrond_wasm_debug::mandos_rs("mandos/crypto_sha256_legacy_managed.scen.json", world());
 }
+
+// #[test]
+// fn crypto_verify_bls_rs() {
+//     elrond_wasm_debug::mandos_rs("mandos/crypto_verify_bls.scen.json", world());
+// }
+
+#[test]
+fn crypto_verify_ed25519_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/crypto_verify_ed25519.scen.json", world());
+}
+
+// #[test]
+// fn crypto_verify_secp256k1_rs() {
+//     elrond_wasm_debug::mandos_rs("mandos/crypto_verify_secp256k1.scen.json", world());
+// }
 
 #[test]
 fn echo_array_u8_rs() {

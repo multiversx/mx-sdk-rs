@@ -14,8 +14,8 @@ fn crypto_keccak256_legacy_alloc_go() {
 }
 
 #[test]
-fn crypto_ripemd160_go() {
-    elrond_wasm_debug::mandos_go("mandos/crypto_ripemd160.scen.json");
+fn crypto_ripemd160_legacy_go() {
+    elrond_wasm_debug::mandos_go("mandos/crypto_ripemd160_legacy.scen.json");
 }
 
 #[test]
@@ -24,18 +24,18 @@ fn crypto_sha256_legacy_alloc_go() {
 }
 
 #[test]
-fn crypto_verify_bls_go() {
-    elrond_wasm_debug::mandos_go("mandos/crypto_verify_bls.scen.json");
+fn crypto_verify_bls_legacy_go() {
+    elrond_wasm_debug::mandos_go("mandos/crypto_verify_bls_legacy.scen.json");
 }
 
 #[test]
-fn crypto_verify_ed25519_go() {
-    elrond_wasm_debug::mandos_go("mandos/crypto_verify_ed25519.scen.json");
+fn crypto_verify_ed25519_legacy_go() {
+    elrond_wasm_debug::mandos_go("mandos/crypto_verify_ed25519_legacy.scen.json");
 }
 
 #[test]
-fn crypto_verify_secp256k1_go() {
-    elrond_wasm_debug::mandos_go("mandos/crypto_verify_secp256k1.scen.json");
+fn crypto_verify_secp256k1_legacy_go() {
+    elrond_wasm_debug::mandos_go("mandos/crypto_verify_secp256k1_legacy.scen.json");
 }
 
 #[test]

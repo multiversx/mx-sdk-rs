@@ -19,6 +19,7 @@ cb_closure_unmanaged_deser = []
 alloc = ["elrond-codec/alloc"]
 promises = []
 big-float = []
+ei-1-2 = []
 
 [dependencies]
 wee_alloc = "0.4"

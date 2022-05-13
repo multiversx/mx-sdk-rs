@@ -55,6 +55,8 @@ elrond_wasm_node::wasm_endpoints! {
         codec_err_storage_set
         compute_keccak256
         compute_keccak256_legacy_managed
+        compute_ripemd160
+        compute_secp256k1_der_signature
         compute_sha256
         compute_sha256_legacy_managed
         count_ones
@@ -302,5 +304,9 @@ elrond_wasm_node::wasm_endpoints! {
         vec_mapper_get
         vec_mapper_len
         vec_mapper_push
+        verify_bls_signature
+        verify_custom_secp256k1_signature
+        verify_ed25519_signature
+        verify_secp256k1_signature
     )
 }
