@@ -138,7 +138,6 @@ where
         }
     }
 
-    #[doc(hidden)]
     fn get_raw_handle(&self) -> Handle {
         self.bytes.get_raw_handle()
     }
