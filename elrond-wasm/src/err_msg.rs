@@ -34,6 +34,11 @@ pub const VALUE_EXCEEDS_SLICE: &[u8] = b"value exceeds target slice";
 pub const BIG_UINT_EXCEEDS_SLICE: &[u8] = b"big uint as_bytes exceed target slice";
 pub const BIG_UINT_SUB_NEGATIVE: &[u8] = b"cannot subtract because result would be negative";
 
+pub const EXPONENT_IS_POSITIVE: &[u8] = b"exponent must be negative";
+pub const NUMBER_IS_NOT_NORMAL: &[u8] =
+    b"number is not normal. It is either infinite, NaN or subnormal";
+pub const CANNOT_COMPARE_VALUES: &[u8] = b"values are not comparable";
+
 pub const DESERIALIZATION_INVALID_BYTE: &str = "call data deserialization error: not a valid byte";
 pub const DESERIALIZATION_NOT_32_BYTES: &str =
     "call data deserialization error: 32 as_bytes expected";

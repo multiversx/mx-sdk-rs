@@ -1,6 +1,6 @@
 use crate::{error_hook, VmApiImpl};
 use elrond_wasm::{
-    api::{EndpointArgumentApi, EndpointArgumentApiImpl, Handle},
+    api::{EndpointArgumentApi, EndpointArgumentApiImpl, Handle, ManagedBufferApi},
     err_msg,
     types::heap::BoxedBytes,
 };
@@ -14,12 +14,16 @@ extern "C" {
     fn bigIntGetUnsignedArgument(arg_index: i32, dest: i32);
     fn bigIntGetSignedArgument(arg_index: i32, dest: i32);
 
+    // big float API
+    fn bigFloatNewFromFrac(numerator: i64, denominator: i64) -> i32;
+
     // small int API
     fn smallIntGetUnsignedArgument(id: i32) -> i64;
     fn smallIntGetSignedArgument(id: i32) -> i64;
 
     // managed buffer API
     fn mBufferGetArgument(argId: i32, mBufferHandle: i32) -> i32;
+    fn mBufferToBigFloat(mBufferHandle: i32, bigFloatHandle: i32) -> i32;
 }
 
 impl EndpointArgumentApi for VmApiImpl {
@@ -93,5 +97,15 @@ impl EndpointArgumentApiImpl for VmApiImpl {
     #[inline]
     fn get_argument_i64(&self, arg_index: i32) -> i64 {
         unsafe { smallIntGetSignedArgument(arg_index) }
+    }
+
+    fn get_argument_big_float(&self, arg_id: i32) -> Handle {
+        unsafe {
+            let buffer_new_handle = self.mb_new_empty();
+            mBufferGetArgument(arg_id, buffer_new_handle);
+            let big_float_new_handle = bigFloatNewFromFrac(0, 1);
+            mBufferToBigFloat(buffer_new_handle, big_float_new_handle);
+            big_float_new_handle
+        }
     }
 }

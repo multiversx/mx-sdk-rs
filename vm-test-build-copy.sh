@@ -32,6 +32,7 @@ build_and_copy ./contracts/experimental/multisig-external-view $VM_REPO_PATH/tes
 build_and_copy ./contracts/examples/egld-esdt-swap $VM_REPO_PATH/test/egld-esdt-swap
 build_and_copy ./contracts/feature-tests/alloc-features $VM_REPO_PATH/test/features/alloc-features
 build_and_copy ./contracts/feature-tests/basic-features $VM_REPO_PATH/test/features/basic-features
+build_and_copy ./contracts/feature-tests/big-float-features $VM_REPO_PATH/test/features/big-float-features
 build_and_copy ./contracts/feature-tests/erc-style-contracts/erc20 $VM_REPO_PATH/test/erc20-rust
 build_and_copy ./contracts/feature-tests/payable-features $VM_REPO_PATH/test/features/payable-features
 build_and_copy ./contracts/feature-tests/esdt-system-sc-mock $VM_REPO_PATH/test/features/esdt-system-sc-mock
