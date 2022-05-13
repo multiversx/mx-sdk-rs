@@ -144,23 +144,16 @@ impl BigFloatApi for DebugApi {
         let bf_x = managed_types.big_float_map.get(x);
         let trunc_x = bf_x.trunc();
         let float_trunc_x = trunc_x.to_f64().unwrap();
-        if *bf_x == float_trunc_x {
-            return true;
-        }
-        false
+        *bf_x == float_trunc_x
     }
 
     fn bf_set_i64(&self, dest: Handle, value: i64) {
-        let f64_value = value.to_f64().unwrap_or_default();
+        let f64_value = value.to_f64().unwrap();
         self.bf_overwrite(dest, f64_value);
     }
 
     fn bf_set_bi(&self, dest: Handle, bi: Handle) {
-        let f64_value = self
-            .bi_to_i64(bi)
-            .unwrap_or_default()
-            .to_f64()
-            .unwrap_or_default();
+        let f64_value = self.bi_to_i64(bi).unwrap().to_f64().unwrap();
         self.bf_overwrite(dest, f64_value);
     }
 
