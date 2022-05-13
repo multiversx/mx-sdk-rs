@@ -25,7 +25,6 @@ pub struct EllipticCurve<M: ManagedTypeApi> {
 }
 
 impl<M: ManagedTypeApi> ManagedType<M> for EllipticCurve<M> {
-    #[doc(hidden)]
     fn from_raw_handle(handle: Handle) -> Self {
         EllipticCurve {
             handle,
@@ -33,7 +32,6 @@ impl<M: ManagedTypeApi> ManagedType<M> for EllipticCurve<M> {
         }
     }
 
-    #[doc(hidden)]
     fn get_raw_handle(&self) -> Handle {
         self.handle
     }
