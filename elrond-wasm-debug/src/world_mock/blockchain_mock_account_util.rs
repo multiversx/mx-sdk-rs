@@ -1,7 +1,7 @@
 use alloc::vec::Vec;
 use elrond_wasm::types::heap::Address;
 
-use std::fmt::Write;
+use std::{collections::HashMap, fmt::Write};
 
 use crate::address_hex;
 
@@ -13,12 +13,31 @@ use super::BlockchainMock;
 
 impl BlockchainMock {
     pub fn add_account(&mut self, acct: AccountData) {
-        self.accounts.insert(acct.address.clone(), acct);
+        let address = acct.address.clone();
+        self.accounts.insert(address.clone(), acct);
+        self.add_addr_mandos_string(address);
+    }
+
+    pub fn add_addr_mandos_string(&mut self, address: Address) {
+        if self.addr_to_mandos_string_map.contains_key(&address) {
+            return;
+        }
+
+        let addr_pretty = super::address_as_mandos_string(&address);
+        self.addr_to_mandos_string_map.insert(address, addr_pretty);
     }
 
     pub fn validate_and_add_account(&mut self, acct: AccountData) {
         self.validate_account(&acct);
         self.add_account(acct);
+    }
+
+    pub fn update_accounts(&mut self, accounts: HashMap<Address, AccountData>) {
+        for addr in accounts.keys() {
+            self.add_addr_mandos_string(addr.clone());
+        }
+
+        self.accounts.extend(accounts.into_iter());
     }
 
     pub fn print_accounts(&self) {
