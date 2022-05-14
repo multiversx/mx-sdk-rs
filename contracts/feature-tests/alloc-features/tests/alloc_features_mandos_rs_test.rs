@@ -17,8 +17,8 @@ fn boxed_bytes_zeros_rs() {
 }
 
 // #[test]
-// fn crypto_elliptic_curves_rs() {
-//     elrond_wasm_debug::mandos_rs("mandos/crypto_elliptic_curves.scen.json", world());
+// fn crypto_elliptic_curves_legacy_rs() {
+//     elrond_wasm_debug::mandos_rs("mandos/crypto_elliptic_curves_legacy.scen.json", world());
 // }
 
 #[test]

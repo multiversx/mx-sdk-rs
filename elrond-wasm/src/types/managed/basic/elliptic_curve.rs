@@ -1,12 +1,16 @@
 use core::marker::PhantomData;
 
+// #[allow(unused_imports)]
 use crate::{
     abi::{TypeAbi, TypeName},
     api::{BigIntApi, EllipticCurveApi, Handle, ManagedTypeApi},
+    types::{heap::BoxedBytes, BigUint, ManagedType},
 };
-use elrond_codec::*;
 
-use crate::types::{heap::BoxedBytes, BigUint, ManagedType};
+#[cfg(feature = "ei-1-2")]
+use crate::{api::StaticVarApiImpl, types::ManagedBuffer};
+
+use elrond_codec::*;
 
 pub type EllipticCurveComponents<M> = (
     BigUint<M>,
@@ -42,17 +46,23 @@ impl<M: ManagedTypeApi> ManagedType<M> for EllipticCurve<M> {
 }
 
 impl<M: ManagedTypeApi> EllipticCurve<M> {
-    pub fn from_name(name: &str) -> Self {
-        let handle = M::managed_type_impl().ec_create(name.as_bytes());
+    #[cfg(feature = "ei-1-2")]
+    pub fn from_name(name: &ManagedBuffer<M>) -> Self {
+        let handle = M::managed_type_impl().ec_create_from_name_mb(name.get_raw_handle());
+        EllipticCurve::from_raw_handle(handle)
+    }
+
+    pub fn from_name_str(name: &str) -> Self {
+        let handle = M::managed_type_impl().ec_create_from_name_bytes(name.as_bytes());
         EllipticCurve::from_raw_handle(handle)
     }
 
     pub fn from_bitsize(bitsize: u32) -> Option<Self> {
         match bitsize {
-            224 => Some(Self::from_name("p224")),
-            256 => Some(Self::from_name("p256")),
-            384 => Some(Self::from_name("p384")),
-            521 => Some(Self::from_name("p521")),
+            224 => Some(Self::from_name_str("p224")),
+            256 => Some(Self::from_name_str("p256")),
+            384 => Some(Self::from_name_str("p384")),
+            521 => Some(Self::from_name_str("p521")),
             _ => None,
         }
     }
@@ -139,7 +149,7 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
         api.ec_is_on_curve(self.handle, x_point.handle, y_point.handle)
     }
 
-    pub fn scalar_mult(
+    pub fn scalar_mult_legacy(
         &self,
         x_point: BigUint<M>,
         y_point: BigUint<M>,
@@ -148,7 +158,7 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
         let api = M::managed_type_impl();
         let x_result_handle = api.bi_new_zero();
         let y_result_handle = api.bi_new_zero();
-        api.ec_scalar_mult(
+        api.ec_scalar_mult_legacy(
             x_result_handle,
             y_result_handle,
             self.handle,
@@ -162,58 +172,172 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
         )
     }
 
-    pub fn scalar_base_mult(&self, data: &[u8]) -> (BigUint<M>, BigUint<M>) {
+    #[cfg(feature = "ei-1-2")]
+    pub fn scalar_mult(
+        &self,
+        x_point: BigUint<M>,
+        y_point: BigUint<M>,
+        data: &ManagedBuffer<M>,
+    ) -> (BigUint<M>, BigUint<M>) {
         let api = M::managed_type_impl();
         let x_result_handle = api.bi_new_zero();
         let y_result_handle = api.bi_new_zero();
-        api.ec_scalar_base_mult(x_result_handle, y_result_handle, self.handle, data);
+        api.ec_scalar_mult(
+            x_result_handle,
+            y_result_handle,
+            self.handle,
+            x_point.handle,
+            y_point.handle,
+            data.get_raw_handle(),
+        );
         (
             BigUint::from_raw_handle(x_result_handle),
             BigUint::from_raw_handle(y_result_handle),
         )
     }
 
-    pub fn marshal(&self, x_pair: BigUint<M>, y_pair: BigUint<M>) -> BoxedBytes {
+    pub fn scalar_base_mult_legacy(&self, data: &[u8]) -> (BigUint<M>, BigUint<M>) {
         let api = M::managed_type_impl();
-        api.ec_marshal(self.handle, x_pair.handle, y_pair.handle)
+        let x_result_handle = api.bi_new_zero();
+        let y_result_handle = api.bi_new_zero();
+        api.ec_scalar_base_mult_legacy(x_result_handle, y_result_handle, self.handle, data);
+        (
+            BigUint::from_raw_handle(x_result_handle),
+            BigUint::from_raw_handle(y_result_handle),
+        )
     }
 
-    pub fn marshal_compressed(&self, x_pair: BigUint<M>, y_pair: BigUint<M>) -> BoxedBytes {
+    #[cfg(feature = "ei-1-2")]
+    pub fn scalar_base_mult(&self, data: &ManagedBuffer<M>) -> (BigUint<M>, BigUint<M>) {
         let api = M::managed_type_impl();
-        api.ec_marshal_compressed(self.handle, x_pair.handle, y_pair.handle)
+        let x_result_handle = api.bi_new_zero();
+        let y_result_handle = api.bi_new_zero();
+        api.ec_scalar_base_mult(
+            x_result_handle,
+            y_result_handle,
+            self.handle,
+            data.get_raw_handle(),
+        );
+        (
+            BigUint::from_raw_handle(x_result_handle),
+            BigUint::from_raw_handle(y_result_handle),
+        )
     }
 
-    pub fn unmarshal(&self, data: &[u8]) -> (BigUint<M>, BigUint<M>) {
+    pub fn marshal_legacy(&self, x_pair: BigUint<M>, y_pair: BigUint<M>) -> BoxedBytes {
+        let api = M::managed_type_impl();
+        api.ec_marshal_legacy(self.handle, x_pair.handle, y_pair.handle)
+    }
+
+    #[cfg(feature = "ei-1-2")]
+    pub fn marshal(&self, x_pair: BigUint<M>, y_pair: BigUint<M>) -> ManagedBuffer<M> {
+        let result_handle = M::static_var_api_impl().next_handle();
+        M::managed_type_impl().ec_marshal(self.handle, x_pair.handle, y_pair.handle, result_handle);
+        ManagedBuffer::from_raw_handle(result_handle)
+    }
+
+    pub fn marshal_compressed_legacy(&self, x_pair: BigUint<M>, y_pair: BigUint<M>) -> BoxedBytes {
+        let api = M::managed_type_impl();
+        api.ec_marshal_compressed_legacy(self.handle, x_pair.handle, y_pair.handle)
+    }
+
+    #[cfg(feature = "ei-1-2")]
+    pub fn marshal_compressed(&self, x_pair: BigUint<M>, y_pair: BigUint<M>) -> ManagedBuffer<M> {
+        let result_handle = M::static_var_api_impl().next_handle();
+        M::managed_type_impl().ec_marshal_compressed(
+            self.handle,
+            x_pair.handle,
+            y_pair.handle,
+            result_handle,
+        );
+        ManagedBuffer::from_raw_handle(result_handle)
+    }
+
+    pub fn unmarshal_legacy(&self, data: &[u8]) -> (BigUint<M>, BigUint<M>) {
         let api = M::managed_type_impl();
         let x_pair_handle = api.bi_new_zero();
         let y_pair_handle = api.bi_new_zero();
-        api.ec_unmarshal(x_pair_handle, y_pair_handle, self.handle, data);
+        api.ec_unmarshal_legacy(x_pair_handle, y_pair_handle, self.handle, data);
         (
             BigUint::from_raw_handle(x_pair_handle),
             BigUint::from_raw_handle(y_pair_handle),
         )
     }
 
-    pub fn unmarshal_compressed(&self, data: &[u8]) -> (BigUint<M>, BigUint<M>) {
+    #[cfg(feature = "ei-1-2")]
+    pub fn unmarshal(&self, data: &ManagedBuffer<M>) -> (BigUint<M>, BigUint<M>) {
         let api = M::managed_type_impl();
         let x_pair_handle = api.bi_new_zero();
         let y_pair_handle = api.bi_new_zero();
-        api.ec_unmarshal_compressed(x_pair_handle, y_pair_handle, self.handle, data);
+        api.ec_unmarshal(
+            x_pair_handle,
+            y_pair_handle,
+            self.handle,
+            data.get_raw_handle(),
+        );
         (
             BigUint::from_raw_handle(x_pair_handle),
             BigUint::from_raw_handle(y_pair_handle),
         )
     }
 
-    pub fn generate_key(&self) -> (BigUint<M>, BigUint<M>, BoxedBytes) {
+    pub fn unmarshal_compressed_legacy(&self, data: &[u8]) -> (BigUint<M>, BigUint<M>) {
+        let api = M::managed_type_impl();
+        let x_pair_handle = api.bi_new_zero();
+        let y_pair_handle = api.bi_new_zero();
+        api.ec_unmarshal_compressed_legacy(x_pair_handle, y_pair_handle, self.handle, data);
+        (
+            BigUint::from_raw_handle(x_pair_handle),
+            BigUint::from_raw_handle(y_pair_handle),
+        )
+    }
+
+    #[cfg(feature = "ei-1-2")]
+    pub fn unmarshal_compressed(&self, data: &ManagedBuffer<M>) -> (BigUint<M>, BigUint<M>) {
+        let api = M::managed_type_impl();
+        let x_pair_handle = api.bi_new_zero();
+        let y_pair_handle = api.bi_new_zero();
+        api.ec_unmarshal_compressed(
+            x_pair_handle,
+            y_pair_handle,
+            self.handle,
+            data.get_raw_handle(),
+        );
+        (
+            BigUint::from_raw_handle(x_pair_handle),
+            BigUint::from_raw_handle(y_pair_handle),
+        )
+    }
+
+    pub fn generate_key_legacy(&self) -> (BigUint<M>, BigUint<M>, BoxedBytes) {
         let api = M::managed_type_impl();
         let x_pub_key_handle = api.bi_new_zero();
         let y_pub_key_handle = api.bi_new_zero();
-        let private_key = api.ec_generate_key(x_pub_key_handle, y_pub_key_handle, self.handle);
+        let private_key =
+            api.ec_generate_key_legacy(x_pub_key_handle, y_pub_key_handle, self.handle);
         (
             BigUint::from_raw_handle(x_pub_key_handle),
             BigUint::from_raw_handle(y_pub_key_handle),
             private_key,
+        )
+    }
+
+    #[cfg(feature = "ei-1-2")]
+    pub fn generate_key(&self) -> (BigUint<M>, BigUint<M>, ManagedBuffer<M>) {
+        let api = M::managed_type_impl();
+        let x_pub_key_handle = api.bi_new_zero();
+        let y_pub_key_handle = api.bi_new_zero();
+        let private_key_handle = M::static_var_api_impl().next_handle();
+        api.ec_generate_key(
+            x_pub_key_handle,
+            y_pub_key_handle,
+            self.handle,
+            private_key_handle,
+        );
+        (
+            BigUint::from_raw_handle(x_pub_key_handle),
+            BigUint::from_raw_handle(y_pub_key_handle),
+            ManagedBuffer::from_raw_handle(private_key_handle),
         )
     }
 }

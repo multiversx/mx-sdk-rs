@@ -20,7 +20,7 @@ pub trait EllipticCurveFeatures {
     }
 
     #[endpoint]
-    fn compute_create_ec(&self, curve: &str) -> EllipticCurveComponents<Self::Api> {
+    fn compute_create_ec(&self, curve: &ManagedBuffer) -> EllipticCurveComponents<Self::Api> {
         EllipticCurve::from_name(curve).get_values()
     }
 
@@ -89,7 +89,7 @@ pub trait EllipticCurveFeatures {
         curve_bitsize: u32,
         x_point: BigUint,
         y_point: BigUint,
-        data: &[u8],
+        data: &ManagedBuffer,
     ) -> MultiValue2<BigUint, BigUint> {
         match EllipticCurve::from_bitsize(curve_bitsize) {
             Some(ec) => ec.scalar_mult(x_point, y_point, data).into(),
@@ -101,7 +101,7 @@ pub trait EllipticCurveFeatures {
     fn compute_scalar_base_mult(
         &self,
         curve_bitsize: u32,
-        data: &[u8],
+        data: &ManagedBuffer,
     ) -> MultiValue2<BigUint, BigUint> {
         match EllipticCurve::from_bitsize(curve_bitsize) {
             Some(ec) => ec.scalar_base_mult(data).into(),
@@ -115,10 +115,10 @@ pub trait EllipticCurveFeatures {
         curve_bitsize: u32,
         x_pair: BigUint,
         y_pair: BigUint,
-    ) -> BoxedBytes {
+    ) -> ManagedBuffer {
         match EllipticCurve::from_bitsize(curve_bitsize) {
             Some(ec) => ec.marshal(x_pair, y_pair),
-            None => BoxedBytes::zeros(0),
+            None => ManagedBuffer::new(),
         }
     }
 
@@ -128,10 +128,10 @@ pub trait EllipticCurveFeatures {
         curve_bitsize: u32,
         x_pair: BigUint,
         y_pair: BigUint,
-    ) -> BoxedBytes {
+    ) -> ManagedBuffer {
         match EllipticCurve::from_bitsize(curve_bitsize) {
             Some(ec) => ec.marshal_compressed(x_pair, y_pair),
-            None => BoxedBytes::zeros(0),
+            None => ManagedBuffer::new(),
         }
     }
 
@@ -139,7 +139,7 @@ pub trait EllipticCurveFeatures {
     fn compute_unmarshal_ec(
         &self,
         curve_bitsize: u32,
-        data: &[u8],
+        data: &ManagedBuffer,
     ) -> MultiValue2<BigUint, BigUint> {
         match EllipticCurve::from_bitsize(curve_bitsize) {
             Some(ec) => ec.unmarshal(data).into(),
@@ -151,7 +151,7 @@ pub trait EllipticCurveFeatures {
     fn compute_unmarshal_compressed_ec(
         &self,
         curve_bitsize: u32,
-        data: &[u8],
+        data: &ManagedBuffer,
     ) -> MultiValue2<BigUint, BigUint> {
         match EllipticCurve::from_bitsize(curve_bitsize) {
             Some(ec) => ec.unmarshal_compressed(data).into(),
@@ -163,10 +163,10 @@ pub trait EllipticCurveFeatures {
     fn compute_generate_key_ec(
         &self,
         curve_bitsize: u32,
-    ) -> MultiValue3<BigUint, BigUint, BoxedBytes> {
+    ) -> MultiValue3<BigUint, BigUint, ManagedBuffer> {
         match EllipticCurve::from_bitsize(curve_bitsize) {
             Some(ec) => ec.generate_key().into(),
-            None => (BigUint::zero(), BigUint::zero(), BoxedBytes::zeros(0)).into(),
+            None => (BigUint::zero(), BigUint::zero(), ManagedBuffer::new()).into(),
         }
     }
 }
