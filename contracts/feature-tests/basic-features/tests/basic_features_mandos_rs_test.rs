@@ -51,6 +51,11 @@ fn count_ones_rs() {
     elrond_wasm_debug::mandos_rs("mandos/count_ones.scen.json", world());
 }
 
+// #[test]
+// fn crypto_elliptic_curves_rs() {
+//     elrond_wasm_debug::mandos_rs("mandos/crypto_elliptic_curves.scen.json", world());
+// }
+
 #[test]
 fn crypto_keccak256_rs() {
     elrond_wasm_debug::mandos_rs("mandos/crypto_keccak256.scen.json", world());

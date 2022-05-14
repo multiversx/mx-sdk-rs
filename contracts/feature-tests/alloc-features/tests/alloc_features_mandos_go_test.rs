@@ -4,8 +4,8 @@ fn boxed_bytes_zeros_go() {
 }
 
 #[test]
-fn crypto_elliptic_curves_go() {
-    elrond_wasm_debug::mandos_go("mandos/crypto_elliptic_curves.scen.json");
+fn crypto_elliptic_curves_legacy_go() {
+    elrond_wasm_debug::mandos_go("mandos/crypto_elliptic_curves_legacy.scen.json");
 }
 
 #[test]

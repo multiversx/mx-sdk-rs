@@ -34,6 +34,11 @@ fn count_ones_go() {
 }
 
 #[test]
+fn crypto_elliptic_curves_go() {
+    elrond_wasm_debug::mandos_go("mandos/crypto_elliptic_curves.scen.json");
+}
+
+#[test]
 fn crypto_keccak256_go() {
     elrond_wasm_debug::mandos_go("mandos/crypto_keccak256.scen.json");
 }

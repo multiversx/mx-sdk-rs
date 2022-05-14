@@ -53,12 +53,26 @@ elrond_wasm_node::wasm_endpoints! {
         codec_err_storage_get
         codec_err_storage_key
         codec_err_storage_set
+        compute_create_ec
+        compute_ec_add
+        compute_ec_double
+        compute_generate_key_ec
+        compute_get_ec_length
+        compute_get_priv_key_byte_length
+        compute_get_values
+        compute_is_on_curve_ec
         compute_keccak256
         compute_keccak256_legacy_managed
+        compute_marshal_compressed_ec
+        compute_marshal_ec
         compute_ripemd160
+        compute_scalar_base_mult
+        compute_scalar_mult
         compute_secp256k1_der_signature
         compute_sha256
         compute_sha256_legacy_managed
+        compute_unmarshal_compressed_ec
+        compute_unmarshal_ec
         count_ones
         div_assign_big_int
         div_assign_big_int_ref
