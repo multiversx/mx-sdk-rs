@@ -137,4 +137,13 @@ impl ManagedBufferApi for DebugApi {
         let bytes2 = managed_types.managed_buffer_map.get(handle2);
         bytes1 == bytes2
     }
+
+    fn mb_to_hex(&self, source_handle: Handle, dest_handle: Handle) {
+        let mut managed_types = self.m_types_borrow_mut();
+        let data = managed_types.managed_buffer_map.get(source_handle);
+        let encoded = hex::encode(data);
+        managed_types
+            .managed_buffer_map
+            .insert(dest_handle, encoded.into_bytes());
+    }
 }
