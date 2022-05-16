@@ -73,7 +73,26 @@
         },
         {
             "step": "scQuery",
-            "txId": "fungible-frozen",
+            "txId": "fungible-simple-is-frozen",
+            "tx": {
+                "to": "sc:forwarder",
+                "function": "is_esdt_frozen",
+                "arguments": [
+                    "sc:forwarder",
+                    "str:FUNG-00001",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "false"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "txId": "fungible-data-frozen",
             "tx": {
                 "to": "sc:forwarder",
                 "function": "get_esdt_token_data",
@@ -94,6 +113,25 @@
                     "0x0000000000000000000000000000000000000000000000000000000000000000",
                     "",
                     ""
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "txId": "fungible-simple-is-frozen",
+            "tx": {
+                "to": "sc:forwarder",
+                "function": "is_esdt_frozen",
+                "arguments": [
+                    "sc:forwarder",
+                    "str:FUNGFROZEN-00002",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "true"
                 ],
                 "status": "0"
             }
@@ -178,6 +216,40 @@
                     "0x0000000000000000000000000000000000000000000000000000000000000000",
                     "",
                     ""
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "txId": "sft-is-paused",
+            "tx": {
+                "to": "sc:forwarder",
+                "function": "is_esdt_paused",
+                "arguments": [
+                    "str:SFT-00003"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "false"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "txId": "sft-is-paused",
+            "tx": {
+                "to": "sc:forwarder",
+                "function": "is_esdt_limited_transfer",
+                "arguments": [
+                    "str:SFT-00003"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "false"
                 ],
                 "status": "0"
             }
