@@ -20,7 +20,6 @@ pub struct BigFloat<M: ManagedTypeApi> {
 }
 
 impl<M: ManagedTypeApi> ManagedType<M> for BigFloat<M> {
-    #[doc(hidden)]
     fn from_raw_handle(handle: Handle) -> Self {
         BigFloat {
             handle,
@@ -28,7 +27,6 @@ impl<M: ManagedTypeApi> ManagedType<M> for BigFloat<M> {
         }
     }
 
-    #[doc(hidden)]
     fn get_raw_handle(&self) -> Handle {
         self.handle
     }
