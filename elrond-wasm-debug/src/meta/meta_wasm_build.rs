@@ -26,6 +26,9 @@ fn build_contract(contract_metadata: &ContractMetadata, build_args: &BuildArgs, 
     command
         .args(["build", "--target=wasm32-unknown-unknown", "--release"])
         .current_dir(&contract_metadata.wasm_crate_path);
+    if let Some(target_dir) = &build_args.target_dir {
+        command.args(["--target-dir", target_dir]);
+    }
     if !build_args.debug_symbols {
         command.env("RUSTFLAGS", "-C link-arg=-s");
     }
@@ -37,7 +40,7 @@ fn build_contract(contract_metadata: &ContractMetadata, build_args: &BuildArgs, 
 
     assert!(exit_status.success(), "contract build process failed");
 
-    let source_wasm_path = contract_metadata.wasm_compilation_output_path();
+    let source_wasm_path = contract_metadata.wasm_compilation_output_path(&build_args.target_dir);
     let dest_wasm_name = build_args.wasm_name(contract_metadata);
     let dest_wasm_path = format!("{}/{}", output_path, dest_wasm_name);
     fs::copy(source_wasm_path.as_str(), dest_wasm_path.as_str())
