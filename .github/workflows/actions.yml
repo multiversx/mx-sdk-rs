@@ -16,6 +16,6 @@ jobs:
     with:
       rust-toolchain: nightly-2022-04-05
       vmtools-version: v1.4.48
-      extra-build-args: --ignore-eei-checks --cargo-target-dir=/home/runner/work/elrond-wasm-rs/elrond-wasm-rs
+      extra-build-args: --ignore-eei-checks --cargo-target-dir=/home/runner/work/elrond-wasm-rs/elrond-wasm-rs/target
     secrets:
       token: ${{ secrets.GITHUB_TOKEN }}
