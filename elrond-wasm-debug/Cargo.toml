@@ -39,7 +39,7 @@ mandos-go-tests = []
 [dependencies.elrond-wasm]
 version = "=0.31.1"
 path = "../elrond-wasm"
-features = ["alloc", "num-bigint", "promises"]
+features = ["alloc", "num-bigint", "promises", "big-float"]
 
 [dependencies.mandos]
 version = "0.13.1"

@@ -28,4 +28,6 @@ pub trait EndpointArgumentApiImpl: ErrorApiImpl {
     fn get_argument_u64(&self, arg_index: i32) -> u64;
 
     fn get_argument_i64(&self, arg_index: i32) -> i64;
+
+    fn get_argument_big_float(&self, arg_index: i32) -> Handle;
 }
