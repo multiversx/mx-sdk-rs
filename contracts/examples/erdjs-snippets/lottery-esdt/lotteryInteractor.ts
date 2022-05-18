@@ -8,7 +8,7 @@
  */
 import path from "path";
 import { CodeMetadata, EnumValue, IAddress, Interaction, ResultsParser, ReturnCode, SmartContract, SmartContractAbi, Struct, TokenPayment, TransactionWatcher, VariadicValue } from "@elrondnetwork/erdjs";
-import { INetworkProvider, ITestSession, ITestUser, loadAbiRegistry, loadCode } from "@elrondnetwork/erdjs-snippets";
+import { IAudit, INetworkConfig, INetworkProvider, ITestSession, ITestUser, loadAbiRegistry, loadCode } from "@elrondnetwork/erdjs-snippets";
 
 const PathToWasm = path.resolve(__dirname, "..", "..", "lottery-esdt", "output", "lottery-esdt.wasm");
 const PathToAbi = path.resolve(__dirname, "..", "..", "lottery-esdt", "output", "lottery-esdt.abi.json");

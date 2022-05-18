@@ -1,4 +1,4 @@
-import { createAirdropService, INetworkProvider, ITestSession, ITestUser, TestSession } from "@elrondnetwork/erdjs-snippets";
+import { createAirdropService, FiveMinutesInMilliseconds, INetworkProvider, ITestSession, ITestUser, TestSession } from "@elrondnetwork/erdjs-snippets";
 import { TokenPayment } from "@elrondnetwork/erdjs";
 import { assert } from "chai";
 import { createInteractor } from "./adderInteractor";

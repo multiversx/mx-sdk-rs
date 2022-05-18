@@ -4,6 +4,11 @@
         "url": "http://localhost:7950",
         "timeout": 5000
     },
+    "reporting": {
+        "explorerUrl": "",
+        "apiUrl": "",
+        "outputFolder": "~/reports"
+    },
     "users": {
         "individuals": [
             {
