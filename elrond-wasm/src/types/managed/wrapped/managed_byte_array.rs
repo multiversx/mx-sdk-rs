@@ -37,7 +37,6 @@ where
         }
     }
 
-    #[doc(hidden)]
     fn get_raw_handle(&self) -> Handle {
         self.buffer.get_raw_handle()
     }

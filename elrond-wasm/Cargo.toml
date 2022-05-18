@@ -1,6 +1,6 @@
 [package]
 name = "elrond-wasm"
-version = "0.31.0"
+version = "0.31.1"
 edition = "2018"
 
 authors = ["Andrei Marinica <andrei.marinica@elrond.com>", "Elrond Network <contact@elrond.com>"]
@@ -18,6 +18,7 @@ num-bigint = ["elrond-codec/num-bigint"]
 cb_closure_unmanaged_deser = []
 alloc = ["elrond-codec/alloc"]
 promises = []
+big-float = []
 
 [dependencies]
 wee_alloc = "0.4"
@@ -27,7 +28,7 @@ bitflags = "1.3.2"
 git-version = "0.3.5"
 
 [dependencies.elrond-wasm-derive]
-version = "=0.31.0"
+version = "=0.31.1"
 path = "../elrond-wasm-derive"
 
 [dependencies.elrond-codec]

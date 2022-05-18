@@ -12,15 +12,15 @@ path = "src/promises_features.rs"
 path = "../vault"
 
 [dependencies.elrond-wasm]
-version = "0.31.0"
+version = "0.31.1"
 path = "../../../../elrond-wasm"
 features = ["promises"]
 
 [dependencies.elrond-wasm-node]
-version = "0.31.0"
+version = "0.31.1"
 path = "../../../../elrond-wasm-node"
 optional = true
 
 [dev-dependencies.elrond-wasm-debug]
-version = "0.31.0"
+version = "0.31.1"
 path = "../../../../elrond-wasm-debug"
