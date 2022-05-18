@@ -1,7 +1,13 @@
 {
     "networkProvider": {
         "type": "ProxyNetworkProvider",
-        "url": "https://devnet-gateway.elrond.com"
+        "url": "https://devnet-gateway.elrond.com",
+        "timeout": 5000
+    },
+    "reporting": {
+        "explorerUrl": "https://devnet-explorer.elrond.com",
+        "apiUrl": "https://devnet-api.elrond.com",
+        "outputFolder": "~/reports"
     },
     "users": {
         "individuals": [

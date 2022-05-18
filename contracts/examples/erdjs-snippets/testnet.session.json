@@ -1,7 +1,13 @@
 {
     "networkProvider": {
         "type": "ProxyNetworkProvider",
-        "url": "https://testnet-gateway.elrond.com"
+        "url": "https://testnet-gateway.elrond.com",
+        "timeout": 5000
+    },
+    "reporting": {
+        "explorerUrl": "https://testnet-explorer.elrond.com",
+        "apiUrl": "https://testnet-api.elrond.com",
+        "outputFolder": "~/reports"
     },
     "users": {
         "individuals": [
