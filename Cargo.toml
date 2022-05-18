@@ -80,6 +80,8 @@ members = [
   "contracts/feature-tests/alloc-features/meta",
   "contracts/feature-tests/basic-features",
   "contracts/feature-tests/basic-features/meta",
+  "contracts/feature-tests/big-float-features",
+  "contracts/feature-tests/big-float-features/meta",
   "contracts/feature-tests/composability",
   "contracts/feature-tests/composability/esdt-contract-pair",
   "contracts/feature-tests/composability/esdt-contract-pair/first-contract",

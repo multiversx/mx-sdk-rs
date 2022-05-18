@@ -31,7 +31,6 @@ where
         }
     }
 
-    #[doc(hidden)]
     fn get_raw_handle(&self) -> Handle {
         self.data.get_raw_handle()
     }

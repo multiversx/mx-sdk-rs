@@ -41,6 +41,7 @@
             "outputs": []
         }
     ],
+    "events": [],
     "hasCallback": false,
     "types": {
         "EsdtTokenType": {
@@ -65,6 +66,39 @@
                 {
                     "name": "Invalid",
                     "discriminant": 4
+                }
+            ]
+        },
+        "GovernanceAction": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "gas_limit",
+                    "type": "u64"
+                },
+                {
+                    "name": "dest_address",
+                    "type": "Address"
+                },
+                {
+                    "name": "token_id",
+                    "type": "TokenIdentifier"
+                },
+                {
+                    "name": "token_nonce",
+                    "type": "u64"
+                },
+                {
+                    "name": "amount",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "function_name",
+                    "type": "bytes"
+                },
+                {
+                    "name": "arguments",
+                    "type": "List<bytes>"
                 }
             ]
         },

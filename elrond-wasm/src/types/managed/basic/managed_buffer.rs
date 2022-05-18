@@ -32,7 +32,6 @@ impl<M: ManagedTypeApi> ManagedType<M> for ManagedBuffer<M> {
         }
     }
 
-    #[doc(hidden)]
     fn get_raw_handle(&self) -> Handle {
         self.handle
     }
