@@ -7,8 +7,8 @@
         "compile": "tsc -p tsconfig.json"
     },
     "dependencies": {
-        "@elrondnetwork/erdjs": "10.2.4",
-        "@elrondnetwork/erdjs-snippets": "3.0.0",
+        "@elrondnetwork/erdjs": "10.2.5",
+        "@elrondnetwork/erdjs-snippets": "3.0.2",
         "@elrondnetwork/erdjs-network-providers": "0.1.5",
         "bignumber.js": "9.0.2"
     },

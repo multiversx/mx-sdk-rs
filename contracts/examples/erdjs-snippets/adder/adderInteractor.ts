@@ -8,7 +8,7 @@
  */
 import path from "path";
 import { BigUIntValue, CodeMetadata, IAddress, Interaction, ResultsParser, ReturnCode, SmartContract, SmartContractAbi, TransactionWatcher } from "@elrondnetwork/erdjs";
-import { INetworkProvider, ITestSession, ITestUser, loadAbiRegistry, loadCode } from "@elrondnetwork/erdjs-snippets";
+import { IAudit, INetworkConfig, INetworkProvider, ITestSession, ITestUser, loadAbiRegistry, loadCode } from "@elrondnetwork/erdjs-snippets";
 
 const PathToWasm = path.resolve(__dirname, "..", "..", "adder", "output", "adder.wasm");
 const PathToAbi = path.resolve(__dirname, "..", "..", "adder", "output", "adder.abi.json");

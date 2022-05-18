@@ -1,5 +1,5 @@
 import { ReturnCode, TokenPayment } from "@elrondnetwork/erdjs";
-import { createAirdropService, createESDTInteractor, INetworkProvider, ITestSession, ITestUser, TestSession } from "@elrondnetwork/erdjs-snippets";
+import { createAirdropService, createESDTInteractor, FiveMinutesInMilliseconds, INetworkProvider, ITestSession, ITestUser, TestSession } from "@elrondnetwork/erdjs-snippets";
 import { assert } from "chai";
 import { createInteractor } from "./lotteryInteractor";
 
