@@ -78,7 +78,11 @@ pub trait PromisesFeatures {
     }
 
     #[promises_callback]
-    fn the_callback(&self, args: MultiValueEncoded<ManagedBuffer>) {
+    fn the_callback(
+        &self,
+        #[call_result] result: ManagedAsyncCallResult<()>,
+        args: MultiValueEncoded<ManagedBuffer>,
+    ) {
         self.async_call_callback_data().set(false);
         let args_as_vec = args.into_vec_of_buffers();
         self.async_call_event_callback(&args_as_vec);

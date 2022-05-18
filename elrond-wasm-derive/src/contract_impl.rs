@@ -2,7 +2,7 @@ use super::generate::{abi_gen, snippets};
 use crate::{
     generate::{
         auto_impl::generate_auto_impls, auto_impl_proxy::generate_all_proxy_trait_imports,
-        callback_gen::*, callback_proxies_gen::*, contract_gen::*,
+        callback_gen::*, proxy_callback_gen::*, contract_gen::*,
         endpoints_mod_gen::generate_endpoints_mod,
         function_selector::generate_function_selector_body, proxy_gen, supertrait_gen,
     },

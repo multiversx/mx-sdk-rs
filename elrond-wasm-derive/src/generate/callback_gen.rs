@@ -6,8 +6,7 @@ use super::{
     util::*,
 };
 use crate::{
-    generate::method_call_gen::generate_arg_nested_tuples,
-    model::{ContractTrait, Method, PublicRole, Supertrait},
+    model::{ContractTrait, Method, PublicRole, Supertrait}, generate::method_call_gen_arg::{load_call_result_args_snippet, load_cb_closure_args_snippet},
 };
 
 /// Callback name max length is checked during derive,
@@ -78,40 +77,6 @@ fn callback_selector_body(
         #(#match_arms)*
         #(#module_calls)*
         elrond_wasm::types::CallbackSelectorResult::NotProcessed(___cb_closure___)
-    }
-}
-
-fn load_call_result_args_snippet(m: &Method) -> proc_macro2::TokenStream {
-    // if no `#[call_result]` present, ignore altogether
-    let has_call_result = m
-        .method_args
-        .iter()
-        .any(|arg| arg.metadata.callback_call_result);
-    if !has_call_result {
-        return quote! {};
-    }
-
-    let (call_result_var_names, call_result_var_types, call_result_var_names_str) =
-        generate_arg_nested_tuples(m.method_args.as_slice(), |arg| {
-            arg.metadata.callback_call_result
-        });
-    quote! {
-        let #call_result_var_names = elrond_wasm::io::load_endpoint_args::<Self::Api,#call_result_var_types>(
-            #call_result_var_names_str,
-        );
-    }
-}
-
-fn load_cb_closure_args_snippet(m: &Method) -> proc_macro2::TokenStream {
-    let (closure_var_names, closure_var_types, closure_var_names_str) =
-        generate_arg_nested_tuples(m.method_args.as_slice(), |arg| {
-            arg.is_endpoint_arg() && !arg.metadata.callback_call_result
-        });
-    quote! {
-        let #closure_var_names = elrond_wasm::io::load_multi_args_custom_loader::<Self::Api, _, #closure_var_types>(
-            ___cb_closure___.into_arg_loader(),
-            #closure_var_names_str,
-        );
     }
 }
 
