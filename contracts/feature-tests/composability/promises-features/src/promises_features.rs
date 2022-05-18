@@ -77,6 +77,20 @@ pub trait PromisesFeatures {
         self.async_call_event_callback(&args_as_vec);
     }
 
+    #[promises_callback]
+    fn the_callback(&self, args: MultiValueEncoded<ManagedBuffer>) {
+        self.async_call_callback_data().set(false);
+        let args_as_vec = args.into_vec_of_buffers();
+        self.async_call_event_callback(&args_as_vec);
+    }
+
+    #[callback]
+    fn legacy_callback(&self, args: MultiValueEncoded<ManagedBuffer>) {
+        self.async_call_callback_data().set(false);
+        let args_as_vec = args.into_vec_of_buffers();
+        self.async_call_event_callback(&args_as_vec);
+    }
+
     #[view]
     #[storage_mapper("async_call_callback_data")]
     fn async_call_callback_data(&self) -> SingleValueMapper<bool>;

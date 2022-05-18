@@ -18,7 +18,18 @@ pub fn generate_call_to_method_expr(m: &Method) -> proc_macro2::TokenStream {
 
 pub fn generate_call_method(m: &Method) -> proc_macro2::TokenStream {
     let call_method_ident = generate_call_method_name(&m.name);
-    let call_method_body = generate_call_method_body(m);
+    let call_method_body = generate_endpoint_call_method_body(m);
+    quote! {
+        #[inline]
+        fn #call_method_ident (&self) {
+            #call_method_body
+        }
+    }
+}
+
+pub fn generate_promises_callback_call_method(m: &Method) -> proc_macro2::TokenStream {
+    let call_method_ident = generate_call_method_name(&m.name);
+    let call_method_body = generate_promises_callback_call_method_body(m);
     quote! {
         #[inline]
         fn #call_method_ident (&self) {
@@ -86,7 +97,25 @@ pub fn generate_call_method_arg_load(m: &Method) -> proc_macro2::TokenStream {
     }
 }
 
-pub fn generate_call_method_body(m: &Method) -> proc_macro2::TokenStream {
+pub fn generate_body_with_result(
+    return_type: &syn::ReturnType,
+    mbody: &proc_macro2::TokenStream,
+) -> proc_macro2::TokenStream {
+    match return_type {
+        syn::ReturnType::Default => quote! {
+            #mbody;
+        },
+        syn::ReturnType::Type(_, _) => {
+            quote! {
+                let result = #mbody;
+                elrond_wasm::io::finish_multi::<Self::Api, _>(&result);
+            }
+        },
+    }
+}
+
+
+pub fn generate_endpoint_call_method_body(m: &Method) -> proc_macro2::TokenStream {
     let api_static_init = snippets::call_method_api_static_init();
     let payable_snippet = generate_payable_snippet(m);
     let only_owner_snippet = generate_only_owner_snippet(m);
@@ -104,19 +133,19 @@ pub fn generate_call_method_body(m: &Method) -> proc_macro2::TokenStream {
     }
 }
 
-pub fn generate_body_with_result(
-    return_type: &syn::ReturnType,
-    mbody: &proc_macro2::TokenStream,
-) -> proc_macro2::TokenStream {
-    match return_type {
-        syn::ReturnType::Default => quote! {
-            #mbody;
-        },
-        syn::ReturnType::Type(_, _) => {
-            quote! {
-                let result = #mbody;
-                elrond_wasm::io::finish_multi::<Self::Api, _>(&result);
-            }
-        },
+
+pub fn generate_promises_callback_call_method_body(m: &Method) -> proc_macro2::TokenStream {
+    let api_static_init = snippets::call_method_api_static_init();
+    let payable_snippet = generate_payable_snippet(m);
+    let arg_load = generate_call_method_arg_load(m);
+
+    let call = generate_call_to_method_expr(m);
+    let body_with_result = generate_body_with_result(&m.return_type, &call);
+
+    quote! {
+        #api_static_init
+        #payable_snippet
+        #arg_load
+        #body_with_result
     }
 }
