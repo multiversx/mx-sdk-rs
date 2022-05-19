@@ -41,6 +41,11 @@ where
         self.len
     }
 
+    #[inline]
+    pub fn is_empty(&self) -> bool {
+        self.len == 0
+    }
+
     /// Returns the underlying array as a slice, without converting 0-values to their actual value
     #[inline]
     pub fn as_raw_slice(&self) -> &[usize] {
@@ -185,7 +190,7 @@ where
 {
     fn clone(&self) -> Self {
         Self {
-            array_ref: self.array_ref.clone(),
+            array_ref: self.array_ref,
             current_index: self.current_index,
             last_index: self.last_index,
         }
