@@ -264,6 +264,11 @@ elrond_wasm_node::wasm_endpoints! {
         shr_assign_big_uint_ref
         shr_big_uint
         shr_big_uint_ref
+        sparse_array_create
+        sparse_array_create_and_get
+        sparse_array_get
+        sparse_array_set
+        sparse_array_swap_remove
         sqrt_big_uint
         sqrt_big_uint_ref
         store_addr
