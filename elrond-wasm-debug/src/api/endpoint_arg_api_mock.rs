@@ -1,5 +1,3 @@
-use std::convert::TryInto;
-
 use crate::{
     num_bigint::{BigInt, BigUint, Sign},
     tx_mock::TxPanic,
@@ -43,32 +41,13 @@ impl EndpointArgumentApiImpl for DebugApi {
         arg.len()
     }
 
-    fn copy_argument_to_slice(&self, _arg_index: i32, _slice: &mut [u8]) {
-        panic!("copy_argument_to_slice not yet implemented")
-    }
-
-    fn get_argument_boxed_bytes(&self, arg_index: i32) -> BoxedBytes {
-        self.get_argument_vec_u8(arg_index).into()
-    }
-
-    fn load_argument_big_int_unsigned(&self, arg_index: i32, dest: Handle) {
-        let arg_bytes = self.get_argument_boxed_bytes(arg_index);
-        let value = BigInt::from_bytes_be(Sign::Plus, arg_bytes.as_slice());
-        self.bi_overwrite(dest, value);
-    }
-
-    fn load_argument_big_int_signed(&self, arg_index: i32, dest: Handle) {
-        let arg_bytes = self.get_argument_boxed_bytes(arg_index);
-        let value = BigInt::from_signed_bytes_be(arg_bytes.as_slice());
-        self.bi_overwrite(dest, value);
-    }
-
     fn load_argument_managed_buffer(&self, arg_index: i32, dest: Handle) {
-        let arg_bytes = self.get_argument_boxed_bytes(arg_index);
+        let arg_bytes = self.get_argument_vec_u8(arg_index);
         self.mb_overwrite(dest, arg_bytes.as_slice());
     }
 
     fn get_argument_i64(&self, arg_index: i32) -> i64 {
+        // specific implementation provided, in order to simulate the VM error (status 10 instead of 4)
         let bytes = self.get_argument_vec_u8(arg_index);
         let bi = BigInt::from_signed_bytes_be(&bytes);
         if let Some(v) = bi.to_i64() {
@@ -82,6 +61,7 @@ impl EndpointArgumentApiImpl for DebugApi {
     }
 
     fn get_argument_u64(&self, arg_index: i32) -> u64 {
+        // specific implementation provided, in order to simulate the VM error (status 10 instead of 4)
         let bytes = self.get_argument_vec_u8(arg_index);
         let bu = BigUint::from_bytes_be(&bytes);
         if let Some(v) = bu.to_u64() {
@@ -92,17 +72,5 @@ impl EndpointArgumentApiImpl for DebugApi {
                 message: "argument out of range".to_string(),
             })
         }
-    }
-
-    fn get_argument_big_float(&self, arg_index: i32) -> Handle {
-        let bytes = self.get_argument_vec_u8(arg_index);
-        let mut managed_types = self.m_types_borrow_mut();
-        let result = f64::from_be_bytes(
-            bytes
-                .as_slice()
-                .try_into()
-                .expect("slice with incorrect length"),
-        );
-        managed_types.big_float_map.insert_new_handle(result)
     }
 }
