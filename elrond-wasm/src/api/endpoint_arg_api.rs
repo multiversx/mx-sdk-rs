@@ -52,6 +52,4 @@ pub trait EndpointArgumentApiImpl: ErrorApiImpl + ManagedTypeApiImpl {
             self.signal_error(err_msg::ARG_OUT_OF_RANGE)
         }
     }
-
-
 }
