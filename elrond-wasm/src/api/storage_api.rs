@@ -19,10 +19,6 @@ pub trait StorageReadApiImpl {
 
     fn storage_load_managed_buffer_raw(&self, key_handle: Handle, dest: Handle);
 
-    fn storage_load_u64(&self, key: &[u8]) -> u64;
-
-    fn storage_load_i64(&self, key: &[u8]) -> i64;
-
     fn storage_load_from_address(&self, address_handle: Handle, key_handle: Handle, dest: Handle);
 }
 
@@ -40,8 +36,4 @@ pub trait StorageWriteApiImpl {
     fn storage_store_managed_buffer_raw(&self, key_handle: Handle, value_handle: Handle);
 
     fn storage_store_managed_buffer_clear(&self, key_handle: Handle);
-
-    fn storage_store_u64(&self, key: &[u8], value: u64);
-
-    fn storage_store_i64(&self, key: &[u8], value: i64);
 }
