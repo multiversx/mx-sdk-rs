@@ -121,6 +121,7 @@ elrond_wasm_node::wasm_endpoints! {
         get_shard_of_address
         get_state_root_hash
         get_tx_hash_legacy
+        init_unique_id_mapper
         is_empty_opt_addr
         is_empty_single_value_mapper
         is_smart_contract
@@ -298,6 +299,10 @@ elrond_wasm_node::wasm_endpoints! {
         token_identifier_egld
         token_identifier_is_valid_1
         token_identifier_is_valid_2
+        unique_id_mapper
+        unique_id_mapper_get
+        unique_id_mapper_set
+        unique_id_mapper_swap_remove
         vec_mapper
         vec_mapper_get
         vec_mapper_len
