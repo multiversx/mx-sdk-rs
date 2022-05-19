@@ -1,6 +1,11 @@
 use super::{
-    method_call_gen_arg::generate_call_method_arg_load, method_gen::generate_arg_call_name,
-    only_owner_gen::*, payable_gen::*, util::*,
+    method_call_gen_arg::{
+        generate_call_method_arg_load, load_call_result_args_snippet, load_cb_closure_args_snippet,
+    },
+    method_gen::generate_arg_call_name,
+    only_owner_gen::*,
+    payable_gen::*,
+    util::*,
 };
 use crate::{generate::snippets, model::Method};
 
@@ -73,7 +78,8 @@ pub fn generate_endpoint_call_method_body(m: &Method) -> proc_macro2::TokenStrea
 pub fn generate_promises_callback_call_method_body(m: &Method) -> proc_macro2::TokenStream {
     let api_static_init = snippets::call_method_api_static_init();
     let payable_snippet = generate_payable_snippet(m);
-    let arg_load = generate_call_method_arg_load(m);
+    let cb_closure_args_snippet = load_cb_closure_args_snippet(m);
+    let call_result_args_snippet = load_call_result_args_snippet(m);
 
     let call = generate_call_to_method_expr(m);
     let body_with_result = generate_body_with_result(&m.return_type, &call);
@@ -81,7 +87,8 @@ pub fn generate_promises_callback_call_method_body(m: &Method) -> proc_macro2::T
     quote! {
         #api_static_init
         #payable_snippet
-        #arg_load
+        #cb_closure_args_snippet
+        #call_result_args_snippet
         #body_with_result
     }
 }

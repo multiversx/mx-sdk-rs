@@ -81,7 +81,7 @@ pub fn load_call_result_args_snippet(m: &Method) -> proc_macro2::TokenStream {
     }
 }
 
-pub fn load_cb_closure_args_snippet(m: &Method) -> proc_macro2::TokenStream {
+pub fn load_legacy_cb_closure_args_snippet(m: &Method) -> proc_macro2::TokenStream {
     let (closure_var_names, closure_var_types, closure_var_names_str) =
         generate_arg_nested_tuples(m.method_args.as_slice(), |arg| {
             arg.is_endpoint_arg() && !arg.metadata.callback_call_result
@@ -91,5 +91,18 @@ pub fn load_cb_closure_args_snippet(m: &Method) -> proc_macro2::TokenStream {
             ___cb_closure___.into_arg_loader(),
             #closure_var_names_str,
         );
+    }
+}
+
+pub fn load_cb_closure_args_snippet(m: &Method) -> proc_macro2::TokenStream {
+    let (closure_var_names, closure_var_types, closure_var_names_str) =
+        generate_arg_nested_tuples(m.method_args.as_slice(), |arg| {
+            arg.is_endpoint_arg() && !arg.metadata.callback_call_result
+        });
+    quote! {
+        let #closure_var_names = elrond_wasm::io::load_endpoint_args::<
+            elrond_wasm::api::CallbackArgApiWrapper<Self::Api>,
+            #closure_var_types,
+        >(#closure_var_names_str);
     }
 }

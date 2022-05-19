@@ -1,6 +1,7 @@
 mod blockchain_api;
 mod builtin_function_names;
 mod call_value_api;
+mod callback_args_wrapper;
 mod composite_api;
 mod crypto_api;
 mod endpoint_arg_api;
@@ -18,6 +19,7 @@ mod vm_api;
 pub use blockchain_api::*;
 pub use builtin_function_names::*;
 pub use call_value_api::*;
+pub use callback_args_wrapper::*;
 pub use composite_api::*;
 pub use crypto_api::*;
 pub use endpoint_arg_api::*;

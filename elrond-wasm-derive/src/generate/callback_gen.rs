@@ -1,12 +1,15 @@
 use super::{
     method_call_gen::{
-        generate_body_with_result, generate_endpoint_call_method_body, generate_call_to_method_expr,
+        generate_body_with_result, generate_call_to_method_expr, generate_endpoint_call_method_body,
     },
     payable_gen::*,
     util::*,
 };
 use crate::{
-    model::{ContractTrait, Method, PublicRole, Supertrait}, generate::method_call_gen_arg::{load_call_result_args_snippet, load_cb_closure_args_snippet},
+    generate::method_call_gen_arg::{
+        load_call_result_args_snippet, load_legacy_cb_closure_args_snippet,
+    },
+    model::{ContractTrait, Method, PublicRole, Supertrait},
 };
 
 /// Callback name max length is checked during derive,
@@ -95,7 +98,7 @@ fn match_arms(methods: &[Method]) -> Vec<proc_macro2::TokenStream> {
                 );
                 let callback_name_literal = byte_str_literal(callback_name_str.as_bytes());
                 let load_call_result_args = load_call_result_args_snippet(m);
-                let load_cb_closure_args = load_cb_closure_args_snippet(m);
+                let load_cb_closure_args = load_legacy_cb_closure_args_snippet(m);
                 let call = generate_call_to_method_expr(m);
                 let body_with_result = generate_body_with_result(&m.return_type, &call);
 
