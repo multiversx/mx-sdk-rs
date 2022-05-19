@@ -1,13 +1,10 @@
 use crate::{
-    num_bigint::{BigInt, BigUint, Sign},
+    num_bigint::{BigInt, BigUint},
     tx_mock::TxPanic,
     DebugApi,
 };
 use alloc::vec::Vec;
-use elrond_wasm::{
-    api::{EndpointArgumentApi, EndpointArgumentApiImpl, Handle, ManagedBufferApi},
-    types::heap::BoxedBytes,
-};
+use elrond_wasm::api::{EndpointArgumentApi, EndpointArgumentApiImpl, Handle, ManagedBufferApi};
 use num_traits::cast::ToPrimitive;
 
 impl EndpointArgumentApi for DebugApi {
