@@ -18,12 +18,6 @@ extern "C" {
 	fn bigIntStorageStoreUnsigned(keyOffset: *const u8, keyLength: i32, source: i32) -> i32;
 	fn bigIntStorageLoadUnsigned(keyOffset: *const u8, keyLength: i32, destination: i32) -> i32;
 
-	// small int API
-	fn smallIntStorageStoreUnsigned(keyOffset: *const u8, keyLength: i32, value: i64) -> i32;
-	fn smallIntStorageStoreSigned(keyOffset: *const u8, keyLength: i32, value: i64) -> i32;
-	fn smallIntStorageLoadUnsigned(keyOffset: *const u8, keyLength: i32) -> i64;
-	fn smallIntStorageLoadSigned(keyOffset: *const u8, keyLength: i32) -> i64;
-
     // managed buffer API
     fn mBufferSetBytes(mBufferHandle: i32, byte_ptr: *const u8, byte_len: i32) -> i32;
     fn mBufferStorageStore(keyHandle: i32, mBufferHandle: i32) -> i32;
@@ -74,16 +68,6 @@ impl StorageReadApiImpl for VmApiImpl {
     }
 
     #[inline]
-    fn storage_load_u64(&self, key: &[u8]) -> u64 {
-        unsafe { smallIntStorageLoadUnsigned(key.as_ref().as_ptr(), key.len() as i32) as u64 }
-    }
-
-    #[inline]
-    fn storage_load_i64(&self, key: &[u8]) -> i64 {
-        unsafe { smallIntStorageLoadSigned(key.as_ref().as_ptr(), key.len() as i32) }
-    }
-
-    #[inline]
     fn storage_load_from_address(&self, address_handle: Handle, key_handle: Handle, dest: Handle) {
         unsafe {
             mBufferStorageLoadFromAddress(address_handle, key_handle, dest);
@@ -130,20 +114,6 @@ impl StorageWriteApiImpl for VmApiImpl {
             // TODO: this will no longer be necessay once the ("no managed buffer under the given handle" is removed from VM
             let _ = mBufferSetBytes(const_handles::MBUF_CONST_EMPTY, core::ptr::null(), 0);
             mBufferStorageStore(key_handle, const_handles::MBUF_CONST_EMPTY);
-        }
-    }
-
-    #[inline]
-    fn storage_store_u64(&self, key: &[u8], value: u64) {
-        unsafe {
-            smallIntStorageStoreUnsigned(key.as_ref().as_ptr(), key.len() as i32, value as i64);
-        }
-    }
-
-    #[inline]
-    fn storage_store_i64(&self, key: &[u8], value: i64) {
-        unsafe {
-            smallIntStorageStoreSigned(key.as_ref().as_ptr(), key.len() as i32, value);
         }
     }
 }
