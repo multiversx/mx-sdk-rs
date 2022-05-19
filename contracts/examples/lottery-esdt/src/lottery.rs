@@ -212,7 +212,8 @@ pub trait Lottery {
         token_identifier: &TokenIdentifier,
         payment: &BigUint,
     ) {
-        let mut info = self.lottery_info(lottery_name).get();
+        let info_mapper = self.lottery_info(lottery_name);
+        let mut info = info_mapper.get();
         let caller = self.blockchain().get_caller();
         let whitelist = self.lottery_whitelist(lottery_name);
 
@@ -225,7 +226,8 @@ pub trait Lottery {
             "Wrong ticket fee!"
         );
 
-        let mut entries = self.number_of_entries_for_user(lottery_name, &caller).get();
+        let entries_mapper = self.number_of_entries_for_user(lottery_name, &caller);
+        let mut entries = entries_mapper.get();
         require!(
             entries < info.max_entries_per_user,
             "Ticket limit exceeded for this lottery!"
@@ -237,14 +239,14 @@ pub trait Lottery {
         info.tickets_left -= 1;
         info.prize_pool += &info.ticket_price;
 
-        self.number_of_entries_for_user(lottery_name, &caller)
-            .set(&entries);
-        self.lottery_info(lottery_name).set(&info);
+        entries_mapper.set(&entries);
+        info_mapper.set(&info);
     }
 
     fn distribute_prizes(&self, lottery_name: &ManagedBuffer) {
         let mut info = self.lottery_info(lottery_name).get();
-        let total_tickets = self.ticket_holders(lottery_name).len();
+        let ticket_holders_mapper = self.ticket_holders(lottery_name);
+        let total_tickets = ticket_holders_mapper.len();
 
         if total_tickets == 0 {
             return;
@@ -283,7 +285,7 @@ pub trait Lottery {
         // 1st place will get the spare money instead.
         for i in (1..total_winning_tickets).rev() {
             let winning_ticket_id = winning_tickets[i];
-            let winner_address = self.ticket_holders(lottery_name).get(winning_ticket_id);
+            let winner_address = ticket_holders_mapper.get(winning_ticket_id);
             let prize = self.calculate_percentage_of(
                 &total_prize,
                 &BigUint::from(info.prize_distribution.get(i)),
@@ -300,7 +302,7 @@ pub trait Lottery {
         }
 
         // send leftover to first place
-        let first_place_winner = self.ticket_holders(lottery_name).get(winning_tickets[0]);
+        let first_place_winner = ticket_holders_mapper.get(winning_tickets[0]);
         self.send().direct(
             &first_place_winner,
             &info.token_identifier,
@@ -311,14 +313,15 @@ pub trait Lottery {
     }
 
     fn clear_storage(&self, lottery_name: &ManagedBuffer) {
-        let current_ticket_number = self.ticket_holders(lottery_name).len();
+        let mut ticket_holders_mapper = self.ticket_holders(lottery_name);
+        let current_ticket_number = ticket_holders_mapper.len();
 
         for i in 1..=current_ticket_number {
-            let addr = self.ticket_holders(lottery_name).get(i);
+            let addr = ticket_holders_mapper.get(i);
             self.number_of_entries_for_user(lottery_name, &addr).clear();
         }
 
-        self.ticket_holders(lottery_name).clear();
+        ticket_holders_mapper.clear();
         self.lottery_info(lottery_name).clear();
         self.lottery_whitelist(lottery_name).clear();
         self.burn_percentage_for_lottery(lottery_name).clear();
@@ -334,8 +337,6 @@ pub trait Lottery {
         sum
     }
 
-    // Normally, we recommend managed types, like ManagedVec > Vec, ManagedBuffer > BoxedBytes, etc.
-    // But in this case, ManagedVec would need too many API calls for this algorithm
     /// does not check if max - min >= amount, that is the caller's job
     fn get_distinct_random(
         &self,
