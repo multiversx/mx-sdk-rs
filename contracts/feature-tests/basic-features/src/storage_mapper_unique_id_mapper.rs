@@ -14,7 +14,7 @@ pub trait UniqueIdMapperFeatures {
 
     #[endpoint]
     fn unique_id_mapper_swap_remove(&self, index: usize) -> UniqueId {
-        self.unique_id_mapper().get_and_swap_remove(index)
+        self.unique_id_mapper().swap_remove(index)
     }
 
     #[endpoint]

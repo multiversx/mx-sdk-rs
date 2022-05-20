@@ -73,7 +73,7 @@ where
 
     /// Gets the value from the index and removes it.
     /// The value is replaced by the last item, and length is decremented.
-    pub fn get_and_swap_remove(&mut self, index: usize) -> UniqueId {
+    pub fn swap_remove(&mut self, index: usize) -> UniqueId {
         let last_item_index = self.len();
         let last_item = self.get(last_item_index);
 
