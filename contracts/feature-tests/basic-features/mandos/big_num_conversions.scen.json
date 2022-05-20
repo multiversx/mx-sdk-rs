@@ -116,6 +116,24 @@
                     "-1234"
                 ]
             }
+        },
+        {
+            "step": "scQuery",
+            "txId": "big-num-mutable-arg",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "endpoint_with_mutable_arg",
+                "arguments": [
+                    "50",
+                    "25",
+                    "25"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "100"
+                ]
+            }
         }
     ]
 }

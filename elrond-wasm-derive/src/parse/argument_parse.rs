@@ -42,14 +42,28 @@ fn extract_method_arg(pat_typed: &syn::PatType) -> MethodArgument {
     let mut arg_metadata = ArgMetadata::default();
     let mut unprocessed_attributes = Vec::new();
 
+    // println!("Pattern:");
+    // println!("{:?}", pat);
+    // println!();
+    // println!("Type:");
+    // println!("{:?}", ty);
+    // println!();
+
     process_arg_attributes(
         &pat_typed.attrs,
         &mut arg_metadata,
         &mut unprocessed_attributes,
     );
 
+    let original_pat = pat.clone();
+    let mut cleaned_pat = original_pat.clone();
+    if let syn::Pat::Ident(ident) = &mut cleaned_pat {
+        ident.mutability = None;
+    }
+
     MethodArgument {
-        pat: pat.clone(),
+        original_pat,
+        pat: cleaned_pat,
         ty: ty.clone(),
         unprocessed_attributes,
         metadata: arg_metadata,
