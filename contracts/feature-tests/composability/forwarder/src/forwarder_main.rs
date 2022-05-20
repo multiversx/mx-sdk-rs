@@ -1,5 +1,6 @@
 #![no_std]
 #![allow(clippy::type_complexity)]
+#![allow(clippy::let_unit_value)]
 
 mod call_async;
 pub mod call_sync;
