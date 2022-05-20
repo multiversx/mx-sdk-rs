@@ -31,10 +31,10 @@ pub trait SparseArrayFeatures {
         index: usize,
         value: usize,
     ) -> SparseArray<Self::Api, 100> {
-        let mut array_clone = array;
-        array_clone.set(index, value);
+        let mut array_mut = array;
+        array_mut.set(index, value);
 
-        array_clone
+        array_mut
     }
 
     #[endpoint]
@@ -43,9 +43,9 @@ pub trait SparseArrayFeatures {
         array: SparseArray<Self::Api, 100>,
         index: usize,
     ) -> MultiValue2<usize, SparseArray<Self::Api, 100>> {
-        let mut array_clone = array;
-        let value = array_clone.swap_remove(index);
+        let mut array_mut = array;
+        let value = array_mut.swap_remove(index);
 
-        (value, array_clone).into()
+        (value, array_mut).into()
     }
 }
