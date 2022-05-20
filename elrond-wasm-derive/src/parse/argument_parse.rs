@@ -42,13 +42,6 @@ fn extract_method_arg(pat_typed: &syn::PatType) -> MethodArgument {
     let mut arg_metadata = ArgMetadata::default();
     let mut unprocessed_attributes = Vec::new();
 
-    // println!("Pattern:");
-    // println!("{:?}", pat);
-    // println!();
-    // println!("Type:");
-    // println!("{:?}", ty);
-    // println!();
-
     process_arg_attributes(
         &pat_typed.attrs,
         &mut arg_metadata,
