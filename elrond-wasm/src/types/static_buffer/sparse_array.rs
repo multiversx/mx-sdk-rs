@@ -24,6 +24,7 @@ impl<E, const CAPACITY: usize> SparseArray<E, CAPACITY>
 where
     E: ErrorApi,
 {
+    /// initializes a sparse array that holds the values from range [0, len)
     pub fn new(len: usize) -> Self {
         if len > CAPACITY {
             E::error_api_impl().signal_error(b"Length exceeds capacity");

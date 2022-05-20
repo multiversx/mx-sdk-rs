@@ -377,8 +377,3 @@ fn struct_eq_go() {
 fn storage_mapper_unique_id_go() {
     elrond_wasm_debug::mandos_go("mandos/storage_mapper_unique_id.scen.json");
 }
-
-#[test]
-fn sparse_array_features_go() {
-    elrond_wasm_debug::mandos_go("mandos/sparse_array_features.scen.json");
-}
