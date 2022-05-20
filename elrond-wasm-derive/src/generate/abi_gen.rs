@@ -106,16 +106,16 @@ fn generate_event_snippet(m: &Method, event_name: &str) -> proc_macro2::TokenStr
     let input_snippets: Vec<proc_macro2::TokenStream> = m
         .method_args
         .iter()
-        .filter_map(|arg| {
+        .map(|arg| {
             let mut arg_type = arg.ty.clone();
             let indexed = arg.metadata.event_topic;
             clear_all_type_lifetimes(&mut arg_type);
             let arg_name = &arg.pat;
             let arg_name_str = quote! { #arg_name }.to_string();
-            Some(quote! {
+            quote! {
                 event_abi.add_input::<#arg_type>(#arg_name_str, #indexed);
                 contract_abi.add_type_descriptions::<#arg_type>();
-            })
+            }
         })
         .collect();
 
@@ -135,7 +135,7 @@ fn generate_event_snippets(contract: &ContractTrait) -> Vec<proc_macro2::TokenSt
         .iter()
         .filter_map(|m| {
             if let MethodImpl::Generated(AutoImpl::Event { identifier }) = &m.implementation {
-                let event_def = generate_event_snippet(m, &identifier);
+                let event_def = generate_event_snippet(m, identifier);
                 Some(quote! {
                     #event_def
                     contract_abi.events.push(event_abi);
