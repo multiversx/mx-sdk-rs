@@ -12,6 +12,10 @@ path = "src/multisig.rs"
 version = "0.31.1"
 path = "../../../elrond-wasm"
 
+[dependencies.elrond-wasm-modules]
+version = "0.31.1"
+path = "../../../elrond-wasm-modules"
+
 [dev-dependencies.elrond-wasm-debug]
 version = "0.31.1"
 path = "../../../elrond-wasm-debug"
