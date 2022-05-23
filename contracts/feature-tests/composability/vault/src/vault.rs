@@ -65,6 +65,12 @@ pub trait Vault {
 
     #[payable("*")]
     #[endpoint]
+    fn accept_funds_single_esdt_transfer(&self) {
+        let _ = self.call_value().payment();
+    }
+
+    #[payable("*")]
+    #[endpoint]
     fn reject_funds(&self) {
         let esdt_transfers_multi = self.esdt_transfers_multi();
         self.reject_funds_event(&self.call_value().egld_value(), &esdt_transfers_multi);
