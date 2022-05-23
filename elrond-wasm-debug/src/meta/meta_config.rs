@@ -9,6 +9,7 @@ pub struct BuildArgs {
     pub wasm_name_suffix: Option<String>,
     pub wasm_opt: bool,
     pub target_dir: Option<String>,
+    pub abi_git_version: bool,
 }
 
 impl Default for BuildArgs {
@@ -19,6 +20,7 @@ impl Default for BuildArgs {
             wasm_name_suffix: None,
             wasm_opt: true,
             target_dir: None,
+            abi_git_version: false,
         }
     }
 }
@@ -108,6 +110,9 @@ pub fn process_args(args: &[String]) -> BuildArgs {
                     .next()
                     .expect("argument `--target-dir` must be followed by argument");
                 result.target_dir = Some(arg.clone());
+            },
+            "--abi-git-version" => {
+                result.abi_git_version = true;
             },
             _ => {},
         }

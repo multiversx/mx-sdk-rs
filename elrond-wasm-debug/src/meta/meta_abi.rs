@@ -21,7 +21,7 @@ fn write_contract_abi(contract_metadata: &ContractMetadata, git_version: &str, o
 impl MetaConfig {
     pub fn write_abi(&self) {
         create_dir_all(&self.output_dir).unwrap();
-        let git_version = git_describe();
+        let git_version = self.git_describe();
 
         if let Some(main_contract) = &self.main_contract {
             write_contract_abi(
@@ -41,14 +41,18 @@ impl MetaConfig {
             view_contract.create_dir_all();
         }
     }
-}
 
-fn git_describe() -> String {
-    Command::new("git")
-        .args(["describe"])
-        .output()
-        .map(git_describe_process_output)
-        .unwrap_or_default()
+    fn git_describe(&self) -> String {
+        if !self.build_args.abi_git_version {
+            return String::new();
+        }
+
+        Command::new("git")
+            .args(["describe"])
+            .output()
+            .map(git_describe_process_output)
+            .unwrap_or_default()
+    }
 }
 
 fn git_describe_process_output(output: Output) -> String {
