@@ -19,6 +19,11 @@ pub trait SendApiImpl {
         M: ManagedTypeApi,
         D: Into<ManagedBuffer<M>>;
 
+    fn direct_egld_legacy<M, D>(&self, to: &ManagedAddress<M>, amount: &BigUint<M>, data: D)
+    where
+        M: ManagedTypeApi,
+        D: Into<ManagedBuffer<M>>;
+
     /// Sends EGLD to an address (optionally) and executes like an async call, but without callback.
     fn direct_egld_execute<M: ManagedTypeApi>(
         &self,
@@ -29,8 +34,27 @@ pub trait SendApiImpl {
         arg_buffer: &ManagedArgBuffer<M>,
     ) -> Result<(), &'static [u8]>;
 
+    fn direct_egld_execute_legacy<M: ManagedTypeApi>(
+        &self,
+        to: &ManagedAddress<M>,
+        amount: &BigUint<M>,
+        gas_limit: u64,
+        endpoint_name: &ManagedBuffer<M>,
+        arg_buffer: &ManagedArgBuffer<M>,
+    ) -> Result<(), &'static [u8]>;
+
     /// Sends ESDT to an address and executes like an async call, but without callback.
     fn direct_esdt_execute<M: ManagedTypeApi>(
+        &self,
+        to: &ManagedAddress<M>,
+        token: &TokenIdentifier<M>,
+        amount: &BigUint<M>,
+        gas_limit: u64,
+        endpoint_name: &ManagedBuffer<M>,
+        arg_buffer: &ManagedArgBuffer<M>,
+    ) -> Result<(), &'static [u8]>;
+
+    fn direct_esdt_execute_legacy<M: ManagedTypeApi>(
         &self,
         to: &ManagedAddress<M>,
         token: &TokenIdentifier<M>,
@@ -52,8 +76,29 @@ pub trait SendApiImpl {
         endpoint_name: &ManagedBuffer<M>,
         arg_buffer: &ManagedArgBuffer<M>,
     ) -> Result<(), &'static [u8]>;
+    #[allow(clippy::too_many_arguments)]
+
+    fn direct_esdt_nft_execute_legacy<M: ManagedTypeApi>(
+        &self,
+        to: &ManagedAddress<M>,
+        token: &TokenIdentifier<M>,
+        nonce: u64,
+        amount: &BigUint<M>,
+        gas_limit: u64,
+        endpoint_name: &ManagedBuffer<M>,
+        arg_buffer: &ManagedArgBuffer<M>,
+    ) -> Result<(), &'static [u8]>;
 
     fn direct_multi_esdt_transfer_execute<M: ManagedTypeApi>(
+        &self,
+        to: &ManagedAddress<M>,
+        payments: &ManagedVec<M, EsdtTokenPayment<M>>,
+        gas_limit: u64,
+        endpoint_name: &ManagedBuffer<M>,
+        arg_buffer: &ManagedArgBuffer<M>,
+    ) -> Result<(), &'static [u8]>;
+
+    fn direct_multi_esdt_transfer_execute_legacy<M: ManagedTypeApi>(
         &self,
         to: &ManagedAddress<M>,
         payments: &ManagedVec<M, EsdtTokenPayment<M>>,
@@ -69,6 +114,14 @@ pub trait SendApiImpl {
     /// The data is expected to be of the form `functionName@<arg1-hex>@<arg2-hex>@...`.
     /// Use a `HexCallDataSerializer` to prepare this field.
     fn async_call_raw<M: ManagedTypeApi>(
+        &self,
+        to: &ManagedAddress<M>,
+        amount: &BigUint<M>,
+        endpoint_name: &ManagedBuffer<M>,
+        arg_buffer: &ManagedArgBuffer<M>,
+    ) -> !;
+
+    fn async_call_raw_legacy<M: ManagedTypeApi>(
         &self,
         to: &ManagedAddress<M>,
         amount: &BigUint<M>,
@@ -101,6 +154,15 @@ pub trait SendApiImpl {
         arg_buffer: &ManagedArgBuffer<M>,
     ) -> (ManagedAddress<M>, ManagedVec<M, ManagedBuffer<M>>);
 
+    fn deploy_contract_legacy<M: ManagedTypeApi>(
+        &self,
+        gas: u64,
+        amount: &BigUint<M>,
+        code: &ManagedBuffer<M>,
+        code_metadata: CodeMetadata,
+        arg_buffer: &ManagedArgBuffer<M>,
+    ) -> (ManagedAddress<M>, ManagedVec<M, ManagedBuffer<M>>);
+
     /// Deploys a new contract in the same shard by re-using the code of an already deployed source contract.
     /// The deployment is done synchronously and the new contract's address is returned.
     /// If the deployment fails, Option::None is returned
@@ -113,7 +175,26 @@ pub trait SendApiImpl {
         arg_buffer: &ManagedArgBuffer<M>,
     ) -> (ManagedAddress<M>, ManagedVec<M, ManagedBuffer<M>>);
 
+    fn deploy_from_source_contract_legacy<M: ManagedTypeApi>(
+        &self,
+        gas: u64,
+        amount: &BigUint<M>,
+        source_contract_address: &ManagedAddress<M>,
+        code_metadata: CodeMetadata,
+        arg_buffer: &ManagedArgBuffer<M>,
+    ) -> (ManagedAddress<M>, ManagedVec<M, ManagedBuffer<M>>);
+
     fn upgrade_from_source_contract<M: ManagedTypeApi>(
+        &self,
+        sc_address: &ManagedAddress<M>,
+        gas: u64,
+        amount: &BigUint<M>,
+        source_contract_address: &ManagedAddress<M>,
+        code_metadata: CodeMetadata,
+        arg_buffer: &ManagedArgBuffer<M>,
+    );
+
+    fn upgrade_from_source_contract_legacy<M: ManagedTypeApi>(
         &self,
         sc_address: &ManagedAddress<M>,
         gas: u64,
@@ -136,8 +217,27 @@ pub trait SendApiImpl {
         arg_buffer: &ManagedArgBuffer<M>,
     );
 
+    fn upgrade_contract_legacy<M: ManagedTypeApi>(
+        &self,
+        sc_address: &ManagedAddress<M>,
+        gas: u64,
+        amount: &BigUint<M>,
+        code: &ManagedBuffer<M>,
+        code_metadata: CodeMetadata,
+        arg_buffer: &ManagedArgBuffer<M>,
+    );
+
     /// Same shard, in-line execution of another contract.
     fn execute_on_dest_context_raw<M: ManagedTypeApi>(
+        &self,
+        gas: u64,
+        address: &ManagedAddress<M>,
+        value: &BigUint<M>,
+        endpoint_name: &ManagedBuffer<M>,
+        arg_buffer: &ManagedArgBuffer<M>,
+    ) -> ManagedVec<M, ManagedBuffer<M>>;
+
+    fn execute_on_dest_context_raw_legacy<M: ManagedTypeApi>(
         &self,
         gas: u64,
         address: &ManagedAddress<M>,
@@ -155,7 +255,25 @@ pub trait SendApiImpl {
         arg_buffer: &ManagedArgBuffer<M>,
     ) -> ManagedVec<M, ManagedBuffer<M>>;
 
+    fn execute_on_dest_context_by_caller_raw_legacy<M: ManagedTypeApi>(
+        &self,
+        gas: u64,
+        address: &ManagedAddress<M>,
+        value: &BigUint<M>,
+        endpoint_name: &ManagedBuffer<M>,
+        arg_buffer: &ManagedArgBuffer<M>,
+    ) -> ManagedVec<M, ManagedBuffer<M>>;
+
     fn execute_on_same_context_raw<M: ManagedTypeApi>(
+        &self,
+        gas: u64,
+        address: &ManagedAddress<M>,
+        value: &BigUint<M>,
+        endpoint_name: &ManagedBuffer<M>,
+        arg_buffer: &ManagedArgBuffer<M>,
+    ) -> ManagedVec<M, ManagedBuffer<M>>;
+
+    fn execute_on_same_context_raw_legacy<M: ManagedTypeApi>(
         &self,
         gas: u64,
         address: &ManagedAddress<M>,
@@ -172,10 +290,25 @@ pub trait SendApiImpl {
         arg_buffer: &ManagedArgBuffer<M>,
     ) -> ManagedVec<M, ManagedBuffer<M>>;
 
+    fn execute_on_dest_context_readonly_raw_legacy<M: ManagedTypeApi>(
+        &self,
+        gas: u64,
+        address: &ManagedAddress<M>,
+        endpoint_name: &ManagedBuffer<M>,
+        arg_buffer: &ManagedArgBuffer<M>,
+    ) -> ManagedVec<M, ManagedBuffer<M>>;
+
     /// Allows synchronously calling a local function by name. Execution is resumed afterwards.
     /// You should never have to call this function directly.
     /// Use the other specific methods instead.
     fn call_local_esdt_built_in_function<M: ManagedTypeApi>(
+        &self,
+        gas: u64,
+        endpoint_name: &ManagedBuffer<M>,
+        arg_buffer: &ManagedArgBuffer<M>,
+    ) -> ManagedVec<M, ManagedBuffer<M>>;
+
+    fn call_local_esdt_built_in_function_legacy<M: ManagedTypeApi>(
         &self,
         gas: u64,
         endpoint_name: &ManagedBuffer<M>,
