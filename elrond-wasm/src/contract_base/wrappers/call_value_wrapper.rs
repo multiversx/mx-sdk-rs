@@ -58,10 +58,12 @@ where
     /// Warning, not tested with multi transfer, use `all_esdt_transfers` instead!
     pub fn token(&self) -> TokenIdentifier<A> {
         let call_value_api = A::call_value_api_impl();
-        if call_value_api.esdt_num_transfers() == 0 {
-            TokenIdentifier::egld()
-        } else {
-            TokenIdentifier::from_raw_handle(call_value_api.token())
+        let error_api = A::error_api_impl();
+
+        match call_value_api.esdt_num_transfers() {
+            0 => TokenIdentifier::egld(),
+            1 => TokenIdentifier::from_raw_handle(call_value_api.token()),
+            _ => error_api.signal_error(err_msg::TOO_MANY_ESDT_TRANSFERS.as_bytes()),
         }
     }
 
