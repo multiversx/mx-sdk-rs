@@ -22,7 +22,7 @@ pub trait SendApiImpl {
         M: ManagedTypeApi,
         D: Into<ManagedBuffer<M>>;
 
-    fn direct_egld_legacy<M, D>(&self, to: &Address, amount: &BigUint<M>, data: &BoxedBytes)
+    fn direct_egld_legacy<M>(&self, to: &Address, amount: &BigUint<M>, data: &BoxedBytes)
     where
         M: ManagedTypeApi;
 

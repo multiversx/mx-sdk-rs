@@ -562,7 +562,7 @@ impl SendApiImpl for DebugApi {
         let _ = tx_result.result_values.remove(index);
     }
 
-    fn direct_egld_legacy<M, D>(&self, _to: &Address, _amount: &BigUint<M>, _data: &BoxedBytes)
+    fn direct_egld_legacy<M>(&self, _to: &Address, _amount: &BigUint<M>, _data: &BoxedBytes)
     where
         M: ManagedTypeApi,
     {
