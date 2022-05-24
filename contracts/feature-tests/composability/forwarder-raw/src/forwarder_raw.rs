@@ -41,7 +41,7 @@ pub trait ForwarderRaw {
         #[payment_token] token: TokenIdentifier,
         #[payment] payment: BigUint,
     ) {
-        let _ = self.send().direct(&to, &token, 0, &payment, &[]);
+        self.send().direct(&to, &token, 0, &payment, &[]);
     }
 
     #[endpoint]

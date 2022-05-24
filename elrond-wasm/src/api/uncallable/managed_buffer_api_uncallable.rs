@@ -71,4 +71,8 @@ impl ManagedBufferApi for super::UncallableApi {
     fn mb_eq(&self, _handle1: Handle, _handle2: Handle) -> bool {
         unreachable!()
     }
+
+    fn mb_to_hex(&self, _source_handle: Handle, _dest_handle: Handle) {
+        unreachable!()
+    }
 }
