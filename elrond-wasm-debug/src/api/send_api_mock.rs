@@ -12,8 +12,8 @@ use elrond_wasm::{
     elrond_codec::top_encode_to_vec_u8,
     err_msg,
     types::{
-        heap::Address, BigUint, CodeMetadata, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer,
-        ManagedBuffer, ManagedType, ManagedVec, TokenIdentifier,
+        heap::Address, ArgBuffer, BigUint, BoxedBytes, CodeMetadata, EsdtTokenPayment,
+        ManagedAddress, ManagedArgBuffer, ManagedBuffer, ManagedType, ManagedVec, TokenIdentifier,
     },
 };
 use num_traits::Zero;
@@ -562,67 +562,66 @@ impl SendApiImpl for DebugApi {
         let _ = tx_result.result_values.remove(index);
     }
 
-    fn direct_egld_legacy<M, D>(&self, _to: &ManagedAddress<M>, _amount: &BigUint<M>, _data: D)
+    fn direct_egld_legacy<M, D>(&self, _to: &Address, _amount: &BigUint<M>, _data: &BoxedBytes)
     where
         M: ManagedTypeApi,
-        D: Into<ManagedBuffer<M>>,
     {
         unimplemented!()
     }
 
     fn direct_egld_execute_legacy<M: ManagedTypeApi>(
         &self,
-        _to: &ManagedAddress<M>,
+        _to: &Address,
         _amount: &BigUint<M>,
         _gas_limit: u64,
-        _endpoint_name: &ManagedBuffer<M>,
-        _arg_buffer: &ManagedArgBuffer<M>,
+        _endpoint_name: &BoxedBytes,
+        _arg_buffer: &ArgBuffer,
     ) -> Result<(), &'static [u8]> {
         unimplemented!()
     }
 
     fn direct_esdt_execute_legacy<M: ManagedTypeApi>(
         &self,
-        _to: &ManagedAddress<M>,
+        _to: &Address,
         _token: &TokenIdentifier<M>,
         _amount: &BigUint<M>,
-        _gas_limit: u64,
-        _endpoint_name: &ManagedBuffer<M>,
-        _arg_buffer: &ManagedArgBuffer<M>,
+        _gas: u64,
+        _endpoint_name: &BoxedBytes,
+        _arg_buffer: &ArgBuffer,
     ) -> Result<(), &'static [u8]> {
         unimplemented!()
     }
 
     fn direct_esdt_nft_execute_legacy<M: ManagedTypeApi>(
         &self,
-        _to: &ManagedAddress<M>,
+        _to: &Address,
         _token: &TokenIdentifier<M>,
         _nonce: u64,
         _amount: &BigUint<M>,
         _gas_limit: u64,
-        _endpoint_name: &ManagedBuffer<M>,
-        _arg_buffer: &ManagedArgBuffer<M>,
+        _endpoint_name: &BoxedBytes,
+        _arg_buffer: &ArgBuffer,
     ) -> Result<(), &'static [u8]> {
         unimplemented!()
     }
 
     fn direct_multi_esdt_transfer_execute_legacy<M: ManagedTypeApi>(
         &self,
-        _to: &ManagedAddress<M>,
-        _payments: &ManagedVec<M, EsdtTokenPayment<M>>,
+        _to: &Address,
+        _payments: &Vec<EsdtTokenPayment<M>>,
         _gas_limit: u64,
-        _endpoint_name: &ManagedBuffer<M>,
-        _arg_buffer: &ManagedArgBuffer<M>,
+        _endpoint_name: &BoxedBytes,
+        _arg_buffer: &ArgBuffer,
     ) -> Result<(), &'static [u8]> {
         unimplemented!()
     }
 
     fn async_call_raw_legacy<M: ManagedTypeApi>(
         &self,
-        _to: &ManagedAddress<M>,
+        _to: &Address,
         _amount: &BigUint<M>,
-        _endpoint_name: &ManagedBuffer<M>,
-        _arg_buffer: &ManagedArgBuffer<M>,
+        _endpoint_name: &BoxedBytes,
+        _arg_buffer: &ArgBuffer,
     ) -> ! {
         unimplemented!()
     }
@@ -631,9 +630,9 @@ impl SendApiImpl for DebugApi {
         &self,
         _gas: u64,
         _amount: &BigUint<M>,
-        _code: &ManagedBuffer<M>,
+        _code: &BoxedBytes,
         _code_metadata: CodeMetadata,
-        _arg_buffer: &ManagedArgBuffer<M>,
+        _arg_buffer: &ArgBuffer,
     ) -> (ManagedAddress<M>, ManagedVec<M, ManagedBuffer<M>>) {
         unimplemented!()
     }
@@ -642,33 +641,33 @@ impl SendApiImpl for DebugApi {
         &self,
         _gas: u64,
         _amount: &BigUint<M>,
-        _source_contract_address: &ManagedAddress<M>,
+        _source_contract_address: &Address,
         _code_metadata: CodeMetadata,
-        _arg_buffer: &ManagedArgBuffer<M>,
+        _arg_buffer: &ArgBuffer,
     ) -> (ManagedAddress<M>, ManagedVec<M, ManagedBuffer<M>>) {
         unimplemented!()
     }
 
     fn upgrade_from_source_contract_legacy<M: ManagedTypeApi>(
         &self,
-        _sc_address: &ManagedAddress<M>,
+        _sc_address: &Address,
         _gas: u64,
         _amount: &BigUint<M>,
-        _source_contract_address: &ManagedAddress<M>,
+        _source_contract_address: &Address,
         _code_metadata: CodeMetadata,
-        _arg_buffer: &ManagedArgBuffer<M>,
+        _arg_buffer: &ArgBuffer,
     ) {
         unimplemented!()
     }
 
     fn upgrade_contract_legacy<M: ManagedTypeApi>(
         &self,
-        _sc_address: &ManagedAddress<M>,
+        _sc_address: &Address,
         _gas: u64,
         _amount: &BigUint<M>,
-        _code: &ManagedBuffer<M>,
+        _code: &BoxedBytes,
         _code_metadata: CodeMetadata,
-        _arg_buffer: &ManagedArgBuffer<M>,
+        _arg_buffer: &ArgBuffer,
     ) {
         unimplemented!()
     }
@@ -676,10 +675,10 @@ impl SendApiImpl for DebugApi {
     fn execute_on_dest_context_raw_legacy<M: ManagedTypeApi>(
         &self,
         _gas: u64,
-        _address: &ManagedAddress<M>,
+        _to: &Address,
         _value: &BigUint<M>,
-        _endpoint_name: &ManagedBuffer<M>,
-        _arg_buffer: &ManagedArgBuffer<M>,
+        _endpoint_name: &BoxedBytes,
+        _arg_buffer: &ArgBuffer,
     ) -> ManagedVec<M, ManagedBuffer<M>> {
         unimplemented!()
     }
@@ -687,10 +686,10 @@ impl SendApiImpl for DebugApi {
     fn execute_on_dest_context_by_caller_raw_legacy<M: ManagedTypeApi>(
         &self,
         _gas: u64,
-        _address: &ManagedAddress<M>,
+        _to: &Address,
         _value: &BigUint<M>,
-        _endpoint_name: &ManagedBuffer<M>,
-        _arg_buffer: &ManagedArgBuffer<M>,
+        _endpoint_name: &BoxedBytes,
+        _arg_buffer: &ArgBuffer,
     ) -> ManagedVec<M, ManagedBuffer<M>> {
         unimplemented!()
     }
@@ -698,10 +697,10 @@ impl SendApiImpl for DebugApi {
     fn execute_on_same_context_raw_legacy<M: ManagedTypeApi>(
         &self,
         _gas: u64,
-        _address: &ManagedAddress<M>,
+        _to: &Address,
         _value: &BigUint<M>,
-        _endpoint_name: &ManagedBuffer<M>,
-        _arg_buffer: &ManagedArgBuffer<M>,
+        _endpoint_name: &BoxedBytes,
+        _arg_buffer: &ArgBuffer,
     ) -> ManagedVec<M, ManagedBuffer<M>> {
         unimplemented!()
     }
@@ -709,9 +708,9 @@ impl SendApiImpl for DebugApi {
     fn execute_on_dest_context_readonly_raw_legacy<M: ManagedTypeApi>(
         &self,
         _gas: u64,
-        _address: &ManagedAddress<M>,
-        _endpoint_name: &ManagedBuffer<M>,
-        _arg_buffer: &ManagedArgBuffer<M>,
+        _address: &Address,
+        _endpoint_name: &BoxedBytes,
+        _arg_buffer: &ArgBuffer,
     ) -> ManagedVec<M, ManagedBuffer<M>> {
         unimplemented!()
     }
@@ -719,8 +718,8 @@ impl SendApiImpl for DebugApi {
     fn call_local_esdt_built_in_function_legacy<M: ManagedTypeApi>(
         &self,
         _gas: u64,
-        _endpoint_name: &ManagedBuffer<M>,
-        _arg_buffer: &ManagedArgBuffer<M>,
+        _function_name: &BoxedBytes,
+        _arg_buffer: &ArgBuffer,
     ) -> ManagedVec<M, ManagedBuffer<M>> {
         unimplemented!()
     }

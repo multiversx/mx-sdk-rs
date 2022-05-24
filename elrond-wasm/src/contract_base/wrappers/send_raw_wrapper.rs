@@ -15,33 +15,30 @@ use crate::{
     },
 };
 
-use super::{BlockchainWrapper, SendRawWrapper};
+use super::BlockchainWrapper;
 
 const PERCENTAGE_TOTAL: u64 = 10_000;
 
-/// API that groups methods that either send EGLD or ESDT, or that call other contracts.
-// pub trait SendApi: Clone + Sized {
-
 #[derive(Default)]
-pub struct SendWrapper<A>
+pub struct SendRawWrapper<A>
 where
     A: CallTypeApi + StorageReadApi + BlockchainApi,
 {
-    send_raw_wrapper: SendRawWrapper<A>,
+    _phantom: PhantomData<A>,
 }
 
-impl<A> SendWrapper<A>
+impl<A> SendRawWrapper<A>
 where
     A: CallTypeApi + StorageReadApi + BlockchainApi,
 {
     pub(crate) fn new() -> Self {
-        SendWrapper {
-            send_raw_wrapper: SendRawWrapper::new(),
+        SendRawWrapper {
+            _phantom: PhantomData,
         }
     }
 
     pub fn esdt_system_sc_proxy(&self) -> ESDTSystemSmartContractProxy<A> {
-        self.send_raw_wrapper.esdt_system_sc_proxy()
+        ESDTSystemSmartContractProxy::new_proxy_obj()
     }
 
     pub fn contract_call<R>(
@@ -49,20 +46,16 @@ where
         to: ManagedAddress<A>,
         endpoint_name: ManagedBuffer<A>,
     ) -> ContractCall<A, R> {
-        self.send_raw_wrapper.contract_call(to, endpoint_name)
+        ContractCall::new(to, endpoint_name)
     }
 
-    /// Sends EGLD to a given address, directly.
-    /// Used especially for sending EGLD to regular accounts.
     pub fn direct_egld<D>(&self, to: &ManagedAddress<A>, amount: &BigUint<A>, data: D)
     where
         D: Into<ManagedBuffer<A>>,
     {
-        self.send_raw_wrapper.direct_egld(to, amount, data)
+        A::send_api_impl().direct_egld(to, amount, data)
     }
 
-    /// Sends either EGLD, ESDT or NFT to the target address,
-    /// depending on the token identifier and nonce
     pub fn direct<D>(
         &self,
         to: &ManagedAddress<A>,
@@ -73,7 +66,7 @@ where
     ) where
         D: Into<ManagedBuffer<A>>,
     {
-        self.send_raw_wrapper.direct(to, token, nonce, amount, data);
+        self.direct_with_gas_limit(to, token, nonce, amount, 0, data, &[]);
     }
 
     #[allow(clippy::too_many_arguments)]
@@ -89,15 +82,40 @@ where
     ) where
         D: Into<ManagedBuffer<A>>,
     {
-        self.send_raw_wrapper.direct_with_gas_limit(
-            to,
-            token,
-            nonce,
-            amount,
-            gas,
-            endpoint_name,
-            arguments,
-        )
+        let endpoint_name_managed = endpoint_name.into();
+        let mut arg_buffer = ManagedArgBuffer::new_empty();
+        for arg in arguments {
+            arg_buffer.push_arg(arg);
+        }
+
+        if token.is_egld() {
+            let _ = A::send_api_impl().direct_egld_execute(
+                to,
+                amount,
+                gas,
+                &endpoint_name_managed,
+                &arg_buffer,
+            );
+        } else if nonce == 0 {
+            let _ = A::send_api_impl().direct_esdt_execute(
+                to,
+                token,
+                amount,
+                gas,
+                &endpoint_name_managed,
+                &arg_buffer,
+            );
+        } else {
+            let _ = A::send_api_impl().direct_esdt_nft_execute(
+                to,
+                token,
+                nonce,
+                amount,
+                gas,
+                &endpoint_name_managed,
+                &arg_buffer,
+            );
+        }
     }
 
     pub fn direct_multi<D>(
@@ -108,14 +126,15 @@ where
     ) where
         D: Into<ManagedBuffer<A>>,
     {
-        self.send_raw_wrapper.direct_multi(to, payments, data)
+        let _ = A::send_api_impl().direct_multi_esdt_transfer_execute(
+            to,
+            payments,
+            0,
+            &data.into(),
+            &ManagedArgBuffer::new_empty(),
+        );
     }
 
-    /// Performs a simple ESDT/NFT transfer, but via async call.  
-    /// As with any async call, this immediately terminates the execution of the current call.  
-    /// So only use as the last call in your endpoint.  
-    /// If you want to perform multiple transfers, use `self.send().transfer_multiple_esdt_via_async_call()` instead.  
-    /// Note that EGLD can NOT be transfered with this function.  
     pub fn transfer_esdt_via_async_call<D>(
         &self,
         to: &ManagedAddress<A>,
@@ -127,8 +146,36 @@ where
     where
         D: Into<ManagedBuffer<A>>,
     {
-        self.send_raw_wrapper
-            .transfer_esdt_via_async_call(to, token, nonce, amount, data)
+        let data_buf: ManagedBuffer<A> = data.into();
+        let mut arg_buffer = ManagedArgBuffer::new_empty();
+        arg_buffer.push_arg(token);
+        if nonce == 0 {
+            arg_buffer.push_arg(amount);
+            if !data_buf.is_empty() {
+                arg_buffer.push_arg_raw(data_buf);
+            }
+
+            A::send_api_impl().async_call_raw(
+                to,
+                &BigUint::zero(),
+                &ManagedBuffer::new_from_bytes(ESDT_TRANSFER_FUNC_NAME),
+                &arg_buffer,
+            )
+        } else {
+            arg_buffer.push_arg(nonce);
+            arg_buffer.push_arg(amount);
+            arg_buffer.push_arg(to);
+            if !data_buf.is_empty() {
+                arg_buffer.push_arg_raw(data_buf);
+            }
+
+            A::send_api_impl().async_call_raw(
+                &BlockchainWrapper::<A>::new().get_sc_address(),
+                &BigUint::zero(),
+                &ManagedBuffer::new_from_bytes(ESDT_NFT_TRANSFER_FUNC_NAME),
+                &arg_buffer,
+            )
+        }
     }
 
     pub fn transfer_multiple_esdt_via_async_call<D>(
@@ -140,11 +187,29 @@ where
     where
         D: Into<ManagedBuffer<A>>,
     {
-        self.send_raw_wrapper
-            .transfer_multiple_esdt_via_async_call(to, payments, data)
+        let mut arg_buffer = ManagedArgBuffer::new_empty();
+        arg_buffer.push_arg(to);
+        arg_buffer.push_arg(payments.len());
+
+        for payment in payments.into_iter() {
+            // TODO: check that `!token_identifier.is_egld()` or let Arwen throw the error?
+            arg_buffer.push_arg(payment.token_identifier);
+            arg_buffer.push_arg(payment.token_nonce);
+            arg_buffer.push_arg(payment.amount);
+        }
+        let data_buf: ManagedBuffer<A> = data.into();
+        if !data_buf.is_empty() {
+            arg_buffer.push_arg_raw(data_buf);
+        }
+
+        A::send_api_impl().async_call_raw(
+            &BlockchainWrapper::<A>::new().get_sc_address(),
+            &BigUint::zero(),
+            &ManagedBuffer::new_from_bytes(ESDT_MULTI_TRANSFER_FUNC_NAME),
+            &arg_buffer,
+        );
     }
 
-    /// Sends a synchronous call to change a smart contract address.
     pub fn change_owner_address(
         &self,
         child_sc_address: ManagedAddress<A>,
@@ -158,9 +223,6 @@ where
         contract_call
     }
 
-    /// Allows synchronously calling a local function by name. Execution is resumed afterwards.
-    /// You should never have to call this function directly.
-    /// Use the other specific methods instead.
     pub fn call_local_esdt_built_in_function(
         &self,
         gas: u64,
@@ -175,11 +237,6 @@ where
         results
     }
 
-    /// Allows synchronous minting of ESDT/SFT (depending on nonce). Execution is resumed afterwards.
-    /// Note that the SC must have the ESDTLocalMint or ESDTNftAddQuantity roles set,
-    /// or this will fail with "action is not allowed"
-    /// For SFTs, you must use `self.send().esdt_nft_create()` before adding additional quantity.
-    /// This function cannot be used for NFTs.
     pub fn esdt_local_mint(&self, token: &TokenIdentifier<A>, nonce: u64, amount: &BigUint<A>) {
         let mut arg_buffer = ManagedArgBuffer::new_empty();
         let func_name: &[u8];
@@ -202,9 +259,6 @@ where
         );
     }
 
-    /// Allows synchronous burning of ESDT/SFT/NFT (depending on nonce). Execution is resumed afterwards.
-    /// Note that the SC must have the ESDTLocalBurn or ESDTNftBurn roles set,
-    /// or this will fail with "action is not allowed"
     pub fn esdt_local_burn(&self, token: &TokenIdentifier<A>, nonce: u64, amount: &BigUint<A>) {
         let mut arg_buffer = ManagedArgBuffer::new_empty();
         let func_name: &[u8];
@@ -226,11 +280,6 @@ where
         );
     }
 
-    /// Creates a new NFT token of a certain type (determined by `token_identifier`).  
-    /// `attributes` can be any serializable custom struct.  
-    /// This is a built-in function, so the smart contract execution is resumed after.
-    /// Must have ESDTNftCreate role set, or this will fail with "action is not allowed".
-    /// Returns the nonce of the newly created NFT.
     #[allow(clippy::too_many_arguments)]
     pub fn esdt_nft_create<T: elrond_codec::TopEncode>(
         &self,
@@ -306,8 +355,6 @@ where
         )
     }
 
-    /// Creates an NFT on behalf of the caller. This will set the "creator" field to the caller's address
-    /// NOT activated on devnet/mainnet yet.
     #[allow(clippy::too_many_arguments)]
     pub fn esdt_nft_create_as_caller<T: elrond_codec::TopEncode>(
         &self,
@@ -353,8 +400,6 @@ where
         }
     }
 
-    /// Sends thr NFTs to the buyer address and calculates and sends the required royalties to the NFT creator.
-    /// Returns the payment amount left after sending royalties.
     #[allow(clippy::too_many_arguments)]
     pub fn sell_nft(
         &self,
