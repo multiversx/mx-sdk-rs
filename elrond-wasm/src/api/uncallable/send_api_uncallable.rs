@@ -121,7 +121,7 @@ impl SendApiImpl for UncallableApi {
     fn direct_multi_esdt_transfer_execute_legacy<M: ManagedTypeApi>(
         &self,
         _to: &Address,
-        _payments: &Vec<EsdtTokenPayment<M>>,
+        _payments: &[EsdtTokenPayment<M>],
         _gas_limit: u64,
         _endpoint_name: &BoxedBytes,
         _arg_buffer: &ArgBuffer,

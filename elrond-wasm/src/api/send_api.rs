@@ -1,5 +1,3 @@
-use elrond_codec::Vec;
-
 use super::{BlockchainApi, ManagedTypeApi};
 use crate::types::{
     heap::{Address, ArgBuffer, BoxedBytes},
@@ -103,7 +101,7 @@ pub trait SendApiImpl {
     fn direct_multi_esdt_transfer_execute_legacy<M: ManagedTypeApi>(
         &self,
         to: &Address,
-        payments: &Vec<EsdtTokenPayment<M>>,
+        payments: &[EsdtTokenPayment<M>],
         gas_limit: u64,
         endpoint_name: &BoxedBytes,
         arg_buffer: &ArgBuffer,
