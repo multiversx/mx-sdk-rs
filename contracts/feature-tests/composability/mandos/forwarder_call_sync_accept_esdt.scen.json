@@ -25,6 +25,36 @@
         },
         {
             "step": "scCall",
+            "txId": "transfer-multi-esdt-to-single-esdt-api",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:vault",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:TEST-TOKENA",
+                        "value": "500"
+                    },
+                    {
+                        "tokenIdentifier": "str:TEST-TOKENA",
+                        "value": "500"
+                    }
+                ],
+                "function": "accept_funds_single_esdt_transfer",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:too many ESDT transfers",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
             "txId": "1",
             "tx": {
                 "from": "address:a_user",

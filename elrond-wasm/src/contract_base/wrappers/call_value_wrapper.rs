@@ -44,7 +44,6 @@ where
 
     /// Retrieves the ESDT call value from the VM.
     /// Will return 0 in case of an EGLD transfer (cannot have both EGLD and ESDT transfer simultaneously).
-    /// Warning, not tested with multi transfer, use `all_esdt_transfers` instead!
     pub fn esdt_value(&self) -> BigUint<A> {
         A::call_value_api_impl().load_single_esdt_value(const_handles::CALL_VALUE_SINGLE_ESDT);
         BigUint::from_raw_handle(const_handles::CALL_VALUE_SINGLE_ESDT)
@@ -55,19 +54,20 @@ where
     ///
     /// A note on implementation: even though the underlying api returns an empty name for EGLD,
     /// but the EGLD TokenIdentifier is serialized as `EGLD`.
-    /// Warning, not tested with multi transfer, use `all_esdt_transfers` instead!
+    /// Calling this when receiving a multi-token transfer will signal an error.
     pub fn token(&self) -> TokenIdentifier<A> {
         let call_value_api = A::call_value_api_impl();
-        if call_value_api.esdt_num_transfers() == 0 {
-            TokenIdentifier::egld()
-        } else {
-            TokenIdentifier::from_raw_handle(call_value_api.token())
+        let error_api = A::error_api_impl();
+
+        match call_value_api.esdt_num_transfers() {
+            0 => TokenIdentifier::egld(),
+            1 => TokenIdentifier::from_raw_handle(call_value_api.token()),
+            _ => error_api.signal_error(err_msg::TOO_MANY_ESDT_TRANSFERS.as_bytes()),
         }
     }
 
     /// Returns the nonce of the received ESDT token.
     /// Will return 0 in case of EGLD or fungible ESDT transfer.
-    /// Warning, not tested with multi transfer, use `all_esdt_transfers` instead!
     pub fn esdt_token_nonce(&self) -> u64 {
         let call_value_api = A::call_value_api_impl();
         if call_value_api.esdt_num_transfers() > 0 {
@@ -79,7 +79,6 @@ where
 
     /// Returns the ESDT token type.
     /// Will return "Fungible" for EGLD.
-    /// Warning, not tested with multi transfer, use `all_esdt_transfers` instead!
     pub fn esdt_token_type(&self) -> EsdtTokenType {
         let call_value_api = A::call_value_api_impl();
         if call_value_api.esdt_num_transfers() > 0 {
