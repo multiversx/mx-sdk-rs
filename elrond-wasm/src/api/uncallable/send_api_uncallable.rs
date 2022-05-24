@@ -28,7 +28,7 @@ impl SendApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn direct_egld_legacy<M, D>(&self, _to: &Address, _amount: &BigUint<M>, _data: &BoxedBytes)
+    fn direct_egld_legacy<M>(&self, _to: &Address, _amount: &BigUint<M>, _data: &BoxedBytes)
     where
         M: ManagedTypeApi,
     {
