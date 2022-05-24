@@ -38,7 +38,7 @@ where
     }
 
     #[cfg(not(feature = "alloc"))]
-    pub fn direct_egld(&self)
+    pub fn direct_egld<D>(&self, to: &ManagedAddress<A>, amount: &BigUint<A>, data: D)
     where
         D: Into<ManagedBuffer<A>>,
     {
@@ -104,7 +104,7 @@ where
         gas_limit: u64,
         endpoint_name: &ManagedBuffer<A>,
         arg_buffer: &ManagedArgBuffer<A>,
-    ) {
+    ) -> Result<(), &'static [u8]> {
         A::send_api_impl().direct_esdt_execute(
             to,
             token,
@@ -182,7 +182,7 @@ where
     pub fn direct_multi_esdt_transfer_execute(
         &self,
         to: &ManagedAddress<A>,
-        payments: &ManagedVec<M, EsdtTokenPayment<A>>,
+        payments: &ManagedVec<A, EsdtTokenPayment<A>>,
         gas_limit: u64,
         endpoint_name: &ManagedBuffer<A>,
         arg_buffer: &ManagedArgBuffer<A>,
