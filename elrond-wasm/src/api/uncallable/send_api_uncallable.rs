@@ -1,5 +1,3 @@
-use elrond_codec::Vec;
-
 use crate::{
     api::{ManagedTypeApi, SendApi, SendApiImpl},
     types::{
