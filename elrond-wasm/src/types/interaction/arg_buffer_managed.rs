@@ -3,7 +3,8 @@ use crate::{
     contract_base::ExitCodecErrorHandler,
     err_msg,
     types::{
-        ArgBuffer, ManagedBuffer, ManagedType, ManagedVec, ManagedVecRefIterator, MultiValueEncoded,
+        heap::ArgBuffer, ManagedBuffer, ManagedType, ManagedVec, ManagedVecRefIterator,
+        MultiValueEncoded,
     },
 };
 use alloc::vec::Vec;
