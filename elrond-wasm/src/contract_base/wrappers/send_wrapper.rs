@@ -1,11 +1,21 @@
 use crate::{
-    api::{BlockchainApi, CallTypeApi, StorageReadApi},
+    api::{
+        BlockchainApi, BlockchainApiImpl, CallTypeApi, StorageReadApi,
+        CHANGE_OWNER_BUILTIN_FUNC_NAME, ESDT_LOCAL_BURN_FUNC_NAME, ESDT_LOCAL_MINT_FUNC_NAME,
+        ESDT_MULTI_TRANSFER_FUNC_NAME, ESDT_NFT_ADD_QUANTITY_FUNC_NAME, ESDT_NFT_ADD_URI_FUNC_NAME,
+        ESDT_NFT_BURN_FUNC_NAME, ESDT_NFT_CREATE_FUNC_NAME, ESDT_NFT_TRANSFER_FUNC_NAME,
+        ESDT_NFT_UPDATE_ATTRIBUTES_FUNC_NAME, ESDT_TRANSFER_FUNC_NAME,
+    },
     esdt::ESDTSystemSmartContractProxy,
     types::{
         BigUint, ContractCall, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer,
-        ManagedVec, TokenIdentifier,
+        ManagedType, ManagedVec, TokenIdentifier,
     },
 };
+
+use super::BlockchainWrapper;
+
+const PERCENTAGE_TOTAL: u64 = 10_000;
 
 use super::SendRawWrapper;
 
@@ -31,7 +41,7 @@ where
     }
 
     pub fn esdt_system_sc_proxy(&self) -> ESDTSystemSmartContractProxy<A> {
-        self.send_raw_wrapper.esdt_system_sc_proxy()
+        ESDTSystemSmartContractProxy::new_proxy_obj()
     }
 
     pub fn contract_call<R>(
@@ -39,7 +49,7 @@ where
         to: ManagedAddress<A>,
         endpoint_name: ManagedBuffer<A>,
     ) -> ContractCall<A, R> {
-        self.send_raw_wrapper.contract_call(to, endpoint_name)
+        ContractCall::new(to, endpoint_name)
     }
 
     /// Sends EGLD to a given address, directly.
@@ -63,7 +73,7 @@ where
     ) where
         D: Into<ManagedBuffer<A>>,
     {
-        self.send_raw_wrapper.direct(to, token, nonce, amount, data);
+        self.direct_with_gas_limit(to, token, nonce, amount, 0, data, &[]);
     }
 
     #[allow(clippy::too_many_arguments)]
@@ -79,15 +89,40 @@ where
     ) where
         D: Into<ManagedBuffer<A>>,
     {
-        self.send_raw_wrapper.direct_with_gas_limit(
-            to,
-            token,
-            nonce,
-            amount,
-            gas,
-            endpoint_name,
-            arguments,
-        )
+        let endpoint_name_managed = endpoint_name.into();
+        let mut arg_buffer = ManagedArgBuffer::new_empty();
+        for arg in arguments {
+            arg_buffer.push_arg(arg);
+        }
+
+        if token.is_egld() {
+            let _ = self.send_raw_wrapper.direct_egld_execute(
+                to,
+                amount,
+                gas,
+                &endpoint_name_managed,
+                &arg_buffer,
+            );
+        } else if nonce == 0 {
+            let _ = self.send_raw_wrapper.direct_esdt_execute(
+                to,
+                token,
+                amount,
+                gas,
+                &endpoint_name_managed,
+                &arg_buffer,
+            );
+        } else {
+            let _ = self.send_raw_wrapper.direct_esdt_nft_execute(
+                to,
+                token,
+                nonce,
+                amount,
+                gas,
+                &endpoint_name_managed,
+                &arg_buffer,
+            );
+        }
     }
 
     pub fn direct_multi<D>(
@@ -98,7 +133,13 @@ where
     ) where
         D: Into<ManagedBuffer<A>>,
     {
-        self.send_raw_wrapper.direct_multi(to, payments, data)
+        let _ = self.send_raw_wrapper.direct_multi_esdt_transfer_execute(
+            to,
+            payments,
+            0,
+            &data.into(),
+            &ManagedArgBuffer::new_empty(),
+        );
     }
 
     /// Performs a simple ESDT/NFT transfer, but via async call.  
@@ -117,8 +158,36 @@ where
     where
         D: Into<ManagedBuffer<A>>,
     {
-        self.send_raw_wrapper
-            .transfer_esdt_via_async_call(to, token, nonce, amount, data)
+        let data_buf: ManagedBuffer<A> = data.into();
+        let mut arg_buffer = ManagedArgBuffer::new_empty();
+        arg_buffer.push_arg(token);
+        if nonce == 0 {
+            arg_buffer.push_arg(amount);
+            if !data_buf.is_empty() {
+                arg_buffer.push_arg_raw(data_buf);
+            }
+
+            self.send_raw_wrapper.async_call_raw(
+                to,
+                &BigUint::zero(),
+                &ManagedBuffer::new_from_bytes(ESDT_TRANSFER_FUNC_NAME),
+                &arg_buffer,
+            )
+        } else {
+            arg_buffer.push_arg(nonce);
+            arg_buffer.push_arg(amount);
+            arg_buffer.push_arg(to);
+            if !data_buf.is_empty() {
+                arg_buffer.push_arg_raw(data_buf);
+            }
+
+            self.send_raw_wrapper.async_call_raw(
+                &BlockchainWrapper::<A>::new().get_sc_address(),
+                &BigUint::zero(),
+                &ManagedBuffer::new_from_bytes(ESDT_NFT_TRANSFER_FUNC_NAME),
+                &arg_buffer,
+            )
+        }
     }
 
     pub fn transfer_multiple_esdt_via_async_call<D>(
@@ -130,8 +199,27 @@ where
     where
         D: Into<ManagedBuffer<A>>,
     {
-        self.send_raw_wrapper
-            .transfer_multiple_esdt_via_async_call(to, payments, data)
+        let mut arg_buffer = ManagedArgBuffer::new_empty();
+        arg_buffer.push_arg(to);
+        arg_buffer.push_arg(payments.len());
+
+        for payment in payments.into_iter() {
+            // TODO: check that `!token_identifier.is_egld()` or let Arwen throw the error?
+            arg_buffer.push_arg(payment.token_identifier);
+            arg_buffer.push_arg(payment.token_nonce);
+            arg_buffer.push_arg(payment.amount);
+        }
+        let data_buf: ManagedBuffer<A> = data.into();
+        if !data_buf.is_empty() {
+            arg_buffer.push_arg_raw(data_buf);
+        }
+
+        self.send_raw_wrapper.async_call_raw(
+            &BlockchainWrapper::<A>::new().get_sc_address(),
+            &BigUint::zero(),
+            &ManagedBuffer::new_from_bytes(ESDT_MULTI_TRANSFER_FUNC_NAME),
+            &arg_buffer,
+        );
     }
 
     /// Sends a synchronous call to change a smart contract address.
@@ -140,8 +228,12 @@ where
         child_sc_address: ManagedAddress<A>,
         new_owner: &ManagedAddress<A>,
     ) -> ContractCall<A, ()> {
-        self.send_raw_wrapper
-            .change_owner_address(child_sc_address, new_owner)
+        let mut contract_call = ContractCall::new(
+            child_sc_address,
+            ManagedBuffer::new_from_bytes(CHANGE_OWNER_BUILTIN_FUNC_NAME),
+        );
+        contract_call.push_endpoint_arg(&new_owner);
+        contract_call
     }
 
     /// Allows synchronously calling a local function by name. Execution is resumed afterwards.
@@ -153,8 +245,13 @@ where
         endpoint_name: &ManagedBuffer<A>,
         arg_buffer: &ManagedArgBuffer<A>,
     ) -> ManagedVec<A, ManagedBuffer<A>> {
-        self.send_raw_wrapper
-            .call_local_esdt_built_in_function(gas, endpoint_name, arg_buffer)
+        let results =
+            self.send_raw_wrapper
+                .call_local_esdt_built_in_function(gas, endpoint_name, arg_buffer);
+
+        self.send_raw_wrapper.clean_return_data();
+
+        results
     }
 
     /// Allows synchronous minting of ESDT/SFT (depending on nonce). Execution is resumed afterwards.
@@ -163,14 +260,49 @@ where
     /// For SFTs, you must use `self.send().esdt_nft_create()` before adding additional quantity.
     /// This function cannot be used for NFTs.
     pub fn esdt_local_mint(&self, token: &TokenIdentifier<A>, nonce: u64, amount: &BigUint<A>) {
-        self.send_raw_wrapper.esdt_local_mint(token, nonce, amount)
+        let mut arg_buffer = ManagedArgBuffer::new_empty();
+        let func_name: &[u8];
+
+        arg_buffer.push_arg(token);
+
+        if nonce == 0 {
+            func_name = ESDT_LOCAL_MINT_FUNC_NAME;
+        } else {
+            func_name = ESDT_NFT_ADD_QUANTITY_FUNC_NAME;
+            arg_buffer.push_arg(nonce);
+        }
+
+        arg_buffer.push_arg(amount);
+
+        let _ = self.call_local_esdt_built_in_function(
+            A::blockchain_api_impl().get_gas_left(),
+            &ManagedBuffer::new_from_bytes(func_name),
+            &arg_buffer,
+        );
     }
 
     /// Allows synchronous burning of ESDT/SFT/NFT (depending on nonce). Execution is resumed afterwards.
     /// Note that the SC must have the ESDTLocalBurn or ESDTNftBurn roles set,
     /// or this will fail with "action is not allowed"
     pub fn esdt_local_burn(&self, token: &TokenIdentifier<A>, nonce: u64, amount: &BigUint<A>) {
-        self.send_raw_wrapper.esdt_local_burn(token, nonce, amount)
+        let mut arg_buffer = ManagedArgBuffer::new_empty();
+        let func_name: &[u8];
+
+        arg_buffer.push_arg(token);
+        if nonce == 0 {
+            func_name = ESDT_LOCAL_BURN_FUNC_NAME;
+        } else {
+            func_name = ESDT_NFT_BURN_FUNC_NAME;
+            arg_buffer.push_arg(&nonce);
+        }
+
+        arg_buffer.push_arg(amount);
+
+        let _ = self.call_local_esdt_built_in_function(
+            A::blockchain_api_impl().get_gas_left(),
+            &ManagedBuffer::new_from_bytes(func_name),
+            &arg_buffer,
+        );
     }
 
     /// Creates a new NFT token of a certain type (determined by `token_identifier`).  
@@ -189,8 +321,36 @@ where
         attributes: &T,
         uris: &ManagedVec<A, ManagedBuffer<A>>,
     ) -> u64 {
-        self.send_raw_wrapper
-            .esdt_nft_create(token, amount, name, royalties, hash, attributes, uris)
+        let mut arg_buffer = ManagedArgBuffer::new_empty();
+        arg_buffer.push_arg(token);
+        arg_buffer.push_arg(amount);
+        arg_buffer.push_arg(name);
+        arg_buffer.push_arg(royalties);
+        arg_buffer.push_arg(hash);
+        arg_buffer.push_arg(attributes);
+
+        if uris.is_empty() {
+            // at least one URI is required, so we push an empty one
+            arg_buffer.push_arg(elrond_codec::Empty);
+        } else {
+            // The API function has the last argument as variadic,
+            // so we top-encode each and send as separate argument
+            for uri in uris {
+                arg_buffer.push_arg(uri);
+            }
+        }
+
+        let output = self.call_local_esdt_built_in_function(
+            A::blockchain_api_impl().get_gas_left(),
+            &ManagedBuffer::new_from_bytes(ESDT_NFT_CREATE_FUNC_NAME),
+            &arg_buffer,
+        );
+
+        if let Some(first_result_bytes) = output.try_get(0) {
+            first_result_bytes.parse_as_u64().unwrap_or_default()
+        } else {
+            0
+        }
     }
 
     #[inline]
@@ -200,8 +360,7 @@ where
         amount: &BigUint<A>,
         attributes: &T,
     ) -> u64 {
-        self.send_raw_wrapper
-            .esdt_nft_create_compact(token, amount, attributes)
+        self.esdt_nft_create_compact_named(token, amount, &ManagedBuffer::new(), attributes)
     }
 
     pub fn esdt_nft_create_compact_named<T: elrond_codec::TopEncode>(
@@ -211,8 +370,19 @@ where
         name: &ManagedBuffer<A>,
         attributes: &T,
     ) -> u64 {
-        self.send_raw_wrapper
-            .esdt_nft_create_compact_named(token, amount, name, attributes)
+        let big_zero = BigUint::zero();
+        let empty_buffer = ManagedBuffer::new();
+        let empty_vec = ManagedVec::from_raw_handle(empty_buffer.get_raw_handle());
+
+        self.esdt_nft_create(
+            token,
+            amount,
+            name,
+            &big_zero,
+            &empty_buffer,
+            attributes,
+            &empty_vec,
+        )
     }
 
     /// Creates an NFT on behalf of the caller. This will set the "creator" field to the caller's address
@@ -228,8 +398,38 @@ where
         attributes: &T,
         uris: &ManagedVec<A, ManagedBuffer<A>>,
     ) -> u64 {
-        self.send_raw_wrapper
-            .esdt_nft_create_as_caller(token, amount, name, royalties, hash, attributes, uris)
+        let mut arg_buffer = ManagedArgBuffer::<A>::new_empty();
+        arg_buffer.push_arg(token);
+        arg_buffer.push_arg(amount);
+        arg_buffer.push_arg(name);
+        arg_buffer.push_arg(royalties);
+        arg_buffer.push_arg(hash);
+        arg_buffer.push_arg(attributes);
+
+        if uris.is_empty() {
+            // at least one URI is required, so we push an empty one
+            arg_buffer.push_arg(&elrond_codec::Empty);
+        } else {
+            // The API function has the last argument as variadic,
+            // so we top-encode each and send as separate argument
+            for uri in uris {
+                arg_buffer.push_arg(uri);
+            }
+        }
+
+        let output = self.send_raw_wrapper.execute_on_dest_context_by_caller_raw(
+            A::blockchain_api_impl().get_gas_left(),
+            &BlockchainWrapper::<A>::new().get_caller(),
+            &BigUint::zero(),
+            &ManagedBuffer::new_from_bytes(ESDT_NFT_CREATE_FUNC_NAME),
+            &arg_buffer,
+        );
+
+        if let Some(first_result_bytes) = output.try_get(0) {
+            first_result_bytes.parse_as_u64().unwrap_or_default()
+        } else {
+            0
+        }
     }
 
     /// Sends thr NFTs to the buyer address and calculates and sends the required royalties to the NFT creator.
@@ -245,15 +445,28 @@ where
         payment_nonce: u64,
         payment_amount: &BigUint<A>,
     ) -> BigUint<A> {
-        self.send_raw_wrapper.sell_nft(
+        let nft_token_data = A::blockchain_api_impl().get_esdt_token_data::<A>(
+            &BlockchainWrapper::<A>::new().get_sc_address(),
             nft_id,
             nft_nonce,
-            nft_amount,
-            buyer,
-            payment_token,
-            payment_nonce,
-            payment_amount,
-        )
+        );
+        let royalties_amount = payment_amount.clone() * nft_token_data.royalties / PERCENTAGE_TOTAL;
+
+        self.direct(buyer, nft_id, nft_nonce, nft_amount, &[]);
+
+        if royalties_amount > 0u32 {
+            self.direct(
+                &nft_token_data.creator,
+                payment_token,
+                payment_nonce,
+                &royalties_amount,
+                &[],
+            );
+
+            payment_amount.clone() - royalties_amount
+        } else {
+            payment_amount.clone()
+        }
     }
 
     pub fn nft_add_uri(
@@ -262,8 +475,7 @@ where
         nft_nonce: u64,
         new_uri: ManagedBuffer<A>,
     ) {
-        self.send_raw_wrapper
-            .nft_add_uri(token_id, nft_nonce, new_uri)
+        self.nft_add_multiple_uri(token_id, nft_nonce, &ManagedVec::from_single_item(new_uri));
     }
 
     pub fn nft_add_multiple_uri(
@@ -272,8 +484,23 @@ where
         nft_nonce: u64,
         new_uris: &ManagedVec<A, ManagedBuffer<A>>,
     ) {
-        self.send_raw_wrapper
-            .nft_add_multiple_uri(token_id, nft_nonce, new_uris)
+        if new_uris.is_empty() {
+            return;
+        }
+
+        let mut arg_buffer = ManagedArgBuffer::new_empty();
+        arg_buffer.push_arg(token_id);
+        arg_buffer.push_arg(nft_nonce);
+
+        for uri in new_uris {
+            arg_buffer.push_arg(uri);
+        }
+
+        let _ = self.call_local_esdt_built_in_function(
+            A::blockchain_api_impl().get_gas_left(),
+            &ManagedBuffer::new_from_bytes(ESDT_NFT_ADD_URI_FUNC_NAME),
+            &arg_buffer,
+        );
     }
 
     pub fn nft_update_attributes<T: elrond_codec::TopEncode>(
@@ -282,7 +509,15 @@ where
         nft_nonce: u64,
         new_attributes: &T,
     ) {
-        self.send_raw_wrapper
-            .nft_update_attributes(token_id, nft_nonce, new_attributes)
+        let mut arg_buffer = ManagedArgBuffer::new_empty();
+        arg_buffer.push_arg(token_id);
+        arg_buffer.push_arg(nft_nonce);
+        arg_buffer.push_arg(new_attributes);
+
+        let _ = self.call_local_esdt_built_in_function(
+            A::blockchain_api_impl().get_gas_left(),
+            &ManagedBuffer::new_from_bytes(ESDT_NFT_UPDATE_ATTRIBUTES_FUNC_NAME),
+            &arg_buffer,
+        );
     }
 }
