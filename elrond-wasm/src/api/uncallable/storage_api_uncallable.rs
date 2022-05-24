@@ -30,14 +30,6 @@ impl StorageReadApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn storage_load_u64(&self, _key: &[u8]) -> u64 {
-        unreachable!()
-    }
-
-    fn storage_load_i64(&self, _key: &[u8]) -> i64 {
-        unreachable!()
-    }
-
     fn storage_load_from_address(
         &self,
         _address_handle: Handle,
@@ -70,14 +62,6 @@ impl StorageWriteApiImpl for super::UncallableApi {
     }
 
     fn storage_store_managed_buffer_clear(&self, _key_handle: Handle) {
-        unreachable!()
-    }
-
-    fn storage_store_u64(&self, _key: &[u8], _value: u64) {
-        unreachable!()
-    }
-
-    fn storage_store_i64(&self, _key: &[u8], _value: i64) {
         unreachable!()
     }
 }

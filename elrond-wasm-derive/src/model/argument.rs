@@ -2,6 +2,7 @@
 /// Contains processed data from argument annotations.
 #[derive(Clone, Debug)]
 pub struct MethodArgument {
+    pub original_pat: syn::Pat,
     pub pat: syn::Pat,
     pub ty: syn::Type,
     pub unprocessed_attributes: Vec<syn::Attribute>,

@@ -392,3 +392,8 @@ fn storage_usize_bad_go() {
 fn struct_eq_go() {
     elrond_wasm_debug::mandos_go("mandos/struct_eq.scen.json");
 }
+
+#[test]
+fn storage_mapper_unique_id_go() {
+    elrond_wasm_debug::mandos_go("mandos/storage_mapper_unique_id.scen.json");
+}
