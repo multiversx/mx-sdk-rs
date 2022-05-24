@@ -3,8 +3,9 @@ use elrond_codec::Vec;
 use crate::{
     api::{ManagedTypeApi, SendApi, SendApiImpl},
     types::{
-        Address, ArgBuffer, BigUint, BoxedBytes, CodeMetadata, EsdtTokenPayment, ManagedAddress,
-        ManagedArgBuffer, ManagedBuffer, ManagedVec, TokenIdentifier,
+        heap::{Address, ArgBuffer, BoxedBytes},
+        BigUint, CodeMetadata, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer,
+        ManagedVec, TokenIdentifier,
     },
 };
 

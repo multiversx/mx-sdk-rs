@@ -1,7 +1,13 @@
-use crate::{api::managed_types::big_int_api_node::unsafe_buffer_load_be_pad_right, VmApiImpl};
+use crate::{
+    api::managed_types::big_int_api_node::unsafe_buffer_load_be_pad_right,
+    elrond_wasm::api::Handle, VmApiImpl,
+};
 use alloc::vec::Vec;
 use elrond_wasm::{
-    api::{const_handles, BlockchainApi, BlockchainApiImpl, ManagedTypeApi, SendApiImpl},
+    api::{
+        const_handles, BlockchainApi, BlockchainApiImpl, ManagedTypeApi, SendApiImpl,
+        StaticVarApiImpl,
+    },
     types::{
         heap::{Address, ArgBuffer, BoxedBytes},
         managed_vec_from_slice_of_boxed_bytes, BigUint, CodeMetadata, EsdtTokenPayment,
@@ -9,7 +15,6 @@ use elrond_wasm::{
     },
     HexCallDataSerializer,
 };
-
 // Token ID + nonce + amount, as bytes
 const AVERAGE_MULTI_TRANSFER_ARG_PAIR_LENGTH: usize = 15 + 2 + 8;
 
@@ -320,7 +325,7 @@ impl SendApiImpl for VmApiImpl {
         unsafe {
             let amount_bytes32_ptr = unsafe_buffer_load_be_pad_right(amount.get_raw_handle(), 32);
             let _ = transferValue(
-                to_address.as_ptr(),
+                to.as_ptr(),
                 amount_bytes32_ptr,
                 data.as_ptr(),
                 data.len() as i32,
@@ -1083,13 +1088,13 @@ impl SendApiImpl for VmApiImpl {
         VmApiImpl::blockchain_api_impl().load_sc_address_managed(own_address_handle);
 
         let managed_arg_buffer = ManagedArgBuffer::from(arg_buffer);
-        let endpoint_name = ManagedBuffer::from(function_name);
+        let endpoint_name = ManagedBuffer::from(function_name.as_slice());
         self.execute_on_dest_context_raw(
             gas,
             &ManagedAddress::from_raw_handle(own_address_handle),
             &BigUint::zero(),
-            function_name,
-            managed_arg_buffer,
+            &endpoint_name,
+            &managed_arg_buffer,
         )
     }
 
