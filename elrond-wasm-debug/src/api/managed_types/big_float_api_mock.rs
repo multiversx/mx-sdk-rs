@@ -59,13 +59,11 @@ impl BigFloatApi for DebugApi {
     fn bf_from_frac(&self, numerator: i64, denominator: i64) -> Handle {
         let f_numerator = numerator.to_f64();
         let f_denominator = denominator.to_f64();
-        let value: f64;
-
-        if f_numerator == None || f_denominator == None {
-            value = f64::from(0);
+        let value = if f_numerator == None || f_denominator == None {
+            f64::from(0)
         } else {
-            value = f_numerator.unwrap() / f_denominator.unwrap();
-        }
+            f_numerator.unwrap() / f_denominator.unwrap()
+        };
 
         let mut managed_types = self.m_types_borrow_mut();
         managed_types.big_float_map.insert_new_handle(value)
@@ -77,14 +75,12 @@ impl BigFloatApi for DebugApi {
         }
 
         let f_significand = significand.to_f64();
-        let value: f64;
-
-        if f_significand == None {
-            value = f64::from(0);
+        let value = if f_significand == None {
+            f64::from(0)
         } else {
             let exponent_multiplier = (10.0_f64).powi(exponent as i32);
-            value = f_significand.unwrap() * exponent_multiplier;
-        }
+            f_significand.unwrap() * exponent_multiplier
+        };
 
         let mut managed_types = self.m_types_borrow_mut();
         managed_types.big_float_map.insert_new_handle(value)

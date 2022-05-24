@@ -419,3 +419,8 @@ fn storage_usize_bad_rs() {
 fn struct_eq_rs() {
     elrond_wasm_debug::mandos_rs("mandos/struct_eq.scen.json", world());
 }
+
+#[test]
+fn storage_mapper_unique_id_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/storage_mapper_unique_id.scen.json", world());
+}

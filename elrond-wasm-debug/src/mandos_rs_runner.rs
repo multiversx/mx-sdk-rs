@@ -11,7 +11,7 @@ use std::path::Path;
 pub fn mandos_rs<P: AsRef<Path>>(relative_path: P, mut world: BlockchainMock) {
     let mut absolute_path = world.current_dir.clone();
     absolute_path.push(relative_path);
-    let _ = parse_execute_mandos_steps(absolute_path.as_ref(), &mut world);
+    parse_execute_mandos_steps(absolute_path.as_ref(), &mut world);
 }
 
 fn parse_execute_mandos_steps(steps_path: &Path, state: &mut BlockchainMock) {
