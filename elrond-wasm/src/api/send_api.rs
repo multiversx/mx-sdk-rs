@@ -2,8 +2,9 @@ use elrond_codec::Vec;
 
 use super::{BlockchainApi, ManagedTypeApi};
 use crate::types::{
-    Address, ArgBuffer, BigUint, BoxedBytes, CodeMetadata, EsdtTokenPayment, ManagedAddress,
-    ManagedArgBuffer, ManagedBuffer, ManagedVec, TokenIdentifier,
+    heap::{Address, ArgBuffer, BoxedBytes},
+    BigUint, CodeMetadata, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer,
+    ManagedVec, TokenIdentifier,
 };
 
 pub trait SendApi: ManagedTypeApi + BlockchainApi {
