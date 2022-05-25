@@ -224,6 +224,7 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
         )
     }
 
+    #[cfg(feature = "alloc")]
     pub fn marshal_legacy(&self, x_pair: BigUint<M>, y_pair: BigUint<M>) -> BoxedBytes {
         let api = M::managed_type_impl();
         api.ec_marshal_legacy(self.handle, x_pair.handle, y_pair.handle)
@@ -236,6 +237,7 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
         ManagedBuffer::from_raw_handle(result_handle)
     }
 
+    #[cfg(feature = "alloc")]
     pub fn marshal_compressed_legacy(&self, x_pair: BigUint<M>, y_pair: BigUint<M>) -> BoxedBytes {
         let api = M::managed_type_impl();
         api.ec_marshal_compressed_legacy(self.handle, x_pair.handle, y_pair.handle)
@@ -309,6 +311,7 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
         )
     }
 
+    #[cfg(feature = "alloc")]
     pub fn generate_key_legacy(&self) -> (BigUint<M>, BigUint<M>, BoxedBytes) {
         let api = M::managed_type_impl();
         let x_pub_key_handle = api.bi_new_zero();
