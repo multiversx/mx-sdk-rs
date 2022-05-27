@@ -298,6 +298,7 @@ unsafe fn code_metadata_to_buffer_handle(code_metadata: CodeMetadata) -> Handle 
 }
 
 impl SendApiImpl for VmApiImpl {
+    #[cfg(not(feature = "ei-unmanaged"))]
     fn direct_egld<M, D>(&self, to: &ManagedAddress<M>, amount: &BigUint<M>, data: D)
     where
         M: ManagedTypeApi,
@@ -317,6 +318,7 @@ impl SendApiImpl for VmApiImpl {
         }
     }
 
+    #[cfg(feature = "ei-unmanaged")]
     fn direct_egld_legacy<M>(&self, to: &Address, amount: &BigUint<M>, data: &BoxedBytes)
     where
         M: ManagedTypeApi,
@@ -332,6 +334,7 @@ impl SendApiImpl for VmApiImpl {
         }
     }
 
+    #[cfg(not(feature = "ei-unmanaged"))]
     fn direct_egld_execute<M: ManagedTypeApi>(
         &self,
         to: &ManagedAddress<M>,
@@ -356,6 +359,7 @@ impl SendApiImpl for VmApiImpl {
         }
     }
 
+    #[cfg(feature = "ei-unmanaged")]
     fn direct_egld_execute_legacy<M: ManagedTypeApi>(
         &self,
         to: &Address,
@@ -384,6 +388,7 @@ impl SendApiImpl for VmApiImpl {
         }
     }
 
+    #[cfg(not(feature = "ei-unmanaged"))]
     fn direct_esdt_execute<M: ManagedTypeApi>(
         &self,
         to: &ManagedAddress<M>,
@@ -396,6 +401,7 @@ impl SendApiImpl for VmApiImpl {
         self.direct_esdt_nft_execute(to, token, 0, amount, gas_limit, endpoint_name, arg_buffer)
     }
 
+    #[cfg(feature = "ei-unmanaged")]
     fn direct_esdt_execute_legacy<M: ManagedTypeApi>(
         &self,
         to: &Address,
@@ -427,6 +433,7 @@ impl SendApiImpl for VmApiImpl {
         }
     }
 
+    #[cfg(not(feature = "ei-unmanaged"))]
     fn direct_esdt_nft_execute<M: ManagedTypeApi>(
         &self,
         to: &ManagedAddress<M>,
@@ -442,6 +449,7 @@ impl SendApiImpl for VmApiImpl {
         self.direct_multi_esdt_transfer_execute(to, &payments, gas_limit, endpoint_name, arg_buffer)
     }
 
+    #[cfg(feature = "ei-unmanaged")]
     fn direct_esdt_nft_execute_legacy<M: ManagedTypeApi>(
         &self,
         to: &Address,
@@ -475,6 +483,7 @@ impl SendApiImpl for VmApiImpl {
         }
     }
 
+    #[cfg(not(feature = "ei-unmanaged"))]
     fn direct_multi_esdt_transfer_execute<M: ManagedTypeApi>(
         &self,
         to: &ManagedAddress<M>,
@@ -499,6 +508,7 @@ impl SendApiImpl for VmApiImpl {
         }
     }
 
+    #[cfg(feature = "ei-unmanaged")]
     fn direct_multi_esdt_transfer_execute_legacy<M: ManagedTypeApi>(
         &self,
         to: &Address,
@@ -547,6 +557,7 @@ impl SendApiImpl for VmApiImpl {
         }
     }
 
+    #[cfg(not(feature = "ei-unmanaged"))]
     fn async_call_raw<M: ManagedTypeApi>(
         &self,
         to: &ManagedAddress<M>,
@@ -564,6 +575,7 @@ impl SendApiImpl for VmApiImpl {
         }
     }
 
+    #[cfg(feature = "ei-unmanaged")]
     fn async_call_raw_legacy<M: ManagedTypeApi>(
         &self,
         to: &Address,
@@ -585,6 +597,7 @@ impl SendApiImpl for VmApiImpl {
         }
     }
 
+    #[cfg(not(feature = "ei-unmanaged"))]
     fn create_async_call_raw<M: ManagedTypeApi>(
         &self,
         to: &ManagedAddress<M>,
@@ -612,6 +625,7 @@ impl SendApiImpl for VmApiImpl {
         }
     }
 
+    #[cfg(not(feature = "ei-unmanaged"))]
     fn deploy_contract<M: ManagedTypeApi>(
         &self,
         gas: u64,
@@ -641,6 +655,7 @@ impl SendApiImpl for VmApiImpl {
         }
     }
 
+    #[cfg(feature = "ei-unmanaged")]
     fn deploy_contract_legacy<M: ManagedTypeApi>(
         &self,
         gas: u64,
@@ -675,6 +690,7 @@ impl SendApiImpl for VmApiImpl {
         }
     }
 
+    #[cfg(not(feature = "ei-unmanaged"))]
     fn deploy_from_source_contract<M: ManagedTypeApi>(
         &self,
         gas: u64,
@@ -704,6 +720,7 @@ impl SendApiImpl for VmApiImpl {
         }
     }
 
+    #[cfg(feature = "ei-unmanaged")]
     fn deploy_from_source_contract_legacy<M: ManagedTypeApi>(
         &self,
         gas: u64,
@@ -736,6 +753,7 @@ impl SendApiImpl for VmApiImpl {
         }
     }
 
+    #[cfg(not(feature = "ei-unmanaged"))]
     fn upgrade_from_source_contract<M: ManagedTypeApi>(
         &self,
         sc_address: &ManagedAddress<M>,
@@ -760,6 +778,7 @@ impl SendApiImpl for VmApiImpl {
         }
     }
 
+    #[cfg(feature = "ei-unmanaged")]
     fn upgrade_from_source_contract_legacy<M: ManagedTypeApi>(
         &self,
         sc_address: &Address,
@@ -785,6 +804,7 @@ impl SendApiImpl for VmApiImpl {
         }
     }
 
+    #[cfg(not(feature = "ei-unmanaged"))]
     fn upgrade_contract<M: ManagedTypeApi>(
         &self,
         sc_address: &ManagedAddress<M>,
@@ -812,6 +832,7 @@ impl SendApiImpl for VmApiImpl {
         }
     }
 
+    #[cfg(feature = "ei-unmanaged")]
     fn upgrade_contract_legacy<M: ManagedTypeApi>(
         &self,
         sc_address: &Address,
@@ -838,6 +859,7 @@ impl SendApiImpl for VmApiImpl {
         }
     }
 
+    #[cfg(not(feature = "ei-unmanaged"))]
     fn execute_on_dest_context_raw<M: ManagedTypeApi>(
         &self,
         gas: u64,
@@ -861,6 +883,7 @@ impl SendApiImpl for VmApiImpl {
         }
     }
 
+    #[cfg(feature = "ei-unmanaged")]
     fn execute_on_dest_context_raw_legacy<M: ManagedTypeApi>(
         &self,
         gas: u64,
@@ -889,6 +912,7 @@ impl SendApiImpl for VmApiImpl {
         }
     }
 
+    #[cfg(not(feature = "ei-unmanaged"))]
     fn execute_on_dest_context_by_caller_raw<M: ManagedTypeApi>(
         &self,
         gas: u64,
@@ -911,6 +935,8 @@ impl SendApiImpl for VmApiImpl {
             ManagedVec::from_raw_handle(result_handle)
         }
     }
+
+    #[cfg(feature = "ei-unmanaged")]
     fn execute_on_dest_context_by_caller_raw_legacy<M: ManagedTypeApi>(
         &self,
         gas: u64,
@@ -939,6 +965,7 @@ impl SendApiImpl for VmApiImpl {
         }
     }
 
+    #[cfg(not(feature = "ei-unmanaged"))]
     fn execute_on_same_context_raw<M: ManagedTypeApi>(
         &self,
         gas: u64,
@@ -963,6 +990,7 @@ impl SendApiImpl for VmApiImpl {
         }
     }
 
+    #[cfg(feature = "ei-unmanaged")]
     fn execute_on_same_context_raw_legacy<M: ManagedTypeApi>(
         &self,
         gas: u64,
@@ -991,6 +1019,7 @@ impl SendApiImpl for VmApiImpl {
         }
     }
 
+    #[cfg(not(feature = "ei-unmanaged"))]
     fn execute_on_dest_context_readonly_raw<M: ManagedTypeApi>(
         &self,
         gas: u64,
@@ -1013,6 +1042,7 @@ impl SendApiImpl for VmApiImpl {
         }
     }
 
+    #[cfg(feature = "ei-unmanaged")]
     fn execute_on_dest_context_readonly_raw_legacy<M: ManagedTypeApi>(
         &self,
         gas: u64,
@@ -1038,6 +1068,7 @@ impl SendApiImpl for VmApiImpl {
         }
     }
 
+    #[cfg(not(feature = "ei-unmanaged"))]
     fn call_local_esdt_built_in_function<M: ManagedTypeApi>(
         &self,
         gas: u64,
@@ -1061,6 +1092,7 @@ impl SendApiImpl for VmApiImpl {
         results
     }
 
+    #[cfg(feature = "ei-unmanaged")]
     fn call_local_esdt_built_in_function_legacy<M: ManagedTypeApi>(
         &self,
         gas: u64,
