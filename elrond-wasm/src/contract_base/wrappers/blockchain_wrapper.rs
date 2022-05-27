@@ -258,12 +258,36 @@ where
         token_id: &TokenIdentifier<A>,
         nonce: u64,
     ) -> EsdtTokenData<A> {
-        A::blockchain_api_impl().get_esdt_token_data::<A>(address, token_id, nonce)
+        A::blockchain_api_impl().load_esdt_token_data::<A>(address, token_id, nonce)
+    }
+
+    #[cfg(feature = "ei-1-2")]
+    pub fn is_esdt_frozen(
+        &self,
+        address: &ManagedAddress<A>,
+        token_id: &TokenIdentifier<A>,
+        nonce: u64,
+    ) -> bool {
+        A::blockchain_api_impl().check_esdt_frozen(
+            address.get_raw_handle(),
+            token_id.get_raw_handle(),
+            nonce,
+        )
+    }
+
+    #[cfg(feature = "ei-1-2")]
+    pub fn is_esdt_paused(&self, token_id: &TokenIdentifier<A>) -> bool {
+        A::blockchain_api_impl().check_esdt_paused(token_id.get_raw_handle())
+    }
+
+    #[cfg(feature = "ei-1-2")]
+    pub fn is_esdt_limited_transfer(&self, token_id: &TokenIdentifier<A>) -> bool {
+        A::blockchain_api_impl().check_esdt_limited_transfer(token_id.get_raw_handle())
     }
 
     #[inline]
     pub fn get_esdt_local_roles(&self, token_id: &TokenIdentifier<A>) -> EsdtLocalRoleFlags {
-        A::blockchain_api_impl().get_esdt_local_roles(token_id.get_raw_handle())
+        A::blockchain_api_impl().load_esdt_local_roles(token_id.get_raw_handle())
     }
 }
 

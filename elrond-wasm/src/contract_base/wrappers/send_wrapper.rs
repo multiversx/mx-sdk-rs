@@ -461,7 +461,7 @@ where
         payment_nonce: u64,
         payment_amount: &BigUint<A>,
     ) -> BigUint<A> {
-        let nft_token_data = A::blockchain_api_impl().get_esdt_token_data::<A>(
+        let nft_token_data = A::blockchain_api_impl().load_esdt_token_data::<A>(
             &BlockchainWrapper::<A>::new().get_sc_address(),
             nft_id,
             nft_nonce,

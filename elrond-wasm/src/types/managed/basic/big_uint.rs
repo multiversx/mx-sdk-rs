@@ -241,6 +241,7 @@ impl<M: ManagedTypeApi> crate::abi::TypeAbi for BigUint<M> {
 }
 
 // TODO: should become part of the VM
+#[cfg(not(feature = "ei-1-2"))]
 fn format_big_uint_rec<M, F>(mut num: BigUint<M>, base: &BigUint<M>, f: &mut F)
 where
     M: ManagedTypeApi,
@@ -257,6 +258,7 @@ where
     }
 }
 
+#[cfg(not(feature = "ei-1-2"))]
 impl<M: ManagedTypeApi> SCDisplay for BigUint<M> {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
         if self == &0 {
@@ -264,6 +266,15 @@ impl<M: ManagedTypeApi> SCDisplay for BigUint<M> {
         } else {
             format_big_uint_rec(self.clone(), &10u64.into(), f);
         }
+    }
+}
+
+#[cfg(feature = "ei-1-2")]
+impl<M: ManagedTypeApi> SCDisplay for BigUint<M> {
+    fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
+        let str_handle = const_handles::MBUF_TEMPORARY_1;
+        M::managed_type_impl().bi_to_string(self.handle, str_handle);
+        f.append_managed_buffer(&ManagedBuffer::from_raw_handle(str_handle));
     }
 }
 

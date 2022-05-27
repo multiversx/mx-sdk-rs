@@ -71,7 +71,7 @@ where
 {
     fn from(arg_buffer: ArgBuffer) -> Self {
         let mut data = ManagedVec::new();
-        for arg in arg_buffer.arg_data().into_iter() {
+        for arg in arg_buffer.arg_data().iter() {
             data.push(ManagedBuffer::new_from_bytes(&[*arg]));
         }
 
@@ -85,7 +85,7 @@ where
 {
     fn from(arg_buffer: &ArgBuffer) -> Self {
         let mut data = ManagedVec::new();
-        for arg in arg_buffer.arg_data().into_iter() {
+        for arg in arg_buffer.arg_data().iter() {
             data.push(ManagedBuffer::new_from_bytes(&[*arg]));
         }
 
