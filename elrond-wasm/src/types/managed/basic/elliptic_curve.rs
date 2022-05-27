@@ -1,6 +1,5 @@
 use core::marker::PhantomData;
 
-// #[allow(unused_imports)]
 use crate::{
     abi::{TypeAbi, TypeName},
     api::{BigIntApi, EllipticCurveApi, Handle, ManagedTypeApi},
@@ -11,6 +10,15 @@ use crate::{
 use crate::{api::StaticVarApiImpl, types::ManagedBuffer};
 
 use elrond_codec::*;
+
+pub const ELLIPTIC_CURVE_P224_INT: u32 = 224;
+pub const ELLIPTIC_CURVE_P224_NAME: &str = "p224";
+pub const ELLIPTIC_CURVE_P256_INT: u32 = 256;
+pub const ELLIPTIC_CURVE_P256_NAME: &str = "p256";
+pub const ELLIPTIC_CURVE_P384_INT: u32 = 384;
+pub const ELLIPTIC_CURVE_P384_NAME: &str = "p384";
+pub const ELLIPTIC_CURVE_P521_INT: u32 = 521;
+pub const ELLIPTIC_CURVE_P521_NAME: &str = "p521";
 
 pub type EllipticCurveComponents<M> = (
     BigUint<M>,
@@ -59,10 +67,10 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
 
     pub fn from_bitsize(bitsize: u32) -> Option<Self> {
         match bitsize {
-            224 => Some(Self::from_name_str("p224")),
-            256 => Some(Self::from_name_str("p256")),
-            384 => Some(Self::from_name_str("p384")),
-            521 => Some(Self::from_name_str("p521")),
+            ELLIPTIC_CURVE_P224_INT => Some(Self::from_name_str(ELLIPTIC_CURVE_P224_NAME)),
+            ELLIPTIC_CURVE_P256_INT => Some(Self::from_name_str(ELLIPTIC_CURVE_P256_NAME)),
+            ELLIPTIC_CURVE_P384_INT => Some(Self::from_name_str(ELLIPTIC_CURVE_P384_NAME)),
+            ELLIPTIC_CURVE_P521_INT => Some(Self::from_name_str(ELLIPTIC_CURVE_P521_NAME)),
             _ => None,
         }
     }
