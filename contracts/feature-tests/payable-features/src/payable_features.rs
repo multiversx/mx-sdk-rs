@@ -33,9 +33,16 @@ pub trait PayableFeatures {
 
     #[endpoint]
     #[payable("*")]
+    fn payment_array_3(&self) -> MultiValue3<EsdtTokenPayment, EsdtTokenPayment, EsdtTokenPayment> {
+        let [payment_a, payment_b, payment_c] = self.call_value().multi_esdt();
+        (payment_a, payment_b, payment_c).into()
+    }
+
+    #[endpoint]
+    #[payable("*")]
     fn payable_any_1(
         &self,
-        #[payment] payment: BigUint,
+        #[payment_amount] payment: BigUint,
         #[payment_token] token: TokenIdentifier,
     ) -> MultiValue2<BigUint, TokenIdentifier> {
         (payment, token).into()
