@@ -33,8 +33,9 @@ pub fn process_event_attribute(attr: &syn::Attribute, method: &mut Method) -> bo
     EventAttribute::parse(attr)
         .map(|event_attr| {
             assert_no_other_auto_impl(&*method);
+            let event_identifier = event_attr.identifier;
             method.implementation = MethodImpl::Generated(AutoImpl::Event {
-                identifier: event_attr.identifier,
+                identifier: event_identifier,
             });
         })
         .is_some()

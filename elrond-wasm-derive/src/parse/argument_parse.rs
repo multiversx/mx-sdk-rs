@@ -48,8 +48,15 @@ fn extract_method_arg(pat_typed: &syn::PatType) -> MethodArgument {
         &mut unprocessed_attributes,
     );
 
+    let original_pat = pat.clone();
+    let mut cleaned_pat = original_pat.clone();
+    if let syn::Pat::Ident(ident) = &mut cleaned_pat {
+        ident.mutability = None;
+    }
+
     MethodArgument {
-        pat: pat.clone(),
+        original_pat,
+        pat: cleaned_pat,
         ty: ty.clone(),
         unprocessed_attributes,
         metadata: arg_metadata,

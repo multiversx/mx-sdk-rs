@@ -43,6 +43,8 @@ extern "C" {
     fn bigIntXor(dest: i32, x: i32, y: i32);
     fn bigIntShr(dest: i32, x: i32, bits: i32);
     fn bigIntShl(dest: i32, x: i32, bits: i32);
+
+    fn bigIntToString(bigIntHandle: i32, destHandle: i32);
 }
 
 macro_rules! binary_op_wrapper {
@@ -181,6 +183,12 @@ impl BigIntApi for crate::VmApiImpl {
     fn bi_shl(&self, dest: Handle, x: Handle, bits: usize) {
         unsafe {
             bigIntShl(dest, x, bits as i32);
+        }
+    }
+
+    fn bi_to_string(&self, bi_handle: Handle, result_handle: Handle) {
+        unsafe {
+            bigIntToString(bi_handle, result_handle);
         }
     }
 }

@@ -2,7 +2,10 @@ use crate::{
     api::{ErrorApi, Handle, ManagedTypeApi},
     contract_base::ExitCodecErrorHandler,
     err_msg,
-    types::{ManagedBuffer, ManagedType, ManagedVec, ManagedVecRefIterator, MultiValueEncoded},
+    types::{
+        heap::ArgBuffer, ManagedBuffer, ManagedType, ManagedVec, ManagedVecRefIterator,
+        MultiValueEncoded,
+    },
 };
 use alloc::vec::Vec;
 use elrond_codec::{
@@ -31,7 +34,6 @@ where
         }
     }
 
-    #[doc(hidden)]
     fn get_raw_handle(&self) -> Handle {
         self.data.get_raw_handle()
     }
@@ -60,6 +62,34 @@ where
 {
     fn from(v: Vec<I>) -> Self {
         ManagedArgBuffer { data: v.into() }
+    }
+}
+
+impl<M> From<ArgBuffer> for ManagedArgBuffer<M>
+where
+    M: ManagedTypeApi,
+{
+    fn from(arg_buffer: ArgBuffer) -> Self {
+        let mut data = ManagedVec::new();
+        for arg in arg_buffer.arg_data().iter() {
+            data.push(ManagedBuffer::new_from_bytes(&[*arg]));
+        }
+
+        ManagedArgBuffer { data }
+    }
+}
+
+impl<M> From<&ArgBuffer> for ManagedArgBuffer<M>
+where
+    M: ManagedTypeApi,
+{
+    fn from(arg_buffer: &ArgBuffer) -> Self {
+        let mut data = ManagedVec::new();
+        for arg in arg_buffer.arg_data().iter() {
+            data.push(ManagedBuffer::new_from_bytes(&[*arg]));
+        }
+
+        ManagedArgBuffer { data }
     }
 }
 

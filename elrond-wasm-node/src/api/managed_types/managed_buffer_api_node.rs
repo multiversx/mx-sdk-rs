@@ -37,6 +37,8 @@ extern "C" {
     fn mBufferSetRandom(destinationHandle: i32, length: i32) -> i32;
     fn mBufferAppend(accumulatorHandle: i32, dataHandle: i32) -> i32;
     fn mBufferAppendBytes(accumulatorHandle: i32, byte_ptr: *const u8, byte_len: i32) -> i32;
+
+    fn managedBufferToHex(sourceHandle: i32, destinationHandle: i32);
 }
 
 impl ManagedBufferApi for crate::VmApiImpl {
@@ -199,6 +201,12 @@ impl ManagedBufferApi for crate::VmApiImpl {
     #[cfg(not(feature = "ei-unmanaged"))]
     fn mb_eq(&self, handle1: Handle, handle2: Handle) -> bool {
         unsafe { mBufferEq(handle1, handle2) > 0 }
+    }
+
+    fn mb_to_hex(&self, source_handle: Handle, dest_handle: Handle) {
+        unsafe {
+            managedBufferToHex(source_handle, dest_handle);
+        }
     }
 }
 

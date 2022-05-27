@@ -111,7 +111,7 @@ pub trait BlockchainApiImpl: ManagedTypeApiImpl {
         dest: Handle,
     );
 
-    fn get_esdt_token_data<M: ManagedTypeApi>(
+    fn load_esdt_token_data<M: ManagedTypeApi>(
         &self,
         address: &ManagedAddress<M>,
         token_id: &TokenIdentifier<M>,
@@ -120,14 +120,25 @@ pub trait BlockchainApiImpl: ManagedTypeApiImpl {
 
     #[deprecated(
         since = "0.31.1",
-        note = "Only used for ;imited backwards compatibility tests. Never use! Use `get_esdt_token_data` instead."
+        note = "Only used for limited backwards compatibility tests. Never use! Use `load_esdt_token_data` instead."
     )]
-    fn get_esdt_token_data_unmanaged<M: ManagedTypeApi>(
+    fn load_esdt_token_data_unmanaged<M: ManagedTypeApi>(
         &self,
         address: &ManagedAddress<M>,
         token_id: &TokenIdentifier<M>,
         nonce: u64,
     ) -> EsdtTokenData<M>;
 
-    fn get_esdt_local_roles(&self, token_id_handle: Handle) -> EsdtLocalRoleFlags;
+    fn check_esdt_frozen(
+        &self,
+        address_handle: Handle,
+        token_id_handle: Handle,
+        nonce: u64,
+    ) -> bool;
+
+    fn check_esdt_paused(&self, token_id_handle: Handle) -> bool;
+
+    fn check_esdt_limited_transfer(&self, token_id_handle: Handle) -> bool;
+
+    fn load_esdt_local_roles(&self, token_id_handle: Handle) -> EsdtLocalRoleFlags;
 }

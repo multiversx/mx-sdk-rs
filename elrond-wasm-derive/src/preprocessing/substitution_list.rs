@@ -38,6 +38,7 @@ fn add_managed_type_with_generics(
 fn add_managed_types(substitutions: &mut SubstitutionsMap) {
     add_managed_type(substitutions, &quote!(BigInt));
     add_managed_type(substitutions, &quote!(BigUint));
+    add_managed_type(substitutions, &quote!(BigFloat));
     add_managed_type(substitutions, &quote!(ManagedBuffer));
     add_managed_type(substitutions, &quote!(EllipticCurve));
     add_managed_type(substitutions, &quote!(ManagedAddress));

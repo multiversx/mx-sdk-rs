@@ -34,6 +34,11 @@ fn count_ones_go() {
 }
 
 #[test]
+fn crypto_elliptic_curves_go() {
+    elrond_wasm_debug::mandos_go("mandos/crypto_elliptic_curves.scen.json");
+}
+
+#[test]
 fn crypto_keccak256_go() {
     elrond_wasm_debug::mandos_go("mandos/crypto_keccak256.scen.json");
 }
@@ -44,13 +49,28 @@ fn crypto_keccak256_legacy_managed_go() {
 }
 
 #[test]
+fn crypto_ripemd160_go() {
+    elrond_wasm_debug::mandos_go("mandos/crypto_ripemd160.scen.json");
+}
+
+#[test]
 fn crypto_sha256_go() {
     elrond_wasm_debug::mandos_go("mandos/crypto_sha256.scen.json");
 }
 
 #[test]
-fn crypto_sha256_legacy_managed_go() {
-    elrond_wasm_debug::mandos_go("mandos/crypto_sha256_legacy_managed.scen.json");
+fn crypto_verify_bls_go() {
+    elrond_wasm_debug::mandos_go("mandos/crypto_verify_bls.scen.json");
+}
+
+#[test]
+fn crypto_verify_ed25519_go() {
+    elrond_wasm_debug::mandos_go("mandos/crypto_verify_ed25519.scen.json");
+}
+
+#[test]
+fn crypto_verify_secp256k1_go() {
+    elrond_wasm_debug::mandos_go("mandos/crypto_verify_secp256k1.scen.json");
 }
 
 #[test]
@@ -371,4 +391,9 @@ fn storage_usize_bad_go() {
 #[test]
 fn struct_eq_go() {
     elrond_wasm_debug::mandos_go("mandos/struct_eq.scen.json");
+}
+
+#[test]
+fn storage_mapper_unique_id_go() {
+    elrond_wasm_debug::mandos_go("mandos/storage_mapper_unique_id.scen.json");
 }

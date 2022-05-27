@@ -11,6 +11,7 @@ pub mod codec_err_test;
 pub mod crypto_features;
 pub mod echo;
 pub mod echo_managed;
+pub mod elliptic_curve_features;
 pub mod event_features;
 pub mod macro_features;
 pub mod managed_address_features;
@@ -28,6 +29,7 @@ pub mod storage_mapper_queue;
 pub mod storage_mapper_set;
 pub mod storage_mapper_single;
 pub mod storage_mapper_token_attributes;
+pub mod storage_mapper_unique_id_mapper;
 pub mod storage_mapper_vec;
 pub mod storage_mapper_whitelist;
 pub mod struct_eq;
@@ -44,6 +46,7 @@ pub trait BasicFeatures:
     + crypto_features::CryptoFeatures
     + echo::EchoTypes
     + echo_managed::EchoManagedTypes
+    + elliptic_curve_features::EllipticCurveFeatures
     + event_features::EventFeatures
     + macro_features::Macros
     + managed_address_features::ManagedAddressFeatures
@@ -62,6 +65,7 @@ pub trait BasicFeatures:
     + storage_mapper_whitelist::StorageMapperWhitelistFeatures
     + storage_mapper_fungible_token::FungibleTokenMapperFeatures
     + storage_mapper_non_fungible_token::NonFungibleTokenMapperFeatures
+    + storage_mapper_unique_id_mapper::UniqueIdMapperFeatures
     + struct_eq::StructEquals
     + token_identifier_features::TokenIdentifierFeatures
     + non_zero_features::TypeFeatures
@@ -79,5 +83,13 @@ pub trait BasicFeatures:
     #[endpoint]
     fn count_ones(&self, arg: u64) -> u32 {
         arg.count_ones()
+    }
+
+    #[endpoint]
+    fn endpoint_with_mutable_arg(&self, mut arg1: BigUint, arg2: u64, arg3: u32) -> BigUint {
+        arg1 += arg2;
+        arg1 += arg3;
+
+        arg1
     }
 }

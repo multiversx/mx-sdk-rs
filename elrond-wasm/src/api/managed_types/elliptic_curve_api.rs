@@ -4,7 +4,9 @@ use super::Handle;
 
 /// Wrapper around the EllipticCurve functionality provided by Arwen.
 pub trait EllipticCurveApi {
-    fn ec_create(&self, name: &[u8]) -> Handle;
+    fn ec_create_from_name_bytes(&self, name: &[u8]) -> Handle;
+
+    fn ec_create_from_name_mb(&self, name_handle: Handle) -> Handle;
 
     fn ec_get_values(
         &self,
@@ -48,7 +50,7 @@ pub trait EllipticCurveApi {
         y_point_handle: Handle,
     ) -> bool;
 
-    fn ec_scalar_mult(
+    fn ec_scalar_mult_legacy(
         &self,
         x_result_handle: Handle,
         y_result_handle: Handle,
@@ -58,7 +60,17 @@ pub trait EllipticCurveApi {
         data: &[u8],
     );
 
-    fn ec_scalar_base_mult(
+    fn ec_scalar_mult(
+        &self,
+        x_result_handle: Handle,
+        y_result_handle: Handle,
+        ec_handle: Handle,
+        x_point_handle: Handle,
+        y_point_handle: Handle,
+        data_handle: Handle,
+    );
+
+    fn ec_scalar_base_mult_legacy(
         &self,
         x_result_handle: Handle,
         y_result_handle: Handle,
@@ -66,7 +78,30 @@ pub trait EllipticCurveApi {
         data: &[u8],
     );
 
+    fn ec_scalar_base_mult(
+        &self,
+        x_result_handle: Handle,
+        y_result_handle: Handle,
+        ec_handle: Handle,
+        data_handle: Handle,
+    );
+
+    fn ec_marshal_legacy(
+        &self,
+        ec_handle: Handle,
+        x_pair_handle: Handle,
+        y_pair_handle: Handle,
+    ) -> BoxedBytes;
+
     fn ec_marshal(
+        &self,
+        ec_handle: Handle,
+        x_pair_handle: Handle,
+        y_pair_handle: Handle,
+        result_handle: Handle,
+    );
+
+    fn ec_marshal_compressed_legacy(
         &self,
         ec_handle: Handle,
         x_pair_handle: Handle,
@@ -78,9 +113,26 @@ pub trait EllipticCurveApi {
         ec_handle: Handle,
         x_pair_handle: Handle,
         y_pair_handle: Handle,
-    ) -> BoxedBytes;
+        result_handle: Handle,
+    );
+
+    fn ec_unmarshal_legacy(
+        &self,
+        x_result_handle: Handle,
+        y_result_handle: Handle,
+        ec_handle: Handle,
+        data: &[u8],
+    );
 
     fn ec_unmarshal(
+        &self,
+        x_result_handle: Handle,
+        y_result_handle: Handle,
+        ec_handle: Handle,
+        data_handle: Handle,
+    );
+
+    fn ec_unmarshal_compressed_legacy(
         &self,
         x_result_handle: Handle,
         y_result_handle: Handle,
@@ -93,13 +145,21 @@ pub trait EllipticCurveApi {
         x_result_handle: Handle,
         y_result_handle: Handle,
         ec_handle: Handle,
-        data: &[u8],
+        data_handle: Handle,
     );
+
+    fn ec_generate_key_legacy(
+        &self,
+        x_pub_key_handle: Handle,
+        y_pub_key_handle: Handle,
+        ec_handle: Handle,
+    ) -> BoxedBytes;
 
     fn ec_generate_key(
         &self,
         x_pub_key_handle: Handle,
         y_pub_key_handle: Handle,
         ec_handle: Handle,
-    ) -> BoxedBytes;
+        result_handle: Handle,
+    );
 }

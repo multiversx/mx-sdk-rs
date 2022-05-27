@@ -32,7 +32,6 @@ impl<M: ManagedTypeApi> ManagedType<M> for ManagedBuffer<M> {
         }
     }
 
-    #[doc(hidden)]
     fn get_raw_handle(&self) -> Handle {
         self.handle
     }
@@ -371,10 +370,20 @@ impl<M: ManagedTypeApi> SCDisplay for ManagedBuffer<M> {
     }
 }
 
+#[cfg(not(feature = "ei-1-2"))]
 impl<M: ManagedTypeApi> SCLowerHex for ManagedBuffer<M> {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
         // TODO: in Rust thr `0x` prefix appears only when writing "{:#x}", not "{:x}"
         f.append_managed_buffer_lower_hex(&ManagedBuffer::from_raw_handle(self.get_raw_handle()));
+    }
+}
+
+#[cfg(feature = "ei-1-2")]
+impl<M: ManagedTypeApi> SCLowerHex for ManagedBuffer<M> {
+    fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
+        let hex_handle = crate::api::const_handles::MBUF_TEMPORARY_1;
+        M::managed_type_impl().mb_to_hex(self.handle, hex_handle);
+        f.append_managed_buffer(&ManagedBuffer::from_raw_handle(hex_handle));
     }
 }
 

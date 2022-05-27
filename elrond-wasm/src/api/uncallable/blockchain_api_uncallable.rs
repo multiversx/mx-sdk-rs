@@ -109,7 +109,7 @@ impl BlockchainApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn get_esdt_token_data<M: ManagedTypeApi>(
+    fn load_esdt_token_data<M: ManagedTypeApi>(
         &self,
         _address: &ManagedAddress<M>,
         _token: &TokenIdentifier<M>,
@@ -118,7 +118,7 @@ impl BlockchainApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn get_esdt_token_data_unmanaged<M: ManagedTypeApi>(
+    fn load_esdt_token_data_unmanaged<M: ManagedTypeApi>(
         &self,
         _address: &ManagedAddress<M>,
         _token: &TokenIdentifier<M>,
@@ -127,7 +127,24 @@ impl BlockchainApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn get_esdt_local_roles(&self, _token_id_handle: Handle) -> crate::types::EsdtLocalRoleFlags {
+    fn check_esdt_frozen(
+        &self,
+        _address_handle: Handle,
+        _token_id_handle: Handle,
+        _nonce: u64,
+    ) -> bool {
+        unreachable!()
+    }
+
+    fn check_esdt_paused(&self, _token_id_handle: Handle) -> bool {
+        unreachable!()
+    }
+
+    fn check_esdt_limited_transfer(&self, _token_id_handle: Handle) -> bool {
+        unreachable!()
+    }
+
+    fn load_esdt_local_roles(&self, _token_id_handle: Handle) -> crate::types::EsdtLocalRoleFlags {
         unreachable!()
     }
 }

@@ -12,6 +12,9 @@ use elrond_codec::{
     TryStaticCast,
 };
 
+#[cfg(feature = "ei-1-2")]
+use crate::formatter::{FormatByteReceiver, SCDisplay};
+
 #[repr(transparent)]
 pub struct BigInt<M: ManagedTypeApi> {
     pub(crate) handle: Handle,
@@ -19,7 +22,6 @@ pub struct BigInt<M: ManagedTypeApi> {
 }
 
 impl<M: ManagedTypeApi> ManagedType<M> for BigInt<M> {
-    #[doc(hidden)]
     fn from_raw_handle(handle: Handle) -> Self {
         BigInt {
             handle,
@@ -27,7 +29,6 @@ impl<M: ManagedTypeApi> ManagedType<M> for BigInt<M> {
         }
     }
 
-    #[doc(hidden)]
     fn get_raw_handle(&self) -> Handle {
         self.handle
     }
@@ -256,6 +257,15 @@ impl<M: ManagedTypeApi> BigInt<M> {
         M::managed_type_impl().bi_set_int64(exp_handle, exp as i64);
         M::managed_type_impl().bi_pow(result_handle, self.handle, exp_handle);
         BigInt::from_raw_handle(result_handle)
+    }
+}
+
+#[cfg(feature = "ei-1-2")]
+impl<M: ManagedTypeApi> SCDisplay for BigInt<M> {
+    fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
+        let str_handle = const_handles::MBUF_TEMPORARY_1;
+        M::managed_type_impl().bi_to_string(self.handle, str_handle);
+        f.append_managed_buffer(&ManagedBuffer::from_raw_handle(str_handle));
     }
 }
 
