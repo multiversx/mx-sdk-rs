@@ -136,6 +136,23 @@ where
         }
     }
 
+    /// Extracts all elements to an array, if the length matches exactly.
+    ///
+    /// The resulting array contains mere references to the items, as defined in `ManagedVecItem`.
+    pub fn to_array_of_refs<const N: usize>(&self) -> Option<[T::Ref<'_>; N]> {
+        if self.len() != N {
+            return None;
+        }
+
+        let mut result_uninit = core::mem::MaybeUninit::<T::Ref<'_>>::uninit_array();
+        for (index, value) in self.iter().enumerate() {
+            result_uninit[index].write(value);
+        }
+
+        let result = unsafe { core::mem::MaybeUninit::array_assume_init(result_uninit) };
+        Some(result)
+    }
+
     /// Retrieves element at index, if the index is valid.
     /// Otherwise, signals an error and terminates execution.
     pub fn get(&self, index: usize) -> T::Ref<'_> {

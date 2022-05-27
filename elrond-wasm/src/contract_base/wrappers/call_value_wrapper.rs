@@ -2,8 +2,8 @@ use core::marker::PhantomData;
 
 use crate::{
     api::{
-        const_handles, CallValueApi, CallValueApiImpl, ErrorApi, ErrorApiImpl, ManagedBufferApi,
-        ManagedTypeApi, StaticVarApiImpl,
+        const_handles, CallValueApi, CallValueApiImpl, ErrorApi, ErrorApiImpl, ManagedTypeApi,
+        StaticVarApiImpl,
     },
     err_msg,
     types::{BigUint, EsdtTokenPayment, EsdtTokenType, ManagedType, ManagedVec, TokenIdentifier},
@@ -52,6 +52,19 @@ where
         ManagedVec::from_raw_handle(call_value_handle) // unsafe, TODO: replace with ManagedRef<...>
     }
 
+    /// Verify and casts the received multi ESDT transfer in to an array.
+    ///
+    /// Can be used to extract all payments in one line like this:
+    ///
+    /// `let [payment_a, payment_b, payment_c] = self.call_value().multi_esdt();`.
+    pub fn multi_esdt<const N: usize>(&self) -> [EsdtTokenPayment<A>; N] {
+        self.all_esdt_transfers()
+            .to_array_of_refs::<N>()
+            .unwrap_or_else(|| {
+                A::error_api_impl().signal_error(err_msg::INCORRECT_NUM_ESDT_TRANSFERS.as_bytes())
+            })
+    }
+
     /// Retrieves the ESDT call value from the VM.
     /// Will return 0 in case of an EGLD transfer (cannot have both EGLD and ESDT transfer simultaneously).
     pub fn esdt_value(&self) -> BigUint<A> {
@@ -96,32 +109,6 @@ where
         } else {
             EsdtTokenType::Fungible
         }
-    }
-
-    pub fn require_egld(&self) -> BigUint<A> {
-        let call_value_api = A::call_value_api_impl();
-        if call_value_api.esdt_num_transfers() > 0 {
-            A::error_api_impl().signal_error(err_msg::NON_PAYABLE_FUNC_ESDT.as_bytes());
-        }
-
-        self.egld_value()
-    }
-
-    pub fn require_esdt(&self, token: &[u8]) -> BigUint<A> {
-        let m_api = A::managed_type_impl();
-        let call_value_api = A::call_value_api_impl();
-        let error_api = A::error_api_impl();
-
-        let expected_token_handle = const_handles::MBUF_TEMPORARY_1;
-        m_api.mb_overwrite(expected_token_handle, token);
-        if call_value_api.esdt_num_transfers() != 1 {
-            error_api.signal_error(err_msg::SINGLE_ESDT_EXPECTED.as_bytes());
-        }
-        if !m_api.mb_eq(call_value_api.token(), expected_token_handle) {
-            error_api.signal_error(err_msg::BAD_TOKEN_PROVIDED.as_bytes());
-        }
-        call_value_api.load_single_esdt_value(const_handles::CALL_VALUE_SINGLE_ESDT);
-        BigUint::from_raw_handle(const_handles::CALL_VALUE_SINGLE_ESDT)
     }
 
     /// Returns both the call value (either EGLD or ESDT) and the token identifier.
