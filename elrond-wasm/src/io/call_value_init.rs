@@ -1,0 +1,83 @@
+use crate::{
+    api::{
+        const_handles, CallValueApi, CallValueApiImpl, ErrorApi, ErrorApiImpl, ManagedBufferApi,
+        ManagedTypeApi,
+    },
+    contract_base::CallValueWrapper,
+    err_msg,
+    types::{BigUint, EsdtTokenPayment, ManagedType, ManagedVec, TokenIdentifier},
+};
+
+pub fn not_payable<A>()
+where
+    A: CallValueApi,
+{
+    A::call_value_api_impl().check_not_payable();
+}
+
+pub fn payable_any<A>()
+where
+    A: CallValueApi,
+{
+}
+
+pub fn payable_egld<A>()
+where
+    A: CallValueApi + ErrorApi,
+{
+    if A::call_value_api_impl().esdt_num_transfers() > 0 {
+        A::error_api_impl().signal_error(err_msg::NON_PAYABLE_FUNC_ESDT.as_bytes());
+    }
+}
+
+pub fn payable_single_specific_token<A>(expected_tokend_identifier: &str)
+where
+    A: CallValueApi + ManagedTypeApi + ErrorApi,
+{
+    let transfers = CallValueWrapper::<A>::new().all_esdt_transfers();
+    if transfers.len() != 1 {
+        A::error_api_impl().signal_error(err_msg::SINGLE_ESDT_EXPECTED.as_bytes());
+    }
+    let expected_token_handle = const_handles::MBUF_TEMPORARY_1;
+    A::managed_type_impl()
+        .mb_overwrite(expected_token_handle, expected_tokend_identifier.as_bytes());
+    let transfer = transfers.get(0);
+    if !A::managed_type_impl().mb_eq(
+        transfer.token_identifier.get_raw_handle(),
+        expected_token_handle,
+    ) {
+        A::error_api_impl().signal_error(err_msg::BAD_TOKEN_PROVIDED.as_bytes());
+    }
+}
+
+pub fn arg_payment_amount<A>() -> BigUint<A>
+where
+    A: CallValueApi + ManagedTypeApi,
+{
+    if A::call_value_api_impl().esdt_num_transfers() == 0 {
+        CallValueWrapper::<A>::new().egld_value()
+    } else {
+        CallValueWrapper::<A>::new().esdt_value()
+    }
+}
+
+pub fn arg_payment_token<A>() -> TokenIdentifier<A>
+where
+    A: CallValueApi + ManagedTypeApi,
+{
+    CallValueWrapper::<A>::new().token()
+}
+
+pub fn arg_payment_nonce<A>() -> u64
+where
+    A: CallValueApi + ManagedTypeApi,
+{
+    CallValueWrapper::<A>::new().esdt_token_nonce()
+}
+
+pub fn arg_payment_multi<A>() -> ManagedVec<A, EsdtTokenPayment<A>>
+where
+    A: CallValueApi + ManagedTypeApi,
+{
+    CallValueWrapper::<A>::new().all_esdt_transfers()
+}
