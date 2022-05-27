@@ -3,7 +3,7 @@ use core::marker::PhantomData;
 use crate::{
     api::{
         const_handles, CallValueApi, CallValueApiImpl, ErrorApi, ErrorApiImpl, ManagedBufferApi,
-        ManagedTypeApi,
+        ManagedTypeApi, StaticVarApiImpl,
     },
     err_msg,
     types::{BigUint, EsdtTokenPayment, EsdtTokenType, ManagedType, ManagedVec, TokenIdentifier},
@@ -30,16 +30,26 @@ where
     /// Retrieves the EGLD call value from the VM.
     /// Will return 0 in case of an ESDT transfer (cannot have both EGLD and ESDT transfer simultaneously).
     pub fn egld_value(&self) -> BigUint<A> {
-        A::call_value_api_impl().load_egld_value(const_handles::CALL_VALUE_EGLD);
-        BigUint::from_raw_handle(const_handles::CALL_VALUE_EGLD) // unsafe, TODO: replace with ManagedRef<...>
+        let mut call_value_handle = A::static_var_api_impl().get_call_value_egld_handle();
+        if call_value_handle == const_handles::UNINITIALIZED_HANDLE {
+            call_value_handle = const_handles::CALL_VALUE_EGLD;
+            A::static_var_api_impl().set_call_value_egld_handle(call_value_handle);
+            A::call_value_api_impl().load_egld_value(call_value_handle);
+        }
+        BigUint::from_raw_handle(call_value_handle) // unsafe, TODO: replace with ManagedRef<...>
     }
 
     /// Returns all ESDT transfers that accompany this SC call.
     /// Will return 0 results if nothing was transfered, or just EGLD.
     /// Fully managed underlying types, very efficient.
     pub fn all_esdt_transfers(&self) -> ManagedVec<A, EsdtTokenPayment<A>> {
-        A::call_value_api_impl().load_all_esdt_transfers(const_handles::CALL_VALUE_MULTI_ESDT);
-        ManagedVec::from_raw_handle(const_handles::CALL_VALUE_MULTI_ESDT) // unsafe, TODO: replace with ManagedRef<...>
+        let mut call_value_handle = A::static_var_api_impl().get_call_value_multi_esdt_handle();
+        if call_value_handle == const_handles::UNINITIALIZED_HANDLE {
+            call_value_handle = const_handles::CALL_VALUE_MULTI_ESDT;
+            A::static_var_api_impl().set_call_value_multi_esdt_handle(call_value_handle);
+            A::call_value_api_impl().load_all_esdt_transfers(call_value_handle);
+        }
+        ManagedVec::from_raw_handle(call_value_handle) // unsafe, TODO: replace with ManagedRef<...>
     }
 
     /// Retrieves the ESDT call value from the VM.
