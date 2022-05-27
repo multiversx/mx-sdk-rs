@@ -116,6 +116,7 @@ where
     }
 
     #[cfg(feature = "alloc")]
+    #[allow(clippy::too_many_arguments)]
     pub fn direct_esdt_nft_execute(
         &self,
         to: &ManagedAddress<A>,
@@ -138,6 +139,7 @@ where
     }
 
     #[cfg(not(feature = "alloc"))]
+    #[allow(clippy::too_many_arguments)]
     pub fn direct_esdt_nft_execute(
         &self,
         to: &ManagedAddress<A>,
