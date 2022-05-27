@@ -36,9 +36,9 @@ impl TxInput {
         let value = BigUint::from_bytes_be(self.args[1].as_slice());
 
         let esdt_values = vec![TxInputESDT {
-            token_identifier: token_identifier.clone(),
+            token_identifier: token_identifier,
             nonce: 0,
-            value: value.clone(),
+            value: value,
         }];
 
         let func_name = self.args.get(2).map(Vec::clone).unwrap_or_default();
