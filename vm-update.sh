@@ -2,12 +2,12 @@
 
 # Locally update the VM version
 
-VM_TAG="1.4.51"
+VM_TAG="v1.4.51"
 
-Echo "Before:"
+echo "Before:"
 erdpy config dump
 erdpy config set dependencies.vmtools.tag $VM_TAG
-Echo "After:"
+echo "After:"
 erdpy config dump
 
 erdpy deps install vmtools --overwrite
