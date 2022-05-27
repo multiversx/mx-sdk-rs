@@ -6,6 +6,8 @@ use elrond_wasm::{
 extern "C" {
     fn createEC(dataOffset: i32, dataLength: i32) -> i32;
 
+    fn managedCreateEC(nameHandle: i32) -> i32;
+
     fn ellipticCurveGetValues(
         ecHandle: i32,
         fieldOrderHandle: i32,
@@ -49,6 +51,15 @@ extern "C" {
         length: i32,
     ) -> i32;
 
+    fn managedScalarMultEC(
+        xResultHandle: i32,
+        yResultHandle: i32,
+        ecHandle: i32,
+        pointXHandle: i32,
+        pointYHandle: i32,
+        dataHandle: i32,
+    ) -> i32;
+
     fn scalarBaseMultEC(
         xResultHandle: i32,
         yResultHandle: i32,
@@ -57,13 +68,34 @@ extern "C" {
         length: i32,
     ) -> i32;
 
+    fn managedScalarBaseMultEC(
+        xResultHandle: i32,
+        yResultHandle: i32,
+        ecHandle: i32,
+        dataHandle: i32,
+    ) -> i32;
+
     fn marshalEC(xPairHandle: i32, yPairHandle: i32, ecHandle: i32, resultOffset: *mut u8) -> i32;
+
+    fn managedMarshalEC(
+        xPairHandle: i32,
+        yPairHandle: i32,
+        ecHandle: i32,
+        resultHandle: i32,
+    ) -> i32;
 
     fn marshalCompressedEC(
         xPairHandle: i32,
         yPairHandle: i32,
         ecHandle: i32,
         resultOffset: *mut u8,
+    ) -> i32;
+
+    fn managedMarshalCompressedEC(
+        xPairHandle: i32,
+        yPairHandle: i32,
+        ecHandle: i32,
+        resultHandle: i32,
     ) -> i32;
 
     fn unmarshalEC(
@@ -74,12 +106,26 @@ extern "C" {
         length: i32,
     ) -> i32;
 
+    fn managedUnmarshalEC(
+        xResultHandle: i32,
+        yResultHandle: i32,
+        ecHandle: i32,
+        dataHandle: i32,
+    ) -> i32;
+
     fn unmarshalCompressedEC(
         xResultHandle: i32,
         yResultHandle: i32,
         ecHandle: i32,
         dataOffset: *const u8,
         length: i32,
+    ) -> i32;
+
+    fn managedUnmarshalCompressedEC(
+        xResultHandle: i32,
+        yResultHandle: i32,
+        ecHandle: i32,
+        dataHandle: i32,
     ) -> i32;
 
     fn generateKeyEC(
@@ -89,11 +135,22 @@ extern "C" {
         resultOffset: *mut u8,
     ) -> i32;
 
+    fn managedGenerateKeyEC(
+        xPubKeyHandle: i32,
+        yPubKeyHandle: i32,
+        ecHandle: i32,
+        resultHandle: i32,
+    ) -> i32;
+
 }
 
 impl EllipticCurveApi for crate::VmApiImpl {
-    fn ec_create(&self, name: &[u8]) -> Handle {
+    fn ec_create_from_name_bytes(&self, name: &[u8]) -> Handle {
         unsafe { createEC(name.as_ptr() as i32, name.len() as i32) }
+    }
+
+    fn ec_create_from_name_mb(&self, name_handle: Handle) -> Handle {
+        unsafe { managedCreateEC(name_handle) }
     }
 
     fn ec_get_values(
@@ -176,7 +233,7 @@ impl EllipticCurveApi for crate::VmApiImpl {
         unsafe { isOnCurveEC(ec_handle, x_point_handle, y_point_handle) > 0 }
     }
 
-    fn ec_scalar_mult(
+    fn ec_scalar_mult_legacy(
         &self,
         x_result_handle: Handle,
         y_result_handle: Handle,
@@ -198,7 +255,28 @@ impl EllipticCurveApi for crate::VmApiImpl {
         }
     }
 
-    fn ec_scalar_base_mult(
+    fn ec_scalar_mult(
+        &self,
+        x_result_handle: Handle,
+        y_result_handle: Handle,
+        ec_handle: Handle,
+        x_point_handle: Handle,
+        y_point_handle: Handle,
+        data: Handle,
+    ) {
+        unsafe {
+            managedScalarMultEC(
+                x_result_handle,
+                y_result_handle,
+                ec_handle,
+                x_point_handle,
+                y_point_handle,
+                data,
+            );
+        }
+    }
+
+    fn ec_scalar_base_mult_legacy(
         &self,
         x_result_handle: Handle,
         y_result_handle: Handle,
@@ -216,7 +294,19 @@ impl EllipticCurveApi for crate::VmApiImpl {
         }
     }
 
-    fn ec_marshal(
+    fn ec_scalar_base_mult(
+        &self,
+        x_result_handle: Handle,
+        y_result_handle: Handle,
+        ec_handle: Handle,
+        data_handle: Handle,
+    ) {
+        unsafe {
+            managedScalarBaseMultEC(x_result_handle, y_result_handle, ec_handle, data_handle);
+        }
+    }
+
+    fn ec_marshal_legacy(
         &self,
         ec_handle: Handle,
         x_pair_handle: Handle,
@@ -230,7 +320,19 @@ impl EllipticCurveApi for crate::VmApiImpl {
         }
     }
 
-    fn ec_marshal_compressed(
+    fn ec_marshal(
+        &self,
+        ec_handle: Handle,
+        x_pair_handle: Handle,
+        y_pair_handle: Handle,
+        result_handle: Handle,
+    ) {
+        unsafe {
+            managedMarshalEC(x_pair_handle, y_pair_handle, ec_handle, result_handle);
+        }
+    }
+
+    fn ec_marshal_compressed_legacy(
         &self,
         ec_handle: Handle,
         x_pair_handle: Handle,
@@ -244,7 +346,19 @@ impl EllipticCurveApi for crate::VmApiImpl {
         }
     }
 
-    fn ec_unmarshal(
+    fn ec_marshal_compressed(
+        &self,
+        ec_handle: Handle,
+        x_pair_handle: Handle,
+        y_pair_handle: Handle,
+        result_handle: Handle,
+    ) {
+        unsafe {
+            managedMarshalCompressedEC(x_pair_handle, y_pair_handle, ec_handle, result_handle);
+        }
+    }
+
+    fn ec_unmarshal_legacy(
         &self,
         x_result_handle: Handle,
         y_result_handle: Handle,
@@ -262,7 +376,19 @@ impl EllipticCurveApi for crate::VmApiImpl {
         }
     }
 
-    fn ec_unmarshal_compressed(
+    fn ec_unmarshal(
+        &self,
+        x_result_handle: Handle,
+        y_result_handle: Handle,
+        ec_handle: Handle,
+        data_handle: Handle,
+    ) {
+        unsafe {
+            managedUnmarshalEC(x_result_handle, y_result_handle, ec_handle, data_handle);
+        }
+    }
+
+    fn ec_unmarshal_compressed_legacy(
         &self,
         x_result_handle: Handle,
         y_result_handle: Handle,
@@ -280,7 +406,19 @@ impl EllipticCurveApi for crate::VmApiImpl {
         }
     }
 
-    fn ec_generate_key(
+    fn ec_unmarshal_compressed(
+        &self,
+        x_result_handle: Handle,
+        y_result_handle: Handle,
+        ec_handle: Handle,
+        data_handle: Handle,
+    ) {
+        unsafe {
+            managedUnmarshalCompressedEC(x_result_handle, y_result_handle, ec_handle, data_handle);
+        }
+    }
+
+    fn ec_generate_key_legacy(
         &self,
         x_pub_key_handle: Handle,
         y_pub_key_handle: Handle,
@@ -296,6 +434,18 @@ impl EllipticCurveApi for crate::VmApiImpl {
                 private_key.as_mut_ptr(),
             );
             private_key
+        }
+    }
+
+    fn ec_generate_key(
+        &self,
+        x_pub_key_handle: Handle,
+        y_pub_key_handle: Handle,
+        ec_handle: Handle,
+        result_handle: Handle,
+    ) {
+        unsafe {
+            managedGenerateKeyEC(x_pub_key_handle, y_pub_key_handle, ec_handle, result_handle);
         }
     }
 }

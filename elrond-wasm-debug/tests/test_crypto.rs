@@ -13,7 +13,7 @@ fn test_verify_ed25519_basic() {
     let sig_bytes: Vec<u8> = FromHex::from_hex(signature).unwrap();
 
     let ctx = DebugApi::dummy();
-    let success = ctx.verify_ed25519(&pub_bytes, &msg_bytes, &sig_bytes);
+    let success = ctx.verify_ed25519_legacy(&pub_bytes, &msg_bytes, &sig_bytes);
     assert!(success);
 }
 
@@ -28,7 +28,7 @@ fn test_verify_ed25519_bad_sig() {
     let sig_bytes: Vec<u8> = FromHex::from_hex(signature).unwrap();
 
     let ctx = DebugApi::dummy();
-    let success = ctx.verify_ed25519(&pub_bytes, &msg_bytes, &sig_bytes);
+    let success = ctx.verify_ed25519_legacy(&pub_bytes, &msg_bytes, &sig_bytes);
     assert!(!success);
 }
 
@@ -43,6 +43,6 @@ fn test_verify_ed25519_invalid_args() {
     let sig_bytes: Vec<u8> = FromHex::from_hex(signature).unwrap();
 
     let ctx = DebugApi::dummy();
-    let success = ctx.verify_ed25519(&pub_bytes, &msg_bytes, &sig_bytes);
+    let success = ctx.verify_ed25519_legacy(&pub_bytes, &msg_bytes, &sig_bytes);
     assert!(!success);
 }
