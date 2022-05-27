@@ -136,12 +136,7 @@ pub trait Vault {
         for multi_arg in token_payments.into_iter() {
             let (token_id, nonce, amount) = multi_arg.into_tuple();
 
-            all_payments.push(EsdtTokenPayment {
-                token_identifier: token_id,
-                token_nonce: nonce,
-                amount,
-                token_type: EsdtTokenType::Invalid,
-            });
+            all_payments.push(EsdtTokenPayment::new(token_id, nonce, amount));
         }
 
         self.send()
@@ -176,12 +171,11 @@ pub trait Vault {
                 &uris,
             );
 
-            new_tokens.push(EsdtTokenPayment {
-                token_identifier: payment.token_identifier,
-                token_nonce: new_token_nonce,
-                amount: payment.amount,
-                token_type: EsdtTokenType::Invalid, // ignored
-            });
+            new_tokens.push(EsdtTokenPayment::new(
+                payment.token_identifier,
+                new_token_nonce,
+                payment.amount,
+            ));
         }
 
         self.send().transfer_multiple_esdt_via_async_call(
