@@ -8,6 +8,7 @@ use crate::{
     types::{BigUint, EsdtTokenPayment, ManagedType, ManagedVec, TokenIdentifier},
 };
 
+/// Called initially in the generated code whenever no payable annotation is provided.
 pub fn not_payable<A>()
 where
     A: CallValueApi,
@@ -15,12 +16,14 @@ where
     A::call_value_api_impl().check_not_payable();
 }
 
+/// Called initially in the generated code whenever `#[payable("*")]` annotation is provided.
 pub fn payable_any<A>()
 where
     A: CallValueApi,
 {
 }
 
+/// Called initially in the generated code whenever `#[payable("EGLD")]` annotation is provided.
 pub fn payable_egld<A>()
 where
     A: CallValueApi + ErrorApi,
@@ -30,6 +33,9 @@ where
     }
 }
 
+/// Called initially in the generated code whenever `#[payable("<token identifier>")]` annotation is provided.
+///
+/// Was never really used, expected to be deprecated/removed.
 pub fn payable_single_specific_token<A>(expected_tokend_identifier: &str)
 where
     A: CallValueApi + ManagedTypeApi + ErrorApi,
@@ -50,6 +56,7 @@ where
     }
 }
 
+/// Initializes an argument annotated with `#[payment_amount]` or `#[payment]`.
 pub fn arg_payment_amount<A>() -> BigUint<A>
 where
     A: CallValueApi + ManagedTypeApi,
@@ -61,6 +68,7 @@ where
     }
 }
 
+/// Initializes an argument annotated with `#[payment_token]`.
 pub fn arg_payment_token<A>() -> TokenIdentifier<A>
 where
     A: CallValueApi + ManagedTypeApi,
@@ -68,6 +76,7 @@ where
     CallValueWrapper::<A>::new().token()
 }
 
+/// Initializes an argument annotated with `#[payment_nonce]`.
 pub fn arg_payment_nonce<A>() -> u64
 where
     A: CallValueApi + ManagedTypeApi,
@@ -75,6 +84,7 @@ where
     CallValueWrapper::<A>::new().esdt_token_nonce()
 }
 
+/// Initializes an argument annotated with `#[payment_multi]`.
 pub fn arg_payment_multi<A>() -> ManagedVec<A, EsdtTokenPayment<A>>
 where
     A: CallValueApi + ManagedTypeApi,
