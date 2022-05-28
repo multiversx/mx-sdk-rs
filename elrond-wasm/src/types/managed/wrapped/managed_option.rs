@@ -7,7 +7,7 @@ use elrond_codec::{
 
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
-    api::{const_handles, Handle, ManagedTypeApi},
+    api::{const_handles, ErrorApiImpl, Handle, ManagedTypeApi},
     types::{ManagedRef, ManagedType},
 };
 
@@ -89,12 +89,16 @@ where
         }
     }
 
-    pub fn unwrap_or_else<F: Fn() -> T>(&self, f: F) -> T {
+    pub fn unwrap_or_else<F: Fn() -> T>(self, f: F) -> T {
         if self.is_some() {
             T::from_raw_handle(self.handle)
         } else {
             f()
         }
+    }
+
+    pub fn unwrap_or_sc_panic(self, panic_message: &str) -> T {
+        self.unwrap_or_else(|| M::error_api_impl().signal_error(panic_message.as_bytes()))
     }
 }
 
