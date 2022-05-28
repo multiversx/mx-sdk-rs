@@ -49,7 +49,7 @@ pub const DESERIALIZATION_ARG_OUT_OF_RANGE: &str =
 
 pub const CALLBACK_BAD_FUNC: &[u8] = b"no callback function with that name exists in contract";
 
-pub const RECIPIENT_ADDRESS_NOT_SET: &[u8] = b"recipient address not set";
+pub const RECIPIENT_ADDRESS_NOT_SET: &str = "recipient address not set";
 
 pub const STORAGE_NOT_I64: &[u8] = b"storage not i64";
 pub const STORAGE_NOT_32_BYTES: &[u8] = b"32 bytes of data expected in storage at key";
