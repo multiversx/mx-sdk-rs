@@ -4,9 +4,10 @@ use elrond_codec::{
     EncodeErrorHandler, NestedEncode, NestedEncodeOutput, TopEncode, TopEncodeOutput,
 };
 
-use crate::api::{Handle, ManagedTypeApi};
-
-use super::ManagedType;
+use crate::{
+    api::{Handle, ManagedTypeApi},
+    types::ManagedType,
+};
 
 /// A very efficient reference to a managed type, with copy semantics.
 ///
