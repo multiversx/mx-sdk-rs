@@ -129,6 +129,7 @@ fn process_contract_deploy<OriginalResult>(
 ) -> (Option<String>, Vec<String>) {
     let to_str = contract_deploy
         .to
+        .as_option()
         .map(|to| format!("0x{}", hex::encode(to.to_address().as_bytes())));
     let mandos_args = convert_call_args(&contract_deploy.arg_buffer);
     (to_str, mandos_args)
