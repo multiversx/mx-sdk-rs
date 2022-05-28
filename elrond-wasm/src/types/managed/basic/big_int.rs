@@ -4,7 +4,7 @@ use crate::{
     abi::TypeName,
     api::{const_handles, BigIntApi, Handle, ManagedTypeApi, ManagedTypeApiImpl, StaticVarApiImpl},
     formatter::hex_util::encode_bytes_as_hex,
-    types::{heap::BoxedBytes, BigUint, ManagedBuffer, ManagedType, Sign},
+    types::{heap::BoxedBytes, BigUint, ManagedBuffer, ManagedOption, ManagedType, Sign},
 };
 use elrond_codec::{
     CodecFrom, DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput,
@@ -56,6 +56,13 @@ impl<M: ManagedTypeApi> From<ManagedBuffer<M>> for BigInt<M> {
     #[inline]
     fn from(item: ManagedBuffer<M>) -> Self {
         BigInt::from_signed_bytes_be_buffer(&item)
+    }
+}
+
+impl<M: ManagedTypeApi> From<BigUint<M>> for BigInt<M> {
+    #[inline]
+    fn from(item: BigUint<M>) -> Self {
+        BigInt::from_raw_handle(item.get_raw_handle())
     }
 }
 
@@ -175,11 +182,11 @@ impl<M: ManagedTypeApi> BigInt<M> {
     }
 
     /// Converts this `BigInt` into a `BigUint`, if it's not negative.
-    pub fn into_biguint(self) -> Option<BigUint<M>> {
+    pub fn into_big_uint(self) -> ManagedOption<M, BigUint<M>> {
         if let Sign::Minus = self.sign() {
-            None
+            ManagedOption::none()
         } else {
-            Some(BigUint::from_raw_handle(self.handle))
+            ManagedOption::some(BigUint::from_raw_handle(self.handle))
         }
     }
 }

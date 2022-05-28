@@ -81,7 +81,7 @@ where
         }
     }
 
-    pub fn as_option<'a>(&'a self) -> Option<ManagedRef<'a, M, T>> {
+    pub fn as_option(&self) -> Option<ManagedRef<'_, M, T>> {
         if self.is_some() {
             unsafe { Some(ManagedRef::wrap_handle(self.handle)) }
         } else {
@@ -100,6 +100,18 @@ where
     pub fn unwrap_or_sc_panic(self, panic_message: &str) -> T {
         self.unwrap_or_else(|| M::error_api_impl().signal_error(panic_message.as_bytes()))
     }
+
+    pub fn map<U, F>(self, f: F) -> ManagedOption<M, U>
+    where
+        U: ManagedType<M>,
+        F: FnOnce(T) -> U,
+    {
+        if self.is_some() {
+            ManagedOption::<M, U>::some(f(T::from_raw_handle(self.handle)))
+        } else {
+            ManagedOption::<M, U>::none()
+        }
+    }
 }
 
 impl<M, T> Clone for ManagedOption<M, T>
@@ -107,6 +119,7 @@ where
     M: ManagedTypeApi,
     T: ManagedType<M> + Clone,
 {
+    #[allow(clippy::redundant_clone)] // the clone is not redundant
     fn clone(&self) -> Self {
         if self.is_some() {
             Self::some(T::from_raw_handle(self.handle).clone())

@@ -217,6 +217,8 @@ impl<M: ManagedTypeApi> elrond_wasm::abi::TypeAbi for EsdtTokenPayment<M> {
     fn type_name() -> elrond_wasm::abi::TypeName {
         "EsdtTokenPayment".into()
     }
+
+    #[allow(clippy::vec_init_then_push)]
     fn provide_type_descriptions<TDC: elrond_wasm::abi::TypeDescriptionContainer>(
         accumulator: &mut TDC,
     ) {
