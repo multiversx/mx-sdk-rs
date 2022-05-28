@@ -75,3 +75,38 @@ fn test_unwrap() {
         BigUint::<DebugApi>::zero()
     );
 }
+
+#[test]
+fn test_map() {
+    let _ = DebugApi::dummy();
+
+    // example BigInt -> BigUint
+    assert_eq!(
+        ManagedOption::some(BigUint::<DebugApi>::from(1u32)).map(|x| BigInt::<DebugApi>::from(x)),
+        ManagedOption::some(BigInt::<DebugApi>::from(1i32))
+    );
+    assert_eq!(
+        ManagedOption::none().map(|x: BigUint<DebugApi>| BigInt::<DebugApi>::from(x)),
+        ManagedOption::none()
+    );
+
+    // example BigUint -> BigInt (magnitude)
+    assert_eq!(
+        ManagedOption::some(BigInt::<DebugApi>::from(-1i32)).map(|x| x.magnitude()),
+        ManagedOption::some(BigUint::<DebugApi>::from(1u32))
+    );
+    assert_eq!(
+        ManagedOption::none().map(|x: BigInt<DebugApi>| x.magnitude()),
+        ManagedOption::none()
+    );
+
+    // BigInt::into_big_uint is actually related
+    assert_eq!(
+        BigInt::<DebugApi>::from(1i32).into_big_uint(),
+        ManagedOption::some(BigUint::<DebugApi>::from(1u32))
+    );
+    assert_eq!(
+        BigInt::<DebugApi>::from(-1i32).into_big_uint(),
+        ManagedOption::none()
+    );
+}
