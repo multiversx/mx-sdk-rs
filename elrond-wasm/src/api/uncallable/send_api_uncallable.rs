@@ -18,22 +18,14 @@ impl SendApi for UncallableApi {
 }
 
 impl SendApiImpl for UncallableApi {
-    fn direct_egld<M, D>(&self, _to: &ManagedAddress<M>, _amount: &BigUint<M>, _data: D)
-    where
-        M: ManagedTypeApi,
-        D: Into<ManagedBuffer<M>>,
-    {
-        unreachable!()
-    }
-
-    fn direct_egld_legacy<M>(&self, _to: &Address, _amount: &BigUint<M>, _data: &BoxedBytes)
+    fn transfer_value_legacy<M>(&self, _to: &Address, _amount: &BigUint<M>, _data: &BoxedBytes)
     where
         M: ManagedTypeApi,
     {
         unreachable!()
     }
 
-    fn direct_egld_execute<M: ManagedTypeApi>(
+    fn transfer_value_execute<M: ManagedTypeApi>(
         &self,
         _to: &ManagedAddress<M>,
         _amount: &BigUint<M>,
@@ -44,7 +36,7 @@ impl SendApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn direct_egld_execute_legacy<M: ManagedTypeApi>(
+    fn transfer_value_execute_legacy<M: ManagedTypeApi>(
         &self,
         _to: &Address,
         _amount: &BigUint<M>,

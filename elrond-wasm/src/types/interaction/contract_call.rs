@@ -453,7 +453,7 @@ where
     fn no_payment_transfer_execute(&self) {
         let gas_limit = self.resolve_gas_limit_with_leftover();
 
-        let _ = SA::send_api_impl().direct_egld_execute(
+        let _ = SA::send_api_impl().transfer_value_execute(
             &self.to,
             &BigUint::zero(),
             gas_limit,
@@ -467,7 +467,7 @@ where
         let payment = &self.payments.try_get(0).unwrap();
 
         if payment.token_identifier.is_egld() {
-            let _ = SA::send_api_impl().direct_egld_execute(
+            let _ = SA::send_api_impl().transfer_value_execute(
                 &self.to,
                 &payment.amount,
                 gas_limit,
