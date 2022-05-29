@@ -13,19 +13,12 @@ pub trait SendApi: ManagedTypeApi + BlockchainApi {
 
 /// API that groups methods that either send EGLD or ESDT, or that call other contracts.
 pub trait SendApiImpl {
-    /// Sends EGLD to a given address, directly.
-    /// Used especially for sending EGLD to regular accounts.
-    fn direct_egld<M, D>(&self, to: &ManagedAddress<M>, amount: &BigUint<M>, data: D)
-    where
-        M: ManagedTypeApi,
-        D: Into<ManagedBuffer<M>>;
-
-    fn direct_egld_legacy<M>(&self, to: &Address, amount: &BigUint<M>, data: &BoxedBytes)
+    fn transfer_value_legacy<M>(&self, to: &Address, amount: &BigUint<M>, data: &BoxedBytes)
     where
         M: ManagedTypeApi;
 
     /// Sends EGLD to an address (optionally) and executes like an async call, but without callback.
-    fn direct_egld_execute<M: ManagedTypeApi>(
+    fn transfer_value_execute<M: ManagedTypeApi>(
         &self,
         to: &ManagedAddress<M>,
         amount: &BigUint<M>,
@@ -34,7 +27,7 @@ pub trait SendApiImpl {
         arg_buffer: &ManagedArgBuffer<M>,
     ) -> Result<(), &'static [u8]>;
 
-    fn direct_egld_execute_legacy<M: ManagedTypeApi>(
+    fn transfer_value_execute_legacy<M: ManagedTypeApi>(
         &self,
         to: &Address,
         amount: &BigUint<M>,

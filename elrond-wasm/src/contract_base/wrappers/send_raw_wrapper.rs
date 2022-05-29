@@ -33,7 +33,7 @@ where
     where
         D: Into<ManagedBuffer<A>>,
     {
-        A::send_api_impl().direct_egld_legacy(
+        A::send_api_impl().transfer_value_legacy(
             &to.to_address(),
             amount,
             &data.into().to_boxed_bytes(),
@@ -45,7 +45,13 @@ where
     where
         D: Into<ManagedBuffer<A>>,
     {
-        A::send_api_impl().direct_egld(to, amount, data)
+        let _ = A::send_api_impl().transfer_value_execute(
+            to,
+            amount,
+            0,
+            &data.into(),
+            &ManagedArgBuffer::new_empty(),
+        );
     }
 
     #[cfg(feature = "ei-unmanaged")]
@@ -75,7 +81,7 @@ where
         endpoint_name: &ManagedBuffer<A>,
         arg_buffer: &ManagedArgBuffer<A>,
     ) -> Result<(), &'static [u8]> {
-        A::send_api_impl().direct_egld_execute(to, amount, gas_limit, endpoint_name, arg_buffer)
+        A::send_api_impl().transfer_value_execute(to, amount, gas_limit, endpoint_name, arg_buffer)
     }
 
     #[cfg(feature = "ei-unmanaged")]

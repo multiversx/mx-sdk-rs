@@ -305,26 +305,7 @@ impl SendApi for VmApiImpl {
 }
 
 impl SendApiImpl for VmApiImpl {
-    fn direct_egld<M, D>(&self, to: &ManagedAddress<M>, amount: &BigUint<M>, data: D)
-    where
-        M: ManagedTypeApi,
-        D: Into<ManagedBuffer<M>>,
-    {
-        let data_buffer = data.into();
-        unsafe {
-            let empty_arguments_handle = mBufferNew();
-
-            let _ = managedTransferValueExecute(
-                to.get_raw_handle(),
-                amount.get_raw_handle(),
-                0,
-                data_buffer.get_raw_handle(),
-                empty_arguments_handle,
-            );
-        }
-    }
-
-    fn direct_egld_legacy<M>(&self, to: &Address, amount: &BigUint<M>, data: &BoxedBytes)
+    fn transfer_value_legacy<M>(&self, to: &Address, amount: &BigUint<M>, data: &BoxedBytes)
     where
         M: ManagedTypeApi,
     {
@@ -339,7 +320,7 @@ impl SendApiImpl for VmApiImpl {
         }
     }
 
-    fn direct_egld_execute<M: ManagedTypeApi>(
+    fn transfer_value_execute<M: ManagedTypeApi>(
         &self,
         to: &ManagedAddress<M>,
         amount: &BigUint<M>,
@@ -363,7 +344,7 @@ impl SendApiImpl for VmApiImpl {
         }
     }
 
-    fn direct_egld_execute_legacy<M: ManagedTypeApi>(
+    fn transfer_value_execute_legacy<M: ManagedTypeApi>(
         &self,
         to: &Address,
         amount: &BigUint<M>,

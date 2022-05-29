@@ -206,31 +206,7 @@ impl SendApi for DebugApi {
 }
 
 impl SendApiImpl for DebugApi {
-    fn direct_egld<M, D>(&self, to: &ManagedAddress<M>, amount: &BigUint<M>, _data: D)
-    where
-        M: ManagedTypeApi,
-        D: Into<ManagedBuffer<M>>,
-    {
-        let amount_value = self.big_uint_handle_to_value(amount.get_raw_handle());
-        let available_egld_balance =
-            self.with_contract_account(|account| account.egld_balance.clone());
-        if amount_value > available_egld_balance {
-            std::panic::panic_any(TxPanic {
-                status: 10,
-                message: "failed transfer (insufficient funds)".to_string(),
-            });
-        }
-
-        let contract_address = &self.input_ref().to;
-        self.blockchain_cache()
-            .subtract_egld_balance(contract_address, &amount_value);
-
-        let recipient = &to.to_address();
-        self.blockchain_cache()
-            .increase_egld_balance(recipient, &amount_value);
-    }
-
-    fn direct_egld_execute<M: ManagedTypeApi>(
+    fn transfer_value_execute<M: ManagedTypeApi>(
         &self,
         to: &ManagedAddress<M>,
         amount: &BigUint<M>,
@@ -542,14 +518,14 @@ impl SendApiImpl for DebugApi {
         let _ = tx_result.result_values.remove(index);
     }
 
-    fn direct_egld_legacy<M>(&self, _to: &Address, _amount: &BigUint<M>, _data: &BoxedBytes)
+    fn transfer_value_legacy<M>(&self, _to: &Address, _amount: &BigUint<M>, _data: &BoxedBytes)
     where
         M: ManagedTypeApi,
     {
         panic!("legacy operation not implemented");
     }
 
-    fn direct_egld_execute_legacy<M: ManagedTypeApi>(
+    fn transfer_value_execute_legacy<M: ManagedTypeApi>(
         &self,
         _to: &Address,
         _amount: &BigUint<M>,
