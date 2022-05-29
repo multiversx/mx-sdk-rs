@@ -566,7 +566,7 @@ impl SendApiImpl for DebugApi {
     where
         M: ManagedTypeApi,
     {
-        unimplemented!()
+        panic!("legacy operation not implemented");
     }
 
     fn direct_egld_execute_legacy<M: ManagedTypeApi>(
@@ -577,7 +577,7 @@ impl SendApiImpl for DebugApi {
         _endpoint_name: &BoxedBytes,
         _arg_buffer: &ArgBuffer,
     ) -> Result<(), &'static [u8]> {
-        unimplemented!()
+        panic!("legacy operation not implemented");
     }
 
     fn direct_esdt_execute_legacy<M: ManagedTypeApi>(
@@ -589,7 +589,7 @@ impl SendApiImpl for DebugApi {
         _endpoint_name: &BoxedBytes,
         _arg_buffer: &ArgBuffer,
     ) -> Result<(), &'static [u8]> {
-        unimplemented!()
+        panic!("legacy operation not implemented");
     }
 
     fn direct_esdt_nft_execute_legacy<M: ManagedTypeApi>(
@@ -602,7 +602,7 @@ impl SendApiImpl for DebugApi {
         _endpoint_name: &BoxedBytes,
         _arg_buffer: &ArgBuffer,
     ) -> Result<(), &'static [u8]> {
-        unimplemented!()
+        panic!("legacy operation not implemented");
     }
 
     fn direct_multi_esdt_transfer_execute_legacy<M: ManagedTypeApi>(
@@ -613,7 +613,7 @@ impl SendApiImpl for DebugApi {
         _endpoint_name: &BoxedBytes,
         _arg_buffer: &ArgBuffer,
     ) -> Result<(), &'static [u8]> {
-        unimplemented!()
+        panic!("legacy operation not implemented");
     }
 
     fn async_call_raw_legacy<M: ManagedTypeApi>(
@@ -623,7 +623,7 @@ impl SendApiImpl for DebugApi {
         _endpoint_name: &BoxedBytes,
         _arg_buffer: &ArgBuffer,
     ) -> ! {
-        unimplemented!()
+        panic!("legacy operation not implemented");
     }
 
     fn deploy_contract_legacy<M: ManagedTypeApi>(
@@ -634,7 +634,7 @@ impl SendApiImpl for DebugApi {
         _code_metadata: CodeMetadata,
         _arg_buffer: &ArgBuffer,
     ) -> (ManagedAddress<M>, ManagedVec<M, ManagedBuffer<M>>) {
-        unimplemented!()
+        panic!("legacy operation not implemented");
     }
 
     fn deploy_from_source_contract_legacy<M: ManagedTypeApi>(
@@ -645,7 +645,7 @@ impl SendApiImpl for DebugApi {
         _code_metadata: CodeMetadata,
         _arg_buffer: &ArgBuffer,
     ) -> (ManagedAddress<M>, ManagedVec<M, ManagedBuffer<M>>) {
-        unimplemented!()
+        panic!("legacy operation not implemented");
     }
 
     fn upgrade_from_source_contract_legacy<M: ManagedTypeApi>(
@@ -657,7 +657,7 @@ impl SendApiImpl for DebugApi {
         _code_metadata: CodeMetadata,
         _arg_buffer: &ArgBuffer,
     ) {
-        unimplemented!()
+        panic!("legacy operation not implemented");
     }
 
     fn upgrade_contract_legacy<M: ManagedTypeApi>(
@@ -669,7 +669,7 @@ impl SendApiImpl for DebugApi {
         _code_metadata: CodeMetadata,
         _arg_buffer: &ArgBuffer,
     ) {
-        unimplemented!()
+        panic!("legacy operation not implemented");
     }
 
     fn execute_on_dest_context_raw_legacy<M: ManagedTypeApi>(
@@ -680,7 +680,7 @@ impl SendApiImpl for DebugApi {
         _endpoint_name: &BoxedBytes,
         _arg_buffer: &ArgBuffer,
     ) -> ManagedVec<M, ManagedBuffer<M>> {
-        unimplemented!()
+        panic!("legacy operation not implemented");
     }
 
     fn execute_on_dest_context_by_caller_raw_legacy<M: ManagedTypeApi>(
@@ -691,7 +691,7 @@ impl SendApiImpl for DebugApi {
         _endpoint_name: &BoxedBytes,
         _arg_buffer: &ArgBuffer,
     ) -> ManagedVec<M, ManagedBuffer<M>> {
-        unimplemented!()
+        panic!("legacy operation not implemented");
     }
 
     fn execute_on_same_context_raw_legacy<M: ManagedTypeApi>(
@@ -702,7 +702,7 @@ impl SendApiImpl for DebugApi {
         _endpoint_name: &BoxedBytes,
         _arg_buffer: &ArgBuffer,
     ) -> ManagedVec<M, ManagedBuffer<M>> {
-        unimplemented!()
+        panic!("legacy operation not implemented");
     }
 
     fn execute_on_dest_context_readonly_raw_legacy<M: ManagedTypeApi>(
@@ -712,7 +712,7 @@ impl SendApiImpl for DebugApi {
         _endpoint_name: &BoxedBytes,
         _arg_buffer: &ArgBuffer,
     ) -> ManagedVec<M, ManagedBuffer<M>> {
-        unimplemented!()
+        panic!("legacy operation not implemented");
     }
 
     fn call_local_esdt_built_in_function_legacy<M: ManagedTypeApi>(
@@ -721,6 +721,6 @@ impl SendApiImpl for DebugApi {
         _function_name: &BoxedBytes,
         _arg_buffer: &ArgBuffer,
     ) -> ManagedVec<M, ManagedBuffer<M>> {
-        unimplemented!()
+        panic!("legacy operation not implemented");
     }
 }
