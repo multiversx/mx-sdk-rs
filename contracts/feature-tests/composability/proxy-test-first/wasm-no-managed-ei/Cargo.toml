@@ -17,16 +17,17 @@ panic = "abort"
 
 [dependencies.proxy-test-first]
 path = ".."
+features = ["ei-unmanaged"]
 
 [dependencies.elrond-wasm-node]
 version = "0.31.1"
 path = "../../../../../elrond-wasm-node"
-features=["ei-unmanaged"]
+features = ["ei-unmanaged-node"]
 
 [dependencies.elrond-wasm-output]
 version = "0.31.1"
 path = "../../../../../elrond-wasm-output"
-features=["wasm-output-mode"]
+features = ["wasm-output-mode"]
 
 [workspace]
 members = ["."]
