@@ -161,7 +161,7 @@ pub trait LocalEsdtAndEsdtNft {
             arg_buffer.push_arg_raw(arg);
         }
 
-        let _ = Self::Api::send_api_impl().direct_esdt_nft_execute(
+        let _ = self.send_raw().direct_esdt_nft_execute(
             &to,
             &token_identifier,
             nonce,

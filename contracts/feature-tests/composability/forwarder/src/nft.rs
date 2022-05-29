@@ -266,7 +266,7 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
         function: ManagedBuffer,
         arguments: MultiValueEncoded<ManagedBuffer>,
     ) {
-        let _ = Self::Api::send_api_impl().direct_esdt_nft_execute(
+        let _ = self.send_raw().direct_esdt_nft_execute(
             &to,
             &token_identifier,
             nonce,

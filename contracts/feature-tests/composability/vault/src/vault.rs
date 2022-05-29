@@ -89,7 +89,7 @@ pub trait Vault {
         let caller = self.blockchain().get_caller();
         let func_name = opt_receive_func.into_option().unwrap_or_default();
 
-        Self::Api::send_api_impl()
+        self.send_raw()
             .direct_esdt_execute(
                 &caller,
                 &token,
