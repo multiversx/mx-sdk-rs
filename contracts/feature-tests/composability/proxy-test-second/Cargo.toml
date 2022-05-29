@@ -8,6 +8,9 @@ publish = false
 [lib]
 path = "src/proxy-test-second.rs"
 
+[features]
+ei-unmanaged = ["elrond-wasm/ei-unmanaged"]
+
 [dependencies.elrond-wasm]
 version = "0.31.1"
 path = "../../../../elrond-wasm"
