@@ -298,22 +298,6 @@ pub trait SendApiImpl {
         arg_buffer: &ArgBuffer,
     ) -> ManagedVec<M, ManagedBuffer<M>>;
 
-    /// Allows synchronously calling a local function by name. Execution is resumed afterwards.
-    /// You should never have to call this function directly.
-    /// Use the other specific methods instead.
-    fn call_local_esdt_built_in_function<M: ManagedTypeApi>(
-        &self,
-        gas: u64,
-        endpoint_name: &ManagedBuffer<M>,
-        arg_buffer: &ManagedArgBuffer<M>,
-    ) -> ManagedVec<M, ManagedBuffer<M>>;
-
-    fn call_local_esdt_built_in_function_legacy<M: ManagedTypeApi>(
-        &self,
-        gas: u64,
-        endpoint_name: &BoxedBytes,
-        arg_buffer: &ArgBuffer,
-    ) -> ManagedVec<M, ManagedBuffer<M>>;
 
     fn clean_return_data(&self);
 

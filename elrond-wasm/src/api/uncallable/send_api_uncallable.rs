@@ -339,24 +339,6 @@ impl SendApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn call_local_esdt_built_in_function<M: ManagedTypeApi>(
-        &self,
-        _gas: u64,
-        _function_name: &ManagedBuffer<M>,
-        _arg_buffer: &ManagedArgBuffer<M>,
-    ) -> ManagedVec<M, ManagedBuffer<M>> {
-        unreachable!()
-    }
-
-    fn call_local_esdt_built_in_function_legacy<M: ManagedTypeApi>(
-        &self,
-        _gas: u64,
-        _function_name: &BoxedBytes,
-        _arg_buffer: &ArgBuffer,
-    ) -> ManagedVec<M, ManagedBuffer<M>> {
-        unreachable!()
-    }
-
     fn clean_return_data(&self) {
         unreachable!();
     }
