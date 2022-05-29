@@ -47,7 +47,7 @@ impl SendApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn direct_esdt_execute<M: ManagedTypeApi>(
+    fn transfer_esdt_execute<M: ManagedTypeApi>(
         &self,
         _to: &ManagedAddress<M>,
         _token: &TokenIdentifier<M>,
@@ -59,7 +59,7 @@ impl SendApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn direct_esdt_execute_legacy<M: ManagedTypeApi>(
+    fn transfer_esdt_execute_legacy<M: ManagedTypeApi>(
         &self,
         _to: &Address,
         _token: &TokenIdentifier<M>,
@@ -71,7 +71,7 @@ impl SendApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn direct_esdt_nft_execute<M: ManagedTypeApi>(
+    fn transfer_esdt_nft_execute<M: ManagedTypeApi>(
         &self,
         _to: &ManagedAddress<M>,
         _token: &TokenIdentifier<M>,
@@ -84,7 +84,7 @@ impl SendApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn direct_esdt_nft_execute_legacy<M: ManagedTypeApi>(
+    fn transfer_esdt_nft_execute_legacy<M: ManagedTypeApi>(
         &self,
         _to: &Address,
         _token: &TokenIdentifier<M>,
@@ -97,7 +97,7 @@ impl SendApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn direct_multi_esdt_transfer_execute<M: ManagedTypeApi>(
+    fn multi_transfer_esdt_nft_execute<M: ManagedTypeApi>(
         &self,
         _to: &ManagedAddress<M>,
         _payments: &ManagedVec<M, EsdtTokenPayment<M>>,
@@ -108,7 +108,7 @@ impl SendApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn direct_multi_esdt_transfer_execute_legacy<M: ManagedTypeApi>(
+    fn multi_transfer_esdt_nft_execute_legacy<M: ManagedTypeApi>(
         &self,
         _to: &Address,
         _payments: &[EsdtTokenPayment<M>],

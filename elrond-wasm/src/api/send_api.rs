@@ -37,7 +37,7 @@ pub trait SendApiImpl {
     ) -> Result<(), &'static [u8]>;
 
     /// Sends ESDT to an address and executes like an async call, but without callback.
-    fn direct_esdt_execute<M: ManagedTypeApi>(
+    fn transfer_esdt_execute<M: ManagedTypeApi>(
         &self,
         to: &ManagedAddress<M>,
         token: &TokenIdentifier<M>,
@@ -47,7 +47,7 @@ pub trait SendApiImpl {
         arg_buffer: &ManagedArgBuffer<M>,
     ) -> Result<(), &'static [u8]>;
 
-    fn direct_esdt_execute_legacy<M: ManagedTypeApi>(
+    fn transfer_esdt_execute_legacy<M: ManagedTypeApi>(
         &self,
         to: &Address,
         token: &TokenIdentifier<M>,
@@ -59,7 +59,7 @@ pub trait SendApiImpl {
 
     /// Sends ESDT NFT to an address and executes like an async call, but without callback.
     #[allow(clippy::too_many_arguments)]
-    fn direct_esdt_nft_execute<M: ManagedTypeApi>(
+    fn transfer_esdt_nft_execute<M: ManagedTypeApi>(
         &self,
         to: &ManagedAddress<M>,
         token: &TokenIdentifier<M>,
@@ -69,9 +69,9 @@ pub trait SendApiImpl {
         endpoint_name: &ManagedBuffer<M>,
         arg_buffer: &ManagedArgBuffer<M>,
     ) -> Result<(), &'static [u8]>;
-    #[allow(clippy::too_many_arguments)]
 
-    fn direct_esdt_nft_execute_legacy<M: ManagedTypeApi>(
+    #[allow(clippy::too_many_arguments)]
+    fn transfer_esdt_nft_execute_legacy<M: ManagedTypeApi>(
         &self,
         to: &Address,
         token: &TokenIdentifier<M>,
@@ -82,7 +82,7 @@ pub trait SendApiImpl {
         arg_buffer: &ArgBuffer,
     ) -> Result<(), &'static [u8]>;
 
-    fn direct_multi_esdt_transfer_execute<M: ManagedTypeApi>(
+    fn multi_transfer_esdt_nft_execute<M: ManagedTypeApi>(
         &self,
         to: &ManagedAddress<M>,
         payments: &ManagedVec<M, EsdtTokenPayment<M>>,
@@ -91,7 +91,7 @@ pub trait SendApiImpl {
         arg_buffer: &ManagedArgBuffer<M>,
     ) -> Result<(), &'static [u8]>;
 
-    fn direct_multi_esdt_transfer_execute_legacy<M: ManagedTypeApi>(
+    fn multi_transfer_esdt_nft_execute_legacy<M: ManagedTypeApi>(
         &self,
         to: &Address,
         payments: &[EsdtTokenPayment<M>],

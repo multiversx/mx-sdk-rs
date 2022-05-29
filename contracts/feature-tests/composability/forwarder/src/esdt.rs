@@ -94,7 +94,7 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
             all_token_payments.push(payment);
         }
 
-        let _ = self.send_raw().direct_multi_esdt_transfer_execute(
+        let _ = self.send_raw().multi_esdt_transfer_execute(
             &to,
             &all_token_payments,
             self.blockchain().get_gas_left(),

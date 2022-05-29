@@ -2,7 +2,7 @@ use core::marker::PhantomData;
 
 use crate::{
     api::{CallTypeApi, SendApiImpl, StorageWriteApi},
-    types::{BigUint, CallbackClosure, ManagedAddress, ManagedArgBuffer, ManagedBuffer},
+    types::{BigUint, CallbackClosure, ManagedAddress, ManagedArgBuffer, ManagedBuffer}, contract_base::SendRawWrapper,
 };
 
 #[must_use]

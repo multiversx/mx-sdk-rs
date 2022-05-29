@@ -90,7 +90,7 @@ pub trait Vault {
         let func_name = opt_receive_func.into_option().unwrap_or_default();
 
         self.send_raw()
-            .direct_esdt_execute(
+            .transfer_esdt_execute(
                 &caller,
                 &token,
                 &amount,

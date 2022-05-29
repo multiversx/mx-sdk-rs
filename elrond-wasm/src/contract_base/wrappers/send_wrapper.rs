@@ -121,7 +121,7 @@ where
                 &arg_buffer,
             );
         } else if nonce == 0 {
-            let _ = self.send_raw_wrapper.direct_esdt_execute(
+            let _ = self.send_raw_wrapper.transfer_esdt_execute(
                 to,
                 token,
                 amount,
@@ -130,7 +130,7 @@ where
                 &arg_buffer,
             );
         } else {
-            let _ = self.send_raw_wrapper.direct_esdt_nft_execute(
+            let _ = self.send_raw_wrapper.transfer_esdt_nft_execute(
                 to,
                 token,
                 nonce,
@@ -150,7 +150,7 @@ where
     ) where
         D: Into<ManagedBuffer<A>>,
     {
-        let _ = self.send_raw_wrapper.direct_multi_esdt_transfer_execute(
+        let _ = self.send_raw_wrapper.multi_esdt_transfer_execute(
             to,
             payments,
             0,
