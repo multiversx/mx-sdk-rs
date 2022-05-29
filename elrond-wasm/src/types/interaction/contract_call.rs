@@ -2,7 +2,7 @@ use elrond_codec::{CodecFrom, TopEncodeMulti};
 
 use crate::{
     api::{
-        BlockchainApiImpl, CallTypeApi, ErrorApiImpl, SendApiImpl, ESDT_MULTI_TRANSFER_FUNC_NAME,
+        BlockchainApiImpl, CallTypeApi, ErrorApiImpl, ESDT_MULTI_TRANSFER_FUNC_NAME,
         ESDT_NFT_TRANSFER_FUNC_NAME, ESDT_TRANSFER_FUNC_NAME,
     },
     contract_base::{BlockchainWrapper, ExitCodecErrorHandler, SendRawWrapper},
@@ -322,7 +322,7 @@ where
     #[cfg(feature = "promises")]
     pub fn register_promise(mut self) {
         self = self.convert_to_esdt_transfer_call();
-        SA::send_api_impl().create_async_call_raw(
+        SendRawWrapper::<SA>::new().create_async_call_raw(
             &self.to,
             &self.egld_payment,
             &self.endpoint_name,
@@ -360,7 +360,7 @@ where
         RequestedResult: CodecFrom<OriginalResult>,
     {
         self = self.convert_to_esdt_transfer_call();
-        let raw_result = SA::send_api_impl().execute_on_dest_context_raw(
+        let raw_result = SendRawWrapper::<SA>::new().execute_on_dest_context_raw(
             self.resolve_gas_limit(),
             &self.to,
             &self.egld_payment,
@@ -368,7 +368,7 @@ where
             &self.arg_buffer,
         );
 
-        SA::send_api_impl().clean_return_data();
+        SendRawWrapper::<SA>::new().clean_return_data();
 
         Self::decode_result(raw_result)
     }
@@ -378,14 +378,14 @@ where
         RequestedResult: CodecFrom<OriginalResult>,
     {
         self = self.convert_to_esdt_transfer_call();
-        let raw_result = SA::send_api_impl().execute_on_dest_context_readonly_raw(
+        let raw_result = SendRawWrapper::<SA>::new().execute_on_dest_context_readonly_raw(
             self.resolve_gas_limit(),
             &self.to,
             &self.endpoint_name,
             &self.arg_buffer,
         );
 
-        SA::send_api_impl().clean_return_data();
+        SendRawWrapper::<SA>::new().clean_return_data();
 
         Self::decode_result(raw_result)
     }
@@ -402,7 +402,7 @@ where
     /// Only works if the target contract is in the same shard.
     pub fn execute_on_dest_context_ignore_result(mut self) {
         self = self.convert_to_esdt_transfer_call();
-        let _ = SA::send_api_impl().execute_on_dest_context_raw(
+        let _ = SendRawWrapper::<SA>::new().execute_on_dest_context_raw(
             self.resolve_gas_limit(),
             &self.to,
             &self.egld_payment,
@@ -410,12 +410,12 @@ where
             &self.arg_buffer,
         );
 
-        SA::send_api_impl().clean_return_data();
+        SendRawWrapper::<SA>::new().clean_return_data();
     }
 
     pub fn execute_on_same_context(mut self) {
         self = self.convert_to_esdt_transfer_call();
-        let _ = SA::send_api_impl().execute_on_same_context_raw(
+        let _ = SendRawWrapper::<SA>::new().execute_on_same_context_raw(
             self.resolve_gas_limit(),
             &self.to,
             &self.egld_payment,
@@ -423,7 +423,7 @@ where
             &self.arg_buffer,
         );
 
-        SA::send_api_impl().clean_return_data();
+        SendRawWrapper::<SA>::new().clean_return_data();
     }
 
     fn resolve_gas_limit_with_leftover(&self) -> u64 {
@@ -453,7 +453,7 @@ where
     fn no_payment_transfer_execute(&self) {
         let gas_limit = self.resolve_gas_limit_with_leftover();
 
-        let _ = SA::send_api_impl().transfer_value_execute(
+        let _ = SendRawWrapper::<SA>::new().direct_egld_execute(
             &self.to,
             &BigUint::zero(),
             gas_limit,
@@ -500,7 +500,7 @@ where
 
     fn multi_transfer_execute(self) {
         let gas_limit = self.resolve_gas_limit_with_leftover();
-        let result = SA::send_api_impl().multi_transfer_esdt_nft_execute(
+        let result = SendRawWrapper::<SA>::new().multi_esdt_transfer_execute(
             &self.to,
             &self.payments,
             gas_limit,

@@ -3,8 +3,8 @@ use core::marker::PhantomData;
 use elrond_codec::{CodecFrom, TopEncodeMulti};
 
 use crate::{
-    api::{BlockchainApiImpl, SendApi, SendApiImpl},
-    contract_base::ExitCodecErrorHandler,
+    api::{BlockchainApiImpl, CallTypeApi},
+    contract_base::{ExitCodecErrorHandler, SendRawWrapper},
     err_msg,
     io::{ArgErrorHandler, ArgId, ManagedResultArgLoader},
     types::{BigUint, CodeMetadata, ManagedAddress, ManagedBuffer, ManagedOption, ManagedVec},
@@ -20,7 +20,7 @@ const UNSPECIFIED_GAS_LIMIT: u64 = u64::MAX;
 #[must_use]
 pub struct ContractDeploy<SA, OriginalResult>
 where
-    SA: SendApi + 'static,
+    SA: CallTypeApi + 'static,
 {
     _phantom: PhantomData<SA>,
     pub to: ManagedOption<SA, ManagedAddress<SA>>, // only used for Upgrade, ignored for Deploy
@@ -36,7 +36,7 @@ pub fn new_contract_deploy<SA, OriginalResult>(
     to: ManagedOption<SA, ManagedAddress<SA>>,
 ) -> ContractDeploy<SA, OriginalResult>
 where
-    SA: SendApi + 'static,
+    SA: CallTypeApi + 'static,
 {
     let mut contract_deploy = ContractDeploy::new();
     contract_deploy.to = to;
@@ -45,7 +45,7 @@ where
 
 impl<SA, OriginalResult> Default for ContractDeploy<SA, OriginalResult>
 where
-    SA: SendApi + 'static,
+    SA: CallTypeApi + 'static,
 {
     fn default() -> Self {
         let zero = BigUint::zero();
@@ -64,7 +64,7 @@ where
 #[allow(clippy::return_self_not_must_use)]
 impl<SA, OriginalResult> ContractDeploy<SA, OriginalResult>
 where
-    SA: SendApi + 'static,
+    SA: CallTypeApi + 'static,
 {
     pub fn new() -> Self {
         Self::default()
@@ -96,7 +96,7 @@ where
 
 impl<SA, OriginalResult> ContractDeploy<SA, OriginalResult>
 where
-    SA: SendApi + 'static,
+    SA: CallTypeApi + 'static,
     OriginalResult: TopEncodeMulti,
 {
     fn decode_result<RequestedResult>(
@@ -122,7 +122,7 @@ where
     where
         RequestedResult: CodecFrom<OriginalResult>,
     {
-        let (address, raw_result) = SA::send_api_impl().deploy_contract(
+        let (address, raw_result) = SendRawWrapper::<SA>::new().deploy_contract(
             self.resolve_gas_limit(),
             &self.egld_payment,
             code,
@@ -130,7 +130,7 @@ where
             &self.arg_buffer,
         );
 
-        SA::send_api_impl().clean_return_data();
+        SendRawWrapper::<SA>::new().clean_return_data();
 
         (address, Self::decode_result(raw_result))
     }
@@ -143,7 +143,7 @@ where
     where
         RequestedResult: CodecFrom<OriginalResult>,
     {
-        let (address, raw_result) = SA::send_api_impl().deploy_from_source_contract(
+        let (address, raw_result) = SendRawWrapper::<SA>::new().deploy_from_source_contract(
             self.resolve_gas_limit(),
             &self.egld_payment,
             source_address,
@@ -151,7 +151,7 @@ where
             &self.arg_buffer,
         );
 
-        SA::send_api_impl().clean_return_data();
+        SendRawWrapper::<SA>::new().clean_return_data();
 
         (address, Self::decode_result(raw_result))
     }
@@ -165,7 +165,7 @@ where
         let sc_address = &self
             .to
             .unwrap_or_sc_panic(err_msg::RECIPIENT_ADDRESS_NOT_SET);
-        SA::send_api_impl().upgrade_from_source_contract(
+        SendRawWrapper::<SA>::new().upgrade_from_source_contract(
             sc_address,
             gas,
             &self.egld_payment,
@@ -180,7 +180,7 @@ where
         let sc_address = &self
             .to
             .unwrap_or_sc_panic(err_msg::RECIPIENT_ADDRESS_NOT_SET);
-        SA::send_api_impl().upgrade_contract(
+        SendRawWrapper::<SA>::new().upgrade_contract(
             sc_address,
             gas,
             &self.egld_payment,
