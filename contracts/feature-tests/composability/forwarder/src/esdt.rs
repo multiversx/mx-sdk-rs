@@ -89,12 +89,7 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
 
         for multi_arg in token_payments.into_iter() {
             let (token_identifier, token_nonce, amount) = multi_arg.into_tuple();
-            let payment = EsdtTokenPayment {
-                token_identifier,
-                token_nonce,
-                amount,
-                token_type: EsdtTokenType::Invalid, // not used
-            };
+            let payment = EsdtTokenPayment::new(token_identifier, token_nonce, amount);
 
             all_token_payments.push(payment);
         }
@@ -212,6 +207,26 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
             token_data.uris,
         )
             .into()
+    }
+
+    #[view]
+    fn is_esdt_frozen(
+        &self,
+        address: &ManagedAddress,
+        token_id: &TokenIdentifier,
+        nonce: u64,
+    ) -> bool {
+        self.blockchain().is_esdt_frozen(address, token_id, nonce)
+    }
+
+    #[view]
+    fn is_esdt_paused(&self, token_id: &TokenIdentifier) -> bool {
+        self.blockchain().is_esdt_paused(token_id)
+    }
+
+    #[view]
+    fn is_esdt_limited_transfer(&self, token_id: &TokenIdentifier) -> bool {
+        self.blockchain().is_esdt_limited_transfer(token_id)
     }
 
     #[view]

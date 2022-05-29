@@ -22,10 +22,10 @@ elrond_wasm_node::wasm_endpoints! {
         compute_keccak256_legacy_alloc
         compute_marshal_compressed_ec
         compute_marshal_ec
-        compute_ripemd160
+        compute_ripemd160_legacy
         compute_scalar_base_mult
         compute_scalar_mult
-        compute_secp256k1_der_signature
+        compute_secp256k1_der_signature_legacy
         compute_sha256_legacy_alloc
         compute_unmarshal_compressed_ec
         compute_unmarshal_ec
@@ -77,10 +77,10 @@ elrond_wasm_node::wasm_endpoints! {
         store_ser_1
         store_vec_u8
         vec_concat_const
-        verify_bls_signature
-        verify_custom_secp256k1_signature
-        verify_ed25519_signature
-        verify_secp256k1_signature
+        verify_bls_signature_legacy
+        verify_custom_secp256k1_signature_legacy
+        verify_ed25519_signature_legacy
+        verify_secp256k1_signature_legacy
     )
 }
 

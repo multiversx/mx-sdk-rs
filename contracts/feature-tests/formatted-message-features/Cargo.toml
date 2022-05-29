@@ -11,6 +11,7 @@ path = "src/formatted_message_features.rs"
 [dependencies.elrond-wasm]
 version = "0.31.1"
 path = "../../../elrond-wasm"
+features = ["ei-1-2"]
 
 [dev-dependencies.elrond-wasm-debug]
 version = "0.31.1"

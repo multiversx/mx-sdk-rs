@@ -6,7 +6,11 @@ use elrond_wasm::{
 use crate::DebugApi;
 
 impl EllipticCurveApi for DebugApi {
-    fn ec_create(&self, _name: &[u8]) -> Handle {
+    fn ec_create_from_name_bytes(&self, _name: &[u8]) -> Handle {
+        panic!("ec_create not implemented")
+    }
+
+    fn ec_create_from_name_mb(&self, _name_handle: Handle) -> Handle {
         panic!("ec_create not implemented")
     }
 
@@ -63,7 +67,7 @@ impl EllipticCurveApi for DebugApi {
         panic!("ec_is_on_curve not implemented")
     }
 
-    fn ec_scalar_mult(
+    fn ec_scalar_mult_legacy(
         &self,
         _x_result_handle: Handle,
         _y_result_handle: Handle,
@@ -75,7 +79,19 @@ impl EllipticCurveApi for DebugApi {
         panic!("ec_scalar_mult not implemented")
     }
 
-    fn ec_scalar_base_mult(
+    fn ec_scalar_mult(
+        &self,
+        _x_result_handle: Handle,
+        _y_result_handle: Handle,
+        _ec_handle: Handle,
+        _x_point_handle: Handle,
+        _y_point_handle: Handle,
+        _data_handle: Handle,
+    ) {
+        panic!("ec_scalar_mult not implemented")
+    }
+
+    fn ec_scalar_base_mult_legacy(
         &self,
         _x_result_handle: Handle,
         _y_result_handle: Handle,
@@ -85,7 +101,17 @@ impl EllipticCurveApi for DebugApi {
         panic!("ec_scalar_base_mult not implemented")
     }
 
-    fn ec_marshal(
+    fn ec_scalar_base_mult(
+        &self,
+        _x_result_handle: Handle,
+        _y_result_handle: Handle,
+        _ec_handle: Handle,
+        _data_handle: Handle,
+    ) {
+        panic!("ec_scalar_base_mult not implemented")
+    }
+
+    fn ec_marshal_legacy(
         &self,
         _ec_handle: Handle,
         _x_pair_handle: Handle,
@@ -94,7 +120,17 @@ impl EllipticCurveApi for DebugApi {
         panic!("ec_marshal not implemented")
     }
 
-    fn ec_marshal_compressed(
+    fn ec_marshal(
+        &self,
+        _ec_handle: Handle,
+        _x_pair_handle: Handle,
+        _y_pair_handle: Handle,
+        _result_handle: Handle,
+    ) {
+        panic!("ec_marshal not implemented")
+    }
+
+    fn ec_marshal_compressed_legacy(
         &self,
         _ec_handle: Handle,
         _x_pair_handle: Handle,
@@ -103,7 +139,17 @@ impl EllipticCurveApi for DebugApi {
         panic!("ec_marshal_compressed not implemented")
     }
 
-    fn ec_unmarshal(
+    fn ec_marshal_compressed(
+        &self,
+        _ec_handle: Handle,
+        _x_pair_handle: Handle,
+        _y_pair_handle: Handle,
+        _result_handle: Handle,
+    ) {
+        panic!("ec_marshal_compressed not implemented")
+    }
+
+    fn ec_unmarshal_legacy(
         &self,
         _x_result_handle: Handle,
         _y_result_handle: Handle,
@@ -113,7 +159,17 @@ impl EllipticCurveApi for DebugApi {
         panic!("ec_unmarshal not implemented")
     }
 
-    fn ec_unmarshal_compressed(
+    fn ec_unmarshal(
+        &self,
+        _x_result_handle: Handle,
+        _y_result_handle: Handle,
+        _ec_handle: Handle,
+        _data_handle: Handle,
+    ) {
+        panic!("ec_unmarshal not implemented")
+    }
+
+    fn ec_unmarshal_compressed_legacy(
         &self,
         _x_result_handle: Handle,
         _y_result_handle: Handle,
@@ -123,12 +179,32 @@ impl EllipticCurveApi for DebugApi {
         panic!("ec_unmarshal_compressed not implemented")
     }
 
-    fn ec_generate_key(
+    fn ec_unmarshal_compressed(
+        &self,
+        _x_result_handle: Handle,
+        _y_result_handle: Handle,
+        _ec_handle: Handle,
+        _data_handle: Handle,
+    ) {
+        panic!("ec_unmarshal_compressed not implemented")
+    }
+
+    fn ec_generate_key_legacy(
         &self,
         _x_pub_key_handle: Handle,
         _y_pub_key_handle: Handle,
         _ec_handle: Handle,
     ) -> BoxedBytes {
+        panic!("ec_generate_key not implemented")
+    }
+
+    fn ec_generate_key(
+        &self,
+        _x_pub_key_handle: Handle,
+        _y_pub_key_handle: Handle,
+        _ec_handle: Handle,
+        _result_handle: Handle,
+    ) {
         panic!("ec_generate_key not implemented")
     }
 }

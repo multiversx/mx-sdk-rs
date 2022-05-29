@@ -15,6 +15,8 @@ extern "C" {
 
     fn ripemd160(dataOffset: *const u8, length: i32, resultOffset: *mut u8) -> i32;
 
+    fn managedRipemd160(inputHandle: i32, outputHandle: i32) -> i32;
+
     fn verifyBLS(
         keyOffset: *const u8,
         messageOffset: *const u8,
@@ -22,12 +24,16 @@ extern "C" {
         sigOffset: *const u8,
     ) -> i32;
 
+    fn managedVerifyBLS(keyHandle: i32, messageHandle: i32, sigHandle: i32) -> i32;
+
     fn verifyEd25519(
         keyOffset: *const u8,
         messageOffset: *const u8,
         messageLength: i32,
         sigOffset: *const u8,
     ) -> i32;
+
+    fn managedVerifyEd25519(keyHandle: i32, messageHandle: i32, sigHandle: i32) -> i32;
 
     fn verifySecp256k1(
         keyOffset: *const u8,
@@ -37,12 +43,21 @@ extern "C" {
         sigOffset: *const u8,
     ) -> i32;
 
+    fn managedVerifySecp256k1(keyHandle: i32, messageHandle: i32, sigHandle: i32) -> i32;
+
     fn verifyCustomSecp256k1(
         keyOffset: *const u8,
         keyLength: i32,
         messageOffset: *const u8,
         messageLength: i32,
         sigOffset: *const u8,
+        hashType: i32,
+    ) -> i32;
+
+    fn managedVerifyCustomSecp256k1(
+        keyHandle: i32,
+        messageHandle: i32,
+        sigHandle: i32,
         hashType: i32,
     ) -> i32;
 
@@ -54,6 +69,7 @@ extern "C" {
         sigOffset: *const u8,
     ) -> i32;
 
+    fn managedEncodeSecp256k1DerSignature(rHandle: i32, sHandle: i32, sigHandle: i32) -> i32;
 }
 
 impl CryptoApi for VmApiImpl {
@@ -77,7 +93,7 @@ impl CryptoApiImpl for VmApiImpl {
 
     fn sha256_managed(&self, result_handle: Handle, data_handle: Handle) {
         unsafe {
-            managedSha256(data_handle, result_handle);
+            let _ = managedSha256(data_handle, result_handle);
         }
     }
 
@@ -92,12 +108,12 @@ impl CryptoApiImpl for VmApiImpl {
 
     fn keccak256_managed(&self, result_handle: Handle, data_handle: Handle) {
         unsafe {
-            managedKeccak256(data_handle, result_handle);
+            let _ = managedKeccak256(data_handle, result_handle);
         }
     }
 
     #[inline]
-    fn ripemd160(&self, data: &[u8]) -> [u8; 20] {
+    fn ripemd160_legacy(&self, data: &[u8]) -> [u8; 20] {
         unsafe {
             let mut res = [0u8; 20];
             ripemd160(data.as_ptr(), data.len() as i32, res.as_mut_ptr());
@@ -105,9 +121,16 @@ impl CryptoApiImpl for VmApiImpl {
         }
     }
 
+    #[inline]
+    fn ripemd160_managed(&self, dest: Handle, data_handle: Handle) {
+        unsafe {
+            let _ = managedRipemd160(data_handle, dest);
+        }
+    }
+
     // the verify functions return 0 if valid signature, -1 if invalid
 
-    fn verify_bls(&self, key: &[u8], message: &[u8], signature: &[u8]) -> bool {
+    fn verify_bls_legacy(&self, key: &[u8], message: &[u8], signature: &[u8]) -> bool {
         unsafe {
             verifyBLS(
                 key.as_ptr(),
@@ -118,7 +141,13 @@ impl CryptoApiImpl for VmApiImpl {
         }
     }
 
-    fn verify_ed25519(&self, key: &[u8], message: &[u8], signature: &[u8]) -> bool {
+    #[inline]
+    fn verify_bls_managed(&self, key: Handle, message: Handle, signature: Handle) -> bool {
+        unsafe { managedVerifyBLS(key, message, signature) == 0 }
+    }
+
+    #[inline]
+    fn verify_ed25519_legacy(&self, key: &[u8], message: &[u8], signature: &[u8]) -> bool {
         unsafe {
             verifyEd25519(
                 key.as_ptr(),
@@ -129,7 +158,13 @@ impl CryptoApiImpl for VmApiImpl {
         }
     }
 
-    fn verify_secp256k1(&self, key: &[u8], message: &[u8], signature: &[u8]) -> bool {
+    #[inline]
+    fn verify_ed25519_managed(&self, key: Handle, message: Handle, signature: Handle) -> bool {
+        unsafe { managedVerifyEd25519(key, message, signature) == 0 }
+    }
+
+    #[inline]
+    fn verify_secp256k1_legacy(&self, key: &[u8], message: &[u8], signature: &[u8]) -> bool {
         unsafe {
             verifySecp256k1(
                 key.as_ptr(),
@@ -141,7 +176,13 @@ impl CryptoApiImpl for VmApiImpl {
         }
     }
 
-    fn verify_custom_secp256k1(
+    #[inline]
+    fn verify_secp256k1_managed(&self, key: Handle, message: Handle, signature: Handle) -> bool {
+        unsafe { managedVerifySecp256k1(key, message, signature) == 0 }
+    }
+
+    #[inline]
+    fn verify_custom_secp256k1_legacy(
         &self,
         key: &[u8],
         message: &[u8],
@@ -160,7 +201,20 @@ impl CryptoApiImpl for VmApiImpl {
         }
     }
 
-    fn encode_secp256k1_der_signature(&self, r: &[u8], s: &[u8]) -> BoxedBytes {
+    #[inline]
+    fn verify_custom_secp256k1_managed(
+        &self,
+        key: Handle,
+        message: Handle,
+        signature: Handle,
+        hash_type: MessageHashType,
+    ) -> bool {
+        unsafe {
+            managedVerifyCustomSecp256k1(key, message, signature, hash_type.as_u8() as i32) == 0
+        }
+    }
+
+    fn encode_secp256k1_der_signature_legacy(&self, r: &[u8], s: &[u8]) -> BoxedBytes {
         unsafe {
             // 3 for "magic" numbers in the signature + 3 for lengths: total_sig_length, r_length, s_length
             let mut sig_length = 6 + r.len() + s.len();
@@ -185,6 +239,17 @@ impl CryptoApiImpl for VmApiImpl {
             );
 
             sig_output
+        }
+    }
+
+    fn encode_secp256k1_der_signature_managed(
+        &self,
+        r: Handle,
+        s: Handle,
+        dest_sig_handle: Handle,
+    ) {
+        unsafe {
+            let _ = managedEncodeSecp256k1DerSignature(r, s, dest_sig_handle);
         }
     }
 }

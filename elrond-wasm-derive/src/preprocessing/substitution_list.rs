@@ -48,6 +48,7 @@ fn add_managed_types(substitutions: &mut SubstitutionsMap) {
     add_managed_type(substitutions, &quote!(ManagedAsyncCallError));
     add_managed_type(substitutions, &quote!(EsdtTokenPaymentMultiValue));
 
+    add_managed_type_with_generics(substitutions, &quote!(ManagedOption));
     add_managed_type_with_generics(substitutions, &quote!(ManagedVec));
     add_managed_type_with_generics(substitutions, &quote!(ManagedVecOwnedIterator));
     add_managed_type_with_generics(substitutions, &quote!(ManagedMultiValue));

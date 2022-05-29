@@ -117,8 +117,6 @@ extern "C" {
         nonce: i64,
     ) -> i32;
 
-    fn getESDTLocalRoles(tokenhandle: i32) -> i64;
-
     fn managedGetESDTTokenData(
         addressHandle: i32,
         tokenIDHandle: i32,
@@ -132,6 +130,12 @@ extern "C" {
         royaltiesHandle: i32,
         urisHandle: i32,
     );
+
+    fn managedIsESDTFrozen(addressHandle: i32, tokenIDHandle: i32, nonce: i64) -> i32;
+    fn managedIsESDTPaused(tokenIDHandle: i32) -> i32;
+    fn managedIsESDTLimitedTransfer(tokenIDHandle: i32) -> i32;
+
+    fn getESDTLocalRoles(tokenhandle: i32) -> i64;
 }
 
 fn esdt_is_frozen(properties_bytes: &[u8; 2]) -> bool {
@@ -377,7 +381,7 @@ impl BlockchainApiImpl for VmApiImpl {
         }
     }
 
-    fn get_esdt_token_data_unmanaged<M: ManagedTypeApi>(
+    fn load_esdt_token_data_unmanaged<M: ManagedTypeApi>(
         &self,
         m_address: &ManagedAddress<M>,
         token: &TokenIdentifier<M>,
@@ -467,7 +471,7 @@ impl BlockchainApiImpl for VmApiImpl {
         }
     }
 
-    fn get_esdt_token_data<M: ManagedTypeApi>(
+    fn load_esdt_token_data<M: ManagedTypeApi>(
         &self,
         address: &ManagedAddress<M>,
         token: &TokenIdentifier<M>,
@@ -533,7 +537,24 @@ impl BlockchainApiImpl for VmApiImpl {
         }
     }
 
-    fn get_esdt_local_roles(
+    fn check_esdt_frozen(
+        &self,
+        address_handle: Handle,
+        token_id_handle: Handle,
+        nonce: u64,
+    ) -> bool {
+        unsafe { managedIsESDTFrozen(address_handle, token_id_handle, nonce as i64) > 0 }
+    }
+
+    fn check_esdt_paused(&self, token_id_handle: Handle) -> bool {
+        unsafe { managedIsESDTPaused(token_id_handle) > 0 }
+    }
+
+    fn check_esdt_limited_transfer(&self, token_id_handle: Handle) -> bool {
+        unsafe { managedIsESDTLimitedTransfer(token_id_handle) > 0 }
+    }
+
+    fn load_esdt_local_roles(
         &self,
         token_id_handle: Handle,
     ) -> elrond_wasm::types::EsdtLocalRoleFlags {

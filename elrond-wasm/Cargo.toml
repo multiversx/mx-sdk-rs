@@ -20,6 +20,7 @@ alloc = ["elrond-codec/alloc"]
 ei-unmanaged = ["alloc"]
 promises = []
 big-float = []
+ei-1-2 = []
 
 [dependencies]
 wee_alloc = "0.4"
