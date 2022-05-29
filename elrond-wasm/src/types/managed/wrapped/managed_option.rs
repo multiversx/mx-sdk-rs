@@ -112,6 +112,30 @@ where
             ManagedOption::<M, U>::none()
         }
     }
+
+    pub fn map_or_else<U, D, F>(self, default: D, f: F) -> U
+    where
+        D: FnOnce() -> U,
+        F: FnOnce(T) -> U,
+    {
+        if self.is_some() {
+            f(T::from_raw_handle(self.handle))
+        } else {
+            default()
+        }
+    }
+
+    pub fn map_ref_or_else<U, D, F>(&self, default: D, f: F) -> U
+    where
+        D: FnOnce() -> U,
+        F: FnOnce(&T) -> U,
+    {
+        if self.is_some() {
+            f(&T::from_raw_handle(self.handle))
+        } else {
+            default()
+        }
+    }
 }
 
 impl<M, T> Clone for ManagedOption<M, T>

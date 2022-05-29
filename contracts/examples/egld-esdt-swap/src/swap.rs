@@ -141,7 +141,7 @@ pub trait EgldEsdtSwap {
     #[view(getLockedEgldBalance)]
     fn get_locked_egld_balance(&self) -> BigUint {
         self.blockchain()
-            .get_sc_balance(&TokenIdentifier::egld(), 0)
+            .get_sc_balance(&EgldOrEsdtTokenIdentifier::egld(), 0)
     }
 
     // storage

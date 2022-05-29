@@ -43,12 +43,13 @@ pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
     #[endpoint]
     fn get_egld_balance(&self) -> BigUint {
         self.blockchain()
-            .get_sc_balance(&TokenIdentifier::egld(), 0)
+            .get_sc_balance(&EgldOrEsdtTokenIdentifier::egld(), 0)
     }
 
     #[endpoint]
     fn get_esdt_balance(&self, token_id: TokenIdentifier, nonce: u64) -> BigUint {
-        self.blockchain().get_sc_balance(&token_id, nonce)
+        self.blockchain()
+            .get_sc_balance(&EgldOrEsdtTokenIdentifier::esdt(token_id), nonce)
     }
 
     #[payable("EGLD")]

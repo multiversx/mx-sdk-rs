@@ -43,6 +43,7 @@ fn add_managed_types(substitutions: &mut SubstitutionsMap) {
     add_managed_type(substitutions, &quote!(EllipticCurve));
     add_managed_type(substitutions, &quote!(ManagedAddress));
     add_managed_type(substitutions, &quote!(TokenIdentifier));
+    add_managed_type(substitutions, &quote!(EgldOrEsdtTokenIdentifier));
     add_managed_type(substitutions, &quote!(ManagedSCError));
     add_managed_type(substitutions, &quote!(AsyncCall));
     add_managed_type(substitutions, &quote!(ManagedAsyncCallError));

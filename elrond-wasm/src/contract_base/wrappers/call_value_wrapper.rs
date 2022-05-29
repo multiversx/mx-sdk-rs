@@ -6,7 +6,10 @@ use crate::{
         StaticVarApiImpl,
     },
     err_msg,
-    types::{BigUint, EsdtTokenPayment, EsdtTokenType, ManagedType, ManagedVec, TokenIdentifier},
+    types::{
+        BigUint, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment, EsdtTokenPayment,
+        EsdtTokenType, ManagedType, ManagedVec, TokenIdentifier,
+    },
 };
 
 #[derive(Default)]
@@ -70,6 +73,19 @@ where
     pub fn esdt_value(&self) -> BigUint<A> {
         A::call_value_api_impl().load_single_esdt_value(const_handles::CALL_VALUE_SINGLE_ESDT);
         BigUint::from_raw_handle(const_handles::CALL_VALUE_SINGLE_ESDT)
+    }
+
+    pub fn egld_or_single_esdt(&self) -> EgldOrEsdtTokenPayment<A> {
+        let esdt_transfers = self.all_esdt_transfers();
+        match esdt_transfers.len() {
+            0 => EgldOrEsdtTokenPayment {
+                token_identifier: EgldOrEsdtTokenIdentifier::egld(),
+                token_nonce: 0,
+                amount: self.egld_value(),
+            },
+            1 => esdt_transfers.get(0).into(),
+            _ => A::error_api_impl().signal_error(err_msg::INCORRECT_NUM_ESDT_TRANSFERS.as_bytes()),
+        }
     }
 
     /// Returns the call value token identifier of the current call.
