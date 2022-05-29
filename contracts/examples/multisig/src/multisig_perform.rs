@@ -15,7 +15,7 @@ pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
     fn gas_for_transfer_exec(&self) -> u64 {
         let gas_left = self.blockchain().get_gas_left();
         if gas_left <= PERFORM_ACTION_FINISH_GAS {
-            Self::Api::error_api_impl().signal_error(b"insufficient gas for call");
+            sc_panic!("insufficient gas for call");
         }
         gas_left - PERFORM_ACTION_FINISH_GAS
     }
@@ -134,7 +134,7 @@ pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
                 OptionalValue::None
             },
             Action::SendTransferExecute(call_data) => {
-                let result = Self::Api::send_api_impl().direct_egld_execute(
+                let result = self.send_raw().direct_egld_execute(
                     &call_data.to,
                     &call_data.egld_amount,
                     self.gas_for_transfer_exec(),
@@ -142,7 +142,7 @@ pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
                     &call_data.arguments.into(),
                 );
                 if let Result::Err(e) = result {
-                    Self::Api::error_api_impl().signal_error(e);
+                    sc_panic!(e);
                 }
                 OptionalValue::None
             },
@@ -160,7 +160,7 @@ pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
                 arguments,
             } => {
                 let gas_left = self.blockchain().get_gas_left();
-                let (new_address, _) = Self::Api::send_api_impl().deploy_from_source_contract(
+                let (new_address, _) = self.send_raw().deploy_from_source_contract(
                     gas_left,
                     &amount,
                     &source,
@@ -177,7 +177,7 @@ pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
                 arguments,
             } => {
                 let gas_left = self.blockchain().get_gas_left();
-                Self::Api::send_api_impl().upgrade_from_source_contract(
+                self.send_raw().upgrade_from_source_contract(
                     &sc_address,
                     gas_left,
                     &amount,
