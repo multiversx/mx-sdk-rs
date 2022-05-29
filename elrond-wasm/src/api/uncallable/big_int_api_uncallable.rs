@@ -113,4 +113,8 @@ impl BigIntApi for super::UncallableApi {
     fn bi_shl(&self, _dest: Handle, _x: Handle, _bits: usize) {
         unreachable!()
     }
+
+    fn bi_to_string(&self, _bi_handle: Handle, _str_handle: Handle) {
+        unreachable!()
+    }
 }

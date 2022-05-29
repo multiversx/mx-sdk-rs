@@ -171,12 +171,7 @@ pub trait ForwarderRaw {
         for multi_arg in token_payments.into_iter() {
             let (token_identifier, token_nonce, amount) = multi_arg.into_tuple();
 
-            all_payments.push(EsdtTokenPayment {
-                token_identifier,
-                token_nonce,
-                amount,
-                token_type: EsdtTokenType::Invalid, // ignored
-            });
+            all_payments.push(EsdtTokenPayment::new(token_identifier, token_nonce, amount));
         }
 
         self.send().transfer_multiple_esdt_via_async_call(

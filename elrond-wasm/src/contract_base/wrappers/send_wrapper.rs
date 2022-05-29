@@ -63,6 +63,7 @@ where
 
     /// Sends either EGLD, ESDT or NFT to the target address,
     /// depending on the token identifier and nonce
+    #[inline]
     pub fn direct<D>(
         &self,
         to: &ManagedAddress<A>,
@@ -74,6 +75,22 @@ where
         D: Into<ManagedBuffer<A>>,
     {
         self.direct_with_gas_limit(to, token, nonce, amount, 0, data, &[]);
+    }
+
+    #[inline]
+    pub fn direct_single<D>(&self, to: &ManagedAddress<A>, payment: &EsdtTokenPayment<A>, data: D)
+    where
+        D: Into<ManagedBuffer<A>>,
+    {
+        self.direct_with_gas_limit(
+            to,
+            &payment.token_identifier,
+            payment.token_nonce,
+            &payment.amount,
+            0,
+            data,
+            &[],
+        );
     }
 
     #[allow(clippy::too_many_arguments)]
@@ -445,7 +462,7 @@ where
         payment_nonce: u64,
         payment_amount: &BigUint<A>,
     ) -> BigUint<A> {
-        let nft_token_data = A::blockchain_api_impl().get_esdt_token_data::<A>(
+        let nft_token_data = A::blockchain_api_impl().load_esdt_token_data::<A>(
             &BlockchainWrapper::<A>::new().get_sc_address(),
             nft_id,
             nft_nonce,

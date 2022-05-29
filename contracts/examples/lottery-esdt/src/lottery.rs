@@ -26,8 +26,8 @@ pub trait Lottery {
         opt_total_tickets: Option<usize>,
         opt_deadline: Option<u64>,
         opt_max_entries_per_user: Option<usize>,
-        opt_prize_distribution: Option<ManagedVec<u8>>,
-        opt_whitelist: Option<ManagedVec<ManagedAddress>>,
+        opt_prize_distribution: ManagedOption<ManagedVec<u8>>,
+        opt_whitelist: ManagedOption<ManagedVec<ManagedAddress>>,
         opt_burn_percentage: OptionalValue<BigUint>,
     ) {
         self.start_lottery(
@@ -52,8 +52,8 @@ pub trait Lottery {
         opt_total_tickets: Option<usize>,
         opt_deadline: Option<u64>,
         opt_max_entries_per_user: Option<usize>,
-        opt_prize_distribution: Option<ManagedVec<u8>>,
-        opt_whitelist: Option<ManagedVec<ManagedAddress>>,
+        opt_prize_distribution: ManagedOption<ManagedVec<u8>>,
+        opt_whitelist: ManagedOption<ManagedVec<ManagedAddress>>,
         opt_burn_percentage: OptionalValue<BigUint>,
     ) {
         self.start_lottery(
@@ -78,8 +78,8 @@ pub trait Lottery {
         opt_total_tickets: Option<usize>,
         opt_deadline: Option<u64>,
         opt_max_entries_per_user: Option<usize>,
-        opt_prize_distribution: Option<ManagedVec<u8>>,
-        opt_whitelist: Option<ManagedVec<ManagedAddress>>,
+        opt_prize_distribution: ManagedOption<ManagedVec<u8>>,
+        opt_whitelist: ManagedOption<ManagedVec<ManagedAddress>>,
         opt_burn_percentage: OptionalValue<BigUint>,
     ) {
         require!(!lottery_name.is_empty(), "Name can't be empty!");
@@ -143,9 +143,9 @@ pub trait Lottery {
             OptionalValue::None => {},
         }
 
-        if let Some(whitelist) = opt_whitelist {
+        if let Some(whitelist) = opt_whitelist.as_option() {
             let mut mapper = self.lottery_whitelist(&lottery_name);
-            for addr in &whitelist {
+            for addr in &*whitelist {
                 mapper.insert(addr);
             }
         }

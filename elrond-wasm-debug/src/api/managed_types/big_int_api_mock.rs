@@ -4,7 +4,7 @@ use core::{
     ops::{Add, BitAnd, BitOr, BitXor, Div, Mul, Neg, Rem, Shl, Shr, Sub},
 };
 use elrond_wasm::{
-    api::{BigIntApi, ErrorApiImpl, Handle},
+    api::{BigIntApi, ErrorApiImpl, Handle, ManagedBufferApi},
     err_msg,
     types::heap::BoxedBytes,
 };
@@ -196,5 +196,14 @@ impl BigIntApi for DebugApi {
         assert_positive(bi_x);
         let result = bi_x.shl(bits);
         managed_types.big_int_map.insert(dest, result);
+    }
+
+    fn bi_to_string(&self, x: Handle, str_handle: Handle) {
+        let s = {
+            let managed_types = self.m_types_borrow();
+            let bi_x = managed_types.big_int_map.get(x);
+            bi_x.to_string()
+        };
+        self.mb_overwrite(str_handle, s.as_bytes());
     }
 }

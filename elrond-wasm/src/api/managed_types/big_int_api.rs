@@ -51,4 +51,6 @@ pub trait BigIntApi {
     fn bi_xor(&self, dest: Handle, x: Handle, y: Handle);
     fn bi_shr(&self, dest: Handle, x: Handle, bits: usize);
     fn bi_shl(&self, dest: Handle, x: Handle, bits: usize);
+
+    fn bi_to_string(&self, bi_handle: Handle, str_handle: Handle);
 }
