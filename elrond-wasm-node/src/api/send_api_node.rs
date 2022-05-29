@@ -4,10 +4,7 @@ use crate::{
 };
 use alloc::vec::Vec;
 use elrond_wasm::{
-    api::{
-        const_handles, BlockchainApi, BlockchainApiImpl, ManagedTypeApi, SendApi, SendApiImpl,
-        StaticVarApiImpl,
-    },
+    api::{const_handles, ManagedTypeApi, SendApi, SendApiImpl, StaticVarApiImpl},
     types::{
         heap::{Address, ArgBuffer, BoxedBytes},
         managed_vec_from_slice_of_boxed_bytes, BigUint, CodeMetadata, EsdtTokenPayment,
@@ -1047,50 +1044,6 @@ impl SendApiImpl for VmApiImpl {
             let result_bytes = get_return_data_range(num_return_data_before, num_return_data_after);
             managed_vec_from_slice_of_boxed_bytes(result_bytes.as_slice())
         }
-    }
-
-    fn call_local_esdt_built_in_function<M: ManagedTypeApi>(
-        &self,
-        gas: u64,
-        function_name: &ManagedBuffer<M>,
-        arg_buffer: &ManagedArgBuffer<M>,
-    ) -> ManagedVec<M, ManagedBuffer<M>> {
-        // account-level built-in function, so the destination address is the contract itself
-        let own_address_handle = const_handles::MBUF_TEMPORARY_1;
-        VmApiImpl::blockchain_api_impl().load_sc_address_managed(own_address_handle);
-
-        let results = self.execute_on_dest_context_raw(
-            gas,
-            &ManagedAddress::from_raw_handle(own_address_handle),
-            &BigUint::zero(),
-            function_name,
-            arg_buffer,
-        );
-
-        self.clean_return_data();
-
-        results
-    }
-
-    fn call_local_esdt_built_in_function_legacy<M: ManagedTypeApi>(
-        &self,
-        gas: u64,
-        function_name: &BoxedBytes,
-        arg_buffer: &ArgBuffer,
-    ) -> ManagedVec<M, ManagedBuffer<M>> {
-        // account-level built-in function, so the destination address is the contract itself
-        let own_address_handle = const_handles::MBUF_TEMPORARY_1;
-        VmApiImpl::blockchain_api_impl().load_sc_address_managed(own_address_handle);
-
-        let managed_arg_buffer = ManagedArgBuffer::from(arg_buffer);
-        let endpoint_name = ManagedBuffer::from(function_name.as_slice());
-        self.execute_on_dest_context_raw(
-            gas,
-            &ManagedAddress::from_raw_handle(own_address_handle),
-            &BigUint::zero(),
-            &endpoint_name,
-            &managed_arg_buffer,
-        )
     }
 
     fn clean_return_data(&self) {

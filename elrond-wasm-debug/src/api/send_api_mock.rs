@@ -528,26 +528,6 @@ impl SendApiImpl for DebugApi {
         panic!("execute_on_dest_context_readonly_raw not implemented yet!");
     }
 
-    fn call_local_esdt_built_in_function<M: ManagedTypeApi>(
-        &self,
-        _gas: u64,
-        function_name: &ManagedBuffer<M>,
-        arg_buffer: &ManagedArgBuffer<M>,
-    ) -> ManagedVec<M, ManagedBuffer<M>> {
-        let contract_address = &self.input_ref().to;
-
-        let result = self.perform_execute_on_dest_context(
-            contract_address.clone(),
-            num_bigint::BigUint::zero(),
-            function_name.to_boxed_bytes().into_vec(),
-            arg_buffer.to_raw_args_vec(),
-        );
-
-        self.clean_return_data();
-
-        ManagedVec::from(result)
-    }
-
     fn clean_return_data(&self) {
         let mut tx_result = self.result_borrow_mut();
         tx_result.result_values.clear();
@@ -710,15 +690,6 @@ impl SendApiImpl for DebugApi {
         _gas: u64,
         _address: &Address,
         _endpoint_name: &BoxedBytes,
-        _arg_buffer: &ArgBuffer,
-    ) -> ManagedVec<M, ManagedBuffer<M>> {
-        panic!("legacy operation not implemented");
-    }
-
-    fn call_local_esdt_built_in_function_legacy<M: ManagedTypeApi>(
-        &self,
-        _gas: u64,
-        _function_name: &BoxedBytes,
         _arg_buffer: &ArgBuffer,
     ) -> ManagedVec<M, ManagedBuffer<M>> {
         panic!("legacy operation not implemented");

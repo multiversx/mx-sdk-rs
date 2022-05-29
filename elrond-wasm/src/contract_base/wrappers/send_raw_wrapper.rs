@@ -1,10 +1,12 @@
 use core::marker::PhantomData;
 
 use crate::{
-    api::{BlockchainApi, CallTypeApi, SendApiImpl, StorageReadApi},
+    api::{
+        const_handles, BlockchainApi, BlockchainApiImpl, CallTypeApi, SendApiImpl, StorageReadApi,
+    },
     types::{
-        BigUint, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer, ManagedVec,
-        TokenIdentifier,
+        BigUint, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer, ManagedType,
+        ManagedVec, TokenIdentifier,
     },
 };
 
@@ -226,28 +228,28 @@ where
         A::send_api_impl().async_call_raw(to, amount, endpoint_name, arg_buffer)
     }
 
-    #[cfg(feature = "ei-unmanaged")]
+    /// Allows synchronously calling a local function by name. Execution is resumed afterwards.
     pub fn call_local_esdt_built_in_function(
         &self,
         gas: u64,
-        endpoint_name: &ManagedBuffer<A>,
+        function_name: &ManagedBuffer<A>,
         arg_buffer: &ManagedArgBuffer<A>,
     ) -> ManagedVec<A, ManagedBuffer<A>> {
-        A::send_api_impl().call_local_esdt_built_in_function_legacy(
-            gas,
-            &endpoint_name.to_boxed_bytes(),
-            &crate::types::heap::ArgBuffer::from(arg_buffer),
-        )
-    }
+        // account-level built-in function, so the destination address is the contract itself
+        let own_address_handle = const_handles::MBUF_TEMPORARY_1;
+        A::blockchain_api_impl().load_sc_address_managed(own_address_handle);
 
-    #[cfg(not(feature = "ei-unmanaged"))]
-    pub fn call_local_esdt_built_in_function(
-        &self,
-        gas: u64,
-        endpoint_name: &ManagedBuffer<A>,
-        arg_buffer: &ManagedArgBuffer<A>,
-    ) -> ManagedVec<A, ManagedBuffer<A>> {
-        A::send_api_impl().call_local_esdt_built_in_function(gas, endpoint_name, arg_buffer)
+        let results = A::send_api_impl().execute_on_dest_context_raw(
+            gas,
+            &ManagedAddress::from_raw_handle(own_address_handle),
+            &BigUint::zero(),
+            function_name,
+            arg_buffer,
+        );
+
+        self.clean_return_data();
+
+        results
     }
 
     pub fn clean_return_data(&self) {
