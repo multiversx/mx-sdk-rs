@@ -60,7 +60,8 @@ pub trait Crowdfunding {
     fn get_current_funds(&self) -> BigUint {
         let token = self.cf_token_identifier().get();
 
-        self.blockchain().get_sc_balance(&token, 0)
+        self.blockchain()
+            .get_sc_balance(&EgldOrEsdtTokenIdentifier::esdt(token), 0)
     }
 
     #[endpoint]

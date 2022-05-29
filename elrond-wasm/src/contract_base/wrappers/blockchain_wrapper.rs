@@ -7,8 +7,8 @@ use crate::{
     },
     storage::{self},
     types::{
-        BigUint, EsdtLocalRoleFlags, EsdtTokenData, ManagedAddress, ManagedByteArray, ManagedType,
-        TokenIdentifier,
+        BigUint, EgldOrEsdtTokenIdentifier, EsdtLocalRoleFlags, EsdtTokenData, ManagedAddress,
+        ManagedByteArray, ManagedType, TokenIdentifier,
     },
 };
 
@@ -119,12 +119,13 @@ where
     }
 
     #[inline]
-    pub fn get_sc_balance(&self, token: &TokenIdentifier<A>, nonce: u64) -> BigUint<A> {
-        if token.is_egld() {
-            self.get_balance(&self.get_sc_address())
-        } else {
-            self.get_esdt_balance(&self.get_sc_address(), token, nonce)
-        }
+    pub fn get_sc_balance(&self, token: &EgldOrEsdtTokenIdentifier<A>, nonce: u64) -> BigUint<A> {
+        token.map_ref_or_else(
+            || self.get_balance(&self.get_sc_address()),
+            |token_identifier| {
+                self.get_esdt_balance(&self.get_sc_address(), token_identifier, nonce)
+            },
+        )
     }
 
     #[cfg(feature = "alloc")]

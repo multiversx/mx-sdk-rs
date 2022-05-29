@@ -1,3 +1,5 @@
+mod egld_or_esdt_token_identifier;
+mod egld_or_esdt_token_payment;
 mod esdt_token_data;
 mod esdt_token_payment;
 mod managed_address;
@@ -14,6 +16,8 @@ pub(crate) mod preloaded_managed_buffer;
 mod randomness_source;
 mod token_identifier;
 
+pub use egld_or_esdt_token_identifier::EgldOrEsdtTokenIdentifier;
+pub use egld_or_esdt_token_payment::EgldOrEsdtTokenPayment;
 pub use esdt_token_data::EsdtTokenData;
 pub use esdt_token_payment::EsdtTokenPayment;
 pub use managed_address::ManagedAddress;
