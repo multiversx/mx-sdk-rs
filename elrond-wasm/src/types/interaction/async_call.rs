@@ -1,8 +1,9 @@
 use core::marker::PhantomData;
 
 use crate::{
-    api::{CallTypeApi, SendApiImpl, StorageWriteApi},
-    types::{BigUint, CallbackClosure, ManagedAddress, ManagedArgBuffer, ManagedBuffer}, contract_base::SendRawWrapper,
+    api::{CallTypeApi, StorageWriteApi},
+    contract_base::SendRawWrapper,
+    types::{BigUint, CallbackClosure, ManagedAddress, ManagedArgBuffer, ManagedBuffer},
 };
 
 #[must_use]
@@ -42,7 +43,7 @@ where
         }
 
         // last, send the async call, which will kill the execution
-        SA::send_api_impl().async_call_raw(
+        SendRawWrapper::<SA>::new().async_call_raw(
             &self.to,
             &self.egld_payment,
             &self.endpoint_name,
