@@ -141,6 +141,7 @@ pub trait SendApiImpl {
         extra_gas_for_callback: u64,
         arg_buffer: &ManagedArgBuffer<M>,
     );
+
     /// Deploys a new contract in the same shard.
     /// Unlike `async_call_raw`, the deployment is synchronous and tx execution continues afterwards.
     /// Also unlike `async_call_raw`, it uses an argument buffer to pass arguments
@@ -297,7 +298,6 @@ pub trait SendApiImpl {
         endpoint_name: &BoxedBytes,
         arg_buffer: &ArgBuffer,
     ) -> ManagedVec<M, ManagedBuffer<M>>;
-
 
     fn clean_return_data(&self);
 
