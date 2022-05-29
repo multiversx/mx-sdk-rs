@@ -106,7 +106,7 @@ pub trait FirstContract {
             "Wrong esdt token"
         );
 
-        let _ = self.send_raw().direct_esdt_execute(
+        let _ = self.send_raw().transfer_esdt_execute(
             &second_contract_address,
             &expected_token_identifier,
             &esdt_value,
@@ -132,7 +132,7 @@ pub trait FirstContract {
             "Wrong esdt token"
         );
 
-        let _ = self.send_raw().direct_esdt_execute(
+        let _ = self.send_raw().transfer_esdt_execute(
             &second_contract_address,
             &expected_token_identifier,
             &esdt_value,

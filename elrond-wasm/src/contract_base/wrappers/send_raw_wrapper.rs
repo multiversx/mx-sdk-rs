@@ -1,9 +1,7 @@
 use core::marker::PhantomData;
 
 use crate::{
-    api::{
-        const_handles, BlockchainApi, BlockchainApiImpl, CallTypeApi, SendApiImpl, StorageReadApi,
-    },
+    api::{const_handles, BlockchainApiImpl, CallTypeApi, SendApiImpl},
     types::{
         BigUint, CodeMetadata, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer,
         ManagedType, ManagedVec, TokenIdentifier,
@@ -13,14 +11,14 @@ use crate::{
 #[derive(Default)]
 pub struct SendRawWrapper<A>
 where
-    A: CallTypeApi + StorageReadApi + BlockchainApi,
+    A: CallTypeApi,
 {
     _phantom: PhantomData<A>,
 }
 
 impl<A> SendRawWrapper<A>
 where
-    A: CallTypeApi + StorageReadApi + BlockchainApi,
+    A: CallTypeApi,
 {
     pub(crate) fn new() -> Self {
         SendRawWrapper {
@@ -63,7 +61,7 @@ where
         endpoint_name: &ManagedBuffer<A>,
         arg_buffer: &ManagedArgBuffer<A>,
     ) -> Result<(), &'static [u8]> {
-        A::send_api_impl().direct_egld_execute_legacy(
+        A::send_api_impl().transfer_value_execute_legacy(
             &to.to_address(),
             amount,
             gas_limit,
@@ -84,28 +82,8 @@ where
         A::send_api_impl().transfer_value_execute(to, amount, gas_limit, endpoint_name, arg_buffer)
     }
 
-    #[cfg(feature = "ei-unmanaged")]
-    pub fn direct_esdt_execute(
-        &self,
-        to: &ManagedAddress<A>,
-        token: &TokenIdentifier<A>,
-        amount: &BigUint<A>,
-        gas_limit: u64,
-        endpoint_name: &ManagedBuffer<A>,
-        arg_buffer: &ManagedArgBuffer<A>,
-    ) -> Result<(), &'static [u8]> {
-        A::send_api_impl().direct_esdt_execute_legacy(
-            &to.to_address(),
-            token,
-            amount,
-            gas_limit,
-            &endpoint_name.to_boxed_bytes(),
-            &crate::types::heap::ArgBuffer::from(arg_buffer),
-        )
-    }
-
     #[cfg(not(feature = "ei-unmanaged"))]
-    pub fn direct_esdt_execute(
+    pub fn transfer_esdt_execute(
         &self,
         to: &ManagedAddress<A>,
         token: &TokenIdentifier<A>,
@@ -114,7 +92,7 @@ where
         endpoint_name: &ManagedBuffer<A>,
         arg_buffer: &ManagedArgBuffer<A>,
     ) -> Result<(), &'static [u8]> {
-        A::send_api_impl().direct_esdt_execute(
+        A::send_api_impl().transfer_esdt_execute(
             to,
             token,
             amount,
@@ -125,21 +103,18 @@ where
     }
 
     #[cfg(feature = "ei-unmanaged")]
-    #[allow(clippy::too_many_arguments)]
-    pub fn direct_esdt_nft_execute(
+    pub fn transfer_esdt_execute(
         &self,
         to: &ManagedAddress<A>,
         token: &TokenIdentifier<A>,
-        nonce: u64,
         amount: &BigUint<A>,
         gas_limit: u64,
         endpoint_name: &ManagedBuffer<A>,
         arg_buffer: &ManagedArgBuffer<A>,
     ) -> Result<(), &'static [u8]> {
-        A::send_api_impl().direct_esdt_nft_execute_legacy(
+        A::send_api_impl().transfer_esdt_execute_legacy(
             &to.to_address(),
             token,
-            nonce,
             amount,
             gas_limit,
             &endpoint_name.to_boxed_bytes(),
@@ -149,7 +124,7 @@ where
 
     #[cfg(not(feature = "ei-unmanaged"))]
     #[allow(clippy::too_many_arguments)]
-    pub fn direct_esdt_nft_execute(
+    pub fn transfer_esdt_nft_execute(
         &self,
         to: &ManagedAddress<A>,
         token: &TokenIdentifier<A>,
@@ -159,7 +134,7 @@ where
         endpoint_name: &ManagedBuffer<A>,
         arg_buffer: &ManagedArgBuffer<A>,
     ) -> Result<(), &'static [u8]> {
-        A::send_api_impl().direct_esdt_nft_execute(
+        A::send_api_impl().transfer_esdt_nft_execute(
             to,
             token,
             nonce,
@@ -171,7 +146,30 @@ where
     }
 
     #[cfg(feature = "ei-unmanaged")]
-    pub fn direct_multi_esdt_transfer_execute(
+    #[allow(clippy::too_many_arguments)]
+    pub fn transfer_esdt_nft_execute(
+        &self,
+        to: &ManagedAddress<A>,
+        token: &TokenIdentifier<A>,
+        nonce: u64,
+        amount: &BigUint<A>,
+        gas_limit: u64,
+        endpoint_name: &ManagedBuffer<A>,
+        arg_buffer: &ManagedArgBuffer<A>,
+    ) -> Result<(), &'static [u8]> {
+        A::send_api_impl().transfer_esdt_nft_execute_legacy(
+            &to.to_address(),
+            token,
+            nonce,
+            amount,
+            gas_limit,
+            &endpoint_name.to_boxed_bytes(),
+            &crate::types::heap::ArgBuffer::from(arg_buffer),
+        )
+    }
+
+    #[cfg(feature = "ei-unmanaged")]
+    pub fn multi_esdt_transfer_execute(
         &self,
         to: &ManagedAddress<A>,
         payments: &ManagedVec<A, EsdtTokenPayment<A>>,
@@ -180,7 +178,7 @@ where
         arg_buffer: &ManagedArgBuffer<A>,
     ) -> Result<(), &'static [u8]> {
         let payments_vec = payments.clone().into_vec();
-        A::send_api_impl().direct_multi_esdt_transfer_execute_legacy(
+        A::send_api_impl().multi_transfer_esdt_nft_execute_legacy(
             &to.to_address(),
             &payments_vec,
             gas_limit,
@@ -190,7 +188,7 @@ where
     }
 
     #[cfg(not(feature = "ei-unmanaged"))]
-    pub fn direct_multi_esdt_transfer_execute(
+    pub fn multi_esdt_transfer_execute(
         &self,
         to: &ManagedAddress<A>,
         payments: &ManagedVec<A, EsdtTokenPayment<A>>,
@@ -198,7 +196,7 @@ where
         endpoint_name: &ManagedBuffer<A>,
         arg_buffer: &ManagedArgBuffer<A>,
     ) -> Result<(), &'static [u8]> {
-        A::send_api_impl().direct_multi_esdt_transfer_execute(
+        A::send_api_impl().multi_transfer_esdt_nft_execute(
             to,
             payments,
             gas_limit,

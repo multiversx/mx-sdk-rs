@@ -372,7 +372,7 @@ impl SendApiImpl for VmApiImpl {
         }
     }
 
-    fn direct_esdt_execute<M: ManagedTypeApi>(
+    fn transfer_esdt_execute<M: ManagedTypeApi>(
         &self,
         to: &ManagedAddress<M>,
         token: &TokenIdentifier<M>,
@@ -381,10 +381,10 @@ impl SendApiImpl for VmApiImpl {
         endpoint_name: &ManagedBuffer<M>,
         arg_buffer: &ManagedArgBuffer<M>,
     ) -> Result<(), &'static [u8]> {
-        self.direct_esdt_nft_execute(to, token, 0, amount, gas_limit, endpoint_name, arg_buffer)
+        self.transfer_esdt_nft_execute(to, token, 0, amount, gas_limit, endpoint_name, arg_buffer)
     }
 
-    fn direct_esdt_execute_legacy<M: ManagedTypeApi>(
+    fn transfer_esdt_execute_legacy<M: ManagedTypeApi>(
         &self,
         to: &Address,
         token: &TokenIdentifier<M>,
@@ -415,7 +415,7 @@ impl SendApiImpl for VmApiImpl {
         }
     }
 
-    fn direct_esdt_nft_execute<M: ManagedTypeApi>(
+    fn transfer_esdt_nft_execute<M: ManagedTypeApi>(
         &self,
         to: &ManagedAddress<M>,
         token: &TokenIdentifier<M>,
@@ -427,10 +427,10 @@ impl SendApiImpl for VmApiImpl {
     ) -> Result<(), &'static [u8]> {
         let mut payments = ManagedVec::new();
         payments.push(EsdtTokenPayment::new(token.clone(), nonce, amount.clone()));
-        self.direct_multi_esdt_transfer_execute(to, &payments, gas_limit, endpoint_name, arg_buffer)
+        self.multi_transfer_esdt_nft_execute(to, &payments, gas_limit, endpoint_name, arg_buffer)
     }
 
-    fn direct_esdt_nft_execute_legacy<M: ManagedTypeApi>(
+    fn transfer_esdt_nft_execute_legacy<M: ManagedTypeApi>(
         &self,
         to: &Address,
         token: &TokenIdentifier<M>,
@@ -463,7 +463,7 @@ impl SendApiImpl for VmApiImpl {
         }
     }
 
-    fn direct_multi_esdt_transfer_execute<M: ManagedTypeApi>(
+    fn multi_transfer_esdt_nft_execute<M: ManagedTypeApi>(
         &self,
         to: &ManagedAddress<M>,
         payments: &ManagedVec<M, EsdtTokenPayment<M>>,
@@ -487,7 +487,7 @@ impl SendApiImpl for VmApiImpl {
         }
     }
 
-    fn direct_multi_esdt_transfer_execute_legacy<M: ManagedTypeApi>(
+    fn multi_transfer_esdt_nft_execute_legacy<M: ManagedTypeApi>(
         &self,
         to: &Address,
         payments: &[EsdtTokenPayment<M>],

@@ -227,7 +227,7 @@ impl SendApiImpl for DebugApi {
         Ok(())
     }
 
-    fn direct_esdt_execute<M: ManagedTypeApi>(
+    fn transfer_esdt_execute<M: ManagedTypeApi>(
         &self,
         to: &ManagedAddress<M>,
         token: &TokenIdentifier<M>,
@@ -253,7 +253,7 @@ impl SendApiImpl for DebugApi {
         Ok(())
     }
 
-    fn direct_esdt_nft_execute<M: ManagedTypeApi>(
+    fn transfer_esdt_nft_execute<M: ManagedTypeApi>(
         &self,
         to: &ManagedAddress<M>,
         token: &TokenIdentifier<M>,
@@ -289,7 +289,7 @@ impl SendApiImpl for DebugApi {
         Ok(())
     }
 
-    fn direct_multi_esdt_transfer_execute<M: ManagedTypeApi>(
+    fn multi_transfer_esdt_nft_execute<M: ManagedTypeApi>(
         &self,
         to: &ManagedAddress<M>,
         payments: &ManagedVec<M, EsdtTokenPayment<M>>,
@@ -536,7 +536,7 @@ impl SendApiImpl for DebugApi {
         panic!("legacy operation not implemented");
     }
 
-    fn direct_esdt_execute_legacy<M: ManagedTypeApi>(
+    fn transfer_esdt_execute_legacy<M: ManagedTypeApi>(
         &self,
         _to: &Address,
         _token: &TokenIdentifier<M>,
@@ -548,7 +548,7 @@ impl SendApiImpl for DebugApi {
         panic!("legacy operation not implemented");
     }
 
-    fn direct_esdt_nft_execute_legacy<M: ManagedTypeApi>(
+    fn transfer_esdt_nft_execute_legacy<M: ManagedTypeApi>(
         &self,
         _to: &Address,
         _token: &TokenIdentifier<M>,
@@ -561,7 +561,7 @@ impl SendApiImpl for DebugApi {
         panic!("legacy operation not implemented");
     }
 
-    fn direct_multi_esdt_transfer_execute_legacy<M: ManagedTypeApi>(
+    fn multi_transfer_esdt_nft_execute_legacy<M: ManagedTypeApi>(
         &self,
         _to: &Address,
         _payments: &[EsdtTokenPayment<M>],

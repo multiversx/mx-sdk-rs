@@ -5,7 +5,7 @@ use crate::{
         BlockchainApiImpl, CallTypeApi, ErrorApiImpl, SendApiImpl, ESDT_MULTI_TRANSFER_FUNC_NAME,
         ESDT_NFT_TRANSFER_FUNC_NAME, ESDT_TRANSFER_FUNC_NAME,
     },
-    contract_base::{BlockchainWrapper, ExitCodecErrorHandler},
+    contract_base::{BlockchainWrapper, ExitCodecErrorHandler, SendRawWrapper},
     err_msg,
     io::{ArgErrorHandler, ArgId, ManagedResultArgLoader},
     types::{
@@ -467,7 +467,7 @@ where
         let payment = &self.payments.try_get(0).unwrap();
 
         if payment.token_identifier.is_egld() {
-            let _ = SA::send_api_impl().transfer_value_execute(
+            let _ = SendRawWrapper::<SA>::new().direct_egld_execute(
                 &self.to,
                 &payment.amount,
                 gas_limit,
@@ -476,7 +476,7 @@ where
             );
         } else if payment.token_nonce == 0 {
             // fungible ESDT
-            let _ = SA::send_api_impl().direct_esdt_execute(
+            let _ = SendRawWrapper::<SA>::new().transfer_esdt_execute(
                 &self.to,
                 &payment.token_identifier,
                 &payment.amount,
@@ -486,7 +486,7 @@ where
             );
         } else {
             // non-fungible/semi-fungible ESDT
-            let _ = SA::send_api_impl().direct_esdt_nft_execute(
+            let _ = SendRawWrapper::<SA>::new().transfer_esdt_nft_execute(
                 &self.to,
                 &payment.token_identifier,
                 payment.token_nonce,
@@ -500,7 +500,7 @@ where
 
     fn multi_transfer_execute(self) {
         let gas_limit = self.resolve_gas_limit_with_leftover();
-        let result = SA::send_api_impl().direct_multi_esdt_transfer_execute(
+        let result = SA::send_api_impl().multi_transfer_esdt_nft_execute(
             &self.to,
             &self.payments,
             gas_limit,
