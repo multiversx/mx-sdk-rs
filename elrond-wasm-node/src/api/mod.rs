@@ -7,7 +7,6 @@ mod error_api_node;
 mod log_api_node;
 mod managed_types;
 mod print_api_node;
-mod send_api_node;
 mod send_api_node_impl;
 mod storage_api_node;
 mod unsafe_buffer;

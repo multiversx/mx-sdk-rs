@@ -15,7 +15,7 @@ extern "C" {
         dataLength: i32,
     );
 
-    #[cfg(not(feature = "ei-unmanaged"))]
+    #[cfg(not(feature = "ei-unmanaged-node"))]
     fn managedWriteLog(topicsHandle: i32, dataHandle: i32);
 }
 
@@ -61,7 +61,7 @@ impl LogApiImpl for VmApiImpl {
         }
     }
 
-    #[cfg(feature = "ei-unmanaged")]
+    #[cfg(feature = "ei-unmanaged-node")]
     fn managed_write_log(&self, topics_handle: Handle, data_handle: Handle) {
         use elrond_wasm::types::{
             managed_vec_of_buffers_to_arg_buffer, ManagedBuffer, ManagedType, ManagedVec,
@@ -72,7 +72,7 @@ impl LogApiImpl for VmApiImpl {
         self.write_event_log(&topics_arg_buffer, data.to_boxed_bytes().as_slice());
     }
 
-    #[cfg(not(feature = "ei-unmanaged"))]
+    #[cfg(not(feature = "ei-unmanaged-node"))]
     fn managed_write_log(&self, topics_handle: Handle, data_handle: Handle) {
         unsafe {
             managedWriteLog(topics_handle, data_handle);

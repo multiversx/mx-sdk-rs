@@ -3,8 +3,8 @@ use core::marker::PhantomData;
 use crate::{
     api::{BlockchainApi, CallTypeApi, SendApiImpl, StorageReadApi},
     types::{
-        heap::ArgBuffer, BigUint, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer,
-        ManagedBuffer, ManagedVec, TokenIdentifier,
+        BigUint, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer, ManagedVec,
+        TokenIdentifier,
     },
 };
 
@@ -25,7 +25,8 @@ where
             _phantom: PhantomData,
         }
     }
-    #[cfg(feature = "alloc")]
+
+    #[cfg(feature = "ei-unmanaged")]
     pub fn direct_egld<D>(&self, to: &ManagedAddress<A>, amount: &BigUint<A>, data: D)
     where
         D: Into<ManagedBuffer<A>>,
@@ -37,7 +38,7 @@ where
         )
     }
 
-    #[cfg(not(feature = "alloc"))]
+    #[cfg(not(feature = "ei-unmanaged"))]
     pub fn direct_egld<D>(&self, to: &ManagedAddress<A>, amount: &BigUint<A>, data: D)
     where
         D: Into<ManagedBuffer<A>>,
@@ -45,7 +46,7 @@ where
         A::send_api_impl().direct_egld(to, amount, data)
     }
 
-    #[cfg(feature = "alloc")]
+    #[cfg(feature = "ei-unmanaged")]
     pub fn direct_egld_execute(
         &self,
         to: &ManagedAddress<A>,
@@ -59,11 +60,11 @@ where
             amount,
             gas_limit,
             &endpoint_name.to_boxed_bytes(),
-            &ArgBuffer::from(arg_buffer),
+            &crate::types::heap::ArgBuffer::from(arg_buffer),
         )
     }
 
-    #[cfg(not(feature = "alloc"))]
+    #[cfg(not(feature = "ei-unmanaged"))]
     pub fn direct_egld_execute(
         &self,
         to: &ManagedAddress<A>,
@@ -75,7 +76,7 @@ where
         A::send_api_impl().direct_egld_execute(to, amount, gas_limit, endpoint_name, arg_buffer)
     }
 
-    #[cfg(feature = "alloc")]
+    #[cfg(feature = "ei-unmanaged")]
     pub fn direct_esdt_execute(
         &self,
         to: &ManagedAddress<A>,
@@ -91,11 +92,11 @@ where
             amount,
             gas_limit,
             &endpoint_name.to_boxed_bytes(),
-            &ArgBuffer::from(arg_buffer),
+            &crate::types::heap::ArgBuffer::from(arg_buffer),
         )
     }
 
-    #[cfg(not(feature = "alloc"))]
+    #[cfg(not(feature = "ei-unmanaged"))]
     pub fn direct_esdt_execute(
         &self,
         to: &ManagedAddress<A>,
@@ -115,7 +116,7 @@ where
         )
     }
 
-    #[cfg(feature = "alloc")]
+    #[cfg(feature = "ei-unmanaged")]
     #[allow(clippy::too_many_arguments)]
     pub fn direct_esdt_nft_execute(
         &self,
@@ -134,11 +135,11 @@ where
             amount,
             gas_limit,
             &endpoint_name.to_boxed_bytes(),
-            &ArgBuffer::from(arg_buffer),
+            &crate::types::heap::ArgBuffer::from(arg_buffer),
         )
     }
 
-    #[cfg(not(feature = "alloc"))]
+    #[cfg(not(feature = "ei-unmanaged"))]
     #[allow(clippy::too_many_arguments)]
     pub fn direct_esdt_nft_execute(
         &self,
@@ -161,7 +162,7 @@ where
         )
     }
 
-    #[cfg(feature = "alloc")]
+    #[cfg(feature = "ei-unmanaged")]
     pub fn direct_multi_esdt_transfer_execute(
         &self,
         to: &ManagedAddress<A>,
@@ -176,11 +177,11 @@ where
             &payments_vec,
             gas_limit,
             &endpoint_name.to_boxed_bytes(),
-            &ArgBuffer::from(arg_buffer),
+            &crate::types::heap::ArgBuffer::from(arg_buffer),
         )
     }
 
-    #[cfg(not(feature = "alloc"))]
+    #[cfg(not(feature = "ei-unmanaged"))]
     pub fn direct_multi_esdt_transfer_execute(
         &self,
         to: &ManagedAddress<A>,
@@ -198,7 +199,7 @@ where
         )
     }
 
-    #[cfg(feature = "alloc")]
+    #[cfg(feature = "ei-unmanaged")]
     pub fn async_call_raw(
         &self,
         to: &ManagedAddress<A>,
@@ -210,11 +211,11 @@ where
             &to.to_address(),
             amount,
             &endpoint_name.to_boxed_bytes(),
-            &ArgBuffer::from(arg_buffer),
+            &crate::types::heap::ArgBuffer::from(arg_buffer),
         )
     }
 
-    #[cfg(not(feature = "alloc"))]
+    #[cfg(not(feature = "ei-unmanaged"))]
     pub fn async_call_raw(
         &self,
         to: &ManagedAddress<A>,
@@ -225,7 +226,7 @@ where
         A::send_api_impl().async_call_raw(to, amount, endpoint_name, arg_buffer)
     }
 
-    #[cfg(feature = "alloc")]
+    #[cfg(feature = "ei-unmanaged")]
     pub fn call_local_esdt_built_in_function(
         &self,
         gas: u64,
@@ -235,11 +236,11 @@ where
         A::send_api_impl().call_local_esdt_built_in_function_legacy(
             gas,
             &endpoint_name.to_boxed_bytes(),
-            &ArgBuffer::from(arg_buffer),
+            &crate::types::heap::ArgBuffer::from(arg_buffer),
         )
     }
 
-    #[cfg(not(feature = "alloc"))]
+    #[cfg(not(feature = "ei-unmanaged"))]
     pub fn call_local_esdt_built_in_function(
         &self,
         gas: u64,
@@ -253,7 +254,7 @@ where
         A::send_api_impl().clean_return_data()
     }
 
-    #[cfg(feature = "alloc")]
+    #[cfg(feature = "ei-unmanaged")]
     pub fn execute_on_dest_context_by_caller_raw(
         &self,
         gas: u64,
@@ -267,11 +268,11 @@ where
             &address.to_address(),
             value,
             &endpoint_name.to_boxed_bytes(),
-            &ArgBuffer::from(arg_buffer),
+            &crate::types::heap::ArgBuffer::from(arg_buffer),
         )
     }
 
-    #[cfg(not(feature = "alloc"))]
+    #[cfg(not(feature = "ei-unmanaged"))]
     pub fn execute_on_dest_context_by_caller_raw(
         &self,
         gas: u64,

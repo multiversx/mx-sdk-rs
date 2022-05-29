@@ -23,7 +23,7 @@ extern "C" {
         sliceLength: i32,
         destinationHandle: i32,
     ) -> i32;
-    #[cfg(not(feature = "ei-unmanaged"))]
+    #[cfg(not(feature = "ei-unmanaged-node"))]
     fn mBufferEq(handle1: i32, handle2: i32) -> i32;
     fn mBufferSetBytes(mBufferHandle: i32, byte_ptr: *const u8, byte_len: i32) -> i32;
 
@@ -177,7 +177,7 @@ impl ManagedBufferApi for crate::VmApiImpl {
         }
     }
 
-    #[cfg(feature = "ei-unmanaged")]
+    #[cfg(feature = "ei-unmanaged-node")]
     fn mb_eq(&self, handle1: Handle, handle2: Handle) -> bool {
         unsafe {
             let len1 = mBufferGetLength(handle1 as i32) as usize;
@@ -196,7 +196,7 @@ impl ManagedBufferApi for crate::VmApiImpl {
         }
     }
 
-    #[cfg(not(feature = "ei-unmanaged"))]
+    #[cfg(not(feature = "ei-unmanaged-node"))]
     fn mb_eq(&self, handle1: Handle, handle2: Handle) -> bool {
         unsafe { mBufferEq(handle1, handle2) > 0 }
     }
