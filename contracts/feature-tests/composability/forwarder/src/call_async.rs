@@ -32,7 +32,7 @@ pub trait ForwarderAsyncCallModule {
     #[endpoint]
     #[payable("*")]
     fn forward_async_accept_funds_half_payment(&self, to: ManagedAddress) {
-        let payment = self.call_value().payment();
+        let payment = self.call_value().egld_or_single_esdt();
         let half_payment = payment.amount / 2u32;
         self.vault_proxy()
             .contract(to)
@@ -45,7 +45,7 @@ pub trait ForwarderAsyncCallModule {
     #[payable("*")]
     #[endpoint]
     fn forward_async_accept_funds_with_fees(&self, to: ManagedAddress, percentage_fees: BigUint) {
-        let payment = self.call_value().payment();
+        let payment = self.call_value().egld_or_single_esdt();
         let fees = &payment.amount * &percentage_fees / PERCENTAGE_TOTAL;
         let amount_to_send = payment.amount - fees;
 
