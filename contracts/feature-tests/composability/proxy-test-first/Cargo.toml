@@ -8,6 +8,9 @@ publish = false
 [lib]
 path = "src/proxy-test-first.rs"
 
+[features]
+ei-unmanaged = ["elrond-wasm/ei-unmanaged"]
+
 [dependencies]
 hex-literal = "0.3.1"
 

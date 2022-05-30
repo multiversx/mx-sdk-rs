@@ -2,7 +2,7 @@ use core::marker::PhantomData;
 
 use crate::{
     api::{
-        BlockchainApi, BlockchainApiImpl, CallTypeApi, SendApiImpl, StorageReadApi,
+        BlockchainApi, BlockchainApiImpl, CallTypeApi, StorageReadApi,
         CHANGE_OWNER_BUILTIN_FUNC_NAME, ESDT_LOCAL_BURN_FUNC_NAME, ESDT_LOCAL_MINT_FUNC_NAME,
         ESDT_MULTI_TRANSFER_FUNC_NAME, ESDT_NFT_ADD_QUANTITY_FUNC_NAME, ESDT_NFT_ADD_URI_FUNC_NAME,
         ESDT_NFT_BURN_FUNC_NAME, ESDT_NFT_CREATE_FUNC_NAME, ESDT_NFT_TRANSFER_FUNC_NAME,
@@ -18,6 +18,8 @@ use crate::{
 use super::BlockchainWrapper;
 
 const PERCENTAGE_TOTAL: u64 = 10_000;
+
+use super::SendRawWrapper;
 
 /// API that groups methods that either send EGLD or ESDT, or that call other contracts.
 // pub trait SendApi: Clone + Sized {
@@ -40,6 +42,10 @@ where
         }
     }
 
+    fn send_raw_wrapper(&self) -> SendRawWrapper<A> {
+        SendRawWrapper::new()
+    }
+
     pub fn esdt_system_sc_proxy(&self) -> ESDTSystemSmartContractProxy<A> {
         ESDTSystemSmartContractProxy::new_proxy_obj()
     }
@@ -58,7 +64,7 @@ where
     where
         D: Into<ManagedBuffer<A>>,
     {
-        A::send_api_impl().direct_egld(to, amount, data)
+        self.send_raw_wrapper().direct_egld(to, amount, data)
     }
 
     /// Sends either EGLD, ESDT or NFT to the target address,
@@ -113,7 +119,7 @@ where
         }
 
         if token.is_egld() {
-            let _ = A::send_api_impl().direct_egld_execute(
+            let _ = self.send_raw_wrapper().direct_egld_execute(
                 to,
                 amount,
                 gas,
@@ -121,7 +127,7 @@ where
                 &arg_buffer,
             );
         } else if nonce == 0 {
-            let _ = A::send_api_impl().direct_esdt_execute(
+            let _ = self.send_raw_wrapper().transfer_esdt_execute(
                 to,
                 token,
                 amount,
@@ -130,7 +136,7 @@ where
                 &arg_buffer,
             );
         } else {
-            let _ = A::send_api_impl().direct_esdt_nft_execute(
+            let _ = self.send_raw_wrapper().transfer_esdt_nft_execute(
                 to,
                 token,
                 nonce,
@@ -150,7 +156,7 @@ where
     ) where
         D: Into<ManagedBuffer<A>>,
     {
-        let _ = A::send_api_impl().direct_multi_esdt_transfer_execute(
+        let _ = self.send_raw_wrapper().multi_esdt_transfer_execute(
             to,
             payments,
             0,
@@ -184,7 +190,7 @@ where
                 arg_buffer.push_arg_raw(data_buf);
             }
 
-            A::send_api_impl().async_call_raw(
+            self.send_raw_wrapper().async_call_raw(
                 to,
                 &BigUint::zero(),
                 &ManagedBuffer::new_from_bytes(ESDT_TRANSFER_FUNC_NAME),
@@ -198,7 +204,7 @@ where
                 arg_buffer.push_arg_raw(data_buf);
             }
 
-            A::send_api_impl().async_call_raw(
+            self.send_raw_wrapper().async_call_raw(
                 &BlockchainWrapper::<A>::new().get_sc_address(),
                 &BigUint::zero(),
                 &ManagedBuffer::new_from_bytes(ESDT_NFT_TRANSFER_FUNC_NAME),
@@ -231,7 +237,7 @@ where
             arg_buffer.push_arg_raw(data_buf);
         }
 
-        A::send_api_impl().async_call_raw(
+        self.send_raw_wrapper().async_call_raw(
             &BlockchainWrapper::<A>::new().get_sc_address(),
             &BigUint::zero(),
             &ManagedBuffer::new_from_bytes(ESDT_MULTI_TRANSFER_FUNC_NAME),
@@ -262,12 +268,8 @@ where
         endpoint_name: &ManagedBuffer<A>,
         arg_buffer: &ManagedArgBuffer<A>,
     ) -> ManagedVec<A, ManagedBuffer<A>> {
-        let results =
-            A::send_api_impl().call_local_esdt_built_in_function(gas, endpoint_name, arg_buffer);
-
-        A::send_api_impl().clean_return_data();
-
-        results
+        self.send_raw_wrapper()
+            .call_local_esdt_built_in_function(gas, endpoint_name, arg_buffer)
     }
 
     /// Allows synchronous minting of ESDT/SFT (depending on nonce). Execution is resumed afterwards.
@@ -433,13 +435,15 @@ where
             }
         }
 
-        let output = A::send_api_impl().execute_on_dest_context_by_caller_raw(
-            A::blockchain_api_impl().get_gas_left(),
-            &BlockchainWrapper::<A>::new().get_caller(),
-            &BigUint::zero(),
-            &ManagedBuffer::new_from_bytes(ESDT_NFT_CREATE_FUNC_NAME),
-            &arg_buffer,
-        );
+        let output = self
+            .send_raw_wrapper()
+            .execute_on_dest_context_by_caller_raw(
+                A::blockchain_api_impl().get_gas_left(),
+                &BlockchainWrapper::<A>::new().get_caller(),
+                &BigUint::zero(),
+                &ManagedBuffer::new_from_bytes(ESDT_NFT_CREATE_FUNC_NAME),
+                &arg_buffer,
+            );
 
         if let Some(first_result_bytes) = output.try_get(0) {
             first_result_bytes.parse_as_u64().unwrap_or_default()

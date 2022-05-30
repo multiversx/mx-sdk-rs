@@ -167,7 +167,7 @@ pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
 
     #[endpoint]
     fn call_other_contract_execute_on_dest(&self, other_sc_address: ManagedAddress) -> BigUint {
-        let call_result = Self::Api::send_api_impl().execute_on_dest_context_raw(
+        let call_result = self.send_raw().execute_on_dest_context_raw(
             self.blockchain().get_gas_left(),
             &other_sc_address,
             &BigUint::zero(),
@@ -186,7 +186,7 @@ pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
         let mut args = ManagedArgBuffer::new_empty();
         args.push_arg(&value);
 
-        Self::Api::send_api_impl().async_call_raw(
+        self.send_raw().async_call_raw(
             &other_sc_address,
             &BigUint::zero(),
             &ManagedBuffer::new_from_bytes(b"add"),
@@ -209,7 +209,7 @@ pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
         let mut args = ManagedArgBuffer::new_empty();
         args.push_arg(value);
 
-        let _ = Self::Api::send_api_impl().execute_on_dest_context_raw(
+        let _ = self.send_raw().execute_on_dest_context_raw(
             self.blockchain().get_gas_left(),
             &other_sc_address,
             &BigUint::zero(),

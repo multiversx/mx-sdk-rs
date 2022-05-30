@@ -106,7 +106,7 @@ pub trait FirstContract {
             "Wrong esdt token"
         );
 
-        let _ = Self::Api::send_api_impl().direct_esdt_execute(
+        let _ = self.send_raw().transfer_esdt_execute(
             &second_contract_address,
             &expected_token_identifier,
             &esdt_value,
@@ -132,7 +132,7 @@ pub trait FirstContract {
             "Wrong esdt token"
         );
 
-        let _ = Self::Api::send_api_impl().direct_esdt_execute(
+        let _ = self.send_raw().transfer_esdt_execute(
             &second_contract_address,
             &expected_token_identifier,
             &esdt_value,
@@ -158,7 +158,7 @@ pub trait FirstContract {
             arg_buffer.push_arg_raw(arg);
         }
 
-        Self::Api::send_api_impl().async_call_raw(
+        self.send_raw().async_call_raw(
             to,
             &BigUint::zero(),
             &ManagedBuffer::from(ESDT_TRANSFER_STRING),
