@@ -47,7 +47,7 @@
             "expect": {
                 "out": [],
                 "status": "4",
-                "message": "str:too many ESDT transfers",
+                "message": "str:incorrect number of ESDT transfers",
                 "logs": "*",
                 "gas": "*",
                 "refund": "*"

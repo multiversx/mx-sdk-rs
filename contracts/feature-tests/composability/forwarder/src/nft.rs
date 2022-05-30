@@ -34,7 +34,7 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
     #[payable("*")]
     #[endpoint]
     fn buy_nft(&self, nft_id: TokenIdentifier, nft_nonce: u64, nft_amount: BigUint) -> BigUint {
-        let payment: EsdtTokenPayment<Self::Api> = self.call_value().payment();
+        let payment = self.call_value().egld_or_single_esdt();
 
         self.send().sell_nft(
             &nft_id,
@@ -299,7 +299,7 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
             uri,
         );
 
-        self.send().direct(
+        self.send().direct_esdt(
             &to,
             &token_identifier,
             token_nonce,

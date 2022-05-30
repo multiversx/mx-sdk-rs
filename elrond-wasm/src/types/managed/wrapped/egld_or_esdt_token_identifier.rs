@@ -6,19 +6,20 @@ use crate::{
 };
 use elrond_codec::*;
 
-use super::{ManagedOption, TokenIdentifier};
+use super::{ManagedOption, ManagedRef, TokenIdentifier};
 
 /// Specialized type for handling either EGLD or ESDT token identifiers.
 ///
 /// Equivalent to a structure of the form
 /// ```
+/// # use elrond_wasm::{api::ManagedTypeApi, types::TokenIdentifier};
 /// enum EgldOrEsdtTokenIdentifier<M: ManagedTypeApi> {
 ///     Egld,
 ///     Esdt(TokenIdentifier<M>),
 /// }
 /// ```
 ///
-/// It is, however more optimized than that.
+/// It is, however more optimized than that. Its implementation is based on `ManagedOption`.
 ///
 /// EGLD a special, invalid token identifier handle. This way we can fit it inside a single i32 in memory.
 #[repr(transparent)]
@@ -97,9 +98,13 @@ impl<M: ManagedTypeApi> EgldOrEsdtTokenIdentifier<M> {
         self.data.map_ref_or_else(for_egld, for_esdt)
     }
 
-    // pub fn as_esdt_token_identifier<'a>(&'a self) -> Option<&'a TokenIdentifier<M>> {
-    //     self.map_ref_or_else(|| None, |token_identifier| Some(token_identifier))
-    // }
+    pub fn unwrap_esdt(self) -> TokenIdentifier<M> {
+        self.data.unwrap_or_sc_panic("ESDT expected")
+    }
+
+    pub fn as_esdt_token_identifier(&self) -> Option<ManagedRef<'_, M, TokenIdentifier<M>>> {
+        self.data.as_option()
+    }
 }
 
 // impl<M: ManagedTypeApi> From<ManagedBuffer<M>> for EgldOrEsdtTokenIdentifier<M> {
@@ -174,9 +179,16 @@ impl<M: ManagedTypeApi> TopDecode for EgldOrEsdtTokenIdentifier<M> {
     }
 }
 
+impl<M> CodecFromSelf for EgldOrEsdtTokenIdentifier<M> where M: ManagedTypeApi {}
+
+impl<M> CodecFrom<TokenIdentifier<M>> for EgldOrEsdtTokenIdentifier<M> where M: ManagedTypeApi {}
+impl<M> CodecFrom<&TokenIdentifier<M>> for EgldOrEsdtTokenIdentifier<M> where M: ManagedTypeApi {}
+
+impl<M> CodecFrom<&[u8]> for EgldOrEsdtTokenIdentifier<M> where M: ManagedTypeApi {}
+
 impl<M: ManagedTypeApi> TypeAbi for EgldOrEsdtTokenIdentifier<M> {
     fn type_name() -> TypeName {
-        "TokenIdentifier".into()
+        "EgldOrEsdtTokenIdentifier".into()
     }
 }
 

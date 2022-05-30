@@ -42,7 +42,7 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
             OptionalValue::Some(data) => data,
             OptionalValue::None => ManagedBuffer::new(),
         };
-        self.send().direct(to, &token_id, 0, amount, data);
+        self.send().direct_esdt(to, &token_id, 0, amount, data);
     }
 
     #[payable("*")]
@@ -57,7 +57,8 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
         let fees = &payment * &percentage_fees / PERCENTAGE_TOTAL;
         let amount_to_send = payment - fees;
 
-        self.send().direct(&to, &token_id, 0, &amount_to_send, &[]);
+        self.send()
+            .direct_esdt(&to, &token_id, 0, &amount_to_send, &[]);
     }
 
     #[endpoint]
@@ -74,9 +75,9 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
             OptionalValue::None => ManagedBuffer::new(),
         };
         self.send()
-            .direct(to, &token_id, 0, amount_first_time, data.clone());
+            .direct_esdt(to, &token_id, 0, amount_first_time, data.clone());
         self.send()
-            .direct(to, &token_id, 0, amount_second_time, data);
+            .direct_esdt(to, &token_id, 0, amount_second_time, data);
     }
 
     #[endpoint]

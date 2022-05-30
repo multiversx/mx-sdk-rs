@@ -174,7 +174,7 @@ where
 
     fn send_payment(&self, to: &ManagedAddress<SA>, payment: &EsdtTokenPayment<SA>) {
         let send_wrapper = SendWrapper::<SA>::new();
-        send_wrapper.direct(to, &payment.token_identifier, 0, &payment.amount, &[]);
+        send_wrapper.direct_esdt(to, &payment.token_identifier, 0, &payment.amount, &[]);
     }
 }
 

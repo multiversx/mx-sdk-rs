@@ -63,8 +63,13 @@ pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
     fn recieve_egld_half(&self) {
         let caller = self.blockchain().get_caller();
         let payment_amount = self.call_value().egld_value() / 2u32;
-        self.send()
-            .direct(&caller, &TokenIdentifier::egld(), 0, &payment_amount, &[]);
+        self.send().direct(
+            &caller,
+            &EgldOrEsdtTokenIdentifier::egld(),
+            0,
+            &payment_amount,
+            &[],
+        );
     }
 
     #[payable("*")]
@@ -89,7 +94,7 @@ pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
         let token_id = self.call_value().token();
         let amount = self.call_value().esdt_value() / 2u32;
 
-        self.send().direct(&caller, &token_id, 0, &amount, &[]);
+        self.send().direct_esdt(&caller, &token_id, 0, &amount, &[]);
     }
 
     #[payable("*")]
@@ -107,7 +112,8 @@ pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
         nft_nonce: u64,
         amount: BigUint,
     ) {
-        self.send().direct(&to, &token_id, nft_nonce, &amount, &[]);
+        self.send()
+            .direct_esdt(&to, &token_id, nft_nonce, &amount, &[]);
     }
 
     #[endpoint]

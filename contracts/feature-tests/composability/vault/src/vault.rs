@@ -66,7 +66,7 @@ pub trait Vault {
     #[payable("*")]
     #[endpoint]
     fn accept_funds_single_esdt_transfer(&self) {
-        let _ = self.call_value().payment();
+        let _ = self.call_value().single_esdt();
     }
 
     #[payable("*")]

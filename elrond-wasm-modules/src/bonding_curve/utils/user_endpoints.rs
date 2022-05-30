@@ -39,7 +39,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
         self.nonce_amount(&offered_token, nonce)
             .update(|val| *val += sell_amount);
 
-        self.send().direct(
+        self.send().direct_esdt(
             &caller,
             &self.bonding_curve(&offered_token).get().payment_token,
             0u64,
@@ -88,7 +88,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
 
         match requested_nonce {
             OptionalValue::Some(nonce) => {
-                self.send().direct(
+                self.send().direct_esdt(
                     &caller,
                     &requested_token,
                     nonce,
@@ -109,7 +109,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
             },
         };
 
-        self.send().direct(
+        self.send().direct_esdt(
             &caller,
             &offered_token,
             0u64,
@@ -146,7 +146,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
                 total_amount = BigUint::zero();
             }
             self.send()
-                .direct(caller, &token, nonce, &amount_to_send, b"buying");
+                .direct_esdt(caller, &token, nonce, &amount_to_send, b"buying");
             if total_amount == BigUint::zero() {
                 break;
             }
