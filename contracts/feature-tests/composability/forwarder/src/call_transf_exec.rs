@@ -19,7 +19,7 @@ pub trait ForwarderTransferExecuteModule {
         self.vault_proxy()
             .contract(to)
             .accept_funds()
-            .add_token_transfer(token, token_nonce, payment)
+            .add_esdt_token_transfer(token, token_nonce, payment)
             .transfer_execute();
     }
 
@@ -38,7 +38,7 @@ pub trait ForwarderTransferExecuteModule {
         self.vault_proxy()
             .contract(to)
             .accept_funds()
-            .add_token_transfer(token_id, 0, amount_to_send)
+            .add_esdt_token_transfer(token_id, 0, amount_to_send)
             .transfer_execute();
     }
 
@@ -57,14 +57,14 @@ pub trait ForwarderTransferExecuteModule {
         self.vault_proxy()
             .contract(to.clone())
             .accept_funds()
-            .add_token_transfer(token.clone(), token_nonce, half_payment.clone())
+            .add_esdt_token_transfer(token.clone(), token_nonce, half_payment.clone())
             .with_gas_limit(half_gas)
             .transfer_execute();
 
         self.vault_proxy()
             .contract(to)
             .accept_funds()
-            .add_token_transfer(token, token_nonce, half_payment)
+            .add_esdt_token_transfer(token, token_nonce, half_payment)
             .with_gas_limit(half_gas)
             .transfer_execute();
     }
@@ -85,7 +85,7 @@ pub trait ForwarderTransferExecuteModule {
         self.vault_proxy()
             .contract(to)
             .accept_funds()
-            .add_token_transfer(token.clone(), token_nonce, payment)
+            .add_esdt_token_transfer(token.clone(), token_nonce, payment)
             .transfer_execute();
 
         let gas_left_after = self.blockchain().get_gas_left();

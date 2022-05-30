@@ -68,7 +68,7 @@ pub trait ForwarderSyncCallModule {
             .vault_proxy()
             .contract(to)
             .accept_funds_echo_payment()
-            .add_token_transfer(token, token_nonce, payment)
+            .add_esdt_token_transfer(token, token_nonce, payment)
             .with_gas_limit(half_gas)
             .execute_on_dest_context();
         let (egld_value, esdt_transfers_multi) = result.into_tuple();
@@ -92,7 +92,7 @@ pub trait ForwarderSyncCallModule {
             .vault_proxy()
             .contract(to)
             .accept_funds()
-            .add_token_transfer(token_id, 0, amount_to_send)
+            .add_esdt_token_transfer(token_id, 0, amount_to_send)
             .execute_on_dest_context();
     }
 
@@ -116,7 +116,7 @@ pub trait ForwarderSyncCallModule {
             .vault_proxy()
             .contract(to.clone())
             .accept_funds()
-            .add_token_transfer(token, token_nonce, payment)
+            .add_esdt_token_transfer(token, token_nonce, payment)
             .execute_on_dest_context();
 
         self.vault_proxy()

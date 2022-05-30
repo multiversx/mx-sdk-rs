@@ -15,7 +15,7 @@ pub struct EsdtTokenPayment<M: ManagedTypeApi> {
 impl<M: ManagedTypeApi> EsdtTokenPayment<M> {
     pub fn no_payment() -> Self {
         EsdtTokenPayment {
-            token_identifier: TokenIdentifier::egld(),
+            token_identifier: TokenIdentifier::empty(),
             token_nonce: 0,
             amount: BigUint::zero(),
         }
@@ -30,7 +30,7 @@ impl<M: ManagedTypeApi> EsdtTokenPayment<M> {
     }
 
     pub fn token_type(&self) -> EsdtTokenType {
-        if self.amount != 0 && self.token_identifier.is_esdt() {
+        if self.amount != 0 {
             if self.token_nonce == 0 {
                 EsdtTokenType::Fungible
             } else if self.amount == 1u64 {

@@ -5,7 +5,7 @@ use crate::{
     },
     contract_base::CallValueWrapper,
     err_msg,
-    types::{BigUint, EsdtTokenPayment, ManagedType, ManagedVec, TokenIdentifier},
+    types::{BigUint, EgldOrEsdtTokenIdentifier, EsdtTokenPayment, ManagedType, ManagedVec},
 };
 
 /// Called initially in the generated code whenever no payable annotation is provided.
@@ -69,7 +69,7 @@ where
 }
 
 /// Initializes an argument annotated with `#[payment_token]`.
-pub fn arg_payment_token<A>() -> TokenIdentifier<A>
+pub fn arg_payment_token<A>() -> EgldOrEsdtTokenIdentifier<A>
 where
     A: CallValueApi + ManagedTypeApi,
 {

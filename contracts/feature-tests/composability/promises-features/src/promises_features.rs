@@ -29,7 +29,7 @@ pub trait PromisesFeatures {
     ) {
         self.send()
             .contract_call::<()>(to, endpoint_name)
-            .add_token_transfer(token, 0, payment)
+            .add_esdt_token_transfer(token, 0, payment)
             .with_arguments_raw(args.to_arg_buffer())
             .with_gas_limit(gas_limit)
             .with_extra_gas_for_callback(extra_gas_for_callback)

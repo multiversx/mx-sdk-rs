@@ -94,18 +94,20 @@ where
     }
 
     /// Returns the call value token identifier of the current call.
-    /// The identifier is wrapped in a TokenIdentifier object, to hide underlying logic.
+    /// The identifier is wrapped in an EgldOrEsdtTokenIdentifier object, to hide underlying logic.
     ///
     /// A note on implementation: even though the underlying api returns an empty name for EGLD,
-    /// but the EGLD TokenIdentifier is serialized as `EGLD`.
+    /// but the EGLD token ID is serialized as `EGLD`.
     /// Calling this when receiving a multi-token transfer will signal an error.
-    pub fn token(&self) -> TokenIdentifier<A> {
+    pub fn token(&self) -> EgldOrEsdtTokenIdentifier<A> {
         let call_value_api = A::call_value_api_impl();
         let error_api = A::error_api_impl();
 
         match call_value_api.esdt_num_transfers() {
-            0 => TokenIdentifier::egld(),
-            1 => TokenIdentifier::from_raw_handle(call_value_api.token()),
+            0 => EgldOrEsdtTokenIdentifier::egld(),
+            1 => EgldOrEsdtTokenIdentifier::esdt(TokenIdentifier::from_raw_handle(
+                call_value_api.token(),
+            )),
             _ => error_api.signal_error(err_msg::TOO_MANY_ESDT_TRANSFERS.as_bytes()),
         }
     }
@@ -132,31 +134,36 @@ where
         }
     }
 
-    /// Returns both the call value (either EGLD or ESDT) and the token identifier.
-    /// Especially used in the `#[payable("*")] auto-generated snippets.
-    /// TODO: replace with multi transfer handling everywhere
-    pub fn payment_token_pair(&self) -> (BigUint<A>, TokenIdentifier<A>) {
+    /// Returns the token ID and the amount for fungible ESDT transfers
+    /// Will signal an error for EGLD or non-fungible token payments
+    pub fn single_fungible_esdt_payment(&self) -> (TokenIdentifier<A>, BigUint<A>) {
         let call_value_api = A::call_value_api_impl();
         if call_value_api.esdt_num_transfers() == 0 {
-            (self.egld_value(), TokenIdentifier::egld())
-        } else {
-            (self.esdt_value(), self.token())
+            A::error_api_impl().signal_error(err_msg::NO_PAYMENT_ERR_MSG);
         }
+        if self.esdt_token_nonce() != 0 {
+            A::error_api_impl().signal_error(err_msg::FUNGIBLE_TOKEN_EXPECTED_ERR_MSG);
+        }
+
+        (self.token().unwrap_esdt(), self.esdt_value())
     }
 
-    pub fn payment(&self) -> EsdtTokenPayment<A> {
+    pub fn payment(&self) -> EgldOrEsdtTokenPayment<A> {
         let api = A::call_value_api_impl();
         if api.esdt_num_transfers() == 0 {
-            EsdtTokenPayment::new(TokenIdentifier::egld(), 0, self.egld_value())
+            EgldOrEsdtTokenPayment::new(EgldOrEsdtTokenIdentifier::egld(), 0, self.egld_value())
         } else {
-            EsdtTokenPayment::new(self.token(), self.esdt_token_nonce(), self.esdt_value())
+            EgldOrEsdtTokenPayment::new(self.token(), self.esdt_token_nonce(), self.esdt_value())
         }
     }
 
-    pub fn payment_as_tuple(&self) -> (TokenIdentifier<A>, u64, BigUint<A>) {
-        let (amount, token) = self.payment_token_pair();
-        let nonce = self.esdt_token_nonce();
+    pub fn payment_as_tuple(&self) -> (EgldOrEsdtTokenIdentifier<A>, u64, BigUint<A>) {
+        let payment = self.payment();
 
-        (token, nonce, amount)
+        (
+            payment.token_identifier,
+            payment.token_nonce,
+            payment.amount,
+        )
     }
 }
