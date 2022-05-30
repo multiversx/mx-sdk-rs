@@ -7,7 +7,7 @@ const PERCENTAGE_TOTAL: u8 = 100;
 
 #[derive(TopEncode, TopDecode, TypeAbi)]
 pub struct Auction<M: ManagedTypeApi> {
-    pub token_identifier: TokenIdentifier<M>,
+    pub token_identifier: EgldOrEsdtTokenIdentifier<M>,
     pub min_bid: BigUint<M>,
     pub max_bid: BigUint<M>,
     pub deadline: u64,
@@ -18,7 +18,7 @@ pub struct Auction<M: ManagedTypeApi> {
 
 #[derive(TopEncode, TopDecode, TypeAbi)]
 pub struct AuctionArgument<M: ManagedTypeApi> {
-    pub token_identifier: TokenIdentifier<M>,
+    pub token_identifier: EgldOrEsdtTokenIdentifier<M>,
     pub min_bid: BigUint<M>,
     pub max_bid: BigUint<M>,
     pub deadline: u64,
@@ -108,7 +108,7 @@ pub trait Erc1155Marketplace {
         let claimable_funds_mapper = self.get_claimable_funds_mapper();
         for (token_identifier, amount) in claimable_funds_mapper.iter() {
             self.send()
-                .direct_esdt(&caller, &token_identifier, 0, &amount, data);
+                .direct(&caller, &token_identifier, 0, &amount, data);
 
             self.clear_claimable_funds(&token_identifier);
         }
@@ -141,13 +141,8 @@ pub trait Erc1155Marketplace {
 
     #[payable("*")]
     #[endpoint]
-    fn bid(
-        &self,
-        type_id: BigUint,
-        nft_id: BigUint,
-        #[payment_token] payment_token: TokenIdentifier,
-        #[payment] payment: BigUint,
-    ) {
+    fn bid(&self, type_id: BigUint, nft_id: BigUint) {
+        let (payment_token, payment) = self.call_value().single_fungible_esdt_or_egld_payment();
         require!(
             self.is_up_for_auction(&type_id, &nft_id),
             "Token is not up for auction"
@@ -185,7 +180,7 @@ pub trait Erc1155Marketplace {
         // refund losing bid
         if !auction.current_winner.is_zero() {
             let data = self.data_or_empty_if_sc(&caller, b"bid refund");
-            self.send().direct_esdt(
+            self.send().direct(
                 &auction.current_winner,
                 &auction.token_identifier,
                 0,
@@ -226,7 +221,7 @@ pub trait Erc1155Marketplace {
 
             // send part of the bid to the original owner
             let data = self.data_or_empty_if_sc(&auction.original_owner, b"sold token");
-            self.send().direct_esdt(
+            self.send().direct(
                 &auction.original_owner,
                 &auction.token_identifier,
                 0,
@@ -289,7 +284,7 @@ pub trait Erc1155Marketplace {
         type_id: &BigUint,
         nft_id: &BigUint,
         original_owner: &ManagedAddress,
-        token: &TokenIdentifier,
+        token: &EgldOrEsdtTokenIdentifier,
         min_bid: &BigUint,
         max_bid: &BigUint,
         deadline: u64,
@@ -332,14 +327,14 @@ pub trait Erc1155Marketplace {
         total_amount * cut_percentage as u32 / PERCENTAGE_TOTAL as u32
     }
 
-    fn add_claimable_funds(&self, token_identifier: &TokenIdentifier, amount: &BigUint) {
+    fn add_claimable_funds(&self, token_identifier: &EgldOrEsdtTokenIdentifier, amount: &BigUint) {
         let mut mapper = self.get_claimable_funds_mapper();
         let mut total = mapper.get(token_identifier).unwrap_or_default();
         total += amount;
         mapper.insert(token_identifier.clone(), total);
     }
 
-    fn clear_claimable_funds(&self, token_identifier: &TokenIdentifier) {
+    fn clear_claimable_funds(&self, token_identifier: &EgldOrEsdtTokenIdentifier) {
         let mut mapper = self.get_claimable_funds_mapper();
         mapper.insert(token_identifier.clone(), BigUint::zero());
     }
@@ -373,7 +368,7 @@ pub trait Erc1155Marketplace {
     // claimable funds - only after an auction ended and the fixed percentage has been reserved by the SC
 
     #[storage_mapper("claimableFunds")]
-    fn get_claimable_funds_mapper(&self) -> MapMapper<TokenIdentifier, BigUint>;
+    fn get_claimable_funds_mapper(&self) -> MapMapper<EgldOrEsdtTokenIdentifier, BigUint>;
 
     // auction properties for each token
 

@@ -29,7 +29,7 @@ mod message_me_proxy {
     pub trait MessageMe {
         #[init]
         #[payable("EGLD")]
-        fn init(&self, #[payment] payment: BigUint, init_arg: i32) -> i32;
+        fn init(&self, init_arg: i32) -> i32;
 
         #[endpoint(messageMe)]
         fn message_me(&self, arg1: i64, arg2: &BigUint, arg3: Vec<u8>, arg4: &ManagedAddress);
@@ -64,7 +64,8 @@ pub trait ProxyTestFirst {
         let payment = self.call_value().egld_value();
         let (address, init_result) = self
             .message_me_proxy()
-            .init(payment, 123)
+            .init(123)
+            .with_egld_transfer(payment)
             .deploy_contract::<i32>(&code, CodeMetadata::DEFAULT);
         self.set_other_contract(&address);
         init_result + 1
@@ -78,7 +79,8 @@ pub trait ProxyTestFirst {
 
         self.message_me_proxy()
             .contract(other_contract)
-            .init(payment, 456)
+            .init(456)
+            .with_egld_transfer(payment)
             .upgrade_contract(&code, CodeMetadata::DEFAULT);
     }
 

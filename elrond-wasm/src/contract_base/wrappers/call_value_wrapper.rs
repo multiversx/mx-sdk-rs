@@ -160,17 +160,8 @@ where
         }
     }
 
-    pub fn payment(&self) -> EgldOrEsdtTokenPayment<A> {
-        let api = A::call_value_api_impl();
-        if api.esdt_num_transfers() == 0 {
-            EgldOrEsdtTokenPayment::new(EgldOrEsdtTokenIdentifier::egld(), 0, self.egld_value())
-        } else {
-            EgldOrEsdtTokenPayment::new(self.token(), self.esdt_token_nonce(), self.esdt_value())
-        }
-    }
-
     pub fn payment_as_tuple(&self) -> (EgldOrEsdtTokenIdentifier<A>, u64, BigUint<A>) {
-        let payment = self.payment();
+        let payment = self.egld_or_single_esdt();
 
         (
             payment.token_identifier,

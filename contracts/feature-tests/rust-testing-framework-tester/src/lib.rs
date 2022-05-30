@@ -78,7 +78,7 @@ pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
         let token_id = self.call_value().token();
         let amount = self.call_value().esdt_value();
 
-        (token_id, amount)
+        (token_id.unwrap_esdt(), amount)
     }
 
     #[payable("*")]
@@ -94,7 +94,8 @@ pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
         let token_id = self.call_value().token();
         let amount = self.call_value().esdt_value() / 2u32;
 
-        self.send().direct_esdt(&caller, &token_id, 0, &amount, &[]);
+        self.send()
+            .direct_esdt(&caller, &token_id.unwrap_esdt(), 0, &amount, &[]);
     }
 
     #[payable("*")]
