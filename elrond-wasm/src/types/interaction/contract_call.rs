@@ -460,7 +460,7 @@ where
 
         let _ = SendRawWrapper::<SA>::new().direct_egld_execute(
             &self.to,
-            &BigUint::zero(),
+            &self.egld_payment,
             gas_limit,
             &self.endpoint_name,
             &self.arg_buffer,

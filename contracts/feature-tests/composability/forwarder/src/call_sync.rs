@@ -101,7 +101,7 @@ pub trait ForwarderSyncCallModule {
             .vault_proxy()
             .contract(to.clone())
             .accept_funds()
-            .add_esdt_token_transfer(token.unwrap_esdt(), token_nonce, payment)
+            .add_token_transfer(token, token_nonce, payment)
             .execute_on_dest_context();
 
         self.vault_proxy()
