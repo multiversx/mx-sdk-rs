@@ -26,7 +26,7 @@ impl CallValueApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn token(&self) -> Handle {
+    fn token(&self) -> Option<Handle> {
         unreachable!()
     }
 

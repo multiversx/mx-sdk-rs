@@ -105,9 +105,7 @@ where
 
         match call_value_api.esdt_num_transfers() {
             0 => EgldOrEsdtTokenIdentifier::egld(),
-            1 => EgldOrEsdtTokenIdentifier::esdt(TokenIdentifier::from_raw_handle(
-                call_value_api.token(),
-            )),
+            1 => EgldOrEsdtTokenIdentifier::from_opt_raw_handle(call_value_api.token()),
             _ => error_api.signal_error(err_msg::TOO_MANY_ESDT_TRANSFERS.as_bytes()),
         }
     }
