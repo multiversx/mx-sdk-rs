@@ -148,6 +148,18 @@ where
         (self.token().unwrap_esdt(), self.esdt_value())
     }
 
+    pub fn single_fungible_esdt_or_egld_payment(
+        &self,
+    ) -> (EgldOrEsdtTokenIdentifier<A>, BigUint<A>) {
+        let egld_value = self.egld_value();
+        if egld_value > 0 {
+            (EgldOrEsdtTokenIdentifier::egld(), egld_value)
+        } else {
+            let (esdt_token, amount) = self.single_fungible_esdt_payment();
+            (EgldOrEsdtTokenIdentifier::esdt(esdt_token), amount)
+        }
+    }
+
     pub fn payment(&self) -> EgldOrEsdtTokenPayment<A> {
         let api = A::call_value_api_impl();
         if api.esdt_num_transfers() == 0 {

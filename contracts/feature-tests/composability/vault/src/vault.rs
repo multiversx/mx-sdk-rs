@@ -104,7 +104,7 @@ pub trait Vault {
     #[endpoint]
     fn retrieve_funds(
         &self,
-        token: TokenIdentifier,
+        token: EgldOrEsdtTokenIdentifier,
         nonce: u64,
         amount: BigUint,
         return_message: OptionalValue<ManagedBuffer>,
@@ -120,8 +120,13 @@ pub trait Vault {
         if token.is_egld() {
             self.send().direct_egld(&caller, &amount, data);
         } else {
-            self.send()
-                .transfer_esdt_via_async_call(&caller, &token, nonce, &amount, data);
+            self.send().transfer_esdt_via_async_call(
+                &caller,
+                &token.unwrap_esdt(),
+                nonce,
+                &amount,
+                data,
+            );
         }
     }
 
@@ -203,7 +208,7 @@ pub trait Vault {
     #[event("retrieve_funds")]
     fn retrieve_funds_event(
         &self,
-        #[indexed] token: &TokenIdentifier,
+        #[indexed] token: &EgldOrEsdtTokenIdentifier,
         #[indexed] nonce: u64,
         #[indexed] amount: &BigUint,
     );

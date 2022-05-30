@@ -72,7 +72,7 @@ pub trait ValidationModule: common::CommonModule {
     fn require_valid_buy_payment(&self) -> Payment<Self::Api> {
         self.require_fungible_input();
         let second_token_id = self.second_token_id().get();
-        let (amount, token_id) = self.call_value().payment_token_pair();
+        let (token_id, amount) = self.call_value().single_fungible_esdt_payment();
         require!(
             token_id == second_token_id,
             "Token in and second token id should be the same"
@@ -85,7 +85,7 @@ pub trait ValidationModule: common::CommonModule {
     fn require_valid_sell_payment(&self) -> Payment<Self::Api> {
         self.require_fungible_input();
         let first_token_id = self.first_token_id().get();
-        let (amount, token_id) = self.call_value().payment_token_pair();
+        let (token_id, amount) = self.call_value().single_fungible_esdt_payment();
         require!(
             token_id == first_token_id,
             "Token in and first token id should be the same"

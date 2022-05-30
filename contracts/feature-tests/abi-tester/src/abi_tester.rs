@@ -153,27 +153,18 @@ pub trait AbiTester {
 
     #[endpoint]
     #[payable("EGLD")]
-    fn payable_egld(&self, #[payment] _payment: BigUint, #[payment_token] _token: TokenIdentifier) {
-    }
+    fn payable_egld(&self) {}
 
     #[endpoint]
     #[payable("TOKEN-FOR-ABI")]
-    fn payable_some_token(
-        &self,
-        #[payment] payment: BigUint,
-        #[payment_token] token: TokenIdentifier,
-    ) {
+    fn payable_some_token(&self) {
+        let (token, payment) = self.call_value().single_fungible_esdt_payment();
         self.payable_event(&token, &payment);
     }
 
     #[endpoint]
     #[payable("*")]
-    fn payable_any_token(
-        &self,
-        #[payment] _payment: BigUint,
-        #[payment_token] _token: TokenIdentifier,
-    ) {
-    }
+    fn payable_any_token(&self) {}
 
     #[external_view]
     fn external_view(&self) {}
