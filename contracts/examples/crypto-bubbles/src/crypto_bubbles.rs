@@ -66,6 +66,7 @@ pub trait CryptoBubbles {
     fn join_game(&self, game_index: BigUint) {
         let bet = self.call_value().egld_value();
         let player = self.blockchain().get_caller();
+        self.top_up();
         self.add_player_to_game_state_change(&game_index, &player, &bet)
     }
 
