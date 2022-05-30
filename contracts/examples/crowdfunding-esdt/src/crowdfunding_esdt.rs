@@ -13,7 +13,7 @@ pub enum Status {
 #[elrond_wasm::contract]
 pub trait Crowdfunding {
     #[init]
-    fn init(&self, target: BigUint, deadline: u64, token_identifier: TokenIdentifier) {
+    fn init(&self, target: BigUint, deadline: u64, token_identifier: EgldOrEsdtTokenIdentifier) {
         require!(target > 0, "Target must be more than 0");
         self.target().set(target);
 
@@ -33,7 +33,7 @@ pub trait Crowdfunding {
     #[endpoint]
     #[payable("*")]
     fn fund(&self) {
-        let (payment, token) = self.call_value().payment_token_pair();
+        let (token, _, payment) = self.call_value().egld_or_single_esdt().into_tuple();
 
         require!(
             self.status() == Status::FundingPeriod,
@@ -60,8 +60,7 @@ pub trait Crowdfunding {
     fn get_current_funds(&self) -> BigUint {
         let token = self.cf_token_identifier().get();
 
-        self.blockchain()
-            .get_sc_balance(&EgldOrEsdtTokenIdentifier::esdt(token), 0)
+        self.blockchain().get_sc_balance(&token, 0)
     }
 
     #[endpoint]
@@ -118,5 +117,5 @@ pub trait Crowdfunding {
 
     #[view(getCrowdfundingTokenIdentifier)]
     #[storage_mapper("tokenIdentifier")]
-    fn cf_token_identifier(&self) -> SingleValueMapper<TokenIdentifier>;
+    fn cf_token_identifier(&self) -> SingleValueMapper<EgldOrEsdtTokenIdentifier>;
 }

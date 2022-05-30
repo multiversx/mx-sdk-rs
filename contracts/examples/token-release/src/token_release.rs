@@ -313,7 +313,7 @@ pub trait TokenRelease {
         amount: &BigUint,
     ) {
         self.send()
-            .direct(address, token_identifier, 0, amount, &[]);
+            .direct_esdt(address, token_identifier, 0, amount, &[]);
     }
 
     fn mint_all_tokens(&self, token_identifier: &TokenIdentifier, amount: &BigUint) {

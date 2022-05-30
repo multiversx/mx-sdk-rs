@@ -291,7 +291,7 @@ pub trait Lottery {
                 &BigUint::from(info.prize_distribution.get(i)),
             );
 
-            self.send().direct(
+            self.send().direct_esdt(
                 &winner_address,
                 &info.token_identifier,
                 0,
@@ -303,7 +303,7 @@ pub trait Lottery {
 
         // send leftover to first place
         let first_place_winner = ticket_holders_mapper.get(winning_tickets[0]);
-        self.send().direct(
+        self.send().direct_esdt(
             &first_place_winner,
             &info.token_identifier,
             0,

@@ -68,6 +68,11 @@ where
             })
     }
 
+    pub fn single_esdt(&self) -> EsdtTokenPayment<A> {
+        let [payments] = self.multi_esdt();
+        payments
+    }
+
     /// Retrieves the ESDT call value from the VM.
     /// Will return 0 in case of an EGLD transfer (cannot have both EGLD and ESDT transfer simultaneously).
     pub fn esdt_value(&self) -> BigUint<A> {

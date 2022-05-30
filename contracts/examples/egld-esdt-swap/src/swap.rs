@@ -113,7 +113,7 @@ pub trait EgldEsdtSwap {
 
         let caller = self.blockchain().get_caller();
         self.send()
-            .direct(&caller, &wrapped_egld_token_id, 0, &payment_amount, &[]);
+            .direct_esdt(&caller, &wrapped_egld_token_id, 0, &payment_amount, &[]);
     }
 
     #[payable("*")]

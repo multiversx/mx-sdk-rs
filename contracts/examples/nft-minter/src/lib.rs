@@ -29,11 +29,11 @@ pub trait NftMinter: nft_module::NftModule {
         opt_token_used_as_payment_nonce: OptionalValue<u64>,
     ) {
         let token_used_as_payment = match opt_token_used_as_payment {
-            OptionalValue::Some(token) => token,
-            OptionalValue::None => TokenIdentifier::egld(),
+            OptionalValue::Some(token) => EgldOrEsdtTokenIdentifier::esdt(token),
+            OptionalValue::None => EgldOrEsdtTokenIdentifier::egld(),
         };
         require!(
-            token_used_as_payment.is_egld() || token_used_as_payment.is_valid_esdt_identifier(),
+            token_used_as_payment.is_valid_esdt_identifier(),
             "Invalid token_used_as_payment arg, not a valid token ID"
         );
 

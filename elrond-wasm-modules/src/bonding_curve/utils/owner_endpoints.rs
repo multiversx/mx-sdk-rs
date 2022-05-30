@@ -120,7 +120,7 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
         for token in self.owned_tokens(&caller).iter() {
             let nonces = self.token_details(&token).get().token_nonces;
             for nonce in &nonces {
-                self.send().direct(
+                self.send().direct_esdt(
                     &caller,
                     &token,
                     nonce,

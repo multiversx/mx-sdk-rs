@@ -82,7 +82,7 @@ pub trait StakingModule {
 
         let staking_token = self.staking_token().get();
         self.send()
-            .direct(&caller, &staking_token, 0, &unstake_amount, &[]);
+            .direct_esdt(&caller, &staking_token, 0, &unstake_amount, &[]);
     }
 
     #[endpoint(voteSlashMember)]

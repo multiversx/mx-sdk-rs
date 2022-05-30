@@ -3,7 +3,10 @@ use crate::{
     types::{BigUint, EgldOrEsdtTokenIdentifier},
 };
 
-use elrond_codec::elrond_codec_derive::{NestedDecode, NestedEncode, TopDecode, TopEncode};
+use elrond_codec::{
+    elrond_codec_derive::{NestedDecode, NestedEncode, TopDecode, TopEncode},
+    CodecFrom, CodecFromSelf,
+};
 
 use crate as elrond_wasm; // needed by the TypeAbi generated code
 use crate::derive::TypeAbi;
@@ -38,6 +41,10 @@ impl<M: ManagedTypeApi> EgldOrEsdtTokenPayment<M> {
         }
     }
 
+    pub fn into_tuple(self) -> (EgldOrEsdtTokenIdentifier<M>, u64, BigUint<M>) {
+        (self.token_identifier, self.token_nonce, self.amount)
+    }
+
     // #[inline]
     // pub fn into_multi_value(self) -> EsdtTokenPaymentMultiValue<M> {
     //     self.into()
@@ -53,3 +60,7 @@ impl<M: ManagedTypeApi> From<EsdtTokenPayment<M>> for EgldOrEsdtTokenPayment<M> 
         }
     }
 }
+
+impl<M> CodecFromSelf for EgldOrEsdtTokenPayment<M> where M: ManagedTypeApi {}
+
+impl<M> CodecFrom<&[u8]> for EgldOrEsdtTokenPayment<M> where M: ManagedTypeApi {}

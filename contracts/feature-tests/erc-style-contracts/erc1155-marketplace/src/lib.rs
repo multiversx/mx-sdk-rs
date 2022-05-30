@@ -108,7 +108,7 @@ pub trait Erc1155Marketplace {
         let claimable_funds_mapper = self.get_claimable_funds_mapper();
         for (token_identifier, amount) in claimable_funds_mapper.iter() {
             self.send()
-                .direct(&caller, &token_identifier, 0, &amount, data);
+                .direct_esdt(&caller, &token_identifier, 0, &amount, data);
 
             self.clear_claimable_funds(&token_identifier);
         }
@@ -185,7 +185,7 @@ pub trait Erc1155Marketplace {
         // refund losing bid
         if !auction.current_winner.is_zero() {
             let data = self.data_or_empty_if_sc(&caller, b"bid refund");
-            self.send().direct(
+            self.send().direct_esdt(
                 &auction.current_winner,
                 &auction.token_identifier,
                 0,
@@ -226,7 +226,7 @@ pub trait Erc1155Marketplace {
 
             // send part of the bid to the original owner
             let data = self.data_or_empty_if_sc(&auction.original_owner, b"sold token");
-            self.send().direct(
+            self.send().direct_esdt(
                 &auction.original_owner,
                 &auction.token_identifier,
                 0,
