@@ -135,27 +135,23 @@ where
     /// Returns the token ID and the amount for fungible ESDT transfers
     /// Will signal an error for EGLD or non-fungible token payments
     pub fn single_fungible_esdt_payment(&self) -> (TokenIdentifier<A>, BigUint<A>) {
-        let call_value_api = A::call_value_api_impl();
-        if call_value_api.esdt_num_transfers() == 0 {
-            A::error_api_impl().signal_error(err_msg::NO_PAYMENT_ERR_MSG);
-        }
-        if self.esdt_token_nonce() != 0 {
+        let payment = self.egld_or_single_esdt();
+        if payment.token_identifier.is_egld() || payment.token_nonce != 0 {
             A::error_api_impl().signal_error(err_msg::FUNGIBLE_TOKEN_EXPECTED_ERR_MSG);
         }
 
-        (self.token().unwrap_esdt(), self.esdt_value())
+        (payment.token_identifier.unwrap_esdt(), payment.amount)
     }
 
     pub fn single_fungible_esdt_or_egld_payment(
         &self,
     ) -> (EgldOrEsdtTokenIdentifier<A>, BigUint<A>) {
-        let egld_value = self.egld_value();
-        if egld_value > 0 {
-            (EgldOrEsdtTokenIdentifier::egld(), egld_value)
-        } else {
-            let (esdt_token, amount) = self.single_fungible_esdt_payment();
-            (EgldOrEsdtTokenIdentifier::esdt(esdt_token), amount)
+        let payment = self.egld_or_single_esdt();
+        if payment.token_nonce != 0 {
+            A::error_api_impl().signal_error(err_msg::FUNGIBLE_TOKEN_EXPECTED_ERR_MSG);
         }
+
+        (payment.token_identifier, payment.amount)
     }
 
     pub fn payment_as_tuple(&self) -> (EgldOrEsdtTokenIdentifier<A>, u64, BigUint<A>) {
