@@ -70,40 +70,29 @@ pub trait ValidationModule: common::CommonModule {
     }
 
     fn require_valid_buy_payment(&self) -> Payment<Self::Api> {
-        self.require_fungible_input();
+        let (token_id, amount) = self.call_value().single_fungible_esdt();
         let second_token_id = self.second_token_id().get();
-        let (token_id, amount) = self.call_value().single_fungible_esdt_payment();
         require!(
             token_id == second_token_id,
             "Token in and second token id should be the same"
         );
-        require!(amount != 0, "Input amount should not be zero");
 
         Payment { token_id, amount }
     }
 
     fn require_valid_sell_payment(&self) -> Payment<Self::Api> {
-        self.require_fungible_input();
+        let (token_id, amount) = self.call_value().single_fungible_esdt();
         let first_token_id = self.first_token_id().get();
-        let (token_id, amount) = self.call_value().single_fungible_esdt_payment();
         require!(
             token_id == first_token_id,
             "Token in and first token id should be the same"
         );
-        require!(amount != 0, "Input amount should not be zero");
 
         Payment { token_id, amount }
     }
 
     fn require_valid_match_input_order_ids(&self, order_ids: &ManagedVec<u64>) {
         require!(order_ids.len() >= 2, "Should be at least two order ids");
-    }
-
-    fn require_fungible_input(&self) {
-        require!(
-            self.call_value().esdt_token_nonce() == 0,
-            "Nonce is not zero"
-        );
     }
 
     fn require_not_max_size(&self, address_order_ids: &MultiValueManagedVec<u64>) {

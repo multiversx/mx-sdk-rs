@@ -142,7 +142,7 @@ pub trait Erc1155Marketplace {
     #[payable("*")]
     #[endpoint]
     fn bid(&self, type_id: BigUint, nft_id: BigUint) {
-        let (payment_token, payment) = self.call_value().single_fungible_esdt_or_egld_payment();
+        let (payment_token, payment) = self.call_value().egld_or_single_fungible_esdt();
         require!(
             self.is_up_for_auction(&type_id, &nft_id),
             "Token is not up for auction"

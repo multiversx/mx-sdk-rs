@@ -7,8 +7,8 @@ use crate::{
     },
     err_msg,
     types::{
-        BigUint, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment, EsdtTokenPayment,
-        EsdtTokenType, ManagedType, ManagedVec, TokenIdentifier,
+        BigUint, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment, EsdtTokenPayment, ManagedType,
+        ManagedVec, TokenIdentifier,
     },
 };
 
@@ -68,9 +68,27 @@ where
             })
     }
 
+    /// Expects precisely one ESDT token transfer, fungible or not.
+    ///
+    /// Will return the received ESDT payment.
+    ///
+    /// The amount cannot be 0, since that would not qualify as an ESDT transfer.
     pub fn single_esdt(&self) -> EsdtTokenPayment<A> {
         let [payments] = self.multi_esdt();
         payments
+    }
+
+    /// Expects precisely one fungible ESDT token transfer.
+    ///
+    /// Returns the token ID and the amount for fungible ESDT transfers.
+    ///
+    /// The amount cannot be 0, since that would not qualify as an ESDT transfer.
+    pub fn single_fungible_esdt(&self) -> (TokenIdentifier<A>, BigUint<A>) {
+        let payment = self.single_esdt();
+        if payment.token_nonce != 0 {
+            A::error_api_impl().signal_error(err_msg::FUNGIBLE_TOKEN_EXPECTED_ERR_MSG.as_bytes());
+        }
+        (payment.token_identifier, payment.amount)
     }
 
     /// Retrieves the ESDT call value from the VM.
@@ -80,6 +98,11 @@ where
         BigUint::from_raw_handle(const_handles::CALL_VALUE_SINGLE_ESDT)
     }
 
+    /// Accepts and returns either an EGLD payment, or a single ESDT token.
+    ///
+    /// Will halt execution if more than one ESDT transfer was received.
+    ///
+    /// In case no transfer of value happen, it will return a payment of 0 EGLD.
     pub fn egld_or_single_esdt(&self) -> EgldOrEsdtTokenPayment<A> {
         let esdt_transfers = self.all_esdt_transfers();
         match esdt_transfers.len() {
@@ -93,74 +116,20 @@ where
         }
     }
 
-    /// Returns the call value token identifier of the current call.
-    /// The identifier is wrapped in an EgldOrEsdtTokenIdentifier object, to hide underlying logic.
+    /// Accepts and returns either an EGLD payment, or a single fungible ESDT token.
     ///
-    /// A note on implementation: even though the underlying api returns an empty name for EGLD,
-    /// but the EGLD token ID is serialized as `EGLD`.
-    /// Calling this when receiving a multi-token transfer will signal an error.
-    pub fn token(&self) -> EgldOrEsdtTokenIdentifier<A> {
-        let call_value_api = A::call_value_api_impl();
-        let error_api = A::error_api_impl();
-
-        match call_value_api.esdt_num_transfers() {
-            0 => EgldOrEsdtTokenIdentifier::egld(),
-            1 => EgldOrEsdtTokenIdentifier::from_opt_raw_handle(call_value_api.token()),
-            _ => error_api.signal_error(err_msg::TOO_MANY_ESDT_TRANSFERS.as_bytes()),
-        }
-    }
-
-    /// Returns the nonce of the received ESDT token.
-    /// Will return 0 in case of EGLD or fungible ESDT transfer.
-    pub fn esdt_token_nonce(&self) -> u64 {
-        let call_value_api = A::call_value_api_impl();
-        if call_value_api.esdt_num_transfers() > 0 {
-            call_value_api.esdt_token_nonce()
-        } else {
-            0
-        }
-    }
-
-    /// Returns the ESDT token type.
-    /// Will return "Fungible" for EGLD.
-    pub fn esdt_token_type(&self) -> EsdtTokenType {
-        let call_value_api = A::call_value_api_impl();
-        if call_value_api.esdt_num_transfers() > 0 {
-            A::call_value_api_impl().esdt_token_type()
-        } else {
-            EsdtTokenType::Fungible
-        }
-    }
-
-    /// Returns the token ID and the amount for fungible ESDT transfers
-    /// Will signal an error for EGLD or non-fungible token payments
-    pub fn single_fungible_esdt_payment(&self) -> (TokenIdentifier<A>, BigUint<A>) {
-        let payment = self.egld_or_single_esdt();
-        if payment.token_identifier.is_egld() || payment.token_nonce != 0 {
-            A::error_api_impl().signal_error(err_msg::FUNGIBLE_TOKEN_EXPECTED_ERR_MSG);
-        }
-
-        (payment.token_identifier.unwrap_esdt(), payment.amount)
-    }
-
-    pub fn single_fungible_esdt_or_egld_payment(
-        &self,
-    ) -> (EgldOrEsdtTokenIdentifier<A>, BigUint<A>) {
+    /// Will halt execution if more than one ESDT transfer was received, or if the received ESDT is non- or semi-fungible.
+    ///
+    /// Works similar to `egld_or_single_esdt`,
+    /// but checks the nonce to be 0 and returns a tuple of just token identifier and amount, for convenience.
+    ///
+    /// In case no transfer of value happen, it will return a payment of 0 EGLD.
+    pub fn egld_or_single_fungible_esdt(&self) -> (EgldOrEsdtTokenIdentifier<A>, BigUint<A>) {
         let payment = self.egld_or_single_esdt();
         if payment.token_nonce != 0 {
-            A::error_api_impl().signal_error(err_msg::FUNGIBLE_TOKEN_EXPECTED_ERR_MSG);
+            A::error_api_impl().signal_error(err_msg::FUNGIBLE_TOKEN_EXPECTED_ERR_MSG.as_bytes());
         }
 
         (payment.token_identifier, payment.amount)
-    }
-
-    pub fn payment_as_tuple(&self) -> (EgldOrEsdtTokenIdentifier<A>, u64, BigUint<A>) {
-        let payment = self.egld_or_single_esdt();
-
-        (
-            payment.token_identifier,
-            payment.token_nonce,
-            payment.amount,
-        )
     }
 }

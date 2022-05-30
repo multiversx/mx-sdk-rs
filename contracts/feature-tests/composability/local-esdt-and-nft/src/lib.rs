@@ -259,8 +259,7 @@ pub trait LocalEsdtAndEsdtNft {
         caller: &ManagedAddress,
         #[call_result] result: ManagedAsyncCallResult<()>,
     ) {
-        let (token_identifier, returned_tokens) =
-            self.call_value().single_fungible_esdt_or_egld_payment();
+        let (token_identifier, returned_tokens) = self.call_value().egld_or_single_fungible_esdt();
         // callback is called with ESDTTransfer of the newly issued token, with the amount requested,
         // so we can get the token identifier and amount from the call data
         match result {
@@ -294,7 +293,7 @@ pub trait LocalEsdtAndEsdtNft {
             ManagedAsyncCallResult::Err(message) => {
                 // return issue cost to the caller
                 let (token_identifier, returned_tokens) =
-                    self.call_value().single_fungible_esdt_or_egld_payment();
+                    self.call_value().egld_or_single_fungible_esdt();
                 if token_identifier.is_egld() && returned_tokens > 0 {
                     self.send().direct_egld(caller, &returned_tokens, &[]);
                 }

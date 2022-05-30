@@ -61,11 +61,10 @@ pub trait GovernanceModule:
         description: ManagedBuffer,
         actions: MultiValueEncoded<GovernanceActionAsMultiArg<Self::Api>>,
     ) -> usize {
-        self.require_payment_token_governance_token();
+        let payment = self.require_payment_token_governance_token();
 
-        let payment_amount = self.call_value().egld_value();
         require!(
-            payment_amount >= self.min_token_balance_for_proposing().get(),
+            payment.amount >= self.min_token_balance_for_proposing().get(),
             "Not enough tokens for proposing action"
         );
         require!(!actions.is_empty(), "Proposal has no actions");
@@ -122,8 +121,8 @@ pub trait GovernanceModule:
 
         self.proposal_start_block(proposal_id).set(&current_block);
 
-        self.total_votes(proposal_id).set(&payment_amount);
-        self.votes(proposal_id).insert(proposer, payment_amount);
+        self.total_votes(proposal_id).set(&payment.amount);
+        self.votes(proposal_id).insert(proposer, payment.amount);
 
         proposal_id
     }
@@ -131,7 +130,7 @@ pub trait GovernanceModule:
     #[payable("*")]
     #[endpoint]
     fn vote(&self, proposal_id: usize) {
-        self.require_payment_token_governance_token();
+        let payment = self.require_payment_token_governance_token();
         self.require_valid_proposal_id(proposal_id);
         require!(
             self.get_proposal_status(proposal_id) == GovernanceProposalStatus::Active,
@@ -139,21 +138,20 @@ pub trait GovernanceModule:
         );
 
         let voter = self.blockchain().get_caller();
-        let payment_amount = self.call_value().egld_value();
-        self.vote_cast_event(&voter, proposal_id, &payment_amount);
+        self.vote_cast_event(&voter, proposal_id, &payment.amount);
 
         self.total_votes(proposal_id)
-            .update(|total_votes| *total_votes += &payment_amount);
+            .update(|total_votes| *total_votes += &payment.amount);
         self.votes(proposal_id)
             .entry(voter)
-            .and_modify(|nr_votes| *nr_votes += &payment_amount)
-            .or_insert(payment_amount);
+            .and_modify(|nr_votes| *nr_votes += &payment.amount)
+            .or_insert(payment.amount);
     }
 
     #[payable("*")]
     #[endpoint]
     fn downvote(&self, proposal_id: usize) {
-        self.require_payment_token_governance_token();
+        let payment = self.require_payment_token_governance_token();
         self.require_valid_proposal_id(proposal_id);
         require!(
             self.get_proposal_status(proposal_id) == GovernanceProposalStatus::Active,
@@ -161,15 +159,14 @@ pub trait GovernanceModule:
         );
 
         let downvoter = self.blockchain().get_caller();
-        let payment_amount = self.call_value().egld_value();
-        self.downvote_cast_event(&downvoter, proposal_id, &payment_amount);
+        self.downvote_cast_event(&downvoter, proposal_id, &payment.amount);
 
         self.total_downvotes(proposal_id)
-            .update(|total_downvotes| *total_downvotes += &payment_amount);
+            .update(|total_downvotes| *total_downvotes += &payment.amount);
         self.downvotes(proposal_id)
             .entry(downvoter)
-            .and_modify(|nr_downvotes| *nr_downvotes += &payment_amount)
-            .or_insert(payment_amount);
+            .and_modify(|nr_downvotes| *nr_downvotes += &payment.amount)
+            .or_insert(payment.amount);
     }
 
     #[endpoint]
@@ -339,11 +336,13 @@ pub trait GovernanceModule:
 
     // private
 
-    fn require_payment_token_governance_token(&self) {
+    fn require_payment_token_governance_token(&self) -> EsdtTokenPayment {
+        let payment = self.call_value().single_esdt();
         require!(
-            self.call_value().token().unwrap_esdt() == self.governance_token_id().get(),
+            payment.token_identifier == self.governance_token_id().get(),
             "Only Governance token accepted as payment"
         );
+        payment
     }
 
     fn require_valid_proposal_id(&self, proposal_id: usize) {

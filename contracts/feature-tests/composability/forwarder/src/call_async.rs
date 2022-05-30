@@ -20,11 +20,11 @@ pub trait ForwarderAsyncCallModule {
     #[endpoint]
     #[payable("*")]
     fn forward_async_accept_funds(&self, to: ManagedAddress) {
-        let (token, token_nonce, payment) = self.call_value().payment_as_tuple();
+        let (token, token_nonce, payment) = self.call_value().egld_or_single_esdt().into_tuple();
         self.vault_proxy()
             .contract(to)
             .accept_funds()
-            .add_token_transfer(token, token_nonce, payment)
+            .with_egld_or_single_esdt_token_transfer(token, token_nonce, payment)
             .async_call()
             .call_and_exit()
     }
@@ -37,7 +37,11 @@ pub trait ForwarderAsyncCallModule {
         self.vault_proxy()
             .contract(to)
             .accept_funds()
-            .add_token_transfer(payment.token_identifier, 0, half_payment)
+            .with_egld_or_single_esdt_token_transfer(
+                payment.token_identifier,
+                payment.token_nonce,
+                half_payment,
+            )
             .async_call()
             .call_and_exit()
     }
@@ -52,7 +56,11 @@ pub trait ForwarderAsyncCallModule {
         self.vault_proxy()
             .contract(to)
             .accept_funds()
-            .add_token_transfer(payment.token_identifier, 0, amount_to_send)
+            .with_egld_or_single_esdt_token_transfer(
+                payment.token_identifier,
+                payment.token_nonce,
+                amount_to_send,
+            )
             .async_call()
             .call_and_exit()
     }
@@ -80,7 +88,7 @@ pub trait ForwarderAsyncCallModule {
 
     #[callback]
     fn retrieve_funds_callback(&self) {
-        let (token, nonce, payment) = self.call_value().payment_as_tuple();
+        let (token, nonce, payment) = self.call_value().egld_or_single_esdt().into_tuple();
         self.retrieve_funds_callback_event(&token, nonce, &payment);
 
         let _ = self.callback_data().push(&CallbackData {
@@ -110,7 +118,7 @@ pub trait ForwarderAsyncCallModule {
         self.vault_proxy()
             .contract(to.clone())
             .accept_funds()
-            .add_token_transfer(token_identifier.clone(), 0, amount.clone())
+            .with_egld_or_single_esdt_token_transfer(token_identifier.clone(), 0, amount.clone())
             .async_call()
             .with_callback(
                 self.callbacks()
@@ -129,7 +137,7 @@ pub trait ForwarderAsyncCallModule {
         self.vault_proxy()
             .contract(to.clone())
             .accept_funds()
-            .add_token_transfer(token_identifier.clone(), 0, cb_amount.clone())
+            .with_egld_or_single_esdt_token_transfer(token_identifier.clone(), 0, cb_amount.clone())
             .async_call()
             .call_and_exit()
     }

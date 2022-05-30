@@ -48,7 +48,7 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
     #[payable("*")]
     #[endpoint]
     fn send_esdt_with_fees(&self, to: ManagedAddress, percentage_fees: BigUint) {
-        let (token_id, payment) = self.call_value().single_fungible_esdt_payment();
+        let (token_id, payment) = self.call_value().single_fungible_esdt();
         let fees = &payment * &percentage_fees / PERCENTAGE_TOTAL;
         let amount_to_send = payment - fees;
 
@@ -140,8 +140,7 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
         caller: &ManagedAddress,
         #[call_result] result: ManagedAsyncCallResult<()>,
     ) {
-        let (token_identifier, returned_tokens) =
-            self.call_value().single_fungible_esdt_or_egld_payment();
+        let (token_identifier, returned_tokens) = self.call_value().egld_or_single_fungible_esdt();
         // callback is called with ESDTTransfer of the newly issued token, with the amount requested,
         // so we can get the token identifier and amount from the call data
         match result {

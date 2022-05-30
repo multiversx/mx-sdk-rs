@@ -61,11 +61,7 @@ pub fn arg_payment_amount<A>() -> BigUint<A>
 where
     A: CallValueApi + ManagedTypeApi,
 {
-    if A::call_value_api_impl().esdt_num_transfers() == 0 {
-        CallValueWrapper::<A>::new().egld_value()
-    } else {
-        CallValueWrapper::<A>::new().esdt_value()
-    }
+    CallValueWrapper::<A>::new().egld_or_single_esdt().amount
 }
 
 /// Initializes an argument annotated with `#[payment_token]`.
@@ -73,7 +69,9 @@ pub fn arg_payment_token<A>() -> EgldOrEsdtTokenIdentifier<A>
 where
     A: CallValueApi + ManagedTypeApi,
 {
-    CallValueWrapper::<A>::new().token()
+    CallValueWrapper::<A>::new()
+        .egld_or_single_esdt()
+        .token_identifier
 }
 
 /// Initializes an argument annotated with `#[payment_nonce]`.
@@ -81,7 +79,9 @@ pub fn arg_payment_nonce<A>() -> u64
 where
     A: CallValueApi + ManagedTypeApi,
 {
-    CallValueWrapper::<A>::new().esdt_token_nonce()
+    CallValueWrapper::<A>::new()
+        .egld_or_single_esdt()
+        .token_nonce
 }
 
 /// Initializes an argument annotated with `#[payment_multi]`.

@@ -158,7 +158,7 @@ pub trait AbiTester {
     #[endpoint]
     #[payable("TOKEN-FOR-ABI")]
     fn payable_some_token(&self) {
-        let (token, payment) = self.call_value().single_fungible_esdt_payment();
+        let (token, payment) = self.call_value().single_fungible_esdt();
         self.payable_event(&token, &payment);
     }
 

@@ -105,7 +105,7 @@ where
         self
     }
 
-    pub fn add_token_transfer(
+    pub fn with_egld_or_single_esdt_token_transfer(
         self,
         payment_token: EgldOrEsdtTokenIdentifier<SA>,
         payment_nonce: u64,

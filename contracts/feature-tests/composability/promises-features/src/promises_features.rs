@@ -25,7 +25,7 @@ pub trait PromisesFeatures {
         extra_gas_for_callback: u64,
         args: MultiValueEncoded<ManagedBuffer>,
     ) {
-        let (token, payment) = self.call_value().single_fungible_esdt_payment();
+        let (token, payment) = self.call_value().single_fungible_esdt();
         self.send()
             .contract_call::<()>(to, endpoint_name)
             .add_esdt_token_transfer(token, 0, payment)

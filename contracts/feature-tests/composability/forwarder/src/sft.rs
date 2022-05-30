@@ -44,7 +44,7 @@ pub trait ForwarderSftModule: storage::ForwarderStorageModule {
             ManagedAsyncCallResult::Err(message) => {
                 // return issue cost to the caller
                 let (token_identifier, returned_tokens) =
-                    self.call_value().single_fungible_esdt_or_egld_payment();
+                    self.call_value().egld_or_single_fungible_esdt();
                 if token_identifier.is_egld() && returned_tokens > 0 {
                     self.send().direct_egld(caller, &returned_tokens, &[]);
                 }

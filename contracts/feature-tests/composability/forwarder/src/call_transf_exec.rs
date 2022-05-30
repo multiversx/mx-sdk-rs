@@ -10,11 +10,11 @@ pub trait ForwarderTransferExecuteModule {
     #[endpoint]
     #[payable("*")]
     fn forward_transf_exec_accept_funds(&self, to: ManagedAddress) {
-        let (token, token_nonce, payment) = self.call_value().payment_as_tuple();
+        let (token, token_nonce, payment) = self.call_value().egld_or_single_esdt().into_tuple();
         self.vault_proxy()
             .contract(to)
             .accept_funds()
-            .add_token_transfer(token, token_nonce, payment)
+            .with_egld_or_single_esdt_token_transfer(token, token_nonce, payment)
             .transfer_execute();
     }
 
@@ -25,35 +25,39 @@ pub trait ForwarderTransferExecuteModule {
         to: ManagedAddress,
         percentage_fees: BigUint,
     ) {
-        let (token_id, payment) = self.call_value().single_fungible_esdt_or_egld_payment();
+        let (token_id, payment) = self.call_value().egld_or_single_fungible_esdt();
         let fees = &payment * &percentage_fees / PERCENTAGE_TOTAL;
         let amount_to_send = payment - fees;
 
         self.vault_proxy()
             .contract(to)
             .accept_funds()
-            .add_token_transfer(token_id, 0, amount_to_send)
+            .with_egld_or_single_esdt_token_transfer(token_id, 0, amount_to_send)
             .transfer_execute();
     }
 
     #[endpoint]
     #[payable("*")]
     fn forward_transf_exec_accept_funds_twice(&self, to: ManagedAddress) {
-        let (token, token_nonce, payment) = self.call_value().payment_as_tuple();
+        let (token, token_nonce, payment) = self.call_value().egld_or_single_esdt().into_tuple();
         let half_payment = payment / 2u32;
         let half_gas = self.blockchain().get_gas_left() / 2;
 
         self.vault_proxy()
             .contract(to.clone())
             .accept_funds()
-            .add_token_transfer(token.clone(), token_nonce, half_payment.clone())
+            .with_egld_or_single_esdt_token_transfer(
+                token.clone(),
+                token_nonce,
+                half_payment.clone(),
+            )
             .with_gas_limit(half_gas)
             .transfer_execute();
 
         self.vault_proxy()
             .contract(to)
             .accept_funds()
-            .add_token_transfer(token, token_nonce, half_payment)
+            .with_egld_or_single_esdt_token_transfer(token, token_nonce, half_payment)
             .with_gas_limit(half_gas)
             .transfer_execute();
     }
@@ -66,13 +70,13 @@ pub trait ForwarderTransferExecuteModule {
         &self,
         to: ManagedAddress,
     ) -> MultiValue4<u64, u64, BigUint, EgldOrEsdtTokenIdentifier> {
-        let (token, token_nonce, payment) = self.call_value().payment_as_tuple();
+        let (token, token_nonce, payment) = self.call_value().egld_or_single_esdt().into_tuple();
         let gas_left_before = self.blockchain().get_gas_left();
 
         self.vault_proxy()
             .contract(to)
             .accept_funds()
-            .add_token_transfer(token.clone(), token_nonce, payment)
+            .with_egld_or_single_esdt_token_transfer(token.clone(), token_nonce, payment)
             .transfer_execute();
 
         let gas_left_after = self.blockchain().get_gas_left();
