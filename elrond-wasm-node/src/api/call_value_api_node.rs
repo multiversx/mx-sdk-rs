@@ -69,15 +69,17 @@ impl CallValueApiImpl for VmApiImpl {
         }
     }
 
-    fn token(&self) -> Handle {
+    fn token(&self) -> Option<Handle> {
         unsafe {
             let mut name_buffer = [0u8; MAX_POSSIBLE_TOKEN_IDENTIFIER_LENGTH];
             let name_len = getESDTTokenName(name_buffer.as_mut_ptr());
             if name_len == 0 {
-                TokenIdentifier::<Self>::egld().get_raw_handle()
+                None
             } else {
-                TokenIdentifier::<Self>::from_esdt_bytes(&name_buffer[..name_len as usize])
-                    .get_raw_handle()
+                Some(
+                    TokenIdentifier::<Self>::from_esdt_bytes(&name_buffer[..name_len as usize])
+                        .get_raw_handle(),
+                )
             }
         }
     }
@@ -102,12 +104,9 @@ impl CallValueApiImpl for VmApiImpl {
         unsafe {
             let mut name_buffer = [0u8; MAX_POSSIBLE_TOKEN_IDENTIFIER_LENGTH];
             let name_len = getESDTTokenNameByIndex(name_buffer.as_mut_ptr(), index as i32);
-            if name_len == 0 {
-                TokenIdentifier::<Self>::egld().get_raw_handle()
-            } else {
-                TokenIdentifier::<Self>::from_esdt_bytes(&name_buffer[..name_len as usize])
-                    .get_raw_handle()
-            }
+
+            TokenIdentifier::<Self>::from_esdt_bytes(&name_buffer[..name_len as usize])
+                .get_raw_handle()
         }
     }
 

@@ -1,6 +1,6 @@
 use crate::{
     abi::{TypeAbi, TypeName},
-    api::ManagedTypeApi,
+    api::{Handle, ManagedTypeApi},
     formatter::{FormatByteReceiver, SCDisplay, SCLowerHex},
     types::{ManagedBuffer, ManagedType},
 };
@@ -46,6 +46,13 @@ impl<M: ManagedTypeApi> EgldOrEsdtTokenIdentifier<M> {
     pub fn esdt(token_identifier: TokenIdentifier<M>) -> Self {
         Self {
             data: ManagedOption::some(token_identifier),
+        }
+    }
+
+    pub fn from_opt_raw_handle(opt_handle: Option<Handle>) -> Self {
+        match opt_handle {
+            Some(handle) => Self::esdt(TokenIdentifier::from_raw_handle(handle)),
+            None => Self::egld(),
         }
     }
 
