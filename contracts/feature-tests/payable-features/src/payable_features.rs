@@ -10,6 +10,7 @@ pub trait PayableFeatures {
     #[init]
     fn init(&self) {}
 
+    /*
     #[view]
     #[payable("*")]
     fn echo_call_value(
@@ -143,4 +144,5 @@ pub trait PayableFeatures {
         let token = self.call_value().token();
         (payment, token).into()
     }
+    */
 }

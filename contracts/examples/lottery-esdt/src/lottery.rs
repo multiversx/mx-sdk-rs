@@ -21,7 +21,7 @@ pub trait Lottery {
     fn start(
         &self,
         lottery_name: ManagedBuffer,
-        token_identifier: TokenIdentifier,
+        token_identifier: EgldOrEsdtTokenIdentifier,
         ticket_price: BigUint,
         opt_total_tickets: Option<usize>,
         opt_deadline: Option<u64>,
@@ -47,7 +47,7 @@ pub trait Lottery {
     fn create_lottery_pool(
         &self,
         lottery_name: ManagedBuffer,
-        token_identifier: TokenIdentifier,
+        token_identifier: EgldOrEsdtTokenIdentifier,
         ticket_price: BigUint,
         opt_total_tickets: Option<usize>,
         opt_deadline: Option<u64>,
@@ -73,7 +73,7 @@ pub trait Lottery {
     fn start_lottery(
         &self,
         lottery_name: ManagedBuffer,
-        token_identifier: TokenIdentifier,
+        token_identifier: EgldOrEsdtTokenIdentifier,
         ticket_price: BigUint,
         opt_total_tickets: Option<usize>,
         opt_deadline: Option<u64>,
@@ -127,7 +127,9 @@ pub trait Lottery {
             OptionalValue::Some(burn_percentage) => {
                 require!(!token_identifier.is_egld(), "EGLD can't be burned!");
 
-                let roles = self.blockchain().get_esdt_local_roles(&token_identifier);
+                let roles = self
+                    .blockchain()
+                    .get_esdt_local_roles(&token_identifier.clone().unwrap_esdt());
                 require!(
                     roles.has_role(&EsdtLocalRole::Burn),
                     "The contract can't burn the selected token!"
@@ -166,7 +168,7 @@ pub trait Lottery {
     #[endpoint]
     #[payable("*")]
     fn buy_ticket(&self, lottery_name: ManagedBuffer) {
-        let (payment, token_identifier) = self.call_value().payment_token_pair();
+        let (token_identifier, payment) = self.call_value().single_fungible_esdt_or_egld_payment();
 
         match self.status(&lottery_name) {
             Status::Inactive => sc_panic!("Lottery is currently inactive."),
@@ -209,7 +211,7 @@ pub trait Lottery {
     fn update_after_buy_ticket(
         &self,
         lottery_name: &ManagedBuffer,
-        token_identifier: &TokenIdentifier,
+        token_identifier: &EgldOrEsdtTokenIdentifier,
         payment: &BigUint,
     ) {
         let info_mapper = self.lottery_info(lottery_name);
@@ -258,12 +260,10 @@ pub trait Lottery {
 
             // Prevent crashing if the role was unset while the lottery was running
             // The tokens will simply remain locked forever
-            let roles = self
-                .blockchain()
-                .get_esdt_local_roles(&info.token_identifier);
+            let esdt_token_id = info.token_identifier.clone().unwrap_esdt();
+            let roles = self.blockchain().get_esdt_local_roles(&esdt_token_id);
             if roles.has_role(&EsdtLocalRole::Burn) {
-                self.send()
-                    .esdt_local_burn(&info.token_identifier, 0, &burn_amount);
+                self.send().esdt_local_burn(&esdt_token_id, 0, &burn_amount);
             }
 
             info.prize_pool -= burn_amount;
@@ -291,7 +291,7 @@ pub trait Lottery {
                 &BigUint::from(info.prize_distribution.get(i)),
             );
 
-            self.send().direct_esdt(
+            self.send().direct(
                 &winner_address,
                 &info.token_identifier,
                 0,
@@ -303,7 +303,7 @@ pub trait Lottery {
 
         // send leftover to first place
         let first_place_winner = ticket_holders_mapper.get(winning_tickets[0]);
-        self.send().direct_esdt(
+        self.send().direct(
             &first_place_winner,
             &info.token_identifier,
             0,

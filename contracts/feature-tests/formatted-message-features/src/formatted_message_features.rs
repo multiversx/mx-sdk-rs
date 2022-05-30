@@ -24,12 +24,8 @@ pub trait FormattedMessageFeatures {
 
     #[payable("*")]
     #[endpoint]
-    fn dynamic_message_multiple(
-        &self,
-        #[payment_token] token_id: TokenIdentifier,
-        #[payment_nonce] nonce: u64,
-        #[payment_amount] amount: BigUint,
-    ) {
+    fn dynamic_message_multiple(&self) {
+        let (token_id, nonce, amount) = self.call_value().payment_as_tuple();
         sc_panic!(
             "Got token {}, with nonce {}, amount {}. I prefer EGLD. ERROR!",
             &&token_id, // references are accepted
@@ -40,12 +36,8 @@ pub trait FormattedMessageFeatures {
 
     #[payable("*")]
     #[endpoint]
-    fn dynamic_message_ascii(
-        &self,
-        #[payment_token] token_id: TokenIdentifier,
-        #[payment_nonce] nonce: u64,
-        #[payment_amount] amount: BigUint,
-    ) {
+    fn dynamic_message_ascii(&self) {
+        let (token_id, nonce, amount) = self.call_value().payment_as_tuple();
         sc_panic!(
             "Got token {}, with nonce {}, amount {}. I prefer EGLD. ERROR!",
             token_id,

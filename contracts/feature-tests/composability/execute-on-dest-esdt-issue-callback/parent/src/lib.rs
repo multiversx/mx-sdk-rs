@@ -37,8 +37,8 @@ pub trait Parent {
         token_display_name: ManagedBuffer,
         token_ticker: ManagedBuffer,
         initial_supply: BigUint,
-        #[payment] issue_cost: BigUint,
     ) {
+        let issue_cost = self.call_value().egld_value();
         let child_contract_adress = self.child_contract_address().get();
         self.child_proxy(child_contract_adress)
             .issue_wrapped_egld(token_display_name, token_ticker, initial_supply, issue_cost)
