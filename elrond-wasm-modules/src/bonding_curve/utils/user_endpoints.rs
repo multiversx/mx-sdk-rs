@@ -11,12 +11,13 @@ use crate::bonding_curve::{
 pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
     #[payable("*")]
     #[endpoint(sellToken)]
-    fn sell_token(
-        &self,
-        #[payment_amount] sell_amount: BigUint,
-        #[payment_nonce] nonce: u64,
-        #[payment_token] offered_token: TokenIdentifier,
-    ) {
+    fn sell_token(&self) {
+        let payment = self.call_value().single_esdt();
+        let (offered_token, nonce, sell_amount) = (
+            payment.token_identifier,
+            payment.token_nonce,
+            payment.amount,
+        );
         let _ = self.check_owned_return_payment_token(&offered_token, &sell_amount);
 
         let calculated_price = self.bonding_curve(&offered_token).update(|bonding_curve| {
@@ -39,7 +40,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
         self.nonce_amount(&offered_token, nonce)
             .update(|val| *val += sell_amount);
 
-        self.send().direct_esdt(
+        self.send().direct(
             &caller,
             &self.bonding_curve(&offered_token).get().payment_token,
             0u64,
@@ -56,12 +57,11 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
     #[endpoint(buyToken)]
     fn buy_token(
         &self,
-        #[payment_amount] payment: BigUint,
-        #[payment_token] offered_token: TokenIdentifier,
         requested_amount: BigUint,
         requested_token: TokenIdentifier,
         requested_nonce: OptionalValue<u64>,
     ) {
+        let (offered_token, payment) = self.call_value().single_fungible_esdt_or_egld_payment();
         let payment_token =
             self.check_owned_return_payment_token(&requested_token, &requested_amount);
         self.check_given_token(&payment_token, &offered_token);
@@ -109,7 +109,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
             },
         };
 
-        self.send().direct_esdt(
+        self.send().direct(
             &caller,
             &offered_token,
             0u64,
@@ -200,7 +200,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
         &self,
         issued_token: &TokenIdentifier,
         amount: &BigUint,
-    ) -> TokenIdentifier {
+    ) -> EgldOrEsdtTokenIdentifier {
         self.check_token_exists(issued_token);
 
         let bonding_curve = self.bonding_curve(issued_token).get();
@@ -213,7 +213,11 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
         bonding_curve.payment_token
     }
 
-    fn check_given_token(&self, accepted_token: &TokenIdentifier, given_token: &TokenIdentifier) {
+    fn check_given_token(
+        &self,
+        accepted_token: &EgldOrEsdtTokenIdentifier,
+        given_token: &EgldOrEsdtTokenIdentifier,
+    ) {
         require!(
             given_token == accepted_token,
             "Only {} tokens accepted",
