@@ -29,7 +29,7 @@ pub trait ForwarderAsyncCallModule {
         self.vault_proxy()
             .contract(to)
             .accept_funds()
-            .add_token_transfer(token, token_nonce, payment)
+            .add_esdt_token_transfer(token, token_nonce, payment)
             .async_call()
             .call_and_exit()
     }
@@ -46,7 +46,7 @@ pub trait ForwarderAsyncCallModule {
         self.vault_proxy()
             .contract(to)
             .accept_funds()
-            .add_token_transfer(token, 0, half_payment)
+            .add_esdt_token_transfer(token, 0, half_payment)
             .async_call()
             .call_and_exit()
     }
@@ -66,7 +66,7 @@ pub trait ForwarderAsyncCallModule {
         self.vault_proxy()
             .contract(to)
             .accept_funds()
-            .add_token_transfer(token_id, 0, amount_to_send)
+            .add_esdt_token_transfer(token_id, 0, amount_to_send)
             .async_call()
             .call_and_exit()
     }
@@ -128,7 +128,7 @@ pub trait ForwarderAsyncCallModule {
         self.vault_proxy()
             .contract(to.clone())
             .accept_funds()
-            .add_token_transfer(token_identifier.clone(), 0, amount.clone())
+            .add_esdt_token_transfer(token_identifier.clone(), 0, amount.clone())
             .async_call()
             .with_callback(
                 self.callbacks()
@@ -147,7 +147,7 @@ pub trait ForwarderAsyncCallModule {
         self.vault_proxy()
             .contract(to.clone())
             .accept_funds()
-            .add_token_transfer(token_identifier.clone(), 0, cb_amount.clone())
+            .add_esdt_token_transfer(token_identifier.clone(), 0, cb_amount.clone())
             .async_call()
             .call_and_exit()
     }

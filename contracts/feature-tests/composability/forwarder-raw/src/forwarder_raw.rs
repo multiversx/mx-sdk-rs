@@ -61,7 +61,7 @@ pub trait ForwarderRaw {
     ) -> ContractCall<Self::Api, ()> {
         self.send()
             .contract_call(to, endpoint_name)
-            .add_token_transfer(payment_token, 0, payment_amount)
+            .add_esdt_token_transfer(payment_token, 0, payment_amount)
             .with_arguments_raw(args.to_arg_buffer())
     }
 

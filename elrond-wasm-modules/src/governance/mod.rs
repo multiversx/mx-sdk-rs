@@ -217,7 +217,7 @@ pub trait GovernanceModule:
                 .with_gas_limit(action.gas_limit);
 
             if action.amount > 0 {
-                contract_call = contract_call.add_token_transfer(
+                contract_call = contract_call.add_esdt_token_transfer(
                     action.token_id,
                     action.token_nonce,
                     action.amount,

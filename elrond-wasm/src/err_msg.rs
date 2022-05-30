@@ -6,6 +6,9 @@ pub const TOO_MANY_ESDT_TRANSFERS: &str = "too many ESDT transfers";
 pub const ESDT_INVALID_TOKEN_INDEX: &str = "invalid token index";
 pub const INCORRECT_NUM_ESDT_TRANSFERS: &str = "incorrect number of ESDT transfers";
 
+pub static NO_PAYMENT_ERR_MSG: &[u8] = b"No payment received";
+pub static FUNGIBLE_TOKEN_EXPECTED_ERR_MSG: &[u8] = b"Expected fungible ESDT token";
+
 pub const ARG_WRONG_NUMBER: &str = "wrong number of arguments";
 pub const ARG_ASYNC_WRONG_NUMBER: &[u8] = b"wrong number of arguments provided to async call";
 pub const ARG_ASYNC_RETURN_WRONG_NUMBER: &[u8] =

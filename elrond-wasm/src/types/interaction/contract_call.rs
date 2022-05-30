@@ -2,15 +2,15 @@ use elrond_codec::{CodecFrom, TopEncodeMulti};
 
 use crate::{
     api::{
-        BlockchainApiImpl, CallTypeApi, ErrorApiImpl, ESDT_MULTI_TRANSFER_FUNC_NAME,
-        ESDT_NFT_TRANSFER_FUNC_NAME, ESDT_TRANSFER_FUNC_NAME,
+        BlockchainApiImpl, CallTypeApi, ESDT_MULTI_TRANSFER_FUNC_NAME, ESDT_NFT_TRANSFER_FUNC_NAME,
+        ESDT_TRANSFER_FUNC_NAME,
     },
     contract_base::{BlockchainWrapper, ExitCodecErrorHandler, SendRawWrapper},
     err_msg,
     io::{ArgErrorHandler, ArgId, ManagedResultArgLoader},
     types::{
-        AsyncCall, BigUint, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer,
-        ManagedVec, TokenIdentifier,
+        AsyncCall, BigUint, EgldOrEsdtTokenIdentifier, EsdtTokenPayment, ManagedAddress,
+        ManagedArgBuffer, ManagedBuffer, ManagedVec, TokenIdentifier,
     },
 };
 use core::marker::PhantomData;
@@ -91,7 +91,7 @@ where
         }
     }
 
-    pub fn add_token_transfer(
+    pub fn add_esdt_token_transfer(
         mut self,
         payment_token: TokenIdentifier<SA>,
         payment_nonce: u64,
@@ -105,13 +105,23 @@ where
         self
     }
 
+    pub fn add_token_transfer(
+        self,
+        payment_token: EgldOrEsdtTokenIdentifier<SA>,
+        payment_nonce: u64,
+        payment_amount: BigUint<SA>,
+    ) -> Self {
+        if payment_token.is_egld() {
+            self.with_egld_transfer(payment_amount)
+        } else {
+            self.add_esdt_token_transfer(payment_token.unwrap_esdt(), payment_nonce, payment_amount)
+        }
+    }
+
     pub fn with_egld_transfer(mut self, egld_amount: BigUint<SA>) -> Self {
-        self.payments
-            .overwrite_with_single_item(EsdtTokenPayment::new(
-                TokenIdentifier::egld(),
-                0,
-                egld_amount,
-            ));
+        self.payments.clear();
+        self.egld_payment = egld_amount;
+
         self
     }
 
@@ -187,13 +197,9 @@ where
         }
     }
 
-    fn convert_to_single_transfer_esdt_call(mut self) -> Self {
+    fn convert_to_single_transfer_esdt_call(self) -> Self {
         if let Some(payment) = self.payments.try_get(0) {
-            if payment.token_identifier.is_egld() {
-                self.egld_payment = payment.amount;
-                self.payments.clear();
-                self
-            } else if payment.token_nonce == 0 {
+            if payment.token_nonce == 0 {
                 let no_payments = self.no_payments();
 
                 // fungible ESDT
@@ -270,7 +276,6 @@ where
         new_arg_buffer.push_arg(self.payments.len());
 
         for payment in self.payments.into_iter() {
-            // TODO: check that `!token_identifier.is_egld()` or let Arwen throw the error?
             new_arg_buffer.push_arg(payment.token_identifier);
             new_arg_buffer.push_arg(payment.token_nonce);
             new_arg_buffer.push_arg(payment.amount);
@@ -466,10 +471,10 @@ where
         let gas_limit = self.resolve_gas_limit_with_leftover();
         let payment = &self.payments.try_get(0).unwrap();
 
-        if payment.token_identifier.is_egld() {
+        if self.egld_payment > 0 {
             let _ = SendRawWrapper::<SA>::new().direct_egld_execute(
                 &self.to,
-                &payment.amount,
+                &self.egld_payment,
                 gas_limit,
                 &self.endpoint_name,
                 &self.arg_buffer,
@@ -500,16 +505,12 @@ where
 
     fn multi_transfer_execute(self) {
         let gas_limit = self.resolve_gas_limit_with_leftover();
-        let result = SendRawWrapper::<SA>::new().multi_esdt_transfer_execute(
+        let _ = SendRawWrapper::<SA>::new().multi_esdt_transfer_execute(
             &self.to,
             &self.payments,
             gas_limit,
             &self.endpoint_name,
             &self.arg_buffer,
         );
-
-        if let Err(e) = result {
-            SA::error_api_impl().signal_error(e);
-        }
     }
 }

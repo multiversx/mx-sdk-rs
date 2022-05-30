@@ -37,7 +37,7 @@ where
         }
     }
 
-    pub const fn none() -> Self {
+    pub fn none() -> Self {
         Self {
             _phantom_m: PhantomData,
             _phantom_t: PhantomData,
