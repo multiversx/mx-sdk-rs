@@ -60,7 +60,8 @@ pub trait FungibleTokenMapperFeatures:
         match result {
             ManagedAsyncCallResult::Ok(()) => {
                 let token_id = self.call_value().token();
-                self.fungible_token_mapper().set_token_id(&token_id);
+                self.fungible_token_mapper()
+                    .set_token_id(&token_id.unwrap_esdt());
             },
             ManagedAsyncCallResult::Err(_) => {},
         }
@@ -126,7 +127,7 @@ pub trait FungibleTokenMapperFeatures:
     fn require_same_token_fungible(&self) {
         let payment_token = self.call_value().token();
         self.fungible_token_mapper()
-            .require_same_token(&payment_token);
+            .require_same_token(&payment_token.unwrap_esdt());
     }
 
     #[payable("*")]

@@ -18,7 +18,8 @@ mod dns_mock {
 
         #[payable("EGLD")]
         #[endpoint]
-        fn register(&self, name: BoxedBytes, #[payment] _payment: BigUint) {
+        fn register(&self, name: BoxedBytes) {
+            let _payment = self.call_value().egld_value();
             let address = self.blockchain().get_caller();
             self.user_builtin_proxy(address)
                 .set_user_name(&name)
