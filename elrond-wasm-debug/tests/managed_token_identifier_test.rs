@@ -1,7 +1,7 @@
 use elrond_wasm::types::{BoxedBytes, EgldOrEsdtTokenIdentifier, TokenIdentifier};
 use elrond_wasm_debug::{
-    check_managed_top_decode, check_managed_top_encode_decode, managed_egld_token_id,
-    managed_token_id, managed_token_id_wrapped, DebugApi,
+    check_managed_top_encode_decode, managed_egld_token_id, managed_token_id,
+    managed_token_id_wrapped, DebugApi,
 };
 
 #[test]
@@ -27,16 +27,6 @@ fn test_codec() {
         api.clone(),
         vec![EgldOrEsdtTokenIdentifier::<DebugApi>::egld()],
         expected.as_slice(),
-    );
-
-    // also allowed
-    assert_eq!(
-        EgldOrEsdtTokenIdentifier::<DebugApi>::egld(),
-        check_managed_top_decode::<EgldOrEsdtTokenIdentifier<DebugApi>>(api.clone(), &[])
-    );
-    assert_eq!(
-        vec![EgldOrEsdtTokenIdentifier::<DebugApi>::egld()],
-        check_managed_top_decode::<Vec<EgldOrEsdtTokenIdentifier<DebugApi>>>(api, &[0, 0, 0, 0])
     );
 }
 

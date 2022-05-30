@@ -61,7 +61,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
         requested_token: TokenIdentifier,
         requested_nonce: OptionalValue<u64>,
     ) {
-        let (offered_token, payment) = self.call_value().single_fungible_esdt_or_egld_payment();
+        let (offered_token, payment) = self.call_value().egld_or_single_fungible_esdt();
         let payment_token =
             self.check_owned_return_payment_token(&requested_token, &requested_amount);
         self.check_given_token(&payment_token, &offered_token);

@@ -47,8 +47,7 @@ pub trait StakingModule {
     #[payable("*")]
     #[endpoint]
     fn stake(&self) {
-        let (payment_token, payment_amount) =
-            self.call_value().single_fungible_esdt_or_egld_payment();
+        let (payment_token, payment_amount) = self.call_value().egld_or_single_fungible_esdt();
         let staking_token = self.staking_token().get();
         require!(payment_token == staking_token, "Invalid payment token");
 

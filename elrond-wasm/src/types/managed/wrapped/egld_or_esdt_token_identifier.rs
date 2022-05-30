@@ -41,7 +41,7 @@ impl<M: ManagedTypeApi> EgldOrEsdtTokenIdentifier<M> {
         }
     }
 
-    /// New instance of the special EGLD token representation.
+    /// ESDT instance, containing an ESDT token identifier.
     #[inline]
     pub fn esdt(token_identifier: TokenIdentifier<M>) -> Self {
         Self {

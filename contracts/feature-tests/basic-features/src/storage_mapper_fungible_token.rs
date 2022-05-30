@@ -59,9 +59,8 @@ pub trait FungibleTokenMapperFeatures:
     fn custom_issue_non_zero_supply_cb(&self, #[call_result] result: ManagedAsyncCallResult<()>) {
         match result {
             ManagedAsyncCallResult::Ok(()) => {
-                let token_id = self.call_value().token();
-                self.fungible_token_mapper()
-                    .set_token_id(&token_id.unwrap_esdt());
+                let token_identifier = self.call_value().single_esdt().token_identifier;
+                self.fungible_token_mapper().set_token_id(&token_identifier);
             },
             ManagedAsyncCallResult::Err(_) => {},
         }
@@ -125,9 +124,9 @@ pub trait FungibleTokenMapperFeatures:
     #[payable("*")]
     #[endpoint]
     fn require_same_token_fungible(&self) {
-        let payment_token = self.call_value().token();
+        let payment_token = self.call_value().single_esdt().token_identifier;
         self.fungible_token_mapper()
-            .require_same_token(&payment_token.unwrap_esdt());
+            .require_same_token(&payment_token);
     }
 
     #[payable("*")]

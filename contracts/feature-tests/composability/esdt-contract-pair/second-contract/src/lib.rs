@@ -12,7 +12,7 @@ pub trait SecondContract {
     #[payable("*")]
     #[endpoint(acceptEsdtPayment)]
     fn accept_esdt_payment(&self) {
-        let actual_token_identifier = self.call_value().token();
+        let actual_token_identifier = self.call_value().egld_or_single_esdt().token_identifier;
         let expected_token_identifier = self.get_contract_esdt_token_identifier();
         require!(
             actual_token_identifier == expected_token_identifier,

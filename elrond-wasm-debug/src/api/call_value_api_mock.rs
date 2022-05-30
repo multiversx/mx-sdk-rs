@@ -62,7 +62,7 @@ impl CallValueApiImpl for DebugApi {
     #[inline]
     fn token(&self) -> Option<Handle> {
         self.fail_if_more_than_one_esdt_transfer();
-        
+
         if self.esdt_num_transfers() > 0 {
             Some(self.token_by_index(0))
         } else {

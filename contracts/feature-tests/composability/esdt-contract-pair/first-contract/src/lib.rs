@@ -21,11 +21,9 @@ pub trait FirstContract {
     #[payable("*")]
     #[endpoint(transferToSecondContractFull)]
     fn transfer_to_second_contract_full(&self) {
-        let (actual_token_identifier, esdt_value) =
-            self.call_value().single_fungible_esdt_payment();
+        let (actual_token_identifier, esdt_value) = self.call_value().single_fungible_esdt();
         let expected_token_identifier = self.get_contract_esdt_token_identifier();
 
-        require!(esdt_value > 0, "no esdt transfered!");
         require!(
             actual_token_identifier == expected_token_identifier,
             "Wrong esdt token"
@@ -43,11 +41,9 @@ pub trait FirstContract {
     #[payable("*")]
     #[endpoint(transferToSecondContractHalf)]
     fn transfer_to_second_contract_half(&self) {
-        let (actual_token_identifier, esdt_value) =
-            self.call_value().single_fungible_esdt_payment();
+        let (actual_token_identifier, esdt_value) = self.call_value().single_fungible_esdt();
         let expected_token_identifier = self.get_contract_esdt_token_identifier();
 
-        require!(esdt_value > 0, "no esdt transfered!");
         require!(
             actual_token_identifier == expected_token_identifier,
             "Wrong esdt token"
@@ -65,11 +61,9 @@ pub trait FirstContract {
     #[payable("*")]
     #[endpoint(transferToSecondContractRejected)]
     fn transfer_to_second_contract_rejected(&self) {
-        let (actual_token_identifier, esdt_value) =
-            self.call_value().single_fungible_esdt_payment();
+        let (actual_token_identifier, esdt_value) = self.call_value().single_fungible_esdt();
         let expected_token_identifier = self.get_contract_esdt_token_identifier();
 
-        require!(esdt_value > 0, "no esdt transfered!");
         require!(
             actual_token_identifier == expected_token_identifier,
             "Wrong esdt token"
@@ -87,12 +81,10 @@ pub trait FirstContract {
     #[payable("*")]
     #[endpoint(transferToSecondContractRejectedWithTransferAndExecute)]
     fn transfer_to_second_contract_rejected_with_transfer_and_execute(&self) {
-        let (actual_token_identifier, esdt_value) =
-            self.call_value().single_fungible_esdt_payment();
+        let (actual_token_identifier, esdt_value) = self.call_value().single_fungible_esdt();
         let second_contract_address = self.get_second_contract_address();
         let expected_token_identifier = self.get_contract_esdt_token_identifier();
 
-        require!(esdt_value > 0u32, "no esdt transfered!");
         require!(
             actual_token_identifier == expected_token_identifier,
             "Wrong esdt token"
@@ -111,12 +103,10 @@ pub trait FirstContract {
     #[payable("*")]
     #[endpoint(transferToSecondContractFullWithTransferAndExecute)]
     fn transfer_to_second_contract_full_with_transfer_and_execute(&self) {
-        let (actual_token_identifier, esdt_value) =
-            self.call_value().single_fungible_esdt_payment();
+        let (actual_token_identifier, esdt_value) = self.call_value().single_fungible_esdt();
         let second_contract_address = self.get_second_contract_address();
         let expected_token_identifier = self.get_contract_esdt_token_identifier();
 
-        require!(esdt_value > 0u32, "no esdt transfered!");
         require!(
             actual_token_identifier == expected_token_identifier,
             "Wrong esdt token"

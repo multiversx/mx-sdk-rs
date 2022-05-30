@@ -168,7 +168,7 @@ pub trait Lottery {
     #[endpoint]
     #[payable("*")]
     fn buy_ticket(&self, lottery_name: ManagedBuffer) {
-        let (token_identifier, payment) = self.call_value().single_fungible_esdt_or_egld_payment();
+        let (token_identifier, payment) = self.call_value().egld_or_single_fungible_esdt();
 
         match self.status(&lottery_name) {
             Status::Inactive => sc_panic!("Lottery is currently inactive."),

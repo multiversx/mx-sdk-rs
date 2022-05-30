@@ -67,7 +67,7 @@
                             "3-actions": {
                                 "3.01-gas_limit": "u64:50,000,000",
                                 "3.02-dest_address": "sc:governance",
-                                "3.03-token_id": "nested:str:EGLD",
+                                "3.03-token_id": "nested:str:",
                                 "3.04-token_nonce": "u64:0",
                                 "3.05-amount": "biguint:0",
                                 "3.06-function_name": "nested:str:changeQuorum",
@@ -177,7 +177,7 @@
                             "3-actions": {
                                 "3.01-gas_limit": "u64:50,000,000",
                                 "3.02-dest_address": "sc:governance",
-                                "3.03-token_id": "nested:str:EGLD",
+                                "3.03-token_id": "nested:str:",
                                 "3.04-token_nonce": "u64:0",
                                 "3.05-amount": "biguint:0",
                                 "3.06-function_name": "nested:str:changeQuorum",

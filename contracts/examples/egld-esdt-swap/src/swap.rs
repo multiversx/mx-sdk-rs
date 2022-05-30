@@ -67,7 +67,7 @@ pub trait EgldEsdtSwap {
             },
             ManagedAsyncCallResult::Err(message) => {
                 let (token_identifier, returned_tokens) =
-                    self.call_value().single_fungible_esdt_or_egld_payment();
+                    self.call_value().egld_or_single_fungible_esdt();
                 self.issue_failure_event(caller, &message.err_msg);
 
                 // return issue cost to the owner
@@ -119,11 +119,10 @@ pub trait EgldEsdtSwap {
     #[payable("*")]
     #[endpoint(unwrapEgld)]
     fn unwrap_egld(&self) {
-        let (payment_token, payment_amount) = self.call_value().single_fungible_esdt_payment();
+        let (payment_token, payment_amount) = self.call_value().single_fungible_esdt();
         let wrapped_egld_token_id = self.wrapped_egld_token_id().get();
 
         require!(payment_token == wrapped_egld_token_id, "Wrong esdt token");
-        require!(payment_amount > 0u32, "Must pay more than 0 tokens!");
         // this should never happen, but we'll check anyway
         require!(
             payment_amount <= self.get_locked_egld_balance(),
