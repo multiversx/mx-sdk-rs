@@ -22,7 +22,10 @@ pub trait TransferDestinationModule {
 
     #[payable("*")]
     #[endpoint(receiveFunds)]
-    fn receive_funds(&self, _original_caller: ManagedAddress) {}
+    fn receive_funds(&self, _original_caller: ManagedAddress) {
+        let proxy_sc = self.blockchain().get_caller();
+        self.require_valid_sender(&proxy_sc);
+    }
 
     fn require_valid_sender(&self, addr: &ManagedAddress) {
         require!(
