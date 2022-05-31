@@ -14,7 +14,7 @@ use elrond_codec::{
     TopEncodeOutput,
 };
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 #[repr(transparent)]
 pub struct ManagedArgBuffer<M>
 where
@@ -47,9 +47,8 @@ impl<M: ManagedTypeApi> ManagedArgBuffer<M>
 where
     M: ManagedTypeApi + 'static,
 {
-    /// TODO: rename to just `new`.
     #[inline]
-    pub fn new_empty() -> Self {
+    pub fn new() -> Self {
         ManagedArgBuffer {
             data: ManagedVec::new(),
         }
@@ -72,7 +71,7 @@ where
     I: Into<ManagedBuffer<M>> + TopEncode,
 {
     fn from(arguments: &[I]) -> Self {
-        let mut arg_buffer = Self::new_empty();
+        let mut arg_buffer = Self::new();
         for arg in arguments {
             arg_buffer.push_arg(arg);
         }

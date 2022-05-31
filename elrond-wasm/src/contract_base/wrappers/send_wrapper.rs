@@ -179,7 +179,7 @@ where
             payments,
             0,
             &data.into(),
-            &ManagedArgBuffer::new_empty(),
+            &ManagedArgBuffer::new(),
         );
     }
 
@@ -200,7 +200,7 @@ where
         D: Into<ManagedBuffer<A>>,
     {
         let data_buf: ManagedBuffer<A> = data.into();
-        let mut arg_buffer = ManagedArgBuffer::new_empty();
+        let mut arg_buffer = ManagedArgBuffer::new();
         arg_buffer.push_arg(token);
         if nonce == 0 {
             arg_buffer.push_arg(amount);
@@ -240,7 +240,7 @@ where
     where
         D: Into<ManagedBuffer<A>>,
     {
-        let mut arg_buffer = ManagedArgBuffer::new_empty();
+        let mut arg_buffer = ManagedArgBuffer::new();
         arg_buffer.push_arg(to);
         arg_buffer.push_arg(payments.len());
 
@@ -296,7 +296,7 @@ where
     /// For SFTs, you must use `self.send().esdt_nft_create()` before adding additional quantity.
     /// This function cannot be used for NFTs.
     pub fn esdt_local_mint(&self, token: &TokenIdentifier<A>, nonce: u64, amount: &BigUint<A>) {
-        let mut arg_buffer = ManagedArgBuffer::new_empty();
+        let mut arg_buffer = ManagedArgBuffer::new();
         let func_name: &[u8];
 
         arg_buffer.push_arg(token);
@@ -321,7 +321,7 @@ where
     /// Note that the SC must have the ESDTLocalBurn or ESDTNftBurn roles set,
     /// or this will fail with "action is not allowed"
     pub fn esdt_local_burn(&self, token: &TokenIdentifier<A>, nonce: u64, amount: &BigUint<A>) {
-        let mut arg_buffer = ManagedArgBuffer::new_empty();
+        let mut arg_buffer = ManagedArgBuffer::new();
         let func_name: &[u8];
 
         arg_buffer.push_arg(token);
@@ -357,7 +357,7 @@ where
         attributes: &T,
         uris: &ManagedVec<A, ManagedBuffer<A>>,
     ) -> u64 {
-        let mut arg_buffer = ManagedArgBuffer::new_empty();
+        let mut arg_buffer = ManagedArgBuffer::new();
         arg_buffer.push_arg(token);
         arg_buffer.push_arg(amount);
         arg_buffer.push_arg(name);
@@ -434,7 +434,7 @@ where
         attributes: &T,
         uris: &ManagedVec<A, ManagedBuffer<A>>,
     ) -> u64 {
-        let mut arg_buffer = ManagedArgBuffer::<A>::new_empty();
+        let mut arg_buffer = ManagedArgBuffer::<A>::new();
         arg_buffer.push_arg(token);
         arg_buffer.push_arg(amount);
         arg_buffer.push_arg(name);
@@ -497,7 +497,7 @@ where
             nft_amount,
             0,
             &ManagedBuffer::new(),
-            &ManagedArgBuffer::new_empty(),
+            &ManagedArgBuffer::new(),
         );
 
         if royalties_amount > 0u32 {
@@ -534,7 +534,7 @@ where
             return;
         }
 
-        let mut arg_buffer = ManagedArgBuffer::new_empty();
+        let mut arg_buffer = ManagedArgBuffer::new();
         arg_buffer.push_arg(token_id);
         arg_buffer.push_arg(nft_nonce);
 
@@ -555,7 +555,7 @@ where
         nft_nonce: u64,
         new_attributes: &T,
     ) {
-        let mut arg_buffer = ManagedArgBuffer::new_empty();
+        let mut arg_buffer = ManagedArgBuffer::new();
         arg_buffer.push_arg(token_id);
         arg_buffer.push_arg(nft_nonce);
         arg_buffer.push_arg(new_attributes);
