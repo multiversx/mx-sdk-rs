@@ -44,6 +44,11 @@ impl<M: ManagedTypeApi> EsdtTokenPayment<M> {
     }
 
     #[inline]
+    pub fn into_tuple(self) -> (TokenIdentifier<M>, u64, BigUint<M>) {
+        (self.token_identifier, self.token_nonce, self.amount)
+    }
+
+    #[inline]
     pub fn into_multi_value(self) -> EsdtTokenPaymentMultiValue<M> {
         self.into()
     }
