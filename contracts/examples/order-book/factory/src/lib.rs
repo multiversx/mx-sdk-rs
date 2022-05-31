@@ -20,7 +20,7 @@ pub trait Factory {
     fn create_pair(&self, token_id_pair: TokenIdPair<Self::Api>) -> ManagedAddress {
         require!(self.get_pair(&token_id_pair).is_none(), "Already has pair");
 
-        let mut arguments = ManagedArgBuffer::new_empty();
+        let mut arguments = ManagedArgBuffer::new();
         arguments.push_arg(&token_id_pair.first_token_id);
         arguments.push_arg(&token_id_pair.second_token_id);
 
