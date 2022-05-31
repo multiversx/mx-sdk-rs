@@ -78,8 +78,10 @@ pub trait TransferProxyModule {
             ManagedAsyncCallResult::Ok(return_values) => return_values,
             ManagedAsyncCallResult::Err(err) => {
                 let returned_tokens = self.call_value().all_esdt_transfers();
-                self.send()
-                    .direct_multi(&original_caller, &returned_tokens, &[]);
+                if returned_tokens.len() > 0 {
+                    self.send()
+                        .direct_multi(&original_caller, &returned_tokens, &[]);
+                }
 
                 let mut err_result = MultiValueEncoded::new();
                 err_result.push(err.err_msg);

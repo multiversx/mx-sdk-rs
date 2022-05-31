@@ -20,6 +20,10 @@ pub trait TransferDestinationModule {
         }
     }
 
+    #[payable("*")]
+    #[endpoint(receiveFunds)]
+    fn receive_funds(&self, _original_caller: ManagedAddress) {}
+
     fn require_valid_sender(&self, addr: &ManagedAddress) {
         require!(
             self.contract_whitelist().contains(addr),
