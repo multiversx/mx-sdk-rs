@@ -33,6 +33,8 @@ pub trait UseModule:
     + elrond_wasm_modules::pause::PauseModule
     + elrond_wasm_modules::staking::StakingModule
     + elrond_wasm_modules::default_issue_callbacks::DefaultIssueCallbacksModule
+    + elrond_wasm_modules::transfer_role::transfer_proxy::TransferProxyModule
+    + elrond_wasm_modules::transfer_role::transfer_destination::TransferDestinationModule
 {
     /// Validates that the "featureName" feature is on.
     /// Uses the `feature_guard!` macro.
