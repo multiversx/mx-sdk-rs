@@ -34,7 +34,7 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
     #[payable("*")]
     #[endpoint]
     fn buy_nft(&self, nft_id: TokenIdentifier, nft_nonce: u64, nft_amount: BigUint) -> BigUint {
-        let payment: EsdtTokenPayment<Self::Api> = self.call_value().payment();
+        let payment = self.call_value().egld_or_single_esdt();
 
         self.send().sell_nft(
             &nft_id,
@@ -49,12 +49,8 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
 
     #[payable("EGLD")]
     #[endpoint]
-    fn nft_issue(
-        &self,
-        #[payment] issue_cost: BigUint,
-        token_display_name: ManagedBuffer,
-        token_ticker: ManagedBuffer,
-    ) {
+    fn nft_issue(&self, token_display_name: ManagedBuffer, token_ticker: ManagedBuffer) {
+        let issue_cost = self.call_value().egld_value();
         let caller = self.blockchain().get_caller();
 
         self.send()
@@ -90,7 +86,8 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
             },
             ManagedAsyncCallResult::Err(message) => {
                 // return issue cost to the caller
-                let (returned_tokens, token_identifier) = self.call_value().payment_token_pair();
+                let (token_identifier, returned_tokens) =
+                    self.call_value().egld_or_single_fungible_esdt();
                 if token_identifier.is_egld() && returned_tokens > 0 {
                     self.send().direct_egld(caller, &returned_tokens, &[]);
                 }
@@ -266,7 +263,7 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
         function: ManagedBuffer,
         arguments: MultiValueEncoded<ManagedBuffer>,
     ) {
-        let _ = Self::Api::send_api_impl().direct_esdt_nft_execute(
+        let _ = self.send_raw().transfer_esdt_nft_execute(
             &to,
             &token_identifier,
             nonce,
@@ -299,7 +296,7 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
             uri,
         );
 
-        self.send().direct(
+        self.send().direct_esdt(
             &to,
             &token_identifier,
             token_nonce,

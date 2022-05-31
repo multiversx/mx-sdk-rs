@@ -18,15 +18,16 @@ pub trait GovernanceModule:
     // Funds can only be retrived through an action
     #[payable("*")]
     #[endpoint(depositTokensForAction)]
-    fn deposit_tokens_for_action(
-        &self,
-        #[payment_token] payment_token: TokenIdentifier,
-        #[payment_nonce] payment_nonce: u64,
-        #[payment_amount] payment_amount: BigUint,
-    ) {
+    fn deposit_tokens_for_action(&self) {
+        let payment = self.call_value().single_esdt();
         let caller = self.blockchain().get_caller();
 
-        self.user_deposit_event(&caller, &payment_token, payment_nonce, &payment_amount);
+        self.user_deposit_event(
+            &caller,
+            &payment.token_identifier,
+            payment.token_nonce,
+            &payment.amount,
+        );
     }
 
     // Used to withdraw the tokens after the action was executed or cancelled
@@ -49,7 +50,7 @@ pub trait GovernanceModule:
             self.downvotes(proposal_id).remove(&caller);
 
             self.send()
-                .direct(&caller, &governance_token_id, 0, &total_tokens, &[]);
+                .direct_esdt(&caller, &governance_token_id, 0, &total_tokens, &[]);
         }
     }
 
@@ -57,13 +58,13 @@ pub trait GovernanceModule:
     #[endpoint]
     fn propose(
         &self,
-        #[payment_amount] payment_amount: BigUint,
         description: ManagedBuffer,
         actions: MultiValueEncoded<GovernanceActionAsMultiArg<Self::Api>>,
     ) -> usize {
-        self.require_payment_token_governance_token();
+        let payment = self.require_payment_token_governance_token();
+
         require!(
-            payment_amount >= self.min_token_balance_for_proposing().get(),
+            payment.amount >= self.min_token_balance_for_proposing().get(),
             "Not enough tokens for proposing action"
         );
         require!(!actions.is_empty(), "Proposal has no actions");
@@ -120,16 +121,16 @@ pub trait GovernanceModule:
 
         self.proposal_start_block(proposal_id).set(&current_block);
 
-        self.total_votes(proposal_id).set(&payment_amount);
-        self.votes(proposal_id).insert(proposer, payment_amount);
+        self.total_votes(proposal_id).set(&payment.amount);
+        self.votes(proposal_id).insert(proposer, payment.amount);
 
         proposal_id
     }
 
     #[payable("*")]
     #[endpoint]
-    fn vote(&self, #[payment_amount] payment_amount: BigUint, proposal_id: usize) {
-        self.require_payment_token_governance_token();
+    fn vote(&self, proposal_id: usize) {
+        let payment = self.require_payment_token_governance_token();
         self.require_valid_proposal_id(proposal_id);
         require!(
             self.get_proposal_status(proposal_id) == GovernanceProposalStatus::Active,
@@ -137,21 +138,20 @@ pub trait GovernanceModule:
         );
 
         let voter = self.blockchain().get_caller();
-
-        self.vote_cast_event(&voter, proposal_id, &payment_amount);
+        self.vote_cast_event(&voter, proposal_id, &payment.amount);
 
         self.total_votes(proposal_id)
-            .update(|total_votes| *total_votes += &payment_amount);
+            .update(|total_votes| *total_votes += &payment.amount);
         self.votes(proposal_id)
             .entry(voter)
-            .and_modify(|nr_votes| *nr_votes += &payment_amount)
-            .or_insert(payment_amount);
+            .and_modify(|nr_votes| *nr_votes += &payment.amount)
+            .or_insert(payment.amount);
     }
 
     #[payable("*")]
     #[endpoint]
-    fn downvote(&self, #[payment_amount] payment_amount: BigUint, proposal_id: usize) {
-        self.require_payment_token_governance_token();
+    fn downvote(&self, proposal_id: usize) {
+        let payment = self.require_payment_token_governance_token();
         self.require_valid_proposal_id(proposal_id);
         require!(
             self.get_proposal_status(proposal_id) == GovernanceProposalStatus::Active,
@@ -159,15 +159,14 @@ pub trait GovernanceModule:
         );
 
         let downvoter = self.blockchain().get_caller();
-
-        self.downvote_cast_event(&downvoter, proposal_id, &payment_amount);
+        self.downvote_cast_event(&downvoter, proposal_id, &payment.amount);
 
         self.total_downvotes(proposal_id)
-            .update(|total_downvotes| *total_downvotes += &payment_amount);
+            .update(|total_downvotes| *total_downvotes += &payment.amount);
         self.downvotes(proposal_id)
             .entry(downvoter)
-            .and_modify(|nr_downvotes| *nr_downvotes += &payment_amount)
-            .or_insert(payment_amount);
+            .and_modify(|nr_downvotes| *nr_downvotes += &payment.amount)
+            .or_insert(payment.amount);
     }
 
     #[endpoint]
@@ -217,7 +216,7 @@ pub trait GovernanceModule:
                 .with_gas_limit(action.gas_limit);
 
             if action.amount > 0 {
-                contract_call = contract_call.add_token_transfer(
+                contract_call = contract_call.add_esdt_token_transfer(
                     action.token_id,
                     action.token_nonce,
                     action.amount,
@@ -337,11 +336,13 @@ pub trait GovernanceModule:
 
     // private
 
-    fn require_payment_token_governance_token(&self) {
+    fn require_payment_token_governance_token(&self) -> EsdtTokenPayment {
+        let payment = self.call_value().single_esdt();
         require!(
-            self.call_value().token() == self.governance_token_id().get(),
+            payment.token_identifier == self.governance_token_id().get(),
             "Only Governance token accepted as payment"
         );
+        payment
     }
 
     fn require_valid_proposal_id(&self, proposal_id: usize) {

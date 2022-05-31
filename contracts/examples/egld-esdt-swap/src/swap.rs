@@ -66,7 +66,8 @@ pub trait EgldEsdtSwap {
                 self.wrapped_egld_token_id().set(&token_identifier);
             },
             ManagedAsyncCallResult::Err(message) => {
-                let (returned_tokens, token_identifier) = self.call_value().payment_token_pair();
+                let (token_identifier, returned_tokens) =
+                    self.call_value().egld_or_single_fungible_esdt();
                 self.issue_failure_event(caller, &message.err_msg);
 
                 // return issue cost to the owner
@@ -103,8 +104,7 @@ pub trait EgldEsdtSwap {
     #[payable("EGLD")]
     #[endpoint(wrapEgld)]
     fn wrap_egld(&self) {
-        let (payment_amount, payment_token) = self.call_value().payment_token_pair();
-        require!(payment_token.is_egld(), "Only EGLD accepted");
+        let payment_amount = self.call_value().egld_value();
         require!(payment_amount > 0u32, "Payment must be more than 0");
 
         let wrapped_egld_token_id = self.wrapped_egld_token_id().get();
@@ -113,17 +113,16 @@ pub trait EgldEsdtSwap {
 
         let caller = self.blockchain().get_caller();
         self.send()
-            .direct(&caller, &wrapped_egld_token_id, 0, &payment_amount, &[]);
+            .direct_esdt(&caller, &wrapped_egld_token_id, 0, &payment_amount, &[]);
     }
 
     #[payable("*")]
     #[endpoint(unwrapEgld)]
     fn unwrap_egld(&self) {
-        let (payment_amount, payment_token) = self.call_value().payment_token_pair();
+        let (payment_token, payment_amount) = self.call_value().single_fungible_esdt();
         let wrapped_egld_token_id = self.wrapped_egld_token_id().get();
 
         require!(payment_token == wrapped_egld_token_id, "Wrong esdt token");
-        require!(payment_amount > 0u32, "Must pay more than 0 tokens!");
         // this should never happen, but we'll check anyway
         require!(
             payment_amount <= self.get_locked_egld_balance(),
@@ -141,7 +140,7 @@ pub trait EgldEsdtSwap {
     #[view(getLockedEgldBalance)]
     fn get_locked_egld_balance(&self) -> BigUint {
         self.blockchain()
-            .get_sc_balance(&TokenIdentifier::egld(), 0)
+            .get_sc_balance(&EgldOrEsdtTokenIdentifier::egld(), 0)
     }
 
     // storage

@@ -20,7 +20,7 @@ pub struct BondingCurve<M: ManagedTypeApi> {
     pub curve: FunctionSelector<M>,
     pub arguments: CurveArguments<M>,
     pub sell_availability: bool,
-    pub payment_token: TokenIdentifier<M>,
+    pub payment_token: EgldOrEsdtTokenIdentifier<M>,
     pub payment_amount: BigUint<M>,
 }
 

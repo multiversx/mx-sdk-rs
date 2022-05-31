@@ -313,8 +313,8 @@ impl<M: ManagedTypeApi> TopEncode for ManagedBuffer<M> {
 
 impl<M> CodecFromSelf for ManagedBuffer<M> where M: ManagedTypeApi {}
 
-impl<M: ManagedTypeApi> CodecFrom<&[u8]> for ManagedBuffer<M> {}
-impl<M: ManagedTypeApi, const N: usize> CodecFrom<&[u8; N]> for ManagedBuffer<M> {}
+impl<M> CodecFrom<&[u8]> for ManagedBuffer<M> where M: ManagedTypeApi {}
+impl<M, const N: usize> CodecFrom<&[u8; N]> for ManagedBuffer<M> where M: ManagedTypeApi {}
 
 macro_rules! managed_buffer_codec_from_impl_bi_di {
     ($other_ty:ty) => {

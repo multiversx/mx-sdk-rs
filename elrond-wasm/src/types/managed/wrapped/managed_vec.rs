@@ -136,6 +136,23 @@ where
         }
     }
 
+    /// Extracts all elements to an array, if the length matches exactly.
+    ///
+    /// The resulting array contains mere references to the items, as defined in `ManagedVecItem`.
+    pub fn to_array_of_refs<const N: usize>(&self) -> Option<[T::Ref<'_>; N]> {
+        if self.len() != N {
+            return None;
+        }
+
+        let mut result_uninit = core::mem::MaybeUninit::<T::Ref<'_>>::uninit_array();
+        for (index, value) in self.iter().enumerate() {
+            result_uninit[index].write(value);
+        }
+
+        let result = unsafe { core::mem::MaybeUninit::array_assume_init(result_uninit) };
+        Some(result)
+    }
+
     /// Retrieves element at index, if the index is valid.
     /// Otherwise, signals an error and terminates execution.
     pub fn get(&self, index: usize) -> T::Ref<'_> {
@@ -318,6 +335,31 @@ where
 {
 }
 
+impl<M, T> ManagedVec<M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedVecItem + PartialEq,
+{
+    /// This can be very costly for big collections.
+    /// It needs to deserialize and compare every single item in the worst case.
+    pub fn find(&self, item: &T) -> Option<usize> {
+        for (i, item_in_vec) in self.iter().enumerate() {
+            if item_in_vec.borrow() == item {
+                return Some(i);
+            }
+        }
+
+        None
+    }
+
+    /// This can be very costly for big collections.
+    /// It needs to iterate, deserialize, and compare every single item in the worst case.
+    #[inline]
+    pub fn contains(&self, item: &T) -> bool {
+        self.find(item).is_some()
+    }
+}
+
 impl<M, T> TopEncode for ManagedVec<M, T>
 where
     M: ManagedTypeApi,
@@ -357,31 +399,6 @@ where
             item.dep_encode_or_handle_err(dest, h)?;
         }
         Ok(())
-    }
-}
-
-impl<M, T> ManagedVec<M, T>
-where
-    M: ManagedTypeApi,
-    T: ManagedVecItem + PartialEq,
-{
-    /// This can be very costly for big collections.
-    /// It needs to deserialize and compare every single item in the worst case.
-    pub fn find(&self, item: &T) -> Option<usize> {
-        for (i, item_in_vec) in self.iter().enumerate() {
-            if item_in_vec.borrow() == item {
-                return Some(i);
-            }
-        }
-
-        None
-    }
-
-    /// This can be very costly for big collections.
-    /// It needs to iterate, deserialize, and compare every single item in the worst case.
-    #[inline]
-    pub fn contains(&self, item: &T) -> bool {
-        self.find(item).is_some()
     }
 }
 

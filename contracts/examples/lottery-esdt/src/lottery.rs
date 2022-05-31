@@ -21,13 +21,13 @@ pub trait Lottery {
     fn start(
         &self,
         lottery_name: ManagedBuffer,
-        token_identifier: TokenIdentifier,
+        token_identifier: EgldOrEsdtTokenIdentifier,
         ticket_price: BigUint,
         opt_total_tickets: Option<usize>,
         opt_deadline: Option<u64>,
         opt_max_entries_per_user: Option<usize>,
-        opt_prize_distribution: Option<ManagedVec<u8>>,
-        opt_whitelist: Option<ManagedVec<ManagedAddress>>,
+        opt_prize_distribution: ManagedOption<ManagedVec<u8>>,
+        opt_whitelist: ManagedOption<ManagedVec<ManagedAddress>>,
         opt_burn_percentage: OptionalValue<BigUint>,
     ) {
         self.start_lottery(
@@ -47,13 +47,13 @@ pub trait Lottery {
     fn create_lottery_pool(
         &self,
         lottery_name: ManagedBuffer,
-        token_identifier: TokenIdentifier,
+        token_identifier: EgldOrEsdtTokenIdentifier,
         ticket_price: BigUint,
         opt_total_tickets: Option<usize>,
         opt_deadline: Option<u64>,
         opt_max_entries_per_user: Option<usize>,
-        opt_prize_distribution: Option<ManagedVec<u8>>,
-        opt_whitelist: Option<ManagedVec<ManagedAddress>>,
+        opt_prize_distribution: ManagedOption<ManagedVec<u8>>,
+        opt_whitelist: ManagedOption<ManagedVec<ManagedAddress>>,
         opt_burn_percentage: OptionalValue<BigUint>,
     ) {
         self.start_lottery(
@@ -73,13 +73,13 @@ pub trait Lottery {
     fn start_lottery(
         &self,
         lottery_name: ManagedBuffer,
-        token_identifier: TokenIdentifier,
+        token_identifier: EgldOrEsdtTokenIdentifier,
         ticket_price: BigUint,
         opt_total_tickets: Option<usize>,
         opt_deadline: Option<u64>,
         opt_max_entries_per_user: Option<usize>,
-        opt_prize_distribution: Option<ManagedVec<u8>>,
-        opt_whitelist: Option<ManagedVec<ManagedAddress>>,
+        opt_prize_distribution: ManagedOption<ManagedVec<u8>>,
+        opt_whitelist: ManagedOption<ManagedVec<ManagedAddress>>,
         opt_burn_percentage: OptionalValue<BigUint>,
     ) {
         require!(!lottery_name.is_empty(), "Name can't be empty!");
@@ -127,7 +127,9 @@ pub trait Lottery {
             OptionalValue::Some(burn_percentage) => {
                 require!(!token_identifier.is_egld(), "EGLD can't be burned!");
 
-                let roles = self.blockchain().get_esdt_local_roles(&token_identifier);
+                let roles = self
+                    .blockchain()
+                    .get_esdt_local_roles(&token_identifier.clone().unwrap_esdt());
                 require!(
                     roles.has_role(&EsdtLocalRole::Burn),
                     "The contract can't burn the selected token!"
@@ -143,9 +145,9 @@ pub trait Lottery {
             OptionalValue::None => {},
         }
 
-        if let Some(whitelist) = opt_whitelist {
+        if let Some(whitelist) = opt_whitelist.as_option() {
             let mut mapper = self.lottery_whitelist(&lottery_name);
-            for addr in &whitelist {
+            for addr in &*whitelist {
                 mapper.insert(addr);
             }
         }
@@ -166,7 +168,7 @@ pub trait Lottery {
     #[endpoint]
     #[payable("*")]
     fn buy_ticket(&self, lottery_name: ManagedBuffer) {
-        let (payment, token_identifier) = self.call_value().payment_token_pair();
+        let (token_identifier, payment) = self.call_value().egld_or_single_fungible_esdt();
 
         match self.status(&lottery_name) {
             Status::Inactive => sc_panic!("Lottery is currently inactive."),
@@ -209,7 +211,7 @@ pub trait Lottery {
     fn update_after_buy_ticket(
         &self,
         lottery_name: &ManagedBuffer,
-        token_identifier: &TokenIdentifier,
+        token_identifier: &EgldOrEsdtTokenIdentifier,
         payment: &BigUint,
     ) {
         let info_mapper = self.lottery_info(lottery_name);
@@ -258,12 +260,10 @@ pub trait Lottery {
 
             // Prevent crashing if the role was unset while the lottery was running
             // The tokens will simply remain locked forever
-            let roles = self
-                .blockchain()
-                .get_esdt_local_roles(&info.token_identifier);
+            let esdt_token_id = info.token_identifier.clone().unwrap_esdt();
+            let roles = self.blockchain().get_esdt_local_roles(&esdt_token_id);
             if roles.has_role(&EsdtLocalRole::Burn) {
-                self.send()
-                    .esdt_local_burn(&info.token_identifier, 0, &burn_amount);
+                self.send().esdt_local_burn(&esdt_token_id, 0, &burn_amount);
             }
 
             info.prize_pool -= burn_amount;

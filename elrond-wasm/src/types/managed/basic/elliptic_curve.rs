@@ -1,16 +1,24 @@
 use core::marker::PhantomData;
 
-// #[allow(unused_imports)]
 use crate::{
     abi::{TypeAbi, TypeName},
     api::{BigIntApi, EllipticCurveApi, Handle, ManagedTypeApi},
-    types::{heap::BoxedBytes, BigUint, ManagedType},
+    types::{BigUint, ManagedType},
 };
 
 #[cfg(feature = "ei-1-2")]
 use crate::{api::StaticVarApiImpl, types::ManagedBuffer};
 
 use elrond_codec::*;
+
+pub const ELLIPTIC_CURVE_P224_INT: u32 = 224;
+pub const ELLIPTIC_CURVE_P224_NAME: &str = "p224";
+pub const ELLIPTIC_CURVE_P256_INT: u32 = 256;
+pub const ELLIPTIC_CURVE_P256_NAME: &str = "p256";
+pub const ELLIPTIC_CURVE_P384_INT: u32 = 384;
+pub const ELLIPTIC_CURVE_P384_NAME: &str = "p384";
+pub const ELLIPTIC_CURVE_P521_INT: u32 = 521;
+pub const ELLIPTIC_CURVE_P521_NAME: &str = "p521";
 
 pub type EllipticCurveComponents<M> = (
     BigUint<M>,
@@ -59,10 +67,10 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
 
     pub fn from_bitsize(bitsize: u32) -> Option<Self> {
         match bitsize {
-            224 => Some(Self::from_name_str("p224")),
-            256 => Some(Self::from_name_str("p256")),
-            384 => Some(Self::from_name_str("p384")),
-            521 => Some(Self::from_name_str("p521")),
+            ELLIPTIC_CURVE_P224_INT => Some(Self::from_name_str(ELLIPTIC_CURVE_P224_NAME)),
+            ELLIPTIC_CURVE_P256_INT => Some(Self::from_name_str(ELLIPTIC_CURVE_P256_NAME)),
+            ELLIPTIC_CURVE_P384_INT => Some(Self::from_name_str(ELLIPTIC_CURVE_P384_NAME)),
+            ELLIPTIC_CURVE_P521_INT => Some(Self::from_name_str(ELLIPTIC_CURVE_P521_NAME)),
             _ => None,
         }
     }
@@ -224,7 +232,12 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
         )
     }
 
-    pub fn marshal_legacy(&self, x_pair: BigUint<M>, y_pair: BigUint<M>) -> BoxedBytes {
+    #[cfg(feature = "alloc")]
+    pub fn marshal_legacy(
+        &self,
+        x_pair: BigUint<M>,
+        y_pair: BigUint<M>,
+    ) -> crate::types::heap::BoxedBytes {
         let api = M::managed_type_impl();
         api.ec_marshal_legacy(self.handle, x_pair.handle, y_pair.handle)
     }
@@ -236,7 +249,12 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
         ManagedBuffer::from_raw_handle(result_handle)
     }
 
-    pub fn marshal_compressed_legacy(&self, x_pair: BigUint<M>, y_pair: BigUint<M>) -> BoxedBytes {
+    #[cfg(feature = "alloc")]
+    pub fn marshal_compressed_legacy(
+        &self,
+        x_pair: BigUint<M>,
+        y_pair: BigUint<M>,
+    ) -> crate::types::heap::BoxedBytes {
         let api = M::managed_type_impl();
         api.ec_marshal_compressed_legacy(self.handle, x_pair.handle, y_pair.handle)
     }
@@ -309,7 +327,8 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
         )
     }
 
-    pub fn generate_key_legacy(&self) -> (BigUint<M>, BigUint<M>, BoxedBytes) {
+    #[cfg(feature = "alloc")]
+    pub fn generate_key_legacy(&self) -> (BigUint<M>, BigUint<M>, crate::types::heap::BoxedBytes) {
         let api = M::managed_type_impl();
         let x_pub_key_handle = api.bi_new_zero();
         let y_pub_key_handle = api.bi_new_zero();

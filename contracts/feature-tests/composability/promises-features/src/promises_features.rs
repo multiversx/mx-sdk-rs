@@ -20,16 +20,15 @@ pub trait PromisesFeatures {
     fn promise_single_token(
         &self,
         to: ManagedAddress,
-        #[payment_token] token: TokenIdentifier,
-        #[payment] payment: BigUint,
         endpoint_name: ManagedBuffer,
         gas_limit: u64,
         extra_gas_for_callback: u64,
         args: MultiValueEncoded<ManagedBuffer>,
     ) {
+        let (token, payment) = self.call_value().single_fungible_esdt();
         self.send()
             .contract_call::<()>(to, endpoint_name)
-            .add_token_transfer(token, 0, payment)
+            .add_esdt_token_transfer(token, 0, payment)
             .with_arguments_raw(args.to_arg_buffer())
             .with_gas_limit(gas_limit)
             .with_extra_gas_for_callback(extra_gas_for_callback)

@@ -4,7 +4,7 @@ use num_traits::ToPrimitive;
 
 use elrond_wasm::{
     elrond_codec::Empty,
-    types::{Address, BigUint, EsdtLocalRole, EsdtTokenPayment, EsdtTokenType, ManagedVec},
+    types::{Address, BigUint, EsdtLocalRole, EsdtTokenPayment, ManagedVec},
 };
 use elrond_wasm_debug::{
     assert_values_eq, managed_address, managed_biguint, managed_buffer, managed_token_id,
@@ -1300,18 +1300,16 @@ fn test_back_and_forth_transfers() {
     wrapper
         .execute_esdt_multi_transfer(&user, &forwarder_wrapper, &transfers, |sc| {
             let mut managed_payments = ManagedVec::new();
-            managed_payments.push(EsdtTokenPayment {
-                token_type: EsdtTokenType::Fungible,
-                token_identifier: managed_token_id!(&first_token_id[..]),
-                token_nonce: 0,
-                amount: managed_biguint!(first_token_amount.to_u64().unwrap()),
-            });
-            managed_payments.push(EsdtTokenPayment {
-                token_type: EsdtTokenType::Fungible,
-                token_identifier: managed_token_id!(&second_token_id[..]),
-                token_nonce: 0,
-                amount: managed_biguint!(second_token_amount.to_u64().unwrap()),
-            });
+            managed_payments.push(EsdtTokenPayment::new(
+                managed_token_id!(&first_token_id[..]),
+                0,
+                managed_biguint!(first_token_amount.to_u64().unwrap()),
+            ));
+            managed_payments.push(EsdtTokenPayment::new(
+                managed_token_id!(&second_token_id[..]),
+                0,
+                managed_biguint!(second_token_amount.to_u64().unwrap()),
+            ));
 
             sc.forward_sync_retrieve_funds_with_accept_func(
                 managed_payments,

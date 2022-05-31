@@ -1,12 +1,13 @@
-use elrond_wasm::types::{BoxedBytes, TokenIdentifier};
+use elrond_wasm::types::{BoxedBytes, EgldOrEsdtTokenIdentifier, TokenIdentifier};
 use elrond_wasm_debug::{
-    check_managed_top_decode, check_managed_top_encode_decode, managed_token_id, DebugApi,
+    check_managed_top_encode_decode, managed_egld_token_id, managed_token_id,
+    managed_token_id_wrapped, DebugApi,
 };
 
 #[test]
 fn test_egld() {
     let _ = DebugApi::dummy();
-    assert!(TokenIdentifier::<DebugApi>::egld().is_egld());
+    assert!(EgldOrEsdtTokenIdentifier::<DebugApi>::egld().is_egld());
 }
 
 #[test]
@@ -14,28 +15,18 @@ fn test_codec() {
     let api = DebugApi::dummy();
     check_managed_top_encode_decode(
         api.clone(),
-        TokenIdentifier::<DebugApi>::egld(),
-        TokenIdentifier::<DebugApi>::EGLD_REPRESENTATION,
+        EgldOrEsdtTokenIdentifier::<DebugApi>::egld(),
+        EgldOrEsdtTokenIdentifier::<DebugApi>::EGLD_REPRESENTATION,
     );
 
     let expected = BoxedBytes::from_concat(&[
         &[0, 0, 0, 4],
-        &TokenIdentifier::<DebugApi>::EGLD_REPRESENTATION[..],
+        &EgldOrEsdtTokenIdentifier::<DebugApi>::EGLD_REPRESENTATION[..],
     ]);
     check_managed_top_encode_decode(
         api.clone(),
-        vec![TokenIdentifier::<DebugApi>::egld()],
+        vec![EgldOrEsdtTokenIdentifier::<DebugApi>::egld()],
         expected.as_slice(),
-    );
-
-    // also allowed
-    assert_eq!(
-        TokenIdentifier::<DebugApi>::egld(),
-        check_managed_top_decode::<TokenIdentifier<DebugApi>>(api.clone(), &[])
-    );
-    assert_eq!(
-        vec![TokenIdentifier::<DebugApi>::egld()],
-        check_managed_top_decode::<Vec<TokenIdentifier<DebugApi>>>(api, &[0, 0, 0, 0])
     );
 }
 
@@ -79,11 +70,15 @@ fn test_is_valid_esdt_identifier() {
 fn test_managed_token_id_macro() {
     let _ = DebugApi::dummy();
     assert_eq!(
-        managed_token_id!(b"EGLD"),
-        TokenIdentifier::<DebugApi>::egld()
+        managed_egld_token_id!(b"EGLD"),
+        EgldOrEsdtTokenIdentifier::<DebugApi>::egld()
     );
     assert_eq!(
         managed_token_id!(b"ALC-6258d2"),
         TokenIdentifier::<DebugApi>::from_esdt_bytes(&b"ALC-6258d2"[..])
     );
+    assert_eq!(
+        managed_token_id_wrapped!(b"ALC-6258d2").unwrap_esdt(),
+        TokenIdentifier::<DebugApi>::from_esdt_bytes(&b"ALC-6258d2"[..])
+    )
 }
