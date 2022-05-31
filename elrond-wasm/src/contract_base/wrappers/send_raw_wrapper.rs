@@ -48,7 +48,7 @@ where
             amount,
             0,
             &data.into(),
-            &ManagedArgBuffer::new_empty(),
+            &ManagedArgBuffer::new(),
         );
     }
 
