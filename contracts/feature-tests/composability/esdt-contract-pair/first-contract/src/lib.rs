@@ -96,7 +96,7 @@ pub trait FirstContract {
             &esdt_value,
             self.blockchain().get_gas_left(),
             &ManagedBuffer::from(SECOND_CONTRACT_REJECT_ESDT_PAYMENT),
-            &ManagedArgBuffer::new_empty(),
+            &ManagedArgBuffer::new(),
         );
     }
 
@@ -118,7 +118,7 @@ pub trait FirstContract {
             &esdt_value,
             self.blockchain().get_gas_left(),
             &ManagedBuffer::from(SECOND_CONTRACT_ACCEPT_ESDT_PAYMENT),
-            &ManagedArgBuffer::new_empty(),
+            &ManagedArgBuffer::new(),
         );
     }
 
@@ -130,7 +130,7 @@ pub trait FirstContract {
         func_name: &ManagedBuffer,
         args: &ManagedVec<Self::Api, ManagedBuffer>,
     ) {
-        let mut arg_buffer = ManagedArgBuffer::new_empty();
+        let mut arg_buffer = ManagedArgBuffer::new();
         arg_buffer.push_arg(esdt_token_identifier);
         arg_buffer.push_arg(amount);
         arg_buffer.push_arg(func_name);
