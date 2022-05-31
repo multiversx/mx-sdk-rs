@@ -44,4 +44,22 @@ impl StaticVarApiImpl for DebugApi {
     fn get_num_arguments(&self) -> i32 {
         self.static_vars_cell.borrow().num_arguments
     }
+
+    fn set_call_value_egld_handle(&self, handle: Handle) {
+        self.static_vars_cell.borrow_mut().call_value_egld_handle = handle;
+    }
+
+    fn get_call_value_egld_handle(&self) -> Handle {
+        self.static_vars_cell.borrow().call_value_egld_handle
+    }
+
+    fn set_call_value_multi_esdt_handle(&self, handle: Handle) {
+        self.static_vars_cell
+            .borrow_mut()
+            .call_value_multi_esdt_handle = handle;
+    }
+
+    fn get_call_value_multi_esdt_handle(&self) -> Handle {
+        self.static_vars_cell.borrow().call_value_multi_esdt_handle
+    }
 }

@@ -43,12 +43,13 @@ pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
     #[endpoint]
     fn get_egld_balance(&self) -> BigUint {
         self.blockchain()
-            .get_sc_balance(&TokenIdentifier::egld(), 0)
+            .get_sc_balance(&EgldOrEsdtTokenIdentifier::egld(), 0)
     }
 
     #[endpoint]
     fn get_esdt_balance(&self, token_id: TokenIdentifier, nonce: u64) -> BigUint {
-        self.blockchain().get_sc_balance(&token_id, nonce)
+        self.blockchain()
+            .get_sc_balance(&EgldOrEsdtTokenIdentifier::esdt(token_id), nonce)
     }
 
     #[payable("EGLD")]
@@ -62,17 +63,20 @@ pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
     fn recieve_egld_half(&self) {
         let caller = self.blockchain().get_caller();
         let payment_amount = self.call_value().egld_value() / 2u32;
-        self.send()
-            .direct(&caller, &TokenIdentifier::egld(), 0, &payment_amount, &[]);
+        self.send().direct(
+            &caller,
+            &EgldOrEsdtTokenIdentifier::egld(),
+            0,
+            &payment_amount,
+            &[],
+        );
     }
 
     #[payable("*")]
     #[endpoint]
     fn receive_esdt(&self) -> (TokenIdentifier, BigUint) {
-        let token_id = self.call_value().token();
-        let amount = self.call_value().esdt_value();
-
-        (token_id, amount)
+        let payment = self.call_value().single_esdt();
+        (payment.token_identifier, payment.amount)
     }
 
     #[payable("*")]
@@ -85,10 +89,11 @@ pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
     #[endpoint]
     fn receive_esdt_half(&self) {
         let caller = self.blockchain().get_caller();
-        let token_id = self.call_value().token();
-        let amount = self.call_value().esdt_value() / 2u32;
+        let payment = self.call_value().single_esdt();
+        let amount = payment.amount / 2u32;
 
-        self.send().direct(&caller, &token_id, 0, &amount, &[]);
+        self.send()
+            .direct_esdt(&caller, &payment.token_identifier, 0, &amount, &[]);
     }
 
     #[payable("*")]
@@ -106,7 +111,8 @@ pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
         nft_nonce: u64,
         amount: BigUint,
     ) {
-        self.send().direct(&to, &token_id, nft_nonce, &amount, &[]);
+        self.send()
+            .direct_esdt(&to, &token_id, nft_nonce, &amount, &[]);
     }
 
     #[endpoint]

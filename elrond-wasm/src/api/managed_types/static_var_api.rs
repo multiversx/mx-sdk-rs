@@ -23,4 +23,12 @@ pub trait StaticVarApiImpl {
     fn set_num_arguments(&self, num_arguments: i32);
 
     fn get_num_arguments(&self) -> i32;
+
+    fn set_call_value_egld_handle(&self, handle: Handle);
+
+    fn get_call_value_egld_handle(&self) -> Handle;
+
+    fn set_call_value_multi_esdt_handle(&self, handle: Handle);
+
+    fn get_call_value_multi_esdt_handle(&self) -> Handle;
 }

@@ -37,7 +37,7 @@ where
         }
     }
 
-    pub const fn none() -> Self {
+    pub fn none() -> Self {
         Self {
             _phantom_m: PhantomData,
             _phantom_t: PhantomData,
@@ -110,6 +110,30 @@ where
             ManagedOption::<M, U>::some(f(T::from_raw_handle(self.handle)))
         } else {
             ManagedOption::<M, U>::none()
+        }
+    }
+
+    pub fn map_or_else<U, D, F>(self, default: D, f: F) -> U
+    where
+        D: FnOnce() -> U,
+        F: FnOnce(T) -> U,
+    {
+        if self.is_some() {
+            f(T::from_raw_handle(self.handle))
+        } else {
+            default()
+        }
+    }
+
+    pub fn map_ref_or_else<U, D, F>(&self, default: D, f: F) -> U
+    where
+        D: FnOnce() -> U,
+        F: FnOnce(&T) -> U,
+    {
+        if self.is_some() {
+            f(&T::from_raw_handle(self.handle))
+        } else {
+            default()
         }
     }
 }

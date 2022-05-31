@@ -29,11 +29,22 @@ macro_rules! managed_address {
 #[macro_export]
 macro_rules! managed_token_id {
     ($bytes:expr) => {{
-        if $bytes == &elrond_wasm::types::TokenIdentifier::<elrond_wasm_debug::DebugApi>::EGLD_REPRESENTATION[..] {
-            elrond_wasm::types::TokenIdentifier::egld()
-        } else {
-            elrond_wasm::types::TokenIdentifier::from_esdt_bytes($bytes)
-        }
+        elrond_wasm::types::TokenIdentifier::from_esdt_bytes($bytes)
+    }};
+}
+
+#[macro_export]
+macro_rules! managed_token_id_wrapped {
+    ($bytes:expr) => {{
+        let ___esdt_token_id___ = elrond_wasm::types::TokenIdentifier::from_esdt_bytes($bytes);
+        elrond_wasm::types::EgldOrEsdtTokenIdentifier::esdt(___esdt_token_id___)
+    }};
+}
+
+#[macro_export]
+macro_rules! managed_egld_token_id {
+    ($bytes:expr) => {{
+        elrond_wasm::types::EgldOrEsdtTokenIdentifier::egld()
     }};
 }
 

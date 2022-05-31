@@ -6,6 +6,8 @@
 #![allow(clippy::type_complexity)]
 #![allow(deprecated)]
 #![feature(generic_associated_types)]
+#![feature(maybe_uninit_uninit_array)]
+#![feature(maybe_uninit_array_assume_init)]
 
 pub use elrond_wasm_derive::{self as derive, contract, module, proxy};
 
