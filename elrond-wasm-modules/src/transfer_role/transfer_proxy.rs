@@ -24,7 +24,7 @@ pub trait TransferProxyModule {
         original_caller: ManagedAddress,
         mut contract_call: ContractCall<Self::Api, Empty>,
     ) -> ! {
-        let mut original_caller_arg = ManagedArgBuffer::new_empty();
+        let mut original_caller_arg = ManagedArgBuffer::new();
         original_caller_arg.push_arg(original_caller.clone());
         contract_call.arg_buffer = original_caller_arg.concat(contract_call.arg_buffer);
 

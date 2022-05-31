@@ -65,7 +65,7 @@ pub trait UseModule:
         if !self.blockchain().is_smart_contract(&dest) {
             self.transfer_to_user(original_caller, dest, payments, endpoint_name);
         } else {
-            let mut args_buffer = ManagedArgBuffer::new_empty();
+            let mut args_buffer = ManagedArgBuffer::new();
             for arg in args {
                 args_buffer.push_arg(arg);
             }

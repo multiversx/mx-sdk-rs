@@ -96,7 +96,7 @@ fn test_transfer_role_module() {
                     managed_address!(sc_dest.address_ref()),
                     payments,
                     managed_buffer!(RECEIVE_FUNDS_FUNC_NAME),
-                    ManagedArgBuffer::new_empty(),
+                    ManagedArgBuffer::new(),
                 );
             },
         )
