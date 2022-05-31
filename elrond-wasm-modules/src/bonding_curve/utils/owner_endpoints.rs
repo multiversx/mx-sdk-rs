@@ -69,12 +69,7 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
     #[endpoint(deposit)]
     #[payable("*")]
     fn deposit(&self, payment_token: OptionalValue<TokenIdentifier>) {
-        let payment = self.call_value().single_esdt();
-        let (identifier, nonce, amount) = (
-            payment.token_identifier,
-            payment.token_nonce,
-            payment.amount,
-        );
+        let (identifier, nonce, amount) = self.call_value().single_esdt().into_tuple();
         let caller = self.blockchain().get_caller();
         let mut set_payment = EgldOrEsdtTokenIdentifier::egld();
 

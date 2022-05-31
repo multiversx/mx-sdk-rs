@@ -12,12 +12,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
     #[payable("*")]
     #[endpoint(sellToken)]
     fn sell_token(&self) {
-        let payment = self.call_value().single_esdt();
-        let (offered_token, nonce, sell_amount) = (
-            payment.token_identifier,
-            payment.token_nonce,
-            payment.amount,
-        );
+        let (offered_token, nonce, sell_amount) = self.call_value().single_esdt().into_tuple();
         let _ = self.check_owned_return_payment_token(&offered_token, &sell_amount);
 
         let calculated_price = self.bonding_curve(&offered_token).update(|bonding_curve| {
