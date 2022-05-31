@@ -49,7 +49,7 @@ where
 {
     fn default() -> Self {
         let zero = BigUint::zero();
-        let arg_buffer = ManagedArgBuffer::new_empty();
+        let arg_buffer = ManagedArgBuffer::new();
         ContractDeploy {
             _phantom: PhantomData,
             to: ManagedOption::none(),
