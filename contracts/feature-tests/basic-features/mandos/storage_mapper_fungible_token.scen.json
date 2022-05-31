@@ -677,7 +677,7 @@
             "expect": {
                 "out": [],
                 "status": "4",
-                "message": "str:Invalid payment token",
+                "message": "str:incorrect number of ESDT transfers",
                 "logs": "*",
                 "gas": "*",
                 "refund": "*"
