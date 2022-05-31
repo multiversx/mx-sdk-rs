@@ -47,4 +47,36 @@ pub trait UseModule:
     fn check_pause(&self) -> SCResult<bool> {
         Ok(self.is_paused())
     }
+
+    #[payable("*")]
+    #[endpoint(forwardPayments)]
+    fn forward_payments(
+        &self,
+        dest: ManagedAddress,
+        endpoint_name: ManagedBuffer,
+        args: MultiValueEncoded<ManagedBuffer>,
+    ) {
+        let original_caller = self.blockchain().get_caller();
+        let payments = self.call_value().all_esdt_transfers();
+        if payments.is_empty() {
+            return;
+        }
+
+        if !self.blockchain().is_smart_contract(&dest) {
+            self.transfer_to_user(original_caller, dest, payments, endpoint_name);
+        } else {
+            let mut args_buffer = ManagedArgBuffer::new_empty();
+            for arg in args {
+                args_buffer.push_arg(arg);
+            }
+
+            self.transfer_to_contract_raw(
+                original_caller,
+                dest,
+                payments,
+                endpoint_name,
+                args_buffer,
+            );
+        }
+    }
 }
