@@ -72,7 +72,7 @@ where
         endpoint_name: ManagedBuffer<SA>,
         payments: ManagedVec<SA, EsdtTokenPayment<SA>>,
     ) -> Self {
-        let arg_buffer = ManagedArgBuffer::new_empty();
+        let arg_buffer = ManagedArgBuffer::new();
         let egld_payment = BigUint::zero();
         let success_callback = b"";
         let error_callback = b"";
@@ -203,7 +203,7 @@ where
                 let no_payments = self.no_payments();
 
                 // fungible ESDT
-                let mut new_arg_buffer = ManagedArgBuffer::new_empty();
+                let mut new_arg_buffer = ManagedArgBuffer::new();
                 new_arg_buffer.push_arg(&payment.token_identifier);
                 new_arg_buffer.push_arg(&payment.amount);
                 if !self.endpoint_name.is_empty() {
@@ -235,7 +235,7 @@ where
                 // arg1 - nonce
                 // arg2 - quantity to transfer
                 // arg3 - destination address
-                let mut new_arg_buffer = ManagedArgBuffer::new_empty();
+                let mut new_arg_buffer = ManagedArgBuffer::new();
                 new_arg_buffer.push_arg(&payment.token_identifier);
                 new_arg_buffer.push_arg(&payment.token_nonce);
                 new_arg_buffer.push_arg(&payment.amount);
@@ -271,7 +271,7 @@ where
     fn convert_to_multi_transfer_esdt_call(self) -> Self {
         let payments = self.no_payments();
 
-        let mut new_arg_buffer = ManagedArgBuffer::new_empty();
+        let mut new_arg_buffer = ManagedArgBuffer::new();
         new_arg_buffer.push_arg(self.to);
         new_arg_buffer.push_arg(self.payments.len());
 

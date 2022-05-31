@@ -96,7 +96,7 @@ pub trait Vault {
                 &amount,
                 50_000_000,
                 &func_name,
-                &ManagedArgBuffer::new_empty(),
+                &ManagedArgBuffer::new(),
             )
             .unwrap_or_else(|_| sc_panic!("ESDT transfer failed"));
     }

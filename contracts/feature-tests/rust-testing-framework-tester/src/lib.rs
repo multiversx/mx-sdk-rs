@@ -178,7 +178,7 @@ pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
             &other_sc_address,
             &BigUint::zero(),
             &ManagedBuffer::new_from_bytes(b"getTotalValue"),
-            &ManagedArgBuffer::new_empty(),
+            &ManagedArgBuffer::new(),
         );
         if let Some(raw_value) = call_result.try_get(0) {
             BigUint::from_bytes_be_buffer(&raw_value)
@@ -189,7 +189,7 @@ pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
 
     #[endpoint]
     fn call_other_contract_add_async_call(&self, other_sc_address: ManagedAddress, value: BigUint) {
-        let mut args = ManagedArgBuffer::new_empty();
+        let mut args = ManagedArgBuffer::new();
         args.push_arg(&value);
 
         self.send_raw().async_call_raw(
@@ -212,7 +212,7 @@ pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
 
     #[endpoint]
     fn execute_on_dest_add_value(&self, other_sc_address: ManagedAddress, value: BigUint) {
-        let mut args = ManagedArgBuffer::new_empty();
+        let mut args = ManagedArgBuffer::new();
         args.push_arg(value);
 
         let _ = self.send_raw().execute_on_dest_context_raw(
