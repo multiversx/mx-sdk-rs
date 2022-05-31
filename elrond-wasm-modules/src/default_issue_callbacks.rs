@@ -31,7 +31,7 @@ pub trait DefaultIssueCallbacksModule {
     ) {
         match result {
             ManagedAsyncCallResult::Ok(()) => {
-                let token_id = self.call_value().token();
+                let token_id = self.call_value().single_esdt().token_identifier;
                 let mapper =
                     SingleValueMapper::<Self::Api, TokenIdentifier>::new(storage_key.into());
                 mapper.set(&token_id);

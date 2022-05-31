@@ -354,7 +354,7 @@ pub trait OrdersModule:
     fn execute_transfers(&self, transfers: ManagedVec<Transfer<Self::Api>>) {
         for transfer in &transfers {
             if transfer.payment.amount > 0 {
-                self.send().direct(
+                self.send().direct_esdt(
                     &transfer.to,
                     &transfer.payment.token_id,
                     0,

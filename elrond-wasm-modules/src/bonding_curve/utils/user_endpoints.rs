@@ -11,12 +11,8 @@ use crate::bonding_curve::{
 pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
     #[payable("*")]
     #[endpoint(sellToken)]
-    fn sell_token(
-        &self,
-        #[payment_amount] sell_amount: BigUint,
-        #[payment_nonce] nonce: u64,
-        #[payment_token] offered_token: TokenIdentifier,
-    ) {
+    fn sell_token(&self) {
+        let (offered_token, nonce, sell_amount) = self.call_value().single_esdt().into_tuple();
         let _ = self.check_owned_return_payment_token(&offered_token, &sell_amount);
 
         let calculated_price = self.bonding_curve(&offered_token).update(|bonding_curve| {
@@ -56,12 +52,11 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
     #[endpoint(buyToken)]
     fn buy_token(
         &self,
-        #[payment_amount] payment: BigUint,
-        #[payment_token] offered_token: TokenIdentifier,
         requested_amount: BigUint,
         requested_token: TokenIdentifier,
         requested_nonce: OptionalValue<u64>,
     ) {
+        let (offered_token, payment) = self.call_value().egld_or_single_fungible_esdt();
         let payment_token =
             self.check_owned_return_payment_token(&requested_token, &requested_amount);
         self.check_given_token(&payment_token, &offered_token);
@@ -88,7 +83,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
 
         match requested_nonce {
             OptionalValue::Some(nonce) => {
-                self.send().direct(
+                self.send().direct_esdt(
                     &caller,
                     &requested_token,
                     nonce,
@@ -146,7 +141,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
                 total_amount = BigUint::zero();
             }
             self.send()
-                .direct(caller, &token, nonce, &amount_to_send, b"buying");
+                .direct_esdt(caller, &token, nonce, &amount_to_send, b"buying");
             if total_amount == BigUint::zero() {
                 break;
             }
@@ -200,7 +195,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
         &self,
         issued_token: &TokenIdentifier,
         amount: &BigUint,
-    ) -> TokenIdentifier {
+    ) -> EgldOrEsdtTokenIdentifier {
         self.check_token_exists(issued_token);
 
         let bonding_curve = self.bonding_curve(issued_token).get();
@@ -213,7 +208,11 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
         bonding_curve.payment_token
     }
 
-    fn check_given_token(&self, accepted_token: &TokenIdentifier, given_token: &TokenIdentifier) {
+    fn check_given_token(
+        &self,
+        accepted_token: &EgldOrEsdtTokenIdentifier,
+        given_token: &EgldOrEsdtTokenIdentifier,
+    ) {
         require!(
             given_token == accepted_token,
             "Only {} tokens accepted",

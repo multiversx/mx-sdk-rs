@@ -1,5 +1,10 @@
 use super::Handle;
 
+/// Used as a flag. Reading from this handle will always result in a crash.
+///
+/// Do not initialize!
+pub const UNINITIALIZED_HANDLE: Handle = i32::MAX;
+
 /// WARNING! With the current VM this still needs to be initialized before use.
 pub const BIG_INT_CONST_ZERO: Handle = -10;
 

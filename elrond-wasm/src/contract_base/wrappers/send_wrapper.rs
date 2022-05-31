@@ -10,8 +10,8 @@ use crate::{
     },
     esdt::ESDTSystemSmartContractProxy,
     types::{
-        BigUint, ContractCall, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer,
-        ManagedType, ManagedVec, TokenIdentifier,
+        BigUint, ContractCall, EgldOrEsdtTokenIdentifier, EsdtTokenPayment, ManagedAddress,
+        ManagedArgBuffer, ManagedBuffer, ManagedType, ManagedVec, TokenIdentifier,
     },
 };
 
@@ -73,7 +73,7 @@ where
     pub fn direct<D>(
         &self,
         to: &ManagedAddress<A>,
-        token: &TokenIdentifier<A>,
+        token: &EgldOrEsdtTokenIdentifier<A>,
         nonce: u64,
         amount: &BigUint<A>,
         data: D,
@@ -83,27 +83,11 @@ where
         self.direct_with_gas_limit(to, token, nonce, amount, 0, data, &[]);
     }
 
-    #[inline]
-    pub fn direct_single<D>(&self, to: &ManagedAddress<A>, payment: &EsdtTokenPayment<A>, data: D)
-    where
-        D: Into<ManagedBuffer<A>>,
-    {
-        self.direct_with_gas_limit(
-            to,
-            &payment.token_identifier,
-            payment.token_nonce,
-            &payment.amount,
-            0,
-            data,
-            &[],
-        );
-    }
-
     #[allow(clippy::too_many_arguments)]
-    pub fn direct_with_gas_limit<D>(
+    pub fn direct_esdt_with_gas_limit<D>(
         &self,
         to: &ManagedAddress<A>,
-        token: &TokenIdentifier<A>,
+        token_identifier: &TokenIdentifier<A>,
         nonce: u64,
         amount: &BigUint<A>,
         gas: u64,
@@ -112,38 +96,72 @@ where
     ) where
         D: Into<ManagedBuffer<A>>,
     {
-        let endpoint_name_managed = endpoint_name.into();
-        let mut arg_buffer = ManagedArgBuffer::new_empty();
-        for arg in arguments {
-            arg_buffer.push_arg(arg);
-        }
-
-        if token.is_egld() {
-            let _ = self.send_raw_wrapper().direct_egld_execute(
-                to,
-                amount,
-                gas,
-                &endpoint_name_managed,
-                &arg_buffer,
-            );
-        } else if nonce == 0 {
+        if nonce == 0 {
             let _ = self.send_raw_wrapper().transfer_esdt_execute(
                 to,
-                token,
+                token_identifier,
                 amount,
                 gas,
-                &endpoint_name_managed,
-                &arg_buffer,
+                &endpoint_name.into(),
+                &arguments.into(),
             );
         } else {
             let _ = self.send_raw_wrapper().transfer_esdt_nft_execute(
                 to,
-                token,
+                token_identifier,
                 nonce,
                 amount,
                 gas,
-                &endpoint_name_managed,
-                &arg_buffer,
+                &endpoint_name.into(),
+                &arguments.into(),
+            );
+        }
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    pub fn direct_esdt<D>(
+        &self,
+        to: &ManagedAddress<A>,
+        token_identifier: &TokenIdentifier<A>,
+        nonce: u64,
+        amount: &BigUint<A>,
+        data: D,
+    ) where
+        D: Into<ManagedBuffer<A>>,
+    {
+        self.direct_esdt_with_gas_limit(to, token_identifier, nonce, amount, 0, data, &[]);
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    pub fn direct_with_gas_limit<D>(
+        &self,
+        to: &ManagedAddress<A>,
+        token: &EgldOrEsdtTokenIdentifier<A>,
+        nonce: u64,
+        amount: &BigUint<A>,
+        gas: u64,
+        endpoint_name: D,
+        arguments: &[ManagedBuffer<A>],
+    ) where
+        D: Into<ManagedBuffer<A>>,
+    {
+        if let Some(esdt_token_identifier) = token.as_esdt_token_identifier() {
+            self.direct_esdt_with_gas_limit(
+                to,
+                &esdt_token_identifier,
+                nonce,
+                amount,
+                gas,
+                endpoint_name,
+                arguments,
+            );
+        } else {
+            let _ = self.send_raw_wrapper().direct_egld_execute(
+                to,
+                amount,
+                gas,
+                &endpoint_name.into(),
+                &arguments.into(),
             );
         }
     }
@@ -452,7 +470,7 @@ where
         }
     }
 
-    /// Sends thr NFTs to the buyer address and calculates and sends the required royalties to the NFT creator.
+    /// Sends the NFTs to the buyer address and calculates and sends the required royalties to the NFT creator.
     /// Returns the payment amount left after sending royalties.
     #[allow(clippy::too_many_arguments)]
     pub fn sell_nft(
@@ -461,7 +479,7 @@ where
         nft_nonce: u64,
         nft_amount: &BigUint<A>,
         buyer: &ManagedAddress<A>,
-        payment_token: &TokenIdentifier<A>,
+        payment_token: &EgldOrEsdtTokenIdentifier<A>,
         payment_nonce: u64,
         payment_amount: &BigUint<A>,
     ) -> BigUint<A> {
@@ -472,7 +490,15 @@ where
         );
         let royalties_amount = payment_amount.clone() * nft_token_data.royalties / PERCENTAGE_TOTAL;
 
-        self.direct(buyer, nft_id, nft_nonce, nft_amount, &[]);
+        let _ = self.send_raw_wrapper().transfer_esdt_nft_execute(
+            buyer,
+            nft_id,
+            nft_nonce,
+            nft_amount,
+            0,
+            &ManagedBuffer::new(),
+            &ManagedArgBuffer::new_empty(),
+        );
 
         if royalties_amount > 0u32 {
             self.direct(

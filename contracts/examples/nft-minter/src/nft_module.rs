@@ -8,7 +8,7 @@ const ROYALTIES_MAX: u32 = 10_000;
 
 #[derive(TypeAbi, TopEncode, TopDecode)]
 pub struct PriceTag<M: ManagedTypeApi> {
-    pub token: TokenIdentifier<M>,
+    pub token: EgldOrEsdtTokenIdentifier<M>,
     pub nonce: u64,
     pub amount: BigUint<M>,
 }
@@ -65,7 +65,7 @@ pub trait NftModule {
     #[payable("*")]
     #[endpoint(buyNft)]
     fn buy_nft(&self, nft_nonce: u64) {
-        let payment: EsdtTokenPayment<Self::Api> = self.call_value().payment();
+        let payment = self.call_value().egld_or_single_esdt();
 
         self.require_token_issued();
         require!(
@@ -91,7 +91,7 @@ pub trait NftModule {
 
         let nft_token_id = self.nft_token_id().get();
         let caller = self.blockchain().get_caller();
-        self.send().direct(
+        self.send().direct_esdt(
             &caller,
             &nft_token_id,
             nft_nonce,
@@ -116,7 +116,7 @@ pub trait NftModule {
     fn get_nft_price(
         &self,
         nft_nonce: u64,
-    ) -> OptionalValue<MultiValue3<TokenIdentifier, u64, BigUint>> {
+    ) -> OptionalValue<MultiValue3<EgldOrEsdtTokenIdentifier, u64, BigUint>> {
         if self.price_tag(nft_nonce).is_empty() {
             // NFT was already sold
             OptionalValue::None
@@ -130,17 +130,25 @@ pub trait NftModule {
     // callbacks
 
     #[callback]
-    fn issue_callback(&self, #[call_result] result: ManagedAsyncCallResult<TokenIdentifier>) {
+    fn issue_callback(
+        &self,
+        #[call_result] result: ManagedAsyncCallResult<EgldOrEsdtTokenIdentifier>,
+    ) {
         match result {
             ManagedAsyncCallResult::Ok(token_id) => {
-                self.nft_token_id().set(&token_id);
+                self.nft_token_id().set(&token_id.unwrap_esdt());
             },
             ManagedAsyncCallResult::Err(_) => {
                 let caller = self.blockchain().get_owner_address();
-                let (returned_tokens, token_id) = self.call_value().payment_token_pair();
-                if token_id.is_egld() && returned_tokens > 0 {
-                    self.send()
-                        .direct(&caller, &token_id, 0, &returned_tokens, &[]);
+                let returned = self.call_value().egld_or_single_esdt();
+                if returned.token_identifier.is_egld() && returned.amount > 0 {
+                    self.send().direct(
+                        &caller,
+                        &returned.token_identifier,
+                        0,
+                        &returned.amount,
+                        &[],
+                    );
                 }
             },
         }
@@ -156,7 +164,7 @@ pub trait NftModule {
         attributes: T,
         uri: ManagedBuffer,
         selling_price: BigUint,
-        token_used_as_payment: TokenIdentifier,
+        token_used_as_payment: EgldOrEsdtTokenIdentifier,
         token_used_as_payment_nonce: u64,
     ) -> u64 {
         self.require_token_issued();

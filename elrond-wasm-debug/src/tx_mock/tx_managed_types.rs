@@ -34,11 +34,17 @@ impl<V> HandleMap<V> {
     }
 
     pub fn get(&self, handle: Handle) -> &V {
-        self.map.get(&handle).unwrap()
+        // TODO: consider simulating the actual error from the VM
+        self.map
+            .get(&handle)
+            .unwrap_or_else(|| panic!("handle not found"))
     }
 
     pub fn get_mut(&mut self, handle: Handle) -> &mut V {
-        self.map.get_mut(&handle).unwrap()
+        // TODO: consider simulating the actual error from the VM
+        self.map
+            .get_mut(&handle)
+            .unwrap_or_else(|| panic!("handle not found"))
     }
 
     pub fn insert(&mut self, handle: Handle, value: V) {
@@ -74,6 +80,8 @@ pub struct TxStaticVars {
     pub(crate) external_view_target_address_handle: Handle,
     pub(crate) next_handle: Handle,
     pub(crate) num_arguments: i32,
+    pub(crate) call_value_egld_handle: Handle,
+    pub(crate) call_value_multi_esdt_handle: Handle,
 }
 
 impl Default for TxStaticVars {
@@ -82,6 +90,8 @@ impl Default for TxStaticVars {
             external_view_target_address_handle: 0,
             next_handle: const_handles::NEW_HANDLE_START_FROM,
             num_arguments: -1,
+            call_value_egld_handle: const_handles::UNINITIALIZED_HANDLE,
+            call_value_multi_esdt_handle: const_handles::UNINITIALIZED_HANDLE,
         }
     }
 }

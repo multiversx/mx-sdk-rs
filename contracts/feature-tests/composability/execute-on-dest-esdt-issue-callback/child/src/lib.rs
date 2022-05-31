@@ -16,8 +16,8 @@ pub trait Child {
         token_display_name: ManagedBuffer,
         token_ticker: ManagedBuffer,
         initial_supply: BigUint,
-        #[payment] issue_cost: BigUint,
     ) {
+        let issue_cost = self.call_value().egld_value();
         self.send()
             .esdt_system_sc_proxy()
             .issue_fungible(
@@ -45,12 +45,8 @@ pub trait Child {
     // callbacks
 
     #[callback]
-    fn esdt_issue_callback(
-        &self,
-        #[payment_token] token_identifier: TokenIdentifier,
-        #[payment] _amount: BigUint,
-        #[call_result] _result: ManagedAsyncCallResult<()>,
-    ) {
+    fn esdt_issue_callback(&self, #[call_result] _result: IgnoreValue) {
+        let (token_identifier, _amount) = self.call_value().single_fungible_esdt();
         self.wrapped_egld_token_identifier().set(&token_identifier);
     }
 
