@@ -20,6 +20,10 @@ impl DebugApi {
         ManagedBuffer::from_raw_handle(handle)
     }
 
+    pub fn mb_handle_to_value(&self, mb_handle: Handle) -> Vec<u8> {
+        ManagedBuffer::<Self>::from_raw_handle(mb_handle).to_boxed_bytes().into_vec()
+    }
+
     pub fn address_handle_to_value(&self, address_handle: Handle) -> Address {
         let mut address = Address::zero();
         self.mb_load_slice(address_handle, 0, address.as_mut())

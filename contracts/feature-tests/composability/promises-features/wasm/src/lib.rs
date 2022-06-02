@@ -7,6 +7,7 @@
 elrond_wasm_node::wasm_endpoints! {
     promises_features
     (
+        callBack
         async_call_callback_data
         error_callback
         promise_multi_transfer
@@ -14,5 +15,3 @@ elrond_wasm_node::wasm_endpoints! {
         success_callback
     )
 }
-
-elrond_wasm_node::wasm_empty_callback! {}

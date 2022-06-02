@@ -25,10 +25,14 @@ pub trait PromisesFeatures {
         extra_gas_for_callback: u64,
         args: MultiValueEncoded<ManagedBuffer>,
     ) {
-        let (token, payment) = self.call_value().single_fungible_esdt();
+        let payment = self.call_value().egld_or_single_esdt();
         self.send()
             .contract_call::<()>(to, endpoint_name)
-            .add_esdt_token_transfer(token, 0, payment)
+            .with_egld_or_single_esdt_token_transfer(
+                payment.token_identifier,
+                payment.token_nonce,
+                payment.amount,
+            )
             .with_arguments_raw(args.to_arg_buffer())
             .with_gas_limit(gas_limit)
             .with_extra_gas_for_callback(extra_gas_for_callback)

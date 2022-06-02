@@ -6,8 +6,9 @@ use crate::{
 };
 use elrond_wasm::{
     api::{
-        BlockchainApiImpl, ManagedTypeApi, SendApi, SendApiImpl, ESDT_MULTI_TRANSFER_FUNC_NAME,
-        ESDT_NFT_TRANSFER_FUNC_NAME, ESDT_TRANSFER_FUNC_NAME, UPGRADE_CONTRACT_FUNC_NAME,
+        BlockchainApiImpl, Handle, ManagedTypeApi, SendApi, SendApiImpl,
+        ESDT_MULTI_TRANSFER_FUNC_NAME, ESDT_NFT_TRANSFER_FUNC_NAME, ESDT_TRANSFER_FUNC_NAME,
+        UPGRADE_CONTRACT_FUNC_NAME,
     },
     elrond_codec::top_encode_to_vec_u8,
     err_msg,
@@ -355,28 +356,32 @@ impl SendApiImpl for DebugApi {
         self.perform_async_call(call)
     }
 
-    fn create_async_call_raw<M: ManagedTypeApi>(
+    fn create_async_call_raw(
         &self,
-        to: &ManagedAddress<M>,
-        amount: &BigUint<M>,
-        endpoint_name: &ManagedBuffer<M>,
+        to: Handle,
+        amount: Handle,
+        endpoint_name_handle: Handle,
+        arg_buffer_handle: Handle,
         success_callback: &'static [u8],
         error_callback: &'static [u8],
         _gas: u64,
         _extra_gas_for_callback: u64,
-        arg_buffer: &ManagedArgBuffer<M>,
+        callback_closure_handle: Handle,
     ) {
-        let amount_value = self.big_uint_handle_to_value(amount.get_raw_handle());
+        let amount_value = self.big_uint_handle_to_value(amount);
+        let endpoint_name = self.mb_handle_to_value(endpoint_name_handle);
         let contract_address = self.input_ref().to.clone();
-        let recipient = to.to_address();
+        let recipient = self.address_handle_to_value(to);
         let tx_hash = self.get_tx_hash_legacy();
+        let callback_closure_data = self.mb_handle_to_value(callback_closure_handle);
 
         let call = AsyncCallTxData {
             from: contract_address,
             to: recipient,
             call_value: amount_value,
-            endpoint_name: endpoint_name.to_boxed_bytes().into_vec(),
-            arguments: arg_buffer.to_raw_args_vec(),
+            endpoint_name,
+            arguments: ManagedArgBuffer::<Self>::from_raw_handle(arg_buffer_handle)
+                .to_raw_args_vec(),
             tx_hash,
         };
 
@@ -384,6 +389,7 @@ impl SendApiImpl for DebugApi {
             endpoint: call,
             success_callback,
             error_callback,
+            callback_closure_data,
         };
 
         let mut tx_result = self.result_borrow_mut();

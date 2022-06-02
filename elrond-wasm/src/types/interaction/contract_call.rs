@@ -331,11 +331,12 @@ where
             &self.to,
             &self.egld_payment,
             &self.endpoint_name,
+            &self.arg_buffer,
             self.success_callback,
             self.error_callback,
             self.explicit_gas_limit,
             self.extra_gas_for_callback,
-            &self.arg_buffer,
+            &ManagedArgBuffer::new(),
         )
     }
 }

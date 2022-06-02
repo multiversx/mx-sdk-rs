@@ -275,6 +275,7 @@ extern "C" {
         errorLength: i32,
         gas: i64,
         extraGasForCallback: i64,
+        callbackClosureHandle: i32,
     ) -> i32;
 
     fn getNumReturnData() -> i32;
@@ -573,29 +574,31 @@ impl SendApiImpl for VmApiImpl {
         }
     }
 
-    fn create_async_call_raw<M: ManagedTypeApi>(
+    fn create_async_call_raw(
         &self,
-        to: &ManagedAddress<M>,
-        amount: &BigUint<M>,
-        endpoint_name: &ManagedBuffer<M>,
-        success: &'static [u8],
-        error: &'static [u8],
+        to: Handle,
+        amount: Handle,
+        endpoint_name: Handle,
+        arg_buffer: Handle,
+        success_callback: &'static [u8],
+        error_callback: &'static [u8],
         gas: u64,
         extra_gas_for_callback: u64,
-        arg_buffer: &ManagedArgBuffer<M>,
+        callback_closure: Handle,
     ) {
         unsafe {
             let _ = managedCreateAsyncCall(
-                to.get_raw_handle(),
-                amount.get_raw_handle(),
-                endpoint_name.get_raw_handle(),
-                arg_buffer.get_raw_handle(),
-                success.as_ptr(),
-                success.len() as i32,
-                error.as_ptr(),
-                error.len() as i32,
+                to,
+                amount,
+                endpoint_name,
+                arg_buffer,
+                success_callback.as_ptr(),
+                success_callback.len() as i32,
+                error_callback.as_ptr(),
+                error_callback.len() as i32,
                 gas as i64,
                 extra_gas_for_callback as i64,
+                callback_closure,
             );
         }
     }

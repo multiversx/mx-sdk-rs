@@ -1,4 +1,4 @@
-use super::{BlockchainApi, ManagedTypeApi};
+use super::{BlockchainApi, ManagedTypeApi, Handle};
 use crate::types::{
     heap::{Address, ArgBuffer, BoxedBytes},
     BigUint, CodeMetadata, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer,
@@ -123,16 +123,17 @@ pub trait SendApiImpl {
     ) -> !;
 
     #[allow(clippy::too_many_arguments)]
-    fn create_async_call_raw<M: ManagedTypeApi>(
+    fn create_async_call_raw(
         &self,
-        to: &ManagedAddress<M>,
-        amount: &BigUint<M>,
-        endpoint_name: &ManagedBuffer<M>,
+        to: Handle,
+        amount: Handle,
+        endpoint_name: Handle,
+        arg_buffer: Handle,
         success: &'static [u8],
         error: &'static [u8],
         gas: u64,
         extra_gas_for_callback: u64,
-        arg_buffer: &ManagedArgBuffer<M>,
+        callback_closure: Handle,
     );
 
     /// Deploys a new contract in the same shard.
