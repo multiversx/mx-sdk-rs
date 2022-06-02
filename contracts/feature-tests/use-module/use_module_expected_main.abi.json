@@ -348,42 +348,6 @@
             ]
         },
         {
-            "docs": [
-                "The module can't protect its storage from the main SC, so it's the developers responsibility",
-                "to not modify parameters manually"
-            ],
-            "name": "initGovernanceModule",
-            "onlyOwner": true,
-            "mutability": "mutable",
-            "inputs": [
-                {
-                    "name": "governance_token_id",
-                    "type": "TokenIdentifier"
-                },
-                {
-                    "name": "quorum",
-                    "type": "BigUint"
-                },
-                {
-                    "name": "min_token_balance_for_proposal",
-                    "type": "BigUint"
-                },
-                {
-                    "name": "voting_delay_in_blocks",
-                    "type": "u64"
-                },
-                {
-                    "name": "voting_period_in_blocks",
-                    "type": "u64"
-                },
-                {
-                    "name": "lock_time_after_voting_ends_in_blocks",
-                    "type": "u64"
-                }
-            ],
-            "outputs": []
-        },
-        {
             "name": "changeQuorum",
             "mutability": "mutable",
             "inputs": [
