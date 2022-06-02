@@ -271,7 +271,6 @@ impl SendApiImpl for UncallableApi {
         &self,
         _gas: u64,
         _to: &ManagedAddress<M>,
-        _value: &BigUint<M>,
         _endpoint_name: &ManagedBuffer<M>,
         _arg_buffer: &ManagedArgBuffer<M>,
     ) -> ManagedVec<M, ManagedBuffer<M>> {
@@ -282,7 +281,6 @@ impl SendApiImpl for UncallableApi {
         &self,
         _gas: u64,
         _to: &Address,
-        _value: &BigUint<M>,
         _endpoint_name: &BoxedBytes,
         _arg_buffer: &ArgBuffer,
     ) -> ManagedVec<M, ManagedBuffer<M>> {
