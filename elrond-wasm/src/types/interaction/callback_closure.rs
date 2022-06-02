@@ -15,6 +15,7 @@ use elrond_codec::{
 use super::ManagedArgBuffer;
 
 pub const CALLBACK_CLOSURE_STORAGE_BASE_KEY: &[u8] = b"CB_CLOSURE";
+pub const NO_CALLBACK: &[u8] = &[];
 
 /// Object that encodes full async callback data.
 ///
@@ -28,26 +29,24 @@ pub const CALLBACK_CLOSURE_STORAGE_BASE_KEY: &[u8] = b"CB_CLOSURE";
 /// In both cases the framework hides all the magic, the developer shouldn't worry about it.
 #[derive(TopEncode)]
 pub struct CallbackClosure<M: ManagedTypeApi + ErrorApi> {
-    callback_name: ManagedBuffer<M>,
-    closure_args: ManagedArgBuffer<M>,
+    pub(super) callback_name: &'static [u8],
+    pub(super) closure_args: ManagedArgBuffer<M>,
 }
 
 /// Syntactical sugar to help macros to generate code easier.
 /// Unlike calling `CallbackClosure::<SA, R>::new`, here types can be inferred from the context.
-pub fn new_callback_call<A>(callback_name_slice: &'static [u8]) -> CallbackClosure<A>
+pub fn new_callback_call<A>(callback_name: &'static [u8]) -> CallbackClosure<A>
 where
     A: ManagedTypeApi + ErrorApi,
 {
-    let callback_name = ManagedBuffer::new_from_bytes(callback_name_slice);
     CallbackClosure::new(callback_name)
 }
 
 impl<M: ManagedTypeApi + ErrorApi> CallbackClosure<M> {
-    pub fn new(callback_name: ManagedBuffer<M>) -> Self {
-        let arg_buffer = ManagedArgBuffer::new();
+    pub fn new(callback_name: &'static [u8]) -> Self {
         CallbackClosure {
             callback_name,
-            closure_args: arg_buffer,
+            closure_args: ManagedArgBuffer::new(),
         }
     }
 

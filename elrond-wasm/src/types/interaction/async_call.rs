@@ -1,5 +1,3 @@
-use core::marker::PhantomData;
-
 use crate::{
     api::{CallTypeApi, StorageWriteApi},
     contract_base::SendRawWrapper,
@@ -11,7 +9,6 @@ pub struct AsyncCall<SA>
 where
     SA: CallTypeApi + 'static,
 {
-    pub(crate) _phantom: PhantomData<SA>,
     pub(crate) to: ManagedAddress<SA>,
     pub(crate) egld_payment: BigUint<SA>,
     pub(crate) endpoint_name: ManagedBuffer<SA>,

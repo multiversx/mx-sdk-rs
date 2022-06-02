@@ -1,4 +1,4 @@
-use super::{BlockchainApi, ManagedTypeApi, Handle};
+use super::{BlockchainApi, Handle, ManagedTypeApi};
 use crate::types::{
     heap::{Address, ArgBuffer, BoxedBytes},
     BigUint, CodeMetadata, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer,

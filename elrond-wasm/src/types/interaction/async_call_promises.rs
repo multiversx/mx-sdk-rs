@@ -1,7 +1,5 @@
-use core::marker::PhantomData;
-
 use crate::{
-    api::{CallTypeApi, StorageWriteApi},
+    api::CallTypeApi,
     contract_base::SendRawWrapper,
     types::{BigUint, CallbackClosure, ManagedAddress, ManagedArgBuffer, ManagedBuffer},
 };
@@ -12,11 +10,14 @@ pub struct AsyncCallPromises<SA>
 where
     SA: CallTypeApi + 'static,
 {
-    pub(crate) _phantom: PhantomData<SA>,
     pub(crate) to: ManagedAddress<SA>,
     pub(crate) egld_payment: BigUint<SA>,
     pub(crate) endpoint_name: ManagedBuffer<SA>,
     pub(crate) arg_buffer: ManagedArgBuffer<SA>,
+    pub(crate) explicit_gas_limit: u64,
+    pub(crate) extra_gas_for_callback: u64,
+    pub(crate) success_callback: &'static [u8],
+    pub(crate) error_callback: &'static [u8],
     pub(crate) callback_call: Option<CallbackClosure<SA>>,
 }
 
@@ -31,24 +32,48 @@ where
             ..self
         }
     }
-}
 
-impl<SA> AsyncCallPromises<SA>
-where
-    SA: CallTypeApi + StorageWriteApi,
-{
-    pub fn call_and_exit(&self) -> ! {
-        // first, save the callback closure
-        if let Some(callback_call) = &self.callback_call {
-            callback_call.save_to_storage::<SA>();
+    #[cfg(feature = "promises")]
+    #[inline]
+    pub fn with_success_callback(mut self, callback: &'static [u8]) -> Self {
+        self.success_callback = callback;
+        self
+    }
+
+    #[cfg(feature = "promises")]
+    #[inline]
+    pub fn with_error_callback(mut self, callback: &'static [u8]) -> Self {
+        self.error_callback = callback;
+        self
+    }
+
+    #[cfg(feature = "promises")]
+    #[inline]
+    pub fn with_extra_gas_for_callback(mut self, gas_limit: u64) -> Self {
+        self.extra_gas_for_callback = gas_limit;
+        self
+    }
+
+    #[cfg(feature = "promises")]
+    pub fn register_promise(mut self) {
+        let callback_closure_args: ManagedArgBuffer<SA>;
+        if let Some(callback_call) = self.callback_call {
+            self.success_callback = callback_call.callback_name;
+            self.error_callback = callback_call.callback_name;
+            callback_closure_args = callback_call.closure_args;
+        } else {
+            callback_closure_args = ManagedArgBuffer::new();
         }
-
-        // last, send the async call, which will kill the execution
-        SendRawWrapper::<SA>::new().async_call_raw(
+        SendRawWrapper::<SA>::new().create_async_call_raw(
             &self.to,
             &self.egld_payment,
             &self.endpoint_name,
             &self.arg_buffer,
+            self.success_callback,
+            self.error_callback,
+            self.explicit_gas_limit,
+            self.extra_gas_for_callback,
+            &callback_closure_args,
         )
     }
 }
