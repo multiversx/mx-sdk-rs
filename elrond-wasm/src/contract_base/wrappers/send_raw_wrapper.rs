@@ -436,7 +436,6 @@ where
         &self,
         gas: u64,
         address: &ManagedAddress<A>,
-        value: &BigUint<A>,
         endpoint_name: &ManagedBuffer<A>,
         arg_buffer: &ManagedArgBuffer<A>,
     ) -> ManagedVec<A, ManagedBuffer<A>> {
@@ -454,14 +453,12 @@ where
         &self,
         gas: u64,
         address: &ManagedAddress<A>,
-        value: &BigUint<A>,
         endpoint_name: &ManagedBuffer<A>,
         arg_buffer: &ManagedArgBuffer<A>,
     ) -> ManagedVec<A, ManagedBuffer<A>> {
         A::send_api_impl().execute_on_dest_context_by_caller_raw(
             gas,
             address,
-            value,
             endpoint_name,
             arg_buffer,
         )
