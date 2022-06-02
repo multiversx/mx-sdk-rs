@@ -183,7 +183,7 @@
                 },
                 {
                     "name": "actions",
-                    "type": "variadic<multi<u64,Address,TokenIdentifier,u64,BigUint,bytes,List<bytes>>>",
+                    "type": "variadic<multi<u64,Address,List<EsdtTokenPayment>,bytes,List<bytes>>>",
                     "multi_arg": true
                 }
             ],
@@ -312,15 +312,12 @@
             ],
             "outputs": [
                 {
-                    "type": "variadic<multi<u64,Address,TokenIdentifier,u64,BigUint,bytes,List<bytes>>>",
+                    "type": "variadic<multi<u64,Address,List<EsdtTokenPayment>,bytes,List<bytes>>>",
                     "multi_result": true
                 }
             ]
         },
         {
-            "docs": [
-                "Could be calculated by iterating over the \"votes\" mapper, but that costs a lot of gas"
-            ],
             "name": "getTotalVotes",
             "mutability": "readonly",
             "inputs": [
@@ -336,9 +333,6 @@
             ]
         },
         {
-            "docs": [
-                "Could be calculated by iterating over the \"downvotes\" mapper, but that costs a lot of gas"
-            ],
             "name": "getTotalDownvotes",
             "mutability": "readonly",
             "inputs": [
@@ -574,6 +568,27 @@
     "events": [],
     "hasCallback": true,
     "types": {
+        "EsdtTokenPayment": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "token_type",
+                    "type": "EsdtTokenType"
+                },
+                {
+                    "name": "token_identifier",
+                    "type": "TokenIdentifier"
+                },
+                {
+                    "name": "token_nonce",
+                    "type": "u64"
+                },
+                {
+                    "name": "amount",
+                    "type": "BigUint"
+                }
+            ]
+        },
         "EsdtTokenType": {
             "type": "enum",
             "variants": [
@@ -611,16 +626,8 @@
                     "type": "Address"
                 },
                 {
-                    "name": "token_id",
-                    "type": "TokenIdentifier"
-                },
-                {
-                    "name": "token_nonce",
-                    "type": "u64"
-                },
-                {
-                    "name": "amount",
-                    "type": "BigUint"
+                    "name": "payments",
+                    "type": "List<EsdtTokenPayment>"
                 },
                 {
                     "name": "function_name",
