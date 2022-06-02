@@ -16,7 +16,17 @@ use super::ManagedArgBuffer;
 
 pub const CALLBACK_CLOSURE_STORAGE_BASE_KEY: &[u8] = b"CB_CLOSURE";
 
-#[derive(TopEncode, TopDecode)]
+/// Object that encodes full async callback data.
+///
+/// Should not be created manually, we have auto-generated call proxies
+/// that will create this object in a type-safe manner.
+///
+/// How it functions:
+/// - With the old async call mechanism, this data is serialized to storage.
+/// - With the new promises framework, the VM handles this data.
+///
+/// In both cases the framework hides all the magic, the developer shouldn't worry about it.
+#[derive(TopEncode)]
 pub struct CallbackClosure<M: ManagedTypeApi + ErrorApi> {
     callback_name: ManagedBuffer<M>,
     closure_args: ManagedArgBuffer<M>,
@@ -59,6 +69,36 @@ impl<M: ManagedTypeApi + ErrorApi> CallbackClosure<M> {
         let storage_key = cb_closure_storage_key::<A>();
         storage_set(storage_key.as_ref(), self);
     }
+}
+
+pub(super) fn cb_closure_storage_key<A: BlockchainApi>() -> StorageKey<A> {
+    let tx_hash = BlockchainWrapper::<A>::new().get_tx_hash();
+    let mut storage_key = StorageKey::new(CALLBACK_CLOSURE_STORAGE_BASE_KEY);
+    storage_key.append_managed_buffer(tx_hash.as_managed_buffer());
+    storage_key
+}
+
+/// Similar object to `CallbackClosure`, but only used for deserializing from storage
+/// the callback data with the old async call mechanism.
+///
+/// Should not be visible to the developer.
+///
+/// It is a separate type from `CallbackClosure`, because we want a different representation of the endpoint name.
+#[derive(TopDecode)]
+pub struct CallbackClosureForDeser<M: ManagedTypeApi + ErrorApi> {
+    callback_name: ManagedBuffer<M>,
+    closure_args: ManagedArgBuffer<M>,
+}
+
+impl<M: ManagedTypeApi + ErrorApi> CallbackClosureForDeser<M> {
+    /// Used by callback_raw.
+    /// TODO: avoid creating any new managed buffers.
+    pub fn no_callback() -> Self {
+        CallbackClosureForDeser {
+            callback_name: ManagedBuffer::new(),
+            closure_args: ManagedArgBuffer::new_empty(),
+        }
+    }
 
     pub fn storage_load_and_clear<A: BlockchainApi + StorageReadApi + StorageWriteApi>(
     ) -> Option<Self> {
@@ -83,13 +123,6 @@ impl<M: ManagedTypeApi + ErrorApi> CallbackClosure<M> {
     pub fn into_arg_loader(self) -> ManagedResultArgLoader<M> {
         ManagedResultArgLoader::new(self.closure_args.data)
     }
-}
-
-pub(super) fn cb_closure_storage_key<A: BlockchainApi>() -> StorageKey<A> {
-    let tx_hash = BlockchainWrapper::<A>::new().get_tx_hash();
-    let mut storage_key = StorageKey::new(CALLBACK_CLOSURE_STORAGE_BASE_KEY);
-    storage_key.append_managed_buffer(tx_hash.as_managed_buffer());
-    storage_key
 }
 
 /// Helps the callback macro expansion to perform callback name matching more efficiently.
