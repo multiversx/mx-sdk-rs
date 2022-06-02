@@ -1,8 +1,9 @@
 elrond_wasm::imports!();
 
 pub mod governance_configurable;
-
+pub mod governance_events;
 pub mod governance_proposal;
+
 use governance_proposal::*;
 
 const MAX_GAS_LIMIT_PER_BLOCK: u64 = 1_500_000_000;
@@ -10,6 +11,7 @@ const MAX_GAS_LIMIT_PER_BLOCK: u64 = 1_500_000_000;
 #[elrond_wasm::module]
 pub trait GovernanceModule:
     governance_configurable::GovernanceConfigurablePropertiesModule
+    + governance_events::GovernanceEventsModule
 {
     // endpoints
 
@@ -19,15 +21,10 @@ pub trait GovernanceModule:
     #[payable("*")]
     #[endpoint(depositTokensForAction)]
     fn deposit_tokens_for_action(&self) {
-        let payment = self.call_value().single_esdt();
+        let payments = self.call_value().all_esdt_transfers();
         let caller = self.blockchain().get_caller();
 
-        self.user_deposit_event(
-            &caller,
-            &payment.token_identifier,
-            payment.token_nonce,
-            &payment.amount,
-        );
+        self.user_deposit_event(&caller, &payments);
     }
 
     // Used to withdraw the tokens after the action was executed or cancelled
@@ -375,52 +372,6 @@ pub trait GovernanceModule:
         self.total_votes(proposal_id).clear();
         self.total_downvotes(proposal_id).clear();
     }
-
-    // events
-
-    #[event("proposalCreated")]
-    fn proposal_created_event(
-        &self,
-        #[indexed] proposal_id: usize,
-        #[indexed] proposer: &ManagedAddress,
-        #[indexed] start_block: u64,
-        #[indexed] description: &ManagedBuffer,
-        actions: &ArrayVec<GovernanceAction<Self::Api>, MAX_ACTIONS>,
-    );
-
-    #[event("voteCast")]
-    fn vote_cast_event(
-        &self,
-        #[indexed] voter: &ManagedAddress,
-        #[indexed] proposal_id: usize,
-        nr_votes: &BigUint,
-    );
-
-    #[event("downvoteCast")]
-    fn downvote_cast_event(
-        &self,
-        #[indexed] downvoter: &ManagedAddress,
-        #[indexed] proposal_id: usize,
-        nr_downvotes: &BigUint,
-    );
-
-    #[event("proposalCanceled")]
-    fn proposal_canceled_event(&self, #[indexed] proposal_id: usize);
-
-    #[event("proposalQueued")]
-    fn proposal_queued_event(&self, #[indexed] proposal_id: usize, #[indexed] queued_block: u64);
-
-    #[event("proposalExecuted")]
-    fn proposal_executed_event(&self, #[indexed] proposal_id: usize);
-
-    #[event("userDeposit")]
-    fn user_deposit_event(
-        &self,
-        #[indexed] address: &ManagedAddress,
-        #[indexed] token_id: &TokenIdentifier,
-        #[indexed] token_nonce: u64,
-        amount: &BigUint,
-    );
 
     // storage - general
 
