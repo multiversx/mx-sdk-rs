@@ -51,15 +51,6 @@ impl<M: ManagedTypeApi + ErrorApi> CallbackClosure<M> {
         }
     }
 
-    /// Used by callback_raw.
-    /// TODO: avoid creating any new managed buffers.
-    pub fn new_empty() -> Self {
-        CallbackClosure {
-            callback_name: ManagedBuffer::new(),
-            closure_args: ManagedArgBuffer::new(),
-        }
-    }
-
     pub fn push_endpoint_arg<T: TopEncodeMulti>(&mut self, endpoint_arg: &T) {
         let h = ExitCodecErrorHandler::<M>::from(err_msg::CONTRACT_CALL_ENCODE_ERROR);
         let Ok(()) = endpoint_arg.multi_encode_or_handle_err(&mut self.closure_args, h);
@@ -96,7 +87,7 @@ impl<M: ManagedTypeApi + ErrorApi> CallbackClosureForDeser<M> {
     pub fn no_callback() -> Self {
         CallbackClosureForDeser {
             callback_name: ManagedBuffer::new(),
-            closure_args: ManagedArgBuffer::new_empty(),
+            closure_args: ManagedArgBuffer::new(),
         }
     }
 
