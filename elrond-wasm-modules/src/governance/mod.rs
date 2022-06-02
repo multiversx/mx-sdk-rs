@@ -75,14 +75,11 @@ pub trait GovernanceModule:
 
         let mut gov_actions = ArrayVec::new();
         for action in actions {
-            let (gas_limit, dest_address, token_id, token_nonce, amount, function_name, arguments) =
-                action.into_tuple();
+            let (gas_limit, dest_address, payments, function_name, arguments) = action.into_tuple();
             let gov_action = GovernanceAction {
                 gas_limit,
                 dest_address,
-                token_id,
-                token_nonce,
-                amount,
+                payments,
                 function_name,
                 arguments,
             };
@@ -215,12 +212,8 @@ pub trait GovernanceModule:
                 .contract_call::<()>(action.dest_address, action.function_name)
                 .with_gas_limit(action.gas_limit);
 
-            if action.amount > 0 {
-                contract_call = contract_call.add_esdt_token_transfer(
-                    action.token_id,
-                    action.token_nonce,
-                    action.amount,
-                );
+            if !action.payments.is_empty() {
+                contract_call = contract_call.with_multi_token_transfer(action.payments);
             }
 
             for arg in &action.arguments {
