@@ -44,7 +44,7 @@ where
 
 impl<M: ManagedTypeApi + ErrorApi> CallbackClosure<M> {
     pub fn new(callback_name: ManagedBuffer<M>) -> Self {
-        let arg_buffer = ManagedArgBuffer::new_empty();
+        let arg_buffer = ManagedArgBuffer::new();
         CallbackClosure {
             callback_name,
             closure_args: arg_buffer,
@@ -56,7 +56,7 @@ impl<M: ManagedTypeApi + ErrorApi> CallbackClosure<M> {
     pub fn new_empty() -> Self {
         CallbackClosure {
             callback_name: ManagedBuffer::new(),
-            closure_args: ManagedArgBuffer::new_empty(),
+            closure_args: ManagedArgBuffer::new(),
         }
     }
 

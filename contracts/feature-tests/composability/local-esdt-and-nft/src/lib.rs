@@ -152,7 +152,7 @@ pub trait LocalEsdtAndEsdtNft {
         function: ManagedBuffer,
         arguments: MultiValueEncoded<ManagedBuffer>,
     ) {
-        let mut arg_buffer = ManagedArgBuffer::new_empty();
+        let mut arg_buffer = ManagedArgBuffer::new();
         for arg in arguments.into_iter() {
             arg_buffer.push_arg_raw(arg);
         }
