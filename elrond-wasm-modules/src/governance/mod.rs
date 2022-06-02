@@ -38,13 +38,17 @@ pub trait GovernanceModule:
 
         let caller = self.blockchain().get_caller();
         let governance_token_id = self.governance_token_id().get();
-        let nr_votes_tokens = self.votes(proposal_id).get(&caller).unwrap_or_default();
-        let nr_downvotes_tokens = self.downvotes(proposal_id).get(&caller).unwrap_or_default();
+
+        let votes_mapper = self.votes(proposal_id, &caller);
+        let downvotes_mapper = self.downvotes(proposal_id, &caller);
+
+        let nr_votes_tokens = votes_mapper.get();
+        let nr_downvotes_tokens = downvotes_mapper.get();
         let total_tokens = nr_votes_tokens + nr_downvotes_tokens;
 
         if total_tokens > 0 {
-            self.votes(proposal_id).remove(&caller);
-            self.downvotes(proposal_id).remove(&caller);
+            votes_mapper.clear();
+            downvotes_mapper.clear();
 
             self.send()
                 .direct_esdt(&caller, &governance_token_id, 0, &total_tokens, &[]);
@@ -106,17 +110,16 @@ pub trait GovernanceModule:
             &gov_actions,
         );
 
+        self.proposal_start_block(proposal_id).set(&current_block);
+        self.total_votes(proposal_id).set(&payment.amount);
+        self.votes(proposal_id, &proposer).set(&payment.amount);
+
         let proposal = GovernanceProposal {
-            proposer: proposer.clone(),
+            proposer,
             description,
             actions: gov_actions,
         };
         let _ = self.proposals().push(&proposal);
-
-        self.proposal_start_block(proposal_id).set(&current_block);
-
-        self.total_votes(proposal_id).set(&payment.amount);
-        self.votes(proposal_id).insert(proposer, payment.amount);
 
         proposal_id
     }
@@ -136,10 +139,8 @@ pub trait GovernanceModule:
 
         self.total_votes(proposal_id)
             .update(|total_votes| *total_votes += &payment.amount);
-        self.votes(proposal_id)
-            .entry(voter)
-            .and_modify(|nr_votes| *nr_votes += &payment.amount)
-            .or_insert(payment.amount);
+        self.votes(proposal_id, &voter)
+            .update(|nr_votes| *nr_votes += &payment.amount);
     }
 
     #[payable("*")]
@@ -157,10 +158,8 @@ pub trait GovernanceModule:
 
         self.total_downvotes(proposal_id)
             .update(|total_downvotes| *total_downvotes += &payment.amount);
-        self.downvotes(proposal_id)
-            .entry(downvoter)
-            .and_modify(|nr_downvotes| *nr_downvotes += &payment.amount)
-            .or_insert(payment.amount);
+        self.downvotes(proposal_id, &downvoter)
+            .update(|nr_downvotes| *nr_downvotes += &payment.amount);
     }
 
     #[endpoint]
@@ -386,17 +385,19 @@ pub trait GovernanceModule:
     fn proposal_queue_block(&self, proposal_id: usize) -> SingleValueMapper<u64>;
 
     #[storage_mapper("governance:votes")]
-    fn votes(&self, proposal_id: usize) -> MapMapper<ManagedAddress, BigUint>;
+    fn votes(&self, proposal_id: usize, voter: &ManagedAddress) -> SingleValueMapper<BigUint>;
 
     #[storage_mapper("governance:downvotes")]
-    fn downvotes(&self, proposal_id: usize) -> MapMapper<ManagedAddress, BigUint>;
+    fn downvotes(
+        &self,
+        proposal_id: usize,
+        downvoter: &ManagedAddress,
+    ) -> SingleValueMapper<BigUint>;
 
-    /// Could be calculated by iterating over the "votes" mapper, but that costs a lot of gas
     #[view(getTotalVotes)]
     #[storage_mapper("governance:totalVotes")]
     fn total_votes(&self, proposal_id: usize) -> SingleValueMapper<BigUint>;
 
-    /// Could be calculated by iterating over the "downvotes" mapper, but that costs a lot of gas
     #[view(getTotalDownvotes)]
     #[storage_mapper("governance:totalDownvotes")]
     fn total_downvotes(&self, proposal_id: usize) -> SingleValueMapper<BigUint>;
