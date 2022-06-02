@@ -95,7 +95,7 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
             &all_token_payments,
             self.blockchain().get_gas_left(),
             &ManagedBuffer::new(),
-            &ManagedArgBuffer::new_empty(),
+            &ManagedArgBuffer::new(),
         );
     }
 
