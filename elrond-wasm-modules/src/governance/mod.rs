@@ -1,8 +1,9 @@
 elrond_wasm::imports!();
 
 pub mod governance_configurable;
-
+pub mod governance_events;
 pub mod governance_proposal;
+
 use governance_proposal::*;
 
 const MAX_GAS_LIMIT_PER_BLOCK: u64 = 1_500_000_000;
@@ -10,6 +11,7 @@ const MAX_GAS_LIMIT_PER_BLOCK: u64 = 1_500_000_000;
 #[elrond_wasm::module]
 pub trait GovernanceModule:
     governance_configurable::GovernanceConfigurablePropertiesModule
+    + governance_events::GovernanceEventsModule
 {
     // endpoints
 
@@ -19,15 +21,10 @@ pub trait GovernanceModule:
     #[payable("*")]
     #[endpoint(depositTokensForAction)]
     fn deposit_tokens_for_action(&self) {
-        let payment = self.call_value().single_esdt();
+        let payments = self.call_value().all_esdt_transfers();
         let caller = self.blockchain().get_caller();
 
-        self.user_deposit_event(
-            &caller,
-            &payment.token_identifier,
-            payment.token_nonce,
-            &payment.amount,
-        );
+        self.user_deposit_event(&caller, &payments);
     }
 
     // Used to withdraw the tokens after the action was executed or cancelled
@@ -41,13 +38,17 @@ pub trait GovernanceModule:
 
         let caller = self.blockchain().get_caller();
         let governance_token_id = self.governance_token_id().get();
-        let nr_votes_tokens = self.votes(proposal_id).get(&caller).unwrap_or_default();
-        let nr_downvotes_tokens = self.downvotes(proposal_id).get(&caller).unwrap_or_default();
+
+        let votes_mapper = self.votes(proposal_id, &caller);
+        let downvotes_mapper = self.downvotes(proposal_id, &caller);
+
+        let nr_votes_tokens = votes_mapper.get();
+        let nr_downvotes_tokens = downvotes_mapper.get();
         let total_tokens = nr_votes_tokens + nr_downvotes_tokens;
 
         if total_tokens > 0 {
-            self.votes(proposal_id).remove(&caller);
-            self.downvotes(proposal_id).remove(&caller);
+            votes_mapper.clear();
+            downvotes_mapper.clear();
 
             self.send()
                 .direct_esdt(&caller, &governance_token_id, 0, &total_tokens, &[]);
@@ -75,14 +76,11 @@ pub trait GovernanceModule:
 
         let mut gov_actions = ArrayVec::new();
         for action in actions {
-            let (gas_limit, dest_address, token_id, token_nonce, amount, function_name, arguments) =
-                action.into_tuple();
+            let (gas_limit, dest_address, payments, function_name, arguments) = action.into_tuple();
             let gov_action = GovernanceAction {
                 gas_limit,
                 dest_address,
-                token_id,
-                token_nonce,
-                amount,
+                payments,
                 function_name,
                 arguments,
             };
@@ -112,17 +110,16 @@ pub trait GovernanceModule:
             &gov_actions,
         );
 
+        self.proposal_start_block(proposal_id).set(&current_block);
+        self.total_votes(proposal_id).set(&payment.amount);
+        self.votes(proposal_id, &proposer).set(&payment.amount);
+
         let proposal = GovernanceProposal {
-            proposer: proposer.clone(),
+            proposer,
             description,
             actions: gov_actions,
         };
         let _ = self.proposals().push(&proposal);
-
-        self.proposal_start_block(proposal_id).set(&current_block);
-
-        self.total_votes(proposal_id).set(&payment.amount);
-        self.votes(proposal_id).insert(proposer, payment.amount);
 
         proposal_id
     }
@@ -142,10 +139,8 @@ pub trait GovernanceModule:
 
         self.total_votes(proposal_id)
             .update(|total_votes| *total_votes += &payment.amount);
-        self.votes(proposal_id)
-            .entry(voter)
-            .and_modify(|nr_votes| *nr_votes += &payment.amount)
-            .or_insert(payment.amount);
+        self.votes(proposal_id, &voter)
+            .update(|nr_votes| *nr_votes += &payment.amount);
     }
 
     #[payable("*")]
@@ -163,10 +158,8 @@ pub trait GovernanceModule:
 
         self.total_downvotes(proposal_id)
             .update(|total_downvotes| *total_downvotes += &payment.amount);
-        self.downvotes(proposal_id)
-            .entry(downvoter)
-            .and_modify(|nr_downvotes| *nr_downvotes += &payment.amount)
-            .or_insert(payment.amount);
+        self.downvotes(proposal_id, &downvoter)
+            .update(|nr_downvotes| *nr_downvotes += &payment.amount);
     }
 
     #[endpoint]
@@ -215,12 +208,8 @@ pub trait GovernanceModule:
                 .contract_call::<()>(action.dest_address, action.function_name)
                 .with_gas_limit(action.gas_limit);
 
-            if action.amount > 0 {
-                contract_call = contract_call.add_esdt_token_transfer(
-                    action.token_id,
-                    action.token_nonce,
-                    action.amount,
-                );
+            if !action.payments.is_empty() {
+                contract_call = contract_call.with_multi_token_transfer(action.payments);
             }
 
             for arg in &action.arguments {
@@ -383,52 +372,6 @@ pub trait GovernanceModule:
         self.total_downvotes(proposal_id).clear();
     }
 
-    // events
-
-    #[event("proposalCreated")]
-    fn proposal_created_event(
-        &self,
-        #[indexed] proposal_id: usize,
-        #[indexed] proposer: &ManagedAddress,
-        #[indexed] start_block: u64,
-        #[indexed] description: &ManagedBuffer,
-        actions: &ArrayVec<GovernanceAction<Self::Api>, MAX_ACTIONS>,
-    );
-
-    #[event("voteCast")]
-    fn vote_cast_event(
-        &self,
-        #[indexed] voter: &ManagedAddress,
-        #[indexed] proposal_id: usize,
-        nr_votes: &BigUint,
-    );
-
-    #[event("downvoteCast")]
-    fn downvote_cast_event(
-        &self,
-        #[indexed] downvoter: &ManagedAddress,
-        #[indexed] proposal_id: usize,
-        nr_downvotes: &BigUint,
-    );
-
-    #[event("proposalCanceled")]
-    fn proposal_canceled_event(&self, #[indexed] proposal_id: usize);
-
-    #[event("proposalQueued")]
-    fn proposal_queued_event(&self, #[indexed] proposal_id: usize, #[indexed] queued_block: u64);
-
-    #[event("proposalExecuted")]
-    fn proposal_executed_event(&self, #[indexed] proposal_id: usize);
-
-    #[event("userDeposit")]
-    fn user_deposit_event(
-        &self,
-        #[indexed] address: &ManagedAddress,
-        #[indexed] token_id: &TokenIdentifier,
-        #[indexed] token_nonce: u64,
-        amount: &BigUint,
-    );
-
     // storage - general
 
     #[storage_mapper("governance:proposals")]
@@ -442,17 +385,19 @@ pub trait GovernanceModule:
     fn proposal_queue_block(&self, proposal_id: usize) -> SingleValueMapper<u64>;
 
     #[storage_mapper("governance:votes")]
-    fn votes(&self, proposal_id: usize) -> MapMapper<ManagedAddress, BigUint>;
+    fn votes(&self, proposal_id: usize, voter: &ManagedAddress) -> SingleValueMapper<BigUint>;
 
     #[storage_mapper("governance:downvotes")]
-    fn downvotes(&self, proposal_id: usize) -> MapMapper<ManagedAddress, BigUint>;
+    fn downvotes(
+        &self,
+        proposal_id: usize,
+        downvoter: &ManagedAddress,
+    ) -> SingleValueMapper<BigUint>;
 
-    /// Could be calculated by iterating over the "votes" mapper, but that costs a lot of gas
     #[view(getTotalVotes)]
     #[storage_mapper("governance:totalVotes")]
     fn total_votes(&self, proposal_id: usize) -> SingleValueMapper<BigUint>;
 
-    /// Could be calculated by iterating over the "downvotes" mapper, but that costs a lot of gas
     #[view(getTotalDownvotes)]
     #[storage_mapper("governance:totalDownvotes")]
     fn total_downvotes(&self, proposal_id: usize) -> SingleValueMapper<BigUint>;
