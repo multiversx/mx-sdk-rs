@@ -83,10 +83,9 @@ fn generate_endpoint_snippets(contract: &ContractTrait) -> Vec<proc_macro2::Toke
                 })
             },
             PublicRole::Endpoint(endpoint_metadata) => {
-                let endpoint_name_str = endpoint_metadata.public_name.to_string();
                 let endpoint_def = generate_endpoint_snippet(
                     m,
-                    &endpoint_name_str,
+                    &endpoint_metadata.public_name.to_string(),
                     endpoint_metadata.only_owner,
                     endpoint_metadata.mutability.clone(),
                     endpoint_metadata.location.clone(),
@@ -94,6 +93,19 @@ fn generate_endpoint_snippets(contract: &ContractTrait) -> Vec<proc_macro2::Toke
                 Some(quote! {
                     #endpoint_def
                     contract_abi.endpoints.push(endpoint_abi);
+                })
+            },
+            PublicRole::CallbackPromise(callback_metadata) => {
+                let endpoint_def = generate_endpoint_snippet(
+                    m,
+                    &callback_metadata.callback_name.to_string(),
+                    false,
+                    EndpointMutabilityMetadata::Mutable,
+                    EndpointLocationMetadata::MainContract,
+                );
+                Some(quote! {
+                    #endpoint_def
+                    contract_abi.promise_callbacks.push(endpoint_abi);
                 })
             },
             _ => None,
@@ -198,6 +210,7 @@ fn generate_abi_method_body(
             name: #contract_name,
             constructors: elrond_wasm::types::heap::Vec::new(),
             endpoints: elrond_wasm::types::heap::Vec::new(),
+            promise_callbacks: elrond_wasm::types::heap::Vec::new(),
             events: elrond_wasm::types::heap::Vec::new(),
             has_callback: #has_callbacks,
             type_descriptions: <elrond_wasm::abi::TypeDescriptionContainerImpl as elrond_wasm::abi::TypeDescriptionContainer>::new(),
