@@ -17,7 +17,7 @@ pub const BIG_INT_TEMPORARY_2: Handle = -15;
 /// WARNING! With the current VM this still needs to be initialized before use.
 pub const MBUF_CONST_EMPTY: Handle = -20;
 pub const CALL_VALUE_MULTI_ESDT: Handle = -21;
-pub const CALL_VALUE_SINGLE_ESDT_TOKEN_NAME: Handle = -22;
+pub const CALLBACK_CLOSURE_ARGS_BUFFER: Handle = -22;
 pub const MBUF_TEMPORARY_1: Handle = -25;
 pub const MBUF_TEMPORARY_2: Handle = -26;
 

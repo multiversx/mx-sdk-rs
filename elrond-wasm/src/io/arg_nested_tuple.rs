@@ -1,8 +1,8 @@
 use super::{EndpointDynArgLoader, EndpointSingleArgLoader};
 use crate::{
     api::{
-        EndpointArgumentApi, EndpointArgumentApiImpl, ErrorApi, ErrorApiImpl, ManagedTypeApi,
-        StaticVarApiImpl,
+        CallbackArgApiWrapper, EndpointArgumentApi, EndpointArgumentApiImpl, ErrorApi,
+        ErrorApiImpl, ManagedTypeApi, StaticVarApiImpl, VMApi,
     },
     err_msg,
     io::{ArgErrorHandler, ArgId},
@@ -170,6 +170,15 @@ where
 {
     N::check_num_single_args(0);
     N::next_single_arg(0, arg_names)
+}
+
+#[inline(always)]
+pub fn load_callback_closure_args<AA, N>(arg_names: N::ArgNames) -> N
+where
+    AA: VMApi,
+    N: ArgNestedTuple<CallbackArgApiWrapper<AA>>,
+{
+    load_endpoint_args::<CallbackArgApiWrapper<AA>, N>(arg_names)
 }
 
 /// Currently used for the callback closure. No distinction there for single values.

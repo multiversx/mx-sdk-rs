@@ -100,8 +100,8 @@ pub fn load_cb_closure_args_snippet(m: &Method) -> proc_macro2::TokenStream {
             arg.is_endpoint_arg() && !arg.metadata.callback_call_result
         });
     quote! {
-        let #closure_var_names = elrond_wasm::io::load_endpoint_args::<
-            elrond_wasm::api::CallbackArgApiWrapper<Self::Api>,
+        let #closure_var_names = elrond_wasm::io::load_callback_closure_args::<
+            Self::Api,
             #closure_var_types,
         >(#closure_var_names_str);
     }

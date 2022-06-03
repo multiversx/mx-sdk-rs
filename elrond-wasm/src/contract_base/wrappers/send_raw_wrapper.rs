@@ -243,7 +243,7 @@ where
         error_callback: &'static [u8],
         gas: u64,
         extra_gas_for_callback: u64,
-        callback_closure_args: &ManagedArgBuffer<A>,
+        serialized_callback_closure_args: &ManagedBuffer<A>,
     ) {
         A::send_api_impl().create_async_call_raw(
             to.get_raw_handle(),
@@ -254,7 +254,7 @@ where
             error_callback,
             gas,
             extra_gas_for_callback,
-            callback_closure_args.get_raw_handle(),
+            serialized_callback_closure_args.get_raw_handle(),
         )
     }
 

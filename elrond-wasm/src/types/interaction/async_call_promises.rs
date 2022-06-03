@@ -56,14 +56,20 @@ where
 
     #[cfg(feature = "promises")]
     pub fn register_promise(mut self) {
-        let callback_closure_args: ManagedArgBuffer<SA>;
+        use crate::{api::const_handles, types::ManagedType};
+
+        let mut cb_closure_args_serialized =
+            ManagedBuffer::<SA>::from_raw_handle(const_handles::MBUF_TEMPORARY_1);
         if let Some(callback_call) = self.callback_call {
             self.success_callback = callback_call.callback_name;
             self.error_callback = callback_call.callback_name;
-            callback_closure_args = callback_call.closure_args;
+            callback_call
+                .closure_args
+                .serialize_overwrite(&mut cb_closure_args_serialized);
         } else {
-            callback_closure_args = ManagedArgBuffer::new();
+            cb_closure_args_serialized.overwrite(&[]);
         }
+
         SendRawWrapper::<SA>::new().create_async_call_raw(
             &self.to,
             &self.egld_payment,
@@ -73,7 +79,7 @@ where
             self.error_callback,
             self.explicit_gas_limit,
             self.extra_gas_for_callback,
-            &callback_closure_args,
+            &cb_closure_args_serialized,
         )
     }
 }

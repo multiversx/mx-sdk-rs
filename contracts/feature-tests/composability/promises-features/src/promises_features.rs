@@ -9,9 +9,6 @@ pub trait PromisesFeatures {
     #[proxy]
     fn vault_proxy(&self) -> vault::Proxy<Self::Api>;
 
-    #[proxy]
-    fn self_proxy(&self) -> self::Proxy<Self::Api>;
-
     #[init]
     fn init(&self) {}
 

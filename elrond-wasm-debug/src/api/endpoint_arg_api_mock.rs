@@ -70,4 +70,8 @@ impl EndpointArgumentApiImpl for DebugApi {
             })
         }
     }
+
+    fn load_callback_closure_buffer(&self, _dest: Handle) {
+        panic!("load_callback_closure_buffer TODO");
+    }
 }
