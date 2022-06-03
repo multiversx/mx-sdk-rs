@@ -1,11 +1,13 @@
 #![no_std]
 #![allow(clippy::type_complexity)]
 
+mod call_async_promises;
+
 elrond_wasm::imports!();
 
 /// Test contract for investigating the new async call framework.
 #[elrond_wasm::contract]
-pub trait PromisesFeatures {
+pub trait PromisesFeatures: call_async_promises::PromisesAsyncCallModule {
     #[proxy]
     fn vault_proxy(&self) -> vault::Proxy<Self::Api>;
 
@@ -36,6 +38,7 @@ pub trait PromisesFeatures {
             .with_extra_gas_for_callback(extra_gas_for_callback)
             .with_success_callback(b"success_callback")
             .with_error_callback(b"error_callback")
+            // .with_callback(self.callbacks().the_callback())
             .register_promise();
     }
 
