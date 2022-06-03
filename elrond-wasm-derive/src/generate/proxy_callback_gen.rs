@@ -1,5 +1,7 @@
 use super::{snippets, util::*};
-use crate::model::{ArgPaymentMetadata, ContractTrait, Method, MethodArgument, PublicRole};
+use crate::model::{
+    ArgPaymentMetadata, CallbackMetadata, ContractTrait, Method, MethodArgument, PublicRole,
+};
 
 /// Excludes the `#[call_result]` and the payment args.
 pub fn cb_proxy_arg_declarations(method_args: &[MethodArgument]) -> Vec<proc_macro2::TokenStream> {
@@ -17,48 +19,55 @@ pub fn cb_proxy_arg_declarations(method_args: &[MethodArgument]) -> Vec<proc_mac
         .collect()
 }
 
+fn generate_callback_proxy_method(
+    m: &Method,
+    callback: &CallbackMetadata,
+) -> proc_macro2::TokenStream {
+    let arg_decl = cb_proxy_arg_declarations(&m.method_args);
+    let cb_name_literal = ident_str_literal(&callback.callback_name);
+
+    let cb_arg_push_snippets: Vec<proc_macro2::TokenStream> = m
+        .method_args
+        .iter()
+        .map(|arg| {
+            if let ArgPaymentMetadata::NotPayment = arg.metadata.payment {
+                if arg.metadata.callback_call_result {
+                    quote! {}
+                } else {
+                    let pat = &arg.pat;
+                    quote! {
+                        ___callback_call___.push_endpoint_arg(&#pat);
+                    }
+                }
+            } else {
+                quote! {}
+            }
+        })
+        .collect();
+    let method_name = &m.name;
+    quote! {
+        #[allow(clippy::too_many_arguments)]
+        #[allow(clippy::type_complexity)]
+        fn #method_name(
+            self,
+            #(#arg_decl),*
+        ) -> elrond_wasm::types::CallbackClosure<Self::Api> {
+            let mut ___callback_call___ =
+                elrond_wasm::types::new_callback_call::<Self::Api>(#cb_name_literal);
+            #(#cb_arg_push_snippets)*
+            ___callback_call___
+        }
+    }
+}
+
 pub fn generate_callback_proxies_object(methods: &[Method]) -> proc_macro2::TokenStream {
     let proxy_methods: Vec<proc_macro2::TokenStream> = methods
         .iter()
         .filter_map(|m| {
-            if let PublicRole::Callback(callback) = &m.public_role {
-                let arg_decl = cb_proxy_arg_declarations(&m.method_args);
-                let cb_name_literal = ident_str_literal(&callback.callback_name);
-
-                let cb_arg_push_snippets: Vec<proc_macro2::TokenStream> = m
-                    .method_args
-                    .iter()
-                    .map(|arg| {
-                        if let ArgPaymentMetadata::NotPayment = arg.metadata.payment {
-                            if arg.metadata.callback_call_result {
-                                quote! {}
-                            } else {
-                                let pat = &arg.pat;
-                                quote! {
-                                    ___callback_call___.push_endpoint_arg(&#pat);
-                                }
-                            }
-                        } else {
-                            quote! {}
-                        }
-                    })
-                    .collect();
-                let method_name = &m.name;
-                let proxy_decl = quote! {
-                    #[allow(clippy::too_many_arguments)]
-                    #[allow(clippy::type_complexity)]
-                    fn #method_name(
-                        self,
-                        #(#arg_decl),*
-                    ) -> elrond_wasm::types::CallbackClosure<Self::Api> {
-                        let mut ___callback_call___ =
-                            elrond_wasm::types::new_callback_call::<Self::Api>(#cb_name_literal);
-                        #(#cb_arg_push_snippets)*
-                        ___callback_call___
-                    }
-                };
-
-                Some(proxy_decl)
+            if let PublicRole::Callback(callback) | PublicRole::CallbackPromise(callback) =
+                &m.public_role
+            {
+                Some(generate_callback_proxy_method(m, callback))
             } else {
                 None
             }
