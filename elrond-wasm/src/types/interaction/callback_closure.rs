@@ -15,7 +15,6 @@ use elrond_codec::{
 use super::ManagedArgBuffer;
 
 pub const CALLBACK_CLOSURE_STORAGE_BASE_KEY: &[u8] = b"CB_CLOSURE";
-pub const NO_CALLBACK: &[u8] = &[];
 
 /// Object that encodes full async callback data.
 ///

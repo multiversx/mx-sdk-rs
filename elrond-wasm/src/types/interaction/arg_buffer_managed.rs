@@ -264,9 +264,8 @@ where
     /// Serializes itself into a managed buffer without allocating a new handle.
     /// Any data lying in the target buffer is overwritten.
     pub fn serialize_overwrite(&self, dest: &mut ManagedBuffer<M>) {
-        // let item_buffer = ManagedArgBuffer::<M>::from_raw_handle(source_arg_buf_handle);
+        dest.overwrite(&[]);
         let h = ExitCodecErrorHandler::<M>::from(err_msg::SERIALIZER_ENCODE_ERROR);
-        // let mut dest = ManagedBuffer::<M>::from_raw_handle(dest_handle);
         let Ok(()) = self.top_encode_or_handle_err(dest, h);
     }
 
@@ -274,7 +273,6 @@ where
     /// Any data lying in self is overwritten.
     pub fn deserialize_overwrite(&mut self, source: ManagedBuffer<M>) {
         let h = ExitCodecErrorHandler::<M>::from(err_msg::SERIALIZER_DECODE_ERROR);
-        // let mut args = ManagedArgBuffer::<M>::from_raw_handle(dest_handle);
         self.clear();
         let mut nested_de_input = ManagedBufferNestedDecodeInput::new(source);
         while nested_de_input.remaining_len() > 0 {

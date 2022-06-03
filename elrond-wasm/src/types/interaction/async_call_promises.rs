@@ -33,28 +33,24 @@ where
         }
     }
 
-    #[cfg(feature = "promises")]
     #[inline]
     pub fn with_success_callback(mut self, callback: &'static [u8]) -> Self {
         self.success_callback = callback;
         self
     }
 
-    #[cfg(feature = "promises")]
     #[inline]
     pub fn with_error_callback(mut self, callback: &'static [u8]) -> Self {
         self.error_callback = callback;
         self
     }
 
-    #[cfg(feature = "promises")]
     #[inline]
     pub fn with_extra_gas_for_callback(mut self, gas_limit: u64) -> Self {
         self.extra_gas_for_callback = gas_limit;
         self
     }
 
-    #[cfg(feature = "promises")]
     pub fn register_promise(mut self) {
         use crate::{api::const_handles, types::ManagedType};
 

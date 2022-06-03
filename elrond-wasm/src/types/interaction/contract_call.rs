@@ -15,8 +15,6 @@ use crate::{
 };
 use core::marker::PhantomData;
 
-use super::{callback_closure::NO_CALLBACK, AsyncCallPromises};
-
 /// Using max u64 to represent maximum possible gas,
 /// so that the value zero is not reserved and can be specified explicitly.
 /// Leaving the gas limit unspecified will replace it with `api.get_gas_left()`.
@@ -288,17 +286,17 @@ where
     }
 
     #[cfg(feature = "promises")]
-    pub fn async_call_promise(mut self) -> AsyncCallPromises<SA> {
+    pub fn async_call_promise(mut self) -> super::AsyncCallPromises<SA> {
         self = self.convert_to_esdt_transfer_call();
-        AsyncCallPromises {
+        super::AsyncCallPromises {
             to: self.to,
             egld_payment: self.egld_payment,
             endpoint_name: self.endpoint_name,
             arg_buffer: self.arg_buffer,
             explicit_gas_limit: self.explicit_gas_limit,
-            extra_gas_for_callback: UNSPECIFIED_GAS_LIMIT,
-            success_callback: NO_CALLBACK,
-            error_callback: NO_CALLBACK,
+            extra_gas_for_callback: 0,
+            success_callback: &[],
+            error_callback: &[],
             callback_call: None,
         }
     }

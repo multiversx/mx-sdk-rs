@@ -61,15 +61,4 @@ pub trait EndpointArgumentApiImpl: ErrorApi + ManagedTypeApi {
     }
 
     fn load_callback_closure_buffer(&self, dest: Handle);
-
-    // fn get_num_callback_closure_items(&self) -> i32 {
-    //     // not yet implemented
-    //     0
-    // }
-
-    // /// To managed buffer handle
-    // fn load_callback_closure_item(&self, _arg_index: i32, _dest: Handle) {
-    //     // not yet implemented
-    //     self.signal_error(b"no closure items can be accessed at the moment")
-    // }
 }

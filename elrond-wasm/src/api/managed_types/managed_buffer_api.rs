@@ -1,6 +1,4 @@
-use crate::{
-    types::{heap::BoxedBytes},
-};
+use crate::types::heap::BoxedBytes;
 
 use super::Handle;
 
