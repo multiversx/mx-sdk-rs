@@ -1,6 +1,6 @@
 elrond_wasm::imports!();
 
-use super::governance_proposal::{GovernanceAction, MAX_ACTIONS};
+use super::governance_proposal::{GovernanceAction, MAX_GOVERNANCE_PROPOSAL_ACTIONS};
 
 #[elrond_wasm::module]
 pub trait GovernanceEventsModule {
@@ -11,7 +11,7 @@ pub trait GovernanceEventsModule {
         #[indexed] proposer: &ManagedAddress,
         #[indexed] start_block: u64,
         #[indexed] description: &ManagedBuffer,
-        actions: &ArrayVec<GovernanceAction<Self::Api>, MAX_ACTIONS>,
+        actions: &ArrayVec<GovernanceAction<Self::Api>, MAX_GOVERNANCE_PROPOSAL_ACTIONS>,
     );
 
     #[event("voteCast")]
