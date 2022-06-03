@@ -178,6 +178,7 @@ where
     AA: VMApi,
     N: ArgNestedTuple<CallbackArgApiWrapper<AA>>,
 {
+    CallbackArgApiWrapper::<AA>::argument_api_impl().endpoint_init();
     load_endpoint_args::<CallbackArgApiWrapper<AA>, N>(arg_names)
 }
 
