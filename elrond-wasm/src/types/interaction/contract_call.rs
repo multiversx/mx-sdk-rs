@@ -295,8 +295,6 @@ where
             arg_buffer: self.arg_buffer,
             explicit_gas_limit: self.explicit_gas_limit,
             extra_gas_for_callback: 0,
-            success_callback: &[],
-            error_callback: &[],
             callback_call: None,
         }
     }

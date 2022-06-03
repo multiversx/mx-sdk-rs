@@ -6,7 +6,7 @@ edition = "2018"
 publish = false
 
 [lib]
-path = "src/promises_features.rs"
+path = "src/promises_main.rs"
 
 [dependencies.vault]
 path = "../vault"

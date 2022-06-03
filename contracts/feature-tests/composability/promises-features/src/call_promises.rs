@@ -11,7 +11,7 @@ pub struct CallbackData<M: ManagedTypeApi> {
 }
 
 #[elrond_wasm::module]
-pub trait PromisesAsyncCallModule {
+pub trait CallPromisesModule {
     #[proxy]
     fn vault_proxy(&self) -> vault::Proxy<Self::Api>;
 

@@ -1,18 +1,10 @@
-#![no_std]
-#![allow(clippy::type_complexity)]
-
-mod call_async_promises;
-
 elrond_wasm::imports!();
 
 /// Test contract for investigating the new async call framework.
-#[elrond_wasm::contract]
-pub trait PromisesFeatures: call_async_promises::PromisesAsyncCallModule {
+#[elrond_wasm::module]
+pub trait CallPromisesDirectModule {
     #[proxy]
     fn vault_proxy(&self) -> vault::Proxy<Self::Api>;
-
-    #[init]
-    fn init(&self) {}
 
     #[endpoint]
     #[payable("*")]
@@ -36,9 +28,7 @@ pub trait PromisesFeatures: call_async_promises::PromisesAsyncCallModule {
             .with_gas_limit(gas_limit)
             .async_call_promise()
             .with_extra_gas_for_callback(extra_gas_for_callback)
-            .with_success_callback(b"success_callback")
-            .with_error_callback(b"error_callback")
-            // .with_callback(self.callbacks().the_callback())
+            .with_callback(self.callbacks().the_one_callback())
             .register_promise();
     }
 
@@ -63,46 +53,14 @@ pub trait PromisesFeatures: call_async_promises::PromisesAsyncCallModule {
             .with_gas_limit(gas_limit)
             .async_call_promise()
             .with_extra_gas_for_callback(extra_gas_for_callback)
-            .with_success_callback(b"success_callback")
-            .with_error_callback(b"error_callback")
+            .with_callback(self.callbacks().the_one_callback())
             .register_promise();
     }
 
-    #[endpoint]
-    fn success_callback(&self, args: MultiValueEncoded<ManagedBuffer>) {
-        self.async_call_callback_data().set(true);
-        let args_as_vec = args.into_vec_of_buffers();
-        self.async_call_event_callback(&args_as_vec);
-    }
-
-    #[endpoint]
-    fn error_callback(&self, args: MultiValueEncoded<ManagedBuffer>) {
-        self.async_call_callback_data().set(false);
-        let args_as_vec = args.into_vec_of_buffers();
-        self.async_call_event_callback(&args_as_vec);
-    }
-
     #[promises_callback]
-    fn the_callback(
-        &self,
-        #[call_result] result: ManagedAsyncCallResult<()>,
-        args: MultiValueEncoded<ManagedBuffer>,
-    ) {
-        self.async_call_callback_data().set(false);
-        let args_as_vec = args.into_vec_of_buffers();
-        self.async_call_event_callback(&args_as_vec);
+    fn the_one_callback(&self, #[call_result] result: MultiValueEncoded<ManagedBuffer>) {
+        self.async_call_event_callback(&result.into_vec_of_buffers());
     }
-
-    #[callback]
-    fn legacy_callback(&self, args: MultiValueEncoded<ManagedBuffer>) {
-        self.async_call_callback_data().set(false);
-        let args_as_vec = args.into_vec_of_buffers();
-        self.async_call_event_callback(&args_as_vec);
-    }
-
-    #[view]
-    #[storage_mapper("async_call_callback_data")]
-    fn async_call_callback_data(&self) -> SingleValueMapper<bool>;
 
     #[event("async_call_event_callback")]
     fn async_call_event_callback(&self, arguments: &ManagedVec<Self::Api, ManagedBuffer>);

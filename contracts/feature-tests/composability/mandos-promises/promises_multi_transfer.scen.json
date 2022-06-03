@@ -139,9 +139,7 @@
                             ]
                         }
                     },
-                    "storage": {
-                        "str:async_call_callback_data": "true"
-                    },
+                    "storage": {},
                     "code": "file:../promises-features/output/promises-features.wasm"
                 }
             }

@@ -89,7 +89,7 @@
                 "logs": [
                     {
                         "address": "sc:promises",
-                        "endpoint": "str:error_callback",
+                        "endpoint": "str:the_one_callback",
                         "topics": [
                             "str:async_call_event_callback"
                         ],
@@ -150,7 +150,7 @@
                 "logs": [
                     {
                         "address": "sc:promises",
-                        "endpoint": "str:success_callback",
+                        "endpoint": "str:the_one_callback",
                         "topics": [
                             "str:async_call_event_callback"
                         ],
@@ -182,9 +182,7 @@
                 "sc:promises": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {
-                        "str:async_call_callback_data": "true"
-                    },
+                    "storage": {},
                     "code": "file:../promises-features/output/promises-features.wasm"
                 }
             }

@@ -16,8 +16,6 @@ where
     pub(crate) arg_buffer: ManagedArgBuffer<SA>,
     pub(crate) explicit_gas_limit: u64,
     pub(crate) extra_gas_for_callback: u64,
-    pub(crate) success_callback: &'static [u8],
-    pub(crate) error_callback: &'static [u8],
     pub(crate) callback_call: Option<CallbackClosure<SA>>,
 }
 
@@ -34,35 +32,24 @@ where
     }
 
     #[inline]
-    pub fn with_success_callback(mut self, callback: &'static [u8]) -> Self {
-        self.success_callback = callback;
-        self
-    }
-
-    #[inline]
-    pub fn with_error_callback(mut self, callback: &'static [u8]) -> Self {
-        self.error_callback = callback;
-        self
-    }
-
-    #[inline]
     pub fn with_extra_gas_for_callback(mut self, gas_limit: u64) -> Self {
         self.extra_gas_for_callback = gas_limit;
         self
     }
 
-    pub fn register_promise(mut self) {
+    pub fn register_promise(self) {
         use crate::{api::const_handles, types::ManagedType};
 
         let mut cb_closure_args_serialized =
             ManagedBuffer::<SA>::from_raw_handle(const_handles::MBUF_TEMPORARY_1);
+        let callback_name;
         if let Some(callback_call) = self.callback_call {
-            self.success_callback = callback_call.callback_name;
-            self.error_callback = callback_call.callback_name;
+            callback_name = callback_call.callback_name;
             callback_call
                 .closure_args
                 .serialize_overwrite(&mut cb_closure_args_serialized);
         } else {
+            callback_name = &[];
             cb_closure_args_serialized.overwrite(&[]);
         }
 
@@ -71,8 +58,8 @@ where
             &self.egld_payment,
             &self.endpoint_name,
             &self.arg_buffer,
-            self.success_callback,
-            self.error_callback,
+            callback_name,
+            callback_name,
             self.explicit_gas_limit,
             self.extra_gas_for_callback,
             &cb_closure_args_serialized,
