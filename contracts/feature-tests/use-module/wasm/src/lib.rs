@@ -39,7 +39,6 @@ elrond_wasm_node::wasm_endpoints! {
         getTotalVotes
         getVotingDelayInBlocks
         getVotingPeriodInBlocks
-        initGovernanceModule
         isPaused
         issueToken
         only_owner_mod_endpoint

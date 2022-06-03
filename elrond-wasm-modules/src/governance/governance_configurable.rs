@@ -33,8 +33,6 @@ pub trait GovernanceConfigurablePropertiesModule {
 
     /// The module can't protect its storage from the main SC, so it's the developers responsibility
     /// to not modify parameters manually
-    #[only_owner]
-    #[endpoint(initGovernanceModule)]
     fn init_governance_module(
         &self,
         governance_token_id: TokenIdentifier,

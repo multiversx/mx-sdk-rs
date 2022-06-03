@@ -3,12 +3,10 @@ elrond_wasm::derive_imports!();
 
 pub(crate) const MAX_ACTIONS: usize = 20;
 
-pub type GovernanceActionAsMultiArg<M> = MultiValue7<
+pub type GovernanceActionAsMultiArg<M> = MultiValue5<
     u64,
     ManagedAddress<M>,
-    TokenIdentifier<M>,
-    u64,
-    BigUint<M>,
+    ManagedVec<M, EsdtTokenPayment<M>>,
     ManagedBuffer<M>,
     ManagedVec<M, ManagedBuffer<M>>,
 >;
@@ -27,9 +25,7 @@ pub enum GovernanceProposalStatus {
 pub struct GovernanceAction<M: ManagedTypeApi> {
     pub gas_limit: u64,
     pub dest_address: ManagedAddress<M>,
-    pub token_id: TokenIdentifier<M>,
-    pub token_nonce: u64,
-    pub amount: BigUint<M>,
+    pub payments: ManagedVec<M, EsdtTokenPayment<M>>,
     pub function_name: ManagedBuffer<M>,
     pub arguments: ManagedVec<M, ManagedBuffer<M>>,
 }
@@ -39,9 +35,7 @@ impl<M: ManagedTypeApi> GovernanceAction<M> {
         (
             self.gas_limit,
             self.dest_address,
-            self.token_id,
-            self.token_nonce,
-            self.amount,
+            self.payments,
             self.function_name,
             self.arguments,
         )

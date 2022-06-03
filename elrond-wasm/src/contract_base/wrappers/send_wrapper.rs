@@ -458,7 +458,6 @@ where
             .execute_on_dest_context_by_caller_raw(
                 A::blockchain_api_impl().get_gas_left(),
                 &BlockchainWrapper::<A>::new().get_caller(),
-                &BigUint::zero(),
                 &ManagedBuffer::new_from_bytes(ESDT_NFT_CREATE_FUNC_NAME),
                 &arg_buffer,
             );

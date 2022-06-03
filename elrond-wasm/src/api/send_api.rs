@@ -244,7 +244,6 @@ pub trait SendApiImpl {
         &self,
         gas: u64,
         address: &ManagedAddress<M>,
-        value: &BigUint<M>,
         endpoint_name: &ManagedBuffer<M>,
         arg_buffer: &ManagedArgBuffer<M>,
     ) -> ManagedVec<M, ManagedBuffer<M>>;
@@ -253,7 +252,6 @@ pub trait SendApiImpl {
         &self,
         gas: u64,
         address: &Address,
-        value: &BigUint<M>,
         endpoint_name: &BoxedBytes,
         arg_buffer: &ArgBuffer,
     ) -> ManagedVec<M, ManagedBuffer<M>>;
