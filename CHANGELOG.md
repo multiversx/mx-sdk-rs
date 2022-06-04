@@ -4,6 +4,27 @@ There are several crates in this repo, this changelog will keep track of all of 
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [elrond-wasm 0.32.0, mandos 0.14.0] - 2022-06-03
+- VM new functionality added as part of the environment interface 1.2:
+	- Fully managed functionality for elliptic curves (no allocator);
+	- Fully managed cryptographic functions (no allocator);
+	- More efficient printing of big ints and hex;
+	- Functionality available by adding the `ei-1-2` flag to contracts.
+- `BigFloat` functionality. Since the functionality is not yet deployed on mainnet, use flag `big-float` to use.
+- Major refactoring of the call value mechanism:
+	- `TokenIdentifier` now only refers to ESDT, for mixed EGLD+ESDT we have `EgldOrEsdtTokenIdentifier`.
+	- `EsdtTokenPayment` now only refers to ESDT, for mixed EGLD+ESDT we have `EgldOrEsdtTokenPayment`.
+	- Compact version for multi-transfer: `let [payment_a, payment_b, payment_c] = self.call_value().multi_esdt();`.
+	- Explicit `single_esdt` vs. `single_fungible_esdt` vs. `egld_or_single_esdt` vs. `egld_or_single_fungible_esdt`.
+	- Payment arguments are still supported, although discouraged. They always assume the EGLD+ESDT scenario.
+- `ManagedOption` provides some minor optimization for specific use-cases. Mostly for use in the framework.
+- Cleanup in the callback mechanism and in the `SendApi`.
+- `SparseArray` implementation.
+- `UniqueIdMapper` - efficient storage mapper for holding unique values.
+- The ABI also contains events.
+- New standard module: `StakingModule`.
+
+
 ## [elrond-wasm 0.31.1, mandos 0.13.1] - 2022-05-04
 - Bugfix - formatter single char issue.
 
