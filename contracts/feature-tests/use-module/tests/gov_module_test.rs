@@ -361,7 +361,7 @@ fn gov_cancel_defeated_proposal_test() {
     // try cancel too early
     gov_setup
         .cancel(&second_user_addr, proposal_id)
-        .assert_user_error("Only original proposer may cancel a non-defeated proposal");
+        .assert_user_error("Action may not be cancelled");
 
     gov_setup.increment_block_nonce(VOTING_PERIOD_BLOCKS);
     gov_setup.cancel(&second_user_addr, proposal_id).assert_ok();
