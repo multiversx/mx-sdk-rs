@@ -41,6 +41,9 @@ elrond_wasm_node::wasm_endpoints! {
         get_esdt_local_roles
         get_esdt_token_data
         get_nft_balance
+        is_esdt_frozen
+        is_esdt_limited_transfer
+        is_esdt_paused
         issue_fungible_token
         lastErrorMessage
         lastIssuedToken
