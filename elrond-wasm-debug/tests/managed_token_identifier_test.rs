@@ -70,7 +70,7 @@ fn test_is_valid_esdt_identifier() {
 fn test_managed_token_id_macro() {
     let _ = DebugApi::dummy();
     assert_eq!(
-        managed_egld_token_id!(b"EGLD"),
+        managed_egld_token_id!(),
         EgldOrEsdtTokenIdentifier::<DebugApi>::egld()
     );
     assert_eq!(

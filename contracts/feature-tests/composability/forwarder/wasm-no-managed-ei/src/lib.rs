@@ -54,7 +54,6 @@ elrond_wasm_node::wasm_endpoints! {
         nft_burn
         nft_create
         nft_create_compact
-        nft_create_on_caller_behalf
         nft_decode_complex_attributes
         nft_issue
         nft_update_attributes

@@ -4,7 +4,7 @@ use elrond_codec::{
     TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
 };
 
-#[derive(PartialEq, Debug, Clone, Copy)]
+#[derive(PartialEq, Eq, Debug, Clone, Copy)]
 pub struct WrappedArray(pub [u8; 5]);
 
 impl NestedEncode for WrappedArray {

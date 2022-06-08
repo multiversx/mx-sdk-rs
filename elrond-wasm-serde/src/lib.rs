@@ -101,7 +101,7 @@ pub mod tests {
 
     #[test]
     fn test_struct() {
-        #[derive(Serialize, Deserialize, PartialEq, Debug)]
+        #[derive(Serialize, Deserialize, PartialEq, Eq, Debug)]
         struct Test {
             int: u16,
             seq: Vec<u8>,
@@ -118,7 +118,7 @@ pub mod tests {
 
     #[test]
     fn test_wrapped_array() {
-        #[derive(Serialize, Deserialize, PartialEq, Debug, Clone, Copy)]
+        #[derive(Serialize, Deserialize, PartialEq, Eq, Debug, Clone, Copy)]
         struct WrappedArray([u8; 5]);
 
         let wa = WrappedArray([1, 2, 3, 4, 5]);

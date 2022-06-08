@@ -43,7 +43,7 @@ macro_rules! managed_token_id_wrapped {
 
 #[macro_export]
 macro_rules! managed_egld_token_id {
-    ($bytes:expr) => {{
+    () => {{
         elrond_wasm::types::EgldOrEsdtTokenIdentifier::egld()
     }};
 }

@@ -15,7 +15,7 @@ use elrond_wasm_debug::DebugApi;
 const ETH_ADDR_WIDTH: usize = 20;
 
 #[derive(
-    ManagedVecItem, NestedEncode, NestedDecode, TopEncode, TopDecode, PartialEq, Clone, Debug,
+    ManagedVecItem, NestedEncode, NestedDecode, TopEncode, TopDecode, PartialEq, Eq, Clone, Debug,
 )]
 pub struct ManagedStructWithToken<M: ManagedTypeApi> {
     pub token: elrond_wasm::types::EsdtTokenPayment<M>,

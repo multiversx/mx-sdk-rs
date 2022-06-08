@@ -421,54 +421,6 @@ where
         )
     }
 
-    /// Creates an NFT on behalf of the caller. This will set the "creator" field to the caller's address
-    /// NOT activated on devnet/mainnet yet.
-    #[allow(clippy::too_many_arguments)]
-    pub fn esdt_nft_create_as_caller<T: elrond_codec::TopEncode>(
-        &self,
-        token: &TokenIdentifier<A>,
-        amount: &BigUint<A>,
-        name: &ManagedBuffer<A>,
-        royalties: &BigUint<A>,
-        hash: &ManagedBuffer<A>,
-        attributes: &T,
-        uris: &ManagedVec<A, ManagedBuffer<A>>,
-    ) -> u64 {
-        let mut arg_buffer = ManagedArgBuffer::<A>::new();
-        arg_buffer.push_arg(token);
-        arg_buffer.push_arg(amount);
-        arg_buffer.push_arg(name);
-        arg_buffer.push_arg(royalties);
-        arg_buffer.push_arg(hash);
-        arg_buffer.push_arg(attributes);
-
-        if uris.is_empty() {
-            // at least one URI is required, so we push an empty one
-            arg_buffer.push_arg(&elrond_codec::Empty);
-        } else {
-            // The API function has the last argument as variadic,
-            // so we top-encode each and send as separate argument
-            for uri in uris {
-                arg_buffer.push_arg(uri);
-            }
-        }
-
-        let output = self
-            .send_raw_wrapper()
-            .execute_on_dest_context_by_caller_raw(
-                A::blockchain_api_impl().get_gas_left(),
-                &BlockchainWrapper::<A>::new().get_caller(),
-                &ManagedBuffer::new_from_bytes(ESDT_NFT_CREATE_FUNC_NAME),
-                &arg_buffer,
-            );
-
-        if let Some(first_result_bytes) = output.try_get(0) {
-            first_result_bytes.parse_as_u64().unwrap_or_default()
-        } else {
-            0
-        }
-    }
-
     /// Sends the NFTs to the buyer address and calculates and sends the required royalties to the NFT creator.
     /// Returns the payment amount left after sending royalties.
     #[allow(clippy::too_many_arguments)]
