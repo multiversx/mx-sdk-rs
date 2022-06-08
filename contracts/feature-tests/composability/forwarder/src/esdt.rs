@@ -205,25 +205,25 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
             .into()
     }
 
-    // #[view]
-    // fn is_esdt_frozen(
-    //     &self,
-    //     address: &ManagedAddress,
-    //     token_id: &TokenIdentifier,
-    //     nonce: u64,
-    // ) -> bool {
-    //     self.blockchain().is_esdt_frozen(address, token_id, nonce)
-    // }
+    #[view]
+    fn is_esdt_frozen(
+        &self,
+        address: &ManagedAddress,
+        token_id: &TokenIdentifier,
+        nonce: u64,
+    ) -> bool {
+        self.blockchain().is_esdt_frozen(address, token_id, nonce)
+    }
 
-    // #[view]
-    // fn is_esdt_paused(&self, token_id: &TokenIdentifier) -> bool {
-    //     self.blockchain().is_esdt_paused(token_id)
-    // }
+    #[view]
+    fn is_esdt_paused(&self, token_id: &TokenIdentifier) -> bool {
+        self.blockchain().is_esdt_paused(token_id)
+    }
 
-    // #[view]
-    // fn is_esdt_limited_transfer(&self, token_id: &TokenIdentifier) -> bool {
-    //     self.blockchain().is_esdt_limited_transfer(token_id)
-    // }
+    #[view]
+    fn is_esdt_limited_transfer(&self, token_id: &TokenIdentifier) -> bool {
+        self.blockchain().is_esdt_limited_transfer(token_id)
+    }
 
     #[view]
     fn validate_token_identifier(&self, token_id: TokenIdentifier) -> bool {
