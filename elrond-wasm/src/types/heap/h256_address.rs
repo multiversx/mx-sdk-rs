@@ -8,7 +8,7 @@ use core::fmt::Debug;
 
 /// An Address is just a H256 with a different name.
 /// Has a different ABI name than H256.
-#[derive(Hash, Eq, PartialEq, Clone, Debug)]
+#[derive(Hash, PartialEq, Eq, Clone, Debug)]
 pub struct Address(H256);
 
 impl From<H256> for Address {

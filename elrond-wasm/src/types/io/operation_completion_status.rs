@@ -8,7 +8,7 @@ use elrond_codec::{CodecFrom, EncodeErrorHandler, TopEncodeMulti, TopEncodeMulti
 /// Standard way of signalling that an operation was interrupted early, before running out of gas.
 /// An endpoint that performs a longer operation can check from time to time if it is running low
 /// on gas and can decide to save its state and exit, so that it can continue the same operation later.
-#[derive(PartialEq, Debug, Clone, Copy)]
+#[derive(PartialEq, Eq, Debug, Clone, Copy)]
 pub enum OperationCompletionStatus {
     Completed,
     InterruptedBeforeOutOfGas,
