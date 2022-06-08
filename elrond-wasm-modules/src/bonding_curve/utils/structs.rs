@@ -3,7 +3,7 @@ use crate::bonding_curve::function_selector::FunctionSelector;
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
-#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, PartialEq, Clone)]
+#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, PartialEq, Eq, Clone)]
 pub struct CurveArguments<M: ManagedTypeApi> {
     pub available_supply: BigUint<M>,
     pub balance: BigUint<M>,
@@ -15,7 +15,7 @@ impl<M: ManagedTypeApi> CurveArguments<M> {
     }
 }
 
-#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, PartialEq, Clone)]
+#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, PartialEq, Eq, Clone)]
 pub struct BondingCurve<M: ManagedTypeApi> {
     pub curve: FunctionSelector<M>,
     pub arguments: CurveArguments<M>,
@@ -24,7 +24,7 @@ pub struct BondingCurve<M: ManagedTypeApi> {
     pub payment_amount: BigUint<M>,
 }
 
-#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, PartialEq, Clone)]
+#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, PartialEq, Eq, Clone)]
 pub struct TokenOwnershipData<M: ManagedTypeApi> {
     pub token_nonces: ManagedVec<M, u64>,
     pub owner: ManagedAddress<M>,

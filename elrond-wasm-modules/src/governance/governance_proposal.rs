@@ -11,7 +11,7 @@ pub type GovernanceActionAsMultiArg<M> = MultiValue5<
     ManagedVec<M, ManagedBuffer<M>>,
 >;
 
-#[derive(TypeAbi, TopEncode, TopDecode, PartialEq)]
+#[derive(TypeAbi, TopEncode, TopDecode, PartialEq, Eq)]
 pub enum GovernanceProposalStatus {
     None,
     Pending,

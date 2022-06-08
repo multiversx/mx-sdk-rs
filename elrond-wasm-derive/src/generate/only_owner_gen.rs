@@ -8,5 +8,5 @@ pub fn generate_only_owner_snippet(m: &Method) -> proc_macro2::TokenStream {
             };
         }
     }
-    return quote! {};
+    quote! {}
 }

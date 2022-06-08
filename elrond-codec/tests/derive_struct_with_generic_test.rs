@@ -17,7 +17,7 @@ impl SimpleTrait for u8 {
     fn simple_function(&self) {}
 }
 
-#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, PartialEq, Clone, Debug)]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, PartialEq, Eq, Clone, Debug)]
 struct StructWithNamedFieldsWithGeneric<ST: SimpleTrait>
 where
     ST: NestedEncode + NestedDecode + TopEncode + TopDecode,
