@@ -33,7 +33,6 @@ const RESERVED: &[&str] = &[
     "getBlockTimestamp",
     "executeOnSameContext",
     "executeOnDestContext",
-    "executeOnDestContextByCaller",
     "asyncCall",
     "delegateExecution",
     "createContract",
