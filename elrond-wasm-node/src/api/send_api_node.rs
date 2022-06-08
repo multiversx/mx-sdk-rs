@@ -4,7 +4,7 @@ use crate::{
 };
 use alloc::vec::Vec;
 use elrond_wasm::{
-    api::{const_handles, BigIntApi, ManagedTypeApi, SendApi, SendApiImpl, StaticVarApiImpl},
+    api::{const_handles, ManagedTypeApi, SendApi, SendApiImpl, StaticVarApiImpl},
     types::{
         heap::{Address, ArgBuffer, BoxedBytes},
         managed_vec_from_slice_of_boxed_bytes, BigUint, CodeMetadata, EsdtTokenPayment,
@@ -12,8 +12,6 @@ use elrond_wasm::{
     },
     HexCallDataSerializer,
 };
-
-use super::unsafe_buffer;
 
 // Token ID + nonce + amount, as bytes
 const AVERAGE_MULTI_TRANSFER_ARG_PAIR_LENGTH: usize = 15 + 2 + 8;
@@ -142,17 +140,6 @@ extern "C" {
         dataOffset: *const u8,
     ) -> i32;
 
-    fn executeOnDestContextByCaller(
-        gas: i64,
-        addressOffset: *const u8,
-        valueOffset: *const u8,
-        functionOffset: *const u8,
-        functionLength: i32,
-        numArguments: i32,
-        argumentsLengthOffset: *const u8,
-        dataOffset: *const u8,
-    ) -> i32;
-
     fn executeOnSameContext(
         gas: i64,
         addressOffset: *const u8,
@@ -193,14 +180,6 @@ extern "C" {
         argumentsHandle: i32,
     ) -> i32;
     fn managedExecuteOnDestContext(
-        gas: i64,
-        addressHandle: i32,
-        valueHandle: i32,
-        functionHandle: i32,
-        argumentsHandle: i32,
-        resultHandle: i32,
-    ) -> i32;
-    fn managedExecuteOnDestContextByCaller(
         gas: i64,
         addressHandle: i32,
         valueHandle: i32,
@@ -863,57 +842,6 @@ impl SendApiImpl for VmApiImpl {
             let num_return_data_before = getNumReturnData();
             let amount_bytes32_ptr = unsafe_buffer_load_be_pad_right(amount.get_raw_handle(), 32);
             let _ = executeOnDestContext(
-                gas as i64,
-                to.as_ptr(),
-                amount_bytes32_ptr,
-                endpoint_name.as_ptr(),
-                endpoint_name.len() as i32,
-                arg_buffer.num_args() as i32,
-                arg_buffer.arg_lengths_bytes_ptr(),
-                arg_buffer.arg_data_ptr(),
-            );
-
-            let num_return_data_after = getNumReturnData();
-            let result_bytes = get_return_data_range(num_return_data_before, num_return_data_after);
-            managed_vec_from_slice_of_boxed_bytes(result_bytes.as_slice())
-        }
-    }
-
-    fn execute_on_dest_context_by_caller_raw<M: ManagedTypeApi>(
-        &self,
-        gas: u64,
-        to: &ManagedAddress<M>,
-        endpoint_name: &ManagedBuffer<M>,
-        arg_buffer: &ManagedArgBuffer<M>,
-    ) -> ManagedVec<M, ManagedBuffer<M>> {
-        unsafe {
-            let result_handle = self.next_handle();
-            let amount_handle = self.bi_new_zero();
-            let _ = managedExecuteOnDestContextByCaller(
-                gas as i64,
-                to.get_raw_handle(),
-                amount_handle,
-                endpoint_name.get_raw_handle(),
-                arg_buffer.get_raw_handle(),
-                result_handle,
-            );
-
-            ManagedVec::from_raw_handle(result_handle)
-        }
-    }
-
-    fn execute_on_dest_context_by_caller_raw_legacy<M: ManagedTypeApi>(
-        &self,
-        gas: u64,
-        to: &Address,
-        endpoint_name: &BoxedBytes,
-        arg_buffer: &ArgBuffer,
-    ) -> ManagedVec<M, ManagedBuffer<M>> {
-        unsafe {
-            let num_return_data_before = getNumReturnData();
-            unsafe_buffer::clear_buffer_1(); // set to zero
-            let amount_bytes32_ptr = unsafe_buffer::buffer_1_ptr();
-            let _ = executeOnDestContextByCaller(
                 gas as i64,
                 to.as_ptr(),
                 amount_bytes32_ptr,
