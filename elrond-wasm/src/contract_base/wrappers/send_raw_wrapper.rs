@@ -436,44 +436,11 @@ where
         &self,
         gas: u64,
         address: &ManagedAddress<A>,
-        endpoint_name: &ManagedBuffer<A>,
-        arg_buffer: &ManagedArgBuffer<A>,
-    ) -> ManagedVec<A, ManagedBuffer<A>> {
-        A::send_api_impl().execute_on_dest_context_raw_legacy(
-            gas,
-            &address.to_address(),
-            value,
-            &endpoint_name.to_boxed_bytes(),
-            &crate::types::heap::ArgBuffer::from(arg_buffer),
-        )
-    }
-
-    #[cfg(not(feature = "ei-unmanaged"))]
-    pub fn execute_on_dest_context_by_caller_raw(
-        &self,
-        gas: u64,
-        address: &ManagedAddress<A>,
-        endpoint_name: &ManagedBuffer<A>,
-        arg_buffer: &ManagedArgBuffer<A>,
-    ) -> ManagedVec<A, ManagedBuffer<A>> {
-        A::send_api_impl().execute_on_dest_context_by_caller_raw(
-            gas,
-            address,
-            endpoint_name,
-            arg_buffer,
-        )
-    }
-
-    #[cfg(feature = "ei-unmanaged")]
-    pub fn execute_on_dest_context_by_caller_raw(
-        &self,
-        gas: u64,
-        address: &ManagedAddress<A>,
         value: &BigUint<A>,
         endpoint_name: &ManagedBuffer<A>,
         arg_buffer: &ManagedArgBuffer<A>,
     ) -> ManagedVec<A, ManagedBuffer<A>> {
-        A::send_api_impl().execute_on_dest_context_by_caller_raw_legacy(
+        A::send_api_impl().execute_on_dest_context_raw_legacy(
             gas,
             &address.to_address(),
             value,

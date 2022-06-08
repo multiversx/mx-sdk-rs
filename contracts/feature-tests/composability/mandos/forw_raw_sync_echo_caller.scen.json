@@ -100,41 +100,6 @@
                 "gas": "*",
                 "refund": "*"
             }
-        },
-        {
-            "step": "scCall",
-            "txId": "call_execute_on_dest_context_by_caller",
-            "tx": {
-                "from": "address:a_user",
-                "to": "sc:forwarder",
-                "function": "call_execute_on_dest_context_by_caller",
-                "arguments": [
-                    "sc:vault",
-                    "str:echo_caller"
-                ],
-                "gasLimit": "50,000,000",
-                "gasPrice": "0"
-            },
-            "expect": {
-                "out": [
-                    "address:a_user"
-                ],
-                "status": "0",
-                "logs": [
-                    {
-                        "address": "sc:forwarder",
-                        "endpoint": "str:call_execute_on_dest_context_by_caller",
-                        "topics": [
-                            "str:execute_on_dest_context_result"
-                        ],
-                        "data": [
-                            "nested:address:a_user"
-                        ]
-                    }
-                ],
-                "gas": "*",
-                "refund": "*"
-            }
         }
     ]
 }

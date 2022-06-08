@@ -132,31 +132,6 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
     }
 
     #[endpoint]
-    fn nft_create_on_caller_behalf(
-        &self,
-        token_identifier: TokenIdentifier,
-        amount: BigUint,
-        name: ManagedBuffer,
-        royalties: BigUint,
-        hash: ManagedBuffer,
-        color: Color,
-        uri: ManagedBuffer,
-    ) -> u64 {
-        let mut uris = ManagedVec::new();
-        uris.push(uri);
-
-        self.send().esdt_nft_create_as_caller::<Color>(
-            &token_identifier,
-            &amount,
-            &name,
-            &royalties,
-            &hash,
-            &color,
-            &uris,
-        )
-    }
-
-    #[endpoint]
     fn nft_add_uris(
         &self,
         token_identifier: TokenIdentifier,
