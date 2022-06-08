@@ -10,7 +10,7 @@ use elrond_wasm::{
 // cargo expand --test derive_managed_vec_item_simple_enum > expanded.rs
 
 #[derive(
-    ManagedVecItem, NestedEncode, NestedDecode, TopEncode, TopDecode, PartialEq, Clone, Debug,
+    ManagedVecItem, NestedEncode, NestedDecode, TopEncode, TopDecode, PartialEq, Eq, Clone, Debug,
 )]
 enum SimpleEnum {
     Variant1,

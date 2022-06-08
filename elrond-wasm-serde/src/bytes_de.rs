@@ -463,7 +463,7 @@ mod tests {
 
     #[test]
     fn test_struct() {
-        #[derive(Deserialize, PartialEq, Debug)]
+        #[derive(Deserialize, PartialEq, Eq, Debug)]
         struct Test {
             int: u16,
             seq: Vec<u8>,
@@ -480,7 +480,7 @@ mod tests {
 
     #[test]
     fn test_enum() {
-        #[derive(Deserialize, Hash, Eq, PartialEq, Clone, Debug)]
+        #[derive(Deserialize, Hash, PartialEq, Eq, Clone, Debug)]
         enum E {
             Unit,
             Newtype(u32),

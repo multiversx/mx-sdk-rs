@@ -15,7 +15,7 @@ static ESDT_ROLE_NFT_UPDATE_ATTRIBUTES: &[u8] = b"ESDTRoleNFTUpdateAttributes";
 static ESDT_ROLE_TRANSFER: &[u8] = b"ESDTTransferRole";
 
 #[derive(
-    TopDecode, TopEncode, NestedDecode, NestedEncode, TypeAbi, Clone, PartialEq, Debug, Copy,
+    TopDecode, TopEncode, NestedDecode, NestedEncode, TypeAbi, Clone, PartialEq, Eq, Debug, Copy,
 )]
 pub enum EsdtLocalRole {
     None,
