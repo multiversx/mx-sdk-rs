@@ -12,7 +12,7 @@ use crate::{
 /// Thin wrapper around EsdtTokenPayment, which has different I/O behaviour:
 /// - as input, is built from 3 arguments instead of 1: token identifier, nonce, value
 /// - as output, it becomes 3 results instead of 1: token identifier, nonce, value
-#[derive(Clone, PartialEq, Debug)]
+#[derive(Clone, PartialEq, Eq, Debug)]
 pub struct EsdtTokenPaymentMultiValue<M: ManagedTypeApi> {
     obj: EsdtTokenPayment<M>,
 }
