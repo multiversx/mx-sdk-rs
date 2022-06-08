@@ -9,7 +9,7 @@ const EGLD_NUM_DECIMALS: usize = 18;
 ///	1 EGLD = 1 wrapped EGLD and is interchangeable at all times.
 /// Also manages the supply of wrapped EGLD tokens.
 #[elrond_wasm::contract]
-pub trait EgldEsdtSwap {
+pub trait EgldEsdtSwap: elrond_wasm_modules::pause::PauseModule {
     #[init]
     fn init(&self) {}
 
@@ -104,6 +104,8 @@ pub trait EgldEsdtSwap {
     #[payable("EGLD")]
     #[endpoint(wrapEgld)]
     fn wrap_egld(&self) {
+        require!(self.not_paused(), "contract is paused");
+
         let payment_amount = self.call_value().egld_value();
         require!(payment_amount > 0u32, "Payment must be more than 0");
 
@@ -119,6 +121,8 @@ pub trait EgldEsdtSwap {
     #[payable("*")]
     #[endpoint(unwrapEgld)]
     fn unwrap_egld(&self) {
+        require!(self.not_paused(), "contract is paused");
+
         let (payment_token, payment_amount) = self.call_value().single_fungible_esdt();
         let wrapped_egld_token_id = self.wrapped_egld_token_id().get();
 

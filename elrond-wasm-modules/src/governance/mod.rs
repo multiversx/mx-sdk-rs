@@ -55,6 +55,17 @@ pub trait GovernanceModule:
         }
     }
 
+    /// Propose a list of actions. 
+    /// A maximum of MAX_GOVERNANCE_PROPOSAL_ACTIONS can be proposed at a time.
+    /// 
+    /// An action has the following format:
+    ///     - gas limit for action execution
+    ///     - destination address
+    ///     - a vector of ESDT transfers, in the form of ManagedVec<EsdTokenPayment>
+    ///     - endpoint to be called on the destination
+    ///     - a vector of arguments for the endpoint, in the form of ManagedVec<ManagedBuffer>
+    ///
+    /// Returns the ID of the newly created proposal.
     #[payable("*")]
     #[endpoint]
     fn propose(
@@ -70,7 +81,7 @@ pub trait GovernanceModule:
         );
         require!(!actions.is_empty(), "Proposal has no actions");
         require!(
-            actions.len() <= MAX_ACTIONS,
+            actions.len() <= MAX_GOVERNANCE_PROPOSAL_ACTIONS,
             "Exceeded max actions per proposal"
         );
 
@@ -124,6 +135,8 @@ pub trait GovernanceModule:
         proposal_id
     }
 
+    /// Vote on a proposal by depositing any amount of governance tokens
+    /// These tokens will be locked until the proposal is executed or cancelled.
     #[payable("*")]
     #[endpoint]
     fn vote(&self, proposal_id: usize) {
@@ -143,6 +156,8 @@ pub trait GovernanceModule:
             .update(|nr_votes| *nr_votes += &payment.amount);
     }
 
+    /// Downvote a proposal by depositing any amount of governance tokens.
+    /// These tokens will be locked until the proposal is executed or cancelled.
     #[payable("*")]
     #[endpoint]
     fn downvote(&self, proposal_id: usize) {
@@ -162,6 +177,10 @@ pub trait GovernanceModule:
             .update(|nr_downvotes| *nr_downvotes += &payment.amount);
     }
 
+    /// Queue a proposal for execution.
+    /// This can be done only if the proposal has reached the quorum.
+    /// A proposal is considered successful and ready for queing if
+    /// total_votes - total_downvotes >= quorum
     #[endpoint]
     fn queue(&self, proposal_id: usize) {
         require!(
@@ -175,6 +194,9 @@ pub trait GovernanceModule:
         self.proposal_queued_event(proposal_id, current_block);
     }
 
+    /// Execute a previously queued proposal.
+    /// This will clear the proposal and unlock the governance tokens.
+    /// Said tokens can then be withdrawn and used to vote/downvote other proposals.
     #[endpoint]
     fn execute(&self, proposal_id: usize) {
         require!(
@@ -224,21 +246,27 @@ pub trait GovernanceModule:
         self.proposal_executed_event(proposal_id);
     }
 
+    /// Cancel a proposed action. This can be done:
+    /// - by the proposer, at any time
+    /// - by anyone, if the proposal was defeated
     #[endpoint]
     fn cancel(&self, proposal_id: usize) {
         match self.get_proposal_status(proposal_id) {
             GovernanceProposalStatus::None => {
                 sc_panic!("Proposal does not exist");
             },
-            GovernanceProposalStatus::Defeated => {},
-            _ => {
+            GovernanceProposalStatus::Pending => {
                 let proposal = self.proposals().get(proposal_id);
                 let caller = self.blockchain().get_caller();
 
                 require!(
                     caller == proposal.proposer,
-                    "Only original proposer may cancel a non-defeated proposal"
+                    "Only original proposer may cancel a pending proposal"
                 );
+            },
+            GovernanceProposalStatus::Defeated => {},
+            _ => {
+                sc_panic!("Action may not be cancelled");
             },
         }
 
@@ -351,7 +379,7 @@ pub trait GovernanceModule:
 
     fn total_gas_needed(
         &self,
-        actions: &ArrayVec<GovernanceAction<Self::Api>, MAX_ACTIONS>,
+        actions: &ArrayVec<GovernanceAction<Self::Api>, MAX_GOVERNANCE_PROPOSAL_ACTIONS>,
     ) -> u64 {
         let mut total = 0;
         for action in actions {
