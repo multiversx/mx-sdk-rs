@@ -56,7 +56,7 @@ pub use transmute::{boxed_slice_into_vec, vec_into_boxed_slice};
 /// This enum provides type information to optimize encoding/decoding by doing fake specialization.
 #[doc(hidden)]
 #[allow(clippy::upper_case_acronyms)]
-#[derive(PartialEq)]
+#[derive(PartialEq, Eq)]
 pub enum TypeInfo {
     /// Default value of [`NestedEncode::TYPE_INFO`] to not require implementors to set this value in the trait.
     Unknown,

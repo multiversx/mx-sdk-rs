@@ -4,7 +4,7 @@ use elrond_codec_derive::*;
 
 use elrond_codec::test_util::check_top_encode_decode;
 
-#[derive(TopEncodeOrDefault, TopDecodeOrDefault, PartialEq, Clone, Debug)]
+#[derive(TopEncodeOrDefault, TopDecodeOrDefault, PartialEq, Eq, Clone, Debug)]
 pub struct StructOrDefault<T>
 where
     T: NestedEncode + NestedDecode + Default + 'static,

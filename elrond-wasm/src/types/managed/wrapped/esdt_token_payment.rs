@@ -5,7 +5,7 @@ use crate::{
 
 use crate as elrond_wasm; // needed by the TypeAbi generated code
 
-#[derive(Clone, PartialEq, Debug)]
+#[derive(Clone, PartialEq, Eq, Debug)]
 pub struct EsdtTokenPayment<M: ManagedTypeApi> {
     pub token_identifier: TokenIdentifier<M>,
     pub token_nonce: u64,

@@ -11,7 +11,7 @@ pub struct Color {
     b: u8,
 }
 
-#[derive(TopEncode, TopDecode, TypeAbi, PartialEq, Clone)]
+#[derive(TopEncode, TopDecode, TypeAbi, PartialEq, Eq, Clone)]
 pub struct ComplexAttributes<M: ManagedTypeApi> {
     pub biguint: BigUint<M>,
     pub vec_u8: ManagedBuffer<M>,

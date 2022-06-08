@@ -9,7 +9,7 @@ use elrond_codec::test_util::{check_top_decode, check_top_encode, check_top_enco
 /// Enum with default that is not the first variant.
 /// Not fieldless, the version with fields.
 /// NOT recommended!
-#[derive(TopEncodeOrDefault, TopDecodeOrDefault, PartialEq, Clone, Debug)]
+#[derive(TopEncodeOrDefault, TopDecodeOrDefault, PartialEq, Eq, Clone, Debug)]
 enum TrickyEnumWithDefault {
     FirstVariant,
     SecondVariant,
