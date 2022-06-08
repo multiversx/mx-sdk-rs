@@ -18,6 +18,42 @@ pub trait ForwarderAsyncCallModule {
     fn vault_proxy(&self) -> vault::Proxy<Self::Api>;
 
     #[endpoint]
+    fn echo_args_async(&self, to: ManagedAddress, args: MultiValueEncoded<ManagedBuffer>) {
+        self.vault_proxy()
+            .contract(to)
+            .echo_arguments(args)
+            .async_call()
+            .with_callback(self.callbacks().echo_args_callback())
+            .call_and_exit();
+    }
+
+    #[callback]
+    fn echo_args_callback(
+        &self,
+        #[call_result] result: ManagedAsyncCallResult<MultiValueEncoded<ManagedBuffer>>,
+    ) -> MultiValueEncoded<ManagedBuffer> {
+        match result {
+            ManagedAsyncCallResult::Ok(results) => {
+                let mut cb_result =
+                    ManagedVec::from_single_item(ManagedBuffer::new_from_bytes(b"success"));
+                cb_result.append_vec(results.into_vec_of_buffers());
+
+                cb_result.into()
+            },
+            ManagedAsyncCallResult::Err(err) => {
+                let mut cb_result =
+                    ManagedVec::from_single_item(ManagedBuffer::new_from_bytes(b"error"));
+                cb_result.push(ManagedBuffer::new_from_bytes(
+                    &err.err_code.to_be_bytes()[..],
+                ));
+                cb_result.push(err.err_msg);
+
+                cb_result.into()
+            },
+        }
+    }
+
+    #[endpoint]
     #[payable("*")]
     fn forward_async_accept_funds(&self, to: ManagedAddress) {
         let (token, token_nonce, payment) = self.call_value().egld_or_single_esdt().into_tuple();

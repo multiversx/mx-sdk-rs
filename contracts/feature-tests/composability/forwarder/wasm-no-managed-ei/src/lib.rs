@@ -18,6 +18,7 @@ elrond_wasm_node::wasm_endpoints! {
         deploy_contract
         deploy_two_contracts
         deploy_vault_from_source
+        echo_args_async
         echo_arguments_sync
         echo_arguments_sync_twice
         forward_async_accept_funds
@@ -40,9 +41,6 @@ elrond_wasm_node::wasm_endpoints! {
         get_esdt_local_roles
         get_esdt_token_data
         get_nft_balance
-        is_esdt_frozen
-        is_esdt_limited_transfer
-        is_esdt_paused
         issue_fungible_token
         lastErrorMessage
         lastIssuedToken
