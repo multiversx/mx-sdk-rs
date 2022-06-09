@@ -277,7 +277,6 @@ where
     }
 }
 
-#[cfg(feature = "alloc")]
 impl<M, T> core::fmt::Debug for ManagedOption<M, T>
 where
     M: ManagedTypeApi,
