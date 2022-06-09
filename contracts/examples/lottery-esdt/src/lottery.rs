@@ -96,10 +96,7 @@ pub trait Lottery {
             "Lottery is already active!"
         );
         require!(!lottery_name.is_empty(), "Can't have empty lottery name!");
-        require!(
-            token_identifier.is_egld() || token_identifier.is_valid_esdt_identifier(),
-            "Invalid token name provided!"
-        );
+        require!(token_identifier.is_valid(), "Invalid token name provided!");
         require!(ticket_price > 0, "Ticket price must be higher than 0!");
         require!(
             total_tickets > 0,
