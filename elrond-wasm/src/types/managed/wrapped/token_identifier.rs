@@ -71,7 +71,7 @@ impl<M: ManagedTypeApi> TokenIdentifier<M> {
 
     #[inline]
     #[cfg(feature = "alloc")]
-    pub fn to_esdt_identifier(&self) -> BoxedBytes {
+    pub fn to_boxed_bytes(&self) -> BoxedBytes {
         self.buffer.to_boxed_bytes()
     }
 

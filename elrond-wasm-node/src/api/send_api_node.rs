@@ -377,7 +377,7 @@ impl SendApiImpl for VmApiImpl {
             let amount_bytes32_ptr = unsafe_buffer_load_be_pad_right(amount.get_raw_handle(), 32);
             let result = transferESDTExecute(
                 to.as_ptr(),
-                token.to_esdt_identifier().as_ptr(),
+                token.to_boxed_bytes().as_ptr(),
                 token.len() as i32,
                 amount_bytes32_ptr,
                 gas_limit as i64,
@@ -424,7 +424,7 @@ impl SendApiImpl for VmApiImpl {
             let amount_bytes32_ptr = unsafe_buffer_load_be_pad_right(amount.get_raw_handle(), 32);
             let result = transferESDTNFTExecute(
                 to.as_ptr(),
-                token.to_esdt_identifier().as_ptr(),
+                token.to_boxed_bytes().as_ptr(),
                 token.len() as i32,
                 amount_bytes32_ptr,
                 nonce as i64,
@@ -482,7 +482,7 @@ impl SendApiImpl for VmApiImpl {
                 Vec::with_capacity(nr_transfers * AVERAGE_MULTI_TRANSFER_ARG_PAIR_LENGTH);
 
             for token in payments {
-                let token_id_bytes = token.token_identifier.to_esdt_identifier();
+                let token_id_bytes = token.token_identifier.to_boxed_bytes();
                 let nonce_bytes = &token.token_nonce.to_be_bytes()[..]; // TODO: Maybe top-encode here instead
                 let amount_bytes = &token.amount.to_bytes_be();
 
