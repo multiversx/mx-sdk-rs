@@ -1,6 +1,9 @@
 use elrond_wasm::{
     hex_literal::hex,
-    types::{BigInt, BigUint, ManagedAddress, ManagedBuffer, ManagedByteArray, ManagedVec},
+    types::{
+        BigInt, BigUint, EgldOrEsdtTokenIdentifier, ManagedAddress, ManagedBuffer,
+        ManagedByteArray, ManagedVec, TokenIdentifier,
+    },
 };
 use elrond_wasm_debug::DebugApi;
 
@@ -67,11 +70,26 @@ fn test_managed_address_pretty() {
 }
 
 #[test]
-fn test_managed_vec_format() {
+fn test_managed_vec_format_biguint() {
     let _ = DebugApi::dummy();
     let mut mv = ManagedVec::<DebugApi, BigUint<DebugApi>>::new();
     mv.push(BigUint::from(1u32));
     mv.push(BigUint::from(2u32));
     let s = format!("{:?}", &mv);
     assert_eq!("[BigUint { handle: -101, hex-value-be: \"01\" }, BigUint { handle: -102, hex-value-be: \"02\" }]", s);
+}
+
+#[test]
+fn test_managed_vec_format_egld_or_esdt() {
+    let _ = DebugApi::dummy();
+    let mut mv = ManagedVec::<DebugApi, EgldOrEsdtTokenIdentifier<DebugApi>>::new();
+    mv.push(EgldOrEsdtTokenIdentifier::egld());
+    mv.push(EgldOrEsdtTokenIdentifier::esdt(TokenIdentifier::from(
+        "MYTOKEN-5678",
+    )));
+    let s = format!("{:?}", &mv);
+    assert_eq!(
+        "[EgldOrEsdtTokenIdentifier::Egld, EgldOrEsdtTokenIdentifier::Esdt(\"MYTOKEN-5678\")]",
+        s
+    );
 }

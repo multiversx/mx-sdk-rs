@@ -40,7 +40,7 @@ fn struct_to_bytes_writer() {
     let _ = DebugApi::dummy();
     let s = ManagedStructWithToken::<DebugApi> {
         token: EsdtTokenPayment::new(
-            TokenIdentifier::from(&b"MYTOKEN-12345"[..]),
+            TokenIdentifier::from("MYTOKEN-12345"),
             0u64,
             BigUint::from(42u64),
         ),
@@ -75,11 +75,7 @@ fn struct_to_bytes_writer() {
 fn struct_from_bytes_reader() {
     let _ = DebugApi::dummy();
     let s = ManagedStructWithToken::<DebugApi> {
-        token: EsdtTokenPayment::new(
-            TokenIdentifier::from(&b"MYTOKEN-12345"[..]),
-            0u64,
-            42u64.into(),
-        ),
+        token: EsdtTokenPayment::new(TokenIdentifier::from("MYTOKEN-12345"), 0u64, 42u64.into()),
         num: 0x12345,
         eth_address_1: ManagedByteArray::new_from_bytes(&[1u8; 20]),
         eth_address_2: ManagedByteArray::new_from_bytes(&[2u8; 20]),
