@@ -2,7 +2,7 @@ use crate::{
     abi::{TypeAbi, TypeName},
     api::{Handle, ManagedTypeApi, ManagedTypeApiImpl},
     formatter::{FormatByteReceiver, SCDisplay, SCLowerHex},
-    types::{heap::BoxedBytes, ManagedBuffer, ManagedType},
+    types::{ManagedBuffer, ManagedType},
 };
 use elrond_codec::*;
 
@@ -70,8 +70,7 @@ impl<M: ManagedTypeApi> TokenIdentifier<M> {
     }
 
     #[inline]
-    #[cfg(feature = "alloc")]
-    pub fn to_boxed_bytes(&self) -> BoxedBytes {
+    pub fn to_boxed_bytes(&self) -> crate::types::heap::BoxedBytes {
         self.buffer.to_boxed_bytes()
     }
 
@@ -184,7 +183,6 @@ impl<M: ManagedTypeApi> SCLowerHex for TokenIdentifier<M> {
     }
 }
 
-#[cfg(feature = "alloc")]
 impl<M: ManagedTypeApi> core::fmt::Display for TokenIdentifier<M> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         let bytes = self.buffer.to_boxed_bytes();
@@ -193,7 +191,6 @@ impl<M: ManagedTypeApi> core::fmt::Display for TokenIdentifier<M> {
     }
 }
 
-#[cfg(feature = "alloc")]
 impl<M: ManagedTypeApi> core::fmt::Debug for TokenIdentifier<M> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         use crate::alloc::string::ToString;

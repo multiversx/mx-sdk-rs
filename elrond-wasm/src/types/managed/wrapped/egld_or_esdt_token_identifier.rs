@@ -220,7 +220,6 @@ impl<M: ManagedTypeApi> SCLowerHex for EgldOrEsdtTokenIdentifier<M> {
     }
 }
 
-#[cfg(feature = "alloc")]
 impl<M> core::fmt::Debug for EgldOrEsdtTokenIdentifier<M>
 where
     M: ManagedTypeApi,
