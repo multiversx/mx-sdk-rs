@@ -83,7 +83,10 @@ impl<M: ManagedTypeApi> EgldOrEsdtTokenIdentifier<M> {
         )
     }
 
-    pub fn is_valid_esdt_identifier(&self) -> bool {
+    /// Checks the ESDT token identifier for validity. EGLD is considered valid, no checks needed.
+    ///
+    /// Will fail if it encodes an invalid ESDT token identifier.
+    pub fn is_valid(&self) -> bool {
         self.map_ref_or_else(
             || true,
             |token_identifier| token_identifier.is_valid_esdt_identifier(),
