@@ -18,6 +18,7 @@ elrond_wasm_node::wasm_endpoints! {
         deploy_contract
         deploy_two_contracts
         deploy_vault_from_source
+        echo_args_async
         echo_arguments_sync
         echo_arguments_sync_twice
         forward_async_accept_funds
