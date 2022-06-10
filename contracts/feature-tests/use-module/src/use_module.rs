@@ -30,6 +30,7 @@ pub trait UseModule:
     + elrond_wasm_modules::features::FeaturesModule
     + elrond_wasm_modules::governance::GovernanceModule
     + elrond_wasm_modules::governance::governance_configurable::GovernanceConfigurablePropertiesModule
+    + elrond_wasm_modules::governance::governance_events::GovernanceEventsModule
     + elrond_wasm_modules::pause::PauseModule
     + elrond_wasm_modules::staking::StakingModule
     + elrond_wasm_modules::default_issue_callbacks::DefaultIssueCallbacksModule

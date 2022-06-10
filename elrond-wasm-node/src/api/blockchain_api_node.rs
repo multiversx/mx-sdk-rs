@@ -17,15 +17,15 @@ use elrond_wasm::{
 extern "C" {
     // address utils
     fn getSCAddress(resultOffset: *mut u8);
-    #[cfg(not(feature = "ei-unmanaged"))]
+    #[cfg(not(feature = "ei-unmanaged-node"))]
     fn managedSCAddress(resultHandle: i32);
 
     fn getOwnerAddress(resultOffset: *mut u8);
-    #[cfg(not(feature = "ei-unmanaged"))]
+    #[cfg(not(feature = "ei-unmanaged-node"))]
     fn managedOwnerAddress(resultHandle: i32);
 
     fn getCaller(resultOffset: *mut u8);
-    #[cfg(not(feature = "ei-unmanaged"))]
+    #[cfg(not(feature = "ei-unmanaged-node"))]
     fn managedCaller(resultHandle: i32);
 
     fn getShardOfAddress(address_ptr: *const u8) -> i32;
@@ -56,13 +56,13 @@ extern "C" {
     fn getOriginalTxHash(resultOffset: *const u8);
 
     // Managed versions of the above
-    #[cfg(not(feature = "ei-unmanaged"))]
+    #[cfg(not(feature = "ei-unmanaged-node"))]
     fn managedGetPrevBlockRandomSeed(resultHandle: i32);
-    #[cfg(not(feature = "ei-unmanaged"))]
+    #[cfg(not(feature = "ei-unmanaged-node"))]
     fn managedGetBlockRandomSeed(resultHandle: i32);
-    #[cfg(not(feature = "ei-unmanaged"))]
+    #[cfg(not(feature = "ei-unmanaged-node"))]
     fn managedGetStateRootHash(resultHandle: i32);
-    #[cfg(not(feature = "ei-unmanaged"))]
+    #[cfg(not(feature = "ei-unmanaged-node"))]
     fn managedGetOriginalTxHash(resultHandle: i32);
 
     // big int API
@@ -162,7 +162,7 @@ impl BlockchainApiImpl for VmApiImpl {
     }
 
     #[inline]
-    #[cfg(not(feature = "ei-unmanaged"))]
+    #[cfg(not(feature = "ei-unmanaged-node"))]
     fn load_caller_managed(&self, dest: Handle) {
         unsafe {
             managedCaller(dest);
@@ -179,7 +179,7 @@ impl BlockchainApiImpl for VmApiImpl {
     }
 
     #[inline]
-    #[cfg(not(feature = "ei-unmanaged"))]
+    #[cfg(not(feature = "ei-unmanaged-node"))]
     fn load_sc_address_managed(&self, dest: Handle) {
         unsafe {
             managedSCAddress(dest);
@@ -196,7 +196,7 @@ impl BlockchainApiImpl for VmApiImpl {
     }
 
     #[inline]
-    #[cfg(not(feature = "ei-unmanaged"))]
+    #[cfg(not(feature = "ei-unmanaged-node"))]
     fn load_owner_address_managed(&self, dest: Handle) {
         unsafe {
             managedOwnerAddress(dest);
@@ -247,7 +247,7 @@ impl BlockchainApiImpl for VmApiImpl {
     }
 
     #[inline]
-    #[cfg(not(feature = "ei-unmanaged"))]
+    #[cfg(not(feature = "ei-unmanaged-node"))]
     fn load_state_root_hash_managed(&self, dest: Handle) {
         unsafe {
             managedGetStateRootHash(dest);
@@ -264,7 +264,7 @@ impl BlockchainApiImpl for VmApiImpl {
     }
 
     #[inline]
-    #[cfg(not(feature = "ei-unmanaged"))]
+    #[cfg(not(feature = "ei-unmanaged-node"))]
     fn load_tx_hash_managed(&self, dest: Handle) {
         unsafe {
             managedGetOriginalTxHash(dest);
@@ -306,7 +306,7 @@ impl BlockchainApiImpl for VmApiImpl {
     }
 
     #[inline]
-    #[cfg(not(feature = "ei-unmanaged"))]
+    #[cfg(not(feature = "ei-unmanaged-node"))]
     fn load_block_random_seed_managed(&self, dest: Handle) {
         unsafe {
             managedGetBlockRandomSeed(dest);
@@ -343,7 +343,7 @@ impl BlockchainApiImpl for VmApiImpl {
     }
 
     #[inline]
-    #[cfg(not(feature = "ei-unmanaged"))]
+    #[cfg(not(feature = "ei-unmanaged-node"))]
     fn load_prev_block_random_seed_managed(&self, dest: Handle) {
         unsafe {
             managedGetPrevBlockRandomSeed(dest);
@@ -397,7 +397,7 @@ impl BlockchainApiImpl for VmApiImpl {
 
             let name_len = getESDTNFTNameLength(
                 address.as_ref().as_ptr(),
-                token.to_esdt_identifier().as_ptr(),
+                token.to_boxed_bytes().as_ptr(),
                 token.len() as i32,
                 nonce as i64,
             ) as usize;
@@ -405,7 +405,7 @@ impl BlockchainApiImpl for VmApiImpl {
 
             let attr_len = getESDTNFTAttributeLength(
                 address.as_ref().as_ptr(),
-                token.to_esdt_identifier().as_ptr(),
+                token.to_boxed_bytes().as_ptr(),
                 token.len() as i32,
                 nonce as i64,
             ) as usize;
@@ -416,7 +416,7 @@ impl BlockchainApiImpl for VmApiImpl {
             // Hence the EsdtTokenData receives a Vec<BoxedBytes>
             let uris_len = getESDTNFTURILength(
                 address.as_ref().as_ptr(),
-                token.to_esdt_identifier().as_ptr(),
+                token.to_boxed_bytes().as_ptr(),
                 token.len() as i32,
                 nonce as i64,
             ) as usize;
@@ -427,7 +427,7 @@ impl BlockchainApiImpl for VmApiImpl {
 
             getESDTTokenData(
                 address.as_ref().as_ptr(),
-                token.to_esdt_identifier().as_ptr(),
+                token.to_boxed_bytes().as_ptr(),
                 token.len() as i32,
                 nonce as i64,
                 value_handle,
@@ -443,7 +443,7 @@ impl BlockchainApiImpl for VmApiImpl {
             // Fungible always have a nonce of 0, so we check nonce to figure out the type
             let nonce = getCurrentESDTNFTNonce(
                 address.as_ref().as_ptr(),
-                token.to_esdt_identifier().as_ptr(),
+                token.to_boxed_bytes().as_ptr(),
                 token.len() as i32,
             );
             let token_type = if nonce == 0 {

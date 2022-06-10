@@ -9,16 +9,16 @@ publish = false
 path = "src/big_float_main.rs"
 
 [dependencies.elrond-wasm]
-version = "0.31.1"
+version = "0.32.0"
 path = "../../../elrond-wasm"
 features = ["big-float"]
 
 [dev-dependencies.elrond-wasm-debug]
-version = "0.31.1"
+version = "0.32.0"
 path = "../../../elrond-wasm-debug"
 
 [dependencies.elrond-wasm-modules]
-version = "0.31.1"
+version = "0.32.0"
 path = "../../../elrond-wasm-modules"
 
 [dev-dependencies.esdt-system-sc-mock]

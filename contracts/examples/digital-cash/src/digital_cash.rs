@@ -20,7 +20,7 @@ pub trait DigitalCash {
     #[endpoint]
     #[payable("*")]
     fn fund(&self, address: ManagedAddress, valability: u64) {
-        let payment: EsdtTokenPayment<Self::Api> = self.call_value().payment();
+        let payment = self.call_value().egld_or_single_esdt();
         require!(
             payment.amount > BigUint::zero(),
             "amount must be greater than 0"

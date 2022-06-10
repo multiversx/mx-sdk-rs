@@ -66,7 +66,7 @@ pub trait Vault {
     #[payable("*")]
     #[endpoint]
     fn accept_funds_single_esdt_transfer(&self) {
-        let _ = self.call_value().payment();
+        let _ = self.call_value().single_esdt();
     }
 
     #[payable("*")]
@@ -89,14 +89,14 @@ pub trait Vault {
         let caller = self.blockchain().get_caller();
         let func_name = opt_receive_func.into_option().unwrap_or_default();
 
-        Self::Api::send_api_impl()
-            .direct_esdt_execute(
+        self.send_raw()
+            .transfer_esdt_execute(
                 &caller,
                 &token,
                 &amount,
                 50_000_000,
                 &func_name,
-                &ManagedArgBuffer::new_empty(),
+                &ManagedArgBuffer::new(),
             )
             .unwrap_or_else(|_| sc_panic!("ESDT transfer failed"));
     }
@@ -104,7 +104,7 @@ pub trait Vault {
     #[endpoint]
     fn retrieve_funds(
         &self,
-        token: TokenIdentifier,
+        token: EgldOrEsdtTokenIdentifier,
         nonce: u64,
         amount: BigUint,
         return_message: OptionalValue<ManagedBuffer>,
@@ -120,8 +120,13 @@ pub trait Vault {
         if token.is_egld() {
             self.send().direct_egld(&caller, &amount, data);
         } else {
-            self.send()
-                .transfer_esdt_via_async_call(&caller, &token, nonce, &amount, data);
+            self.send().transfer_esdt_via_async_call(
+                &caller,
+                &token.unwrap_esdt(),
+                nonce,
+                &amount,
+                data,
+            );
         }
     }
 
@@ -136,12 +141,7 @@ pub trait Vault {
         for multi_arg in token_payments.into_iter() {
             let (token_id, nonce, amount) = multi_arg.into_tuple();
 
-            all_payments.push(EsdtTokenPayment {
-                token_identifier: token_id,
-                token_nonce: nonce,
-                amount,
-                token_type: EsdtTokenType::Invalid,
-            });
+            all_payments.push(EsdtTokenPayment::new(token_id, nonce, amount));
         }
 
         self.send()
@@ -176,12 +176,11 @@ pub trait Vault {
                 &uris,
             );
 
-            new_tokens.push(EsdtTokenPayment {
-                token_identifier: payment.token_identifier,
-                token_nonce: new_token_nonce,
-                amount: payment.amount,
-                token_type: EsdtTokenType::Invalid, // ignored
-            });
+            new_tokens.push(EsdtTokenPayment::new(
+                payment.token_identifier,
+                new_token_nonce,
+                payment.amount,
+            ));
         }
 
         self.send().transfer_multiple_esdt_via_async_call(
@@ -209,7 +208,7 @@ pub trait Vault {
     #[event("retrieve_funds")]
     fn retrieve_funds_event(
         &self,
-        #[indexed] token: &TokenIdentifier,
+        #[indexed] token: &EgldOrEsdtTokenIdentifier,
         #[indexed] nonce: u64,
         #[indexed] amount: &BigUint,
     );

@@ -8,15 +8,18 @@ publish = false
 [lib]
 path = "src/forwarder_main.rs"
 
+[features]
+ei-unmanaged = ["elrond-wasm/ei-unmanaged"]
+
 [dependencies.vault]
 path = "../vault"
 
 [dependencies.elrond-wasm]
-version = "0.31.1"
+version = "0.32.0"
 path = "../../../../elrond-wasm"
 features = ["ei-1-2"]
 
 [dev-dependencies.elrond-wasm-debug]
-version = "0.31.1"
+version = "0.32.0"
 path = "../../../../elrond-wasm-debug"
 

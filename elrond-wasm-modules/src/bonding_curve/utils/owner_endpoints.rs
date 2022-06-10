@@ -68,19 +68,14 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
 
     #[endpoint(deposit)]
     #[payable("*")]
-    fn deposit(
-        &self,
-        #[payment] amount: BigUint,
-        #[payment_token] identifier: TokenIdentifier,
-        #[payment_nonce] nonce: u64,
-        payment_token: OptionalValue<TokenIdentifier>,
-    ) {
+    fn deposit(&self, payment_token: OptionalValue<TokenIdentifier>) {
+        let (identifier, nonce, amount) = self.call_value().single_esdt().into_tuple();
         let caller = self.blockchain().get_caller();
-        let mut set_payment: TokenIdentifier = TokenIdentifier::egld();
+        let mut set_payment = EgldOrEsdtTokenIdentifier::egld();
 
         if self.bonding_curve(&identifier).is_empty() {
             match payment_token {
-                OptionalValue::Some(token) => set_payment = token,
+                OptionalValue::Some(token) => set_payment = EgldOrEsdtTokenIdentifier::esdt(token),
                 OptionalValue::None => {
                     sc_panic!("Expected provided accepted_payment for the token");
                 },
@@ -120,7 +115,7 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
         for token in self.owned_tokens(&caller).iter() {
             let nonces = self.token_details(&token).get().token_nonces;
             for nonce in &nonces {
-                self.send().direct(
+                self.send().direct_esdt(
                     &caller,
                     &token,
                     nonce,
@@ -139,7 +134,7 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
         &self,
         identifier: &TokenIdentifier,
         amount: BigUint,
-        payment: TokenIdentifier,
+        payment: EgldOrEsdtTokenIdentifier,
     ) {
         let mut curve = FunctionSelector::None;
         let mut arguments;

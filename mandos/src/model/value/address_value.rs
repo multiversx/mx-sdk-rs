@@ -10,7 +10,7 @@ use crate::{
 
 use super::AddressKey;
 
-#[derive(PartialEq, Clone, Debug)]
+#[derive(PartialEq, Eq, Clone, Debug)]
 pub struct AddressValue {
     pub value: Address,
     pub original: ValueSubTree,

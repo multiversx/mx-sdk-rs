@@ -4,7 +4,7 @@ use serde::{
 };
 use std::{collections::BTreeMap, fmt};
 
-#[derive(PartialEq, Clone, Debug)]
+#[derive(PartialEq, Eq, Clone, Debug)]
 pub enum ValueSubTree {
     Str(String),
     List(Vec<ValueSubTree>),

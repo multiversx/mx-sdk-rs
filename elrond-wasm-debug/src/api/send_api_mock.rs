@@ -12,8 +12,8 @@ use elrond_wasm::{
     elrond_codec::top_encode_to_vec_u8,
     err_msg,
     types::{
-        heap::Address, BigUint, CodeMetadata, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer,
-        ManagedBuffer, ManagedType, ManagedVec, TokenIdentifier,
+        heap::Address, ArgBuffer, BigUint, BoxedBytes, CodeMetadata, EsdtTokenPayment,
+        ManagedAddress, ManagedArgBuffer, ManagedBuffer, ManagedType, ManagedVec, TokenIdentifier,
     },
 };
 use num_traits::Zero;
@@ -206,31 +206,7 @@ impl SendApi for DebugApi {
 }
 
 impl SendApiImpl for DebugApi {
-    fn direct_egld<M, D>(&self, to: &ManagedAddress<M>, amount: &BigUint<M>, _data: D)
-    where
-        M: ManagedTypeApi,
-        D: Into<ManagedBuffer<M>>,
-    {
-        let amount_value = self.big_uint_handle_to_value(amount.get_raw_handle());
-        let available_egld_balance =
-            self.with_contract_account(|account| account.egld_balance.clone());
-        if amount_value > available_egld_balance {
-            std::panic::panic_any(TxPanic {
-                status: 10,
-                message: "failed transfer (insufficient funds)".to_string(),
-            });
-        }
-
-        let contract_address = &self.input_ref().to;
-        self.blockchain_cache()
-            .subtract_egld_balance(contract_address, &amount_value);
-
-        let recipient = &to.to_address();
-        self.blockchain_cache()
-            .increase_egld_balance(recipient, &amount_value);
-    }
-
-    fn direct_egld_execute<M: ManagedTypeApi>(
+    fn transfer_value_execute<M: ManagedTypeApi>(
         &self,
         to: &ManagedAddress<M>,
         amount: &BigUint<M>,
@@ -251,7 +227,7 @@ impl SendApiImpl for DebugApi {
         Ok(())
     }
 
-    fn direct_esdt_execute<M: ManagedTypeApi>(
+    fn transfer_esdt_execute<M: ManagedTypeApi>(
         &self,
         to: &ManagedAddress<M>,
         token: &TokenIdentifier<M>,
@@ -277,7 +253,7 @@ impl SendApiImpl for DebugApi {
         Ok(())
     }
 
-    fn direct_esdt_nft_execute<M: ManagedTypeApi>(
+    fn transfer_esdt_nft_execute<M: ManagedTypeApi>(
         &self,
         to: &ManagedAddress<M>,
         token: &TokenIdentifier<M>,
@@ -313,7 +289,7 @@ impl SendApiImpl for DebugApi {
         Ok(())
     }
 
-    fn direct_multi_esdt_transfer_execute<M: ManagedTypeApi>(
+    fn multi_transfer_esdt_nft_execute<M: ManagedTypeApi>(
         &self,
         to: &ManagedAddress<M>,
         payments: &ManagedVec<M, EsdtTokenPayment<M>>,
@@ -496,17 +472,6 @@ impl SendApiImpl for DebugApi {
         ManagedVec::from(result)
     }
 
-    fn execute_on_dest_context_by_caller_raw<M: ManagedTypeApi>(
-        &self,
-        _gas: u64,
-        _to: &ManagedAddress<M>,
-        _value: &BigUint<M>,
-        _endpoint_name: &ManagedBuffer<M>,
-        _arg_buffer: &ManagedArgBuffer<M>,
-    ) -> ManagedVec<M, ManagedBuffer<M>> {
-        panic!("execute_on_dest_context_by_caller_raw not implemented yet!");
-    }
-
     fn execute_on_same_context_raw<M: ManagedTypeApi>(
         &self,
         _gas: u64,
@@ -528,26 +493,6 @@ impl SendApiImpl for DebugApi {
         panic!("execute_on_dest_context_readonly_raw not implemented yet!");
     }
 
-    fn call_local_esdt_built_in_function<M: ManagedTypeApi>(
-        &self,
-        _gas: u64,
-        function_name: &ManagedBuffer<M>,
-        arg_buffer: &ManagedArgBuffer<M>,
-    ) -> ManagedVec<M, ManagedBuffer<M>> {
-        let contract_address = &self.input_ref().to;
-
-        let result = self.perform_execute_on_dest_context(
-            contract_address.clone(),
-            num_bigint::BigUint::zero(),
-            function_name.to_boxed_bytes().into_vec(),
-            arg_buffer.to_raw_args_vec(),
-        );
-
-        self.clean_return_data();
-
-        ManagedVec::from(result)
-    }
-
     fn clean_return_data(&self) {
         let mut tx_result = self.result_borrow_mut();
         tx_result.result_values.clear();
@@ -560,5 +505,147 @@ impl SendApiImpl for DebugApi {
         }
 
         let _ = tx_result.result_values.remove(index);
+    }
+
+    fn transfer_value_legacy<M>(&self, _to: &Address, _amount: &BigUint<M>, _data: &BoxedBytes)
+    where
+        M: ManagedTypeApi,
+    {
+        panic!("legacy operation not implemented");
+    }
+
+    fn transfer_value_execute_legacy<M: ManagedTypeApi>(
+        &self,
+        _to: &Address,
+        _amount: &BigUint<M>,
+        _gas_limit: u64,
+        _endpoint_name: &BoxedBytes,
+        _arg_buffer: &ArgBuffer,
+    ) -> Result<(), &'static [u8]> {
+        panic!("legacy operation not implemented");
+    }
+
+    fn transfer_esdt_execute_legacy<M: ManagedTypeApi>(
+        &self,
+        _to: &Address,
+        _token: &TokenIdentifier<M>,
+        _amount: &BigUint<M>,
+        _gas: u64,
+        _endpoint_name: &BoxedBytes,
+        _arg_buffer: &ArgBuffer,
+    ) -> Result<(), &'static [u8]> {
+        panic!("legacy operation not implemented");
+    }
+
+    fn transfer_esdt_nft_execute_legacy<M: ManagedTypeApi>(
+        &self,
+        _to: &Address,
+        _token: &TokenIdentifier<M>,
+        _nonce: u64,
+        _amount: &BigUint<M>,
+        _gas_limit: u64,
+        _endpoint_name: &BoxedBytes,
+        _arg_buffer: &ArgBuffer,
+    ) -> Result<(), &'static [u8]> {
+        panic!("legacy operation not implemented");
+    }
+
+    fn multi_transfer_esdt_nft_execute_legacy<M: ManagedTypeApi>(
+        &self,
+        _to: &Address,
+        _payments: &[EsdtTokenPayment<M>],
+        _gas_limit: u64,
+        _endpoint_name: &BoxedBytes,
+        _arg_buffer: &ArgBuffer,
+    ) -> Result<(), &'static [u8]> {
+        panic!("legacy operation not implemented");
+    }
+
+    fn async_call_raw_legacy<M: ManagedTypeApi>(
+        &self,
+        _to: &Address,
+        _amount: &BigUint<M>,
+        _endpoint_name: &BoxedBytes,
+        _arg_buffer: &ArgBuffer,
+    ) -> ! {
+        panic!("legacy operation not implemented");
+    }
+
+    fn deploy_contract_legacy<M: ManagedTypeApi>(
+        &self,
+        _gas: u64,
+        _amount: &BigUint<M>,
+        _code: &BoxedBytes,
+        _code_metadata: CodeMetadata,
+        _arg_buffer: &ArgBuffer,
+    ) -> (ManagedAddress<M>, ManagedVec<M, ManagedBuffer<M>>) {
+        panic!("legacy operation not implemented");
+    }
+
+    fn deploy_from_source_contract_legacy<M: ManagedTypeApi>(
+        &self,
+        _gas: u64,
+        _amount: &BigUint<M>,
+        _source_contract_address: &Address,
+        _code_metadata: CodeMetadata,
+        _arg_buffer: &ArgBuffer,
+    ) -> (ManagedAddress<M>, ManagedVec<M, ManagedBuffer<M>>) {
+        panic!("legacy operation not implemented");
+    }
+
+    fn upgrade_from_source_contract_legacy<M: ManagedTypeApi>(
+        &self,
+        _sc_address: &Address,
+        _gas: u64,
+        _amount: &BigUint<M>,
+        _source_contract_address: &Address,
+        _code_metadata: CodeMetadata,
+        _arg_buffer: &ArgBuffer,
+    ) {
+        panic!("legacy operation not implemented");
+    }
+
+    fn upgrade_contract_legacy<M: ManagedTypeApi>(
+        &self,
+        _sc_address: &Address,
+        _gas: u64,
+        _amount: &BigUint<M>,
+        _code: &BoxedBytes,
+        _code_metadata: CodeMetadata,
+        _arg_buffer: &ArgBuffer,
+    ) {
+        panic!("legacy operation not implemented");
+    }
+
+    fn execute_on_dest_context_raw_legacy<M: ManagedTypeApi>(
+        &self,
+        _gas: u64,
+        _to: &Address,
+        _value: &BigUint<M>,
+        _endpoint_name: &BoxedBytes,
+        _arg_buffer: &ArgBuffer,
+    ) -> ManagedVec<M, ManagedBuffer<M>> {
+        panic!("legacy operation not implemented");
+    }
+
+    fn execute_on_same_context_raw_legacy<M: ManagedTypeApi>(
+        &self,
+        _gas: u64,
+        _to: &Address,
+        _value: &BigUint<M>,
+        _endpoint_name: &BoxedBytes,
+        _arg_buffer: &ArgBuffer,
+    ) -> ManagedVec<M, ManagedBuffer<M>> {
+        panic!("legacy operation not implemented");
+    }
+
+    fn execute_on_dest_context_readonly_raw_legacy<M: ManagedTypeApi>(
+        &self,
+        _gas: u64,
+        _address: &Address,
+        _endpoint_name: &BoxedBytes,
+        _arg_buffer: &ArgBuffer,
+    ) -> ManagedVec<M, ManagedBuffer<M>> {
+        panic!("legacy operation not implemented");
     }
 }

@@ -8,7 +8,7 @@ use elrond_codec::test_util::{check_top_decode, check_top_encode, check_top_enco
 
 /// Fieldless enum with default that is not the first variant.
 /// NOT recommended!
-#[derive(TopEncodeOrDefault, TopDecodeOrDefault, PartialEq, Clone, Debug)]
+#[derive(TopEncodeOrDefault, TopDecodeOrDefault, PartialEq, Eq, Clone, Debug)]
 enum TrickyDefaultDayOfWeek {
     Monday,
     Tuesday,

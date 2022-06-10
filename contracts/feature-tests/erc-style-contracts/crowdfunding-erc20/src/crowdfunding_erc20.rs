@@ -3,7 +3,7 @@
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
-#[derive(TopEncode, TopDecode, PartialEq, TypeAbi, Clone, Copy)]
+#[derive(TopEncode, TopDecode, PartialEq, Eq, TypeAbi, Clone, Copy)]
 pub enum Status {
     FundingPeriod,
     Successful,
@@ -46,7 +46,7 @@ pub trait Crowdfunding {
             Status::FundingPeriod
         } else if self
             .blockchain()
-            .get_sc_balance(&TokenIdentifier::egld(), 0)
+            .get_sc_balance(&EgldOrEsdtTokenIdentifier::egld(), 0)
             >= self.target().get()
         {
             Status::Successful

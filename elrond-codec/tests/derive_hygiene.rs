@@ -45,7 +45,7 @@ fn top_encode_to_vec_u8() {}
 fn boxed_slice_into_vec() {}
 fn vec_into_boxed_slice() {}
 
-#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, PartialEq, Clone, Debug)]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, PartialEq, Eq, Clone, Debug)]
 pub struct Struct {
     pub int: u16,
     pub seq: Vec<u8>,
@@ -54,10 +54,10 @@ pub struct Struct {
     pub uint_64: u64,
 }
 
-#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, PartialEq, Clone, Debug)]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, PartialEq, Eq, Clone, Debug)]
 struct TupleStruct(u8, u16, u32);
 
-#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, PartialEq, Clone, Debug)]
+#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, PartialEq, Eq, Clone, Debug)]
 enum DayOfWeek {
     Monday,
     Tuesday,
@@ -68,7 +68,7 @@ enum DayOfWeek {
     Sunday,
 }
 
-#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, PartialEq, Clone, Debug)]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, PartialEq, Eq, Clone, Debug)]
 enum EnumWithEverything {
     Quit,
     Today(DayOfWeek),
@@ -86,7 +86,7 @@ trait SimpleTrait {
     fn simple_function(&self);
 }
 
-#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, PartialEq, Clone, Debug)]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, PartialEq, Eq, Clone, Debug)]
 struct StructWithNamedFieldsWithGeneric<ST: SimpleTrait>
 where
     ST: elrond_codec::NestedEncode

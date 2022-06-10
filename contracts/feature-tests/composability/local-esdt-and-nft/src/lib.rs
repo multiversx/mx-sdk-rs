@@ -22,11 +22,11 @@ pub trait LocalEsdtAndEsdtNft {
     #[endpoint(issueFungibleToken)]
     fn issue_fungible_token(
         &self,
-        #[payment] issue_cost: BigUint,
         token_display_name: ManagedBuffer,
         token_ticker: ManagedBuffer,
         initial_supply: BigUint,
     ) {
+        let issue_cost = self.call_value().egld_value();
         let caller = self.blockchain().get_caller();
 
         self.send()
@@ -67,12 +67,8 @@ pub trait LocalEsdtAndEsdtNft {
 
     #[payable("EGLD")]
     #[endpoint(nftIssue)]
-    fn nft_issue(
-        &self,
-        #[payment] issue_cost: BigUint,
-        token_display_name: ManagedBuffer,
-        token_ticker: ManagedBuffer,
-    ) {
+    fn nft_issue(&self, token_display_name: ManagedBuffer, token_ticker: ManagedBuffer) {
+        let issue_cost = self.call_value().egld_value();
         let caller = self.blockchain().get_caller();
 
         self.send()
@@ -156,12 +152,12 @@ pub trait LocalEsdtAndEsdtNft {
         function: ManagedBuffer,
         arguments: MultiValueEncoded<ManagedBuffer>,
     ) {
-        let mut arg_buffer = ManagedArgBuffer::new_empty();
+        let mut arg_buffer = ManagedArgBuffer::new();
         for arg in arguments.into_iter() {
             arg_buffer.push_arg_raw(arg);
         }
 
-        let _ = Self::Api::send_api_impl().direct_esdt_nft_execute(
+        let _ = self.send_raw().transfer_esdt_nft_execute(
             &to,
             &token_identifier,
             nonce,
@@ -176,12 +172,8 @@ pub trait LocalEsdtAndEsdtNft {
 
     #[payable("EGLD")]
     #[endpoint(sftIssue)]
-    fn sft_issue(
-        &self,
-        #[payment] issue_cost: BigUint,
-        token_display_name: ManagedBuffer,
-        token_ticker: ManagedBuffer,
-    ) {
+    fn sft_issue(&self, token_display_name: ManagedBuffer, token_ticker: ManagedBuffer) {
+        let issue_cost = self.call_value().egld_value();
         let caller = self.blockchain().get_caller();
 
         self.send()
@@ -265,15 +257,15 @@ pub trait LocalEsdtAndEsdtNft {
     fn esdt_issue_callback(
         &self,
         caller: &ManagedAddress,
-        #[payment_token] token_identifier: TokenIdentifier,
-        #[payment] returned_tokens: BigUint,
         #[call_result] result: ManagedAsyncCallResult<()>,
     ) {
+        let (token_identifier, returned_tokens) = self.call_value().egld_or_single_fungible_esdt();
         // callback is called with ESDTTransfer of the newly issued token, with the amount requested,
         // so we can get the token identifier and amount from the call data
         match result {
             ManagedAsyncCallResult::Ok(()) => {
-                self.last_issued_token().set(&token_identifier);
+                self.last_issued_token()
+                    .set(&token_identifier.unwrap_esdt());
                 self.last_error_message().clear();
             },
             ManagedAsyncCallResult::Err(message) => {
@@ -300,7 +292,8 @@ pub trait LocalEsdtAndEsdtNft {
             },
             ManagedAsyncCallResult::Err(message) => {
                 // return issue cost to the caller
-                let (returned_tokens, token_identifier) = self.call_value().payment_token_pair();
+                let (token_identifier, returned_tokens) =
+                    self.call_value().egld_or_single_fungible_esdt();
                 if token_identifier.is_egld() && returned_tokens > 0 {
                     self.send().direct_egld(caller, &returned_tokens, &[]);
                 }

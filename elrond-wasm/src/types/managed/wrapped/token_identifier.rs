@@ -2,7 +2,7 @@ use crate::{
     abi::{TypeAbi, TypeName},
     api::{Handle, ManagedTypeApi, ManagedTypeApiImpl},
     formatter::{FormatByteReceiver, SCDisplay, SCLowerHex},
-    types::{heap::BoxedBytes, ManagedBuffer, ManagedType},
+    types::{ManagedBuffer, ManagedType},
 };
 use elrond_codec::*;
 
@@ -12,7 +12,7 @@ use elrond_codec::*;
 ///
 /// Not yet implemented, but we might add additional restrictions when deserializing as argument.
 #[repr(transparent)]
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub struct TokenIdentifier<M: ManagedTypeApi> {
     buffer: ManagedBuffer<M>,
 }
@@ -35,10 +35,6 @@ impl<M: ManagedTypeApi> ManagedType<M> for TokenIdentifier<M> {
 }
 
 impl<M: ManagedTypeApi> TokenIdentifier<M> {
-    /// This special representation is interpreted as the EGLD token.
-    #[allow(clippy::needless_borrow)] // clippy is wrog here, there is no other way
-    pub const EGLD_REPRESENTATION: &'static [u8; 4] = &b"EGLD";
-
     #[inline]
     pub fn from_esdt_bytes<B: Into<ManagedBuffer<M>>>(bytes: B) -> Self {
         TokenIdentifier {
@@ -46,22 +42,11 @@ impl<M: ManagedTypeApi> TokenIdentifier<M> {
         }
     }
 
-    /// New instance of the special EGLD token representation.
     #[inline]
-    pub fn egld() -> Self {
+    pub fn empty() -> Self {
         TokenIdentifier {
             buffer: ManagedBuffer::new(),
         }
-    }
-
-    #[inline]
-    pub fn is_egld(&self) -> bool {
-        self.is_empty()
-    }
-
-    #[inline]
-    pub fn is_esdt(&self) -> bool {
-        !self.is_egld()
     }
 
     #[inline]
@@ -85,49 +70,33 @@ impl<M: ManagedTypeApi> TokenIdentifier<M> {
     }
 
     #[inline]
-    pub fn to_esdt_identifier(&self) -> BoxedBytes {
+    pub fn to_boxed_bytes(&self) -> crate::types::heap::BoxedBytes {
         self.buffer.to_boxed_bytes()
-    }
-
-    #[inline]
-    pub fn as_name(&self) -> BoxedBytes {
-        if self.is_egld() {
-            BoxedBytes::from(&Self::EGLD_REPRESENTATION[..])
-        } else {
-            self.buffer.to_boxed_bytes()
-        }
     }
 
     pub fn is_valid_esdt_identifier(&self) -> bool {
         M::managed_type_impl().validate_token_identifier(self.buffer.handle)
-    }
-    /// Converts `"EGLD"` to `""`.
-    /// Does nothing for the other values.
-    fn normalize(&mut self) {
-        if self.buffer == Self::EGLD_REPRESENTATION {
-            self.buffer.overwrite(&[]);
-        }
     }
 }
 
 impl<M: ManagedTypeApi> From<ManagedBuffer<M>> for TokenIdentifier<M> {
     #[inline]
     fn from(buffer: ManagedBuffer<M>) -> Self {
-        let mut token_identifier = TokenIdentifier { buffer };
-        token_identifier.normalize();
-        token_identifier
+        TokenIdentifier { buffer }
     }
 }
 
 impl<M: ManagedTypeApi> From<&[u8]> for TokenIdentifier<M> {
     fn from(bytes: &[u8]) -> Self {
-        if bytes == Self::EGLD_REPRESENTATION {
-            TokenIdentifier::egld()
-        } else {
-            TokenIdentifier {
-                buffer: ManagedBuffer::new_from_bytes(bytes),
-            }
+        TokenIdentifier {
+            buffer: ManagedBuffer::new_from_bytes(bytes),
         }
+    }
+}
+
+impl<M: ManagedTypeApi> From<&str> for TokenIdentifier<M> {
+    fn from(s: &str) -> Self {
+        TokenIdentifier::from(s.as_bytes())
     }
 }
 
@@ -147,11 +116,7 @@ impl<M: ManagedTypeApi> NestedEncode for TokenIdentifier<M> {
         O: NestedEncodeOutput,
         H: EncodeErrorHandler,
     {
-        if self.is_empty() {
-            (&Self::EGLD_REPRESENTATION[..]).dep_encode_or_handle_err(dest, h)
-        } else {
-            self.buffer.dep_encode_or_handle_err(dest, h)
-        }
+        self.buffer.dep_encode_or_handle_err(dest, h)
     }
 }
 
@@ -162,11 +127,7 @@ impl<M: ManagedTypeApi> TopEncode for TokenIdentifier<M> {
         O: TopEncodeOutput,
         H: EncodeErrorHandler,
     {
-        if self.is_empty() {
-            (&Self::EGLD_REPRESENTATION[..]).top_encode_or_handle_err(output, h)
-        } else {
-            self.buffer.top_encode_or_handle_err(output, h)
-        }
+        self.buffer.top_encode_or_handle_err(output, h)
     }
 }
 
@@ -194,11 +155,11 @@ impl<M: ManagedTypeApi> TopDecode for TokenIdentifier<M> {
     }
 }
 
-impl<M: ManagedTypeApi> CodecFromSelf for TokenIdentifier<M> {}
+impl<M> CodecFromSelf for TokenIdentifier<M> where M: ManagedTypeApi {}
 
-impl<M: ManagedTypeApi> CodecFrom<&[u8]> for TokenIdentifier<M> {}
+impl<M> CodecFrom<&[u8]> for TokenIdentifier<M> where M: ManagedTypeApi {}
 
-impl<M: ManagedTypeApi> CodecFrom<Vec<u8>> for TokenIdentifier<M> {}
+impl<M> CodecFrom<Vec<u8>> for TokenIdentifier<M> where M: ManagedTypeApi {}
 
 impl<M: ManagedTypeApi> TypeAbi for TokenIdentifier<M> {
     fn type_name() -> TypeName {
@@ -208,26 +169,33 @@ impl<M: ManagedTypeApi> TypeAbi for TokenIdentifier<M> {
 
 impl<M: ManagedTypeApi> SCDisplay for TokenIdentifier<M> {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
-        if self.is_egld() {
-            f.append_bytes(Self::EGLD_REPRESENTATION);
-        } else {
-            f.append_managed_buffer(&ManagedBuffer::from_raw_handle(
-                self.buffer.get_raw_handle(),
-            ));
-        }
+        f.append_managed_buffer(&ManagedBuffer::from_raw_handle(
+            self.buffer.get_raw_handle(),
+        ));
     }
 }
 
-const EGLD_REPRESENTATION_HEX: &[u8] = b"45474C44";
-
 impl<M: ManagedTypeApi> SCLowerHex for TokenIdentifier<M> {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
-        if self.is_egld() {
-            f.append_bytes(EGLD_REPRESENTATION_HEX);
-        } else {
-            f.append_managed_buffer_lower_hex(&ManagedBuffer::from_raw_handle(
-                self.buffer.get_raw_handle(),
-            ));
-        }
+        f.append_managed_buffer_lower_hex(&ManagedBuffer::from_raw_handle(
+            self.buffer.get_raw_handle(),
+        ));
+    }
+}
+
+impl<M: ManagedTypeApi> core::fmt::Display for TokenIdentifier<M> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        let bytes = self.buffer.to_boxed_bytes();
+        let s = alloc::string::String::from_utf8_lossy(bytes.as_slice());
+        s.fmt(f)
+    }
+}
+
+impl<M: ManagedTypeApi> core::fmt::Debug for TokenIdentifier<M> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        use crate::alloc::string::ToString;
+        f.debug_tuple("TokenIdentifier")
+            .field(&self.to_string())
+            .finish()
     }
 }
