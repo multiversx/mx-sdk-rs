@@ -13,14 +13,6 @@ pub struct EsdtTokenPayment<M: ManagedTypeApi> {
 }
 
 impl<M: ManagedTypeApi> EsdtTokenPayment<M> {
-    pub fn no_payment() -> Self {
-        EsdtTokenPayment {
-            token_identifier: TokenIdentifier::empty(),
-            token_nonce: 0,
-            amount: BigUint::zero(),
-        }
-    }
-
     pub fn new(token_identifier: TokenIdentifier<M>, token_nonce: u64, amount: BigUint<M>) -> Self {
         EsdtTokenPayment {
             token_identifier,
