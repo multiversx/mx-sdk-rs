@@ -36,34 +36,34 @@ fn test_is_valid_esdt_identifier() {
     let _ = DebugApi::dummy();
 
     // valid identifier
-    assert!(TokenIdentifier::<DebugApi>::from_esdt_bytes(&b"ALC-6258d2"[..]).is_valid_esdt_identifier());
+    assert!(TokenIdentifier::<DebugApi>::from("ALC-6258d2").is_valid_esdt_identifier());
 
     // valid identifier with numbers in ticker
-    assert!(TokenIdentifier::<DebugApi>::from_esdt_bytes(&b"ALC123-6258d2"[..]).is_valid_esdt_identifier());
+    assert!(TokenIdentifier::<DebugApi>::from("ALC123-6258d2").is_valid_esdt_identifier());
 
     // valid ticker only numbers
-    assert!(TokenIdentifier::<DebugApi>::from_esdt_bytes(&b"12345-6258d2"[..]).is_valid_esdt_identifier());
+    assert!(TokenIdentifier::<DebugApi>::from("12345-6258d2").is_valid_esdt_identifier());
 
     // missing dash
-    assert!(!TokenIdentifier::<DebugApi>::from_esdt_bytes(&b"ALC6258d2"[..]).is_valid_esdt_identifier());
+    assert!(!TokenIdentifier::<DebugApi>::from("ALC6258d2").is_valid_esdt_identifier());
 
     // wrong dash position
-    assert!(!TokenIdentifier::<DebugApi>::from_esdt_bytes(&b"AL-C6258d2"[..]).is_valid_esdt_identifier());
+    assert!(!TokenIdentifier::<DebugApi>::from("AL-C6258d2").is_valid_esdt_identifier());
 
     // lowercase ticker
-    assert!(!TokenIdentifier::<DebugApi>::from_esdt_bytes(&b"alc-6258d2"[..]).is_valid_esdt_identifier());
+    assert!(!TokenIdentifier::<DebugApi>::from("alc-6258d2").is_valid_esdt_identifier());
 
     // uppercase random chars
-    assert!(!TokenIdentifier::<DebugApi>::from_esdt_bytes(&b"ALC-6258D2"[..]).is_valid_esdt_identifier());
+    assert!(!TokenIdentifier::<DebugApi>::from("ALC-6258D2").is_valid_esdt_identifier());
 
     // too many random chars
-    assert!(!TokenIdentifier::<DebugApi>::from_esdt_bytes(&b"ALC-6258d2ff"[..]).is_valid_esdt_identifier());
+    assert!(!TokenIdentifier::<DebugApi>::from("ALC-6258d2ff").is_valid_esdt_identifier());
 
     // ticker too short
-    assert!(!TokenIdentifier::<DebugApi>::from_esdt_bytes(&b"AL-6258d2"[..]).is_valid_esdt_identifier());
+    assert!(!TokenIdentifier::<DebugApi>::from("AL-6258d2").is_valid_esdt_identifier());
 
     // ticker too long
-    assert!(!TokenIdentifier::<DebugApi>::from_esdt_bytes(&b"ALCCCCCCCCC-6258d2"[..]).is_valid_esdt_identifier());
+    assert!(!TokenIdentifier::<DebugApi>::from("ALCCCCCCCCC-6258d2").is_valid_esdt_identifier());
 }
 
 #[test]
@@ -120,10 +120,10 @@ fn test_managed_token_id_macro() {
     );
     assert_eq!(
         managed_token_id!(b"ALC-6258d2"),
-        TokenIdentifier::<DebugApi>::from_esdt_bytes(&b"ALC-6258d2"[..])
+        TokenIdentifier::<DebugApi>::from("ALC-6258d2")
     );
     assert_eq!(
         managed_token_id_wrapped!(b"ALC-6258d2").unwrap_esdt(),
-        TokenIdentifier::<DebugApi>::from_esdt_bytes(&b"ALC-6258d2"[..])
+        TokenIdentifier::<DebugApi>::from("ALC-6258d2")
     )
 }
