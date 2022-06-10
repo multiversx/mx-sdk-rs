@@ -67,6 +67,51 @@ fn test_is_valid_esdt_identifier() {
 }
 
 #[test]
+fn test_is_valid_egld_or_esdt() {
+    let _ = DebugApi::dummy();
+
+    // egld is always valid
+    assert!(EgldOrEsdtTokenIdentifier::<DebugApi>::egld().is_valid());
+
+    // valid esdt
+    assert!(
+        EgldOrEsdtTokenIdentifier::<DebugApi>::esdt(TokenIdentifier::from("ALC-6258d2")).is_valid()
+    );
+
+    // invalid esdt, see above
+    assert!(
+        !EgldOrEsdtTokenIdentifier::<DebugApi>::esdt(TokenIdentifier::from("ALCCCCCCCCC-6258d2"))
+            .is_valid()
+    );
+}
+
+#[test]
+fn test_token_identifier_eq() {
+    let _ = DebugApi::dummy();
+    assert_eq!(
+        TokenIdentifier::<DebugApi>::from("ESDT-00000"),
+        TokenIdentifier::<DebugApi>::from("ESDT-00000")
+    );
+    assert_ne!(
+        TokenIdentifier::<DebugApi>::from("ESDT-00001"),
+        TokenIdentifier::<DebugApi>::from("ESDT-00002")
+    );
+
+    assert_eq!(
+        EgldOrEsdtTokenIdentifier::<DebugApi>::esdt(TokenIdentifier::from("ESDT-00003")),
+        TokenIdentifier::<DebugApi>::from("ESDT-00003")
+    );
+    assert_ne!(
+        EgldOrEsdtTokenIdentifier::<DebugApi>::egld(),
+        TokenIdentifier::<DebugApi>::from("ANYTHING-1234")
+    );
+    assert_ne!(
+        EgldOrEsdtTokenIdentifier::<DebugApi>::egld(),
+        TokenIdentifier::<DebugApi>::from("EGLD")
+    );
+}
+
+#[test]
 fn test_managed_token_id_macro() {
     let _ = DebugApi::dummy();
     assert_eq!(
