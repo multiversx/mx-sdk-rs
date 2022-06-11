@@ -1,4 +1,7 @@
-use elrond_wasm::types::{BoxedBytes, EgldOrEsdtTokenIdentifier, TokenIdentifier};
+use elrond_wasm::types::{
+    BoxedBytes, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment, EsdtTokenPayment,
+    TokenIdentifier,
+};
 use elrond_wasm_debug::{
     check_managed_top_encode_decode, managed_egld_token_id, managed_token_id,
     managed_token_id_wrapped, DebugApi,
@@ -108,6 +111,55 @@ fn test_token_identifier_eq() {
     assert_ne!(
         EgldOrEsdtTokenIdentifier::<DebugApi>::egld(),
         TokenIdentifier::<DebugApi>::from("EGLD")
+    );
+}
+
+#[test]
+fn test_payment_eq() {
+    let _ = DebugApi::dummy();
+    assert_eq!(
+        EsdtTokenPayment::<DebugApi>::new("PAY-00000".into(), 0, 1000u32.into()),
+        EsdtTokenPayment::<DebugApi>::new("PAY-00000".into(), 0, 1000u32.into()),
+    );
+    assert_ne!(
+        EsdtTokenPayment::<DebugApi>::new("PAY-00001".into(), 0, 1000u32.into()),
+        EsdtTokenPayment::<DebugApi>::new("PAY-00002".into(), 0, 1000u32.into()),
+    );
+    assert_eq!(
+        EgldOrEsdtTokenPayment::<DebugApi>::no_payment(),
+        EgldOrEsdtTokenPayment::<DebugApi>::no_payment(),
+    );
+    assert_eq!(
+        EgldOrEsdtTokenPayment::<DebugApi>::new(
+            EgldOrEsdtTokenIdentifier::esdt("ESDTPAY-00000".into()),
+            0,
+            1000u32.into()
+        ),
+        EgldOrEsdtTokenPayment::<DebugApi>::new(
+            EgldOrEsdtTokenIdentifier::esdt("ESDTPAY-00000".into()),
+            0,
+            1000u32.into()
+        ),
+    );
+    assert_ne!(
+        EgldOrEsdtTokenPayment::<DebugApi>::new(
+            EgldOrEsdtTokenIdentifier::esdt("ESDTPAY-00001".into()),
+            0,
+            1000u32.into()
+        ),
+        EgldOrEsdtTokenPayment::<DebugApi>::new(
+            EgldOrEsdtTokenIdentifier::esdt("ESDTPAY-00002".into()),
+            0,
+            1000u32.into()
+        ),
+    );
+    assert_ne!(
+        EgldOrEsdtTokenPayment::<DebugApi>::new(
+            EgldOrEsdtTokenIdentifier::esdt("ESDTPAY-00001".into()),
+            0,
+            1000u32.into()
+        ),
+        EgldOrEsdtTokenPayment::<DebugApi>::no_payment(),
     );
 }
 
