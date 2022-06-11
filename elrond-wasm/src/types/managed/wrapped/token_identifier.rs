@@ -43,11 +43,6 @@ impl<M: ManagedTypeApi> TokenIdentifier<M> {
     }
 
     #[inline]
-    pub fn len(&self) -> usize {
-        self.buffer.len()
-    }
-
-    #[inline]
     pub fn into_managed_buffer(self) -> ManagedBuffer<M> {
         self.buffer
     }
