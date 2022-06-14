@@ -222,10 +222,9 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
         token_identifier: TokenIdentifier,
         nonce: u64,
         amount: BigUint,
-        data: ManagedBuffer,
     ) {
         self.send()
-            .transfer_esdt_via_async_call(&to, &token_identifier, nonce, &amount, data);
+            .transfer_esdt_via_async_call(to, token_identifier, nonce, amount);
     }
 
     #[endpoint]
