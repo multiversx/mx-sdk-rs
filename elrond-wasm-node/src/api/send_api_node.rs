@@ -375,10 +375,11 @@ impl SendApiImpl for VmApiImpl {
     ) -> Result<(), &'static [u8]> {
         unsafe {
             let amount_bytes32_ptr = unsafe_buffer_load_be_pad_right(amount.get_raw_handle(), 32);
+            let token_bytes = token.to_boxed_bytes();
             let result = transferESDTExecute(
                 to.as_ptr(),
-                token.to_boxed_bytes().as_ptr(),
-                token.len() as i32,
+                token_bytes.as_ptr(),
+                token_bytes.len() as i32,
                 amount_bytes32_ptr,
                 gas_limit as i64,
                 endpoint_name.as_ptr(),
@@ -422,10 +423,11 @@ impl SendApiImpl for VmApiImpl {
     ) -> Result<(), &'static [u8]> {
         unsafe {
             let amount_bytes32_ptr = unsafe_buffer_load_be_pad_right(amount.get_raw_handle(), 32);
+            let token_bytes = token.to_boxed_bytes();
             let result = transferESDTNFTExecute(
                 to.as_ptr(),
-                token.to_boxed_bytes().as_ptr(),
-                token.len() as i32,
+                token_bytes.as_ptr(),
+                token_bytes.len() as i32,
                 amount_bytes32_ptr,
                 nonce as i64,
                 gas_limit as i64,

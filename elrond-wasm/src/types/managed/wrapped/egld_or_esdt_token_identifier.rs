@@ -127,6 +127,16 @@ impl<M: ManagedTypeApi> PartialEq for EgldOrEsdtTokenIdentifier<M> {
 
 impl<M: ManagedTypeApi> Eq for EgldOrEsdtTokenIdentifier<M> {}
 
+impl<M: ManagedTypeApi> PartialEq<TokenIdentifier<M>> for EgldOrEsdtTokenIdentifier<M> {
+    #[inline]
+    fn eq(&self, other: &TokenIdentifier<M>) -> bool {
+        self.map_ref_or_else(
+            || false,
+            |self_esdt_token_identifier| self_esdt_token_identifier == other,
+        )
+    }
+}
+
 impl<M: ManagedTypeApi> NestedEncode for EgldOrEsdtTokenIdentifier<M> {
     #[inline]
     fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>

@@ -48,10 +48,6 @@
             "type": "struct",
             "fields": [
                 {
-                    "name": "token_type",
-                    "type": "EsdtTokenType"
-                },
-                {
                     "name": "token_identifier",
                     "type": "TokenIdentifier"
                 },
