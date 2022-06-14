@@ -442,7 +442,7 @@
             },
             "expect": {
                 "out": [
-                    "u8:0|nested:str:TICKER-333333|u64:0|biguint:1000"
+                    "nested:str:TICKER-333333|u64:0|biguint:1000"
                 ],
                 "status": "",
                 "logs": "*",
@@ -490,7 +490,7 @@
             },
             "expect": {
                 "out": [
-                    "u8:0|nested:str:TICKER-333333|u64:0|biguint:2000"
+                    "nested:str:TICKER-333333|u64:0|biguint:2000"
                 ],
                 "status": "",
                 "logs": "*",
