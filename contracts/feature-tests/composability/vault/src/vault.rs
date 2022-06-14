@@ -118,7 +118,7 @@ pub trait Vault {
         };
 
         if token.is_egld() {
-            self.send().direct_egld(&caller, &amount, data);
+            self.send().direct_egld(&caller, &amount);
         } else {
             self.send().transfer_esdt_via_async_call(
                 &caller,

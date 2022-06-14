@@ -96,7 +96,6 @@ pub trait NftModule {
             &nft_token_id,
             nft_nonce,
             &BigUint::from(NFT_AMOUNT),
-            &[],
         );
 
         let owner = self.blockchain().get_owner_address();
@@ -105,7 +104,6 @@ pub trait NftModule {
             &payment.token_identifier,
             payment.token_nonce,
             &payment.amount,
-            &[],
         );
     }
 
@@ -142,13 +140,8 @@ pub trait NftModule {
                 let caller = self.blockchain().get_owner_address();
                 let returned = self.call_value().egld_or_single_esdt();
                 if returned.token_identifier.is_egld() && returned.amount > 0 {
-                    self.send().direct(
-                        &caller,
-                        &returned.token_identifier,
-                        0,
-                        &returned.amount,
-                        &[],
-                    );
+                    self.send()
+                        .direct(&caller, &returned.token_identifier, 0, &returned.amount);
                 }
             },
         }

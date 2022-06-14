@@ -1,5 +1,7 @@
 use core::marker::PhantomData;
 
+use elrond_codec::Empty;
+
 use crate::{
     api::{
         BlockchainApi, BlockchainApiImpl, CallTypeApi, StorageReadApi,
@@ -60,27 +62,21 @@ where
 
     /// Sends EGLD to a given address, directly.
     /// Used especially for sending EGLD to regular accounts.
-    pub fn direct_egld<D>(&self, to: &ManagedAddress<A>, amount: &BigUint<A>, data: D)
-    where
-        D: Into<ManagedBuffer<A>>,
-    {
-        self.send_raw_wrapper().direct_egld(to, amount, data)
+    pub fn direct_egld(&self, to: &ManagedAddress<A>, amount: &BigUint<A>) {
+        self.send_raw_wrapper().direct_egld(to, amount, Empty)
     }
 
     /// Sends either EGLD, ESDT or NFT to the target address,
     /// depending on the token identifier and nonce
     #[inline]
-    pub fn direct<D>(
+    pub fn direct(
         &self,
         to: &ManagedAddress<A>,
         token: &EgldOrEsdtTokenIdentifier<A>,
         nonce: u64,
         amount: &BigUint<A>,
-        data: D,
-    ) where
-        D: Into<ManagedBuffer<A>>,
-    {
-        self.direct_with_gas_limit(to, token, nonce, amount, 0, data, &[]);
+    ) {
+        self.direct_with_gas_limit(to, token, nonce, amount, 0, Empty, &[]);
     }
 
     #[allow(clippy::too_many_arguments)]
@@ -119,17 +115,14 @@ where
     }
 
     #[allow(clippy::too_many_arguments)]
-    pub fn direct_esdt<D>(
+    pub fn direct_esdt(
         &self,
         to: &ManagedAddress<A>,
         token_identifier: &TokenIdentifier<A>,
         nonce: u64,
         amount: &BigUint<A>,
-        data: D,
-    ) where
-        D: Into<ManagedBuffer<A>>,
-    {
-        self.direct_esdt_with_gas_limit(to, token_identifier, nonce, amount, 0, data, &[]);
+    ) {
+        self.direct_esdt_with_gas_limit(to, token_identifier, nonce, amount, 0, Empty, &[]);
     }
 
     #[allow(clippy::too_many_arguments)]
@@ -166,19 +159,16 @@ where
         }
     }
 
-    pub fn direct_multi<D>(
+    pub fn direct_multi(
         &self,
         to: &ManagedAddress<A>,
         payments: &ManagedVec<A, EsdtTokenPayment<A>>,
-        data: D,
-    ) where
-        D: Into<ManagedBuffer<A>>,
-    {
+    ) {
         let _ = self.send_raw_wrapper().multi_esdt_transfer_execute(
             to,
             payments,
             0,
-            &data.into(),
+            &ManagedBuffer::new(),
             &ManagedArgBuffer::new(),
         );
     }
@@ -457,7 +447,6 @@ where
                 payment_token,
                 payment_nonce,
                 &royalties_amount,
-                &[],
             );
 
             payment_amount.clone() - royalties_amount
