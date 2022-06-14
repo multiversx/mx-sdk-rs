@@ -277,7 +277,7 @@ impl DebugApi {
                 self.insert_new_managed_buffer(instance.metadata.hash.clone().unwrap_or_default()),
             ),
             name: ManagedBuffer::from_raw_handle(
-                self.insert_new_managed_buffer(token_identifier_value),
+                self.insert_new_managed_buffer(instance.metadata.name.clone()),
             ),
             attributes: ManagedBuffer::from_raw_handle(
                 self.insert_new_managed_buffer(instance.metadata.attributes.clone()),
