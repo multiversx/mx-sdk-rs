@@ -102,32 +102,10 @@ pub trait Vault {
     }
 
     #[endpoint]
-    fn retrieve_funds(
-        &self,
-        token: EgldOrEsdtTokenIdentifier,
-        nonce: u64,
-        amount: BigUint,
-        return_message: OptionalValue<ManagedBuffer>,
-    ) {
+    fn retrieve_funds(&self, token: EgldOrEsdtTokenIdentifier, nonce: u64, amount: BigUint) {
         self.retrieve_funds_event(&token, nonce, &amount);
-
         let caller = self.blockchain().get_caller();
-        let data = match return_message {
-            OptionalValue::Some(data) => data,
-            OptionalValue::None => ManagedBuffer::new(),
-        };
-
-        if token.is_egld() {
-            self.send().direct_egld(&caller, &amount);
-        } else {
-            self.send().transfer_esdt_via_async_call(
-                &caller,
-                &token.unwrap_esdt(),
-                nonce,
-                &amount,
-                data,
-            );
-        }
+        self.send().direct(&caller, &token, nonce, &amount);
     }
 
     #[endpoint]
@@ -145,7 +123,7 @@ pub trait Vault {
         }
 
         self.send()
-            .transfer_multiple_esdt_via_async_call(&caller, &all_payments, b"");
+            .transfer_multiple_esdt_via_async_call(caller, all_payments);
     }
 
     #[payable("*")]
@@ -183,11 +161,8 @@ pub trait Vault {
             ));
         }
 
-        self.send().transfer_multiple_esdt_via_async_call(
-            &self.blockchain().get_caller(),
-            &new_tokens,
-            &[],
-        );
+        self.send()
+            .transfer_multiple_esdt_via_async_call(self.blockchain().get_caller(), new_tokens);
     }
 
     /// TODO: invert token_payment and token_nonce, for consistency.

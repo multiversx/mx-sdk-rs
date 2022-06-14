@@ -6,9 +6,8 @@ use crate::{
     api::{
         BlockchainApi, BlockchainApiImpl, CallTypeApi, StorageReadApi,
         CHANGE_OWNER_BUILTIN_FUNC_NAME, ESDT_LOCAL_BURN_FUNC_NAME, ESDT_LOCAL_MINT_FUNC_NAME,
-        ESDT_MULTI_TRANSFER_FUNC_NAME, ESDT_NFT_ADD_QUANTITY_FUNC_NAME, ESDT_NFT_ADD_URI_FUNC_NAME,
-        ESDT_NFT_BURN_FUNC_NAME, ESDT_NFT_CREATE_FUNC_NAME, ESDT_NFT_TRANSFER_FUNC_NAME,
-        ESDT_NFT_UPDATE_ATTRIBUTES_FUNC_NAME, ESDT_TRANSFER_FUNC_NAME,
+        ESDT_NFT_ADD_QUANTITY_FUNC_NAME, ESDT_NFT_ADD_URI_FUNC_NAME, ESDT_NFT_BURN_FUNC_NAME,
+        ESDT_NFT_CREATE_FUNC_NAME, ESDT_NFT_UPDATE_ATTRIBUTES_FUNC_NAME,
     },
     esdt::ESDTSystemSmartContractProxy,
     types::{
@@ -178,79 +177,28 @@ where
     /// So only use as the last call in your endpoint.  
     /// If you want to perform multiple transfers, use `self.send().transfer_multiple_esdt_via_async_call()` instead.  
     /// Note that EGLD can NOT be transfered with this function.  
-    pub fn transfer_esdt_via_async_call<D>(
+    pub fn transfer_esdt_via_async_call(
         &self,
-        to: &ManagedAddress<A>,
-        token: &TokenIdentifier<A>,
+        to: ManagedAddress<A>,
+        token: TokenIdentifier<A>,
         nonce: u64,
-        amount: &BigUint<A>,
-        data: D,
-    ) -> !
-    where
-        D: Into<ManagedBuffer<A>>,
-    {
-        let data_buf: ManagedBuffer<A> = data.into();
-        let mut arg_buffer = ManagedArgBuffer::new();
-        arg_buffer.push_arg(token);
-        if nonce == 0 {
-            arg_buffer.push_arg(amount);
-            if !data_buf.is_empty() {
-                arg_buffer.push_arg_raw(data_buf);
-            }
-
-            self.send_raw_wrapper().async_call_raw(
-                to,
-                &BigUint::zero(),
-                &ManagedBuffer::new_from_bytes(ESDT_TRANSFER_FUNC_NAME),
-                &arg_buffer,
-            )
-        } else {
-            arg_buffer.push_arg(nonce);
-            arg_buffer.push_arg(amount);
-            arg_buffer.push_arg(to);
-            if !data_buf.is_empty() {
-                arg_buffer.push_arg_raw(data_buf);
-            }
-
-            self.send_raw_wrapper().async_call_raw(
-                &BlockchainWrapper::<A>::new().get_sc_address(),
-                &BigUint::zero(),
-                &ManagedBuffer::new_from_bytes(ESDT_NFT_TRANSFER_FUNC_NAME),
-                &arg_buffer,
-            )
-        }
+        amount: BigUint<A>,
+    ) -> ! {
+        ContractCall::<A, ()>::new(to, ManagedBuffer::new())
+            .add_esdt_token_transfer(token, nonce, amount)
+            .async_call()
+            .call_and_exit_ignore_callback()
     }
 
-    pub fn transfer_multiple_esdt_via_async_call<D>(
+    pub fn transfer_multiple_esdt_via_async_call(
         &self,
-        to: &ManagedAddress<A>,
-        payments: &ManagedVec<A, EsdtTokenPayment<A>>,
-        data: D,
-    ) -> !
-    where
-        D: Into<ManagedBuffer<A>>,
-    {
-        let mut arg_buffer = ManagedArgBuffer::new();
-        arg_buffer.push_arg(to);
-        arg_buffer.push_arg(payments.len());
-
-        for payment in payments.into_iter() {
-            // TODO: check that `!token_identifier.is_egld()` or let Arwen throw the error?
-            arg_buffer.push_arg(payment.token_identifier);
-            arg_buffer.push_arg(payment.token_nonce);
-            arg_buffer.push_arg(payment.amount);
-        }
-        let data_buf: ManagedBuffer<A> = data.into();
-        if !data_buf.is_empty() {
-            arg_buffer.push_arg_raw(data_buf);
-        }
-
-        self.send_raw_wrapper().async_call_raw(
-            &BlockchainWrapper::<A>::new().get_sc_address(),
-            &BigUint::zero(),
-            &ManagedBuffer::new_from_bytes(ESDT_MULTI_TRANSFER_FUNC_NAME),
-            &arg_buffer,
-        );
+        to: ManagedAddress<A>,
+        payments: ManagedVec<A, EsdtTokenPayment<A>>,
+    ) -> ! {
+        ContractCall::<A, ()>::new(to, ManagedBuffer::new())
+            .with_multi_token_transfer(payments)
+            .async_call()
+            .call_and_exit_ignore_callback()
     }
 
     /// Sends a synchronous call to change a smart contract address.
