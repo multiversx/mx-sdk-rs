@@ -31,18 +31,8 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
     }
 
     #[endpoint]
-    fn send_esdt(
-        &self,
-        to: &ManagedAddress,
-        token_id: TokenIdentifier,
-        amount: &BigUint,
-        opt_data: OptionalValue<ManagedBuffer>,
-    ) {
-        let data = match opt_data {
-            OptionalValue::Some(data) => data,
-            OptionalValue::None => ManagedBuffer::new(),
-        };
-        self.send().direct_esdt(to, &token_id, 0, amount, data);
+    fn send_esdt(&self, to: &ManagedAddress, token_id: TokenIdentifier, amount: &BigUint) {
+        self.send().direct_esdt(to, &token_id, 0, amount);
     }
 
     #[payable("*")]
@@ -52,8 +42,7 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
         let fees = &payment * &percentage_fees / PERCENTAGE_TOTAL;
         let amount_to_send = payment - fees;
 
-        self.send()
-            .direct_esdt(&to, &token_id, 0, &amount_to_send, &[]);
+        self.send().direct_esdt(&to, &token_id, 0, &amount_to_send);
     }
 
     #[endpoint]
@@ -63,16 +52,10 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
         token_id: TokenIdentifier,
         amount_first_time: &BigUint,
         amount_second_time: &BigUint,
-        opt_data: OptionalValue<ManagedBuffer>,
     ) {
-        let data = match opt_data {
-            OptionalValue::Some(data) => data,
-            OptionalValue::None => ManagedBuffer::new(),
-        };
+        self.send().direct_esdt(to, &token_id, 0, amount_first_time);
         self.send()
-            .direct_esdt(to, &token_id, 0, amount_first_time, data.clone());
-        self.send()
-            .direct_esdt(to, &token_id, 0, amount_second_time, data);
+            .direct_esdt(to, &token_id, 0, amount_second_time);
     }
 
     #[endpoint]
@@ -152,7 +135,7 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
             ManagedAsyncCallResult::Err(message) => {
                 // return issue cost to the caller
                 if token_identifier.is_egld() && returned_tokens > 0 {
-                    self.send().direct_egld(caller, &returned_tokens, &[]);
+                    self.send().direct_egld(caller, &returned_tokens);
                 }
 
                 self.last_error_message().set(&message.err_msg);

@@ -298,7 +298,6 @@ where
             &payment.token_identifier,
             payment.token_nonce,
             &payment.amount,
-            &[],
         );
     }
 }

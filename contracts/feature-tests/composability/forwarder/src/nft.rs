@@ -89,7 +89,7 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
                 let (token_identifier, returned_tokens) =
                     self.call_value().egld_or_single_fungible_esdt();
                 if token_identifier.is_egld() && returned_tokens > 0 {
-                    self.send().direct_egld(caller, &returned_tokens, &[]);
+                    self.send().direct_egld(caller, &returned_tokens);
                 }
 
                 self.last_error_message().set(&message.err_msg);
@@ -271,13 +271,8 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
             uri,
         );
 
-        self.send().direct_esdt(
-            &to,
-            &token_identifier,
-            token_nonce,
-            &amount,
-            b"NFT transfer",
-        );
+        self.send()
+            .direct_esdt(&to, &token_identifier, token_nonce, &amount);
 
         self.send_event(&to, &token_identifier, token_nonce, &amount);
     }

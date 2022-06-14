@@ -17,7 +17,7 @@ pub trait ForwarderRaw {
     fn forward_payment(&self, to: ManagedAddress) {
         let (token, payment) = self.call_value().egld_or_single_fungible_esdt();
         if token.is_egld() {
-            self.send().direct_egld(&to, &payment, ManagedBuffer::new());
+            self.send().direct_egld(&to, &payment);
         } else {
             self.send().transfer_esdt_via_async_call(
                 &to,
@@ -33,14 +33,14 @@ pub trait ForwarderRaw {
     #[payable("*")]
     fn forward_direct_esdt_via_transf_exec(&self, to: ManagedAddress) {
         let (token, payment) = self.call_value().single_fungible_esdt();
-        self.send().direct_esdt(&to, &token, 0, &payment, &[]);
+        self.send().direct_esdt(&to, &token, 0, &payment);
     }
 
     #[endpoint]
     #[payable("*")]
     fn forward_direct_esdt_multi(&self, to: ManagedAddress) {
         let payments = self.call_value().all_esdt_transfers();
-        self.send().direct_multi(&to, &payments, &[]);
+        self.send().direct_multi(&to, &payments);
     }
 
     fn forward_contract_call(
