@@ -170,12 +170,7 @@ impl BlockchainApiImpl for DebugApi {
                     .get_by_identifier(token_identifier_value.as_slice())
                 {
                     if let Some(instance) = esdt_data.instances.get_by_nonce(nonce) {
-                        self.esdt_token_data_from_instance(
-                            token_identifier_value.into_vec(),
-                            esdt_data,
-                            nonce,
-                            instance,
-                        )
+                        self.esdt_token_data_from_instance(esdt_data, nonce, instance)
                     } else {
                         // missing nonce
                         EsdtTokenData {
@@ -253,7 +248,6 @@ impl BlockchainApiImpl for DebugApi {
 impl DebugApi {
     fn esdt_token_data_from_instance<M: ManagedTypeApi>(
         &self,
-        token_identifier_value: Vec<u8>,
         esdt_data: &EsdtData,
         nonce: u64,
         instance: &EsdtInstance,
