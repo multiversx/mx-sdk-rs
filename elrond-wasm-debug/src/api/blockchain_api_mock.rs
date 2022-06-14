@@ -125,7 +125,7 @@ impl BlockchainApiImpl for DebugApi {
                 .esdt
                 .get_by_identifier_or_default(
                     TokenIdentifier::<DebugApi>::from_raw_handle(token_id_handle)
-                        .to_esdt_identifier()
+                        .to_boxed_bytes()
                         .as_slice(),
                 )
                 .last_nonce
@@ -148,7 +148,7 @@ impl BlockchainApiImpl for DebugApi {
         let esdt_balance = self.with_contract_account(|account| {
             account.esdt.get_esdt_balance(
                 TokenIdentifier::<DebugApi>::from_raw_handle(token_id_handle)
-                    .to_esdt_identifier()
+                    .to_boxed_bytes()
                     .as_slice(),
                 nonce,
             )
@@ -164,7 +164,7 @@ impl BlockchainApiImpl for DebugApi {
     ) -> EsdtTokenData<M> {
         self.blockchain_cache()
             .with_account(&address.to_address(), |account| {
-                let token_identifier_value = token.to_esdt_identifier();
+                let token_identifier_value = token.to_boxed_bytes();
                 if let Some(esdt_data) = account
                     .esdt
                     .get_by_identifier(token_identifier_value.as_slice())
@@ -237,7 +237,7 @@ impl BlockchainApiImpl for DebugApi {
                 let mut result = EsdtLocalRoleFlags::NONE;
                 if let Some(esdt_data) = account.esdt.get_by_identifier(
                     TokenIdentifier::<DebugApi>::from_raw_handle(token_id_handle)
-                        .to_esdt_identifier()
+                        .to_boxed_bytes()
                         .as_slice(),
                 ) {
                     for role_name in esdt_data.roles.get() {

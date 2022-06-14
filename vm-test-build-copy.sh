@@ -78,6 +78,7 @@ if [ "$ADD_PROMISES" = true ]; then
       $VM_REPO_PATH/test/features/composability/promises-features/output/promises-features.wasm
 fi
 
+rm -f $VM_REPO_PATH/test/features/composability/mandos/*
 cp -R contracts/feature-tests/composability/mandos \
    $VM_REPO_PATH/test/features/composability
 

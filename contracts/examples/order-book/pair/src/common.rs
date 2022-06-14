@@ -8,7 +8,7 @@ pub const FEE_PENALTY_INCREASE_PERCENT: u64 = 1_000;
 pub const FREE_ORDER_FROM_STORAGE_MIN_PENALTIES: u64 = 6;
 
 #[derive(
-    ManagedVecItem, TopEncode, TopDecode, NestedEncode, NestedDecode, PartialEq, TypeAbi, Clone,
+    ManagedVecItem, TopEncode, TopDecode, NestedEncode, NestedDecode, PartialEq, Eq, TypeAbi, Clone,
 )]
 pub enum OrderType {
     Buy,

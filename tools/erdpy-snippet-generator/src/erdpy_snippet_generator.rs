@@ -11,7 +11,7 @@ use cmd_builder::*;
 use constants::*;
 use helper_types::*;
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Eq)]
 pub enum PrintOption {
     ErdpySnippet,
     TxData,

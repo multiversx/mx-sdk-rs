@@ -7,11 +7,14 @@ publish = false
 [lib]
 path = "src/swap.rs"
 
-
 [dependencies.elrond-wasm]
-version = "0.31.1"
+version = "0.32.0"
 path = "../../../elrond-wasm"
 
+[dependencies.elrond-wasm-modules]
+version = "0.32.0"
+path = "../../../elrond-wasm-modules"
+
 [dev-dependencies.elrond-wasm-debug]
-version = "0.31.1"
+version = "0.32.0"
 path = "../../../elrond-wasm-debug"

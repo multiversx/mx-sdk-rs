@@ -14,7 +14,7 @@
         },
         "framework": {
             "name": "elrond-wasm",
-            "version": "0.31.1"
+            "version": "0.32.0"
         }
     },
     "docs": [
@@ -44,6 +44,23 @@
     "events": [],
     "hasCallback": false,
     "types": {
+        "EsdtTokenPayment": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "token_identifier",
+                    "type": "TokenIdentifier"
+                },
+                {
+                    "name": "token_nonce",
+                    "type": "u64"
+                },
+                {
+                    "name": "amount",
+                    "type": "BigUint"
+                }
+            ]
+        },
         "EsdtTokenType": {
             "type": "enum",
             "variants": [
@@ -81,16 +98,8 @@
                     "type": "Address"
                 },
                 {
-                    "name": "token_id",
-                    "type": "TokenIdentifier"
-                },
-                {
-                    "name": "token_nonce",
-                    "type": "u64"
-                },
-                {
-                    "name": "amount",
-                    "type": "BigUint"
+                    "name": "payments",
+                    "type": "List<EsdtTokenPayment>"
                 },
                 {
                     "name": "function_name",

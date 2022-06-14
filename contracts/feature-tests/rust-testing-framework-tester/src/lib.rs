@@ -5,7 +5,7 @@ elrond_wasm::derive_imports!();
 
 pub mod dummy_module;
 
-#[derive(TopEncode, TopDecode, TypeAbi, Clone, Debug, PartialEq)]
+#[derive(TopEncode, TopDecode, TypeAbi, Clone, Debug, PartialEq, Eq)]
 pub struct NftDummyAttributes {
     pub creation_epoch: u64,
     pub cool_factor: u8,

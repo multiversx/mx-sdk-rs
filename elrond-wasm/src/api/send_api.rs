@@ -241,24 +241,6 @@ pub trait SendApiImpl {
         arg_buffer: &ArgBuffer,
     ) -> ManagedVec<M, ManagedBuffer<M>>;
 
-    fn execute_on_dest_context_by_caller_raw<M: ManagedTypeApi>(
-        &self,
-        gas: u64,
-        address: &ManagedAddress<M>,
-        value: &BigUint<M>,
-        endpoint_name: &ManagedBuffer<M>,
-        arg_buffer: &ManagedArgBuffer<M>,
-    ) -> ManagedVec<M, ManagedBuffer<M>>;
-
-    fn execute_on_dest_context_by_caller_raw_legacy<M: ManagedTypeApi>(
-        &self,
-        gas: u64,
-        address: &Address,
-        value: &BigUint<M>,
-        endpoint_name: &BoxedBytes,
-        arg_buffer: &ArgBuffer,
-    ) -> ManagedVec<M, ManagedBuffer<M>>;
-
     fn execute_on_same_context_raw<M: ManagedTypeApi>(
         &self,
         gas: u64,

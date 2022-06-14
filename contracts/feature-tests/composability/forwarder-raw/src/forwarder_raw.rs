@@ -283,27 +283,6 @@ pub trait ForwarderRaw {
 
     #[endpoint]
     #[payable("EGLD")]
-    fn call_execute_on_dest_context_by_caller(
-        &self,
-        to: ManagedAddress,
-        endpoint_name: ManagedBuffer,
-        args: MultiValueEncoded<ManagedBuffer>,
-    ) {
-        let payment = self.call_value().egld_value();
-        let half_gas = self.blockchain().get_gas_left() / 2;
-        let result = self.send_raw().execute_on_dest_context_by_caller_raw(
-            half_gas,
-            &to,
-            &payment,
-            &endpoint_name,
-            &args.to_arg_buffer(),
-        );
-
-        self.execute_on_dest_context_result(result);
-    }
-
-    #[endpoint]
-    #[payable("EGLD")]
     fn call_execute_on_same_context(
         &self,
         to: ManagedAddress,

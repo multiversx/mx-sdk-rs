@@ -390,6 +390,7 @@ impl BlockchainApiImpl for VmApiImpl {
         use elrond_wasm::{api::BigIntApi, types::heap::BoxedBytes};
 
         let address = m_address.to_address();
+        let token_bytes = token.to_boxed_bytes();
         unsafe {
             let value_handle = self.bi_new_zero();
             let mut properties_bytes = [0u8; 2]; // always 2 bytes
@@ -397,16 +398,16 @@ impl BlockchainApiImpl for VmApiImpl {
 
             let name_len = getESDTNFTNameLength(
                 address.as_ref().as_ptr(),
-                token.to_esdt_identifier().as_ptr(),
-                token.len() as i32,
+                token_bytes.as_ptr(),
+                token_bytes.len() as i32,
                 nonce as i64,
             ) as usize;
             let mut name_bytes = BoxedBytes::allocate(name_len);
 
             let attr_len = getESDTNFTAttributeLength(
                 address.as_ref().as_ptr(),
-                token.to_esdt_identifier().as_ptr(),
-                token.len() as i32,
+                token_bytes.as_ptr(),
+                token_bytes.len() as i32,
                 nonce as i64,
             ) as usize;
             let mut attr_bytes = BoxedBytes::allocate(attr_len);
@@ -416,8 +417,8 @@ impl BlockchainApiImpl for VmApiImpl {
             // Hence the EsdtTokenData receives a Vec<BoxedBytes>
             let uris_len = getESDTNFTURILength(
                 address.as_ref().as_ptr(),
-                token.to_esdt_identifier().as_ptr(),
-                token.len() as i32,
+                token_bytes.as_ptr(),
+                token_bytes.len() as i32,
                 nonce as i64,
             ) as usize;
             let mut uri_bytes = BoxedBytes::allocate(uris_len);
@@ -427,8 +428,8 @@ impl BlockchainApiImpl for VmApiImpl {
 
             getESDTTokenData(
                 address.as_ref().as_ptr(),
-                token.to_esdt_identifier().as_ptr(),
-                token.len() as i32,
+                token_bytes.as_ptr(),
+                token_bytes.len() as i32,
                 nonce as i64,
                 value_handle,
                 properties_bytes.as_mut_ptr(),
@@ -443,8 +444,8 @@ impl BlockchainApiImpl for VmApiImpl {
             // Fungible always have a nonce of 0, so we check nonce to figure out the type
             let nonce = getCurrentESDTNFTNonce(
                 address.as_ref().as_ptr(),
-                token.to_esdt_identifier().as_ptr(),
-                token.len() as i32,
+                token_bytes.as_ptr(),
+                token_bytes.len() as i32,
             );
             let token_type = if nonce == 0 {
                 EsdtTokenType::Fungible

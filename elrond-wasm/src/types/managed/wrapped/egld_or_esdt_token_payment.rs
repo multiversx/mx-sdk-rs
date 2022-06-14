@@ -13,7 +13,9 @@ use crate::derive::TypeAbi;
 
 use super::EsdtTokenPayment;
 
-#[derive(TopDecode, TopEncode, NestedDecode, NestedEncode, TypeAbi, Clone, PartialEq, Debug)]
+#[derive(
+    TopDecode, TopEncode, NestedDecode, NestedEncode, TypeAbi, Clone, PartialEq, Eq, Debug,
+)]
 pub struct EgldOrEsdtTokenPayment<M: ManagedTypeApi> {
     pub token_identifier: EgldOrEsdtTokenIdentifier<M>,
     pub token_nonce: u64,

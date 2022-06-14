@@ -14,7 +14,7 @@
         },
         "framework": {
             "name": "elrond-wasm",
-            "version": "0.31.1"
+            "version": "0.32.0"
         }
     },
     "docs": [
@@ -171,6 +171,19 @@
             "outputs": []
         },
         {
+            "docs": [
+                "Propose a list of actions.",
+                "A maximum of MAX_GOVERNANCE_PROPOSAL_ACTIONS can be proposed at a time.",
+                "",
+                "An action has the following format:",
+                "    - gas limit for action execution",
+                "    - destination address",
+                "    - a vector of ESDT transfers, in the form of ManagedVec<EsdTokenPayment>",
+                "    - endpoint to be called on the destination",
+                "    - a vector of arguments for the endpoint, in the form of ManagedVec<ManagedBuffer>",
+                "",
+                "Returns the ID of the newly created proposal."
+            ],
             "name": "propose",
             "mutability": "mutable",
             "payableInTokens": [
@@ -183,7 +196,7 @@
                 },
                 {
                     "name": "actions",
-                    "type": "variadic<multi<u64,Address,TokenIdentifier,u64,BigUint,bytes,List<bytes>>>",
+                    "type": "variadic<multi<u64,Address,List<EsdtTokenPayment>,bytes,List<bytes>>>",
                     "multi_arg": true
                 }
             ],
@@ -194,6 +207,10 @@
             ]
         },
         {
+            "docs": [
+                "Vote on a proposal by depositing any amount of governance tokens",
+                "These tokens will be locked until the proposal is executed or cancelled."
+            ],
             "name": "vote",
             "mutability": "mutable",
             "payableInTokens": [
@@ -208,6 +225,10 @@
             "outputs": []
         },
         {
+            "docs": [
+                "Downvote a proposal by depositing any amount of governance tokens.",
+                "These tokens will be locked until the proposal is executed or cancelled."
+            ],
             "name": "downvote",
             "mutability": "mutable",
             "payableInTokens": [
@@ -222,6 +243,12 @@
             "outputs": []
         },
         {
+            "docs": [
+                "Queue a proposal for execution.",
+                "This can be done only if the proposal has reached the quorum.",
+                "A proposal is considered successful and ready for queing if",
+                "total_votes - total_downvotes >= quorum"
+            ],
             "name": "queue",
             "mutability": "mutable",
             "inputs": [
@@ -233,6 +260,11 @@
             "outputs": []
         },
         {
+            "docs": [
+                "Execute a previously queued proposal.",
+                "This will clear the proposal and unlock the governance tokens.",
+                "Said tokens can then be withdrawn and used to vote/downvote other proposals."
+            ],
             "name": "execute",
             "mutability": "mutable",
             "inputs": [
@@ -244,6 +276,11 @@
             "outputs": []
         },
         {
+            "docs": [
+                "Cancel a proposed action. This can be done:",
+                "- by the proposer, at any time",
+                "- by anyone, if the proposal was defeated"
+            ],
             "name": "cancel",
             "mutability": "mutable",
             "inputs": [
@@ -312,15 +349,12 @@
             ],
             "outputs": [
                 {
-                    "type": "variadic<multi<u64,Address,TokenIdentifier,u64,BigUint,bytes,List<bytes>>>",
+                    "type": "variadic<multi<u64,Address,List<EsdtTokenPayment>,bytes,List<bytes>>>",
                     "multi_result": true
                 }
             ]
         },
         {
-            "docs": [
-                "Could be calculated by iterating over the \"votes\" mapper, but that costs a lot of gas"
-            ],
             "name": "getTotalVotes",
             "mutability": "readonly",
             "inputs": [
@@ -336,9 +370,6 @@
             ]
         },
         {
-            "docs": [
-                "Could be calculated by iterating over the \"downvotes\" mapper, but that costs a lot of gas"
-            ],
             "name": "getTotalDownvotes",
             "mutability": "readonly",
             "inputs": [
@@ -352,42 +383,6 @@
                     "type": "BigUint"
                 }
             ]
-        },
-        {
-            "docs": [
-                "The module can't protect its storage from the main SC, so it's the developers responsibility",
-                "to not modify parameters manually"
-            ],
-            "name": "initGovernanceModule",
-            "onlyOwner": true,
-            "mutability": "mutable",
-            "inputs": [
-                {
-                    "name": "governance_token_id",
-                    "type": "TokenIdentifier"
-                },
-                {
-                    "name": "quorum",
-                    "type": "BigUint"
-                },
-                {
-                    "name": "min_token_balance_for_proposal",
-                    "type": "BigUint"
-                },
-                {
-                    "name": "voting_delay_in_blocks",
-                    "type": "u64"
-                },
-                {
-                    "name": "voting_period_in_blocks",
-                    "type": "u64"
-                },
-                {
-                    "name": "lock_time_after_voting_ends_in_blocks",
-                    "type": "u64"
-                }
-            ],
-            "outputs": []
         },
         {
             "name": "changeQuorum",
@@ -574,6 +569,23 @@
     "events": [],
     "hasCallback": true,
     "types": {
+        "EsdtTokenPayment": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "token_identifier",
+                    "type": "TokenIdentifier"
+                },
+                {
+                    "name": "token_nonce",
+                    "type": "u64"
+                },
+                {
+                    "name": "amount",
+                    "type": "BigUint"
+                }
+            ]
+        },
         "EsdtTokenType": {
             "type": "enum",
             "variants": [
@@ -611,16 +623,8 @@
                     "type": "Address"
                 },
                 {
-                    "name": "token_id",
-                    "type": "TokenIdentifier"
-                },
-                {
-                    "name": "token_nonce",
-                    "type": "u64"
-                },
-                {
-                    "name": "amount",
-                    "type": "BigUint"
+                    "name": "payments",
+                    "type": "List<EsdtTokenPayment>"
                 },
                 {
                     "name": "function_name",
