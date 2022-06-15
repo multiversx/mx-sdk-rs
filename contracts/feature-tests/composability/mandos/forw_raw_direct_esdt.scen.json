@@ -56,16 +56,6 @@
                             "sc:vault"
                         ],
                         "data": ""
-                    },
-                    {
-                        "address": "sc:forwarder",
-                        "endpoint": "str:callBack",
-                        "topics": [
-                            "str:callback_raw"
-                        ],
-                        "data": {
-                            "0-status": "biguint:0"
-                        }
                     }
                 ],
                 "gas": "*",
@@ -96,12 +86,7 @@
                 "sc:forwarder": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {
-                        "str:callback_data.len": "1",
-                        "str:callback_data.item|u32:1": [
-                            "u32:0"
-                        ]
-                    },
+                    "storage": {},
                     "code": "file:../forwarder-raw/output/forwarder-raw.wasm"
                 }
             }

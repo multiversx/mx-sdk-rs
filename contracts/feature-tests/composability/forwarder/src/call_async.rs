@@ -111,12 +111,7 @@ pub trait ForwarderAsyncCallModule {
     ) {
         self.vault_proxy()
             .contract(to)
-            .retrieve_funds(
-                token,
-                token_nonce,
-                amount,
-                OptionalValue::<ManagedBuffer>::None,
-            )
+            .retrieve_funds(token, token_nonce, amount)
             .async_call()
             .with_callback(self.callbacks().retrieve_funds_callback())
             .call_and_exit()
@@ -193,12 +188,12 @@ pub trait ForwarderAsyncCallModule {
             all_token_payments.push(payment);
         }
 
-        // TODO: use proxy here
-        self.send().transfer_multiple_esdt_via_async_call(
-            &to,
-            &all_token_payments,
-            b"accept_funds",
-        );
+        self.vault_proxy()
+            .contract(to)
+            .accept_funds()
+            .with_multi_token_transfer(all_token_payments)
+            .async_call()
+            .call_and_exit()
     }
 
     #[view]
