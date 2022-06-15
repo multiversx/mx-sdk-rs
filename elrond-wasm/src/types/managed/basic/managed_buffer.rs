@@ -75,6 +75,16 @@ where
     }
 }
 
+impl<M> From<&str> for ManagedBuffer<M>
+where
+    M: ManagedTypeApi,
+{
+    #[inline]
+    fn from(s: &str) -> Self {
+        Self::new_from_bytes(s.as_bytes())
+    }
+}
+
 impl<M> From<BoxedBytes> for ManagedBuffer<M>
 where
     M: ManagedTypeApi,

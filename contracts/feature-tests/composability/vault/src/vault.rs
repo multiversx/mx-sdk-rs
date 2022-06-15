@@ -105,7 +105,13 @@ pub trait Vault {
     fn retrieve_funds(&self, token: EgldOrEsdtTokenIdentifier, nonce: u64, amount: BigUint) {
         self.retrieve_funds_event(&token, nonce, &amount);
         let caller = self.blockchain().get_caller();
-        self.send().direct(&caller, &token, nonce, &amount);
+
+        if let Some(esdt_token_id) = token.into_esdt_option() {
+            self.send()
+                .transfer_esdt_via_async_call(caller, esdt_token_id, nonce, amount);
+        } else {
+            self.send().direct_egld(&caller, &amount);
+        }
     }
 
     #[endpoint]
