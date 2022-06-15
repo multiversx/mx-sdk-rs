@@ -137,7 +137,7 @@ where
     ) where
         D: Into<ManagedBuffer<A>>,
     {
-        if let Some(esdt_token_identifier) = token.as_esdt_token_identifier() {
+        if let Some(esdt_token_identifier) = token.as_esdt_option() {
             self.direct_esdt_with_gas_limit(
                 to,
                 &esdt_token_identifier,

@@ -166,8 +166,10 @@ pub trait ForwarderRaw {
             all_payments.push(EsdtTokenPayment::new(token_identifier, token_nonce, amount));
         }
 
-        self.send()
-            .transfer_multiple_esdt_via_async_call(to, all_payments);
+        ContractCall::<Self::Api, ()>::new(to, "burn_and_create_retrive_async".into())
+            .with_multi_token_transfer(all_payments)
+            .async_call()
+            .call_and_exit_ignore_callback()
     }
 
     #[view]
