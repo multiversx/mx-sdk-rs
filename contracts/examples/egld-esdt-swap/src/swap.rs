@@ -73,7 +73,7 @@ pub trait EgldEsdtSwap: elrond_wasm_modules::pause::PauseModule {
                 // return issue cost to the owner
                 // TODO: test that it works
                 if token_identifier.is_egld() && returned_tokens > 0 {
-                    self.send().direct_egld(caller, &returned_tokens, &[]);
+                    self.send().direct_egld(caller, &returned_tokens);
                 }
             },
         }
@@ -115,7 +115,7 @@ pub trait EgldEsdtSwap: elrond_wasm_modules::pause::PauseModule {
 
         let caller = self.blockchain().get_caller();
         self.send()
-            .direct_esdt(&caller, &wrapped_egld_token_id, 0, &payment_amount, &[]);
+            .direct_esdt(&caller, &wrapped_egld_token_id, 0, &payment_amount);
     }
 
     #[payable("*")]
@@ -138,7 +138,7 @@ pub trait EgldEsdtSwap: elrond_wasm_modules::pause::PauseModule {
 
         // 1 wrapped eGLD = 1 eGLD, so we pay back the same amount
         let caller = self.blockchain().get_caller();
-        self.send().direct_egld(&caller, &payment_amount, &[]);
+        self.send().direct_egld(&caller, &payment_amount);
     }
 
     #[view(getLockedEgldBalance)]
