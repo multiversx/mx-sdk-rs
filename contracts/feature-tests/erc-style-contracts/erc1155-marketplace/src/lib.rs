@@ -103,13 +103,10 @@ pub trait Erc1155Marketplace {
     #[endpoint]
     fn claim(&self) {
         let caller = self.blockchain().get_caller();
-        let data = self.data_or_empty_if_sc(&caller, b"claim");
 
         let claimable_funds_mapper = self.get_claimable_funds_mapper();
         for (token_identifier, amount) in claimable_funds_mapper.iter() {
-            self.send()
-                .direct(&caller, &token_identifier, 0, &amount, data);
-
+            self.send().direct(&caller, &token_identifier, 0, &amount);
             self.clear_claimable_funds(&token_identifier);
         }
     }
@@ -179,13 +176,11 @@ pub trait Erc1155Marketplace {
 
         // refund losing bid
         if !auction.current_winner.is_zero() {
-            let data = self.data_or_empty_if_sc(&caller, b"bid refund");
             self.send().direct(
                 &auction.current_winner,
                 &auction.token_identifier,
                 0,
                 &auction.current_bid,
-                data,
             );
         }
 
@@ -220,13 +215,11 @@ pub trait Erc1155Marketplace {
             self.add_claimable_funds(&auction.token_identifier, &cut_amount);
 
             // send part of the bid to the original owner
-            let data = self.data_or_empty_if_sc(&auction.original_owner, b"sold token");
             self.send().direct(
                 &auction.original_owner,
                 &auction.token_identifier,
                 0,
                 &amount_to_send,
-                data,
             );
 
             // send token to winner
@@ -337,14 +330,6 @@ pub trait Erc1155Marketplace {
     fn clear_claimable_funds(&self, token_identifier: &EgldOrEsdtTokenIdentifier) {
         let mut mapper = self.get_claimable_funds_mapper();
         mapper.insert(token_identifier.clone(), BigUint::zero());
-    }
-
-    fn data_or_empty_if_sc(&self, dest: &ManagedAddress, data: &'static [u8]) -> &[u8] {
-        if self.blockchain().is_smart_contract(dest) {
-            &[]
-        } else {
-            data
-        }
     }
 
     // proxy

@@ -29,13 +29,8 @@ pub trait PayableFeatures {
 
             self.send()
                 .esdt_local_mint(&new_token_id, 0, &initial_supply);
-            self.send().transfer_esdt_via_async_call(
-                &caller,
-                &new_token_id,
-                0,
-                &initial_supply,
-                &[],
-            );
+            self.send()
+                .transfer_esdt_via_async_call(caller, new_token_id, 0, initial_supply);
         }
 
         new_token_id
