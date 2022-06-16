@@ -10,11 +10,6 @@ fn world() -> BlockchainMock {
 }
 
 #[test]
-fn test_send_tx_repeat_without_data_mandos_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/send_tx_repeat_without_data.scen.json", world());
-}
-
-#[test]
-fn test_send_tx_repeat_with_data_mandos_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/send_tx_repeat_with_data.scen.json", world());
+fn send_tx_repeat_mandos_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/send_tx_repeat.scen.json", world());
 }
