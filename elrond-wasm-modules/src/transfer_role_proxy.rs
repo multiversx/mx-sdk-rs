@@ -6,7 +6,7 @@ static ERR_CALLBACK_MSG: &[u8] = b"Error received in callback:";
 pub type PaymentsVec<M> = ManagedVec<M, EsdtTokenPayment<M>>;
 
 #[elrond_wasm::module]
-pub trait TransferProxyModule {
+pub trait TransferRoleProxyModule {
     fn transfer_to_user(
         &self,
         original_caller: ManagedAddress,
@@ -17,22 +17,20 @@ pub trait TransferProxyModule {
         let contract_call =
             ContractCall::<Self::Api, ()>::new_with_esdt_payment(dest, data, payments.clone());
 
-        self.execute_async_call(original_caller, payments, contract_call);
+        self.execute_async_call(original_caller, payments, contract_call, None);
     }
 
     fn transfer_to_contract_typed_call<T>(
         &self,
         original_caller: ManagedAddress,
-        mut contract_call: ContractCall<Self::Api, T>,
+        contract_call: ContractCall<Self::Api, T>,
+        opt_custom_callback: Option<CallbackClosure<Self::Api>>,
     ) -> ! {
-        let mut original_caller_arg = ManagedArgBuffer::new();
-        original_caller_arg.push_arg(original_caller.clone());
-        contract_call.arg_buffer = original_caller_arg.concat(contract_call.arg_buffer);
-
         self.execute_async_call(
             original_caller,
             contract_call.payments.clone(),
             contract_call,
+            opt_custom_callback,
         );
     }
 
@@ -43,16 +41,21 @@ pub trait TransferProxyModule {
         payments: PaymentsVec<Self::Api>,
         endpoint_name: ManagedBuffer,
         args: ManagedArgBuffer<Self::Api>,
+        opt_custom_callback: Option<CallbackClosure<Self::Api>>,
     ) -> ! {
         let mut contract_call = ContractCall::<Self::Api, ()>::new_with_esdt_payment(
             dest,
             endpoint_name,
             payments.clone(),
         );
-        contract_call.arg_buffer.push_arg(original_caller.clone());
-        contract_call.arg_buffer = contract_call.arg_buffer.concat(args);
+        contract_call.arg_buffer = args;
 
-        self.execute_async_call(original_caller, payments, contract_call);
+        self.execute_async_call(
+            original_caller,
+            payments,
+            contract_call,
+            opt_custom_callback,
+        );
     }
 
     fn execute_async_call<T>(
@@ -60,6 +63,7 @@ pub trait TransferProxyModule {
         original_caller: ManagedAddress,
         initial_payments: PaymentsVec<Self::Api>,
         contract_call: ContractCall<Self::Api, T>,
+        opt_custom_callback: Option<CallbackClosure<Self::Api>>,
     ) -> ! {
         let remaining_gas = self.blockchain().get_gas_left();
         let cb_gas_needed = CALLBACK_RESERVED_GAS_PER_TOKEN * contract_call.payments.len() as u64;
@@ -69,8 +73,12 @@ pub trait TransferProxyModule {
         );
 
         let async_call_gas = remaining_gas - cb_gas_needed;
-        let cb = TransferProxyModule::callbacks(self)
-            .transfer_callback(original_caller, initial_payments);
+        let cb = match opt_custom_callback {
+            Some(custom_cb) => custom_cb,
+            None => TransferRoleProxyModule::callbacks(self)
+                .transfer_callback(original_caller, initial_payments),
+        };
+
         contract_call
             .with_gas_limit(async_call_gas)
             .async_call()
@@ -95,7 +103,9 @@ pub trait TransferProxyModule {
 
                 let mut err_result = MultiValueEncoded::new();
                 err_result.push(ManagedBuffer::new_from_bytes(ERR_CALLBACK_MSG));
-                err_result.push(err.err_msg);
+                err_result.push(err.err_msg.clone());
+
+                sc_print!("{}", err.err_msg);
 
                 err_result
             },

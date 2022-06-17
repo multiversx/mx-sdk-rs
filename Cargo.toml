@@ -106,6 +106,8 @@ members = [
   "contracts/feature-tests/composability/proxy-test-second/meta",
   "contracts/feature-tests/composability/recursive-caller",
   "contracts/feature-tests/composability/recursive-caller/meta",
+  "contracts/feature-tests/composability/transfer-role-features",
+  "contracts/feature-tests/composability/transfer-role-features/meta",
   "contracts/feature-tests/composability/vault",
   "contracts/feature-tests/composability/vault/meta",
   "contracts/feature-tests/erc-style-contracts/crowdfunding-erc20",
