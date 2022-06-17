@@ -14,7 +14,7 @@
         },
         "framework": {
             "name": "elrond-wasm",
-            "version": "0.31.1"
+            "version": "0.32.0"
         }
     },
     "docs": [
@@ -47,10 +47,6 @@
         "EsdtTokenPayment": {
             "type": "struct",
             "fields": [
-                {
-                    "name": "token_type",
-                    "type": "EsdtTokenType"
-                },
                 {
                     "name": "token_identifier",
                     "type": "TokenIdentifier"
