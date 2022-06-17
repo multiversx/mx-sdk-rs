@@ -8,7 +8,6 @@ elrond_wasm_node::wasm_endpoints! {
     use_module
     (
         callBack
-        addContractToWhitelist
         call_derived_not_owner_only
         call_mod_a
         call_mod_b
@@ -25,8 +24,6 @@ elrond_wasm_node::wasm_endpoints! {
         dnsRegister
         downvote
         execute
-        forwardPayments
-        getContractWhitelist
         getGovernanceTokenId
         getLockTimeAfterVotingEndsInBlocks
         getMinTokenBalanceForProposing
@@ -45,8 +42,6 @@ elrond_wasm_node::wasm_endpoints! {
         pause
         propose
         queue
-        receiveFunds
-        removeContractFromWhitelist
         setFeatureFlag
         slashMember
         stake
