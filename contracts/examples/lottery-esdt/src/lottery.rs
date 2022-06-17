@@ -96,10 +96,7 @@ pub trait Lottery {
             "Lottery is already active!"
         );
         require!(!lottery_name.is_empty(), "Can't have empty lottery name!");
-        require!(
-            token_identifier.is_egld() || token_identifier.is_valid_esdt_identifier(),
-            "Invalid token name provided!"
-        );
+        require!(token_identifier.is_valid(), "Invalid token name provided!");
         require!(ticket_price > 0, "Ticket price must be higher than 0!");
         require!(
             total_tickets > 0,
@@ -291,13 +288,8 @@ pub trait Lottery {
                 &BigUint::from(info.prize_distribution.get(i)),
             );
 
-            self.send().direct(
-                &winner_address,
-                &info.token_identifier,
-                0,
-                &prize,
-                b"You won the lottery! Congratulations!",
-            );
+            self.send()
+                .direct(&winner_address, &info.token_identifier, 0, &prize);
             info.prize_pool -= prize;
         }
 
@@ -308,7 +300,6 @@ pub trait Lottery {
             &info.token_identifier,
             0,
             &info.prize_pool,
-            b"You won the lottery, 1st place! Congratulations!",
         );
     }
 

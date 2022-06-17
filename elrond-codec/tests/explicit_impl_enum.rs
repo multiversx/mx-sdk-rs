@@ -5,7 +5,7 @@ use elrond_codec::{
     NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
 };
 
-#[derive(PartialEq, Clone, Debug)]
+#[derive(PartialEq, Eq, Clone, Debug)]
 pub enum E {
     Unit,
     Newtype(u32),

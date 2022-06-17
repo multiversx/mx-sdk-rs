@@ -472,16 +472,6 @@ impl SendApiImpl for DebugApi {
         ManagedVec::from(result)
     }
 
-    fn execute_on_dest_context_by_caller_raw<M: ManagedTypeApi>(
-        &self,
-        _gas: u64,
-        _to: &ManagedAddress<M>,
-        _endpoint_name: &ManagedBuffer<M>,
-        _arg_buffer: &ManagedArgBuffer<M>,
-    ) -> ManagedVec<M, ManagedBuffer<M>> {
-        panic!("execute_on_dest_context_by_caller_raw not implemented yet!");
-    }
-
     fn execute_on_same_context_raw<M: ManagedTypeApi>(
         &self,
         _gas: u64,
@@ -632,16 +622,6 @@ impl SendApiImpl for DebugApi {
         _gas: u64,
         _to: &Address,
         _value: &BigUint<M>,
-        _endpoint_name: &BoxedBytes,
-        _arg_buffer: &ArgBuffer,
-    ) -> ManagedVec<M, ManagedBuffer<M>> {
-        panic!("legacy operation not implemented");
-    }
-
-    fn execute_on_dest_context_by_caller_raw_legacy<M: ManagedTypeApi>(
-        &self,
-        _gas: u64,
-        _to: &Address,
         _endpoint_name: &BoxedBytes,
         _arg_buffer: &ArgBuffer,
     ) -> ManagedVec<M, ManagedBuffer<M>> {

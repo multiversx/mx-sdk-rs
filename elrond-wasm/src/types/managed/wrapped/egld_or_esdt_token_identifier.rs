@@ -1,12 +1,13 @@
 use crate::{
     abi::{TypeAbi, TypeName},
     api::{Handle, ManagedTypeApi},
+    derive::ManagedVecItem,
     formatter::{FormatByteReceiver, SCDisplay, SCLowerHex},
-    types::{ManagedBuffer, ManagedType},
+    types::{ManagedBuffer, ManagedOption, ManagedRef, ManagedType, TokenIdentifier},
 };
 use elrond_codec::*;
 
-use super::{ManagedOption, ManagedRef, TokenIdentifier};
+use crate as elrond_wasm; // required by the ManagedVecItem derive
 
 /// Specialized type for handling either EGLD or ESDT token identifiers.
 ///
@@ -23,7 +24,7 @@ use super::{ManagedOption, ManagedRef, TokenIdentifier};
 ///
 /// EGLD a special, invalid token identifier handle. This way we can fit it inside a single i32 in memory.
 #[repr(transparent)]
-#[derive(Clone, Debug)]
+#[derive(ManagedVecItem, Clone)]
 pub struct EgldOrEsdtTokenIdentifier<M: ManagedTypeApi> {
     data: ManagedOption<M, TokenIdentifier<M>>,
 }
@@ -82,7 +83,10 @@ impl<M: ManagedTypeApi> EgldOrEsdtTokenIdentifier<M> {
         )
     }
 
-    pub fn is_valid_esdt_identifier(&self) -> bool {
+    /// Checks the ESDT token identifier for validity. EGLD is considered valid, no checks needed.
+    ///
+    /// Will fail if it encodes an invalid ESDT token identifier.
+    pub fn is_valid(&self) -> bool {
         self.map_ref_or_else(
             || true,
             |token_identifier| token_identifier.is_valid_esdt_identifier(),
@@ -109,19 +113,18 @@ impl<M: ManagedTypeApi> EgldOrEsdtTokenIdentifier<M> {
         self.data.unwrap_or_sc_panic("ESDT expected")
     }
 
-    pub fn as_esdt_token_identifier(&self) -> Option<ManagedRef<'_, M, TokenIdentifier<M>>> {
+    /// Representation of the object as an `Option`.
+    /// 
+    /// Because it does not consume `self` only a reference to the ESDT token identifier can be returned.
+    pub fn as_esdt_option(&self) -> Option<ManagedRef<'_, M, TokenIdentifier<M>>> {
         self.data.as_option()
     }
-}
 
-// impl<M: ManagedTypeApi> From<ManagedBuffer<M>> for EgldOrEsdtTokenIdentifier<M> {
-//     #[inline]
-//     fn from(buffer: ManagedBuffer<M>) -> Self {
-//         let mut token_identifier = TokenIdentifier { buffer };
-//         token_identifier.normalize();
-//         token_identifier
-//     }
-// }
+    /// Converts `self` into an `Option`. Consumes `self` in the process.
+    pub fn into_esdt_option(self) -> Option<TokenIdentifier<M>> {
+        self.data.into_option()
+    }
+}
 
 impl<M: ManagedTypeApi> PartialEq for EgldOrEsdtTokenIdentifier<M> {
     #[inline]
@@ -131,6 +134,16 @@ impl<M: ManagedTypeApi> PartialEq for EgldOrEsdtTokenIdentifier<M> {
 }
 
 impl<M: ManagedTypeApi> Eq for EgldOrEsdtTokenIdentifier<M> {}
+
+impl<M: ManagedTypeApi> PartialEq<TokenIdentifier<M>> for EgldOrEsdtTokenIdentifier<M> {
+    #[inline]
+    fn eq(&self, other: &TokenIdentifier<M>) -> bool {
+        self.map_ref_or_else(
+            || false,
+            |self_esdt_token_identifier| self_esdt_token_identifier == other,
+        )
+    }
+}
 
 impl<M: ManagedTypeApi> NestedEncode for EgldOrEsdtTokenIdentifier<M> {
     #[inline]
@@ -221,6 +234,23 @@ impl<M: ManagedTypeApi> SCLowerHex for EgldOrEsdtTokenIdentifier<M> {
             ));
         } else {
             f.append_bytes(EGLD_REPRESENTATION_HEX);
+        }
+    }
+}
+
+impl<M> core::fmt::Debug for EgldOrEsdtTokenIdentifier<M>
+where
+    M: ManagedTypeApi,
+{
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        use crate::alloc::string::ToString;
+        if let Some(token_identifier) = self.data.as_option() {
+            let token_id_str = token_identifier.to_string();
+            f.debug_tuple("EgldOrEsdtTokenIdentifier::Esdt")
+                .field(&token_id_str)
+                .finish()
+        } else {
+            f.write_str("EgldOrEsdtTokenIdentifier::Egld")
         }
     }
 }

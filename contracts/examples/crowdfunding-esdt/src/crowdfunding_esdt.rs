@@ -3,7 +3,7 @@
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
-#[derive(TopEncode, TopDecode, TypeAbi, PartialEq, Clone, Copy, Debug)]
+#[derive(TopEncode, TopDecode, TypeAbi, PartialEq, Eq, Clone, Copy, Debug)]
 pub enum Status {
     FundingPeriod,
     Successful,
@@ -23,10 +23,7 @@ pub trait Crowdfunding {
         );
         self.deadline().set(deadline);
 
-        require!(
-            token_identifier.is_egld() || token_identifier.is_valid_esdt_identifier(),
-            "Invalid token provided"
-        );
+        require!(token_identifier.is_valid(), "Invalid token provided");
         self.cf_token_identifier().set(token_identifier);
     }
 
@@ -78,7 +75,7 @@ pub trait Crowdfunding {
                 let sc_balance = self.get_current_funds();
 
                 self.send()
-                    .direct(&caller, &token_identifier, 0, &sc_balance, &[]);
+                    .direct(&caller, &token_identifier, 0, &sc_balance);
             },
             Status::Failed => {
                 let caller = self.blockchain().get_caller();
@@ -88,8 +85,7 @@ pub trait Crowdfunding {
                     let token_identifier = self.cf_token_identifier().get();
 
                     self.deposit(&caller).clear();
-                    self.send()
-                        .direct(&caller, &token_identifier, 0, &deposit, &[]);
+                    self.send().direct(&caller, &token_identifier, 0, &deposit);
                 }
             },
         }
