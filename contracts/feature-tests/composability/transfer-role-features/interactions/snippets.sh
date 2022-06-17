@@ -28,8 +28,16 @@ FORWARD_FUNC_NAME_HEX=0x666F72776172645061796D656E7473
 ACCEPT_FUNDS_FUNC_NAME_ASCII="depositTokensForAction"
 ACCEPT_FUNDS_FUNC_NAME_HEX=0x6465706F736974546F6B656E73466F72416374696F6E
 
-deploySc() {
+deployTransferSc() {
     erdpy --verbose contract deploy --project=${PROJECT} \
+    --recall-nonce --pem=${USER_PEM} \
+    --gas-limit=100000000 \
+    --send --outfile="deploy-testnet.interaction.json" \
+    --proxy=${PROXY} --chain=${CHAIN_ID} || return
+}
+
+deployVault() {
+    erdpy --verbose contract deploy --bytecode="../vault/output/vault.wasm" \
     --recall-nonce --pem=${USER_PEM} \
     --gas-limit=100000000 \
     --send --outfile="deploy-testnet.interaction.json" \
