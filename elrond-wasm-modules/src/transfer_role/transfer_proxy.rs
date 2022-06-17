@@ -1,7 +1,5 @@
 elrond_wasm::imports!();
 
-use elrond_wasm::elrond_codec::Empty;
-
 const CALLBACK_RESERVED_GAS_PER_TOKEN: u64 = 1_000_000;
 static ERR_CALLBACK_MSG: &[u8] = b"Error received in callback:";
 
@@ -17,15 +15,15 @@ pub trait TransferProxyModule {
         data: ManagedBuffer,
     ) -> ! {
         let contract_call =
-            ContractCall::<Self::Api, Empty>::new_with_esdt_payment(dest, data, payments.clone());
+            ContractCall::<Self::Api, ()>::new_with_esdt_payment(dest, data, payments.clone());
 
         self.execute_async_call(original_caller, payments, contract_call);
     }
 
-    fn transfer_to_contract_typed_call(
+    fn transfer_to_contract_typed_call<T>(
         &self,
         original_caller: ManagedAddress,
-        mut contract_call: ContractCall<Self::Api, Empty>,
+        mut contract_call: ContractCall<Self::Api, T>,
     ) -> ! {
         let mut original_caller_arg = ManagedArgBuffer::new();
         original_caller_arg.push_arg(original_caller.clone());
@@ -46,7 +44,7 @@ pub trait TransferProxyModule {
         endpoint_name: ManagedBuffer,
         args: ManagedArgBuffer<Self::Api>,
     ) -> ! {
-        let mut contract_call = ContractCall::<Self::Api, Empty>::new_with_esdt_payment(
+        let mut contract_call = ContractCall::<Self::Api, ()>::new_with_esdt_payment(
             dest,
             endpoint_name,
             payments.clone(),
@@ -57,11 +55,11 @@ pub trait TransferProxyModule {
         self.execute_async_call(original_caller, payments, contract_call);
     }
 
-    fn execute_async_call(
+    fn execute_async_call<T>(
         &self,
         original_caller: ManagedAddress,
         initial_payments: PaymentsVec<Self::Api>,
-        contract_call: ContractCall<Self::Api, Empty>,
+        contract_call: ContractCall<Self::Api, T>,
     ) -> ! {
         let remaining_gas = self.blockchain().get_gas_left();
         let cb_gas_needed = CALLBACK_RESERVED_GAS_PER_TOKEN * contract_call.payments.len() as u64;
