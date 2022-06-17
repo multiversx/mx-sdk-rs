@@ -90,7 +90,7 @@ pub trait TransferProxyModule {
         match result {
             ManagedAsyncCallResult::Ok(return_values) => return_values,
             ManagedAsyncCallResult::Err(err) => {
-                if initial_payments.len() > 0 {
+                if !initial_payments.is_empty() {
                     self.send()
                         .direct_multi(&original_caller, &initial_payments);
                 }
