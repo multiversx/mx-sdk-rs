@@ -14,7 +14,7 @@
         },
         "framework": {
             "name": "elrond-wasm",
-            "version": "0.31.1"
+            "version": "0.32.0"
         }
     },
     "docs": [
@@ -172,7 +172,7 @@
         },
         {
             "docs": [
-                "Propose a list of actions. ",
+                "Propose a list of actions.",
                 "A maximum of MAX_GOVERNANCE_PROPOSAL_ACTIONS can be proposed at a time.",
                 "",
                 "An action has the following format:",
@@ -572,10 +572,6 @@
         "EsdtTokenPayment": {
             "type": "struct",
             "fields": [
-                {
-                    "name": "token_type",
-                    "type": "EsdtTokenType"
-                },
                 {
                     "name": "token_identifier",
                     "type": "TokenIdentifier"
