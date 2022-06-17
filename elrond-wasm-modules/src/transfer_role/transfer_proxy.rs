@@ -92,7 +92,7 @@ pub trait TransferProxyModule {
             ManagedAsyncCallResult::Err(err) => {
                 if initial_payments.len() > 0 {
                     self.send()
-                        .direct_multi(&original_caller, &initial_payments, &[]);
+                        .direct_multi(&original_caller, &initial_payments);
                 }
 
                 let mut err_result = MultiValueEncoded::new();

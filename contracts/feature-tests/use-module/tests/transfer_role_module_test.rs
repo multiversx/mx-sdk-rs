@@ -110,40 +110,37 @@ fn test_transfer_role_module() {
     );
 
     // transfer to sc - err, wrong number of args
-    //
-    // does not work yet
-    //
-    // b_mock
-    //     .execute_esdt_transfer(
-    //         &user,
-    //         &sc_with_transfer_role,
-    //         TRANSFER_TOKEN_ID,
-    //         0,
-    //         &rust_biguint!(100),
-    //         |sc| {
-    //             let payments = ManagedVec::from_single_item(EsdtTokenPayment::new(
-    //                 managed_token_id!(TRANSFER_TOKEN_ID),
-    //                 0,
-    //                 managed_biguint!(100),
-    //             ));
+    b_mock
+        .execute_esdt_transfer(
+            &user,
+            &sc_with_transfer_role,
+            TRANSFER_TOKEN_ID,
+            0,
+            &rust_biguint!(100),
+            |sc| {
+                let payments = ManagedVec::from_single_item(EsdtTokenPayment::new(
+                    managed_token_id!(TRANSFER_TOKEN_ID),
+                    0,
+                    managed_biguint!(100),
+                ));
 
-    //             let mut args = ManagedArgBuffer::new_empty();
-    //             args.push_arg(b"EVIL ARGUMENT");
-    //             sc.transfer_to_contract_raw(
-    //                 managed_address!(&user),
-    //                 managed_address!(sc_dest.address_ref()),
-    //                 payments,
-    //                 managed_buffer!(RECEIVE_FUNDS_FUNC_NAME),
-    //                 args,
-    //             );
-    //         },
-    //     )
-    //     .assert_ok();
+                let mut args = ManagedArgBuffer::new();
+                args.push_arg(b"EVIL ARGUMENT");
+                sc.transfer_to_contract_raw(
+                    managed_address!(&user),
+                    managed_address!(sc_dest.address_ref()),
+                    payments,
+                    managed_buffer!(RECEIVE_FUNDS_FUNC_NAME),
+                    args,
+                );
+            },
+        )
+        .assert_ok();
 
-    // b_mock.check_esdt_balance(&user, TRANSFER_TOKEN_ID, &rust_biguint!(800));
-    // b_mock.check_esdt_balance(
-    //     sc_dest.address_ref(),
-    //     TRANSFER_TOKEN_ID,
-    //     &rust_biguint!(100),
-    // );
+    b_mock.check_esdt_balance(&user, TRANSFER_TOKEN_ID, &rust_biguint!(800));
+    b_mock.check_esdt_balance(
+        sc_dest.address_ref(),
+        TRANSFER_TOKEN_ID,
+        &rust_biguint!(100),
+    );
 }
