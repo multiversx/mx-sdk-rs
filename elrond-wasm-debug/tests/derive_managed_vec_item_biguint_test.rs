@@ -13,7 +13,7 @@ use elrond_wasm_debug::DebugApi;
 // cargo expand --test derive_managed_vec_item_biguint_test > expanded.rs
 
 #[derive(
-    ManagedVecItem, NestedEncode, NestedDecode, TopEncode, TopDecode, PartialEq, Clone, Debug,
+    ManagedVecItem, NestedEncode, NestedDecode, TopEncode, TopDecode, PartialEq, Eq, Clone, Debug,
 )]
 pub struct ManagedStructWithBigUint<M: ManagedTypeApi> {
     pub big_uint: elrond_wasm::types::BigUint<M>,

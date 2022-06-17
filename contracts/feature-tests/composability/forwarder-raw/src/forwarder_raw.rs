@@ -16,31 +16,21 @@ pub trait ForwarderRaw {
     #[payable("*")]
     fn forward_payment(&self, to: ManagedAddress) {
         let (token, payment) = self.call_value().egld_or_single_fungible_esdt();
-        if token.is_egld() {
-            self.send().direct_egld(&to, &payment, ManagedBuffer::new());
-        } else {
-            self.send().transfer_esdt_via_async_call(
-                &to,
-                &token.unwrap_esdt(),
-                0,
-                &payment,
-                ManagedBuffer::new(),
-            );
-        }
+        self.send().direct(&to, &token, 0, &payment);
     }
 
     #[endpoint]
     #[payable("*")]
     fn forward_direct_esdt_via_transf_exec(&self, to: ManagedAddress) {
         let (token, payment) = self.call_value().single_fungible_esdt();
-        self.send().direct_esdt(&to, &token, 0, &payment, &[]);
+        self.send().direct_esdt(&to, &token, 0, &payment);
     }
 
     #[endpoint]
     #[payable("*")]
     fn forward_direct_esdt_multi(&self, to: ManagedAddress) {
         let payments = self.call_value().all_esdt_transfers();
-        self.send().direct_multi(&to, &payments, &[]);
+        self.send().direct_multi(&to, &payments);
     }
 
     fn forward_contract_call(
@@ -176,11 +166,10 @@ pub trait ForwarderRaw {
             all_payments.push(EsdtTokenPayment::new(token_identifier, token_nonce, amount));
         }
 
-        self.send().transfer_multiple_esdt_via_async_call(
-            &to,
-            &all_payments,
-            &b"burn_and_create_retrive_async"[..],
-        );
+        ContractCall::<Self::Api, ()>::new(to, "burn_and_create_retrive_async".into())
+            .with_multi_token_transfer(all_payments)
+            .async_call()
+            .call_and_exit_ignore_callback()
     }
 
     #[view]
@@ -278,24 +267,6 @@ pub trait ForwarderRaw {
             &endpoint_name,
             &arg_buffer,
         );
-        self.execute_on_dest_context_result(result);
-    }
-
-    #[endpoint]
-    fn call_execute_on_dest_context_by_caller(
-        &self,
-        to: ManagedAddress,
-        endpoint_name: ManagedBuffer,
-        args: MultiValueEncoded<ManagedBuffer>,
-    ) {
-        let half_gas = self.blockchain().get_gas_left() / 2;
-        let result = self.send_raw().execute_on_dest_context_by_caller_raw(
-            half_gas,
-            &to,
-            &endpoint_name,
-            &args.to_arg_buffer(),
-        );
-
         self.execute_on_dest_context_result(result);
     }
 

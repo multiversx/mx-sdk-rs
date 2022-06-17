@@ -51,13 +51,13 @@ pub trait GovernanceModule:
             downvotes_mapper.clear();
 
             self.send()
-                .direct_esdt(&caller, &governance_token_id, 0, &total_tokens, &[]);
+                .direct_esdt(&caller, &governance_token_id, 0, &total_tokens);
         }
     }
 
-    /// Propose a list of actions. 
+    /// Propose a list of actions.
     /// A maximum of MAX_GOVERNANCE_PROPOSAL_ACTIONS can be proposed at a time.
-    /// 
+    ///
     /// An action has the following format:
     ///     - gas limit for action execution
     ///     - destination address

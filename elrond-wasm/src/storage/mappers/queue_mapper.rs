@@ -19,13 +19,13 @@ const INFO_IDENTIFIER: &[u8] = b".info";
 const NODE_IDENTIFIER: &[u8] = b".node_links";
 const VALUE_IDENTIFIER: &[u8] = b".value";
 
-#[derive(TopEncode, TopDecode, PartialEq, Clone, Copy)]
+#[derive(TopEncode, TopDecode, PartialEq, Eq, Clone, Copy)]
 pub struct Node {
     pub previous: u32,
     pub next: u32,
 }
 
-#[derive(TopEncodeOrDefault, TopDecodeOrDefault, PartialEq, Clone, Copy)]
+#[derive(TopEncodeOrDefault, TopDecodeOrDefault, PartialEq, Eq, Clone, Copy)]
 pub struct QueueMapperInfo {
     pub len: u32,
     pub front: u32,

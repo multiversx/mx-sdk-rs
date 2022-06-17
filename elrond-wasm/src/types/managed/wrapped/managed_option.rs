@@ -11,6 +11,8 @@ use crate::{
     types::{ManagedRef, ManagedType},
 };
 
+use super::ManagedVecItem;
+
 /// A very efficient optional managed type.
 ///
 /// `None` is flagged by a special invalid handle.
@@ -29,20 +31,20 @@ where
     M: ManagedTypeApi,
     T: ManagedType<M>,
 {
-    pub fn some(value: T) -> Self {
+    fn new_with_handle(handle: Handle) -> Self {
         Self {
             _phantom_m: PhantomData,
             _phantom_t: PhantomData,
-            handle: value.get_raw_handle(),
+            handle,
         }
     }
 
+    pub fn some(value: T) -> Self {
+        Self::new_with_handle(value.get_raw_handle())
+    }
+
     pub fn none() -> Self {
-        Self {
-            _phantom_m: PhantomData,
-            _phantom_t: PhantomData,
-            handle: const_handles::MANAGED_OPTION_NONE,
-        }
+        Self::new_with_handle(const_handles::MANAGED_OPTION_NONE)
     }
 }
 
@@ -176,6 +178,31 @@ where
     M: ManagedTypeApi,
     T: ManagedType<M> + PartialEq,
 {
+}
+
+impl<M, T> ManagedVecItem for ManagedOption<M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedType<M> + 'static,
+{
+    const PAYLOAD_SIZE: usize = 4;
+    const SKIPS_RESERIALIZATION: bool = false;
+    type Ref<'a> = Self;
+
+    fn from_byte_reader<Reader: FnMut(&mut [u8])>(reader: Reader) -> Self {
+        let handle = Handle::from_byte_reader(reader);
+        Self::new_with_handle(handle)
+    }
+
+    unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
+        reader: Reader,
+    ) -> Self::Ref<'a> {
+        Self::from_byte_reader(reader)
+    }
+
+    fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, writer: Writer) -> R {
+        <Handle as ManagedVecItem>::to_byte_writer(&self.handle, writer)
+    }
 }
 
 impl<M, T> TopEncode for ManagedOption<M, T>

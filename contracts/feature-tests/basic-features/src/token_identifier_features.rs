@@ -9,7 +9,7 @@ pub trait TokenIdentifierFeatures {
 
     #[endpoint]
     fn token_identifier_is_valid_1(&self, token_id: EgldOrEsdtTokenIdentifier) -> bool {
-        token_id.is_valid_esdt_identifier()
+        token_id.is_valid()
     }
 
     #[endpoint]

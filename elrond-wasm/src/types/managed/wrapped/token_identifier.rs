@@ -2,7 +2,7 @@ use crate::{
     abi::{TypeAbi, TypeName},
     api::{Handle, ManagedTypeApi, ManagedTypeApiImpl},
     formatter::{FormatByteReceiver, SCDisplay, SCLowerHex},
-    types::{heap::BoxedBytes, ManagedBuffer, ManagedType},
+    types::{ManagedBuffer, ManagedType},
 };
 use elrond_codec::*;
 
@@ -12,7 +12,7 @@ use elrond_codec::*;
 ///
 /// Not yet implemented, but we might add additional restrictions when deserializing as argument.
 #[repr(transparent)]
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub struct TokenIdentifier<M: ManagedTypeApi> {
     buffer: ManagedBuffer<M>,
 }
@@ -43,23 +43,6 @@ impl<M: ManagedTypeApi> TokenIdentifier<M> {
     }
 
     #[inline]
-    pub fn empty() -> Self {
-        TokenIdentifier {
-            buffer: ManagedBuffer::new(),
-        }
-    }
-
-    #[inline]
-    pub fn len(&self) -> usize {
-        self.buffer.len()
-    }
-
-    #[inline]
-    pub fn is_empty(&self) -> bool {
-        self.buffer.is_empty()
-    }
-
-    #[inline]
     pub fn into_managed_buffer(self) -> ManagedBuffer<M> {
         self.buffer
     }
@@ -70,7 +53,7 @@ impl<M: ManagedTypeApi> TokenIdentifier<M> {
     }
 
     #[inline]
-    pub fn to_esdt_identifier(&self) -> BoxedBytes {
+    pub fn to_boxed_bytes(&self) -> crate::types::heap::BoxedBytes {
         self.buffer.to_boxed_bytes()
     }
 
@@ -91,6 +74,12 @@ impl<M: ManagedTypeApi> From<&[u8]> for TokenIdentifier<M> {
         TokenIdentifier {
             buffer: ManagedBuffer::new_from_bytes(bytes),
         }
+    }
+}
+
+impl<M: ManagedTypeApi> From<&str> for TokenIdentifier<M> {
+    fn from(s: &str) -> Self {
+        TokenIdentifier::from(s.as_bytes())
     }
 }
 
@@ -174,5 +163,22 @@ impl<M: ManagedTypeApi> SCLowerHex for TokenIdentifier<M> {
         f.append_managed_buffer_lower_hex(&ManagedBuffer::from_raw_handle(
             self.buffer.get_raw_handle(),
         ));
+    }
+}
+
+impl<M: ManagedTypeApi> core::fmt::Display for TokenIdentifier<M> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        let bytes = self.buffer.to_boxed_bytes();
+        let s = alloc::string::String::from_utf8_lossy(bytes.as_slice());
+        s.fmt(f)
+    }
+}
+
+impl<M: ManagedTypeApi> core::fmt::Debug for TokenIdentifier<M> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        use crate::alloc::string::ToString;
+        f.debug_tuple("TokenIdentifier")
+            .field(&self.to_string())
+            .finish()
     }
 }
