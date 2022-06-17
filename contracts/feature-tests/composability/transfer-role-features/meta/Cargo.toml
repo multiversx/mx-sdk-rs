@@ -1,0 +1,12 @@
+[package]
+name = "transfer-role-features-meta"
+version = "0.0.0"
+edition = "2018"
+publish = false
+
+[dependencies.transfer-role-features]
+path = ".."
+
+[dependencies.elrond-wasm-debug]
+version = "0.32.0"
+path = "../../../../../elrond-wasm-debug"
