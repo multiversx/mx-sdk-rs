@@ -34,8 +34,6 @@ pub trait UseModule:
     + elrond_wasm_modules::pause::PauseModule
     + elrond_wasm_modules::staking::StakingModule
     + elrond_wasm_modules::default_issue_callbacks::DefaultIssueCallbacksModule
-    + elrond_wasm_modules::transfer_role::transfer_proxy::TransferProxyModule
-    + elrond_wasm_modules::transfer_role::transfer_destination::TransferDestinationModule
 {
     /// Validates that the "featureName" feature is on.
     /// Uses the `feature_guard!` macro.
@@ -47,37 +45,5 @@ pub trait UseModule:
     #[endpoint(checkPause)]
     fn check_pause(&self) -> SCResult<bool> {
         Ok(self.is_paused())
-    }
-
-    #[payable("*")]
-    #[endpoint(forwardPayments)]
-    fn forward_payments(
-        &self,
-        dest: ManagedAddress,
-        endpoint_name: ManagedBuffer,
-        args: MultiValueEncoded<ManagedBuffer>,
-    ) {
-        let original_caller = self.blockchain().get_caller();
-        let payments = self.call_value().all_esdt_transfers();
-        if payments.is_empty() {
-            return;
-        }
-
-        if !self.blockchain().is_smart_contract(&dest) {
-            self.transfer_to_user(original_caller, dest, payments, endpoint_name);
-        } else {
-            let mut args_buffer = ManagedArgBuffer::new();
-            for arg in args {
-                args_buffer.push_arg(arg);
-            }
-
-            self.transfer_to_contract_raw(
-                original_caller,
-                dest,
-                payments,
-                endpoint_name,
-                args_buffer,
-            );
-        }
     }
 }

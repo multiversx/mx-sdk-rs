@@ -1,17 +1,13 @@
-use elrond_wasm::types::{
-    EsdtLocalRole, EsdtTokenPayment, ManagedArgBuffer, ManagedVec, MultiValueEncoded,
-};
+use elrond_wasm::types::{EsdtLocalRole, EsdtTokenPayment, ManagedArgBuffer, ManagedVec};
 use elrond_wasm_debug::{
     managed_address, managed_biguint, managed_buffer, managed_token_id, rust_biguint,
     testing_framework::BlockchainStateWrapper,
 };
-use elrond_wasm_modules::transfer_role::{
-    transfer_destination::TransferDestinationModule, transfer_proxy::TransferProxyModule,
-};
+use elrond_wasm_modules::transfer_role_proxy::TransferRoleProxyModule;
 
 static TRANSFER_TOKEN_ID: &[u8] = b"TRANSFER-123456";
-static WASM_PATH: &'static str = "wasm path";
-static RECEIVE_FUNDS_FUNC_NAME: &[u8] = b"receiveFunds";
+static ACCEPT_FUNDS_FUNC_NAME: &[u8] = b"accept_funds";
+static REJECT_FUNDS_FUNC_NAME: &[u8] = b"reject_funds";
 
 #[test]
 fn test_transfer_role_module() {
@@ -24,15 +20,10 @@ fn test_transfer_role_module() {
     let sc_with_transfer_role = b_mock.create_sc_account(
         &rust_zero,
         Some(&owner),
-        use_module::contract_obj,
-        WASM_PATH,
+        transfer_role_features::contract_obj,
+        "wasm 1",
     );
-    let sc_dest = b_mock.create_sc_account(
-        &rust_zero,
-        Some(&owner),
-        use_module::contract_obj,
-        WASM_PATH,
-    );
+    let sc_dest = b_mock.create_sc_account(&rust_zero, Some(&owner), vault::contract_obj, "wasm 2");
 
     // Note: The role restrictions are not currently implemented in the mock
     b_mock.set_esdt_local_roles(
@@ -40,15 +31,6 @@ fn test_transfer_role_module() {
         TRANSFER_TOKEN_ID,
         &[EsdtLocalRole::Transfer],
     );
-
-    // add sc to whitelist
-    b_mock
-        .execute_tx(&owner, &sc_dest, &rust_zero, |sc| {
-            let mut args = MultiValueEncoded::new();
-            args.push(managed_address!(sc_with_transfer_role.address_ref()));
-            sc.add_contract_to_whitelist(args);
-        })
-        .assert_ok();
 
     // transfer to user
     b_mock
@@ -95,8 +77,9 @@ fn test_transfer_role_module() {
                     managed_address!(&user),
                     managed_address!(sc_dest.address_ref()),
                     payments,
-                    managed_buffer!(RECEIVE_FUNDS_FUNC_NAME),
+                    managed_buffer!(ACCEPT_FUNDS_FUNC_NAME),
                     ManagedArgBuffer::new(),
+                    None,
                 );
             },
         )
@@ -124,14 +107,13 @@ fn test_transfer_role_module() {
                     managed_biguint!(100),
                 ));
 
-                let mut args = ManagedArgBuffer::new();
-                args.push_arg(b"EVIL ARGUMENT");
                 sc.transfer_to_contract_raw(
                     managed_address!(&user),
                     managed_address!(sc_dest.address_ref()),
                     payments,
-                    managed_buffer!(RECEIVE_FUNDS_FUNC_NAME),
-                    args,
+                    managed_buffer!(REJECT_FUNDS_FUNC_NAME),
+                    ManagedArgBuffer::new(),
+                    None,
                 );
             },
         )
