@@ -37,7 +37,7 @@ deployTransferSc() {
 }
 
 deployVault() {
-    erdpy --verbose contract deploy --bytecode="../vault/output/vault.wasm" \
+    erdpy --verbose contract deploy --bytecode="../../vault/output/vault.wasm" \
     --recall-nonce --pem=${USER_PEM} \
     --gas-limit=100000000 \
     --send --outfile="deploy-testnet.interaction.json" \
