@@ -54,13 +54,13 @@
                 },
                 "sc:vault": {
                     "nonce": "0",
-                    "balance": "1000",
+                    "balance": "0",
                     "storage": {},
                     "code": "file:../vault/output/vault.wasm"
                 },
                 "sc:forwarder": {
                     "nonce": "0",
-                    "balance": "0",
+                    "balance": "1000",
                     "storage": {
                         "str:call_counts|nested:str:accept_funds": "1"
                     },
