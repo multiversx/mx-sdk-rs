@@ -67,7 +67,11 @@ pub fn async_callback_tx_input(async_data: &AsyncCallTxData, async_result: &TxRe
         None => TxInput {
             from: async_data.to.clone(),
             to: async_data.from.clone(),
-            egld_value: 0u32.into(),
+            egld_value: async_result
+                .result_calls
+                .transfer_execute_calls
+                .egld_value
+                .clone(),
             esdt_values: Vec::new(),
             func_name: b"callBack".to_vec(),
             args,

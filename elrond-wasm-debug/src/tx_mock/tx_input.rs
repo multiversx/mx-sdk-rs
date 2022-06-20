@@ -173,9 +173,15 @@ impl TxInput {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub struct TxInputESDT {
     pub token_identifier: Vec<u8>,
     pub nonce: u64,
     pub value: BigUint,
+}
+
+#[derive(Clone, Debug, Default)]
+pub struct TxInputESDTOrEGLD {
+    pub egld_value: BigUint,
+    pub esdt_value: TxInputESDT,
 }

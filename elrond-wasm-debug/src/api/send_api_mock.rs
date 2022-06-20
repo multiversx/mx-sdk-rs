@@ -156,6 +156,7 @@ impl DebugApi {
     fn perform_async_call(&self, call: AsyncCallTxData) -> ! {
         // the cell is no longer needed, since we end in a panic
         let mut tx_result = self.extract_result();
+        tx_result.result_calls.transfer_execute_calls.egld_value = call.call_value.clone();
         tx_result.result_calls.async_call = Some(call);
         std::panic::panic_any(tx_result)
     }

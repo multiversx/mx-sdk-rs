@@ -14,7 +14,9 @@ use crate::{
     num_bigint,
     testing_framework::raw_converter::bytes_to_hex,
     tx_execution::{execute_async_call_and_callback, interpret_panic_as_tx_result},
-    tx_mock::{TxCache, TxContext, TxContextStack, TxInput, TxInputESDT, TxResult},
+    tx_mock::{
+        TxCache, TxContext, TxContextStack, TxInput, TxInputESDT, TxInputESDTOrEGLD, TxResult,
+    },
     world_mock::{is_smart_contract_address, AccountData, AccountEsdt, EsdtInstanceMetadata},
     BlockchainMock, DebugApi,
 };
@@ -731,7 +733,11 @@ impl BlockchainStateWrapper {
             if let Some(async_data) = &tx_result.result_calls.async_call {
                 let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
                 b_mock_ref.with_borrowed(|state| {
-                    let (_, _, state) = execute_async_call_and_callback(async_data.clone(), state);
+                    let (_, _, state) = execute_async_call_and_callback(
+                        async_data.clone(),
+                        state,
+                        TxInputESDTOrEGLD::default(),
+                    );
                     ((), state)
                 });
             }

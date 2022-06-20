@@ -5,7 +5,8 @@ use elrond_wasm::types::Address;
 use crate::{
     tx_mock::{
         async_call_tx_input, async_callback_tx_input, async_promise_tx_input, merge_results,
-        AsyncCallTxData, Promise, TxCache, TxContext, TxInput, TxResult, TxResultCalls,
+        AsyncCallTxData, Promise, TxCache, TxContext, TxInput, TxInputESDTOrEGLD, TxResult,
+        TxResultCalls,
     },
     world_mock::{AccountData, AccountEsdt, BlockchainMock},
 };
@@ -38,6 +39,7 @@ pub fn execute_sc_call(tx_input: TxInput, mut state: BlockchainMock) -> (TxResul
 pub fn execute_async_call_and_callback(
     async_data: AsyncCallTxData,
     state: BlockchainMock,
+    tx_payments: TxInputESDTOrEGLD,
 ) -> (TxResult, TxResult, BlockchainMock) {
     if state.accounts.contains_key(&async_data.to) {
         let async_input = async_call_tx_input(&async_data);
@@ -45,7 +47,8 @@ pub fn execute_async_call_and_callback(
         let (async_result, state) = sc_call_with_async_and_callback(async_input, state);
 
         let callback_input = async_callback_tx_input(&async_data, &async_result);
-        let (callback_result, state) = execute_sc_call(callback_input, state);
+        let (mut callback_result, state) = execute_sc_call(callback_input, state);
+
         assert!(
             callback_result.result_calls.async_call.is_none(),
             "successive asyncs currently not supported"
@@ -94,8 +97,11 @@ pub fn sc_call_with_async_and_callback(
     let result_calls = std::mem::replace(&mut tx_result.result_calls, TxResultCalls::empty());
     if tx_result.result_status == 0 {
         if let Some(async_data) = result_calls.async_call {
-            let (async_result, callback_result, new_state) =
-                execute_async_call_and_callback(async_data, state);
+            let (async_result, callback_result, new_state) = execute_async_call_and_callback(
+                async_data,
+                state,
+                tx_result.result_calls.transfer_execute_calls.clone(),
+            );
             state = new_state;
 
             tx_result = merge_results(tx_result, async_result);
@@ -124,6 +130,7 @@ pub fn execute_promise_call_and_callback(
 ) -> (TxResult, TxResult, BlockchainMock) {
     if state.accounts.contains_key(&promise.endpoint.to) {
         let async_input = async_call_tx_input(&promise.endpoint);
+
         let (async_result, state) = sc_call_with_async_and_callback(async_input, state);
 
         let callback_input = async_promise_tx_input(address, promise, &async_result);
