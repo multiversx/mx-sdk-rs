@@ -71,7 +71,7 @@
                         "data": "0"
                     },
                     {
-                        "address": "sc:basic-features",
+                        "address": "*",
                         "endpoint": "str:logEventARepeat",
                         "topics": [
                             "str:event_a"

@@ -115,7 +115,7 @@
                     },
                     "storage": {
                         "str:callback_data.item|u32:1": {
-                            "1-return_code": "u32:0"
+                            "1-return_code": "nested:0x00"
                         },
                         "str:callback_data.len": "1",
                         "str:callback_payments.item|u32:1": {

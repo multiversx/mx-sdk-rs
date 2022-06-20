@@ -50,7 +50,7 @@
                             "str:callback_raw"
                         ],
                         "data": {
-                            "0-status": "biguint:0",
+                            "0-status": "nested:0x00",
                             "1-echoed-args": [
                                 "biguint:1",
                                 "biguint:2"
@@ -85,7 +85,7 @@
                     "storage": {
                         "str:callback_data.len": "1",
                         "str:callback_data.item|u32:1": [
-                            "biguint:0",
+                            "nested:0x00",
                             "biguint:1",
                             "biguint:2"
                         ]
