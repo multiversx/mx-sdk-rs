@@ -1,7 +1,8 @@
 use elrond_wasm::types::heap::Address;
+use num_traits::Zero;
 
 use crate::{
-    tx_mock::{BlockchainUpdate, TxCache, TxContext, TxInput, TxResult},
+    tx_mock::{BlockchainUpdate, TxCache, TxContext, TxInput, TxLog, TxResult},
     world_mock::is_smart_contract_address,
 };
 
@@ -19,6 +20,25 @@ pub fn default_execution(tx_input: TxInput, tx_cache: TxCache) -> (TxResult, Blo
         &tx_context.tx_input_box.egld_value,
     );
 
+    // skip for transactions coming directly from mandos, which should all be coming from user wallets
+    // TODO: reorg context logic
+    let add_transfer_log = is_smart_contract_address(&tx_context.tx_input_box.from)
+        && !tx_context.tx_input_box.egld_value.is_zero();
+    let transfer_value_log = if add_transfer_log {
+        Some(TxLog {
+            address: Address::zero(), // TODO: figure out the real VM behavior
+            endpoint: b"transferValueOnly".to_vec(),
+            topics: vec![
+                tx_context.tx_input_box.from.to_vec(),
+                tx_context.tx_input_box.to.to_vec(),
+                tx_context.tx_input_box.egld_value.to_bytes_be(),
+            ],
+            data: Vec::new(),
+        })
+    } else {
+        None
+    };
+
     // TODO: temporary, will convert to explicit builtin function first
     for esdt_transfer in tx_context.tx_input_box.esdt_values.iter() {
         tx_context.tx_cache.transfer_esdt_balance(
@@ -30,7 +50,7 @@ pub fn default_execution(tx_input: TxInput, tx_cache: TxCache) -> (TxResult, Blo
         );
     }
 
-    let tx_result = if !is_smart_contract_address(&tx_context.tx_input_box.to)
+    let mut tx_result = if !is_smart_contract_address(&tx_context.tx_input_box.to)
         || tx_context.tx_input_box.func_name.is_empty()
     {
         // direct EGLD transfer
@@ -40,6 +60,10 @@ pub fn default_execution(tx_input: TxInput, tx_cache: TxCache) -> (TxResult, Blo
         tx_context = tx_context_modified;
         tx_result
     };
+
+    if let Some(tv_log) = transfer_value_log {
+        tx_result.result_logs.insert(0, tv_log);
+    }
 
     let blockchain_updates = tx_context.into_blockchain_updates();
 

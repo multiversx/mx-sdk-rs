@@ -52,6 +52,16 @@
                         "data": ""
                     },
                     {
+                        "address": "*",
+                        "endpoint": "str:transferValueOnly",
+                        "topics": [
+                            "sc:vault",
+                            "sc:forwarder",
+                            "1000"
+                        ],
+                        "data": ""
+                    },
+                    {
                         "address": "sc:forwarder",
                         "endpoint": "str:callBack",
                         "topics": [
