@@ -4,6 +4,11 @@ There are several crates in this repo, this changelog will keep track of all of 
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [elrond-wasm 0.33.0, mandos 0.15.0] - 2022-06-20
+- Removed the data field for direct EGLD & ESDT transfers.
+- Testing and debugging environment aligned with VM version 1.4.53.
+- Call value and token data infrastructure additional cleanup.
+
 ## [elrond-wasm 0.32.0, mandos 0.14.0] - 2022-06-03
 - VM new functionality added as part of the environment interface 1.2:
 	- Fully managed functionality for elliptic curves (no allocator);
