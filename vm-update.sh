@@ -2,7 +2,7 @@
 
 # Locally update the VM version
 
-VM_TAG="v1.4.51"
+VM_TAG="v1.4.53"
 
 echo "Before:"
 erdpy config dump

@@ -12,7 +12,7 @@ pub struct TxLog {
 
 impl TxLog {
     pub fn mandos_check(&self, check_log: &mandos::model::CheckLog) -> bool {
-        self.address.to_vec() == check_log.address.value
+        check_log.address.check(self.address.as_bytes())
             && check_log.endpoint.check(self.endpoint.as_slice())
             && check_log.topics.check(self.topics.as_slice())
             && check_log.data.check(self.data.as_slice())

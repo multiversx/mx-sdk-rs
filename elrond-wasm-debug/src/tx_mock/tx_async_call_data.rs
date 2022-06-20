@@ -34,10 +34,17 @@ pub fn async_call_tx_input(async_data: &AsyncCallTxData) -> TxInput {
     }
 }
 
+fn result_status_bytes(result_status: u64) -> Vec<u8> {
+    if result_status == 0 {
+        vec![0x00]
+    } else {
+        top_encode_to_vec_u8(&result_status).unwrap()
+    }
+}
+
 pub fn async_callback_tx_input(async_data: &AsyncCallTxData, async_result: &TxResult) -> TxInput {
     let mut args: Vec<Vec<u8>> = Vec::new();
-    let serialized_bytes = top_encode_to_vec_u8(&async_result.result_status).unwrap();
-    args.push(serialized_bytes);
+    args.push(result_status_bytes(async_result.result_status));
     if async_result.result_status == 0 {
         args.extend_from_slice(async_result.result_values.as_slice());
     } else {
