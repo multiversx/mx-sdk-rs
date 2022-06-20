@@ -8,13 +8,13 @@ publish = false
 path = "src/swap.rs"
 
 [dependencies.elrond-wasm]
-version = "0.32.0"
+version = "0.33.0"
 path = "../../../elrond-wasm"
 
 [dependencies.elrond-wasm-modules]
-version = "0.32.0"
+version = "0.33.0"
 path = "../../../elrond-wasm-modules"
 
 [dev-dependencies.elrond-wasm-debug]
-version = "0.32.0"
+version = "0.33.0"
 path = "../../../elrond-wasm-debug"
