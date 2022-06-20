@@ -48,7 +48,7 @@ pub fn check_tx_output(tx_id: &str, tx_expect: &TxExpect, tx_result: &TxResult) 
                         "Logs do not match. Tx id: {}. Index: {}.\nWant: Address: {}, Endpoint: {}, Topics: {:?}, Data: {}\nHave: Address: {}, Endpoint: {}, Topics: {:?}, Data: {}",
                         tx_id,
                         i,
-                        verbose_hex(&expected_log.address.value),
+                        &expected_log.address,
                         &expected_log.endpoint,
                         &expected_log.topics.pretty_str(),
                         &expected_log.data,
