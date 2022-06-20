@@ -95,7 +95,7 @@
                         }
                     },
                     "storage": {
-                        "str:callback_data.item|u32:1": "u32:0",
+                        "str:callback_data.item|u32:1": "nested:0x00",
                         "str:callback_data.len": "1",
                         "str:callback_payments.item|u32:1": {
                             "1-token_id": "nested:str:TEST-SFTABC",
