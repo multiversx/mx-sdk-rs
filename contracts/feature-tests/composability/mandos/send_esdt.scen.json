@@ -93,19 +93,7 @@
             "expect": {
                 "out": [],
                 "status": "",
-                "logs": [
-                    {
-                        "address": "sc:basic-features",
-                        "endpoint": "str:ESDTTransfer",
-                        "topics": [
-                            "str:BASIC-FEATUR",
-                            "",
-                            "100",
-                            "address:an_account"
-                        ],
-                        "data": ""
-                    }
-                ]
+                "logs": "*"
             }
         },
         {

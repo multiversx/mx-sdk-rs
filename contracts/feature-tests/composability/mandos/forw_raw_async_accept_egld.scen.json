@@ -40,6 +40,16 @@
                 "status": "0",
                 "logs": [
                     {
+                        "address": "*",
+                        "endpoint": "str:transferValueOnly",
+                        "topics": [
+                            "sc:forwarder",
+                            "sc:vault",
+                            "1000"
+                        ],
+                        "data": ""
+                    },
+                    {
                         "address": "sc:vault",
                         "endpoint": "str:accept_funds",
                         "topics": [
@@ -55,7 +65,7 @@
                             "str:callback_raw"
                         ],
                         "data": {
-                            "0-status": "biguint:0"
+                            "0-status": "nested:0x00"
                         }
                     }
                 ],
@@ -86,7 +96,7 @@
                     "storage": {
                         "str:callback_data.len": "1",
                         "str:callback_data.item|u32:1": [
-                            "u32:0"
+                            "nested:0x00"
                         ]
                     },
                     "code": "file:../forwarder-raw/output/forwarder-raw.wasm"
