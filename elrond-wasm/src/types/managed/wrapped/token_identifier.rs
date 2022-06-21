@@ -99,7 +99,7 @@ impl<M: ManagedTypeApi> PartialEq<EgldOrEsdtTokenIdentifier<M>> for TokenIdentif
     fn eq(&self, other: &EgldOrEsdtTokenIdentifier<M>) -> bool {
         other.map_ref_or_else(
             || false,
-            |self_esdt_token_identifier| self_esdt_token_identifier == self,
+            |esdt_token_identifier| esdt_token_identifier == self,
         )
     }
 }
