@@ -75,7 +75,7 @@ pub trait Crowdfunding {
                 let sc_balance = self.get_current_funds();
 
                 self.send()
-                    .direct(&caller, &token_identifier, 0, &sc_balance, &[]);
+                    .direct(&caller, &token_identifier, 0, &sc_balance);
             },
             Status::Failed => {
                 let caller = self.blockchain().get_caller();
@@ -85,8 +85,7 @@ pub trait Crowdfunding {
                     let token_identifier = self.cf_token_identifier().get();
 
                     self.deposit(&caller).clear();
-                    self.send()
-                        .direct(&caller, &token_identifier, 0, &deposit, &[]);
+                    self.send().direct(&caller, &token_identifier, 0, &deposit);
                 }
             },
         }

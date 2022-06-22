@@ -55,6 +55,16 @@
                         "data": "0x200"
                     },
                     {
+                        "address": "*",
+                        "endpoint": "str:transferValueOnly",
+                        "topics": [
+                            "sc:crypto_bubbles",
+                            "address:acc1",
+                            "0x0200"
+                        ],
+                        "data": ""
+                    },
+                    {
                         "address": "sc:crypto_bubbles",
                         "endpoint": "str:rewardAndSendToWallet",
                         "topics": [
@@ -90,8 +100,7 @@
                     "nonce": "0",
                     "balance": "0x200",
                     "storage": {},
-                    "code": "",
-                    "asyncCallData": "str:crypto bubbles"
+                    "code": ""
                 }
             }
         }

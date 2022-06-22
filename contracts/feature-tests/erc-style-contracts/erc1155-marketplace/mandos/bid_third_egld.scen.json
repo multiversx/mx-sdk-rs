@@ -24,10 +24,7 @@
             "expect": {
                 "out": [],
                 "status": "0",
-                "message": "",
-                "logs": [],
-                "gas": "*",
-                "refund": "*"
+                "message": ""
             }
         },
         {

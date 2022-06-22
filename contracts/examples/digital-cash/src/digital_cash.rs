@@ -53,7 +53,6 @@ pub trait DigitalCash {
             &deposit.token_name,
             deposit.nonce,
             &deposit.amount,
-            b"successful withdrawal",
         );
 
         self.deposit(&address).clear();
@@ -88,7 +87,6 @@ pub trait DigitalCash {
             &deposit.token_name,
             deposit.nonce,
             &deposit.amount,
-            b"successful claim",
         );
         self.deposit(&address).clear();
     }

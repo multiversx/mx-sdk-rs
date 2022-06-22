@@ -40,6 +40,16 @@
                 "status": "0",
                 "logs": [
                     {
+                        "address": "*",
+                        "endpoint": "str:transferValueOnly",
+                        "topics": [
+                            "sc:forwarder",
+                            "sc:vault",
+                            "1000"
+                        ],
+                        "data": ""
+                    },
+                    {
                         "address": "sc:vault",
                         "endpoint": "str:accept_funds",
                         "topics": [
@@ -81,6 +91,16 @@
                 "status": "0",
                 "logs": [
                     {
+                        "address": "*",
+                        "endpoint": "str:transferValueOnly",
+                        "topics": [
+                            "sc:forwarder",
+                            "sc:vault",
+                            "500"
+                        ],
+                        "data": ""
+                    },
+                    {
                         "address": "sc:vault",
                         "endpoint": "str:accept_funds",
                         "topics": [
@@ -96,6 +116,16 @@
                             "str:execute_on_dest_context_result"
                         ],
                         "data": {}
+                    },
+                    {
+                        "address": "*",
+                        "endpoint": "str:transferValueOnly",
+                        "topics": [
+                            "sc:forwarder",
+                            "sc:vault",
+                            "500"
+                        ],
+                        "data": ""
                     },
                     {
                         "address": "sc:vault",

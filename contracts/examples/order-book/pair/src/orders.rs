@@ -359,7 +359,6 @@ pub trait OrdersModule:
                     &transfer.payment.token_id,
                     0,
                     &transfer.payment.amount,
-                    &[],
                 )
             }
         }

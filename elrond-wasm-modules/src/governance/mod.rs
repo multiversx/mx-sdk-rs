@@ -51,7 +51,7 @@ pub trait GovernanceModule:
             downvotes_mapper.clear();
 
             self.send()
-                .direct_esdt(&caller, &governance_token_id, 0, &total_tokens, &[]);
+                .direct_esdt(&caller, &governance_token_id, 0, &total_tokens);
         }
     }
 

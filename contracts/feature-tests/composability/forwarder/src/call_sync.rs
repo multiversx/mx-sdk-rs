@@ -121,12 +121,7 @@ pub trait ForwarderSyncCallModule {
     ) {
         self.vault_proxy()
             .contract(to)
-            .retrieve_funds(
-                token,
-                token_nonce,
-                amount,
-                OptionalValue::<ManagedBuffer>::None,
-            )
+            .retrieve_funds(token, token_nonce, amount)
             .execute_on_dest_context()
     }
 

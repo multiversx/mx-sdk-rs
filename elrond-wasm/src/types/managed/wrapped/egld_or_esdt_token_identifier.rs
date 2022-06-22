@@ -113,8 +113,16 @@ impl<M: ManagedTypeApi> EgldOrEsdtTokenIdentifier<M> {
         self.data.unwrap_or_sc_panic("ESDT expected")
     }
 
-    pub fn as_esdt_token_identifier(&self) -> Option<ManagedRef<'_, M, TokenIdentifier<M>>> {
+    /// Representation of the object as an `Option`.
+    /// 
+    /// Because it does not consume `self` only a reference to the ESDT token identifier can be returned.
+    pub fn as_esdt_option(&self) -> Option<ManagedRef<'_, M, TokenIdentifier<M>>> {
         self.data.as_option()
+    }
+
+    /// Converts `self` into an `Option`. Consumes `self` in the process.
+    pub fn into_esdt_option(self) -> Option<TokenIdentifier<M>> {
+        self.data.into_option()
     }
 }
 

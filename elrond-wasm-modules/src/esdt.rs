@@ -67,8 +67,7 @@ pub trait EsdtModule {
                 let initial_caller = self.blockchain().get_owner_address();
                 let egld_returned = self.call_value().egld_value();
                 if egld_returned > 0u32 {
-                    self.send()
-                        .direct_egld(&initial_caller, &egld_returned, &[]);
+                    self.send().direct_egld(&initial_caller, &egld_returned);
                 }
             },
         }

@@ -51,7 +51,7 @@ pub trait KittyOwnership {
             .blockchain()
             .get_sc_balance(&EgldOrEsdtTokenIdentifier::egld(), 0);
 
-        self.send().direct_egld(&caller, &egld_balance, b"claim");
+        self.send().direct_egld(&caller, &egld_balance);
     }
 
     // views/endpoints - ERC721 required
@@ -568,8 +568,7 @@ pub trait KittyOwnership {
 
                 // send birth fee to caller
                 let fee = self.birth_fee().get();
-                self.send()
-                    .direct_egld(&original_caller, &fee, b"birth fee");
+                self.send().direct_egld(&original_caller, &fee);
             },
             ManagedAsyncCallResult::Err(_) => {
                 // this can only fail if the kitty_genes contract address is invalid

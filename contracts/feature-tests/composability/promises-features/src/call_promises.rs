@@ -44,7 +44,6 @@ pub trait CallPromisesModule {
                 token,
                 token_nonce,
                 amount,
-                OptionalValue::<ManagedBuffer>::None,
             )
             .with_gas_limit(gas_limit)
             .async_call_promise()

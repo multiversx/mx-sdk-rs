@@ -1,0 +1,45 @@
+#![no_std]
+#![allow(clippy::type_complexity)]
+
+elrond_wasm::imports!();
+
+#[elrond_wasm::contract]
+pub trait TransferRoleFeatures:
+    elrond_wasm_modules::transfer_role_proxy::TransferRoleProxyModule
+{
+    #[init]
+    fn init(&self) {}
+
+    #[payable("*")]
+    #[endpoint(forwardPayments)]
+    fn forward_payments(
+        &self,
+        dest: ManagedAddress,
+        endpoint_name: ManagedBuffer,
+        args: MultiValueEncoded<ManagedBuffer>,
+    ) {
+        let original_caller = self.blockchain().get_caller();
+        let payments = self.call_value().all_esdt_transfers();
+        if payments.is_empty() {
+            return;
+        }
+
+        if !self.blockchain().is_smart_contract(&dest) {
+            self.transfer_to_user(original_caller, dest, payments, endpoint_name);
+        } else {
+            let mut args_buffer = ManagedArgBuffer::new();
+            for arg in args {
+                args_buffer.push_arg(arg);
+            }
+
+            self.transfer_to_contract_raw(
+                original_caller,
+                dest,
+                payments,
+                endpoint_name,
+                args_buffer,
+                None,
+            );
+        }
+    }
+}

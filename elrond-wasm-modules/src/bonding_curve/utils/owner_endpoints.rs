@@ -120,7 +120,6 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
                     &token,
                     nonce,
                     &self.nonce_amount(&token, nonce).get(),
-                    b"claim",
                 );
                 self.nonce_amount(&token, nonce).clear();
             }
