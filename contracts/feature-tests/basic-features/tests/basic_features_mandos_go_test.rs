@@ -229,6 +229,11 @@ fn only_owner_go() {
 }
 
 #[test]
+fn only_user_account_go() {
+    elrond_wasm_debug::mandos_go("mandos/only_user_account.scen.json");
+}
+
+#[test]
 fn out_of_gas_go() {
     elrond_wasm_debug::mandos_go("mandos/out_of_gas.scen.json");
 }

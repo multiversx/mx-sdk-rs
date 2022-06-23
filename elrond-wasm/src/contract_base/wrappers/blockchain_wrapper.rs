@@ -81,6 +81,12 @@ where
         }
     }
 
+    pub fn check_caller_is_user_account(&self) {
+        if self.is_smart_contract(&self.get_caller()) {
+            A::error_api_impl().signal_error(b"Endpoint can only be called by user accounts");
+        }
+    }
+
     #[cfg(feature = "alloc")]
     #[inline]
     pub fn get_shard_of_address_legacy(&self, address: &crate::types::Address) -> u32 {
