@@ -251,6 +251,11 @@ fn only_owner_rs() {
     elrond_wasm_debug::mandos_rs("mandos/only_owner.scen.json", world());
 }
 
+#[test]
+fn only_user_account_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/only_user_account.scen.json", world());
+}
+
 // Will never run in mandos-rs.
 // #[test]
 // fn out_of_gas_rs() {
