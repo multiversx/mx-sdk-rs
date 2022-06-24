@@ -5,11 +5,12 @@ use crate::{
         const_handles, BlockchainApi, BlockchainApiImpl, ErrorApi, ErrorApiImpl, ManagedTypeApi,
         StaticVarApiImpl, StorageReadApi, StorageReadApiImpl,
     },
+    err_msg::{ONLY_OWNER_CALLER, ONLY_USER_ACCOUNT_CALLER},
     storage::{self},
     types::{
         BigUint, EgldOrEsdtTokenIdentifier, EsdtLocalRoleFlags, EsdtTokenData, ManagedAddress,
         ManagedByteArray, ManagedType, TokenIdentifier,
-    }, err_msg::{ONLY_OWNER_CALLER, ONLY_USER_ACCOUNT_CALLER},
+    },
 };
 
 /// Interface to be used by the actual smart contract code.
