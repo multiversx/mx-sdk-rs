@@ -29,7 +29,9 @@ elrond_wasm_node::wasm_endpoints! {
         mul_big_float
         mul_big_float_ref
         new_from_frac_big_float
+        new_from_frac_big_float_multiplied
         new_from_parts_big_float
+        new_from_parts_big_float_multiplied
         new_from_sci_big_float
         pow_big_float
         pow_big_float_ref

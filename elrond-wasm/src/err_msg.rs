@@ -35,6 +35,7 @@ pub const CONTRACT_CALL_ENCODE_ERROR: &[u8] = b"contract call encode error: ";
 pub const VALUE_EXCEEDS_SLICE: &[u8] = b"value exceeds target slice";
 pub const BIG_UINT_EXCEEDS_SLICE: &[u8] = b"big uint as_bytes exceed target slice";
 pub const BIG_UINT_SUB_NEGATIVE: &[u8] = b"cannot subtract because result would be negative";
+pub const DIVISION_BY_0: &str = "division by 0";
 
 pub const EXPONENT_IS_POSITIVE: &[u8] = b"exponent must be negative";
 pub const NUMBER_IS_NOT_NORMAL: &[u8] =

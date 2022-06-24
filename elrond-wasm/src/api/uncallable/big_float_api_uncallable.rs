@@ -61,6 +61,7 @@ impl BigFloatApi for super::UncallableApi {
     fn bf_is_bi(&self, _x: Handle) -> bool {
         unreachable!()
     }
+
     fn bf_set_i64(&self, _dest: Handle, _value: i64) {
         unreachable!()
     }
