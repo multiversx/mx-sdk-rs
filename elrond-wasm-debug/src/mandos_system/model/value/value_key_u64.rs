@@ -17,15 +17,6 @@ pub struct U64Key {
     pub original: String,
 }
 
-impl From<u64> for U64Key {
-    fn from(v: u64) -> Self {
-        U64Key {
-            value: v,
-            original: String::default(),
-        }
-    }
-}
-
 impl PartialEq for U64Key {
     fn eq(&self, other: &Self) -> bool {
         self.value == other.value
@@ -46,13 +37,13 @@ impl Ord for U64Key {
     }
 }
 
-impl InterpretableFrom<String> for U64Key {
-    fn interpret_from(from: String, context: &InterpreterContext) -> Self {
-        let bytes = interpret_string(&from, context);
+impl InterpretableFrom<&str> for U64Key {
+    fn interpret_from(from: &str, context: &InterpreterContext) -> Self {
+        let bytes = interpret_string(from, context);
         let bu = BigUint::from_bytes_be(&bytes);
         U64Key {
             value: bu.to_u64().unwrap(),
-            original: from,
+            original: from.to_string(),
         }
     }
 }
@@ -60,6 +51,37 @@ impl InterpretableFrom<String> for U64Key {
 impl IntoRaw<String> for U64Key {
     fn into_raw(self) -> String {
         self.original
+    }
+}
+
+impl From<u64> for U64Key {
+    fn from(from: u64) -> Self {
+        U64Key {
+            value: from,
+            original: from.to_string(),
+        }
+    }
+}
+
+impl From<u32> for U64Key {
+    fn from(from: u32) -> Self {
+        U64Key {
+            value: from as u64,
+            original: from.to_string(),
+        }
+    }
+}
+
+impl From<i32> for U64Key {
+    fn from(from: i32) -> Self {
+        assert!(from >= 0, "U64Key cannot be negative");
+        Self::from(from as u32)
+    }
+}
+
+impl From<&str> for U64Key {
+    fn from(from: &str) -> Self {
+        U64Key::interpret_from(from, &InterpreterContext::default())
     }
 }
 

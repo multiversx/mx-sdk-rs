@@ -13,9 +13,9 @@ impl SetStateStep {
 
     pub fn put_account<A>(mut self, address_expr: A, account: Account) -> Self
     where
-        AddressKey: InterpretableFrom<A>,
+        AddressKey: From<A>,
     {
-        let address_key = AddressKey::interpret_from(address_expr, &InterpreterContext::default());
+        let address_key = AddressKey::from(address_expr);
         self.accounts.insert(address_key, account);
         self
     }
@@ -27,32 +27,22 @@ impl SetStateStep {
         new_address_expr: NA,
     ) -> Self
     where
-        AddressValue: InterpretableFrom<CA>,
-        AddressValue: InterpretableFrom<NA>,
+        AddressValue: From<CA>,
+        AddressValue: From<NA>,
     {
         self.new_addresses.push(NewAddress {
-            creator_address: AddressValue::interpret_from(
-                creator_address_expr,
-                &InterpreterContext::default(),
-            ),
-            creator_nonce: U64Value::interpret_from(
-                creator_nonce_expr,
-                &InterpreterContext::default(),
-            ),
-            new_address: AddressValue::interpret_from(
-                new_address_expr,
-                &InterpreterContext::default(),
-            ),
+            creator_address: AddressValue::from(creator_address_expr),
+            creator_nonce: U64Value::from(creator_nonce_expr),
+            new_address: AddressValue::from(new_address_expr),
         });
         self
     }
 
     pub fn block_epoch<N>(mut self, block_epoch_expr: N) -> Self
     where
-        U64Value: InterpretableFrom<N>,
+        U64Value: From<N>,
     {
-        let ctx = InterpreterContext::default();
-        let block_epoch = U64Value::interpret_from(block_epoch_expr, &ctx);
+        let block_epoch = U64Value::from(block_epoch_expr);
 
         if let Some(block_info) = &mut *self.current_block_info {
             block_info.block_epoch = Some(block_epoch);
@@ -68,10 +58,9 @@ impl SetStateStep {
 
     pub fn block_nonce<N>(mut self, block_nonce_expr: N) -> Self
     where
-        U64Value: InterpretableFrom<N>,
+        U64Value: From<N>,
     {
-        let ctx = InterpreterContext::default();
-        let block_nonce = U64Value::interpret_from(block_nonce_expr, &ctx);
+        let block_nonce = U64Value::from(block_nonce_expr);
 
         if let Some(block_info) = &mut *self.current_block_info {
             block_info.block_nonce = Some(block_nonce);
@@ -87,10 +76,9 @@ impl SetStateStep {
 
     pub fn block_round<N>(mut self, block_round_expr: N) -> Self
     where
-        U64Value: InterpretableFrom<N>,
+        U64Value: From<N>,
     {
-        let ctx = InterpreterContext::default();
-        let block_round = U64Value::interpret_from(block_round_expr, &ctx);
+        let block_round = U64Value::from(block_round_expr);
 
         if let Some(block_info) = &mut *self.current_block_info {
             block_info.block_round = Some(block_round);
@@ -106,10 +94,9 @@ impl SetStateStep {
 
     pub fn block_timestamp<N>(mut self, block_timestamp_expr: N) -> Self
     where
-        U64Value: InterpretableFrom<N>,
+        U64Value: From<N>,
     {
-        let ctx = InterpreterContext::default();
-        let block_timestamp = U64Value::interpret_from(block_timestamp_expr, &ctx);
+        let block_timestamp = U64Value::from(block_timestamp_expr);
 
         if let Some(block_info) = &mut *self.current_block_info {
             block_info.block_timestamp = Some(block_timestamp);
@@ -125,10 +112,9 @@ impl SetStateStep {
 
     pub fn block_random_seed<B>(mut self, block_random_seed_expr: B) -> Self
     where
-        BytesValue: InterpretableFrom<B>,
+        BytesValue: From<B>,
     {
-        let ctx = InterpreterContext::default();
-        let block_random_seed = BytesValue::interpret_from(block_random_seed_expr, &ctx);
+        let block_random_seed = BytesValue::from(block_random_seed_expr);
 
         if let Some(block_info) = &mut *self.current_block_info {
             block_info.block_random_seed = Some(block_random_seed);
@@ -150,17 +136,17 @@ impl ScDeployStep {
 
     pub fn from<V>(mut self, expr: V) -> Self
     where
-        AddressValue: InterpretableFrom<V>,
+        AddressValue: From<V>,
     {
-        self.tx.from = AddressValue::interpret_from(expr, &InterpreterContext::default());
+        self.tx.from = AddressValue::from(expr);
         self
     }
 
     pub fn egld_value<V>(mut self, expr: V) -> Self
     where
-        BigUintValue: InterpretableFrom<V>,
+        BigUintValue: From<V>,
     {
-        self.tx.egld_value = BigUintValue::interpret_from(expr, &InterpreterContext::default());
+        self.tx.egld_value = BigUintValue::from(expr);
         self
     }
 
@@ -170,18 +156,15 @@ impl ScDeployStep {
     }
 
     pub fn argument(mut self, expr: &str) -> Self {
-        self.tx.arguments.push(BytesValue::interpret_from(
-            expr,
-            &InterpreterContext::default(),
-        ));
+        self.tx.arguments.push(BytesValue::from(expr));
         self
     }
 
     pub fn gas_limit<V>(mut self, value: V) -> Self
     where
-        U64Value: InterpretableFrom<V>,
+        U64Value: From<V>,
     {
-        self.tx.gas_limit = U64Value::interpret_from(value, &InterpreterContext::default());
+        self.tx.gas_limit = U64Value::from(value);
         self
     }
 
@@ -198,9 +181,9 @@ impl ScQueryStep {
 
     pub fn to<A>(mut self, address: A) -> Self
     where
-        AddressValue: InterpretableFrom<A>,
+        AddressValue: From<A>,
     {
-        self.tx.to = AddressValue::interpret_from(address, &InterpreterContext::default());
+        self.tx.to = AddressValue::from(address);
         self
     }
 
@@ -210,10 +193,7 @@ impl ScQueryStep {
     }
 
     pub fn argument(mut self, expr: &str) -> Self {
-        self.tx.arguments.push(BytesValue::interpret_from(
-            expr,
-            &InterpreterContext::default(),
-        ));
+        self.tx.arguments.push(BytesValue::from(expr));
         self
     }
 
@@ -230,47 +210,46 @@ impl ScCallStep {
 
     pub fn from<A>(mut self, address: A) -> Self
     where
-        AddressValue: InterpretableFrom<A>,
+        AddressValue: From<A>,
     {
-        self.tx.from = AddressValue::interpret_from(address, &InterpreterContext::default());
+        self.tx.from = AddressValue::from(address);
         self
     }
 
     pub fn to<A>(mut self, address: A) -> Self
     where
-        AddressValue: InterpretableFrom<A>,
+        AddressValue: From<A>,
     {
-        self.tx.to = AddressValue::interpret_from(address, &InterpreterContext::default());
+        self.tx.to = AddressValue::from(address);
         self
     }
 
     pub fn egld_value<A>(mut self, amount: A) -> Self
     where
-        BigUintValue: InterpretableFrom<A>,
+        BigUintValue: From<A>,
     {
         if !self.tx.esdt_value.is_empty() {
             panic!("Cannot transfer both EGLD and ESDT");
         }
 
-        self.tx.egld_value = BigUintValue::interpret_from(amount, &InterpreterContext::default());
+        self.tx.egld_value = BigUintValue::from(amount);
         self
     }
 
     pub fn esdt_transfer<T, N, A>(mut self, token_id: T, token_nonce: N, amount: A) -> Self
     where
-        BytesValue: InterpretableFrom<T>,
-        U64Value: InterpretableFrom<N>,
-        BigUintValue: InterpretableFrom<A>,
+        BytesValue: From<T>,
+        U64Value: From<N>,
+        BigUintValue: From<A>,
     {
         if self.tx.egld_value.value > 0u32.into() {
             panic!("Cannot transfer both EGLD and ESDT");
         }
 
-        let ctx = InterpreterContext::default();
         self.tx.esdt_value.push(TxESDT {
-            esdt_token_identifier: BytesValue::interpret_from(token_id, &ctx),
-            nonce: U64Value::interpret_from(token_nonce, &ctx),
-            esdt_value: BigUintValue::interpret_from(amount, &ctx),
+            esdt_token_identifier: BytesValue::from(token_id),
+            nonce: U64Value::from(token_nonce),
+            esdt_value: BigUintValue::from(amount),
         });
 
         self
@@ -281,19 +260,19 @@ impl ScCallStep {
         self
     }
 
-    pub fn argument(mut self, expr: &str) -> Self {
-        self.tx.arguments.push(BytesValue::interpret_from(
-            expr,
-            &InterpreterContext::default(),
-        ));
+    pub fn argument<A>(mut self, expr: A) -> Self
+    where
+        BytesValue: From<A>,
+    {
+        self.tx.arguments.push(BytesValue::from(expr));
         self
     }
 
     pub fn gas_limit<V>(mut self, value: V) -> Self
     where
-        U64Value: InterpretableFrom<V>,
+        U64Value: From<V>,
     {
-        self.tx.gas_limit = U64Value::interpret_from(value, &InterpreterContext::default());
+        self.tx.gas_limit = U64Value::from(value);
         self
     }
 
@@ -310,9 +289,9 @@ impl CheckStateStep {
 
     pub fn put_account<A>(mut self, address_expr: A, account: CheckAccount) -> Self
     where
-        AddressKey: InterpretableFrom<A>,
+        AddressKey: From<A>,
     {
-        let address_key = AddressKey::interpret_from(address_expr, &InterpreterContext::default());
+        let address_key = AddressKey::from(address_expr);
         self.accounts.accounts.insert(address_key, account);
         self
     }

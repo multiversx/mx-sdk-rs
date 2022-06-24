@@ -23,15 +23,6 @@ impl BytesValue {
     }
 }
 
-impl From<Vec<u8>> for BytesValue {
-    fn from(v: Vec<u8>) -> Self {
-        BytesValue {
-            value: v,
-            original: ValueSubTree::Str(String::default()),
-        }
-    }
-}
-
 impl InterpretableFrom<ValueSubTree> for BytesValue {
     fn interpret_from(from: ValueSubTree, context: &InterpreterContext) -> Self {
         BytesValue {
@@ -65,8 +56,30 @@ impl InterpretableFrom<String> for BytesValue {
     }
 }
 
-impl InterpretableFrom<BytesKey> for BytesValue {
-    fn interpret_from(from: BytesKey, _context: &InterpreterContext) -> Self {
+impl From<&str> for BytesValue {
+    fn from(from: &str) -> Self {
+        BytesValue::interpret_from(from, &InterpreterContext::default())
+    }
+}
+
+impl From<String> for BytesValue {
+    fn from(from: String) -> Self {
+        BytesValue::interpret_from(from, &InterpreterContext::default())
+    }
+}
+
+impl From<Vec<u8>> for BytesValue {
+    fn from(v: Vec<u8>) -> Self {
+        let expr = format!("0x{}", hex::encode(&v));
+        BytesValue {
+            value: v,
+            original: ValueSubTree::Str(expr),
+        }
+    }
+}
+
+impl From<BytesKey> for BytesValue {
+    fn from(from: BytesKey) -> Self {
         BytesValue {
             value: from.value,
             original: ValueSubTree::Str(from.original),
@@ -74,8 +87,8 @@ impl InterpretableFrom<BytesKey> for BytesValue {
     }
 }
 
-impl InterpretableFrom<&BytesKey> for BytesValue {
-    fn interpret_from(from: &BytesKey, _context: &InterpreterContext) -> Self {
+impl From<&BytesKey> for BytesValue {
+    fn from(from: &BytesKey) -> Self {
         BytesValue {
             value: from.value.clone(),
             original: ValueSubTree::Str(from.original.clone()),

@@ -47,6 +47,17 @@ impl InterpretableFrom<ValueSubTree> for U64Value {
     }
 }
 
+impl InterpretableFrom<&str> for U64Value {
+    fn interpret_from(from: &str, context: &InterpreterContext) -> Self {
+        let bytes = interpret_string(from, context);
+        let bu = BigUint::from_bytes_be(&bytes);
+        U64Value {
+            value: bu.to_u64().unwrap(),
+            original: ValueSubTree::Str(from.to_string()),
+        }
+    }
+}
+
 impl IntoRaw<ValueSubTree> for U64Value {
     fn into_raw(self) -> ValueSubTree {
         self.original
@@ -63,23 +74,34 @@ impl U64Value {
     }
 }
 
-impl InterpretableFrom<&str> for U64Value {
-    fn interpret_from(from: &str, context: &InterpreterContext) -> Self {
-        let bytes = interpret_string(from, context);
-        let bu = BigUint::from_bytes_be(&bytes);
+impl From<u64> for U64Value {
+    fn from(from: u64) -> Self {
         U64Value {
-            value: bu.to_u64().unwrap(),
+            value: from,
             original: ValueSubTree::Str(from.to_string()),
         }
     }
 }
 
-impl InterpretableFrom<u64> for U64Value {
-    fn interpret_from(from: u64, _context: &InterpreterContext) -> Self {
+impl From<u32> for U64Value {
+    fn from(from: u32) -> Self {
         U64Value {
-            value: from,
+            value: from as u64,
             original: ValueSubTree::Str(from.to_string()),
         }
+    }
+}
+
+impl From<i32> for U64Value {
+    fn from(from: i32) -> Self {
+        assert!(from >= 0, "U64Value cannot be negative");
+        Self::from(from as u32)
+    }
+}
+
+impl From<&str> for U64Value {
+    fn from(from: &str) -> Self {
+        U64Value::interpret_from(from, &InterpreterContext::default())
     }
 }
 

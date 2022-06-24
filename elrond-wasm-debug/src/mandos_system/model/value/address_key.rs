@@ -67,8 +67,26 @@ impl InterpretableFrom<String> for AddressKey {
     }
 }
 
-impl InterpretableFrom<&AddressValue> for AddressKey {
-    fn interpret_from(from: &AddressValue, _context: &InterpreterContext) -> Self {
+impl IntoRaw<String> for AddressKey {
+    fn into_raw(self) -> String {
+        self.original
+    }
+}
+
+impl From<&str> for AddressKey {
+    fn from(from: &str) -> Self {
+        Self::interpret_from(from, &InterpreterContext::default())
+    }
+}
+
+impl From<String> for AddressKey {
+    fn from(from: String) -> Self {
+        Self::interpret_from(from, &InterpreterContext::default())
+    }
+}
+
+impl From<&AddressValue> for AddressKey {
+    fn from(from: &AddressValue) -> Self {
         AddressKey {
             value: from.to_address(),
             original: from.original.to_concatenated_string(),
@@ -76,23 +94,17 @@ impl InterpretableFrom<&AddressValue> for AddressKey {
     }
 }
 
-impl InterpretableFrom<AddressValue> for AddressKey {
-    fn interpret_from(from: AddressValue, context: &InterpreterContext) -> Self {
-        AddressKey::interpret_from(&from, context)
+impl From<AddressValue> for AddressKey {
+    fn from(from: AddressValue) -> Self {
+        AddressKey::from(&from)
     }
 }
 
-impl InterpretableFrom<&Address> for AddressKey {
-    fn interpret_from(from: &Address, _context: &InterpreterContext) -> Self {
+impl From<&Address> for AddressKey {
+    fn from(from: &Address) -> Self {
         AddressKey {
             value: from.clone(),
             original: format!("0x{}", hex::encode(from)),
         }
-    }
-}
-
-impl IntoRaw<String> for AddressKey {
-    fn into_raw(self) -> String {
-        self.original
     }
 }
