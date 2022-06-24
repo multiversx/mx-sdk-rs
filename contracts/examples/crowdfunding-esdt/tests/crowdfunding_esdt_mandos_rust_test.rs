@@ -1,8 +1,5 @@
 use crowdfunding_esdt::*;
-use elrond_wasm_debug::{
-    mandos::{interpret_trait::InterpretableFrom, model::*},
-    *,
-};
+use elrond_wasm_debug::{mandos::interpret_trait::InterpretableFrom, mandos_system::model::*, *};
 
 fn world() -> BlockchainMock {
     let mut blockchain = BlockchainMock::new();

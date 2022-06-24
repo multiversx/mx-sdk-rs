@@ -11,11 +11,9 @@ use elrond_wasm::{
     types::{Address, CodeMetadata},
 };
 use elrond_wasm_debug::{
-    mandos::{
-        interpret_trait::{InterpretableFrom, InterpreterContext},
-        model::{
-            Account, AddressKey, AddressValue, ScCallStep, ScDeployStep, SetStateStep, TxExpect,
-        },
+    mandos::interpret_trait::{InterpretableFrom, InterpreterContext},
+    mandos_system::model::{
+        Account, AddressKey, AddressValue, ScCallStep, ScDeployStep, SetStateStep, TxExpect,
     },
     BlockchainMock, ContractInfo, DebugApi,
 };
