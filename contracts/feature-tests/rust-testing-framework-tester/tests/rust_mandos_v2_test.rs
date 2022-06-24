@@ -1,7 +1,4 @@
-use elrond_wasm_debug::{
-    mandos::{interpret_trait::InterpretableFrom, model::*},
-    *,
-};
+use elrond_wasm_debug::{mandos::interpret_trait::InterpretableFrom, mandos_system::model::*, *};
 use rust_testing_framework_tester::*; // TODO: clean up imports
 
 const WASM_PATH_EXPR: &'static str = "file:output/rust-testing-framework-tester.wasm";

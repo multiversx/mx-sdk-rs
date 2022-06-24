@@ -114,7 +114,7 @@ impl<M: ManagedTypeApi> EgldOrEsdtTokenIdentifier<M> {
     }
 
     /// Representation of the object as an `Option`.
-    /// 
+    ///
     /// Because it does not consume `self` only a reference to the ESDT token identifier can be returned.
     pub fn as_esdt_option(&self) -> Option<ManagedRef<'_, M, TokenIdentifier<M>>> {
         self.data.as_option()

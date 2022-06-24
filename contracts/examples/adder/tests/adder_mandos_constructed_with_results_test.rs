@@ -1,9 +1,7 @@
 use adder::*;
 use elrond_wasm::storage::mappers::SingleValue;
 use elrond_wasm_debug::{
-    mandos::{interpret_trait::InterpretableFrom, model::*},
-    num_bigint::BigUint,
-    *,
+    mandos::interpret_trait::InterpretableFrom, mandos_system::model::*, num_bigint::BigUint, *,
 }; // TODO: clean up imports
 
 fn world() -> BlockchainMock {
