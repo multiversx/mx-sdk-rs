@@ -244,6 +244,7 @@ elrond_wasm_node::wasm_endpoints! {
         non_zero_usize_iter
         non_zero_usize_macro
         only_owner_endpoint
+        only_user_account_endpoint
         panicWithMessage
         pow_big_int
         pow_big_int_ref

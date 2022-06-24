@@ -57,4 +57,5 @@ impl MethodArgument {
 #[derive(Clone, Debug, Default)]
 pub struct TraitProperties {
     pub only_owner: bool,
+    pub only_user_account: bool,
 }

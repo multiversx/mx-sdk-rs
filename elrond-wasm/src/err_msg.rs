@@ -52,6 +52,8 @@ pub const DESERIALIZATION_ARG_OUT_OF_RANGE: &str =
 pub const CALLBACK_BAD_FUNC: &[u8] = b"no callback function with that name exists in contract";
 
 pub const RECIPIENT_ADDRESS_NOT_SET: &str = "recipient address not set";
+pub static ONLY_OWNER_CALLER: &[u8] = b"Endpoint can only be called by owner";
+pub static ONLY_USER_ACCOUNT_CALLER: &[u8] = b"Endpoint can only be called by user accounts";
 
 pub const STORAGE_NOT_I64: &[u8] = b"storage not i64";
 pub const STORAGE_NOT_32_BYTES: &[u8] = b"32 bytes of data expected in storage at key";

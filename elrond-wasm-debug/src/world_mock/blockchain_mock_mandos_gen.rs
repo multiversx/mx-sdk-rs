@@ -1,12 +1,10 @@
-use elrond_wasm::types::Address;
-use mandos::{
-    interpret_trait::IntoRaw,
-    model::{AddressKey, AddressValue},
-    serde_raw::ValueSubTree,
+use crate::{
+    mandos_system::model::{AddressKey, AddressValue, Step},
+    BlockchainMock,
 };
+use elrond_wasm::types::Address;
+use mandos::{interpret_trait::IntoRaw, serde_raw::ValueSubTree};
 use std::{collections::HashMap, path::Path};
-
-use crate::BlockchainMock;
 
 const SC_ADDRESS_NUM_LEADING_ZEROS: u8 = 8;
 const UNDERSCORE: u8 = b'_';
@@ -26,8 +24,8 @@ impl BlockchainMock {
     fn mandos_trace_prettify(&mut self) {
         for step in &mut self.mandos_trace.steps {
             match step {
-                mandos::model::Step::ExternalSteps(_) => {},
-                mandos::model::Step::SetState(set_state_step) => {
+                Step::ExternalSteps(_) => {},
+                Step::SetState(set_state_step) => {
                     let acc_map_keys = set_state_step
                         .accounts
                         .keys()
@@ -46,7 +44,7 @@ impl BlockchainMock {
                         set_state_step.accounts.insert(pretty_addr_key, acc);
                     }
                 },
-                mandos::model::Step::ScCall(sc_call_step) => {
+                Step::ScCall(sc_call_step) => {
                     sc_call_step.tx.from = addr_value_to_pretty(
                         &self.addr_to_mandos_string_map,
                         sc_call_step.tx.from.clone(),
@@ -56,19 +54,19 @@ impl BlockchainMock {
                         sc_call_step.tx.to.clone(),
                     );
                 },
-                mandos::model::Step::ScQuery(sc_query_step) => {
+                Step::ScQuery(sc_query_step) => {
                     sc_query_step.tx.to = addr_value_to_pretty(
                         &self.addr_to_mandos_string_map,
                         sc_query_step.tx.to.clone(),
                     );
                 },
-                mandos::model::Step::ScDeploy(sc_deploy_step) => {
+                Step::ScDeploy(sc_deploy_step) => {
                     sc_deploy_step.tx.from = addr_value_to_pretty(
                         &self.addr_to_mandos_string_map,
                         sc_deploy_step.tx.from.clone(),
                     );
                 },
-                mandos::model::Step::Transfer(transfer_step) => {
+                Step::Transfer(transfer_step) => {
                     transfer_step.tx.from = addr_value_to_pretty(
                         &self.addr_to_mandos_string_map,
                         transfer_step.tx.from.clone(),
@@ -78,8 +76,8 @@ impl BlockchainMock {
                         transfer_step.tx.to.clone(),
                     );
                 },
-                mandos::model::Step::ValidatorReward(_) => todo!(),
-                mandos::model::Step::CheckState(check_state_step) => {
+                Step::ValidatorReward(_) => todo!(),
+                Step::CheckState(check_state_step) => {
                     let acc_map_keys = check_state_step
                         .accounts
                         .accounts
@@ -103,7 +101,7 @@ impl BlockchainMock {
                             .insert(pretty_addr_key, acc);
                     }
                 },
-                mandos::model::Step::DumpState(_) => {},
+                Step::DumpState(_) => {},
             }
         }
     }

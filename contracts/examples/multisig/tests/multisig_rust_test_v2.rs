@@ -11,11 +11,9 @@ use elrond_wasm::{
     types::{Address, CodeMetadata},
 };
 use elrond_wasm_debug::{
-    mandos::{
-        interpret_trait::{InterpretableFrom, InterpreterContext},
-        model::{
-            Account, AddressKey, AddressValue, ScCallStep, ScDeployStep, SetStateStep, TxExpect,
-        },
+    mandos::interpret_trait::{InterpretableFrom, InterpreterContext},
+    mandos_system::model::{
+        Account, AddressKey, AddressValue, ScCallStep, ScDeployStep, SetStateStep, TxExpect,
     },
     BlockchainMock, ContractInfo, DebugApi,
 };
@@ -98,13 +96,13 @@ impl MultisigTestState {
 
         let mut state = MultisigTestState {
             world,
-            owner: AddressValue::interpret_from("address:owner", ic),
-            alice: AddressValue::interpret_from("address:alice", ic),
-            bob: AddressValue::interpret_from("address:bob", ic),
-            carol: AddressValue::interpret_from("address:carol", ic),
-            multisig: MultisigContract::new("sc:multisig", &ic),
-            adder: AdderContract::new("sc:adder", &ic),
-            adder_multisig: AdderContract::new("sc:adder-multisig", &ic),
+            owner: "address:owner".into(),
+            alice: "address:alice".into(),
+            bob: "address:bob".into(),
+            carol: "address:carol".into(),
+            multisig: MultisigContract::new("sc:multisig"),
+            adder: AdderContract::new("sc:adder"),
+            adder_multisig: AdderContract::new("sc:adder-multisig"),
         };
 
         state.world.mandos_set_state(
