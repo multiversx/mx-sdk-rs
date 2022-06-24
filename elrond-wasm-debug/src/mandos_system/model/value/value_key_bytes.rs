@@ -69,6 +69,12 @@ impl InterpretableFrom<String> for BytesKey {
     }
 }
 
+impl From<&str> for BytesKey {
+    fn from(from: &str) -> Self {
+        Self::interpret_from(from, &InterpreterContext::default())
+    }
+}
+
 impl fmt::Display for BytesKey {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         self.original.fmt(f)

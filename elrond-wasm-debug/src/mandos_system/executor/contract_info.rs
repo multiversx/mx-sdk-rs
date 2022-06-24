@@ -8,7 +8,6 @@ use elrond_wasm::{
 };
 
 use crate::mandos_system::model::{AddressKey, AddressValue};
-use mandos::interpret_trait::{InterpretableFrom, InterpreterContext};
 
 /// Bundles a mandos representation of a contract with the contract proxy,
 /// so that it can be easily called in the context of a blockchain mock.
@@ -18,11 +17,11 @@ pub struct ContractInfo<P: ProxyObjBase> {
 }
 
 impl<P: ProxyObjBase> ContractInfo<P> {
-    pub fn new<A>(address_expr: A, ic: &InterpreterContext) -> Self
+    pub fn new<A>(address_expr: A) -> Self
     where
-        AddressKey: InterpretableFrom<A>,
+        AddressKey: From<A>,
     {
-        let mandos_address_expr = AddressKey::interpret_from(address_expr, ic);
+        let mandos_address_expr = AddressKey::from(address_expr);
         let proxy_inst = P::new_proxy_obj().contract(mandos_address_expr.value.clone().into());
         ContractInfo {
             mandos_address_expr,
@@ -35,15 +34,27 @@ impl<P: ProxyObjBase> ContractInfo<P> {
     }
 }
 
-impl<P: ProxyObjBase> InterpretableFrom<&ContractInfo<P>> for AddressKey {
-    fn interpret_from(from: &ContractInfo<P>, _context: &InterpreterContext) -> Self {
+impl<P: ProxyObjBase> From<&ContractInfo<P>> for AddressKey {
+    fn from(from: &ContractInfo<P>) -> Self {
         from.mandos_address_expr.clone()
     }
 }
 
-impl<P: ProxyObjBase> InterpretableFrom<&ContractInfo<P>> for AddressValue {
-    fn interpret_from(from: &ContractInfo<P>, context: &InterpreterContext) -> Self {
-        AddressValue::interpret_from(&from.mandos_address_expr, context)
+impl<P: ProxyObjBase> From<ContractInfo<P>> for AddressKey {
+    fn from(from: ContractInfo<P>) -> Self {
+        from.mandos_address_expr
+    }
+}
+
+impl<P: ProxyObjBase> From<&ContractInfo<P>> for AddressValue {
+    fn from(from: &ContractInfo<P>) -> Self {
+        AddressValue::from(&from.mandos_address_expr)
+    }
+}
+
+impl<P: ProxyObjBase> From<ContractInfo<P>> for AddressValue {
+    fn from(from: ContractInfo<P>) -> Self {
+        AddressValue::from(&from.mandos_address_expr)
     }
 }
 
