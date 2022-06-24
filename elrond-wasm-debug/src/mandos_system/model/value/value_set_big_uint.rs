@@ -23,6 +23,16 @@ impl InterpretableFrom<ValueSubTree> for BigUintValue {
     }
 }
 
+impl InterpretableFrom<&str> for BigUintValue {
+    fn interpret_from(from: &str, context: &InterpreterContext) -> Self {
+        let bytes = interpret_string(from, context);
+        BigUintValue {
+            value: BigUint::from_bytes_be(&bytes),
+            original: ValueSubTree::Str(from.to_string()),
+        }
+    }
+}
+
 impl IntoRaw<ValueSubTree> for BigUintValue {
     fn into_raw(self) -> ValueSubTree {
         self.original
@@ -39,33 +49,27 @@ impl BigUintValue {
     }
 }
 
-impl InterpretableFrom<u32> for BigUintValue {
-    fn interpret_from(from: u32, _context: &InterpreterContext) -> Self {
-        let bytes = from.to_be_bytes().to_vec();
+impl From<u32> for BigUintValue {
+    fn from(from: u32) -> Self {
         BigUintValue {
-            value: BigUint::from_bytes_be(&bytes),
+            value: from.into(),
             original: ValueSubTree::Str(from.to_string()),
         }
     }
 }
 
-impl InterpretableFrom<u64> for BigUintValue {
-    fn interpret_from(from: u64, _context: &InterpreterContext) -> Self {
-        let bytes = from.to_be_bytes().to_vec();
+impl From<u64> for BigUintValue {
+    fn from(from: u64) -> Self {
         BigUintValue {
-            value: BigUint::from_bytes_be(&bytes),
+            value: from.into(),
             original: ValueSubTree::Str(from.to_string()),
         }
     }
 }
 
-impl InterpretableFrom<&str> for BigUintValue {
-    fn interpret_from(from: &str, context: &InterpreterContext) -> Self {
-        let bytes = interpret_string(from, context);
-        BigUintValue {
-            value: BigUint::from_bytes_be(&bytes),
-            original: ValueSubTree::Str(from.to_string()),
-        }
+impl From<&str> for BigUintValue {
+    fn from(from: &str) -> Self {
+        BigUintValue::interpret_from(from, &InterpreterContext::default())
     }
 }
 

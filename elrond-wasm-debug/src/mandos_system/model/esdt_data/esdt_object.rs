@@ -1,6 +1,5 @@
 use super::EsdtInstance;
 use crate::mandos_system::model::{BigUintValue, BytesValue, U64Value};
-use mandos::interpret_trait::{InterpretableFrom, InterpreterContext};
 
 #[derive(Debug, Default)]
 pub struct EsdtObject {
@@ -25,11 +24,10 @@ impl EsdtObject {
 
     pub fn set_balance<N, A>(&mut self, token_nonce_expr: N, amount_expr: A)
     where
-        U64Value: InterpretableFrom<N>,
-        BigUintValue: InterpretableFrom<A>,
+        U64Value: From<N>,
+        BigUintValue: From<A>,
     {
-        let ctx = InterpreterContext::default();
-        let amount = BigUintValue::interpret_from(amount_expr, &ctx);
+        let amount = BigUintValue::from(amount_expr);
         let inst_for_nonce = self.get_or_insert_instance_for_nonce(token_nonce_expr);
 
         if amount.value > 0u32.into() {
@@ -41,11 +39,10 @@ impl EsdtObject {
 
     pub fn set_token_attributes<N, T>(&mut self, token_nonce_expr: N, attributes_expr: T)
     where
-        U64Value: InterpretableFrom<N>,
-        BytesValue: InterpretableFrom<T>,
+        U64Value: From<N>,
+        BytesValue: From<T>,
     {
-        let ctx = InterpreterContext::default();
-        let attr_bytes = BytesValue::interpret_from(attributes_expr, &ctx);
+        let attr_bytes = BytesValue::from(attributes_expr);
         let inst_for_nonce = self.get_or_insert_instance_for_nonce(token_nonce_expr);
 
         if !attr_bytes.value.is_empty() {
@@ -57,10 +54,9 @@ impl EsdtObject {
 
     pub fn set_last_nonce<N>(&mut self, last_nonce_expr: N)
     where
-        U64Value: InterpretableFrom<N>,
+        U64Value: From<N>,
     {
-        let ctx = InterpreterContext::default();
-        let last_nonce = U64Value::interpret_from(last_nonce_expr, &ctx);
+        let last_nonce = U64Value::from(last_nonce_expr);
         if last_nonce.value > 0 {
             self.last_nonce = Some(last_nonce);
         } else {
@@ -75,10 +71,9 @@ impl EsdtObject {
 
     pub fn get_or_insert_instance_for_nonce<N>(&mut self, token_nonce_expr: N) -> &mut EsdtInstance
     where
-        U64Value: InterpretableFrom<N>,
+        U64Value: From<N>,
     {
-        let ctx = InterpreterContext::default();
-        let token_nonce = U64Value::interpret_from(token_nonce_expr, &ctx);
+        let token_nonce = U64Value::from(token_nonce_expr);
 
         if let Some(i) = self.instances.iter().position(|inst| match &inst.nonce {
             Some(nonce) => nonce.value == token_nonce.value,
