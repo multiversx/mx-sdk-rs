@@ -7,19 +7,26 @@ use elrond_wasm::{
     types::{ContractCall, ContractDeploy, ManagedArgBuffer},
 };
 
-/// Attaches the `call` method to mandos steps,
-/// so that the call data can be initialized from smart contract proxies.
-pub trait CallBuilder<C> {
+impl ScCallStep {
     /// Sets following fields based on the smart contract proxy:
     /// - "to"
     /// - "function"
     /// - "arguments"
-    fn call(self, contract_call: C) -> Self;
+    pub fn call<OriginalResult>(
+        mut self,
+        contract_call: ContractCall<DebugApi, OriginalResult>,
+    ) -> Self {
+        let (to_str, function, mandos_args) = process_contract_call(contract_call);
+        self = self.to(to_str.as_str());
+        self = self.function(function.as_str());
+        for arg in mandos_args {
+            self = self.argument(arg.as_str());
+        }
+        self
+    }
 }
 
-/// Attaches the `call_expect` method to mandos steps,
-/// so that the call data and expect fields can be initialized from smart contract proxies.
-pub trait CallExpectBuilder<C, E> {
+impl ScCallStep {
     /// Sets following fields based on the smart contract proxy:
     /// - "to"
     /// - "function"
@@ -27,11 +34,30 @@ pub trait CallExpectBuilder<C, E> {
     /// - "expect"
     ///     - "out"
     ///     - "status" set to 0
-    fn call_expect(self, contract_call: C, expect_value: E) -> Self;
+    pub fn call_expect<OriginalResult, ExpectedResult>(
+        mut self,
+        contract_call: ContractCall<DebugApi, OriginalResult>,
+        expect_value: ExpectedResult,
+    ) -> Self
+    where
+        OriginalResult: TopEncodeMulti,
+        ExpectedResult: CodecFrom<OriginalResult> + TopEncodeMulti,
+    {
+        self = self.call(contract_call);
+        self = self.expect(format_expect(expect_value));
+        self
+    }
 }
 
-impl<OriginalResult> CallBuilder<ContractCall<DebugApi, OriginalResult>> for ScCallStep {
-    fn call(mut self, contract_call: ContractCall<DebugApi, OriginalResult>) -> Self {
+impl ScQueryStep {
+    /// Sets following fields based on the smart contract proxy:
+    /// - "to"
+    /// - "function"
+    /// - "arguments"
+    pub fn call<OriginalResult>(
+        mut self,
+        contract_call: ContractCall<DebugApi, OriginalResult>,
+    ) -> Self {
         let (to_str, function, mandos_args) = process_contract_call(contract_call);
         self = self.to(to_str.as_str());
         self = self.function(function.as_str());
@@ -42,54 +68,37 @@ impl<OriginalResult> CallBuilder<ContractCall<DebugApi, OriginalResult>> for ScC
     }
 }
 
-impl<OriginalResult, ExpectedResult>
-    CallExpectBuilder<ContractCall<DebugApi, OriginalResult>, ExpectedResult> for ScCallStep
-where
-    OriginalResult: TopEncodeMulti,
-    ExpectedResult: CodecFrom<OriginalResult> + TopEncodeMulti,
-{
-    fn call_expect(
+impl ScQueryStep {
+    /// Sets following fields based on the smart contract proxy:
+    /// - "to"
+    /// - "function"
+    /// - "arguments"
+    /// - "expect"
+    ///     - "out"
+    ///     - "status" set to 0
+    pub fn call_expect<OriginalResult, ExpectedResult>(
         mut self,
         contract_call: ContractCall<DebugApi, OriginalResult>,
         expect_value: ExpectedResult,
-    ) -> Self {
+    ) -> Self
+    where
+        OriginalResult: TopEncodeMulti,
+        ExpectedResult: CodecFrom<OriginalResult> + TopEncodeMulti,
+    {
         self = self.call(contract_call);
         self = self.expect(format_expect(expect_value));
         self
     }
 }
 
-impl<OriginalResult> CallBuilder<ContractCall<DebugApi, OriginalResult>> for ScQueryStep {
-    fn call(mut self, contract_call: ContractCall<DebugApi, OriginalResult>) -> Self {
-        let (to_str, function, mandos_args) = process_contract_call(contract_call);
-        self = self.to(to_str.as_str());
-        self = self.function(function.as_str());
-        for arg in mandos_args {
-            self = self.argument(arg.as_str());
-        }
-        self
-    }
-}
-
-impl<OriginalResult, ExpectedResult>
-    CallExpectBuilder<ContractCall<DebugApi, OriginalResult>, ExpectedResult> for ScQueryStep
-where
-    OriginalResult: TopEncodeMulti,
-    ExpectedResult: CodecFrom<OriginalResult> + TopEncodeMulti,
-{
-    fn call_expect(
+impl ScDeployStep {
+    /// Sets following fields based on the smart contract proxy:
+    /// - "function"
+    /// - "arguments"
+    pub fn call<OriginalResult>(
         mut self,
-        contract_call: ContractCall<DebugApi, OriginalResult>,
-        expect_value: ExpectedResult,
+        contract_deploy: ContractDeploy<DebugApi, OriginalResult>,
     ) -> Self {
-        self = self.call(contract_call);
-        self = self.expect(format_expect(expect_value));
-        self
-    }
-}
-
-impl<OriginalResult> CallBuilder<ContractDeploy<DebugApi, OriginalResult>> for ScDeployStep {
-    fn call(mut self, contract_deploy: ContractDeploy<DebugApi, OriginalResult>) -> Self {
         let (_, mandos_args) = process_contract_deploy(contract_deploy);
         for arg in mandos_args {
             self = self.argument(arg.as_str());
