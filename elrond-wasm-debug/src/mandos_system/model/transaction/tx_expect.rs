@@ -28,12 +28,11 @@ impl TxExpect {
 
     pub fn err<S, E>(status_code_expr: S, err_msg_expr: E) -> Self
     where
-        U64Value: InterpretableFrom<S>,
-        BytesValue: InterpretableFrom<E>,
+        U64Value: From<S>,
+        BytesValue: From<E>,
     {
-        let ctx = InterpreterContext::default();
-        let status_code = U64Value::interpret_from(status_code_expr, &ctx);
-        let err_msg = BytesValue::interpret_from(err_msg_expr, &ctx);
+        let status_code = U64Value::from(status_code_expr);
+        let err_msg = BytesValue::from(err_msg_expr);
 
         TxExpect {
             out: CheckValue::Star,

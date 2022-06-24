@@ -131,31 +131,31 @@ fn test_payment_eq() {
     );
     assert_eq!(
         EgldOrEsdtTokenPayment::<DebugApi>::new(
-            EgldOrEsdtTokenIdentifier::esdt("ESDTPAY-00000".into()),
+            EgldOrEsdtTokenIdentifier::esdt("ESDTPAY-00000"),
             0,
             1000u32.into()
         ),
         EgldOrEsdtTokenPayment::<DebugApi>::new(
-            EgldOrEsdtTokenIdentifier::esdt("ESDTPAY-00000".into()),
-            0,
-            1000u32.into()
-        ),
-    );
-    assert_ne!(
-        EgldOrEsdtTokenPayment::<DebugApi>::new(
-            EgldOrEsdtTokenIdentifier::esdt("ESDTPAY-00001".into()),
-            0,
-            1000u32.into()
-        ),
-        EgldOrEsdtTokenPayment::<DebugApi>::new(
-            EgldOrEsdtTokenIdentifier::esdt("ESDTPAY-00002".into()),
+            EgldOrEsdtTokenIdentifier::esdt("ESDTPAY-00000"),
             0,
             1000u32.into()
         ),
     );
     assert_ne!(
         EgldOrEsdtTokenPayment::<DebugApi>::new(
-            EgldOrEsdtTokenIdentifier::esdt("ESDTPAY-00001".into()),
+            EgldOrEsdtTokenIdentifier::esdt("ESDTPAY-00001"),
+            0,
+            1000u32.into()
+        ),
+        EgldOrEsdtTokenPayment::<DebugApi>::new(
+            EgldOrEsdtTokenIdentifier::esdt("ESDTPAY-00002"),
+            0,
+            1000u32.into()
+        ),
+    );
+    assert_ne!(
+        EgldOrEsdtTokenPayment::<DebugApi>::new(
+            EgldOrEsdtTokenIdentifier::esdt("ESDTPAY-00001"),
             0,
             1000u32.into()
         ),

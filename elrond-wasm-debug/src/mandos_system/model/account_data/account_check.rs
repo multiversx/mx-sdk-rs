@@ -50,12 +50,11 @@ impl CheckAccount {
 
     pub fn esdt_balance<K, V>(mut self, token_id_expr: K, balance_expr: V) -> Self
     where
-        BytesKey: InterpretableFrom<K>,
-        BigUintValue: InterpretableFrom<V>,
+        BytesKey: From<K>,
+        BigUintValue: From<V>,
     {
-        let ctx = InterpreterContext::default();
-        let token_id = BytesKey::interpret_from(token_id_expr, &ctx);
-        let balance = BigUintValue::interpret_from(balance_expr, &ctx);
+        let token_id = BytesKey::from(token_id_expr);
+        let balance = BigUintValue::from(balance_expr);
 
         match &mut self.esdt {
             CheckEsdtMap::Unspecified | CheckEsdtMap::Star => {

@@ -27,33 +27,26 @@ impl Account {
 
     pub fn nonce<V>(mut self, nonce: V) -> Self
     where
-        U64Value: InterpretableFrom<V>,
+        U64Value: From<V>,
     {
-        self.nonce = Some(U64Value::interpret_from(
-            nonce,
-            &InterpreterContext::default(),
-        ));
+        self.nonce = Some(U64Value::from(nonce));
         self
     }
 
     pub fn balance<V>(mut self, balance_expr: V) -> Self
     where
-        BigUintValue: InterpretableFrom<V>,
+        BigUintValue: From<V>,
     {
-        self.balance = Some(BigUintValue::interpret_from(
-            balance_expr,
-            &InterpreterContext::default(),
-        ));
+        self.balance = Some(BigUintValue::from(balance_expr));
         self
     }
 
     pub fn esdt_balance<K, V>(mut self, token_id_expr: K, balance_expr: V) -> Self
     where
-        BytesKey: InterpretableFrom<K>,
-        BigUintValue: InterpretableFrom<V>,
+        BytesKey: From<K>,
+        BigUintValue: From<V>,
     {
-        let ctx = InterpreterContext::default();
-        let token_id = BytesKey::interpret_from(token_id_expr, &ctx);
+        let token_id = BytesKey::from(token_id_expr);
         let esdt_data_ref = self.get_esdt_data_or_create(&token_id);
         esdt_data_ref.set_balance(0u64, balance_expr);
 
@@ -69,13 +62,12 @@ impl Account {
     ) -> Self
     where
         N: Clone,
-        BytesKey: InterpretableFrom<K>,
-        U64Value: InterpretableFrom<N>,
-        BigUintValue: InterpretableFrom<V>,
-        BytesValue: InterpretableFrom<T>,
+        BytesKey: From<K>,
+        U64Value: From<N>,
+        BigUintValue: From<V>,
+        BytesValue: From<T>,
     {
-        let ctx = InterpreterContext::default();
-        let token_id = BytesKey::interpret_from(token_id_expr, &ctx);
+        let token_id = BytesKey::from(token_id_expr);
 
         let esdt_obj_ref = self
             .get_esdt_data_or_create(&token_id)
@@ -91,11 +83,10 @@ impl Account {
 
     pub fn esdt_nft_last_nonce<K, N>(mut self, token_id_expr: K, last_nonce_expr: N) -> Self
     where
-        BytesKey: InterpretableFrom<K>,
-        U64Value: InterpretableFrom<N>,
+        BytesKey: From<K>,
+        U64Value: From<N>,
     {
-        let ctx = InterpreterContext::default();
-        let token_id = BytesKey::interpret_from(token_id_expr, &ctx);
+        let token_id = BytesKey::from(token_id_expr);
 
         let esdt_obj_ref = self
             .get_esdt_data_or_create(&token_id)
@@ -108,10 +99,9 @@ impl Account {
     // TODO: Find a better way to pass roles
     pub fn esdt_roles<K>(mut self, token_id_expr: K, roles: Vec<String>) -> Self
     where
-        BytesKey: InterpretableFrom<K>,
+        BytesKey: From<K>,
     {
-        let ctx = InterpreterContext::default();
-        let token_id = BytesKey::interpret_from(token_id_expr, &ctx);
+        let token_id = BytesKey::from(token_id_expr);
 
         let esdt_obj_ref = self
             .get_esdt_data_or_create(&token_id)

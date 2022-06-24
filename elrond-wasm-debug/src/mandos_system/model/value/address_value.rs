@@ -67,8 +67,20 @@ impl InterpretableFrom<&str> for AddressValue {
     }
 }
 
-impl InterpretableFrom<&AddressKey> for AddressValue {
-    fn interpret_from(from: &AddressKey, _context: &InterpreterContext) -> Self {
+impl IntoRaw<ValueSubTree> for AddressValue {
+    fn into_raw(self) -> ValueSubTree {
+        self.original
+    }
+}
+
+impl From<&AddressValue> for AddressValue {
+    fn from(from: &AddressValue) -> Self {
+        from.clone()
+    }
+}
+
+impl From<&AddressKey> for AddressValue {
+    fn from(from: &AddressKey) -> Self {
         AddressValue {
             value: from.to_address(),
             original: ValueSubTree::Str(from.original.clone()),
@@ -76,14 +88,14 @@ impl InterpretableFrom<&AddressKey> for AddressValue {
     }
 }
 
-impl InterpretableFrom<AddressKey> for AddressValue {
-    fn interpret_from(from: AddressKey, context: &InterpreterContext) -> Self {
-        AddressValue::interpret_from(&from, context)
+impl From<AddressKey> for AddressValue {
+    fn from(from: AddressKey) -> Self {
+        AddressValue::from(&from)
     }
 }
 
-impl InterpretableFrom<&Address> for AddressValue {
-    fn interpret_from(from: &Address, _context: &InterpreterContext) -> Self {
+impl From<&Address> for AddressValue {
+    fn from(from: &Address) -> Self {
         AddressValue {
             value: from.clone(),
             original: ValueSubTree::Str(format!("0x{}", hex::encode(from))),
@@ -91,8 +103,8 @@ impl InterpretableFrom<&Address> for AddressValue {
     }
 }
 
-impl IntoRaw<ValueSubTree> for AddressValue {
-    fn into_raw(self) -> ValueSubTree {
-        self.original
+impl From<&str> for AddressValue {
+    fn from(from: &str) -> Self {
+        AddressValue::interpret_from(from, &InterpreterContext::default())
     }
 }
