@@ -4,7 +4,7 @@ use crate::{
     tx_execution::execute_sc_query,
     tx_mock::{generate_tx_hash_dummy, TxInput, TxResult},
     world_mock::BlockchainMock,
-    CallBuilder, DebugApi,
+    DebugApi,
 };
 use elrond_wasm::{
     elrond_codec::{CodecFrom, PanicErrorHandler, TopEncodeMulti},

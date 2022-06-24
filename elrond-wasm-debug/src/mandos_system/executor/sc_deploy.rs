@@ -8,7 +8,7 @@ use crate::{
     tx_execution::sc_create,
     tx_mock::{generate_tx_hash_dummy, TxInput, TxResult},
     world_mock::BlockchainMock,
-    CallBuilder, DebugApi,
+    DebugApi,
 };
 
 use super::check_tx_output;
