@@ -5,7 +5,7 @@ use mandos::{
 
 use std::collections::BTreeMap;
 
-use super::{
+use crate::mandos_system::model::{
     Account, AddressKey, BlockInfo, BytesValue, CheckAccounts, NewAddress, TxCall, TxDeploy,
     TxExpect, TxQuery, TxTransfer, TxValidatorReward,
 };

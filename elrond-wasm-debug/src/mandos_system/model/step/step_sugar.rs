@@ -1,6 +1,6 @@
 use mandos::interpret_trait::{InterpretableFrom, InterpreterContext};
 
-use super::{
+use crate::mandos_system::model::{
     Account, AddressKey, AddressValue, BigUintValue, BlockInfo, BytesValue, CheckAccount,
     CheckStateStep, NewAddress, ScCallStep, ScDeployStep, ScQueryStep, SetStateStep, TxESDT,
     TxExpect, U64Value,
