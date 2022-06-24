@@ -4,6 +4,9 @@ There are several crates in this repo, this changelog will keep track of all of 
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [elrond-wasm 0.33.1, mandos 0.15.1] - 2022-06-24
+- CodecSelf for BigInt
+
 ## [elrond-wasm 0.33.0, mandos 0.15.0] - 2022-06-20
 - Removed the data field for direct EGLD & ESDT transfers.
 - Testing and debugging environment aligned with VM version 1.4.53.
