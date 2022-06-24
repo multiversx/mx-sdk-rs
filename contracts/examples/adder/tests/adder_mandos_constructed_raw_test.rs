@@ -1,4 +1,4 @@
-use elrond_wasm_debug::{mandos::model::*, *};
+use elrond_wasm_debug::{mandos_system::model::*, *};
 
 fn world() -> BlockchainMock {
     let mut blockchain = BlockchainMock::new();

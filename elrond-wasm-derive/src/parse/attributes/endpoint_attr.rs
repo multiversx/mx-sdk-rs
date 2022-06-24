@@ -8,6 +8,10 @@ pub fn is_only_owner(attr: &syn::Attribute) -> bool {
     is_attribute_with_no_args(attr, ATTR_ONLY_OWNER)
 }
 
+pub fn is_only_user_account(attr: &syn::Attribute) -> bool {
+    is_attribute_with_no_args(attr, ATTR_ONLY_USER_ACCOUNT)
+}
+
 pub fn is_callback_raw(attr: &syn::Attribute) -> bool {
     is_attribute_with_no_args(attr, ATTR_CALLBACK_RAW_DECL)
 }
