@@ -6,6 +6,8 @@ use crate::{
 };
 use elrond_codec::*;
 
+use super::EgldOrEsdtTokenIdentifier;
+
 /// Specialized type for handling token identifiers.
 /// It wraps a BoxedBytes with the full ASCII name of the token.
 /// EGLD is stored as an empty name.
@@ -91,6 +93,16 @@ impl<M: ManagedTypeApi> PartialEq for TokenIdentifier<M> {
 }
 
 impl<M: ManagedTypeApi> Eq for TokenIdentifier<M> {}
+
+impl<M: ManagedTypeApi> PartialEq<EgldOrEsdtTokenIdentifier<M>> for TokenIdentifier<M> {
+    #[inline]
+    fn eq(&self, other: &EgldOrEsdtTokenIdentifier<M>) -> bool {
+        other.map_ref_or_else(
+            || false,
+            |esdt_token_identifier| esdt_token_identifier == self,
+        )
+    }
+}
 
 impl<M: ManagedTypeApi> NestedEncode for TokenIdentifier<M> {
     #[inline]
