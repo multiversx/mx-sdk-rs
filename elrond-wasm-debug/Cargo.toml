@@ -1,6 +1,6 @@
 [package]
 name = "elrond-wasm-debug"
-version = "0.33.0"
+version = "0.33.1"
 edition = "2018"
 
 authors = [
@@ -38,10 +38,10 @@ itertools = "0.10.3"
 mandos-go-tests = []
 
 [dependencies.elrond-wasm]
-version = "=0.33.0"
+version = "=0.33.1"
 path = "../elrond-wasm"
 features = ["alloc", "num-bigint", "promises", "big-float"]
 
 [dependencies.mandos]
-version = "0.15.0"
+version = "0.15.1"
 path = "../mandos"
