@@ -7,7 +7,6 @@
 elrond_wasm_node::wasm_endpoints! {
     forwarder
     (
-        callBack
         accept_funds_func
         buy_nft
         callback_data
@@ -74,5 +73,6 @@ elrond_wasm_node::wasm_endpoints! {
         upgradeVault
         upgrade_vault_from_source
         validate_token_identifier
+        callBack
     )
 }
