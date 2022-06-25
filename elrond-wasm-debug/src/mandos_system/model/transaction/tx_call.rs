@@ -64,3 +64,18 @@ impl IntoRaw<TxCallRaw> for TxCall {
         }
     }
 }
+
+pub(super) fn create_tx_data(function: String, arguments: &[BytesValue]) -> String {
+    let mut result = function;
+    for argument in arguments {
+        result.push('@');
+        result.push_str(hex::encode(argument.value.as_slice()).as_str());
+    }
+    result
+}
+
+impl TxCall {
+    pub fn to_tx_data(&self) -> String {
+        create_tx_data(self.function.clone(), self.arguments.as_slice())
+    }
+}

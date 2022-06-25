@@ -1,0 +1,7 @@
+# Pem files are used for interactions, but shouldn't be committed
+*.pem
+
+# Be very careful not to commit your own .pem files.
+# Alice and Bob are public, do NEVER use them on the mainnet.
+!alice.pem
+!bob.pem

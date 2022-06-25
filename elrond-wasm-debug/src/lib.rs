@@ -32,4 +32,6 @@ pub use elrond_wasm::elrond_codec::num_bigint;
 extern crate alloc;
 pub use alloc::{boxed::Box, vec::Vec};
 
+pub use elrond_wasm;
+
 pub use std::collections::HashMap;
