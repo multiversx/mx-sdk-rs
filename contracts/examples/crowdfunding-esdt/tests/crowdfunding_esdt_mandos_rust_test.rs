@@ -41,7 +41,7 @@ fn crowdfunding_mandos_rust_test() {
                 deadline,
                 EgldOrEsdtTokenIdentifier::esdt(cf_token_id_value),
             )
-            .into_blockchain_deploy()
+            .into_blockchain_call()
             .from(owner_addr)
             .contract_code("file:output/crowdfunding-esdt.wasm", &ctx)
             .gas_limit("5,000,000")

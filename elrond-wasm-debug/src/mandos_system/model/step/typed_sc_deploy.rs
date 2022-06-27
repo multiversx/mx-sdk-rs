@@ -1,11 +1,9 @@
 use std::marker::PhantomData;
 
-use elrond_wasm::types::ContractDeploy;
 use mandos::interpret_trait::{InterpretableFrom, InterpreterContext};
 
-use crate::{
-    mandos_system::model::{AddressValue, BigUintValue, BytesValue, TxDeploy, TxExpect, U64Value},
-    DebugApi,
+use crate::mandos_system::model::{
+    AddressValue, BigUintValue, BytesValue, TxDeploy, TxExpect, U64Value,
 };
 
 use super::ScDeployStep;
@@ -18,18 +16,6 @@ pub struct TypedScDeploy<OriginalResult> {
     pub tx: Box<TxDeploy>,
     pub expect: Option<TxExpect>,
     _return_type: PhantomData<OriginalResult>,
-}
-
-pub trait IntoBlockchainDeploy<OriginalResult> {
-    fn into_blockchain_deploy(self) -> TypedScDeploy<OriginalResult>;
-}
-
-impl<OriginalResult> IntoBlockchainDeploy<OriginalResult>
-    for ContractDeploy<DebugApi, OriginalResult>
-{
-    fn into_blockchain_deploy(self) -> TypedScDeploy<OriginalResult> {
-        ScDeployStep::new().call(self).into()
-    }
 }
 
 impl<OriginalResult> Default for TypedScDeploy<OriginalResult> {
@@ -56,12 +42,12 @@ impl<OriginalResult> From<TypedScDeploy<OriginalResult>> for ScDeployStep {
 }
 
 impl<OriginalResult> From<ScDeployStep> for TypedScDeploy<OriginalResult> {
-    fn from(typed: ScDeployStep) -> Self {
+    fn from(untyped: ScDeployStep) -> Self {
         Self {
-            tx_id: typed.tx_id,
-            comment: typed.comment,
-            tx: typed.tx,
-            expect: typed.expect,
+            tx_id: untyped.tx_id,
+            comment: untyped.comment,
+            tx: untyped.tx,
+            expect: untyped.expect,
             _return_type: PhantomData,
         }
     }
