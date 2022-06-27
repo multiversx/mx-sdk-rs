@@ -27,8 +27,9 @@ fn adder_mandos_constructed() {
 
     // deploy
     let (new_address, ()) = world.mandos_sc_deploy_get_result(
-        adder_contract.init(5u32),
-        ScDeployStep::new()
+        adder_contract
+            .init(5u32)
+            .into_blockchain_deploy()
             .from(owner_address)
             .contract_code("file:output/adder.wasm", &ic)
             .gas_limit("5,000,000")

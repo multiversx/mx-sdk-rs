@@ -7,6 +7,7 @@ mod step_sc_query;
 mod step_set_state;
 mod step_transfer;
 mod typed_sc_call;
+mod typed_sc_deploy;
 mod typed_sc_query;
 
 pub use step_check_state::*;
@@ -18,4 +19,5 @@ pub use step_sc_query::*;
 pub use step_set_state::*;
 pub use step_transfer::*;
 pub use typed_sc_call::*;
+pub use typed_sc_deploy::*;
 pub use typed_sc_query::*;

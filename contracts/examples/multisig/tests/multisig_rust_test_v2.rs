@@ -12,10 +12,7 @@ use elrond_wasm::{
 };
 use elrond_wasm_debug::{
     mandos::interpret_trait::{InterpretableFrom, InterpreterContext},
-    mandos_system::model::{
-        Account, AddressKey, AddressValue, IntoBlockchainCall, ScCallStep, ScDeployStep,
-        SetStateStep, TxExpect,
-    },
+    mandos_system::model::*,
     BlockchainMock, ContractInfo, DebugApi,
 };
 use num_bigint::BigUint;
@@ -136,8 +133,9 @@ impl MultisigTestState {
 
         let ic = &self.world.interpreter_context();
         let (_new_address, ()) = self.world.mandos_sc_deploy_get_result(
-            self.multisig.init(2u32, board),
-            ScDeployStep::new()
+            self.multisig
+                .init(2u32, board)
+                .into_blockchain_deploy()
                 .from(self.owner.clone())
                 .contract_code("file:output/multisig.wasm", &ic)
                 .gas_limit("5,000,000")
@@ -156,8 +154,9 @@ impl MultisigTestState {
         );
 
         let (_new_address, ()) = self.world.mandos_sc_deploy_get_result(
-            self.adder.init(0u64),
-            ScDeployStep::new()
+            self.adder
+                .init(0u64)
+                .into_blockchain_deploy()
                 .from(&self.owner)
                 .contract_code("file:test-contracts/adder.wasm", &ic)
                 .gas_limit("5,000,000")
