@@ -35,12 +35,13 @@ fn crowdfunding_mandos_rust_test() {
             .new_address(owner_addr, 0, &cf_sc),
     );
     let (_, ()) = world.mandos_sc_deploy_get_result(
-        cf_sc.init(
-            2_000u32,
-            deadline,
-            EgldOrEsdtTokenIdentifier::esdt(cf_token_id_value),
-        ),
-        ScDeployStep::new()
+        cf_sc
+            .init(
+                2_000u32,
+                deadline,
+                EgldOrEsdtTokenIdentifier::esdt(cf_token_id_value),
+            )
+            .into_blockchain_deploy()
             .from(owner_addr)
             .contract_code("file:output/crowdfunding-esdt.wasm", &ctx)
             .gas_limit("5,000,000")

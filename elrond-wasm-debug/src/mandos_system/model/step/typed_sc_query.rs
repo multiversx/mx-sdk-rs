@@ -42,7 +42,7 @@ impl<OriginalResult> Default for TypedScQuery<OriginalResult> {
 
 impl<OriginalResult> From<TypedScQuery<OriginalResult>> for ScQueryStep {
     fn from(typed: TypedScQuery<OriginalResult>) -> Self {
-        ScQueryStep {
+        Self {
             tx_id: typed.tx_id,
             comment: typed.comment,
             tx: typed.tx,
