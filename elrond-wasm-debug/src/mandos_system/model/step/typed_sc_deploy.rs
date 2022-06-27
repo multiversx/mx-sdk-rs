@@ -1,5 +1,9 @@
 use std::marker::PhantomData;
 
+use elrond_wasm::{
+    elrond_codec::{CodecFrom, TopEncodeMulti},
+    types::Address,
+};
 use mandos::interpret_trait::{InterpretableFrom, InterpreterContext};
 
 use crate::mandos_system::model::{
@@ -86,5 +90,34 @@ impl<OriginalResult> TypedScDeploy<OriginalResult> {
     pub fn expect(mut self, expect: TxExpect) -> Self {
         self.expect = Some(expect);
         self
+    }
+}
+
+/// Helps with syntax. Allows the `TypedScDeploy` to call the `execute` operation directly.
+///
+/// The trait defines the connection to the executor.
+pub trait TypedScDeployExecutor {
+    fn execute_typed_sc_deploy<OriginalResult, RequestedResult>(
+        &mut self,
+        typed_sc_call: TypedScDeploy<OriginalResult>,
+    ) -> (Address, RequestedResult)
+    where
+        OriginalResult: TopEncodeMulti,
+        RequestedResult: CodecFrom<OriginalResult>;
+}
+
+impl<OriginalResult> TypedScDeploy<OriginalResult>
+where
+    OriginalResult: TopEncodeMulti,
+{
+    /// Executes the operation, on the given executor.
+    pub fn execute<E: TypedScDeployExecutor, RequestedResult>(
+        self,
+        executor: &mut E,
+    ) -> (Address, RequestedResult)
+    where
+        RequestedResult: CodecFrom<OriginalResult>,
+    {
+        executor.execute_typed_sc_deploy(self)
     }
 }

@@ -1,4 +1,4 @@
-use crate::mandos_system::model::{ScCallStep, Step, TxESDT, TypedScCall};
+use crate::mandos_system::model::{ScCallStep, Step, TxESDT, TypedScCall, TypedScCallExecutor};
 use elrond_wasm::elrond_codec::{CodecFrom, PanicErrorHandler, TopEncodeMulti};
 
 use crate::{
@@ -36,6 +36,19 @@ impl BlockchainMock {
         self.mandos_trace.steps.push(Step::ScCall(sc_call_step));
         let mut raw_result = tx_result.result_values;
         RequestedResult::multi_decode_or_handle_err(&mut raw_result, PanicErrorHandler).unwrap()
+    }
+}
+
+impl TypedScCallExecutor for BlockchainMock {
+    fn execute_typed_sc_call<OriginalResult, RequestedResult>(
+        &mut self,
+        typed_sc_call: TypedScCall<OriginalResult>,
+    ) -> RequestedResult
+    where
+        OriginalResult: TopEncodeMulti,
+        RequestedResult: CodecFrom<OriginalResult>,
+    {
+        self.mandos_sc_call_get_result(typed_sc_call)
     }
 }
 
