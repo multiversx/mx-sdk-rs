@@ -21,11 +21,10 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "add_big_float_wrapped",
+                "function": "add_big_float",
                 "arguments": [
                     "0x010a000000350000003a001f1c1a96fe0e2d",
-                    "0x010b0000003500000034ded4316c407a6b64",
-                    "1"
+                    "0x010b0000003500000034ded4316c407a6b64"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
@@ -41,11 +40,10 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "add_big_float_wrapped",
+                "function": "add_big_float",
                 "arguments": [
                     "0x010a00000035000100139c9920182fea6800",
-                    "0x010b0000003500000034ded4316c407a6b64",
-                    "1"
+                    "0x010b0000003500000034ded4316c407a6b64"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
@@ -61,11 +59,10 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "sub_big_float_wrapped",
+                "function": "sub_big_float",
                 "arguments": [
                     "0x010a000000350000003a001f1c1a96fe0e2d",
-                    "0x010a0000003500000034ded4316c407a6b64",
-                    "1"
+                    "0x010a0000003500000034ded4316c407a6b64"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"

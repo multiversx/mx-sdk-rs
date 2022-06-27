@@ -97,26 +97,6 @@ pub trait BigFloatWrappedMethods: big_float_methods::BigFloatMethods {
     }
 
     #[endpoint]
-    fn big_float_from_man_buf_wrapped(
-        &self,
-        man_buf: ManagedBuffer,
-        fixed_point_denominator: i64,
-    ) -> BigInt {
-        let number = self.big_float_from_man_buf(man_buf);
-        number.to_fixed_point(&BigFloat::from(fixed_point_denominator))
-    }
-
-    #[endpoint]
-    fn big_float_from_man_buf_ref_wrapped(
-        &self,
-        man_buf: &ManagedBuffer,
-        fixed_point_denominator: i64,
-    ) -> BigInt {
-        let number = self.big_float_from_man_buf_ref(man_buf);
-        number.to_fixed_point(&BigFloat::from(fixed_point_denominator))
-    }
-
-    #[endpoint]
     fn sqrt_big_float_wrapped(&self, a: BigInt, fixed_point_denominator: i64) -> BigInt {
         let number = self.sqrt_big_float(BigFloat::from(a));
         number.to_fixed_point(&BigFloat::from(fixed_point_denominator))
