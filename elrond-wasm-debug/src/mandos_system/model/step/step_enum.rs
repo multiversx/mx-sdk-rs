@@ -3,76 +3,20 @@ use mandos::{
     serde_raw::StepRaw,
 };
 
-use std::collections::BTreeMap;
-
 use crate::mandos_system::model::{
     Account, AddressKey, BlockInfo, BytesValue, CheckAccounts, NewAddress, TxCall, TxDeploy,
     TxExpect, TxQuery, TxTransfer, TxValidatorReward,
+};
+
+use super::{
+    CheckStateStep, DumpStateStep, ScCallStep, ScDeployStep, ScQueryStep, SetStateStep,
+    TransferStep, ValidatorRewardStep,
 };
 
 #[derive(Debug)]
 pub struct ExternalStepsStep {
     pub comment: Option<String>,
     pub path: String,
-}
-
-#[derive(Debug, Default)]
-pub struct SetStateStep {
-    pub comment: Option<String>,
-    pub accounts: BTreeMap<AddressKey, Account>,
-    pub new_addresses: Vec<NewAddress>,
-    pub block_hashes: Vec<BytesValue>,
-    pub previous_block_info: Box<Option<BlockInfo>>,
-    pub current_block_info: Box<Option<BlockInfo>>,
-}
-
-#[derive(Debug, Default)]
-pub struct ScCallStep {
-    pub tx_id: String,
-    pub comment: Option<String>,
-    pub tx: Box<TxCall>,
-    pub expect: Option<TxExpect>,
-}
-
-#[derive(Debug, Default)]
-pub struct ScQueryStep {
-    pub tx_id: String,
-    pub comment: Option<String>,
-    pub tx: Box<TxQuery>,
-    pub expect: Option<TxExpect>,
-}
-
-#[derive(Debug, Default)]
-pub struct ScDeployStep {
-    pub tx_id: String,
-    pub comment: Option<String>,
-    pub tx: Box<TxDeploy>,
-    pub expect: Option<TxExpect>,
-}
-
-#[derive(Debug)]
-pub struct TransferStep {
-    pub tx_id: String,
-    pub comment: Option<String>,
-    pub tx: Box<TxTransfer>,
-}
-
-#[derive(Debug)]
-pub struct ValidatorRewardStep {
-    pub tx_id: String,
-    pub comment: Option<String>,
-    pub tx: Box<TxValidatorReward>,
-}
-
-#[derive(Debug, Default)]
-pub struct CheckStateStep {
-    pub comment: Option<String>,
-    pub accounts: CheckAccounts,
-}
-
-#[derive(Debug, Default)]
-pub struct DumpStateStep {
-    pub comment: Option<String>,
 }
 
 #[derive(Debug)]
