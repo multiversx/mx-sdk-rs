@@ -1,5 +1,5 @@
 use crate::{
-    mandos_system::model::{ScQueryStep, Step, TxExpect, TypedScQuery},
+    mandos_system::model::{ScQueryStep, Step, TxExpect, TypedScQuery, TypedScQueryExecutor},
     num_bigint::BigUint,
     tx_execution::execute_sc_query,
     tx_mock::{generate_tx_hash_dummy, TxInput, TxResult},
@@ -48,7 +48,22 @@ impl BlockchainMock {
         let mut raw_results = tx_result.result_values;
         RequestedResult::multi_decode_or_handle_err(&mut raw_results, PanicErrorHandler).unwrap()
     }
+}
 
+impl TypedScQueryExecutor for BlockchainMock {
+    fn execute_typed_sc_query<OriginalResult, RequestedResult>(
+        &mut self,
+        typed_sc_call: TypedScQuery<OriginalResult>,
+    ) -> RequestedResult
+    where
+        OriginalResult: TopEncodeMulti,
+        RequestedResult: CodecFrom<OriginalResult>,
+    {
+        self.mandos_sc_query_expect_result(typed_sc_call)
+    }
+}
+
+impl BlockchainMock {
     /// Performs a SC query to a contract, leaves no mandos trace behind.
     ///
     /// Meant to be used for the test to investigate the state of the contract.

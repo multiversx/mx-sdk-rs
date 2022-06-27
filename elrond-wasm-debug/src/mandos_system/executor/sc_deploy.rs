@@ -1,4 +1,4 @@
-use crate::mandos_system::model::{ScDeployStep, Step, TypedScDeploy};
+use crate::mandos_system::model::{ScDeployStep, Step, TypedScDeploy, TypedScDeployExecutor};
 use elrond_wasm::{
     elrond_codec::{CodecFrom, PanicErrorHandler, TopEncodeMulti},
     types::heap::Address,
@@ -50,6 +50,19 @@ impl BlockchainMock {
                 .unwrap();
 
         (new_address, deser_result)
+    }
+}
+
+impl TypedScDeployExecutor for BlockchainMock {
+    fn execute_typed_sc_deploy<OriginalResult, RequestedResult>(
+        &mut self,
+        typed_sc_call: TypedScDeploy<OriginalResult>,
+    ) -> (Address, RequestedResult)
+    where
+        OriginalResult: TopEncodeMulti,
+        RequestedResult: CodecFrom<OriginalResult>,
+    {
+        self.mandos_sc_deploy_get_result(typed_sc_call)
     }
 }
 

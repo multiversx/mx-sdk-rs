@@ -1,5 +1,7 @@
 use std::marker::PhantomData;
 
+use elrond_wasm::elrond_codec::{CodecFrom, TopEncodeMulti};
+
 use crate::mandos_system::model::{
     AddressValue, BigUintValue, BytesValue, TxCall, TxESDT, TxExpect, U64Value,
 };
@@ -123,5 +125,34 @@ impl<OriginalResult> TypedScCall<OriginalResult> {
     pub fn expect(mut self, expect: TxExpect) -> Self {
         self.expect = Some(expect);
         self
+    }
+}
+
+/// Helps with syntax. Allows the `TypedScCall` to call the `execute` operation directly.
+///
+/// The trait defines the connection to the executor.
+pub trait TypedScCallExecutor {
+    fn execute_typed_sc_call<OriginalResult, RequestedResult>(
+        &mut self,
+        typed_sc_call: TypedScCall<OriginalResult>,
+    ) -> RequestedResult
+    where
+        OriginalResult: TopEncodeMulti,
+        RequestedResult: CodecFrom<OriginalResult>;
+}
+
+impl<OriginalResult> TypedScCall<OriginalResult>
+where
+    OriginalResult: TopEncodeMulti,
+{
+    /// Executes the operation, on the given executor.
+    pub fn execute<E: TypedScCallExecutor, RequestedResult>(
+        self,
+        executor: &mut E,
+    ) -> RequestedResult
+    where
+        RequestedResult: CodecFrom<OriginalResult>,
+    {
+        executor.execute_typed_sc_call(self)
     }
 }
