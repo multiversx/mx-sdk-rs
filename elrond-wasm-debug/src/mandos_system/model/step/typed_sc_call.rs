@@ -1,12 +1,7 @@
 use std::marker::PhantomData;
 
-use elrond_wasm::types::ContractCall;
-
-use crate::{
-    mandos_system::model::{
-        AddressValue, BigUintValue, BytesValue, TxCall, TxESDT, TxExpect, U64Value,
-    },
-    DebugApi,
+use crate::mandos_system::model::{
+    AddressValue, BigUintValue, BytesValue, TxCall, TxESDT, TxExpect, U64Value,
 };
 
 use super::ScCallStep;
@@ -19,16 +14,6 @@ pub struct TypedScCall<OriginalResult> {
     pub tx: Box<TxCall>,
     pub expect: Option<TxExpect>,
     _return_type: PhantomData<OriginalResult>,
-}
-
-pub trait IntoBlockchainCall<OriginalResult> {
-    fn into_blockchain_call(self) -> TypedScCall<OriginalResult>;
-}
-
-impl<OriginalResult> IntoBlockchainCall<OriginalResult> for ContractCall<DebugApi, OriginalResult> {
-    fn into_blockchain_call(self) -> TypedScCall<OriginalResult> {
-        ScCallStep::new().call(self).into()
-    }
 }
 
 impl<OriginalResult> Default for TypedScCall<OriginalResult> {
@@ -55,12 +40,12 @@ impl<OriginalResult> From<TypedScCall<OriginalResult>> for ScCallStep {
 }
 
 impl<OriginalResult> From<ScCallStep> for TypedScCall<OriginalResult> {
-    fn from(typed: ScCallStep) -> Self {
+    fn from(untyped: ScCallStep) -> Self {
         Self {
-            tx_id: typed.tx_id,
-            comment: typed.comment,
-            tx: typed.tx,
-            expect: typed.expect,
+            tx_id: untyped.tx_id,
+            comment: untyped.comment,
+            tx: untyped.tx,
+            expect: untyped.expect,
             _return_type: PhantomData,
         }
     }

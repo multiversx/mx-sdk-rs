@@ -135,7 +135,7 @@ impl MultisigTestState {
         let (_new_address, ()) = self.world.mandos_sc_deploy_get_result(
             self.multisig
                 .init(2u32, board)
-                .into_blockchain_deploy()
+                .into_blockchain_call()
                 .from(self.owner.clone())
                 .contract_code("file:output/multisig.wasm", &ic)
                 .gas_limit("5,000,000")
@@ -156,7 +156,7 @@ impl MultisigTestState {
         let (_new_address, ()) = self.world.mandos_sc_deploy_get_result(
             self.adder
                 .init(0u64)
-                .into_blockchain_deploy()
+                .into_blockchain_call()
                 .from(&self.owner)
                 .contract_code("file:test-contracts/adder.wasm", &ic)
                 .gas_limit("5,000,000")

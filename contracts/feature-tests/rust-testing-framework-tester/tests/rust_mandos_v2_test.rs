@@ -35,7 +35,7 @@ fn tester_deploy_test() {
     let (new_address, result): (_, String) = world.mandos_sc_deploy_get_result(
         adder_contract
             .init()
-            .into_blockchain_deploy()
+            .into_blockchain_call()
             .from(owner_address)
             .contract_code(WASM_PATH_EXPR, &ic)
             .gas_limit("5,000,000"),
