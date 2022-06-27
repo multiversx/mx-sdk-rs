@@ -152,7 +152,17 @@ impl BigFloatApi for DebugApi {
         self.bf_overwrite(dest, value);
     }
 
-    unary_op_method!(bf_sqrt, sqrt);
+    fn bf_sqrt(&self, dest: Handle, x: Handle) {
+        let bf_x = self.bf_get_f64(x);
+        if bf_x < 0f64 {
+            std::panic::panic_any(TxPanic {
+                status: 10,
+                message: err_msg::BAD_BOUNDS_LOWER.to_string(),
+            });
+        }
+        let result = bf_x.sqrt();
+        self.bf_overwrite(dest, result);
+    }
 
     fn bf_pow(&self, dest: Handle, x: Handle, exp: i32) {
         let value = self.bf_get_f64(x);

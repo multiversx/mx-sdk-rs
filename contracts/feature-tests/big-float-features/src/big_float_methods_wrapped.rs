@@ -3,7 +3,7 @@ use crate::big_float_methods;
 elrond_wasm::imports!();
 
 #[elrond_wasm::module]
-pub trait BigFloatWrappedEndpoints: big_float_methods::BigFloatMethods {
+pub trait BigFloatWrappedMethods: big_float_methods::BigFloatMethods {
     #[endpoint]
     fn new_from_parts_big_float_wrapped(
         &self,
@@ -113,6 +113,42 @@ pub trait BigFloatWrappedEndpoints: big_float_methods::BigFloatMethods {
         fixed_point_denominator: i64,
     ) -> BigInt {
         let number = self.big_float_from_man_buf_ref(man_buf);
+        number.to_fixed_point(&BigFloat::from(fixed_point_denominator))
+    }
+
+    #[endpoint]
+    fn sqrt_big_float_wrapped(&self, a: BigInt, fixed_point_denominator: i64) -> BigInt {
+        let number = self.sqrt_big_float(BigFloat::from(a));
+        number.to_fixed_point(&BigFloat::from(fixed_point_denominator))
+    }
+
+    #[endpoint]
+    fn sqrt_big_float_ref_wrapped(&self, a: BigInt, fixed_point_denominator: i64) -> BigInt {
+        let number = self.sqrt_big_float_ref(&BigFloat::from(a));
+        number.to_fixed_point(&BigFloat::from(fixed_point_denominator))
+    }
+
+    #[endpoint]
+    fn pow_big_float_wrapped(&self, a: BigInt, b: u32, fixed_point_denominator: i64) -> BigInt {
+        let number = self.pow_big_float(BigFloat::from(a), b);
+        number.to_fixed_point(&BigFloat::from(fixed_point_denominator))
+    }
+
+    #[endpoint]
+    fn pow_big_float_ref_wrapped(&self, a: BigInt, b: u32, fixed_point_denominator: i64) -> BigInt {
+        let number = self.pow_big_float_ref(&BigFloat::from(a), b);
+        number.to_fixed_point(&BigFloat::from(fixed_point_denominator))
+    }
+
+    #[endpoint]
+    fn big_float_zero_wrapped(&self) -> BigInt {
+        let number = self.big_float_zero();
+        number.to_fixed_point(&BigFloat::from(1))
+    }
+
+    #[endpoint]
+    fn big_float_neg_wrapped(&self, a: BigInt, fixed_point_denominator: i64) -> BigInt {
+        let number = self.big_float_neg(BigFloat::from(a));
         number.to_fixed_point(&BigFloat::from(fixed_point_denominator))
     }
 }

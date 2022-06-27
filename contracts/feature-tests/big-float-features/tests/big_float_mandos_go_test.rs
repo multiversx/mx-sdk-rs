@@ -37,3 +37,8 @@ fn big_float_new_from_sci_go() {
 fn big_float_operators_go() {
     elrond_wasm_debug::mandos_go("mandos/big_float_operators.scen.json");
 }
+
+#[test]
+fn big_float_operator_checks_go() {
+    elrond_wasm_debug::mandos_go("mandos/big_float_operator_checks.scen.json");
+}

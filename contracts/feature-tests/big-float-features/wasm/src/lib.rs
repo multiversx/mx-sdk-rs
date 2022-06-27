@@ -12,12 +12,27 @@ elrond_wasm_node::wasm_endpoints! {
         add_big_float
         add_big_float_ref
         big_float_from_big_int_1
+        big_float_from_big_int_1_wrapped
         big_float_from_big_int_2
+        big_float_from_big_int_2_wrapped
         big_float_from_big_uint_1
+        big_float_from_big_uint_1_wrapped
         big_float_from_big_uint_2
+        big_float_from_big_uint_2_wrapped
+        big_float_from_i16
+        big_float_from_i16_wrapped
+        big_float_from_i32
+        big_float_from_i32_wrapped
         big_float_from_i64
+        big_float_from_i64_wrapped
+        big_float_from_i8
+        big_float_from_i8_wrapped
+        big_float_from_isize
+        big_float_from_isize_wrapped
         big_float_from_man_buf
         big_float_from_man_buf_ref
+        big_float_from_man_buf_ref_wrapped
+        big_float_from_man_buf_wrapped
         big_float_neg
         big_float_zero
         div_assign_big_float
@@ -28,13 +43,12 @@ elrond_wasm_node::wasm_endpoints! {
         mul_assign_big_float_ref
         mul_big_float
         mul_big_float_ref
-        new_from_big_int_1_wrapped
-        new_from_big_int_2_wrapped
         new_from_frac_big_float
         new_from_frac_big_float_wrapped
         new_from_parts_big_float
         new_from_parts_big_float_wrapped
         new_from_sci_big_float
+        new_from_sci_big_float_wrapped
         pow_big_float
         pow_big_float_ref
         sqrt_big_float

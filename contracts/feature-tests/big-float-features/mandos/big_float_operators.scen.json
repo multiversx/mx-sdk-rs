@@ -21,16 +21,17 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "sqrt_big_float",
+                "function": "sqrt_big_float_wrapped",
                 "arguments": [
-                    "121.0"
+                    "121",
+                    "1"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "11.0"
+                    "11"
                 ]
             }
         },
@@ -40,16 +41,17 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "sqrt_big_float",
+                "function": "sqrt_big_float_wrapped",
                 "arguments": [
-                    "0x010a00000035000000118d4d11374bc6a800"
+                    "152399025",
+                    "1"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "0x010a0000003500000009867c768a1fb48800"
+                    "+12345"
                 ]
             }
         },
@@ -59,9 +61,10 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "sqrt_big_float",
+                "function": "sqrt_big_float_wrapped",
                 "arguments": [
-                    "-4.0"
+                    "-4",
+                    "1"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
@@ -77,14 +80,14 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "big_float_zero",
+                "function": "big_float_zero_wrapped",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "0x010800000035"
+                    "0"
                 ]
             }
         },
@@ -94,14 +97,14 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "big_float_zero",
+                "function": "big_float_zero_wrapped",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "0.0"
+                    "0"
                 ]
             }
         },
@@ -111,16 +114,17 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "big_float_neg",
+                "function": "big_float_neg_wrapped",
                 "arguments": [
-                    "892346.824562435"
+                    "892346",
+                    "1"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "-892346.824562435"
+                    "-892346"
                 ]
             }
         },
@@ -130,16 +134,17 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "big_float_neg",
+                "function": "big_float_neg_wrapped",
                 "arguments": [
-                    "72457.2862"
+                    "72457",
+                    "10000"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "-72457.2862"
+                    "-724570000"
                 ]
             }
         },
@@ -149,17 +154,18 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "add_big_float",
+                "function": "add_big_float_wrapped",
                 "arguments": [
-                    "2.0",
-                    "2.0"
+                    "2",
+                    "2",
+                    "1"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "4.0"
+                    "+4"
                 ]
             }
         },
@@ -169,56 +175,19 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "add_big_float",
+                "function": "add_big_float_wrapped",
                 "arguments": [
-                    "-2.0",
-                    "2.0"
+                    "-2",
+                    "2",
+                    "1"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "0.0"
+                    "0"
                 ]
-            }
-        },
-        {
-            "step": "scCall",
-            "txId": "BigFloatAdd - 3",
-            "tx": {
-                "from": "address:an_account",
-                "to": "sc:basic-features",
-                "function": "add_big_float",
-                "arguments": [
-                    "0x010a000000350000003a001f1c1a96fe0e2d",
-                    "0x010b0000003500000034ded4316c407a6b64"
-                ],
-                "gasLimit": "50,000,000",
-                "gasPrice": "0"
-            },
-            "expect": {
-                "status": "10",
-                "message": "str:this big Float operation is not permitted while doing float.Add"
-            }
-        },
-        {
-            "step": "scCall",
-            "txId": "BigFloatAdd - 4",
-            "tx": {
-                "from": "address:an_account",
-                "to": "sc:basic-features",
-                "function": "add_big_float",
-                "arguments": [
-                    "0x010a00000035000100139c9920182fea6800",
-                    "0x010b0000003500000034ded4316c407a6b64"
-                ],
-                "gasLimit": "50,000,000",
-                "gasPrice": "0"
-            },
-            "expect": {
-                "status": "10",
-                "message": "str:exponent is either too small or too big"
             }
         },
         {
@@ -227,17 +196,18 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "add_big_float_ref",
+                "function": "add_big_float_ref_wrapped",
                 "arguments": [
-                    "2.0",
-                    "2.0"
+                    "2",
+                    "2",
+                    "1"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "4.0"
+                    "+4"
                 ]
             }
         },
@@ -247,17 +217,18 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "add_big_float_ref",
+                "function": "add_big_float_ref_wrapped",
                 "arguments": [
-                    "-2.0",
-                    "2.0"
+                    "-2",
+                    "2",
+                    "1"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "0.0"
+                    "0"
                 ]
             }
         },
@@ -267,17 +238,18 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "sub_big_float",
+                "function": "sub_big_float_wrapped",
                 "arguments": [
-                    "4.45",
-                    "2.0"
+                    "4",
+                    "2",
+                    "100"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "2.45"
+                    "+200"
                 ]
             }
         },
@@ -287,37 +259,19 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "sub_big_float",
+                "function": "sub_big_float_wrapped",
                 "arguments": [
-                    "-2.0",
-                    "2.0"
+                    "-2",
+                    "2",
+                    "1"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "-4.0"
+                    "-4"
                 ]
-            }
-        },
-        {
-            "step": "scCall",
-            "txId": "BigFloatSub - 3",
-            "tx": {
-                "from": "address:an_account",
-                "to": "sc:basic-features",
-                "function": "sub_big_float",
-                "arguments": [
-                    "0x010a000000350000003a001f1c1a96fe0e2d",
-                    "0x010a0000003500000034ded4316c407a6b64"
-                ],
-                "gasLimit": "50,000,000",
-                "gasPrice": "0"
-            },
-            "expect": {
-                "status": "10",
-                "message": "str:this big Float operation is not permitted while doing float.Sub"
             }
         },
         {
@@ -326,17 +280,18 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "sub_big_float_ref",
+                "function": "sub_big_float_ref_wrapped",
                 "arguments": [
-                    "4.45",
-                    "2.0"
+                    "4",
+                    "2",
+                    "100"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "2.45"
+                    "+200"
                 ]
             }
         },
@@ -346,17 +301,18 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "sub_big_float_ref",
+                "function": "sub_big_float_ref_wrapped",
                 "arguments": [
-                    "-2.0",
-                    "2.0"
+                    "-2",
+                    "2",
+                    "1"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "-4.0"
+                    "-4"
                 ]
             }
         },
@@ -366,17 +322,18 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "mul_big_float",
+                "function": "mul_big_float_wrapped",
                 "arguments": [
-                    "4.45",
-                    "2.0"
+                    "4",
+                    "2",
+                    "10"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "8.9"
+                    "+80"
                 ]
             }
         },
@@ -386,17 +343,18 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "mul_big_float",
+                "function": "mul_big_float_wrapped",
                 "arguments": [
-                    "-2.0",
-                    "2.0"
+                    "-2",
+                    "2",
+                    "1"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "-4.0"
+                    "-4"
                 ]
             }
         },
@@ -406,17 +364,18 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "mul_big_float_ref",
+                "function": "mul_big_float_ref_wrapped",
                 "arguments": [
-                    "4.45",
-                    "2.0"
+                    "4",
+                    "2",
+                    "10"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "8.9"
+                    "+80"
                 ]
             }
         },
@@ -426,17 +385,18 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "mul_big_float_ref",
+                "function": "mul_big_float_ref_wrapped",
                 "arguments": [
-                    "-2.0",
-                    "2.0"
+                    "-2",
+                    "2",
+                    "1"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "-4.0"
+                    "-4"
                 ]
             }
         },
@@ -446,17 +406,18 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "div_big_float",
+                "function": "div_big_float_wrapped",
                 "arguments": [
-                    "4.45",
-                    "2.0"
+                    "4",
+                    "2",
+                    "1000"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "2.225"
+                    "+2000"
                 ]
             }
         },
@@ -466,17 +427,18 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "div_big_float",
+                "function": "div_big_float_wrapped",
                 "arguments": [
-                    "-2.0",
-                    "2.0"
+                    "-2",
+                    "2",
+                    "1"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "-1.0"
+                    "-1"
                 ]
             }
         },
@@ -486,17 +448,18 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "div_big_float_ref",
+                "function": "div_big_float_ref_wrapped",
                 "arguments": [
-                    "4.45",
-                    "2.0"
+                    "4",
+                    "2",
+                    "1000"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "2.225"
+                    "+2000"
                 ]
             }
         },
@@ -506,17 +469,18 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "div_big_float_ref",
+                "function": "div_big_float_ref_wrapped",
                 "arguments": [
-                    "-2.0",
-                    "2.0"
+                    "-2",
+                    "2",
+                    "1"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "-1.0"
+                    "-1"
                 ]
             }
         },
@@ -526,17 +490,18 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "add_assign_big_float",
+                "function": "add_assign_big_float_wrapped",
                 "arguments": [
-                    "2.0",
-                    "2.0"
+                    "2",
+                    "2",
+                    "1"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "4.0"
+                    "+4"
                 ]
             }
         },
@@ -546,17 +511,18 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "add_assign_big_float",
+                "function": "add_assign_big_float_wrapped",
                 "arguments": [
-                    "-2.0",
-                    "2.0"
+                    "-2",
+                    "2",
+                    "1"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "0.0"
+                    "0"
                 ]
             }
         },
@@ -566,17 +532,18 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "add_assign_big_float_ref",
+                "function": "add_assign_big_float_ref_wrapped",
                 "arguments": [
-                    "2.0",
-                    "2.0"
+                    "2",
+                    "2",
+                    "1"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "4.0"
+                    "+4"
                 ]
             }
         },
@@ -586,17 +553,18 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "add_assign_big_float_ref",
+                "function": "add_assign_big_float_ref_wrapped",
                 "arguments": [
-                    "-2.0",
-                    "2.0"
+                    "-2",
+                    "2",
+                    "1"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "0.0"
+                    "0"
                 ]
             }
         },
@@ -606,17 +574,18 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "sub_assign_big_float",
+                "function": "sub_assign_big_float_wrapped",
                 "arguments": [
-                    "4.45",
-                    "2.0"
+                    "4",
+                    "2",
+                    "100"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "2.45"
+                    "+200"
                 ]
             }
         },
@@ -626,17 +595,18 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "sub_assign_big_float",
+                "function": "sub_assign_big_float_wrapped",
                 "arguments": [
-                    "-2.0",
-                    "2.0"
+                    "-2",
+                    "2",
+                    "1"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "-4.0"
+                    "-4"
                 ]
             }
         },
@@ -646,17 +616,18 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "sub_assign_big_float_ref",
+                "function": "sub_assign_big_float_ref_wrapped",
                 "arguments": [
-                    "4.45",
-                    "2.0"
+                    "4",
+                    "2",
+                    "100"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "2.45"
+                    "+200"
                 ]
             }
         },
@@ -666,17 +637,18 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "sub_assign_big_float_ref",
+                "function": "sub_assign_big_float_ref_wrapped",
                 "arguments": [
-                    "-2.0",
-                    "2.0"
+                    "-2",
+                    "2",
+                    "1"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "-4.0"
+                    "-4"
                 ]
             }
         },
@@ -686,17 +658,18 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "mul_assign_big_float",
+                "function": "mul_assign_big_float_wrapped",
                 "arguments": [
-                    "4.45",
-                    "2.0"
+                    "4",
+                    "2",
+                    "10"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "8.9"
+                    "+80"
                 ]
             }
         },
@@ -706,17 +679,18 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "mul_assign_big_float",
+                "function": "mul_assign_big_float_wrapped",
                 "arguments": [
-                    "-2.0",
-                    "2.0"
+                    "-2",
+                    "2",
+                    "1"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "-4.0"
+                    "-4"
                 ]
             }
         },
@@ -726,17 +700,18 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "mul_assign_big_float_ref",
+                "function": "mul_assign_big_float_ref_wrapped",
                 "arguments": [
-                    "4.45",
-                    "2.0"
+                    "4",
+                    "2",
+                    "10"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "8.9"
+                    "+80"
                 ]
             }
         },
@@ -746,17 +721,18 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "mul_assign_big_float_ref",
+                "function": "mul_assign_big_float_ref_wrapped",
                 "arguments": [
-                    "-2.0",
-                    "2.0"
+                    "-2",
+                    "2",
+                    "1"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "-4.0"
+                    "-4"
                 ]
             }
         },
@@ -766,17 +742,18 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "div_assign_big_float",
+                "function": "div_assign_big_float_wrapped",
                 "arguments": [
-                    "4.45",
-                    "2.0"
+                    "4",
+                    "2",
+                    "1000"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "2.225"
+                    "+2000"
                 ]
             }
         },
@@ -786,17 +763,18 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "div_assign_big_float",
+                "function": "div_assign_big_float_wrapped",
                 "arguments": [
-                    "-2.0",
-                    "2.0"
+                    "-2",
+                    "2",
+                    "1"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "-1.0"
+                    "-1"
                 ]
             }
         },
@@ -806,17 +784,18 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "div_assign_big_float_ref",
+                "function": "div_assign_big_float_ref_wrapped",
                 "arguments": [
-                    "4.45",
-                    "2.0"
+                    "4",
+                    "2",
+                    "1000"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "2.225"
+                    "+2000"
                 ]
             }
         },
@@ -826,17 +805,18 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "div_assign_big_float_ref",
+                "function": "div_assign_big_float_ref_wrapped",
                 "arguments": [
-                    "-2.0",
-                    "2.0"
+                    "-2",
+                    "2",
+                    "1"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "-1.0"
+                    "-1"
                 ]
             }
         }

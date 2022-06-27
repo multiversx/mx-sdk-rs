@@ -54,7 +54,12 @@ fn big_float_new_from_sci_rs() {
     elrond_wasm_debug::mandos_rs("mandos/big_float_new_from_sci.scen.json", world());
 }
 
+#[test]
+fn big_float_operators_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/big_float_operators.scen.json", world());
+}
+
 // #[test]
-// fn big_float_operators_rs() {
-//     elrond_wasm_debug::mandos_rs("mandos/big_float_operators.scen.json", world());
+// fn big_float_operator_checks_rs() {
+//     elrond_wasm_debug::mandos_rs("mandos/big_float_operator_checks.scen.json", world());
 // }
