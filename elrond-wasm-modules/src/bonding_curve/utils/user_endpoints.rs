@@ -3,8 +3,7 @@ elrond_wasm::derive_imports!();
 
 use crate::bonding_curve::{
     curves::curve_function::CurveFunction,
-    function_selector::FunctionSelector,
-    utils::{events, storage, structs::CurveArguments},
+    utils::{events, storage},
 };
 
 #[elrond_wasm::module]
@@ -20,11 +19,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
                 bonding_curve.sell_availability,
                 "Selling is not available on this token"
             );
-            let price = self.compute_sell_price(
-                &bonding_curve.curve,
-                sell_amount.clone(),
-                bonding_curve.arguments.clone(),
-            );
+            let price = self.compute_sell_price(&offered_token, sell_amount.clone());
             bonding_curve.payment_amount -= price.clone();
             bonding_curve.arguments.balance += sell_amount.clone();
             price
@@ -63,11 +58,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
         let calculated_price = self
             .bonding_curve(&requested_token)
             .update(|bonding_curve| {
-                let price = self.compute_buy_price(
-                    &bonding_curve.curve,
-                    requested_amount.clone(),
-                    bonding_curve.arguments.clone(),
-                );
+                let price = self.compute_buy_price(&requested_token, requested_amount.clone());
                 require!(
                     price <= payment,
                     "The payment provided is not enough for the transaction"
@@ -148,16 +139,16 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
     fn get_buy_price(&self, amount: BigUint, identifier: TokenIdentifier) -> BigUint {
         self.check_token_exists(&identifier);
 
-        let bonding_curve = self.bonding_curve(&identifier).get();
-        self.compute_buy_price(&bonding_curve.curve, amount, bonding_curve.arguments)
+        //    let bonding_curve = self.bonding_curve(&identifier).get();
+        self.compute_buy_price(&identifier, amount)
     }
 
     #[view]
     fn get_sell_price(&self, amount: BigUint, identifier: TokenIdentifier) -> BigUint {
         self.check_token_exists(&identifier);
 
-        let bonding_curve = self.bonding_curve(&identifier).get();
-        self.compute_sell_price(&bonding_curve.curve, amount, bonding_curve.arguments)
+        //    let bonding_curve = self.bonding_curve(&identifier).get();
+        self.compute_sell_price(&identifier, amount)
     }
 
     fn check_token_exists(&self, issued_token: &TokenIdentifier) {
@@ -213,22 +204,22 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
         );
     }
 
-    fn compute_buy_price(
-        &self,
-        function_selector: &FunctionSelector<Self::Api>,
-        amount: BigUint,
-        arguments: CurveArguments<Self::Api>,
-    ) -> BigUint {
-        let token_start = arguments.first_token_available();
+    fn compute_buy_price(&self, identifier: &TokenIdentifier, amount: BigUint) -> BigUint {
+        let bonding_curve = self.bonding_curve(&identifier).get();
+
+        let arguments = &bonding_curve.arguments;
+        let function_selector = &bonding_curve.curve;
+
+        let token_start = &arguments.first_token_available();
         function_selector.calculate_price(&token_start, &amount, &arguments)
     }
 
-    fn compute_sell_price(
-        &self,
-        function_selector: &FunctionSelector<Self::Api>,
-        amount: BigUint,
-        arguments: CurveArguments<Self::Api>,
-    ) -> BigUint {
+    fn compute_sell_price(&self, identifier: &TokenIdentifier, amount: BigUint) -> BigUint {
+        let bonding_curve = self.bonding_curve(&identifier).get();
+
+        let arguments = &bonding_curve.arguments;
+        let function_selector = &bonding_curve.curve;
+
         let token_start = &arguments.first_token_available() - &amount;
         function_selector.calculate_price(&token_start, &amount, &arguments)
     }
