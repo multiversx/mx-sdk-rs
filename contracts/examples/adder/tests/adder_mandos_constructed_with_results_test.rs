@@ -38,12 +38,13 @@ fn adder_mandos_constructed() {
 
     // mandos query, gets saved in the trace
     let result: SingleValue<BigUint> =
-        world.mandos_sc_query_expect_result(adder_contract.sum(), ScQueryStep::new());
+        world.mandos_sc_query_expect_result(adder_contract.sum().into_vm_query());
     assert_eq!(result.into(), BigUint::from(5u32));
 
     let () = world.mandos_sc_call_get_result(
-        adder_contract.add(3u32),
-        ScCallStep::new()
+        adder_contract
+            .add(3u32)
+            .into_blockchain_call()
             .from(owner_address)
             .gas_limit(5000000)
             .expect(TxExpect::ok().no_result()),

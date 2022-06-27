@@ -13,7 +13,8 @@ use elrond_wasm::{
 use elrond_wasm_debug::{
     mandos::interpret_trait::{InterpretableFrom, InterpreterContext},
     mandos_system::model::{
-        Account, AddressKey, AddressValue, ScCallStep, ScDeployStep, SetStateStep, TxExpect,
+        Account, AddressKey, AddressValue, IntoBlockchainCall, ScCallStep, ScDeployStep,
+        SetStateStep, TxExpect,
     },
     BlockchainMock, ContractInfo, DebugApi,
 };
@@ -36,8 +37,11 @@ fn basic_setup_test() {
     test.multisig_deploy();
 
     let board_members: MultiValueVec<Address> = test.world.mandos_sc_call_get_result(
-        test.multisig.get_all_board_members(),
-        ScCallStep::new().from(&test.alice).expect(TxExpect::ok()),
+        test.multisig
+            .get_all_board_members()
+            .into_blockchain_call()
+            .from(&test.alice)
+            .expect(TxExpect::ok()),
     );
 
     let expected_board_members: Vec<_> = [
@@ -165,8 +169,9 @@ impl MultisigTestState {
 
     fn multisig_sign(&mut self, action_id: usize, signer: &Address) {
         let () = self.world.mandos_sc_call_get_result(
-            self.multisig.sign(action_id),
-            ScCallStep::new()
+            self.multisig
+                .sign(action_id)
+                .into_blockchain_call()
                 .from(signer)
                 .gas_limit("5,000,000")
                 .expect(TxExpect::ok().no_result()),
@@ -181,8 +186,9 @@ impl MultisigTestState {
 
     fn multisig_perform(&mut self, action_id: usize, caller: &Address) -> Option<Address> {
         let result: OptionalValue<Address> = self.world.mandos_sc_call_get_result(
-            self.multisig.perform_action_endpoint(action_id),
-            ScCallStep::new()
+            self.multisig
+                .perform_action_endpoint(action_id)
+                .into_blockchain_call()
                 .from(caller)
                 .gas_limit("5,000,000")
                 .expect(TxExpect::ok()),
@@ -215,13 +221,14 @@ impl MultisigTestState {
 
         let adder_init_args = self.adder.init(0u64).arg_buffer.into_multi_value_encoded();
         let action_id = self.world.mandos_sc_call_get_result(
-            self.multisig.propose_sc_deploy_from_source(
-                0u64,
-                &self.adder,
-                CodeMetadata::DEFAULT,
-                adder_init_args,
-            ),
-            ScCallStep::new()
+            self.multisig
+                .propose_sc_deploy_from_source(
+                    0u64,
+                    &self.adder,
+                    CodeMetadata::DEFAULT,
+                    adder_init_args,
+                )
+                .into_blockchain_call()
                 .from(caller)
                 .gas_limit("5,000,000")
                 .expect(TxExpect::ok()),
@@ -237,13 +244,14 @@ impl MultisigTestState {
     fn multisig_propose_adder_add(&mut self, number: BigUint, caller: &Address) -> usize {
         let adder_call = self.adder.add(number);
         self.world.mandos_sc_call_get_result(
-            self.multisig.propose_transfer_execute(
-                &self.adder.to_address(),
-                0u32,
-                adder_call.endpoint_name,
-                adder_call.arg_buffer.into_multi_value_encoded(),
-            ),
-            ScCallStep::new()
+            self.multisig
+                .propose_transfer_execute(
+                    &self.adder.to_address(),
+                    0u32,
+                    adder_call.endpoint_name,
+                    adder_call.arg_buffer.into_multi_value_encoded(),
+                )
+                .into_blockchain_call()
                 .from(caller)
                 .gas_limit("5,000,000")
                 .expect(TxExpect::ok()),
@@ -252,8 +260,9 @@ impl MultisigTestState {
 
     fn adder_expect_get_sum(&mut self, expected_sum: BigUint, caller: &Address) -> BigUint {
         let value: SingleValue<BigUint> = self.world.mandos_sc_call_get_result(
-            self.adder.sum(),
-            ScCallStep::new()
+            self.adder
+                .sum()
+                .into_blockchain_call()
                 .from(caller)
                 .gas_limit("5,000,000")
                 .expect(TxExpect::ok().result(&format!("{}", expected_sum))),

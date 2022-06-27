@@ -104,8 +104,10 @@ fn crowdfunding_mandos_rust_test() {
 
     // get status before
     let status: Status = world.mandos_sc_query_expect_result(
-        cf_sc.status(),
-        ScQueryStep::new().expect(TxExpect::ok().result("")),
+        cf_sc
+            .status()
+            .into_vm_query()
+            .expect(TxExpect::ok().result("")),
     );
     assert_eq!(status, Status::FundingPeriod);
 
@@ -114,8 +116,10 @@ fn crowdfunding_mandos_rust_test() {
 
     // get status after deadline
     let status: Status = world.mandos_sc_query_expect_result(
-        cf_sc.status(),
-        ScQueryStep::new().expect(TxExpect::ok().result("2")),
+        cf_sc
+            .status()
+            .into_vm_query()
+            .expect(TxExpect::ok().result("2")),
     );
     assert_eq!(status, Status::Failed);
 
@@ -206,16 +210,20 @@ fn crowdfunding_mandos_rust_test() {
     );
 
     let status: Status = world.mandos_sc_query_expect_result(
-        cf_sc.status(),
-        ScQueryStep::new().expect(TxExpect::ok().result("")),
+        cf_sc
+            .status()
+            .into_vm_query()
+            .expect(TxExpect::ok().result("")),
     );
     assert_eq!(status, Status::FundingPeriod);
 
     world.mandos_set_state(SetStateStep::new().block_timestamp(deadline));
 
     let status: Status = world.mandos_sc_query_expect_result(
-        cf_sc.status(),
-        ScQueryStep::new().expect(TxExpect::ok().result("1")),
+        cf_sc
+            .status()
+            .into_vm_query()
+            .expect(TxExpect::ok().result("1")),
     );
     assert_eq!(status, Status::Successful);
 

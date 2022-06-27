@@ -1,8 +1,13 @@
 use mandos::interpret_trait::{InterpretableFrom, InterpreterContext};
 
-use crate::mandos_system::model::{
-    AddressValue, BigUintValue, BytesValue, TxDeploy, TxExpect, U64Value,
+use crate::{
+    mandos_system::model::{AddressValue, BigUintValue, BytesValue, TxDeploy, TxExpect, U64Value},
+    DebugApi,
 };
+
+use elrond_wasm::types::ContractDeploy;
+
+use super::convert_call_args;
 
 #[derive(Debug, Default)]
 pub struct ScDeployStep {
@@ -55,4 +60,32 @@ impl ScDeployStep {
         self.expect = Some(expect);
         self
     }
+
+    /// Sets following fields based on the smart contract proxy:
+    /// - "function"
+    /// - "arguments"
+    pub fn call<OriginalResult>(
+        mut self,
+        contract_deploy: ContractDeploy<DebugApi, OriginalResult>,
+    ) -> Self {
+        let (_, mandos_args) = process_contract_deploy(contract_deploy);
+        for arg in mandos_args {
+            self = self.argument(arg.as_str());
+        }
+        self
+    }
+}
+
+/// Extracts
+/// - (optional) recipient (needed for contract upgrade, not yet used);
+/// - the arguments.
+fn process_contract_deploy<OriginalResult>(
+    contract_deploy: ContractDeploy<DebugApi, OriginalResult>,
+) -> (Option<String>, Vec<String>) {
+    let to_str = contract_deploy
+        .to
+        .as_option()
+        .map(|to| format!("0x{}", hex::encode(to.to_address().as_bytes())));
+    let mandos_args = convert_call_args(&contract_deploy.arg_buffer);
+    (to_str, mandos_args)
 }
