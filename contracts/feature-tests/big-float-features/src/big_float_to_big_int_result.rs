@@ -23,8 +23,6 @@ pub trait BigFloatWrappedEndpoints {
         fixed_point_denominator: i64,
     ) -> BigInt {
         let number = BigFloat::from_frac(numerator_value, denominator_value);
-        let mut result = number.to_fixed_point(&BigFloat::from(fixed_point_denominator));
-        result = result * 10i64.into();
-        result
+        number.to_fixed_point(&BigFloat::from(fixed_point_denominator))
     }
 }

@@ -21,18 +21,19 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "new_from_parts_big_float",
+                "function": "new_from_parts_big_float_multiplied",
                 "arguments": [
                     "i32:62345",
                     "i32:652345",
-                    "i32:-7"
+                    "i32:-7",
+                    "i32:10000000"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "0x010a0000003500000010F38910B3354C1000"
+                    "+623450652345"
                 ]
             }
         },
@@ -42,18 +43,19 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "new_from_parts_big_float",
+                "function": "new_from_parts_big_float_multiplied",
                 "arguments": [
                     "i32:-62345",
                     "i32:652345",
-                    "i32:-7"
+                    "i32:-7",
+                    "i32:10000000"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "0x010b0000003500000010f38910b3354c1000"
+                    "-623450652345"
                 ]
             }
         },
@@ -63,18 +65,19 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "new_from_parts_big_float",
+                "function": "new_from_parts_big_float_multiplied",
                 "arguments": [
                     "i32:62345",
                     "i32:652345",
-                    "i32:-311"
+                    "i32:-311",
+                    "i32:10000"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "0x010a0000003500000010f389000000000000"
+                    "+623450000"
                 ]
             }
         },
@@ -84,11 +87,12 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "new_from_parts_big_float",
+                "function": "new_from_parts_big_float_multiplied",
                 "arguments": [
                     "i32:62345",
                     "i32:65234",
-                    "i32:223"
+                    "i32:223",
+                    "i32:10000"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
@@ -104,18 +108,19 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "new_from_parts_big_float",
+                "function": "new_from_parts_big_float_multiplied",
                 "arguments": [
                     "i32:62345",
                     "i32:6523452",
-                    "i32:-323"
+                    "i32:-323",
+                    "i32:10000"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "0x010a0000003500000010f389000000000000"
+                    "+623450000"
                 ]
             }
         }

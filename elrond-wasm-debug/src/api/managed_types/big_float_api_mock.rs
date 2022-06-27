@@ -56,16 +56,25 @@ macro_rules! unary_op_method_big_int_handle {
 impl BigFloatApi for DebugApi {
     fn bf_from_parts(&self, integral_part: i32, fractional_part: i32, exponent: i32) -> Handle {
         if exponent > 0 {
-            self.signal_error(err_msg::EXPONENT_IS_POSITIVE)
+            std::panic::panic_any(TxPanic {
+                status: 10,
+                message: err_msg::EXPONENT_IS_POSITIVE.to_string(),
+            });
         }
 
         let exponent_multiplier = (10.0_f64).powi(exponent);
         let fractional_part = f64::from(fractional_part) * exponent_multiplier;
-        let value = f64::from(integral_part) + fractional_part;
+        let mut value = f64::from(integral_part);
+        if value > 0f64 {
+            value += fractional_part;
+        } else {
+            value -= fractional_part;
+        }
 
         let mut managed_types = self.m_types_borrow_mut();
         managed_types.big_float_map.insert_new_handle(value)
     }
+
     fn bf_from_frac(&self, numerator: i64, denominator: i64) -> Handle {
         if denominator == 0 {
             std::panic::panic_any(TxPanic {
@@ -87,7 +96,10 @@ impl BigFloatApi for DebugApi {
 
     fn bf_from_sci(&self, significand: i64, exponent: i64) -> Handle {
         if exponent > 0 {
-            self.signal_error(err_msg::EXPONENT_IS_POSITIVE)
+            std::panic::panic_any(TxPanic {
+                status: 10,
+                message: err_msg::EXPONENT_IS_POSITIVE.to_string(),
+            });
         }
 
         let f_significand = significand.to_f64();
