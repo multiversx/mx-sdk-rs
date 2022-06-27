@@ -37,7 +37,6 @@ pub trait BigFloatOperators {
         a / b
     }
 
-    // assign version of all operators above
     #[endpoint]
     fn add_assign_big_float(&self, a: BigFloat, b: BigFloat) -> BigFloat {
         let mut r = a.clone();
