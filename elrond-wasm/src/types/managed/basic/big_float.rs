@@ -86,7 +86,6 @@ macro_rules! big_float_conv_num {
     };
 }
 
-// TODO: more coverage, only from i64 currently tested
 big_float_conv_num! {i64}
 big_float_conv_num! {i32}
 big_float_conv_num! {isize}
