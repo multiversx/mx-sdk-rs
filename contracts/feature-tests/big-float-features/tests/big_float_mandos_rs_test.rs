@@ -16,15 +16,15 @@ fn world() -> BlockchainMock {
     blockchain
 }
 
-// #[test]
-// fn big_float_new_from_big_int_rs() {
-//     elrond_wasm_debug::mandos_rs("mandos/big_float_new_from_big_int.scen.json", world());
-// }
+#[test]
+fn big_float_new_from_big_int_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/big_float_new_from_big_int.scen.json", world());
+}
 
-// #[test]
-// fn big_float_new_from_big_uint_rs() {
-//     elrond_wasm_debug::mandos_rs("mandos/big_float_new_from_big_uint.scen.json", world());
-// }
+#[test]
+fn big_float_new_from_big_uint_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/big_float_new_from_big_uint.scen.json", world());
+}
 
 #[test]
 fn big_float_new_from_frac_rs() {

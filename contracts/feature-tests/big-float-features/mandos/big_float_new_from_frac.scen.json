@@ -21,7 +21,7 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "new_from_frac_big_float_multiplied",
+                "function": "new_from_frac_big_float_wrapped",
                 "arguments": [
                     "i64:3",
                     "i64:2",
@@ -42,7 +42,7 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "new_from_frac_big_float_multiplied",
+                "function": "new_from_frac_big_float_wrapped",
                 "arguments": [
                     "i64:-3",
                     "i64:2",
@@ -63,7 +63,7 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "new_from_frac_big_float_multiplied",
+                "function": "new_from_frac_big_float_wrapped",
                 "arguments": [
                     "i64:182456",
                     "i64:8248134216",
@@ -84,7 +84,7 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "new_from_frac_big_float_multiplied",
+                "function": "new_from_frac_big_float_wrapped",
                 "arguments": [
                     "i64:9223372036854",
                     "i64:8248134216",
@@ -105,7 +105,7 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "new_from_frac_big_float_multiplied",
+                "function": "new_from_frac_big_float_wrapped",
                 "arguments": [
                     "i64:0",
                     "i64:1",
@@ -126,7 +126,7 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "new_from_frac_big_float_multiplied",
+                "function": "new_from_frac_big_float_wrapped",
                 "arguments": [
                     "i64:1",
                     "i64:0",

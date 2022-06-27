@@ -21,7 +21,7 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "big_float_from_big_int_1",
+                "function": "big_float_from_big_int_1_wrapped",
                 "arguments": [
                     "0"
                 ],
@@ -30,7 +30,7 @@
             },
             "expect": {
                 "out": [
-                    "0x010800000035"
+                    "0"
                 ]
             }
         },
@@ -40,16 +40,16 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "big_float_from_big_int_1",
+                "function": "big_float_from_big_int_1_wrapped",
                 "arguments": [
-                    "3853625"
+                    "+3853625"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "3853625.0"
+                    "+3853625"
                 ]
             }
         },
@@ -59,7 +59,7 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "big_float_from_big_int_2",
+                "function": "big_float_from_big_int_2_wrapped",
                 "arguments": [
                     "0"
                 ],
@@ -68,7 +68,7 @@
             },
             "expect": {
                 "out": [
-                    "0.0"
+                    "0"
                 ]
             }
         },
@@ -78,7 +78,7 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "big_float_from_big_int_2",
+                "function": "big_float_from_big_int_2_wrapped",
                 "arguments": [
                     "3853625"
                 ],
@@ -87,7 +87,7 @@
             },
             "expect": {
                 "out": [
-                    "0x010a0000003500000016eb34e40000000000"
+                    "+3853625"
                 ]
             }
         }

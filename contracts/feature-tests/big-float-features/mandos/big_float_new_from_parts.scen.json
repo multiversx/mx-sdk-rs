@@ -21,7 +21,7 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "new_from_parts_big_float_multiplied",
+                "function": "new_from_parts_big_float_wrapped",
                 "arguments": [
                     "i32:62345",
                     "i32:652345",
@@ -43,7 +43,7 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "new_from_parts_big_float_multiplied",
+                "function": "new_from_parts_big_float_wrapped",
                 "arguments": [
                     "i32:-62345",
                     "i32:652345",
@@ -65,7 +65,7 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "new_from_parts_big_float_multiplied",
+                "function": "new_from_parts_big_float_wrapped",
                 "arguments": [
                     "i32:62345",
                     "i32:652345",
@@ -87,7 +87,7 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "new_from_parts_big_float_multiplied",
+                "function": "new_from_parts_big_float_wrapped",
                 "arguments": [
                     "i32:62345",
                     "i32:65234",
@@ -108,7 +108,7 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "new_from_parts_big_float_multiplied",
+                "function": "new_from_parts_big_float_wrapped",
                 "arguments": [
                     "i32:62345",
                     "i32:6523452",
