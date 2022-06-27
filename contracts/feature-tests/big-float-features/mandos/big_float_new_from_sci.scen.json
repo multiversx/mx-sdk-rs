@@ -21,17 +21,18 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "new_from_sci_big_float",
+                "function": "new_from_sci_big_float_wrapped",
                 "arguments": [
                     "i64:17132472",
-                    "i64:-3"
+                    "i64:-3",
+                    "i64:1000"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "17132.472"
+                    "17132472"
                 ]
             }
         },
@@ -41,17 +42,18 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "new_from_sci_big_float",
+                "function": "new_from_sci_big_float_wrapped",
                 "arguments": [
                     "i64:17132472",
-                    "i64:0"
+                    "i64:0",
+                    "i64:1"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "17132472.0"
+                    "17132472"
                 ]
             }
         },
@@ -61,17 +63,18 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "new_from_sci_big_float",
+                "function": "new_from_sci_big_float_wrapped",
                 "arguments": [
                     "i64:17132472",
-                    "i64:-323"
+                    "i64:-323",
+                    "i64:1"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "0.0"
+                    "0"
                 ]
             }
         },
@@ -81,9 +84,10 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "new_from_sci_big_float",
+                "function": "new_from_sci_big_float_wrapped",
                 "arguments": [
                     "i64:17132472",
+                    "i64:1",
                     "i64:1"
                 ],
                 "gasLimit": "50,000,000",

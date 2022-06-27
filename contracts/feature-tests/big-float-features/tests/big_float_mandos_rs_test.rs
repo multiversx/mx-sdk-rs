@@ -31,10 +31,10 @@ fn big_float_new_from_frac_rs() {
     elrond_wasm_debug::mandos_rs("mandos/big_float_new_from_frac.scen.json", world());
 }
 
-// #[test]
-// fn big_float_new_from_int_rs() {
-//     elrond_wasm_debug::mandos_rs("mandos/big_float_new_from_int.scen.json", world());
-// }
+#[test]
+fn big_float_new_from_int_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/big_float_new_from_int.scen.json", world());
+}
 
 // #[test]
 // fn big_float_new_from_managed_buffer_rs() {
@@ -49,10 +49,10 @@ fn big_float_new_from_parts_rs() {
     elrond_wasm_debug::mandos_rs("mandos/big_float_new_from_parts.scen.json", world());
 }
 
-// #[test]
-// fn big_float_new_from_sci_rs() {
-//     elrond_wasm_debug::mandos_rs("mandos/big_float_new_from_sci.scen.json", world());
-// }
+#[test]
+fn big_float_new_from_sci_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/big_float_new_from_sci.scen.json", world());
+}
 
 // #[test]
 // fn big_float_operators_rs() {

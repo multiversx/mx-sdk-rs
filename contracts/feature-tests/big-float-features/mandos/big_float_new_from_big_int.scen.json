@@ -59,6 +59,25 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
+                "function": "big_float_from_big_int_1_wrapped",
+                "arguments": [
+                    "-3853625"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "-3853625"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "newBigFloatFromBigInt - 4",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
                 "function": "big_float_from_big_int_2_wrapped",
                 "arguments": [
                     "0"
@@ -74,7 +93,7 @@
         },
         {
             "step": "scCall",
-            "txId": "newBigFloatFromBigInt - 4",
+            "txId": "newBigFloatFromBigInt - 5",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -88,6 +107,25 @@
             "expect": {
                 "out": [
                     "+3853625"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "newBigFloatFromBigInt - 6",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "big_float_from_big_int_2_wrapped",
+                "arguments": [
+                    "-3853625"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "-3853625"
                 ]
             }
         }

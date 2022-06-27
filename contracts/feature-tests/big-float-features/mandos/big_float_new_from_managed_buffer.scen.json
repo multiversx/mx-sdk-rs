@@ -21,7 +21,7 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "big_float_from_man_buf",
+                "function": "big_float_from_man_buf_wrapped",
                 "arguments": [
                     "0x010b0000003500000016eb34e40000000000"
                 ],
@@ -40,7 +40,7 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "big_float_from_man_buf_ref",
+                "function": "big_float_from_man_buf_ref_wrapped",
                 "arguments": [
                     "0x010b0000003500000016eb34e40000000000"
                 ],
