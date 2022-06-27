@@ -86,7 +86,6 @@ macro_rules! big_float_conv_num {
     };
 }
 
-// TODO: more coverage, only from i64 currently tested
 big_float_conv_num! {i64}
 big_float_conv_num! {i32}
 big_float_conv_num! {isize}
@@ -141,6 +140,31 @@ impl<M: ManagedTypeApi> BigFloat<M> {
         let api = M::managed_type_impl();
         let new_bf_handle = api.bf_from_sci(significand_value, exponent_value as i64);
         BigFloat::from_raw_handle(new_bf_handle)
+    }
+
+    pub fn trunc(&self) -> BigInt<M> {
+        let result = M::static_var_api_impl().next_handle();
+        let api = M::managed_type_impl();
+        api.bf_trunc(result, self.handle);
+        BigInt::from_raw_handle(result)
+    }
+
+    pub fn floor(&self) -> BigInt<M> {
+        let result = M::static_var_api_impl().next_handle();
+        let api = M::managed_type_impl();
+        api.bf_floor(result, self.handle);
+        BigInt::from_raw_handle(result)
+    }
+
+    pub fn ceil(&self) -> BigInt<M> {
+        let result = M::static_var_api_impl().next_handle();
+        let api = M::managed_type_impl();
+        api.bf_ceil(result, self.handle);
+        BigInt::from_raw_handle(result)
+    }
+
+    pub fn to_fixed_point(&self, denominator: &BigFloat<M>) -> BigInt<M> {
+        (self * denominator).trunc()
     }
 }
 
