@@ -44,9 +44,12 @@ impl<M: ManagedTypeApi> EgldOrEsdtTokenIdentifier<M> {
 
     /// ESDT instance, containing an ESDT token identifier.
     #[inline]
-    pub fn esdt(token_identifier: TokenIdentifier<M>) -> Self {
+    pub fn esdt<TI>(token_identifier: TI) -> Self
+    where
+        TokenIdentifier<M>: From<TI>,
+    {
         Self {
-            data: ManagedOption::some(token_identifier),
+            data: ManagedOption::some(TokenIdentifier::from(token_identifier)),
         }
     }
 
@@ -114,7 +117,7 @@ impl<M: ManagedTypeApi> EgldOrEsdtTokenIdentifier<M> {
     }
 
     /// Representation of the object as an `Option`.
-    /// 
+    ///
     /// Because it does not consume `self` only a reference to the ESDT token identifier can be returned.
     pub fn as_esdt_option(&self) -> Option<ManagedRef<'_, M, TokenIdentifier<M>>> {
         self.data.as_option()
@@ -205,6 +208,7 @@ impl<M> CodecFrom<TokenIdentifier<M>> for EgldOrEsdtTokenIdentifier<M> where M: 
 impl<M> CodecFrom<&TokenIdentifier<M>> for EgldOrEsdtTokenIdentifier<M> where M: ManagedTypeApi {}
 
 impl<M> CodecFrom<&[u8]> for EgldOrEsdtTokenIdentifier<M> where M: ManagedTypeApi {}
+impl<M> CodecFrom<&str> for EgldOrEsdtTokenIdentifier<M> where M: ManagedTypeApi {}
 
 impl<M: ManagedTypeApi> TypeAbi for EgldOrEsdtTokenIdentifier<M> {
     fn type_name() -> TypeName {

@@ -2,9 +2,10 @@ use core::marker::PhantomData;
 
 use crate::{
     api::{
-        BlockchainApi, BlockchainApiImpl, ErrorApi, ErrorApiImpl, ManagedTypeApi, StaticVarApiImpl,
-        StorageReadApi, StorageReadApiImpl,
+        const_handles, BlockchainApi, BlockchainApiImpl, ErrorApi, ErrorApiImpl, ManagedTypeApi,
+        StaticVarApiImpl, StorageReadApi, StorageReadApiImpl,
     },
+    err_msg::{ONLY_OWNER_CALLER, ONLY_USER_ACCOUNT_CALLER},
     storage::{self},
     types::{
         BigUint, EgldOrEsdtTokenIdentifier, EsdtLocalRoleFlags, EsdtTokenData, ManagedAddress,
@@ -77,7 +78,14 @@ where
 
     pub fn check_caller_is_owner(&self) {
         if self.get_owner_address() != self.get_caller() {
-            A::error_api_impl().signal_error(b"Endpoint can only be called by owner");
+            A::error_api_impl().signal_error(ONLY_OWNER_CALLER);
+        }
+    }
+
+    pub fn check_caller_is_user_account(&self) {
+        A::blockchain_api_impl().load_caller_managed(const_handles::MBUF_TEMPORARY_1);
+        if A::blockchain_api_impl().is_smart_contract(const_handles::MBUF_TEMPORARY_1) {
+            A::error_api_impl().signal_error(ONLY_USER_ACCOUNT_CALLER);
         }
     }
 
