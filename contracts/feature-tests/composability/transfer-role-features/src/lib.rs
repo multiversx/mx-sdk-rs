@@ -8,7 +8,12 @@ pub trait TransferRoleFeatures:
     elrond_wasm_modules::transfer_role_proxy::TransferRoleProxyModule
 {
     #[init]
-    fn init(&self) {}
+    fn init(&self, whitelist: MultiValueEncoded<ManagedAddress>) {
+        let mut whitelist_mapper = self.destination_whitelist();
+        for addr in whitelist {
+            let _ = whitelist_mapper.insert(addr);
+        }
+    }
 
     #[payable("*")]
     #[endpoint(forwardPayments)]
