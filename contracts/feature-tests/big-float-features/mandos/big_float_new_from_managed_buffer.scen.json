@@ -23,14 +23,16 @@
                 "to": "sc:basic-features",
                 "function": "big_float_from_man_buf_wrapped",
                 "arguments": [
-                    "0x010b0000003500000016eb34e40000000000"
+                    "0x010b0000003500000016eb34e40000000000",
+                    "1"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "0x010b0000003500000016eb34e40000000000"
+                    "0x010b0000003500000016eb34e40000000000",
+                    "1"
                 ]
             }
         },
