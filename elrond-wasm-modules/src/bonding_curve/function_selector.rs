@@ -28,7 +28,7 @@ impl<M: ManagedTypeApi> CurveFunction<M> for FunctionSelector<M> {
     ) -> BigUint<M> {
         match &self {
             FunctionSelector::Linear(linear_function) => {
-                CurveFunction::calculate_price(linear_function, token_start, amount, arguments)
+                linear_function.calculate_price(token_start, amount, arguments)
             },
 
             FunctionSelector::CustomExample(initial_cost) => {

@@ -1,9 +1,11 @@
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
+use elrond_wasm::contract_base::ManagedSerializer;
+
 use crate::bonding_curve::{
     curves::curve_function::CurveFunction,
-    utils::{events, storage},
+    utils::{events, storage, structs::BondingCurve},
 };
 
 #[elrond_wasm::module]
@@ -14,28 +16,32 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
         let (offered_token, nonce, sell_amount) = self.call_value().single_esdt().into_tuple();
         let _ = self.check_owned_return_payment_token(&offered_token, &sell_amount);
 
-        let calculated_price = self.bonding_curve(&offered_token).update(|bonding_curve| {
-            require!(
-                bonding_curve.sell_availability,
-                "Selling is not available on this token"
-            );
-            let price = self.compute_sell_price(&offered_token, sell_amount.clone());
-            bonding_curve.payment_amount -= price.clone();
-            bonding_curve.arguments.balance += sell_amount.clone();
-            price
-        });
+        let (calculated_price, payment_token) =
+            self.bonding_curve(&offered_token).update(|buffer| {
+                let serializer = ManagedSerializer::new();
+
+                let mut bonding_curve: BondingCurve<Self::Api> =
+                    serializer.top_decode_from_managed_buffer(buffer);
+
+                require!(
+                    bonding_curve.sell_availability,
+                    "Selling is not available on this token"
+                );
+                let price = self.compute_sell_price(&offered_token, sell_amount.clone());
+                bonding_curve.payment_amount -= price.clone();
+                bonding_curve.arguments.balance += sell_amount.clone();
+                let payment_token = bonding_curve.payment_token.clone();
+                *buffer = serializer.top_encode_to_managed_buffer(&bonding_curve);
+                (price, payment_token)
+            });
 
         let caller = self.blockchain().get_caller();
 
         self.nonce_amount(&offered_token, nonce)
             .update(|val| *val += sell_amount);
 
-        self.send().direct(
-            &caller,
-            &self.bonding_curve(&offered_token).get().payment_token,
-            0u64,
-            &calculated_price,
-        );
+        self.send()
+            .direct(&caller, &payment_token, 0u64, &calculated_price);
         self.token_details(&offered_token)
             .update(|details| details.add_nonce(nonce));
 
@@ -55,19 +61,23 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
             self.check_owned_return_payment_token(&requested_token, &requested_amount);
         self.check_given_token(&payment_token, &offered_token);
 
-        let calculated_price = self
-            .bonding_curve(&requested_token)
-            .update(|bonding_curve| {
-                let price = self.compute_buy_price(&requested_token, requested_amount.clone());
-                require!(
-                    price <= payment,
-                    "The payment provided is not enough for the transaction"
-                );
-                bonding_curve.payment_amount += &price;
-                bonding_curve.arguments.balance -= &requested_amount;
+        let calculated_price = self.bonding_curve(&requested_token).update(|buffer| {
+            let serializer = ManagedSerializer::new();
 
-                price
-            });
+            let mut bonding_curve: BondingCurve<Self::Api> =
+                serializer.top_decode_from_managed_buffer(buffer);
+
+            let price = self.compute_buy_price(&requested_token, requested_amount.clone());
+            require!(
+                price <= payment,
+                "The payment provided is not enough for the transaction"
+            );
+            bonding_curve.payment_amount += &price;
+            bonding_curve.arguments.balance -= &requested_amount;
+            *buffer = serializer.top_encode_to_managed_buffer(&bonding_curve);
+
+            price
+        });
 
         let caller = self.blockchain().get_caller();
 
@@ -182,13 +192,15 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
     ) -> EgldOrEsdtTokenIdentifier {
         self.check_token_exists(issued_token);
 
-        let bonding_curve = self.bonding_curve(issued_token).get();
+        let serializer = ManagedSerializer::new();
+        let bonding_curve: BondingCurve<Self::Api> =
+            serializer.top_decode_from_managed_buffer(&self.bonding_curve(issued_token).get());
 
         require!(
             bonding_curve.curve.is_none(),
             "The token price was not set yet!"
         );
-        require!(amount > &0, "Must pay more than 0 tokens!");
+        require!(amount > &BigUint::zero(), "Must pay more than 0 tokens!");
         bonding_curve.payment_token
     }
 
@@ -205,7 +217,9 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
     }
 
     fn compute_buy_price(&self, identifier: &TokenIdentifier, amount: BigUint) -> BigUint {
-        let bonding_curve = self.bonding_curve(&identifier).get();
+        let serializer = ManagedSerializer::new();
+        let bonding_curve: BondingCurve<Self::Api> =
+            serializer.top_decode_from_managed_buffer(&self.bonding_curve(identifier).get());
 
         let arguments = &bonding_curve.arguments;
         let function_selector = &bonding_curve.curve;
@@ -215,7 +229,9 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
     }
 
     fn compute_sell_price(&self, identifier: &TokenIdentifier, amount: BigUint) -> BigUint {
-        let bonding_curve = self.bonding_curve(&identifier).get();
+        let serializer = ManagedSerializer::new();
+        let bonding_curve: BondingCurve<Self::Api> =
+            serializer.top_decode_from_managed_buffer(&self.bonding_curve(identifier).get());
 
         let arguments = &bonding_curve.arguments;
         let function_selector = &bonding_curve.curve;

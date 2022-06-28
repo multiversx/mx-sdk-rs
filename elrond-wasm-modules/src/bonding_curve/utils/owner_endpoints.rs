@@ -1,6 +1,8 @@
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
+use elrond_wasm::contract_base::ManagedSerializer;
+
 use crate::bonding_curve::{
     function_selector::FunctionSelector,
     utils::{
@@ -60,9 +62,14 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
             details.owner == caller,
             "The price function can only be set by the seller."
         );
-        self.bonding_curve(&identifier).update(|bonding_curve| {
+        self.bonding_curve(&identifier).update(|buffer| {
+            let serializer = ManagedSerializer::new();
+
+            let mut bonding_curve: BondingCurve<Self::Api> =
+                serializer.top_decode_from_managed_buffer(buffer);
             bonding_curve.curve = function;
-            bonding_curve.sell_availability = sell_availability
+            bonding_curve.sell_availability = sell_availability;
+            *buffer = serializer.top_encode_to_managed_buffer(&bonding_curve);
         });
     }
 
@@ -140,6 +147,7 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
         let payment_token;
         let payment_amount: BigUint;
         let sell_availability: bool;
+        let serializer = ManagedSerializer::new();
 
         if self.bonding_curve(identifier).is_empty() {
             arguments = CurveArguments {
@@ -150,7 +158,9 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
             payment_amount = BigUint::zero();
             sell_availability = false;
         } else {
-            let bonding_curve = self.bonding_curve(identifier).get();
+            let bonding_curve: BondingCurve<Self::Api> =
+                serializer.top_decode_from_managed_buffer(&self.bonding_curve(identifier).get());
+
             payment_token = bonding_curve.payment_token;
             payment_amount = bonding_curve.payment_amount;
             curve = bonding_curve.curve;
@@ -159,12 +169,13 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
             arguments.available_supply += amount;
             sell_availability = bonding_curve.sell_availability;
         }
-        self.bonding_curve(identifier).set(&BondingCurve {
+        let encoded_curve = serializer.top_encode_to_managed_buffer(&BondingCurve {
             curve,
             arguments,
             sell_availability,
             payment_token,
             payment_amount,
         });
+        self.bonding_curve(identifier).set(encoded_curve);
     }
 }
