@@ -34,18 +34,18 @@ fn crowdfunding_mandos_rust_test() {
             .put_account(owner_addr, Account::new())
             .new_address(owner_addr, 0, &cf_sc),
     );
-    let (_, ()) = world.mandos_sc_deploy_get_result(
-        cf_sc.init(
+    let (_, ()) = cf_sc
+        .init(
             2_000u32,
             deadline,
             EgldOrEsdtTokenIdentifier::esdt(cf_token_id_value),
-        ),
-        ScDeployStep::new()
-            .from(owner_addr)
-            .contract_code("file:output/crowdfunding-esdt.wasm", &ctx)
-            .gas_limit("5,000,000")
-            .expect(TxExpect::ok().no_result()),
-    );
+        )
+        .into_blockchain_call()
+        .from(owner_addr)
+        .contract_code("file:output/crowdfunding-esdt.wasm", &ctx)
+        .gas_limit("5,000,000")
+        .expect(TxExpect::ok().no_result())
+        .execute(&mut world);
 
     // setup user accounts
     world
@@ -103,20 +103,22 @@ fn crowdfunding_mandos_rust_test() {
         );
 
     // get status before
-    let status: Status = world.mandos_sc_query_expect_result(
-        cf_sc.status(),
-        ScQueryStep::new().expect(TxExpect::ok().result("")),
-    );
+    let status: Status = cf_sc
+        .status()
+        .into_vm_query()
+        .expect(TxExpect::ok().result(""))
+        .execute(&mut world);
     assert_eq!(status, Status::FundingPeriod);
 
     // deadline passed
     world.mandos_set_state(SetStateStep::new().block_timestamp(deadline));
 
     // get status after deadline
-    let status: Status = world.mandos_sc_query_expect_result(
-        cf_sc.status(),
-        ScQueryStep::new().expect(TxExpect::ok().result("2")),
-    );
+    let status: Status = cf_sc
+        .status()
+        .into_vm_query()
+        .expect(TxExpect::ok().result("2"))
+        .execute(&mut world);
     assert_eq!(status, Status::Failed);
 
     // test failed campaign
@@ -205,18 +207,20 @@ fn crowdfunding_mandos_rust_test() {
             .expect(TxExpect::ok().no_result()),
     );
 
-    let status: Status = world.mandos_sc_query_expect_result(
-        cf_sc.status(),
-        ScQueryStep::new().expect(TxExpect::ok().result("")),
-    );
+    let status: Status = cf_sc
+        .status()
+        .into_vm_query()
+        .expect(TxExpect::ok().result(""))
+        .execute(&mut world);
     assert_eq!(status, Status::FundingPeriod);
 
     world.mandos_set_state(SetStateStep::new().block_timestamp(deadline));
 
-    let status: Status = world.mandos_sc_query_expect_result(
-        cf_sc.status(),
-        ScQueryStep::new().expect(TxExpect::ok().result("1")),
-    );
+    let status: Status = cf_sc
+        .status()
+        .into_vm_query()
+        .expect(TxExpect::ok().result("1"))
+        .execute(&mut world);
     assert_eq!(status, Status::Successful);
 
     // first user try claim - successful campaign
