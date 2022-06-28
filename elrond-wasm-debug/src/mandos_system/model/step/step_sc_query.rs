@@ -1,4 +1,14 @@
-use crate::mandos_system::model::{AddressValue, BytesValue, TxExpect, TxQuery};
+use elrond_wasm::{
+    elrond_codec::{CodecFrom, TopEncodeMulti},
+    types::ContractCall,
+};
+
+use crate::{
+    mandos_system::model::{AddressValue, BytesValue, TxExpect, TxQuery},
+    DebugApi,
+};
+
+use super::{format_expect, process_contract_call};
 
 #[derive(Debug, Default)]
 pub struct ScQueryStep {
@@ -33,6 +43,44 @@ impl ScQueryStep {
 
     pub fn expect(mut self, expect: TxExpect) -> Self {
         self.expect = Some(expect);
+        self
+    }
+
+    /// Sets following fields based on the smart contract proxy:
+    /// - "to"
+    /// - "function"
+    /// - "arguments"
+    pub fn call<OriginalResult>(
+        mut self,
+        contract_call: ContractCall<DebugApi, OriginalResult>,
+    ) -> Self {
+        let (to_str, function, mandos_args) = process_contract_call(contract_call);
+        self = self.to(to_str.as_str());
+        self = self.function(function.as_str());
+        for arg in mandos_args {
+            self = self.argument(arg.as_str());
+        }
+        self
+    }
+
+    /// Sets following fields based on the smart contract proxy:
+    /// - "to"
+    /// - "function"
+    /// - "arguments"
+    /// - "expect"
+    ///     - "out"
+    ///     - "status" set to 0
+    pub fn call_expect<OriginalResult, ExpectedResult>(
+        mut self,
+        contract_call: ContractCall<DebugApi, OriginalResult>,
+        expect_value: ExpectedResult,
+    ) -> Self
+    where
+        OriginalResult: TopEncodeMulti,
+        ExpectedResult: CodecFrom<OriginalResult> + TopEncodeMulti,
+    {
+        self = self.call(contract_call);
+        self = self.expect(format_expect(expect_value));
         self
     }
 }
