@@ -11,14 +11,21 @@ use elrond_wasm_debug::{
         elrond_codec::{CodecFrom, PanicErrorHandler, TopEncodeMulti},
         types::{Address, ContractCall},
     },
-    mandos_system::model::{AddressValue, ScCallStep},
+    mandos_system::model::{AddressValue, ScCallStep, TypedScCall},
     DebugApi, HashMap,
 };
+use log::info;
+use std::time::Duration;
+
+use crate::scr_decode::decode_scr_data_or_panic;
+
+pub const TX_GET_RESULTS_NUM_RETRIES: usize = 8;
 
 pub struct Interactor {
     pub proxy: ElrondProxy,
     pub network_config: NetworkConfig,
     pub signing_wallets: HashMap<Address, Wallet>,
+    waiting_time_ms: u64,
 }
 
 impl Interactor {
@@ -29,6 +36,7 @@ impl Interactor {
             proxy,
             network_config,
             signing_wallets: HashMap::new(),
+            waiting_time_ms: 0,
         }
     }
 
@@ -54,7 +62,7 @@ impl Interactor {
         }
     }
 
-    pub async fn mandos_sc_call(&mut self, sc_call_step: ScCallStep) -> &mut Self {
+    pub async fn send_sc_call(&mut self, sc_call_step: ScCallStep) -> String {
         let sender_address = &sc_call_step.tx.from.value;
         let mut transaction = self.sc_call_to_tx(&sc_call_step);
         transaction.nonce = self.recall_nonce(sender_address).await;
@@ -66,14 +74,71 @@ impl Interactor {
 
         let signature = wallet.sign_tx(&transaction);
         transaction.signature = Some(hex::encode(signature));
-        println!("transaction {:#?}", transaction);
+        info!("transaction {:#?}", transaction);
 
-        let tx_hash = self.proxy.send_transaction(&transaction).await.unwrap();
-        println!("tx_hash {}", tx_hash);
-
-        self
+        self.proxy.send_transaction(&transaction).await.unwrap()
     }
 
+    async fn sleep(&mut self, duration: Duration) {
+        self.waiting_time_ms += duration.as_millis() as u64;
+        tokio::time::sleep(duration).await;
+    }
+
+    pub async fn sc_call<OriginalResult, RequestedResult>(
+        &mut self,
+        typed_sc_call: TypedScCall<OriginalResult>,
+    ) -> RequestedResult
+    where
+        OriginalResult: TopEncodeMulti,
+        RequestedResult: CodecFrom<OriginalResult>,
+    {
+        let sc_call_step: ScCallStep = typed_sc_call.into();
+        let tx_hash = self.send_sc_call(sc_call_step).await;
+        info!("tx_hash {}", tx_hash);
+
+        self.waiting_time_ms = 0;
+        self.sleep(Duration::from_secs(25)).await;
+
+        let mut retries = TX_GET_RESULTS_NUM_RETRIES;
+        let mut wait = 1000u64;
+        let tx = loop {
+            let tx_info_result = self
+                .proxy
+                .get_transaction_info_with_results(tx_hash.as_str())
+                .await;
+            match tx_info_result {
+                Ok(tx) => break tx,
+                Err(err) => {
+                    assert!(
+                        retries > 0,
+                        "still no answer after {} retries",
+                        TX_GET_RESULTS_NUM_RETRIES
+                    );
+
+                    info!(
+                        "tx result fetch error after {} ms: {}",
+                        self.waiting_time_ms, err
+                    );
+                    retries -= 1;
+                    self.sleep(Duration::from_millis(wait)).await;
+                    wait *= 2;
+                },
+            }
+        };
+
+        info!("tx with results: {:#?}", tx);
+
+        let scrs = tx
+            .smart_contract_results
+            .expect("no smart contract results obtained");
+        let first_scr = scrs.get(0).expect("no smart contract results obtained");
+
+        let mut raw_result = decode_scr_data_or_panic(first_scr.data.as_str());
+        RequestedResult::multi_decode_or_handle_err(&mut raw_result, PanicErrorHandler).unwrap()
+    }
+}
+
+impl Interactor {
     pub async fn vm_query<OriginalResult, RequestedResult>(
         &mut self,
         contract_call: ContractCall<DebugApi, OriginalResult>,
@@ -101,7 +166,7 @@ impl Interactor {
             .await
             .expect("error executing VM query");
 
-        // println!("{:#?}", result);
+        // info!("{:#?}", result);
 
         let mut raw_results: Vec<Vec<u8>> = result
             .data
