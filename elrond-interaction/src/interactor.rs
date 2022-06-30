@@ -6,8 +6,6 @@ use elrond_sdk_erdrs::{
 use elrond_wasm_debug::{elrond_wasm::types::Address, mandos_system::model::AddressValue, HashMap};
 use std::time::Duration;
 
-pub const TX_GET_RESULTS_NUM_RETRIES: usize = 8;
-
 pub struct Interactor {
     pub proxy: ElrondProxy,
     pub network_config: NetworkConfig,

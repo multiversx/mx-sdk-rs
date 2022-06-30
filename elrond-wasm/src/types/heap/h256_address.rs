@@ -3,8 +3,7 @@ use crate::{
     abi::{TypeAbi, TypeName},
     types::heap::BoxedBytes,
 };
-use alloc::{boxed::Box, string::String, vec::Vec};
-use bech32_no_std::{FromBase32, ToBase32};
+use alloc::{boxed::Box, vec::Vec};
 use core::fmt::Debug;
 
 /// An Address is just a H256 with a different name.
@@ -149,20 +148,6 @@ impl Address {
     /// Does not reallocate or copy data, the data on the heap remains untouched.
     pub fn into_boxed_bytes(self) -> BoxedBytes {
         self.0.into_boxed_bytes()
-    }
-
-    pub fn from_bech32(bech32_address: &str) -> Address {
-        let (_, dest_address_bytes_u5) = bech32_no_std::decode(bech32_address).unwrap();
-        let dest_address_bytes = Vec::<u8>::from_base32(&dest_address_bytes_u5).unwrap();
-        if dest_address_bytes.len() != 32 {
-            panic!("Invalid address length after decoding")
-        }
-
-        Address::from_slice(&dest_address_bytes)
-    }
-
-    pub fn to_bech32(&self) -> String {
-        bech32_no_std::encode("erd", self.0.to_base32()).expect("bech32 encode error")
     }
 }
 
