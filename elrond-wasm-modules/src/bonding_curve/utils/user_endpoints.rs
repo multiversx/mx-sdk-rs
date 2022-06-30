@@ -133,6 +133,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
     ) {
         let mut nonces = self.token_details(&token).get().token_nonces;
         let mut total_amount = amount;
+        let mut tokens_to_send = ManagedVec::<Self::Api, EsdtTokenPayment<Self::Api>>::new();
         loop {
             require!(!nonces.is_empty(), "Insufficient balance");
             let nonce = nonces.get(0);
@@ -150,12 +151,13 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
                 amount_to_send = total_amount.clone();
                 total_amount = BigUint::zero();
             }
-            self.send()
-                .direct_esdt(caller, &token, nonce, &amount_to_send);
+            tokens_to_send.push(EsdtTokenPayment::new(token.clone(), nonce, amount_to_send));
             if total_amount == BigUint::zero() {
                 break;
             }
         }
+
+        self.send().direct_multi(caller, &tokens_to_send);
 
         self.token_details(&token)
             .update(|token_ownership| token_ownership.token_nonces = nonces);
