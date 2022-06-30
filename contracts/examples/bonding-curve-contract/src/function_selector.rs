@@ -13,9 +13,9 @@ pub enum FunctionSelector<M: ManagedTypeApi> {
     None,
 }
 
-impl<M: ManagedTypeApi> FunctionSelector<M> {
-    pub fn is_none(&self) -> bool {
-        matches!(self, FunctionSelector::None)
+impl<M: ManagedTypeApi> Default for FunctionSelector<M> {
+    fn default() -> Self {
+        FunctionSelector::None
     }
 }
 

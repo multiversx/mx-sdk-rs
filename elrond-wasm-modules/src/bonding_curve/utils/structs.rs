@@ -1,4 +1,5 @@
-use crate::bonding_curve::function_selector::FunctionSelector;
+use crate::bonding_curve::curves::curve_function::CurveFunction;
+use elrond_wasm::{abi::TypeAbi, elrond_codec::TopEncode};
 
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
@@ -16,8 +17,11 @@ impl<M: ManagedTypeApi> CurveArguments<M> {
 }
 
 #[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, PartialEq, Eq, Clone)]
-pub struct BondingCurve<M: ManagedTypeApi> {
-    pub curve: FunctionSelector<M>,
+pub struct BondingCurve<
+    M: ManagedTypeApi,
+    T: CurveFunction<M> + TopEncode + TopDecode + NestedEncode + NestedDecode + TypeAbi,
+> {
+    pub curve: T,
     pub arguments: CurveArguments<M>,
     pub sell_availability: bool,
     pub payment_token: EgldOrEsdtTokenIdentifier<M>,

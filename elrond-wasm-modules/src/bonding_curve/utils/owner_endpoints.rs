@@ -4,7 +4,7 @@ elrond_wasm::derive_imports!();
 use elrond_wasm::contract_base::ManagedSerializer;
 
 use crate::bonding_curve::{
-    function_selector::FunctionSelector,
+    curves::curve_function::CurveFunction,
     utils::{
         events, storage,
         structs::{BondingCurve, TokenOwnershipData},
@@ -12,6 +12,7 @@ use crate::bonding_curve::{
 };
 
 use super::structs::CurveArguments;
+use elrond_wasm::{abi::TypeAbi, elrond_codec::TopEncode};
 
 #[elrond_wasm::module]
 pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
@@ -43,13 +44,21 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
             .call_and_exit()
     }
 
-    #[endpoint(setBondingCurve)]
-    fn set_bonding_curve(
+    fn set_bonding_curve<T>(
         &self,
         identifier: TokenIdentifier,
-        function: FunctionSelector<Self::Api>,
+        function: T,
         sell_availability: bool,
-    ) {
+    ) where
+        T: CurveFunction<Self::Api>
+            + TopEncode
+            + TopDecode
+            + NestedEncode
+            + NestedDecode
+            + TypeAbi
+            + PartialEq
+            + Default,
+    {
         require!(
             !self.token_details(&identifier).is_empty(),
             "Token is not issued yet!"
@@ -65,7 +74,7 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
         self.bonding_curve(&identifier).update(|buffer| {
             let serializer = ManagedSerializer::new();
 
-            let mut bonding_curve: BondingCurve<Self::Api> =
+            let mut bonding_curve: BondingCurve<Self::Api, T> =
                 serializer.top_decode_from_managed_buffer(buffer);
             bonding_curve.curve = function;
             bonding_curve.sell_availability = sell_availability;
@@ -73,9 +82,17 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
         });
     }
 
-    #[endpoint(deposit)]
-    #[payable("*")]
-    fn deposit(&self, payment_token: OptionalValue<TokenIdentifier>) {
+    fn deposit<T>(&self, payment_token: OptionalValue<TokenIdentifier>)
+    where
+        T: CurveFunction<Self::Api>
+            + TopEncode
+            + TopDecode
+            + NestedEncode
+            + NestedDecode
+            + TypeAbi
+            + PartialEq
+            + Default,
+    {
         let (identifier, nonce, amount) = self.call_value().single_esdt().into_tuple();
         let caller = self.blockchain().get_caller();
         let mut set_payment = EgldOrEsdtTokenIdentifier::egld();
@@ -106,7 +123,7 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
             }
         }
 
-        self.set_curve_storage(&identifier, amount.clone(), set_payment);
+        self.set_curve_storage::<T>(&identifier, amount.clone(), set_payment);
         self.owned_tokens(&caller).insert(identifier.clone());
         self.nonce_amount(&identifier, nonce)
             .update(|current_amount| *current_amount += amount);
@@ -136,13 +153,22 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
         self.owned_tokens(&caller).clear();
     }
 
-    fn set_curve_storage(
+    fn set_curve_storage<T>(
         &self,
         identifier: &TokenIdentifier,
         amount: BigUint,
         payment: EgldOrEsdtTokenIdentifier,
-    ) {
-        let mut curve = FunctionSelector::None;
+    ) where
+        T: CurveFunction<Self::Api>
+            + TopEncode
+            + TopDecode
+            + NestedEncode
+            + NestedDecode
+            + TypeAbi
+            + PartialEq
+            + Default,
+    {
+        let mut curve: T = T::default();
         let mut arguments;
         let payment_token;
         let payment_amount: BigUint;
@@ -158,7 +184,7 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
             payment_amount = BigUint::zero();
             sell_availability = false;
         } else {
-            let bonding_curve: BondingCurve<Self::Api> =
+            let bonding_curve: BondingCurve<Self::Api, T> =
                 serializer.top_decode_from_managed_buffer(&self.bonding_curve(identifier).get());
 
             payment_token = bonding_curve.payment_token;
