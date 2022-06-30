@@ -19,7 +19,7 @@
                 ],
                 "function": "deposit",
                 "arguments": [
-                    "str:EGLD-12345"
+                    "str:EGLD-13579"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
@@ -43,7 +43,7 @@
                     "nonce": "3",
                     "balance": "0",
                     "esdt": {
-                        "str:EGLD-12345": "135",
+                        "str:EGLD-13579": "135",
                         "str:MFFT-12345": "10",
                         "str:MFSFT-24680": {
                             "instances": [
@@ -60,7 +60,7 @@
                     "nonce": "3",
                     "balance": "0",
                     "esdt": {
-                        "str:EGLD-12345": "19995",
+                        "str:EGLD-13579": "19995",
                         "str:MFNFT-67899": {
                             "instances": [
                                 {
@@ -128,7 +128,7 @@
                     "balance": "0",
                     "esdt": {
                         "str:MFFT-12345": "690",
-                        "str:EGLD-12345": "70",
+                        "str:EGLD-13579": "70",
                         "str:MFSFT-24680": {
                             "instances": [
                                 {
@@ -156,9 +156,9 @@
                         }
                     },
                     "storage": {
-                        "str:bonding_curve|nested:str:MFFT-12345": "u8:0|biguint:1|biguint:1|biguint:700|biguint:690|u8:1|nested:str:EGLD-12345|biguint:55",
-                        "str:bonding_curve|nested:str:MFSFT-24680": "u8:0|biguint:0|biguint:1|biguint:3000|biguint:2995|u8:0|nested:str:EGLD-12345|biguint:10",
-                        "str:bonding_curve|nested:str:MFNFT-67890": "u8:1|biguint:1|biguint:7|biguint:3|u8:1|nested:str:EGLD-12345|biguint:5",
+                        "str:bonding_curve|nested:str:MFFT-12345": "u8:0|biguint:1|biguint:1|biguint:700|biguint:690|u8:1|nested:str:EGLD-13579|biguint:55",
+                        "str:bonding_curve|nested:str:MFSFT-24680": "u8:0|biguint:0|biguint:1|biguint:3000|biguint:2995|u8:0|nested:str:EGLD-13579|biguint:10",
+                        "str:bonding_curve|nested:str:MFNFT-67890": "u8:1|biguint:1|biguint:7|biguint:3|u8:1|nested:str:EGLD-13579|biguint:5",
                         "str:token_details|nested:str:MFFT-12345": "u32:1|u64:0|address:artist1",
                         "str:token_details|nested:str:MFSFT-24680": "u32:2|u64:1|u64:17|address:artist2",
                         "str:token_details|nested:str:MFNFT-67890": "u32:3|u64:8|u64:9|u64:2|address:artist1",
@@ -170,14 +170,14 @@
                         "str:nonce_amount|nested:str:MFNFT-67890|u64:2": "1",
                         "str:owned_tokens|address:artist1|str:.info": "u32:2|u32:1|u32:2|u32:2",
                         "str:owned_tokens|address:artist1|str:.node_links|u32:1": "u32:0|u32:2",
-                        "str:owned_tokens|address:artist1|str:.node_id|str:MFFT-12345": "1",
+                        "str:owned_tokens|address:artist1|str:.node_id|nested:str:MFFT-12345": "1",
                         "str:owned_tokens|address:artist1|str:.value|u32:1": "str:MFFT-12345",
                         "str:owned_tokens|address:artist1|str:.node_links|u32:2": "u32:1|u32:0",
-                        "str:owned_tokens|address:artist1|str:.node_id|str:MFNFT-67890": "2",
+                        "str:owned_tokens|address:artist1|str:.node_id|nested:str:MFNFT-67890": "2",
                         "str:owned_tokens|address:artist1|str:.value|u32:2": "str:MFNFT-67890",
                         "str:owned_tokens|address:artist2|str:.info": "u32:1|u32:1|u32:1|u32:1",
                         "str:owned_tokens|address:artist2|str:.node_links|u32:1": "u32:0|u32:0",
-                        "str:owned_tokens|address:artist2|str:.node_id|str:MFSFT-24680": "1",
+                        "str:owned_tokens|address:artist2|str:.node_id|nested:str:MFSFT-24680": "1",
                         "str:owned_tokens|address:artist2|str:.value|u32:1": "str:MFSFT-24680"
                     },
                     "code": "file:../output/bonding-curve-contract.wasm"

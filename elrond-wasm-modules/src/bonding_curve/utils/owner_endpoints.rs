@@ -136,21 +136,22 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
             !self.owned_tokens(&caller).is_empty(),
             "You have nothing to claim"
         );
+        let mut tokens_to_claim = ManagedVec::<Self::Api, EsdtTokenPayment<Self::Api>>::new();
         for token in self.owned_tokens(&caller).iter() {
             let nonces = self.token_details(&token).get().token_nonces;
             for nonce in &nonces {
-                self.send().direct_esdt(
-                    &caller,
-                    &token,
+                tokens_to_claim.push(EsdtTokenPayment::new(
+                    token.clone(),
                     nonce,
-                    &self.nonce_amount(&token, nonce).get(),
-                );
+                    self.nonce_amount(&token, nonce).get(),
+                ));
                 self.nonce_amount(&token, nonce).clear();
             }
             self.token_details(&token).clear();
             self.bonding_curve(&token).clear();
         }
         self.owned_tokens(&caller).clear();
+        self.send().direct_multi(&caller, &tokens_to_claim);
     }
 
     fn set_curve_storage<T>(

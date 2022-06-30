@@ -13,14 +13,14 @@
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
-                        "str:EGLD-12345": "200"
+                        "str:EGLD-13579": "200"
                     }
                 },
                 "address:buyer2": {
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
-                        "str:EGLD-12345": "20000"
+                        "str:EGLD-13579": "20000"
                     }
                 },
                 "address:artist1": {
@@ -130,7 +130,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
-                        "str:EGLD-12345": "200"
+                        "str:EGLD-13579": "200"
                     },
                     "storage": {}
                 },
@@ -138,7 +138,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
-                        "str:EGLD-12345": "20000"
+                        "str:EGLD-13579": "20000"
                     },
                     "storage": {}
                 },

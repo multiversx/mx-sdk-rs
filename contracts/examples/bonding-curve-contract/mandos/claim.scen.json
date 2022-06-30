@@ -69,7 +69,7 @@
                     "nonce": "4",
                     "balance": "0",
                     "esdt": {
-                        "str:EGLD-12345": "135",
+                        "str:EGLD-13579": "135",
                         "str:MFFT-12345": "10",
                         "str:MFSFT-24680": {
                             "instances": [
@@ -86,7 +86,7 @@
                     "nonce": "3",
                     "balance": "0",
                     "esdt": {
-                        "str:EGLD-12345": "19995",
+                        "str:EGLD-13579": "19995",
                         "str:MFNFT-67899": {
                             "instances": [
                                 {
@@ -110,7 +110,7 @@
                     "nonce": "12",
                     "balance": "0",
                     "esdt": {
-                        "str:EGLD-12345": "60",
+                        "str:EGLD-13579": "60",
                         "str:MFNFT-67890": {
                             "instances": [
                                 {
@@ -143,7 +143,7 @@
                     "nonce": "6",
                     "balance": "0",
                     "esdt": {
-                        "str:EGLD-12345": "10",
+                        "str:EGLD-13579": "10",
                         "str:MFSFT-24680": {
                             "instances": [
                                 {
@@ -166,6 +166,7 @@
                 "sc:bonding-curve-contract": {
                     "nonce": "0",
                     "balance": "0",
+                    "esdt": {},
                     "storage": {},
                     "code": "file:../output/bonding-curve-contract.wasm"
                 }
