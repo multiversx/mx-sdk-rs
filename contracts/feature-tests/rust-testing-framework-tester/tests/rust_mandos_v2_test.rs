@@ -32,13 +32,13 @@ fn tester_deploy_test() {
     );
 
     // deploy
-    let (new_address, result): (_, String) = world.mandos_sc_deploy_get_result(
-        adder_contract.init(),
-        ScDeployStep::new()
-            .from(owner_address)
-            .contract_code(WASM_PATH_EXPR, &ic)
-            .gas_limit("5,000,000"),
-    );
+    let (new_address, result): (_, String) = adder_contract
+        .init()
+        .into_blockchain_call()
+        .from(owner_address)
+        .contract_code(WASM_PATH_EXPR, &ic)
+        .gas_limit("5,000,000")
+        .execute(&mut world);
     assert_eq!(new_address, adder_contract.to_address());
     assert_eq!(result, "constructor-result");
 

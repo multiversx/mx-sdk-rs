@@ -1,14 +1,13 @@
-use crate::mandos_system::model::{ScDeployStep, Step};
+use crate::mandos_system::model::{ScDeployStep, Step, TypedScDeploy, TypedScDeployExecutor};
 use elrond_wasm::{
     elrond_codec::{CodecFrom, PanicErrorHandler, TopEncodeMulti},
-    types::{heap::Address, ContractDeploy},
+    types::heap::Address,
 };
 
 use crate::{
     tx_execution::sc_create,
     tx_mock::{generate_tx_hash_dummy, TxInput, TxResult},
     world_mock::BlockchainMock,
-    DebugApi,
 };
 
 use super::check_tx_output;
@@ -32,14 +31,13 @@ impl BlockchainMock {
     /// so we can benefit from type inference in the result.
     pub fn mandos_sc_deploy_get_result<OriginalResult, RequestedResult>(
         &mut self,
-        contract_deploy: ContractDeploy<DebugApi, OriginalResult>,
-        mut sc_deploy_step: ScDeployStep,
+        typed_sc_deploy: TypedScDeploy<OriginalResult>,
     ) -> (Address, RequestedResult)
     where
         OriginalResult: TopEncodeMulti,
         RequestedResult: CodecFrom<OriginalResult>,
     {
-        sc_deploy_step = sc_deploy_step.call(contract_deploy);
+        let sc_deploy_step: ScDeployStep = typed_sc_deploy.into();
         let (tx_result, new_address) = self.with_borrowed(|state| {
             let (tx_result, new_address, state) = execute(state, &sc_deploy_step);
             ((tx_result, new_address), state)
@@ -52,6 +50,19 @@ impl BlockchainMock {
                 .unwrap();
 
         (new_address, deser_result)
+    }
+}
+
+impl TypedScDeployExecutor for BlockchainMock {
+    fn execute_typed_sc_deploy<OriginalResult, RequestedResult>(
+        &mut self,
+        typed_sc_call: TypedScDeploy<OriginalResult>,
+    ) -> (Address, RequestedResult)
+    where
+        OriginalResult: TopEncodeMulti,
+        RequestedResult: CodecFrom<OriginalResult>,
+    {
+        self.mandos_sc_deploy_get_result(typed_sc_call)
     }
 }
 
