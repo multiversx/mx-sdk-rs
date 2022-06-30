@@ -1,4 +1,7 @@
 mod interactor;
+mod interactor_sc_call;
+mod interactor_sc_deploy;
+mod interactor_vm_query;
 mod scr_decode;
 
 pub use elrond_sdk_erdrs as erdrs;
