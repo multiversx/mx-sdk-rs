@@ -1,8 +1,13 @@
 use elrond_interaction::{
     elrond_wasm::{
-        elrond_codec::multi_types::MultiValueVec, storage::mappers::SingleValue, types::Address,
+        elrond_codec::multi_types::MultiValueVec,
+        storage::mappers::SingleValue,
+        types::{Address, CodeMetadata},
     },
-    elrond_wasm_debug::{mandos_system::model::*, ContractInfo, DebugApi},
+    elrond_wasm_debug::{
+        bech32, mandos::interpret_trait::InterpreterContext, mandos_system::model::*, ContractInfo,
+        DebugApi,
+    },
     env_logger,
     erdrs::interactors::wallet::Wallet,
     tokio, Interactor,
@@ -13,7 +18,7 @@ use multisig::{
 use std::env::Args;
 
 const GATEWAY: &str = elrond_interaction::erdrs::blockchain::rpc::TESTNET_GATEWAY;
-const PEM: &str = "alice.pem";
+const PEM: &str = "xena.pem";
 const MULTISIG_ADDRESS_BECH32: &str =
     "bech32:erd1qqqqqqqqqqqqqpgq09aksdufwfs07e0vdypgev8dvsemwg4td8sssx9shk";
 // const MULTISIG_ADDRESS_BECH32: &str =
@@ -31,6 +36,7 @@ async fn main() {
     let cmd = args.next().expect("at lest one argument required");
     let mut state = State::init(args).await;
     match cmd.as_str() {
+        "deploy" => state.deploy().await,
         "send" => state.send().await,
         "quorum" => state.quorum().await,
         "board" => state.board().await,
@@ -57,6 +63,26 @@ impl State {
             multisig,
             args,
         }
+    }
+
+    async fn deploy(&mut self) {
+        let (multisig_address, ()) = self
+            .interactor
+            .sc_deploy(
+                self.multisig
+                    .init(0usize, MultiValueVec::from([self.wallet_address.clone()]))
+                    .into_blockchain_call()
+                    .from(&self.wallet_address)
+                    .code_metadata(CodeMetadata::all())
+                    .contract_code(
+                        "file:../output/multisig.wasm",
+                        &InterpreterContext::default(),
+                    )
+                    .gas_limit("70,000,000")
+                    .expect(TxExpect::ok()),
+            )
+            .await;
+        println!("new address: {}", bech32::encode(&multisig_address))
     }
 
     async fn send(&mut self) {
@@ -88,7 +114,7 @@ impl State {
 
         println!("board members:");
         for board_member in board_members.iter() {
-            println!("    {}", board_member.to_bech32());
+            println!("    {}", bech32::encode(board_member));
         }
     }
 }

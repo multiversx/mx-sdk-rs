@@ -4,6 +4,7 @@
 
 pub mod abi_json;
 pub mod api;
+pub mod bech32;
 mod contract_map;
 mod display_util;
 mod managed_test_util;

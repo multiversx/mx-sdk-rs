@@ -1,4 +1,5 @@
 mod interactor;
+mod interactor_retrieve;
 mod interactor_sc_call;
 mod interactor_sc_deploy;
 mod interactor_vm_query;
