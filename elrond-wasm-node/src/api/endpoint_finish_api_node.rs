@@ -36,14 +36,14 @@ impl EndpointFinishApiImpl for VmApiImpl {
     }
 
     #[inline]
-    fn finish_big_int_raw(&self, handle: i32) {
+    fn finish_big_int_raw(&self, handle: Self::BigIntHandle) {
         unsafe {
             bigIntFinishSigned(handle);
         }
     }
 
     #[inline]
-    fn finish_big_uint_raw(&self, handle: i32) {
+    fn finish_big_uint_raw(&self, handle: Self::BigIntHandle) {
         unsafe {
             bigIntFinishUnsigned(handle);
         }

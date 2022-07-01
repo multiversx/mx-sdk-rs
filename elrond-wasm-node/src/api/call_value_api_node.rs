@@ -92,7 +92,7 @@ impl CallValueApiImpl for VmApiImpl {
         unsafe { (getESDTTokenType() as u8).into() }
     }
 
-    fn esdt_value_by_index(&self, index: usize) -> Self::ManagedBufferHandle {
+    fn esdt_value_by_index(&self, index: usize) -> Self::BigIntHandle {
         unsafe {
             let value_handle = self.next_handle();
             bigIntGetESDTCallValueByIndex(value_handle, index as i32);

@@ -43,7 +43,7 @@ pub trait CallValueApiImpl: ErrorApiImpl + ManagedTypeApiImpl + Sized {
     /// Will return "Fungible" for EGLD.
     fn esdt_token_type(&self) -> EsdtTokenType;
 
-    fn esdt_value_by_index(&self, index: usize) -> Self::ManagedBufferHandle;
+    fn esdt_value_by_index(&self, index: usize) -> Self::BigIntHandle;
 
     fn token_by_index(&self, index: usize) -> Self::ManagedBufferHandle;
 

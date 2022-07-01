@@ -42,7 +42,7 @@ impl CallValueApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn esdt_value_by_index(&self, _index: usize) -> Self::ManagedBufferHandle {
+    fn esdt_value_by_index(&self, _index: usize) -> Self::BigIntHandle {
         unreachable!()
     }
 

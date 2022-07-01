@@ -22,13 +22,13 @@ impl EndpointFinishApiImpl for DebugApi {
         tx_result.result_values.push(v)
     }
 
-    fn finish_big_int_raw(&self, handle: Self::ManagedBufferHandle) {
+    fn finish_big_int_raw(&self, handle: Self::BigIntHandle) {
         let bi_bytes = self.bi_get_signed_bytes(handle);
         let mut tx_result = self.result_borrow_mut();
         tx_result.result_values.push(bi_bytes.into_vec());
     }
 
-    fn finish_big_uint_raw(&self, handle: Self::ManagedBufferHandle) {
+    fn finish_big_uint_raw(&self, handle: Self::BigIntHandle) {
         let bu_bytes = self.bi_get_unsigned_bytes(handle);
         let mut tx_result = self.result_borrow_mut();
         tx_result.result_values.push(bu_bytes.into_vec());
