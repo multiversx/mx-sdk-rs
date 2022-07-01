@@ -6,7 +6,17 @@ static SC_DOES_NOT_OWN_NFT_PARTS_ERR_MSG: &[u8] = b"NFT parts belong to another 
 const MIN_MERGE_PAYMENTS: usize = 2;
 const NFT_AMOUNT: u64 = 1;
 
-#[derive(TypeAbi, TopEncode, TopDecode, NestedEncode, NestedDecode, ManagedVecItem)]
+#[derive(
+    TypeAbi,
+    TopEncode,
+    TopDecode,
+    NestedEncode,
+    NestedDecode,
+    ManagedVecItem,
+    Debug,
+    Clone,
+    PartialEq,
+)]
 pub struct MergedTokenAttributesInstance<M: ManagedTypeApi> {
     pub original_token: EsdtTokenPayment<M>,
     pub attributes_raw: ManagedBuffer<M>,
@@ -14,7 +24,7 @@ pub struct MergedTokenAttributesInstance<M: ManagedTypeApi> {
 }
 
 #[elrond_wasm::module]
-pub trait NftMergeModule:
+pub trait TokenMergeModule:
     crate::default_issue_callbacks::DefaultIssueCallbacksModule + crate::pause::PauseModule
 {
     #[only_owner]
