@@ -277,7 +277,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
         let function_selector = &bonding_curve.curve;
 
         let token_start = &arguments.first_token_available();
-        function_selector.calculate_price(&token_start, &amount, &arguments)
+        function_selector.calculate_price(token_start, &amount, arguments)
     }
 
     fn compute_sell_price<T>(&self, identifier: &TokenIdentifier, amount: BigUint) -> BigUint
@@ -299,6 +299,6 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
         let function_selector = &bonding_curve.curve;
 
         let token_start = &arguments.first_token_available() - &amount;
-        function_selector.calculate_price(&token_start, &amount, &arguments)
+        function_selector.calculate_price(&token_start, &amount, arguments)
     }
 }
