@@ -31,9 +31,9 @@ macro_rules! binary_op_method {
     ($method_name:ident, $rust_op_name:ident) => {
         fn $method_name(
             &self,
-            dest: Self::ManagedBufferHandle,
-            x: Self::ManagedBufferHandle,
-            y: Self::ManagedBufferHandle,
+            dest: Self::BigFloatHandle,
+            x: Self::BigFloatHandle,
+            y: Self::BigFloatHandle,
         ) {
             let bf_x = self.bf_get_f64(x);
             let bf_y = self.bf_get_f64(y);
@@ -45,7 +45,7 @@ macro_rules! binary_op_method {
 
 macro_rules! unary_op_method {
     ($method_name:ident, $rust_op_name:ident) => {
-        fn $method_name(&self, dest: Self::ManagedBufferHandle, x: Self::ManagedBufferHandle) {
+        fn $method_name(&self, dest: Self::BigFloatHandle, x: Self::BigFloatHandle) {
             let bf_x = self.bf_get_f64(x);
             let result = bf_x.$rust_op_name();
             self.bf_overwrite(dest, result);
@@ -89,7 +89,7 @@ impl BigFloatApi for DebugApi {
         managed_types.big_float_map.insert_new_handle(value)
     }
 
-    fn bf_from_frac(&self, numerator: i64, denominator: i64) -> Self::ManagedBufferHandle {
+    fn bf_from_frac(&self, numerator: i64, denominator: i64) -> Self::BigFloatHandle {
         if denominator == 0 {
             std::panic::panic_any(TxPanic {
                 status: 10,
@@ -108,7 +108,7 @@ impl BigFloatApi for DebugApi {
         managed_types.big_float_map.insert_new_handle(value)
     }
 
-    fn bf_from_sci(&self, significand: i64, exponent: i64) -> Self::ManagedBufferHandle {
+    fn bf_from_sci(&self, significand: i64, exponent: i64) -> Self::BigFloatHandle {
         if exponent > 0 {
             std::panic::panic_any(TxPanic {
                 status: 10,
@@ -135,7 +135,7 @@ impl BigFloatApi for DebugApi {
 
     unary_op_method!(bf_abs, abs);
     unary_op_method!(bf_neg, neg);
-    fn bf_cmp(&self, x: Self::ManagedBufferHandle, y: Self::ManagedBufferHandle) -> Ordering {
+    fn bf_cmp(&self, x: Self::BigFloatHandle, y: Self::BigFloatHandle) -> Ordering {
         let managed_types = self.m_types_borrow_mut();
         let bf_x = managed_types.big_float_map.get(x);
         let bf_y = managed_types.big_float_map.get(y);
@@ -146,7 +146,7 @@ impl BigFloatApi for DebugApi {
         order_opt.unwrap()
     }
 
-    fn bf_sign(&self, x: Self::ManagedBufferHandle) -> Sign {
+    fn bf_sign(&self, x: Self::BigFloatHandle) -> Sign {
         let managed_types = self.m_types_borrow();
         let bf = managed_types.big_float_map.get(x);
         if !bf.is_normal() {
@@ -178,7 +178,7 @@ impl BigFloatApi for DebugApi {
         self.bf_overwrite(dest, result);
     }
 
-    fn bf_pow(&self, dest: Self::ManagedBufferHandle, x: Self::ManagedBufferHandle, exp: i32) {
+    fn bf_pow(&self, dest: Self::BigFloatHandle, x: Self::BigFloatHandle, exp: i32) {
         let value = self.bf_get_f64(x);
         self.bf_overwrite(dest, value.powi(exp));
     }
@@ -187,7 +187,7 @@ impl BigFloatApi for DebugApi {
     unary_op_method_big_int_handle!(bf_ceil, ceil);
     unary_op_method_big_int_handle!(bf_trunc, trunc);
 
-    fn bf_is_bi(&self, x: Self::ManagedBufferHandle) -> bool {
+    fn bf_is_bi(&self, x: Self::BigFloatHandle) -> bool {
         let managed_types = self.m_types_borrow();
         let bf_x = managed_types.big_float_map.get(x);
         let trunc_x = bf_x.trunc();
@@ -195,21 +195,21 @@ impl BigFloatApi for DebugApi {
         *bf_x == float_trunc_x
     }
 
-    fn bf_set_i64(&self, dest: Self::ManagedBufferHandle, value: i64) {
+    fn bf_set_i64(&self, dest: Self::BigFloatHandle, value: i64) {
         let f64_value = value.to_f64().unwrap();
         self.bf_overwrite(dest, f64_value);
     }
 
-    fn bf_set_bi(&self, dest: Self::ManagedBufferHandle, bi: Self::ManagedBufferHandle) {
+    fn bf_set_bi(&self, dest: Self::BigFloatHandle, bi: Self::BigIntHandle) {
         let f64_value = self.bi_to_i64(bi).unwrap().to_f64().unwrap();
         self.bf_overwrite(dest, f64_value);
     }
 
-    fn bf_get_const_pi(&self, dest: Self::ManagedBufferHandle) {
+    fn bf_get_const_pi(&self, dest: Self::BigFloatHandle) {
         self.bf_overwrite(dest, std::f64::consts::PI);
     }
 
-    fn bf_get_const_e(&self, dest: Self::ManagedBufferHandle) {
+    fn bf_get_const_e(&self, dest: Self::BigFloatHandle) {
         self.bf_overwrite(dest, std::f64::consts::E);
     }
 }

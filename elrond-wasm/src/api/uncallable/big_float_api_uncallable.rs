@@ -69,12 +69,7 @@ impl BigFloatApi for super::UncallableApi {
     fn bf_sqrt(&self, _dest: Self::BigFloatHandle, _x: Self::BigFloatHandle) {
         unreachable!()
     }
-    fn bf_pow(
-        &self,
-        _dest: Self::BigFloatHandle,
-        _x: Self::BigFloatHandle,
-        _y: Self::BigFloatHandle,
-    ) {
+    fn bf_pow(&self, _dest: Self::BigFloatHandle, _x: Self::BigFloatHandle, _exp: i32) {
         unreachable!()
     }
 
