@@ -83,7 +83,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
             let mut bonding_curve: BondingCurve<Self::Api, T> =
                 serializer.top_decode_from_managed_buffer(buffer);
 
-            let price = self.compute_buy_price::<T>(&requested_token, requested_amount.clone());
+            let price = self.compute_buy_price::<T>(&requested_token, &requested_amount);
             require!(
                 price <= payment,
                 "The payment provided is not enough for the transaction"
@@ -175,7 +175,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
             + Default,
     {
         self.check_token_exists(&identifier);
-        self.compute_buy_price::<T>(&identifier, amount)
+        self.compute_buy_price::<T>(&identifier, &amount)
     }
 
     fn get_sell_price<T>(&self, amount: BigUint, identifier: TokenIdentifier) -> BigUint
@@ -190,7 +190,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
             + Default,
     {
         self.check_token_exists(&identifier);
-        self.compute_sell_price::<T>(&identifier, amount)
+        self.compute_sell_price::<T>(&identifier, &amount)
     }
 
     fn check_token_exists(&self, issued_token: &TokenIdentifier) {
@@ -298,7 +298,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
         let arguments = &bonding_curve.arguments;
         let function_selector = &bonding_curve.curve;
 
-        let token_start = &arguments.first_token_available() - &amount;
+        let token_start = arguments.first_token_available() - amount;
         function_selector.calculate_price(&token_start, amount, arguments)
     }
 }
