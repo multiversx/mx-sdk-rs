@@ -29,10 +29,6 @@ const DEFAULT_MULTISIG_ADDRESS_EXPR: &str =
     "0x0000000000000000000000000000000000000000000000000000000000000000";
 const SYSTEM_SC_BECH32: &str = "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u";
 
-const COLLECTION_NAME: &str = "TestCollection1";
-const COLLECTION_TICKER: &str = "TESTCOLL1";
-const COLLECTION_TOKEN_IDENTIFIER: &str = "TESTCOLL1-a36f7b";
-
 type MultisigContract = ContractInfo<multisig::Proxy<DebugApi>>;
 
 #[tokio::main]
@@ -49,6 +45,7 @@ async fn main() {
         "feed" => state.feed_contract_egld().await,
         "issue" => state.issue_collection().await,
         "special-role" => state.set_special_role().await,
+        "items" => state.create_items().await,
         "send" => state.send().await,
         "quorum" => state.quorum().await,
         "board" => state.board().await,
@@ -76,7 +73,8 @@ impl State {
             wallet_address,
             multisig,
             system_sc_address: bech32::decode(SYSTEM_SC_BECH32),
-            collection_token_identifier: COLLECTION_TOKEN_IDENTIFIER.to_string(),
+            collection_token_identifier: multisig_interact_nfts::COLLECTION_TOKEN_IDENTIFIER
+                .to_string(),
             args,
         }
     }
@@ -117,17 +115,18 @@ impl State {
             .await;
     }
 
+    fn perform_action_step(&mut self, action_id: usize, gas_expr: &str) -> ScCallStep {
+        self.multisig
+            .perform_action_endpoint(action_id)
+            .into_blockchain_call()
+            .from(&self.wallet_address)
+            .gas_limit(gas_expr)
+            .into()
+    }
+
     async fn perform_action(&mut self, action_id: usize, gas_expr: &str) -> String {
-        self.interactor
-            .sc_call(
-                self.multisig
-                    .perform_action_endpoint(action_id)
-                    .into_blockchain_call()
-                    .from(&self.wallet_address)
-                    .gas_limit(gas_expr)
-                    .expect(TxExpect::ok()),
-            )
-            .await
+        let sc_call_step = self.perform_action_step(action_id, gas_expr);
+        self.interactor.sc_call(sc_call_step).await
     }
 
     async fn send(&mut self) {
@@ -147,6 +146,12 @@ impl State {
         let quorum: SingleValue<usize> = self.interactor.vm_query(self.multisig.quorum()).await;
 
         println!("quorum: {}", quorum.into());
+    }
+
+    async fn get_action_last_index(&mut self) -> usize {
+        self.interactor
+            .vm_query(self.multisig.get_action_last_index())
+            .await
     }
 
     async fn board(&mut self) {
