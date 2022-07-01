@@ -4,7 +4,7 @@ use core::{
     ops::{Add, BitAnd, BitOr, BitXor, Div, Mul, Neg, Rem, Shl, Shr, Sub},
 };
 use elrond_wasm::{
-    api::{BigIntApi, ErrorApiImpl, Handle, ManagedBufferApi},
+    api::{BigIntApi, ErrorApiImpl, HandleTypeInfo, ManagedBufferApi},
     err_msg,
     types::heap::BoxedBytes,
 };
@@ -21,7 +21,12 @@ fn assert_positive(bi: &num_bigint::BigInt) {
 
 macro_rules! binary_op_method {
     ($method_name:ident, $rust_op_name:ident) => {
-        fn $method_name(&self, dest: Handle, x: Handle, y: Handle) {
+        fn $method_name(
+            &self,
+            dest: Self::ManagedBufferHandle,
+            x: Self::ManagedBufferHandle,
+            y: Self::ManagedBufferHandle,
+        ) {
             let mut managed_types = self.m_types_borrow_mut();
             let bi_x = managed_types.big_int_map.get(x);
             let bi_y = managed_types.big_int_map.get(y);
@@ -33,7 +38,12 @@ macro_rules! binary_op_method {
 
 macro_rules! binary_bitwise_op_method {
     ($method_name:ident, $rust_op_name:ident) => {
-        fn $method_name(&self, dest: Handle, x: Handle, y: Handle) {
+        fn $method_name(
+            &self,
+            dest: Self::ManagedBufferHandle,
+            x: Self::ManagedBufferHandle,
+            y: Self::ManagedBufferHandle,
+        ) {
             let mut managed_types = self.m_types_borrow_mut();
             let bi_x = managed_types.big_int_map.get(x);
             assert_positive(&bi_x);
@@ -47,7 +57,7 @@ macro_rules! binary_bitwise_op_method {
 
 macro_rules! unary_op_method {
     ($method_name:ident, $rust_op_name:ident) => {
-        fn $method_name(&self, dest: Handle, x: Handle) {
+        fn $method_name(&self, dest: Self::ManagedBufferHandle, x: Self::ManagedBufferHandle) {
             let mut managed_types = self.m_types_borrow_mut();
             let bi_x = managed_types.big_int_map.get(x);
             let result = bi_x.$rust_op_name();
@@ -57,7 +67,11 @@ macro_rules! unary_op_method {
 }
 
 impl DebugApi {
-    pub(crate) fn bi_overwrite(&self, destination: Handle, value: num_bigint::BigInt) {
+    pub(crate) fn bi_overwrite(
+        &self,
+        destination: <Self as HandleTypeInfo>::BigIntHandle,
+        value: num_bigint::BigInt,
+    ) {
         let mut managed_types = self.m_types_borrow_mut();
         managed_types.big_int_map.insert(destination, value);
     }
@@ -65,22 +79,22 @@ impl DebugApi {
 
 impl BigIntApi for DebugApi {
     #[allow(dead_code)]
-    fn bi_new(&self, value: i64) -> Handle {
+    fn bi_new(&self, value: i64) -> Self::ManagedBufferHandle {
         let mut managed_types = self.m_types_borrow_mut();
         managed_types
             .big_int_map
             .insert_new_handle(num_bigint::BigInt::from(value))
     }
 
-    fn bi_set_int64(&self, destination: Handle, value: i64) {
+    fn bi_set_int64(&self, destination: Self::BigIntHandle, value: i64) {
         self.bi_overwrite(destination, num_bigint::BigInt::from(value))
     }
 
-    fn bi_unsigned_byte_length(&self, handle: Handle) -> usize {
+    fn bi_unsigned_byte_length(&self, handle: Self::ManagedBufferHandle) -> usize {
         self.bi_get_unsigned_bytes(handle).len()
     }
 
-    fn bi_get_unsigned_bytes(&self, handle: Handle) -> BoxedBytes {
+    fn bi_get_unsigned_bytes(&self, handle: Self::ManagedBufferHandle) -> BoxedBytes {
         let managed_types = self.m_types_borrow();
         let bi = managed_types.big_int_map.get(handle);
         if bi.is_zero() {
@@ -91,17 +105,17 @@ impl BigIntApi for DebugApi {
         }
     }
 
-    fn bi_set_unsigned_bytes(&self, dest: Handle, bytes: &[u8]) {
+    fn bi_set_unsigned_bytes(&self, dest: Self::ManagedBufferHandle, bytes: &[u8]) {
         let mut managed_types = self.m_types_borrow_mut();
         let result = num_bigint::BigInt::from_bytes_be(num_bigint::Sign::Plus, bytes);
         managed_types.big_int_map.insert(dest, result);
     }
 
-    fn bi_signed_byte_length(&self, handle: Handle) -> usize {
+    fn bi_signed_byte_length(&self, handle: Self::ManagedBufferHandle) -> usize {
         self.bi_get_signed_bytes(handle).len()
     }
 
-    fn bi_get_signed_bytes(&self, handle: Handle) -> BoxedBytes {
+    fn bi_get_signed_bytes(&self, handle: Self::ManagedBufferHandle) -> BoxedBytes {
         let managed_types = self.m_types_borrow();
         let bi = managed_types.big_int_map.get(handle);
         if bi.is_zero() {
@@ -111,13 +125,13 @@ impl BigIntApi for DebugApi {
         }
     }
 
-    fn bi_set_signed_bytes(&self, dest: Handle, bytes: &[u8]) {
+    fn bi_set_signed_bytes(&self, dest: Self::ManagedBufferHandle, bytes: &[u8]) {
         let mut managed_types = self.m_types_borrow_mut();
         let result = num_bigint::BigInt::from_signed_bytes_be(bytes);
         managed_types.big_int_map.insert(dest, result);
     }
 
-    fn bi_to_i64(&self, handle: Handle) -> Option<i64> {
+    fn bi_to_i64(&self, handle: Self::ManagedBufferHandle) -> Option<i64> {
         let managed_types = self.m_types_borrow();
         let bi = managed_types.big_int_map.get(handle);
         big_int_to_i64(bi)
@@ -126,7 +140,12 @@ impl BigIntApi for DebugApi {
     binary_op_method! {bi_add, add}
     binary_op_method! {bi_sub, sub}
 
-    fn bi_sub_unsigned(&self, dest: Handle, x: Handle, y: Handle) {
+    fn bi_sub_unsigned(
+        &self,
+        dest: Self::ManagedBufferHandle,
+        x: Self::ManagedBufferHandle,
+        y: Self::ManagedBufferHandle,
+    ) {
         let mut managed_types = self.m_types_borrow_mut();
         let bi_x = managed_types.big_int_map.get(x);
         let bi_y = managed_types.big_int_map.get(y);
@@ -144,7 +163,7 @@ impl BigIntApi for DebugApi {
     unary_op_method! {bi_abs, abs}
     unary_op_method! {bi_neg, neg}
 
-    fn bi_sign(&self, x: Handle) -> elrond_wasm::api::Sign {
+    fn bi_sign(&self, x: Self::ManagedBufferHandle) -> elrond_wasm::api::Sign {
         let managed_types = self.m_types_borrow();
         let bi = managed_types.big_int_map.get(x);
         match bi.sign() {
@@ -154,7 +173,7 @@ impl BigIntApi for DebugApi {
         }
     }
 
-    fn bi_cmp(&self, x: Handle, y: Handle) -> Ordering {
+    fn bi_cmp(&self, x: Self::ManagedBufferHandle, y: Self::ManagedBufferHandle) -> Ordering {
         let managed_types = self.m_types_borrow();
         let bi_x = managed_types.big_int_map.get(x);
         let bi_y = managed_types.big_int_map.get(y);
@@ -163,7 +182,12 @@ impl BigIntApi for DebugApi {
 
     unary_op_method! {bi_sqrt, sqrt}
 
-    fn bi_pow(&self, dest: Handle, x: Handle, y: Handle) {
+    fn bi_pow(
+        &self,
+        dest: Self::ManagedBufferHandle,
+        x: Self::ManagedBufferHandle,
+        y: Self::ManagedBufferHandle,
+    ) {
         let mut managed_types = self.m_types_borrow_mut();
         let bi_x = managed_types.big_int_map.get(x);
         let bi_y = managed_types.big_int_map.get(y);
@@ -172,7 +196,7 @@ impl BigIntApi for DebugApi {
         managed_types.big_int_map.insert(dest, result);
     }
 
-    fn bi_log2(&self, x: Handle) -> u32 {
+    fn bi_log2(&self, x: Self::ManagedBufferHandle) -> u32 {
         let managed_types = self.m_types_borrow();
         let bi_x = managed_types.big_int_map.get(x);
         bi_x.bits() as u32 - 1
@@ -182,7 +206,7 @@ impl BigIntApi for DebugApi {
     binary_bitwise_op_method! {bi_or, bitor}
     binary_bitwise_op_method! {bi_xor, bitxor}
 
-    fn bi_shr(&self, dest: Handle, x: Handle, bits: usize) {
+    fn bi_shr(&self, dest: Self::ManagedBufferHandle, x: Self::ManagedBufferHandle, bits: usize) {
         let mut managed_types = self.m_types_borrow_mut();
         let bi_x = managed_types.big_int_map.get(x);
         assert_positive(bi_x);
@@ -190,7 +214,7 @@ impl BigIntApi for DebugApi {
         managed_types.big_int_map.insert(dest, result);
     }
 
-    fn bi_shl(&self, dest: Handle, x: Handle, bits: usize) {
+    fn bi_shl(&self, dest: Self::ManagedBufferHandle, x: Self::ManagedBufferHandle, bits: usize) {
         let mut managed_types = self.m_types_borrow_mut();
         let bi_x = managed_types.big_int_map.get(x);
         assert_positive(bi_x);
@@ -198,7 +222,7 @@ impl BigIntApi for DebugApi {
         managed_types.big_int_map.insert(dest, result);
     }
 
-    fn bi_to_string(&self, x: Handle, str_handle: Handle) {
+    fn bi_to_string(&self, x: Self::ManagedBufferHandle, str_handle: Self::ManagedBufferHandle) {
         let s = {
             let managed_types = self.m_types_borrow();
             let bi_x = managed_types.big_int_map.get(x);

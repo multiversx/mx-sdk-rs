@@ -1,5 +1,5 @@
 use crate::{
-    api::{const_handles, BigIntApi, ManagedTypeApi, StaticVarApiImpl},
+    api::{const_handles, use_raw_handle, BigIntApi, ManagedTypeApi, StaticVarApiImpl},
     types::{BigUint, ManagedType},
 };
 use core::ops::{
@@ -14,7 +14,7 @@ macro_rules! binary_operator {
 
             fn $method(self, other: BigUint<M>) -> BigUint<M> {
                 M::managed_type_impl().$api_func(self.handle, self.handle, other.handle);
-                BigUint::from_raw_handle(self.handle)
+                BigUint::from_handle(self.handle)
             }
         }
 
@@ -24,7 +24,7 @@ macro_rules! binary_operator {
             fn $method(self, other: &BigUint<M>) -> BigUint<M> {
                 let result_handle = M::static_var_api_impl().next_handle();
                 M::managed_type_impl().$api_func(result_handle, self.handle, other.handle);
-                BigUint::from_raw_handle(result_handle)
+                BigUint::from_handle(result_handle)
             }
         }
 
@@ -33,7 +33,7 @@ macro_rules! binary_operator {
 
             fn $method(self, other: &BigUint<M>) -> BigUint<M> {
                 M::managed_type_impl().$api_func(self.handle, self.handle, other.handle);
-                BigUint::from_raw_handle(self.handle)
+                BigUint::from_handle(self.handle)
             }
         }
 
@@ -41,14 +41,10 @@ macro_rules! binary_operator {
             type Output = BigUint<M>;
 
             fn $method(self, other: u32) -> BigUint<M> {
-                M::managed_type_impl()
-                    .bi_set_int64(const_handles::BIG_INT_TEMPORARY_1, other as i64);
-                M::managed_type_impl().$api_func(
-                    self.handle,
-                    self.handle,
-                    const_handles::BIG_INT_TEMPORARY_1,
-                );
-                BigUint::from_raw_handle(self.handle)
+                let big_int_temp_1 = use_raw_handle(const_handles::BIG_INT_TEMPORARY_1);
+                M::managed_type_impl().bi_set_int64(big_int_temp_1, other as i64);
+                M::managed_type_impl().$api_func(self.handle, self.handle, big_int_temp_1);
+                BigUint::from_handle(self.handle)
             }
         }
 
@@ -56,15 +52,11 @@ macro_rules! binary_operator {
             type Output = BigUint<M>;
 
             fn $method(self, other: u32) -> BigUint<M> {
-                M::managed_type_impl()
-                    .bi_set_int64(const_handles::BIG_INT_TEMPORARY_1, other as i64);
+                let big_int_temp_1 = use_raw_handle(const_handles::BIG_INT_TEMPORARY_1);
+                M::managed_type_impl().bi_set_int64(big_int_temp_1, other as i64);
                 let result_handle = M::static_var_api_impl().next_handle();
-                M::managed_type_impl().$api_func(
-                    result_handle,
-                    self.handle,
-                    const_handles::BIG_INT_TEMPORARY_1,
-                );
-                BigUint::from_raw_handle(result_handle)
+                M::managed_type_impl().$api_func(result_handle, self.handle, big_int_temp_1);
+                BigUint::from_handle(result_handle)
             }
         }
 
@@ -72,14 +64,10 @@ macro_rules! binary_operator {
             type Output = BigUint<M>;
 
             fn $method(self, other: u64) -> BigUint<M> {
-                M::managed_type_impl()
-                    .bi_set_int64(const_handles::BIG_INT_TEMPORARY_1, other as i64);
-                M::managed_type_impl().$api_func(
-                    self.handle,
-                    self.handle,
-                    const_handles::BIG_INT_TEMPORARY_1,
-                );
-                BigUint::from_raw_handle(self.handle)
+                let big_int_temp_1 = use_raw_handle(const_handles::BIG_INT_TEMPORARY_1);
+                M::managed_type_impl().bi_set_int64(big_int_temp_1, other as i64);
+                M::managed_type_impl().$api_func(self.handle, self.handle, big_int_temp_1);
+                BigUint::from_handle(self.handle)
             }
         }
 
@@ -87,15 +75,11 @@ macro_rules! binary_operator {
             type Output = BigUint<M>;
 
             fn $method(self, other: u64) -> BigUint<M> {
-                M::managed_type_impl()
-                    .bi_set_int64(const_handles::BIG_INT_TEMPORARY_1, other as i64);
+                let big_int_temp_1 = use_raw_handle(const_handles::BIG_INT_TEMPORARY_1);
+                M::managed_type_impl().bi_set_int64(big_int_temp_1, other as i64);
                 let result_handle = M::static_var_api_impl().next_handle();
-                M::managed_type_impl().$api_func(
-                    result_handle,
-                    self.handle,
-                    const_handles::BIG_INT_TEMPORARY_1,
-                );
-                BigUint::from_raw_handle(result_handle)
+                M::managed_type_impl().$api_func(result_handle, self.handle, big_int_temp_1);
+                BigUint::from_handle(result_handle)
             }
         }
     };
@@ -128,25 +112,17 @@ macro_rules! binary_assign_operator {
 
         impl<M: ManagedTypeApi> $trait<u32> for BigUint<M> {
             fn $method(&mut self, other: u32) {
-                M::managed_type_impl()
-                    .bi_set_int64(const_handles::BIG_INT_TEMPORARY_1, other as i64);
-                M::managed_type_impl().$api_func(
-                    self.handle,
-                    self.handle,
-                    const_handles::BIG_INT_TEMPORARY_1,
-                );
+                let big_int_temp_1 = use_raw_handle(const_handles::BIG_INT_TEMPORARY_1);
+                M::managed_type_impl().bi_set_int64(big_int_temp_1, other as i64);
+                M::managed_type_impl().$api_func(self.handle, self.handle, big_int_temp_1);
             }
         }
 
         impl<M: ManagedTypeApi> $trait<u64> for BigUint<M> {
             fn $method(&mut self, other: u64) {
-                M::managed_type_impl()
-                    .bi_set_int64(const_handles::BIG_INT_TEMPORARY_1, other as i64);
-                M::managed_type_impl().$api_func(
-                    self.handle,
-                    self.handle,
-                    const_handles::BIG_INT_TEMPORARY_1,
-                );
+                let big_int_temp_1 = use_raw_handle(const_handles::BIG_INT_TEMPORARY_1);
+                M::managed_type_impl().bi_set_int64(big_int_temp_1, other as i64);
+                M::managed_type_impl().$api_func(self.handle, self.handle, big_int_temp_1);
             }
         }
     };
@@ -179,7 +155,7 @@ macro_rules! shift_traits {
             fn $method(self, rhs: usize) -> BigUint<M> {
                 let result_handle = M::static_var_api_impl().next_handle();
                 M::managed_type_impl().$api_func(result_handle, self.handle, rhs);
-                BigUint::from_raw_handle(result_handle)
+                BigUint::from_handle(result_handle)
             }
         }
     };

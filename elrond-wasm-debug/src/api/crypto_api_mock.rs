@@ -2,8 +2,8 @@ use crate::DebugApi;
 use ed25519_dalek::*;
 use elrond_wasm::{
     api::{
-        CryptoApi, CryptoApiImpl, Handle, ManagedBufferApi, KECCAK256_RESULT_LEN,
-        RIPEMD_RESULT_LEN, SHA256_RESULT_LEN,
+        CryptoApi, CryptoApiImpl, ManagedBufferApi, KECCAK256_RESULT_LEN, RIPEMD_RESULT_LEN,
+        SHA256_RESULT_LEN,
     },
     types::{heap::BoxedBytes, MessageHashType},
 };
@@ -25,7 +25,11 @@ impl CryptoApiImpl for DebugApi {
         hasher.finalize().into()
     }
 
-    fn sha256_managed(&self, dest: Handle, data_handle: Handle) {
+    fn sha256_managed(
+        &self,
+        dest: Self::ManagedBufferHandle,
+        data_handle: Self::ManagedBufferHandle,
+    ) {
         // default implementation used in debugger
         // the VM has a dedicated hook
         let result_bytes = self.sha256_legacy(self.mb_to_boxed_bytes(data_handle).as_slice());
@@ -38,7 +42,11 @@ impl CryptoApiImpl for DebugApi {
         hasher.finalize().into()
     }
 
-    fn keccak256_managed(&self, dest: Handle, data_handle: Handle) {
+    fn keccak256_managed(
+        &self,
+        dest: Self::ManagedBufferHandle,
+        data_handle: Self::ManagedBufferHandle,
+    ) {
         // default implementation used in debugger
         // the VM has a dedicated hook
         let result_bytes = self.keccak256_legacy(self.mb_to_boxed_bytes(data_handle).as_slice());
@@ -49,7 +57,11 @@ impl CryptoApiImpl for DebugApi {
         panic!("ripemd160 not implemented yet!")
     }
 
-    fn ripemd160_managed(&self, _dest: Handle, _data_handle: Handle) {
+    fn ripemd160_managed(
+        &self,
+        _dest: Self::ManagedBufferHandle,
+        _data_handle: Self::ManagedBufferHandle,
+    ) {
         panic!("ripemd160 not implemented yet!")
     }
 
@@ -57,7 +69,12 @@ impl CryptoApiImpl for DebugApi {
         panic!("verify_bls not implemented yet!")
     }
 
-    fn verify_bls_managed(&self, _key: Handle, _message: Handle, _signature: Handle) -> bool {
+    fn verify_bls_managed(
+        &self,
+        _key: Self::ManagedBufferHandle,
+        _message: Self::ManagedBufferHandle,
+        _signature: Self::ManagedBufferHandle,
+    ) -> bool {
         panic!("verify_bls not implemented yet!")
     }
 
@@ -75,7 +92,12 @@ impl CryptoApiImpl for DebugApi {
         public.unwrap().verify(message, &sig.unwrap()).is_ok()
     }
 
-    fn verify_ed25519_managed(&self, key: Handle, message: Handle, signature: Handle) -> bool {
+    fn verify_ed25519_managed(
+        &self,
+        key: Self::ManagedBufferHandle,
+        message: Self::ManagedBufferHandle,
+        signature: Self::ManagedBufferHandle,
+    ) -> bool {
         self.verify_ed25519_legacy(
             self.mb_to_boxed_bytes(key).as_slice(),
             self.mb_to_boxed_bytes(message).as_slice(),
@@ -87,7 +109,12 @@ impl CryptoApiImpl for DebugApi {
         panic!("verify_secp256k1 not implemented yet!")
     }
 
-    fn verify_secp256k1_managed(&self, _key: Handle, _message: Handle, _signature: Handle) -> bool {
+    fn verify_secp256k1_managed(
+        &self,
+        _key: Self::ManagedBufferHandle,
+        _message: Self::ManagedBufferHandle,
+        _signature: Self::ManagedBufferHandle,
+    ) -> bool {
         panic!("verify_secp256k1 not implemented yet!")
     }
 
@@ -103,9 +130,9 @@ impl CryptoApiImpl for DebugApi {
 
     fn verify_custom_secp256k1_managed(
         &self,
-        _key: Handle,
-        _message: Handle,
-        _signature: Handle,
+        _key: Self::ManagedBufferHandle,
+        _message: Self::ManagedBufferHandle,
+        _signature: Self::ManagedBufferHandle,
         _hash_type: MessageHashType,
     ) -> bool {
         panic!("verify_custom_secp256k1 not implemented yet!")
@@ -115,7 +142,12 @@ impl CryptoApiImpl for DebugApi {
         panic!("encode_secp256k1_signature not implemented yet!")
     }
 
-    fn encode_secp256k1_der_signature_managed(&self, _r: Handle, _s: Handle, _dest: Handle) {
+    fn encode_secp256k1_der_signature_managed(
+        &self,
+        _r: Self::ManagedBufferHandle,
+        _s: Self::ManagedBufferHandle,
+        _dest: Self::ManagedBufferHandle,
+    ) {
         panic!("encode_secp256k1_signature not implemented yet!")
     }
 }

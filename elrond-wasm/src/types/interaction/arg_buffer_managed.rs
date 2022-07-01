@@ -1,5 +1,5 @@
 use crate::{
-    api::{ErrorApi, Handle, ManagedTypeApi},
+    api::{ErrorApi, ManagedTypeApi},
     contract_base::ExitCodecErrorHandler,
     err_msg,
     types::{
@@ -27,18 +27,20 @@ impl<M: ManagedTypeApi> ManagedType<M> for ManagedArgBuffer<M>
 where
     M: ManagedTypeApi + 'static,
 {
+    type OwnHandle = M::ManagedBufferHandle;
+
     #[inline]
-    fn from_raw_handle(handle: Handle) -> Self {
+    fn from_handle(handle: M::ManagedBufferHandle) -> Self {
         ManagedArgBuffer {
-            data: ManagedVec::from_raw_handle(handle),
+            data: ManagedVec::from_handle(handle),
         }
     }
 
-    fn get_raw_handle(&self) -> Handle {
-        self.data.get_raw_handle()
+    fn get_handle(&self) -> M::ManagedBufferHandle {
+        self.data.get_handle()
     }
 
-    fn transmute_from_handle_ref(handle_ref: &Handle) -> &Self {
+    fn transmute_from_handle_ref(handle_ref: &M::ManagedBufferHandle) -> &Self {
         unsafe { core::mem::transmute(handle_ref) }
     }
 }

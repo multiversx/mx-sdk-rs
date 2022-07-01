@@ -1,4 +1,4 @@
-use elrond_wasm::api::{CallTypeApi, StorageMapperApi, VMApi};
+use elrond_wasm::api::{CallTypeApi, HandleTypeInfo, StorageMapperApi, VMApi};
 
 use crate::DebugApi;
 
@@ -15,3 +15,15 @@ impl PartialEq for DebugApi {
 impl Eq for DebugApi {}
 
 impl VMApi for DebugApi {}
+
+type DebugHandle = i32;
+
+impl HandleTypeInfo for DebugApi {
+    type ManagedBufferHandle = DebugHandle;
+
+    type BigIntHandle = DebugHandle;
+
+    type BigFloatHandle = DebugHandle;
+
+    type EllipticCurveHandle = DebugHandle;
+}

@@ -1,13 +1,13 @@
 use crate::DebugApi;
 use elrond_wasm::{
-    api::{Handle, InvalidSliceError, ManagedBufferApi},
+    api::{HandleTypeInfo, InvalidSliceError, ManagedBufferApi},
     types::heap::BoxedBytes,
 };
 
 impl DebugApi {
     fn mb_get_slice(
         &self,
-        source_handle: Handle,
+        source_handle: <Self as HandleTypeInfo>::ManagedBufferHandle,
         starting_position: usize,
         slice_len: usize,
     ) -> Option<Vec<u8>> {
@@ -22,27 +22,27 @@ impl DebugApi {
 }
 
 impl ManagedBufferApi for DebugApi {
-    fn mb_new_empty(&self) -> Handle {
+    fn mb_new_empty(&self) -> Self::ManagedBufferHandle {
         let mut managed_types = self.m_types_borrow_mut();
         managed_types
             .managed_buffer_map
             .insert_new_handle(Vec::new())
     }
 
-    fn mb_new_from_bytes(&self, bytes: &[u8]) -> Handle {
+    fn mb_new_from_bytes(&self, bytes: &[u8]) -> Self::ManagedBufferHandle {
         let mut managed_types = self.m_types_borrow_mut();
         managed_types
             .managed_buffer_map
             .insert_new_handle(Vec::from(bytes))
     }
 
-    fn mb_len(&self, handle: Handle) -> usize {
+    fn mb_len(&self, handle: Self::ManagedBufferHandle) -> usize {
         let managed_types = self.m_types_borrow();
         let data = managed_types.managed_buffer_map.get(handle);
         data.len()
     }
 
-    fn mb_to_boxed_bytes(&self, handle: Handle) -> BoxedBytes {
+    fn mb_to_boxed_bytes(&self, handle: Self::ManagedBufferHandle) -> BoxedBytes {
         let managed_types = self.m_types_borrow();
         let data = managed_types.managed_buffer_map.get(handle);
         data.into()
@@ -50,7 +50,7 @@ impl ManagedBufferApi for DebugApi {
 
     fn mb_load_slice(
         &self,
-        source_handle: Handle,
+        source_handle: Self::ManagedBufferHandle,
         starting_position: usize,
         dest_slice: &mut [u8],
     ) -> Result<(), InvalidSliceError> {
@@ -65,10 +65,10 @@ impl ManagedBufferApi for DebugApi {
 
     fn mb_copy_slice(
         &self,
-        source_handle: Handle,
+        source_handle: Self::ManagedBufferHandle,
         starting_position: usize,
         slice_len: usize,
-        dest_handle: Handle,
+        dest_handle: Self::ManagedBufferHandle,
     ) -> Result<(), InvalidSliceError> {
         let opt_slice = self.mb_get_slice(source_handle, starting_position, slice_len);
         if let Some(slice) = opt_slice {
@@ -80,13 +80,17 @@ impl ManagedBufferApi for DebugApi {
         }
     }
 
-    fn mb_copy_to_slice_pad_right(&self, handle: Handle, destination: &mut [u8]) {
+    fn mb_copy_to_slice_pad_right(
+        &self,
+        handle: Self::ManagedBufferHandle,
+        destination: &mut [u8],
+    ) {
         let bytes = self.mb_to_boxed_bytes(handle);
         let offset = 32 - bytes.len();
         destination[offset..].copy_from_slice(bytes.as_slice());
     }
 
-    fn mb_overwrite(&self, handle: Handle, value: &[u8]) {
+    fn mb_overwrite(&self, handle: Self::ManagedBufferHandle, value: &[u8]) {
         let mut managed_types = self.m_types_borrow_mut();
         managed_types
             .managed_buffer_map
@@ -95,7 +99,7 @@ impl ManagedBufferApi for DebugApi {
 
     fn mb_set_slice(
         &self,
-        dest_handle: Handle,
+        dest_handle: Self::ManagedBufferHandle,
         starting_position: usize,
         source_slice: &[u8],
     ) -> Result<(), InvalidSliceError> {
@@ -110,7 +114,7 @@ impl ManagedBufferApi for DebugApi {
         }
     }
 
-    fn mb_set_random(&self, dest_handle: Handle, length: usize) {
+    fn mb_set_random(&self, dest_handle: Self::ManagedBufferHandle, length: usize) {
         let mut bytes = Vec::<u8>::new();
         bytes.resize(length, 0);
         let mut rng = self.rng_borrow_mut();
@@ -118,27 +122,39 @@ impl ManagedBufferApi for DebugApi {
         self.mb_overwrite(dest_handle, bytes.as_slice());
     }
 
-    fn mb_append(&self, accumulator_handle: Handle, data_handle: Handle) {
+    fn mb_append(
+        &self,
+        accumulator_handle: Self::ManagedBufferHandle,
+        data_handle: Self::ManagedBufferHandle,
+    ) {
         let mut managed_types = self.m_types_borrow_mut();
         let mut data = managed_types.managed_buffer_map.get(data_handle).clone();
         let accumulator = managed_types.managed_buffer_map.get_mut(accumulator_handle);
         accumulator.append(&mut data);
     }
 
-    fn mb_append_bytes(&self, accumulator_handle: Handle, bytes: &[u8]) {
+    fn mb_append_bytes(&self, accumulator_handle: Self::ManagedBufferHandle, bytes: &[u8]) {
         let mut managed_types = self.m_types_borrow_mut();
         let accumulator = managed_types.managed_buffer_map.get_mut(accumulator_handle);
         accumulator.extend_from_slice(bytes);
     }
 
-    fn mb_eq(&self, handle1: Handle, handle2: Handle) -> bool {
+    fn mb_eq(
+        &self,
+        handle1: Self::ManagedBufferHandle,
+        handle2: Self::ManagedBufferHandle,
+    ) -> bool {
         let managed_types = self.m_types_borrow();
         let bytes1 = managed_types.managed_buffer_map.get(handle1);
         let bytes2 = managed_types.managed_buffer_map.get(handle2);
         bytes1 == bytes2
     }
 
-    fn mb_to_hex(&self, source_handle: Handle, dest_handle: Handle) {
+    fn mb_to_hex(
+        &self,
+        source_handle: Self::ManagedBufferHandle,
+        dest_handle: Self::ManagedBufferHandle,
+    ) {
         let mut managed_types = self.m_types_borrow_mut();
         let data = managed_types.managed_buffer_map.get(source_handle);
         let encoded = hex::encode(data);

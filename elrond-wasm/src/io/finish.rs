@@ -98,7 +98,7 @@ where
     }
 
     fn finalize_nested_encode(self, nb: Self::NestedBuffer) {
-        FA::finish_api_impl().finish_managed_buffer_raw(nb.into_managed_buffer().get_raw_handle());
+        FA::finish_api_impl().finish_managed_buffer_raw(nb.into_managed_buffer().get_handle());
     }
 }
 
