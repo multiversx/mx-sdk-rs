@@ -1,6 +1,5 @@
-use crate::{scr_decode::decode_scr_data_or_panic, Interactor};
+use crate::Interactor;
 use elrond_sdk_erdrs::data::transaction::TransactionOnNetwork;
-use elrond_wasm_debug::elrond_wasm::elrond_codec::{PanicErrorHandler, TopDecodeMulti};
 use log::info;
 use std::time::Duration;
 
@@ -37,21 +36,5 @@ impl Interactor {
 
         info!("tx with results: {:#?}", tx);
         tx
-    }
-
-    pub(crate) fn extract_sc_call_result<RequestedResult>(
-        &mut self,
-        tx: TransactionOnNetwork,
-    ) -> RequestedResult
-    where
-        RequestedResult: TopDecodeMulti,
-    {
-        let scrs = tx
-            .smart_contract_results
-            .expect("no smart contract results obtained");
-        let first_scr = scrs.get(0).expect("no smart contract results obtained");
-
-        let mut raw_result = decode_scr_data_or_panic(first_scr.data.as_str());
-        RequestedResult::multi_decode_or_handle_err(&mut raw_result, PanicErrorHandler).unwrap()
     }
 }

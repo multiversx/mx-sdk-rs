@@ -14,7 +14,8 @@ const METADATA: &str = "tags:test,rust-interactor";
 impl State {
     pub(crate) async fn propose_issue_collection(&mut self) -> usize {
         let system_sc_address = bech32::decode(SYSTEM_SC_BECH32);
-        self.interactor
+        let result = self
+            .interactor
             .sc_call_get_result(
                 self.multisig
                     .propose_async_call(
@@ -31,18 +32,25 @@ impl State {
                     .gas_limit("10,000,000")
                     .expect(TxExpect::ok()),
             )
-            .await
+            .await;
+        result.value()
     }
 
     pub(crate) async fn issue_collection(&mut self) {
         let action_id = self.propose_issue_collection().await;
-        let tx_hash = self.perform_action(action_id, "80,000,000").await;
-        println!("perform issue collection tx hash: {}", tx_hash);
+        let step = self.perform_action_step(action_id, "80,000,000");
+        let raw_result = self.interactor.sc_call_get_raw_result(step).await;
+        self.collection_token_identifier = raw_result.issue_non_fungible_new_token_identifier();
+        println!(
+            "collection token identifier: {}",
+            self.collection_token_identifier
+        );
     }
 
     pub(crate) async fn propose_set_special_role(&mut self) -> usize {
         let multisig_address = self.multisig.to_address();
-        self.interactor
+        let result = self
+            .interactor
             .sc_call_get_result(
                 self.multisig
                     .propose_async_call(
@@ -60,7 +68,8 @@ impl State {
                     .gas_limit("10,000,000")
                     .expect(TxExpect::ok()),
             )
-            .await
+            .await;
+        result.value()
     }
 
     pub(crate) async fn set_special_role(&mut self) {
