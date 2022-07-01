@@ -61,6 +61,10 @@ pub trait Contract:
             sell_availability,
         );
     }
+    #[endpoint(claim)]
+    fn claim_endpoint(&self) {
+        self.claim::<FunctionSelector<Self::Api>>();
+    }
 
     #[view]
     fn view_buy_price(&self, amount: BigUint, identifier: TokenIdentifier) -> BigUint {

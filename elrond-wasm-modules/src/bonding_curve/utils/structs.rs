@@ -24,8 +24,20 @@ pub struct BondingCurve<
     pub curve: T,
     pub arguments: CurveArguments<M>,
     pub sell_availability: bool,
-    pub payment_token: EgldOrEsdtTokenIdentifier<M>,
-    pub payment_amount: BigUint<M>,
+    pub payment: EgldOrEsdtTokenPayment<M>,
+}
+
+impl<
+        M: ManagedTypeApi,
+        T: CurveFunction<M> + TopEncode + TopDecode + NestedEncode + NestedDecode + TypeAbi,
+    > BondingCurve<M, T>
+{
+    pub fn payment_token(&self) -> EgldOrEsdtTokenIdentifier<M> {
+        self.payment.token_identifier.clone()
+    }
+    pub fn payment_is_egld(&self) -> bool {
+        self.payment.token_identifier.is_egld()
+    }
 }
 
 #[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, PartialEq, Eq, Clone)]

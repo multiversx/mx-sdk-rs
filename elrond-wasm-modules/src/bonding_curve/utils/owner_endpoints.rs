@@ -129,14 +129,24 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
             .update(|current_amount| *current_amount += amount);
     }
 
-    #[endpoint(claim)]
-    fn claim(&self) {
+    fn claim<T>(&self)
+    where
+        T: CurveFunction<Self::Api>
+            + TopEncode
+            + TopDecode
+            + NestedEncode
+            + NestedDecode
+            + TypeAbi
+            + PartialEq
+            + Default,
+    {
         let caller = self.blockchain().get_caller();
         require!(
             !self.owned_tokens(&caller).is_empty(),
             "You have nothing to claim"
         );
         let mut tokens_to_claim = ManagedVec::<Self::Api, EsdtTokenPayment<Self::Api>>::new();
+        let mut egld_to_claim = BigUint::zero();
         for token in self.owned_tokens(&caller).iter() {
             let nonces = self.token_details(&token).get().token_nonces;
             for nonce in &nonces {
@@ -145,20 +155,41 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
                     nonce,
                     self.nonce_amount(&token, nonce).get(),
                 ));
+
                 self.nonce_amount(&token, nonce).clear();
             }
+
+            let serializer = ManagedSerializer::new();
+            let bonding_curve: BondingCurve<Self::Api, T> =
+                serializer.top_decode_from_managed_buffer(&self.bonding_curve(&token).get());
+
+            if let Some(esdt_token_identifier) =
+                bonding_curve.payment.token_identifier.into_esdt_option()
+            {
+                tokens_to_claim.push(EsdtTokenPayment::new(
+                    esdt_token_identifier,
+                    bonding_curve.payment.token_nonce,
+                    bonding_curve.payment.amount,
+                ));
+            } else {
+                egld_to_claim += bonding_curve.payment.amount;
+            }
+
             self.token_details(&token).clear();
             self.bonding_curve(&token).clear();
         }
         self.owned_tokens(&caller).clear();
         self.send().direct_multi(&caller, &tokens_to_claim);
+        if egld_to_claim > BigUint::zero() {
+            self.send().direct_egld(&caller, &egld_to_claim);
+        }
     }
 
     fn set_curve_storage<T>(
         &self,
         identifier: &TokenIdentifier,
         amount: BigUint,
-        payment: EgldOrEsdtTokenIdentifier,
+        payment_token_identifier: EgldOrEsdtTokenIdentifier,
     ) where
         T: CurveFunction<Self::Api>
             + TopEncode
@@ -171,8 +202,7 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
     {
         let mut curve: T = T::default();
         let mut arguments;
-        let payment_token;
-        let payment_amount: BigUint;
+        let payment;
         let sell_availability: bool;
         let serializer = ManagedSerializer::new();
 
@@ -181,15 +211,13 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
                 available_supply: amount.clone(),
                 balance: amount,
             };
-            payment_token = payment;
-            payment_amount = BigUint::zero();
+            payment = EgldOrEsdtTokenPayment::new(payment_token_identifier, 0, BigUint::zero());
             sell_availability = false;
         } else {
             let bonding_curve: BondingCurve<Self::Api, T> =
                 serializer.top_decode_from_managed_buffer(&self.bonding_curve(identifier).get());
 
-            payment_token = bonding_curve.payment_token;
-            payment_amount = bonding_curve.payment_amount;
+            payment = bonding_curve.payment;
             curve = bonding_curve.curve;
             arguments = bonding_curve.arguments;
             arguments.balance += &amount;
@@ -200,8 +228,7 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
             curve,
             arguments,
             sell_availability,
-            payment_token,
-            payment_amount,
+            payment,
         });
         self.bonding_curve(identifier).set(encoded_curve);
     }

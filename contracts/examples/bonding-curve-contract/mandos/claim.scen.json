@@ -25,6 +25,7 @@
         },
         {
             "step": "scCall",
+            "txId": "claim_artist1",
             "tx": {
                 "from": "address:artist1",
                 "to": "sc:bonding-curve-contract",
@@ -42,6 +43,7 @@
         },
         {
             "step": "scCall",
+            "txId": "claim_artist2",
             "tx": {
                 "from": "address:artist2",
                 "to": "sc:bonding-curve-contract",
@@ -110,7 +112,7 @@
                     "nonce": "12",
                     "balance": "0",
                     "esdt": {
-                        "str:EGLD-13579": "60",
+                        "str:EGLD-13579": "70",
                         "str:MFNFT-67890": {
                             "instances": [
                                 {

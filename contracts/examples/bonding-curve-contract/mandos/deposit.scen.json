@@ -377,9 +377,9 @@
                         }
                     },
                     "storage": {
-                        "str:bonding_curve|nested:str:MFFT-12345": "u8:2|biguint:700|biguint:700|u8:0|nested:str:EGLD-13579|biguint:0",
-                        "str:bonding_curve|nested:str:MFSFT-24680": "u8:2|biguint:2500|biguint:2500|u8:0|nested:str:EGLD-13579|biguint:0",
-                        "str:bonding_curve|nested:str:MFNFT-67890": "u8:2|biguint:7|biguint:7|u8:0|nested:str:EGLD-13579|biguint:0",
+                        "str:bonding_curve|nested:str:MFFT-12345": "u8:2|biguint:700|biguint:700|u8:0|nested:str:EGLD-13579|u64:0|biguint:0",
+                        "str:bonding_curve|nested:str:MFSFT-24680": "u8:2|biguint:2500|biguint:2500|u8:0|nested:str:EGLD-13579|u64:0|biguint:0",
+                        "str:bonding_curve|nested:str:MFNFT-67890": "u8:2|biguint:7|biguint:7|u8:0|nested:str:EGLD-13579|u64:0|biguint:0",
                         "str:token_details|nested:str:MFFT-12345": "u32:1|u64:0|address:artist1",
                         "str:token_details|nested:str:MFSFT-24680": "u32:2|u64:1|u64:17|address:artist2",
                         "str:token_details|nested:str:MFNFT-67890": "u32:7|u64:2|u64:3|u64:4|u64:5|u64:6|u64:8|u64:9|address:artist1",

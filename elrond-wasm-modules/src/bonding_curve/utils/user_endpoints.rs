@@ -37,9 +37,9 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
                     "Selling is not available on this token"
                 );
                 let price = self.compute_sell_price::<T>(&offered_token, sell_amount.clone());
-                bonding_curve.payment_amount -= price.clone();
+                bonding_curve.payment.amount -= price.clone();
                 bonding_curve.arguments.balance += sell_amount.clone();
-                let payment_token = bonding_curve.payment_token.clone();
+                let payment_token = bonding_curve.payment_token();
                 *buffer = serializer.top_encode_to_managed_buffer(&bonding_curve);
                 (price, payment_token)
             });
@@ -88,7 +88,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
                 price <= payment,
                 "The payment provided is not enough for the transaction"
             );
-            bonding_curve.payment_amount += &price;
+            bonding_curve.payment.amount += &price;
             bonding_curve.arguments.balance -= &requested_amount;
             *buffer = serializer.top_encode_to_managed_buffer(&bonding_curve);
 
@@ -243,7 +243,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
             "The token price was not set yet!"
         );
         require!(amount > &BigUint::zero(), "Must pay more than 0 tokens!");
-        bonding_curve.payment_token
+        bonding_curve.payment_token()
     }
 
     fn check_given_token(
