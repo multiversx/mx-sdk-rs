@@ -1,8 +1,8 @@
-use crate::{address_h256_to_erdrs, mandos_to_erdrs_address, Interactor};
+use crate::{address_h256_to_erdrs, mandos_to_erdrs_address, Interactor, InteractorResult};
 use elrond_sdk_erdrs::data::transaction::Transaction;
 use elrond_wasm_debug::{
     elrond_wasm::{
-        elrond_codec::{CodecFrom, TopEncodeMulti},
+        elrond_codec::{multi_types::IgnoreValue, CodecFrom, TopEncodeMulti},
         types::ContractCall,
     },
     mandos_system::model::{ScCallStep, TransferStep, TxCall, TypedScCall},
@@ -54,22 +54,32 @@ impl Interactor {
         let mut transaction = self.tx_call_to_blockchain_tx(&sc_call_step.tx);
         transaction.nonce = self.recall_nonce(sender_address).await;
         self.sign_tx(sender_address, &mut transaction);
-        self.proxy.send_transaction(&transaction).await.unwrap()
+        let tx_hash = self.proxy.send_transaction(&transaction).await.unwrap();
+        println!("sc call tx hash: {}", tx_hash);
+        info!("sc call tx hash: {}", tx_hash);
+        tx_hash
     }
 
     pub async fn sc_call_get_result<OriginalResult, RequestedResult>(
         &mut self,
         typed_sc_call: TypedScCall<OriginalResult>,
-    ) -> RequestedResult
+    ) -> InteractorResult<RequestedResult>
     where
         OriginalResult: TopEncodeMulti,
         RequestedResult: CodecFrom<OriginalResult>,
     {
         let tx_hash = self.sc_call(typed_sc_call).await;
-        println!("sc call tx hash: {}", tx_hash);
-        info!("sc call tx hash: {}", tx_hash);
         let tx = self.retrieve_tx_on_network(tx_hash.as_str()).await;
-        self.extract_sc_call_result(tx)
+        InteractorResult::new(tx)
+    }
+
+    pub async fn sc_call_get_raw_result(
+        &mut self,
+        sc_call_step: ScCallStep,
+    ) -> InteractorResult<IgnoreValue> {
+        let tx_hash = self.sc_call(sc_call_step).await;
+        let tx = self.retrieve_tx_on_network(tx_hash.as_str()).await;
+        InteractorResult::new(tx)
     }
 
     pub async fn multiple_sc_calls(&mut self, sc_call_steps: &[ScCallStep]) {

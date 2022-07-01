@@ -80,7 +80,7 @@ impl State {
     }
 
     async fn deploy(&mut self) {
-        let (new_address, ()) = self
+        let deploy_result: elrond_interaction::InteractorResult<()> = self
             .interactor
             .sc_deploy(
                 self.multisig
@@ -96,6 +96,7 @@ impl State {
                     .expect(TxExpect::ok()),
             )
             .await;
+        let new_address = deploy_result.new_deployed_address();
         let new_address_bech32 = bech32::encode(&new_address);
         println!("new address: {}", new_address_bech32);
         let new_address_expr = format!("bech32:{}", new_address_bech32);
