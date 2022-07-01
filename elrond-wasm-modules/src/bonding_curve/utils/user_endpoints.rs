@@ -258,7 +258,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
         );
     }
 
-    fn compute_buy_price<T>(&self, identifier: &TokenIdentifier, amount: BigUint) -> BigUint
+    fn compute_buy_price<T>(&self, identifier: &TokenIdentifier, amount: &BigUint) -> BigUint
     where
         T: CurveFunction<Self::Api>
             + TopEncode
