@@ -43,10 +43,10 @@ async fn main() {
     match cmd.as_str() {
         "deploy" => state.deploy().await,
         "feed" => state.feed_contract_egld().await,
-        "issue" => state.issue_collection().await,
-        "special-role" => state.set_special_role().await,
-        "items" => state.create_items().await,
-        "send" => state.send().await,
+        "nft-full" => state.issue_multisig_and_collection_full().await,
+        "nft-issue" => state.issue_collection().await,
+        "nft-special" => state.set_special_role().await,
+        "nft-items" => state.create_items().await,
         "quorum" => state.quorum().await,
         "board" => state.board().await,
         _ => panic!("unknown command: {}", &cmd),
@@ -125,22 +125,9 @@ impl State {
             .into()
     }
 
-    async fn perform_action(&mut self, action_id: usize, gas_expr: &str) -> String {
+    async fn perform_action(&mut self, action_id: usize, gas_expr: &str) {
         let sc_call_step = self.perform_action_step(action_id, gas_expr);
-        self.interactor.sc_call(sc_call_step).await
-    }
-
-    async fn send(&mut self) {
-        self.interactor
-            .sc_call(
-                self.multisig
-                    .propose_change_quorum(5usize)
-                    .into_blockchain_call()
-                    .from(&self.wallet_address)
-                    .gas_limit("5,000,000")
-                    .expect(TxExpect::ok()),
-            )
-            .await;
+        let _ = self.interactor.sc_call_get_raw_result(sc_call_step).await;
     }
 
     async fn quorum(&mut self) {

@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use elrond_interaction::elrond_wasm::elrond_codec::test_util::top_encode_to_vec_u8_or_panic;
 
 use super::*;
@@ -6,13 +8,22 @@ const ISSUE_COST: u64 = 50000000000000000; // 0.05 EGLD
 
 const COLLECTION_NAME: &str = "TestCollection1";
 const COLLECTION_TICKER: &str = "TESTCOLL1";
-pub const COLLECTION_TOKEN_IDENTIFIER: &str = "TESTCOLL1-a36f7b";
+pub const COLLECTION_TOKEN_IDENTIFIER: &str = "TESTCOLL1-4096bf";
 const NUM_ITEMS: usize = 3;
 const ROYALTIES: usize = 3000;
 const METADATA: &str = "tags:test,rust-interactor";
 
 impl State {
-    pub(crate) async fn propose_issue_collection(&mut self) -> usize {
+    pub async fn issue_multisig_and_collection_full(&mut self) {
+        self.deploy().await;
+        self.feed_contract_egld().await;
+        self.issue_collection().await;
+        self.set_special_role().await;
+        self.interactor.sleep(Duration::from_secs(15)).await;
+        self.create_items().await;
+    }
+
+    pub async fn propose_issue_collection(&mut self) -> usize {
         let system_sc_address = bech32::decode(SYSTEM_SC_BECH32);
         let result = self
             .interactor
@@ -36,18 +47,19 @@ impl State {
         result.value()
     }
 
-    pub(crate) async fn issue_collection(&mut self) {
+    pub async fn issue_collection(&mut self) {
         let action_id = self.propose_issue_collection().await;
+        println!("propose issue collection: {}", action_id);
         let step = self.perform_action_step(action_id, "80,000,000");
         let raw_result = self.interactor.sc_call_get_raw_result(step).await;
         self.collection_token_identifier = raw_result.issue_non_fungible_new_token_identifier();
         println!(
-            "collection token identifier: {}",
-            self.collection_token_identifier
+            "perform issue collection: {}; collection token identifier: {}",
+            action_id, self.collection_token_identifier
         );
     }
 
-    pub(crate) async fn propose_set_special_role(&mut self) -> usize {
+    pub async fn propose_set_special_role(&mut self) -> usize {
         let multisig_address = self.multisig.to_address();
         let result = self
             .interactor
@@ -65,20 +77,20 @@ impl State {
                     )
                     .into_blockchain_call()
                     .from(&self.wallet_address)
-                    .gas_limit("10,000,000")
-                    .expect(TxExpect::ok()),
+                    .gas_limit("10,000,000"),
             )
             .await;
         result.value()
     }
 
-    pub(crate) async fn set_special_role(&mut self) {
+    pub async fn set_special_role(&mut self) {
         let action_id = self.propose_set_special_role().await;
-        let tx_hash = self.perform_action(action_id, "80,000,000").await;
-        println!("perform issue collection tx hash: {}", tx_hash);
+        println!("propose set special role: {}", action_id);
+        self.perform_action(action_id, "80,000,000").await;
+        println!("perform set special role: {}", action_id);
     }
 
-    pub(crate) async fn create_items(&mut self) {
+    pub async fn create_items(&mut self) {
         let mut last_index = self.get_action_last_index().await;
         let multisig_address = self.multisig.to_address();
 

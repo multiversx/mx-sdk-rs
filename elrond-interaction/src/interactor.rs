@@ -1,18 +1,18 @@
 use elrond_sdk_erdrs::{
     blockchain::rpc::ElrondProxy,
-    data::{
-        address::Address as ErdrsAddress, network_config::NetworkConfig, transaction::Transaction,
-    },
+    data::{address::Address as ErdrsAddress, network_config::NetworkConfig},
     interactors::wallet::Wallet,
 };
 use elrond_wasm_debug::{elrond_wasm::types::Address, mandos_system::model::AddressValue, HashMap};
-use log::info;
 use std::time::Duration;
+
+use crate::Sender;
 
 pub struct Interactor {
     pub proxy: ElrondProxy,
     pub network_config: NetworkConfig,
-    pub signing_wallets: HashMap<Address, Wallet>,
+    pub sender_map: HashMap<Address, Sender>,
+
     pub(crate) waiting_time_ms: u64,
 }
 
@@ -23,41 +23,27 @@ impl Interactor {
         Self {
             proxy,
             network_config,
-            signing_wallets: HashMap::new(),
+            sender_map: HashMap::new(),
             waiting_time_ms: 0,
         }
     }
 
     pub fn register_wallet(&mut self, wallet: Wallet) -> Address {
         let address = erdrs_address_to_h256(wallet.address());
-        self.signing_wallets.insert(address.clone(), wallet);
+        self.sender_map.insert(
+            address.clone(),
+            Sender {
+                address: address.clone(),
+                wallet,
+                current_nonce: None,
+            },
+        );
         address
     }
 
     pub async fn sleep(&mut self, duration: Duration) {
         self.waiting_time_ms += duration.as_millis() as u64;
         tokio::time::sleep(duration).await;
-    }
-
-    pub async fn recall_nonce(&self, address: &Address) -> u64 {
-        let erdrs_address = address_h256_to_erdrs(address);
-        let account = self
-            .proxy
-            .get_account(&erdrs_address)
-            .await
-            .expect("failed to retrieve account nonce");
-        account.nonce
-    }
-
-    pub(crate) fn sign_tx(&self, sender_address: &Address, transaction: &mut Transaction) {
-        let wallet = self
-            .signing_wallets
-            .get(sender_address)
-            .expect("the wallet that was supposed to sign is not registered");
-
-        let signature = wallet.sign_tx(transaction);
-        transaction.signature = Some(hex::encode(signature));
-        info!("transaction {:#?}", transaction);
     }
 }
 
