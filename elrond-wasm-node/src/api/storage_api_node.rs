@@ -105,7 +105,7 @@ impl StorageWriteApiImpl for VmApiImpl {
     }
 
     #[inline]
-    fn storage_store_big_uint_raw(&self, key: &[u8], value_handle: Self::ManagedBufferHandle) {
+    fn storage_store_big_uint_raw(&self, key: &[u8], value_handle: Self::BigIntHandle) {
         unsafe {
             bigIntStorageStoreUnsigned(key.as_ref().as_ptr(), key.len() as i32, value_handle);
         }

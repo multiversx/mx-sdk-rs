@@ -46,7 +46,7 @@ impl StorageWriteApiImpl for super::UncallableApi {
         unreachable!()
     }
 
-    fn storage_store_big_uint_raw(&self, _key: &[u8], _value_handle: Self::ManagedBufferHandle) {
+    fn storage_store_big_uint_raw(&self, _key: &[u8], _value_handle: Self::BigIntHandle) {
         unreachable!()
     }
 

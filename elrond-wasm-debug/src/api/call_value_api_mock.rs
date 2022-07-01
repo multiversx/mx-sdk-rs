@@ -88,7 +88,7 @@ impl CallValueApiImpl for DebugApi {
     }
 
     #[inline]
-    fn esdt_value_by_index(&self, index: usize) -> Self::ManagedBufferHandle {
+    fn esdt_value_by_index(&self, index: usize) -> Self::BigIntHandle {
         if let Some(esdt_value) = self.input_ref().esdt_values.get(index) {
             self.insert_new_big_uint(esdt_value.value.clone())
         } else {

@@ -93,7 +93,7 @@ impl StorageWriteApiImpl for DebugApi {
         });
     }
 
-    fn storage_store_big_uint_raw(&self, key: &[u8], handle: i32) {
+    fn storage_store_big_uint_raw(&self, key: &[u8], handle: Self::BigIntHandle) {
         self.storage_store_slice_u8(key, self.bi_get_signed_bytes(handle).as_slice());
     }
 
