@@ -71,7 +71,9 @@ impl<T: TopDecodeMulti> InteractorResult<T> {
         let mut split = second_scr.data.split('@');
         let _ = split.next().unwrap();
         let _ = split.next().unwrap();
-        let encoded_tid = split.next().unwrap().to_string();
+        let encoded_tid = split
+            .next()
+            .unwrap_or_else(|| panic!("bad issue token SCR data: {}", second_scr.data));
         String::from_utf8(hex::decode(encoded_tid).unwrap()).unwrap()
     }
 }

@@ -27,8 +27,8 @@ impl Interactor {
     pub async fn send_sc_deploy(&mut self, sc_call_step: ScDeployStep) -> String {
         let sender_address = &sc_call_step.tx.from.value;
         let mut transaction = self.sc_deploy_to_tx(&sc_call_step);
-        transaction.nonce = self.recall_nonce(sender_address).await;
-        self.sign_tx(sender_address, &mut transaction);
+        self.set_nonce_and_sign_tx(sender_address, &mut transaction)
+            .await;
         self.proxy.send_transaction(&transaction).await.unwrap()
     }
 

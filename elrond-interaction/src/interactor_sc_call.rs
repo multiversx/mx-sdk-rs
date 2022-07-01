@@ -52,8 +52,8 @@ impl Interactor {
         let sc_call_step: ScCallStep = sc_call_step.into();
         let sender_address = &sc_call_step.tx.from.value;
         let mut transaction = self.tx_call_to_blockchain_tx(&sc_call_step.tx);
-        transaction.nonce = self.recall_nonce(sender_address).await;
-        self.sign_tx(sender_address, &mut transaction);
+        self.set_nonce_and_sign_tx(sender_address, &mut transaction)
+            .await;
         let tx_hash = self.proxy.send_transaction(&transaction).await.unwrap();
         println!("sc call tx hash: {}", tx_hash);
         info!("sc call tx hash: {}", tx_hash);
@@ -84,25 +84,35 @@ impl Interactor {
 
     pub async fn multiple_sc_calls(&mut self, sc_call_steps: &[ScCallStep]) {
         let sender_address = &sc_call_steps.get(0).unwrap().tx.from.value;
-        let mut nonce = self.recall_nonce(sender_address).await;
         for sc_call_step in sc_call_steps {
             assert_eq!(
                 &sc_call_step.tx.from.value, sender_address,
                 "all calls are expected to have the same sender"
             );
             let mut transaction = self.tx_call_to_blockchain_tx(&sc_call_step.tx);
-            transaction.nonce = nonce;
-            self.sign_tx(sender_address, &mut transaction);
+            self.set_nonce_and_sign_tx(sender_address, &mut transaction)
+                .await;
             let _ = self.proxy.send_transaction(&transaction).await.unwrap();
-            nonce += 1;
         }
     }
 
     pub async fn transfer(&mut self, transfer_step: TransferStep) -> String {
         let sender_address = &transfer_step.tx.from.value;
         let mut transaction = self.tx_call_to_blockchain_tx(&transfer_step.tx.to_tx_call());
-        transaction.nonce = self.recall_nonce(sender_address).await;
-        self.sign_tx(sender_address, &mut transaction);
-        self.proxy.send_transaction(&transaction).await.unwrap()
+        self.set_nonce_and_sign_tx(sender_address, &mut transaction)
+            .await;
+        let tx_hash = self.proxy.send_transaction(&transaction).await.unwrap();
+        println!("transfer tx hash: {}", tx_hash);
+        info!("transfer tx hash: {}", tx_hash);
+        tx_hash
+    }
+
+    pub async fn transfer_get_raw_result(
+        &mut self,
+        transfer_step: TransferStep,
+    ) -> InteractorResult<IgnoreValue> {
+        let tx_hash = self.transfer(transfer_step).await;
+        let tx = self.retrieve_tx_on_network(tx_hash.as_str()).await;
+        InteractorResult::new(tx)
     }
 }
