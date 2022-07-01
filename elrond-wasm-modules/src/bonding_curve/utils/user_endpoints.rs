@@ -36,7 +36,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
                     bonding_curve.sell_availability,
                     "Selling is not available on this token"
                 );
-                let price = self.compute_sell_price::<T>(&offered_token, sell_amount.clone());
+                let price = self.compute_sell_price::<T>(&offered_token, &sell_amount);
                 bonding_curve.payment.amount -= &price;
                 bonding_curve.arguments.balance += &sell_amount;
                 let payment_token = bonding_curve.payment_token();
