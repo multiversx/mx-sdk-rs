@@ -1,9 +1,12 @@
 use elrond_sdk_erdrs::{
     blockchain::rpc::ElrondProxy,
-    data::{address::Address as ErdrsAddress, network_config::NetworkConfig},
+    data::{
+        address::Address as ErdrsAddress, network_config::NetworkConfig, transaction::Transaction,
+    },
     interactors::wallet::Wallet,
 };
 use elrond_wasm_debug::{elrond_wasm::types::Address, mandos_system::model::AddressValue, HashMap};
+use log::info;
 use std::time::Duration;
 
 pub struct Interactor {
@@ -44,6 +47,17 @@ impl Interactor {
             .await
             .expect("failed to retrieve account nonce");
         account.nonce
+    }
+
+    pub(crate) fn sign_tx(&self, sender_address: &Address, transaction: &mut Transaction) {
+        let wallet = self
+            .signing_wallets
+            .get(sender_address)
+            .expect("the wallet that was supposed to sign is not registered");
+
+        let signature = wallet.sign_tx(transaction);
+        transaction.signature = Some(hex::encode(signature));
+        info!("transaction {:#?}", transaction);
     }
 }
 
