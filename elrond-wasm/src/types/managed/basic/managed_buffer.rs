@@ -1,10 +1,6 @@
-use core::marker::PhantomData;
-
 use crate::{
     abi::TypeName,
-    api::{
-        ErrorApiImpl, Handle, InvalidSliceError, ManagedBufferApi, ManagedTypeApi, StaticVarApiImpl,
-    },
+    api::{ErrorApiImpl, InvalidSliceError, ManagedBufferApi, ManagedTypeApi, StaticVarApiImpl},
     formatter::{
         hex_util::encode_bytes_as_hex, FormatByteReceiver, SCBinary, SCDisplay, SCLowerHex,
     },
@@ -16,27 +12,28 @@ use elrond_codec::{
     TopEncodeOutput, TryStaticCast,
 };
 
+#[cfg(feature = "ei-1-2")]
+use crate::api::use_raw_handle;
+
 /// A byte buffer managed by an external API.
 #[repr(transparent)]
 pub struct ManagedBuffer<M: ManagedTypeApi> {
-    pub(crate) handle: Handle,
-    _phantom: PhantomData<M>,
+    pub(crate) handle: M::ManagedBufferHandle,
 }
 
 impl<M: ManagedTypeApi> ManagedType<M> for ManagedBuffer<M> {
+    type OwnHandle = M::ManagedBufferHandle;
+
     #[inline]
-    fn from_raw_handle(handle: Handle) -> Self {
-        ManagedBuffer {
-            handle,
-            _phantom: PhantomData,
-        }
+    fn from_handle(handle: M::ManagedBufferHandle) -> Self {
+        ManagedBuffer { handle }
     }
 
-    fn get_raw_handle(&self) -> Handle {
+    fn get_handle(&self) -> M::ManagedBufferHandle {
         self.handle
     }
 
-    fn transmute_from_handle_ref(handle_ref: &Handle) -> &Self {
+    fn transmute_from_handle_ref(handle_ref: &M::ManagedBufferHandle) -> &Self {
         unsafe { core::mem::transmute(handle_ref) }
     }
 }
@@ -47,21 +44,21 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
         let new_handle = M::static_var_api_impl().next_handle();
         // TODO: remove after VM no longer crashes with "unknown handle":
         M::managed_type_impl().mb_overwrite(new_handle, &[]);
-        ManagedBuffer::from_raw_handle(new_handle)
+        ManagedBuffer::from_handle(new_handle)
     }
 
     #[inline]
     pub fn new_from_bytes(bytes: &[u8]) -> Self {
         let new_handle = M::static_var_api_impl().next_handle();
         M::managed_type_impl().mb_overwrite(new_handle, bytes);
-        ManagedBuffer::from_raw_handle(new_handle)
+        ManagedBuffer::from_handle(new_handle)
     }
 
     #[inline]
     pub fn new_random(nr_bytes: usize) -> Self {
         let new_handle = M::static_var_api_impl().next_handle();
         M::managed_type_impl().mb_set_random(new_handle, nr_bytes);
-        ManagedBuffer::from_raw_handle(new_handle)
+        ManagedBuffer::from_handle(new_handle)
     }
 }
 
@@ -169,7 +166,7 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
         let err_result =
             api.mb_copy_slice(self.handle, starting_position, slice_len, result_handle);
         if err_result.is_ok() {
-            Some(ManagedBuffer::from_raw_handle(result_handle))
+            Some(ManagedBuffer::from_handle(result_handle))
         } else {
             None
         }
@@ -264,7 +261,7 @@ impl<M: ManagedTypeApi> Clone for ManagedBuffer<M> {
         let api = M::managed_type_impl();
         let clone_handle = api.mb_new_empty();
         api.mb_append(clone_handle, self.handle);
-        ManagedBuffer::from_raw_handle(clone_handle)
+        ManagedBuffer::from_handle(clone_handle)
     }
 }
 
@@ -386,7 +383,9 @@ impl<M: ManagedTypeApi> crate::abi::TypeAbi for ManagedBuffer<M> {
 
 impl<M: ManagedTypeApi> SCDisplay for ManagedBuffer<M> {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
-        f.append_managed_buffer(&ManagedBuffer::from_raw_handle(self.get_raw_handle()));
+        f.append_managed_buffer(&ManagedBuffer::from_handle(
+            self.get_handle().cast_or_signal_err(),
+        ));
     }
 }
 
@@ -394,23 +393,27 @@ impl<M: ManagedTypeApi> SCDisplay for ManagedBuffer<M> {
 impl<M: ManagedTypeApi> SCLowerHex for ManagedBuffer<M> {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
         // TODO: in Rust thr `0x` prefix appears only when writing "{:#x}", not "{:x}"
-        f.append_managed_buffer_lower_hex(&ManagedBuffer::from_raw_handle(self.get_raw_handle()));
+        f.append_managed_buffer_lower_hex(&ManagedBuffer::from_raw_handle(
+            self.get_raw_handle().cast_or_signal_err(),
+        ));
     }
 }
 
 #[cfg(feature = "ei-1-2")]
 impl<M: ManagedTypeApi> SCLowerHex for ManagedBuffer<M> {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
-        let hex_handle = crate::api::const_handles::MBUF_TEMPORARY_1;
+        let hex_handle = use_raw_handle(crate::api::const_handles::MBUF_TEMPORARY_1);
         M::managed_type_impl().mb_to_hex(self.handle, hex_handle);
-        f.append_managed_buffer(&ManagedBuffer::from_raw_handle(hex_handle));
+        f.append_managed_buffer(&ManagedBuffer::from_handle(hex_handle.cast_or_signal_err()));
     }
 }
 
 impl<M: ManagedTypeApi> SCBinary for ManagedBuffer<M> {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
         // TODO: in Rust thr `0b` prefix appears only when writing "{:#x}", not "{:x}"
-        f.append_managed_buffer_binary(&ManagedBuffer::from_raw_handle(self.get_raw_handle()));
+        f.append_managed_buffer_binary(&ManagedBuffer::from_handle(
+            self.get_handle().cast_or_signal_err(),
+        ));
     }
 }
 

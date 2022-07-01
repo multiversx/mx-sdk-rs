@@ -7,7 +7,7 @@ use elrond_codec::{
 
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
-    api::{const_handles, ErrorApiImpl, Handle, ManagedTypeApi},
+    api::{const_handles, use_raw_handle, ErrorApiImpl, ManagedTypeApi},
     types::{ManagedRef, ManagedType},
 };
 
@@ -23,7 +23,7 @@ where
 {
     pub(super) _phantom_m: PhantomData<M>,
     pub(super) _phantom_t: PhantomData<T>,
-    pub(super) handle: Handle,
+    pub(super) handle: T::OwnHandle,
 }
 
 impl<M, T> ManagedOption<M, T>
@@ -31,7 +31,7 @@ where
     M: ManagedTypeApi,
     T: ManagedType<M>,
 {
-    fn new_with_handle(handle: Handle) -> Self {
+    fn new_with_handle(handle: T::OwnHandle) -> Self {
         Self {
             _phantom_m: PhantomData,
             _phantom_t: PhantomData,
@@ -40,11 +40,11 @@ where
     }
 
     pub fn some(value: T) -> Self {
-        Self::new_with_handle(value.get_raw_handle())
+        Self::new_with_handle(value.get_handle())
     }
 
     pub fn none() -> Self {
-        Self::new_with_handle(const_handles::MANAGED_OPTION_NONE)
+        Self::new_with_handle(use_raw_handle(const_handles::MANAGED_OPTION_NONE))
     }
 }
 
@@ -77,7 +77,7 @@ where
 
     pub fn into_option(self) -> Option<T> {
         if self.is_some() {
-            Some(T::from_raw_handle(self.handle))
+            Some(T::from_handle(self.handle))
         } else {
             None
         }
@@ -93,7 +93,7 @@ where
 
     pub fn unwrap_or_else<F: Fn() -> T>(self, f: F) -> T {
         if self.is_some() {
-            T::from_raw_handle(self.handle)
+            T::from_handle(self.handle)
         } else {
             f()
         }
@@ -109,7 +109,7 @@ where
         F: FnOnce(T) -> U,
     {
         if self.is_some() {
-            ManagedOption::<M, U>::some(f(T::from_raw_handle(self.handle)))
+            ManagedOption::<M, U>::some(f(T::from_handle(self.handle)))
         } else {
             ManagedOption::<M, U>::none()
         }
@@ -121,7 +121,7 @@ where
         F: FnOnce(T) -> U,
     {
         if self.is_some() {
-            f(T::from_raw_handle(self.handle))
+            f(T::from_handle(self.handle))
         } else {
             default()
         }
@@ -133,7 +133,7 @@ where
         F: FnOnce(&T) -> U,
     {
         if self.is_some() {
-            f(&T::from_raw_handle(self.handle))
+            f(&T::from_handle(self.handle))
         } else {
             default()
         }
@@ -148,7 +148,7 @@ where
     #[allow(clippy::redundant_clone)] // the clone is not redundant
     fn clone(&self) -> Self {
         if self.is_some() {
-            Self::some(T::from_raw_handle(self.handle).clone())
+            Self::some(T::from_handle(self.handle).clone())
         } else {
             Self::none()
         }
@@ -167,7 +167,7 @@ where
             return true;
         }
         if self.is_some() && other.is_some() {
-            return T::from_raw_handle(self.handle) == T::from_raw_handle(other.handle);
+            return T::from_handle(self.handle) == T::from_handle(other.handle);
         }
         false
     }
@@ -190,7 +190,7 @@ where
     type Ref<'a> = Self;
 
     fn from_byte_reader<Reader: FnMut(&mut [u8])>(reader: Reader) -> Self {
-        let handle = Handle::from_byte_reader(reader);
+        let handle = T::OwnHandle::from_byte_reader(reader);
         Self::new_with_handle(handle)
     }
 
@@ -201,7 +201,7 @@ where
     }
 
     fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, writer: Writer) -> R {
-        <Handle as ManagedVecItem>::to_byte_writer(&self.handle, writer)
+        <T::OwnHandle as ManagedVecItem>::to_byte_writer(&self.handle, writer)
     }
 }
 
@@ -285,7 +285,7 @@ where
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         if self.is_some() {
             f.debug_tuple("ManagedOption::Some")
-                .field(&T::from_raw_handle(self.handle))
+                .field(&T::from_handle(self.handle))
                 .finish()
         } else {
             f.write_str("ManagedOption::None")

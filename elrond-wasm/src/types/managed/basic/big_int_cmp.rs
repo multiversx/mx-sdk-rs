@@ -1,6 +1,6 @@
 use core::cmp::Ordering;
 
-use crate::api::{const_handles, BigIntApi, ManagedTypeApi};
+use crate::api::{const_handles, use_raw_handle, BigIntApi, ManagedTypeApi};
 
 use super::BigInt;
 
@@ -38,8 +38,9 @@ fn cmp_i64<M: ManagedTypeApi>(bi: &BigInt<M>, other: i64) -> Ordering {
             crate::api::Sign::Minus => Ordering::Less,
         }
     } else {
-        M::managed_type_impl().bi_set_int64(const_handles::BIG_INT_TEMPORARY_1, other as i64);
-        api.bi_cmp(bi.handle, const_handles::BIG_INT_TEMPORARY_1)
+        let big_int_temp_1 = use_raw_handle(const_handles::BIG_INT_TEMPORARY_1);
+        M::managed_type_impl().bi_set_int64(big_int_temp_1, other as i64);
+        api.bi_cmp(bi.handle, big_int_temp_1)
     }
 }
 

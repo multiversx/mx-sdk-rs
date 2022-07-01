@@ -51,10 +51,10 @@ fn struct_to_bytes_writer() {
     let mut arr: [u8; 28] = [0u8;
         <ManagedStructWithToken<DebugApi> as elrond_wasm::types::ManagedVecItem>::PAYLOAD_SIZE];
 
-    let handle1 = s.token.token_identifier.get_raw_handle().to_be_bytes();
-    let handle2 = s.token.amount.get_raw_handle().to_be_bytes();
-    let handle3 = s.eth_address_1.get_raw_handle().to_be_bytes();
-    let handle4 = s.eth_address_2.get_raw_handle().to_be_bytes();
+    let handle1 = s.token.token_identifier.get_handle().to_be_bytes();
+    let handle2 = s.token.amount.get_handle().to_be_bytes();
+    let handle3 = s.eth_address_1.get_handle().to_be_bytes();
+    let handle4 = s.eth_address_2.get_handle().to_be_bytes();
     let expected = [
         handle1[0], handle1[1], handle1[2], handle1[3], 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, handle2[0], handle2[1], handle2[2], handle2[3], 0x00, 0x01, 0x23, 0x45, handle3[0],
@@ -81,10 +81,10 @@ fn struct_from_bytes_reader() {
         eth_address_2: ManagedByteArray::new_from_bytes(&[2u8; 20]),
     };
 
-    let handle1 = s.token.token_identifier.get_raw_handle().to_be_bytes();
-    let handle2 = s.token.amount.get_raw_handle().to_be_bytes();
-    let handle3 = s.eth_address_1.get_raw_handle().to_be_bytes();
-    let handle4 = s.eth_address_2.get_raw_handle().to_be_bytes();
+    let handle1 = s.token.token_identifier.get_handle().to_be_bytes();
+    let handle2 = s.token.amount.get_handle().to_be_bytes();
+    let handle3 = s.eth_address_1.get_handle().to_be_bytes();
+    let handle4 = s.eth_address_2.get_handle().to_be_bytes();
     let arr: [u8; 28] = [
         handle1[0], handle1[1], handle1[2], handle1[3], 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, handle2[0], handle2[1], handle2[2], handle2[3], 0x00, 0x01, 0x23, 0x45, handle3[0],

@@ -1,62 +1,77 @@
 use crate::num_bigint::BigInt;
-use elrond_wasm::api::{const_handles, Handle};
-use std::collections::HashMap;
+use elrond_wasm::api::{
+    const_handles, use_raw_handle, HandleConstraints, HandleTypeInfo, RawHandle,
+};
+use std::{collections::HashMap, marker::PhantomData};
 
 type ManagedBufferImpl = Vec<u8>;
 
 #[derive(Debug)]
-pub struct HandleMap<V> {
-    next_handle: Handle,
-    pub map: HashMap<Handle, V>,
+pub struct HandleMap<H: HandleConstraints, V> {
+    next_handle: RawHandle,
+    pub map: HashMap<RawHandle, V>,
+    _phantom: PhantomData<H>,
 }
 
-impl<V> HandleMap<V> {
+impl<H: HandleConstraints, V> HandleMap<H, V> {
     pub fn new() -> Self {
         HandleMap {
             next_handle: 0,
             map: HashMap::new(),
+            _phantom: PhantomData,
         }
     }
 }
 
-impl<V> Default for HandleMap<V> {
+impl<H: HandleConstraints, V> Default for HandleMap<H, V> {
     fn default() -> Self {
         HandleMap::new()
     }
 }
 
-impl<V> HandleMap<V> {
-    pub fn insert_new_handle(&mut self, value: V) -> Handle {
+impl<H: HandleConstraints, V> HandleMap<H, V> {
+    pub fn insert_new_handle(&mut self, value: V) -> H {
         let new_handle = self.next_handle;
         self.map.insert(new_handle, value);
         self.next_handle += 1;
-        new_handle
+        use_raw_handle(new_handle)
     }
 
-    pub fn get(&self, handle: Handle) -> &V {
+    pub fn get(&self, handle: H) -> &V {
         // TODO: consider simulating the actual error from the VM
         self.map
-            .get(&handle)
+            .get(&handle.get_raw_handle())
             .unwrap_or_else(|| panic!("handle not found"))
     }
 
-    pub fn get_mut(&mut self, handle: Handle) -> &mut V {
+    pub fn get_mut(&mut self, handle: H) -> &mut V {
         // TODO: consider simulating the actual error from the VM
         self.map
-            .get_mut(&handle)
+            .get_mut(&handle.get_raw_handle())
             .unwrap_or_else(|| panic!("handle not found"))
     }
 
-    pub fn insert(&mut self, handle: Handle, value: V) {
-        let _ = self.map.insert(handle, value);
+    pub fn insert(&mut self, handle: H, value: V) {
+        let _ = self.map.insert(handle.get_raw_handle(), value);
     }
 }
 
 #[derive(Debug)]
 pub struct TxManagedTypes {
-    pub(crate) big_int_map: HandleMap<BigInt>,
-    pub(crate) big_float_map: HandleMap<f64>,
-    pub(crate) managed_buffer_map: HandleMap<ManagedBufferImpl>,
+    pub(crate) big_int_map: HandleMap<<Self as HandleTypeInfo>::BigIntHandle, BigInt>,
+    pub(crate) big_float_map: HandleMap<<Self as HandleTypeInfo>::BigFloatHandle, f64>,
+    pub(crate) managed_buffer_map:
+        HandleMap<<Self as HandleTypeInfo>::ManagedBufferHandle, ManagedBufferImpl>,
+}
+
+impl HandleTypeInfo for TxManagedTypes {
+    type ManagedBufferHandle = i32;
+
+    type BigIntHandle = i32;
+
+    type BigFloatHandle = i32;
+
+    type EllipticCurveHandle = i32;
 }
 
 impl TxManagedTypes {
@@ -77,11 +92,11 @@ impl Default for TxManagedTypes {
 
 #[derive(Debug)]
 pub struct TxStaticVars {
-    pub(crate) external_view_target_address_handle: Handle,
-    pub(crate) next_handle: Handle,
+    pub(crate) external_view_target_address_handle: RawHandle,
+    pub(crate) next_handle: RawHandle,
     pub(crate) num_arguments: i32,
-    pub(crate) call_value_egld_handle: Handle,
-    pub(crate) call_value_multi_esdt_handle: Handle,
+    pub(crate) call_value_egld_handle: RawHandle,
+    pub(crate) call_value_multi_esdt_handle: RawHandle,
 }
 
 impl Default for TxStaticVars {
