@@ -5,8 +5,6 @@ use super::{
     ManagedBufferApi,
 };
 
-//pub type Self::ManagedBufferHandle = i32;
-
 pub trait ManagedTypeApiImpl:
     BigIntApi + BigFloatApi + EllipticCurveApi + ManagedBufferApi + ErrorApi
 {
