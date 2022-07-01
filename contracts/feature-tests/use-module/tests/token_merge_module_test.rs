@@ -132,15 +132,20 @@ fn test_token_merge() {
                 );
             assert_eq!(decoded_attributes, expected_attributes);
 
-            // let mut expected_uris = ManagedVec::new();
-            // for uri in FIRST_URIS {
-            //     expected_uris.push(managed_buffer!(*uri));
-            // }
-            // for uri in SECOND_URIS {
-            //     expected_uris.push(managed_buffer!(*uri));
-            // }
+            let mut expected_uris = ManagedVec::new();
+            for uri in FIRST_URIS {
+                expected_uris.push(managed_buffer!(*uri));
+            }
+            for uri in SECOND_URIS {
+                expected_uris.push(managed_buffer!(*uri));
+            }
 
-            // assert_eq!(merged_token_data.uris, expected_uris);
+            assert_eq!(merged_token_data.uris, expected_uris);
+
+            assert_eq!(
+                merged_token_data.royalties,
+                managed_biguint!(SECOND_ROYALTIES)
+            );
         })
         .assert_ok();
 
@@ -261,12 +266,17 @@ fn test_token_merge() {
                 );
             assert_eq!(decoded_attributes, expected_attributes);
 
-            // let mut expected_uris = ManagedVec::new();
-            // for uri in FIRST_URIS {
-            //     expected_uris.push(managed_buffer!(*uri));
-            // }
+            let mut expected_uris = ManagedVec::new();
+            for uri in FIRST_URIS {
+                expected_uris.push(managed_buffer!(*uri));
+            }
 
-            // assert_eq!(merged_token_data.uris, expected_uris);
+            assert_eq!(merged_token_data.uris, expected_uris);
+
+            assert_eq!(
+                merged_token_data.royalties,
+                managed_biguint!(FIRST_ROYALTIES)
+            );
         })
         .assert_ok();
 
