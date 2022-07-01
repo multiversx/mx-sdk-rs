@@ -145,8 +145,10 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
             !self.owned_tokens(&caller).is_empty(),
             "You have nothing to claim"
         );
+
         let mut tokens_to_claim = ManagedVec::<Self::Api, EsdtTokenPayment<Self::Api>>::new();
         let mut egld_to_claim = BigUint::zero();
+        let serializer = ManagedSerializer::new();
         for token in self.owned_tokens(&caller).iter() {
             let nonces = self.token_details(&token).get().token_nonces;
             for nonce in &nonces {
@@ -159,7 +161,6 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
                 self.nonce_amount(&token, nonce).clear();
             }
 
-            let serializer = ManagedSerializer::new();
             let bonding_curve: BondingCurve<Self::Api, T> =
                 serializer.top_decode_from_managed_buffer(&self.bonding_curve(&token).get());
 

@@ -112,7 +112,7 @@
                     "nonce": "12",
                     "balance": "0",
                     "esdt": {
-                        "str:EGLD-13579": "70",
+                        "str:EGLD-13579": "60",
                         "str:MFNFT-67890": {
                             "instances": [
                                 {
