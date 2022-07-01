@@ -280,7 +280,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
         function_selector.calculate_price(token_start, &amount, arguments)
     }
 
-    fn compute_sell_price<T>(&self, identifier: &TokenIdentifier, amount: BigUint) -> BigUint
+    fn compute_sell_price<T>(&self, identifier: &TokenIdentifier, amount: &BigUint) -> BigUint
     where
         T: CurveFunction<Self::Api>
             + TopEncode
