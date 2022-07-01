@@ -37,8 +37,8 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
                     "Selling is not available on this token"
                 );
                 let price = self.compute_sell_price::<T>(&offered_token, sell_amount.clone());
-                bonding_curve.payment.amount -= price.clone();
-                bonding_curve.arguments.balance += sell_amount.clone();
+                bonding_curve.payment.amount -= &price;
+                bonding_curve.arguments.balance += &sell_amount;
                 let payment_token = bonding_curve.payment_token();
                 *buffer = serializer.top_encode_to_managed_buffer(&bonding_curve);
                 (price, payment_token)
