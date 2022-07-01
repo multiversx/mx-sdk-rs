@@ -3,7 +3,7 @@ use elrond_sdk_erdrs::data::transaction::Transaction;
 use elrond_wasm_debug::{
     elrond_wasm::{
         elrond_codec::{CodecFrom, TopEncodeMulti},
-        types::{Address, ContractCall},
+        types::ContractCall,
     },
     mandos_system::model::{ScCallStep, TransferStep, TxCall, TypedScCall},
     DebugApi,
@@ -45,18 +45,11 @@ impl Interactor {
         }
     }
 
-    pub(crate) fn sign_tx(&self, sender_address: &Address, transaction: &mut Transaction) {
-        let wallet = self
-            .signing_wallets
-            .get(sender_address)
-            .expect("the wallet that was supposed to sign is not registered");
-
-        let signature = wallet.sign_tx(transaction);
-        transaction.signature = Some(hex::encode(signature));
-        info!("transaction {:#?}", transaction);
-    }
-
-    pub async fn send_sc_call(&mut self, sc_call_step: ScCallStep) -> String {
+    pub async fn sc_call<S>(&mut self, sc_call_step: S) -> String
+    where
+        ScCallStep: From<S>,
+    {
+        let sc_call_step: ScCallStep = sc_call_step.into();
         let sender_address = &sc_call_step.tx.from.value;
         let mut transaction = self.tx_call_to_blockchain_tx(&sc_call_step.tx);
         transaction.nonce = self.recall_nonce(sender_address).await;
@@ -64,7 +57,7 @@ impl Interactor {
         self.proxy.send_transaction(&transaction).await.unwrap()
     }
 
-    pub async fn sc_call<OriginalResult, RequestedResult>(
+    pub async fn sc_call_get_result<OriginalResult, RequestedResult>(
         &mut self,
         typed_sc_call: TypedScCall<OriginalResult>,
     ) -> RequestedResult
@@ -72,8 +65,7 @@ impl Interactor {
         OriginalResult: TopEncodeMulti,
         RequestedResult: CodecFrom<OriginalResult>,
     {
-        let sc_call_step: ScCallStep = typed_sc_call.into();
-        let tx_hash = self.send_sc_call(sc_call_step).await;
+        let tx_hash = self.sc_call(typed_sc_call).await;
         println!("sc call tx hash: {}", tx_hash);
         info!("sc call tx hash: {}", tx_hash);
         let tx = self.retrieve_tx_on_network(tx_hash.as_str()).await;

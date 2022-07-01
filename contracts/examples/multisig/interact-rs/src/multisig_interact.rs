@@ -1,3 +1,5 @@
+mod multisig_interact_nfts;
+
 use elrond_interaction::{
     elrond_wasm::{
         elrond_codec::multi_types::MultiValueVec,
@@ -13,7 +15,8 @@ use elrond_interaction::{
     tokio, Interactor,
 };
 use multisig::{
-    multisig_propose::ProxyTrait as _, multisig_state::ProxyTrait as _, ProxyTrait as _,
+    multisig_perform::ProxyTrait as _, multisig_propose::ProxyTrait as _,
+    multisig_state::ProxyTrait as _, ProxyTrait as _,
 };
 use std::{
     env::Args,
@@ -22,8 +25,13 @@ use std::{
 
 const GATEWAY: &str = elrond_interaction::erdrs::blockchain::rpc::TESTNET_GATEWAY;
 const PEM: &str = "xena.pem";
-const DEFAULT_MULTISIG_ADDRESS_BECH32: &str =
+const DEFAULT_MULTISIG_ADDRESS_EXPR: &str =
     "0x0000000000000000000000000000000000000000000000000000000000000000";
+const SYSTEM_SC_BECH32: &str = "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u";
+
+const COLLECTION_NAME: &str = "TestCollection1";
+const COLLECTION_TICKER: &str = "TESTCOLL1";
+const COLLECTION_TOKEN_IDENTIFIER: &str = "TESTCOLL1-a36f7b";
 
 type MultisigContract = ContractInfo<multisig::Proxy<DebugApi>>;
 
@@ -34,11 +42,13 @@ async fn main() {
 
     let mut args = std::env::args();
     let _ = args.next();
-    let cmd = args.next().expect("at lest one argument required");
+    let cmd = args.next().expect("at least one argument required");
     let mut state = State::init(args).await;
     match cmd.as_str() {
         "deploy" => state.deploy().await,
         "feed" => state.feed_contract_egld().await,
+        "issue" => state.issue_collection().await,
+        "special-role" => state.set_special_role().await,
         "send" => state.send().await,
         "quorum" => state.quorum().await,
         "board" => state.board().await,
@@ -50,6 +60,8 @@ struct State {
     interactor: Interactor,
     wallet_address: Address,
     multisig: MultisigContract,
+    system_sc_address: Address,
+    collection_token_identifier: String,
     #[allow(dead_code)]
     args: Args,
 }
@@ -63,6 +75,8 @@ impl State {
             interactor,
             wallet_address,
             multisig,
+            system_sc_address: bech32::decode(SYSTEM_SC_BECH32),
+            collection_token_identifier: COLLECTION_TOKEN_IDENTIFIER.to_string(),
             args,
         }
     }
@@ -103,9 +117,21 @@ impl State {
             .await;
     }
 
+    async fn perform_action(&mut self, action_id: usize, gas_expr: &str) -> String {
+        self.interactor
+            .sc_call(
+                self.multisig
+                    .perform_action_endpoint(action_id)
+                    .into_blockchain_call()
+                    .from(&self.wallet_address)
+                    .gas_limit(gas_expr)
+                    .expect(TxExpect::ok()),
+            )
+            .await
+    }
+
     async fn send(&mut self) {
-        let action_id: usize = self
-            .interactor
+        self.interactor
             .sc_call(
                 self.multisig
                     .propose_change_quorum(5usize)
@@ -115,7 +141,6 @@ impl State {
                     .expect(TxExpect::ok()),
             )
             .await;
-        println!("action id: {}", action_id);
     }
 
     async fn quorum(&mut self) {
@@ -146,7 +171,7 @@ fn load_address_expr() -> String {
             file.read_to_string(&mut contents).unwrap();
             contents
         },
-        Err(_) => DEFAULT_MULTISIG_ADDRESS_BECH32.to_string(),
+        Err(_) => DEFAULT_MULTISIG_ADDRESS_EXPR.to_string(),
     }
 }
 
