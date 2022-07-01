@@ -24,7 +24,7 @@ use std::{
 };
 
 const GATEWAY: &str = elrond_interaction::erdrs::blockchain::rpc::TESTNET_GATEWAY;
-const PEM: &str = "xena.pem";
+const PEM: &str = "alice.pem";
 const DEFAULT_MULTISIG_ADDRESS_EXPR: &str =
     "0x0000000000000000000000000000000000000000000000000000000000000000";
 const SYSTEM_SC_BECH32: &str = "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u";
@@ -47,8 +47,8 @@ async fn main() {
         "nft-issue" => state.issue_collection().await,
         "nft-special" => state.set_special_role().await,
         "nft-items" => state.create_items().await,
-        "quorum" => state.quorum().await,
-        "board" => state.board().await,
+        "quorum" => state.print_quorum().await,
+        "board" => state.print_board().await,
         _ => panic!("unknown command: {}", &cmd),
     }
 }
@@ -130,7 +130,7 @@ impl State {
         let _ = self.interactor.sc_call_get_raw_result(sc_call_step).await;
     }
 
-    async fn quorum(&mut self) {
+    async fn print_quorum(&mut self) {
         let quorum: SingleValue<usize> = self.interactor.vm_query(self.multisig.quorum()).await;
 
         println!("quorum: {}", quorum.into());
@@ -142,7 +142,7 @@ impl State {
             .await
     }
 
-    async fn board(&mut self) {
+    async fn print_board(&mut self) {
         let board_members: MultiValueVec<Address> = self
             .interactor
             .vm_query(self.multisig.get_all_board_members())
