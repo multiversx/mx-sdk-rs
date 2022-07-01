@@ -5,3 +5,6 @@
 # Alice and Bob are public, do NEVER use them on the mainnet.
 !alice.pem
 !bob.pem
+
+# Temporary storage of deployed contract address, so we can preserve the context between executions.
+multisig_address.txt

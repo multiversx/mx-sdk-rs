@@ -1,24 +1,43 @@
-use crate::{mandos_to_erdrs_address, Interactor};
+use crate::{address_h256_to_erdrs, mandos_to_erdrs_address, Interactor};
 use elrond_sdk_erdrs::data::transaction::Transaction;
 use elrond_wasm_debug::{
     elrond_wasm::{
         elrond_codec::{CodecFrom, TopEncodeMulti},
-        types::Address,
+        types::{Address, ContractCall},
     },
-    mandos_system::model::{ScCallStep, TypedScCall},
+    mandos_system::model::{ScCallStep, TransferStep, TxCall, TypedScCall},
+    DebugApi,
 };
 use log::info;
 
+fn contract_call_to_tx_data(contract_call: &ContractCall<DebugApi, ()>) -> String {
+    let mut result =
+        String::from_utf8(contract_call.endpoint_name.to_boxed_bytes().into_vec()).unwrap();
+    for argument in contract_call.arg_buffer.raw_arg_iter() {
+        result.push('@');
+        result.push_str(hex::encode(argument.to_boxed_bytes().as_slice()).as_str());
+    }
+    result
+}
+
 impl Interactor {
-    fn sc_call_to_tx(&self, sc_call_step: &ScCallStep) -> Transaction {
+    fn tx_call_to_blockchain_tx(&self, tx_call: &TxCall) -> Transaction {
+        let contract_call = tx_call.to_contract_call().convert_to_esdt_transfer_call();
+        let contract_call_tx_data = contract_call_to_tx_data(&contract_call);
+        let data = if contract_call_tx_data.is_empty() {
+            None
+        } else {
+            Some(base64::encode(contract_call_tx_data))
+        };
+
         Transaction {
             nonce: 0,
-            value: sc_call_step.tx.egld_value.value.to_string(),
-            sender: mandos_to_erdrs_address(&sc_call_step.tx.from),
-            receiver: mandos_to_erdrs_address(&sc_call_step.tx.to),
+            value: contract_call.egld_payment.to_alloc().to_string(),
+            sender: mandos_to_erdrs_address(&tx_call.from),
+            receiver: address_h256_to_erdrs(&contract_call.to.to_address()),
             gas_price: self.network_config.min_gas_price,
-            gas_limit: sc_call_step.tx.gas_limit.value,
-            data: Some(base64::encode(sc_call_step.tx.to_tx_data())),
+            gas_limit: tx_call.gas_limit.value,
+            data,
             signature: None,
             chain_id: self.network_config.chain_id.clone(),
             version: self.network_config.min_transaction_version,
@@ -39,7 +58,7 @@ impl Interactor {
 
     pub async fn send_sc_call(&mut self, sc_call_step: ScCallStep) -> String {
         let sender_address = &sc_call_step.tx.from.value;
-        let mut transaction = self.sc_call_to_tx(&sc_call_step);
+        let mut transaction = self.tx_call_to_blockchain_tx(&sc_call_step.tx);
         transaction.nonce = self.recall_nonce(sender_address).await;
         self.sign_tx(sender_address, &mut transaction);
         self.proxy.send_transaction(&transaction).await.unwrap()
@@ -59,5 +78,13 @@ impl Interactor {
         info!("sc call tx hash: {}", tx_hash);
         let tx = self.retrieve_tx_on_network(tx_hash.as_str()).await;
         self.extract_sc_call_result(tx)
+    }
+
+    pub async fn transfer(&mut self, transfer_step: TransferStep) -> String {
+        let sender_address = &transfer_step.tx.from.value;
+        let mut transaction = self.tx_call_to_blockchain_tx(&transfer_step.tx.to_tx_call());
+        transaction.nonce = self.recall_nonce(sender_address).await;
+        self.sign_tx(sender_address, &mut transaction);
+        self.proxy.send_transaction(&transaction).await.unwrap()
     }
 }
