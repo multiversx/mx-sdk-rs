@@ -54,16 +54,6 @@ impl<M: ManagedTypeApi> MergedTokenAttributes<M> {
         Self { instances }
     }
 
-    #[inline]
-    pub fn len(&self) -> usize {
-        self.instances.len()
-    }
-
-    #[inline]
-    pub fn is_empty(&self) -> bool {
-        self.len() == 0
-    }
-
     pub fn add_or_update_instance(&mut self, new_instance: TokenAttributesInstance<M>) {
         let search_result = self.instances.binary_search_by(|item| {
             let token_id_cmp_result = item
