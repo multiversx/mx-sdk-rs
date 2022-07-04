@@ -1,7 +1,20 @@
 # Function Selector 
 
-The `FunctionSelector` stores the pre-defined functions. For now the only one available is [Linear](linear.md).
-Other fuctions such as `Power`, `Sigmoid` and `Logarithmic` will be added later once the math module is functional.
+The `FunctionSelector` stores the pre-defined and user defined functions and needs to be added to the contract together with the following endpoints and views:
+	- buyToken
+	- claim
+	- deposit
+	- getTokenAvailability
+	- sellToken
+	- setBondingCurve
+	- setLocalRoles
+	- unsetLocalRoles
+	- view_buy_price
+	- view_sell_price
+
+ This entity is passed as a generic to the module reason why some of the endpoints and views will also need to be defined in the contract calling their defined counterpart from the module with `FunctionSelector` as a generic.
+
+An example of predefined curve function is [Linear](linear.md).
 
 When setting the bonding curve by a predefined function one mush pay attention by the parameters requested by the certain function. All the predefined functions are available in the curves folder and are implementing the `CurveFunction` trait.
 

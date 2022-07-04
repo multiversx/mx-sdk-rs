@@ -1,7 +1,7 @@
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
-use super::structs::{BondingCurve, TokenOwnershipData};
+use super::structs::TokenOwnershipData;
 
 #[elrond_wasm::module]
 pub trait StorageModule {
@@ -12,7 +12,7 @@ pub trait StorageModule {
     ) -> SingleValueMapper<TokenOwnershipData<Self::Api>>;
 
     #[storage_mapper("bonding_curve")]
-    fn bonding_curve(&self, token: &TokenIdentifier) -> SingleValueMapper<BondingCurve<Self::Api>>;
+    fn bonding_curve(&self, token: &TokenIdentifier) -> SingleValueMapper<ManagedBuffer>;
 
     #[storage_mapper("owned_tokens")]
     fn owned_tokens(&self, owner: &ManagedAddress) -> SetMapper<TokenIdentifier>;
