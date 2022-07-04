@@ -8,7 +8,7 @@ use elrond_wasm_debug::{
     managed_address, managed_biguint, managed_buffer, managed_token_id, rust_biguint,
     testing_framework::BlockchainStateWrapper, tx_mock::TxInputESDT, DebugApi,
 };
-use elrond_wasm_modules::token_merge::{MergedTokenAttributesInstance, TokenMergeModule};
+use elrond_wasm_modules::token_merge::{TokenAttributesInstance, TokenMergeModule};
 
 static MERGED_TOKEN_ID: &[u8] = b"MERGED-123456";
 static NFT_TOKEN_ID: &[u8] = b"NFT-123456";
@@ -108,7 +108,7 @@ fn test_token_merge() {
             );
 
             let mut expected_attributes = ManagedVec::new();
-            expected_attributes.push(MergedTokenAttributesInstance {
+            expected_attributes.push(TokenAttributesInstance {
                 original_token: EsdtTokenPayment::new(
                     managed_token_id!(NFT_TOKEN_ID),
                     FIRST_NFT_NONCE,
@@ -117,7 +117,7 @@ fn test_token_merge() {
                 attributes_raw: managed_buffer!(FIRST_ATTRIBUTES),
                 nr_uris: FIRST_URIS.len(),
             });
-            expected_attributes.push(MergedTokenAttributesInstance {
+            expected_attributes.push(TokenAttributesInstance {
                 original_token: EsdtTokenPayment::new(
                     managed_token_id!(NFT_TOKEN_ID),
                     SECOND_NFT_NONCE,
@@ -128,7 +128,7 @@ fn test_token_merge() {
             });
 
             let decoded_attributes = merged_token_data
-                .decode_attributes::<ManagedVec<DebugApi, MergedTokenAttributesInstance<DebugApi>>>(
+                .decode_attributes::<ManagedVec<DebugApi, TokenAttributesInstance<DebugApi>>>(
                 );
             assert_eq!(decoded_attributes, expected_attributes);
 
@@ -242,7 +242,7 @@ fn test_token_merge() {
             );
 
             let mut expected_attributes = ManagedVec::new();
-            expected_attributes.push(MergedTokenAttributesInstance {
+            expected_attributes.push(TokenAttributesInstance {
                 original_token: EsdtTokenPayment::new(
                     managed_token_id!(NFT_TOKEN_ID),
                     FIRST_NFT_NONCE,
@@ -251,7 +251,7 @@ fn test_token_merge() {
                 attributes_raw: managed_buffer!(FIRST_ATTRIBUTES),
                 nr_uris: FIRST_URIS.len(),
             });
-            expected_attributes.push(MergedTokenAttributesInstance {
+            expected_attributes.push(TokenAttributesInstance {
                 original_token: EsdtTokenPayment::new(
                     managed_token_id!(FUNGIBLE_TOKEN_ID),
                     0,
@@ -262,7 +262,7 @@ fn test_token_merge() {
             });
 
             let decoded_attributes = merged_token_data
-                .decode_attributes::<ManagedVec<DebugApi, MergedTokenAttributesInstance<DebugApi>>>(
+                .decode_attributes::<ManagedVec<DebugApi, TokenAttributesInstance<DebugApi>>>(
                 );
             assert_eq!(decoded_attributes, expected_attributes);
 
@@ -318,7 +318,7 @@ fn test_token_merge() {
             );
 
             let mut expected_attributes = ManagedVec::new();
-            expected_attributes.push(MergedTokenAttributesInstance {
+            expected_attributes.push(TokenAttributesInstance {
                 original_token: EsdtTokenPayment::new(
                     managed_token_id!(NFT_TOKEN_ID),
                     SECOND_NFT_NONCE,
@@ -327,7 +327,7 @@ fn test_token_merge() {
                 attributes_raw: managed_buffer!(SECOND_ATTRIBUTES),
                 nr_uris: SECOND_URIS.len(),
             });
-            expected_attributes.push(MergedTokenAttributesInstance {
+            expected_attributes.push(TokenAttributesInstance {
                 original_token: EsdtTokenPayment::new(
                     managed_token_id!(NFT_TOKEN_ID),
                     FIRST_NFT_NONCE,
@@ -336,7 +336,7 @@ fn test_token_merge() {
                 attributes_raw: managed_buffer!(FIRST_ATTRIBUTES),
                 nr_uris: FIRST_URIS.len(),
             });
-            expected_attributes.push(MergedTokenAttributesInstance {
+            expected_attributes.push(TokenAttributesInstance {
                 original_token: EsdtTokenPayment::new(
                     managed_token_id!(FUNGIBLE_TOKEN_ID),
                     0,
@@ -347,7 +347,7 @@ fn test_token_merge() {
             });
 
             let decoded_attributes = merged_token_data
-                .decode_attributes::<ManagedVec<DebugApi, MergedTokenAttributesInstance<DebugApi>>>(
+                .decode_attributes::<ManagedVec<DebugApi, TokenAttributesInstance<DebugApi>>>(
                 );
             assert_eq!(decoded_attributes, expected_attributes);
 
