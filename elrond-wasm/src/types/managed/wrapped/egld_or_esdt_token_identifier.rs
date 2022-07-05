@@ -1,6 +1,6 @@
 use crate::{
     abi::{TypeAbi, TypeName},
-    api::ManagedTypeApi,
+    api::{HandleConstraints, ManagedTypeApi},
     derive::ManagedVecItem,
     formatter::{FormatByteReceiver, SCDisplay, SCLowerHex},
     types::{ManagedBuffer, ManagedOption, ManagedRef, ManagedType, TokenIdentifier},
@@ -220,7 +220,7 @@ impl<M: ManagedTypeApi> SCDisplay for EgldOrEsdtTokenIdentifier<M> {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
         if let Some(token_identifier) = self.data.as_option() {
             f.append_managed_buffer(&ManagedBuffer::from_handle(
-                token_identifier.get_handle().cast_or_signal_err(),
+                token_identifier.get_handle().cast_or_signal_error::<M, _>(),
             ));
         } else {
             f.append_bytes(Self::EGLD_REPRESENTATION);
@@ -234,7 +234,7 @@ impl<M: ManagedTypeApi> SCLowerHex for EgldOrEsdtTokenIdentifier<M> {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
         if let Some(token_identifier) = self.data.as_option() {
             f.append_managed_buffer_lower_hex(&ManagedBuffer::from_handle(
-                token_identifier.get_handle().cast_or_signal_err(),
+                token_identifier.get_handle().cast_or_signal_error::<M, _>(),
             ));
         } else {
             f.append_bytes(EGLD_REPRESENTATION_HEX);

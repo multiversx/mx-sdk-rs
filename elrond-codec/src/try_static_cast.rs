@@ -8,14 +8,6 @@ pub trait TryStaticCast: Sized + 'static {
         TypeId::of::<Self>() == TypeId::of::<U>()
     }
 
-    fn cast_or_signal_err<U: TryStaticCast>(self) -> U {
-        if let Some(other) = self.try_cast() {
-            other
-        } else {
-            panic!("Cast type mismatch")
-        }
-    }
-
     #[inline]
     fn try_cast<U: TryStaticCast>(self) -> Option<U> {
         if Self::type_eq::<U>() {

@@ -9,7 +9,10 @@ pub trait HandleTypeInfo {
 
 use elrond_codec::TryStaticCast;
 
-use crate::types::ManagedVecItem;
+use crate::{
+    api::{ErrorApi, ErrorApiImpl},
+    types::ManagedVecItem,
+};
 
 pub type RawHandle = i32;
 
@@ -19,6 +22,14 @@ pub trait HandleConstraints:
     fn new(handle: RawHandle) -> Self;
     fn to_be_bytes(&self) -> [u8; 4];
     fn get_raw_handle(&self) -> RawHandle;
+
+    fn cast_or_signal_error<E: ErrorApi, U: TryStaticCast>(self) -> U {
+        if let Some(other) = self.try_cast() {
+            other
+        } else {
+            E::error_api_impl().signal_error(b"Cast type mismatch")
+        }
+    }
 }
 
 pub fn use_raw_handle<H>(handle: RawHandle) -> H
