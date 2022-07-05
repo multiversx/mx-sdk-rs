@@ -1,5 +1,3 @@
-use elrond_codec::TryStaticCast;
-
 use crate::api::{HandleConstraints, ManagedTypeApi, RawHandle};
 
 use super::ManagedRef;
@@ -15,11 +13,11 @@ pub trait ManagedType<M: ManagedTypeApi>: Sized {
 
     #[doc(hidden)]
     fn from_raw_handle(handle: RawHandle) -> Self {
-        Self::from_handle(handle.cast_or_signal_err())
+        Self::from_handle(handle.cast_or_signal_error::<M, _>())
     }
 
     fn get_raw_handle(&self) -> RawHandle {
-        self.get_handle().cast_or_signal_err()
+        self.get_handle().cast_or_signal_error::<M, _>()
     }
 
     /// Implement carefully, since the underlying transmutation is an unsafe operation.

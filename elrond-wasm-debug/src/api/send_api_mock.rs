@@ -6,10 +6,11 @@ use crate::{
 };
 use elrond_wasm::{
     api::{
-        BlockchainApiImpl, ManagedTypeApi, SendApi, SendApiImpl, ESDT_MULTI_TRANSFER_FUNC_NAME,
-        ESDT_NFT_TRANSFER_FUNC_NAME, ESDT_TRANSFER_FUNC_NAME, UPGRADE_CONTRACT_FUNC_NAME,
+        BlockchainApiImpl, HandleConstraints, ManagedTypeApi, SendApi, SendApiImpl,
+        ESDT_MULTI_TRANSFER_FUNC_NAME, ESDT_NFT_TRANSFER_FUNC_NAME, ESDT_TRANSFER_FUNC_NAME,
+        UPGRADE_CONTRACT_FUNC_NAME,
     },
-    elrond_codec::{top_encode_to_vec_u8, TryStaticCast},
+    elrond_codec::top_encode_to_vec_u8,
     err_msg,
     types::{
         heap::Address, ArgBuffer, BigUint, BoxedBytes, CodeMetadata, EsdtTokenPayment,
@@ -169,7 +170,8 @@ impl DebugApi {
         arg_buffer: &ManagedArgBuffer<M>,
     ) -> ! {
         let recipient = sc_address.to_address();
-        let call_value = self.big_uint_handle_to_value(amount.get_handle().cast_or_signal_err());
+        let call_value =
+            self.big_uint_handle_to_value(amount.get_handle().cast_or_signal_error::<M, _>());
         let contract_address = self.input_ref().to.clone();
         let tx_hash = self.get_tx_hash_legacy();
 
@@ -214,7 +216,8 @@ impl SendApiImpl for DebugApi {
         endpoint_name: &ManagedBuffer<M>,
         arg_buffer: &ManagedArgBuffer<M>,
     ) -> Result<(), &'static [u8]> {
-        let egld_value = self.big_uint_handle_to_value(amount.get_handle().cast_or_signal_err());
+        let egld_value =
+            self.big_uint_handle_to_value(amount.get_handle().cast_or_signal_error::<M, _>());
         let recipient = to.to_address();
 
         let _ = self.perform_transfer_execute(
@@ -340,7 +343,8 @@ impl SendApiImpl for DebugApi {
         endpoint_name: &ManagedBuffer<M>,
         arg_buffer: &ManagedArgBuffer<M>,
     ) -> ! {
-        let amount_value = self.big_uint_handle_to_value(amount.get_handle().cast_or_signal_err());
+        let amount_value =
+            self.big_uint_handle_to_value(amount.get_handle().cast_or_signal_error::<M, _>());
         let contract_address = self.input_ref().to.clone();
         let recipient = to.to_address();
         let tx_hash = self.get_tx_hash_legacy();
@@ -366,7 +370,8 @@ impl SendApiImpl for DebugApi {
         _extra_gas_for_callback: u64,
         arg_buffer: &ManagedArgBuffer<M>,
     ) {
-        let amount_value = self.big_uint_handle_to_value(amount.get_handle().cast_or_signal_err());
+        let amount_value =
+            self.big_uint_handle_to_value(amount.get_handle().cast_or_signal_error::<M, _>());
         let contract_address = self.input_ref().to.clone();
         let recipient = to.to_address();
         let tx_hash = self.get_tx_hash_legacy();
@@ -398,7 +403,8 @@ impl SendApiImpl for DebugApi {
         _code_metadata: CodeMetadata,
         arg_buffer: &ManagedArgBuffer<M>,
     ) -> (ManagedAddress<M>, ManagedVec<M, ManagedBuffer<M>>) {
-        let egld_value = self.big_uint_handle_to_value(amount.get_handle().cast_or_signal_err());
+        let egld_value =
+            self.big_uint_handle_to_value(amount.get_handle().cast_or_signal_error::<M, _>());
         let contract_code = code.to_boxed_bytes().into_vec();
         let (new_address, result) =
             self.perform_deploy(contract_code, egld_value, arg_buffer.to_raw_args_vec());
@@ -414,7 +420,8 @@ impl SendApiImpl for DebugApi {
         _code_metadata: CodeMetadata,
         arg_buffer: &ManagedArgBuffer<M>,
     ) -> (ManagedAddress<M>, ManagedVec<M, ManagedBuffer<M>>) {
-        let egld_value = self.big_uint_handle_to_value(amount.get_handle().cast_or_signal_err());
+        let egld_value =
+            self.big_uint_handle_to_value(amount.get_handle().cast_or_signal_error::<M, _>());
         let source_contract_code = self.get_contract_code(&source_contract_address.to_address());
         let (new_address, result) = self.perform_deploy(
             source_contract_code,
@@ -459,7 +466,8 @@ impl SendApiImpl for DebugApi {
         endpoint_name: &ManagedBuffer<M>,
         arg_buffer: &ManagedArgBuffer<M>,
     ) -> ManagedVec<M, ManagedBuffer<M>> {
-        let egld_value = self.big_uint_handle_to_value(value.get_handle().cast_or_signal_err());
+        let egld_value =
+            self.big_uint_handle_to_value(value.get_handle().cast_or_signal_error::<M, _>());
         let recipient = to.to_address();
 
         let result = self.perform_execute_on_dest_context(

@@ -4,8 +4,7 @@ use crate::{
     DebugApi,
 };
 use elrond_wasm::{
-    api::{BlockchainApi, BlockchainApiImpl, ManagedBufferApi, ManagedTypeApi},
-    elrond_codec::TryStaticCast,
+    api::{BlockchainApi, BlockchainApiImpl, HandleConstraints, ManagedBufferApi, ManagedTypeApi},
     types::{
         heap::{Address, H256},
         BigUint, EsdtLocalRole, EsdtLocalRoleFlags, EsdtTokenData, EsdtTokenType, ManagedAddress,
@@ -275,25 +274,25 @@ impl DebugApi {
             token_type: EsdtTokenType::based_on_token_nonce(nonce),
             amount: BigUint::from_handle(
                 self.insert_new_big_uint(instance.balance.clone())
-                    .cast_or_signal_err(),
+                    .cast_or_signal_error::<M, _>(),
             ),
             frozen: esdt_data.frozen,
             hash: ManagedBuffer::from_handle(
                 self.insert_new_managed_buffer(instance.metadata.hash.clone().unwrap_or_default())
-                    .cast_or_signal_err(),
+                    .cast_or_signal_error::<M, _>(),
             ),
             name: ManagedBuffer::from_handle(
                 self.insert_new_managed_buffer(instance.metadata.name.clone())
-                    .cast_or_signal_err(),
+                    .cast_or_signal_error::<M, _>(),
             ),
             attributes: ManagedBuffer::from_handle(
                 self.insert_new_managed_buffer(instance.metadata.attributes.clone())
-                    .cast_or_signal_err(),
+                    .cast_or_signal_error::<M, _>(),
             ),
             creator,
             royalties: BigUint::from_handle(
                 self.insert_new_big_uint(num_bigint::BigUint::from(instance.metadata.royalties))
-                    .cast_or_signal_err(),
+                    .cast_or_signal_error::<M, _>(),
             ),
             uris,
         }

@@ -1,6 +1,6 @@
 use crate::{
     abi::{TypeAbi, TypeName},
-    api::{ManagedTypeApi, ManagedTypeApiImpl},
+    api::{HandleConstraints, ManagedTypeApi, ManagedTypeApiImpl},
     formatter::{FormatByteReceiver, SCDisplay, SCLowerHex},
     types::{ManagedBuffer, ManagedType},
 };
@@ -167,7 +167,7 @@ impl<M: ManagedTypeApi> TypeAbi for TokenIdentifier<M> {
 impl<M: ManagedTypeApi> SCDisplay for TokenIdentifier<M> {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
         f.append_managed_buffer(&ManagedBuffer::from_handle(
-            self.buffer.get_handle().cast_or_signal_err(),
+            self.buffer.get_handle().cast_or_signal_error::<M, _>(),
         ));
     }
 }
@@ -175,7 +175,7 @@ impl<M: ManagedTypeApi> SCDisplay for TokenIdentifier<M> {
 impl<M: ManagedTypeApi> SCLowerHex for TokenIdentifier<M> {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
         f.append_managed_buffer_lower_hex(&ManagedBuffer::from_handle(
-            self.buffer.get_handle().cast_or_signal_err(),
+            self.buffer.get_handle().cast_or_signal_error::<M, _>(),
         ));
     }
 }

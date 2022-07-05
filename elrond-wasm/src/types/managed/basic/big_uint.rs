@@ -13,6 +13,9 @@ use elrond_codec::{
     TopEncodeOutput, TryStaticCast,
 };
 
+#[cfg(feature = "ei-1-2")]
+use crate::api::HandleConstraints;
+
 #[repr(transparent)]
 pub struct BigUint<M: ManagedTypeApi> {
     pub(crate) handle: M::BigIntHandle,
@@ -287,7 +290,9 @@ impl<M: ManagedTypeApi> SCDisplay for BigUint<M> {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
         let str_handle = use_raw_handle(const_handles::MBUF_TEMPORARY_1);
         M::managed_type_impl().bi_to_string(self.handle, str_handle);
-        f.append_managed_buffer(&ManagedBuffer::from_handle(str_handle.cast_or_signal_err()));
+        f.append_managed_buffer(&ManagedBuffer::from_handle(
+            str_handle.cast_or_signal_error::<M, _>(),
+        ));
     }
 }
 

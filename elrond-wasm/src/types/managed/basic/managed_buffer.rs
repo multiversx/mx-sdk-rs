@@ -1,6 +1,9 @@
 use crate::{
     abi::TypeName,
-    api::{ErrorApiImpl, InvalidSliceError, ManagedBufferApi, ManagedTypeApi, StaticVarApiImpl},
+    api::{
+        ErrorApiImpl, HandleConstraints, InvalidSliceError, ManagedBufferApi, ManagedTypeApi,
+        StaticVarApiImpl,
+    },
     formatter::{
         hex_util::encode_bytes_as_hex, FormatByteReceiver, SCBinary, SCDisplay, SCLowerHex,
     },
@@ -385,7 +388,7 @@ impl<M: ManagedTypeApi> crate::abi::TypeAbi for ManagedBuffer<M> {
 impl<M: ManagedTypeApi> SCDisplay for ManagedBuffer<M> {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
         f.append_managed_buffer(&ManagedBuffer::from_handle(
-            self.get_handle().cast_or_signal_err(),
+            self.get_handle().cast_or_signal_error::<M, _>(),
         ));
     }
 }
@@ -395,7 +398,7 @@ impl<M: ManagedTypeApi> SCLowerHex for ManagedBuffer<M> {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
         // TODO: in Rust thr `0x` prefix appears only when writing "{:#x}", not "{:x}"
         f.append_managed_buffer_lower_hex(&ManagedBuffer::from_raw_handle(
-            self.get_raw_handle().cast_or_signal_err(),
+            self.get_raw_handle().cast_or_signal_error::<M, _>(),
         ));
     }
 }
@@ -405,7 +408,9 @@ impl<M: ManagedTypeApi> SCLowerHex for ManagedBuffer<M> {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
         let hex_handle = use_raw_handle(crate::api::const_handles::MBUF_TEMPORARY_1);
         M::managed_type_impl().mb_to_hex(self.handle, hex_handle);
-        f.append_managed_buffer(&ManagedBuffer::from_handle(hex_handle.cast_or_signal_err()));
+        f.append_managed_buffer(&ManagedBuffer::from_handle(
+            hex_handle.cast_or_signal_error::<M, _>(),
+        ));
     }
 }
 
@@ -413,7 +418,7 @@ impl<M: ManagedTypeApi> SCBinary for ManagedBuffer<M> {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
         // TODO: in Rust thr `0b` prefix appears only when writing "{:#x}", not "{:x}"
         f.append_managed_buffer_binary(&ManagedBuffer::from_handle(
-            self.get_handle().cast_or_signal_err(),
+            self.get_handle().cast_or_signal_error::<M, _>(),
         ));
     }
 }
