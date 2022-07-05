@@ -5,7 +5,6 @@ pub mod merged_token_attributes;
 
 use merged_token_attributes::{MergedTokenAttributes, TokenAttributesInstance, MAX_MERGED_TOKENS};
 
-static PAUSED_ERR_MSG: &[u8] = b"Contract is paused";
 static SC_DOES_NOT_OWN_NFT_PARTS_ERR_MSG: &[u8] = b"NFT parts belong to another merging SC";
 
 const MIN_MERGE_PAYMENTS: usize = 2;
@@ -51,7 +50,7 @@ pub trait TokenMergeModule:
     #[payable("*")]
     #[endpoint(mergeTokens)]
     fn merge_tokens(&self) -> EsdtTokenPayment<Self::Api> {
-        require!(self.not_paused(), PAUSED_ERR_MSG);
+        self.require_not_paused();
 
         let payments = self.call_value().all_esdt_transfers();
         require!(
@@ -112,31 +111,22 @@ pub trait TokenMergeModule:
             merged_attributes.add_or_update_instance(single_token_instance);
         }
 
-        let nft_amount = BigUint::from(NFT_AMOUNT);
-        let empty_buffer = ManagedBuffer::new();
-        let uris = merged_attributes.construct_full_uri_list();
-        let royalties = merged_attributes.get_max_royalties();
-        let merged_token_nonce = self.send().esdt_nft_create(
-            &merged_token_id,
-            &nft_amount,
-            &empty_buffer,
-            &royalties,
-            &empty_buffer,
-            &merged_attributes.into_instances(),
-            &uris,
+        let merged_token_payment = self.create_merged_token(merged_token_id, merged_attributes);
+        let caller = self.blockchain().get_caller();
+        self.send().direct_esdt(
+            &caller,
+            &merged_token_payment.token_identifier,
+            merged_token_payment.token_nonce,
+            &merged_token_payment.amount,
         );
 
-        let caller = self.blockchain().get_caller();
-        self.send()
-            .direct_esdt(&caller, &merged_token_id, merged_token_nonce, &nft_amount);
-
-        EsdtTokenPayment::new(merged_token_id, merged_token_nonce, nft_amount)
+        merged_token_payment
     }
 
     #[payable("*")]
     #[endpoint(splitTokens)]
-    fn split_tokens(&self) -> ManagedVec<EsdtTokenPayment<Self::Api>> {
-        require!(self.not_paused(), PAUSED_ERR_MSG);
+    fn split_tokens(&self) -> MultiValueEncoded<EsdtTokenPayment<Self::Api>> {
+        self.require_not_paused();
 
         let payments = self.call_value().all_esdt_transfers();
         require!(!payments.is_empty(), "No payments");
@@ -179,7 +169,83 @@ pub trait TokenMergeModule:
         let caller = self.blockchain().get_caller();
         self.send().direct_multi(&caller, &output_payments);
 
-        output_payments
+        output_payments.into()
+    }
+
+    #[payable("*")]
+    #[endpoint(splitTokenPartial)]
+    fn split_token_partial(
+        &self,
+        tokens_to_remove: MultiValueEncoded<EsdtTokenPayment<Self::Api>>,
+    ) -> MultiValueEncoded<EsdtTokenPayment<Self::Api>> {
+        self.require_not_paused();
+
+        let merged_token = self.call_value().single_esdt();
+        self.merged_token()
+            .require_same_token(&merged_token.token_identifier);
+
+        let sc_address = self.blockchain().get_sc_address();
+        let merged_token_data = self.blockchain().get_esdt_token_data(
+            &sc_address,
+            &merged_token.token_identifier,
+            merged_token.token_nonce,
+        );
+        require!(
+            merged_token_data.creator == sc_address,
+            SC_DOES_NOT_OWN_NFT_PARTS_ERR_MSG
+        );
+
+        let merged_attributes_raw = merged_token_data
+            .decode_attributes::<ArrayVec<TokenAttributesInstance<Self::Api>, MAX_MERGED_TOKENS>>();
+        let mut merged_attributes =
+            MergedTokenAttributes::new_from_sorted_instances(merged_attributes_raw);
+
+        let mut tokens_to_remove_vec = tokens_to_remove.to_vec();
+        for token in &tokens_to_remove_vec {
+            merged_attributes.deduct_balance_for_instance(&token);
+        }
+
+        self.send().esdt_local_burn(
+            &merged_token.token_identifier,
+            merged_token.token_nonce,
+            &merged_token.amount,
+        );
+
+        // all removed tokens get sent to user, so we can re-use this as output payments
+        let new_merged_token =
+            self.create_merged_token(merged_token.token_identifier, merged_attributes);
+        tokens_to_remove_vec.push(new_merged_token);
+
+        let caller = self.blockchain().get_caller();
+        self.send().direct_multi(&caller, &tokens_to_remove_vec);
+
+        tokens_to_remove_vec.into()
+    }
+
+    fn create_merged_token(
+        &self,
+        merged_token_id: TokenIdentifier,
+        merged_attributes: MergedTokenAttributes<Self::Api>,
+    ) -> EsdtTokenPayment<Self::Api> {
+        let nft_amount = BigUint::from(NFT_AMOUNT);
+        let empty_buffer = ManagedBuffer::new();
+        let uris = merged_attributes.construct_full_uri_list();
+        let royalties = merged_attributes.get_max_royalties();
+        let merged_token_nonce = self.send().esdt_nft_create(
+            &merged_token_id,
+            &nft_amount,
+            &empty_buffer,
+            &royalties,
+            &empty_buffer,
+            &merged_attributes.into_instances(),
+            &uris,
+        );
+
+        EsdtTokenPayment::new(merged_token_id, merged_token_nonce, nft_amount)
+    }
+
+    fn require_not_paused(&self) {
+        require!(self.not_paused(), "Contract is paused");
     }
 
     #[view(getMergedTokenId)]
