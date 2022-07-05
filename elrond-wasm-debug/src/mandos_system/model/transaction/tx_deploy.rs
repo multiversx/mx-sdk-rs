@@ -1,4 +1,5 @@
 use crate::mandos_system::model::{AddressValue, BigUintValue, BytesValue, U64Value};
+use elrond_wasm::types::CodeMetadata;
 use mandos::{
     interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
     serde_raw::TxDeployRaw,
@@ -10,6 +11,7 @@ use super::tx_interpret_util::interpret_egld_value;
 pub struct TxDeploy {
     pub from: AddressValue,
     pub egld_value: BigUintValue,
+    pub code_metadata: CodeMetadata,
     pub contract_code: BytesValue,
     pub arguments: Vec<BytesValue>,
     pub gas_limit: U64Value,
@@ -21,6 +23,7 @@ impl InterpretableFrom<TxDeployRaw> for TxDeploy {
         TxDeploy {
             from: AddressValue::interpret_from(from.from, context),
             egld_value: interpret_egld_value(from.value, from.egld_value, context),
+            code_metadata: CodeMetadata::empty(), // not yet modelled in mandos
             contract_code: BytesValue::interpret_from(from.contract_code, context),
             arguments: from
                 .arguments
@@ -48,5 +51,19 @@ impl IntoRaw<TxDeployRaw> for TxDeploy {
             gas_limit: self.gas_limit.into_raw(),
             gas_price: self.gas_price.into_raw(),
         }
+    }
+}
+
+impl TxDeploy {
+    pub fn to_tx_data(&self) -> String {
+        let mut result = hex::encode(&self.contract_code.value);
+        result.push_str("@0500@"); // VM identifier
+        result.push_str(hex::encode(self.code_metadata.to_byte_array()).as_str());
+        for argument in &self.arguments {
+            result.push('@');
+            result.push_str(hex::encode(argument.value.as_slice()).as_str());
+        }
+
+        result
     }
 }
