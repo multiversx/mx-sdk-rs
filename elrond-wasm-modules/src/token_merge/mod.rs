@@ -103,7 +103,7 @@ pub trait TokenMergeModule:
             MergedTokenAttributes::new()
         };
 
-        while let Some(already_merged) = already_merged_tokens_iter.next() {
+        for already_merged in already_merged_tokens_iter {
             merged_attributes.merge_with_other(already_merged);
         }
 
