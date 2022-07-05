@@ -4,9 +4,9 @@ use mandos::{
     serde_raw::TxTransferRaw,
 };
 
-use super::{tx_interpret_util::interpret_egld_value, TxESDT};
+use super::{tx_interpret_util::interpret_egld_value, TxCall, TxESDT};
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct TxTransfer {
     pub from: AddressValue,
     pub to: AddressValue,
@@ -47,6 +47,22 @@ impl IntoRaw<TxTransferRaw> for TxTransfer {
                 .collect(),
             gas_limit: self.gas_limit.into_raw_opt(),
             gas_price: self.gas_price.into_raw_opt(),
+        }
+    }
+}
+
+impl TxTransfer {
+    /// Converts to a TxCall, with empty endpoint and arguments.
+    pub fn to_tx_call(&self) -> TxCall {
+        TxCall {
+            from: self.from.clone(),
+            to: self.to.clone(),
+            egld_value: self.egld_value.clone(),
+            esdt_value: self.esdt_value.clone(),
+            function: String::new(),
+            arguments: Vec::new(),
+            gas_limit: self.gas_limit.clone(),
+            gas_price: self.gas_price.clone(),
         }
     }
 }

@@ -80,6 +80,25 @@ impl<M: ManagedTypeApi> CodecFrom<elrond_codec::num_bigint::BigUint> for BigUint
 #[cfg(feature = "num-bigint")]
 impl<M: ManagedTypeApi> CodecFrom<BigUint<M>> for elrond_codec::num_bigint::BigUint {}
 
+#[cfg(feature = "num-bigint")]
+impl<M: ManagedTypeApi> From<&elrond_codec::num_bigint::BigUint> for BigUint<M> {
+    fn from(alloc_big_uint: &elrond_codec::num_bigint::BigUint) -> Self {
+        BigUint::from_bytes_be(alloc_big_uint.to_bytes_be().as_slice())
+    }
+}
+#[cfg(feature = "num-bigint")]
+impl<M: ManagedTypeApi> From<elrond_codec::num_bigint::BigUint> for BigUint<M> {
+    fn from(alloc_big_uint: elrond_codec::num_bigint::BigUint) -> Self {
+        BigUint::from(&alloc_big_uint)
+    }
+}
+#[cfg(feature = "num-bigint")]
+impl<M: ManagedTypeApi> BigUint<M> {
+    pub fn to_alloc(&self) -> elrond_codec::num_bigint::BigUint {
+        elrond_codec::num_bigint::BigUint::from_bytes_be(self.to_bytes_be().as_slice())
+    }
+}
+
 impl<M: ManagedTypeApi> Default for BigUint<M> {
     #[inline]
     fn default() -> Self {
