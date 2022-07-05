@@ -10,7 +10,9 @@ pub static TOO_MANY_TOKENS_ERR_MESG: &[u8] = b"Too many tokens to merge";
 pub static INSUFFICIENT_BALANCE_IN_MERGED_INST_ERR_MSG: &[u8] =
     b"Insufficient token balance to deduct from merged instance";
 
-#[derive(TypeAbi, TopEncode, TopDecode, NestedEncode, NestedDecode, Debug, Clone, PartialEq)]
+#[derive(
+    TypeAbi, TopEncode, TopDecode, NestedEncode, NestedDecode, Debug, Clone, PartialEq, Eq,
+)]
 pub struct TokenAttributesInstance<M: ManagedTypeApi> {
     pub original_token_id_raw: ArrayVec<u8, MAX_TOKEN_ID_LEN>,
     pub original_token_nonce: u64,
