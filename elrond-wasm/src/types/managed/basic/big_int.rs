@@ -95,6 +95,19 @@ impl<M: ManagedTypeApi> CodecFrom<elrond_codec::num_bigint::BigInt> for BigInt<M
 #[cfg(feature = "num-bigint")]
 impl<M: ManagedTypeApi> CodecFrom<BigInt<M>> for elrond_codec::num_bigint::BigInt {}
 
+#[cfg(feature = "num-bigint")]
+impl<M: ManagedTypeApi> From<&elrond_codec::num_bigint::BigInt> for BigInt<M> {
+    fn from(alloc_big_int: &elrond_codec::num_bigint::BigInt) -> Self {
+        BigInt::from_signed_bytes_be(alloc_big_int.to_signed_bytes_be().as_slice())
+    }
+}
+#[cfg(feature = "num-bigint")]
+impl<M: ManagedTypeApi> From<elrond_codec::num_bigint::BigInt> for BigInt<M> {
+    fn from(alloc_big_int: elrond_codec::num_bigint::BigInt) -> Self {
+        BigInt::from(&alloc_big_int)
+    }
+}
+
 impl<M: ManagedTypeApi> BigInt<M> {
     #[inline]
     pub fn zero() -> Self {
@@ -111,18 +124,14 @@ impl<M: ManagedTypeApi> BigInt<M> {
 
     #[inline]
     pub fn from_signed_bytes_be(bytes: &[u8]) -> Self {
-        let api = M::managed_type_impl();
-
         let handle = M::static_var_api_impl().next_handle();
-        M::managed_type_impl().bi_set_int64(handle, 0);
-        api.bi_set_signed_bytes(handle, bytes);
+        M::managed_type_impl().bi_set_signed_bytes(handle, bytes);
         BigInt::from_raw_handle(handle)
     }
 
     #[inline]
     pub fn to_signed_bytes_be(&self) -> BoxedBytes {
-        let api = M::managed_type_impl();
-        api.bi_get_signed_bytes(self.handle)
+        M::managed_type_impl().bi_get_signed_bytes(self.handle)
     }
 
     #[inline]

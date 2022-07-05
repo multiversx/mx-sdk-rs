@@ -68,6 +68,10 @@ pub fn interpret_string(s: &str, context: &InterpreterContext) -> Vec<u8> {
         return keccak256(arg.as_slice());
     }
 
+    if let Some(stripped) = s.strip_prefix(BECH32_PREFIX) {
+        return bech32(stripped);
+    }
+
     if let Some(stripped) = s.strip_prefix(NESTED_PREFIX) {
         return parse_nested(stripped, context);
     }

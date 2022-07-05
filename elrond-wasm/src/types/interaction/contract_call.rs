@@ -189,7 +189,7 @@ where
 
     /// If this is an ESDT call, it converts it to a regular call to ESDTTransfer.
     /// Async calls require this step, but not `transfer_esdt_execute`.
-    fn convert_to_esdt_transfer_call(self) -> Self {
+    pub fn convert_to_esdt_transfer_call(self) -> Self {
         match self.payments.len() {
             0 => self,
             1 => self.convert_to_single_transfer_esdt_call(),

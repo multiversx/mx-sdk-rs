@@ -8,7 +8,7 @@ use num_bigint::BigUint;
 use num_traits::ToPrimitive;
 use std::fmt;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct U64Value {
     pub value: u64,
     pub original: ValueSubTree,

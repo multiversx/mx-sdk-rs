@@ -1,0 +1,17 @@
+[package]
+name = "multisig-interact"
+version = "0.0.0"
+authors = ["Andrei Marinica <andrei.marinica@elrond.com>"]
+edition = "2018"
+publish = false
+
+[[bin]]
+name = "multisig-interact"
+path = "src/multisig_interact.rs"
+
+[dependencies.multisig]
+path = ".."
+
+[dependencies.elrond-interaction]
+version = "0.1.0"
+path = "../../../../elrond-interaction"
