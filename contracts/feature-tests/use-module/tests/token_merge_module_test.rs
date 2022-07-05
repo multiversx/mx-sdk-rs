@@ -1,4 +1,8 @@
+use std::convert::TryFrom;
+
 use elrond_wasm::{
+    api::ManagedTypeApi,
+    arrayvec::ArrayVec,
     contract_base::ContractBase,
     elrond_codec::Empty,
     storage::mappers::StorageTokenWrapper,
@@ -8,7 +12,10 @@ use elrond_wasm_debug::{
     managed_address, managed_biguint, managed_buffer, managed_token_id, rust_biguint,
     testing_framework::BlockchainStateWrapper, tx_mock::TxInputESDT, DebugApi,
 };
-use elrond_wasm_modules::token_merge::{MergedTokenAttributesInstance, TokenMergeModule};
+use elrond_wasm_modules::token_merge::{
+    merged_token_attributes::{TokenAttributesInstance, MAX_MERGED_TOKENS},
+    TokenMergeModule,
+};
 
 static MERGED_TOKEN_ID: &[u8] = b"MERGED-123456";
 static NFT_TOKEN_ID: &[u8] = b"NFT-123456";
@@ -44,6 +51,12 @@ fn test_token_merge() {
         .execute_tx(&owner, &merging_sc, &rust_zero, |sc| {
             sc.merged_token()
                 .set_token_id(&managed_token_id!(MERGED_TOKEN_ID));
+            let _ = sc
+                .mergeable_tokens_whitelist()
+                .insert(managed_token_id!(NFT_TOKEN_ID));
+            let _ = sc
+                .mergeable_tokens_whitelist()
+                .insert(managed_token_id!(FUNGIBLE_TOKEN_ID));
         })
         .assert_ok();
     b_mock.set_esdt_local_roles(
@@ -107,29 +120,26 @@ fn test_token_merge() {
                 1,
             );
 
-            let mut expected_attributes = ManagedVec::new();
-            expected_attributes.push(MergedTokenAttributesInstance {
-                original_token: EsdtTokenPayment::new(
-                    managed_token_id!(NFT_TOKEN_ID),
-                    FIRST_NFT_NONCE,
-                    managed_biguint!(NFT_AMOUNT),
-                ),
+            let mut expected_attributes = ArrayVec::new();
+            expected_attributes.push(TokenAttributesInstance {
+                original_token_id_raw: ArrayVec::try_from(NFT_TOKEN_ID).unwrap(),
+                original_token_nonce: FIRST_NFT_NONCE,
+                original_token_amount: managed_biguint!(NFT_AMOUNT),
                 attributes_raw: managed_buffer!(FIRST_ATTRIBUTES),
-                nr_uris: FIRST_URIS.len(),
+                royalties: managed_biguint!(FIRST_ROYALTIES),
+                uris: uris_to_managed_vec(FIRST_URIS),
             });
-            expected_attributes.push(MergedTokenAttributesInstance {
-                original_token: EsdtTokenPayment::new(
-                    managed_token_id!(NFT_TOKEN_ID),
-                    SECOND_NFT_NONCE,
-                    managed_biguint!(NFT_AMOUNT),
-                ),
+            expected_attributes.push(TokenAttributesInstance {
+                original_token_id_raw: ArrayVec::try_from(NFT_TOKEN_ID).unwrap(),
+                original_token_nonce: SECOND_NFT_NONCE,
+                original_token_amount: managed_biguint!(NFT_AMOUNT),
                 attributes_raw: managed_buffer!(SECOND_ATTRIBUTES),
-                nr_uris: SECOND_URIS.len(),
+                royalties: managed_biguint!(SECOND_ROYALTIES),
+                uris: uris_to_managed_vec(SECOND_URIS),
             });
 
             let decoded_attributes = merged_token_data
-                .decode_attributes::<ManagedVec<DebugApi, MergedTokenAttributesInstance<DebugApi>>>(
-                );
+                .decode_attributes::<ArrayVec<TokenAttributesInstance<DebugApi>, MAX_MERGED_TOKENS>>();
             assert_eq!(decoded_attributes, expected_attributes);
 
             let mut expected_uris = ManagedVec::new();
@@ -241,29 +251,26 @@ fn test_token_merge() {
                 2,
             );
 
-            let mut expected_attributes = ManagedVec::new();
-            expected_attributes.push(MergedTokenAttributesInstance {
-                original_token: EsdtTokenPayment::new(
-                    managed_token_id!(NFT_TOKEN_ID),
-                    FIRST_NFT_NONCE,
-                    managed_biguint!(NFT_AMOUNT),
-                ),
-                attributes_raw: managed_buffer!(FIRST_ATTRIBUTES),
-                nr_uris: FIRST_URIS.len(),
-            });
-            expected_attributes.push(MergedTokenAttributesInstance {
-                original_token: EsdtTokenPayment::new(
-                    managed_token_id!(FUNGIBLE_TOKEN_ID),
-                    0,
-                    managed_biguint!(FUNGIBLE_AMOUNT),
-                ),
+            let mut expected_attributes = ArrayVec::new();
+            expected_attributes.push(TokenAttributesInstance {
+                original_token_id_raw: ArrayVec::try_from(FUNGIBLE_TOKEN_ID).unwrap(),
+                original_token_nonce: 0,
+                original_token_amount: managed_biguint!(FUNGIBLE_AMOUNT),
                 attributes_raw: ManagedBuffer::new(),
-                nr_uris: 0,
+                royalties: managed_biguint!(0),
+                uris: ManagedVec::new(),
+            });
+            expected_attributes.push(TokenAttributesInstance {
+                original_token_id_raw: ArrayVec::try_from(NFT_TOKEN_ID).unwrap(),
+                original_token_nonce: FIRST_NFT_NONCE,
+                original_token_amount: managed_biguint!(NFT_AMOUNT),
+                attributes_raw: managed_buffer!(FIRST_ATTRIBUTES),
+                royalties: managed_biguint!(FIRST_ROYALTIES),
+                uris: uris_to_managed_vec(FIRST_URIS),
             });
 
             let decoded_attributes = merged_token_data
-                .decode_attributes::<ManagedVec<DebugApi, MergedTokenAttributesInstance<DebugApi>>>(
-                );
+                .decode_attributes::<ArrayVec<TokenAttributesInstance<DebugApi>, MAX_MERGED_TOKENS>>();
             assert_eq!(decoded_attributes, expected_attributes);
 
             let mut expected_uris = ManagedVec::new();
@@ -302,71 +309,67 @@ fn test_token_merge() {
         },
     ];
     b_mock
-        .execute_esdt_multi_transfer(&user, &merging_sc, &combined_transfers, |sc| {
-            let merged_token = sc.merge_tokens();
-            assert_eq!(
-                merged_token.token_identifier,
-                managed_token_id!(MERGED_TOKEN_ID)
-            );
-            assert_eq!(merged_token.token_nonce, 3);
-            assert_eq!(merged_token.amount, managed_biguint!(NFT_AMOUNT));
-
-            let merged_token_data = sc.blockchain().get_esdt_token_data(
-                &managed_address!(&user),
-                &managed_token_id!(MERGED_TOKEN_ID),
-                3,
-            );
-
-            let mut expected_attributes = ManagedVec::new();
-            expected_attributes.push(MergedTokenAttributesInstance {
-                original_token: EsdtTokenPayment::new(
-                    managed_token_id!(NFT_TOKEN_ID),
-                    SECOND_NFT_NONCE,
-                    managed_biguint!(NFT_AMOUNT),
-                ),
-                attributes_raw: managed_buffer!(SECOND_ATTRIBUTES),
-                nr_uris: SECOND_URIS.len(),
-            });
-            expected_attributes.push(MergedTokenAttributesInstance {
-                original_token: EsdtTokenPayment::new(
-                    managed_token_id!(NFT_TOKEN_ID),
-                    FIRST_NFT_NONCE,
-                    managed_biguint!(NFT_AMOUNT),
-                ),
-                attributes_raw: managed_buffer!(FIRST_ATTRIBUTES),
-                nr_uris: FIRST_URIS.len(),
-            });
-            expected_attributes.push(MergedTokenAttributesInstance {
-                original_token: EsdtTokenPayment::new(
-                    managed_token_id!(FUNGIBLE_TOKEN_ID),
-                    0,
-                    managed_biguint!(FUNGIBLE_AMOUNT),
-                ),
-                attributes_raw: ManagedBuffer::new(),
-                nr_uris: 0,
-            });
-
-            let decoded_attributes = merged_token_data
-                .decode_attributes::<ManagedVec<DebugApi, MergedTokenAttributesInstance<DebugApi>>>(
+            .execute_esdt_multi_transfer(&user, &merging_sc, &combined_transfers, |sc| {
+                let merged_token = sc.merge_tokens();
+                assert_eq!(
+                    merged_token.token_identifier,
+                    managed_token_id!(MERGED_TOKEN_ID)
                 );
-            assert_eq!(decoded_attributes, expected_attributes);
+                assert_eq!(merged_token.token_nonce, 3);
+                assert_eq!(merged_token.amount, managed_biguint!(NFT_AMOUNT));
 
-            let mut expected_uris = ManagedVec::new();
-            for uri in SECOND_URIS {
-                expected_uris.push(managed_buffer!(*uri));
-            }
-            for uri in FIRST_URIS {
-                expected_uris.push(managed_buffer!(*uri));
-            }
+                let merged_token_data = sc.blockchain().get_esdt_token_data(
+                    &managed_address!(&user),
+                    &managed_token_id!(MERGED_TOKEN_ID),
+                    3,
+                );
 
-            assert_eq!(merged_token_data.uris, expected_uris);
+                let mut expected_attributes = ArrayVec::new();
+                expected_attributes.push(TokenAttributesInstance {
+                    original_token_id_raw: ArrayVec::try_from(FUNGIBLE_TOKEN_ID).unwrap(),
+                    original_token_nonce: 0,
+                    original_token_amount: managed_biguint!(FUNGIBLE_AMOUNT),
+                    attributes_raw: ManagedBuffer::new(),
+                    royalties: managed_biguint!(0),
+                    uris: ManagedVec::new(),
+                });
+                expected_attributes.push(TokenAttributesInstance {
+                    original_token_id_raw: ArrayVec::try_from(NFT_TOKEN_ID).unwrap(),
+                    original_token_nonce: FIRST_NFT_NONCE,
+                    original_token_amount: managed_biguint!(NFT_AMOUNT),
+                    attributes_raw: managed_buffer!(FIRST_ATTRIBUTES),
+                    royalties: managed_biguint!(FIRST_ROYALTIES),
+                    uris: uris_to_managed_vec(FIRST_URIS),
+                });
+                expected_attributes.push(TokenAttributesInstance {
+                    original_token_id_raw: ArrayVec::try_from(NFT_TOKEN_ID).unwrap(),
+                    original_token_nonce: SECOND_NFT_NONCE,
+                    original_token_amount: managed_biguint!(NFT_AMOUNT),
+                    attributes_raw: managed_buffer!(SECOND_ATTRIBUTES),
+                    royalties: managed_biguint!(SECOND_ROYALTIES),
+                    uris: uris_to_managed_vec(SECOND_URIS),
+                });
 
-            assert_eq!(
-                merged_token_data.royalties,
-                managed_biguint!(SECOND_ROYALTIES)
-            );
-        })
-        .assert_ok();
+                let decoded_attributes = merged_token_data
+                    .decode_attributes::<ArrayVec<TokenAttributesInstance<DebugApi>, MAX_MERGED_TOKENS>>();
+                assert_eq!(decoded_attributes, expected_attributes);
+
+                let mut expected_uris = ManagedVec::new();
+                for uri in FIRST_URIS {
+                    expected_uris.push(managed_buffer!(*uri));
+                }
+                for uri in SECOND_URIS {
+                    expected_uris.push(managed_buffer!(*uri));
+                }
+
+                assert_eq!(merged_token_data.uris, expected_uris);
+
+                assert_eq!(
+                    merged_token_data.royalties,
+                    managed_biguint!(SECOND_ROYALTIES)
+                );
+            })
+            .assert_ok();
 
     b_mock.check_nft_balance(
         &user,
@@ -388,9 +391,9 @@ fn test_token_merge() {
                 let output_tokens = sc.split_tokens();
                 let mut expected_output_tokens = ManagedVec::new();
                 expected_output_tokens.push(EsdtTokenPayment::new(
-                    managed_token_id!(NFT_TOKEN_ID),
-                    SECOND_NFT_NONCE,
-                    managed_biguint!(NFT_AMOUNT),
+                    managed_token_id!(FUNGIBLE_TOKEN_ID),
+                    0,
+                    managed_biguint!(FUNGIBLE_AMOUNT),
                 ));
                 expected_output_tokens.push(EsdtTokenPayment::new(
                     managed_token_id!(NFT_TOKEN_ID),
@@ -398,10 +401,11 @@ fn test_token_merge() {
                     managed_biguint!(NFT_AMOUNT),
                 ));
                 expected_output_tokens.push(EsdtTokenPayment::new(
-                    managed_token_id!(FUNGIBLE_TOKEN_ID),
-                    0,
-                    managed_biguint!(FUNGIBLE_AMOUNT),
+                    managed_token_id!(NFT_TOKEN_ID),
+                    SECOND_NFT_NONCE,
+                    managed_biguint!(NFT_AMOUNT),
                 ));
+
                 assert_eq!(output_tokens, expected_output_tokens);
             },
         )
@@ -428,6 +432,15 @@ fn uris_to_vec(uris: &[&[u8]]) -> Vec<Vec<u8>> {
     let mut out = Vec::new();
     for uri in uris {
         out.push((*uri).to_vec());
+    }
+
+    out
+}
+
+fn uris_to_managed_vec<M: ManagedTypeApi>(uris: &[&[u8]]) -> ManagedVec<M, ManagedBuffer<M>> {
+    let mut out = ManagedVec::new();
+    for uri in uris {
+        out.push(ManagedBuffer::new_from_bytes(*uri));
     }
 
     out
