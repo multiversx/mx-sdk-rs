@@ -4,6 +4,7 @@
 
 pub mod abi_json;
 pub mod api;
+pub mod bech32;
 mod contract_map;
 mod display_util;
 mod managed_test_util;
@@ -31,5 +32,7 @@ pub use elrond_wasm::elrond_codec::num_bigint;
 #[macro_use]
 extern crate alloc;
 pub use alloc::{boxed::Box, vec::Vec};
+
+pub use elrond_wasm;
 
 pub use std::collections::HashMap;
