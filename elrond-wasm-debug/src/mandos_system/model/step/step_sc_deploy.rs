@@ -5,7 +5,7 @@ use crate::{
     DebugApi,
 };
 
-use elrond_wasm::types::ContractDeploy;
+use elrond_wasm::types::{CodeMetadata, ContractDeploy};
 
 use super::convert_call_args;
 
@@ -35,6 +35,11 @@ impl ScDeployStep {
         BigUintValue: From<V>,
     {
         self.tx.egld_value = BigUintValue::from(expr);
+        self
+    }
+
+    pub fn code_metadata(mut self, code_metadata: CodeMetadata) -> Self {
+        self.tx.code_metadata = code_metadata;
         self
     }
 
