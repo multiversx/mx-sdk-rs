@@ -39,10 +39,10 @@ impl EllipticCurveApi for DebugApi {
         _x_result_handle: Self::BigIntHandle,
         _y_result_handle: Self::BigIntHandle,
         _ec_handle: Self::EllipticCurveHandle,
-        _x_first_point: Self::ManagedBufferHandle,
-        _y_first_point: Self::ManagedBufferHandle,
-        _x_second_point: Self::ManagedBufferHandle,
-        _y_second_point: Self::ManagedBufferHandle,
+        _x_first_point: Self::BigIntHandle,
+        _y_first_point: Self::BigIntHandle,
+        _x_second_point: Self::BigIntHandle,
+        _y_second_point: Self::BigIntHandle,
     ) {
         panic!("ec_add not implemented")
     }
