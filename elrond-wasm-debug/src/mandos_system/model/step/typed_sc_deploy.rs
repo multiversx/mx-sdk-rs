@@ -2,7 +2,7 @@ use std::marker::PhantomData;
 
 use elrond_wasm::{
     elrond_codec::{CodecFrom, TopEncodeMulti},
-    types::Address,
+    types::{Address, CodeMetadata},
 };
 use mandos::interpret_trait::{InterpretableFrom, InterpreterContext};
 
@@ -71,6 +71,11 @@ impl<OriginalResult> TypedScDeploy<OriginalResult> {
         BigUintValue: From<A>,
     {
         self.tx.egld_value = BigUintValue::from(amount);
+        self
+    }
+
+    pub fn code_metadata(mut self, code_metadata: CodeMetadata) -> Self {
+        self.tx.code_metadata = code_metadata;
         self
     }
 
