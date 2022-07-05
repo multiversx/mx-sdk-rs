@@ -22,7 +22,6 @@ where
     T: ManagedType<M>,
 {
     pub(super) _phantom_m: PhantomData<M>,
-    pub(super) _phantom_t: PhantomData<T>,
     pub(super) handle: T::OwnHandle,
 }
 
@@ -34,7 +33,6 @@ where
     fn new_with_handle(handle: T::OwnHandle) -> Self {
         Self {
             _phantom_m: PhantomData,
-            _phantom_t: PhantomData,
             handle,
         }
     }
