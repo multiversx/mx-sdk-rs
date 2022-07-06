@@ -123,7 +123,7 @@ impl<M: ManagedTypeApi> BigUint<M> {
     #[inline]
     pub fn set_u64(&self, value: u64) {
         let api = M::managed_type_impl();
-        api.bi_set_int64(self.handle, value as i64);
+        api.bi_set_int64(self.handle.clone(), value as i64);
     }
 
     #[inline]
