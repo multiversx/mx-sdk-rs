@@ -7,8 +7,12 @@ pub const MAX_MERGED_TOKENS: usize = 10;
 pub const MAX_TOKEN_ID_LEN: usize = 17; // 10 for ticker + '-' + 6 random hex chars
 
 pub static TOO_MANY_TOKENS_ERR_MESG: &[u8] = b"Too many tokens to merge";
+pub static INSUFFICIENT_BALANCE_IN_MERGED_INST_ERR_MSG: &[u8] =
+    b"Insufficient token balance to deduct from merged instance";
 
-#[derive(TypeAbi, TopEncode, TopDecode, NestedEncode, NestedDecode, Debug, Clone, PartialEq)]
+#[derive(
+    TypeAbi, TopEncode, TopDecode, NestedEncode, NestedDecode, Debug, Clone, PartialEq, Eq,
+)]
 pub struct TokenAttributesInstance<M: ManagedTypeApi> {
     pub original_token_id_raw: ArrayVec<u8, MAX_TOKEN_ID_LEN>,
     pub original_token_nonce: u64,
@@ -55,17 +59,10 @@ impl<M: ManagedTypeApi> MergedTokenAttributes<M> {
     }
 
     pub fn add_or_update_instance(&mut self, new_instance: TokenAttributesInstance<M>) {
-        let search_result = self.instances.binary_search_by(|item| {
-            let token_id_cmp_result = item
-                .original_token_id_raw
-                .cmp(&new_instance.original_token_id_raw);
-            if token_id_cmp_result != Ordering::Equal {
-                return token_id_cmp_result;
-            }
-
-            item.original_token_nonce
-                .cmp(&new_instance.original_token_nonce)
-        });
+        let search_result = self.binary_search_instance(
+            &new_instance.original_token_id_raw,
+            new_instance.original_token_nonce,
+        );
         match search_result {
             core::result::Result::Ok(existing_index) => {
                 self.instances[existing_index].original_token_amount +=
@@ -87,6 +84,28 @@ impl<M: ManagedTypeApi> MergedTokenAttributes<M> {
     ) {
         for inst in other {
             self.add_or_update_instance(inst);
+        }
+    }
+
+    pub fn deduct_balance_for_instance(&mut self, tokens_to_deduct: &EsdtTokenPayment<M>) {
+        let token_id_raw = token_id_to_array_vec(&tokens_to_deduct.token_identifier);
+        let search_result =
+            self.binary_search_instance(&token_id_raw, tokens_to_deduct.token_nonce);
+        match search_result {
+            core::result::Result::Ok(index) => {
+                let found_instance = &mut self.instances[index];
+                if found_instance.original_token_amount < tokens_to_deduct.amount {
+                    M::error_api_impl().signal_error(INSUFFICIENT_BALANCE_IN_MERGED_INST_ERR_MSG);
+                }
+
+                found_instance.original_token_amount -= &tokens_to_deduct.amount;
+                if found_instance.original_token_amount == 0 {
+                    let _ = self.instances.remove(index);
+                }
+            },
+            core::result::Result::Err(_) => {
+                M::error_api_impl().signal_error(INSUFFICIENT_BALANCE_IN_MERGED_INST_ERR_MSG)
+            },
         }
     }
 
@@ -115,9 +134,24 @@ impl<M: ManagedTypeApi> MergedTokenAttributes<M> {
     pub fn into_instances(self) -> ArrayVec<TokenAttributesInstance<M>, MAX_MERGED_TOKENS> {
         self.instances
     }
+
+    fn binary_search_instance(
+        &self,
+        original_token_id_raw: &ArrayVec<u8, MAX_TOKEN_ID_LEN>,
+        original_token_nonce: u64,
+    ) -> Result<usize, usize> {
+        self.instances.binary_search_by(|item| {
+            let token_id_cmp_result = item.original_token_id_raw.cmp(original_token_id_raw);
+            if token_id_cmp_result != Ordering::Equal {
+                return token_id_cmp_result;
+            }
+
+            item.original_token_nonce.cmp(&original_token_nonce)
+        })
+    }
 }
 
-pub fn token_id_to_array_vec<M: ManagedTypeApi>(
+fn token_id_to_array_vec<M: ManagedTypeApi>(
     token_id: &TokenIdentifier<M>,
 ) -> ArrayVec<u8, MAX_TOKEN_ID_LEN> {
     let mut array_vec = ArrayVec::new();

@@ -632,7 +632,28 @@
             "inputs": [],
             "outputs": [
                 {
-                    "type": "List<EsdtTokenPayment>"
+                    "type": "variadic<EsdtTokenPayment>",
+                    "multi_result": true
+                }
+            ]
+        },
+        {
+            "name": "splitTokenPartial",
+            "mutability": "mutable",
+            "payableInTokens": [
+                "*"
+            ],
+            "inputs": [
+                {
+                    "name": "tokens_to_remove",
+                    "type": "variadic<EsdtTokenPayment>",
+                    "multi_arg": true
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "variadic<EsdtTokenPayment>",
+                    "multi_result": true
                 }
             ]
         },
