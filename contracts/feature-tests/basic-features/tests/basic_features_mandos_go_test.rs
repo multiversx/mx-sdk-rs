@@ -224,6 +224,11 @@ fn managed_vec_biguint_push_go() {
 }
 
 #[test]
+fn managed_vec_array_push_go() {
+    elrond_wasm_debug::mandos_go("mandos/managed_vec_array_push.scen.json");
+}
+
+#[test]
 fn only_owner_go() {
     elrond_wasm_debug::mandos_go("mandos/only_owner.scen.json");
 }
