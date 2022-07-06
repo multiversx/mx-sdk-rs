@@ -121,6 +121,12 @@ impl<M: ManagedTypeApi> BigUint<M> {
     }
 
     #[inline]
+    pub fn set_u64(&self, value: u64) {
+        let api = M::managed_type_impl();
+        api.bi_set_int64(self.handle, value as i64);
+    }
+
+    #[inline]
     pub fn from_bytes_be(bytes: &[u8]) -> Self {
         let api = M::managed_type_impl();
         let result_handle = M::static_var_api_impl().next_handle();
