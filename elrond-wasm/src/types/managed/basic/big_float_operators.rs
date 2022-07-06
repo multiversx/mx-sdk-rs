@@ -79,7 +79,7 @@ impl<M: ManagedTypeApi> Neg for BigFloat<M> {
 
     fn neg(self) -> Self::Output {
         let result_handle: M::BigFloatHandle = M::static_var_api_impl().next_handle();
-        M::managed_type_impl().bf_neg(result_handle.clone(), self.handle.clone());
+        M::managed_type_impl().bf_neg(result_handle.clone(), self.handle);
         BigFloat::from_handle(result_handle)
     }
 }

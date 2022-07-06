@@ -75,7 +75,7 @@ where
 
     pub fn into_option(self) -> Option<T> {
         if self.is_some() {
-            Some(T::from_handle(self.handle.clone()))
+            Some(T::from_handle(self.handle))
         } else {
             None
         }
@@ -91,7 +91,7 @@ where
 
     pub fn unwrap_or_else<F: Fn() -> T>(self, f: F) -> T {
         if self.is_some() {
-            T::from_handle(self.handle.clone())
+            T::from_handle(self.handle)
         } else {
             f()
         }
@@ -107,7 +107,7 @@ where
         F: FnOnce(T) -> U,
     {
         if self.is_some() {
-            ManagedOption::<M, U>::some(f(T::from_handle(self.handle.clone())))
+            ManagedOption::<M, U>::some(f(T::from_handle(self.handle)))
         } else {
             ManagedOption::<M, U>::none()
         }
@@ -119,7 +119,7 @@ where
         F: FnOnce(T) -> U,
     {
         if self.is_some() {
-            f(T::from_handle(self.handle.clone()))
+            f(T::from_handle(self.handle))
         } else {
             default()
         }

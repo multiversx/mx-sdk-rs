@@ -146,7 +146,7 @@ impl ManagedBufferApi for DebugApi {
         accumulator_handle: Self::ManagedBufferHandle,
         data_handle: Self::ManagedBufferHandle,
     ) {
-        let mut data = self.mb_get(data_handle).clone();
+        let mut data = self.mb_get(data_handle);
         self.mb_update(accumulator_handle, |accumulator| {
             accumulator.append(&mut data);
         });

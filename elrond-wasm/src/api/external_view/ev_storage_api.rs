@@ -35,7 +35,7 @@ where
         let external_view_target_address_handle: A::ManagedBufferHandle =
             A::static_var_api_impl().next_handle();
         A::storage_read_api_impl().storage_load_managed_buffer_raw(
-            external_view_target_key_handle.clone(),
+            external_view_target_key_handle,
             external_view_target_address_handle.clone(),
         );
         A::static_var_api_impl()

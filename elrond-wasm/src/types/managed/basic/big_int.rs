@@ -209,7 +209,7 @@ impl<M: ManagedTypeApi> BigInt<M> {
         if let Sign::Minus = self.sign() {
             ManagedOption::none()
         } else {
-            ManagedOption::some(BigUint::from_handle(self.handle.clone()))
+            ManagedOption::some(BigUint::from_handle(self.handle))
         }
     }
 }

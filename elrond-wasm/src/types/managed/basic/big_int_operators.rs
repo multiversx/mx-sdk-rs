@@ -86,7 +86,7 @@ impl<M: ManagedTypeApi> Neg for BigInt<M> {
     fn neg(self) -> Self::Output {
         let api = M::managed_type_impl();
         let result_handle: M::BigIntHandle = M::static_var_api_impl().next_handle();
-        api.bi_neg(result_handle.clone(), self.handle.clone());
+        api.bi_neg(result_handle.clone(), self.handle);
         BigInt::from_handle(result_handle)
     }
 }

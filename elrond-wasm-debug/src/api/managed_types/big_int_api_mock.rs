@@ -186,7 +186,7 @@ impl BigIntApi for DebugApi {
         let bi_x = self.bi_get(x);
         let bi_y = self.bi_get(y);
         let exp = big_int_to_i64(&bi_y).unwrap() as usize;
-        let result = pow(bi_x.clone(), exp);
+        let result = pow(bi_x, exp);
         self.bi_overwrite(dest, result);
     }
 
