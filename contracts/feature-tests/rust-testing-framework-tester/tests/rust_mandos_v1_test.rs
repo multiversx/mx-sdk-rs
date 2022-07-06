@@ -2,9 +2,10 @@ use adder::*;
 use forwarder::call_sync::*;
 use num_traits::ToPrimitive;
 
+use basic_features::BasicFeatures;
 use elrond_wasm::{
     elrond_codec::Empty,
-    types::{Address, BigUint, EsdtLocalRole, EsdtTokenPayment, ManagedVec},
+    types::{Address, BigUint, EsdtLocalRole, EsdtTokenPayment, ManagedVec, TokenIdentifier},
 };
 use elrond_wasm_debug::{
     assert_values_eq, managed_address, managed_biguint, managed_buffer, managed_token_id,
@@ -18,6 +19,8 @@ const TEST_ESDT_OUTPUT_PATH: &'static str = "test_esdt_generation.scen.json";
 
 const SC_WASM_PATH: &'static str = "output/rust-testing-framework-tester.wasm";
 const ADDER_WASM_PATH: &'static str = "../../examples/adder/output/adder.wasm";
+const BASIC_FEATURES_WASM_PATH: &'static str =
+    "../../feature-tests/basic-features/output/basic-features.wasm";
 
 #[test]
 fn test_add() {
@@ -1186,7 +1189,6 @@ fn managed_environment_test() {
         });
 }
 
-/* Doesn't work due to API instance inconsistency
 #[test]
 fn managed_environment_consistency_test() {
     let mut wrapper = BlockchainStateWrapper::new();
@@ -1207,7 +1209,101 @@ fn managed_environment_consistency_test() {
         })
         .assert_ok();
 }
-*/
+
+#[test]
+fn test_managed_values_standalone_consistency() {
+    let _ = DebugApi::dummy();
+
+    let mut blockchain_wrapper = BlockchainStateWrapper::new();
+
+    let owner_address = blockchain_wrapper.create_user_account(&rust_biguint!(0u64));
+    let basic_features_wrapper = blockchain_wrapper.create_sc_account(
+        &rust_biguint!(0u64),
+        Some(&owner_address),
+        basic_features::contract_obj,
+        BASIC_FEATURES_WASM_PATH,
+    );
+
+    let foo = TokenIdentifier::<DebugApi>::from_esdt_bytes(b"FOO-a1a1a1");
+    let _ = blockchain_wrapper
+        .execute_query(&basic_features_wrapper, |_sc| {
+            let _bar = TokenIdentifier::<DebugApi>::from_esdt_bytes(b"BAR-a1a1a1");
+            // 'foo' and '_bar' have the same numerical handle value
+            // check that the value of 'foo' is taken from the correct context
+            assert_eq!(
+                foo,
+                TokenIdentifier::<DebugApi>::from_esdt_bytes(b"FOO-a1a1a1")
+            );
+        })
+        .assert_ok();
+}
+
+#[test]
+fn test_managed_values_argument_and_return_value_consistency() {
+    let _ = DebugApi::dummy();
+
+    let mut blockchain_wrapper = BlockchainStateWrapper::new();
+
+    let owner_address = blockchain_wrapper.create_user_account(&rust_biguint!(0u64));
+    let basic_features_wrapper = blockchain_wrapper.create_sc_account(
+        &rust_biguint!(0u64),
+        Some(&owner_address),
+        basic_features::contract_obj,
+        BASIC_FEATURES_WASM_PATH,
+    );
+
+    let argument = managed_biguint!(42u64);
+    let mut result = managed_biguint!(0u64);
+
+    let _ = blockchain_wrapper
+        .execute_tx(
+            &owner_address,
+            &basic_features_wrapper,
+            &rust_biguint!(0u64),
+            |sc| {
+                let dummy: BigUint<DebugApi> = managed_biguint!(100u64);
+                assert_eq!(dummy.to_u64().unwrap(), 100);
+
+                // 'argument' was created in the top-level context
+                assert_eq!(argument.to_u64().unwrap(), 42);
+                result = sc.endpoint_with_mutable_arg(argument, 3, 4);
+                assert_eq!(result.to_u64().unwrap(), 49);
+            },
+        )
+        .assert_ok();
+    // 'result' was created in the context of 'execute_tx'
+    assert_eq!(result.to_u64().unwrap(), 49);
+}
+
+#[test]
+fn test_managed_values_insert_handle_panics() {
+    let _ = DebugApi::dummy();
+
+    let mut blockchain_wrapper = BlockchainStateWrapper::new();
+
+    let owner_address = blockchain_wrapper.create_user_account(&rust_biguint!(0u64));
+    let basic_features_wrapper = blockchain_wrapper.create_sc_account(
+        &rust_biguint!(0u64),
+        Some(&owner_address),
+        basic_features::contract_obj,
+        BASIC_FEATURES_WASM_PATH,
+    );
+
+    let item = managed_biguint!(42);
+
+    let _ = blockchain_wrapper
+        .execute_tx(
+            &owner_address,
+            &basic_features_wrapper,
+            &rust_biguint!(0u64),
+            |_sc| {
+                let mut vec: ManagedVec<DebugApi, BigUint<DebugApi>> = ManagedVec::new();
+                // this should panic because we're pushing the handle's value, which discards the context
+                vec.push(item);
+            },
+        )
+        .assert_user_error("panic occurred");
+}
 
 #[should_panic]
 #[test]
