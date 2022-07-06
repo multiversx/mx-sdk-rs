@@ -130,30 +130,32 @@ impl BlockchainStateWrapper {
     ) where
         T: TopEncode + TopDecode + PartialEq + core::fmt::Debug,
     {
-        let actual_attributes_serialized = match &self.rc_b_mock.accounts.get(address) {
-            Some(acc) => {
-                let esdt_data = acc.esdt.get_by_identifier_or_default(token_id);
-                let opt_instance = esdt_data.instances.get_by_nonce(nonce);
+        let (actual_balance, actual_attributes_serialized) =
+            match &self.rc_b_mock.accounts.get(address) {
+                Some(acc) => {
+                    let esdt_data = acc.esdt.get_by_identifier_or_default(token_id);
+                    let opt_instance = esdt_data.instances.get_by_nonce(nonce);
 
-                match opt_instance {
-                    Some(instance) => {
-                        assert!(
-                            expected_balance == &instance.balance,
-                            "ESDT NFT balance mismatch for address {}\n Token: {}, nonce: {}\n Expected: {}\n Have: {}\n",
-                            address_to_hex(address),
-                            String::from_utf8(token_id.to_vec()).unwrap(),
-                            nonce,
-                            expected_balance,
-                            instance.balance
-                        );
+                    match opt_instance {
+                        Some(instance) => (
+                            instance.balance.clone(),
+                            instance.metadata.attributes.clone(),
+                        ),
+                        None => (num_bigint::BigUint::zero(), Vec::new()),
+                    }
+                },
+                None => (num_bigint::BigUint::zero(), Vec::new()),
+            };
 
-                        instance.metadata.attributes.clone()
-                    },
-                    None => Vec::new(),
-                }
-            },
-            None => Vec::new(),
-        };
+        assert!(
+            expected_balance == &actual_balance,
+            "ESDT NFT balance mismatch for address {}\n Token: {}, nonce: {}\n Expected: {}\n Have: {}\n",
+            address_to_hex(address),
+            String::from_utf8(token_id.to_vec()).unwrap(),
+            nonce,
+            expected_balance,
+            actual_balance
+        );
 
         if let Some(expected_attributes) = opt_expected_attributes {
             let actual_attributes = T::top_decode(actual_attributes_serialized).unwrap();
