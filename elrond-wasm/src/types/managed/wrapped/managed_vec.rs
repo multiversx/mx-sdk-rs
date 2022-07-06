@@ -1,6 +1,6 @@
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
-    api::{ErrorApiImpl, Handle, InvalidSliceError, ManagedTypeApi},
+    api::{ErrorApiImpl, InvalidSliceError, ManagedTypeApi},
     types::{
         heap::{ArgBuffer, BoxedBytes},
         ManagedBuffer, ManagedBufferNestedDecodeInput, ManagedType, ManagedVecItem, ManagedVecRef,
@@ -35,19 +35,21 @@ where
     M: ManagedTypeApi,
     T: ManagedVecItem,
 {
+    type OwnHandle = M::ManagedBufferHandle;
+
     #[inline]
-    fn from_raw_handle(handle: Handle) -> Self {
+    fn from_handle(handle: M::ManagedBufferHandle) -> Self {
         ManagedVec {
-            buffer: ManagedBuffer::from_raw_handle(handle),
+            buffer: ManagedBuffer::from_handle(handle),
             _phantom: PhantomData,
         }
     }
 
-    fn get_raw_handle(&self) -> Handle {
-        self.buffer.get_raw_handle()
+    fn get_handle(&self) -> M::ManagedBufferHandle {
+        self.buffer.get_handle()
     }
 
-    fn transmute_from_handle_ref(handle_ref: &Handle) -> &Self {
+    fn transmute_from_handle_ref(handle_ref: &M::ManagedBufferHandle) -> &Self {
         unsafe { core::mem::transmute(handle_ref) }
     }
 }
@@ -163,7 +165,7 @@ where
     }
 
     pub fn get_mut(&mut self, index: usize) -> ManagedVecRef<M, T> {
-        ManagedVecRef::new(self.get_raw_handle(), index)
+        ManagedVecRef::new(self.get_handle(), index)
     }
 
     pub(super) unsafe fn get_unsafe(&self, index: usize) -> T {

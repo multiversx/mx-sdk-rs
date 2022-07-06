@@ -42,7 +42,7 @@ fn managed_struct_to_bytes_writer() {
     let mut arr: [u8; 8] = [0u8;
         <ManagedStructWithBigUint<DebugApi> as elrond_wasm::types::ManagedVecItem>::PAYLOAD_SIZE];
 
-    let handle_bytes = s.big_uint.get_raw_handle().to_be_bytes();
+    let handle_bytes = s.big_uint.get_handle().to_be_bytes();
     let expected = [0xff, 0xff, 0xff, handle_bytes[3], 0x00, 0x01, 0x23, 0x45];
 
     <ManagedStructWithBigUint<DebugApi> as elrond_wasm::types::ManagedVecItem>::to_byte_writer(
@@ -62,7 +62,7 @@ fn managed_struct_from_bytes_reader() {
         big_uint: BigUint::from(42u64),
         num: 0x12345,
     };
-    let handle_bytes = s.big_uint.get_raw_handle().to_be_bytes();
+    let handle_bytes = s.big_uint.get_handle().to_be_bytes();
     let arr: [u8; 8] = [0xff, 0xff, 0xff, handle_bytes[3], 0x00, 0x01, 0x23, 0x45];
 
     let struct_from_bytes = <ManagedStructWithBigUint<DebugApi> as elrond_wasm::types::ManagedVecItem>::from_byte_reader( |bytes| {

@@ -1,5 +1,5 @@
 use crate::{error_hook, VmApiImpl};
-use elrond_wasm::api::{ErrorApi, ErrorApiImpl, Handle};
+use elrond_wasm::api::{ErrorApi, ErrorApiImpl};
 
 extern "C" {
     fn managedSignalError(messageHandle: i32) -> !;
@@ -21,7 +21,7 @@ impl ErrorApiImpl for VmApiImpl {
     }
 
     #[inline(always)]
-    fn signal_error_from_buffer(&self, message_handle: Handle) -> ! {
+    fn signal_error_from_buffer(&self, message_handle: Self::ManagedBufferHandle) -> ! {
         unsafe { managedSignalError(message_handle) }
     }
 }

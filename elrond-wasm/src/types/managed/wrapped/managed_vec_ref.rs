@@ -1,5 +1,5 @@
 use crate::{
-    api::{Handle, ManagedTypeApi},
+    api::ManagedTypeApi,
     types::{ManagedType, ManagedVec, ManagedVecItem},
 };
 use core::{
@@ -14,7 +14,7 @@ where
 {
     _phantom_m: PhantomData<M>,
     _phantom_t: PhantomData<&'a mut T>, // needed for the lifetime, even though T is present
-    managed_vec_handle: Handle,
+    managed_vec_handle: M::ManagedBufferHandle,
     item_index: usize,
     item: T,
 }
@@ -25,11 +25,11 @@ where
     T: ManagedVecItem,
 {
     #[inline]
-    fn wrap_as_managed_vec(managed_vec_handle: Handle) -> ManagedVec<M, T> {
-        ManagedVec::from_raw_handle(managed_vec_handle)
+    fn wrap_as_managed_vec(managed_vec_handle: M::ManagedBufferHandle) -> ManagedVec<M, T> {
+        ManagedVec::from_handle(managed_vec_handle)
     }
 
-    pub(super) fn new(managed_vec_handle: Handle, item_index: usize) -> Self {
+    pub(super) fn new(managed_vec_handle: M::ManagedBufferHandle, item_index: usize) -> Self {
         let item = unsafe { Self::wrap_as_managed_vec(managed_vec_handle).get_unsafe(item_index) };
         Self {
             _phantom_m: PhantomData,

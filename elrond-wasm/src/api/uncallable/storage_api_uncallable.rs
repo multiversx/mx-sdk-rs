@@ -1,14 +1,12 @@
-use crate::api::{
-    Handle, StorageReadApi, StorageReadApiImpl, StorageWriteApi, StorageWriteApiImpl,
-};
+use crate::api::{StorageReadApi, StorageReadApiImpl, StorageWriteApi, StorageWriteApiImpl};
 use alloc::boxed::Box;
 
 use super::UncallableApi;
 
 impl StorageReadApi for UncallableApi {
-    type StorageReadApiImpl = UncallableApi;
+    type StorageReadApiImpl = Self;
 
-    fn storage_read_api_impl() -> Self::StorageReadApiImpl {
+    fn storage_read_api_impl() -> Self {
         unreachable!()
     }
 }
@@ -22,20 +20,15 @@ impl StorageReadApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn storage_load_big_uint_raw(&self, _key: &[u8], _dest: Handle) {
+    fn storage_load_big_uint_raw(&self, _key: &[u8], _dest: i32) {
         unreachable!()
     }
 
-    fn storage_load_managed_buffer_raw(&self, _key_handle: Handle, _dest: Handle) {
+    fn storage_load_managed_buffer_raw(&self, _key_handle: i32, _dest: i32) {
         unreachable!()
     }
 
-    fn storage_load_from_address(
-        &self,
-        _address_handle: Handle,
-        _key_handle: Handle,
-        _dest: Handle,
-    ) {
+    fn storage_load_from_address(&self, _address_handle: i32, _key_handle: i32, _dest: i32) {
         unreachable!()
     }
 }
@@ -53,15 +46,19 @@ impl StorageWriteApiImpl for super::UncallableApi {
         unreachable!()
     }
 
-    fn storage_store_big_uint_raw(&self, _key: &[u8], _value_handle: Handle) {
+    fn storage_store_big_uint_raw(&self, _key: &[u8], _value_handle: Self::BigIntHandle) {
         unreachable!()
     }
 
-    fn storage_store_managed_buffer_raw(&self, _key_handle: Handle, _value_handle: Handle) {
+    fn storage_store_managed_buffer_raw(
+        &self,
+        _key_handle: Self::ManagedBufferHandle,
+        _value_handle: Self::ManagedBufferHandle,
+    ) {
         unreachable!()
     }
 
-    fn storage_store_managed_buffer_clear(&self, _key_handle: Handle) {
+    fn storage_store_managed_buffer_clear(&self, _key_handle: Self::ManagedBufferHandle) {
         unreachable!()
     }
 }

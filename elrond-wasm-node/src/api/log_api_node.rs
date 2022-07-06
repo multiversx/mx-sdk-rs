@@ -1,6 +1,6 @@
 use super::VmApiImpl;
 use elrond_wasm::{
-    api::{Handle, LogApi, LogApiImpl},
+    api::{LogApi, LogApiImpl},
     types::heap::ArgBuffer,
 };
 
@@ -60,7 +60,11 @@ impl LogApiImpl for VmApiImpl {
         }
     }
 
-    fn managed_write_log(&self, topics_handle: Handle, data_handle: Handle) {
+    fn managed_write_log(
+        &self,
+        topics_handle: Self::ManagedBufferHandle,
+        data_handle: Self::ManagedBufferHandle,
+    ) {
         unsafe {
             managedWriteLog(topics_handle, data_handle);
         }

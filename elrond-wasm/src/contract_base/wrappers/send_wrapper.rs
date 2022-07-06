@@ -346,7 +346,7 @@ where
     ) -> u64 {
         let big_zero = BigUint::zero();
         let empty_buffer = ManagedBuffer::new();
-        let empty_vec = ManagedVec::from_raw_handle(empty_buffer.get_raw_handle());
+        let empty_vec = ManagedVec::from_handle(empty_buffer.get_handle());
 
         self.esdt_nft_create(
             token,

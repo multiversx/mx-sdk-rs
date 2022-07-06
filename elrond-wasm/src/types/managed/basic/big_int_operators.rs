@@ -15,7 +15,7 @@ macro_rules! binary_operator {
             fn $method(self, other: BigInt<M>) -> BigInt<M> {
                 let api = M::managed_type_impl();
                 api.$api_func(self.handle, self.handle, other.handle);
-                BigInt::from_raw_handle(self.handle)
+                BigInt::from_handle(self.handle)
             }
         }
 
@@ -26,7 +26,7 @@ macro_rules! binary_operator {
                 let api = M::managed_type_impl();
                 let result_handle = M::static_var_api_impl().next_handle();
                 api.$api_func(result_handle, self.handle, other.handle);
-                BigInt::from_raw_handle(result_handle)
+                BigInt::from_handle(result_handle)
             }
         }
     };
@@ -71,6 +71,6 @@ impl<M: ManagedTypeApi> Neg for BigInt<M> {
         let api = M::managed_type_impl();
         let result_handle = M::static_var_api_impl().next_handle();
         api.bi_neg(result_handle, self.handle);
-        BigInt::from_raw_handle(result_handle)
+        BigInt::from_handle(result_handle)
     }
 }

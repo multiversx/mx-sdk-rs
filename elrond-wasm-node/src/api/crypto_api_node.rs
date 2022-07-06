@@ -1,6 +1,6 @@
 use super::VmApiImpl;
 use elrond_wasm::{
-    api::{CryptoApi, CryptoApiImpl, Handle},
+    api::{CryptoApi, CryptoApiImpl},
     types::{heap::BoxedBytes, MessageHashType},
 };
 
@@ -91,7 +91,11 @@ impl CryptoApiImpl for VmApiImpl {
         }
     }
 
-    fn sha256_managed(&self, result_handle: Handle, data_handle: Handle) {
+    fn sha256_managed(
+        &self,
+        result_handle: Self::ManagedBufferHandle,
+        data_handle: Self::ManagedBufferHandle,
+    ) {
         unsafe {
             let _ = managedSha256(data_handle, result_handle);
         }
@@ -106,7 +110,11 @@ impl CryptoApiImpl for VmApiImpl {
         }
     }
 
-    fn keccak256_managed(&self, result_handle: Handle, data_handle: Handle) {
+    fn keccak256_managed(
+        &self,
+        result_handle: Self::ManagedBufferHandle,
+        data_handle: Self::ManagedBufferHandle,
+    ) {
         unsafe {
             let _ = managedKeccak256(data_handle, result_handle);
         }
@@ -122,7 +130,11 @@ impl CryptoApiImpl for VmApiImpl {
     }
 
     #[inline]
-    fn ripemd160_managed(&self, dest: Handle, data_handle: Handle) {
+    fn ripemd160_managed(
+        &self,
+        dest: Self::ManagedBufferHandle,
+        data_handle: Self::ManagedBufferHandle,
+    ) {
         unsafe {
             let _ = managedRipemd160(data_handle, dest);
         }
@@ -142,7 +154,12 @@ impl CryptoApiImpl for VmApiImpl {
     }
 
     #[inline]
-    fn verify_bls_managed(&self, key: Handle, message: Handle, signature: Handle) -> bool {
+    fn verify_bls_managed(
+        &self,
+        key: Self::ManagedBufferHandle,
+        message: Self::ManagedBufferHandle,
+        signature: Self::ManagedBufferHandle,
+    ) -> bool {
         unsafe { managedVerifyBLS(key, message, signature) == 0 }
     }
 
@@ -159,7 +176,12 @@ impl CryptoApiImpl for VmApiImpl {
     }
 
     #[inline]
-    fn verify_ed25519_managed(&self, key: Handle, message: Handle, signature: Handle) -> bool {
+    fn verify_ed25519_managed(
+        &self,
+        key: Self::ManagedBufferHandle,
+        message: Self::ManagedBufferHandle,
+        signature: Self::ManagedBufferHandle,
+    ) -> bool {
         unsafe { managedVerifyEd25519(key, message, signature) == 0 }
     }
 
@@ -177,7 +199,12 @@ impl CryptoApiImpl for VmApiImpl {
     }
 
     #[inline]
-    fn verify_secp256k1_managed(&self, key: Handle, message: Handle, signature: Handle) -> bool {
+    fn verify_secp256k1_managed(
+        &self,
+        key: Self::ManagedBufferHandle,
+        message: Self::ManagedBufferHandle,
+        signature: Self::ManagedBufferHandle,
+    ) -> bool {
         unsafe { managedVerifySecp256k1(key, message, signature) == 0 }
     }
 
@@ -204,9 +231,9 @@ impl CryptoApiImpl for VmApiImpl {
     #[inline]
     fn verify_custom_secp256k1_managed(
         &self,
-        key: Handle,
-        message: Handle,
-        signature: Handle,
+        key: Self::ManagedBufferHandle,
+        message: Self::ManagedBufferHandle,
+        signature: Self::ManagedBufferHandle,
         hash_type: MessageHashType,
     ) -> bool {
         unsafe {
@@ -244,9 +271,9 @@ impl CryptoApiImpl for VmApiImpl {
 
     fn encode_secp256k1_der_signature_managed(
         &self,
-        r: Handle,
-        s: Handle,
-        dest_sig_handle: Handle,
+        r: Self::ManagedBufferHandle,
+        s: Self::ManagedBufferHandle,
+        dest_sig_handle: Self::ManagedBufferHandle,
     ) {
         unsafe {
             let _ = managedEncodeSecp256k1DerSignature(r, s, dest_sig_handle);

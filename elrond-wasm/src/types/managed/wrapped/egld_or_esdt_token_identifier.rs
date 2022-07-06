@@ -1,6 +1,6 @@
 use crate::{
     abi::{TypeAbi, TypeName},
-    api::{Handle, ManagedTypeApi},
+    api::{HandleConstraints, ManagedTypeApi},
     derive::ManagedVecItem,
     formatter::{FormatByteReceiver, SCDisplay, SCLowerHex},
     types::{ManagedBuffer, ManagedOption, ManagedRef, ManagedType, TokenIdentifier},
@@ -53,9 +53,9 @@ impl<M: ManagedTypeApi> EgldOrEsdtTokenIdentifier<M> {
         }
     }
 
-    pub fn from_opt_raw_handle(opt_handle: Option<Handle>) -> Self {
+    pub fn from_opt_raw_handle(opt_handle: Option<M::ManagedBufferHandle>) -> Self {
         match opt_handle {
-            Some(handle) => Self::esdt(TokenIdentifier::from_raw_handle(handle)),
+            Some(handle) => Self::esdt(TokenIdentifier::from_handle(handle)),
             None => Self::egld(),
         }
     }
@@ -219,8 +219,8 @@ impl<M: ManagedTypeApi> TypeAbi for EgldOrEsdtTokenIdentifier<M> {
 impl<M: ManagedTypeApi> SCDisplay for EgldOrEsdtTokenIdentifier<M> {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
         if let Some(token_identifier) = self.data.as_option() {
-            f.append_managed_buffer(&ManagedBuffer::from_raw_handle(
-                token_identifier.get_raw_handle(),
+            f.append_managed_buffer(&ManagedBuffer::from_handle(
+                token_identifier.get_handle().cast_or_signal_error::<M, _>(),
             ));
         } else {
             f.append_bytes(Self::EGLD_REPRESENTATION);
@@ -233,8 +233,8 @@ const EGLD_REPRESENTATION_HEX: &[u8] = b"45474C44";
 impl<M: ManagedTypeApi> SCLowerHex for EgldOrEsdtTokenIdentifier<M> {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
         if let Some(token_identifier) = self.data.as_option() {
-            f.append_managed_buffer_lower_hex(&ManagedBuffer::from_raw_handle(
-                token_identifier.get_raw_handle(),
+            f.append_managed_buffer_lower_hex(&ManagedBuffer::from_handle(
+                token_identifier.get_handle().cast_or_signal_error::<M, _>(),
             ));
         } else {
             f.append_bytes(EGLD_REPRESENTATION_HEX);

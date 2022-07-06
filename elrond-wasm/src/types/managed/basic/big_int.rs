@@ -2,7 +2,10 @@ use core::marker::PhantomData;
 
 use crate::{
     abi::TypeName,
-    api::{const_handles, BigIntApi, Handle, ManagedTypeApi, ManagedTypeApiImpl, StaticVarApiImpl},
+    api::{
+        const_handles, use_raw_handle, BigIntApi, ManagedTypeApi, ManagedTypeApiImpl,
+        StaticVarApiImpl,
+    },
     formatter::hex_util::encode_bytes_as_hex,
     types::{heap::BoxedBytes, BigUint, ManagedBuffer, ManagedOption, ManagedType, Sign},
 };
@@ -13,27 +16,32 @@ use elrond_codec::{
 };
 
 #[cfg(feature = "ei-1-2")]
-use crate::formatter::{FormatByteReceiver, SCDisplay};
+use crate::{
+    api::HandleConstraints,
+    formatter::{FormatByteReceiver, SCDisplay},
+};
 
 #[repr(transparent)]
 pub struct BigInt<M: ManagedTypeApi> {
-    pub(crate) handle: Handle,
+    pub(crate) handle: M::BigIntHandle,
     _phantom: PhantomData<M>,
 }
 
 impl<M: ManagedTypeApi> ManagedType<M> for BigInt<M> {
-    fn from_raw_handle(handle: Handle) -> Self {
+    type OwnHandle = M::BigIntHandle;
+
+    fn from_handle(handle: M::BigIntHandle) -> Self {
         BigInt {
             handle,
             _phantom: PhantomData,
         }
     }
 
-    fn get_raw_handle(&self) -> Handle {
+    fn get_handle(&self) -> M::BigIntHandle {
         self.handle
     }
 
-    fn transmute_from_handle_ref(handle_ref: &Handle) -> &Self {
+    fn transmute_from_handle_ref(handle_ref: &M::BigIntHandle) -> &Self {
         unsafe { core::mem::transmute(handle_ref) }
     }
 }
@@ -62,7 +70,7 @@ impl<M: ManagedTypeApi> From<ManagedBuffer<M>> for BigInt<M> {
 impl<M: ManagedTypeApi> From<BigUint<M>> for BigInt<M> {
     #[inline]
     fn from(item: BigUint<M>) -> Self {
-        BigInt::from_raw_handle(item.get_raw_handle())
+        BigInt::from_handle(item.get_handle())
     }
 }
 
@@ -73,7 +81,7 @@ macro_rules! big_int_conv_num {
             fn from(value: $num_ty) -> Self {
                 let handle = M::static_var_api_impl().next_handle();
                 M::managed_type_impl().bi_set_int64(handle, value as i64);
-                BigInt::from_raw_handle(handle)
+                BigInt::from_handle(handle)
             }
         }
 
@@ -114,7 +122,7 @@ impl<M: ManagedTypeApi> BigInt<M> {
         let handle = M::static_var_api_impl().next_handle();
         // TODO: seting 0 will no longer be needed once we fix VM handle error
         M::managed_type_impl().bi_set_int64(handle, 0);
-        BigInt::from_raw_handle(handle)
+        BigInt::from_handle(handle)
     }
 
     #[inline]
@@ -126,7 +134,7 @@ impl<M: ManagedTypeApi> BigInt<M> {
     pub fn from_signed_bytes_be(bytes: &[u8]) -> Self {
         let handle = M::static_var_api_impl().next_handle();
         M::managed_type_impl().bi_set_signed_bytes(handle, bytes);
-        BigInt::from_raw_handle(handle)
+        BigInt::from_handle(handle)
     }
 
     #[inline]
@@ -138,14 +146,14 @@ impl<M: ManagedTypeApi> BigInt<M> {
     pub fn from_signed_bytes_be_buffer(managed_buffer: &ManagedBuffer<M>) -> Self {
         let handle = M::static_var_api_impl().next_handle();
         M::managed_type_impl().mb_to_big_int_signed(managed_buffer.handle, handle);
-        BigInt::from_raw_handle(handle)
+        BigInt::from_handle(handle)
     }
 
     #[inline]
     pub fn to_signed_bytes_be_buffer(&self) -> ManagedBuffer<M> {
         let mb_handle = M::static_var_api_impl().next_handle();
         M::managed_type_impl().mb_from_big_int_signed(self.handle, mb_handle);
-        ManagedBuffer::from_raw_handle(mb_handle)
+        ManagedBuffer::from_handle(mb_handle)
     }
 }
 
@@ -155,7 +163,7 @@ impl<M: ManagedTypeApi> Clone for BigInt<M> {
         let clone_handle = M::static_var_api_impl().next_handle();
         M::managed_type_impl().bi_set_int64(clone_handle, 0);
         api.bi_add(clone_handle, clone_handle, self.handle);
-        BigInt::from_raw_handle(clone_handle)
+        BigInt::from_handle(clone_handle)
     }
 }
 
@@ -165,7 +173,7 @@ impl<M: ManagedTypeApi> BigInt<M> {
         if sign.is_minus() {
             api.bi_neg(unsigned.handle, unsigned.handle);
         }
-        BigInt::from_raw_handle(unsigned.handle)
+        BigInt::from_handle(unsigned.handle)
     }
 
     /// Returns the sign of the `BigInt` as a `Sign`.
@@ -183,7 +191,7 @@ impl<M: ManagedTypeApi> BigInt<M> {
         let api = M::managed_type_impl();
         let result_handle = M::static_var_api_impl().next_handle();
         api.bi_abs(result_handle, self.handle);
-        BigUint::from_raw_handle(result_handle)
+        BigUint::from_handle(result_handle)
     }
 
     /// Convert this `BigInt` into its `Sign` and `BigUint` magnitude,
@@ -197,7 +205,7 @@ impl<M: ManagedTypeApi> BigInt<M> {
         if let Sign::Minus = self.sign() {
             ManagedOption::none()
         } else {
-            ManagedOption::some(BigUint::from_raw_handle(self.handle))
+            ManagedOption::some(BigUint::from_handle(self.handle))
         }
     }
 }
@@ -271,19 +279,21 @@ impl<M: ManagedTypeApi> BigInt<M> {
     #[must_use]
     pub fn pow(&self, exp: u32) -> Self {
         let result_handle = M::static_var_api_impl().next_handle();
-        let exp_handle = const_handles::BIG_INT_TEMPORARY_1;
+        let exp_handle = use_raw_handle(const_handles::BIG_INT_TEMPORARY_1);
         M::managed_type_impl().bi_set_int64(exp_handle, exp as i64);
         M::managed_type_impl().bi_pow(result_handle, self.handle, exp_handle);
-        BigInt::from_raw_handle(result_handle)
+        BigInt::from_handle(result_handle)
     }
 }
 
 #[cfg(feature = "ei-1-2")]
 impl<M: ManagedTypeApi> SCDisplay for BigInt<M> {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
-        let str_handle = const_handles::MBUF_TEMPORARY_1;
+        let str_handle = use_raw_handle(const_handles::MBUF_TEMPORARY_1);
         M::managed_type_impl().bi_to_string(self.handle, str_handle);
-        f.append_managed_buffer(&ManagedBuffer::from_raw_handle(str_handle));
+        f.append_managed_buffer(&ManagedBuffer::from_handle(
+            str_handle.cast_or_signal_error::<M, _>(),
+        ));
     }
 }
 
