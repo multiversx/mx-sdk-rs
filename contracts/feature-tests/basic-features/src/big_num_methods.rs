@@ -99,7 +99,7 @@ pub trait BigIntMethods {
     }
 
     #[endpoint]
-    fn biguint_set_i64(&self, bi: BigInt, small: i64) -> BigInt {
+    fn bigint_set_i64(&self, bi: BigInt, small: i64) -> BigInt {
         bi.set_i64(small);
         bi
     }
