@@ -1,5 +1,5 @@
 use basic_features::BasicFeatures;
-use elrond_wasm::types::{BigUint, TokenIdentifier};
+use elrond_wasm::types::{BigUint, ManagedVec, TokenIdentifier};
 use elrond_wasm_debug::{
     managed_biguint, rust_biguint, testing_framework::BlockchainStateWrapper, DebugApi,
 };
@@ -65,4 +65,34 @@ fn test_managed_values_argument_and_return_value_consistency() {
         )
         .assert_ok();
     assert_eq!(result.to_u64().unwrap(), 49);
+}
+
+#[test]
+fn test_managed_values_insert_handle_panics() {
+    let _ = DebugApi::dummy();
+
+    let mut blockchain_wrapper = BlockchainStateWrapper::new();
+
+    let owner_address = blockchain_wrapper.create_user_account(&rust_biguint!(0u64));
+    let basic_features_wrapper = blockchain_wrapper.create_sc_account(
+        &rust_biguint!(0u64),
+        Some(&owner_address),
+        basic_features::contract_obj,
+        WASM_PATH,
+    );
+
+    let item = managed_biguint!(42);
+
+    let _ = blockchain_wrapper
+        .execute_tx(
+            &owner_address,
+            &basic_features_wrapper,
+            &rust_biguint!(0u64),
+            |_sc| {
+                let mut vec: ManagedVec<DebugApi, BigUint<DebugApi>> = ManagedVec::new();
+                // this should panic because we're pushing the handle's value, which discards the context
+                vec.push(item);
+            },
+        )
+        .assert_user_error("panic occurred");
 }
