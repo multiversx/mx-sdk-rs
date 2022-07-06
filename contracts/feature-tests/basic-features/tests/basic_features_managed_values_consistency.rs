@@ -24,6 +24,8 @@ fn test_managed_values_standalone_consistency() {
     let _ = blockchain_wrapper
         .execute_query(&basic_features_wrapper, |_sc| {
             let _bar = TokenIdentifier::<DebugApi>::from_esdt_bytes(b"BAR-a1a1a1");
+            // 'foo' and '_bar' have the same numerical handle value
+            // check that the value of 'foo' is taken from the correct context
             assert_eq!(
                 foo,
                 TokenIdentifier::<DebugApi>::from_esdt_bytes(b"FOO-a1a1a1")
@@ -58,12 +60,14 @@ fn test_managed_values_argument_and_return_value_consistency() {
                 let dummy: BigUint<DebugApi> = managed_biguint!(100u64);
                 assert_eq!(dummy.to_u64().unwrap(), 100);
 
+                // 'argument' was created in the top-level context
                 assert_eq!(argument.to_u64().unwrap(), 42);
                 result = sc.endpoint_with_mutable_arg(argument, 3, 4);
                 assert_eq!(result.to_u64().unwrap(), 49);
             },
         )
         .assert_ok();
+    // 'result' was created in the context of 'execute_tx'
     assert_eq!(result.to_u64().unwrap(), 49);
 }
 
