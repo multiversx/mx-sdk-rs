@@ -403,8 +403,8 @@ impl<M: ManagedTypeApi> SCDisplay for ManagedBuffer<M> {
 impl<M: ManagedTypeApi> SCLowerHex for ManagedBuffer<M> {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
         // TODO: in Rust thr `0x` prefix appears only when writing "{:#x}", not "{:x}"
-        f.append_managed_buffer_lower_hex(&ManagedBuffer::from_raw_handle(
-            self.get_raw_handle().cast_or_signal_error::<M, _>(),
+        f.append_managed_buffer_lower_hex(&ManagedBuffer::from_handle(
+            self.get_handle().cast_or_signal_error::<M, _>(),
         ));
     }
 }

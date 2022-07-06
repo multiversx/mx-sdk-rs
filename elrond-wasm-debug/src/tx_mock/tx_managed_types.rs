@@ -36,7 +36,7 @@ impl<V> HandleMap<V> {
     pub fn get(&self, handle: RawHandle) -> &V {
         // TODO: consider simulating the actual error from the VM
         self.map
-            .get(&handle.get_raw_handle())
+            .get(&handle)
             .unwrap_or_else(|| panic!("handle not found"))
     }
 
