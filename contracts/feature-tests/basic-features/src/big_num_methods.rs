@@ -48,6 +48,12 @@ pub trait BigIntMethods {
     }
 
     #[endpoint]
+    fn biguint_set_u64(&self, bu: BigUint, small: u64) -> BigUint {
+        bu.set_u64(small);
+        bu
+    }
+
+    #[endpoint]
     fn big_uint_zero(&self) -> BigUint {
         BigUint::zero()
     }
@@ -90,6 +96,12 @@ pub trait BigIntMethods {
     #[endpoint]
     fn big_int_to_i64(&self, bi: &BigInt) -> OptionalValue<i64> {
         bi.to_i64().into()
+    }
+
+    #[endpoint]
+    fn biguint_set_i64(&self, bi: BigInt, small: i64) -> BigInt {
+        bi.set_i64(small);
+        bi
     }
 
     #[endpoint]
