@@ -66,7 +66,7 @@ where
     T: ManagedType<M>,
 {
     pub fn is_none(&self) -> bool {
-        self.handle == const_handles::MANAGED_OPTION_NONE
+        self.handle.clone() == const_handles::MANAGED_OPTION_NONE
     }
 
     pub fn is_some(&self) -> bool {
@@ -75,7 +75,7 @@ where
 
     pub fn into_option(self) -> Option<T> {
         if self.is_some() {
-            Some(T::from_handle(self.handle))
+            Some(T::from_handle(self.handle.clone()))
         } else {
             None
         }
@@ -83,7 +83,7 @@ where
 
     pub fn as_option(&self) -> Option<ManagedRef<'_, M, T>> {
         if self.is_some() {
-            unsafe { Some(ManagedRef::wrap_handle(self.handle)) }
+            unsafe { Some(ManagedRef::wrap_handle(self.handle.clone())) }
         } else {
             None
         }
@@ -91,7 +91,7 @@ where
 
     pub fn unwrap_or_else<F: Fn() -> T>(self, f: F) -> T {
         if self.is_some() {
-            T::from_handle(self.handle)
+            T::from_handle(self.handle.clone())
         } else {
             f()
         }
@@ -107,7 +107,7 @@ where
         F: FnOnce(T) -> U,
     {
         if self.is_some() {
-            ManagedOption::<M, U>::some(f(T::from_handle(self.handle)))
+            ManagedOption::<M, U>::some(f(T::from_handle(self.handle.clone())))
         } else {
             ManagedOption::<M, U>::none()
         }
@@ -119,7 +119,7 @@ where
         F: FnOnce(T) -> U,
     {
         if self.is_some() {
-            f(T::from_handle(self.handle))
+            f(T::from_handle(self.handle.clone()))
         } else {
             default()
         }
@@ -131,7 +131,7 @@ where
         F: FnOnce(&T) -> U,
     {
         if self.is_some() {
-            f(&T::from_handle(self.handle))
+            f(&T::from_handle(self.handle.clone()))
         } else {
             default()
         }
@@ -146,7 +146,7 @@ where
     #[allow(clippy::redundant_clone)] // the clone is not redundant
     fn clone(&self) -> Self {
         if self.is_some() {
-            Self::some(T::from_handle(self.handle).clone())
+            Self::some(T::from_handle(self.handle.clone()).clone())
         } else {
             Self::none()
         }
@@ -160,12 +160,12 @@ where
 {
     #[inline]
     fn eq(&self, other: &Self) -> bool {
-        if self.handle == other.handle {
+        if self.handle.clone() == other.handle.clone() {
             // also catches None == None
             return true;
         }
         if self.is_some() && other.is_some() {
-            return T::from_handle(self.handle) == T::from_handle(other.handle);
+            return T::from_handle(self.handle.clone()) == T::from_handle(other.handle.clone());
         }
         false
     }
@@ -199,7 +199,7 @@ where
     }
 
     fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, writer: Writer) -> R {
-        <T::OwnHandle as ManagedVecItem>::to_byte_writer(&self.handle, writer)
+        <T::OwnHandle as ManagedVecItem>::to_byte_writer(&self.handle.clone(), writer)
     }
 }
 
@@ -283,7 +283,7 @@ where
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         if self.is_some() {
             f.debug_tuple("ManagedOption::Some")
-                .field(&T::from_handle(self.handle))
+                .field(&T::from_handle(self.handle.clone()))
                 .finish()
         } else {
             f.write_str("ManagedOption::None")

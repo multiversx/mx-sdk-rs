@@ -9,12 +9,14 @@ use elrond_wasm::{
     elrond_codec::num_bigint::BigInt,
     err_msg,
 };
-use num_traits::{Signed, ToPrimitive};
+use num_traits::ToPrimitive;
 
 impl DebugApi {
     pub(crate) fn bf_get_f64(&self, handle: <Self as HandleTypeInfo>::BigFloatHandle) -> f64 {
-        let managed_types = self.m_types_borrow_mut();
-        *managed_types.big_float_map.get(handle)
+        let managed_types = handle.context.m_types_borrow_mut();
+        *managed_types
+            .big_float_map
+            .get(handle.get_raw_handle_unchecked())
     }
 
     pub(crate) fn bf_overwrite(
@@ -22,8 +24,10 @@ impl DebugApi {
         handle: <Self as HandleTypeInfo>::BigFloatHandle,
         value: f64,
     ) {
-        let mut managed_types = self.m_types_borrow_mut();
-        managed_types.big_float_map.insert(handle, value);
+        let mut managed_types = handle.context.m_types_borrow_mut();
+        managed_types
+            .big_float_map
+            .insert(handle.get_raw_handle_unchecked(), value);
     }
 }
 
@@ -136,10 +140,9 @@ impl BigFloatApi for DebugApi {
     unary_op_method!(bf_abs, abs);
     unary_op_method!(bf_neg, neg);
     fn bf_cmp(&self, x: Self::BigFloatHandle, y: Self::BigFloatHandle) -> Ordering {
-        let managed_types = self.m_types_borrow_mut();
-        let bf_x = managed_types.big_float_map.get(x);
-        let bf_y = managed_types.big_float_map.get(y);
-        let order_opt = bf_x.partial_cmp(bf_y);
+        let bf_x = self.bf_get_f64(x);
+        let bf_y = self.bf_get_f64(y);
+        let order_opt = bf_x.partial_cmp(&bf_y);
         if order_opt == None {
             self.signal_error(err_msg::CANNOT_COMPARE_VALUES)
         }
@@ -147,15 +150,14 @@ impl BigFloatApi for DebugApi {
     }
 
     fn bf_sign(&self, x: Self::BigFloatHandle) -> Sign {
-        let managed_types = self.m_types_borrow();
-        let bf = managed_types.big_float_map.get(x);
+        let bf = self.bf_get_f64(x);
         if !bf.is_normal() {
             self.signal_error(err_msg::NUMBER_IS_NOT_NORMAL)
         }
 
-        if bf.is_positive() {
+        if bf.is_sign_positive() {
             return elrond_wasm::api::Sign::Plus;
-        } else if bf.is_negative() {
+        } else if bf.is_sign_negative() {
             return elrond_wasm::api::Sign::Minus;
         }
         elrond_wasm::api::Sign::NoSign
@@ -188,11 +190,10 @@ impl BigFloatApi for DebugApi {
     unary_op_method_big_int_handle!(bf_trunc, trunc);
 
     fn bf_is_bi(&self, x: Self::BigFloatHandle) -> bool {
-        let managed_types = self.m_types_borrow();
-        let bf_x = managed_types.big_float_map.get(x);
+        let bf_x = self.bf_get_f64(x);
         let trunc_x = bf_x.trunc();
         let float_trunc_x = trunc_x.to_f64().unwrap();
-        *bf_x == float_trunc_x
+        bf_x == float_trunc_x
     }
 
     fn bf_set_i64(&self, dest: Self::BigFloatHandle, value: i64) {
