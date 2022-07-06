@@ -1,7 +1,7 @@
 use core::borrow::Borrow;
 
 use crate::{
-    api::{Handle, ManagedTypeApi},
+    api::ManagedTypeApi,
     types::{
         BigInt, BigUint, EllipticCurve, ManagedAddress, ManagedBuffer, ManagedByteArray,
         ManagedRef, ManagedType, ManagedVec, TokenIdentifier,
@@ -175,19 +175,19 @@ macro_rules! impl_managed_type {
             type Ref<'a> = ManagedRef<'a, M, Self>;
 
             fn from_byte_reader<Reader: FnMut(&mut [u8])>(reader: Reader) -> Self {
-                let handle = Handle::from_byte_reader(reader);
-                $ty::from_raw_handle(handle)
+                let handle = <$ty<M> as ManagedType<M>>::OwnHandle::from_byte_reader(reader);
+                $ty::from_handle(handle)
             }
 
             unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
                 reader: Reader,
             ) -> Self::Ref<'a> {
-                let handle = Handle::from_byte_reader(reader);
+                let handle = <$ty<M> as ManagedType<M>>::OwnHandle::from_byte_reader(reader);
                 ManagedRef::wrap_handle(handle)
             }
 
             fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, writer: Writer) -> R {
-                <Handle as ManagedVecItem>::to_byte_writer(&self.get_raw_handle(), writer)
+                <$ty<M> as ManagedType<M>>::OwnHandle::to_byte_writer(&self.get_handle(), writer)
             }
         }
     };
@@ -209,19 +209,22 @@ where
     type Ref<'a> = ManagedRef<'a, M, Self>;
 
     fn from_byte_reader<Reader: FnMut(&mut [u8])>(reader: Reader) -> Self {
-        let handle = Handle::from_byte_reader(reader);
-        Self::from_raw_handle(handle)
+        let handle = <Self as ManagedType<M>>::OwnHandle::from_byte_reader(reader);
+        Self::from_handle(handle)
     }
 
     unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
         reader: Reader,
     ) -> Self::Ref<'a> {
-        let handle = Handle::from_byte_reader(reader);
+        let handle = <Self as ManagedType<M>>::OwnHandle::from_byte_reader(reader);
         ManagedRef::wrap_handle(handle)
     }
 
     fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, writer: Writer) -> R {
-        <Handle as ManagedVecItem>::to_byte_writer(&self.get_raw_handle(), writer)
+        <<Self as ManagedType<M>>::OwnHandle as ManagedVecItem>::to_byte_writer(
+            &self.get_handle(),
+            writer,
+        )
     }
 }
 
@@ -235,18 +238,18 @@ where
     type Ref<'a> = ManagedRef<'a, M, Self>;
 
     fn from_byte_reader<Reader: FnMut(&mut [u8])>(reader: Reader) -> Self {
-        let handle = Handle::from_byte_reader(reader);
-        Self::from_raw_handle(handle)
+        let handle = M::ManagedBufferHandle::from_byte_reader(reader);
+        Self::from_handle(handle)
     }
 
     unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
         reader: Reader,
     ) -> Self::Ref<'a> {
-        let handle = Handle::from_byte_reader(reader);
+        let handle = M::ManagedBufferHandle::from_byte_reader(reader);
         ManagedRef::wrap_handle(handle)
     }
 
     fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, writer: Writer) -> R {
-        <Handle as ManagedVecItem>::to_byte_writer(&self.get_raw_handle(), writer)
+        <M::ManagedBufferHandle as ManagedVecItem>::to_byte_writer(&self.get_handle(), writer)
     }
 }

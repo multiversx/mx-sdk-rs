@@ -1,6 +1,6 @@
 use core::cmp::Ordering;
 
-use elrond_wasm::api::{BigFloatApi, Handle, Sign};
+use elrond_wasm::api::{BigFloatApi, Sign};
 
 extern "C" {
     fn bigFloatNewFromParts(integralPart: i32, fractionalPart: i32, exponent: i32) -> i32;
@@ -34,7 +34,12 @@ extern "C" {
 
 macro_rules! binary_op_wrapper {
     ($method_name:ident, $hook_name:ident) => {
-        fn $method_name(&self, dest: Handle, x: Handle, y: Handle) {
+        fn $method_name(
+            &self,
+            dest: Self::BigFloatHandle,
+            x: Self::BigFloatHandle,
+            y: Self::BigFloatHandle,
+        ) {
             unsafe {
                 $hook_name(dest, x, y);
             }
@@ -44,7 +49,17 @@ macro_rules! binary_op_wrapper {
 
 macro_rules! unary_op_wrapper {
     ($method_name:ident, $hook_name:ident) => {
-        fn $method_name(&self, dest: Handle, x: Handle) {
+        fn $method_name(&self, dest: Self::BigFloatHandle, x: Self::BigFloatHandle) {
+            unsafe {
+                $hook_name(dest, x);
+            }
+        }
+    };
+}
+
+macro_rules! unary_op_method_big_int_handle {
+    ($method_name:ident, $hook_name:ident) => {
+        fn $method_name(&self, dest: Self::BigIntHandle, x: Self::BigFloatHandle) {
             unsafe {
                 $hook_name(dest, x);
             }
@@ -59,17 +74,21 @@ impl BigFloatApi for crate::VmApiImpl {
         integral_part_value: i32,
         fractional_part_value: i32,
         exponent_value: i32,
-    ) -> Handle {
+    ) -> Self::BigFloatHandle {
         unsafe { bigFloatNewFromParts(integral_part_value, fractional_part_value, exponent_value) }
     }
 
     #[inline]
-    fn bf_from_frac(&self, numerator_value: i64, denominator_value: i64) -> Handle {
+    fn bf_from_frac(&self, numerator_value: i64, denominator_value: i64) -> Self::BigFloatHandle {
         unsafe { bigFloatNewFromFrac(numerator_value, denominator_value) }
     }
 
     #[inline]
-    fn bf_from_sci(&self, significand_value: i64, exponent_value: i64) -> Handle {
+    fn bf_from_sci(
+        &self,
+        significand_value: i64,
+        exponent_value: i64,
+    ) -> Self::ManagedBufferHandle {
         unsafe { bigFloatNewFromSci(significand_value, exponent_value) }
     }
 
@@ -82,11 +101,11 @@ impl BigFloatApi for crate::VmApiImpl {
     unary_op_wrapper! {bf_abs, bigFloatAbs}
 
     #[inline]
-    fn bf_cmp(&self, x: Handle, y: Handle) -> Ordering {
+    fn bf_cmp(&self, x: Self::ManagedBufferHandle, y: Self::ManagedBufferHandle) -> Ordering {
         unsafe { bigFloatCmp(x, y).cmp(&0) }
     }
 
-    fn bf_sign(&self, x: Handle) -> Sign {
+    fn bf_sign(&self, x: Self::ManagedBufferHandle) -> Sign {
         unsafe {
             match bigFloatSign(x).cmp(&0) {
                 Ordering::Greater => Sign::Plus,
@@ -98,33 +117,43 @@ impl BigFloatApi for crate::VmApiImpl {
 
     unary_op_wrapper! {bf_clone, bigFloatClone}
     unary_op_wrapper! {bf_sqrt, bigFloatSqrt}
-    binary_op_wrapper! {bf_pow, bigFloatPow}
 
-    unary_op_wrapper! {bf_floor , bigFloatFloor}
-    unary_op_wrapper! {bf_ceil , bigFloatCeil}
-    unary_op_wrapper! {bf_trunc , bigFloatTruncate}
+    fn bf_pow(&self, dest: Self::BigFloatHandle, x: Self::BigFloatHandle, exp: i32) {
+        unsafe {
+            bigFloatPow(dest, x, exp);
+        }
+    }
+
+    unary_op_method_big_int_handle! {bf_floor , bigFloatFloor}
+    unary_op_method_big_int_handle! {bf_ceil , bigFloatCeil}
+    unary_op_method_big_int_handle! {bf_trunc , bigFloatTruncate}
 
     #[inline]
-    fn bf_is_bi(&self, x: Handle) -> bool {
+    fn bf_is_bi(&self, x: Self::BigFloatHandle) -> bool {
         unsafe { 1 == bigFloatIsInt(x) }
     }
 
     #[inline]
-    fn bf_set_i64(&self, dest: Handle, value: i64) {
+    fn bf_set_i64(&self, dest: Self::BigFloatHandle, value: i64) {
         unsafe {
             bigFloatSetInt64(dest, value);
         }
     }
 
-    unary_op_wrapper! {bf_set_bi, bigFloatSetBigInt}
+    #[inline]
+    fn bf_set_bi(&self, dest: Self::BigFloatHandle, x: Self::BigIntHandle) {
+        unsafe {
+            bigFloatSetBigInt(dest, x);
+        }
+    }
 
     #[inline]
-    fn bf_get_const_e(&self, dest: Handle) {
+    fn bf_get_const_e(&self, dest: Self::BigFloatHandle) {
         unsafe { bigFloatGetConstE(dest) }
     }
 
     #[inline]
-    fn bf_get_const_pi(&self, dest: Handle) {
+    fn bf_get_const_pi(&self, dest: Self::BigFloatHandle) {
         unsafe { bigFloatGetConstPi(dest) }
     }
 }

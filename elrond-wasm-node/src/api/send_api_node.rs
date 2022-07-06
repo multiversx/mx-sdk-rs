@@ -1,7 +1,4 @@
-use crate::{
-    api::managed_types::big_int_api_node::unsafe_buffer_load_be_pad_right,
-    elrond_wasm::api::Handle, VmApiImpl,
-};
+use crate::{api::managed_types::big_int_api_node::unsafe_buffer_load_be_pad_right, VmApiImpl};
 use alloc::vec::Vec;
 use elrond_wasm::{
     api::{const_handles, ManagedTypeApi, SendApi, SendApiImpl, StaticVarApiImpl},
@@ -267,7 +264,7 @@ extern "C" {
     fn deleteFromReturnData(resultID: i32);
 }
 
-unsafe fn code_metadata_to_buffer_handle(code_metadata: CodeMetadata) -> Handle {
+unsafe fn code_metadata_to_buffer_handle(code_metadata: CodeMetadata) -> i32 {
     let code_metadata_bytes = code_metadata.to_byte_array();
     mBufferNewFromBytes(
         code_metadata_bytes.as_ptr(),

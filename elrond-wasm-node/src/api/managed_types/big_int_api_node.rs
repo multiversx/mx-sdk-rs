@@ -3,7 +3,7 @@ use core::cmp::Ordering;
 use crate::{api::unsafe_buffer, error_hook};
 
 use elrond_wasm::{
-    api::{BigIntApi, Handle, Sign},
+    api::{BigIntApi, Sign},
     err_msg,
     types::heap::BoxedBytes,
 };
@@ -49,7 +49,12 @@ extern "C" {
 
 macro_rules! binary_op_wrapper {
     ($method_name:ident, $hook_name:ident) => {
-        fn $method_name(&self, dest: Handle, x: Handle, y: Handle) {
+        fn $method_name(
+            &self,
+            dest: Self::BigIntHandle,
+            x: Self::BigIntHandle,
+            y: Self::BigIntHandle,
+        ) {
             unsafe {
                 $hook_name(dest, x, y);
             }
@@ -59,7 +64,7 @@ macro_rules! binary_op_wrapper {
 
 macro_rules! unary_op_wrapper {
     ($method_name:ident, $hook_name:ident) => {
-        fn $method_name(&self, dest: Handle, x: Handle) {
+        fn $method_name(&self, dest: Self::BigIntHandle, x: Self::BigIntHandle) {
             unsafe {
                 $hook_name(dest, x);
             }
@@ -69,23 +74,23 @@ macro_rules! unary_op_wrapper {
 
 impl BigIntApi for crate::VmApiImpl {
     #[inline]
-    fn bi_new(&self, value: i64) -> Handle {
+    fn bi_new(&self, value: i64) -> Self::BigIntHandle {
         unsafe { bigIntNew(value) }
     }
 
     #[inline]
-    fn bi_set_int64(&self, destination: Handle, value: i64) {
+    fn bi_set_int64(&self, destination: Self::BigIntHandle, value: i64) {
         unsafe {
             bigIntSetInt64(destination, value);
         }
     }
 
     #[inline]
-    fn bi_unsigned_byte_length(&self, x: Handle) -> usize {
+    fn bi_unsigned_byte_length(&self, x: Self::BigIntHandle) -> usize {
         unsafe { bigIntUnsignedByteLength(x) as usize }
     }
 
-    fn bi_get_unsigned_bytes(&self, handle: Handle) -> BoxedBytes {
+    fn bi_get_unsigned_bytes(&self, handle: Self::BigIntHandle) -> BoxedBytes {
         unsafe {
             let byte_len = bigIntUnsignedByteLength(handle);
             let mut bb = BoxedBytes::allocate(byte_len as usize);
@@ -95,16 +100,16 @@ impl BigIntApi for crate::VmApiImpl {
     }
 
     #[inline]
-    fn bi_set_unsigned_bytes(&self, destination: Handle, bytes: &[u8]) {
+    fn bi_set_unsigned_bytes(&self, destination: Self::BigIntHandle, bytes: &[u8]) {
         unsafe { bigIntSetUnsignedBytes(destination, bytes.as_ptr(), bytes.len() as i32) }
     }
 
     #[inline]
-    fn bi_signed_byte_length(&self, x: Handle) -> usize {
+    fn bi_signed_byte_length(&self, x: Self::BigIntHandle) -> usize {
         unsafe { bigIntSignedByteLength(x) as usize }
     }
 
-    fn bi_get_signed_bytes(&self, handle: Handle) -> BoxedBytes {
+    fn bi_get_signed_bytes(&self, handle: Self::BigIntHandle) -> BoxedBytes {
         unsafe {
             let byte_len = bigIntSignedByteLength(handle);
             let mut bb = BoxedBytes::allocate(byte_len as usize);
@@ -114,11 +119,11 @@ impl BigIntApi for crate::VmApiImpl {
     }
 
     #[inline]
-    fn bi_set_signed_bytes(&self, destination: Handle, bytes: &[u8]) {
+    fn bi_set_signed_bytes(&self, destination: Self::BigIntHandle, bytes: &[u8]) {
         unsafe { bigIntSetSignedBytes(destination, bytes.as_ptr(), bytes.len() as i32) }
     }
 
-    fn bi_to_i64(&self, reference: Handle) -> Option<i64> {
+    fn bi_to_i64(&self, reference: Self::BigIntHandle) -> Option<i64> {
         unsafe {
             let is_i64_result = bigIntIsInt64(reference);
             if is_i64_result > 0 {
@@ -132,7 +137,12 @@ impl BigIntApi for crate::VmApiImpl {
     binary_op_wrapper! {bi_add, bigIntAdd}
     binary_op_wrapper! {bi_sub, bigIntSub}
 
-    fn bi_sub_unsigned(&self, dest: Handle, x: Handle, y: Handle) {
+    fn bi_sub_unsigned(
+        &self,
+        dest: Self::BigIntHandle,
+        x: Self::BigIntHandle,
+        y: Self::BigIntHandle,
+    ) {
         unsafe {
             bigIntSub(dest, x, y);
             if bigIntSign(dest) < 0 {
@@ -148,7 +158,7 @@ impl BigIntApi for crate::VmApiImpl {
     unary_op_wrapper! {bi_abs, bigIntAbs}
     unary_op_wrapper! {bi_neg, bigIntNeg}
 
-    fn bi_sign(&self, x: Handle) -> Sign {
+    fn bi_sign(&self, x: Self::BigIntHandle) -> Sign {
         unsafe {
             match bigIntSign(x).cmp(&0) {
                 Ordering::Greater => Sign::Plus,
@@ -159,14 +169,14 @@ impl BigIntApi for crate::VmApiImpl {
     }
 
     #[inline]
-    fn bi_cmp(&self, x: Handle, y: Handle) -> Ordering {
+    fn bi_cmp(&self, x: Self::BigIntHandle, y: Self::BigIntHandle) -> Ordering {
         unsafe { bigIntCmp(x, y).cmp(&0) }
     }
 
     unary_op_wrapper! {bi_sqrt, bigIntSqrt}
     binary_op_wrapper! {bi_pow, bigIntPow}
 
-    fn bi_log2(&self, x: Handle) -> u32 {
+    fn bi_log2(&self, x: Self::BigIntHandle) -> u32 {
         unsafe { bigIntLog2(x) as u32 }
     }
 
@@ -174,19 +184,23 @@ impl BigIntApi for crate::VmApiImpl {
     binary_op_wrapper! {bi_or, bigIntOr}
     binary_op_wrapper! {bi_xor, bigIntXor}
 
-    fn bi_shr(&self, dest: Handle, x: Handle, bits: usize) {
+    fn bi_shr(&self, dest: Self::BigIntHandle, x: Self::BigIntHandle, bits: usize) {
         unsafe {
             bigIntShr(dest, x, bits as i32);
         }
     }
 
-    fn bi_shl(&self, dest: Handle, x: Handle, bits: usize) {
+    fn bi_shl(&self, dest: Self::BigIntHandle, x: Self::BigIntHandle, bits: usize) {
         unsafe {
             bigIntShl(dest, x, bits as i32);
         }
     }
 
-    fn bi_to_string(&self, bi_handle: Handle, result_handle: Handle) {
+    fn bi_to_string(
+        &self,
+        bi_handle: Self::BigIntHandle,
+        result_handle: Self::ManagedBufferHandle,
+    ) {
         unsafe {
             bigIntToString(bi_handle, result_handle);
         }
@@ -194,10 +208,7 @@ impl BigIntApi for crate::VmApiImpl {
 }
 
 #[allow(unused)]
-pub(crate) unsafe fn unsafe_buffer_load_be_pad_right(
-    bi_handle: Handle,
-    nr_bytes: usize,
-) -> *const u8 {
+pub(crate) unsafe fn unsafe_buffer_load_be_pad_right(bi_handle: i32, nr_bytes: usize) -> *const u8 {
     let byte_len = bigIntUnsignedByteLength(bi_handle) as usize;
     if byte_len > nr_bytes {
         error_hook::signal_error(err_msg::BIG_UINT_EXCEEDS_SLICE);

@@ -1,4 +1,4 @@
-use crate::api::{endpoint_arg_api::EndpointArgumentApiImpl, EndpointArgumentApi, Handle};
+use crate::api::{endpoint_arg_api::EndpointArgumentApiImpl, EndpointArgumentApi};
 
 use super::UncallableApi;
 
@@ -15,7 +15,7 @@ impl EndpointArgumentApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn load_argument_managed_buffer(&self, _arg_id: i32, _dest: Handle) {
+    fn load_argument_managed_buffer(&self, _arg_id: i32, _dest: Self::ManagedBufferHandle) {
         unreachable!()
     }
 }

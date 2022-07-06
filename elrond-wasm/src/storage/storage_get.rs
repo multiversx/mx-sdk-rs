@@ -2,8 +2,8 @@ use core::marker::PhantomData;
 
 use crate::{
     api::{
-        const_handles, ErrorApi, ErrorApiImpl, ManagedBufferApi, ManagedTypeApi, StaticVarApiImpl,
-        StorageReadApi, StorageReadApiImpl,
+        const_handles, use_raw_handle, ErrorApi, ErrorApiImpl, ManagedBufferApi, ManagedTypeApi,
+        StaticVarApiImpl, StorageReadApi, StorageReadApiImpl,
     },
     err_msg,
     types::{
@@ -34,8 +34,8 @@ where
     fn to_managed_buffer(&self) -> ManagedBuffer<A> {
         let mbuf_handle = A::static_var_api_impl().next_handle();
         A::storage_read_api_impl()
-            .storage_load_managed_buffer_raw(self.key.buffer.get_raw_handle(), mbuf_handle);
-        ManagedBuffer::from_raw_handle(mbuf_handle)
+            .storage_load_managed_buffer_raw(self.key.buffer.get_handle(), mbuf_handle);
+        ManagedBuffer::from_handle(mbuf_handle)
     }
 
     fn to_big_uint(&self) -> BigUint<A> {
@@ -47,9 +47,9 @@ where
     }
 
     fn load_len_managed_buffer(&self) -> usize {
-        let value_handle = const_handles::MBUF_TEMPORARY_1;
+        let value_handle = use_raw_handle(const_handles::MBUF_TEMPORARY_1);
         A::storage_read_api_impl()
-            .storage_load_managed_buffer_raw(self.key.buffer.get_raw_handle(), value_handle);
+            .storage_load_managed_buffer_raw(self.key.buffer.get_handle(), value_handle);
         A::managed_type_impl().mb_len(value_handle)
     }
 }
@@ -126,8 +126,8 @@ pub fn storage_get_len<A>(key: ManagedRef<'_, A, StorageKey<A>>) -> usize
 where
     A: StorageReadApi + ManagedTypeApi + ErrorApi,
 {
-    let value_handle = const_handles::MBUF_TEMPORARY_1;
-    A::storage_read_api_impl().storage_load_managed_buffer_raw(key.get_raw_handle(), value_handle);
+    let value_handle = use_raw_handle(const_handles::MBUF_TEMPORARY_1);
+    A::storage_read_api_impl().storage_load_managed_buffer_raw(key.get_handle(), value_handle);
     A::managed_type_impl().mb_len(value_handle)
 }
 
@@ -164,6 +164,6 @@ where
     fn handle_error(&self, err: DecodeError) -> Self::HandledErr {
         let mut message_buffer = ManagedBuffer::<M>::new_from_bytes(err_msg::STORAGE_DECODE_ERROR);
         message_buffer.append_bytes(err.message_bytes());
-        M::error_api_impl().signal_error_from_buffer(message_buffer.get_raw_handle())
+        M::error_api_impl().signal_error_from_buffer(message_buffer.get_handle())
     }
 }

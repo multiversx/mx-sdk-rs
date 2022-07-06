@@ -1,5 +1,5 @@
 use super::VmApiImpl;
-use elrond_wasm::api::{EndpointFinishApi, EndpointFinishApiImpl, Handle};
+use elrond_wasm::api::{EndpointFinishApi, EndpointFinishApiImpl};
 
 extern "C" {
     fn finish(dataOffset: *const u8, length: i32);
@@ -36,21 +36,21 @@ impl EndpointFinishApiImpl for VmApiImpl {
     }
 
     #[inline]
-    fn finish_big_int_raw(&self, handle: i32) {
+    fn finish_big_int_raw(&self, handle: Self::BigIntHandle) {
         unsafe {
             bigIntFinishSigned(handle);
         }
     }
 
     #[inline]
-    fn finish_big_uint_raw(&self, handle: i32) {
+    fn finish_big_uint_raw(&self, handle: Self::BigIntHandle) {
         unsafe {
             bigIntFinishUnsigned(handle);
         }
     }
 
     #[inline]
-    fn finish_managed_buffer_raw(&self, handle: Handle) {
+    fn finish_managed_buffer_raw(&self, handle: Self::ManagedBufferHandle) {
         unsafe {
             mBufferFinish(handle);
         }

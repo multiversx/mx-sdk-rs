@@ -1,13 +1,13 @@
 use crate::num_bigint::BigInt;
-use elrond_wasm::api::{const_handles, Handle};
+use elrond_wasm::api::{const_handles, use_raw_handle, HandleConstraints, RawHandle};
 use std::collections::HashMap;
 
 type ManagedBufferImpl = Vec<u8>;
 
 #[derive(Debug)]
 pub struct HandleMap<V> {
-    next_handle: Handle,
-    pub map: HashMap<Handle, V>,
+    next_handle: RawHandle,
+    pub map: HashMap<RawHandle, V>,
 }
 
 impl<V> HandleMap<V> {
@@ -26,29 +26,29 @@ impl<V> Default for HandleMap<V> {
 }
 
 impl<V> HandleMap<V> {
-    pub fn insert_new_handle(&mut self, value: V) -> Handle {
+    pub fn insert_new_handle<H: HandleConstraints>(&mut self, value: V) -> H {
         let new_handle = self.next_handle;
         self.map.insert(new_handle, value);
         self.next_handle += 1;
-        new_handle
+        use_raw_handle(new_handle)
     }
 
-    pub fn get(&self, handle: Handle) -> &V {
+    pub fn get<H: HandleConstraints>(&self, handle: H) -> &V {
         // TODO: consider simulating the actual error from the VM
         self.map
-            .get(&handle)
+            .get(&handle.get_raw_handle())
             .unwrap_or_else(|| panic!("handle not found"))
     }
 
-    pub fn get_mut(&mut self, handle: Handle) -> &mut V {
+    pub fn get_mut<H: HandleConstraints>(&mut self, handle: H) -> &mut V {
         // TODO: consider simulating the actual error from the VM
         self.map
-            .get_mut(&handle)
+            .get_mut(&handle.get_raw_handle())
             .unwrap_or_else(|| panic!("handle not found"))
     }
 
-    pub fn insert(&mut self, handle: Handle, value: V) {
-        let _ = self.map.insert(handle, value);
+    pub fn insert<H: HandleConstraints>(&mut self, handle: H, value: V) {
+        let _ = self.map.insert(handle.get_raw_handle(), value);
     }
 }
 
@@ -77,11 +77,11 @@ impl Default for TxManagedTypes {
 
 #[derive(Debug)]
 pub struct TxStaticVars {
-    pub(crate) external_view_target_address_handle: Handle,
-    pub(crate) next_handle: Handle,
+    pub(crate) external_view_target_address_handle: RawHandle,
+    pub(crate) next_handle: RawHandle,
     pub(crate) num_arguments: i32,
-    pub(crate) call_value_egld_handle: Handle,
-    pub(crate) call_value_multi_esdt_handle: Handle,
+    pub(crate) call_value_egld_handle: RawHandle,
+    pub(crate) call_value_multi_esdt_handle: RawHandle,
 }
 
 impl Default for TxStaticVars {

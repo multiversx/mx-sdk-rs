@@ -77,10 +77,10 @@ pub trait StorageLoadFeatures {
         };
         let value_handle = Self::Api::static_var_api_impl().next_handle();
         Self::Api::storage_read_api_impl().storage_load_from_address(
-            address.get_raw_handle(),
-            key.get_raw_handle(),
+            address.get_handle(),
+            key.get_handle(),
             value_handle,
         );
-        ManagedBuffer::from_raw_handle(value_handle)
+        ManagedBuffer::from_handle(value_handle)
     }
 }

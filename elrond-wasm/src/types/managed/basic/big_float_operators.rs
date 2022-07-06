@@ -12,7 +12,7 @@ macro_rules! binary_operator {
 
             fn $method(self, other: BigFloat<M>) -> BigFloat<M> {
                 M::managed_type_impl().$api_func(self.handle, self.handle, other.handle);
-                BigFloat::from_raw_handle(self.handle)
+                BigFloat::from_handle(self.handle)
             }
         }
 
@@ -22,7 +22,7 @@ macro_rules! binary_operator {
             fn $method(self, other: &BigFloat<M>) -> BigFloat<M> {
                 let result_handle = M::static_var_api_impl().next_handle();
                 M::managed_type_impl().$api_func(result_handle, self.handle, other.handle);
-                BigFloat::from_raw_handle(result_handle)
+                BigFloat::from_handle(result_handle)
             }
         }
     };
@@ -64,6 +64,6 @@ impl<M: ManagedTypeApi> Neg for BigFloat<M> {
     fn neg(self) -> Self::Output {
         let result_handle = M::static_var_api_impl().next_handle();
         M::managed_type_impl().bf_neg(result_handle, self.handle);
-        BigFloat::from_raw_handle(result_handle)
+        BigFloat::from_handle(result_handle)
     }
 }

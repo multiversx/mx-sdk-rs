@@ -1,9 +1,6 @@
 use super::UncallableApi;
 use crate::{
-    api::{
-        CryptoApi, CryptoApiImpl, Handle, KECCAK256_RESULT_LEN, RIPEMD_RESULT_LEN,
-        SHA256_RESULT_LEN,
-    },
+    api::{CryptoApi, CryptoApiImpl, KECCAK256_RESULT_LEN, RIPEMD_RESULT_LEN, SHA256_RESULT_LEN},
     types::{heap::BoxedBytes, MessageHashType},
 };
 
@@ -20,7 +17,11 @@ impl CryptoApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn sha256_managed(&self, _dest: Handle, _data_handle: Handle) {
+    fn sha256_managed(
+        &self,
+        _dest: Self::ManagedBufferHandle,
+        _data_handle: Self::ManagedBufferHandle,
+    ) {
         unreachable!()
     }
 
@@ -28,7 +29,11 @@ impl CryptoApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn keccak256_managed(&self, _dest: Handle, _data_handle: Handle) {
+    fn keccak256_managed(
+        &self,
+        _dest: Self::ManagedBufferHandle,
+        _data_handle: Self::ManagedBufferHandle,
+    ) {
         unreachable!()
     }
 
@@ -36,7 +41,11 @@ impl CryptoApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn ripemd160_managed(&self, _dest: Handle, _data_handle: Handle) {
+    fn ripemd160_managed(
+        &self,
+        _dest: Self::ManagedBufferHandle,
+        _data_handle: Self::ManagedBufferHandle,
+    ) {
         unreachable!()
     }
 
@@ -44,7 +53,12 @@ impl CryptoApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn verify_bls_managed(&self, _key: Handle, _message: Handle, _signature: Handle) -> bool {
+    fn verify_bls_managed(
+        &self,
+        _key: Self::ManagedBufferHandle,
+        _message: Self::ManagedBufferHandle,
+        _signature: Self::ManagedBufferHandle,
+    ) -> bool {
         unreachable!()
     }
 
@@ -52,7 +66,12 @@ impl CryptoApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn verify_ed25519_managed(&self, _key: Handle, _message: Handle, _signature: Handle) -> bool {
+    fn verify_ed25519_managed(
+        &self,
+        _key: Self::ManagedBufferHandle,
+        _message: Self::ManagedBufferHandle,
+        _signature: Self::ManagedBufferHandle,
+    ) -> bool {
         unreachable!()
     }
 
@@ -60,7 +79,12 @@ impl CryptoApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn verify_secp256k1_managed(&self, _key: Handle, _message: Handle, _signature: Handle) -> bool {
+    fn verify_secp256k1_managed(
+        &self,
+        _key: Self::ManagedBufferHandle,
+        _message: Self::ManagedBufferHandle,
+        _signature: Self::ManagedBufferHandle,
+    ) -> bool {
         unreachable!()
     }
 
@@ -76,9 +100,9 @@ impl CryptoApiImpl for UncallableApi {
 
     fn verify_custom_secp256k1_managed(
         &self,
-        _key: Handle,
-        _message: Handle,
-        _signature: Handle,
+        _key: Self::ManagedBufferHandle,
+        _message: Self::ManagedBufferHandle,
+        _signature: Self::ManagedBufferHandle,
         _hash_type: MessageHashType,
     ) -> bool {
         unreachable!()
@@ -88,7 +112,12 @@ impl CryptoApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn encode_secp256k1_der_signature_managed(&self, _r: Handle, _s: Handle, _dest: Handle) {
+    fn encode_secp256k1_der_signature_managed(
+        &self,
+        _r: Self::ManagedBufferHandle,
+        _s: Self::ManagedBufferHandle,
+        _dest: Self::ManagedBufferHandle,
+    ) {
         unreachable!()
     }
 }

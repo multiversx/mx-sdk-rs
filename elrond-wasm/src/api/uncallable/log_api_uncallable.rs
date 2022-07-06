@@ -1,5 +1,5 @@
 use crate::{
-    api::{Handle, LogApi, LogApiImpl},
+    api::{LogApi, LogApiImpl},
     types::heap::ArgBuffer,
 };
 
@@ -22,7 +22,11 @@ impl LogApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn managed_write_log(&self, _topics_handle: Handle, _data_handle: Handle) {
+    fn managed_write_log(
+        &self,
+        _topics_handle: Self::ManagedBufferHandle,
+        _data_handle: Self::ManagedBufferHandle,
+    ) {
         unreachable!()
     }
 }

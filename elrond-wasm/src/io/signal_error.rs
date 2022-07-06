@@ -14,5 +14,5 @@ where
     message_buffer.append_bytes(arg_id.as_bytes());
     message_buffer.append_bytes(err_msg::ARG_DECODE_ERROR_2);
     message_buffer.append_bytes(decode_err.message_bytes());
-    EA::error_api_impl().signal_error_from_buffer(message_buffer.get_raw_handle())
+    EA::error_api_impl().signal_error_from_buffer(message_buffer.get_handle())
 }

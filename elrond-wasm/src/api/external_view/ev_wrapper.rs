@@ -4,8 +4,8 @@ use crate::{
     abi::EndpointLocationAbi,
     api::{
         BlockchainApi, CallTypeApi, CallValueApi, CryptoApi, EndpointArgumentApi,
-        EndpointFinishApi, ErrorApi, LogApi, ManagedTypeApi, PrintApi, SendApi, StaticVarApi,
-        StorageMapperApi, StorageWriteApi, VMApi,
+        EndpointFinishApi, ErrorApi, HandleTypeInfo, LogApi, ManagedTypeApi, PrintApi, SendApi,
+        StaticVarApi, StorageMapperApi, StorageWriteApi, VMApi,
     },
 };
 
@@ -22,6 +22,19 @@ impl<A: VMApi> ExternalViewApi<A> {
     }
 }
 
+impl<A> HandleTypeInfo for ExternalViewApi<A>
+where
+    A: VMApi,
+{
+    type ManagedBufferHandle = <A as HandleTypeInfo>::ManagedBufferHandle;
+
+    type BigIntHandle = <A as HandleTypeInfo>::BigIntHandle;
+
+    type BigFloatHandle = <A as HandleTypeInfo>::BigFloatHandle;
+
+    type EllipticCurveHandle = <A as HandleTypeInfo>::EllipticCurveHandle;
+}
+
 impl<A> BlockchainApi for ExternalViewApi<A>
 where
     A: VMApi,
@@ -33,7 +46,10 @@ where
     }
 }
 
-impl<A: VMApi> CallValueApi for ExternalViewApi<A> {
+impl<A> CallValueApi for ExternalViewApi<A>
+where
+    A: VMApi,
+{
     type CallValueApiImpl = A::CallValueApiImpl;
 
     fn call_value_api_impl() -> Self::CallValueApiImpl {
@@ -41,7 +57,10 @@ impl<A: VMApi> CallValueApi for ExternalViewApi<A> {
     }
 }
 
-impl<A: VMApi> CryptoApi for ExternalViewApi<A> {
+impl<A> CryptoApi for ExternalViewApi<A>
+where
+    A: VMApi,
+{
     type CryptoApiImpl = A::CryptoApiImpl;
 
     fn crypto_api_impl() -> Self::CryptoApiImpl {
@@ -49,7 +68,10 @@ impl<A: VMApi> CryptoApi for ExternalViewApi<A> {
     }
 }
 
-impl<A: VMApi> EndpointArgumentApi for ExternalViewApi<A> {
+impl<A> EndpointArgumentApi for ExternalViewApi<A>
+where
+    A: VMApi,
+{
     type EndpointArgumentApiImpl = A::EndpointArgumentApiImpl;
 
     fn argument_api_impl() -> Self::EndpointArgumentApiImpl {
@@ -57,7 +79,10 @@ impl<A: VMApi> EndpointArgumentApi for ExternalViewApi<A> {
     }
 }
 
-impl<A: VMApi> EndpointFinishApi for ExternalViewApi<A> {
+impl<A> EndpointFinishApi for ExternalViewApi<A>
+where
+    A: VMApi,
+{
     type EndpointFinishApiImpl = A::EndpointFinishApiImpl;
 
     fn finish_api_impl() -> Self::EndpointFinishApiImpl {
@@ -65,7 +90,10 @@ impl<A: VMApi> EndpointFinishApi for ExternalViewApi<A> {
     }
 }
 
-impl<A: VMApi> ErrorApi for super::ExternalViewApi<A> {
+impl<A> ErrorApi for super::ExternalViewApi<A>
+where
+    A: VMApi,
+{
     type ErrorApiImpl = A::ErrorApiImpl;
 
     fn error_api_impl() -> Self::ErrorApiImpl {
@@ -73,7 +101,10 @@ impl<A: VMApi> ErrorApi for super::ExternalViewApi<A> {
     }
 }
 
-impl<A: VMApi> LogApi for ExternalViewApi<A> {
+impl<A> LogApi for ExternalViewApi<A>
+where
+    A: VMApi,
+{
     type LogApiImpl = A::LogApiImpl;
 
     fn log_api_impl() -> Self::LogApiImpl {
@@ -81,7 +112,10 @@ impl<A: VMApi> LogApi for ExternalViewApi<A> {
     }
 }
 
-impl<A: VMApi> ManagedTypeApi for ExternalViewApi<A> {
+impl<A> ManagedTypeApi for ExternalViewApi<A>
+where
+    A: VMApi,
+{
     type ManagedTypeApiImpl = A::ManagedTypeApiImpl;
 
     fn managed_type_impl() -> Self::ManagedTypeApiImpl {
@@ -89,7 +123,10 @@ impl<A: VMApi> ManagedTypeApi for ExternalViewApi<A> {
     }
 }
 
-impl<A: VMApi> PrintApi for ExternalViewApi<A> {
+impl<A> PrintApi for ExternalViewApi<A>
+where
+    A: VMApi,
+{
     type PrintApiImpl = A::PrintApiImpl;
 
     fn print_api_impl() -> Self::PrintApiImpl {
@@ -97,7 +134,10 @@ impl<A: VMApi> PrintApi for ExternalViewApi<A> {
     }
 }
 
-impl<A: VMApi> SendApi for ExternalViewApi<A> {
+impl<A> SendApi for ExternalViewApi<A>
+where
+    A: VMApi,
+{
     type SendApiImpl = A::SendApiImpl;
 
     fn send_api_impl() -> Self::SendApiImpl {
@@ -105,7 +145,10 @@ impl<A: VMApi> SendApi for ExternalViewApi<A> {
     }
 }
 
-impl<A: VMApi> StaticVarApi for ExternalViewApi<A> {
+impl<A> StaticVarApi for ExternalViewApi<A>
+where
+    A: VMApi,
+{
     type StaticVarApiImpl = A::StaticVarApiImpl;
 
     fn static_var_api_impl() -> Self::StaticVarApiImpl {
@@ -113,7 +156,10 @@ impl<A: VMApi> StaticVarApi for ExternalViewApi<A> {
     }
 }
 
-impl<A: VMApi> StorageWriteApi for ExternalViewApi<A> {
+impl<A> StorageWriteApi for ExternalViewApi<A>
+where
+    A: VMApi,
+{
     type StorageWriteApiImpl = A::StorageWriteApiImpl;
 
     fn storage_write_api_impl() -> Self::StorageWriteApiImpl {
@@ -121,20 +167,26 @@ impl<A: VMApi> StorageWriteApi for ExternalViewApi<A> {
     }
 }
 
-impl<A: VMApi> CallTypeApi for ExternalViewApi<A> {}
+impl<A> CallTypeApi for ExternalViewApi<A> where A: VMApi {}
 
-impl<A: VMApi> StorageMapperApi for ExternalViewApi<A> {}
+impl<A> StorageMapperApi for ExternalViewApi<A> where A: VMApi {}
 
-impl<A: VMApi> VMApi for ExternalViewApi<A> {
+impl<A> VMApi for ExternalViewApi<A>
+where
+    A: VMApi,
+{
     fn has_location(location: EndpointLocationAbi) -> bool {
         location == EndpointLocationAbi::ViewContract
     }
 }
 
-impl<A: VMApi> PartialEq for ExternalViewApi<A> {
+impl<A> PartialEq for ExternalViewApi<A>
+where
+    A: VMApi,
+{
     fn eq(&self, _: &Self) -> bool {
         true
     }
 }
 
-impl<A: VMApi> Eq for ExternalViewApi<A> {}
+impl<A> Eq for ExternalViewApi<A> where A: VMApi {}
