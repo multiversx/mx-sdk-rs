@@ -8,7 +8,7 @@ use elrond_wasm::{
 
 use crate::tx_mock::{TxContext, TxContextStack};
 
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub struct DebugHandle {
     pub(crate) context: Rc<TxContext>,
     raw_handle: RawHandle,
@@ -24,6 +24,12 @@ impl DebugHandle {
 
     pub(crate) fn get_raw_handle_unchecked(&self) -> RawHandle {
         self.raw_handle
+    }
+}
+
+impl core::fmt::Debug for DebugHandle {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        RawHandle::fmt(&self.raw_handle, f)
     }
 }
 
