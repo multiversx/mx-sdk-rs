@@ -45,7 +45,7 @@ where
     #[doc(hidden)]
     #[inline]
     pub fn get_raw_handle_of_ref(self) -> T::OwnHandle {
-        self.handle.clone()
+        self.handle
     }
 }
 
