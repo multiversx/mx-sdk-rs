@@ -131,6 +131,12 @@ impl<M: ManagedTypeApi> BigInt<M> {
     }
 
     #[inline]
+    pub fn set_i64(&self, value: i64) {
+        let api = M::managed_type_impl();
+        api.bi_set_int64(self.handle, value);
+    }
+
+    #[inline]
     pub fn from_signed_bytes_be(bytes: &[u8]) -> Self {
         let handle: M::BigIntHandle = M::static_var_api_impl().next_handle();
         M::managed_type_impl().bi_set_signed_bytes(handle.clone(), bytes);
