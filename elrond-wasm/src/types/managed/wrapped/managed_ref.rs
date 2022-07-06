@@ -45,15 +45,8 @@ where
     #[doc(hidden)]
     #[inline]
     pub fn get_raw_handle_of_ref(self) -> T::OwnHandle {
-        self.handle
+        self.handle.clone()
     }
-}
-
-impl<'a, M, T> Copy for ManagedRef<'a, M, T>
-where
-    M: ManagedTypeApi,
-    T: ManagedType<M>,
-{
 }
 
 impl<'a, M, T> Clone for ManagedRef<'a, M, T>
@@ -63,7 +56,11 @@ where
 {
     #[inline]
     fn clone(&self) -> Self {
-        *self
+        Self {
+            _phantom_m: PhantomData,
+            _phantom_t: PhantomData,
+            handle: self.handle.clone(),
+        }
     }
 }
 

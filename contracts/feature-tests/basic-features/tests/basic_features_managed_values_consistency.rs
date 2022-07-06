@@ -1,4 +1,4 @@
-use basic_features::{big_num_methods::BigIntMethods, BasicFeatures};
+use basic_features::BasicFeatures;
 use elrond_wasm::types::{BigUint, TokenIdentifier};
 use elrond_wasm_debug::{
     managed_biguint, rust_biguint, testing_framework::BlockchainStateWrapper, DebugApi,
