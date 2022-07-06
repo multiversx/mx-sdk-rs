@@ -66,4 +66,14 @@ pub trait ManagedVecFeatures {
     fn managed_vec_contains(&self, mv: ManagedVec<BigUint>, item: BigUint) -> bool {
         mv.contains(&item)
     }
+
+    #[endpoint]
+    fn managed_vec_array_push(
+        &self,
+        mut mv: ManagedVec<[u8; 5]>,
+        item: [u8; 5],
+    ) -> ManagedVec<[u8; 5]> {
+        mv.push(item);
+        mv
+    }
 }
