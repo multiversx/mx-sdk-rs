@@ -386,6 +386,33 @@ fn test_nft_balance() {
         .assert_ok();
 }
 
+#[should_panic]
+#[test]
+fn check_nft_zero_balance() {
+    let mut wrapper = BlockchainStateWrapper::new();
+    let sc_wrapper = wrapper.create_sc_account(
+        &rust_biguint!(0),
+        None,
+        rust_testing_framework_tester::contract_obj,
+        SC_WASM_PATH,
+    );
+    let token_id = &b"COOL-123456"[..];
+    let nft_nonce = 2;
+    let nft_balance = rust_biguint!(1_000);
+    let nft_attributes = NftDummyAttributes {
+        creation_epoch: 666,
+        cool_factor: 101,
+    };
+
+    wrapper.check_nft_balance(
+        sc_wrapper.address_ref(),
+        token_id,
+        nft_nonce,
+        &nft_balance,
+        Some(&nft_attributes),
+    );
+}
+
 #[test]
 fn test_sc_send_nft_to_user() {
     let mut wrapper = BlockchainStateWrapper::new();
