@@ -228,6 +228,28 @@ where
     }
 }
 
+impl<const N: usize> ManagedVecItem for [u8; N] {
+    const PAYLOAD_SIZE: usize = N;
+    const SKIPS_RESERIALIZATION: bool = true;
+    type Ref<'a> = Self;
+
+    fn from_byte_reader<Reader: FnMut(&mut [u8])>(mut reader: Reader) -> Self {
+        let mut array: [u8; N] = [0u8; N];
+        reader(&mut array[..]);
+        array
+    }
+
+    unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
+        reader: Reader,
+    ) -> Self::Ref<'a> {
+        Self::from_byte_reader(reader)
+    }
+
+    fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, mut writer: Writer) -> R {
+        writer(self.as_slice())
+    }
+}
+
 impl<M, T> ManagedVecItem for ManagedVec<M, T>
 where
     M: ManagedTypeApi,
