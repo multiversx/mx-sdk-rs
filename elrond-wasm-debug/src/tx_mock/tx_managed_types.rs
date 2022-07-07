@@ -33,22 +33,22 @@ impl<V> HandleMap<V> {
         use_raw_handle(new_handle)
     }
 
-    pub fn get<H: HandleConstraints>(&self, handle: H) -> &V {
+    pub fn get(&self, handle: RawHandle) -> &V {
         // TODO: consider simulating the actual error from the VM
         self.map
-            .get(&handle.get_raw_handle())
+            .get(&handle)
             .unwrap_or_else(|| panic!("handle not found"))
     }
 
-    pub fn get_mut<H: HandleConstraints>(&mut self, handle: H) -> &mut V {
+    pub fn get_mut(&mut self, handle: RawHandle) -> &mut V {
         // TODO: consider simulating the actual error from the VM
         self.map
-            .get_mut(&handle.get_raw_handle())
+            .get_mut(&handle)
             .unwrap_or_else(|| panic!("handle not found"))
     }
 
-    pub fn insert<H: HandleConstraints>(&mut self, handle: H, value: V) {
-        let _ = self.map.insert(handle.get_raw_handle(), value);
+    pub fn insert(&mut self, handle: RawHandle, value: V) {
+        let _ = self.map.insert(handle, value);
     }
 }
 
