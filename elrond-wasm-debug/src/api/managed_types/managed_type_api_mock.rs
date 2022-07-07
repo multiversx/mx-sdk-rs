@@ -57,8 +57,7 @@ impl ManagedTypeApiImpl for DebugApi {
         buffer_handle: Self::ManagedBufferHandle,
         dest: Self::BigFloatHandle,
     ) {
-        let managed_types = self.m_types_borrow_mut();
-        let mb_bytes = managed_types.managed_buffer_map.get(buffer_handle);
+        let mb_bytes = self.mb_get(buffer_handle);
         let float_bytes: [u8; 8] = mb_bytes
             .as_slice()
             .try_into()
@@ -72,8 +71,7 @@ impl ManagedTypeApiImpl for DebugApi {
         big_float_handle: Self::BigFloatHandle,
         dest: Self::ManagedBufferHandle,
     ) {
-        let managed_types = self.m_types_borrow_mut();
-        let bf = managed_types.big_float_map.get(big_float_handle);
+        let bf = self.bf_get_f64(big_float_handle);
         let bf_bytes = bf.to_be_bytes();
         self.mb_overwrite(dest, &bf_bytes[..]);
     }

@@ -21,13 +21,15 @@ impl StaticVarApiImpl for DebugApi {
     fn set_external_view_target_address_handle(&self, handle: Self::ManagedBufferHandle) {
         self.static_vars_cell
             .borrow_mut()
-            .external_view_target_address_handle = handle;
+            .external_view_target_address_handle = handle.get_raw_handle();
     }
 
     fn get_external_view_target_address_handle(&self) -> Self::ManagedBufferHandle {
-        self.static_vars_cell
-            .borrow()
-            .external_view_target_address_handle
+        use_raw_handle(
+            self.static_vars_cell
+                .borrow()
+                .external_view_target_address_handle,
+        )
     }
 
     fn next_handle<H: HandleConstraints>(&self) -> H {
@@ -46,20 +48,20 @@ impl StaticVarApiImpl for DebugApi {
     }
 
     fn set_call_value_egld_handle(&self, handle: Self::BigIntHandle) {
-        self.static_vars_cell.borrow_mut().call_value_egld_handle = handle;
+        self.static_vars_cell.borrow_mut().call_value_egld_handle = handle.get_raw_handle();
     }
 
     fn get_call_value_egld_handle(&self) -> Self::BigIntHandle {
-        self.static_vars_cell.borrow().call_value_egld_handle
+        use_raw_handle(self.static_vars_cell.borrow().call_value_egld_handle)
     }
 
     fn set_call_value_multi_esdt_handle(&self, handle: Self::ManagedBufferHandle) {
         self.static_vars_cell
             .borrow_mut()
-            .call_value_multi_esdt_handle = handle;
+            .call_value_multi_esdt_handle = handle.get_raw_handle();
     }
 
     fn get_call_value_multi_esdt_handle(&self) -> Self::ManagedBufferHandle {
-        self.static_vars_cell.borrow().call_value_multi_esdt_handle
+        use_raw_handle(self.static_vars_cell.borrow().call_value_multi_esdt_handle)
     }
 }

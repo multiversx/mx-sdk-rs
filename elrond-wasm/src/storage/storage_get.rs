@@ -32,9 +32,9 @@ where
     }
 
     fn to_managed_buffer(&self) -> ManagedBuffer<A> {
-        let mbuf_handle = A::static_var_api_impl().next_handle();
+        let mbuf_handle: A::ManagedBufferHandle = A::static_var_api_impl().next_handle();
         A::storage_read_api_impl()
-            .storage_load_managed_buffer_raw(self.key.buffer.get_handle(), mbuf_handle);
+            .storage_load_managed_buffer_raw(self.key.buffer.get_handle(), mbuf_handle.clone());
         ManagedBuffer::from_handle(mbuf_handle)
     }
 
@@ -47,9 +47,9 @@ where
     }
 
     fn load_len_managed_buffer(&self) -> usize {
-        let value_handle = use_raw_handle(const_handles::MBUF_TEMPORARY_1);
+        let value_handle: A::ManagedBufferHandle = use_raw_handle(const_handles::MBUF_TEMPORARY_1);
         A::storage_read_api_impl()
-            .storage_load_managed_buffer_raw(self.key.buffer.get_handle(), value_handle);
+            .storage_load_managed_buffer_raw(self.key.buffer.get_handle(), value_handle.clone());
         A::managed_type_impl().mb_len(value_handle)
     }
 }
@@ -126,8 +126,9 @@ pub fn storage_get_len<A>(key: ManagedRef<'_, A, StorageKey<A>>) -> usize
 where
     A: StorageReadApi + ManagedTypeApi + ErrorApi,
 {
-    let value_handle = use_raw_handle(const_handles::MBUF_TEMPORARY_1);
-    A::storage_read_api_impl().storage_load_managed_buffer_raw(key.get_handle(), value_handle);
+    let value_handle: A::ManagedBufferHandle = use_raw_handle(const_handles::MBUF_TEMPORARY_1);
+    A::storage_read_api_impl()
+        .storage_load_managed_buffer_raw(key.get_handle(), value_handle.clone());
     A::managed_type_impl().mb_len(value_handle)
 }
 

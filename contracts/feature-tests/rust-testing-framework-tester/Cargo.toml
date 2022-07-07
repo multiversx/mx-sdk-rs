@@ -13,6 +13,9 @@ features = [ "alloc" ]
 [dependencies.adder]
 path = "../../examples/adder"
 
+[dependencies.basic-features]
+path = "../../feature-tests/basic-features"
+
 [dev-dependencies.elrond-wasm-debug]
 version = "0.33.1"
 path = "../../../elrond-wasm-debug"

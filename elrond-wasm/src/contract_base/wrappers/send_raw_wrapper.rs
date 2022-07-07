@@ -526,8 +526,9 @@ where
         arg_buffer: &ManagedArgBuffer<A>,
     ) -> ManagedVec<A, ManagedBuffer<A>> {
         // account-level built-in function, so the destination address is the contract itself
-        let own_address_handle = use_raw_handle(const_handles::MBUF_TEMPORARY_1);
-        A::blockchain_api_impl().load_sc_address_managed(own_address_handle);
+        let own_address_handle: A::ManagedBufferHandle =
+            use_raw_handle(const_handles::MBUF_TEMPORARY_1);
+        A::blockchain_api_impl().load_sc_address_managed(own_address_handle.clone());
 
         let results = A::send_api_impl().execute_on_dest_context_raw(
             gas,

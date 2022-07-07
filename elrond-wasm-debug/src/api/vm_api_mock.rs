@@ -2,6 +2,8 @@ use elrond_wasm::api::{CallTypeApi, HandleTypeInfo, StorageMapperApi, VMApi};
 
 use crate::DebugApi;
 
+use super::debug_handle_mock::DebugHandle;
+
 impl CallTypeApi for DebugApi {}
 
 impl StorageMapperApi for DebugApi {}
@@ -15,8 +17,6 @@ impl PartialEq for DebugApi {
 impl Eq for DebugApi {}
 
 impl VMApi for DebugApi {}
-
-type DebugHandle = i32;
 
 impl HandleTypeInfo for DebugApi {
     type ManagedBufferHandle = DebugHandle;
