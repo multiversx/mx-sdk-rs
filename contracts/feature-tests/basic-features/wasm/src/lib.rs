@@ -29,7 +29,7 @@ elrond_wasm_node::wasm_endpoints! {
         big_uint_from_u64_2
         big_uint_to_u64
         big_uint_zero
-        biguint_set_i64
+        bigint_set_i64
         biguint_set_u64
         bit_and_assign_big_uint
         bit_and_assign_big_uint_ref
@@ -287,6 +287,9 @@ elrond_wasm_node::wasm_endpoints! {
         shr_big_uint_ref
         sqrt_big_uint
         sqrt_big_uint_ref
+        storage_read_from_address
+        storage_read_raw
+        storage_write_raw
         store_addr
         store_big_int
         store_big_uint
