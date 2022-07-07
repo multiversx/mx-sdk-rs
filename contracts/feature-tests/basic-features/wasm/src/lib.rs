@@ -29,8 +29,8 @@ elrond_wasm_node::wasm_endpoints! {
         big_uint_from_u64_2
         big_uint_to_u64
         big_uint_zero
-        bigint_set_i64
-        biguint_set_u64
+        bigint_overwrite_i64
+        biguint_overwrite_u64
         bit_and_assign_big_uint
         bit_and_assign_big_uint_ref
         bit_and_big_uint

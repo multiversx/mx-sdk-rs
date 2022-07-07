@@ -131,7 +131,7 @@ impl<M: ManagedTypeApi> BigInt<M> {
     }
 
     #[inline]
-    pub fn set_i64(&self, value: i64) {
+    pub fn overwrite_i64(&self, value: i64) {
         let api = M::managed_type_impl();
         api.bi_set_int64(self.handle.clone(), value);
     }
