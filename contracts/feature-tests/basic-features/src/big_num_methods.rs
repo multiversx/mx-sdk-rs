@@ -49,7 +49,7 @@ pub trait BigIntMethods {
 
     #[endpoint]
     fn biguint_set_u64(&self, bu: BigUint, small: u64) -> BigUint {
-        bu.set_u64(small);
+        bu.overwrite_u64(small);
         bu
     }
 
@@ -100,7 +100,7 @@ pub trait BigIntMethods {
 
     #[endpoint]
     fn bigint_set_i64(&self, bi: BigInt, small: i64) -> BigInt {
-        bi.set_i64(small);
+        bi.overwrite_i64(small);
         bi
     }
 
