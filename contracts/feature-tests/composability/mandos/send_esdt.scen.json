@@ -9,7 +9,7 @@
                     "nonce": "1000",
                     "balance": "0",
                     "esdt": {
-                        "str:BASIC-FEATUR": "1,000"
+                        "str:SENDESDT": "1,000"
                     },
                     "code": "file:../forwarder/output/forwarder.wasm"
                 },
@@ -28,7 +28,7 @@
                 "function": "send_esdt",
                 "arguments": [
                     "address:an_account",
-                    "str:BASIC-FEATUR",
+                    "str:SENDESDT",
                     "10000"
                 ],
                 "gasLimit": "50,000,000",
@@ -43,15 +43,15 @@
         },
         {
             "step": "scCall",
-            "txId": "without-message",
+            "txId": "send_esdt-ok",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
                 "function": "send_esdt",
                 "arguments": [
                     "address:an_account",
-                    "str:BASIC-FEATUR",
-                    "100"
+                    "str:SENDESDT",
+                    "200"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
@@ -64,43 +64,9 @@
                         "address": "sc:basic-features",
                         "endpoint": "str:ESDTTransfer",
                         "topics": [
-                            "str:BASIC-FEATUR",
+                            "str:SENDESDT",
                             "",
-                            "100",
-                            "address:an_account"
-                        ],
-                        "data": ""
-                    }
-                ]
-            }
-        },
-        {
-            "step": "scCall",
-            "txId": "with-message",
-            "tx": {
-                "from": "address:an_account",
-                "to": "sc:basic-features",
-                "function": "send_esdt",
-                "arguments": [
-                    "address:an_account",
-                    "str:BASIC-FEATUR",
-                    "100",
-                    "str:send tx message here"
-                ],
-                "gasLimit": "50,000,000",
-                "gasPrice": "0"
-            },
-            "expect": {
-                "out": [],
-                "status": "",
-                "logs": [
-                    {
-                        "address": "sc:basic-features",
-                        "endpoint": "str:ESDTTransfer",
-                        "topics": [
-                            "str:BASIC-FEATUR",
-                            "",
-                            "100",
+                            "200",
                             "address:an_account"
                         ],
                         "data": ""
@@ -115,7 +81,7 @@
                     "nonce": "1000",
                     "balance": "0",
                     "esdt": {
-                        "str:BASIC-FEATUR": "800"
+                        "str:SENDESDT": "800"
                     },
                     "storage": {},
                     "code": "file:../forwarder/output/forwarder.wasm"
@@ -124,7 +90,7 @@
                     "nonce": "*",
                     "balance": "0",
                     "esdt": {
-                        "str:BASIC-FEATUR": "200"
+                        "str:SENDESDT": "200"
                     },
                     "storage": {},
                     "code": ""

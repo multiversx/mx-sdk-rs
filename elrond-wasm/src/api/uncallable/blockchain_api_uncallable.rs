@@ -1,7 +1,7 @@
 use alloc::boxed::Box;
 
 use crate::{
-    api::{BlockchainApi, BlockchainApiImpl, Handle, ManagedTypeApi},
+    api::{BlockchainApi, BlockchainApiImpl, ManagedTypeApi},
     types::{
         heap::{Address, H256},
         EsdtTokenData, ManagedAddress, TokenIdentifier,
@@ -39,7 +39,7 @@ impl BlockchainApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn load_balance_legacy(&self, _dest: Handle, _address: &Address) {
+    fn load_balance_legacy(&self, _dest: Self::BigIntHandle, _address: &Address) {
         unreachable!()
     }
 
@@ -95,21 +95,25 @@ impl BlockchainApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn get_current_esdt_nft_nonce(&self, _address_handle: Handle, _token_id_handle: Handle) -> u64 {
+    fn get_current_esdt_nft_nonce(
+        &self,
+        _address_handle: Self::ManagedBufferHandle,
+        _token_id_handle: Self::ManagedBufferHandle,
+    ) -> u64 {
         unreachable!()
     }
 
     fn load_esdt_balance(
         &self,
-        _address_handle: Handle,
-        _token_id_handle: Handle,
+        _address_handle: Self::ManagedBufferHandle,
+        _token_id_handle: Self::ManagedBufferHandle,
         _nonce: u64,
-        _dest: Handle,
+        _dest: Self::BigIntHandle,
     ) {
         unreachable!()
     }
 
-    fn get_esdt_token_data<M: ManagedTypeApi>(
+    fn load_esdt_token_data<M: ManagedTypeApi>(
         &self,
         _address: &ManagedAddress<M>,
         _token: &TokenIdentifier<M>,
@@ -118,7 +122,7 @@ impl BlockchainApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn get_esdt_token_data_unmanaged<M: ManagedTypeApi>(
+    fn load_esdt_token_data_unmanaged<M: ManagedTypeApi>(
         &self,
         _address: &ManagedAddress<M>,
         _token: &TokenIdentifier<M>,
@@ -127,7 +131,27 @@ impl BlockchainApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn get_esdt_local_roles(&self, _token_id_handle: Handle) -> crate::types::EsdtLocalRoleFlags {
+    fn check_esdt_frozen(
+        &self,
+        _address_handle: Self::ManagedBufferHandle,
+        _token_id_handle: Self::ManagedBufferHandle,
+        _nonce: u64,
+    ) -> bool {
+        unreachable!()
+    }
+
+    fn check_esdt_paused(&self, _token_id_handle: Self::ManagedBufferHandle) -> bool {
+        unreachable!()
+    }
+
+    fn check_esdt_limited_transfer(&self, _token_id_handle: Self::ManagedBufferHandle) -> bool {
+        unreachable!()
+    }
+
+    fn load_esdt_local_roles(
+        &self,
+        _token_id_handle: Self::ManagedBufferHandle,
+    ) -> crate::types::EsdtLocalRoleFlags {
         unreachable!()
     }
 }

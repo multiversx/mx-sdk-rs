@@ -53,43 +53,43 @@
 #
 
 cd elrond-codec-derive
-cargo publish
+cargo publish || return 1
 cd ..
 
 sleep 20
 
 cd elrond-codec
-cargo publish
+cargo publish || return 1
 cd ..
 
 cd elrond-wasm-derive
-cargo publish
+cargo publish || return 1
 cd ..
 
 sleep 20
 
 cd elrond-wasm
-cargo publish
+cargo publish || return 1
 cd ..
 
 sleep 20
 
 cd mandos
-cargo publish
+cargo publish || return 1
 cd ..
 
 cd elrond-wasm-node
-cargo publish
+cargo publish || return 1
 cd ..
 
 cd elrond-wasm-debug
-cargo publish
+cargo publish || return 1
 cd ..
 
 cd elrond-wasm-output
-cargo publish
+cargo publish || return 1
 cd ..
 
 cd elrond-wasm-modules
-cargo publish
+cargo publish || return 1
 cd ..

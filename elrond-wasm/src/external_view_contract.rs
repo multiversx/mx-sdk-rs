@@ -1,7 +1,7 @@
 use crate::{
     api::{
-        const_handles, CallValueApiImpl, ManagedBufferApi, StorageWriteApiImpl, VMApi,
-        EXTERNAL_VIEW_TARGET_ADRESS_KEY,
+        const_handles, use_raw_handle, CallValueApiImpl, ManagedBufferApi, StorageWriteApiImpl,
+        VMApi, EXTERNAL_VIEW_TARGET_ADRESS_KEY,
     },
     io::load_endpoint_args,
     types::ManagedType,
@@ -18,8 +18,8 @@ where
         A,
         (crate::types::ManagedAddress<A>, ()),
     >(("target_contract_address", ()));
-    let key_handle = const_handles::MBUF_TEMPORARY_1;
-    A::managed_type_impl().mb_overwrite(key_handle, EXTERNAL_VIEW_TARGET_ADRESS_KEY);
+    let key_handle: A::ManagedBufferHandle = use_raw_handle(const_handles::MBUF_TEMPORARY_1);
+    A::managed_type_impl().mb_overwrite(key_handle.clone(), EXTERNAL_VIEW_TARGET_ADRESS_KEY);
     A::storage_write_api_impl()
-        .storage_store_managed_buffer_raw(key_handle, target_contract_address.get_raw_handle());
+        .storage_store_managed_buffer_raw(key_handle, target_contract_address.get_handle());
 }

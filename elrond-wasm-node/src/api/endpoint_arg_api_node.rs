@@ -1,6 +1,6 @@
 use crate::VmApiImpl;
 use elrond_wasm::{
-    api::{EndpointArgumentApi, EndpointArgumentApiImpl, Handle},
+    api::{EndpointArgumentApi, EndpointArgumentApiImpl},
     types::heap::BoxedBytes,
 };
 
@@ -44,7 +44,7 @@ impl EndpointArgumentApiImpl for VmApiImpl {
     }
 
     #[inline]
-    fn load_argument_managed_buffer(&self, arg_index: i32, dest: Handle) {
+    fn load_argument_managed_buffer(&self, arg_index: i32, dest: Self::ManagedBufferHandle) {
         unsafe {
             mBufferGetArgument(arg_index, dest);
         }
@@ -62,14 +62,14 @@ impl EndpointArgumentApiImpl for VmApiImpl {
     }
 
     #[inline]
-    fn load_argument_big_int_unsigned(&self, arg_index: i32, dest: Handle) {
+    fn load_argument_big_int_unsigned(&self, arg_index: i32, dest: Self::ManagedBufferHandle) {
         unsafe {
             bigIntGetUnsignedArgument(arg_index, dest);
         }
     }
 
     #[inline]
-    fn load_argument_big_int_signed(&self, arg_index: i32, dest: Handle) {
+    fn load_argument_big_int_signed(&self, arg_index: i32, dest: Self::ManagedBufferHandle) {
         unsafe {
             bigIntGetSignedArgument(arg_index, dest);
         }

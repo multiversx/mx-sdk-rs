@@ -5,7 +5,7 @@ use crate::{
 };
 use alloc::vec::Vec;
 use elrond_wasm::api::{
-    BigIntApi, Handle, ManagedBufferApi, StorageReadApi, StorageReadApiImpl, StorageWriteApi,
+    BigIntApi, ManagedBufferApi, StorageReadApi, StorageReadApiImpl, StorageWriteApi,
     StorageWriteApiImpl,
 };
 
@@ -35,19 +35,28 @@ impl StorageReadApiImpl for DebugApi {
         self.storage_load_vec_u8(key).into_boxed_slice()
     }
 
-    fn storage_load_big_uint_raw(&self, key: &[u8], dest: Handle) {
+    fn storage_load_big_uint_raw(&self, key: &[u8], dest: Self::ManagedBufferHandle) {
         let bytes = self.storage_load_vec_u8(key);
         let bi = BigInt::from_bytes_be(Sign::Plus, bytes.as_slice());
         self.bi_overwrite(dest, bi);
     }
 
-    fn storage_load_managed_buffer_raw(&self, key_handle: Handle, dest: Handle) {
+    fn storage_load_managed_buffer_raw(
+        &self,
+        key_handle: Self::ManagedBufferHandle,
+        dest: Self::ManagedBufferHandle,
+    ) {
         let key_bytes = self.mb_to_boxed_bytes(key_handle);
         let bytes = self.storage_load_vec_u8(key_bytes.as_slice());
         self.mb_overwrite(dest, bytes.as_slice());
     }
 
-    fn storage_load_from_address(&self, address_handle: Handle, key_handle: Handle, dest: Handle) {
+    fn storage_load_from_address(
+        &self,
+        address_handle: Self::ManagedBufferHandle,
+        key_handle: Self::ManagedBufferHandle,
+        dest: Self::ManagedBufferHandle,
+    ) {
         let address = elrond_wasm::types::heap::Address::from_slice(
             self.mb_to_boxed_bytes(address_handle).as_slice(),
         );
@@ -84,17 +93,21 @@ impl StorageWriteApiImpl for DebugApi {
         });
     }
 
-    fn storage_store_big_uint_raw(&self, key: &[u8], handle: i32) {
+    fn storage_store_big_uint_raw(&self, key: &[u8], handle: Self::BigIntHandle) {
         self.storage_store_slice_u8(key, self.bi_get_signed_bytes(handle).as_slice());
     }
 
-    fn storage_store_managed_buffer_raw(&self, key_handle: Handle, value_handle: Handle) {
+    fn storage_store_managed_buffer_raw(
+        &self,
+        key_handle: Self::ManagedBufferHandle,
+        value_handle: Self::ManagedBufferHandle,
+    ) {
         let key_bytes = self.mb_to_boxed_bytes(key_handle);
         let value_bytes = self.mb_to_boxed_bytes(value_handle);
         self.storage_store_slice_u8(key_bytes.as_slice(), value_bytes.as_slice());
     }
 
-    fn storage_store_managed_buffer_clear(&self, key_handle: Handle) {
+    fn storage_store_managed_buffer_clear(&self, key_handle: Self::ManagedBufferHandle) {
         let key_bytes = self.mb_to_boxed_bytes(key_handle);
         self.storage_store_slice_u8(key_bytes.as_slice(), &[]);
     }

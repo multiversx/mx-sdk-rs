@@ -5,6 +5,9 @@ on:
     types:
       - created
 
+permissions:
+  contents: write
+
 jobs:
   build:
     name: Upload release asset to ${{ github.ref }}

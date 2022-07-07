@@ -29,6 +29,7 @@ fn test_hash_set_simple() {
     set.insert(44);
     check_set(&set, vec![42, 43, 44]);
     assert_eq!(set.contains(&42), true);
+    assert_eq!(set.get_by_index(1), 42);
     assert_eq!(set.contains(&50), false);
 }
 

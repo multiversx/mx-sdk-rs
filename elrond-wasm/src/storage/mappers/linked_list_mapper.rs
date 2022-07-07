@@ -21,7 +21,7 @@ const NULL_ENTRY: u32 = 0;
 const INFO_IDENTIFIER: &[u8] = b".info";
 const NODE_IDENTIFIER: &[u8] = b".node";
 
-#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, PartialEq, Clone, Copy)]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, PartialEq, Eq, Clone, Copy)]
 pub struct LinkedListNode<T: NestedEncode + NestedDecode + TopEncode + TopDecode + Clone> {
     pub(crate) value: T,
     pub(crate) node_id: u32,
@@ -55,7 +55,7 @@ impl<T: NestedEncode + NestedDecode + TopEncode + TopDecode + Clone> LinkedListN
     }
 }
 
-#[derive(TopEncodeOrDefault, TopDecodeOrDefault, PartialEq, Clone, Copy)]
+#[derive(TopEncodeOrDefault, TopDecodeOrDefault, PartialEq, Eq, Clone, Copy)]
 pub struct LinkedListInfo {
     pub len: u32,
     pub front: u32,

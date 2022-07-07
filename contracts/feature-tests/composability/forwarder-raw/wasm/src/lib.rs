@@ -9,7 +9,6 @@ elrond_wasm_node::wasm_endpoints! {
     (
         callBack
         call_execute_on_dest_context
-        call_execute_on_dest_context_by_caller
         call_execute_on_dest_context_readonly
         call_execute_on_dest_context_twice
         call_execute_on_same_context

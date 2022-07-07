@@ -4,18 +4,18 @@ use super::EsdtLocalRoleFlags;
 use crate as elrond_wasm;
 use crate::{derive::TypeAbi, types::ManagedVecItem};
 
-const ESDT_ROLE_NONE: &[u8] = &[];
-const ESDT_ROLE_LOCAL_MINT: &[u8] = b"ESDTRoleLocalMint";
-const ESDT_ROLE_LOCAL_BURN: &[u8] = b"ESDTRoleLocalBurn";
-const ESDT_ROLE_NFT_CREATE: &[u8] = b"ESDTRoleNFTCreate";
-const ESDT_ROLE_NFT_ADD_QUANTITY: &[u8] = b"ESDTRoleNFTAddQuantity";
-const ESDT_ROLE_NFT_BURN: &[u8] = b"ESDTRoleNFTBurn";
-const ESDT_ROLE_NFT_ADD_URI: &[u8] = b"ESDTRoleNFTAddURI";
-const ESDT_ROLE_NFT_UPDATE_ATTRIBUTES: &[u8] = b"ESDTRoleNFTUpdateAttributes";
-const ESDT_ROLE_TRANSFER: &[u8] = b"ESDTRoleTransfer";
+static ESDT_ROLE_NONE: &[u8] = &[];
+static ESDT_ROLE_LOCAL_MINT: &[u8] = b"ESDTRoleLocalMint";
+static ESDT_ROLE_LOCAL_BURN: &[u8] = b"ESDTRoleLocalBurn";
+static ESDT_ROLE_NFT_CREATE: &[u8] = b"ESDTRoleNFTCreate";
+static ESDT_ROLE_NFT_ADD_QUANTITY: &[u8] = b"ESDTRoleNFTAddQuantity";
+static ESDT_ROLE_NFT_BURN: &[u8] = b"ESDTRoleNFTBurn";
+static ESDT_ROLE_NFT_ADD_URI: &[u8] = b"ESDTRoleNFTAddURI";
+static ESDT_ROLE_NFT_UPDATE_ATTRIBUTES: &[u8] = b"ESDTRoleNFTUpdateAttributes";
+static ESDT_ROLE_TRANSFER: &[u8] = b"ESDTTransferRole";
 
 #[derive(
-    TopDecode, TopEncode, NestedDecode, NestedEncode, TypeAbi, Clone, PartialEq, Debug, Copy,
+    TopDecode, TopEncode, NestedDecode, NestedEncode, TypeAbi, Clone, PartialEq, Eq, Debug, Copy,
 )]
 pub enum EsdtLocalRole {
     None,

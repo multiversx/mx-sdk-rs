@@ -70,6 +70,12 @@ where
         storage_get(self.item_index_key(value).as_ref())
     }
 
+    /// Get item at index from storage.
+    /// Index must be valid (1 <= index <= count).
+    pub fn get_by_index(&self, index: usize) -> T {
+        self.vec_mapper.get(index)
+    }
+
     fn set_index(&self, value: &T, index: usize) {
         storage_set(self.item_index_key(value).as_ref(), &index);
     }

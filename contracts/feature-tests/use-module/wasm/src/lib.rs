@@ -8,6 +8,7 @@ elrond_wasm_node::wasm_endpoints! {
     use_module
     (
         callBack
+        addMergeableTokensToWhitelist
         call_derived_not_owner_only
         call_mod_a
         call_mod_b
@@ -26,6 +27,8 @@ elrond_wasm_node::wasm_endpoints! {
         execute
         getGovernanceTokenId
         getLockTimeAfterVotingEndsInBlocks
+        getMergeableTokensWhitelist
+        getMergedTokenId
         getMinTokenBalanceForProposing
         getProposalActions
         getProposalDescription
@@ -36,15 +39,18 @@ elrond_wasm_node::wasm_endpoints! {
         getTotalVotes
         getVotingDelayInBlocks
         getVotingPeriodInBlocks
-        initGovernanceModule
         isPaused
+        issueMergedToken
         issueToken
+        mergeTokens
         only_owner_mod_endpoint
         pause
         propose
         queue
+        removeMergeableTokensFromWhitelist
         setFeatureFlag
         slashMember
+        splitTokens
         stake
         unpause
         unstake

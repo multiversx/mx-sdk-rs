@@ -18,7 +18,7 @@ pub trait RecursiveCaller {
     fn recursive_send_funds(
         &self,
         to: &ManagedAddress,
-        token_identifier: &TokenIdentifier,
+        token_identifier: &EgldOrEsdtTokenIdentifier,
         amount: &BigUint,
         counter: u32,
     ) {
@@ -27,7 +27,7 @@ pub trait RecursiveCaller {
         self.vault_proxy()
             .contract(to.clone())
             .accept_funds()
-            .add_token_transfer(token_identifier.clone(), 0, amount.clone())
+            .with_egld_or_single_esdt_token_transfer(token_identifier.clone(), 0, amount.clone())
             .async_call()
             .with_callback(self.callbacks().recursive_send_funds_callback(
                 to,
@@ -42,7 +42,7 @@ pub trait RecursiveCaller {
     fn recursive_send_funds_callback(
         &self,
         to: &ManagedAddress,
-        token_identifier: &TokenIdentifier,
+        token_identifier: &EgldOrEsdtTokenIdentifier,
         amount: &BigUint,
         counter: u32,
     ) {
@@ -61,7 +61,7 @@ pub trait RecursiveCaller {
     fn recursive_send_funds_event(
         &self,
         #[indexed] to: &ManagedAddress,
-        #[indexed] token_identifier: &TokenIdentifier,
+        #[indexed] token_identifier: &EgldOrEsdtTokenIdentifier,
         #[indexed] amount: &BigUint,
         counter: u32,
     );
@@ -70,7 +70,7 @@ pub trait RecursiveCaller {
     fn recursive_send_funds_callback_event(
         &self,
         #[indexed] to: &ManagedAddress,
-        #[indexed] token_identifier: &TokenIdentifier,
+        #[indexed] token_identifier: &EgldOrEsdtTokenIdentifier,
         #[indexed] amount: &BigUint,
         counter: u32,
     );

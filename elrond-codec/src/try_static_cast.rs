@@ -31,6 +31,7 @@ pub trait TryStaticCast: Sized + 'static {
 }
 
 impl TryStaticCast for () {}
+impl TryStaticCast for i32 {}
 
 fn type_eq<T, U>() -> bool
 where

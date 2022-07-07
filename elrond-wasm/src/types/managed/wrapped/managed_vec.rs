@@ -1,6 +1,6 @@
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
-    api::{ErrorApiImpl, Handle, InvalidSliceError, ManagedTypeApi},
+    api::{ErrorApiImpl, InvalidSliceError, ManagedTypeApi},
     types::{
         heap::{ArgBuffer, BoxedBytes},
         ManagedBuffer, ManagedBufferNestedDecodeInput, ManagedType, ManagedVecItem, ManagedVecRef,
@@ -35,19 +35,21 @@ where
     M: ManagedTypeApi,
     T: ManagedVecItem,
 {
+    type OwnHandle = M::ManagedBufferHandle;
+
     #[inline]
-    fn from_raw_handle(handle: Handle) -> Self {
+    fn from_handle(handle: M::ManagedBufferHandle) -> Self {
         ManagedVec {
-            buffer: ManagedBuffer::from_raw_handle(handle),
+            buffer: ManagedBuffer::from_handle(handle),
             _phantom: PhantomData,
         }
     }
 
-    fn get_raw_handle(&self) -> Handle {
-        self.buffer.get_raw_handle()
+    fn get_handle(&self) -> M::ManagedBufferHandle {
+        self.buffer.get_handle()
     }
 
-    fn transmute_from_handle_ref(handle_ref: &Handle) -> &Self {
+    fn transmute_from_handle_ref(handle_ref: &M::ManagedBufferHandle) -> &Self {
         unsafe { core::mem::transmute(handle_ref) }
     }
 }
@@ -136,6 +138,23 @@ where
         }
     }
 
+    /// Extracts all elements to an array, if the length matches exactly.
+    ///
+    /// The resulting array contains mere references to the items, as defined in `ManagedVecItem`.
+    pub fn to_array_of_refs<const N: usize>(&self) -> Option<[T::Ref<'_>; N]> {
+        if self.len() != N {
+            return None;
+        }
+
+        let mut result_uninit = core::mem::MaybeUninit::<T::Ref<'_>>::uninit_array();
+        for (index, value) in self.iter().enumerate() {
+            result_uninit[index].write(value);
+        }
+
+        let result = unsafe { core::mem::MaybeUninit::array_assume_init(result_uninit) };
+        Some(result)
+    }
+
     /// Retrieves element at index, if the index is valid.
     /// Otherwise, signals an error and terminates execution.
     pub fn get(&self, index: usize) -> T::Ref<'_> {
@@ -146,7 +165,7 @@ where
     }
 
     pub fn get_mut(&mut self, index: usize) -> ManagedVecRef<M, T> {
-        ManagedVecRef::new(self.get_raw_handle(), index)
+        ManagedVecRef::new(self.get_handle(), index)
     }
 
     pub(super) unsafe fn get_unsafe(&self, index: usize) -> T {
@@ -318,6 +337,31 @@ where
 {
 }
 
+impl<M, T> ManagedVec<M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedVecItem + PartialEq,
+{
+    /// This can be very costly for big collections.
+    /// It needs to deserialize and compare every single item in the worst case.
+    pub fn find(&self, item: &T) -> Option<usize> {
+        for (i, item_in_vec) in self.iter().enumerate() {
+            if item_in_vec.borrow() == item {
+                return Some(i);
+            }
+        }
+
+        None
+    }
+
+    /// This can be very costly for big collections.
+    /// It needs to iterate, deserialize, and compare every single item in the worst case.
+    #[inline]
+    pub fn contains(&self, item: &T) -> bool {
+        self.find(item).is_some()
+    }
+}
+
 impl<M, T> TopEncode for ManagedVec<M, T>
 where
     M: ManagedTypeApi,
@@ -357,31 +401,6 @@ where
             item.dep_encode_or_handle_err(dest, h)?;
         }
         Ok(())
-    }
-}
-
-impl<M, T> ManagedVec<M, T>
-where
-    M: ManagedTypeApi,
-    T: ManagedVecItem + PartialEq,
-{
-    /// This can be very costly for big collections.
-    /// It needs to deserialize and compare every single item in the worst case.
-    pub fn find(&self, item: &T) -> Option<usize> {
-        for (i, item_in_vec) in self.iter().enumerate() {
-            if item_in_vec.borrow() == item {
-                return Some(i);
-            }
-        }
-
-        None
-    }
-
-    /// This can be very costly for big collections.
-    /// It needs to iterate, deserialize, and compare every single item in the worst case.
-    #[inline]
-    pub fn contains(&self, item: &T) -> bool {
-        self.find(item).is_some()
     }
 }
 

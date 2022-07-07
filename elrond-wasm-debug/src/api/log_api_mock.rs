@@ -1,5 +1,5 @@
 use elrond_wasm::{
-    api::{Handle, LogApi, LogApiImpl},
+    api::{LogApi, LogApiImpl},
     types::{
         heap::ArgBuffer, managed_vec_of_buffers_to_arg_buffer, ManagedBuffer, ManagedType,
         ManagedVec,
@@ -55,10 +55,14 @@ impl LogApiImpl for DebugApi {
         });
     }
 
-    fn managed_write_log(&self, topics_handle: Handle, data_handle: Handle) {
-        let topics = ManagedVec::<Self, ManagedBuffer<Self>>::from_raw_handle(topics_handle);
+    fn managed_write_log(
+        &self,
+        topics_handle: Self::ManagedBufferHandle,
+        data_handle: Self::ManagedBufferHandle,
+    ) {
+        let topics = ManagedVec::<Self, ManagedBuffer<Self>>::from_handle(topics_handle);
         let topics_arg_buffer = managed_vec_of_buffers_to_arg_buffer(topics);
-        let data = ManagedBuffer::<Self>::from_raw_handle(data_handle);
+        let data = ManagedBuffer::<Self>::from_handle(data_handle);
         self.write_event_log(&topics_arg_buffer, data.to_boxed_bytes().as_slice());
     }
 }

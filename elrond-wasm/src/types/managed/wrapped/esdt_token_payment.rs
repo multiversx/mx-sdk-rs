@@ -3,48 +3,45 @@ use crate::{
     types::{BigUint, EsdtTokenPaymentMultiValue, EsdtTokenType, ManagedVecItem, TokenIdentifier},
 };
 
+use crate as elrond_wasm; // needed by the codec and TypeAbi generated code
+use crate::derive::TypeAbi;
 use elrond_codec::elrond_codec_derive::{NestedDecode, NestedEncode, TopDecode, TopEncode};
 
-use crate as elrond_wasm; // needed by the TypeAbi generated code
-use crate::derive::TypeAbi;
-
-#[derive(TopDecode, TopEncode, NestedDecode, NestedEncode, TypeAbi, Clone, PartialEq, Debug)]
+#[derive(
+    TopDecode, TopEncode, NestedDecode, NestedEncode, TypeAbi, Clone, PartialEq, Eq, Debug,
+)]
 pub struct EsdtTokenPayment<M: ManagedTypeApi> {
-    pub token_type: EsdtTokenType,
     pub token_identifier: TokenIdentifier<M>,
     pub token_nonce: u64,
     pub amount: BigUint<M>,
 }
 
 impl<M: ManagedTypeApi> EsdtTokenPayment<M> {
-    pub fn no_payment() -> Self {
+    pub fn new(token_identifier: TokenIdentifier<M>, token_nonce: u64, amount: BigUint<M>) -> Self {
         EsdtTokenPayment {
-            token_type: EsdtTokenType::Invalid,
-            token_identifier: TokenIdentifier::egld(),
-            token_nonce: 0,
-            amount: BigUint::zero(),
+            token_identifier,
+            token_nonce,
+            amount,
         }
     }
 
-    pub fn new(token_identifier: TokenIdentifier<M>, token_nonce: u64, amount: BigUint<M>) -> Self {
-        let token_type = if amount != 0 && token_identifier.is_esdt() {
-            if token_nonce == 0 {
+    pub fn token_type(&self) -> EsdtTokenType {
+        if self.amount != 0 {
+            if self.token_nonce == 0 {
                 EsdtTokenType::Fungible
-            } else if amount == 1u64 {
+            } else if self.amount == 1u64 {
                 EsdtTokenType::NonFungible
             } else {
                 EsdtTokenType::SemiFungible
             }
         } else {
             EsdtTokenType::Invalid
-        };
-
-        EsdtTokenPayment {
-            token_type,
-            token_identifier,
-            token_nonce,
-            amount,
         }
+    }
+
+    #[inline]
+    pub fn into_tuple(self) -> (TokenIdentifier<M>, u64, BigUint<M>) {
+        (self.token_identifier, self.token_nonce, self.amount)
     }
 
     #[inline]
@@ -89,14 +86,7 @@ impl<M: ManagedTypeApi> ManagedVecItem for EsdtTokenPayment<M> {
         let token_nonce = managed_vec_item_from_slice(&arr, &mut index);
         let amount = managed_vec_item_from_slice(&arr, &mut index);
 
-        let token_type = if token_nonce > 0 {
-            EsdtTokenType::SemiFungible
-        } else {
-            EsdtTokenType::Fungible
-        };
-
         EsdtTokenPayment {
-            token_type,
             token_identifier,
             token_nonce,
             amount,

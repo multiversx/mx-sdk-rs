@@ -51,6 +51,11 @@ fn count_ones_rs() {
     elrond_wasm_debug::mandos_rs("mandos/count_ones.scen.json", world());
 }
 
+// #[test]
+// fn crypto_elliptic_curves_rs() {
+//     elrond_wasm_debug::mandos_rs("mandos/crypto_elliptic_curves.scen.json", world());
+// }
+
 #[test]
 fn crypto_keccak256_rs() {
     elrond_wasm_debug::mandos_rs("mandos/crypto_keccak256.scen.json", world());
@@ -61,6 +66,11 @@ fn crypto_keccak256_legacy_managed_rs() {
     elrond_wasm_debug::mandos_rs("mandos/crypto_keccak256_legacy_managed.scen.json", world());
 }
 
+// #[test]
+// fn crypto_ripemd160_rs() {
+//     elrond_wasm_debug::mandos_rs("mandos/crypto_ripemd160.scen.json", world());
+// }
+
 #[test]
 fn crypto_sha256_rs() {
     elrond_wasm_debug::mandos_rs("mandos/crypto_sha256.scen.json", world());
@@ -70,6 +80,21 @@ fn crypto_sha256_rs() {
 fn crypto_sha256_legacy_managed_rs() {
     elrond_wasm_debug::mandos_rs("mandos/crypto_sha256_legacy_managed.scen.json", world());
 }
+
+// #[test]
+// fn crypto_verify_bls_rs() {
+//     elrond_wasm_debug::mandos_rs("mandos/crypto_verify_bls.scen.json", world());
+// }
+
+#[test]
+fn crypto_verify_ed25519_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/crypto_verify_ed25519.scen.json", world());
+}
+
+// #[test]
+// fn crypto_verify_secp256k1_rs() {
+//     elrond_wasm_debug::mandos_rs("mandos/crypto_verify_secp256k1.scen.json", world());
+// }
 
 #[test]
 fn echo_array_u8_rs() {
@@ -222,8 +247,18 @@ fn managed_vec_biguint_push_rs() {
 }
 
 #[test]
+fn managed_vec_array_push_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/managed_vec_array_push.scen.json", world());
+}
+
+#[test]
 fn only_owner_rs() {
     elrond_wasm_debug::mandos_rs("mandos/only_owner.scen.json", world());
+}
+
+#[test]
+fn only_user_account_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/only_user_account.scen.json", world());
 }
 
 // Will never run in mandos-rs.
@@ -245,6 +280,11 @@ fn return_codes_rs() {
 #[test]
 fn sc_properties_rs() {
     elrond_wasm_debug::mandos_rs("mandos/sc_properties.scen.json", world());
+}
+
+#[test]
+fn storage_raw_api_features_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/storage_raw_api_features.scen.json", world());
 }
 
 #[test]
