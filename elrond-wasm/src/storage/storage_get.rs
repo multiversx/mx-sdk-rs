@@ -135,7 +135,7 @@ where
 /// Because its handled error type is the never type, when compiled,
 /// the codec will return the value directly, without wrapping it in a Result.
 #[derive(Clone)]
-struct StorageGetErrorHandler<M>
+pub(crate) struct StorageGetErrorHandler<M>
 where
     M: ManagedTypeApi + ErrorApi,
 {
