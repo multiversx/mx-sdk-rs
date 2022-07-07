@@ -11,8 +11,12 @@ macro_rules! binary_operator {
             type Output = BigFloat<M>;
 
             fn $method(self, other: BigFloat<M>) -> BigFloat<M> {
-                M::managed_type_impl().$api_func(self.handle, self.handle, other.handle);
-                BigFloat::from_raw_handle(self.handle)
+                M::managed_type_impl().$api_func(
+                    self.handle.clone(),
+                    self.handle.clone(),
+                    other.handle.clone(),
+                );
+                BigFloat::from_handle(self.handle.clone())
             }
         }
 
@@ -20,9 +24,13 @@ macro_rules! binary_operator {
             type Output = BigFloat<M>;
 
             fn $method(self, other: &BigFloat<M>) -> BigFloat<M> {
-                let result_handle = M::static_var_api_impl().next_handle();
-                M::managed_type_impl().$api_func(result_handle, self.handle, other.handle);
-                BigFloat::from_raw_handle(result_handle)
+                let result_handle: M::BigFloatHandle = M::static_var_api_impl().next_handle();
+                M::managed_type_impl().$api_func(
+                    result_handle.clone(),
+                    self.handle.clone(),
+                    other.handle.clone(),
+                );
+                BigFloat::from_handle(result_handle)
             }
         }
     };
@@ -39,7 +47,11 @@ macro_rules! binary_assign_operator {
             #[inline]
             fn $method(&mut self, other: Self) {
                 let api = M::managed_type_impl();
-                api.$api_func(self.handle, self.handle, other.handle);
+                api.$api_func(
+                    self.handle.clone(),
+                    self.handle.clone(),
+                    other.handle.clone(),
+                );
             }
         }
 
@@ -47,7 +59,11 @@ macro_rules! binary_assign_operator {
             #[inline]
             fn $method(&mut self, other: &BigFloat<M>) {
                 let api = M::managed_type_impl();
-                api.$api_func(self.handle, self.handle, other.handle);
+                api.$api_func(
+                    self.handle.clone(),
+                    self.handle.clone(),
+                    other.handle.clone(),
+                );
             }
         }
     };
@@ -62,8 +78,8 @@ impl<M: ManagedTypeApi> Neg for BigFloat<M> {
     type Output = BigFloat<M>;
 
     fn neg(self) -> Self::Output {
-        let result_handle = M::static_var_api_impl().next_handle();
-        M::managed_type_impl().bf_neg(result_handle, self.handle);
-        BigFloat::from_raw_handle(result_handle)
+        let result_handle: M::BigFloatHandle = M::static_var_api_impl().next_handle();
+        M::managed_type_impl().bf_neg(result_handle.clone(), self.handle);
+        BigFloat::from_handle(result_handle)
     }
 }

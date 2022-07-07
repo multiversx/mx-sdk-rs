@@ -2,7 +2,7 @@ use elrond_wasm::{api::ManagedTypeApi, types::BigUint};
 
 elrond_wasm::derive_imports!();
 
-#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, PartialEq, TypeAbi, Clone)]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, PartialEq, Eq, TypeAbi, Clone)]
 pub enum UnlockType<M: ManagedTypeApi> {
     FixedAmount {
         period_unlock_amount: BigUint<M>,
@@ -16,7 +16,7 @@ pub enum UnlockType<M: ManagedTypeApi> {
     },
 }
 
-#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, PartialEq, TypeAbi, Clone)]
+#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, PartialEq, Eq, TypeAbi, Clone)]
 pub struct Schedule<M: ManagedTypeApi> {
     pub group_total_amount: BigUint<M>,
     pub unlock_type: UnlockType<M>,

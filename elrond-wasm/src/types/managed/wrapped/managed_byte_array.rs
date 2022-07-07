@@ -2,7 +2,7 @@ use core::convert::TryFrom;
 
 use crate::{
     abi::{TypeAbi, TypeName},
-    api::{Handle, ManagedTypeApi},
+    api::ManagedTypeApi,
     formatter::{hex_util::encode_bytes_as_hex, FormatByteReceiver, SCLowerHex},
     types::{ManagedBuffer, ManagedType},
 };
@@ -30,18 +30,20 @@ impl<M, const N: usize> ManagedType<M> for ManagedByteArray<M, N>
 where
     M: ManagedTypeApi,
 {
+    type OwnHandle = M::ManagedBufferHandle;
+
     #[inline]
-    fn from_raw_handle(handle: Handle) -> Self {
+    fn from_handle(handle: M::ManagedBufferHandle) -> Self {
         ManagedByteArray {
-            buffer: ManagedBuffer::from_raw_handle(handle),
+            buffer: ManagedBuffer::from_handle(handle),
         }
     }
 
-    fn get_raw_handle(&self) -> Handle {
-        self.buffer.get_raw_handle()
+    fn get_handle(&self) -> M::ManagedBufferHandle {
+        self.buffer.get_handle()
     }
 
-    fn transmute_from_handle_ref(handle_ref: &Handle) -> &Self {
+    fn transmute_from_handle_ref(handle_ref: &M::ManagedBufferHandle) -> &Self {
         unsafe { core::mem::transmute(handle_ref) }
     }
 }

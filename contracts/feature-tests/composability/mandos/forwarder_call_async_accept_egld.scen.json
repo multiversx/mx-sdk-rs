@@ -39,6 +39,16 @@
                 "status": "0",
                 "logs": [
                     {
+                        "address": "*",
+                        "endpoint": "str:transferValueOnly",
+                        "topics": [
+                            "sc:forwarder",
+                            "sc:vault",
+                            "1000"
+                        ],
+                        "data": ""
+                    },
+                    {
                         "address": "sc:vault",
                         "endpoint": "str:accept_funds",
                         "topics": [

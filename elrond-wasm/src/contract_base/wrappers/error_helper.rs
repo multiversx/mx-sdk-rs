@@ -78,6 +78,6 @@ where
     B: Borrow<ManagedBuffer<M>>,
 {
     fn signal_error_with_message(self) -> ! {
-        M::error_api_impl().signal_error_from_buffer(self.borrow().get_raw_handle())
+        M::error_api_impl().signal_error_from_buffer(self.borrow().get_handle())
     }
 }

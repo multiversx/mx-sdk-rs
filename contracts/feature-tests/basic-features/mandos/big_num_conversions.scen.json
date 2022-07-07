@@ -134,6 +134,40 @@
                     "100"
                 ]
             }
+        },
+        {
+            "step": "scQuery",
+            "txId": "big-uint-set-u64",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "biguint_overwrite_u64",
+                "arguments": [
+                    "100",
+                    "200"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "200"
+                ]
+            }
+        },
+        {
+            "step": "scQuery",
+            "txId": "big-int-set-i64",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "bigint_overwrite_i64",
+                "arguments": [
+                    "-5",
+                    "-10"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "-10"
+                ]
+            }
         }
     ]
 }

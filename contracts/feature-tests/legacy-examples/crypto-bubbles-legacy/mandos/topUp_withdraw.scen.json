@@ -68,6 +68,16 @@
                 "status": "",
                 "logs": [
                     {
+                        "address": "*",
+                        "endpoint": "str:transferValueOnly",
+                        "topics": [
+                            "sc:crypto_bubbles_legacy",
+                            "address:acc1",
+                            "0x4000000"
+                        ],
+                        "data": ""
+                    },
+                    {
                         "address": "sc:crypto_bubbles_legacy",
                         "endpoint": "str:withdraw",
                         "topics": [
@@ -100,8 +110,7 @@
                     "nonce": "2",
                     "balance": "0x7000000",
                     "storage": {},
-                    "code": "",
-                    "asyncCallData": "str:crypto bubbles"
+                    "code": ""
                 }
             }
         }

@@ -53,6 +53,16 @@
                         "data": "1"
                     },
                     {
+                        "address": "*",
+                        "endpoint": "str:transferValueOnly",
+                        "topics": [
+                            "sc:recursive-caller",
+                            "sc:vault",
+                            "1"
+                        ],
+                        "data": ""
+                    },
+                    {
                         "address": "sc:vault",
                         "endpoint": "str:accept_funds",
                         "topics": [

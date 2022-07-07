@@ -62,7 +62,9 @@ impl<T: SCDisplay> SCDisplay for &T {
 }
 
 pub trait SCLowerHex {
-    fn fmt<F: FormatByteReceiver>(&self, f: &mut F);
+    fn fmt<F>(&self, f: &mut F)
+    where
+        F: FormatByteReceiver;
 }
 
 impl<T: SCLowerHex> SCLowerHex for &T {

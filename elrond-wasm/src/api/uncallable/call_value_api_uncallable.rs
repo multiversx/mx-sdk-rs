@@ -1,5 +1,5 @@
 use crate::{
-    api::{CallValueApi, CallValueApiImpl, Handle},
+    api::{CallValueApi, CallValueApiImpl},
     types::EsdtTokenType,
 };
 
@@ -18,15 +18,15 @@ impl CallValueApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn load_egld_value(&self, _dest: Handle) {
+    fn load_egld_value(&self, _dest: Self::BigIntHandle) {
         unreachable!()
     }
 
-    fn load_single_esdt_value(&self, _dest: Handle) {
+    fn load_single_esdt_value(&self, _dest: Self::BigIntHandle) {
         unreachable!()
     }
 
-    fn token(&self) -> Handle {
+    fn token(&self) -> Option<Self::ManagedBufferHandle> {
         unreachable!()
     }
 
@@ -42,11 +42,11 @@ impl CallValueApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn esdt_value_by_index(&self, _index: usize) -> Handle {
+    fn esdt_value_by_index(&self, _index: usize) -> Self::BigIntHandle {
         unreachable!()
     }
 
-    fn token_by_index(&self, _index: usize) -> Handle {
+    fn token_by_index(&self, _index: usize) -> Self::ManagedBufferHandle {
         unreachable!()
     }
 

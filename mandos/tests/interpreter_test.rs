@@ -280,3 +280,26 @@ fn test_biguint_nested_neg() {
     let context = &InterpreterContext::default();
     interpret_string("biguint:-1", context);
 }
+
+#[test]
+fn test_bech32() {
+    let context = &InterpreterContext::default();
+
+    // alice
+    assert_eq!(
+        hex::decode("0139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e1").unwrap(),
+        interpret_string(
+            "bech32:erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th",
+            context
+        )
+    );
+
+    // system SC
+    assert_eq!(
+        hex::decode("000000000000000000010000000000000000000000000000000000000002ffff").unwrap(),
+        interpret_string(
+            "bech32:erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u",
+            context
+        )
+    );
+}

@@ -80,13 +80,13 @@ where
         H: EncodeErrorHandler,
     {
         if let Some(managed_buffer) = value.try_cast_ref::<ManagedBuffer<FA>>() {
-            FA::finish_api_impl().finish_managed_buffer_raw(managed_buffer.handle);
+            FA::finish_api_impl().finish_managed_buffer_raw(managed_buffer.handle.clone());
             Ok(())
         } else if let Some(big_uint) = value.try_cast_ref::<BigUint<FA>>() {
-            FA::finish_api_impl().finish_big_uint_raw(big_uint.handle);
+            FA::finish_api_impl().finish_big_uint_raw(big_uint.handle.clone());
             Ok(())
         } else if let Some(big_int) = value.try_cast_ref::<BigInt<FA>>() {
-            FA::finish_api_impl().finish_big_int_raw(big_int.handle);
+            FA::finish_api_impl().finish_big_int_raw(big_int.handle.clone());
             Ok(())
         } else {
             Err(h.handle_error(EncodeError::UNSUPPORTED_OPERATION))
@@ -98,7 +98,7 @@ where
     }
 
     fn finalize_nested_encode(self, nb: Self::NestedBuffer) {
-        FA::finish_api_impl().finish_managed_buffer_raw(nb.into_managed_buffer().get_raw_handle());
+        FA::finish_api_impl().finish_managed_buffer_raw(nb.into_managed_buffer().get_handle());
     }
 }
 

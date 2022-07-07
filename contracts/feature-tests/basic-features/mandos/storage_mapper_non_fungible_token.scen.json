@@ -114,7 +114,7 @@
             },
             "expect": {
                 "out": [
-                    "u8:2|nested:str:TICKER-000000|u64:1|biguint:1000"
+                    "nested:str:TICKER-000000|u64:1|biguint:1000"
                 ],
                 "status": "",
                 "logs": "*",
@@ -139,7 +139,7 @@
             },
             "expect": {
                 "out": [
-                    "u8:2|nested:str:TICKER-000000|u64:2|biguint:2000"
+                    "nested:str:TICKER-000000|u64:2|biguint:2000"
                 ],
                 "status": "",
                 "logs": "*",
@@ -206,7 +206,7 @@
             },
             "expect": {
                 "out": [
-                    "u8:2|nested:str:TICKER-000000|u64:1|biguint:5000"
+                    "nested:str:TICKER-000000|u64:1|biguint:5000"
                 ],
                 "status": "",
                 "logs": "*",
@@ -231,7 +231,7 @@
             },
             "expect": {
                 "out": [
-                    "u8:2|nested:str:TICKER-000000|u64:1|biguint:7000"
+                    "nested:str:TICKER-000000|u64:1|biguint:7000"
                 ],
                 "status": "",
                 "logs": "*",

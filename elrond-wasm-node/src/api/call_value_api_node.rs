@@ -1,6 +1,6 @@
 use super::VmApiImpl;
 use elrond_wasm::{
-    api::{CallValueApi, CallValueApiImpl, Handle, StaticVarApiImpl},
+    api::{CallValueApi, CallValueApiImpl, StaticVarApiImpl},
     types::{EsdtTokenType, ManagedType, TokenIdentifier},
 };
 
@@ -11,7 +11,7 @@ extern "C" {
 
     fn bigIntGetCallValue(dest: i32);
 
-    #[cfg(not(feature = "ei-unmanaged"))]
+    #[cfg(not(feature = "ei-unmanaged-node"))]
     fn managedGetMultiESDTCallValue(resultHandle: i32);
 
     fn getNumESDTTransfers() -> i32;
@@ -46,14 +46,14 @@ impl CallValueApiImpl for VmApiImpl {
         }
     }
 
-    fn load_egld_value(&self, dest: Handle) {
+    fn load_egld_value(&self, dest: Self::BigIntHandle) {
         unsafe {
             bigIntGetCallValue(dest);
         }
     }
 
-    #[cfg(not(feature = "ei-unmanaged"))]
-    fn load_all_esdt_transfers(&self, dest_handle: Handle) {
+    #[cfg(not(feature = "ei-unmanaged-node"))]
+    fn load_all_esdt_transfers(&self, dest_handle: Self::ManagedBufferHandle) {
         unsafe {
             managedGetMultiESDTCallValue(dest_handle);
         }
@@ -63,21 +63,23 @@ impl CallValueApiImpl for VmApiImpl {
         unsafe { getNumESDTTransfers() as usize }
     }
 
-    fn load_single_esdt_value(&self, dest: Handle) {
+    fn load_single_esdt_value(&self, dest: Self::BigIntHandle) {
         unsafe {
             bigIntGetESDTCallValue(dest);
         }
     }
 
-    fn token(&self) -> Handle {
+    fn token(&self) -> Option<Self::ManagedBufferHandle> {
         unsafe {
             let mut name_buffer = [0u8; MAX_POSSIBLE_TOKEN_IDENTIFIER_LENGTH];
             let name_len = getESDTTokenName(name_buffer.as_mut_ptr());
             if name_len == 0 {
-                TokenIdentifier::<Self>::egld().get_raw_handle()
+                None
             } else {
-                TokenIdentifier::<Self>::from_esdt_bytes(&name_buffer[..name_len as usize])
-                    .get_raw_handle()
+                Some(
+                    TokenIdentifier::<Self>::from_esdt_bytes(&name_buffer[..name_len as usize])
+                        .get_raw_handle(),
+                )
             }
         }
     }
@@ -90,7 +92,7 @@ impl CallValueApiImpl for VmApiImpl {
         unsafe { (getESDTTokenType() as u8).into() }
     }
 
-    fn esdt_value_by_index(&self, index: usize) -> Handle {
+    fn esdt_value_by_index(&self, index: usize) -> Self::BigIntHandle {
         unsafe {
             let value_handle = self.next_handle();
             bigIntGetESDTCallValueByIndex(value_handle, index as i32);
@@ -98,16 +100,13 @@ impl CallValueApiImpl for VmApiImpl {
         }
     }
 
-    fn token_by_index(&self, index: usize) -> Handle {
+    fn token_by_index(&self, index: usize) -> Self::ManagedBufferHandle {
         unsafe {
             let mut name_buffer = [0u8; MAX_POSSIBLE_TOKEN_IDENTIFIER_LENGTH];
             let name_len = getESDTTokenNameByIndex(name_buffer.as_mut_ptr(), index as i32);
-            if name_len == 0 {
-                TokenIdentifier::<Self>::egld().get_raw_handle()
-            } else {
-                TokenIdentifier::<Self>::from_esdt_bytes(&name_buffer[..name_len as usize])
-                    .get_raw_handle()
-            }
+
+            TokenIdentifier::<Self>::from_esdt_bytes(&name_buffer[..name_len as usize])
+                .get_raw_handle()
         }
     }
 

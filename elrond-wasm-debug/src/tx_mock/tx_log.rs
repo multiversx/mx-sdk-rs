@@ -1,6 +1,6 @@
+use crate::mandos_system::model::Checkable;
 use alloc::vec::Vec;
 use elrond_wasm::types::heap::Address;
-use mandos::model::Checkable;
 
 #[derive(Clone, Debug)]
 pub struct TxLog {
@@ -11,8 +11,8 @@ pub struct TxLog {
 }
 
 impl TxLog {
-    pub fn mandos_check(&self, check_log: &mandos::model::CheckLog) -> bool {
-        self.address.to_vec() == check_log.address.value
+    pub fn mandos_check(&self, check_log: &crate::mandos_system::model::CheckLog) -> bool {
+        check_log.address.check(self.address.as_bytes())
             && check_log.endpoint.check(self.endpoint.as_slice())
             && check_log.topics.check(self.topics.as_slice())
             && check_log.data.check(self.data.as_slice())

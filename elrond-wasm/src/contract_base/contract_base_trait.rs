@@ -1,5 +1,6 @@
 use super::{
-    BlockchainWrapper, CallValueWrapper, CryptoWrapper, ErrorHelper, ManagedSerializer, SendWrapper,
+    BlockchainWrapper, CallValueWrapper, CryptoWrapper, ErrorHelper, ManagedSerializer,
+    SendRawWrapper, SendWrapper, StorageRawWrapper,
 };
 use crate::api::VMApi;
 
@@ -25,6 +26,14 @@ pub trait ContractBase: Sized {
         SendWrapper::new()
     }
 
+    /// Low-level functionality related to sending transactions from the current contract.
+    ///
+    /// For almost all cases contracts should instead use `self.send()` and `ContractCall`.
+    #[inline]
+    fn send_raw(&self) -> SendRawWrapper<Self::Api> {
+        SendRawWrapper::new()
+    }
+
     /// Gateway blockchain info related to the current transaction and to accounts.
     #[inline]
     fn blockchain(&self) -> BlockchainWrapper<Self::Api> {
@@ -47,5 +56,10 @@ pub trait ContractBase: Sized {
     #[inline]
     fn error(&self) -> ErrorHelper<Self::Api> {
         ErrorHelper::new_instance()
+    }
+
+    #[inline]
+    fn storage_raw(&self) -> StorageRawWrapper<Self::Api> {
+        StorageRawWrapper::new()
     }
 }

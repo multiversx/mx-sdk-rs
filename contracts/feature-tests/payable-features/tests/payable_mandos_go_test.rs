@@ -44,6 +44,11 @@ fn payable_egld_4_go() {
 }
 
 #[test]
+fn payable_multi_array_go() {
+    elrond_wasm_debug::mandos_go("mandos/payable_multi_array.scen.json");
+}
+
+#[test]
 fn payable_token_1_go() {
     elrond_wasm_debug::mandos_go("mandos/payable_token_1.scen.json");
 }
