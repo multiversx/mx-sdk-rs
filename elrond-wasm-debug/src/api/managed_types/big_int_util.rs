@@ -18,8 +18,7 @@ impl DebugApi {
     }
 
     pub fn insert_new_managed_buffer_old(&self, value: Vec<u8>) -> ManagedBuffer<Self> {
-        let mut managed_types = self.m_types_borrow_mut();
-        let handle = managed_types.managed_buffer_map.insert_new_handle(value);
+        let handle = self.insert_new_managed_buffer(value);
         ManagedBuffer::from_handle(handle)
     }
 
@@ -46,8 +45,10 @@ impl DebugApi {
         handle: <Self as HandleTypeInfo>::BigIntHandle,
         value: num_bigint::BigUint,
     ) {
-        let mut managed_types = self.m_types_borrow_mut();
-        managed_types.big_int_map.insert(handle, value.into())
+        let mut managed_types = handle.context.m_types_borrow_mut();
+        managed_types
+            .big_int_map
+            .insert(handle.get_raw_handle_unchecked(), value.into())
     }
 
     pub fn insert_new_big_uint_old(
@@ -67,8 +68,12 @@ impl DebugApi {
         &self,
         bu_handle: <Self as HandleTypeInfo>::BigIntHandle,
     ) -> num_bigint::BigUint {
-        let managed_types = self.m_types_borrow();
-        managed_types.big_int_map.get(bu_handle).magnitude().clone()
+        let managed_types = bu_handle.context.m_types_borrow();
+        managed_types
+            .big_int_map
+            .get(bu_handle.get_raw_handle_unchecked())
+            .magnitude()
+            .clone()
     }
 }
 

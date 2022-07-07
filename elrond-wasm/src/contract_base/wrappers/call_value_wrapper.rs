@@ -36,8 +36,8 @@ where
         let mut call_value_handle = A::static_var_api_impl().get_call_value_egld_handle();
         if call_value_handle == const_handles::UNINITIALIZED_HANDLE {
             call_value_handle = use_raw_handle(const_handles::CALL_VALUE_EGLD);
-            A::static_var_api_impl().set_call_value_egld_handle(call_value_handle);
-            A::call_value_api_impl().load_egld_value(call_value_handle);
+            A::static_var_api_impl().set_call_value_egld_handle(call_value_handle.clone());
+            A::call_value_api_impl().load_egld_value(call_value_handle.clone());
         }
         BigUint::from_handle(call_value_handle) // unsafe, TODO: replace with ManagedRef<...>
     }
@@ -49,8 +49,8 @@ where
         let mut call_value_handle = A::static_var_api_impl().get_call_value_multi_esdt_handle();
         if call_value_handle == const_handles::UNINITIALIZED_HANDLE {
             call_value_handle = use_raw_handle(const_handles::CALL_VALUE_MULTI_ESDT);
-            A::static_var_api_impl().set_call_value_multi_esdt_handle(call_value_handle);
-            A::call_value_api_impl().load_all_esdt_transfers(call_value_handle);
+            A::static_var_api_impl().set_call_value_multi_esdt_handle(call_value_handle.clone());
+            A::call_value_api_impl().load_all_esdt_transfers(call_value_handle.clone());
         }
         ManagedVec::from_handle(call_value_handle) // unsafe, TODO: replace with ManagedRef<...>
     }
@@ -94,8 +94,9 @@ where
     /// Retrieves the ESDT call value from the VM.
     /// Will return 0 in case of an EGLD transfer (cannot have both EGLD and ESDT transfer simultaneously).
     pub fn esdt_value(&self) -> BigUint<A> {
-        let call_value_single_esdt = use_raw_handle(const_handles::CALL_VALUE_SINGLE_ESDT);
-        A::call_value_api_impl().load_single_esdt_value(call_value_single_esdt);
+        let call_value_single_esdt: A::BigIntHandle =
+            use_raw_handle(const_handles::CALL_VALUE_SINGLE_ESDT);
+        A::call_value_api_impl().load_single_esdt_value(call_value_single_esdt.clone());
         BigUint::from_handle(call_value_single_esdt)
     }
 

@@ -57,7 +57,7 @@ where
     A: CallValueApiImpl,
 {
     let num_transfers = api.esdt_num_transfers();
-    api.mb_overwrite(dest_handle, &[]);
+    api.mb_overwrite(dest_handle.clone(), &[]);
 
     for i in 0..num_transfers {
         let token_identifier_handle = api.token_by_index(i);
@@ -65,10 +65,10 @@ where
         let amount_handle = api.esdt_value_by_index(i);
 
         api.mb_append_bytes(
-            dest_handle,
+            dest_handle.clone(),
             &handle_to_be_bytes(token_identifier_handle)[..],
         );
-        api.mb_append_bytes(dest_handle, &token_nonce.to_be_bytes()[..]);
-        api.mb_append_bytes(dest_handle, &handle_to_be_bytes(amount_handle)[..]);
+        api.mb_append_bytes(dest_handle.clone(), &token_nonce.to_be_bytes()[..]);
+        api.mb_append_bytes(dest_handle.clone(), &handle_to_be_bytes(amount_handle)[..]);
     }
 }
