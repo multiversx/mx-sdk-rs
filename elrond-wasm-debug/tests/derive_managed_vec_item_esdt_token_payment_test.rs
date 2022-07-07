@@ -1,7 +1,7 @@
 #![feature(generic_associated_types)]
 
 use elrond_wasm::{
-    api::ManagedTypeApi,
+    api::{HandleConstraints, ManagedTypeApi},
     derive::ManagedVecItem,
     elrond_codec,
     elrond_codec::elrond_codec_derive::{NestedDecode, NestedEncode, TopDecode, TopEncode},

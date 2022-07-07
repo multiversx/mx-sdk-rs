@@ -25,8 +25,10 @@ where
     }
 
     fn set_managed_buffer(&self, managed_buffer: &ManagedBuffer<A>) {
-        A::storage_write_api_impl()
-            .storage_store_managed_buffer_raw(self.key.buffer.get_handle(), managed_buffer.handle);
+        A::storage_write_api_impl().storage_store_managed_buffer_raw(
+            self.key.buffer.get_handle(),
+            managed_buffer.handle.clone(),
+        );
     }
 }
 
