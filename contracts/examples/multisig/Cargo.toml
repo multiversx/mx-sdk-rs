@@ -13,7 +13,7 @@ version = "0.33.1"
 path = "../../../elrond-wasm"
 
 [dependencies.elrond-wasm-modules]
-version = "0.31.1"
+version = "0.33.1"
 path = "../../../elrond-wasm-modules"
 
 [dev-dependencies.elrond-wasm-debug]
