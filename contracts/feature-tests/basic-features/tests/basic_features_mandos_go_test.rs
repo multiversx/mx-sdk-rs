@@ -259,8 +259,8 @@ fn sc_properties_go() {
 }
 
 #[test]
-fn storage_api_features_go() {
-    elrond_wasm_debug::mandos_go("mandos/storage_api_features.scen.json");
+fn storage_raw_api_features_go() {
+    elrond_wasm_debug::mandos_go("mandos/storage_raw_api_features.scen.json");
 }
 
 #[test]

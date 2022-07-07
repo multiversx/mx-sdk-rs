@@ -18,7 +18,6 @@ pub mod managed_address_features;
 pub mod managed_buffer_features;
 pub mod managed_vec_features;
 pub mod non_zero_features;
-pub mod storage_api_features;
 pub mod storage_direct_load;
 pub mod storage_direct_store;
 pub mod storage_mapper_fungible_token;
@@ -33,6 +32,7 @@ pub mod storage_mapper_token_attributes;
 pub mod storage_mapper_unique_id_mapper;
 pub mod storage_mapper_vec;
 pub mod storage_mapper_whitelist;
+pub mod storage_raw_api_features;
 pub mod struct_eq;
 pub mod token_identifier_features;
 pub mod types;
@@ -53,7 +53,7 @@ pub trait BasicFeatures:
     + managed_address_features::ManagedAddressFeatures
     + managed_buffer_features::ManagedBufferFeatures
     + managed_vec_features::ManagedVecFeatures
-    + storage_api_features::StorageApiFeatures
+    + storage_raw_api_features::StorageRawApiFeatures
     + storage_direct_load::StorageLoadFeatures
     + storage_direct_store::StorageStoreFeatures
     + storage_mapper_linked_list::LinkedListMapperFeatures
