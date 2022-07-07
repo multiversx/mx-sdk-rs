@@ -283,8 +283,8 @@ fn sc_properties_rs() {
 }
 
 #[test]
-fn storage_api_features_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/storage_api_features.scen.json", world());
+fn storage_raw_api_features_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/storage_raw_api_features.scen.json", world());
 }
 
 #[test]
