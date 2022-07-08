@@ -90,7 +90,7 @@ pub trait BlockchainApiImpl: ManagedTypeApiImpl {
     fn get_block_random_seed_legacy(&self) -> Box<[u8; 48]>;
 
     fn load_block_random_seed_managed(&self, dest: Self::ManagedBufferHandle) {
-        self.mb_overwrite(dest, &*self.get_block_random_seed_legacy());
+        self.mb_overwrite(dest, self.get_block_random_seed_legacy().as_slice());
     }
 
     fn get_prev_block_timestamp(&self) -> u64;
@@ -104,7 +104,7 @@ pub trait BlockchainApiImpl: ManagedTypeApiImpl {
     fn get_prev_block_random_seed_legacy(&self) -> Box<[u8; 48]>;
 
     fn load_prev_block_random_seed_managed(&self, dest: Self::ManagedBufferHandle) {
-        self.mb_overwrite(dest, &*self.get_prev_block_random_seed_legacy());
+        self.mb_overwrite(dest, self.get_prev_block_random_seed_legacy().as_slice());
     }
 
     fn get_current_esdt_nft_nonce(

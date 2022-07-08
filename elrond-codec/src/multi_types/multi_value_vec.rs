@@ -21,7 +21,7 @@ where
     T: Clone,
 {
     fn from(arr: [T; N]) -> Self {
-        MultiValueVec((&arr[..]).to_vec())
+        MultiValueVec(arr[..].to_vec())
     }
 }
 
