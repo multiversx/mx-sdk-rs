@@ -1,5 +1,5 @@
 [package]
-name = "elrond-interaction"
+name = "elrond-interact-snippets"
 version = "0.1.0"
 edition = "2018"
 
@@ -12,9 +12,9 @@ readme = "README.md"
 repository = "https://github.com/ElrondNetwork/elrond-wasm-rs"
 homepage = "https://elrond.com/"
 documentation = "https://docs.elrond.com/"
-description = "Elrond WebAssembly smart contract API debugging mocks and utils"
-keywords = ["elrond", "blockchain", "contract", "debug"]
-categories = ["cryptography::cryptocurrencies", "development-tools::debugging"]
+description = "Elrond framework for building smart contract interaction snippets"
+keywords = ["elrond", "blockchain", "contract", "snippets"]
+categories = ["cryptography::cryptocurrencies"]
 
 [dependencies]
 tokio = { version = "1.12.0", features = ["full"] }
