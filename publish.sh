@@ -72,8 +72,6 @@ cd elrond-wasm
 cargo publish || return 1
 cd ..
 
-sleep 20
-
 cd mandos
 cargo publish || return 1
 cd ..
@@ -91,5 +89,9 @@ cargo publish || return 1
 cd ..
 
 cd elrond-wasm-modules
+cargo publish || return 1
+cd ..
+
+cd elrond-interact-snippets
 cargo publish || return 1
 cd ..
