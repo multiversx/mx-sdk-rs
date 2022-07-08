@@ -50,7 +50,6 @@ where
     ///
     /// This is a synchronous call, so it only works when
     /// both the current contract and the destination are in the same shard.
-    #[inline]
     pub fn read_from_address<K, V>(&self, address: &ManagedAddress<A>, storage_key: K) -> V
     where
         K: Into<StorageKey<A>>,
