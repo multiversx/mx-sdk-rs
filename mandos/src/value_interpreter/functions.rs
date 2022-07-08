@@ -3,7 +3,7 @@ use sha3::{Digest, Keccak256};
 
 const SC_ADDRESS_NUM_LEADING_ZEROS: usize = 8;
 
-pub(crate) fn keccak256(data: &[u8]) -> Vec<u8> {
+pub fn keccak256(data: &[u8]) -> Vec<u8> {
     let mut hasher = Keccak256::new();
     hasher.update(data);
     let hash: [u8; 32] = hasher.finalize().into();
