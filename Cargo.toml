@@ -9,7 +9,7 @@ members = [
   "mandos",
   "elrond-codec",
   "elrond-codec-derive",
-  "elrond-interaction",
+  "elrond-interact-snippets",
 
   "contracts/benchmarks/mappers/benchmark-common",
   "contracts/benchmarks/mappers/linked-list-repeat",

@@ -13,9 +13,9 @@ path = "src/multisig_interact.rs"
 path = ".."
 
 [dependencies.elrond-wasm-modules]
-version = "0.33.1"
+version = "0.34.0"
 path = "../../../../elrond-wasm-modules"
 
-[dependencies.elrond-interaction]
+[dependencies.elrond-interact-snippets]
 version = "0.1.0"
-path = "../../../../elrond-interaction"
+path = "../../../../elrond-interact-snippets"
