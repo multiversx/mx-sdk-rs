@@ -1,6 +1,6 @@
 mod multisig_interact_nfts;
-
 use elrond_interaction::{
+    dns_address_for_name,
     elrond_wasm::{
         elrond_codec::multi_types::MultiValueVec,
         storage::mappers::SingleValue,
@@ -14,6 +14,7 @@ use elrond_interaction::{
     erdrs::interactors::wallet::Wallet,
     tokio, Interactor,
 };
+use elrond_wasm_modules::dns::ProxyTrait as _;
 use multisig::{
     multisig_perform::ProxyTrait as _, multisig_propose::ProxyTrait as _,
     multisig_state::ProxyTrait as _, ProxyTrait as _,
@@ -49,6 +50,7 @@ async fn main() {
         "nft-items" => state.create_items().await,
         "quorum" => state.print_quorum().await,
         "board" => state.print_board().await,
+        "dns-register" => state.dns_register().await,
         _ => panic!("unknown command: {}", &cmd),
     }
 }
@@ -152,6 +154,19 @@ impl State {
         for board_member in board_members.iter() {
             println!("    {}", bech32::encode(board_member));
         }
+    }
+
+    async fn dns_register(&mut self) {
+        let name = self.args.next().expect("name argument missing");
+        let dns_address = dns_address_for_name(&name);
+        let dns_register_call: ScCallStep = self
+            .multisig
+            .dns_register(dns_address, name)
+            .into_blockchain_call()
+            .from(&self.wallet_address)
+            .gas_limit("30,000,000")
+            .into();
+        self.interactor.sc_call(dns_register_call).await;
     }
 }
 
