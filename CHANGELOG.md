@@ -4,6 +4,22 @@ There are several crates in this repo, this changelog will keep track of all of 
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [elrond-wasm 0.34.0, elrond-codec 0.12.0, mandos 0.16.0, elrond-interact-snippets 0.1.0] - 2022-07-08
+- Major refactor of the mandos-rs infrastructure.
+	- High-level Mandos objects moved to elrond-wasm-debug;
+	- The `mandos` crate no longer depends on `elrond-wasm-debug` (as originally intended and implemented);
+	- Typed mandos contract call objects, for better call syntax.
+	- More syntactic sugar for writing mandos calls.
+- The first version of elrond-interact-snippets, which can be used to write short blockchain interactor programs.
+	- The syntax relies on contract proxies to easily build calls.
+	- Some of the infrastructure is shared with Mandos.
+	- There is an example of such a interactor for the multisig contract.
+- Refactor of managed type handles in all API traits. Eliminated undefined behavior when using the same handle in multiple contexts.
+- Transfer role proxy module.
+- NFT merge module.
+- `#[only_user_account]` annotation. Only user accounts can call these endpoints.
+- ABI - fixed missing event logs from modules.
+
 ## [elrond-wasm 0.33.1, mandos 0.15.1] - 2022-06-24
 - CodecSelf for BigInt
 
