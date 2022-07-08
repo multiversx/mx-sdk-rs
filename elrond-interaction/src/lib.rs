@@ -1,4 +1,5 @@
 mod interactor;
+mod interactor_dns;
 mod interactor_result;
 mod interactor_retrieve;
 mod interactor_sc_call;
@@ -11,6 +12,7 @@ pub use elrond_wasm_debug::{self, elrond_wasm};
 pub use env_logger;
 pub use hex;
 pub use interactor::*;
+pub use interactor_dns::*;
 pub use interactor_result::*;
 pub use interactor_sender::*;
 pub use log;
