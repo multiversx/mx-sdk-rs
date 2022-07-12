@@ -4,7 +4,7 @@ use mandos::{
     serde_raw::{TxESDTRaw, ValueSubTree},
 };
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct TxESDT {
     pub esdt_token_identifier: BytesValue,
     pub nonce: U64Value,

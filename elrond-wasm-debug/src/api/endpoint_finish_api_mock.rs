@@ -2,9 +2,7 @@ use crate::{
     num_bigint::{BigInt, BigUint},
     DebugApi,
 };
-use elrond_wasm::api::{
-    BigIntApi, EndpointFinishApi, EndpointFinishApiImpl, Handle, ManagedBufferApi,
-};
+use elrond_wasm::api::{BigIntApi, EndpointFinishApi, EndpointFinishApiImpl, ManagedBufferApi};
 
 impl EndpointFinishApi for DebugApi {
     type EndpointFinishApiImpl = DebugApi;
@@ -24,19 +22,19 @@ impl EndpointFinishApiImpl for DebugApi {
         tx_result.result_values.push(v)
     }
 
-    fn finish_big_int_raw(&self, handle: Handle) {
+    fn finish_big_int_raw(&self, handle: Self::BigIntHandle) {
         let bi_bytes = self.bi_get_signed_bytes(handle);
         let mut tx_result = self.result_borrow_mut();
         tx_result.result_values.push(bi_bytes.into_vec());
     }
 
-    fn finish_big_uint_raw(&self, handle: Handle) {
+    fn finish_big_uint_raw(&self, handle: Self::BigIntHandle) {
         let bu_bytes = self.bi_get_unsigned_bytes(handle);
         let mut tx_result = self.result_borrow_mut();
         tx_result.result_values.push(bu_bytes.into_vec());
     }
 
-    fn finish_managed_buffer_raw(&self, handle: Handle) {
+    fn finish_managed_buffer_raw(&self, handle: Self::ManagedBufferHandle) {
         let bytes = self.mb_to_boxed_bytes(handle);
         self.finish_slice_u8(bytes.as_slice());
     }

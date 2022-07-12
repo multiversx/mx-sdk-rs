@@ -1,4 +1,8 @@
-use crate::mandos_system::model::{AddressValue, BigUintValue, BytesValue, U64Value};
+use crate::{
+    mandos_system::model::{AddressValue, BigUintValue, BytesValue, U64Value},
+    DebugApi,
+};
+use elrond_wasm::types::{ContractCall, EsdtTokenPayment};
 use mandos::{
     interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
     serde_raw::TxCallRaw,
@@ -62,5 +66,26 @@ impl IntoRaw<TxCallRaw> for TxCall {
             gas_limit: self.gas_limit.into_raw(),
             gas_price: self.gas_price.into_raw(),
         }
+    }
+}
+
+impl TxCall {
+    pub fn to_contract_call(&self) -> ContractCall<DebugApi, ()> {
+        let mut contract_call =
+            ContractCall::new((&self.to.value).into(), self.function.as_bytes().into());
+        contract_call.egld_payment = (&self.egld_value.value).into();
+        for esdt in &self.esdt_value {
+            contract_call.payments.push(EsdtTokenPayment::new(
+                esdt.esdt_token_identifier.value.as_slice().into(),
+                esdt.nonce.value,
+                (&esdt.esdt_value.value).into(),
+            ))
+        }
+        for argument in &self.arguments {
+            contract_call
+                .arg_buffer
+                .push_arg_raw(argument.value.as_slice().into());
+        }
+        contract_call
     }
 }

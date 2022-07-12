@@ -111,7 +111,7 @@ where
     M: ManagedTypeApi,
 {
     pub fn to_arg_buffer(&self) -> ManagedArgBuffer<M> {
-        ManagedArgBuffer::from_raw_handle(self.raw_buffers.get_raw_handle())
+        ManagedArgBuffer::from_handle(self.raw_buffers.get_handle())
     }
 }
 
@@ -249,7 +249,7 @@ use elrond_codec::{multi_types::MultiValueVec, CodecFrom};
 impl<M, T, U> CodecFrom<MultiValueVec<T>> for MultiValueEncoded<M, U>
 where
     M: ManagedTypeApi + ErrorApi,
-    T: TopEncodeMulti + TopDecodeMulti,
+    T: TopEncodeMulti,
     U: CodecFrom<T>,
 {
 }
@@ -258,7 +258,7 @@ where
 impl<M, T, U> CodecFrom<MultiValueEncoded<M, T>> for MultiValueVec<U>
 where
     M: ManagedTypeApi + ErrorApi,
-    T: TopEncodeMulti + TopDecodeMulti,
+    T: TopEncodeMulti,
     U: CodecFrom<T>,
 {
 }

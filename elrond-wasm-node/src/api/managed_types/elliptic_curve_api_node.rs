@@ -1,7 +1,4 @@
-use elrond_wasm::{
-    api::{EllipticCurveApi, Handle},
-    types::heap::BoxedBytes,
-};
+use elrond_wasm::{api::EllipticCurveApi, types::heap::BoxedBytes};
 
 extern "C" {
     fn createEC(dataOffset: i32, dataLength: i32) -> i32;
@@ -145,22 +142,25 @@ extern "C" {
 }
 
 impl EllipticCurveApi for crate::VmApiImpl {
-    fn ec_create_from_name_bytes(&self, name: &[u8]) -> Handle {
+    fn ec_create_from_name_bytes(&self, name: &[u8]) -> Self::ManagedBufferHandle {
         unsafe { createEC(name.as_ptr() as i32, name.len() as i32) }
     }
 
-    fn ec_create_from_name_mb(&self, name_handle: Handle) -> Handle {
+    fn ec_create_from_name_mb(
+        &self,
+        name_handle: Self::ManagedBufferHandle,
+    ) -> Self::ManagedBufferHandle {
         unsafe { managedCreateEC(name_handle) }
     }
 
     fn ec_get_values(
         &self,
-        ec_handle: Handle,
-        field_order_handle: Handle,
-        base_point_order_handle: Handle,
-        eq_constant_handle: Handle,
-        x_base_point_handle: Handle,
-        y_base_point_handle: Handle,
+        ec_handle: Self::EllipticCurveHandle,
+        field_order_handle: Self::BigIntHandle,
+        base_point_order_handle: Self::BigIntHandle,
+        eq_constant_handle: Self::BigIntHandle,
+        x_base_point_handle: Self::BigIntHandle,
+        y_base_point_handle: Self::BigIntHandle,
     ) {
         unsafe {
             let _ = ellipticCurveGetValues(
@@ -174,23 +174,23 @@ impl EllipticCurveApi for crate::VmApiImpl {
         }
     }
 
-    fn ec_curve_length(&self, ec_handle: Handle) -> u32 {
+    fn ec_curve_length(&self, ec_handle: Self::EllipticCurveHandle) -> u32 {
         unsafe { getCurveLengthEC(ec_handle) as u32 }
     }
 
-    fn ec_private_key_byte_length(&self, ec_handle: Handle) -> u32 {
+    fn ec_private_key_byte_length(&self, ec_handle: Self::EllipticCurveHandle) -> u32 {
         unsafe { getPrivKeyByteLengthEC(ec_handle) as u32 }
     }
 
     fn ec_add(
         &self,
-        x_result_handle: Handle,
-        y_result_handle: Handle,
-        ec_handle: Handle,
-        x_first_point: Handle,
-        y_first_point: Handle,
-        x_second_point: Handle,
-        y_second_point: Handle,
+        x_result_handle: Self::BigIntHandle,
+        y_result_handle: Self::BigIntHandle,
+        ec_handle: Self::EllipticCurveHandle,
+        x_first_point: Self::BigIntHandle,
+        y_first_point: Self::BigIntHandle,
+        x_second_point: Self::BigIntHandle,
+        y_second_point: Self::BigIntHandle,
     ) {
         unsafe {
             addEC(
@@ -207,11 +207,11 @@ impl EllipticCurveApi for crate::VmApiImpl {
 
     fn ec_double(
         &self,
-        x_result_handle: Handle,
-        y_result_handle: Handle,
-        ec_handle: Handle,
-        x_point_handle: Handle,
-        y_point_handle: Handle,
+        x_result_handle: Self::BigIntHandle,
+        y_result_handle: Self::BigIntHandle,
+        ec_handle: Self::EllipticCurveHandle,
+        x_point_handle: Self::BigIntHandle,
+        y_point_handle: Self::BigIntHandle,
     ) {
         unsafe {
             doubleEC(
@@ -226,20 +226,20 @@ impl EllipticCurveApi for crate::VmApiImpl {
 
     fn ec_is_on_curve(
         &self,
-        ec_handle: Handle,
-        x_point_handle: Handle,
-        y_point_handle: Handle,
+        ec_handle: Self::EllipticCurveHandle,
+        x_point_handle: Self::BigIntHandle,
+        y_point_handle: Self::BigIntHandle,
     ) -> bool {
         unsafe { isOnCurveEC(ec_handle, x_point_handle, y_point_handle) > 0 }
     }
 
     fn ec_scalar_mult_legacy(
         &self,
-        x_result_handle: Handle,
-        y_result_handle: Handle,
-        ec_handle: Handle,
-        x_point_handle: Handle,
-        y_point_handle: Handle,
+        x_result_handle: Self::BigIntHandle,
+        y_result_handle: Self::BigIntHandle,
+        ec_handle: Self::EllipticCurveHandle,
+        x_point_handle: Self::BigIntHandle,
+        y_point_handle: Self::BigIntHandle,
         data: &[u8],
     ) {
         unsafe {
@@ -257,12 +257,12 @@ impl EllipticCurveApi for crate::VmApiImpl {
 
     fn ec_scalar_mult(
         &self,
-        x_result_handle: Handle,
-        y_result_handle: Handle,
-        ec_handle: Handle,
-        x_point_handle: Handle,
-        y_point_handle: Handle,
-        data: Handle,
+        x_result_handle: Self::BigIntHandle,
+        y_result_handle: Self::BigIntHandle,
+        ec_handle: Self::EllipticCurveHandle,
+        x_point_handle: Self::BigIntHandle,
+        y_point_handle: Self::BigIntHandle,
+        data: Self::ManagedBufferHandle,
     ) {
         unsafe {
             managedScalarMultEC(
@@ -278,9 +278,9 @@ impl EllipticCurveApi for crate::VmApiImpl {
 
     fn ec_scalar_base_mult_legacy(
         &self,
-        x_result_handle: Handle,
-        y_result_handle: Handle,
-        ec_handle: Handle,
+        x_result_handle: Self::BigIntHandle,
+        y_result_handle: Self::BigIntHandle,
+        ec_handle: Self::EllipticCurveHandle,
         data: &[u8],
     ) {
         unsafe {
@@ -296,10 +296,10 @@ impl EllipticCurveApi for crate::VmApiImpl {
 
     fn ec_scalar_base_mult(
         &self,
-        x_result_handle: Handle,
-        y_result_handle: Handle,
-        ec_handle: Handle,
-        data_handle: Handle,
+        x_result_handle: Self::BigIntHandle,
+        y_result_handle: Self::BigIntHandle,
+        ec_handle: Self::EllipticCurveHandle,
+        data_handle: Self::ManagedBufferHandle,
     ) {
         unsafe {
             managedScalarBaseMultEC(x_result_handle, y_result_handle, ec_handle, data_handle);
@@ -308,9 +308,9 @@ impl EllipticCurveApi for crate::VmApiImpl {
 
     fn ec_marshal_legacy(
         &self,
-        ec_handle: Handle,
-        x_pair_handle: Handle,
-        y_pair_handle: Handle,
+        ec_handle: Self::EllipticCurveHandle,
+        x_pair_handle: Self::BigIntHandle,
+        y_pair_handle: Self::BigIntHandle,
     ) -> BoxedBytes {
         unsafe {
             let byte_length = (getCurveLengthEC(ec_handle) + 7) / 8;
@@ -322,10 +322,10 @@ impl EllipticCurveApi for crate::VmApiImpl {
 
     fn ec_marshal(
         &self,
-        ec_handle: Handle,
-        x_pair_handle: Handle,
-        y_pair_handle: Handle,
-        result_handle: Handle,
+        ec_handle: Self::EllipticCurveHandle,
+        x_pair_handle: Self::BigIntHandle,
+        y_pair_handle: Self::BigIntHandle,
+        result_handle: Self::ManagedBufferHandle,
     ) {
         unsafe {
             managedMarshalEC(x_pair_handle, y_pair_handle, ec_handle, result_handle);
@@ -334,9 +334,9 @@ impl EllipticCurveApi for crate::VmApiImpl {
 
     fn ec_marshal_compressed_legacy(
         &self,
-        ec_handle: Handle,
-        x_pair_handle: Handle,
-        y_pair_handle: Handle,
+        ec_handle: Self::EllipticCurveHandle,
+        x_pair_handle: Self::BigIntHandle,
+        y_pair_handle: Self::BigIntHandle,
     ) -> BoxedBytes {
         unsafe {
             let byte_length = (getCurveLengthEC(ec_handle) + 7) / 8;
@@ -348,10 +348,10 @@ impl EllipticCurveApi for crate::VmApiImpl {
 
     fn ec_marshal_compressed(
         &self,
-        ec_handle: Handle,
-        x_pair_handle: Handle,
-        y_pair_handle: Handle,
-        result_handle: Handle,
+        ec_handle: Self::EllipticCurveHandle,
+        x_pair_handle: Self::BigIntHandle,
+        y_pair_handle: Self::BigIntHandle,
+        result_handle: Self::ManagedBufferHandle,
     ) {
         unsafe {
             managedMarshalCompressedEC(x_pair_handle, y_pair_handle, ec_handle, result_handle);
@@ -360,9 +360,9 @@ impl EllipticCurveApi for crate::VmApiImpl {
 
     fn ec_unmarshal_legacy(
         &self,
-        x_result_handle: Handle,
-        y_result_handle: Handle,
-        ec_handle: Handle,
+        x_result_handle: Self::BigIntHandle,
+        y_result_handle: Self::BigIntHandle,
+        ec_handle: Self::EllipticCurveHandle,
         data: &[u8],
     ) {
         unsafe {
@@ -378,10 +378,10 @@ impl EllipticCurveApi for crate::VmApiImpl {
 
     fn ec_unmarshal(
         &self,
-        x_result_handle: Handle,
-        y_result_handle: Handle,
-        ec_handle: Handle,
-        data_handle: Handle,
+        x_result_handle: Self::BigIntHandle,
+        y_result_handle: Self::BigIntHandle,
+        ec_handle: Self::EllipticCurveHandle,
+        data_handle: Self::ManagedBufferHandle,
     ) {
         unsafe {
             managedUnmarshalEC(x_result_handle, y_result_handle, ec_handle, data_handle);
@@ -390,9 +390,9 @@ impl EllipticCurveApi for crate::VmApiImpl {
 
     fn ec_unmarshal_compressed_legacy(
         &self,
-        x_result_handle: Handle,
-        y_result_handle: Handle,
-        ec_handle: Handle,
+        x_result_handle: Self::BigIntHandle,
+        y_result_handle: Self::BigIntHandle,
+        ec_handle: Self::EllipticCurveHandle,
         data: &[u8],
     ) {
         unsafe {
@@ -408,10 +408,10 @@ impl EllipticCurveApi for crate::VmApiImpl {
 
     fn ec_unmarshal_compressed(
         &self,
-        x_result_handle: Handle,
-        y_result_handle: Handle,
-        ec_handle: Handle,
-        data_handle: Handle,
+        x_result_handle: Self::BigIntHandle,
+        y_result_handle: Self::BigIntHandle,
+        ec_handle: Self::EllipticCurveHandle,
+        data_handle: Self::ManagedBufferHandle,
     ) {
         unsafe {
             managedUnmarshalCompressedEC(x_result_handle, y_result_handle, ec_handle, data_handle);
@@ -420,9 +420,9 @@ impl EllipticCurveApi for crate::VmApiImpl {
 
     fn ec_generate_key_legacy(
         &self,
-        x_pub_key_handle: Handle,
-        y_pub_key_handle: Handle,
-        ec_handle: Handle,
+        x_pub_key_handle: Self::BigIntHandle,
+        y_pub_key_handle: Self::BigIntHandle,
+        ec_handle: Self::EllipticCurveHandle,
     ) -> BoxedBytes {
         unsafe {
             let priv_key_length = getPrivKeyByteLengthEC(ec_handle);
@@ -439,10 +439,10 @@ impl EllipticCurveApi for crate::VmApiImpl {
 
     fn ec_generate_key(
         &self,
-        x_pub_key_handle: Handle,
-        y_pub_key_handle: Handle,
-        ec_handle: Handle,
-        result_handle: Handle,
+        x_pub_key_handle: Self::BigIntHandle,
+        y_pub_key_handle: Self::BigIntHandle,
+        ec_handle: Self::EllipticCurveHandle,
+        result_handle: Self::ManagedBufferHandle,
     ) {
         unsafe {
             managedGenerateKeyEC(x_pub_key_handle, y_pub_key_handle, ec_handle, result_handle);

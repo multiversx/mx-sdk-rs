@@ -15,12 +15,12 @@ where
 {
     let obj_ref = obj.as_ref();
     assert_eq!(
-        obj_ref.get_raw_handle(),
-        ManagedRef::get_raw_handle_of_ref(obj_ref)
+        obj_ref.get_handle(),
+        ManagedRef::get_raw_handle_of_ref(obj_ref.clone())
     );
     let obj_clone: T = Clone::clone(&obj_ref);
     assert_eq!(obj, obj_clone);
-    assert_ne!(obj_ref.get_raw_handle(), obj_clone.get_raw_handle());
+    assert_ne!(obj_ref.get_handle(), obj_clone.get_handle());
 }
 
 #[test]
@@ -41,11 +41,11 @@ fn test_managed_ref_clone() {
 
     let obj = BigUint::<DebugApi>::from(7u32);
     let obj_ref = obj.as_ref();
-    assert_eq!(obj.get_raw_handle(), obj_ref.get_raw_handle());
+    assert_eq!(obj.get_handle(), obj_ref.get_handle());
 
     let obj_clone = Clone::clone(&*obj_ref);
     assert_eq!(obj, obj_clone);
-    assert_ne!(obj.get_raw_handle(), obj_clone.get_raw_handle());
+    assert_ne!(obj.get_handle(), obj_clone.get_handle());
 }
 
 #[test]

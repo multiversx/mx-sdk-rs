@@ -247,6 +247,11 @@ fn managed_vec_biguint_push_rs() {
 }
 
 #[test]
+fn managed_vec_array_push_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/managed_vec_array_push.scen.json", world());
+}
+
+#[test]
 fn only_owner_rs() {
     elrond_wasm_debug::mandos_rs("mandos/only_owner.scen.json", world());
 }
@@ -275,6 +280,11 @@ fn return_codes_rs() {
 #[test]
 fn sc_properties_rs() {
     elrond_wasm_debug::mandos_rs("mandos/sc_properties.scen.json", world());
+}
+
+#[test]
+fn storage_raw_api_features_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/storage_raw_api_features.scen.json", world());
 }
 
 #[test]

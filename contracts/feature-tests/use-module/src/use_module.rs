@@ -37,6 +37,7 @@ pub trait UseModule:
     + elrond_wasm_modules::governance::governance_events::GovernanceEventsModule
     + elrond_wasm_modules::pause::PauseModule
     + elrond_wasm_modules::staking::StakingModule
+    + elrond_wasm_modules::token_merge::TokenMergeModule
     + elrond_wasm_modules::default_issue_callbacks::DefaultIssueCallbacksModule
     + elrond_wasm_modules::only_admin::OnlyAdminModule
 {

@@ -45,7 +45,7 @@ pub fn bytes_to_string(bytes: &[u8]) -> String {
 
 impl<M: ManagedTypeApi> fmt::Debug for BigUintPrinter<M> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let handle = self.value.get_raw_handle();
+        let handle = self.value.get_handle();
         let mut bytes = self.value.to_bytes_be();
         if bytes.is_empty() {
             bytes = BoxedBytes::from(vec![0u8]);

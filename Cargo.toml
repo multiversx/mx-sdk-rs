@@ -9,6 +9,7 @@ members = [
   "mandos",
   "elrond-codec",
   "elrond-codec-derive",
+  "elrond-interact-snippets",
 
   "contracts/benchmarks/mappers/benchmark-common",
   "contracts/benchmarks/mappers/linked-list-repeat",
@@ -56,6 +57,7 @@ members = [
   "contracts/examples/lottery-esdt/meta",
   "contracts/examples/multisig",
   "contracts/examples/multisig/meta",
+  "contracts/examples/multisig/interact-rs",
   "contracts/examples/nft-minter",
   "contracts/examples/nft-minter/meta",
   "contracts/examples/nft-storage-prepay",
