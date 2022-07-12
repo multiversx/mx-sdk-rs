@@ -10,19 +10,20 @@ pub trait OnlyAdminModule {
     #[only_owner]
     #[endpoint(addAdmin)]
     fn add_admin(&self, address: ManagedAddress) {
-        self.admins().add(&address);
+        self.admins().insert(address);
         // TODO: event
     }
 
     #[only_owner]
     #[endpoint(removeAdmin)]
     fn remove_admin(&self, address: ManagedAddress) {
-        self.admins().remove(&address);
+        self.admins().swap_remove(&address);
         // TODO: event
     }
 
+    #[view(admins)]
     #[storage_mapper("only_admin_module:admins")]
-    fn admins(&self) -> WhitelistMapper<Self::Api, ManagedAddress>;
+    fn admins(&self) -> UnorderedSetMapper<Self::Api, ManagedAddress>;
 
     fn check_caller_is_admin(&self) {
         require!(
