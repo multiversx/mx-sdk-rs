@@ -10,6 +10,7 @@ elrond_wasm_node::wasm_endpoints! {
         callBack
         addAdmin
         addMergeableTokensToWhitelist
+        admins
         call_derived_not_admin_only
         call_derived_not_owner_only
         call_mod_a
