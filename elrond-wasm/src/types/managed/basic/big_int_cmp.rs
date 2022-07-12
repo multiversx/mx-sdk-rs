@@ -39,7 +39,7 @@ fn cmp_i64<M: ManagedTypeApi>(bi: &BigInt<M>, other: i64) -> Ordering {
         }
     } else {
         let big_int_temp_1: M::BigIntHandle = use_raw_handle(const_handles::BIG_INT_TEMPORARY_1);
-        M::managed_type_impl().bi_set_int64(big_int_temp_1.clone(), other as i64);
+        M::managed_type_impl().bi_set_int64(big_int_temp_1.clone(), other);
         api.bi_cmp(bi.handle.clone(), big_int_temp_1)
     }
 }

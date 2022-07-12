@@ -2,6 +2,7 @@ use super::ManagedBuffer;
 
 use crate::{
     api::{BigFloatApi, ManagedTypeApi, ManagedTypeApiImpl, Sign, StaticVarApiImpl},
+    safe_into::SafeInto,
     types::{BigInt, BigUint, ManagedType},
 };
 use alloc::string::String;
@@ -76,7 +77,7 @@ macro_rules! big_float_conv_num {
             #[inline]
             fn from(value: $num_ty) -> Self {
                 let new_bf_handle: M::BigFloatHandle = M::static_var_api_impl().next_handle();
-                M::managed_type_impl().bf_set_i64(new_bf_handle.clone(), value as i64);
+                M::managed_type_impl().bf_set_i64(new_bf_handle.clone(), value.safe_into::<M>());
                 BigFloat::from_handle(new_bf_handle)
             }
         }
@@ -135,7 +136,7 @@ impl<M: ManagedTypeApi> BigFloat<M> {
     #[inline]
     pub fn from_sci(significand_value: i64, exponent_value: i32) -> Self {
         let api = M::managed_type_impl();
-        let new_bf_handle = api.bf_from_sci(significand_value, exponent_value as i64);
+        let new_bf_handle = api.bf_from_sci(significand_value, exponent_value.safe_into::<M>());
         BigFloat::from_handle(new_bf_handle)
     }
 
@@ -196,7 +197,11 @@ impl<M: ManagedTypeApi> BigFloat<M> {
     pub fn pow(&self, exp: u32) -> Self {
         let api = M::managed_type_impl();
         let new_handle: M::BigFloatHandle = M::static_var_api_impl().next_handle();
-        api.bf_pow(new_handle.clone(), self.handle.clone(), exp as i32);
+        api.bf_pow(
+            new_handle.clone(),
+            self.handle.clone(),
+            exp.safe_into::<M>(),
+        );
         BigFloat::from_handle(new_handle)
     }
 
