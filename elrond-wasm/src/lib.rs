@@ -31,6 +31,7 @@ pub mod io;
 pub mod log_util;
 mod macros;
 pub mod non_zero_util;
+pub mod safe_into;
 pub mod storage;
 pub mod types;
 

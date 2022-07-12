@@ -1,6 +1,9 @@
 use core::cmp::Ordering;
 
-use crate::api::{const_handles, use_raw_handle, BigIntApi, ManagedTypeApi};
+use crate::{
+    api::{const_handles, use_raw_handle, BigIntApi, ManagedTypeApi},
+    safe_into::SafeInto,
+};
 
 use super::BigUint;
 
@@ -39,7 +42,7 @@ fn cmp_i64<M: ManagedTypeApi>(bi: &BigUint<M>, other: i64) -> Ordering {
         }
     } else {
         let big_int_temp_1: M::BigIntHandle = use_raw_handle(const_handles::BIG_INT_TEMPORARY_1);
-        M::managed_type_impl().bi_set_int64(big_int_temp_1.clone(), other as i64);
+        M::managed_type_impl().bi_set_int64(big_int_temp_1.clone(), other);
         api.bi_cmp(bi.handle.clone(), big_int_temp_1)
     }
 }
@@ -49,14 +52,21 @@ macro_rules! partial_eq_and_ord {
         impl<M: ManagedTypeApi> PartialEq<$small_int_type> for BigUint<M> {
             #[inline]
             fn eq(&self, other: &$small_int_type) -> bool {
-                cmp_i64(self, *other as i64).is_eq()
+                cmp_i64(
+                    self,
+                    <$small_int_type as SafeInto<i64>>::safe_into::<M>(*other),
+                )
+                .is_eq()
             }
         }
 
         impl<M: ManagedTypeApi> PartialOrd<$small_int_type> for BigUint<M> {
             #[inline]
             fn partial_cmp(&self, other: &$small_int_type) -> Option<Ordering> {
-                Some(cmp_i64(self, *other as i64))
+                Some(cmp_i64(
+                    self,
+                    <$small_int_type as SafeInto<i64>>::safe_into::<M>(*other),
+                ))
             }
         }
     };

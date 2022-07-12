@@ -17,6 +17,11 @@ fn world() -> BlockchainMock {
 }
 
 #[test]
+fn big_int_from_i64_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/big_int_from_i64.scen.json", world());
+}
+
+#[test]
 fn big_int_to_i64_rs() {
     elrond_wasm_debug::mandos_rs("mandos/big_int_to_i64.scen.json", world());
 }
@@ -29,6 +34,11 @@ fn big_num_conversions_rs() {
 #[test]
 fn big_uint_sqrt_rs() {
     elrond_wasm_debug::mandos_rs("mandos/big_uint_sqrt.scen.json", world());
+}
+
+#[test]
+fn big_uint_from_u64_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/big_uint_from_u64.scen.json", world());
 }
 
 #[test]

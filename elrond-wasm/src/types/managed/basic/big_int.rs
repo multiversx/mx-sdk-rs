@@ -7,6 +7,7 @@ use crate::{
         StaticVarApiImpl,
     },
     formatter::hex_util::encode_bytes_as_hex,
+    safe_into::SafeInto,
     types::{heap::BoxedBytes, BigUint, ManagedBuffer, ManagedOption, ManagedType, Sign},
 };
 use elrond_codec::{
@@ -80,7 +81,7 @@ macro_rules! big_int_conv_num {
             #[inline]
             fn from(value: $num_ty) -> Self {
                 let handle: M::BigIntHandle = M::static_var_api_impl().next_handle();
-                M::managed_type_impl().bi_set_int64(handle.clone(), value as i64);
+                M::managed_type_impl().bi_set_int64(handle.clone(), value.safe_into::<M>());
                 BigInt::from_handle(handle)
             }
         }
@@ -290,7 +291,7 @@ impl<M: ManagedTypeApi> BigInt<M> {
     pub fn pow(&self, exp: u32) -> Self {
         let result_handle: M::BigIntHandle = M::static_var_api_impl().next_handle();
         let exp_handle: M::BigIntHandle = use_raw_handle(const_handles::BIG_INT_TEMPORARY_1);
-        M::managed_type_impl().bi_set_int64(exp_handle.clone(), exp as i64);
+        M::managed_type_impl().bi_set_int64(exp_handle.clone(), exp.safe_into::<M>());
         M::managed_type_impl().bi_pow(result_handle.clone(), self.handle.clone(), exp_handle);
         BigInt::from_handle(result_handle)
     }
