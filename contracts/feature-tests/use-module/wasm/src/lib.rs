@@ -8,6 +8,8 @@ elrond_wasm_node::wasm_endpoints! {
     use_module
     (
         callBack
+        addAdmin
+        call_derived_not_admin_only
         call_derived_not_owner_only
         call_mod_a
         call_mod_b
@@ -37,11 +39,14 @@ elrond_wasm_node::wasm_endpoints! {
         getVotingDelayInBlocks
         getVotingPeriodInBlocks
         isPaused
+        is_admin
         issueToken
+        only_admin_mod_endpoint
         only_owner_mod_endpoint
         pause
         propose
         queue
+        removeAdmin
         setFeatureFlag
         slashMember
         stake

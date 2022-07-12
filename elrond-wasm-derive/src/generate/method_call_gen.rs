@@ -90,6 +90,7 @@ pub fn generate_call_method_body(m: &Method) -> proc_macro2::TokenStream {
     let api_static_init = snippets::call_method_api_static_init();
     let payable_snippet = generate_payable_snippet(m);
     let only_owner_snippet = generate_only_owner_snippet(m);
+    let only_admin_snippet = generate_only_admin_snippet(m);
     let only_user_account_snippet = generate_only_user_account_snippet(m);
     let arg_load = generate_call_method_arg_load(m);
 
@@ -100,6 +101,7 @@ pub fn generate_call_method_body(m: &Method) -> proc_macro2::TokenStream {
         #api_static_init
         #payable_snippet
         #only_owner_snippet
+        #only_admin_snippet
         #only_user_account_snippet
         #arg_load
         #body_with_result

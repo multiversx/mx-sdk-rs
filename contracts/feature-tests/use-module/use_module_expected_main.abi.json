@@ -88,6 +88,19 @@
             "outputs": []
         },
         {
+            "name": "only_admin_mod_endpoint",
+            "onlyAdmin": true,
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "call_derived_not_admin_only",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": []
+        },
+        {
             "name": "dnsRegister",
             "onlyOwner": true,
             "mutability": "mutable",
@@ -560,6 +573,45 @@
             "inputs": [
                 {
                     "name": "member_to_slash",
+                    "type": "Address"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "is_admin",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "address",
+                    "type": "Address"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "addAdmin",
+            "onlyOwner": true,
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "address",
+                    "type": "Address"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "removeAdmin",
+            "onlyOwner": true,
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "address",
                     "type": "Address"
                 }
             ],

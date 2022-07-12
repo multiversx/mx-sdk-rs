@@ -8,6 +8,7 @@ fn generate_endpoint_snippet(
     m: &Method,
     endpoint_name: &str,
     only_owner: bool,
+    only_admin: bool,
     mutability: EndpointMutabilityMetadata,
     location: EndpointLocationMetadata,
 ) -> proc_macro2::TokenStream {
@@ -53,6 +54,7 @@ fn generate_endpoint_snippet(
             docs: &[ #(#endpoint_docs),* ],
             name: #endpoint_name,
             only_owner: #only_owner,
+            only_admin: #only_admin,
             mutability: #mutability_tokens,
             location: #location_tokens,
             payable_in_tokens: &[ #(#payable_in_tokens),* ],
@@ -74,6 +76,7 @@ fn generate_endpoint_snippets(contract: &ContractTrait) -> Vec<proc_macro2::Toke
                     m,
                     "init",
                     false,
+                    false,
                     EndpointMutabilityMetadata::Mutable,
                     EndpointLocationMetadata::MainContract,
                 );
@@ -88,6 +91,7 @@ fn generate_endpoint_snippets(contract: &ContractTrait) -> Vec<proc_macro2::Toke
                     m,
                     &endpoint_name_str,
                     endpoint_metadata.only_owner,
+                    endpoint_metadata.only_admin,
                     endpoint_metadata.mutability.clone(),
                     endpoint_metadata.location.clone(),
                 );
