@@ -109,13 +109,13 @@ pub trait BigFloatWrappedMethods: big_float_methods::BigFloatMethods {
     }
 
     #[endpoint]
-    fn pow_big_float_wrapped(&self, a: BigInt, b: u32, fixed_point_denominator: i64) -> BigInt {
+    fn pow_big_float_wrapped(&self, a: BigInt, b: i32, fixed_point_denominator: i64) -> BigInt {
         let number = self.pow_big_float(BigFloat::from(a), b);
         number.to_fixed_point(&BigFloat::from(fixed_point_denominator))
     }
 
     #[endpoint]
-    fn pow_big_float_ref_wrapped(&self, a: BigInt, b: u32, fixed_point_denominator: i64) -> BigInt {
+    fn pow_big_float_ref_wrapped(&self, a: BigInt, b: i32, fixed_point_denominator: i64) -> BigInt {
         let number = self.pow_big_float_ref(&BigFloat::from(a), b);
         number.to_fixed_point(&BigFloat::from(fixed_point_denominator))
     }
