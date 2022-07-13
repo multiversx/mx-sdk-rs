@@ -165,7 +165,7 @@
             },
             "expect": {
                 "status": "4",
-                "message": "str:safe_into cast error"
+                "message": "str:big uint cast error"
             }
         },
         {

@@ -3,12 +3,12 @@ use core::{
     cmp::Ordering,
     ops::{Add, Div, Mul, Neg, Sub},
 };
+use std::convert::TryInto;
 
 use elrond_wasm::{
     api::{BigFloatApi, BigIntApi, ErrorApiImpl, HandleTypeInfo, Sign},
     elrond_codec::num_bigint::BigInt,
     err_msg,
-    safe_into::SafeInto,
 };
 use num_traits::ToPrimitive;
 
@@ -125,7 +125,7 @@ impl BigFloatApi for DebugApi {
         let value = if f_significand == None {
             f64::from(0)
         } else {
-            let exponent_multiplier = (10.0_f64).powi(exponent.safe_into::<Self>());
+            let exponent_multiplier = (10.0_f64).powi(exponent.try_into().unwrap());
             f_significand.unwrap() * exponent_multiplier
         };
 

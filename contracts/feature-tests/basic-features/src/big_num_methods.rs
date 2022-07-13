@@ -94,6 +94,11 @@ pub trait BigIntMethods {
     }
 
     #[endpoint]
+    fn big_uint_eq_u64(&self, bi: BigUint, small: u64) -> bool {
+        bi == small
+    }
+
+    #[endpoint]
     fn big_int_to_i64(&self, bi: &BigInt) -> OptionalValue<i64> {
         bi.to_i64().into()
     }
