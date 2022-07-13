@@ -1,13 +1,13 @@
-use core::marker::PhantomData;
+use core::{convert::TryInto, marker::PhantomData};
 
 use crate::{
     abi::TypeName,
     api::{
-        const_handles, use_raw_handle, BigIntApi, ManagedTypeApi, ManagedTypeApiImpl,
-        StaticVarApiImpl,
+        const_handles, use_raw_handle, BigIntApi, ErrorApiImpl, ManagedTypeApi, ManagedTypeApiImpl,
+        RawHandle, StaticVarApiImpl,
     },
+    err_msg,
     formatter::hex_util::encode_bytes_as_hex,
-    safe_into::SafeInto,
     types::{heap::BoxedBytes, BigUint, ManagedBuffer, ManagedOption, ManagedType, Sign},
 };
 use elrond_codec::{
@@ -68,6 +68,29 @@ impl<M: ManagedTypeApi> From<ManagedBuffer<M>> for BigInt<M> {
     }
 }
 
+impl<M: ManagedTypeApi> BigInt<M> {
+    pub(crate) fn set_value<T>(handle: M::BigIntHandle, value: T)
+    where
+        T: TryInto<i64>,
+    {
+        M::managed_type_impl().bi_set_int64(
+            handle,
+            value
+                .try_into()
+                .unwrap_or_else(|_| M::error_api_impl().signal_error(err_msg::BIG_INT_CAST_ERROR)),
+        );
+    }
+
+    pub(crate) fn make_temp<T>(handle: RawHandle, value: T) -> M::BigIntHandle
+    where
+        T: TryInto<i64>,
+    {
+        let temp: M::BigIntHandle = use_raw_handle(handle);
+        Self::set_value(temp.clone(), value);
+        temp
+    }
+}
+
 impl<M: ManagedTypeApi> From<BigUint<M>> for BigInt<M> {
     #[inline]
     fn from(item: BigUint<M>) -> Self {
@@ -81,7 +104,7 @@ macro_rules! big_int_conv_num {
             #[inline]
             fn from(value: $num_ty) -> Self {
                 let handle: M::BigIntHandle = M::static_var_api_impl().next_handle();
-                M::managed_type_impl().bi_set_int64(handle.clone(), value.safe_into::<M>());
+                Self::set_value(handle.clone(), value);
                 BigInt::from_handle(handle)
             }
         }
@@ -122,7 +145,7 @@ impl<M: ManagedTypeApi> BigInt<M> {
     pub fn zero() -> Self {
         let handle: M::BigIntHandle = M::static_var_api_impl().next_handle();
         // TODO: seting 0 will no longer be needed once we fix VM handle error
-        M::managed_type_impl().bi_set_int64(handle.clone(), 0);
+        Self::set_value(handle.clone(), 0);
         BigInt::from_handle(handle)
     }
 
@@ -133,8 +156,7 @@ impl<M: ManagedTypeApi> BigInt<M> {
 
     #[inline]
     pub fn overwrite_i64(&self, value: i64) {
-        let api = M::managed_type_impl();
-        api.bi_set_int64(self.handle.clone(), value);
+        Self::set_value(self.handle.clone(), value);
     }
 
     #[inline]
@@ -168,7 +190,7 @@ impl<M: ManagedTypeApi> Clone for BigInt<M> {
     fn clone(&self) -> Self {
         let api = M::managed_type_impl();
         let clone_handle: M::BigIntHandle = M::static_var_api_impl().next_handle();
-        M::managed_type_impl().bi_set_int64(clone_handle.clone(), 0);
+        Self::set_value(clone_handle.clone(), 0);
         api.bi_add(
             clone_handle.clone(),
             clone_handle.clone(),
@@ -290,8 +312,7 @@ impl<M: ManagedTypeApi> BigInt<M> {
     #[must_use]
     pub fn pow(&self, exp: u32) -> Self {
         let result_handle: M::BigIntHandle = M::static_var_api_impl().next_handle();
-        let exp_handle: M::BigIntHandle = use_raw_handle(const_handles::BIG_INT_TEMPORARY_1);
-        M::managed_type_impl().bi_set_int64(exp_handle.clone(), exp.safe_into::<M>());
+        let exp_handle = BigUint::<M>::make_temp(const_handles::BIG_INT_TEMPORARY_1, exp);
         M::managed_type_impl().bi_pow(result_handle.clone(), self.handle.clone(), exp_handle);
         BigInt::from_handle(result_handle)
     }

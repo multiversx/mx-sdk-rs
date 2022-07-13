@@ -1,12 +1,13 @@
 use super::ManagedBuffer;
 
 use crate::{
-    api::{BigFloatApi, ManagedTypeApi, ManagedTypeApiImpl, Sign, StaticVarApiImpl},
-    safe_into::SafeInto,
+    api::{BigFloatApi, ErrorApiImpl, ManagedTypeApi, ManagedTypeApiImpl, Sign, StaticVarApiImpl},
+    err_msg,
     types::{BigInt, BigUint, ManagedType},
 };
 use alloc::string::String;
 
+use core::convert::TryInto;
 use elrond_codec::{
     CodecFromSelf, DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput,
     NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
@@ -77,7 +78,12 @@ macro_rules! big_float_conv_num {
             #[inline]
             fn from(value: $num_ty) -> Self {
                 let new_bf_handle: M::BigFloatHandle = M::static_var_api_impl().next_handle();
-                M::managed_type_impl().bf_set_i64(new_bf_handle.clone(), value.safe_into::<M>());
+                M::managed_type_impl().bf_set_i64(
+                    new_bf_handle.clone(),
+                    value.try_into().unwrap_or_else(|_| {
+                        M::error_api_impl().signal_error(err_msg::BIG_FLOAT_CAST_ERROR)
+                    }),
+                );
                 BigFloat::from_handle(new_bf_handle)
             }
         }
@@ -136,7 +142,7 @@ impl<M: ManagedTypeApi> BigFloat<M> {
     #[inline]
     pub fn from_sci(significand_value: i64, exponent_value: i32) -> Self {
         let api = M::managed_type_impl();
-        let new_bf_handle = api.bf_from_sci(significand_value, exponent_value.safe_into::<M>());
+        let new_bf_handle = api.bf_from_sci(significand_value, exponent_value as i64);
         BigFloat::from_handle(new_bf_handle)
     }
 
@@ -200,7 +206,8 @@ impl<M: ManagedTypeApi> BigFloat<M> {
         api.bf_pow(
             new_handle.clone(),
             self.handle.clone(),
-            exp.safe_into::<M>(),
+            exp.try_into()
+                .unwrap_or_else(|_| M::error_api_impl().signal_error(err_msg::EXPONENT_CAST_ERROR)),
         );
         BigFloat::from_handle(new_handle)
     }

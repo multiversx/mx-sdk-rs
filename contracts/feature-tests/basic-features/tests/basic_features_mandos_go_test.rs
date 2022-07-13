@@ -14,6 +14,11 @@ fn big_num_conversions_go() {
 }
 
 #[test]
+fn big_uint_eq_u64_go() {
+    elrond_wasm_debug::mandos_go("mandos/big_uint_eq_u64.scen.json");
+}
+
+#[test]
 fn big_uint_sqrt_go() {
     elrond_wasm_debug::mandos_go("mandos/big_uint_sqrt.scen.json");
 }

@@ -20,14 +20,15 @@
             "txId": "1",
             "tx": {
                 "to": "sc:basic-features",
-                "function": "big_uint_from_u64_1",
+                "function": "big_uint_eq_u64",
                 "arguments": [
-                    "42"
+                    "0x7FFFFFFFFFFFFFFF",
+                    "0x7FFFFFFFFFFFFFFF"
                 ]
             },
             "expect": {
                 "out": [
-                    "42"
+                    "1"
                 ]
             }
         },
@@ -36,30 +37,15 @@
             "txId": "2",
             "tx": {
                 "to": "sc:basic-features",
-                "function": "big_uint_from_u64_1",
+                "function": "big_uint_eq_u64",
                 "arguments": [
-                    "0x7FFFFFFFFFFFFFFF"
-                ]
-            },
-            "expect": {
-                "out": [
-                    "0x7FFFFFFFFFFFFFFF"
-                ]
-            }
-        },
-        {
-            "step": "scQuery",
-            "txId": "3",
-            "tx": {
-                "to": "sc:basic-features",
-                "function": "big_uint_from_u64_1",
-                "arguments": [
+                    "0xFFFFFFFFFFFFFFFF",
                     "0xFFFFFFFFFFFFFFFF"
                 ]
             },
             "expect": {
                 "status": "4",
-                "message": "str:big uint cast error"
+                "message": "str:big int cast error"
             }
         }
     ]

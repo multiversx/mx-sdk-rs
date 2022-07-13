@@ -32,6 +32,11 @@ fn big_num_conversions_rs() {
 }
 
 #[test]
+fn big_uint_eq_u64_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/big_uint_eq_u64.scen.json", world());
+}
+
+#[test]
 fn big_uint_sqrt_rs() {
     elrond_wasm_debug::mandos_rs("mandos/big_uint_sqrt.scen.json", world());
 }
