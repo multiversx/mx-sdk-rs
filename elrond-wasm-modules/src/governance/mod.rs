@@ -6,7 +6,7 @@ pub mod governance_proposal;
 
 use governance_proposal::*;
 
-const MAX_GAS_LIMIT_PER_BLOCK: u64 = 1_500_000_000;
+const MAX_GAS_LIMIT_PER_BLOCK: u64 = 600_000_000;
 
 #[elrond_wasm::module]
 pub trait GovernanceModule:
