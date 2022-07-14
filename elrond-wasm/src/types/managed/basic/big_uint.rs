@@ -136,7 +136,7 @@ impl<M: ManagedTypeApi> BigUint<M> {
     #[inline]
     pub fn zero() -> Self {
         let handle: M::BigIntHandle = M::static_var_api_impl().next_handle();
-        Self::set_value(handle.clone(), 0u32);
+        M::managed_type_impl().bi_set_int64(handle.clone(), 0);
         BigUint::from_handle(handle)
     }
 
@@ -217,7 +217,7 @@ impl<M: ManagedTypeApi> Clone for BigUint<M> {
     fn clone(&self) -> Self {
         let api = M::managed_type_impl();
         let clone_handle: M::BigIntHandle = M::static_var_api_impl().next_handle();
-        Self::set_value(clone_handle.clone(), 0u32);
+        api.bi_set_int64(clone_handle.clone(), 0);
         api.bi_add(
             clone_handle.clone(),
             clone_handle.clone(),

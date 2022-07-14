@@ -145,7 +145,7 @@ impl<M: ManagedTypeApi> BigInt<M> {
     pub fn zero() -> Self {
         let handle: M::BigIntHandle = M::static_var_api_impl().next_handle();
         // TODO: seting 0 will no longer be needed once we fix VM handle error
-        Self::set_value(handle.clone(), 0);
+        M::managed_type_impl().bi_set_int64(handle.clone(), 0);
         BigInt::from_handle(handle)
     }
 
@@ -190,7 +190,7 @@ impl<M: ManagedTypeApi> Clone for BigInt<M> {
     fn clone(&self) -> Self {
         let api = M::managed_type_impl();
         let clone_handle: M::BigIntHandle = M::static_var_api_impl().next_handle();
-        Self::set_value(clone_handle.clone(), 0);
+        api.bi_set_int64(clone_handle.clone(), 0);
         api.bi_add(
             clone_handle.clone(),
             clone_handle.clone(),
