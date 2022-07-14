@@ -3,10 +3,9 @@ use core::{convert::TryInto, marker::PhantomData};
 use crate::{
     abi::TypeName,
     api::{
-        const_handles, use_raw_handle, BigIntApi, ErrorApiImpl, ManagedTypeApi, ManagedTypeApiImpl,
-        RawHandle, StaticVarApiImpl,
+        const_handles, use_raw_handle, BigIntApi, ManagedTypeApi, ManagedTypeApiImpl, RawHandle,
+        StaticVarApiImpl,
     },
-    err_msg,
     formatter::hex_util::encode_bytes_as_hex,
     types::{heap::BoxedBytes, BigUint, ManagedBuffer, ManagedOption, ManagedType, Sign},
 };
@@ -21,6 +20,8 @@ use crate::{
     api::HandleConstraints,
     formatter::{FormatByteReceiver, SCDisplay},
 };
+
+use super::cast_to_i64::cast_to_i64;
 
 #[repr(transparent)]
 pub struct BigInt<M: ManagedTypeApi> {
@@ -73,12 +74,7 @@ impl<M: ManagedTypeApi> BigInt<M> {
     where
         T: TryInto<i64>,
     {
-        M::managed_type_impl().bi_set_int64(
-            handle,
-            value
-                .try_into()
-                .unwrap_or_else(|_| M::error_api_impl().signal_error(err_msg::BIG_INT_CAST_ERROR)),
-        );
+        M::managed_type_impl().bi_set_int64(handle, cast_to_i64::<M, _>(value));
     }
 
     pub(crate) fn make_temp<T>(handle: RawHandle, value: T) -> M::BigIntHandle

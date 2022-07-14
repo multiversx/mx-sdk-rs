@@ -3,10 +3,9 @@ use core::convert::TryInto;
 use crate::{
     abi::TypeName,
     api::{
-        const_handles, use_raw_handle, BigIntApi, ErrorApiImpl, ManagedBufferApi, ManagedTypeApi,
+        const_handles, use_raw_handle, BigIntApi, ManagedBufferApi, ManagedTypeApi,
         ManagedTypeApiImpl, RawHandle, StaticVarApiImpl,
     },
-    err_msg,
     formatter::{hex_util::encode_bytes_as_hex, FormatByteReceiver, SCDisplay},
     types::{heap::BoxedBytes, ManagedBuffer, ManagedType},
 };
@@ -18,6 +17,8 @@ use elrond_codec::{
 
 #[cfg(feature = "ei-1-2")]
 use crate::api::HandleConstraints;
+
+use super::cast_to_i64::cast_to_i64;
 
 #[repr(transparent)]
 pub struct BigUint<M: ManagedTypeApi> {
@@ -59,12 +60,7 @@ impl<M: ManagedTypeApi> BigUint<M> {
     where
         T: TryInto<i64> + num_traits::Unsigned,
     {
-        M::managed_type_impl().bi_set_int64(
-            handle,
-            value
-                .try_into()
-                .unwrap_or_else(|_| M::error_api_impl().signal_error(err_msg::BIG_UINT_CAST_ERROR)),
-        );
+        M::managed_type_impl().bi_set_int64(handle, cast_to_i64::<M, _>(value));
     }
 
     pub(crate) fn make_temp<T>(handle: RawHandle, value: T) -> M::BigIntHandle

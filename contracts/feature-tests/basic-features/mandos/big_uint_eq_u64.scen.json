@@ -45,7 +45,7 @@
             },
             "expect": {
                 "status": "4",
-                "message": "str:big int cast error"
+                "message": "str:cast to i64 error"
             }
         }
     ]
