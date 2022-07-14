@@ -1,8 +1,8 @@
-use core::{cmp::Ordering, convert::TryInto};
+use core::cmp::Ordering;
 
-use crate::api::{const_handles, BigIntApi, ManagedTypeApi};
+use crate::api::{BigIntApi, ManagedTypeApi};
 
-use super::BigInt;
+use super::{big_num_cmp::cmp_i64, BigInt};
 
 impl<M: ManagedTypeApi> PartialEq for BigInt<M> {
     #[inline]
@@ -29,33 +29,16 @@ impl<M: ManagedTypeApi> Ord for BigInt<M> {
     }
 }
 
-fn cmp<M: ManagedTypeApi, T>(bi: &BigInt<M>, other: T) -> Ordering
-where
-    T: TryInto<i64> + PartialEq<T> + From<u8>,
-{
-    let api = M::managed_type_impl();
-    if other == 0u8.into() {
-        match api.bi_sign(bi.handle.clone()) {
-            crate::api::Sign::Plus => Ordering::Greater,
-            crate::api::Sign::NoSign => Ordering::Equal,
-            crate::api::Sign::Minus => Ordering::Less,
-        }
-    } else {
-        let big_int_temp_1 = BigInt::<M>::make_temp(const_handles::BIG_INT_TEMPORARY_1, other);
-        api.bi_cmp(bi.handle.clone(), big_int_temp_1)
-    }
-}
-
 impl<M: ManagedTypeApi> PartialEq<i64> for BigInt<M> {
     #[inline]
     fn eq(&self, other: &i64) -> bool {
-        cmp(self, *other).is_eq()
+        cmp_i64(self, *other).is_eq()
     }
 }
 
 impl<M: ManagedTypeApi> PartialOrd<i64> for BigInt<M> {
     #[inline]
     fn partial_cmp(&self, other: &i64) -> Option<Ordering> {
-        Some(cmp(self, *other))
+        Some(cmp_i64(self, *other))
     }
 }
