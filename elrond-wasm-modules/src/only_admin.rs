@@ -23,7 +23,7 @@ pub trait OnlyAdminModule {
 
     #[view(getAdmins)]
     #[storage_mapper("only_admin_module:admins")]
-    fn admins(&self) -> UnorderedSetMapper<Self::Api, ManagedAddress>;
+    fn admins(&self) -> UnorderedSetMapper<ManagedAddress>;
 
     fn check_caller_is_admin(&self) {
         require!(
