@@ -60,6 +60,16 @@ fn use_module_internal_rs() {
 }
 
 #[test]
+fn use_module_only_owner_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/use_module_only_owner.scen.json", world());
+}
+
+#[test]
+fn use_module_only_admin_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/use_module_only_admin.scen.json", world());
+}
+
+#[test]
 fn use_module_no_endpoint_rs() {
     elrond_wasm_debug::mandos_rs("mandos/use_module_no_endpoint.scen.json", world());
 }

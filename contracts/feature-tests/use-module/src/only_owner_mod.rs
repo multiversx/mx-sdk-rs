@@ -2,7 +2,7 @@ elrond_wasm::imports!();
 
 #[elrond_wasm::module]
 #[only_owner]
-pub trait OnlyOwnerModule: super::only_owner_derived_mod::OnlyOwnerDerivedModule {
+pub trait OnlyOwnerTestModule: super::only_owner_derived_mod::OnlyOwnerDerivedTestModule {
     #[endpoint]
     fn only_owner_mod_endpoint(&self) {}
 }
