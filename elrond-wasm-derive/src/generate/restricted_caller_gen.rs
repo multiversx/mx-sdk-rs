@@ -15,7 +15,7 @@ pub fn generate_only_admin_snippet(m: &Method) -> proc_macro2::TokenStream {
     if let PublicRole::Endpoint(endpoint_metadata) = &m.public_role {
         if endpoint_metadata.only_admin {
             return quote! {
-                self.check_caller_is_admin();
+                self.require_caller_is_admin();
             };
         }
     }
