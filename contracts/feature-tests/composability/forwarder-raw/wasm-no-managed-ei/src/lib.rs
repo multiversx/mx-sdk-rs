@@ -12,7 +12,11 @@ elrond_wasm_node::wasm_endpoints! {
         call_execute_on_dest_context_readonly
         call_execute_on_dest_context_twice
         call_execute_on_same_context
-        callback_data
+        callback_args
+        callback_args_at_index
+        callback_payment_at_index
+        callback_payments
+        callback_payments_triples
         clear_callback_info
         deploy_contract
         deploy_from_source
