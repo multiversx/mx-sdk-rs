@@ -1,5 +1,6 @@
 pub(super) static ATTR_PAYABLE: &str = "payable";
 pub(super) static ATTR_ONLY_OWNER: &str = "only_owner";
+pub(super) static ATTR_ONLY_ADMIN: &str = "only_admin";
 pub(super) static ATTR_ONLY_USER_ACCOUNT: &str = "only_user_account";
 pub(super) static ATTR_OUTPUT_NAME: &str = "output_name";
 pub(super) static ATTR_PAYMENT: &str = "payment"; // synonymous with `payment_amount`
