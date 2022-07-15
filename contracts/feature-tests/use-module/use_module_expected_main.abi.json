@@ -692,7 +692,7 @@
             ]
         },
         {
-            "name": "is_admin",
+            "name": "isAdmin",
             "mutability": "readonly",
             "inputs": [
                 {
@@ -731,7 +731,7 @@
             "outputs": []
         },
         {
-            "name": "admins",
+            "name": "getAdmins",
             "mutability": "readonly",
             "inputs": [],
             "outputs": [
