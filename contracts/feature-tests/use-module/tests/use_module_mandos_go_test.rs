@@ -19,6 +19,11 @@ fn use_module_only_owner_go() {
 }
 
 #[test]
+fn use_module_only_admin_go() {
+    elrond_wasm_debug::mandos_go("mandos/use_module_only_admin.scen.json");
+}
+
+#[test]
 fn use_module_no_endpoint_go() {
     elrond_wasm_debug::mandos_go("mandos/use_module_no_endpoint.scen.json");
 }
