@@ -21,7 +21,7 @@ pub trait OnlyAdminModule {
         // TODO: event
     }
 
-    #[view(admins)]
+    #[view(getAdmins)]
     #[storage_mapper("only_admin_module:admins")]
     fn admins(&self) -> UnorderedSetMapper<Self::Api, ManagedAddress>;
 
