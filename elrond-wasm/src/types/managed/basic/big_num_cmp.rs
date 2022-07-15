@@ -13,7 +13,7 @@ where
     B: ManagedType<M, OwnHandle = M::BigIntHandle>,
 {
     let api = M::managed_type_impl();
-    if other == 0u8.into() {
+    if other == 0 {
         match api.bi_sign(bi.get_handle()) {
             crate::api::Sign::Plus => Ordering::Greater,
             crate::api::Sign::NoSign => Ordering::Equal,
