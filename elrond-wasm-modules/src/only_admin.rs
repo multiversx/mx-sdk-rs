@@ -2,7 +2,7 @@ elrond_wasm::imports!();
 
 #[elrond_wasm::module]
 pub trait OnlyAdminModule {
-    #[view(is_admin)]
+    #[view(isAdmin)]
     fn is_admin(&self, address: ManagedAddress) -> bool {
         self.admins().contains(&address)
     }
