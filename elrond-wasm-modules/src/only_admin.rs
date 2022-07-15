@@ -25,7 +25,7 @@ pub trait OnlyAdminModule {
     #[storage_mapper("only_admin_module:admins")]
     fn admins(&self) -> UnorderedSetMapper<ManagedAddress>;
 
-    fn check_caller_is_admin(&self) {
+    fn require_caller_is_admin(&self) {
         require!(
             self.is_admin(self.blockchain().get_caller()),
             "Endpoint can only be called by admins"
