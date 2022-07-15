@@ -5,8 +5,9 @@ use crate::model::{
 
 use super::{
     attributes::{
-        is_callback_raw, is_init, is_only_owner, is_only_user_account, CallbackAttribute,
-        EndpointAttribute, ExternalViewAttribute, OutputNameAttribute, ViewAttribute,
+        is_callback_raw, is_init, is_only_admin, is_only_owner, is_only_user_account,
+        CallbackAttribute, EndpointAttribute, ExternalViewAttribute, OutputNameAttribute,
+        ViewAttribute,
     },
     MethodAttributesPass1,
 };
@@ -44,6 +45,17 @@ pub fn process_only_owner_attribute(
     is_only_owner
 }
 
+pub fn process_only_admin_attribute(
+    attr: &syn::Attribute,
+    pass_1_data: &mut MethodAttributesPass1,
+) -> bool {
+    let is_only_admin = is_only_admin(attr);
+    if is_only_admin {
+        pass_1_data.only_admin = true;
+    }
+    is_only_admin
+}
+
 pub fn process_only_user_account_attribute(
     attr: &syn::Attribute,
     pass_1_data: &mut MethodAttributesPass1,
@@ -71,6 +83,7 @@ pub fn process_endpoint_attribute(
                 public_name: endpoint_ident,
                 payable: pass_1_data.payable.clone(),
                 only_owner: pass_1_data.only_owner,
+                only_admin: pass_1_data.only_admin,
                 only_user_account: pass_1_data.only_user_account,
                 mutability: EndpointMutabilityMetadata::Mutable,
                 location: EndpointLocationMetadata::MainContract,
@@ -95,6 +108,7 @@ pub fn process_view_attribute(
                 public_name: view_ident,
                 payable: pass_1_data.payable.clone(),
                 only_owner: pass_1_data.only_owner,
+                only_admin: pass_1_data.only_admin,
                 only_user_account: pass_1_data.only_user_account,
                 mutability: EndpointMutabilityMetadata::Readonly,
                 location: EndpointLocationMetadata::MainContract,
@@ -119,6 +133,7 @@ pub fn process_external_view_attribute(
                 public_name: view_ident,
                 payable: pass_1_data.payable.clone(),
                 only_owner: pass_1_data.only_owner,
+                only_admin: pass_1_data.only_admin,
                 only_user_account: pass_1_data.only_user_account,
                 mutability: EndpointMutabilityMetadata::Readonly,
                 location: EndpointLocationMetadata::ViewContract,
