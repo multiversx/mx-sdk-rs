@@ -88,12 +88,12 @@ pub trait BigFloatMethods {
     }
 
     #[endpoint]
-    fn pow_big_float(&self, a: BigFloat, b: u32) -> BigFloat {
+    fn pow_big_float(&self, a: BigFloat, b: i32) -> BigFloat {
         a.pow(b)
     }
 
     #[endpoint]
-    fn pow_big_float_ref(&self, a: &BigFloat, b: u32) -> BigFloat {
+    fn pow_big_float_ref(&self, a: &BigFloat, b: i32) -> BigFloat {
         a.pow(b)
     }
 
