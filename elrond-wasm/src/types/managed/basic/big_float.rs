@@ -193,10 +193,10 @@ impl<M: ManagedTypeApi> BigFloat<M> {
         BigFloat::from_handle(new_handle)
     }
 
-    pub fn pow(&self, exp: u32) -> Self {
+    pub fn pow(&self, exp: i32) -> Self {
         let api = M::managed_type_impl();
         let new_handle: M::BigFloatHandle = M::static_var_api_impl().next_handle();
-        api.bf_pow(new_handle.clone(), self.handle.clone(), exp as i32);
+        api.bf_pow(new_handle.clone(), self.handle.clone(), exp);
         BigFloat::from_handle(new_handle)
     }
 
