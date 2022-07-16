@@ -154,6 +154,22 @@
         },
         {
             "step": "scQuery",
+            "txId": "big-uint-set-u64",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "biguint_overwrite_u64",
+                "arguments": [
+                    "100",
+                    "0xFFFFFFFFFFFFFFFF"
+                ]
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:cast to i64 error"
+            }
+        },
+        {
+            "step": "scQuery",
             "txId": "big-int-set-i64",
             "tx": {
                 "to": "sc:basic-features",

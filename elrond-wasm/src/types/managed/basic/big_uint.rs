@@ -1,8 +1,10 @@
+use core::convert::TryInto;
+
 use crate::{
     abi::TypeName,
     api::{
         const_handles, use_raw_handle, BigIntApi, ManagedBufferApi, ManagedTypeApi,
-        ManagedTypeApiImpl, StaticVarApiImpl,
+        ManagedTypeApiImpl, RawHandle, StaticVarApiImpl,
     },
     formatter::{hex_util::encode_bytes_as_hex, FormatByteReceiver, SCDisplay},
     types::{heap::BoxedBytes, ManagedBuffer, ManagedType},
@@ -15,6 +17,8 @@ use elrond_codec::{
 
 #[cfg(feature = "ei-1-2")]
 use crate::api::HandleConstraints;
+
+use super::cast_to_i64::cast_to_i64;
 
 #[repr(transparent)]
 pub struct BigUint<M: ManagedTypeApi> {
@@ -51,13 +55,31 @@ impl<M: ManagedTypeApi> From<&ManagedBuffer<M>> for BigUint<M> {
     }
 }
 
+impl<M: ManagedTypeApi> BigUint<M> {
+    pub(crate) fn set_value<T>(handle: M::BigIntHandle, value: T)
+    where
+        T: TryInto<i64> + num_traits::Unsigned,
+    {
+        M::managed_type_impl().bi_set_int64(handle, cast_to_i64::<M, _>(value));
+    }
+
+    pub(crate) fn make_temp<T>(handle: RawHandle, value: T) -> M::BigIntHandle
+    where
+        T: TryInto<i64> + num_traits::Unsigned,
+    {
+        let temp: M::BigIntHandle = use_raw_handle(handle);
+        Self::set_value(temp.clone(), value);
+        temp
+    }
+}
+
 macro_rules! big_uint_conv_num {
     ($num_ty:ty) => {
         impl<M: ManagedTypeApi> From<$num_ty> for BigUint<M> {
             #[inline]
             fn from(value: $num_ty) -> Self {
                 let handle: M::BigIntHandle = M::static_var_api_impl().next_handle();
-                M::managed_type_impl().bi_set_int64(handle.clone(), value as i64);
+                Self::set_value(handle.clone(), value);
                 BigUint::from_handle(handle)
             }
         }
@@ -122,8 +144,7 @@ impl<M: ManagedTypeApi> BigUint<M> {
 
     #[inline]
     pub fn overwrite_u64(&self, value: u64) {
-        let api = M::managed_type_impl();
-        api.bi_set_int64(self.handle.clone(), value as i64);
+        Self::set_value(self.handle.clone(), value);
     }
 
     #[inline]
@@ -176,8 +197,7 @@ impl<M: ManagedTypeApi> BigUint<M> {
     #[must_use]
     pub fn pow(&self, exp: u32) -> Self {
         let result_handle: M::BigIntHandle = M::static_var_api_impl().next_handle();
-        let big_int_temp_1: M::BigIntHandle = use_raw_handle(const_handles::BIG_INT_TEMPORARY_1);
-        M::managed_type_impl().bi_set_int64(big_int_temp_1.clone(), exp as i64);
+        let big_int_temp_1 = BigUint::<M>::make_temp(const_handles::BIG_INT_TEMPORARY_1, exp);
         M::managed_type_impl().bi_pow(result_handle.clone(), self.handle.clone(), big_int_temp_1);
         BigUint::from_handle(result_handle)
     }
@@ -193,7 +213,7 @@ impl<M: ManagedTypeApi> Clone for BigUint<M> {
     fn clone(&self) -> Self {
         let api = M::managed_type_impl();
         let clone_handle: M::BigIntHandle = M::static_var_api_impl().next_handle();
-        M::managed_type_impl().bi_set_int64(clone_handle.clone(), 0);
+        api.bi_set_int64(clone_handle.clone(), 0);
         api.bi_add(
             clone_handle.clone(),
             clone_handle.clone(),
