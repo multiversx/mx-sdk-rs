@@ -131,6 +131,30 @@ pub trait ForwarderRaw {
     }
 
     #[endpoint]
+    #[payable("*")]
+    fn forward_transf_exec_twice(
+        &self,
+        to: ManagedAddress,
+        endpoint_name: ManagedBuffer,
+        args: MultiValueEncoded<ManagedBuffer>,
+    ) {
+        let (token, payment) = self.call_value().egld_or_single_fungible_esdt();
+        let half_payment = payment / 2u32;
+        self.forward_contract_call(
+            to.clone(),
+            token.clone(),
+            half_payment.clone(),
+            endpoint_name.clone(),
+            args.clone(),
+        )
+        .with_gas_limit(self.blockchain().get_gas_left() / 2)
+        .transfer_execute();
+        self.forward_contract_call(to, token, half_payment, endpoint_name, args)
+            .with_gas_limit(self.blockchain().get_gas_left() / 2)
+            .transfer_execute();
+    }
+
+    #[endpoint]
     fn forward_async_retrieve_multi_transfer_funds(
         &self,
         to: ManagedAddress,

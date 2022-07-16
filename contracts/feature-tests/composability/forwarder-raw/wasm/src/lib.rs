@@ -29,6 +29,7 @@ elrond_wasm_node::wasm_endpoints! {
         forward_transf_exec
         forward_transf_exec_egld
         forward_transf_exec_esdt
+        forward_transf_exec_twice
         forwarder_async_send_and_retrieve_multi_transfer_funds
         upgrade
         upgrade_from_source
