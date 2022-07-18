@@ -580,6 +580,8 @@ impl SendApiImpl for DebugApi {
     }
 
     fn claim_developer_rewards(&self) -> i32 {
+        let caller = self.get_caller_legacy();
+        let owner = self.get_owner_address_legacy();
         panic!("legacy operation not implemented");
     }
 

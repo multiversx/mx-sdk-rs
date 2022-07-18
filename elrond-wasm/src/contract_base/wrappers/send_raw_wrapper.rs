@@ -232,7 +232,7 @@ where
         A::send_api_impl().async_call_raw(to, amount, endpoint_name, arg_buffer)
     }
 
-    pub fn claim_developer_rewards() -> i32 {
+    pub fn claim_developer_rewards(&self) -> i32 {
         A::send_api_impl().claim_developer_rewards()
     }
 

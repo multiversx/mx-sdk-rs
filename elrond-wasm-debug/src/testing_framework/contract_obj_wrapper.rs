@@ -283,6 +283,7 @@ impl BlockchainStateWrapper {
             username: Vec::new(),
             contract_path: sc_identifier,
             contract_owner: owner.cloned(),
+            developer_rewards: num_bigint::BigUint::zero(),
         };
         self.mandos_generator
             .set_account(&acc_data, sc_mandos_path_expr);
