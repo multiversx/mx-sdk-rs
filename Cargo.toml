@@ -29,6 +29,9 @@ members = [
   "contracts/benchmarks/send-tx-repeat",
   "contracts/benchmarks/send-tx-repeat/meta",
 
+  "contracts/core/price-aggregator",
+  "contracts/core/price-aggregator/meta",
+
   "contracts/examples/adder",
   "contracts/examples/adder/meta",
   "contracts/examples/esdt-transfer-with-fee",
