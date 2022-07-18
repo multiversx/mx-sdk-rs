@@ -153,6 +153,10 @@ impl SendApiImpl for UncallableApi {
         unreachable!()
     }
 
+    fn claim_developer_rewards(&self) -> i32 {
+        unreachable!()
+    }
+
     fn deploy_contract<M: ManagedTypeApi>(
         &self,
         _gas: u64,

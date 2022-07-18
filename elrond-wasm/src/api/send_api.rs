@@ -122,6 +122,8 @@ pub trait SendApiImpl {
         arg_buffer: &ArgBuffer,
     ) -> !;
 
+    fn claim_developer_rewards(&self) -> i32;
+
     #[allow(clippy::too_many_arguments)]
     fn create_async_call_raw<M: ManagedTypeApi>(
         &self,

@@ -232,6 +232,10 @@ where
         A::send_api_impl().async_call_raw(to, amount, endpoint_name, arg_buffer)
     }
 
+    pub fn claim_developer_rewards() -> i32 {
+        A::send_api_impl().claim_developer_rewards()
+    }
+
     #[allow(clippy::too_many_arguments)]
     pub fn create_async_call_raw(
         &self,

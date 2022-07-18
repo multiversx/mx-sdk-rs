@@ -79,6 +79,8 @@ extern "C" {
         length: i32,
     ) -> !;
 
+    fn claimDeveloperRewards() -> i32;
+
     fn createContract(
         gas: i64,
         valueOffset: *const u8,
@@ -550,6 +552,10 @@ impl SendApiImpl for VmApiImpl {
                 call_data.len() as i32,
             )
         }
+    }
+
+    fn claim_developer_rewards(&self) -> i32 {
+        unsafe { claimDeveloperRewards() }
     }
 
     fn create_async_call_raw<M: ManagedTypeApi>(
