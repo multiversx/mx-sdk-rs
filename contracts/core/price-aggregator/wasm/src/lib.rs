@@ -5,7 +5,7 @@
 #![no_std]
 
 elrond_wasm_node::wasm_endpoints! {
-    price_aggregator
+    elrond_sc_price_aggregator
     (
         addOracles
         decimals
