@@ -1,4 +1,5 @@
-use elrond_wasm::types::{Address, MultiValueEncoded, EgldOrEsdtTokenIdentifier};
+use elrond_sc_price_aggregator::{staking::StakingModule, PriceAggregator};
+use elrond_wasm::types::{Address, EgldOrEsdtTokenIdentifier, MultiValueEncoded};
 use elrond_wasm_debug::{
     managed_address, managed_biguint, managed_buffer, rust_biguint,
     testing_framework::{BlockchainStateWrapper, ContractObjWrapper},
@@ -6,7 +7,6 @@ use elrond_wasm_debug::{
     DebugApi,
 };
 use elrond_wasm_modules::pause::PauseModule;
-use price_aggregator::{staking::StakingModule, PriceAggregator};
 
 pub const NR_ORACLES: usize = 4;
 pub const SUBMISSION_COUNT: usize = 3;
@@ -20,17 +20,18 @@ pub const SLASH_QUORUM: usize = 2;
 
 pub struct PriceAggSetup<PriceAggObjBuilder>
 where
-    PriceAggObjBuilder: 'static + Copy + Fn() -> price_aggregator::ContractObj<DebugApi>,
+    PriceAggObjBuilder: 'static + Copy + Fn() -> elrond_sc_price_aggregator::ContractObj<DebugApi>,
 {
     pub b_mock: BlockchainStateWrapper,
     pub owner: Address,
     pub oracles: Vec<Address>,
-    pub price_agg: ContractObjWrapper<price_aggregator::ContractObj<DebugApi>, PriceAggObjBuilder>,
+    pub price_agg:
+        ContractObjWrapper<elrond_sc_price_aggregator::ContractObj<DebugApi>, PriceAggObjBuilder>,
 }
 
 impl<PriceAggObjBuilder> PriceAggSetup<PriceAggObjBuilder>
 where
-    PriceAggObjBuilder: 'static + Copy + Fn() -> price_aggregator::ContractObj<DebugApi>,
+    PriceAggObjBuilder: 'static + Copy + Fn() -> elrond_sc_price_aggregator::ContractObj<DebugApi>,
 {
     pub fn new(builder: PriceAggObjBuilder) -> Self {
         let rust_zero = rust_biguint!(0);

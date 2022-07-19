@@ -1,5 +1,5 @@
 [package]
-name = "price-aggregator-wasm"
+name = "elrond-sc-price-aggregator-wasm"
 version = "0.0.0"
 authors = [ "Claudiu-Marcel Bruda <claudiu.bruda@elrond.com>",]
 edition = "2018"
@@ -15,15 +15,15 @@ lto = true
 debug = false
 panic = "abort"
 
-[dependencies.price-aggregator]
+[dependencies.elrond-sc-price-aggregator]
 path = ".."
 
 [dependencies.elrond-wasm-node]
-version = "0.34.0"
+version = "0.34.1"
 path = "../../../../elrond-wasm-node"
 
 [dependencies.elrond-wasm-output]
-version = "0.34.0"
+version = "0.34.1"
 path = "../../../../elrond-wasm-output"
 features = ["wasm-output-mode"]
 

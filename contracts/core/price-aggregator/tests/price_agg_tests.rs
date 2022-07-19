@@ -1,16 +1,16 @@
-use elrond_wasm_debug::{managed_address, managed_biguint, managed_buffer, rust_biguint};
-use price_aggregator::{
+use elrond_sc_price_aggregator::{
     price_aggregator_data::{OracleStatus, TimestampedPrice, TokenPair},
     staking::StakingModule,
     PriceAggregator, MAX_ROUND_DURATION_SECONDS,
 };
+use elrond_wasm_debug::{managed_address, managed_biguint, managed_buffer, rust_biguint};
 
 mod price_agg_setup;
 use price_agg_setup::*;
 
 #[test]
 fn price_agg_submit_test() {
-    let mut pa_setup = PriceAggSetup::new(price_aggregator::contract_obj);
+    let mut pa_setup = PriceAggSetup::new(elrond_sc_price_aggregator::contract_obj);
     let current_timestamp = 100;
     let oracles = pa_setup.oracles.clone();
 
@@ -86,7 +86,7 @@ fn price_agg_submit_test() {
 
 #[test]
 fn price_agg_submit_round_ok_test() {
-    let mut pa_setup = PriceAggSetup::new(price_aggregator::contract_obj);
+    let mut pa_setup = PriceAggSetup::new(elrond_sc_price_aggregator::contract_obj);
     let oracles = pa_setup.oracles.clone();
 
     // unpause
@@ -133,7 +133,7 @@ fn price_agg_submit_round_ok_test() {
 
 #[test]
 fn price_agg_discarded_round_test() {
-    let mut pa_setup = PriceAggSetup::new(price_aggregator::contract_obj);
+    let mut pa_setup = PriceAggSetup::new(elrond_sc_price_aggregator::contract_obj);
     let oracles = pa_setup.oracles.clone();
 
     // unpause
@@ -170,7 +170,7 @@ fn price_agg_discarded_round_test() {
 #[test]
 fn price_agg_slashing_test() {
     let rust_zero = rust_biguint!(0);
-    let mut pa_setup = PriceAggSetup::new(price_aggregator::contract_obj);
+    let mut pa_setup = PriceAggSetup::new(elrond_sc_price_aggregator::contract_obj);
     let oracles = pa_setup.oracles.clone();
 
     // unpause
