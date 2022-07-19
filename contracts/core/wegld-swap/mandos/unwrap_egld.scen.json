@@ -55,7 +55,7 @@
                     "storage": {
                         "str:wrappedEgldTokenId": "str:EGLD-abcdef"
                     },
-                    "code": "file:../output/egld-esdt-swap.wasm"
+                    "code": "file:../output/elrond-sc-wegld-swap.wasm"
                 }
             }
         }

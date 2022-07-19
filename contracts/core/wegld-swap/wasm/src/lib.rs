@@ -5,7 +5,7 @@
 #![no_std]
 
 elrond_wasm_node::wasm_endpoints! {
-    egld_esdt_swap
+    elrond_sc_wegld_swap
     (
         getLockedEgldBalance
         getWrappedEgldTokenId

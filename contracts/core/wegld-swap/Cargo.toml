@@ -1,8 +1,9 @@
 [package]
-name = "elrond-sc-price-aggregator"
+name = "elrond-sc-wegld-swap"
 version = "0.34.1"
+
 authors = [
-    "Claudiu-Marcel Bruda <claudiu.bruda@elrond.com>",
+    "Dorin Iancu <dorin.iancu@elrond.com>",
     "Elrond Network <contact@elrond.com>",
 ]
 license = "GPL-3.0-only"
@@ -16,7 +17,7 @@ categories = ["no-std", "wasm", "cryptography::cryptocurrencies"]
 edition = "2018"
 
 [lib]
-path = "src/lib.rs"
+path = "src/wegld.rs"
 
 [dependencies.elrond-wasm]
 version = "0.34.1"
@@ -29,6 +30,3 @@ path = "../../../elrond-wasm-modules"
 [dev-dependencies.elrond-wasm-debug]
 version = "0.34.1"
 path = "../../../elrond-wasm-debug"
-
-[dependencies]
-arrayvec = { version = "0.7.1", default-features = false }
