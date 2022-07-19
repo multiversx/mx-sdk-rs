@@ -29,10 +29,10 @@ members = [
   "contracts/benchmarks/send-tx-repeat",
   "contracts/benchmarks/send-tx-repeat/meta",
 
-  "contracts/core/egld-esdt-swap",
-  "contracts/core/egld-esdt-swap/meta",
   "contracts/core/price-aggregator",
   "contracts/core/price-aggregator/meta",
+  "contracts/core/wegld-swap",
+  "contracts/core/wegld-swap/meta",
 
   "contracts/examples/adder",
   "contracts/examples/adder/meta",
