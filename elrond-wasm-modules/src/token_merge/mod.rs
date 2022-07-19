@@ -244,10 +244,6 @@ pub trait TokenMergeModule:
         EsdtTokenPayment::new(merged_token_id, merged_token_nonce, nft_amount)
     }
 
-    fn require_not_paused(&self) {
-        require!(self.not_paused(), "Contract is paused");
-    }
-
     #[view(getMergedTokenId)]
     #[storage_mapper("mergedToken")]
     fn merged_token(&self) -> NonFungibleTokenMapper<Self::Api>;

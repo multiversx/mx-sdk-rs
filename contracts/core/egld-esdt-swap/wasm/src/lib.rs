@@ -9,6 +9,9 @@ elrond_wasm_node::wasm_endpoints! {
     (
         getLockedEgldBalance
         getWrappedEgldTokenId
+        isPaused
+        pause
+        unpause
         unwrapEgld
         wrapEgld
     )
