@@ -131,6 +131,30 @@ pub trait ForwarderRaw {
     }
 
     #[endpoint]
+    #[payable("*")]
+    fn forward_transf_exec_twice(
+        &self,
+        to: ManagedAddress,
+        endpoint_name: ManagedBuffer,
+        args: MultiValueEncoded<ManagedBuffer>,
+    ) {
+        let (token, payment) = self.call_value().egld_or_single_fungible_esdt();
+        let half_payment = payment / 2u32;
+        self.forward_contract_call(
+            to.clone(),
+            token.clone(),
+            half_payment.clone(),
+            endpoint_name.clone(),
+            args.clone(),
+        )
+        .with_gas_limit(self.blockchain().get_gas_left() / 2)
+        .transfer_execute();
+        self.forward_contract_call(to, token, half_payment, endpoint_name, args)
+            .with_gas_limit(self.blockchain().get_gas_left() / 2)
+            .transfer_execute();
+    }
+
+    #[endpoint]
     fn forward_async_retrieve_multi_transfer_funds(
         &self,
         to: ManagedAddress,
@@ -173,15 +197,44 @@ pub trait ForwarderRaw {
     }
 
     #[view]
-    #[storage_mapper("callback_data")]
-    fn callback_data(&self) -> VecMapper<ManagedVec<Self::Api, ManagedBuffer>>;
+    #[storage_mapper("callback_args")]
+    fn callback_args(&self) -> VecMapper<ManagedVec<Self::Api, ManagedBuffer>>;
 
+    #[view]
     #[storage_mapper("callback_payments")]
     fn callback_payments(&self) -> VecMapper<(EgldOrEsdtTokenIdentifier, u64, BigUint)>;
 
+    #[view]
+    fn callback_payments_triples(
+        &self,
+    ) -> MultiValueEncoded<MultiValue3<EgldOrEsdtTokenIdentifier, u64, BigUint>> {
+        let mut result = MultiValueEncoded::new();
+        for payment_tuple in self.callback_payments().iter() {
+            result.push(payment_tuple.into());
+        }
+        result
+    }
+
     #[endpoint]
     fn clear_callback_info(&self) {
-        self.callback_data().clear();
+        self.callback_args().clear();
+        self.callback_payments().clear();
+    }
+
+    /// Used in the elrond-go tests, do not remove.
+    #[view]
+    fn callback_args_at_index(&self, index: usize) -> MultiValueEncoded<ManagedBuffer> {
+        let cb_args = self.callback_args().get(index);
+        cb_args.into()
+    }
+
+    /// Used in the elrond-go tests, do not remove.
+    #[view]
+    fn callback_payment_at_index(
+        &self,
+        index: usize,
+    ) -> MultiValue3<EgldOrEsdtTokenIdentifier, u64, BigUint> {
+        self.callback_payments().get(index).into()
     }
 
     #[callback_raw]
@@ -209,7 +262,7 @@ pub trait ForwarderRaw {
         let args_as_vec = args.into_vec_of_buffers();
         self.callback_raw_event(&args_as_vec);
 
-        let _ = self.callback_data().push(&args_as_vec);
+        let _ = self.callback_args().push(&args_as_vec);
     }
 
     #[event("callback_raw")]
