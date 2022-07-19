@@ -4,6 +4,11 @@ There are several crates in this repo, this changelog will keep track of all of 
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [elrond-wasm 0.34.1] - 2022-07-19
+- `#[only_admin]` annotation
+- Safer BigUint/BigInt conversions
+- Added and published `price-aggregator` and `egld-esdt-swap` core contracts.
+
 ## [elrond-wasm 0.34.0, elrond-codec 0.12.0, mandos 0.16.0, elrond-interact-snippets 0.1.0] - 2022-07-08
 - Major refactor of the mandos-rs infrastructure.
 	- High-level Mandos objects moved to elrond-wasm-debug;
