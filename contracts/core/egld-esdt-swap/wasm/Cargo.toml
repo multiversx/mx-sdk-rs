@@ -1,6 +1,7 @@
 [package]
 name = "egld-esdt-swap-wasm"
 version = "0.0.0"
+authors = [ "you",]
 edition = "2018"
 publish = false
 
