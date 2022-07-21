@@ -72,7 +72,7 @@
                     "nonce": "0",
                     "balance": "*",
                     "storage": {
-                        "str:ongoing_operation:currentOngoingOperation": "12"
+                        "str:ongoing_operation:currentOngoingOperation": "19"
                     },
                     "code": "file:../output/use-module.wasm"
                 },
