@@ -16,6 +16,12 @@ pub trait OngoingOperationModule {
     ///
     /// # Usage example: Counting to 100
     /// ```
+    /// # use elrond_wasm::types::OperationCompletionStatus;
+    /// # use elrond_wasm_modules::ongoing_operation::{
+    /// #     self, CONTINUE_OP, DEFAULT_MIN_GAS_TO_SAVE_PROGRESS, STOP_OP,
+    /// # };
+    /// # pub trait ExampleContract: elrond_wasm::contract_base::ContractBase + ongoing_operation::OngoingOperationModule
+    /// # {
     /// fn count_to_100(&self) -> OperationCompletionStatus {
     ///     let mut current_number = self.load_operation::<usize>();
     ///     let run_result = self.run_while_it_has_gas(DEFAULT_MIN_GAS_TO_SAVE_PROGRESS, || {
@@ -34,6 +40,7 @@ pub trait OngoingOperationModule {
     ///
     ///     run_result
     /// }
+    /// # }
     /// ```
     fn run_while_it_has_gas<Process>(
         &self,
