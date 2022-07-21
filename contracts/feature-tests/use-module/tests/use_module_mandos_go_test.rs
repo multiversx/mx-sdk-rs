@@ -32,3 +32,8 @@ fn use_module_no_endpoint_go() {
 fn use_module_pause_go() {
     elrond_wasm_debug::mandos_go("mandos/use_module_pause.scen.json");
 }
+
+#[test]
+fn use_module_ongoing_operation_go() {
+    elrond_wasm_debug::mandos_go("mandos/use_module_ongoing_operation_example.scen.json");
+}

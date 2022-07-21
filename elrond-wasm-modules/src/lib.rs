@@ -7,6 +7,7 @@ pub mod dns;
 pub mod esdt;
 pub mod features;
 pub mod governance;
+pub mod ongoing_operation;
 pub mod only_admin;
 pub mod pause;
 pub mod staking;
