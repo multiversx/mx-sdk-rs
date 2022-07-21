@@ -3,7 +3,6 @@ elrond_wasm::imports!();
 use elrond_wasm::elrond_codec::TopEncode;
 
 pub const DEFAULT_MIN_GAS_TO_SAVE_PROGRESS: u64 = 1_000_000;
-static mut MIN_GAS_TO_SAVE_PROGRESS: u64 = DEFAULT_MIN_GAS_TO_SAVE_PROGRESS;
 
 pub type LoopOp = bool;
 pub const CONTINUE_OP: bool = true;
@@ -44,10 +43,6 @@ pub trait OngoingOperationModule {
     where
         Process: FnMut() -> LoopOp,
     {
-        unsafe {
-            MIN_GAS_TO_SAVE_PROGRESS = min_gas_to_save_progress;
-        }
-
         let mut gas_per_iteration = 0;
         let mut gas_before = self.blockchain().get_gas_left();
         loop {
@@ -62,7 +57,7 @@ pub trait OngoingOperationModule {
                 gas_per_iteration = current_iteration_cost;
             }
 
-            if !self.can_continue_operation(gas_per_iteration) {
+            if !self.can_continue_operation(gas_per_iteration, min_gas_to_save_progress) {
                 return OperationCompletionStatus::InterruptedBeforeOutOfGas;
             }
 
@@ -74,10 +69,11 @@ pub trait OngoingOperationModule {
         OperationCompletionStatus::Completed
     }
 
-    fn can_continue_operation(&self, operation_cost: u64) -> bool {
+    #[inline]
+    fn can_continue_operation(&self, operation_cost: u64, min_gas_to_save_progress: u64) -> bool {
         let gas_left = self.blockchain().get_gas_left();
 
-        unsafe { gas_left > MIN_GAS_TO_SAVE_PROGRESS + operation_cost }
+        gas_left > min_gas_to_save_progress + operation_cost
     }
 
     /// Load the current ongoing operation.
