@@ -78,3 +78,12 @@ fn use_module_no_endpoint_rs() {
 fn use_module_pause_rs() {
     elrond_wasm_debug::mandos_rs("mandos/use_module_pause.scen.json", world());
 }
+
+// Will not work in mandos-rs, since there is no gas usage
+// #[test]
+// fn use_module_ongoing_operation_rs() {
+//     elrond_wasm_debug::mandos_rs(
+//         "mandos/use_module_ongoing_operation_example.scen.json",
+//         world(),
+//     );
+// }

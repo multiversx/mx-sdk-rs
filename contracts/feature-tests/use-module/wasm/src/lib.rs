@@ -10,7 +10,6 @@ elrond_wasm_node::wasm_endpoints! {
         callBack
         addAdmin
         addMergeableTokensToWhitelist
-        admins
         call_derived_not_admin_only
         call_derived_not_owner_only
         call_mod_a
@@ -24,10 +23,12 @@ elrond_wasm_node::wasm_endpoints! {
         changeVotingPeriodInBlocks
         checkFeatureGuard
         checkPause
+        countTo100
         depositTokensForAction
         dnsRegister
         downvote
         execute
+        getAdmins
         getGovernanceTokenId
         getLockTimeAfterVotingEndsInBlocks
         getMergeableTokensWhitelist
@@ -42,8 +43,8 @@ elrond_wasm_node::wasm_endpoints! {
         getTotalVotes
         getVotingDelayInBlocks
         getVotingPeriodInBlocks
+        isAdmin
         isPaused
-        is_admin
         issueMergedToken
         issueToken
         mergeTokens
