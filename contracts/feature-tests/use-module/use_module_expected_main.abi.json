@@ -101,6 +101,16 @@
             "outputs": []
         },
         {
+            "name": "countTo100",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "OperationCompletionStatus"
+                }
+            ]
+        },
+        {
             "name": "dnsRegister",
             "onlyOwner": true,
             "mutability": "mutable",
