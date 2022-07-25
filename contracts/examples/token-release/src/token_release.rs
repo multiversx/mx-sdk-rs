@@ -207,6 +207,7 @@ pub trait TokenRelease {
     #[only_owner]
     #[endpoint(endSetupPeriod)]
     fn end_setup_period(&self) {
+        self.require_setup_period_live();
         let token_identifier = self.token_identifier().get();
         let total_mint_tokens = self.token_total_supply().get();
         self.mint_all_tokens(&token_identifier, &total_mint_tokens);
