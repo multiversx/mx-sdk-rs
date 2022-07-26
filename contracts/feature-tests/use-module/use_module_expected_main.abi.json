@@ -14,7 +14,7 @@
         },
         "framework": {
             "name": "elrond-wasm",
-            "version": "0.34.0"
+            "version": "0.34.1"
         }
     },
     "docs": [
@@ -99,6 +99,16 @@
             "mutability": "readonly",
             "inputs": [],
             "outputs": []
+        },
+        {
+            "name": "countTo100",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "OperationCompletionStatus"
+                }
+            ]
         },
         {
             "name": "dnsRegister",

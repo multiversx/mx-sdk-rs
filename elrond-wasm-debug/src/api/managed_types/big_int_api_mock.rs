@@ -3,7 +3,6 @@ use core::{
     cmp::Ordering,
     ops::{Add, BitAnd, BitOr, BitXor, Div, Mul, Neg, Rem, Shl, Shr, Sub},
 };
-use std::convert::TryInto;
 use elrond_wasm::{
     api::{BigIntApi, ErrorApiImpl, HandleTypeInfo, ManagedBufferApi},
     err_msg,
@@ -11,6 +10,7 @@ use elrond_wasm::{
 };
 use num_bigint::BigInt;
 use num_traits::{pow, sign::Signed, Zero};
+use std::convert::TryInto;
 
 use super::big_int_util::big_int_to_i64;
 

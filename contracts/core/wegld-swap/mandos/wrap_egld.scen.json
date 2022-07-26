@@ -7,19 +7,15 @@
             "accounts": {
                 "address:user": {
                     "nonce": "0",
-                    "balance": "1000"
+                    "balance": "1000",
+                    "storage": {}
                 },
                 "sc:egld_esdt_swap": {
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
                         "str:EGLD-abcdef": {
-                            "instances": [
-                                {
-                                    "nonce": "",
-                                    "balance": "1"
-                                }
-                            ],
+                            "balance": "1",
                             "roles": [
                                 "ESDTRoleLocalMint",
                                 "ESDTRoleLocalBurn"
@@ -29,7 +25,7 @@
                     "storage": {
                         "str:wrappedEgldTokenId": "str:EGLD-abcdef"
                     },
-                    "code": "file:../output/egld-esdt-swap.wasm"
+                    "code": "file:../output/elrond-sc-wegld-swap.wasm"
                 }
             }
         },
@@ -39,16 +35,18 @@
             "tx": {
                 "from": "address:user",
                 "to": "sc:egld_esdt_swap",
-                "egldValue": "500",
+                "value": "500",
                 "function": "wrapEgld",
                 "arguments": [],
                 "gasLimit": "5,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [],
                 "status": "0",
                 "message": "",
+                "out": [
+                    "nested:str:EGLD-abcdef|u64:0|biguint:500"
+                ],
                 "gas": "*",
                 "refund": "*"
             }
@@ -69,12 +67,7 @@
                     "balance": "500",
                     "esdt": {
                         "str:EGLD-abcdef": {
-                            "instances": [
-                                {
-                                    "nonce": "",
-                                    "balance": "1"
-                                }
-                            ],
+                            "balance": "1",
                             "roles": [
                                 "ESDTRoleLocalMint",
                                 "ESDTRoleLocalBurn"
@@ -84,7 +77,7 @@
                     "storage": {
                         "str:wrappedEgldTokenId": "str:EGLD-abcdef"
                     },
-                    "code": "file:../output/egld-esdt-swap.wasm"
+                    "code": "file:../output/elrond-sc-wegld-swap.wasm"
                 }
             }
         }

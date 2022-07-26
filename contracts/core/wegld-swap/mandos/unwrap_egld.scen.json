@@ -12,19 +12,17 @@
             "tx": {
                 "from": "address:user",
                 "to": "sc:egld_esdt_swap",
-                "esdtValue": [
-                    {
-                        "tokenIdentifier": "str:EGLD-abcdef",
-                        "value": "300"
-                    }
-                ],
+                "value": "0",
+                "esdt": {
+                    "tokenIdentifier": "str:EGLD-abcdef",
+                    "value": "300"
+                },
                 "function": "unwrapEgld",
                 "arguments": [],
                 "gasLimit": "5,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [],
                 "status": "0",
                 "message": "",
                 "gas": "*",
@@ -47,12 +45,7 @@
                     "balance": "200",
                     "esdt": {
                         "str:EGLD-abcdef": {
-                            "instances": [
-                                {
-                                    "nonce": "",
-                                    "balance": "1"
-                                }
-                            ],
+                            "balance": "1",
                             "roles": [
                                 "ESDTRoleLocalMint",
                                 "ESDTRoleLocalBurn"
@@ -62,7 +55,7 @@
                     "storage": {
                         "str:wrappedEgldTokenId": "str:EGLD-abcdef"
                     },
-                    "code": "file:../output/egld-esdt-swap.wasm"
+                    "code": "file:../output/elrond-sc-wegld-swap.wasm"
                 }
             }
         }

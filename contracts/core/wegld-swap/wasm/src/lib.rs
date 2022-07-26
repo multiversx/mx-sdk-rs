@@ -5,17 +5,16 @@
 #![no_std]
 
 elrond_wasm_node::wasm_endpoints! {
-    egld_esdt_swap
+    elrond_sc_wegld_swap
     (
-        callBack
         getLockedEgldBalance
-        getWrappedEgldTokenIdentifier
+        getWrappedEgldTokenId
         isPaused
-        issueWrappedEgld
         pause
-        setLocalRoles
         unpause
         unwrapEgld
         wrapEgld
     )
 }
+
+elrond_wasm_node::wasm_empty_callback! {}
