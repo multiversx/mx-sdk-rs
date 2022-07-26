@@ -5,8 +5,9 @@ use crate::{
 
 use super::{
     change_owner_mock::execute_change_owner,
-    claim_developer_rewards::execute_claim_developer_rewards, esdt_local_burn::execute_local_burn,
-    esdt_local_mint::execute_local_mint, esdt_multi_transfer_mock::execute_esdt_multi_transfer,
+    claim_developer_rewards_mock::execute_claim_developer_rewards,
+    esdt_local_burn::execute_local_burn, esdt_local_mint::execute_local_mint,
+    esdt_multi_transfer_mock::execute_esdt_multi_transfer,
     esdt_nft_add_quantity_mock::execute_nft_add_quantity,
     esdt_nft_add_uri_mock::execute_nft_add_uri, esdt_nft_burn_mock::execute_nft_burn,
     esdt_nft_create_mock::execute_esdt_nft_create,

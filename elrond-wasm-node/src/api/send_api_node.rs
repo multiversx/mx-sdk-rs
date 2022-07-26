@@ -554,10 +554,6 @@ impl SendApiImpl for VmApiImpl {
         }
     }
 
-    fn claim_developer_rewards(&self) -> i32 {
-        unsafe { claimDeveloperRewards() }
-    }
-
     fn create_async_call_raw<M: ManagedTypeApi>(
         &self,
         to: &ManagedAddress<M>,
