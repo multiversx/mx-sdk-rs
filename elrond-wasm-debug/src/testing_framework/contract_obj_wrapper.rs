@@ -8,6 +8,7 @@ use elrond_wasm::{
         EsdtLocalRole,
     },
 };
+use num_bigint::BigUint;
 use num_traits::Zero;
 
 use crate::{
@@ -175,7 +176,7 @@ impl BlockchainStateWrapper {
 impl BlockchainStateWrapper {
     pub fn create_user_account(&mut self, egld_balance: &num_bigint::BigUint) -> Address {
         let address = self.address_factory.new_address();
-        self.create_account_raw(&address, egld_balance, None, None, None);
+        self.create_account_raw(&address, egld_balance, None, &BigUint::zero(), None, None);
 
         address
     }
@@ -185,13 +186,14 @@ impl BlockchainStateWrapper {
         address: &Address,
         egld_balance: &num_bigint::BigUint,
     ) {
-        self.create_account_raw(address, egld_balance, None, None, None);
+        self.create_account_raw(address, egld_balance, None, &BigUint::zero(), None, None);
     }
 
     pub fn create_sc_account<CB, ContractObjBuilder>(
         &mut self,
         egld_balance: &num_bigint::BigUint,
         owner: Option<&Address>,
+        developer_rewards: &num_bigint::BigUint,
         obj_builder: ContractObjBuilder,
         contract_wasm_path: &str,
     ) -> ContractObjWrapper<CB, ContractObjBuilder>
@@ -204,6 +206,7 @@ impl BlockchainStateWrapper {
             &address,
             egld_balance,
             owner,
+            developer_rewards,
             obj_builder,
             contract_wasm_path,
         )
@@ -214,6 +217,7 @@ impl BlockchainStateWrapper {
         address: &Address,
         egld_balance: &num_bigint::BigUint,
         owner: Option<&Address>,
+        developer_rewards: &num_bigint::BigUint,
         obj_builder: ContractObjBuilder,
         contract_wasm_path: &str,
     ) -> ContractObjWrapper<CB, ContractObjBuilder>
@@ -248,6 +252,7 @@ impl BlockchainStateWrapper {
             address,
             egld_balance,
             owner,
+            developer_rewards,
             Some(contract_bytes),
             Some(wasm_relative_path_expr_bytes),
         );
@@ -267,6 +272,7 @@ impl BlockchainStateWrapper {
         address: &Address,
         egld_balance: &num_bigint::BigUint,
         owner: Option<&Address>,
+        developer_rewards: &num_bigint::BigUint,
         sc_identifier: Option<Vec<u8>>,
         sc_mandos_path_expr: Option<Vec<u8>>,
     ) {
@@ -283,7 +289,7 @@ impl BlockchainStateWrapper {
             username: Vec::new(),
             contract_path: sc_identifier,
             contract_owner: owner.cloned(),
-            developer_rewards: num_bigint::BigUint::zero(),
+            developer_rewards: developer_rewards.clone(),
         };
         self.mandos_generator
             .set_account(&acc_data, sc_mandos_path_expr);

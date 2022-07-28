@@ -201,18 +201,14 @@ where
             .call_and_exit_ignore_callback()
     }
 
-    /// Sends a synchronous call to change a smart contract address.
     pub fn claim_developer_rewards(
         &self,
         child_sc_address: ManagedAddress<A>,
-        new_owner: &ManagedAddress<A>,
     ) -> ContractCall<A, ()> {
-        let mut contract_call = ContractCall::new(
+        ContractCall::new(
             child_sc_address,
             ManagedBuffer::new_from_bytes(CLAIM_DEVELOPER_REWARDS_NAME),
-        );
-        contract_call.push_endpoint_arg(&new_owner);
-        contract_call
+        )
     }
 
     /// Sends a synchronous call to change a smart contract address.

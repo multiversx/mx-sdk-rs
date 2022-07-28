@@ -79,8 +79,6 @@ extern "C" {
         length: i32,
     ) -> !;
 
-    fn claimDeveloperRewards() -> i32;
-
     fn createContract(
         gas: i64,
         valueOffset: *const u8,

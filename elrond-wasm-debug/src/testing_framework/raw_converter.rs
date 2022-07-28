@@ -248,6 +248,7 @@ pub(crate) fn account_as_check_state_raw(acc: &AccountData) -> CheckAccountsRaw 
             contents: all_check_esdt_raw,
         }),
         owner: CheckBytesValueRaw::Star, // TODO: Add owner check?
+        developer_rewards: CheckBytesValueRaw::Equal(rust_biguint_as_raw(&acc.developer_rewards)),
         storage: CheckStorageRaw::Equal(check_storage_raw),
         code: CheckBytesValueRaw::Star,
         async_call_data: CheckBytesValueRaw::Unspecified,
