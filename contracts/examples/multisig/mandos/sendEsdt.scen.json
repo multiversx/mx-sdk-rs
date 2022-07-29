@@ -166,6 +166,14 @@
                         "address": "sc:multisig",
                         "endpoint": "str:performAction",
                         "topics": [
+                            "str:startPerformAction"
+                        ],
+                        "data": "*"
+                    },
+                    {
+                        "address": "sc:multisig",
+                        "endpoint": "str:performAction",
+                        "topics": [
                             "str:performAsyncCall",
                             "3",
                             "sc:multisig",

@@ -1,10 +1,13 @@
-use crate::user_role::UserRole;
+use crate::{action::ActionFullInfo, user_role::UserRole};
 
 elrond_wasm::imports!();
 
 /// Contains all events that can be emitted by the contract.
 #[elrond_wasm::module]
 pub trait MultisigEventsModule {
+    #[event("startPerformAction")]
+    fn start_perform_action_event(&self, data: &ActionFullInfo<Self::Api>);
+
     #[event("performChangeUser")]
     fn perform_change_user_event(
         &self,

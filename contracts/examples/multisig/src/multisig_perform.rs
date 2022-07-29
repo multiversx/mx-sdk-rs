@@ -1,4 +1,7 @@
-use crate::{action::Action, user_role::UserRole};
+use crate::{
+    action::{Action, ActionFullInfo},
+    user_role::UserRole,
+};
 
 elrond_wasm::imports!();
 
@@ -93,6 +96,12 @@ pub trait MultisigPerformModule:
 
     fn perform_action(&self, action_id: usize) -> OptionalValue<ManagedAddress> {
         let action = self.action_mapper().get(action_id);
+
+        self.start_perform_action_event(&ActionFullInfo {
+            action_id,
+            action_data: action.clone(),
+            signers: self.get_action_signers(action_id),
+        });
 
         // clean up storage
         // happens before actual execution, because the match provides the return on each branch
