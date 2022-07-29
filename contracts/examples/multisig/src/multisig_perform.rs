@@ -1,4 +1,4 @@
-use crate::{action::Action, user_role::UserRole};
+use crate::{action::Action, action::ActionFullInfo, user_role::UserRole};
 
 elrond_wasm::imports!();
 
@@ -87,9 +87,24 @@ pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
         self.perform_action(action_id)
     }
 
+    #[event("actionPerformed")]
+    fn perform_action_event(
+        &self,
+        data: ActionFullInfo<Self::Api>,
+    );
+
     fn perform_action(&self, action_id: usize) -> OptionalValue<ManagedAddress> {
         let action = self.action_mapper().get(action_id);
 
+        let action_mapper = self.action_mapper();
+        let action_data = action_mapper.get(action_id);
+
+        self.perform_action_event(ActionFullInfo {
+            action_id,
+            action_data,
+            signers: self.get_action_signers(action_id),
+        });
+        
         // clean up storage
         // happens before actual execution, because the match provides the return on each branch
         // syntax aside, the async_call_raw kills contract execution so cleanup cannot happen afterwards
