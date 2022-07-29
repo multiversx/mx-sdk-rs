@@ -44,13 +44,8 @@ where
             oracles.push(oracle);
         }
 
-        let price_agg = b_mock.create_sc_account(
-            &rust_zero,
-            Some(&owner),
-            &rust_zero,
-            builder,
-            "price_agg_path",
-        );
+        let price_agg =
+            b_mock.create_sc_account(&rust_zero, Some(&owner), builder, "price_agg_path");
 
         let current_timestamp = 100;
         b_mock.set_block_timestamp(current_timestamp);

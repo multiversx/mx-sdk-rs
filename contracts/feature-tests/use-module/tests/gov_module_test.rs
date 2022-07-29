@@ -56,13 +56,8 @@ where
         let second_user = b_mock.create_user_account(&rust_zero);
         b_mock.set_esdt_balance(&second_user, GOV_TOKEN_ID, &initial_gov);
 
-        let gov_wrapper = b_mock.create_sc_account(
-            &rust_zero,
-            Some(&owner),
-            &rust_zero,
-            gov_builder,
-            "gov path",
-        );
+        let gov_wrapper =
+            b_mock.create_sc_account(&rust_zero, Some(&owner), gov_builder, "gov path");
 
         b_mock
             .execute_tx(&owner, &gov_wrapper, &rust_zero, |sc| {

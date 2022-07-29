@@ -72,7 +72,6 @@ where
         let ms_wrapper = b_mock.create_sc_account(
             &rust_zero,
             Some(&owner_address),
-            &rust_zero,
             ms_builder,
             MULTISIG_WASM_PATH,
         );

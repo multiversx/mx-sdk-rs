@@ -35,7 +35,6 @@ where
     let cf_wrapper = blockchain_wrapper.create_sc_account(
         &rust_zero,
         Some(&owner_address),
-        &rust_zero,
         cf_builder,
         WASM_PATH,
     );

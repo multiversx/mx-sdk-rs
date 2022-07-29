@@ -24,7 +24,6 @@ fn staking_module_test() {
     let staking_sc = b_mock.create_sc_account(
         &rust_zero,
         Some(&owner),
-        &rust_zero,
         use_module::contract_obj,
         "wasm path",
     );

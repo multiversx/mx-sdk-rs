@@ -43,7 +43,6 @@ fn test_token_merge() {
     let merging_sc = b_mock.create_sc_account(
         &rust_zero,
         Some(&owner),
-        &rust_zero,
         use_module::contract_obj,
         "wasm path",
     );
@@ -438,7 +437,6 @@ fn partial_split_test() {
     let merging_sc = b_mock.create_sc_account(
         &rust_zero,
         Some(&owner),
-        &rust_zero,
         use_module::contract_obj,
         "wasm path",
     );
