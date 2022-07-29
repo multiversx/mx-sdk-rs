@@ -24,10 +24,12 @@ const BASIC_FEATURES_WASM_PATH: &'static str =
 
 #[test]
 fn test_add() {
+    let rust_zero = rust_biguint!(0);
     let mut wrapper = BlockchainStateWrapper::new();
     let sc_wrapper = wrapper.create_sc_account(
         &rust_biguint!(0),
         None,
+        &rust_zero,
         rust_testing_framework_tester::contract_obj,
         SC_WASM_PATH,
     );
@@ -47,10 +49,12 @@ fn test_add() {
 #[should_panic]
 #[test]
 fn test_add_wrong_expect() {
+    let rust_zero = rust_biguint!(0);
     let mut wrapper = BlockchainStateWrapper::new();
     let sc_wrapper = wrapper.create_sc_account(
         &rust_biguint!(0),
         None,
+        &rust_zero,
         rust_testing_framework_tester::contract_obj,
         SC_WASM_PATH,
     );
@@ -69,10 +73,12 @@ fn test_add_wrong_expect() {
 
 #[test]
 fn test_sc_result_ok() {
+    let rust_zero = rust_biguint!(0);
     let mut wrapper = BlockchainStateWrapper::new();
     let sc_wrapper = wrapper.create_sc_account(
         &rust_biguint!(0),
         None,
+        &rust_zero,
         rust_testing_framework_tester::contract_obj,
         SC_WASM_PATH,
     );
@@ -91,10 +97,12 @@ fn test_sc_result_ok() {
 
 #[test]
 fn test_sc_result_ok_unwrap() {
+    let rust_zero = rust_biguint!(0);
     let mut wrapper = BlockchainStateWrapper::new();
     let sc_wrapper = wrapper.create_sc_account(
         &rust_biguint!(0),
         None,
+        &rust_zero,
         rust_testing_framework_tester::contract_obj,
         SC_WASM_PATH,
     );
@@ -113,10 +121,12 @@ fn test_sc_result_ok_unwrap() {
 
 #[test]
 fn test_sc_result_err() {
+    let rust_zero = rust_biguint!(0);
     let mut wrapper = BlockchainStateWrapper::new();
     let sc_wrapper = wrapper.create_sc_account(
         &rust_biguint!(0),
         None,
+        &rust_zero,
         rust_testing_framework_tester::contract_obj,
         SC_WASM_PATH,
     );
@@ -136,10 +146,12 @@ fn test_sc_result_err() {
 )]
 #[test]
 fn test_sc_result_err_unwrap() {
+    let rust_zero = rust_biguint!(0);
     let mut wrapper = BlockchainStateWrapper::new();
     let sc_wrapper = wrapper.create_sc_account(
         &rust_biguint!(0),
         None,
+        &rust_zero,
         rust_testing_framework_tester::contract_obj,
         SC_WASM_PATH,
     );
@@ -159,10 +171,12 @@ fn test_sc_result_err_unwrap() {
 )]
 #[test]
 fn test_assert_err_with_ok() {
+    let rust_zero = rust_biguint!(0);
     let mut wrapper = BlockchainStateWrapper::new();
     let sc_wrapper = wrapper.create_sc_account(
         &rust_biguint!(0),
         None,
+        &rust_zero,
         rust_testing_framework_tester::contract_obj,
         SC_WASM_PATH,
     );
@@ -182,10 +196,12 @@ fn test_assert_err_with_ok() {
 fn test_sc_payment_ok() {
     let mut wrapper = BlockchainStateWrapper::new();
 
+    let rust_zero = rust_biguint!(0);
     let caller_addr = wrapper.create_user_account(&rust_biguint!(1_000));
     let sc_wrapper = wrapper.create_sc_account(
         &rust_biguint!(2_000),
         Some(&caller_addr),
+        &rust_zero,
         rust_testing_framework_tester::contract_obj,
         SC_WASM_PATH,
     );
@@ -206,10 +222,12 @@ fn test_sc_payment_ok() {
 fn test_sc_payment_reverted() {
     let mut wrapper = BlockchainStateWrapper::new();
 
+    let rust_zero = rust_biguint!(0);
     let caller_addr = wrapper.create_user_account(&rust_biguint!(1_000));
     let sc_wrapper = wrapper.create_sc_account(
         &rust_biguint!(2_000),
         Some(&caller_addr),
+        &rust_zero,
         rust_testing_framework_tester::contract_obj,
         SC_WASM_PATH,
     );
@@ -228,10 +246,12 @@ fn test_sc_payment_reverted() {
 fn test_sc_half_payment() {
     let mut wrapper = BlockchainStateWrapper::new();
 
+    let rust_zero = rust_biguint!(0);
     let caller_addr = wrapper.create_user_account(&rust_biguint!(1_000));
     let sc_wrapper = wrapper.create_sc_account(
         &rust_biguint!(2_000),
         Some(&caller_addr),
+        &rust_zero,
         rust_testing_framework_tester::contract_obj,
         SC_WASM_PATH,
     );
@@ -248,10 +268,12 @@ fn test_sc_half_payment() {
 
 #[test]
 fn test_esdt_balance() {
+    let rust_zero = rust_biguint!(0);
     let mut wrapper = BlockchainStateWrapper::new();
     let sc_wrapper = wrapper.create_sc_account(
         &rust_biguint!(0),
         None,
+        &rust_zero,
         rust_testing_framework_tester::contract_obj,
         SC_WASM_PATH,
     );
@@ -283,6 +305,7 @@ fn test_esdt_payment_ok() {
     let sc_wrapper = wrapper.create_sc_account(
         &rust_zero,
         None,
+        &rust_zero,
         rust_testing_framework_tester::contract_obj,
         SC_WASM_PATH,
     );
@@ -321,6 +344,7 @@ fn test_esdt_payment_reverted() {
     let sc_wrapper = wrapper.create_sc_account(
         &rust_zero,
         None,
+        &rust_zero,
         rust_testing_framework_tester::contract_obj,
         SC_WASM_PATH,
     );
@@ -348,10 +372,12 @@ fn test_esdt_payment_reverted() {
 
 #[test]
 fn test_nft_balance() {
+    let rust_zero = rust_biguint!(0);
     let mut wrapper = BlockchainStateWrapper::new();
     let sc_wrapper = wrapper.create_sc_account(
         &rust_biguint!(0),
         None,
+        &rust_zero,
         rust_testing_framework_tester::contract_obj,
         SC_WASM_PATH,
     );
@@ -392,10 +418,12 @@ fn test_nft_balance() {
 #[should_panic]
 #[test]
 fn check_nft_zero_balance() {
+    let rust_zero = rust_biguint!(0);
     let mut wrapper = BlockchainStateWrapper::new();
     let sc_wrapper = wrapper.create_sc_account(
         &rust_biguint!(0),
         None,
+        &rust_zero,
         rust_testing_framework_tester::contract_obj,
         SC_WASM_PATH,
     );
@@ -418,11 +446,13 @@ fn check_nft_zero_balance() {
 
 #[test]
 fn test_sc_send_nft_to_user() {
+    let rust_zero = rust_biguint!(0);
     let mut wrapper = BlockchainStateWrapper::new();
     let caller_addr = wrapper.create_user_account(&rust_biguint!(0));
     let sc_wrapper = wrapper.create_sc_account(
         &rust_biguint!(0),
         None,
+        &rust_zero,
         rust_testing_framework_tester::contract_obj,
         SC_WASM_PATH,
     );
@@ -476,11 +506,13 @@ fn test_sc_send_nft_to_user() {
 
 #[test]
 fn test_sc_esdt_mint_burn() {
+    let rust_zero = rust_biguint!(0);
     let mut wrapper = BlockchainStateWrapper::new();
     let caller_addr = wrapper.create_user_account(&rust_biguint!(0));
     let sc_wrapper = wrapper.create_sc_account(
         &rust_biguint!(0),
         None,
+        &rust_zero,
         rust_testing_framework_tester::contract_obj,
         SC_WASM_PATH,
     );
@@ -515,11 +547,13 @@ fn test_sc_esdt_mint_burn() {
 
 #[test]
 fn test_sc_nft() {
+    let rust_zero = rust_biguint!(0);
     let mut wrapper = BlockchainStateWrapper::new();
     let caller_addr = wrapper.create_user_account(&rust_biguint!(0));
     let sc_wrapper = wrapper.create_sc_account(
         &rust_biguint!(0),
         None,
+        &rust_zero,
         rust_testing_framework_tester::contract_obj,
         SC_WASM_PATH,
     );
@@ -620,11 +654,13 @@ fn test_sc_nft() {
 
 #[test]
 fn test_esdt_multi_transfer() {
+    let rust_zero = rust_biguint!(0);
     let mut wrapper = BlockchainStateWrapper::new();
     let caller_addr = wrapper.create_user_account(&rust_biguint!(0));
     let sc_wrapper = wrapper.create_sc_account(
         &rust_biguint!(0),
         None,
+        &rust_zero,
         rust_testing_framework_tester::contract_obj,
         SC_WASM_PATH,
     );
@@ -703,10 +739,12 @@ fn test_esdt_multi_transfer() {
 
 #[test]
 fn test_query() {
+    let rust_zero = rust_biguint!(0);
     let mut wrapper = BlockchainStateWrapper::new();
     let sc_wrapper = wrapper.create_sc_account(
         &rust_biguint!(2_000),
         None,
+        &rust_zero,
         rust_testing_framework_tester::contract_obj,
         SC_WASM_PATH,
     );
@@ -726,6 +764,7 @@ fn storage_check_test() {
     let sc_wrapper = wrapper.create_sc_account(
         &rust_zero,
         None,
+        &rust_zero,
         rust_testing_framework_tester::contract_obj,
         SC_WASM_PATH,
     );
@@ -781,6 +820,7 @@ fn storage_revert_test() {
     let sc_wrapper = wrapper.create_sc_account(
         &rust_zero,
         None,
+        &rust_zero,
         rust_testing_framework_tester::contract_obj,
         SC_WASM_PATH,
     );
@@ -838,6 +878,7 @@ fn storage_set_test() {
     let sc_wrapper = wrapper.create_sc_account(
         &rust_zero,
         None,
+        &rust_zero,
         rust_testing_framework_tester::contract_obj,
         SC_WASM_PATH,
     );
@@ -877,6 +918,7 @@ fn blockchain_state_test() {
     let sc_wrapper = wrapper.create_sc_account(
         &rust_zero,
         None,
+        &rust_zero,
         rust_testing_framework_tester::contract_obj,
         SC_WASM_PATH,
     );
@@ -910,12 +952,14 @@ fn execute_on_dest_context_query_test() {
     let sc_wrapper = wrapper.create_sc_account(
         &rust_zero,
         None,
+        &rust_zero,
         rust_testing_framework_tester::contract_obj,
         SC_WASM_PATH,
     );
     let other_sc_wrapper = wrapper.create_sc_account(
         &rust_zero,
         None,
+        &rust_zero,
         rust_testing_framework_tester::contract_obj,
         SC_WASM_PATH,
     );
@@ -947,12 +991,14 @@ fn execute_on_dest_context_change_state_test() {
     let sc_wrapper = wrapper.create_sc_account(
         &rust_zero,
         None,
+        &rust_zero,
         rust_testing_framework_tester::contract_obj,
         SC_WASM_PATH,
     );
     let other_sc_wrapper = wrapper.create_sc_account(
         &rust_zero,
         None,
+        &rust_zero,
         rust_testing_framework_tester::contract_obj,
         SC_WASM_PATH,
     );
@@ -990,6 +1036,7 @@ fn test_mandos_generation() {
     let sc_wrapper = wrapper.create_sc_account(
         &rust_zero,
         None,
+        &rust_zero,
         rust_testing_framework_tester::contract_obj,
         SC_WASM_PATH,
     );
@@ -1060,10 +1107,12 @@ fn test_mandos_generation() {
 
 #[test]
 fn test_multiple_contracts() {
+    let rust_zero = rust_biguint!(0);
     let mut wrapper = BlockchainStateWrapper::new();
     let _sc_wrapper = wrapper.create_sc_account(
         &rust_biguint!(0u64),
         None,
+        &rust_zero,
         rust_testing_framework_tester::contract_obj,
         SC_WASM_PATH,
     );
@@ -1071,6 +1120,7 @@ fn test_multiple_contracts() {
     let _sc_wrapper_other = wrapper.create_sc_account(
         &rust_biguint!(0u64),
         None,
+        &rust_zero,
         adder::contract_obj,
         ADDER_WASM_PATH,
     );
@@ -1086,11 +1136,17 @@ fn test_async_call() {
     let sc_wrapper = wrapper.create_sc_account(
         &rust_zero,
         None,
+        &rust_zero,
         rust_testing_framework_tester::contract_obj,
         SC_WASM_PATH,
     );
-    let adder_wrapper =
-        wrapper.create_sc_account(&rust_zero, None, adder::contract_obj, ADDER_WASM_PATH);
+    let adder_wrapper = wrapper.create_sc_account(
+        &rust_zero,
+        None,
+        &rust_zero,
+        adder::contract_obj,
+        ADDER_WASM_PATH,
+    );
 
     let tx_result = wrapper.execute_tx(&user_addr, &sc_wrapper, &rust_zero, |sc| {
         let adder_address = managed_address!(adder_wrapper.address_ref());
@@ -1166,6 +1222,7 @@ fn fixed_address_account_creation_test() {
 )]
 #[test]
 fn fixed_address_invalid_sc_test() {
+    let rust_zero = rust_biguint!(0);
     let mut wrapper = BlockchainStateWrapper::new();
     let user_addr = Address::from_slice(&[1u8; 32][..]);
 
@@ -1174,6 +1231,7 @@ fn fixed_address_invalid_sc_test() {
         &Address::from_slice(&[2u8; 32][..]),
         &rust_biguint!(0),
         Some(&user_addr),
+        &rust_zero,
         rust_testing_framework_tester::contract_obj,
         SC_WASM_PATH,
     );
@@ -1191,10 +1249,12 @@ fn managed_environment_test() {
 
 #[test]
 fn managed_environment_consistency_test() {
+    let rust_zero = rust_biguint!(0);
     let mut wrapper = BlockchainStateWrapper::new();
     let adder_wrapper = wrapper.create_sc_account(
         &rust_biguint!(0),
         None,
+        &rust_zero,
         adder::contract_obj,
         ADDER_WASM_PATH,
     );
@@ -1216,10 +1276,12 @@ fn test_managed_values_standalone_consistency() {
 
     let mut blockchain_wrapper = BlockchainStateWrapper::new();
 
+    let rust_zero = rust_biguint!(0);
     let owner_address = blockchain_wrapper.create_user_account(&rust_biguint!(0u64));
     let basic_features_wrapper = blockchain_wrapper.create_sc_account(
         &rust_biguint!(0u64),
         Some(&owner_address),
+        &rust_zero,
         basic_features::contract_obj,
         BASIC_FEATURES_WASM_PATH,
     );
@@ -1244,10 +1306,12 @@ fn test_managed_values_argument_and_return_value_consistency() {
 
     let mut blockchain_wrapper = BlockchainStateWrapper::new();
 
+    let rust_zero = rust_biguint!(0);
     let owner_address = blockchain_wrapper.create_user_account(&rust_biguint!(0u64));
     let basic_features_wrapper = blockchain_wrapper.create_sc_account(
         &rust_biguint!(0u64),
         Some(&owner_address),
+        &rust_zero,
         basic_features::contract_obj,
         BASIC_FEATURES_WASM_PATH,
     );
@@ -1281,10 +1345,12 @@ fn test_managed_values_insert_handle_panics() {
 
     let mut blockchain_wrapper = BlockchainStateWrapper::new();
 
+    let rust_zero = rust_biguint!(0);
     let owner_address = blockchain_wrapper.create_user_account(&rust_biguint!(0u64));
     let basic_features_wrapper = blockchain_wrapper.create_sc_account(
         &rust_biguint!(0u64),
         Some(&owner_address),
+        &rust_zero,
         basic_features::contract_obj,
         BASIC_FEATURES_WASM_PATH,
     );
@@ -1316,10 +1382,12 @@ fn test_managed_types_without_environment() {
 
 #[test]
 fn test_random_buffer() {
+    let rust_zero = rust_biguint!(0);
     let mut wrapper = BlockchainStateWrapper::new();
     let sc_wrapper = wrapper.create_sc_account(
         &rust_biguint!(0),
         None,
+        &rust_zero,
         rust_testing_framework_tester::contract_obj,
         SC_WASM_PATH,
     );
@@ -1335,10 +1403,12 @@ fn test_random_buffer() {
 
 #[test]
 fn test_random_buffer_twice() {
+    let rust_zero = rust_biguint!(0);
     let mut wrapper = BlockchainStateWrapper::new();
     let sc_wrapper = wrapper.create_sc_account(
         &rust_biguint!(0),
         None,
+        &rust_zero,
         rust_testing_framework_tester::contract_obj,
         SC_WASM_PATH,
     );
@@ -1358,10 +1428,12 @@ fn test_random_buffer_twice() {
 
 #[test]
 fn test_modules() {
+    let rust_zero = rust_biguint!(0);
     let mut wrapper = BlockchainStateWrapper::new();
     let sc_wrapper = wrapper.create_sc_account(
         &rust_biguint!(0),
         None,
+        &rust_zero,
         rust_testing_framework_tester::contract_obj,
         SC_WASM_PATH,
     );
@@ -1378,6 +1450,7 @@ fn test_back_and_forth_transfers() {
     let mut wrapper = BlockchainStateWrapper::new();
     let user = wrapper.create_user_account(&rust_biguint!(0));
 
+    let rust_zero = rust_biguint!(0);
     let first_token_id = b"FIRSTTOKEN-abcdef";
     let second_token_id = b"SECTOKEN-abcdef";
     let third_token_id = b"THIRDTOKEN-abcdef";
@@ -1392,6 +1465,7 @@ fn test_back_and_forth_transfers() {
     let forwarder_wrapper = wrapper.create_sc_account(
         &rust_biguint!(0),
         None,
+        &rust_zero,
         forwarder::contract_obj,
         "../forwarder/output/forwarder.wasm",
     );
@@ -1399,6 +1473,7 @@ fn test_back_and_forth_transfers() {
     let vault_wrapper = wrapper.create_sc_account(
         &rust_biguint!(0),
         None,
+        &rust_zero,
         vault::contract_obj,
         "../vault/output/vault.wasm",
     );
@@ -1452,10 +1527,12 @@ fn test_back_and_forth_transfers() {
 
 #[test]
 fn dump_state_single_test() {
+    let rust_zero = rust_biguint!(0);
     let mut wrapper = BlockchainStateWrapper::new();
     let sc_wrapper = wrapper.create_sc_account(
         &rust_biguint!(0),
         None,
+        &rust_zero,
         rust_testing_framework_tester::contract_obj,
         SC_WASM_PATH,
     );
@@ -1496,10 +1573,12 @@ fn dump_state_single_test() {
 
 #[test]
 fn dump_state_raw_attributes_test() {
+    let rust_zero = rust_biguint!(0);
     let mut wrapper = BlockchainStateWrapper::new();
     let sc_wrapper = wrapper.create_sc_account(
         &rust_biguint!(0),
         None,
+        &rust_zero,
         rust_testing_framework_tester::contract_obj,
         SC_WASM_PATH,
     );
@@ -1540,11 +1619,13 @@ fn dump_state_raw_attributes_test() {
 
 #[test]
 fn dump_state_all_test() {
+    let rust_zero = rust_biguint!(0);
     let mut wrapper = BlockchainStateWrapper::new();
     let user_addr = wrapper.create_user_account(&rust_biguint!(333));
     let sc_wrapper = wrapper.create_sc_account(
         &rust_biguint!(0),
         None,
+        &rust_zero,
         rust_testing_framework_tester::contract_obj,
         SC_WASM_PATH,
     );

@@ -240,6 +240,7 @@ fn transfer_execute_sc_call_test() {
     let adder_wrapper = ms_setup.b_mock.create_sc_account(
         &rust_zero,
         Some(&adder_owner),
+        &rust_zero,
         adder::contract_obj,
         "path",
     );
@@ -281,6 +282,7 @@ fn async_call_to_sc_test() {
     let adder_wrapper = ms_setup.b_mock.create_sc_account(
         &rust_zero,
         Some(&adder_owner),
+        &rust_zero,
         adder::contract_obj,
         "path",
     );
@@ -326,6 +328,7 @@ fn deploy_and_upgrade_from_source_test() {
     let adder_wrapper = ms_setup.b_mock.create_sc_account(
         &rust_zero,
         Some(&adder_owner),
+        &rust_zero,
         adder::contract_obj,
         "path",
     );
@@ -387,6 +390,7 @@ fn deploy_and_upgrade_from_source_test() {
     let fact_wrapper = ms_setup.b_mock.create_sc_account(
         &rust_zero,
         Some(&fact_owner),
+        &rust_zero,
         factorial::contract_obj,
         "path222",
     );
