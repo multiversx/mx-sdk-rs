@@ -20,7 +20,7 @@ pub(crate) const STAR_STR: &str = "*";
 
 pub(crate) fn account_as_raw(acc: &AccountData) -> AccountRaw {
     let balance_raw = Some(rust_biguint_as_raw(&acc.egld_balance));
-    let developer_rewards_raw = Some(rust_biguint_as_raw(&&acc.developer_rewards));
+    let developer_rewards_raw = Some(rust_biguint_as_raw(&acc.developer_rewards));
     let code_raw = acc
         .contract_path
         .clone()

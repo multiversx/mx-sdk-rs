@@ -43,8 +43,7 @@ fn result_status_bytes(result_status: u64) -> Vec<u8> {
 }
 
 pub fn async_callback_tx_input(async_data: &AsyncCallTxData, async_result: &TxResult) -> TxInput {
-    let mut args: Vec<Vec<u8>> = Vec::new();
-    args.push(result_status_bytes(async_result.result_status));
+    let mut args: Vec<Vec<u8>> = vec![result_status_bytes(async_result.result_status)];
     if async_result.result_status == 0 {
         args.extend_from_slice(async_result.result_values.as_slice());
     } else {

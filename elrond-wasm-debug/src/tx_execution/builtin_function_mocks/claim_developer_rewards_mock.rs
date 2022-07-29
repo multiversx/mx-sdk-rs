@@ -7,7 +7,7 @@ pub fn execute_claim_developer_rewards(
     tx_input: TxInput,
     tx_cache: TxCache,
 ) -> (TxResult, BlockchainUpdate) {
-    if tx_input.args.len() != 0 {
+    if tx_input.args.is_empty() {
         return (
             TxResult::from_vm_error("ClaimDeveloperRewards expects no arguments".to_string()),
             BlockchainUpdate::empty(),
@@ -17,7 +17,7 @@ pub fn execute_claim_developer_rewards(
     let mut developer_rewards = BigUint::zero();
     let mut caller_is_owner = false;
 
-    tx_cache.with_account_mut(&tx_input.to.clone(), |account| {
+    tx_cache.with_account_mut(&tx_input.to, |account| {
         if account.contract_owner == Some(tx_input.from.clone()) {
             developer_rewards = account.developer_rewards.clone();
             account.developer_rewards = BigUint::zero();
