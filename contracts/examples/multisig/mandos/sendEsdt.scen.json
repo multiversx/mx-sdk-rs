@@ -164,6 +164,30 @@
                 "logs": [
                     {
                         "address": "sc:multisig",
+                        "endpoint": "str:performAction",
+                        "topics": [
+                            "str:performAsyncCall",
+                            "3",
+                            "sc:multisig",
+                            "0",
+                            "*",
+                            "str:MultiESDTNFTTransfer",
+                            "address:esdt-owner",
+                            "3",
+                            "str:FUNG-TOKEN",
+                            "0",
+                            "1000",
+                            "str:NFT-123456",
+                            "1",
+                            "1",
+                            "str:SFT-456789",
+                            "3",
+                            "10"
+                        ],
+                        "data": ""
+                    },
+                    {
+                        "address": "sc:multisig",
                         "endpoint": "str:MultiESDTNFTTransfer",
                         "topics": [
                             "str:FUNG-TOKEN",
