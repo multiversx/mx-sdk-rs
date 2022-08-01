@@ -64,7 +64,6 @@ where
                     managed_biguint!(SLASH_AMOUNT),
                     SLASH_QUORUM,
                     SUBMISSION_COUNT,
-                    DECIMALS,
                     oracle_args,
                 );
             })
@@ -91,6 +90,14 @@ where
         }
     }
 
+    pub fn set_pair_decimals(&mut self, from: &[u8], to: &[u8], decimals: u8) {
+        self.b_mock
+            .execute_tx(&&self.owner, &self.price_agg, &rust_biguint!(0), |sc| {
+                sc.set_pair_decimals(managed_buffer!(from), managed_buffer!(to), decimals);
+            })
+            .assert_ok();
+    }
+
     pub fn unpause(&mut self) {
         self.b_mock
             .execute_tx(&self.owner, &self.price_agg, &rust_biguint!(0), |sc| {
@@ -107,6 +114,7 @@ where
                     managed_buffer!(USD_TICKER),
                     timestamp,
                     managed_biguint!(price),
+                    DECIMALS,
                 );
             })
     }
