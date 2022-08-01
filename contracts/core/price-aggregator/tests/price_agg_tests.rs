@@ -14,6 +14,9 @@ fn price_agg_submit_test() {
     let current_timestamp = 100;
     let oracles = pa_setup.oracles.clone();
 
+    // configure the number of decimals
+    pa_setup.set_pair_decimals(EGLD_TICKER, USD_TICKER, DECIMALS);
+
     // try submit while paused
     pa_setup
         .submit(&oracles[0], 99, 100)
@@ -89,6 +92,9 @@ fn price_agg_submit_round_ok_test() {
     let mut pa_setup = PriceAggSetup::new(elrond_sc_price_aggregator::contract_obj);
     let oracles = pa_setup.oracles.clone();
 
+    // configure the number of decimals
+    pa_setup.set_pair_decimals(EGLD_TICKER, USD_TICKER, DECIMALS);
+
     // unpause
     pa_setup.unpause();
 
@@ -126,7 +132,14 @@ fn price_agg_submit_round_ok_test() {
 
             let rounds = sc.rounds().get(&token_pair).unwrap();
             assert_eq!(rounds.len(), 1);
-            assert_eq!(rounds.get(1), TimestampedPrice { timestamp, price });
+            assert_eq!(
+                rounds.get(1),
+                TimestampedPrice {
+                    timestamp,
+                    price,
+                    decimals
+                }
+            );
         })
         .assert_ok();
 }
@@ -135,6 +148,9 @@ fn price_agg_submit_round_ok_test() {
 fn price_agg_discarded_round_test() {
     let mut pa_setup = PriceAggSetup::new(elrond_sc_price_aggregator::contract_obj);
     let oracles = pa_setup.oracles.clone();
+
+    // configure the number of decimals
+    pa_setup.set_pair_decimals(EGLD_TICKER, USD_TICKER, DECIMALS);
 
     // unpause
     pa_setup.unpause();

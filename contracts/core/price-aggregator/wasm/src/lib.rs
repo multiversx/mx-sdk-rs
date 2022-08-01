@@ -8,8 +8,8 @@ elrond_wasm_node::wasm_endpoints! {
     elrond_sc_price_aggregator
     (
         addOracles
-        decimals
         getOracles
+        getPairDecimals
         isPaused
         latestPriceFeed
         latestPriceFeedOptional
@@ -17,6 +17,7 @@ elrond_wasm_node::wasm_endpoints! {
         pause
         removeOracles
         setSubmissionCount
+        set_pair_decimals
         slashMember
         stake
         submission_count
