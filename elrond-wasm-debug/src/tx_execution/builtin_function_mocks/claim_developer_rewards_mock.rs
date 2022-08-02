@@ -7,9 +7,9 @@ pub fn execute_claim_developer_rewards(
     tx_input: TxInput,
     tx_cache: TxCache,
 ) -> (TxResult, BlockchainUpdate) {
-    if tx_input.args.is_empty() {
+    if tx_input.args.len() != 1 {
         return (
-            TxResult::from_vm_error("ClaimDeveloperRewards expects no arguments".to_string()),
+            TxResult::from_vm_error("ClaimDeveloperRewards expects 1 argument".to_string()),
             BlockchainUpdate::empty(),
         );
     }
