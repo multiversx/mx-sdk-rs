@@ -21,6 +21,7 @@ pub struct PriceFeed<M: ManagedTypeApi> {
 pub struct TimestampedPrice<M: ManagedTypeApi> {
     pub price: BigUint<M>,
     pub timestamp: u64,
+    pub decimals: u8,
 }
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi, Debug, PartialEq, Eq)]

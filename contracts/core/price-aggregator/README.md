@@ -8,15 +8,29 @@ Compared to the other chainlink contracts, it is a simplified and easier to use 
 ## Deployment
 
 Arguments:
+- `staking_token` - the token used for staking and slashing
+- `staking_amount` - the minimum staked amount required for a used to be considered a board member
+- `slash_amount` - the amount to be slashed from a board member on a successful slash vote
+- `slash_quorum` - the minimum number of board members required for a vote to be considered successful
 - `oracles` - the list of addresses which are allowed to submit price feed updates
 - `submission_count` - the minimum number of submissions from different oracles which trigger an update of the price feed
-- `decimals` - the number of decimals of the price feed
+
+## Configuring the number of decimals
+
+The number of decimals for a given token pair can be set by calling `setPairDecimals(from, to, decimals)`. Notes:
+- only the owner can configure the number of decimals
+- the contract must be paused first
+- this method also clears the submissions accumulated so far
+- no submissions will be accepted for any given pair unless the number of decimals is configured first
+- every oracle must change its configuration to provide submissions with the new number of decimals, as any mismatch will be considered a configuration error and the submission will be rejected
 
 ## Submitting price feed updates
 
 An oracle can submit a price feed update using one of the endpoints:
-- `submit` - submit a single price feed as 3 arguments (`from`, `to` and `price`).
-- `submitBatch` - submit multiple price feeds simultaneously. The number of arguments must be a multiple of 3.
+- `submit` - submit a single price feed as 5 arguments (`from`, `to`, `submission_timestamp`, `price` and `decimals`).
+- `submitBatch` - submit multiple price feeds simultaneously. The number of arguments must be a multiple of 5.
+
+Note: the decimals argument must match the value returned by `getPairDecimals` for that specific pair, otherwise the submission will be rejected.
 
 ## Rounds
 
