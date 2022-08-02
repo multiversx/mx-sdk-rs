@@ -23,17 +23,10 @@ fn test_transfer_role_module() {
     let sc_with_transfer_role = b_mock.create_sc_account(
         &rust_zero,
         Some(&owner),
-        &rust_zero,
         transfer_role_features::contract_obj,
         "wasm 1",
     );
-    let sc_dest = b_mock.create_sc_account(
-        &rust_zero,
-        Some(&owner),
-        &rust_zero,
-        vault::contract_obj,
-        "wasm 2",
-    );
+    let sc_dest = b_mock.create_sc_account(&rust_zero, Some(&owner), vault::contract_obj, "wasm 2");
 
     b_mock
         .execute_tx(&owner, &sc_with_transfer_role, &rust_zero, |sc| {
