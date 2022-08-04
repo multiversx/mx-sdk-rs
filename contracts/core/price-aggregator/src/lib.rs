@@ -5,6 +5,7 @@ elrond_wasm::imports!();
 pub mod median;
 pub mod price_aggregator_data;
 pub mod staking;
+mod events;
 
 use price_aggregator_data::{OracleStatus, PriceFeed, TimestampedPrice, TokenPair};
 
@@ -17,7 +18,7 @@ static WRONG_NUMBER_OF_DECIMALS_ERROR: &[u8] = b"wrong number of decimals";
 
 #[elrond_wasm::contract]
 pub trait PriceAggregator:
-    elrond_wasm_modules::pause::PauseModule + staking::StakingModule
+    elrond_wasm_modules::pause::PauseModule + staking::StakingModule + events::EventsModule
 {
     #[init]
     fn init(
@@ -242,10 +243,11 @@ pub trait PriceAggregator:
             self.last_submission_timestamp(&token_pair).clear();
 
             self.rounds()
-                .entry(token_pair)
+                .entry(token_pair.clone())
                 .or_default()
                 .get()
                 .push(&price_feed);
+            self.emit_new_round_event(&token_pair, &price_feed);
         }
     }
 
