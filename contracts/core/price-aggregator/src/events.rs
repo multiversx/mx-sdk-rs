@@ -25,7 +25,7 @@ pub trait EventsModule {
                 timestamp: price_feed.timestamp,
                 decimals: price_feed.decimals,
                 block: self.blockchain().get_block_nonce(),
-                epoch: epoch,
+                epoch,
             },
         )
     }
