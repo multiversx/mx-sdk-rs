@@ -16,8 +16,8 @@ elrond_wasm_node::wasm_endpoints! {
         latestRoundData
         pause
         removeOracles
+        setPairDecimals
         setSubmissionCount
-        set_pair_decimals
         slashMember
         stake
         submission_count
