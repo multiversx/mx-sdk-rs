@@ -5,9 +5,10 @@ use elrond_codec::Empty;
 use crate::{
     api::{
         BlockchainApi, BlockchainApiImpl, CallTypeApi, StorageReadApi,
-        CHANGE_OWNER_BUILTIN_FUNC_NAME, CLAIM_DEVELOPER_REWARDS_NAME, ESDT_LOCAL_BURN_FUNC_NAME,
-        ESDT_LOCAL_MINT_FUNC_NAME, ESDT_NFT_ADD_QUANTITY_FUNC_NAME, ESDT_NFT_ADD_URI_FUNC_NAME,
-        ESDT_NFT_BURN_FUNC_NAME, ESDT_NFT_CREATE_FUNC_NAME, ESDT_NFT_UPDATE_ATTRIBUTES_FUNC_NAME,
+        CHANGE_OWNER_BUILTIN_FUNC_NAME, CLAIM_DEVELOPER_REWARDS_FUNC_NAME,
+        ESDT_LOCAL_BURN_FUNC_NAME, ESDT_LOCAL_MINT_FUNC_NAME, ESDT_NFT_ADD_QUANTITY_FUNC_NAME,
+        ESDT_NFT_ADD_URI_FUNC_NAME, ESDT_NFT_BURN_FUNC_NAME, ESDT_NFT_CREATE_FUNC_NAME,
+        ESDT_NFT_UPDATE_ATTRIBUTES_FUNC_NAME,
     },
     esdt::ESDTSystemSmartContractProxy,
     types::{
@@ -207,7 +208,7 @@ where
     ) -> ContractCall<A, ()> {
         ContractCall::new(
             child_sc_address,
-            ManagedBuffer::new_from_bytes(CLAIM_DEVELOPER_REWARDS_NAME),
+            ManagedBuffer::new_from_bytes(CLAIM_DEVELOPER_REWARDS_FUNC_NAME),
         )
     }
 

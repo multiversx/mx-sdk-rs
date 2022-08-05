@@ -18,7 +18,7 @@ use super::{
 };
 
 use elrond_wasm::api::{
-    CHANGE_OWNER_BUILTIN_FUNC_NAME, CLAIM_DEVELOPER_REWARDS_NAME, ESDT_LOCAL_BURN_FUNC_NAME,
+    CHANGE_OWNER_BUILTIN_FUNC_NAME, CLAIM_DEVELOPER_REWARDS_FUNC_NAME, ESDT_LOCAL_BURN_FUNC_NAME,
     ESDT_LOCAL_MINT_FUNC_NAME, ESDT_MULTI_TRANSFER_FUNC_NAME, ESDT_NFT_ADD_QUANTITY_FUNC_NAME,
     ESDT_NFT_ADD_URI_FUNC_NAME, ESDT_NFT_BURN_FUNC_NAME, ESDT_NFT_CREATE_FUNC_NAME,
     ESDT_NFT_TRANSFER_FUNC_NAME, ESDT_NFT_UPDATE_ATTRIBUTES_FUNC_NAME, ESDT_TRANSFER_FUNC_NAME,
@@ -85,7 +85,7 @@ pub fn execute_builtin_function_or_default(
 
         ESDT_TRANSFER_FUNC_NAME => execute_esdt_transfer(tx_input, tx_cache),
         CHANGE_OWNER_BUILTIN_FUNC_NAME => execute_change_owner(tx_input, tx_cache),
-        CLAIM_DEVELOPER_REWARDS_NAME => execute_claim_developer_rewards(tx_input, tx_cache),
+        CLAIM_DEVELOPER_REWARDS_FUNC_NAME => execute_claim_developer_rewards(tx_input, tx_cache),
         SET_USERNAME_FUNC_NAME => execute_set_username(tx_input, tx_cache),
         UPGRADE_CONTRACT_FUNC_NAME => execute_upgrade_contract(tx_input, tx_cache),
         _ => default_execution(tx_input, tx_cache),
