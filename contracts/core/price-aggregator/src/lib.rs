@@ -10,7 +10,7 @@ mod events;
 use price_aggregator_data::{OracleStatus, PriceFeed, TimestampedPrice, TokenPair};
 
 const SUBMISSION_LIST_MAX_LEN: usize = 50;
-const FIRST_SUBMISSION_TIMESTAMP_MAX_DIFF_SECONDS: u64 = 6;
+const FIRST_SUBMISSION_TIMESTAMP_MAX_DIFF_SECONDS: u64 = 30;
 pub const MAX_ROUND_DURATION_SECONDS: u64 = 1_800; // 30 minutes
 static PAUSED_ERROR_MSG: &[u8] = b"Contract is paused";
 static PAIR_DECIMALS_NOT_CONFIGURED_ERROR: &[u8] = b"pair decimals not configured";
