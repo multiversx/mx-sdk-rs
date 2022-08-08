@@ -157,6 +157,12 @@ where
         payment
     }
 
+    pub fn send(&self, to: &ManagedAddress<SA>, amount: &BigUint<SA>) {
+        let send_wrapper = SendWrapper::<SA>::new();
+        let token_id = self.get_token_id();
+        send_wrapper.direct_esdt(to, &token_id, 0, amount);
+    }
+
     pub fn burn(&self, amount: &BigUint<SA>) {
         let send_wrapper = SendWrapper::<SA>::new();
         let token_id = self.get_token_id();
