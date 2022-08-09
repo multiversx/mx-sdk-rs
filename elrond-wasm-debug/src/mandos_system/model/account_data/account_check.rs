@@ -18,6 +18,7 @@ pub struct CheckAccount {
     pub storage: CheckStorage,
     pub code: CheckValue<BytesValue>,
     pub owner: CheckValue<BytesValue>, // WARNING! Not currently checked. TODO: implement check
+    pub developer_rewards: CheckValue<BigUintValue>,
     pub async_call_data: CheckValue<BytesValue>,
 }
 
@@ -113,6 +114,10 @@ impl InterpretableFrom<Box<CheckAccountRaw>> for CheckAccount {
             storage: CheckStorage::interpret_from(from.storage, context),
             code: CheckValue::<BytesValue>::interpret_from(from.code, context),
             owner: CheckValue::<BytesValue>::interpret_from(from.owner, context),
+            developer_rewards: CheckValue::<BigUintValue>::interpret_from(
+                from.developer_rewards,
+                context,
+            ),
             async_call_data: CheckValue::<BytesValue>::interpret_from(
                 from.async_call_data,
                 context,
@@ -132,6 +137,7 @@ impl IntoRaw<CheckAccountRaw> for CheckAccount {
             storage: self.storage.into_raw(),
             code: self.code.into_raw(),
             owner: self.owner.into_raw(),
+            developer_rewards: self.developer_rewards.into_raw(),
             async_call_data: self.async_call_data.into_raw(),
         }
     }

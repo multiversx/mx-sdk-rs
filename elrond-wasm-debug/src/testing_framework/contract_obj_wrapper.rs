@@ -283,6 +283,7 @@ impl BlockchainStateWrapper {
             username: Vec::new(),
             contract_path: sc_identifier,
             contract_owner: owner.cloned(),
+            developer_rewards: num_bigint::BigUint::zero(),
         };
         self.mandos_generator
             .set_account(&acc_data, sc_mandos_path_expr);
@@ -386,6 +387,26 @@ impl BlockchainStateWrapper {
             None,
             &[],
         );
+    }
+
+    pub fn set_developer_rewards<T: TopEncode>(
+        &mut self,
+        address: &Address,
+        developer_rewards: num_bigint::BigUint,
+    ) {
+        let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
+
+        match b_mock_ref.accounts.get_mut(address) {
+            Some(acc) => {
+                acc.developer_rewards = developer_rewards;
+
+                self.add_mandos_set_account(address);
+            },
+            None => panic!(
+                "set_developer_rewards: Account {:?} does not exist",
+                address_to_hex(address)
+            ),
+        }
     }
 
     #[allow(clippy::too_many_arguments)]
