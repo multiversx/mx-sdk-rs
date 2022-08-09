@@ -372,9 +372,17 @@ fn forwarder_call_transf_exec_reject_nft_rs() {
     );
 }
 
-#[test]
+#[test] 
 fn forwarder_contract_change_owner_rs() {
     elrond_wasm_debug::mandos_rs("mandos/forwarder_contract_change_owner.scen.json", world());
+}
+
+#[test]
+fn forwarder_contract_claim_developer_rewards_rs() {
+    elrond_wasm_debug::mandos_rs(
+        "mandos/forwarder_contract_claim_developer_rewards.scen.json",
+        world(),
+    );
 }
 
 #[test]

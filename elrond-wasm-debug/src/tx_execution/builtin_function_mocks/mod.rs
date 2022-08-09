@@ -1,5 +1,6 @@
 mod builtin_func_exec;
 mod change_owner_mock;
+mod claim_developer_rewards_mock;
 mod esdt_local_burn;
 mod esdt_local_mint;
 mod esdt_multi_transfer_mock;
