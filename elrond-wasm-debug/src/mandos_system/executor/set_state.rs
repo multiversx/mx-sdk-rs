@@ -56,6 +56,11 @@ fn execute(state: &mut BlockchainMock, set_state_step: &SetStateStep) {
                 .owner
                 .as_ref()
                 .map(|address_value| address_value.value.clone()),
+            developer_rewards: account
+                .developer_rewards
+                .as_ref()
+                .map(|rewards| rewards.value.clone())
+                .unwrap_or_default(),
         });
     }
     for new_address in set_state_step.new_addresses.iter() {

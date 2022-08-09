@@ -18,6 +18,7 @@ pub struct Account {
     pub storage: BTreeMap<BytesKey, BytesValue>,
     pub code: Option<BytesValue>,
     pub owner: Option<AddressValue>,
+    pub developer_rewards: Option<BigUintValue>,
 }
 
 impl Account {
@@ -155,6 +156,9 @@ impl InterpretableFrom<AccountRaw> for Account {
                 .collect(),
             code: from.code.map(|c| BytesValue::interpret_from(c, context)),
             owner: from.owner.map(|v| AddressValue::interpret_from(v, context)),
+            developer_rewards: from
+                .developer_rewards
+                .map(|b| BigUintValue::interpret_from(b, context)),
         }
     }
 }
@@ -178,6 +182,7 @@ impl IntoRaw<AccountRaw> for Account {
                 .collect(),
             code: self.code.map(|n| n.original),
             owner: self.owner.map(|n| n.original),
+            developer_rewards: self.developer_rewards.map(|n| n.original),
         }
     }
 }
