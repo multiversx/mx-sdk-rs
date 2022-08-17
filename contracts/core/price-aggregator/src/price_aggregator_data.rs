@@ -7,6 +7,9 @@ pub struct TokenPair<M: ManagedTypeApi> {
     pub to: ManagedBuffer<M>,
 }
 
+pub type PriceFeedMultiValue<M> =
+    MultiValue6<u32, ManagedBuffer<M>, ManagedBuffer<M>, u64, BigUint<M>, u8>;
+
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi)]
 pub struct PriceFeed<M: ManagedTypeApi> {
     pub round_id: u32,
@@ -15,6 +18,20 @@ pub struct PriceFeed<M: ManagedTypeApi> {
     pub timestamp: u64,
     pub price: BigUint<M>,
     pub decimals: u8,
+}
+
+impl<M: ManagedTypeApi> PriceFeed<M> {
+    pub fn into_multi_value(self) -> PriceFeedMultiValue<M> {
+        (
+            self.round_id,
+            self.from,
+            self.to,
+            self.timestamp,
+            self.price,
+            self.decimals,
+        )
+            .into()
+    }
 }
 
 #[derive(TopEncode, TopDecode, TypeAbi, Debug, PartialEq, Eq)]
