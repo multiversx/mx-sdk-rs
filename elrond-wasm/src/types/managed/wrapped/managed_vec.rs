@@ -4,7 +4,7 @@ use crate::{
     types::{
         heap::{ArgBuffer, BoxedBytes},
         ManagedBuffer, ManagedBufferNestedDecodeInput, ManagedType, ManagedVecItem, ManagedVecRef,
-        ManagedVecRefIterator,
+        ManagedVecRefIterator, MultiValueManagedVec,
     },
 };
 use alloc::vec::Vec;
@@ -281,6 +281,11 @@ where
 
     pub fn iter(&self) -> ManagedVecRefIterator<M, T> {
         ManagedVecRefIterator::new(self)
+    }
+
+    /// Creates a reference to and identical object, but one which behaves like a multi-value-vec.
+    pub fn as_multi(&self) -> &MultiValueManagedVec<M, T> {
+        MultiValueManagedVec::transmute_from_handle_ref(&self.buffer.handle)
     }
 }
 
