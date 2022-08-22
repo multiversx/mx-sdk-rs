@@ -166,7 +166,7 @@
                 "arguments": [
                     "str:My Managed Buffer"
                 ],
-                "gasLimit": "1,500,000",
+                "gasLimit": "2,500,000",
                 "gasPrice": "0"
             },
             "expect": {
