@@ -5,17 +5,20 @@ elrond_wasm::imports!();
 pub mod median;
 pub mod price_aggregator_data;
 pub mod staking;
+mod events;
 
 use price_aggregator_data::{OracleStatus, PriceFeed, TimestampedPrice, TokenPair};
 
 const SUBMISSION_LIST_MAX_LEN: usize = 50;
-const FIRST_SUBMISSION_TIMESTAMP_MAX_DIFF_SECONDS: u64 = 6;
+const FIRST_SUBMISSION_TIMESTAMP_MAX_DIFF_SECONDS: u64 = 30;
 pub const MAX_ROUND_DURATION_SECONDS: u64 = 1_800; // 30 minutes
 static PAUSED_ERROR_MSG: &[u8] = b"Contract is paused";
+static PAIR_DECIMALS_NOT_CONFIGURED_ERROR: &[u8] = b"pair decimals not configured";
+static WRONG_NUMBER_OF_DECIMALS_ERROR: &[u8] = b"wrong number of decimals";
 
 #[elrond_wasm::contract]
 pub trait PriceAggregator:
-    elrond_wasm_modules::pause::PauseModule + staking::StakingModule
+    elrond_wasm_modules::pause::PauseModule + staking::StakingModule + events::EventsModule
 {
     #[init]
     fn init(
@@ -25,7 +28,6 @@ pub trait PriceAggregator:
         slash_amount: BigUint,
         slash_quorum: usize,
         submission_count: usize,
-        decimals: u8,
         oracles: MultiValueEncoded<ManagedAddress>,
     ) {
         self.init_staking_module(
@@ -35,12 +37,6 @@ pub trait PriceAggregator:
             slash_quorum,
             &oracles.to_vec(),
         );
-
-        let is_deploy_call = !self.was_contract_deployed().get();
-        if is_deploy_call {
-            self.decimals().set(decimals);
-            self.was_contract_deployed().set(true);
-        }
 
         self.add_oracles(oracles);
 
@@ -90,6 +86,7 @@ pub trait PriceAggregator:
         to: ManagedBuffer,
         submission_timestamp: u64,
         price: BigUint,
+        decimals: u8,
     ) {
         self.require_not_paused();
         self.require_is_oracle();
@@ -100,7 +97,9 @@ pub trait PriceAggregator:
             "Timestamp is from the future"
         );
 
-        self.submit_unchecked(from, to, submission_timestamp, price);
+        self.check_decimals(&from, &to, decimals);
+
+        self.submit_unchecked(from, to, submission_timestamp, price, decimals);
     }
 
     fn submit_unchecked(
@@ -109,6 +108,7 @@ pub trait PriceAggregator:
         to: ManagedBuffer,
         submission_timestamp: u64,
         price: BigUint,
+        decimals: u8,
     ) {
         let token_pair = TokenPair { from, to };
         let mut submissions = self
@@ -152,7 +152,7 @@ pub trait PriceAggregator:
             submissions.insert(caller, price);
             last_sub_time_mapper.set(current_timestamp);
 
-            self.create_new_round(token_pair, submissions);
+            self.create_new_round(token_pair, submissions, decimals);
         }
 
         self.oracle_status()
@@ -173,13 +173,13 @@ pub trait PriceAggregator:
     #[endpoint(submitBatch)]
     fn submit_batch(
         &self,
-        submissions: MultiValueEncoded<MultiValue4<ManagedBuffer, ManagedBuffer, u64, BigUint>>,
+        submissions: MultiValueEncoded<MultiValue5<ManagedBuffer, ManagedBuffer, u64, BigUint, u8>>,
     ) {
         self.require_not_paused();
         self.require_is_oracle();
 
         let current_timestamp = self.blockchain().get_block_timestamp();
-        for (from, to, submission_timestamp, price) in submissions
+        for (from, to, submission_timestamp, price, decimals) in submissions
             .into_iter()
             .map(|submission| submission.into_tuple())
         {
@@ -188,7 +188,9 @@ pub trait PriceAggregator:
                 "Timestamp is from the future"
             );
 
-            self.submit_unchecked(from, to, submission_timestamp, price);
+            self.check_decimals(&from, &to, decimals);
+
+            self.submit_unchecked(from, to, submission_timestamp, price, decimals);
         }
     }
 
@@ -213,6 +215,7 @@ pub trait PriceAggregator:
         &self,
         token_pair: TokenPair<Self::Api>,
         mut submissions: MapMapper<ManagedAddress, BigUint>,
+        decimals: u8,
     ) {
         let submissions_len = submissions.len();
         if submissions_len >= self.submission_count().get() {
@@ -232,6 +235,7 @@ pub trait PriceAggregator:
             let price_feed = TimestampedPrice {
                 price,
                 timestamp: self.blockchain().get_block_timestamp(),
+                decimals,
             };
 
             submissions.clear();
@@ -239,10 +243,11 @@ pub trait PriceAggregator:
             self.last_submission_timestamp(&token_pair).clear();
 
             self.rounds()
-                .entry(token_pair)
+                .entry(token_pair.clone())
                 .or_default()
                 .get()
                 .push(&price_feed);
+            self.emit_new_round_event(&token_pair, &price_feed);
         }
     }
 
@@ -314,7 +319,7 @@ pub trait PriceAggregator:
             to: token_pair.to,
             timestamp: last_price.timestamp,
             price: last_price.price,
-            decimals: self.decimals().get(),
+            decimals: last_price.decimals,
         }
     }
 
@@ -327,16 +332,49 @@ pub trait PriceAggregator:
         result
     }
 
-    #[storage_mapper("was_contract_deployed")]
-    fn was_contract_deployed(&self) -> SingleValueMapper<bool>;
+    fn clear_submissions(&self, token_pair: &TokenPair<Self::Api>) {
+        if let Some(mut pair_submission_mapper) = self.submissions().get(token_pair) {
+            pair_submission_mapper.clear();
+        }
+        self.first_submission_timestamp(token_pair).clear();
+        self.last_submission_timestamp(token_pair).clear();
+    }
+
+    #[only_owner]
+    #[endpoint(setPairDecimals)]
+    fn set_pair_decimals(&self, from: ManagedBuffer, to: ManagedBuffer, decimals: u8) {
+        self.require_paused();
+
+        self.pair_decimals(&from, &to).set(Some(decimals));
+        let pair = TokenPair { from, to };
+        self.clear_submissions(&pair);
+    }
+
+    fn check_decimals(&self, from: &ManagedBuffer, to: &ManagedBuffer, decimals: u8) {
+        let configured_decimals = self.get_pair_decimals(from, to);
+        require!(
+            decimals == configured_decimals,
+            WRONG_NUMBER_OF_DECIMALS_ERROR
+        )
+    }
+
+    #[view(getPairDecimals)]
+    fn get_pair_decimals(&self, from: &ManagedBuffer, to: &ManagedBuffer) -> u8 {
+        self.pair_decimals(from, to)
+            .get()
+            .unwrap_or_else(|| sc_panic!(PAIR_DECIMALS_NOT_CONFIGURED_ERROR))
+    }
+
+    #[storage_mapper("pair_decimals")]
+    fn pair_decimals(
+        &self,
+        from: &ManagedBuffer,
+        to: &ManagedBuffer,
+    ) -> SingleValueMapper<Option<u8>>;
 
     #[view]
     #[storage_mapper("submission_count")]
     fn submission_count(&self) -> SingleValueMapper<usize>;
-
-    #[view]
-    #[storage_mapper("decimals")]
-    fn decimals(&self) -> SingleValueMapper<u8>;
 
     #[storage_mapper("oracle_status")]
     fn oracle_status(&self) -> MapMapper<ManagedAddress, OracleStatus>;

@@ -181,7 +181,6 @@ fn test_assert_err_with_ok() {
 #[test]
 fn test_sc_payment_ok() {
     let mut wrapper = BlockchainStateWrapper::new();
-
     let caller_addr = wrapper.create_user_account(&rust_biguint!(1_000));
     let sc_wrapper = wrapper.create_sc_account(
         &rust_biguint!(2_000),
@@ -205,7 +204,6 @@ fn test_sc_payment_ok() {
 #[test]
 fn test_sc_payment_reverted() {
     let mut wrapper = BlockchainStateWrapper::new();
-
     let caller_addr = wrapper.create_user_account(&rust_biguint!(1_000));
     let sc_wrapper = wrapper.create_sc_account(
         &rust_biguint!(2_000),
@@ -227,7 +225,6 @@ fn test_sc_payment_reverted() {
 #[test]
 fn test_sc_half_payment() {
     let mut wrapper = BlockchainStateWrapper::new();
-
     let caller_addr = wrapper.create_user_account(&rust_biguint!(1_000));
     let sc_wrapper = wrapper.create_sc_account(
         &rust_biguint!(2_000),
@@ -1215,7 +1212,6 @@ fn test_managed_values_standalone_consistency() {
     let _ = DebugApi::dummy();
 
     let mut blockchain_wrapper = BlockchainStateWrapper::new();
-
     let owner_address = blockchain_wrapper.create_user_account(&rust_biguint!(0u64));
     let basic_features_wrapper = blockchain_wrapper.create_sc_account(
         &rust_biguint!(0u64),
@@ -1243,7 +1239,6 @@ fn test_managed_values_argument_and_return_value_consistency() {
     let _ = DebugApi::dummy();
 
     let mut blockchain_wrapper = BlockchainStateWrapper::new();
-
     let owner_address = blockchain_wrapper.create_user_account(&rust_biguint!(0u64));
     let basic_features_wrapper = blockchain_wrapper.create_sc_account(
         &rust_biguint!(0u64),
@@ -1280,7 +1275,6 @@ fn test_managed_values_insert_handle_panics() {
     let _ = DebugApi::dummy();
 
     let mut blockchain_wrapper = BlockchainStateWrapper::new();
-
     let owner_address = blockchain_wrapper.create_user_account(&rust_biguint!(0u64));
     let basic_features_wrapper = blockchain_wrapper.create_sc_account(
         &rust_biguint!(0u64),
@@ -1377,7 +1371,6 @@ fn test_modules() {
 fn test_back_and_forth_transfers() {
     let mut wrapper = BlockchainStateWrapper::new();
     let user = wrapper.create_user_account(&rust_biguint!(0));
-
     let first_token_id = b"FIRSTTOKEN-abcdef";
     let second_token_id = b"SECTOKEN-abcdef";
     let third_token_id = b"THIRDTOKEN-abcdef";
