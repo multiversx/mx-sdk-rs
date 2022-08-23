@@ -81,7 +81,7 @@ where
                 board_members.push(managed_address!(&board_member_address));
 
                 sc.init(QUORUM_SIZE, board_members.into());
-                sc.change_user_role(managed_address!(&proposer_address), UserRole::Proposer);
+                sc.change_user_role(0, managed_address!(&proposer_address), UserRole::Proposer);
             })
             .assert_ok();
 
