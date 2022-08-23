@@ -11,8 +11,7 @@ const WASM_PATH: &'static str = "output/crowdfunding-esdt.wasm";
 
 struct CrowdfundingSetup<CrowdfundingObjBuilder>
 where
-    CrowdfundingObjBuilder:
-        'static + Copy + Clone + Fn() -> crowdfunding_esdt::ContractObj<DebugApi>,
+    CrowdfundingObjBuilder: 'static + Copy + Fn() -> crowdfunding_esdt::ContractObj<DebugApi>,
 {
     pub blockchain_wrapper: BlockchainStateWrapper,
     pub owner_address: Address,

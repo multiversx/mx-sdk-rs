@@ -27,7 +27,7 @@ pub struct Payment {
 
 pub struct GovSetup<GovBuilder>
 where
-    GovBuilder: 'static + Copy + Clone + Fn() -> use_module::ContractObj<DebugApi>,
+    GovBuilder: 'static + Copy + Fn() -> use_module::ContractObj<DebugApi>,
 {
     pub b_mock: BlockchainStateWrapper,
     pub owner: Address,

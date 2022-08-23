@@ -6,7 +6,7 @@ const WASM_PATH: &'static str = "output/empty.wasm";
 
 struct ContractSetup<ContractObjBuilder>
 where
-    ContractObjBuilder: 'static + Copy + Clone + Fn() -> empty::ContractObj<DebugApi>,
+    ContractObjBuilder: 'static + Copy + Fn() -> empty::ContractObj<DebugApi>,
 {
     pub blockchain_wrapper: BlockchainStateWrapper,
     pub owner_address: Address,

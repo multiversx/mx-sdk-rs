@@ -49,7 +49,7 @@ pub struct CallActionDataRaw {
 
 pub struct MultisigSetup<MultisigObjBuilder>
 where
-    MultisigObjBuilder: 'static + Copy + Clone + Fn() -> multisig::ContractObj<DebugApi>,
+    MultisigObjBuilder: 'static + Copy + Fn() -> multisig::ContractObj<DebugApi>,
 {
     pub b_mock: BlockchainStateWrapper,
     pub owner_address: Address,
