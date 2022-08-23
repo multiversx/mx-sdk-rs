@@ -24,9 +24,10 @@ use super::{
     AddressFactory, MandosGenerator, ScQueryMandos,
 };
 
+#[derive(Clone)]
 pub struct ContractObjWrapper<
     CB: ContractBase<Api = DebugApi> + CallableContract + 'static,
-    ContractObjBuilder: 'static + Copy + Fn() -> CB,
+    ContractObjBuilder: 'static + Copy + Clone + Fn() -> CB,
 > {
     pub(crate) address: Address,
     pub(crate) obj_builder: ContractObjBuilder,
@@ -35,7 +36,7 @@ pub struct ContractObjWrapper<
 impl<CB, ContractObjBuilder> ContractObjWrapper<CB, ContractObjBuilder>
 where
     CB: ContractBase<Api = DebugApi> + CallableContract + 'static,
-    ContractObjBuilder: 'static + Copy + Fn() -> CB,
+    ContractObjBuilder: 'static + Copy + Clone + Fn() -> CB,
 {
     pub(crate) fn new(address: Address, obj_builder: ContractObjBuilder) -> Self {
         ContractObjWrapper {
@@ -197,7 +198,7 @@ impl BlockchainStateWrapper {
     ) -> ContractObjWrapper<CB, ContractObjBuilder>
     where
         CB: ContractBase<Api = DebugApi> + CallableContract + 'static,
-        ContractObjBuilder: 'static + Copy + Fn() -> CB,
+        ContractObjBuilder: 'static + Copy + Clone + Fn() -> CB,
     {
         let address = self.address_factory.new_sc_address();
         self.create_sc_account_fixed_address(
@@ -219,7 +220,7 @@ impl BlockchainStateWrapper {
     ) -> ContractObjWrapper<CB, ContractObjBuilder>
     where
         CB: ContractBase<Api = DebugApi> + CallableContract + 'static,
-        ContractObjBuilder: 'static + Copy + Fn() -> CB,
+        ContractObjBuilder: 'static + Copy + Clone + Fn() -> CB,
     {
         if !is_smart_contract_address(address) {
             panic!("Invalid SC Address: {:?}", address_to_hex(address))
@@ -301,7 +302,7 @@ impl BlockchainStateWrapper {
     ) -> ContractObjWrapper<CB, ContractObjBuilder>
     where
         CB: ContractBase<Api = DebugApi> + CallableContract + 'static,
-        ContractObjBuilder: 'static + Copy + Fn() -> CB,
+        ContractObjBuilder: 'static + Copy + Clone + Fn() -> CB,
     {
         let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
         let deployer_acc = b_mock_ref.accounts.get(deployer).unwrap().clone();
@@ -319,9 +320,9 @@ impl BlockchainStateWrapper {
     ) -> ContractObjWrapper<NewCB, NewContractObjBuilder>
     where
         OldCB: ContractBase<Api = DebugApi> + CallableContract + 'static,
-        OldContractObjBuilder: 'static + Copy + Fn() -> OldCB,
+        OldContractObjBuilder: 'static + Copy + Clone + Fn() -> OldCB,
         NewCB: ContractBase<Api = DebugApi> + CallableContract + 'static,
-        NewContractObjBuilder: 'static + Copy + Fn() -> NewCB,
+        NewContractObjBuilder: 'static + Copy + Clone + Fn() -> NewCB,
     {
         ContractObjWrapper::new(old_wrapper.address, new_builder)
     }
@@ -617,7 +618,7 @@ impl BlockchainStateWrapper {
     ) -> TxResult
     where
         CB: ContractBase<Api = DebugApi> + CallableContract + 'static,
-        ContractObjBuilder: 'static + Copy + Fn() -> CB,
+        ContractObjBuilder: 'static + Copy + Clone + Fn() -> CB,
         TxFn: FnOnce(CB),
     {
         self.execute_tx_any(caller, sc_wrapper, egld_payment, Vec::new(), tx_fn)
@@ -634,7 +635,7 @@ impl BlockchainStateWrapper {
     ) -> TxResult
     where
         CB: ContractBase<Api = DebugApi> + CallableContract + 'static,
-        ContractObjBuilder: 'static + Copy + Fn() -> CB,
+        ContractObjBuilder: 'static + Copy + Clone + Fn() -> CB,
         TxFn: FnOnce(CB),
     {
         let esdt_transfer = vec![TxInputESDT {
@@ -660,7 +661,7 @@ impl BlockchainStateWrapper {
     ) -> TxResult
     where
         CB: ContractBase<Api = DebugApi> + CallableContract + 'static,
-        ContractObjBuilder: 'static + Copy + Fn() -> CB,
+        ContractObjBuilder: 'static + Copy + Clone + Fn() -> CB,
     {
         self.execute_tx_any(
             caller,
@@ -678,7 +679,7 @@ impl BlockchainStateWrapper {
     ) -> TxResult
     where
         CB: ContractBase<Api = DebugApi> + CallableContract + 'static,
-        ContractObjBuilder: 'static + Copy + Fn() -> CB,
+        ContractObjBuilder: 'static + Copy + Clone + Fn() -> CB,
     {
         self.execute_tx(
             sc_wrapper.address_ref(),
@@ -699,7 +700,7 @@ impl BlockchainStateWrapper {
     ) -> TxResult
     where
         CB: ContractBase<Api = DebugApi> + CallableContract + 'static,
-        ContractObjBuilder: 'static + Copy + Fn() -> CB,
+        ContractObjBuilder: 'static + Copy + Clone + Fn() -> CB,
     {
         let sc_address = sc_wrapper.address_ref();
         let tx_cache = TxCache::new(self.rc_b_mock.clone());

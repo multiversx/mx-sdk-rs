@@ -20,7 +20,8 @@ pub const SLASH_QUORUM: usize = 2;
 
 pub struct PriceAggSetup<PriceAggObjBuilder>
 where
-    PriceAggObjBuilder: 'static + Copy + Fn() -> elrond_sc_price_aggregator::ContractObj<DebugApi>,
+    PriceAggObjBuilder:
+        'static + Copy + Clone + Fn() -> elrond_sc_price_aggregator::ContractObj<DebugApi>,
 {
     pub b_mock: BlockchainStateWrapper,
     pub owner: Address,
