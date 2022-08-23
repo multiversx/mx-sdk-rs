@@ -24,6 +24,7 @@ use super::{
     AddressFactory, MandosGenerator, ScQueryMandos,
 };
 
+#[derive(Clone)]
 pub struct ContractObjWrapper<
     CB: ContractBase<Api = DebugApi> + CallableContract + 'static,
     ContractObjBuilder: 'static + Copy + Fn() -> CB,
