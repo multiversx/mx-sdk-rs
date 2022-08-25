@@ -44,7 +44,7 @@
             "expect": {
                 "out": [],
                 "status": "10",
-                "message": "str:Only owner can claim this",
+                "message": "str:operation in account not permitted",
                 "gas": "*",
                 "refund": "*"
             }
