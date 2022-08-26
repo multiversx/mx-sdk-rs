@@ -1,13 +1,14 @@
 use core::marker::PhantomData;
 
 use super::properties::*;
+use elrond_codec::multi_types::MultiValue2;
 use hex_literal::hex;
 
 use crate::{
     api::{CallTypeApi, SendApi},
     types::{
         BigUint, ContractCall, EsdtLocalRole, EsdtTokenType, ManagedAddress, ManagedBuffer,
-        TokenIdentifier,
+        TokenIdentifier, MultiValueEncoded,
     },
 };
 
@@ -437,6 +438,24 @@ where
         contract_call.push_endpoint_arg(token_identifier);
         contract_call.push_endpoint_arg(old_creator);
         contract_call.push_endpoint_arg(new_creator);
+
+        contract_call
+    }
+
+    pub fn control_changes(
+        self,
+        token_identifier: &TokenIdentifier<SA>,
+        properties: MultiValueEncoded<SA, MultiValue2<Properties, bool>>
+    ) -> ContractCall<SA, ()> {
+        let mut contract_call = self.esdt_system_sc_call_no_args(b"controlChanges");
+
+        contract_call.push_endpoint_arg(token_identifier);
+        
+        for property in properties.into_iter() {
+            let (property, value) = property.into_tuple();
+
+            set_token_property(&mut contract_call, &property.as_bytes()[..], value);
+        }
 
         contract_call
     }
