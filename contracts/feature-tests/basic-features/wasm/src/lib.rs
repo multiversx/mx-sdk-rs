@@ -13,8 +13,12 @@ elrond_wasm_node::wasm_endpoints! {
         add_assign_big_uint
         add_assign_big_uint_ref
         add_big_int
+        add_big_int_big_uint
+        add_big_int_big_uint_ref
         add_big_int_ref
         add_big_uint
+        add_big_uint_big_int
+        add_big_uint_big_int_ref
         add_big_uint_ref
         add_to_whitelist
         big_int_from_biguint
