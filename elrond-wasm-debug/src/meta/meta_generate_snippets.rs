@@ -7,6 +7,8 @@ use elrond_wasm::abi::ContractAbi;
 
 use super::meta_config::MetaConfig;
 
+const INIT_FUNC_NAME: &str = "init";
+
 impl MetaConfig {
     // TODO: Handle overwrite flag
     pub fn generate_rust_snippets(&self) {
@@ -118,12 +120,15 @@ fn write_snippets_to_file(mut file: File, abi: &ContractAbi, contract_crate_name
     write_snippet_imports(&mut file, contract_crate_name);
     write_snippet_constants(&mut file);
     write_contract_type_alias(&mut file, contract_crate_name);
+    write_snippet_main_function(&mut file, abi);
 }
 
 fn write_snippet_imports(file: &mut File, contract_crate_name: &str) {
     writeln!(
         file,
-        "use {}::ProxyTrait as _;
+        "#[allow(non_snake_case)]
+
+use {}::ProxyTrait as _;
 use elrond_interact_snippets::{{
     elrond_wasm::{{
         elrond_codec::multi_types::MultiValueVec,
@@ -168,6 +173,53 @@ fn write_contract_type_alias(file: &mut File, contract_crate_name: &str) {
     .unwrap();
 
     write_newline(file);
+}
+
+fn write_snippet_main_function(file: &mut File, abi: &ContractAbi) {
+    writeln!(
+        file,
+        "#[tokio::main]
+async fn main() {{
+    env_logger::init();
+    let _ = DebugApi::dummy();
+
+    let mut args = std::env::args();
+    let _ = args.next();
+    let cmd = args.next().expect(\"at least one argument required\");
+    let mut state = State::new().await;
+    match cmd.as_str() {{"
+    )
+    .unwrap();
+
+    // all contracts have a deploy and upgrade snippet
+    writeln!(
+        file,
+        "        \"deploy\" => state.deploy().await,
+        \"upgrade\" => state.upgrade().await,"
+    )
+    .unwrap();
+
+    for endpoint in &abi.endpoints {
+        if endpoint.name == INIT_FUNC_NAME {
+            continue;
+        }
+
+        writeln!(
+            file,
+            "        \"{}\" => state.{}().await,",
+            endpoint.name, endpoint.name
+        )
+        .unwrap();
+    }
+
+    // general case of "command not found" + close curly brackets
+    writeln!(
+        file,
+        "        _ => panic!(\"unknown command: {{}}\", &cmd),
+    }}
+}}"
+    )
+    .unwrap();
 }
 
 fn write_newline(file: &mut File) {

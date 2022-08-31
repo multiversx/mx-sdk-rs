@@ -1,3 +1,5 @@
+#[allow(non_snake_case)]
+
 use adder::ProxyTrait as _;
 use elrond_interact_snippets::{
     elrond_wasm::{
@@ -26,3 +28,20 @@ const DEFAULT_ADDRESS_EXPR: &str = "0x000000000000000000000000000000000000000000
 
 type ContractType = ContractInfo<adder::Proxy<DebugApi>>;
 
+#[tokio::main]
+async fn main() {
+    env_logger::init();
+    let _ = DebugApi::dummy();
+
+    let mut args = std::env::args();
+    let _ = args.next();
+    let cmd = args.next().expect("at least one argument required");
+    let mut state = State::new().await;
+    match cmd.as_str() {
+        "deploy" => state.deploy().await,
+        "upgrade" => state.upgrade().await,
+        "getSum" => state.getSum().await,
+        "add" => state.add().await,
+        _ => panic!("unknown command: {}", &cmd),
+    }
+}
