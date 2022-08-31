@@ -310,7 +310,7 @@ where
         send_wrapper.esdt_local_burn(&token_id, token_nonce, amount);
     }
 
-    pub fn get_all_token_data(&self, token_nonce: u64) -> EsdtTokenData<SA> {
+    pub fn get_token_data(&self, token_nonce: u64) -> EsdtTokenData<SA> {
         let b_wrapper = BlockchainWrapper::new();
         let own_sc_address = Self::get_sc_address();
         let token_id = self.get_token_id();
@@ -327,7 +327,7 @@ where
     }
 
     pub fn get_token_attributes<T: TopDecode>(&self, token_nonce: u64) -> T {
-        let token_data = self.get_all_token_data(token_nonce);
+        let token_data = self.get_token_data(token_nonce);
         token_data.decode_attributes()
     }
 
