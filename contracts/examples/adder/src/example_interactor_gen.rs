@@ -1,3 +1,22 @@
+use adder::ProxyTrait as _;
+use elrond_interact_snippets::{
+    elrond_wasm::{
+        elrond_codec::multi_types::MultiValueVec,
+        storage::mappers::SingleValue,
+        types::{Address, CodeMetadata},
+    },
+    elrond_wasm_debug::{
+        bech32, mandos::interpret_trait::InterpreterContext, mandos_system::model::*, ContractInfo,
+        DebugApi,
+    },
+    env_logger,
+    erdrs::interactors::wallet::Wallet,
+    tokio, Interactor,
+};
+use std::{
+    env::Args,
+    io::{Read, Write},
+};
 
 // should probably be saved into a user-friendly config file
 // also, have a default config file structure and path, which users can extend with custom variables
@@ -44,13 +63,13 @@ impl State {
         State {
             interactor,
             wallet_address,
-            contract
+            contract,
         }
     }
 
     async fn deploy(&mut self, mut args: Args) {
         // extract payments
-        // process and decode each argument - 
+        // process and decode each argument -
         // - early fail if decoding fails - no tx created
 
         let deploy_result: elrond_interact_snippets::InteractorResult<()> = self
@@ -84,14 +103,15 @@ impl State {
         // extract arg
         let add_val: num_bigint::BigUint = 0u32.into();
 
-        let results = self.contract
+        let results = self
+            .contract
             .add(add_val)
             .into_blockchain_call()
             .from(&self.wallet_address)
             .gas_limit(gas_limit)
             .into()
             .expect(TxExpect::ok())
-        .await;
+            .await;
 
         // print results
     }

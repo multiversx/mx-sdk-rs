@@ -3,14 +3,18 @@ use std::{
     io::Write,
 };
 
+use elrond_wasm::abi::ContractAbi;
+
 use super::meta_config::MetaConfig;
 
 impl MetaConfig {
     // TODO: Handle overwrite flag
     pub fn generate_rust_snippets(&self) {
         if let Some(contract) = &self.main_contract {
-            let crate_name = contract.output_base_name.clone();
-            let _ = create_snippets_crate_and_get_lib_file(&self.snippets_dir, &crate_name, true);
+            let crate_name = contract.output_base_name.clone().replace("-", "_");
+            let file =
+                create_snippets_crate_and_get_lib_file(&self.snippets_dir, &crate_name, true);
+            write_snippets_to_file(file, &contract.abi, &crate_name);
         }
     }
 }
@@ -22,6 +26,7 @@ fn create_snippets_crate_and_get_lib_file(
     overwrite: bool,
 ) -> File {
     create_snippets_folder(snippets_folder_path);
+    create_snippets_gitignore(snippets_folder_path, overwrite);
     create_snippets_cargo_toml(snippets_folder_path, contract_crate_name, overwrite);
     create_src_folder(snippets_folder_path);
     create_and_get_lib_file(snippets_folder_path, overwrite)
@@ -30,6 +35,25 @@ fn create_snippets_crate_and_get_lib_file(
 fn create_snippets_folder(snippets_folder_path: &str) {
     // returns error if folder already exists, so we ignore the result
     let _ = fs::create_dir(snippets_folder_path);
+}
+
+fn create_snippets_gitignore(snippets_folder_path: &str, overwrite: bool) {
+    let gitignore_path = format!("{}/.gitignore", snippets_folder_path);
+    let mut file = if overwrite {
+        File::create(&gitignore_path).unwrap()
+    } else {
+        match File::options().create_new(true).open(&gitignore_path) {
+            Ok(f) => f,
+            Err(_) => return,
+        }
+    };
+
+    writeln!(
+        &mut file,
+        "# Pem files are used for interactions, but shouldn't be committed
+*.pem"
+    )
+    .unwrap();
 }
 
 fn create_snippets_cargo_toml(
@@ -47,7 +71,8 @@ fn create_snippets_cargo_toml(
         }
     };
 
-    file.write_fmt(format_args!(
+    writeln!(
+        &mut file,
         "[package]
 name = \"rust-interact\"
 version = \"0.0.0\"
@@ -66,7 +91,7 @@ path = \"..\"
 version = \"0.1.0\"
 ",
         contract_crate_name
-    ))
+    )
     .unwrap();
 }
 
@@ -87,4 +112,64 @@ fn create_and_get_lib_file(snippets_folder_path: &str, overwrite: bool) -> File 
             Err(_) => panic!("lib.rs file already exists, overwrite option was not provided"),
         }
     }
+}
+
+fn write_snippets_to_file(mut file: File, abi: &ContractAbi, contract_crate_name: &str) {
+    write_snippet_imports(&mut file, contract_crate_name);
+    write_snippet_constants(&mut file);
+    write_contract_type_alias(&mut file, contract_crate_name);
+}
+
+fn write_snippet_imports(file: &mut File, contract_crate_name: &str) {
+    writeln!(
+        file,
+        "use {}::ProxyTrait as _;
+use elrond_interact_snippets::{{
+    elrond_wasm::{{
+        elrond_codec::multi_types::MultiValueVec,
+        storage::mappers::SingleValue,
+        types::{{Address, CodeMetadata}},
+    }},
+    elrond_wasm_debug::{{
+        bech32, mandos::interpret_trait::InterpreterContext, mandos_system::model::*, ContractInfo,
+        DebugApi,
+    }},
+    env_logger,
+    erdrs::interactors::wallet::Wallet,
+    tokio, Interactor,
+}};
+use std::{{
+    env::Args,
+    io::{{Read, Write}},
+}};",
+        contract_crate_name
+    )
+    .unwrap();
+
+    write_newline(file);
+}
+
+fn write_snippet_constants(file: &mut File) {
+    writeln!(file, "const GATEWAY: &str = elrond_interact_snippets::erdrs::blockchain::rpc::DEVNET_GATEWAY;
+const PEM: &str = \"alice.pem\";
+
+const SYSTEM_SC_BECH32: &str = \"erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u\";
+const DEFAULT_ADDRESS_EXPR: &str = \"0x0000000000000000000000000000000000000000000000000000000000000000\";").unwrap();
+
+    write_newline(file);
+}
+
+fn write_contract_type_alias(file: &mut File, contract_crate_name: &str) {
+    writeln!(
+        file,
+        "type ContractType = ContractInfo<{}::Proxy<DebugApi>>;",
+        contract_crate_name
+    )
+    .unwrap();
+
+    write_newline(file);
+}
+
+fn write_newline(file: &mut File) {
+    file.write(b"\n").unwrap();
 }
