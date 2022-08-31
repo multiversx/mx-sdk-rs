@@ -1,0 +1,16 @@
+[package]
+name = "rust-interact"
+version = "0.0.0"
+authors = ["you"]
+edition = "2018"
+publish = false
+
+[[bin]]
+name = "rust-interact"
+path = "src/lib.rs"
+
+[dependencies.adder]
+path = ".."
+
+[dependencies.elrond-interact-snippets]
+version = "0.1.0"
