@@ -5,6 +5,7 @@ use alloc::vec::Vec;
 pub struct InputAbi {
     pub arg_name: &'static str,
     pub type_name: TypeName,
+    // pub original_type_name: TypeName,
     pub multi_arg: bool,
 }
 
