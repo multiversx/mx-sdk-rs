@@ -242,6 +242,46 @@ where
         payment
     }
 
+    pub fn nft_create_with_uris<T: TopEncode>(
+        &self,
+        amount: BigUint<SA>,
+        name: &ManagedBuffer<SA>,
+        royalties: BigUint<SA>,
+        attributes: &T,
+        uris: &ManagedVec<A, ManagedBuffer<A>>
+    ) -> EsdtTokenPayment<SA> {
+        let send_wrapper = SendWrapper::<SA>::new();
+        let token_id = self.get_token_id();
+
+        let token_nonce = send_wrapper.esdt_nft_create(
+            &token_id,
+            &amount,
+            name,
+            &royalties,
+            &ManagedBuffer::new(),
+            attributes,
+            uris
+        );
+
+        EsdtTokenPayment::new(token_id, token_nonce, amount)
+    }
+
+    pub fn nft_create_with_uris_and_send<T: TopEncode>(
+        to: &ManagedAddress<SA>,
+        amount: BigUint<SA>,
+        name: &ManagedBuffer<SA>,
+        royalties: BigUint<SA>,
+        attributes: &T,
+        uris: &ManagedVec<A, ManagedBuffer<A>>
+    ) -> EsdtTokenPayment<SA> {
+        let payment = 
+            self.nft_create_with_uris(amount, name, royalties, attributes, uris);
+
+        self.send_payment(to, &payment);
+
+        payment
+    }
+
     pub fn nft_add_quantity(&self, token_nonce: u64, amount: BigUint<SA>) -> EsdtTokenPayment<SA> {
         let send_wrapper = SendWrapper::<SA>::new();
         let token_id = self.get_token_id();
