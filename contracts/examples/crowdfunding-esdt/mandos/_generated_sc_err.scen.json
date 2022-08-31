@@ -5,7 +5,8 @@
             "accounts": {
                 "0x66687aadf862bd776c8fc18b8e9f8e20089714856ee233b3902a591d0d5f2925": {
                     "nonce": "0",
-                    "balance": "0"
+                    "balance": "0",
+                    "developer_rewards": "0"
                 }
             }
         },
@@ -14,7 +15,8 @@
             "accounts": {
                 "0x2b32db6c2c0a6235fb1397e8225ea85e0f0e6e8c7b126d0016ccbde0e667151e": {
                     "nonce": "0",
-                    "balance": "0"
+                    "balance": "0",
+                    "developer_rewards": "0"
                 }
             }
         },
@@ -23,7 +25,8 @@
             "accounts": {
                 "0x12771355e46cd47c71ed1721fd5319b383cca3a1f9fce3aa1c8cd3bd37af20d7": {
                     "nonce": "0",
-                    "balance": "0"
+                    "balance": "0",
+                    "developer_rewards": "0"
                 }
             }
         },
@@ -34,7 +37,8 @@
                     "nonce": "0",
                     "balance": "0",
                     "code": "file:../output/crowdfunding-esdt.wasm",
-                    "owner": "0x66687aadf862bd776c8fc18b8e9f8e20089714856ee233b3902a591d0d5f2925"
+                    "owner": "0x66687aadf862bd776c8fc18b8e9f8e20089714856ee233b3902a591d0d5f2925",
+                    "developer_rewards": "0"
                 }
             }
         },
@@ -55,7 +59,8 @@
                                 }
                             ]
                         }
-                    }
+                    },
+                    "developer_rewards": "0"
                 }
             }
         },
@@ -76,7 +81,8 @@
                                 }
                             ]
                         }
-                    }
+                    },
+                    "developer_rewards": "0"
                 }
             }
         },
@@ -92,7 +98,8 @@
                         "str:tokenIdentifier": "0x43524f57442d313233343536"
                     },
                     "code": "file:../output/crowdfunding-esdt.wasm",
-                    "owner": "0x66687aadf862bd776c8fc18b8e9f8e20089714856ee233b3902a591d0d5f2925"
+                    "owner": "0x66687aadf862bd776c8fc18b8e9f8e20089714856ee233b3902a591d0d5f2925",
+                    "developer_rewards": "0"
                 }
             }
         },
@@ -113,7 +120,8 @@
                                 }
                             ]
                         }
-                    }
+                    },
+                    "developer_rewards": "0"
                 }
             }
         },
