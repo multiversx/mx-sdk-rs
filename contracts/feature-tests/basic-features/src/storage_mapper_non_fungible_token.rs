@@ -52,6 +52,48 @@ pub trait NonFungibleTokenMapperFeatures:
             .nft_create_and_send(&to, amount, &attributes)
     }
 
+    #[endpoint()]
+    fn mapper_nft_create_with_uris(
+        &self,
+        amount: BigUint,
+        name: ManagedBuffer,
+        royalties: BigUint,
+        attributes: RgbColor,
+    ) -> EsdtTokenPayment<Self::Api> {
+        let mut uris = ManagedVec::new();
+        uris.push(ManagedBuffer::new());
+
+        self.non_fungible_token_mapper().nft_create_with_uris(
+            amount,
+            &name,
+            royalties,
+            &attributes,
+            &uris
+        )
+    }
+
+    #[endpoint()]
+    fn mapper_nft_create_with_uris_and_send(
+        &self,
+        to: ManagedAddress,
+        amount: BigUint,
+        name: ManagedBuffer,
+        royalties: BigUint,
+        attributes: RgbColor,
+    ) -> EsdtTokenPayment<Self::Api> {
+        let mut uris = ManagedVec::new();
+        uris.push(ManagedBuffer::new());
+
+        self.non_fungible_token_mapper().nft_create_with_uris_and_send(
+            &to,
+            amount,
+            &name,
+            royalties,
+            &attributes,
+            &uris
+        )
+    }
+
     #[endpoint]
     fn mapper_nft_add_quantity(
         &self,
