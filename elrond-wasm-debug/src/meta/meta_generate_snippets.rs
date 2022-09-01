@@ -3,7 +3,7 @@ use std::{
     io::Write,
 };
 
-use elrond_wasm::abi::ContractAbi;
+use elrond_wasm::abi::{ContractAbi, EndpointAbi, InputAbi, OutputAbi};
 
 use super::meta_config::MetaConfig;
 
@@ -121,6 +121,8 @@ fn write_snippets_to_file(mut file: File, abi: &ContractAbi, contract_crate_name
     write_snippet_constants(&mut file);
     write_contract_type_alias(&mut file, contract_crate_name);
     write_snippet_main_function(&mut file, abi);
+    write_state_struct_declaration(&mut file);
+    write_state_struct_impl(&mut file, abi);
 }
 
 fn write_snippet_imports(file: &mut File, contract_crate_name: &str) {
@@ -131,7 +133,7 @@ fn write_snippet_imports(file: &mut File, contract_crate_name: &str) {
 use {}::ProxyTrait as _;
 use elrond_interact_snippets::{{
     elrond_wasm::{{
-        elrond_codec::multi_types::MultiValueVec,
+        elrond_codec::multi_types::{{MultiValueVec, TopDecode}},
         storage::mappers::SingleValue,
         types::{{Address, CodeMetadata}},
     }},
@@ -157,9 +159,11 @@ use std::{{
 fn write_snippet_constants(file: &mut File) {
     writeln!(file, "const GATEWAY: &str = elrond_interact_snippets::erdrs::blockchain::rpc::DEVNET_GATEWAY;
 const PEM: &str = \"alice.pem\";
+const SC_ADDRESS: &str = \"\";
 
 const SYSTEM_SC_BECH32: &str = \"erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u\";
-const DEFAULT_ADDRESS_EXPR: &str = \"0x0000000000000000000000000000000000000000000000000000000000000000\";").unwrap();
+const DEFAULT_ADDRESS_EXPR: &str = \"0x0000000000000000000000000000000000000000000000000000000000000000\";
+const DEFAULT_GAS_LIMIT: u64 = 100_000_000;").unwrap();
 
     write_newline(file);
 }
@@ -220,6 +224,161 @@ async fn main() {{
 }}"
     )
     .unwrap();
+
+    write_newline(file);
+}
+
+fn write_state_struct_declaration(file: &mut File) {
+    writeln!(
+        file,
+        "struct State {{
+    interactor: Interactor,
+    wallet_address: Address,
+    contract: ContractType,
+}}"
+    )
+    .unwrap();
+
+    write_newline(file);
+}
+
+fn write_state_struct_impl(file: &mut File, abi: &ContractAbi) {
+    writeln!(
+        file,
+        "impl State {{
+    async fn new() -> Self {{
+        let mut interactor = Interactor::new(GATEWAY).await;
+        let wallet_address = interactor.register_wallet(Wallet::from_pem_file(PEM).unwrap());
+        let sc_addr_expr = if SC_ADDRESS == \"\" {{
+            DEFAULT_ADDRESS_EXPR.to_string()
+        }} else {{
+            \"bec32:\".to_string() + SC_ADDRESS
+        }};
+        let contract = ContractType::new(sc_addr_expr);
+
+        State {{
+            interactor,
+            wallet_address,
+            contract,
+        }}
+    }}"
+    )
+    .unwrap();
+
+    for endpoint_abi in &abi.endpoints {
+        write_endpoint_impl(file, endpoint_abi);
+    }
+
+    writeln!(file, "}}").unwrap();
+}
+
+fn write_endpoint_impl(file: &mut File, endpoint_abi: &EndpointAbi) {
+    write_method_declaration(file, endpoint_abi.name);
+    write_endpoint_args_declaration(file, &endpoint_abi.inputs);
+    write_contract_call(file, endpoint_abi);
+    write_call_results_print(file, &endpoint_abi.outputs);
+    writeln!(file, "    }}").unwrap();
+}
+
+fn write_method_declaration(file: &mut File, endpoint_name: &str) {
+    writeln!(file, "    async fn {}(&mut self) {{", endpoint_name).unwrap();
+}
+
+/// TODO: Handle optionals, var args and payments
+/// TODO: Use an actual Rust type instead of invalid `type_name`
+fn write_endpoint_args_declaration(file: &mut File, inputs: &[InputAbi]) {
+    if inputs.is_empty() {
+        return;
+    }
+
+    for input in inputs {
+        writeln!(
+            file,
+            "        let {}: {} = Default::default();",
+            input.arg_name, input.type_name
+        )
+        .unwrap();
+    }
+
+    write_newline(file);
+}
+
+fn write_contract_call(file: &mut File, endpoint_abi: &EndpointAbi) {
+    writeln!(
+        file,
+        "        let sc_addr = self.contract.address.clone().into_option().unwrap();
+        let mut contract_call =
+            ContractCall::<DebugApi, MultiValueVec<Vec<u8>>>::new(sc_addr, \"{}\");",
+        endpoint_abi.name
+    )
+    .unwrap();
+
+    // the variables were previously declared in `write_endpoint_args_declaration`
+    for input in &endpoint_abi.inputs {
+        writeln!(
+            file,
+            "        contract_call.push_endpoint_arg(&{});",
+            input.arg_name
+        )
+        .unwrap();
+    }
+
+    writeln!(
+        file,
+        "        let b_call: ScCallStep = contract_call
+            .into_blockchain_call()
+            .from(&self.wallet_address)
+            .gas_limit(DEFAULT_GAS_LIMIT)
+            .into();"
+    )
+    .unwrap();
+
+    if endpoint_abi.outputs.is_empty() {
+        writeln!(file, "        self.interactor.sc_call(b_call).await;").unwrap();
+    } else {
+        writeln!(
+            file,
+            "        let results: InteractorResult<MultiValueVec<Vec<u8>>> =
+        self.interactor.sc_call_get_result(b_call).await;"
+        )
+        .unwrap();
+
+        write_newline(file);
+    }
+}
+
+fn write_call_results_print(file: &mut File, outputs: &[OutputAbi]) {
+    if outputs.is_empty() {
+        return;
+    }
+
+    writeln!(file, "        let raw_result_values = results.value().0;").unwrap();
+
+    for (i, output) in outputs.iter().enumerate() {
+        let output_name = format!("out{}", i);
+
+        writeln!(
+            file,
+            "        let {} = {}::top_decode(raw_result_values[{}]).unwrap();",
+            output_name, output.type_name, i
+        )
+        .unwrap();
+    }
+
+    write_newline(file);
+
+    for (i, _output) in outputs.iter().enumerate() {
+        let output_name = format!("out{}", i);
+
+        writeln!(
+            file,
+            "        println!(\"{}: {{}}\", {})",
+            output_name, output_name
+        )
+        .unwrap();
+    }
+
+    write_newline(file);
 }
 
 fn write_newline(file: &mut File) {
