@@ -22,6 +22,7 @@ use std::{
 // also, have a default config file structure and path, which users can extend with custom variables
 const GATEWAY: &str = elrond_interact_snippets::erdrs::blockchain::rpc::TESTNET_GATEWAY;
 const PEM: &str = "alice.pem";
+const SC_ADDRESS: &str = "";
 
 // can remain const
 const SYSTEM_SC_BECH32: &str = "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u";
@@ -59,7 +60,13 @@ impl State {
     async fn new() -> Self {
         let mut interactor = Interactor::new(GATEWAY).await;
         let wallet_address = interactor.register_wallet(Wallet::from_pem_file(PEM).unwrap());
-        let contract = AdderContract::new(load_address_expr());
+        let sc_addr_expr = if SC_ADDRESS == "" {
+            DEFAULT_ADDRESS_EXPR.to_string()
+        } else {
+            "bec32:".to_string() + SC_ADDRESS
+        };
+        let contract = AdderContract::new(sc_addr_expr);
+
         State {
             interactor,
             wallet_address,
@@ -67,11 +74,7 @@ impl State {
         }
     }
 
-    async fn deploy(&mut self, mut args: Args) {
-        // extract payments
-        // process and decode each argument -
-        // - early fail if decoding fails - no tx created
-
+    async fn deploy(&mut self) {
         let deploy_result: elrond_interact_snippets::InteractorResult<()> = self
             .interactor
             .sc_deploy(
