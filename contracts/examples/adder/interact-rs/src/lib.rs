@@ -27,6 +27,7 @@ const SC_ADDRESS: &str = "";
 const SYSTEM_SC_BECH32: &str = "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u";
 const DEFAULT_ADDRESS_EXPR: &str = "0x0000000000000000000000000000000000000000000000000000000000000000";
 const DEFAULT_GAS_LIMIT: u64 = 100_000_000;
+const TOKEN_ISSUE_COST: u64 = 50_000_000_000_000_000;
 
 type ContractType = ContractInfo<adder::Proxy<DebugApi>>;
 
@@ -61,7 +62,7 @@ impl State {
         let sc_addr_expr = if SC_ADDRESS == "" {
             DEFAULT_ADDRESS_EXPR.to_string()
         } else {
-            "bec32:".to_string() + SC_ADDRESS
+            "bech32:".to_string() + SC_ADDRESS
         };
         let contract = ContractType::new(sc_addr_expr);
 
@@ -71,6 +72,7 @@ impl State {
             contract,
         }
     }
+
     async fn getSum(&mut self) {
         let sc_addr = self.contract.address.clone().into_option().unwrap();
         let mut contract_call =
@@ -89,6 +91,7 @@ impl State {
         println!("out0: {}", out0)
 
     }
+
     async fn add(&mut self) {
         let value: BigUint = Default::default();
 
@@ -103,4 +106,5 @@ impl State {
             .into();
         self.interactor.sc_call(b_call).await;
     }
+
 }

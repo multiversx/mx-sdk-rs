@@ -7,8 +7,6 @@ pub fn perform<AbiObj: ContractAbiProvider>() {
     let original_contract_abi = <AbiObj as ContractAbiProvider>::abi();
     super::meta_validate_abi::validate_abi(&original_contract_abi).unwrap();
 
-    // original_contract_abi.endpoints[0].
-
     let args: Vec<String> = env::args().collect();
     let mut meta_config = MetaConfig::create(&original_contract_abi, args.as_slice());
 

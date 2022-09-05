@@ -7,8 +7,6 @@ use elrond_wasm::abi::{ContractAbi, EndpointAbi, InputAbi, OutputAbi};
 
 use super::meta_config::MetaConfig;
 
-const INIT_FUNC_NAME: &str = "init";
-
 impl MetaConfig {
     // TODO: Handle overwrite flag
     pub fn generate_rust_snippets(&self) {
@@ -163,7 +161,8 @@ const SC_ADDRESS: &str = \"\";
 
 const SYSTEM_SC_BECH32: &str = \"erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u\";
 const DEFAULT_ADDRESS_EXPR: &str = \"0x0000000000000000000000000000000000000000000000000000000000000000\";
-const DEFAULT_GAS_LIMIT: u64 = 100_000_000;").unwrap();
+const DEFAULT_GAS_LIMIT: u64 = 100_000_000;
+const TOKEN_ISSUE_COST: u64 = 50_000_000_000_000_000;").unwrap();
 
     write_newline(file);
 }
@@ -204,10 +203,6 @@ async fn main() {{
     .unwrap();
 
     for endpoint in &abi.endpoints {
-        if endpoint.name == INIT_FUNC_NAME {
-            continue;
-        }
-
         writeln!(
             file,
             "        \"{}\" => state.{}().await,",
@@ -252,7 +247,7 @@ fn write_state_struct_impl(file: &mut File, abi: &ContractAbi) {
         let sc_addr_expr = if SC_ADDRESS == \"\" {{
             DEFAULT_ADDRESS_EXPR.to_string()
         }} else {{
-            \"bec32:\".to_string() + SC_ADDRESS
+            \"bech32:\".to_string() + SC_ADDRESS
         }};
         let contract = ContractType::new(sc_addr_expr);
 
@@ -261,7 +256,7 @@ fn write_state_struct_impl(file: &mut File, abi: &ContractAbi) {
             wallet_address,
             contract,
         }}
-    }}"
+    }}\n"
     )
     .unwrap();
 
@@ -269,22 +264,48 @@ fn write_state_struct_impl(file: &mut File, abi: &ContractAbi) {
         write_endpoint_impl(file, endpoint_abi);
     }
 
+    // close impl block brackets
     writeln!(file, "}}").unwrap();
 }
 
 fn write_endpoint_impl(file: &mut File, endpoint_abi: &EndpointAbi) {
     write_method_declaration(file, endpoint_abi.name);
+    write_payments_declaration(file, endpoint_abi.payable_in_tokens);
     write_endpoint_args_declaration(file, &endpoint_abi.inputs);
     write_contract_call(file, endpoint_abi);
     write_call_results_print(file, &endpoint_abi.outputs);
+
+    // close method block brackets
     writeln!(file, "    }}").unwrap();
+    write_newline(file);
 }
 
 fn write_method_declaration(file: &mut File, endpoint_name: &str) {
     writeln!(file, "    async fn {}(&mut self) {{", endpoint_name).unwrap();
 }
 
-/// TODO: Handle optionals, var args and payments
+fn write_payments_declaration(file: &mut File, accepted_tokens: &[&str]) {
+    if accepted_tokens.is_empty() {
+        return;
+    }
+
+    // only handle EGLD and "any" case, as they're the most common
+    let first_accepted = accepted_tokens[0];
+    if first_accepted == "EGLD" {
+        writeln!(file, "        let egld_amount = 0u64;").unwrap();
+    } else {
+        writeln!(
+            file,
+            "        let token_id = b\"\";
+        let token_nonce = 0u64;
+        let token_amount = 0u64;"
+        )
+        .unwrap();
+    }
+
+    write_newline(file);
+}
+
 /// TODO: Use an actual Rust type instead of invalid `type_name`
 fn write_endpoint_args_declaration(file: &mut File, inputs: &[InputAbi]) {
     if inputs.is_empty() {
@@ -323,15 +344,23 @@ fn write_contract_call(file: &mut File, endpoint_abi: &EndpointAbi) {
         .unwrap();
     }
 
-    writeln!(
-        file,
-        "        let b_call: ScCallStep = contract_call
+    let payment_snippet = if endpoint_abi.payable_in_tokens.is_empty() {
+        ""
+    } else if endpoint_abi.payable_in_tokens[0] == "EGLD" {
+        "            .egld_value(egld_amount)\n"
+    } else {
+        "            .esdt_transfer(token_id, token_nonce, token_amount)\n"
+    };
+
+    let call_snippet = "        let b_call: ScCallStep = contract_call
             .into_blockchain_call()
-            .from(&self.wallet_address)
-            .gas_limit(DEFAULT_GAS_LIMIT)
-            .into();"
-    )
-    .unwrap();
+            .from(&self.wallet_address)\n"
+        .to_string()
+        + payment_snippet
+        + "            .gas_limit(DEFAULT_GAS_LIMIT)
+            .into();";
+
+    writeln!(file, "{}", &call_snippet).unwrap();
 
     if endpoint_abi.outputs.is_empty() {
         writeln!(file, "        self.interactor.sc_call(b_call).await;").unwrap();
