@@ -4,7 +4,7 @@ use elrond_interact_snippets::{
     elrond_wasm::{
         elrond_codec::multi_types::MultiValueVec,
         storage::mappers::SingleValue,
-        types::{Address, CodeMetadata},
+        types::{Address, CodeMetadata, ContractDeploy},
     },
     elrond_wasm_debug::{
         bech32, mandos::interpret_trait::InterpreterContext, mandos_system::model::*, ContractInfo,

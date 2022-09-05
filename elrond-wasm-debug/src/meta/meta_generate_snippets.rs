@@ -12,9 +12,15 @@ impl MetaConfig {
     pub fn generate_rust_snippets(&self) {
         if let Some(contract) = &self.main_contract {
             let crate_name = contract.output_base_name.clone().replace("-", "_");
+            let wasm_output_file_path_expr = format!("\"file:../output/{}.wasm\"", &crate_name);
             let file =
                 create_snippets_crate_and_get_lib_file(&self.snippets_dir, &crate_name, true);
-            write_snippets_to_file(file, &contract.abi, &crate_name);
+            write_snippets_to_file(
+                file,
+                &contract.abi,
+                &crate_name,
+                &wasm_output_file_path_expr,
+            );
         }
     }
 }
@@ -114,13 +120,18 @@ fn create_and_get_lib_file(snippets_folder_path: &str, overwrite: bool) -> File 
     }
 }
 
-fn write_snippets_to_file(mut file: File, abi: &ContractAbi, contract_crate_name: &str) {
+fn write_snippets_to_file(
+    mut file: File,
+    abi: &ContractAbi,
+    contract_crate_name: &str,
+    wasm_output_file_path_expr: &str,
+) {
     write_snippet_imports(&mut file, contract_crate_name);
     write_snippet_constants(&mut file);
     write_contract_type_alias(&mut file, contract_crate_name);
     write_snippet_main_function(&mut file, abi);
     write_state_struct_declaration(&mut file);
-    write_state_struct_impl(&mut file, abi);
+    write_state_struct_impl(&mut file, abi, wasm_output_file_path_expr);
 }
 
 fn write_snippet_imports(file: &mut File, contract_crate_name: &str) {
@@ -237,7 +248,7 @@ fn write_state_struct_declaration(file: &mut File) {
     write_newline(file);
 }
 
-fn write_state_struct_impl(file: &mut File, abi: &ContractAbi) {
+fn write_state_struct_impl(file: &mut File, abi: &ContractAbi, wasm_output_file_path_expr: &str) {
     writeln!(
         file,
         "impl State {{
@@ -260,12 +271,75 @@ fn write_state_struct_impl(file: &mut File, abi: &ContractAbi) {
     )
     .unwrap();
 
+    write_deploy_method_impl(file, &abi.constructors[0], wasm_output_file_path_expr);
+
     for endpoint_abi in &abi.endpoints {
         write_endpoint_impl(file, endpoint_abi);
     }
 
     // close impl block brackets
     writeln!(file, "}}").unwrap();
+}
+
+fn write_deploy_method_impl(
+    file: &mut File,
+    init_abi: &EndpointAbi,
+    wasm_output_file_path_expr: &str,
+) {
+    write_method_declaration(file, "deploy");
+    write_endpoint_args_declaration(file, &init_abi.inputs);
+
+    writeln!(
+        file,
+        "        let contract_deploy = ContractDeploy::<DebugApi, MultiValueVec<Vec<u8>>>::new();"
+    )
+    .unwrap();
+
+    // the variables were previously declared in `write_endpoint_args_declaration`
+    for input in &init_abi.inputs {
+        writeln!(
+            file,
+            "        contract_deploy.push_endpoint_arg(&{});",
+            input.arg_name
+        )
+        .unwrap();
+    }
+
+    write_newline(file);
+
+    writeln!(
+        file,
+        "        let b_call: ScDeployStep = contract_deploy
+            .into_blockchain_call()
+            .from(&self.wallet_address)
+            .code_metadata(CodeMetadata::all())
+            .contract_code(
+                {},
+                &InterpreterContext::default(),
+            )
+            .gas_limit(DEFAULT_GAS_LIMIT)
+            .expect(TxExpect::ok())
+            .into();",
+        wasm_output_file_path_expr,
+    )
+    .unwrap();
+
+    writeln!(
+        file,
+        "        let results: InteractorResult<MultiValueVec<Vec<u8>>> =
+            self.interactor.sc_deploy(b_call).await;
+    
+        let new_address = deploy_result.new_deployed_address();
+        let new_address_bech32 = bech32::encode(&new_address);
+        println!(\"new address: {{}}\", new_address_bech32);"
+    )
+    .unwrap();
+
+    write_call_results_print(file, &init_abi.outputs);
+
+    // close method block brackets
+    writeln!(file, "    }}").unwrap();
+    write_newline(file);
 }
 
 fn write_endpoint_impl(file: &mut File, endpoint_abi: &EndpointAbi) {
@@ -344,6 +418,8 @@ fn write_contract_call(file: &mut File, endpoint_abi: &EndpointAbi) {
         .unwrap();
     }
 
+    write_newline(file);
+
     let payment_snippet = if endpoint_abi.payable_in_tokens.is_empty() {
         ""
     } else if endpoint_abi.payable_in_tokens[0] == "EGLD" {
@@ -368,7 +444,7 @@ fn write_contract_call(file: &mut File, endpoint_abi: &EndpointAbi) {
         writeln!(
             file,
             "        let results: InteractorResult<MultiValueVec<Vec<u8>>> =
-        self.interactor.sc_call_get_result(b_call).await;"
+            self.interactor.sc_call_get_result(b_call).await;"
         )
         .unwrap();
 
