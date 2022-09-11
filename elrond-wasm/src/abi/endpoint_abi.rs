@@ -35,6 +35,7 @@ pub enum EndpointLocationAbi {
 pub struct EndpointAbi {
     pub docs: &'static [&'static str],
     pub name: &'static str,
+    pub rust_method_name: &'static str,
     pub only_owner: bool,
     pub only_admin: bool,
     pub mutability: EndpointMutabilityAbi,

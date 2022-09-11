@@ -3,7 +3,7 @@ use std::{
     io::Write,
 };
 
-use elrond_wasm::abi::{ContractAbi, EndpointAbi, InputAbi, OutputAbi};
+use elrond_wasm::abi::{ContractAbi, EndpointAbi, EndpointMutabilityAbi, InputAbi, OutputAbi};
 
 use super::meta_config::MetaConfig;
 
@@ -79,23 +79,27 @@ fn create_snippets_cargo_toml(
 
     writeln!(
         &mut file,
-        "[package]
-name = \"rust-interact\"
-version = \"0.0.0\"
-authors = [\"you\"]
-edition = \"2018\"
+        r#"[package]
+name = "rust-interact"
+version = "0.0.0"
+authors = ["you"]
+edition = "2018"
 publish = false
 
 [[bin]]
-name = \"rust-interact\"
-path = \"src/lib.rs\"
+name = "rust-interact"
+path = "src/lib.rs"
 
 [dependencies.{}]
-path = \"..\"
+path = ".."
 
 [dependencies.elrond-interact-snippets]
-version = \"0.1.0\"
-",
+version = "0.1.0"
+path = "../../../../elrond-interact-snippets" # TEMPORARY, until we have a release
+
+[workspace]
+
+"#,
         contract_crate_name
     )
     .unwrap();
@@ -142,8 +146,7 @@ fn write_snippet_imports(file: &mut File, contract_crate_name: &str) {
 use {}::ProxyTrait as _;
 use elrond_interact_snippets::{{
     elrond_wasm::{{
-        elrond_codec::multi_types::{{MultiValueVec, TopDecode}},
-        storage::mappers::SingleValue,
+        elrond_codec::multi_types::*,
         types::{{Address, CodeMetadata}},
     }},
     elrond_wasm_debug::{{
@@ -206,18 +209,13 @@ async fn main() {{
     .unwrap();
 
     // all contracts have a deploy and upgrade snippet
-    writeln!(
-        file,
-        "        \"deploy\" => state.deploy().await,
-        \"upgrade\" => state.upgrade().await,"
-    )
-    .unwrap();
+    writeln!(file, r#"        "deploy" => state.deploy().await,"#).unwrap();
 
     for endpoint in &abi.endpoints {
         writeln!(
             file,
-            "        \"{}\" => state.{}().await,",
-            endpoint.name, endpoint.name
+            r#"        "{}" => state.{}().await,"#,
+            endpoint.name, endpoint.rust_method_name
         )
         .unwrap();
     }
@@ -291,47 +289,27 @@ fn write_deploy_method_impl(
 
     writeln!(
         file,
-        "        let contract_deploy = ContractDeploy::<DebugApi, MultiValueVec<Vec<u8>>>::new();"
-    )
-    .unwrap();
-
-    // the variables were previously declared in `write_endpoint_args_declaration`
-    for input in &init_abi.inputs {
-        writeln!(
-            file,
-            "        contract_deploy.push_endpoint_arg(&{});",
-            input.arg_name
-        )
-        .unwrap();
-    }
-
-    write_newline(file);
-
-    writeln!(
-        file,
-        "        let b_call: ScDeployStep = contract_deploy
-            .into_blockchain_call()
-            .from(&self.wallet_address)
-            .code_metadata(CodeMetadata::all())
-            .contract_code(
-                {},
-                &InterpreterContext::default(),
+        r#"        let result: elrond_interact_snippets::InteractorResult<PlaceholderOutput> = self
+            .interactor
+            .sc_deploy(
+                self.contract
+                    .{}({})
+                    .into_blockchain_call()
+                    .from(&self.wallet_address)
+                    .code_metadata(CodeMetadata::all())
+                    .contract_code({}, &InterpreterContext::default())
+                    .gas_limit(DEFAULT_GAS_LIMIT),
             )
-            .gas_limit(DEFAULT_GAS_LIMIT)
-            .expect(TxExpect::ok())
-            .into();",
-        wasm_output_file_path_expr,
-    )
-    .unwrap();
+            .await;
 
-    writeln!(
-        file,
-        "        let results: InteractorResult<MultiValueVec<Vec<u8>>> =
-            self.interactor.sc_deploy(b_call).await;
-    
-        let new_address = deploy_result.new_deployed_address();
+        let new_address = result.new_deployed_address();
         let new_address_bech32 = bech32::encode(&new_address);
-        println!(\"new address: {{}}\", new_address_bech32);"
+        println!("new address: {{}}", new_address_bech32);
+        let result_value = result.value();
+"#,
+        init_abi.rust_method_name,
+        endpoint_args_when_called(init_abi.inputs.as_slice()),
+        wasm_output_file_path_expr
     )
     .unwrap();
 
@@ -343,10 +321,14 @@ fn write_deploy_method_impl(
 }
 
 fn write_endpoint_impl(file: &mut File, endpoint_abi: &EndpointAbi) {
-    write_method_declaration(file, endpoint_abi.name);
+    write_method_declaration(file, endpoint_abi.rust_method_name);
     write_payments_declaration(file, endpoint_abi.payable_in_tokens);
     write_endpoint_args_declaration(file, &endpoint_abi.inputs);
-    write_contract_call(file, endpoint_abi);
+    if matches!(endpoint_abi.mutability, EndpointMutabilityAbi::Readonly) {
+        write_contract_query(file, endpoint_abi);
+    } else {
+        write_contract_call(file, endpoint_abi);
+    }
     write_call_results_print(file, &endpoint_abi.outputs);
 
     // close method block brackets
@@ -380,108 +362,106 @@ fn write_payments_declaration(file: &mut File, accepted_tokens: &[&str]) {
     write_newline(file);
 }
 
-/// TODO: Use an actual Rust type instead of invalid `type_name`
 fn write_endpoint_args_declaration(file: &mut File, inputs: &[InputAbi]) {
     if inputs.is_empty() {
         return;
     }
 
     for input in inputs {
-        writeln!(
-            file,
-            "        let {}: {} = Default::default();",
-            input.arg_name, input.type_name
-        )
-        .unwrap();
+        writeln!(file, "        let {} = PlaceholderInput;", input.arg_name).unwrap();
     }
 
     write_newline(file);
+}
+
+fn endpoint_args_when_called(inputs: &[InputAbi]) -> String {
+    let mut result = String::new();
+    for input in inputs {
+        if !result.is_empty() {
+            result.push_str(", ");
+        }
+        result.push_str(input.arg_name);
+    }
+    result
 }
 
 fn write_contract_call(file: &mut File, endpoint_abi: &EndpointAbi) {
-    writeln!(
-        file,
-        "        let sc_addr = self.contract.address.clone().into_option().unwrap();
-        let mut contract_call =
-            ContractCall::<DebugApi, MultiValueVec<Vec<u8>>>::new(sc_addr, \"{}\");",
-        endpoint_abi.name
-    )
-    .unwrap();
-
-    // the variables were previously declared in `write_endpoint_args_declaration`
-    for input in &endpoint_abi.inputs {
-        writeln!(
-            file,
-            "        contract_call.push_endpoint_arg(&{});",
-            input.arg_name
-        )
-        .unwrap();
-    }
-
-    write_newline(file);
-
     let payment_snippet = if endpoint_abi.payable_in_tokens.is_empty() {
         ""
     } else if endpoint_abi.payable_in_tokens[0] == "EGLD" {
-        "            .egld_value(egld_amount)\n"
+        "\n            .egld_value(egld_amount)\n"
     } else {
-        "            .esdt_transfer(token_id, token_nonce, token_amount)\n"
+        "\n            .esdt_transfer(token_id, token_nonce, token_amount)\n"
     };
 
-    let call_snippet = "        let b_call: ScCallStep = contract_call
-            .into_blockchain_call()
-            .from(&self.wallet_address)\n"
-        .to_string()
-        + payment_snippet
-        + "            .gas_limit(DEFAULT_GAS_LIMIT)
-            .into();";
-
-    writeln!(file, "{}", &call_snippet).unwrap();
-
-    if endpoint_abi.outputs.is_empty() {
-        writeln!(file, "        self.interactor.sc_call(b_call).await;").unwrap();
-    } else {
-        writeln!(
-            file,
-            "        let results: InteractorResult<MultiValueVec<Vec<u8>>> =
-            self.interactor.sc_call_get_result(b_call).await;"
-        )
-        .unwrap();
-
-        write_newline(file);
-    }
+    writeln!(
+        file,
+        r#"        let result: elrond_interact_snippets::InteractorResult<PlaceholderOutput> = self
+            .interactor
+            .sc_call_get_result(
+                self.contract
+                    .{}({})
+                    .into_blockchain_call()
+                    .from(&self.wallet_address){}
+                    .gas_limit("10,000,000")
+                    .into(),
+            )
+            .await;
+        let result_value = result.value();
+"#,
+        endpoint_abi.rust_method_name,
+        endpoint_args_when_called(endpoint_abi.inputs.as_slice()),
+        payment_snippet,
+    )
+    .unwrap();
 }
 
-fn write_call_results_print(file: &mut File, outputs: &[OutputAbi]) {
-    if outputs.is_empty() {
-        return;
-    }
+fn write_contract_query(file: &mut File, endpoint_abi: &EndpointAbi) {
+    writeln!(
+        file,
+        r#"        let result_value: PlaceholderOutput = self
+            .interactor
+            .vm_query(self.contract.{}({}))
+            .await;
+"#,
+        endpoint_abi.rust_method_name,
+        endpoint_args_when_called(endpoint_abi.inputs.as_slice()),
+    )
+    .unwrap();
+}
 
-    writeln!(file, "        let raw_result_values = results.value().0;").unwrap();
+fn write_call_results_print(file: &mut File, _outputs: &[OutputAbi]) {
+    writeln!(file, r#"        println!("Result: {{:?}}", result_value);"#).unwrap();
 
-    for (i, output) in outputs.iter().enumerate() {
-        let output_name = format!("out{}", i);
+    // if outputs.is_empty() {
+    //     return;
+    // }
 
-        writeln!(
-            file,
-            "        let {} = {}::top_decode(raw_result_values[{}]).unwrap();",
-            output_name, output.type_name, i
-        )
-        .unwrap();
-    }
+    // writeln!(file, "        let raw_result_values = results.value().0;").unwrap();
 
-    write_newline(file);
+    // for (i, output) in outputs.iter().enumerate() {
+    //     let output_name = format!("out{}", i);
 
-    for (i, _output) in outputs.iter().enumerate() {
-        let output_name = format!("out{}", i);
+    //     writeln!(
+    //         file,
+    //         "        let {} = {}::top_decode(raw_result_values[{}]).unwrap();",
+    //         output_name, output.type_name, i
+    //     )
+    //     .unwrap();
+    // }
 
-        writeln!(
-            file,
-            "        println!(\"{}: {{}}\", {})",
-            output_name, output_name
-        )
-        .unwrap();
-    }
+    // write_newline(file);
+
+    // for (i, _output) in outputs.iter().enumerate() {
+    //     let output_name = format!("out{}", i);
+
+    //     writeln!(
+    //         file,
+    //         "        println!(\"{}: {{}}\", {})",
+    //         output_name, output_name
+    //     )
+    //     .unwrap();
+    // }
 
     write_newline(file);
 }

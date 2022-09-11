@@ -13,6 +13,7 @@ fn generate_endpoint_snippet(
     location: EndpointLocationMetadata,
 ) -> proc_macro2::TokenStream {
     let endpoint_docs = &m.docs;
+    let rust_method_name = m.name.to_string();
     let payable_in_tokens = m.payable_metadata().abi_strings();
 
     let input_snippets: Vec<proc_macro2::TokenStream> = m
@@ -53,6 +54,7 @@ fn generate_endpoint_snippet(
         let mut endpoint_abi = elrond_wasm::abi::EndpointAbi{
             docs: &[ #(#endpoint_docs),* ],
             name: #endpoint_name,
+            rust_method_name: #rust_method_name,
             only_owner: #only_owner,
             only_admin: #only_admin,
             mutability: #mutability_tokens,
