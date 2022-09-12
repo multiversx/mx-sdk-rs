@@ -13,7 +13,11 @@ pub(crate) fn create_snippets_gitignore(snippets_folder_path: &str, overwrite: b
     let mut file = if overwrite {
         File::create(&gitignore_path).unwrap()
     } else {
-        match File::options().create_new(true).open(&gitignore_path) {
+        match File::options()
+            .create_new(true)
+            .write(true)
+            .open(&gitignore_path)
+        {
             Ok(f) => f,
             Err(_) => return,
         }
@@ -36,7 +40,11 @@ pub(crate) fn create_snippets_cargo_toml(
     let mut file = if overwrite {
         File::create(&cargo_toml_path).unwrap()
     } else {
-        match File::options().create_new(true).open(&cargo_toml_path) {
+        match File::options()
+            .create_new(true)
+            .write(true)
+            .open(&cargo_toml_path)
+        {
             Ok(f) => f,
             Err(_) => return,
         }
@@ -82,9 +90,9 @@ pub(crate) fn create_and_get_lib_file(snippets_folder_path: &str, overwrite: boo
     if overwrite {
         File::create(&lib_path).unwrap()
     } else {
-        match File::options().create_new(true).open(&lib_path) {
+        match File::options().create_new(true).write(true).open(&lib_path) {
             Ok(f) => f,
-            Err(_) => panic!("lib.rs file already exists, overwrite option was not provided"),
+            Err(_) => panic!("lib.rs file already exists, --overwrite option was not provided"),
         }
     }
 }
