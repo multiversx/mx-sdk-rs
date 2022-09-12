@@ -403,7 +403,7 @@ fn write_contract_call(file: &mut File, endpoint_abi: &EndpointAbi) {
                     .{}({})
                     .into_blockchain_call()
                     .from(&self.wallet_address){}
-                    .gas_limit("10,000,000")
+                    .gas_limit(DEFAULT_GAS_LIMIT)
                     .into(),
             )
             .await;
@@ -432,40 +432,8 @@ fn write_contract_query(file: &mut File, endpoint_abi: &EndpointAbi) {
 
 fn write_call_results_print(file: &mut File, _outputs: &[OutputAbi]) {
     writeln!(file, r#"        println!("Result: {{:?}}", result_value);"#).unwrap();
-
-    // if outputs.is_empty() {
-    //     return;
-    // }
-
-    // writeln!(file, "        let raw_result_values = results.value().0;").unwrap();
-
-    // for (i, output) in outputs.iter().enumerate() {
-    //     let output_name = format!("out{}", i);
-
-    //     writeln!(
-    //         file,
-    //         "        let {} = {}::top_decode(raw_result_values[{}]).unwrap();",
-    //         output_name, output.type_name, i
-    //     )
-    //     .unwrap();
-    // }
-
-    // write_newline(file);
-
-    // for (i, _output) in outputs.iter().enumerate() {
-    //     let output_name = format!("out{}", i);
-
-    //     writeln!(
-    //         file,
-    //         "        println!(\"{}: {{}}\", {})",
-    //         output_name, output_name
-    //     )
-    //     .unwrap();
-    // }
-
-    write_newline(file);
 }
 
 fn write_newline(file: &mut File) {
-    file.write(b"\n").unwrap();
+    file.write_all(b"\n").unwrap();
 }
