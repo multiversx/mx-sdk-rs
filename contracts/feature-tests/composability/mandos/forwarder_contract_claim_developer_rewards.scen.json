@@ -79,9 +79,11 @@
                     "owner": "address:owner"
                 },
                 "address:not_owner": {
+                    "balance": "0",
                     "nonce": "1"
                 },
                 "address:owner": {
+                    "balance": "0",
                     "nonce": "1"
                 },
                 "sc:child": {
