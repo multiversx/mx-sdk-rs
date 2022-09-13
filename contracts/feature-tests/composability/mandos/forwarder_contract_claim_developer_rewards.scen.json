@@ -92,8 +92,7 @@
                 "sc:not_child": {
                     "balance": "500",
                     "code": "file:../vault/output/vault.wasm",
-                    "owner": "sc:not_owner",
-                    "developerRewards": "0"
+                    "owner": "sc:not_owner"
                 }
             }
         }
