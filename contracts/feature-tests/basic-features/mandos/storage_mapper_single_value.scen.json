@@ -18,7 +18,7 @@
         },
         {
             "step": "scCall",
-            "txId": "before",
+            "id": "before",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -39,7 +39,7 @@
         },
         {
             "step": "scCall",
-            "txId": "increment-1",
+            "id": "increment-1",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -60,7 +60,7 @@
         },
         {
             "step": "scCall",
-            "txId": "after-1",
+            "id": "after-1",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -81,7 +81,7 @@
         },
         {
             "step": "scCall",
-            "txId": "increment-2",
+            "id": "increment-2",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -102,7 +102,7 @@
         },
         {
             "step": "scCall",
-            "txId": "subtract-too-much",
+            "id": "subtract-too-much",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -124,7 +124,7 @@
         },
         {
             "step": "scCall",
-            "txId": "subtract-ok",
+            "id": "subtract-ok",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -145,7 +145,7 @@
         },
         {
             "step": "scCall",
-            "txId": "after-2",
+            "id": "after-2",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -185,7 +185,7 @@
         },
         {
             "step": "scCall",
-            "txId": "is-empty-before-clear",
+            "id": "is-empty-before-clear",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -206,7 +206,7 @@
         },
         {
             "step": "scCall",
-            "txId": "clear-single-value-mapper",
+            "id": "clear-single-value-mapper",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -225,7 +225,7 @@
         },
         {
             "step": "scCall",
-            "txId": "is-empty-after-clear",
+            "id": "is-empty-after-clear",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -263,7 +263,7 @@
         },
         {
             "step": "scCall",
-            "txId": "set-empty-entry",
+            "id": "set-empty-entry",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -304,7 +304,7 @@
         },
         {
             "step": "scCall",
-            "txId": "call-set-if-empty-on-non-empty-entry",
+            "id": "call-set-if-empty-on-non-empty-entry",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -345,7 +345,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "query-raw-byte-length",
+            "id": "query-raw-byte-length",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "raw_byte_length_single_value_mapper",

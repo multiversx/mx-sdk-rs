@@ -20,7 +20,7 @@
         },
         {
             "step": "scCall",
-            "txId": "change-owner",
+            "id": "change-owner",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",

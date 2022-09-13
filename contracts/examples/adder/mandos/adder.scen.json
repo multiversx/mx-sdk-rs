@@ -21,7 +21,7 @@
         },
         {
             "step": "scDeploy",
-            "txId": "1",
+            "id": "1",
             "tx": {
                 "from": "address:owner",
                 "contractCode": "file:../output/adder.wasm",
@@ -41,7 +41,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "2",
+            "id": "2",
             "tx": {
                 "to": "sc:adder",
                 "function": "getSum",
@@ -57,7 +57,7 @@
         },
         {
             "step": "scCall",
-            "txId": "3",
+            "id": "3",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:adder",

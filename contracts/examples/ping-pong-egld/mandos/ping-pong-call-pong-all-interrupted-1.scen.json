@@ -14,7 +14,7 @@
         },
         {
             "step": "scCall",
-            "txId": "pong-all-interrupted-0/2",
+            "id": "pong-all-interrupted-0/2",
             "comment": "initially, the gas is only enough to perform 0 of 2 pongs",
             "tx": {
                 "from": "address:participant1",

@@ -33,7 +33,7 @@
         },
         {
             "step": "scCall",
-            "txId": "multi-transfer-through-callback",
+            "id": "multi-transfer-through-callback",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",

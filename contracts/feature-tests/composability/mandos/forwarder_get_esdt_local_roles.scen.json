@@ -21,7 +21,7 @@
         },
         {
             "step": "scCall",
-            "txId": "0",
+            "id": "0",
             "comment": "no roles",
             "tx": {
                 "from": "address:viewer",
@@ -64,7 +64,7 @@
         },
         {
             "step": "scCall",
-            "txId": "1",
+            "id": "1",
             "comment": "one role",
             "tx": {
                 "from": "address:viewer",
@@ -110,7 +110,7 @@
         },
         {
             "step": "scCall",
-            "txId": "2",
+            "id": "2",
             "comment": "multiple roles",
             "tx": {
                 "from": "address:viewer",
@@ -159,7 +159,7 @@
         },
         {
             "step": "scCall",
-            "txId": "3",
+            "id": "3",
             "comment": "nft roles",
             "tx": {
                 "from": "address:viewer",

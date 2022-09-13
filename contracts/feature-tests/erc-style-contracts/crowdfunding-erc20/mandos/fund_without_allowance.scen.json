@@ -11,7 +11,7 @@
         },
         {
             "step": "scCall",
-            "txId": "fund-without-allowance",
+            "id": "fund-without-allowance",
             "tx": {
                 "from": "address:acc1",
                 "to": "sc:crowdfunding",

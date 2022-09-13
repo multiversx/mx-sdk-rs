@@ -16,7 +16,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "1",
+            "id": "1",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "managed_vec_biguint_push",
@@ -33,7 +33,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "2",
+            "id": "2",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "managed_vec_biguint_push",
@@ -50,7 +50,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "3",
+            "id": "3",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "managed_vec_biguint_push",
@@ -67,7 +67,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "4",
+            "id": "4",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "managed_vec_biguint_push",
@@ -84,7 +84,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "5",
+            "id": "5",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "managed_vec_remove",
@@ -101,7 +101,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "6",
+            "id": "6",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "managed_vec_remove",
@@ -118,7 +118,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "7",
+            "id": "7",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "managed_vec_remove",
@@ -135,7 +135,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "8",
+            "id": "8",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "managed_vec_remove",
@@ -152,7 +152,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "9",
+            "id": "9",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "managed_vec_find",
@@ -169,7 +169,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "10",
+            "id": "10",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "managed_vec_find",
@@ -186,7 +186,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "11",
+            "id": "11",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "managed_vec_find",
@@ -203,7 +203,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "12",
+            "id": "12",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "managed_vec_find",
@@ -220,7 +220,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "13",
+            "id": "13",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "managed_vec_contains",
@@ -237,7 +237,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "14",
+            "id": "14",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "managed_vec_contains",

@@ -7,7 +7,7 @@
         },
         {
             "step": "scCall",
-            "txId": "claim-too-early-donor",
+            "id": "claim-too-early-donor",
             "tx": {
                 "from": "address:donor1",
                 "to": "sc:crowdfunding",
@@ -26,7 +26,7 @@
         },
         {
             "step": "scCall",
-            "txId": "claim-too-early-owner",
+            "id": "claim-too-early-owner",
             "tx": {
                 "from": "address:my_address",
                 "to": "sc:crowdfunding",

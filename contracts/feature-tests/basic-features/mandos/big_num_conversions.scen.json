@@ -17,7 +17,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "big_int_to_parts+",
+            "id": "big_int_to_parts+",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "big_int_to_parts",
@@ -34,7 +34,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "big_int_to_parts0",
+            "id": "big_int_to_parts0",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "big_int_to_parts",
@@ -51,7 +51,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "big_int_to_parts-",
+            "id": "big_int_to_parts-",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "big_int_to_parts",
@@ -68,7 +68,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "big_int_from_biguint+",
+            "id": "big_int_from_biguint+",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "big_int_from_biguint",
@@ -85,7 +85,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "big_int_from_parts0",
+            "id": "big_int_from_parts0",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "big_int_from_biguint",
@@ -102,7 +102,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "big_int_from_biguint-",
+            "id": "big_int_from_biguint-",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "big_int_from_biguint",
@@ -119,7 +119,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "big-num-mutable-arg",
+            "id": "big-num-mutable-arg",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "endpoint_with_mutable_arg",
@@ -137,7 +137,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "big-uint-set-u64",
+            "id": "big-uint-set-u64",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "biguint_overwrite_u64",
@@ -154,7 +154,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "big-uint-set-u64",
+            "id": "big-uint-set-u64",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "biguint_overwrite_u64",
@@ -164,13 +164,14 @@
                 ]
             },
             "expect": {
+                "out": [],
                 "status": "4",
                 "message": "str:cast to i64 error"
             }
         },
         {
             "step": "scQuery",
-            "txId": "big-int-set-i64",
+            "id": "big-int-set-i64",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "bigint_overwrite_i64",

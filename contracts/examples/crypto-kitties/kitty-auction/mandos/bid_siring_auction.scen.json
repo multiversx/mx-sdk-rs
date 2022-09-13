@@ -8,7 +8,7 @@
         },
         {
             "step": "scCall",
-            "txId": "tx-bid-siring-auction",
+            "id": "tx-bid-siring-auction",
             "tx": {
                 "from": "address:bidder1",
                 "to": "sc:kitty_auction_contract",

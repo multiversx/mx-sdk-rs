@@ -14,7 +14,7 @@
         },
         {
             "step": "scCall",
-            "txId": "tx-create-sale-auction-not-owner",
+            "id": "tx-create-sale-auction-not-owner",
             "tx": {
                 "from": "address:bidder1",
                 "to": "sc:kitty_auction_contract",

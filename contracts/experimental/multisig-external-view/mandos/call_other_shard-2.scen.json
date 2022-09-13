@@ -19,7 +19,7 @@
         },
         {
             "step": "scCall",
-            "txId": "propose-send-to-other-shard-2",
+            "id": "propose-send-to-other-shard-2",
             "tx": {
                 "from": "address:alice",
                 "to": "sc:multisig",
@@ -46,7 +46,7 @@
         },
         {
             "step": "scCall",
-            "txId": "perform-send-to-other-shard-2",
+            "id": "perform-send-to-other-shard-2",
             "tx": {
                 "from": "address:alice",
                 "to": "sc:multisig",

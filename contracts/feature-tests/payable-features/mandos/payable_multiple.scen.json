@@ -30,7 +30,7 @@
         },
         {
             "step": "scCall",
-            "txId": "payment-multiple",
+            "id": "payment-multiple",
             "tx": {
                 "from": "address:an-account",
                 "to": "sc:payable-features",

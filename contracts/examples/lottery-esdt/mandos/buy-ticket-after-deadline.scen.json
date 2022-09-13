@@ -23,7 +23,7 @@
         },
         {
             "step": "scCall",
-            "txId": "buy-ticket-after-deadline",
+            "id": "buy-ticket-after-deadline",
             "tx": {
                 "from": "address:acc2",
                 "to": "sc:lottery",

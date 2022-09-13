@@ -31,7 +31,7 @@
         },
         {
             "step": "scCall",
-            "txId": "payment-array-too-many",
+            "id": "payment-array-too-many",
             "tx": {
                 "from": "address:an-account",
                 "to": "sc:payable-features",
@@ -60,6 +60,7 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "4",
                 "message": "str:incorrect number of ESDT transfers",
                 "logs": "*",
@@ -67,10 +68,9 @@
                 "refund": "*"
             }
         },
-
         {
             "step": "scCall",
-            "txId": "payment-array-too-few",
+            "id": "payment-array-too-few",
             "tx": {
                 "from": "address:an-account",
                 "to": "sc:payable-features",
@@ -91,6 +91,7 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "4",
                 "message": "str:incorrect number of ESDT transfers",
                 "logs": "*",
@@ -100,7 +101,7 @@
         },
         {
             "step": "scCall",
-            "txId": "payment-array-ok",
+            "id": "payment-array-ok",
             "tx": {
                 "from": "address:an-account",
                 "to": "sc:payable-features",

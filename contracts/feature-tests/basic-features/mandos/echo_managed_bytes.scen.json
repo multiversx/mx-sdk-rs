@@ -17,7 +17,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "1",
+            "id": "1",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "echo_managed_address",
@@ -34,7 +34,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "address-eq",
+            "id": "address-eq",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "managed_address_eq",
@@ -52,7 +52,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "address-not-eq",
+            "id": "address-not-eq",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "managed_address_eq",

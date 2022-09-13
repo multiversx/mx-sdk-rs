@@ -39,7 +39,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "2",
+            "id": "2",
             "tx": {
                 "to": "sc:forwarder",
                 "function": "getCurrentNftNonce",

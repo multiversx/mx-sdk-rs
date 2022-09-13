@@ -6,7 +6,7 @@
         },
         {
             "step": "scCall",
-            "txId": "proposeSCUpgradeFromSource",
+            "id": "proposeSCUpgradeFromSource",
             "comment": "missing argument",
             "tx": {
                 "from": "address:paul",
@@ -34,7 +34,7 @@
         },
         {
             "step": "scCall",
-            "txId": "sc-upgrade-sign-alice",
+            "id": "sc-upgrade-sign-alice",
             "tx": {
                 "from": "address:alice",
                 "to": "sc:multisig",
@@ -55,7 +55,7 @@
         },
         {
             "step": "scCall",
-            "txId": "sc-upgrade-sign-bob",
+            "id": "sc-upgrade-sign-bob",
             "tx": {
                 "from": "address:bob",
                 "to": "sc:multisig",
@@ -76,7 +76,7 @@
         },
         {
             "step": "scCall",
-            "txId": "sc-upgrade-perform-3",
+            "id": "sc-upgrade-perform-3",
             "tx": {
                 "from": "address:paul",
                 "to": "sc:multisig",

@@ -21,7 +21,7 @@
         },
         {
             "step": "scDeploy",
-            "txId": "deploy",
+            "id": "deploy",
             "tx": {
                 "from": "address:owner",
                 "contractCode": "file:../output/vec-repeat.wasm",
@@ -39,7 +39,7 @@
         },
         {
             "step": "scCall",
-            "txId": "add_struct",
+            "id": "add_struct",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
@@ -68,7 +68,7 @@
         },
         {
             "step": "scCall",
-            "txId": "count_struct",
+            "id": "count_struct",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
@@ -98,7 +98,7 @@
         },
         {
             "step": "scCall",
-            "txId": "remove_struct",
+            "id": "remove_struct",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",

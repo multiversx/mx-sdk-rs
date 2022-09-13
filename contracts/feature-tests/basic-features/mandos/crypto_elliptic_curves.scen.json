@@ -17,7 +17,7 @@
         },
         {
             "step": "scCall",
-            "txId": "FAIL-Create-ec",
+            "id": "FAIL-Create-ec",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
@@ -39,7 +39,7 @@
         },
         {
             "step": "scCall",
-            "txId": "Verify-P224",
+            "id": "Verify-P224",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
@@ -69,7 +69,7 @@
         },
         {
             "step": "scCall",
-            "txId": "Verify-P256",
+            "id": "Verify-P256",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
@@ -99,7 +99,7 @@
         },
         {
             "step": "scCall",
-            "txId": "Verify-P384",
+            "id": "Verify-P384",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
@@ -129,7 +129,7 @@
         },
         {
             "step": "scCall",
-            "txId": "Verify-P521",
+            "id": "Verify-P521",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
@@ -159,7 +159,7 @@
         },
         {
             "step": "scCall",
-            "txId": "GetValues-P224",
+            "id": "GetValues-P224",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
@@ -189,7 +189,7 @@
         },
         {
             "step": "scCall",
-            "txId": "GetValues-P256",
+            "id": "GetValues-P256",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
@@ -219,7 +219,7 @@
         },
         {
             "step": "scCall",
-            "txId": "GetValues-P384",
+            "id": "GetValues-P384",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
@@ -249,7 +249,7 @@
         },
         {
             "step": "scCall",
-            "txId": "GetValues-P521",
+            "id": "GetValues-P521",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
@@ -279,7 +279,7 @@
         },
         {
             "step": "scCall",
-            "txId": "GetEcLength-P224",
+            "id": "GetEcLength-P224",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
@@ -302,7 +302,7 @@
         },
         {
             "step": "scCall",
-            "txId": "GetEcLength-P256",
+            "id": "GetEcLength-P256",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
@@ -325,7 +325,7 @@
         },
         {
             "step": "scCall",
-            "txId": "GetEcLength-P384",
+            "id": "GetEcLength-P384",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
@@ -348,7 +348,7 @@
         },
         {
             "step": "scCall",
-            "txId": "GetEcLength-P521",
+            "id": "GetEcLength-P521",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
@@ -371,7 +371,7 @@
         },
         {
             "step": "scCall",
-            "txId": "GetPrivKeyLength-P224",
+            "id": "GetPrivKeyLength-P224",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
@@ -394,7 +394,7 @@
         },
         {
             "step": "scCall",
-            "txId": "GetPrivKeyLength-P256",
+            "id": "GetPrivKeyLength-P256",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
@@ -417,7 +417,7 @@
         },
         {
             "step": "scCall",
-            "txId": "GetPrivKeyLength-P384",
+            "id": "GetPrivKeyLength-P384",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
@@ -440,7 +440,7 @@
         },
         {
             "step": "scCall",
-            "txId": "GetPrivKeyLength-P521",
+            "id": "GetPrivKeyLength-P521",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
@@ -463,7 +463,7 @@
         },
         {
             "step": "scCall",
-            "txId": "P521-IsOnCurve-ReturnTrue-V1",
+            "id": "P521-IsOnCurve-ReturnTrue-V1",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
@@ -488,7 +488,7 @@
         },
         {
             "step": "scCall",
-            "txId": "P521-IsOnCurve-ReturnTrue-V2",
+            "id": "P521-IsOnCurve-ReturnTrue-V2",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
@@ -513,7 +513,7 @@
         },
         {
             "step": "scCall",
-            "txId": "P521-IsOnCurve-ReturnFalse",
+            "id": "P521-IsOnCurve-ReturnFalse",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
@@ -538,7 +538,7 @@
         },
         {
             "step": "scCall",
-            "txId": "P256-Add-Fail-OnePointNotOnCurve",
+            "id": "P256-Add-Fail-OnePointNotOnCurve",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
@@ -563,7 +563,7 @@
         },
         {
             "step": "scCall",
-            "txId": "P256-Add-Fail-BothPointsNotOnCurve",
+            "id": "P256-Add-Fail-BothPointsNotOnCurve",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
@@ -588,7 +588,7 @@
         },
         {
             "step": "scCall",
-            "txId": "P256-Add-Success",
+            "id": "P256-Add-Success",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
@@ -616,7 +616,7 @@
         },
         {
             "step": "scCall",
-            "txId": "P521-Double-Fail-PointNotOnCurve",
+            "id": "P521-Double-Fail-PointNotOnCurve",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
@@ -639,7 +639,7 @@
         },
         {
             "step": "scCall",
-            "txId": "P521-Double-Success",
+            "id": "P521-Double-Success",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
@@ -665,7 +665,7 @@
         },
         {
             "step": "scCall",
-            "txId": "P256-Marshal-FailExecution-BufferTooSmall",
+            "id": "P256-Marshal-FailExecution-BufferTooSmall",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
@@ -686,7 +686,7 @@
         },
         {
             "step": "scCall",
-            "txId": "P256-Marshal-Success",
+            "id": "P256-Marshal-Success",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
@@ -709,7 +709,7 @@
         },
         {
             "step": "scCall",
-            "txId": "P256-Marshal-Fail-Infinity/ZeroPoint",
+            "id": "P256-Marshal-Fail-Infinity/ZeroPoint",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
@@ -730,7 +730,7 @@
         },
         {
             "step": "scCall",
-            "txId": "P256-Unmarshal-Fail-PointNotOnCurve",
+            "id": "P256-Unmarshal-Fail-PointNotOnCurve",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
@@ -750,7 +750,7 @@
         },
         {
             "step": "scCall",
-            "txId": "P256-Unmarshal-Fail-DataInvalid",
+            "id": "P256-Unmarshal-Fail-DataInvalid",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
@@ -770,7 +770,7 @@
         },
         {
             "step": "scCall",
-            "txId": "P256-Unmarshal-Success",
+            "id": "P256-Unmarshal-Success",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
@@ -793,7 +793,7 @@
         },
         {
             "step": "scCall",
-            "txId": "P256-MarshalCompressed-FailExecution-BufferTooSmall",
+            "id": "P256-MarshalCompressed-FailExecution-BufferTooSmall",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
@@ -814,7 +814,7 @@
         },
         {
             "step": "scCall",
-            "txId": "P256-MarshalCompressed-Success",
+            "id": "P256-MarshalCompressed-Success",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
@@ -837,7 +837,7 @@
         },
         {
             "step": "scCall",
-            "txId": "P256-MarshalCompressed-Fail-Infinity/ZeroPoint",
+            "id": "P256-MarshalCompressed-Fail-Infinity/ZeroPoint",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
@@ -858,7 +858,7 @@
         },
         {
             "step": "scCall",
-            "txId": "P256-UnmarshalCompressed-Fail-PointNotOnCurve",
+            "id": "P256-UnmarshalCompressed-Fail-PointNotOnCurve",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
@@ -878,7 +878,7 @@
         },
         {
             "step": "scCall",
-            "txId": "P256-UnmarshalCompressed-Fail-DataInvalid",
+            "id": "P256-UnmarshalCompressed-Fail-DataInvalid",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
@@ -898,7 +898,7 @@
         },
         {
             "step": "scCall",
-            "txId": "P256-UnmarshalCompressed-Success",
+            "id": "P256-UnmarshalCompressed-Success",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
@@ -921,7 +921,7 @@
         },
         {
             "step": "scCall",
-            "txId": "P224-GenerateKey-Success",
+            "id": "P224-GenerateKey-Success",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
@@ -944,7 +944,7 @@
         },
         {
             "step": "scCall",
-            "txId": "P256-GenerateKey-Success",
+            "id": "P256-GenerateKey-Success",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
@@ -967,7 +967,7 @@
         },
         {
             "step": "scCall",
-            "txId": "P384-GenerateKey-Success",
+            "id": "P384-GenerateKey-Success",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
@@ -990,7 +990,7 @@
         },
         {
             "step": "scCall",
-            "txId": "P521-GenerateKey-Success",
+            "id": "P521-GenerateKey-Success",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
@@ -1013,7 +1013,7 @@
         },
         {
             "step": "scCall",
-            "txId": "P224-ScalarBaseMult-Success",
+            "id": "P224-ScalarBaseMult-Success",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
@@ -1036,7 +1036,7 @@
         },
         {
             "step": "scCall",
-            "txId": "P256-ScalarMult-Fail",
+            "id": "P256-ScalarMult-Fail",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
@@ -1058,7 +1058,7 @@
         },
         {
             "step": "scCall",
-            "txId": "P224-ScalarMult-Success",
+            "id": "P224-ScalarMult-Success",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
@@ -1083,7 +1083,7 @@
         },
         {
             "step": "scCall",
-            "txId": "P256-ScalarMult-Success",
+            "id": "P256-ScalarMult-Success",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
@@ -1108,7 +1108,7 @@
         },
         {
             "step": "scCall",
-            "txId": "P384-ScalarMult-Success",
+            "id": "P384-ScalarMult-Success",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",
@@ -1133,7 +1133,7 @@
         },
         {
             "step": "scCall",
-            "txId": "P521-ScalarMult-Success",
+            "id": "P521-ScalarMult-Success",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:features_contract",

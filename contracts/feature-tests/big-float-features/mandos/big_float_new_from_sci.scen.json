@@ -17,7 +17,7 @@
         },
         {
             "step": "scCall",
-            "txId": "newBigFloatFromSci - 1",
+            "id": "newBigFloatFromSci - 1",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -38,7 +38,7 @@
         },
         {
             "step": "scCall",
-            "txId": "newBigFloatFromSci - 2",
+            "id": "newBigFloatFromSci - 2",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -59,7 +59,7 @@
         },
         {
             "step": "scCall",
-            "txId": "newBigFloatFromSci - 3",
+            "id": "newBigFloatFromSci - 3",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -80,7 +80,7 @@
         },
         {
             "step": "scCall",
-            "txId": "newBigFloatFromSci - 4",
+            "id": "newBigFloatFromSci - 4",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -94,6 +94,7 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "10",
                 "message": "str:exponent must be negative"
             }

@@ -18,7 +18,7 @@
         },
         {
             "step": "scCall",
-            "txId": "before",
+            "id": "before",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -37,7 +37,7 @@
         },
         {
             "step": "scCall",
-            "txId": "first-insert",
+            "id": "first-insert",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -84,7 +84,7 @@
         },
         {
             "step": "scCall",
-            "txId": "check-map-keys-after-first-insert",
+            "id": "check-map-keys-after-first-insert",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -105,7 +105,7 @@
         },
         {
             "step": "scCall",
-            "txId": "check-map-values-after-first-insert",
+            "id": "check-map-values-after-first-insert",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -126,7 +126,7 @@
         },
         {
             "step": "scCall",
-            "txId": "second-insert",
+            "id": "second-insert",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -150,7 +150,7 @@
         },
         {
             "step": "scCall",
-            "txId": "check-map-keys-after-second-insert",
+            "id": "check-map-keys-after-second-insert",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -172,7 +172,7 @@
         },
         {
             "step": "scCall",
-            "txId": "check-map-values-after-second-insert",
+            "id": "check-map-values-after-second-insert",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -221,7 +221,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "check-map-key-value-pairs",
+            "id": "check-map-key-value-pairs",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "map_mapper",
@@ -239,7 +239,7 @@
         },
         {
             "step": "scCall",
-            "txId": "check-contains-after-second-insert",
+            "id": "check-contains-after-second-insert",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -262,7 +262,7 @@
         },
         {
             "step": "scCall",
-            "txId": "first-remove",
+            "id": "first-remove",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -308,7 +308,7 @@
         },
         {
             "step": "scCall",
-            "txId": "second-remove",
+            "id": "second-remove",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -348,7 +348,7 @@
         },
         {
             "step": "scCall",
-            "txId": "check-get-after-second-remove",
+            "id": "check-get-after-second-remove",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -388,7 +388,7 @@
         },
         {
             "step": "scCall",
-            "txId": "entry or default for a non-existing item",
+            "id": "entry or default for a non-existing item",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -435,7 +435,7 @@
         },
         {
             "step": "scCall",
-            "txId": "entry or default for the previously added item",
+            "id": "entry or default for the previously added item",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -482,7 +482,7 @@
         },
         {
             "step": "scCall",
-            "txId": "entry or insert default for an existing entry shouldn't change anything, only return its existing value",
+            "id": "entry or insert default for an existing entry shouldn't change anything, only return its existing value",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -529,7 +529,7 @@
         },
         {
             "step": "scCall",
-            "txId": "entry or insert default for an non-existing entry should add it",
+            "id": "entry or insert default for an non-existing entry should add it",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -580,7 +580,7 @@
         },
         {
             "step": "scCall",
-            "txId": "entry or modify should simply increment the value if it exists",
+            "id": "entry or modify should simply increment the value if it exists",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -605,7 +605,7 @@
         },
         {
             "step": "scCall",
-            "txId": "entry or modify should set the value if the entry doesn't exist",
+            "id": "entry or modify should set the value if the entry doesn't exist",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -661,7 +661,7 @@
         },
         {
             "step": "scCall",
-            "txId": "entry or insert with key should do nothing if the key already exists",
+            "id": "entry or insert with key should do nothing if the key already exists",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -685,7 +685,7 @@
         },
         {
             "step": "scCall",
-            "txId": "entry or insert with key should add a new value if the key doesn't exist",
+            "id": "entry or insert with key should add a new value if the key doesn't exist",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",

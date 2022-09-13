@@ -57,7 +57,7 @@
         },
         {
             "step": "scCall",
-            "txId": "nft_add_quantity",
+            "id": "nft_add_quantity",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
@@ -91,7 +91,7 @@
         },
         {
             "step": "scCall",
-            "txId": "nft_add_quantity",
+            "id": "nft_add_quantity",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder2",

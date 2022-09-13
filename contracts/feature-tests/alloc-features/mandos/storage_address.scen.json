@@ -18,7 +18,7 @@
         },
         {
             "step": "scCall",
-            "txId": "store-val",
+            "id": "store-val",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:alloc-features",
@@ -58,7 +58,7 @@
         },
         {
             "step": "scCall",
-            "txId": "load-val",
+            "id": "load-val",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:alloc-features",
