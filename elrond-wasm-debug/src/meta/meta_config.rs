@@ -76,6 +76,7 @@ impl ContractMetadata {
 pub struct MetaConfig {
     pub build_args: BuildArgs,
     pub output_dir: String,
+    pub snippets_dir: String,
     pub main_contract: Option<ContractMetadata>,
     pub view_contract: Option<ContractMetadata>,
 }
@@ -149,6 +150,7 @@ impl MetaConfig {
         MetaConfig {
             build_args,
             output_dir: "../output".to_string(),
+            snippets_dir: "../interact-rs".to_string(),
             main_contract: Some(main_contract),
             view_contract: view_contract_opt,
         }
