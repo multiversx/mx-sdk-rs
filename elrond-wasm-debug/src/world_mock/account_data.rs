@@ -47,7 +47,7 @@ impl fmt::Display for AccountData {
 		esdt: [{} ],
 		username: {},
 		storage: [{} ],
-		developer_rewards: {},
+		developerRewards: {},
 	}}",
             self.nonce,
             self.egld_balance,

@@ -19,7 +19,7 @@
                     "balance": "500",
                     "code": "file:../vault/output/vault.wasm",
                     "owner": "sc:forwarder",
-                    "developer_rewards": "100"
+                    "developerRewards": "100"
                 },
                 "sc:not_child": {
                     "balance": "500",
@@ -92,8 +92,7 @@
                 "sc:not_child": {
                     "balance": "500",
                     "code": "file:../vault/output/vault.wasm",
-                    "owner": "sc:not_owner",
-                    "developer_rewards": "0"
+                    "owner": "sc:not_owner"
                 }
             }
         }
