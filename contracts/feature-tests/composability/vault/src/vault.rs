@@ -25,6 +25,14 @@ pub trait Vault {
     }
 
     #[endpoint]
+    fn echo_arguments_without_storage(
+        &self,
+        args: MultiValueEncoded<ManagedBuffer>,
+    ) -> MultiValueEncoded<ManagedBuffer> {
+        args
+    }
+
+    #[endpoint]
     fn echo_caller(&self) -> ManagedAddress {
         self.blockchain().get_caller()
     }
