@@ -140,7 +140,8 @@
                         }
                     },
                     "code": "file:smart-contract.wasm",
-                    "owner": "address:alice"
+                    "owner": "address:alice",
+                    "developerRewards": "100"
                 }
             },
             "newAddresses": [

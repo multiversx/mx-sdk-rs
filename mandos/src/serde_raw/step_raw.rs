@@ -52,6 +52,7 @@ pub enum StepRaw {
         id: String,
 
         #[serde(default)]
+        #[serde(skip_serializing_if = "Option::is_none")]
         tx_id: Option<String>,
 
         #[serde(default)]
@@ -75,6 +76,7 @@ pub enum StepRaw {
         id: String,
 
         #[serde(default)]
+        #[serde(skip_serializing_if = "Option::is_none")]
         tx_id: Option<String>,
 
         #[serde(default)]
@@ -98,6 +100,7 @@ pub enum StepRaw {
         id: String,
 
         #[serde(default)]
+        #[serde(skip_serializing_if = "Option::is_none")]
         tx_id: Option<String>,
 
         #[serde(default)]
@@ -121,6 +124,7 @@ pub enum StepRaw {
         id: String,
 
         #[serde(default)]
+        #[serde(skip_serializing_if = "Option::is_none")]
         tx_id: Option<String>,
 
         #[serde(default)]
@@ -136,6 +140,7 @@ pub enum StepRaw {
         id: String,
 
         #[serde(default)]
+        #[serde(skip_serializing_if = "Option::is_none")]
         tx_id: Option<String>,
 
         #[serde(default)]

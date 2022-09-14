@@ -114,8 +114,8 @@ impl InterpretableFrom<StepRaw> for Step {
                 expect: expect.map(|v| TxExpect::interpret_from(v, context)),
             }),
             StepRaw::Transfer {
-                tx_id,
                 id,
+                tx_id,
                 comment,
                 tx,
             } => Step::Transfer(TransferStep {
