@@ -41,7 +41,7 @@
         },
         {
             "step": "scCall",
-            "txId": "1",
+            "id": "1",
             "comment": "send fungible twice",
             "tx": {
                 "from": "address:a_user",
@@ -116,7 +116,7 @@
         },
         {
             "step": "scCall",
-            "txId": "2",
+            "id": "2",
             "comment": "send all types",
             "tx": {
                 "from": "address:a_user",

@@ -17,7 +17,7 @@
         },
         {
             "step": "scCall",
-            "txId": "newBigFloatFromManagedBuffer - 1",
+            "id": "newBigFloatFromManagedBuffer - 1",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -36,7 +36,7 @@
         },
         {
             "step": "scCall",
-            "txId": "newBigFloatFromManagedBufferRef - 1 - NegativeValue",
+            "id": "newBigFloatFromManagedBufferRef - 1 - NegativeValue",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",

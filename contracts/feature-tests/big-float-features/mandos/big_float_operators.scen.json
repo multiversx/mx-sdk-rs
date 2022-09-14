@@ -17,7 +17,7 @@
         },
         {
             "step": "scCall",
-            "txId": "BigFloatSqrt - 1",
+            "id": "BigFloatSqrt - 1",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -37,7 +37,7 @@
         },
         {
             "step": "scCall",
-            "txId": "BigFloatSqrt - 2",
+            "id": "BigFloatSqrt - 2",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -57,7 +57,7 @@
         },
         {
             "step": "scCall",
-            "txId": "BigFloatSqrt - 3 - NegativeValue",
+            "id": "BigFloatSqrt - 3 - NegativeValue",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -70,13 +70,14 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "10",
                 "message": "str:bad bounds (lower)"
             }
         },
         {
             "step": "scCall",
-            "txId": "BigFloatZero",
+            "id": "BigFloatZero",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -93,7 +94,7 @@
         },
         {
             "step": "scCall",
-            "txId": "BigFloatZero",
+            "id": "BigFloatZero",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -110,7 +111,7 @@
         },
         {
             "step": "scCall",
-            "txId": "BigFloatNeg - 1",
+            "id": "BigFloatNeg - 1",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -130,7 +131,7 @@
         },
         {
             "step": "scCall",
-            "txId": "BigFloatNeg - 2",
+            "id": "BigFloatNeg - 2",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -150,7 +151,7 @@
         },
         {
             "step": "scCall",
-            "txId": "BigFloatAdd - 1",
+            "id": "BigFloatAdd - 1",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -171,7 +172,7 @@
         },
         {
             "step": "scCall",
-            "txId": "BigFloatAdd - 2",
+            "id": "BigFloatAdd - 2",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -192,7 +193,7 @@
         },
         {
             "step": "scCall",
-            "txId": "BigFloatAddRef - 1",
+            "id": "BigFloatAddRef - 1",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -213,7 +214,7 @@
         },
         {
             "step": "scCall",
-            "txId": "BigFloatAddRef - 2",
+            "id": "BigFloatAddRef - 2",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -234,7 +235,7 @@
         },
         {
             "step": "scCall",
-            "txId": "BigFloatSub - 1",
+            "id": "BigFloatSub - 1",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -255,7 +256,7 @@
         },
         {
             "step": "scCall",
-            "txId": "BigFloatSub - 2",
+            "id": "BigFloatSub - 2",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -276,7 +277,7 @@
         },
         {
             "step": "scCall",
-            "txId": "BigFloatSubRef - 1",
+            "id": "BigFloatSubRef - 1",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -297,7 +298,7 @@
         },
         {
             "step": "scCall",
-            "txId": "BigFloatSubRef - 2",
+            "id": "BigFloatSubRef - 2",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -318,7 +319,7 @@
         },
         {
             "step": "scCall",
-            "txId": "BigFloatMul - 1",
+            "id": "BigFloatMul - 1",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -339,7 +340,7 @@
         },
         {
             "step": "scCall",
-            "txId": "BigFloatMul - 2",
+            "id": "BigFloatMul - 2",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -360,7 +361,7 @@
         },
         {
             "step": "scCall",
-            "txId": "BigFloatMulRef - 1",
+            "id": "BigFloatMulRef - 1",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -381,7 +382,7 @@
         },
         {
             "step": "scCall",
-            "txId": "BigFloatMulRef - 2",
+            "id": "BigFloatMulRef - 2",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -402,7 +403,7 @@
         },
         {
             "step": "scCall",
-            "txId": "BigFloatDiv - 1",
+            "id": "BigFloatDiv - 1",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -423,7 +424,7 @@
         },
         {
             "step": "scCall",
-            "txId": "BigFloatDiv - 2",
+            "id": "BigFloatDiv - 2",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -444,7 +445,7 @@
         },
         {
             "step": "scCall",
-            "txId": "BigFloatDivRef - 1",
+            "id": "BigFloatDivRef - 1",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -465,7 +466,7 @@
         },
         {
             "step": "scCall",
-            "txId": "BigFloatDivRef - 2",
+            "id": "BigFloatDivRef - 2",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -486,7 +487,7 @@
         },
         {
             "step": "scCall",
-            "txId": "BigFloatAddAssign - 1",
+            "id": "BigFloatAddAssign - 1",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -507,7 +508,7 @@
         },
         {
             "step": "scCall",
-            "txId": "BigFloatAddAssign - 2",
+            "id": "BigFloatAddAssign - 2",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -528,7 +529,7 @@
         },
         {
             "step": "scCall",
-            "txId": "BigFloatAddAssignRef - 1",
+            "id": "BigFloatAddAssignRef - 1",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -549,7 +550,7 @@
         },
         {
             "step": "scCall",
-            "txId": "BigFloatAddAssignRef - 2",
+            "id": "BigFloatAddAssignRef - 2",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -570,7 +571,7 @@
         },
         {
             "step": "scCall",
-            "txId": "BigFloatSubAssign - 1",
+            "id": "BigFloatSubAssign - 1",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -591,7 +592,7 @@
         },
         {
             "step": "scCall",
-            "txId": "BigFloatSubAssign - 2",
+            "id": "BigFloatSubAssign - 2",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -612,7 +613,7 @@
         },
         {
             "step": "scCall",
-            "txId": "BigFloatSubAssignRef - 1",
+            "id": "BigFloatSubAssignRef - 1",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -633,7 +634,7 @@
         },
         {
             "step": "scCall",
-            "txId": "BigFloatSubRef - 2",
+            "id": "BigFloatSubRef - 2",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -654,7 +655,7 @@
         },
         {
             "step": "scCall",
-            "txId": "BigFloatMulAssign - 1",
+            "id": "BigFloatMulAssign - 1",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -675,7 +676,7 @@
         },
         {
             "step": "scCall",
-            "txId": "BigFloatMulAssign - 2",
+            "id": "BigFloatMulAssign - 2",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -696,7 +697,7 @@
         },
         {
             "step": "scCall",
-            "txId": "BigFloatMulAssignRef - 1",
+            "id": "BigFloatMulAssignRef - 1",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -717,7 +718,7 @@
         },
         {
             "step": "scCall",
-            "txId": "BigFloatMulAssignRef - 2",
+            "id": "BigFloatMulAssignRef - 2",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -738,7 +739,7 @@
         },
         {
             "step": "scCall",
-            "txId": "BigFloatDivAssign - 1",
+            "id": "BigFloatDivAssign - 1",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -759,7 +760,7 @@
         },
         {
             "step": "scCall",
-            "txId": "BigFloatDivAssign - 2",
+            "id": "BigFloatDivAssign - 2",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -780,7 +781,7 @@
         },
         {
             "step": "scCall",
-            "txId": "BigFloatDivAssignRef - 1",
+            "id": "BigFloatDivAssignRef - 1",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -801,7 +802,7 @@
         },
         {
             "step": "scCall",
-            "txId": "BigFloatDivAssignRef - 2",
+            "id": "BigFloatDivAssignRef - 2",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",

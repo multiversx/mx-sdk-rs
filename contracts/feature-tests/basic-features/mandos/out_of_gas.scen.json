@@ -18,7 +18,7 @@
         },
         {
             "step": "scCall",
-            "txId": "oog",
+            "id": "oog",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",

@@ -20,7 +20,7 @@
         },
         {
             "step": "scCall",
-            "txId": "buy-ticket-after-announced-winner",
+            "id": "buy-ticket-after-announced-winner",
             "tx": {
                 "from": "address:acc1",
                 "to": "sc:lottery",

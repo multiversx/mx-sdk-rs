@@ -12,7 +12,8 @@ use elrond_wasm::{
 
 #[derive(Debug, Default)]
 pub struct ScCallStep {
-    pub tx_id: String,
+    pub id: String,
+    pub tx_id: Option<String>,
     pub comment: Option<String>,
     pub tx: Box<TxCall>,
     pub expect: Option<TxExpect>,

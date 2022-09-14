@@ -12,7 +12,8 @@ use super::{format_expect, process_contract_call};
 
 #[derive(Debug, Default)]
 pub struct ScQueryStep {
-    pub tx_id: String,
+    pub id: String,
+    pub tx_id: Option<String>,
     pub comment: Option<String>,
     pub tx: Box<TxQuery>,
     pub expect: Option<TxExpect>,

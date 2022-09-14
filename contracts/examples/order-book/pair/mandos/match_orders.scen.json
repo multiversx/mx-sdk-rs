@@ -15,7 +15,7 @@
         },
         {
             "step": "scCall",
-            "txId": "matchOrders",
+            "id": "matchOrders",
             "tx": {
                 "from": "address:match_provider",
                 "to": "sc:pair",

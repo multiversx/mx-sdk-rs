@@ -26,7 +26,7 @@
         },
         {
             "step": "scCall",
-            "txId": "load_from_address_raw_ok",
+            "id": "load_from_address_raw_ok",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -50,7 +50,7 @@
         },
         {
             "step": "scCall",
-            "txId": "load_from_address_raw_wrong_address",
+            "id": "load_from_address_raw_wrong_address",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",

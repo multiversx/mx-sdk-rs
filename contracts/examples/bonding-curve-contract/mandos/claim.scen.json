@@ -25,7 +25,7 @@
         },
         {
             "step": "scCall",
-            "txId": "claim_artist1",
+            "id": "claim_artist1",
             "tx": {
                 "from": "address:artist1",
                 "to": "sc:bonding-curve-contract",
@@ -43,7 +43,7 @@
         },
         {
             "step": "scCall",
-            "txId": "claim_artist2",
+            "id": "claim_artist2",
             "tx": {
                 "from": "address:artist2",
                 "to": "sc:bonding-curve-contract",
@@ -172,7 +172,6 @@
                 "sc:bonding-curve-contract": {
                     "nonce": "0",
                     "balance": "0",
-                    "esdt": {},
                     "storage": {},
                     "code": "file:../output/bonding-curve-contract.wasm"
                 }

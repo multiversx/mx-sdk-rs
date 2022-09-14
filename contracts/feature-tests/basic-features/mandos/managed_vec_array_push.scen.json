@@ -16,7 +16,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "1",
+            "id": "1",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "managed_vec_array_push",
@@ -33,7 +33,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "1",
+            "id": "1",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "managed_vec_array_push",

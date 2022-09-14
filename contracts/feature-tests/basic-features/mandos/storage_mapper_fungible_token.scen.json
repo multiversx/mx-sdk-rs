@@ -30,14 +30,13 @@
                             ]
                         }
                     },
-                    "storage": {},
                     "code": "file:../../esdt-system-sc-mock/output/esdt-system-sc-mock.wasm"
                 }
             }
         },
         {
             "step": "scCall",
-            "txId": "issue-default-callback-non-zero-initial-supply",
+            "id": "issue-default-callback-non-zero-initial-supply",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -118,7 +117,7 @@
         },
         {
             "step": "scCall",
-            "txId": "issue-default-callback-zero-initial-supply",
+            "id": "issue-default-callback-zero-initial-supply",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -201,7 +200,7 @@
         },
         {
             "step": "scCall",
-            "txId": "issue-custom-callback-non-zero-initial-supply",
+            "id": "issue-custom-callback-non-zero-initial-supply",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -284,7 +283,7 @@
         },
         {
             "step": "scCall",
-            "txId": "issue-custom-callback-initial-supply",
+            "id": "issue-custom-callback-initial-supply",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -368,7 +367,7 @@
         },
         {
             "step": "scCall",
-            "txId": "simulate-set-local-roles",
+            "id": "simulate-set-local-roles",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -400,7 +399,7 @@
                     },
                     "code": "file:../output/basic-features.wasm"
                 },
-                "+": {}
+                "+": ""
             }
         },
         {
@@ -412,7 +411,12 @@
                     "balance": "0",
                     "esdt": {
                         "str:TICKER-333333": {
-                            "balance": "3000",
+                            "instances": [
+                                {
+                                    "nonce": "",
+                                    "balance": "3000"
+                                }
+                            ],
                             "roles": [
                                 "ESDTRoleLocalMint",
                                 "ESDTRoleLocalBurn"
@@ -429,7 +433,7 @@
         },
         {
             "step": "scCall",
-            "txId": "mint-fungible",
+            "id": "mint-fungible",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -458,7 +462,12 @@
                     "balance": "0",
                     "esdt": {
                         "str:TICKER-333333": {
-                            "balance": "4000",
+                            "instances": [
+                                {
+                                    "nonce": "",
+                                    "balance": "4000"
+                                }
+                            ],
                             "roles": [
                                 "ESDTRoleLocalMint",
                                 "ESDTRoleLocalBurn"
@@ -471,12 +480,12 @@
                     },
                     "code": "file:../output/basic-features.wasm"
                 },
-                "+": {}
+                "+": ""
             }
         },
         {
             "step": "scCall",
-            "txId": "mint-and-send-fungible",
+            "id": "mint-and-send-fungible",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -513,7 +522,12 @@
                     "balance": "0",
                     "esdt": {
                         "str:TICKER-333333": {
-                            "balance": "4000",
+                            "instances": [
+                                {
+                                    "nonce": "",
+                                    "balance": "4000"
+                                }
+                            ],
                             "roles": [
                                 "ESDTRoleLocalMint",
                                 "ESDTRoleLocalBurn"
@@ -526,12 +540,12 @@
                     },
                     "code": "file:../output/basic-features.wasm"
                 },
-                "+": {}
+                "+": ""
             }
         },
         {
             "step": "scCall",
-            "txId": "burn-fungible",
+            "id": "burn-fungible",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -558,7 +572,12 @@
                     "balance": "0",
                     "esdt": {
                         "str:TICKER-333333": {
-                            "balance": "3000",
+                            "instances": [
+                                {
+                                    "nonce": "",
+                                    "balance": "3000"
+                                }
+                            ],
                             "roles": [
                                 "ESDTRoleLocalMint",
                                 "ESDTRoleLocalBurn"
@@ -571,12 +590,12 @@
                     },
                     "code": "file:../output/basic-features.wasm"
                 },
-                "+": {}
+                "+": ""
             }
         },
         {
             "step": "scCall",
-            "txId": "get-balance-fungible-non-zero",
+            "id": "get-balance-fungible-non-zero",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -597,7 +616,7 @@
         },
         {
             "step": "scCall",
-            "txId": "burn-all-fungible",
+            "id": "burn-all-fungible",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -618,7 +637,7 @@
         },
         {
             "step": "scCall",
-            "txId": "get-balance-fungible-zero",
+            "id": "get-balance-fungible-zero",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -639,7 +658,7 @@
         },
         {
             "step": "scCall",
-            "txId": "require-same-fungible-token-success",
+            "id": "require-same-fungible-token-success",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -664,7 +683,7 @@
         },
         {
             "step": "scCall",
-            "txId": "require-same-fungible-token-failed",
+            "id": "require-same-fungible-token-failed",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -685,7 +704,7 @@
         },
         {
             "step": "scCall",
-            "txId": "require-all-same-fungible-token-success",
+            "id": "require-all-same-fungible-token-success",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -718,7 +737,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "get-fungible-token-id",
+            "id": "get-fungible-token-id",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "getFungibleTokenId",
@@ -753,7 +772,7 @@
         },
         {
             "step": "scCall",
-            "txId": "issue-and-set-all-roles-fungible",
+            "id": "issue-and-set-all-roles-fungible",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",

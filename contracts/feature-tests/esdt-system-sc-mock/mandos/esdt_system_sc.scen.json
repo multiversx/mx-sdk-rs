@@ -18,14 +18,13 @@
                             ]
                         }
                     },
-                    "storage": {},
                     "code": "file:../output/esdt-system-sc-mock.wasm"
                 }
             }
         },
         {
             "step": "scCall",
-            "txId": "issue-invalid-token",
+            "id": "issue-invalid-token",
             "tx": {
                 "from": "address:user",
                 "to": "sc:esdt",
@@ -50,7 +49,7 @@
         },
         {
             "step": "scCall",
-            "txId": "issue-fungible-non-zero-supply",
+            "id": "issue-fungible-non-zero-supply",
             "tx": {
                 "from": "address:user",
                 "to": "sc:esdt",
@@ -103,7 +102,7 @@
         },
         {
             "step": "scCall",
-            "txId": "issue-fungible-zero-supply",
+            "id": "issue-fungible-zero-supply",
             "tx": {
                 "from": "address:user",
                 "to": "sc:esdt",
@@ -130,7 +129,7 @@
         },
         {
             "step": "scCall",
-            "txId": "issue-non-fungible",
+            "id": "issue-non-fungible",
             "tx": {
                 "from": "address:user",
                 "to": "sc:esdt",
@@ -155,7 +154,7 @@
         },
         {
             "step": "scCall",
-            "txId": "issue-semi-fungible",
+            "id": "issue-semi-fungible",
             "tx": {
                 "from": "address:user",
                 "to": "sc:esdt",
@@ -180,7 +179,7 @@
         },
         {
             "step": "scCall",
-            "txId": "issue-meta-esdt",
+            "id": "issue-meta-esdt",
             "tx": {
                 "from": "address:user",
                 "to": "sc:esdt",

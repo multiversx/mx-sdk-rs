@@ -17,7 +17,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "1",
+            "id": "1",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "big_uint_eq_u64",
@@ -34,7 +34,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "2",
+            "id": "2",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "big_uint_eq_u64",
@@ -44,6 +44,7 @@
                 ]
             },
             "expect": {
+                "out": [],
                 "status": "4",
                 "message": "str:cast to i64 error"
             }

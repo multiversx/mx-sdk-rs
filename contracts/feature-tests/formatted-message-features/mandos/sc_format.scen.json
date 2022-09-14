@@ -16,7 +16,7 @@
         },
         {
             "step": "scCall",
-            "txId": "format_message_one_part",
+            "id": "format_message_one_part",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:msg-features",
@@ -38,7 +38,7 @@
         },
         {
             "step": "scCall",
-            "txId": "format_message_multiple_parts",
+            "id": "format_message_multiple_parts",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:msg-features",
@@ -62,7 +62,7 @@
         },
         {
             "step": "scCall",
-            "txId": "format_message_big_int---positive",
+            "id": "format_message_big_int---positive",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:msg-features",
@@ -86,7 +86,7 @@
         },
         {
             "step": "scCall",
-            "txId": "format_message_big_int---negative",
+            "id": "format_message_big_int---negative",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:msg-features",
@@ -110,7 +110,7 @@
         },
         {
             "step": "scCall",
-            "txId": "format_message_big_int---negative",
+            "id": "format_message_big_int---negative",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:msg-features",
@@ -134,7 +134,7 @@
         },
         {
             "step": "scCall",
-            "txId": "format_message_managed_buffer",
+            "id": "format_message_managed_buffer",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:msg-features",
@@ -158,7 +158,7 @@
         },
         {
             "step": "scCall",
-            "txId": "format_message_managed_buffer_hex",
+            "id": "format_message_managed_buffer_hex",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:msg-features",

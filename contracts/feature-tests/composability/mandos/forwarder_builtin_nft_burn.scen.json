@@ -57,7 +57,7 @@
         },
         {
             "step": "scCall",
-            "txId": "nft_burn",
+            "id": "nft_burn",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
@@ -91,7 +91,7 @@
         },
         {
             "step": "scCall",
-            "txId": "nft_burn",
+            "id": "nft_burn",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder2",

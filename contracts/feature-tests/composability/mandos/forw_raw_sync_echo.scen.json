@@ -22,7 +22,7 @@
         },
         {
             "step": "scCall",
-            "txId": "call_execute_on_dest_context",
+            "id": "call_execute_on_dest_context",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
@@ -63,7 +63,7 @@
         },
         {
             "step": "scCall",
-            "txId": "call_execute_on_dest_context_twice",
+            "id": "call_execute_on_dest_context_twice",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",

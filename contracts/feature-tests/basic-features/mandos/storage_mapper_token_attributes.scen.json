@@ -18,7 +18,7 @@
         },
         {
             "step": "scCall",
-            "txId": "set-token-attributes-1",
+            "id": "set-token-attributes-1",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
@@ -40,7 +40,7 @@
         },
         {
             "step": "scCall",
-            "txId": "set-token-attributes-2",
+            "id": "set-token-attributes-2",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
@@ -62,7 +62,7 @@
         },
         {
             "step": "scCall",
-            "txId": "set-token-attributes-3",
+            "id": "set-token-attributes-3",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
@@ -84,7 +84,7 @@
         },
         {
             "step": "scCall",
-            "txId": "set-token-attributes-4",
+            "id": "set-token-attributes-4",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
@@ -131,7 +131,7 @@
         },
         {
             "step": "scCall",
-            "txId": "get-token-attributes-1",
+            "id": "get-token-attributes-1",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
@@ -154,7 +154,7 @@
         },
         {
             "step": "scCall",
-            "txId": "get-token-attributes-2",
+            "id": "get-token-attributes-2",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
@@ -175,7 +175,7 @@
         },
         {
             "step": "scCall",
-            "txId": "get-token-attributes-3",
+            "id": "get-token-attributes-3",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
@@ -198,7 +198,7 @@
         },
         {
             "step": "scCall",
-            "txId": "get-token-attributes-4",
+            "id": "get-token-attributes-4",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
@@ -219,7 +219,7 @@
         },
         {
             "step": "scCall",
-            "txId": "get-token-nonce-1",
+            "id": "get-token-nonce-1",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
@@ -242,7 +242,7 @@
         },
         {
             "step": "scCall",
-            "txId": "get-token-nonce-2",
+            "id": "get-token-nonce-2",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
@@ -263,7 +263,7 @@
         },
         {
             "step": "scCall",
-            "txId": "get-token-nonce-3",
+            "id": "get-token-nonce-3",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
@@ -286,7 +286,7 @@
         },
         {
             "step": "scCall",
-            "txId": "get-token-nonce-4",
+            "id": "get-token-nonce-4",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
@@ -307,7 +307,7 @@
         },
         {
             "step": "scCall",
-            "txId": "has_attributes-token-attributes-1",
+            "id": "has_attributes-token-attributes-1",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
@@ -330,7 +330,7 @@
         },
         {
             "step": "scCall",
-            "txId": "has_attributes-token-attributes-2",
+            "id": "has_attributes-token-attributes-2",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
@@ -353,7 +353,7 @@
         },
         {
             "step": "scCall",
-            "txId": "has_attributes-token-attributes-3",
+            "id": "has_attributes-token-attributes-3",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
@@ -376,7 +376,7 @@
         },
         {
             "step": "scCall",
-            "txId": "has_attributes-token-attributes-4",
+            "id": "has_attributes-token-attributes-4",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
@@ -399,7 +399,7 @@
         },
         {
             "step": "scCall",
-            "txId": "update-token-attributes-1",
+            "id": "update-token-attributes-1",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
@@ -422,7 +422,7 @@
         },
         {
             "step": "scCall",
-            "txId": "update-token-attributes-2",
+            "id": "update-token-attributes-2",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
@@ -444,7 +444,7 @@
         },
         {
             "step": "scCall",
-            "txId": "update-token-attributes-3",
+            "id": "update-token-attributes-3",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
@@ -467,7 +467,7 @@
         },
         {
             "step": "scCall",
-            "txId": "update-token-attributes-4",
+            "id": "update-token-attributes-4",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
@@ -514,7 +514,7 @@
         },
         {
             "step": "scCall",
-            "txId": "clear-token-attributes-1",
+            "id": "clear-token-attributes-1",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
@@ -536,7 +536,7 @@
         },
         {
             "step": "scCall",
-            "txId": "clear-token-attributes-2",
+            "id": "clear-token-attributes-2",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
@@ -557,7 +557,7 @@
         },
         {
             "step": "scCall",
-            "txId": "clear-token-attributes-3",
+            "id": "clear-token-attributes-3",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
@@ -579,7 +579,7 @@
         },
         {
             "step": "scCall",
-            "txId": "clear-token-attributes-4",
+            "id": "clear-token-attributes-4",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
