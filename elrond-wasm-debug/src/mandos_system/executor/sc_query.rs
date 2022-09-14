@@ -102,7 +102,7 @@ pub(crate) fn execute(
             .collect(),
         gas_limit: u64::MAX,
         gas_price: 0u64,
-        tx_hash: generate_tx_hash_dummy(&sc_query_step.tx_id),
+        tx_hash: generate_tx_hash_dummy(&sc_query_step.id),
     };
 
     let (tx_result, state) = execute_sc_query(tx_input, state);
@@ -119,7 +119,7 @@ fn execute_and_check(
 ) -> (TxResult, BlockchainMock) {
     let (tx_result, state) = execute(state, sc_query_step);
     if let Some(tx_expect) = &sc_query_step.expect {
-        check_tx_output(&sc_query_step.tx_id, tx_expect, &tx_result);
+        check_tx_output(&sc_query_step.id, tx_expect, &tx_result);
     }
 
     (tx_result, state)

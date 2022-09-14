@@ -84,7 +84,7 @@ pub(crate) fn execute(
             .collect(),
         gas_limit: tx.gas_limit.value,
         gas_price: tx.gas_price.value,
-        tx_hash: generate_tx_hash_dummy(&sc_deploy_step.tx_id),
+        tx_hash: generate_tx_hash_dummy(&sc_deploy_step.id),
     };
     sc_create(tx_input, &tx.contract_code.value, state)
 }
@@ -95,7 +95,7 @@ fn execute_and_check(
 ) -> (TxResult, Address, BlockchainMock) {
     let (tx_result, address, state) = execute(state, sc_deploy_step);
     if let Some(tx_expect) = &sc_deploy_step.expect {
-        check_tx_output(&sc_deploy_step.tx_id, tx_expect, &tx_result);
+        check_tx_output(&sc_deploy_step.id, tx_expect, &tx_result);
     }
     (tx_result, address, state)
 }

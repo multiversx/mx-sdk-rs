@@ -8,7 +8,8 @@ use super::ScQueryStep;
 
 #[derive(Debug)]
 pub struct TypedScQuery<OriginalResult> {
-    pub tx_id: String,
+    pub id: String,
+    pub tx_id: Option<String>,
     pub comment: Option<String>,
     pub tx: Box<TxQuery>,
     pub expect: Option<TxExpect>,
@@ -18,6 +19,7 @@ pub struct TypedScQuery<OriginalResult> {
 impl<OriginalResult> Default for TypedScQuery<OriginalResult> {
     fn default() -> Self {
         Self {
+            id: Default::default(),
             tx_id: Default::default(),
             comment: Default::default(),
             tx: Default::default(),
@@ -30,6 +32,7 @@ impl<OriginalResult> Default for TypedScQuery<OriginalResult> {
 impl<OriginalResult> From<TypedScQuery<OriginalResult>> for ScQueryStep {
     fn from(typed: TypedScQuery<OriginalResult>) -> Self {
         Self {
+            id: typed.id,
             tx_id: typed.tx_id,
             comment: typed.comment,
             tx: typed.tx,
@@ -41,6 +44,7 @@ impl<OriginalResult> From<TypedScQuery<OriginalResult>> for ScQueryStep {
 impl<OriginalResult> From<ScQueryStep> for TypedScQuery<OriginalResult> {
     fn from(untyped: ScQueryStep) -> Self {
         Self {
+            id: untyped.id,
             tx_id: untyped.tx_id,
             comment: untyped.comment,
             tx: untyped.tx,
