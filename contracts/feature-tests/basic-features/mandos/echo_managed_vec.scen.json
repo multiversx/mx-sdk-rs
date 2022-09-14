@@ -17,7 +17,7 @@
         },
         {
             "step": "scCall",
-            "txId": "echo_managed_vec_of_managed_vec",
+            "id": "echo_managed_vec_of_managed_vec",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -66,7 +66,7 @@
         },
         {
             "step": "scCall",
-            "txId": "echo_managed_vec_of_managed_vec-empty",
+            "id": "echo_managed_vec_of_managed_vec-empty",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -89,7 +89,7 @@
         },
         {
             "step": "scCall",
-            "txId": "echo_managed_vec_of_token_identifier",
+            "id": "echo_managed_vec_of_token_identifier",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",

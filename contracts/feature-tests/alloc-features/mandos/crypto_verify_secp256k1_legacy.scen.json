@@ -19,7 +19,7 @@
         },
         {
             "step": "scCall",
-            "txId": "5 - compressed key",
+            "id": "5 - compressed key",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:alloc-features",
@@ -44,7 +44,7 @@
         },
         {
             "step": "scCall",
-            "txId": "6 - uncompressed key",
+            "id": "6 - uncompressed key",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:alloc-features",
@@ -69,7 +69,7 @@
         },
         {
             "step": "scCall",
-            "txId": "7 - encode key from r and s",
+            "id": "7 - encode key from r and s",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:alloc-features",
@@ -93,7 +93,7 @@
         },
         {
             "step": "scCall",
-            "txId": "8 - verify custom secp256k1",
+            "id": "8 - verify custom secp256k1",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:alloc-features",

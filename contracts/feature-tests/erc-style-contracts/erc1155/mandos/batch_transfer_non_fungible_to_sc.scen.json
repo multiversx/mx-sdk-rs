@@ -18,7 +18,7 @@
         },
         {
             "step": "scCall",
-            "txId": "batch-transfer-non-fungible",
+            "id": "batch-transfer-non-fungible",
             "tx": {
                 "from": "address:creator",
                 "to": "sc:erc1155",

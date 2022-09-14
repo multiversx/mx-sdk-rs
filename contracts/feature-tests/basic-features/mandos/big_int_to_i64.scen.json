@@ -17,7 +17,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "1",
+            "id": "1",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "big_int_to_i64",
@@ -33,7 +33,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "2",
+            "id": "2",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "big_int_to_i64",
@@ -49,7 +49,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "3",
+            "id": "3",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "big_int_to_i64",
@@ -65,7 +65,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "4",
+            "id": "4",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "big_int_to_i64",
@@ -81,7 +81,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "4",
+            "id": "4",
             "comment": "too big",
             "tx": {
                 "to": "sc:basic-features",
@@ -96,7 +96,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "5",
+            "id": "5",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "big_int_to_i64",
@@ -112,7 +112,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "6",
+            "id": "6",
             "comment": "too small",
             "tx": {
                 "to": "sc:basic-features",

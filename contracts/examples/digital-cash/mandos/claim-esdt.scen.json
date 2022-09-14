@@ -26,7 +26,7 @@
         },
         {
             "step": "scCall",
-            "txId": "fund",
+            "id": "fund",
             "tx": {
                 "from": "address:acc2",
                 "to": "sc:the_digital_cash_contract",
@@ -100,7 +100,7 @@
         },
         {
             "step": "scCall",
-            "txId": "claim2",
+            "id": "claim2",
             "tx": {
                 "from": "0xebfd923cd251f857ed7639e87143ac83f12f423827abc4a0cdde0119c3e37915",
                 "to": "sc:the_digital_cash_contract",
@@ -133,7 +133,7 @@
         },
         {
             "step": "scCall",
-            "txId": "claim3",
+            "id": "claim3",
             "tx": {
                 "from": "0xebfd923cd251f857ed7639e87143ac83f12f423827abc4a0cdde0119c3e37915",
                 "to": "sc:the_digital_cash_contract",
@@ -166,7 +166,7 @@
         },
         {
             "step": "scCall",
-            "txId": "claim4",
+            "id": "claim4",
             "tx": {
                 "from": "0xebfd923cd251f857ed7639e87143ac83f12f423827abc4a0cdde0119c3e37915",
                 "to": "sc:the_digital_cash_contract",
@@ -182,14 +182,14 @@
                 "out": [],
                 "status": "4",
                 "message": "str:argument decode error (signature): bad array length",
+                "logs": "*",
                 "gas": "*",
-                "refund": "*",
-                "logs": "*"
+                "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "claim5",
+            "id": "claim5",
             "tx": {
                 "from": "0xebfd923cd251f857ed7639e87143ac83f12f423827abc4a0cdde0119c3e37915",
                 "to": "sc:the_digital_cash_contract",

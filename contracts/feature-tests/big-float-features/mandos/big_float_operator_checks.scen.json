@@ -17,7 +17,7 @@
         },
         {
             "step": "scCall",
-            "txId": "BigFloatAdd - 3",
+            "id": "BigFloatAdd - 3",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -30,13 +30,14 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "10",
                 "message": "str:this big Float operation is not permitted while doing float.Add"
             }
         },
         {
             "step": "scCall",
-            "txId": "BigFloatAdd - 4",
+            "id": "BigFloatAdd - 4",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -49,13 +50,14 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "10",
                 "message": "str:exponent is either too small or too big"
             }
         },
         {
             "step": "scCall",
-            "txId": "BigFloatSub - 3",
+            "id": "BigFloatSub - 3",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -68,6 +70,7 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "10",
                 "message": "str:this big Float operation is not permitted while doing float.Sub"
             }

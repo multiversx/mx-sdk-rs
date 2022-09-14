@@ -19,7 +19,7 @@
         },
         {
             "step": "scDeploy",
-            "txId": "deploy",
+            "id": "deploy",
             "tx": {
                 "from": "address:owner",
                 "contractCode": "file:../output/str-repeat.wasm",
@@ -37,7 +37,7 @@
         },
         {
             "step": "scCall",
-            "txId": "append-abc-3-times",
+            "id": "append-abc-3-times",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
@@ -59,7 +59,7 @@
         },
         {
             "step": "scCall",
-            "txId": "append-abc-0-times",
+            "id": "append-abc-0-times",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
@@ -95,7 +95,7 @@
         },
         {
             "step": "scCall",
-            "txId": "append-whitespace",
+            "id": "append-whitespace",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",

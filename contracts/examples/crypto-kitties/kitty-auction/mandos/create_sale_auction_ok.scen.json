@@ -14,7 +14,7 @@
         },
         {
             "step": "scCall",
-            "txId": "tx-create-sale-auction-ok",
+            "id": "tx-create-sale-auction-ok",
             "tx": {
                 "from": "address:bidder2",
                 "to": "sc:kitty_auction_contract",

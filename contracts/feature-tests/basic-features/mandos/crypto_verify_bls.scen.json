@@ -19,7 +19,7 @@
         },
         {
             "step": "scCall",
-            "txId": "3",
+            "id": "3",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",

@@ -8,7 +8,7 @@
         },
         {
             "step": "scCall",
-            "txId": "mint-non-fungible-token",
+            "id": "mint-non-fungible-token",
             "tx": {
                 "from": "address:creator",
                 "to": "sc:erc1155",

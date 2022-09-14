@@ -22,7 +22,7 @@
         },
         {
             "step": "scCall",
-            "txId": "1",
+            "id": "1",
             "tx": {
                 "from": "address:account_1",
                 "to": "sc:erc20",
@@ -55,7 +55,7 @@
         },
         {
             "step": "scCall",
-            "txId": "2",
+            "id": "2",
             "tx": {
                 "from": "address:account_1",
                 "to": "sc:erc20",

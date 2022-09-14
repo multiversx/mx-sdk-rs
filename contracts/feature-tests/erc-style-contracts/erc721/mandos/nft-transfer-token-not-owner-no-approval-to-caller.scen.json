@@ -16,7 +16,7 @@
         },
         {
             "step": "scCall",
-            "txId": "steal-token",
+            "id": "steal-token",
             "tx": {
                 "from": "address:acc1",
                 "to": "sc:the_nft_contract",

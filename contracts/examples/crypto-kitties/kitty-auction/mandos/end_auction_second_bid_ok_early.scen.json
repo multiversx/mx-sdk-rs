@@ -8,7 +8,7 @@
         },
         {
             "step": "scCall",
-            "txId": "tx-end-auction-early-after-second-bid-ok",
+            "id": "tx-end-auction-early-after-second-bid-ok",
             "tx": {
                 "from": "address:bidder2",
                 "to": "sc:kitty_auction_contract",

@@ -21,18 +21,22 @@
         },
         {
             "step": "scCall",
-            "txId": "log2",
+            "id": "log2",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
                 "value": "0",
                 "function": "log2_big_uint",
-                "arguments": ["33"],
+                "arguments": [
+                    "33"
+                ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "5" ],
+                "out": [
+                    "5"
+                ],
                 "status": "0",
                 "logs": "*",
                 "gas": "*",

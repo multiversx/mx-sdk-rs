@@ -12,7 +12,7 @@
         },
         {
             "step": "validatorReward",
-            "txId": "1",
+            "id": "1",
             "tx": {
                 "to": "address:A",
                 "egldValue": "100"
@@ -33,7 +33,7 @@
         },
         {
             "step": "validatorReward",
-            "txId": "2",
+            "id": "2",
             "tx": {
                 "to": "address:A",
                 "egldValue": "50"

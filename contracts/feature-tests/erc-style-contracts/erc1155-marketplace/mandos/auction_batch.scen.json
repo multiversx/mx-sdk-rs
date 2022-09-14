@@ -8,7 +8,7 @@
         },
         {
             "step": "scCall",
-            "txId": "auction-batch",
+            "id": "auction-batch",
             "comment": "last argument is an AuctionArgument: token: eGLD (serialized as empty string), min_bid: 100, max_bid: 500, deadline: 1000",
             "tx": {
                 "from": "address:creator",

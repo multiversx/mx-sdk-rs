@@ -16,7 +16,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "managed_struct_eq_yes",
+            "id": "managed_struct_eq_yes",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "managed_struct_eq",
@@ -41,7 +41,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "managed_struct_eq_no",
+            "id": "managed_struct_eq_no",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "managed_struct_eq",

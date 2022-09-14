@@ -19,7 +19,7 @@
         },
         {
             "step": "scCall",
-            "txId": "fund-1",
+            "id": "fund-1",
             "tx": {
                 "from": "address:donor1",
                 "to": "sc:crowdfunding",

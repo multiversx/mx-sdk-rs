@@ -17,7 +17,7 @@
         },
         {
             "step": "scCall",
-            "txId": "newBigFloatFromFrac - 1",
+            "id": "newBigFloatFromFrac - 1",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -38,7 +38,7 @@
         },
         {
             "step": "scCall",
-            "txId": "newBigFloatFromFrac - 2",
+            "id": "newBigFloatFromFrac - 2",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -59,7 +59,7 @@
         },
         {
             "step": "scCall",
-            "txId": "newBigFloatFromFrac - 3",
+            "id": "newBigFloatFromFrac - 3",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -80,7 +80,7 @@
         },
         {
             "step": "scCall",
-            "txId": "newBigFloatFromFrac - 4",
+            "id": "newBigFloatFromFrac - 4",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -101,7 +101,7 @@
         },
         {
             "step": "scCall",
-            "txId": "newBigFloatFromFrac - 5",
+            "id": "newBigFloatFromFrac - 5",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -122,7 +122,7 @@
         },
         {
             "step": "scCall",
-            "txId": "newBigFloatFromFrac - 6",
+            "id": "newBigFloatFromFrac - 6",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -136,6 +136,7 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "10",
                 "message": "str:division by 0"
             }

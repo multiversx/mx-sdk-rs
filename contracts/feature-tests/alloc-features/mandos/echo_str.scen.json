@@ -18,7 +18,7 @@
         },
         {
             "step": "scCall",
-            "txId": "1",
+            "id": "1",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:alloc-features",
@@ -42,7 +42,7 @@
         },
         {
             "step": "scCall",
-            "txId": "2",
+            "id": "2",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:alloc-features",
@@ -66,7 +66,7 @@
         },
         {
             "step": "scCall",
-            "txId": "invalid-utf-8",
+            "id": "invalid-utf-8",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:alloc-features",

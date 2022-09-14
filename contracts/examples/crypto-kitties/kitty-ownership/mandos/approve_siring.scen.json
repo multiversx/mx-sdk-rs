@@ -8,7 +8,7 @@
         },
         {
             "step": "scCall",
-            "txId": "tx-approve-siring",
+            "id": "tx-approve-siring",
             "tx": {
                 "from": "address:acc1",
                 "to": "sc:kitty_ownership_contract",

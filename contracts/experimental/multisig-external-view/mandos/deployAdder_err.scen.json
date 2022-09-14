@@ -18,7 +18,7 @@
         },
         {
             "step": "scCall",
-            "txId": "proposeSCDeploy",
+            "id": "proposeSCDeploy",
             "comment": "missing argument",
             "tx": {
                 "from": "address:paul",
@@ -44,7 +44,7 @@
         },
         {
             "step": "scCall",
-            "txId": "sc-deploy-sign-alice",
+            "id": "sc-deploy-sign-alice",
             "tx": {
                 "from": "address:alice",
                 "to": "sc:multisig",
@@ -65,7 +65,7 @@
         },
         {
             "step": "scCall",
-            "txId": "sc-deploy-sign-bob",
+            "id": "sc-deploy-sign-bob",
             "tx": {
                 "from": "address:bob",
                 "to": "sc:multisig",
@@ -96,7 +96,7 @@
         },
         {
             "step": "scCall",
-            "txId": "sc-deploy-perform-err",
+            "id": "sc-deploy-perform-err",
             "tx": {
                 "from": "address:paul",
                 "to": "sc:multisig",

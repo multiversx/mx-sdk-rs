@@ -21,18 +21,23 @@
         },
         {
             "step": "scCall",
-            "txId": "pow",
+            "id": "pow",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
                 "value": "0",
                 "function": "pow_big_uint",
-                "arguments": ["10", "2"],
+                "arguments": [
+                    "10",
+                    "2"
+                ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "100" ],
+                "out": [
+                    "100"
+                ],
                 "status": "0",
                 "logs": "*",
                 "gas": "*",

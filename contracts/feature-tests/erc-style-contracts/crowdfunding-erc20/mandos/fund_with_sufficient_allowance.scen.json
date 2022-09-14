@@ -11,7 +11,7 @@
         },
         {
             "step": "scCall",
-            "txId": "set-allowance",
+            "id": "set-allowance",
             "tx": {
                 "from": "address:acc1",
                 "to": "sc:erc20",
@@ -80,7 +80,7 @@
         },
         {
             "step": "scCall",
-            "txId": "fund-with-sufficient-allowance",
+            "id": "fund-with-sufficient-allowance",
             "tx": {
                 "from": "address:acc1",
                 "to": "sc:crowdfunding",

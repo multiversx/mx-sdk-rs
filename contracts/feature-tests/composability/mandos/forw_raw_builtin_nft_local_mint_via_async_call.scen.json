@@ -26,7 +26,7 @@
         },
         {
             "step": "scCall",
-            "txId": "local_mint",
+            "id": "local_mint",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
