@@ -277,11 +277,6 @@ fn forwarder_contract_change_owner_go() {
 }
 
 #[test]
-fn forwarder_contract_claim_developer_rewards_go() {
-    elrond_wasm_debug::mandos_go("mandos/forwarder_contract_claim_developer_rewards.scen.json");
-}
-
-#[test]
 fn forwarder_contract_deploy_go() {
     elrond_wasm_debug::mandos_go("mandos/forwarder_contract_deploy.scen.json");
 }
