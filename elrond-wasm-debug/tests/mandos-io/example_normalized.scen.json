@@ -173,7 +173,7 @@
         },
         {
             "step": "scCall",
-            "txId": "1",
+            "id": "1",
             "comment": "just an example",
             "tx": {
                 "from": "address:an_address",
@@ -228,7 +228,7 @@
         },
         {
             "step": "scCall",
-            "txId": "1b",
+            "id": "1b",
             "comment": "without expected result",
             "tx": {
                 "from": "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b000000000000000000000000",
@@ -247,7 +247,7 @@
         },
         {
             "step": "scCall",
-            "txId": "1b",
+            "id": "1b",
             "comment": "with minimal expected result",
             "tx": {
                 "from": "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b000000000000000000000000",
@@ -263,7 +263,7 @@
         },
         {
             "step": "scCall",
-            "txId": "1c",
+            "id": "1c",
             "comment": "without logs",
             "tx": {
                 "from": "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b000000000000000000000000",
@@ -280,7 +280,7 @@
         },
         {
             "step": "scDeploy",
-            "txId": "2",
+            "id": "2",
             "comment": "another",
             "tx": {
                 "from": "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b000000000000000000000000",
@@ -303,7 +303,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "1b",
+            "id": "1b",
             "comment": "a query, as would be performed off-chain",
             "tx": {
                 "to": "address:the_smart_contract",
@@ -317,7 +317,7 @@
         },
         {
             "step": "transfer",
-            "txId": "3",
+            "id": "3",
             "comment": "simple transfer, no VM",
             "tx": {
                 "from": "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b000000000000000000000000",
@@ -333,7 +333,7 @@
         },
         {
             "step": "validatorReward",
-            "txId": "4",
+            "id": "4",
             "comment": "system send out validator rewards",
             "tx": {
                 "to": "sc:delegation",
@@ -342,7 +342,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "5",
+            "id": "5",
             "tx": {
                 "to": "address:this_is_just_a_display_logs_test",
                 "function": "thisIsJustADisplayLogsTest",
@@ -439,7 +439,7 @@
         },
         {
             "step": "transfer",
-            "txId": "multi-transfer",
+            "id": "multi-transfer",
             "comment": "test ESDT multi-transfer",
             "tx": {
                 "from": "address:A",
