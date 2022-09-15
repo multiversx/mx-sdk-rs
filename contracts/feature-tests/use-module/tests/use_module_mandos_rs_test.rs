@@ -45,6 +45,14 @@ fn world() -> BlockchainMock {
 }
 
 #[test]
+fn use_module_claim_developer_rewards_rs() {
+    elrond_wasm_debug::mandos_rs(
+        "mandos/use_module_claim_developer_rewards.scen.json",
+        world(),
+    );
+}
+
+#[test]
 fn use_module_dns_register_rs() {
     elrond_wasm_debug::mandos_rs("mandos/use_module_dns_register.scen.json", world());
 }
