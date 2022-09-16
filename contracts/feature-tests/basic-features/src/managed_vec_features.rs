@@ -81,6 +81,6 @@ pub trait ManagedVecFeatures {
     fn managed_ref_explicit(&self, mv: ManagedVec<BigUint>, index: usize) -> BigUint {
         let value: ManagedRef<BigUint> = mv.get(index);
         let with_explicit_lifetime: ManagedRef<'_, BigUint> = value;
-        with_explicit_lifetime.clone()
+        (*with_explicit_lifetime).clone()
     }
 }
