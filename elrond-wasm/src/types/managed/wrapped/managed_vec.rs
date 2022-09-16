@@ -8,7 +8,7 @@ use crate::{
     },
 };
 use alloc::vec::Vec;
-use core::{borrow::Borrow, marker::PhantomData};
+use core::{borrow::Borrow, iter::FromIterator, marker::PhantomData};
 use elrond_codec::{
     DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode,
     NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeMultiOutput,
@@ -518,5 +518,17 @@ where
         arg.top_encode_or_handle_err(&mut result, h)?;
         self.push(result);
         Ok(())
+    }
+}
+
+impl<M, V> FromIterator<V> for ManagedVec<M, V>
+where
+    M: ManagedTypeApi,
+    V: ManagedVecItem,
+{
+    fn from_iter<T: IntoIterator<Item = V>>(iter: T) -> Self {
+        let mut result: ManagedVec<M, V> = ManagedVec::new();
+        iter.into_iter().for_each(|f| result.push(f));
+        result
     }
 }
