@@ -28,6 +28,23 @@ fn test_managed_vec_iter_rev() {
 }
 
 #[test]
+fn test_managed_vec_from_iterator_trait() {
+    let _ = DebugApi::dummy();
+    let mut managed_vec = ManagedVec::<DebugApi, i32>::new();
+    for i in 1..=10 {
+        managed_vec.push(i);
+    }
+    let mut expected_vec = ManagedVec::<DebugApi, i32>::new();
+    for i in 1..=5 {
+        expected_vec.push(i);
+    }
+
+    let collected_vec = managed_vec.iter().filter(|x| x <= &5).collect::<ManagedVec<DebugApi, i32>>();
+
+    assert_eq!(collected_vec, expected_vec);
+}
+
+#[test]
 fn test_managed_vec_iter_exact_size_trait() {
     let _ = DebugApi::dummy();
 
