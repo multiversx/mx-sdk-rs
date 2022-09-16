@@ -49,21 +49,6 @@ where
     }
 }
 
-impl<'a, M, T> Clone for ManagedRef<'a, M, T>
-where
-    M: ManagedTypeApi,
-    T: ManagedType<M>,
-{
-    #[inline]
-    fn clone(&self) -> Self {
-        Self {
-            _phantom_m: PhantomData,
-            _phantom_t: PhantomData,
-            handle: self.handle.clone(),
-        }
-    }
-}
-
 impl<'a, M, T> Deref for ManagedRef<'a, M, T>
 where
     M: ManagedTypeApi,
