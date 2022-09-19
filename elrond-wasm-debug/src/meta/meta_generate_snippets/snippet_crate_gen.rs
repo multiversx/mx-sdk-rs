@@ -68,7 +68,6 @@ path = ".."
 
 [dependencies.elrond-interact-snippets]
 version = "0.1.0"
-path = "../../../../elrond-interact-snippets" # TEMPORARY, until we have a release
 
 [workspace]
 
