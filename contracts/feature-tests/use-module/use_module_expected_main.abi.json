@@ -111,6 +111,17 @@
             ]
         },
         {
+            "name": "claimDeveloperRewards",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "child_sc_address",
+                    "type": "Address"
+                }
+            ],
+            "outputs": []
+        },
+        {
             "name": "dnsRegister",
             "onlyOwner": true,
             "mutability": "mutable",

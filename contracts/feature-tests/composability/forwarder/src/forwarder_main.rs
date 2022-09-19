@@ -6,7 +6,6 @@ mod call_async;
 pub mod call_sync;
 mod call_transf_exec;
 mod contract_change_owner;
-mod contract_claim_developer_rewards;
 mod contract_deploy;
 mod contract_upgrade;
 mod esdt;
@@ -26,7 +25,6 @@ pub trait Forwarder:
     + contract_change_owner::ChangeOwnerModule
     + contract_deploy::DeployContractModule
     + contract_upgrade::UpgradeContractModule
-    + contract_claim_developer_rewards::ClaimDeveloperRewardsModule
     + esdt::ForwarderEsdtModule
     + sft::ForwarderSftModule
     + nft::ForwarderNftModule

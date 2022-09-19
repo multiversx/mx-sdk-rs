@@ -4,27 +4,54 @@
         {
             "step": "setState",
             "accounts": {
-                "address:not_owner": {
-                    "nonce": "0"
-                },
                 "address:owner": {
-                    "nonce": "0"
+                    "nonce": "5",
+                    "balance": "0"
                 },
-                "sc:forwarder": {
-                    "balance": "0",
-                    "code": "file:../forwarder/output/forwarder.wasm",
-                    "owner": "address:owner"
-                },
+                "address:not_owner": {
+                    "nonce": "5",
+                    "balance": "0"
+                }
+            },
+            "newAddresses": [
+                {
+                    "creatorAddress": "address:owner",
+                    "creatorNonce": "5",
+                    "newAddress": "sc:use_module"
+                }
+            ]
+        },
+        {
+            "step": "scDeploy",
+            "id": "1",
+            "tx": {
+                "from": "address:owner",
+                "contractCode": "file:../output/use-module.wasm",
+                "arguments": [],
+                "gasLimit": "20,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "setState",
+            "accounts": {
                 "sc:child": {
                     "balance": "500",
-                    "code": "file:../vault/output/vault.wasm",
-                    "owner": "sc:forwarder",
+                    "owner": "sc:use_module",
+                    "code": "file:../../composability/vault/output/vault.wasm",
                     "developerRewards": "100"
                 },
                 "sc:not_child": {
                     "balance": "500",
-                    "code": "file:../vault/output/vault.wasm",
-                    "owner": "sc:not_owner"
+                    "owner": "sc:not_owner",
+                    "code": "file:../../composability/vault/output/vault.wasm"
                 }
             }
         },
@@ -33,7 +60,7 @@
             "id": "fail_claim",
             "tx": {
                 "from": "address:not_owner",
-                "to": "sc:forwarder",
+                "to": "sc:use_module",
                 "function": "claimDeveloperRewards",
                 "arguments": [
                     "sc:not_child"
@@ -54,7 +81,7 @@
             "id": "success_claim",
             "tx": {
                 "from": "address:owner",
-                "to": "sc:forwarder",
+                "to": "sc:use_module",
                 "function": "claimDeveloperRewards",
                 "arguments": [
                     "sc:child"
@@ -73,29 +100,29 @@
         {
             "step": "checkState",
             "accounts": {
-                "sc:forwarder": {
+                "sc:use_module": {
                     "balance": "100",
-                    "code": "file:../forwarder/output/forwarder.wasm",
+                    "code": "file:../output/use-module.wasm",
                     "owner": "address:owner"
                 },
                 "address:not_owner": {
-                    "nonce": "1",
+                    "nonce": "6",
                     "balance": "0"
                 },
                 "address:owner": {
-                    "nonce": "1",
+                    "nonce": "7",
                     "balance": "0"
                 },
                 "sc:child": {
                     "balance": "500",
-                    "code": "file:../vault/output/vault.wasm",
-                    "owner": "sc:forwarder",
+                    "owner": "sc:use_module",
+                    "code": "file:../../composability/vault/output/vault.wasm",
                     "developerRewards": "0"
                 },
                 "sc:not_child": {
                     "balance": "500",
-                    "code": "file:../vault/output/vault.wasm",
-                    "owner": "sc:not_owner"
+                    "owner": "sc:not_owner",
+                    "code": "file:../../composability/vault/output/vault.wasm"
                 }
             }
         }
