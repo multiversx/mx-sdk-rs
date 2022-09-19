@@ -23,6 +23,7 @@ elrond_wasm_node::wasm_endpoints! {
         changeVotingPeriodInBlocks
         checkFeatureGuard
         checkPause
+        claimDeveloperRewards
         countTo100
         depositTokensForAction
         dnsRegister
