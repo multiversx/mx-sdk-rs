@@ -534,16 +534,6 @@
             ]
         },
         {
-            "name": "isPaused",
-            "mutability": "readonly",
-            "inputs": [],
-            "outputs": [
-                {
-                    "type": "bool"
-                }
-            ]
-        },
-        {
             "name": "pause",
             "onlyOwner": true,
             "mutability": "mutable",
@@ -556,6 +546,16 @@
             "mutability": "mutable",
             "inputs": [],
             "outputs": []
+        },
+        {
+            "name": "isPaused",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "bool"
+                }
+            ]
         },
         {
             "name": "stake",
