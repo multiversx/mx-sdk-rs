@@ -21,6 +21,7 @@ pub trait PauseModule {
         !self.is_paused()
     }
 
+    #[inline]
     fn set_paused(&self, paused: bool) {
         self.paused_status().set(paused);
     }
