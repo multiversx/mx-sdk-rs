@@ -20,6 +20,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8da52d66c7071e2e3fa2a1e5c6d088fec47b593032b254f5e980de8ea54454d6"
 
 [[package]]
+name = "autocfg"
+version = "1.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d468802bab17cbc0cc575e9b053f41e72aa36bfa6b7f55e3529ffa43161b97fa"
+
+[[package]]
 name = "bitflags"
 version = "1.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -39,7 +45,7 @@ checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
 name = "elrond-codec"
-version = "0.11.0"
+version = "0.12.0"
 dependencies = [
  "arrayvec",
  "elrond-codec-derive",
@@ -48,7 +54,7 @@ dependencies = [
 
 [[package]]
 name = "elrond-codec-derive"
-version = "0.11.0"
+version = "0.12.0"
 dependencies = [
  "hex",
  "proc-macro2",
@@ -58,7 +64,7 @@ dependencies = [
 
 [[package]]
 name = "elrond-wasm"
-version = "0.31.1"
+version = "0.34.1"
 dependencies = [
  "bitflags",
  "elrond-codec",
@@ -66,12 +72,13 @@ dependencies = [
  "git-version",
  "hashbrown",
  "hex-literal",
+ "num-traits",
  "wee_alloc",
 ]
 
 [[package]]
 name = "elrond-wasm-derive"
-version = "0.31.1"
+version = "0.34.1"
 dependencies = [
  "hex",
  "proc-macro2",
@@ -82,14 +89,14 @@ dependencies = [
 
 [[package]]
 name = "elrond-wasm-node"
-version = "0.31.1"
+version = "0.34.1"
 dependencies = [
  "elrond-wasm",
 ]
 
 [[package]]
 name = "elrond-wasm-output"
-version = "0.31.1"
+version = "0.34.1"
 dependencies = [
  "elrond-wasm-node",
  "wee_alloc",
@@ -188,6 +195,15 @@ name = "nibble_vec"
 version = "0.0.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c8d77f3db4bce033f4d04db08079b2ef1c3d02b44e86f25d08886fafa7756ffa"
+
+[[package]]
+name = "num-traits"
+version = "0.2.15"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "578ede34cf02f8924ab9447f50c28075b4d3e5b269972345e7e0372b38c6cdcd"
+dependencies = [
+ "autocfg",
+]
 
 [[package]]
 name = "once_cell"
