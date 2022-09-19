@@ -31,6 +31,7 @@ pub trait UseModule:
     + only_admin_mod::OnlyAdminTestModule
     + only_admin_derived_mod::OnlyAdminDerivedTestModule
     + ongoing_operation_mod_example::OngoingOperationModExample
+    + elrond_wasm_modules::claim_developer_rewards::ClaimDeveloperRewardsModule
     + elrond_wasm_modules::dns::DnsModule
     + elrond_wasm_modules::esdt::EsdtModule
     + elrond_wasm_modules::features::FeaturesModule
