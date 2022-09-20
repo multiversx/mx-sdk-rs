@@ -9,6 +9,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 - Added some missing substitution rules in the contract preprocessor.
 - Allow single zero byte when top-decoding Option::None.
 - Ongoing operations module.
+- Claim developer rewards module.
 - `FromIterator` trait for `ManagedVec`.
 - Mandos `"id"` accepted as synonym to `"txId"`.
 
