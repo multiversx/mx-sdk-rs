@@ -28,7 +28,7 @@ pub trait NonFungibleTokenMapperFeatures:
 
     #[endpoint]
     fn mapper_nft_set_token_id(&self, token_id: TokenIdentifier) {
-        self.non_fungible_token_mapper().set_token_id(&token_id);
+        self.non_fungible_token_mapper().set_token_id(token_id);
     }
 
     #[endpoint]
