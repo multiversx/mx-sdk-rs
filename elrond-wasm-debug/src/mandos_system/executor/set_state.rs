@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::mandos_system::model::{ SetStateStep, Step};
+use crate::mandos_system::model::{SetStateStep, Step};
 use elrond_wasm::types::heap::Address;
 
 use crate::world_mock::{
@@ -18,38 +18,41 @@ impl BlockchainMock {
 
 fn execute(state: &mut BlockchainMock, set_state_step: &SetStateStep) {
     for (address, account) in set_state_step.accounts.iter() {
-        let mut storage: HashMap<Vec<u8>, Vec<u8>> = account
+        let update = match account.update {
+            Some(update) => update,
+            _ => false,
+        };
+
+        let old_account_data = state.accounts.get(&address.to_address());
+        if update && old_account_data.is_none() {
+            panic!(
+                "Called update flag on non-existent Address: {}",
+                &address.to_string()
+            )
+        }
+
+        let storage: HashMap<Vec<u8>, Vec<u8>> = account
             .storage
             .iter()
             .map(|(k, v)| (k.value.clone(), v.value.clone()))
             .collect();
 
-        if let Some(update) = account.update {
-            if update {
-                let new_storage = storage;
-                let mut old_storage = state
-                    .accounts
-                    .get(&address.to_address())
-                    .unwrap_or_else(|| {
-                        panic!(
-                            "Called update flag on non-existent Address: {}",
-                            &address.to_string()
-                        )
-                    })
-                    .storage
-                    .clone();
+        let storage = if update {
+            let mut old_storage = old_account_data.unwrap().storage.clone();
 
-                for (k, v) in new_storage.into_iter() {
-                    old_storage
-                        .entry(k)
-                        .and_modify(|old_v| *old_v = v.clone())
-                        .or_insert(v);
-                }
-
-                storage = old_storage;
+            for (k, v) in storage.into_iter() {
+                old_storage
+                    .entry(k)
+                    .and_modify(|old_v| *old_v = v.clone())
+                    .or_insert(v);
             }
-        }
 
+            old_storage
+        } else {
+            storage
+        };
+
+        // TODO: Update flag not yet implemented for this. Implement when needed
         let esdt = AccountEsdt::new_from_raw_map(
             account
                 .esdt
@@ -58,38 +61,82 @@ fn execute(state: &mut BlockchainMock, set_state_step: &SetStateStep) {
                 .collect(),
         );
 
+        let nonce = match account.nonce.as_ref() {
+            Some(nonce) => nonce.value,
+            None => {
+                if update {
+                    old_account_data.unwrap().nonce
+                } else {
+                    Default::default()
+                }
+            },
+        };
+
+        let egld_balance = match account.balance.as_ref() {
+            Some(balance) => balance.value.clone(),
+            None => {
+                if update {
+                    old_account_data.unwrap().egld_balance.clone()
+                } else {
+                    Default::default()
+                }
+            },
+        };
+
+        let username = match account.username.as_ref() {
+            Some(bytes_value) => bytes_value.value.clone(),
+            None => {
+                if update {
+                    old_account_data.unwrap().username.clone()
+                } else {
+                    Default::default()
+                }
+            },
+        };
+
+        let contract_path = match account.code.as_ref() {
+            Some(bytes_value) => Some(bytes_value.value.clone()),
+            None => {
+                if update {
+                    old_account_data.unwrap().contract_path.clone()
+                } else {
+                    Default::default()
+                }
+            },
+        };
+
+        let contract_owner = match account.owner.as_ref() {
+            Some(address_value) => Some(address_value.value.clone()),
+            None => {
+                if update {
+                    old_account_data.unwrap().contract_owner.clone()
+                } else {
+                    Default::default()
+                }
+            },
+        };
+
+        let developer_rewards = match account.developer_rewards.as_ref() {
+            Some(rewards) => rewards.value.clone(),
+            None => {
+                if update {
+                    old_account_data.unwrap().developer_rewards.clone()
+                } else {
+                    Default::default()
+                }
+            },
+        };
+
         state.validate_and_add_account(AccountData {
             address: address.to_address(),
-            nonce: account
-                .nonce
-                .as_ref()
-                .map(|nonce| nonce.value)
-                .unwrap_or_default(),
-            egld_balance: account
-                .balance
-                .as_ref()
-                .map(|balance| balance.value.clone())
-                .unwrap_or_default(),
+            nonce,
+            egld_balance,
             esdt,
-            username: account
-                .username
-                .as_ref()
-                .map(|bytes_value| bytes_value.value.clone())
-                .unwrap_or_default(),
+            username,
             storage,
-            contract_path: account
-                .code
-                .as_ref()
-                .map(|bytes_value| bytes_value.value.clone()),
-            contract_owner: account
-                .owner
-                .as_ref()
-                .map(|address_value| address_value.value.clone()),
-            developer_rewards: account
-                .developer_rewards
-                .as_ref()
-                .map(|rewards| rewards.value.clone())
-                .unwrap_or_default(),
+            contract_path,
+            contract_owner,
+            developer_rewards,
         });
     }
     for new_address in set_state_step.new_addresses.iter() {
