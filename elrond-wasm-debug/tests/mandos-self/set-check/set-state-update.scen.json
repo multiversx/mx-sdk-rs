@@ -1,0 +1,70 @@
+{
+	"comment": "checks that owner is correct if specified",
+	"steps": [
+		{
+			"step": "setState",
+			"accounts": {
+				"address:child": {
+					"nonce": "1",
+					"storage": {
+						"str:value1": "1",
+						"str:value2": "2",
+						"str:value3": "3"
+					}
+				}
+			}
+		},
+		{
+			"step": "setState",
+			"accounts": {
+				"address:child": {
+					"update": true,
+					"nonce": "2",
+					"storage": {
+						"str:value2": "22",
+						"str:value3": "",
+						"str:value4": "4"
+					}
+				}
+			}
+		},
+		{"step":"dumpState"},
+		{
+			"step": "checkState",
+            "id": "check-1",
+			"accounts": {
+				"address:child": {
+					"nonce": "2",
+					"storage": {
+						"str:value1": "1",
+						"str:value2": "22",
+						"str:value4": "4"
+					}
+				}
+			}
+		},
+		{
+			"step": "setState",
+			"accounts": {
+				"address:child": {
+					"nonce": "1",
+					"storage": {
+						"str:value5": "5"
+					}
+				}
+			}
+		},
+		{
+			"step": "checkState",
+            "id": "check-2",
+			"accounts": {
+				"address:child": {
+					"nonce": "1",
+					"storage": {
+						"str:value5": "5"
+					}
+				}
+			}
+		}
+	]
+}

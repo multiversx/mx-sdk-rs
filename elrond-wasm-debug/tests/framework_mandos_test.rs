@@ -201,6 +201,23 @@ fn set_check_username_rs() {
 }
 
 #[test]
+#[should_panic(expected = "Called update flag on non-existent Address: address:update_before_set")]
+fn set_state_update_err1_rs() {
+    elrond_wasm_debug::mandos_rs(
+        "tests/mandos-self/set-check/set-state-update.err1.json",
+        world(),
+    );
+}
+
+#[test]
+fn set_state_update_rs() {
+    elrond_wasm_debug::mandos_rs(
+        "tests/mandos-self/set-check/set-state-update.scen.json",
+        world(),
+    );
+}
+
+#[test]
 fn builtin_func_esdt_transfer() {
     elrond_wasm_debug::mandos_rs(
         "tests/mandos-self/builtin-func-esdt-transfer.scen.json",

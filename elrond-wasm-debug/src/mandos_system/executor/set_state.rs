@@ -1,4 +1,6 @@
-use crate::mandos_system::model::{SetStateStep, Step};
+use std::collections::HashMap;
+
+use crate::mandos_system::model::{ SetStateStep, Step};
 use elrond_wasm::types::heap::Address;
 
 use crate::world_mock::{
@@ -16,11 +18,38 @@ impl BlockchainMock {
 
 fn execute(state: &mut BlockchainMock, set_state_step: &SetStateStep) {
     for (address, account) in set_state_step.accounts.iter() {
-        let storage = account
+        let mut storage: HashMap<Vec<u8>, Vec<u8>> = account
             .storage
             .iter()
             .map(|(k, v)| (k.value.clone(), v.value.clone()))
             .collect();
+
+        if let Some(update) = account.update {
+            if update {
+                let new_storage = storage;
+                let mut old_storage = state
+                    .accounts
+                    .get(&address.to_address())
+                    .unwrap_or_else(|| {
+                        panic!(
+                            "Called update flag on non-existent Address: {}",
+                            &address.to_string()
+                        )
+                    })
+                    .storage
+                    .clone();
+
+                for (k, v) in new_storage.into_iter() {
+                    old_storage
+                        .entry(k)
+                        .and_modify(|old_v| *old_v = v.clone())
+                        .or_insert(v);
+                }
+
+                storage = old_storage;
+            }
+        }
+
         let esdt = AccountEsdt::new_from_raw_map(
             account
                 .esdt

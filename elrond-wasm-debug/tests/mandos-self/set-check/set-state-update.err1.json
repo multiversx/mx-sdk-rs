@@ -1,0 +1,13 @@
+{
+	"comment": "updating an account that does not exist",
+	"steps": [
+		{
+			"step": "setState",
+			"accounts": {
+				"address:update_before_set": {
+					"update": true
+				}
+			}
+		}
+	]
+}

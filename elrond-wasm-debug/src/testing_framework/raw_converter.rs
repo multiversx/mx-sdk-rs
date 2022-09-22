@@ -52,6 +52,7 @@ pub(crate) fn account_as_raw(acc: &AccountData) -> AccountRaw {
         storage: storage_raw,
         username: None, // TODO: Add if needed
         developer_rewards: developer_rewards_raw,
+        update: None
     }
 }
 

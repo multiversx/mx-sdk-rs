@@ -19,6 +19,7 @@ pub struct Account {
     pub code: Option<BytesValue>,
     pub owner: Option<AddressValue>,
     pub developer_rewards: Option<BigUintValue>,
+    pub update: Option<bool>,
 }
 
 impl Account {
@@ -159,6 +160,7 @@ impl InterpretableFrom<AccountRaw> for Account {
             developer_rewards: from
                 .developer_rewards
                 .map(|b| BigUintValue::interpret_from(b, context)),
+            update: from.update,
         }
     }
 }
@@ -183,6 +185,7 @@ impl IntoRaw<AccountRaw> for Account {
             code: self.code.map(|n| n.original),
             owner: self.owner.map(|n| n.original),
             developer_rewards: self.developer_rewards.map(|n| n.original),
+            update: self.update,
         }
     }
 }
