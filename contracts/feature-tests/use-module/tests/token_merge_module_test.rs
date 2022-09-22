@@ -50,7 +50,7 @@ fn test_token_merge() {
     b_mock
         .execute_tx(&owner, &merging_sc, &rust_zero, |sc| {
             sc.merged_token()
-                .set_token_id(&managed_token_id!(MERGED_TOKEN_ID));
+                .set_token_id(managed_token_id!(MERGED_TOKEN_ID));
             let _ = sc
                 .mergeable_tokens_whitelist()
                 .insert(managed_token_id!(NFT_TOKEN_ID));
@@ -444,7 +444,7 @@ fn partial_split_test() {
     b_mock
         .execute_tx(&owner, &merging_sc, &rust_zero, |sc| {
             sc.merged_token()
-                .set_token_id(&managed_token_id!(MERGED_TOKEN_ID));
+                .set_token_id(managed_token_id!(MERGED_TOKEN_ID));
             let _ = sc
                 .mergeable_tokens_whitelist()
                 .insert(managed_token_id!(NFT_TOKEN_ID));
