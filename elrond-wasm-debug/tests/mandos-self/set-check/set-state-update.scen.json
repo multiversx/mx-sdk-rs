@@ -28,7 +28,6 @@
 				}
 			}
 		},
-		{"step":"dumpState"},
 		{
 			"step": "checkState",
             "id": "check-1",
