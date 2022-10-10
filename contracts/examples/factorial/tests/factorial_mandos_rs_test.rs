@@ -9,6 +9,6 @@ fn world() -> BlockchainMock {
 }
 
 #[test]
-fn adder_rs() {
+fn factorial_rs() {
     elrond_wasm_debug::mandos_rs("mandos/factorial.scen.json", world());
 }
