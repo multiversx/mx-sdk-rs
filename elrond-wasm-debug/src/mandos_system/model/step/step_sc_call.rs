@@ -157,7 +157,7 @@ pub fn convert_call_args(arg_buffer: &ManagedArgBuffer<DebugApi>) -> Vec<String>
     arg_buffer
         .to_raw_args_vec()
         .iter()
-        .map(|arg| format!("0x{}", hex::encode(&arg)))
+        .map(|arg| format!("0x{}", hex::encode(arg)))
         .collect()
 }
 

@@ -43,7 +43,7 @@ where
 {
     pub fn add(&self, item: &T) {
         let mapper = self.build_mapper_for_item(item);
-        mapper.set(&true);
+        mapper.set(true);
     }
 
     pub fn remove(&self, item: &T) {

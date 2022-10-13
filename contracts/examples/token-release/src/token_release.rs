@@ -20,7 +20,7 @@ pub trait TokenRelease {
             "Invalid token provided"
         );
         self.token_identifier().set(&token_identifier);
-        self.setup_period_status().set(&true);
+        self.setup_period_status().set(true);
     }
 
     // endpoints
@@ -212,7 +212,7 @@ pub trait TokenRelease {
         let total_mint_tokens = self.token_total_supply().get();
         self.mint_all_tokens(&token_identifier, &total_mint_tokens);
         let activation_timestamp = self.blockchain().get_block_timestamp();
-        self.activation_timestamp().set(&activation_timestamp);
+        self.activation_timestamp().set(activation_timestamp);
         self.setup_period_status().set(false);
     }
 

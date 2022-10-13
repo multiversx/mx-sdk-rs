@@ -1,5 +1,3 @@
-#![feature(generic_associated_types)]
-
 use elrond_wasm_debug::DebugApi;
 
 elrond_wasm::derive_imports!();
