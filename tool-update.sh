@@ -2,7 +2,7 @@
 
 # Locally update the VM version
 
-VM_TAG="v1.4.53"
+VM_TAG="v1.5.1"
 
 echo "Before:"
 erdpy config dump
@@ -11,3 +11,7 @@ echo "After:"
 erdpy config dump
 
 erdpy deps install vmtools --overwrite
+
+# Also update the Rust version
+
+erdpy deps install rust --tag="nightly" --overwrite
