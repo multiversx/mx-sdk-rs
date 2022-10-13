@@ -4,6 +4,11 @@ There are several crates in this repo, this changelog will keep track of all of 
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [elrond-wasm 0.36.0, elrond-codec 0.14.0] - 2022-10-13
+- `EsdtTokenPayment` legacy decode: objects encoded by older versions of the framework can now also be decoded, if flag `esdt-token-payment-legacy-decode` is active.
+- Codec `NestedDecodeInput` new  `peek_into` method.
+- `FungibleTokenMapper` caches the token identifier.
+
 ## [elrond-wasm 0.35.0, elrond-codec 0.13.0, mandos 0.17.0] - 2022-09-20
 - Rust interactor snippet generator.
 - Added some missing substitution rules in the contract preprocessor.
