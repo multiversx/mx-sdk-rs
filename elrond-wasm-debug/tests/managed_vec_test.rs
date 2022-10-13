@@ -48,6 +48,30 @@ fn test_managed_vec_from_iterator_trait() {
 }
 
 #[test]
+fn test_managed_vec_extend_trait() {
+    let _ = DebugApi::dummy();
+    let mut managed_vec = ManagedVec::<DebugApi, i32>::new();
+    for i in 1..=10 {
+        managed_vec.push(i);
+    }
+    let mut expected_vec1 = ManagedVec::<DebugApi, i32>::new();
+    for i in 1..=5 {
+        expected_vec1.push(i);
+    }
+    let mut expected_vec2 = ManagedVec::<DebugApi, i32>::new();
+    for i in 6..=10 {
+        expected_vec2.push(i);
+    }
+
+    let (collected_vec1, collected_vec2) = managed_vec
+        .iter()
+        .partition::<ManagedVec<DebugApi, i32>, _>(|x| x <= &5);
+
+    assert_eq!(collected_vec1, expected_vec1);
+    assert_eq!(collected_vec2, expected_vec2);
+}
+
+#[test]
 fn test_managed_vec_iter_exact_size_trait() {
     let _ = DebugApi::dummy();
 
