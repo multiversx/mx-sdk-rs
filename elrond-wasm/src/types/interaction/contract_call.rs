@@ -237,7 +237,7 @@ where
                 // arg3 - destination address
                 let mut new_arg_buffer = ManagedArgBuffer::new();
                 new_arg_buffer.push_arg(&payment.token_identifier);
-                new_arg_buffer.push_arg(&payment.token_nonce);
+                new_arg_buffer.push_arg(payment.token_nonce);
                 new_arg_buffer.push_arg(&payment.amount);
                 new_arg_buffer.push_arg(&self.to);
                 if !self.endpoint_name.is_empty() {

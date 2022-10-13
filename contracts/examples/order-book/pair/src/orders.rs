@@ -370,7 +370,7 @@ pub trait OrdersModule:
 
     fn get_and_increase_order_id_counter(&self) -> u64 {
         let id = self.order_id_counter().get();
-        self.order_id_counter().set(&(id + 1));
+        self.order_id_counter().set(id + 1);
         id
     }
 

@@ -35,7 +35,7 @@ pub trait MultisigPerformModule:
         let user_id = self.user_mapper().get_or_create_user(&user_address);
         let user_id_to_role_mapper = self.user_id_to_role(user_id);
         let old_role = user_id_to_role_mapper.get();
-        user_id_to_role_mapper.set(&new_role);
+        user_id_to_role_mapper.set(new_role);
 
         self.perform_change_user_event(action_id, &user_address, old_role, new_role);
 

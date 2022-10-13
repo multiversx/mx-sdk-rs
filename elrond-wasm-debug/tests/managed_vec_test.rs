@@ -39,7 +39,10 @@ fn test_managed_vec_from_iterator_trait() {
         expected_vec.push(i);
     }
 
-    let collected_vec = managed_vec.iter().filter(|x| x <= &5).collect::<ManagedVec<DebugApi, i32>>();
+    let collected_vec = managed_vec
+        .iter()
+        .filter(|x| x <= &5)
+        .collect::<ManagedVec<DebugApi, i32>>();
 
     assert_eq!(collected_vec, expected_vec);
 }

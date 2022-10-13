@@ -1,0 +1,35 @@
+{
+    "name": "factorial",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "1",
+                    "balance": "0"
+                },
+                "sc:factorial": {
+                    "code": "file:../output/factorial.wasm"
+                }
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "factorial(3)",
+            "tx": {
+                "to": "sc:factorial",
+                "function": "factorial",
+                "arguments": [
+                    "3"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "6"
+                ],
+                "status": "",
+                "logs": []
+            }
+        }
+    ]
+}

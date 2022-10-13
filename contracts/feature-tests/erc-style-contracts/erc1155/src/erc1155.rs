@@ -168,7 +168,7 @@ pub trait Erc1155 {
     fn set_approved_for_all(&self, operator: ManagedAddress, approved: bool) {
         let caller = self.blockchain().get_caller();
 
-        self.is_approved(&operator, &caller).set(&approved);
+        self.is_approved(&operator, &caller).set(approved);
     }
 
     // returns assigned id
@@ -186,7 +186,7 @@ pub trait Erc1155 {
 
         self.set_balance(&creator, &type_id, &initial_supply);
         self.token_type_creator(&type_id).set(&creator);
-        self.is_fungible(&type_id).set(&is_fungible);
+        self.is_fungible(&type_id).set(is_fungible);
 
         if !is_fungible {
             self.set_owner_for_range(&type_id, &big_uint_one, &initial_supply, &creator);

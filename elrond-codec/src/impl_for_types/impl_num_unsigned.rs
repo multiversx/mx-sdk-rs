@@ -8,7 +8,7 @@ use crate::{
 // No reversing needed for u8, because it is a single byte.
 impl NestedEncodeNoErr for u8 {
     fn dep_encode_no_err<O: NestedEncodeOutput>(&self, dest: &mut O) {
-        dest.push_byte(*self as u8);
+        dest.push_byte(*self);
     }
 }
 dep_encode_from_no_err! {u8, TypeInfo::U8}
