@@ -91,10 +91,6 @@ cd elrond-wasm-modules
 cargo publish || return 1
 cd ..
 
-cd elrond-interact-snippets
-cargo publish || return 1
-cd ..
-
 cd contracts/core/price-aggregator
 cargo publish || return 1
 cd ../../..
@@ -102,3 +98,7 @@ cd ../../..
 cd contracts/core/wegld-swap
 cargo publish || return 1
 cd ../../..
+
+cd elrond-interact-snippets
+cargo publish || return 1
+cd ..
