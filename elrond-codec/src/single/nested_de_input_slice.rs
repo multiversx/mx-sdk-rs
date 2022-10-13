@@ -6,7 +6,7 @@ impl<'a> NestedDecodeInput for &'a [u8] {
         self.len()
     }
 
-    fn read_into<H>(&mut self, into: &mut [u8], h: H) -> Result<(), H::HandledErr>
+    fn peek_into<H>(&mut self, into: &mut [u8], h: H) -> Result<(), H::HandledErr>
     where
         H: DecodeErrorHandler,
     {
@@ -15,7 +15,15 @@ impl<'a> NestedDecodeInput for &'a [u8] {
         }
         let len = into.len();
         into.copy_from_slice(&self[..len]);
-        *self = &self[len..];
+        Ok(())
+    }
+
+    fn read_into<H>(&mut self, into: &mut [u8], h: H) -> Result<(), H::HandledErr>
+    where
+        H: DecodeErrorHandler,
+    {
+        self.peek_into(into, h)?;
+        *self = &self[into.len()..];
         Ok(())
     }
 }

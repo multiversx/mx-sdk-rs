@@ -122,7 +122,9 @@ impl ManagedVecItem for bool {
     }
 
     fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, writer: Writer) -> R {
-        let u8_value = if *self { 1u8 } else { 0u8 };
+        // true -> 1u8
+        // false -> 0u8
+        let u8_value = u8::from(*self);
         <u8 as ManagedVecItem>::to_byte_writer(&u8_value, writer)
     }
 }

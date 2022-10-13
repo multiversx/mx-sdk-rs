@@ -7,14 +7,14 @@ pub trait GlobalOperationModule {
     #[endpoint(startGlobalOperation)]
     fn global_op_start(&self) {
         self.require_global_op_not_ongoing();
-        self.global_op_is_ongoing().set(&true);
+        self.global_op_is_ongoing().set(true);
     }
 
     #[only_owner]
     #[endpoint(stopGlobalOperation)]
     fn global_op_stop(&self) {
         self.require_global_op_ongoing();
-        self.global_op_is_ongoing().set(&false);
+        self.global_op_is_ongoing().set(false);
     }
 
     fn require_global_op_not_ongoing(&self) {
