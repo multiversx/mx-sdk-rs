@@ -1,6 +1,6 @@
 [package]
 name = "elrond-wasm"
-version = "0.35.0"
+version = "0.36.0"
 edition = "2018"
 
 authors = ["Andrei Marinica <andrei.marinica@elrond.com>", "Elrond Network <contact@elrond.com>"]
@@ -20,6 +20,7 @@ ei-unmanaged = ["alloc"]
 promises = []
 big-float = []
 ei-1-2 = []
+esdt-token-payment-legacy-decode = []
 
 [dependencies]
 wee_alloc = "0.4"
@@ -33,10 +34,10 @@ version = "0.2"
 default-features = false
 
 [dependencies.elrond-wasm-derive]
-version = "=0.35.0"
+version = "=0.36.0"
 path = "../elrond-wasm-derive"
 
 [dependencies.elrond-codec]
-version = "=0.13.0"
+version = "=0.14.0"
 path = "../elrond-codec"
 features = ["derive"]

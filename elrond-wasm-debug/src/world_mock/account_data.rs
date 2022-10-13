@@ -25,7 +25,7 @@ pub struct AccountData {
 impl fmt::Display for AccountData {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut storage_buf = String::new();
-        let mut storage_keys: Vec<Vec<u8>> = self.storage.iter().map(|(k, _)| k.clone()).collect();
+        let mut storage_keys: Vec<Vec<u8>> = self.storage.keys().cloned().collect();
         storage_keys.sort();
 
         for key in &storage_keys {

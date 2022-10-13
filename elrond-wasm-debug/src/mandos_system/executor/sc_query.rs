@@ -39,7 +39,7 @@ impl BlockchainMock {
 
         let mut tx_expect = TxExpect::ok();
         for raw_result in &tx_result.result_values {
-            let result_hex_string = format!("0x{}", hex::encode(&raw_result));
+            let result_hex_string = format!("0x{}", hex::encode(raw_result));
             tx_expect = tx_expect.result(result_hex_string.as_str());
         }
         sc_query_step = sc_query_step.expect(tx_expect);

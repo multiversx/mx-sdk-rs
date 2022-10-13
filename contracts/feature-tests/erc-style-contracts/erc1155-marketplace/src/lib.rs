@@ -31,7 +31,7 @@ pub trait Erc1155Marketplace {
     fn init(&self, token_ownership_contract_address: ManagedAddress, bid_cut_percentage: u8) {
         self.token_ownership_contract_address()
             .set(&token_ownership_contract_address);
-        self.percentage_cut().set(&bid_cut_percentage);
+        self.percentage_cut().set(bid_cut_percentage);
     }
 
     // endpoints - Token ownership contract only
@@ -119,7 +119,7 @@ pub trait Erc1155Marketplace {
             "Invalid percentage value, should be between 0 and 100"
         );
 
-        self.percentage_cut().set(&new_cut_percentage);
+        self.percentage_cut().set(new_cut_percentage);
     }
 
     #[only_owner]

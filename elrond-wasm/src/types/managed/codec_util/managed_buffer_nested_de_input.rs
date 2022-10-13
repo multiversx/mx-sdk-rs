@@ -87,17 +87,22 @@ where
         self.buffer_len - self.decode_index
     }
 
+    fn peek_into<H>(&mut self, into: &mut [u8], h: H) -> Result<(), H::HandledErr>
+    where
+        H: DecodeErrorHandler,
+    {
+        self.buffer
+            .load_slice(self.decode_index, into)
+            .map_err(|_| h.handle_error(DecodeError::INPUT_TOO_SHORT))
+    }
+
     fn read_into<H>(&mut self, into: &mut [u8], h: H) -> Result<(), H::HandledErr>
     where
         H: DecodeErrorHandler,
     {
-        let err_result = self.buffer.load_slice(self.decode_index, into);
-        if err_result.is_ok() {
-            self.decode_index += into.len();
-            Ok(())
-        } else {
-            Err(h.handle_error(DecodeError::INPUT_TOO_SHORT))
-        }
+        self.peek_into(into, h)?;
+        self.decode_index += into.len();
+        Ok(())
     }
 
     fn supports_specialized_type<T: TryStaticCast>() -> bool {
