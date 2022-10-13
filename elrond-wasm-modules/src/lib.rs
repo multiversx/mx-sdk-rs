@@ -1,5 +1,4 @@
 #![no_std]
-#![feature(generic_associated_types)]
 
 pub mod bonding_curve;
 pub mod claim_developer_rewards;

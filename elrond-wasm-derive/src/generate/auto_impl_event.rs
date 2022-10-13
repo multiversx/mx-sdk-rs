@@ -98,7 +98,7 @@ pub fn generate_legacy_event_impl(m: &Method, event_id_bytes: &[u8]) -> proc_mac
         nr_args_no_self != 0,
         "events need at least 1 argument, for the data"
     );
-    let nr_topics = nr_args_no_self as usize; // -1 data, +1 event id
+    let nr_topics = nr_args_no_self; // -1 data, +1 event id
 
     let mut topic_index: usize = 1;
     let topic_conv_snippets: Vec<proc_macro2::TokenStream> = m

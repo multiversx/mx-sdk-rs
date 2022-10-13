@@ -9,7 +9,9 @@ impl TopEncodeNoErr for bool {
     fn top_encode_no_err<O: TopEncodeOutput>(&self, output: O) {
         // only using signed because this one is implemented in Arwen, unsigned is not
         // TODO: change to set_u64
-        output.set_i64(if *self { 1i64 } else { 0i64 });
+        // true -> 1i64
+        // false -> 0i64
+        output.set_i64(i64::from(*self));
     }
 }
 
