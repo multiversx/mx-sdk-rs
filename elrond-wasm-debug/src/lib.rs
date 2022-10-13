@@ -1,4 +1,3 @@
-#![feature(generic_associated_types)]
 #![allow(clippy::type_complexity)]
 #![feature(exhaustive_patterns)]
 

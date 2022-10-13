@@ -41,7 +41,7 @@ where
 
 impl HandleConstraints for i32 {
     fn new(handle: RawHandle) -> Self {
-        handle as i32
+        handle
     }
 
     fn to_be_bytes(&self) -> [u8; 4] {

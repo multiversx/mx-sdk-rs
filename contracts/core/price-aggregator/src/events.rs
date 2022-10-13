@@ -14,7 +14,11 @@ pub struct NewRoundEvent<M: ManagedTypeApi> {
 
 #[elrond_wasm::module]
 pub trait EventsModule {
-    fn emit_new_round_event(&self, token_pair: &TokenPair<Self::Api>, price_feed: &TimestampedPrice<Self::Api>) {
+    fn emit_new_round_event(
+        &self,
+        token_pair: &TokenPair<Self::Api>,
+        price_feed: &TimestampedPrice<Self::Api>,
+    ) {
         let epoch = self.blockchain().get_block_epoch();
         self.new_round_event(
             &token_pair.from.clone(),

@@ -26,7 +26,7 @@ impl Interactor {
             args: contract_call
                 .arg_buffer
                 .raw_arg_iter()
-                .map(|arg| hex::encode(&arg.to_boxed_bytes().as_slice()))
+                .map(|arg| hex::encode(arg.to_boxed_bytes().as_slice()))
                 .collect(),
             caller: sc_address,
             value: "0".to_string(),

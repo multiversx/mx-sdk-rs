@@ -91,7 +91,7 @@ pub trait FungibleTokenMapperFeatures:
     fn set_roles_callback(&self, #[call_result] result: ManagedAsyncCallResult<()>) {
         match result {
             ManagedAsyncCallResult::Ok(()) => {
-                self.roles_set().set(&true);
+                self.roles_set().set(true);
             },
             ManagedAsyncCallResult::Err(_) => {},
         }

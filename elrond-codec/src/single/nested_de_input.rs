@@ -11,7 +11,16 @@ pub trait NestedDecodeInput {
         self.remaining_len() == 0
     }
 
-    /// Read the exact number of bytes required to fill the given buffer.
+    /// Read the exact number of bytes required to fill the given buffer, without consuming the underlying bytes.
+    ///
+    /// Will fail is not enough bytes left in buffer.
+    fn peek_into<H>(&mut self, into: &mut [u8], h: H) -> Result<(), H::HandledErr>
+    where
+        H: DecodeErrorHandler;
+
+    /// Read & consume the exact number of bytes required to fill the given buffer.
+    ///
+    /// Will fail is not enough bytes left in buffer.
     fn read_into<H>(&mut self, into: &mut [u8], h: H) -> Result<(), H::HandledErr>
     where
         H: DecodeErrorHandler;
