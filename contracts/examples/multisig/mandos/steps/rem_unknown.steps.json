@@ -1,23 +1,22 @@
 {
-    "name": "adder",
-    "comment": "add then check",
+    "comment": "remove a user that doesn't exist",
     "steps": [
         {
             "step": "scCall",
-            "id": "rem-alice-prop",
+            "id": "rem-unknown-prop",
             "tx": {
                 "from": "address:paul",
                 "to": "sc:multisig",
                 "function": "proposeRemoveUser",
                 "arguments": [
-                    "address:alice"
+                    "address:unknown"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "3"
+                    "4"
                 ],
                 "status": "",
                 "logs": "*",
@@ -27,13 +26,13 @@
         },
         {
             "step": "scCall",
-            "id": "rem-alice-sign-bob",
+            "id": "rem-unknown-sign-bob",
             "tx": {
                 "from": "address:bob",
                 "to": "sc:multisig",
                 "function": "sign",
                 "arguments": [
-                    "3"
+                    "4"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
@@ -48,13 +47,13 @@
         },
         {
             "step": "scCall",
-            "id": "rem-alice-sign-charlie",
+            "id": "rem-unknown-sign-charlie",
             "tx": {
                 "from": "address:charlie",
                 "to": "sc:multisig",
                 "function": "sign",
                 "arguments": [
-                    "3"
+                    "4"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
@@ -69,13 +68,13 @@
         },
         {
             "step": "scCall",
-            "id": "rem-alice--perform",
+            "id": "rem-unknown-perform",
             "tx": {
                 "from": "address:paul",
                 "to": "sc:multisig",
                 "function": "performAction",
                 "arguments": [
-                    "3"
+                    "4"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"

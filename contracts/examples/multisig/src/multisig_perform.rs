@@ -32,7 +32,17 @@ pub trait MultisigPerformModule:
     /// - convert between board member and proposer
     /// Will keep the board size and proposer count in sync.
     fn change_user_role(&self, action_id: usize, user_address: ManagedAddress, new_role: UserRole) {
-        let user_id = self.user_mapper().get_or_create_user(&user_address);
+        let user_id = if new_role == UserRole::None {
+            // avoid creating a new user just to delete it
+            let user_id = self.user_mapper().get_user_id(&user_address);
+            if user_id == 0 {
+                return;
+            }
+            user_id
+        } else {
+            self.user_mapper().get_or_create_user(&user_address)
+        };
+
         let user_id_to_role_mapper = self.user_id_to_role(user_id);
         let old_role = user_id_to_role_mapper.get();
         user_id_to_role_mapper.set(new_role);
