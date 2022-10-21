@@ -13,10 +13,11 @@ permissions:
 jobs:
   contracts:
     name: Contracts
-    uses: ElrondNetwork/elrond-actions/.github/workflows/contracts.yml@v1
+    uses: ElrondNetwork/elrond-actions/.github/workflows/contracts.yml@add-disable-reports-flag
     with:
       rust-toolchain: nightly-2022-10-12
       vmtools-version: v1.4.60
       extra-build-args: --ignore-eei-checks
+      disable-reports: true
     secrets:
       token: ${{ secrets.GITHUB_TOKEN }}
