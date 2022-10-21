@@ -1,4 +1,4 @@
-# elrond-wasm-rs
+# elrond-wasm-rs 111
 
 Rust smart contract library designed for Elrond's VM. Also provides a debugging mode with mocks.
 
