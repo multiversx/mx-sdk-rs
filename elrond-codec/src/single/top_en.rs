@@ -1,14 +1,10 @@
 use crate::{
     codec_err::EncodeError, DefaultErrorHandler, EncodeErrorHandler, NestedEncode,
-    PanicErrorHandler, TopEncodeOutput, TypeInfo,
+    PanicErrorHandler, TopEncodeOutput,
 };
 use alloc::vec::Vec;
 
 pub trait TopEncode: Sized {
-    // !INTERNAL USE ONLY!
-    #[doc(hidden)]
-    const TYPE_INFO: TypeInfo = TypeInfo::Unknown;
-
     /// Attempt to serialize the value to ouput.
     fn top_encode<O>(&self, output: O) -> Result<(), EncodeError>
     where

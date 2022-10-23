@@ -1,6 +1,4 @@
-use crate::{
-    codec_err::EncodeError, DefaultErrorHandler, EncodeErrorHandler, NestedEncodeOutput, TypeInfo,
-};
+use crate::{codec_err::EncodeError, DefaultErrorHandler, EncodeErrorHandler, NestedEncodeOutput};
 use alloc::vec::Vec;
 
 /// Trait that allows zero-copy write of value-references to slices in LE format.
@@ -8,11 +6,6 @@ use alloc::vec::Vec;
 /// Implementations should override `using_top_encoded` for value types and `dep_encode` and `size_hint` for allocating types.
 /// Wrapper types should override all methods.
 pub trait NestedEncode: Sized {
-    // !INTERNAL USE ONLY!
-    // This const helps SCALE to optimize the encoding/decoding by doing fake specialization.
-    #[doc(hidden)]
-    const TYPE_INFO: TypeInfo = TypeInfo::Unknown;
-
     /// NestedEncode to output, using the format of an object nested inside another structure.
     /// Does not provide compact version.
     fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {

@@ -1,16 +1,9 @@
 // use core::ops::Try;
 
-use crate::{
-    codec_err::DecodeError, DecodeErrorHandler, DefaultErrorHandler, NestedDecodeInput, TypeInfo,
-};
+use crate::{codec_err::DecodeError, DecodeErrorHandler, DefaultErrorHandler, NestedDecodeInput};
 
 /// Trait that allows zero-copy read of value-references from slices in LE format.
 pub trait NestedDecode: Sized {
-    // !INTERNAL USE ONLY!
-    // This const helps elrond-wasm to optimize the encoding/decoding by doing fake specialization.
-    #[doc(hidden)]
-    const TYPE_INFO: TypeInfo = TypeInfo::Unknown;
-
     /// Attempt to deserialise the value from input,
     /// using the format of an object nested inside another structure.
     /// In case of success returns the deserialized value and the number of bytes consumed during the operation.
