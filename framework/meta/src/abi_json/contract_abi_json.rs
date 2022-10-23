@@ -9,12 +9,16 @@ pub struct ContractAbiJson {
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub build_info: Option<BuildInfoAbiJson>,
+    #[serde(default)]
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub docs: Vec<String>,
     pub name: String,
+    #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub constructor: Option<ConstructorAbiJson>,
     pub endpoints: Vec<EndpointAbiJson>,
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Vec::is_empty")]
     pub events: Vec<EventAbiJson>,
     pub has_callback: bool,
     pub types: BTreeMap<String, TypeDescriptionJson>,
@@ -52,4 +56,8 @@ pub fn serialize_abi_to_json(abi_json: &ContractAbiJson) -> String {
     let mut serialized = String::from_utf8(ser.into_inner()).unwrap();
     serialized.push('\n');
     serialized
+}
+
+pub fn deserialize_abi_from_json(input: &str) -> Result<ContractAbiJson, String> {
+    serde_json::from_str(input).map_err(|err| err.to_string())
 }

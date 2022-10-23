@@ -1,17 +1,24 @@
 use multiversx_sc::abi::*;
 use serde::{Deserialize, Serialize};
 
+pub const TYPE_DESCRIPTION_JSON_TYPE_NOT_SPECIFIED: &str = "not-specified";
+pub const TYPE_DESCRIPTION_JSON_TYPE_ENUM: &str = "enum";
+pub const TYPE_DESCRIPTION_JSON_TYPE_STRUCT: &str = "struct";
+
 #[derive(Serialize, Deserialize)]
 pub struct TypeDescriptionJson {
     #[serde(rename = "type")]
     pub content_type: String,
 
+    #[serde(default)]
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub docs: Vec<String>,
 
+    #[serde(default)]
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub variants: Vec<EnumVariantDescriptionJson>,
 
+    #[serde(default)]
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub fields: Vec<StructFieldDescriptionJson>,
 }
@@ -19,9 +26,9 @@ pub struct TypeDescriptionJson {
 impl From<&TypeDescription> for TypeDescriptionJson {
     fn from(abi: &TypeDescription) -> Self {
         let content_type = match &abi.contents {
-            TypeContents::NotSpecified => "not_specified",
-            TypeContents::Enum(_) => "enum",
-            TypeContents::Struct(_) => "struct",
+            TypeContents::NotSpecified => TYPE_DESCRIPTION_JSON_TYPE_NOT_SPECIFIED,
+            TypeContents::Enum(_) => TYPE_DESCRIPTION_JSON_TYPE_ENUM,
+            TypeContents::Struct(_) => TYPE_DESCRIPTION_JSON_TYPE_STRUCT,
         };
         let mut type_desc_json = TypeDescriptionJson {
             content_type: content_type.to_string(),
@@ -51,8 +58,33 @@ impl From<&TypeDescription> for TypeDescriptionJson {
     }
 }
 
+impl TypeDescriptionJson {
+    pub fn to_type_description(&self, name: &str) -> TypeDescription {
+        TypeDescription {
+            docs: &[],
+            name: name.to_string(),
+            contents: match self.content_type.as_str() {
+                TYPE_DESCRIPTION_JSON_TYPE_STRUCT => TypeContents::Struct(
+                    self.fields
+                        .iter()
+                        .map(StructFieldDescriptionJson::to_struct_field_description)
+                        .collect(),
+                ),
+                TYPE_DESCRIPTION_JSON_TYPE_ENUM => TypeContents::Enum(
+                    self.variants
+                        .iter()
+                        .map(EnumVariantDescriptionJson::to_enum_variant_description)
+                        .collect(),
+                ),
+                _ => TypeContents::NotSpecified,
+            },
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize)]
 pub struct StructFieldDescriptionJson {
+    #[serde(default)]
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub docs: Vec<String>,
     pub name: String,
@@ -70,8 +102,19 @@ impl From<&StructFieldDescription> for StructFieldDescriptionJson {
     }
 }
 
+impl StructFieldDescriptionJson {
+    pub fn to_struct_field_description(&self) -> StructFieldDescription {
+        StructFieldDescription {
+            docs: &[],
+            name: self.name.clone(),
+            field_type: self.field_type.clone(),
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize)]
 pub struct EnumVariantDescriptionJson {
+    #[serde(default)]
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub docs: Vec<String>,
     pub name: String,
@@ -90,6 +133,21 @@ impl From<&EnumVariantDescription> for EnumVariantDescriptionJson {
                 .fields
                 .iter()
                 .map(StructFieldDescriptionJson::from)
+                .collect(),
+        }
+    }
+}
+
+impl EnumVariantDescriptionJson {
+    pub fn to_enum_variant_description(&self) -> EnumVariantDescription {
+        EnumVariantDescription {
+            docs: &[],
+            discriminant: self.discriminant,
+            name: "",
+            fields: self
+                .fields
+                .iter()
+                .map(StructFieldDescriptionJson::to_struct_field_description)
                 .collect(),
         }
     }

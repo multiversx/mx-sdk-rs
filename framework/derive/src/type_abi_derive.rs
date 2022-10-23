@@ -11,11 +11,11 @@ fn field_snippet(index: usize, field: &syn::Field) -> proc_macro2::TokenStream {
     };
     let field_ty = &field.ty;
     quote! {
-        field_descriptions.push(multiversx_sc::abi::StructFieldDescription {
-            docs: &[ #(#field_docs),* ],
-            name: #field_name_str,
-            field_type: <#field_ty>::type_name(),
-        });
+        field_descriptions.push(multiversx_sc::abi::StructFieldDescription::new(
+            &[ #(#field_docs),* ],
+            #field_name_str,
+            <#field_ty>::type_name(),
+        ));
         <#field_ty>::provide_type_descriptions(accumulator);
     }
 }

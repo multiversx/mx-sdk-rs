@@ -8,6 +8,7 @@ pub struct InputAbiJson {
     #[serde(rename = "type")]
     pub type_name: String,
     /// Bool that is only serialized when true
+    #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub multi_arg: Option<bool>,
 }
@@ -25,11 +26,13 @@ impl From<&InputAbi> for InputAbiJson {
 #[derive(Serialize, Deserialize)]
 pub struct OutputAbiJson {
     #[serde(rename = "name")]
+    #[serde(default)]
     #[serde(skip_serializing_if = "String::is_empty")]
     pub output_name: String,
     #[serde(rename = "type")]
     pub type_name: String,
     /// Bool that is only serialized when true
+    #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub multi_result: Option<bool>,
 }
@@ -55,9 +58,11 @@ pub enum EndpointMutabilityAbiJson {
 /// Same as EndpointAbiJson but ignores the name
 #[derive(Serialize, Deserialize)]
 pub struct ConstructorAbiJson {
+    #[serde(default)]
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub docs: Vec<String>,
     #[serde(rename = "payableInTokens")]
+    #[serde(default)]
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub payable_in_tokens: Vec<String>,
     pub inputs: Vec<InputAbiJson>,
@@ -81,17 +86,21 @@ impl From<&EndpointAbi> for ConstructorAbiJson {
 
 #[derive(Serialize, Deserialize)]
 pub struct EndpointAbiJson {
+    #[serde(default)]
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub docs: Vec<String>,
     pub name: String,
     #[serde(rename = "onlyOwner")]
+    #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub only_owner: Option<bool>,
     #[serde(rename = "onlyAdmin")]
+    #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub only_admin: Option<bool>,
     pub mutability: EndpointMutabilityAbiJson,
     #[serde(rename = "payableInTokens")]
+    #[serde(default)]
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub payable_in_tokens: Vec<String>,
     pub inputs: Vec<InputAbiJson>,
