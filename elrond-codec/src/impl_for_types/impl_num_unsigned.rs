@@ -1,8 +1,8 @@
 use crate::{
-    dep_encode_from_no_err, dep_encode_num_mimic, num_conv::universal_decode_number,
-    top_encode_from_no_err, DecodeError, DecodeErrorHandler, EncodeErrorHandler, NestedDecode,
-    NestedDecodeInput, NestedEncode, NestedEncodeNoErr, NestedEncodeOutput, TopDecode,
-    TopDecodeInput, TopEncode, TopEncodeNoErr, TopEncodeOutput, TypeInfo,
+    dep_encode_from_no_err, dep_encode_num_mimic, num_conv::universal_decode_number, DecodeError,
+    DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode,
+    NestedEncodeNoErr, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
+    TypeInfo,
 };
 
 // No reversing needed for u8, because it is a single byte.
@@ -34,13 +34,17 @@ dep_encode_num_unsigned! {u16, 16, TypeInfo::U16}
 
 macro_rules! top_encode_num_unsigned {
     ($num_type:ty, $size_in_bits:expr, $type_info:expr) => {
-        impl TopEncodeNoErr for $num_type {
+        impl TopEncode for $num_type {
             #[inline]
-            fn top_encode_no_err<O: TopEncodeOutput>(&self, output: O) {
+            fn top_encode_or_handle_err<O, H>(&self, output: O, _h: H) -> Result<(), H::HandledErr>
+            where
+                O: TopEncodeOutput,
+                H: EncodeErrorHandler,
+            {
                 output.set_u64(*self as u64);
+                Ok(())
             }
         }
-        top_encode_from_no_err! {$num_type, $type_info}
     };
 }
 

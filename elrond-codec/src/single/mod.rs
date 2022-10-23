@@ -18,7 +18,6 @@ pub use nested_en_output::NestedEncodeOutput;
 pub use top_de::{top_decode_from_nested, top_decode_from_nested_or_handle_err, TopDecode};
 pub use top_de_input::TopDecodeInput;
 pub use top_en::{
-    top_encode_from_nested, top_encode_no_err, top_encode_to_vec_u8, top_encode_to_vec_u8_or_panic,
-    TopEncode, TopEncodeNoErr,
+    top_encode_from_nested, top_encode_to_vec_u8, top_encode_to_vec_u8_or_panic, TopEncode,
 };
 pub use top_en_output::TopEncodeOutput;

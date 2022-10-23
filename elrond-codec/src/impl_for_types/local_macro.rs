@@ -35,22 +35,3 @@ macro_rules! dep_encode_from_no_err {
         }
     };
 }
-
-#[macro_export]
-macro_rules! top_encode_from_no_err {
-    ($type:ty, $type_info:expr) => {
-        impl TopEncode for $type {
-            const TYPE_INFO: TypeInfo = $type_info;
-
-            #[inline]
-            fn top_encode_or_handle_err<O, H>(&self, output: O, _h: H) -> Result<(), H::HandledErr>
-            where
-                O: TopEncodeOutput,
-                H: EncodeErrorHandler,
-            {
-                self.top_encode_no_err(output);
-                Ok(())
-            }
-        }
-    };
-}

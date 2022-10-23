@@ -1,21 +1,26 @@
 use crate::{
-    dep_encode_from_no_err, dep_encode_num_mimic, top_encode_from_no_err, DecodeError,
-    DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode,
-    NestedEncodeNoErr, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeNoErr,
-    TopEncodeOutput, TypeInfo,
+    dep_encode_from_no_err, dep_encode_num_mimic, DecodeError, DecodeErrorHandler,
+    EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode, NestedEncodeNoErr,
+    NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, TypeInfo,
 };
 
-impl TopEncodeNoErr for bool {
-    fn top_encode_no_err<O: TopEncodeOutput>(&self, output: O) {
+impl TopEncode for bool {
+    const TYPE_INFO: TypeInfo = TypeInfo::Bool;
+
+    #[inline]
+    fn top_encode_or_handle_err<O, H>(&self, output: O, _h: H) -> Result<(), H::HandledErr>
+    where
+        O: TopEncodeOutput,
+        H: EncodeErrorHandler,
+    {
         // only using signed because this one is implemented in Arwen, unsigned is not
         // TODO: change to set_u64
         // true -> 1i64
         // false -> 0i64
         output.set_i64(i64::from(*self));
+        Ok(())
     }
 }
-
-top_encode_from_no_err! {bool, TypeInfo::Bool}
 
 impl TopDecode for bool {
     const TYPE_INFO: TypeInfo = TypeInfo::Bool;
