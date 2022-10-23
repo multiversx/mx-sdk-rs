@@ -1,4 +1,7 @@
-use alloc::{string::String, vec::Vec};
+use alloc::{
+    string::{String, ToString},
+    vec::Vec,
+};
 
 #[derive(Clone, Debug)]
 pub struct TypeDescription {
@@ -43,6 +46,16 @@ pub struct EnumVariantDescription {
 #[derive(Clone, Debug)]
 pub struct StructFieldDescription {
     pub docs: &'static [&'static str],
-    pub name: &'static str,
+    pub name: String,
     pub field_type: String,
+}
+
+impl StructFieldDescription {
+    pub fn new(docs: &'static [&'static str], name: &str, field_type: String) -> Self {
+        Self {
+            docs,
+            name: name.to_string(),
+            field_type,
+        }
+    }
 }

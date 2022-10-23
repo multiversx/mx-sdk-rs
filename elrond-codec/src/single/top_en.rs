@@ -4,7 +4,7 @@ use crate::{
 };
 use alloc::vec::Vec;
 
-pub trait TopEncode: Sized {
+pub trait TopEncode {
     /// Attempt to serialize the value to ouput.
     fn top_encode<O>(&self, output: O) -> Result<(), EncodeError>
     where

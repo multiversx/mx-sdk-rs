@@ -1,0 +1,20 @@
+[package]
+name = "elrond-human-readable"
+version = "0.1.0"
+edition = "2018"
+
+authors = ["Elrond Network <contact@elrond.com>"]
+license = "GPL-3.0-only"
+readme = "README.md"
+repository = "https://github.com/ElrondNetwork/elrond-wasm-rs"
+homepage = "https://elrond.com/"
+documentation = "https://docs.elrond.com/"
+description = "Conversions from a human readable format to the elrond-codec"
+keywords = ["elrond", "blockchain", "contract"]
+categories = ["cryptography::cryptocurrencies", "development-tools"]
+
+[dependencies]
+
+[dependencies.elrond-wasm-debug]
+version = "=0.36.0"
+path = "../elrond-wasm-debug"
