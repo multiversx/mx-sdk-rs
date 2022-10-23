@@ -17,6 +17,14 @@ impl NestedEncode for u8 {
         dest.push_byte(*self);
         Ok(())
     }
+
+    fn if_u8<Output, If, Else, R>(input: Output, if_branch: If, _else_branch: Else) -> R
+    where
+        If: FnOnce(Output) -> R,
+        Else: FnOnce(Output) -> R,
+    {
+        if_branch(input)
+    }
 }
 
 dep_encode_num_mimic! {usize, u32, TypeInfo::USIZE}
@@ -79,6 +87,14 @@ impl NestedDecode for u8 {
         H: DecodeErrorHandler,
     {
         input.read_byte(h)
+    }
+
+    fn if_u8<Input, If, Else, R>(input: Input, if_branch: If, _else_branch: Else) -> R
+    where
+        If: FnOnce(Input) -> R,
+        Else: FnOnce(Input) -> R,
+    {
+        if_branch(input)
     }
 }
 

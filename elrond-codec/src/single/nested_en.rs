@@ -32,6 +32,21 @@ pub trait NestedEncode: Sized {
             Err(e) => Err(h.handle_error(e)),
         }
     }
+
+    /// Allows the framework to do monomorphisation of special cases where the data is of type `u8`.
+    ///
+    /// Especially useful for serializing byte arrays.
+    ///
+    /// Working with this also involves transmuting low-level data. Only use if you really know what you are doing!
+    #[doc(hidden)]
+    #[allow(unused_variables)]
+    fn if_u8<Output, If, Else, R>(output: Output, if_branch: If, else_branch: Else) -> R
+    where
+        If: FnOnce(Output) -> R,
+        Else: FnOnce(Output) -> R,
+    {
+        else_branch(output)
+    }
 }
 
 /// Convenience function for getting an object nested-encoded to a Vec<u8> directly.
