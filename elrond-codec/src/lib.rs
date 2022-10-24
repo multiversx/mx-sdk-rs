@@ -50,26 +50,3 @@ pub use multi::*;
 pub use single::*;
 
 pub use transmute::{boxed_slice_into_vec, vec_into_boxed_slice};
-
-/// !INTERNAL USE ONLY!
-///
-/// This enum provides type information to optimize encoding/decoding by doing fake specialization.
-#[doc(hidden)]
-#[allow(clippy::upper_case_acronyms)]
-#[derive(PartialEq, Eq)]
-pub enum TypeInfo {
-    /// Default value of [`NestedEncode::TYPE_INFO`] to not require implementors to set this value in the trait.
-    Unknown,
-    U8,
-    I8,
-    U16,
-    I16,
-    U32,
-    I32,
-    USIZE,
-    ISIZE,
-    U64,
-    I64,
-    Bool,
-    Unit,
-}
