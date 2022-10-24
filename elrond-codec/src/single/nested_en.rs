@@ -3,13 +3,6 @@ use crate::{
 };
 use alloc::vec::Vec;
 
-/// Most types will be encoded without any possibility of error.
-/// The trait is used to provide these implementations.
-/// This is currently not a substitute for implementing a proper NestedEncode.
-pub trait NestedEncodeNoErr: Sized {
-    fn dep_encode_no_err<O: NestedEncodeOutput>(&self, dest: &mut O);
-}
-
 /// Trait that allows zero-copy write of value-references to slices in LE format.
 ///
 /// Implementations should override `using_top_encoded` for value types and `dep_encode` and `size_hint` for allocating types.
