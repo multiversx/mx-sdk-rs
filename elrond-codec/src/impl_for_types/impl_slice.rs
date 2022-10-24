@@ -1,6 +1,6 @@
 use crate::{
     vec_into_boxed_slice, DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedEncode,
-    NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, TypeInfo,
+    NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
 };
 use alloc::{boxed::Box, vec::Vec};
 
@@ -17,20 +17,22 @@ where
     O: NestedEncodeOutput,
     H: EncodeErrorHandler,
 {
-    match T::TYPE_INFO {
-        TypeInfo::U8 => {
+    T::if_u8(
+        dest,
+        |dest| {
             // cast &[T] to &[u8]
             let slice: &[u8] =
                 unsafe { core::slice::from_raw_parts(slice.as_ptr() as *const u8, slice.len()) };
             dest.write(slice);
+            Ok(())
         },
-        _ => {
+        |dest| {
             for x in slice {
                 x.dep_encode_or_handle_err(dest, h)?;
             }
+            Ok(())
         },
-    }
-    Ok(())
+    )
 }
 
 impl<T: NestedEncode> TopEncode for &[T] {
@@ -39,24 +41,26 @@ impl<T: NestedEncode> TopEncode for &[T] {
         O: TopEncodeOutput,
         H: EncodeErrorHandler,
     {
-        match T::TYPE_INFO {
-            TypeInfo::U8 => {
+        T::if_u8(
+            output,
+            |output| {
                 // transmute to &[u8]
                 // save directly, without passing through the buffer
                 let slice: &[u8] =
                     unsafe { core::slice::from_raw_parts(self.as_ptr() as *const u8, self.len()) };
                 output.set_slice_u8(slice);
+                Ok(())
             },
-            _ => {
+            |output| {
                 // only using `dep_encode_slice_contents` for non-u8,
                 // because it always appends to the buffer,
                 // which is not necessary above
                 let mut buffer = output.start_nested_encode();
                 dep_encode_slice_contents(self, &mut buffer, h)?;
                 output.finalize_nested_encode(buffer);
+                Ok(())
             },
-        }
-        Ok(())
+        )
     }
 }
 
@@ -78,14 +82,18 @@ impl<T: NestedDecode> TopDecode for Box<[T]> {
         I: TopDecodeInput,
         H: DecodeErrorHandler,
     {
-        if let TypeInfo::U8 = T::TYPE_INFO {
-            let bytes = input.into_boxed_slice_u8();
-            let cast_bytes: Box<[T]> = unsafe { core::mem::transmute(bytes) };
-            Ok(cast_bytes)
-        } else {
-            let vec = Vec::<T>::top_decode_or_handle_err(input, h)?;
-            Ok(vec_into_boxed_slice(vec))
-        }
+        T::if_u8(
+            input,
+            |input| {
+                let bytes = input.into_boxed_slice_u8();
+                let cast_bytes: Box<[T]> = unsafe { core::mem::transmute(bytes) };
+                Ok(cast_bytes)
+            },
+            |input| {
+                let vec = Vec::<T>::top_decode_or_handle_err(input, h)?;
+                Ok(vec_into_boxed_slice(vec))
+            },
+        )
     }
 }
 

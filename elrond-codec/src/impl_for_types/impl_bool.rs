@@ -1,12 +1,10 @@
 use crate::{
     dep_encode_num_mimic, DecodeError, DecodeErrorHandler, EncodeErrorHandler, NestedDecode,
     NestedDecodeInput, NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode,
-    TopEncodeOutput, TypeInfo,
+    TopEncodeOutput,
 };
 
 impl TopEncode for bool {
-    const TYPE_INFO: TypeInfo = TypeInfo::Bool;
-
     #[inline]
     fn top_encode_or_handle_err<O, H>(&self, output: O, _h: H) -> Result<(), H::HandledErr>
     where
@@ -23,8 +21,6 @@ impl TopEncode for bool {
 }
 
 impl TopDecode for bool {
-    const TYPE_INFO: TypeInfo = TypeInfo::Bool;
-
     fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
     where
         I: TopDecodeInput,
@@ -38,11 +34,9 @@ impl TopDecode for bool {
     }
 }
 
-dep_encode_num_mimic! {bool, u8, TypeInfo::Bool}
+dep_encode_num_mimic! {bool, u8}
 
 impl NestedDecode for bool {
-    const TYPE_INFO: TypeInfo = TypeInfo::Bool;
-
     fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
     where
         I: NestedDecodeInput,

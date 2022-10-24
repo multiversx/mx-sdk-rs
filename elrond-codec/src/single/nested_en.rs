@@ -1,6 +1,4 @@
-use crate::{
-    codec_err::EncodeError, DefaultErrorHandler, EncodeErrorHandler, NestedEncodeOutput, TypeInfo,
-};
+use crate::{codec_err::EncodeError, DefaultErrorHandler, EncodeErrorHandler, NestedEncodeOutput};
 use alloc::vec::Vec;
 
 /// Trait that allows zero-copy write of value-references to slices in LE format.
@@ -8,11 +6,6 @@ use alloc::vec::Vec;
 /// Implementations should override `using_top_encoded` for value types and `dep_encode` and `size_hint` for allocating types.
 /// Wrapper types should override all methods.
 pub trait NestedEncode: Sized {
-    // !INTERNAL USE ONLY!
-    // This const helps SCALE to optimize the encoding/decoding by doing fake specialization.
-    #[doc(hidden)]
-    const TYPE_INFO: TypeInfo = TypeInfo::Unknown;
-
     /// NestedEncode to output, using the format of an object nested inside another structure.
     /// Does not provide compact version.
     fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
@@ -31,6 +24,21 @@ pub trait NestedEncode: Sized {
             Ok(()) => Ok(()),
             Err(e) => Err(h.handle_error(e)),
         }
+    }
+
+    /// Allows the framework to do monomorphisation of special cases where the data is of type `u8`.
+    ///
+    /// Especially useful for serializing byte arrays.
+    ///
+    /// Working with this also involves transmuting low-level data. Only use if you really know what you are doing!
+    #[doc(hidden)]
+    #[allow(unused_variables)]
+    fn if_u8<Output, If, Else, R>(output: Output, if_branch: If, else_branch: Else) -> R
+    where
+        If: FnOnce(Output) -> R,
+        Else: FnOnce(Output) -> R,
+    {
+        else_branch(output)
     }
 }
 

@@ -100,7 +100,7 @@ macro_rules! formatter_signed {
 }
 
 macro_rules! formatter_signed_hex {
-    ($num_ty:ty, $size_in_bits:expr, $type_info:expr) => {
+    ($num_ty:ty, $size_in_bits:expr) => {
         impl SCLowerHex for $num_ty {
             #[inline]
             fn fmt<F: super::FormatByteReceiver>(&self, f: &mut F) {
@@ -116,8 +116,8 @@ formatter_signed! {isize}
 formatter_signed! {i16}
 formatter_signed! {i8}
 
-formatter_signed_hex! {i64, 64, TypeInfo::I64}
-formatter_signed_hex! {i32, 32, TypeInfo::I32}
-formatter_signed_hex! {isize, 32, TypeInfo::ISIZE}
-formatter_signed_hex! {i16, 16, TypeInfo::I16}
-formatter_signed_hex! {i8, 8, TypeInfo::I8}
+formatter_signed_hex! {i64, 64}
+formatter_signed_hex! {i32, 32}
+formatter_signed_hex! {isize, 32}
+formatter_signed_hex! {i16, 16}
+formatter_signed_hex! {i8, 8}

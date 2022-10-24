@@ -1,11 +1,9 @@
 use crate::{
     DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode,
-    NestedEncodeOutput, TypeInfo,
+    NestedEncodeOutput,
 };
 
 impl NestedEncode for () {
-    const TYPE_INFO: TypeInfo = TypeInfo::Unit;
-
     #[inline]
     fn dep_encode_or_handle_err<O, H>(&self, _: &mut O, _h: H) -> Result<(), H::HandledErr>
     where
@@ -17,8 +15,6 @@ impl NestedEncode for () {
 }
 
 impl NestedDecode for () {
-    const TYPE_INFO: TypeInfo = TypeInfo::Unit;
-
     fn dep_decode_or_handle_err<I, H>(_input: &mut I, _h: H) -> Result<Self, H::HandledErr>
     where
         I: NestedDecodeInput,

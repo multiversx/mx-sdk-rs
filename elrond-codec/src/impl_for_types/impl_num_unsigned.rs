@@ -1,13 +1,11 @@
 use crate::{
     dep_encode_num_mimic, num_conv::universal_decode_number, DecodeError, DecodeErrorHandler,
     EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode, NestedEncodeOutput,
-    TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, TypeInfo,
+    TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
 };
 
 // No reversing needed for u8, because it is a single byte.
 impl NestedEncode for u8 {
-    const TYPE_INFO: TypeInfo = TypeInfo::U8;
-
     #[inline]
     fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, _h: H) -> Result<(), H::HandledErr>
     where
@@ -17,16 +15,22 @@ impl NestedEncode for u8 {
         dest.push_byte(*self);
         Ok(())
     }
+
+    fn if_u8<Output, If, Else, R>(input: Output, if_branch: If, _else_branch: Else) -> R
+    where
+        If: FnOnce(Output) -> R,
+        Else: FnOnce(Output) -> R,
+    {
+        if_branch(input)
+    }
 }
 
-dep_encode_num_mimic! {usize, u32, TypeInfo::USIZE}
+dep_encode_num_mimic! {usize, u32}
 
 // The main unsigned types need to be reversed before serializing.
 macro_rules! dep_encode_num_unsigned {
-    ($num_type:ty, $size_in_bits:expr, $type_info:expr) => {
+    ($num_type:ty, $size_in_bits:expr) => {
         impl NestedEncode for $num_type {
-            const TYPE_INFO: TypeInfo = $type_info;
-
             #[inline]
             fn dep_encode_or_handle_err<O, H>(
                 &self,
@@ -44,12 +48,12 @@ macro_rules! dep_encode_num_unsigned {
     };
 }
 
-dep_encode_num_unsigned! {u64, 64, TypeInfo::U64}
-dep_encode_num_unsigned! {u32, 32, TypeInfo::U32}
-dep_encode_num_unsigned! {u16, 16, TypeInfo::U16}
+dep_encode_num_unsigned! {u64, 64}
+dep_encode_num_unsigned! {u32, 32}
+dep_encode_num_unsigned! {u16, 16}
 
 macro_rules! top_encode_num_unsigned {
-    ($num_type:ty, $size_in_bits:expr, $type_info:expr) => {
+    ($num_type:ty, $size_in_bits:expr) => {
         impl TopEncode for $num_type {
             #[inline]
             fn top_encode_or_handle_err<O, H>(&self, output: O, _h: H) -> Result<(), H::HandledErr>
@@ -64,15 +68,13 @@ macro_rules! top_encode_num_unsigned {
     };
 }
 
-top_encode_num_unsigned! {u64, 64, TypeInfo::U64}
-top_encode_num_unsigned! {u32, 32, TypeInfo::U32}
-top_encode_num_unsigned! {usize, 32, TypeInfo::USIZE}
-top_encode_num_unsigned! {u16, 16, TypeInfo::U16}
-top_encode_num_unsigned! {u8, 8, TypeInfo::U8}
+top_encode_num_unsigned! {u64, 64}
+top_encode_num_unsigned! {u32, 32}
+top_encode_num_unsigned! {usize, 32}
+top_encode_num_unsigned! {u16, 16}
+top_encode_num_unsigned! {u8, 8}
 
 impl NestedDecode for u8 {
-    const TYPE_INFO: TypeInfo = TypeInfo::U8;
-
     fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
     where
         I: NestedDecodeInput,
@@ -80,13 +82,19 @@ impl NestedDecode for u8 {
     {
         input.read_byte(h)
     }
+
+    fn if_u8<Input, If, Else, R>(input: Input, if_branch: If, _else_branch: Else) -> R
+    where
+        If: FnOnce(Input) -> R,
+        Else: FnOnce(Input) -> R,
+    {
+        if_branch(input)
+    }
 }
 
 macro_rules! dep_decode_num_unsigned {
-    ($ty:ty, $num_bytes:expr, $type_info:expr) => {
+    ($ty:ty, $num_bytes:expr) => {
         impl NestedDecode for $ty {
-            const TYPE_INFO: TypeInfo = $type_info;
-
             fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
             where
                 I: NestedDecodeInput,
@@ -101,16 +109,14 @@ macro_rules! dep_decode_num_unsigned {
     };
 }
 
-dep_decode_num_unsigned!(u16, 2, TypeInfo::U16);
-dep_decode_num_unsigned!(u32, 4, TypeInfo::U32);
-dep_decode_num_unsigned!(usize, 4, TypeInfo::USIZE);
-dep_decode_num_unsigned!(u64, 8, TypeInfo::U64);
+dep_decode_num_unsigned!(u16, 2);
+dep_decode_num_unsigned!(u32, 4);
+dep_decode_num_unsigned!(usize, 4);
+dep_decode_num_unsigned!(u64, 8);
 
 macro_rules! top_decode_num_unsigned {
-    ($ty:ty, $bounds_ty:ty, $type_info:expr) => {
+    ($ty:ty, $bounds_ty:ty) => {
         impl TopDecode for $ty {
-            const TYPE_INFO: TypeInfo = $type_info;
-
             fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
             where
                 I: TopDecodeInput,
@@ -128,11 +134,11 @@ macro_rules! top_decode_num_unsigned {
     };
 }
 
-top_decode_num_unsigned!(u8, u8, TypeInfo::U8);
-top_decode_num_unsigned!(u16, u16, TypeInfo::U16);
-top_decode_num_unsigned!(u32, u32, TypeInfo::U32);
-top_decode_num_unsigned!(usize, u32, TypeInfo::USIZE); // even if usize can be 64 bits on some platforms, we always deserialize as max 32 bits
-top_decode_num_unsigned!(u64, u64, TypeInfo::U64);
+top_decode_num_unsigned!(u8, u8);
+top_decode_num_unsigned!(u16, u16);
+top_decode_num_unsigned!(u32, u32);
+top_decode_num_unsigned!(usize, u32); // even if usize can be 64 bits on some platforms, we always deserialize as max 32 bits
+top_decode_num_unsigned!(u64, u64);
 
 #[cfg(test)]
 pub mod tests {
