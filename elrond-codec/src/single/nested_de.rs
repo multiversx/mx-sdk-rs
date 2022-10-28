@@ -1,16 +1,9 @@
 // use core::ops::Try;
 
-use crate::{
-    codec_err::DecodeError, DecodeErrorHandler, DefaultErrorHandler, NestedDecodeInput, TypeInfo,
-};
+use crate::{codec_err::DecodeError, DecodeErrorHandler, DefaultErrorHandler, NestedDecodeInput};
 
 /// Trait that allows zero-copy read of value-references from slices in LE format.
 pub trait NestedDecode: Sized {
-    // !INTERNAL USE ONLY!
-    // This const helps elrond-wasm to optimize the encoding/decoding by doing fake specialization.
-    #[doc(hidden)]
-    const TYPE_INFO: TypeInfo = TypeInfo::Unknown;
-
     /// Attempt to deserialise the value from input,
     /// using the format of an object nested inside another structure.
     /// In case of success returns the deserialized value and the number of bytes consumed during the operation.
@@ -30,5 +23,20 @@ pub trait NestedDecode: Sized {
             Ok(v) => Ok(v),
             Err(e) => Err(h.handle_error(e)),
         }
+    }
+
+    /// Allows the framework to do monomorphisation of special cases where the data is of type `u8`.
+    ///
+    /// Especially useful for deserializing byte arrays.
+    ///
+    /// Working with this also involves transmuting low-level data. Only use if you really know what you are doing!
+    #[doc(hidden)]
+    #[allow(unused_variables)]
+    fn if_u8<Input, If, Else, R>(input: Input, if_branch: If, else_branch: Else) -> R
+    where
+        If: FnOnce(Input) -> R,
+        Else: FnOnce(Input) -> R,
+    {
+        else_branch(input)
     }
 }

@@ -1,28 +1,10 @@
 use crate::{
     codec_err::EncodeError, DefaultErrorHandler, EncodeErrorHandler, NestedEncode,
-    PanicErrorHandler, TopEncodeOutput, TypeInfo,
+    PanicErrorHandler, TopEncodeOutput,
 };
 use alloc::vec::Vec;
 
-/// Most types will be encoded without any possibility of error.
-/// The trait is used to provide these implementations.
-/// This is currently not a substitute for implementing a proper TopEncode.
-pub trait TopEncodeNoErr: Sized {
-    fn top_encode_no_err<O: TopEncodeOutput>(&self, output: O);
-}
-
-/// Quick encoding of a type that never fails on encoding.
-pub fn top_encode_no_err<T: TopEncodeNoErr>(obj: &T) -> Vec<u8> {
-    let mut bytes = Vec::<u8>::new();
-    obj.top_encode_no_err(&mut bytes);
-    bytes
-}
-
 pub trait TopEncode: Sized {
-    // !INTERNAL USE ONLY!
-    #[doc(hidden)]
-    const TYPE_INFO: TypeInfo = TypeInfo::Unknown;
-
     /// Attempt to serialize the value to ouput.
     fn top_encode<O>(&self, output: O) -> Result<(), EncodeError>
     where
