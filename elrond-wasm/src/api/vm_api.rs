@@ -26,7 +26,7 @@ pub trait VMApi:
     + Eq
 {
     fn has_location(location: EndpointLocationAbi) -> bool {
-        location == EndpointLocationAbi::MainContract
+        location == EndpointLocationAbi{location: "main"}
     }
 
     fn init_static() {

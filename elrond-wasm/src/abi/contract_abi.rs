@@ -34,7 +34,12 @@ impl ContractAbi {
                 .endpoints
                 .clone()
                 .iter()
-                .filter(|endpoint| endpoint.location == EndpointLocationAbi::MainContract)
+                .filter(|endpoint| {
+                    endpoint
+                        .locations
+                        .iter()
+                        .any(|item| item == &EndpointLocationAbi { location: "main" })
+                })
                 .cloned()
                 .collect(),
             events: self.events.clone(),
@@ -47,7 +52,7 @@ impl ContractAbi {
         self.constructors
             .iter()
             .chain(self.endpoints.iter())
-            .any(|endpoint| endpoint.location == location)
+            .any(|endpoint| endpoint.locations.iter().any(|item| item == &location))
     }
 
     #[must_use]
@@ -61,7 +66,7 @@ impl ContractAbi {
                 .endpoints
                 .clone()
                 .iter()
-                .filter(|endpoint| endpoint.location == location)
+                .filter(|endpoint| endpoint.locations.iter().any(|item| item == &location))
                 .cloned()
                 .collect(),
             events: self.events.clone(),

@@ -125,7 +125,7 @@ impl MetaConfig {
         let main_contract_crate_name = main_contract_abi.get_crate_name();
 
         let main_contract = ContractMetadata {
-            location: EndpointLocationAbi::MainContract,
+            location: EndpointLocationAbi { location: "main" },
             wasm_crate_name: format!("{}-wasm", &main_contract_crate_name),
             wasm_crate_path: "../wasm".to_string(),
             output_base_name: main_contract_crate_name.to_string(),
@@ -133,11 +133,11 @@ impl MetaConfig {
         };
 
         let view_contract_opt =
-            if original_contract_abi.location_exists(EndpointLocationAbi::ViewContract) {
-                let view_contract_abi =
-                    original_contract_abi.secondary_contract(EndpointLocationAbi::ViewContract);
+            if original_contract_abi.location_exists(EndpointLocationAbi { location: "view" }) {
+                let view_contract_abi = original_contract_abi
+                    .secondary_contract(EndpointLocationAbi { location: "view" });
                 Some(ContractMetadata {
-                    location: EndpointLocationAbi::ViewContract,
+                    location: EndpointLocationAbi { location: "view" },
                     wasm_crate_name: format!("{}-wasm", &main_contract_crate_name),
                     wasm_crate_path: "../wasm-view".to_string(),
                     output_base_name: format!("{}-view", main_contract_crate_name),

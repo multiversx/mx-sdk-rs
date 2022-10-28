@@ -176,7 +176,7 @@ where
     A: VMApi,
 {
     fn has_location(location: EndpointLocationAbi) -> bool {
-        location == EndpointLocationAbi::ViewContract
+        location == EndpointLocationAbi { location: "view" }
     }
 }
 
