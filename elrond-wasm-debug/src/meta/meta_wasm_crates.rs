@@ -56,8 +56,10 @@ fn write_wasm_src_lib(contract_metadata: &ContractMetadata) {
     endpoint_names.sort();
 
     let full_macro_name = match contract_metadata.location {
-        EndpointLocationAbi::MainContract => "elrond_wasm_node::wasm_endpoints!",
-        EndpointLocationAbi::ViewContract => "elrond_wasm_node::external_view_wasm_endpoints!",
+        EndpointLocationAbi { location: "main" } => "elrond_wasm_node::wasm_endpoints!",
+        EndpointLocationAbi { location: "view" } => {
+            "elrond_wasm_node::external_view_wasm_endpoints!"
+        },
     };
     let mut mandatory_endpoints = Vec::new();
     if contract_metadata.abi.has_callback {

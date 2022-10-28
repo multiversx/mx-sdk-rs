@@ -9,7 +9,7 @@ fn abi_tester_abi_generated_ok() {
     let original_contract_abi = <abi_tester::AbiProvider>::abi();
     let main_contract_abi = original_contract_abi.main_contract();
     let view_contract_abi =
-        original_contract_abi.secondary_contract(EndpointLocationAbi::ViewContract);
+        original_contract_abi.secondary_contract(EndpointLocationAbi { location: "view" });
 
     let main_contract_abi_json = abi_json::abi_to_json_dummy_environment(&main_contract_abi);
     let view_contract_abi_json = abi_json::abi_to_json_dummy_environment(&view_contract_abi);
