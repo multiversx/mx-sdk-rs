@@ -11,8 +11,8 @@ impl MetaConfig {
             self.build_args.wasm_opt = false;
         }
 
-        for contract in self.contracts{
-            build_contract(contract,&self.build_args, self.output_dir.as_str());
+        for contract in &self.contracts{
+            build_contract(&contract,&self.build_args, self.output_dir.as_str());
         }
     }
 }

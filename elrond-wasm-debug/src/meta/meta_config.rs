@@ -77,7 +77,7 @@ pub struct MetaConfig {
     pub build_args: BuildArgs,
     pub output_dir: String,
     pub snippets_dir: String,
-    pub contracts: &'static [ContractMetadata],
+    pub contracts: Vec<ContractMetadata>,
 }
 
 pub fn process_args(args: &[String]) -> BuildArgs {
@@ -125,21 +125,22 @@ impl MetaConfig {
 
         locations.dedup();
 
-        let contracts: Vec<ContractMetadata>;
+        let mut contracts: Vec<ContractMetadata> = vec![];
         let build_args = process_args(args);
 
         for EndpointLocationAbi {location} in locations{
             let contract_abi: ContractAbi;
-            let wasm_crate_path= "../wasm".to_string();
-            let contract_crate_name = contract_abi.get_crate_name();
+            let mut wasm_crate_path= "../wasm".to_string();
+            let contract_crate_name: String;
             match location{
                 "main" => { 
-                    contract_abi = original_contract_abi.main_contract();    
+                    contract_abi = original_contract_abi.main_contract(); 
+                    contract_crate_name = contract_abi.get_crate_name().to_string(); 
                 }
                 _=> {
-                    contract_abi = original_contract_abi.secondary_contract(EndpointLocationAbi { location });                             
+                    contract_abi = original_contract_abi.secondary_contract(EndpointLocationAbi { location });    
                     wasm_crate_path = format!("{}-{}", &wasm_crate_path, &location);
-                    contract_crate_name = &format!("{}-{}", &contract_crate_name, &location);
+                    contract_crate_name = format!("{}-{}", contract_abi.get_crate_name(), &location);
                 }
             }
 
@@ -147,7 +148,7 @@ impl MetaConfig {
                 location: EndpointLocationAbi { location },
                 wasm_crate_name: format!("{}-wasm", &contract_crate_name),
                 wasm_crate_path,
-                output_base_name: contract_crate_name.to_string(),
+                output_base_name: contract_crate_name,
                 abi: contract_abi.clone(),
             });
         }
@@ -156,7 +157,7 @@ impl MetaConfig {
             build_args,
             output_dir: "../output".to_string(),
             snippets_dir: "../interact-rs".to_string(),
-            contracts: &contracts,
+            contracts,
         }
     }
 }

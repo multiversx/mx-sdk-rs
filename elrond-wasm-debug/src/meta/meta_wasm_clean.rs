@@ -16,8 +16,8 @@ pub fn clean_contract_wasm(contract_metadata: &ContractMetadata) {
 
 impl MetaConfig {
     pub fn clean_wasm(&self) {
-        for contract in self.contracts{
-            clean_contract_wasm(contract);
+        for contract in &self.contracts{
+            clean_contract_wasm(&contract);
         }
 
         fs::remove_dir_all(&self.output_dir).expect("failed to remove output directory");

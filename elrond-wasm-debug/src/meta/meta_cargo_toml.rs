@@ -9,13 +9,13 @@ use super::meta_config::{ContractMetadata, MetaConfig};
 impl MetaConfig {
     pub fn create_wasm_secondary_cargo_toml(&self) {
         if let Some(main_contract) = &self.get_contract("main") {
-            for secondary_contract in self.contracts{
+            for secondary_contract in &self.contracts{
                 if secondary_contract.location == (EndpointLocationAbi { location: "main" }){
                     continue;
                 }
 
                 create_dir_all(&secondary_contract.wasm_crate_path).unwrap();
-                create_cargo_toml_from_source(main_contract, secondary_contract);
+                create_cargo_toml_from_source(main_contract, &secondary_contract);
             }
         }
     }

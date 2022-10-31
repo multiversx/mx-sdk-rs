@@ -33,7 +33,7 @@ impl MetaConfig {
         }
     }
 
-    pub fn get_contract(&self, location: &str) -> Option<&ContractMetadata>{
+    pub fn get_contract(&self, location:  &'static str) -> Option<&ContractMetadata>{
         self.contracts.iter().find(|&contract| contract.location == EndpointLocationAbi{location})
     }
 }

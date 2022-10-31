@@ -50,7 +50,7 @@ pub trait PauseProxy {
     where
         F: Fn(pause_proxy::Proxy<Self::Api>),
     {
-        for contract_address in self.contracts().iter() {
+        for contract_address in &self.contracts().iter() {
             f(self.pausable_contract().contract(contract_address));
         }
     }

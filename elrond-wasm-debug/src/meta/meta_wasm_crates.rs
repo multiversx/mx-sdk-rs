@@ -89,8 +89,8 @@ pub fn copy_to_wasm_unmanaged_ei() {
 
 impl MetaConfig {
     pub fn write_wasm_src_lib(&self) {
-        for contract in self.contracts{
-            write_wasm_src_lib(contract);
+        for contract in &self.contracts{
+            write_wasm_src_lib(&contract);
         }
     }
 }
