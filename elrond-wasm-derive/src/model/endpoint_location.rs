@@ -9,7 +9,7 @@ impl EndpointLocationMetadata {
     pub fn to_tokens(&self) -> proc_macro2::TokenStream {
         let mut locations: Vec<TokenStream> = vec![];
 
-        for item in self.locations.split("|") {           
+        for item in self.locations.split('|') {           
             locations.push(self.get_location_as_token(item));
         }
 
