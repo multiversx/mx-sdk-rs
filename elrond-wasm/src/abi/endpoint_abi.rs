@@ -43,7 +43,7 @@ pub struct EndpointAbi {
     pub only_owner: bool,
     pub only_admin: bool,
     pub mutability: EndpointMutabilityAbi,
-    pub locations: Vec<EndpointLocationAbi>,
+    pub locations: &'static[EndpointLocationAbi],
     pub payable_in_tokens: &'static [&'static str],
     pub inputs: Vec<InputAbi>,
     pub outputs: OutputAbis,

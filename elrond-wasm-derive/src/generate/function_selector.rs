@@ -4,12 +4,12 @@ use crate::model::{ContractTrait, EndpointLocationMetadata, Method, PublicRole};
 fn endpoint_match_arm(
     m: &Method,
     endpoint_name: &str,
-    location: &EndpointLocationMetadata,
+    locations: &EndpointLocationMetadata,
 ) -> proc_macro2::TokenStream {
     let fn_ident = &m.name;
     let call_method_ident = generate_call_method_name(fn_ident);
     let endpoint_name_str = array_literal(endpoint_name.to_string().as_bytes());
-    let location_tokens = location.to_tokens();
+    let location_tokens = locations.to_tokens();
     quote! {
         #endpoint_name_str if <Self::Api as elrond_wasm::api::VMApi>::has_location(#location_tokens) =>
         {
@@ -27,12 +27,12 @@ pub fn generate_function_selector_body(contract: &ContractTrait) -> proc_macro2:
             PublicRole::Init(_) => Some(endpoint_match_arm(
                 m,
                 "init",
-                &EndpointLocationMetadata::MainContract,
+                &EndpointLocationMetadata{locations: "main"},
             )),
             PublicRole::Endpoint(endpoint_metadata) => Some(endpoint_match_arm(
                 m,
                 endpoint_metadata.public_name.to_string().as_str(),
-                &endpoint_metadata.location,
+                &endpoint_metadata.locations,
             )),
             _ => None,
         })

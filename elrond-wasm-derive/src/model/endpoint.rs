@@ -13,7 +13,7 @@ pub struct EndpointMetadata {
     pub only_admin: bool,
     pub only_user_account: bool,
     pub mutability: EndpointMutabilityMetadata,
-    pub location: EndpointLocationMetadata,
+    pub locations: EndpointLocationMetadata,
 }
 
 #[derive(Clone, Debug)]

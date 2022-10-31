@@ -20,14 +20,8 @@ impl MetaConfig {
     pub fn write_abi(&self) {
         create_dir_all(&self.output_dir).unwrap();
 
-        if let Some(main_contract) = &self.main_contract {
-            write_contract_abi(main_contract, self.output_dir.as_str());
-            main_contract.create_dir_all();
-        }
-
-        if let Some(view_contract) = &self.view_contract {
-            write_contract_abi(view_contract, self.output_dir.as_str());
-            view_contract.create_dir_all();
-        }
+        for contract in &self.contracts{
+            write_contract_abi(contract, self.output_dir.as_str());
+            contract.create_dir_all();}
     }
 }

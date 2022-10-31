@@ -86,7 +86,7 @@ pub fn process_endpoint_attribute(
                 only_admin: pass_1_data.only_admin,
                 only_user_account: pass_1_data.only_user_account,
                 mutability: EndpointMutabilityMetadata::Mutable,
-                location: EndpointLocationMetadata::MainContract,
+                locations: EndpointLocationMetadata{locations: "main"},
             });
         })
         .is_some()
@@ -111,7 +111,7 @@ pub fn process_view_attribute(
                 only_admin: pass_1_data.only_admin,
                 only_user_account: pass_1_data.only_user_account,
                 mutability: EndpointMutabilityMetadata::Readonly,
-                location: EndpointLocationMetadata::MainContract,
+                locations: EndpointLocationMetadata{locations: "main"},
             });
         })
         .is_some()
@@ -136,7 +136,7 @@ pub fn process_external_view_attribute(
                 only_admin: pass_1_data.only_admin,
                 only_user_account: pass_1_data.only_user_account,
                 mutability: EndpointMutabilityMetadata::Readonly,
-                location: EndpointLocationMetadata::ViewContract,
+                locations: EndpointLocationMetadata{locations: "view"},
             });
         })
         .is_some()

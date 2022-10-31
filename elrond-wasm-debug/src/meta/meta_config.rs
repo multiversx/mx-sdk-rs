@@ -77,8 +77,7 @@ pub struct MetaConfig {
     pub build_args: BuildArgs,
     pub output_dir: String,
     pub snippets_dir: String,
-    pub main_contract: Option<ContractMetadata>,
-    pub view_contract: Option<ContractMetadata>,
+    pub contracts: [ContractMetadata],
 }
 
 pub fn process_args(args: &[String]) -> BuildArgs {
@@ -119,40 +118,42 @@ pub fn process_args(args: &[String]) -> BuildArgs {
 
 impl MetaConfig {
     pub fn create(original_contract_abi: &ContractAbi, args: &[String]) -> MetaConfig {
+        let locations  = original_contract_abi.constructors
+        .iter().map(|endpoint| endpoint.locations.iter())
+        .collect();
+
+        let contracts;
         let build_args = process_args(args);
 
-        let main_contract_abi = original_contract_abi.main_contract();
-        let main_contract_crate_name = main_contract_abi.get_crate_name();
+        for location in locations{
+            let contract_abi;
+            let wasm_crate_path= "../wasm".to_string();;
+            let contract_crate_name = contract_abi.get_crate_name();
+            match location{
+                "main"=> { 
+                    contract_abi = original_contract_abi.main_contract();    
+                }
+                "_"=> {
+                    contract_abi = original_contract_abi.secondary_contract(EndpointLocationAbi { location: &location });                             
+                    wasm_crate_path = format!("{}-{}", &wasm_crate_path, &location);
+                    contract_crate_name = format!("{}-{}", &contract_crate_name, &location);
+                }
+            }
 
-        let main_contract = ContractMetadata {
-            location: EndpointLocationAbi { location: "main" },
-            wasm_crate_name: format!("{}-wasm", &main_contract_crate_name),
-            wasm_crate_path: "../wasm".to_string(),
-            output_base_name: main_contract_crate_name.to_string(),
-            abi: main_contract_abi.clone(),
-        };
-
-        let view_contract_opt =
-            if original_contract_abi.location_exists(EndpointLocationAbi { location: "view" }) {
-                let view_contract_abi = original_contract_abi
-                    .secondary_contract(EndpointLocationAbi { location: "view" });
-                Some(ContractMetadata {
-                    location: EndpointLocationAbi { location: "view" },
-                    wasm_crate_name: format!("{}-wasm", &main_contract_crate_name),
-                    wasm_crate_path: "../wasm-view".to_string(),
-                    output_base_name: format!("{}-view", main_contract_crate_name),
-                    abi: view_contract_abi,
-                })
-            } else {
-                None
-            };
+            contracts.push(ContractMetadata {
+                location: EndpointLocationAbi { location: location },
+                wasm_crate_name: format!("{}-wasm", &contract_crate_name),
+                wasm_crate_path,
+                output_base_name: contract_crate_name.to_string(),
+                abi: contract_abi.clone(),
+            });
+        }
 
         MetaConfig {
             build_args,
             output_dir: "../output".to_string(),
             snippets_dir: "../interact-rs".to_string(),
-            main_contract: Some(main_contract),
-            view_contract: view_contract_opt,
+            contracts,
         }
     }
 }

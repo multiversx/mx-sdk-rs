@@ -55,9 +55,9 @@ fn write_wasm_src_lib(contract_metadata: &ContractMetadata) {
         .collect();
     endpoint_names.sort();
 
-    let full_macro_name = match contract_metadata.location {
+    let full_macro_name = match &contract_metadata.location {
         EndpointLocationAbi { location: "main" } => "elrond_wasm_node::wasm_endpoints!",
-        EndpointLocationAbi { location: "view" } => {
+        _default => {
             "elrond_wasm_node::external_view_wasm_endpoints!"
         },
     };
