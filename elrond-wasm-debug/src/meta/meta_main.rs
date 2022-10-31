@@ -14,7 +14,7 @@ pub fn perform<AbiObj: ContractAbiProvider>() {
 
     meta_config.write_abi();
 
-    meta_config.create_wasm_view_cargo_toml();
+    meta_config.create_wasm_secondary_cargo_toml();
 
     meta_config.write_wasm_src_lib();
 

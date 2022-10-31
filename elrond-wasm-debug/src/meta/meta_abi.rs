@@ -20,7 +20,7 @@ impl MetaConfig {
     pub fn write_abi(&self) {
         create_dir_all(&self.output_dir).unwrap();
 
-        for contract in &self.contracts{
+        for contract in self.contracts{
             write_contract_abi(contract, self.output_dir.as_str());
             contract.create_dir_all();}
     }

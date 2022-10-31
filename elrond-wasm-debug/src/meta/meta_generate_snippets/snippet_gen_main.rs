@@ -1,8 +1,8 @@
 use std::fs::File;
 
-use elrond_wasm::abi::ContractAbi;
+use elrond_wasm::abi::{ContractAbi, EndpointLocationAbi};
 
-use crate::meta::meta_config::MetaConfig;
+use crate::meta::meta_config::{MetaConfig, ContractMetadata};
 
 use super::{
     snippet_crate_gen::{
@@ -19,7 +19,7 @@ use super::{
 impl MetaConfig {
     // TODO: Handle overwrite flag
     pub fn generate_rust_snippets(&self, overwrite: bool) {
-        if let Some(contract) = &self.main_contract {
+        if let Some(contract) = &self.get_contract("main") {
             let crate_name = contract.output_base_name.clone().replace('-', "_");
             let wasm_output_file_path_expr = format!("\"file:../output/{}.wasm\"", &crate_name);
             let file =
@@ -31,6 +31,10 @@ impl MetaConfig {
                 &wasm_output_file_path_expr,
             );
         }
+    }
+
+    pub fn get_contract(&self, location: &str) -> Option<&ContractMetadata>{
+        self.contracts.iter().find(|&contract| contract.location == EndpointLocationAbi{location})
     }
 }
 

@@ -89,12 +89,8 @@ pub fn copy_to_wasm_unmanaged_ei() {
 
 impl MetaConfig {
     pub fn write_wasm_src_lib(&self) {
-        if let Some(main_contract) = &self.main_contract {
-            write_wasm_src_lib(main_contract);
-        }
-
-        if let Some(view_contract) = &self.view_contract {
-            write_wasm_src_lib(view_contract);
+        for contract in self.contracts{
+            write_wasm_src_lib(contract);
         }
     }
 }

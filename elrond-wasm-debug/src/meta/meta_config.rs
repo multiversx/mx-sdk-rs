@@ -77,7 +77,7 @@ pub struct MetaConfig {
     pub build_args: BuildArgs,
     pub output_dir: String,
     pub snippets_dir: String,
-    pub contracts: [ContractMetadata],
+    pub contracts: &'static [ContractMetadata],
 }
 
 pub fn process_args(args: &[String]) -> BuildArgs {
@@ -118,30 +118,33 @@ pub fn process_args(args: &[String]) -> BuildArgs {
 
 impl MetaConfig {
     pub fn create(original_contract_abi: &ContractAbi, args: &[String]) -> MetaConfig {
-        let locations  = original_contract_abi.constructors
-        .iter().map(|endpoint| endpoint.locations.iter())
+        let locations :Vec<EndpointLocationAbi> = original_contract_abi.constructors
+        .iter()
+        .map(|endpoint| endpoint.locations.iter().cloned()).flatten()
         .collect();
 
-        let contracts;
+        locations.dedup();
+
+        let contracts: Vec<ContractMetadata>;
         let build_args = process_args(args);
 
-        for location in locations{
-            let contract_abi;
-            let wasm_crate_path= "../wasm".to_string();;
+        for EndpointLocationAbi {location} in locations{
+            let contract_abi: ContractAbi;
+            let wasm_crate_path= "../wasm".to_string();
             let contract_crate_name = contract_abi.get_crate_name();
             match location{
-                "main"=> { 
+                "main" => { 
                     contract_abi = original_contract_abi.main_contract();    
                 }
-                "_"=> {
-                    contract_abi = original_contract_abi.secondary_contract(EndpointLocationAbi { location: &location });                             
+                _=> {
+                    contract_abi = original_contract_abi.secondary_contract(EndpointLocationAbi { location });                             
                     wasm_crate_path = format!("{}-{}", &wasm_crate_path, &location);
-                    contract_crate_name = format!("{}-{}", &contract_crate_name, &location);
+                    contract_crate_name = &format!("{}-{}", &contract_crate_name, &location);
                 }
             }
 
             contracts.push(ContractMetadata {
-                location: EndpointLocationAbi { location: location },
+                location: EndpointLocationAbi { location },
                 wasm_crate_name: format!("{}-wasm", &contract_crate_name),
                 wasm_crate_path,
                 output_base_name: contract_crate_name.to_string(),
@@ -153,7 +156,7 @@ impl MetaConfig {
             build_args,
             output_dir: "../output".to_string(),
             snippets_dir: "../interact-rs".to_string(),
-            contracts,
+            contracts: &contracts,
         }
     }
 }

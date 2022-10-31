@@ -11,12 +11,8 @@ impl MetaConfig {
             self.build_args.wasm_opt = false;
         }
 
-        if let Some(main_contract) = &self.main_contract {
-            build_contract(main_contract, &self.build_args, self.output_dir.as_str());
-        }
-
-        if let Some(view_contract) = &self.view_contract {
-            build_contract(view_contract, &self.build_args, self.output_dir.as_str());
+        for contract in self.contracts{
+            build_contract(contract,&self.build_args, self.output_dir.as_str());
         }
     }
 }
