@@ -32,7 +32,6 @@ impl ContractAbi {
             constructors: self.constructors.clone(),
             endpoints: self
                 .endpoints
-                .clone()
                 .iter()
                 .filter(|endpoint| {
                     endpoint
@@ -64,7 +63,6 @@ impl ContractAbi {
             constructors: Vec::new(),
             endpoints: self
                 .endpoints
-                .clone()
                 .iter()
                 .filter(|endpoint| endpoint.locations.iter().any(|item| item == &location))
                 .cloned()
