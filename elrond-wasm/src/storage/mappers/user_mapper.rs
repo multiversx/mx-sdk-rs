@@ -128,10 +128,9 @@ where
     pub fn get_or_create_user(&self, address: &ManagedAddress<SA>) -> usize {
         let mut user_id = self.get_user_id(address);
         if user_id == 0 {
-            let mut user_count = self.get_user_count();
-            user_count += 1;
-            self.set_user_count(user_count);
-            user_id = user_count;
+            let next_user_count = self.get_user_count() + 1;
+            self.set_user_count(next_user_count);
+            user_id = next_user_count;
             self.set_user_id(address, user_id);
             self.set_user_address(user_id, address);
         }
@@ -150,15 +149,15 @@ where
     {
         let mut user_count = self.get_user_count();
         for address in address_iter {
-            let mut user_id = self.get_user_id(&address);
+            let user_id = self.get_user_id(&address);
             if user_id > 0 {
                 user_id_lambda(user_id, false);
             } else {
                 user_count += 1;
-                user_id = user_count;
-                self.set_user_id(&address, user_id);
-                self.set_user_address(user_id, &address);
-                user_id_lambda(user_id, true);
+                let new_user_id = user_count;
+                self.set_user_id(&address, new_user_id);
+                self.set_user_address(new_user_id, &address);
+                user_id_lambda(new_user_id, true);
             }
         }
         self.set_user_count(user_count);

@@ -33,6 +33,14 @@ impl<T> OptionalValue<T> {
             OptionalValue::None => None,
         }
     }
+
+    pub fn is_some(&self) -> bool {
+        matches!(self, OptionalValue::Some(_))
+    }
+
+    pub fn is_none(&self) -> bool {
+        !self.is_some()
+    }
 }
 
 impl<T> TopEncodeMulti for OptionalValue<T>

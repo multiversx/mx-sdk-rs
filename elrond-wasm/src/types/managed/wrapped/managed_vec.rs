@@ -532,3 +532,15 @@ where
         result
     }
 }
+
+impl<M, V> Extend<V> for ManagedVec<M, V>
+where
+    M: ManagedTypeApi,
+    V: ManagedVecItem,
+{
+    fn extend<T: IntoIterator<Item = V>>(&mut self, iter: T) {
+        for elem in iter {
+            self.push(elem);
+        }
+    }
+}

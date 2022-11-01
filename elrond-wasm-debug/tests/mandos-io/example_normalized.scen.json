@@ -112,7 +112,20 @@
                                     "uri": [
                                         "str:www.something.com/funny.jpeg"
                                     ],
-                                    "attributes": "str:other_attributes"
+                                    "attributes": {
+                                        "0-u8": "u8:2",
+                                        "1-u16": "u16:1",
+                                        "2-u32": "u32:42",
+                                        "3-u64": "u32:42",
+                                        "4-str": "nested:str:lorem iposum",
+                                        "5-struc": {
+                                            "50-u8": "u8:2",
+                                            "51-u16": "u16:1",
+                                            "52-u32": "u32:42",
+                                            "53-u64": "u32:42",
+                                            "54-str": "nested:str:lorem iposum"
+                                        }
+                                    }
                                 }
                             ]
                         }
