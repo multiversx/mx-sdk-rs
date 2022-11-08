@@ -422,7 +422,11 @@ where
     ///
     /// The result (if any) is ignored.
     ///
-    /// Only works if the target contract is in the same shard.
+    /// Deprecated and will be removed soon. Use `let _: IgnoreValue = contract_call.execute_on_dest_context(...)` instead.
+    #[deprecated(
+        since = "0.36.1",
+        note = "Redundant method, use `let _: IgnoreValue = contract_call.execute_on_dest_context(...)` instead"
+    )]
     pub fn execute_on_dest_context_ignore_result(mut self) {
         self = self.convert_to_esdt_transfer_call();
         let _ = SendRawWrapper::<SA>::new().execute_on_dest_context_raw(
