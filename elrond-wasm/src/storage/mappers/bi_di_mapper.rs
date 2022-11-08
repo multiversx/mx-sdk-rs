@@ -100,11 +100,11 @@ where
     }
 
     pub fn has_id(&self, id: &K) -> bool {
-        self.id_set_mapper.contains(&id)
+        self.id_set_mapper.contains(id)
     }
 
     pub fn has_value(&self, value: &V) -> bool {
-        self.value_set_mapper.contains(&value)
+        self.value_set_mapper.contains(value)
     }
 
     pub fn insert(&mut self, id: K, value: V) -> bool {
