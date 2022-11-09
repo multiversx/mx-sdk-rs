@@ -125,17 +125,13 @@ fn test_token_merge() {
                 original_token_id_raw: ArrayVec::try_from(NFT_TOKEN_ID).unwrap(),
                 original_token_nonce: FIRST_NFT_NONCE,
                 original_token_amount: managed_biguint!(NFT_AMOUNT),
-                attributes_raw: managed_buffer!(FIRST_ATTRIBUTES),
                 royalties: managed_biguint!(FIRST_ROYALTIES),
-                uris: uris_to_managed_vec(FIRST_URIS),
             });
             expected_attributes.push(TokenAttributesInstance {
                 original_token_id_raw: ArrayVec::try_from(NFT_TOKEN_ID).unwrap(),
                 original_token_nonce: SECOND_NFT_NONCE,
                 original_token_amount: managed_biguint!(NFT_AMOUNT),
-                attributes_raw: managed_buffer!(SECOND_ATTRIBUTES),
                 royalties: managed_biguint!(SECOND_ROYALTIES),
-                uris: uris_to_managed_vec(SECOND_URIS),
             });
 
             let decoded_attributes = merged_token_data
@@ -256,17 +252,13 @@ fn test_token_merge() {
                 original_token_id_raw: ArrayVec::try_from(FUNGIBLE_TOKEN_ID).unwrap(),
                 original_token_nonce: 0,
                 original_token_amount: managed_biguint!(FUNGIBLE_AMOUNT),
-                attributes_raw: ManagedBuffer::new(),
                 royalties: managed_biguint!(0),
-                uris: ManagedVec::new(),
             });
             expected_attributes.push(TokenAttributesInstance {
                 original_token_id_raw: ArrayVec::try_from(NFT_TOKEN_ID).unwrap(),
                 original_token_nonce: FIRST_NFT_NONCE,
                 original_token_amount: managed_biguint!(NFT_AMOUNT),
-                attributes_raw: managed_buffer!(FIRST_ATTRIBUTES),
                 royalties: managed_biguint!(FIRST_ROYALTIES),
-                uris: uris_to_managed_vec(FIRST_URIS),
             });
 
             let decoded_attributes = merged_token_data
@@ -329,25 +321,19 @@ fn test_token_merge() {
                     original_token_id_raw: ArrayVec::try_from(FUNGIBLE_TOKEN_ID).unwrap(),
                     original_token_nonce: 0,
                     original_token_amount: managed_biguint!(FUNGIBLE_AMOUNT),
-                    attributes_raw: ManagedBuffer::new(),
                     royalties: managed_biguint!(0),
-                    uris: ManagedVec::new(),
                 });
                 expected_attributes.push(TokenAttributesInstance {
                     original_token_id_raw: ArrayVec::try_from(NFT_TOKEN_ID).unwrap(),
                     original_token_nonce: FIRST_NFT_NONCE,
                     original_token_amount: managed_biguint!(NFT_AMOUNT),
-                    attributes_raw: managed_buffer!(FIRST_ATTRIBUTES),
                     royalties: managed_biguint!(FIRST_ROYALTIES),
-                    uris: uris_to_managed_vec(FIRST_URIS),
                 });
                 expected_attributes.push(TokenAttributesInstance {
                     original_token_id_raw: ArrayVec::try_from(NFT_TOKEN_ID).unwrap(),
                     original_token_nonce: SECOND_NFT_NONCE,
                     original_token_amount: managed_biguint!(NFT_AMOUNT),
-                    attributes_raw: managed_buffer!(SECOND_ATTRIBUTES),
                     royalties: managed_biguint!(SECOND_ROYALTIES),
-                    uris: uris_to_managed_vec(SECOND_URIS),
                 });
 
                 let decoded_attributes = merged_token_data
@@ -524,25 +510,19 @@ fn partial_split_test() {
                 original_token_id_raw: ArrayVec::try_from(FUNGIBLE_TOKEN_ID).unwrap(),
                 original_token_nonce: 0,
                 original_token_amount: managed_biguint!(FUNGIBLE_AMOUNT),
-                attributes_raw: ManagedBuffer::new(),
                 royalties: managed_biguint!(0),
-                uris: ManagedVec::new(),
             });
             expected_attributes.push(TokenAttributesInstance {
                 original_token_id_raw: ArrayVec::try_from(NFT_TOKEN_ID).unwrap(),
                 original_token_nonce: FIRST_NFT_NONCE,
                 original_token_amount: managed_biguint!(NFT_AMOUNT),
-                attributes_raw: managed_buffer!(FIRST_ATTRIBUTES),
                 royalties: managed_biguint!(FIRST_ROYALTIES),
-                uris: uris_to_managed_vec(FIRST_URIS),
             });
             expected_attributes.push(TokenAttributesInstance {
                 original_token_id_raw: ArrayVec::try_from(NFT_TOKEN_ID).unwrap(),
                 original_token_nonce: SECOND_NFT_NONCE,
                 original_token_amount: managed_biguint!(NFT_AMOUNT),
-                attributes_raw: managed_buffer!(SECOND_ATTRIBUTES),
                 royalties: managed_biguint!(SECOND_ROYALTIES),
-                uris: uris_to_managed_vec(SECOND_URIS),
             });
 
             let decoded_attributes = merged_token_data
@@ -626,17 +606,13 @@ fn partial_split_test() {
                     original_token_id_raw: ArrayVec::try_from(FUNGIBLE_TOKEN_ID).unwrap(),
                     original_token_nonce: 0,
                     original_token_amount: managed_biguint!(FUNGIBLE_AMOUNT - 40),
-                    attributes_raw: ManagedBuffer::new(),
                     royalties: managed_biguint!(0),
-                    uris: ManagedVec::new(),
                 });
                 expected_attributes.push(TokenAttributesInstance {
                     original_token_id_raw: ArrayVec::try_from(NFT_TOKEN_ID).unwrap(),
                     original_token_nonce: SECOND_NFT_NONCE,
                     original_token_amount: managed_biguint!(NFT_AMOUNT),
-                    attributes_raw: managed_buffer!(SECOND_ATTRIBUTES),
                     royalties: managed_biguint!(SECOND_ROYALTIES),
-                    uris: uris_to_managed_vec(SECOND_URIS),
                 });
 
                 let decoded_attributes = merged_token_data
@@ -663,15 +639,6 @@ fn uris_to_vec(uris: &[&[u8]]) -> Vec<Vec<u8>> {
     let mut out = Vec::new();
     for uri in uris {
         out.push((*uri).to_vec());
-    }
-
-    out
-}
-
-fn uris_to_managed_vec<M: ManagedTypeApi>(uris: &[&[u8]]) -> ManagedVec<M, ManagedBuffer<M>> {
-    let mut out = ManagedVec::new();
-    for uri in uris {
-        out.push(ManagedBuffer::new_from_bytes(*uri));
     }
 
     out

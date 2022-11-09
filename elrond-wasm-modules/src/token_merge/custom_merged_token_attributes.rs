@@ -1,0 +1,44 @@
+elrond_wasm::imports!();
+
+use core::marker::PhantomData;
+
+use elrond_wasm::elrond_codec::{Empty, TopEncode};
+
+use super::merged_token_attributes::MergedTokenAttributes;
+
+pub trait AllMergeScTraits = super::merged_token_setup::MergedTokenSetupModule
+    + crate::default_issue_callbacks::DefaultIssueCallbacksModule
+    + crate::pause::PauseModule;
+
+pub trait MergedTokenAttributesCreator {
+    type ScType: AllMergeScTraits;
+    type AttributesType: TopEncode + TopDecode;
+
+    fn get_merged_token_attributes(
+        &self,
+        sc: &Self::ScType,
+        merged_token_id: &TokenIdentifier<<Self::ScType as ContractBase>::Api>,
+        merged_token_raw_attributes: &MergedTokenAttributes<<Self::ScType as ContractBase>::Api>,
+    ) -> Self::AttributesType;
+}
+
+pub struct DefaultMergedAttributesWrapper<Sc: AllMergeScTraits> {
+    _phantom: PhantomData<Sc>,
+}
+
+impl<Sc> MergedTokenAttributesCreator for DefaultMergedAttributesWrapper<Sc>
+where
+    Sc: AllMergeScTraits,
+{
+    type ScType = Sc;
+    type AttributesType = Empty;
+
+    fn get_merged_token_attributes(
+        &self,
+        _sc: &Self::ScType,
+        _merged_token_id: &TokenIdentifier<<Self::ScType as ContractBase>::Api>,
+        _merged_token_raw_attributes: &MergedTokenAttributes<<Self::ScType as ContractBase>::Api>,
+    ) -> Self::AttributesType {
+        Empty
+    }
+}
