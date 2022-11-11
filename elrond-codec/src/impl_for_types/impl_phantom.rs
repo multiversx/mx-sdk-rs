@@ -5,8 +5,6 @@ use crate::{
     NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
 };
 
-
-use crate::test_util::{check_dep_encode_decode, check_top_encode_decode};
 /// Empty structure with an empty bytes representation. Equivalent to `false`, `0` or `[u8; 0]`, but more explicit.
 ///
 /// Note: the unit type `()` would have naturally fit this role, but we decided to make the unit type multi-value only.
@@ -60,13 +58,11 @@ impl <T> NestedDecode for PhantomData<T> {
 }
 
 
-
-
 #[cfg(test)]
 pub mod tests {
-    use crate::test_util::{check_dep_encode_decode, check_top_encode_decode};
+    use crate as elrond_codec;
     use elrond_codec_derive::{TopDecode, TopEncode, NestedDecode, NestedEncode};
-    
+    use crate::test_util::{check_dep_encode_decode, check_top_encode_decode};
     use core::marker::PhantomData;
 
     #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, PartialEq, Eq, Clone, Debug)]
@@ -88,11 +84,11 @@ pub mod tests {
 
     #[test]
     fn test_dep_struc() {
-        check_dep_encode_decode(TestStructWithPhantom::<u64>{x: 42, y:42, _phantom: PhantomData::<u64>}, &[]);
+        check_dep_encode_decode(TestStructWithPhantom::<u64>{x: 42, y:42, _phantom: PhantomData::<u64>}, &[0, 0, 0, 42, 0, 0, 0, 0, 0, 0, 0, 42]);
     }
 
     #[test]
     fn test_top_struc() {
-        check_top_encode_decode(TestStructWithPhantom::<u64>{x: 42, y:42, _phantom: PhantomData::<u64>}, &[]);
+        check_top_encode_decode(TestStructWithPhantom::<u64>{x: 42, y:42, _phantom: PhantomData::<u64>}, &[0, 0, 0, 42, 0, 0, 0, 0, 0, 0, 0, 42]);
     }
 }
