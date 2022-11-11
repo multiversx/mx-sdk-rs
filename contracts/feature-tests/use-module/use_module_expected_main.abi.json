@@ -124,6 +124,19 @@
             ]
         },
         {
+            "name": "mergeTokensCustomAttributes",
+            "mutability": "mutable",
+            "payableInTokens": [
+                "*"
+            ],
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "EsdtTokenPayment"
+                }
+            ]
+        },
+        {
             "name": "splitTokens",
             "mutability": "mutable",
             "payableInTokens": [

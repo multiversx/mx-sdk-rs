@@ -1,6 +1,20 @@
 elrond_wasm::imports!();
+elrond_wasm::derive_imports!();
 
-use elrond_wasm_modules::token_merge::custom_merged_token_attributes::DefaultMergedAttributesWrapper;
+use core::marker::PhantomData;
+
+use elrond_wasm_modules::token_merge::{
+    custom_merged_token_attributes::{
+        AllMergeScTraits, DefaultMergedAttributesWrapper, MergedTokenAttributesCreator,
+    },
+    merged_token_instances::MergedTokenInstances,
+};
+
+#[derive(TypeAbi, TopEncode, TopDecode, PartialEq, Debug)]
+pub struct CustomAttributes {
+    pub first: u32,
+    pub second: u64,
+}
 
 #[elrond_wasm::module]
 pub trait TokenMergeModImpl:
@@ -14,6 +28,14 @@ pub trait TokenMergeModImpl:
     fn merge_tokens_endpoint(&self) -> EsdtTokenPayment {
         let payments = self.call_value().all_esdt_transfers();
         let attributes_creator = DefaultMergedAttributesWrapper::new();
+        self.merge_tokens(payments, &attributes_creator)
+    }
+
+    #[payable("*")]
+    #[endpoint(mergeTokensCustomAttributes)]
+    fn merge_tokens_custom_attributes_endpoint(&self) -> EsdtTokenPayment {
+        let payments = self.call_value().all_esdt_transfers();
+        let attributes_creator = CustomMergedAttributesWrapper::new();
         self.merge_tokens(payments, &attributes_creator)
     }
 
@@ -33,5 +55,40 @@ pub trait TokenMergeModImpl:
         let payment = self.call_value().single_esdt();
         let attributes_creator = DefaultMergedAttributesWrapper::new();
         self.split_token_partial(payment, tokens_to_remove, &attributes_creator)
+    }
+}
+
+pub struct CustomMergedAttributesWrapper<Sc: AllMergeScTraits> {
+    _phantom: PhantomData<Sc>,
+}
+
+impl<Sc> CustomMergedAttributesWrapper<Sc>
+where
+    Sc: AllMergeScTraits,
+{
+    pub fn new() -> Self {
+        Self {
+            _phantom: PhantomData,
+        }
+    }
+}
+
+impl<Sc> MergedTokenAttributesCreator for CustomMergedAttributesWrapper<Sc>
+where
+    Sc: AllMergeScTraits,
+{
+    type ScType = Sc;
+    type AttributesType = CustomAttributes;
+
+    fn get_merged_token_attributes(
+        &self,
+        _sc: &Self::ScType,
+        _merged_token_id: &TokenIdentifier<<Self::ScType as ContractBase>::Api>,
+        _merged_token_raw_attributes: &MergedTokenInstances<<Self::ScType as ContractBase>::Api>,
+    ) -> Self::AttributesType {
+        CustomAttributes {
+            first: 5u32,
+            second: 10u64,
+        }
     }
 }
