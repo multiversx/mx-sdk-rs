@@ -2,10 +2,10 @@ elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
 pub mod custom_merged_token_attributes;
-pub mod merged_token_attributes;
+pub mod merged_token_instances;
 pub mod merged_token_setup;
 
-use merged_token_attributes::{MergedTokenAttributes, TokenAttributesInstance, MAX_MERGED_TOKENS};
+use merged_token_instances::{MergedTokenInstances, MAX_MERGED_TOKENS};
 
 use self::custom_merged_token_attributes::MergedTokenAttributesCreator;
 
@@ -23,7 +23,7 @@ pub trait TokenMergeModule:
         &self,
         payments: ManagedVec<EsdtTokenPayment>,
         attr_creator: &AttributesCreator,
-    ) -> EsdtTokenPayment<Self::Api> {
+    ) -> EsdtTokenPayment {
         self.require_not_paused();
         require!(
             payments.len() >= MIN_MERGE_PAYMENTS,
@@ -37,21 +37,21 @@ pub trait TokenMergeModule:
         let mut already_merged_tokens = ArrayVec::<_, MAX_MERGED_TOKENS>::new();
         let mut single_tokens = ArrayVec::<_, MAX_MERGED_TOKENS>::new();
         for token in &payments {
-            let token_data = self.blockchain().get_esdt_token_data(
-                &sc_address,
-                &token.token_identifier,
-                token.token_nonce,
-            );
-
             if token.token_identifier == merged_token_id {
+                let token_data = self.blockchain().get_esdt_token_data(
+                    &sc_address,
+                    &token.token_identifier,
+                    token.token_nonce,
+                );
+
                 require!(
                     token_data.creator == sc_address,
                     SC_DOES_NOT_OWN_NFT_PARTS_ERR_MSG
                 );
 
-                let merged_inst_attributes: MergedTokenAttributes<Self::Api> =
-                    token_data.decode_attributes();
-                already_merged_tokens.push(merged_inst_attributes);
+                let merged_instances =
+                    MergedTokenInstances::decode_from_first_uri(&token_data.uris);
+                already_merged_tokens.push(merged_instances);
             } else {
                 require!(
                     token_whitelist.contains(&token.token_identifier),
@@ -59,23 +59,21 @@ pub trait TokenMergeModule:
                     (token.token_identifier)
                 );
 
-                let single_token_inst_attributes =
-                    TokenAttributesInstance::from_single_token(token, token_data.royalties);
-                single_tokens.push((single_token_inst_attributes, token_data.creator));
+                single_tokens.push(token);
             }
         }
 
-        let mut merged_attributes = MergedTokenAttributes::new();
+        let mut all_merged_instances = MergedTokenInstances::new();
         for already_merged in already_merged_tokens {
-            merged_attributes.merge_with_other(already_merged);
+            all_merged_instances.merge_with_other(already_merged);
         }
 
-        for (single_token_instance, creator) in single_tokens {
-            merged_attributes.add_or_update_instance(single_token_instance, &creator);
+        for single_token_instance in single_tokens {
+            all_merged_instances.add_or_update_instance(single_token_instance);
         }
 
         let merged_token_payment =
-            self.create_merged_token(merged_token_id, &merged_attributes, attr_creator);
+            self.create_merged_token(merged_token_id, &all_merged_instances, attr_creator);
         let caller = self.blockchain().get_caller();
         self.send()
             .direct_non_zero_esdt_payment(&caller, &merged_token_payment);
@@ -107,15 +105,10 @@ pub trait TokenMergeModule:
                 SC_DOES_NOT_OWN_NFT_PARTS_ERR_MSG
             );
 
-            let previously_merged_instance_attributes: MergedTokenAttributes<Self::Api> =
-                token_data.decode_attributes();
+            let previously_merged_instance_attributes =
+                MergedTokenInstances::decode_from_first_uri(&token_data.uris);
             for inst in previously_merged_instance_attributes.into_instances() {
-                let original_token = EsdtTokenPayment::new(
-                    TokenIdentifier::from_esdt_bytes(inst.original_token_id_raw.as_slice()),
-                    inst.original_token_nonce,
-                    inst.original_token_amount,
-                );
-                output_payments.push(original_token);
+                output_payments.push(inst);
             }
 
             self.send()
@@ -149,8 +142,8 @@ pub trait TokenMergeModule:
             SC_DOES_NOT_OWN_NFT_PARTS_ERR_MSG
         );
 
-        let mut merged_attributes: MergedTokenAttributes<Self::Api> =
-            merged_token_data.decode_attributes();
+        let mut merged_attributes =
+            MergedTokenInstances::decode_from_first_uri(&merged_token_data.uris);
         for token in &tokens_to_remove {
             merged_attributes.deduct_balance_for_instance(&token);
         }

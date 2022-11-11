@@ -10,6 +10,7 @@ mod only_admin_derived_mod;
 mod only_admin_mod;
 mod only_owner_derived_mod;
 mod only_owner_mod;
+pub mod token_merge_mod_impl;
 
 elrond_wasm::imports!();
 
@@ -31,6 +32,7 @@ pub trait UseModule:
     + only_admin_mod::OnlyAdminTestModule
     + only_admin_derived_mod::OnlyAdminDerivedTestModule
     + ongoing_operation_mod_example::OngoingOperationModExample
+    + token_merge_mod_impl::TokenMergeModImpl
     + elrond_wasm_modules::claim_developer_rewards::ClaimDeveloperRewardsModule
     + elrond_wasm_modules::dns::DnsModule
     + elrond_wasm_modules::esdt::EsdtModule
