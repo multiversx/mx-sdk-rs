@@ -5,7 +5,7 @@ use crate::model::{
 
 use super::{
     attributes::{
-        is_callback_raw, is_init, is_only_admin, is_only_owner, is_only_user_account,
+        is_callback_raw, is_init, is_only_admin, is_only_owner, is_only_user_account, 
         CallbackAttribute, EndpointAttribute, ExternalViewAttribute, OutputNameAttribute,
         ViewAttribute, TargetAttribute, 
     },
@@ -67,12 +67,13 @@ pub fn process_only_user_account_attribute(
     is_only_user_account
 }
 
-pub fn process_target(attr: &syn::Attribute) -> String{
+pub fn process_target_attribute(
+    attr: &syn::Attribute,
+    pass_1_data: &mut MethodAttributesPass1,) -> bool {
     
-    if let Some(TargetAttribute{location}) = TargetAttribute::parse(attr){
-        return location;
-    }
-    "main".to_string()    
+    TargetAttribute::parse(attr).map(|target_attr|{
+        pass_1_data.target = target_attr.location
+    }).is_some()
 }
 
 pub fn process_endpoint_attribute(
@@ -80,7 +81,6 @@ pub fn process_endpoint_attribute(
     pass_1_data: &MethodAttributesPass1,
     method: &mut Method,
 ) -> bool {
-    let locations = process_target(attr);
 
     EndpointAttribute::parse(attr)
         .map(|endpoint_attr| {
@@ -96,7 +96,7 @@ pub fn process_endpoint_attribute(
                 only_admin: pass_1_data.only_admin,
                 only_user_account: pass_1_data.only_user_account,
                 mutability: EndpointMutabilityMetadata::Mutable,
-                locations: EndpointLocationMetadata{locations},
+                locations: EndpointLocationMetadata { locations: pass_1_data.target.clone() },
             });
         })
         .is_some()
@@ -107,7 +107,6 @@ pub fn process_view_attribute(
     pass_1_data: &MethodAttributesPass1,
     method: &mut Method,
 ) -> bool {
-    let locations = process_target(attr);
     ViewAttribute::parse(attr)
         .map(|view_attribute| {
             check_single_role(&*method);
@@ -122,7 +121,7 @@ pub fn process_view_attribute(
                 only_admin: pass_1_data.only_admin,
                 only_user_account: pass_1_data.only_user_account,
                 mutability: EndpointMutabilityMetadata::Readonly,
-                locations: EndpointLocationMetadata{locations},
+                locations: EndpointLocationMetadata { locations: pass_1_data.target.clone() },
             });
         })
         .is_some()
