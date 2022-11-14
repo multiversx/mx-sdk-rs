@@ -77,6 +77,36 @@ version = "0.1.0"
     .unwrap();
 }
 
+pub(crate) fn create_snippets_multi_contract_toml(
+    snippets_folder_path: &str,
+    contract_crate_name: &str,
+    overwrite: bool,
+) {
+    let multi_contract_toml_path = format!("{}/multicontract.toml", snippets_folder_path);
+    let mut file = if overwrite {
+        File::create(&multi_contract_toml_path).unwrap()
+    } else {
+        match File::options()
+            .create_new(true)
+            .write(true)
+            .open(&multi_contract_toml_path)
+        {
+            Ok(f) => f,
+            Err(_) => return,
+        }
+    };
+
+    writeln!(
+        &mut file,
+        r#"
+[dependencies.{}]
+path = ".."
+"#,
+        contract_crate_name
+    )
+    .unwrap();
+}
+
 pub(crate) fn create_src_folder(snippets_folder_path: &str) {
     // returns error if folder already exists, so we ignore the result
     let src_folder_path = format!("{}/src", snippets_folder_path);

@@ -12,14 +12,14 @@ use super::{
     process_endpoint_attribute, process_external_view_attribute, process_init_attribute,
     process_only_admin_attribute, process_only_owner_attribute,
     process_only_user_account_attribute, process_output_names_attribute, process_payable_attribute,
-    process_view_attribute,
+    process_view_attribute, process_target, 
 };
 pub struct MethodAttributesPass1 {
     pub method_name: String,
     pub payable: MethodPayableMetadata,
     pub only_owner: bool,
     pub only_admin: bool,
-    pub only_user_account: bool,
+    pub only_user_account: bool
 }
 
 pub fn process_method(m: &syn::TraitItemMethod, trait_attributes: &TraitProperties) -> Method {
@@ -38,6 +38,7 @@ pub fn process_method(m: &syn::TraitItemMethod, trait_attributes: &TraitProperti
         only_admin: trait_attributes.only_admin,
         only_user_account: trait_attributes.only_user_account,
     };
+    
     let mut first_pass_unprocessed_attributes = Vec::new();
 
     process_attributes_first_pass(
@@ -124,3 +125,4 @@ fn process_attribute_second_pass(
         || process_storage_clear_attribute(attr, method)
         || process_output_names_attribute(attr, method)
 }
+

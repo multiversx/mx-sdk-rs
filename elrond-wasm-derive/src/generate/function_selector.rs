@@ -27,7 +27,7 @@ pub fn generate_function_selector_body(contract: &ContractTrait) -> proc_macro2:
             PublicRole::Init(_) => Some(endpoint_match_arm(
                 m,
                 "init",
-                &EndpointLocationMetadata{locations: "main"},
+                &EndpointLocationMetadata{locations: "main".to_string()},
             )),
             PublicRole::Endpoint(endpoint_metadata) => Some(endpoint_match_arm(
                 m,

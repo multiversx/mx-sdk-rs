@@ -80,7 +80,7 @@ fn generate_endpoint_snippets(contract: &ContractTrait) -> Vec<proc_macro2::Toke
                     false,
                     false,
                     EndpointMutabilityMetadata::Mutable,
-                EndpointLocationMetadata{locations: "main"},
+                EndpointLocationMetadata{locations: "main".to_string()},
                 );
                 Some(quote! {
                     #endpoint_def

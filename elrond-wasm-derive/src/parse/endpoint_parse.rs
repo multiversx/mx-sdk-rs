@@ -7,7 +7,7 @@ use super::{
     attributes::{
         is_callback_raw, is_init, is_only_admin, is_only_owner, is_only_user_account,
         CallbackAttribute, EndpointAttribute, ExternalViewAttribute, OutputNameAttribute,
-        ViewAttribute,
+        ViewAttribute, TargetAttribute, 
     },
     MethodAttributesPass1,
 };
@@ -67,11 +67,21 @@ pub fn process_only_user_account_attribute(
     is_only_user_account
 }
 
+pub fn process_target(attr: &syn::Attribute) -> String{
+    
+    if let Some(TargetAttribute{location}) = TargetAttribute::parse(attr){
+        return location;
+    }
+    "main".to_string()    
+}
+
 pub fn process_endpoint_attribute(
     attr: &syn::Attribute,
     pass_1_data: &MethodAttributesPass1,
     method: &mut Method,
 ) -> bool {
+    let locations = process_target(attr);
+
     EndpointAttribute::parse(attr)
         .map(|endpoint_attr| {
             check_single_role(&*method);
@@ -86,7 +96,7 @@ pub fn process_endpoint_attribute(
                 only_admin: pass_1_data.only_admin,
                 only_user_account: pass_1_data.only_user_account,
                 mutability: EndpointMutabilityMetadata::Mutable,
-                locations: EndpointLocationMetadata{locations: "main"},
+                locations: EndpointLocationMetadata{locations},
             });
         })
         .is_some()
@@ -97,6 +107,7 @@ pub fn process_view_attribute(
     pass_1_data: &MethodAttributesPass1,
     method: &mut Method,
 ) -> bool {
+    let locations = process_target(attr);
     ViewAttribute::parse(attr)
         .map(|view_attribute| {
             check_single_role(&*method);
@@ -111,7 +122,7 @@ pub fn process_view_attribute(
                 only_admin: pass_1_data.only_admin,
                 only_user_account: pass_1_data.only_user_account,
                 mutability: EndpointMutabilityMetadata::Readonly,
-                locations: EndpointLocationMetadata{locations: "main"},
+                locations: EndpointLocationMetadata{locations},
             });
         })
         .is_some()
@@ -136,7 +147,7 @@ pub fn process_external_view_attribute(
                 only_admin: pass_1_data.only_admin,
                 only_user_account: pass_1_data.only_user_account,
                 mutability: EndpointMutabilityMetadata::Readonly,
-                locations: EndpointLocationMetadata{locations: "view"},
+                locations: EndpointLocationMetadata{locations: "view".to_string()},
             });
         })
         .is_some()

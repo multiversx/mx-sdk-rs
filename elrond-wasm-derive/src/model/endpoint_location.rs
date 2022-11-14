@@ -2,7 +2,7 @@ use proc_macro2::TokenStream;
 
 #[derive(Clone, Debug)]
 pub struct EndpointLocationMetadata {
-    pub locations: &'static str,
+    pub locations: String,
 }
 
 impl EndpointLocationMetadata {

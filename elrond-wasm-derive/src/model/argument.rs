@@ -59,4 +59,5 @@ pub struct TraitProperties {
     pub only_owner: bool,
     pub only_admin: bool,
     pub only_user_account: bool,
+    pub target: String,
 }

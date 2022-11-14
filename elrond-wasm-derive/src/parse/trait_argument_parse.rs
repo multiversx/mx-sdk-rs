@@ -18,8 +18,9 @@ fn process_trait_attribute(
     attr: &syn::Attribute,
     trait_arg_metadata: &mut TraitProperties,
 ) -> bool {
+    process_target_argument(attr, trait_arg_metadata); 
     process_only_owner_argument(attr, trait_arg_metadata)
-        || process_only_admin_argument(attr, trait_arg_metadata)
+    ||  process_only_admin_argument(attr, trait_arg_metadata)
 }
 
 fn process_only_owner_argument(attr: &syn::Attribute, arg_metadata: &mut TraitProperties) -> bool {
@@ -36,4 +37,12 @@ fn process_only_admin_argument(attr: &syn::Attribute, arg_metadata: &mut TraitPr
         arg_metadata.only_admin = true;
     }
     has_attr
+}
+
+fn process_target_argument(attr: &syn::Attribute, arg_metadata: &mut TraitProperties) -> bool {
+    TargetAttribute::parse(attr)
+    .map(|target_attr| {
+        arg_metadata.target = target_attr.location;
+    })
+    .is_some()
 }
