@@ -51,7 +51,7 @@ pub fn process_only_admin_attribute(
 ) -> bool {
     let is_only_admin = is_only_admin(attr);
     if is_only_admin {
-        pass_1_data.only_admin = true;
+    pass_1_data.only_admin = true;
     }
     is_only_admin
 }
@@ -71,6 +71,7 @@ pub fn process_target_attribute(
     attr: &syn::Attribute,
     pass_1_data: &mut MethodAttributesPass1,) -> bool {
     
+    pass_1_data.target = "main".to_string();
     TargetAttribute::parse(attr).map(|target_attr|{
         pass_1_data.target = target_attr.location
     }).is_some()
