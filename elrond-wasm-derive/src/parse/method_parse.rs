@@ -125,4 +125,3 @@ fn process_attribute_second_pass(
         || process_storage_clear_attribute(attr, method)
         || process_output_names_attribute(attr, method)
 }
-

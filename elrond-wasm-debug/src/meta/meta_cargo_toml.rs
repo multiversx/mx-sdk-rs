@@ -15,7 +15,7 @@ impl MetaConfig {
                 }
 
                 create_dir_all(&secondary_contract.wasm_crate_path).unwrap();
-                create_cargo_toml_from_source(main_contract, &secondary_contract);
+                create_cargo_toml_from_source(main_contract, secondary_contract);
             }
         }
     }

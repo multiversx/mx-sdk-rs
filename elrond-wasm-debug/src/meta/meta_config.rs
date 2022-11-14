@@ -120,7 +120,7 @@ impl MetaConfig {
     pub fn create(original_contract_abi: &ContractAbi, args: &[String]) -> MetaConfig {
         let mut locations :Vec<EndpointLocationAbi> = original_contract_abi.constructors
         .iter()
-        .map(|endpoint| endpoint.locations.iter().cloned()).flatten()
+        .flat_map(|endpoint| endpoint.locations.iter().cloned())
         .collect();
 
         locations.dedup();

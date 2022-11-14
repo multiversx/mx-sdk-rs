@@ -12,7 +12,7 @@ impl MetaConfig {
         }
 
         for contract in &self.contracts{
-            build_contract(&contract,&self.build_args, self.output_dir.as_str());
+            build_contract(contract,&self.build_args, self.output_dir.as_str());
         }
     }
 }
