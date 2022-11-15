@@ -147,8 +147,7 @@ pub trait RewardsDistribution:
         if rand_pos == current_ticket_position {
             current_ticket_id
         } else {
-            let picked_ticket = self.replace_ticket(rand_pos, current_ticket_id);
-            picked_ticket
+            self.replace_ticket(rand_pos, current_ticket_id)
         }
     }
 
@@ -230,7 +229,7 @@ pub trait RewardsDistribution:
     fn claim_rewards(&self) {
         let nfts = self.call_value().all_esdt_transfers();
         let nft_token_identifier = self.nft_token_identifier().get();
-        require!(nfts.len() > 0, "Missing payment");
+        require!(!nfts.is_empty(), "Missing payment");
         let mut total = BigUint::zero();
         for nft in &nfts {
             require!(
