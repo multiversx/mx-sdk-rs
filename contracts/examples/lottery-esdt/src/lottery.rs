@@ -342,7 +342,7 @@ pub trait Lottery {
         }
 
         let total_numbers = rand_numbers.len();
-        let mut rand = RandomnessSource::<Self::Api>::new();
+        let mut rand = RandomnessSource::new();
 
         for i in 0..amount {
             let rand_index = rand.next_usize_in_range(0, total_numbers);
