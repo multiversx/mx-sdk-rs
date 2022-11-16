@@ -1,7 +1,6 @@
 use core::marker::PhantomData;
 
 use crate::{
-    abi::EndpointLocationAbi,
     api::{
         BlockchainApi, CallTypeApi, CallValueApi, CryptoApi, EndpointArgumentApi,
         EndpointFinishApi, ErrorApi, HandleTypeInfo, LogApi, ManagedTypeApi, PrintApi, SendApi,
@@ -175,8 +174,8 @@ impl<A> VMApi for ExternalViewApi<A>
 where
     A: VMApi,
 {
-    fn has_location(location: EndpointLocationAbi) -> bool {
-        location == EndpointLocationAbi { location: "view" }
+    fn has_location(location: &str) -> bool {
+        location == "view" 
     }
 }
 

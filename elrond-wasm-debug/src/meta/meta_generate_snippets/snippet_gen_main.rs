@@ -1,6 +1,6 @@
 use std::fs::File;
 
-use elrond_wasm::abi::{ContractAbi, EndpointLocationAbi};
+use elrond_wasm::abi::{ContractAbi};
 
 use crate::meta::meta_config::{MetaConfig, ContractMetadata};
 
@@ -34,7 +34,7 @@ impl MetaConfig {
     }
 
     pub fn get_contract(&self, location:  &'static str) -> Option<&ContractMetadata>{
-        self.contracts.iter().find(|&contract| contract.location == EndpointLocationAbi{location})
+        self.contracts.iter().find(|&contract| contract.location == location.to_owned())
     }
 }
 

@@ -41,11 +41,11 @@ pub fn generate_function_selector_body(contract: &ContractTrait) -> proc_macro2:
         supertrait_gen::function_selector_module_calls(contract.supertraits.as_slice());
     quote! {
         if match fn_name {
-            b"callBack" if <Self::Api as elrond_wasm::api::VMApi>::has_location(elrond_wasm::abi::EndpointLocationAbi{location: "main"}) => {
+            b"callBack" if <Self::Api as elrond_wasm::api::VMApi>::has_location("main") => {
                 self::EndpointWrappers::callback(self);
                 return true;
             },
-            b"init" if <Self::Api as elrond_wasm::api::VMApi>::has_location(elrond_wasm::abi::EndpointLocationAbi{location: "view"}) => {
+            b"init" if <Self::Api as elrond_wasm::api::VMApi>::has_location("view") => {
                 elrond_wasm::external_view_contract::external_view_contract_constructor::<Self::Api>();
                 return true;
             },

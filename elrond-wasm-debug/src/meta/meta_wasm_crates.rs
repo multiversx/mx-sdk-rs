@@ -3,8 +3,6 @@ use std::{
     io::Write,
 };
 
-use elrond_wasm::abi::EndpointLocationAbi;
-
 use super::meta_config::{ContractMetadata, MetaConfig};
 
 const WASM_LIB_PATH: &str = "../wasm/src/lib.rs";
@@ -55,8 +53,8 @@ fn write_wasm_src_lib(contract_metadata: &ContractMetadata) {
         .collect();
     endpoint_names.sort();
 
-    let full_macro_name = match &contract_metadata.location {
-        EndpointLocationAbi { location: "main" } => "elrond_wasm_node::wasm_endpoints!",
+    let full_macro_name = match contract_metadata.location.as_str() {
+         "main" => "elrond_wasm_node::wasm_endpoints!",
         _default => {
             "elrond_wasm_node::external_view_wasm_endpoints!"
         },

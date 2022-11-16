@@ -1,5 +1,3 @@
-use crate::abi::EndpointLocationAbi;
-
 use super::{
     BlockchainApi, CallTypeApi, CallValueApi, CryptoApi, EndpointArgumentApi, EndpointFinishApi,
     ErrorApi, LogApi, ManagedTypeApi, PrintApi, SendApi, StorageMapperApi, StorageReadApi,
@@ -25,8 +23,8 @@ pub trait VMApi:
     + PartialEq // for helping derive PartialEq for managed types
     + Eq
 {
-    fn has_location(location: EndpointLocationAbi) -> bool {
-        location == EndpointLocationAbi{location: "main"}
+    fn has_location(location: &str) -> bool {
+        location == "main"
     }
 
     fn init_static() {

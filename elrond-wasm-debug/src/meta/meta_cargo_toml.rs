@@ -2,15 +2,13 @@ use std::fs::{self, create_dir_all};
 
 // use cargo_toml::{Manifest, Value};
 
-use elrond_wasm::abi::EndpointLocationAbi;
-
 use super::meta_config::{ContractMetadata, MetaConfig};
 
 impl MetaConfig {
     pub fn create_wasm_secondary_cargo_toml(&self) {
         if let Some(main_contract) = &self.get_contract("main") {
             for secondary_contract in &self.contracts{
-                if secondary_contract.location == (EndpointLocationAbi { location: "main" }){
+                if secondary_contract.location == "main" {
                     continue;
                 }
 

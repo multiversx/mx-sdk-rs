@@ -1,6 +1,6 @@
 use std::{fs::create_dir_all, path::PathBuf};
 use crate::meta::multi_contract::MultiContract;
-use elrond_wasm::abi::{ContractAbi, EndpointLocationAbi};
+use elrond_wasm::abi::{ContractAbi};
 
 #[derive(Debug)]
 pub struct BuildArgs {
@@ -40,7 +40,7 @@ impl BuildArgs {
 }
 
 pub struct ContractMetadata {
-    pub location: EndpointLocationAbi,
+    pub location: String,
     pub wasm_crate_name: String,
     pub wasm_crate_path: String,
     pub output_base_name: String,
@@ -118,9 +118,9 @@ pub fn process_args(args: &[String]) -> BuildArgs {
 
 impl MetaConfig {
     pub fn create(original_contract_abi: &ContractAbi, args: &[String]) -> MetaConfig {
-        let mut locations :Vec<EndpointLocationAbi> = original_contract_abi.constructors
+        let mut locations :Vec<String> = original_contract_abi.constructors
         .iter()
-        .flat_map(|endpoint| endpoint.locations.iter().cloned())
+        .flat_map(|endpoint| endpoint.locations.iter().map(|&location|location.to_owned()))
         .collect();
 
         locations.dedup();
@@ -128,24 +128,24 @@ impl MetaConfig {
         let mut contracts: Vec<ContractMetadata> = vec![];
         let build_args = process_args(args);
 
-        for EndpointLocationAbi {location} in locations{
+        for location in locations{
             let contract_abi: ContractAbi;
             let mut wasm_crate_path= "../wasm".to_string();
             let contract_crate_name: String;
-            match location{
+            match location.as_str() {
                 "main" => { 
                     contract_abi = original_contract_abi.main_contract(); 
                     contract_crate_name = contract_abi.get_crate_name().to_string(); 
                 }
                 _=> {
-                    contract_abi = original_contract_abi.secondary_contract(EndpointLocationAbi { location: location.clone() });    
+                    contract_abi = original_contract_abi.secondary_contract(&location);    
                     wasm_crate_path = format!("{}-{}", &wasm_crate_path, &location);
                     contract_crate_name = format!("{}-{}", contract_abi.get_crate_name(), &location);
                 }
             }
 
             contracts.push(ContractMetadata {
-                location: EndpointLocationAbi { location },
+                location: location.to_string(),
                 wasm_crate_name: format!("{}-wasm", &contract_crate_name),
                 wasm_crate_path,
                 output_base_name: contract_crate_name,
@@ -161,43 +161,43 @@ impl MetaConfig {
         }
     }
 
-    // fn interpret_toml(original_contract_abi: &ContractAbi, args: &[String]) -> MetaConfig {
-    //     let content = std::fs::read_to_string("multicontract.toml").unwrap();
-    //     let contract_details: MultiContract = toml::from_str(&content).unwrap();
+    fn interpret_toml(original_contract_abi: &ContractAbi, args: &[String]) -> MetaConfig {
+        let content = std::fs::read_to_string("multicontract.toml").unwrap();
+        let contract_details: MultiContract = toml::from_str(&content).unwrap();
 
-    //     let mut contracts: Vec<ContractMetadata> = vec![];
-    //     let build_args = process_args(args);
+        let mut contracts: Vec<ContractMetadata> = vec![];
+        let build_args = process_args(args);
 
-    //     for (location, _) in contract_details.labels {
-    //         let contract_abi: ContractAbi;
-    //         let mut wasm_crate_path= "../wasm".to_string();
-    //         let contract_crate_name: String;
+        for (location, _) in contract_details.labels {
+            let contract_abi: ContractAbi;
+            let mut wasm_crate_path= "../wasm".to_string();
+            let contract_crate_name: String;
 
-    //         if &location == &contract_details.default{
-    //             contract_abi = original_contract_abi.main_contract(); 
-    //             contract_crate_name = contract_abi.get_crate_name().to_string(); 
-    //         }
-    //         else{
-    //             contract_abi = original_contract_abi.secondary_contract(EndpointLocationAbi { location });    
-    //             wasm_crate_path = format!("{}-{}", &wasm_crate_path, &location);
-    //             contract_crate_name = format!("{}-{}", contract_abi.get_crate_name(), &location);
-    //         }
-    //         contracts.push(ContractMetadata {
-    //             location: EndpointLocationAbi { location },
-    //             wasm_crate_name: format!("{}-wasm", &contract_crate_name),
-    //             wasm_crate_path,
-    //             output_base_name: contract_crate_name,
-    //             abi: contract_abi.clone(),
-    //         });
-    //     }
+            if &location == &contract_details.default{
+                contract_abi = original_contract_abi.main_contract(); 
+                contract_crate_name = contract_abi.get_crate_name().to_string(); 
+            }
+            else{
+                contract_abi = original_contract_abi.secondary_contract(&location);    
+                wasm_crate_path = format!("{}-{}", &wasm_crate_path, &location);
+                contract_crate_name = format!("{}-{}", contract_abi.get_crate_name(), &location);
+            }
+            contracts.push(ContractMetadata {
+                location,
+                wasm_crate_name: format!("{}-wasm", &contract_crate_name),
+                wasm_crate_path,
+                output_base_name: contract_crate_name,
+                abi: contract_abi.clone(),
+            });
+        }
 
-    //     MetaConfig {
-    //         build_args,
-    //         output_dir: "../output".to_string(),
-    //         snippets_dir: "../interact-rs".to_string(),
-    //         contracts,
-    //     }
-    // }
+        MetaConfig {
+            build_args,
+            output_dir: "../output".to_string(),
+            snippets_dir: "../interact-rs".to_string(),
+            contracts,
+        }
+    }
 }
 
 impl ContractMetadata {

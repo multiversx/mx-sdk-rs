@@ -37,7 +37,7 @@ impl ContractAbi {
                     endpoint
                         .locations
                         .iter()
-                        .any(|item| item == &EndpointLocationAbi { location: "main" })
+                        .any(|item| item == &"main" )
                 })
                 .cloned()
                 .collect(),
@@ -47,7 +47,7 @@ impl ContractAbi {
         }
     }
 
-    pub fn location_exists(&self, location: EndpointLocationAbi) -> bool {
+    pub fn location_exists(&self, location: &str) -> bool {
         self.constructors
             .iter()
             .chain(self.endpoints.iter())
@@ -55,7 +55,7 @@ impl ContractAbi {
     }
 
     #[must_use]
-    pub fn secondary_contract(&self, location: EndpointLocationAbi) -> ContractAbi {
+    pub fn secondary_contract(&self, location: &str) -> ContractAbi {
         ContractAbi {
             build_info: self.build_info.clone(),
             docs: self.docs,

@@ -20,7 +20,7 @@ impl EndpointLocationMetadata {
 
     pub fn get_location_as_token(&self, location: &str) -> proc_macro2::TokenStream {
         quote! {   
-                elrond_wasm::abi::EndpointLocationAbi{location: #location}
+                #location
         }
     }
 }
