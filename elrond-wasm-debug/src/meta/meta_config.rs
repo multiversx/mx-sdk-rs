@@ -161,10 +161,7 @@ impl MetaConfig {
         }
     }
 
-    fn interpret_toml(original_contract_abi: &ContractAbi, args: &[String]) -> MetaConfig {
-        let content = std::fs::read_to_string("multicontract.toml").unwrap();
-        let contract_details: MultiContract = toml::from_str(&content).unwrap();
-
+    pub fn interpret_toml(original_contract_abi: &ContractAbi, args: &[String], contract_details: MultiContract) -> MetaConfig {
         let mut contracts: Vec<ContractMetadata> = vec![];
         let build_args = process_args(args);
 

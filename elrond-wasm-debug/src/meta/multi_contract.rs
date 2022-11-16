@@ -3,13 +3,13 @@ use std::collections::HashMap;
 use serde::Deserialize;
 
 #[derive(Deserialize)]
-pub(crate) struct MultiContract{
+pub struct MultiContract{
     pub default: String,
     pub labels: HashMap<String, WasmLabel>,
 }
 
 #[derive(Deserialize)]
-pub(crate) struct WasmLabel{
-    pub name:String,
+pub struct WasmLabel{
+    pub wasm: String,
     pub endpoints: Vec<String>,
 }

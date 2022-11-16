@@ -1,7 +1,7 @@
 use elrond_wasm::contract_base::ContractAbiProvider;
 use std::env;
 
-use super::meta_config::MetaConfig;
+use super::{meta_config::MetaConfig, multi_contract::MultiContract};
 
 static SNIPPETS_OVERWRITE_FLAG_NAME: &str = "--overwrite";
 
@@ -10,7 +10,15 @@ pub fn perform<AbiObj: ContractAbiProvider>() {
     super::meta_validate_abi::validate_abi(&original_contract_abi).unwrap();
 
     let args: Vec<String> = env::args().collect();
-    let mut meta_config = MetaConfig::create(&original_contract_abi, args.as_slice());
+    let arguments = args.as_slice();
+    let mut meta_config;
+
+    if let Some(contract_details) = get_multicontract(){
+        meta_config = MetaConfig::interpret_toml(&original_contract_abi, arguments, contract_details);
+    }
+    else {    
+        meta_config = MetaConfig::create(&original_contract_abi, arguments);
+    }
 
     meta_config.write_abi();
 
@@ -35,4 +43,14 @@ pub fn perform<AbiObj: ContractAbiProvider>() {
             _ => (),
         }
     }
+}
+
+pub fn get_multicontract() -> Option<MultiContract>{
+    if let Ok(content) = std::fs::read_to_string("./multicontract.toml"){
+        if let Ok(multicontract) = toml::from_str(&content){
+            return Some(multicontract);
+        }
+    }
+    panic!("Hopa!");
+    return None;
 }

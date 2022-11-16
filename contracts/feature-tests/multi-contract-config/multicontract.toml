@@ -5,6 +5,6 @@ wasm = "main.wasm"
 endpoints = ["init", "add"]
 
 [labels.custom]
-name = "custom.wasm"
+wasm = "custom.wasm"
 endpoints = ["sum"]
 
