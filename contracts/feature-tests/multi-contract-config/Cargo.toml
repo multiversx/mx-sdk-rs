@@ -1,0 +1,17 @@
+[package]
+name = "multi-contract-config"
+version = "0.0.0"
+authors = ["Alin Cruceat <alin.cruceat@elrond.com>"]
+edition = "2018"
+publish = false
+
+[lib]
+path = "src/lib.rs"
+
+[dependencies.elrond-wasm]
+version = "0.36.1"
+path = "../../../elrond-wasm"
+
+[dev-dependencies.elrond-wasm-debug]
+version = "0.36.1"
+path = "../../../elrond-wasm-debug"

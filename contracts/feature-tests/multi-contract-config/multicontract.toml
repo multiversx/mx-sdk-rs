@@ -1,0 +1,10 @@
+default = "main"
+
+[labels.main]
+wasm = "main.wasm"
+endpoints = ["init", "add"]
+
+[labels.custom]
+name = "custom.wasm"
+endpoints = ["sum"]
+

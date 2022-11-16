@@ -40,7 +40,7 @@ fn build_contract(contract_metadata: &ContractMetadata, build_args: &BuildArgs, 
     let dest_wasm_name = build_args.wasm_name(contract_metadata);
     let dest_wasm_path = format!("{}/{}", output_path, dest_wasm_name);
     fs::copy(source_wasm_path.as_str(), dest_wasm_path.as_str())
-        .expect("failed to copy compiled contract to output directory");
+        .expect(&format!("failed to copy compiled contract {} to output directory {}", source_wasm_path, dest_wasm_path));
 
     optimize_contract(build_args, dest_wasm_path.as_str());
 }

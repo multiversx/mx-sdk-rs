@@ -1,0 +1,12 @@
+[package]
+name = "multi-contract-config-meta"
+version = "0.0.0"
+edition = "2018"
+publish = false
+
+[dependencies.multi-contract-config]
+path = ".."
+
+[dependencies.elrond-wasm-debug]
+version = "0.36.1"
+path = "../../../../elrond-wasm-debug"
