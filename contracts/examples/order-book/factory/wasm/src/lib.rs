@@ -1,0 +1,15 @@
+////////////////////////////////////////////////////
+////////////////// AUTO-GENERATED //////////////////
+////////////////////////////////////////////////////
+
+#![no_std]
+
+elrond_wasm_node::wasm_endpoints! {
+    order_book_factory
+    (
+        createPair
+        getPair
+    )
+}
+
+elrond_wasm_node::wasm_empty_callback! {}

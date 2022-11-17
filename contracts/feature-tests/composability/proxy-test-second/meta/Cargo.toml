@@ -1,0 +1,12 @@
+[package]
+name = "proxy-test-second-meta"
+version = "0.0.0"
+edition = "2018"
+publish = false
+
+[dependencies.proxy-test-second]
+path = ".."
+
+[dependencies.elrond-wasm-debug]
+version = "0.36.1"
+path = "../../../../../elrond-wasm-debug"

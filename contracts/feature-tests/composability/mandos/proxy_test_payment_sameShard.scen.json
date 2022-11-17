@@ -7,33 +7,30 @@
             "accounts": {
                 "address:a_user": {
                     "nonce": "0",
-                    "balance": "0x10000000000000e8d4a51000",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0x10000000000000e8d4a51000"
                 },
-                "sc:alice": {
+                "sc:proxy-first": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "``other_contract": "sc:bob"
+                        "str:other_contract": "sc:proxy-second"
                     },
                     "code": "file:../proxy-test-first/output/proxy-test-first.wasm"
                 },
-                "sc:bob": {
+                "sc:proxy-second": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
                     "code": "file:../proxy-test-second/output/proxy-test-second.wasm"
                 }
             }
         },
         {
             "step": "scCall",
-            "txId": "1",
+            "id": "1",
             "tx": {
                 "from": "address:a_user",
-                "to": "sc:alice",
-                "value": "0x123400",
+                "to": "sc:proxy-first",
+                "egldValue": "0x123400",
                 "function": "forwardToOtherContract",
                 "arguments": [],
                 "gasLimit": "0x1000000000000",
@@ -42,7 +39,7 @@
             "expect": {
                 "out": [],
                 "status": "0",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -56,20 +53,20 @@
                     "storage": {},
                     "code": ""
                 },
-                "sc:alice": {
+                "sc:proxy-first": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "``other_contract": "sc:bob"
+                        "str:other_contract": "sc:proxy-second"
                     },
                     "code": "file:../proxy-test-first/output/proxy-test-first.wasm"
                 },
-                "sc:bob": {
+                "sc:proxy-second": {
                     "nonce": "0",
                     "balance": "0x123400",
                     "storage": {
-                        "``pay_me_arg": "0x56",
-                        "``last_payment": "0x123400"
+                        "str:pay_me_arg": "0x56",
+                        "str:last_payment": "0x123400"
                     },
                     "code": "file:../proxy-test-second/output/proxy-test-second.wasm"
                 }

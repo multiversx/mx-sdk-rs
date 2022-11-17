@@ -12,7 +12,6 @@
                 "address:acc1": {
                     "nonce": "0",
                     "balance": "1,000,000",
-                    "storage": {},
                     "esdt": {
                         "str:LOTTERY-123456": "100"
                     }
@@ -21,15 +20,16 @@
         },
         {
             "step": "scCall",
-            "txId": "buy-ticket",
+            "id": "buy-ticket",
             "tx": {
                 "from": "address:acc1",
                 "to": "sc:lottery",
-                "value": "0",
-                "esdt": {
-                    "tokenIdentifier": "str:LOTTERY-123456",
-                    "value": "100"
-                },
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:LOTTERY-123456",
+                        "value": "100"
+                    }
+                ],
                 "function": "buy_ticket",
                 "arguments": [
                     "str:lottery_name"
@@ -38,6 +38,7 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "",
                 "gas": "*",
                 "refund": "*"
@@ -64,23 +65,22 @@
                 "sc:lottery": {
                     "nonce": "0",
                     "balance": "0",
+                    "esdt": {
+                        "str:LOTTERY-123456": "100"
+                    },
                     "storage": {
                         "str:lotteryInfo|nested:str:lottery_name": {
-                            "0-token_name": "nested:str:LOTTERY-123456",
+                            "0-token_identifier": "nested:str:LOTTERY-123456",
                             "1-ticket_price": "biguint:100",
                             "2-tickets-left": "u32:1",
                             "3-deadline": "u64:123,456",
                             "4-max_entries_per_user": "u32:800",
                             "5-prize_distribution": "nested:u8:100",
-                            "6-whitelist": "nested:",
-                            "7-prize_pool": "biguint:100"
+                            "6-prize_pool": "biguint:100"
                         },
                         "str:ticketHolder|nested:str:lottery_name|str:.len": "1",
                         "str:ticketHolder|nested:str:lottery_name|str:.item|u32:1": "address:acc1",
                         "str:numberOfEntriesForUser|u32:12|str:lottery_name|address:acc1": "1"
-                    },
-                    "esdt": {
-                        "str:LOTTERY-123456": "100"
                     },
                     "code": "file:../output/lottery-esdt.wasm"
                 }

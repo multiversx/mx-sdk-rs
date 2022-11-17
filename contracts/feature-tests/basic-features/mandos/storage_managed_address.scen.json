@@ -1,0 +1,81 @@
+{
+    "name": "storage",
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "store-val",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "store_addr",
+                "arguments": [
+                    "str:____________address_____________"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:addr": "str:____________address_____________"
+                    },
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "*",
+                    "balance": "*",
+                    "storage": {},
+                    "code": ""
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "load-val",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "load_addr",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "str:____________address_____________"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

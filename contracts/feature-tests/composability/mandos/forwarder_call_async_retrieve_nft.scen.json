@@ -6,45 +6,44 @@
             "accounts": {
                 "address:a_user": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 },
                 "sc:vault": {
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
-                        "str:NFT-0001": {
-                            "nonce": "5",
-                            "balance": "1"
+                        "str:NFT-000001": {
+                            "instances": [
+                                {
+                                    "nonce": "5",
+                                    "balance": "1"
+                                }
+                            ]
                         }
                     },
-                    "storage": {},
                     "code": "file:../vault/output/vault.wasm"
                 },
                 "sc:forwarder": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
                     "code": "file:../forwarder/output/forwarder.wasm"
                 }
             }
         },
         {
             "step": "scCall",
-            "txId": "1",
+            "id": "1",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "value": "0",
                 "function": "forward_async_retrieve_funds",
                 "arguments": [
                     "sc:vault",
-                    "str:NFT-0001",
+                    "str:NFT-000001",
                     "5",
                     "1"
                 ],
-                "gasLimit": "60,000,000",
+                "gasLimit": "70,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -53,18 +52,31 @@
                 "logs": [
                     {
                         "address": "sc:vault",
-                        "identifier": "str:retrieve_funds",
+                        "endpoint": "str:retrieve_funds",
                         "topics": [
-                            "str:NFT-0001",
+                            "str:retrieve_funds",
+                            "str:NFT-000001",
                             "5",
                             "1"
                         ],
                         "data": ""
                     },
                     {
-                        "address": "sc:forwarder",
-                        "identifier": "str:retrieve_funds_callback",
+                        "address": "sc:vault",
+                        "endpoint": "str:ESDTNFTTransfer",
                         "topics": [
+                            "str:NFT-000001",
+                            "5",
+                            "01",
+                            "sc:forwarder"
+                        ],
+                        "data": ""
+                    },
+                    {
+                        "address": "sc:forwarder",
+                        "endpoint": "str:callBack",
+                        "topics": [
+                            "str:retrieve_funds_callback",
                             "*",
                             "*",
                             "*"
@@ -95,9 +107,13 @@
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
-                        "str:NFT-0001": {
-                            "nonce": "5",
-                            "balance": "1"
+                        "str:NFT-000001": {
+                            "instances": [
+                                {
+                                    "nonce": "5",
+                                    "balance": "1"
+                                }
+                            ]
                         }
                     },
                     "storage": "*",

@@ -1,0 +1,181 @@
+{
+    "name": "buy tokens",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "deposit_more_view.scen.json"
+        },
+        {
+            "step": "scCall",
+            "tx": {
+                "from": "address:buyer1",
+                "to": "sc:bonding-curve-contract",
+                "function": "claim",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:You have nothing to claim",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "claim_artist1",
+            "tx": {
+                "from": "address:artist1",
+                "to": "sc:bonding-curve-contract",
+                "function": "claim",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "claim_artist2",
+            "tx": {
+                "from": "address:artist2",
+                "to": "sc:bonding-curve-contract",
+                "function": "claim",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "1",
+                    "balance": "0",
+                    "storage": {}
+                },
+                "address:buyer1": {
+                    "nonce": "4",
+                    "balance": "0",
+                    "esdt": {
+                        "str:EGLD-135790": "135",
+                        "str:MFFT-123456": "10",
+                        "str:MFSFT-246802": {
+                            "instances": [
+                                {
+                                    "nonce": "17",
+                                    "balance": "5"
+                                }
+                            ]
+                        }
+                    },
+                    "storage": {}
+                },
+                "address:buyer2": {
+                    "nonce": "3",
+                    "balance": "0",
+                    "esdt": {
+                        "str:EGLD-135790": "19995",
+                        "str:MFNFT-567890": {
+                            "instances": [
+                                {
+                                    "nonce": "3",
+                                    "balance": "1"
+                                },
+                                {
+                                    "nonce": "4",
+                                    "balance": "1"
+                                },
+                                {
+                                    "nonce": "5",
+                                    "balance": "1"
+                                },
+                                {
+                                    "nonce": "6",
+                                    "balance": "1"
+                                }
+                            ]
+                        }
+                    },
+                    "storage": {}
+                },
+                "address:artist1": {
+                    "nonce": "12",
+                    "balance": "0",
+                    "esdt": {
+                        "str:EGLD-135790": "60",
+                        "str:MFNFT-567890": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "1"
+                                },
+                                {
+                                    "nonce": "2",
+                                    "balance": "1"
+                                },
+                                {
+                                    "nonce": "7",
+                                    "balance": "1"
+                                },
+                                {
+                                    "nonce": "8",
+                                    "balance": "1"
+                                },
+                                {
+                                    "nonce": "9",
+                                    "balance": "1"
+                                }
+                            ]
+                        },
+                        "str:MFFT-123456": "990"
+                    },
+                    "storage": {}
+                },
+                "address:artist2": {
+                    "nonce": "6",
+                    "balance": "0",
+                    "esdt": {
+                        "str:EGLD-135790": "10",
+                        "str:MFSFT-246802": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "2000"
+                                },
+                                {
+                                    "nonce": "2",
+                                    "balance": "1000"
+                                },
+                                {
+                                    "nonce": "17",
+                                    "balance": "995"
+                                }
+                            ]
+                        }
+                    },
+                    "storage": {}
+                },
+                "sc:bonding-curve-contract": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "file:../output/bonding-curve-contract.wasm"
+                }
+            }
+        }
+    ]
+}

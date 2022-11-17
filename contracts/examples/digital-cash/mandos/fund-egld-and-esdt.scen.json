@@ -1,0 +1,145 @@
+{
+    "name": "fund-egld-esdt",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "set-accounts.scen.json"
+        },
+        {
+            "step": "scCall",
+            "id": "fund",
+            "tx": {
+                "from": "address:acc1",
+                "to": "sc:the_digital_cash_contract",
+                "egldValue": "1,000,000",
+                "function": "fund",
+                "arguments": [
+                    "0x558fd9b0dd9fed3d3bed883d3b92907743362c56b9728392f84b261f1cc5ae0a",
+                    "u64:100"
+                ],
+                "gasLimit": "500,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "message": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:the_digital_cash_contract": {
+                    "nonce": "0",
+                    "balance": "1,000,000",
+                    "storage": {
+                        "str:deposit|0x558fd9b0dd9fed3d3bed883d3b92907743362c56b9728392f84b261f1cc5ae0a": {
+                            "1-amount": "biguint:1,000,000",
+                            "2-depositor_address": "address:acc1",
+                            "3-expiration_round": "u64:16",
+                            "4-token_name": "nested:str:EGLD",
+                            "5-nonce": "u64:0"
+                        }
+                    },
+                    "code": "file:../output/digital-cash.wasm"
+                },
+                "address:acc1": {
+                    "nonce": "1",
+                    "balance": "0",
+                    "storage": {}
+                },
+                "address:acc2": {
+                    "nonce": "0",
+                    "balance": "1,000,000",
+                    "esdt": {
+                        "str:CASHTOKEN-123456": "100"
+                    },
+                    "storage": {}
+                },
+                "address:digital_cash_owner_address": {
+                    "nonce": "1",
+                    "balance": "0",
+                    "storage": {}
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "fund-2",
+            "tx": {
+                "from": "address:acc2",
+                "to": "sc:the_digital_cash_contract",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:CASHTOKEN-123456",
+                        "value": "50"
+                    }
+                ],
+                "function": "fund",
+                "arguments": [
+                    "0xe868c2baab2a20b612f1351da5945c52c60f5321c6cde572149db90c9e8fbfc8",
+                    "u64:100"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "message": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:the_digital_cash_contract": {
+                    "nonce": "0",
+                    "balance": "1,000,000",
+                    "esdt": {
+                        "''CASHTOKEN-123456": "50"
+                    },
+                    "storage": {
+                        "str:deposit|0x558fd9b0dd9fed3d3bed883d3b92907743362c56b9728392f84b261f1cc5ae0a": {
+                            "1-amount": "biguint:1,000,000",
+                            "2-depositor_address": "address:acc1",
+                            "3-expiration_round": "u64:16",
+                            "4-token_name": "nested:str:EGLD",
+                            "5-nonce": "u64:0"
+                        },
+                        "str:deposit|0xe868c2baab2a20b612f1351da5945c52c60f5321c6cde572149db90c9e8fbfc8": {
+                            "1-amount": "biguint:50",
+                            "2-depositor_address": "address:acc2",
+                            "3-expiration_round": "u64:16",
+                            "4-token_name": "nested:str:CASHTOKEN-123456",
+                            "5-nonce": "u64:0"
+                        }
+                    },
+                    "code": "file:../output/digital-cash.wasm"
+                },
+                "address:acc1": {
+                    "nonce": "1",
+                    "balance": "0",
+                    "storage": {}
+                },
+                "address:acc2": {
+                    "nonce": "1",
+                    "balance": "1,000,000",
+                    "esdt": {
+                        "str:CASHTOKEN-123456": "50"
+                    },
+                    "storage": {}
+                },
+                "address:digital_cash_owner_address": {
+                    "nonce": "1",
+                    "balance": "0",
+                    "storage": {}
+                }
+            }
+        }
+    ]
+}

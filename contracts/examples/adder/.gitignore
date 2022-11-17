@@ -4,4 +4,7 @@
 */target/
 
 # The erdpy output
-output
+output*
+
+# Mandos test trace
+trace*.scen.json

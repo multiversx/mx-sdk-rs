@@ -6,38 +6,33 @@
             "accounts": {
                 "address:a_user": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 },
                 "sc:vault": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
                     "code": "file:../vault/output/vault.wasm"
                 },
                 "sc:forwarder": {
                     "nonce": "0",
                     "balance": "1000",
-                    "storage": {},
                     "code": "file:../forwarder/output/forwarder.wasm"
                 }
             }
         },
         {
             "step": "scCall",
-            "txId": "1",
+            "id": "1",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "value": "0",
                 "function": "send_funds_twice",
                 "arguments": [
                     "sc:vault",
                     "str:EGLD",
                     "1"
                 ],
-                "gasLimit": "80,000,000",
+                "gasLimit": "100,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -45,24 +40,40 @@
                 "status": "0",
                 "logs": [
                     {
-                        "address": "sc:vault",
-                        "identifier": "str:accept_funds",
+                        "address": "*",
+                        "endpoint": "str:transferValueOnly",
                         "topics": [
-                            "str:EGLD",
-                            "str:FungibleESDT",
-                            "1",
-                            "0"
+                            "sc:forwarder",
+                            "sc:vault",
+                            "1"
                         ],
                         "data": ""
                     },
                     {
                         "address": "sc:vault",
-                        "identifier": "str:accept_funds",
+                        "endpoint": "str:accept_funds",
                         "topics": [
-                            "str:EGLD",
-                            "str:FungibleESDT",
-                            "1",
-                            "0"
+                            "str:accept_funds",
+                            "1"
+                        ],
+                        "data": ""
+                    },
+                    {
+                        "address": "*",
+                        "endpoint": "str:transferValueOnly",
+                        "topics": [
+                            "sc:forwarder",
+                            "sc:vault",
+                            "1"
+                        ],
+                        "data": ""
+                    },
+                    {
+                        "address": "sc:vault",
+                        "endpoint": "str:accept_funds",
+                        "topics": [
+                            "str:accept_funds",
+                            "1"
                         ],
                         "data": ""
                     }

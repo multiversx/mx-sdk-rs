@@ -8,24 +8,20 @@
                 "sc:basic-features": {
                     "nonce": "1000",
                     "balance": "200",
-                    "storage": {},
                     "code": "file:../forwarder/output/forwarder.wasm"
                 },
                 "address:an_account": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 }
             }
         },
         {
             "step": "scCall",
-            "txId": "not-enough",
+            "id": "not-enough",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "send_egld",
                 "arguments": [
                     "address:an_account",
@@ -38,20 +34,19 @@
                 "out": [],
                 "status": "*",
                 "message": "str:failed transfer (insufficient funds)",
-                "logs": []
+                "logs": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "without-message",
+            "id": "send_egld-ok",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "send_egld",
                 "arguments": [
                     "address:an_account",
-                    "100"
+                    "200"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
@@ -59,29 +54,7 @@
             "expect": {
                 "out": [],
                 "status": "",
-                "logs": []
-            }
-        },
-        {
-            "step": "scCall",
-            "txId": "with-message",
-            "tx": {
-                "from": "address:an_account",
-                "to": "sc:basic-features",
-                "value": "0",
-                "function": "send_egld",
-                "arguments": [
-                    "address:an_account",
-                    "100",
-                    "str:send tx message here"
-                ],
-                "gasLimit": "50,000,000",
-                "gasPrice": "0"
-            },
-            "expect": {
-                "out": [],
-                "status": "",
-                "logs": []
+                "logs": "*"
             }
         },
         {

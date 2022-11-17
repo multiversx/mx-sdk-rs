@@ -1,0 +1,12 @@
+[package]
+name = "rust-testing-framework-tester-meta"
+version = "0.0.0"
+edition = "2018"
+publish = false
+
+[dependencies.rust-testing-framework-tester]
+path = ".."
+
+[dependencies.elrond-wasm-debug]
+version = "0.36.1"
+path = "../../../../elrond-wasm-debug"

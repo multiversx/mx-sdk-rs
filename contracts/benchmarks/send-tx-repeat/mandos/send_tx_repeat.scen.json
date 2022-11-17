@@ -1,0 +1,90 @@
+{
+    "name": "str-repeat",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "0",
+                    "balance": "1,000"
+                },
+                "address:receiver": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            },
+            "newAddresses": [
+                {
+                    "creatorAddress": "address:owner",
+                    "creatorNonce": "0",
+                    "newAddress": "sc:contract"
+                }
+            ]
+        },
+        {
+            "step": "scDeploy",
+            "id": "1",
+            "tx": {
+                "from": "address:owner",
+                "contractCode": "file:../output/send-tx-repeat.wasm",
+                "arguments": [],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "2",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:contract",
+                "egldValue": "1000",
+                "function": "repeat",
+                "arguments": [
+                    "address:receiver",
+                    "1",
+                    "1000"
+                ],
+                "gasLimit": "100,000,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "2",
+                    "balance": "0",
+                    "storage": {},
+                    "code": ""
+                },
+                "address:receiver": {
+                    "nonce": "0",
+                    "balance": "1,000",
+                    "storage": {},
+                    "code": ""
+                },
+                "sc:contract": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "file:../output/send-tx-repeat.wasm"
+                }
+            }
+        }
+    ]
+}

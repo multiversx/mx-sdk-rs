@@ -1,0 +1,107 @@
+{
+    "name": "queue-repeat",
+    "traceGas": true,
+    "gasSchedule": "v4",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            },
+            "newAddresses": [
+                {
+                    "creatorAddress": "address:owner",
+                    "creatorNonce": "0",
+                    "newAddress": "sc:contract"
+                }
+            ]
+        },
+        {
+            "step": "scDeploy",
+            "id": "deploy",
+            "tx": {
+                "from": "address:owner",
+                "contractCode": "file:../output/queue-repeat.wasm",
+                "arguments": [],
+                "gasLimit": "20,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "add",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:contract",
+                "function": "add",
+                "arguments": [
+                    "1000",
+                    "str:testing---testing---"
+                ],
+                "gasLimit": "1,000,000,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "count",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:contract",
+                "function": "count",
+                "arguments": [
+                    "str:testing---testing---|u32:500"
+                ],
+                "gasLimit": "1,000,000,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "1"
+                ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "remove",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:contract",
+                "function": "remove",
+                "arguments": [
+                    "1000"
+                ],
+                "gasLimit": "1,000,000,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

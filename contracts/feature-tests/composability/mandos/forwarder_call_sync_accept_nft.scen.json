@@ -8,17 +8,19 @@
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
-                        "str:NFT-0001": {
-                            "nonce": "5",
-                            "balance": "1",
+                        "str:NFT-000001": {
+                            "instances": [
+                                {
+                                    "nonce": "5",
+                                    "balance": "1"
+                                }
+                            ],
                             "lastNonce": "1",
                             "roles": [
                                 "ESDTRoleNFTCreate"
                             ]
                         }
-                    },
-                    "storage": {},
-                    "code": ""
+                    }
                 },
                 "sc:vault": {
                     "nonce": "0",
@@ -28,23 +30,23 @@
                 "sc:forwarder": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
                     "code": "file:../forwarder/output/forwarder.wasm"
                 }
             }
         },
         {
             "step": "scCall",
-            "txId": "1",
+            "id": "1",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "value": "0",
-                "esdt": {
-                    "tokenIdentifier": "str:NFT-0001",
-                    "value": "1",
-                    "nonce": "5"
-                },
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:NFT-000001",
+                        "nonce": "5",
+                        "value": "1"
+                    }
+                ],
                 "function": "forward_sync_accept_funds",
                 "arguments": [
                     "sc:vault"
@@ -53,33 +55,41 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [
-                    "str:NFT-0001",
-                    "str:NonFungibleESDT",
-                    "1",
-                    "5"
-                ],
+                "out": [],
                 "status": "0",
                 "logs": [
                     {
-                        "address": "sc:vault",
-                        "identifier": "str:accept_funds",
+                        "address": "sc:forwarder",
+                        "endpoint": "str:ESDTNFTTransfer",
                         "topics": [
-                            "str:NFT-0001",
-                            "str:NonFungibleESDT",
+                            "str:NFT-000001",
+                            "5",
                             "1",
-                            "5"
+                            "sc:vault"
+                        ],
+                        "data": ""
+                    },
+                    {
+                        "address": "sc:vault",
+                        "endpoint": "str:accept_funds_echo_payment",
+                        "topics": [
+                            "str:accept_funds",
+                            "0",
+                            "str:NFT-000001",
+                            "5",
+                            "1"
                         ],
                         "data": ""
                     },
                     {
                         "address": "sc:forwarder",
-                        "identifier": "str:accept_funds_sync_result",
+                        "endpoint": "str:forward_sync_accept_funds",
                         "topics": [
-                            "str:NFT-0001",
-                            "str:NonFungibleESDT",
-                            "1",
-                            "5"
+                            "str:accept_funds_sync_result",
+                            "0",
+                            "str:NFT-000001",
+                            "5",
+                            "1"
                         ],
                         "data": ""
                     }
@@ -95,7 +105,12 @@
                     "nonce": "*",
                     "balance": "0",
                     "esdt": {
-                        "str:TEST-TOKEN": "0"
+                        "str:NFT-000001": {
+                            "lastNonce": "1",
+                            "roles": [
+                                "ESDTRoleNFTCreate"
+                            ]
+                        }
                     },
                     "storage": {},
                     "code": ""
@@ -103,11 +118,18 @@
                 "sc:vault": {
                     "nonce": "0",
                     "balance": "0",
+                    "esdt": {
+                        "str:NFT-000001": {
+                            "instances": [
+                                {
+                                    "nonce": "5",
+                                    "balance": "1"
+                                }
+                            ]
+                        }
+                    },
                     "storage": {
                         "str:call_counts|nested:str:accept_funds_echo_payment": "1"
-                    },
-                    "esdt": {
-                        "str:TEST-TOKEN": "1000"
                     },
                     "code": "file:../vault/output/vault.wasm"
                 },

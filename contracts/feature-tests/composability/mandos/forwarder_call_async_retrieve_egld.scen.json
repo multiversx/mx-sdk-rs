@@ -6,31 +6,26 @@
             "accounts": {
                 "address:a_user": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 },
                 "sc:vault": {
                     "nonce": "0",
                     "balance": "1000",
-                    "storage": {},
                     "code": "file:../vault/output/vault.wasm"
                 },
                 "sc:forwarder": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
                     "code": "file:../forwarder/output/forwarder.wasm"
                 }
             }
         },
         {
             "step": "scCall",
-            "txId": "1",
+            "id": "1",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "value": "0",
                 "function": "forward_async_retrieve_funds",
                 "arguments": [
                     "sc:vault",
@@ -38,7 +33,7 @@
                     "0",
                     "1000"
                 ],
-                "gasLimit": "50,000,000",
+                "gasLimit": "60,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -47,8 +42,9 @@
                 "logs": [
                     {
                         "address": "sc:vault",
-                        "identifier": "str:retrieve_funds",
+                        "endpoint": "str:retrieve_funds",
                         "topics": [
+                            "str:retrieve_funds",
                             "str:EGLD",
                             "0",
                             "1000"
@@ -56,9 +52,20 @@
                         "data": ""
                     },
                     {
-                        "address": "sc:forwarder",
-                        "identifier": "str:retrieve_funds_callback",
+                        "address": "*",
+                        "endpoint": "str:transferValueOnly",
                         "topics": [
+                            "sc:vault",
+                            "sc:forwarder",
+                            "1000"
+                        ],
+                        "data": ""
+                    },
+                    {
+                        "address": "sc:forwarder",
+                        "endpoint": "str:callBack",
+                        "topics": [
+                            "str:retrieve_funds_callback",
                             "str:EGLD",
                             "0",
                             "1000"

@@ -1,5 +1,16 @@
+////////////////////////////////////////////////////
+////////////////// AUTO-GENERATED //////////////////
+////////////////////////////////////////////////////
 
 #![no_std]
 
-pub use second_contract::*;
-pub use elrond_wasm_output::*;
+elrond_wasm_node::wasm_endpoints! {
+    second_contract
+    (
+        acceptEsdtPayment
+        getesdtTokenName
+        rejectEsdtPayment
+    )
+}
+
+elrond_wasm_node::wasm_empty_callback! {}

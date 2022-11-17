@@ -1,0 +1,173 @@
+{
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:a_user": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:NFT-000001": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "1"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "sc:forwarder": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:NFT-000001": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "1"
+                                }
+                            ],
+                            "lastNonce": "1",
+                            "roles": [
+                                "ESDTRoleNFTAddQuantity"
+                            ]
+                        }
+                    },
+                    "code": "file:../forwarder/output/forwarder.wasm"
+                },
+                "sc:forwarder2": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:NFT-000001": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "1"
+                                }
+                            ],
+                            "lastNonce": "1"
+                        }
+                    },
+                    "code": "file:../forwarder/output/forwarder.wasm"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "nft_add_quantity",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:forwarder",
+                "function": "nft_add_quantity",
+                "arguments": [
+                    "str:NFT-000001",
+                    "1",
+                    "1200"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "logs": [
+                    {
+                        "address": "sc:forwarder",
+                        "endpoint": "str:ESDTNFTAddQuantity",
+                        "topics": [
+                            "str:NFT-000001",
+                            "1",
+                            "1200"
+                        ],
+                        "data": ""
+                    }
+                ],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "nft_add_quantity",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:forwarder2",
+                "function": "nft_add_quantity",
+                "arguments": [
+                    "str:NFT-000001",
+                    "1",
+                    "1200"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "10",
+                "message": "str:action is not allowed",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:a_user": {
+                    "nonce": "*",
+                    "balance": "0",
+                    "esdt": {
+                        "str:NFT-000001": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "1"
+                                }
+                            ]
+                        }
+                    },
+                    "storage": {},
+                    "code": ""
+                },
+                "sc:forwarder": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:NFT-000001": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "1201"
+                                }
+                            ],
+                            "lastNonce": "1",
+                            "roles": [
+                                "ESDTRoleNFTAddQuantity"
+                            ]
+                        }
+                    },
+                    "storage": {},
+                    "code": "file:../forwarder/output/forwarder.wasm"
+                },
+                "sc:forwarder2": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:NFT-000001": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "1"
+                                }
+                            ],
+                            "lastNonce": "1"
+                        }
+                    },
+                    "code": "file:../forwarder/output/forwarder.wasm"
+                }
+            }
+        }
+    ]
+}

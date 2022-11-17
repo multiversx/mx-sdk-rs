@@ -1,51 +1,55 @@
 elrond_wasm::imports!();
 
-#[elrond_wasm_derive::module]
+#[elrond_wasm::module]
 pub trait DeployContractModule {
-	#[endpoint(deployContract)]
-	fn deploy_contract(
-		&self,
-		code: BoxedBytes,
-		#[var_args] arguments: VarArgs<BoxedBytes>,
-	) -> SCResult<Address> {
-		let deployed_contract_address = self.deploy(&code, &arguments.into_vec());
-		if deployed_contract_address.is_zero() {
-			return sc_error!("Deploy failed");
-		}
+    #[proxy]
+    fn vault_proxy(&self) -> vault::Proxy<Self::Api>;
 
-		Ok(deployed_contract_address)
-	}
+    #[endpoint]
+    fn deploy_contract(
+        &self,
+        code: ManagedBuffer,
+        opt_arg: OptionalValue<ManagedBuffer>,
+    ) -> MultiValue2<ManagedAddress, OptionalValue<ManagedBuffer>> {
+        self.perform_deploy_vault(&code, opt_arg).into()
+    }
 
-	#[endpoint(deployTwoContracts)]
-	fn deploy_two_contracts(
-		&self,
-		code: BoxedBytes,
-		#[var_args] arguments: VarArgs<BoxedBytes>,
-	) -> SCResult<(Address, Address)> {
-		let args_as_vec = arguments.into_vec();
-		let first_deployed_contract_address = self.deploy(&code, &args_as_vec);
-		if first_deployed_contract_address.is_zero() {
-			return sc_error!("First deploy failed");
-		}
+    #[endpoint]
+    fn deploy_two_contracts(
+        &self,
+        code: ManagedBuffer,
+    ) -> MultiValue2<ManagedAddress, ManagedAddress> {
+        let (first_deployed_contract_address, _) =
+            self.perform_deploy_vault(&code, OptionalValue::None);
+        let (second_deployed_contract_address, _) =
+            self.perform_deploy_vault(&code, OptionalValue::None);
 
-		let second_deployed_contract_address = self.deploy(&code, &args_as_vec);
-		if second_deployed_contract_address.is_zero() {
-			return sc_error!("Second deploy failed");
-		}
+        (
+            first_deployed_contract_address,
+            second_deployed_contract_address,
+        )
+            .into()
+    }
 
-		Ok((
-			first_deployed_contract_address,
-			second_deployed_contract_address,
-		))
-	}
+    fn perform_deploy_vault(
+        &self,
+        code: &ManagedBuffer,
+        opt_arg: OptionalValue<ManagedBuffer>,
+    ) -> (ManagedAddress, OptionalValue<ManagedBuffer>) {
+        self.vault_proxy()
+            .init(opt_arg)
+            .deploy_contract(code, CodeMetadata::DEFAULT)
+    }
 
-	fn deploy(&self, code: &BoxedBytes, arguments: &[BoxedBytes]) -> Address {
-		self.send().deploy_contract(
-			self.blockchain().get_gas_left(),
-			&Self::BigUint::zero(),
-			code,
-			CodeMetadata::DEFAULT,
-			&arguments.into(),
-		)
-	}
+    #[endpoint]
+    fn deploy_vault_from_source(
+        &self,
+        source_address: ManagedAddress,
+        opt_arg: OptionalValue<ManagedBuffer>,
+    ) -> MultiValue2<ManagedAddress, OptionalValue<ManagedBuffer>> {
+        self.vault_proxy()
+            .init(opt_arg)
+            .deploy_from_source(&source_address, CodeMetadata::DEFAULT)
+            .into()
+    }
 }

@@ -1,0 +1,196 @@
+{
+    "name": "adder",
+    "comment": "add then check",
+    "steps": [
+        {
+            "step": "scCall",
+            "id": "prop-add-1",
+            "tx": {
+                "from": "address:alice",
+                "to": "sc:multisig",
+                "function": "proposeAddProposer",
+                "arguments": [
+                    "address:paul"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "1"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "prop-signers-1",
+            "tx": {
+                "to": "sc:multisig-view",
+                "function": "getActionSigners",
+                "arguments": [
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "address:alice"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "prop-sign-alice-again",
+            "comment": "should have no effect",
+            "tx": {
+                "from": "address:alice",
+                "to": "sc:multisig",
+                "function": "sign",
+                "arguments": [
+                    "1"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "prop-signers-2",
+            "tx": {
+                "to": "sc:multisig-view",
+                "function": "getActionSigners",
+                "arguments": [
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "address:alice"
+                ],
+                "status": ""
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "prop-add-1-try-perform-insufficient-signatures",
+            "tx": {
+                "from": "address:alice",
+                "to": "sc:multisig",
+                "function": "performAction",
+                "arguments": [
+                    "1"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:quorum has not been reached",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "prop-sign-bob",
+            "tx": {
+                "from": "address:bob",
+                "to": "sc:multisig",
+                "function": "sign",
+                "arguments": [
+                    "1"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "prop-signers-3",
+            "tx": {
+                "to": "sc:multisig-view",
+                "function": "getActionSigners",
+                "arguments": [
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "address:alice|address:bob"
+                ]
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "prop-signers-3-count",
+            "tx": {
+                "to": "sc:multisig-view",
+                "function": "getActionSignerCount",
+                "arguments": [
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "2"
+                ],
+                "status": ""
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "prop-add-1-perform",
+            "tx": {
+                "from": "address:alice",
+                "to": "sc:multisig",
+                "function": "performAction",
+                "arguments": [
+                    "1"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "getAllProposers",
+            "tx": {
+                "to": "sc:multisig-view",
+                "function": "getAllProposers",
+                "arguments": []
+            },
+            "expect": {
+                "out": [
+                    "address:paul"
+                ],
+                "status": ""
+            }
+        }
+    ]
+}

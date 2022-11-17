@@ -8,24 +8,20 @@
                 "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
                     "code": "file:../output/basic-features.wasm"
                 },
                 "address:an_account": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 }
             }
         },
         {
             "step": "scCall",
-            "txId": "oog",
+            "id": "oog",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "store_map3",
                 "arguments": [
                     "0x57",
@@ -38,7 +34,7 @@
                 "out": [],
                 "status": "5",
                 "message": "str:not enough gas",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }

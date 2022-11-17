@@ -8,31 +8,27 @@
                 "sc:basic-features": {
                     "nonce": "1000",
                     "balance": "0",
-                    "storage": {},
                     "esdt": {
-                        "str:BASIC-FEATURES-TOKEN": "1,000"
+                        "str:SENDESDT": "1,000"
                     },
                     "code": "file:../forwarder/output/forwarder.wasm"
                 },
                 "address:an_account": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 }
             }
         },
         {
             "step": "scCall",
-            "txId": "not-enough",
+            "id": "not-enough",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "send_esdt",
                 "arguments": [
                     "address:an_account",
-                    "str:BASIC-FEATURES-TOKEN",
+                    "str:SENDESDT",
                     "10000"
                 ],
                 "gasLimit": "50,000,000",
@@ -42,21 +38,20 @@
                 "out": [],
                 "status": "*",
                 "message": "str:insufficient funds",
-                "logs": []
+                "logs": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "without-message",
+            "id": "send_esdt-ok",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "send_esdt",
                 "arguments": [
                     "address:an_account",
-                    "str:BASIC-FEATURES-TOKEN",
-                    "100"
+                    "str:SENDESDT",
+                    "200"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
@@ -64,30 +59,19 @@
             "expect": {
                 "out": [],
                 "status": "",
-                "logs": []
-            }
-        },
-        {
-            "step": "scCall",
-            "txId": "with-message",
-            "tx": {
-                "from": "address:an_account",
-                "to": "sc:basic-features",
-                "value": "0",
-                "function": "send_esdt",
-                "arguments": [
-                    "address:an_account",
-                    "str:BASIC-FEATURES-TOKEN",
-                    "100",
-                    "str:send tx message here"
-                ],
-                "gasLimit": "50,000,000",
-                "gasPrice": "0"
-            },
-            "expect": {
-                "out": [],
-                "status": "",
-                "logs": []
+                "logs": [
+                    {
+                        "address": "sc:basic-features",
+                        "endpoint": "str:ESDTTransfer",
+                        "topics": [
+                            "str:SENDESDT",
+                            "",
+                            "200",
+                            "address:an_account"
+                        ],
+                        "data": ""
+                    }
+                ]
             }
         },
         {
@@ -96,19 +80,19 @@
                 "sc:basic-features": {
                     "nonce": "1000",
                     "balance": "0",
-                    "storage": {},
                     "esdt": {
-                        "str:BASIC-FEATURES-TOKEN": "800"
+                        "str:SENDESDT": "800"
                     },
+                    "storage": {},
                     "code": "file:../forwarder/output/forwarder.wasm"
                 },
                 "address:an_account": {
                     "nonce": "*",
                     "balance": "0",
-                    "storage": {},
                     "esdt": {
-                        "str:BASIC-FEATURES-TOKEN": "200"
+                        "str:SENDESDT": "200"
                     },
+                    "storage": {},
                     "code": ""
                 }
             }

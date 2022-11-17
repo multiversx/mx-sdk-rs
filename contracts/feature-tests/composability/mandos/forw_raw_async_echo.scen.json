@@ -6,31 +6,26 @@
             "accounts": {
                 "address:a_user": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 },
                 "sc:vault": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
                     "code": "file:../vault/output/vault.wasm"
                 },
                 "sc:forwarder": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
                     "code": "file:../forwarder-raw/output/forwarder-raw.wasm"
                 }
             }
         },
         {
             "step": "scCall",
-            "txId": "1",
+            "id": "1",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "value": "0",
                 "function": "forward_async_call",
                 "arguments": [
                     "sc:vault",
@@ -50,13 +45,12 @@
                 "logs": [
                     {
                         "address": "sc:forwarder",
-                        "identifier": "str:callback_raw",
+                        "endpoint": "str:callBack",
                         "topics": [
-                            "str:EGLD",
-                            "0"
+                            "str:callback_raw"
                         ],
                         "data": {
-                            "0-status": "biguint:0",
+                            "0-status": "nested:0x00",
                             "1-echoed-args": [
                                 "biguint:1",
                                 "biguint:2"
@@ -89,17 +83,12 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "str:callback_data.len": "1",
-                        "str:callback_data.item|u32:1": {
-                            "0-token": ["u32:4", "str:EGLD"],
-                            "1-payment": "u32:0",
-                            "2-num-arguments": "u32:3",
-                            "3-arguments": [
-                                "biguint:0",
-                                "biguint:1",
-                                "biguint:2"
-                            ]
-                        }
+                        "str:callback_args.len": "1",
+                        "str:callback_args.item|u32:1": [
+                            "nested:0x00",
+                            "biguint:1",
+                            "biguint:2"
+                        ]
                     },
                     "code": "file:../forwarder-raw/output/forwarder-raw.wasm"
                 }

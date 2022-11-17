@@ -7,41 +7,34 @@
             "accounts": {
                 "address:crypto_bubbles_owner": {
                     "nonce": "0",
-                    "balance": "0x10000000",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0x10000000"
                 },
                 "sc:crypto_bubbles": {
                     "nonce": "0",
                     "balance": "0x100",
                     "storage": {
-                        "''owner": "address:crypto_bubbles_owner",
-                        "''playerBalance|address:acc1": "0x311",
-                        "''playerBalance|address:acc2": "0x422"
+                        "str:playerBalance|address:acc1": "0x311",
+                        "str:playerBalance|address:acc2": "0x422"
                     },
                     "code": "file:../output/crypto-bubbles.wasm"
                 },
                 "address:acc1": {
                     "nonce": "0",
-                    "balance": "0x20100200",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0x20100200"
                 },
                 "address:acc2": {
                     "nonce": "0",
-                    "balance": "0x20202150",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0x20202150"
                 }
             }
         },
         {
             "step": "scCall",
-            "txId": "1",
+            "id": "1",
             "tx": {
                 "from": "address:acc1",
                 "to": "sc:crypto_bubbles",
-                "value": "0x200",
+                "egldValue": "0x200",
                 "function": "joinGame",
                 "arguments": [
                     "0x12"
@@ -55,17 +48,19 @@
                 "logs": [
                     {
                         "address": "sc:crypto_bubbles",
-                        "identifier": "0x1000000000000000000000000000000000000000000000000000000000000001",
+                        "endpoint": "str:joinGame",
                         "topics": [
+                            "str:top_up",
                             "address:acc1"
                         ],
                         "data": "0x0200"
                     },
                     {
                         "address": "sc:crypto_bubbles",
-                        "identifier": "0x1000000000000000000000000000000000000000000000000000000000000003",
+                        "endpoint": "str:joinGame",
                         "topics": [
-                            "0x0000000000000000000000000000000000000000000000000000000000000012",
+                            "str:player_joins_game",
+                            "0x12",
                             "address:acc1"
                         ],
                         "data": "0x200"
@@ -77,11 +72,11 @@
         },
         {
             "step": "scCall",
-            "txId": "2",
+            "id": "2",
             "tx": {
                 "from": "address:acc2",
                 "to": "sc:crypto_bubbles",
-                "value": "0x150",
+                "egldValue": "0x150",
                 "function": "joinGame",
                 "arguments": [
                     "0x12"
@@ -95,17 +90,19 @@
                 "logs": [
                     {
                         "address": "sc:crypto_bubbles",
-                        "identifier": "0x1000000000000000000000000000000000000000000000000000000000000001",
+                        "endpoint": "str:joinGame",
                         "topics": [
+                            "str:top_up",
                             "address:acc2"
                         ],
                         "data": "0x150"
                     },
                     {
                         "address": "sc:crypto_bubbles",
-                        "identifier": "0x1000000000000000000000000000000000000000000000000000000000000003",
+                        "endpoint": "str:joinGame",
                         "topics": [
-                            "0x0000000000000000000000000000000000000000000000000000000000000012",
+                            "str:player_joins_game",
+                            "0x12",
                             "address:acc2"
                         ],
                         "data": "0x150"
@@ -117,11 +114,11 @@
         },
         {
             "step": "scCall",
-            "txId": "3",
+            "id": "3",
             "tx": {
                 "from": "address:acc2",
                 "to": "sc:crypto_bubbles",
-                "value": "0x2000",
+                "egldValue": "0x2000",
                 "function": "joinGame",
                 "arguments": [
                     "0x12"
@@ -135,17 +132,19 @@
                 "logs": [
                     {
                         "address": "sc:crypto_bubbles",
-                        "identifier": "0x1000000000000000000000000000000000000000000000000000000000000001",
+                        "endpoint": "str:joinGame",
                         "topics": [
+                            "str:top_up",
                             "address:acc2"
                         ],
                         "data": "0x2000"
                     },
                     {
                         "address": "sc:crypto_bubbles",
-                        "identifier": "0x1000000000000000000000000000000000000000000000000000000000000003",
+                        "endpoint": "str:joinGame",
                         "topics": [
-                            "0x0000000000000000000000000000000000000000000000000000000000000012",
+                            "str:player_joins_game",
+                            "0x12",
                             "address:acc2"
                         ],
                         "data": "0x2000"
@@ -168,9 +167,8 @@
                     "nonce": "0",
                     "balance": "0x2450",
                     "storage": {
-                        "''owner": "address:crypto_bubbles_owner",
-                        "''playerBalance|address:acc1": "0x311",
-                        "''playerBalance|address:acc2": "0x422"
+                        "str:playerBalance|address:acc1": "0x311",
+                        "str:playerBalance|address:acc2": "0x422"
                     },
                     "code": "file:../output/crypto-bubbles.wasm"
                 },

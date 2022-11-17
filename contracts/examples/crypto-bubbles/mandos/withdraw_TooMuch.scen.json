@@ -7,34 +7,28 @@
             "accounts": {
                 "address:crypto_bubbles_owner": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 },
                 "sc:crypto_bubbles": {
                     "nonce": "0",
                     "balance": "0x100",
                     "storage": {
-                        "''owner": "address:crypto_bubbles_owner",
-                        "''playerBalance|address:acc1": "0x100"
+                        "str:playerBalance|address:acc1": "0x100"
                     },
                     "code": "file:../output/crypto-bubbles.wasm"
                 },
                 "address:acc1": {
                     "nonce": "0",
-                    "balance": "0x200000",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0x200000"
                 }
             }
         },
         {
             "step": "scCall",
-            "txId": "1",
+            "id": "1",
             "tx": {
                 "from": "address:acc1",
                 "to": "sc:crypto_bubbles",
-                "value": "0",
                 "function": "withdraw",
                 "arguments": [
                     "0x10000"
@@ -46,7 +40,7 @@
                 "out": [],
                 "status": "0x04",
                 "message": "str:amount to withdraw must be less or equal to balance",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -64,8 +58,7 @@
                     "nonce": "0",
                     "balance": "0x100",
                     "storage": {
-                        "''owner": "address:crypto_bubbles_owner",
-                        "''playerBalance|address:acc1": "0x100"
+                        "str:playerBalance|address:acc1": "0x100"
                     },
                     "code": "file:../output/crypto-bubbles.wasm"
                 },

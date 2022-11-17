@@ -1,0 +1,299 @@
+{
+    "name": "storage",
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "set-initial-len",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "init_unique_id_mapper",
+                "arguments": [
+                    "5"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:unique_id_mapper.len": "5",
+                        "str:unique_id_mapper.item|u32:1": "",
+                        "str:unique_id_mapper.item|u32:2": "",
+                        "str:unique_id_mapper.item|u32:3": "",
+                        "str:unique_id_mapper.item|u32:4": "",
+                        "str:unique_id_mapper.item|u32:5": ""
+                    },
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "*",
+                    "balance": "*",
+                    "storage": {},
+                    "code": ""
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "get-unique-id-mapper",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "unique_id_mapper",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "1",
+                    "2",
+                    "3",
+                    "4",
+                    "5"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "try-set-len-again",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "init_unique_id_mapper",
+                "arguments": [
+                    "10"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:len already set",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "swap-remove",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "unique_id_mapper_swap_remove",
+                "arguments": [
+                    "3"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "3"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:unique_id_mapper.len": "4",
+                        "str:unique_id_mapper.item|u32:1": "",
+                        "str:unique_id_mapper.item|u32:2": "",
+                        "str:unique_id_mapper.item|u32:3": "5",
+                        "str:unique_id_mapper.item|u32:4": "",
+                        "str:unique_id_mapper.item|u32:5": ""
+                    },
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "*",
+                    "balance": "*",
+                    "storage": {},
+                    "code": ""
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "get-unique-id-mapper",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "unique_id_mapper",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "1",
+                    "2",
+                    "5",
+                    "4"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "get-modified-entry",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "unique_id_mapper_get",
+                "arguments": [
+                    "3"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "5"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "get-empty-entry",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "unique_id_mapper_get",
+                "arguments": [
+                    "1"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "1"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "set-entry",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "unique_id_mapper_set",
+                "arguments": [
+                    "3",
+                    "3"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:unique_id_mapper.len": "4",
+                        "str:unique_id_mapper.item|u32:1": "",
+                        "str:unique_id_mapper.item|u32:2": "",
+                        "str:unique_id_mapper.item|u32:3": "",
+                        "str:unique_id_mapper.item|u32:4": "",
+                        "str:unique_id_mapper.item|u32:5": ""
+                    },
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "*",
+                    "balance": "*",
+                    "storage": {},
+                    "code": ""
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "get-unique-id-mapper",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "unique_id_mapper",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "1",
+                    "2",
+                    "3",
+                    "4"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

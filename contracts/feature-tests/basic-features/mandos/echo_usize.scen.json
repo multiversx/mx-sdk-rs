@@ -8,24 +8,20 @@
                 "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
                     "code": "file:../output/basic-features.wasm"
                 },
                 "address:an_account": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 }
             }
         },
         {
             "step": "scCall",
-            "txId": "1",
+            "id": "1",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "echo_usize",
                 "arguments": [
                     "0"
@@ -38,18 +34,17 @@
                     ""
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "2",
+            "id": "2",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "echo_usize",
                 "arguments": [
                     "5"
@@ -62,18 +57,17 @@
                     "5"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "3",
+            "id": "3",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "echo_usize",
                 "arguments": [
                     "0xc8"
@@ -86,18 +80,17 @@
                     "0xc8"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "4",
+            "id": "4",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "echo_usize",
                 "arguments": [
                     "0xffffffff"
@@ -110,18 +103,17 @@
                     "0xffffffff"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "5",
+            "id": "5",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "echo_usize",
                 "arguments": [
                     "0x0100000000"
@@ -133,7 +125,7 @@
                 "out": [],
                 "status": "4",
                 "message": "str:argument decode error (i): input too long",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }

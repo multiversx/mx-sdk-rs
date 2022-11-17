@@ -1,0 +1,145 @@
+{
+    "name": "test that codec errors are returned correctly",
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:basic-features": {
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "address:an_account": {}
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "codec_err_finish",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "codec_err_finish",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:endpoint result encode error: deliberate top encode error"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "codec_err_storage_key",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "codec_err_storage_key",
+                "arguments": []
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:storage key encode error: deliberate nested encode error"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "codec_err_storage_get",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "codec_err_storage_get",
+                "arguments": []
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:storage decode error: deliberate top decode error"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "codec_err_storage_set",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "codec_err_storage_set",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:storage encode error: deliberate top encode error"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "codec_err_event_topic",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "codec_err_event_topic",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:log topic encode error: deliberate top encode error"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "codec_err_event_data",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "codec_err_event_data",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:log data encode error: deliberate top encode error"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "codec_err_contract_init",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "codec_err_contract_init",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:contract call encode error: deliberate top encode error"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "codec_err_contract_call",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "codec_err_contract_call",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:contract call encode error: deliberate top encode error"
+            }
+        }
+    ]
+}

@@ -27,8 +27,8 @@ deploy_ping_pong() {
         --arguments $FIXED_SUM $DURATION $BEGINNING $MAX_FUNDS --send \
         || return)
 
-    local RESULT_ADDRESS=$(erdpy data parse --file="$OUTFILE" --expression="data['emitted_tx']['address']")
-    local RESULT_TRANSACTION=$(erdpy data parse --file="$OUTFILE" --expression="data['emitted_tx']['hash']")
+    local RESULT_ADDRESS=$(erdpy data parse --file="$OUTFILE" --expression="data['contractAddress']")
+    local RESULT_TRANSACTION=$(erdpy data parse --file="$OUTFILE" --expression="data['emittedTransactionHash']")
 
     echo ""
     echo "Deployed contract with:"

@@ -1,0 +1,55 @@
+{
+    "comment": "verifies that setState and checkState are consistent",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:the-address": {
+                    "esdt": {
+                        "str:NFT-123456": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "1",
+                                    "creator": "address:the-address",
+                                    "royalties": "2000",
+                                    "hash": "keccak256:str:metadata_hash",
+                                    "uri": [
+                                        "str:www.cool_nft.com/my_nft.jpg",
+                                        "str:www.cool_nft.com/my_nft.json"
+                                    ],
+                                    "attributes": "str:serialized_attributes"
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:the-address": {
+                    "esdt": {
+                        "str:NFT-123456": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "4",
+                                    "creator": "address:another-address",
+                                    "royalties": "2001",
+                                    "hash": "keccak256:str:another_hash",
+                                    "uri": [
+                                        "str:www.cool_nft.com/another_nft.jpg",
+                                        "*"
+                                    ],
+                                    "attributes": "str:other_attributes"
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+    ]
+}

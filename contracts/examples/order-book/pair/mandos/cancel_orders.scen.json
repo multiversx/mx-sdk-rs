@@ -1,0 +1,53 @@
+{
+    "name": "createBuyOrder",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "steps/complete_setup.steps.json"
+        },
+        {
+            "step": "externalSteps",
+            "path": "steps/create_buy_order.steps.json"
+        },
+        {
+            "step": "scCall",
+            "id": "cancelOrders",
+            "tx": {
+                "from": "address:user1",
+                "to": "sc:pair",
+                "function": "cancelOrders",
+                "arguments": [
+                    "u64:0"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "getAddressOrderIds",
+            "tx": {
+                "from": "address:user1",
+                "to": "sc:pair",
+                "function": "getAddressOrderIds",
+                "arguments": [
+                    "address:user1"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

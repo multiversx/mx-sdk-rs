@@ -1,0 +1,31 @@
+{
+    "name": "createSellOrder",
+    "steps": [
+        {
+            "step": "scCall",
+            "id": "createSellOrder",
+            "tx": {
+                "from": "address:user2",
+                "to": "sc:pair",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:WEGLD-abcdef",
+                        "value": "200,000"
+                    }
+                ],
+                "function": "createSellOrder",
+                "arguments": [
+                    "biguint:2000000|address:match_provider|0x00|biguint:10000|u64:0|u64:1000"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

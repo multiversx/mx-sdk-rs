@@ -1,0 +1,220 @@
+{
+    "name": "init contract",
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "0",
+                    "balance": "0"
+                },
+                "address:buyer1": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:EGLD-135790": "200"
+                    }
+                },
+                "address:buyer2": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:EGLD-135790": "20000"
+                    }
+                },
+                "address:artist1": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:MFNFT-567890": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "1"
+                                },
+                                {
+                                    "nonce": "2",
+                                    "balance": "1"
+                                },
+                                {
+                                    "nonce": "3",
+                                    "balance": "1"
+                                },
+                                {
+                                    "nonce": "4",
+                                    "balance": "1"
+                                },
+                                {
+                                    "nonce": "5",
+                                    "balance": "1"
+                                },
+                                {
+                                    "nonce": "6",
+                                    "balance": "1"
+                                },
+                                {
+                                    "nonce": "7",
+                                    "balance": "1"
+                                },
+                                {
+                                    "nonce": "8",
+                                    "balance": "1"
+                                },
+                                {
+                                    "nonce": "9",
+                                    "balance": "1"
+                                }
+                            ]
+                        },
+                        "str:MFFT-123456": "1000"
+                    }
+                },
+                "address:artist2": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:MFSFT-246802": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "2000"
+                                },
+                                {
+                                    "nonce": "2",
+                                    "balance": "1000"
+                                },
+                                {
+                                    "nonce": "17",
+                                    "balance": "1000"
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "newAddresses": [
+                {
+                    "creatorAddress": "address:owner",
+                    "creatorNonce": "0",
+                    "newAddress": "sc:bonding-curve-contract"
+                }
+            ]
+        },
+        {
+            "step": "scDeploy",
+            "id": "deploy",
+            "tx": {
+                "from": "address:owner",
+                "contractCode": "file:../output/bonding-curve-contract.wasm",
+                "arguments": [],
+                "gasLimit": "15,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "1",
+                    "balance": "0",
+                    "storage": {}
+                },
+                "address:buyer1": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:EGLD-135790": "200"
+                    }
+                },
+                "address:buyer2": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:EGLD-135790": "20000"
+                    }
+                },
+                "address:artist1": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:MFNFT-567890": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "1"
+                                },
+                                {
+                                    "nonce": "2",
+                                    "balance": "1"
+                                },
+                                {
+                                    "nonce": "3",
+                                    "balance": "1"
+                                },
+                                {
+                                    "nonce": "4",
+                                    "balance": "1"
+                                },
+                                {
+                                    "nonce": "5",
+                                    "balance": "1"
+                                },
+                                {
+                                    "nonce": "6",
+                                    "balance": "1"
+                                },
+                                {
+                                    "nonce": "7",
+                                    "balance": "1"
+                                },
+                                {
+                                    "nonce": "8",
+                                    "balance": "1"
+                                },
+                                {
+                                    "nonce": "9",
+                                    "balance": "1"
+                                }
+                            ]
+                        },
+                        "str:MFFT-123456": "1000"
+                    }
+                },
+                "address:artist2": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:MFSFT-246802": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "2000"
+                                },
+                                {
+                                    "nonce": "2",
+                                    "balance": "1000"
+                                },
+                                {
+                                    "nonce": "17",
+                                    "balance": "1000"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "sc:bonding-curve-contract": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../output/bonding-curve-contract.wasm"
+                }
+            }
+        }
+    ]
+}

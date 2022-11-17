@@ -17,10 +17,13 @@ panic = "abort"
 
 [dependencies.proxy-test-first]
 path = ".."
-features=["wasm-output-mode"]
+
+[dependencies.elrond-wasm-node]
+version = "0.36.1"
+path = "../../../../../elrond-wasm-node"
 
 [dependencies.elrond-wasm-output]
-version = "0.17.3"
+version = "0.36.1"
 path = "../../../../../elrond-wasm-output"
 features=["wasm-output-mode"]
 

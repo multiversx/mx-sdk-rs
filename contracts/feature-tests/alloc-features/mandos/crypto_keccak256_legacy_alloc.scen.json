@@ -1,0 +1,65 @@
+{
+    "name": "crypto",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:alloc-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../output/alloc-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "1",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:alloc-features",
+                "function": "compute_keccak256_legacy_alloc",
+                "arguments": [
+                    "0x61"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "0x3ac225168df54212a25c1c01fd35bebfea408fdac2e31ddd6f80a4bbf9a5f1cb"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "2",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:alloc-features",
+                "function": "compute_keccak256_legacy_alloc",
+                "arguments": [
+                    "0x0102030405060708"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "keccak256:0x0102030405060708"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

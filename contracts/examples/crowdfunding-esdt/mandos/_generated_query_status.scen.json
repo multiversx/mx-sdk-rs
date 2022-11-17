@@ -1,0 +1,126 @@
+{
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "0x66687aadf862bd776c8fc18b8e9f8e20089714856ee233b3902a591d0d5f2925": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "developerRewards": "0"
+                }
+            }
+        },
+        {
+            "step": "setState",
+            "accounts": {
+                "0x2b32db6c2c0a6235fb1397e8225ea85e0f0e6e8c7b126d0016ccbde0e667151e": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "developerRewards": "0"
+                }
+            }
+        },
+        {
+            "step": "setState",
+            "accounts": {
+                "0x12771355e46cd47c71ed1721fd5319b383cca3a1f9fce3aa1c8cd3bd37af20d7": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "developerRewards": "0"
+                }
+            }
+        },
+        {
+            "step": "setState",
+            "accounts": {
+                "0x0000000000000000d720a08b839a004c2e6386f5aecc19ec74807d1920cb6aeb": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../output/crowdfunding-esdt.wasm",
+                    "owner": "0x66687aadf862bd776c8fc18b8e9f8e20089714856ee233b3902a591d0d5f2925",
+                    "developerRewards": "0"
+                }
+            }
+        },
+        {
+            "step": "setState",
+            "accounts": {
+                "0x2b32db6c2c0a6235fb1397e8225ea85e0f0e6e8c7b126d0016ccbde0e667151e": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:CROWD-123456": {
+                            "instances": [
+                                {
+                                    "nonce": "0",
+                                    "balance": "1000",
+                                    "royalties": "0",
+                                    "attributes": "0x"
+                                }
+                            ]
+                        }
+                    },
+                    "developerRewards": "0"
+                }
+            }
+        },
+        {
+            "step": "setState",
+            "accounts": {
+                "0x12771355e46cd47c71ed1721fd5319b383cca3a1f9fce3aa1c8cd3bd37af20d7": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:CROWD-123456": {
+                            "instances": [
+                                {
+                                    "nonce": "0",
+                                    "balance": "1000",
+                                    "royalties": "0",
+                                    "attributes": "0x"
+                                }
+                            ]
+                        }
+                    },
+                    "developerRewards": "0"
+                }
+            }
+        },
+        {
+            "step": "setState",
+            "accounts": {
+                "0x0000000000000000d720a08b839a004c2e6386f5aecc19ec74807d1920cb6aeb": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:deadline": "0x093a80",
+                        "str:target": "0x07d0",
+                        "str:tokenIdentifier": "0x43524f57442d313233343536"
+                    },
+                    "code": "file:../output/crowdfunding-esdt.wasm",
+                    "owner": "0x66687aadf862bd776c8fc18b8e9f8e20089714856ee233b3902a591d0d5f2925",
+                    "developerRewards": "0"
+                }
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "0",
+            "tx": {
+                "to": "0x0000000000000000d720a08b839a004c2e6386f5aecc19ec74807d1920cb6aeb",
+                "function": "status",
+                "arguments": []
+            },
+            "expect": {
+                "out": [
+                    "0x"
+                ],
+                "status": "0",
+                "message": "str:",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

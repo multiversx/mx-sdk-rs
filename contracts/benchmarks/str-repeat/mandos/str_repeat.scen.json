@@ -6,9 +6,7 @@
             "accounts": {
                 "address:owner": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 }
             },
             "newAddresses": [
@@ -21,10 +19,9 @@
         },
         {
             "step": "scDeploy",
-            "txId": "deploy",
+            "id": "deploy",
             "tx": {
                 "from": "address:owner",
-                "value": "0",
                 "contractCode": "file:../output/str-repeat.wasm",
                 "arguments": [],
                 "gasLimit": "2,000,000",
@@ -40,14 +37,14 @@
         },
         {
             "step": "scCall",
-            "txId": "append-abc-3-times",
+            "id": "append-abc-3-times",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
-                "value": "0",
                 "function": "repeat",
                 "arguments": [
-                    "str:abc", "3"
+                    "str:abc",
+                    "3"
                 ],
                 "gasLimit": "4,000,000",
                 "gasPrice": "0"
@@ -62,14 +59,14 @@
         },
         {
             "step": "scCall",
-            "txId": "append-abc-0-times",
+            "id": "append-abc-0-times",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
-                "value": "0",
                 "function": "repeat",
                 "arguments": [
-                    "str:abc", "0"
+                    "str:abc",
+                    "0"
                 ],
                 "gasLimit": "3,000,000",
                 "gasPrice": "0"
@@ -98,14 +95,14 @@
         },
         {
             "step": "scCall",
-            "txId": "append-whitespace",
+            "id": "append-whitespace",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
-                "value": "0",
                 "function": "repeat",
                 "arguments": [
-                    "", "1000"
+                    "",
+                    "1000"
                 ],
                 "gasLimit": "4,000,000",
                 "gasPrice": "0"

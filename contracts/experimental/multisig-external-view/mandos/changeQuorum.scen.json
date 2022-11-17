@@ -1,0 +1,130 @@
+{
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "steps/init_accounts.steps.json"
+        },
+        {
+            "step": "externalSteps",
+            "path": "steps/deploy.steps.json"
+        },
+        {
+            "step": "scCall",
+            "id": "change-quorum-propose",
+            "tx": {
+                "from": "address:alice",
+                "to": "sc:multisig",
+                "function": "proposeChangeQuorum",
+                "arguments": [
+                    "3"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "1"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "change-quorum-sign-bob",
+            "tx": {
+                "from": "address:bob",
+                "to": "sc:multisig",
+                "function": "sign",
+                "arguments": [
+                    "1"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "pending-action-data",
+            "tx": {
+                "to": "sc:multisig-view",
+                "function": "getPendingActionFullInfo",
+                "arguments": []
+            },
+            "expect": {
+                "out": [
+                    [
+                        "u32:1",
+                        "u8:4|u32:3",
+                        "u32:2|address:alice|address:bob"
+                    ]
+                ],
+                "status": ""
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "change-quorum-perform",
+            "tx": {
+                "from": "address:alice",
+                "to": "sc:multisig",
+                "function": "performAction",
+                "arguments": [
+                    "1"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "getQuorum",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:multisig",
+                "function": "getQuorum",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "3"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "pending-action-data-none",
+            "tx": {
+                "to": "sc:multisig-view",
+                "function": "getPendingActionFullInfo",
+                "arguments": []
+            },
+            "expect": {
+                "out": [],
+                "status": ""
+            }
+        }
+    ]
+}

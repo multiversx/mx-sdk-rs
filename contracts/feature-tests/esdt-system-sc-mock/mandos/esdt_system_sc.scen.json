@@ -1,0 +1,207 @@
+{
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:user": {
+                    "nonce": "0",
+                    "balance": "100"
+                },
+                "sc:esdt": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:TICKER-000000": {
+                            "roles": [
+                                "ESDTRoleLocalMint",
+                                "ESDTRoleLocalBurn"
+                            ]
+                        }
+                    },
+                    "code": "file:../output/esdt-system-sc-mock.wasm"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "issue-invalid-token",
+            "tx": {
+                "from": "address:user",
+                "to": "sc:esdt",
+                "egldValue": "5",
+                "function": "issue",
+                "arguments": [
+                    "str:display",
+                    "str:wrongTicker",
+                    "1000",
+                    "18"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:Invalid token ID",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "issue-fungible-non-zero-supply",
+            "tx": {
+                "from": "address:user",
+                "to": "sc:esdt",
+                "egldValue": "5",
+                "function": "issue",
+                "arguments": [
+                    "str:display",
+                    "str:TICKER",
+                    "1000",
+                    "18"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "message": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "setState",
+            "accounts": {
+                "address:user": {
+                    "nonce": "0",
+                    "balance": "95",
+                    "esdt": {
+                        "str:TICKER-000000": "1000"
+                    }
+                },
+                "sc:esdt": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:TICKER-000000": {
+                            "roles": [
+                                "ESDTRoleLocalMint",
+                                "ESDTRoleLocalBurn"
+                            ]
+                        }
+                    },
+                    "storage": {
+                        "str:nrIssuedTokens": "1"
+                    },
+                    "code": "file:../output/esdt-system-sc-mock.wasm"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "issue-fungible-zero-supply",
+            "tx": {
+                "from": "address:user",
+                "to": "sc:esdt",
+                "egldValue": "5",
+                "function": "issue",
+                "arguments": [
+                    "str:display",
+                    "str:TICKER",
+                    "0",
+                    "18"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "str:TICKER-111111"
+                ],
+                "status": "0",
+                "message": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "issue-non-fungible",
+            "tx": {
+                "from": "address:user",
+                "to": "sc:esdt",
+                "egldValue": "5",
+                "function": "issueNonFungible",
+                "arguments": [
+                    "str:display",
+                    "str:BESTTOKEN"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "str:BESTTOKEN-222222"
+                ],
+                "status": "0",
+                "message": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "issue-semi-fungible",
+            "tx": {
+                "from": "address:user",
+                "to": "sc:esdt",
+                "egldValue": "5",
+                "function": "issueSemiFungible",
+                "arguments": [
+                    "str:display",
+                    "str:GOODTOKEN"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "str:GOODTOKEN-333333"
+                ],
+                "status": "0",
+                "message": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "issue-meta-esdt",
+            "tx": {
+                "from": "address:user",
+                "to": "sc:esdt",
+                "egldValue": "5",
+                "function": "registerMetaESDT",
+                "arguments": [
+                    "str:display",
+                    "str:META",
+                    "18"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "str:META-444444"
+                ],
+                "status": "0",
+                "message": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

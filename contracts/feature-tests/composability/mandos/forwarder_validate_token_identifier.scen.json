@@ -1,0 +1,95 @@
+{
+    "name": "load local esdt roles",
+    "gasSchedule": "dummy",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:forwarder": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:ESDT-123456": "200"
+                    },
+                    "code": "file:../forwarder/output/forwarder.wasm"
+                },
+                "address:viewer": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "0",
+            "comment": "valid token identifier",
+            "tx": {
+                "from": "address:viewer",
+                "to": "sc:forwarder",
+                "function": "validate_token_identifier",
+                "arguments": [
+                    "str:ESDT-123456"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "1"
+                ],
+                "status": "0",
+                "message": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "0",
+            "comment": "invalid token identifier",
+            "tx": {
+                "from": "address:viewer",
+                "to": "sc:forwarder",
+                "function": "validate_token_identifier",
+                "arguments": [
+                    "str:ESDT-12345"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ],
+                "status": "0",
+                "message": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "0",
+            "comment": "invalid token identifier",
+            "tx": {
+                "from": "address:viewer",
+                "to": "sc:forwarder",
+                "function": "validate_token_identifier",
+                "arguments": [
+                    "str:esdt-123456"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ],
+                "status": "0",
+                "message": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

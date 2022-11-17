@@ -6,31 +6,26 @@
             "accounts": {
                 "address:a_user": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 },
                 "sc:vault": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
                     "code": "file:../vault/output/vault.wasm"
                 },
                 "sc:forwarder": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
                     "code": "file:../forwarder/output/forwarder.wasm"
                 }
             }
         },
         {
             "step": "scCall",
-            "txId": "echo_arguments_sync",
+            "id": "echo_arguments_sync",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "value": "0",
                 "function": "echo_arguments_sync",
                 "arguments": [
                     "sc:vault",
@@ -41,16 +36,15 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [
-                    "1",
-                    "2"
-                ],
+                "out": [],
                 "status": "0",
                 "logs": [
                     {
                         "address": "sc:forwarder",
-                        "identifier": "str:echo_arguments_sync_result",
-                        "topics": [],
+                        "endpoint": "str:echo_arguments_sync",
+                        "topics": [
+                            "str:echo_arguments_sync_result"
+                        ],
                         "data": {
                             "0-echoed-args": [
                                 "biguint:1",
@@ -65,11 +59,10 @@
         },
         {
             "step": "scCall",
-            "txId": "echo_arguments_sync_twice",
+            "id": "echo_arguments_sync_twice",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "value": "0",
                 "function": "echo_arguments_sync_twice",
                 "arguments": [
                     "sc:vault",
@@ -80,18 +73,15 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [
-                    "1",
-                    "2",
-                    "1",
-                    "2"
-                ],
+                "out": [],
                 "status": "0",
                 "logs": [
                     {
                         "address": "sc:forwarder",
-                        "identifier": "str:echo_arguments_sync_result",
-                        "topics": [],
+                        "endpoint": "str:echo_arguments_sync_twice",
+                        "topics": [
+                            "str:echo_arguments_sync_result"
+                        ],
                         "data": {
                             "0-echoed-args": [
                                 "biguint:1",
@@ -101,8 +91,10 @@
                     },
                     {
                         "address": "sc:forwarder",
-                        "identifier": "str:echo_arguments_sync_result",
-                        "topics": [],
+                        "endpoint": "str:echo_arguments_sync_twice",
+                        "topics": [
+                            "str:echo_arguments_sync_result"
+                        ],
                         "data": {
                             "0-echoed-args": [
                                 "biguint:1",

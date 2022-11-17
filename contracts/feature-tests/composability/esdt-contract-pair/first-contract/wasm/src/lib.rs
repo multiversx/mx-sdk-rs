@@ -1,5 +1,20 @@
+////////////////////////////////////////////////////
+////////////////// AUTO-GENERATED //////////////////
+////////////////////////////////////////////////////
 
 #![no_std]
 
-pub use first_contract::*;
-pub use elrond_wasm_output::*;
+elrond_wasm_node::wasm_endpoints! {
+    first_contract
+    (
+        getSecondContractAddress
+        getesdtTokenName
+        transferToSecondContractFull
+        transferToSecondContractFullWithTransferAndExecute
+        transferToSecondContractHalf
+        transferToSecondContractRejected
+        transferToSecondContractRejectedWithTransferAndExecute
+    )
+}
+
+elrond_wasm_node::wasm_empty_callback! {}

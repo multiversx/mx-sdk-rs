@@ -8,42 +8,47 @@
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
-                        "str:NFT-0001": {
-                            "nonce": "1",
-                            "balance": "1"
+                        "str:NFT-000001": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "1"
+                                }
+                            ]
                         }
-                    },
-                    "storage": {},
-                    "code": ""
+                    }
                 },
                 "sc:forwarder": {
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
-                        "str:NFT-0001": {
-                            "nonce": "1",
-                            "balance": "1",
+                        "str:NFT-000001": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "1"
+                                }
+                            ],
                             "lastNonce": "1",
                             "roles": [
                                 "ESDTRoleNFTCreate"
                             ]
                         }
                     },
-                    "storage": {},
                     "code": "file:../forwarder/output/forwarder.wasm"
                 }
             }
         },
         {
             "step": "scCall",
-            "txId": "1",
+            "id": "1",
             "comment": "Attributes are Color(128, 128, 128)",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
                 "function": "nft_create",
                 "arguments": [
-                    "str:NFT-0001",
+                    "str:NFT-000001",
                     "1",
                     "str:nft-create-name",
                     "0",
@@ -55,8 +60,34 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": ["2"],
+                "out": [
+                    "2"
+                ],
                 "status": "0",
+                "logs": [
+                    {
+                        "address": "sc:forwarder",
+                        "endpoint": "str:ESDTNFTCreate",
+                        "topics": [
+                            "str:NFT-000001",
+                            "2",
+                            "1",
+                            "*"
+                        ],
+                        "data": ""
+                    },
+                    {
+                        "address": "sc:forwarder",
+                        "endpoint": "str:nft_create",
+                        "topics": [
+                            "str:create",
+                            "str:NFT-000001",
+                            "2",
+                            "1"
+                        ],
+                        "data": ""
+                    }
+                ],
                 "gas": "*",
                 "refund": "*"
             }
@@ -68,9 +99,13 @@
                     "nonce": "*",
                     "balance": "0",
                     "esdt": {
-                        "str:NFT-0001": {
-                            "nonce": "1",
-                            "balance": "1"
+                        "str:NFT-000001": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "1"
+                                }
+                            ]
                         }
                     },
                     "storage": {},
@@ -80,7 +115,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
-                        "str:NFT-0001": {
+                        "str:NFT-000001": {
                             "instances": [
                                 {
                                     "nonce": "1",
@@ -92,10 +127,10 @@
                                     "creator": "sc:forwarder",
                                     "royalties": "0",
                                     "hash": "str:nft-create-hash-----------------",
-                                    "attributes": "0x808080",
                                     "uri": [
                                         "str:nft-create-uri"
-                                    ]
+                                    ],
+                                    "attributes": "0x808080"
                                 }
                             ],
                             "lastNonce": "2",

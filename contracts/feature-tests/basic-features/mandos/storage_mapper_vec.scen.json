@@ -8,24 +8,20 @@
                 "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
                     "code": "file:../output/basic-features.wasm"
                 },
                 "address:an_account": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 }
             }
         },
         {
             "step": "scCall",
-            "txId": "before",
+            "id": "before",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "vec_mapper",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -34,107 +30,113 @@
             "expect": {
                 "out": [],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "increment-1",
+            "id": "increment-1",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "vec_mapper_push",
-                "arguments": [ "123" ],
+                "arguments": [
+                    "123"
+                ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "after-1",
+            "id": "after-1",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "vec_mapper",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "123" ],
+                "out": [
+                    "123"
+                ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "increment-2",
+            "id": "increment-2",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "vec_mapper_push",
-                "arguments": [ "111" ],
+                "arguments": [
+                    "111"
+                ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "after-2",
+            "id": "after-2",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "vec_mapper",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "123", "111" ],
+                "out": [
+                    "123",
+                    "111"
+                ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "after-2-len",
+            "id": "after-2-len",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "vec_mapper_len",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "2" ],
+                "out": [
+                    "2"
+                ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -146,9 +148,9 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "``vec_mapper.len": "2",
-                        "``vec_mapper.item|u32:1": "123",
-                        "``vec_mapper.item|u32:2": "111"
+                        "str:vec_mapper.len": "2",
+                        "str:vec_mapper.item|u32:1": "123",
+                        "str:vec_mapper.item|u32:2": "111"
                     },
                     "code": "file:../output/basic-features.wasm"
                 },
@@ -162,13 +164,14 @@
         },
         {
             "step": "scCall",
-            "txId": "index-0",
+            "id": "index-0",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "vec_mapper_get",
-                "arguments": [ "0" ],
+                "arguments": [
+                    "0"
+                ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
@@ -176,40 +179,44 @@
                 "out": [],
                 "status": "4",
                 "message": "str:index out of range",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "index-2",
+            "id": "index-2",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "vec_mapper_get",
-                "arguments": [ "2" ],
+                "arguments": [
+                    "2"
+                ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "111" ],
+                "out": [
+                    "111"
+                ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "index-3",
+            "id": "index-3",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "vec_mapper_get",
-                "arguments": [ "3" ],
+                "arguments": [
+                    "3"
+                ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
@@ -217,7 +224,7 @@
                 "out": [],
                 "status": "4",
                 "message": "str:index out of range",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }

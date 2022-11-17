@@ -7,39 +7,30 @@
             "accounts": {
                 "address:crypto_bubbles_owner": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 },
                 "sc:crypto_bubbles": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {
-                        "''owner": "address:crypto_bubbles_owner"
-                    },
                     "code": "file:../output/crypto-bubbles.wasm"
                 },
                 "address:acc1": {
                     "nonce": "0",
-                    "balance": "0x100800",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0x100800"
                 },
                 "address:acc2": {
                     "nonce": "0",
-                    "balance": "0x100800",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0x100800"
                 }
             }
         },
         {
             "step": "scCall",
-            "txId": "1",
+            "id": "1",
             "tx": {
                 "from": "address:acc1",
                 "to": "sc:crypto_bubbles",
-                "value": "0x100",
+                "egldValue": "0x100",
                 "function": "topUp",
                 "arguments": [],
                 "gasLimit": "0x100000",
@@ -51,8 +42,9 @@
                 "logs": [
                     {
                         "address": "sc:crypto_bubbles",
-                        "identifier": "0x1000000000000000000000000000000000000000000000000000000000000001",
+                        "endpoint": "str:topUp",
                         "topics": [
+                            "str:top_up",
                             "address:acc1"
                         ],
                         "data": "0x0100"
@@ -64,11 +56,11 @@
         },
         {
             "step": "scCall",
-            "txId": "2",
+            "id": "2",
             "tx": {
                 "from": "address:acc2",
                 "to": "sc:crypto_bubbles",
-                "value": "0x100",
+                "egldValue": "0x100",
                 "function": "topUp",
                 "arguments": [],
                 "gasLimit": "0x100000",
@@ -80,8 +72,9 @@
                 "logs": [
                     {
                         "address": "sc:crypto_bubbles",
-                        "identifier": "0x1000000000000000000000000000000000000000000000000000000000000001",
+                        "endpoint": "str:topUp",
                         "topics": [
+                            "str:top_up",
                             "address:acc2"
                         ],
                         "data": "0x0100"
@@ -104,9 +97,8 @@
                     "nonce": "0",
                     "balance": "0x200",
                     "storage": {
-                        "''owner": "address:crypto_bubbles_owner",
-                        "''playerBalance|address:acc1": "0x100",
-                        "''playerBalance|address:acc2": "0x100"
+                        "str:playerBalance|address:acc1": "0x100",
+                        "str:playerBalance|address:acc2": "0x100"
                     },
                     "code": "file:../output/crypto-bubbles.wasm"
                 },

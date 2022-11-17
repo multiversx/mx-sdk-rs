@@ -1,4 +1,14 @@
+////////////////////////////////////////////////////
+////////////////// AUTO-GENERATED //////////////////
+////////////////////////////////////////////////////
+
 #![no_std]
 
-pub use send_tx_repeat::*;
-pub use elrond_wasm_output::*;
+elrond_wasm_node::wasm_endpoints! {
+    send_tx_repeat
+    (
+        repeat
+    )
+}
+
+elrond_wasm_node::wasm_empty_callback! {}

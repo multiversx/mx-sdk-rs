@@ -1,0 +1,187 @@
+{
+    "name": "load local esdt roles",
+    "gasSchedule": "dummy",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:forwarder": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:ESDT-123456": "200"
+                    },
+                    "code": "file:../forwarder/output/forwarder.wasm"
+                },
+                "address:viewer": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "0",
+            "comment": "no roles",
+            "tx": {
+                "from": "address:viewer",
+                "to": "sc:forwarder",
+                "function": "get_esdt_local_roles",
+                "arguments": [
+                    "str:ESDT-123456"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "message": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:forwarder": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:ESDT-123456": {
+                            "roles": [
+                                "ESDTRoleLocalMint"
+                            ]
+                        }
+                    },
+                    "code": "file:../forwarder/output/forwarder.wasm"
+                },
+                "address:viewer": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "1",
+            "comment": "one role",
+            "tx": {
+                "from": "address:viewer",
+                "to": "sc:forwarder",
+                "function": "get_esdt_local_roles",
+                "arguments": [
+                    "str:ESDT-123456"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "str:ESDTRoleLocalMint"
+                ],
+                "status": "0",
+                "message": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:forwarder": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:ESDT-123456": {
+                            "roles": [
+                                "ESDTRoleLocalMint",
+                                "ESDTRoleLocalBurn"
+                            ]
+                        }
+                    },
+                    "code": "file:../forwarder/output/forwarder.wasm"
+                },
+                "address:viewer": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "2",
+            "comment": "multiple roles",
+            "tx": {
+                "from": "address:viewer",
+                "to": "sc:forwarder",
+                "function": "get_esdt_local_roles",
+                "arguments": [
+                    "str:ESDT-123456"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "str:ESDTRoleLocalMint",
+                    "str:ESDTRoleLocalBurn"
+                ],
+                "status": "0",
+                "message": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:forwarder": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:ESDT-123456": {
+                            "lastNonce": "5",
+                            "roles": [
+                                "ESDTRoleNFTCreate",
+                                "ESDTRoleNFTAddQuantity",
+                                "ESDTRoleNFTBurn"
+                            ]
+                        }
+                    },
+                    "code": "file:../forwarder/output/forwarder.wasm"
+                },
+                "address:viewer": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "3",
+            "comment": "nft roles",
+            "tx": {
+                "from": "address:viewer",
+                "to": "sc:forwarder",
+                "function": "get_esdt_local_roles",
+                "arguments": [
+                    "str:ESDT-123456"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "str:ESDTRoleNFTCreate",
+                    "str:ESDTRoleNFTAddQuantity",
+                    "str:ESDTRoleNFTBurn"
+                ],
+                "status": "0",
+                "message": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

@@ -8,24 +8,20 @@
                 "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
                     "code": "file:../output/basic-features.wasm"
                 },
                 "address:an_account": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 }
             }
         },
         {
             "step": "scCall",
-            "txId": "store-reserved-1",
+            "id": "store-reserved-1",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "store_reserved_vec_u8",
                 "arguments": [
                     "123"
@@ -37,18 +33,17 @@
                 "out": [],
                 "status": "*",
                 "message": "str:cannot write to storage under Elrond reserved key",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "store-reserved-2",
+            "id": "store-reserved-2",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "store_reserved_big_uint",
                 "arguments": [
                     "123"
@@ -60,18 +55,17 @@
                 "out": [],
                 "status": "*",
                 "message": "str:cannot write to storage under Elrond reserved key",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "store-reserved-3",
+            "id": "store-reserved-3",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "store_reserved_i64",
                 "arguments": [
                     "123"
@@ -83,7 +77,7 @@
                 "out": [],
                 "status": "*",
                 "message": "str:cannot write to storage under Elrond reserved key",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }

@@ -1,0 +1,181 @@
+{
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:a_user": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:NFT-000001": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "1"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "sc:forwarder": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:NFT-000001": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "1"
+                                }
+                            ],
+                            "lastNonce": "1",
+                            "roles": [
+                                "ESDTRoleNFTUpdateAttributes"
+                            ]
+                        }
+                    },
+                    "code": "file:../forwarder/output/forwarder.wasm"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "1",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:forwarder",
+                "function": "nft_update_attributes",
+                "arguments": [
+                    "str:NFT-000001",
+                    "1",
+                    "0x808080"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "logs": [
+                    {
+                        "address": "sc:forwarder",
+                        "endpoint": "str:ESDTNFTUpdateAttributes",
+                        "topics": [
+                            "str:NFT-000001",
+                            "1",
+                            "",
+                            "0x808080"
+                        ],
+                        "data": ""
+                    }
+                ],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:a_user": {
+                    "nonce": "*",
+                    "balance": "0",
+                    "esdt": {
+                        "str:NFT-000001": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "1"
+                                }
+                            ]
+                        }
+                    },
+                    "storage": {},
+                    "code": ""
+                },
+                "sc:forwarder": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:NFT-000001": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "1",
+                                    "attributes": "0x808080"
+                                }
+                            ],
+                            "lastNonce": "1",
+                            "roles": [
+                                "ESDTRoleNFTUpdateAttributes"
+                            ]
+                        }
+                    },
+                    "storage": {},
+                    "code": "file:../forwarder/output/forwarder.wasm"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "2",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:forwarder",
+                "function": "nft_update_attributes",
+                "arguments": [
+                    "str:NFT-000001",
+                    "1",
+                    "0x909090"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "logs": [
+                    {
+                        "address": "sc:forwarder",
+                        "endpoint": "str:ESDTNFTUpdateAttributes",
+                        "topics": [
+                            "str:NFT-000001",
+                            "1",
+                            "",
+                            "0x909090"
+                        ],
+                        "data": ""
+                    }
+                ],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:forwarder": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:NFT-000001": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "1",
+                                    "attributes": "0x909090"
+                                }
+                            ],
+                            "lastNonce": "1",
+                            "roles": [
+                                "ESDTRoleNFTUpdateAttributes"
+                            ]
+                        }
+                    },
+                    "storage": {},
+                    "code": "file:../forwarder/output/forwarder.wasm"
+                },
+                "+": ""
+            }
+        }
+    ]
+}

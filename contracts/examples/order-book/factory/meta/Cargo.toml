@@ -1,0 +1,13 @@
+[package]
+name = "factory-meta"
+version = "0.0.0"
+authors = ["you"]
+edition = "2018"
+publish = false
+
+[dependencies.order-book-factory]
+path = ".."
+
+[dependencies.elrond-wasm-debug]
+version = "0.36.1"
+path = "../../../../../elrond-wasm-debug"

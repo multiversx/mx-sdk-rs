@@ -1,0 +1,142 @@
+{
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:owner": {}
+            },
+            "newAddresses": [
+                {
+                    "creatorAddress": "address:owner",
+                    "creatorNonce": "0",
+                    "newAddress": "sc:multi-contract-features"
+                },
+                {
+                    "creatorAddress": "address:owner",
+                    "creatorNonce": "1",
+                    "newAddress": "sc:multi-contract-features-view"
+                }
+            ]
+        },
+        {
+            "step": "scDeploy",
+            "id": "deploy",
+            "tx": {
+                "from": "address:owner",
+                "contractCode": "file:../output/multi-contract-features.wasm",
+                "arguments": [
+                    "123"
+                ],
+                "gasLimit": "20,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scDeploy",
+            "id": "deploy",
+            "tx": {
+                "from": "address:owner",
+                "contractCode": "file:../output/multi-contract-features-view.wasm",
+                "arguments": [
+                    "sc:multi-contract-features"
+                ],
+                "gasLimit": "20,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:multi-contract-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:sample-value": "123"
+                    },
+                    "code": "file:../output/multi-contract-features.wasm"
+                },
+                "sc:multi-contract-features-view": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:external-view-target-address": "sc:multi-contract-features"
+                    },
+                    "code": "file:../output/multi-contract-features-view.wasm"
+                },
+                "address:owner": {
+                    "nonce": "*"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "sample_value_external_set",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:multi-contract-features-view",
+                "function": "sample_value_external_set",
+                "arguments": [
+                    "567"
+                ],
+                "gasLimit": "20,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": []
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:multi-contract-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:sample-value": "123"
+                    },
+                    "code": "file:../output/multi-contract-features.wasm"
+                },
+                "sc:multi-contract-features-view": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:sample-value": "567",
+                        "str:external-view-target-address": "sc:multi-contract-features"
+                    },
+                    "code": "file:../output/multi-contract-features-view.wasm"
+                },
+                "address:owner": {
+                    "nonce": "*"
+                }
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "sample_value_external_get",
+            "tx": {
+                "to": "sc:multi-contract-features-view",
+                "function": "sample_value_external_get",
+                "arguments": []
+            },
+            "expect": {
+                "out": [
+                    "123"
+                ]
+            }
+        }
+    ]
+}

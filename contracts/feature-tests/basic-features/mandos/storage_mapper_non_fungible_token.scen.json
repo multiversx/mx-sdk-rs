@@ -1,0 +1,411 @@
+{
+    "name": "storage",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:TICKER-000000": {
+                            "roles": [
+                                "ESDTRoleNFTCreate",
+                                "ESDTRoleNFTAddQuantity",
+                                "ESDTRoleNFTBurn"
+                            ]
+                        }
+                    },
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "0"
+                },
+                "0x000000000000000000010000000000000000000000000000000000000002ffff": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../../esdt-system-sc-mock/output/esdt-system-sc-mock.wasm"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "issue-and-set-all-roles-meta",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "issue_and_set_all_roles_meta",
+                "arguments": [
+                    "str:TICKER"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "str:TICKER-000000"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "setState",
+            "comment": "reset the token ID so we can set it again",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:TICKER-000000": {
+                            "roles": [
+                                "ESDTRoleNFTCreate",
+                                "ESDTRoleNFTAddQuantity",
+                                "ESDTRoleNFTBurn"
+                            ]
+                        }
+                    },
+                    "storage": {
+                        "str:nonFungibleTokenMapper": ""
+                    },
+                    "code": "file:../output/basic-features.wasm"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "mapper-nft-set-token-id",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "mapper_nft_set_token_id",
+                "arguments": [
+                    "str:TICKER-000000"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "mapper-nft-create",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "mapper_nft_create",
+                "arguments": [
+                    "1000",
+                    "u8:1|u8:2|u8:3"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "nested:str:TICKER-000000|u64:1|biguint:1000"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "mapper-nft-create-and-send",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "mapper_nft_create_and_send",
+                "arguments": [
+                    "address:an_account",
+                    "2000",
+                    "u8:4|u8:5|u8:6"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "nested:str:TICKER-000000|u64:2|biguint:2000"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:TICKER-000000": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "1000",
+                                    "attributes": "u8:1|u8:2|u8:3"
+                                }
+                            ],
+                            "lastNonce": "2",
+                            "roles": [
+                                "ESDTRoleNFTCreate",
+                                "ESDTRoleNFTAddQuantity",
+                                "ESDTRoleNFTBurn"
+                            ]
+                        }
+                    },
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "*",
+                    "balance": "0",
+                    "esdt": {
+                        "str:TICKER-000000": {
+                            "instances": [
+                                {
+                                    "nonce": "2",
+                                    "balance": "2000",
+                                    "attributes": "u8:4|u8:5|u8:6"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "+": ""
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "mapper-nft-add-quantity",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "mapper_nft_add_quantity",
+                "arguments": [
+                    "1",
+                    "5000"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "nested:str:TICKER-000000|u64:1|biguint:5000"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "mapper-nft-add-quantity-and-send",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "mapper_nft_add_quantity_and_send",
+                "arguments": [
+                    "address:an_account",
+                    "1",
+                    "7000"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "nested:str:TICKER-000000|u64:1|biguint:7000"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:TICKER-000000": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "6000",
+                                    "attributes": "u8:1|u8:2|u8:3"
+                                }
+                            ],
+                            "lastNonce": "2",
+                            "roles": [
+                                "ESDTRoleNFTCreate",
+                                "ESDTRoleNFTAddQuantity",
+                                "ESDTRoleNFTBurn"
+                            ]
+                        }
+                    },
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "*",
+                    "balance": "0",
+                    "esdt": {
+                        "str:TICKER-000000": {
+                            "instances": [
+                                {
+                                    "nonce": "2",
+                                    "balance": "2000",
+                                    "attributes": "u8:4|u8:5|u8:6"
+                                },
+                                {
+                                    "nonce": "1",
+                                    "balance": "7000",
+                                    "attributes": "u8:1|u8:2|u8:3"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "+": ""
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "mapper-nft-burn",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "mapper_nft_burn",
+                "arguments": [
+                    "1",
+                    "2000"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:TICKER-000000": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "4000",
+                                    "attributes": "u8:1|u8:2|u8:3"
+                                }
+                            ],
+                            "lastNonce": "2",
+                            "roles": [
+                                "ESDTRoleNFTCreate",
+                                "ESDTRoleNFTAddQuantity",
+                                "ESDTRoleNFTBurn"
+                            ]
+                        }
+                    },
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "*",
+                    "balance": "0",
+                    "esdt": {
+                        "str:TICKER-000000": {
+                            "instances": [
+                                {
+                                    "nonce": "2",
+                                    "balance": "2000",
+                                    "attributes": "u8:4|u8:5|u8:6"
+                                },
+                                {
+                                    "nonce": "1",
+                                    "balance": "7000",
+                                    "attributes": "u8:1|u8:2|u8:3"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "+": ""
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "mapper-nft-get-balance",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mapper_nft_get_balance",
+                "arguments": [
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "4000"
+                ],
+                "status": "",
+                "logs": "*"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "mapper-nft-get-attributes",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mapper_get_token_attributes",
+                "arguments": [
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "u8:1|u8:2|u8:3"
+                ],
+                "status": "",
+                "logs": "*"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "mapper-nft-token-id",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "getNonFungibleTokenId",
+                "arguments": []
+            },
+            "expect": {
+                "out": [
+                    "str:TICKER-000000"
+                ],
+                "status": "",
+                "logs": "*"
+            }
+        }
+    ]
+}

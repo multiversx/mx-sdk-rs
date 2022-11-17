@@ -1,0 +1,16 @@
+{
+    "comment": "verifies a setState validation error",
+    "steps": [
+        {
+            "step": "setState",
+            "comment": "sc addresses should contain code",
+            "newAddresses": [
+                {
+                    "creatorAddress": "str:currently not verified",
+                    "creatorNonce": "1234",
+                    "newAddress": "0x0000"
+                }
+            ]
+        }
+    ]
+}

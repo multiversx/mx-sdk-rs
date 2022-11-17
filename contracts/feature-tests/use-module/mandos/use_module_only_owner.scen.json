@@ -1,0 +1,101 @@
+{
+    "name": "use_module_only_owner",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "5",
+                    "balance": "0"
+                },
+                "address:not_owner": {
+                    "nonce": "5",
+                    "balance": "0"
+                }
+            },
+            "newAddresses": [
+                {
+                    "creatorAddress": "address:owner",
+                    "creatorNonce": "5",
+                    "newAddress": "sc:use_module"
+                }
+            ]
+        },
+        {
+            "step": "scDeploy",
+            "id": "1",
+            "tx": {
+                "from": "address:owner",
+                "contractCode": "file:../output/use-module.wasm",
+                "arguments": [],
+                "gasLimit": "20,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "2",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:use_module",
+                "function": "only_owner_mod_endpoint",
+                "arguments": [],
+                "gasLimit": "20,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "3",
+            "tx": {
+                "from": "address:not_owner",
+                "to": "sc:use_module",
+                "function": "only_owner_mod_endpoint",
+                "arguments": [],
+                "gasLimit": "20,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:Endpoint can only be called by owner",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "3",
+            "tx": {
+                "from": "address:not_owner",
+                "to": "sc:use_module",
+                "function": "call_derived_not_owner_only",
+                "arguments": [],
+                "gasLimit": "20,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

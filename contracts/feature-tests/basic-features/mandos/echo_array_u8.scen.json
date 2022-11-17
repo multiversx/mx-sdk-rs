@@ -8,24 +8,20 @@
                 "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
                     "code": "file:../output/basic-features.wasm"
                 },
                 "address:an_account": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 }
             }
         },
         {
             "step": "scCall",
-            "txId": "1",
+            "id": "1",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "echo_array_u8",
                 "arguments": [
                     "0x0102030405"
@@ -38,18 +34,17 @@
                     "0x0102030405"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "2",
+            "id": "2",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "echo_array_u8",
                 "arguments": [
                     "0x010203"
@@ -61,7 +56,7 @@
                 "out": [],
                 "status": "4",
                 "message": "str:argument decode error (s): input too short",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }

@@ -1,6 +1,5 @@
 {
     "comment": "add then check",
-    "gasSchedule": "v3",
     "steps": [
         {
             "step": "externalSteps",
@@ -8,10 +7,9 @@
         },
         {
             "step": "scDeploy",
-            "txId": "multisig-deploy",
+            "id": "multisig-deploy",
             "tx": {
                 "from": "address:owner",
-                "value": "0",
                 "contractCode": "file:../output/multisig.wasm",
                 "arguments": [
                     "2",
@@ -25,7 +23,7 @@
                 "out": [],
                 "status": "4",
                 "message": "str:duplicate board member",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }

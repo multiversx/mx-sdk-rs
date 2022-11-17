@@ -1,0 +1,78 @@
+{
+    "name": "echo_arrayvec",
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "1",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "echo_arrayvec",
+                "arguments": [
+                    [
+                        "u32:5",
+                        "u32:6",
+                        "u32:7"
+                    ]
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    [
+                        "u32:5",
+                        "u32:6",
+                        "u32:7"
+                    ]
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "2",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "echo_arrayvec",
+                "arguments": [
+                    [
+                        "u32:5",
+                        "u32:6",
+                        "u32:7",
+                        "u32:8"
+                    ]
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:argument decode error (av): capacity exceeded",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

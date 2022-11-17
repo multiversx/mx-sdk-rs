@@ -1,0 +1,13 @@
+[package]
+name = "ping-pong-egld-meta"
+version = "0.0.0"
+authors = [ "Bruda Claudiu-Marcel <claudiu725@yahoo.com>",]
+edition = "2018"
+publish = false
+
+[dependencies.ping-pong-egld]
+path = ".."
+
+[dependencies.elrond-wasm-debug]
+version = "0.36.1"
+path = "../../../../elrond-wasm-debug"

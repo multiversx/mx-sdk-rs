@@ -1,0 +1,113 @@
+{
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:alloc-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../output/alloc-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "A1",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:alloc-features",
+                "function": "logLegacyEventA",
+                "arguments": [
+                    "0"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": [
+                    {
+                        "address": "sc:alloc-features",
+                        "endpoint": "str:logLegacyEventA",
+                        "topics": [
+                            "0x0123456789abcdef0123456789abcdef0123456789abcdef000000000000000a"
+                        ],
+                        "data": "0"
+                    }
+                ],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "A2",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:alloc-features",
+                "function": "logLegacyEventA",
+                "arguments": [
+                    "0x1234abc"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": [
+                    {
+                        "address": "sc:alloc-features",
+                        "endpoint": "str:logLegacyEventA",
+                        "topics": [
+                            "0x0123456789abcdef0123456789abcdef0123456789abcdef000000000000000a"
+                        ],
+                        "data": "0x1234abc"
+                    }
+                ],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "B1",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:alloc-features",
+                "function": "logLegacyEventB",
+                "arguments": [
+                    "0xa1",
+                    "str:arg2_an_address_______________s3",
+                    "0x1234abc"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": [
+                    {
+                        "address": "sc:alloc-features",
+                        "endpoint": "str:logLegacyEventB",
+                        "topics": [
+                            "0x0123456789abcdef0123456789abcdef0123456789abcdef000000000000000b",
+                            "0x00000000000000000000000000000000000000000000000000000000000000a1",
+                            "str:arg2_an_address_______________s3"
+                        ],
+                        "data": "0x1234abc"
+                    }
+                ],
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

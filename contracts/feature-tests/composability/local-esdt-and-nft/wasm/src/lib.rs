@@ -1,5 +1,29 @@
+////////////////////////////////////////////////////
+////////////////// AUTO-GENERATED //////////////////
+////////////////////////////////////////////////////
 
 #![no_std]
 
-pub use local_esdt_and_nft::*;
-pub use elrond_wasm_output::*;
+elrond_wasm_node::wasm_endpoints! {
+    local_esdt_and_nft
+    (
+        callBack
+        getCurrentNftNonce
+        getFungibleEsdtBalance
+        getNftBalance
+        issueFungibleToken
+        lastErrorMessage
+        lastIssuedToken
+        localBurn
+        localMint
+        nftAddQuantity
+        nftBurn
+        nftCreate
+        nftIssue
+        setLocalRoles
+        sftIssue
+        transferNftViaAsyncCall
+        transfer_nft_and_execute
+        unsetLocalRoles
+    )
+}

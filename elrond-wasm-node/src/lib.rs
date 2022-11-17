@@ -1,24 +1,17 @@
 #![no_std]
 #![feature(new_uninit)]
 
-pub mod api;
+mod api;
 pub mod error_hook;
+mod node_macros;
 
-#[macro_use]
 extern crate alloc;
-pub use alloc::boxed::Box;
-pub use alloc::string::String;
-pub use alloc::vec::Vec;
+pub use alloc::{boxed::Box, string::String, vec::Vec};
+pub use api::VmApiImpl;
 
-/// The reference to the API implementation based on Arwen hooks.
-/// It continas no data, can be embedded at no cost.
-/// Cloning it is a no-op.
-pub struct ArwenApiImpl {}
+pub use elrond_wasm;
 
-/// Should be no-op. The API implementation is zero-sized.
-impl Clone for ArwenApiImpl {
-	#[inline]
-	fn clone(&self) -> Self {
-		ArwenApiImpl {}
-	}
+/// Provides an API instance.
+pub fn vm_api() -> VmApiImpl {
+    VmApiImpl {}
 }

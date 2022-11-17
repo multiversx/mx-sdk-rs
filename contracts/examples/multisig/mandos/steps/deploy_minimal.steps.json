@@ -1,0 +1,67 @@
+{
+    "steps": [
+        {
+            "step": "scDeploy",
+            "id": "multisig-deploy",
+            "tx": {
+                "from": "address:owner",
+                "contractCode": "file:../../output/multisig.wasm",
+                "arguments": [
+                    "0",
+                    "address:alice"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "getQuorum",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:multisig",
+                "function": "getQuorum",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "getNumBoardMembers",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:multisig",
+                "function": "getNumBoardMembers",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "1"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

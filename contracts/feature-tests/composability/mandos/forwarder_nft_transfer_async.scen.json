@@ -8,41 +8,45 @@
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
-                        "str:NFT-0001": {
-                            "nonce": "1",
-                            "balance": "0"
+                        "str:NFT-000001": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "0"
+                                }
+                            ]
                         }
-                    },
-                    "storage": {},
-                    "code": ""
+                    }
                 },
                 "sc:forwarder": {
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
-                        "str:NFT-0001": {
-                            "nonce": "1",
-                            "balance": "1"
+                        "str:NFT-000001": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "1"
+                                }
+                            ]
                         }
                     },
-                    "storage": {},
                     "code": "file:../forwarder/output/forwarder.wasm"
                 }
             }
         },
         {
             "step": "scCall",
-            "txId": "1",
+            "id": "1",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
                 "function": "transfer_nft_via_async_call",
                 "arguments": [
                     "address:a_user",
-                    "str:NFT-0001",
+                    "str:NFT-000001",
                     "1",
-                    "1",
-                    ""
+                    "1"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
@@ -61,9 +65,13 @@
                     "nonce": "*",
                     "balance": "0",
                     "esdt": {
-                        "str:NFT-0001": {
-                            "nonce": "1",
-                            "balance": "1"
+                        "str:NFT-000001": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "1"
+                                }
+                            ]
                         }
                     },
                     "storage": {},
@@ -73,9 +81,13 @@
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
-                        "str:NFT-0001": {
-                            "nonce": "1",
-                            "balance": "0"
+                        "str:NFT-000001": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "0"
+                                }
+                            ]
                         }
                     },
                     "storage": {},

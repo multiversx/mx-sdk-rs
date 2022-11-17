@@ -1,0 +1,63 @@
+{
+    "name": "setup accounts",
+    "gasSchedule": "dummy",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:creator": {
+                    "nonce": "0",
+                    "balance": "1000",
+                    "esdt": {
+                        "str:marketToken": "1000"
+                    }
+                },
+                "address:user1": {
+                    "nonce": "0",
+                    "balance": "1000",
+                    "esdt": {
+                        "str:marketToken": "1000"
+                    }
+                },
+                "address:user2": {
+                    "nonce": "0",
+                    "balance": "1000",
+                    "esdt": {
+                        "str:marketToken": "1000"
+                    }
+                },
+                "sc:ownership_contract": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:tokenTypeCreator|biguint:1": "address:creator",
+                        "str:isFungible|biguint:1": "false",
+                        "str:tokenTypeUri|biguint:1": "str:https://token-cdn-domain/{id}.json",
+                        "str:lastValidTokenIdForType|biguint:1": "5",
+                        "str:balanceOf|address:creator|str:.mapped|biguint:1": "5",
+                        "str:lastValidTypeId": "1",
+                        "str:tokenOwner|biguint:1|biguint:1": "address:creator",
+                        "str:tokenOwner|biguint:1|biguint:2": "address:creator",
+                        "str:tokenOwner|biguint:1|biguint:3": "address:creator",
+                        "str:tokenOwner|biguint:1|biguint:4": "address:creator",
+                        "str:tokenOwner|biguint:1|biguint:5": "address:creator",
+                        "str:balanceOf|address:creator|str:.node_links|u32:1": "u32:0|u32:0",
+                        "str:balanceOf|address:creator|str:.value|u32:1": "1",
+                        "str:balanceOf|address:creator|str:.node_id|biguint:1": "1",
+                        "str:balanceOf|address:creator|str:.info": "u32:1|u32:1|u32:1|u32:1"
+                    },
+                    "code": "file:../../erc1155/output/erc1155.wasm"
+                },
+                "sc:marketplace_contract": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:tokenOwnershipContractAddress": "sc:ownership_contract",
+                        "str:percentageCut": "10"
+                    },
+                    "code": "file:../output/erc1155-marketplace.wasm"
+                }
+            }
+        }
+    ]
+}

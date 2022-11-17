@@ -1,0 +1,112 @@
+{
+    "comment": "direct builtin function call",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:A": {
+                    "nonce": "0",
+                    "esdt": {
+                        "str:TOK-123000": "150"
+                    }
+                },
+                "address:B": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "1",
+            "tx": {
+                "from": "address:A",
+                "to": "address:B",
+                "function": "ESDTTransfer",
+                "arguments": [
+                    "str:TOK-123000",
+                    "100"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "logs": [
+                    {
+                        "address": "address:A",
+                        "endpoint": "str:ESDTTransfer",
+                        "topics": [
+                            "str:TOK-123000",
+                            "",
+                            "100",
+                            "address:B"
+                        ],
+                        "data": ""
+                    }
+                ],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:A": {
+                    "nonce": "1",
+                    "balance": "0",
+                    "esdt": {
+                        "str:TOK-123000": "50"
+                    },
+                    "storage": {},
+                    "code": ""
+                },
+                "address:B": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:TOK-123000": "100"
+                    },
+                    "storage": {},
+                    "code": ""
+                }
+            }
+        },
+        {
+            "step": "transfer",
+            "id": "2",
+            "tx": {
+                "from": "address:A",
+                "to": "address:B",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:TOK-123000",
+                        "value": "50"
+                    }
+                ]
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:A": {
+                    "nonce": "2",
+                    "balance": "0",
+                    "esdt": {
+                        "str:TOK-123000": "0"
+                    },
+                    "storage": {},
+                    "code": ""
+                },
+                "address:B": {
+                    "nonce": "0",
+                    "esdt": {
+                        "str:TOK-123000": "150"
+                    },
+                    "storage": {},
+                    "code": ""
+                }
+            }
+        }
+    ]
+}

@@ -5,31 +5,27 @@
         {
             "step": "setState",
             "accounts": {
-                "sc:basic-features": {
+                "sc:payable-features": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
                     "code": "file:../output/payable-features.wasm"
                 },
-                "address:an_account": {
+                "address:an-account": {
                     "nonce": "0",
                     "balance": "1,000,000,000,000",
-                    "storage": {},
                     "esdt": {
                         "str:PAYABLE-FEATURES-TOKEN": "1,000,000,000,000",
                         "str:OTHER-TOKEN": "1,000,000,000,000"
-                    },
-                    "code": ""
+                    }
                 }
             }
         },
         {
             "step": "scCall",
-            "txId": "payable_token_4.1",
+            "id": "payable_token_4.1",
             "tx": {
-                "from": "address:an_account",
-                "to": "sc:basic-features",
-                "value": "0",
+                "from": "address:an-account",
+                "to": "sc:payable-features",
                 "function": "payable_token_4",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -38,19 +34,19 @@
             "expect": {
                 "out": [],
                 "status": "4",
-                "message": "str:bad call value token provided",
-                "logs": [],
+                "message": "str:function expects single ESDT payment",
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "payable_token_4.2",
+            "id": "payable_token_4.2",
             "tx": {
-                "from": "address:an_account",
-                "to": "sc:basic-features",
-                "value": "5",
+                "from": "address:an-account",
+                "to": "sc:payable-features",
+                "egldValue": "5",
                 "function": "payable_token_4",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -59,47 +55,52 @@
             "expect": {
                 "out": [],
                 "status": "4",
-                "message": "str:bad call value token provided",
-                "logs": [],
+                "message": "str:function expects single ESDT payment",
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "payable_token_4.3",
+            "id": "payable_token_4.3",
             "tx": {
-                "from": "address:an_account",
-                "to": "sc:basic-features",
-                "value": "0",
-                "esdt": {
-                    "tokenIdentifier": "str:PAYABLE-FEATURES-TOKEN",
-                    "value": "100"
-                },
+                "from": "address:an-account",
+                "to": "sc:payable-features",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:PAYABLE-FEATURES-TOKEN",
+                        "value": "100"
+                    }
+                ],
                 "function": "payable_token_4",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "100", "str:PAYABLE-FEATURES-TOKEN" ],
+                "out": [
+                    "100",
+                    "str:PAYABLE-FEATURES-TOKEN"
+                ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "payable_token_4.4",
+            "id": "payable_token_4.4",
             "tx": {
-                "from": "address:an_account",
-                "to": "sc:basic-features",
-                "value": "0",
-                "esdt": {
-                    "tokenIdentifier": "str:OTHER-TOKEN",
-                    "value": "100"
-                },
+                "from": "address:an-account",
+                "to": "sc:payable-features",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:OTHER-TOKEN",
+                        "value": "100"
+                    }
+                ],
                 "function": "payable_token_4",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -109,7 +110,7 @@
                 "out": [],
                 "status": "4",
                 "message": "str:bad call value token provided",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }

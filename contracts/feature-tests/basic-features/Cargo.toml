@@ -8,22 +8,18 @@ publish = false
 [lib]
 path = "src/basic_features_main.rs"
 
-[features]
-wasm-output-mode = ["elrond-wasm-node"]
-
 [dependencies.elrond-wasm]
-version = "0.17.3"
+version = "0.36.1"
 path = "../../../elrond-wasm"
-
-[dependencies.elrond-wasm-derive]
-version = "0.17.3"
-path = "../../../elrond-wasm-derive"
-
-[dependencies.elrond-wasm-node]
-version = "0.17.3"
-path = "../../../elrond-wasm-node"
-optional = true
+features = ["ei-1-2"]
 
 [dev-dependencies.elrond-wasm-debug]
-version = "0.17.3"
+version = "0.36.1"
 path = "../../../elrond-wasm-debug"
+
+[dependencies.elrond-wasm-modules]
+version = "0.36.1"
+path = "../../../elrond-wasm-modules"
+
+[dev-dependencies.esdt-system-sc-mock]
+path = "../esdt-system-sc-mock"

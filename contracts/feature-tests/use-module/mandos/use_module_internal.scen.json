@@ -6,9 +6,7 @@
             "accounts": {
                 "address:owner": {
                     "nonce": "5",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 }
             },
             "newAddresses": [
@@ -21,13 +19,12 @@
         },
         {
             "step": "scDeploy",
-            "txId": "1",
+            "id": "1",
             "tx": {
                 "from": "address:owner",
-                "value": "0",
                 "contractCode": "file:../output/use-module.wasm",
                 "arguments": [],
-                "gasLimit": "6,000,000",
+                "gasLimit": "20,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -40,14 +37,13 @@
         },
         {
             "step": "scCall",
-            "txId": "call_mod_a",
+            "id": "call_mod_a",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:use_module",
-                "value": "0",
                 "function": "call_mod_a",
                 "arguments": [],
-                "gasLimit": "7,000,000",
+                "gasLimit": "20,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -60,14 +56,13 @@
         },
         {
             "step": "scCall",
-            "txId": "call_mod_b",
+            "id": "call_mod_b",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:use_module",
-                "value": "0",
                 "function": "call_mod_b",
                 "arguments": [],
-                "gasLimit": "7,000,000",
+                "gasLimit": "20,000,000",
                 "gasPrice": "0"
             },
             "expect": {

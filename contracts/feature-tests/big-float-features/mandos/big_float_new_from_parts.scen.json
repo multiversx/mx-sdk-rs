@@ -1,0 +1,129 @@
+{
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../output/big-float-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "100000000000"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "newBigFloatFromParts - 1",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "new_from_parts_big_float_wrapped",
+                "arguments": [
+                    "i32:62345",
+                    "i32:652345",
+                    "i32:-7",
+                    "i32:10000000"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "+623450652345"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "newBigFloatFromParts - 2",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "new_from_parts_big_float_wrapped",
+                "arguments": [
+                    "i32:-62345",
+                    "i32:652345",
+                    "i32:-7",
+                    "i32:10000000"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "-623450652345"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "newBigFloatFromParts - 3",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "new_from_parts_big_float_wrapped",
+                "arguments": [
+                    "i32:62345",
+                    "i32:652345",
+                    "i32:-311",
+                    "i32:10000"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "+623450000"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "newBigFloatFromParts - 4 - fail positive exponent",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "new_from_parts_big_float_wrapped",
+                "arguments": [
+                    "i32:62345",
+                    "i32:65234",
+                    "i32:223",
+                    "i32:10000"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "10",
+                "message": "str:exponent must be negative"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "newBigFloatFromParts - 5",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "new_from_parts_big_float_wrapped",
+                "arguments": [
+                    "i32:62345",
+                    "i32:6523452",
+                    "i32:-323",
+                    "i32:10000"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "+623450000"
+                ]
+            }
+        }
+    ]
+}

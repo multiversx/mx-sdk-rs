@@ -1,4 +1,14 @@
+////////////////////////////////////////////////////
+////////////////// AUTO-GENERATED //////////////////
+////////////////////////////////////////////////////
+
 #![no_std]
 
-pub use factorial::*;
-pub use elrond_wasm_output::*;
+elrond_wasm_node::wasm_endpoints! {
+    factorial
+    (
+        factorial
+    )
+}
+
+elrond_wasm_node::wasm_empty_callback! {}

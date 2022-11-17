@@ -1,0 +1,59 @@
+{
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "steps/init_accounts.steps.json"
+        },
+        {
+            "step": "externalSteps",
+            "path": "steps/deploy_minimal.steps.json"
+        },
+        {
+            "step": "scCall",
+            "id": "propose-send-to-other-shard",
+            "tx": {
+                "from": "address:alice",
+                "to": "sc:multisig",
+                "function": "proposeTransferExecute",
+                "arguments": [
+                    "sc:other-shard-1",
+                    "0"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "1"
+                ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "perform-send-to-other-shard-precise-insufficient-gas",
+            "comment": "this test is fragile, since it uses very precise gas; can be discarded",
+            "tx": {
+                "from": "address:alice",
+                "to": "sc:multisig",
+                "function": "performAction",
+                "arguments": [
+                    "1"
+                ],
+                "gasLimit": "16,746,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:insufficient gas for call",
+                "logs": [],
+                "gas": "0",
+                "refund": "*"
+            }
+        }
+    ]
+}

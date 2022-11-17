@@ -1,0 +1,99 @@
+{
+    "comment": "simple ESDT transfer, no SC",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:A": {
+                    "nonce": "0",
+                    "balance": "0x1000000000",
+                    "esdt": {
+                        "str:TOK-123456": "150"
+                    }
+                },
+                "address:B": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            }
+        },
+        {
+            "step": "transfer",
+            "id": "1",
+            "tx": {
+                "from": "address:A",
+                "to": "address:B",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:TOK-123456",
+                        "value": "100"
+                    }
+                ],
+                "gasLimit": "0x100000000",
+                "gasPrice": "0x01"
+            }
+        },
+        {
+            "step": "checkState",
+            "comment": "check after tx 1",
+            "accounts": {
+                "address:A": {
+                    "nonce": "1",
+                    "balance": "0xf00000000",
+                    "esdt": {
+                        "str:TOK-123456": "50"
+                    },
+                    "storage": {},
+                    "code": ""
+                },
+                "address:B": {
+                    "nonce": "0",
+                    "esdt": {
+                        "str:TOK-123456": "100"
+                    },
+                    "storage": {},
+                    "code": ""
+                }
+            }
+        },
+        {
+            "step": "transfer",
+            "id": "2",
+            "tx": {
+                "from": "address:A",
+                "to": "address:B",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:TOK-123456",
+                        "value": "50"
+                    }
+                ],
+                "gasLimit": "0x100000000",
+                "gasPrice": "0x01"
+            }
+        },
+        {
+            "step": "checkState",
+            "comment": "check after tx 2",
+            "accounts": {
+                "address:A": {
+                    "nonce": "2",
+                    "balance": "0xe00000000",
+                    "esdt": {
+                        "str:TOK-123456": "0"
+                    },
+                    "storage": {},
+                    "code": ""
+                },
+                "address:B": {
+                    "nonce": "0",
+                    "esdt": {
+                        "str:TOK-123456": "150"
+                    },
+                    "storage": {},
+                    "code": ""
+                }
+            }
+        }
+    ]
+}

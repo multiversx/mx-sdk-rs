@@ -1,5 +1,5 @@
 {
-    "name": "upgrade Factorial SC to Adder",
+    "name": "upgrade Vault SC to Forwarder, and then back to vault",
     "steps": [
         {
             "step": "setState",
@@ -9,22 +9,21 @@
                     "code": "file:../forwarder/output/forwarder.wasm"
                 },
                 "sc:child": {
-                    "owner": "sc:forwarder",
-                    "code":"file:../vault/output/vault.wasm"
+                    "code": "file:../vault/output/vault.wasm",
+                    "owner": "sc:forwarder"
                 }
             }
         },
         {
             "step": "scCall",
-            "txId": "upgrade-to-adder",
+            "id": "upgrade-vault-to-forwarder",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "value": "0",
-                "function": "upgradeChildContract",
+                "function": "upgrade_vault_from_source",
                 "arguments": [
                     "sc:child",
-                    "file:../forwarder/output/forwarder.wasm"
+                    "sc:forwarder"
                 ],
                 "gasLimit": "500,000,000",
                 "gasPrice": "0"
@@ -39,7 +38,35 @@
                 "sc:child": {
                     "code": "file:../forwarder/output/forwarder.wasm"
                 },
-                "+": {}
+                "+": ""
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "upgrade-back-to-vault",
+            "comment": "init results cannot be retrieved directly, since it is an async call, but we can experiment with callbacks in the future",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:forwarder",
+                "function": "upgradeVault",
+                "arguments": [
+                    "sc:child",
+                    "file:../vault/output/vault.wasm"
+                ],
+                "gasLimit": "500,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": []
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:child": {
+                    "code": "file:../vault/output/vault.wasm"
+                },
+                "+": ""
             }
         }
     ]

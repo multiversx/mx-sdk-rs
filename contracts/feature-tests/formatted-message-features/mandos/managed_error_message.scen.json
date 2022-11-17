@@ -1,0 +1,135 @@
+{
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:msg-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../output/formatted-message-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:TOKEN-123456": "1,000"
+                    }
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "static_message",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:msg-features",
+                "function": "static_message",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:Static error",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "1",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:msg-features",
+                "function": "dynamic_message",
+                "arguments": [
+                    "str:abcd"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:Got this buffer: abcd. I don't like it, ERROR!",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "2",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:msg-features",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:TOKEN-123456",
+                        "value": "1,000"
+                    }
+                ],
+                "function": "dynamic_message_multiple",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:Got token TOKEN-123456, with nonce 0, amount 1000. I prefer EGLD. ERROR!",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "3",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:msg-features",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:TOKEN-123456",
+                        "value": "1,000"
+                    }
+                ],
+                "function": "dynamic_message_ascii",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:Got token TOKEN-123456, with nonce 0, amount 1000. I prefer EGLD. ERROR!",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "4",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:msg-features",
+                "function": "decode_error_message",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:unsupported operation",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

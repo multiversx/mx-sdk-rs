@@ -1,0 +1,129 @@
+{
+    "name": "set-repeat",
+    "traceGas": true,
+    "gasSchedule": "v4",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            },
+            "newAddresses": [
+                {
+                    "creatorAddress": "address:owner",
+                    "creatorNonce": "0",
+                    "newAddress": "sc:contract"
+                }
+            ]
+        },
+        {
+            "step": "scDeploy",
+            "id": "deploy",
+            "tx": {
+                "from": "address:owner",
+                "contractCode": "file:../output/set-repeat.wasm",
+                "arguments": [],
+                "gasLimit": "20,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "add_struct",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:contract",
+                "function": "add_struct",
+                "arguments": [
+                    "1000",
+                    {
+                        "0-first_token_id": "nested:str:TESTTOK-1234",
+                        "1-first_token_nonce": "u64:500",
+                        "2-first_token_amount": "biguint:1,000,000,000,000,000,000",
+                        "3-second_token_id": "nested:str:TESTTOK-2345",
+                        "4-second_token_nonce": "u64:500",
+                        "5-second_token_amount": "biguint:1,000,000,000,000,000,000"
+                    }
+                ],
+                "gasLimit": "1,000,000,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "count_struct",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:contract",
+                "function": "count_struct",
+                "arguments": [
+                    {
+                        "0-first_token_id": "nested:str:TESTTOK-1234",
+                        "1-first_token_nonce": "u64:500",
+                        "2-first_token_amount": "biguint:1,000,000,000,000,000,000",
+                        "3-second_token_id": "nested:str:TESTTOK-2345",
+                        "4-second_token_nonce": "u64:500",
+                        "5-second_token_amount": "biguint:1,000,000,000,000,000,000"
+                    }
+                ],
+                "gasLimit": "1,000,000,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "1"
+                ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "remove_struct",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:contract",
+                "function": "remove_struct",
+                "arguments": [
+                    "1000",
+                    {
+                        "0-first_token_id": "nested:str:TESTTOK-1234",
+                        "1-first_token_nonce": "u64:500",
+                        "2-first_token_amount": "biguint:1,000,000,000,000,000,000",
+                        "3-second_token_id": "nested:str:TESTTOK-2345",
+                        "4-second_token_nonce": "u64:500",
+                        "5-second_token_amount": "biguint:1,000,000,000,000,000,000"
+                    }
+                ],
+                "gasLimit": "1,000,000,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

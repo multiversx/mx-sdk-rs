@@ -7,8 +7,7 @@
             "accounts": {
                 "address:owner": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {}
+                    "balance": "0"
                 }
             },
             "newAddresses": [
@@ -26,11 +25,10 @@
         },
         {
             "step": "scDeploy",
-            "txId": "deploy-first-contract",
+            "id": "deploy-first-contract",
             "tx": {
                 "from": "address:owner",
                 "contractCode": "file:../first-contract/output/first-contract.wasm",
-                "value": "0",
                 "arguments": [
                     "str:cool_token",
                     "sc:second_contract"
@@ -39,6 +37,7 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "0",
                 "gas": "*",
                 "refund": "*"
@@ -46,11 +45,10 @@
         },
         {
             "step": "scDeploy",
-            "txId": "deploy-second-contract",
+            "id": "deploy-second-contract",
             "tx": {
                 "from": "address:owner",
                 "contractCode": "file:../second-contract/output/second-contract.wasm",
-                "value": "0",
                 "arguments": [
                     "str:cool_token"
                 ],
@@ -58,6 +56,7 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "0",
                 "gas": "*",
                 "refund": "*"

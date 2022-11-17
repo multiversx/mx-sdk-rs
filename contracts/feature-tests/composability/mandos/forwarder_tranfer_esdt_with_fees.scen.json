@@ -1,0 +1,310 @@
+{
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:a_user": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:FWD-TOKEN": "1000"
+                    }
+                },
+                "address:other_user": {
+                    "nonce": "0",
+                    "balance": "0"
+                },
+                "sc:vault": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../vault/output/vault.wasm"
+                },
+                "sc:forwarder": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../forwarder/output/forwarder.wasm"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "simple-transfer-to-account-10%-fees",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:forwarder",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:FWD-TOKEN",
+                        "value": "100"
+                    }
+                ],
+                "function": "send_esdt_with_fees",
+                "arguments": [
+                    "address:other_user",
+                    "1000"
+                ],
+                "gasLimit": "80,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "message": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:a_user": {
+                    "nonce": "*",
+                    "balance": "0",
+                    "esdt": {
+                        "str:FWD-TOKEN": "900"
+                    },
+                    "storage": {},
+                    "code": ""
+                },
+                "address:other_user": {
+                    "nonce": "*",
+                    "balance": "0",
+                    "esdt": {
+                        "str:FWD-TOKEN": "90"
+                    },
+                    "storage": {},
+                    "code": ""
+                },
+                "sc:vault": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "file:../vault/output/vault.wasm"
+                },
+                "sc:forwarder": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:FWD-TOKEN": "10"
+                    },
+                    "storage": {},
+                    "code": "file:../forwarder/output/forwarder.wasm"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "transfer-to-vault-via-transfer-exec-10%-fees",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:forwarder",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:FWD-TOKEN",
+                        "value": "100"
+                    }
+                ],
+                "function": "forward_transf_execu_accept_funds_with_fees",
+                "arguments": [
+                    "sc:vault",
+                    "1000"
+                ],
+                "gasLimit": "80,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "message": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:a_user": {
+                    "nonce": "*",
+                    "balance": "0",
+                    "esdt": {
+                        "str:FWD-TOKEN": "800"
+                    },
+                    "storage": {},
+                    "code": ""
+                },
+                "address:other_user": {
+                    "nonce": "*",
+                    "balance": "0",
+                    "esdt": {
+                        "str:FWD-TOKEN": "90"
+                    },
+                    "storage": {},
+                    "code": ""
+                },
+                "sc:vault": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:FWD-TOKEN": "90"
+                    },
+                    "storage": {
+                        "+": ""
+                    },
+                    "code": "file:../vault/output/vault.wasm"
+                },
+                "sc:forwarder": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:FWD-TOKEN": "20"
+                    },
+                    "storage": {},
+                    "code": "file:../forwarder/output/forwarder.wasm"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "transfer-to-vault-sync-via-execute-on-dest-10%-fees",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:forwarder",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:FWD-TOKEN",
+                        "value": "100"
+                    }
+                ],
+                "function": "forward_sync_accept_funds_with_fees",
+                "arguments": [
+                    "sc:vault",
+                    "1000"
+                ],
+                "gasLimit": "80,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "message": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:a_user": {
+                    "nonce": "*",
+                    "balance": "0",
+                    "esdt": {
+                        "str:FWD-TOKEN": "700"
+                    },
+                    "storage": {},
+                    "code": ""
+                },
+                "address:other_user": {
+                    "nonce": "*",
+                    "balance": "0",
+                    "esdt": {
+                        "str:FWD-TOKEN": "90"
+                    },
+                    "storage": {},
+                    "code": ""
+                },
+                "sc:vault": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:FWD-TOKEN": "180"
+                    },
+                    "storage": {
+                        "+": ""
+                    },
+                    "code": "file:../vault/output/vault.wasm"
+                },
+                "sc:forwarder": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:FWD-TOKEN": "30"
+                    },
+                    "storage": {},
+                    "code": "file:../forwarder/output/forwarder.wasm"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "transfer-to-vault-async-10%-fees",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:forwarder",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:FWD-TOKEN",
+                        "value": "100"
+                    }
+                ],
+                "function": "forward_async_accept_funds_with_fees",
+                "arguments": [
+                    "sc:vault",
+                    "1000"
+                ],
+                "gasLimit": "80,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "message": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:a_user": {
+                    "nonce": "*",
+                    "balance": "0",
+                    "esdt": {
+                        "str:FWD-TOKEN": "600"
+                    },
+                    "storage": {},
+                    "code": ""
+                },
+                "address:other_user": {
+                    "nonce": "*",
+                    "balance": "0",
+                    "esdt": {
+                        "str:FWD-TOKEN": "90"
+                    },
+                    "storage": {},
+                    "code": ""
+                },
+                "sc:vault": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:FWD-TOKEN": "270"
+                    },
+                    "storage": {
+                        "+": ""
+                    },
+                    "code": "file:../vault/output/vault.wasm"
+                },
+                "sc:forwarder": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:FWD-TOKEN": "40"
+                    },
+                    "storage": {},
+                    "code": "file:../forwarder/output/forwarder.wasm"
+                }
+            }
+        }
+    ]
+}
