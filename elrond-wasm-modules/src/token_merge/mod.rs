@@ -118,7 +118,7 @@ pub trait TokenMergeModule:
         let caller = self.blockchain().get_caller();
         self.send().direct_multi(&caller, &output_payments);
 
-        output_payments.into()
+        output_payments
     }
 
     fn split_token_partial<AttributesCreator: MergedTokenAttributesCreator<ScType = Self>>(

@@ -38,6 +38,15 @@ where
     }
 }
 
+impl<Sc> Default for DefaultMergedAttributesWrapper<Sc>
+where
+    Sc: AllMergeScTraits,
+{
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl<Sc> MergedTokenAttributesCreator for DefaultMergedAttributesWrapper<Sc>
 where
     Sc: AllMergeScTraits,
