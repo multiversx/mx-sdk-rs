@@ -320,7 +320,7 @@ mod sample_adder {
     where
         A: elrond_wasm::api::VMApi + 'static,
     {
-        pub address: core::option::Option<elrond_wasm::types::ManagedAddress<A>>,
+        pub address: elrond_wasm::types::ManagedOption<A, elrond_wasm::types::ManagedAddress<A>>,
     }
 
     impl<A> elrond_wasm::contract_base::ProxyObjBase for Proxy<A>
@@ -331,27 +331,28 @@ mod sample_adder {
 
         fn new_proxy_obj() -> Self {
             Proxy {
-                address: core::option::Option::None,
+                address: elrond_wasm::types::ManagedOption::none(),
             }
         }
 
-        fn contract(mut self, address: ManagedAddress<Self::Api>) -> Self {
-            self.address = Some(address);
+        fn contract(mut self, address: elrond_wasm::types::ManagedAddress<Self::Api>) -> Self {
+            self.address = elrond_wasm::types::ManagedOption::some(address);
             self
         }
 
-        fn extract_address(&mut self) -> ManagedAddress<Self::Api> {
-            let address = core::mem::replace(&mut self.address, core::option::Option::None);
-            address.unwrap_or_else(|| {
-                elrond_wasm::api::ErrorApiImpl::signal_error(
-                    &A::error_api_impl(),
-                    elrond_wasm::err_msg::RECIPIENT_ADDRESS_NOT_SET,
-                )
-            })
+        fn extract_opt_address(
+            &mut self,
+        ) -> elrond_wasm::types::ManagedOption<
+            Self::Api,
+            elrond_wasm::types::ManagedAddress<Self::Api>,
+        > {
+            core::mem::replace(&mut self.address, elrond_wasm::types::ManagedOption::none())
         }
 
-        fn extract_opt_address(&mut self) -> core::option::Option<ManagedAddress<Self::Api>> {
-            core::mem::replace(&mut self.address, core::option::Option::None)
+        fn extract_address(&mut self) -> elrond_wasm::types::ManagedAddress<Self::Api> {
+            let address =
+                core::mem::replace(&mut self.address, elrond_wasm::types::ManagedOption::none());
+            address.unwrap_or_sc_panic(elrond_wasm::err_msg::RECIPIENT_ADDRESS_NOT_SET)
         }
     }
 

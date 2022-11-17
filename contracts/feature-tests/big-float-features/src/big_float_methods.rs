@@ -48,6 +48,26 @@ pub trait BigFloatMethods {
     }
 
     #[endpoint]
+    fn big_float_from_i32(&self, small_value: i16) -> BigFloat {
+        BigFloat::from(small_value)
+    }
+
+    #[endpoint]
+    fn big_float_from_i16(&self, small_value: i32) -> BigFloat {
+        BigFloat::from(small_value)
+    }
+
+    #[endpoint]
+    fn big_float_from_i8(&self, small_value: i8) -> BigFloat {
+        BigFloat::from(small_value)
+    }
+
+    #[endpoint]
+    fn big_float_from_isize(&self, small_value: isize) -> BigFloat {
+        BigFloat::from(small_value)
+    }
+
+    #[endpoint]
     fn big_float_from_man_buf(&self, man_buf: ManagedBuffer) -> BigFloat {
         BigFloat::from(man_buf)
     }
@@ -68,12 +88,12 @@ pub trait BigFloatMethods {
     }
 
     #[endpoint]
-    fn pow_big_float(&self, a: BigFloat, b: u32) -> BigFloat {
+    fn pow_big_float(&self, a: BigFloat, b: i32) -> BigFloat {
         a.pow(b)
     }
 
     #[endpoint]
-    fn pow_big_float_ref(&self, a: &BigFloat, b: u32) -> BigFloat {
+    fn pow_big_float_ref(&self, a: &BigFloat, b: i32) -> BigFloat {
         a.pow(b)
     }
 

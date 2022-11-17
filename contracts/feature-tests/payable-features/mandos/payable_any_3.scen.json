@@ -22,7 +22,7 @@
         },
         {
             "step": "scCall",
-            "txId": "payable_any_3.1",
+            "id": "payable_any_3.1",
             "tx": {
                 "from": "address:an-account",
                 "to": "sc:payable-features",
@@ -44,7 +44,7 @@
         },
         {
             "step": "scCall",
-            "txId": "payable_any_3.2",
+            "id": "payable_any_3.2",
             "tx": {
                 "from": "address:an-account",
                 "to": "sc:payable-features",
@@ -67,7 +67,7 @@
         },
         {
             "step": "scCall",
-            "txId": "payable_any_3.3",
+            "id": "payable_any_3.3",
             "tx": {
                 "from": "address:an-account",
                 "to": "sc:payable-features",

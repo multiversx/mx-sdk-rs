@@ -44,7 +44,7 @@
         },
         {
             "step": "transfer",
-            "txId": "multi-transfer",
+            "id": "multi-transfer",
             "tx": {
                 "from": "address:esdt-owner",
                 "to": "sc:multisig",
@@ -70,7 +70,7 @@
         },
         {
             "step": "scCall",
-            "txId": "proposeSendEsdt",
+            "id": "proposeSendEsdt",
             "tx": {
                 "from": "address:paul",
                 "to": "sc:multisig",
@@ -105,7 +105,7 @@
         },
         {
             "step": "scCall",
-            "txId": "sc-deploy-sign-alice",
+            "id": "sc-deploy-sign-alice",
             "tx": {
                 "from": "address:alice",
                 "to": "sc:multisig",
@@ -126,7 +126,7 @@
         },
         {
             "step": "scCall",
-            "txId": "sc-deploy-sign-bob",
+            "id": "sc-deploy-sign-bob",
             "tx": {
                 "from": "address:bob",
                 "to": "sc:multisig",
@@ -147,7 +147,7 @@
         },
         {
             "step": "scCall",
-            "txId": "send-esdt-perform-1",
+            "id": "send-esdt-perform-1",
             "tx": {
                 "from": "address:paul",
                 "to": "sc:multisig",

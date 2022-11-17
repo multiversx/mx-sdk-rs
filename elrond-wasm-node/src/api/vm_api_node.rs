@@ -1,4 +1,4 @@
-use elrond_wasm::api::{CallTypeApi, StorageMapperApi, VMApi};
+use elrond_wasm::api::{CallTypeApi, HandleTypeInfo, StorageMapperApi, VMApi};
 
 /// The reference to the API implementation based on Arwen hooks.
 /// It continas no data, can be embedded at no cost.
@@ -26,3 +26,13 @@ impl PartialEq for VmApiImpl {
 impl Eq for VmApiImpl {}
 
 impl VMApi for VmApiImpl {}
+
+impl HandleTypeInfo for VmApiImpl {
+    type ManagedBufferHandle = i32;
+
+    type BigIntHandle = i32;
+
+    type BigFloatHandle = i32;
+
+    type EllipticCurveHandle = i32;
+}

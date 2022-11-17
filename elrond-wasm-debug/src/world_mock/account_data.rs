@@ -19,12 +19,13 @@ pub struct AccountData {
     pub username: Vec<u8>,
     pub contract_path: Option<Vec<u8>>,
     pub contract_owner: Option<Address>,
+    pub developer_rewards: BigUint,
 }
 
 impl fmt::Display for AccountData {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut storage_buf = String::new();
-        let mut storage_keys: Vec<Vec<u8>> = self.storage.iter().map(|(k, _)| k.clone()).collect();
+        let mut storage_keys: Vec<Vec<u8>> = self.storage.keys().cloned().collect();
         storage_keys.sort();
 
         for key in &storage_keys {
@@ -45,13 +46,15 @@ impl fmt::Display for AccountData {
 		balance: {},
 		esdt: [{} ],
 		username: {},
-		storage: [{} ]
+		storage: [{} ],
+		developerRewards: {},
 	}}",
             self.nonce,
             self.egld_balance,
             self.esdt,
             String::from_utf8(self.username.clone()).unwrap(),
-            storage_buf
+            storage_buf,
+            self.developer_rewards
         )
     }
 }

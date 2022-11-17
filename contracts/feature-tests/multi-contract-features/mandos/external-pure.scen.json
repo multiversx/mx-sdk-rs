@@ -21,7 +21,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "external-function-in-external-view",
+            "id": "external-function-in-external-view",
             "tx": {
                 "to": "sc:multi-contract-features-view",
                 "function": "external_pure",
@@ -37,7 +37,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "external-function-not-in-main",
+            "id": "external-function-not-in-main",
             "tx": {
                 "to": "sc:multi-contract-features",
                 "function": "external_pure",

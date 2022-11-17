@@ -8,7 +8,7 @@
         },
         {
             "step": "scCall",
-            "txId": "start limited tickets, fixed deadline",
+            "id": "start limited tickets, fixed deadline",
             "tx": {
                 "from": "address:my_address",
                 "to": "sc:lottery",

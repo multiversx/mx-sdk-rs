@@ -38,5 +38,9 @@ pub struct CheckAccountRaw {
 
     #[serde(default)]
     #[serde(skip_serializing_if = "CheckBytesValueRaw::is_unspecified")]
+    pub developer_rewards: CheckBytesValueRaw,
+
+    #[serde(default)]
+    #[serde(skip_serializing_if = "CheckBytesValueRaw::is_unspecified")]
     pub async_call_data: CheckBytesValueRaw,
 }

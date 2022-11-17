@@ -4,7 +4,9 @@ use elrond_codec::{
 
 use super::{
     fungible_token_mapper::DEFAULT_ISSUE_CALLBACK_NAME,
-    token_mapper::{StorageTokenWrapper, TOKEN_ID_ALREADY_SET_ERR_MSG},
+    token_mapper::{
+        read_token_id, store_token_id, StorageTokenWrapper, TOKEN_ID_ALREADY_SET_ERR_MSG,
+    },
     StorageMapper,
 };
 use crate::{
@@ -29,6 +31,7 @@ where
     SA: StorageMapperApi + CallTypeApi,
 {
     key: StorageKey<SA>,
+    token_id: TokenIdentifier<SA>,
 }
 
 impl<SA> StorageMapper<SA> for NonFungibleTokenMapper<SA>
@@ -36,7 +39,10 @@ where
     SA: StorageMapperApi + CallTypeApi,
 {
     fn new(base_key: StorageKey<SA>) -> Self {
-        Self { key: base_key }
+        Self {
+            token_id: read_token_id(base_key.as_ref()),
+            key: base_key,
+        }
     }
 }
 
@@ -46,6 +52,19 @@ where
 {
     fn get_storage_key(&self) -> crate::types::ManagedRef<SA, StorageKey<SA>> {
         self.key.as_ref()
+    }
+
+    fn get_token_id(&self) -> TokenIdentifier<SA> {
+        self.token_id.clone()
+    }
+
+    fn get_token_id_ref(&self) -> &TokenIdentifier<SA> {
+        &self.token_id
+    }
+
+    fn set_token_id(&mut self, token_id: TokenIdentifier<SA>) {
+        store_token_id(self, &token_id);
+        self.token_id = token_id;
     }
 }
 
@@ -265,25 +284,25 @@ where
 
     pub fn nft_burn(&self, token_nonce: u64, amount: &BigUint<SA>) {
         let send_wrapper = SendWrapper::<SA>::new();
-        let token_id = self.get_token_id();
+        let token_id = self.get_token_id_ref();
 
-        send_wrapper.esdt_local_burn(&token_id, token_nonce, amount);
+        send_wrapper.esdt_local_burn(token_id, token_nonce, amount);
     }
 
     pub fn get_all_token_data(&self, token_nonce: u64) -> EsdtTokenData<SA> {
         let b_wrapper = BlockchainWrapper::new();
         let own_sc_address = Self::get_sc_address();
-        let token_id = self.get_token_id();
+        let token_id = self.get_token_id_ref();
 
-        b_wrapper.get_esdt_token_data(&own_sc_address, &token_id, token_nonce)
+        b_wrapper.get_esdt_token_data(&own_sc_address, token_id, token_nonce)
     }
 
     pub fn get_balance(&self, token_nonce: u64) -> BigUint<SA> {
         let b_wrapper = BlockchainWrapper::new();
         let own_sc_address = Self::get_sc_address();
-        let token_id = self.get_token_id();
+        let token_id = self.get_token_id_ref();
 
-        b_wrapper.get_esdt_balance(&own_sc_address, &token_id, token_nonce)
+        b_wrapper.get_esdt_balance(&own_sc_address, token_id, token_nonce)
     }
 
     pub fn get_token_attributes<T: TopDecode>(&self, token_nonce: u64) -> T {
@@ -293,12 +312,11 @@ where
 
     fn send_payment(&self, to: &ManagedAddress<SA>, payment: &EsdtTokenPayment<SA>) {
         let send_wrapper = SendWrapper::<SA>::new();
-        send_wrapper.direct(
+        send_wrapper.direct_esdt(
             to,
             &payment.token_identifier,
             payment.token_nonce,
             &payment.amount,
-            &[],
         );
     }
 }

@@ -1,15 +1,13 @@
-#![feature(generic_associated_types)]
 #![allow(clippy::type_complexity)]
 #![feature(exhaustive_patterns)]
 
 pub mod abi_json;
 pub mod api;
+pub mod bech32;
 mod contract_map;
 mod display_util;
 mod managed_test_util;
-mod mandos_go_runner;
-mod mandos_rs_runner;
-mod mandos_step;
+pub mod mandos_system;
 pub mod meta;
 pub mod testing_framework;
 pub mod tx_execution;
@@ -19,10 +17,8 @@ pub mod world_mock;
 pub use contract_map::*;
 pub use display_util::*;
 pub use managed_test_util::*;
-pub use mandos_step::*;
+pub use mandos_system::{executor::*, mandos_go, mandos_rs};
 
-pub use mandos_go_runner::mandos_go;
-pub use mandos_rs_runner::mandos_rs;
 pub use tx_mock::DebugApi;
 pub use world_mock::BlockchainMock;
 
@@ -35,5 +31,7 @@ pub use elrond_wasm::elrond_codec::num_bigint;
 #[macro_use]
 extern crate alloc;
 pub use alloc::{boxed::Box, vec::Vec};
+
+pub use elrond_wasm;
 
 pub use std::collections::HashMap;

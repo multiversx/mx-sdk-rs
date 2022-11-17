@@ -27,6 +27,7 @@ build_and_copy() {
 build_and_copy ./contracts/examples/adder $VM_REPO_PATH/test/adder
 build_and_copy ./contracts/examples/crowdfunding-esdt $VM_REPO_PATH/test/crowdfunding-esdt
 build_and_copy ./contracts/examples/digital-cash $VM_REPO_PATH/test/digital-cash
+build_and_copy ./contracts/examples/factorial $VM_REPO_PATH/test/factorial
 build_and_copy ./contracts/examples/ping-pong-egld $VM_REPO_PATH/test/ping-pong-egld
 build_and_copy ./contracts/experimental/multisig-external-view $VM_REPO_PATH/test/multisig
 build_and_copy ./contracts/examples/egld-esdt-swap $VM_REPO_PATH/test/egld-esdt-swap
@@ -34,6 +35,7 @@ build_and_copy ./contracts/feature-tests/alloc-features $VM_REPO_PATH/test/featu
 build_and_copy ./contracts/feature-tests/basic-features $VM_REPO_PATH/test/features/basic-features
 build_and_copy ./contracts/feature-tests/big-float-features $VM_REPO_PATH/test/features/big-float-features
 build_and_copy ./contracts/feature-tests/erc-style-contracts/erc20 $VM_REPO_PATH/test/erc20-rust
+build_and_copy ./contracts/feature-tests/formatted-message-features $VM_REPO_PATH/test/features/formatted-message-features
 build_and_copy ./contracts/feature-tests/payable-features $VM_REPO_PATH/test/features/payable-features
 build_and_copy ./contracts/feature-tests/esdt-system-sc-mock $VM_REPO_PATH/test/features/esdt-system-sc-mock
 
@@ -74,6 +76,7 @@ cp -R contracts/feature-tests/composability/vault/output/vault.wasm \
 # cp -R contracts/feature-tests/composability/promises-features/output/promises-features.wasm \
 #    $VM_REPO_PATH/test/features/composability/promises-features/output/promises-features.wasm
 
+rm -f $VM_REPO_PATH/test/features/composability/mandos/*
 cp -R contracts/feature-tests/composability/mandos \
    $VM_REPO_PATH/test/features/composability
 rm -f $VM_REPO_PATH/test/features/composability/mandos-legacy/*

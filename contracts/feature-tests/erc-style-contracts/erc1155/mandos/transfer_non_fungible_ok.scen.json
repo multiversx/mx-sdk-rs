@@ -8,7 +8,7 @@
         },
         {
             "step": "scCall",
-            "txId": "transfer-non-fungible-ok",
+            "id": "transfer-non-fungible-ok",
             "tx": {
                 "from": "address:creator",
                 "to": "sc:erc1155",

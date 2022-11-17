@@ -5,6 +5,7 @@ mod arg_loader_multi;
 mod arg_loader_single;
 mod arg_nested_tuple;
 mod bytes_arg_loader;
+pub mod call_value_init;
 mod finish;
 mod managed_result_arg_loader;
 mod signal_error;

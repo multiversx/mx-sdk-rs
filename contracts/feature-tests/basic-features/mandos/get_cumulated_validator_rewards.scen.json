@@ -18,7 +18,7 @@
         },
         {
             "step": "scCall",
-            "txId": "0",
+            "id": "0",
             "tx": {
                 "from": "address:viewer",
                 "to": "sc:basic-features",
@@ -39,7 +39,7 @@
         },
         {
             "step": "validatorReward",
-            "txId": "validatorReward-1",
+            "id": "validatorReward-1",
             "tx": {
                 "to": "sc:basic-features",
                 "egldValue": "100,000,000"
@@ -47,7 +47,7 @@
         },
         {
             "step": "scCall",
-            "txId": "0",
+            "id": "0",
             "tx": {
                 "from": "address:viewer",
                 "to": "sc:basic-features",
@@ -68,7 +68,7 @@
         },
         {
             "step": "validatorReward",
-            "txId": "validatorReward-1",
+            "id": "validatorReward-1",
             "tx": {
                 "to": "sc:basic-features",
                 "egldValue": "300"
@@ -76,7 +76,7 @@
         },
         {
             "step": "scCall",
-            "txId": "0",
+            "id": "0",
             "tx": {
                 "from": "address:viewer",
                 "to": "sc:basic-features",

@@ -8,7 +8,7 @@
         },
         {
             "step": "scCall",
-            "txId": "add-user-1",
+            "id": "add-user-1",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:token_release_contract",
@@ -29,7 +29,7 @@
         },
         {
             "step": "scCall",
-            "txId": "add-user-2",
+            "id": "add-user-2",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:token_release_contract",

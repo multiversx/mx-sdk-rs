@@ -4,6 +4,77 @@ There are several crates in this repo, this changelog will keep track of all of 
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## Unreleased
+#### (Next release must be minor and include elrond-codec)
+- elrond-codec refactor: removed `TopEncodeNoErr`, `NestedEncodeNoErr` and `TypeInfo`
+
+## [elrond-wasm 0.36.1] - 2022-11-01
+- Deprecated `ContractCall` `execute_on_dest_context_ignore_result` method, since it is currently redundant.
+
+## [elrond-wasm 0.36.0, elrond-codec 0.14.0] - 2022-10-13
+- `EsdtTokenPayment` legacy decode: objects encoded by older versions of the framework can now also be decoded, if flag `esdt-token-payment-legacy-decode` is active.
+- Codec `NestedDecodeInput` new  `peek_into` method.
+- `FungibleTokenMapper` caches the token identifier.
+
+## [elrond-wasm 0.35.0, elrond-codec 0.13.0, mandos 0.17.0] - 2022-09-20
+- Rust interactor snippet generator.
+- Added some missing substitution rules in the contract preprocessor.
+- Allow single zero byte when top-decoding Option::None.
+- Ongoing operations module.
+- Claim developer rewards module.
+- `FromIterator` trait for `ManagedVec`.
+- Mandos `"id"` accepted as synonym to `"txId"`.
+
+## [elrond-wasm 0.34.1] - 2022-07-19
+- `#[only_admin]` annotation
+- Safer BigUint/BigInt conversions
+- Added and published `price-aggregator` and `wegld-swap` core contracts.
+
+## [elrond-wasm 0.34.0, elrond-codec 0.12.0, mandos 0.16.0, elrond-interact-snippets 0.1.0] - 2022-07-08
+- Major refactor of the mandos-rs infrastructure.
+	- High-level Mandos objects moved to elrond-wasm-debug;
+	- The `mandos` crate no longer depends on `elrond-wasm-debug` (as originally intended and implemented);
+	- Typed mandos contract call objects, for better call syntax.
+	- More syntactic sugar for writing mandos calls.
+- The first version of elrond-interact-snippets, which can be used to write short blockchain interactor programs.
+	- The syntax relies on contract proxies to easily build calls.
+	- Some of the infrastructure is shared with Mandos.
+	- There is an example of such a interactor for the multisig contract.
+- Refactor of managed type handles in all API traits. Eliminated undefined behavior when using the same handle in multiple contexts.
+- Transfer role proxy module.
+- NFT merge module.
+- `#[only_user_account]` annotation. Only user accounts can call these endpoints.
+- ABI - fixed missing event logs from modules.
+
+## [elrond-wasm 0.33.1, mandos 0.15.1] - 2022-06-24
+- CodecSelf for BigInt
+
+## [elrond-wasm 0.33.0, mandos 0.15.0] - 2022-06-20
+- Removed the data field for direct EGLD & ESDT transfers.
+- Testing and debugging environment aligned with VM version 1.4.53.
+- Call value and token data infrastructure additional cleanup.
+
+## [elrond-wasm 0.32.0, mandos 0.14.0] - 2022-06-03
+- VM new functionality added as part of the environment interface 1.2:
+	- Fully managed functionality for elliptic curves (no allocator);
+	- Fully managed cryptographic functions (no allocator);
+	- More efficient printing of big ints and hex;
+	- Functionality available by adding the `ei-1-2` flag to contracts.
+- `BigFloat` functionality. Since the functionality is not yet deployed on mainnet, use flag `big-float` to use.
+- Major refactoring of the call value mechanism:
+	- `TokenIdentifier` now only refers to ESDT, for mixed EGLD+ESDT we have `EgldOrEsdtTokenIdentifier`.
+	- `EsdtTokenPayment` now only refers to ESDT, for mixed EGLD+ESDT we have `EgldOrEsdtTokenPayment`.
+	- Compact version for multi-transfer: `let [payment_a, payment_b, payment_c] = self.call_value().multi_esdt();`.
+	- Explicit `single_esdt` vs. `single_fungible_esdt` vs. `egld_or_single_esdt` vs. `egld_or_single_fungible_esdt`.
+	- Payment arguments are still supported, although discouraged. They always assume the EGLD+ESDT scenario.
+- `ManagedOption` provides some minor optimization for specific use-cases. Mostly for use in the framework.
+- Cleanup in the callback mechanism and in the `SendApi`.
+- `SparseArray` implementation.
+- `UniqueIdMapper` - efficient storage mapper for holding unique values.
+- The ABI also contains events.
+- New standard module: `StakingModule`.
+
+
 ## [elrond-wasm 0.31.1, mandos 0.13.1] - 2022-05-04
 - Bugfix - formatter single char issue.
 

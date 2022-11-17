@@ -3,7 +3,7 @@ elrond_wasm::derive_imports!();
 
 use crate::bonding_curve::{curves::curve_function::CurveFunction, utils::structs::CurveArguments};
 
-#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, PartialEq, Clone)]
+#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, PartialEq, Eq, Clone)]
 pub struct LinearFunction<M: ManagedTypeApi> {
     pub initial_price: BigUint<M>,
     pub linear_coefficient: BigUint<M>,

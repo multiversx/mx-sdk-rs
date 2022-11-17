@@ -1,6 +1,6 @@
 use crate::{num_bigint, tx_mock::TxPanic, DebugApi};
 use elrond_wasm::{
-    api::{CallValueApi, CallValueApiImpl, Handle},
+    api::{CallValueApi, CallValueApiImpl},
     err_msg,
     types::EsdtTokenType,
 };
@@ -42,12 +42,12 @@ impl CallValueApiImpl for DebugApi {
     }
 
     #[inline]
-    fn load_egld_value(&self, dest: Handle) {
+    fn load_egld_value(&self, dest: Self::BigIntHandle) {
         self.set_big_uint(dest, self.input_ref().egld_value.clone())
     }
 
     #[inline]
-    fn load_single_esdt_value(&self, dest: Handle) {
+    fn load_single_esdt_value(&self, dest: Self::BigIntHandle) {
         self.fail_if_more_than_one_esdt_transfer();
         if let Some(esdt_value) = self.input_ref().esdt_values.get(0) {
             self.set_big_uint(dest, esdt_value.value.clone());
@@ -60,9 +60,14 @@ impl CallValueApiImpl for DebugApi {
     }
 
     #[inline]
-    fn token(&self) -> Handle {
+    fn token(&self) -> Option<Self::ManagedBufferHandle> {
         self.fail_if_more_than_one_esdt_transfer();
-        self.token_by_index(0)
+
+        if self.esdt_num_transfers() > 0 {
+            Some(self.token_by_index(0))
+        } else {
+            None
+        }
     }
 
     #[inline]
@@ -83,7 +88,7 @@ impl CallValueApiImpl for DebugApi {
     }
 
     #[inline]
-    fn esdt_value_by_index(&self, index: usize) -> Handle {
+    fn esdt_value_by_index(&self, index: usize) -> Self::BigIntHandle {
         if let Some(esdt_value) = self.input_ref().esdt_values.get(index) {
             self.insert_new_big_uint(esdt_value.value.clone())
         } else {
@@ -95,7 +100,7 @@ impl CallValueApiImpl for DebugApi {
     }
 
     #[inline]
-    fn token_by_index(&self, index: usize) -> Handle {
+    fn token_by_index(&self, index: usize) -> Self::ManagedBufferHandle {
         if let Some(esdt_value) = self.input_ref().esdt_values.get(index) {
             self.insert_new_managed_buffer(esdt_value.token_identifier.clone())
         } else {

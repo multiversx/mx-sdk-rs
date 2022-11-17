@@ -22,7 +22,7 @@
         },
         {
             "step": "scCall",
-            "txId": "1",
+            "id": "1",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
@@ -47,6 +47,16 @@
                             "str:retrieve_funds",
                             "str:EGLD",
                             "0",
+                            "1000"
+                        ],
+                        "data": ""
+                    },
+                    {
+                        "address": "*",
+                        "endpoint": "str:transferValueOnly",
+                        "topics": [
+                            "sc:vault",
+                            "sc:forwarder",
                             "1000"
                         ],
                         "data": ""

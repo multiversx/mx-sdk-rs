@@ -1,0 +1,79 @@
+{
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../output/big-float-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "100000000000"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "BigFloatAdd - 3",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "add_big_float",
+                "arguments": [
+                    "0x010a000000350000003a001f1c1a96fe0e2d",
+                    "0x010b0000003500000034ded4316c407a6b64"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "10",
+                "message": "str:this big Float operation is not permitted while doing float.Add"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "BigFloatAdd - 4",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "add_big_float",
+                "arguments": [
+                    "0x010a00000035000100139c9920182fea6800",
+                    "0x010b0000003500000034ded4316c407a6b64"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "10",
+                "message": "str:exponent is either too small or too big"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "BigFloatSub - 3",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "sub_big_float",
+                "arguments": [
+                    "0x010a000000350000003a001f1c1a96fe0e2d",
+                    "0x010a0000003500000034ded4316c407a6b64"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "10",
+                "message": "str:this big Float operation is not permitted while doing float.Sub"
+            }
+        }
+    ]
+}

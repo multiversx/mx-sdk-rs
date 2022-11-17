@@ -28,8 +28,7 @@
 # The branch doesn't need to be published for the following steps to work.
 # 
 # 5. Run this script, `./publish.sh`.
-# You can comment out the crates you are not publishing. Nothing happens if you do not,
-# you will just receive a message that they are already published.
+# You can comment out the crates you are not publishing. The script will stop otherwise when it cannot publish them.
 # 
 # 6. Search for `elrond` on `crates.io` and check that the new versions appear for all crates.
 # If any of the crates was not published, check what went wrong and try again.
@@ -53,43 +52,53 @@
 #
 
 cd elrond-codec-derive
-cargo publish
+cargo publish || return 1
 cd ..
 
 sleep 20
 
 cd elrond-codec
-cargo publish
+cargo publish || return 1
 cd ..
 
 cd elrond-wasm-derive
-cargo publish
+cargo publish || return 1
 cd ..
 
 sleep 20
 
 cd elrond-wasm
-cargo publish
+cargo publish || return 1
 cd ..
 
-sleep 20
-
 cd mandos
-cargo publish
+cargo publish || return 1
 cd ..
 
 cd elrond-wasm-node
-cargo publish
+cargo publish || return 1
 cd ..
 
 cd elrond-wasm-debug
-cargo publish
+cargo publish || return 1
 cd ..
 
 cd elrond-wasm-output
-cargo publish
+cargo publish || return 1
 cd ..
 
 cd elrond-wasm-modules
-cargo publish
+cargo publish || return 1
+cd ..
+
+cd contracts/core/price-aggregator
+cargo publish || return 1
+cd ../../..
+
+cd contracts/core/wegld-swap
+cargo publish || return 1
+cd ../../..
+
+cd elrond-interact-snippets
+cargo publish || return 1
 cd ..

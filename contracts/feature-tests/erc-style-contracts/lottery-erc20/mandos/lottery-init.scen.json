@@ -37,7 +37,7 @@
         },
         {
             "step": "scDeploy",
-            "txId": "deploy",
+            "id": "deploy",
             "tx": {
                 "from": "address:erc20_owner",
                 "contractCode": "file:../../erc20/output/erc20.wasm",
@@ -90,7 +90,7 @@
         },
         {
             "step": "scDeploy",
-            "txId": "deploy",
+            "id": "deploy",
             "tx": {
                 "from": "address:my_address",
                 "contractCode": "file:../output/lottery-erc20.wasm",

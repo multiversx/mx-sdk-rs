@@ -31,33 +31,18 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
     }
 
     #[endpoint]
-    fn send_esdt(
-        &self,
-        to: &ManagedAddress,
-        token_id: TokenIdentifier,
-        amount: &BigUint,
-        opt_data: OptionalValue<ManagedBuffer>,
-    ) {
-        let data = match opt_data {
-            OptionalValue::Some(data) => data,
-            OptionalValue::None => ManagedBuffer::new(),
-        };
-        self.send().direct(to, &token_id, 0, amount, data);
+    fn send_esdt(&self, to: &ManagedAddress, token_id: TokenIdentifier, amount: &BigUint) {
+        self.send().direct_esdt(to, &token_id, 0, amount);
     }
 
     #[payable("*")]
     #[endpoint]
-    fn send_esdt_with_fees(
-        &self,
-        #[payment_token] token_id: TokenIdentifier,
-        #[payment_amount] payment: BigUint,
-        to: ManagedAddress,
-        percentage_fees: BigUint,
-    ) {
+    fn send_esdt_with_fees(&self, to: ManagedAddress, percentage_fees: BigUint) {
+        let (token_id, payment) = self.call_value().single_fungible_esdt();
         let fees = &payment * &percentage_fees / PERCENTAGE_TOTAL;
         let amount_to_send = payment - fees;
 
-        self.send().direct(&to, &token_id, 0, &amount_to_send, &[]);
+        self.send().direct_esdt(&to, &token_id, 0, &amount_to_send);
     }
 
     #[endpoint]
@@ -67,16 +52,10 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
         token_id: TokenIdentifier,
         amount_first_time: &BigUint,
         amount_second_time: &BigUint,
-        opt_data: OptionalValue<ManagedBuffer>,
     ) {
-        let data = match opt_data {
-            OptionalValue::Some(data) => data,
-            OptionalValue::None => ManagedBuffer::new(),
-        };
+        self.send().direct_esdt(to, &token_id, 0, amount_first_time);
         self.send()
-            .direct(to, &token_id, 0, amount_first_time, data.clone());
-        self.send()
-            .direct(to, &token_id, 0, amount_second_time, data);
+            .direct_esdt(to, &token_id, 0, amount_second_time);
     }
 
     #[endpoint]
@@ -89,22 +68,17 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
 
         for multi_arg in token_payments.into_iter() {
             let (token_identifier, token_nonce, amount) = multi_arg.into_tuple();
-            let payment = EsdtTokenPayment {
-                token_identifier,
-                token_nonce,
-                amount,
-                token_type: EsdtTokenType::Invalid, // not used
-            };
+            let payment = EsdtTokenPayment::new(token_identifier, token_nonce, amount);
 
             all_token_payments.push(payment);
         }
 
-        let _ = Self::Api::send_api_impl().direct_multi_esdt_transfer_execute(
+        let _ = self.send_raw().multi_esdt_transfer_execute(
             &to,
             &all_token_payments,
             self.blockchain().get_gas_left(),
             &ManagedBuffer::new(),
-            &ManagedArgBuffer::new_empty(),
+            &ManagedArgBuffer::new(),
         );
     }
 
@@ -112,11 +86,11 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
     #[endpoint]
     fn issue_fungible_token(
         &self,
-        #[payment] issue_cost: BigUint,
         token_display_name: ManagedBuffer,
         token_ticker: ManagedBuffer,
         initial_supply: BigUint,
     ) {
+        let issue_cost = self.call_value().egld_value();
         let caller = self.blockchain().get_caller();
 
         self.send()
@@ -147,21 +121,21 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
     fn esdt_issue_callback(
         &self,
         caller: &ManagedAddress,
-        #[payment_token] token_identifier: TokenIdentifier,
-        #[payment] returned_tokens: BigUint,
         #[call_result] result: ManagedAsyncCallResult<()>,
     ) {
+        let (token_identifier, returned_tokens) = self.call_value().egld_or_single_fungible_esdt();
         // callback is called with ESDTTransfer of the newly issued token, with the amount requested,
         // so we can get the token identifier and amount from the call data
         match result {
             ManagedAsyncCallResult::Ok(()) => {
-                self.last_issued_token().set(&token_identifier);
+                self.last_issued_token()
+                    .set(&token_identifier.unwrap_esdt());
                 self.last_error_message().clear();
             },
             ManagedAsyncCallResult::Err(message) => {
                 // return issue cost to the caller
                 if token_identifier.is_egld() && returned_tokens > 0 {
-                    self.send().direct_egld(caller, &returned_tokens, &[]);
+                    self.send().direct_egld(caller, &returned_tokens);
                 }
 
                 self.last_error_message().set(&message.err_msg);
@@ -212,6 +186,26 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
             token_data.uris,
         )
             .into()
+    }
+
+    #[view]
+    fn is_esdt_frozen(
+        &self,
+        address: &ManagedAddress,
+        token_id: &TokenIdentifier,
+        nonce: u64,
+    ) -> bool {
+        self.blockchain().is_esdt_frozen(address, token_id, nonce)
+    }
+
+    #[view]
+    fn is_esdt_paused(&self, token_id: &TokenIdentifier) -> bool {
+        self.blockchain().is_esdt_paused(token_id)
+    }
+
+    #[view]
+    fn is_esdt_limited_transfer(&self, token_id: &TokenIdentifier) -> bool {
+        self.blockchain().is_esdt_limited_transfer(token_id)
     }
 
     #[view]

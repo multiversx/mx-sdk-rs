@@ -20,7 +20,7 @@
         },
         {
             "step": "scCall",
-            "txId": "transfer-full-wrong-token",
+            "id": "transfer-full-wrong-token",
             "tx": {
                 "from": "address:acc1",
                 "to": "sc:first_contract",

@@ -14,7 +14,7 @@
         },
         {
             "step": "scCall",
-            "txId": "claim-user-1",
+            "id": "claim-user-1",
             "tx": {
                 "from": "address:user1",
                 "to": "sc:token_release_contract",
@@ -40,7 +40,7 @@
         },
         {
             "step": "scCall",
-            "txId": "claim-user-2",
+            "id": "claim-user-2",
             "tx": {
                 "from": "address:user2",
                 "to": "sc:token_release_contract",

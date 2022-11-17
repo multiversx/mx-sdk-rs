@@ -25,6 +25,14 @@ pub trait Vault {
     }
 
     #[endpoint]
+    fn echo_arguments_without_storage(
+        &self,
+        args: MultiValueEncoded<ManagedBuffer>,
+    ) -> MultiValueEncoded<ManagedBuffer> {
+        args
+    }
+
+    #[endpoint]
     fn echo_caller(&self) -> ManagedAddress {
         self.blockchain().get_caller()
     }
@@ -65,6 +73,12 @@ pub trait Vault {
 
     #[payable("*")]
     #[endpoint]
+    fn accept_funds_single_esdt_transfer(&self) {
+        let _ = self.call_value().single_esdt();
+    }
+
+    #[payable("*")]
+    #[endpoint]
     fn reject_funds(&self) {
         let esdt_transfers_multi = self.esdt_transfers_multi();
         self.reject_funds_event(&self.call_value().egld_value(), &esdt_transfers_multi);
@@ -83,39 +97,28 @@ pub trait Vault {
         let caller = self.blockchain().get_caller();
         let func_name = opt_receive_func.into_option().unwrap_or_default();
 
-        Self::Api::send_api_impl()
-            .direct_esdt_execute(
+        self.send_raw()
+            .transfer_esdt_execute(
                 &caller,
                 &token,
                 &amount,
                 50_000_000,
                 &func_name,
-                &ManagedArgBuffer::new_empty(),
+                &ManagedArgBuffer::new(),
             )
             .unwrap_or_else(|_| sc_panic!("ESDT transfer failed"));
     }
 
     #[endpoint]
-    fn retrieve_funds(
-        &self,
-        token: TokenIdentifier,
-        nonce: u64,
-        amount: BigUint,
-        return_message: OptionalValue<ManagedBuffer>,
-    ) {
+    fn retrieve_funds(&self, token: EgldOrEsdtTokenIdentifier, nonce: u64, amount: BigUint) {
         self.retrieve_funds_event(&token, nonce, &amount);
-
         let caller = self.blockchain().get_caller();
-        let data = match return_message {
-            OptionalValue::Some(data) => data,
-            OptionalValue::None => ManagedBuffer::new(),
-        };
 
-        if token.is_egld() {
-            self.send().direct_egld(&caller, &amount, data);
-        } else {
+        if let Some(esdt_token_id) = token.into_esdt_option() {
             self.send()
-                .transfer_esdt_via_async_call(&caller, &token, nonce, &amount, data);
+                .transfer_esdt_via_async_call(caller, esdt_token_id, nonce, amount);
+        } else {
+            self.send().direct_egld(&caller, &amount);
         }
     }
 
@@ -130,16 +133,11 @@ pub trait Vault {
         for multi_arg in token_payments.into_iter() {
             let (token_id, nonce, amount) = multi_arg.into_tuple();
 
-            all_payments.push(EsdtTokenPayment {
-                token_identifier: token_id,
-                token_nonce: nonce,
-                amount,
-                token_type: EsdtTokenType::Invalid,
-            });
+            all_payments.push(EsdtTokenPayment::new(token_id, nonce, amount));
         }
 
         self.send()
-            .transfer_multiple_esdt_via_async_call(&caller, &all_payments, b"");
+            .transfer_multiple_esdt_via_async_call(caller, all_payments);
     }
 
     #[payable("*")]
@@ -170,19 +168,15 @@ pub trait Vault {
                 &uris,
             );
 
-            new_tokens.push(EsdtTokenPayment {
-                token_identifier: payment.token_identifier,
-                token_nonce: new_token_nonce,
-                amount: payment.amount,
-                token_type: EsdtTokenType::Invalid, // ignored
-            });
+            new_tokens.push(EsdtTokenPayment::new(
+                payment.token_identifier,
+                new_token_nonce,
+                payment.amount,
+            ));
         }
 
-        self.send().transfer_multiple_esdt_via_async_call(
-            &self.blockchain().get_caller(),
-            &new_tokens,
-            &[],
-        );
+        self.send()
+            .transfer_multiple_esdt_via_async_call(self.blockchain().get_caller(), new_tokens);
     }
 
     /// TODO: invert token_payment and token_nonce, for consistency.
@@ -203,7 +197,7 @@ pub trait Vault {
     #[event("retrieve_funds")]
     fn retrieve_funds_event(
         &self,
-        #[indexed] token: &TokenIdentifier,
+        #[indexed] token: &EgldOrEsdtTokenIdentifier,
         #[indexed] nonce: u64,
         #[indexed] amount: &BigUint,
     );

@@ -1,8 +1,9 @@
+use bech32::FromBase32;
 use sha3::{Digest, Keccak256};
 
 const SC_ADDRESS_NUM_LEADING_ZEROS: usize = 8;
 
-pub(crate) fn keccak256(data: &[u8]) -> Vec<u8> {
+pub fn keccak256(data: &[u8]) -> Vec<u8> {
     let mut hasher = Keccak256::new();
     hasher.update(data);
     let hash: [u8; 32] = hasher.finalize().into();
@@ -60,4 +61,9 @@ pub(crate) fn address_expression(input: &str) -> Vec<u8> {
 /// Generates a 32-byte smart contract address based on the input.
 pub(crate) fn sc_address_expression(input: &str) -> Vec<u8> {
     create_address_optional_shard_id(input, SC_ADDRESS_NUM_LEADING_ZEROS)
+}
+
+pub(crate) fn bech32(input: &str) -> Vec<u8> {
+    let (_, decoded, _) = bech32::decode(input).expect("bech32 decode error");
+    Vec::<u8>::from_base32(&decoded).expect("bech32 base64 decode error")
 }

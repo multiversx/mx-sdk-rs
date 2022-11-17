@@ -6,7 +6,7 @@ use elrond_codec::test_util::{check_dep_encode_decode, check_top_decode, check_t
 // to test, run the following command in elrond-codec folder:
 // cargo expand --test derive_enum_test > enum_expanded.rs
 
-#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, PartialEq, Clone, Debug)]
+#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, PartialEq, Eq, Clone, Debug)]
 enum DayOfWeek {
     Monday,
     Tuesday,
@@ -40,7 +40,7 @@ fn fieldless_enum() {
     assert_eq!(DayOfWeek::Monday, check_top_decode(&[0, 0]));
 }
 
-#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, PartialEq, Clone, Debug)]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, PartialEq, Eq, Clone, Debug)]
 enum EnumWithEverything {
     Quit,
     Today(DayOfWeek),

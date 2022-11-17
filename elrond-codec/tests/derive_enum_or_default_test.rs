@@ -9,7 +9,7 @@ use elrond_codec::test_util::{check_top_decode, check_top_encode_decode};
 /// This is a good example of an enum with a useful default.
 /// Because the first variant has fields, a default cannot be auto-generated.
 /// So we need to provide an explicit default.
-#[derive(TopEncodeOrDefault, TopDecodeOrDefault, PartialEq, Clone, Debug)]
+#[derive(TopEncodeOrDefault, TopDecodeOrDefault, PartialEq, Eq, Clone, Debug)]
 enum EnumWithDefault {
     Basic(i8),
     SomethingElse,

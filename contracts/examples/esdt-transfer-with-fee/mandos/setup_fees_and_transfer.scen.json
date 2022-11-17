@@ -8,7 +8,7 @@
         },
         {
             "step": "scCall",
-            "txId": "3",
+            "id": "3",
             "tx": {
                 "from": "address:user1",
                 "to": "sc:esdt-transfer-with-fee",
@@ -36,7 +36,7 @@
         },
         {
             "step": "scCall",
-            "txId": "4",
+            "id": "4",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:esdt-transfer-with-fee",
@@ -59,7 +59,7 @@
         },
         {
             "step": "scCall",
-            "txId": "5",
+            "id": "5",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:esdt-transfer-with-fee",
@@ -83,7 +83,7 @@
         },
         {
             "step": "scCall",
-            "txId": "6",
+            "id": "6",
             "tx": {
                 "from": "address:user2",
                 "to": "sc:esdt-transfer-with-fee",
@@ -115,7 +115,7 @@
         },
         {
             "step": "scCall",
-            "txId": "7",
+            "id": "7",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:esdt-transfer-with-fee",
@@ -139,7 +139,7 @@
         },
         {
             "step": "scCall",
-            "txId": "8",
+            "id": "8",
             "tx": {
                 "from": "address:user1",
                 "to": "sc:esdt-transfer-with-fee",
@@ -167,7 +167,7 @@
         },
         {
             "step": "scCall",
-            "txId": "9",
+            "id": "9",
             "tx": {
                 "from": "address:user2",
                 "to": "sc:esdt-transfer-with-fee",
@@ -199,7 +199,7 @@
         },
         {
             "step": "scCall",
-            "txId": "10",
+            "id": "10",
             "tx": {
                 "from": "address:user2",
                 "to": "sc:esdt-transfer-with-fee",
@@ -294,14 +294,12 @@
                 "sc:esdt-transfer-with-fee": {
                     "nonce": "0",
                     "esdt": {
-                        "str:USDC-aaaaaa": {
-                            "balance": "13"
-                        }
+                        "str:USDC-aaaaaa": "13"
                     },
                     "storage": {
                         "str:token_fee|nested:str:USDC-aaaaaa": "u8:2|u32:1000",
-                        "str:token_fee|nested:str:MFNFT-567890": "u8:1|u8:0|nested:str:USDC-aaaaaa|u64:0|biguint:5",
-                        "str:token_fee|nested:str:WEGLD-012345": "u8:1|u8:0|nested:str:USDC-aaaaaa|u64:0|biguint:10",
+                        "str:token_fee|nested:str:MFNFT-567890": "u8:1|nested:str:USDC-aaaaaa|u64:0|biguint:5",
+                        "str:token_fee|nested:str:WEGLD-012345": "u8:1|nested:str:USDC-aaaaaa|u64:0|biguint:10",
                         "str:paid_fees.info": "u32:1|u32:1|u32:1|u32:1",
                         "str:paid_fees.node_links|u32:1": "u32:0|u32:0",
                         "str:paid_fees.node_id|nested:str:USDC-aaaaaa|u64:0": "1",

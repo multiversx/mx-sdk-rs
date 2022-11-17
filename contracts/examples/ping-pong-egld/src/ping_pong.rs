@@ -50,7 +50,7 @@ pub trait PingPong {
     /// Optional `_data` argument is ignored.
     #[payable("EGLD")]
     #[endpoint]
-    fn ping(&self, _data: OptionalValue<ManagedBuffer>) {
+    fn ping(&self, _data: IgnoreValue) {
         let payment = self.call_value().egld_value();
 
         require!(
@@ -73,7 +73,7 @@ pub trait PingPong {
             require!(
                 &self
                     .blockchain()
-                    .get_sc_balance(&TokenIdentifier::egld(), 0)
+                    .get_sc_balance(&EgldOrEsdtTokenIdentifier::egld(), 0)
                     + &payment
                     <= max_funds,
                 "smart contract full"
@@ -104,7 +104,7 @@ pub trait PingPong {
                 self.user_status(user_id).set(UserStatus::Withdrawn);
                 if let Some(user_address) = self.user_mapper().get_user_address(user_id) {
                     self.send()
-                        .direct_egld(&user_address, &self.ping_amount().get(), b"pong");
+                        .direct_egld(&user_address, &self.ping_amount().get());
                     Result::Ok(())
                 } else {
                     Result::Err("unknown user")

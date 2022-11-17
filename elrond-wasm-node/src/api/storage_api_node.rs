@@ -1,8 +1,7 @@
 use super::VmApiImpl;
 use elrond_wasm::{
     api::{
-        const_handles, Handle, StorageReadApi, StorageReadApiImpl, StorageWriteApi,
-        StorageWriteApiImpl,
+        const_handles, StorageReadApi, StorageReadApiImpl, StorageWriteApi, StorageWriteApiImpl,
     },
     types::heap::{Box, BoxedBytes},
 };
@@ -54,21 +53,30 @@ impl StorageReadApiImpl for VmApiImpl {
     }
 
     #[inline]
-    fn storage_load_big_uint_raw(&self, key: &[u8], dest: Handle) {
+    fn storage_load_big_uint_raw(&self, key: &[u8], dest: Self::ManagedBufferHandle) {
         unsafe {
             bigIntStorageLoadUnsigned(key.as_ref().as_ptr(), key.len() as i32, dest);
         }
     }
 
     #[inline]
-    fn storage_load_managed_buffer_raw(&self, key_handle: Handle, dest: Handle) {
+    fn storage_load_managed_buffer_raw(
+        &self,
+        key_handle: Self::ManagedBufferHandle,
+        dest: Self::ManagedBufferHandle,
+    ) {
         unsafe {
             mBufferStorageLoad(key_handle, dest);
         }
     }
 
     #[inline]
-    fn storage_load_from_address(&self, address_handle: Handle, key_handle: Handle, dest: Handle) {
+    fn storage_load_from_address(
+        &self,
+        address_handle: Self::ManagedBufferHandle,
+        key_handle: Self::ManagedBufferHandle,
+        dest: Self::ManagedBufferHandle,
+    ) {
         unsafe {
             mBufferStorageLoadFromAddress(address_handle, key_handle, dest);
         }
@@ -97,19 +105,23 @@ impl StorageWriteApiImpl for VmApiImpl {
     }
 
     #[inline]
-    fn storage_store_big_uint_raw(&self, key: &[u8], value_handle: Handle) {
+    fn storage_store_big_uint_raw(&self, key: &[u8], value_handle: Self::BigIntHandle) {
         unsafe {
             bigIntStorageStoreUnsigned(key.as_ref().as_ptr(), key.len() as i32, value_handle);
         }
     }
 
-    fn storage_store_managed_buffer_raw(&self, key_handle: Handle, value_handle: Handle) {
+    fn storage_store_managed_buffer_raw(
+        &self,
+        key_handle: Self::ManagedBufferHandle,
+        value_handle: Self::ManagedBufferHandle,
+    ) {
         unsafe {
             mBufferStorageStore(key_handle, value_handle);
         }
     }
 
-    fn storage_store_managed_buffer_clear(&self, key_handle: Handle) {
+    fn storage_store_managed_buffer_clear(&self, key_handle: Self::ManagedBufferHandle) {
         unsafe {
             // TODO: this will no longer be necessay once the ("no managed buffer under the given handle" is removed from VM
             let _ = mBufferSetBytes(const_handles::MBUF_CONST_EMPTY, core::ptr::null(), 0);

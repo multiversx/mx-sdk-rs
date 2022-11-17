@@ -16,7 +16,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "1",
+            "id": "1",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "mbuffer_concat",
@@ -33,7 +33,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "2",
+            "id": "2",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "mbuffer_concat",
@@ -50,7 +50,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "3",
+            "id": "3",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "mbuffer_concat",
@@ -67,7 +67,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "4",
+            "id": "4",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "mbuffer_concat",

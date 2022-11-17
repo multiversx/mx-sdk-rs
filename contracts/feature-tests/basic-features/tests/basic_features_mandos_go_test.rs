@@ -1,4 +1,9 @@
 #[test]
+fn big_int_from_i64_go() {
+    elrond_wasm_debug::mandos_go("mandos/big_int_from_i64.scen.json");
+}
+
+#[test]
 fn big_int_to_i64_go() {
     elrond_wasm_debug::mandos_go("mandos/big_int_to_i64.scen.json");
 }
@@ -9,8 +14,18 @@ fn big_num_conversions_go() {
 }
 
 #[test]
+fn big_uint_eq_u64_go() {
+    elrond_wasm_debug::mandos_go("mandos/big_uint_eq_u64.scen.json");
+}
+
+#[test]
 fn big_uint_sqrt_go() {
     elrond_wasm_debug::mandos_go("mandos/big_uint_sqrt.scen.json");
+}
+
+#[test]
+fn big_uint_from_u64_go() {
+    elrond_wasm_debug::mandos_go("mandos/big_uint_from_u64.scen.json");
 }
 
 #[test]
@@ -34,6 +49,11 @@ fn count_ones_go() {
 }
 
 #[test]
+fn crypto_elliptic_curves_go() {
+    elrond_wasm_debug::mandos_go("mandos/crypto_elliptic_curves.scen.json");
+}
+
+#[test]
 fn crypto_keccak256_go() {
     elrond_wasm_debug::mandos_go("mandos/crypto_keccak256.scen.json");
 }
@@ -44,13 +64,28 @@ fn crypto_keccak256_legacy_managed_go() {
 }
 
 #[test]
+fn crypto_ripemd160_go() {
+    elrond_wasm_debug::mandos_go("mandos/crypto_ripemd160.scen.json");
+}
+
+#[test]
 fn crypto_sha256_go() {
     elrond_wasm_debug::mandos_go("mandos/crypto_sha256.scen.json");
 }
 
 #[test]
-fn crypto_sha256_legacy_managed_go() {
-    elrond_wasm_debug::mandos_go("mandos/crypto_sha256_legacy_managed.scen.json");
+fn crypto_verify_bls_go() {
+    elrond_wasm_debug::mandos_go("mandos/crypto_verify_bls.scen.json");
+}
+
+#[test]
+fn crypto_verify_ed25519_go() {
+    elrond_wasm_debug::mandos_go("mandos/crypto_verify_ed25519.scen.json");
+}
+
+#[test]
+fn crypto_verify_secp256k1_go() {
+    elrond_wasm_debug::mandos_go("mandos/crypto_verify_secp256k1.scen.json");
 }
 
 #[test]
@@ -204,8 +239,18 @@ fn managed_vec_biguint_push_go() {
 }
 
 #[test]
+fn managed_vec_array_push_go() {
+    elrond_wasm_debug::mandos_go("mandos/managed_vec_array_push.scen.json");
+}
+
+#[test]
 fn only_owner_go() {
     elrond_wasm_debug::mandos_go("mandos/only_owner.scen.json");
+}
+
+#[test]
+fn only_user_account_go() {
+    elrond_wasm_debug::mandos_go("mandos/only_user_account.scen.json");
 }
 
 #[test]
@@ -226,6 +271,11 @@ fn return_codes_go() {
 #[test]
 fn sc_properties_go() {
     elrond_wasm_debug::mandos_go("mandos/sc_properties.scen.json");
+}
+
+#[test]
+fn storage_raw_api_features_go() {
+    elrond_wasm_debug::mandos_go("mandos/storage_raw_api_features.scen.json");
 }
 
 #[test]

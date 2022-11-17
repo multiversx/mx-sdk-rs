@@ -20,7 +20,7 @@
         },
         {
             "step": "scCall",
-            "txId": "reject-transfer",
+            "id": "reject-transfer",
             "tx": {
                 "from": "address:acc1",
                 "to": "sc:first_contract",

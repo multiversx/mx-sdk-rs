@@ -4,6 +4,8 @@ pub const BAD_TOKEN_PROVIDED: &str = "bad call value token provided";
 pub const SINGLE_ESDT_EXPECTED: &str = "function expects single ESDT payment";
 pub const TOO_MANY_ESDT_TRANSFERS: &str = "too many ESDT transfers";
 pub const ESDT_INVALID_TOKEN_INDEX: &str = "invalid token index";
+pub const INCORRECT_NUM_ESDT_TRANSFERS: &str = "incorrect number of ESDT transfers";
+pub static FUNGIBLE_TOKEN_EXPECTED_ERR_MSG: &str = "fungible ESDT token expected";
 
 pub const ARG_WRONG_NUMBER: &str = "wrong number of arguments";
 pub const ARG_ASYNC_WRONG_NUMBER: &[u8] = b"wrong number of arguments provided to async call";
@@ -31,10 +33,13 @@ pub const LOG_DATA_ENCODE_ERROR: &[u8] = b"log data encode error: ";
 pub const CONTRACT_CALL_ENCODE_ERROR: &[u8] = b"contract call encode error: ";
 
 pub const VALUE_EXCEEDS_SLICE: &[u8] = b"value exceeds target slice";
+pub const CAST_TO_I64_ERROR: &[u8] = b"cast to i64 error";
 pub const BIG_UINT_EXCEEDS_SLICE: &[u8] = b"big uint as_bytes exceed target slice";
 pub const BIG_UINT_SUB_NEGATIVE: &[u8] = b"cannot subtract because result would be negative";
+pub const DIVISION_BY_0: &str = "division by 0";
+pub const BAD_BOUNDS_LOWER: &str = "bad bounds (lower)";
 
-pub const EXPONENT_IS_POSITIVE: &[u8] = b"exponent must be negative";
+pub const EXPONENT_IS_POSITIVE: &str = "exponent must be negative";
 pub const NUMBER_IS_NOT_NORMAL: &[u8] =
     b"number is not normal. It is either infinite, NaN or subnormal";
 pub const CANNOT_COMPARE_VALUES: &[u8] = b"values are not comparable";
@@ -49,7 +54,9 @@ pub const DESERIALIZATION_ARG_OUT_OF_RANGE: &str =
 
 pub const CALLBACK_BAD_FUNC: &[u8] = b"no callback function with that name exists in contract";
 
-pub const RECIPIENT_ADDRESS_NOT_SET: &[u8] = b"recipient address not set";
+pub const RECIPIENT_ADDRESS_NOT_SET: &str = "recipient address not set";
+pub static ONLY_OWNER_CALLER: &[u8] = b"Endpoint can only be called by owner";
+pub static ONLY_USER_ACCOUNT_CALLER: &[u8] = b"Endpoint can only be called by user accounts";
 
 pub const STORAGE_NOT_I64: &[u8] = b"storage not i64";
 pub const STORAGE_NOT_32_BYTES: &[u8] = b"32 bytes of data expected in storage at key";

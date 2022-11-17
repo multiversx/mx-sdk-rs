@@ -20,7 +20,7 @@
         },
         {
             "step": "scDeploy",
-            "txId": "1",
+            "id": "1",
             "tx": {
                 "from": "address:crypto_bubbles_owner",
                 "contractCode": "file:../output/crypto-bubbles.wasm",

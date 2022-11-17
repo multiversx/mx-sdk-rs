@@ -54,6 +54,11 @@ pub trait MultisigProposeModule: crate::multisig_state::MultisigStateModule {
         opt_function: OptionalValue<ManagedBuffer>,
         arguments: MultiValueEncoded<ManagedBuffer>,
     ) -> CallActionData<Self::Api> {
+        require!(
+            egld_amount > 0 || opt_function.is_some(),
+            "proposed action has no effect"
+        );
+
         let endpoint_name = match opt_function {
             OptionalValue::Some(data) => data,
             OptionalValue::None => ManagedBuffer::new(),

@@ -10,7 +10,7 @@ const ZERO_32: &[u8] = &[0u8; 32];
 
 /// Type that holds 32 bytes of data.
 /// Data is kept on the heap to keep wasm size low and avoid copies.
-#[derive(Hash, Eq, PartialEq, Clone, Debug)]
+#[derive(Hash, PartialEq, Eq, Clone, Debug)]
 pub struct H256(Box<[u8; 32]>);
 
 impl From<[u8; 32]> for H256 {

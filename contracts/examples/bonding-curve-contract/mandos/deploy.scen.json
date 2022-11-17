@@ -13,21 +13,21 @@
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
-                        "str:EGLD-12345": "200"
+                        "str:EGLD-135790": "200"
                     }
                 },
                 "address:buyer2": {
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
-                        "str:EGLD-12345": "20000"
+                        "str:EGLD-135790": "20000"
                     }
                 },
                 "address:artist1": {
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
-                        "str:MFNFT-67890": {
+                        "str:MFNFT-567890": {
                             "instances": [
                                 {
                                     "nonce": "1",
@@ -67,14 +67,14 @@
                                 }
                             ]
                         },
-                        "str:MFFT-12345": "1000"
+                        "str:MFFT-123456": "1000"
                     }
                 },
                 "address:artist2": {
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
-                        "str:MFSFT-24680": {
+                        "str:MFSFT-246802": {
                             "instances": [
                                 {
                                     "nonce": "1",
@@ -103,7 +103,7 @@
         },
         {
             "step": "scDeploy",
-            "txId": "deploy",
+            "id": "deploy",
             "tx": {
                 "from": "address:owner",
                 "contractCode": "file:../output/bonding-curve-contract.wasm",
@@ -130,23 +130,21 @@
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
-                        "str:EGLD-12345": "200"
-                    },
-                    "storage": {}
+                        "str:EGLD-135790": "200"
+                    }
                 },
                 "address:buyer2": {
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
-                        "str:EGLD-12345": "20000"
-                    },
-                    "storage": {}
+                        "str:EGLD-135790": "20000"
+                    }
                 },
                 "address:artist1": {
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
-                        "str:MFNFT-67890": {
+                        "str:MFNFT-567890": {
                             "instances": [
                                 {
                                     "nonce": "1",
@@ -186,15 +184,14 @@
                                 }
                             ]
                         },
-                        "str:MFFT-12345": "1000"
-                    },
-                    "storage": {}
+                        "str:MFFT-123456": "1000"
+                    }
                 },
                 "address:artist2": {
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
-                        "str:MFSFT-24680": {
+                        "str:MFSFT-246802": {
                             "instances": [
                                 {
                                     "nonce": "1",
@@ -210,8 +207,7 @@
                                 }
                             ]
                         }
-                    },
-                    "storage": {}
+                    }
                 },
                 "sc:bonding-curve-contract": {
                     "nonce": "0",

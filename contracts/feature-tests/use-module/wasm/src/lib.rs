@@ -8,6 +8,9 @@ elrond_wasm_node::wasm_endpoints! {
     use_module
     (
         callBack
+        addAdmin
+        addMergeableTokensToWhitelist
+        call_derived_not_admin_only
         call_derived_not_owner_only
         call_mod_a
         call_mod_b
@@ -20,12 +23,17 @@ elrond_wasm_node::wasm_endpoints! {
         changeVotingPeriodInBlocks
         checkFeatureGuard
         checkPause
+        claimDeveloperRewards
+        countTo100
         depositTokensForAction
         dnsRegister
         downvote
         execute
+        getAdmins
         getGovernanceTokenId
         getLockTimeAfterVotingEndsInBlocks
+        getMergeableTokensWhitelist
+        getMergedTokenId
         getMinTokenBalanceForProposing
         getProposalActions
         getProposalDescription
@@ -36,15 +44,22 @@ elrond_wasm_node::wasm_endpoints! {
         getTotalVotes
         getVotingDelayInBlocks
         getVotingPeriodInBlocks
-        initGovernanceModule
+        isAdmin
         isPaused
+        issueMergedToken
         issueToken
+        mergeTokens
+        only_admin_mod_endpoint
         only_owner_mod_endpoint
         pause
         propose
         queue
+        removeAdmin
+        removeMergeableTokensFromWhitelist
         setFeatureFlag
         slashMember
+        splitTokenPartial
+        splitTokens
         stake
         unpause
         unstake

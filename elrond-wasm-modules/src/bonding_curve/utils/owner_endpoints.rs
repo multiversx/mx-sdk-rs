@@ -1,8 +1,10 @@
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
+use elrond_wasm::contract_base::ManagedSerializer;
+
 use crate::bonding_curve::{
-    function_selector::FunctionSelector,
+    curves::curve_function::CurveFunction,
     utils::{
         events, storage,
         structs::{BondingCurve, TokenOwnershipData},
@@ -10,6 +12,7 @@ use crate::bonding_curve::{
 };
 
 use super::structs::CurveArguments;
+use elrond_wasm::{abi::TypeAbi, elrond_codec::TopEncode};
 
 #[elrond_wasm::module]
 pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
@@ -41,13 +44,21 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
             .call_and_exit()
     }
 
-    #[endpoint(setBondingCurve)]
-    fn set_bonding_curve(
+    fn set_bonding_curve<T>(
         &self,
         identifier: TokenIdentifier,
-        function: FunctionSelector<Self::Api>,
+        function: T,
         sell_availability: bool,
-    ) {
+    ) where
+        T: CurveFunction<Self::Api>
+            + TopEncode
+            + TopDecode
+            + NestedEncode
+            + NestedDecode
+            + TypeAbi
+            + PartialEq
+            + Default,
+    {
         require!(
             !self.token_details(&identifier).is_empty(),
             "Token is not issued yet!"
@@ -60,27 +71,35 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
             details.owner == caller,
             "The price function can only be set by the seller."
         );
-        self.bonding_curve(&identifier).update(|bonding_curve| {
+        self.bonding_curve(&identifier).update(|buffer| {
+            let serializer = ManagedSerializer::new();
+
+            let mut bonding_curve: BondingCurve<Self::Api, T> =
+                serializer.top_decode_from_managed_buffer(buffer);
             bonding_curve.curve = function;
-            bonding_curve.sell_availability = sell_availability
+            bonding_curve.sell_availability = sell_availability;
+            *buffer = serializer.top_encode_to_managed_buffer(&bonding_curve);
         });
     }
 
-    #[endpoint(deposit)]
-    #[payable("*")]
-    fn deposit(
-        &self,
-        #[payment] amount: BigUint,
-        #[payment_token] identifier: TokenIdentifier,
-        #[payment_nonce] nonce: u64,
-        payment_token: OptionalValue<TokenIdentifier>,
-    ) {
+    fn deposit<T>(&self, payment_token: OptionalValue<TokenIdentifier>)
+    where
+        T: CurveFunction<Self::Api>
+            + TopEncode
+            + TopDecode
+            + NestedEncode
+            + NestedDecode
+            + TypeAbi
+            + PartialEq
+            + Default,
+    {
+        let (identifier, nonce, amount) = self.call_value().single_esdt().into_tuple();
         let caller = self.blockchain().get_caller();
-        let mut set_payment: TokenIdentifier = TokenIdentifier::egld();
+        let mut set_payment = EgldOrEsdtTokenIdentifier::egld();
 
         if self.bonding_curve(&identifier).is_empty() {
             match payment_token {
-                OptionalValue::Some(token) => set_payment = token,
+                OptionalValue::Some(token) => set_payment = EgldOrEsdtTokenIdentifier::esdt(token),
                 OptionalValue::None => {
                     sc_panic!("Expected provided accepted_payment for the token");
                 },
@@ -104,73 +123,114 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
             }
         }
 
-        self.set_curve_storage(&identifier, amount.clone(), set_payment);
+        self.set_curve_storage::<T>(&identifier, amount.clone(), set_payment);
         self.owned_tokens(&caller).insert(identifier.clone());
         self.nonce_amount(&identifier, nonce)
             .update(|current_amount| *current_amount += amount);
     }
 
-    #[endpoint(claim)]
-    fn claim(&self) {
+    fn claim<T>(&self)
+    where
+        T: CurveFunction<Self::Api>
+            + TopEncode
+            + TopDecode
+            + NestedEncode
+            + NestedDecode
+            + TypeAbi
+            + PartialEq
+            + Default,
+    {
         let caller = self.blockchain().get_caller();
         require!(
             !self.owned_tokens(&caller).is_empty(),
             "You have nothing to claim"
         );
+
+        let mut tokens_to_claim = ManagedVec::<Self::Api, EsdtTokenPayment<Self::Api>>::new();
+        let mut egld_to_claim = BigUint::zero();
+        let serializer = ManagedSerializer::new();
         for token in self.owned_tokens(&caller).iter() {
             let nonces = self.token_details(&token).get().token_nonces;
             for nonce in &nonces {
-                self.send().direct(
-                    &caller,
-                    &token,
+                tokens_to_claim.push(EsdtTokenPayment::new(
+                    token.clone(),
                     nonce,
-                    &self.nonce_amount(&token, nonce).get(),
-                    b"claim",
-                );
+                    self.nonce_amount(&token, nonce).get(),
+                ));
+
                 self.nonce_amount(&token, nonce).clear();
             }
+
+            let bonding_curve: BondingCurve<Self::Api, T> =
+                serializer.top_decode_from_managed_buffer(&self.bonding_curve(&token).get());
+
+            if let Some(esdt_token_identifier) =
+                bonding_curve.payment.token_identifier.into_esdt_option()
+            {
+                tokens_to_claim.push(EsdtTokenPayment::new(
+                    esdt_token_identifier,
+                    bonding_curve.payment.token_nonce,
+                    bonding_curve.payment.amount,
+                ));
+            } else {
+                egld_to_claim += bonding_curve.payment.amount;
+            }
+
             self.token_details(&token).clear();
             self.bonding_curve(&token).clear();
         }
         self.owned_tokens(&caller).clear();
+        self.send().direct_multi(&caller, &tokens_to_claim);
+        if egld_to_claim > BigUint::zero() {
+            self.send().direct_egld(&caller, &egld_to_claim);
+        }
     }
 
-    fn set_curve_storage(
+    fn set_curve_storage<T>(
         &self,
         identifier: &TokenIdentifier,
         amount: BigUint,
-        payment: TokenIdentifier,
-    ) {
-        let mut curve = FunctionSelector::None;
+        payment_token_identifier: EgldOrEsdtTokenIdentifier,
+    ) where
+        T: CurveFunction<Self::Api>
+            + TopEncode
+            + TopDecode
+            + NestedEncode
+            + NestedDecode
+            + TypeAbi
+            + PartialEq
+            + Default,
+    {
+        let mut curve: T = T::default();
         let mut arguments;
-        let payment_token;
-        let payment_amount: BigUint;
+        let payment;
         let sell_availability: bool;
+        let serializer = ManagedSerializer::new();
 
         if self.bonding_curve(identifier).is_empty() {
             arguments = CurveArguments {
                 available_supply: amount.clone(),
                 balance: amount,
             };
-            payment_token = payment;
-            payment_amount = BigUint::zero();
+            payment = EgldOrEsdtTokenPayment::new(payment_token_identifier, 0, BigUint::zero());
             sell_availability = false;
         } else {
-            let bonding_curve = self.bonding_curve(identifier).get();
-            payment_token = bonding_curve.payment_token;
-            payment_amount = bonding_curve.payment_amount;
+            let bonding_curve: BondingCurve<Self::Api, T> =
+                serializer.top_decode_from_managed_buffer(&self.bonding_curve(identifier).get());
+
+            payment = bonding_curve.payment;
             curve = bonding_curve.curve;
             arguments = bonding_curve.arguments;
             arguments.balance += &amount;
             arguments.available_supply += amount;
             sell_availability = bonding_curve.sell_availability;
         }
-        self.bonding_curve(identifier).set(&BondingCurve {
+        let encoded_curve = serializer.top_encode_to_managed_buffer(&BondingCurve {
             curve,
             arguments,
             sell_availability,
-            payment_token,
-            payment_amount,
+            payment,
         });
+        self.bonding_curve(identifier).set(encoded_curve);
     }
 }

@@ -7,7 +7,7 @@ const PERCENTAGE_TOTAL: u8 = 100;
 
 #[derive(TopEncode, TopDecode, TypeAbi)]
 pub struct Auction<M: ManagedTypeApi> {
-    pub token_identifier: TokenIdentifier<M>,
+    pub token_identifier: EgldOrEsdtTokenIdentifier<M>,
     pub min_bid: BigUint<M>,
     pub max_bid: BigUint<M>,
     pub deadline: u64,
@@ -18,7 +18,7 @@ pub struct Auction<M: ManagedTypeApi> {
 
 #[derive(TopEncode, TopDecode, TypeAbi)]
 pub struct AuctionArgument<M: ManagedTypeApi> {
-    pub token_identifier: TokenIdentifier<M>,
+    pub token_identifier: EgldOrEsdtTokenIdentifier<M>,
     pub min_bid: BigUint<M>,
     pub max_bid: BigUint<M>,
     pub deadline: u64,
@@ -31,7 +31,7 @@ pub trait Erc1155Marketplace {
     fn init(&self, token_ownership_contract_address: ManagedAddress, bid_cut_percentage: u8) {
         self.token_ownership_contract_address()
             .set(&token_ownership_contract_address);
-        self.percentage_cut().set(&bid_cut_percentage);
+        self.percentage_cut().set(bid_cut_percentage);
     }
 
     // endpoints - Token ownership contract only
@@ -103,13 +103,10 @@ pub trait Erc1155Marketplace {
     #[endpoint]
     fn claim(&self) {
         let caller = self.blockchain().get_caller();
-        let data = self.data_or_empty_if_sc(&caller, b"claim");
 
         let claimable_funds_mapper = self.get_claimable_funds_mapper();
         for (token_identifier, amount) in claimable_funds_mapper.iter() {
-            self.send()
-                .direct(&caller, &token_identifier, 0, &amount, data);
-
+            self.send().direct(&caller, &token_identifier, 0, &amount);
             self.clear_claimable_funds(&token_identifier);
         }
     }
@@ -122,7 +119,7 @@ pub trait Erc1155Marketplace {
             "Invalid percentage value, should be between 0 and 100"
         );
 
-        self.percentage_cut().set(&new_cut_percentage);
+        self.percentage_cut().set(new_cut_percentage);
     }
 
     #[only_owner]
@@ -141,13 +138,8 @@ pub trait Erc1155Marketplace {
 
     #[payable("*")]
     #[endpoint]
-    fn bid(
-        &self,
-        type_id: BigUint,
-        nft_id: BigUint,
-        #[payment_token] payment_token: TokenIdentifier,
-        #[payment] payment: BigUint,
-    ) {
+    fn bid(&self, type_id: BigUint, nft_id: BigUint) {
+        let (payment_token, payment) = self.call_value().egld_or_single_fungible_esdt();
         require!(
             self.is_up_for_auction(&type_id, &nft_id),
             "Token is not up for auction"
@@ -184,13 +176,11 @@ pub trait Erc1155Marketplace {
 
         // refund losing bid
         if !auction.current_winner.is_zero() {
-            let data = self.data_or_empty_if_sc(&caller, b"bid refund");
             self.send().direct(
                 &auction.current_winner,
                 &auction.token_identifier,
                 0,
                 &auction.current_bid,
-                data,
             );
         }
 
@@ -225,13 +215,11 @@ pub trait Erc1155Marketplace {
             self.add_claimable_funds(&auction.token_identifier, &cut_amount);
 
             // send part of the bid to the original owner
-            let data = self.data_or_empty_if_sc(&auction.original_owner, b"sold token");
             self.send().direct(
                 &auction.original_owner,
                 &auction.token_identifier,
                 0,
                 &amount_to_send,
-                data,
             );
 
             // send token to winner
@@ -289,7 +277,7 @@ pub trait Erc1155Marketplace {
         type_id: &BigUint,
         nft_id: &BigUint,
         original_owner: &ManagedAddress,
-        token: &TokenIdentifier,
+        token: &EgldOrEsdtTokenIdentifier,
         min_bid: &BigUint,
         max_bid: &BigUint,
         deadline: u64,
@@ -332,24 +320,16 @@ pub trait Erc1155Marketplace {
         total_amount * cut_percentage as u32 / PERCENTAGE_TOTAL as u32
     }
 
-    fn add_claimable_funds(&self, token_identifier: &TokenIdentifier, amount: &BigUint) {
+    fn add_claimable_funds(&self, token_identifier: &EgldOrEsdtTokenIdentifier, amount: &BigUint) {
         let mut mapper = self.get_claimable_funds_mapper();
         let mut total = mapper.get(token_identifier).unwrap_or_default();
         total += amount;
         mapper.insert(token_identifier.clone(), total);
     }
 
-    fn clear_claimable_funds(&self, token_identifier: &TokenIdentifier) {
+    fn clear_claimable_funds(&self, token_identifier: &EgldOrEsdtTokenIdentifier) {
         let mut mapper = self.get_claimable_funds_mapper();
         mapper.insert(token_identifier.clone(), BigUint::zero());
-    }
-
-    fn data_or_empty_if_sc(&self, dest: &ManagedAddress, data: &'static [u8]) -> &[u8] {
-        if self.blockchain().is_smart_contract(dest) {
-            &[]
-        } else {
-            data
-        }
     }
 
     // proxy
@@ -373,7 +353,7 @@ pub trait Erc1155Marketplace {
     // claimable funds - only after an auction ended and the fixed percentage has been reserved by the SC
 
     #[storage_mapper("claimableFunds")]
-    fn get_claimable_funds_mapper(&self) -> MapMapper<TokenIdentifier, BigUint>;
+    fn get_claimable_funds_mapper(&self) -> MapMapper<EgldOrEsdtTokenIdentifier, BigUint>;
 
     // auction properties for each token
 

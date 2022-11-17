@@ -5,7 +5,7 @@ use crate::{
     err_msg,
     types::{ManagedArgBuffer, ManagedBuffer, ManagedType, ManagedVec, ManagedVecItem},
 };
-use core::marker::PhantomData;
+use core::{iter::FromIterator, marker::PhantomData};
 use elrond_codec::{
     try_cast_execute_or_else, CodecFromSelf, DecodeErrorHandler, EncodeErrorHandler, TopDecode,
     TopDecodeMulti, TopDecodeMultiInput, TopDecodeMultiLength, TopEncode, TopEncodeMulti,
@@ -23,7 +23,7 @@ use elrond_codec::{
 ///
 /// Since it can contain multi-values, the number of actual items it contains cannot be determined without fully decoding.
 ///
-#[derive(Clone, Default)]
+#[derive(Clone, Default, Debug, PartialEq)]
 pub struct MultiValueEncoded<M, T>
 where
     M: ManagedTypeApi,
@@ -111,7 +111,7 @@ where
     M: ManagedTypeApi,
 {
     pub fn to_arg_buffer(&self) -> ManagedArgBuffer<M> {
-        ManagedArgBuffer::from_raw_handle(self.raw_buffers.get_raw_handle())
+        ManagedArgBuffer::from_handle(self.raw_buffers.get_handle())
     }
 }
 
@@ -249,7 +249,7 @@ use elrond_codec::{multi_types::MultiValueVec, CodecFrom};
 impl<M, T, U> CodecFrom<MultiValueVec<T>> for MultiValueEncoded<M, U>
 where
     M: ManagedTypeApi + ErrorApi,
-    T: TopEncodeMulti + TopDecodeMulti,
+    T: TopEncodeMulti,
     U: CodecFrom<T>,
 {
 }
@@ -258,7 +258,19 @@ where
 impl<M, T, U> CodecFrom<MultiValueEncoded<M, T>> for MultiValueVec<U>
 where
     M: ManagedTypeApi + ErrorApi,
-    T: TopEncodeMulti + TopDecodeMulti,
+    T: TopEncodeMulti,
     U: CodecFrom<T>,
 {
+}
+
+impl<M, V> FromIterator<V> for MultiValueEncoded<M, V>
+where
+    M: ManagedTypeApi,
+    V: TopEncodeMulti,
+{
+    fn from_iter<T: IntoIterator<Item = V>>(iter: T) -> Self {
+        let mut result: MultiValueEncoded<M, V> = MultiValueEncoded::new();
+        iter.into_iter().for_each(|f| result.push(f));
+        result
+    }
 }

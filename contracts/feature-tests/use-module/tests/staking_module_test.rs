@@ -1,4 +1,4 @@
-use elrond_wasm::types::ManagedVec;
+use elrond_wasm::types::{EgldOrEsdtTokenIdentifier, ManagedVec};
 use elrond_wasm_debug::{
     managed_address, managed_biguint, managed_token_id, rust_biguint,
     testing_framework::BlockchainStateWrapper,
@@ -42,7 +42,7 @@ fn staking_module_test() {
             whitelist.push(managed_address!(&carol));
 
             sc.init_staking_module(
-                &managed_token_id!(STAKING_TOKEN_ID),
+                &EgldOrEsdtTokenIdentifier::esdt(managed_token_id!(STAKING_TOKEN_ID)),
                 &managed_biguint!(REQUIRED_STAKE_AMOUNT),
                 &managed_biguint!(SLASH_AMOUNT),
                 QUORUM,

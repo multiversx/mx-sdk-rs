@@ -14,7 +14,7 @@
         },
         "framework": {
             "name": "elrond-wasm",
-            "version": "0.31.1"
+            "version": "0.36.1"
         }
     },
     "docs": [
@@ -85,6 +85,40 @@
             "name": "call_derived_not_owner_only",
             "mutability": "readonly",
             "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "only_admin_mod_endpoint",
+            "onlyAdmin": true,
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "call_derived_not_admin_only",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "countTo100",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "OperationCompletionStatus"
+                }
+            ]
+        },
+        {
+            "name": "claimDeveloperRewards",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "child_sc_address",
+                    "type": "Address"
+                }
+            ],
             "outputs": []
         },
         {
@@ -171,6 +205,19 @@
             "outputs": []
         },
         {
+            "docs": [
+                "Propose a list of actions.",
+                "A maximum of MAX_GOVERNANCE_PROPOSAL_ACTIONS can be proposed at a time.",
+                "",
+                "An action has the following format:",
+                "    - gas limit for action execution",
+                "    - destination address",
+                "    - a vector of ESDT transfers, in the form of ManagedVec<EsdTokenPayment>",
+                "    - endpoint to be called on the destination",
+                "    - a vector of arguments for the endpoint, in the form of ManagedVec<ManagedBuffer>",
+                "",
+                "Returns the ID of the newly created proposal."
+            ],
             "name": "propose",
             "mutability": "mutable",
             "payableInTokens": [
@@ -183,7 +230,7 @@
                 },
                 {
                     "name": "actions",
-                    "type": "variadic<multi<u64,Address,TokenIdentifier,u64,BigUint,bytes,List<bytes>>>",
+                    "type": "variadic<multi<u64,Address,List<EsdtTokenPayment>,bytes,List<bytes>>>",
                     "multi_arg": true
                 }
             ],
@@ -194,6 +241,10 @@
             ]
         },
         {
+            "docs": [
+                "Vote on a proposal by depositing any amount of governance tokens",
+                "These tokens will be locked until the proposal is executed or cancelled."
+            ],
             "name": "vote",
             "mutability": "mutable",
             "payableInTokens": [
@@ -208,6 +259,10 @@
             "outputs": []
         },
         {
+            "docs": [
+                "Downvote a proposal by depositing any amount of governance tokens.",
+                "These tokens will be locked until the proposal is executed or cancelled."
+            ],
             "name": "downvote",
             "mutability": "mutable",
             "payableInTokens": [
@@ -222,6 +277,12 @@
             "outputs": []
         },
         {
+            "docs": [
+                "Queue a proposal for execution.",
+                "This can be done only if the proposal has reached the quorum.",
+                "A proposal is considered successful and ready for queing if",
+                "total_votes - total_downvotes >= quorum"
+            ],
             "name": "queue",
             "mutability": "mutable",
             "inputs": [
@@ -233,6 +294,11 @@
             "outputs": []
         },
         {
+            "docs": [
+                "Execute a previously queued proposal.",
+                "This will clear the proposal and unlock the governance tokens.",
+                "Said tokens can then be withdrawn and used to vote/downvote other proposals."
+            ],
             "name": "execute",
             "mutability": "mutable",
             "inputs": [
@@ -244,6 +310,11 @@
             "outputs": []
         },
         {
+            "docs": [
+                "Cancel a proposed action. This can be done:",
+                "- by the proposer, at any time",
+                "- by anyone, if the proposal was defeated"
+            ],
             "name": "cancel",
             "mutability": "mutable",
             "inputs": [
@@ -312,15 +383,12 @@
             ],
             "outputs": [
                 {
-                    "type": "variadic<multi<u64,Address,TokenIdentifier,u64,BigUint,bytes,List<bytes>>>",
+                    "type": "variadic<multi<u64,Address,List<EsdtTokenPayment>,bytes,List<bytes>>>",
                     "multi_result": true
                 }
             ]
         },
         {
-            "docs": [
-                "Could be calculated by iterating over the \"votes\" mapper, but that costs a lot of gas"
-            ],
             "name": "getTotalVotes",
             "mutability": "readonly",
             "inputs": [
@@ -336,9 +404,6 @@
             ]
         },
         {
-            "docs": [
-                "Could be calculated by iterating over the \"downvotes\" mapper, but that costs a lot of gas"
-            ],
             "name": "getTotalDownvotes",
             "mutability": "readonly",
             "inputs": [
@@ -352,42 +417,6 @@
                     "type": "BigUint"
                 }
             ]
-        },
-        {
-            "docs": [
-                "The module can't protect its storage from the main SC, so it's the developers responsibility",
-                "to not modify parameters manually"
-            ],
-            "name": "initGovernanceModule",
-            "onlyOwner": true,
-            "mutability": "mutable",
-            "inputs": [
-                {
-                    "name": "governance_token_id",
-                    "type": "TokenIdentifier"
-                },
-                {
-                    "name": "quorum",
-                    "type": "BigUint"
-                },
-                {
-                    "name": "min_token_balance_for_proposal",
-                    "type": "BigUint"
-                },
-                {
-                    "name": "voting_delay_in_blocks",
-                    "type": "u64"
-                },
-                {
-                    "name": "voting_period_in_blocks",
-                    "type": "u64"
-                },
-                {
-                    "name": "lock_time_after_voting_ends_in_blocks",
-                    "type": "u64"
-                }
-            ],
-            "outputs": []
         },
         {
             "name": "changeQuorum",
@@ -505,16 +534,6 @@
             ]
         },
         {
-            "name": "isPaused",
-            "mutability": "readonly",
-            "inputs": [],
-            "outputs": [
-                {
-                    "type": "bool"
-                }
-            ]
-        },
-        {
             "name": "pause",
             "onlyOwner": true,
             "mutability": "mutable",
@@ -527,6 +546,16 @@
             "mutability": "mutable",
             "inputs": [],
             "outputs": []
+        },
+        {
+            "name": "isPaused",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "bool"
+                }
+            ]
         },
         {
             "name": "stake",
@@ -569,11 +598,318 @@
                 }
             ],
             "outputs": []
+        },
+        {
+            "name": "issueMergedToken",
+            "onlyOwner": true,
+            "mutability": "mutable",
+            "payableInTokens": [
+                "EGLD"
+            ],
+            "inputs": [
+                {
+                    "name": "token_display_name",
+                    "type": "bytes"
+                },
+                {
+                    "name": "token_ticker",
+                    "type": "bytes"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "addMergeableTokensToWhitelist",
+            "onlyOwner": true,
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "tokens",
+                    "type": "variadic<TokenIdentifier>",
+                    "multi_arg": true
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "removeMergeableTokensFromWhitelist",
+            "onlyOwner": true,
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "tokens",
+                    "type": "variadic<TokenIdentifier>",
+                    "multi_arg": true
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "mergeTokens",
+            "mutability": "mutable",
+            "payableInTokens": [
+                "*"
+            ],
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "EsdtTokenPayment"
+                }
+            ]
+        },
+        {
+            "name": "splitTokens",
+            "mutability": "mutable",
+            "payableInTokens": [
+                "*"
+            ],
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "variadic<EsdtTokenPayment>",
+                    "multi_result": true
+                }
+            ]
+        },
+        {
+            "name": "splitTokenPartial",
+            "mutability": "mutable",
+            "payableInTokens": [
+                "*"
+            ],
+            "inputs": [
+                {
+                    "name": "tokens_to_remove",
+                    "type": "variadic<EsdtTokenPayment>",
+                    "multi_arg": true
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "variadic<EsdtTokenPayment>",
+                    "multi_result": true
+                }
+            ]
+        },
+        {
+            "name": "getMergedTokenId",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "TokenIdentifier"
+                }
+            ]
+        },
+        {
+            "name": "getMergeableTokensWhitelist",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "variadic<TokenIdentifier>",
+                    "multi_result": true
+                }
+            ]
+        },
+        {
+            "name": "isAdmin",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "address",
+                    "type": "Address"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "addAdmin",
+            "onlyOwner": true,
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "address",
+                    "type": "Address"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "removeAdmin",
+            "onlyOwner": true,
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "address",
+                    "type": "Address"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "getAdmins",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "variadic<Address>",
+                    "multi_result": true
+                }
+            ]
         }
     ],
-    "events": [],
+    "events": [
+        {
+            "identifier": "eventInModule",
+            "inputs": [
+                {
+                    "name": "arg",
+                    "type": "u32",
+                    "indexed": true
+                }
+            ]
+        },
+        {
+            "identifier": "proposalCreated",
+            "inputs": [
+                {
+                    "name": "proposal_id",
+                    "type": "u32",
+                    "indexed": true
+                },
+                {
+                    "name": "proposer",
+                    "type": "Address",
+                    "indexed": true
+                },
+                {
+                    "name": "start_block",
+                    "type": "u64",
+                    "indexed": true
+                },
+                {
+                    "name": "description",
+                    "type": "bytes",
+                    "indexed": true
+                },
+                {
+                    "name": "actions",
+                    "type": "List<GovernanceAction>"
+                }
+            ]
+        },
+        {
+            "identifier": "voteCast",
+            "inputs": [
+                {
+                    "name": "voter",
+                    "type": "Address",
+                    "indexed": true
+                },
+                {
+                    "name": "proposal_id",
+                    "type": "u32",
+                    "indexed": true
+                },
+                {
+                    "name": "nr_votes",
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "identifier": "downvoteCast",
+            "inputs": [
+                {
+                    "name": "downvoter",
+                    "type": "Address",
+                    "indexed": true
+                },
+                {
+                    "name": "proposal_id",
+                    "type": "u32",
+                    "indexed": true
+                },
+                {
+                    "name": "nr_downvotes",
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "identifier": "proposalCanceled",
+            "inputs": [
+                {
+                    "name": "proposal_id",
+                    "type": "u32",
+                    "indexed": true
+                }
+            ]
+        },
+        {
+            "identifier": "proposalQueued",
+            "inputs": [
+                {
+                    "name": "proposal_id",
+                    "type": "u32",
+                    "indexed": true
+                },
+                {
+                    "name": "queued_block",
+                    "type": "u64",
+                    "indexed": true
+                }
+            ]
+        },
+        {
+            "identifier": "proposalExecuted",
+            "inputs": [
+                {
+                    "name": "proposal_id",
+                    "type": "u32",
+                    "indexed": true
+                }
+            ]
+        },
+        {
+            "identifier": "userDeposit",
+            "inputs": [
+                {
+                    "name": "address",
+                    "type": "Address",
+                    "indexed": true
+                },
+                {
+                    "name": "payments",
+                    "type": "List<EsdtTokenPayment>"
+                }
+            ]
+        }
+    ],
     "hasCallback": true,
     "types": {
+        "EsdtTokenPayment": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "token_identifier",
+                    "type": "TokenIdentifier"
+                },
+                {
+                    "name": "token_nonce",
+                    "type": "u64"
+                },
+                {
+                    "name": "amount",
+                    "type": "BigUint"
+                }
+            ]
+        },
         "EsdtTokenType": {
             "type": "enum",
             "variants": [
@@ -611,16 +947,8 @@
                     "type": "Address"
                 },
                 {
-                    "name": "token_id",
-                    "type": "TokenIdentifier"
-                },
-                {
-                    "name": "token_nonce",
-                    "type": "u64"
-                },
-                {
-                    "name": "amount",
-                    "type": "BigUint"
+                    "name": "payments",
+                    "type": "List<EsdtTokenPayment>"
                 },
                 {
                     "name": "function_name",

@@ -1,0 +1,130 @@
+{
+    "name": "claim developer rewards",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "5",
+                    "balance": "0"
+                },
+                "address:not_owner": {
+                    "nonce": "5",
+                    "balance": "0"
+                }
+            },
+            "newAddresses": [
+                {
+                    "creatorAddress": "address:owner",
+                    "creatorNonce": "5",
+                    "newAddress": "sc:use_module"
+                }
+            ]
+        },
+        {
+            "step": "scDeploy",
+            "id": "1",
+            "tx": {
+                "from": "address:owner",
+                "contractCode": "file:../output/use-module.wasm",
+                "arguments": [],
+                "gasLimit": "20,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:child": {
+                    "balance": "500",
+                    "owner": "sc:use_module",
+                    "code": "file:../../composability/vault/output/vault.wasm",
+                    "developerRewards": "100"
+                },
+                "sc:not_child": {
+                    "balance": "500",
+                    "owner": "sc:not_owner",
+                    "code": "file:../../composability/vault/output/vault.wasm"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "fail_claim",
+            "tx": {
+                "from": "address:not_owner",
+                "to": "sc:use_module",
+                "function": "claimDeveloperRewards",
+                "arguments": [
+                    "sc:not_child"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "10",
+                "message": "str:operation in account not permitted",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "success_claim",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:use_module",
+                "function": "claimDeveloperRewards",
+                "arguments": [
+                    "sc:child"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "message": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:use_module": {
+                    "balance": "100",
+                    "code": "file:../output/use-module.wasm",
+                    "owner": "address:owner"
+                },
+                "address:not_owner": {
+                    "nonce": "6",
+                    "balance": "0"
+                },
+                "address:owner": {
+                    "nonce": "7",
+                    "balance": "0"
+                },
+                "sc:child": {
+                    "balance": "500",
+                    "owner": "sc:use_module",
+                    "code": "file:../../composability/vault/output/vault.wasm",
+                    "developerRewards": "0"
+                },
+                "sc:not_child": {
+                    "balance": "500",
+                    "owner": "sc:not_owner",
+                    "code": "file:../../composability/vault/output/vault.wasm"
+                }
+            }
+        }
+    ]
+}

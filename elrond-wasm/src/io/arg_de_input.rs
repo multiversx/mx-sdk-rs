@@ -40,21 +40,21 @@ where
     }
 
     fn to_managed_buffer(&self) -> ManagedBuffer<AA> {
-        let mbuf_handle = AA::static_var_api_impl().next_handle();
-        AA::argument_api_impl().load_argument_managed_buffer(self.arg_index, mbuf_handle);
-        ManagedBuffer::from_raw_handle(mbuf_handle)
+        let mbuf_handle: AA::ManagedBufferHandle = AA::static_var_api_impl().next_handle();
+        AA::argument_api_impl().load_argument_managed_buffer(self.arg_index, mbuf_handle.clone());
+        ManagedBuffer::from_handle(mbuf_handle)
     }
 
     fn to_big_int(&self) -> BigInt<AA> {
-        let bi_handle = AA::static_var_api_impl().next_handle();
-        AA::argument_api_impl().load_argument_big_int_signed(self.arg_index, bi_handle);
-        BigInt::from_raw_handle(bi_handle)
+        let bi_handle: AA::BigIntHandle = AA::static_var_api_impl().next_handle();
+        AA::argument_api_impl().load_argument_big_int_signed(self.arg_index, bi_handle.clone());
+        BigInt::from_handle(bi_handle)
     }
 
     fn to_big_uint(&self) -> BigUint<AA> {
-        let bi_handle = AA::static_var_api_impl().next_handle();
-        AA::argument_api_impl().load_argument_big_int_unsigned(self.arg_index, bi_handle);
-        BigUint::from_raw_handle(bi_handle)
+        let bi_handle: AA::BigIntHandle = AA::static_var_api_impl().next_handle();
+        AA::argument_api_impl().load_argument_big_int_unsigned(self.arg_index, bi_handle.clone());
+        BigUint::from_handle(bi_handle)
     }
 }
 

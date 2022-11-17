@@ -1,7 +1,7 @@
 use crate::{
     boxed_slice_into_vec, DecodeError, DecodeErrorHandler, EncodeErrorHandler, NestedDecode,
     NestedDecodeInput, NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode,
-    TopEncodeOutput, TypeInfo,
+    TopEncodeOutput,
 };
 use alloc::vec::Vec;
 
@@ -22,23 +22,26 @@ impl<T: NestedDecode> TopDecode for Vec<T> {
         I: TopDecodeInput,
         H: DecodeErrorHandler,
     {
-        // TODO: use specialized getter, get rid of TypeInfo
-        if let TypeInfo::U8 = T::TYPE_INFO {
-            let bytes = input.into_boxed_slice_u8();
-            let bytes_vec = boxed_slice_into_vec(bytes);
-            let cast_vec: Vec<T> = unsafe { core::mem::transmute(bytes_vec) };
-            Ok(cast_vec)
-        } else {
-            let mut result: Vec<T> = Vec::new();
-            let mut nested_buffer = input.into_nested_buffer();
-            while !nested_buffer.is_depleted() {
-                result.push(T::dep_decode_or_handle_err(&mut nested_buffer, h)?);
-            }
-            if !nested_buffer.is_depleted() {
-                return Err(h.handle_error(DecodeError::INPUT_TOO_LONG));
-            }
-            Ok(result)
-        }
+        T::if_u8(
+            input,
+            |input| {
+                let bytes = input.into_boxed_slice_u8();
+                let bytes_vec = boxed_slice_into_vec(bytes);
+                let cast_vec: Vec<T> = unsafe { core::mem::transmute(bytes_vec) };
+                Ok(cast_vec)
+            },
+            |input| {
+                let mut result: Vec<T> = Vec::new();
+                let mut nested_buffer = input.into_nested_buffer();
+                while !nested_buffer.is_depleted() {
+                    result.push(T::dep_decode_or_handle_err(&mut nested_buffer, h)?);
+                }
+                if !nested_buffer.is_depleted() {
+                    return Err(h.handle_error(DecodeError::INPUT_TOO_LONG));
+                }
+                Ok(result)
+            },
+        )
     }
 }
 
@@ -60,21 +63,22 @@ impl<T: NestedDecode> NestedDecode for Vec<T> {
         H: DecodeErrorHandler,
     {
         let size = usize::dep_decode_or_handle_err(input, h)?;
-        match T::TYPE_INFO {
-            TypeInfo::U8 => {
+        T::if_u8(
+            input,
+            |input| {
                 let mut vec_u8: Vec<u8> = alloc::vec![0; size];
                 input.read_into(vec_u8.as_mut_slice(), h)?;
                 let cast_vec: Vec<T> = unsafe { core::mem::transmute(vec_u8) };
                 Ok(cast_vec)
             },
-            _ => {
+            |input| {
                 let mut result: Vec<T> = Vec::with_capacity(size);
                 for _ in 0..size {
                     result.push(T::dep_decode_or_handle_err(input, h)?);
                 }
                 Ok(result)
             },
-        }
+        )
     }
 }
 

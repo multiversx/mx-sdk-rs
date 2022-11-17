@@ -27,7 +27,7 @@
         },
         {
             "step": "scCall",
-            "txId": "1",
+            "id": "1",
             "tx": {
                 "from": "address:crypto_bubbles_owner",
                 "to": "sc:crypto_bubbles_legacy",
@@ -53,6 +53,16 @@
                             "address:acc1"
                         ],
                         "data": "0x200"
+                    },
+                    {
+                        "address": "*",
+                        "endpoint": "str:transferValueOnly",
+                        "topics": [
+                            "sc:crypto_bubbles_legacy",
+                            "address:acc1",
+                            "0x0200"
+                        ],
+                        "data": ""
                     },
                     {
                         "address": "sc:crypto_bubbles_legacy",
@@ -90,8 +100,7 @@
                     "nonce": "0",
                     "balance": "0x200",
                     "storage": {},
-                    "code": "",
-                    "asyncCallData": "str:crypto bubbles"
+                    "code": ""
                 }
             }
         }

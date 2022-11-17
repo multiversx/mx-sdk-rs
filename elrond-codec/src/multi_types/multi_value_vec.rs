@@ -16,6 +16,15 @@ impl<T> From<Vec<T>> for MultiValueVec<T> {
     }
 }
 
+impl<T, const N: usize> From<[T; N]> for MultiValueVec<T>
+where
+    T: Clone,
+{
+    fn from(arr: [T; N]) -> Self {
+        MultiValueVec(arr[..].to_vec())
+    }
+}
+
 impl<T> MultiValueVec<T> {
     #[inline]
     pub fn new() -> Self {
