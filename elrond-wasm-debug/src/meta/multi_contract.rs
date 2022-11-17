@@ -17,8 +17,8 @@ pub struct MCLabel{
 
 #[derive(Deserialize, Debug)]
 pub struct MCContract{
-    pub externalview: Option<bool>,
-    pub wasmname: Option<String>,
+    pub external_view: Option<bool>,
+    pub wasm_name: Option<String>,
 }
 
 #[derive(Deserialize, Debug)]

@@ -13,8 +13,8 @@ fn test_serialize_multi_contract() {
         multisig = {}
         
         [contracts.multisig-external-view]
-        externalview = true
-        wasmname = "multisig-ev.wasm"
+        external_view = true
+        wasm_name = "multisig-ev.wasm"
         
         [labels]
         default = ["multisig", "multisig-external-view"]
@@ -24,8 +24,8 @@ fn test_serialize_multi_contract() {
     assert_eq!(multi_contract.settings.default, "multisig");
     assert_eq!(multi_contract.labels.default, ["multisig", "multisig-external-view"]);
     assert_eq!(multi_contract.labels.ev, ["multisig-external-view"]);
-    assert_eq!(multi_contract.contracts.get("multisig").unwrap().wasmname.is_none(), true);
-    assert_eq!(multi_contract.contracts.get("multisig").unwrap().externalview.is_none(), true);
-    assert_eq!(multi_contract.contracts.get("multisig-external-view").unwrap().wasmname.as_ref().unwrap(), "multisig-ev.wasm");
-    assert_eq!(multi_contract.contracts.get("multisig-external-view").unwrap().externalview.unwrap(), true);
+    assert_eq!(multi_contract.contracts.get("multisig").unwrap().wasm_name.is_none(), true);
+    assert_eq!(multi_contract.contracts.get("multisig").unwrap().external_view.is_none(), true);
+    assert_eq!(multi_contract.contracts.get("multisig-external-view").unwrap().wasm_name.as_ref().unwrap(), "multisig-ev.wasm");
+    assert_eq!(multi_contract.contracts.get("multisig-external-view").unwrap().external_view.unwrap(), true);
 }
