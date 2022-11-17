@@ -1,5 +1,5 @@
 use elrond_wasm_debug::DebugApi;
-use elrond_wasm_debug::meta::multi_contract::MultiContract;
+use elrond_wasm_debug::meta::multi_contract::{MultiContract};
 
 #[test]
 fn test_serialize_multi_contract() {
@@ -7,25 +7,31 @@ fn test_serialize_multi_contract() {
 
     let multi_contract: MultiContract = toml::from_str(r#"
         [settings]
-        default = "multisig"
+        default = "main_identifier"
         
         [contracts]
-        multisig = {}
+        main_identifier = {}
         
-        [contracts.multisig-external-view]
+        [contracts.c1]
         external_view = true
-        wasm_name = "multisig-ev.wasm"
+        wasm_name = "c1-name.wasm"
         
         [labels]
-        default = ["multisig", "multisig-external-view"]
-        ev = ["multisig-external-view"]
+        default = ["main-identifier", "c3", "all"]
+        label1 = ["c1", "all"]
+        label2 = ["c1", "c2"]
+        "*" = ["all"]
     "#).unwrap();
 
-    assert_eq!(multi_contract.settings.default, "multisig");
-    assert_eq!(multi_contract.labels.default, ["multisig", "multisig-external-view"]);
-    assert_eq!(multi_contract.labels.ev, ["multisig-external-view"]);
-    assert_eq!(multi_contract.contracts.get("multisig").unwrap().wasm_name.is_none(), true);
-    assert_eq!(multi_contract.contracts.get("multisig").unwrap().external_view.is_none(), true);
-    assert_eq!(multi_contract.contracts.get("multisig-external-view").unwrap().wasm_name.as_ref().unwrap(), "multisig-ev.wasm");
-    assert_eq!(multi_contract.contracts.get("multisig-external-view").unwrap().external_view.unwrap(), true);
+    assert_eq!(multi_contract.settings.default, "main_identifier");
+
+    assert_eq!(multi_contract.contracts.get("main_identifier").unwrap().wasm_name.is_none(), true);
+    assert_eq!(multi_contract.contracts.get("main_identifier").unwrap().external_view.is_none(), true);
+    assert_eq!(multi_contract.contracts.get("c1").unwrap().wasm_name.as_ref().unwrap(), "c1-name.wasm");
+    assert_eq!(multi_contract.contracts.get("c1").unwrap().external_view.unwrap(), true);
+
+    assert_eq!(multi_contract.labels.get("default").unwrap().0, ["main-identifier", "c3", "all"]);
+    assert_eq!(multi_contract.labels.get("label1").unwrap().0 , ["c1", "all"]);
+    assert_eq!(multi_contract.labels.get("label2").unwrap().0, ["c1", "c2"]);
+    assert_eq!(multi_contract.labels.get("*").unwrap().0, ["all"]);
 }
