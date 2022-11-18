@@ -30,7 +30,7 @@
         },
         {
             "step": "scCall",
-            "txId": "1",
+            "id": "1",
             "tx": {
                 "from": "address:acc1",
                 "to": "sc:crypto_bubbles",
@@ -72,7 +72,7 @@
         },
         {
             "step": "scCall",
-            "txId": "2",
+            "id": "2",
             "tx": {
                 "from": "address:acc2",
                 "to": "sc:crypto_bubbles",
@@ -114,7 +114,7 @@
         },
         {
             "step": "scCall",
-            "txId": "3",
+            "id": "3",
             "tx": {
                 "from": "address:acc2",
                 "to": "sc:crypto_bubbles",

@@ -2,7 +2,7 @@ use core::convert::{TryFrom, TryInto};
 
 use crate::{
     abi::{TypeAbi, TypeName},
-    api::{Handle, ManagedTypeApi},
+    api::ManagedTypeApi,
     formatter::{hex_util::encode_bytes_as_hex, FormatByteReceiver, SCLowerHex},
     types::{heap::Address, ManagedBuffer, ManagedByteArray, ManagedType},
 };
@@ -131,19 +131,20 @@ impl<M> ManagedType<M> for ManagedAddress<M>
 where
     M: ManagedTypeApi,
 {
+    type OwnHandle = M::ManagedBufferHandle;
+
     #[inline]
-    fn from_raw_handle(handle: Handle) -> Self {
+    fn from_handle(handle: M::ManagedBufferHandle) -> Self {
         ManagedAddress {
-            bytes: ManagedByteArray::from_raw_handle(handle),
+            bytes: ManagedByteArray::from_handle(handle),
         }
     }
 
-    #[doc(hidden)]
-    fn get_raw_handle(&self) -> Handle {
-        self.bytes.get_raw_handle()
+    fn get_handle(&self) -> M::ManagedBufferHandle {
+        self.bytes.get_handle()
     }
 
-    fn transmute_from_handle_ref(handle_ref: &Handle) -> &Self {
+    fn transmute_from_handle_ref(handle_ref: &M::ManagedBufferHandle) -> &Self {
         unsafe { core::mem::transmute(handle_ref) }
     }
 }
@@ -266,4 +267,10 @@ impl<M> CodecFrom<[u8; 32]> for ManagedAddress<M> where M: ManagedTypeApi {}
 impl<M> CodecFrom<Address> for ManagedAddress<M> where M: ManagedTypeApi {}
 
 #[cfg(feature = "alloc")]
+impl<M> CodecFrom<&Address> for ManagedAddress<M> where M: ManagedTypeApi {}
+
+#[cfg(feature = "alloc")]
 impl<M> CodecFrom<ManagedAddress<M>> for Address where M: ManagedTypeApi {}
+
+#[cfg(feature = "alloc")]
+impl<M> CodecFrom<&ManagedAddress<M>> for Address where M: ManagedTypeApi {}

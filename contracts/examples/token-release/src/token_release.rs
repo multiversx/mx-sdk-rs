@@ -20,7 +20,7 @@ pub trait TokenRelease {
             "Invalid token provided"
         );
         self.token_identifier().set(&token_identifier);
-        self.setup_period_status().set(&true);
+        self.setup_period_status().set(true);
     }
 
     // endpoints
@@ -207,11 +207,12 @@ pub trait TokenRelease {
     #[only_owner]
     #[endpoint(endSetupPeriod)]
     fn end_setup_period(&self) {
+        self.require_setup_period_live();
         let token_identifier = self.token_identifier().get();
         let total_mint_tokens = self.token_total_supply().get();
         self.mint_all_tokens(&token_identifier, &total_mint_tokens);
         let activation_timestamp = self.blockchain().get_block_timestamp();
-        self.activation_timestamp().set(&activation_timestamp);
+        self.activation_timestamp().set(activation_timestamp);
         self.setup_period_status().set(false);
     }
 
@@ -313,7 +314,7 @@ pub trait TokenRelease {
         amount: &BigUint,
     ) {
         self.send()
-            .direct(address, token_identifier, 0, amount, &[]);
+            .direct_esdt(address, token_identifier, 0, amount);
     }
 
     fn mint_all_tokens(&self, token_identifier: &TokenIdentifier, amount: &BigUint) {

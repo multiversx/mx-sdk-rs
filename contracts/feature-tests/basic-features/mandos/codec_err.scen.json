@@ -13,7 +13,7 @@
         },
         {
             "step": "scCall",
-            "txId": "codec_err_finish",
+            "id": "codec_err_finish",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -30,7 +30,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "codec_err_storage_key",
+            "id": "codec_err_storage_key",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "codec_err_storage_key",
@@ -44,7 +44,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "codec_err_storage_get",
+            "id": "codec_err_storage_get",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "codec_err_storage_get",
@@ -58,7 +58,7 @@
         },
         {
             "step": "scCall",
-            "txId": "codec_err_storage_set",
+            "id": "codec_err_storage_set",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -75,7 +75,7 @@
         },
         {
             "step": "scCall",
-            "txId": "codec_err_event_topic",
+            "id": "codec_err_event_topic",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -92,7 +92,7 @@
         },
         {
             "step": "scCall",
-            "txId": "codec_err_event_data",
+            "id": "codec_err_event_data",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -109,7 +109,7 @@
         },
         {
             "step": "scCall",
-            "txId": "codec_err_contract_init",
+            "id": "codec_err_contract_init",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -126,7 +126,7 @@
         },
         {
             "step": "scCall",
-            "txId": "codec_err_contract_call",
+            "id": "codec_err_contract_call",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",

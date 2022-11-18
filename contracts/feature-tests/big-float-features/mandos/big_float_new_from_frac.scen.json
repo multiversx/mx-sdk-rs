@@ -1,0 +1,145 @@
+{
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../output/big-float-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "100000000000"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "newBigFloatFromFrac - 1",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "new_from_frac_big_float_wrapped",
+                "arguments": [
+                    "i64:3",
+                    "i64:2",
+                    "i64:100"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "+150"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "newBigFloatFromFrac - 2",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "new_from_frac_big_float_wrapped",
+                "arguments": [
+                    "i64:-3",
+                    "i64:2",
+                    "i64:100"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "-150"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "newBigFloatFromFrac - 3",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "new_from_frac_big_float_wrapped",
+                "arguments": [
+                    "i64:182456",
+                    "i64:8248134216",
+                    "i64:10000000000"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "+221208"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "newBigFloatFromFrac - 4",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "new_from_frac_big_float_wrapped",
+                "arguments": [
+                    "i64:9223372036854",
+                    "i64:8248134216",
+                    "i64:10000"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "+11182373"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "newBigFloatFromFrac - 5",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "new_from_frac_big_float_wrapped",
+                "arguments": [
+                    "i64:0",
+                    "i64:1",
+                    "i64:100"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "newBigFloatFromFrac - 6",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "new_from_frac_big_float_wrapped",
+                "arguments": [
+                    "i64:1",
+                    "i64:0",
+                    "i64:100"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "10",
+                "message": "str:division by 0"
+            }
+        }
+    ]
+}

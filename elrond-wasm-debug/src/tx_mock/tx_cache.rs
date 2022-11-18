@@ -123,6 +123,6 @@ impl BlockchainUpdate {
     }
 
     pub fn apply(self, blockchain: &mut BlockchainMock) {
-        blockchain.accounts.extend(self.accounts.into_iter());
+        blockchain.update_accounts(self.accounts);
     }
 }

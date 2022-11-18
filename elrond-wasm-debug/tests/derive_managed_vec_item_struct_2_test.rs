@@ -1,5 +1,3 @@
-#![feature(generic_associated_types)]
-
 use elrond_wasm_debug::DebugApi;
 
 elrond_wasm::derive_imports!();
@@ -8,7 +6,7 @@ elrond_wasm::derive_imports!();
 // cargo expand --test derive_managed_vec_item_struct_2_test > expanded.rs
 
 #[derive(
-    ManagedVecItem, NestedEncode, NestedDecode, TopEncode, TopDecode, PartialEq, Clone, Debug,
+    ManagedVecItem, NestedEncode, NestedDecode, TopEncode, TopDecode, PartialEq, Eq, Clone, Debug,
 )]
 pub struct Struct2 {
     pub u_8: u8,

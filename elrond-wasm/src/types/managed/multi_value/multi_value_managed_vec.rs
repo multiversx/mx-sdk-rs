@@ -1,6 +1,7 @@
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
     api::ManagedTypeApi,
+    types::ManagedType,
 };
 use elrond_codec::{
     DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti, TopDecodeMultiInput, TopEncodeMulti,
@@ -32,6 +33,27 @@ where
     #[inline]
     fn from(managed_vec: ManagedVec<M, T>) -> Self {
         MultiValueManagedVec(managed_vec)
+    }
+}
+
+impl<M, T> ManagedType<M> for MultiValueManagedVec<M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedVecItem,
+{
+    type OwnHandle = M::ManagedBufferHandle;
+
+    #[inline]
+    fn from_handle(handle: M::ManagedBufferHandle) -> Self {
+        Self(ManagedVec::from_handle(handle))
+    }
+
+    fn get_handle(&self) -> M::ManagedBufferHandle {
+        self.0.get_handle()
+    }
+
+    fn transmute_from_handle_ref(handle_ref: &M::ManagedBufferHandle) -> &Self {
+        unsafe { core::mem::transmute(handle_ref) }
     }
 }
 
@@ -125,7 +147,7 @@ where
     }
 }
 
-impl<M, T> TopEncodeMulti for MultiValueManagedVec<M, T>
+impl<M, T> TopEncodeMulti for &MultiValueManagedVec<M, T>
 where
     M: ManagedTypeApi,
     T: ManagedVecItem + TopEncodeMulti,
@@ -139,6 +161,20 @@ where
             elem.multi_encode_or_handle_err(output, h)?;
         }
         Ok(())
+    }
+}
+
+impl<M, T> TopEncodeMulti for MultiValueManagedVec<M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedVecItem + TopEncodeMulti,
+{
+    fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: TopEncodeMultiOutput,
+        H: EncodeErrorHandler,
+    {
+        (&self).multi_encode_or_handle_err(output, h)
     }
 }
 

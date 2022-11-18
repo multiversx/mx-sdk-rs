@@ -18,7 +18,7 @@
         },
         {
             "step": "scCall",
-            "txId": "proposeSCDeploy",
+            "id": "proposeSCDeploy",
             "tx": {
                 "from": "address:paul",
                 "to": "sc:multisig",
@@ -87,7 +87,7 @@
         },
         {
             "step": "scCall",
-            "txId": "sc-deploy-sign-alice",
+            "id": "sc-deploy-sign-alice",
             "tx": {
                 "from": "address:alice",
                 "to": "sc:multisig",
@@ -108,7 +108,7 @@
         },
         {
             "step": "scCall",
-            "txId": "sc-deploy-sign-bob",
+            "id": "sc-deploy-sign-bob",
             "tx": {
                 "from": "address:bob",
                 "to": "sc:multisig",
@@ -139,7 +139,7 @@
         },
         {
             "step": "scCall",
-            "txId": "sc-deploy-perform-1",
+            "id": "sc-deploy-perform-1",
             "tx": {
                 "from": "address:paul",
                 "to": "sc:multisig",
@@ -176,7 +176,7 @@
         },
         {
             "step": "scCall",
-            "txId": "proposeTransferExecute",
+            "id": "proposeTransferExecute",
             "tx": {
                 "from": "address:paul",
                 "to": "sc:multisig",
@@ -202,7 +202,7 @@
         },
         {
             "step": "scCall",
-            "txId": "sc-deploy-sign-alice",
+            "id": "sc-deploy-sign-alice",
             "tx": {
                 "from": "address:alice",
                 "to": "sc:multisig",
@@ -223,7 +223,7 @@
         },
         {
             "step": "scCall",
-            "txId": "sc-deploy-sign-bob",
+            "id": "sc-deploy-sign-bob",
             "tx": {
                 "from": "address:bob",
                 "to": "sc:multisig",
@@ -244,7 +244,7 @@
         },
         {
             "step": "scCall",
-            "txId": "sc-deploy-perform-2",
+            "id": "sc-deploy-perform-2",
             "tx": {
                 "from": "address:paul",
                 "to": "sc:multisig",
@@ -265,7 +265,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "check-cleanup-1",
+            "id": "check-cleanup-1",
             "comment": "check that account data got cleaned up",
             "tx": {
                 "to": "sc:multisig-view",
@@ -283,7 +283,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "check-cleanup-2",
+            "id": "check-cleanup-2",
             "comment": "check that account data got cleaned up",
             "tx": {
                 "to": "sc:multisig-view",

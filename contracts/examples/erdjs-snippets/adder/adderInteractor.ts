@@ -8,35 +8,37 @@
  */
 import path from "path";
 import { BigUIntValue, CodeMetadata, IAddress, Interaction, ResultsParser, ReturnCode, SmartContract, SmartContractAbi, TransactionWatcher } from "@elrondnetwork/erdjs";
-import { INetworkProvider, ITestSession, ITestUser, loadAbiRegistry, loadCode } from "@elrondnetwork/erdjs-snippets";
-import { NetworkConfig } from "@elrondnetwork/erdjs-network-providers";
+import { IAudit, INetworkConfig, INetworkProvider, ITestSession, ITestUser, loadAbiRegistry, loadCode } from "@elrondnetwork/erdjs-snippets";
 
 const PathToWasm = path.resolve(__dirname, "..", "..", "adder", "output", "adder.wasm");
 const PathToAbi = path.resolve(__dirname, "..", "..", "adder", "output", "adder.abi.json");
 
 export async function createInteractor(session: ITestSession, contractAddress?: IAddress): Promise<AdderInteractor> {
-    let registry = await loadAbiRegistry(PathToAbi);
-    let abi = new SmartContractAbi(registry, ["Adder"]);
-    let contract = new SmartContract({ address: contractAddress, abi: abi });
-    let networkProvider = session.networkProvider;
-    let networkConfig = session.getNetworkConfig();
-    let interactor = new AdderInteractor(contract, networkProvider, networkConfig);
+    const registry = await loadAbiRegistry(PathToAbi);
+    const abi = new SmartContractAbi(registry);
+    const contract = new SmartContract({ address: contractAddress, abi: abi });
+    const networkProvider = session.networkProvider;
+    const networkConfig = session.getNetworkConfig();
+    const audit = session.audit;
+    const interactor = new AdderInteractor(contract, networkProvider, networkConfig, audit);
     return interactor;
 }
 
 export class AdderInteractor {
     private readonly contract: SmartContract;
     private readonly networkProvider: INetworkProvider;
-    private readonly networkConfig: NetworkConfig;
+    private readonly networkConfig: INetworkConfig;
     private readonly transactionWatcher: TransactionWatcher;
     private readonly resultsParser: ResultsParser;
+    private readonly audit: IAudit;
 
-    constructor(contract: SmartContract, networkProvider: INetworkProvider, networkConfig: NetworkConfig) {
+    constructor(contract: SmartContract, networkProvider: INetworkProvider, networkConfig: INetworkConfig, audit: IAudit) {
         this.contract = contract;
         this.networkProvider = networkProvider;
         this.networkConfig = networkConfig;
         this.transactionWatcher = new TransactionWatcher(networkProvider);
         this.resultsParser = new ResultsParser();
+        this.audit = audit;
     }
 
     async deploy(deployer: ITestUser, initialValue: number): Promise<{ address: IAddress, returnCode: ReturnCode }> {
@@ -60,14 +62,17 @@ export class AdderInteractor {
         await deployer.signer.sign(transaction);
 
         // The contract address is deterministically computable:
-        let address = SmartContract.computeAddress(transaction.getSender(), transaction.getNonce());
+        const address = SmartContract.computeAddress(transaction.getSender(), transaction.getNonce());
 
         // Let's broadcast the transaction and await its completion:
-        await this.networkProvider.sendTransaction(transaction);
+        const transactionHash = await this.networkProvider.sendTransaction(transaction);
+        await this.audit.onContractDeploymentSent({ transactionHash: transactionHash, contractAddress: address });
+
         let transactionOnNetwork = await this.transactionWatcher.awaitCompleted(transaction);
+        await this.audit.onTransactionCompleted({ transactionHash: transactionHash, transaction: transactionOnNetwork });
 
         // In the end, parse the results:
-        let { returnCode } = this.resultsParser.parseUntypedOutcome(transactionOnNetwork);
+        const { returnCode } = this.resultsParser.parseUntypedOutcome(transactionOnNetwork);
 
         console.log(`AdderInteractor.deploy(): contract = ${address}`);
         return { address, returnCode };
@@ -88,8 +93,11 @@ export class AdderInteractor {
         await caller.signer.sign(transaction);
 
         // Let's broadcast the transaction and await its completion:
-        await this.networkProvider.sendTransaction(transaction);
+        const transactionHash = await this.networkProvider.sendTransaction(transaction);
+        await this.audit.onTransactionSent({ action: "add", args: [value], transactionHash: transactionHash });
+
         let transactionOnNetwork = await this.transactionWatcher.awaitCompleted(transaction);
+        await this.audit.onTransactionCompleted({ transactionHash: transactionHash, transaction: transactionOnNetwork });
 
         // In the end, parse the results:
         let { returnCode } = this.resultsParser.parseOutcome(transactionOnNetwork, interaction.getEndpoint());

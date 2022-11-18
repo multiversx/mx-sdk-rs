@@ -1,0 +1,56 @@
+{
+    "comment": "tests mandos validatorReward, no SC",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:A": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            }
+        },
+        {
+            "step": "validatorReward",
+            "id": "1",
+            "tx": {
+                "to": "address:A",
+                "egldValue": "100"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:A": {
+                    "nonce": "0",
+                    "balance": "100",
+                    "storage": {
+                        "str:ELRONDreward": "100"
+                    },
+                    "code": ""
+                }
+            }
+        },
+        {
+            "step": "validatorReward",
+            "id": "2",
+            "tx": {
+                "to": "address:A",
+                "egldValue": "50"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:A": {
+                    "nonce": "0",
+                    "balance": "150",
+                    "storage": {
+                        "str:ELRONDreward": "150"
+                    },
+                    "code": ""
+                }
+            }
+        }
+    ]
+}

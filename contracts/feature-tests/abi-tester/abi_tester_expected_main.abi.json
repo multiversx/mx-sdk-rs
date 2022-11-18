@@ -9,11 +9,12 @@
         },
         "contractCrate": {
             "name": "abi-tester",
-            "version": "0.0.0"
+            "version": "0.0.0",
+            "gitVersion": "<git version here>"
         },
         "framework": {
             "name": "elrond-wasm",
-            "version": "0.30.0"
+            "version": "0.36.1"
         }
     },
     "docs": [
@@ -390,6 +391,37 @@
             "outputs": []
         }
     ],
+    "events": [
+        {
+            "identifier": "payable-event",
+            "inputs": [
+                {
+                    "name": "token",
+                    "type": "TokenIdentifier",
+                    "indexed": true
+                },
+                {
+                    "name": "amount",
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "identifier": "address-h256-event",
+            "inputs": [
+                {
+                    "name": "address",
+                    "type": "Address",
+                    "indexed": true
+                },
+                {
+                    "name": "h256",
+                    "type": "H256",
+                    "indexed": true
+                }
+            ]
+        }
+    ],
     "hasCallback": false,
     "types": {
         "AbiEnum": {
@@ -593,10 +625,6 @@
         "EsdtTokenPayment": {
             "type": "struct",
             "fields": [
-                {
-                    "name": "token_type",
-                    "type": "EsdtTokenType"
-                },
                 {
                     "name": "token_identifier",
                     "type": "TokenIdentifier"

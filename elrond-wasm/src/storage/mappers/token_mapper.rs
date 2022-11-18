@@ -25,32 +25,23 @@ where
         storage_get_len(self.get_storage_key()) == 0
     }
 
-    fn get_token_id(&self) -> TokenIdentifier<SA> {
-        storage_get(self.get_storage_key())
-    }
+    fn get_token_id(&self) -> TokenIdentifier<SA>;
 
-    fn set_token_id(&self, token_id: &TokenIdentifier<SA>) {
-        if !self.is_empty() {
-            SA::error_api_impl().signal_error(TOKEN_ID_ALREADY_SET_ERR_MSG);
-        }
-        if !token_id.is_valid_esdt_identifier() {
-            SA::error_api_impl().signal_error(INVALID_TOKEN_ID_ERR_MSG);
-        }
+    fn get_token_id_ref(&self) -> &TokenIdentifier<SA>;
 
-        storage_set(self.get_storage_key(), token_id);
-    }
+    fn set_token_id(&mut self, token_id: TokenIdentifier<SA>);
 
     fn require_same_token(&self, expected_token_id: &TokenIdentifier<SA>) {
-        let actual_token_id = self.get_token_id();
-        if &actual_token_id != expected_token_id {
+        let actual_token_id = self.get_token_id_ref();
+        if actual_token_id != expected_token_id {
             SA::error_api_impl().signal_error(INVALID_PAYMENT_TOKEN_ERR_MSG);
         }
     }
 
     fn require_all_same_token(&self, payments: &ManagedVec<SA, EsdtTokenPayment<SA>>) {
-        let actual_token_id = self.get_token_id();
+        let actual_token_id = self.get_token_id_ref();
         for p in payments {
-            if actual_token_id != p.token_identifier {
+            if actual_token_id != &p.token_identifier {
                 SA::error_api_impl().signal_error(INVALID_PAYMENT_TOKEN_ERR_MSG);
             }
         }
@@ -76,9 +67,9 @@ where
         }
 
         let system_sc_proxy = ESDTSystemSmartContractProxy::<SA>::new_proxy_obj();
-        let token_id = self.get_token_id();
+        let token_id = self.get_token_id_ref();
         let mut async_call = system_sc_proxy
-            .set_special_roles(address, &token_id, roles[..].iter().cloned())
+            .set_special_roles(address, token_id, roles[..].iter().cloned())
             .async_call();
 
         if let Some(cb) = opt_callback {
@@ -92,4 +83,28 @@ where
         let b_wrapper = BlockchainWrapper::new();
         b_wrapper.get_sc_address()
     }
+}
+
+#[inline]
+pub(crate) fn read_token_id<SA: StorageMapperApi + CallTypeApi>(
+    storage_key: ManagedRef<SA, StorageKey<SA>>,
+) -> TokenIdentifier<SA> {
+    storage_get(storage_key)
+}
+
+pub(crate) fn store_token_id<
+    SA: StorageMapperApi + CallTypeApi,
+    Mapper: StorageTokenWrapper<SA>,
+>(
+    mapper: &Mapper,
+    token_id: &TokenIdentifier<SA>,
+) {
+    if !mapper.is_empty() {
+        SA::error_api_impl().signal_error(TOKEN_ID_ALREADY_SET_ERR_MSG);
+    }
+    if !token_id.is_valid_esdt_identifier() {
+        SA::error_api_impl().signal_error(INVALID_TOKEN_ID_ERR_MSG);
+    }
+
+    storage_set(mapper.get_storage_key(), token_id);
 }

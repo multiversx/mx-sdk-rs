@@ -24,7 +24,7 @@
         },
         {
             "step": "scCall",
-            "txId": "load-val",
+            "id": "load-val",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:alloc-features",
@@ -44,7 +44,7 @@
         },
         {
             "step": "scCall",
-            "txId": "store-val",
+            "id": "store-val",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:alloc-features",
@@ -79,7 +79,7 @@
         },
         {
             "step": "scCall",
-            "txId": "load-val",
+            "id": "load-val",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:alloc-features",
@@ -100,7 +100,7 @@
         },
         {
             "step": "scCall",
-            "txId": "is-empty-false",
+            "id": "is-empty-false",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:alloc-features",
@@ -121,7 +121,7 @@
         },
         {
             "step": "scCall",
-            "txId": "store-empty",
+            "id": "store-empty",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:alloc-features",
@@ -140,7 +140,7 @@
         },
         {
             "step": "scCall",
-            "txId": "is-empty-true",
+            "id": "is-empty-true",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:alloc-features",
@@ -175,7 +175,7 @@
         },
         {
             "step": "scCall",
-            "txId": "load-empty",
+            "id": "load-empty",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:alloc-features",

@@ -2,7 +2,7 @@ use alloc::boxed::Box;
 
 use crate::{
     codec_err::DecodeError, DecodeErrorHandler, DefaultErrorHandler, NestedDecode,
-    NestedDecodeInput, TopDecodeInput, TypeInfo,
+    NestedDecodeInput, TopDecodeInput,
 };
 
 /// Trait that allows zero-copy read of values from an underlying API in big endian format.
@@ -19,9 +19,6 @@ use crate::{
 /// and would overly complicate the trait.
 ///
 pub trait TopDecode: Sized {
-    #[doc(hidden)]
-    const TYPE_INFO: TypeInfo = TypeInfo::Unknown;
-
     /// Attempt to deserialize the value from input.
     fn top_decode<I>(input: I) -> Result<Self, DecodeError>
     where

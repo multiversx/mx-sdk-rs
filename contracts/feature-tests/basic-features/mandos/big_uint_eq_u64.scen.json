@@ -1,0 +1,53 @@
+{
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "1",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "big_uint_eq_u64",
+                "arguments": [
+                    "0x7FFFFFFFFFFFFFFF",
+                    "0x7FFFFFFFFFFFFFFF"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "1"
+                ]
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "2",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "big_uint_eq_u64",
+                "arguments": [
+                    "0xFFFFFFFFFFFFFFFF",
+                    "0xFFFFFFFFFFFFFFFF"
+                ]
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:cast to i64 error"
+            }
+        }
+    ]
+}

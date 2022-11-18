@@ -24,6 +24,7 @@ use super::{
     AddressFactory, MandosGenerator, ScQueryMandos,
 };
 
+#[derive(Clone)]
 pub struct ContractObjWrapper<
     CB: ContractBase<Api = DebugApi> + CallableContract + 'static,
     ContractObjBuilder: 'static + Copy + Fn() -> CB,
@@ -130,30 +131,32 @@ impl BlockchainStateWrapper {
     ) where
         T: TopEncode + TopDecode + PartialEq + core::fmt::Debug,
     {
-        let actual_attributes_serialized = match &self.rc_b_mock.accounts.get(address) {
-            Some(acc) => {
-                let esdt_data = acc.esdt.get_by_identifier_or_default(token_id);
-                let opt_instance = esdt_data.instances.get_by_nonce(nonce);
+        let (actual_balance, actual_attributes_serialized) =
+            match &self.rc_b_mock.accounts.get(address) {
+                Some(acc) => {
+                    let esdt_data = acc.esdt.get_by_identifier_or_default(token_id);
+                    let opt_instance = esdt_data.instances.get_by_nonce(nonce);
 
-                match opt_instance {
-                    Some(instance) => {
-                        assert!(
-                            expected_balance == &instance.balance,
-                            "ESDT NFT balance mismatch for address {}\n Token: {}, nonce: {}\n Expected: {}\n Have: {}\n",
-                            address_to_hex(address),
-                            String::from_utf8(token_id.to_vec()).unwrap(),
-                            nonce,
-                            expected_balance,
-                            instance.balance
-                        );
+                    match opt_instance {
+                        Some(instance) => (
+                            instance.balance.clone(),
+                            instance.metadata.attributes.clone(),
+                        ),
+                        None => (num_bigint::BigUint::zero(), Vec::new()),
+                    }
+                },
+                None => (num_bigint::BigUint::zero(), Vec::new()),
+            };
 
-                        instance.metadata.attributes.clone()
-                    },
-                    None => Vec::new(),
-                }
-            },
-            None => Vec::new(),
-        };
+        assert!(
+            expected_balance == &actual_balance,
+            "ESDT NFT balance mismatch for address {}\n Token: {}, nonce: {}\n Expected: {}\n Have: {}\n",
+            address_to_hex(address),
+            String::from_utf8(token_id.to_vec()).unwrap(),
+            nonce,
+            expected_balance,
+            actual_balance
+        );
 
         if let Some(expected_attributes) = opt_expected_attributes {
             let actual_attributes = T::top_decode(actual_attributes_serialized).unwrap();
@@ -281,6 +284,7 @@ impl BlockchainStateWrapper {
             username: Vec::new(),
             contract_path: sc_identifier,
             contract_owner: owner.cloned(),
+            developer_rewards: num_bigint::BigUint::zero(),
         };
         self.mandos_generator
             .set_account(&acc_data, sc_mandos_path_expr);
@@ -384,6 +388,26 @@ impl BlockchainStateWrapper {
             None,
             &[],
         );
+    }
+
+    pub fn set_developer_rewards<T: TopEncode>(
+        &mut self,
+        address: &Address,
+        developer_rewards: num_bigint::BigUint,
+    ) {
+        let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
+
+        match b_mock_ref.accounts.get_mut(address) {
+            Some(acc) => {
+                acc.developer_rewards = developer_rewards;
+
+                self.add_mandos_set_account(address);
+            },
+            None => panic!(
+                "set_developer_rewards: Account {:?} does not exist",
+                address_to_hex(address)
+            ),
+        }
     }
 
     #[allow(clippy::too_many_arguments)]

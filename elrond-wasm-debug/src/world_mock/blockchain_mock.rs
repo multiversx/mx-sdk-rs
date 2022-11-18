@@ -1,10 +1,8 @@
-use crate::{num_bigint::BigUint, tx_mock::BlockchainUpdate, ContractMap};
-use elrond_wasm::types::heap::Address;
-use mandos::{
-    interpret_trait::{InterpreterContext, IntoRaw},
-    model::Scenario,
-    value_interpreter::interpret_string,
+use crate::{
+    mandos_system::model::Scenario, num_bigint::BigUint, tx_mock::BlockchainUpdate, ContractMap,
 };
+use elrond_wasm::types::heap::Address;
+use mandos::{interpret_trait::InterpreterContext, value_interpreter::interpret_string};
 use num_traits::Zero;
 use std::{collections::HashMap, path::PathBuf};
 
@@ -15,6 +13,7 @@ const ELROND_REWARD_KEY: &[u8] = b"ELRONDreward";
 #[derive(Debug)]
 pub struct BlockchainMock {
     pub accounts: HashMap<Address, AccountData>,
+    pub addr_to_mandos_string_map: HashMap<Address, String>,
     pub new_addresses: HashMap<(Address, u64), Address>,
     pub previous_block_info: BlockInfo,
     pub current_block_info: BlockInfo,
@@ -27,6 +26,7 @@ impl BlockchainMock {
     pub fn new() -> Self {
         BlockchainMock {
             accounts: HashMap::new(),
+            addr_to_mandos_string_map: HashMap::new(),
             new_addresses: HashMap::new(),
             previous_block_info: BlockInfo::new(),
             current_block_info: BlockInfo::new(),
@@ -114,11 +114,5 @@ impl BlockchainMock {
         let (result, obj) = f(obj);
         *self = obj;
         result
-    }
-
-    pub fn write_mandos_trace(&mut self, file_path: &str) {
-        let mandos_trace = core::mem::take(&mut self.mandos_trace);
-        let mandos_trace_raw = mandos_trace.into_raw();
-        mandos_trace_raw.save_to_file(file_path);
     }
 }

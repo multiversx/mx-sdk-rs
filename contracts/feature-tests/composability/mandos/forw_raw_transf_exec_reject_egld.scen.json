@@ -22,7 +22,7 @@
         },
         {
             "step": "scCall",
-            "txId": "11",
+            "id": "11",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",

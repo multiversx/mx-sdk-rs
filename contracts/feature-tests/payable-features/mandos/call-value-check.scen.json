@@ -28,7 +28,7 @@
         },
         {
             "step": "scCall",
-            "txId": "call-value-egld",
+            "id": "call-value-egld",
             "tx": {
                 "from": "address:an-account",
                 "to": "sc:payable-features",
@@ -51,7 +51,7 @@
         },
         {
             "step": "scCall",
-            "txId": "call-value-single-esdt",
+            "id": "call-value-single-esdt",
             "tx": {
                 "from": "address:an-account",
                 "to": "sc:payable-features",
@@ -70,7 +70,7 @@
                 "out": [
                     "0",
                     [
-                        "u8:0|nested:str:TOK-123456|u64:0|biguint:100"
+                        "nested:str:TOK-123456|u64:0|biguint:100"
                     ]
                 ],
                 "status": "",
@@ -81,7 +81,7 @@
         },
         {
             "step": "scCall",
-            "txId": "call-value-multi-esdt",
+            "id": "call-value-multi-esdt",
             "tx": {
                 "from": "address:an-account",
                 "to": "sc:payable-features",
@@ -109,9 +109,9 @@
                 "out": [
                     "0",
                     [
-                        "u8:0|nested:str:TOK-123456|u64:0|biguint:100",
-                        "u8:0|nested:str:OTHERTOK-123456|u64:0|biguint:400",
-                        "u8:2|nested:str:SFT-123|u64:5|biguint:10"
+                        "nested:str:TOK-123456|u64:0|biguint:100",
+                        "nested:str:OTHERTOK-123456|u64:0|biguint:400",
+                        "nested:str:SFT-123|u64:5|biguint:10"
                     ]
                 ],
                 "status": "",

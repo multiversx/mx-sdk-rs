@@ -25,7 +25,7 @@
         },
         {
             "step": "scDeploy",
-            "txId": "deploy-first-contract",
+            "id": "deploy-first-contract",
             "tx": {
                 "from": "address:owner",
                 "contractCode": "file:../first-contract/output/first-contract.wasm",
@@ -45,7 +45,7 @@
         },
         {
             "step": "scDeploy",
-            "txId": "deploy-second-contract",
+            "id": "deploy-second-contract",
             "tx": {
                 "from": "address:owner",
                 "contractCode": "file:../second-contract/output/second-contract.wasm",

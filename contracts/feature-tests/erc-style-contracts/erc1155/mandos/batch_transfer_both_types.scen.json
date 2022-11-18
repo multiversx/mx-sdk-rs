@@ -8,7 +8,7 @@
         },
         {
             "step": "scCall",
-            "txId": "batch-transfer-both",
+            "id": "batch-transfer-both",
             "tx": {
                 "from": "address:creator",
                 "to": "sc:erc1155",

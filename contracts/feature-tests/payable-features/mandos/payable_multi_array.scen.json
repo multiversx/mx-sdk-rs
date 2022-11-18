@@ -1,0 +1,141 @@
+{
+    "name": "payable",
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:payable-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../output/payable-features.wasm"
+                },
+                "address:an-account": {
+                    "nonce": "0",
+                    "balance": "10000",
+                    "esdt": {
+                        "str:TOK-000001": "1000",
+                        "str:TOK-000002": "500",
+                        "str:TOK-000003": "500",
+                        "str:SFT-123": {
+                            "instances": [
+                                {
+                                    "nonce": "5",
+                                    "balance": "20"
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "payment-array-too-many",
+            "tx": {
+                "from": "address:an-account",
+                "to": "sc:payable-features",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:TOK-000001",
+                        "value": "100"
+                    },
+                    {
+                        "tokenIdentifier": "str:TOK-000002",
+                        "value": "400"
+                    },
+                    {
+                        "tokenIdentifier": "str:TOK-000003",
+                        "value": "400"
+                    },
+                    {
+                        "tokenIdentifier": "str:SFT-123",
+                        "nonce": "5",
+                        "value": "10"
+                    }
+                ],
+                "function": "payment_array_3",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:incorrect number of ESDT transfers",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "payment-array-too-few",
+            "tx": {
+                "from": "address:an-account",
+                "to": "sc:payable-features",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:TOK-000001",
+                        "value": "100"
+                    },
+                    {
+                        "tokenIdentifier": "str:SFT-123",
+                        "nonce": "5",
+                        "value": "10"
+                    }
+                ],
+                "function": "payment_array_3",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:incorrect number of ESDT transfers",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "payment-array-ok",
+            "tx": {
+                "from": "address:an-account",
+                "to": "sc:payable-features",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:TOK-000001",
+                        "value": "100"
+                    },
+                    {
+                        "tokenIdentifier": "str:TOK-000002",
+                        "value": "400"
+                    },
+                    {
+                        "tokenIdentifier": "str:SFT-123",
+                        "nonce": "5",
+                        "value": "10"
+                    }
+                ],
+                "function": "payment_array_3",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "nested:str:TOK-000001|u64:0|biguint:100",
+                    "nested:str:TOK-000002|u64:0|biguint:400",
+                    "nested:str:SFT-123|u64:5|biguint:10"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

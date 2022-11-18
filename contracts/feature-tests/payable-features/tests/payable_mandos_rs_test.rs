@@ -61,6 +61,11 @@ fn payable_egld_4_rs() {
 }
 
 #[test]
+fn payable_multi_array_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/payable_multi_array.scen.json", world());
+}
+
+#[test]
 fn payable_token_1_rs() {
     elrond_wasm_debug::mandos_rs("mandos/payable_token_1.scen.json", world());
 }

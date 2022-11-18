@@ -15,7 +15,7 @@
         },
         {
             "step": "scCall",
-            "txId": "tx-generate-kitty-genes",
+            "id": "tx-generate-kitty-genes",
             "comment": "arguments are matron and sire serialized kitties.",
             "tx": {
                 "from": "address:my_address",

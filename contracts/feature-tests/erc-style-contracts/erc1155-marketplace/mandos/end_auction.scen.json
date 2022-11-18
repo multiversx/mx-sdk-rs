@@ -8,7 +8,7 @@
         },
         {
             "step": "scCall",
-            "txId": "end-auction",
+            "id": "end-auction",
             "tx": {
                 "from": "address:user1",
                 "to": "sc:marketplace_contract",
@@ -23,10 +23,7 @@
             "expect": {
                 "out": [],
                 "status": "0",
-                "message": "",
-                "logs": [],
-                "gas": "*",
-                "refund": "*"
+                "message": ""
             }
         },
         {

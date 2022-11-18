@@ -17,7 +17,7 @@
         },
         {
             "step": "scCall",
-            "txId": "withdraw-esdt-1",
+            "id": "withdraw-esdt-1",
             "tx": {
                 "from": "address:acc1",
                 "to": "sc:the_digital_cash_contract",
@@ -86,7 +86,7 @@
         },
         {
             "step": "scCall",
-            "txId": "withdraw-egld-2",
+            "id": "withdraw-egld-2",
             "tx": {
                 "from": "address:acc1",
                 "to": "sc:the_digital_cash_contract",
@@ -118,7 +118,7 @@
         },
         {
             "step": "scCall",
-            "txId": "withdraw-egld-3",
+            "id": "withdraw-egld-3",
             "tx": {
                 "from": "address:acc1",
                 "to": "sc:the_digital_cash_contract",

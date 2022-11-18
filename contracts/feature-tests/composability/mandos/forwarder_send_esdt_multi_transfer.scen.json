@@ -36,7 +36,7 @@
         },
         {
             "step": "scCall",
-            "txId": "1",
+            "id": "1",
             "comment": "send fungible twice",
             "tx": {
                 "from": "address:a_user",
@@ -103,7 +103,7 @@
         },
         {
             "step": "scCall",
-            "txId": "1",
+            "id": "1",
             "comment": "send all types",
             "tx": {
                 "from": "address:a_user",
@@ -181,7 +181,7 @@
         },
         {
             "step": "scCall",
-            "txId": "EGLD-test",
+            "id": "EGLD-test",
             "comment": "send all types",
             "tx": {
                 "from": "address:a_user",

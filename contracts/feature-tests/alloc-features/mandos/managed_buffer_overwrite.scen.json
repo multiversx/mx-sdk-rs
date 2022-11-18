@@ -16,7 +16,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "1",
+            "id": "1",
             "tx": {
                 "to": "sc:alloc-features",
                 "function": "mbuffer_overwrite",

@@ -37,7 +37,7 @@
         },
         {
             "step": "scCall",
-            "txId": "1",
+            "id": "1",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
@@ -46,8 +46,7 @@
                     "address:a_user",
                     "str:NFT-000001",
                     "1",
-                    "1",
-                    ""
+                    "1"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"

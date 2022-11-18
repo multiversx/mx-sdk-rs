@@ -1,0 +1,202 @@
+{
+    "comment": "verifies that setState and checkState are consistent",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:the-address": {
+                    "esdt": {
+                        "str:NFT-123456": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "1",
+                                    "creator": "address:the-address",
+                                    "royalties": "2000",
+                                    "hash": "keccak256:str:metadata_hash",
+                                    "uri": [
+                                        "str:www.cool_nft.com/my_nft.jpg",
+                                        "str:www.cool_nft.com/my_nft.json"
+                                    ],
+                                    "attributes": "str:serialized_attributes"
+                                }
+                            ]
+                        },
+                        "str:NFT-7890ab": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "1",
+                                    "attributes": {
+                                        "0-u8": "u8:2",
+                                        "1-u16": "u16:1",
+                                        "2-u32": "u32:42",
+                                        "3-u64": "u32:42",
+                                        "4-str": "nested:str:lorem iposum",
+                                        "5-struc": {
+                                            "50-u8": "u8:2",
+                                            "51-u16": "u16:1",
+                                            "52-u32": "u32:42",
+                                            "53-u64": "u32:42",
+                                            "54-str": "nested:str:lorem iposum"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "step": "checkState",
+            "id": "check-1",
+            "accounts": {
+                "address:the-address": {
+                    "esdt": {
+                        "str:NFT-123456": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "1",
+                                    "creator": "address:the-address",
+                                    "royalties": "2000",
+                                    "hash": "keccak256:str:metadata_hash",
+                                    "uri": [
+                                        "str:www.cool_nft.com/my_nft.jpg",
+                                        "*"
+                                    ],
+                                    "attributes": "str:serialized_attributes"
+                                }
+                            ]
+                        },
+                        "str:NFT-7890ab": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "1",
+                                    "attributes": {
+                                        "0-u8": "u8:2",
+                                        "1-u16": "u16:1",
+                                        "2-u32": "u32:42",
+                                        "3-u64": "u32:42",
+                                        "4-str": "nested:str:lorem iposum",
+                                        "5-struc": {
+                                            "50-u8": "u8:2",
+                                            "51-u16": "u16:1",
+                                            "52-u32": "u32:42",
+                                            "53-u64": "u32:42",
+                                            "54-str": "nested:str:lorem iposum"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "step": "checkState",
+            "id": "check-2",
+            "accounts": {
+                "address:the-address": {
+                    "esdt": {
+                        "str:NFT-123456": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "1",
+                                    "creator": "address:the-address",
+                                    "royalties": "2000",
+                                    "hash": "keccak256:str:metadata_hash",
+                                    "uri": [
+                                        "*",
+                                        "str:www.cool_nft.com/my_nft.json"
+                                    ],
+                                    "attributes": "str:serialized_attributes"
+                                }
+                            ]
+                        },
+                        "str:NFT-7890ab": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "1",
+                                    "attributes": {
+                                        "0-u8": "u8:2",
+                                        "1-u16": "u16:1",
+                                        "2-u32": "u32:42",
+                                        "3-u64": "u32:42",
+                                        "4-str": "nested:str:lorem iposum",
+                                        "5-struc": {
+                                            "50-u8": "u8:2",
+                                            "51-u16": "u16:1",
+                                            "52-u32": "u32:42",
+                                            "53-u64": "u32:42",
+                                            "54-str": "nested:str:lorem iposum"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "step": "checkState",
+            "id": "check-3",
+            "accounts": {
+                "address:the-address": {
+                    "esdt": {
+                        "str:NFT-123456": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "1",
+                                    "royalties": "*",
+                                    "uri": "*"
+                                }
+                            ]
+                        },
+                        "str:NFT-7890ab": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "1"
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "step": "checkState",
+            "id": "check-4",
+            "accounts": {
+                "address:the-address": {
+                    "esdt": {
+                        "str:NFT-123456": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "1"
+                                }
+                            ]
+                        },
+                        "str:NFT-7890ab": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "1"
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+    ]
+}

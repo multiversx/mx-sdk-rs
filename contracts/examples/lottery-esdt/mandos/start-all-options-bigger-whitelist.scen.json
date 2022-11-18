@@ -8,7 +8,7 @@
         },
         {
             "step": "scCall",
-            "txId": "start with all options, bigger whitelist",
+            "id": "start with all options, bigger whitelist",
             "tx": {
                 "from": "address:my_address",
                 "to": "sc:lottery",

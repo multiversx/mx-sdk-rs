@@ -22,7 +22,7 @@
         },
         {
             "step": "scCall",
-            "txId": "payable_token_2.1",
+            "id": "payable_token_2.1",
             "tx": {
                 "from": "address:an-account",
                 "to": "sc:payable-features",
@@ -42,7 +42,7 @@
         },
         {
             "step": "scCall",
-            "txId": "payable_token_2.2",
+            "id": "payable_token_2.2",
             "tx": {
                 "from": "address:an-account",
                 "to": "sc:payable-features",
@@ -63,7 +63,7 @@
         },
         {
             "step": "scCall",
-            "txId": "payable_token_2.3",
+            "id": "payable_token_2.3",
             "tx": {
                 "from": "address:an-account",
                 "to": "sc:payable-features",
@@ -91,7 +91,7 @@
         },
         {
             "step": "scCall",
-            "txId": "payable_token_2.4",
+            "id": "payable_token_2.4",
             "tx": {
                 "from": "address:an-account",
                 "to": "sc:payable-features",

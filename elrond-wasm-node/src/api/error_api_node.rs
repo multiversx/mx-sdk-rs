@@ -1,8 +1,7 @@
 use crate::{error_hook, VmApiImpl};
-use elrond_wasm::api::{ErrorApi, ErrorApiImpl, Handle};
+use elrond_wasm::api::{ErrorApi, ErrorApiImpl};
 
 extern "C" {
-    #[cfg(not(feature = "ei-unmanaged"))]
     fn managedSignalError(messageHandle: i32) -> !;
 }
 
@@ -21,16 +20,8 @@ impl ErrorApiImpl for VmApiImpl {
         error_hook::signal_error(message)
     }
 
-    #[cfg(feature = "ei-unmanaged")]
-    fn signal_error_from_buffer(&self, message_handle: Handle) -> ! {
-        use elrond_wasm::api::ManagedBufferApi;
-        let message = self.mb_to_boxed_bytes(message_handle);
-        self.signal_error(message.as_slice())
-    }
-
     #[inline(always)]
-    #[cfg(not(feature = "ei-unmanaged"))]
-    fn signal_error_from_buffer(&self, message_handle: Handle) -> ! {
+    fn signal_error_from_buffer(&self, message_handle: Self::ManagedBufferHandle) -> ! {
         unsafe { managedSignalError(message_handle) }
     }
 }

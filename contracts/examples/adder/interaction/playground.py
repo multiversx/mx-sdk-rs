@@ -5,7 +5,6 @@ from pathlib import Path
 from erdpy import config
 from erdpy.accounts import Account
 from erdpy.contracts import SmartContract
-from erdpy.environments import TestnetEnvironment
 from erdpy.projects import ProjectRust
 from erdpy.proxy import ElrondProxy
 
@@ -26,7 +25,6 @@ if __name__ == '__main__':
     gas_price = network.min_gas_price
     tx_version = network.min_tx_version
 
-    environment = TestnetEnvironment(args.proxy)
     user = Account(pem_file=args.pem)
 
     project = ProjectRust(Path(__file__).parent.parent)
@@ -42,36 +40,39 @@ if __name__ == '__main__':
         # For deploy, we initialize the smart contract with the compiled bytecode
         contract = SmartContract(bytecode=bytecode)
 
-        tx, address = environment.deploy_contract(
-            contract=contract,
+        tx = contract.deploy(
             owner=user,
             arguments=["0x0064"],
             gas_price=gas_price,
             gas_limit=50000000,
-            value=None,
+            value=0,
             chain=chain,
             version=tx_version
         )
 
-        logger.info("Tx hash: %s", tx)
-        logger.info("Contract address: %s", address.bech32())
+        tx_on_network = tx.send_wait_result(proxy, 5000)
+
+        logger.info("Tx hash: %s", tx_on_network.get_hash())
+        logger.info("Contract address: %s", contract.address.bech32())
 
     def get_sum_flow():
-        answer = environment.query_contract(contract, "getSum")
+        answer = contract.query(proxy, "getSum", [])
         logger.info(f"Answer: {answer}")
 
     def add_flow(number):
-        environment.execute_contract(
-            contract=contract,
+        tx = contract.execute(
             caller=user,
             function="add",
             arguments=[number],
             gas_price=gas_price,
             gas_limit=50000000,
-            value=None,
+            value=0,
             chain=chain,
             version=tx_version
         )
+
+        tx_hash = tx.send(proxy)
+        logger.info("Tx hash: %s", tx_hash)
 
     user.sync_nonce(ElrondProxy(args.proxy))
 
@@ -87,11 +88,11 @@ if __name__ == '__main__':
             break
 
         if choice == 1:
-            environment.run_flow(deploy_flow)
+            deploy_flow()
             user.nonce += 1
         elif choice == 2:
-            environment.run_flow(get_sum_flow)
+            get_sum_flow()
         elif choice == 3:
             number = int(input("Enter number:"))
-            environment.run_flow(lambda: add_flow(number))
+            add_flow(number)
             user.nonce += 1

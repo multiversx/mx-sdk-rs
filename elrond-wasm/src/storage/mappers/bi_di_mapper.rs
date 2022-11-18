@@ -7,11 +7,11 @@ use elrond_codec::{
 
 use super::{unordered_set_mapper, StorageMapper, UnorderedSetMapper};
 use crate::{
-    abi::{TypeAbi, TypeName},
+    abi::{TypeAbi, TypeDescriptionContainer, TypeName},
     api::StorageMapperApi,
     storage::{storage_get, storage_set, StorageKey},
     storage_clear,
-    types::{ManagedAddress, ManagedType, MultiValueEncoded},
+    types::{ManagedType, MultiValueEncoded},
 };
 
 const VALUE_SUFIX: &[u8] = b"_value";
@@ -241,13 +241,31 @@ where
 impl<SA, K, V> TypeAbi for BiDiMapper<SA, K, V>
 where
     SA: StorageMapperApi,
-    K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static + Default + PartialEq,
-    V: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static + Default + PartialEq,
+    K: TopEncode
+        + TopDecode
+        + NestedEncode
+        + NestedDecode
+        + 'static
+        + Default
+        + PartialEq
+        + TypeAbi,
+    V: TopEncode
+        + TopDecode
+        + NestedEncode
+        + NestedDecode
+        + 'static
+        + Default
+        + PartialEq
+        + TypeAbi,
 {
     fn type_name() -> TypeName {
-        crate::abi::type_name_variadic::<ManagedAddress<SA>>()
+        MultiValueEncoded::<SA, MultiValue2<K, V>>::type_name()
     }
 
+    fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
+        K::provide_type_descriptions(accumulator);
+        V::provide_type_descriptions(accumulator);
+    }
     fn is_variadic() -> bool {
         true
     }

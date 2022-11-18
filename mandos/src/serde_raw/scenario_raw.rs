@@ -56,6 +56,8 @@ impl ScenarioRaw {
         P: AsRef<Path>,
     {
         let json_string = self.to_json_string();
+        let path_parent = path.as_ref().parent().unwrap();
+        fs::create_dir_all(path_parent).unwrap();
         let mut file = fs::File::create(path).unwrap();
         file.write_all(json_string.as_bytes()).unwrap();
     }

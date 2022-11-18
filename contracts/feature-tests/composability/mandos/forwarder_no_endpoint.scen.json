@@ -12,7 +12,7 @@
         },
         {
             "step": "scCall",
-            "txId": "no-endpoint",
+            "id": "no-endpoint",
             "comment": "checks that no endpoints were accidentally included from the vault",
             "tx": {
                 "from": "address:a_user",

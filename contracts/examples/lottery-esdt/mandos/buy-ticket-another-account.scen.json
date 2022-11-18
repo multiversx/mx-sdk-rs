@@ -20,7 +20,7 @@
         },
         {
             "step": "scCall",
-            "txId": "buy-ticket-2-another-account",
+            "id": "buy-ticket-2-another-account",
             "tx": {
                 "from": "address:acc2",
                 "to": "sc:lottery",

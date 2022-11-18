@@ -1,6 +1,7 @@
 #![no_std]
 
 pub mod action;
+pub mod multisig_events;
 pub mod multisig_perform;
 pub mod multisig_propose;
 pub mod multisig_state;
@@ -19,6 +20,8 @@ pub trait Multisig:
     multisig_state::MultisigStateModule
     + multisig_propose::MultisigProposeModule
     + multisig_perform::MultisigPerformModule
+    + multisig_events::MultisigEventsModule
+    + elrond_wasm_modules::dns::DnsModule
 {
     #[init]
     fn init(&self, quorum: usize, board: MultiValueEncoded<ManagedAddress>) {

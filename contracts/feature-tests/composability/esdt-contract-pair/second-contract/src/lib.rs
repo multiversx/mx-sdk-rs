@@ -5,13 +5,14 @@ elrond_wasm::imports!();
 #[elrond_wasm::contract]
 pub trait SecondContract {
     #[init]
-    fn init(&self, esdt_token_identifier: TokenIdentifier) {
+    fn init(&self, esdt_token_identifier: EgldOrEsdtTokenIdentifier) {
         self.set_contract_esdt_token_identifier(&esdt_token_identifier);
     }
 
     #[payable("*")]
     #[endpoint(acceptEsdtPayment)]
-    fn accept_esdt_payment(&self, #[payment_token] actual_token_identifier: TokenIdentifier) {
+    fn accept_esdt_payment(&self) {
+        let actual_token_identifier = self.call_value().egld_or_single_esdt().token_identifier;
         let expected_token_identifier = self.get_contract_esdt_token_identifier();
         require!(
             actual_token_identifier == expected_token_identifier,
@@ -28,9 +29,9 @@ pub trait SecondContract {
     // storage
 
     #[storage_set("esdtTokenName")]
-    fn set_contract_esdt_token_identifier(&self, esdt_token_identifier: &TokenIdentifier);
+    fn set_contract_esdt_token_identifier(&self, esdt_token_identifier: &EgldOrEsdtTokenIdentifier);
 
     #[view(getesdtTokenName)]
     #[storage_get("esdtTokenName")]
-    fn get_contract_esdt_token_identifier(&self) -> TokenIdentifier;
+    fn get_contract_esdt_token_identifier(&self) -> EgldOrEsdtTokenIdentifier;
 }

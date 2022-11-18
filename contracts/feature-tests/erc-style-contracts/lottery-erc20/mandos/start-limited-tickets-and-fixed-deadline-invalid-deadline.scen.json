@@ -14,7 +14,7 @@
         },
         {
             "step": "scCall",
-            "txId": "start limited tickets, fixed deadline, invalid deadline arg",
+            "id": "start limited tickets, fixed deadline, invalid deadline arg",
             "tx": {
                 "from": "address:my_address",
                 "to": "sc:lottery",

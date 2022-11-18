@@ -23,7 +23,7 @@ pub enum ChainConfig {
 
 impl ChainConfig {
     pub fn to_strings(&self) -> (String, String) {
-        match &*self {
+        match self {
             ChainConfig::Testnet => (TESTNET_PROXY.to_owned(), TESTNET_CHAIN_ID.to_owned()),
             ChainConfig::Devnet => (DEVNET_PROXY.to_owned(), DEVNET_CHAIN_ID.to_owned()),
             ChainConfig::Mainnet => (MAINNET_PROXY.to_owned(), MAINNET_CHAIN_ID.to_owned()),

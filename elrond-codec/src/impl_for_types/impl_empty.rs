@@ -6,7 +6,7 @@ use crate::{
 /// Empty structure with an empty bytes representation. Equivalent to `false`, `0` or `[u8; 0]`, but more explicit.
 ///
 /// Note: the unit type `()` would have naturally fit this role, but we decided to make the unit type multi-value only.
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct Empty;
 
 impl TopEncode for Empty {
