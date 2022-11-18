@@ -1,0 +1,16 @@
+[settings]
+default = "main"
+
+[contracts.main]
+wasm_name = "multisig"
+
+[contracts.full]
+wasm_name = "multisig-full"
+
+[contracts.view]
+external_view = true
+wasm_name = "multisig-view"
+
+[labels]
+default = ["main", "full"]
+additionalView = ["view", "full"]
