@@ -1,5 +1,3 @@
-use std::{fs::create_dir_all, path::PathBuf};
-
 use elrond_wasm::abi::{ContractAbi, EndpointLocationAbi};
 
 use super::{
@@ -91,11 +89,5 @@ impl MetaConfig {
             view_contract: None,
             output_contracts,
         }
-    }
-}
-
-impl ContractMetadata {
-    pub fn create_dir_all(&self) {
-        create_dir_all(PathBuf::from(&self.wasm_crate_path).join("src")).unwrap();
     }
 }
