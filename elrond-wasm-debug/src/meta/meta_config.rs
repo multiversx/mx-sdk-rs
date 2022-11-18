@@ -20,7 +20,7 @@ impl Default for BuildArgs {
             wasm_name_suffix: None,
             wasm_opt: true,
             target_dir: None,
-            abi_git_version: false,
+            abi_git_version: true,
         }
     }
 }
@@ -112,8 +112,8 @@ pub fn process_args(args: &[String]) -> BuildArgs {
                     .expect("argument `--target-dir` must be followed by argument");
                 result.target_dir = Some(arg.clone());
             },
-            "--abi-git-version" => {
-                result.abi_git_version = true;
+            "--no-abi-git-version" => {
+                result.abi_git_version = false;
             },
             _ => {},
         }
