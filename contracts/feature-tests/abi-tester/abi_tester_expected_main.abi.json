@@ -10,7 +10,7 @@
         "contractCrate": {
             "name": "abi-tester",
             "version": "0.0.0",
-            "git_version": "<git version here>"
+            "gitVersion": "<git version here>"
         },
         "framework": {
             "name": "elrond-wasm",
