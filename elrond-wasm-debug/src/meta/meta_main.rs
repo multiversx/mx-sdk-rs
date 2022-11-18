@@ -1,7 +1,7 @@
 use elrond_wasm::contract_base::ContractAbiProvider;
 use std::env;
 
-use super::meta_config::MetaConfig;
+use super::{meta_build_args::BuildArgs, meta_config::MetaConfig};
 
 static SNIPPETS_OVERWRITE_FLAG_NAME: &str = "--overwrite";
 
@@ -10,7 +10,8 @@ pub fn perform<AbiObj: ContractAbiProvider>() {
     super::meta_validate_abi::validate_abi(&original_contract_abi).unwrap();
 
     let args: Vec<String> = env::args().collect();
-    let mut meta_config = MetaConfig::create(&original_contract_abi, args.as_slice());
+    let build_args = BuildArgs::process(args.as_slice());
+    let mut meta_config = MetaConfig::create(&original_contract_abi, build_args);
 
     meta_config.write_abi();
 

@@ -1,6 +1,9 @@
 use std::{fs, process::Command};
 
-use super::meta_config::{BuildArgs, ContractMetadata, MetaConfig};
+use super::{
+    meta_build_args::BuildArgs,
+    meta_config::{ContractMetadata, MetaConfig},
+};
 
 const WASM_OPT_NAME: &str = "wasm-opt";
 
@@ -41,7 +44,8 @@ fn build_contract(contract_metadata: &ContractMetadata, build_args: &BuildArgs, 
     assert!(exit_status.success(), "contract build process failed");
 
     let source_wasm_path = contract_metadata.wasm_compilation_output_path(&build_args.target_dir);
-    let dest_wasm_name = build_args.wasm_name(contract_metadata);
+    // let dest_wasm_name = build_args.wasm_name(contract_metadata);
+    let dest_wasm_name = "temptemptemp";
     let dest_wasm_path = format!("{}/{}", output_path, dest_wasm_name);
     fs::copy(source_wasm_path.as_str(), dest_wasm_path.as_str())
         .expect("failed to copy compiled contract to output directory");
