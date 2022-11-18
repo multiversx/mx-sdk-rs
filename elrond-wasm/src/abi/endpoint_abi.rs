@@ -59,4 +59,9 @@ impl EndpointAbi {
         self.outputs
             .extend_from_slice(T::output_abis(output_names).as_slice());
     }
+
+    pub fn add_labels(&mut self, label_names: &'static str) {
+        self.labels
+            .push(label_names);
+    }
 }
