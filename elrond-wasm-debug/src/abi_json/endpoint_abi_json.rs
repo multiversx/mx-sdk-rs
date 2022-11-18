@@ -120,7 +120,7 @@ impl From<&EndpointAbi> for EndpointAbiJson {
                 .collect(),
             inputs: abi.inputs.iter().map(InputAbiJson::from).collect(),
             outputs: abi.outputs.iter().map(OutputAbiJson::from).collect(),
-            labels: abi.labels.iter().map(|&label| label.to_owned()).collect()
+            labels: abi.labels.iter().map(|&label| label.to_owned()).collect(),
         }
     }
 }
