@@ -1,5 +1,5 @@
 use super::*;
-use alloc::{vec::Vec};
+use alloc::vec::Vec;
 
 #[derive(Clone, Debug)]
 pub struct InputAbi {

@@ -48,7 +48,6 @@ fn generate_endpoint_snippet(
         },
     };
 
-
     let label_names = &m.label_names;
     let mutability_tokens = mutability.to_tokens();
     let location_tokens = location.to_tokens();

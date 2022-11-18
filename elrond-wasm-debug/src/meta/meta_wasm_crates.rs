@@ -42,13 +42,13 @@ fn write_wasm_empty_callback_macro(wasm_lib_file: &mut File) {
 }
 
 fn write_wasm_src_lib(contract_metadata: &ContractMetadata) {
-    let contract_module_name = contract_metadata.abi.get_crate_name_for_code();
+    let contract_module_name = contract_metadata.original_abi.get_crate_name_for_code();
     let lib_path = format!("{}/src/lib.rs", &contract_metadata.wasm_crate_path);
     let mut wasm_lib_file = File::create(lib_path).unwrap();
     wasm_lib_file.write_all(PRELUDE.as_bytes()).unwrap();
 
     let mut endpoint_names: Vec<String> = contract_metadata
-        .abi
+        .original_abi
         .endpoints
         .iter()
         .map(|endpoint| endpoint.name.to_string())
@@ -60,7 +60,7 @@ fn write_wasm_src_lib(contract_metadata: &ContractMetadata) {
         EndpointLocationAbi::ViewContract => "elrond_wasm_node::external_view_wasm_endpoints!",
     };
     let mut mandatory_endpoints = Vec::new();
-    if contract_metadata.abi.has_callback {
+    if contract_metadata.original_abi.has_callback {
         mandatory_endpoints.push("callBack".to_string());
     }
     let all_endpoint_names = mandatory_endpoints.iter().chain(endpoint_names.iter());
@@ -72,7 +72,7 @@ fn write_wasm_src_lib(contract_metadata: &ContractMetadata) {
         all_endpoint_names,
     );
 
-    if !contract_metadata.abi.has_callback {
+    if !contract_metadata.original_abi.has_callback {
         write_wasm_empty_callback_macro(&mut wasm_lib_file);
     }
 }

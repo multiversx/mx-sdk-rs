@@ -26,7 +26,7 @@ impl MetaConfig {
                 create_snippets_crate_and_get_lib_file(&self.snippets_dir, &crate_name, overwrite);
             write_snippets_to_file(
                 file,
-                &contract.abi,
+                &contract.original_abi,
                 &crate_name,
                 &wasm_output_file_path_expr,
             );
