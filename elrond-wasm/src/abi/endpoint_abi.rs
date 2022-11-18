@@ -1,5 +1,5 @@
 use super::*;
-use alloc::vec::Vec;
+use alloc::{vec::Vec};
 
 #[derive(Clone, Debug)]
 pub struct InputAbi {
@@ -38,6 +38,7 @@ pub struct EndpointAbi {
     pub rust_method_name: &'static str,
     pub only_owner: bool,
     pub only_admin: bool,
+    pub labels: &'static [&'static str],
     pub mutability: EndpointMutabilityAbi,
     pub location: EndpointLocationAbi,
     pub payable_in_tokens: &'static [&'static str],
