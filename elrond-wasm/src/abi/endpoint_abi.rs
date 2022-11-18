@@ -38,6 +38,7 @@ pub struct EndpointAbi {
     pub rust_method_name: &'static str,
     pub only_owner: bool,
     pub only_admin: bool,
+    pub labels: Vec<&'static str>,
     pub mutability: EndpointMutabilityAbi,
     pub location: EndpointLocationAbi,
     pub payable_in_tokens: &'static [&'static str],
@@ -57,5 +58,10 @@ impl EndpointAbi {
     pub fn add_output<T: TypeAbi>(&mut self, output_names: &[&'static str]) {
         self.outputs
             .extend_from_slice(T::output_abis(output_names).as_slice());
+    }
+
+    pub fn add_labels(&mut self, label_names: &'static str) {
+        self.labels
+            .push(label_names);
     }
 }

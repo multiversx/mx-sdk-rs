@@ -1,13 +1,13 @@
 use crate::model::{
-    CallbackMetadata, EndpointLocationMetadata, EndpointMetadata, EndpointMutabilityMetadata,
-    InitMetadata, Method, PublicRole,
+    CallbackMetadata, EndpointMetadata, EndpointMutabilityMetadata,
+    InitMetadata, Method, PublicRole, EndpointLocationMetadata,
 };
 
 use super::{
     attributes::{
         is_callback_raw, is_init, is_only_admin, is_only_owner, is_only_user_account,
         CallbackAttribute, EndpointAttribute, ExternalViewAttribute, OutputNameAttribute,
-        ViewAttribute,
+        ViewAttribute, LabelAttribute,
     },
     MethodAttributesPass1,
 };
@@ -173,4 +173,14 @@ pub fn process_output_names_attribute(attr: &syn::Attribute, method: &mut Method
             method.output_names.push(output_name_attr.output_name);
         })
         .is_some()
+}
+
+pub fn process_label_names_attribute(
+    attr: &syn::Attribute,
+    method: &mut Method) -> bool {
+
+    
+    LabelAttribute::parse(attr).map(|label_attr|{
+        method.label_names.push(label_attr.label);
+    }).is_some()
 }
