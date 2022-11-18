@@ -389,6 +389,25 @@
             ],
             "inputs": [],
             "outputs": []
+        },
+        {
+            "name": "label_a",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [],
+            "labels": [
+                "label1"
+            ]
+        },
+        {
+            "name": "label_b",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [],
+            "labels": [
+                "label1",
+                "label2"
+            ]
         }
     ],
     "events": [
