@@ -4,7 +4,7 @@ use elrond_wasm::abi::{ContractAbi, EndpointLocationAbi};
 
 use super::{
     meta_build_args::BuildArgs,
-    multi_contract::{self, OutputContract, OutputContractConfig},
+    output_contract::{self, OutputContract, OutputContractConfig},
 };
 
 pub struct ContractMetadata {

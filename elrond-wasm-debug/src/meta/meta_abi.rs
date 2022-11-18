@@ -8,7 +8,7 @@ use crate::abi_json::{serialize_abi_to_json, ContractAbiJson};
 
 use super::{
     meta_config::{ContractMetadata, MetaConfig},
-    multi_contract::OutputContract,
+    output_contract::OutputContract,
 };
 
 fn write_contract_abi(output_contract: &OutputContract, git_version: &str, output_path: &str) {
