@@ -47,6 +47,9 @@ fn generate_endpoint_snippet(
             }
         },
     };
+
+
+    let label_names = &m.label_names;
     let mutability_tokens = mutability.to_tokens();
     let location_tokens = location.to_tokens();
 
@@ -62,6 +65,7 @@ fn generate_endpoint_snippet(
             payable_in_tokens: &[ #(#payable_in_tokens),* ],
             inputs: elrond_wasm::types::heap::Vec::new(),
             outputs: elrond_wasm::types::heap::Vec::new(),
+            labels: &[ #(#label_names),* ],
         };
         #(#input_snippets)*
         #output_snippet

@@ -12,7 +12,7 @@ use super::{
     process_endpoint_attribute, process_external_view_attribute, process_init_attribute,
     process_only_admin_attribute, process_only_owner_attribute,
     process_only_user_account_attribute, process_output_names_attribute, process_payable_attribute,
-    process_view_attribute,
+    process_view_attribute, process_label_names_attribute,
 };
 pub struct MethodAttributesPass1 {
     pub method_name: String,
@@ -54,6 +54,7 @@ pub fn process_method(m: &syn::TraitItemMethod, trait_attributes: &TraitProperti
         unprocessed_attributes: Vec::new(),
         method_args,
         output_names: Vec::new(),
+        label_names: Vec::new(),
         return_type: m.sig.output.clone(),
         implementation,
     };
@@ -123,4 +124,5 @@ fn process_attribute_second_pass(
         || process_storage_is_empty_attribute(attr, method)
         || process_storage_clear_attribute(attr, method)
         || process_output_names_attribute(attr, method)
+        || process_label_names_attribute(attr, method)
 }

@@ -7,12 +7,14 @@ mod payable_attr;
 mod storage_attr;
 mod trait_argument_prop;
 mod trait_prop_names;
+mod label_attr;
 mod util;
 
 pub use argument_attr::*;
 pub use doc_attr::{extract_doc, OutputNameAttribute};
 pub use endpoint_attr::*;
 pub use event_attr::*;
+pub use label_attr::*;
 pub use payable_attr::*;
 pub use storage_attr::*;
 pub use trait_argument_prop::*;
