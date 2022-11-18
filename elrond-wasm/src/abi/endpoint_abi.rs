@@ -1,5 +1,5 @@
 use super::*;
-use alloc::{vec::Vec, string::String};
+use alloc::{vec::Vec};
 
 #[derive(Clone, Debug)]
 pub struct InputAbi {
@@ -58,9 +58,5 @@ impl EndpointAbi {
     pub fn add_output<T: TypeAbi>(&mut self, output_names: &[&'static str]) {
         self.outputs
             .extend_from_slice(T::output_abis(output_names).as_slice());
-    }
-
-    pub fn add_labels(&mut self, label_names: Vec<String>) {
-        self.labels.iter().chain(label_names.iter()).collect()
     }
 }

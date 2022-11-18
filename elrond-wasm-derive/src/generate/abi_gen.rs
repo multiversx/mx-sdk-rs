@@ -50,17 +50,6 @@ fn generate_endpoint_snippet(
 
 
     let label_names = &m.label_names;
-    let label_snippet = match &m.return_type {
-        syn::ReturnType::Default => quote! {},
-        syn::ReturnType::Type(_, ty) => {
-            let mut res_type = ty.clone();
-            clear_all_type_lifetimes(&mut res_type);
-            quote! {
-                endpoint_abi.add_labels::<#res_type>([ #(#label_names),* ]);
-                contract_abi.add_type_descriptions::<#res_type>();
-            }
-        },
-    };
     let mutability_tokens = mutability.to_tokens();
     let location_tokens = location.to_tokens();
 
@@ -76,11 +65,10 @@ fn generate_endpoint_snippet(
             payable_in_tokens: &[ #(#payable_in_tokens),* ],
             inputs: elrond_wasm::types::heap::Vec::new(),
             outputs: elrond_wasm::types::heap::Vec::new(),
-            labels: elrond_wasm::types::heap::Vec::new(),
+            labels: &[ #(#label_names),* ],
         };
         #(#input_snippets)*
         #output_snippet
-        #label_snippet
     }
 }
 
