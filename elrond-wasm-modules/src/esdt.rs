@@ -1,5 +1,3 @@
-use elrond_wasm::elrond_codec::TopEncode;
-
 elrond_wasm::imports!();
 
 /// Standard smart contract module for managing a single ESDT.

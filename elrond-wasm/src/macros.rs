@@ -11,6 +11,7 @@ macro_rules! imports {
             SubAssign,
         };
         use elrond_wasm::{
+            abi::TypeAbi,
             api::{
                 BigFloatApi, BigIntApi, BlockchainApi, BlockchainApiImpl, CallValueApi,
                 CallValueApiImpl, CryptoApi, CryptoApiImpl, EllipticCurveApi, ErrorApi,
@@ -19,7 +20,10 @@ macro_rules! imports {
             },
             arrayvec::ArrayVec,
             contract_base::{ContractBase, ProxyObjBase},
-            elrond_codec::{multi_types::*, DecodeError, NestedDecode, NestedEncode, TopDecode},
+            elrond_codec::{
+                multi_types::*, DecodeError, IntoMultiValue, NestedDecode, NestedEncode, TopDecode,
+                TopEncode,
+            },
             err_msg,
             esdt::*,
             io::*,

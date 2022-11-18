@@ -1,5 +1,4 @@
 use crate::bonding_curve::curves::curve_function::CurveFunction;
-use elrond_wasm::{abi::TypeAbi, elrond_codec::TopEncode};
 
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
