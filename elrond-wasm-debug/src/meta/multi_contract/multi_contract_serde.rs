@@ -2,14 +2,14 @@ use serde::Deserialize;
 use std::collections::HashMap;
 
 #[derive(Deserialize, Debug)]
-pub struct MultiContractSerde {
+pub struct MultiContractConfigSerde {
     pub settings: MultiContractGeneralSettingsSerde,
-    pub contracts: HashMap<String, MultiContractInstanceSerde>,
+    pub contracts: HashMap<String, ContractMetadataSerde>,
     pub labels: HashMap<String, MultiContractTargetLabelSerde>,
 }
 
 #[derive(Deserialize, Debug)]
-pub struct MultiContractInstanceSerde {
+pub struct ContractMetadataSerde {
     pub external_view: Option<bool>,
     pub wasm_name: Option<String>,
 }

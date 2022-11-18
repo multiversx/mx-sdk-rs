@@ -1,10 +1,10 @@
-use elrond_wasm_debug::{meta::MultiContractSerde, DebugApi};
+use elrond_wasm_debug::{meta::MultiContractConfigSerde, DebugApi};
 
 #[test]
 fn test_serialize_multi_contract() {
     let _ = DebugApi::dummy();
 
-    let multi_contract: MultiContractSerde = toml::from_str(
+    let multi_contract: MultiContractConfigSerde = toml::from_str(
         r#"
         [settings]
         default = "main_identifier"
@@ -17,7 +17,7 @@ fn test_serialize_multi_contract() {
         wasm_name = "c1-name.wasm"
         
         [labels]
-        default = ["main-identifier", "c3", "all"]
+        default = ["main-identifier", "c1", "c3", "all"]
         label1 = ["c1", "all"]
         label2 = ["c1", "c2"]
         "*" = ["all"]
