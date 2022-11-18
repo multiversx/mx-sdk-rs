@@ -38,12 +38,7 @@ pub trait Vault {
     }
 
     fn esdt_transfers_multi(&self) -> MultiValueEncoded<EsdtTokenPaymentMultiValue> {
-        let esdt_transfers = self.call_value().all_esdt_transfers();
-        let mut esdt_transfers_multi = MultiValueEncoded::new();
-        for esdt_transfer in esdt_transfers.into_iter() {
-            esdt_transfers_multi.push(esdt_transfer.into_multi_value());
-        }
-        esdt_transfers_multi
+        self.call_value().all_esdt_transfers().into_multi_value()
     }
 
     #[payable("*")]

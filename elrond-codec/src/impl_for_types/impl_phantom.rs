@@ -9,7 +9,7 @@ use crate::{
 ///
 /// Note: the unit type `()` would have naturally fit this role, but we decided to make the unit type multi-value only.
 
-impl <T> TopEncode for PhantomData<T> {
+impl<T> TopEncode for PhantomData<T> {
     #[inline]
     fn top_encode_or_handle_err<O, H>(&self, output: O, _h: H) -> Result<(), H::HandledErr>
     where
@@ -21,7 +21,7 @@ impl <T> TopEncode for PhantomData<T> {
     }
 }
 
-impl <T> TopDecode for PhantomData<T> {
+impl<T> TopDecode for PhantomData<T> {
     fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
     where
         I: TopDecodeInput,
@@ -35,7 +35,7 @@ impl <T> TopDecode for PhantomData<T> {
     }
 }
 
-impl <T> NestedEncode for PhantomData<T> {
+impl<T> NestedEncode for PhantomData<T> {
     #[inline]
     fn dep_encode_or_handle_err<O, H>(&self, _dest: &mut O, _h: H) -> Result<(), H::HandledErr>
     where
@@ -46,7 +46,7 @@ impl <T> NestedEncode for PhantomData<T> {
     }
 }
 
-impl <T> NestedDecode for PhantomData<T> {
+impl<T> NestedDecode for PhantomData<T> {
     #[inline]
     fn dep_decode_or_handle_err<I, H>(_input: &mut I, _h: H) -> Result<Self, H::HandledErr>
     where
@@ -57,13 +57,12 @@ impl <T> NestedDecode for PhantomData<T> {
     }
 }
 
-
 #[cfg(test)]
 pub mod tests {
     use crate as elrond_codec;
-    use elrond_codec_derive::{TopDecode, TopEncode, NestedDecode, NestedEncode};
     use crate::test_util::{check_dep_encode_decode, check_top_encode_decode};
     use core::marker::PhantomData;
+    use elrond_codec_derive::{NestedDecode, NestedEncode, TopDecode, TopEncode};
 
     #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, PartialEq, Eq, Clone, Debug)]
     pub struct TestStructWithPhantom<M> {
@@ -84,11 +83,25 @@ pub mod tests {
 
     #[test]
     fn test_dep_struc() {
-        check_dep_encode_decode(TestStructWithPhantom::<u64>{x: 42, y:42, _phantom: PhantomData::<u64>}, &[0, 0, 0, 42, 0, 0, 0, 0, 0, 0, 0, 42]);
+        check_dep_encode_decode(
+            TestStructWithPhantom::<u64> {
+                x: 42,
+                y: 42,
+                _phantom: PhantomData::<u64>,
+            },
+            &[0, 0, 0, 42, 0, 0, 0, 0, 0, 0, 0, 42],
+        );
     }
 
     #[test]
     fn test_top_struc() {
-        check_top_encode_decode(TestStructWithPhantom::<u64>{x: 42, y:42, _phantom: PhantomData::<u64>}, &[0, 0, 0, 42, 0, 0, 0, 0, 0, 0, 0, 42]);
+        check_top_encode_decode(
+            TestStructWithPhantom::<u64> {
+                x: 42,
+                y: 42,
+                _phantom: PhantomData::<u64>,
+            },
+            &[0, 0, 0, 42, 0, 0, 0, 0, 0, 0, 0, 42],
+        );
     }
 }
