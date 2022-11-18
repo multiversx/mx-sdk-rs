@@ -11,12 +11,8 @@ use elrond_wasm::{
     types::{Address, CodeMetadata},
 };
 use elrond_wasm_debug::{
-    mandos::{
-        interpret_trait::{InterpretableFrom, InterpreterContext},
-        model::{
-            Account, AddressKey, AddressValue, ScCallStep, ScDeployStep, SetStateStep, TxExpect,
-        },
-    },
+    mandos::interpret_trait::{InterpretableFrom, InterpreterContext},
+    mandos_system::model::*,
     BlockchainMock, ContractInfo, DebugApi,
 };
 use num_bigint::BigUint;
@@ -37,10 +33,13 @@ fn basic_setup_test() {
     let mut test = MultisigTestState::setup();
     test.multisig_deploy();
 
-    let board_members: MultiValueVec<Address> = test.world.mandos_sc_call_get_result(
-        test.multisig.get_all_board_members(),
-        ScCallStep::new().from(&test.alice).expect(TxExpect::ok()),
-    );
+    let board_members: MultiValueVec<Address> = test
+        .multisig
+        .get_all_board_members()
+        .into_blockchain_call()
+        .from(&test.alice)
+        .expect(TxExpect::ok())
+        .execute(&mut test.world);
 
     let expected_board_members: Vec<_> = [
         test.alice.to_address(),
@@ -98,13 +97,13 @@ impl MultisigTestState {
 
         let mut state = MultisigTestState {
             world,
-            owner: AddressValue::interpret_from("address:owner", ic),
-            alice: AddressValue::interpret_from("address:alice", ic),
-            bob: AddressValue::interpret_from("address:bob", ic),
-            carol: AddressValue::interpret_from("address:carol", ic),
-            multisig: MultisigContract::new("sc:multisig", &ic),
-            adder: AdderContract::new("sc:adder", &ic),
-            adder_multisig: AdderContract::new("sc:adder-multisig", &ic),
+            owner: "address:owner".into(),
+            alice: "address:alice".into(),
+            bob: "address:bob".into(),
+            carol: "address:carol".into(),
+            multisig: MultisigContract::new("sc:multisig"),
+            adder: AdderContract::new("sc:adder"),
+            adder_multisig: AdderContract::new("sc:adder-multisig"),
         };
 
         state.world.mandos_set_state(
@@ -133,14 +132,15 @@ impl MultisigTestState {
         .into();
 
         let ic = &self.world.interpreter_context();
-        let (_new_address, ()) = self.world.mandos_sc_deploy_get_result(
-            self.multisig.init(2u32, board),
-            ScDeployStep::new()
-                .from(self.owner.clone())
-                .contract_code("file:output/multisig.wasm", &ic)
-                .gas_limit("5,000,000")
-                .expect(TxExpect::ok().no_result()),
-        );
+        let (_new_address, ()) = self
+            .multisig
+            .init(2u32, board)
+            .into_blockchain_call()
+            .from(self.owner.clone())
+            .contract_code("file:output/multisig.wasm", &ic)
+            .gas_limit("5,000,000")
+            .expect(TxExpect::ok().no_result())
+            .execute(&mut self.world);
 
         self
     }
@@ -153,26 +153,28 @@ impl MultisigTestState {
                 .new_address(&self.owner, 1, &self.adder),
         );
 
-        let (_new_address, ()) = self.world.mandos_sc_deploy_get_result(
-            self.adder.init(0u64),
-            ScDeployStep::new()
-                .from(&self.owner)
-                .contract_code("file:test-contracts/adder.wasm", &ic)
-                .gas_limit("5,000,000")
-                .expect(TxExpect::ok().no_result()),
-        );
+        let (_new_address, ()) = self
+            .adder
+            .init(0u64)
+            .into_blockchain_call()
+            .from(&self.owner)
+            .contract_code("file:test-contracts/adder.wasm", &ic)
+            .gas_limit("5,000,000")
+            .expect(TxExpect::ok().no_result())
+            .execute(&mut self.world);
 
         self
     }
 
     fn multisig_sign(&mut self, action_id: usize, signer: &Address) {
-        let () = self.world.mandos_sc_call_get_result(
-            self.multisig.sign(action_id),
-            ScCallStep::new()
-                .from(signer)
-                .gas_limit("5,000,000")
-                .expect(TxExpect::ok().no_result()),
-        );
+        let () = self
+            .multisig
+            .sign(action_id)
+            .into_blockchain_call()
+            .from(signer)
+            .gas_limit("5,000,000")
+            .expect(TxExpect::ok().no_result())
+            .execute(&mut self.world);
     }
 
     fn multisig_sign_multiple(&mut self, action_id: usize, signers: &[&Address]) {
@@ -182,13 +184,14 @@ impl MultisigTestState {
     }
 
     fn multisig_perform(&mut self, action_id: usize, caller: &Address) -> Option<Address> {
-        let result: OptionalValue<Address> = self.world.mandos_sc_call_get_result(
-            self.multisig.perform_action_endpoint(action_id),
-            ScCallStep::new()
-                .from(caller)
-                .gas_limit("5,000,000")
-                .expect(TxExpect::ok()),
-        );
+        let result: OptionalValue<Address> = self
+            .multisig
+            .perform_action_endpoint(action_id)
+            .into_blockchain_call()
+            .from(caller)
+            .gas_limit("5,000,000")
+            .expect(TxExpect::ok())
+            .execute(&mut self.world);
         result.into_option()
     }
 
@@ -216,18 +219,19 @@ impl MultisigTestState {
         ));
 
         let adder_init_args = self.adder.init(0u64).arg_buffer.into_multi_value_encoded();
-        let action_id = self.world.mandos_sc_call_get_result(
-            self.multisig.propose_sc_deploy_from_source(
+        let action_id = self
+            .multisig
+            .propose_sc_deploy_from_source(
                 0u64,
                 &self.adder,
                 CodeMetadata::DEFAULT,
                 adder_init_args,
-            ),
-            ScCallStep::new()
-                .from(caller)
-                .gas_limit("5,000,000")
-                .expect(TxExpect::ok()),
-        );
+            )
+            .into_blockchain_call()
+            .from(caller)
+            .gas_limit("5,000,000")
+            .expect(TxExpect::ok())
+            .execute(&mut self.world);
         action_id
     }
 
@@ -238,28 +242,29 @@ impl MultisigTestState {
 
     fn multisig_propose_adder_add(&mut self, number: BigUint, caller: &Address) -> usize {
         let adder_call = self.adder.add(number);
-        self.world.mandos_sc_call_get_result(
-            self.multisig.propose_transfer_execute(
+        self.multisig
+            .propose_transfer_execute(
                 &self.adder.to_address(),
                 0u32,
                 adder_call.endpoint_name,
                 adder_call.arg_buffer.into_multi_value_encoded(),
-            ),
-            ScCallStep::new()
-                .from(caller)
-                .gas_limit("5,000,000")
-                .expect(TxExpect::ok()),
-        )
+            )
+            .into_blockchain_call()
+            .from(caller)
+            .gas_limit("5,000,000")
+            .expect(TxExpect::ok())
+            .execute(&mut self.world)
     }
 
     fn adder_expect_get_sum(&mut self, expected_sum: BigUint, caller: &Address) -> BigUint {
-        let value: SingleValue<BigUint> = self.world.mandos_sc_call_get_result(
-            self.adder.sum(),
-            ScCallStep::new()
-                .from(caller)
-                .gas_limit("5,000,000")
-                .expect(TxExpect::ok().result(&format!("{}", expected_sum))),
-        );
+        let value: SingleValue<BigUint> = self
+            .adder
+            .sum()
+            .into_blockchain_call()
+            .from(caller)
+            .gas_limit("5,000,000")
+            .expect(TxExpect::ok().result(&format!("{}", expected_sum)))
+            .execute(&mut self.world);
         value.into()
     }
 }

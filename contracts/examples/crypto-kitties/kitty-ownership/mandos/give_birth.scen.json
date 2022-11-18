@@ -15,7 +15,7 @@
         },
         {
             "step": "scCall",
-            "txId": "tx-give-birth",
+            "id": "tx-give-birth",
             "tx": {
                 "from": "address:acc3",
                 "to": "sc:kitty_ownership_contract",

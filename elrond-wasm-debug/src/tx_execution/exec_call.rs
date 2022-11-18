@@ -1,6 +1,8 @@
 use std::{collections::HashMap, rc::Rc};
 
 use elrond_wasm::types::Address;
+use num_bigint::BigUint;
+use num_traits::Zero;
 
 use crate::{
     tx_mock::{
@@ -67,6 +69,7 @@ pub fn execute_async_call_and_callback(
             storage: HashMap::new(),
             contract_path: None,
             contract_owner: None,
+            developer_rewards: BigUint::zero(),
         });
         let blockchain_updates = tx_cache.into_blockchain_updates();
         let mut state = Rc::try_unwrap(state_rc).unwrap();
@@ -153,6 +156,7 @@ pub fn execute_promise_call_and_callback(
             storage: HashMap::new(),
             contract_path: None,
             contract_owner: None,
+            developer_rewards: BigUint::zero(),
         });
         let blockchain_updates = tx_cache.into_blockchain_updates();
         let mut state = Rc::try_unwrap(state_rc).unwrap();

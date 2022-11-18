@@ -20,7 +20,7 @@
         },
         {
             "step": "scCall",
-            "txId": "request-change-user1",
+            "id": "request-change-user1",
             "tx": {
                 "from": "address:user1",
                 "to": "sc:token_release_contract",
@@ -40,7 +40,7 @@
         },
         {
             "step": "scCall",
-            "txId": "approve-change-user1",
+            "id": "approve-change-user1",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:token_release_contract",

@@ -18,7 +18,7 @@
         },
         {
             "step": "scCall",
-            "txId": "before",
+            "id": "before",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -37,7 +37,7 @@
         },
         {
             "step": "scCall",
-            "txId": "first-push-back",
+            "id": "first-push-back",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -79,7 +79,7 @@
         },
         {
             "step": "scCall",
-            "txId": "check-queue-after-first-push-back",
+            "id": "check-queue-after-first-push-back",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -100,7 +100,7 @@
         },
         {
             "step": "scCall",
-            "txId": "second-push-back",
+            "id": "second-push-back",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -121,7 +121,7 @@
         },
         {
             "step": "scCall",
-            "txId": "check-queue-after-second-push-back",
+            "id": "check-queue-after-second-push-back",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -166,7 +166,7 @@
         },
         {
             "step": "scCall",
-            "txId": "check-front-after-second-push-back",
+            "id": "check-front-after-second-push-back",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -187,7 +187,7 @@
         },
         {
             "step": "scCall",
-            "txId": "first-pop-front",
+            "id": "first-pop-front",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -229,7 +229,7 @@
         },
         {
             "step": "scCall",
-            "txId": "second-pop-front",
+            "id": "second-pop-front",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -267,7 +267,7 @@
         },
         {
             "step": "scCall",
-            "txId": "check-front-after-second-pop-front",
+            "id": "check-front-after-second-pop-front",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",

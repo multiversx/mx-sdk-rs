@@ -4,7 +4,7 @@
     "steps": [
         {
             "step": "scCall",
-            "txId": "prop-add-1",
+            "id": "prop-add-1",
             "tx": {
                 "from": "address:alice",
                 "to": "sc:multisig",
@@ -27,7 +27,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "prop-signers-1",
+            "id": "prop-signers-1",
             "tx": {
                 "to": "sc:multisig-view",
                 "function": "getActionSigners",
@@ -43,7 +43,7 @@
         },
         {
             "step": "scCall",
-            "txId": "prop-sign-alice-again",
+            "id": "prop-sign-alice-again",
             "comment": "should have no effect",
             "tx": {
                 "from": "address:alice",
@@ -65,7 +65,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "prop-signers-2",
+            "id": "prop-signers-2",
             "tx": {
                 "to": "sc:multisig-view",
                 "function": "getActionSigners",
@@ -82,7 +82,7 @@
         },
         {
             "step": "scCall",
-            "txId": "prop-add-1-try-perform-insufficient-signatures",
+            "id": "prop-add-1-try-perform-insufficient-signatures",
             "tx": {
                 "from": "address:alice",
                 "to": "sc:multisig",
@@ -104,7 +104,7 @@
         },
         {
             "step": "scCall",
-            "txId": "prop-sign-bob",
+            "id": "prop-sign-bob",
             "tx": {
                 "from": "address:bob",
                 "to": "sc:multisig",
@@ -125,7 +125,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "prop-signers-3",
+            "id": "prop-signers-3",
             "tx": {
                 "to": "sc:multisig-view",
                 "function": "getActionSigners",
@@ -141,7 +141,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "prop-signers-3-count",
+            "id": "prop-signers-3-count",
             "tx": {
                 "to": "sc:multisig-view",
                 "function": "getActionSignerCount",
@@ -158,7 +158,7 @@
         },
         {
             "step": "scCall",
-            "txId": "prop-add-1-perform",
+            "id": "prop-add-1-perform",
             "tx": {
                 "from": "address:alice",
                 "to": "sc:multisig",
@@ -179,7 +179,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "getAllProposers",
+            "id": "getAllProposers",
             "tx": {
                 "to": "sc:multisig-view",
                 "function": "getAllProposers",

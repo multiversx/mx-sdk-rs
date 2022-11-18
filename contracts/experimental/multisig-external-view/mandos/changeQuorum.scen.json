@@ -10,7 +10,7 @@
         },
         {
             "step": "scCall",
-            "txId": "change-quorum-propose",
+            "id": "change-quorum-propose",
             "tx": {
                 "from": "address:alice",
                 "to": "sc:multisig",
@@ -33,7 +33,7 @@
         },
         {
             "step": "scCall",
-            "txId": "change-quorum-sign-bob",
+            "id": "change-quorum-sign-bob",
             "tx": {
                 "from": "address:bob",
                 "to": "sc:multisig",
@@ -54,7 +54,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "pending-action-data",
+            "id": "pending-action-data",
             "tx": {
                 "to": "sc:multisig-view",
                 "function": "getPendingActionFullInfo",
@@ -73,7 +73,7 @@
         },
         {
             "step": "scCall",
-            "txId": "change-quorum-perform",
+            "id": "change-quorum-perform",
             "tx": {
                 "from": "address:alice",
                 "to": "sc:multisig",
@@ -94,7 +94,7 @@
         },
         {
             "step": "scCall",
-            "txId": "getQuorum",
+            "id": "getQuorum",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:multisig",
@@ -115,7 +115,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "pending-action-data-none",
+            "id": "pending-action-data-none",
             "tx": {
                 "to": "sc:multisig-view",
                 "function": "getPendingActionFullInfo",

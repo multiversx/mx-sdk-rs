@@ -16,7 +16,7 @@
         },
         {
             "step": "scCall",
-            "txId": "upgrade-through-proxy",
+            "id": "upgrade-through-proxy",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:proxy-first",

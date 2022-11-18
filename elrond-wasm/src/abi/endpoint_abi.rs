@@ -5,6 +5,7 @@ use alloc::vec::Vec;
 pub struct InputAbi {
     pub arg_name: &'static str,
     pub type_name: TypeName,
+    // pub original_type_name: TypeName,
     pub multi_arg: bool,
 }
 
@@ -34,7 +35,9 @@ pub enum EndpointLocationAbi {
 pub struct EndpointAbi {
     pub docs: &'static [&'static str],
     pub name: &'static str,
+    pub rust_method_name: &'static str,
     pub only_owner: bool,
+    pub only_admin: bool,
     pub mutability: EndpointMutabilityAbi,
     pub location: EndpointLocationAbi,
     pub payable_in_tokens: &'static [&'static str],

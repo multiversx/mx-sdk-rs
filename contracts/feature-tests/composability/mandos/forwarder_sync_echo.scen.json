@@ -22,7 +22,7 @@
         },
         {
             "step": "scCall",
-            "txId": "echo_arguments_sync",
+            "id": "echo_arguments_sync",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
@@ -59,7 +59,7 @@
         },
         {
             "step": "scCall",
-            "txId": "echo_arguments_sync_twice",
+            "id": "echo_arguments_sync_twice",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",

@@ -16,7 +16,7 @@ pub trait Crowdfunding {
     fn init(&self, target: BigUint, deadline: u64, erc20_contract_address: ManagedAddress) {
         self.erc20_contract_address().set(&erc20_contract_address);
         self.target().set(&target);
-        self.deadline().set(&deadline);
+        self.deadline().set(deadline);
     }
 
     #[endpoint]

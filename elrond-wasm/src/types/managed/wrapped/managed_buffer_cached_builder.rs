@@ -181,10 +181,7 @@ where
     }
 }
 
-impl<M> FormatBuffer for ManagedBufferCachedBuilder<M>
-where
-    M: ManagedTypeApi,
-{
+impl<M: ManagedTypeApi> FormatBuffer for ManagedBufferCachedBuilder<M> {
     fn append_ascii(&mut self, ascii: &[u8]) {
         self.append_bytes(ascii)
     }

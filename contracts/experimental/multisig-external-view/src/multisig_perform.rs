@@ -30,7 +30,7 @@ pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
         let user_id = self.user_mapper().get_or_create_user(&user_address);
         let user_id_to_role_mapper = self.user_id_to_role(user_id);
         let old_role = user_id_to_role_mapper.get();
-        user_id_to_role_mapper.set(&new_role);
+        user_id_to_role_mapper.set(new_role);
 
         // update board size
         let mut board_members_delta = 0isize;

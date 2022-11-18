@@ -21,7 +21,7 @@
         },
         {
             "step": "scCall",
-            "txId": "check-initial-val",
+            "id": "check-initial-val",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -42,7 +42,7 @@
         },
         {
             "step": "scCall",
-            "txId": "clear val",
+            "id": "clear val",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",

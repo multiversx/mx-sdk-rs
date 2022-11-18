@@ -1,7 +1,7 @@
 use crate::{
     api::{
-        const_handles, CallValueApi, CallValueApiImpl, ErrorApi, ErrorApiImpl, ManagedBufferApi,
-        ManagedTypeApi,
+        const_handles, use_raw_handle, CallValueApi, CallValueApiImpl, ErrorApi, ErrorApiImpl,
+        ManagedBufferApi, ManagedTypeApi,
     },
     contract_base::CallValueWrapper,
     err_msg,
@@ -44,12 +44,15 @@ where
     if transfers.len() != 1 {
         A::error_api_impl().signal_error(err_msg::SINGLE_ESDT_EXPECTED.as_bytes());
     }
-    let expected_token_handle = const_handles::MBUF_TEMPORARY_1;
-    A::managed_type_impl()
-        .mb_overwrite(expected_token_handle, expected_tokend_identifier.as_bytes());
+    let expected_token_handle: A::ManagedBufferHandle =
+        use_raw_handle(const_handles::MBUF_TEMPORARY_1);
+    A::managed_type_impl().mb_overwrite(
+        expected_token_handle.clone(),
+        expected_tokend_identifier.as_bytes(),
+    );
     let transfer = transfers.get(0);
     if !A::managed_type_impl().mb_eq(
-        transfer.token_identifier.get_raw_handle(),
+        transfer.token_identifier.get_handle(),
         expected_token_handle,
     ) {
         A::error_api_impl().signal_error(err_msg::BAD_TOKEN_PROVIDED.as_bytes());

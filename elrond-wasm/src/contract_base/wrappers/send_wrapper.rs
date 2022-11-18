@@ -5,9 +5,10 @@ use elrond_codec::Empty;
 use crate::{
     api::{
         BlockchainApi, BlockchainApiImpl, CallTypeApi, StorageReadApi,
-        CHANGE_OWNER_BUILTIN_FUNC_NAME, ESDT_LOCAL_BURN_FUNC_NAME, ESDT_LOCAL_MINT_FUNC_NAME,
-        ESDT_NFT_ADD_QUANTITY_FUNC_NAME, ESDT_NFT_ADD_URI_FUNC_NAME, ESDT_NFT_BURN_FUNC_NAME,
-        ESDT_NFT_CREATE_FUNC_NAME, ESDT_NFT_UPDATE_ATTRIBUTES_FUNC_NAME,
+        CHANGE_OWNER_BUILTIN_FUNC_NAME, CLAIM_DEVELOPER_REWARDS_FUNC_NAME,
+        ESDT_LOCAL_BURN_FUNC_NAME, ESDT_LOCAL_MINT_FUNC_NAME, ESDT_NFT_ADD_QUANTITY_FUNC_NAME,
+        ESDT_NFT_ADD_URI_FUNC_NAME, ESDT_NFT_BURN_FUNC_NAME, ESDT_NFT_CREATE_FUNC_NAME,
+        ESDT_NFT_UPDATE_ATTRIBUTES_FUNC_NAME,
     },
     esdt::ESDTSystemSmartContractProxy,
     types::{
@@ -201,6 +202,16 @@ where
             .call_and_exit_ignore_callback()
     }
 
+    pub fn claim_developer_rewards(
+        &self,
+        child_sc_address: ManagedAddress<A>,
+    ) -> ContractCall<A, ()> {
+        ContractCall::new(
+            child_sc_address,
+            ManagedBuffer::new_from_bytes(CLAIM_DEVELOPER_REWARDS_FUNC_NAME),
+        )
+    }
+
     /// Sends a synchronous call to change a smart contract address.
     pub fn change_owner_address(
         &self,
@@ -267,7 +278,7 @@ where
             func_name = ESDT_LOCAL_BURN_FUNC_NAME;
         } else {
             func_name = ESDT_NFT_BURN_FUNC_NAME;
-            arg_buffer.push_arg(&nonce);
+            arg_buffer.push_arg(nonce);
         }
 
         arg_buffer.push_arg(amount);
@@ -346,7 +357,7 @@ where
     ) -> u64 {
         let big_zero = BigUint::zero();
         let empty_buffer = ManagedBuffer::new();
-        let empty_vec = ManagedVec::from_raw_handle(empty_buffer.get_raw_handle());
+        let empty_vec = ManagedVec::from_handle(empty_buffer.get_handle());
 
         self.esdt_nft_create(
             token,

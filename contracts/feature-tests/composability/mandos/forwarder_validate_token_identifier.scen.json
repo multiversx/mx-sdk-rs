@@ -21,7 +21,7 @@
         },
         {
             "step": "scCall",
-            "txId": "0",
+            "id": "0",
             "comment": "valid token identifier",
             "tx": {
                 "from": "address:viewer",
@@ -45,7 +45,7 @@
         },
         {
             "step": "scCall",
-            "txId": "0",
+            "id": "0",
             "comment": "invalid token identifier",
             "tx": {
                 "from": "address:viewer",
@@ -69,7 +69,7 @@
         },
         {
             "step": "scCall",
-            "txId": "0",
+            "id": "0",
             "comment": "invalid token identifier",
             "tx": {
                 "from": "address:viewer",

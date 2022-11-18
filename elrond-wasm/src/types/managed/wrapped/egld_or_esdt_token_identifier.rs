@@ -1,6 +1,6 @@
 use crate::{
     abi::{TypeAbi, TypeName},
-    api::{Handle, ManagedTypeApi},
+    api::{HandleConstraints, ManagedTypeApi},
     derive::ManagedVecItem,
     formatter::{FormatByteReceiver, SCDisplay, SCLowerHex},
     types::{ManagedBuffer, ManagedOption, ManagedRef, ManagedType, TokenIdentifier},
@@ -44,15 +44,18 @@ impl<M: ManagedTypeApi> EgldOrEsdtTokenIdentifier<M> {
 
     /// ESDT instance, containing an ESDT token identifier.
     #[inline]
-    pub fn esdt(token_identifier: TokenIdentifier<M>) -> Self {
+    pub fn esdt<TI>(token_identifier: TI) -> Self
+    where
+        TokenIdentifier<M>: From<TI>,
+    {
         Self {
-            data: ManagedOption::some(token_identifier),
+            data: ManagedOption::some(TokenIdentifier::from(token_identifier)),
         }
     }
 
-    pub fn from_opt_raw_handle(opt_handle: Option<Handle>) -> Self {
+    pub fn from_opt_raw_handle(opt_handle: Option<M::ManagedBufferHandle>) -> Self {
         match opt_handle {
-            Some(handle) => Self::esdt(TokenIdentifier::from_raw_handle(handle)),
+            Some(handle) => Self::esdt(TokenIdentifier::from_handle(handle)),
             None => Self::egld(),
         }
     }
@@ -114,7 +117,7 @@ impl<M: ManagedTypeApi> EgldOrEsdtTokenIdentifier<M> {
     }
 
     /// Representation of the object as an `Option`.
-    /// 
+    ///
     /// Because it does not consume `self` only a reference to the ESDT token identifier can be returned.
     pub fn as_esdt_option(&self) -> Option<ManagedRef<'_, M, TokenIdentifier<M>>> {
         self.data.as_option()
@@ -205,6 +208,7 @@ impl<M> CodecFrom<TokenIdentifier<M>> for EgldOrEsdtTokenIdentifier<M> where M: 
 impl<M> CodecFrom<&TokenIdentifier<M>> for EgldOrEsdtTokenIdentifier<M> where M: ManagedTypeApi {}
 
 impl<M> CodecFrom<&[u8]> for EgldOrEsdtTokenIdentifier<M> where M: ManagedTypeApi {}
+impl<M> CodecFrom<&str> for EgldOrEsdtTokenIdentifier<M> where M: ManagedTypeApi {}
 
 impl<M: ManagedTypeApi> TypeAbi for EgldOrEsdtTokenIdentifier<M> {
     fn type_name() -> TypeName {
@@ -215,8 +219,8 @@ impl<M: ManagedTypeApi> TypeAbi for EgldOrEsdtTokenIdentifier<M> {
 impl<M: ManagedTypeApi> SCDisplay for EgldOrEsdtTokenIdentifier<M> {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
         if let Some(token_identifier) = self.data.as_option() {
-            f.append_managed_buffer(&ManagedBuffer::from_raw_handle(
-                token_identifier.get_raw_handle(),
+            f.append_managed_buffer(&ManagedBuffer::from_handle(
+                token_identifier.get_handle().cast_or_signal_error::<M, _>(),
             ));
         } else {
             f.append_bytes(Self::EGLD_REPRESENTATION);
@@ -229,8 +233,8 @@ const EGLD_REPRESENTATION_HEX: &[u8] = b"45474C44";
 impl<M: ManagedTypeApi> SCLowerHex for EgldOrEsdtTokenIdentifier<M> {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
         if let Some(token_identifier) = self.data.as_option() {
-            f.append_managed_buffer_lower_hex(&ManagedBuffer::from_raw_handle(
-                token_identifier.get_raw_handle(),
+            f.append_managed_buffer_lower_hex(&ManagedBuffer::from_handle(
+                token_identifier.get_handle().cast_or_signal_error::<M, _>(),
             ));
         } else {
             f.append_bytes(EGLD_REPRESENTATION_HEX);

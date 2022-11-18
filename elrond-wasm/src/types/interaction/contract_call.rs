@@ -1,4 +1,4 @@
-use elrond_codec::{CodecFrom, TopEncodeMulti};
+use elrond_codec::{TopDecodeMulti, TopEncodeMulti};
 
 use crate::{
     api::{
@@ -189,7 +189,7 @@ where
 
     /// If this is an ESDT call, it converts it to a regular call to ESDTTransfer.
     /// Async calls require this step, but not `transfer_esdt_execute`.
-    fn convert_to_esdt_transfer_call(self) -> Self {
+    pub fn convert_to_esdt_transfer_call(self) -> Self {
         match self.payments.len() {
             0 => self,
             1 => self.convert_to_single_transfer_esdt_call(),
@@ -237,7 +237,7 @@ where
                 // arg3 - destination address
                 let mut new_arg_buffer = ManagedArgBuffer::new();
                 new_arg_buffer.push_arg(&payment.token_identifier);
-                new_arg_buffer.push_arg(&payment.token_nonce);
+                new_arg_buffer.push_arg(payment.token_nonce);
                 new_arg_buffer.push_arg(&payment.amount);
                 new_arg_buffer.push_arg(&self.to);
                 if !self.endpoint_name.is_empty() {
@@ -349,7 +349,7 @@ where
         raw_result: ManagedVec<SA, ManagedBuffer<SA>>,
     ) -> RequestedResult
     where
-        RequestedResult: CodecFrom<OriginalResult>,
+        RequestedResult: TopDecodeMulti,
     {
         let mut loader = ManagedResultArgLoader::new(raw_result);
         let arg_id = ArgId::from(&b"sync result"[..]);
@@ -362,7 +362,7 @@ where
     /// Only works if the target contract is in the same shard.
     pub fn execute_on_dest_context<RequestedResult>(mut self) -> RequestedResult
     where
-        RequestedResult: CodecFrom<OriginalResult>,
+        RequestedResult: TopDecodeMulti,
     {
         self = self.convert_to_esdt_transfer_call();
         let raw_result = SendRawWrapper::<SA>::new().execute_on_dest_context_raw(
@@ -380,12 +380,30 @@ where
 
     pub fn execute_on_dest_context_readonly<RequestedResult>(mut self) -> RequestedResult
     where
-        RequestedResult: CodecFrom<OriginalResult>,
+        RequestedResult: TopDecodeMulti,
     {
         self = self.convert_to_esdt_transfer_call();
         let raw_result = SendRawWrapper::<SA>::new().execute_on_dest_context_readonly_raw(
             self.resolve_gas_limit(),
             &self.to,
+            &self.endpoint_name,
+            &self.arg_buffer,
+        );
+
+        SendRawWrapper::<SA>::new().clean_return_data();
+
+        Self::decode_result(raw_result)
+    }
+
+    pub fn execute_on_same_context<RequestedResult>(mut self) -> RequestedResult
+    where
+        RequestedResult: TopDecodeMulti,
+    {
+        self = self.convert_to_esdt_transfer_call();
+        let raw_result = SendRawWrapper::<SA>::new().execute_on_same_context_raw(
+            self.resolve_gas_limit(),
+            &self.to,
+            &self.egld_payment,
             &self.endpoint_name,
             &self.arg_buffer,
         );
@@ -404,23 +422,14 @@ where
     ///
     /// The result (if any) is ignored.
     ///
-    /// Only works if the target contract is in the same shard.
+    /// Deprecated and will be removed soon. Use `let _: IgnoreValue = contract_call.execute_on_dest_context(...)` instead.
+    #[deprecated(
+        since = "0.36.1",
+        note = "Redundant method, use `let _: IgnoreValue = contract_call.execute_on_dest_context(...)` instead"
+    )]
     pub fn execute_on_dest_context_ignore_result(mut self) {
         self = self.convert_to_esdt_transfer_call();
         let _ = SendRawWrapper::<SA>::new().execute_on_dest_context_raw(
-            self.resolve_gas_limit(),
-            &self.to,
-            &self.egld_payment,
-            &self.endpoint_name,
-            &self.arg_buffer,
-        );
-
-        SendRawWrapper::<SA>::new().clean_return_data();
-    }
-
-    pub fn execute_on_same_context(mut self) {
-        self = self.convert_to_esdt_transfer_call();
-        let _ = SendRawWrapper::<SA>::new().execute_on_same_context_raw(
             self.resolve_gas_limit(),
             &self.to,
             &self.egld_payment,

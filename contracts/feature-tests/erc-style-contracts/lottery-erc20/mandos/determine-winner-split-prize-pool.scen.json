@@ -15,7 +15,7 @@
         },
         {
             "step": "scCall",
-            "txId": "determine-winner-with-split-prize-pool",
+            "id": "determine-winner-with-split-prize-pool",
             "tx": {
                 "from": "address:acc4",
                 "to": "sc:lottery",

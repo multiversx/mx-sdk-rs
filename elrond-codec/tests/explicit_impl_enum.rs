@@ -1,8 +1,8 @@
 use elrond_codec::{
     test_util::{check_dep_encode_decode, check_top_encode_decode},
     top_decode_from_nested_or_handle_err, top_encode_from_nested, DecodeError, DecodeErrorHandler,
-    EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode, NestedEncodeNoErr,
-    NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
+    EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode, NestedEncodeOutput,
+    TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
 };
 
 #[derive(PartialEq, Eq, Clone, Debug)]
@@ -13,37 +13,30 @@ pub enum E {
     Struct { a: u32 },
 }
 
-impl NestedEncodeNoErr for E {
-    fn dep_encode_no_err<O: NestedEncodeOutput>(&self, dest: &mut O) {
-        match self {
-            E::Unit => {
-                0u32.dep_encode_no_err(dest);
-            },
-            E::Newtype(arg1) => {
-                1u32.dep_encode_no_err(dest);
-                arg1.dep_encode_no_err(dest);
-            },
-            E::Tuple(arg1, arg2) => {
-                2u32.dep_encode_no_err(dest);
-                arg1.dep_encode_no_err(dest);
-                arg2.dep_encode_no_err(dest);
-            },
-            E::Struct { a } => {
-                3u32.dep_encode_no_err(dest);
-                a.dep_encode_no_err(dest);
-            },
-        }
-    }
-}
-
 impl NestedEncode for E {
-    #[inline]
-    fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, _h: H) -> Result<(), H::HandledErr>
+    fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>
     where
         O: NestedEncodeOutput,
         H: EncodeErrorHandler,
     {
-        self.dep_encode_no_err(dest);
+        match self {
+            E::Unit => {
+                0u32.dep_encode_or_handle_err(dest, h)?;
+            },
+            E::Newtype(arg1) => {
+                1u32.dep_encode_or_handle_err(dest, h)?;
+                arg1.dep_encode_or_handle_err(dest, h)?;
+            },
+            E::Tuple(arg1, arg2) => {
+                2u32.dep_encode_or_handle_err(dest, h)?;
+                arg1.dep_encode_or_handle_err(dest, h)?;
+                arg2.dep_encode_or_handle_err(dest, h)?;
+            },
+            E::Struct { a } => {
+                3u32.dep_encode_or_handle_err(dest, h)?;
+                a.dep_encode_or_handle_err(dest, h)?;
+            },
+        }
         Ok(())
     }
 }

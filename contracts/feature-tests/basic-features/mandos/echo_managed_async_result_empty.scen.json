@@ -18,7 +18,7 @@
         },
         {
             "step": "scCall",
-            "txId": "1-ok",
+            "id": "1-ok",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -39,7 +39,7 @@
         },
         {
             "step": "scCall",
-            "txId": "2-err",
+            "id": "2-err",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -62,7 +62,7 @@
         },
         {
             "step": "scCall",
-            "txId": "2-err-no-message",
+            "id": "2-err-no-message",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",

@@ -25,7 +25,7 @@
         },
         {
             "step": "scDeploy",
-            "txId": "deploy - kitty ownership contract",
+            "id": "deploy - kitty ownership contract",
             "comment": "we don't care about autoBirthFee in this test, so we set it to 0",
             "tx": {
                 "from": "address:my_address",
@@ -46,7 +46,7 @@
         },
         {
             "step": "scDeploy",
-            "txId": "deploy - kitty auction contract",
+            "id": "deploy - kitty auction contract",
             "tx": {
                 "from": "address:my_address",
                 "contractCode": "file:../output/kitty-auction.wasm",
@@ -69,7 +69,7 @@
         },
         {
             "step": "scCall",
-            "txId": "tx-set-auction-contract-address",
+            "id": "tx-set-auction-contract-address",
             "tx": {
                 "from": "address:my_address",
                 "to": "sc:kitty_ownership_contract",

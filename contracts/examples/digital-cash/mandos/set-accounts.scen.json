@@ -30,7 +30,7 @@
         },
         {
             "step": "scDeploy",
-            "txId": "deploy",
+            "id": "deploy",
             "tx": {
                 "from": "address:digital_cash_owner_address",
                 "contractCode": "file:../output/digital-cash.wasm",

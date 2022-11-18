@@ -44,7 +44,7 @@
         },
         {
             "step": "transfer",
-            "txId": "multi-transfer",
+            "id": "multi-transfer",
             "tx": {
                 "from": "address:esdt-owner",
                 "to": "sc:multisig",
@@ -70,7 +70,7 @@
         },
         {
             "step": "scCall",
-            "txId": "proposeSendEsdt",
+            "id": "proposeSendEsdt",
             "tx": {
                 "from": "address:paul",
                 "to": "sc:multisig",
@@ -105,7 +105,7 @@
         },
         {
             "step": "scCall",
-            "txId": "sc-deploy-sign-alice",
+            "id": "sc-deploy-sign-alice",
             "tx": {
                 "from": "address:alice",
                 "to": "sc:multisig",
@@ -126,7 +126,7 @@
         },
         {
             "step": "scCall",
-            "txId": "sc-deploy-sign-bob",
+            "id": "sc-deploy-sign-bob",
             "tx": {
                 "from": "address:bob",
                 "to": "sc:multisig",
@@ -147,7 +147,7 @@
         },
         {
             "step": "scCall",
-            "txId": "send-esdt-perform-1",
+            "id": "send-esdt-perform-1",
             "tx": {
                 "from": "address:paul",
                 "to": "sc:multisig",
@@ -162,6 +162,38 @@
                 "out": [],
                 "status": "",
                 "logs": [
+                    {
+                        "address": "sc:multisig",
+                        "endpoint": "str:performAction",
+                        "topics": [
+                            "str:startPerformAction"
+                        ],
+                        "data": "*"
+                    },
+                    {
+                        "address": "sc:multisig",
+                        "endpoint": "str:performAction",
+                        "topics": [
+                            "str:performAsyncCall",
+                            "3",
+                            "sc:multisig",
+                            "0",
+                            "*",
+                            "str:MultiESDTNFTTransfer",
+                            "address:esdt-owner",
+                            "3",
+                            "str:FUNG-TOKEN",
+                            "0",
+                            "1000",
+                            "str:NFT-123456",
+                            "1",
+                            "1",
+                            "str:SFT-456789",
+                            "3",
+                            "10"
+                        ],
+                        "data": ""
+                    },
                     {
                         "address": "sc:multisig",
                         "endpoint": "str:MultiESDTNFTTransfer",

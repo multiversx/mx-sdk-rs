@@ -14,7 +14,7 @@
         },
         {
             "step": "scCall",
-            "txId": "status-test",
+            "id": "status-test",
             "tx": {
                 "from": "address:my_address",
                 "to": "sc:lottery",
@@ -36,7 +36,7 @@
         },
         {
             "step": "scCall",
-            "txId": "determine-winner-early",
+            "id": "determine-winner-early",
             "tx": {
                 "from": "address:my_address",
                 "to": "sc:lottery",

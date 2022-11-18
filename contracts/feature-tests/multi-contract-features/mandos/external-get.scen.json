@@ -20,7 +20,7 @@
         },
         {
             "step": "scDeploy",
-            "txId": "deploy",
+            "id": "deploy",
             "tx": {
                 "from": "address:owner",
                 "contractCode": "file:../output/multi-contract-features.wasm",
@@ -40,7 +40,7 @@
         },
         {
             "step": "scDeploy",
-            "txId": "deploy",
+            "id": "deploy",
             "tx": {
                 "from": "address:owner",
                 "contractCode": "file:../output/multi-contract-features-view.wasm",
@@ -84,7 +84,7 @@
         },
         {
             "step": "scCall",
-            "txId": "sample_value_external_set",
+            "id": "sample_value_external_set",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:multi-contract-features-view",
@@ -126,7 +126,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "sample_value_external_get",
+            "id": "sample_value_external_get",
             "tx": {
                 "to": "sc:multi-contract-features-view",
                 "function": "sample_value_external_get",

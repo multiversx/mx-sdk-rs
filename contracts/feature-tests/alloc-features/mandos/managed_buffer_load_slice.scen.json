@@ -16,7 +16,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "1",
+            "id": "1",
             "tx": {
                 "to": "sc:alloc-features",
                 "function": "mbuffer_load_slice",
@@ -34,7 +34,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "2",
+            "id": "2",
             "tx": {
                 "to": "sc:alloc-features",
                 "function": "mbuffer_load_slice",
@@ -52,7 +52,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "3",
+            "id": "3",
             "tx": {
                 "to": "sc:alloc-features",
                 "function": "mbuffer_load_slice",
@@ -68,7 +68,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "3",
+            "id": "3",
             "tx": {
                 "to": "sc:alloc-features",
                 "function": "mbuffer_load_slice",
@@ -86,7 +86,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "3",
+            "id": "3",
             "tx": {
                 "to": "sc:alloc-features",
                 "function": "mbuffer_load_slice",

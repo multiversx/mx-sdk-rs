@@ -30,9 +30,9 @@ where
         &self,
         data: B,
     ) -> ManagedByteArray<A, SHA256_RESULT_LEN> {
-        let new_handle = A::static_var_api_impl().next_handle();
-        A::crypto_api_impl().sha256_managed(new_handle, data.borrow().get_raw_handle());
-        ManagedByteArray::from_raw_handle(new_handle)
+        let new_handle: A::ManagedBufferHandle = A::static_var_api_impl().next_handle();
+        A::crypto_api_impl().sha256_managed(new_handle.clone(), data.borrow().get_handle());
+        ManagedByteArray::from_handle(new_handle)
     }
 
     #[cfg(feature = "alloc")]
@@ -57,9 +57,9 @@ where
         &self,
         data: B,
     ) -> ManagedByteArray<A, KECCAK256_RESULT_LEN> {
-        let new_handle = A::static_var_api_impl().next_handle();
-        A::crypto_api_impl().keccak256_managed(new_handle, data.borrow().get_raw_handle());
-        ManagedByteArray::from_raw_handle(new_handle)
+        let new_handle: A::ManagedBufferHandle = A::static_var_api_impl().next_handle();
+        A::crypto_api_impl().keccak256_managed(new_handle.clone(), data.borrow().get_handle());
+        ManagedByteArray::from_handle(new_handle)
     }
 
     #[cfg(feature = "alloc")]
@@ -90,9 +90,9 @@ where
         &self,
         data: B,
     ) -> ManagedByteArray<A, { crate::api::RIPEMD_RESULT_LEN }> {
-        let new_handle = A::static_var_api_impl().next_handle();
-        A::crypto_api_impl().ripemd160_managed(new_handle, data.borrow().get_raw_handle());
-        ManagedByteArray::from_raw_handle(new_handle)
+        let new_handle: A::ManagedBufferHandle = A::static_var_api_impl().next_handle();
+        A::crypto_api_impl().ripemd160_managed(new_handle.clone(), data.borrow().get_handle());
+        ManagedByteArray::from_handle(new_handle)
     }
 
     pub fn verify_bls_legacy(&self, key: &[u8], message: &[u8], signature: &[u8]) -> bool {
@@ -107,9 +107,9 @@ where
         signature: &ManagedBuffer<A>,
     ) -> bool {
         A::crypto_api_impl().verify_bls_managed(
-            key.get_raw_handle(),
-            message.get_raw_handle(),
-            signature.get_raw_handle(),
+            key.get_handle(),
+            message.get_handle(),
+            signature.get_handle(),
         )
     }
 
@@ -143,9 +143,9 @@ where
         signature: &ManagedBuffer<A>,
     ) -> bool {
         A::crypto_api_impl().verify_ed25519_managed(
-            key.get_raw_handle(),
-            message.get_raw_handle(),
-            signature.get_raw_handle(),
+            key.get_handle(),
+            message.get_handle(),
+            signature.get_handle(),
         )
     }
 
@@ -163,9 +163,9 @@ where
         signature: &ManagedBuffer<A>,
     ) -> bool {
         A::crypto_api_impl().verify_secp256k1_managed(
-            key.get_raw_handle(),
-            message.get_raw_handle(),
-            signature.get_raw_handle(),
+            key.get_handle(),
+            message.get_handle(),
+            signature.get_handle(),
         )
     }
 
@@ -188,9 +188,9 @@ where
         hash_type: MessageHashType,
     ) -> bool {
         A::crypto_api_impl().verify_custom_secp256k1_managed(
-            key.get_raw_handle(),
-            message.get_raw_handle(),
-            signature.get_raw_handle(),
+            key.get_handle(),
+            message.get_handle(),
+            signature.get_handle(),
             hash_type,
         )
     }
@@ -210,12 +210,12 @@ where
         r: &ManagedBuffer<A>,
         s: &ManagedBuffer<A>,
     ) -> ManagedBuffer<A> {
-        let new_handle = A::static_var_api_impl().next_handle();
+        let new_handle: A::ManagedBufferHandle = A::static_var_api_impl().next_handle();
         A::crypto_api_impl().encode_secp256k1_der_signature_managed(
-            r.get_raw_handle(),
-            s.get_raw_handle(),
-            new_handle,
+            r.get_handle(),
+            s.get_handle(),
+            new_handle.clone(),
         );
-        ManagedBuffer::from_raw_handle(new_handle)
+        ManagedBuffer::from_handle(new_handle)
     }
 }

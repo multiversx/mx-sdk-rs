@@ -18,7 +18,7 @@
         },
         {
             "step": "scCall",
-            "txId": "set-initial-len",
+            "id": "set-initial-len",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -63,7 +63,7 @@
         },
         {
             "step": "scCall",
-            "txId": "get-unique-id-mapper",
+            "id": "get-unique-id-mapper",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -88,7 +88,7 @@
         },
         {
             "step": "scCall",
-            "txId": "try-set-len-again",
+            "id": "try-set-len-again",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -110,7 +110,7 @@
         },
         {
             "step": "scCall",
-            "txId": "swap-remove",
+            "id": "swap-remove",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -157,7 +157,7 @@
         },
         {
             "step": "scCall",
-            "txId": "get-unique-id-mapper",
+            "id": "get-unique-id-mapper",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -181,7 +181,7 @@
         },
         {
             "step": "scCall",
-            "txId": "get-modified-entry",
+            "id": "get-modified-entry",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -204,7 +204,7 @@
         },
         {
             "step": "scCall",
-            "txId": "get-empty-entry",
+            "id": "get-empty-entry",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -227,7 +227,7 @@
         },
         {
             "step": "scCall",
-            "txId": "set-entry",
+            "id": "set-entry",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -273,7 +273,7 @@
         },
         {
             "step": "scCall",
-            "txId": "get-unique-id-mapper",
+            "id": "get-unique-id-mapper",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",

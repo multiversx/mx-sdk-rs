@@ -215,6 +215,16 @@ fn transfer_execute_to_user_test() {
         &rust_biguint!(egld_amount),
     );
 
+    // failed attempt
+    let (_, tx_result) = ms_setup.call_propose(ActionRaw::SendTransferExecute(CallActionDataRaw {
+        to: user_addr.clone(),
+        egld_amount: rust_biguint!(0),
+        endpoint_name: BoxedBytes::empty(),
+        arguments: Vec::new(),
+    }));
+    tx_result.assert_user_error("proposed action has no effect");
+
+    // propose
     let (action_id, tx_result) =
         ms_setup.call_propose(ActionRaw::SendTransferExecute(CallActionDataRaw {
             to: user_addr.clone(),

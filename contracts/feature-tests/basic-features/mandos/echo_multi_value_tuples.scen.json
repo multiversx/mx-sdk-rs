@@ -18,7 +18,7 @@
         },
         {
             "step": "scCall",
-            "txId": "1",
+            "id": "1",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -47,7 +47,7 @@
         },
         {
             "step": "scCall",
-            "txId": "2",
+            "id": "2",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -66,7 +66,7 @@
         },
         {
             "step": "scCall",
-            "txId": "3",
+            "id": "3",
             "comment": "only even number of arguments possible",
             "tx": {
                 "from": "address:an_account",

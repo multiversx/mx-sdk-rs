@@ -7,6 +7,10 @@ pub trait Macros {
     #[endpoint]
     fn only_owner_endpoint(&self) {}
 
+    #[only_user_account]
+    #[endpoint]
+    fn only_user_account_endpoint(&self) {}
+
     #[view]
     fn require_equals(&self, a: u32, b: u32) {
         require!(a == b, "a must equal b");

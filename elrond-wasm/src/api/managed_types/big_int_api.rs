@@ -2,7 +2,7 @@ use core::cmp::Ordering;
 
 use crate::types::heap::BoxedBytes;
 
-use super::Handle;
+use super::HandleTypeInfo;
 
 /// Only used for sending sign information from the API.
 pub enum Sign {
@@ -12,45 +12,50 @@ pub enum Sign {
 }
 
 /// Definition of the BigInt type required by the API.
-pub trait BigIntApi {
-    fn bi_new(&self, value: i64) -> Handle;
+pub trait BigIntApi: HandleTypeInfo {
+    fn bi_new(&self, value: i64) -> Self::BigIntHandle;
 
-    fn bi_new_zero(&self) -> Handle {
+    fn bi_new_zero(&self) -> Self::BigIntHandle {
         self.bi_new(0)
     }
 
-    fn bi_set_int64(&self, destination: Handle, value: i64);
-    fn bi_unsigned_byte_length(&self, handle: Handle) -> usize;
-    fn bi_get_unsigned_bytes(&self, handle: Handle) -> BoxedBytes;
-    fn bi_set_unsigned_bytes(&self, destination: Handle, bytes: &[u8]);
+    fn bi_set_int64(&self, destination: Self::BigIntHandle, value: i64);
+    fn bi_unsigned_byte_length(&self, handle: Self::BigIntHandle) -> usize;
+    fn bi_get_unsigned_bytes(&self, handle: Self::BigIntHandle) -> BoxedBytes;
+    fn bi_set_unsigned_bytes(&self, destination: Self::BigIntHandle, bytes: &[u8]);
 
-    fn bi_signed_byte_length(&self, handle: Handle) -> usize;
-    fn bi_get_signed_bytes(&self, handle: Handle) -> BoxedBytes;
-    fn bi_set_signed_bytes(&self, destination: Handle, bytes: &[u8]);
+    fn bi_signed_byte_length(&self, handle: Self::BigIntHandle) -> usize;
+    fn bi_get_signed_bytes(&self, handle: Self::BigIntHandle) -> BoxedBytes;
+    fn bi_set_signed_bytes(&self, destination: Self::BigIntHandle, bytes: &[u8]);
 
-    fn bi_to_i64(&self, handle: Handle) -> Option<i64>;
+    fn bi_to_i64(&self, handle: Self::BigIntHandle) -> Option<i64>;
 
-    fn bi_add(&self, dest: Handle, x: Handle, y: Handle);
-    fn bi_sub(&self, dest: Handle, x: Handle, y: Handle);
-    fn bi_sub_unsigned(&self, dest: Handle, x: Handle, y: Handle);
-    fn bi_mul(&self, dest: Handle, x: Handle, y: Handle);
-    fn bi_t_div(&self, dest: Handle, x: Handle, y: Handle);
-    fn bi_t_mod(&self, dest: Handle, x: Handle, y: Handle);
+    fn bi_add(&self, dest: Self::BigIntHandle, x: Self::BigIntHandle, y: Self::BigIntHandle);
+    fn bi_sub(&self, dest: Self::BigIntHandle, x: Self::BigIntHandle, y: Self::BigIntHandle);
+    fn bi_sub_unsigned(
+        &self,
+        dest: Self::BigIntHandle,
+        x: Self::BigIntHandle,
+        y: Self::BigIntHandle,
+    );
+    fn bi_mul(&self, dest: Self::BigIntHandle, x: Self::BigIntHandle, y: Self::BigIntHandle);
+    fn bi_t_div(&self, dest: Self::BigIntHandle, x: Self::BigIntHandle, y: Self::BigIntHandle);
+    fn bi_t_mod(&self, dest: Self::BigIntHandle, x: Self::BigIntHandle, y: Self::BigIntHandle);
 
-    fn bi_abs(&self, dest: Handle, x: Handle);
-    fn bi_neg(&self, dest: Handle, x: Handle);
-    fn bi_sign(&self, x: Handle) -> Sign;
-    fn bi_cmp(&self, x: Handle, y: Handle) -> Ordering;
+    fn bi_abs(&self, dest: Self::BigIntHandle, x: Self::BigIntHandle);
+    fn bi_neg(&self, dest: Self::BigIntHandle, x: Self::BigIntHandle);
+    fn bi_sign(&self, x: Self::BigIntHandle) -> Sign;
+    fn bi_cmp(&self, x: Self::BigIntHandle, y: Self::BigIntHandle) -> Ordering;
 
-    fn bi_sqrt(&self, dest: Handle, x: Handle);
-    fn bi_pow(&self, dest: Handle, x: Handle, y: Handle);
-    fn bi_log2(&self, x: Handle) -> u32;
+    fn bi_sqrt(&self, dest: Self::BigIntHandle, x: Self::BigIntHandle);
+    fn bi_pow(&self, dest: Self::BigIntHandle, x: Self::BigIntHandle, y: Self::BigIntHandle);
+    fn bi_log2(&self, x: Self::BigIntHandle) -> u32;
 
-    fn bi_and(&self, dest: Handle, x: Handle, y: Handle);
-    fn bi_or(&self, dest: Handle, x: Handle, y: Handle);
-    fn bi_xor(&self, dest: Handle, x: Handle, y: Handle);
-    fn bi_shr(&self, dest: Handle, x: Handle, bits: usize);
-    fn bi_shl(&self, dest: Handle, x: Handle, bits: usize);
+    fn bi_and(&self, dest: Self::BigIntHandle, x: Self::BigIntHandle, y: Self::BigIntHandle);
+    fn bi_or(&self, dest: Self::BigIntHandle, x: Self::BigIntHandle, y: Self::BigIntHandle);
+    fn bi_xor(&self, dest: Self::BigIntHandle, x: Self::BigIntHandle, y: Self::BigIntHandle);
+    fn bi_shr(&self, dest: Self::BigIntHandle, x: Self::BigIntHandle, bits: usize);
+    fn bi_shl(&self, dest: Self::BigIntHandle, x: Self::BigIntHandle, bits: usize);
 
-    fn bi_to_string(&self, bi_handle: Handle, str_handle: Handle);
+    fn bi_to_string(&self, bi_handle: Self::BigIntHandle, str_handle: Self::ManagedBufferHandle);
 }

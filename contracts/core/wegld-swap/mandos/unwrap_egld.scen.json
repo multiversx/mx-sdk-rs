@@ -1,0 +1,70 @@
+{
+    "name": "unwrap egld",
+    "gasSchedule": "v4",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "wrap_egld.scen.json"
+        },
+        {
+            "step": "scCall",
+            "id": "unwrap-egld",
+            "tx": {
+                "from": "address:user",
+                "to": "sc:egld_esdt_swap",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:EGLD-abcdef",
+                        "value": "300"
+                    }
+                ],
+                "function": "unwrapEgld",
+                "arguments": [],
+                "gasLimit": "5,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "message": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:user": {
+                    "nonce": "2",
+                    "balance": "800",
+                    "esdt": {
+                        "str:EGLD-abcdef": "200"
+                    },
+                    "storage": {}
+                },
+                "sc:egld_esdt_swap": {
+                    "nonce": "0",
+                    "balance": "200",
+                    "esdt": {
+                        "str:EGLD-abcdef": {
+                            "instances": [
+                                {
+                                    "nonce": "",
+                                    "balance": "1"
+                                }
+                            ],
+                            "roles": [
+                                "ESDTRoleLocalMint",
+                                "ESDTRoleLocalBurn"
+                            ]
+                        }
+                    },
+                    "storage": {
+                        "str:wrappedEgldTokenId": "str:EGLD-abcdef"
+                    },
+                    "code": "file:../output/elrond-sc-wegld-swap.wasm"
+                }
+            }
+        }
+    ]
+}

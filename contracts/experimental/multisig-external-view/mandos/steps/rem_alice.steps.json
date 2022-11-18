@@ -4,7 +4,7 @@
     "steps": [
         {
             "step": "scCall",
-            "txId": "rem-alice-prop",
+            "id": "rem-alice-prop",
             "tx": {
                 "from": "address:paul",
                 "to": "sc:multisig",
@@ -27,7 +27,7 @@
         },
         {
             "step": "scCall",
-            "txId": "rem-alice-sign-bob",
+            "id": "rem-alice-sign-bob",
             "tx": {
                 "from": "address:bob",
                 "to": "sc:multisig",
@@ -48,7 +48,7 @@
         },
         {
             "step": "scCall",
-            "txId": "rem-alice-sign-charlie",
+            "id": "rem-alice-sign-charlie",
             "tx": {
                 "from": "address:charlie",
                 "to": "sc:multisig",
@@ -69,7 +69,7 @@
         },
         {
             "step": "scCall",
-            "txId": "rem-alice--perform",
+            "id": "rem-alice--perform",
             "tx": {
                 "from": "address:paul",
                 "to": "sc:multisig",

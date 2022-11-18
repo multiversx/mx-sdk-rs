@@ -4,10 +4,7 @@ use elrond_codec::{
     EncodeErrorHandler, NestedEncode, NestedEncodeOutput, TopEncode, TopEncodeOutput,
 };
 
-use crate::{
-    api::{Handle, ManagedTypeApi},
-    types::ManagedType,
-};
+use crate::{api::ManagedTypeApi, types::ManagedType};
 
 /// A very efficient reference to a managed type, with copy semantics.
 ///
@@ -19,7 +16,7 @@ where
 {
     pub(super) _phantom_m: PhantomData<M>,
     pub(super) _phantom_t: PhantomData<&'a T>,
-    pub(super) handle: Handle,
+    pub(super) handle: T::OwnHandle,
 }
 
 impl<'a, M, T> ManagedRef<'a, M, T>
@@ -31,13 +28,13 @@ where
         Self {
             _phantom_m: PhantomData,
             _phantom_t: PhantomData,
-            handle: value.get_raw_handle(),
+            handle: value.get_handle(),
         }
     }
 
     /// Will completely disregard lifetimes, use with care.
     #[doc(hidden)]
-    pub(crate) unsafe fn wrap_handle(handle: Handle) -> Self {
+    pub(crate) unsafe fn wrap_handle(handle: T::OwnHandle) -> Self {
         Self {
             _phantom_m: PhantomData,
             _phantom_t: PhantomData,
@@ -47,16 +44,9 @@ where
 
     #[doc(hidden)]
     #[inline]
-    pub fn get_raw_handle_of_ref(self) -> Handle {
+    pub fn get_raw_handle_of_ref(self) -> T::OwnHandle {
         self.handle
     }
-}
-
-impl<'a, M, T> Copy for ManagedRef<'a, M, T>
-where
-    M: ManagedTypeApi,
-    T: ManagedType<M>,
-{
 }
 
 impl<'a, M, T> Clone for ManagedRef<'a, M, T>
@@ -66,7 +56,11 @@ where
 {
     #[inline]
     fn clone(&self) -> Self {
-        *self
+        Self {
+            _phantom_m: PhantomData,
+            _phantom_t: PhantomData,
+            handle: self.handle.clone(),
+        }
     }
 }
 

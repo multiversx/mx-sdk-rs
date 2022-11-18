@@ -17,7 +17,7 @@
         },
         {
             "step": "scCall",
-            "txId": "A1",
+            "id": "A1",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -47,7 +47,7 @@
         },
         {
             "step": "scCall",
-            "txId": "logEventARepeat",
+            "id": "logEventARepeat",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -71,7 +71,7 @@
                         "data": "0"
                     },
                     {
-                        "address": "sc:basic-features",
+                        "address": "*",
                         "endpoint": "str:logEventARepeat",
                         "topics": [
                             "str:event_a"
@@ -93,7 +93,7 @@
         },
         {
             "step": "scCall",
-            "txId": "logEventARepeat",
+            "id": "logEventARepeat",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -124,7 +124,7 @@
         },
         {
             "step": "scCall",
-            "txId": "B1",
+            "id": "B1",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",

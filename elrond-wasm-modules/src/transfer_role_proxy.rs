@@ -65,6 +65,11 @@ pub trait TransferRoleProxyModule {
         contract_call: ContractCall<Self::Api, T>,
         opt_custom_callback: Option<CallbackClosure<Self::Api>>,
     ) -> ! {
+        require!(
+            self.destination_whitelist().contains(&contract_call.to),
+            "Destination address not whitelisted"
+        );
+
         let remaining_gas = self.blockchain().get_gas_left();
         let cb_gas_needed = CALLBACK_RESERVED_GAS_PER_TOKEN * contract_call.payments.len() as u64;
         require!(
@@ -111,4 +116,7 @@ pub trait TransferRoleProxyModule {
             },
         }
     }
+
+    #[storage_mapper("transfer_role_proxy:destination_whitelist")]
+    fn destination_whitelist(&self) -> UnorderedSetMapper<ManagedAddress>;
 }

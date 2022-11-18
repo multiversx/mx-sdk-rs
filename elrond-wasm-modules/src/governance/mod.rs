@@ -6,7 +6,7 @@ pub mod governance_proposal;
 
 use governance_proposal::*;
 
-const MAX_GAS_LIMIT_PER_BLOCK: u64 = 1_500_000_000;
+const MAX_GAS_LIMIT_PER_BLOCK: u64 = 600_000_000;
 
 #[elrond_wasm::module]
 pub trait GovernanceModule:
@@ -121,7 +121,7 @@ pub trait GovernanceModule:
             &gov_actions,
         );
 
-        self.proposal_start_block(proposal_id).set(&current_block);
+        self.proposal_start_block(proposal_id).set(current_block);
         self.total_votes(proposal_id).set(&payment.amount);
         self.votes(proposal_id, &proposer).set(&payment.amount);
 
@@ -189,7 +189,7 @@ pub trait GovernanceModule:
         );
 
         let current_block = self.blockchain().get_block_nonce();
-        self.proposal_queue_block(proposal_id).set(&current_block);
+        self.proposal_queue_block(proposal_id).set(current_block);
 
         self.proposal_queued_event(proposal_id, current_block);
     }

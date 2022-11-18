@@ -17,7 +17,7 @@
         },
         {
             "step": "scCall",
-            "txId": "tx-second-bid-too-low",
+            "id": "tx-second-bid-too-low",
             "tx": {
                 "from": "address:bidder2",
                 "to": "sc:kitty_auction_contract",

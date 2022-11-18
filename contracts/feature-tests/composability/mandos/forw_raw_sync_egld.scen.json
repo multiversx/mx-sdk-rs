@@ -22,7 +22,7 @@
         },
         {
             "step": "scCall",
-            "txId": "call_execute_on_dest_context",
+            "id": "call_execute_on_dest_context",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
@@ -39,6 +39,16 @@
                 "out": [],
                 "status": "0",
                 "logs": [
+                    {
+                        "address": "*",
+                        "endpoint": "str:transferValueOnly",
+                        "topics": [
+                            "sc:forwarder",
+                            "sc:vault",
+                            "1000"
+                        ],
+                        "data": ""
+                    },
                     {
                         "address": "sc:vault",
                         "endpoint": "str:accept_funds",
@@ -63,7 +73,7 @@
         },
         {
             "step": "scCall",
-            "txId": "call_execute_on_dest_context_twice",
+            "id": "call_execute_on_dest_context_twice",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
@@ -81,6 +91,16 @@
                 "status": "0",
                 "logs": [
                     {
+                        "address": "*",
+                        "endpoint": "str:transferValueOnly",
+                        "topics": [
+                            "sc:forwarder",
+                            "sc:vault",
+                            "500"
+                        ],
+                        "data": ""
+                    },
+                    {
                         "address": "sc:vault",
                         "endpoint": "str:accept_funds",
                         "topics": [
@@ -96,6 +116,16 @@
                             "str:execute_on_dest_context_result"
                         ],
                         "data": {}
+                    },
+                    {
+                        "address": "*",
+                        "endpoint": "str:transferValueOnly",
+                        "topics": [
+                            "sc:forwarder",
+                            "sc:vault",
+                            "500"
+                        ],
+                        "data": ""
                     },
                     {
                         "address": "sc:vault",

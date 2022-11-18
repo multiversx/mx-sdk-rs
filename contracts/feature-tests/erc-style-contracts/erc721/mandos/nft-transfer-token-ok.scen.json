@@ -7,7 +7,7 @@
         },
         {
             "step": "scCall",
-            "txId": "transfer-ok",
+            "id": "transfer-ok",
             "tx": {
                 "from": "address:contract_owner",
                 "to": "sc:the_nft_contract",

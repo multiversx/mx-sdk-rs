@@ -45,6 +45,14 @@ fn world() -> BlockchainMock {
 }
 
 #[test]
+fn use_module_claim_developer_rewards_rs() {
+    elrond_wasm_debug::mandos_rs(
+        "mandos/use_module_claim_developer_rewards.scen.json",
+        world(),
+    );
+}
+
+#[test]
 fn use_module_dns_register_rs() {
     elrond_wasm_debug::mandos_rs("mandos/use_module_dns_register.scen.json", world());
 }
@@ -60,6 +68,16 @@ fn use_module_internal_rs() {
 }
 
 #[test]
+fn use_module_only_owner_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/use_module_only_owner.scen.json", world());
+}
+
+#[test]
+fn use_module_only_admin_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/use_module_only_admin.scen.json", world());
+}
+
+#[test]
 fn use_module_no_endpoint_rs() {
     elrond_wasm_debug::mandos_rs("mandos/use_module_no_endpoint.scen.json", world());
 }
@@ -68,3 +86,12 @@ fn use_module_no_endpoint_rs() {
 fn use_module_pause_rs() {
     elrond_wasm_debug::mandos_rs("mandos/use_module_pause.scen.json", world());
 }
+
+// Will not work in mandos-rs, since there is no gas usage
+// #[test]
+// fn use_module_ongoing_operation_rs() {
+//     elrond_wasm_debug::mandos_rs(
+//         "mandos/use_module_ongoing_operation_example.scen.json",
+//         world(),
+//     );
+// }

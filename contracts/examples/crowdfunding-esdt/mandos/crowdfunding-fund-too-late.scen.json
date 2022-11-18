@@ -13,7 +13,7 @@
         },
         {
             "step": "scCall",
-            "txId": "fund-too-late",
+            "id": "fund-too-late",
             "tx": {
                 "from": "address:donor1",
                 "to": "sc:crowdfunding",
@@ -70,7 +70,7 @@
         },
         {
             "step": "scCall",
-            "txId": "check-status",
+            "id": "check-status",
             "tx": {
                 "from": "address:donor1",
                 "to": "sc:crowdfunding",

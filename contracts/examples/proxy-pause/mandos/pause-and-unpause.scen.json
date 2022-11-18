@@ -8,7 +8,7 @@
         },
         {
             "step": "scCall",
-            "txId": "1-check-is-initially-not-paused",
+            "id": "1-check-is-initially-not-paused",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:use-module",
@@ -29,7 +29,7 @@
         },
         {
             "step": "scCall",
-            "txId": "2-pause",
+            "id": "2-pause",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:proxy-pause",
@@ -48,7 +48,7 @@
         },
         {
             "step": "scCall",
-            "txId": "3-check-is-paused",
+            "id": "3-check-is-paused",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:use-module",
@@ -69,7 +69,7 @@
         },
         {
             "step": "scCall",
-            "txId": "3-resume",
+            "id": "3-resume",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:proxy-pause",
@@ -88,7 +88,7 @@
         },
         {
             "step": "scCall",
-            "txId": "4-check-has-resumed",
+            "id": "4-check-has-resumed",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:use-module",
