@@ -35,18 +35,18 @@ fn generate_endpoint_snippet(
         })
         .collect();
 
-        let output_names = &m.output_names;
-        let output_snippet = match &m.return_type {
-            syn::ReturnType::Default => quote! {},
-            syn::ReturnType::Type(_, ty) => {
-                let mut res_type = ty.clone();
-                clear_all_type_lifetimes(&mut res_type);
-                quote! {
-                    endpoint_abi.add_output::<#res_type>(&[ #(#output_names),* ]);
-                    contract_abi.add_type_descriptions::<#res_type>();
-                }
-            },
-        };
+    let output_names = &m.output_names;
+    let output_snippet = match &m.return_type {
+        syn::ReturnType::Default => quote! {},
+        syn::ReturnType::Type(_, ty) => {
+            let mut res_type = ty.clone();
+            clear_all_type_lifetimes(&mut res_type);
+            quote! {
+                endpoint_abi.add_output::<#res_type>(&[ #(#output_names),* ]);
+                contract_abi.add_type_descriptions::<#res_type>();
+            }
+        },
+    };
 
 
     let label_names = &m.label_names;
