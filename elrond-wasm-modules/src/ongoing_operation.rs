@@ -1,7 +1,5 @@
 elrond_wasm::imports!();
 
-use elrond_wasm::elrond_codec::TopEncode;
-
 pub const DEFAULT_MIN_GAS_TO_SAVE_PROGRESS: u64 = 1_000_000;
 
 pub type LoopOp = bool;

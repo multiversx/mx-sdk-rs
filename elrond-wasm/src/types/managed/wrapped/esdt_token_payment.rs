@@ -7,7 +7,7 @@ use crate as elrond_wasm; // needed by the codec and TypeAbi generated code
 use crate::derive::TypeAbi;
 use elrond_codec::{
     elrond_codec_derive::{NestedEncode, TopEncode},
-    NestedDecode, TopDecode,
+    IntoMultiValue, NestedDecode, TopDecode,
 };
 
 #[derive(TopEncode, NestedEncode, TypeAbi, Clone, PartialEq, Eq, Debug)]
@@ -43,11 +43,6 @@ impl<M: ManagedTypeApi> EsdtTokenPayment<M> {
     #[inline]
     pub fn into_tuple(self) -> (TokenIdentifier<M>, u64, BigUint<M>) {
         (self.token_identifier, self.token_nonce, self.amount)
-    }
-
-    #[inline]
-    pub fn into_multi_value(self) -> EsdtTokenPaymentMultiValue<M> {
-        self.into()
     }
 }
 
@@ -160,6 +155,15 @@ where
         arr[*index..*index + size].copy_from_slice(bytes);
         *index += size;
     });
+}
+
+impl<M: ManagedTypeApi> IntoMultiValue for EsdtTokenPayment<M> {
+    type MultiValue = EsdtTokenPaymentMultiValue<M>;
+
+    #[inline]
+    fn into_multi_value(self) -> Self::MultiValue {
+        self.into()
+    }
 }
 
 impl<M: ManagedTypeApi> ManagedVecItem for EsdtTokenPayment<M> {
