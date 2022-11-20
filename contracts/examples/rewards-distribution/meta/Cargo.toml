@@ -1,0 +1,15 @@
+[package]
+name = "rewards-distribution-meta"
+version = "0.0.0"
+edition = "2018"
+publish = false
+authors = ["Claudiu-Marcel Bruda <claudiu.bruda@elrond.com>"]
+
+[dev-dependencies]
+
+[dependencies.rewards-distribution]
+path = ".."
+
+[dependencies.elrond-wasm-debug]
+version = "0.36.1"
+path = "../../../../elrond-wasm-debug"

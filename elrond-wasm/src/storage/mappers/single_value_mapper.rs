@@ -94,6 +94,23 @@ where
     pub fn raw_byte_length(&self) -> usize {
         storage_get_len(self.key.as_ref())
     }
+
+    /// Takes the value out of the storage, clearing it in the process.
+    pub fn take(&self) -> T {
+        let value = self.get();
+        self.clear();
+        value
+    }
+
+    // Replaces the actual value in the storage by the value given in parameter, returning the old value.
+    pub fn replace<BT>(&self, new_value: BT) -> T
+    where
+        BT: Borrow<T>,
+    {
+        let value = self.get();
+        self.set(new_value);
+        value
+    }
 }
 
 impl<SA, T> TopEncodeMulti for SingleValueMapper<SA, T>
