@@ -36,9 +36,9 @@ impl OutputContract {
     }
 
     /// Can be used to edit and save a Cargo.toml file.
-    /// 
+    ///
     /// Not currently used to manage Cargo.toml contents, but could be.
-    /// 
+    ///
     /// Warning! Not very reliable. Its output differs from its source. Most notably it writes "rlib" instead of "cdylib".
     pub fn reserialize_cargo_toml(&mut self) -> String {
         self.with_cargo_toml_contents(|manifest| {

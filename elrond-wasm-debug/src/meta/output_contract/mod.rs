@@ -3,6 +3,7 @@ mod output_contract_builder;
 mod output_contract_model;
 mod output_contract_wasm_build;
 mod output_contract_wasm_cargo_toml;
+mod output_contract_wasm_clean;
 mod output_contract_wasm_crate_gen;
 
 pub use multi_contract_serde::*;
