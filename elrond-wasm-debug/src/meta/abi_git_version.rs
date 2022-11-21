@@ -6,10 +6,6 @@ pub fn update_git_version(abi: &mut ContractAbi) {
 }
 
 fn git_describe() -> String {
-    // if !self.build_args.abi_git_version {
-    //     return String::new();
-    // }
-
     Command::new("git")
         .args(["describe"])
         .output()

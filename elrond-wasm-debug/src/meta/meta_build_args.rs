@@ -22,20 +22,6 @@ impl Default for BuildArgs {
 }
 
 impl BuildArgs {
-    // pub fn wasm_name(&self, contract_metadata: &ContractMetadata) -> String {
-    //     if let Some(wasm_name_override) = &self.wasm_name_override {
-    //         return wasm_name_override.clone();
-    //     }
-    //     if let Some(wasm_suffix) = &self.wasm_name_suffix {
-    //         format!(
-    //             "{}-{}.wasm",
-    //             contract_metadata.output_base_name, wasm_suffix
-    //         )
-    //     } else {
-    //         contract_metadata.wasm_output_name()
-    //     }
-    // }
-
     pub fn process(args: &[String]) -> BuildArgs {
         let mut result = BuildArgs::default();
         let mut iter = args.iter();

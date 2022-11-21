@@ -1,7 +1,10 @@
 use elrond_wasm::contract_base::ContractAbiProvider;
 use std::env;
 
-use super::{meta_build_args::BuildArgs, meta_config::MetaConfig};
+use super::{
+    meta_build_args::BuildArgs,
+    meta_config::{copy_to_wasm_unmanaged_ei, MetaConfig},
+};
 
 static SNIPPETS_OVERWRITE_FLAG_NAME: &str = "--overwrite";
 
@@ -19,7 +22,7 @@ pub fn perform<AbiObj: ContractAbiProvider>() {
 
     meta_config.write_wasm_src_lib();
 
-    super::meta_wasm_crates::copy_to_wasm_unmanaged_ei();
+    copy_to_wasm_unmanaged_ei();
 
     if args.len() > 1 {
         match args[1].as_str() {

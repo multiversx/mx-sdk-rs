@@ -29,24 +29,6 @@ impl MetaConfig {
                 self.output_dir.as_str(),
             );
         }
-
-        // if let Some(main_contract) = &self.main_contract {
-        //     write_contract_abi(
-        //         main_contract,
-        //         git_version.as_str(),
-        //         self.output_dir.as_str(),
-        //     );
-        //     main_contract.create_dir_all();
-        // }
-
-        // if let Some(view_contract) = &self.view_contract {
-        //     write_contract_abi(
-        //         view_contract,
-        //         git_version.as_str(),
-        //         self.output_dir.as_str(),
-        //     );
-        //     view_contract.create_dir_all();
-        // }
     }
 
     fn git_describe(&self) -> String {

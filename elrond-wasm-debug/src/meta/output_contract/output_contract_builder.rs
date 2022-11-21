@@ -102,19 +102,12 @@ fn build_contract_abi(builder: ContractMetadataBuilder, original_abi: &ContractA
 }
 
 fn build_contract(builder: ContractMetadataBuilder, original_abi: &ContractAbi) -> OutputContract {
-    // let wasm_name = builder.wasm_name();
-    // let wasm_crate_name = crate_config
-    //     .build_args
-    //     .wasm_name(&crate_config.main_contract.as_ref().unwrap());
     let name = builder.wasm_name().clone();
     OutputContract {
         main: false,
         external_view: builder.external_view,
         config_name: builder.config_name.clone(),
         public_name: name,
-        // wasm_crate_name: format!("wasm-{}", wasm_name),
-        // wasm_crate_path: format!("./wasm-{}", wasm_name),
-        // output_name: wasm_name.clone(),
         abi: build_contract_abi(builder, original_abi),
         cargo_toml_contents_cache: None,
     }
