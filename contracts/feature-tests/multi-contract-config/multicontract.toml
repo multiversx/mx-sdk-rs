@@ -1,5 +1,5 @@
 [settings]
-default = "main"
+main = "main"
 
 [contract.main]
 

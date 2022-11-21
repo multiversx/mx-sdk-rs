@@ -158,9 +158,9 @@ impl OutputContractConfig {
             .into_values()
             .map(|builder| build_contract(builder, original_abi))
             .collect();
-        set_main_contract_flag(&mut contracts, &config.settings.default);
+        set_main_contract_flag(&mut contracts, &config.settings.main);
         OutputContractConfig {
-            default_contract_config_name: config.settings.default.clone().unwrap_or_default(),
+            default_contract_config_name: config.settings.main.clone().unwrap_or_default(),
             contracts,
         }
     }

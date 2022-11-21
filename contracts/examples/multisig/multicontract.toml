@@ -1,5 +1,5 @@
 [settings]
-default = "main"
+main = "main"
 
 [contracts.main]
 wasm_name = "multisig"
