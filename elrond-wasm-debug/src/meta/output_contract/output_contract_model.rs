@@ -4,7 +4,7 @@ pub const DEFAULT_LABEL: &str = "default";
 
 #[derive(Debug)]
 pub struct OutputContractConfig {
-    pub default: String,
+    pub default_contract_config_name: String,
     pub contracts: Vec<OutputContract>,
 }
 
@@ -12,21 +12,37 @@ impl OutputContractConfig {
     pub fn main_contract(&self) -> &OutputContract {
         self.contracts
             .iter()
-            .find(|contract| contract.name == self.default)
-            .unwrap()
+            .find(|contract| contract.config_name == self.default_contract_config_name)
+            .unwrap_or_else(|| {
+                panic!(
+                    "Could not find default contract '{}' among the output contracts.",
+                    self.default_contract_config_name
+                )
+            })
     }
 
     pub fn secondary_contracts(&self) -> impl Iterator<Item = &OutputContract> {
         self.contracts
             .iter()
-            .filter(move |contract| contract.name != self.default)
+            .filter(move |contract| contract.config_name != self.default_contract_config_name)
     }
 }
 
+/// Represents a contract created by the framework when building.
+///
+/// It might have only some of the endpoints written by the developer and maybe some other function.
 #[derive(Debug)]
 pub struct OutputContract {
+    /// External view contracts are just readers of data from another contract.
     pub external_view: bool,
-    pub name: String,
+
+    /// The name, as defined in `multicontract.toml`.
+    pub config_name: String,
+
+    /// The name, as seen in the generated contract names.
+    pub public_name: String,
+
+    /// Filtered and processed ABI of the output contract.
     pub abi: ContractAbi,
 }
 
@@ -35,7 +51,7 @@ impl OutputContract {
         if main {
             return "wasm".to_string();
         } else {
-            format!("wasm-{}", &self.name)
+            format!("wasm-{}", &self.public_name)
         }
     }
 
@@ -64,10 +80,10 @@ impl OutputContract {
     }
 
     pub fn abi_output_name(&self) -> String {
-        format!("{}.abi.json", &self.name)
+        format!("{}.abi.json", &self.public_name)
     }
 
     pub fn wasm_output_name(&self) -> String {
-        format!("{}.wasm", &self.name)
+        format!("{}.wasm", &self.public_name)
     }
 }

@@ -106,9 +106,11 @@ fn build_contract(builder: ContractMetadataBuilder, original_abi: &ContractAbi) 
     // let wasm_crate_name = crate_config
     //     .build_args
     //     .wasm_name(&crate_config.main_contract.as_ref().unwrap());
+    let name = builder.wasm_name().clone();
     OutputContract {
         external_view: builder.external_view,
-        name: builder.wasm_name().clone(),
+        config_name: builder.config_name.clone(),
+        public_name: name,
         // wasm_crate_name: format!("wasm-{}", wasm_name),
         // wasm_crate_path: format!("./wasm-{}", wasm_name),
         // output_name: wasm_name.clone(),
@@ -133,16 +135,21 @@ impl OutputContractConfig {
             .settings
             .default
             .clone()
-            .unwrap_or(contracts[0].name.clone());
-        OutputContractConfig { default, contracts }
+            .unwrap_or(contracts[0].public_name.clone());
+        OutputContractConfig {
+            default_contract_config_name: default,
+            contracts,
+        }
     }
 
     pub fn default_config(original_abi: &ContractAbi) -> Self {
+        let default_contract_config_name = original_abi.build_info.contract_crate.name.to_string();
         OutputContractConfig {
-            default: original_abi.build_info.contract_crate.name.to_string(),
+            default_contract_config_name: default_contract_config_name.clone(),
             contracts: vec![OutputContract {
                 external_view: false,
-                name: original_abi.build_info.contract_crate.name.to_string(),
+                config_name: default_contract_config_name.clone(),
+                public_name: default_contract_config_name,
                 abi: original_abi.clone(),
             }],
         }

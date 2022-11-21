@@ -1,4 +1,4 @@
-use elrond_wasm_debug::{meta::MultiContractConfigSerde, DebugApi};
+use elrond_wasm_debug::{meta::output_contract::MultiContractConfigSerde, DebugApi};
 
 #[test]
 fn test_serialize_multi_contract() {
@@ -25,7 +25,7 @@ fn test_serialize_multi_contract() {
     )
     .unwrap();
 
-    assert_eq!(multi_contract.settings.default, "main_identifier");
+    assert_eq!(multi_contract.settings.default, Some("main_identifier".to_string()));
 
     assert_eq!(
         multi_contract
@@ -67,7 +67,7 @@ fn test_serialize_multi_contract() {
 
     assert_eq!(
         multi_contract.labels.get("default").unwrap().0,
-        ["main-identifier", "c3", "all"]
+        ["main-identifier", "c1", "c3", "all"]
     );
     assert_eq!(
         multi_contract.labels.get("label1").unwrap().0,
