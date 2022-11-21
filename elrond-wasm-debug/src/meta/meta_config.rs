@@ -1,6 +1,6 @@
 use std::{fs, process::Command};
 
-use elrond_wasm::abi::{ContractAbi, EndpointLocationAbi};
+use elrond_wasm::abi::ContractAbi;
 
 use crate::meta::output_contract::WASM_OPT_NAME;
 
@@ -15,36 +15,26 @@ const MULTI_CONTRACT_CONFIG_RELATIVE_PATH: &str = "../multicontract.toml";
 const WASM_LIB_PATH: &str = "../wasm/src/lib.rs";
 const WASM_LIB_PATH_NO_MANAGED_EI: &str = "../wasm-no-managed-ei/src/lib.rs";
 
-pub struct ContractMetadata {
-    pub location: EndpointLocationAbi,
-    pub wasm_crate_name: String,
-    pub wasm_crate_path: String,
-    pub output_base_name: String,
-    pub original_abi: ContractAbi,
-}
-
 pub struct MetaConfig {
     pub build_args: BuildArgs,
     pub output_dir: String,
     pub snippets_dir: String,
-    pub main_contract: Option<ContractMetadata>,
-    pub view_contract: Option<ContractMetadata>,
+    pub original_contract_abi: ContractAbi,
     pub output_contracts: OutputContractConfig,
 }
 
 impl MetaConfig {
-    pub fn create(original_contract_abi: &ContractAbi, build_args: BuildArgs) -> MetaConfig {
+    pub fn create(original_contract_abi: ContractAbi, build_args: BuildArgs) -> MetaConfig {
         let output_contracts = OutputContractConfig::load_from_file_or_default(
             MULTI_CONTRACT_CONFIG_RELATIVE_PATH,
-            original_contract_abi,
+            &original_contract_abi,
         );
 
         MetaConfig {
             build_args,
             output_dir: OUTPUT_RELATIVE_PATH.to_string(),
             snippets_dir: SNIPPETS_RELATIVE_PATH.to_string(),
-            main_contract: None,
-            view_contract: None,
+            original_contract_abi,
             output_contracts,
         }
     }

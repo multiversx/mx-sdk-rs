@@ -53,6 +53,10 @@ pub struct OutputContract {
 }
 
 impl OutputContract {
+    pub fn public_name_snake_case(&self) -> String {
+        self.public_name.replace('-', "_")
+    }
+
     /// The name of the directory of the wasm crate.
     ///
     /// Note this does not necessarily have to match the wasm crate name defined in Cargo.toml.
@@ -80,7 +84,7 @@ impl OutputContract {
         format!(
             "{}/wasm32-unknown-unknown/release/{}.wasm",
             &target_dir,
-            &self.wasm_crate_name().replace('-', "_")
+            &self.wasm_crate_name_snake_case(),
         )
     }
 

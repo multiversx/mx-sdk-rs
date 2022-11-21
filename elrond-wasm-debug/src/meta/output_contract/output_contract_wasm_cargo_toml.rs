@@ -35,6 +35,10 @@ impl OutputContract {
         })
     }
 
+    pub fn wasm_crate_name_snake_case(&mut self) -> String {
+        self.wasm_crate_name().replace('-', "_")
+    }
+
     /// Can be used to edit and save a Cargo.toml file.
     ///
     /// Not currently used to manage Cargo.toml contents, but could be.

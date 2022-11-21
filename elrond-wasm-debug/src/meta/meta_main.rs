@@ -14,7 +14,7 @@ pub fn perform<AbiObj: ContractAbiProvider>() {
 
     let args: Vec<String> = env::args().collect();
     let build_args = BuildArgs::process(args.as_slice());
-    let mut meta_config = MetaConfig::create(&original_contract_abi, build_args);
+    let mut meta_config = MetaConfig::create(original_contract_abi, build_args);
 
     meta_config.write_abi();
 
