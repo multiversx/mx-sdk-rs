@@ -19,5 +19,5 @@ pub struct MultiContractTargetLabelSerde(pub Vec<String>);
 
 #[derive(Deserialize, Debug)]
 pub struct MultiContractGeneralSettingsSerde {
-    pub default: String,
+    pub default: Option<String>,
 }
