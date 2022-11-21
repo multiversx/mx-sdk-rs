@@ -1,9 +1,6 @@
 use elrond_wasm::abi::{ContractAbi, EndpointLocationAbi};
 
-use super::{
-    meta_build_args::BuildArgs,
-    output_contract::{self, OutputContract, OutputContractConfig},
-};
+use super::{meta_build_args::BuildArgs, output_contract::OutputContractConfig};
 
 pub struct ContractMetadata {
     pub location: EndpointLocationAbi,

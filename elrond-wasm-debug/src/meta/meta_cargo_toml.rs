@@ -2,7 +2,7 @@ use std::fs::{self, create_dir_all};
 
 // use cargo_toml::{Manifest, Value};
 
-use super::{meta_config::{ContractMetadata, MetaConfig}, output_contract::OutputContract};
+use super::{meta_config::MetaConfig, output_contract::OutputContract};
 
 impl MetaConfig {
     pub fn create_wasm_view_cargo_toml(&self) {
@@ -12,7 +12,7 @@ impl MetaConfig {
         //         create_cargo_toml_from_source(main_contract, view_contract);
         //     }
         // }
-        for contract in self.output_contracts.secondary_contracts(){
+        for contract in self.output_contracts.secondary_contracts() {
             create_dir_all(&contract.wasm_crate_path(false)).unwrap();
             create_cargo_toml_from_source(self.output_contracts.main_contract(), contract);
         }

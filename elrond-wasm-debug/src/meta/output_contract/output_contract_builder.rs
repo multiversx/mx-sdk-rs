@@ -126,14 +126,15 @@ impl OutputContractConfig {
         collect_contract_labels(&mut contract_builders, &config.labels);
         collect_endpoints(&mut contract_builders, original_abi);
         let contracts: Vec<OutputContract> = contract_builders
-        .into_values()
-        .map(|builder| build_contract(builder, original_abi))
-        .collect();
-        let default = config.settings.default.clone().unwrap_or(contracts[0].name.clone());
-        OutputContractConfig {
-            default,
-            contracts
-        }
+            .into_values()
+            .map(|builder| build_contract(builder, original_abi))
+            .collect();
+        let default = config
+            .settings
+            .default
+            .clone()
+            .unwrap_or(contracts[0].name.clone());
+        OutputContractConfig { default, contracts }
     }
 
     pub fn default_config(original_abi: &ContractAbi) -> Self {

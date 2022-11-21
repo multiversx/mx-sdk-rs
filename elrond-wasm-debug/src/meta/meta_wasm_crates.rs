@@ -1,11 +1,6 @@
-use std::{
-    fs::{self, File},
-    io::Write,
-};
+use std::fs::{self};
 
-use elrond_wasm::abi::EndpointLocationAbi;
-
-use super::meta_config::{ContractMetadata, MetaConfig};
+use super::meta_config::MetaConfig;
 
 const WASM_LIB_PATH: &str = "../wasm/src/lib.rs";
 const WASM_LIB_PATH_NO_MANAGED_EI: &str = "../wasm-no-managed-ei/src/lib.rs";
@@ -20,7 +15,9 @@ pub fn copy_to_wasm_unmanaged_ei() {
 
 impl MetaConfig {
     pub fn write_wasm_src_lib(&self) {
-        self.output_contracts.main_contract().write_wasm_src_lib(true);
+        self.output_contracts
+            .main_contract()
+            .write_wasm_src_lib(true);
         for output_contract in self.output_contracts.secondary_contracts() {
             output_contract.write_wasm_src_lib(false);
         }

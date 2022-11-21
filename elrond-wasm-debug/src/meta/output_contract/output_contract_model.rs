@@ -1,6 +1,4 @@
-use std::iter::Filter;
-
-use elrond_wasm::{abi::ContractAbi, contract_base};
+use elrond_wasm::abi::ContractAbi;
 
 pub const DEFAULT_LABEL: &str = "default";
 
