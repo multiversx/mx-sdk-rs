@@ -1,5 +1,7 @@
 use elrond_wasm::abi::ContractAbi;
 
+use super::output_contract_wasm_cargo_toml::CargoTomlContents;
+
 pub const DEFAULT_LABEL: &str = "default";
 
 #[derive(Debug)]
@@ -12,7 +14,7 @@ impl OutputContractConfig {
     pub fn main_contract(&self) -> &OutputContract {
         self.contracts
             .iter()
-            .find(|contract| contract.config_name == self.default_contract_config_name)
+            .find(|contract| contract.main)
             .unwrap_or_else(|| {
                 panic!(
                     "Could not find default contract '{}' among the output contracts.",
@@ -22,9 +24,7 @@ impl OutputContractConfig {
     }
 
     pub fn secondary_contracts(&self) -> impl Iterator<Item = &OutputContract> {
-        self.contracts
-            .iter()
-            .filter(move |contract| contract.config_name != self.default_contract_config_name)
+        self.contracts.iter().filter(move |contract| !contract.main)
     }
 }
 
@@ -33,6 +33,10 @@ impl OutputContractConfig {
 /// It might have only some of the endpoints written by the developer and maybe some other function.
 #[derive(Debug)]
 pub struct OutputContract {
+    /// If it is the main contract, then the wasm crate is called just `wasm`,
+    ///and the wasm `Cargo.toml` is provided by the dev.
+    pub main: bool,
+
     /// External view contracts are just readers of data from another contract.
     pub external_view: bool,
 
@@ -44,38 +48,39 @@ pub struct OutputContract {
 
     /// Filtered and processed ABI of the output contract.
     pub abi: ContractAbi,
+
+    pub(crate) cargo_toml_contents_cache: Option<CargoTomlContents>,
 }
 
 impl OutputContract {
-    pub fn wasm_crate_name(&self, main: bool) -> String {
-        if main {
+    /// The name of the directory of the wasm crate.
+    ///
+    /// Note this does not necessarily have to match the wasm crate name defined in Cargo.toml.
+    pub fn wasm_crate_dir_name(&self) -> String {
+        if self.main {
             return "wasm".to_string();
         } else {
             format!("wasm-{}", &self.public_name)
         }
     }
 
-    pub fn wasm_crate_path(&self, main: bool) -> String {
-        format!("../{}", &self.wasm_crate_name(main))
+    pub fn wasm_crate_path(&self) -> String {
+        format!("../{}", &self.wasm_crate_dir_name())
     }
 
-    pub fn cargo_toml_path(&self, main: bool) -> String {
-        format!("{}/Cargo.toml", &self.wasm_crate_path(main))
+    pub fn cargo_toml_path(&self) -> String {
+        format!("{}/Cargo.toml", &self.wasm_crate_path())
     }
 
     /// This is where Rust will initially compile the WASM binary.
-    pub fn wasm_compilation_output_path(
-        &self,
-        explicit_target_dir: &Option<String>,
-        main: bool,
-    ) -> String {
+    pub fn wasm_compilation_output_path(&mut self, explicit_target_dir: &Option<String>) -> String {
         let target_dir = explicit_target_dir
             .clone()
-            .unwrap_or_else(|| format!("{}/target", &self.wasm_crate_path(main),));
+            .unwrap_or_else(|| format!("{}/target", &self.wasm_crate_path(),));
         format!(
             "{}/wasm32-unknown-unknown/release/{}.wasm",
             &target_dir,
-            &self.wasm_crate_name(main).replace('-', "_")
+            &self.wasm_crate_name().replace('-', "_")
         )
     }
 

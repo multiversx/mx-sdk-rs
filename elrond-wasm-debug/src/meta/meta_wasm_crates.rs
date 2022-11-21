@@ -15,12 +15,11 @@ pub fn copy_to_wasm_unmanaged_ei() {
 
 impl MetaConfig {
     pub fn write_wasm_src_lib(&self) {
-        self.output_contracts
-            .main_contract()
-            .write_wasm_src_lib(true);
-        for output_contract in self.output_contracts.secondary_contracts() {
-            output_contract.write_wasm_src_lib(false);
+        for output_contract in &self.output_contracts.contracts {
+            output_contract.write_wasm_src_lib();
         }
+
+        // super::meta_wasm_crates::copy_to_wasm_unmanaged_ei();
         // if let Some(main_contract) = &self.main_contract {
         //     write_wasm_src_lib(main_contract);
         // }

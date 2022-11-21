@@ -25,7 +25,10 @@ fn test_serialize_multi_contract() {
     )
     .unwrap();
 
-    assert_eq!(multi_contract.settings.default, Some("main_identifier".to_string()));
+    assert_eq!(
+        multi_contract.settings.default,
+        Some("main_identifier".to_string())
+    );
 
     assert_eq!(
         multi_contract

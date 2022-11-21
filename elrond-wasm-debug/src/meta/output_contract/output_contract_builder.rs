@@ -108,6 +108,7 @@ fn build_contract(builder: ContractMetadataBuilder, original_abi: &ContractAbi) 
     //     .wasm_name(&crate_config.main_contract.as_ref().unwrap());
     let name = builder.wasm_name().clone();
     OutputContract {
+        main: false,
         external_view: builder.external_view,
         config_name: builder.config_name.clone(),
         public_name: name,
@@ -115,6 +116,32 @@ fn build_contract(builder: ContractMetadataBuilder, original_abi: &ContractAbi) 
         // wasm_crate_path: format!("./wasm-{}", wasm_name),
         // output_name: wasm_name.clone(),
         abi: build_contract_abi(builder, original_abi),
+        cargo_toml_contents_cache: None,
+    }
+}
+
+fn set_main_contract_flag(
+    contracts: &mut Vec<OutputContract>,
+    default_contract_config_name_opt: &Option<String>,
+) {
+    if let Some(default_contract_config_name) = default_contract_config_name_opt {
+        for contract in contracts.iter_mut() {
+            if &contract.config_name == default_contract_config_name {
+                contract.main = true;
+                return;
+            }
+        }
+
+        panic!(
+            "Could not find default contract '{}' among the output contracts. Available contracts are: {:?}",
+            default_contract_config_name,
+            contracts.iter().map(|contract| &contract.config_name).collect::<Vec<_>>(),
+        )
+    } else {
+        let first_contract = contracts.get_mut(0).unwrap_or_else(|| {
+            panic!("Cannot set default contract because no optput contract was specified.")
+        });
+        first_contract.main = true;
     }
 }
 
@@ -127,17 +154,13 @@ impl OutputContractConfig {
             .collect();
         collect_contract_labels(&mut contract_builders, &config.labels);
         collect_endpoints(&mut contract_builders, original_abi);
-        let contracts: Vec<OutputContract> = contract_builders
+        let mut contracts: Vec<OutputContract> = contract_builders
             .into_values()
             .map(|builder| build_contract(builder, original_abi))
             .collect();
-        let default = config
-            .settings
-            .default
-            .clone()
-            .unwrap_or(contracts[0].public_name.clone());
+        set_main_contract_flag(&mut contracts, &config.settings.default);
         OutputContractConfig {
-            default_contract_config_name: default,
+            default_contract_config_name: config.settings.default.clone().unwrap_or_default(),
             contracts,
         }
     }
@@ -147,10 +170,12 @@ impl OutputContractConfig {
         OutputContractConfig {
             default_contract_config_name: default_contract_config_name.clone(),
             contracts: vec![OutputContract {
+                main: true,
                 external_view: false,
                 config_name: default_contract_config_name.clone(),
                 public_name: default_contract_config_name,
                 abi: original_abi.clone(),
+                cargo_toml_contents_cache: None,
             }],
         }
     }

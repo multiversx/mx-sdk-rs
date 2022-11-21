@@ -38,11 +38,11 @@ fn write_wasm_empty_callback_macro(wasm_lib_file: &mut File) {
 }
 
 impl OutputContract {
-    pub fn write_wasm_src_lib(&self, main: bool) {
-        fs::create_dir_all(PathBuf::from(&self.wasm_crate_path(main)).join("src")).unwrap();
+    pub fn write_wasm_src_lib(&self) {
+        fs::create_dir_all(PathBuf::from(&self.wasm_crate_path()).join("src")).unwrap();
 
         let contract_module_name = self.abi.get_crate_name_for_code();
-        let lib_path = format!("{}/src/lib.rs", &self.wasm_crate_path(main));
+        let lib_path = format!("{}/src/lib.rs", &self.wasm_crate_path());
         let mut wasm_lib_file = File::create(lib_path).unwrap();
         wasm_lib_file.write_all(PRELUDE.as_bytes()).unwrap();
 

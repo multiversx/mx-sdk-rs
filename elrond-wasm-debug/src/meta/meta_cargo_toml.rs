@@ -6,15 +6,10 @@ use super::{meta_config::MetaConfig, output_contract::OutputContract};
 
 impl MetaConfig {
     pub fn create_wasm_view_cargo_toml(&self) {
-        // if let Some(main_contract) = &self.main_contract {
-        //     if let Some(view_contract) = &self.view_contract {
-        //         create_dir_all(&view_contract.wasm_crate_path).unwrap();
-        //         create_cargo_toml_from_source(main_contract, view_contract);
-        //     }
-        // }
-        for contract in self.output_contracts.secondary_contracts() {
-            create_dir_all(&contract.wasm_crate_path(false)).unwrap();
-            create_cargo_toml_from_source(self.output_contracts.main_contract(), contract);
+        let main_contract = self.output_contracts.main_contract();
+        for secondary_contract in self.output_contracts.secondary_contracts() {
+            create_dir_all(&secondary_contract.wasm_crate_path()).unwrap();
+            create_cargo_toml_from_source(main_contract, secondary_contract);
         }
     }
 }
@@ -32,5 +27,5 @@ fn create_cargo_toml_from_source(source: &OutputContract, dest: &OutputContract)
     // let toml_string = toml::to_string(&manifest).expect("Could not encode TOML value");
     // write!(wasm_view_cargo_file, "{}", toml_string).unwrap();
 
-    fs::copy(source.cargo_toml_path(true), dest.cargo_toml_path(false)).unwrap();
+    fs::copy(source.cargo_toml_path(), dest.cargo_toml_path()).unwrap();
 }
