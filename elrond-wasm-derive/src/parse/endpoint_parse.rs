@@ -1,6 +1,6 @@
 use crate::model::{
-    CallbackMetadata, EndpointMetadata, EndpointMutabilityMetadata,
-    InitMetadata, Method, PublicRole, EndpointLocationMetadata,
+    CallbackMetadata, EndpointLocationMetadata, EndpointMetadata, EndpointMutabilityMetadata,
+    InitMetadata, Method, PublicRole,
 };
 
 use super::{

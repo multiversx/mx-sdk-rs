@@ -12,7 +12,7 @@ use super::{
     process_endpoint_attribute, process_external_view_attribute, process_init_attribute,
     process_label_names_attribute, process_only_admin_attribute, process_only_owner_attribute,
     process_only_user_account_attribute, process_output_names_attribute, process_payable_attribute,
-    process_view_attribute, 
+    process_view_attribute,
 };
 pub struct MethodAttributesPass1 {
     pub method_name: String,

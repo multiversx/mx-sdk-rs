@@ -20,8 +20,9 @@ pub fn copy_to_wasm_unmanaged_ei() {
 
 impl MetaConfig {
     pub fn write_wasm_src_lib(&self) {
-        for output_contract in &self.output_contracts.contracts {
-            output_contract.write_wasm_src_lib();
+        self.output_contracts.main_contract().write_wasm_src_lib(true);
+        for output_contract in self.output_contracts.secondary_contracts() {
+            output_contract.write_wasm_src_lib(false);
         }
         // if let Some(main_contract) = &self.main_contract {
         //     write_wasm_src_lib(main_contract);
