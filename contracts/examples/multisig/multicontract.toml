@@ -2,15 +2,15 @@
 main = "main"
 
 [contracts.main]
-wasm_name = "multisig"
+name = "multisig"
+add-unlabelled = true
 
 [contracts.full]
-wasm_name = "multisig-full"
+name = "multisig-full"
+add-unlabelled = true
+add-labels = ["additionalView"]
 
 [contracts.view]
-external_view = true
-wasm_name = "multisig-view"
-
-[labels]
-default = ["main", "full"]
-additionalView = ["view", "full"]
+name = "multisig-view"
+external-view = true
+add-labels = ["additionalView"]

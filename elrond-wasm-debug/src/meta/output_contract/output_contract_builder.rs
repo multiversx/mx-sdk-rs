@@ -6,89 +6,114 @@ use std::{
 };
 
 use super::{
-    ContractMetadataSerde, MultiContractConfigSerde, MultiContractTargetLabelSerde, OutputContract,
-    OutputContractConfig, DEFAULT_LABEL,
+    MultiContractConfigSerde, MultiContractTargetLabelSerde, OutputContract, OutputContractConfig,
+    OutputContractSerde,
 };
 
 #[derive(Default)]
-struct ContractMetadataBuilder {
+struct OutputContractBuilder {
+    pub config_id: String,
     pub config_name: String,
-    pub config_wasm_name: String,
-    pub labels: BTreeSet<String>,
-    pub endpoints: BTreeMap<String, EndpointAbi>,
     pub external_view: bool,
+    pub add_unlabelled: bool,
+    pub add_labels: BTreeSet<String>,
+    pub endpoints: BTreeMap<String, EndpointAbi>,
 }
 
-impl ContractMetadataBuilder {
-    fn map_from_config(
-        kvp: (&String, &ContractMetadataSerde),
-    ) -> (String, ContractMetadataBuilder) {
+impl OutputContractBuilder {
+    fn new(id: String) -> Self {
+        OutputContractBuilder {
+            config_id: id.clone(),
+            config_name: id,
+            external_view: false, // if unspecified, it should be considered false
+            ..Default::default()
+        }
+    }
+
+    fn map_from_config(kvp: (&String, &OutputContractSerde)) -> (String, OutputContractBuilder) {
         let (config_name, cms) = kvp;
         (
             config_name.clone(),
-            ContractMetadataBuilder {
-                config_name: config_name.clone(),
-                config_wasm_name: cms.wasm_name.clone().unwrap_or_default(),
+            OutputContractBuilder {
+                config_id: config_name.clone(),
+                config_name: cms.name.clone().unwrap_or_default(),
                 external_view: cms.external_view.unwrap_or_default(),
+                add_unlabelled: cms.add_unlabelled.unwrap_or_default(),
+                add_labels: cms.add_labels.iter().cloned().collect(),
                 ..Default::default()
             },
         )
     }
 
-    fn matches_endpoint_labels(&self, endpoint_labels: &[&str]) -> bool {
-        if endpoint_labels.is_empty() {
-            self.labels.contains(DEFAULT_LABEL)
+    fn wasm_name(&self) -> &String {
+        if !self.config_name.is_empty() {
+            &self.config_name
         } else {
-            self.labels
-                .iter()
-                .any(|contract_label| endpoint_labels.contains(&contract_label.as_str()))
+            &self.config_id
         }
     }
 
-    fn wasm_name(&self) -> &String {
-        if !self.config_wasm_name.is_empty() {
-            &self.config_wasm_name
-        } else {
-            &self.config_name
-        }
+    fn add_endpoint(&mut self, endpoint_abi: &EndpointAbi) {
+        self.endpoints
+            .insert(endpoint_abi.name.to_string(), endpoint_abi.clone());
     }
 }
 
-fn collect_contract_labels(
-    contract_builders: &mut HashMap<String, ContractMetadataBuilder>,
-    label_targets: &HashMap<String, MultiContractTargetLabelSerde>,
+fn process_labels_for_contracts(
+    contract_builders: &mut HashMap<String, OutputContractBuilder>,
+    send_labels: &HashMap<String, MultiContractTargetLabelSerde>,
 ) {
-    for (label, targets) in label_targets {
+    for (label, targets) in send_labels {
         for target in &targets.0 {
             contract_builders
                 .entry(target.clone())
-                .or_insert_with(|| ContractMetadataBuilder {
-                    config_name: target.clone(),
-                    external_view: false, // if unspecified, it should be considered false
-                    ..Default::default()
-                })
-                .labels
+                .or_insert_with(|| OutputContractBuilder::new(target.clone()))
+                .add_labels
                 .insert(label.clone());
         }
     }
 }
 
-fn collect_endpoints(
-    contract_builders: &mut HashMap<String, ContractMetadataBuilder>,
+fn endpoint_unlabelled(endpoint_abi: &EndpointAbi) -> bool {
+    endpoint_abi.labels.is_empty()
+}
+
+fn endpoint_matches_labels(endpoint_abi: &EndpointAbi, labels: &BTreeSet<String>) -> bool {
+    endpoint_abi
+        .labels
+        .iter()
+        .any(|&endpoint_label| labels.contains(endpoint_label))
+}
+
+fn collect_unlabelled_endpoints(
+    contract_builders: &mut HashMap<String, OutputContractBuilder>,
     original_abi: &ContractAbi,
 ) {
     for builder in contract_builders.values_mut() {
-        for endpoint_abi in &original_abi.endpoints {
-            if builder.matches_endpoint_labels(&endpoint_abi.labels) {
-                builder
-                    .endpoints
-                    .insert(endpoint_abi.name.to_string(), endpoint_abi.clone());
+        if builder.add_unlabelled {
+            for endpoint_abi in &original_abi.endpoints {
+                if endpoint_unlabelled(endpoint_abi) {
+                    builder.add_endpoint(endpoint_abi);
+                }
             }
         }
     }
 }
 
-fn build_contract_abi(builder: ContractMetadataBuilder, original_abi: &ContractAbi) -> ContractAbi {
+fn collect_labelled_endpoints(
+    contract_builders: &mut HashMap<String, OutputContractBuilder>,
+    original_abi: &ContractAbi,
+) {
+    for builder in contract_builders.values_mut() {
+        for endpoint_abi in &original_abi.endpoints {
+            if endpoint_matches_labels(endpoint_abi, &builder.add_labels) {
+                builder.add_endpoint(endpoint_abi);
+            }
+        }
+    }
+}
+
+fn build_contract_abi(builder: OutputContractBuilder, original_abi: &ContractAbi) -> ContractAbi {
     ContractAbi {
         build_info: original_abi.build_info.clone(),
         docs: original_abi.docs,
@@ -101,12 +126,12 @@ fn build_contract_abi(builder: ContractMetadataBuilder, original_abi: &ContractA
     }
 }
 
-fn build_contract(builder: ContractMetadataBuilder, original_abi: &ContractAbi) -> OutputContract {
+fn build_contract(builder: OutputContractBuilder, original_abi: &ContractAbi) -> OutputContract {
     let name = builder.wasm_name().clone();
     OutputContract {
         main: false,
         external_view: builder.external_view,
-        config_name: builder.config_name.clone(),
+        config_name: builder.config_id.clone(),
         public_name: name,
         abi: build_contract_abi(builder, original_abi),
         cargo_toml_contents_cache: None,
@@ -140,13 +165,14 @@ fn set_main_contract_flag(
 
 impl OutputContractConfig {
     pub fn load_from_config(config: &MultiContractConfigSerde, original_abi: &ContractAbi) -> Self {
-        let mut contract_builders: HashMap<String, ContractMetadataBuilder> = config
+        let mut contract_builders: HashMap<String, OutputContractBuilder> = config
             .contracts
             .iter()
-            .map(ContractMetadataBuilder::map_from_config)
+            .map(OutputContractBuilder::map_from_config)
             .collect();
-        collect_contract_labels(&mut contract_builders, &config.labels);
-        collect_endpoints(&mut contract_builders, original_abi);
+        collect_unlabelled_endpoints(&mut contract_builders, original_abi);
+        collect_labelled_endpoints(&mut contract_builders, original_abi);
+        process_labels_for_contracts(&mut contract_builders, &config.labels_for_contracts);
         let mut contracts: Vec<OutputContract> = contract_builders
             .into_values()
             .map(|builder| build_contract(builder, original_abi))

@@ -3,21 +3,32 @@ use std::collections::HashMap;
 
 #[derive(Deserialize, Debug)]
 pub struct MultiContractConfigSerde {
+    #[serde(default)]
     pub settings: MultiContractGeneralSettingsSerde,
-    pub contracts: HashMap<String, ContractMetadataSerde>,
-    pub labels: HashMap<String, MultiContractTargetLabelSerde>,
+    #[serde(default)]
+    pub contracts: HashMap<String, OutputContractSerde>,
+    #[serde(default)]
+    #[serde(rename = "labels-for-contracts")]
+    pub labels_for_contracts: HashMap<String, MultiContractTargetLabelSerde>,
 }
 
 #[derive(Deserialize, Debug)]
-pub struct ContractMetadataSerde {
+pub struct OutputContractSerde {
+    #[serde(rename = "external-view")]
     pub external_view: Option<bool>,
-    pub wasm_name: Option<String>,
+    pub name: Option<String>,
+    #[serde(default)]
+    #[serde(rename = "add-unlabelled")]
+    pub add_unlabelled: Option<bool>,
+    #[serde(default)]
+    #[serde(rename = "add-labels")]
+    pub add_labels: Vec<String>,
 }
 
 #[derive(Deserialize, Debug)]
 pub struct MultiContractTargetLabelSerde(pub Vec<String>);
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Default, Debug)]
 pub struct MultiContractGeneralSettingsSerde {
     pub main: Option<String>,
 }

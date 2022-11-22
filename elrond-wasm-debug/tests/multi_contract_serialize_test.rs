@@ -7,75 +7,79 @@ fn test_serialize_multi_contract() {
     let multi_contract: MultiContractConfigSerde = toml::from_str(
         r#"
         [settings]
-        default = "main_identifier"
+        main = "main_id"
         
         [contracts]
-        main_identifier = {}
+        main_id = {}
         
         [contracts.c1]
-        external_view = true
-        wasm_name = "c1-name.wasm"
+        name = "c1-name"
+        external-view = true
+
+        [contracts.c2]
+        add-unlabelled = true
+        add-labels = ["label1", "label2"]
         
-        [labels]
+        [labels-for-contracts]
         default = ["main-identifier", "c1", "c3", "all"]
         label1 = ["c1", "all"]
         label2 = ["c1", "c2"]
-        "*" = ["all"]
     "#,
     )
     .unwrap();
 
-    assert_eq!(
-        multi_contract.settings.main,
-        Some("main_identifier".to_string())
-    );
+    assert_eq!(multi_contract.settings.main, Some("main_id".to_string()));
 
     assert_eq!(
         multi_contract
             .contracts
-            .get("main_identifier")
+            .get("main_id")
             .unwrap()
-            .wasm_name
+            .name
             .is_none(),
         true
     );
     assert_eq!(
         multi_contract
             .contracts
-            .get("main_identifier")
+            .get("main_id")
             .unwrap()
-            .external_view
-            .is_none(),
-        true
+            .external_view,
+        None
     );
     assert_eq!(
-        multi_contract
-            .contracts
-            .get("c1")
-            .unwrap()
-            .wasm_name
-            .as_ref()
-            .unwrap(),
-        "c1-name.wasm"
+        multi_contract.contracts.get("c1").unwrap().name,
+        Some("c1-name".to_string())
     );
     assert_eq!(
-        multi_contract
-            .contracts
-            .get("c1")
-            .unwrap()
-            .external_view
-            .unwrap(),
-        true
+        multi_contract.contracts.get("c1").unwrap().external_view,
+        Some(true)
     );
 
     assert_eq!(
-        multi_contract.labels.get("default").unwrap().0,
+        multi_contract.contracts.get("c2").unwrap().add_unlabelled,
+        Some(true)
+    );
+
+    assert_eq!(
+        multi_contract.contracts.get("c2").unwrap().add_labels,
+        vec!["label1", "label2"]
+    );
+
+    assert_eq!(
+        multi_contract
+            .labels_for_contracts
+            .get("default")
+            .unwrap()
+            .0,
         ["main-identifier", "c1", "c3", "all"]
     );
     assert_eq!(
-        multi_contract.labels.get("label1").unwrap().0,
+        multi_contract.labels_for_contracts.get("label1").unwrap().0,
         ["c1", "all"]
     );
-    assert_eq!(multi_contract.labels.get("label2").unwrap().0, ["c1", "c2"]);
-    assert_eq!(multi_contract.labels.get("*").unwrap().0, ["all"]);
+    assert_eq!(
+        multi_contract.labels_for_contracts.get("label2").unwrap().0,
+        ["c1", "c2"]
+    );
 }
