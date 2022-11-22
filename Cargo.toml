@@ -75,6 +75,8 @@ members = [
   "contracts/examples/ping-pong-egld/meta",
   "contracts/examples/rewards-distribution",
   "contracts/examples/rewards-distribution/meta",
+  "contracts/examples/seed-nft-minter",
+  "contracts/examples/seed-nft-minter/meta",
   "contracts/examples/token-release",
   "contracts/examples/token-release/meta",
 
