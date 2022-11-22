@@ -47,7 +47,7 @@ impl MetaConfig {
 
     fn write_wasm_src_lib(&self) {
         for output_contract in &self.output_contracts.contracts {
-            output_contract.write_wasm_src_lib();
+            output_contract.write_wasm_src_lib_file();
         }
     }
 
