@@ -9,7 +9,7 @@ pub struct MultiContractConfigSerde {
     pub contracts: HashMap<String, OutputContractSerde>,
     #[serde(default)]
     #[serde(rename = "labels-for-contracts")]
-    pub labels_for_contracts: HashMap<String, MultiContractTargetLabelSerde>,
+    pub labels_for_contracts: HashMap<String, Vec<String>>,
 }
 
 #[derive(Deserialize, Debug)]
@@ -24,9 +24,6 @@ pub struct OutputContractSerde {
     #[serde(rename = "add-labels")]
     pub add_labels: Vec<String>,
 }
-
-#[derive(Deserialize, Debug)]
-pub struct MultiContractTargetLabelSerde(pub Vec<String>);
 
 #[derive(Deserialize, Default, Debug)]
 pub struct MultiContractGeneralSettingsSerde {

@@ -67,19 +67,15 @@ fn test_serialize_multi_contract() {
     );
 
     assert_eq!(
-        multi_contract
-            .labels_for_contracts
-            .get("default")
-            .unwrap()
-            .0,
-        ["main-identifier", "c1", "c3", "all"]
+        multi_contract.labels_for_contracts.get("default").unwrap(),
+        &vec!["main-identifier", "c1", "c3", "all"]
     );
     assert_eq!(
-        multi_contract.labels_for_contracts.get("label1").unwrap().0,
-        ["c1", "all"]
+        multi_contract.labels_for_contracts.get("label1").unwrap(),
+        &vec!["c1", "all"]
     );
     assert_eq!(
-        multi_contract.labels_for_contracts.get("label2").unwrap().0,
-        ["c1", "c2"]
+        multi_contract.labels_for_contracts.get("label2").unwrap(),
+        &vec!["c1", "c2"]
     );
 }

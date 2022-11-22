@@ -5,10 +5,7 @@ use std::{
     path::Path,
 };
 
-use super::{
-    MultiContractConfigSerde, MultiContractTargetLabelSerde, OutputContract, OutputContractConfig,
-    OutputContractSerde,
-};
+use super::{MultiContractConfigSerde, OutputContract, OutputContractConfig, OutputContractSerde};
 
 #[derive(Default)]
 struct OutputContractBuilder {
@@ -61,10 +58,10 @@ impl OutputContractBuilder {
 
 fn process_labels_for_contracts(
     contract_builders: &mut HashMap<String, OutputContractBuilder>,
-    send_labels: &HashMap<String, MultiContractTargetLabelSerde>,
+    labels_for_contracts: &HashMap<String, Vec<String>>,
 ) {
-    for (label, targets) in send_labels {
-        for target in &targets.0 {
+    for (label, targets) in labels_for_contracts {
+        for target in targets {
             contract_builders
                 .entry(target.clone())
                 .or_insert_with(|| OutputContractBuilder::new(target.clone()))
