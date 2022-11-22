@@ -78,10 +78,8 @@ pub trait RewardsDistribution:
                 raffle.ticket_position,
             );
 
-            self.rewards(ticket).update(|balance| {
-                require!(balance.to_u64().unwrap() == 0u64, "OOF");
-                *balance += &bracket.reward
-            });
+            self.rewards(ticket)
+                .update(|balance| *balance += &bracket.reward);
             total_distributed += &bracket.reward;
 
             if raffle.ticket_position == raffle.ticket_count {
