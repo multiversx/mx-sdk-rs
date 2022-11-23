@@ -28,9 +28,7 @@ pub trait SeedNftMinter: nft_module::NftModule {
         marketplaces: ManagedVec<ManagedAddress>,
         distribution: ManagedVec<Distribution<Self::Api>>,
     ) {
-        for marketplace in &marketplaces {
-            self.marketplaces().insert(marketplace);
-        }
+        self.marketplaces().extend(&marketplaces);
         self.validate_distribution(&distribution);
         self.distribution_rules().set(distribution);
     }
@@ -82,33 +80,56 @@ pub trait SeedNftMinter: nft_module::NftModule {
 
     #[only_owner]
     #[endpoint(claimAndDistribute)]
-    fn claim_and_distribute(&self) {
-        let total_amount = self.claim_royalties(EgldOrEsdtTokenIdentifier::egld(), 0);
-        self.distribute_royalties(total_amount);
+    fn claim_and_distribute(&self, token_id: EgldOrEsdtTokenIdentifier, token_nonce: u64) {
+        let total_amount = self.claim_royalties(&token_id, token_nonce);
+        self.distribute_royalties(&token_id, token_nonce, total_amount);
     }
 
-    fn claim_royalties(&self, token_id: EgldOrEsdtTokenIdentifier, token_nonce: u64) -> BigUint {
+    fn claim_royalties(&self, token_id: &EgldOrEsdtTokenIdentifier, token_nonce: u64) -> BigUint {
         let claim_destination = self.blockchain().get_sc_address();
         let mut total_amount = BigUint::zero();
         for address in self.marketplaces().iter() {
-            let results: MultiValue2<BigUint, IgnoreValue> = self
+            let results: MultiValue2<BigUint, ManagedVec<EsdtTokenPayment>> = self
                 .marketplace_proxy(address)
-                .claim_tokens(&claim_destination, &token_id, token_nonce)
+                .claim_tokens(&claim_destination, token_id, token_nonce)
                 .execute_on_dest_context();
 
-            let (claimed_amount, _) = results.into_tuple();
-            total_amount += claimed_amount;
+            let (egld_amount, esdt_payments) = results.into_tuple();
+            let amount = if token_id.is_egld() {
+                egld_amount
+            } else {
+                esdt_payments
+                    .try_get(0)
+                    .map(|esdt_payment| esdt_payment.amount)
+                    .unwrap_or_default()
+            };
+            total_amount += amount;
         }
 
         total_amount
     }
 
-    fn distribute_royalties(&self, total_amount: BigUint) {
+    fn distribute_royalties(
+        &self,
+        token_id: &EgldOrEsdtTokenIdentifier,
+        token_nonce: u64,
+        total_amount: BigUint,
+    ) {
+        if total_amount == 0 {
+            return;
+        }
         for distribution in self.distribution_rules().get().iter() {
             let payment_amount = total_amount.clone() * distribution.percentage / MAX_PERCENTAGE;
+            if payment_amount == 0 {
+                continue;
+            }
             self.send()
                 .contract_call::<IgnoreValue>(distribution.address, distribution.endpoint)
-                .with_egld_transfer(payment_amount)
+                .with_egld_or_single_esdt_token_transfer(
+                    token_id.clone(),
+                    token_nonce,
+                    payment_amount,
+                )
                 .with_gas_limit(distribution.gas_limit)
                 .transfer_execute();
         }
@@ -155,6 +176,6 @@ mod nft_marketplace_proxy {
             claim_destination: &ManagedAddress,
             token_id: &EgldOrEsdtTokenIdentifier,
             token_nonce: u64,
-        ) -> MultiValue2<BigUint, IgnoreValue>;
+        ) -> MultiValue2<BigUint, ManagedVec<EsdtTokenPayment>>;
     }
 }
