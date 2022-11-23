@@ -3,17 +3,10 @@
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
+mod distribution_module;
 mod nft_module;
 
-pub const MAX_PERCENTAGE: u64 = 100_000; // 100%
-
-#[derive(ManagedVecItem, NestedEncode, NestedDecode, TypeAbi)]
-pub struct Distribution<M: ManagedTypeApi> {
-    pub address: ManagedAddress<M>,
-    pub percentage: u64,
-    pub endpoint: ManagedBuffer<M>,
-    pub gas_limit: u64,
-}
+use distribution_module::Distribution;
 
 #[derive(TypeAbi, TopEncode, TopDecode)]
 pub struct ExampleAttributes {
@@ -21,7 +14,7 @@ pub struct ExampleAttributes {
 }
 
 #[elrond_wasm::contract]
-pub trait SeedNftMinter: nft_module::NftModule {
+pub trait SeedNftMinter: distribution_module::DistributionModule + nft_module::NftModule {
     #[init]
     fn init(
         &self,
@@ -29,8 +22,7 @@ pub trait SeedNftMinter: nft_module::NftModule {
         distribution: ManagedVec<Distribution<Self::Api>>,
     ) {
         self.marketplaces().extend(&marketplaces);
-        self.validate_distribution(&distribution);
-        self.distribution_rules().set(distribution);
+        self.init_distribution(distribution);
     }
 
     #[only_owner]
@@ -82,7 +74,7 @@ pub trait SeedNftMinter: nft_module::NftModule {
     #[endpoint(claimAndDistribute)]
     fn claim_and_distribute(&self, token_id: EgldOrEsdtTokenIdentifier, token_nonce: u64) {
         let total_amount = self.claim_royalties(&token_id, token_nonce);
-        self.distribute_royalties(&token_id, token_nonce, total_amount);
+        self.distribute_funds(&token_id, token_nonce, total_amount);
     }
 
     fn claim_royalties(&self, token_id: &EgldOrEsdtTokenIdentifier, token_nonce: u64) -> BigUint {
@@ -109,43 +101,6 @@ pub trait SeedNftMinter: nft_module::NftModule {
         total_amount
     }
 
-    fn distribute_royalties(
-        &self,
-        token_id: &EgldOrEsdtTokenIdentifier,
-        token_nonce: u64,
-        total_amount: BigUint,
-    ) {
-        if total_amount == 0 {
-            return;
-        }
-        for distribution in self.distribution_rules().get().iter() {
-            let payment_amount = total_amount.clone() * distribution.percentage / MAX_PERCENTAGE;
-            if payment_amount == 0 {
-                continue;
-            }
-            self.send()
-                .contract_call::<IgnoreValue>(distribution.address, distribution.endpoint)
-                .with_egld_or_single_esdt_token_transfer(
-                    token_id.clone(),
-                    token_nonce,
-                    payment_amount,
-                )
-                .with_gas_limit(distribution.gas_limit)
-                .transfer_execute();
-        }
-    }
-
-    fn validate_distribution(&self, distribution: &ManagedVec<Distribution<Self::Api>>) {
-        let index_total: u64 = distribution
-            .iter()
-            .map(|distribution| distribution.percentage)
-            .sum();
-        require!(
-            index_total == MAX_PERCENTAGE,
-            "Distribution percent total must be 100%"
-        );
-    }
-
     #[view(getMarketplaces)]
     #[storage_mapper("marketplaces")]
     fn marketplaces(&self) -> UnorderedSetMapper<ManagedAddress>;
@@ -153,10 +108,6 @@ pub trait SeedNftMinter: nft_module::NftModule {
     #[view(getNftCount)]
     #[storage_mapper("nftCount")]
     fn nft_count(&self) -> SingleValueMapper<u64>;
-
-    #[view(getDistributionRules)]
-    #[storage_mapper("distributionRules")]
-    fn distribution_rules(&self) -> SingleValueMapper<ManagedVec<Distribution<Self::Api>>>;
 
     #[proxy]
     fn marketplace_proxy(
