@@ -85,4 +85,11 @@ impl ContractAbi {
     pub fn get_crate_name_for_code(&self) -> String {
         self.get_crate_name().replace('-', "_").to_lowercase()
     }
+
+    pub fn generate_with_endpoints(endpoints: Vec<EndpointAbi>)-> Self{
+        ContractAbi{
+            endpoints,
+            ..Default::default()
+        }
+    }
 }

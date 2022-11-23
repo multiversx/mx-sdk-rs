@@ -18,20 +18,22 @@ pub struct OutputAbi {
 
 pub type OutputAbis = Vec<OutputAbi>;
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Default, Debug)]
 pub enum EndpointMutabilityAbi {
+    #[default]
     Mutable,
     Readonly,
     Pure,
 }
 
-#[derive(Clone, PartialEq, Eq, Debug)]
+#[derive(Clone, PartialEq, Default, Eq, Debug)]
 pub enum EndpointLocationAbi {
+    #[default]
     MainContract,
     ViewContract,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Default, Debug)]
 pub struct EndpointAbi {
     pub docs: &'static [&'static str],
     pub name: &'static str,
@@ -58,5 +60,13 @@ impl EndpointAbi {
     pub fn add_output<T: TypeAbi>(&mut self, output_names: &[&'static str]) {
         self.outputs
             .extend_from_slice(T::output_abis(output_names).as_slice());
+    }
+
+    pub fn generate_with_name_and_labels(&self, name: &'static str, labels: &'static [&'static str]) -> Self {
+        EndpointAbi{
+            name,
+            labels,
+            ..Default::default()
+        }
     }
 }
