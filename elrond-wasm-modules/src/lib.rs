@@ -1,4 +1,5 @@
 #![no_std]
+#![feature(trait_alias)]
 
 pub mod bonding_curve;
 pub mod claim_developer_rewards;
