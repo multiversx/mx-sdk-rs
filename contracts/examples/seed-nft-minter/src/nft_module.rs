@@ -1,3 +1,5 @@
+use crate::distribution_module;
+
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
@@ -12,7 +14,7 @@ pub struct PriceTag<M: ManagedTypeApi> {
 }
 
 #[elrond_wasm::module]
-pub trait NftModule {
+pub trait NftModule: distribution_module::DistributionModule {
     // endpoints - owner-only
 
     #[only_owner]
@@ -96,12 +98,10 @@ pub trait NftModule {
             &BigUint::from(NFT_AMOUNT),
         );
 
-        let owner = self.blockchain().get_owner_address();
-        self.send().direct(
-            &owner,
+        self.distribute_funds(
             &payment.token_identifier,
             payment.token_nonce,
-            &payment.amount,
+            payment.amount,
         );
     }
 
