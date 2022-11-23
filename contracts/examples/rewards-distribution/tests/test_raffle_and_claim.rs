@@ -15,7 +15,7 @@ fn test_raffle_and_claim() {
 
     let mut wrapper = BlockchainStateWrapper::new();
 
-    let full_reward_amount = rust_biguint!(2_070_00000u64);
+    let full_reward_amount = rust_biguint!(2_070_000_000u64);
     let nft_count = 10_000u64;
 
     let owner = wrapper.create_user_account(&rust_biguint!(0));
@@ -47,7 +47,7 @@ fn test_raffle_and_claim() {
     // setup the mock contract
     wrapper
         .execute_tx(&alice, &seed_nft_minter_mock_sc, &rust_biguint!(0), |sc| {
-            sc.init((&nft_token_id).clone());
+            sc.init(nft_token_id.clone());
 
             sc.set_nft_count(nft_count);
         })
@@ -64,9 +64,9 @@ fn test_raffle_and_claim() {
     wrapper
         .execute_tx(&alice, &rewards_distribution_sc, &rust_biguint!(0), |sc| {
             let brackets = utils::to_brackets(&[
-                (0_010, 2_000),
-                (0_090, 6_000),
-                (0_400, 7_000),
+                (10, 2_000),
+                (90, 6_000),
+                (400, 7_000),
                 (2_500, 10_000),
                 (25_000, 35_000),
                 (72_000, 40_000),
@@ -114,12 +114,12 @@ fn test_raffle_and_claim() {
             assert_eq!(rewards.len() as u64, nft_count);
             // check that the reward amounts match in frequency
             let expected_reward_amounts = [
-                (41_40000, 1),
-                (13_80000, 9),
-                (3_62250, 40),
-                (0_82800, 250),
-                (0_28980, 2500),
-                (0_11500, 7200),
+                (41_400_000, 1),
+                (13_800_000, 9),
+                (3_622_500, 40),
+                (828_000, 250),
+                (289_800, 2500),
+                (115_000, 7200),
             ];
             for (amount, expected_count) in expected_reward_amounts {
                 let expected_amount_biguint = managed_biguint!(amount as u64);
@@ -140,13 +140,13 @@ fn test_raffle_and_claim() {
     let nft_payments: Vec<TxInputESDT> = nft_nonces
         .iter()
         .map(|nonce| TxInputESDT {
-            token_identifier: (&token_identifier).clone(),
+            token_identifier: token_identifier.clone(),
             nonce: *nonce,
             value: rust_biguint!(1),
         })
         .collect();
 
-    let expected_rewards = [0_11500, 0_11500, 0_11500, 8_2800, 0_11500, 0_11500];
+    let expected_rewards = [115_000, 115_000, 115_000, 828_000, 115_000, 115_000];
     wrapper
         .execute_esdt_multi_transfer(&alice, &rewards_distribution_sc, &nft_payments, |sc| {
             // get and check the claimable reward amounts for each NFT (sample the few first values)

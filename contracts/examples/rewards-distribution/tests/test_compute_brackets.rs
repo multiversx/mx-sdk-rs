@@ -25,23 +25,23 @@ fn test_compute_brackets() {
     wrapper
         .execute_tx(&owner, &rewards_distribution_sc, &rust_biguint!(0), |sc| {
             let brackets = utils::to_brackets(&[
-                (0_010, 2_000),
-                (0_090, 6_000),
-                (0_400, 7_000),
+                (10, 2_000),
+                (90, 6_000),
+                (400, 7_000),
                 (2_500, 10_000),
                 (25_000, 35_000),
                 (72_000, 40_000),
             ]);
 
-            let computed_brackets = sc.compute_brackets(brackets, 10_000, 2_070_00000u64.into());
+            let computed_brackets = sc.compute_brackets(brackets, 10_000, 2_070_000_000u64.into());
 
             let expected_values = vec![
-                (1, 41_40000),
-                (10, 13_80000),
-                (50, 3_62250),
-                (300, 0_82800),
-                (2800, 0_28980),
-                (10000, 0_11500),
+                (1, 41_400_000),
+                (10, 13_800_000),
+                (50, 3_622_500),
+                (300, 828_000),
+                (2800, 289_800),
+                (10000, 115_000),
             ];
 
             assert_eq!(computed_brackets.len(), expected_values.len());

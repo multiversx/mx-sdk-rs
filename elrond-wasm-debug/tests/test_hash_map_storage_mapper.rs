@@ -14,8 +14,8 @@ fn create_map_storage() -> MapStorageMapper<DebugApi, u64, MapMapper<DebugApi, u
 fn test_map_storage_simple() {
     let mut map = create_map_storage();
     assert_eq!(map.len(), 0);
-    assert_eq!(map.insert_default(42), true);
-    assert_eq!(map.insert_default(42), false);
+    assert!(map.insert_default(42));
+    assert!(!map.insert_default(42));
     let map42_option = map.get(&42);
     assert!(map42_option.is_some());
     let mut map42 = map42_option.unwrap();
@@ -28,8 +28,8 @@ fn test_map_storage_simple() {
     assert_eq!(map.len(), 2);
     map.insert_default(44);
     assert_eq!(map.len(), 3);
-    assert_eq!(map.contains_key(&42), true);
-    assert_eq!(map.contains_key(&50), false);
+    assert!(map.contains_key(&42));
+    assert!(!map.contains_key(&50));
 }
 
 #[test]
@@ -38,8 +38,8 @@ fn test_map_storage_remove() {
     map.insert_default(42);
     map.insert_default(43);
     assert_eq!(map.len(), 2);
-    assert_eq!(map.remove(&42), true);
-    assert_eq!(map.remove(&42), false);
+    assert!(map.remove(&42));
+    assert!(!map.remove(&42));
     assert_eq!(map.len(), 1);
 }
 
