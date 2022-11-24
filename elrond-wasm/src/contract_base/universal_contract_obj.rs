@@ -31,6 +31,15 @@ where
     }
 }
 
+impl<A> Default for UniversalContractObj<A>
+where
+    A: VMApi,
+{
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl<A> ContractBase for UniversalContractObj<A>
 where
     A: VMApi,
