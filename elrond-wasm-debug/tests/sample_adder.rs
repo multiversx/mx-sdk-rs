@@ -47,6 +47,11 @@ mod module_1 {
         fn callback(&self) {}
     }
 
+    impl<A> AutoImpl for elrond_wasm::contract_base::UniversalContractObj<A> where
+        A: elrond_wasm::api::VMApi
+    {
+    }
+
     pub trait EndpointWrappers: VersionModule + elrond_wasm::contract_base::ContractBase {
         #[inline]
         fn call_version(&self) {
@@ -77,6 +82,12 @@ mod module_1 {
             false
         }
     }
+
+    impl<A> EndpointWrappers for elrond_wasm::contract_base::UniversalContractObj<A> where
+        A: elrond_wasm::api::VMApi
+    {
+    }
+
     pub struct AbiProvider {}
 
     impl elrond_wasm::contract_base::ContractAbiProvider for AbiProvider {
@@ -152,6 +163,11 @@ mod sample_adder {
         }
     }
 
+    impl<A> AutoImpl for elrond_wasm::contract_base::UniversalContractObj<A> where
+        A: elrond_wasm::api::VMApi
+    {
+    }
+
     pub trait EndpointWrappers:
         Adder + elrond_wasm::contract_base::ContractBase + super::module_1::EndpointWrappers
     {
@@ -214,6 +230,11 @@ mod sample_adder {
         }
     }
 
+    impl<A> EndpointWrappers for elrond_wasm::contract_base::UniversalContractObj<A> where
+        A: elrond_wasm::api::VMApi
+    {
+    }
+
     pub trait ProxyTrait:
         elrond_wasm::contract_base::ProxyObjBase + super::module_1::ProxyTrait
     {
@@ -271,7 +292,10 @@ mod sample_adder {
         A: elrond_wasm::api::VMApi,
     {
         fn call(&self, fn_name: &[u8]) -> bool {
-            EndpointWrappers::call(self, fn_name)
+            EndpointWrappers::call(
+                &elrond_wasm::contract_base::UniversalContractObj::<A>::new(),
+                fn_name,
+            )
         }
 
         fn clone_obj(
