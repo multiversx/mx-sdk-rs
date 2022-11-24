@@ -14,7 +14,7 @@ elrond_wasm_node::wasm_endpoints! {
         getCompletedRaffleIdCount
         getLastRaffleEpoch
         getNftRewardPercent
-        getNftTokenIdentifier
+        getNftTokenId
         getRaffleId
         getRoyalties
         getSeedNftMinterAddress

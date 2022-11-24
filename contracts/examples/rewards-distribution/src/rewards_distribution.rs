@@ -40,11 +40,11 @@ pub trait RewardsDistribution:
     fn init(&self, seed_nft_minter_address: ManagedAddress, brackets: ManagedVec<Bracket>) {
         self.seed_nft_minter_address().set(&seed_nft_minter_address);
 
-        let nft_token_identifier: TokenIdentifier = self
+        let nft_token_id: TokenIdentifier = self
             .seed_nft_minter_proxy(seed_nft_minter_address)
             .get_nft_token_id()
             .execute_on_dest_context();
-        self.nft_token_identifier().set(nft_token_identifier);
+        self.nft_token_id().set(nft_token_id);
 
         self.validate_brackets(&brackets);
         self.brackets().set(brackets);
@@ -239,38 +239,76 @@ pub trait RewardsDistribution:
     #[endpoint(claimRewards)]
     fn claim_rewards(
         &self,
-        raffle_id_range_start: u64,
-        raffle_id_range_end: u64,
+        raffle_id_start: u64,
+        raffle_id_end: u64,
         reward_tokens: MultiValueEncoded<MultiValue2<EgldOrEsdtTokenIdentifier, u64>>,
     ) {
         let nfts = self.call_value().all_esdt_transfers();
         self.validate_nft_payments(&nfts);
-        self.validate_range(raffle_id_range_start, raffle_id_range_end);
+        self.validate_raffle_id_range(raffle_id_start, raffle_id_end);
 
         let caller = self.blockchain().get_caller();
         for reward_token_pair in reward_tokens.into_iter() {
             let (reward_token_id, reward_token_nonce) = reward_token_pair.into_tuple();
-            let mut total = BigUint::zero();
+            self.claim_reward_token(
+                &caller,
+                raffle_id_start,
+                raffle_id_end,
+                &reward_token_id,
+                reward_token_nonce,
+                &nfts,
+            );
+        }
+        self.send().direct_multi(&caller, &nfts);
+    }
 
-            for raffle_id in raffle_id_range_start..=raffle_id_range_end {
-                for nft in &nfts {
-                    if self.was_claimed(raffle_id, nft.token_nonce).replace(true) {
-                        continue;
-                    }
+    fn claim_reward_token(
+        &self,
+        caller: &ManagedAddress,
+        raffle_id_start: u64,
+        raffle_id_end: u64,
+        reward_token_id: &EgldOrEsdtTokenIdentifier,
+        reward_token_nonce: u64,
+        nfts: &ManagedVec<EsdtTokenPayment>,
+    ) {
+        let mut total = BigUint::zero();
+
+        for raffle_id in raffle_id_start..=raffle_id_end {
+            for nft in nfts {
+                if self.try_claim(raffle_id, reward_token_id, reward_token_nonce, &nft) {
                     total += self.compute_claimable_amount(
                         raffle_id,
-                        &reward_token_id,
+                        reward_token_id,
                         reward_token_nonce,
                         nft.token_nonce,
                     )
                 }
             }
-            if total > 0 {
-                self.send()
-                    .direct(&caller, &reward_token_id, reward_token_nonce, &total);
-            }
         }
-        self.send().direct_multi(&caller, &nfts);
+        if total > 0 {
+            self.send()
+                .direct(caller, reward_token_id, reward_token_nonce, &total);
+        }
+    }
+
+    fn try_claim(
+        &self,
+        raffle_id: u64,
+        reward_token_id: &EgldOrEsdtTokenIdentifier,
+        reward_token_nonce: u64,
+        nft: &EsdtTokenPayment,
+    ) -> bool {
+        let was_claimed_mapper = self.was_claimed(
+            raffle_id,
+            reward_token_id,
+            reward_token_nonce,
+            nft.token_nonce,
+        );
+        let available = !was_claimed_mapper.get();
+        if available {
+            was_claimed_mapper.set(true);
+        }
+        available
     }
 
     #[view(computeClaimableAmount)]
@@ -289,26 +327,18 @@ pub trait RewardsDistribution:
     }
 
     fn validate_nft_payments(&self, nfts: &ManagedVec<EsdtTokenPayment>) {
-        let nft_token_identifier = self.nft_token_identifier().get();
+        let nft_token_id = self.nft_token_id().get();
         require!(!nfts.is_empty(), "Missing payment");
         for nft in nfts {
-            require!(
-                nft.token_identifier == nft_token_identifier,
-                "Invalid payment"
-            );
+            require!(nft.token_identifier == nft_token_id, "Invalid payment");
         }
     }
 
-    fn validate_range(&self, raffle_id_range_start: u64, raffle_id_range_end: u64) {
-        require!(
-            raffle_id_range_start <= raffle_id_range_end,
-            "Invalid range"
-        );
+    fn validate_raffle_id_range(&self, start: u64, end: u64) {
+        require!(start <= end, "Invalid range");
+
         let completed_raffle_id_count = self.completed_raffle_id_count().get();
-        require!(
-            raffle_id_range_end < completed_raffle_id_count,
-            "Invalid raffle id end"
-        );
+        require!(end < completed_raffle_id_count, "Invalid raffle id end");
     }
 
     #[view(getRaffleId)]
@@ -325,7 +355,7 @@ pub trait RewardsDistribution:
         &self,
         raffle_id: u64,
         reward_token_id: &EgldOrEsdtTokenIdentifier,
-        reward_nonce: u64,
+        reward_token_nonce: u64,
     ) -> SingleValueMapper<BigUint>;
 
     #[view(getNftRewardPercent)]
@@ -334,7 +364,13 @@ pub trait RewardsDistribution:
 
     #[view(getWasClaimed)]
     #[storage_mapper("wasClaimed")]
-    fn was_claimed(&self, raffle_id: u64, nft_nonce: u64) -> SingleValueMapper<bool>;
+    fn was_claimed(
+        &self,
+        raffle_id: u64,
+        reward_token_id: &EgldOrEsdtTokenIdentifier,
+        reward_token_nonce: u64,
+        nft_nonce: u64,
+    ) -> SingleValueMapper<bool>;
 
     #[view(getSeedNftMinterAddress)]
     #[storage_mapper("seedNftMinterAddress")]
@@ -348,9 +384,9 @@ pub trait RewardsDistribution:
     #[storage_mapper("lastRaffleEpoch")]
     fn last_raffle_epoch(&self) -> SingleValueMapper<Epoch>;
 
-    #[view(getNftTokenIdentifier)]
+    #[view(getNftTokenId)]
     #[storage_mapper("nftTokenIdentifier")]
-    fn nft_token_identifier(&self) -> SingleValueMapper<TokenIdentifier>;
+    fn nft_token_id(&self) -> SingleValueMapper<TokenIdentifier>;
 
     #[storage_mapper("tickets")]
     fn tickets(&self, position: u64) -> SingleValueMapper<u64>;
