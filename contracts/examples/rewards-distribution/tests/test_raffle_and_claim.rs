@@ -1,6 +1,9 @@
-use elrond_wasm::types::{BigUint, OperationCompletionStatus};
+use elrond_wasm::{
+    elrond_codec::multi_types::MultiValue2,
+    types::{BigUint, EgldOrEsdtTokenIdentifier, MultiValueEncoded, OperationCompletionStatus},
+};
 use elrond_wasm_debug::{
-    managed_biguint, managed_token_id, rust_biguint, testing_framework::BlockchainStateWrapper,
+    managed_token_id, rust_biguint, testing_framework::BlockchainStateWrapper,
     tx_mock::TxInputESDT, DebugApi,
 };
 use rewards_distribution::RewardsDistribution as _;
@@ -15,7 +18,7 @@ fn test_raffle_and_claim() {
 
     let mut wrapper = BlockchainStateWrapper::new();
 
-    let full_reward_amount = rust_biguint!(2_070_00000u64);
+    let full_reward_amount = rust_biguint!(2_070_000_000u64);
     let nft_count = 10_000u64;
 
     let owner = wrapper.create_user_account(&rust_biguint!(0));
@@ -47,7 +50,7 @@ fn test_raffle_and_claim() {
     // setup the mock contract
     wrapper
         .execute_tx(&alice, &seed_nft_minter_mock_sc, &rust_biguint!(0), |sc| {
-            sc.init((&nft_token_id).clone());
+            sc.init(nft_token_id.clone());
 
             sc.set_nft_count(nft_count);
         })
@@ -64,9 +67,9 @@ fn test_raffle_and_claim() {
     wrapper
         .execute_tx(&alice, &rewards_distribution_sc, &rust_biguint!(0), |sc| {
             let brackets = utils::to_brackets(&[
-                (0_010, 2_000),
-                (0_090, 6_000),
-                (0_400, 7_000),
+                (10, 2_000),
+                (90, 6_000),
+                (400, 7_000),
                 (2_500, 10_000),
                 (25_000, 35_000),
                 (72_000, 40_000),
@@ -100,33 +103,42 @@ fn test_raffle_and_claim() {
 
     wrapper
         .execute_tx(&alice, &rewards_distribution_sc, &rust_biguint!(0), |sc| {
-            // check the royalties left after the raffle
-            let royalties_remaining = sc.royalties().get();
-            assert_eq!(royalties_remaining, managed_biguint!(0));
-
+            // collect the claimable amounts
+            let raffle_id = 0;
             let mut rewards: Vec<BigUint<DebugApi>> = Vec::new();
 
             for nonce in 1u64..=nft_count {
-                let reward = sc.rewards(nonce).get();
-                rewards.push(reward);
+                let amount = sc.compute_claimable_amount(
+                    raffle_id,
+                    &EgldOrEsdtTokenIdentifier::egld(),
+                    0,
+                    nonce,
+                );
+                rewards.push(amount);
             }
 
             assert_eq!(rewards.len() as u64, nft_count);
+
             // check that the reward amounts match in frequency
             let expected_reward_amounts = [
-                (41_40000, 1),
-                (13_80000, 9),
-                (3_62250, 40),
-                (0_82800, 250),
-                (0_28980, 2500),
-                (0_11500, 7200),
+                (41_400_000, 1),
+                (13_799_999, 9),
+                (3_622_500, 40),
+                (828_000, 250),
+                (289_800, 2500),
+                (114_999, 7200),
             ];
+
+            let total_expected_count: u64 =
+                expected_reward_amounts.iter().map(|(_, count)| count).sum();
+            assert_eq!(total_expected_count, nft_count);
+
             for (amount, expected_count) in expected_reward_amounts {
-                let expected_amount_biguint = managed_biguint!(amount as u64);
+                let expected_amount = amount as u64;
                 assert_eq!(
                     rewards
                         .iter()
-                        .filter(|value| *value == &expected_amount_biguint)
+                        .filter(|value| *value == &expected_amount)
                         .count(),
                     expected_count as usize
                 );
@@ -140,48 +152,61 @@ fn test_raffle_and_claim() {
     let nft_payments: Vec<TxInputESDT> = nft_nonces
         .iter()
         .map(|nonce| TxInputESDT {
-            token_identifier: (&token_identifier).clone(),
+            token_identifier: token_identifier.clone(),
             nonce: *nonce,
             value: rust_biguint!(1),
         })
         .collect();
 
-    let expected_rewards = [0_11500, 0_11500, 0_11500, 8_2800, 0_11500, 0_11500];
+    let expected_rewards = [114_999, 114_999, 114_999, 828_000, 114_999, 114_999];
     wrapper
         .execute_esdt_multi_transfer(&alice, &rewards_distribution_sc, &nft_payments, |sc| {
             // get and check the claimable reward amounts for each NFT (sample the few first values)
+            let raffle_id = 0;
             assert_eq!(nft_nonces.len(), expected_rewards.len());
-            for (nonce, expected_rewards) in std::iter::zip(nft_nonces, expected_rewards) {
-                let rewards = sc.rewards(nonce).get();
-                assert_eq!(rewards, managed_biguint!(expected_rewards));
-            }
-
-            let mut claimable_amounts: Vec<BigUint<DebugApi>> = Vec::new();
-
-            for nonce in 1u64..=nft_count {
-                let claimable = sc.rewards(nonce).get();
-                claimable_amounts.push(claimable);
+            for (nonce, expected_reward) in std::iter::zip(nft_nonces, expected_rewards) {
+                let rewards = sc.compute_claimable_amount(
+                    raffle_id,
+                    &EgldOrEsdtTokenIdentifier::egld(),
+                    0,
+                    nonce,
+                );
+                assert_eq!(rewards, expected_reward);
             }
 
             // claim the rewards
-            sc.claim_rewards();
+            let reward_id_range_start = 0;
+            let reward_id_range_end = 0;
+            let mut reward_tokens: MultiValueEncoded<
+                DebugApi,
+                MultiValue2<EgldOrEsdtTokenIdentifier<DebugApi>, u64>,
+            > = MultiValueEncoded::new();
+            reward_tokens.push((EgldOrEsdtTokenIdentifier::egld(), 0).into());
+            sc.claim_rewards(reward_id_range_start, reward_id_range_end, reward_tokens);
 
-            // check that the claimable rewards are now 0
+            // check that the flags which mark claimed rewards were set
             for nonce in nft_nonces {
-                let rewards = sc.rewards(nonce).get();
-                assert_eq!(rewards, managed_biguint!(0));
+                let was_claimed = sc.was_claimed(raffle_id, nonce).get();
+                assert!(was_claimed);
             }
         })
         .assert_ok();
 
     // confirm the received amount matches the sum of the queried rewards
-    let alice_balance_after_claim: i32 = expected_rewards.iter().sum();
+    let alice_balance_after_claim: u64 = expected_rewards.iter().sum();
     wrapper.check_egld_balance(&alice, &rust_biguint!(alice_balance_after_claim));
 
     // a second claim with the same nfts should succeed, but return no more rewards
     wrapper
         .execute_esdt_multi_transfer(&alice, &rewards_distribution_sc, &nft_payments, |sc| {
-            sc.claim_rewards();
+            let reward_id_range_start = 0;
+            let reward_id_range_end = 0;
+            let mut reward_tokens: MultiValueEncoded<
+                DebugApi,
+                MultiValue2<EgldOrEsdtTokenIdentifier<DebugApi>, u64>,
+            > = MultiValueEncoded::new();
+            reward_tokens.push((EgldOrEsdtTokenIdentifier::egld(), 0).into());
+            sc.claim_rewards(reward_id_range_start, reward_id_range_end, reward_tokens);
         })
         .assert_ok();
 

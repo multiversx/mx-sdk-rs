@@ -1,7 +1,7 @@
 use core::iter::zip;
 
 use elrond_wasm_debug::{rust_biguint, testing_framework::BlockchainStateWrapper, DebugApi};
-use rewards_distribution::RewardsDistribution;
+use rewards_distribution::{RewardsDistribution, DIVISION_SAFETY_CONSTANT};
 
 mod utils;
 
@@ -25,31 +25,30 @@ fn test_compute_brackets() {
     wrapper
         .execute_tx(&owner, &rewards_distribution_sc, &rust_biguint!(0), |sc| {
             let brackets = utils::to_brackets(&[
-                (0_010, 2_000),
-                (0_090, 6_000),
-                (0_400, 7_000),
+                (10, 2_000),
+                (90, 6_000),
+                (400, 7_000),
                 (2_500, 10_000),
                 (25_000, 35_000),
                 (72_000, 40_000),
             ]);
 
-            let computed_brackets = sc.compute_brackets(brackets, 10_000, 2_070_00000u64.into());
+            let computed_brackets = sc.compute_brackets(brackets, 10_000);
 
             let expected_values = vec![
-                (1, 41_40000),
-                (10, 13_80000),
-                (50, 3_62250),
-                (300, 0_82800),
-                (2800, 0_28980),
-                (10000, 0_11500),
+                (1, 2_000 * DIVISION_SAFETY_CONSTANT),
+                (10, 6_000 * DIVISION_SAFETY_CONSTANT / (10 - 1)),
+                (50, 7_000 * DIVISION_SAFETY_CONSTANT / (50 - 10)),
+                (300, 10_000 * DIVISION_SAFETY_CONSTANT / (300 - 50)),
+                (2_800, 35_000 * DIVISION_SAFETY_CONSTANT / (2_800 - 300)),
+                (10_000, 40_000 * DIVISION_SAFETY_CONSTANT / (10_000 - 2_800)),
             ];
 
             assert_eq!(computed_brackets.len(), expected_values.len());
             for (computed, expected) in zip(computed_brackets.iter(), expected_values) {
-                let (expected_end_index, expected_reward) = expected;
-                let reward = computed.reward.to_u64().unwrap();
+                let (expected_end_index, expected_reward_percent) = expected;
                 assert_eq!(computed.end_index, expected_end_index);
-                assert_eq!(reward, expected_reward);
+                assert_eq!(computed.nft_reward_percent, expected_reward_percent);
             }
         })
         .assert_ok();

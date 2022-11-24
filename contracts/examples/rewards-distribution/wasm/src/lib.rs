@@ -8,13 +8,17 @@ elrond_wasm_node::wasm_endpoints! {
     rewards_distribution
     (
         claimRewards
+        computeClaimableAmount
         depositRoyalties
         getBrackets
+        getCompletedRaffleIdCount
         getLastRaffleEpoch
+        getNftRewardPercent
         getNftTokenIdentifier
-        getRewards
+        getRaffleId
         getRoyalties
         getSeedNftMinterAddress
+        getWasClaimed
         raffle
     )
 }

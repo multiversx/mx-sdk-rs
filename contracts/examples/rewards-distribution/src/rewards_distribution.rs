@@ -10,21 +10,23 @@ type Epoch = u64;
 
 pub const EPOCHS_IN_WEEK: Epoch = 7;
 pub const MAX_PERCENTAGE: u64 = 100_000; // 100%
+pub const DIVISION_SAFETY_CONSTANT: u64 = 1_000_000_000_000;
 
 #[derive(ManagedVecItem, NestedEncode, NestedDecode, TypeAbi)]
 pub struct Bracket {
     pub index_percent: u64,
-    pub reward_percent: u64,
+    pub bracket_reward_percent: u64,
 }
 
 #[derive(ManagedVecItem, NestedEncode, NestedDecode, TypeAbi)]
 pub struct ComputedBracket<M: ManagedTypeApi> {
     pub end_index: u64,
-    pub reward: BigUint<M>,
+    pub nft_reward_percent: BigUint<M>,
 }
 
 #[derive(NestedEncode, NestedDecode)]
 pub struct RaffleProgress<M: ManagedTypeApi> {
+    pub raffle_id: u64,
     pub ticket_position: u64,
     pub ticket_count: u64,
     pub computed_brackets: ManagedVec<M, ComputedBracket<M>>,
@@ -48,11 +50,13 @@ pub trait RewardsDistribution:
         self.brackets().set(brackets);
     }
 
-    #[payable("EGLD")]
+    #[payable("*")]
     #[endpoint(depositRoyalties)]
     fn deposit_royalties(&self) {
-        let value = self.call_value().egld_value();
-        self.royalties().update(|total| *total += value);
+        let payment = self.call_value().egld_or_single_esdt();
+        let raffle_id = self.raffle_id().get();
+        self.royalties(raffle_id, &payment.token_identifier, payment.token_nonce)
+            .update(|total| *total += payment.amount);
     }
 
     #[endpoint(raffle)]
@@ -65,7 +69,6 @@ pub trait RewardsDistribution:
 
         let mut bracket = raffle.computed_brackets.get(0);
 
-        let mut total_distributed = BigUint::zero();
         let run_result = self.run_while_it_has_gas(DEFAULT_MIN_GAS_TO_SAVE_PROGRESS, || {
             let ticket = self.shuffle_and_pick_single_ticket(
                 &mut rng,
@@ -78,11 +81,8 @@ pub trait RewardsDistribution:
                 raffle.ticket_position,
             );
 
-            self.rewards(ticket).update(|balance| {
-                require!(balance.to_u64().unwrap() == 0u64, "OOF");
-                *balance += &bracket.reward
-            });
-            total_distributed += &bracket.reward;
+            self.nft_reward_percent(raffle.raffle_id, ticket)
+                .update(|nft_reward_percent| *nft_reward_percent += &bracket.nft_reward_percent);
 
             if raffle.ticket_position == raffle.ticket_count {
                 return STOP_OP;
@@ -92,12 +92,13 @@ pub trait RewardsDistribution:
 
             CONTINUE_OP
         });
-        self.royalties()
-            .update(|royalties| *royalties -= total_distributed);
 
         let raffle_progress = match run_result {
             OperationCompletionStatus::InterruptedBeforeOutOfGas => Some(raffle),
-            OperationCompletionStatus::Completed => None,
+            OperationCompletionStatus::Completed => {
+                self.completed_raffle_id_count().set(raffle.raffle_id + 1);
+                None
+            },
         };
 
         self.raffle_progress().set(raffle_progress);
@@ -112,7 +113,10 @@ pub trait RewardsDistribution:
             "Index percent total must be 100%"
         );
 
-        let reward_total: u64 = brackets.iter().map(|bracket| bracket.reward_percent).sum();
+        let reward_total: u64 = brackets
+            .iter()
+            .map(|bracket| bracket.bracket_reward_percent)
+            .sum();
         require!(
             reward_total == MAX_PERCENTAGE,
             "Reward percent total must be 100%"
@@ -165,6 +169,12 @@ pub trait RewardsDistribution:
     fn new_raffle(&self) -> RaffleProgress<Self::Api> {
         self.require_new_raffle_period();
 
+        let raffle_id = self.raffle_id().update(|raffle_id| {
+            let last_id = *raffle_id;
+            *raffle_id += 1;
+            last_id
+        });
+
         let seed_nft_minter_address = self.seed_nft_minter_address().get();
         let ticket_count: u64 = self
             .seed_nft_minter_proxy(seed_nft_minter_address)
@@ -172,12 +182,12 @@ pub trait RewardsDistribution:
             .execute_on_dest_context();
         let brackets = self.brackets().get();
 
-        let reward_amount = self.royalties().get();
-        let computed_brackets = self.compute_brackets(brackets, ticket_count, reward_amount);
+        let computed_brackets = self.compute_brackets(brackets, ticket_count);
 
         let ticket_position = 1;
 
         RaffleProgress {
+            raffle_id,
             ticket_position,
             ticket_count,
             computed_brackets,
@@ -188,7 +198,6 @@ pub trait RewardsDistribution:
         &self,
         brackets: ManagedVec<Bracket>,
         ticket_count: u64,
-        reward_amount: BigUint,
     ) -> ManagedVec<ComputedBracket<Self::Api>> {
         require!(ticket_count > 0, "No tickets");
 
@@ -199,14 +208,16 @@ pub trait RewardsDistribution:
         for bracket in &brackets {
             index_cutoff_percent += bracket.index_percent;
             let end_index = ticket_count * index_cutoff_percent / MAX_PERCENTAGE;
-            let total_reward_for_bracket =
-                reward_amount.clone() * bracket.reward_percent / MAX_PERCENTAGE;
             let count = end_index - start_index;
             start_index = end_index;
             require!(count > 0, "Invalid bracket");
-            let reward = total_reward_for_bracket / count;
+            let nft_reward_percent =
+                BigUint::from(bracket.bracket_reward_percent) * DIVISION_SAFETY_CONSTANT / count;
 
-            computed_brackets.push(ComputedBracket { end_index, reward });
+            computed_brackets.push(ComputedBracket {
+                end_index,
+                nft_reward_percent,
+            });
         }
 
         computed_brackets
@@ -226,32 +237,104 @@ pub trait RewardsDistribution:
 
     #[payable("*")]
     #[endpoint(claimRewards)]
-    fn claim_rewards(&self) {
+    fn claim_rewards(
+        &self,
+        raffle_id_range_start: u64,
+        raffle_id_range_end: u64,
+        reward_tokens: MultiValueEncoded<MultiValue2<EgldOrEsdtTokenIdentifier, u64>>,
+    ) {
         let nfts = self.call_value().all_esdt_transfers();
-        let nft_token_identifier = self.nft_token_identifier().get();
-        require!(!nfts.is_empty(), "Missing payment");
-        let mut total = BigUint::zero();
-        for nft in &nfts {
-            require!(
-                nft.token_identifier == nft_token_identifier,
-                "Invalid payment"
-            );
-            total += self.rewards(nft.token_nonce).take();
-        }
+        self.validate_nft_payments(&nfts);
+        self.validate_range(raffle_id_range_start, raffle_id_range_end);
+
         let caller = self.blockchain().get_caller();
-        if total > 0 {
-            self.send().direct_egld(&caller, &total);
+        for reward_token_pair in reward_tokens.into_iter() {
+            let (reward_token_id, reward_token_nonce) = reward_token_pair.into_tuple();
+            let mut total = BigUint::zero();
+
+            for raffle_id in raffle_id_range_start..=raffle_id_range_end {
+                for nft in &nfts {
+                    if self.was_claimed(raffle_id, nft.token_nonce).replace(true) {
+                        continue;
+                    }
+                    total += self.compute_claimable_amount(
+                        raffle_id,
+                        &reward_token_id,
+                        reward_token_nonce,
+                        nft.token_nonce,
+                    )
+                }
+            }
+            if total > 0 {
+                self.send()
+                    .direct(&caller, &reward_token_id, reward_token_nonce, &total);
+            }
         }
         self.send().direct_multi(&caller, &nfts);
     }
 
+    #[view(computeClaimableAmount)]
+    fn compute_claimable_amount(
+        &self,
+        raffle_id: u64,
+        reward_token_id: &EgldOrEsdtTokenIdentifier,
+        reward_token_nonce: u64,
+        nft_nonce: u64,
+    ) -> BigUint {
+        let nft_reward_percent = self.nft_reward_percent(raffle_id, nft_nonce).get();
+        let royalties = self
+            .royalties(raffle_id, reward_token_id, reward_token_nonce)
+            .get();
+        royalties * nft_reward_percent / MAX_PERCENTAGE / DIVISION_SAFETY_CONSTANT
+    }
+
+    fn validate_nft_payments(&self, nfts: &ManagedVec<EsdtTokenPayment>) {
+        let nft_token_identifier = self.nft_token_identifier().get();
+        require!(!nfts.is_empty(), "Missing payment");
+        for nft in nfts {
+            require!(
+                nft.token_identifier == nft_token_identifier,
+                "Invalid payment"
+            );
+        }
+    }
+
+    fn validate_range(&self, raffle_id_range_start: u64, raffle_id_range_end: u64) {
+        require!(
+            raffle_id_range_start <= raffle_id_range_end,
+            "Invalid range"
+        );
+        let completed_raffle_id_count = self.completed_raffle_id_count().get();
+        require!(
+            raffle_id_range_end < completed_raffle_id_count,
+            "Invalid raffle id end"
+        );
+    }
+
+    #[view(getRaffleId)]
+    #[storage_mapper("raffleId")]
+    fn raffle_id(&self) -> SingleValueMapper<u64>;
+
+    #[view(getCompletedRaffleIdCount)]
+    #[storage_mapper("completedRaffleIdCount")]
+    fn completed_raffle_id_count(&self) -> SingleValueMapper<u64>;
+
     #[view(getRoyalties)]
     #[storage_mapper("royalties")]
-    fn royalties(&self) -> SingleValueMapper<BigUint>;
+    fn royalties(
+        &self,
+        raffle_id: u64,
+        reward_token_id: &EgldOrEsdtTokenIdentifier,
+        reward_nonce: u64,
+    ) -> SingleValueMapper<BigUint>;
 
-    #[view(getRewards)]
-    #[storage_mapper("rewards")]
-    fn rewards(&self, nft_nonce: u64) -> SingleValueMapper<BigUint>;
+    #[view(getNftRewardPercent)]
+    #[storage_mapper("nftRewardPercent")]
+    fn nft_reward_percent(&self, raffle_id: u64, nft_nonce: u64) -> SingleValueMapper<BigUint>;
+
+    #[view(getWasClaimed)]
+    #[storage_mapper("wasClaimed")]
+    fn was_claimed(&self, raffle_id: u64, nft_nonce: u64) -> SingleValueMapper<bool>;
 
     #[view(getSeedNftMinterAddress)]
     #[storage_mapper("seedNftMinterAddress")]
