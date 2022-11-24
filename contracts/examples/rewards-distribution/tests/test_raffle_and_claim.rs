@@ -186,7 +186,9 @@ fn test_raffle_and_claim() {
 
             // check that the flags which mark claimed rewards were set
             for nonce in nft_nonces {
-                let was_claimed = sc.was_claimed(raffle_id, nonce).get();
+                let was_claimed = sc
+                    .was_claimed(raffle_id, &EgldOrEsdtTokenIdentifier::egld(), 0, nonce)
+                    .get();
                 assert!(was_claimed);
             }
         })
