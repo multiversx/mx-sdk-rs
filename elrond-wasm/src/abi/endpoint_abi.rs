@@ -62,8 +62,11 @@ impl EndpointAbi {
             .extend_from_slice(T::output_abis(output_names).as_slice());
     }
 
-    pub fn generate_with_name_and_labels(&self, name: &'static str, labels: &'static [&'static str]) -> Self {
-        EndpointAbi{
+    pub fn generate_with_name_and_labels(
+        name: &'static str,
+        labels: &'static [&'static str],
+    ) -> Self {
+        EndpointAbi {
             name,
             labels,
             ..Default::default()

@@ -26,6 +26,18 @@ impl OutputContractConfig {
     pub fn secondary_contracts(&self) -> impl Iterator<Item = &OutputContract> {
         self.contracts.iter().filter(move |contract| !contract.main)
     }
+
+    pub fn get_contract_with_config_name(&self, name: String) -> Option<&OutputContract>{
+        self.contracts
+        .iter()
+        .find(|contract| contract.config_name == name)
+    }
+
+    pub fn get_contract_with_public_name(&self, name: String) -> Option<&OutputContract>{
+        self.contracts
+        .iter()
+        .find(|contract| contract.config_name == name)
+    }
 }
 
 /// Represents a contract created by the framework when building.
