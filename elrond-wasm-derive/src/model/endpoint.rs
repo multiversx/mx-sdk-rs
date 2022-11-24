@@ -1,4 +1,4 @@
-use super::{EndpointMutabilityMetadata, MethodPayableMetadata, EndpointLocationMetadata};
+use super::{EndpointLocationMetadata, EndpointMutabilityMetadata, MethodPayableMetadata};
 
 #[derive(Clone, Debug)]
 pub struct InitMetadata {
