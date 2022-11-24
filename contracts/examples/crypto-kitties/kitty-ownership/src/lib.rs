@@ -394,7 +394,7 @@ pub trait KittyOwnership {
 
         total_kitties += 1;
         self.total_kitties().set(total_kitties);
-        self.kitty_by_id(new_kitty_id).set(&kitty);
+        self.kitty_by_id(new_kitty_id).set(kitty);
 
         self.perform_transfer(&ManagedAddress::zero(), owner, new_kitty_id);
 
