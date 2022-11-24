@@ -36,7 +36,9 @@ pub fn generate_endpoints_mod(
             where
                 A: elrond_wasm::api::VMApi ,
             {
-                super::contract_obj::<A>().callback();
+                super::EndpointWrappers::callback(
+                    &elrond_wasm::contract_base::UniversalContractObj::<A>::new(),
+                );
             }
         }
     } else {
