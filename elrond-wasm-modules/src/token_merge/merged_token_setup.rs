@@ -1,7 +1,5 @@
 elrond_wasm::imports!();
 
-use elrond_wasm::elrond_codec::TopEncode;
-
 use super::{
     custom_merged_token_attributes::MergedTokenAttributesCreator,
     merged_token_instances::{MergedTokenInstances, MAX_MERGED_TOKENS},
