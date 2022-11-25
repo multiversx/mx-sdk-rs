@@ -1,38 +1,5 @@
 use elrond_wasm_debug::*;
 
-// TODO: move to abi-tester
-#[test]
-fn check_multi_contract_config() {
-    let mut blockchain = BlockchainMock::new();
-    blockchain.set_current_dir_from_workspace("contracts/examples/multisig");
-
-    let multi_contract_config =
-        elrond_wasm_debug::meta::multi_contract_config::<multisig::AbiProvider>(
-            blockchain
-                .current_dir
-                .join("multicontract.toml")
-                .to_str()
-                .unwrap(),
-        );
-
-    let view_endpoints = multi_contract_config
-        .find_contract("multisig-view")
-        .endpoint_names();
-    assert_eq!(
-        view_endpoints,
-        vec![
-            "getActionData",
-            "getActionSignerCount",
-            "getActionSigners",
-            "getActionValidSignerCount",
-            "getAllBoardMembers",
-            "getAllProposers",
-            "getPendingActionFullInfo",
-            "userRole"
-        ]
-    );
-}
-
 fn world() -> BlockchainMock {
     let mut blockchain = BlockchainMock::new();
     blockchain.set_current_dir_from_workspace("contracts/examples/multisig");
