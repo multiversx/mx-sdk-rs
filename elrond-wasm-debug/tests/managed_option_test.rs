@@ -16,7 +16,7 @@ where
 {
     assert!(ManagedOption::some(f()).is_some());
     assert_eq!(ManagedOption::some(f()), ManagedOption::some(f()));
-    assert_eq!(ManagedOption::some(f()).clone(), ManagedOption::some(f()));
+    assert_eq!(ManagedOption::some(f()), ManagedOption::some(f()));
     assert_eq!(ManagedOption::from(Some(f())), ManagedOption::some(f()));
     assert_eq!(ManagedOption::some(f()).into_option(), Some(f()));
     assert_ne!(ManagedOption::some(f()), ManagedOption::<M, T>::none());
@@ -29,10 +29,7 @@ where
 {
     assert!(ManagedOption::<M, T>::none().is_none());
     assert_eq!(ManagedOption::<M, T>::none(), ManagedOption::<M, T>::none());
-    assert_eq!(
-        ManagedOption::<M, T>::none().clone(),
-        ManagedOption::<M, T>::none()
-    );
+    assert_eq!(ManagedOption::<M, T>::none(), ManagedOption::<M, T>::none());
     assert_eq!(ManagedOption::from(None), ManagedOption::<M, T>::none());
     assert_eq!(ManagedOption::<M, T>::none().into_option(), None);
 }
@@ -67,11 +64,11 @@ fn test_unwrap() {
 
     assert_eq!(
         ManagedOption::some(BigUint::<DebugApi>::from(1u32))
-            .unwrap_or_else(|| BigUint::<DebugApi>::zero()),
+            .unwrap_or_else(BigUint::<DebugApi>::zero),
         BigUint::<DebugApi>::from(1u32)
     );
     assert_eq!(
-        ManagedOption::none().unwrap_or_else(|| BigUint::<DebugApi>::zero()),
+        ManagedOption::none().unwrap_or_else(BigUint::<DebugApi>::zero),
         BigUint::<DebugApi>::zero()
     );
 }
@@ -82,11 +79,11 @@ fn test_map() {
 
     // example BigInt -> BigUint
     assert_eq!(
-        ManagedOption::some(BigUint::<DebugApi>::from(1u32)).map(|x| BigInt::<DebugApi>::from(x)),
+        ManagedOption::some(BigUint::<DebugApi>::from(1u32)).map(BigInt::<DebugApi>::from),
         ManagedOption::some(BigInt::<DebugApi>::from(1i32))
     );
     assert_eq!(
-        ManagedOption::none().map(|x: BigUint<DebugApi>| BigInt::<DebugApi>::from(x)),
+        ManagedOption::<DebugApi, BigUint::<DebugApi>>::none().map(BigInt::<DebugApi>::from),
         ManagedOption::none()
     );
 

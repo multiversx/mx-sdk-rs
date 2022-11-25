@@ -23,6 +23,7 @@ pub struct ManagedStructWithToken<M: ManagedTypeApi> {
 }
 
 #[test]
+#[allow(clippy::assertions_on_constants)]
 fn struct_with_numbers_static() {
     assert_eq!(
         <ManagedStructWithToken<DebugApi> as elrond_wasm::types::ManagedVecItem>::PAYLOAD_SIZE,
