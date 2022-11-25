@@ -3,11 +3,11 @@ mod attr_names;
 mod doc_attr;
 mod endpoint_attr;
 mod event_attr;
+mod label_attr;
 mod payable_attr;
 mod storage_attr;
 mod trait_argument_prop;
 mod trait_prop_names;
-mod label_attr;
 mod util;
 
 pub use argument_attr::*;

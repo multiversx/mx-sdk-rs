@@ -1,16 +1,15 @@
-
-use std::collections::HashMap;
 use serde::Deserialize;
+use std::collections::HashMap;
 
 #[derive(Deserialize, Debug)]
-pub struct MultiContract{
+pub struct MultiContract {
     pub settings: MultiContractGeneralSettings,
     pub contracts: HashMap<String, MultiContractInstance>,
     pub labels: HashMap<String, MultiContractTargetLabel>,
 }
 
 #[derive(Deserialize, Debug)]
-pub struct MultiContractInstance{
+pub struct MultiContractInstance {
     pub external_view: Option<bool>,
     pub wasm_name: Option<String>,
 }
@@ -19,7 +18,6 @@ pub struct MultiContractInstance{
 pub struct MultiContractTargetLabel(pub Vec<String>);
 
 #[derive(Deserialize, Debug)]
-pub struct MultiContractGeneralSettings{
+pub struct MultiContractGeneralSettings {
     pub default: String,
 }
-

@@ -111,6 +111,63 @@
             ]
         },
         {
+            "name": "mergeTokens",
+            "mutability": "mutable",
+            "payableInTokens": [
+                "*"
+            ],
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "EsdtTokenPayment"
+                }
+            ]
+        },
+        {
+            "name": "mergeTokensCustomAttributes",
+            "mutability": "mutable",
+            "payableInTokens": [
+                "*"
+            ],
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "EsdtTokenPayment"
+                }
+            ]
+        },
+        {
+            "name": "splitTokens",
+            "mutability": "mutable",
+            "payableInTokens": [
+                "*"
+            ],
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "List<EsdtTokenPayment>"
+                }
+            ]
+        },
+        {
+            "name": "splitTokenPartial",
+            "mutability": "mutable",
+            "payableInTokens": [
+                "*"
+            ],
+            "inputs": [
+                {
+                    "name": "tokens_to_remove",
+                    "type": "List<EsdtTokenPayment>"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "List<EsdtTokenPayment>"
+                }
+            ]
+        },
+        {
             "name": "claimDeveloperRewards",
             "mutability": "mutable",
             "inputs": [
@@ -643,53 +700,6 @@
                 }
             ],
             "outputs": []
-        },
-        {
-            "name": "mergeTokens",
-            "mutability": "mutable",
-            "payableInTokens": [
-                "*"
-            ],
-            "inputs": [],
-            "outputs": [
-                {
-                    "type": "EsdtTokenPayment"
-                }
-            ]
-        },
-        {
-            "name": "splitTokens",
-            "mutability": "mutable",
-            "payableInTokens": [
-                "*"
-            ],
-            "inputs": [],
-            "outputs": [
-                {
-                    "type": "variadic<EsdtTokenPayment>",
-                    "multi_result": true
-                }
-            ]
-        },
-        {
-            "name": "splitTokenPartial",
-            "mutability": "mutable",
-            "payableInTokens": [
-                "*"
-            ],
-            "inputs": [
-                {
-                    "name": "tokens_to_remove",
-                    "type": "variadic<EsdtTokenPayment>",
-                    "multi_arg": true
-                }
-            ],
-            "outputs": [
-                {
-                    "type": "variadic<EsdtTokenPayment>",
-                    "multi_result": true
-                }
-            ]
         },
         {
             "name": "getMergedTokenId",

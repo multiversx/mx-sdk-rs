@@ -21,7 +21,7 @@ fn parse_execute_mandos_steps(steps_path: &Path, state: &mut BlockchainMock) {
         match step {
             Step::ExternalSteps(external_steps_step) => {
                 let parent_path = steps_path.parent().unwrap();
-                let new_path = parent_path.join(&external_steps_step.path);
+                let new_path = parent_path.join(external_steps_step.path);
                 parse_execute_mandos_steps(new_path.as_path(), state);
             },
             Step::SetState(set_state_step) => {

@@ -49,6 +49,7 @@ elrond_wasm_node::wasm_endpoints! {
         issueMergedToken
         issueToken
         mergeTokens
+        mergeTokensCustomAttributes
         only_admin_mod_endpoint
         only_owner_mod_endpoint
         pause
