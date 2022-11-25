@@ -21,5 +21,5 @@ fn tuple_struct_derive_test() {
 	];
 
     check_top_encode_decode(s.clone(), bytes);
-    check_dep_encode_decode(s.clone(), bytes);
+    check_dep_encode_decode(s, bytes);
 }

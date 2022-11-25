@@ -61,8 +61,8 @@ mod module_1 {
         }
 
         fn call_some_async(&self) {
-            let result = self.some_async();
-            elrond_wasm::io::finish_multi::<Self::Api, _>(&result)
+            self.some_async();
+            elrond_wasm::io::finish_multi::<Self::Api, _>(&())
         }
 
         fn call(&self, fn_name: &[u8]) -> bool {
@@ -101,12 +101,11 @@ mod module_1 {
     pub trait ProxyTrait: elrond_wasm::contract_base::ProxyObjBase + Sized {
         fn version(&mut self) -> ContractCall<Self::Api, BigInt<Self::Api>> {
             let ___address___ = self.extract_address();
-            let mut ___contract_call___ = elrond_wasm::types::new_contract_call(
+            elrond_wasm::types::new_contract_call(
                 ___address___,
                 &b"version"[..],
                 ManagedVec::<Self::Api, EsdtTokenPayment<Self::Api>>::new(),
-            );
-            ___contract_call___
+            )
         }
     }
 }
@@ -240,12 +239,11 @@ mod sample_adder {
     {
         fn get_sum(&mut self) -> elrond_wasm::types::ContractCall<Self::Api, BigInt<Self::Api>> {
             let ___address___ = self.extract_address();
-            let mut ___contract_call___ = elrond_wasm::types::new_contract_call(
+            elrond_wasm::types::new_contract_call(
                 ___address___,
                 &b"get_sum"[..],
                 ManagedVec::<Self::Api, EsdtTokenPayment<Self::Api>>::new(),
-            );
-            ___contract_call___
+            )
         }
         fn add(&mut self, amount: &BigInt<Self::Api>) -> ContractCall<Self::Api, ()> {
             let ___address___ = self.extract_address();
