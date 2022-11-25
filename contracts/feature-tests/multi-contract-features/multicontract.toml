@@ -5,7 +5,7 @@ main = "main"
 name = "multi-contract-features"
 add-unlabelled = true
 
-[contracts.view]
-name = "multi-contract-features-view"
+[contracts.multi-contract-features-view]
+# name is optional, if missing this ^^^ id will be used
 external-view = true
 add-labels = ["mcs-external-view"]

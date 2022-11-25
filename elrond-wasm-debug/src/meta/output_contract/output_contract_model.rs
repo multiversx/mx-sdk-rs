@@ -39,6 +39,7 @@ impl OutputContractConfig {
             .find(|contract| contract.config_name == name)
     }
 
+    /// Yields the contract with the given public name.
     pub fn find_contract(&self, contract_name: &str) -> &OutputContract {
         self.contracts
             .iter()
