@@ -1,0 +1,11 @@
+[settings]
+main = "main"
+
+[contracts.main]
+name = "multi-contract-features"
+add-unlabelled = true
+
+[contracts.view]
+name = "multi-contract-features-view"
+external-view = true
+add-labels = ["mcs-external-view"]

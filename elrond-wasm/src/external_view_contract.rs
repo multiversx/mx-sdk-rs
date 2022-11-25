@@ -42,7 +42,7 @@ pub fn external_view_contract_constructor_abi() -> EndpointAbi {
         payable_in_tokens: &[],
         inputs: [InputAbi{
             arg_name: "target_contract_address",
-            type_name: crate::types::Address::type_name(),
+            type_name: crate::types::heap::Address::type_name(),
             multi_arg: false,
         }].to_vec(),
         outputs: OutputAbis::new(),

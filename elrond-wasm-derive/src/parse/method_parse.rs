@@ -131,7 +131,7 @@ fn process_attribute_second_pass(
 
 fn validate_method(method: &Method) {
     assert!(
-        !matches!(
+        matches!(
             method.public_role,
             PublicRole::Init(_) | PublicRole::Endpoint(_)
         ) || method.label_names.is_empty(),
