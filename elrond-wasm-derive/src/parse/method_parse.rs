@@ -65,6 +65,8 @@ pub fn process_method(m: &syn::TraitItemMethod, trait_attributes: &TraitProperti
         &mut method,
     );
 
+    validate_method(&method);
+
     method
 }
 
@@ -125,4 +127,15 @@ fn process_attribute_second_pass(
         || process_storage_clear_attribute(attr, method)
         || process_output_names_attribute(attr, method)
         || process_label_names_attribute(attr, method)
+}
+
+fn validate_method(method: &Method) {
+    assert!(
+        !matches!(
+            method.public_role,
+            PublicRole::Init(_) | PublicRole::Endpoint(_)
+        ) || method.label_names.is_empty(),
+        "Labels can only be placed on endpoints and constructors. Method '{}' is neither.",
+        &method.name.to_string()
+    )
 }
