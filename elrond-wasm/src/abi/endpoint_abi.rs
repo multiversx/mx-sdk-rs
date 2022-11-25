@@ -26,13 +26,6 @@ pub enum EndpointMutabilityAbi {
     Pure,
 }
 
-#[derive(Clone, PartialEq, Default, Eq, Debug)]
-pub enum EndpointLocationAbi {
-    #[default]
-    MainContract,
-    ViewContract,
-}
-
 #[derive(Clone, Default, Debug)]
 pub struct EndpointAbi {
     pub docs: &'static [&'static str],
