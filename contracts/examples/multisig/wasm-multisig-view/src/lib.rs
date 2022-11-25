@@ -11,14 +11,14 @@
 elrond_wasm_node::external_view_wasm_endpoints! {
     multisig
     (
-        getActionData
-        getActionSignerCount
-        getActionSigners
-        getActionValidSignerCount
-        getAllBoardMembers
-        getAllProposers
         getPendingActionFullInfo
         userRole
+        getAllBoardMembers
+        getAllProposers
+        getActionData
+        getActionSigners
+        getActionSignerCount
+        getActionValidSignerCount
     )
 }
 
