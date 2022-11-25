@@ -42,7 +42,6 @@ pub struct EndpointAbi {
     pub only_admin: bool,
     pub labels: &'static [&'static str],
     pub mutability: EndpointMutabilityAbi,
-    pub location: EndpointLocationAbi,
     pub payable_in_tokens: &'static [&'static str],
     pub inputs: Vec<InputAbi>,
     pub outputs: OutputAbis,

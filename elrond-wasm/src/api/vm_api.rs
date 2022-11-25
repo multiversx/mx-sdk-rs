@@ -1,5 +1,3 @@
-use crate::abi::EndpointLocationAbi;
-
 use super::{
     BlockchainApi, CallTypeApi, CallValueApi, CryptoApi, EndpointArgumentApi, EndpointFinishApi,
     ErrorApi, LogApi, ManagedTypeApi, PrintApi, SendApi, StorageMapperApi, StorageReadApi,
@@ -25,10 +23,14 @@ pub trait VMApi:
     + PartialEq // for helping derive PartialEq for managed types
     + Eq
 {
-    fn has_location(location: EndpointLocationAbi) -> bool {
-        location == EndpointLocationAbi::MainContract
+    /// Slightly hacky way of overriding the constructor for external view contracts.
+    /// 
+    /// Only required for the tests, in production the meta crate makes sure to replace it.
+    /// 
+    /// TODO: find a more robust and maybe extendable solution.
+    fn external_view_init_override() -> bool {
+        false
     }
-
     fn init_static() {
         Self::storage_read_api_impl().storage_read_api_init();
     }

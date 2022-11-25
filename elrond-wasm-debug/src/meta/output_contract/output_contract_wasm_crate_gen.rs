@@ -45,17 +45,6 @@ fn write_wasm_empty_callback_macro(wasm_lib_file: &mut File) {
 }
 
 impl OutputContract {
-    fn endpoint_names(&self) -> Vec<String> {
-        let mut endpoint_names: Vec<String> = self
-            .abi
-            .endpoints
-            .iter()
-            .map(|endpoint| endpoint.name.to_string())
-            .collect();
-        endpoint_names.sort();
-        endpoint_names
-    }
-
     fn write_wasm_src_lib_contents(&self, wasm_lib_file: &mut File) {
         let endpoint_names = self.endpoint_names();
         wasm_lib_file

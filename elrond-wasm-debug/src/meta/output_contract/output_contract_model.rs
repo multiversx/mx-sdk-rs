@@ -27,16 +27,23 @@ impl OutputContractConfig {
         self.contracts.iter().filter(move |contract| !contract.main)
     }
 
-    pub fn get_contract_with_config_name(&self, name: String) -> Option<&OutputContract>{
+    pub fn get_contract_with_config_name(&self, name: String) -> Option<&OutputContract> {
         self.contracts
-        .iter()
-        .find(|contract| contract.config_name == name)
+            .iter()
+            .find(|contract| contract.config_name == name)
     }
 
-    pub fn get_contract_with_public_name(&self, name: String) -> Option<&OutputContract>{
+    pub fn get_contract_with_public_name(&self, name: String) -> Option<&OutputContract> {
         self.contracts
-        .iter()
-        .find(|contract| contract.config_name == name)
+            .iter()
+            .find(|contract| contract.config_name == name)
+    }
+
+    pub fn find_contract(&self, contract_name: &str) -> &OutputContract {
+        self.contracts
+            .iter()
+            .find(|contract| contract.public_name == contract_name)
+            .unwrap_or_else(|| panic!("output contract {} not found", contract_name))
     }
 }
 
@@ -106,5 +113,13 @@ impl OutputContract {
 
     pub fn wasm_output_name(&self) -> String {
         format!("{}.wasm", &self.public_name)
+    }
+
+    pub fn endpoint_names(&self) -> Vec<String> {
+        self.abi
+            .endpoints
+            .iter()
+            .map(|endpoint| endpoint.name.to_string())
+            .collect()
     }
 }

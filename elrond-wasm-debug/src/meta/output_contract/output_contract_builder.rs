@@ -196,14 +196,19 @@ impl OutputContractConfig {
         }
     }
 
-    pub fn load_from_file_or_default<P: AsRef<Path>>(path: P, original_abi: &ContractAbi) -> Self {
+    pub fn load_from_file<P: AsRef<Path>>(path: P, original_abi: &ContractAbi) -> Option<Self> {
         match fs::read_to_string(path.as_ref()) {
             Ok(s) => {
                 let config_serde: MultiContractConfigSerde = toml::from_str(s.as_str())
                     .unwrap_or_else(|error| panic!("error parsing multicontract.toml: {}", error));
-                Self::load_from_config(&config_serde, original_abi)
+                Some(Self::load_from_config(&config_serde, original_abi))
             },
-            Err(_) => Self::default_config(original_abi),
+            Err(_) => None,
         }
+    }
+
+    pub fn load_from_file_or_default<P: AsRef<Path>>(path: P, original_abi: &ContractAbi) -> Self {
+        Self::load_from_file(path, original_abi)
+            .unwrap_or_else(|| Self::default_config(original_abi))
     }
 }
