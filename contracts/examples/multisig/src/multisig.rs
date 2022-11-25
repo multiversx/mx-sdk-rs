@@ -51,7 +51,7 @@ pub trait Multisig:
     /// - the action id
     /// - the serialized action data
     /// - (number of signers followed by) list of signer addresses.
-    #[label("additionalView")]
+    #[label("multisig-external-view")]
     #[view(getPendingActionFullInfo)]
     fn get_pending_action_full_info(&self) -> MultiValueEncoded<ActionFullInfo<Self::Api>> {
         let mut result = MultiValueEncoded::new();
@@ -86,7 +86,7 @@ pub trait Multisig:
     /// `0` = no rights,
     /// `1` = can propose, but not sign,
     /// `2` = can propose and sign.
-    #[label("additionalView")]
+    #[label("multisig-external-view")]
     #[view(userRole)]
     fn user_role(&self, user: ManagedAddress) -> UserRole {
         let user_id = self.user_mapper().get_user_id(&user);
@@ -98,14 +98,14 @@ pub trait Multisig:
     }
 
     /// Lists all users that can sign actions.
-    #[label("additionalView")]
+    #[label("multisig-external-view")]
     #[view(getAllBoardMembers)]
     fn get_all_board_members(&self) -> MultiValueEncoded<ManagedAddress> {
         self.get_all_users_with_role(UserRole::BoardMember)
     }
 
     /// Lists all proposers that are not board members.
-    #[label("additionalView")]
+    #[label("multisig-external-view")]
     #[view(getAllProposers)]
     fn get_all_proposers(&self) -> MultiValueEncoded<ManagedAddress> {
         self.get_all_users_with_role(UserRole::Proposer)
