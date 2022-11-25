@@ -7,7 +7,7 @@ use elrond_wasm_debug::{
 
 const CF_TOKEN_ID: &[u8] = b"CROWD-123456";
 const CF_DEADLINE: u64 = 7 * 24 * 60 * 60; // 1 week in seconds
-const WASM_PATH: &'static str = "output/crowdfunding-esdt.wasm";
+const WASM_PATH: &str = "output/crowdfunding-esdt.wasm";
 
 struct CrowdfundingSetup<CrowdfundingObjBuilder>
 where

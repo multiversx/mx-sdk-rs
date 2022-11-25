@@ -54,7 +54,7 @@ fn test_vec_clear_entries() {
     assert_eq!(vect.get(5), 46);
     vect.clear_entry(5);
     assert_eq!(vect.len(), 5);
-    assert_eq!(vect.item_is_empty(5), true);
+    assert!(vect.item_is_empty(5));
     assert_eq!(vect.get(5), 0);
     vect.clear_entry(2);
     vect.clear_entry(3);

@@ -56,8 +56,6 @@ fn test_top() {
     let wa = WrappedArray([1, 2, 3, 4, 5]);
     check_top_encode_decode(wa, &[1, 2, 3, 4, 5]);
 
-    let mut v: Vec<WrappedArray> = Vec::new();
-    v.push(wa);
-    v.push(WrappedArray([6, 7, 8, 9, 0]));
+    let v: Vec<WrappedArray> = vec![wa, WrappedArray([6, 7, 8, 9, 0])];
     check_top_encode_decode(v, &[1, 2, 3, 4, 5, 6, 7, 8, 9, 0]);
 }

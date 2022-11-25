@@ -27,24 +27,20 @@ fn test_serialize_multi_contract() {
 
     assert_eq!(multi_contract.settings.default, "main_identifier");
 
-    assert_eq!(
-        multi_contract
-            .contracts
-            .get("main_identifier")
-            .unwrap()
-            .wasm_name
-            .is_none(),
-        true
-    );
-    assert_eq!(
-        multi_contract
-            .contracts
-            .get("main_identifier")
-            .unwrap()
-            .external_view
-            .is_none(),
-        true
-    );
+    assert!(multi_contract
+        .contracts
+        .get("main_identifier")
+        .unwrap()
+        .wasm_name
+        .is_none());
+
+    assert!(multi_contract
+        .contracts
+        .get("main_identifier")
+        .unwrap()
+        .external_view
+        .is_none());
+
     assert_eq!(
         multi_contract
             .contracts
@@ -55,15 +51,13 @@ fn test_serialize_multi_contract() {
             .unwrap(),
         "c1-name.wasm"
     );
-    assert_eq!(
-        multi_contract
-            .contracts
-            .get("c1")
-            .unwrap()
-            .external_view
-            .unwrap(),
-        true
-    );
+
+    assert!(multi_contract
+        .contracts
+        .get("c1")
+        .unwrap()
+        .external_view
+        .unwrap(),);
 
     assert_eq!(
         multi_contract.labels.get("default").unwrap().0,
