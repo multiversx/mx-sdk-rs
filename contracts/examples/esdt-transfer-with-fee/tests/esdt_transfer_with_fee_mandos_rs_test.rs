@@ -4,7 +4,7 @@ fn world() -> BlockchainMock {
     let mut blockchain = BlockchainMock::new();
     blockchain.set_current_dir_from_workspace("contracts/examples/esdt-transfer-with-fee");
 
-    blockchain.register_contract_builder(
+    blockchain.register_contract(
         "file:output/esdt-transfer-with-fee.wasm",
         esdt_transfer_with_fee::ContractBuilder,
     );

@@ -4,8 +4,7 @@ fn world() -> BlockchainMock {
     let mut blockchain = BlockchainMock::new();
     blockchain.set_current_dir_from_workspace("contracts/benchmarks/mappers/vec-repeat");
 
-    blockchain
-        .register_contract_builder("file:output/vec-repeat.wasm", vec_repeat::ContractBuilder);
+    blockchain.register_contract("file:output/vec-repeat.wasm", vec_repeat::ContractBuilder);
     blockchain
 }
 

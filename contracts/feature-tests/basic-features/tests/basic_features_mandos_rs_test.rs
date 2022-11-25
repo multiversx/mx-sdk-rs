@@ -4,11 +4,11 @@ fn world() -> BlockchainMock {
     let mut blockchain = BlockchainMock::new();
     blockchain.set_current_dir_from_workspace("contracts/feature-tests/basic-features");
 
-    blockchain.register_contract_builder(
+    blockchain.register_contract(
         "file:output/basic-features.wasm",
         basic_features::ContractBuilder,
     );
-    blockchain.register_contract_builder(
+    blockchain.register_contract(
         "file:../esdt-system-sc-mock/output/esdt-system-sc-mock.wasm",
         esdt_system_sc_mock::ContractBuilder,
     );
