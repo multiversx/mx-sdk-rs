@@ -28,7 +28,6 @@ impl ContractMap {
         _debug_api: DebugApi,
     ) -> &ContractContainer {
         if let Some(contract_contatiner) = self.contract_objs.get(contract_identifier) {
-            // contract_contatiner.callable.clone_obj()
             contract_contatiner
         } else {
             unknown_contract_panic(contract_identifier)

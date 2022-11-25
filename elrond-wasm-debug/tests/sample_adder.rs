@@ -295,15 +295,6 @@ mod sample_adder {
                 fn_name,
             )
         }
-
-        fn clone_obj(
-            &self,
-        ) -> elrond_wasm::types::heap::Box<dyn elrond_wasm::contract_base::CallableContract>
-        {
-            elrond_wasm::types::heap::Box::new(ContractObj::<A> {
-                _phantom: core::marker::PhantomData,
-            })
-        }
     }
 
     pub struct ContractBuilder;
