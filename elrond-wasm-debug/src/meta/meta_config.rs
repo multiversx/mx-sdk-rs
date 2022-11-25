@@ -117,9 +117,9 @@ impl MetaConfig {
                 let dir_name = file_name.to_str().expect("error processing dir name");
                 if !self.is_expected_crate(dir_name) {
                     println!("Removing crate {}", dir_name);
-                    fs::remove_dir_all(path.path()).expect(
-                        format!("failed to remove unexpected directory {}", dir_name).as_str(),
-                    );
+                    fs::remove_dir_all(path.path()).unwrap_or_else(|_| {
+                        panic!("failed to remove unexpected directory {}", dir_name)
+                    });
                 }
             }
         }

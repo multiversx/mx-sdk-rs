@@ -168,7 +168,7 @@ fn build_contract(builder: OutputContractBuilder, original_abi: &ContractAbi) ->
 }
 
 fn set_main_contract_flag(
-    contracts: &mut Vec<OutputContract>,
+    contracts: &mut [OutputContract],
     default_contract_config_name_opt: &Option<String>,
 ) {
     if let Some(default_contract_config_name) = default_contract_config_name_opt {

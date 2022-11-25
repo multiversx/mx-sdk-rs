@@ -81,7 +81,7 @@ impl OutputContract {
     /// Note this does not necessarily have to match the wasm crate name defined in Cargo.toml.
     pub fn wasm_crate_dir_name(&self) -> String {
         if self.main {
-            return "wasm".to_string();
+            "wasm".to_string()
         } else {
             format!("wasm-{}", &self.public_name)
         }

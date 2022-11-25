@@ -24,11 +24,11 @@ impl MetaConfig {
             .main_contract()
             .public_name_snake_case();
         let wasm_output_file_path_expr = format!("\"file:../output/{}.wasm\"", name);
-        let file = create_snippets_crate_and_get_lib_file(&self.snippets_dir, &name, overwrite);
+        let file = create_snippets_crate_and_get_lib_file(&self.snippets_dir, name, overwrite);
         write_snippets_to_file(
             file,
             &self.original_contract_abi,
-            &name,
+            name,
             &wasm_output_file_path_expr,
         );
     }
