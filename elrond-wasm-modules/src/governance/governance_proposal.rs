@@ -9,7 +9,7 @@ pub type GovernanceActionAsMultiArg<M> =
 
 #[derive(TypeAbi, TopEncode, TopDecode)]
 pub enum VoteType {
-    Upvote,
+    UpVote,
     DownVote,
     DownVetoVote,
     AbstainVote,
@@ -88,5 +88,25 @@ impl<M: ManagedTypeApi> ProposalVotes<M> {
             down_veto_votes: BigUint::zero(),
             abstain_votes: BigUint::zero(),
         }
+    }
+
+    pub fn get_total_votes(&self) -> BigUint<M> {
+        &self.up_votes + &self.down_votes + &self.down_veto_votes + &self.abstain_votes
+    }
+    pub fn get_up_votes_percentage(&self) -> BigUint<M> {
+        let total_votes = self.get_total_votes();
+        &self.up_votes / &total_votes
+    }
+    pub fn get_down_votes_percentage(&self) -> BigUint<M> {
+        let total_votes = self.get_total_votes();
+        &self.down_votes / &total_votes
+    }
+    pub fn get_down_veto_votes_percentage(&self) -> BigUint<M> {
+        let total_votes = self.get_total_votes();
+        &self.down_veto_votes / &total_votes
+    }
+    pub fn get_abstain_votes_percentage(&self) -> BigUint<M> {
+        let total_votes = self.get_total_votes();
+        &self.abstain_votes / &total_votes
     }
 }
