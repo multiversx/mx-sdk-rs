@@ -368,6 +368,7 @@ pub trait GovernanceModule:
         let third_total_votes = &total_votes / 3u64;
         let quorum = self.quorum().get();
 
+        sc_print!("Total votes = {} quorum = {}", total_votes, quorum);
         if total_down_veto_votes > third_total_votes {
             false
         } else {

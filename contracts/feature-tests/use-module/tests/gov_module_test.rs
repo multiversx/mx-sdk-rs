@@ -361,6 +361,146 @@ fn change_gov_config_test() {
     );
 }
 
+
+
+#[test]
+fn down_veto_gov_config_test() {
+    let mut gov_setup = GovSetup::new(use_module::contract_obj);
+
+    let first_user_addr = gov_setup.first_user.clone();
+    let second_user_addr = gov_setup.second_user.clone();
+    let third_user_addr = gov_setup.third_user.clone();
+    let sc_addr = gov_setup.gov_wrapper.address_ref().clone();
+    
+    let (result, proposal_id) = gov_setup.propose(
+        &first_user_addr,
+        500,
+        &sc_addr,
+        b"changeQuorum",
+        vec![1_000u64.to_be_bytes().to_vec()],
+    );
+    result.assert_ok();
+    assert_eq!(proposal_id, 1);
+
+    gov_setup.increment_block_nonce(VOTING_DELAY_BLOCKS);
+
+    gov_setup
+        .vote(&first_user_addr, proposal_id, 300)
+        .assert_ok();
+
+    gov_setup.increment_block_nonce(VOTING_PERIOD_BLOCKS);
+
+
+    // user 1 vote again
+    gov_setup.set_block_nonce(20);
+    gov_setup
+        .vote(&second_user_addr, proposal_id, 200)
+        .assert_ok();
+
+    // user 3 vote again
+    gov_setup
+        .down_veto_vote(&third_user_addr, proposal_id, 200)
+        .assert_ok();
+
+    // Vote didn't succeed;
+    gov_setup.set_block_nonce(45);
+    gov_setup.queue(proposal_id).assert_user_error("Can only queue succeeded proposals");
+
+
+    gov_setup.b_mock.check_esdt_balance(
+        &first_user_addr,
+        GOV_TOKEN_ID,
+        &rust_biguint!(200),
+    );
+    gov_setup.b_mock.check_esdt_balance(
+        &second_user_addr,
+        GOV_TOKEN_ID,
+        &rust_biguint!(800),
+    );
+    gov_setup.b_mock.check_esdt_balance(
+        &third_user_addr,
+        GOV_TOKEN_ID,
+        &rust_biguint!(800),
+    );
+}
+
+
+
+#[test]
+fn abstain_vote_gov_config_test() {
+    let mut gov_setup = GovSetup::new(use_module::contract_obj);
+
+    let first_user_addr = gov_setup.first_user.clone();
+    let second_user_addr = gov_setup.second_user.clone();
+    let third_user_addr = gov_setup.third_user.clone();
+    let sc_addr = gov_setup.gov_wrapper.address_ref().clone();
+    
+    let (result, proposal_id) = gov_setup.propose(
+        &first_user_addr,
+        500,
+        &sc_addr,
+        b"changeQuorum",
+        vec![1_000u64.to_be_bytes().to_vec()],
+    );
+    result.assert_ok();
+    assert_eq!(proposal_id, 1);
+
+    gov_setup.increment_block_nonce(VOTING_DELAY_BLOCKS);
+
+    gov_setup
+        .vote(&first_user_addr, proposal_id, 500)
+        .assert_ok();
+
+    gov_setup.increment_block_nonce(VOTING_PERIOD_BLOCKS);
+
+
+    // user 1 vote again
+    gov_setup.set_block_nonce(20);
+    gov_setup
+        .down_vote(&second_user_addr, proposal_id, 400)
+        .assert_ok();
+
+    // user 3 vote again
+    gov_setup
+        .abstain_vote(&third_user_addr, proposal_id, 600)
+        .assert_ok();
+
+    // Vote didn't succeed;
+    gov_setup.set_block_nonce(45);
+    gov_setup.queue(proposal_id).assert_ok();
+
+    // execute ok
+    gov_setup.increment_block_nonce(LOCKING_PERIOD_BLOCKS);
+    gov_setup.execute(proposal_id).assert_ok();
+
+    // after execution, quorum changed from 1_500 to the proposed 1_000
+    gov_setup
+        .b_mock
+        .execute_query(&gov_setup.gov_wrapper, |sc| {
+            assert_eq!(sc.quorum().get(), managed_biguint!(1_000));
+            assert!(sc.proposals().item_is_empty(1));
+        })
+        .assert_ok();
+
+
+    gov_setup.b_mock.check_esdt_balance(
+        &first_user_addr,
+        GOV_TOKEN_ID,
+        &rust_biguint!(0),
+    );
+    gov_setup.b_mock.check_esdt_balance(
+        &second_user_addr,
+        GOV_TOKEN_ID,
+        &rust_biguint!(600),
+    );
+    gov_setup.b_mock.check_esdt_balance(
+        &third_user_addr,
+        GOV_TOKEN_ID,
+        &rust_biguint!(400),
+    );
+}
+
+
 #[test]
 fn gov_cancel_defeated_proposal_test() {
     let mut gov_setup = GovSetup::new(use_module::contract_obj);
