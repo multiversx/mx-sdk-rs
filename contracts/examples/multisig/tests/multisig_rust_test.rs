@@ -132,7 +132,7 @@ fn remove_proposer_test() {
             assert_eq!(user_role, UserRole::None);
 
             let proposers = sc.get_all_proposers().to_vec();
-            assert_eq!(proposers.is_empty(), true);
+            assert!(proposers.is_empty());
         })
         .assert_ok();
 }
@@ -184,7 +184,7 @@ fn change_quorum_test() {
     // add another board member
     let new_board_member_addr = ms_setup.b_mock.create_user_account(&rust_zero);
     let (second_action_id, tx_result) =
-        ms_setup.call_propose(ActionRaw::AddBoardMember(new_board_member_addr.clone()));
+        ms_setup.call_propose(ActionRaw::AddBoardMember(new_board_member_addr));
     tx_result.assert_ok();
 
     ms_setup.call_sign(second_action_id).assert_ok();

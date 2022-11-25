@@ -16,6 +16,7 @@ enum SimpleEnum {
 }
 
 #[test]
+#[allow(clippy::assertions_on_constants)]
 fn enum_static() {
     assert_eq!(
         <SimpleEnum as elrond_wasm::types::ManagedVecItem>::PAYLOAD_SIZE,
