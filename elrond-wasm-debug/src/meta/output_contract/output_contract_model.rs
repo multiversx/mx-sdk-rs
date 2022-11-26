@@ -1,5 +1,7 @@
 use elrond_wasm::abi::ContractAbi;
 
+use crate::meta::meta_build_args::BuildArgs;
+
 pub const DEFAULT_LABEL: &str = "default";
 
 #[derive(Debug)]
@@ -128,8 +130,10 @@ impl OutputContract {
         format!("{}.abi.json", &self.contract_name)
     }
 
-    pub fn wasm_output_name(&self, opt_suffix: &Option<String>) -> String {
-        if let Some(suffix) = opt_suffix {
+    pub fn wasm_output_name(&self, build_args: &BuildArgs) -> String {
+        if let Some(wasm_name_override) = &build_args.wasm_name_override {
+            format!("{}.wasm", &wasm_name_override)
+        } else if let Some(suffix) = &build_args.wasm_name_suffix {
             format!("{}-{}.wasm", &self.contract_name, suffix)
         } else {
             format!("{}.wasm", &self.contract_name)

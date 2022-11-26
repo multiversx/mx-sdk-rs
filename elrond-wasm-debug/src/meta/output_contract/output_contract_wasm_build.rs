@@ -34,7 +34,7 @@ impl OutputContract {
         let dest_wasm_path = format!(
             "{}/{}",
             output_path,
-            self.wasm_output_name(&build_args.wasm_name_suffix)
+            self.wasm_output_name(build_args)
         );
         fs::copy(source_wasm_path.as_str(), dest_wasm_path.as_str())
             .expect("failed to copy compiled contract to output directory");
