@@ -31,23 +31,23 @@ impl OutputContractConfig {
             .filter(move |contract| !contract.main)
     }
 
-    pub fn get_contract_with_config_name(&self, name: String) -> Option<&OutputContract> {
+    pub fn get_contract_by_id(&self, name: String) -> Option<&OutputContract> {
         self.contracts
             .iter()
-            .find(|contract| contract.config_name == name)
+            .find(|contract| contract.contract_id == name)
     }
 
-    pub fn get_contract_with_public_name(&self, name: String) -> Option<&OutputContract> {
+    pub fn get_contract_by_name(&self, name: String) -> Option<&OutputContract> {
         self.contracts
             .iter()
-            .find(|contract| contract.config_name == name)
+            .find(|contract| contract.contract_id == name)
     }
 
     /// Yields the contract with the given public name.
     pub fn find_contract(&self, contract_name: &str) -> &OutputContract {
         self.contracts
             .iter()
-            .find(|contract| contract.public_name == contract_name)
+            .find(|contract| contract.contract_name == contract_name)
             .unwrap_or_else(|| panic!("output contract {} not found", contract_name))
     }
 }
@@ -63,11 +63,15 @@ pub struct OutputContract {
     /// External view contracts are just readers of data from another contract.
     pub external_view: bool,
 
-    /// The name, as defined in `multicontract.toml`.
-    pub config_name: String,
+    /// The contract id is defined in `multicontract.toml`. It has no effect on the produced assets.
+    ///
+    /// It can be the same as the contract name, but it is not necessary.
+    pub contract_id: String,
 
     /// The name, as seen in the generated contract names.
-    pub public_name: String,
+    ///
+    /// It is either defined in the multicontract.toml, or is inferred from the main crate name.
+    pub contract_name: String,
 
     /// Filtered and processed ABI of the output contract.
     pub abi: ContractAbi,
@@ -75,7 +79,7 @@ pub struct OutputContract {
 
 impl OutputContract {
     pub fn public_name_snake_case(&self) -> String {
-        self.public_name.replace('-', "_")
+        self.contract_name.replace('-', "_")
     }
 
     /// The name of the directory of the wasm crate.
@@ -85,7 +89,7 @@ impl OutputContract {
         if self.main {
             "wasm".to_string()
         } else {
-            format!("wasm-{}", &self.public_name)
+            format!("wasm-{}", &self.contract_name)
         }
     }
 
@@ -101,7 +105,7 @@ impl OutputContract {
     ///
     /// Note this does not necessarily have to match the name of the crate directory.
     pub fn wasm_crate_name(&self) -> String {
-        format!("{}-wasm", &self.public_name)
+        format!("{}-wasm", &self.contract_name)
     }
 
     pub fn wasm_crate_name_snake_case(&self) -> String {
@@ -121,11 +125,11 @@ impl OutputContract {
     }
 
     pub fn abi_output_name(&self) -> String {
-        format!("{}.abi.json", &self.public_name)
+        format!("{}.abi.json", &self.contract_name)
     }
 
     pub fn wasm_output_name(&self) -> String {
-        format!("{}.wasm", &self.public_name)
+        format!("{}.wasm", &self.contract_name)
     }
 
     pub fn endpoint_names(&self) -> Vec<String> {
@@ -141,8 +145,8 @@ impl std::fmt::Debug for OutputContract {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         f.debug_struct("OutputContract")
             .field("main", &self.main)
-            .field("config_name", &self.config_name)
-            .field("public_name", &self.public_name)
+            .field("config_name", &self.contract_id)
+            .field("public_name", &self.contract_name)
             .finish()
     }
 }

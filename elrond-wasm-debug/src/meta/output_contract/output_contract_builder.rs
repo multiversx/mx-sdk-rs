@@ -161,8 +161,8 @@ fn build_contract(builder: OutputContractBuilder, original_abi: &ContractAbi) ->
     OutputContract {
         main: false,
         external_view: builder.external_view,
-        config_name: builder.contract_id.clone(),
-        public_name: name,
+        contract_id: builder.contract_id.clone(),
+        contract_name: name,
         abi: build_contract_abi(builder, original_abi),
     }
 }
@@ -173,7 +173,7 @@ fn set_main_contract_flag(
 ) {
     if let Some(default_contract_config_name) = default_contract_config_name_opt {
         for contract in contracts.iter_mut() {
-            if &contract.config_name == default_contract_config_name {
+            if &contract.contract_id == default_contract_config_name {
                 contract.main = true;
                 return;
             }
@@ -182,7 +182,7 @@ fn set_main_contract_flag(
         panic!(
             "Could not find default contract '{}' among the output contracts. Available contracts are: {:?}",
             default_contract_config_name,
-            contracts.iter().map(|contract| &contract.config_name).collect::<Vec<_>>(),
+            contracts.iter().map(|contract| &contract.contract_id).collect::<Vec<_>>(),
         )
     } else {
         let first_contract = contracts.get_mut(0).unwrap_or_else(|| {
@@ -226,8 +226,8 @@ impl OutputContractConfig {
             contracts: vec![OutputContract {
                 main: true,
                 external_view: false,
-                config_name: default_contract_config_name.clone(),
-                public_name: default_contract_config_name,
+                contract_id: default_contract_config_name.clone(),
+                contract_name: default_contract_config_name,
                 abi: original_abi.clone(),
             }],
         }

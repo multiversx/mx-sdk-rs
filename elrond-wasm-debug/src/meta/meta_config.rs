@@ -43,24 +43,35 @@ impl MetaConfig {
     /// Generates all code for the wasm crate(s).
     pub fn generate_wasm_crates(&mut self) {
         self.remove_unexpected_wasm_crates();
-        self.generate_secondary_contract_cargo_toml();
-        self.write_wasm_src_lib();
+        self.create_wasm_crate_dirs();
+        self.generate_cargo_toml_for_secondary_contracts();
+        self.generate_wasm_src_lib();
         copy_to_wasm_unmanaged_ei();
     }
 
-    fn write_wasm_src_lib(&self) {
+    fn create_wasm_crate_dirs(&self) {
         for output_contract in &self.output_contracts.contracts {
-            output_contract.write_wasm_src_lib_file();
+            output_contract.create_wasm_crate_dir();
         }
     }
 
-    pub fn generate_secondary_contract_cargo_toml(&mut self) {
+    /// Cargo.toml files for secondary contracts are generated from the main contract Cargo.toml,
+    /// by changing the package name.
+    pub fn generate_cargo_toml_for_secondary_contracts(&mut self) {
         let main_contract = self.output_contracts.main_contract();
+
+        // using the same local structure for all contracts is enough for now
         let mut cargo_toml_contents =
             CargoTomlContents::load_from_file(main_contract.cargo_toml_path());
         for secondary_contract in self.output_contracts.secondary_contracts() {
             cargo_toml_contents.change_package_name(secondary_contract.wasm_crate_name());
             cargo_toml_contents.save_to_file(secondary_contract.cargo_toml_path());
+        }
+    }
+
+    fn generate_wasm_src_lib(&self) {
+        for output_contract in &self.output_contracts.contracts {
+            output_contract.generate_wasm_src_lib_file();
         }
     }
 

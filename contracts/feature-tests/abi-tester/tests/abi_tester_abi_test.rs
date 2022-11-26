@@ -43,7 +43,6 @@ fn abi_tester_abi_generated_ok() {
     );
 }
 
-// TODO: move to abi-tester
 #[test]
 fn check_multi_contract_config() {
     let mut blockchain = BlockchainMock::new();

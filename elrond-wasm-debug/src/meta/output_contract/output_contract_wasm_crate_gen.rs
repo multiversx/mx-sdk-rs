@@ -83,9 +83,11 @@ impl OutputContract {
         }
     }
 
-    pub fn write_wasm_src_lib_file(&self) {
+    pub fn create_wasm_crate_dir(&self) {
         fs::create_dir_all(PathBuf::from(&self.wasm_crate_path()).join("src")).unwrap();
+    }
 
+    pub fn generate_wasm_src_lib_file(&self) {
         let lib_path = format!("{}/src/lib.rs", &self.wasm_crate_path());
         let mut wasm_lib_file = File::create(lib_path).unwrap();
         self.write_wasm_src_lib_contents(&mut wasm_lib_file);

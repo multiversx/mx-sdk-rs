@@ -1,7 +1,8 @@
 [settings]
-main = "main"
+main = "multi-contract-main"
 
-[contracts.main]
+[contracts.multi-contract-main]
+# main contract can have any id and any name
 name = "multi-contract-features"
 add-unlabelled = true
 
