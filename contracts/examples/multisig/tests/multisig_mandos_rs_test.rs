@@ -4,7 +4,16 @@ fn world() -> BlockchainMock {
     let mut blockchain = BlockchainMock::new();
     blockchain.set_current_dir_from_workspace("contracts/examples/multisig");
 
-    blockchain.register_contract_builder("file:output/multisig.wasm", multisig::ContractBuilder);
+    blockchain.register_partial_contract::<multisig::AbiProvider, _>(
+        "file:output/multisig.wasm",
+        multisig::ContractBuilder,
+        "multisig",
+    );
+    blockchain.register_partial_contract::<multisig::AbiProvider, _>(
+        "file:output/multisig-view.wasm",
+        multisig::ContractBuilder,
+        "multisig-view",
+    );
 
     blockchain.register_contract_builder("file:test-contracts/adder.wasm", adder::ContractBuilder);
 
@@ -16,15 +25,17 @@ fn world() -> BlockchainMock {
     blockchain
 }
 
-// #[test]
-// fn call_other_shard_1_rs() {
-//     elrond_wasm_debug::mandos_rs("mandos/call_other_shard-1.scen.json", world());
-// }
+#[ignore]
+#[test]
+fn call_other_shard_1_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/call_other_shard-1.scen.json", world());
+}
 
-// #[test]
-// fn call_other_shard_2_rs() {
-//     elrond_wasm_debug::mandos_rs("mandos/call_other_shard-2.scen.json", world());
-// }
+#[ignore]
+#[test]
+fn call_other_shard_2_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/call_other_shard-2.scen.json", world());
+}
 
 #[test]
 fn changeboard_rs() {

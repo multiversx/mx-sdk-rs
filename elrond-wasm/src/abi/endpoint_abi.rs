@@ -26,13 +26,6 @@ pub enum EndpointMutabilityAbi {
     Pure,
 }
 
-#[derive(Clone, PartialEq, Default, Eq, Debug)]
-pub enum EndpointLocationAbi {
-    #[default]
-    MainContract,
-    ViewContract,
-}
-
 #[derive(Clone, Default, Debug)]
 pub struct EndpointAbi {
     pub docs: &'static [&'static str],
@@ -42,7 +35,6 @@ pub struct EndpointAbi {
     pub only_admin: bool,
     pub labels: &'static [&'static str],
     pub mutability: EndpointMutabilityAbi,
-    pub location: EndpointLocationAbi,
     pub payable_in_tokens: &'static [&'static str],
     pub inputs: Vec<InputAbi>,
     pub outputs: OutputAbis,

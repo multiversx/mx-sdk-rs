@@ -1,5 +1,8 @@
 use elrond_wasm::abi::{ContractAbi, EndpointAbi};
-use elrond_wasm_debug::{meta::output_contract::{MultiContractConfigSerde, OutputContractConfig}, DebugApi};
+use elrond_wasm_debug::{
+    meta::output_contract::{MultiContractConfigSerde, OutputContractConfig},
+    DebugApi,
+};
 
 fn get_serialized_toml() -> MultiContractConfigSerde {
     toml::from_str(
@@ -79,9 +82,8 @@ fn test_serialize_multi_contract() {
 
 #[test]
 fn test_output_contract_config() {
-
     let serde = get_serialized_toml();
-    let abi  = get_contract_abi();
+    let abi = get_contract_abi();
 
     let contract_config = OutputContractConfig::load_from_config(&serde, &abi);
 

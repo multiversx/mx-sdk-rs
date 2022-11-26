@@ -26,8 +26,16 @@ impl OutputContract {
 
         assert!(exit_status.success(), "contract build process failed");
 
+        self.copy_contracts_to_output(build_args, output_path);
+    }
+
+    fn copy_contracts_to_output(&mut self, build_args: &BuildArgs, output_path: &str) {
         let source_wasm_path = self.wasm_compilation_output_path(&build_args.target_dir);
-        let dest_wasm_path = format!("{}/{}", output_path, self.wasm_output_name());
+        let dest_wasm_path = format!(
+            "{}/{}",
+            output_path,
+            self.wasm_output_name(build_args)
+        );
         fs::copy(source_wasm_path.as_str(), dest_wasm_path.as_str())
             .expect("failed to copy compiled contract to output directory");
 

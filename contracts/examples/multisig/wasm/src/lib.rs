@@ -12,25 +12,25 @@ elrond_wasm_node::wasm_endpoints! {
     multisig
     (
         deposit
+        signed
+        sign
+        unsign
         discardAction
-        dnsRegister
-        getActionLastIndex
+        getQuorum
         getNumBoardMembers
         getNumProposers
-        getQuorum
-        performAction
+        getActionLastIndex
         proposeAddBoardMember
         proposeAddProposer
-        proposeAsyncCall
-        proposeChangeQuorum
         proposeRemoveUser
+        proposeChangeQuorum
+        proposeTransferExecute
+        proposeAsyncCall
         proposeSCDeployFromSource
         proposeSCUpgradeFromSource
-        proposeTransferExecute
         quorumReached
-        sign
-        signed
-        unsign
+        performAction
+        dnsRegister
     )
 }
 

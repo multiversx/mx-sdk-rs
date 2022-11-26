@@ -6,4 +6,4 @@ mod meta_main;
 mod meta_validate_abi;
 pub mod output_contract;
 
-pub use meta_main::perform;
+pub use meta_main::{multi_contract_config, perform};

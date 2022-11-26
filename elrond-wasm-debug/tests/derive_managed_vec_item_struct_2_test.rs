@@ -18,6 +18,7 @@ pub struct Struct2 {
 }
 
 #[test]
+#[allow(clippy::assertions_on_constants)]
 fn struct_2_static() {
     assert_eq!(
         <Struct2 as elrond_wasm::types::ManagedVecItem>::PAYLOAD_SIZE,
