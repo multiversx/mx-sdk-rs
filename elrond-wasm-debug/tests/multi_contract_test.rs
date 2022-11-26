@@ -34,7 +34,7 @@ fn get_contract_abi() -> ContractAbi {
         EndpointAbi::generate_with_name_and_labels("endpoint2", &["label2"]),
         EndpointAbi::generate_with_name_and_labels("endpoint3", &["label2"]),
         EndpointAbi::generate_with_name_and_labels("endpoint4", &["label2"]),
-        EndpointAbi::generate_with_name_and_labels("endpoint5", &[]),
+        EndpointAbi::generate_with_name_and_labels("endpoint5", &[]),   // unlabeled endpoint, should end up in main contract
     ];
     ContractAbi::generate_with_endpoints(endpoints)
 }
