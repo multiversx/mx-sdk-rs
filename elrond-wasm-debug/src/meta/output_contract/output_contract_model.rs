@@ -128,8 +128,12 @@ impl OutputContract {
         format!("{}.abi.json", &self.contract_name)
     }
 
-    pub fn wasm_output_name(&self) -> String {
-        format!("{}.wasm", &self.contract_name)
+    pub fn wasm_output_name(&self, opt_suffix: &Option<String>) -> String {
+        if let Some(suffix) = opt_suffix {
+            format!("{}-{}.wasm", &self.contract_name, suffix)
+        } else {
+            format!("{}.wasm", &self.contract_name)
+        }
     }
 
     pub fn endpoint_names(&self) -> Vec<String> {
