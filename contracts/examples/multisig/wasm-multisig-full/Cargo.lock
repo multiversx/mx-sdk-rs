@@ -167,7 +167,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "multisig-wasm"
+name = "multisig-full-wasm"
 version = "0.0.0"
 dependencies = [
  "elrond-wasm-node",

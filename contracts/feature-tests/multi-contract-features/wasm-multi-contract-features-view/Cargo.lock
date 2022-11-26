@@ -159,7 +159,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "multi-contract-features-wasm"
+name = "multi-contract-features-view-wasm"
 version = "0.0.0"
 dependencies = [
  "elrond-wasm-node",

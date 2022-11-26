@@ -1,7 +1,5 @@
 use elrond_wasm::abi::ContractAbi;
 
-use super::output_contract_wasm_cargo_toml::CargoTomlContents;
-
 pub const DEFAULT_LABEL: &str = "default";
 
 #[derive(Debug)]
@@ -25,6 +23,12 @@ impl OutputContractConfig {
 
     pub fn secondary_contracts(&self) -> impl Iterator<Item = &OutputContract> {
         self.contracts.iter().filter(move |contract| !contract.main)
+    }
+
+    pub fn secondary_contracts_mut(&mut self) -> impl Iterator<Item = &mut OutputContract> {
+        self.contracts
+            .iter_mut()
+            .filter(move |contract| !contract.main)
     }
 
     pub fn get_contract_with_config_name(&self, name: String) -> Option<&OutputContract> {
@@ -51,7 +55,6 @@ impl OutputContractConfig {
 /// Represents a contract created by the framework when building.
 ///
 /// It might have only some of the endpoints written by the developer and maybe some other function.
-#[derive(Debug)]
 pub struct OutputContract {
     /// If it is the main contract, then the wasm crate is called just `wasm`,
     ///and the wasm `Cargo.toml` is provided by the dev.
@@ -68,8 +71,6 @@ pub struct OutputContract {
 
     /// Filtered and processed ABI of the output contract.
     pub abi: ContractAbi,
-
-    pub(crate) cargo_toml_contents_cache: Option<CargoTomlContents>,
 }
 
 impl OutputContract {
@@ -94,6 +95,17 @@ impl OutputContract {
 
     pub fn cargo_toml_path(&self) -> String {
         format!("{}/Cargo.toml", &self.wasm_crate_path())
+    }
+
+    /// The name of the wasm crate, as defined in its corresponding `Cargo.toml`.
+    ///
+    /// Note this does not necessarily have to match the name of the crate directory.
+    pub fn wasm_crate_name(&self) -> String {
+        format!("{}-wasm", &self.public_name)
+    }
+
+    pub fn wasm_crate_name_snake_case(&self) -> String {
+        self.wasm_crate_name().replace('-', "_")
     }
 
     /// This is where Rust will initially compile the WASM binary.
@@ -122,5 +134,15 @@ impl OutputContract {
             .iter()
             .map(|endpoint| endpoint.name.to_string())
             .collect()
+    }
+}
+
+impl std::fmt::Debug for OutputContract {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        f.debug_struct("OutputContract")
+            .field("main", &self.main)
+            .field("config_name", &self.config_name)
+            .field("public_name", &self.public_name)
+            .finish()
     }
 }

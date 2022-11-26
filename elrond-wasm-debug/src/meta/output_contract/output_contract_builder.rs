@@ -164,7 +164,6 @@ fn build_contract(builder: OutputContractBuilder, original_abi: &ContractAbi) ->
         config_name: builder.contract_id.clone(),
         public_name: name,
         abi: build_contract_abi(builder, original_abi),
-        cargo_toml_contents_cache: None,
     }
 }
 
@@ -230,7 +229,6 @@ impl OutputContractConfig {
                 config_name: default_contract_config_name.clone(),
                 public_name: default_contract_config_name,
                 abi: original_abi.clone(),
-                cargo_toml_contents_cache: None,
             }],
         }
     }

@@ -4,7 +4,10 @@ use elrond_wasm::abi::ContractAbi;
 
 use crate::meta::output_contract::WASM_OPT_NAME;
 
-use super::{meta_build_args::BuildArgs, output_contract::OutputContractConfig};
+use super::{
+    meta_build_args::BuildArgs,
+    output_contract::{CargoTomlContents, OutputContractConfig},
+};
 
 const OUTPUT_RELATIVE_PATH: &str = "../output";
 const SNIPPETS_RELATIVE_PATH: &str = "../interact-rs";
@@ -38,9 +41,9 @@ impl MetaConfig {
     }
 
     /// Generates all code for the wasm crate(s).
-    pub fn generate_wasm_crates(&self) {
+    pub fn generate_wasm_crates(&mut self) {
         self.remove_unexpected_wasm_crates();
-        self.copy_secondary_contract_cargo_toml();
+        self.generate_secondary_contract_cargo_toml();
         self.write_wasm_src_lib();
         copy_to_wasm_unmanaged_ei();
     }
@@ -51,15 +54,13 @@ impl MetaConfig {
         }
     }
 
-    pub fn copy_secondary_contract_cargo_toml(&self) {
+    pub fn generate_secondary_contract_cargo_toml(&mut self) {
         let main_contract = self.output_contracts.main_contract();
+        let mut cargo_toml_contents =
+            CargoTomlContents::load_from_file(main_contract.cargo_toml_path());
         for secondary_contract in self.output_contracts.secondary_contracts() {
-            fs::create_dir_all(&secondary_contract.wasm_crate_path()).unwrap();
-            fs::copy(
-                main_contract.cargo_toml_path(),
-                secondary_contract.cargo_toml_path(),
-            )
-            .unwrap();
+            cargo_toml_contents.change_package_name(secondary_contract.wasm_crate_name());
+            cargo_toml_contents.save_to_file(secondary_contract.cargo_toml_path());
         }
     }
 
