@@ -95,4 +95,12 @@ fn test_output_contract_config() {
         contract_config.contracts.len(),
         2
     );
+    assert_eq!(contract_config.get_contract_by_id("secondary-contract".to_string()).is_none(), false);
+    assert_eq!(contract_config.get_contract_by_id("unexisting-contract]".to_string()).is_none(), true);
+    assert_eq!(contract_config.get_contract_by_name("contract2-name".to_string()).is_none(), false);
+    assert_eq!(contract_config.get_contract_by_name("contract-wrong-name]".to_string()).is_none(), true);
+
+    let main_contract = contract_config.main_contract();
+    assert_eq!(main_contract.contract_id, "main-contract");
+    assert_eq!(main_contract.contract_name, "main-contract");
 }
