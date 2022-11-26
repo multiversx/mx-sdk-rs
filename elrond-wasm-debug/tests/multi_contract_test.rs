@@ -34,7 +34,6 @@ fn get_contract_abi() -> ContractAbi {
         EndpointAbi::generate_with_name_and_labels("endpoint2", &["label2"]),
         EndpointAbi::generate_with_name_and_labels("endpoint3", &["label2"]),
         EndpointAbi::generate_with_name_and_labels("endpoint4", &["label2"]),
-        EndpointAbi::generate_with_name_and_labels("endpoint5", &["label1"]),
         EndpointAbi::generate_with_name_and_labels("endpoint5", &[]),
     ];
     ContractAbi::generate_with_endpoints(endpoints)
@@ -103,4 +102,9 @@ fn test_output_contract_config() {
     let main_contract = contract_config.main_contract();
     assert_eq!(main_contract.contract_id, "main-contract");
     assert_eq!(main_contract.contract_name, "main-contract");
+
+
+    assert_eq!(main_contract.endpoint_names(), ["endpoint5", "endpoint1"]);
+    assert_eq!(contract_config.get_contract_by_name("contract2-name".to_string()).unwrap().endpoint_names(),  ["endpoint1", "endpoint2", "endpoint3", "endpoint4"]);
+
 }
