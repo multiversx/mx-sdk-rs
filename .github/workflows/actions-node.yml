@@ -3,8 +3,6 @@ name: Clippy check elrond-wasm-node
 on: push
 jobs:
   clippy_check:
-    name: Clippy linter check
-    permissions: write-all
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
@@ -13,8 +11,7 @@ jobs:
             toolchain: nightly
             components: clippy
             override: true
-      - uses: reinismu/clippy-check@master
+      - uses: actions-rs/clippy-check@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          working-directory: my-directory
-          args: --all-features
+          args: --all-features --manifest-path ./elrond-wasm-node/Cargo.toml
