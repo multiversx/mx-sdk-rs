@@ -5,6 +5,7 @@ members = [
   "elrond-wasm",
   "elrond-wasm-debug",
   "elrond-wasm-derive",
+  "elrond-wasm-node",
   "elrond-wasm-modules",
   "mandos",
   "elrond-codec",
@@ -150,6 +151,5 @@ members = [
 ]
 
 exclude = [
-  "elrond-wasm-node",
   "elrond-wasm-output",
 ]
