@@ -5,9 +5,9 @@ use super::{StorageClearable, StorageMapper, VecMapper};
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
     api::StorageMapperApi,
-    storage::StorageKey,
+    storage::{storage_get_from_address, StorageKey},
     storage_clear, storage_get, storage_set,
-    types::{ManagedType, MultiValueEncoded},
+    types::{ManagedAddress, ManagedType, MultiValueEncoded},
 };
 use elrond_codec::{
     multi_encode_iter_or_handle_err, CodecFrom, EncodeErrorHandler, NestedDecode, NestedEncode,
@@ -70,10 +70,22 @@ where
         storage_get(self.item_index_key(value).as_ref())
     }
 
+    /// Gets the item's index at the given address' mapper.
+    /// Returns `0` if the item is not in the list.
+    pub fn get_index_at_address(&self, address: &ManagedAddress<SA>, value: &T) -> usize {
+        storage_get_from_address(address.as_ref(), self.item_index_key(value).as_ref())
+    }
+
     /// Get item at index from storage.
     /// Index must be valid (1 <= index <= count).
     pub fn get_by_index(&self, index: usize) -> T {
         self.vec_mapper.get(index)
+    }
+
+    /// Gets the item by index from the given address.
+    /// Index must be valid (1 <= index <= count).
+    pub fn get_by_index_at_address(&self, address: &ManagedAddress<SA>, index: usize) -> T {
+        self.vec_mapper.get_at_address(address, index)
     }
 
     fn set_index(&self, value: &T, index: usize) {
@@ -89,14 +101,29 @@ where
         self.vec_mapper.is_empty()
     }
 
+    /// Returns `true` if the address' mapper contains no elements.
+    pub fn is_empty_at_address(&self, address: &ManagedAddress<SA>) -> bool {
+        self.vec_mapper.is_empty_at_address(address)
+    }
+
     /// Returns the number of elements in the set.
     pub fn len(&self) -> usize {
         self.vec_mapper.len()
     }
 
+    /// Returns the number of elements contained in the given address' mapper.
+    pub fn len_at_address(&self, address: &ManagedAddress<SA>) -> usize {
+        self.vec_mapper.len_at_address(address)
+    }
+
     /// Returns `true` if the set contains a value.
     pub fn contains(&self, value: &T) -> bool {
         self.get_index(value) != NULL_ENTRY
+    }
+
+    /// Returns `true` if the mapper at the given address contains the value.
+    pub fn contains_at_address(&self, address: &ManagedAddress<SA>, value: &T) -> bool {
+        self.get_index_at_address(address, value) != NULL_ENTRY
     }
 
     /// Adds a value to the set.
