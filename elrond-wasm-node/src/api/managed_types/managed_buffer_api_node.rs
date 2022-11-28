@@ -53,7 +53,7 @@ impl ManagedBufferApi for crate::VmApiImpl {
 
     #[inline]
     fn mb_len(&self, handle: Self::ManagedBufferHandle) -> usize {
-        unsafe { mBufferGetLength(handle as i32) as usize }
+        unsafe { mBufferGetLength(handle) as usize }
     }
 
     fn mb_to_boxed_bytes(&self, handle: Self::ManagedBufferHandle) -> BoxedBytes {
@@ -131,7 +131,7 @@ impl ManagedBufferApi for crate::VmApiImpl {
     #[inline]
     fn mb_overwrite(&self, handle: Self::ManagedBufferHandle, bytes: &[u8]) {
         unsafe {
-            let _ = mBufferSetBytes(handle as i32, bytes.as_ptr(), bytes.len() as i32);
+            let _ = mBufferSetBytes(handle, bytes.as_ptr(), bytes.len() as i32);
         }
     }
 
@@ -160,7 +160,7 @@ impl ManagedBufferApi for crate::VmApiImpl {
     #[inline]
     fn mb_set_random(&self, dest_handle: Self::ManagedBufferHandle, length: usize) {
         unsafe {
-            let _ = mBufferSetRandom(dest_handle as i32, length as i32);
+            let _ = mBufferSetRandom(dest_handle, length as i32);
         }
     }
 
@@ -171,18 +171,14 @@ impl ManagedBufferApi for crate::VmApiImpl {
         data_handle: Self::ManagedBufferHandle,
     ) {
         unsafe {
-            let _ = mBufferAppend(accumulator_handle as i32, data_handle as i32);
+            let _ = mBufferAppend(accumulator_handle, data_handle);
         }
     }
 
     #[inline]
     fn mb_append_bytes(&self, accumulator_handle: Self::ManagedBufferHandle, bytes: &[u8]) {
         unsafe {
-            let _ = mBufferAppendBytes(
-                accumulator_handle as i32,
-                bytes.as_ptr(),
-                bytes.len() as i32,
-            );
+            let _ = mBufferAppendBytes(accumulator_handle, bytes.as_ptr(), bytes.len() as i32);
         }
     }
 
