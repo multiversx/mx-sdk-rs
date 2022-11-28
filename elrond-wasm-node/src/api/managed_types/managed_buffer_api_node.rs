@@ -178,11 +178,7 @@ impl ManagedBufferApi for crate::VmApiImpl {
     #[inline]
     fn mb_append_bytes(&self, accumulator_handle: Self::ManagedBufferHandle, bytes: &[u8]) {
         unsafe {
-            let _ = mBufferAppendBytes(
-                accumulator_handle,
-                bytes.as_ptr(),
-                bytes.len() as i32,
-            );
+            let _ = mBufferAppendBytes(accumulator_handle, bytes.as_ptr(), bytes.len() as i32);
         }
     }
 
