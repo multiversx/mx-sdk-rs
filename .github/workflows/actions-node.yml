@@ -3,6 +3,8 @@ name: Clippy check elrond-wasm-node
 on: push
 jobs:
   clippy_check:
+    name: Clippy linter check
+    permissions: write-all
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
