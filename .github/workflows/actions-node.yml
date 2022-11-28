@@ -6,9 +6,6 @@ jobs:
     name: Clippy linter check
     permissions: write-all
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./elrond-wasm-node
     steps:
       - uses: actions/checkout@v1
       - uses: actions-rs/toolchain@v1
@@ -16,7 +13,8 @@ jobs:
             toolchain: nightly
             components: clippy
             override: true
-      - uses: actions-rs/clippy-check@v1
+      - uses: reinismu/clippy-check@master
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          working-directory: my-directory
           args: --all-features
