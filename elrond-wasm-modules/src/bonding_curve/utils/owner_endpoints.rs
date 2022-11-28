@@ -12,7 +12,6 @@ use crate::bonding_curve::{
 };
 
 use super::structs::CurveArguments;
-use elrond_wasm::{abi::TypeAbi, elrond_codec::TopEncode};
 
 #[elrond_wasm::module]
 pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {

@@ -43,6 +43,7 @@ impl RustcAbiJson {
 }
 
 #[derive(Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ContractCrateBuildAbiJson {
     pub name: String,
     pub version: String,

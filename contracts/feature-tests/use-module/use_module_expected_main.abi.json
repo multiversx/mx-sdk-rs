@@ -10,11 +10,11 @@
         "contractCrate": {
             "name": "use-module",
             "version": "0.0.0",
-            "git_version": "<git version here>"
+            "gitVersion": "<git version here>"
         },
         "framework": {
             "name": "elrond-wasm",
-            "version": "0.36.0"
+            "version": "0.36.1"
         }
     },
     "docs": [
@@ -107,6 +107,63 @@
             "outputs": [
                 {
                     "type": "OperationCompletionStatus"
+                }
+            ]
+        },
+        {
+            "name": "mergeTokens",
+            "mutability": "mutable",
+            "payableInTokens": [
+                "*"
+            ],
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "EsdtTokenPayment"
+                }
+            ]
+        },
+        {
+            "name": "mergeTokensCustomAttributes",
+            "mutability": "mutable",
+            "payableInTokens": [
+                "*"
+            ],
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "EsdtTokenPayment"
+                }
+            ]
+        },
+        {
+            "name": "splitTokens",
+            "mutability": "mutable",
+            "payableInTokens": [
+                "*"
+            ],
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "List<EsdtTokenPayment>"
+                }
+            ]
+        },
+        {
+            "name": "splitTokenPartial",
+            "mutability": "mutable",
+            "payableInTokens": [
+                "*"
+            ],
+            "inputs": [
+                {
+                    "name": "tokens_to_remove",
+                    "type": "List<EsdtTokenPayment>"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "List<EsdtTokenPayment>"
                 }
             ]
         },
@@ -643,53 +700,6 @@
                 }
             ],
             "outputs": []
-        },
-        {
-            "name": "mergeTokens",
-            "mutability": "mutable",
-            "payableInTokens": [
-                "*"
-            ],
-            "inputs": [],
-            "outputs": [
-                {
-                    "type": "EsdtTokenPayment"
-                }
-            ]
-        },
-        {
-            "name": "splitTokens",
-            "mutability": "mutable",
-            "payableInTokens": [
-                "*"
-            ],
-            "inputs": [],
-            "outputs": [
-                {
-                    "type": "variadic<EsdtTokenPayment>",
-                    "multi_result": true
-                }
-            ]
-        },
-        {
-            "name": "splitTokenPartial",
-            "mutability": "mutable",
-            "payableInTokens": [
-                "*"
-            ],
-            "inputs": [
-                {
-                    "name": "tokens_to_remove",
-                    "type": "variadic<EsdtTokenPayment>",
-                    "multi_arg": true
-                }
-            ],
-            "outputs": [
-                {
-                    "type": "variadic<EsdtTokenPayment>",
-                    "multi_result": true
-                }
-            ]
         },
         {
             "name": "getMergedTokenId",

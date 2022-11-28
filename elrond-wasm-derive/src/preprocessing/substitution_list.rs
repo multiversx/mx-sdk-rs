@@ -79,7 +79,7 @@ fn add_managed_types(substitutions: &mut SubstitutionsMap) {
     add_managed_type_with_generics(substitutions, &quote!(ManagedVecRef));
     add_managed_type_with_generics(substitutions, &quote!(ManagedVec));
     add_managed_type_with_generics(substitutions, &quote!(PreloadedManagedBuffer));
-    add_managed_type_with_generics(substitutions, &quote!(RandomnessSource));
+    add_managed_type(substitutions, &quote!(RandomnessSource));
     add_managed_type(substitutions, &quote!(TokenIdentifier));
 }
 

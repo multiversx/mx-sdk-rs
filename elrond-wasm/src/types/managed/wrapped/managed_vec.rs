@@ -4,14 +4,14 @@ use crate::{
     types::{
         heap::{ArgBuffer, BoxedBytes},
         ManagedBuffer, ManagedBufferNestedDecodeInput, ManagedType, ManagedVecItem, ManagedVecRef,
-        ManagedVecRefIterator, MultiValueManagedVec,
+        ManagedVecRefIterator, MultiValueEncoded, MultiValueManagedVec,
     },
 };
 use alloc::vec::Vec;
 use core::{borrow::Borrow, iter::FromIterator, marker::PhantomData};
 use elrond_codec::{
-    DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode,
-    NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeMultiOutput,
+    DecodeErrorHandler, EncodeErrorHandler, IntoMultiValue, NestedDecode, NestedDecodeInput,
+    NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeMultiOutput,
     TopEncodeOutput,
 };
 
@@ -449,6 +449,22 @@ where
             result.push(T::dep_decode_or_handle_err(input, h)?);
         }
         Ok(result)
+    }
+}
+
+impl<M, T> IntoMultiValue for ManagedVec<M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedVecItem + IntoMultiValue,
+{
+    type MultiValue = MultiValueEncoded<M, T::MultiValue>;
+
+    fn into_multi_value(self) -> Self::MultiValue {
+        let mut result = MultiValueEncoded::new();
+        for item in self.into_iter() {
+            result.push(item.into_multi_value());
+        }
+        result
     }
 }
 
