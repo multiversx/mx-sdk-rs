@@ -186,6 +186,8 @@ where
         item.to_byte_writer(|slice| self.buffer.set_slice(byte_index, slice))
     }
 
+    /// Returns a new `ManagedVec`, containing the [start_index, end_index) range of elements. 
+    /// Returns `None` if any index is out of range
     pub fn slice(&self, start_index: usize, end_index: usize) -> Option<Self> {
         let byte_start = start_index * T::PAYLOAD_SIZE;
         let byte_end = end_index * T::PAYLOAD_SIZE;
