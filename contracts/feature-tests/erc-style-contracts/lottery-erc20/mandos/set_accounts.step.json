@@ -1,0 +1,25 @@
+{
+    "name": "set initial balance for accounts",
+    "gasSchedule": "dummy",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:erc20": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:balance|address:erc20_owner": "997,000,000",
+                        "str:balance|address:my_address": "1,000,000",
+                        "str:balance|address:acc1": "1,000,000",
+                        "str:balance|address:acc2": "1,000,000",
+                        "str:allowance|address:acc1|sc:lottery": "100",
+                        "str:allowance|address:acc2|sc:lottery": "100",
+                        "str:totalSupply": "1,000,000,000"
+                    },
+                    "code": "file:../../erc20/output/erc20.wasm"
+                }
+            }
+        }
+    ]
+}

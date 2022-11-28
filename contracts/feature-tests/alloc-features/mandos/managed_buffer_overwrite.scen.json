@@ -1,0 +1,35 @@
+{
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:alloc-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../output/alloc-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "1",
+            "tx": {
+                "to": "sc:alloc-features",
+                "function": "mbuffer_overwrite",
+                "arguments": [
+                    "str:old",
+                    "str:new"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "str:new"
+                ]
+            }
+        }
+    ]
+}

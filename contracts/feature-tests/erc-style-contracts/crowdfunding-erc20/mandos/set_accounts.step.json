@@ -1,0 +1,48 @@
+{
+    "name": "set initial accounts",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:acc1": {
+                    "nonce": "0",
+                    "balance": "1,000,000"
+                },
+                "address:acc2": {
+                    "nonce": "0",
+                    "balance": "1,000,000"
+                },
+                "address:erc20_owner": {
+                    "nonce": "1",
+                    "balance": "0"
+                },
+                "address:crowdfunding_owner": {
+                    "nonce": "1",
+                    "balance": "0"
+                },
+                "sc:erc20": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:balance|address:erc20_owner": "1,000,000,000",
+                        "str:balance|address:acc1": "600,000",
+                        "str:allowance|address:erc20_owner|address:acc1": "400,000",
+                        "str:totalSupply": "1,000,000,000"
+                    },
+                    "code": "file:../../erc20/output/erc20.wasm"
+                },
+                "sc:crowdfunding": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:target": "1,000,000",
+                        "str:deadline": "123,456",
+                        "str:erc20ContractAddress": "sc:erc20"
+                    },
+                    "code": "file:../output/crowdfunding-erc20.wasm",
+                    "owner": "address:crowdfunding_owner"
+                }
+            }
+        }
+    ]
+}

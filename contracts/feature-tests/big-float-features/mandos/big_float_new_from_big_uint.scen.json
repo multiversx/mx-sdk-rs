@@ -1,0 +1,95 @@
+{
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../output/big-float-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "100000000000"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "newBigFloatFromBigUint - 1",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "big_float_from_big_uint_1_wrapped",
+                "arguments": [
+                    "0"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "newBigFloatFromBigUint - 2",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "big_float_from_big_uint_1_wrapped",
+                "arguments": [
+                    "3853625"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "3853625"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "newBigFloatFromBigUint - 3",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "big_float_from_big_uint_2_wrapped",
+                "arguments": [
+                    "0"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "newBigFloatFromBigUint - 4",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "big_float_from_big_uint_2_wrapped",
+                "arguments": [
+                    "3853625"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "+3853625"
+                ]
+            }
+        }
+    ]
+}

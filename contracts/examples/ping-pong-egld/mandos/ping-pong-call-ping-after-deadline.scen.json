@@ -17,13 +17,14 @@
             "tx": {
                 "from": "address:participant1",
                 "to": "sc:ping-pong",
-                "value": "500,000,000,000",
+                "egldValue": "500,000,000,000",
                 "function": "ping",
                 "arguments": [],
                 "gasLimit": "10,000,000",
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "4",
                 "message": "str:deadline has passed",
                 "gas": "*",
@@ -52,9 +53,9 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "''ping_amount": "500,000,000,000",
-                        "''activation_timestamp": "780",
-                        "''deadline": "123,780"
+                        "str:pingAmount": "500,000,000,000",
+                        "str:activationTimestamp": "780",
+                        "str:deadline": "123,780"
                     },
                     "code": "file:../output/ping-pong-egld.wasm"
                 }

@@ -1,0 +1,86 @@
+{
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:alloc-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../output/alloc-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "1",
+            "tx": {
+                "to": "sc:alloc-features",
+                "function": "mbuffer_append_bytes",
+                "arguments": [
+                    "str:abc",
+                    "str:def"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "str:abcdef"
+                ]
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "2",
+            "tx": {
+                "to": "sc:alloc-features",
+                "function": "mbuffer_append_bytes",
+                "arguments": [
+                    "",
+                    "str:def"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "str:def"
+                ]
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "3",
+            "tx": {
+                "to": "sc:alloc-features",
+                "function": "mbuffer_append_bytes",
+                "arguments": [
+                    "str:abc",
+                    ""
+                ]
+            },
+            "expect": {
+                "out": [
+                    "str:abc"
+                ]
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "4",
+            "tx": {
+                "to": "sc:alloc-features",
+                "function": "mbuffer_append_bytes",
+                "arguments": [
+                    "",
+                    ""
+                ]
+            },
+            "expect": {
+                "out": [
+                    ""
+                ]
+            }
+        }
+    ]
+}

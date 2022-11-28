@@ -1,0 +1,141 @@
+{
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:a_user": {},
+                "sc:forwarder": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:FUNG-0001": {
+                            "instances": [
+                                {
+                                    "nonce": "0",
+                                    "balance": "1"
+                                }
+                            ],
+                            "roles": [
+                                "ESDTRoleLocalMint"
+                            ]
+                        }
+                    },
+                    "code": "file:../forwarder/output/forwarder.wasm"
+                },
+                "sc:forwarder2": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:FUNG-0001": {
+                            "instances": [
+                                {
+                                    "nonce": "0",
+                                    "balance": "1"
+                                }
+                            ]
+                        }
+                    },
+                    "code": "file:../forwarder/output/forwarder.wasm"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "local_mint",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:forwarder",
+                "function": "local_mint",
+                "arguments": [
+                    "str:FUNG-0001",
+                    "1200"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "logs": [
+                    {
+                        "address": "sc:forwarder",
+                        "endpoint": "str:ESDTLocalMint",
+                        "topics": [
+                            "str:FUNG-0001",
+                            "0",
+                            "1200"
+                        ],
+                        "data": ""
+                    }
+                ],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "local_mint",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:forwarder2",
+                "function": "local_mint",
+                "arguments": [
+                    "str:FUNG-0001",
+                    "1200"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "10",
+                "message": "str:action is not allowed",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:a_user": {
+                    "nonce": "*"
+                },
+                "sc:forwarder": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:FUNG-0001": {
+                            "instances": [
+                                {
+                                    "nonce": "0",
+                                    "balance": "1201"
+                                }
+                            ],
+                            "roles": [
+                                "ESDTRoleLocalMint"
+                            ]
+                        }
+                    },
+                    "storage": {},
+                    "code": "file:../forwarder/output/forwarder.wasm"
+                },
+                "sc:forwarder2": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:FUNG-0001": {
+                            "instances": [
+                                {
+                                    "nonce": "0",
+                                    "balance": "1"
+                                }
+                            ]
+                        }
+                    },
+                    "code": "file:../forwarder/output/forwarder.wasm"
+                }
+            }
+        }
+    ]
+}

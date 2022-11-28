@@ -1,0 +1,115 @@
+{
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "0x66687aadf862bd776c8fc18b8e9f8e20089714856ee233b3902a591d0d5f2925": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "developerRewards": "0"
+                }
+            }
+        },
+        {
+            "step": "setState",
+            "accounts": {
+                "0x0000000000000000fb1397e8225ea85e0f0e6e8c7b126d0016ccbde0e667151e": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../output/rust-testing-framework-tester.wasm",
+                    "developerRewards": "0"
+                }
+            }
+        },
+        {
+            "step": "setState",
+            "accounts": {
+                "0x0000000000000000fb1397e8225ea85e0f0e6e8c7b126d0016ccbde0e667151e": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:totalValue": "0x01"
+                    },
+                    "code": "file:../output/rust-testing-framework-tester.wasm",
+                    "developerRewards": "0"
+                }
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "0x0000000000000000fb1397e8225ea85e0f0e6e8c7b126d0016ccbde0e667151e": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {},
+                    "storage": {
+                        "str:totalValue": "0x01"
+                    },
+                    "code": "*",
+                    "owner": "*",
+                    "developerRewards": "0"
+                },
+                "+": ""
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "0",
+            "tx": {
+                "from": "0x66687aadf862bd776c8fc18b8e9f8e20089714856ee233b3902a591d0d5f2925",
+                "to": "0x0000000000000000fb1397e8225ea85e0f0e6e8c7b126d0016ccbde0e667151e",
+                "function": "addValue",
+                "arguments": [
+                    "0x32"
+                ],
+                "gasLimit": "100000000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "message": "str:",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "0x0000000000000000fb1397e8225ea85e0f0e6e8c7b126d0016ccbde0e667151e": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {},
+                    "storage": {
+                        "0x76616c756550657243616c6c657266687aadf862bd776c8fc18b8e9f8e20089714856ee233b3902a591d0d5f2925": "0x32",
+                        "str:totalValue": "0x33"
+                    },
+                    "code": "*",
+                    "owner": "*",
+                    "developerRewards": "0"
+                },
+                "+": ""
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "1",
+            "tx": {
+                "to": "0x0000000000000000fb1397e8225ea85e0f0e6e8c7b126d0016ccbde0e667151e",
+                "function": "getTotalValue",
+                "arguments": []
+            },
+            "expect": {
+                "out": [
+                    "0x33"
+                ],
+                "status": "0",
+                "message": "str:",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

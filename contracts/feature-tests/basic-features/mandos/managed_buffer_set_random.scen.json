@@ -1,0 +1,66 @@
+{
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "1",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mbuffer_set_random",
+                "arguments": [
+                    "4"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "0x4788781f"
+                ]
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "1",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mbuffer_set_random",
+                "arguments": [
+                    "8"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "0x4788781f3960d577"
+                ]
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "1",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mbuffer_set_random",
+                "arguments": [
+                    "16"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "0x4788781f3960d577c0d696621996458b"
+                ]
+            }
+        }
+    ]
+}

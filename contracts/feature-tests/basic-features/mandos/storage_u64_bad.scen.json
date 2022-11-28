@@ -9,25 +9,22 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "``u64": "0x010000000000000000"
+                        "str:u64": "0x010000000000000000"
                     },
                     "code": "file:../output/basic-features.wasm"
                 },
                 "address:an_account": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 }
             }
         },
         {
             "step": "scCall",
-            "txId": "load-val",
+            "id": "load-val",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "load_u64",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -35,9 +32,9 @@
             },
             "expect": {
                 "out": [],
-                "status": "*",
-                "message": "str:storage value out of range",
-                "logs": [],
+                "status": "4",
+                "message": "str:storage decode error: input too long",
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }

@@ -1,0 +1,92 @@
+{
+    "name": "init",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "0",
+                    "balance": "0"
+                },
+                "address:buyer": {
+                    "nonce": "0",
+                    "balance": "1000",
+                    "esdt": {
+                        "str:FUNG-123456": "1000",
+                        "str:SEMIFUNG-123456": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "1000"
+                                },
+                                {
+                                    "nonce": "2",
+                                    "balance": "1000"
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "newAddresses": [
+                {
+                    "creatorAddress": "address:owner",
+                    "creatorNonce": "0",
+                    "newAddress": "sc:nft-minter"
+                }
+            ]
+        },
+        {
+            "step": "scDeploy",
+            "id": "deploy",
+            "tx": {
+                "from": "address:owner",
+                "contractCode": "file:../output/nft-minter.wasm",
+                "arguments": [],
+                "gasLimit": "10,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:nft-minter": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "file:../output/nft-minter.wasm"
+                },
+                "+": ""
+            }
+        },
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:nft-minter": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:NFT-123456": {
+                            "lastNonce": "0",
+                            "roles": [
+                                "ESDTRoleNFTCreate"
+                            ]
+                        }
+                    },
+                    "storage": {
+                        "str:nftTokenId": "str:NFT-123456"
+                    },
+                    "code": "file:../output/nft-minter.wasm",
+                    "owner": "address:owner"
+                }
+            }
+        }
+    ]
+}

@@ -1,0 +1,141 @@
+{
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "steps/init_accounts.steps.json"
+        },
+        {
+            "step": "externalSteps",
+            "path": "steps/deploy.steps.json"
+        },
+        {
+            "step": "externalSteps",
+            "path": "steps/add_prop.steps.json"
+        },
+        {
+            "step": "externalSteps",
+            "path": "steps/add_bm.steps.json"
+        },
+        {
+            "step": "scCall",
+            "id": "proposeSCDeployFromSource",
+            "tx": {
+                "from": "address:paul",
+                "to": "sc:multisig",
+                "function": "proposeSCDeployFromSource",
+                "arguments": [
+                    "0",
+                    "sc:multisig",
+                    "0x0000",
+                    "1",
+                    "address:paul"
+                ],
+                "gasLimit": "20,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "3"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "sc-deploy-sign-alice",
+            "tx": {
+                "from": "address:alice",
+                "to": "sc:multisig",
+                "function": "sign",
+                "arguments": [
+                    "3"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "sc-deploy-sign-bob",
+            "tx": {
+                "from": "address:bob",
+                "to": "sc:multisig",
+                "function": "sign",
+                "arguments": [
+                    "3"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "setState",
+            "newAddresses": [
+                {
+                    "creatorAddress": "sc:multisig",
+                    "creatorNonce": "0",
+                    "newAddress": "sc:multisig-child"
+                }
+            ]
+        },
+        {
+            "step": "scCall",
+            "id": "sc-deploy-perform-1",
+            "tx": {
+                "from": "address:paul",
+                "to": "sc:multisig",
+                "function": "performAction",
+                "arguments": [
+                    "3"
+                ],
+                "gasLimit": "80,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "sc:multisig-child"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:multisig-child": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:user_count": "1",
+                        "str:user_address_to_id|address:paul": "1",
+                        "str:user_id_to_address|u32:1": "address:paul",
+                        "str:user_role|u32:1": "2",
+                        "str:num_board_members": "1",
+                        "str:quorum": "1"
+                    },
+                    "code": "file:../output/multisig.wasm"
+                },
+                "+": ""
+            }
+        }
+    ]
+}

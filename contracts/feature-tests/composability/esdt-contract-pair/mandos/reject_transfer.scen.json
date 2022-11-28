@@ -1,0 +1,81 @@
+{
+    "name": "reject transfer",
+    "gasSchedule": "dummy",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "init.scen.json"
+        },
+        {
+            "step": "setState",
+            "accounts": {
+                "address:acc1": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:cool_token": "1,000,000"
+                    }
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "reject-transfer",
+            "tx": {
+                "from": "address:acc1",
+                "to": "sc:first_contract",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:cool_token",
+                        "value": "500,000"
+                    }
+                ],
+                "function": "transferToSecondContractFull",
+                "arguments": [],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:Rejected",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:owner": {
+                    "storage": {}
+                },
+                "address:acc1": {
+                    "nonce": "1",
+                    "balance": "0",
+                    "esdt": {
+                        "str:boring_token": "1,000,000"
+                    },
+                    "storage": {}
+                },
+                "sc:first_contract": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:esdtTokenName": "str:cool_token",
+                        "str:secondContractAddress": "sc:second_contract"
+                    },
+                    "code": "*"
+                },
+                "sc:second_contract": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:esdtTokenName": "str:cool_token"
+                    },
+                    "code": "*"
+                },
+                "+": ""
+            }
+        }
+    ]
+}

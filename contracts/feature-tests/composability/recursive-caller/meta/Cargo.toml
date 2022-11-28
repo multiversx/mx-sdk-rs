@@ -1,0 +1,12 @@
+[package]
+name = "recursive-caller-meta"
+version = "0.0.0"
+edition = "2018"
+publish = false
+
+[dependencies.recursive-caller]
+path = ".."
+
+[dependencies.elrond-wasm-debug]
+version = "0.36.1"
+path = "../../../../../elrond-wasm-debug"

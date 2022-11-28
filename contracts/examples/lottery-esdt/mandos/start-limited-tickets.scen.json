@@ -8,11 +8,10 @@
         },
         {
             "step": "scCall",
-            "txId": "start limited tickets",
+            "id": "start limited tickets",
             "tx": {
                 "from": "address:my_address",
                 "to": "sc:lottery",
-                "value": "0",
                 "function": "start",
                 "arguments": [
                     "str:lottery_name",
@@ -28,6 +27,7 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "",
                 "gas": "*",
                 "refund": "*"
@@ -56,14 +56,13 @@
                     "balance": "0",
                     "storage": {
                         "str:lotteryInfo|nested:str:lottery_name": {
-                            "0-token_name": "nested:str:LOTTERY-123456",
+                            "0-token_identifier": "nested:str:LOTTERY-123456",
                             "1-ticket_price": "biguint:100",
                             "2-tickets-left": "u32:2",
                             "3-deadline": "u64:2592000",
                             "4-max_entries_per_user": "u32:800",
                             "5-prize_distribution": "nested:u8:100",
-                            "6-whitelist": "nested:",
-                            "7-prize_pool": "biguint:0"
+                            "6-prize_pool": "biguint:0"
                         }
                     },
                     "code": "file:../output/lottery-esdt.wasm"

@@ -1,0 +1,184 @@
+{
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:msg-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../output/formatted-message-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "format_message_one_part",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:msg-features",
+                "function": "format_message_one_part",
+                "arguments": [],
+                "gasLimit": "1,500,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "str:Test"
+                ],
+                "status": "0",
+                "message": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "format_message_multiple_parts",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:msg-features",
+                "function": "format_message_multiple_parts",
+                "arguments": [
+                    "123456789"
+                ],
+                "gasLimit": "1,500,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "str:Hello 123456789 world"
+                ],
+                "status": "0",
+                "message": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "format_message_big_int---positive",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:msg-features",
+                "function": "format_message_big_int",
+                "arguments": [
+                    "123456789"
+                ],
+                "gasLimit": "1,500,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "str:BigInt: 123456789"
+                ],
+                "status": "0",
+                "message": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "format_message_big_int---negative",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:msg-features",
+                "function": "format_message_big_int",
+                "arguments": [
+                    "-123456789"
+                ],
+                "gasLimit": "1,500,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "str:BigInt: -123456789"
+                ],
+                "status": "0",
+                "message": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "format_message_big_int---negative",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:msg-features",
+                "function": "format_message_big_int",
+                "arguments": [
+                    "-123456789"
+                ],
+                "gasLimit": "1,500,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "str:BigInt: -123456789"
+                ],
+                "status": "0",
+                "message": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "format_message_managed_buffer",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:msg-features",
+                "function": "format_message_managed_buffer",
+                "arguments": [
+                    "str:My Managed Buffer"
+                ],
+                "gasLimit": "1,500,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "str:ManagedBuffer: My Managed Buffer"
+                ],
+                "status": "0",
+                "message": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "format_message_managed_buffer_hex",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:msg-features",
+                "function": "format_message_managed_buffer_hex",
+                "arguments": [
+                    "str:My Managed Buffer"
+                ],
+                "gasLimit": "2,500,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "str:ManagedBuffer hex: 4d79204d616e6167656420427566666572"
+                ],
+                "status": "0",
+                "message": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

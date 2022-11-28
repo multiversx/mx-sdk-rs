@@ -3,16 +3,16 @@
     "gasSchedule": "dummy",
     "steps": [
         {
-            "step" :"externalSteps",
+            "step": "externalSteps",
             "path": "approve_siring.scen.json"
         },
         {
             "step": "scCall",
-            "txId": "tx-breed-ok",
+            "id": "tx-breed-ok",
             "tx": {
                 "from": "address:acc2",
                 "to": "sc:kitty_ownership_contract",
-                "value": "10",
+                "egldValue": "10",
                 "function": "breedWith",
                 "arguments": [
                     "2",
@@ -22,8 +22,9 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "message": "",
+                "out": [],
                 "status": "0",
+                "message": "",
                 "gas": "*",
                 "refund": "*"
             }
@@ -54,14 +55,11 @@
                         "str:kittyAuctionContractAddress": "sc:kitty_auction_contract",
                         "str:birthFee": "10",
                         "str:totalKitties": "3",
-
                         "str:kitty|u32:0": "u8:0|u8:0|u8:0|u8:0|u8:0|u8:0|u8:0|u64:0|u64:0|u32:0|u32:0|u32:0|u16:0|u16:0",
                         "str:kitty|u32:1": "u8:0|u8:0|u8:0|u8:0|u8:0|u8:0|u8:0|u64:0|u64:100,060|u32:0|u32:0|u32:0|u16:0|u16:0",
                         "str:kitty|u32:2": "u8:255|u8:255|u8:255|u8:255|u8:255|u8:255|u8:255|u64:0|u64:100,060|u32:0|u32:0|u32:1|u16:0|u16:0",
-                        
                         "str:owner|u32:1": "address:acc1",
                         "str:owner|u32:2": "address:acc2",
-
                         "str:nrOwnedKitties|address:acc1": "1",
                         "str:nrOwnedKitties|address:acc2": "1"
                     },

@@ -1,0 +1,116 @@
+{
+    "comment": "not the main test, just warmup",
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:a_user": {
+                    "nonce": "0",
+                    "balance": "0"
+                },
+                "sc:vault": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../vault/output/vault.wasm"
+                },
+                "sc:recursive-caller": {
+                    "nonce": "0",
+                    "balance": "1000",
+                    "code": "file:../recursive-caller/output/recursive-caller.wasm"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "1",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:recursive-caller",
+                "function": "recursive_send_funds",
+                "arguments": [
+                    "sc:vault",
+                    "str:EGLD",
+                    "1",
+                    "1"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "logs": [
+                    {
+                        "address": "sc:recursive-caller",
+                        "endpoint": "str:recursive_send_funds",
+                        "topics": [
+                            "str:recursive_send_funds",
+                            "sc:vault",
+                            "str:EGLD",
+                            "1"
+                        ],
+                        "data": "1"
+                    },
+                    {
+                        "address": "*",
+                        "endpoint": "str:transferValueOnly",
+                        "topics": [
+                            "sc:recursive-caller",
+                            "sc:vault",
+                            "1"
+                        ],
+                        "data": ""
+                    },
+                    {
+                        "address": "sc:vault",
+                        "endpoint": "str:accept_funds",
+                        "topics": [
+                            "str:accept_funds",
+                            "1"
+                        ],
+                        "data": ""
+                    },
+                    {
+                        "address": "sc:recursive-caller",
+                        "endpoint": "str:callBack",
+                        "topics": [
+                            "str:recursive_send_funds_callback",
+                            "sc:vault",
+                            "str:EGLD",
+                            "1"
+                        ],
+                        "data": "1"
+                    }
+                ],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:a_user": {
+                    "nonce": "*",
+                    "balance": "0",
+                    "storage": {},
+                    "code": ""
+                },
+                "sc:vault": {
+                    "nonce": "0",
+                    "balance": "1",
+                    "storage": {
+                        "str:call_counts|nested:str:accept_funds": "1"
+                    },
+                    "code": "file:../vault/output/vault.wasm"
+                },
+                "sc:recursive-caller": {
+                    "nonce": "0",
+                    "balance": "999",
+                    "storage": {},
+                    "code": "file:../recursive-caller/output/recursive-caller.wasm"
+                }
+            }
+        }
+    ]
+}

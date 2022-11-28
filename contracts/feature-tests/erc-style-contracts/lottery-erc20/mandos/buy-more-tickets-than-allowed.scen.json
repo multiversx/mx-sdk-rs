@@ -1,0 +1,83 @@
+{
+    "name": "buy more tickets than allowed",
+    "gasSchedule": "dummy",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "buy-ticket-all-options.scen.json"
+        },
+        {
+            "step": "scCall",
+            "id": "buy-more-tickets-than-allowed",
+            "tx": {
+                "from": "address:acc1",
+                "to": "sc:lottery",
+                "function": "buy_ticket",
+                "arguments": [
+                    "str:lottery_name",
+                    "100"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:Ticket limit exceeded for this lottery!",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:my_address": {
+                    "nonce": "2",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "address:acc1": {
+                    "nonce": "2",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "address:acc2": {
+                    "nonce": "0",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "sc:lottery": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:lotteryInfo|u32:12|str:lottery_name": "u32:1|u8:100|u32:4|u64:123,456|u32:1|u32:2|u8:75|u8:25|u32:3|address:my_address|address:acc1|address:acc2|u32:1|u32:1|u8:100|u32:0",
+                        "str:erc20ContractAddress": "sc:erc20",
+                        "str:ticketHolder|u32:12|str:lottery_name|0x00000000": "address:acc1",
+                        "str:numberOfEntriesForUser|u32:12|str:lottery_name|address:acc1": "1"
+                    },
+                    "code": "file:../output/lottery-erc20.wasm"
+                },
+                "sc:erc20": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:balance|address:erc20_owner": "997,000,000",
+                        "str:balance|address:my_address": "1,000,000",
+                        "str:balance|address:acc1": "999,900",
+                        "str:balance|address:acc2": "1,000,000",
+                        "str:balance|sc:lottery": "100",
+                        "str:allowance|address:acc1|sc:lottery": "0",
+                        "str:allowance|address:acc2|sc:lottery": "100",
+                        "str:totalSupply": "1,000,000,000"
+                    },
+                    "code": "file:../../erc20/output/erc20.wasm"
+                },
+                "address:erc20_owner": {
+                    "nonce": "1",
+                    "balance": "1,000,000",
+                    "storage": {}
+                }
+            }
+        }
+    ]
+}

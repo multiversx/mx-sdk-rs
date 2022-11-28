@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  format_tests:
+    name: LLDB formatter tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions-rs/toolchain@v1
+        with:
+          default: true
+          toolchain: nightly-2022-10-12
+
+      - name: Download vscode-lldb
+        uses: robinraju/release-downloader@v1.5
+        with:
+          repository: vadimcn/vscode-lldb
+          latest: true
+          fileName: codelldb-x86_64-linux.vsix
+
+      - name: Setup vscode-lldb
+        run: |
+          unzip codelldb-x86_64-linux.vsix -d vscode-lldb
+          mkdir -p $HOME/.vscode/extensions/vadimcn.vscode-lldb-x.x.x/
+          mv vscode-lldb/extension/* $HOME/.vscode/extensions/vadimcn.vscode-lldb-x.x.x/
+
+      - name: Run the rust tests
+        run: |
+          cd tools/rust-debugger/format-tests
+          cargo test

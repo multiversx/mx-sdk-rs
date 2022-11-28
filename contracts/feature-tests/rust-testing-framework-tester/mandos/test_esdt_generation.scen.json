@@ -1,0 +1,65 @@
+{
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "0x00000000000000006c8fc18b8e9f8e20089714856ee233b3902a591d0d5f2925": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../output/rust-testing-framework-tester.wasm",
+                    "developerRewards": "0"
+                }
+            }
+        },
+        {
+            "step": "setState",
+            "accounts": {
+                "0x00000000000000006c8fc18b8e9f8e20089714856ee233b3902a591d0d5f2925": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:COOL-123456": {
+                            "instances": [
+                                {
+                                    "nonce": "0",
+                                    "balance": "1000",
+                                    "royalties": "0",
+                                    "attributes": "0x"
+                                }
+                            ]
+                        }
+                    },
+                    "code": "file:../output/rust-testing-framework-tester.wasm",
+                    "developerRewards": "0"
+                }
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "0x00000000000000006c8fc18b8e9f8e20089714856ee233b3902a591d0d5f2925": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:COOL-123456": {
+                            "instances": [
+                                {
+                                    "nonce": "0",
+                                    "balance": "1000",
+                                    "royalties": "0",
+                                    "uri": [],
+                                    "attributes": "0x"
+                                }
+                            ]
+                        }
+                    },
+                    "storage": {},
+                    "code": "*",
+                    "owner": "*",
+                    "developerRewards": "0"
+                },
+                "+": ""
+            }
+        }
+    ]
+}

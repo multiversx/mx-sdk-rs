@@ -1,0 +1,196 @@
+{
+    "name": "storage",
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:opt_addr": [
+                            "1",
+                            "str:____________address_too_long____________"
+                        ]
+                    },
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "load-val",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "load_opt_addr",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:storage decode error: input too long",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "store-val",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "store_opt_addr",
+                "arguments": [
+                    "str:____________address_____________"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:opt_addr": "1|str:____________address_____________"
+                    },
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "+": ""
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "load-val",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "load_opt_addr",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "str:____________address_____________"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "is-empty-false",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "is_empty_opt_addr",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "false"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "store-empty",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "store_opt_addr",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "is-empty-true",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "is_empty_opt_addr",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "true"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "*",
+                    "balance": "*",
+                    "storage": {
+                        "str:opt_addr": ""
+                    },
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "+": ""
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "load-empty",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "load_opt_addr",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

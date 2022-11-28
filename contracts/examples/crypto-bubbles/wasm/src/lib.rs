@@ -1,4 +1,19 @@
+////////////////////////////////////////////////////
+////////////////// AUTO-GENERATED //////////////////
+////////////////////////////////////////////////////
+
 #![no_std]
 
-pub use crypto_bubbles::*;
-pub use elrond_wasm_output::*;
+elrond_wasm_node::wasm_endpoints! {
+    crypto_bubbles
+    (
+        balanceOf
+        joinGame
+        rewardAndSendToWallet
+        rewardWinner
+        topUp
+        withdraw
+    )
+}
+
+elrond_wasm_node::wasm_empty_callback! {}

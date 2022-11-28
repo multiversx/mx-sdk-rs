@@ -1,0 +1,70 @@
+{
+    "comment": "simple EGLD transfer, no SC",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:A": {
+                    "nonce": "0",
+                    "balance": "150"
+                },
+                "address:B": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            }
+        },
+        {
+            "step": "transfer",
+            "id": "1",
+            "tx": {
+                "from": "address:A",
+                "to": "address:B",
+                "egldValue": "100"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:A": {
+                    "nonce": "1",
+                    "balance": "50",
+                    "storage": {},
+                    "code": ""
+                },
+                "address:B": {
+                    "nonce": "0",
+                    "balance": "100",
+                    "storage": {},
+                    "code": ""
+                }
+            }
+        },
+        {
+            "step": "transfer",
+            "id": "2",
+            "tx": {
+                "from": "address:A",
+                "to": "address:B",
+                "egldValue": "50"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:A": {
+                    "nonce": "2",
+                    "balance": "0",
+                    "storage": {},
+                    "code": ""
+                },
+                "address:B": {
+                    "nonce": "0",
+                    "balance": "150",
+                    "storage": {},
+                    "code": ""
+                }
+            }
+        }
+    ]
+}

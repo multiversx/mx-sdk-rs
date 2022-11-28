@@ -1,21 +1,48 @@
-use elrond_codec::{EncodeError, TopEncode};
+use elrond_codec::{TopEncode, TopEncodeMulti};
 
-use crate::{api::ErrorApi, types::BoxedBytes};
+use crate::{
+    api::{ErrorApi, LogApi, LogApiImpl, ManagedTypeApi},
+    contract_base::ExitCodecErrorHandler,
+    err_msg,
+    types::{ManagedBuffer, ManagedType, ManagedVec},
+};
 
-pub fn serialize_log_data<T, EA>(data: T, api: EA) -> BoxedBytes
+pub fn event_topic_accumulator<A>(event_identifier: &[u8]) -> ManagedVec<A, ManagedBuffer<A>>
 where
-	T: TopEncode,
-	EA: ErrorApi + Clone + 'static,
+    A: ErrorApi + ManagedTypeApi,
 {
-	let mut result = BoxedBytes::empty();
-	data.top_encode_or_exit(&mut result, api, serialize_log_data_exit);
-	result
+    let mut accumulator = ManagedVec::new();
+    accumulator.push(ManagedBuffer::new_from_bytes(event_identifier));
+    accumulator
 }
 
-#[inline(always)]
-fn serialize_log_data_exit<EA>(api: EA, encode_err: EncodeError) -> !
+pub fn serialize_event_topic<A, T>(accumulator: &mut ManagedVec<A, ManagedBuffer<A>>, topic: T)
 where
-	EA: ErrorApi + 'static,
+    A: ErrorApi + ManagedTypeApi,
+    T: TopEncodeMulti,
 {
-	api.signal_error(encode_err.message_bytes())
+    let Ok(()) = topic.multi_encode_or_handle_err(
+        accumulator,
+        ExitCodecErrorHandler::<A>::from(err_msg::LOG_TOPIC_ENCODE_ERROR),
+    );
+}
+
+pub fn serialize_log_data<T, A>(data: T) -> ManagedBuffer<A>
+where
+    T: TopEncode,
+    A: ErrorApi + ManagedTypeApi,
+{
+    let mut data_buffer = ManagedBuffer::new();
+    let Ok(()) = data.top_encode_or_handle_err(
+        &mut data_buffer,
+        ExitCodecErrorHandler::<A>::from(err_msg::LOG_DATA_ENCODE_ERROR),
+    );
+    data_buffer
+}
+
+pub fn write_log<A>(topics: &ManagedVec<A, ManagedBuffer<A>>, data: &ManagedBuffer<A>)
+where
+    A: LogApi + ManagedTypeApi,
+{
+    A::log_api_impl().managed_write_log(topics.get_handle(), data.get_handle());
 }

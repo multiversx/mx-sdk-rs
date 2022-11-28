@@ -1,0 +1,43 @@
+{
+    "name": "matchOrders",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "steps/complete_setup.steps.json"
+        },
+        {
+            "step": "externalSteps",
+            "path": "steps/create_buy_order.steps.json"
+        },
+        {
+            "step": "externalSteps",
+            "path": "steps/create_sell_order.steps.json"
+        },
+        {
+            "step": "setState",
+            "currentBlockInfo": {
+                "blockEpoch": "50"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "freeOrders",
+            "tx": {
+                "from": "address:match_provider",
+                "to": "sc:pair",
+                "function": "freeOrders",
+                "arguments": [
+                    "u64:0|u64:1"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

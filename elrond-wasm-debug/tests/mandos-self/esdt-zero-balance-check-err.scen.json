@@ -1,0 +1,41 @@
+{
+    "name": "check should fail if expected 0 and the actual is non-zero",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:A": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:TOK-123456": "150"
+                    }
+                },
+                "address:B": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:A": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:TOK-123456": "0"
+                    },
+                    "storage": {},
+                    "code": ""
+                },
+                "address:B": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": ""
+                }
+            }
+        }
+    ]
+}

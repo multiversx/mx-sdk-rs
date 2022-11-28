@@ -1,0 +1,445 @@
+{
+    "name": "deposit tokens from artists",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "deploy.scen.json"
+        },
+        {
+            "step": "scCall",
+            "tx": {
+                "from": "address:artist1",
+                "to": "sc:bonding-curve-contract",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:MFFT-123456",
+                        "nonce": "0",
+                        "value": "50"
+                    }
+                ],
+                "function": "deposit",
+                "arguments": [
+                    "str:EGLD-135790"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "tx": {
+                "from": "address:artist1",
+                "to": "sc:bonding-curve-contract",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:MFFT-123456",
+                        "nonce": "0",
+                        "value": "650"
+                    }
+                ],
+                "function": "deposit",
+                "arguments": [
+                    "str:EGLD-135790"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "tx": {
+                "from": "address:artist2",
+                "to": "sc:bonding-curve-contract",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:MFSFT-246802",
+                        "nonce": "1",
+                        "value": "2000"
+                    }
+                ],
+                "function": "deposit",
+                "arguments": [
+                    "str:EGLD-135790"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "tx": {
+                "from": "address:artist2",
+                "to": "sc:bonding-curve-contract",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:MFSFT-246802",
+                        "nonce": "17",
+                        "value": "500"
+                    }
+                ],
+                "function": "deposit",
+                "arguments": [
+                    "str:EGLD-135790"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "tx": {
+                "from": "address:artist1",
+                "to": "sc:bonding-curve-contract",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:MFNFT-567890",
+                        "nonce": "2",
+                        "value": "1"
+                    }
+                ],
+                "function": "deposit",
+                "arguments": [
+                    "str:EGLD-135790"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "tx": {
+                "from": "address:artist1",
+                "to": "sc:bonding-curve-contract",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:MFNFT-567890",
+                        "nonce": "3",
+                        "value": "1"
+                    }
+                ],
+                "function": "deposit",
+                "arguments": [
+                    "str:EGLD-135790"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "tx": {
+                "from": "address:artist1",
+                "to": "sc:bonding-curve-contract",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:MFNFT-567890",
+                        "nonce": "4",
+                        "value": "1"
+                    }
+                ],
+                "function": "deposit",
+                "arguments": [
+                    "str:EGLD-135790"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "tx": {
+                "from": "address:artist1",
+                "to": "sc:bonding-curve-contract",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:MFNFT-567890",
+                        "nonce": "5",
+                        "value": "1"
+                    }
+                ],
+                "function": "deposit",
+                "arguments": [
+                    "str:EGLD-135790"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "tx": {
+                "from": "address:artist1",
+                "to": "sc:bonding-curve-contract",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:MFNFT-567890",
+                        "nonce": "6",
+                        "value": "1"
+                    }
+                ],
+                "function": "deposit",
+                "arguments": [
+                    "str:EGLD-135790"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "tx": {
+                "from": "address:artist1",
+                "to": "sc:bonding-curve-contract",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:MFNFT-567890",
+                        "nonce": "8",
+                        "value": "1"
+                    }
+                ],
+                "function": "deposit",
+                "arguments": [
+                    "str:EGLD-135790"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "tx": {
+                "from": "address:artist1",
+                "to": "sc:bonding-curve-contract",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:MFNFT-567890",
+                        "nonce": "9",
+                        "value": "1"
+                    }
+                ],
+                "function": "deposit",
+                "arguments": [
+                    "str:EGLD-135790"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "1",
+                    "balance": "0",
+                    "storage": {}
+                },
+                "address:buyer1": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:EGLD-135790": "200"
+                    },
+                    "storage": {}
+                },
+                "address:buyer2": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:EGLD-135790": "20000"
+                    },
+                    "storage": {}
+                },
+                "address:artist1": {
+                    "nonce": "9",
+                    "balance": "0",
+                    "esdt": {
+                        "str:MFNFT-567890": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "1"
+                                },
+                                {
+                                    "nonce": "7",
+                                    "balance": "1"
+                                }
+                            ]
+                        },
+                        "str:MFFT-123456": "300"
+                    },
+                    "storage": {}
+                },
+                "address:artist2": {
+                    "nonce": "2",
+                    "balance": "0",
+                    "esdt": {
+                        "str:MFSFT-246802": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "0"
+                                },
+                                {
+                                    "nonce": "2",
+                                    "balance": "1000"
+                                },
+                                {
+                                    "nonce": "17",
+                                    "balance": "500"
+                                }
+                            ]
+                        }
+                    },
+                    "storage": {}
+                },
+                "sc:bonding-curve-contract": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:MFFT-123456": "700",
+                        "str:MFNFT-567890": {
+                            "instances": [
+                                {
+                                    "nonce": "2",
+                                    "balance": "1"
+                                },
+                                {
+                                    "nonce": "3",
+                                    "balance": "1"
+                                },
+                                {
+                                    "nonce": "4",
+                                    "balance": "1"
+                                },
+                                {
+                                    "nonce": "5",
+                                    "balance": "1"
+                                },
+                                {
+                                    "nonce": "6",
+                                    "balance": "1"
+                                },
+                                {
+                                    "nonce": "8",
+                                    "balance": "1"
+                                },
+                                {
+                                    "nonce": "9",
+                                    "balance": "1"
+                                }
+                            ]
+                        },
+                        "str:MFSFT-246802": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "2000"
+                                },
+                                {
+                                    "nonce": "17",
+                                    "balance": "500"
+                                }
+                            ]
+                        }
+                    },
+                    "storage": {
+                        "str:bonding_curve|nested:str:MFFT-123456": "u8:2|biguint:700|biguint:700|u8:0|nested:str:EGLD-135790|u64:0|biguint:0",
+                        "str:bonding_curve|nested:str:MFSFT-246802": "u8:2|biguint:2500|biguint:2500|u8:0|nested:str:EGLD-135790|u64:0|biguint:0",
+                        "str:bonding_curve|nested:str:MFNFT-567890": "u8:2|biguint:7|biguint:7|u8:0|nested:str:EGLD-135790|u64:0|biguint:0",
+                        "str:token_details|nested:str:MFFT-123456": "u32:1|u64:0|address:artist1",
+                        "str:token_details|nested:str:MFSFT-246802": "u32:2|u64:1|u64:17|address:artist2",
+                        "str:token_details|nested:str:MFNFT-567890": "u32:7|u64:2|u64:3|u64:4|u64:5|u64:6|u64:8|u64:9|address:artist1",
+                        "str:nonce_amount|nested:str:MFFT-123456|u64:0": "700",
+                        "str:nonce_amount|nested:str:MFSFT-246802|u64:1": "2000",
+                        "str:nonce_amount|nested:str:MFSFT-246802|u64:17": "500",
+                        "str:nonce_amount|nested:str:MFNFT-567890|u64:2": "1",
+                        "str:nonce_amount|nested:str:MFNFT-567890|u64:3": "1",
+                        "str:nonce_amount|nested:str:MFNFT-567890|u64:4": "1",
+                        "str:nonce_amount|nested:str:MFNFT-567890|u64:5": "1",
+                        "str:nonce_amount|nested:str:MFNFT-567890|u64:6": "1",
+                        "str:nonce_amount|nested:str:MFNFT-567890|u64:8": "1",
+                        "str:nonce_amount|nested:str:MFNFT-567890|u64:9": "1",
+                        "str:owned_tokens|address:artist1|str:.info": "u32:2|u32:1|u32:2|u32:2",
+                        "str:owned_tokens|address:artist1|str:.node_links|u32:1": "u32:0|u32:2",
+                        "str:owned_tokens|address:artist1|str:.node_id|nested:str:MFFT-123456": "1",
+                        "str:owned_tokens|address:artist1|str:.value|u32:1": "str:MFFT-123456",
+                        "str:owned_tokens|address:artist1|str:.node_links|u32:2": "u32:1|u32:0",
+                        "str:owned_tokens|address:artist1|str:.node_id|nested:str:MFNFT-567890": "2",
+                        "str:owned_tokens|address:artist1|str:.value|u32:2": "str:MFNFT-567890",
+                        "str:owned_tokens|address:artist2|str:.info": "u32:1|u32:1|u32:1|u32:1",
+                        "str:owned_tokens|address:artist2|str:.node_links|u32:1": "u32:0|u32:0",
+                        "str:owned_tokens|address:artist2|str:.node_id|nested:str:MFSFT-246802": "1",
+                        "str:owned_tokens|address:artist2|str:.value|u32:1": "str:MFSFT-246802"
+                    },
+                    "code": "file:../output/bonding-curve-contract.wasm"
+                }
+            }
+        }
+    ]
+}

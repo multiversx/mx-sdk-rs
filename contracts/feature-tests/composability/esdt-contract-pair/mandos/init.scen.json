@@ -1,0 +1,94 @@
+{
+    "name": "init",
+    "gasSchedule": "dummy",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            },
+            "newAddresses": [
+                {
+                    "creatorAddress": "address:owner",
+                    "creatorNonce": "0",
+                    "newAddress": "sc:first_contract"
+                },
+                {
+                    "creatorAddress": "address:owner",
+                    "creatorNonce": "1",
+                    "newAddress": "sc:second_contract"
+                }
+            ]
+        },
+        {
+            "step": "scDeploy",
+            "id": "deploy-first-contract",
+            "tx": {
+                "from": "address:owner",
+                "contractCode": "file:../first-contract/output/first-contract.wasm",
+                "arguments": [
+                    "str:cool_token",
+                    "sc:second_contract"
+                ],
+                "gasLimit": "1,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scDeploy",
+            "id": "deploy-second-contract",
+            "tx": {
+                "from": "address:owner",
+                "contractCode": "file:../second-contract/output/second-contract.wasm",
+                "arguments": [
+                    "str:cool_token"
+                ],
+                "gasLimit": "1,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "2",
+                    "balance": "0",
+                    "storage": {}
+                },
+                "sc:first_contract": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:esdtTokenName": "str:cool_token",
+                        "str:secondContractAddress": "sc:second_contract"
+                    },
+                    "code": "*"
+                },
+                "sc:second_contract": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:esdtTokenName": "str:cool_token"
+                    },
+                    "code": "*"
+                },
+                "+": ""
+            }
+        }
+    ]
+}

@@ -7,24 +7,20 @@
                 "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
                     "code": "file:../output/basic-features.wasm"
                 },
                 "address:an_account": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 }
             }
         },
         {
             "step": "scCall",
-            "txId": "call-a-function-which-does-not-exist",
+            "id": "call-a-function-which-does-not-exist",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "function_which_does_not_exist",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -34,7 +30,7 @@
                 "out": [],
                 "status": "1",
                 "message": "str:invalid function (not found)",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }

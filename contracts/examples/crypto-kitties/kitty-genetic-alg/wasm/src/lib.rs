@@ -1,4 +1,14 @@
+////////////////////////////////////////////////////
+////////////////// AUTO-GENERATED //////////////////
+////////////////////////////////////////////////////
+
 #![no_std]
 
-pub use kitty_genetic_alg::*;
-pub use elrond_wasm_output::*;
+elrond_wasm_node::wasm_endpoints! {
+    kitty_genetic_alg
+    (
+        generateKittyGenes
+    )
+}
+
+elrond_wasm_node::wasm_empty_callback! {}

@@ -1,0 +1,32 @@
+{
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:a_user": {},
+                "sc:forwarder": {
+                    "code": "file:../output/use-module.wasm"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "no-endpoint",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:forwarder",
+                "function": "call_mod_d",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "1",
+                "message": "str:invalid function (not found)",
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

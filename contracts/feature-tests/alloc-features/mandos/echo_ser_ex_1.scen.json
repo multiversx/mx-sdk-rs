@@ -1,0 +1,118 @@
+{
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:alloc-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../output/alloc-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "1",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:alloc-features",
+                "function": "echo_ser_example_1",
+                "arguments": [
+                    {
+                        "0-int": "u16:0",
+                        "1-seq": [
+                            "u32:3",
+                            "0x010203"
+                        ],
+                        "2-another_byte": "u8:4",
+                        "3-uint_32": "u32:5",
+                        "4-uint_64": "u64:6",
+                        "5-boxed_bytes": [
+                            "u32:4",
+                            "0x0708090a"
+                        ]
+                    }
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    {
+                        "0-int": "u16:0",
+                        "1-seq": [
+                            "u32:3",
+                            "0x010203"
+                        ],
+                        "2-another_byte": "u8:4",
+                        "3-uint_32": "u32:5",
+                        "4-uint_64": "u64:6",
+                        "5-boxed_bytes": [
+                            "u32:4",
+                            "0x0708090a"
+                        ]
+                    }
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "2",
+            "comment": "also checks that map keys are sorted, but it's the same as above",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:alloc-features",
+                "function": "echo_boxed_ser_example_1",
+                "arguments": [
+                    {
+                        "3-uint_32": "u32:5",
+                        "4-uint_64": "u64:6",
+                        "5-boxed_bytes": [
+                            "u32:4",
+                            "0x0708090a"
+                        ],
+                        "0-int": "u16:0",
+                        "1-seq": [
+                            "u32:3",
+                            "0x010203"
+                        ],
+                        "2-another_byte": "u8:4"
+                    }
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    {
+                        "5-boxed_bytes": [
+                            "u32:4",
+                            "0x0708090a"
+                        ],
+                        "4-uint_64": "u64:6",
+                        "3-uint_32": "u32:5",
+                        "2-another_byte": "u8:4",
+                        "1-seq": [
+                            "u32:3",
+                            "0x010203"
+                        ],
+                        "0-int": "u16:0"
+                    }
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

@@ -1,0 +1,77 @@
+{
+    "name": "message_sameShard",
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:a_user": {
+                    "nonce": "0",
+                    "balance": "0x10000000000000e8d4a51000"
+                },
+                "sc:proxy-first": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:other_contract": "sc:proxy-second"
+                    },
+                    "code": "file:../proxy-test-first/output/proxy-test-first.wasm"
+                },
+                "sc:proxy-second": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../proxy-test-second/output/proxy-test-second.wasm"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "1",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:proxy-first",
+                "function": "messageOtherContract",
+                "arguments": [],
+                "gasLimit": "0x1000000000000",
+                "gasPrice": "0x01"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:a_user": {
+                    "nonce": "1",
+                    "balance": "0xfffffffffff00e8d4a51000",
+                    "storage": {},
+                    "code": ""
+                },
+                "sc:proxy-first": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:other_contract": "sc:proxy-second"
+                    },
+                    "code": "file:../proxy-test-first/output/proxy-test-first.wasm"
+                },
+                "sc:proxy-second": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:message_me_1": "0x01",
+                        "str:message_me_2": "0x02",
+                        "str:message_me_3": "0x030303",
+                        "str:message_me_4": "0xfefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefe"
+                    },
+                    "code": "file:../proxy-test-second/output/proxy-test-second.wasm"
+                }
+            }
+        }
+    ]
+}

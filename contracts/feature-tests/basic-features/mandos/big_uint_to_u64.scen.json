@@ -1,0 +1,82 @@
+{
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "1",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "big_uint_to_u64",
+                "arguments": [
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ]
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "2",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "big_uint_to_u64",
+                "arguments": [
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "1"
+                ]
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "4",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "big_uint_to_u64",
+                "arguments": [
+                    "0x7FFFFFFFFFFFFFFF"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "0x7FFFFFFFFFFFFFFF"
+                ]
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "5",
+            "comment": "too big because we are first converting to int64; TODO: change conversion to completely unsigned",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "big_uint_to_u64",
+                "arguments": [
+                    "0x8000000000000000"
+                ]
+            },
+            "expect": {
+                "out": []
+            }
+        }
+    ]
+}

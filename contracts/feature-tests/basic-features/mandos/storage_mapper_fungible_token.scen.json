@@ -1,0 +1,797 @@
+{
+    "name": "storage",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "100"
+                },
+                "0x000000000000000000010000000000000000000000000000000000000002ffff": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:TICKER-000000": {
+                            "roles": [
+                                "ESDTRoleLocalMint",
+                                "ESDTRoleLocalBurn"
+                            ]
+                        },
+                        "str:TICKER-222222": {
+                            "roles": [
+                                "ESDTRoleLocalMint",
+                                "ESDTRoleLocalBurn"
+                            ]
+                        }
+                    },
+                    "code": "file:../../esdt-system-sc-mock/output/esdt-system-sc-mock.wasm"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "issue-default-callback-non-zero-initial-supply",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "issue_fungible_default_callback",
+                "arguments": [
+                    "str:TICKER",
+                    "1000"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:TICKER-000000": "1000"
+                    },
+                    "storage": {
+                        "str:fungibleTokenMapper": "str:TICKER-000000"
+                    },
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "*",
+                    "balance": "*"
+                },
+                "0x000000000000000000010000000000000000000000000000000000000002ffff": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:TICKER-000000": {
+                            "roles": [
+                                "ESDTRoleLocalMint",
+                                "ESDTRoleLocalBurn"
+                            ]
+                        },
+                        "str:TICKER-222222": {
+                            "roles": [
+                                "ESDTRoleLocalMint",
+                                "ESDTRoleLocalBurn"
+                            ]
+                        }
+                    },
+                    "storage": {
+                        "str:nrIssuedTokens": "1"
+                    },
+                    "code": "file:../../esdt-system-sc-mock/output/esdt-system-sc-mock.wasm"
+                }
+            }
+        },
+        {
+            "step": "setState",
+            "comment": "reset the token ID so we can issue again",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:TICKER-000000": "1000"
+                    },
+                    "storage": {
+                        "str:fungibleTokenMapper": ""
+                    },
+                    "code": "file:../output/basic-features.wasm"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "issue-default-callback-zero-initial-supply",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "issue_fungible_default_callback",
+                "arguments": [
+                    "str:TICKER",
+                    "0"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "str:TICKER-111111"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:TICKER-000000": "1000"
+                    },
+                    "storage": {
+                        "str:fungibleTokenMapper": "str:TICKER-111111"
+                    },
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "*",
+                    "balance": "*"
+                },
+                "0x000000000000000000010000000000000000000000000000000000000002ffff": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:TICKER-000000": {
+                            "roles": [
+                                "ESDTRoleLocalMint",
+                                "ESDTRoleLocalBurn"
+                            ]
+                        },
+                        "str:TICKER-222222": {
+                            "roles": [
+                                "ESDTRoleLocalMint",
+                                "ESDTRoleLocalBurn"
+                            ]
+                        }
+                    },
+                    "storage": {
+                        "str:nrIssuedTokens": "2"
+                    },
+                    "code": "file:../../esdt-system-sc-mock/output/esdt-system-sc-mock.wasm"
+                }
+            }
+        },
+        {
+            "step": "setState",
+            "comment": "reset the token ID so we can issue again",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:TICKER-000000": "1000"
+                    },
+                    "storage": {
+                        "str:fungibleTokenMapper": ""
+                    },
+                    "code": "file:../output/basic-features.wasm"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "issue-custom-callback-non-zero-initial-supply",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "issue_fungible_custom_callback",
+                "arguments": [
+                    "str:TICKER",
+                    "2000"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:TICKER-000000": "1000",
+                        "str:TICKER-222222": "2000"
+                    },
+                    "storage": {
+                        "str:fungibleTokenMapper": "str:TICKER-222222"
+                    },
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "*",
+                    "balance": "*"
+                },
+                "0x000000000000000000010000000000000000000000000000000000000002ffff": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:TICKER-000000": {
+                            "roles": [
+                                "ESDTRoleLocalMint",
+                                "ESDTRoleLocalBurn"
+                            ]
+                        },
+                        "str:TICKER-222222": {
+                            "roles": [
+                                "ESDTRoleLocalMint",
+                                "ESDTRoleLocalBurn"
+                            ]
+                        }
+                    },
+                    "storage": {
+                        "str:nrIssuedTokens": "3"
+                    },
+                    "code": "file:../../esdt-system-sc-mock/output/esdt-system-sc-mock.wasm"
+                }
+            }
+        },
+        {
+            "step": "setState",
+            "comment": "reset the token ID so we can issue again",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:TICKER-000000": "1000",
+                        "str:TICKER-222222": "2000"
+                    },
+                    "storage": {
+                        "str:fungibleTokenMapper": ""
+                    },
+                    "code": "file:../output/basic-features.wasm"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "issue-custom-callback-initial-supply",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "issue_fungible_custom_callback",
+                "arguments": [
+                    "str:TICKER",
+                    "0"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "str:TICKER-333333"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:TICKER-000000": "1000",
+                        "str:TICKER-222222": "2000"
+                    },
+                    "storage": {
+                        "str:fungibleTokenMapper": "str:TICKER-333333"
+                    },
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "*",
+                    "balance": "*"
+                },
+                "0x000000000000000000010000000000000000000000000000000000000002ffff": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:TICKER-000000": {
+                            "roles": [
+                                "ESDTRoleLocalMint",
+                                "ESDTRoleLocalBurn"
+                            ]
+                        },
+                        "str:TICKER-222222": {
+                            "roles": [
+                                "ESDTRoleLocalMint",
+                                "ESDTRoleLocalBurn"
+                            ]
+                        }
+                    },
+                    "storage": {
+                        "str:nrIssuedTokens": "4"
+                    },
+                    "code": "file:../../esdt-system-sc-mock/output/esdt-system-sc-mock.wasm"
+                }
+            }
+        },
+        {
+            "step": "setState",
+            "comment": "set balance",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:TICKER-333333": "3000"
+                    },
+                    "storage": {
+                        "str:fungibleTokenMapper": "str:TICKER-333333"
+                    },
+                    "code": "file:../output/basic-features.wasm"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "simulate-set-local-roles",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "set_local_roles_fungible",
+                "arguments": [],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:TICKER-333333": "3000"
+                    },
+                    "storage": {
+                        "str:fungibleTokenMapper": "str:TICKER-333333",
+                        "str:rolesSet": "true"
+                    },
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "+": ""
+            }
+        },
+        {
+            "step": "setState",
+            "comment": "actually set roles",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:TICKER-333333": {
+                            "instances": [
+                                {
+                                    "nonce": "",
+                                    "balance": "3000"
+                                }
+                            ],
+                            "roles": [
+                                "ESDTRoleLocalMint",
+                                "ESDTRoleLocalBurn"
+                            ]
+                        }
+                    },
+                    "storage": {
+                        "str:fungibleTokenMapper": "str:TICKER-333333",
+                        "str:rolesSet": "true"
+                    },
+                    "code": "file:../output/basic-features.wasm"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "mint-fungible",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "mint_fungible",
+                "arguments": [
+                    "1000"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "nested:str:TICKER-333333|u64:0|biguint:1000"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:TICKER-333333": {
+                            "instances": [
+                                {
+                                    "nonce": "",
+                                    "balance": "4000"
+                                }
+                            ],
+                            "roles": [
+                                "ESDTRoleLocalMint",
+                                "ESDTRoleLocalBurn"
+                            ]
+                        }
+                    },
+                    "storage": {
+                        "str:fungibleTokenMapper": "str:TICKER-333333",
+                        "str:rolesSet": "true"
+                    },
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "+": ""
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "mint-and-send-fungible",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "mint_and_send_fungible",
+                "arguments": [
+                    "address:an_account",
+                    "2000"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "nested:str:TICKER-333333|u64:0|biguint:2000"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:an_account": {
+                    "nonce": "*",
+                    "balance": "100",
+                    "esdt": {
+                        "str:TICKER-333333": "2000"
+                    }
+                },
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:TICKER-333333": {
+                            "instances": [
+                                {
+                                    "nonce": "",
+                                    "balance": "4000"
+                                }
+                            ],
+                            "roles": [
+                                "ESDTRoleLocalMint",
+                                "ESDTRoleLocalBurn"
+                            ]
+                        }
+                    },
+                    "storage": {
+                        "str:fungibleTokenMapper": "str:TICKER-333333",
+                        "str:rolesSet": "true"
+                    },
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "+": ""
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "burn-fungible",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "burn_fungible",
+                "arguments": [
+                    "1000"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:TICKER-333333": {
+                            "instances": [
+                                {
+                                    "nonce": "",
+                                    "balance": "3000"
+                                }
+                            ],
+                            "roles": [
+                                "ESDTRoleLocalMint",
+                                "ESDTRoleLocalBurn"
+                            ]
+                        }
+                    },
+                    "storage": {
+                        "str:fungibleTokenMapper": "str:TICKER-333333",
+                        "str:rolesSet": "true"
+                    },
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "+": ""
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "get-balance-fungible-non-zero",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "get_balance_fungible",
+                "arguments": [],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "3000"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "burn-all-fungible",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "burn_fungible",
+                "arguments": [
+                    "3000"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "get-balance-fungible-zero",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "get_balance_fungible",
+                "arguments": [],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "require-same-fungible-token-success",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:TICKER-333333",
+                        "value": "500"
+                    }
+                ],
+                "function": "require_same_token_fungible",
+                "arguments": [],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "require-same-fungible-token-failed",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "egldValue": "100",
+                "function": "require_same_token_fungible",
+                "arguments": [],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:incorrect number of ESDT transfers",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "require-all-same-fungible-token-success",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:TICKER-333333",
+                        "value": "100"
+                    },
+                    {
+                        "tokenIdentifier": "str:TICKER-333333",
+                        "value": "100"
+                    },
+                    {
+                        "tokenIdentifier": "str:TICKER-333333",
+                        "value": "100"
+                    }
+                ],
+                "function": "require_all_same_token_fungible",
+                "arguments": [],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "get-fungible-token-id",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "getFungibleTokenId",
+                "arguments": []
+            },
+            "expect": {
+                "out": [
+                    "str:TICKER-333333"
+                ],
+                "status": "0",
+                "message": "",
+                "logs": "*"
+            }
+        },
+        {
+            "step": "setState",
+            "comment": "reset the token ID so we can issue again",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:TICKER-000000": "1000",
+                        "str:TICKER-222222": "2000"
+                    },
+                    "storage": {
+                        "str:fungibleTokenMapper": ""
+                    },
+                    "code": "file:../output/basic-features.wasm"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "issue-and-set-all-roles-fungible",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "issue_and_set_all_roles_fungible",
+                "arguments": [
+                    "str:TICKER"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "str:TICKER-444444"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

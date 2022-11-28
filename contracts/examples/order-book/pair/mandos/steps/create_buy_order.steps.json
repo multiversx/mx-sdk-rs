@@ -1,0 +1,31 @@
+{
+    "name": "createBuyOrder",
+    "steps": [
+        {
+            "step": "scCall",
+            "id": "createBuyOrder",
+            "tx": {
+                "from": "address:user1",
+                "to": "sc:pair",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:BUSD-abcdef",
+                        "value": "2,000,000"
+                    }
+                ],
+                "function": "createBuyOrder",
+                "arguments": [
+                    "biguint:200000|address:match_provider|0x00|biguint:1000|u64:0|u64:1000"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

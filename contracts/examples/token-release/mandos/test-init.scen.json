@@ -1,0 +1,142 @@
+{
+    "name": "token release deployment test",
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "0",
+                    "balance": "1,000,000"
+                },
+                "address:user1": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:FIRSTTOKEN-123456": "10"
+                    }
+                },
+                "address:user2": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:FIRSTTOKEN-123456": "0"
+                    }
+                }
+            },
+            "newAddresses": [
+                {
+                    "creatorAddress": "address:owner",
+                    "creatorNonce": "0",
+                    "newAddress": "sc:token_release_contract"
+                }
+            ]
+        },
+        {
+            "step": "scDeploy",
+            "id": "deploy",
+            "tx": {
+                "from": "address:owner",
+                "contractCode": "file:../output/token-release.wasm",
+                "arguments": [
+                    "str:FIRSTTOKEN-123456"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "1",
+                    "balance": "1,000,000"
+                },
+                "address:user1": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:FIRSTTOKEN-123456": "10"
+                    }
+                },
+                "address:user2": {
+                    "nonce": "0",
+                    "balance": "0"
+                },
+                "sc:token_release_contract": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:setupPeriodStatus": "1",
+                        "str:tokenIdentifier": "str:FIRSTTOKEN-123456"
+                    },
+                    "code": "file:../output/token-release.wasm"
+                }
+            }
+        },
+        {
+            "step": "setState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "0",
+                    "balance": "1,000,000"
+                },
+                "address:user1": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:FIRSTTOKEN-123456": "10"
+                    }
+                },
+                "address:user2": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:FIRSTTOKEN-123456": "0"
+                    }
+                }
+            },
+            "newAddresses": [
+                {
+                    "creatorAddress": "address:owner",
+                    "creatorNonce": "0",
+                    "newAddress": "sc:token_release_contract"
+                }
+            ]
+        },
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:token_release_contract": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:FIRSTTOKEN-123456": {
+                            "roles": [
+                                "ESDTRoleLocalMint"
+                            ]
+                        }
+                    },
+                    "storage": {
+                        "str:setupPeriodStatus": "1",
+                        "str:tokenIdentifier": "str:FIRSTTOKEN-123456"
+                    },
+                    "code": "file:../output/token-release.wasm",
+                    "owner": "address:owner"
+                }
+            }
+        },
+        {
+            "step": "setState",
+            "currentBlockInfo": {
+                "blockTimestamp": "1"
+            }
+        }
+    ]
+}

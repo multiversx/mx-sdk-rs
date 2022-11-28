@@ -1,0 +1,144 @@
+{
+    "name": "start with all options",
+    "gasSchedule": "dummy",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "lottery-init.scen.json"
+        },
+        {
+            "step": "scCall",
+            "id": "start with all options",
+            "tx": {
+                "from": "address:my_address",
+                "to": "sc:lottery",
+                "function": "start",
+                "arguments": [
+                    "str:lottery_name",
+                    "100",
+                    "0x01|u32:5",
+                    "0x01|u64:123,456",
+                    "0x01|u32:1",
+                    "0x01|u32:2|u8:75|u8:25",
+                    "0x01|u32:5|address:acc1|address:acc2|address:acc3|address:acc4|address:acc5"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "setState",
+            "accounts": {
+                "address:acc3": {
+                    "nonce": "0",
+                    "balance": "1,000,000"
+                },
+                "address:acc4": {
+                    "nonce": "0",
+                    "balance": "1,000,000"
+                },
+                "address:acc5": {
+                    "nonce": "0",
+                    "balance": "1,000,000"
+                },
+                "sc:erc20": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:balance|address:erc20_owner": "994,000,000",
+                        "str:balance|address:my_address": "1,000,000",
+                        "str:balance|address:acc1": "1,000,000",
+                        "str:balance|address:acc2": "1,000,000",
+                        "str:balance|address:acc3": "1,000,000",
+                        "str:balance|address:acc4": "1,000,000",
+                        "str:balance|address:acc5": "1,000,000",
+                        "str:balance|sc:lottery": "0",
+                        "str:allowance|address:acc1|sc:lottery": "100",
+                        "str:allowance|address:acc2|sc:lottery": "100",
+                        "str:allowance|address:acc3|sc:lottery": "100",
+                        "str:allowance|address:acc4|sc:lottery": "100",
+                        "str:allowance|address:acc5|sc:lottery": "100",
+                        "str:totalSupply": "1,000,000,000"
+                    },
+                    "code": "file:../../erc20/output/erc20.wasm"
+                }
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:my_address": {
+                    "nonce": "2",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "address:erc20_owner": {
+                    "nonce": "1",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "address:acc1": {
+                    "nonce": "0",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "address:acc2": {
+                    "nonce": "0",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "address:acc3": {
+                    "nonce": "0",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "address:acc4": {
+                    "nonce": "0",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "address:acc5": {
+                    "nonce": "0",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "sc:lottery": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:lotteryInfo|u32:12|str:lottery_name": "u32:1|u8:100|u32:5|u64:123,456|u32:1|u32:2|u8:75|u8:25|u32:5|address:acc1|address:acc2|address:acc3|address:acc4|address:acc5|u32:0|u32:0|u32:0",
+                        "str:erc20ContractAddress": "sc:erc20"
+                    },
+                    "code": "file:../output/lottery-erc20.wasm"
+                },
+                "sc:erc20": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:balance|address:erc20_owner": "994,000,000",
+                        "str:balance|address:my_address": "1,000,000",
+                        "str:balance|address:acc1": "1,000,000",
+                        "str:balance|address:acc2": "1,000,000",
+                        "str:balance|address:acc3": "1,000,000",
+                        "str:balance|address:acc4": "1,000,000",
+                        "str:balance|address:acc5": "1,000,000",
+                        "str:balance|sc:lottery": "00",
+                        "str:allowance|address:acc1|sc:lottery": "100",
+                        "str:allowance|address:acc2|sc:lottery": "100",
+                        "str:allowance|address:acc3|sc:lottery": "100",
+                        "str:allowance|address:acc4|sc:lottery": "100",
+                        "str:allowance|address:acc5|sc:lottery": "100",
+                        "str:totalSupply": "1,000,000,000"
+                    },
+                    "code": "file:../../erc20/output/erc20.wasm"
+                }
+            }
+        }
+    ]
+}

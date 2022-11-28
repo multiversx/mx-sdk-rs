@@ -1,0 +1,70 @@
+{
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "proxy_test_init.scen.json"
+        },
+        {
+            "step": "setState",
+            "accounts": {
+                "address:a_user": {
+                    "nonce": "1",
+                    "balance": "200"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "upgrade-through-proxy",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:proxy-first",
+                "egldValue": "200",
+                "function": "upgradeSecondContract",
+                "arguments": [
+                    "file:../proxy-test-second/output/proxy-test-second.wasm"
+                ],
+                "gasLimit": "1,000,000,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "457"
+                ],
+                "status": "0",
+                "message": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:a_user": {
+                    "nonce": "2",
+                    "balance": "0",
+                    "storage": {},
+                    "code": ""
+                },
+                "sc:proxy-first": {
+                    "nonce": "1",
+                    "balance": "0",
+                    "storage": {
+                        "str:other_contract": "sc:proxy-second"
+                    },
+                    "code": "file:../proxy-test-first/output/proxy-test-first.wasm"
+                },
+                "sc:proxy-second": {
+                    "nonce": "0",
+                    "balance": "300",
+                    "storage": {
+                        "str:init_arg": "456",
+                        "str:last_payment": "200"
+                    },
+                    "code": "file:../proxy-test-second/output/proxy-test-second.wasm"
+                }
+            }
+        }
+    ]
+}

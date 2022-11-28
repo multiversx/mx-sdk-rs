@@ -1,0 +1,50 @@
+{
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "1",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "maddress_from_managed_buffer",
+                "arguments": [
+                    "address:an_account"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "address:an_account"
+                ]
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "2",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "maddress_from_managed_buffer",
+                "arguments": [
+                    "address:an_account|u32:123"
+                ]
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:bad array length"
+            }
+        }
+    ]
+}

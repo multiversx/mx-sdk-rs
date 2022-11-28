@@ -1,0 +1,103 @@
+{
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "1",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mbuffer_eq",
+                "arguments": [
+                    "str:abcdef",
+                    "str:abcdef"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "true"
+                ]
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "2",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mbuffer_eq",
+                "arguments": [
+                    "str:abcdef",
+                    "str:abcdeg"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "false"
+                ]
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "3",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mbuffer_eq",
+                "arguments": [
+                    "",
+                    ""
+                ]
+            },
+            "expect": {
+                "out": [
+                    "true"
+                ]
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "4",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mbuffer_eq",
+                "arguments": [
+                    "str:x",
+                    ""
+                ]
+            },
+            "expect": {
+                "out": [
+                    "false"
+                ]
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "5",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mbuffer_eq",
+                "arguments": [
+                    "",
+                    "str:x"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "false"
+                ]
+            }
+        }
+    ]
+}

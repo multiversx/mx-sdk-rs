@@ -6,41 +6,17 @@ edition = "2018"
 publish = false
 
 [lib]
-path = "src/lib.rs"
+path = "src/use_module.rs"
 
-[features]
-wasm-output-mode = [
-    "elrond-wasm-node",
-    "elrond-wasm-module-dns/wasm-output-mode",
-    "elrond-wasm-module-features/wasm-output-mode",
-    "elrond-wasm-module-pause/wasm-output-mode",
-]
-
-[dependencies.elrond-wasm-module-dns]
-version = "0.17.2"
-path = "../../modules/elrond-wasm-module-dns"
-
-[dependencies.elrond-wasm-module-features]
-version = "0.17.2"
-path = "../../modules/elrond-wasm-module-features"
-
-[dependencies.elrond-wasm-module-pause]
-version = "0.17.2"
-path = "../../modules/elrond-wasm-module-pause"
+[dependencies.elrond-wasm-modules]
+version = "0.36.1"
+path = "../../../elrond-wasm-modules"
 
 [dependencies.elrond-wasm]
-version = "0.17.2"
+version = "0.36.1"
 path = "../../../elrond-wasm"
-
-[dependencies.elrond-wasm-derive]
-version = "0.17.2"
-path = "../../../elrond-wasm-derive"
-
-[dependencies.elrond-wasm-node]
-version = "0.17.2"
-path = "../../../elrond-wasm-node"
-optional = true
+features = [ "alloc" ]
 
 [dev-dependencies.elrond-wasm-debug]
-version = "0.17.2"
+version = "0.36.1"
 path = "../../../elrond-wasm-debug"

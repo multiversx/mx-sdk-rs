@@ -1,0 +1,112 @@
+{
+    "name": "forwarder receive multi transfer on callback",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:a_user": {
+                    "nonce": "0",
+                    "balance": "0"
+                },
+                "sc:vault": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:TEST-TOKENA": "1000",
+                        "str:TEST-SFTABC": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "1000"
+                                }
+                            ]
+                        }
+                    },
+                    "code": "file:../vault/output/vault.wasm"
+                },
+                "sc:forwarder": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../forwarder-raw/output/forwarder-raw.wasm"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "multi-transfer-through-callback",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:forwarder",
+                "function": "forward_async_retrieve_multi_transfer_funds",
+                "arguments": [
+                    "sc:vault",
+                    "str:TEST-SFTABC",
+                    "1",
+                    "500"
+                ],
+                "gasLimit": "80,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "message": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:a_user": {
+                    "nonce": "*",
+                    "balance": "0",
+                    "storage": {},
+                    "code": ""
+                },
+                "sc:vault": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:TEST-TOKENA": "1000",
+                        "str:TEST-SFTABC": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "500"
+                                }
+                            ]
+                        }
+                    },
+                    "storage": {},
+                    "code": "file:../vault/output/vault.wasm"
+                },
+                "sc:forwarder": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:TEST-SFTABC": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "500"
+                                }
+                            ]
+                        }
+                    },
+                    "storage": {
+                        "str:callback_args.item|u32:1": "nested:0x00",
+                        "str:callback_args.len": "1",
+                        "str:callback_payments.item|u32:1": {
+                            "1-token_id": "nested:str:TEST-SFTABC",
+                            "2-nonce": "u64:1",
+                            "3-amount": "biguint:500"
+                        },
+                        "str:callback_payments.len": "1"
+                    },
+                    "code": "file:../forwarder-raw/output/forwarder-raw.wasm"
+                }
+            }
+        }
+    ]
+}

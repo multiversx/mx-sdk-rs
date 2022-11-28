@@ -1,0 +1,34 @@
+{
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:a_user": {},
+                "sc:forwarder": {
+                    "code": "file:../forwarder/output/forwarder.wasm"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "no-endpoint",
+            "comment": "checks that no endpoints were accidentally included from the vault",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:forwarder",
+                "function": "echo_caller",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "1",
+                "message": "str:invalid function (not found)",
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

@@ -1,0 +1,190 @@
+{
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "big_int_to_parts+",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "big_int_to_parts",
+                "arguments": [
+                    "1234"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "+1",
+                    "1234"
+                ]
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "big_int_to_parts0",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "big_int_to_parts",
+                "arguments": [
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "0",
+                    "0"
+                ]
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "big_int_to_parts-",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "big_int_to_parts",
+                "arguments": [
+                    "-1234"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "-1",
+                    "1234"
+                ]
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "big_int_from_biguint+",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "big_int_from_biguint",
+                "arguments": [
+                    "+1",
+                    "1234"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "1234"
+                ]
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "big_int_from_parts0",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "big_int_from_biguint",
+                "arguments": [
+                    "0",
+                    "1234"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "1234"
+                ]
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "big_int_from_biguint-",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "big_int_from_biguint",
+                "arguments": [
+                    "-1",
+                    "1234"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "-1234"
+                ]
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "big-num-mutable-arg",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "endpoint_with_mutable_arg",
+                "arguments": [
+                    "50",
+                    "25",
+                    "25"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "100"
+                ]
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "big-uint-set-u64",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "biguint_overwrite_u64",
+                "arguments": [
+                    "100",
+                    "200"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "200"
+                ]
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "big-uint-set-u64",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "biguint_overwrite_u64",
+                "arguments": [
+                    "100",
+                    "0xFFFFFFFFFFFFFFFF"
+                ]
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:cast to i64 error"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "big-int-set-i64",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "bigint_overwrite_i64",
+                "arguments": [
+                    "-5",
+                    "-10"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "-10"
+                ]
+            }
+        }
+    ]
+}

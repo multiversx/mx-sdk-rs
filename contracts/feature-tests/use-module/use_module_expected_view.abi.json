@@ -1,0 +1,271 @@
+{
+    "buildInfo": {
+        "rustc": {
+            "version": "x.x.x-nightly",
+            "commitHash": "<commit hash here>",
+            "commitDate": "<commit date here>",
+            "channel": "Channel",
+            "short": "rustc <version> (<short hash> <date>)"
+        },
+        "contractCrate": {
+            "name": "use-module",
+            "version": "0.0.0",
+            "gitVersion": "<git version here>"
+        },
+        "framework": {
+            "name": "elrond-wasm",
+            "version": "0.36.1"
+        }
+    },
+    "docs": [
+        "Contract that tests that using modules works correctly.",
+        "Also provides testing for the most common modules:",
+        "- DnsModule",
+        "- FeaturesModule",
+        "- EsdtModule",
+        "- GovernanceModule",
+        "- PauseModule"
+    ],
+    "name": "UseModule",
+    "endpoints": [
+        {
+            "name": "external_view_mod_a",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "external_view_mod_b",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": []
+        }
+    ],
+    "events": [
+        {
+            "identifier": "eventInModule",
+            "inputs": [
+                {
+                    "name": "arg",
+                    "type": "u32",
+                    "indexed": true
+                }
+            ]
+        },
+        {
+            "identifier": "proposalCreated",
+            "inputs": [
+                {
+                    "name": "proposal_id",
+                    "type": "u32",
+                    "indexed": true
+                },
+                {
+                    "name": "proposer",
+                    "type": "Address",
+                    "indexed": true
+                },
+                {
+                    "name": "start_block",
+                    "type": "u64",
+                    "indexed": true
+                },
+                {
+                    "name": "description",
+                    "type": "bytes",
+                    "indexed": true
+                },
+                {
+                    "name": "actions",
+                    "type": "List<GovernanceAction>"
+                }
+            ]
+        },
+        {
+            "identifier": "voteCast",
+            "inputs": [
+                {
+                    "name": "voter",
+                    "type": "Address",
+                    "indexed": true
+                },
+                {
+                    "name": "proposal_id",
+                    "type": "u32",
+                    "indexed": true
+                },
+                {
+                    "name": "nr_votes",
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "identifier": "downvoteCast",
+            "inputs": [
+                {
+                    "name": "downvoter",
+                    "type": "Address",
+                    "indexed": true
+                },
+                {
+                    "name": "proposal_id",
+                    "type": "u32",
+                    "indexed": true
+                },
+                {
+                    "name": "nr_downvotes",
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "identifier": "proposalCanceled",
+            "inputs": [
+                {
+                    "name": "proposal_id",
+                    "type": "u32",
+                    "indexed": true
+                }
+            ]
+        },
+        {
+            "identifier": "proposalQueued",
+            "inputs": [
+                {
+                    "name": "proposal_id",
+                    "type": "u32",
+                    "indexed": true
+                },
+                {
+                    "name": "queued_block",
+                    "type": "u64",
+                    "indexed": true
+                }
+            ]
+        },
+        {
+            "identifier": "proposalExecuted",
+            "inputs": [
+                {
+                    "name": "proposal_id",
+                    "type": "u32",
+                    "indexed": true
+                }
+            ]
+        },
+        {
+            "identifier": "userDeposit",
+            "inputs": [
+                {
+                    "name": "address",
+                    "type": "Address",
+                    "indexed": true
+                },
+                {
+                    "name": "payments",
+                    "type": "List<EsdtTokenPayment>"
+                }
+            ]
+        }
+    ],
+    "hasCallback": false,
+    "types": {
+        "EsdtTokenPayment": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "token_identifier",
+                    "type": "TokenIdentifier"
+                },
+                {
+                    "name": "token_nonce",
+                    "type": "u64"
+                },
+                {
+                    "name": "amount",
+                    "type": "BigUint"
+                }
+            ]
+        },
+        "EsdtTokenType": {
+            "type": "enum",
+            "variants": [
+                {
+                    "name": "Fungible",
+                    "discriminant": 0
+                },
+                {
+                    "name": "NonFungible",
+                    "discriminant": 1
+                },
+                {
+                    "name": "SemiFungible",
+                    "discriminant": 2
+                },
+                {
+                    "name": "Meta",
+                    "discriminant": 3
+                },
+                {
+                    "name": "Invalid",
+                    "discriminant": 4
+                }
+            ]
+        },
+        "GovernanceAction": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "gas_limit",
+                    "type": "u64"
+                },
+                {
+                    "name": "dest_address",
+                    "type": "Address"
+                },
+                {
+                    "name": "payments",
+                    "type": "List<EsdtTokenPayment>"
+                },
+                {
+                    "name": "function_name",
+                    "type": "bytes"
+                },
+                {
+                    "name": "arguments",
+                    "type": "List<bytes>"
+                }
+            ]
+        },
+        "GovernanceProposalStatus": {
+            "type": "enum",
+            "variants": [
+                {
+                    "name": "None",
+                    "discriminant": 0
+                },
+                {
+                    "name": "Pending",
+                    "discriminant": 1
+                },
+                {
+                    "name": "Active",
+                    "discriminant": 2
+                },
+                {
+                    "name": "Defeated",
+                    "discriminant": 3
+                },
+                {
+                    "name": "Succeeded",
+                    "discriminant": 4
+                },
+                {
+                    "name": "Queued",
+                    "discriminant": 5
+                }
+            ]
+        }
+    }
+}

@@ -1,0 +1,96 @@
+{
+    "name": "retrieve funds through accept funds func",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:a_user": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:FIRSTTOKEN-abcdef": "1,000,000",
+                        "str:SECTOKEN-abcdef": "2,000,000"
+                    }
+                },
+                "sc:vault": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:THIRDTOKEN-abcdef": "5,000,000"
+                    },
+                    "code": "file:../vault/output/vault.wasm"
+                },
+                "sc:forwarder": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../forwarder/output/forwarder.wasm"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "1",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:forwarder",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:FIRSTTOKEN-abcdef",
+                        "value": "1,000,000"
+                    },
+                    {
+                        "tokenIdentifier": "str:SECTOKEN-abcdef",
+                        "value": "2,000,000"
+                    }
+                ],
+                "function": "forward_sync_retrieve_funds_with_accept_func",
+                "arguments": [
+                    "sc:vault",
+                    "str:THIRDTOKEN-abcdef",
+                    "5,000,000"
+                ],
+                "gasLimit": "400,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "message": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:a_user": {
+                    "nonce": "*",
+                    "balance": "0",
+                    "storage": {},
+                    "code": ""
+                },
+                "sc:vault": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:FIRSTTOKEN-abcdef": "1,000,000",
+                        "str:SECTOKEN-abcdef": "2,000,000"
+                    },
+                    "storage": {},
+                    "code": "file:../vault/output/vault.wasm"
+                },
+                "sc:forwarder": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:THIRDTOKEN-abcdef": "5,000,000"
+                    },
+                    "storage": {
+                        "+": ""
+                    },
+                    "code": "file:../forwarder/output/forwarder.wasm"
+                }
+            }
+        }
+    ]
+}

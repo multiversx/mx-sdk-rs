@@ -1,0 +1,190 @@
+{
+    "name": "joinGame",
+    "gasSchedule": "dummy",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:crypto_bubbles_owner": {
+                    "nonce": "0",
+                    "balance": "0x10000000"
+                },
+                "sc:crypto_bubbles_legacy": {
+                    "nonce": "0",
+                    "balance": "0x100",
+                    "storage": {
+                        "str:playerBalance|address:acc1": "0x311",
+                        "str:playerBalance|address:acc2": "0x422"
+                    },
+                    "code": "file:../output/crypto-bubbles-legacy.wasm"
+                },
+                "address:acc1": {
+                    "nonce": "0",
+                    "balance": "0x20100200"
+                },
+                "address:acc2": {
+                    "nonce": "0",
+                    "balance": "0x20202150"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "1",
+            "tx": {
+                "from": "address:acc1",
+                "to": "sc:crypto_bubbles_legacy",
+                "egldValue": "0x200",
+                "function": "joinGame",
+                "arguments": [
+                    "0x12"
+                ],
+                "gasLimit": "0x100000",
+                "gasPrice": "0x01"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": [
+                    {
+                        "address": "sc:crypto_bubbles_legacy",
+                        "endpoint": "str:joinGame",
+                        "topics": [
+                            "0x1000000000000000000000000000000000000000000000000000000000000001",
+                            "address:acc1"
+                        ],
+                        "data": "0x0200"
+                    },
+                    {
+                        "address": "sc:crypto_bubbles_legacy",
+                        "endpoint": "str:joinGame",
+                        "topics": [
+                            "0x1000000000000000000000000000000000000000000000000000000000000003",
+                            "0x0000000000000000000000000000000000000000000000000000000000000012",
+                            "address:acc1"
+                        ],
+                        "data": "0x200"
+                    }
+                ],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "2",
+            "tx": {
+                "from": "address:acc2",
+                "to": "sc:crypto_bubbles_legacy",
+                "egldValue": "0x150",
+                "function": "joinGame",
+                "arguments": [
+                    "0x12"
+                ],
+                "gasLimit": "0x100000",
+                "gasPrice": "0x01"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": [
+                    {
+                        "address": "sc:crypto_bubbles_legacy",
+                        "endpoint": "str:joinGame",
+                        "topics": [
+                            "0x1000000000000000000000000000000000000000000000000000000000000001",
+                            "address:acc2"
+                        ],
+                        "data": "0x150"
+                    },
+                    {
+                        "address": "sc:crypto_bubbles_legacy",
+                        "endpoint": "str:joinGame",
+                        "topics": [
+                            "0x1000000000000000000000000000000000000000000000000000000000000003",
+                            "0x0000000000000000000000000000000000000000000000000000000000000012",
+                            "address:acc2"
+                        ],
+                        "data": "0x150"
+                    }
+                ],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "3",
+            "tx": {
+                "from": "address:acc2",
+                "to": "sc:crypto_bubbles_legacy",
+                "egldValue": "0x2000",
+                "function": "joinGame",
+                "arguments": [
+                    "0x12"
+                ],
+                "gasLimit": "0x100000",
+                "gasPrice": "0x01"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": [
+                    {
+                        "address": "sc:crypto_bubbles_legacy",
+                        "endpoint": "str:joinGame",
+                        "topics": [
+                            "0x1000000000000000000000000000000000000000000000000000000000000001",
+                            "address:acc2"
+                        ],
+                        "data": "0x2000"
+                    },
+                    {
+                        "address": "sc:crypto_bubbles_legacy",
+                        "endpoint": "str:joinGame",
+                        "topics": [
+                            "0x1000000000000000000000000000000000000000000000000000000000000003",
+                            "0x0000000000000000000000000000000000000000000000000000000000000012",
+                            "address:acc2"
+                        ],
+                        "data": "0x2000"
+                    }
+                ],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:crypto_bubbles_owner": {
+                    "nonce": "0",
+                    "balance": "0x10000000",
+                    "storage": {},
+                    "code": ""
+                },
+                "sc:crypto_bubbles_legacy": {
+                    "nonce": "0",
+                    "balance": "0x2450",
+                    "storage": {
+                        "str:playerBalance|address:acc1": "0x311",
+                        "str:playerBalance|address:acc2": "0x422"
+                    },
+                    "code": "file:../output/crypto-bubbles-legacy.wasm"
+                },
+                "address:acc1": {
+                    "nonce": "1",
+                    "balance": "0x20000000",
+                    "storage": {},
+                    "code": ""
+                },
+                "address:acc2": {
+                    "nonce": "2",
+                    "balance": "0x20000000",
+                    "storage": {},
+                    "code": ""
+                }
+            }
+        }
+    ]
+}

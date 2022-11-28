@@ -1,0 +1,122 @@
+{
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "echo_managed_vec_of_managed_vec",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "echo_managed_vec_of_managed_vec",
+                "arguments": [
+                    [
+                        "u32:3",
+                        [
+                            "u32:1",
+                            "u32:2",
+                            "u32:3"
+                        ],
+                        "u32:0",
+                        "u32:2",
+                        [
+                            "u32:5",
+                            "u32:6"
+                        ]
+                    ]
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    [
+                        "u32:3",
+                        [
+                            "u32:1",
+                            "u32:2",
+                            "u32:3"
+                        ],
+                        "u32:0",
+                        "u32:2",
+                        [
+                            "u32:5",
+                            "u32:6"
+                        ]
+                    ]
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "echo_managed_vec_of_managed_vec-empty",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "echo_managed_vec_of_managed_vec",
+                "arguments": [
+                    []
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    []
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "echo_managed_vec_of_token_identifier",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "echo_managed_vec_of_token_identifier",
+                "arguments": [
+                    [
+                        "nested:str:TOKENA-1234",
+                        "nested:str:EGLD",
+                        "nested:str:TOKENB-1234"
+                    ]
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    [
+                        "nested:str:TOKENA-1234",
+                        "nested:str:EGLD",
+                        "nested:str:TOKENB-1234"
+                    ]
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

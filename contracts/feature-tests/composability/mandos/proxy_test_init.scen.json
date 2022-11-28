@@ -1,0 +1,78 @@
+{
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:a_user": {
+                    "nonce": "0",
+                    "balance": "100"
+                },
+                "sc:proxy-first": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../proxy-test-first/output/proxy-test-first.wasm"
+                }
+            },
+            "newAddresses": [
+                {
+                    "creatorAddress": "sc:proxy-first",
+                    "creatorNonce": "0",
+                    "newAddress": "sc:proxy-second"
+                }
+            ]
+        },
+        {
+            "step": "scCall",
+            "id": "1",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:proxy-first",
+                "egldValue": "100",
+                "function": "deploySecondContract",
+                "arguments": [
+                    "file:../proxy-test-second/output/proxy-test-second.wasm"
+                ],
+                "gasLimit": "1,000,000,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "125"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:a_user": {
+                    "nonce": "1",
+                    "balance": "0",
+                    "storage": {},
+                    "code": ""
+                },
+                "sc:proxy-first": {
+                    "nonce": "1",
+                    "balance": "0",
+                    "storage": {
+                        "str:other_contract": "sc:proxy-second"
+                    },
+                    "code": "file:../proxy-test-first/output/proxy-test-first.wasm"
+                },
+                "sc:proxy-second": {
+                    "nonce": "0",
+                    "balance": "100",
+                    "storage": {
+                        "str:init_arg": "123",
+                        "str:last_payment": "100"
+                    },
+                    "code": "file:../proxy-test-second/output/proxy-test-second.wasm"
+                }
+            }
+        }
+    ]
+}

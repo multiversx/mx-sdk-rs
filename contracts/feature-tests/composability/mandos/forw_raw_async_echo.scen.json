@@ -1,0 +1,98 @@
+{
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:a_user": {
+                    "nonce": "0",
+                    "balance": "0"
+                },
+                "sc:vault": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../vault/output/vault.wasm"
+                },
+                "sc:forwarder": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../forwarder-raw/output/forwarder-raw.wasm"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "1",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:forwarder",
+                "function": "forward_async_call",
+                "arguments": [
+                    "sc:vault",
+                    "str:echo_arguments",
+                    "1",
+                    "2"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "1",
+                    "2"
+                ],
+                "status": "0",
+                "logs": [
+                    {
+                        "address": "sc:forwarder",
+                        "endpoint": "str:callBack",
+                        "topics": [
+                            "str:callback_raw"
+                        ],
+                        "data": {
+                            "0-status": "nested:0x00",
+                            "1-echoed-args": [
+                                "biguint:1",
+                                "biguint:2"
+                            ]
+                        }
+                    }
+                ],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:a_user": {
+                    "nonce": "*",
+                    "balance": "0",
+                    "storage": {},
+                    "code": ""
+                },
+                "sc:vault": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:call_counts|nested:str:echo_arguments": "1"
+                    },
+                    "code": "file:../vault/output/vault.wasm"
+                },
+                "sc:forwarder": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:callback_args.len": "1",
+                        "str:callback_args.item|u32:1": [
+                            "nested:0x00",
+                            "biguint:1",
+                            "biguint:2"
+                        ]
+                    },
+                    "code": "file:../forwarder-raw/output/forwarder-raw.wasm"
+                }
+            }
+        }
+    ]
+}

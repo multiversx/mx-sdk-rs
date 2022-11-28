@@ -7,24 +7,20 @@
                 "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
                     "code": "file:../output/basic-features.wasm"
                 },
                 "address:an_account": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 }
             }
         },
         {
             "step": "scCall",
-            "txId": "before",
+            "id": "before",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "map_storage_mapper_view",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -33,18 +29,17 @@
             "expect": {
                 "out": [],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "first-insert",
+            "id": "first-insert",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "map_storage_mapper_insert_default",
                 "arguments": [
                     "42"
@@ -57,18 +52,17 @@
                     "true"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "first-map-insert-value",
+            "id": "first-map-insert-value",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "map_storage_mapper_insert_value",
                 "arguments": [
                     "42",
@@ -83,7 +77,7 @@
                     []
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -95,15 +89,15 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "``map_storage_mapper.node_links|u32:1": "u32:0|u32:0",
-                        "``map_storage_mapper.value|u32:1": "42",
-                        "``map_storage_mapper.node_id|42": "1",
-                        "``map_storage_mapper.info": "u32:1|u32:1|u32:1|u32:1",
-                        "``map_storage_mapper.storage|42|``.node_links|u32:1": "u32:0|u32:0",
-                        "``map_storage_mapper.storage|42|``.value|u32:1": "420",
-                        "``map_storage_mapper.storage|42|``.node_id|420": "1",
-                        "``map_storage_mapper.storage|42|``.mapped|420": "421",
-                        "``map_storage_mapper.storage|42|``.info": "u32:1|u32:1|u32:1|u32:1"
+                        "str:map_storage_mapper.node_links|u32:1": "u32:0|u32:0",
+                        "str:map_storage_mapper.value|u32:1": "42",
+                        "str:map_storage_mapper.node_id|u32:42": "1",
+                        "str:map_storage_mapper.info": "u32:1|u32:1|u32:1|u32:1",
+                        "str:map_storage_mapper.storage|u32:42|str:.node_links|u32:1": "u32:0|u32:0",
+                        "str:map_storage_mapper.storage|u32:42|str:.value|u32:1": "420",
+                        "str:map_storage_mapper.storage|u32:42|str:.node_id|u32:420": "1",
+                        "str:map_storage_mapper.storage|u32:42|str:.mapped|u32:420": "421",
+                        "str:map_storage_mapper.storage|u32:42|str:.info": "u32:1|u32:1|u32:1|u32:1"
                     },
                     "code": "file:../output/basic-features.wasm"
                 },
@@ -117,11 +111,10 @@
         },
         {
             "step": "scCall",
-            "txId": "check-map-storage-after-first-insert",
+            "id": "check-map-storage-after-first-insert",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "map_storage_mapper_view",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -134,18 +127,17 @@
                     "421"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "second-insert",
+            "id": "second-insert",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "map_storage_mapper_insert_default",
                 "arguments": [
                     "43"
@@ -158,18 +150,17 @@
                     "true"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "second-map-insert-value",
+            "id": "second-map-insert-value",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "map_storage_mapper_insert_value",
                 "arguments": [
                     "43",
@@ -184,18 +175,17 @@
                     []
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "check-map-storage-after-second-insert",
+            "id": "check-map-storage-after-second-insert",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "map_storage_mapper_view",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -211,7 +201,7 @@
                     "431"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -223,23 +213,23 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "``map_storage_mapper.node_links|u32:1": "u32:0|u32:2",
-                        "``map_storage_mapper.node_links|u32:2": "u32:1|u32:0",
-                        "``map_storage_mapper.value|u32:1": "42",
-                        "``map_storage_mapper.value|u32:2": "43",
-                        "``map_storage_mapper.node_id|42": "1",
-                        "``map_storage_mapper.node_id|43": "2",
-                        "``map_storage_mapper.info": "u32:2|u32:1|u32:2|u32:2",
-                        "``map_storage_mapper.storage|42|``.node_links|u32:1": "u32:0|u32:0",
-                        "``map_storage_mapper.storage|42|``.value|u32:1": "420",
-                        "``map_storage_mapper.storage|42|``.node_id|420": "1",
-                        "``map_storage_mapper.storage|42|``.mapped|420": "421",
-                        "``map_storage_mapper.storage|42|``.info": "u32:1|u32:1|u32:1|u32:1",
-                        "``map_storage_mapper.storage|43|``.node_links|u32:1": "u32:0|u32:0",
-                        "``map_storage_mapper.storage|43|``.value|u32:1": "430",
-                        "``map_storage_mapper.storage|43|``.node_id|430": "1",
-                        "``map_storage_mapper.storage|43|``.mapped|430": "431",
-                        "``map_storage_mapper.storage|43|``.info": "u32:1|u32:1|u32:1|u32:1"
+                        "str:map_storage_mapper.node_links|u32:1": "u32:0|u32:2",
+                        "str:map_storage_mapper.node_links|u32:2": "u32:1|u32:0",
+                        "str:map_storage_mapper.value|u32:1": "42",
+                        "str:map_storage_mapper.value|u32:2": "43",
+                        "str:map_storage_mapper.node_id|u32:42": "1",
+                        "str:map_storage_mapper.node_id|u32:43": "2",
+                        "str:map_storage_mapper.info": "u32:2|u32:1|u32:2|u32:2",
+                        "str:map_storage_mapper.storage|u32:42|str:.node_links|u32:1": "u32:0|u32:0",
+                        "str:map_storage_mapper.storage|u32:42|str:.value|u32:1": "420",
+                        "str:map_storage_mapper.storage|u32:42|str:.node_id|u32:420": "1",
+                        "str:map_storage_mapper.storage|u32:42|str:.mapped|u32:420": "421",
+                        "str:map_storage_mapper.storage|u32:42|str:.info": "u32:1|u32:1|u32:1|u32:1",
+                        "str:map_storage_mapper.storage|u32:43|str:.node_links|u32:1": "u32:0|u32:0",
+                        "str:map_storage_mapper.storage|u32:43|str:.value|u32:1": "430",
+                        "str:map_storage_mapper.storage|u32:43|str:.node_id|u32:430": "1",
+                        "str:map_storage_mapper.storage|u32:43|str:.mapped|u32:430": "431",
+                        "str:map_storage_mapper.storage|u32:43|str:.info": "u32:1|u32:1|u32:1|u32:1"
                     },
                     "code": "file:../output/basic-features.wasm"
                 },
@@ -253,11 +243,10 @@
         },
         {
             "step": "scCall",
-            "txId": "check-contains-after-second-insert",
+            "id": "check-contains-after-second-insert",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "map_storage_mapper_contains_key",
                 "arguments": [
                     "42"
@@ -270,18 +259,17 @@
                     "true"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "insert-first-value-into-first-storage",
+            "id": "insert-first-value-into-first-storage",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "map_storage_mapper_insert_value",
                 "arguments": [
                     "42",
@@ -296,7 +284,7 @@
                     "0"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -308,27 +296,27 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "``map_storage_mapper.node_links|u32:1": "u32:0|u32:2",
-                        "``map_storage_mapper.node_links|u32:2": "u32:1|u32:0",
-                        "``map_storage_mapper.value|u32:1": "42",
-                        "``map_storage_mapper.value|u32:2": "43",
-                        "``map_storage_mapper.node_id|42": "1",
-                        "``map_storage_mapper.node_id|43": "2",
-                        "``map_storage_mapper.info": "u32:2|u32:1|u32:2|u32:2",
-                        "``map_storage_mapper.storage|42|``.node_links|u32:1": "u32:0|u32:2",
-                        "``map_storage_mapper.storage|42|``.value|u32:1": "420",
-                        "``map_storage_mapper.storage|42|``.node_id|420": "1",
-                        "``map_storage_mapper.storage|42|``.mapped|420": "421",
-                        "``map_storage_mapper.storage|42|``.node_links|u32:2": "u32:1|u32:0",
-                        "``map_storage_mapper.storage|42|``.value|u32:2": "100",
-                        "``map_storage_mapper.storage|42|``.node_id|100": "2",
-                        "``map_storage_mapper.storage|42|``.mapped|100": "200",
-                        "``map_storage_mapper.storage|42|``.info": "u32:2|u32:1|u32:2|u32:2",
-                        "``map_storage_mapper.storage|43|``.node_links|u32:1": "u32:0|u32:0",
-                        "``map_storage_mapper.storage|43|``.value|u32:1": "430",
-                        "``map_storage_mapper.storage|43|``.node_id|430": "1",
-                        "``map_storage_mapper.storage|43|``.mapped|430": "431",
-                        "``map_storage_mapper.storage|43|``.info": "u32:1|u32:1|u32:1|u32:1"
+                        "str:map_storage_mapper.node_links|u32:1": "u32:0|u32:2",
+                        "str:map_storage_mapper.node_links|u32:2": "u32:1|u32:0",
+                        "str:map_storage_mapper.value|u32:1": "42",
+                        "str:map_storage_mapper.value|u32:2": "43",
+                        "str:map_storage_mapper.node_id|u32:42": "1",
+                        "str:map_storage_mapper.node_id|u32:43": "2",
+                        "str:map_storage_mapper.info": "u32:2|u32:1|u32:2|u32:2",
+                        "str:map_storage_mapper.storage|u32:42|str:.node_links|u32:1": "u32:0|u32:2",
+                        "str:map_storage_mapper.storage|u32:42|str:.value|u32:1": "420",
+                        "str:map_storage_mapper.storage|u32:42|str:.node_id|u32:420": "1",
+                        "str:map_storage_mapper.storage|u32:42|str:.mapped|u32:420": "421",
+                        "str:map_storage_mapper.storage|u32:42|str:.node_links|u32:2": "u32:1|u32:0",
+                        "str:map_storage_mapper.storage|u32:42|str:.value|u32:2": "100",
+                        "str:map_storage_mapper.storage|u32:42|str:.node_id|u32:100": "2",
+                        "str:map_storage_mapper.storage|u32:42|str:.mapped|u32:100": "200",
+                        "str:map_storage_mapper.storage|u32:42|str:.info": "u32:2|u32:1|u32:2|u32:2",
+                        "str:map_storage_mapper.storage|u32:43|str:.node_links|u32:1": "u32:0|u32:0",
+                        "str:map_storage_mapper.storage|u32:43|str:.value|u32:1": "430",
+                        "str:map_storage_mapper.storage|u32:43|str:.node_id|u32:430": "1",
+                        "str:map_storage_mapper.storage|u32:43|str:.mapped|u32:430": "431",
+                        "str:map_storage_mapper.storage|u32:43|str:.info": "u32:1|u32:1|u32:1|u32:1"
                     },
                     "code": "file:../output/basic-features.wasm"
                 },
@@ -342,11 +330,10 @@
         },
         {
             "step": "scCall",
-            "txId": "first-remove",
+            "id": "first-remove",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "map_storage_mapper_remove",
                 "arguments": [
                     "42"
@@ -359,7 +346,7 @@
                     "true"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -371,15 +358,15 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "``map_storage_mapper.node_links|u32:2": "u32:0|u32:0",
-                        "``map_storage_mapper.value|u32:2": "43",
-                        "``map_storage_mapper.node_id|43": "2",
-                        "``map_storage_mapper.info": "u32:1|u32:2|u32:2|u32:2",
-                        "``map_storage_mapper.storage|43|``.node_links|u32:1": "u32:0|u32:0",
-                        "``map_storage_mapper.storage|43|``.value|u32:1": "430",
-                        "``map_storage_mapper.storage|43|``.node_id|430": "1",
-                        "``map_storage_mapper.storage|43|``.mapped|430": "431",
-                        "``map_storage_mapper.storage|43|``.info": "u32:1|u32:1|u32:1|u32:1"
+                        "str:map_storage_mapper.node_links|u32:2": "u32:0|u32:0",
+                        "str:map_storage_mapper.value|u32:2": "43",
+                        "str:map_storage_mapper.node_id|u32:43": "2",
+                        "str:map_storage_mapper.info": "u32:1|u32:2|u32:2|u32:2",
+                        "str:map_storage_mapper.storage|u32:43|str:.node_links|u32:1": "u32:0|u32:0",
+                        "str:map_storage_mapper.storage|u32:43|str:.value|u32:1": "430",
+                        "str:map_storage_mapper.storage|u32:43|str:.node_id|u32:430": "1",
+                        "str:map_storage_mapper.storage|u32:43|str:.mapped|u32:430": "431",
+                        "str:map_storage_mapper.storage|u32:43|str:.info": "u32:1|u32:1|u32:1|u32:1"
                     },
                     "code": "file:../output/basic-features.wasm"
                 },
@@ -393,11 +380,10 @@
         },
         {
             "step": "scCall",
-            "txId": "clear-map-storage",
+            "id": "clear-map-storage",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "map_storage_mapper_clear",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -406,7 +392,7 @@
             "expect": {
                 "out": [],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -430,11 +416,10 @@
         },
         {
             "step": "scCall",
-            "txId": "check-get-after-second-remove",
+            "id": "check-get-after-second-remove",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "map_storage_mapper_get",
                 "arguments": [
                     "42"
@@ -443,9 +428,10 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "4",
                 "message": "str:No storage!",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -469,11 +455,10 @@
         },
         {
             "step": "scCall",
-            "txId": "map storage mapper entry or default should create a map if it doesn't exist",
+            "id": "map storage mapper entry or default should create a map if it doesn't exist",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "map_storage_mapper_entry_or_default_update_increment",
                 "arguments": [
                     "42",
@@ -488,18 +473,17 @@
                     "10"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "map storage mapper entry or default - calling it again should update the value from the existing map",
+            "id": "map storage mapper entry or default - calling it again should update the value from the existing map",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "map_storage_mapper_entry_or_default_update_increment",
                 "arguments": [
                     "42",
@@ -514,7 +498,7 @@
                     "30"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -526,15 +510,15 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "``map_storage_mapper.info": "u32:1|u32:1|u32:1|u32:1",
-                        "``map_storage_mapper.node_links|u32:1": "u32:0|u32:0",
-                        "``map_storage_mapper.value|u32:1": "42",
-                        "``map_storage_mapper.node_id|42": "1",
-                        "``map_storage_mapper.storage|42|``.info": "u32:1|u32:1|u32:1|u32:1",
-                        "``map_storage_mapper.storage|42|``.node_links|u32:1": "u32:0|u32:0",
-                        "``map_storage_mapper.storage|42|``.value|u32:1": "5",
-                        "``map_storage_mapper.storage|42|``.node_id|5": "1",
-                        "``map_storage_mapper.storage|42|``.mapped|5": "30"
+                        "str:map_storage_mapper.info": "u32:1|u32:1|u32:1|u32:1",
+                        "str:map_storage_mapper.node_links|u32:1": "u32:0|u32:0",
+                        "str:map_storage_mapper.value|u32:1": "42",
+                        "str:map_storage_mapper.node_id|u32:42": "1",
+                        "str:map_storage_mapper.storage|u32:42|str:.info": "u32:1|u32:1|u32:1|u32:1",
+                        "str:map_storage_mapper.storage|u32:42|str:.node_links|u32:1": "u32:0|u32:0",
+                        "str:map_storage_mapper.storage|u32:42|str:.value|u32:1": "5",
+                        "str:map_storage_mapper.storage|u32:42|str:.node_id|u32:5": "1",
+                        "str:map_storage_mapper.storage|u32:42|str:.mapped|u32:5": "30"
                     },
                     "code": "file:../output/basic-features.wasm"
                 },
@@ -548,11 +532,10 @@
         },
         {
             "step": "scCall",
-            "txId": "map storage mapper entry and modify should insert a new value if the entry already exists",
+            "id": "map storage mapper entry and modify should insert a new value if the entry already exists",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "map_storage_mapper_entry_and_modify_increment_or_default",
                 "arguments": [
                     "42",
@@ -568,18 +551,17 @@
                     "100"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "map storage mapper entry and modify should create a new default map, but should not insert anything, only return the default",
+            "id": "map storage mapper entry and modify should create a new default map, but should not insert anything, only return the default",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "map_storage_mapper_entry_and_modify_increment_or_default",
                 "arguments": [
                     "55",
@@ -595,7 +577,7 @@
                     "500"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -607,22 +589,22 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "``map_storage_mapper.info": "u32:2|u32:1|u32:2|u32:2",
-                        "``map_storage_mapper.node_links|u32:1": "u32:0|u32:2",
-                        "``map_storage_mapper.value|u32:1": "42",
-                        "``map_storage_mapper.node_id|42": "1",
-                        "``map_storage_mapper.node_links|u32:2": "u32:1|u32:0",
-                        "``map_storage_mapper.value|u32:2": "55",
-                        "``map_storage_mapper.node_id|55": "2",
-                        "``map_storage_mapper.storage|42|``.info": "u32:2|u32:1|u32:2|u32:2",
-                        "``map_storage_mapper.storage|42|``.node_links|u32:1": "u32:0|u32:2",
-                        "``map_storage_mapper.storage|42|``.value|u32:1": "5",
-                        "``map_storage_mapper.storage|42|``.node_id|5": "1",
-                        "``map_storage_mapper.storage|42|``.mapped|5": "30",
-                        "``map_storage_mapper.storage|42|``.node_links|u32:2": "u32:1|u32:0",
-                        "``map_storage_mapper.storage|42|``.value|u32:2": "15",
-                        "``map_storage_mapper.storage|42|``.node_id|15": "2",
-                        "``map_storage_mapper.storage|42|``.mapped|15": "100"
+                        "str:map_storage_mapper.info": "u32:2|u32:1|u32:2|u32:2",
+                        "str:map_storage_mapper.node_links|u32:1": "u32:0|u32:2",
+                        "str:map_storage_mapper.value|u32:1": "42",
+                        "str:map_storage_mapper.node_id|u32:42": "1",
+                        "str:map_storage_mapper.node_links|u32:2": "u32:1|u32:0",
+                        "str:map_storage_mapper.value|u32:2": "55",
+                        "str:map_storage_mapper.node_id|u32:55": "2",
+                        "str:map_storage_mapper.storage|u32:42|str:.info": "u32:2|u32:1|u32:2|u32:2",
+                        "str:map_storage_mapper.storage|u32:42|str:.node_links|u32:1": "u32:0|u32:2",
+                        "str:map_storage_mapper.storage|u32:42|str:.value|u32:1": "5",
+                        "str:map_storage_mapper.storage|u32:42|str:.node_id|u32:5": "1",
+                        "str:map_storage_mapper.storage|u32:42|str:.mapped|u32:5": "30",
+                        "str:map_storage_mapper.storage|u32:42|str:.node_links|u32:2": "u32:1|u32:0",
+                        "str:map_storage_mapper.storage|u32:42|str:.value|u32:2": "15",
+                        "str:map_storage_mapper.storage|u32:42|str:.node_id|u32:15": "2",
+                        "str:map_storage_mapper.storage|u32:42|str:.mapped|u32:15": "100"
                     },
                     "code": "file:../output/basic-features.wasm"
                 },
@@ -636,11 +618,10 @@
         },
         {
             "step": "scCall",
-            "txId": "map storage mapper entry or default update - should create a new map and insert the value and return none if the map doesn't exist",
+            "id": "map storage mapper entry or default update - should create a new map and insert the value and return none if the map doesn't exist",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "map_storage_mapper_entry_or_default_update",
                 "arguments": [
                     "77",
@@ -655,18 +636,17 @@
                     "0"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "map storage mapper entry or default update - should re-use the existing map and insert the value and return none if the map exists but the value doesn't",
+            "id": "map storage mapper entry or default update - should re-use the existing map and insert the value and return none if the map exists but the value doesn't",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "map_storage_mapper_entry_or_default_update",
                 "arguments": [
                     "77",
@@ -681,18 +661,17 @@
                     "0"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "map storage mapper entry or default update - should replace the existing value and return it",
+            "id": "map storage mapper entry or default update - should replace the existing value and return it",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "map_storage_mapper_entry_or_default_update",
                 "arguments": [
                     "77",
@@ -707,7 +686,7 @@
                     "1|u32:40"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -719,34 +698,34 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "``map_storage_mapper.info": "u32:3|u32:1|u32:3|u32:3",
-                        "``map_storage_mapper.node_links|u32:1": "u32:0|u32:2",
-                        "``map_storage_mapper.value|u32:1": "42",
-                        "``map_storage_mapper.node_id|42": "1",
-                        "``map_storage_mapper.node_links|u32:2": "u32:1|u32:3",
-                        "``map_storage_mapper.value|u32:2": "55",
-                        "``map_storage_mapper.node_id|55": "2",
-                        "``map_storage_mapper.node_links|u32:3": "u32:2|u32:0",
-                        "``map_storage_mapper.value|u32:3": "77",
-                        "``map_storage_mapper.node_id|77": "3",
-                        "``map_storage_mapper.storage|42|``.info": "u32:2|u32:1|u32:2|u32:2",
-                        "``map_storage_mapper.storage|42|``.node_links|u32:1": "u32:0|u32:2",
-                        "``map_storage_mapper.storage|42|``.value|u32:1": "5",
-                        "``map_storage_mapper.storage|42|``.node_id|5": "1",
-                        "``map_storage_mapper.storage|42|``.mapped|5": "30",
-                        "``map_storage_mapper.storage|42|``.node_links|u32:2": "u32:1|u32:0",
-                        "``map_storage_mapper.storage|42|``.value|u32:2": "15",
-                        "``map_storage_mapper.storage|42|``.node_id|15": "2",
-                        "``map_storage_mapper.storage|42|``.mapped|15": "100",
-                        "``map_storage_mapper.storage|77|``.info": "u32:2|u32:1|u32:2|u32:2",
-                        "``map_storage_mapper.storage|77|``.node_links|u32:1": "u32:0|u32:2",
-                        "``map_storage_mapper.storage|77|``.value|u32:1": "222",
-                        "``map_storage_mapper.storage|77|``.node_id|222": "1",
-                        "``map_storage_mapper.storage|77|``.mapped|222": "20",
-                        "``map_storage_mapper.storage|77|``.node_links|u32:2": "u32:1|u32:0",
-                        "``map_storage_mapper.storage|77|``.value|u32:2": "444",
-                        "``map_storage_mapper.storage|77|``.node_id|444": "2",
-                        "``map_storage_mapper.storage|77|``.mapped|444": "50"
+                        "str:map_storage_mapper.info": "u32:3|u32:1|u32:3|u32:3",
+                        "str:map_storage_mapper.node_links|u32:1": "u32:0|u32:2",
+                        "str:map_storage_mapper.value|u32:1": "42",
+                        "str:map_storage_mapper.node_id|u32:42": "1",
+                        "str:map_storage_mapper.node_links|u32:2": "u32:1|u32:3",
+                        "str:map_storage_mapper.value|u32:2": "55",
+                        "str:map_storage_mapper.node_id|u32:55": "2",
+                        "str:map_storage_mapper.node_links|u32:3": "u32:2|u32:0",
+                        "str:map_storage_mapper.value|u32:3": "77",
+                        "str:map_storage_mapper.node_id|u32:77": "3",
+                        "str:map_storage_mapper.storage|u32:42|str:.info": "u32:2|u32:1|u32:2|u32:2",
+                        "str:map_storage_mapper.storage|u32:42|str:.node_links|u32:1": "u32:0|u32:2",
+                        "str:map_storage_mapper.storage|u32:42|str:.value|u32:1": "5",
+                        "str:map_storage_mapper.storage|u32:42|str:.node_id|u32:5": "1",
+                        "str:map_storage_mapper.storage|u32:42|str:.mapped|u32:5": "30",
+                        "str:map_storage_mapper.storage|u32:42|str:.node_links|u32:2": "u32:1|u32:0",
+                        "str:map_storage_mapper.storage|u32:42|str:.value|u32:2": "15",
+                        "str:map_storage_mapper.storage|u32:42|str:.node_id|u32:15": "2",
+                        "str:map_storage_mapper.storage|u32:42|str:.mapped|u32:15": "100",
+                        "str:map_storage_mapper.storage|u32:77|str:.info": "u32:2|u32:1|u32:2|u32:2",
+                        "str:map_storage_mapper.storage|u32:77|str:.node_links|u32:1": "u32:0|u32:2",
+                        "str:map_storage_mapper.storage|u32:77|str:.value|u32:1": "222",
+                        "str:map_storage_mapper.storage|u32:77|str:.node_id|u32:222": "1",
+                        "str:map_storage_mapper.storage|u32:77|str:.mapped|u32:222": "20",
+                        "str:map_storage_mapper.storage|u32:77|str:.node_links|u32:2": "u32:1|u32:0",
+                        "str:map_storage_mapper.storage|u32:77|str:.value|u32:2": "444",
+                        "str:map_storage_mapper.storage|u32:77|str:.node_id|u32:444": "2",
+                        "str:map_storage_mapper.storage|u32:77|str:.mapped|u32:444": "50"
                     },
                     "code": "file:../output/basic-features.wasm"
                 },

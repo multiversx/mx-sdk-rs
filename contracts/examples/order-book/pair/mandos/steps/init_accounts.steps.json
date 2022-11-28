@@ -1,0 +1,42 @@
+{
+    "name": "init accounts",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "0",
+                    "balance": "5,000,000,000",
+                    "esdt": {
+                        "str:WEGLD-abcdef": "5,000,000,000",
+                        "str:BUSD-abcdef": "5,000,000,000"
+                    }
+                },
+                "address:user1": {
+                    "nonce": "0",
+                    "balance": "5,000,000,000",
+                    "esdt": {
+                        "str:WEGLD-abcdef": "5,000,000,000",
+                        "str:BUSD-abcdef": "5,000,000,000"
+                    }
+                },
+                "address:user2": {
+                    "nonce": "0",
+                    "balance": "5,000,000,000",
+                    "esdt": {
+                        "str:WEGLD-abcdef": "5,000,000,000",
+                        "str:BUSD-abcdef": "5,000,000,000"
+                    }
+                },
+                "address:match_provider": {
+                    "nonce": "0",
+                    "balance": "5,000,000,000",
+                    "esdt": {
+                        "str:WEGLD-abcdef": "5,000,000,000",
+                        "str:BUSD-abcdef": "5,000,000,000"
+                    }
+                }
+            }
+        }
+    ]
+}

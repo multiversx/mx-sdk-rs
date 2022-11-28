@@ -8,12 +8,11 @@
         },
         {
             "step": "scCall",
+            "id": "start limited tickets, fixed deadline - invalid",
             "comment": "try starting lottery without setting local burn role",
-            "txId": "start limited tickets, fixed deadline - invalid",
             "tx": {
                 "from": "address:my_address",
                 "to": "sc:lottery",
-                "value": "0",
                 "function": "start",
                 "arguments": [
                     "str:lottery_name",
@@ -30,6 +29,7 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "4",
                 "message": "str:The contract can't burn the selected token!",
                 "gas": "*",
@@ -43,7 +43,6 @@
                 "address:acc1": {
                     "nonce": "0",
                     "balance": "1,000,000",
-                    "storage": {},
                     "esdt": {
                         "str:LOTTERY-123456": "200"
                     }
@@ -58,19 +57,17 @@
                             ]
                         }
                     },
-                    "storage": {},
                     "code": "file:../output/lottery-esdt.wasm"
                 }
             }
         },
         {
             "step": "scCall",
+            "id": "start limited tickets, fixed deadline, 50% burn rate",
             "comment": "start lottery after setting local burn role",
-            "txId": "start limited tickets, fixed deadline, 50% burn rate",
             "tx": {
                 "from": "address:my_address",
                 "to": "sc:lottery",
-                "value": "0",
                 "function": "start",
                 "arguments": [
                     "str:lottery_name",
@@ -87,6 +84,7 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "0",
                 "message": "",
                 "gas": "*",
@@ -108,33 +106,33 @@
                     },
                     "storage": {
                         "str:lotteryInfo|nested:str:lottery_name": {
-                            "0-token_name": "nested:str:LOTTERY-123456",
+                            "0-token_identifier": "nested:str:LOTTERY-123456",
                             "1-ticket_price": "biguint:100",
                             "2-tickets-left": "u32:2",
                             "3-deadline": "u64:123,456",
                             "4-max_entries_per_user": "u32:800",
                             "5-prize_distribution": "nested:u8:100",
-                            "6-whitelist": "nested:",
-                            "7-prize_pool": "biguint:0"
+                            "6-prize_pool": "biguint:0"
                         },
                         "str:burnPercentageForLottery|nested:str:lottery_name": "50"
                     },
                     "code": "file:../output/lottery-esdt.wasm"
                 },
-                "+": {}
+                "+": ""
             }
         },
         {
             "step": "scCall",
-            "txId": "buy first ticket",
+            "id": "buy first ticket",
             "tx": {
                 "from": "address:acc1",
                 "to": "sc:lottery",
-                "value": "0",
-                "esdt": {
-                    "tokenIdentifier": "str:LOTTERY-123456",
-                    "value": "100"
-                },
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:LOTTERY-123456",
+                        "value": "100"
+                    }
+                ],
                 "function": "buy_ticket",
                 "arguments": [
                     "str:lottery_name"
@@ -143,23 +141,25 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "message": "",
+                "out": [],
                 "status": "0",
+                "message": "",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "buy second ticket",
+            "id": "buy second ticket",
             "tx": {
                 "from": "address:acc1",
                 "to": "sc:lottery",
-                "value": "0",
-                "esdt": {
-                    "tokenIdentifier": "str:LOTTERY-123456",
-                    "value": "100"
-                },
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:LOTTERY-123456",
+                        "value": "100"
+                    }
+                ],
                 "function": "buy_ticket",
                 "arguments": [
                     "str:lottery_name"
@@ -168,8 +168,9 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "message": "",
+                "out": [],
                 "status": "0",
+                "message": "",
                 "gas": "*",
                 "refund": "*"
             }
@@ -180,17 +181,22 @@
                 "address:acc1": {
                     "nonce": "2",
                     "balance": "1,000,000",
-                    "storage": {},
                     "esdt": {
                         "str:LOTTERY-123456": "0"
-                    }
+                    },
+                    "storage": {}
                 },
                 "sc:lottery": {
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
                         "str:LOTTERY-123456": {
-                            "balance": "200",
+                            "instances": [
+                                {
+                                    "nonce": "0",
+                                    "balance": "200"
+                                }
+                            ],
                             "roles": [
                                 "ESDTRoleLocalBurn"
                             ]
@@ -198,17 +204,15 @@
                     },
                     "storage": {
                         "str:lotteryInfo|nested:str:lottery_name": {
-                            "0-token_name": "nested:str:LOTTERY-123456",
+                            "0-token_identifier": "nested:str:LOTTERY-123456",
                             "1-ticket_price": "biguint:100",
                             "2-tickets-left": "u32:0",
                             "3-deadline": "u64:123,456",
                             "4-max_entries_per_user": "u32:800",
                             "5-prize_distribution": "nested:u8:100",
-                            "6-whitelist": "nested:",
-                            "7-prize_pool": "biguint:200"
+                            "6-prize_pool": "biguint:200"
                         },
                         "str:burnPercentageForLottery|nested:str:lottery_name": "50",
-
                         "str:ticketHolder|nested:str:lottery_name|str:.len": "2",
                         "str:ticketHolder|nested:str:lottery_name|str:.item|u32:1": "address:acc1",
                         "str:ticketHolder|nested:str:lottery_name|str:.item|u32:2": "address:acc1",
@@ -216,16 +220,15 @@
                     },
                     "code": "file:../output/lottery-esdt.wasm"
                 },
-                "+": {}
+                "+": ""
             }
         },
         {
             "step": "scCall",
-            "txId": "determine-winner-same-ticket-holder",
+            "id": "determine-winner-same-ticket-holder",
             "tx": {
                 "from": "address:my_address",
                 "to": "sc:lottery",
-                "value": "0",
                 "function": "determine_winner",
                 "arguments": [
                     "str:lottery_name"
@@ -234,6 +237,7 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "0",
                 "message": "",
                 "gas": "*",
@@ -247,17 +251,16 @@
                 "address:acc1": {
                     "nonce": "2",
                     "balance": "1,000,000",
-                    "storage": {},
                     "esdt": {
                         "str:LOTTERY-123456": "100"
-                    }
+                    },
+                    "storage": {}
                 },
                 "sc:lottery": {
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
                         "str:LOTTERY-123456": {
-                            "balance": "0",
                             "roles": [
                                 "ESDTRoleLocalBurn"
                             ]
@@ -269,7 +272,7 @@
                     },
                     "code": "file:../output/lottery-esdt.wasm"
                 },
-                "+": {}
+                "+": ""
             }
         }
     ]

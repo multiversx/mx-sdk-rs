@@ -1,0 +1,48 @@
+{
+    "name": "allowance_OtherEqOther",
+    "gasSchedule": "dummy",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:account_1": {
+                    "nonce": "0",
+                    "balance": "0xe8d4a51000"
+                },
+                "sc:erc20": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:balance|address:account_1": "0x2710",
+                        "str:totalSupply": "0x2710"
+                    },
+                    "code": "file:../output/erc20.wasm"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "1",
+            "tx": {
+                "from": "address:account_1",
+                "to": "sc:erc20",
+                "function": "allowance",
+                "arguments": [
+                    "address:account_2",
+                    "address:account_2"
+                ],
+                "gasLimit": "0x100000",
+                "gasPrice": "0x01"
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

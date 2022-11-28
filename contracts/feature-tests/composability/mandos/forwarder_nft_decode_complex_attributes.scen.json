@@ -1,0 +1,125 @@
+{
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:a_user": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:NFT-000001": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "1"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "sc:forwarder": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:NFT-000001": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "1"
+                                }
+                            ],
+                            "lastNonce": "1",
+                            "roles": [
+                                "ESDTRoleNFTCreate"
+                            ]
+                        }
+                    },
+                    "code": "file:../forwarder/output/forwarder.wasm"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "1",
+            "comment": "Attributes are Color(128, 128, 128)",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:forwarder",
+                "function": "nft_decode_complex_attributes",
+                "arguments": [
+                    "str:NFT-000001",
+                    "1",
+                    "str:nft-create-name",
+                    "0",
+                    "str:nft-create-hash-----------------",
+                    "str:nft-create-uri",
+                    "123",
+                    "u32:4|u8:1|u8:2|u8:3|u8:4",
+                    "str:NFT-000001",
+                    "1",
+                    "str:MY_BOXED_BYTES"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:a_user": {
+                    "nonce": "*",
+                    "balance": "0",
+                    "esdt": {
+                        "str:NFT-000001": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "1"
+                                }
+                            ]
+                        }
+                    },
+                    "storage": {},
+                    "code": ""
+                },
+                "sc:forwarder": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:NFT-000001": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "1"
+                                },
+                                {
+                                    "nonce": "2",
+                                    "balance": "1",
+                                    "creator": "sc:forwarder",
+                                    "royalties": "0",
+                                    "hash": "str:nft-create-hash-----------------",
+                                    "uri": [
+                                        "str:nft-create-uri"
+                                    ]
+                                }
+                            ],
+                            "lastNonce": "2",
+                            "roles": [
+                                "ESDTRoleNFTCreate"
+                            ]
+                        }
+                    },
+                    "storage": {},
+                    "code": "file:../forwarder/output/forwarder.wasm"
+                }
+            }
+        }
+    ]
+}

@@ -7,29 +7,26 @@
             "step": "setState",
             "accounts": {
                 "address:owner": {
-                    "nonce": "5",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "nonce": "1",
+                    "balance": "0"
                 }
             },
             "newAddresses": [
                 {
                     "creatorAddress": "address:owner",
-                    "creatorNonce": "5",
+                    "creatorNonce": "1",
                     "newAddress": "sc:adder"
                 }
             ]
         },
         {
             "step": "scDeploy",
-            "txId": "1",
+            "id": "1",
             "tx": {
                 "from": "address:owner",
-                "value": "0",
                 "contractCode": "file:../output/adder.wasm",
                 "arguments": [
-                    "0x05"
+                    "5"
                 ],
                 "gasLimit": "5,000,000",
                 "gasPrice": "0"
@@ -37,14 +34,14 @@
             "expect": {
                 "out": [],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scQuery",
-            "txId": "2",
+            "id": "2",
             "tx": {
                 "to": "sc:adder",
                 "function": "getSum",
@@ -60,11 +57,10 @@
         },
         {
             "step": "scCall",
-            "txId": "3",
+            "id": "3",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:adder",
-                "value": "0",
                 "function": "add",
                 "arguments": [
                     "3"
@@ -75,7 +71,7 @@
             "expect": {
                 "out": [],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -84,7 +80,7 @@
             "step": "checkState",
             "accounts": {
                 "address:owner": {
-                    "nonce": "7",
+                    "nonce": "*",
                     "balance": "0",
                     "storage": {},
                     "code": ""
@@ -93,7 +89,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "``sum": "0x08"
+                        "str:sum": "8"
                     },
                     "code": "file:../output/adder.wasm"
                 }

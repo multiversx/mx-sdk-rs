@@ -1,0 +1,76 @@
+{
+    "name": "storage",
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "sc:external-contract": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:external-key": "str:external-value"
+                    },
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "load_from_address_raw_ok",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "load_from_address_raw",
+                "arguments": [
+                    "sc:external-contract",
+                    "str:external-key"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "str:external-value"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "load_from_address_raw_wrong_address",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "load_from_address_raw",
+                "arguments": [
+                    "sc:basic-features",
+                    "str:external-key"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    ""
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

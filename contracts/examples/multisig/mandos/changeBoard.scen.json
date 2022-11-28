@@ -1,5 +1,4 @@
 {
-    "gasSchedule": "v3",
     "steps": [
         {
             "step": "externalSteps",
@@ -20,6 +19,10 @@
         {
             "step": "externalSteps",
             "path": "steps/rem_alice.steps.json"
+        },
+        {
+            "step": "externalSteps",
+            "path": "steps/rem_unknown.steps.json"
         },
         {
             "step": "externalSteps",

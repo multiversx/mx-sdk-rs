@@ -4,10 +4,326 @@ There are several crates in this repo, this changelog will keep track of all of 
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
-## [Unreleased]
-### New math hooks exposed from Arwen:
-- `pow`, `log2`, `sqrt`
-- cryptography: elliptic curves
+## Unreleased
+#### (Next release must be minor and include elrond-codec)
+- elrond-codec refactor: removed `TopEncodeNoErr`, `NestedEncodeNoErr` and `TypeInfo`
+
+## [elrond-wasm 0.36.1] - 2022-11-01
+- Deprecated `ContractCall` `execute_on_dest_context_ignore_result` method, since it is currently redundant.
+
+## [elrond-wasm 0.36.0, elrond-codec 0.14.0] - 2022-10-13
+- `EsdtTokenPayment` legacy decode: objects encoded by older versions of the framework can now also be decoded, if flag `esdt-token-payment-legacy-decode` is active.
+- Codec `NestedDecodeInput` new  `peek_into` method.
+- `FungibleTokenMapper` caches the token identifier.
+
+## [elrond-wasm 0.35.0, elrond-codec 0.13.0, mandos 0.17.0] - 2022-09-20
+- Rust interactor snippet generator.
+- Added some missing substitution rules in the contract preprocessor.
+- Allow single zero byte when top-decoding Option::None.
+- Ongoing operations module.
+- Claim developer rewards module.
+- `FromIterator` trait for `ManagedVec`.
+- Mandos `"id"` accepted as synonym to `"txId"`.
+
+## [elrond-wasm 0.34.1] - 2022-07-19
+- `#[only_admin]` annotation
+- Safer BigUint/BigInt conversions
+- Added and published `price-aggregator` and `wegld-swap` core contracts.
+
+## [elrond-wasm 0.34.0, elrond-codec 0.12.0, mandos 0.16.0, elrond-interact-snippets 0.1.0] - 2022-07-08
+- Major refactor of the mandos-rs infrastructure.
+	- High-level Mandos objects moved to elrond-wasm-debug;
+	- The `mandos` crate no longer depends on `elrond-wasm-debug` (as originally intended and implemented);
+	- Typed mandos contract call objects, for better call syntax.
+	- More syntactic sugar for writing mandos calls.
+- The first version of elrond-interact-snippets, which can be used to write short blockchain interactor programs.
+	- The syntax relies on contract proxies to easily build calls.
+	- Some of the infrastructure is shared with Mandos.
+	- There is an example of such a interactor for the multisig contract.
+- Refactor of managed type handles in all API traits. Eliminated undefined behavior when using the same handle in multiple contexts.
+- Transfer role proxy module.
+- NFT merge module.
+- `#[only_user_account]` annotation. Only user accounts can call these endpoints.
+- ABI - fixed missing event logs from modules.
+
+## [elrond-wasm 0.33.1, mandos 0.15.1] - 2022-06-24
+- CodecSelf for BigInt
+
+## [elrond-wasm 0.33.0, mandos 0.15.0] - 2022-06-20
+- Removed the data field for direct EGLD & ESDT transfers.
+- Testing and debugging environment aligned with VM version 1.4.53.
+- Call value and token data infrastructure additional cleanup.
+
+## [elrond-wasm 0.32.0, mandos 0.14.0] - 2022-06-03
+- VM new functionality added as part of the environment interface 1.2:
+	- Fully managed functionality for elliptic curves (no allocator);
+	- Fully managed cryptographic functions (no allocator);
+	- More efficient printing of big ints and hex;
+	- Functionality available by adding the `ei-1-2` flag to contracts.
+- `BigFloat` functionality. Since the functionality is not yet deployed on mainnet, use flag `big-float` to use.
+- Major refactoring of the call value mechanism:
+	- `TokenIdentifier` now only refers to ESDT, for mixed EGLD+ESDT we have `EgldOrEsdtTokenIdentifier`.
+	- `EsdtTokenPayment` now only refers to ESDT, for mixed EGLD+ESDT we have `EgldOrEsdtTokenPayment`.
+	- Compact version for multi-transfer: `let [payment_a, payment_b, payment_c] = self.call_value().multi_esdt();`.
+	- Explicit `single_esdt` vs. `single_fungible_esdt` vs. `egld_or_single_esdt` vs. `egld_or_single_fungible_esdt`.
+	- Payment arguments are still supported, although discouraged. They always assume the EGLD+ESDT scenario.
+- `ManagedOption` provides some minor optimization for specific use-cases. Mostly for use in the framework.
+- Cleanup in the callback mechanism and in the `SendApi`.
+- `SparseArray` implementation.
+- `UniqueIdMapper` - efficient storage mapper for holding unique values.
+- The ABI also contains events.
+- New standard module: `StakingModule`.
+
+
+## [elrond-wasm 0.31.1, mandos 0.13.1] - 2022-05-04
+- Bugfix - formatter single char issue.
+
+## [elrond-wasm 0.31.0, elrond-codec 0.11.0, mandos 0.13.0] - 2022-05-02
+- Improved formatter. Strings can be formatted similarly to the standard Rust ones, but without allocator, using managed buffers. Macros `require!`, `sc_panic!`, `sc_format!`, `sc_print!` use it.
+- Removed build flag `ei-1-1`, following mainnet updated and new VM endpoints being available. Among others, managed `sha256` and `keccak256` APIs can be used freely.
+- `CodecFrom` and `CodecInto` traits to define equivalent encodings and conversions via codec.
+- Generated smart contract proxies use the `CodecFrom`/`CodecInto` traits to accept a wider range of types.
+- Mandos Rust testing framework v2, which uses contract proxies for composing calls and is capable of building and exporting mandos scenarios.
+- Managed type handle management system in the contract, to reduce the number of API calls to the VM. General VM API refactor.
+- Eliminated `#[var_args]` annotation. The framework can now distinguish between single-values and multi-values solely based on type.
+- Contract cleans up return data after performing synchronous calls. Getting return data by range is no longer needed and the respective methods have been removed.
+- Fixed behavior of blockchain API `get_esdt_token_data`.
+- Git tag/commit info in ABI (fixed & reintroduced).
+
+## [elrond-wasm 0.30.0, elrond-codec 0.10.0] - 2022-03-17
+- Feature flags in `elrond-wasm`:
+	- `alloc` allows contracts to use the heap allocator. It is not a hard restriction, there is still access to the implementations of the heap-allocated types, but they are not imported. Some methods are only available with this flag.
+	- `ei-1-1` allows contracts to use VM endpoints that are not yet available on the mainnet.
+- Fixes with async calls, smart contract deploy & upgrade.
+- Refactoring regarding small number types in the API.
+- Rust testing framework: Allow checking NFT balance without also checking attributes.
+- View for `MapMapper`.
+
+## [elrond-wasm 0.29.3] - 2022-03-03
+- `ManagedVec` backwards compatible implementation for `set`.
+- Implemented `ManagedVecItem` for `Option<T>`.
+
+## [elrond-wasm 0.29.2] - 2022-03-01
+- Disabled git tag/commit info in ABI due to issue in standard modules.
+
+## [elrond-wasm 0.29.0] - 2022-03-01
+- Cleaned up allocator from modules: `DnsModule`, `EsdtModule`, `FeaturesModule`, `PauseModule`, `UsersModule`.
+- Crypto API managed wrapper over legacy VM endpoints.
+- Managed multi-value types refactor and rename.
+- `ManagedVec` - `remove`, `contains`, `find`.
+- `ManagedVecItem` derive for simple enums.
+- Feature `cb_closure_managed_deser` replaced by `cb_closure_unmanaged_deser`, managed implementation is now the default.
+- Git tag/commit info in ABI.
+
+## [elrond-wasm 0.28.0, elrond-codec 0.9.0, mandos 0.12.0] - 2022-02-22
+- Major elrond-codec refactor:
+	- Redesigned the error handling for single value encoding
+	- Introduced multi-value encoding, which replaces the previous endpoint argument and result mechanisms
+- Mandos improvements:
+	- Multi-values: out, topics, ESDT uri
+	- Logs "+" wildcard
+- Builtin function mocks: `ESDTNFTUpdateAttributes`, `ESDTNFTAddURI`
+- New storage mappers: `FungibleTokenMapper`, `NonFungibleTokenMapper`, `WhitelistMapper`
+- Call value wrapper avoids using invalid token index in requests
+
+## [elrond-wasm 0.27.4, elrond-codec 0.8.5] - 2022-02-02
+- Backwards compatibility fix.
+
+## [elrond-wasm 0.27.3] - 2022-01-31
+- Backwards compatibility fix.
+- Trailing commas are allowed in `sc_panic!`, `require!` and `sc_print!`.
+- EsdtTokenData `decode_attributes_or_exit` for easier error handling.
+
+## [elrond-wasm 0.27.2, elrond-codec 0.8.4] - 2022-01-27
+- Added missing non-specialized decode implementations for managed types.
+
+## [elrond-wasm 0.27.1] - 2022-01-27
+- Deriving `PartialEq` now works on structs that contain managed types.
+
+## [elrond-wasm 0.27.0] - 2022-01-25
+- Fixed certain compilation error messages. The previous implementation of the macro preprocessor would have concealed the location of many issues.
+- Changed implementation of `require!`:
+	- `require!` no longer returns a `SCResult` type, when the condition is false it now stops the transaction immediately, via `signal_error`;
+	- `require!` now accepts message formatting;
+	- `require_old!` gives access to the old implementation.
+- The Rust testing framework can now handle panics and async calls.
+- ABI bugfix - an issue regarding nested types.
+- `meta` crate build also attempts to call `wasm-opt` after building the contracts.
+- Refactored `CodeMetadata` and added "payable by SC" field.
+- Empty contract template.
+
+## [elrond-wasm 0.26.0] - 2022-01-19
+- Major VM API trait refactoring. All API methods can be accessed from a static context. Removed api instance variables from all objects.
+- External view contracts
+	- Annotating one or more endpoints with `#[external_view]` triggers the framework to create a second "external view" contract where all these endpoints are placed. This is primarily to reduce the main contract size.
+	- General `meta` crate functionality refactor to allow multiple contract generation.
+- `ManagedRef` type
+	- Provided as a more efficient alternative to regular references to managed types
+	- Has `Copy` semantics
+	- `ManagedVec` iterators made safer by the proper use of lifetimes
+	- `ManagedVec` `get_mut` offers a safe mutable reference, using lifetimes
+	- Some initial optimizations in storage mappers
+- First version of a message formatter based on `ManagedBuffer`s:
+	- `sc_print!` macro
+	- `sc_panic!` macro
+- Random number generator wrapper over randomness source from the VM.
+
+## [elrond-wasm 0.25.0] - 2021-12-14
+- Rust testing framework - mandos generation fixes and some more getters
+- Standard modules moved to `elrond-wasm-modules` crates
+
+## [elrond-wasm 0.24.0] - 2021-12-07
+- Rust testing framework
+- Managed Crypto API - keccak256 and sha256
+- New hook for ESDT local roles
+- Only-owner module annotation
+
+## [elrond-wasm 0.23.1, elrond-codec 0.8.3] - 2021-11-25
+- `ArrayVec` serialization
+- `ManagedAddress` additional conversions
+
+## [elrond-wasm 0.23.0] - 2021-11-23
+- Static access to API. Static thread-local context stack in the debugger.
+
+## [elrond-wasm 0.22.11] - 2021-11-17
+- Derive `ManagedVecItem` generics fix
+- Constructor can reside in module
+
+## [elrond-wasm 0.22.10] - 2021-11-12
+- `ManagedMultiResultVec` push accepts multi result
+
+## [elrond-wasm 0.22.9] - 2021-11-12
+- `ManagedVarArgsEager` implementation
+- `EsdtLocalRoleFlags`, no heap allocation in `get_esdt_local_roles`
+
+## [elrond-wasm 0.22.8, elrond-codec 0.8.2] - 2021-11-12
+- Optimized decode unsigned number from slice
+
+## [elrond-wasm 0.22.7] - 2021-11-12
+- Optimized decode unsigned number from slice
+- Optimized blockchain API: managed get token nonce, get esdt balance
+- `ManagedVecItem` for `ManagedByteArray`
+
+## [elrond-wasm 0.22.6] - 2021-11-11
+- Optimized decode u64 from `ManagedBuffer`
+- `ManagedVecItem` in `derive_imports`
+
+## [elrond-wasm 0.22.5] - 2021-11-11
+- Implemented `ManagedVecItem` for `bool`.
+- Substitution for `ManagedMultiResultVec::new()`.
+
+## [elrond-wasm 0.22.4] - 2021-11-11
+- Derive `ManagedVecItem`.
+- Nested encode and decode from ManagedBuffers cached in a static singleton buffer.
+- Implemented `ExactSizeIterator` for `ManagedVecIterator`.
+
+## [elrond-wasm 0.22.3] - 2021-11-10
+- Memory allocation optimisations.
+
+## [elrond-wasm 0.22.2] - 2021-11-06
+- Callback endpoint automatically created empty for contracts that have no callbacks. This is determined by the `meta` crate, based on the ABI of the contract and its modules.
+- `UnorderedSetMapper`
+- `IgnoreVarArgs` variadic argument type that ignores input
+
+## [elrond-wasm 0.22.1] - 2021-11-04
+- Made the generated code in `wasm/lib.rs` more compact with the use of macros.
+
+## [elrond-wasm 0.22.0] - 2021-11-02
+- Mechanism for generating contract endpoints based on ABI. Previously, all endpoints from all modules from a crate were automaticaly included, now they can be filtered based on what modules are used.
+- Contract `meta` crates are now capable of building the respective contracts and the ABIs without relying on `erdpy`.
+- Renamed feature `arwen-tests` to `mandos-go-tests`
+
+## [elrond-wasm 0.21.2] - 2021-10-26
+- Bugfix regarding contract upgrade args in `elrond-wasm-debug`
+
+## [elrond-wasm 0.21.1, elrond-codec 0.8.1, mandos 0.11.1] - 2021-10-26
+- Relative path improvements and fixes in `elrond-wasm-debug`:
+	- mandos-rs `file:` syntax now actually loads files and correctly unifies equivalent paths
+	- debugging now works seamlessly, without needing to temporarily change paths in the tests
+- SC proxy - `register_meta_esdt`
+- Debugger builtin function mocks check for ESDT roles
+- ABI provides definitions for EsdtTokenPayment, EsdtTokenData, EsdtTokenType
+
+## [elrond-wasm 0.21.0, elrond-codec 0.8.0, mandos 0.11.0] - 2021-10-22
+- Mandos support for NFT syntax. Many more small improvements and some major refactoring.
+- Major refactoring of the `elrond-wasm-debug` crate, which enables the debugger and the coverage tool. Many features added:
+	- support for synchronous calls, also nested synchronous calls
+	- support for NFT simple transfers
+	- support for ESDT multitransfer (FT + NFT)
+	- builtin functions mocked in the debugger: `ESDTLocalMint`, `ESDTLocalBurn`, `MultiESDTNFTTransfer`, `ESDTNFTTransfer`, `ESDTNFTCreate`, `ESDTNFTAddQuantity`, `ESDTNFTBurn`, `ESDTTransfer`, `ChangeOwnerAddress`, `SetUserName`
+	- supports deploy/deploy from source/upgrade/upgrade from source from contracts
+- `#[payment_multi]` annotation
+- `ManagedRef` type, that allows easier handling of managed types
+- ABI contains endpoint mutability flag (mutable/readonly)
+- reverse iteration for `ManagedVec`
+
+## [elrond-wasm 0.20.1] - 2021-10-05
+- Added missing managed methods in blockchain API: `is_smart_contract`, `get_shard_of_address`, `get_balance`.
+- Improved preprocessor substitutions: `ManagedAddress`, `TokenIdentifier`.
+
+## [elrond-wasm 0.20.0, elrond-codec 0.7.0, mandos 0.10.0] - 2021-10-02
+- Managed callback handling
+- Managed async call result
+- ManagedVec improvements, deserialization fix
+- Better conversions between big numeric types
+- Improved preprocessor substitutions: hidden generics for most managed types
+- Build info in ABI - rustc version, framework version, crate version
+
+## [elrond-wasm 0.19.1] - 2021-09-17
+- Legacy Send API implementation fix
+
+## [elrond-wasm 0.19.0, elrond-codec 0.6.0, mandos 0.9.0] - 2021-09-10
+- Managed types used extensively. Because of this, the recommended Arwen minimum version is `v1.4.10`.
+	- Redesigned parts of the elrond-codec, so as to allow custom type specializations. These specializations allow serializers and types to bypass the limitations of the codec traits to provide optimized implementations. Managed type serialization relies on this.
+	- Redesigned existing managed types: `BigInt`, `BigUint`, `EllipticCurve`.
+	- Added the `ManagedBuffer` type, which can be used to store anything on the VM side.
+	- Support for complex operations using managed buffers, such as storing lists of elements in a managed buffer via the `ManagedVec` type.
+	- There are `ManagedAddress`es now. They rely on another managed type, the `ManagedByteArray`, which is a fixed size managed structure.
+	- `TokenIdentifier` is now a managed type.
+	- Serializer based on a managed buffer.
+	- Storage keys are now based on managed buffers.
+	- All error messages generated by the framework are assembled using a managed buffer.
+	- The blockchain API uses managed types for most interactions.
+	- The contract call API uses managed types for most interactions.
+	- The call value API supports multi transfer via managed `EsdtTokenPayment` objects.
+	- Event logs are sent to the VM via managed types (`ManagedVec<ManagedBuffer>` for topics, `ManagedBuffer` for data).
+	- Type conversion traits for managed types: `ManagedFrom` and `ManagedInto`.
+	- There are now 2 types of `SCError`: `StaticSCError` for static messages and `ManagedSCError`, which is backed by a managed buffer.
+	- Contract errors can now be triggered immediately, without the need to return them from an endpoint.
+- Improved macro preprocessor: more complex patterns can now be substituted.
+	- Generic API parameter needs not be specified every time.
+	- Substitutions available for most managed types and storage mappers.
+- Separated contract API into low-level VM API connectors and high-level utility objects to be used in the contracts.
+- Mandos-rs improvements:
+	- Self tests synchronized with mandos-go. Some missing features needed to be added to make them pass.
+	- Support for ESDT tokens.
+	- Support for ESDT multi-transfer.
+
+
+## [elrond-wasm 0.18.2] - 2021-08-20
+- Crypto API: `ripemd160` function, custom secp256k1 signature verification (`verify_custom_secp256k1`) and signature generation (`encode_secp256k1_der_signature`).
+
+## [elrond-wasm 0.18.1] - 2021-08-05
+- Added "safe" storage mappers, which serialize keys using nested encoding instead of top. The old respective mappers only kept for backwards compatibility, are now deprecated.
+
+## [elrond-wasm 0.18.0, mandos 0.8.0] - 2021-07-28
+
+- New math hooks exposed from Arwen:
+	- `pow`, `log2`, `sqrt`
+	- cryptography: elliptic curves
+- `deploy_contract` now returns `Option<Address>`
+- `deploy_from_source_contract` API
+- Send API refactored for more consistency and ease of use.
+- High level proxies can be used to deploy contracts.
+- Mandos log syntax updated, to match Arwen.
+- A better `#[only_owner]` annotation, which can be applied directly to endoint methods. This annotation also shows up in the ABI.
+- `elrond-wasm-derive` now an optional dependency of `elrond-wasm`. Use `#[elrond_wasm::contract]` instead of `#[elrond_wasm_derive::contract]` now. Same for proxies and modules.
+
+## [elrond-wasm 0.17.4] - 2021-06-30
+- conversions from big ints to small int: `BigUint::to_u64`, `BigInt::to_i64`
+
+## [elrond-wasm 0.17.3] - 2021-06-11
+- `SingleValueMapper` `set_if_empty` method
 
 ## [elrond-wasm 0.17.2] - 2021-06-04
 - callbacks can now declared in modules only (manual forwarding from the main contract no longer required)
