@@ -160,6 +160,10 @@ pub trait GovernanceConfigurablePropertiesModule {
     #[storage_mapper("governance:quorum")]
     fn quorum(&self) -> SingleValueMapper<BigUint>;
 
+    #[view(getMinFeeForPropose)]
+    #[storage_mapper("minFeeForPropose")]
+    fn min_fee_for_propose(&self) -> SingleValueMapper<BigUint>;
+
     #[view(getMinTokenBalanceForProposing)]
     #[storage_mapper("governance:minTokenBalanceForProposing")]
     fn min_token_balance_for_proposing(&self) -> SingleValueMapper<BigUint>;
