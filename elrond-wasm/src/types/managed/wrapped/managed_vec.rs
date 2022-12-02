@@ -4,7 +4,7 @@ use crate::{
     types::{
         heap::{ArgBuffer, BoxedBytes},
         ManagedBuffer, ManagedBufferNestedDecodeInput, ManagedType, ManagedVecItem, ManagedVecRef,
-        ManagedVecRefIterator, MultiValueEncoded, MultiValueManagedVec,
+        ManagedVecRefIterator, MultiValueEncoded, MultiValueManagedVec, StaticBufferRef,
     },
 };
 use alloc::vec::Vec;
@@ -14,6 +14,7 @@ use elrond_codec::{
     NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeMultiOutput,
     TopEncodeOutput,
 };
+use core::fmt::Debug;
 
 pub(crate) const INDEX_OUT_OF_RANGE_MSG: &[u8] = b"ManagedVec index out of range";
 
