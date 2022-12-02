@@ -2,6 +2,7 @@
 /// Contains processed data from argument annotations.
 #[derive(Clone, Debug)]
 pub struct MethodArgument {
+    pub original_pat: syn::Pat,
     pub pat: syn::Pat,
     pub ty: syn::Type,
     pub unprocessed_attributes: Vec<syn::Attribute>,
@@ -12,7 +13,6 @@ pub struct MethodArgument {
 #[derive(Clone, Debug)]
 pub struct ArgMetadata {
     pub payment: ArgPaymentMetadata,
-    pub var_args: bool,
     pub callback_call_result: bool,
     pub event_topic: bool,
 }
@@ -21,7 +21,6 @@ impl Default for ArgMetadata {
     fn default() -> Self {
         ArgMetadata {
             payment: ArgPaymentMetadata::NotPayment,
-            var_args: false,
             callback_call_result: false,
             event_topic: false,
         }
@@ -58,4 +57,6 @@ impl MethodArgument {
 #[derive(Clone, Debug, Default)]
 pub struct TraitProperties {
     pub only_owner: bool,
+    pub only_admin: bool,
+    pub only_user_account: bool,
 }

@@ -8,7 +8,7 @@
         },
         {
             "step": "scCall",
-            "txId": "start limited tickets, fixed deadline. Again.",
+            "id": "start limited tickets, fixed deadline. Again.",
             "tx": {
                 "from": "address:my_address",
                 "to": "sc:lottery",
@@ -65,8 +65,7 @@
                             "3-deadline": "u64:12345678905",
                             "4-max_entries_per_user": "u32:800",
                             "5-prize_distribution": "nested:u8:100",
-                            "6-whitelist": "nested:",
-                            "7-prize_pool": "biguint:0"
+                            "6-prize_pool": "biguint:0"
                         }
                     },
                     "code": "file:../output/lottery-esdt.wasm"

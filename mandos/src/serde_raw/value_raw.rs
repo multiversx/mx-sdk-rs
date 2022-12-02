@@ -4,7 +4,7 @@ use serde::{
 };
 use std::{collections::BTreeMap, fmt};
 
-#[derive(PartialEq, Clone, Debug)]
+#[derive(PartialEq, Eq, Clone, Debug)]
 pub enum ValueSubTree {
     Str(String),
     List(Vec<ValueSubTree>),
@@ -17,6 +17,35 @@ impl ValueSubTree {
             ValueSubTree::Str(s) => s.is_empty(),
             _ => false,
         }
+    }
+
+    fn append_to_concatenated_string(&self, accumulator: &mut String) {
+        match self {
+            ValueSubTree::Str(s) => accumulator.push_str(s.as_str()),
+            ValueSubTree::List(l) => {
+                for item in l {
+                    if !(accumulator.is_empty()) {
+                        accumulator.push('|');
+                    }
+                    item.append_to_concatenated_string(accumulator);
+                }
+            },
+            ValueSubTree::Map(m) => {
+                for value in m.values() {
+                    if !(accumulator.is_empty()) {
+                        accumulator.push('|');
+                    }
+                    value.append_to_concatenated_string(accumulator);
+                }
+            },
+        }
+    }
+
+    /// Concatenates all contained values into a String.
+    pub fn to_concatenated_string(&self) -> String {
+        let mut accumulator = String::new();
+        self.append_to_concatenated_string(&mut accumulator);
+        accumulator
     }
 }
 

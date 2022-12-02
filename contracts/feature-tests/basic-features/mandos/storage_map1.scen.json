@@ -18,7 +18,7 @@
         },
         {
             "step": "scCall",
-            "txId": "store-val",
+            "id": "store-val",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -33,7 +33,7 @@
             "expect": {
                 "out": [],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -59,7 +59,7 @@
         },
         {
             "step": "scCall",
-            "txId": "load-val",
+            "id": "load-val",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -75,14 +75,14 @@
                     "123"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "store-empty",
+            "id": "store-empty",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -97,7 +97,7 @@
             "expect": {
                 "out": [],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -123,7 +123,7 @@
         },
         {
             "step": "scCall",
-            "txId": "load-empty",
+            "id": "load-empty",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -139,7 +139,7 @@
                     "0"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }

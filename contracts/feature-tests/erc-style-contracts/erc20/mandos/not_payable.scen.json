@@ -22,7 +22,7 @@
         },
         {
             "step": "scCall",
-            "txId": "1",
+            "id": "1",
             "tx": {
                 "from": "address:account_1",
                 "to": "sc:erc20",
@@ -36,14 +36,14 @@
                 "out": [],
                 "status": "10",
                 "message": "str:function does not accept EGLD payment",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "2",
+            "id": "2",
             "tx": {
                 "from": "address:account_1",
                 "to": "sc:erc20",
@@ -59,14 +59,14 @@
                 "out": [],
                 "status": "10",
                 "message": "str:function does not accept EGLD payment",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "3",
+            "id": "3",
             "tx": {
                 "from": "address:account_1",
                 "to": "sc:erc20",
@@ -83,14 +83,14 @@
                 "out": [],
                 "status": "10",
                 "message": "str:function does not accept EGLD payment",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "4",
+            "id": "4",
             "tx": {
                 "from": "address:account_1",
                 "to": "sc:erc20",
@@ -107,14 +107,14 @@
                 "out": [],
                 "status": "10",
                 "message": "str:function does not accept EGLD payment",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "5",
+            "id": "5",
             "tx": {
                 "from": "address:account_1",
                 "to": "sc:erc20",
@@ -131,14 +131,14 @@
                 "out": [],
                 "status": "10",
                 "message": "str:function does not accept EGLD payment",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "6",
+            "id": "6",
             "tx": {
                 "from": "address:account_1",
                 "to": "sc:erc20",
@@ -156,7 +156,7 @@
                 "out": [],
                 "status": "10",
                 "message": "str:function does not accept EGLD payment",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }

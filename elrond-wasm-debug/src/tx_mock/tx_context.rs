@@ -1,8 +1,10 @@
-use crate::world_mock::{AccountData, AccountEsdt, BlockchainMock};
+use crate::{
+    num_bigint::BigUint,
+    world_mock::{AccountData, AccountEsdt, BlockchainMock},
+};
 use alloc::vec::Vec;
 use core::cell::RefCell;
-use elrond_wasm::types::{Address, LockableStaticBuffer};
-use num_bigint::BigUint;
+use elrond_wasm::types::{heap::Address, LockableStaticBuffer};
 use num_traits::Zero;
 use std::{
     cell::{Ref, RefMut},
@@ -23,6 +25,7 @@ pub struct TxContext {
     pub static_vars_cell: RefCell<TxStaticVars>,
     pub tx_result_cell: RefCell<TxResult>,
     pub b_rng: RefCell<BlockchainRng>,
+    pub printed_messages: RefCell<Vec<String>>,
 }
 
 impl TxContext {
@@ -36,6 +39,7 @@ impl TxContext {
             static_vars_cell: RefCell::new(TxStaticVars::default()),
             tx_result_cell: RefCell::new(TxResult::empty()),
             b_rng,
+            printed_messages: RefCell::new(Vec::new()),
         }
     }
 
@@ -51,6 +55,7 @@ impl TxContext {
             username: Vec::new(),
             contract_path: None,
             contract_owner: None,
+            developer_rewards: BigUint::zero(),
         });
 
         let tx_input = TxInput {
@@ -74,6 +79,7 @@ impl TxContext {
             static_vars_cell: RefCell::new(TxStaticVars::default()),
             tx_result_cell: RefCell::new(TxResult::empty()),
             b_rng,
+            printed_messages: RefCell::new(Vec::new()),
         }
     }
 
@@ -161,6 +167,7 @@ impl TxContext {
             username: Vec::new(),
             contract_path: Some(contract_path),
             contract_owner: Some(contract_owner),
+            developer_rewards: BigUint::zero(),
         });
     }
 

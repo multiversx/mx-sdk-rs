@@ -5,7 +5,7 @@ use std::{
     rc::Rc,
 };
 
-use elrond_wasm::types::Address;
+use elrond_wasm::types::heap::Address;
 
 use crate::{
     address_hex,
@@ -123,6 +123,6 @@ impl BlockchainUpdate {
     }
 
     pub fn apply(self, blockchain: &mut BlockchainMock) {
-        blockchain.accounts.extend(self.accounts.into_iter());
+        blockchain.update_accounts(self.accounts);
     }
 }

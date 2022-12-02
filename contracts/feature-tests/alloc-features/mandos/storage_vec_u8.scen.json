@@ -1,0 +1,142 @@
+{
+    "name": "storage",
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:alloc-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../output/alloc-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "store-val",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:alloc-features",
+                "function": "store_vec_u8",
+                "arguments": [
+                    "123"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:alloc-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:vec_u8": "123"
+                    },
+                    "code": "file:../output/alloc-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "*",
+                    "balance": "*",
+                    "storage": {},
+                    "code": ""
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "load-val",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:alloc-features",
+                "function": "load_vec_u8",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "123"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "store-empty",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:alloc-features",
+                "function": "store_vec_u8",
+                "arguments": [
+                    "0"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:alloc-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:vec_u8": "0"
+                    },
+                    "code": "file:../output/alloc-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "*",
+                    "balance": "*",
+                    "storage": {},
+                    "code": ""
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "load-empty",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:alloc-features",
+                "function": "load_vec_u8",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

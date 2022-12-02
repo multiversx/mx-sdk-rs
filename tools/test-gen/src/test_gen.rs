@@ -1,5 +1,21 @@
 use std::{env, fs, fs::File, io::Write};
 
+/// Examples how to run:
+/// `cargo run ../../contracts/examples/multisig/mandos`
+/// `cargo run ../../contracts/feature-tests/basic-features/mandos`
+fn main() {
+    let args: Vec<String> = env::args().collect();
+    let files_path = &args[1];
+
+    let names = read_dirs(files_path);
+
+    let mut rs_file = File::create("mandos_rs_test.rs").unwrap();
+    print_mandos_rs(&mut rs_file, names.as_slice());
+
+    let mut go_file = File::create("mandos_go_test.rs").unwrap();
+    print_mandos_go(&mut go_file, names.as_slice());
+}
+
 fn split_file_name(name: String, separator: &str) -> Vec<String> {
     let splitted_name = name.split(separator);
     let collection: Vec<&str> = splitted_name.collect();
@@ -61,20 +77,4 @@ fn {}_go() {{
         )
         .unwrap();
     }
-}
-
-/// Examples how to run:
-/// `cargo run ../../contracts/examples/multisig/mandos`
-/// `cargo run ../../contracts/feature-tests/composability/mandos`
-fn main() {
-    let args: Vec<String> = env::args().collect();
-    let files_path = &args[1];
-
-    let names = read_dirs(files_path);
-
-    let mut rs_file = File::create("mandos_rs_test.rs").unwrap();
-    print_mandos_rs(&mut rs_file, names.as_slice());
-
-    let mut go_file = File::create("mandos_go_test.rs").unwrap();
-    print_mandos_go(&mut go_file, names.as_slice());
 }

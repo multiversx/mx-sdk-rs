@@ -23,7 +23,7 @@ impl fmt::Display for EsdtRoles {
         let esdt_keys: Vec<Vec<u8>> = self.clone().0.to_vec();
 
         for value in &esdt_keys {
-            write!(&mut esdt_buf, "{}", hex::encode(value.as_slice()))?;
+            write!(esdt_buf, "{}", hex::encode(value.as_slice()))?;
         }
         Ok(())
     }

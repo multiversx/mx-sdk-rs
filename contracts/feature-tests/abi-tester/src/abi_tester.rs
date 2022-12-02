@@ -37,18 +37,22 @@ pub trait AbiTester {
     }
 
     #[endpoint]
+    #[only_owner]
+    fn take_managed_type(&self, _arg: AbiManagedType<Self::Api>) {}
+
+    #[endpoint]
     #[output_name("multi-result-1")]
     #[output_name("multi-result-2")]
     #[output_name("multi-result-3")]
     #[output_name("multi-result-in-excess")]
-    fn multi_result_3(&self) -> MultiResult3<i32, [u8; 3], BoxedBytes> {
+    fn multi_result_3(&self) -> MultiValue3<i32, [u8; 3], BoxedBytes> {
         (1, [2; 3], BoxedBytes::empty()).into()
     }
 
     #[endpoint]
     #[output_name("multi-too-few-1")]
     #[output_name("multi-too-few-2")]
-    fn multi_result_4(&self) -> MultiResult4<i32, [u8; 3], BoxedBytes, OnlyShowsUpAsNested03> {
+    fn multi_result_4(&self) -> MultiValue4<i32, [u8; 3], BoxedBytes, OnlyShowsUpAsNested03> {
         (1, [2; 3], BoxedBytes::empty(), OnlyShowsUpAsNested03()).into()
     }
 
@@ -56,30 +60,26 @@ pub trait AbiTester {
     fn var_args(
         &self,
         _simple_arg: u32,
-        #[var_args] _var_args: VarArgs<MultiArg2<OnlyShowsUpAsNested04, i32>>,
+        _var_args: MultiValueVec<MultiValue2<OnlyShowsUpAsNested04, i32>>,
     ) {
     }
 
     #[endpoint]
-    fn multi_result_vec(&self) -> MultiResultVec<MultiResult3<OnlyShowsUpAsNested05, bool, ()>> {
-        MultiResultVec::new()
+    fn multi_result_vec(&self) -> MultiValueVec<MultiValue3<OnlyShowsUpAsNested05, bool, ()>> {
+        MultiValueVec::new()
     }
 
     #[endpoint]
-    fn optional_arg(
-        &self,
-        _simple_arg: u32,
-        #[var_args] _opt_args: OptionalArg<OnlyShowsUpAsNested06>,
-    ) {
+    fn optional_arg(&self, _simple_arg: u32, _opt_args: OptionalValue<OnlyShowsUpAsNested06>) {}
+
+    #[endpoint]
+    fn optional_result(&self) -> OptionalValue<OnlyShowsUpAsNested07> {
+        OptionalValue::None
     }
 
     #[endpoint]
-    fn optional_result(&self) -> OptionalResult<OnlyShowsUpAsNested07> {
-        OptionalResult::None
-    }
-
-    #[endpoint]
-    fn address_vs_h256(&self, address: Address, h256: H256) -> MultiResult2<Address, H256> {
+    fn address_vs_h256(&self, address: Address, h256: H256) -> MultiValue2<Address, H256> {
+        self.address_h256_event(&address, &h256);
         (address, h256).into()
     }
 
@@ -88,7 +88,7 @@ pub trait AbiTester {
         &self,
         address: ManagedAddress,
         byte_array: ManagedByteArray<Self::Api, 32>,
-    ) -> MultiResult2<ManagedAddress, ManagedByteArray<Self::Api, 32>> {
+    ) -> MultiValue2<ManagedAddress, ManagedByteArray<Self::Api, 32>> {
         (address, byte_array).into()
     }
 
@@ -109,31 +109,77 @@ pub trait AbiTester {
 
     #[view]
     #[storage_mapper("sample_storage_mapper")]
-    fn sample_storage_mapper(&self) -> SingleValueMapper<OnlyShowsUpAsNested10>;
+    fn sample_storage_mapper(&self) -> SingleValueMapper<OnlyShowsUpAsNestedInSingleValueMapper>;
 
-    #[endpoint]
-    #[payable("EGLD")]
-    fn payable_egld(&self, #[payment] _payment: BigUint, #[payment_token] _token: TokenIdentifier) {
+    #[view]
+    fn item_for_vec(&self) -> Vec<OnlyShowsUpAsNestedInVec> {
+        Vec::new()
+    }
+
+    #[view]
+    fn item_for_array_vec(&self) -> ArrayVec<OnlyShowsUpAsNestedInArrayVec, 3> {
+        ArrayVec::new()
+    }
+
+    #[view]
+    fn item_for_managed_vec(&self) -> ManagedVec<AbiManagedVecItem> {
+        ManagedVec::new()
+    }
+
+    #[view]
+    fn item_for_array(&self, _array: &[OnlyShowsUpAsNestedInArray; 5]) {}
+
+    #[view]
+    fn item_for_box(&self) -> Box<OnlyShowsUpAsNestedInBox> {
+        Box::new(OnlyShowsUpAsNestedInBox)
+    }
+
+    #[view]
+    fn item_for_boxed_slice(&self) -> Box<[OnlyShowsUpAsNestedInBoxedSlice]> {
+        Vec::new().into_boxed_slice()
+    }
+
+    #[view]
+    fn item_for_ref(&self, _ref: &OnlyShowsUpAsNestedInRef) {}
+
+    #[view]
+    fn item_for_slice(&self, _ref: &[OnlyShowsUpAsNestedInSlice]) {}
+
+    #[view]
+    fn item_for_option(&self) -> Option<OnlyShowsUpAsNestedInOption> {
+        None
     }
 
     #[endpoint]
+    #[payable("EGLD")]
+    fn payable_egld(&self) {}
+
+    #[endpoint]
     #[payable("TOKEN-FOR-ABI")]
-    fn payable_some_token(
-        &self,
-        #[payment] _payment: BigUint,
-        #[payment_token] _token: TokenIdentifier,
-    ) {
+    fn payable_some_token(&self) {
+        let (token, payment) = self.call_value().single_fungible_esdt();
+        self.payable_event(&token, &payment);
     }
 
     #[endpoint]
     #[payable("*")]
-    fn payable_any_token(
-        &self,
-        #[payment] _payment: BigUint,
-        #[payment_token] _token: TokenIdentifier,
-    ) {
-    }
+    fn payable_any_token(&self) {}
 
     #[external_view]
     fn external_view(&self) {}
+
+    #[event("payable-event")]
+    fn payable_event(&self, #[indexed] token: &TokenIdentifier, amount: &BigUint);
+
+    #[event("address-h256-event")]
+    fn address_h256_event(&self, #[indexed] address: &Address, #[indexed] h256: &H256);
+
+    #[endpoint]
+    #[label("label1")]
+    fn label_a(&self) {}
+
+    #[endpoint]
+    #[label("label1")]
+    #[label("label2")]
+    fn label_b(&self) {}
 }

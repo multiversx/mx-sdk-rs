@@ -1,13 +1,18 @@
 use std::collections::BTreeMap;
 
-use crate::world_mock::{AccountData, BlockInfo, EsdtData};
-use elrond_wasm::types::Address;
+use crate::{
+    num_bigint,
+    world_mock::{AccountData, BlockInfo, EsdtData},
+};
+use elrond_wasm::types::heap::Address;
 use mandos::serde_raw::{
     AccountRaw, BlockInfoRaw, CheckAccountRaw, CheckAccountsRaw, CheckBytesValueRaw,
     CheckEsdtDataRaw, CheckEsdtInstanceRaw, CheckEsdtInstancesRaw, CheckEsdtMapContentsRaw,
     CheckEsdtMapRaw, CheckEsdtRaw, CheckLogsRaw, CheckStorageDetailsRaw, CheckStorageRaw,
-    EsdtFullRaw, EsdtRaw, InstanceRaw, TxCallRaw, TxESDTRaw, TxExpectRaw, TxQueryRaw, ValueSubTree,
+    CheckValueListRaw, EsdtFullRaw, EsdtInstanceRaw, EsdtRaw, TxCallRaw, TxESDTRaw, TxExpectRaw,
+    TxQueryRaw, ValueSubTree,
 };
+use num_traits::Zero;
 
 use super::{ScCallMandos, ScQueryMandos, TxExpectMandos};
 
@@ -15,6 +20,7 @@ pub(crate) const STAR_STR: &str = "*";
 
 pub(crate) fn account_as_raw(acc: &AccountData) -> AccountRaw {
     let balance_raw = Some(rust_biguint_as_raw(&acc.egld_balance));
+    let developer_rewards_raw = Some(rust_biguint_as_raw(&acc.developer_rewards));
     let code_raw = acc
         .contract_path
         .clone()
@@ -45,6 +51,7 @@ pub(crate) fn account_as_raw(acc: &AccountData) -> AccountRaw {
         owner: acc.contract_owner.as_ref().map(address_as_raw),
         storage: storage_raw,
         username: None, // TODO: Add if needed
+        developer_rewards: developer_rewards_raw,
     }
 }
 
@@ -63,14 +70,14 @@ pub(crate) fn esdt_data_as_raw(esdt: &EsdtData) -> EsdtRaw {
 
     let mut instances_raw = Vec::new();
     for inst in esdt.instances.get_instances().values() {
-        let inst_raw = InstanceRaw {
+        let inst_raw = EsdtInstanceRaw {
             attributes: Some(bytes_as_raw(&inst.metadata.attributes)),
             balance: Some(rust_biguint_as_raw(&inst.balance)),
             creator: inst.metadata.creator.as_ref().map(address_as_raw),
             hash: inst.metadata.hash.as_ref().map(|h| bytes_as_raw(h)),
             nonce: Some(u64_as_raw(inst.nonce)),
             royalties: Some(u64_as_raw(inst.metadata.royalties)),
-            uri: inst.metadata.uri.as_ref().map(|u| bytes_as_raw(u)),
+            uri: inst.metadata.uri.iter().map(|u| bytes_as_raw(u)).collect(),
         };
 
         instances_raw.push(inst_raw);
@@ -119,7 +126,7 @@ pub(crate) fn tx_call_as_raw(tx_call: &ScCallMandos) -> TxCallRaw {
         from: address_as_raw(&tx_call.from),
         to: address_as_raw(&tx_call.to),
         value: None, // this is the old "value" field, which is now "egld_value". Only kept for backwards compatibility
-        egld_value: Some(rust_biguint_as_raw(&tx_call.egld_value)),
+        egld_value: rust_biguint_as_opt_raw(&tx_call.egld_value),
         esdt_value: all_esdt_raw,
         function: tx_call.function.clone(),
         arguments: arguments_raw,
@@ -162,7 +169,7 @@ pub(crate) fn tx_expect_as_raw(tx_expect: &TxExpectMandos) -> TxExpectRaw {
     };
 
     TxExpectRaw {
-        out: out_values_raw,
+        out: CheckValueListRaw::CheckList(out_values_raw),
         status: CheckBytesValueRaw::Equal(u64_as_raw(tx_expect.status)),
         message: msg_raw,
         logs: CheckLogsRaw::Star,
@@ -192,7 +199,13 @@ pub(crate) fn account_as_check_state_raw(acc: &AccountData) -> CheckAccountsRaw 
                     .clone()
                     .unwrap_or_else(|| ValueSubTree::Str("0".to_owned())),
                 royalties: opt_raw_value_to_check_raw(&inst_raw.royalties),
-                uri: opt_raw_value_to_check_raw(&inst_raw.uri),
+                uri: CheckValueListRaw::CheckList(
+                    inst_raw
+                        .uri
+                        .iter()
+                        .map(|v| CheckBytesValueRaw::Equal(v.clone()))
+                        .collect(),
+                ),
             };
 
             esdt_instances_check_raw.push(inst_check_raw);
@@ -235,6 +248,7 @@ pub(crate) fn account_as_check_state_raw(acc: &AccountData) -> CheckAccountsRaw 
             contents: all_check_esdt_raw,
         }),
         owner: CheckBytesValueRaw::Star, // TODO: Add owner check?
+        developer_rewards: CheckBytesValueRaw::Equal(rust_biguint_as_raw(&acc.developer_rewards)),
         storage: CheckStorageRaw::Equal(check_storage_raw),
         code: CheckBytesValueRaw::Star,
         async_call_data: CheckBytesValueRaw::Unspecified,
@@ -271,6 +285,14 @@ pub(crate) fn bytes_to_mandos_string_or_hex(bytes: &[u8]) -> String {
 
 pub(crate) fn rust_biguint_as_raw(big_uint: &num_bigint::BigUint) -> ValueSubTree {
     ValueSubTree::Str(big_uint.to_string())
+}
+
+pub(crate) fn rust_biguint_as_opt_raw(big_uint: &num_bigint::BigUint) -> Option<ValueSubTree> {
+    if big_uint > &num_bigint::BigUint::zero() {
+        Some(rust_biguint_as_raw(big_uint))
+    } else {
+        None
+    }
 }
 
 pub(crate) fn address_as_raw(address: &Address) -> ValueSubTree {

@@ -16,7 +16,7 @@
         },
         {
             "step": "scCall",
-            "txId": "upgrade-vault-to-forwarder",
+            "id": "upgrade-vault-to-forwarder",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
@@ -43,7 +43,7 @@
         },
         {
             "step": "scCall",
-            "txId": "upgrade-back-to-vault-with-args",
+            "id": "upgrade-back-to-vault-with-args",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",

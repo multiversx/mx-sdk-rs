@@ -1,4 +1,4 @@
-use core::convert::TryInto;
+use core::convert::TryFrom;
 
 elrond_wasm::imports!();
 
@@ -10,10 +10,7 @@ pub trait ManagedAddressFeatures {
     }
 
     #[endpoint]
-    fn maddress_from_managed_buffer(
-        &self,
-        managed_buffer: ManagedBuffer,
-    ) -> SCResult<ManagedAddress> {
-        managed_buffer.try_into().into()
+    fn maddress_from_managed_buffer(&self, managed_buffer: ManagedBuffer) -> ManagedAddress {
+        ManagedAddress::try_from(managed_buffer).unwrap_or_else(|err| sc_panic!(err))
     }
 }

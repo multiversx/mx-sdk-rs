@@ -5,7 +5,7 @@ mod dns_proxy {
     pub trait Dns {
         #[payable("EGLD")]
         #[endpoint]
-        fn register(&self, name: BoxedBytes, #[payment] payment: BigUint);
+        fn register(&self, name: &ManagedBuffer);
     }
 }
 
@@ -22,18 +22,14 @@ pub trait DnsModule {
     fn dns_proxy(&self, to: ManagedAddress) -> dns_proxy::Proxy<Self::Api>;
 
     #[payable("EGLD")]
+    #[only_owner]
     #[endpoint(dnsRegister)]
-    fn dns_register(
-        &self,
-        dns_address: ManagedAddress,
-        name: BoxedBytes,
-        #[payment] payment: BigUint,
-    ) -> SCResult<AsyncCall> {
-        only_owner!(self, "only owner can call dnsRegister");
-
-        Ok(self
-            .dns_proxy(dns_address)
-            .register(name, payment)
-            .async_call())
+    fn dns_register(&self, dns_address: ManagedAddress, name: ManagedBuffer) {
+        let payment = self.call_value().egld_value();
+        self.dns_proxy(dns_address)
+            .register(&name)
+            .with_egld_transfer(payment)
+            .async_call()
+            .call_and_exit()
     }
 }

@@ -1,8 +1,8 @@
+use crate::num_bigint::BigUint;
 use elrond_wasm::{
     api::ESDT_NFT_BURN_FUNC_NAME,
     elrond_codec::{top_encode_to_vec_u8, TopDecode},
 };
-use num_bigint::BigUint;
 
 use crate::tx_mock::{BlockchainUpdate, TxCache, TxInput, TxLog, TxResult, TxResultCalls};
 

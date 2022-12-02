@@ -18,7 +18,7 @@
         },
         {
             "step": "scCall",
-            "txId": "proposeSCDeploy",
+            "id": "proposeSCDeploy",
             "comment": "missing argument",
             "tx": {
                 "from": "address:paul",
@@ -37,14 +37,14 @@
                     "3"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "sc-deploy-sign-alice",
+            "id": "sc-deploy-sign-alice",
             "tx": {
                 "from": "address:alice",
                 "to": "sc:multisig",
@@ -58,14 +58,14 @@
             "expect": {
                 "out": [],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "sc-deploy-sign-bob",
+            "id": "sc-deploy-sign-bob",
             "tx": {
                 "from": "address:bob",
                 "to": "sc:multisig",
@@ -79,7 +79,7 @@
             "expect": {
                 "out": [],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -96,7 +96,7 @@
         },
         {
             "step": "scCall",
-            "txId": "sc-deploy-perform-err",
+            "id": "sc-deploy-perform-err",
             "tx": {
                 "from": "address:paul",
                 "to": "sc:multisig",
@@ -111,7 +111,7 @@
                 "out": [],
                 "status": "10",
                 "message": "str:error signalled by smartcontract",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }

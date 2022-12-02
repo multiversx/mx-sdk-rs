@@ -1,0 +1,30 @@
+{
+    "comment": "checks that owner is correct if specified",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:parent": {},
+                "address:child": {
+                    "owner": "address:parent"
+                }
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:parent": {},
+                "address:child": {}
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:parent": {},
+                "address:child": {
+                    "owner": "address:parent"
+                }
+            }
+        }
+    ]
+}

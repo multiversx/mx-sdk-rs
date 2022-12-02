@@ -14,7 +14,6 @@
         },
         {
             "step": "scCall",
-            "txId": "",
             "tx": {
                 "from": "address:my_address",
                 "to": "sc:lottery",

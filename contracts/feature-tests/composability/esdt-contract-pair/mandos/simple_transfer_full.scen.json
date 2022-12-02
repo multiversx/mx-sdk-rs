@@ -20,7 +20,7 @@
         },
         {
             "step": "scCall",
-            "txId": "transfer-full",
+            "id": "transfer-full",
             "tx": {
                 "from": "address:acc1",
                 "to": "sc:first_contract",

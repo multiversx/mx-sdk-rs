@@ -40,12 +40,47 @@ pub trait ManagedVecFeatures {
         mv: ManagedVec<BigUint>,
         index: usize,
         item: &BigUint,
-    ) -> SCResult<ManagedVec<BigUint>> {
+    ) -> ManagedVec<BigUint> {
         let mut result = mv;
         if result.set(index, item).is_ok() {
-            Ok(result)
+            result
         } else {
-            Err("index out of bounds".into())
+            sc_panic!("index out of bounds")
         }
+    }
+
+    #[endpoint]
+    fn managed_vec_remove(&self, mv: ManagedVec<BigUint>, index: usize) -> ManagedVec<BigUint> {
+        let mut result = mv;
+        result.remove(index);
+
+        result
+    }
+
+    #[endpoint]
+    fn managed_vec_find(&self, mv: ManagedVec<BigUint>, item: BigUint) -> Option<usize> {
+        mv.find(&item)
+    }
+
+    #[endpoint]
+    fn managed_vec_contains(&self, mv: ManagedVec<BigUint>, item: BigUint) -> bool {
+        mv.contains(&item)
+    }
+
+    #[endpoint]
+    fn managed_vec_array_push(
+        &self,
+        mut mv: ManagedVec<[u8; 5]>,
+        item: [u8; 5],
+    ) -> ManagedVec<[u8; 5]> {
+        mv.push(item);
+        mv
+    }
+
+    #[endpoint]
+    fn managed_ref_explicit(&self, mv: ManagedVec<BigUint>, index: usize) -> BigUint {
+        let value: ManagedRef<BigUint> = mv.get(index);
+        let with_explicit_lifetime: ManagedRef<'_, BigUint> = value;
+        (*with_explicit_lifetime).clone()
     }
 }

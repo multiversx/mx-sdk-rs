@@ -13,11 +13,10 @@
         },
         {
             "step": "scDeploy",
-            "txId": "deploy-router",
+            "id": "deploy-router",
             "tx": {
                 "from": "address:owner",
-                "value": "0",
-                "contractCode": "file:../../output/pair.wasm",
+                "contractCode": "file:../../output/order-book-pair.wasm",
                 "arguments": [
                     "str:WEGLD-abcdef",
                     "str:BUSD-abcdef"

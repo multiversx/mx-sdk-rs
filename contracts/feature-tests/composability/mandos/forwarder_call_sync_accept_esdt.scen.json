@@ -25,7 +25,37 @@
         },
         {
             "step": "scCall",
-            "txId": "1",
+            "id": "transfer-multi-esdt-to-single-esdt-api",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:vault",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:TEST-TOKENA",
+                        "value": "500"
+                    },
+                    {
+                        "tokenIdentifier": "str:TEST-TOKENA",
+                        "value": "500"
+                    }
+                ],
+                "function": "accept_funds_single_esdt_transfer",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:incorrect number of ESDT transfers",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "1",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
@@ -43,12 +73,7 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [
-                    "str:TEST-TOKENA",
-                    "str:FungibleESDT",
-                    "1000",
-                    "0"
-                ],
+                "out": [],
                 "status": "0",
                 "logs": [
                     {
@@ -67,10 +92,10 @@
                         "endpoint": "str:accept_funds_echo_payment",
                         "topics": [
                             "str:accept_funds",
+                            "0",
                             "str:TEST-TOKENA",
-                            "str:FungibleESDT",
-                            "1000",
-                            "0"
+                            "0",
+                            "1000"
                         ],
                         "data": ""
                     },
@@ -79,10 +104,10 @@
                         "endpoint": "str:forward_sync_accept_funds",
                         "topics": [
                             "str:accept_funds_sync_result",
+                            "0",
                             "str:TEST-TOKENA",
-                            "str:FungibleESDT",
-                            "1000",
-                            "0"
+                            "0",
+                            "1000"
                         ],
                         "data": ""
                     }

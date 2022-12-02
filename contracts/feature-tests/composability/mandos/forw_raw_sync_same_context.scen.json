@@ -22,7 +22,7 @@
         },
         {
             "step": "scCall",
-            "txId": "call_execute_on_same_context",
+            "id": "call_execute_on_same_context",
             "comment": "forwarder's own storage is modified instead of vault's",
             "tx": {
                 "from": "address:a_user",

@@ -1,4 +1,7 @@
-use crate::{api::VMApi, types::ManagedAddress};
+use crate::{
+    api::VMApi,
+    types::{ManagedAddress, ManagedOption},
+};
 
 pub trait ProxyObjBase {
     type Api: VMApi;
@@ -11,6 +14,15 @@ pub trait ProxyObjBase {
     #[must_use]
     fn contract(self, address: ManagedAddress<Self::Api>) -> Self;
 
+    /// Extracts the address contained in the proxy object and replaces it with None.
+    ///
+    /// Will just return `ManagedOption::none()` if no address was specified.
     #[doc(hidden)]
-    fn into_fields(self) -> ManagedAddress<Self::Api>;
+    fn extract_opt_address(&mut self) -> ManagedOption<Self::Api, ManagedAddress<Self::Api>>;
+
+    /// Extracts the address contained in the proxy object and replaces it with None.
+    ///
+    /// Will crash if no address was specified.
+    #[doc(hidden)]
+    fn extract_address(&mut self) -> ManagedAddress<Self::Api>;
 }

@@ -5,7 +5,7 @@ pub fn arg_declarations(method_args: &[MethodArgument]) -> Vec<proc_macro2::Toke
         .iter()
         .map(|arg| {
             let unprocessed_attributes = &arg.unprocessed_attributes;
-            let pat = &arg.pat;
+            let pat = &arg.original_pat;
             let ty = &arg.ty;
             quote! { #(#unprocessed_attributes)* #pat : #ty }
         })
@@ -19,7 +19,7 @@ pub fn generate_sig(m: &Method) -> proc_macro2::TokenStream {
     let arg_decl = arg_declarations(&m.method_args);
     let ret_tok = match &m.return_type {
         syn::ReturnType::Default => quote! {},
-        syn::ReturnType::Type(_, ty) => quote! { -> #ty },
+        syn::ReturnType::Type(r_arrow_token, ty) => quote! { #r_arrow_token #ty },
     };
     let result = quote! {
         #[allow(clippy::too_many_arguments)]

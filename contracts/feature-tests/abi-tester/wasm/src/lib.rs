@@ -13,6 +13,15 @@ elrond_wasm_node::wasm_endpoints! {
         esdt_local_role
         esdt_token_data
         esdt_token_payment
+        item_for_array
+        item_for_array_vec
+        item_for_box
+        item_for_boxed_slice
+        item_for_managed_vec
+        item_for_option
+        item_for_ref
+        item_for_slice
+        item_for_vec
         managed_address_vs_byte_array
         multi_result_3
         multi_result_4
@@ -23,6 +32,7 @@ elrond_wasm_node::wasm_endpoints! {
         payable_egld
         payable_some_token
         sample_storage_mapper
+        take_managed_type
         var_args
     )
 }

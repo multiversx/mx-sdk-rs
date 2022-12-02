@@ -1,0 +1,93 @@
+{
+    "name": "echo_multi_value_tuples",
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:alloc-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../output/alloc-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "1",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:alloc-features",
+                "function": "echo_multi_value_tuples",
+                "arguments": [
+                    "10",
+                    "20",
+                    "30",
+                    "40"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "10",
+                    "20",
+                    "30",
+                    "40"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "2",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:alloc-features",
+                "function": "echo_multi_value_tuples",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "1",
+            "comment": "only even number of arguments possible",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:alloc-features",
+                "function": "echo_multi_value_tuples",
+                "arguments": [
+                    "10",
+                    "20",
+                    "30"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:argument decode error (m): too few arguments",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

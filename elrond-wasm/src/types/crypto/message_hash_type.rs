@@ -1,9 +1,8 @@
-use crate::abi::TypeAbi;
-use alloc::string::String;
+use crate::abi::{TypeAbi, TypeName};
 use elrond_codec::elrond_codec_derive::{NestedDecode, NestedEncode, TopDecode, TopEncode};
 
 /// Message hash type for the `verifyCustomSecp256k1` CryptoApi function
-#[derive(TopDecode, TopEncode, NestedDecode, NestedEncode, Clone, PartialEq, Debug)]
+#[derive(TopDecode, TopEncode, NestedDecode, NestedEncode, Clone, PartialEq, Eq, Debug)]
 pub enum MessageHashType {
     ECDSAPlainMsg,
     ECDSASha256,
@@ -37,7 +36,7 @@ impl From<u8> for MessageHashType {
 }
 
 impl TypeAbi for MessageHashType {
-    fn type_name() -> String {
+    fn type_name() -> TypeName {
         "MessageHashType".into()
     }
 }

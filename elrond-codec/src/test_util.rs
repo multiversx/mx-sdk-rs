@@ -2,27 +2,20 @@ use crate::*;
 use alloc::vec::Vec;
 use core::fmt::Debug;
 
-/// Calls `top_encode_or_exit` and panics if an encoding error occurs.
+/// Calls top encode and panics if an encoding error occurs.
 /// Do not use in smart contracts!
 pub fn top_encode_to_vec_u8_or_panic<T: TopEncode>(obj: &T) -> Vec<u8> {
     let mut bytes = Vec::<u8>::new();
-    obj.top_encode_or_exit(&mut bytes, (), encode_panic_exit);
+    let Ok(()) = obj.top_encode_or_handle_err(&mut bytes, PanicErrorHandler);
     bytes
 }
 
-/// Calls `dep_encode_or_exit` and panics if an encoding error occurs.
+/// Calls nested encode and panics if an encoding error occurs.
 /// Do not use in smart contracts!
 pub fn dep_encode_to_vec_or_panic<T: NestedEncode>(obj: &T) -> Vec<u8> {
     let mut bytes = Vec::<u8>::new();
-    obj.dep_encode_or_exit(&mut bytes, (), encode_panic_exit);
+    let Ok(()) = obj.dep_encode_or_handle_err(&mut bytes, PanicErrorHandler);
     bytes
-}
-
-fn encode_panic_exit(_: (), en_err: EncodeError) -> ! {
-    panic!(
-        "encode panicked: {}",
-        core::str::from_utf8(en_err.message_bytes()).unwrap()
-    )
 }
 
 /// Calls both the fast exit and the regular top-encode,
@@ -45,31 +38,19 @@ pub fn check_dep_encode<T: NestedEncode>(obj: &T) -> Vec<u8> {
     fast_exit_bytes
 }
 
-/// Calls `top_decode_or_exit` and panics if an encoding error occurs.
-/// Do not use in smart contracts!
-pub fn top_decode_from_byte_slice_or_panic<T: TopDecode>(input: &[u8]) -> T {
-    T::top_decode_or_exit(input, (), decode_panic_exit)
-}
-
-/// Calls `dep_decode_or_exit` and panics if an encoding error occurs.
+/// Calls nested decode and panics if an encoding error occurs.
 /// Do not use in smart contracts!
 pub fn dep_decode_from_byte_slice_or_panic<T: NestedDecode>(input: &[u8]) -> T {
-    dep_decode_from_byte_slice_or_exit(input, (), decode_panic_exit)
-}
-
-fn decode_panic_exit(_: (), de_err: DecodeError) -> ! {
-    panic!(
-        "decode panicked: {}",
-        core::str::from_utf8(de_err.message_bytes()).unwrap()
-    )
+    let Ok(result) = dep_decode_from_byte_slice(input, PanicErrorHandler);
+    result
 }
 
 /// Calls both the fast exit and the regular top-decode,
 /// compares that the outputs are equal, then returns the result.
 /// To be used in serialization tests.
 pub fn check_top_decode<T: TopDecode + PartialEq + Debug>(bytes: &[u8]) -> T {
-    let fast_exit_obj = top_decode_from_byte_slice_or_panic(bytes);
-    let result_obj = T::top_decode(bytes).unwrap();
+    let Ok(fast_exit_obj) = T::top_decode_or_handle_err(bytes, PanicErrorHandler);
+    let result_obj = T::top_decode_or_handle_err(bytes, DefaultErrorHandler).unwrap();
     assert_eq!(fast_exit_obj, result_obj);
     fast_exit_obj
 }
@@ -78,8 +59,8 @@ pub fn check_top_decode<T: TopDecode + PartialEq + Debug>(bytes: &[u8]) -> T {
 /// compares that the outputs are equal, then returns the result.
 /// To be used in serialization tests.
 pub fn check_dep_decode<T: NestedDecode + PartialEq + Debug>(bytes: &[u8]) -> T {
-    let fast_exit_obj = dep_decode_from_byte_slice_or_panic(bytes);
-    let result_obj = dep_decode_from_byte_slice::<T>(bytes).unwrap();
+    let Ok(fast_exit_obj) = dep_decode_from_byte_slice(bytes, PanicErrorHandler);
+    let result_obj = dep_decode_from_byte_slice(bytes, DefaultErrorHandler).unwrap();
     assert_eq!(fast_exit_obj, result_obj);
     fast_exit_obj
 }

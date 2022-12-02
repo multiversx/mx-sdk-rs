@@ -1,0 +1,825 @@
+{
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../output/big-float-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "100000000000"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "BigFloatSqrt - 1",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "sqrt_big_float_wrapped",
+                "arguments": [
+                    "121",
+                    "1"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "11"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "BigFloatSqrt - 2",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "sqrt_big_float_wrapped",
+                "arguments": [
+                    "152399025",
+                    "1"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "+12345"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "BigFloatSqrt - 3 - NegativeValue",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "sqrt_big_float_wrapped",
+                "arguments": [
+                    "-4",
+                    "1"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "10",
+                "message": "str:bad bounds (lower)"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "BigFloatZero",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "big_float_zero_wrapped",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "BigFloatZero",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "big_float_zero_wrapped",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "BigFloatNeg - 1",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "big_float_neg_wrapped",
+                "arguments": [
+                    "892346",
+                    "1"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "-892346"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "BigFloatNeg - 2",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "big_float_neg_wrapped",
+                "arguments": [
+                    "72457",
+                    "10000"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "-724570000"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "BigFloatAdd - 1",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "add_big_float_wrapped",
+                "arguments": [
+                    "2",
+                    "2",
+                    "1"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "+4"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "BigFloatAdd - 2",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "add_big_float_wrapped",
+                "arguments": [
+                    "-2",
+                    "2",
+                    "1"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "BigFloatAddRef - 1",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "add_big_float_ref_wrapped",
+                "arguments": [
+                    "2",
+                    "2",
+                    "1"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "+4"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "BigFloatAddRef - 2",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "add_big_float_ref_wrapped",
+                "arguments": [
+                    "-2",
+                    "2",
+                    "1"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "BigFloatSub - 1",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "sub_big_float_wrapped",
+                "arguments": [
+                    "4",
+                    "2",
+                    "100"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "+200"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "BigFloatSub - 2",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "sub_big_float_wrapped",
+                "arguments": [
+                    "-2",
+                    "2",
+                    "1"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "-4"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "BigFloatSubRef - 1",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "sub_big_float_ref_wrapped",
+                "arguments": [
+                    "4",
+                    "2",
+                    "100"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "+200"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "BigFloatSubRef - 2",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "sub_big_float_ref_wrapped",
+                "arguments": [
+                    "-2",
+                    "2",
+                    "1"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "-4"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "BigFloatMul - 1",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "mul_big_float_wrapped",
+                "arguments": [
+                    "4",
+                    "2",
+                    "10"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "+80"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "BigFloatMul - 2",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "mul_big_float_wrapped",
+                "arguments": [
+                    "-2",
+                    "2",
+                    "1"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "-4"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "BigFloatMulRef - 1",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "mul_big_float_ref_wrapped",
+                "arguments": [
+                    "4",
+                    "2",
+                    "10"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "+80"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "BigFloatMulRef - 2",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "mul_big_float_ref_wrapped",
+                "arguments": [
+                    "-2",
+                    "2",
+                    "1"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "-4"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "BigFloatDiv - 1",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "div_big_float_wrapped",
+                "arguments": [
+                    "4",
+                    "2",
+                    "1000"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "+2000"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "BigFloatDiv - 2",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "div_big_float_wrapped",
+                "arguments": [
+                    "-2",
+                    "2",
+                    "1"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "-1"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "BigFloatDivRef - 1",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "div_big_float_ref_wrapped",
+                "arguments": [
+                    "4",
+                    "2",
+                    "1000"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "+2000"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "BigFloatDivRef - 2",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "div_big_float_ref_wrapped",
+                "arguments": [
+                    "-2",
+                    "2",
+                    "1"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "-1"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "BigFloatAddAssign - 1",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "add_assign_big_float_wrapped",
+                "arguments": [
+                    "2",
+                    "2",
+                    "1"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "+4"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "BigFloatAddAssign - 2",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "add_assign_big_float_wrapped",
+                "arguments": [
+                    "-2",
+                    "2",
+                    "1"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "BigFloatAddAssignRef - 1",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "add_assign_big_float_ref_wrapped",
+                "arguments": [
+                    "2",
+                    "2",
+                    "1"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "+4"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "BigFloatAddAssignRef - 2",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "add_assign_big_float_ref_wrapped",
+                "arguments": [
+                    "-2",
+                    "2",
+                    "1"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "BigFloatSubAssign - 1",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "sub_assign_big_float_wrapped",
+                "arguments": [
+                    "4",
+                    "2",
+                    "100"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "+200"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "BigFloatSubAssign - 2",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "sub_assign_big_float_wrapped",
+                "arguments": [
+                    "-2",
+                    "2",
+                    "1"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "-4"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "BigFloatSubAssignRef - 1",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "sub_assign_big_float_ref_wrapped",
+                "arguments": [
+                    "4",
+                    "2",
+                    "100"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "+200"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "BigFloatSubRef - 2",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "sub_assign_big_float_ref_wrapped",
+                "arguments": [
+                    "-2",
+                    "2",
+                    "1"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "-4"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "BigFloatMulAssign - 1",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "mul_assign_big_float_wrapped",
+                "arguments": [
+                    "4",
+                    "2",
+                    "10"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "+80"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "BigFloatMulAssign - 2",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "mul_assign_big_float_wrapped",
+                "arguments": [
+                    "-2",
+                    "2",
+                    "1"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "-4"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "BigFloatMulAssignRef - 1",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "mul_assign_big_float_ref_wrapped",
+                "arguments": [
+                    "4",
+                    "2",
+                    "10"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "+80"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "BigFloatMulAssignRef - 2",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "mul_assign_big_float_ref_wrapped",
+                "arguments": [
+                    "-2",
+                    "2",
+                    "1"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "-4"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "BigFloatDivAssign - 1",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "div_assign_big_float_wrapped",
+                "arguments": [
+                    "4",
+                    "2",
+                    "1000"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "+2000"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "BigFloatDivAssign - 2",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "div_assign_big_float_wrapped",
+                "arguments": [
+                    "-2",
+                    "2",
+                    "1"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "-1"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "BigFloatDivAssignRef - 1",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "div_assign_big_float_ref_wrapped",
+                "arguments": [
+                    "4",
+                    "2",
+                    "1000"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "+2000"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "BigFloatDivAssignRef - 2",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "div_assign_big_float_ref_wrapped",
+                "arguments": [
+                    "-2",
+                    "2",
+                    "1"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "-1"
+                ]
+            }
+        }
+    ]
+}

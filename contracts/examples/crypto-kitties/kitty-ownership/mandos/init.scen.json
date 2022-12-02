@@ -28,7 +28,7 @@
         },
         {
             "step": "scDeploy",
-            "txId": "deploy - kitty genetic alg contract",
+            "id": "deploy - kitty genetic alg contract",
             "tx": {
                 "from": "address:my_address",
                 "contractCode": "file:../../kitty-genetic-alg/output/kitty-genetic-alg.wasm",
@@ -46,7 +46,7 @@
         },
         {
             "step": "scDeploy",
-            "txId": "deploy - kitty ownership contract",
+            "id": "deploy - kitty ownership contract",
             "tx": {
                 "from": "address:my_address",
                 "contractCode": "file:../output/kitty-ownership.wasm",

@@ -1,30 +1,17 @@
 use crate::{
-    codec_err::{DecodeError, EncodeError},
-    nested_de::NestedDecode,
-    nested_de_input::NestedDecodeInput,
-    nested_ser::NestedEncode,
-    nested_ser_output::NestedEncodeOutput,
-    top_de::TopDecode,
-    top_de_input::TopDecodeInput,
-    top_ser::TopEncode,
-    top_ser_output::TopEncodeOutput,
+    DecodeError, DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput,
+    NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
 };
 use arrayvec::ArrayVec;
 
 impl<T: NestedEncode, const CAP: usize> TopEncode for ArrayVec<T, CAP> {
     #[inline]
-    fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
-        self.as_slice().top_encode(output)
-    }
-
-    #[inline]
-    fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
-        &self,
-        output: O,
-        c: ExitCtx,
-        exit: fn(ExitCtx, EncodeError) -> !,
-    ) {
-        self.as_slice().top_encode_or_exit(output, c, exit);
+    fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: TopEncodeOutput,
+        H: EncodeErrorHandler,
+    {
+        self.as_slice().top_encode_or_handle_err(output, h)
     }
 }
 
@@ -37,95 +24,61 @@ impl<T> From<arrayvec::CapacityError<T>> for DecodeError {
 }
 
 impl<T: NestedDecode, const CAP: usize> TopDecode for ArrayVec<T, CAP> {
-    fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
+    fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: TopDecodeInput,
+        H: DecodeErrorHandler,
+    {
         let mut result: ArrayVec<T, CAP> = ArrayVec::new();
         let mut nested_buffer = input.into_nested_buffer();
         while !nested_buffer.is_depleted() {
-            result.try_push(T::dep_decode(&mut nested_buffer)?)?;
-        }
-        if !nested_buffer.is_depleted() {
-            return Err(DecodeError::INPUT_TOO_LONG);
-        }
-        Ok(result)
-    }
-
-    fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
-        input: I,
-        c: ExitCtx,
-        exit: fn(ExitCtx, DecodeError) -> !,
-    ) -> Self {
-        let mut result: ArrayVec<T, CAP> = ArrayVec::new();
-        let mut nested_buffer = input.into_nested_buffer();
-        while !nested_buffer.is_depleted() {
-            let elem = T::dep_decode_or_exit(&mut nested_buffer, c.clone(), exit);
-            if result.try_push(elem).is_err() {
-                exit(c, DecodeError::CAPACITY_EXCEEDED_ERROR)
+            if let Err(capacity_error) =
+                result.try_push(T::dep_decode_or_handle_err(&mut nested_buffer, h)?)
+            {
+                return Err(h.handle_error(DecodeError::from(capacity_error)));
             }
         }
         if !nested_buffer.is_depleted() {
-            exit(c, DecodeError::INPUT_TOO_LONG);
+            return Err(h.handle_error(DecodeError::INPUT_TOO_LONG));
         }
-        result
+        Ok(result)
     }
 }
 
 impl<T: NestedEncode, const CAP: usize> NestedEncode for ArrayVec<T, CAP> {
     #[inline]
-    fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
-        self.as_slice().dep_encode(dest)
-    }
-
-    #[inline]
-    fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(
-        &self,
-        dest: &mut O,
-        c: ExitCtx,
-        exit: fn(ExitCtx, EncodeError) -> !,
-    ) {
-        self.as_slice().dep_encode_or_exit(dest, c, exit);
+    fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: NestedEncodeOutput,
+        H: EncodeErrorHandler,
+    {
+        self.as_slice().dep_encode_or_handle_err(dest, h)
     }
 }
 
 impl<T: NestedDecode, const CAP: usize> NestedDecode for ArrayVec<T, CAP> {
-    fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
-        let size = usize::dep_decode(input)?;
+    fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: NestedDecodeInput,
+        H: DecodeErrorHandler,
+    {
+        let size = usize::dep_decode_or_handle_err(input, h)?;
         if size > CAP {
-            return Err(DecodeError::CAPACITY_EXCEEDED_ERROR);
+            return Err(h.handle_error(DecodeError::CAPACITY_EXCEEDED_ERROR));
         }
         let mut result: ArrayVec<T, CAP> = ArrayVec::new();
         for _ in 0..size {
             unsafe {
-                result.push_unchecked(T::dep_decode(input)?);
+                result.push_unchecked(T::dep_decode_or_handle_err(input, h)?);
             }
         }
         Ok(result)
-    }
-
-    fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
-        input: &mut I,
-        c: ExitCtx,
-        exit: fn(ExitCtx, DecodeError) -> !,
-    ) -> Self {
-        let size = usize::dep_decode_or_exit(input, c.clone(), exit);
-        if size > CAP {
-            exit(c, DecodeError::CAPACITY_EXCEEDED_ERROR);
-        }
-        let mut result: ArrayVec<T, CAP> = ArrayVec::new();
-        for _ in 0..size {
-            unsafe {
-                result.push_unchecked(T::dep_decode_or_exit(input, c.clone(), exit));
-            }
-        }
-        result
     }
 }
 
 #[cfg(test)]
 pub mod tests {
-    use crate::{
-        test_util::{check_top_encode_decode, top_decode_from_byte_slice_or_panic},
-        DecodeError, TopDecode,
-    };
+    use crate::{test_util::check_top_encode_decode, DecodeError, PanicErrorHandler, TopDecode};
     use arrayvec::ArrayVec;
 
     /// [1, 2, 3]
@@ -149,7 +102,7 @@ pub mod tests {
     #[test]
     #[should_panic]
     fn test_top_arrayvec_capacity_exceeded_panic() {
-        let _ = top_decode_from_byte_slice_or_panic::<ArrayVec<i32, 2>>(TOP_BYTES);
+        let _ = <ArrayVec<i32, 2>>::top_decode_or_handle_err(TOP_BYTES, PanicErrorHandler);
     }
 
     #[test]
@@ -167,6 +120,7 @@ pub mod tests {
     #[test]
     #[should_panic]
     fn test_nested_arrayvec_capacity_exceeded_panic() {
-        let _ = top_decode_from_byte_slice_or_panic::<Option<ArrayVec<i32, 2>>>(NESTED_BYTES);
+        let _ =
+            Option::<ArrayVec<i32, 2>>::top_decode_or_handle_err(NESTED_BYTES, PanicErrorHandler);
     }
 }

@@ -44,7 +44,7 @@
         },
         {
             "step": "scCall",
-            "txId": "deploy-vault",
+            "id": "deploy-vault",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
@@ -57,8 +57,7 @@
             },
             "expect": {
                 "out": [
-                    "sc:child",
-                    ""
+                    "sc:child"
                 ],
                 "status": "0",
                 "message": "",
@@ -81,7 +80,7 @@
         },
         {
             "step": "scCall",
-            "txId": "deploy-vault-with-arg",
+            "id": "deploy-vault-with-arg",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
@@ -95,9 +94,8 @@
             },
             "expect": {
                 "out": [
-                    "str:some_argument",
                     "sc:child-with-arg",
-                    "nested:str:some_argument"
+                    "str:some_argument"
                 ],
                 "status": "0",
                 "message": "",
@@ -120,7 +118,7 @@
         },
         {
             "step": "scCall",
-            "txId": "deploy-vault-twice",
+            "id": "deploy-vault-twice",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
@@ -164,7 +162,7 @@
         },
         {
             "step": "scCall",
-            "txId": "deploy-vault-from-source-with-arg",
+            "id": "deploy-vault-from-source-with-arg",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
@@ -178,9 +176,8 @@
             },
             "expect": {
                 "out": [
-                    "str:some_argument",
                     "sc:child-src-with-arg",
-                    "nested:str:some_argument"
+                    "str:some_argument"
                 ],
                 "status": "0",
                 "message": "",

@@ -5,8 +5,12 @@ mod internal_mod_b;
 mod internal_mod_c;
 mod internal_mod_d;
 mod internal_mod_init;
+mod ongoing_operation_mod_example;
+mod only_admin_derived_mod;
+mod only_admin_mod;
 mod only_owner_derived_mod;
 mod only_owner_mod;
+pub mod token_merge_mod_impl;
 
 elrond_wasm::imports!();
 
@@ -23,14 +27,26 @@ pub trait UseModule:
     + internal_mod_b::InternalModuleB
     + internal_mod_c::InternalModuleC
     + internal_mod_init::InternalModuleInit
-    + only_owner_mod::OnlyOwnerModule
-    + only_owner_derived_mod::OnlyOwnerDerivedModule
-    + elrond_wasm_module_dns::DnsModule
+    + only_owner_mod::OnlyOwnerTestModule
+    + only_owner_derived_mod::OnlyOwnerDerivedTestModule
+    + only_admin_mod::OnlyAdminTestModule
+    + only_admin_derived_mod::OnlyAdminDerivedTestModule
+    + ongoing_operation_mod_example::OngoingOperationModExample
+    + token_merge_mod_impl::TokenMergeModImpl
+    + elrond_wasm_modules::claim_developer_rewards::ClaimDeveloperRewardsModule
+    + elrond_wasm_modules::dns::DnsModule
     + elrond_wasm_modules::esdt::EsdtModule
-    + elrond_wasm_module_features::FeaturesModule
+    + elrond_wasm_modules::features::FeaturesModule
     + elrond_wasm_modules::governance::GovernanceModule
     + elrond_wasm_modules::governance::governance_configurable::GovernanceConfigurablePropertiesModule
-    + elrond_wasm_module_pause::PauseModule
+    + elrond_wasm_modules::governance::governance_events::GovernanceEventsModule
+    + elrond_wasm_modules::pause::PauseModule
+    + elrond_wasm_modules::staking::StakingModule
+    + elrond_wasm_modules::token_merge::TokenMergeModule
+    + elrond_wasm_modules::token_merge::merged_token_setup::MergedTokenSetupModule
+    + elrond_wasm_modules::default_issue_callbacks::DefaultIssueCallbacksModule
+    + elrond_wasm_modules::only_admin::OnlyAdminModule
+    + elrond_wasm_modules::ongoing_operation::OngoingOperationModule
 {
     /// Validates that the "featureName" feature is on.
     /// Uses the `feature_guard!` macro.

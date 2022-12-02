@@ -1,0 +1,68 @@
+{
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "managed_struct_eq_yes",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "managed_struct_eq",
+                "arguments": [
+                    {
+                        "1": "biguint:1",
+                        "2": "u32:2",
+                        "3": "nested:str:data3"
+                    },
+                    {
+                        "1": "biguint:1",
+                        "2": "u32:2",
+                        "3": "nested:str:data3"
+                    }
+                ]
+            },
+            "expect": {
+                "out": [
+                    "true"
+                ]
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "managed_struct_eq_no",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "managed_struct_eq",
+                "arguments": [
+                    {
+                        "1": "biguint:1",
+                        "2": "u32:2",
+                        "3": "nested:str:data3"
+                    },
+                    {
+                        "1": "biguint:1",
+                        "2": "u32:2",
+                        "3": "nested:str:data4"
+                    }
+                ]
+            },
+            "expect": {
+                "out": [
+                    "false"
+                ]
+            }
+        }
+    ]
+}

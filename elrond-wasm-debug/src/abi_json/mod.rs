@@ -1,12 +1,14 @@
 mod build_info_abi_json;
 mod contract_abi_json;
 mod endpoint_abi_json;
+mod event_abi_json;
 mod type_abi_json;
 
 pub use build_info_abi_json::{BuildInfoAbiJson, RustcAbiJson};
 pub use contract_abi_json::*;
 use elrond_wasm::{abi::ContractAbi, contract_base::ContractAbiProvider};
 pub use endpoint_abi_json::*;
+pub use event_abi_json::*;
 pub use type_abi_json::*;
 
 /// Function provided for convenience.
@@ -28,6 +30,7 @@ pub fn print_abi<AbiTrait: ContractAbiProvider>() {
 /// Will return the main contract ABI + view contract ABI.
 pub fn abi_to_json_dummy_environment(contract_abi: &ContractAbi) -> String {
     let mut abi_json = ContractAbiJson::from(contract_abi);
+    abi_json.build_info.contract_crate.git_version = "<git version here>".to_string();
     abi_json.build_info.rustc = RustcAbiJson {
         version: "x.x.x-nightly".to_string(),
         commit_hash: "<commit hash here>".to_string(),

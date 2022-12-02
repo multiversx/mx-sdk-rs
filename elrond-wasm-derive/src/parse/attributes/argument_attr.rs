@@ -17,10 +17,6 @@ pub fn is_payment_multi(attr: &syn::Attribute) -> bool {
     is_attribute_with_no_args(attr, ATTR_PAYMENT_MULTI)
 }
 
-pub fn is_var_args(attr: &syn::Attribute) -> bool {
-    is_attribute_with_no_args(attr, ATTR_VAR_ARGS)
-}
-
 pub fn is_callback_result_arg(attr: &syn::Attribute) -> bool {
     is_attribute_with_no_args(attr, ATTR_CALLBACK_CALL_RESULT)
 }

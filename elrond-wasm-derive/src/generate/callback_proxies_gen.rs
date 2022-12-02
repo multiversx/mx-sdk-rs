@@ -35,7 +35,7 @@ pub fn generate_callback_proxies_object(methods: &[Method]) -> proc_macro2::Toke
                             } else {
                                 let pat = &arg.pat;
                                 quote! {
-                                    ___callback_call___.push_endpoint_arg(#pat);
+                                    ___callback_call___.push_endpoint_arg(&#pat);
                                 }
                             }
                         } else {

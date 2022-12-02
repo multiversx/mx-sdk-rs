@@ -22,7 +22,7 @@
         },
         {
             "step": "scCall",
-            "txId": "payable_egld_2.1",
+            "id": "payable_egld_2.1",
             "tx": {
                 "from": "address:an-account",
                 "to": "sc:payable-features",
@@ -37,14 +37,14 @@
                     "str:EGLD"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "payable_egld_2.2",
+            "id": "payable_egld_2.2",
             "tx": {
                 "from": "address:an-account",
                 "to": "sc:payable-features",
@@ -60,14 +60,14 @@
                     "str:EGLD"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "payable_egld_2.3",
+            "id": "payable_egld_2.3",
             "tx": {
                 "from": "address:an-account",
                 "to": "sc:payable-features",
@@ -86,7 +86,7 @@
                 "out": [],
                 "status": "4",
                 "message": "str:function does not accept ESDT payment",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }

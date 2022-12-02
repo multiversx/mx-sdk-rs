@@ -25,7 +25,7 @@
         },
         {
             "step": "scCall",
-            "txId": "1",
+            "id": "1",
             "tx": {
                 "from": "address:acc1",
                 "to": "sc:crypto_bubbles",
@@ -40,7 +40,7 @@
                 "out": [],
                 "status": "0x04",
                 "message": "str:amount to withdraw must be less or equal to balance",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }

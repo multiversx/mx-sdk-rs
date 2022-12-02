@@ -1,9 +1,12 @@
+use crate::{num_bigint, num_bigint::BigInt};
 use alloc::string::String;
 use elrond_wasm::{
     api::ManagedTypeApi,
-    types::{Address, BigUint, BoxedBytes, ManagedType},
+    types::{
+        heap::{Address, BoxedBytes},
+        BigUint, ManagedType,
+    },
 };
-use num_bigint::BigInt;
 use std::fmt;
 
 pub struct BigUintPrinter<M: ManagedTypeApi> {
@@ -22,6 +25,19 @@ pub fn verbose_hex(value: &[u8]) -> String {
     alloc::format!("0x{}", hex::encode(value))
 }
 
+pub fn verbose_hex_list(values: &[Vec<u8>]) -> String {
+    let mut s = String::new();
+    s.push('[');
+    for (i, topic) in values.iter().enumerate() {
+        if i > 0 {
+            s.push(',');
+        }
+        s.push_str(verbose_hex(topic).as_str());
+    }
+    s.push(']');
+    s
+}
+
 /// returns it as hex formatted number if it's not valid utf8
 pub fn bytes_to_string(bytes: &[u8]) -> String {
     String::from_utf8(bytes.to_vec()).unwrap_or_else(|_| verbose_hex(bytes))
@@ -29,7 +45,7 @@ pub fn bytes_to_string(bytes: &[u8]) -> String {
 
 impl<M: ManagedTypeApi> fmt::Debug for BigUintPrinter<M> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let handle = self.value.get_raw_handle();
+        let handle = self.value.get_handle();
         let mut bytes = self.value.to_bytes_be();
         if bytes.is_empty() {
             bytes = BoxedBytes::from(vec![0u8]);

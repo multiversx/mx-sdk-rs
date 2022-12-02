@@ -3,7 +3,7 @@ use elrond_codec_derive::*;
 
 use elrond_codec::test_util::{check_dep_encode_decode, check_top_encode_decode};
 
-#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, PartialEq, Clone, Debug)]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, PartialEq, Eq, Clone, Debug)]
 struct TupleStruct(u8, u16, u32);
 
 // to test, run the following command in elrond-codec folder:
@@ -21,5 +21,5 @@ fn tuple_struct_derive_test() {
 	];
 
     check_top_encode_decode(s.clone(), bytes);
-    check_dep_encode_decode(s.clone(), bytes);
+    check_dep_encode_decode(s, bytes);
 }

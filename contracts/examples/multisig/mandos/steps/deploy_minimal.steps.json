@@ -2,7 +2,7 @@
     "steps": [
         {
             "step": "scDeploy",
-            "txId": "multisig-deploy",
+            "id": "multisig-deploy",
             "tx": {
                 "from": "address:owner",
                 "contractCode": "file:../../output/multisig.wasm",
@@ -16,14 +16,14 @@
             "expect": {
                 "out": [],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "getQuorum",
+            "id": "getQuorum",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:multisig",
@@ -37,14 +37,14 @@
                     "0"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "getNumBoardMembers",
+            "id": "getNumBoardMembers",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:multisig",
@@ -58,7 +58,7 @@
                     "1"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }

@@ -1,56 +1,54 @@
+#![feature(exhaustive_patterns)]
+
 use elrond_wasm::{
-    load_dyn_arg,
-    types::{AsyncCallResult, BigUint, MultiArg2, OptionalArg, VarArgs},
-    ArgId, CallDataArgLoader, DynArgInput, HexCallDataDeserializer,
+    elrond_codec::{
+        multi_types::{MultiValue2, MultiValueVec, OptionalValue},
+        PanicErrorHandler, TopDecodeMulti, TopDecodeMultiInput,
+    },
+    types::{AsyncCallResult, BigUint},
+    HexCallDataDeserializer,
 };
 use elrond_wasm_debug::DebugApi;
 
 #[test]
 fn test_simple_args() {
-    let api = DebugApi::dummy();
     let input: &[u8] = b"func@1111@2222";
-    let de = HexCallDataDeserializer::new(input);
-    let mut cd_loader = CallDataArgLoader::new(de, api);
-    let arg1: i32 = load_dyn_arg(&mut cd_loader, ArgId::empty());
+    let mut de = HexCallDataDeserializer::new(input);
+    let Ok(arg1) = i32::multi_decode_or_handle_err(&mut de, PanicErrorHandler);
     assert_eq!(arg1, 0x1111i32);
 
-    let arg2: &i32 = &load_dyn_arg(&mut cd_loader, ArgId::empty());
-    assert_eq!(arg2, &0x2222i32);
+    let Ok(arg2) = i32::multi_decode_or_handle_err(&mut de, PanicErrorHandler);
+    assert_eq!(arg2, 0x2222i32);
 
-    cd_loader.assert_no_more_args();
+    de.assert_no_more_args(PanicErrorHandler).unwrap();
 }
 
 #[test]
 fn test_simple_managed_arg() {
-    let api = DebugApi::dummy();
+    let _ = DebugApi::dummy();
     let input: &[u8] = b"some_other_func@05";
-    let de = HexCallDataDeserializer::new(input);
-    let mut cd_loader = CallDataArgLoader::new(de, api.clone());
-    let arg1: BigUint<DebugApi> = load_dyn_arg(&mut cd_loader, ArgId::empty());
+    let mut de = HexCallDataDeserializer::new(input);
+    let Ok(arg1) = BigUint::<DebugApi>::multi_decode_or_handle_err(&mut de, PanicErrorHandler);
     assert_eq!(arg1, BigUint::from(5u32));
 
-    cd_loader.assert_no_more_args();
+    de.assert_no_more_args(PanicErrorHandler).unwrap();
 }
 
 #[test]
 fn test_simple_vec_arg() {
-    let api = DebugApi::dummy();
     let input: &[u8] = b"some_other_func@000000020000000300000006";
-    let de = HexCallDataDeserializer::new(input);
-    let mut cd_loader = CallDataArgLoader::new(de, api);
-    let arg1: Vec<usize> = load_dyn_arg(&mut cd_loader, ArgId::empty());
+    let mut de = HexCallDataDeserializer::new(input);
+    let Ok(arg1) = Vec::<usize>::multi_decode_or_handle_err(&mut de, PanicErrorHandler);
     assert_eq!(arg1, [2usize, 3usize, 6usize].to_vec());
 
-    cd_loader.assert_no_more_args();
+    de.assert_no_more_args(PanicErrorHandler).unwrap();
 }
 
 #[test]
 fn test_var_args() {
-    let api = DebugApi::dummy();
     let input: &[u8] = b"func@1111@2222";
-    let de = HexCallDataDeserializer::new(input);
-    let mut cd_loader = CallDataArgLoader::new(de, api);
-    let var_arg: VarArgs<i32> = load_dyn_arg(&mut cd_loader, ArgId::empty());
+    let mut de = HexCallDataDeserializer::new(input);
+    let Ok(var_arg) = MultiValueVec::<i32>::multi_decode_or_handle_err(&mut de, PanicErrorHandler);
     let arg_vec = var_arg.into_vec();
     assert_eq!(arg_vec.len(), 2);
     assert_eq!(arg_vec[0], 0x1111i32);
@@ -59,11 +57,10 @@ fn test_var_args() {
 
 #[test]
 fn test_multi_arg_2() {
-    let api = DebugApi::dummy();
     let input: &[u8] = b"func@1111@2222";
-    let de = HexCallDataDeserializer::new(input);
-    let mut cd_loader = CallDataArgLoader::new(de, api);
-    let tuple_arg: MultiArg2<i32, i32> = load_dyn_arg(&mut cd_loader, ArgId::empty());
+    let mut de = HexCallDataDeserializer::new(input);
+    let Ok(tuple_arg) =
+        MultiValue2::<i32, i32>::multi_decode_or_handle_err(&mut de, PanicErrorHandler);
     let tuple = tuple_arg.into_tuple();
     assert_eq!(tuple.0, 0x1111i32);
     assert_eq!(tuple.1, 0x2222i32);
@@ -71,11 +68,12 @@ fn test_multi_arg_2() {
 
 #[test]
 fn test_var_multi_arg_2() {
-    let api = DebugApi::dummy();
     let input: &[u8] = b"func@1111@2222";
-    let de = HexCallDataDeserializer::new(input);
-    let mut cd_loader = CallDataArgLoader::new(de, api);
-    let tuple_arg: VarArgs<MultiArg2<i32, i32>> = load_dyn_arg(&mut cd_loader, ArgId::empty());
+    let mut de = HexCallDataDeserializer::new(input);
+    let Ok(tuple_arg) = MultiValueVec::<MultiValue2<i32, i32>>::multi_decode_or_handle_err(
+        &mut de,
+        PanicErrorHandler,
+    );
     let tuple_vec = tuple_arg.into_vec();
     assert_eq!(tuple_vec.len(), 1);
     let mut iter = tuple_vec.into_iter();
@@ -86,31 +84,32 @@ fn test_var_multi_arg_2() {
 
 #[test]
 fn test_opt_multi_arg_2() {
-    let api = DebugApi::dummy();
     let input: &[u8] = b"func@1111@2222";
-    let de = HexCallDataDeserializer::new(input);
-    let mut cd_loader = CallDataArgLoader::new(de, api);
-    let opt_tuple_arg: OptionalArg<MultiArg2<i32, i32>> =
-        load_dyn_arg(&mut cd_loader, ArgId::empty());
+    let mut de = HexCallDataDeserializer::new(input);
+    let Ok(opt_tuple_arg) = OptionalValue::<MultiValue2<i32, i32>>::multi_decode_or_handle_err(
+        &mut de,
+        PanicErrorHandler,
+    );
     match opt_tuple_arg {
-        OptionalArg::Some(tuple_arg) => {
+        OptionalValue::Some(tuple_arg) => {
             let tuple = tuple_arg.into_tuple();
             assert_eq!(tuple.0, 0x1111i32);
             assert_eq!(tuple.1, 0x2222i32);
         },
-        OptionalArg::None => {
-            panic!("OptionalArg::Some expected");
+        OptionalValue::None => {
+            panic!("OptionalValue::Some expected");
         },
     }
 }
 
 #[test]
 fn test_async_call_result_ok() {
-    let api = DebugApi::dummy();
     let input: &[u8] = b"func@@1111@2222";
-    let de = HexCallDataDeserializer::new(input);
-    let mut cd_loader = CallDataArgLoader::new(de, api);
-    let acr: AsyncCallResult<MultiArg2<i32, i32>> = load_dyn_arg(&mut cd_loader, ArgId::empty());
+    let mut de = HexCallDataDeserializer::new(input);
+    let Ok(acr) = AsyncCallResult::<MultiValue2<i32, i32>>::multi_decode_or_handle_err(
+        &mut de,
+        PanicErrorHandler,
+    );
     match acr {
         AsyncCallResult::Ok(tuple_arg) => {
             let tuple = tuple_arg.into_tuple();
@@ -125,12 +124,13 @@ fn test_async_call_result_ok() {
 
 #[test]
 fn test_async_call_result_ok2() {
-    let api = DebugApi::dummy();
     let input: &[u8] = b"func@00";
-    let de = HexCallDataDeserializer::new(input);
-    let mut cd_loader = CallDataArgLoader::new(de, api);
-    let acr: AsyncCallResult<VarArgs<MultiArg2<i32, i32>>> =
-        load_dyn_arg(&mut cd_loader, ArgId::empty());
+    let mut de = HexCallDataDeserializer::new(input);
+    let Ok(acr) =
+        AsyncCallResult::<MultiValueVec<MultiValue2<i32, i32>>>::multi_decode_or_handle_err(
+            &mut de,
+            PanicErrorHandler,
+        );
     match acr {
         AsyncCallResult::Ok(var_args) => {
             assert_eq!(var_args.len(), 0);
@@ -143,11 +143,12 @@ fn test_async_call_result_ok2() {
 
 #[test]
 fn test_async_call_result_err() {
-    let api = DebugApi::dummy();
     let input: &[u8] = b"func@0123@1111";
-    let de = HexCallDataDeserializer::new(input);
-    let mut cd_loader = CallDataArgLoader::new(de, api);
-    let acr: AsyncCallResult<MultiArg2<i32, i32>> = load_dyn_arg(&mut cd_loader, ArgId::empty());
+    let mut de = HexCallDataDeserializer::new(input);
+    let Ok(acr) = AsyncCallResult::<MultiValue2<i32, i32>>::multi_decode_or_handle_err(
+        &mut de,
+        PanicErrorHandler,
+    );
     match acr {
         AsyncCallResult::Ok(_) => {
             panic!("AsyncCallResult::Err expected");

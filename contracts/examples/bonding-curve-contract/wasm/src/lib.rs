@@ -7,16 +7,17 @@
 elrond_wasm_node::wasm_endpoints! {
     bonding_curve_contract
     (
-        callBack
         buyToken
         claim
         deposit
         getTokenAvailability
-        get_buy_price
-        get_sell_price
         sellToken
         setBondingCurve
         setLocalRoles
         unsetLocalRoles
+        view_buy_price
+        view_sell_price
     )
 }
+
+elrond_wasm_node::wasm_empty_callback! {}

@@ -19,7 +19,7 @@
         },
         {
             "step": "scDeploy",
-            "txId": "1",
+            "id": "1",
             "tx": {
                 "from": "address:owner",
                 "contractCode": "file:../output/use-module.wasm",
@@ -37,7 +37,7 @@
         },
         {
             "step": "scCall",
-            "txId": "call_mod_a",
+            "id": "call_mod_a",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:use_module",
@@ -56,7 +56,7 @@
         },
         {
             "step": "scCall",
-            "txId": "call_mod_b",
+            "id": "call_mod_b",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:use_module",

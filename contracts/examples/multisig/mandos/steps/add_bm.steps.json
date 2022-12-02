@@ -4,7 +4,7 @@
     "steps": [
         {
             "step": "scCall",
-            "txId": "bm-add-1",
+            "id": "bm-add-1",
             "tx": {
                 "from": "address:paul",
                 "to": "sc:multisig",
@@ -20,16 +20,16 @@
                     "2"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scQuery",
-            "txId": "prop-signers-2",
+            "id": "prop-signers-2",
             "tx": {
-                "to": "sc:multisig-view",
+                "to": "sc:multisig",
                 "function": "getActionSigners",
                 "arguments": [
                     "2"
@@ -43,7 +43,7 @@
         },
         {
             "step": "scCall",
-            "txId": "bm-sign-alice",
+            "id": "bm-sign-alice",
             "tx": {
                 "from": "address:alice",
                 "to": "sc:multisig",
@@ -57,16 +57,16 @@
             "expect": {
                 "out": [],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scQuery",
-            "txId": "prop-signers-2",
+            "id": "prop-signers-2",
             "tx": {
-                "to": "sc:multisig-view",
+                "to": "sc:multisig",
                 "function": "getActionSigners",
                 "arguments": [
                     "2"
@@ -80,9 +80,9 @@
         },
         {
             "step": "scQuery",
-            "txId": "bm-add-1-try-perform-insufficient-signatures-num-valid-signatures",
+            "id": "bm-add-1-try-perform-insufficient-signatures-num-valid-signatures",
             "tx": {
-                "to": "sc:multisig-view",
+                "to": "sc:multisig",
                 "function": "getActionValidSignerCount",
                 "arguments": [
                     "2"
@@ -97,7 +97,7 @@
         },
         {
             "step": "scCall",
-            "txId": "bm-add-1-try-perform-insufficient-signatures",
+            "id": "bm-add-1-try-perform-insufficient-signatures",
             "tx": {
                 "from": "address:paul",
                 "to": "sc:multisig",
@@ -112,14 +112,14 @@
                 "out": [],
                 "status": "4",
                 "message": "str:quorum has not been reached",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "prop-sign-bob",
+            "id": "prop-sign-bob",
             "tx": {
                 "from": "address:bob",
                 "to": "sc:multisig",
@@ -133,16 +133,16 @@
             "expect": {
                 "out": [],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scQuery",
-            "txId": "prop-signers-3",
+            "id": "prop-signers-3",
             "tx": {
-                "to": "sc:multisig-view",
+                "to": "sc:multisig",
                 "function": "getActionSigners",
                 "arguments": [
                     "2"
@@ -156,9 +156,9 @@
         },
         {
             "step": "scQuery",
-            "txId": "prop-signers-3-count",
+            "id": "prop-signers-3-count",
             "tx": {
-                "to": "sc:multisig-view",
+                "to": "sc:multisig",
                 "function": "getActionSignerCount",
                 "arguments": [
                     "2"
@@ -173,7 +173,7 @@
         },
         {
             "step": "scCall",
-            "txId": "bm-add-1-perform",
+            "id": "bm-add-1-perform",
             "tx": {
                 "from": "address:paul",
                 "to": "sc:multisig",
@@ -187,16 +187,16 @@
             "expect": {
                 "out": [],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scQuery",
-            "txId": "getAllBoardMembers",
+            "id": "getAllBoardMembers",
             "tx": {
-                "to": "sc:multisig-view",
+                "to": "sc:multisig",
                 "function": "getAllBoardMembers",
                 "arguments": []
             },

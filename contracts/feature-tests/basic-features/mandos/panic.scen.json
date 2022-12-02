@@ -18,7 +18,7 @@
         },
         {
             "step": "scCall",
-            "txId": "1",
+            "id": "1",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -31,7 +31,7 @@
                 "out": [],
                 "status": "0x04",
                 "message": "str:panic occurred",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }

@@ -5,7 +5,7 @@ elrond_wasm::derive_imports!();
 pub struct TokenAttributesStruct<M: ManagedTypeApi> {
     field_biguint: BigUint<M>,
     field_u64: u64,
-    field_vec_u32: Vec<u32>,
+    field_vec_u32: ManagedVec<M, u32>,
 }
 
 #[elrond_wasm::module]

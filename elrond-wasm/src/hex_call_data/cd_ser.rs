@@ -1,7 +1,7 @@
 use crate::{
     api::ManagedTypeApi,
-    hex_util::byte_to_hex_digits,
-    types::{ArgBuffer, ManagedArgBuffer, ManagedBuffer},
+    formatter::hex_util::byte_to_hex_digits,
+    types::{heap::ArgBuffer, ManagedArgBuffer, ManagedBuffer},
 };
 use alloc::vec::Vec;
 
@@ -53,9 +53,9 @@ impl HexCallDataSerializer {
     }
 
     fn push_byte(&mut self, byte: u8) {
-        let (digit1, digit2) = byte_to_hex_digits(byte);
-        self.0.push(digit1);
-        self.0.push(digit2);
+        let digits = byte_to_hex_digits(byte);
+        self.0.push(digits[0]);
+        self.0.push(digits[1]);
     }
 
     pub fn push_argument_bytes(&mut self, bytes: &[u8]) {
@@ -73,7 +73,7 @@ mod tests {
 
     #[test]
     fn test_push_bytes_1() {
-        let mut cd = HexCallDataSerializer::new(&*b"func");
+        let mut cd = HexCallDataSerializer::new(b"func");
         let arg_bytes: &[u8] = &[0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef];
         cd.push_argument_bytes(arg_bytes);
         assert_eq!(cd.as_slice(), &b"func@0123456789abcdef"[..]);
@@ -81,7 +81,7 @@ mod tests {
 
     #[test]
     fn test_push_bytes_2() {
-        let mut cd = HexCallDataSerializer::new(&*b"func");
+        let mut cd = HexCallDataSerializer::new(b"func");
         let arg_bytes: &[u8] = &[0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef];
         cd.push_argument_bytes(arg_bytes);
         cd.push_argument_bytes(arg_bytes);
@@ -93,14 +93,14 @@ mod tests {
 
     #[test]
     fn test_push_empty_1() {
-        let mut cd = HexCallDataSerializer::new(&*b"func");
+        let mut cd = HexCallDataSerializer::new(b"func");
         cd.push_argument_bytes(&[][..]);
         assert_eq!(cd.as_slice(), &b"func@"[..]);
     }
 
     #[test]
     fn test_push_empty_2() {
-        let mut cd = HexCallDataSerializer::new(&*b"func");
+        let mut cd = HexCallDataSerializer::new(b"func");
         cd.push_argument_bytes(&[][..]);
         cd.push_argument_bytes(&[][..]);
         assert_eq!(cd.as_slice(), &b"func@@"[..]);
@@ -108,7 +108,7 @@ mod tests {
 
     #[test]
     fn test_push_empty_3() {
-        let mut cd = HexCallDataSerializer::new(&*b"");
+        let mut cd = HexCallDataSerializer::new(b"");
         cd.push_argument_bytes(&[][..]);
         cd.push_argument_bytes(&[][..]);
         cd.push_argument_bytes(&[][..]);
@@ -117,7 +117,7 @@ mod tests {
 
     #[test]
     fn test_push_some_empty_1() {
-        let mut cd = HexCallDataSerializer::new(&*b"func");
+        let mut cd = HexCallDataSerializer::new(b"func");
         let arg_bytes: &[u8] = &[0xff, 0xff];
         cd.push_argument_bytes(arg_bytes);
         cd.push_argument_bytes(&[][..]);
@@ -126,7 +126,7 @@ mod tests {
 
     #[test]
     fn test_push_some_empty_2() {
-        let mut cd = HexCallDataSerializer::new(&*b"func");
+        let mut cd = HexCallDataSerializer::new(b"func");
         let arg_bytes: &[u8] = &[0xff, 0xff];
         cd.push_argument_bytes(&[][..]);
         cd.push_argument_bytes(&[][..]);

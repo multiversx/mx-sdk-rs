@@ -1,0 +1,96 @@
+{
+    "comment": "ESDT multi-transfer, no SC",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:A": {
+                    "nonce": "0",
+                    "balance": "0x1000000000",
+                    "esdt": {
+                        "str:TOK-123456": "150",
+                        "str:OTHERTOK-123456": "500",
+                        "str:NFT-123456": {
+                            "instances": [
+                                {
+                                    "nonce": "5",
+                                    "balance": "20"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "address:B": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            }
+        },
+        {
+            "step": "transfer",
+            "id": "multi-transfer",
+            "tx": {
+                "from": "address:A",
+                "to": "address:B",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:TOK-123456",
+                        "value": "100"
+                    },
+                    {
+                        "tokenIdentifier": "str:OTHERTOK-123456",
+                        "value": "400"
+                    },
+                    {
+                        "tokenIdentifier": "str:NFT-123456",
+                        "nonce": "5",
+                        "value": "10"
+                    }
+                ],
+                "gasLimit": "0x100000000",
+                "gasPrice": "0x01"
+            }
+        },
+        {
+            "step": "checkState",
+            "comment": "check after tx 1",
+            "accounts": {
+                "address:A": {
+                    "nonce": "1",
+                    "balance": "0xf00000000",
+                    "esdt": {
+                        "str:TOK-123456": "50",
+                        "str:OTHERTOK-123456": "100",
+                        "str:NFT-123456": {
+                            "instances": [
+                                {
+                                    "nonce": "5",
+                                    "balance": "10"
+                                }
+                            ]
+                        }
+                    },
+                    "storage": {},
+                    "code": ""
+                },
+                "address:B": {
+                    "nonce": "0",
+                    "esdt": {
+                        "str:TOK-123456": "100",
+                        "str:OTHERTOK-123456": "400",
+                        "str:NFT-123456": {
+                            "instances": [
+                                {
+                                    "nonce": "5",
+                                    "balance": "10"
+                                }
+                            ]
+                        }
+                    },
+                    "storage": {},
+                    "code": ""
+                }
+            }
+        }
+    ]
+}

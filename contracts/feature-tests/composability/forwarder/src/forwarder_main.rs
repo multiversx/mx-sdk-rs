@@ -1,5 +1,6 @@
 #![no_std]
 #![allow(clippy::type_complexity)]
+#![allow(clippy::let_unit_value)]
 
 mod call_async;
 pub mod call_sync;
@@ -34,16 +35,7 @@ pub trait Forwarder:
     fn init(&self) {}
 
     #[endpoint]
-    fn send_egld(
-        &self,
-        to: &ManagedAddress,
-        amount: &BigUint,
-        #[var_args] opt_data: OptionalArg<ManagedBuffer>,
-    ) {
-        let data = match opt_data {
-            OptionalArg::Some(data) => data,
-            OptionalArg::None => ManagedBuffer::new(),
-        };
-        self.send().direct_egld(to, amount, data);
+    fn send_egld(&self, to: &ManagedAddress, amount: &BigUint) {
+        self.send().direct_egld(to, amount);
     }
 }

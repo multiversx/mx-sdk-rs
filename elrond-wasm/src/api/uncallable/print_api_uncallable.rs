@@ -1,4 +1,7 @@
-use crate::api::{Handle, PrintApi, PrintApiImpl};
+use crate::{
+    api::{PrintApi, PrintApiImpl},
+    formatter::FormatBufferIgnore,
+};
 
 use super::UncallableApi;
 
@@ -11,7 +14,5 @@ impl PrintApi for UncallableApi {
 }
 
 impl PrintApiImpl for UncallableApi {
-    fn print_biguint(&self, _bu_handle: Handle) {
-        unreachable!();
-    }
+    type Buffer = FormatBufferIgnore;
 }

@@ -7,7 +7,7 @@
         },
         {
             "step": "scDeploy",
-            "txId": "multisig-deploy",
+            "id": "multisig-deploy",
             "tx": {
                 "from": "address:owner",
                 "contractCode": "file:../output/multisig.wasm",
@@ -23,7 +23,7 @@
                 "out": [],
                 "status": "4",
                 "message": "str:duplicate board member",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }

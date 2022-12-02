@@ -6,7 +6,7 @@
         },
         {
             "step": "scCall",
-            "txId": "proposeSCUpgradeFromSource",
+            "id": "proposeSCUpgradeFromSource",
             "comment": "missing argument",
             "tx": {
                 "from": "address:paul",
@@ -28,14 +28,14 @@
                     "5"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "sc-deploy-sign-alice",
+            "id": "sc-deploy-sign-alice",
             "tx": {
                 "from": "address:alice",
                 "to": "sc:multisig",
@@ -49,14 +49,14 @@
             "expect": {
                 "out": [],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "sc-deploy-sign-bob",
+            "id": "sc-deploy-sign-bob",
             "tx": {
                 "from": "address:bob",
                 "to": "sc:multisig",
@@ -70,14 +70,14 @@
             "expect": {
                 "out": [],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "sc-deploy-perform-3",
+            "id": "sc-deploy-perform-3",
             "tx": {
                 "from": "address:paul",
                 "to": "sc:multisig",
@@ -91,7 +91,7 @@
             "expect": {
                 "out": [],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }

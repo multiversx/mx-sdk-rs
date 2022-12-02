@@ -43,8 +43,14 @@ pub trait BigIntMethods {
     }
 
     #[endpoint]
-    fn big_uint_to_u64(&self, bu: &BigUint) -> OptionalResult<u64> {
+    fn big_uint_to_u64(&self, bu: &BigUint) -> OptionalValue<u64> {
         bu.to_u64().into()
+    }
+
+    #[endpoint]
+    fn biguint_overwrite_u64(&self, bu: BigUint, small: u64) -> BigUint {
+        bu.overwrite_u64(small);
+        bu
     }
 
     #[endpoint]
@@ -88,12 +94,23 @@ pub trait BigIntMethods {
     }
 
     #[endpoint]
-    fn big_int_to_i64(&self, bi: &BigInt) -> OptionalResult<i64> {
+    fn big_uint_eq_u64(&self, bi: BigUint, small: u64) -> bool {
+        bi == small
+    }
+
+    #[endpoint]
+    fn big_int_to_i64(&self, bi: &BigInt) -> OptionalValue<i64> {
         bi.to_i64().into()
     }
 
     #[endpoint]
-    fn big_int_to_parts(&self, bi: BigInt) -> MultiResult2<Sign, BigUint> {
+    fn bigint_overwrite_i64(&self, bi: BigInt, small: i64) -> BigInt {
+        bi.overwrite_i64(small);
+        bi
+    }
+
+    #[endpoint]
+    fn big_int_to_parts(&self, bi: BigInt) -> MultiValue2<Sign, BigUint> {
         bi.to_parts().into()
     }
 

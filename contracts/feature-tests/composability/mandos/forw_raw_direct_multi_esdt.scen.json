@@ -1,0 +1,83 @@
+{
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:TEST-TOKENA": "1000",
+                        "str:TEST-TOKENB": "2000"
+                    }
+                },
+                "address:a_user": {
+                    "nonce": "0",
+                    "balance": "0"
+                },
+                "sc:forwarder": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../forwarder-raw/output/forwarder-raw.wasm"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "1",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:forwarder",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:TEST-TOKENA",
+                        "value": "1000"
+                    },
+                    {
+                        "tokenIdentifier": "str:TEST-TOKENB",
+                        "value": "2000"
+                    }
+                ],
+                "function": "forward_direct_esdt_multi",
+                "arguments": [
+                    "address:a_user"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "1",
+                    "balance": "0"
+                },
+                "address:a_user": {
+                    "nonce": "*",
+                    "balance": "0",
+                    "esdt": {
+                        "str:TEST-TOKENA": "1000",
+                        "str:TEST-TOKENB": "2000"
+                    },
+                    "storage": {},
+                    "code": ""
+                },
+                "sc:forwarder": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "file:../forwarder-raw/output/forwarder-raw.wasm"
+                }
+            }
+        }
+    ]
+}

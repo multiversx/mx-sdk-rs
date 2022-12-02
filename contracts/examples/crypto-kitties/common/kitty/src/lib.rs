@@ -26,14 +26,14 @@ pub struct Kitty {
 
 impl Kitty {
     pub fn new(
-        genes: &KittyGenes,
+        genes: KittyGenes,
         birth_time: u64,
         matron_id: u32,
         sire_id: u32,
         generation: u16,
     ) -> Self {
         Kitty {
-            genes: genes.clone(),
+            genes,
             birth_time,
             cooldown_end: 0,
             matron_id,

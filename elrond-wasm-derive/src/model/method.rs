@@ -41,6 +41,7 @@ pub struct Method {
     pub unprocessed_attributes: Vec<syn::Attribute>,
     pub method_args: Vec<MethodArgument>,
     pub output_names: Vec<String>,
+    pub label_names: Vec<String>,
     pub return_type: syn::ReturnType,
     pub implementation: MethodImpl,
 }
@@ -90,9 +91,5 @@ impl Method {
             PublicRole::Callback(_) | PublicRole::CallbackRaw => MethodPayableMetadata::AnyToken,
             PublicRole::Private => MethodPayableMetadata::NotPayable,
         }
-    }
-
-    pub fn has_variable_nr_args(&self) -> bool {
-        self.method_args.iter().any(|arg| arg.metadata.var_args)
     }
 }

@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use elrond_wasm::elrond_codec::TopEncode;
+use elrond_wasm::elrond_codec::{top_encode_to_vec_u8_or_panic, TopEncode};
 use num_traits::Zero;
 
 mod cmd_builder;
@@ -11,7 +11,7 @@ use cmd_builder::*;
 use constants::*;
 use helper_types::*;
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Eq)]
 pub enum PrintOption {
     ErdpySnippet,
     TxData,
@@ -150,10 +150,7 @@ impl ErdpySnippetGenerator {
     }
 
     fn encode_arg<T: TopEncode>(&mut self, arg: &T) -> Vec<u8> {
-        let mut arg_bytes = Vec::new();
-        arg.top_encode(&mut arg_bytes).unwrap();
-
-        arg_bytes
+        top_encode_to_vec_u8_or_panic(arg)
     }
 
     pub fn add_argument<T: TopEncode>(&mut self, arg: &T) {

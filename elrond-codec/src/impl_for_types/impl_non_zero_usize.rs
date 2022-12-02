@@ -1,89 +1,55 @@
 use core::num::NonZeroUsize;
 
 use crate::{
-    codec_err::{DecodeError, EncodeError},
-    nested_de::NestedDecode,
-    nested_de_input::NestedDecodeInput,
-    nested_ser::NestedEncode,
-    nested_ser_output::NestedEncodeOutput,
-    top_de::TopDecode,
-    top_de_input::TopDecodeInput,
-    top_ser::TopEncode,
-    top_ser_output::TopEncodeOutput,
+    DecodeError, DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput,
+    NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
 };
 
 impl TopEncode for NonZeroUsize {
-    fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
-        self.get().top_encode(output)
-    }
-
-    fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(
-        &self,
-        output: O,
-        c: ExitCtx,
-        exit: fn(ExitCtx, EncodeError) -> !,
-    ) {
-        self.get().top_encode_or_exit(output, c, exit);
+    fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: TopEncodeOutput,
+        H: EncodeErrorHandler,
+    {
+        self.get().top_encode_or_handle_err(output, h)
     }
 }
 
 impl TopDecode for NonZeroUsize {
-    fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
-        if let Some(nz) = NonZeroUsize::new(usize::top_decode(input)?) {
+    fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: TopDecodeInput,
+        H: DecodeErrorHandler,
+    {
+        if let Some(nz) = NonZeroUsize::new(usize::top_decode_or_handle_err(input, h)?) {
             Ok(nz)
         } else {
-            Err(DecodeError::INVALID_VALUE)
-        }
-    }
-
-    fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(
-        input: I,
-        c: ExitCtx,
-        exit: fn(ExitCtx, DecodeError) -> !,
-    ) -> Self {
-        if let Some(nz) = NonZeroUsize::new(usize::top_decode_or_exit(input, c.clone(), exit)) {
-            nz
-        } else {
-            exit(c, DecodeError::INVALID_VALUE)
+            Err(h.handle_error(DecodeError::INVALID_VALUE))
         }
     }
 }
 
 impl NestedEncode for NonZeroUsize {
     #[inline]
-    fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
-        self.get().dep_encode(dest)
-    }
-
-    #[inline]
-    fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(
-        &self,
-        dest: &mut O,
-        c: ExitCtx,
-        exit: fn(ExitCtx, EncodeError) -> !,
-    ) {
-        self.get().dep_encode_or_exit(dest, c, exit);
+    fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: NestedEncodeOutput,
+        H: EncodeErrorHandler,
+    {
+        self.get().dep_encode_or_handle_err(dest, h)
     }
 }
 
 impl NestedDecode for NonZeroUsize {
-    fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
-        if let Some(nz) = NonZeroUsize::new(usize::dep_decode(input)?) {
+    fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: NestedDecodeInput,
+        H: DecodeErrorHandler,
+    {
+        if let Some(nz) = NonZeroUsize::new(usize::dep_decode_or_handle_err(input, h)?) {
             Ok(nz)
         } else {
-            Err(DecodeError::INVALID_VALUE)
-        }
-    }
-
-    fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(
-        input: &mut I,
-        c: ExitCtx,
-        exit: fn(ExitCtx, DecodeError) -> !,
-    ) -> Self {
-        if let Some(nz) = NonZeroUsize::new(usize::dep_decode_or_exit(input, c.clone(), exit)) {
-            nz
-        } else {
-            exit(c, DecodeError::INVALID_VALUE)
+            Err(h.handle_error(DecodeError::INVALID_VALUE))
         }
     }
 }

@@ -7,15 +7,20 @@ CONTRACT_PATH=$1
 CONTRACT_NAME=${CONTRACT_PATH##*/}
 
 rm -f ${CONTRACT_PATH}/output/${CONTRACT_NAME}.wasm
+rm -f ${CONTRACT_PATH}/output/${CONTRACT_NAME}.wat
 rm -f ${CONTRACT_PATH}/output/${CONTRACT_NAME}-dbg.wasm
 rm -f ${CONTRACT_PATH}/output/${CONTRACT_NAME}-dbg.c
 rm -f ${CONTRACT_PATH}/output/${CONTRACT_NAME}-dbg.wat
 
 cd ${CONTRACT_PATH}/meta
 cargo run build
-cargo run build --wasm-symbols --wasm-suffix "dbg"
+cargo run build --wasm-symbols --wasm-suffix "dbg" --no-wasm-opt
 
 cd ../output
+wasm2wat \
+    ${CONTRACT_NAME}.wasm \
+    -o \
+    ${CONTRACT_NAME}.wat
 wasm2wat \
     ${CONTRACT_NAME}-dbg.wasm \
     -o \

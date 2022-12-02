@@ -7,7 +7,7 @@
         },
         {
             "step": "scCall",
-            "txId": "buy-nft-wrong-amount",
+            "id": "buy-nft-wrong-amount",
             "tx": {
                 "from": "address:buyer",
                 "to": "sc:nft-minter",
@@ -29,7 +29,7 @@
         },
         {
             "step": "scCall",
-            "txId": "buy-nft-wrong-requested-nonce",
+            "id": "buy-nft-wrong-requested-nonce",
             "tx": {
                 "from": "address:buyer",
                 "to": "sc:nft-minter",
@@ -51,7 +51,7 @@
         },
         {
             "step": "scCall",
-            "txId": "buy-nft-1",
+            "id": "buy-nft-1",
             "tx": {
                 "from": "address:buyer",
                 "to": "sc:nft-minter",
@@ -103,7 +103,9 @@
                                     "balance": "1",
                                     "creator": "sc:nft-minter",
                                     "royalties": "5000",
-                                    "uri": "str:www.mycoolnft.com/nft1.jpg",
+                                    "uri": [
+                                        "str:www.mycoolnft.com/nft1.jpg"
+                                    ],
                                     "attributes": "u64:100,000"
                                 }
                             ]
@@ -122,7 +124,9 @@
                                     "balance": "1",
                                     "creator": "sc:nft-minter",
                                     "royalties": "5000",
-                                    "uri": "str:www.mycoolnft.com/nft2.jpg",
+                                    "uri": [
+                                        "str:www.mycoolnft.com/nft2.jpg"
+                                    ],
                                     "attributes": "u64:200,000"
                                 }
                             ],
@@ -147,7 +151,7 @@
         },
         {
             "step": "scCall",
-            "txId": "buy-nft-with-sft-wrong-nonce",
+            "id": "buy-nft-with-sft-wrong-nonce",
             "tx": {
                 "from": "address:buyer",
                 "to": "sc:nft-minter",
@@ -175,7 +179,7 @@
         },
         {
             "step": "scCall",
-            "txId": "buy-nft-2",
+            "id": "buy-nft-2",
             "tx": {
                 "from": "address:buyer",
                 "to": "sc:nft-minter",
@@ -243,7 +247,9 @@
                                     "balance": "1",
                                     "creator": "sc:nft-minter",
                                     "royalties": "5000",
-                                    "uri": "str:www.mycoolnft.com/nft1.jpg",
+                                    "uri": [
+                                        "str:www.mycoolnft.com/nft1.jpg"
+                                    ],
                                     "attributes": "u64:100,000"
                                 },
                                 {
@@ -251,7 +257,9 @@
                                     "balance": "1",
                                     "creator": "sc:nft-minter",
                                     "royalties": "5000",
-                                    "uri": "str:www.mycoolnft.com/nft2.jpg",
+                                    "uri": [
+                                        "str:www.mycoolnft.com/nft2.jpg"
+                                    ],
                                     "attributes": "u64:200,000"
                                 }
                             ]

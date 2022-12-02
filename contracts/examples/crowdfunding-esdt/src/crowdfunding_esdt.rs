@@ -3,7 +3,7 @@
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
-#[derive(TopEncode, TopDecode, TypeAbi, PartialEq, Clone, Copy, Debug)]
+#[derive(TopEncode, TopDecode, TypeAbi, PartialEq, Eq, Clone, Copy, Debug)]
 pub enum Status {
     FundingPeriod,
     Successful,
@@ -13,12 +13,7 @@ pub enum Status {
 #[elrond_wasm::contract]
 pub trait Crowdfunding {
     #[init]
-    fn init(
-        &self,
-        target: BigUint,
-        deadline: u64,
-        token_identifier: TokenIdentifier,
-    ) -> SCResult<()> {
+    fn init(&self, target: BigUint, deadline: u64, token_identifier: EgldOrEsdtTokenIdentifier) {
         require!(target > 0, "Target must be more than 0");
         self.target().set(target);
 
@@ -28,22 +23,15 @@ pub trait Crowdfunding {
         );
         self.deadline().set(deadline);
 
-        require!(
-            token_identifier.is_egld() || token_identifier.is_valid_esdt_identifier(),
-            "Invalid token provided"
-        );
+        require!(token_identifier.is_valid(), "Invalid token provided");
         self.cf_token_identifier().set(token_identifier);
-
-        Ok(())
     }
 
     #[endpoint]
     #[payable("*")]
-    fn fund(
-        &self,
-        #[payment_token] token: TokenIdentifier,
-        #[payment] payment: BigUint,
-    ) -> SCResult<()> {
+    fn fund(&self) {
+        let (token, _, payment) = self.call_value().egld_or_single_esdt().into_tuple();
+
         require!(
             self.status() == Status::FundingPeriod,
             "cannot fund after deadline"
@@ -52,8 +40,6 @@ pub trait Crowdfunding {
 
         let caller = self.blockchain().get_caller();
         self.deposit(&caller).update(|deposit| *deposit += payment);
-
-        Ok(())
     }
 
     #[view]
@@ -75,9 +61,9 @@ pub trait Crowdfunding {
     }
 
     #[endpoint]
-    fn claim(&self) -> SCResult<()> {
+    fn claim(&self) {
         match self.status() {
-            Status::FundingPeriod => sc_error!("cannot claim before deadline"),
+            Status::FundingPeriod => sc_panic!("cannot claim before deadline"),
             Status::Successful => {
                 let caller = self.blockchain().get_caller();
                 require!(
@@ -89,23 +75,18 @@ pub trait Crowdfunding {
                 let sc_balance = self.get_current_funds();
 
                 self.send()
-                    .direct(&caller, &token_identifier, 0, &sc_balance, &[]);
-
-                Ok(())
+                    .direct(&caller, &token_identifier, 0, &sc_balance);
             },
             Status::Failed => {
                 let caller = self.blockchain().get_caller();
                 let deposit = self.deposit(&caller).get();
 
-                if deposit > 0 {
+                if deposit > 0u32 {
                     let token_identifier = self.cf_token_identifier().get();
 
                     self.deposit(&caller).clear();
-                    self.send()
-                        .direct(&caller, &token_identifier, 0, &deposit, &[]);
+                    self.send().direct(&caller, &token_identifier, 0, &deposit);
                 }
-
-                Ok(())
             },
         }
     }
@@ -132,5 +113,5 @@ pub trait Crowdfunding {
 
     #[view(getCrowdfundingTokenIdentifier)]
     #[storage_mapper("tokenIdentifier")]
-    fn cf_token_identifier(&self) -> SingleValueMapper<TokenIdentifier>;
+    fn cf_token_identifier(&self) -> SingleValueMapper<EgldOrEsdtTokenIdentifier>;
 }

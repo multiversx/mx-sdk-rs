@@ -20,7 +20,7 @@
         },
         {
             "step": "scCall",
-            "txId": "change-owner",
+            "id": "change-owner",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
@@ -34,7 +34,6 @@
             },
             "expect": {
                 "out": [
-                    "address:new_owner",
                     "address:new_owner"
                 ]
             }

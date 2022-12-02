@@ -1,0 +1,29 @@
+{
+    "comment": "verifies that setState and checkState are consistent",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:the-address": {
+                    "username": "str:theusername.elrond"
+                }
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:the-address": {
+                    "username": "str:theusername.elrond"
+                }
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:the-address": {
+                    "username": "*"
+                }
+            }
+        }
+    ]
+}

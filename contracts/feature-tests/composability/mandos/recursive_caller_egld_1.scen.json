@@ -23,7 +23,7 @@
         },
         {
             "step": "scCall",
-            "txId": "1",
+            "id": "1",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:recursive-caller",
@@ -53,14 +53,21 @@
                         "data": "1"
                     },
                     {
+                        "address": "*",
+                        "endpoint": "str:transferValueOnly",
+                        "topics": [
+                            "sc:recursive-caller",
+                            "sc:vault",
+                            "1"
+                        ],
+                        "data": ""
+                    },
+                    {
                         "address": "sc:vault",
                         "endpoint": "str:accept_funds",
                         "topics": [
                             "str:accept_funds",
-                            "str:EGLD",
-                            "str:FungibleESDT",
-                            "1",
-                            "0"
+                            "1"
                         ],
                         "data": ""
                     },

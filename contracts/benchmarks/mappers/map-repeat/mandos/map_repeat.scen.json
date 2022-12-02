@@ -1,16 +1,14 @@
 {
-    "gasSchedule": "v4",
     "name": "map-repeat",
     "traceGas": true,
+    "gasSchedule": "v4",
     "steps": [
         {
             "step": "setState",
             "accounts": {
                 "address:owner": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 }
             },
             "newAddresses": [
@@ -23,10 +21,9 @@
         },
         {
             "step": "scDeploy",
-            "txId": "deploy",
+            "id": "deploy",
             "tx": {
                 "from": "address:owner",
-                "value": "0",
                 "contractCode": "file:../output/map-repeat.wasm",
                 "arguments": [],
                 "gasLimit": "20,000,000",
@@ -42,11 +39,10 @@
         },
         {
             "step": "scCall",
-            "txId": "add",
+            "id": "add",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
-                "value": "0",
                 "function": "add",
                 "arguments": [
                     "1000",
@@ -66,11 +62,10 @@
         },
         {
             "step": "scCall",
-            "txId": "count",
+            "id": "count",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
-                "value": "0",
                 "function": "count",
                 "arguments": [
                     "str:testing---testing---"
@@ -90,11 +85,10 @@
         },
         {
             "step": "scCall",
-            "txId": "remove",
+            "id": "remove",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
-                "value": "0",
                 "function": "remove",
                 "arguments": [
                     "1000",

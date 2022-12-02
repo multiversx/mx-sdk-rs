@@ -23,7 +23,7 @@
         },
         {
             "step": "scCall",
-            "txId": "1",
+            "id": "1",
             "tx": {
                 "from": "address:account_1",
                 "to": "sc:erc20",
@@ -40,7 +40,7 @@
                 "out": [],
                 "status": "0x04",
                 "message": "str:allowance exceeded",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }

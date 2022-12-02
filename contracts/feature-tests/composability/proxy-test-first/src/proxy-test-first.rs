@@ -14,11 +14,11 @@ mod pay_me_proxy {
     pub trait PayMe {
         #[payable("EGLD")]
         #[endpoint(payMe)]
-        fn pay_me(&self, #[payment] payment: BigUint, arg1: i64);
+        fn pay_me(&self, arg1: i64);
 
         #[payable("EGLD")]
         #[endpoint(payMeWithResult)]
-        fn pay_me_with_result(&self, #[payment] payment: BigUint, arg1: i64);
+        fn pay_me_with_result(&self, arg1: i64);
     }
 }
 
@@ -29,7 +29,7 @@ mod message_me_proxy {
     pub trait MessageMe {
         #[init]
         #[payable("EGLD")]
-        fn init(&self, #[payment] payment: BigUint, init_arg: i32);
+        fn init(&self, init_arg: i32) -> i32;
 
         #[endpoint(messageMe)]
         fn message_me(&self, arg1: i64, arg2: &BigUint, arg3: Vec<u8>, arg4: &ManagedAddress);
@@ -60,54 +60,59 @@ pub trait ProxyTestFirst {
 
     #[payable("EGLD")]
     #[endpoint(deploySecondContract)]
-    fn deploy_second_contract(
-        &self,
-        #[payment] payment: BigUint,
-        code: ManagedBuffer,
-    ) -> ManagedVec<Self::Api, ManagedBuffer> {
-        let (address, results) = self
+    fn deploy_second_contract(&self, code: ManagedBuffer) -> i32 {
+        let payment = self.call_value().egld_value();
+        let (address, init_result) = self
             .message_me_proxy()
-            .init(payment, 123)
-            .deploy_contract(&code, CodeMetadata::DEFAULT);
+            .init(123)
+            .with_egld_transfer(payment)
+            .deploy_contract::<i32>(&code, CodeMetadata::DEFAULT);
         self.set_other_contract(&address);
-
-        results
+        init_result + 1
     }
 
     #[payable("EGLD")]
     #[endpoint(upgradeSecondContract)]
-    fn upgrade_second_contract(&self, #[payment] payment: BigUint, code: ManagedBuffer) {
+    fn upgrade_second_contract(&self, code: ManagedBuffer) {
+        let payment = self.call_value().egld_value();
         let other_contract = self.get_other_contract();
 
         self.message_me_proxy()
             .contract(other_contract)
-            .init(payment, 456)
+            .init(456)
+            .with_egld_transfer(payment)
             .upgrade_contract(&code, CodeMetadata::DEFAULT);
     }
 
     #[payable("EGLD")]
     #[endpoint(forwardToOtherContract)]
-    fn forward_to_other_contract(&self, #[payment] payment: BigUint) -> AsyncCall {
+    fn forward_to_other_contract(&self) {
+        let payment = self.call_value().egld_value();
         let other_contract = self.get_other_contract();
         self.pay_me_proxy()
             .contract(other_contract)
-            .pay_me(payment, 0x56)
+            .pay_me(0x56)
+            .with_egld_transfer(payment)
             .async_call()
+            .call_and_exit()
     }
 
     #[payable("EGLD")]
     #[endpoint(forwardToOtherContractWithCallback)]
-    fn forward_to_other_contract_with_callback(&self, #[payment] payment: BigUint) -> AsyncCall {
+    fn forward_to_other_contract_with_callback(&self) {
+        let payment = self.call_value().egld_value();
         let other_contract = self.get_other_contract();
         self.pay_me_proxy()
             .contract(other_contract)
-            .pay_me_with_result(payment, 0x56)
+            .pay_me_with_result(0x56)
+            .with_egld_transfer(payment)
             .async_call()
             .with_callback(self.callbacks().pay_callback())
+            .call_and_exit()
     }
 
     #[endpoint(messageOtherContract)]
-    fn message_other_contract(&self) -> AsyncCall {
+    fn message_other_contract(&self) {
         let other_contract = self.get_other_contract();
         self.message_me_proxy()
             .contract(other_contract)
@@ -118,10 +123,11 @@ pub trait ProxyTestFirst {
                 &ManagedAddress::from(&HARDCODED_ADDRESS),
             )
             .async_call()
+            .call_and_exit()
     }
 
     #[endpoint(messageOtherContractWithCallback)]
-    fn message_other_contract_with_callback(&self) -> AsyncCall {
+    fn message_other_contract_with_callback(&self) {
         let other_contract = self.get_other_contract();
         self.message_me_proxy()
             .contract(other_contract)
@@ -133,6 +139,7 @@ pub trait ProxyTestFirst {
             )
             .async_call()
             .with_callback(self.callbacks().message_callback())
+            .call_and_exit()
     }
 
     #[callback(payCallback)] // although uncommon, custom callback names are possible

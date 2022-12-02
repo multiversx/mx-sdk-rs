@@ -31,7 +31,7 @@
         },
         {
             "step": "scCall",
-            "txId": "get_prev_block_timestamp",
+            "id": "get_prev_block_timestamp",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -45,14 +45,14 @@
                     "506"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "get_prev_block_nonce",
+            "id": "get_prev_block_nonce",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -66,14 +66,14 @@
                     "521"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "get_prev_block_round",
+            "id": "get_prev_block_round",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -87,14 +87,14 @@
                     "532"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "get_prev_block_epoch",
+            "id": "get_prev_block_epoch",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -108,14 +108,14 @@
                     "544"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "get_prev_block_random_seed",
+            "id": "get_prev_block_random_seed",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -129,14 +129,14 @@
                     "0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "get_block_timestamp",
+            "id": "get_block_timestamp",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -150,14 +150,14 @@
                     "511"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "get_block_nonce",
+            "id": "get_block_nonce",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -171,14 +171,14 @@
                     "522"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "get_block_round",
+            "id": "get_block_round",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -192,14 +192,14 @@
                     "533"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "get_block_epoch",
+            "id": "get_block_epoch",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -213,14 +213,14 @@
                     "544"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "get_block_random_seed",
+            "id": "get_block_random_seed",
             "comment": "0-padding added in out-value",
             "tx": {
                 "from": "address:an_account",
@@ -235,7 +235,7 @@
                     "0x123456000000000000000000000000000000000000000000000000000000000000000000000000000000000000000007"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }

@@ -33,8 +33,7 @@
                                     "nonce": "0",
                                     "balance": "1"
                                 }
-                            ],
-                            "roles": []
+                            ]
                         }
                     },
                     "code": "file:../forwarder/output/forwarder.wasm"
@@ -43,7 +42,7 @@
         },
         {
             "step": "scCall",
-            "txId": "local_mint",
+            "id": "local_mint",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
@@ -76,7 +75,7 @@
         },
         {
             "step": "scCall",
-            "txId": "local_mint",
+            "id": "local_mint",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder2",
@@ -131,8 +130,7 @@
                                     "nonce": "0",
                                     "balance": "1"
                                 }
-                            ],
-                            "roles": []
+                            ]
                         }
                     },
                     "code": "file:../forwarder/output/forwarder.wasm"

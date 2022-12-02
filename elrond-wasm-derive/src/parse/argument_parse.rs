@@ -48,8 +48,15 @@ fn extract_method_arg(pat_typed: &syn::PatType) -> MethodArgument {
         &mut unprocessed_attributes,
     );
 
+    let original_pat = pat.clone();
+    let mut cleaned_pat = original_pat.clone();
+    if let syn::Pat::Ident(ident) = &mut cleaned_pat {
+        ident.mutability = None;
+    }
+
     MethodArgument {
-        pat: pat.clone(),
+        original_pat,
+        pat: cleaned_pat,
         ty: ty.clone(),
         unprocessed_attributes,
         metadata: arg_metadata,
@@ -74,7 +81,6 @@ fn process_arg_attribute(attr: &syn::Attribute, arg_metadata: &mut ArgMetadata) 
         || process_payment_nonce_attribute(attr, arg_metadata)
         || process_payment_amount_attribute(attr, arg_metadata)
         || process_payment_multi_attribute(attr, arg_metadata)
-        || process_var_args_attribute(attr, arg_metadata)
         || process_callback_result_attribute(attr, arg_metadata)
         || process_event_topic_attribute(attr, arg_metadata)
 }
@@ -115,14 +121,6 @@ fn process_payment_multi_attribute(attr: &syn::Attribute, arg_metadata: &mut Arg
     if has_attr {
         check_no_other_payment_attr(&*arg_metadata);
         arg_metadata.payment = ArgPaymentMetadata::PaymentMulti;
-    }
-    has_attr
-}
-
-fn process_var_args_attribute(attr: &syn::Attribute, arg_metadata: &mut ArgMetadata) -> bool {
-    let has_attr = is_var_args(attr);
-    if has_attr {
-        arg_metadata.var_args = true;
     }
     has_attr
 }

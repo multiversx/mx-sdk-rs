@@ -22,7 +22,7 @@
         },
         {
             "step": "scCall",
-            "txId": "payable_token_4.1",
+            "id": "payable_token_4.1",
             "tx": {
                 "from": "address:an-account",
                 "to": "sc:payable-features",
@@ -34,15 +34,15 @@
             "expect": {
                 "out": [],
                 "status": "4",
-                "message": "str:bad call value token provided",
-                "logs": [],
+                "message": "str:function expects single ESDT payment",
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "payable_token_4.2",
+            "id": "payable_token_4.2",
             "tx": {
                 "from": "address:an-account",
                 "to": "sc:payable-features",
@@ -55,15 +55,15 @@
             "expect": {
                 "out": [],
                 "status": "4",
-                "message": "str:bad call value token provided",
-                "logs": [],
+                "message": "str:function expects single ESDT payment",
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "payable_token_4.3",
+            "id": "payable_token_4.3",
             "tx": {
                 "from": "address:an-account",
                 "to": "sc:payable-features",
@@ -84,14 +84,14 @@
                     "str:PAYABLE-FEATURES-TOKEN"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "payable_token_4.4",
+            "id": "payable_token_4.4",
             "tx": {
                 "from": "address:an-account",
                 "to": "sc:payable-features",
@@ -110,7 +110,7 @@
                 "out": [],
                 "status": "4",
                 "message": "str:bad call value token provided",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }

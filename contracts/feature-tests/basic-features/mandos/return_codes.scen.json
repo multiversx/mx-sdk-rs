@@ -17,7 +17,7 @@
         },
         {
             "step": "scCall",
-            "txId": "call-a-function-which-does-not-exist",
+            "id": "call-a-function-which-does-not-exist",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -30,7 +30,7 @@
                 "out": [],
                 "status": "1",
                 "message": "str:invalid function (not found)",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }

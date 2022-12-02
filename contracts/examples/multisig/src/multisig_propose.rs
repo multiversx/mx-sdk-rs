@@ -5,7 +5,7 @@ elrond_wasm::imports!();
 /// Contains all events that can be emitted by the contract.
 #[elrond_wasm::module]
 pub trait MultisigProposeModule: crate::multisig_state::MultisigStateModule {
-    fn propose_action(&self, action: Action<Self::Api>) -> SCResult<usize> {
+    fn propose_action(&self, action: Action<Self::Api>) -> usize {
         let (caller_id, caller_role) = self.get_caller_id_and_role();
         require!(
             caller_role.can_propose(),
@@ -19,31 +19,31 @@ pub trait MultisigProposeModule: crate::multisig_state::MultisigStateModule {
             self.action_signer_ids(action_id).insert(caller_id);
         }
 
-        Ok(action_id)
+        action_id
     }
 
     /// Initiates board member addition process.
     /// Can also be used to promote a proposer to board member.
     #[endpoint(proposeAddBoardMember)]
-    fn propose_add_board_member(&self, board_member_address: ManagedAddress) -> SCResult<usize> {
+    fn propose_add_board_member(&self, board_member_address: ManagedAddress) -> usize {
         self.propose_action(Action::AddBoardMember(board_member_address))
     }
 
     /// Initiates proposer addition process..
     /// Can also be used to demote a board member to proposer.
     #[endpoint(proposeAddProposer)]
-    fn propose_add_proposer(&self, proposer_address: ManagedAddress) -> SCResult<usize> {
+    fn propose_add_proposer(&self, proposer_address: ManagedAddress) -> usize {
         self.propose_action(Action::AddProposer(proposer_address))
     }
 
     /// Removes user regardless of whether it is a board member or proposer.
     #[endpoint(proposeRemoveUser)]
-    fn propose_remove_user(&self, user_address: ManagedAddress) -> SCResult<usize> {
+    fn propose_remove_user(&self, user_address: ManagedAddress) -> usize {
         self.propose_action(Action::RemoveUser(user_address))
     }
 
     #[endpoint(proposeChangeQuorum)]
-    fn propose_change_quorum(&self, new_quorum: usize) -> SCResult<usize> {
+    fn propose_change_quorum(&self, new_quorum: usize) -> usize {
         self.propose_action(Action::ChangeQuorum(new_quorum))
     }
 
@@ -51,12 +51,17 @@ pub trait MultisigProposeModule: crate::multisig_state::MultisigStateModule {
         &self,
         to: ManagedAddress,
         egld_amount: BigUint,
-        opt_function: OptionalArg<ManagedBuffer>,
-        arguments: ManagedVarArgs<ManagedBuffer>,
+        opt_function: OptionalValue<ManagedBuffer>,
+        arguments: MultiValueEncoded<ManagedBuffer>,
     ) -> CallActionData<Self::Api> {
+        require!(
+            egld_amount > 0 || opt_function.is_some(),
+            "proposed action has no effect"
+        );
+
         let endpoint_name = match opt_function {
-            OptionalArg::Some(data) => data,
-            OptionalArg::None => ManagedBuffer::new(),
+            OptionalValue::Some(data) => data,
+            OptionalValue::None => ManagedBuffer::new(),
         };
         CallActionData {
             to,
@@ -75,9 +80,9 @@ pub trait MultisigProposeModule: crate::multisig_state::MultisigStateModule {
         &self,
         to: ManagedAddress,
         egld_amount: BigUint,
-        #[var_args] opt_function: OptionalArg<ManagedBuffer>,
-        #[var_args] arguments: ManagedVarArgs<ManagedBuffer>,
-    ) -> SCResult<usize> {
+        opt_function: OptionalValue<ManagedBuffer>,
+        arguments: MultiValueEncoded<ManagedBuffer>,
+    ) -> usize {
         let call_data = self.prepare_call_data(to, egld_amount, opt_function, arguments);
         self.propose_action(Action::SendTransferExecute(call_data))
     }
@@ -92,9 +97,9 @@ pub trait MultisigProposeModule: crate::multisig_state::MultisigStateModule {
         &self,
         to: ManagedAddress,
         egld_amount: BigUint,
-        #[var_args] opt_function: OptionalArg<ManagedBuffer>,
-        #[var_args] arguments: ManagedVarArgs<ManagedBuffer>,
-    ) -> SCResult<usize> {
+        opt_function: OptionalValue<ManagedBuffer>,
+        arguments: MultiValueEncoded<ManagedBuffer>,
+    ) -> usize {
         let call_data = self.prepare_call_data(to, egld_amount, opt_function, arguments);
         self.propose_action(Action::SendAsyncCall(call_data))
     }
@@ -105,8 +110,8 @@ pub trait MultisigProposeModule: crate::multisig_state::MultisigStateModule {
         amount: BigUint,
         source: ManagedAddress,
         code_metadata: CodeMetadata,
-        #[var_args] arguments: ManagedVarArgs<ManagedBuffer>,
-    ) -> SCResult<usize> {
+        arguments: MultiValueEncoded<ManagedBuffer>,
+    ) -> usize {
         self.propose_action(Action::SCDeployFromSource {
             amount,
             source,
@@ -122,8 +127,8 @@ pub trait MultisigProposeModule: crate::multisig_state::MultisigStateModule {
         amount: BigUint,
         source: ManagedAddress,
         code_metadata: CodeMetadata,
-        #[var_args] arguments: ManagedVarArgs<ManagedBuffer>,
-    ) -> SCResult<usize> {
+        arguments: MultiValueEncoded<ManagedBuffer>,
+    ) -> usize {
         self.propose_action(Action::SCUpgradeFromSource {
             sc_address,
             amount,

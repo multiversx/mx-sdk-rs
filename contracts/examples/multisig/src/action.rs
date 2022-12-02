@@ -1,14 +1,11 @@
 use elrond_wasm::{
-    api::{CallTypeApi, EndpointFinishApi, ManagedTypeApi, StorageWriteApi},
-    io::EndpointResult,
-    types::{
-        AsyncCall, BigUint, CodeMetadata, ManagedAddress, ManagedBuffer, ManagedVec, OptionalResult,
-    },
+    api::ManagedTypeApi,
+    types::{BigUint, CodeMetadata, ManagedAddress, ManagedBuffer, ManagedVec},
 };
 
 elrond_wasm::derive_imports!();
 
-#[derive(NestedEncode, NestedDecode, TypeAbi)]
+#[derive(NestedEncode, NestedDecode, TypeAbi, Clone)]
 pub struct CallActionData<M: ManagedTypeApi> {
     pub to: ManagedAddress<M>,
     pub egld_amount: BigUint<M>,
@@ -16,7 +13,7 @@ pub struct CallActionData<M: ManagedTypeApi> {
     pub arguments: ManagedVec<M, ManagedBuffer<M>>,
 }
 
-#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi)]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi, Clone)]
 pub enum Action<M: ManagedTypeApi> {
     Nothing,
     AddBoardMember(ManagedAddress<M>),
@@ -55,34 +52,6 @@ pub struct ActionFullInfo<M: ManagedTypeApi> {
     pub action_id: usize,
     pub action_data: Action<M>,
     pub signers: ManagedVec<M, ManagedAddress<M>>,
-}
-
-#[derive(TypeAbi)]
-pub enum PerformActionResult<SA>
-where
-    SA: CallTypeApi + ManagedTypeApi + StorageWriteApi + 'static,
-{
-    Nothing,
-    DeployResult(ManagedAddress<SA>),
-    SendAsyncCall(AsyncCall<SA>),
-}
-
-impl<SA> EndpointResult for PerformActionResult<SA>
-where
-    SA: CallTypeApi + StorageWriteApi,
-{
-    type DecodeAs = OptionalResult<ManagedAddress<SA>>;
-
-    fn finish<FA>(&self)
-    where
-        FA: ManagedTypeApi + EndpointFinishApi,
-    {
-        match self {
-            PerformActionResult::Nothing => (),
-            PerformActionResult::DeployResult(address) => address.finish::<FA>(),
-            PerformActionResult::SendAsyncCall(async_call) => async_call.finish::<FA>(),
-        }
-    }
 }
 
 #[cfg(test)]

@@ -19,7 +19,7 @@
         },
         {
             "step": "scDeploy",
-            "txId": "1",
+            "id": "1",
             "tx": {
                 "from": "address:owner",
                 "contractCode": "file:../output/use-module.wasm",
@@ -37,7 +37,7 @@
         },
         {
             "step": "scCall",
-            "txId": "2",
+            "id": "2",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:use_module",
@@ -58,7 +58,7 @@
         },
         {
             "step": "scCall",
-            "txId": "pause",
+            "id": "pause",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:use_module",
@@ -77,7 +77,7 @@
         },
         {
             "step": "scCall",
-            "txId": "check paused",
+            "id": "check paused",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:use_module",
@@ -98,7 +98,7 @@
         },
         {
             "step": "scCall",
-            "txId": "unpause",
+            "id": "unpause",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:use_module",
@@ -117,7 +117,7 @@
         },
         {
             "step": "scCall",
-            "txId": "check unpaused",
+            "id": "check unpaused",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:use_module",

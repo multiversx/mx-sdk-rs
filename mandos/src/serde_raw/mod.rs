@@ -11,6 +11,7 @@ mod storage_raw_check;
 mod transaction_raw;
 mod value_raw;
 mod value_raw_check;
+mod value_raw_check_list;
 
 pub use account_data_raw::*;
 pub use block_info_raw::*;
@@ -25,3 +26,4 @@ pub use storage_raw_check::*;
 pub use transaction_raw::*;
 pub use value_raw::*;
 pub use value_raw_check::*;
+pub use value_raw_check_list::*;

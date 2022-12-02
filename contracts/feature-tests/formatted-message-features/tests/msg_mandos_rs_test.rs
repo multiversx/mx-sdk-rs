@@ -13,6 +13,11 @@ fn world() -> BlockchainMock {
 }
 
 #[test]
-fn msg_rs() {
+fn managed_error_message_rs() {
     elrond_wasm_debug::mandos_rs("mandos/managed_error_message.scen.json", world());
+}
+
+#[test]
+fn sc_format_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/sc_format.scen.json", world());
 }

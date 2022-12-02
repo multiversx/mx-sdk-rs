@@ -10,7 +10,7 @@ pub trait SingleValueMapperFeatures {
     #[endpoint]
     fn my_single_value_mapper_increment_1(&self, amount: BigInt) {
         let my_single_value_mapper = self.map_my_single_value_mapper();
-        my_single_value_mapper.set((my_single_value_mapper.get() + amount));
+        my_single_value_mapper.set(my_single_value_mapper.get() + amount);
     }
 
     /// Same as my_single_value_mapper_increment_1, but expressed more compactly.
@@ -24,11 +24,10 @@ pub trait SingleValueMapperFeatures {
     // For example, when subtracting from a balance, we must first check that we have enough funds
     // The closure can return a Result, which can be propagated (either directly, or via sc_try!)
     #[endpoint]
-    fn my_single_value_mapper_subtract_with_require(&self, amount: &BigInt) -> SCResult<()> {
+    fn my_single_value_mapper_subtract_with_require(&self, amount: &BigInt) {
         self.map_my_single_value_mapper().update(|value| {
             require!(*value >= *amount, "not enough funds");
             *value -= amount;
-            Ok(())
         })
     }
 

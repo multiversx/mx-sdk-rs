@@ -3,18 +3,17 @@ use core::marker::PhantomData;
 use super::{StorageClearable, StorageMapper};
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
-    api::{EndpointFinishApi, ManagedTypeApi, StorageMapperApi},
-    finish_all,
-    io::EndpointResult,
+    api::StorageMapperApi,
     storage::{storage_get, storage_set, StorageKey},
-    types::{BoxedBytes, ManagedType, MultiResultVec},
+    types::{heap::BoxedBytes, ManagedType, MultiValueEncoded},
 };
 use alloc::vec::Vec;
 use elrond_codec::{
     elrond_codec_derive::{
         NestedDecode, NestedEncode, TopDecode, TopDecodeOrDefault, TopEncode, TopEncodeOrDefault,
     },
-    DecodeDefault, EncodeDefault, NestedDecode, NestedEncode, TopDecode, TopEncode,
+    CodecFrom, DecodeDefault, EncodeDefault, EncodeErrorHandler, NestedDecode, NestedEncode,
+    TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
 };
 use storage_get::storage_get_len;
 
@@ -22,7 +21,7 @@ const NULL_ENTRY: u32 = 0;
 const INFO_IDENTIFIER: &[u8] = b".info";
 const NODE_IDENTIFIER: &[u8] = b".node";
 
-#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, PartialEq, Clone, Copy)]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, PartialEq, Eq, Clone, Copy)]
 pub struct LinkedListNode<T: NestedEncode + NestedDecode + TopEncode + TopDecode + Clone> {
     pub(crate) value: T,
     pub(crate) node_id: u32,
@@ -56,7 +55,7 @@ impl<T: NestedEncode + NestedDecode + TopEncode + TopDecode + Clone> LinkedListN
     }
 }
 
-#[derive(TopEncodeOrDefault, TopDecodeOrDefault, PartialEq, Clone, Copy)]
+#[derive(TopEncodeOrDefault, TopDecodeOrDefault, PartialEq, Eq, Clone, Copy)]
 pub struct LinkedListInfo {
     pub len: u32,
     pub front: u32,
@@ -545,20 +544,28 @@ where
     }
 }
 
-impl<SA, T> EndpointResult for LinkedListMapper<SA, T>
+impl<SA, T> TopEncodeMulti for LinkedListMapper<SA, T>
 where
     SA: StorageMapperApi,
-    T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + EndpointResult,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone,
 {
-    type DecodeAs = MultiResultVec<T::DecodeAs>;
-
-    fn finish<FA>(&self)
+    fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
     where
-        FA: ManagedTypeApi + EndpointFinishApi,
+        O: TopEncodeMultiOutput,
+        H: EncodeErrorHandler,
     {
-        let values_iter = self.iter().map(|x| x.into_value());
-        finish_all::<FA, _, _>(values_iter);
+        for elem in self.iter() {
+            elem.into_value().multi_encode_or_handle_err(output, h)?;
+        }
+        Ok(())
     }
+}
+
+impl<SA, T> CodecFrom<LinkedListMapper<SA, T>> for MultiValueEncoded<SA, T>
+where
+    SA: StorageMapperApi,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone,
+{
 }
 
 impl<SA, T> TypeAbi for LinkedListMapper<SA, T>
@@ -567,14 +574,14 @@ where
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + TypeAbi,
 {
     fn type_name() -> TypeName {
-        crate::types::MultiResultVec::<T>::type_name()
+        crate::abi::type_name_variadic::<T>()
     }
 
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
         T::provide_type_descriptions(accumulator);
     }
 
-    fn is_multi_arg_or_result() -> bool {
+    fn is_variadic() -> bool {
         true
     }
 }

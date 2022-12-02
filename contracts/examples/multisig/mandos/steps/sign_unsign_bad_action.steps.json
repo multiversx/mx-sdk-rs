@@ -3,7 +3,7 @@
     "steps": [
         {
             "step": "scCall",
-            "txId": "processed-action-id-sign-bob",
+            "id": "processed-action-id-sign-bob",
             "tx": {
                 "from": "address:bob",
                 "to": "sc:multisig",
@@ -18,14 +18,14 @@
                 "out": [],
                 "status": "4",
                 "message": "str:action does not exist",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "processed-action-id-unsign-bob",
+            "id": "processed-action-id-unsign-bob",
             "tx": {
                 "from": "address:bob",
                 "to": "sc:multisig",
@@ -40,14 +40,14 @@
                 "out": [],
                 "status": "4",
                 "message": "str:action does not exist",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "huge-action-id-sign-bob",
+            "id": "huge-action-id-sign-bob",
             "tx": {
                 "from": "address:bob",
                 "to": "sc:multisig",
@@ -62,14 +62,14 @@
                 "out": [],
                 "status": "4",
                 "message": "str:action does not exist",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "huge-action-id-unsign-bob",
+            "id": "huge-action-id-unsign-bob",
             "tx": {
                 "from": "address:bob",
                 "to": "sc:multisig",
@@ -84,7 +84,7 @@
                 "out": [],
                 "status": "4",
                 "message": "str:action does not exist",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }

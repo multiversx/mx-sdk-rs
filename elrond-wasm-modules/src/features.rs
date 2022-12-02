@@ -13,62 +13,46 @@ pub const FEATURE_OFF: u8 = 2;
 ///
 #[elrond_wasm::module]
 pub trait FeaturesModule {
-    #[storage_get("feat:")]
-    fn get_feature_flag(&self, feature_name: FeatureName) -> u8;
-
-    #[storage_set("feat:")]
-    fn set_feature_flag(&self, feature_name: FeatureName, value: u8);
+    #[storage_mapper("feat:")]
+    fn feature_flag(&self, feature_name: &FeatureName<Self::Api>) -> SingleValueMapper<u8>;
 
     fn check_feature_on(&self, feature_name: &'static [u8], default: bool) {
-        let flag = self.get_feature_flag(FeatureName(feature_name));
+        let flag = self.feature_flag(&FeatureName(feature_name.into())).get();
         let value = match flag {
             FEATURE_NOT_SET => default,
             FEATURE_ON => true,
             _ => false,
         };
-        if !value {
-            let mut err = self.error().new_error();
-            err.append_bytes(feature_name);
-            err.append_bytes(&b" currently disabled"[..]);
-            err.exit_now()
-        }
+        require!(value, "{} currently disabled", feature_name);
     }
 
+    #[only_owner]
     #[endpoint(setFeatureFlag)]
-    fn set_feature_flag_endpoint(&self, feature_name: Vec<u8>, value: bool) -> SCResult<()> {
-        require!(
-            self.blockchain().get_caller() == self.blockchain().get_owner_address(),
-            "only owner allowed to change features"
-        );
-
-        self.set_feature_flag(
-            FeatureName(feature_name.as_slice()),
-            if value { FEATURE_ON } else { FEATURE_OFF },
-        );
-        Ok(())
+    fn set_feature_flag_endpoint(&self, feature_name: ManagedBuffer, value: bool) {
+        let feature_value = if value { FEATURE_ON } else { FEATURE_OFF };
+        self.feature_flag(&FeatureName(feature_name))
+            .set(feature_value);
     }
 }
 
 elrond_wasm::derive_imports!();
 
 #[derive(TopEncode)]
-pub struct FeatureName<'a>(&'a [u8]);
+pub struct FeatureName<M>(ManagedBuffer<M>)
+where
+    M: ManagedTypeApi;
 
 use elrond_wasm::elrond_codec::*;
-impl<'a> NestedEncode for FeatureName<'a> {
+impl<M> NestedEncode for FeatureName<M>
+where
+    M: ManagedTypeApi,
+{
     #[inline]
-    fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
-        dest.write(self.0);
-        Result::Ok(())
-    }
-
-    #[inline]
-    fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(
-        &self,
-        dest: &mut O,
-        _: ExitCtx,
-        _: fn(ExitCtx, EncodeError) -> !,
-    ) {
-        dest.write(self.0);
+    fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: NestedEncodeOutput,
+        H: EncodeErrorHandler,
+    {
+        dest.push_specialized((), &self.0, h)
     }
 }

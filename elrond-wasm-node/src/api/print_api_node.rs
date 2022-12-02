@@ -1,5 +1,8 @@
 use crate::VmApiImpl;
-use elrond_wasm::api::{Handle, PrintApi, PrintApiImpl};
+use elrond_wasm::{
+    api::{PrintApi, PrintApiImpl},
+    formatter::FormatBufferIgnore,
+};
 
 impl PrintApi for VmApiImpl {
     type PrintApiImpl = VmApiImpl;
@@ -10,6 +13,5 @@ impl PrintApi for VmApiImpl {
 }
 
 impl PrintApiImpl for VmApiImpl {
-    #[inline]
-    fn print_biguint(&self, _bu_handle: Handle) {}
+    type Buffer = FormatBufferIgnore;
 }

@@ -48,8 +48,7 @@
                                     "balance": "1"
                                 }
                             ],
-                            "lastNonce": "1",
-                            "roles": []
+                            "lastNonce": "1"
                         }
                     },
                     "code": "file:../forwarder/output/forwarder.wasm"
@@ -58,7 +57,7 @@
         },
         {
             "step": "scCall",
-            "txId": "nft_add_quantity",
+            "id": "nft_add_quantity",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
@@ -92,7 +91,7 @@
         },
         {
             "step": "scCall",
-            "txId": "nft_add_quantity",
+            "id": "nft_add_quantity",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder2",
@@ -163,8 +162,7 @@
                                     "balance": "1"
                                 }
                             ],
-                            "lastNonce": "1",
-                            "roles": []
+                            "lastNonce": "1"
                         }
                     },
                     "code": "file:../forwarder/output/forwarder.wasm"

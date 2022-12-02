@@ -6,7 +6,7 @@
         },
         {
             "step": "scDeploy",
-            "txId": "multisig-deploy",
+            "id": "multisig-deploy",
             "tx": {
                 "from": "address:owner",
                 "contractCode": "file:../output/multisig.wasm",
@@ -20,14 +20,14 @@
             "expect": {
                 "out": [],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "rem-alice-prop",
+            "id": "rem-alice-prop",
             "tx": {
                 "from": "address:alice",
                 "to": "sc:multisig",
@@ -43,14 +43,14 @@
                     "1"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "rem-alice-sign-alice",
+            "id": "rem-alice-sign-alice",
             "tx": {
                 "from": "address:alice",
                 "to": "sc:multisig",
@@ -64,14 +64,14 @@
             "expect": {
                 "out": [],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "rem-alice--perform",
+            "id": "rem-alice--perform",
             "tx": {
                 "from": "address:alice",
                 "to": "sc:multisig",
@@ -86,7 +86,7 @@
                 "out": [],
                 "status": "4",
                 "message": "str:cannot remove all board members and proposers",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }

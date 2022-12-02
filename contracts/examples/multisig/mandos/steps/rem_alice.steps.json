@@ -4,7 +4,7 @@
     "steps": [
         {
             "step": "scCall",
-            "txId": "rem-alice-prop",
+            "id": "rem-alice-prop",
             "tx": {
                 "from": "address:paul",
                 "to": "sc:multisig",
@@ -20,14 +20,14 @@
                     "3"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "rem-alice-sign-bob",
+            "id": "rem-alice-sign-bob",
             "tx": {
                 "from": "address:bob",
                 "to": "sc:multisig",
@@ -41,14 +41,14 @@
             "expect": {
                 "out": [],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "rem-alice-sign-charlie",
+            "id": "rem-alice-sign-charlie",
             "tx": {
                 "from": "address:charlie",
                 "to": "sc:multisig",
@@ -62,14 +62,14 @@
             "expect": {
                 "out": [],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "rem-alice--perform",
+            "id": "rem-alice--perform",
             "tx": {
                 "from": "address:paul",
                 "to": "sc:multisig",
@@ -83,9 +83,25 @@
             "expect": {
                 "out": [],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "getAllBoardMembers",
+            "tx": {
+                "to": "sc:multisig",
+                "function": "getAllBoardMembers",
+                "arguments": []
+            },
+            "expect": {
+                "out": [
+                    "address:bob",
+                    "address:charlie",
+                    "address:dan"
+                ]
             }
         }
     ]

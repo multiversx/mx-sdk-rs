@@ -20,6 +20,7 @@ elrond_wasm_node::wasm_endpoints! {
         payable_token_2
         payable_token_3
         payable_token_4
+        payment_array_3
         payment_multiple
     )
 }

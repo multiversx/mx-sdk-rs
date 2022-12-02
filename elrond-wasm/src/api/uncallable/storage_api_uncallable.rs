@@ -1,14 +1,12 @@
-use crate::api::{
-    Handle, StorageReadApi, StorageReadApiImpl, StorageWriteApi, StorageWriteApiImpl,
-};
-use alloc::vec::Vec;
+use crate::api::{StorageReadApi, StorageReadApiImpl, StorageWriteApi, StorageWriteApiImpl};
+use alloc::boxed::Box;
 
 use super::UncallableApi;
 
 impl StorageReadApi for UncallableApi {
-    type StorageReadApiImpl = UncallableApi;
+    type StorageReadApiImpl = Self;
 
-    fn storage_read_api_impl() -> Self::StorageReadApiImpl {
+    fn storage_read_api_impl() -> Self {
         unreachable!()
     }
 }
@@ -18,31 +16,19 @@ impl StorageReadApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn storage_load_vec_u8(&self, _key: &[u8]) -> Vec<u8> {
+    fn storage_load_to_heap(&self, _key: &[u8]) -> Box<[u8]> {
         unreachable!()
     }
 
-    fn storage_load_big_uint_raw(&self, _key: &[u8]) -> Handle {
+    fn storage_load_big_uint_raw(&self, _key: &[u8], _dest: i32) {
         unreachable!()
     }
 
-    fn storage_load_managed_buffer_raw(&self, _key_handle: Handle) -> Handle {
+    fn storage_load_managed_buffer_raw(&self, _key_handle: i32, _dest: i32) {
         unreachable!()
     }
 
-    fn storage_load_managed_buffer_len(&self, _key_handle: Handle) -> usize {
-        unreachable!()
-    }
-
-    fn storage_load_u64(&self, _key: &[u8]) -> u64 {
-        unreachable!()
-    }
-
-    fn storage_load_i64(&self, _key: &[u8]) -> i64 {
-        unreachable!()
-    }
-
-    fn storage_load_from_address(&self, _address_handle: Handle, _key_handle: Handle) -> Handle {
+    fn storage_load_from_address(&self, _address_handle: i32, _key_handle: i32, _dest: i32) {
         unreachable!()
     }
 }
@@ -60,23 +46,19 @@ impl StorageWriteApiImpl for super::UncallableApi {
         unreachable!()
     }
 
-    fn storage_store_big_uint_raw(&self, _key: &[u8], _value_handle: Handle) {
+    fn storage_store_big_uint_raw(&self, _key: &[u8], _value_handle: Self::BigIntHandle) {
         unreachable!()
     }
 
-    fn storage_store_managed_buffer_raw(&self, _key_handle: Handle, _value_handle: Handle) {
+    fn storage_store_managed_buffer_raw(
+        &self,
+        _key_handle: Self::ManagedBufferHandle,
+        _value_handle: Self::ManagedBufferHandle,
+    ) {
         unreachable!()
     }
 
-    fn storage_store_managed_buffer_clear(&self, _key_handle: Handle) {
-        unreachable!()
-    }
-
-    fn storage_store_u64(&self, _key: &[u8], _value: u64) {
-        unreachable!()
-    }
-
-    fn storage_store_i64(&self, _key: &[u8], _value: i64) {
+    fn storage_store_managed_buffer_clear(&self, _key_handle: Self::ManagedBufferHandle) {
         unreachable!()
     }
 }

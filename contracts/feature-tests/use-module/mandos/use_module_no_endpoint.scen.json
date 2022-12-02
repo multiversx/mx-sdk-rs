@@ -11,7 +11,7 @@
         },
         {
             "step": "scCall",
-            "txId": "no-endpoint",
+            "id": "no-endpoint",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",

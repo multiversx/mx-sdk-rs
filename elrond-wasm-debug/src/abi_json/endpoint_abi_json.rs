@@ -88,12 +88,17 @@ pub struct EndpointAbiJson {
     #[serde(rename = "onlyOwner")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub only_owner: Option<bool>,
+    #[serde(rename = "onlyAdmin")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub only_admin: Option<bool>,
     pub mutability: EndpointMutabilityAbiJson,
     #[serde(rename = "payableInTokens")]
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub payable_in_tokens: Vec<String>,
     pub inputs: Vec<InputAbiJson>,
     pub outputs: Vec<OutputAbiJson>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub labels: Vec<String>,
 }
 
 impl From<&EndpointAbi> for EndpointAbiJson {
@@ -102,6 +107,7 @@ impl From<&EndpointAbi> for EndpointAbiJson {
             docs: abi.docs.iter().map(|d| d.to_string()).collect(),
             name: abi.name.to_string(),
             only_owner: if abi.only_owner { Some(true) } else { None },
+            only_admin: if abi.only_admin { Some(true) } else { None },
             mutability: match abi.mutability {
                 EndpointMutabilityAbi::Mutable => EndpointMutabilityAbiJson::Mutable,
                 EndpointMutabilityAbi::Readonly => EndpointMutabilityAbiJson::Readonly,
@@ -114,6 +120,7 @@ impl From<&EndpointAbi> for EndpointAbiJson {
                 .collect(),
             inputs: abi.inputs.iter().map(InputAbiJson::from).collect(),
             outputs: abi.outputs.iter().map(OutputAbiJson::from).collect(),
+            labels: abi.labels.iter().map(|&label| label.to_owned()).collect(),
         }
     }
 }

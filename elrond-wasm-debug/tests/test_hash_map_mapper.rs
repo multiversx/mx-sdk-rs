@@ -17,8 +17,8 @@ fn test_map_simple() {
     assert_eq!(map.get(&42), None);
     assert_eq!(map.insert(42, 142), None);
     assert_eq!(map.len(), 1);
-    assert_eq!(map.contains_key(&42), true);
-    assert_eq!(map.contains_key(&50), false);
+    assert!(map.contains_key(&42));
+    assert!(!map.contains_key(&50));
     assert_eq!(map.insert(42, 242), Some(142));
     assert_eq!(map.len(), 1);
     assert_eq!(map.get(&42), Some(242));

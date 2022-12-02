@@ -8,7 +8,7 @@
         },
         {
             "step": "scCall",
-            "txId": "bid-third",
+            "id": "bid-third",
             "tx": {
                 "from": "address:user1",
                 "to": "sc:marketplace_contract",
@@ -24,10 +24,7 @@
             "expect": {
                 "out": [],
                 "status": "0",
-                "message": "",
-                "logs": [],
-                "gas": "*",
-                "refund": "*"
+                "message": ""
             }
         },
         {

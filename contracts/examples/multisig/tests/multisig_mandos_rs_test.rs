@@ -5,10 +5,6 @@ fn world() -> BlockchainMock {
     blockchain.set_current_dir_from_workspace("contracts/examples/multisig");
 
     blockchain.register_contract_builder("file:output/multisig.wasm", multisig::ContractBuilder);
-    blockchain.register_external_view_contract_builder(
-        "file:output/multisig-view.wasm",
-        multisig::ContractBuilder,
-    );
 
     blockchain.register_contract_builder("file:test-contracts/adder.wasm", adder::ContractBuilder);
 

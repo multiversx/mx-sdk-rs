@@ -18,7 +18,7 @@
         },
         {
             "step": "scCall",
-            "txId": "before",
+            "id": "before",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -30,14 +30,14 @@
             "expect": {
                 "out": [],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "first-push-back",
+            "id": "first-push-back",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -51,7 +51,7 @@
             "expect": {
                 "out": [],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -78,7 +78,7 @@
         },
         {
             "step": "scCall",
-            "txId": "check-list-after-first-push-back",
+            "id": "check-list-after-first-push-back",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -92,14 +92,14 @@
                     "123"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "second-push-back",
+            "id": "second-push-back",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -113,14 +113,14 @@
             "expect": {
                 "out": [],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "check-list-after-second-push-back",
+            "id": "check-list-after-second-push-back",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -135,14 +135,14 @@
                     "111"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "set-node-value",
+            "id": "set-node-value",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -157,14 +157,14 @@
             "expect": {
                 "out": [],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "check-list-after-set-value",
+            "id": "check-list-after-set-value",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -179,14 +179,14 @@
                     "111"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "set-node-value-by-id",
+            "id": "set-node-value-by-id",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -201,14 +201,14 @@
             "expect": {
                 "out": [],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "check-list-after-set-value-back-to-original",
+            "id": "check-list-after-set-value-back-to-original",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -223,7 +223,7 @@
                     "111"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -251,7 +251,7 @@
         },
         {
             "step": "scCall",
-            "txId": "check-front-after-second-push-back",
+            "id": "check-front-after-second-push-back",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -265,14 +265,14 @@
                     "123"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "first-pop-front",
+            "id": "first-pop-front",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -286,7 +286,7 @@
                     "123"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -313,7 +313,7 @@
         },
         {
             "step": "scCall",
-            "txId": "second-pop-front",
+            "id": "second-pop-front",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -327,7 +327,7 @@
                     "111"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -351,7 +351,7 @@
         },
         {
             "step": "scCall",
-            "txId": "check-front-after-second-pop-front",
+            "id": "check-front-after-second-pop-front",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -364,14 +364,14 @@
                 "out": [],
                 "status": "",
                 "message": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "first-push-back",
+            "id": "first-push-back",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -385,14 +385,14 @@
             "expect": {
                 "out": [],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "first-push-back",
+            "id": "first-push-back",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -409,14 +409,14 @@
                     "6"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "first-push-back",
+            "id": "first-push-back",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -433,14 +433,14 @@
                     "4"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "first-push-back",
+            "id": "first-push-back",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -454,14 +454,14 @@
             "expect": {
                 "out": [],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "first-push-back",
+            "id": "first-push-back",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -478,14 +478,14 @@
                     "6"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "first-push-back",
+            "id": "first-push-back",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -504,14 +504,14 @@
                     "6"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "first-push-back",
+            "id": "first-push-back",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -530,14 +530,14 @@
                     "6"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "first-push-back",
+            "id": "first-push-back",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -551,14 +551,14 @@
             "expect": {
                 "out": [],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "first-push-back",
+            "id": "first-push-back",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -574,14 +574,14 @@
                     "6"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "first-push-back",
+            "id": "first-push-back",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -595,14 +595,14 @@
                     "3"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "first-push-back",
+            "id": "first-push-back",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -617,14 +617,14 @@
                     "6"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "first-push-back",
+            "id": "first-push-back",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -640,14 +640,14 @@
                     "6"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "first-push-back",
+            "id": "first-push-back",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -661,14 +661,14 @@
                     "4"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "first-push-back",
+            "id": "first-push-back",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -682,14 +682,14 @@
                     "4"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "first-push-back",
+            "id": "first-push-back",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -701,7 +701,7 @@
             "expect": {
                 "out": [],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }

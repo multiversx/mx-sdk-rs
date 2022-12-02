@@ -26,7 +26,7 @@
         },
         {
             "step": "scCall",
-            "txId": "1",
+            "id": "1",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:proxy-first",
@@ -41,7 +41,7 @@
                     "0x7777"
                 ],
                 "status": "0",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }

@@ -10,24 +10,21 @@
                     "balance": "1000",
                     "esdt": {
                         "str:marketToken": "1000"
-                    },
-                    "storage": {}
+                    }
                 },
                 "address:user1": {
                     "nonce": "0",
                     "balance": "1000",
                     "esdt": {
                         "str:marketToken": "1000"
-                    },
-                    "storage": {}
+                    }
                 },
                 "address:user2": {
                     "nonce": "0",
                     "balance": "1000",
                     "esdt": {
                         "str:marketToken": "1000"
-                    },
-                    "storage": {}
+                    }
                 },
                 "sc:ownership_contract": {
                     "nonce": "0",

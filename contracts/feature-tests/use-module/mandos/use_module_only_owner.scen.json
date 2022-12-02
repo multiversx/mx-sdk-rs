@@ -23,7 +23,7 @@
         },
         {
             "step": "scDeploy",
-            "txId": "1",
+            "id": "1",
             "tx": {
                 "from": "address:owner",
                 "contractCode": "file:../output/use-module.wasm",
@@ -41,7 +41,7 @@
         },
         {
             "step": "scCall",
-            "txId": "2",
+            "id": "2",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:use_module",
@@ -60,7 +60,7 @@
         },
         {
             "step": "scCall",
-            "txId": "3",
+            "id": "3",
             "tx": {
                 "from": "address:not_owner",
                 "to": "sc:use_module",
@@ -73,14 +73,14 @@
                 "out": [],
                 "status": "4",
                 "message": "str:Endpoint can only be called by owner",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "3",
+            "id": "3",
             "tx": {
                 "from": "address:not_owner",
                 "to": "sc:use_module",

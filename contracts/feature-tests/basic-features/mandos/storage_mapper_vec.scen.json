@@ -18,7 +18,7 @@
         },
         {
             "step": "scCall",
-            "txId": "before",
+            "id": "before",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -30,14 +30,14 @@
             "expect": {
                 "out": [],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "increment-1",
+            "id": "increment-1",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -51,14 +51,14 @@
             "expect": {
                 "out": [],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "after-1",
+            "id": "after-1",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -72,14 +72,14 @@
                     "123"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "increment-2",
+            "id": "increment-2",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -93,14 +93,14 @@
             "expect": {
                 "out": [],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "after-2",
+            "id": "after-2",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -115,14 +115,14 @@
                     "111"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "after-2-len",
+            "id": "after-2-len",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -136,7 +136,7 @@
                     "2"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
@@ -164,7 +164,7 @@
         },
         {
             "step": "scCall",
-            "txId": "index-0",
+            "id": "index-0",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -179,14 +179,14 @@
                 "out": [],
                 "status": "4",
                 "message": "str:index out of range",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "index-2",
+            "id": "index-2",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -202,14 +202,14 @@
                     "111"
                 ],
                 "status": "",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "txId": "index-3",
+            "id": "index-3",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -224,7 +224,7 @@
                 "out": [],
                 "status": "4",
                 "message": "str:index out of range",
-                "logs": [],
+                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }

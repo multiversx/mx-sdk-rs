@@ -19,12 +19,21 @@ fn process_trait_attribute(
     trait_arg_metadata: &mut TraitProperties,
 ) -> bool {
     process_only_owner_argument(attr, trait_arg_metadata)
+        || process_only_admin_argument(attr, trait_arg_metadata)
 }
 
 fn process_only_owner_argument(attr: &syn::Attribute, arg_metadata: &mut TraitProperties) -> bool {
     let has_attr = is_only_owner_prop(attr);
     if has_attr {
         arg_metadata.only_owner = true;
+    }
+    has_attr
+}
+
+fn process_only_admin_argument(attr: &syn::Attribute, arg_metadata: &mut TraitProperties) -> bool {
+    let has_attr = is_only_admin_prop(attr);
+    if has_attr {
+        arg_metadata.only_admin = true;
     }
     has_attr
 }

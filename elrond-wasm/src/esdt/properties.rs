@@ -39,3 +39,59 @@ pub struct MetaTokenProperties {
     pub can_upgrade: bool,
     pub can_add_special_roles: bool,
 }
+
+impl Default for TokenProperties {
+    fn default() -> Self {
+        Self {
+            num_decimals: 0,
+            can_freeze: true,
+            can_wipe: true,
+            can_pause: true,
+            can_mint: false,
+            can_burn: false,
+            can_change_owner: true,
+            can_upgrade: true,
+            can_add_special_roles: true,
+        }
+    }
+}
+
+impl Default for NonFungibleTokenProperties {
+    fn default() -> Self {
+        Self {
+            can_freeze: true,
+            can_wipe: true,
+            can_pause: true,
+            can_change_owner: true,
+            can_upgrade: true,
+            can_add_special_roles: true,
+        }
+    }
+}
+
+impl Default for SemiFungibleTokenProperties {
+    fn default() -> Self {
+        Self {
+            can_freeze: true,
+            can_wipe: true,
+            can_pause: true,
+            can_change_owner: true,
+            can_upgrade: true,
+            can_add_special_roles: true,
+        }
+    }
+}
+
+impl Default for MetaTokenProperties {
+    fn default() -> Self {
+        Self {
+            num_decimals: 0,
+            can_freeze: true,
+            can_wipe: true,
+            can_pause: true,
+            can_change_owner: true,
+            can_upgrade: true,
+            can_add_special_roles: true,
+        }
+    }
+}

@@ -22,7 +22,7 @@
         },
         {
             "step": "scCall",
-            "txId": "1",
+            "id": "1",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
@@ -35,23 +35,25 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [
-                    "str:EGLD",
-                    "str:FungibleESDT",
-                    "1000",
-                    "0"
-                ],
+                "out": [],
                 "status": "0",
                 "logs": [
+                    {
+                        "address": "*",
+                        "endpoint": "str:transferValueOnly",
+                        "topics": [
+                            "sc:forwarder",
+                            "sc:vault",
+                            "1000"
+                        ],
+                        "data": ""
+                    },
                     {
                         "address": "sc:vault",
                         "endpoint": "str:accept_funds_echo_payment",
                         "topics": [
                             "str:accept_funds",
-                            "str:EGLD",
-                            "str:FungibleESDT",
-                            "1000",
-                            "0"
+                            "1000"
                         ],
                         "data": ""
                     },
@@ -60,10 +62,7 @@
                         "endpoint": "str:forward_sync_accept_funds",
                         "topics": [
                             "str:accept_funds_sync_result",
-                            "str:EGLD",
-                            "str:FungibleESDT",
-                            "1000",
-                            "0"
+                            "1000"
                         ],
                         "data": ""
                     }

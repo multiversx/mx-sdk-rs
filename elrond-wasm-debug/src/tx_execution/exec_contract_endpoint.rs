@@ -29,6 +29,8 @@ fn execute_tx_context_rc(tx_context_rc: Rc<TxContext>) -> (Rc<TxContext>, TxResu
     let contract_identifier = get_contract_identifier(&tx_context_ref);
     let contract_map = &tx_context_rc.blockchain_ref().contract_map;
 
+    // Not redundant at all, func_name is borrowed from it...
+    #[allow(clippy::redundant_clone)]
     let contract_instance =
         contract_map.new_contract_instance(contract_identifier.as_slice(), tx_context_ref.clone());
 
@@ -62,18 +64,22 @@ fn execute_contract_instance_endpoint(
         if !call_successful {
             std::panic::panic_any(TxPanic {
                 status: 1,
-                message: b"invalid function (not found)".to_vec(),
+                message: "invalid function (not found)".to_string(),
             });
         }
         DebugApi::new_from_static().into_tx_result()
     }));
     match result {
         Ok(tx_output) => tx_output,
-        Err(panic_any) => panic_result(panic_any),
+        Err(panic_any) => interpret_panic_as_tx_result(panic_any),
     }
 }
 
-fn panic_result(panic_any: Box<dyn std::any::Any + std::marker::Send>) -> TxResult {
+/// Interprets a panic thrown during execution as a tx failure.
+/// Note: specific tx outcomes from the debugger are signalled via specific panic objects.
+pub fn interpret_panic_as_tx_result(
+    panic_any: Box<dyn std::any::Any + std::marker::Send>,
+) -> TxResult {
     if panic_any.downcast_ref::<TxResult>().is_some() {
         // async calls panic with the tx output directly
         // it is not a failure, simply a way to kill the execution

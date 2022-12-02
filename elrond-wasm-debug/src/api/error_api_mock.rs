@@ -1,5 +1,5 @@
 use crate::{tx_mock::TxPanic, DebugApi};
-use elrond_wasm::api::{ErrorApi, ErrorApiImpl, Handle, ManagedBufferApi};
+use elrond_wasm::api::{ErrorApi, ErrorApiImpl, ManagedBufferApi};
 
 impl ErrorApi for DebugApi {
     type ErrorApiImpl = DebugApi;
@@ -17,11 +17,11 @@ impl ErrorApiImpl for DebugApi {
 
         std::panic::panic_any(TxPanic {
             status: 4,
-            message: message.to_vec(),
+            message: String::from_utf8(message.to_vec()).unwrap(),
         })
     }
 
-    fn signal_error_from_buffer(&self, message_handle: Handle) -> ! {
+    fn signal_error_from_buffer(&self, message_handle: Self::ManagedBufferHandle) -> ! {
         let message = self.mb_to_boxed_bytes(message_handle);
         self.signal_error(message.as_slice())
     }

@@ -1,0 +1,120 @@
+{
+    "name": "topUp_ok",
+    "gasSchedule": "dummy",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:crypto_bubbles_owner": {
+                    "nonce": "0",
+                    "balance": "0"
+                },
+                "sc:crypto_bubbles_legacy": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../output/crypto-bubbles-legacy.wasm"
+                },
+                "address:acc1": {
+                    "nonce": "0",
+                    "balance": "0x100800"
+                },
+                "address:acc2": {
+                    "nonce": "0",
+                    "balance": "0x100800"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "1",
+            "tx": {
+                "from": "address:acc1",
+                "to": "sc:crypto_bubbles_legacy",
+                "egldValue": "0x100",
+                "function": "topUp",
+                "arguments": [],
+                "gasLimit": "0x100000",
+                "gasPrice": "0x01"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": [
+                    {
+                        "address": "sc:crypto_bubbles_legacy",
+                        "endpoint": "str:topUp",
+                        "topics": [
+                            "0x1000000000000000000000000000000000000000000000000000000000000001",
+                            "address:acc1"
+                        ],
+                        "data": "0x0100"
+                    }
+                ],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "2",
+            "tx": {
+                "from": "address:acc2",
+                "to": "sc:crypto_bubbles_legacy",
+                "egldValue": "0x100",
+                "function": "topUp",
+                "arguments": [],
+                "gasLimit": "0x100000",
+                "gasPrice": "0x01"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": [
+                    {
+                        "address": "sc:crypto_bubbles_legacy",
+                        "endpoint": "str:topUp",
+                        "topics": [
+                            "0x1000000000000000000000000000000000000000000000000000000000000001",
+                            "address:acc2"
+                        ],
+                        "data": "0x0100"
+                    }
+                ],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:crypto_bubbles_owner": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": ""
+                },
+                "sc:crypto_bubbles_legacy": {
+                    "nonce": "0",
+                    "balance": "0x200",
+                    "storage": {
+                        "str:playerBalance|address:acc1": "0x100",
+                        "str:playerBalance|address:acc2": "0x100"
+                    },
+                    "code": "file:../output/crypto-bubbles-legacy.wasm"
+                },
+                "address:acc1": {
+                    "nonce": "1",
+                    "balance": "0x700",
+                    "storage": {},
+                    "code": ""
+                },
+                "address:acc2": {
+                    "nonce": "1",
+                    "balance": "0x700",
+                    "storage": {},
+                    "code": ""
+                }
+            }
+        }
+    ]
+}

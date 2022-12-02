@@ -1,5 +1,6 @@
 use crate::{
-    api::{ErrorApi, ErrorApiImpl, ManagedTypeApi, StorageWriteApi, StorageWriteApiImpl},
+    api::{ErrorApi, ManagedTypeApi, StorageWriteApi, StorageWriteApiImpl},
+    contract_base::ExitCodecErrorHandler,
     err_msg,
     types::{BigInt, BigUint, ManagedBuffer, ManagedBufferCachedBuilder, ManagedRef, ManagedType},
 };
@@ -25,8 +26,8 @@ where
 
     fn set_managed_buffer(&self, managed_buffer: &ManagedBuffer<A>) {
         A::storage_write_api_impl().storage_store_managed_buffer_raw(
-            self.key.buffer.get_raw_handle(),
-            managed_buffer.handle,
+            self.key.buffer.get_handle(),
+            managed_buffer.handle.clone(),
         );
     }
 }
@@ -41,23 +42,16 @@ where
         self.set_managed_buffer(&bytes.into())
     }
 
-    fn set_u64(self, value: u64) {
-        using_encoded_number(value, 64, false, true, |bytes| {
-            self.set_managed_buffer(&bytes.into())
-        });
-    }
-
-    fn set_i64(self, value: i64) {
-        using_encoded_number(value as u64, 64, true, true, |bytes| {
-            self.set_managed_buffer(&bytes.into())
-        });
+    #[inline]
+    fn supports_specialized_type<T: TryStaticCast>() -> bool {
+        T::type_eq::<ManagedBuffer<A>>() || T::type_eq::<BigUint<A>>() || T::type_eq::<BigInt<A>>()
     }
 
     #[inline]
-    fn set_specialized<T, F>(self, value: &T, else_serialization: F) -> Result<(), EncodeError>
+    fn set_specialized<T, H>(self, value: &T, h: H) -> Result<(), H::HandledErr>
     where
         T: TryStaticCast,
-        F: FnOnce(Self) -> Result<(), EncodeError>,
+        H: EncodeErrorHandler,
     {
         if let Some(managed_buffer) = value.try_cast_ref::<ManagedBuffer<A>>() {
             self.set_managed_buffer(managed_buffer);
@@ -69,7 +63,7 @@ where
             self.set_managed_buffer(&big_int.to_signed_bytes_be_buffer());
             Ok(())
         } else {
-            else_serialization(self)
+            Err(h.handle_error(EncodeError::UNSUPPORTED_OPERATION))
         }
     }
 
@@ -88,7 +82,10 @@ where
     T: TopEncode,
     A: StorageWriteApi + ManagedTypeApi + ErrorApi,
 {
-    value.top_encode_or_exit(StorageSetOutput::new(key), (), storage_set_exit::<A>);
+    let Ok(()) = value.top_encode_or_handle_err(
+        StorageSetOutput::new(key),
+        ExitCodecErrorHandler::<A>::from(err_msg::STORAGE_ENCODE_ERROR),
+    );
 }
 
 /// Useful for storage mappers.
@@ -97,15 +94,5 @@ pub fn storage_clear<A>(key: ManagedRef<'_, A, StorageKey<A>>)
 where
     A: StorageWriteApi + ManagedTypeApi + ErrorApi,
 {
-    A::storage_write_api_impl().storage_store_managed_buffer_clear(key.get_raw_handle());
-}
-
-#[inline(always)]
-fn storage_set_exit<A>(_: (), encode_err: EncodeError) -> !
-where
-    A: StorageWriteApi + ManagedTypeApi + ErrorApi + 'static,
-{
-    let mut message_buffer = ManagedBuffer::<A>::new_from_bytes(err_msg::STORAGE_ENCODE_ERROR);
-    message_buffer.append_bytes(encode_err.message_bytes());
-    A::error_api_impl().signal_error_from_buffer(message_buffer.get_raw_handle())
+    A::storage_write_api_impl().storage_store_managed_buffer_clear(key.get_handle());
 }

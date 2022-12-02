@@ -1,32 +1,39 @@
-use super::{ErrorApiImpl, Handle, ManagedTypeApi, ManagedTypeApiImpl};
-use crate::{
-    err_msg,
-    types::{BigUint, EsdtTokenPayment, EsdtTokenType, ManagedType, ManagedVec, TokenIdentifier},
-};
+use super::{handle_to_be_bytes, ErrorApiImpl, HandleTypeInfo, ManagedTypeApiImpl};
+use crate::types::EsdtTokenType;
 
-pub trait CallValueApi {
-    type CallValueApiImpl: CallValueApiImpl;
+pub trait CallValueApi: HandleTypeInfo {
+    type CallValueApiImpl: CallValueApiImpl
+        + HandleTypeInfo<
+            ManagedBufferHandle = Self::ManagedBufferHandle,
+            BigIntHandle = Self::BigIntHandle,
+            BigFloatHandle = Self::BigFloatHandle,
+            EllipticCurveHandle = Self::EllipticCurveHandle,
+        >;
 
     fn call_value_api_impl() -> Self::CallValueApiImpl;
 }
 
-pub trait CallValueApiImpl: ErrorApiImpl + ManagedTypeApiImpl {
+pub trait CallValueApiImpl: ErrorApiImpl + ManagedTypeApiImpl + Sized {
     fn check_not_payable(&self);
 
     /// Retrieves the EGLD call value from the VM.
     /// Will return 0 in case of an ESDT transfer (cannot have both EGLD and ESDT transfer simultaneously).
-    fn egld_value(&self) -> Handle;
+    fn load_egld_value(&self, dest_handle: Self::BigIntHandle);
+
+    /// Loads all ESDT call values into a managed vec. Overwrites destination.
+    fn load_all_esdt_transfers(&self, dest_handle: Self::ManagedBufferHandle) {
+        load_all_esdt_transfers_from_unmanaged(self, dest_handle);
+    }
+
+    fn esdt_num_transfers(&self) -> usize;
 
     /// Retrieves the ESDT call value from the VM.
     /// Will return 0 in case of an EGLD transfer (cannot have both EGLD and ESDT transfer simultaneously).
-    fn esdt_value(&self) -> Handle;
+    fn load_single_esdt_value(&self, dest_handle: Self::BigIntHandle);
 
     /// Returns the call value token identifier of the current call.
     /// The identifier is wrapped in a TokenIdentifier object, to hide underlying logic.
-    ///
-    /// A note on implementation: even though the underlying api returns an empty name for EGLD,
-    /// but the EGLD TokenIdentifier is serialized as `EGLD`.
-    fn token(&self) -> Handle;
+    fn token(&self) -> Option<Self::ManagedBufferHandle>;
 
     /// Returns the nonce of the received ESDT token.
     /// Will return 0 in case of EGLD or fungible ESDT transfer.
@@ -36,68 +43,32 @@ pub trait CallValueApiImpl: ErrorApiImpl + ManagedTypeApiImpl {
     /// Will return "Fungible" for EGLD.
     fn esdt_token_type(&self) -> EsdtTokenType;
 
-    /// Will return the EGLD call value,
-    /// but also fail with an error if ESDT is sent.
-    /// Especially used in the auto-generated call value processing.
-    fn require_egld(&self) -> Handle {
-        if self.esdt_num_transfers() > 0 {
-            self.signal_error(err_msg::NON_PAYABLE_FUNC_ESDT);
-        }
-        self.egld_value()
-    }
+    fn esdt_value_by_index(&self, index: usize) -> Self::BigIntHandle;
 
-    /// Will return the ESDT call value,
-    /// but also fail with an error if EGLD or the wrong ESDT token is sent.
-    /// Especially used in the auto-generated call value processing.
-    fn require_esdt(&self, token: &[u8]) -> Handle {
-        let want = self.mb_new_from_bytes(token);
-        if !self.mb_eq(self.token(), want) {
-            self.signal_error(err_msg::BAD_TOKEN_PROVIDED);
-        }
-        self.esdt_value()
-    }
-
-    /// Returns both the call value (either EGLD or ESDT) and the token identifier.
-    /// Especially used in the `#[payable("*")] auto-generated snippets.
-    /// The method might seem redundant, but there is such a hook in Arwen
-    /// that might be used in this scenario in the future.
-    fn payment_token_pair(&self) -> (Handle, Handle) {
-        let token = self.token();
-        if self.esdt_num_transfers() == 0 {
-            (self.egld_value(), token)
-        } else {
-            (self.esdt_value(), token)
-        }
-    }
-
-    fn esdt_num_transfers(&self) -> usize;
-
-    fn esdt_value_by_index(&self, index: usize) -> Handle;
-
-    fn token_by_index(&self, index: usize) -> Handle;
+    fn token_by_index(&self, index: usize) -> Self::ManagedBufferHandle;
 
     fn esdt_token_nonce_by_index(&self, index: usize) -> u64;
 
     fn esdt_token_type_by_index(&self, index: usize) -> EsdtTokenType;
+}
 
-    fn get_all_esdt_transfers<M: ManagedTypeApi>(&self) -> ManagedVec<M, EsdtTokenPayment<M>> {
-        let num_transfers = self.esdt_num_transfers();
-        let mut transfers = ManagedVec::new();
+pub fn load_all_esdt_transfers_from_unmanaged<A>(api: &A, dest_handle: A::ManagedBufferHandle)
+where
+    A: CallValueApiImpl,
+{
+    let num_transfers = api.esdt_num_transfers();
+    api.mb_overwrite(dest_handle.clone(), &[]);
 
-        for i in 0..num_transfers {
-            let token_type = self.esdt_token_type_by_index(i);
-            let token_identifier = TokenIdentifier::from_raw_handle(self.token_by_index(i));
-            let token_nonce = self.esdt_token_nonce_by_index(i);
-            let amount = BigUint::from_raw_handle(self.esdt_value_by_index(i));
+    for i in 0..num_transfers {
+        let token_identifier_handle = api.token_by_index(i);
+        let token_nonce = api.esdt_token_nonce_by_index(i);
+        let amount_handle = api.esdt_value_by_index(i);
 
-            transfers.push(EsdtTokenPayment::<M> {
-                token_type,
-                token_identifier,
-                token_nonce,
-                amount,
-            });
-        }
-
-        transfers
+        api.mb_append_bytes(
+            dest_handle.clone(),
+            &handle_to_be_bytes(token_identifier_handle)[..],
+        );
+        api.mb_append_bytes(dest_handle.clone(), &token_nonce.to_be_bytes()[..]);
+        api.mb_append_bytes(dest_handle.clone(), &handle_to_be_bytes(amount_handle)[..]);
     }
 }

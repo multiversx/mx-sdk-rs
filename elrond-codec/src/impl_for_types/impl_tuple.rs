@@ -1,13 +1,7 @@
 use crate::{
-    codec_err::{DecodeError, EncodeError},
-    nested_de::NestedDecode,
-    nested_de_input::NestedDecodeInput,
-    nested_ser::NestedEncode,
-    nested_ser_output::NestedEncodeOutput,
-    top_de::{top_decode_from_nested, top_decode_from_nested_or_exit, TopDecode},
-    top_de_input::TopDecodeInput,
-    top_ser::TopEncode,
-    top_ser_output::TopEncodeOutput,
+    top_decode_from_nested_or_handle_err, DecodeErrorHandler, EncodeErrorHandler, NestedDecode,
+    NestedDecodeInput, NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode,
+    TopEncodeOutput,
 };
 
 macro_rules! tuple_impls {
@@ -17,70 +11,63 @@ macro_rules! tuple_impls {
             where
                 $($name: NestedEncode,)+
             {
-				fn top_encode<O: TopEncodeOutput>(&self, output: O) -> Result<(), EncodeError> {
+				fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
+                where
+                    O: TopEncodeOutput,
+                    H: EncodeErrorHandler,
+                {
 					let mut buffer = output.start_nested_encode();
 					$(
-                        self.$n.dep_encode(&mut buffer)?;
+                        self.$n.dep_encode_or_handle_err(&mut buffer, h)?;
                     )+
 					output.finalize_nested_encode(buffer);
 					Ok(())
 				}
-
-				fn top_encode_or_exit<O: TopEncodeOutput, ExitCtx: Clone>(&self, output: O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
-					let mut buffer = output.start_nested_encode();
-					$(
-                        self.$n.dep_encode_or_exit(&mut buffer, c.clone(), exit);
-                    )+
-					output.finalize_nested_encode(buffer);
-				}
             }
+
             impl<$($name),+> TopDecode for ($($name,)+)
             where
                 $($name: NestedDecode,)+
             {
-                fn top_decode<I: TopDecodeInput>(input: I) -> Result<Self, DecodeError> {
-                    top_decode_from_nested(input)
-                }
-
-                fn top_decode_or_exit<I: TopDecodeInput, ExitCtx: Clone>(input: I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
-                    top_decode_from_nested_or_exit(input, c, exit)
+                fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
+                where
+                    I: TopDecodeInput,
+                    H: DecodeErrorHandler,
+                {
+                    top_decode_from_nested_or_handle_err(input, h)
                 }
             }
+
             impl<$($name),+> NestedEncode for ($($name,)+)
             where
                 $($name: NestedEncode,)+
             {
-				fn dep_encode<O: NestedEncodeOutput>(&self, dest: &mut O) -> Result<(), EncodeError> {
+				fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>
+                where
+                    O: NestedEncodeOutput,
+                    H: EncodeErrorHandler,
+                {
 					$(
-                        self.$n.dep_encode(dest)?;
+                        self.$n.dep_encode_or_handle_err(dest, h)?;
                     )+
 					Ok(())
 				}
-
-				fn dep_encode_or_exit<O: NestedEncodeOutput, ExitCtx: Clone>(&self, dest: &mut O, c: ExitCtx, exit: fn(ExitCtx, EncodeError) -> !) {
-					$(
-                        self.$n.dep_encode_or_exit(dest, c.clone(), exit);
-                    )+
-				}
             }
+
             impl<$($name),+> NestedDecode for ($($name,)+)
             where
                 $($name: NestedDecode,)+
             {
-                fn dep_decode<I: NestedDecodeInput>(input: &mut I) -> Result<Self, DecodeError> {
+                fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
+                where
+                    I: NestedDecodeInput,
+                    H: DecodeErrorHandler,
+                {
                     Ok((
                         $(
-                            $name::dep_decode(input)?,
+                            $name::dep_decode_or_handle_err(input, h)?,
                         )+
                     ))
-                }
-
-                fn dep_decode_or_exit<I: NestedDecodeInput, ExitCtx: Clone>(input: &mut I, c: ExitCtx, exit: fn(ExitCtx, DecodeError) -> !) -> Self {
-                    (
-                        $(
-                            $name::dep_decode_or_exit(input, c.clone(), exit),
-                        )+
-                    )
                 }
             }
         )+

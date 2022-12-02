@@ -13,6 +13,13 @@ impl From<&'static [u8]> for ArgId {
     }
 }
 
+impl From<&'static str> for ArgId {
+    #[inline]
+    fn from(static_str: &'static str) -> Self {
+        ArgId(static_str.as_bytes())
+    }
+}
+
 impl ArgId {
     pub fn as_bytes(&self) -> &'static [u8] {
         self.0

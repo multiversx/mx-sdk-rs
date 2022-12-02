@@ -1,0 +1,258 @@
+{
+    "name": "load local esdt token data",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:forwarder": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:FUNG-00001": "100",
+                        "str:FUNGFROZEN-00002": {
+                            "instances": [
+                                {
+                                    "nonce": "0",
+                                    "balance": "200"
+                                }
+                            ],
+                            "frozen": "true"
+                        },
+                        "str:SFT-00003": {
+                            "instances": [
+                                {
+                                    "nonce": "103",
+                                    "balance": "300",
+                                    "creator": "address:sft-003-creator",
+                                    "royalties": "3000",
+                                    "hash": "keccak256:str:SFT-00003-HASH",
+                                    "uri": [
+                                        "str:uri1",
+                                        "str:uri2"
+                                    ],
+                                    "attributes": "str:other_attributes"
+                                }
+                            ],
+                            "frozen": "true"
+                        }
+                    },
+                    "code": "file:../forwarder/output/forwarder.wasm"
+                },
+                "address:other": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "fungible-simple",
+            "tx": {
+                "to": "sc:forwarder",
+                "function": "get_esdt_token_data",
+                "arguments": [
+                    "sc:forwarder",
+                    "str:FUNG-00001",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "",
+                    "100",
+                    "false",
+                    "",
+                    "",
+                    "",
+                    "0x0000000000000000000000000000000000000000000000000000000000000000",
+                    "",
+                    ""
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "fungible-simple-is-frozen",
+            "tx": {
+                "to": "sc:forwarder",
+                "function": "is_esdt_frozen",
+                "arguments": [
+                    "sc:forwarder",
+                    "str:FUNG-00001",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "false"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "fungible-data-frozen",
+            "tx": {
+                "to": "sc:forwarder",
+                "function": "get_esdt_token_data",
+                "arguments": [
+                    "sc:forwarder",
+                    "str:FUNGFROZEN-00002",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "",
+                    "200",
+                    "true",
+                    "",
+                    "",
+                    "",
+                    "0x0000000000000000000000000000000000000000000000000000000000000000",
+                    "",
+                    ""
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "fungible-simple-is-frozen",
+            "tx": {
+                "to": "sc:forwarder",
+                "function": "is_esdt_frozen",
+                "arguments": [
+                    "sc:forwarder",
+                    "str:FUNGFROZEN-00002",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "true"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "sft-attributes",
+            "tx": {
+                "to": "sc:forwarder",
+                "function": "get_esdt_token_data",
+                "arguments": [
+                    "sc:forwarder",
+                    "str:SFT-00003",
+                    "103"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "1",
+                    "300",
+                    "true",
+                    "keccak256:str:SFT-00003-HASH",
+                    "",
+                    "str:other_attributes",
+                    "address:sft-003-creator",
+                    "3000",
+                    [
+                        "nested:str:uri1",
+                        "nested:str:uri2"
+                    ]
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "missing-token",
+            "tx": {
+                "to": "sc:forwarder",
+                "function": "get_esdt_token_data",
+                "arguments": [
+                    "address:other",
+                    "str:FUNG-00001",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "0",
+                    "0",
+                    "false",
+                    "",
+                    "",
+                    "",
+                    "0x0000000000000000000000000000000000000000000000000000000000000000",
+                    "",
+                    ""
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "missing-nonce",
+            "tx": {
+                "to": "sc:forwarder",
+                "function": "get_esdt_token_data",
+                "arguments": [
+                    "sc:forwarder",
+                    "str:SFT-00003",
+                    "99999"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "1",
+                    "0",
+                    "false",
+                    "",
+                    "",
+                    "",
+                    "0x0000000000000000000000000000000000000000000000000000000000000000",
+                    "",
+                    ""
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "sft-is-paused",
+            "tx": {
+                "to": "sc:forwarder",
+                "function": "is_esdt_paused",
+                "arguments": [
+                    "str:SFT-00003"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "false"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "sft-is-paused",
+            "tx": {
+                "to": "sc:forwarder",
+                "function": "is_esdt_limited_transfer",
+                "arguments": [
+                    "str:SFT-00003"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "false"
+                ],
+                "status": "0"
+            }
+        }
+    ]
+}

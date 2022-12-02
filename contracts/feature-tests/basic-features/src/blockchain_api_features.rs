@@ -24,7 +24,7 @@ pub trait BlockchainApiFeatures {
     }
 
     #[endpoint]
-    fn get_state_root_hash_legacy(&self) -> ManagedByteArray<Self::Api, 32> {
+    fn get_state_root_hash(&self) -> ManagedByteArray<Self::Api, 32> {
         self.blockchain().get_state_root_hash()
     }
 

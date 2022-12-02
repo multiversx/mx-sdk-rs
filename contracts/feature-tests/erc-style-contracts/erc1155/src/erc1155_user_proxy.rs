@@ -9,8 +9,8 @@ pub trait Erc1155UserProxy {
         from: ManagedAddress,
         type_id: BigUint,
         value: BigUint,
-        data: &[u8],
-    ) -> SCResult<()>;
+        data: ManagedBuffer,
+    );
 
     #[endpoint(onERC1155BatchReceived)]
     fn on_erc1155_batch_received(
@@ -19,6 +19,6 @@ pub trait Erc1155UserProxy {
         from: ManagedAddress,
         type_ids: Vec<BigUint>,
         values: Vec<BigUint>,
-        data: &[u8],
-    ) -> SCResult<()>;
+        data: ManagedBuffer,
+    );
 }

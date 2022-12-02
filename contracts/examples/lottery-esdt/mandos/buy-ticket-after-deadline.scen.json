@@ -23,7 +23,7 @@
         },
         {
             "step": "scCall",
-            "txId": "buy-ticket-after-deadline",
+            "id": "buy-ticket-after-deadline",
             "tx": {
                 "from": "address:acc2",
                 "to": "sc:lottery",
@@ -83,8 +83,7 @@
                             "3-deadline": "u64:123,456",
                             "4-max_entries_per_user": "u32:800",
                             "5-prize_distribution": "nested:u8:100",
-                            "6-whitelist": "nested:",
-                            "7-prize_pool": "biguint:100"
+                            "6-prize_pool": "biguint:100"
                         },
                         "str:ticketHolder|nested:str:lottery_name|str:.len": "1",
                         "str:ticketHolder|nested:str:lottery_name|str:.item|u32:1": "address:acc1",

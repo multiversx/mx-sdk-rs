@@ -16,8 +16,8 @@ deploy() {
           --arguments ${TARGET} ${DEADLINE_UNIX_TIMESTAMP} ${EGLD_TOKEN_ID} \
           --outfile="deploy-testnet.interaction.json" --send --proxy=${PROXY} --chain=T || return
 
-    TRANSACTION=$(erdpy data parse --file="deploy-testnet.interaction.json" --expression="data['emitted_tx']['hash']")
-    ADDRESS=$(erdpy data parse --file="deploy-testnet.interaction.json" --expression="data['emitted_tx']['address']")
+    TRANSACTION=$(erdpy data parse --file="deploy-testnet.interaction.json" --expression="data['emittedTransactionHash']")
+    ADDRESS=$(erdpy data parse --file="deploy-testnet.interaction.json" --expression="data['contractAddress']")
 
     erdpy data store --key=address-testnet --value=${ADDRESS}
     erdpy data store --key=deployTransaction-testnet --value=${TRANSACTION}
