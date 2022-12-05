@@ -2,7 +2,7 @@ use elrond_wasm_debug::*;
 
 fn world() -> BlockchainMock {
     let mut blockchain = BlockchainMock::new();
-    blockchain.register_contract_builder(
+    blockchain.register_contract(
         "file:output/bonding-curve-contract.wasm",
         bonding_curve_contract::ContractBuilder,
     );

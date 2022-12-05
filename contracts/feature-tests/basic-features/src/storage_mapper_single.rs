@@ -42,8 +42,18 @@ pub trait SingleValueMapperFeatures {
     }
 
     #[endpoint]
+    fn get_from_address_single_value_mapper(&self) -> bool {
+        self.map_my_single_value_mapper().is_empty()
+    }
+
+    #[endpoint]
     fn is_empty_single_value_mapper(&self) -> bool {
         self.map_my_single_value_mapper().is_empty()
+    }
+
+    #[endpoint]
+    fn is_empty_at_address_single_value_mapper(&self, address: ManagedAddress) -> bool {
+        self.map_my_single_value_mapper().is_empty_at_address(&address)
     }
 
     #[endpoint]
