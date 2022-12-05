@@ -19,18 +19,18 @@ use super::{
 impl MetaConfig {
     // TODO: Handle overwrite flag
     pub fn generate_rust_snippets(&self, overwrite: bool) {
-        if let Some(contract) = &self.main_contract {
-            let crate_name = contract.output_base_name.clone().replace('-', "_");
-            let wasm_output_file_path_expr = format!("\"file:../output/{}.wasm\"", &crate_name);
-            let file =
-                create_snippets_crate_and_get_lib_file(&self.snippets_dir, &crate_name, overwrite);
-            write_snippets_to_file(
-                file,
-                &contract.abi,
-                &crate_name,
-                &wasm_output_file_path_expr,
-            );
-        }
+        let name = &self
+            .output_contracts
+            .main_contract()
+            .public_name_snake_case();
+        let wasm_output_file_path_expr = format!("\"file:../output/{}.wasm\"", name);
+        let file = create_snippets_crate_and_get_lib_file(&self.snippets_dir, name, overwrite);
+        write_snippets_to_file(
+            file,
+            &self.original_contract_abi,
+            name,
+            &wasm_output_file_path_expr,
+        );
     }
 }
 

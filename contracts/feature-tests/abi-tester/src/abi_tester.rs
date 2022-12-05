@@ -165,7 +165,8 @@ pub trait AbiTester {
     #[payable("*")]
     fn payable_any_token(&self) {}
 
-    #[external_view]
+    #[endpoint]
+    #[label("test-external-view")]
     fn external_view(&self) {}
 
     #[event("payable-event")]

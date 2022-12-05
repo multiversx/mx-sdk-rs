@@ -1,5 +1,5 @@
 [package]
-name = "multisig-wasm"
+name = "multi-contract-features-view-wasm"
 version = "0.0.0"
 authors = ["Andrei Marinica <andrei.marinica@elrond.com>"]
 edition = "2018"
@@ -7,15 +7,13 @@ publish = false
 
 [lib]
 crate-type = ["cdylib"]
-
 [profile.release]
 codegen-units = 1
 opt-level = "z"
 lto = true
 debug = false
 panic = "abort"
-
-[dependencies.multisig]
+[dependencies.multi-contract-features]
 path = ".."
 
 [dependencies.elrond-wasm-node]

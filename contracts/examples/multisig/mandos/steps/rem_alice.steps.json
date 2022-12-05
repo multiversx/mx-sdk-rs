@@ -92,7 +92,7 @@
             "step": "scQuery",
             "id": "getAllBoardMembers",
             "tx": {
-                "to": "sc:multisig",
+                "to": "sc:multisig-view",
                 "function": "getAllBoardMembers",
                 "arguments": []
             },

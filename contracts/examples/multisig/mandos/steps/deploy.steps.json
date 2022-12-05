@@ -26,6 +26,26 @@
             }
         },
         {
+            "step": "scDeploy",
+            "id": "multisig-view-deploy",
+            "tx": {
+                "from": "address:owner",
+                "contractCode": "file:../../output/multisig-view.wasm",
+                "arguments": [
+                    "sc:multisig"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
             "step": "scCall",
             "id": "getQuorum",
             "tx": {

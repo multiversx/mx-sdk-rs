@@ -2,14 +2,11 @@ use crate::DebugApi;
 
 use super::*;
 
-use alloc::{boxed::Box, vec::Vec};
-use elrond_wasm::contract_base::CallableContract;
+use alloc::vec::Vec;
 use std::{collections::HashMap, fmt};
 
-pub type ContractCallFactory = Box<dyn Fn(DebugApi) -> Box<dyn CallableContract>>;
-
 pub struct ContractMap {
-    contract_objs: HashMap<Vec<u8>, Box<dyn CallableContract>>,
+    contract_objs: HashMap<Vec<u8>, ContractContainer>,
 }
 
 impl fmt::Debug for ContractMap {
@@ -25,13 +22,14 @@ impl ContractMap {
         }
     }
 
-    pub fn new_contract_instance(
+    pub fn get_contract(
         &self,
         contract_identifier: &[u8],
         _debug_api: DebugApi,
-    ) -> Box<dyn CallableContract> {
-        if let Some(contract_obj) = self.contract_objs.get(contract_identifier) {
-            contract_obj.clone_obj()
+    ) -> &ContractContainer {
+        if let Some(contract_contatiner) = self.contract_objs.get(contract_identifier) {
+            // contract_contatiner.callable.clone_obj()
+            contract_contatiner
         } else {
             unknown_contract_panic(contract_identifier)
         }
@@ -40,9 +38,11 @@ impl ContractMap {
     pub fn register_contract(
         &mut self,
         contract_bytes: Vec<u8>,
-        new_contract_obj: Box<dyn CallableContract>,
+        contract_container: ContractContainer,
     ) {
-        let previous_entry = self.contract_objs.insert(contract_bytes, new_contract_obj);
+        let previous_entry = self
+            .contract_objs
+            .insert(contract_bytes, contract_container);
         assert!(previous_entry.is_none(), "contract inserted twice");
     }
 
