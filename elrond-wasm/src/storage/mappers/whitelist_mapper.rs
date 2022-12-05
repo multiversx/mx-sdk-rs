@@ -4,12 +4,13 @@ use super::{SingleValueMapper, StorageMapper};
 use crate::{
     api::{ErrorApiImpl, StorageMapperApi},
     storage::StorageKey,
+    types::ManagedAddress,
 };
 use elrond_codec::NestedEncode;
 
 type FlagMapper<SA> = SingleValueMapper<SA, bool>;
 
-const ITEM_NOT_WHITELISTED_ERR_MSG: &[u8] = b"Item not whitelisted";
+static ITEM_NOT_WHITELISTED_ERR_MSG: &[u8] = b"Item not whitelisted";
 
 /// A non-iterable whitelist mapper.
 /// Very efficient for storing a whitelist, as each item requires only one storage key.
@@ -56,8 +57,19 @@ where
         !mapper.is_empty()
     }
 
+    pub fn contains_at_address(&self, address: &ManagedAddress<SA>, item: &T) -> bool {
+        let mapper = self.build_mapper_for_item(item);
+        !mapper.is_empty_at_address(address)
+    }
+
     pub fn require_whitelisted(&self, item: &T) {
         if !self.contains(item) {
+            SA::error_api_impl().signal_error(ITEM_NOT_WHITELISTED_ERR_MSG);
+        }
+    }
+
+    pub fn require_whitelisted_at_address(&self, address: &ManagedAddress<SA>, item: &T) {
+        if !self.contains_at_address(address, item) {
             SA::error_api_impl().signal_error(ITEM_NOT_WHITELISTED_ERR_MSG);
         }
     }
