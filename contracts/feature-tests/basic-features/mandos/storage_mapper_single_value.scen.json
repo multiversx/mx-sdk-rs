@@ -304,6 +304,12 @@
                     "storage": {},
                     "code": "file:../output/basic-features.wasm"
                 },
+                "sc:extra-instance": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "file:../output/basic-features.wasm"
+                },
                 "address:an_account": {
                     "nonce": "*",
                     "balance": "*",
@@ -343,6 +349,12 @@
                     "storage": {
                         "str:my_single_value_mapper": "42"
                     },
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "sc:extra-instance": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
                     "code": "file:../output/basic-features.wasm"
                 },
                 "address:an_account": {
