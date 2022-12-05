@@ -15,6 +15,7 @@ struct OutputContractBuilder {
     pub external_view: bool,
     pub add_unlabelled: bool,
     pub add_labels: BTreeSet<String>,
+    pub add_endpoints: BTreeSet<String>,
     pub constructors: Vec<EndpointAbi>,
     pub endpoint_names: HashSet<String>,
     pub endpoints: Vec<EndpointAbi>,
@@ -46,6 +47,7 @@ impl OutputContractBuilder {
                 external_view,
                 add_unlabelled: cms.add_unlabelled.unwrap_or_default(),
                 add_labels: cms.add_labels.iter().cloned().collect(),
+                add_endpoints: cms.add_endpoints.iter().cloned().collect(),
                 constructors,
                 ..Default::default()
             },
@@ -143,6 +145,24 @@ fn collect_labelled_endpoints(
     }
 }
 
+fn collect_add_endpoints(
+    contract_builders: &mut HashMap<String, OutputContractBuilder>,
+    original_abi: &ContractAbi,
+) {
+    for builder in contract_builders.values_mut() {
+        for constructor_abi in &original_abi.constructors {
+            if builder.add_endpoints.contains(constructor_abi.name) {
+                builder.add_constructor(constructor_abi);
+            }
+        }
+        for endpoint_abi in &original_abi.endpoints {
+            if builder.add_endpoints.contains(endpoint_abi.name) {
+                builder.add_endpoint(endpoint_abi);
+            }
+        }
+    }
+}
+
 fn build_contract_abi(builder: OutputContractBuilder, original_abi: &ContractAbi) -> ContractAbi {
     ContractAbi {
         build_info: original_abi.build_info.clone(),
@@ -205,6 +225,7 @@ impl OutputContractConfig {
             .collect();
         collect_unlabelled_endpoints(&mut contract_builders, original_abi);
         collect_labelled_endpoints(&mut contract_builders, original_abi);
+        collect_add_endpoints(&mut contract_builders, original_abi);
         process_labels_for_contracts(&mut contract_builders, &config.labels_for_contracts);
         let mut contracts: Vec<OutputContract> = contract_builders
             .into_values()

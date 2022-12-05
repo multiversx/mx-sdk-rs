@@ -1,5 +1,5 @@
 [package]
-name = "use-module-wasm"
+name = "use-module-view-wasm"
 version = "0.0.0"
 authors = ["Andrei Marinica <andrei.marinica@elrond.com>"]
 edition = "2018"
@@ -7,14 +7,12 @@ publish = false
 
 [lib]
 crate-type = ["cdylib"]
-
 [profile.release]
 codegen-units = 1
 opt-level = "z"
 lto = true
 debug = false
 panic = "abort"
-
 [dependencies.use-module]
 path = ".."
 
@@ -25,7 +23,7 @@ path = "../../../../elrond-wasm-node"
 [dependencies.elrond-wasm-output]
 version = "0.36.1"
 path = "../../../../elrond-wasm-output"
-features=["wasm-output-mode"]
+features = ["wasm-output-mode"]
 
 [workspace]
 members = ["."]

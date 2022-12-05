@@ -23,6 +23,9 @@ pub struct OutputContractSerde {
     #[serde(default)]
     #[serde(rename = "add-labels")]
     pub add_labels: Vec<String>,
+    #[serde(default)]
+    #[serde(rename = "add-endpoints")]
+    pub add_endpoints: Vec<String>,
 }
 
 #[derive(Deserialize, Default, Debug)]

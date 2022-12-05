@@ -48,6 +48,24 @@
             "labels": [
                 "test-external-view"
             ]
+        },
+        {
+            "name": "payable_any_token",
+            "mutability": "mutable",
+            "payableInTokens": [
+                "*"
+            ],
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "label_a",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [],
+            "labels": [
+                "label1"
+            ]
         }
     ],
     "events": [
