@@ -33,16 +33,16 @@ impl OutputContractConfig {
             .filter(move |contract| !contract.main)
     }
 
-    pub fn get_contract_by_id(&self, name: String) -> Option<&OutputContract> {
+    pub fn get_contract_by_id(&self, contract_id: String) -> Option<&OutputContract> {
         self.contracts
             .iter()
-            .find(|contract| contract.contract_id == name)
+            .find(|contract| contract.contract_id == contract_id)
     }
 
-    pub fn get_contract_by_name(&self, name: String) -> Option<&OutputContract> {
+    pub fn get_contract_by_name(&self, contract_name: String) -> Option<&OutputContract> {
         self.contracts
             .iter()
-            .find(|contract| contract.contract_id == name)
+            .find(|contract| contract.contract_name == contract_name)
     }
 
     /// Yields the contract with the given public name.
