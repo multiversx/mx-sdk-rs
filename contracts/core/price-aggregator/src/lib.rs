@@ -7,7 +7,9 @@ pub mod median;
 pub mod price_aggregator_data;
 pub mod staking;
 
-use price_aggregator_data::{OracleStatus, PriceFeed, TimestampedPrice, TokenPair};
+use price_aggregator_data::{
+    OracleStatus, PriceFeed, PriceFeedMultiValue, TimestampedPrice, TokenPair,
+};
 
 const SUBMISSION_LIST_MAX_LEN: usize = 50;
 const FIRST_SUBMISSION_TIMESTAMP_MAX_DIFF_SECONDS: u64 = 30;
@@ -264,12 +266,11 @@ pub trait PriceAggregator:
         result
     }
 
-    #[view(latestPriceFeed)]
-    fn latest_price_feed(
+    fn get_price_feed(
         &self,
         from: ManagedBuffer,
         to: ManagedBuffer,
-    ) -> SCResult<MultiValue6<u32, ManagedBuffer, ManagedBuffer, u64, BigUint, u8>> {
+    ) -> SCResult<PriceFeed<Self::Api>> {
         require_old!(self.not_paused(), PAUSED_ERROR_MSG);
 
         let token_pair = TokenPair { from, to };
@@ -277,16 +278,21 @@ pub trait PriceAggregator:
             .rounds()
             .get(&token_pair)
             .ok_or("token pair not found")?;
-        let feed = self.make_price_feed(token_pair, round_values);
-        Ok((
-            feed.round_id,
-            feed.from,
-            feed.to,
-            feed.timestamp,
-            feed.price,
-            feed.decimals,
-        )
-            .into())
+
+        Ok(self.make_price_feed(token_pair, round_values))
+    }
+
+    #[view(latestPriceFeed)]
+    fn latest_price_feed(
+        &self,
+        from: ManagedBuffer,
+        to: ManagedBuffer,
+    ) -> SCResult<PriceFeedMultiValue<Self::Api>> {
+        let result_price_feed = self.get_price_feed(from, to);
+        match result_price_feed {
+            SCResult::Ok(feed) => Ok(feed.into_multi_value()),
+            SCResult::Err(err) => SCResult::Err(err),
+        }
     }
 
     #[view(latestPriceFeedOptional)]
@@ -294,8 +300,52 @@ pub trait PriceAggregator:
         &self,
         from: ManagedBuffer,
         to: ManagedBuffer,
-    ) -> OptionalValue<MultiValue6<u32, ManagedBuffer, ManagedBuffer, u64, BigUint, u8>> {
+    ) -> OptionalValue<PriceFeedMultiValue<Self::Api>> {
         self.latest_price_feed(from, to).ok().into()
+    }
+
+    /// Receives pairs of (from, to) arguments,
+    /// where `from` is the token ticker which we query the price for,
+    /// and `to` is the token ticker in which we want the price to be denominated in.
+    ///
+    /// For example, if we want the USDC price of EGLD, we would pass "(EGLD, USDC)",
+    /// even if the USDC full token ID would be something like USDC-abcdef. Only ticker is needed.
+    ///
+    /// Returns all the prices. Will fail if one of the prices of not available.
+    /// If you want to do error handling yourself, use the `latestPriceFeedOptionalMulti` view.
+    #[view(latestPriceFeedMulti)]
+    fn latest_price_feed_multi(
+        &self,
+        from_to_pairs: MultiValueEncoded<MultiValue2<ManagedBuffer, ManagedBuffer>>,
+    ) -> SCResult<MultiValueEncoded<PriceFeedMultiValue<Self::Api>>> {
+        let mut results = MultiValueEncoded::new();
+        for pair in from_to_pairs {
+            let (from, to) = pair.into_tuple();
+            let price_feed = self.latest_price_feed(from, to)?;
+            results.push(price_feed);
+        }
+
+        Ok(results)
+    }
+
+    /// Same as the `latestPriceFeedMulti` view, but instead,
+    /// returns Option<Price> instead of signalling an error if any prices are missing.
+    #[view(latestPriceFeedOptionalMulti)]
+    fn latest_price_feed_optional_multi(
+        &self,
+        from_to_pairs: MultiValueEncoded<MultiValue2<ManagedBuffer, ManagedBuffer>>,
+    ) -> MultiValueEncoded<Option<PriceFeed<Self::Api>>> {
+        let mut results = MultiValueEncoded::new();
+        for pair in from_to_pairs {
+            let (from, to) = pair.into_tuple();
+            let result_price_feed = self.get_price_feed(from, to);
+            match result_price_feed {
+                SCResult::Ok(price_feed) => results.push(Some(price_feed)),
+                SCResult::Err(_) => results.push(None),
+            };
+        }
+
+        results
     }
 
     #[only_owner]

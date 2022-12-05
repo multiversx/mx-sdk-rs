@@ -22,7 +22,7 @@
                 "to": "sc:msg-features",
                 "function": "format_message_one_part",
                 "arguments": [],
-                "gasLimit": "1,500,000",
+                "gasLimit": "10,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -46,7 +46,7 @@
                 "arguments": [
                     "123456789"
                 ],
-                "gasLimit": "1,500,000",
+                "gasLimit": "10,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -70,7 +70,7 @@
                 "arguments": [
                     "123456789"
                 ],
-                "gasLimit": "1,500,000",
+                "gasLimit": "10,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -94,7 +94,7 @@
                 "arguments": [
                     "-123456789"
                 ],
-                "gasLimit": "1,500,000",
+                "gasLimit": "10,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -118,7 +118,7 @@
                 "arguments": [
                     "-123456789"
                 ],
-                "gasLimit": "1,500,000",
+                "gasLimit": "10,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -142,7 +142,7 @@
                 "arguments": [
                     "str:My Managed Buffer"
                 ],
-                "gasLimit": "1,500,000",
+                "gasLimit": "10,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -166,7 +166,7 @@
                 "arguments": [
                     "str:My Managed Buffer"
                 ],
-                "gasLimit": "2,500,000",
+                "gasLimit": "1,500,000",
                 "gasPrice": "0"
             },
             "expect": {

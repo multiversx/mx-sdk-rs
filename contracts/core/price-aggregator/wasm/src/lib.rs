@@ -12,7 +12,9 @@ elrond_wasm_node::wasm_endpoints! {
         getPairDecimals
         isPaused
         latestPriceFeed
+        latestPriceFeedMulti
         latestPriceFeedOptional
+        latestPriceFeedOptionalMulti
         latestRoundData
         pause
         removeOracles
