@@ -47,7 +47,8 @@ impl BlockchainMock {
             .register_contract(contract_bytes, contract_container);
     }
 
-    pub fn register_contract_builder<B: CallableContractBuilder>(
+    /// Links a contract path in a test to a contract implementation.
+    pub fn register_contract<B: CallableContractBuilder>(
         &mut self,
         expression: &str,
         contract_builder: B,
@@ -58,14 +59,21 @@ impl BlockchainMock {
         )
     }
 
-    pub fn register_external_view_contract_builder<B: CallableContractBuilder>(
+    #[deprecated(
+        since = "0.37.0",
+        note = "Got renamed to `register_contract`, but not completely removed, in order to ease test migration. Please replace with `register_contract`."
+    )]
+    pub fn register_contract_builder<B: CallableContractBuilder>(
         &mut self,
-        _expression: &str,
-        _contract_builder: B,
+        expression: &str,
+        contract_builder: B,
     ) {
-        panic!("register_external_view_contract_builder no longer supported")
+        self.register_contract(expression, contract_builder)
     }
 
+    /// Links a contract path in a test to a multi-contract output.
+    ///
+    /// This simulates the effects of building such a contract with only part of the endpoints.
     pub fn register_partial_contract<Abi, B>(
         &mut self,
         expression: &str,

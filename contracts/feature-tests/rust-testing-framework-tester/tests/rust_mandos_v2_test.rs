@@ -8,7 +8,7 @@ fn world() -> BlockchainMock {
     blockchain
         .set_current_dir_from_workspace("contracts/feature_tests/rust-testing-framework-tester");
 
-    blockchain.register_contract_builder(
+    blockchain.register_contract(
         WASM_PATH_EXPR,
         rust_testing_framework_tester::ContractBuilder,
     );

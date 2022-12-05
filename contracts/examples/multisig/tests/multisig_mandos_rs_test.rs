@@ -15,9 +15,9 @@ fn world() -> BlockchainMock {
         "multisig-view",
     );
 
-    blockchain.register_contract_builder("file:test-contracts/adder.wasm", adder::ContractBuilder);
+    blockchain.register_contract("file:test-contracts/adder.wasm", adder::ContractBuilder);
 
-    blockchain.register_contract_builder(
+    blockchain.register_contract(
         "file:test-contracts/factorial.wasm",
         factorial::ContractBuilder,
     );
