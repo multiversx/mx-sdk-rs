@@ -10,6 +10,11 @@
                     "balance": "0",
                     "code": "file:../output/basic-features.wasm"
                 },
+                "sc:extra-instance": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../output/basic-features.wasm"
+                },
                 "address:an_account": {
                     "nonce": "0",
                     "balance": "0"
@@ -175,6 +180,12 @@
                     },
                     "code": "file:../output/basic-features.wasm"
                 },
+                "sc:extra-instance": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "file:../output/basic-features.wasm"
+                },
                 "address:an_account": {
                     "nonce": "*",
                     "balance": "*",
@@ -191,6 +202,29 @@
                 "to": "sc:basic-features",
                 "function": "is_empty_single_value_mapper",
                 "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "false"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "is-empty-at-address-before-clear",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:extra-instance",
+                "function": "is_empty_at_address_single_value_mapper",
+                "arguments": [
+                    "sc:basic-features"
+                ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
@@ -245,9 +279,38 @@
             }
         },
         {
+            "step": "scCall",
+            "id": "is-empty-at-address-after-clear",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:extra-instance",
+                "function": "is_empty_at_address_single_value_mapper",
+                "arguments": [
+                    "sc:basic-features"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "true"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
             "step": "checkState",
             "accounts": {
                 "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "sc:extra-instance": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
@@ -294,6 +357,12 @@
                     },
                     "code": "file:../output/basic-features.wasm"
                 },
+                "sc:extra-instance": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "file:../output/basic-features.wasm"
+                },
                 "address:an_account": {
                     "nonce": "*",
                     "balance": "*",
@@ -333,6 +402,12 @@
                     "storage": {
                         "str:my_single_value_mapper": "42"
                     },
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "sc:extra-instance": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
                     "code": "file:../output/basic-features.wasm"
                 },
                 "address:an_account": {
