@@ -11,7 +11,7 @@ use multisig::{
     user_role::UserRole, Multisig,
 };
 
-const MULTISIG_WASM_PATH: &'static str = "multisig/output/multisig.wasm";
+const MULTISIG_WASM_PATH: &str = "multisig/output/multisig.wasm";
 const QUORUM_SIZE: usize = 1;
 pub const EGLD_TOKEN_ID: &[u8] = b"EGLD";
 
@@ -81,7 +81,7 @@ where
                 board_members.push(managed_address!(&board_member_address));
 
                 sc.init(QUORUM_SIZE, board_members.into());
-                sc.change_user_role(managed_address!(&proposer_address), UserRole::Proposer);
+                sc.change_user_role(0, managed_address!(&proposer_address), UserRole::Proposer);
             })
             .assert_ok();
 
@@ -262,7 +262,7 @@ where
             &self.ms_wrapper,
             &rust_biguint!(0),
             |sc| {
-                let _ = sc.discard_action(action_id);
+                sc.discard_action(action_id);
             },
         )
     }

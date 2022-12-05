@@ -13,8 +13,12 @@ elrond_wasm_node::wasm_endpoints! {
         add_assign_big_uint
         add_assign_big_uint_ref
         add_big_int
+        add_big_int_big_uint
+        add_big_int_big_uint_ref
         add_big_int_ref
         add_big_uint
+        add_big_uint_big_int
+        add_big_uint_big_int_ref
         add_big_uint_ref
         add_to_whitelist
         big_int_from_biguint
@@ -23,12 +27,15 @@ elrond_wasm_node::wasm_endpoints! {
         big_int_to_i64
         big_int_to_parts
         big_int_zero
+        big_uint_eq_u64
         big_uint_from_managed_buffer
         big_uint_from_managed_buffer_ref
         big_uint_from_u64_1
         big_uint_from_u64_2
         big_uint_to_u64
         big_uint_zero
+        bigint_overwrite_i64
+        biguint_overwrite_u64
         bit_and_assign_big_uint
         bit_and_assign_big_uint_ref
         bit_and_big_uint
@@ -182,8 +189,10 @@ elrond_wasm_node::wasm_endpoints! {
         maddress_from_managed_buffer
         managed_address_eq
         managed_address_zero
+        managed_ref_explicit
         managed_struct_eq
         managed_vec_address_push
+        managed_vec_array_push
         managed_vec_biguint_eq
         managed_vec_biguint_push
         managed_vec_contains
@@ -284,6 +293,9 @@ elrond_wasm_node::wasm_endpoints! {
         shr_big_uint_ref
         sqrt_big_uint
         sqrt_big_uint_ref
+        storage_read_from_address
+        storage_read_raw
+        storage_write_raw
         store_addr
         store_big_int
         store_big_uint

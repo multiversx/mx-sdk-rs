@@ -3,7 +3,7 @@
     "steps": [
         {
             "step": "scCall",
-            "txId": "createBuyOrder",
+            "id": "createBuyOrder",
             "tx": {
                 "from": "address:user1",
                 "to": "sc:pair",

@@ -4,7 +4,7 @@ use crate::{
     DebugApi,
 };
 use alloc::vec::Vec;
-use elrond_wasm::api::{EndpointArgumentApi, EndpointArgumentApiImpl, Handle, ManagedBufferApi};
+use elrond_wasm::api::{EndpointArgumentApi, EndpointArgumentApiImpl, ManagedBufferApi};
 use num_traits::cast::ToPrimitive;
 
 impl EndpointArgumentApi for DebugApi {
@@ -38,7 +38,7 @@ impl EndpointArgumentApiImpl for DebugApi {
         arg.len()
     }
 
-    fn load_argument_managed_buffer(&self, arg_index: i32, dest: Handle) {
+    fn load_argument_managed_buffer(&self, arg_index: i32, dest: Self::ManagedBufferHandle) {
         let arg_bytes = self.get_argument_vec_u8(arg_index);
         self.mb_overwrite(dest, arg_bytes.as_slice());
     }
@@ -71,7 +71,7 @@ impl EndpointArgumentApiImpl for DebugApi {
         }
     }
 
-    fn load_callback_closure_buffer(&self, _dest: Handle) {
+    fn load_callback_closure_buffer(&self, _dest: Self::ManagedBufferHandle) {
         panic!("load_callback_closure_buffer TODO");
     }
 }

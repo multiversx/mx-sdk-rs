@@ -1,5 +1,5 @@
 use crate::{
-    api::{Handle, ManagedTypeApi, SendApi, SendApiImpl},
+    api::{ManagedTypeApi, SendApi, SendApiImpl},
     types::{
         heap::{Address, ArgBuffer, BoxedBytes},
         BigUint, CodeMetadata, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer,
@@ -141,15 +141,15 @@ impl SendApiImpl for UncallableApi {
 
     fn create_async_call_raw(
         &self,
-        _to: Handle,
-        _amount: Handle,
-        _endpoint_name: Handle,
-        _arg_buffer: Handle,
+        _to: Self::ManagedBufferHandle,
+        _amount: Self::BigIntHandle,
+        _endpoint_name: Self::ManagedBufferHandle,
+        _arg_buffer: Self::ManagedBufferHandle,
         _success_callback: &'static [u8],
         _error_callback: &'static [u8],
         _gas: u64,
         _extra_gas_for_callback: u64,
-        _callback_closure: Handle,
+        _callback_closure: Self::ManagedBufferHandle,
     ) {
         unreachable!()
     }

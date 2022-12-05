@@ -16,7 +16,7 @@
         },
         {
             "step": "scCall",
-            "txId": "upgrade-vault-to-forwarder",
+            "id": "upgrade-vault-to-forwarder",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
@@ -43,7 +43,7 @@
         },
         {
             "step": "scCall",
-            "txId": "upgrade-back-to-vault",
+            "id": "upgrade-back-to-vault",
             "comment": "init results cannot be retrieved directly, since it is an async call, but we can experiment with callbacks in the future",
             "tx": {
                 "from": "address:a_user",

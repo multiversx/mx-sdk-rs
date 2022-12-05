@@ -5,7 +5,7 @@ use elrond_wasm_debug::{check_managed_top_encode_decode, DebugApi};
 fn test_big_uint_serialization() {
     let api = DebugApi::dummy();
 
-    check_managed_top_encode_decode(api.clone(), BigUint::<DebugApi>::from(5u32), &[5u8]);
+    check_managed_top_encode_decode(api, BigUint::<DebugApi>::from(5u32), &[5u8]);
 }
 
 #[test]
@@ -24,7 +24,7 @@ fn test_big_int_serialization() {
     let api = DebugApi::dummy();
 
     check_managed_top_encode_decode(api.clone(), BigInt::<DebugApi>::from(5), &[5u8]);
-    check_managed_top_encode_decode(api.clone(), BigInt::<DebugApi>::from(-5), &[251u8]);
+    check_managed_top_encode_decode(api, BigInt::<DebugApi>::from(-5), &[251u8]);
 }
 
 #[test]
@@ -40,7 +40,7 @@ fn test_man_buf_serialization() {
     let api = DebugApi::dummy();
 
     check_managed_top_encode_decode(
-        api.clone(),
+        api,
         ManagedBuffer::<DebugApi>::new_from_bytes(&b"abc"[..]),
         &b"abc"[..],
     );

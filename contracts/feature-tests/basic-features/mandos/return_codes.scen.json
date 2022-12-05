@@ -17,7 +17,7 @@
         },
         {
             "step": "scCall",
-            "txId": "call-a-function-which-does-not-exist",
+            "id": "call-a-function-which-does-not-exist",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",

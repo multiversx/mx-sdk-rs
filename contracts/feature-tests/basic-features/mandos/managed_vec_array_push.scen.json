@@ -1,0 +1,52 @@
+{
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "1",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "managed_vec_array_push",
+                "arguments": [
+                    "",
+                    "str:12345"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "str:12345"
+                ]
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "1",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "managed_vec_array_push",
+                "arguments": [
+                    "str:12345",
+                    "str:67890"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "str:1234567890"
+                ]
+            }
+        }
+    ]
+}

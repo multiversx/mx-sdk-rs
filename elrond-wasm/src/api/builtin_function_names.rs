@@ -9,5 +9,6 @@ pub const ESDT_NFT_UPDATE_ATTRIBUTES_FUNC_NAME: &[u8] = b"ESDTNFTUpdateAttribute
 pub const ESDT_NFT_BURN_FUNC_NAME: &[u8] = b"ESDTNFTBurn";
 pub const ESDT_TRANSFER_FUNC_NAME: &[u8] = b"ESDTTransfer";
 pub const CHANGE_OWNER_BUILTIN_FUNC_NAME: &[u8] = b"ChangeOwnerAddress";
+pub const CLAIM_DEVELOPER_REWARDS_FUNC_NAME: &[u8] = b"ClaimDeveloperRewards";
 pub const SET_USERNAME_FUNC_NAME: &[u8] = b"SetUserName";
 pub const UPGRADE_CONTRACT_FUNC_NAME: &[u8] = b"upgradeContract";

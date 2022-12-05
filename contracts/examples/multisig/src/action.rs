@@ -5,7 +5,7 @@ use elrond_wasm::{
 
 elrond_wasm::derive_imports!();
 
-#[derive(NestedEncode, NestedDecode, TypeAbi)]
+#[derive(NestedEncode, NestedDecode, TypeAbi, Clone)]
 pub struct CallActionData<M: ManagedTypeApi> {
     pub to: ManagedAddress<M>,
     pub egld_amount: BigUint<M>,
@@ -13,7 +13,7 @@ pub struct CallActionData<M: ManagedTypeApi> {
     pub arguments: ManagedVec<M, ManagedBuffer<M>>,
 }
 
-#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi)]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi, Clone)]
 pub enum Action<M: ManagedTypeApi> {
     Nothing,
     AddBoardMember(ManagedAddress<M>),

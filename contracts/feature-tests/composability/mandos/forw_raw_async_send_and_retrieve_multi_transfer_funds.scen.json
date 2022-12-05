@@ -46,7 +46,7 @@
         },
         {
             "step": "scCall",
-            "txId": "multi-transfer-through-callback-burn-and-create",
+            "id": "multi-transfer-through-callback-burn-and-create",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
@@ -114,10 +114,10 @@
                         }
                     },
                     "storage": {
-                        "str:callback_data.item|u32:1": {
+                        "str:callback_args.item|u32:1": {
                             "1-return_code": "nested:0x00"
                         },
-                        "str:callback_data.len": "1",
+                        "str:callback_args.len": "1",
                         "str:callback_payments.item|u32:1": {
                             "1-token_id": "nested:str:TEST-SFTABC",
                             "2-nonce": "u64:3",

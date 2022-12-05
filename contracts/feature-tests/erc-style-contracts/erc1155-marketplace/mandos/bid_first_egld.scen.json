@@ -8,7 +8,7 @@
         },
         {
             "step": "scCall",
-            "txId": "bid-first",
+            "id": "bid-first",
             "tx": {
                 "from": "address:user1",
                 "to": "sc:marketplace_contract",

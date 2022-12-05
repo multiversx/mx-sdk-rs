@@ -13,6 +13,7 @@ elrond_wasm_node::wasm_endpoints! {
         burn_and_create_retrive_async
         call_counts
         echo_arguments
+        echo_arguments_without_storage
         echo_caller
         get_owner_address
         reject_funds

@@ -1,7 +1,7 @@
 use core::marker::PhantomData;
 
 use crate::{
-    api::{const_handles, BlockchainApiImpl, CallTypeApi, SendApiImpl},
+    api::{const_handles, use_raw_handle, BlockchainApiImpl, CallTypeApi, SendApiImpl},
     types::{
         BigUint, CodeMetadata, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer,
         ManagedType, ManagedVec, TokenIdentifier,
@@ -246,15 +246,15 @@ where
         serialized_callback_closure_args: &ManagedBuffer<A>,
     ) {
         A::send_api_impl().create_async_call_raw(
-            to.get_raw_handle(),
-            amount.get_raw_handle(),
-            endpoint_name.get_raw_handle(),
-            arg_buffer.get_raw_handle(),
+            to.get_handle(),
+            amount.get_handle(),
+            endpoint_name.get_handle(),
+            arg_buffer.get_handle(),
             success_callback,
             error_callback,
             gas,
             extra_gas_for_callback,
-            serialized_callback_closure_args.get_raw_handle(),
+            serialized_callback_closure_args.get_handle(),
         )
     }
 
@@ -528,12 +528,13 @@ where
         arg_buffer: &ManagedArgBuffer<A>,
     ) -> ManagedVec<A, ManagedBuffer<A>> {
         // account-level built-in function, so the destination address is the contract itself
-        let own_address_handle = const_handles::MBUF_TEMPORARY_1;
-        A::blockchain_api_impl().load_sc_address_managed(own_address_handle);
+        let own_address_handle: A::ManagedBufferHandle =
+            use_raw_handle(const_handles::MBUF_TEMPORARY_1);
+        A::blockchain_api_impl().load_sc_address_managed(own_address_handle.clone());
 
         let results = A::send_api_impl().execute_on_dest_context_raw(
             gas,
-            &ManagedAddress::from_raw_handle(own_address_handle),
+            &ManagedAddress::from_handle(own_address_handle),
             &BigUint::zero(),
             function_name,
             arg_buffer,

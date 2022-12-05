@@ -8,7 +8,7 @@
         },
         {
             "step": "scCall",
-            "txId": "buy-ticket-acc1",
+            "id": "buy-ticket-acc1",
             "tx": {
                 "from": "address:acc1",
                 "to": "sc:lottery",
@@ -30,7 +30,7 @@
         },
         {
             "step": "scCall",
-            "txId": "buy-ticket-acc2",
+            "id": "buy-ticket-acc2",
             "tx": {
                 "from": "address:acc2",
                 "to": "sc:lottery",
@@ -52,7 +52,7 @@
         },
         {
             "step": "scCall",
-            "txId": "buy-ticket-acc3",
+            "id": "buy-ticket-acc3",
             "tx": {
                 "from": "address:acc3",
                 "to": "sc:lottery",
@@ -74,7 +74,7 @@
         },
         {
             "step": "scCall",
-            "txId": "buy-ticket-acc4",
+            "id": "buy-ticket-acc4",
             "tx": {
                 "from": "address:acc4",
                 "to": "sc:lottery",
@@ -96,7 +96,7 @@
         },
         {
             "step": "scCall",
-            "txId": "buy-ticket-acc5",
+            "id": "buy-ticket-acc5",
             "tx": {
                 "from": "address:acc5",
                 "to": "sc:lottery",

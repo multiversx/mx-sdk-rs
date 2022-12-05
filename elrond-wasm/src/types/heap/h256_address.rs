@@ -8,6 +8,9 @@ use core::fmt::Debug;
 
 /// An Address is just a H256 with a different name.
 /// Has a different ABI name than H256.
+///
+/// Note: we are currently using ManagedAddress in contracts.
+/// While this also works, its use in contracts is discouraged.
 #[derive(Hash, PartialEq, Eq, Clone, Debug)]
 pub struct Address(H256);
 

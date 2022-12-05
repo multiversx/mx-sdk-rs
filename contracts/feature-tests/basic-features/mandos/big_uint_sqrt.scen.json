@@ -18,7 +18,7 @@
         },
         {
             "step": "scCall",
-            "txId": "sqrt",
+            "id": "sqrt",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",

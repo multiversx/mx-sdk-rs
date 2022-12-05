@@ -1,5 +1,6 @@
 pub(super) static ATTR_PAYABLE: &str = "payable";
 pub(super) static ATTR_ONLY_OWNER: &str = "only_owner";
+pub(super) static ATTR_ONLY_ADMIN: &str = "only_admin";
 pub(super) static ATTR_ONLY_USER_ACCOUNT: &str = "only_user_account";
 pub(super) static ATTR_OUTPUT_NAME: &str = "output_name";
 pub(super) static ATTR_PAYMENT: &str = "payment"; // synonymous with `payment_amount`
@@ -24,3 +25,4 @@ pub(super) static ATTR_STORAGE_MAPPER: &str = "storage_mapper";
 pub(super) static ATTR_STORAGE_IS_EMPTY: &str = "storage_is_empty";
 pub(super) static ATTR_STORAGE_CLEAR: &str = "storage_clear";
 pub(super) static ATTR_PROXY: &str = "proxy";
+pub(super) static ATTR_LABEL: &str = "label";

@@ -23,7 +23,7 @@
         },
         {
             "step": "scCall",
-            "txId": "1",
+            "id": "1",
             "tx": {
                 "from": "address:account_1",
                 "to": "sc:erc20",
@@ -57,7 +57,7 @@
         },
         {
             "step": "scCall",
-            "txId": "2",
+            "id": "2",
             "tx": {
                 "from": "address:account_1",
                 "to": "sc:erc20",
@@ -91,7 +91,7 @@
         },
         {
             "step": "scCall",
-            "txId": "3",
+            "id": "3",
             "tx": {
                 "from": "address:account_1",
                 "to": "sc:erc20",
@@ -125,7 +125,7 @@
         },
         {
             "step": "scCall",
-            "txId": "4",
+            "id": "4",
             "tx": {
                 "from": "address:account_1",
                 "to": "sc:erc20",

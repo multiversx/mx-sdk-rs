@@ -1,6 +1,6 @@
 use crate::{
     abi::{TypeAbi, TypeName},
-    api::{Handle, ManagedTypeApi, ManagedTypeApiImpl},
+    api::{HandleConstraints, ManagedTypeApi, ManagedTypeApiImpl},
     formatter::{FormatByteReceiver, SCDisplay, SCLowerHex},
     types::{ManagedBuffer, ManagedType},
 };
@@ -20,18 +20,20 @@ pub struct TokenIdentifier<M: ManagedTypeApi> {
 }
 
 impl<M: ManagedTypeApi> ManagedType<M> for TokenIdentifier<M> {
+    type OwnHandle = M::ManagedBufferHandle;
+
     #[inline]
-    fn from_raw_handle(handle: Handle) -> Self {
+    fn from_handle(handle: M::ManagedBufferHandle) -> Self {
         TokenIdentifier {
-            buffer: ManagedBuffer::from_raw_handle(handle),
+            buffer: ManagedBuffer::from_handle(handle),
         }
     }
 
-    fn get_raw_handle(&self) -> Handle {
-        self.buffer.get_raw_handle()
+    fn get_handle(&self) -> M::ManagedBufferHandle {
+        self.buffer.get_handle()
     }
 
-    fn transmute_from_handle_ref(handle_ref: &Handle) -> &Self {
+    fn transmute_from_handle_ref(handle_ref: &M::ManagedBufferHandle) -> &Self {
         unsafe { core::mem::transmute(handle_ref) }
     }
 }
@@ -60,7 +62,7 @@ impl<M: ManagedTypeApi> TokenIdentifier<M> {
     }
 
     pub fn is_valid_esdt_identifier(&self) -> bool {
-        M::managed_type_impl().validate_token_identifier(self.buffer.handle)
+        M::managed_type_impl().validate_token_identifier(self.buffer.handle.clone())
     }
 }
 
@@ -164,16 +166,16 @@ impl<M: ManagedTypeApi> TypeAbi for TokenIdentifier<M> {
 
 impl<M: ManagedTypeApi> SCDisplay for TokenIdentifier<M> {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
-        f.append_managed_buffer(&ManagedBuffer::from_raw_handle(
-            self.buffer.get_raw_handle(),
+        f.append_managed_buffer(&ManagedBuffer::from_handle(
+            self.buffer.get_handle().cast_or_signal_error::<M, _>(),
         ));
     }
 }
 
 impl<M: ManagedTypeApi> SCLowerHex for TokenIdentifier<M> {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
-        f.append_managed_buffer_lower_hex(&ManagedBuffer::from_raw_handle(
-            self.buffer.get_raw_handle(),
+        f.append_managed_buffer_lower_hex(&ManagedBuffer::from_handle(
+            self.buffer.get_handle().cast_or_signal_error::<M, _>(),
         ));
     }
 }

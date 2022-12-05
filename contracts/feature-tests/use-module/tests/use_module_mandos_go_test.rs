@@ -1,4 +1,9 @@
 #[test]
+fn use_module_claim_developer_rewards_go() {
+    elrond_wasm_debug::mandos_go("mandos/use_module_claim_developer_rewards.scen.json");
+}
+
+#[test]
 fn use_module_dns_register_go() {
     elrond_wasm_debug::mandos_go("mandos/use_module_dns_register.scen.json");
 }
@@ -19,6 +24,11 @@ fn use_module_only_owner_go() {
 }
 
 #[test]
+fn use_module_only_admin_go() {
+    elrond_wasm_debug::mandos_go("mandos/use_module_only_admin.scen.json");
+}
+
+#[test]
 fn use_module_no_endpoint_go() {
     elrond_wasm_debug::mandos_go("mandos/use_module_no_endpoint.scen.json");
 }
@@ -26,4 +36,9 @@ fn use_module_no_endpoint_go() {
 #[test]
 fn use_module_pause_go() {
     elrond_wasm_debug::mandos_go("mandos/use_module_pause.scen.json");
+}
+
+#[test]
+fn use_module_ongoing_operation_go() {
+    elrond_wasm_debug::mandos_go("mandos/use_module_ongoing_operation_example.scen.json");
 }

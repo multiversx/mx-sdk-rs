@@ -1,7 +1,7 @@
 use crate::{
     top_decode_from_nested_or_handle_err, DecodeError, DecodeErrorHandler, EncodeErrorHandler,
     NestedDecode, NestedDecodeInput, NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput,
-    TopEncode, TopEncodeOutput, TypeInfo,
+    TopEncode, TopEncodeOutput,
 };
 use alloc::boxed::Box;
 use arrayvec::ArrayVec;
@@ -63,18 +63,20 @@ impl<T: NestedDecode, const N: usize> TopDecode for [T; N] {
         I: TopDecodeInput,
         H: DecodeErrorHandler,
     {
-        if let TypeInfo::U8 = T::TYPE_INFO {
-            // transmute directly
-            let bs = input.into_boxed_slice_u8();
-            if bs.len() != N {
-                return Err(h.handle_error(DecodeError::ARRAY_DECODE_ERROR));
-            }
-            let raw = Box::into_raw(bs);
-            let array_box = unsafe { Box::<[T; N]>::from_raw(raw as *mut [T; N]) };
-            Ok(array_box)
-        } else {
-            Ok(Box::new(Self::top_decode_or_handle_err(input, h)?))
-        }
+        T::if_u8(
+            input,
+            |input| {
+                // transmute directly
+                let bs = input.into_boxed_slice_u8();
+                if bs.len() != N {
+                    return Err(h.handle_error(DecodeError::ARRAY_DECODE_ERROR));
+                }
+                let raw = Box::into_raw(bs);
+                let array_box = unsafe { Box::<[T; N]>::from_raw(raw as *mut [T; N]) };
+                Ok(array_box)
+            },
+            |input| Ok(Box::new(Self::top_decode_or_handle_err(input, h)?)),
+        )
     }
 }
 
@@ -102,8 +104,8 @@ mod tests {
 
         // deserialize
         let deserialized = <[i32; 16384]>::top_decode(&serialized_bytes[..]).unwrap();
-        for i in 0..16384 {
-            assert_eq!(deserialized[i], 7i32);
+        for byte in deserialized {
+            assert_eq!(byte, 7i32);
         }
     }
 }

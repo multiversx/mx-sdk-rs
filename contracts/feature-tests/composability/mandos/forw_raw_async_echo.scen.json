@@ -22,7 +22,7 @@
         },
         {
             "step": "scCall",
-            "txId": "1",
+            "id": "1",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
@@ -83,8 +83,8 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "str:callback_data.len": "1",
-                        "str:callback_data.item|u32:1": [
+                        "str:callback_args.len": "1",
+                        "str:callback_args.item|u32:1": [
                             "nested:0x00",
                             "biguint:1",
                             "biguint:2"

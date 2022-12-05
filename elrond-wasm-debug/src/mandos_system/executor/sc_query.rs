@@ -1,5 +1,5 @@
 use crate::{
-    mandos_system::model::{ScQueryStep, Step, TxExpect},
+    mandos_system::model::{ScQueryStep, Step, TxExpect, TypedScQuery, TypedScQueryExecutor},
     num_bigint::BigUint,
     tx_execution::execute_sc_query,
     tx_mock::{generate_tx_hash_dummy, TxInput, TxResult},
@@ -28,19 +28,18 @@ impl BlockchainMock {
     /// It is the duty of the test developer to check that the result is actually correct after the call.
     pub fn mandos_sc_query_expect_result<OriginalResult, RequestedResult>(
         &mut self,
-        contract_call: ContractCall<DebugApi, OriginalResult>,
-        mut sc_query_step: ScQueryStep,
+        typed_sc_query: TypedScQuery<OriginalResult>,
     ) -> RequestedResult
     where
         OriginalResult: TopEncodeMulti,
         RequestedResult: CodecFrom<OriginalResult>,
     {
-        sc_query_step = sc_query_step.call(contract_call);
+        let mut sc_query_step: ScQueryStep = typed_sc_query.into();
         let tx_result = self.with_borrowed(|state| execute_and_check(state, &sc_query_step));
 
         let mut tx_expect = TxExpect::ok();
         for raw_result in &tx_result.result_values {
-            let result_hex_string = format!("0x{}", hex::encode(&raw_result));
+            let result_hex_string = format!("0x{}", hex::encode(raw_result));
             tx_expect = tx_expect.result(result_hex_string.as_str());
         }
         sc_query_step = sc_query_step.expect(tx_expect);
@@ -49,7 +48,22 @@ impl BlockchainMock {
         let mut raw_results = tx_result.result_values;
         RequestedResult::multi_decode_or_handle_err(&mut raw_results, PanicErrorHandler).unwrap()
     }
+}
 
+impl TypedScQueryExecutor for BlockchainMock {
+    fn execute_typed_sc_query<OriginalResult, RequestedResult>(
+        &mut self,
+        typed_sc_call: TypedScQuery<OriginalResult>,
+    ) -> RequestedResult
+    where
+        OriginalResult: TopEncodeMulti,
+        RequestedResult: CodecFrom<OriginalResult>,
+    {
+        self.mandos_sc_query_expect_result(typed_sc_call)
+    }
+}
+
+impl BlockchainMock {
     /// Performs a SC query to a contract, leaves no mandos trace behind.
     ///
     /// Meant to be used for the test to investigate the state of the contract.
@@ -88,7 +102,7 @@ pub(crate) fn execute(
             .collect(),
         gas_limit: u64::MAX,
         gas_price: 0u64,
-        tx_hash: generate_tx_hash_dummy(&sc_query_step.tx_id),
+        tx_hash: generate_tx_hash_dummy(&sc_query_step.id),
     };
 
     let (tx_result, state) = execute_sc_query(tx_input, state);
@@ -105,7 +119,7 @@ fn execute_and_check(
 ) -> (TxResult, BlockchainMock) {
     let (tx_result, state) = execute(state, sc_query_step);
     if let Some(tx_expect) = &sc_query_step.expect {
-        check_tx_output(&sc_query_step.tx_id, tx_expect, &tx_result);
+        check_tx_output(&sc_query_step.id, tx_expect, &tx_result);
     }
 
     (tx_result, state)

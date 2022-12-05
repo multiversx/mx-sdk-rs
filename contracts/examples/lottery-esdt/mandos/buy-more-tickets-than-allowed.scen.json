@@ -20,7 +20,7 @@
         },
         {
             "step": "scCall",
-            "txId": "buy-more-tickets-than-allowed",
+            "id": "buy-more-tickets-than-allowed",
             "tx": {
                 "from": "address:acc1",
                 "to": "sc:lottery",

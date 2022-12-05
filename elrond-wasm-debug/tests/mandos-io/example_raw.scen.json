@@ -113,7 +113,20 @@
                                     "uri": [
                                         "str:www.something.com/funny.jpeg"
                                     ],
-                                    "attributes": "str:other_attributes"
+                                    "attributes": {
+                                        "0-u8": "u8:2",
+                                        "1-u16": "u16:1",
+                                        "2-u32": "u32:42",
+                                        "3-u64": "u32:42",
+                                        "4-str": "nested:str:lorem iposum",
+                                        "5-struc": {
+                                            "50-u8": "u8:2",
+                                            "51-u16": "u16:1",
+                                            "52-u32": "u32:42",
+                                            "53-u64": "u32:42",
+                                            "54-str": "nested:str:lorem iposum"
+                                        }
+                                    }
                                 }
                             ]
                         }
@@ -141,7 +154,8 @@
                         }
                     },
                     "code": "file:smart-contract.wasm",
-                    "owner": "address:alice"
+                    "owner": "address:alice",
+                    "developerRewards": "100"
                 }
             },
             "newAddresses": [
@@ -174,7 +188,7 @@
         },
         {
             "step": "scCall",
-            "txId": "1",
+            "id": "1",
             "comment": "just an example",
             "tx": {
                 "from": "address:an_address",
@@ -231,7 +245,7 @@
         },
         {
             "step": "scCall",
-            "txId": "1b",
+            "id": "1b",
             "comment": "without expected result",
             "tx": {
                 "from": "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b000000000000000000000000",
@@ -251,7 +265,7 @@
         },
         {
             "step": "scCall",
-            "txId": "1b",
+            "id": "1b",
             "comment": "with minimal expected result",
             "tx": {
                 "from": "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b000000000000000000000000",
@@ -269,7 +283,7 @@
         },
         {
             "step": "scCall",
-            "txId": "1c",
+            "id": "1c",
             "comment": "without logs",
             "tx": {
                 "from": "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b000000000000000000000000",
@@ -286,7 +300,7 @@
         },
         {
             "step": "scDeploy",
-            "txId": "2",
+            "id": "2",
             "comment": "another",
             "tx": {
                 "from": "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b000000000000000000000000",
@@ -311,7 +325,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "1b",
+            "id": "1b",
             "comment": "a query, as would be performed off-chain",
             "tx": {
                 "to": "address:the_smart_contract",
@@ -325,7 +339,7 @@
         },
         {
             "step": "transfer",
-            "txId": "3",
+            "id": "3",
             "comment": "simple transfer, no VM",
             "tx": {
                 "from": "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b000000000000000000000000",
@@ -341,7 +355,7 @@
         },
         {
             "step": "validatorReward",
-            "txId": "4",
+            "id": "4",
             "comment": "system send out validator rewards",
             "tx": {
                 "to": "sc:delegation",
@@ -350,7 +364,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "5",
+            "id": "5",
             "displayLogs": true,
             "tx": {
                 "to": "address:this_is_just_a_display_logs_test",
@@ -475,7 +489,7 @@
         },
         {
             "step": "transfer",
-            "txId": "multi-transfer",
+            "id": "multi-transfer",
             "comment": "test ESDT multi-transfer",
             "tx": {
                 "from": "address:A",

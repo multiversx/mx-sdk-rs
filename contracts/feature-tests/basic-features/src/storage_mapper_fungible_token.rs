@@ -49,7 +49,7 @@ pub trait FungibleTokenMapperFeatures:
     ) {
         match result {
             ManagedAsyncCallResult::Ok(token_id) => {
-                self.fungible_token_mapper().set_token_id(&token_id);
+                self.fungible_token_mapper().set_token_id(token_id);
             },
             ManagedAsyncCallResult::Err(_) => {},
         }
@@ -60,7 +60,7 @@ pub trait FungibleTokenMapperFeatures:
         match result {
             ManagedAsyncCallResult::Ok(()) => {
                 let token_identifier = self.call_value().single_esdt().token_identifier;
-                self.fungible_token_mapper().set_token_id(&token_identifier);
+                self.fungible_token_mapper().set_token_id(token_identifier);
             },
             ManagedAsyncCallResult::Err(_) => {},
         }
@@ -91,7 +91,7 @@ pub trait FungibleTokenMapperFeatures:
     fn set_roles_callback(&self, #[call_result] result: ManagedAsyncCallResult<()>) {
         match result {
             ManagedAsyncCallResult::Ok(()) => {
-                self.roles_set().set(&true);
+                self.roles_set().set(true);
             },
             ManagedAsyncCallResult::Err(_) => {},
         }

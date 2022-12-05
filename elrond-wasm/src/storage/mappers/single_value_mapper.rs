@@ -8,8 +8,9 @@ use crate::{
     types::ManagedType,
 };
 use elrond_codec::{
-    CodecFrom, DecodeErrorHandler, EncodeErrorHandler, TopDecode, TopDecodeInput, TopEncode,
-    TopEncodeMulti, TopEncodeMultiOutput, TopEncodeOutput,
+    multi_types::PlaceholderOutput, CodecFrom, CodecFromSelf, DecodeErrorHandler,
+    EncodeErrorHandler, TopDecode, TopDecodeInput, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
+    TopEncodeOutput,
 };
 
 /// Manages a single serializable item in storage.
@@ -93,6 +94,23 @@ where
     pub fn raw_byte_length(&self) -> usize {
         storage_get_len(self.key.as_ref())
     }
+
+    /// Takes the value out of the storage, clearing it in the process.
+    pub fn take(&self) -> T {
+        let value = self.get();
+        self.clear();
+        value
+    }
+
+    // Replaces the actual value in the storage by the value given in parameter, returning the old value.
+    pub fn replace<BT>(&self, new_value: BT) -> T
+    where
+        BT: Borrow<T>,
+    {
+        let value = self.get();
+        self.set(new_value);
+        value
+    }
 }
 
 impl<SA, T> TopEncodeMulti for SingleValueMapper<SA, T>
@@ -147,11 +165,25 @@ impl<T: TopDecode> SingleValue<T> {
     }
 }
 
+impl<SA, T> !CodecFromSelf for SingleValueMapper<SA, T>
+where
+    SA: StorageMapperApi,
+    T: TopEncode + TopDecode,
+{
+}
+
 impl<SA, T, R> CodecFrom<SingleValueMapper<SA, T>> for SingleValue<R>
 where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode,
     R: TopDecode + CodecFrom<T>,
+{
+}
+
+impl<SA, T> CodecFrom<SingleValueMapper<SA, T>> for PlaceholderOutput
+where
+    SA: StorageMapperApi,
+    T: TopEncode + TopDecode,
 {
 }
 

@@ -1,0 +1,67 @@
+{
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "1",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "big_int_from_i64_1",
+                "arguments": [
+                    "42"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "42"
+                ]
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "2",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "big_int_from_i64_1",
+                "arguments": [
+                    "0x7FFFFFFFFFFFFFFF"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "0x7FFFFFFFFFFFFFFF"
+                ]
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "3",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "big_int_from_i64_1",
+                "arguments": [
+                    "0xFFFFFFFFFFFFFFFF"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "0xFF"
+                ]
+            }
+        }
+    ]
+}

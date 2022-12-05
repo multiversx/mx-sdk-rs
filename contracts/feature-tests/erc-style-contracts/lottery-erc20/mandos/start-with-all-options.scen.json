@@ -8,7 +8,7 @@
         },
         {
             "step": "scCall",
-            "txId": "start with all options",
+            "id": "start with all options",
             "tx": {
                 "from": "address:my_address",
                 "to": "sc:lottery",

@@ -29,7 +29,7 @@
         },
         {
             "step": "scCall",
-            "txId": "simple-transfer-to-account-10%-fees",
+            "id": "simple-transfer-to-account-10%-fees",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
@@ -95,7 +95,7 @@
         },
         {
             "step": "scCall",
-            "txId": "transfer-to-vault-via-transfer-exec-10%-fees",
+            "id": "transfer-to-vault-via-transfer-exec-10%-fees",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
@@ -166,7 +166,7 @@
         },
         {
             "step": "scCall",
-            "txId": "transfer-to-vault-sync-via-execute-on-dest-10%-fees",
+            "id": "transfer-to-vault-sync-via-execute-on-dest-10%-fees",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
@@ -237,7 +237,7 @@
         },
         {
             "step": "scCall",
-            "txId": "transfer-to-vault-async-10%-fees",
+            "id": "transfer-to-vault-async-10%-fees",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",

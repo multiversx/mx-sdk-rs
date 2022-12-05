@@ -1,4 +1,7 @@
-use crate::{action::Action, user_role::UserRole};
+use crate::{
+    action::{Action, ActionFullInfo},
+    user_role::UserRole,
+};
 
 elrond_wasm::imports!();
 
@@ -11,7 +14,9 @@ fn usize_add_isize(value: &mut usize, delta: isize) {
 
 /// Contains all events that can be emitted by the contract.
 #[elrond_wasm::module]
-pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
+pub trait MultisigPerformModule:
+    crate::multisig_state::MultisigStateModule + crate::multisig_events::MultisigEventsModule
+{
     fn gas_for_transfer_exec(&self) -> u64 {
         let gas_left = self.blockchain().get_gas_left();
         if gas_left <= PERFORM_ACTION_FINISH_GAS {
@@ -26,11 +31,23 @@ pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
     /// - reactivate removed user
     /// - convert between board member and proposer
     /// Will keep the board size and proposer count in sync.
-    fn change_user_role(&self, user_address: ManagedAddress, new_role: UserRole) {
-        let user_id = self.user_mapper().get_or_create_user(&user_address);
+    fn change_user_role(&self, action_id: usize, user_address: ManagedAddress, new_role: UserRole) {
+        let user_id = if new_role == UserRole::None {
+            // avoid creating a new user just to delete it
+            let user_id = self.user_mapper().get_user_id(&user_address);
+            if user_id == 0 {
+                return;
+            }
+            user_id
+        } else {
+            self.user_mapper().get_or_create_user(&user_address)
+        };
+
         let user_id_to_role_mapper = self.user_id_to_role(user_id);
         let old_role = user_id_to_role_mapper.get();
-        user_id_to_role_mapper.set(&new_role);
+        user_id_to_role_mapper.set(new_role);
+
+        self.perform_change_user_event(action_id, &user_address, old_role, new_role);
 
         // update board size
         let mut board_members_delta = 0isize;
@@ -90,6 +107,12 @@ pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
     fn perform_action(&self, action_id: usize) -> OptionalValue<ManagedAddress> {
         let action = self.action_mapper().get(action_id);
 
+        self.start_perform_action_event(&ActionFullInfo {
+            action_id,
+            action_data: action.clone(),
+            signers: self.get_action_signers(action_id),
+        });
+
         // clean up storage
         // happens before actual execution, because the match provides the return on each branch
         // syntax aside, the async_call_raw kills contract execution so cleanup cannot happen afterwards
@@ -98,11 +121,11 @@ pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
         match action {
             Action::Nothing => OptionalValue::None,
             Action::AddBoardMember(board_member_address) => {
-                self.change_user_role(board_member_address, UserRole::BoardMember);
+                self.change_user_role(action_id, board_member_address, UserRole::BoardMember);
                 OptionalValue::None
             },
             Action::AddProposer(proposer_address) => {
-                self.change_user_role(proposer_address, UserRole::Proposer);
+                self.change_user_role(action_id, proposer_address, UserRole::Proposer);
 
                 // validation required for the scenario when a board member becomes a proposer
                 require!(
@@ -112,7 +135,7 @@ pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
                 OptionalValue::None
             },
             Action::RemoveUser(user_address) => {
-                self.change_user_role(user_address, UserRole::None);
+                self.change_user_role(action_id, user_address, UserRole::None);
                 let num_board_members = self.num_board_members().get();
                 let num_proposers = self.num_proposers().get();
                 require!(
@@ -131,13 +154,23 @@ pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
                     "quorum cannot exceed board size"
                 );
                 self.quorum().set(new_quorum);
+                self.perform_change_quorum_event(action_id, new_quorum);
                 OptionalValue::None
             },
             Action::SendTransferExecute(call_data) => {
+                let gas = self.gas_for_transfer_exec();
+                self.perform_transfer_execute_event(
+                    action_id,
+                    &call_data.to,
+                    &call_data.egld_amount,
+                    gas,
+                    &call_data.endpoint_name,
+                    call_data.arguments.as_multi(),
+                );
                 let result = self.send_raw().direct_egld_execute(
                     &call_data.to,
                     &call_data.egld_amount,
-                    self.gas_for_transfer_exec(),
+                    gas,
                     &call_data.endpoint_name,
                     &call_data.arguments.into(),
                 );
@@ -146,13 +179,23 @@ pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
                 }
                 OptionalValue::None
             },
-            Action::SendAsyncCall(call_data) => self
-                .send()
-                .contract_call::<()>(call_data.to, call_data.endpoint_name)
-                .with_egld_transfer(call_data.egld_amount)
-                .with_arguments_raw(call_data.arguments.into())
-                .async_call()
-                .call_and_exit(),
+            Action::SendAsyncCall(call_data) => {
+                let gas_left = self.blockchain().get_gas_left();
+                self.perform_async_call_event(
+                    action_id,
+                    &call_data.to,
+                    &call_data.egld_amount,
+                    gas_left,
+                    &call_data.endpoint_name,
+                    call_data.arguments.as_multi(),
+                );
+                self.send()
+                    .contract_call::<()>(call_data.to, call_data.endpoint_name)
+                    .with_egld_transfer(call_data.egld_amount)
+                    .with_arguments_raw(call_data.arguments.into())
+                    .async_call()
+                    .call_and_exit()
+            },
             Action::SCDeployFromSource {
                 amount,
                 source,
@@ -160,6 +203,14 @@ pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
                 arguments,
             } => {
                 let gas_left = self.blockchain().get_gas_left();
+                self.perform_deploy_from_source_event(
+                    action_id,
+                    &amount,
+                    &source,
+                    code_metadata,
+                    gas_left,
+                    arguments.as_multi(),
+                );
                 let (new_address, _) = self.send_raw().deploy_from_source_contract(
                     gas_left,
                     &amount,
@@ -177,6 +228,15 @@ pub trait MultisigPerformModule: crate::multisig_state::MultisigStateModule {
                 arguments,
             } => {
                 let gas_left = self.blockchain().get_gas_left();
+                self.perform_upgrade_from_source_event(
+                    action_id,
+                    &sc_address,
+                    &amount,
+                    &source,
+                    code_metadata,
+                    gas_left,
+                    arguments.as_multi(),
+                );
                 self.send_raw().upgrade_from_source_contract(
                     &sc_address,
                     gas_left,

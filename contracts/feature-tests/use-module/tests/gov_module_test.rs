@@ -1,4 +1,4 @@
-use elrond_wasm::types::{Address, EsdtTokenPayment, ManagedVec, MultiValueEncoded};
+use elrond_wasm::types::{Address, ManagedVec, MultiValueEncoded};
 use elrond_wasm_debug::{
     managed_address, managed_biguint, managed_buffer, managed_token_id, rust_biguint,
     testing_framework::{BlockchainStateWrapper, ContractObjWrapper},
@@ -6,7 +6,8 @@ use elrond_wasm_debug::{
     DebugApi,
 };
 use elrond_wasm_modules::governance::{
-    governance_configurable::GovernanceConfigurablePropertiesModule, GovernanceModule,
+    governance_configurable::GovernanceConfigurablePropertiesModule, governance_proposal::VoteType,
+    GovernanceModule,
 };
 
 static GOV_TOKEN_ID: &[u8] = b"GOV-123456";
@@ -33,6 +34,7 @@ where
     pub owner: Address,
     pub first_user: Address,
     pub second_user: Address,
+    pub third_user: Address,
     pub gov_wrapper: ContractObjWrapper<use_module::ContractObj<DebugApi>, GovBuilder>,
     pub current_block: u64,
 }
@@ -55,6 +57,9 @@ where
 
         let second_user = b_mock.create_user_account(&rust_zero);
         b_mock.set_esdt_balance(&second_user, GOV_TOKEN_ID, &initial_gov);
+
+        let third_user = b_mock.create_user_account(&rust_zero);
+        b_mock.set_esdt_balance(&third_user, GOV_TOKEN_ID, &initial_gov);
 
         let gov_wrapper =
             b_mock.create_sc_account(&rust_zero, Some(&owner), gov_builder, "gov path");
@@ -79,6 +84,7 @@ where
             owner,
             first_user,
             second_user,
+            third_user,
             gov_wrapper,
             current_block: 10,
         }
@@ -89,7 +95,6 @@ where
         proposer: &Address,
         gov_token_amount: u64,
         dest_address: &Address,
-        payments: Vec<Payment>,
         endpoint_name: &[u8],
         args: Vec<Vec<u8>>,
     ) -> (TxResult, usize) {
@@ -101,15 +106,6 @@ where
             0,
             &rust_biguint!(gov_token_amount),
             |sc| {
-                let mut payments_managed = ManagedVec::new();
-                for p in payments {
-                    payments_managed.push(EsdtTokenPayment::new(
-                        managed_token_id!(p.token),
-                        p.nonce,
-                        managed_biguint!(p.amount),
-                    ));
-                }
-
                 let mut args_managed = ManagedVec::new();
                 for arg in args {
                     args_managed.push(managed_buffer!(&arg));
@@ -120,7 +116,6 @@ where
                     (
                         GAS_LIMIT,
                         managed_address!(dest_address),
-                        payments_managed,
                         managed_buffer!(endpoint_name),
                         args_managed,
                     )
@@ -142,12 +137,12 @@ where
             0,
             &rust_biguint!(gov_token_amount),
             |sc| {
-                sc.vote(proposal_id);
+                sc.vote(proposal_id, VoteType::UpVote);
             },
         )
     }
 
-    pub fn downvote(
+    pub fn down_vote(
         &mut self,
         voter: &Address,
         proposal_id: usize,
@@ -160,7 +155,43 @@ where
             0,
             &rust_biguint!(gov_token_amount),
             |sc| {
-                sc.downvote(proposal_id);
+                sc.vote(proposal_id, VoteType::DownVote);
+            },
+        )
+    }
+
+    pub fn down_veto_vote(
+        &mut self,
+        voter: &Address,
+        proposal_id: usize,
+        gov_token_amount: u64,
+    ) -> TxResult {
+        self.b_mock.execute_esdt_transfer(
+            voter,
+            &self.gov_wrapper,
+            GOV_TOKEN_ID,
+            0,
+            &rust_biguint!(gov_token_amount),
+            |sc| {
+                sc.vote(proposal_id, VoteType::DownVetoVote);
+            },
+        )
+    }
+
+    pub fn abstain_vote(
+        &mut self,
+        voter: &Address,
+        proposal_id: usize,
+        gov_token_amount: u64,
+    ) -> TxResult {
+        self.b_mock.execute_esdt_transfer(
+            voter,
+            &self.gov_wrapper,
+            GOV_TOKEN_ID,
+            0,
+            &rust_biguint!(gov_token_amount),
+            |sc| {
+                sc.vote(proposal_id, VoteType::AbstainVote);
             },
         )
     }
@@ -194,13 +225,6 @@ where
             })
     }
 
-    pub fn withdraw(&mut self, caller: &Address, proposal_id: usize) -> TxResult {
-        self.b_mock
-            .execute_tx(caller, &self.gov_wrapper, &rust_biguint!(0), |sc| {
-                sc.withdraw_governance_tokens(proposal_id);
-            })
-    }
-
     pub fn increment_block_nonce(&mut self, inc_amount: u64) {
         self.current_block += inc_amount;
         self.b_mock.set_block_nonce(self.current_block);
@@ -224,12 +248,13 @@ fn change_gov_config_test() {
     let owner_addr = gov_setup.owner.clone();
     let first_user_addr = gov_setup.first_user.clone();
     let second_user_addr = gov_setup.second_user.clone();
+    let third_user_addr = gov_setup.third_user.clone();
     let sc_addr = gov_setup.gov_wrapper.address_ref().clone();
+
     let (result, proposal_id) = gov_setup.propose(
         &first_user_addr,
         500,
         &sc_addr,
-        Vec::new(),
         b"changeQuorum",
         vec![1_000u64.to_be_bytes().to_vec()],
     );
@@ -272,7 +297,7 @@ fn change_gov_config_test() {
 
     // owner downvote
     gov_setup
-        .downvote(&owner_addr, proposal_id, 200)
+        .down_vote(&owner_addr, proposal_id, 200)
         .assert_ok();
 
     // try queue too many downvotes
@@ -285,6 +310,11 @@ fn change_gov_config_test() {
     gov_setup.set_block_nonce(20);
     gov_setup
         .vote(&first_user_addr, proposal_id, 200)
+        .assert_user_error("Already voted for this proposal");
+
+    // user 3 vote again
+    gov_setup
+        .vote(&third_user_addr, proposal_id, 200)
         .assert_ok();
 
     // queue ok
@@ -309,30 +339,139 @@ fn change_gov_config_test() {
         })
         .assert_ok();
 
-    // withdraw tokens
     gov_setup
-        .withdraw(&first_user_addr, proposal_id)
-        .assert_ok();
+        .b_mock
+        .check_esdt_balance(&first_user_addr, GOV_TOKEN_ID, &rust_biguint!(300));
     gov_setup
-        .withdraw(&second_user_addr, proposal_id)
-        .assert_ok();
-    gov_setup.withdraw(&owner_addr, proposal_id).assert_ok();
+        .b_mock
+        .check_esdt_balance(&second_user_addr, GOV_TOKEN_ID, &rust_biguint!(1));
+    gov_setup
+        .b_mock
+        .check_esdt_balance(&third_user_addr, GOV_TOKEN_ID, &rust_biguint!(800));
+    gov_setup
+        .b_mock
+        .check_esdt_balance(&owner_addr, GOV_TOKEN_ID, &rust_biguint!(800));
+}
 
-    gov_setup.b_mock.check_esdt_balance(
+#[test]
+fn down_veto_gov_config_test() {
+    let mut gov_setup = GovSetup::new(use_module::contract_obj);
+
+    let first_user_addr = gov_setup.first_user.clone();
+    let second_user_addr = gov_setup.second_user.clone();
+    let third_user_addr = gov_setup.third_user.clone();
+    let sc_addr = gov_setup.gov_wrapper.address_ref().clone();
+
+    let (result, proposal_id) = gov_setup.propose(
         &first_user_addr,
-        GOV_TOKEN_ID,
-        &rust_biguint!(INITIAL_GOV_TOKEN_BALANCE),
+        500,
+        &sc_addr,
+        b"changeQuorum",
+        vec![1_000u64.to_be_bytes().to_vec()],
     );
-    gov_setup.b_mock.check_esdt_balance(
-        &second_user_addr,
-        GOV_TOKEN_ID,
-        &rust_biguint!(INITIAL_GOV_TOKEN_BALANCE),
+    result.assert_ok();
+    assert_eq!(proposal_id, 1);
+
+    gov_setup.increment_block_nonce(VOTING_DELAY_BLOCKS);
+
+    gov_setup
+        .vote(&first_user_addr, proposal_id, 300)
+        .assert_ok();
+
+    gov_setup.increment_block_nonce(VOTING_PERIOD_BLOCKS);
+
+    // user 1 vote again
+    gov_setup.set_block_nonce(20);
+    gov_setup
+        .vote(&second_user_addr, proposal_id, 200)
+        .assert_ok();
+
+    // user 3 vote again
+    gov_setup
+        .down_veto_vote(&third_user_addr, proposal_id, 200)
+        .assert_ok();
+
+    // Vote didn't succeed;
+    gov_setup.set_block_nonce(45);
+    gov_setup
+        .queue(proposal_id)
+        .assert_user_error("Can only queue succeeded proposals");
+
+    gov_setup
+        .b_mock
+        .check_esdt_balance(&first_user_addr, GOV_TOKEN_ID, &rust_biguint!(200));
+    gov_setup
+        .b_mock
+        .check_esdt_balance(&second_user_addr, GOV_TOKEN_ID, &rust_biguint!(800));
+    gov_setup
+        .b_mock
+        .check_esdt_balance(&third_user_addr, GOV_TOKEN_ID, &rust_biguint!(800));
+}
+
+#[test]
+fn abstain_vote_gov_config_test() {
+    let mut gov_setup = GovSetup::new(use_module::contract_obj);
+
+    let first_user_addr = gov_setup.first_user.clone();
+    let second_user_addr = gov_setup.second_user.clone();
+    let third_user_addr = gov_setup.third_user.clone();
+    let sc_addr = gov_setup.gov_wrapper.address_ref().clone();
+
+    let (result, proposal_id) = gov_setup.propose(
+        &first_user_addr,
+        500,
+        &sc_addr,
+        b"changeQuorum",
+        vec![1_000u64.to_be_bytes().to_vec()],
     );
-    gov_setup.b_mock.check_esdt_balance(
-        &owner_addr,
-        GOV_TOKEN_ID,
-        &rust_biguint!(INITIAL_GOV_TOKEN_BALANCE),
-    );
+    result.assert_ok();
+    assert_eq!(proposal_id, 1);
+
+    gov_setup.increment_block_nonce(VOTING_DELAY_BLOCKS);
+
+    gov_setup
+        .vote(&first_user_addr, proposal_id, 500)
+        .assert_ok();
+
+    gov_setup.increment_block_nonce(VOTING_PERIOD_BLOCKS);
+
+    // user 1 vote again
+    gov_setup.set_block_nonce(20);
+    gov_setup
+        .down_vote(&second_user_addr, proposal_id, 400)
+        .assert_ok();
+
+    // user 3 vote again
+    gov_setup
+        .abstain_vote(&third_user_addr, proposal_id, 600)
+        .assert_ok();
+
+    // Vote didn't succeed;
+    gov_setup.set_block_nonce(45);
+    gov_setup.queue(proposal_id).assert_ok();
+
+    // execute ok
+    gov_setup.increment_block_nonce(LOCKING_PERIOD_BLOCKS);
+    gov_setup.execute(proposal_id).assert_ok();
+
+    // after execution, quorum changed from 1_500 to the proposed 1_000
+    gov_setup
+        .b_mock
+        .execute_query(&gov_setup.gov_wrapper, |sc| {
+            assert_eq!(sc.quorum().get(), managed_biguint!(1_000));
+            assert!(sc.proposals().item_is_empty(1));
+        })
+        .assert_ok();
+
+    gov_setup
+        .b_mock
+        .check_esdt_balance(&first_user_addr, GOV_TOKEN_ID, &rust_biguint!(0));
+    gov_setup
+        .b_mock
+        .check_esdt_balance(&second_user_addr, GOV_TOKEN_ID, &rust_biguint!(600));
+    gov_setup
+        .b_mock
+        .check_esdt_balance(&third_user_addr, GOV_TOKEN_ID, &rust_biguint!(400));
 }
 
 #[test]
@@ -346,7 +485,6 @@ fn gov_cancel_defeated_proposal_test() {
         &first_user_addr,
         500,
         &sc_addr,
-        Vec::new(),
         b"changeQuorum",
         vec![1_000u64.to_be_bytes().to_vec()],
     );
@@ -355,7 +493,7 @@ fn gov_cancel_defeated_proposal_test() {
 
     gov_setup.increment_block_nonce(VOTING_DELAY_BLOCKS);
     gov_setup
-        .downvote(&second_user_addr, proposal_id, 999)
+        .down_vote(&second_user_addr, proposal_id, 999)
         .assert_ok();
 
     // try cancel too early

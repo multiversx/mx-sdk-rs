@@ -17,7 +17,7 @@
         },
         {
             "step": "scCall",
-            "txId": "before",
+            "id": "before",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -36,7 +36,7 @@
         },
         {
             "step": "scCall",
-            "txId": "first-insert",
+            "id": "first-insert",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -59,7 +59,7 @@
         },
         {
             "step": "scCall",
-            "txId": "first-map-insert-value",
+            "id": "first-map-insert-value",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -111,7 +111,7 @@
         },
         {
             "step": "scCall",
-            "txId": "check-map-storage-after-first-insert",
+            "id": "check-map-storage-after-first-insert",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -134,7 +134,7 @@
         },
         {
             "step": "scCall",
-            "txId": "second-insert",
+            "id": "second-insert",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -157,7 +157,7 @@
         },
         {
             "step": "scCall",
-            "txId": "second-map-insert-value",
+            "id": "second-map-insert-value",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -182,7 +182,7 @@
         },
         {
             "step": "scCall",
-            "txId": "check-map-storage-after-second-insert",
+            "id": "check-map-storage-after-second-insert",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -243,7 +243,7 @@
         },
         {
             "step": "scCall",
-            "txId": "check-contains-after-second-insert",
+            "id": "check-contains-after-second-insert",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -266,7 +266,7 @@
         },
         {
             "step": "scCall",
-            "txId": "insert-first-value-into-first-storage",
+            "id": "insert-first-value-into-first-storage",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -330,7 +330,7 @@
         },
         {
             "step": "scCall",
-            "txId": "first-remove",
+            "id": "first-remove",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -380,7 +380,7 @@
         },
         {
             "step": "scCall",
-            "txId": "clear-map-storage",
+            "id": "clear-map-storage",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -416,7 +416,7 @@
         },
         {
             "step": "scCall",
-            "txId": "check-get-after-second-remove",
+            "id": "check-get-after-second-remove",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -455,7 +455,7 @@
         },
         {
             "step": "scCall",
-            "txId": "map storage mapper entry or default should create a map if it doesn't exist",
+            "id": "map storage mapper entry or default should create a map if it doesn't exist",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -480,7 +480,7 @@
         },
         {
             "step": "scCall",
-            "txId": "map storage mapper entry or default - calling it again should update the value from the existing map",
+            "id": "map storage mapper entry or default - calling it again should update the value from the existing map",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -532,7 +532,7 @@
         },
         {
             "step": "scCall",
-            "txId": "map storage mapper entry and modify should insert a new value if the entry already exists",
+            "id": "map storage mapper entry and modify should insert a new value if the entry already exists",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -558,7 +558,7 @@
         },
         {
             "step": "scCall",
-            "txId": "map storage mapper entry and modify should create a new default map, but should not insert anything, only return the default",
+            "id": "map storage mapper entry and modify should create a new default map, but should not insert anything, only return the default",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -618,7 +618,7 @@
         },
         {
             "step": "scCall",
-            "txId": "map storage mapper entry or default update - should create a new map and insert the value and return none if the map doesn't exist",
+            "id": "map storage mapper entry or default update - should create a new map and insert the value and return none if the map doesn't exist",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -643,7 +643,7 @@
         },
         {
             "step": "scCall",
-            "txId": "map storage mapper entry or default update - should re-use the existing map and insert the value and return none if the map exists but the value doesn't",
+            "id": "map storage mapper entry or default update - should re-use the existing map and insert the value and return none if the map exists but the value doesn't",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -668,7 +668,7 @@
         },
         {
             "step": "scCall",
-            "txId": "map storage mapper entry or default update - should replace the existing value and return it",
+            "id": "map storage mapper entry or default update - should replace the existing value and return it",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",

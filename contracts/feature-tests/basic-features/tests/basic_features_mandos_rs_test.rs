@@ -17,6 +17,11 @@ fn world() -> BlockchainMock {
 }
 
 #[test]
+fn big_int_from_i64_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/big_int_from_i64.scen.json", world());
+}
+
+#[test]
 fn big_int_to_i64_rs() {
     elrond_wasm_debug::mandos_rs("mandos/big_int_to_i64.scen.json", world());
 }
@@ -27,8 +32,18 @@ fn big_num_conversions_rs() {
 }
 
 #[test]
+fn big_uint_eq_u64_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/big_uint_eq_u64.scen.json", world());
+}
+
+#[test]
 fn big_uint_sqrt_rs() {
     elrond_wasm_debug::mandos_rs("mandos/big_uint_sqrt.scen.json", world());
+}
+
+#[test]
+fn big_uint_from_u64_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/big_uint_from_u64.scen.json", world());
 }
 
 #[test]
@@ -247,6 +262,11 @@ fn managed_vec_biguint_push_rs() {
 }
 
 #[test]
+fn managed_vec_array_push_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/managed_vec_array_push.scen.json", world());
+}
+
+#[test]
 fn only_owner_rs() {
     elrond_wasm_debug::mandos_rs("mandos/only_owner.scen.json", world());
 }
@@ -275,6 +295,11 @@ fn return_codes_rs() {
 #[test]
 fn sc_properties_rs() {
     elrond_wasm_debug::mandos_rs("mandos/sc_properties.scen.json", world());
+}
+
+#[test]
+fn storage_raw_api_features_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/storage_raw_api_features.scen.json", world());
 }
 
 #[test]

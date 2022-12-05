@@ -2,8 +2,8 @@ use core::marker::PhantomData;
 
 use crate::{
     api::{
-        const_handles, CallValueApi, CallValueApiImpl, ErrorApi, ErrorApiImpl, ManagedTypeApi,
-        StaticVarApiImpl,
+        const_handles, use_raw_handle, CallValueApi, CallValueApiImpl, ErrorApi, ErrorApiImpl,
+        ManagedTypeApi, StaticVarApiImpl,
     },
     err_msg,
     types::{
@@ -35,11 +35,11 @@ where
     pub fn egld_value(&self) -> BigUint<A> {
         let mut call_value_handle = A::static_var_api_impl().get_call_value_egld_handle();
         if call_value_handle == const_handles::UNINITIALIZED_HANDLE {
-            call_value_handle = const_handles::CALL_VALUE_EGLD;
-            A::static_var_api_impl().set_call_value_egld_handle(call_value_handle);
-            A::call_value_api_impl().load_egld_value(call_value_handle);
+            call_value_handle = use_raw_handle(const_handles::CALL_VALUE_EGLD);
+            A::static_var_api_impl().set_call_value_egld_handle(call_value_handle.clone());
+            A::call_value_api_impl().load_egld_value(call_value_handle.clone());
         }
-        BigUint::from_raw_handle(call_value_handle) // unsafe, TODO: replace with ManagedRef<...>
+        BigUint::from_handle(call_value_handle) // unsafe, TODO: replace with ManagedRef<...>
     }
 
     /// Returns all ESDT transfers that accompany this SC call.
@@ -48,11 +48,11 @@ where
     pub fn all_esdt_transfers(&self) -> ManagedVec<A, EsdtTokenPayment<A>> {
         let mut call_value_handle = A::static_var_api_impl().get_call_value_multi_esdt_handle();
         if call_value_handle == const_handles::UNINITIALIZED_HANDLE {
-            call_value_handle = const_handles::CALL_VALUE_MULTI_ESDT;
-            A::static_var_api_impl().set_call_value_multi_esdt_handle(call_value_handle);
-            A::call_value_api_impl().load_all_esdt_transfers(call_value_handle);
+            call_value_handle = use_raw_handle(const_handles::CALL_VALUE_MULTI_ESDT);
+            A::static_var_api_impl().set_call_value_multi_esdt_handle(call_value_handle.clone());
+            A::call_value_api_impl().load_all_esdt_transfers(call_value_handle.clone());
         }
-        ManagedVec::from_raw_handle(call_value_handle) // unsafe, TODO: replace with ManagedRef<...>
+        ManagedVec::from_handle(call_value_handle) // unsafe, TODO: replace with ManagedRef<...>
     }
 
     /// Verify and casts the received multi ESDT transfer in to an array.
@@ -94,8 +94,10 @@ where
     /// Retrieves the ESDT call value from the VM.
     /// Will return 0 in case of an EGLD transfer (cannot have both EGLD and ESDT transfer simultaneously).
     pub fn esdt_value(&self) -> BigUint<A> {
-        A::call_value_api_impl().load_single_esdt_value(const_handles::CALL_VALUE_SINGLE_ESDT);
-        BigUint::from_raw_handle(const_handles::CALL_VALUE_SINGLE_ESDT)
+        let call_value_single_esdt: A::BigIntHandle =
+            use_raw_handle(const_handles::CALL_VALUE_SINGLE_ESDT);
+        A::call_value_api_impl().load_single_esdt_value(call_value_single_esdt.clone());
+        BigUint::from_handle(call_value_single_esdt)
     }
 
     /// Accepts and returns either an EGLD payment, or a single ESDT token.

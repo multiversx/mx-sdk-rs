@@ -10,14 +10,15 @@ use super::{
     },
     extract_method_args, process_callback_attribute, process_callback_raw_attribute,
     process_endpoint_attribute, process_external_view_attribute, process_init_attribute,
-    process_only_owner_attribute, process_only_user_account_attribute,
-    process_output_names_attribute, process_payable_attribute, process_promises_callback_attribute,
-    process_view_attribute,
+    process_label_names_attribute, process_only_admin_attribute, process_only_owner_attribute,
+    process_only_user_account_attribute, process_output_names_attribute, process_payable_attribute,
+    process_promises_callback_attribute, process_view_attribute,
 };
 pub struct MethodAttributesPass1 {
     pub method_name: String,
     pub payable: MethodPayableMetadata,
     pub only_owner: bool,
+    pub only_admin: bool,
     pub only_user_account: bool,
 }
 
@@ -34,6 +35,7 @@ pub fn process_method(m: &syn::TraitItemMethod, trait_attributes: &TraitProperti
         method_name: m.sig.ident.to_string(),
         payable: MethodPayableMetadata::NotPayable,
         only_owner: trait_attributes.only_owner,
+        only_admin: trait_attributes.only_admin,
         only_user_account: trait_attributes.only_user_account,
     };
     let mut first_pass_unprocessed_attributes = Vec::new();
@@ -52,6 +54,7 @@ pub fn process_method(m: &syn::TraitItemMethod, trait_attributes: &TraitProperti
         unprocessed_attributes: Vec::new(),
         method_args,
         output_names: Vec::new(),
+        label_names: Vec::new(),
         return_type: m.sig.output.clone(),
         implementation,
     };
@@ -84,6 +87,7 @@ fn process_attribute_first_pass(
 ) -> bool {
     process_payable_attribute(attr, first_pass_data)
         || process_only_owner_attribute(attr, first_pass_data)
+        || process_only_admin_attribute(attr, first_pass_data)
         || process_only_user_account_attribute(attr, first_pass_data)
 }
 
@@ -121,4 +125,5 @@ fn process_attribute_second_pass(
         || process_storage_is_empty_attribute(attr, method)
         || process_storage_clear_attribute(attr, method)
         || process_output_names_attribute(attr, method)
+        || process_label_names_attribute(attr, method)
 }

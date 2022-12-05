@@ -42,7 +42,7 @@
         },
         {
             "step": "scCall",
-            "txId": "local_burn",
+            "id": "local_burn",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
@@ -75,7 +75,7 @@
         },
         {
             "step": "scCall",
-            "txId": "local_burn",
+            "id": "local_burn",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder2",

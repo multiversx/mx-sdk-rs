@@ -1,0 +1,103 @@
+{
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../output/big-float-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "100000000000"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "newBigFloatFromSci - 1",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "new_from_sci_big_float_wrapped",
+                "arguments": [
+                    "i64:17132472",
+                    "i64:-3",
+                    "i64:1000"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "17132472"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "newBigFloatFromSci - 2",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "new_from_sci_big_float_wrapped",
+                "arguments": [
+                    "i64:17132472",
+                    "i64:0",
+                    "i64:1"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "17132472"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "newBigFloatFromSci - 3",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "new_from_sci_big_float_wrapped",
+                "arguments": [
+                    "i64:17132472",
+                    "i64:-323",
+                    "i64:1"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "newBigFloatFromSci - 4",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "new_from_sci_big_float_wrapped",
+                "arguments": [
+                    "i64:17132472",
+                    "i64:1",
+                    "i64:1"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "10",
+                "message": "str:exponent must be negative"
+            }
+        }
+    ]
+}

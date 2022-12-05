@@ -44,5 +44,5 @@ pub fn write_log<A>(topics: &ManagedVec<A, ManagedBuffer<A>>, data: &ManagedBuff
 where
     A: LogApi + ManagedTypeApi,
 {
-    A::log_api_impl().managed_write_log(topics.get_raw_handle(), data.get_raw_handle());
+    A::log_api_impl().managed_write_log(topics.get_handle(), data.get_handle());
 }

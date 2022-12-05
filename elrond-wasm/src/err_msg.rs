@@ -33,10 +33,13 @@ pub const LOG_DATA_ENCODE_ERROR: &[u8] = b"log data encode error: ";
 pub const CONTRACT_CALL_ENCODE_ERROR: &[u8] = b"contract call encode error: ";
 
 pub const VALUE_EXCEEDS_SLICE: &[u8] = b"value exceeds target slice";
+pub const CAST_TO_I64_ERROR: &[u8] = b"cast to i64 error";
 pub const BIG_UINT_EXCEEDS_SLICE: &[u8] = b"big uint as_bytes exceed target slice";
 pub const BIG_UINT_SUB_NEGATIVE: &[u8] = b"cannot subtract because result would be negative";
+pub const DIVISION_BY_0: &str = "division by 0";
+pub const BAD_BOUNDS_LOWER: &str = "bad bounds (lower)";
 
-pub const EXPONENT_IS_POSITIVE: &[u8] = b"exponent must be negative";
+pub const EXPONENT_IS_POSITIVE: &str = "exponent must be negative";
 pub const NUMBER_IS_NOT_NORMAL: &[u8] =
     b"number is not normal. It is either infinite, NaN or subnormal";
 pub const CANNOT_COMPARE_VALUES: &[u8] = b"values are not comparable";

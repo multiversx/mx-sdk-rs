@@ -8,7 +8,7 @@
         },
         {
             "step": "scCall",
-            "txId": "create-second-non-fungible-token",
+            "id": "create-second-non-fungible-token",
             "tx": {
                 "from": "address:creator",
                 "to": "sc:erc1155",

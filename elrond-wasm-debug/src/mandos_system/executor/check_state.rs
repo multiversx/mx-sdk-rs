@@ -59,6 +59,17 @@ fn execute(state: &BlockchainMock, accounts: &CheckAccounts) {
                 expected_account.code,
                 std::str::from_utf8(actual_code.as_slice()).unwrap()
             );
+
+            assert!(
+                expected_account
+                    .developer_rewards
+                    .check(&account.developer_rewards),
+                "bad account developerRewards. Address: {}. Want: {}. Have: {}",
+                expected_address,
+                expected_account.developer_rewards,
+                account.developer_rewards
+            );
+
             if let CheckStorage::Equal(eq) = &expected_account.storage {
                 let default_value = &Vec::new();
                 for (expected_key, expected_value) in eq.storages.iter() {

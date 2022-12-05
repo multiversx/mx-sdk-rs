@@ -6,7 +6,7 @@ use crate::{
 };
 use elrond_wasm::{
     api::{
-        BlockchainApiImpl, Handle, ManagedTypeApi, SendApi, SendApiImpl,
+        BlockchainApiImpl, HandleConstraints, ManagedTypeApi, SendApi, SendApiImpl,
         ESDT_MULTI_TRANSFER_FUNC_NAME, ESDT_NFT_TRANSFER_FUNC_NAME, ESDT_TRANSFER_FUNC_NAME,
         UPGRADE_CONTRACT_FUNC_NAME,
     },
@@ -170,7 +170,8 @@ impl DebugApi {
         arg_buffer: &ManagedArgBuffer<M>,
     ) -> ! {
         let recipient = sc_address.to_address();
-        let call_value = self.big_uint_handle_to_value(amount.get_raw_handle());
+        let call_value =
+            self.big_uint_handle_to_value(amount.get_handle().cast_or_signal_error::<M, _>());
         let contract_address = self.input_ref().to.clone();
         let tx_hash = self.get_tx_hash_legacy();
 
@@ -215,7 +216,8 @@ impl SendApiImpl for DebugApi {
         endpoint_name: &ManagedBuffer<M>,
         arg_buffer: &ManagedArgBuffer<M>,
     ) -> Result<(), &'static [u8]> {
-        let egld_value = self.big_uint_handle_to_value(amount.get_raw_handle());
+        let egld_value =
+            self.big_uint_handle_to_value(amount.get_handle().cast_or_signal_error::<M, _>());
         let recipient = to.to_address();
 
         let _ = self.perform_transfer_execute(
@@ -341,7 +343,8 @@ impl SendApiImpl for DebugApi {
         endpoint_name: &ManagedBuffer<M>,
         arg_buffer: &ManagedArgBuffer<M>,
     ) -> ! {
-        let amount_value = self.big_uint_handle_to_value(amount.get_raw_handle());
+        let amount_value =
+            self.big_uint_handle_to_value(amount.get_handle().cast_or_signal_error::<M, _>());
         let contract_address = self.input_ref().to.clone();
         let recipient = to.to_address();
         let tx_hash = self.get_tx_hash_legacy();
@@ -358,20 +361,20 @@ impl SendApiImpl for DebugApi {
 
     fn create_async_call_raw(
         &self,
-        to: Handle,
-        amount: Handle,
-        endpoint_name_handle: Handle,
-        arg_buffer_handle: Handle,
+        to: Self::ManagedBufferHandle,
+        amount: Self::BigIntHandle,
+        endpoint_name_handle: Self::ManagedBufferHandle,
+        arg_buffer_handle: Self::ManagedBufferHandle,
         success_callback: &'static [u8],
         error_callback: &'static [u8],
         _gas: u64,
         _extra_gas_for_callback: u64,
-        callback_closure_handle: Handle,
+        callback_closure_handle: Self::ManagedBufferHandle,
     ) {
         let amount_value = self.big_uint_handle_to_value(amount);
-        let endpoint_name = self.mb_handle_to_value(endpoint_name_handle);
         let contract_address = self.input_ref().to.clone();
         let recipient = self.address_handle_to_value(to);
+        let endpoint_name = self.mb_handle_to_value(endpoint_name_handle);
         let tx_hash = self.get_tx_hash_legacy();
         let callback_closure_data = self.mb_handle_to_value(callback_closure_handle);
 
@@ -380,8 +383,10 @@ impl SendApiImpl for DebugApi {
             to: recipient,
             call_value: amount_value,
             endpoint_name,
-            arguments: ManagedArgBuffer::<Self>::from_raw_handle(arg_buffer_handle)
-                .to_raw_args_vec(),
+            arguments: ManagedArgBuffer::<Self>::from_raw_handle(
+                arg_buffer_handle.get_raw_handle_unchecked(),
+            )
+            .to_raw_args_vec(),
             tx_hash,
         };
 
@@ -404,7 +409,8 @@ impl SendApiImpl for DebugApi {
         _code_metadata: CodeMetadata,
         arg_buffer: &ManagedArgBuffer<M>,
     ) -> (ManagedAddress<M>, ManagedVec<M, ManagedBuffer<M>>) {
-        let egld_value = self.big_uint_handle_to_value(amount.get_raw_handle());
+        let egld_value =
+            self.big_uint_handle_to_value(amount.get_handle().cast_or_signal_error::<M, _>());
         let contract_code = code.to_boxed_bytes().into_vec();
         let (new_address, result) =
             self.perform_deploy(contract_code, egld_value, arg_buffer.to_raw_args_vec());
@@ -420,7 +426,8 @@ impl SendApiImpl for DebugApi {
         _code_metadata: CodeMetadata,
         arg_buffer: &ManagedArgBuffer<M>,
     ) -> (ManagedAddress<M>, ManagedVec<M, ManagedBuffer<M>>) {
-        let egld_value = self.big_uint_handle_to_value(amount.get_raw_handle());
+        let egld_value =
+            self.big_uint_handle_to_value(amount.get_handle().cast_or_signal_error::<M, _>());
         let source_contract_code = self.get_contract_code(&source_contract_address.to_address());
         let (new_address, result) = self.perform_deploy(
             source_contract_code,
@@ -465,7 +472,8 @@ impl SendApiImpl for DebugApi {
         endpoint_name: &ManagedBuffer<M>,
         arg_buffer: &ManagedArgBuffer<M>,
     ) -> ManagedVec<M, ManagedBuffer<M>> {
-        let egld_value = self.big_uint_handle_to_value(value.get_raw_handle());
+        let egld_value =
+            self.big_uint_handle_to_value(value.get_handle().cast_or_signal_error::<M, _>());
         let recipient = to.to_address();
 
         let result = self.perform_execute_on_dest_context(

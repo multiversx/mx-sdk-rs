@@ -25,7 +25,7 @@
         },
         {
             "step": "scCall",
-            "txId": "1",
+            "id": "1",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:forwarder",

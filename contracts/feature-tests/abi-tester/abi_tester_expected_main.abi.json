@@ -10,11 +10,11 @@
         "contractCrate": {
             "name": "abi-tester",
             "version": "0.0.0",
-            "git_version": "<git version here>"
+            "gitVersion": "<git version here>"
         },
         "framework": {
             "name": "elrond-wasm",
-            "version": "0.33.0"
+            "version": "0.36.1"
         }
     },
     "docs": [
@@ -389,6 +389,25 @@
             ],
             "inputs": [],
             "outputs": []
+        },
+        {
+            "name": "label_a",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [],
+            "labels": [
+                "label1"
+            ]
+        },
+        {
+            "name": "label_b",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [],
+            "labels": [
+                "label1",
+                "label2"
+            ]
         }
     ],
     "events": [

@@ -19,7 +19,6 @@ struct TopDecodeInput;
 struct TopEncodeOutput;
 struct NestedDecodeInput;
 struct NestedEncodeOutput;
-struct NestedEncodeNoErr;
 
 // Making sure derive explicitly only works with core::result::Result
 // and doesn't get tricked by other enums with the same name.

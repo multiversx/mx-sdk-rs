@@ -1,5 +1,3 @@
-#![feature(generic_associated_types)]
-
 use elrond_wasm::{
     derive::ManagedVecItem,
     elrond_codec,
@@ -18,6 +16,7 @@ enum SimpleEnum {
 }
 
 #[test]
+#[allow(clippy::assertions_on_constants)]
 fn enum_static() {
     assert_eq!(
         <SimpleEnum as elrond_wasm::types::ManagedVecItem>::PAYLOAD_SIZE,

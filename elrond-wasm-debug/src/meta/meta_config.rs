@@ -9,6 +9,7 @@ pub struct BuildArgs {
     pub wasm_name_suffix: Option<String>,
     pub wasm_opt: bool,
     pub target_dir: Option<String>,
+    pub abi_git_version: bool,
 }
 
 impl Default for BuildArgs {
@@ -19,6 +20,7 @@ impl Default for BuildArgs {
             wasm_name_suffix: None,
             wasm_opt: true,
             target_dir: None,
+            abi_git_version: true,
         }
     }
 }
@@ -76,6 +78,7 @@ impl ContractMetadata {
 pub struct MetaConfig {
     pub build_args: BuildArgs,
     pub output_dir: String,
+    pub snippets_dir: String,
     pub main_contract: Option<ContractMetadata>,
     pub view_contract: Option<ContractMetadata>,
 }
@@ -108,6 +111,9 @@ pub fn process_args(args: &[String]) -> BuildArgs {
                     .next()
                     .expect("argument `--target-dir` must be followed by argument");
                 result.target_dir = Some(arg.clone());
+            },
+            "--no-abi-git-version" => {
+                result.abi_git_version = false;
             },
             _ => {},
         }
@@ -149,6 +155,7 @@ impl MetaConfig {
         MetaConfig {
             build_args,
             output_dir: "../output".to_string(),
+            snippets_dir: "../interact-rs".to_string(),
             main_contract: Some(main_contract),
             view_contract: view_contract_opt,
         }

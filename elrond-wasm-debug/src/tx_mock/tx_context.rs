@@ -55,6 +55,7 @@ impl TxContext {
             username: Vec::new(),
             contract_path: None,
             contract_owner: None,
+            developer_rewards: BigUint::zero(),
         });
 
         let tx_input = TxInput {
@@ -166,6 +167,7 @@ impl TxContext {
             username: Vec::new(),
             contract_path: Some(contract_path),
             contract_owner: Some(contract_owner),
+            developer_rewards: BigUint::zero(),
         });
     }
 

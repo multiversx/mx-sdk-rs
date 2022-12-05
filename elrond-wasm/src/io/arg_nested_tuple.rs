@@ -1,9 +1,10 @@
 use super::{EndpointDynArgLoader, EndpointSingleArgLoader};
 use crate::{
     api::{
-        CallbackArgApiWrapper, EndpointArgumentApi, EndpointArgumentApiImpl, ErrorApi,
-        ErrorApiImpl, ManagedTypeApi, StaticVarApiImpl, VMApi,
+        EndpointArgumentApi, EndpointArgumentApiImpl, ErrorApi, ErrorApiImpl, ManagedTypeApi,
+        StaticVarApiImpl, VMApi,
     },
+    contract_base::CallbackArgApiWrapper,
     err_msg,
     io::{ArgErrorHandler, ArgId},
 };

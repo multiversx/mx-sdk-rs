@@ -11,16 +11,20 @@ elrond_wasm::imports!();
 ///
 #[elrond_wasm::module]
 pub trait PauseModule {
-    #[view(isPaused)]
-    #[storage_get("pause_module:paused")]
-    fn is_paused(&self) -> bool;
+    #[inline]
+    fn is_paused(&self) -> bool {
+        self.paused_status().get()
+    }
 
+    #[inline]
     fn not_paused(&self) -> bool {
         !self.is_paused()
     }
 
-    #[storage_set("pause_module:paused")]
-    fn set_paused(&self, paused: bool);
+    #[inline]
+    fn set_paused(&self, paused: bool) {
+        self.paused_status().set(paused);
+    }
 
     #[only_owner]
     #[endpoint(pause)]
@@ -35,4 +39,16 @@ pub trait PauseModule {
         self.set_paused(false);
         // TODO: event
     }
+
+    fn require_paused(&self) {
+        require!(self.is_paused(), "Contract is not paused");
+    }
+
+    fn require_not_paused(&self) {
+        require!(self.not_paused(), "Contract is paused");
+    }
+
+    #[view(isPaused)]
+    #[storage_mapper("pause_module:paused")]
+    fn paused_status(&self) -> SingleValueMapper<bool>;
 }

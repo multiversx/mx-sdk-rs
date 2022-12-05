@@ -1,6 +1,6 @@
 use crate::{api::unsafe_buffer, error_hook};
 use elrond_wasm::{
-    api::{Handle, InvalidSliceError, ManagedBufferApi},
+    api::{InvalidSliceError, ManagedBufferApi},
     err_msg,
     types::heap::BoxedBytes,
 };
@@ -42,21 +42,21 @@ extern "C" {
 
 impl ManagedBufferApi for crate::VmApiImpl {
     #[inline]
-    fn mb_new_empty(&self) -> Handle {
+    fn mb_new_empty(&self) -> Self::ManagedBufferHandle {
         unsafe { mBufferNew() }
     }
 
     #[inline]
-    fn mb_new_from_bytes(&self, bytes: &[u8]) -> Handle {
+    fn mb_new_from_bytes(&self, bytes: &[u8]) -> Self::ManagedBufferHandle {
         unsafe { mBufferNewFromBytes(bytes.as_ptr(), bytes.len() as i32) }
     }
 
     #[inline]
-    fn mb_len(&self, handle: Handle) -> usize {
-        unsafe { mBufferGetLength(handle as i32) as usize }
+    fn mb_len(&self, handle: Self::ManagedBufferHandle) -> usize {
+        unsafe { mBufferGetLength(handle) as usize }
     }
 
-    fn mb_to_boxed_bytes(&self, handle: Handle) -> BoxedBytes {
+    fn mb_to_boxed_bytes(&self, handle: Self::ManagedBufferHandle) -> BoxedBytes {
         unsafe {
             let len = mBufferGetLength(handle);
             let mut res = BoxedBytes::allocate(len as usize);
@@ -69,7 +69,7 @@ impl ManagedBufferApi for crate::VmApiImpl {
 
     fn mb_load_slice(
         &self,
-        source_handle: Handle,
+        source_handle: Self::ManagedBufferHandle,
         starting_position: usize,
         dest_slice: &mut [u8],
     ) -> Result<(), InvalidSliceError> {
@@ -91,10 +91,10 @@ impl ManagedBufferApi for crate::VmApiImpl {
     #[inline]
     fn mb_copy_slice(
         &self,
-        source_handle: Handle,
+        source_handle: Self::ManagedBufferHandle,
         starting_pos: usize,
         slice_len: usize,
-        dest_handle: Handle,
+        dest_handle: Self::ManagedBufferHandle,
     ) -> Result<(), InvalidSliceError> {
         unsafe {
             let err = mBufferCopyByteSlice(
@@ -111,7 +111,11 @@ impl ManagedBufferApi for crate::VmApiImpl {
         }
     }
 
-    fn mb_copy_to_slice_pad_right(&self, handle: Handle, destination: &mut [u8]) {
+    fn mb_copy_to_slice_pad_right(
+        &self,
+        handle: Self::ManagedBufferHandle,
+        destination: &mut [u8],
+    ) {
         unsafe {
             let byte_len = mBufferGetLength(handle) as usize;
             if byte_len > destination.len() {
@@ -125,16 +129,16 @@ impl ManagedBufferApi for crate::VmApiImpl {
     }
 
     #[inline]
-    fn mb_overwrite(&self, handle: Handle, bytes: &[u8]) {
+    fn mb_overwrite(&self, handle: Self::ManagedBufferHandle, bytes: &[u8]) {
         unsafe {
-            let _ = mBufferSetBytes(handle as i32, bytes.as_ptr(), bytes.len() as i32);
+            let _ = mBufferSetBytes(handle, bytes.as_ptr(), bytes.len() as i32);
         }
     }
 
     #[inline]
     fn mb_set_slice(
         &self,
-        dest_handle: Handle,
+        dest_handle: Self::ManagedBufferHandle,
         starting_position: usize,
         source_slice: &[u8],
     ) -> Result<(), InvalidSliceError> {
@@ -154,42 +158,50 @@ impl ManagedBufferApi for crate::VmApiImpl {
     }
 
     #[inline]
-    fn mb_set_random(&self, dest_handle: Handle, length: usize) {
+    fn mb_set_random(&self, dest_handle: Self::ManagedBufferHandle, length: usize) {
         unsafe {
-            let _ = mBufferSetRandom(dest_handle as i32, length as i32);
+            let _ = mBufferSetRandom(dest_handle, length as i32);
         }
     }
 
     #[inline]
-    fn mb_append(&self, accumulator_handle: Handle, data_handle: Handle) {
+    fn mb_append(
+        &self,
+        accumulator_handle: Self::ManagedBufferHandle,
+        data_handle: Self::ManagedBufferHandle,
+    ) {
         unsafe {
-            let _ = mBufferAppend(accumulator_handle as i32, data_handle as i32);
+            let _ = mBufferAppend(accumulator_handle, data_handle);
         }
     }
 
     #[inline]
-    fn mb_append_bytes(&self, accumulator_handle: Handle, bytes: &[u8]) {
+    fn mb_append_bytes(&self, accumulator_handle: Self::ManagedBufferHandle, bytes: &[u8]) {
         unsafe {
-            let _ = mBufferAppendBytes(
-                accumulator_handle as i32,
-                bytes.as_ptr(),
-                bytes.len() as i32,
-            );
+            let _ = mBufferAppendBytes(accumulator_handle, bytes.as_ptr(), bytes.len() as i32);
         }
     }
 
-    fn mb_eq(&self, handle1: Handle, handle2: Handle) -> bool {
+    fn mb_eq(
+        &self,
+        handle1: Self::ManagedBufferHandle,
+        handle2: Self::ManagedBufferHandle,
+    ) -> bool {
         unsafe { mBufferEq(handle1, handle2) > 0 }
     }
 
-    fn mb_to_hex(&self, source_handle: Handle, dest_handle: Handle) {
+    fn mb_to_hex(
+        &self,
+        source_handle: Self::ManagedBufferHandle,
+        dest_handle: Self::ManagedBufferHandle,
+    ) {
         unsafe {
             managedBufferToHex(source_handle, dest_handle);
         }
     }
 }
 
-pub(crate) unsafe fn unsafe_buffer_load_address(address_handle: Handle) -> *const u8 {
+pub(crate) unsafe fn unsafe_buffer_load_address(address_handle: i32) -> *const u8 {
     let unsafe_buffer_1_ptr = unsafe_buffer::buffer_1_ptr();
     let _ = mBufferGetBytes(address_handle, unsafe_buffer_1_ptr);
     unsafe_buffer_1_ptr
@@ -197,7 +209,7 @@ pub(crate) unsafe fn unsafe_buffer_load_address(address_handle: Handle) -> *cons
 
 /// We usually need it at the same time with the address,
 /// so we put in in buffer #2.
-pub(crate) unsafe fn unsafe_buffer_load_token_identifier(token_handle: Handle) -> *const u8 {
+pub(crate) unsafe fn unsafe_buffer_load_token_identifier(token_handle: i32) -> *const u8 {
     let unsafe_buffer_2_ptr = unsafe_buffer::buffer_2_ptr();
     let _ = mBufferGetBytes(token_handle, unsafe_buffer_2_ptr);
     unsafe_buffer_2_ptr

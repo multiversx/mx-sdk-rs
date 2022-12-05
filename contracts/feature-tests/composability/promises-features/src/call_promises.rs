@@ -40,11 +40,7 @@ pub trait CallPromisesModule {
         let gas_limit = self.blockchain().get_gas_left() - 20_000_000;
         self.vault_proxy()
             .contract(to)
-            .retrieve_funds(
-                token,
-                token_nonce,
-                amount,
-            )
+            .retrieve_funds(token, token_nonce, amount)
             .with_gas_limit(gas_limit)
             .async_call_promise()
             .with_callback(self.callbacks().retrieve_funds_callback())

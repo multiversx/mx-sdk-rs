@@ -10,7 +10,7 @@ use elrond_codec::{
 
 /// Argument or result that is made up of the argument count, followed by the arguments themselves.
 /// Think of it as a `VarArgs` preceded by the count.
-/// Unlike `ManagedMultiValue` it deserializes eagerly.
+/// Unlike `MultiValueManagedVec` it deserializes eagerly.
 #[derive(Clone, Default)]
 pub struct MultiValueManagedVecCounted<M, T>
 where

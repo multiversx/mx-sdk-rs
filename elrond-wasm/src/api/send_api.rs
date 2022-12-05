@@ -1,4 +1,4 @@
-use super::{BlockchainApi, Handle, ManagedTypeApi};
+use super::{BlockchainApi, HandleTypeInfo, ManagedTypeApi, ManagedTypeApiImpl};
 use crate::types::{
     heap::{Address, ArgBuffer, BoxedBytes},
     BigUint, CodeMetadata, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer,
@@ -6,13 +6,20 @@ use crate::types::{
 };
 
 pub trait SendApi: ManagedTypeApi + BlockchainApi {
-    type SendApiImpl: SendApiImpl;
+    // type SendApiImpl: SendApiImpl;
+    type SendApiImpl: SendApiImpl
+        + HandleTypeInfo<
+            ManagedBufferHandle = Self::ManagedBufferHandle,
+            BigIntHandle = Self::BigIntHandle,
+            BigFloatHandle = Self::BigFloatHandle,
+            EllipticCurveHandle = Self::EllipticCurveHandle,
+        >;
 
     fn send_api_impl() -> Self::SendApiImpl;
 }
 
 /// API that groups methods that either send EGLD or ESDT, or that call other contracts.
-pub trait SendApiImpl {
+pub trait SendApiImpl: ManagedTypeApiImpl {
     fn transfer_value_legacy<M>(&self, to: &Address, amount: &BigUint<M>, data: &BoxedBytes)
     where
         M: ManagedTypeApi;
@@ -125,15 +132,15 @@ pub trait SendApiImpl {
     #[allow(clippy::too_many_arguments)]
     fn create_async_call_raw(
         &self,
-        to: Handle,
-        amount: Handle,
-        endpoint_name: Handle,
-        arg_buffer: Handle,
+        to: Self::ManagedBufferHandle,
+        amount: Self::BigIntHandle,
+        endpoint_name: Self::ManagedBufferHandle,
+        arg_buffer: Self::ManagedBufferHandle,
         success: &'static [u8],
         error: &'static [u8],
         gas: u64,
         extra_gas_for_callback: u64,
-        callback_closure: Handle,
+        callback_closure: Self::ManagedBufferHandle,
     );
 
     /// Deploys a new contract in the same shard.

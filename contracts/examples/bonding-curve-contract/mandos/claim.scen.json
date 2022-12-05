@@ -25,6 +25,7 @@
         },
         {
             "step": "scCall",
+            "id": "claim_artist1",
             "tx": {
                 "from": "address:artist1",
                 "to": "sc:bonding-curve-contract",
@@ -42,6 +43,7 @@
         },
         {
             "step": "scCall",
+            "id": "claim_artist2",
             "tx": {
                 "from": "address:artist2",
                 "to": "sc:bonding-curve-contract",
@@ -69,9 +71,9 @@
                     "nonce": "4",
                     "balance": "0",
                     "esdt": {
-                        "str:EGLD-12345": "135",
-                        "str:MFFT-12345": "10",
-                        "str:MFSFT-24680": {
+                        "str:EGLD-135790": "135",
+                        "str:MFFT-123456": "10",
+                        "str:MFSFT-246802": {
                             "instances": [
                                 {
                                     "nonce": "17",
@@ -86,20 +88,24 @@
                     "nonce": "3",
                     "balance": "0",
                     "esdt": {
-                        "str:EGLD-12345": "19995",
-                        "str:MFNFT-67899": {
+                        "str:EGLD-135790": "19995",
+                        "str:MFNFT-567890": {
                             "instances": [
                                 {
-                                    "nonce": "3"
+                                    "nonce": "3",
+                                    "balance": "1"
                                 },
                                 {
-                                    "nonce": "4"
+                                    "nonce": "4",
+                                    "balance": "1"
                                 },
                                 {
-                                    "nonce": "5"
+                                    "nonce": "5",
+                                    "balance": "1"
                                 },
                                 {
-                                    "nonce": "6"
+                                    "nonce": "6",
+                                    "balance": "1"
                                 }
                             ]
                         }
@@ -110,8 +116,8 @@
                     "nonce": "12",
                     "balance": "0",
                     "esdt": {
-                        "str:EGLD-12345": "60",
-                        "str:MFNFT-67890": {
+                        "str:EGLD-135790": "60",
+                        "str:MFNFT-567890": {
                             "instances": [
                                 {
                                     "nonce": "1",
@@ -135,7 +141,7 @@
                                 }
                             ]
                         },
-                        "str:MFFT-12345": "990"
+                        "str:MFFT-123456": "990"
                     },
                     "storage": {}
                 },
@@ -143,8 +149,8 @@
                     "nonce": "6",
                     "balance": "0",
                     "esdt": {
-                        "str:EGLD-12345": "10",
-                        "str:MFSFT-24680": {
+                        "str:EGLD-135790": "10",
+                        "str:MFSFT-246802": {
                             "instances": [
                                 {
                                     "nonce": "1",

@@ -26,7 +26,7 @@
         },
         {
             "step": "scCall",
-            "txId": "local_mint",
+            "id": "local_mint",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
@@ -90,8 +90,8 @@
                         }
                     },
                     "storage": {
-                        "str:callback_data.len": "1",
-                        "str:callback_data.item|u32:01": "nested:0x00"
+                        "str:callback_args.len": "1",
+                        "str:callback_args.item|u32:01": "nested:0x00"
                     },
                     "code": "file:../forwarder-raw/output/forwarder-raw.wasm"
                 }

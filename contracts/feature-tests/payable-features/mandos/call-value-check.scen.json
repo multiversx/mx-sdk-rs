@@ -28,7 +28,7 @@
         },
         {
             "step": "scCall",
-            "txId": "call-value-egld",
+            "id": "call-value-egld",
             "tx": {
                 "from": "address:an-account",
                 "to": "sc:payable-features",
@@ -51,7 +51,7 @@
         },
         {
             "step": "scCall",
-            "txId": "call-value-single-esdt",
+            "id": "call-value-single-esdt",
             "tx": {
                 "from": "address:an-account",
                 "to": "sc:payable-features",
@@ -81,7 +81,7 @@
         },
         {
             "step": "scCall",
-            "txId": "call-value-multi-esdt",
+            "id": "call-value-multi-esdt",
             "tx": {
                 "from": "address:an-account",
                 "to": "sc:payable-features",

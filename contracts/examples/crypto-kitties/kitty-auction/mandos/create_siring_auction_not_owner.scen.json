@@ -14,7 +14,7 @@
         },
         {
             "step": "scCall",
-            "txId": "tx-create-siring-auction-not-owner",
+            "id": "tx-create-siring-auction-not-owner",
             "tx": {
                 "from": "address:bidder1",
                 "to": "sc:kitty_auction_contract",

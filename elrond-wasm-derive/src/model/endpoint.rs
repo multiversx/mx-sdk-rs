@@ -10,6 +10,7 @@ pub struct EndpointMetadata {
     pub public_name: syn::Ident,
     pub payable: MethodPayableMetadata,
     pub only_owner: bool,
+    pub only_admin: bool,
     pub only_user_account: bool,
     pub mutability: EndpointMutabilityMetadata,
     pub location: EndpointLocationMetadata,

@@ -1,0 +1,57 @@
+{
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../output/big-float-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "100000000000"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "newBigFloatFromManagedBuffer - 1",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "big_float_from_man_buf",
+                "arguments": [
+                    "0x010b0000003500000016eb34e40000000000"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "0x010b0000003500000016eb34e40000000000"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "newBigFloatFromManagedBufferRef - 1 - NegativeValue",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "big_float_from_man_buf_ref",
+                "arguments": [
+                    "0x010b0000003500000016eb34e40000000000"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "0x010b0000003500000016eb34e40000000000"
+                ]
+            }
+        }
+    ]
+}

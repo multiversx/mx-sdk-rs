@@ -22,6 +22,10 @@
         },
         {
             "step": "externalSteps",
+            "path": "steps/rem_unknown.steps.json"
+        },
+        {
+            "step": "externalSteps",
             "path": "steps/sign_unsign_bad_action.steps.json"
         }
     ]

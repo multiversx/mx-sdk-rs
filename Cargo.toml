@@ -5,10 +5,12 @@ members = [
   "elrond-wasm",
   "elrond-wasm-debug",
   "elrond-wasm-derive",
+  "elrond-wasm-node",
   "elrond-wasm-modules",
   "mandos",
   "elrond-codec",
   "elrond-codec-derive",
+  "elrond-interact-snippets",
 
   "contracts/benchmarks/mappers/benchmark-common",
   "contracts/benchmarks/mappers/linked-list-repeat",
@@ -28,6 +30,11 @@ members = [
   "contracts/benchmarks/send-tx-repeat",
   "contracts/benchmarks/send-tx-repeat/meta",
 
+  "contracts/core/price-aggregator",
+  "contracts/core/price-aggregator/meta",
+  "contracts/core/wegld-swap",
+  "contracts/core/wegld-swap/meta",
+
   "contracts/examples/adder",
   "contracts/examples/adder/meta",
   "contracts/examples/esdt-transfer-with-fee",
@@ -46,8 +53,6 @@ members = [
   "contracts/examples/crypto-kitties/kitty-auction/meta",
   "contracts/examples/digital-cash",
   "contracts/examples/digital-cash/meta",
-  "contracts/examples/egld-esdt-swap",
-  "contracts/examples/egld-esdt-swap/meta",
   "contracts/examples/empty",
   "contracts/examples/empty/meta",
   "contracts/examples/factorial",
@@ -56,6 +61,7 @@ members = [
   "contracts/examples/lottery-esdt/meta",
   "contracts/examples/multisig",
   "contracts/examples/multisig/meta",
+  "contracts/examples/multisig/interact-rs",
   "contracts/examples/nft-minter",
   "contracts/examples/nft-minter/meta",
   "contracts/examples/nft-storage-prepay",
@@ -68,11 +74,10 @@ members = [
   "contracts/examples/proxy-pause/meta",
   "contracts/examples/ping-pong-egld",
   "contracts/examples/ping-pong-egld/meta",
+  "contracts/examples/rewards-distribution",
+  "contracts/examples/rewards-distribution/meta",
   "contracts/examples/token-release",
   "contracts/examples/token-release/meta",
-
-  "contracts/experimental/multisig-external-view",
-  "contracts/experimental/multisig-external-view/meta",
 
   "contracts/feature-tests/abi-tester",
   "contracts/feature-tests/abi-tester/meta",
@@ -146,6 +151,5 @@ members = [
 ]
 
 exclude = [
-  "elrond-wasm-node",
   "elrond-wasm-output",
 ]

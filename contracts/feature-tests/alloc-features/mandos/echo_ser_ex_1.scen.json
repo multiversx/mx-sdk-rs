@@ -17,7 +17,7 @@
         },
         {
             "step": "scCall",
-            "txId": "1",
+            "id": "1",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:alloc-features",
@@ -66,7 +66,7 @@
         },
         {
             "step": "scCall",
-            "txId": "2",
+            "id": "2",
             "comment": "also checks that map keys are sorted, but it's the same as above",
             "tx": {
                 "from": "address:an_account",

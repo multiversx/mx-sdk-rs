@@ -32,7 +32,7 @@
         },
         {
             "step": "scCall",
-            "txId": "buy-ticket-2-same-account",
+            "id": "buy-ticket-2-same-account",
             "tx": {
                 "from": "address:acc1",
                 "to": "sc:lottery",

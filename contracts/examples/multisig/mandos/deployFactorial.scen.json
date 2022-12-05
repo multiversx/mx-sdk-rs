@@ -18,7 +18,7 @@
         },
         {
             "step": "scCall",
-            "txId": "proposeSCDeploy",
+            "id": "proposeSCDeploy",
             "tx": {
                 "from": "address:paul",
                 "to": "sc:multisig",
@@ -83,7 +83,7 @@
         },
         {
             "step": "scCall",
-            "txId": "sc-deploy-sign-alice",
+            "id": "sc-deploy-sign-alice",
             "tx": {
                 "from": "address:alice",
                 "to": "sc:multisig",
@@ -104,7 +104,7 @@
         },
         {
             "step": "scCall",
-            "txId": "sc-deploy-sign-bob",
+            "id": "sc-deploy-sign-bob",
             "tx": {
                 "from": "address:bob",
                 "to": "sc:multisig",
@@ -135,7 +135,7 @@
         },
         {
             "step": "scCall",
-            "txId": "sc-deploy-perform",
+            "id": "sc-deploy-perform",
             "tx": {
                 "from": "address:paul",
                 "to": "sc:multisig",

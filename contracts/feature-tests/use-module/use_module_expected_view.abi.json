@@ -10,11 +10,11 @@
         "contractCrate": {
             "name": "use-module",
             "version": "0.0.0",
-            "git_version": "<git version here>"
+            "gitVersion": "<git version here>"
         },
         "framework": {
             "name": "elrond-wasm",
-            "version": "0.33.0"
+            "version": "0.36.1"
         }
     },
     "docs": [
@@ -41,7 +41,191 @@
             "outputs": []
         }
     ],
-    "events": [],
+    "events": [
+        {
+            "identifier": "eventInModule",
+            "inputs": [
+                {
+                    "name": "arg",
+                    "type": "u32",
+                    "indexed": true
+                }
+            ]
+        },
+        {
+            "identifier": "proposalCreated",
+            "inputs": [
+                {
+                    "name": "proposal_id",
+                    "type": "u32",
+                    "indexed": true
+                },
+                {
+                    "name": "proposer",
+                    "type": "Address",
+                    "indexed": true
+                },
+                {
+                    "name": "start_block",
+                    "type": "u64",
+                    "indexed": true
+                },
+                {
+                    "name": "proposal",
+                    "type": "GovernanceProposal"
+                }
+            ]
+        },
+        {
+            "identifier": "upVoteCast",
+            "inputs": [
+                {
+                    "name": "up_voter",
+                    "type": "Address",
+                    "indexed": true
+                },
+                {
+                    "name": "proposal_id",
+                    "type": "u32",
+                    "indexed": true
+                },
+                {
+                    "name": "nr_votes",
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "identifier": "downVoteCast",
+            "inputs": [
+                {
+                    "name": "down_voter",
+                    "type": "Address",
+                    "indexed": true
+                },
+                {
+                    "name": "proposal_id",
+                    "type": "u32",
+                    "indexed": true
+                },
+                {
+                    "name": "nr_downvotes",
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "identifier": "downVetoVoteCast",
+            "inputs": [
+                {
+                    "name": "down_veto_voter",
+                    "type": "Address",
+                    "indexed": true
+                },
+                {
+                    "name": "proposal_id",
+                    "type": "u32",
+                    "indexed": true
+                },
+                {
+                    "name": "nr_downvotes",
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "identifier": "abstainVoteCast",
+            "inputs": [
+                {
+                    "name": "abstain_voter",
+                    "type": "Address",
+                    "indexed": true
+                },
+                {
+                    "name": "proposal_id",
+                    "type": "u32",
+                    "indexed": true
+                },
+                {
+                    "name": "nr_downvotes",
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "identifier": "proposalCanceled",
+            "inputs": [
+                {
+                    "name": "proposal_id",
+                    "type": "u32",
+                    "indexed": true
+                }
+            ]
+        },
+        {
+            "identifier": "proposalQueued",
+            "inputs": [
+                {
+                    "name": "proposal_id",
+                    "type": "u32",
+                    "indexed": true
+                },
+                {
+                    "name": "queued_block",
+                    "type": "u64",
+                    "indexed": true
+                }
+            ]
+        },
+        {
+            "identifier": "proposalExecuted",
+            "inputs": [
+                {
+                    "name": "proposal_id",
+                    "type": "u32",
+                    "indexed": true
+                }
+            ]
+        },
+        {
+            "identifier": "userDeposit",
+            "inputs": [
+                {
+                    "name": "address",
+                    "type": "Address",
+                    "indexed": true
+                },
+                {
+                    "name": "proposal_id",
+                    "type": "u32",
+                    "indexed": true
+                },
+                {
+                    "name": "payment",
+                    "type": "EsdtTokenPayment"
+                }
+            ]
+        },
+        {
+            "identifier": "userClaimDepositedTokens",
+            "inputs": [
+                {
+                    "name": "address",
+                    "type": "Address",
+                    "indexed": true
+                },
+                {
+                    "name": "proposal_id",
+                    "type": "u32",
+                    "indexed": true
+                },
+                {
+                    "name": "payment",
+                    "type": "EsdtTokenPayment"
+                }
+            ]
+        }
+    ],
     "hasCallback": false,
     "types": {
         "EsdtTokenPayment": {
@@ -86,6 +270,19 @@
                 }
             ]
         },
+        "FeeEntry": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "depositor_addr",
+                    "type": "Address"
+                },
+                {
+                    "name": "tokens",
+                    "type": "EsdtTokenPayment"
+                }
+            ]
+        },
         "GovernanceAction": {
             "type": "struct",
             "fields": [
@@ -98,16 +295,33 @@
                     "type": "Address"
                 },
                 {
-                    "name": "payments",
-                    "type": "List<EsdtTokenPayment>"
-                },
-                {
                     "name": "function_name",
                     "type": "bytes"
                 },
                 {
                     "name": "arguments",
                     "type": "List<bytes>"
+                }
+            ]
+        },
+        "GovernanceProposal": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "proposer",
+                    "type": "Address"
+                },
+                {
+                    "name": "actions",
+                    "type": "List<GovernanceAction>"
+                },
+                {
+                    "name": "description",
+                    "type": "bytes"
+                },
+                {
+                    "name": "fees",
+                    "type": "ProposalFees"
                 }
             ]
         },
@@ -137,6 +351,65 @@
                 {
                     "name": "Queued",
                     "discriminant": 5
+                },
+                {
+                    "name": "WaitingForFees",
+                    "discriminant": 6
+                }
+            ]
+        },
+        "ProposalFees": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "total_amount",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "entries",
+                    "type": "List<FeeEntry>"
+                }
+            ]
+        },
+        "ProposalVotes": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "up_votes",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "down_votes",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "down_veto_votes",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "abstain_votes",
+                    "type": "BigUint"
+                }
+            ]
+        },
+        "VoteType": {
+            "type": "enum",
+            "variants": [
+                {
+                    "name": "UpVote",
+                    "discriminant": 0
+                },
+                {
+                    "name": "DownVote",
+                    "discriminant": 1
+                },
+                {
+                    "name": "DownVetoVote",
+                    "discriminant": 2
+                },
+                {
+                    "name": "AbstainVote",
+                    "discriminant": 3
                 }
             ]
         }

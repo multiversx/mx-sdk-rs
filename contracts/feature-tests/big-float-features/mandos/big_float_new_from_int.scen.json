@@ -1,0 +1,304 @@
+{
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../output/big-float-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "100000000000"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "newBigFloatFromInt64 - 1",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "big_float_from_i64_wrapped",
+                "arguments": [
+                    "i64:0"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "newBigFloatFromInt64 - 2",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "big_float_from_i64_wrapped",
+                "arguments": [
+                    "i64:3853625"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "+3853625"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "newBigFloatFromInt64 - 3",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "big_float_from_i64_wrapped",
+                "arguments": [
+                    "i64:-3853625"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "-3853625"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "newBigFloatFromInt32 - 1",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "big_float_from_i32_wrapped",
+                "arguments": [
+                    "i64:0"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "newBigFloatFromInt32 - 2",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "big_float_from_i32_wrapped",
+                "arguments": [
+                    "i64:3853625"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "+3853625"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "newBigFloatFromInt32 - 3",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "big_float_from_i32_wrapped",
+                "arguments": [
+                    "i64:-3853625"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "-3853625"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "newBigFloatFromInt16 - 1",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "big_float_from_i16_wrapped",
+                "arguments": [
+                    "i64:0"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "newBigFloatFromInt16 - 2",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "big_float_from_i16_wrapped",
+                "arguments": [
+                    "i64:3853"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "+3853"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "newBigFloatFromInt16 - 3",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "big_float_from_i16_wrapped",
+                "arguments": [
+                    "i64:-3853"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "-3853"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "newBigFloatFromInt8 - 1",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "big_float_from_i8_wrapped",
+                "arguments": [
+                    "i64:0"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "newBigFloatFromInt8 - 2",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "big_float_from_i8_wrapped",
+                "arguments": [
+                    "i64:3"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "+3"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "newBigFloatFromInt8 - 3",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "big_float_from_i8_wrapped",
+                "arguments": [
+                    "i64:-3"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "-3"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "newBigFloatFromIntSize - 1",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "big_float_from_isize_wrapped",
+                "arguments": [
+                    "i64:0"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "newBigFloatFromIntSize - 2",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "big_float_from_isize_wrapped",
+                "arguments": [
+                    "i64:3853625"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "+3853625"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "newBigFloatFromIntSize - 3",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "big_float_from_isize_wrapped",
+                "arguments": [
+                    "i64:-3853625"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "-3853625"
+                ]
+            }
+        }
+    ]
+}

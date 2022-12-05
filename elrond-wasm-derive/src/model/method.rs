@@ -41,6 +41,7 @@ pub struct Method {
     pub unprocessed_attributes: Vec<syn::Attribute>,
     pub method_args: Vec<MethodArgument>,
     pub output_names: Vec<String>,
+    pub label_names: Vec<String>,
     pub return_type: syn::ReturnType,
     pub implementation: MethodImpl,
 }
