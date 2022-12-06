@@ -71,7 +71,8 @@ impl EndpointArgumentApiImpl for DebugApi {
         }
     }
 
-    fn load_callback_closure_buffer(&self, _dest: Self::ManagedBufferHandle) {
-        panic!("load_callback_closure_buffer TODO");
+    fn load_callback_closure_buffer(&self, dest: Self::ManagedBufferHandle) {
+        let closure_data = self.input_ref().promise_callback_closure_data.as_slice();
+        self.mb_overwrite(dest, closure_data);
     }
 }

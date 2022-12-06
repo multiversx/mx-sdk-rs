@@ -66,6 +66,7 @@ impl DebugApi {
             gas_limit: 1000,
             gas_price: 0,
             tx_hash,
+            promise_callback_closure_data: Vec::new(),
         }
     }
 
@@ -133,6 +134,7 @@ impl DebugApi {
             gas_limit: 1000,
             gas_price: 0,
             tx_hash,
+            promise_callback_closure_data: Vec::new(),
         };
 
         let tx_cache = TxCache::new(self.blockchain_cache_rc());
