@@ -17,5 +17,6 @@ elrond_wasm_node::wasm_endpoints! {
         forwardToOtherContractWithCallback
         messageOtherContract
         messageOtherContractWithCallback
+        callBack
     )
 }

@@ -11,7 +11,6 @@
 elrond_wasm_node::wasm_endpoints! {
     forwarder
     (
-        callBack
         send_egld
         echo_arguments_sync
         echo_arguments_sync_twice
@@ -78,5 +77,6 @@ elrond_wasm_node::wasm_endpoints! {
         unsetLocalRoles
         lastIssuedToken
         lastErrorMessage
+        callBack
     )
 }

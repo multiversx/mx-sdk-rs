@@ -11,7 +11,6 @@
 elrond_wasm_node::wasm_endpoints! {
     forwarder_raw
     (
-        callBack
         forward_payment
         forward_direct_esdt_via_transf_exec
         forward_direct_esdt_multi

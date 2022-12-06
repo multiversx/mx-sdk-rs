@@ -4,18 +4,23 @@
 ////////////////// AUTO-GENERATED //////////////////
 ////////////////////////////////////////////////////
 
-// Number of endpoints: 5
+// Number of endpoints: 7
+// Number of promise callbacks: 2
 
 #![no_std]
 
 elrond_wasm_node::wasm_endpoints! {
     promises_features
     (
+        forward_async_accept_funds
+        forward_async_retrieve_funds
+        callback_data
+        callback_data_at_index
+        clear_callback_data
         promise_single_token
         promise_multi_transfer
-        success_callback
-        error_callback
-        async_call_callback_data
+        retrieve_funds_callback
+        the_one_callback
     )
 }
 

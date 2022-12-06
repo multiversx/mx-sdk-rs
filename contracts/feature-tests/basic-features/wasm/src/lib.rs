@@ -4,14 +4,13 @@
 ////////////////// AUTO-GENERATED //////////////////
 ////////////////////////////////////////////////////
 
-// Number of endpoints: 333
+// Number of endpoints: 339
 
 #![no_std]
 
 elrond_wasm_node::wasm_endpoints! {
     basic_features
     (
-        callBack
         panicWithMessage
         count_ones
         endpoint_with_mutable_arg
@@ -297,12 +296,16 @@ elrond_wasm_node::wasm_endpoints! {
         my_single_value_mapper_subtract_with_require
         my_single_value_mapper_set_if_empty
         clear_single_value_mapper
+        get_from_address_single_value_mapper
         is_empty_single_value_mapper
+        is_empty_at_address_single_value_mapper
         raw_byte_length_single_value_mapper
         vec_mapper
         vec_mapper_push
         vec_mapper_get
+        vec_mapper_get_at_address
         vec_mapper_len
+        vec_mapper_len_at_address
         token_attributes_set
         token_attributes_update
         token_attributes_get_attributes
@@ -312,7 +315,9 @@ elrond_wasm_node::wasm_endpoints! {
         add_to_whitelist
         remove_from_whitelist
         check_contains
+        check_contains_at_address
         require_contains
+        require_contains_at_address
         issue_fungible_default_callback
         issue_fungible_custom_callback
         issue_and_set_all_roles_fungible
@@ -345,5 +350,6 @@ elrond_wasm_node::wasm_endpoints! {
         token_identifier_is_valid_2
         non_zero_usize_iter
         non_zero_usize_macro
+        callBack
     )
 }
