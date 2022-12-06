@@ -275,14 +275,18 @@ pub trait RewardsDistribution:
 
         for raffle_id in raffle_id_start..=raffle_id_end {
             for nft in nfts {
-                if self.try_claim(raffle_id, reward_token_id, reward_token_nonce, &nft) {
-                    total += self.compute_claimable_amount(
-                        raffle_id,
-                        reward_token_id,
-                        reward_token_nonce,
-                        nft.token_nonce,
-                    );
+                let claim_result =
+                    self.try_claim(raffle_id, reward_token_id, reward_token_nonce, &nft);
+                if claim_result.is_err() {
+                    continue;
                 }
+
+                total += self.compute_claimable_amount(
+                    raffle_id,
+                    reward_token_id,
+                    reward_token_nonce,
+                    nft.token_nonce,
+                );
             }
         }
         if total > 0 {
@@ -297,7 +301,7 @@ pub trait RewardsDistribution:
         reward_token_id: &EgldOrEsdtTokenIdentifier,
         reward_token_nonce: u64,
         nft: &EsdtTokenPayment,
-    ) -> bool {
+    ) -> Result<(), ()> {
         let was_claimed_mapper = self.was_claimed(
             raffle_id,
             reward_token_id,
@@ -307,8 +311,10 @@ pub trait RewardsDistribution:
         let available = !was_claimed_mapper.get();
         if available {
             was_claimed_mapper.set(true);
+            Result::Ok(())
+        } else {
+            Result::Err(())
         }
-        available
     }
 
     #[view(computeClaimableAmount)]
