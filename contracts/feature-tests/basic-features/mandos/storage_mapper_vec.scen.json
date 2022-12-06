@@ -10,6 +10,11 @@
                     "balance": "0",
                     "code": "file:../output/basic-features.wasm"
                 },
+                "sc:extra-instance": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../output/basic-features.wasm"
+                },
                 "address:an_account": {
                     "nonce": "0",
                     "balance": "0"
@@ -154,6 +159,12 @@
                     },
                     "code": "file:../output/basic-features.wasm"
                 },
+                "sc:extra-instance": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "file:../output/basic-features.wasm"
+                },
                 "address:an_account": {
                     "nonce": "*",
                     "balance": "*",
@@ -224,6 +235,53 @@
                 "out": [],
                 "status": "4",
                 "message": "str:index out of range",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "index-0-at-address",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:extra-instance",
+                "function": "vec_mapper_get_at_address",
+                "arguments": [
+                    "sc:basic-features",
+                    "2"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "111"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "after-2-len-at-address",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:extra-instance",
+                "function": "vec_mapper_len_at_address",
+                "arguments": [
+                    "sc:basic-features"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "2"
+                ],
+                "status": "",
                 "logs": "*",
                 "gas": "*",
                 "refund": "*"

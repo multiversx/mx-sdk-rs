@@ -1,0 +1,16 @@
+[settings]
+main = "main"
+
+[contracts.main]
+name = "multisig"
+add-unlabelled = true
+
+[contracts.full]
+name = "multisig-full"
+add-unlabelled = true
+add-labels = ["multisig-external-view"]
+
+[contracts.view]
+name = "multisig-view"
+external-view = true
+add-labels = ["multisig-external-view"]

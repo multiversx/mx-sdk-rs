@@ -20,17 +20,17 @@ fn check_set(set: &UnorderedSetMapper<DebugApi, u64>, expected: Vec<u64>) {
 fn test_hash_set_simple() {
     let mut set = create_set();
     check_set(&set, vec![]);
-    assert_eq!(set.insert(42), true);
+    assert!(set.insert(42));
     check_set(&set, vec![42]);
-    assert_eq!(set.insert(42), false);
+    assert!(!set.insert(42));
     check_set(&set, vec![42]);
     set.insert(43);
     check_set(&set, vec![42, 43]);
     set.insert(44);
     check_set(&set, vec![42, 43, 44]);
-    assert_eq!(set.contains(&42), true);
+    assert!(set.contains(&42));
     assert_eq!(set.get_by_index(1), 42);
-    assert_eq!(set.contains(&50), false);
+    assert!(!set.contains(&50));
 }
 
 #[test]
@@ -41,12 +41,12 @@ fn test_set_removal() {
     check_set(&set, vec![42]);
     set.insert(43);
     check_set(&set, vec![42, 43]);
-    assert_eq!(set.swap_remove(&50), false);
+    assert!(!set.swap_remove(&50));
     check_set(&set, vec![42, 43]);
-    assert_eq!(set.swap_remove(&42), true);
+    assert!(set.swap_remove(&42));
     check_set(&set, vec![43]);
-    assert_eq!(set.contains(&42), false);
-    assert_eq!(set.swap_remove(&42), false);
+    assert!(!set.contains(&42));
+    assert!(!set.swap_remove(&42));
     check_set(&set, vec![43]);
 }
 
@@ -58,13 +58,13 @@ fn test_set_removal_from_middle() {
     set.insert(44);
     set.insert(45);
     check_set(&set, vec![42, 43, 44, 45]);
-    assert_eq!(set.swap_remove(&43), true);
+    assert!(set.swap_remove(&43));
     check_set(&set, vec![42, 45, 44]);
-    assert_eq!(set.swap_remove(&45), true);
+    assert!(set.swap_remove(&45));
     check_set(&set, vec![42, 44]);
-    assert_eq!(set.swap_remove(&44), true);
+    assert!(set.swap_remove(&44));
     check_set(&set, vec![42]);
-    assert_eq!(set.swap_remove(&42), true);
+    assert!(set.swap_remove(&42));
     check_set(&set, vec![]);
 }
 

@@ -1,6 +1,7 @@
 elrond_wasm::imports!();
 
-use super::governance_proposal::{GovernanceAction, MAX_GOVERNANCE_PROPOSAL_ACTIONS};
+use super::governance_proposal::GovernanceProposal;
+use crate::governance::ProposalId;
 
 #[elrond_wasm::module]
 pub trait GovernanceEventsModule {
@@ -10,23 +11,38 @@ pub trait GovernanceEventsModule {
         #[indexed] proposal_id: usize,
         #[indexed] proposer: &ManagedAddress,
         #[indexed] start_block: u64,
-        #[indexed] description: &ManagedBuffer,
-        actions: &ArrayVec<GovernanceAction<Self::Api>, MAX_GOVERNANCE_PROPOSAL_ACTIONS>,
+        proposal: &GovernanceProposal<Self::Api>,
     );
 
-    #[event("voteCast")]
-    fn vote_cast_event(
+    #[event("upVoteCast")]
+    fn up_vote_cast_event(
         &self,
-        #[indexed] voter: &ManagedAddress,
-        #[indexed] proposal_id: usize,
+        #[indexed] up_voter: &ManagedAddress,
+        #[indexed] proposal_id: ProposalId,
         nr_votes: &BigUint,
     );
 
-    #[event("downvoteCast")]
-    fn downvote_cast_event(
+    #[event("downVoteCast")]
+    fn down_vote_cast_event(
         &self,
-        #[indexed] downvoter: &ManagedAddress,
-        #[indexed] proposal_id: usize,
+        #[indexed] down_voter: &ManagedAddress,
+        #[indexed] proposal_id: ProposalId,
+        nr_downvotes: &BigUint,
+    );
+
+    #[event("downVetoVoteCast")]
+    fn down_veto_vote_cast_event(
+        &self,
+        #[indexed] down_veto_voter: &ManagedAddress,
+        #[indexed] proposal_id: ProposalId,
+        nr_downvotes: &BigUint,
+    );
+
+    #[event("abstainVoteCast")]
+    fn abstain_vote_cast_event(
+        &self,
+        #[indexed] abstain_voter: &ManagedAddress,
+        #[indexed] proposal_id: ProposalId,
         nr_downvotes: &BigUint,
     );
 
@@ -43,6 +59,15 @@ pub trait GovernanceEventsModule {
     fn user_deposit_event(
         &self,
         #[indexed] address: &ManagedAddress,
-        payments: &ManagedVec<EsdtTokenPayment<Self::Api>>,
+        #[indexed] proposal_id: ProposalId,
+        payment: &EsdtTokenPayment<Self::Api>,
+    );
+
+    #[event("userClaimDepositedTokens")]
+    fn user_claim_event(
+        &self,
+        #[indexed] address: &ManagedAddress,
+        #[indexed] proposal_id: ProposalId,
+        payment: &EsdtTokenPayment<Self::Api>,
     );
 }

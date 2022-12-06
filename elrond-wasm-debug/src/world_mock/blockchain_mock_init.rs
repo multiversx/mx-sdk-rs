@@ -1,11 +1,11 @@
 use std::path::{Path, PathBuf};
 
-use elrond_wasm::contract_base::{CallableContract, CallableContractBuilder};
+use elrond_wasm::contract_base::{CallableContractBuilder, ContractAbiProvider};
 use mandos::{interpret_trait::InterpreterContext, value_interpreter::interpret_string};
 
 use crate::DebugApi;
 
-use super::BlockchainMock;
+use super::{BlockchainMock, ContractContainer};
 
 fn is_target(path_buf: &Path) -> bool {
     path_buf.file_name().unwrap() == "target"
@@ -30,39 +30,75 @@ impl BlockchainMock {
 
     /// Tells the tests where the crate lies relative to the workspace.
     /// This ensures that the paths are set correctly, including in debug mode.
-    pub fn set_current_dir_from_workspace(&mut self, relative_path: &str) {
+    pub fn set_current_dir_from_workspace(&mut self, relative_path: &str) -> &mut Self {
         let mut path = find_workspace();
         path.push(relative_path);
         self.current_dir = path;
+        self
     }
 
-    pub fn register_contract_obj(
+    pub(crate) fn register_contract_container(
         &mut self,
         expression: &str,
-        new_contract_obj: Box<dyn CallableContract>,
+        contract_container: ContractContainer,
     ) {
         let contract_bytes = interpret_string(expression, &self.interpreter_context());
-        // panic!("{}", String::from_utf8(contract_bytes).unwrap());
         self.contract_map
-            .register_contract(contract_bytes, new_contract_obj);
+            .register_contract(contract_bytes, contract_container);
     }
 
+    /// Links a contract path in a test to a contract implementation.
+    pub fn register_contract<B: CallableContractBuilder>(
+        &mut self,
+        expression: &str,
+        contract_builder: B,
+    ) {
+        self.register_contract_container(
+            expression,
+            ContractContainer::new(contract_builder.new_contract_obj::<DebugApi>(), None),
+        )
+    }
+
+    #[deprecated(
+        since = "0.37.0",
+        note = "Got renamed to `register_contract`, but not completely removed, in order to ease test migration. Please replace with `register_contract`."
+    )]
     pub fn register_contract_builder<B: CallableContractBuilder>(
         &mut self,
         expression: &str,
         contract_builder: B,
     ) {
-        self.register_contract_obj(expression, contract_builder.new_contract_obj::<DebugApi>())
+        self.register_contract(expression, contract_builder)
     }
 
-    pub fn register_external_view_contract_builder<B: CallableContractBuilder>(
+    /// Links a contract path in a test to a multi-contract output.
+    ///
+    /// This simulates the effects of building such a contract with only part of the endpoints.
+    pub fn register_partial_contract<Abi, B>(
         &mut self,
         expression: &str,
         contract_builder: B,
-    ) {
-        self.register_contract_obj(
+        sub_contract_name: &str,
+    ) where
+        Abi: ContractAbiProvider,
+        B: CallableContractBuilder,
+    {
+        let multi_contract_config = crate::meta::multi_contract_config::<Abi>(
+            self.current_dir
+                .join("multicontract.toml")
+                .to_str()
+                .unwrap(),
+        );
+        let sub_contract = multi_contract_config.find_contract(sub_contract_name);
+        let contract_obj = if sub_contract.external_view {
+            contract_builder.new_contract_obj::<elrond_wasm::api::ExternalViewApi<DebugApi>>()
+        } else {
+            contract_builder.new_contract_obj::<DebugApi>()
+        };
+
+        self.register_contract_container(
             expression,
-            contract_builder.new_contract_obj::<elrond_wasm::api::ExternalViewApi<DebugApi>>(),
-        )
+            ContractContainer::new(contract_obj, Some(sub_contract.endpoint_names())),
+        );
     }
 }

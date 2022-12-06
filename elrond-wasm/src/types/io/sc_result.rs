@@ -184,8 +184,7 @@ mod tests {
 
         assert!(sc_result_ok.unwrap() == 5);
 
-        let result_err: Result<i32, DecodeError> =
-            Result::Err(DecodeError::from("Decode Error").into());
+        let result_err: Result<i32, DecodeError> = Result::Err(DecodeError::from("Decode Error"));
         let sc_result_err: SCResult<i32> = result_err.into();
 
         assert!(sc_result_err.err().unwrap().as_bytes() == &b"Decode Error"[..]);

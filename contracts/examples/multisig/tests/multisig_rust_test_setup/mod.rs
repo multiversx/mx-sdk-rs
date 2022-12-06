@@ -11,7 +11,7 @@ use multisig::{
     user_role::UserRole, Multisig,
 };
 
-const MULTISIG_WASM_PATH: &'static str = "multisig/output/multisig.wasm";
+const MULTISIG_WASM_PATH: &str = "multisig/output/multisig.wasm";
 const QUORUM_SIZE: usize = 1;
 pub const EGLD_TOKEN_ID: &[u8] = b"EGLD";
 
@@ -262,7 +262,7 @@ where
             &self.ms_wrapper,
             &rust_biguint!(0),
             |sc| {
-                let _ = sc.discard_action(action_id);
+                sc.discard_action(action_id);
             },
         )
     }

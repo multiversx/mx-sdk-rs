@@ -4,31 +4,31 @@ fn world() -> BlockchainMock {
     let mut blockchain = BlockchainMock::new();
     blockchain.set_current_dir_from_workspace("contracts/feature-tests/composability");
 
-    blockchain.register_contract_builder(
+    blockchain.register_contract(
         "file:forwarder/output/forwarder.wasm",
         forwarder::ContractBuilder,
     );
-    blockchain.register_contract_builder(
+    blockchain.register_contract(
         "file:forwarder-raw/output/forwarder-raw.wasm",
         forwarder_raw::ContractBuilder,
     );
-    blockchain.register_contract_builder(
+    blockchain.register_contract(
         "file:promises-features/output/promises-features.wasm",
         promises_features::ContractBuilder,
     );
-    blockchain.register_contract_builder(
+    blockchain.register_contract(
         "file:proxy-test-first/output/proxy-test-first.wasm",
         proxy_test_first::ContractBuilder,
     );
-    blockchain.register_contract_builder(
+    blockchain.register_contract(
         "file:proxy-test-second/output/proxy-test-second.wasm",
         proxy_test_second::ContractBuilder,
     );
-    blockchain.register_contract_builder(
+    blockchain.register_contract(
         "file:recursive-caller/output/recursive-caller.wasm",
         recursive_caller::ContractBuilder,
     );
-    blockchain.register_contract_builder("file:vault/output/vault.wasm", vault::ContractBuilder);
+    blockchain.register_contract("file:vault/output/vault.wasm", vault::ContractBuilder);
     blockchain
 }
 
