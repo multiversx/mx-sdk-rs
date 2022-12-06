@@ -281,7 +281,7 @@ pub trait RewardsDistribution:
                         reward_token_id,
                         reward_token_nonce,
                         nft.token_nonce,
-                    )
+                    );
                 }
             }
         }
