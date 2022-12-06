@@ -248,29 +248,39 @@ pub trait RewardsDistribution:
         self.validate_raffle_id_range(raffle_id_start, raffle_id_end);
 
         let caller = self.blockchain().get_caller();
+        let mut rewards = ManagedVec::new();
+        let mut total_egld_reward = BigUint::zero();
+
         for reward_token_pair in reward_tokens.into_iter() {
             let (reward_token_id, reward_token_nonce) = reward_token_pair.into_tuple();
-            self.claim_reward_token(
-                &caller,
+            let (egld_reward, reward_payment_opt) = self.claim_reward_token(
                 raffle_id_start,
                 raffle_id_end,
                 &reward_token_id,
                 reward_token_nonce,
                 &nfts,
             );
+
+            total_egld_reward += egld_reward;
+            if let Some(reward_payment) = reward_payment_opt {
+                rewards.push(reward_payment);
+            }
         }
+
+        self.send()
+            .direct_non_zero_egld(&caller, &total_egld_reward);
+        self.send().direct_multi(&caller, &rewards);
         self.send().direct_multi(&caller, &nfts);
     }
 
     fn claim_reward_token(
         &self,
-        caller: &ManagedAddress,
         raffle_id_start: u64,
         raffle_id_end: u64,
         reward_token_id: &EgldOrEsdtTokenIdentifier,
         reward_token_nonce: u64,
         nfts: &ManagedVec<EsdtTokenPayment>,
-    ) {
+    ) -> (BigUint, Option<EsdtTokenPayment>) {
         let mut total = BigUint::zero();
 
         for raffle_id in raffle_id_start..=raffle_id_end {
@@ -289,10 +299,16 @@ pub trait RewardsDistribution:
                 );
             }
         }
-        if total > 0 {
-            self.send()
-                .direct(caller, reward_token_id, reward_token_nonce, &total);
+
+        if total == 0 || reward_token_id.is_egld() {
+            return (total, None);
         }
+        let reward_payment = EsdtTokenPayment::new(
+            reward_token_id.clone().unwrap_esdt(),
+            reward_token_nonce,
+            total,
+        );
+        (BigUint::zero(), Some(reward_payment))
     }
 
     fn try_claim(
