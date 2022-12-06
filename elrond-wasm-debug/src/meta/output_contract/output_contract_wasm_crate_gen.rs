@@ -96,7 +96,7 @@ impl OutputContract {
         let total =
             self.abi.endpoints.len() + NUM_INIT + NUM_ASYNC_CB + self.abi.promise_callbacks.len();
 
-        write_stat_comment(wasm_lib_file, "Total number of exported functions:", t);
+        write_stat_comment(wasm_lib_file, "Total number of exported functions:", total);
     }
 }
 
