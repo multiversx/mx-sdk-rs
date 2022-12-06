@@ -84,18 +84,22 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [],
+                "out": [
+                    "1",
+                    "2"
+                ],
                 "status": "0",
                 "logs": [
                     {
                         "address": "sc:promises",
-                        "endpoint": "str:error_callback",
+                        "endpoint": "str:the_one_callback",
                         "topics": [
                             "str:async_call_event_callback"
                         ],
                         "data": {
-                            "0-status": "biguint:5",
-                            "1-message": "nested:str:not enough gas"
+                            "0-status": "nested:0x00",
+                            "1-arg1": "biguint:1",
+                            "2-arg2": "biguint:2"
                         }
                     },
                     "+"
@@ -171,7 +175,7 @@
             "step": "checkState",
             "accounts": {
                 "address:a_user": {
-                    "nonce": "1",
+                    "nonce": "3",
                     "balance": "1000"
                 },
                 "sc:vault": {
