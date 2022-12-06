@@ -17,7 +17,7 @@ pub trait CallPromisesModule {
 
     #[endpoint]
     #[payable("*")]
-    fn forward_async_accept_funds(&self, to: ManagedAddress) {
+    fn forward_promise_accept_funds(&self, to: ManagedAddress) {
         let (token, token_nonce, payment) = self.call_value().egld_or_single_esdt().into_tuple();
         let gas_limit = self.blockchain().get_gas_left() / 2;
         self.vault_proxy()
@@ -30,7 +30,7 @@ pub trait CallPromisesModule {
     }
 
     #[endpoint]
-    fn forward_async_retrieve_funds(
+    fn forward_promise_retrieve_funds(
         &self,
         to: ManagedAddress,
         token: EgldOrEsdtTokenIdentifier,

@@ -8,7 +8,7 @@ pub trait CallPromisesDirectModule {
 
     #[endpoint]
     #[payable("*")]
-    fn promise_single_token(
+    fn promise_raw_single_token(
         &self,
         to: ManagedAddress,
         endpoint_name: ManagedBuffer,
@@ -33,7 +33,7 @@ pub trait CallPromisesDirectModule {
     }
 
     #[endpoint]
-    fn promise_multi_transfer(
+    fn promise_raw_multi_transfer(
         &self,
         to: ManagedAddress,
         endpoint_name: ManagedBuffer,

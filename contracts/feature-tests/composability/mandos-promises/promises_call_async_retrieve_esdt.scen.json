@@ -28,7 +28,7 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "function": "forward_async_retrieve_funds",
+                "function": "forward_promise_retrieve_funds",
                 "arguments": [
                     "sc:vault",
                     "str:TEST-TOKENA",

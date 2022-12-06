@@ -25,7 +25,7 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:promises",
-                "function": "promise_single_token",
+                "function": "promise_raw_single_token",
                 "arguments": [
                     "sc:vault",
                     "str:echo_arguments",

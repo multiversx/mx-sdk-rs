@@ -12,13 +12,13 @@
 elrond_wasm_node::wasm_endpoints! {
     promises_features
     (
-        forward_async_accept_funds
-        forward_async_retrieve_funds
+        forward_promise_accept_funds
+        forward_promise_retrieve_funds
         callback_data
         callback_data_at_index
         clear_callback_data
-        promise_single_token
-        promise_multi_transfer
+        promise_raw_single_token
+        promise_raw_multi_transfer
         retrieve_funds_callback
         the_one_callback
     )
