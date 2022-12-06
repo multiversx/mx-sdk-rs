@@ -29,7 +29,7 @@ pub trait DistributionModule {
         }
         for distribution in self.distribution_rules().get().iter() {
             let payment_amount =
-                total_amount.clone() * distribution.percentage / MAX_DISTRIBUTION_PERCENTAGE;
+                &total_amount * distribution.percentage / MAX_DISTRIBUTION_PERCENTAGE;
             if payment_amount == 0 {
                 continue;
             }
