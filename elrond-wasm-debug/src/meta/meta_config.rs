@@ -81,7 +81,7 @@ impl MetaConfig {
         }
     }
 
-    /// Convenince functionality, to get all flags right for the debug build.
+    /// Convenience functionality, to get all flags right for the debug build.
     pub fn build_dbg(&mut self) {
         self.build_args.wasm_name_suffix = Some("dbg".to_string());
         self.build_args.wasm_opt = false;
