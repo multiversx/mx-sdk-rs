@@ -29,7 +29,8 @@ pub trait StorageMapperWhitelistFeatures {
 
     #[endpoint]
     fn require_contains_at_address(&self, address: ManagedAddress, item: ManagedBuffer) {
-        self.whitelist_mapper().require_whitelisted_at_address(&address, &item);
+        self.whitelist_mapper()
+            .require_whitelisted_at_address(&address, &item);
     }
 
     #[storage_mapper("whitelistMapper")]
