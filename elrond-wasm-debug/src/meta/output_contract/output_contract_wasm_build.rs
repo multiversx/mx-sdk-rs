@@ -1,11 +1,8 @@
 use std::{fs, process::Command};
 
-use crate::meta::meta_build_args::BuildArgs;
+use crate::meta::{meta_build_args::BuildArgs, meta_wasm_tools};
 
 use super::OutputContract;
-
-pub const WASM_OPT_NAME: &str = "wasm-opt";
-pub const WASM2WAT_NAME: &str = "wasm2wat";
 
 impl OutputContract {
     pub fn build_contract(&self, build_args: &BuildArgs, output_path: &str) {
@@ -34,6 +31,7 @@ impl OutputContract {
         self.copy_contracts_to_output(build_args, output_path);
         self.run_wasm_opt(build_args, output_path);
         self.run_wasm2wat(build_args, output_path);
+        self.extract_imports(build_args, output_path);
     }
 
     fn copy_contracts_to_output(&self, build_args: &BuildArgs, output_path: &str) {
@@ -49,17 +47,7 @@ impl OutputContract {
         }
 
         let output_wasm_path = format!("{}/{}", output_path, self.wasm_output_name(build_args));
-        let _ = Command::new(WASM_OPT_NAME)
-            .args([
-                output_wasm_path.as_str(),
-                "-Oz",
-                "--output",
-                output_wasm_path.as_str(),
-            ])
-            .spawn()
-            .expect("failed to spawn wasm-out process")
-            .wait()
-            .expect("wasm-out was not running");
+        meta_wasm_tools::run_wasm_opt(output_wasm_path.as_str());
     }
 
     fn run_wasm2wat(&self, build_args: &BuildArgs, output_path: &str) {
@@ -69,15 +57,27 @@ impl OutputContract {
 
         let output_wasm_path = format!("{}/{}", output_path, self.wasm_output_name(build_args));
         let output_wat_path = format!("{}/{}", output_path, self.wat_output_name(build_args));
-        let _ = Command::new(WASM2WAT_NAME)
-            .args([
-                output_wasm_path.as_str(),
-                "--output",
-                output_wat_path.as_str(),
-            ])
-            .spawn()
-            .expect("failed to spawn wasm2wat process")
-            .wait()
-            .expect("wasm2wat was not running");
+        meta_wasm_tools::run_wasm2wat(output_wasm_path.as_str(), output_wat_path.as_str());
     }
+
+    fn extract_imports(&self, build_args: &BuildArgs, output_path: &str) {
+        if !build_args.extract_imports {
+            return;
+        }
+
+        let output_wasm_path = format!("{}/{}", output_path, self.wasm_output_name(build_args));
+        let output_imports_json_path = format!(
+            "{}/{}",
+            output_path,
+            self.imports_json_output_name(build_args)
+        );
+        let result = meta_wasm_tools::run_wasm_objdump(output_wasm_path.as_str());
+        let import_names = meta_wasm_tools::parse_imports(result.as_str());
+        write_imports_output(output_imports_json_path.as_str(), import_names.as_slice());
+    }
+}
+
+fn write_imports_output(dest_path: &str, import_names: &[String]) {
+    let json = serde_json::to_string_pretty(import_names).unwrap();
+    fs::write(dest_path, json).expect("failed to write imports json file");
 }

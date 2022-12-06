@@ -1,10 +1,10 @@
-use std::{fs, process::Command};
+use std::fs;
 
 use elrond_wasm::abi::ContractAbi;
 
 use super::{
     meta_build_args::BuildArgs,
-    output_contract::{CargoTomlContents, OutputContractConfig, WASM2WAT_NAME, WASM_OPT_NAME},
+    output_contract::{CargoTomlContents, OutputContractConfig},
 };
 
 const OUTPUT_RELATIVE_PATH: &str = "../output";
@@ -74,14 +74,7 @@ impl MetaConfig {
     }
 
     pub fn build(&mut self) {
-        if self.build_args.wasm_opt && !is_wasm_opt_installed() {
-            println!("Warning: {} not installed", WASM_OPT_NAME);
-            self.build_args.wasm_opt = false;
-        }
-        if self.build_args.wat && !is_wasm2wat_installed() {
-            println!("Warning: {} not installed", WASM2WAT_NAME);
-            self.build_args.wat = false;
-        }
+        self.check_tools_installed();
 
         for output_contract in &self.output_contracts.contracts {
             output_contract.build_contract(&self.build_args, self.output_dir.as_str());
@@ -94,6 +87,7 @@ impl MetaConfig {
         self.build_args.wasm_opt = false;
         self.build_args.debug_symbols = true;
         self.build_args.wat = true;
+        self.build_args.extract_imports = false;
         self.build();
     }
 
@@ -147,20 +141,6 @@ impl MetaConfig {
             }
         }
     }
-}
-
-fn is_wasm_opt_installed() -> bool {
-    Command::new(WASM_OPT_NAME)
-        .args(["--version"])
-        .output()
-        .is_ok()
-}
-
-fn is_wasm2wat_installed() -> bool {
-    Command::new(WASM2WAT_NAME)
-        .args(["--version"])
-        .output()
-        .is_ok()
 }
 
 /// This one is useful for some of the special unmanaged EI tests in the framework.
