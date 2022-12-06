@@ -5,8 +5,6 @@ use crate::api::VMApi;
 /// CallableContract is the means by which the debugger calls methods in the contract.
 pub trait CallableContract {
     fn call(&self, fn_name: &[u8]) -> bool;
-
-    fn clone_obj(&self) -> Box<dyn CallableContract>;
 }
 
 /// Describes objects that can create instances of contract objects, with the given API.

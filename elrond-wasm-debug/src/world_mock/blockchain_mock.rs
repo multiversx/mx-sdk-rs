@@ -1,12 +1,10 @@
-use crate::{
-    mandos_system::model::Scenario, num_bigint::BigUint, tx_mock::BlockchainUpdate, ContractMap,
-};
+use crate::{mandos_system::model::Scenario, num_bigint::BigUint, tx_mock::BlockchainUpdate};
 use elrond_wasm::types::heap::Address;
 use mandos::{interpret_trait::InterpreterContext, value_interpreter::interpret_string};
 use num_traits::Zero;
 use std::{collections::HashMap, path::PathBuf};
 
-use super::{AccountData, BlockInfo};
+use super::{AccountData, BlockInfo, ContractMap};
 
 const ELROND_REWARD_KEY: &[u8] = b"ELRONDreward";
 

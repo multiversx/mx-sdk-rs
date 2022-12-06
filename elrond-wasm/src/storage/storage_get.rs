@@ -126,10 +126,8 @@ pub fn storage_get_len<A>(key: ManagedRef<'_, A, StorageKey<A>>) -> usize
 where
     A: StorageReadApi + ManagedTypeApi + ErrorApi,
 {
-    let value_handle: A::ManagedBufferHandle = use_raw_handle(const_handles::MBUF_TEMPORARY_1);
-    A::storage_read_api_impl()
-        .storage_load_managed_buffer_raw(key.get_handle(), value_handle.clone());
-    A::managed_type_impl().mb_len(value_handle)
+    let input = StorageGetInput::new(key);
+    input.load_len_managed_buffer()
 }
 
 /// Will immediately end the execution when encountering the first decode error, via `signal_error`.
