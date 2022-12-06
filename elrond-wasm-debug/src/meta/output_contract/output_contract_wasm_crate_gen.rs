@@ -45,14 +45,14 @@ fn write_wasm_empty_callback_macro(wasm_lib_file: &mut File) {
 
 impl OutputContract {
     fn write_wasm_src_lib_contents(&self, wasm_lib_file: &mut File) {
-        let endpoint_names = self.endpoint_names();
+        let explicit_endpoint_names = self.endpoint_names();
         wasm_lib_file
             .write_all(PREFIX_AUTO_GENERATED.as_bytes())
             .unwrap();
         writeln!(
             wasm_lib_file,
             "// Number of endpoints: {}",
-            endpoint_names.len()
+            explicit_endpoint_names.len()
         )
         .unwrap();
         if !self.abi.promise_callbacks.is_empty() {
@@ -71,7 +71,7 @@ impl OutputContract {
             "elrond_wasm_node::wasm_endpoints!"
         };
 
-        let mut all_endpoint_names = endpoint_names.clone();
+        let mut all_endpoint_names = explicit_endpoint_names;
         if self.abi.has_callback {
             all_endpoint_names.push("callBack".to_string());
         }

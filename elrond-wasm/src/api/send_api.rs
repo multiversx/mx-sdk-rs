@@ -6,7 +6,6 @@ use crate::types::{
 };
 
 pub trait SendApi: ManagedTypeApi + BlockchainApi {
-    // type SendApiImpl: SendApiImpl;
     type SendApiImpl: SendApiImpl
         + HandleTypeInfo<
             ManagedBufferHandle = Self::ManagedBufferHandle,
