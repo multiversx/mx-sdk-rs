@@ -8,6 +8,8 @@ use crate::{
     types::{ManagedArgBuffer, ManagedBuffer, ManagedType},
 };
 
+/// Replaces the EndpointArgumentApi inside a promises callback,
+/// and causes it to read arguments from the callback data instead of the regular tx input.
 #[derive(Clone)]
 pub struct CallbackArgApiWrapper<A: VMApi> {
     _phantom: PhantomData<A>,
