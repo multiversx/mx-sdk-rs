@@ -102,9 +102,14 @@ fn add_storage_mapper(
 }
 
 fn add_storage_mappers(substitutions: &mut SubstitutionsMap) {
+    add_storage_mapper_single_generic_arg(substitutions, &quote!(FungibleTokenMapper));
+    add_storage_mapper_single_generic_arg(substitutions, &quote!(NonFungibleTokenMapper));
     add_storage_mapper_single_generic_arg(substitutions, &quote!(TokenAttributesMapper));
+    add_storage_mapper_single_generic_arg(substitutions, &quote!(UniqueIdMapper));
     add_storage_mapper_single_generic_arg(substitutions, &quote!(UserMapper));
+    add_storage_mapper_single_generic_arg(substitutions, &quote!(WhitelistMapper));
 
+    add_storage_mapper(substitutions, &quote!(BiDiMapper));
     add_storage_mapper(substitutions, &quote!(LinkedListMapper));
     add_storage_mapper(substitutions, &quote!(MapMapper));
     add_storage_mapper(substitutions, &quote!(MapStorageMapper));
