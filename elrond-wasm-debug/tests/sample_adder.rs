@@ -295,15 +295,6 @@ mod sample_adder {
                 fn_name,
             )
         }
-
-        fn clone_obj(
-            &self,
-        ) -> elrond_wasm::types::heap::Box<dyn elrond_wasm::contract_base::CallableContract>
-        {
-            elrond_wasm::types::heap::Box::new(ContractObj::<A> {
-                _phantom: core::marker::PhantomData,
-            })
-        }
     }
 
     pub struct ContractBuilder;
@@ -449,7 +440,7 @@ fn test_add() {
 
 fn world() -> elrond_wasm_debug::BlockchainMock {
     let mut blockchain = elrond_wasm_debug::BlockchainMock::new();
-    blockchain.register_contract_builder(
+    blockchain.register_contract(
         "file:../contracts/examples/adder/output/adder.wasm",
         sample_adder::ContractBuilder,
     );

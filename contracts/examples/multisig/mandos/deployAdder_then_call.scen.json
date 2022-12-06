@@ -268,7 +268,7 @@
             "id": "check-cleanup-1",
             "comment": "check that account data got cleaned up",
             "tx": {
-                "to": "sc:multisig",
+                "to": "sc:multisig-view",
                 "function": "getActionData",
                 "arguments": [
                     "4"
@@ -286,7 +286,7 @@
             "id": "check-cleanup-2",
             "comment": "check that account data got cleaned up",
             "tx": {
-                "to": "sc:multisig",
+                "to": "sc:multisig-view",
                 "function": "getActionSigners",
                 "arguments": [
                     "4"

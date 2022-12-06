@@ -1,0 +1,11 @@
+[settings]
+main = "main"
+
+[contracts.main]
+name = "use-module"
+add-unlabelled = true
+
+[contracts.view]
+name = "use-module-view"
+external-view = true
+add-labels = ["module-external-view"]

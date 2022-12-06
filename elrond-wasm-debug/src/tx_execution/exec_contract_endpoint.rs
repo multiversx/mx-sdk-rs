@@ -1,11 +1,11 @@
 use std::rc::Rc;
 
 use alloc::boxed::Box;
-use elrond_wasm::contract_base::CallableContract;
 
 use crate::{
     address_hex,
     tx_mock::{TxContext, TxContextStack, TxPanic, TxResult},
+    world_mock::ContractContainer,
     DebugApi,
 };
 
@@ -31,11 +31,11 @@ fn execute_tx_context_rc(tx_context_rc: Rc<TxContext>) -> (Rc<TxContext>, TxResu
 
     // Not redundant at all, func_name is borrowed from it...
     #[allow(clippy::redundant_clone)]
-    let contract_instance =
-        contract_map.new_contract_instance(contract_identifier.as_slice(), tx_context_ref.clone());
+    let contract_container =
+        contract_map.get_contract(contract_identifier.as_slice(), tx_context_ref.clone());
 
     TxContextStack::static_push(tx_context_rc.clone());
-    let tx_result = execute_contract_instance_endpoint(contract_instance, func_name);
+    let tx_result = execute_contract_instance_endpoint(contract_container, func_name);
 
     let tx_context_rc = TxContextStack::static_pop();
     (tx_context_rc, tx_result)
@@ -56,11 +56,11 @@ fn get_contract_identifier(tx_context: &TxContext) -> Vec<u8> {
 
 /// The actual execution and the extraction/wrapping of results.
 fn execute_contract_instance_endpoint(
-    contract_instance: Box<dyn CallableContract>,
+    contract_container: &ContractContainer,
     endpoint_name: &[u8],
 ) -> TxResult {
     let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-        let call_successful = contract_instance.call(endpoint_name);
+        let call_successful = contract_container.call(endpoint_name);
         if !call_successful {
             std::panic::panic_any(TxPanic {
                 status: 1,

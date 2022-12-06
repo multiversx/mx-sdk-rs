@@ -15,7 +15,10 @@ use crate::{
     testing_framework::raw_converter::bytes_to_hex,
     tx_execution::{execute_async_call_and_callback, interpret_panic_as_tx_result},
     tx_mock::{TxCache, TxContext, TxContextStack, TxInput, TxInputESDT, TxResult},
-    world_mock::{is_smart_contract_address, AccountData, AccountEsdt, EsdtInstanceMetadata},
+    world_mock::{
+        is_smart_contract_address, AccountData, AccountEsdt, ContractContainer,
+        EsdtInstanceMetadata,
+    },
     BlockchainMock, DebugApi,
 };
 
@@ -257,7 +260,10 @@ impl BlockchainStateWrapper {
             let contract_obj = create_contract_obj_box(obj_builder);
 
             let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
-            b_mock_ref.register_contract_obj(&wasm_full_path_as_expr, contract_obj);
+            b_mock_ref.register_contract_container(
+                &wasm_full_path_as_expr,
+                ContractContainer::new(contract_obj, None),
+            );
         }
 
         ContractObjWrapper::new(address.clone(), obj_builder)
