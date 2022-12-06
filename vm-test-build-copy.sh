@@ -4,7 +4,6 @@
 # expects 1 argument: the path to the Arwen repo root
 
 VM_REPO_PATH=${1:?"Missing VM repo path!"}
-ADD_PROMISES=true
 
 build_and_copy() {
    contract_path=$1
@@ -69,24 +68,16 @@ build_and_copy_composability forwarder-raw
 build_and_copy_composability proxy-test-first
 build_and_copy_composability proxy-test-second
 build_and_copy_composability recursive-caller
-
+build_and_copy_composability promises-features
 erdpy --verbose contract build --skip-eei-checks ./contracts/feature-tests/composability/vault || return 1
 cp -R contracts/feature-tests/composability/vault/output/vault.wasm \
    $VM_REPO_PATH/test/features/composability/vault/output/vault.wasm
-if [ "$ADD_PROMISES" = true ]; then
-   erdpy --verbose  contract build --skip-eei-checks ./contracts/feature-tests/composability/promises-features || return 1
-   cp -R contracts/feature-tests/composability/promises-features/output/promises-features.wasm \
-      $VM_REPO_PATH/test/features/composability/promises-features/output/promises-features.wasm
-fi
 
 rm -f $VM_REPO_PATH/test/features/composability/mandos/*
 cp -R contracts/feature-tests/composability/mandos \
    $VM_REPO_PATH/test/features/composability
-
-if [ "$ADD_PROMISES" = true ]; then
-   cp -R contracts/feature-tests/composability/mandos-promises \
-      $VM_REPO_PATH/test/features/composability
-fi
+cp -R contracts/feature-tests/composability/mandos-promises \
+   $VM_REPO_PATH/test/features/composability
 
 mkdir -p $VM_REPO_PATH/test/features/composability/mandos-legacy
 rm -f $VM_REPO_PATH/test/features/composability/mandos-legacy/*
