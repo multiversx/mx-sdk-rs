@@ -69,16 +69,11 @@ where
             })
             .assert_ok();
 
-        for i in 0..4 {
+        for oracle in &oracles {
             b_mock
-                .execute_tx(
-                    &oracles[i],
-                    &price_agg,
-                    &rust_biguint!(STAKE_AMOUNT),
-                    |sc| {
-                        sc.stake();
-                    },
-                )
+                .execute_tx(oracle, &price_agg, &rust_biguint!(STAKE_AMOUNT), |sc| {
+                    sc.stake();
+                })
                 .assert_ok();
         }
 
@@ -92,7 +87,7 @@ where
 
     pub fn set_pair_decimals(&mut self, from: &[u8], to: &[u8], decimals: u8) {
         self.b_mock
-            .execute_tx(&&self.owner, &self.price_agg, &rust_biguint!(0), |sc| {
+            .execute_tx(&self.owner, &self.price_agg, &rust_biguint!(0), |sc| {
                 sc.set_pair_decimals(managed_buffer!(from), managed_buffer!(to), decimals);
             })
             .assert_ok();

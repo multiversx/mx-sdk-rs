@@ -1,162 +1,152 @@
-use std::{fs::create_dir_all, path::PathBuf};
+use std::fs;
 
-use elrond_wasm::abi::{ContractAbi, EndpointLocationAbi};
+use elrond_wasm::abi::ContractAbi;
 
-#[derive(Debug)]
-pub struct BuildArgs {
-    pub debug_symbols: bool,
-    pub wasm_name_override: Option<String>,
-    pub wasm_name_suffix: Option<String>,
-    pub wasm_opt: bool,
-    pub target_dir: Option<String>,
-}
+use super::{
+    meta_build_args::BuildArgs,
+    output_contract::{CargoTomlContents, OutputContractConfig},
+};
 
-impl Default for BuildArgs {
-    fn default() -> Self {
-        BuildArgs {
-            debug_symbols: false,
-            wasm_name_override: None,
-            wasm_name_suffix: None,
-            wasm_opt: true,
-            target_dir: None,
-        }
-    }
-}
-
-impl BuildArgs {
-    pub fn wasm_name(&self, contract_metadata: &ContractMetadata) -> String {
-        if let Some(wasm_name_override) = &self.wasm_name_override {
-            return wasm_name_override.clone();
-        }
-        if let Some(wasm_suffix) = &self.wasm_name_suffix {
-            format!(
-                "{}-{}.wasm",
-                contract_metadata.output_base_name, wasm_suffix
-            )
-        } else {
-            contract_metadata.wasm_output_name()
-        }
-    }
-}
-
-pub struct ContractMetadata {
-    pub location: EndpointLocationAbi,
-    pub wasm_crate_name: String,
-    pub wasm_crate_path: String,
-    pub output_base_name: String,
-    pub abi: ContractAbi,
-}
-
-impl ContractMetadata {
-    pub fn cargo_toml_path(&self) -> String {
-        format!("{}/Cargo.toml", &self.wasm_crate_path)
-    }
-
-    /// This is where Rust will initially compile the WASM binary.
-    pub fn wasm_compilation_output_path(&self, explicit_target_dir: &Option<String>) -> String {
-        let target_dir = explicit_target_dir
-            .clone()
-            .unwrap_or_else(|| format!("{}/target", &self.wasm_crate_path,));
-        format!(
-            "{}/wasm32-unknown-unknown/release/{}.wasm",
-            &target_dir,
-            &self.wasm_crate_name.replace('-', "_")
-        )
-    }
-
-    pub fn abi_output_name(&self) -> String {
-        format!("{}.abi.json", &self.output_base_name)
-    }
-
-    pub fn wasm_output_name(&self) -> String {
-        format!("{}.wasm", &self.output_base_name)
-    }
-}
+const OUTPUT_RELATIVE_PATH: &str = "../output";
+const SNIPPETS_RELATIVE_PATH: &str = "../interact-rs";
+const MULTI_CONTRACT_CONFIG_RELATIVE_PATH: &str = "../multicontract.toml";
+const WASM_LIB_PATH: &str = "../wasm/src/lib.rs";
+const WASM_NO_MANAGED_EI: &str = "wasm-no-managed-ei";
+const WASM_NO_MANAGED_EI_LIB_PATH: &str = "../wasm-no-managed-ei/src/lib.rs";
 
 pub struct MetaConfig {
     pub build_args: BuildArgs,
     pub output_dir: String,
-    pub main_contract: Option<ContractMetadata>,
-    pub view_contract: Option<ContractMetadata>,
-}
-
-pub fn process_args(args: &[String]) -> BuildArgs {
-    let mut result = BuildArgs::default();
-    let mut iter = args.iter();
-    while let Some(arg) = iter.next() {
-        match arg.as_str() {
-            "--wasm-symbols" => {
-                result.debug_symbols = true;
-            },
-            "--wasm-name" => {
-                let name = iter
-                    .next()
-                    .expect("argument `--wasm-name` must be followed by the desired name");
-                result.wasm_name_override = Some(name.clone());
-            },
-            "--wasm-suffix" => {
-                let suffix = iter
-                    .next()
-                    .expect("argument `--wasm-suffix` must be followed by the desired suffix");
-                result.wasm_name_suffix = Some(suffix.clone());
-            },
-            "--no-wasm-opt" => {
-                result.wasm_opt = false;
-            },
-            "--target-dir" => {
-                let arg = iter
-                    .next()
-                    .expect("argument `--target-dir` must be followed by argument");
-                result.target_dir = Some(arg.clone());
-            },
-            _ => {},
-        }
-    }
-
-    result
+    pub snippets_dir: String,
+    pub original_contract_abi: ContractAbi,
+    pub output_contracts: OutputContractConfig,
 }
 
 impl MetaConfig {
-    pub fn create(original_contract_abi: &ContractAbi, args: &[String]) -> MetaConfig {
-        let build_args = process_args(args);
-
-        let main_contract_abi = original_contract_abi.main_contract();
-        let main_contract_crate_name = main_contract_abi.get_crate_name();
-
-        let main_contract = ContractMetadata {
-            location: EndpointLocationAbi::MainContract,
-            wasm_crate_name: format!("{}-wasm", &main_contract_crate_name),
-            wasm_crate_path: "../wasm".to_string(),
-            output_base_name: main_contract_crate_name.to_string(),
-            abi: main_contract_abi.clone(),
-        };
-
-        let view_contract_opt =
-            if original_contract_abi.location_exists(EndpointLocationAbi::ViewContract) {
-                let view_contract_abi =
-                    original_contract_abi.secondary_contract(EndpointLocationAbi::ViewContract);
-                Some(ContractMetadata {
-                    location: EndpointLocationAbi::ViewContract,
-                    wasm_crate_name: format!("{}-wasm", &main_contract_crate_name),
-                    wasm_crate_path: "../wasm-view".to_string(),
-                    output_base_name: format!("{}-view", main_contract_crate_name),
-                    abi: view_contract_abi,
-                })
-            } else {
-                None
-            };
+    pub fn create(original_contract_abi: ContractAbi, build_args: BuildArgs) -> MetaConfig {
+        let output_contracts = OutputContractConfig::load_from_file_or_default(
+            MULTI_CONTRACT_CONFIG_RELATIVE_PATH,
+            &original_contract_abi,
+        );
 
         MetaConfig {
             build_args,
-            output_dir: "../output".to_string(),
-            main_contract: Some(main_contract),
-            view_contract: view_contract_opt,
+            output_dir: OUTPUT_RELATIVE_PATH.to_string(),
+            snippets_dir: SNIPPETS_RELATIVE_PATH.to_string(),
+            original_contract_abi,
+            output_contracts,
+        }
+    }
+
+    /// Generates all code for the wasm crate(s).
+    pub fn generate_wasm_crates(&mut self) {
+        self.remove_unexpected_wasm_crates();
+        self.create_wasm_crate_dirs();
+        self.generate_cargo_toml_for_secondary_contracts();
+        self.generate_wasm_src_lib();
+        copy_to_wasm_unmanaged_ei();
+    }
+
+    fn create_wasm_crate_dirs(&self) {
+        for output_contract in &self.output_contracts.contracts {
+            output_contract.create_wasm_crate_dir();
+        }
+    }
+
+    /// Cargo.toml files for secondary contracts are generated from the main contract Cargo.toml,
+    /// by changing the package name.
+    pub fn generate_cargo_toml_for_secondary_contracts(&mut self) {
+        let main_contract = self.output_contracts.main_contract();
+
+        // using the same local structure for all contracts is enough for now
+        let mut cargo_toml_contents =
+            CargoTomlContents::load_from_file(main_contract.cargo_toml_path());
+        for secondary_contract in self.output_contracts.secondary_contracts() {
+            cargo_toml_contents.change_package_name(secondary_contract.wasm_crate_name());
+            cargo_toml_contents.save_to_file(secondary_contract.cargo_toml_path());
+        }
+    }
+
+    fn generate_wasm_src_lib(&self) {
+        for output_contract in &self.output_contracts.contracts {
+            output_contract.generate_wasm_src_lib_file();
+        }
+    }
+
+    pub fn build(&mut self) {
+        self.check_tools_installed();
+
+        for output_contract in &self.output_contracts.contracts {
+            output_contract.build_contract(&self.build_args, self.output_dir.as_str());
+        }
+    }
+
+    /// Convenience functionality, to get all flags right for the debug build.
+    pub fn build_dbg(&mut self) {
+        self.build_args.wasm_name_suffix = Some("dbg".to_string());
+        self.build_args.wasm_opt = false;
+        self.build_args.debug_symbols = true;
+        self.build_args.wat = true;
+        self.build_args.extract_imports = false;
+        self.build();
+    }
+
+    /// Cleans the wasm crates and all other outputs.
+    pub fn clean(&self) {
+        self.clean_contract_crates();
+        self.remove_output_dir();
+    }
+
+    fn clean_contract_crates(&self) {
+        for output_contract in &self.output_contracts.contracts {
+            output_contract.cargo_clean();
+        }
+    }
+
+    fn remove_output_dir(&self) {
+        fs::remove_dir_all(&self.output_dir).expect("failed to remove output directory");
+    }
+
+    fn is_expected_crate(&self, dir_name: &str) -> bool {
+        if !dir_name.starts_with("wasm-") {
+            return true;
+        }
+
+        if dir_name == WASM_NO_MANAGED_EI {
+            return true;
+        }
+
+        self.output_contracts
+            .secondary_contracts()
+            .any(|contract| contract.wasm_crate_dir_name().as_str() == dir_name)
+    }
+
+    fn remove_unexpected_wasm_crates(&self) {
+        let list_iter = fs::read_dir("..").expect("error listing contract directory");
+        for path_result in list_iter {
+            let path = path_result.expect("error processing file name in contract directory");
+            if path
+                .metadata()
+                .expect("error retrieving file metadata")
+                .is_dir()
+            {
+                let file_name = path.file_name();
+                let dir_name = file_name.to_str().expect("error processing dir name");
+                if !self.is_expected_crate(dir_name) {
+                    println!("Removing crate {}", dir_name);
+                    fs::remove_dir_all(path.path()).unwrap_or_else(|_| {
+                        panic!("failed to remove unexpected directory {}", dir_name)
+                    });
+                }
+            }
         }
     }
 }
 
-impl ContractMetadata {
-    pub fn create_dir_all(&self) {
-        create_dir_all(PathBuf::from(&self.wasm_crate_path).join("src")).unwrap();
+/// This one is useful for some of the special unmanaged EI tests in the framework.
+/// Will do nothing for regular contracts.
+fn copy_to_wasm_unmanaged_ei() {
+    if std::path::Path::new(WASM_NO_MANAGED_EI_LIB_PATH).exists() {
+        fs::copy(WASM_LIB_PATH, WASM_NO_MANAGED_EI_LIB_PATH).unwrap();
     }
 }

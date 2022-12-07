@@ -21,7 +21,7 @@
         },
         {
             "step": "scDeploy",
-            "txId": "deploy",
+            "id": "deploy",
             "tx": {
                 "from": "address:owner",
                 "contractCode": "file:../output/set-repeat.wasm",
@@ -39,7 +39,7 @@
         },
         {
             "step": "scCall",
-            "txId": "add",
+            "id": "add",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
@@ -61,7 +61,7 @@
         },
         {
             "step": "scCall",
-            "txId": "count",
+            "id": "count",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",
@@ -84,7 +84,7 @@
         },
         {
             "step": "scCall",
-            "txId": "remove",
+            "id": "remove",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:contract",

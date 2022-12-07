@@ -4,7 +4,7 @@ fn world() -> BlockchainMock {
     let mut blockchain = BlockchainMock::new();
     blockchain.set_current_dir_from_workspace("contracts/examples/ping-pong-egld");
 
-    blockchain.register_contract_builder(
+    blockchain.register_contract(
         "file:output/ping-pong-egld.wasm",
         ping_pong_egld::ContractBuilder,
     );

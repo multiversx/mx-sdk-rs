@@ -12,7 +12,8 @@ use elrond_wasm::{
 
 #[derive(Debug, Default)]
 pub struct ScCallStep {
-    pub tx_id: String,
+    pub id: String,
+    pub tx_id: Option<String>,
     pub comment: Option<String>,
     pub tx: Box<TxCall>,
     pub expect: Option<TxExpect>,
@@ -156,7 +157,7 @@ pub fn convert_call_args(arg_buffer: &ManagedArgBuffer<DebugApi>) -> Vec<String>
     arg_buffer
         .to_raw_args_vec()
         .iter()
-        .map(|arg| format!("0x{}", hex::encode(&arg)))
+        .map(|arg| format!("0x{}", hex::encode(arg)))
         .collect()
 }
 

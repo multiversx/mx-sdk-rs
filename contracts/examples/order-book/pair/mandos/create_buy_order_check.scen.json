@@ -11,7 +11,7 @@
         },
         {
             "step": "scCall",
-            "txId": "getOrderById",
+            "id": "getOrderById",
             "tx": {
                 "from": "address:user1",
                 "to": "sc:pair",
@@ -33,7 +33,7 @@
         },
         {
             "step": "scCall",
-            "txId": "getAddressOrderIds",
+            "id": "getAddressOrderIds",
             "tx": {
                 "from": "address:user1",
                 "to": "sc:pair",

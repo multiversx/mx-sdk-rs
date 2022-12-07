@@ -27,7 +27,7 @@ fn test_codec() {
         &EgldOrEsdtTokenIdentifier::<DebugApi>::EGLD_REPRESENTATION[..],
     ]);
     check_managed_top_encode_decode(
-        api.clone(),
+        api,
         vec![EgldOrEsdtTokenIdentifier::<DebugApi>::egld()],
         expected.as_slice(),
     );

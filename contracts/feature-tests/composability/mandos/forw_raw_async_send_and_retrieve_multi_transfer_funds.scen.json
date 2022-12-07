@@ -46,7 +46,7 @@
         },
         {
             "step": "scCall",
-            "txId": "multi-transfer-through-callback-burn-and-create",
+            "id": "multi-transfer-through-callback-burn-and-create",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",

@@ -44,14 +44,17 @@ where
         }
     }
 
+    #[inline]
     fn send_raw_wrapper(&self) -> SendRawWrapper<A> {
         SendRawWrapper::new()
     }
 
+    #[inline]
     pub fn esdt_system_sc_proxy(&self) -> ESDTSystemSmartContractProxy<A> {
         ESDTSystemSmartContractProxy::new_proxy_obj()
     }
 
+    #[inline]
     pub fn contract_call<R>(
         &self,
         to: ManagedAddress<A>,
@@ -62,6 +65,7 @@ where
 
     /// Sends EGLD to a given address, directly.
     /// Used especially for sending EGLD to regular accounts.
+    #[inline]
     pub fn direct_egld(&self, to: &ManagedAddress<A>, amount: &BigUint<A>) {
         self.send_raw_wrapper().direct_egld(to, amount, Empty)
     }
@@ -114,6 +118,7 @@ where
         }
     }
 
+    #[inline]
     #[allow(clippy::too_many_arguments)]
     pub fn direct_esdt(
         &self,
@@ -123,6 +128,23 @@ where
         amount: &BigUint<A>,
     ) {
         self.direct_esdt_with_gas_limit(to, token_identifier, nonce, amount, 0, Empty, &[]);
+    }
+
+    pub fn direct_non_zero_esdt_payment(
+        &self,
+        to: &ManagedAddress<A>,
+        payment: &EsdtTokenPayment<A>,
+    ) {
+        if payment.amount == 0 {
+            return;
+        }
+
+        self.direct_esdt(
+            to,
+            &payment.token_identifier,
+            payment.token_nonce,
+            &payment.amount,
+        );
     }
 
     #[allow(clippy::too_many_arguments)]
@@ -278,7 +300,7 @@ where
             func_name = ESDT_LOCAL_BURN_FUNC_NAME;
         } else {
             func_name = ESDT_NFT_BURN_FUNC_NAME;
-            arg_buffer.push_arg(&nonce);
+            arg_buffer.push_arg(nonce);
         }
 
         arg_buffer.push_arg(amount);

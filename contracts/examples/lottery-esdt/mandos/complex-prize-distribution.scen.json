@@ -97,7 +97,7 @@
         },
         {
             "step": "scCall",
-            "txId": "determine-winner-same-ticket-holder",
+            "id": "determine-winner-same-ticket-holder",
             "tx": {
                 "from": "address:my_address",
                 "to": "sc:lottery",

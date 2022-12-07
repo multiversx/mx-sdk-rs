@@ -17,7 +17,7 @@
         },
         {
             "step": "scCall",
-            "txId": "create-fungible-token",
+            "id": "create-fungible-token",
             "tx": {
                 "from": "address:creator",
                 "to": "sc:erc1155",

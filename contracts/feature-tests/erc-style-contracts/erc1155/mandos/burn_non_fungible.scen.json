@@ -8,7 +8,7 @@
         },
         {
             "step": "scCall",
-            "txId": "burn-non-fungible-token",
+            "id": "burn-non-fungible-token",
             "tx": {
                 "from": "address:creator",
                 "to": "sc:erc1155",

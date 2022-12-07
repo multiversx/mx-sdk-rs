@@ -18,7 +18,7 @@
         },
         {
             "step": "scCall",
-            "txId": "store-reserved-1",
+            "id": "store-reserved-1",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -40,7 +40,7 @@
         },
         {
             "step": "scCall",
-            "txId": "store-reserved-2",
+            "id": "store-reserved-2",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -62,7 +62,7 @@
         },
         {
             "step": "scCall",
-            "txId": "store-reserved-3",
+            "id": "store-reserved-3",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",

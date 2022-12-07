@@ -1,0 +1,14 @@
+# Abi-tester multi-contract config, used for testing.
+
+[settings]
+main = "main"
+
+[contracts.main]
+name = "abi-tester"
+add-unlabelled = true
+
+[contracts.external-view]
+name = "abi-tester-ev"
+external-view = true
+add-labels = ["test-external-view"]
+add-endpoints = ["payable_any_token", "label_a"] # labels can be bypassed, endpoints added directly

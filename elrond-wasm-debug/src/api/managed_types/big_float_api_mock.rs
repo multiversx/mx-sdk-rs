@@ -101,12 +101,12 @@ impl BigFloatApi for DebugApi {
                 message: err_msg::DIVISION_BY_0.to_string(),
             });
         }
-        let f_numerator = numerator.to_f64();
-        let f_denominator = denominator.to_f64();
-        let value = if f_numerator == None || f_denominator == None {
-            f64::from(0)
+        let value = if let (Some(f_numerator), Some(f_denominator)) =
+            (numerator.to_f64(), denominator.to_f64())
+        {
+            f_numerator / f_denominator
         } else {
-            f_numerator.unwrap() / f_denominator.unwrap()
+            f64::from(0)
         };
 
         let mut managed_types = self.m_types_borrow_mut();
@@ -121,12 +121,11 @@ impl BigFloatApi for DebugApi {
             });
         }
 
-        let f_significand = significand.to_f64();
-        let value = if f_significand == None {
-            f64::from(0)
-        } else {
+        let value = if let Some(f_significand) = significand.to_f64() {
             let exponent_multiplier = (10.0_f64).powi(exponent.try_into().unwrap());
-            f_significand.unwrap() * exponent_multiplier
+            f_significand * exponent_multiplier
+        } else {
+            f64::from(0)
         };
 
         let mut managed_types = self.m_types_borrow_mut();
@@ -144,7 +143,7 @@ impl BigFloatApi for DebugApi {
         let bf_x = self.bf_get_f64(x);
         let bf_y = self.bf_get_f64(y);
         let order_opt = bf_x.partial_cmp(&bf_y);
-        if order_opt == None {
+        if order_opt.is_none() {
             self.signal_error(err_msg::CANNOT_COMPARE_VALUES)
         }
         order_opt.unwrap()

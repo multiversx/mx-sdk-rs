@@ -17,7 +17,7 @@
         },
         {
             "step": "scCall",
-            "txId": "newBigFloatFromInt64 - 1",
+            "id": "newBigFloatFromInt64 - 1",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -36,7 +36,7 @@
         },
         {
             "step": "scCall",
-            "txId": "newBigFloatFromInt64 - 2",
+            "id": "newBigFloatFromInt64 - 2",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -55,7 +55,7 @@
         },
         {
             "step": "scCall",
-            "txId": "newBigFloatFromInt64 - 3",
+            "id": "newBigFloatFromInt64 - 3",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -74,7 +74,7 @@
         },
         {
             "step": "scCall",
-            "txId": "newBigFloatFromInt32 - 1",
+            "id": "newBigFloatFromInt32 - 1",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -93,7 +93,7 @@
         },
         {
             "step": "scCall",
-            "txId": "newBigFloatFromInt32 - 2",
+            "id": "newBigFloatFromInt32 - 2",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -112,7 +112,7 @@
         },
         {
             "step": "scCall",
-            "txId": "newBigFloatFromInt32 - 3",
+            "id": "newBigFloatFromInt32 - 3",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -131,7 +131,7 @@
         },
         {
             "step": "scCall",
-            "txId": "newBigFloatFromInt16 - 1",
+            "id": "newBigFloatFromInt16 - 1",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -150,7 +150,7 @@
         },
         {
             "step": "scCall",
-            "txId": "newBigFloatFromInt16 - 2",
+            "id": "newBigFloatFromInt16 - 2",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -169,7 +169,7 @@
         },
         {
             "step": "scCall",
-            "txId": "newBigFloatFromInt16 - 3",
+            "id": "newBigFloatFromInt16 - 3",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -188,7 +188,7 @@
         },
         {
             "step": "scCall",
-            "txId": "newBigFloatFromInt8 - 1",
+            "id": "newBigFloatFromInt8 - 1",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -207,7 +207,7 @@
         },
         {
             "step": "scCall",
-            "txId": "newBigFloatFromInt8 - 2",
+            "id": "newBigFloatFromInt8 - 2",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -226,7 +226,7 @@
         },
         {
             "step": "scCall",
-            "txId": "newBigFloatFromInt8 - 3",
+            "id": "newBigFloatFromInt8 - 3",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -245,7 +245,7 @@
         },
         {
             "step": "scCall",
-            "txId": "newBigFloatFromIntSize - 1",
+            "id": "newBigFloatFromIntSize - 1",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -264,7 +264,7 @@
         },
         {
             "step": "scCall",
-            "txId": "newBigFloatFromIntSize - 2",
+            "id": "newBigFloatFromIntSize - 2",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -283,7 +283,7 @@
         },
         {
             "step": "scCall",
-            "txId": "newBigFloatFromIntSize - 3",
+            "id": "newBigFloatFromIntSize - 3",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",

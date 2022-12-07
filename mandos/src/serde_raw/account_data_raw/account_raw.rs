@@ -39,7 +39,6 @@ pub struct AccountRaw {
     pub owner: Option<ValueSubTree>,
 
     #[serde(default)]
-    #[serde(rename = "developer_rewards")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub developer_rewards: Option<ValueSubTree>,
 }

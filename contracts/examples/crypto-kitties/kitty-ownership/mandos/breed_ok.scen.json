@@ -8,7 +8,7 @@
         },
         {
             "step": "scCall",
-            "txId": "tx-breed-ok",
+            "id": "tx-breed-ok",
             "tx": {
                 "from": "address:acc2",
                 "to": "sc:kitty_ownership_contract",

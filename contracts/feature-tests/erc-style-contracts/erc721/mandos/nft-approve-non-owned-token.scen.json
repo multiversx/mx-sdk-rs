@@ -16,7 +16,7 @@
         },
         {
             "step": "scCall",
-            "txId": "approve-non-owned",
+            "id": "approve-non-owned",
             "tx": {
                 "from": "address:acc1",
                 "to": "sc:the_nft_contract",

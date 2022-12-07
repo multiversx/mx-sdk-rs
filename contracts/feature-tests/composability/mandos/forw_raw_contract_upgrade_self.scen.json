@@ -16,7 +16,7 @@
         },
         {
             "step": "scCall",
-            "txId": "upgrade-self",
+            "id": "upgrade-self",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",

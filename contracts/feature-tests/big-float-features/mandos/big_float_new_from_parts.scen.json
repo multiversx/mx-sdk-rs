@@ -17,7 +17,7 @@
         },
         {
             "step": "scCall",
-            "txId": "newBigFloatFromParts - 1",
+            "id": "newBigFloatFromParts - 1",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -39,7 +39,7 @@
         },
         {
             "step": "scCall",
-            "txId": "newBigFloatFromParts - 2",
+            "id": "newBigFloatFromParts - 2",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -61,7 +61,7 @@
         },
         {
             "step": "scCall",
-            "txId": "newBigFloatFromParts - 3",
+            "id": "newBigFloatFromParts - 3",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -83,7 +83,7 @@
         },
         {
             "step": "scCall",
-            "txId": "newBigFloatFromParts - 4 - fail positive exponent",
+            "id": "newBigFloatFromParts - 4 - fail positive exponent",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -98,13 +98,14 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "10",
                 "message": "str:exponent must be negative"
             }
         },
         {
             "step": "scCall",
-            "txId": "newBigFloatFromParts - 5",
+            "id": "newBigFloatFromParts - 5",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",

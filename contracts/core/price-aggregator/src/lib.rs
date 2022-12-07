@@ -2,10 +2,10 @@
 
 elrond_wasm::imports!();
 
+mod events;
 pub mod median;
 pub mod price_aggregator_data;
 pub mod staking;
-mod events;
 
 use price_aggregator_data::{OracleStatus, PriceFeed, TimestampedPrice, TokenPair};
 

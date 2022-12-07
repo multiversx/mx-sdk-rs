@@ -72,53 +72,69 @@ impl InterpretableFrom<StepRaw> for Step {
                 ),
             }),
             StepRaw::ScCall {
+                id,
                 tx_id,
                 comment,
                 display_logs: _,
                 tx,
                 expect,
             } => Step::ScCall(ScCallStep {
+                id,
                 tx_id,
                 comment,
                 tx: Box::new(TxCall::interpret_from(tx, context)),
                 expect: expect.map(|v| TxExpect::interpret_from(v, context)),
             }),
             StepRaw::ScQuery {
+                id,
                 tx_id,
                 comment,
                 display_logs: _,
                 tx,
                 expect,
             } => Step::ScQuery(ScQueryStep {
+                id,
                 tx_id,
                 comment,
                 tx: Box::new(TxQuery::interpret_from(tx, context)),
                 expect: expect.map(|v| TxExpect::interpret_from(v, context)),
             }),
             StepRaw::ScDeploy {
+                id,
                 tx_id,
                 comment,
                 display_logs: _,
                 tx,
                 expect,
             } => Step::ScDeploy(ScDeployStep {
+                id,
                 tx_id,
                 comment,
                 tx: Box::new(TxDeploy::interpret_from(tx, context)),
                 expect: expect.map(|v| TxExpect::interpret_from(v, context)),
             }),
-            StepRaw::Transfer { tx_id, comment, tx } => Step::Transfer(TransferStep {
+            StepRaw::Transfer {
+                id,
+                tx_id,
+                comment,
+                tx,
+            } => Step::Transfer(TransferStep {
+                id,
                 tx_id,
                 comment,
                 tx: Box::new(TxTransfer::interpret_from(tx, context)),
             }),
-            StepRaw::ValidatorReward { tx_id, comment, tx } => {
-                Step::ValidatorReward(ValidatorRewardStep {
-                    tx_id,
-                    comment,
-                    tx: Box::new(TxValidatorReward::interpret_from(tx, context)),
-                })
-            },
+            StepRaw::ValidatorReward {
+                id,
+                tx_id,
+                comment,
+                tx,
+            } => Step::ValidatorReward(ValidatorRewardStep {
+                id,
+                tx_id,
+                comment,
+                tx: Box::new(TxValidatorReward::interpret_from(tx, context)),
+            }),
             StepRaw::CheckState { comment, accounts } => Step::CheckState(CheckStateStep {
                 comment,
                 accounts: CheckAccounts::interpret_from(accounts, context),
@@ -152,6 +168,7 @@ impl IntoRaw<StepRaw> for Step {
                 current_block_info: s.current_block_info.map(|bi| bi.into_raw()),
             },
             Step::ScCall(s) => StepRaw::ScCall {
+                id: s.id,
                 tx_id: s.tx_id,
                 comment: s.comment,
                 display_logs: None,
@@ -159,6 +176,7 @@ impl IntoRaw<StepRaw> for Step {
                 expect: s.expect.map(|expect| expect.into_raw()),
             },
             Step::ScQuery(s) => StepRaw::ScQuery {
+                id: s.id,
                 tx_id: s.tx_id,
                 comment: s.comment,
                 display_logs: None,
@@ -166,6 +184,7 @@ impl IntoRaw<StepRaw> for Step {
                 expect: s.expect.map(|expect| expect.into_raw()),
             },
             Step::ScDeploy(s) => StepRaw::ScDeploy {
+                id: s.id,
                 tx_id: s.tx_id,
                 comment: s.comment,
                 display_logs: None,
@@ -173,11 +192,13 @@ impl IntoRaw<StepRaw> for Step {
                 expect: s.expect.map(|expect| expect.into_raw()),
             },
             Step::Transfer(s) => StepRaw::Transfer {
+                id: s.id,
                 tx_id: s.tx_id,
                 comment: s.comment,
                 tx: s.tx.into_raw(),
             },
             Step::ValidatorReward(s) => StepRaw::ValidatorReward {
+                id: s.id,
                 tx_id: s.tx_id,
                 comment: s.comment,
                 tx: s.tx.into_raw(),

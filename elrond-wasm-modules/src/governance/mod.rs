@@ -7,6 +7,10 @@ pub mod governance_proposal;
 use governance_proposal::*;
 
 const MAX_GAS_LIMIT_PER_BLOCK: u64 = 600_000_000;
+const MIN_AMOUNT_PER_DEPOSIT: u64 = 1;
+pub const ALREADY_VOTED_ERR_MSG: &[u8] = b"Already voted for this proposal";
+pub const MIN_FEES_REACHED: &[u8] = b"Propose already reached min threshold for fees";
+pub const MIN_AMOUNT_NOT_REACHED: &[u8] = b"Minimum amount not reached";
 
 #[elrond_wasm::module]
 pub trait GovernanceModule:
@@ -15,43 +19,78 @@ pub trait GovernanceModule:
 {
     // endpoints
 
-    // Used to deposit tokens for "payable" actions
-    // There is no "withdraw" functionality
-    // Funds can only be retrived through an action
+    /// Used to deposit tokens for "payable" actions.
+    /// Funds will be returned if the proposal is defeated.
+    /// To keep the logic simple, all tokens have to be deposited at once
     #[payable("*")]
-    #[endpoint(depositTokensForAction)]
-    fn deposit_tokens_for_action(&self) {
-        let payments = self.call_value().all_esdt_transfers();
-        let caller = self.blockchain().get_caller();
+    #[endpoint(depositTokensForProposal)]
+    fn deposit_tokens_for_proposal(&self, proposal_id: ProposalId) {
+        self.require_caller_not_self();
+        self.require_valid_proposal_id(proposal_id);
+        require!(
+            self.get_proposal_status(proposal_id) == GovernanceProposalStatus::WaitingForFees,
+            "Proposal has to be executed or canceled first"
+        );
+        require!(
+            !self.proposal_reached_min_fees(proposal_id),
+            MIN_FEES_REACHED
+        );
+        let additional_fee = self.require_payment_token_governance_token();
+        require!(
+            additional_fee.amount >= MIN_AMOUNT_PER_DEPOSIT,
+            MIN_AMOUNT_NOT_REACHED
+        );
 
-        self.user_deposit_event(&caller, &payments);
+        let caller = self.blockchain().get_caller();
+        let mut proposal = self.proposals().get(proposal_id);
+        proposal.fees.entries.push(FeeEntry {
+            depositor_addr: caller.clone(),
+            tokens: additional_fee.clone(),
+        });
+        proposal.fees.total_amount += additional_fee.amount.clone();
+        self.proposals().set(proposal_id, &proposal);
+
+        self.user_deposit_event(&caller, proposal_id, &additional_fee);
     }
 
     // Used to withdraw the tokens after the action was executed or cancelled
     #[endpoint(withdrawGovernanceTokens)]
-    fn withdraw_governance_tokens(&self, proposal_id: usize) {
+    fn claim_deposited_tokens(&self, proposal_id: usize) {
+        self.require_caller_not_self();
         self.require_valid_proposal_id(proposal_id);
         require!(
-            self.get_proposal_status(proposal_id) == GovernanceProposalStatus::None,
-            "Proposal has to be executed or canceled first"
+            self.get_proposal_status(proposal_id) == GovernanceProposalStatus::WaitingForFees,
+            "Cannot claim deposited tokens anymore; Proposal is not in WatingForFees state"
+        );
+
+        require!(
+            !self.proposal_reached_min_fees(proposal_id),
+            MIN_FEES_REACHED
         );
 
         let caller = self.blockchain().get_caller();
-        let governance_token_id = self.governance_token_id().get();
+        let mut proposal = self.proposals().get(proposal_id);
+        let mut fees_to_send = ManagedVec::<Self::Api, FeeEntry<Self::Api>>::new();
+        let mut i = 0;
+        while i < proposal.fees.entries.len() {
+            if proposal.fees.entries.get(i).depositor_addr == caller {
+                fees_to_send.push(proposal.fees.entries.get(i));
+                proposal.fees.entries.remove(i);
+            } else {
+                i += 1;
+            }
+        }
 
-        let votes_mapper = self.votes(proposal_id, &caller);
-        let downvotes_mapper = self.downvotes(proposal_id, &caller);
+        for fee_entry in fees_to_send.iter() {
+            let payment = fee_entry.tokens.clone();
 
-        let nr_votes_tokens = votes_mapper.get();
-        let nr_downvotes_tokens = downvotes_mapper.get();
-        let total_tokens = nr_votes_tokens + nr_downvotes_tokens;
-
-        if total_tokens > 0 {
-            votes_mapper.clear();
-            downvotes_mapper.clear();
-
-            self.send()
-                .direct_esdt(&caller, &governance_token_id, 0, &total_tokens);
+            self.send().direct_esdt(
+                &fee_entry.depositor_addr,
+                &payment.token_identifier,
+                payment.token_nonce,
+                &payment.amount,
+            );
+            self.user_claim_event(&caller, proposal_id, &fee_entry.tokens);
         }
     }
 
@@ -73,6 +112,8 @@ pub trait GovernanceModule:
         description: ManagedBuffer,
         actions: MultiValueEncoded<GovernanceActionAsMultiArg<Self::Api>>,
     ) -> usize {
+        self.require_caller_not_self();
+
         let payment = self.require_payment_token_governance_token();
 
         require!(
@@ -87,11 +128,10 @@ pub trait GovernanceModule:
 
         let mut gov_actions = ArrayVec::new();
         for action in actions {
-            let (gas_limit, dest_address, payments, function_name, arguments) = action.into_tuple();
+            let (gas_limit, dest_address, function_name, arguments) = action.into_tuple();
             let gov_action = GovernanceAction {
                 gas_limit,
                 dest_address,
-                payments,
                 function_name,
                 arguments,
             };
@@ -110,27 +150,28 @@ pub trait GovernanceModule:
         );
 
         let proposer = self.blockchain().get_caller();
-        let current_block = self.blockchain().get_block_nonce();
-        let proposal_id = self.proposals().len() + 1;
-
-        self.proposal_created_event(
-            proposal_id,
-            &proposer,
-            current_block,
-            &description,
-            &gov_actions,
-        );
-
-        self.proposal_start_block(proposal_id).set(&current_block);
-        self.total_votes(proposal_id).set(&payment.amount);
-        self.votes(proposal_id, &proposer).set(&payment.amount);
+        let fees_entries = ManagedVec::from_single_item(FeeEntry {
+            depositor_addr: proposer.clone(),
+            tokens: payment.clone(),
+        });
 
         let proposal = GovernanceProposal {
-            proposer,
+            proposer: proposer.clone(),
             description,
             actions: gov_actions,
+            fees: ProposalFees {
+                total_amount: payment.amount,
+                entries: fees_entries,
+            },
         };
-        let _ = self.proposals().push(&proposal);
+
+        let proposal_id = self.proposals().push(&proposal);
+        self.proposal_votes(proposal_id).set(ProposalVotes::new());
+
+        let current_block = self.blockchain().get_block_nonce();
+        self.proposal_start_block(proposal_id).set(current_block);
+
+        self.proposal_created_event(proposal_id, &proposer, current_block, &proposal);
 
         proposal_id
     }
@@ -139,7 +180,9 @@ pub trait GovernanceModule:
     /// These tokens will be locked until the proposal is executed or cancelled.
     #[payable("*")]
     #[endpoint]
-    fn vote(&self, proposal_id: usize) {
+    fn vote(&self, proposal_id: usize, vote: VoteType) {
+        self.require_caller_not_self();
+
         let payment = self.require_payment_token_governance_token();
         self.require_valid_proposal_id(proposal_id);
         require!(
@@ -148,33 +191,35 @@ pub trait GovernanceModule:
         );
 
         let voter = self.blockchain().get_caller();
-        self.vote_cast_event(&voter, proposal_id, &payment.amount);
+        let new_user = self.user_voted_proposals(&voter).insert(proposal_id);
+        require!(new_user, ALREADY_VOTED_ERR_MSG);
 
-        self.total_votes(proposal_id)
-            .update(|total_votes| *total_votes += &payment.amount);
-        self.votes(proposal_id, &voter)
-            .update(|nr_votes| *nr_votes += &payment.amount);
-    }
-
-    /// Downvote a proposal by depositing any amount of governance tokens.
-    /// These tokens will be locked until the proposal is executed or cancelled.
-    #[payable("*")]
-    #[endpoint]
-    fn downvote(&self, proposal_id: usize) {
-        let payment = self.require_payment_token_governance_token();
-        self.require_valid_proposal_id(proposal_id);
-        require!(
-            self.get_proposal_status(proposal_id) == GovernanceProposalStatus::Active,
-            "Proposal is not active"
-        );
-
-        let downvoter = self.blockchain().get_caller();
-        self.downvote_cast_event(&downvoter, proposal_id, &payment.amount);
-
-        self.total_downvotes(proposal_id)
-            .update(|total_downvotes| *total_downvotes += &payment.amount);
-        self.downvotes(proposal_id, &downvoter)
-            .update(|nr_downvotes| *nr_downvotes += &payment.amount);
+        match vote {
+            VoteType::UpVote => {
+                self.proposal_votes(proposal_id).update(|total_votes| {
+                    total_votes.up_votes += &payment.amount.clone();
+                });
+                self.up_vote_cast_event(&voter, proposal_id, &payment.amount);
+            },
+            VoteType::DownVote => {
+                self.proposal_votes(proposal_id).update(|total_votes| {
+                    total_votes.down_votes += &payment.amount.clone();
+                });
+                self.down_vote_cast_event(&voter, proposal_id, &payment.amount);
+            },
+            VoteType::DownVetoVote => {
+                self.proposal_votes(proposal_id).update(|total_votes| {
+                    total_votes.down_veto_votes += &payment.amount.clone();
+                });
+                self.down_veto_vote_cast_event(&voter, proposal_id, &payment.amount);
+            },
+            VoteType::AbstainVote => {
+                self.proposal_votes(proposal_id).update(|total_votes| {
+                    total_votes.abstain_votes += &payment.amount.clone();
+                });
+                self.abstain_vote_cast_event(&voter, proposal_id, &payment.amount);
+            },
+        }
     }
 
     /// Queue a proposal for execution.
@@ -183,13 +228,15 @@ pub trait GovernanceModule:
     /// total_votes - total_downvotes >= quorum
     #[endpoint]
     fn queue(&self, proposal_id: usize) {
+        self.require_caller_not_self();
+
         require!(
             self.get_proposal_status(proposal_id) == GovernanceProposalStatus::Succeeded,
             "Can only queue succeeded proposals"
         );
 
         let current_block = self.blockchain().get_block_nonce();
-        self.proposal_queue_block(proposal_id).set(&current_block);
+        self.proposal_queue_block(proposal_id).set(current_block);
 
         self.proposal_queued_event(proposal_id, current_block);
     }
@@ -199,6 +246,8 @@ pub trait GovernanceModule:
     /// Said tokens can then be withdrawn and used to vote/downvote other proposals.
     #[endpoint]
     fn execute(&self, proposal_id: usize) {
+        self.require_caller_not_self();
+
         require!(
             self.get_proposal_status(proposal_id) == GovernanceProposalStatus::Queued,
             "Can only execute queued proposals"
@@ -224,15 +273,13 @@ pub trait GovernanceModule:
             "Not enough gas to execute all proposals"
         );
 
+        self.clear_proposal(proposal_id);
+
         for action in proposal.actions {
             let mut contract_call = self
                 .send()
                 .contract_call::<()>(action.dest_address, action.function_name)
                 .with_gas_limit(action.gas_limit);
-
-            if !action.payments.is_empty() {
-                contract_call = contract_call.with_multi_token_transfer(action.payments);
-            }
 
             for arg in &action.arguments {
                 contract_call.push_arg_managed_buffer(arg);
@@ -240,8 +287,6 @@ pub trait GovernanceModule:
 
             contract_call.transfer_execute();
         }
-
-        self.clear_proposal(proposal_id);
 
         self.proposal_executed_event(proposal_id);
     }
@@ -251,6 +296,8 @@ pub trait GovernanceModule:
     /// - by anyone, if the proposal was defeated
     #[endpoint]
     fn cancel(&self, proposal_id: usize) {
+        self.require_caller_not_self();
+
         match self.get_proposal_status(proposal_id) {
             GovernanceProposalStatus::None => {
                 sc_panic!("Proposal does not exist");
@@ -265,13 +312,15 @@ pub trait GovernanceModule:
                 );
             },
             GovernanceProposalStatus::Defeated => {},
+            GovernanceProposalStatus::WaitingForFees => {
+                self.refund_payments(proposal_id);
+            },
             _ => {
                 sc_panic!("Action may not be cancelled");
             },
         }
 
         self.clear_proposal(proposal_id);
-
         self.proposal_canceled_event(proposal_id);
     }
 
@@ -303,14 +352,27 @@ pub trait GovernanceModule:
             return GovernanceProposalStatus::Active;
         }
 
-        let total_votes = self.total_votes(proposal_id).get();
-        let total_downvotes = self.total_downvotes(proposal_id).get();
-        let quorum = self.quorum().get();
-
-        if total_votes > total_downvotes && total_votes - total_downvotes >= quorum {
+        if self.quorum_and_vote_reached(proposal_id) {
             GovernanceProposalStatus::Succeeded
         } else {
             GovernanceProposalStatus::Defeated
+        }
+    }
+
+    fn quorum_and_vote_reached(&self, proposal_id: ProposalId) -> bool {
+        let proposal_votes = self.proposal_votes(proposal_id).get();
+        let total_votes = proposal_votes.get_total_votes();
+        let total_up_votes = proposal_votes.up_votes;
+        let total_down_votes = proposal_votes.down_votes;
+        let total_down_veto_votes = proposal_votes.down_veto_votes;
+        let third_total_votes = &total_votes / 3u64;
+        let quorum = self.quorum().get();
+
+        sc_print!("Total votes = {} quorum = {}", total_votes, quorum);
+        if total_down_veto_votes > third_total_votes {
+            false
+        } else {
+            total_votes >= quorum && total_up_votes > (total_down_votes + total_down_veto_votes)
         }
     }
 
@@ -353,6 +415,20 @@ pub trait GovernanceModule:
 
     // private
 
+    fn refund_payments(&self, proposal_id: ProposalId) {
+        let payments = self.proposals().get(proposal_id).fees;
+
+        for fee_entry in payments.entries.iter() {
+            let payment = fee_entry.tokens;
+            self.send().direct_esdt(
+                &fee_entry.depositor_addr,
+                &payment.token_identifier,
+                payment.token_nonce,
+                &payment.amount,
+            );
+        }
+    }
+
     fn require_payment_token_governance_token(&self) -> EsdtTokenPayment {
         let payment = self.call_value().single_esdt();
         require!(
@@ -369,8 +445,24 @@ pub trait GovernanceModule:
         );
     }
 
+    fn require_caller_not_self(&self) {
+        let caller = self.blockchain().get_caller();
+        let sc_address = self.blockchain().get_sc_address();
+
+        require!(
+            caller != sc_address,
+            "Cannot call this endpoint through proposed action"
+        );
+    }
+
     fn is_valid_proposal_id(&self, proposal_id: usize) -> bool {
         proposal_id >= 1 && proposal_id <= self.proposals().len()
+    }
+
+    fn proposal_reached_min_fees(&self, proposal_id: ProposalId) -> bool {
+        let accumulated_fees = self.proposals().get(proposal_id).fees.total_amount;
+        let min_fees = self.min_fee_for_propose().get();
+        accumulated_fees >= min_fees
     }
 
     fn proposal_exists(&self, proposal_id: usize) -> bool {
@@ -412,15 +504,15 @@ pub trait GovernanceModule:
     #[storage_mapper("governance:proposalQueueBlock")]
     fn proposal_queue_block(&self, proposal_id: usize) -> SingleValueMapper<u64>;
 
-    #[storage_mapper("governance:votes")]
-    fn votes(&self, proposal_id: usize, voter: &ManagedAddress) -> SingleValueMapper<BigUint>;
+    #[storage_mapper("governance:userVotedProposals")]
+    fn user_voted_proposals(&self, user: &ManagedAddress) -> UnorderedSetMapper<ProposalId>;
 
-    #[storage_mapper("governance:downvotes")]
-    fn downvotes(
+    #[view(getProposalVotes)]
+    #[storage_mapper("proposalVotes")]
+    fn proposal_votes(
         &self,
-        proposal_id: usize,
-        downvoter: &ManagedAddress,
-    ) -> SingleValueMapper<BigUint>;
+        proposal_id: ProposalId,
+    ) -> SingleValueMapper<ProposalVotes<Self::Api>>;
 
     #[view(getTotalVotes)]
     #[storage_mapper("governance:totalVotes")]

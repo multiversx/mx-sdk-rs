@@ -23,7 +23,7 @@
         },
         {
             "step": "scCall",
-            "txId": "1",
+            "id": "1",
             "tx": {
                 "from": "address:user",
                 "to": "sc:basic-features",
@@ -43,7 +43,7 @@
         },
         {
             "step": "scCall",
-            "txId": "1",
+            "id": "1",
             "tx": {
                 "from": "sc:evil-caller-sc",
                 "to": "sc:basic-features",

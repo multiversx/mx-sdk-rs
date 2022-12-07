@@ -41,7 +41,7 @@
         },
         {
             "step": "scCall",
-            "txId": "multi-transfer-through-promises",
+            "id": "multi-transfer-through-promises",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:promises",

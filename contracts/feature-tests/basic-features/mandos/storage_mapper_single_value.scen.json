@@ -10,6 +10,11 @@
                     "balance": "0",
                     "code": "file:../output/basic-features.wasm"
                 },
+                "sc:extra-instance": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../output/basic-features.wasm"
+                },
                 "address:an_account": {
                     "nonce": "0",
                     "balance": "0"
@@ -18,7 +23,7 @@
         },
         {
             "step": "scCall",
-            "txId": "before",
+            "id": "before",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -39,7 +44,7 @@
         },
         {
             "step": "scCall",
-            "txId": "increment-1",
+            "id": "increment-1",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -60,7 +65,7 @@
         },
         {
             "step": "scCall",
-            "txId": "after-1",
+            "id": "after-1",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -81,7 +86,7 @@
         },
         {
             "step": "scCall",
-            "txId": "increment-2",
+            "id": "increment-2",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -102,7 +107,7 @@
         },
         {
             "step": "scCall",
-            "txId": "subtract-too-much",
+            "id": "subtract-too-much",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -124,7 +129,7 @@
         },
         {
             "step": "scCall",
-            "txId": "subtract-ok",
+            "id": "subtract-ok",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -145,7 +150,7 @@
         },
         {
             "step": "scCall",
-            "txId": "after-2",
+            "id": "after-2",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -175,6 +180,12 @@
                     },
                     "code": "file:../output/basic-features.wasm"
                 },
+                "sc:extra-instance": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "file:../output/basic-features.wasm"
+                },
                 "address:an_account": {
                     "nonce": "*",
                     "balance": "*",
@@ -185,7 +196,7 @@
         },
         {
             "step": "scCall",
-            "txId": "is-empty-before-clear",
+            "id": "is-empty-before-clear",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -206,7 +217,30 @@
         },
         {
             "step": "scCall",
-            "txId": "clear-single-value-mapper",
+            "id": "is-empty-at-address-before-clear",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:extra-instance",
+                "function": "is_empty_at_address_single_value_mapper",
+                "arguments": [
+                    "sc:basic-features"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "false"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "clear-single-value-mapper",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -225,12 +259,35 @@
         },
         {
             "step": "scCall",
-            "txId": "is-empty-after-clear",
+            "id": "is-empty-after-clear",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
                 "function": "is_empty_single_value_mapper",
                 "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "true"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "is-empty-at-address-after-clear",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:extra-instance",
+                "function": "is_empty_at_address_single_value_mapper",
+                "arguments": [
+                    "sc:basic-features"
+                ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
@@ -253,6 +310,12 @@
                     "storage": {},
                     "code": "file:../output/basic-features.wasm"
                 },
+                "sc:extra-instance": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "file:../output/basic-features.wasm"
+                },
                 "address:an_account": {
                     "nonce": "*",
                     "balance": "*",
@@ -263,7 +326,7 @@
         },
         {
             "step": "scCall",
-            "txId": "set-empty-entry",
+            "id": "set-empty-entry",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -294,6 +357,12 @@
                     },
                     "code": "file:../output/basic-features.wasm"
                 },
+                "sc:extra-instance": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "file:../output/basic-features.wasm"
+                },
                 "address:an_account": {
                     "nonce": "*",
                     "balance": "*",
@@ -304,7 +373,7 @@
         },
         {
             "step": "scCall",
-            "txId": "call-set-if-empty-on-non-empty-entry",
+            "id": "call-set-if-empty-on-non-empty-entry",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -335,6 +404,12 @@
                     },
                     "code": "file:../output/basic-features.wasm"
                 },
+                "sc:extra-instance": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "file:../output/basic-features.wasm"
+                },
                 "address:an_account": {
                     "nonce": "*",
                     "balance": "*",
@@ -345,7 +420,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "query-raw-byte-length",
+            "id": "query-raw-byte-length",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "raw_byte_length_single_value_mapper",

@@ -37,7 +37,6 @@ pub struct CheckAccountRaw {
     pub owner: CheckBytesValueRaw,
 
     #[serde(default)]
-    #[serde(rename = "developer_rewards")]
     #[serde(skip_serializing_if = "CheckBytesValueRaw::is_unspecified")]
     pub developer_rewards: CheckBytesValueRaw,
 

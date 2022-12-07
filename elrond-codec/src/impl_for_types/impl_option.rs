@@ -67,18 +67,19 @@ impl<T: NestedDecode> TopDecode for Option<T> {
     {
         let mut buffer = input.into_nested_buffer();
         if buffer.is_depleted() {
-            Ok(None)
+            Ok(None) // empty input is none
         } else {
             let first_byte = buffer.read_byte(h)?;
-            if first_byte == 1 {
-                let item = T::dep_decode_or_handle_err(&mut buffer, h)?;
-                if buffer.is_depleted() {
-                    Ok(Some(item))
-                } else {
-                    Err(h.handle_error(DecodeError::INPUT_TOO_LONG))
-                }
+            let value = match first_byte {
+                0 => None, // also allow "0x00" to be interpreted as None
+                1 => Some(T::dep_decode_or_handle_err(&mut buffer, h)?),
+                _ => return Err(h.handle_error(DecodeError::INVALID_VALUE)),
+            };
+
+            if buffer.is_depleted() {
+                Ok(value)
             } else {
-                Err(h.handle_error(DecodeError::INVALID_VALUE))
+                Err(h.handle_error(DecodeError::INPUT_TOO_LONG))
             }
         }
     }
@@ -88,7 +89,10 @@ impl<T: NestedDecode> TopDecode for Option<T> {
 pub mod tests {
     use alloc::vec::Vec;
 
-    use crate::test_util::check_top_encode_decode;
+    use crate::{
+        test_util::{check_top_decode, check_top_encode_decode},
+        DecodeError, TopDecode,
+    };
 
     #[test]
     fn test_top() {
@@ -101,5 +105,32 @@ pub mod tests {
 
         let none_v: Option<Vec<i32>> = None;
         check_top_encode_decode(none_v, &[]);
+    }
+
+    #[test]
+    fn test_top_none() {
+        // default representation
+        assert_eq!(None, check_top_decode::<Option<u32>>(&[][..]));
+
+        // single zero byte also allowed
+        assert_eq!(None, check_top_decode::<Option<u32>>(&[0x00u8][..]));
+
+        // invalid None bytes
+        assert_eq!(
+            Option::<u32>::top_decode(&[0x00u8, 0x00u8][..]),
+            Err(DecodeError::INPUT_TOO_LONG)
+        );
+
+        // more invalid None bytes
+        assert_eq!(
+            Option::<u32>::top_decode(&[0x00u8, 0x00u8, 0x00u8][..]),
+            Err(DecodeError::INPUT_TOO_LONG)
+        );
+
+        // just invalid byte
+        assert_eq!(
+            Option::<u32>::top_decode(&[0x02u8][..]),
+            Err(DecodeError::INVALID_VALUE)
+        );
     }
 }

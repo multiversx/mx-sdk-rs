@@ -2,12 +2,12 @@ use elrond_wasm_debug::*;
 
 fn world() -> BlockchainMock {
     let mut blockchain = BlockchainMock::new();
-    blockchain.register_contract_builder(
+    blockchain.register_contract(
         "file:first-contract/output/first-contract.wasm",
         first_contract::ContractBuilder,
     );
 
-    blockchain.register_contract_builder(
+    blockchain.register_contract(
         "file:second-contract/output/second-contract.wasm",
         second_contract::ContractBuilder,
     );

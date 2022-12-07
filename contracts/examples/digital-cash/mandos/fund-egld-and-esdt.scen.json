@@ -7,7 +7,7 @@
         },
         {
             "step": "scCall",
-            "txId": "fund",
+            "id": "fund",
             "tx": {
                 "from": "address:acc1",
                 "to": "sc:the_digital_cash_contract",
@@ -68,7 +68,7 @@
         },
         {
             "step": "scCall",
-            "txId": "fund-2",
+            "id": "fund-2",
             "tx": {
                 "from": "address:acc2",
                 "to": "sc:the_digital_cash_contract",

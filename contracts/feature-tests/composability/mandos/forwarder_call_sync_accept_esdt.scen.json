@@ -25,7 +25,7 @@
         },
         {
             "step": "scCall",
-            "txId": "transfer-multi-esdt-to-single-esdt-api",
+            "id": "transfer-multi-esdt-to-single-esdt-api",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:vault",
@@ -55,7 +55,7 @@
         },
         {
             "step": "scCall",
-            "txId": "1",
+            "id": "1",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",

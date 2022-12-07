@@ -9,15 +9,32 @@
             "path": "steps/deploy_minimal.steps.json"
         },
         {
+            "step": "setState",
+            "accounts": {
+                "address:faucet": {
+                    "balance": "10"
+                }
+            }
+        },
+        {
+            "step": "transfer",
+            "id": "1",
+            "tx": {
+                "from": "address:faucet",
+                "to": "sc:multisig",
+                "egldValue": "10"
+            }
+        },
+        {
             "step": "scCall",
-            "txId": "propose-send-to-other-shard-1",
+            "id": "propose-send-to-other-shard-1",
             "tx": {
                 "from": "address:alice",
                 "to": "sc:multisig",
                 "function": "proposeTransferExecute",
                 "arguments": [
                     "sc:other-shard-1",
-                    "0"
+                    "10"
                 ],
                 "gasLimit": "100,000,000",
                 "gasPrice": "0"
@@ -34,7 +51,7 @@
         },
         {
             "step": "scCall",
-            "txId": "perform-send-to-other-shard-1",
+            "id": "perform-send-to-other-shard-1",
             "tx": {
                 "from": "address:alice",
                 "to": "sc:multisig",

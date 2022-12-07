@@ -7,7 +7,7 @@
         },
         {
             "step": "scCall",
-            "txId": "revoke-non-approved",
+            "id": "revoke-non-approved",
             "tx": {
                 "from": "address:contract_owner",
                 "to": "sc:the_nft_contract",

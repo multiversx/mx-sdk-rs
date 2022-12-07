@@ -1,0 +1,12 @@
+[settings]
+main = "multi-contract-main"
+
+[contracts.multi-contract-main]
+# main contract can have any id and any name
+name = "multi-contract-features"
+add-unlabelled = true
+
+[contracts.multi-contract-features-view]
+# name is optional, if missing this ^^^ id will be used
+external-view = true
+add-labels = ["mcs-external-view"]

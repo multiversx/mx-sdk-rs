@@ -13,7 +13,7 @@
         },
         {
             "step": "scCall",
-            "txId": "create-NFT-1",
+            "id": "create-NFT-1",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:nft-minter",
@@ -43,7 +43,7 @@
         },
         {
             "step": "scCall",
-            "txId": "create-NFT-2",
+            "id": "create-NFT-2",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:nft-minter",

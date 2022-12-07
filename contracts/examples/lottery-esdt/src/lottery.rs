@@ -238,7 +238,7 @@ pub trait Lottery {
         info.tickets_left -= 1;
         info.prize_pool += &info.ticket_price;
 
-        entries_mapper.set(&entries);
+        entries_mapper.set(entries);
         info_mapper.set(&info);
     }
 
@@ -270,7 +270,7 @@ pub trait Lottery {
         // the 1st place gets the leftover, maybe could split between the remaining
         // but this is a rare case anyway and it's not worth the overhead
         let total_winning_tickets = if total_tickets < info.prize_distribution.len() {
-            total_tickets as usize
+            total_tickets
         } else {
             info.prize_distribution.len()
         };
@@ -342,7 +342,7 @@ pub trait Lottery {
         }
 
         let total_numbers = rand_numbers.len();
-        let mut rand = RandomnessSource::<Self::Api>::new();
+        let mut rand = RandomnessSource::new();
 
         for i in 0..amount {
             let rand_index = rand.next_usize_in_range(0, total_numbers);

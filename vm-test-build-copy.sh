@@ -27,6 +27,7 @@ build_and_copy() {
 build_and_copy ./contracts/examples/adder $VM_REPO_PATH/test/adder
 build_and_copy ./contracts/examples/crowdfunding-esdt $VM_REPO_PATH/test/crowdfunding-esdt
 build_and_copy ./contracts/examples/digital-cash $VM_REPO_PATH/test/digital-cash
+build_and_copy ./contracts/examples/factorial $VM_REPO_PATH/test/factorial
 build_and_copy ./contracts/examples/ping-pong-egld $VM_REPO_PATH/test/ping-pong-egld
 build_and_copy ./contracts/experimental/multisig-external-view $VM_REPO_PATH/test/multisig
 build_and_copy ./contracts/examples/egld-esdt-swap $VM_REPO_PATH/test/egld-esdt-swap

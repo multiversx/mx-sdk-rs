@@ -10,7 +10,7 @@
         },
         {
             "step": "scCall",
-            "txId": "propose-send-to-other-shard",
+            "id": "propose-send-to-other-shard",
             "tx": {
                 "from": "address:alice",
                 "to": "sc:multisig",
@@ -34,7 +34,7 @@
         },
         {
             "step": "scCall",
-            "txId": "perform-send-to-other-shard-precise-insufficient-gas",
+            "id": "perform-send-to-other-shard-precise-insufficient-gas",
             "comment": "this test is fragile, since it uses very precise gas; can be discarded",
             "tx": {
                 "from": "address:alice",

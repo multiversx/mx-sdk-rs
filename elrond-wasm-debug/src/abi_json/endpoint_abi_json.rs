@@ -97,6 +97,8 @@ pub struct EndpointAbiJson {
     pub payable_in_tokens: Vec<String>,
     pub inputs: Vec<InputAbiJson>,
     pub outputs: Vec<OutputAbiJson>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub labels: Vec<String>,
 }
 
 impl From<&EndpointAbi> for EndpointAbiJson {
@@ -118,6 +120,7 @@ impl From<&EndpointAbi> for EndpointAbiJson {
                 .collect(),
             inputs: abi.inputs.iter().map(InputAbiJson::from).collect(),
             outputs: abi.outputs.iter().map(OutputAbiJson::from).collect(),
+            labels: abi.labels.iter().map(|&label| label.to_owned()).collect(),
         }
     }
 }

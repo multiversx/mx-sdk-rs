@@ -1,6 +1,6 @@
 [package]
 name = "elrond-sc-wegld-swap"
-version = "0.34.1"
+version = "0.36.1"
 
 authors = [
     "Dorin Iancu <dorin.iancu@elrond.com>",
@@ -20,13 +20,13 @@ edition = "2018"
 path = "src/wegld.rs"
 
 [dependencies.elrond-wasm]
-version = "0.34.1"
+version = "0.36.1"
 path = "../../../elrond-wasm"
 
 [dependencies.elrond-wasm-modules]
-version = "0.34.1"
+version = "0.36.1"
 path = "../../../elrond-wasm-modules"
 
 [dev-dependencies.elrond-wasm-debug]
-version = "0.34.1"
+version = "0.36.1"
 path = "../../../elrond-wasm-debug"

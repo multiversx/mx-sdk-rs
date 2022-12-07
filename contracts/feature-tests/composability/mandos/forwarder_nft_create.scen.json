@@ -41,7 +41,7 @@
         },
         {
             "step": "scCall",
-            "txId": "1",
+            "id": "1",
             "comment": "Attributes are Color(128, 128, 128)",
             "tx": {
                 "from": "address:a_user",

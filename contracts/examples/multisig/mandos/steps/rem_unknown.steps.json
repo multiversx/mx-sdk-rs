@@ -1,0 +1,107 @@
+{
+    "comment": "remove a user that doesn't exist",
+    "steps": [
+        {
+            "step": "scCall",
+            "id": "rem-unknown-prop",
+            "tx": {
+                "from": "address:paul",
+                "to": "sc:multisig",
+                "function": "proposeRemoveUser",
+                "arguments": [
+                    "address:unknown"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "4"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "rem-unknown-sign-bob",
+            "tx": {
+                "from": "address:bob",
+                "to": "sc:multisig",
+                "function": "sign",
+                "arguments": [
+                    "4"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "rem-unknown-sign-charlie",
+            "tx": {
+                "from": "address:charlie",
+                "to": "sc:multisig",
+                "function": "sign",
+                "arguments": [
+                    "4"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "rem-unknown-perform",
+            "tx": {
+                "from": "address:paul",
+                "to": "sc:multisig",
+                "function": "performAction",
+                "arguments": [
+                    "4"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "getAllBoardMembers",
+            "tx": {
+                "to": "sc:multisig-view",
+                "function": "getAllBoardMembers",
+                "arguments": []
+            },
+            "expect": {
+                "out": [
+                    "address:bob",
+                    "address:charlie",
+                    "address:dan"
+                ]
+            }
+        }
+    ]
+}

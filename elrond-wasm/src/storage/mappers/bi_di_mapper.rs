@@ -99,8 +99,16 @@ where
         storage_clear(self.get_value_key(id).as_ref());
     }
 
+    pub fn contains_id(&self, id: &K) -> bool {
+        self.id_set_mapper.contains(id)
+    }
+
+    pub fn contains_value(&self, value: &V) -> bool {
+        self.value_set_mapper.contains(value)
+    }
+
     pub fn insert(&mut self, id: K, value: V) -> bool {
-        if self.id_set_mapper.contains(&id) || self.value_set_mapper.contains(&value) {
+        if self.contains_id(&id) || self.contains_value(&value) {
             return false;
         }
         self.set_id(&value, &id);

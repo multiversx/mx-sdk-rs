@@ -4,14 +4,14 @@ use crate::{
     types::{
         heap::{ArgBuffer, BoxedBytes},
         ManagedBuffer, ManagedBufferNestedDecodeInput, ManagedType, ManagedVecItem, ManagedVecRef,
-        ManagedVecRefIterator, MultiValueManagedVec,
+        ManagedVecRefIterator, MultiValueEncoded, MultiValueManagedVec,
     },
 };
 use alloc::vec::Vec;
-use core::{borrow::Borrow, marker::PhantomData};
+use core::{borrow::Borrow, iter::FromIterator, marker::PhantomData};
 use elrond_codec::{
-    DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode,
-    NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeMultiOutput,
+    DecodeErrorHandler, EncodeErrorHandler, IntoMultiValue, NestedDecode, NestedDecodeInput,
+    NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeMultiOutput,
     TopEncodeOutput,
 };
 
@@ -186,6 +186,8 @@ where
         item.to_byte_writer(|slice| self.buffer.set_slice(byte_index, slice))
     }
 
+    /// Returns a new `ManagedVec`, containing the [start_index, end_index) range of elements.
+    /// Returns `None` if any index is out of range
     pub fn slice(&self, start_index: usize, end_index: usize) -> Option<Self> {
         let byte_start = start_index * T::PAYLOAD_SIZE;
         let byte_end = end_index * T::PAYLOAD_SIZE;
@@ -452,6 +454,22 @@ where
     }
 }
 
+impl<M, T> IntoMultiValue for ManagedVec<M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedVecItem + IntoMultiValue,
+{
+    type MultiValue = MultiValueEncoded<M, T::MultiValue>;
+
+    fn into_multi_value(self) -> Self::MultiValue {
+        let mut result = MultiValueEncoded::new();
+        for item in self.into_iter() {
+            result.push(item.into_multi_value());
+        }
+        result
+    }
+}
+
 impl<M, T> TypeAbi for ManagedVec<M, T>
 where
     M: ManagedTypeApi,
@@ -518,5 +536,29 @@ where
         arg.top_encode_or_handle_err(&mut result, h)?;
         self.push(result);
         Ok(())
+    }
+}
+
+impl<M, V> FromIterator<V> for ManagedVec<M, V>
+where
+    M: ManagedTypeApi,
+    V: ManagedVecItem,
+{
+    fn from_iter<T: IntoIterator<Item = V>>(iter: T) -> Self {
+        let mut result: ManagedVec<M, V> = ManagedVec::new();
+        iter.into_iter().for_each(|f| result.push(f));
+        result
+    }
+}
+
+impl<M, V> Extend<V> for ManagedVec<M, V>
+where
+    M: ManagedTypeApi,
+    V: ManagedVecItem,
+{
+    fn extend<T: IntoIterator<Item = V>>(&mut self, iter: T) {
+        for elem in iter {
+            self.push(elem);
+        }
     }
 }

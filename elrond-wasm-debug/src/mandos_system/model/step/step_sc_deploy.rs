@@ -11,7 +11,8 @@ use super::convert_call_args;
 
 #[derive(Debug, Default)]
 pub struct ScDeployStep {
-    pub tx_id: String,
+    pub id: String,
+    pub tx_id: Option<String>,
     pub comment: Option<String>,
     pub tx: Box<TxDeploy>,
     pub expect: Option<TxExpect>,
