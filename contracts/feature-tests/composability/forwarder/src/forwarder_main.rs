@@ -3,7 +3,7 @@
 #![allow(clippy::let_unit_value)]
 
 mod call_async;
-mod call_programmed;
+mod call_queue;
 mod call_sync;
 mod call_transf_exec;
 mod contract_change_owner;
@@ -23,7 +23,7 @@ pub trait Forwarder:
     call_sync::ForwarderSyncCallModule
     + call_async::ForwarderAsyncCallModule
     + call_transf_exec::ForwarderTransferExecuteModule
-	+ call_programmed::ForwarderProgrammedCallModule
+    + call_queue::ForwarderQueuedCallModule
     + contract_change_owner::ChangeOwnerModule
     + contract_deploy::DeployContractModule
     + contract_upgrade::UpgradeContractModule
