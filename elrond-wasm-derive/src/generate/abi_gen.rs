@@ -1,7 +1,6 @@
 use super::util::*;
 use crate::model::{
-    AutoImpl, ContractTrait, EndpointLocationMetadata, EndpointMutabilityMetadata, Method,
-    MethodImpl, PublicRole,
+    AutoImpl, ContractTrait, EndpointMutabilityMetadata, Method, MethodImpl, PublicRole,
 };
 
 fn generate_endpoint_snippet(
@@ -10,7 +9,6 @@ fn generate_endpoint_snippet(
     only_owner: bool,
     only_admin: bool,
     mutability: EndpointMutabilityMetadata,
-    location: EndpointLocationMetadata,
 ) -> proc_macro2::TokenStream {
     let endpoint_docs = &m.docs;
     let rust_method_name = m.name.to_string();
@@ -47,8 +45,9 @@ fn generate_endpoint_snippet(
             }
         },
     };
+
+    let label_names = &m.label_names;
     let mutability_tokens = mutability.to_tokens();
-    let location_tokens = location.to_tokens();
 
     quote! {
         let mut endpoint_abi = elrond_wasm::abi::EndpointAbi{
@@ -58,10 +57,10 @@ fn generate_endpoint_snippet(
             only_owner: #only_owner,
             only_admin: #only_admin,
             mutability: #mutability_tokens,
-            location: #location_tokens,
             payable_in_tokens: &[ #(#payable_in_tokens),* ],
             inputs: elrond_wasm::types::heap::Vec::new(),
             outputs: elrond_wasm::types::heap::Vec::new(),
+            labels: &[ #(#label_names),* ],
         };
         #(#input_snippets)*
         #output_snippet
@@ -80,7 +79,6 @@ fn generate_endpoint_snippets(contract: &ContractTrait) -> Vec<proc_macro2::Toke
                     false,
                     false,
                     EndpointMutabilityMetadata::Mutable,
-                    EndpointLocationMetadata::MainContract,
                 );
                 Some(quote! {
                     #endpoint_def
@@ -95,7 +93,6 @@ fn generate_endpoint_snippets(contract: &ContractTrait) -> Vec<proc_macro2::Toke
                     endpoint_metadata.only_owner,
                     endpoint_metadata.only_admin,
                     endpoint_metadata.mutability.clone(),
-                    endpoint_metadata.location.clone(),
                 );
                 Some(quote! {
                     #endpoint_def

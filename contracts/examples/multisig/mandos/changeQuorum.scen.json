@@ -56,7 +56,7 @@
             "step": "scQuery",
             "id": "pending-action-data",
             "tx": {
-                "to": "sc:multisig",
+                "to": "sc:multisig-view",
                 "function": "getPendingActionFullInfo",
                 "arguments": []
             },
@@ -117,7 +117,7 @@
             "step": "scQuery",
             "id": "pending-action-data-none",
             "tx": {
-                "to": "sc:multisig",
+                "to": "sc:multisig-view",
                 "function": "getPendingActionFullInfo",
                 "arguments": []
             },

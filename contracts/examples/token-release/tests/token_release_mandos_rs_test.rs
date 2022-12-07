@@ -4,7 +4,7 @@ fn world() -> BlockchainMock {
     let mut blockchain = BlockchainMock::new();
     blockchain.set_current_dir_from_workspace("contracts/examples/token-release");
 
-    blockchain.register_contract_builder(
+    blockchain.register_contract(
         "file:output/token-release.wasm",
         token_release::ContractBuilder,
     );

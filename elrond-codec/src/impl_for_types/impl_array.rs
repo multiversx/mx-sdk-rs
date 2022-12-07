@@ -104,8 +104,8 @@ mod tests {
 
         // deserialize
         let deserialized = <[i32; 16384]>::top_decode(&serialized_bytes[..]).unwrap();
-        for i in 0..16384 {
-            assert_eq!(deserialized[i], 7i32);
+        for byte in deserialized {
+            assert_eq!(byte, 7i32);
         }
     }
 }

@@ -33,10 +33,9 @@ use elrond_wasm_debug::*;
 
 fn world() -> BlockchainMock {
     let mut blockchain = BlockchainMock::new();
-    blockchain
-        .register_contract_builder("file:output/use-module.wasm", use_module::ContractBuilder);
+    blockchain.register_contract("file:output/use-module.wasm", use_module::ContractBuilder);
 
-    blockchain.register_contract_builder(
+    blockchain.register_contract(
         "file:test-wasm/elrond-wasm-sc-dns.wasm",
         dns_mock::ContractBuilder,
     );

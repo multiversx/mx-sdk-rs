@@ -21,8 +21,8 @@ fn world() -> BlockchainMock {
     let mut blockchain = BlockchainMock::new();
     blockchain.set_current_dir_from_workspace("contracts/examples/multisig");
 
-    blockchain.register_contract_builder("file:test-contracts/adder.wasm", adder::ContractBuilder);
-    blockchain.register_contract_builder("file:output/multisig.wasm", multisig::ContractBuilder);
+    blockchain.register_contract("file:test-contracts/adder.wasm", adder::ContractBuilder);
+    blockchain.register_contract("file:output/multisig.wasm", multisig::ContractBuilder);
     blockchain
 }
 
@@ -137,7 +137,7 @@ impl MultisigTestState {
             .init(2u32, board)
             .into_blockchain_call()
             .from(self.owner.clone())
-            .contract_code("file:output/multisig.wasm", &ic)
+            .contract_code("file:output/multisig.wasm", ic)
             .gas_limit("5,000,000")
             .expect(TxExpect::ok().no_result())
             .execute(&mut self.world);
@@ -158,7 +158,7 @@ impl MultisigTestState {
             .init(0u64)
             .into_blockchain_call()
             .from(&self.owner)
-            .contract_code("file:test-contracts/adder.wasm", &ic)
+            .contract_code("file:test-contracts/adder.wasm", ic)
             .gas_limit("5,000,000")
             .expect(TxExpect::ok().no_result())
             .execute(&mut self.world);
@@ -206,7 +206,7 @@ impl MultisigTestState {
     }
 
     fn multisig_deploy_adder(&mut self, caller: &Address, signers: &[&Address]) -> Address {
-        let action_id = self.multisig_propose_adder_deploy(&caller);
+        let action_id = self.multisig_propose_adder_deploy(caller);
         self.multisig_sign_and_perform(action_id, caller, signers)
             .unwrap()
     }
@@ -219,8 +219,7 @@ impl MultisigTestState {
         ));
 
         let adder_init_args = self.adder.init(0u64).arg_buffer.into_multi_value_encoded();
-        let action_id = self
-            .multisig
+        self.multisig
             .propose_sc_deploy_from_source(
                 0u64,
                 &self.adder,
@@ -231,8 +230,7 @@ impl MultisigTestState {
             .from(caller)
             .gas_limit("5,000,000")
             .expect(TxExpect::ok())
-            .execute(&mut self.world);
-        action_id
+            .execute(&mut self.world)
     }
 
     fn multisig_call_adder_add(&mut self, number: BigUint, caller: &Address, signers: &[&Address]) {

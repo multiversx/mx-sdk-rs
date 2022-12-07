@@ -6,12 +6,12 @@ fn world() -> BlockchainMock {
         "contracts/feature-tests/erc-style-contracts/lottery-erc20",
     );
 
-    blockchain.register_contract_builder(
+    blockchain.register_contract(
         "file:output/lottery-erc20.wasm",
         lottery_erc20::ContractBuilder,
     );
 
-    blockchain.register_contract_builder("file:../erc20/output/erc20.wasm", erc20::ContractBuilder);
+    blockchain.register_contract("file:../erc20/output/erc20.wasm", erc20::ContractBuilder);
 
     blockchain
 }

@@ -4,14 +4,18 @@ use super::StorageMapper;
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
     api::StorageMapperApi,
-    storage::{storage_clear, storage_get, storage_get_len, storage_set, StorageKey},
-    types::ManagedType,
+    storage::{
+        storage_clear, storage_get, storage_get_from_address, storage_get_len, storage_set,
+        StorageKey,
+    },
+    types::{ManagedAddress, ManagedType},
 };
 use elrond_codec::{
     multi_types::PlaceholderOutput, CodecFrom, CodecFromSelf, DecodeErrorHandler,
     EncodeErrorHandler, TopDecode, TopDecodeInput, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
     TopEncodeOutput,
 };
+use storage_get_from_address::storage_get_len_from_address;
 
 /// Manages a single serializable item in storage.
 pub struct SingleValueMapper<SA, T>
@@ -49,9 +53,21 @@ where
         storage_get(self.key.as_ref())
     }
 
+    /// Gets the value from the given address. Both adresses have to be in the same shard.
+    pub fn get_from_address(&self, address: &ManagedAddress<SA>) -> T {
+        storage_get_from_address(address.as_ref(), self.key.as_ref())
+    }
+
     /// Returns whether the storage managed by this mapper is empty.
     pub fn is_empty(&self) -> bool {
         self.raw_byte_length() == 0
+    }
+
+    /// Returns whether the storage at the given key is empty at the given address.
+    /// Both adresses have to be in the same shard.
+    pub fn is_empty_at_address(&self, address: &ManagedAddress<SA>) -> bool {
+        let len = storage_get_len_from_address(address.as_ref(), self.key.as_ref());
+        len == 0
     }
 
     /// Saves argument to storage.
@@ -93,6 +109,23 @@ where
 
     pub fn raw_byte_length(&self) -> usize {
         storage_get_len(self.key.as_ref())
+    }
+
+    /// Takes the value out of the storage, clearing it in the process.
+    pub fn take(&self) -> T {
+        let value = self.get();
+        self.clear();
+        value
+    }
+
+    // Replaces the actual value in the storage by the value given in parameter, returning the old value.
+    pub fn replace<BT>(&self, new_value: BT) -> T
+    where
+        BT: Borrow<T>,
+    {
+        let value = self.get();
+        self.set(new_value);
+        value
     }
 }
 
