@@ -139,7 +139,7 @@ pub trait FungibleTokenMapperFeatures:
 
     #[view(getFungibleTokenId)]
     #[storage_mapper("fungibleTokenMapper")]
-    fn fungible_token_mapper(&self) -> FungibleTokenMapper<Self::Api>;
+    fn fungible_token_mapper(&self) -> FungibleTokenMapper;
 
     #[storage_mapper("rolesSet")]
     fn roles_set(&self) -> SingleValueMapper<bool>;
