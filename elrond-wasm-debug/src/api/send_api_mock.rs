@@ -66,6 +66,7 @@ impl DebugApi {
             gas_limit: 1000,
             gas_price: 0,
             tx_hash,
+            promise_callback_closure_data: Vec::new(),
         }
     }
 
@@ -133,6 +134,7 @@ impl DebugApi {
             gas_limit: 1000,
             gas_price: 0,
             tx_hash,
+            promise_callback_closure_data: Vec::new(),
         };
 
         let tx_cache = TxCache::new(self.blockchain_cache_rc());
@@ -359,29 +361,34 @@ impl SendApiImpl for DebugApi {
         self.perform_async_call(call)
     }
 
-    fn create_async_call_raw<M: ManagedTypeApi>(
+    fn create_async_call_raw(
         &self,
-        to: &ManagedAddress<M>,
-        amount: &BigUint<M>,
-        endpoint_name: &ManagedBuffer<M>,
+        to: Self::ManagedBufferHandle,
+        amount: Self::BigIntHandle,
+        endpoint_name_handle: Self::ManagedBufferHandle,
+        arg_buffer_handle: Self::ManagedBufferHandle,
         success_callback: &'static [u8],
         error_callback: &'static [u8],
         _gas: u64,
         _extra_gas_for_callback: u64,
-        arg_buffer: &ManagedArgBuffer<M>,
+        callback_closure_handle: Self::ManagedBufferHandle,
     ) {
-        let amount_value =
-            self.big_uint_handle_to_value(amount.get_handle().cast_or_signal_error::<M, _>());
+        let amount_value = self.big_uint_handle_to_value(amount);
         let contract_address = self.input_ref().to.clone();
-        let recipient = to.to_address();
+        let recipient = self.address_handle_to_value(to);
+        let endpoint_name = self.mb_handle_to_value(endpoint_name_handle);
         let tx_hash = self.get_tx_hash_legacy();
+        let callback_closure_data = self.mb_handle_to_value(callback_closure_handle);
 
         let call = AsyncCallTxData {
             from: contract_address,
             to: recipient,
             call_value: amount_value,
-            endpoint_name: endpoint_name.to_boxed_bytes().into_vec(),
-            arguments: arg_buffer.to_raw_args_vec(),
+            endpoint_name,
+            arguments: ManagedArgBuffer::<Self>::from_raw_handle(
+                arg_buffer_handle.get_raw_handle_unchecked(),
+            )
+            .to_raw_args_vec(),
             tx_hash,
         };
 
@@ -389,6 +396,7 @@ impl SendApiImpl for DebugApi {
             endpoint: call,
             success_callback,
             error_callback,
+            callback_closure_data,
         };
 
         let mut tx_result = self.result_borrow_mut();

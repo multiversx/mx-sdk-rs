@@ -33,6 +33,11 @@ pub fn generate_function_selector_body(contract: &ContractTrait) -> proc_macro2:
                 endpoint_metadata.public_name.to_string().as_str(),
                 quote!{},
             )),
+            PublicRole::CallbackPromise(callback_metadata) => Some(endpoint_match_arm(
+                m,
+                callback_metadata.callback_name.to_string().as_str(),
+                quote!{},
+            )),
             _ => None,
         })
         .collect();

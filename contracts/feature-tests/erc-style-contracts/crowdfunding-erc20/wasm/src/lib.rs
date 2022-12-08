@@ -4,14 +4,16 @@
 ////////////////// AUTO-GENERATED //////////////////
 ////////////////////////////////////////////////////
 
-// Number of endpoints: 8
+// Init:                                 1
+// Endpoints:                            8
+// Async Callback:                       1
+// Total number of exported functions:  10
 
 #![no_std]
 
 elrond_wasm_node::wasm_endpoints! {
     crowdfunding_erc20
     (
-        callBack
         fund
         status
         claim
@@ -20,5 +22,6 @@ elrond_wasm_node::wasm_endpoints! {
         get_deposit
         get_erc20_contract_address
         get_total_balance
+        callBack
     )
 }

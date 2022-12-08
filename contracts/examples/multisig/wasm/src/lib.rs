@@ -4,7 +4,10 @@
 ////////////////// AUTO-GENERATED //////////////////
 ////////////////////////////////////////////////////
 
-// Number of endpoints: 20
+// Init:                                 1
+// Endpoints:                           20
+// Async Callback (empty):               1
+// Total number of exported functions:  22
 
 #![no_std]
 

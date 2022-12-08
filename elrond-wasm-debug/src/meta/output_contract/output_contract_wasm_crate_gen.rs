@@ -15,11 +15,90 @@ const PREFIX_AUTO_GENERATED: &str =
 
 ";
 
-const PREFIX_NO_STD: &str = "
+const NUM_INIT: usize = 1;
+const NUM_ASYNC_CB: usize = 1;
 
+const PREFIX_NO_STD: &str = "
 #![no_std]
 
 ";
+
+impl OutputContract {
+    /// Makes sure that all the necessary wasm crate directories exist.
+    pub fn create_wasm_crate_dir(&self) {
+        fs::create_dir_all(PathBuf::from(&self.wasm_crate_path()).join("src")).unwrap();
+    }
+
+    /// Generates the wasm crate lib.rs source, st the given path.
+    pub fn generate_wasm_src_lib_file(&self) {
+        let lib_path = format!("{}/src/lib.rs", &self.wasm_crate_path());
+        let mut wasm_lib_file = File::create(lib_path).unwrap();
+        self.write_wasm_src_lib_contents(&mut wasm_lib_file);
+    }
+
+    fn write_wasm_src_lib_contents(&self, wasm_lib_file: &mut File) {
+        let explicit_endpoint_names = self.endpoint_names();
+        wasm_lib_file
+            .write_all(PREFIX_AUTO_GENERATED.as_bytes())
+            .unwrap();
+        self.write_stat_comments(wasm_lib_file);
+        wasm_lib_file.write_all(PREFIX_NO_STD.as_bytes()).unwrap();
+
+        let full_macro_name = if self.external_view {
+            "elrond_wasm_node::external_view_wasm_endpoints!"
+        } else {
+            "elrond_wasm_node::wasm_endpoints!"
+        };
+
+        let mut all_endpoint_names = explicit_endpoint_names;
+        if self.abi.has_callback {
+            all_endpoint_names.push("callBack".to_string());
+        }
+        for promise_callback in &self.abi.promise_callbacks {
+            all_endpoint_names.push(promise_callback.name.to_string());
+        }
+
+        let contract_module_name = self.abi.get_crate_name_for_code();
+        write_endpoints_macro(
+            full_macro_name,
+            wasm_lib_file,
+            &contract_module_name,
+            all_endpoint_names.iter(),
+        );
+
+        if !self.abi.has_callback {
+            write_wasm_empty_callback_macro(wasm_lib_file);
+        }
+    }
+}
+
+fn write_stat_comment(wasm_lib_file: &mut File, label: &str, number: usize) {
+    writeln!(wasm_lib_file, "// {:<35} {:3}", label, number).unwrap();
+}
+
+impl OutputContract {
+    /// Writing some nicely formatted comments breaking down all exported functions.
+    fn write_stat_comments(&self, wasm_lib_file: &mut File) {
+        write_stat_comment(wasm_lib_file, "Init:", NUM_INIT);
+        write_stat_comment(wasm_lib_file, "Endpoints:", self.abi.endpoints.len());
+        if self.abi.has_callback {
+            write_stat_comment(wasm_lib_file, "Async Callback:", NUM_ASYNC_CB);
+        } else {
+            write_stat_comment(wasm_lib_file, "Async Callback (empty):", NUM_ASYNC_CB);
+        }
+        if !self.abi.promise_callbacks.is_empty() {
+            write_stat_comment(
+                wasm_lib_file,
+                "Promise callbacks:",
+                self.abi.promise_callbacks.len(),
+            );
+        }
+        let total =
+            self.abi.endpoints.len() + NUM_INIT + NUM_ASYNC_CB + self.abi.promise_callbacks.len();
+
+        write_stat_comment(wasm_lib_file, "Total number of exported functions:", total);
+    }
+}
 
 fn write_endpoints_macro<'a, I>(
     full_macro_name: &str,
@@ -42,54 +121,4 @@ fn write_endpoints_macro<'a, I>(
 fn write_wasm_empty_callback_macro(wasm_lib_file: &mut File) {
     writeln!(wasm_lib_file).unwrap();
     writeln!(wasm_lib_file, "elrond_wasm_node::wasm_empty_callback! {{}}").unwrap();
-}
-
-impl OutputContract {
-    fn write_wasm_src_lib_contents(&self, wasm_lib_file: &mut File) {
-        let endpoint_names = self.endpoint_names();
-        wasm_lib_file
-            .write_all(PREFIX_AUTO_GENERATED.as_bytes())
-            .unwrap();
-        write!(
-            wasm_lib_file,
-            "// Number of endpoints: {}",
-            endpoint_names.len()
-        )
-        .unwrap();
-        wasm_lib_file.write_all(PREFIX_NO_STD.as_bytes()).unwrap();
-
-        let full_macro_name = if self.external_view {
-            "elrond_wasm_node::external_view_wasm_endpoints!"
-        } else {
-            "elrond_wasm_node::wasm_endpoints!"
-        };
-
-        let mut mandatory_endpoints = Vec::new();
-        if self.abi.has_callback {
-            mandatory_endpoints.push("callBack".to_string());
-        }
-        let all_endpoint_names = mandatory_endpoints.iter().chain(endpoint_names.iter());
-
-        let contract_module_name = self.abi.get_crate_name_for_code();
-        write_endpoints_macro(
-            full_macro_name,
-            wasm_lib_file,
-            &contract_module_name,
-            all_endpoint_names,
-        );
-
-        if !self.abi.has_callback {
-            write_wasm_empty_callback_macro(wasm_lib_file);
-        }
-    }
-
-    pub fn create_wasm_crate_dir(&self) {
-        fs::create_dir_all(PathBuf::from(&self.wasm_crate_path()).join("src")).unwrap();
-    }
-
-    pub fn generate_wasm_src_lib_file(&self) {
-        let lib_path = format!("{}/src/lib.rs", &self.wasm_crate_path());
-        let mut wasm_lib_file = File::create(lib_path).unwrap();
-        self.write_wasm_src_lib_contents(&mut wasm_lib_file);
-    }
 }

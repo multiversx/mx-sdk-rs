@@ -149,7 +149,7 @@ where
             DEFAULT_ISSUE_CALLBACK_NAME
         };
 
-        let mut cb_closure = CallbackClosure::new(cb_name.into());
+        let mut cb_closure = CallbackClosure::new(cb_name);
         cb_closure.push_endpoint_arg(&initial_caller);
         cb_closure.push_endpoint_arg(&self.key.buffer);
 
