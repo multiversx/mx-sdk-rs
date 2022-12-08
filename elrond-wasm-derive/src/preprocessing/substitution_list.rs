@@ -107,7 +107,6 @@ fn add_storage_mappers(substitutions: &mut SubstitutionsMap) {
     add_storage_mapper_single_generic_arg(substitutions, &quote!(TokenAttributesMapper));
     add_storage_mapper_single_generic_arg(substitutions, &quote!(UniqueIdMapper));
     add_storage_mapper_single_generic_arg(substitutions, &quote!(UserMapper));
-    add_storage_mapper_single_generic_arg(substitutions, &quote!(WhitelistMapper));
 
     add_storage_mapper(substitutions, &quote!(BiDiMapper));
     add_storage_mapper(substitutions, &quote!(LinkedListMapper));
@@ -118,4 +117,5 @@ fn add_storage_mappers(substitutions: &mut SubstitutionsMap) {
     add_storage_mapper(substitutions, &quote!(SingleValueMapper));
     add_storage_mapper(substitutions, &quote!(VecMapper));
     add_storage_mapper(substitutions, &quote!(QueueMapper));
+    add_storage_mapper(substitutions, &quote!(WhitelistMapper));
 }
