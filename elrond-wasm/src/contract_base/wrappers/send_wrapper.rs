@@ -70,6 +70,14 @@ where
         self.send_raw_wrapper().direct_egld(to, amount, Empty)
     }
 
+    pub fn direct_non_zero_egld(&self, to: &ManagedAddress<A>, amount: &BigUint<A>) {
+        if amount == &0 {
+            return;
+        }
+
+        self.direct_egld(to, amount)
+    }
+
     /// Sends either EGLD, ESDT or NFT to the target address,
     /// depending on the token identifier and nonce
     #[inline]
