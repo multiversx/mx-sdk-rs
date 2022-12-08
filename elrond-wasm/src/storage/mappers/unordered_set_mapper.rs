@@ -161,6 +161,21 @@ where
     }
 }
 
+impl<SA, T> Extend<T> for UnorderedSetMapper<SA, T>
+where
+    SA: StorageMapperApi,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
+{
+    fn extend<I>(&mut self, iter: I)
+    where
+        I: IntoIterator<Item = T>,
+    {
+        for item in iter {
+            self.insert(item);
+        }
+    }
+}
+
 /// Behaves like a MultiResultVec when an endpoint result.
 impl<SA, T> TopEncodeMulti for UnorderedSetMapper<SA, T>
 where

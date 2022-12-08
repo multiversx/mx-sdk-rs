@@ -34,5 +34,5 @@ pub trait StorageMapperWhitelistFeatures {
     }
 
     #[storage_mapper("whitelistMapper")]
-    fn whitelist_mapper(&self) -> WhitelistMapper<Self::Api, ManagedBuffer>;
+    fn whitelist_mapper(&self) -> WhitelistMapper<ManagedBuffer>;
 }
