@@ -28,7 +28,7 @@ pub trait CallPromisesDirectModule {
             .with_gas_limit(gas_limit)
             .async_call_promise()
             .with_extra_gas_for_callback(extra_gas_for_callback)
-            .with_callback(self.callbacks().the_one_callback())
+            .with_callback(self.callbacks().the_one_callback(1001, 1002))
             .register_promise();
     }
 
@@ -53,15 +53,18 @@ pub trait CallPromisesDirectModule {
             .with_gas_limit(gas_limit)
             .async_call_promise()
             .with_extra_gas_for_callback(extra_gas_for_callback)
-            .with_callback(self.callbacks().the_one_callback())
+            .with_callback(self.callbacks().the_one_callback(2001, 2002))
             .register_promise();
     }
 
     #[promises_callback]
-    fn the_one_callback(&self, #[call_result] result: MultiValueEncoded<ManagedBuffer>) {
-        self.async_call_event_callback(&result.into_vec_of_buffers());
+    fn the_one_callback(&self, #[call_result] result: MultiValueEncoded<ManagedBuffer>, arg1: usize, arg2: usize) {
+        self.async_call_event_callback(arg1, arg2, &result.into_vec_of_buffers());
     }
 
     #[event("async_call_event_callback")]
-    fn async_call_event_callback(&self, arguments: &ManagedVec<Self::Api, ManagedBuffer>);
+    fn async_call_event_callback(&self, 
+        #[indexed] arg1: usize, 
+        #[indexed] arg2: usize,
+        arguments: &ManagedVec<Self::Api, ManagedBuffer>);
 }

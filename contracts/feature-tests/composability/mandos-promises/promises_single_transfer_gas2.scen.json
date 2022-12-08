@@ -45,7 +45,9 @@
                         "address": "sc:promises",
                         "endpoint": "str:the_one_callback",
                         "topics": [
-                            "str:async_call_event_callback"
+                            "str:async_call_event_callback",
+                            "1001",
+                            "1002"
                         ],
                         "data": {
                             "0-status": "biguint:5",
