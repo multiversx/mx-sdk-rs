@@ -7,6 +7,7 @@ mod distribution_module;
 mod nft_module;
 
 use distribution_module::Distribution;
+use elrond_wasm_modules::default_issue_callbacks;
 
 #[derive(TypeAbi, TopEncode, TopDecode)]
 pub struct ExampleAttributes {
@@ -14,7 +15,11 @@ pub struct ExampleAttributes {
 }
 
 #[elrond_wasm::contract]
-pub trait SeedNftMinter: distribution_module::DistributionModule + nft_module::NftModule {
+pub trait SeedNftMinter:
+    distribution_module::DistributionModule
+    + nft_module::NftModule
+    + default_issue_callbacks::DefaultIssueCallbacksModule
+{
     #[init]
     fn init(
         &self,

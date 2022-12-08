@@ -3,6 +3,8 @@ use crate::distribution_module;
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
+use elrond_wasm_modules::default_issue_callbacks;
+
 const NFT_AMOUNT: u32 = 1;
 const ROYALTIES_MAX: u32 = 10_000; // 100%
 
@@ -14,50 +16,24 @@ pub struct PriceTag<M: ManagedTypeApi> {
 }
 
 #[elrond_wasm::module]
-pub trait NftModule: distribution_module::DistributionModule {
+pub trait NftModule:
+    distribution_module::DistributionModule + default_issue_callbacks::DefaultIssueCallbacksModule
+{
     // endpoints - owner-only
 
     #[only_owner]
     #[payable("EGLD")]
     #[endpoint(issueToken)]
-    fn issue_token(&self, token_name: ManagedBuffer, token_ticker: ManagedBuffer) {
-        require!(self.nft_token_id().is_empty(), "Token already issued");
-
-        let payment_amount = self.call_value().egld_value();
-        self.send()
-            .esdt_system_sc_proxy()
-            .issue_non_fungible(
-                payment_amount,
-                &token_name,
-                &token_ticker,
-                NonFungibleTokenProperties {
-                    can_freeze: true,
-                    can_wipe: true,
-                    can_pause: true,
-                    can_change_owner: false,
-                    can_upgrade: false,
-                    can_add_special_roles: true,
-                },
-            )
-            .async_call()
-            .with_callback(self.callbacks().issue_callback())
-            .call_and_exit()
-    }
-
-    #[only_owner]
-    #[endpoint(setLocalRoles)]
-    fn set_local_roles(&self) {
-        self.require_token_issued();
-
-        self.send()
-            .esdt_system_sc_proxy()
-            .set_special_roles(
-                &self.blockchain().get_sc_address(),
-                &self.nft_token_id().get(),
-                [EsdtLocalRole::NftCreate][..].iter().cloned(),
-            )
-            .async_call()
-            .call_and_exit()
+    fn issue_token(&self, token_display_name: ManagedBuffer, token_ticker: ManagedBuffer) {
+        let issue_cost = self.call_value().egld_value();
+        self.nft_token_id().issue_and_set_all_roles(
+            EsdtTokenType::NonFungible,
+            issue_cost,
+            token_display_name,
+            token_ticker,
+            0,
+            None,
+        );
     }
 
     // endpoints
@@ -89,7 +65,7 @@ pub trait NftModule: distribution_module::DistributionModule {
 
         self.price_tag(nft_nonce).clear();
 
-        let nft_token_id = self.nft_token_id().get();
+        let nft_token_id = self.nft_token_id().get_token_id();
         let caller = self.blockchain().get_caller();
         self.send().direct_esdt(
             &caller,
@@ -123,28 +99,6 @@ pub trait NftModule: distribution_module::DistributionModule {
         }
     }
 
-    // callbacks
-
-    #[callback]
-    fn issue_callback(
-        &self,
-        #[call_result] result: ManagedAsyncCallResult<EgldOrEsdtTokenIdentifier>,
-    ) {
-        match result {
-            ManagedAsyncCallResult::Ok(token_id) => {
-                self.nft_token_id().set(&token_id.unwrap_esdt());
-            },
-            ManagedAsyncCallResult::Err(_) => {
-                let caller = self.blockchain().get_owner_address();
-                let returned = self.call_value().egld_or_single_esdt();
-                if returned.token_identifier.is_egld() && returned.amount > 0 {
-                    self.send()
-                        .direct(&caller, &returned.token_identifier, 0, &returned.amount);
-                }
-            },
-        }
-    }
-
     // private
 
     #[allow(clippy::too_many_arguments)]
@@ -161,7 +115,7 @@ pub trait NftModule: distribution_module::DistributionModule {
         self.require_token_issued();
         require!(royalties <= ROYALTIES_MAX, "Royalties cannot exceed 100%");
 
-        let nft_token_id = self.nft_token_id().get();
+        let nft_token_id = self.nft_token_id().get_token_id();
 
         let mut serialized_attributes = ManagedBuffer::new();
         if let core::result::Result::Err(err) = attributes.top_encode(&mut serialized_attributes) {
@@ -198,7 +152,7 @@ pub trait NftModule: distribution_module::DistributionModule {
 
     #[view(getNftTokenId)]
     #[storage_mapper("nftTokenId")]
-    fn nft_token_id(&self) -> SingleValueMapper<TokenIdentifier>;
+    fn nft_token_id(&self) -> NonFungibleTokenMapper;
 
     #[storage_mapper("priceTag")]
     fn price_tag(&self, nft_nonce: u64) -> SingleValueMapper<PriceTag<Self::Api>>;
