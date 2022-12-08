@@ -39,6 +39,7 @@ fn execute(mut state: BlockchainMock, tx_transfer: &TxTransfer) -> BlockchainMoc
         gas_limit: tx_transfer.gas_limit.value,
         gas_price: tx_transfer.gas_price.value,
         tx_hash: H256::zero(),
+        promise_callback_closure_data: Vec::new(),
     };
 
     // nonce gets increased irrespective of whether the tx fails or not

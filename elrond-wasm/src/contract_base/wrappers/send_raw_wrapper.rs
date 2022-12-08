@@ -238,21 +238,23 @@ where
         to: &ManagedAddress<A>,
         amount: &BigUint<A>,
         endpoint_name: &ManagedBuffer<A>,
-        success: &'static [u8],
-        error: &'static [u8],
+        arg_buffer: &ManagedArgBuffer<A>,
+        success_callback: &'static [u8],
+        error_callback: &'static [u8],
         gas: u64,
         extra_gas_for_callback: u64,
-        arg_buffer: &ManagedArgBuffer<A>,
+        serialized_callback_closure_args: &ManagedBuffer<A>,
     ) {
         A::send_api_impl().create_async_call_raw(
-            to,
-            amount,
-            endpoint_name,
-            success,
-            error,
+            to.get_handle(),
+            amount.get_handle(),
+            endpoint_name.get_handle(),
+            arg_buffer.get_handle(),
+            success_callback,
+            error_callback,
             gas,
             extra_gas_for_callback,
-            arg_buffer,
+            serialized_callback_closure_args.get_handle(),
         )
     }
 

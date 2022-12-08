@@ -1,0 +1,38 @@
+{
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:a_user": {
+                    "nonce": "0",
+                    "balance": "0"
+                },
+                "sc:forwarder": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../promises-features/output/promises-features.wasm"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "1",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:forwarder",
+                "function": "retrieve_funds_callback",
+                "arguments": [],
+                "gasLimit": "70,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "10",
+                "message": "str:no callback for closure, cannot call callback directly",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

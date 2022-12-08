@@ -103,6 +103,7 @@ pub(crate) fn execute(
         gas_limit: u64::MAX,
         gas_price: 0u64,
         tx_hash: generate_tx_hash_dummy(&sc_query_step.id),
+        promise_callback_closure_data: Vec::new(),
     };
 
     let (tx_result, state) = execute_sc_query(tx_input, state);

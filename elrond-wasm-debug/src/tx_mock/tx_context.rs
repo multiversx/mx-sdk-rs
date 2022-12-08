@@ -68,6 +68,7 @@ impl TxContext {
             gas_limit: 0,
             gas_price: 0,
             tx_hash: b"dummy...........................".into(),
+            promise_callback_closure_data: Vec::new(),
         };
 
         let b_rng = RefCell::new(BlockchainRng::new(&tx_input, &tx_cache));

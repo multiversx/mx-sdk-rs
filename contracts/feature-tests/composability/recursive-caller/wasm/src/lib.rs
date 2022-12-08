@@ -4,14 +4,17 @@
 ////////////////// AUTO-GENERATED //////////////////
 ////////////////////////////////////////////////////
 
-// Number of endpoints: 1
+// Init:                                 1
+// Endpoints:                            1
+// Async Callback:                       1
+// Total number of exported functions:   3
 
 #![no_std]
 
 elrond_wasm_node::wasm_endpoints! {
     recursive_caller
     (
-        callBack
         recursive_send_funds
+        callBack
     )
 }

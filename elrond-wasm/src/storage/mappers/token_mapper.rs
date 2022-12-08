@@ -31,6 +31,12 @@ where
 
     fn set_token_id(&mut self, token_id: TokenIdentifier<SA>);
 
+    fn set_if_empty(&mut self, token_id: TokenIdentifier<SA>) {
+        if self.is_empty() {
+            self.set_token_id(token_id);
+        }
+    }
+
     fn require_same_token(&self, expected_token_id: &TokenIdentifier<SA>) {
         let actual_token_id = self.get_token_id_ref();
         if actual_token_id != expected_token_id {

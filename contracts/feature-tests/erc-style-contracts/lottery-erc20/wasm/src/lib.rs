@@ -4,14 +4,16 @@
 ////////////////// AUTO-GENERATED //////////////////
 ////////////////////////////////////////////////////
 
-// Number of endpoints: 7
+// Init:                                 1
+// Endpoints:                            7
+// Async Callback:                       1
+// Total number of exported functions:   9
 
 #![no_std]
 
 elrond_wasm_node::wasm_endpoints! {
     lottery_erc20
     (
-        callBack
         start
         createLotteryPool
         buy_ticket
@@ -19,5 +21,6 @@ elrond_wasm_node::wasm_endpoints! {
         status
         lotteryInfo
         erc20ContractManagedAddress
+        callBack
     )
 }

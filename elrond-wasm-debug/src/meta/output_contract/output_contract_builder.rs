@@ -170,6 +170,7 @@ fn build_contract_abi(builder: OutputContractBuilder, original_abi: &ContractAbi
         name: original_abi.name,
         constructors: builder.constructors,
         endpoints: builder.endpoints,
+        promise_callbacks: original_abi.promise_callbacks.clone(),
         events: original_abi.events.clone(),
         has_callback: !builder.external_view && original_abi.has_callback,
         type_descriptions: original_abi.type_descriptions.clone(),
