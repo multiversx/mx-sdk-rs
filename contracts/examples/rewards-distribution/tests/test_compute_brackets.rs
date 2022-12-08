@@ -1,7 +1,7 @@
 use core::iter::zip;
 
 use elrond_wasm_debug::{rust_biguint, testing_framework::BlockchainStateWrapper, DebugApi};
-use rewards_distribution::RewardsDistribution;
+use rewards_distribution::{RewardsDistribution, DIVISION_SAFETY_CONSTANT};
 
 mod utils;
 
@@ -33,23 +33,22 @@ fn test_compute_brackets() {
                 (72_000, 40_000),
             ]);
 
-            let computed_brackets = sc.compute_brackets(brackets, 10_000, 2_070_000_000u64.into());
+            let computed_brackets = sc.compute_brackets(brackets, 10_000);
 
             let expected_values = vec![
-                (1, 41_400_000),
-                (10, 13_800_000),
-                (50, 3_622_500),
-                (300, 828_000),
-                (2800, 289_800),
-                (10000, 115_000),
+                (1, 2_000 * DIVISION_SAFETY_CONSTANT),
+                (10, 6_000 * DIVISION_SAFETY_CONSTANT / (10 - 1)),
+                (50, 7_000 * DIVISION_SAFETY_CONSTANT / (50 - 10)),
+                (300, 10_000 * DIVISION_SAFETY_CONSTANT / (300 - 50)),
+                (2_800, 35_000 * DIVISION_SAFETY_CONSTANT / (2_800 - 300)),
+                (10_000, 40_000 * DIVISION_SAFETY_CONSTANT / (10_000 - 2_800)),
             ];
 
             assert_eq!(computed_brackets.len(), expected_values.len());
             for (computed, expected) in zip(computed_brackets.iter(), expected_values) {
-                let (expected_end_index, expected_reward) = expected;
-                let reward = computed.reward.to_u64().unwrap();
+                let (expected_end_index, expected_reward_percent) = expected;
                 assert_eq!(computed.end_index, expected_end_index);
-                assert_eq!(reward, expected_reward);
+                assert_eq!(computed.nft_reward_percent, expected_reward_percent);
             }
         })
         .assert_ok();

@@ -4,7 +4,7 @@
 ////////////////// AUTO-GENERATED //////////////////
 ////////////////////////////////////////////////////
 
-// Number of endpoints: 9
+// Number of endpoints: 13
 
 #![no_std]
 
@@ -14,12 +14,16 @@ elrond_wasm_node::wasm_endpoints! {
         depositRoyalties
         raffle
         claimRewards
+        computeClaimableAmount
+        getRaffleId
+        getCompletedRaffleIdCount
         getRoyalties
-        getRewards
+        getNftRewardPercent
+        getWasClaimed
         getSeedNftMinterAddress
         getBrackets
         getLastRaffleEpoch
-        getNftTokenIdentifier
+        getNftTokenId
     )
 }
 
