@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                           66
+// Endpoints:                           69
 // Async Callback:                       1
-// Total number of exported functions:  68
+// Total number of exported functions:  71
 
 #![no_std]
 
@@ -41,6 +41,9 @@ elrond_wasm_node::wasm_endpoints! {
         transf_exec_multi_accept_funds
         forward_transf_exec_reject_funds_multi_transfer
         transf_exec_multi_reject_funds
+        queued_calls
+        add_queued_call
+        forward_queued_calls
         changeOwnerAddress
         deploy_contract
         deploy_two_contracts
