@@ -63,6 +63,7 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
                     can_freeze: true,
                     can_wipe: true,
                     can_pause: true,
+                    can_transfer_create_role: true,
                     can_change_owner: true,
                     can_upgrade: true,
                     can_add_special_roles: true,

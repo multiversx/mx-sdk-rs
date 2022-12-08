@@ -32,6 +32,7 @@ pub trait NftModule {
                     can_freeze: true,
                     can_wipe: true,
                     can_pause: true,
+                    can_transfer_create_role: true,
                     can_change_owner: false,
                     can_upgrade: false,
                     can_add_special_roles: true,
