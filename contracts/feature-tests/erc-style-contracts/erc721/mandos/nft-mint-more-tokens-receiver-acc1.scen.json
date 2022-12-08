@@ -7,7 +7,7 @@
         },
         {
             "step": "scCall",
-            "txId": "mint-more-tokens",
+            "id": "mint-more-tokens",
             "tx": {
                 "from": "address:contract_owner",
                 "to": "sc:the_nft_contract",

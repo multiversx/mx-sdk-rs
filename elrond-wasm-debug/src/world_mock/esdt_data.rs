@@ -171,7 +171,7 @@ impl fmt::Display for EsdtData {
 impl fmt::Display for AccountEsdt {
     fn fmt(&self, _f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut esdt_buf = String::new();
-        let esdt_keys: Vec<Vec<u8>> = self.clone().0.iter().map(|(k, _)| k.clone()).collect();
+        let esdt_keys: Vec<Vec<u8>> = self.0.keys().cloned().collect();
 
         for key in &esdt_keys {
             let value = self.0.get(key).unwrap();

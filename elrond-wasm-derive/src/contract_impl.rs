@@ -58,6 +58,11 @@ pub fn contract_implementation(
 
             #callbacks_impl
         }
+
+        impl<A> AutoImpl for elrond_wasm::contract_base::UniversalContractObj<A> where
+            A: elrond_wasm::api::VMApi
+        {
+        }
     };
 
     let endpoint_wrapper_supertrait_decl =
@@ -81,6 +86,11 @@ pub fn contract_implementation(
             fn callback(&self) {
                 #callback_body
             }
+        }
+
+        impl<A> EndpointWrappers for elrond_wasm::contract_base::UniversalContractObj<A> where
+            A: elrond_wasm::api::VMApi
+        {
         }
     };
 

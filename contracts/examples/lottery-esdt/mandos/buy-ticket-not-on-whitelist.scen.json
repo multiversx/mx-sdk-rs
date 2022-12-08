@@ -20,7 +20,7 @@
         },
         {
             "step": "scCall",
-            "txId": "buy-ticket-not-on-whitelist",
+            "id": "buy-ticket-not-on-whitelist",
             "tx": {
                 "from": "address:acc3",
                 "to": "sc:lottery",

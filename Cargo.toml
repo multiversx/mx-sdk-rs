@@ -5,6 +5,7 @@ members = [
   "elrond-wasm",
   "elrond-wasm-debug",
   "elrond-wasm-derive",
+  "elrond-wasm-node",
   "elrond-wasm-modules",
   "mandos",
   "elrond-codec",
@@ -73,11 +74,10 @@ members = [
   "contracts/examples/proxy-pause/meta",
   "contracts/examples/ping-pong-egld",
   "contracts/examples/ping-pong-egld/meta",
+  "contracts/examples/rewards-distribution",
+  "contracts/examples/rewards-distribution/meta",
   "contracts/examples/token-release",
   "contracts/examples/token-release/meta",
-
-  "contracts/experimental/multisig-external-view",
-  "contracts/experimental/multisig-external-view/meta",
 
   "contracts/feature-tests/abi-tester",
   "contracts/feature-tests/abi-tester/meta",
@@ -151,6 +151,5 @@ members = [
 ]
 
 exclude = [
-  "elrond-wasm-node",
   "elrond-wasm-output",
 ]

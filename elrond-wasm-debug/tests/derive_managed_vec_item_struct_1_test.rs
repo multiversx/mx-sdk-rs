@@ -1,5 +1,3 @@
-#![feature(generic_associated_types)]
-
 use elrond_wasm::elrond_codec::test_util::{check_dep_encode_decode, check_top_encode_decode};
 use elrond_wasm_debug::DebugApi;
 
@@ -20,6 +18,7 @@ pub struct Struct1 {
 }
 
 #[test]
+#[allow(clippy::assertions_on_constants)]
 fn struct_1_static() {
     assert_eq!(
         <Struct1 as elrond_wasm::types::ManagedVecItem>::PAYLOAD_SIZE,
@@ -50,7 +49,7 @@ fn struct_1_encode_decode_skips_reserialization() {
 	];
 
     check_top_encode_decode(s.clone(), bytes_1);
-    check_dep_encode_decode(s.clone(), bytes_1);
+    check_dep_encode_decode(s, bytes_1);
 }
 
 #[test]

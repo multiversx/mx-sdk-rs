@@ -1,13 +1,13 @@
 use crate::model::{
-    CallbackMetadata, EndpointLocationMetadata, EndpointMetadata, EndpointMutabilityMetadata,
-    InitMetadata, Method, PublicRole,
+    CallbackMetadata, EndpointMetadata, EndpointMutabilityMetadata, InitMetadata, Method,
+    PublicRole,
 };
 
 use super::{
     attributes::{
         is_callback_raw, is_init, is_only_admin, is_only_owner, is_only_user_account,
-        CallbackAttribute, EndpointAttribute, ExternalViewAttribute, OutputNameAttribute,
-        ViewAttribute,
+        CallbackAttribute, EndpointAttribute, ExternalViewAttribute, LabelAttribute,
+        OutputNameAttribute, ViewAttribute,
     },
     MethodAttributesPass1,
 };
@@ -86,7 +86,6 @@ pub fn process_endpoint_attribute(
                 only_admin: pass_1_data.only_admin,
                 only_user_account: pass_1_data.only_user_account,
                 mutability: EndpointMutabilityMetadata::Mutable,
-                location: EndpointLocationMetadata::MainContract,
             });
         })
         .is_some()
@@ -111,7 +110,6 @@ pub fn process_view_attribute(
                 only_admin: pass_1_data.only_admin,
                 only_user_account: pass_1_data.only_user_account,
                 mutability: EndpointMutabilityMetadata::Readonly,
-                location: EndpointLocationMetadata::MainContract,
             });
         })
         .is_some()
@@ -136,7 +134,6 @@ pub fn process_external_view_attribute(
                 only_admin: pass_1_data.only_admin,
                 only_user_account: pass_1_data.only_user_account,
                 mutability: EndpointMutabilityMetadata::Readonly,
-                location: EndpointLocationMetadata::ViewContract,
             });
         })
         .is_some()
@@ -171,6 +168,14 @@ pub fn process_output_names_attribute(attr: &syn::Attribute, method: &mut Method
     OutputNameAttribute::parse(attr)
         .map(|output_name_attr| {
             method.output_names.push(output_name_attr.output_name);
+        })
+        .is_some()
+}
+
+pub fn process_label_names_attribute(attr: &syn::Attribute, method: &mut Method) -> bool {
+    LabelAttribute::parse(attr)
+        .map(|label_attr| {
+            method.label_names.push(label_attr.label);
         })
         .is_some()
 }

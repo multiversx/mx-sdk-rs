@@ -36,5 +36,5 @@ fn struct_named_fields_test() {
 	];
 
     check_top_encode_decode(s.clone(), bytes_1);
-    check_dep_encode_decode(s.clone(), bytes_1);
+    check_dep_encode_decode(s, bytes_1);
 }

@@ -63,5 +63,5 @@ fn enum_not_defaults() {
 		/* uint_64 */ 0x00, 0x00, 0x00, 0x01, 0x23, 0x45, 0x67, 0x89,
 	];
 
-    check_top_encode_decode(enum_struct.clone(), enum_struct_bytes);
+    check_top_encode_decode(enum_struct, enum_struct_bytes);
 }

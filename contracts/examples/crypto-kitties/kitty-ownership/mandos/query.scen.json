@@ -8,7 +8,7 @@
         },
         {
             "step": "scCall",
-            "txId": "tx-total-supply",
+            "id": "tx-total-supply",
             "tx": {
                 "from": "address:acc3",
                 "to": "sc:kitty_ownership_contract",
@@ -29,7 +29,7 @@
         },
         {
             "step": "scCall",
-            "txId": "tx-balance-of",
+            "id": "tx-balance-of",
             "tx": {
                 "from": "address:acc3",
                 "to": "sc:kitty_ownership_contract",
@@ -52,7 +52,7 @@
         },
         {
             "step": "scCall",
-            "txId": "tx-owner-of",
+            "id": "tx-owner-of",
             "tx": {
                 "from": "address:acc3",
                 "to": "sc:kitty_ownership_contract",
@@ -75,7 +75,7 @@
         },
         {
             "step": "scCall",
-            "txId": "tx-tokens-of-owner",
+            "id": "tx-tokens-of-owner",
             "tx": {
                 "from": "address:acc3",
                 "to": "sc:kitty_ownership_contract",
@@ -98,7 +98,7 @@
         },
         {
             "step": "scCall",
-            "txId": "tx-get-kitty-by-id",
+            "id": "tx-get-kitty-by-id",
             "tx": {
                 "from": "address:acc3",
                 "to": "sc:kitty_ownership_contract",
@@ -121,7 +121,7 @@
         },
         {
             "step": "scCall",
-            "txId": "tx-is-ready-to-breed",
+            "id": "tx-is-ready-to-breed",
             "tx": {
                 "from": "address:acc3",
                 "to": "sc:kitty_ownership_contract",
@@ -144,7 +144,7 @@
         },
         {
             "step": "scCall",
-            "txId": "tx-is-pregnant",
+            "id": "tx-is-pregnant",
             "tx": {
                 "from": "address:acc3",
                 "to": "sc:kitty_ownership_contract",
@@ -167,7 +167,7 @@
         },
         {
             "step": "scCall",
-            "txId": "tx-can-breed-with",
+            "id": "tx-can-breed-with",
             "tx": {
                 "from": "address:acc3",
                 "to": "sc:kitty_ownership_contract",

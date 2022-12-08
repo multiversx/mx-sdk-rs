@@ -1,4 +1,9 @@
 #[test]
+fn use_module_claim_developer_rewards_go() {
+    elrond_wasm_debug::mandos_go("mandos/use_module_claim_developer_rewards.scen.json");
+}
+
+#[test]
 fn use_module_dns_register_go() {
     elrond_wasm_debug::mandos_go("mandos/use_module_dns_register.scen.json");
 }

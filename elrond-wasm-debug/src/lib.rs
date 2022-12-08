@@ -1,11 +1,9 @@
-#![feature(generic_associated_types)]
 #![allow(clippy::type_complexity)]
 #![feature(exhaustive_patterns)]
 
 pub mod abi_json;
 pub mod api;
 pub mod bech32;
-mod contract_map;
 mod display_util;
 mod managed_test_util;
 pub mod mandos_system;
@@ -15,7 +13,6 @@ pub mod tx_execution;
 pub mod tx_mock;
 pub mod world_mock;
 
-pub use contract_map::*;
 pub use display_util::*;
 pub use managed_test_util::*;
 pub use mandos_system::{executor::*, mandos_go, mandos_rs};

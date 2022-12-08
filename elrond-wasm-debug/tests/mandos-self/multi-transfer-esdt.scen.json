@@ -28,7 +28,7 @@
         },
         {
             "step": "transfer",
-            "txId": "multi-transfer",
+            "id": "multi-transfer",
             "tx": {
                 "from": "address:A",
                 "to": "address:B",

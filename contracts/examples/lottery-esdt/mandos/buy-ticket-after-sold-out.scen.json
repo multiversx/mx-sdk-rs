@@ -20,7 +20,7 @@
         },
         {
             "step": "scCall",
-            "txId": "buy-ticket-after-sold-out",
+            "id": "buy-ticket-after-sold-out",
             "tx": {
                 "from": "address:acc1",
                 "to": "sc:lottery",

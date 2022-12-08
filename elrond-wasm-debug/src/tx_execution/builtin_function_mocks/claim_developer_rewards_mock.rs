@@ -30,7 +30,7 @@ pub fn execute_claim_developer_rewards(
         (TxResult::empty(), tx_cache.into_blockchain_updates())
     } else {
         (
-            TxResult::from_vm_error("Only owner can claim this".to_string()),
+            TxResult::from_vm_error("operation in account not permitted".to_string()),
             BlockchainUpdate::empty(),
         )
     }

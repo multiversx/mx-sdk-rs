@@ -16,7 +16,7 @@
         },
         {
             "step": "scCall",
-            "txId": "fund-2",
+            "id": "fund-2",
             "tx": {
                 "from": "address:donor2",
                 "to": "sc:crowdfunding",
@@ -73,7 +73,7 @@
         },
         {
             "step": "scCall",
-            "txId": "claim-donor",
+            "id": "claim-donor",
             "tx": {
                 "from": "address:donor1",
                 "to": "sc:crowdfunding",
@@ -92,7 +92,7 @@
         },
         {
             "step": "scCall",
-            "txId": "claim-owner",
+            "id": "claim-owner",
             "tx": {
                 "from": "address:my_address",
                 "to": "sc:crowdfunding",

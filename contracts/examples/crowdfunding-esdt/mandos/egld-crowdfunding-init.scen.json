@@ -19,7 +19,7 @@
         },
         {
             "step": "scDeploy",
-            "txId": "deploy",
+            "id": "deploy",
             "tx": {
                 "from": "address:my_address",
                 "contractCode": "file:../output/crowdfunding-esdt.wasm",

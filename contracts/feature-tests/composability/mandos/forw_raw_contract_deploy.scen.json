@@ -34,7 +34,7 @@
         },
         {
             "step": "scCall",
-            "txId": "deploy-vault",
+            "id": "deploy-vault",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
@@ -71,7 +71,7 @@
         },
         {
             "step": "scCall",
-            "txId": "deploy-vault-with-arg",
+            "id": "deploy-vault-with-arg",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
@@ -110,7 +110,7 @@
         },
         {
             "step": "scCall",
-            "txId": "deploy-from-source-with-arg",
+            "id": "deploy-from-source-with-arg",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",

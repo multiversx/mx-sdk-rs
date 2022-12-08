@@ -1,5 +1,3 @@
-#![feature(generic_associated_types)]
-
 use elrond_wasm::{
     api::{HandleConstraints, ManagedTypeApi},
     derive::ManagedVecItem,
@@ -21,6 +19,7 @@ pub struct ManagedStructWithBigUint<M: ManagedTypeApi> {
 }
 
 #[test]
+#[allow(clippy::assertions_on_constants)]
 fn struct_with_numbers_static() {
     assert_eq!(
         <ManagedStructWithBigUint<DebugApi> as elrond_wasm::types::ManagedVecItem>::PAYLOAD_SIZE,

@@ -15,7 +15,7 @@
         },
         {
             "step": "scCall",
-            "txId": "0000000tx-createAndAuctionGenZeroKitty",
+            "id": "0000000tx-createAndAuctionGenZeroKitty",
             "tx": {
                 "from": "address:my_address",
                 "to": "sc:kitty_auction_contract",

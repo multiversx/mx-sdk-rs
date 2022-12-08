@@ -64,7 +64,7 @@ fn execute(state: &BlockchainMock, accounts: &CheckAccounts) {
                 expected_account
                     .developer_rewards
                     .check(&account.developer_rewards),
-                "bad account developer_rewards. Address: {}. Want: {}. Have: {}",
+                "bad account developerRewards. Address: {}. Want: {}. Have: {}",
                 expected_address,
                 expected_account.developer_rewards,
                 account.developer_rewards

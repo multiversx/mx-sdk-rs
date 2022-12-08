@@ -11,7 +11,7 @@
         },
         {
             "step": "scCall",
-            "txId": "count-to-100-one-call",
+            "id": "count-to-100-one-call",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:use_module",
@@ -46,7 +46,7 @@
         },
         {
             "step": "scCall",
-            "txId": "count-to-100-two-calls-1st",
+            "id": "count-to-100-two-calls-1st",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:use_module",
@@ -72,7 +72,7 @@
                     "nonce": "0",
                     "balance": "*",
                     "storage": {
-                        "str:ongoing_operation:currentOngoingOperation": "9"
+                        "str:ongoing_operation:currentOngoingOperation": "1"
                     },
                     "code": "file:../output/use-module.wasm"
                 },
@@ -81,7 +81,7 @@
         },
         {
             "step": "scCall",
-            "txId": "count-to-100-two-calls-2nd",
+            "id": "count-to-100-two-calls-2nd",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:use_module",

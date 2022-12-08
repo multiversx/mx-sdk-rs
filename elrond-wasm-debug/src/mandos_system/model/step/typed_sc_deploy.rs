@@ -15,7 +15,8 @@ use super::ScDeployStep;
 /// `SCCallStep` with explicit return type.
 #[derive(Debug)]
 pub struct TypedScDeploy<OriginalResult> {
-    pub tx_id: String,
+    pub id: String,
+    pub tx_id: Option<String>,
     pub comment: Option<String>,
     pub tx: Box<TxDeploy>,
     pub expect: Option<TxExpect>,
@@ -25,6 +26,7 @@ pub struct TypedScDeploy<OriginalResult> {
 impl<OriginalResult> Default for TypedScDeploy<OriginalResult> {
     fn default() -> Self {
         Self {
+            id: Default::default(),
             tx_id: Default::default(),
             comment: Default::default(),
             tx: Default::default(),
@@ -37,6 +39,7 @@ impl<OriginalResult> Default for TypedScDeploy<OriginalResult> {
 impl<OriginalResult> From<TypedScDeploy<OriginalResult>> for ScDeployStep {
     fn from(typed: TypedScDeploy<OriginalResult>) -> Self {
         Self {
+            id: typed.id,
             tx_id: typed.tx_id,
             comment: typed.comment,
             tx: typed.tx,
@@ -48,6 +51,7 @@ impl<OriginalResult> From<TypedScDeploy<OriginalResult>> for ScDeployStep {
 impl<OriginalResult> From<ScDeployStep> for TypedScDeploy<OriginalResult> {
     fn from(untyped: ScDeployStep) -> Self {
         Self {
+            id: untyped.id,
             tx_id: untyped.tx_id,
             comment: untyped.comment,
             tx: untyped.tx,

@@ -4,14 +4,16 @@ use crate::mandos_system::model::{
 
 #[derive(Debug, Default)]
 pub struct TransferStep {
-    pub tx_id: String,
+    pub id: String,
+    pub tx_id: Option<String>,
     pub comment: Option<String>,
     pub tx: Box<TxTransfer>,
 }
 
 #[derive(Debug)]
 pub struct ValidatorRewardStep {
-    pub tx_id: String,
+    pub id: String,
+    pub tx_id: Option<String>,
     pub comment: Option<String>,
     pub tx: Box<TxValidatorReward>,
 }

@@ -7,7 +7,7 @@
         },
         {
             "step": "scCall",
-            "txId": "buy-nft-wrong-amount",
+            "id": "buy-nft-wrong-amount",
             "tx": {
                 "from": "address:buyer",
                 "to": "sc:nft-minter",
@@ -29,7 +29,7 @@
         },
         {
             "step": "scCall",
-            "txId": "buy-nft-wrong-requested-nonce",
+            "id": "buy-nft-wrong-requested-nonce",
             "tx": {
                 "from": "address:buyer",
                 "to": "sc:nft-minter",
@@ -51,7 +51,7 @@
         },
         {
             "step": "scCall",
-            "txId": "buy-nft-1",
+            "id": "buy-nft-1",
             "tx": {
                 "from": "address:buyer",
                 "to": "sc:nft-minter",
@@ -151,7 +151,7 @@
         },
         {
             "step": "scCall",
-            "txId": "buy-nft-with-sft-wrong-nonce",
+            "id": "buy-nft-with-sft-wrong-nonce",
             "tx": {
                 "from": "address:buyer",
                 "to": "sc:nft-minter",
@@ -179,7 +179,7 @@
         },
         {
             "step": "scCall",
-            "txId": "buy-nft-2",
+            "id": "buy-nft-2",
             "tx": {
                 "from": "address:buyer",
                 "to": "sc:nft-minter",

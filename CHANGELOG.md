@@ -4,6 +4,27 @@ There are several crates in this repo, this changelog will keep track of all of 
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## Unreleased
+#### (Next release must be minor and include elrond-codec)
+- elrond-codec refactor: removed `TopEncodeNoErr`, `NestedEncodeNoErr` and `TypeInfo`
+
+## [elrond-wasm 0.36.1] - 2022-11-01
+- Deprecated `ContractCall` `execute_on_dest_context_ignore_result` method, since it is currently redundant.
+
+## [elrond-wasm 0.36.0, elrond-codec 0.14.0] - 2022-10-13
+- `EsdtTokenPayment` legacy decode: objects encoded by older versions of the framework can now also be decoded, if flag `esdt-token-payment-legacy-decode` is active.
+- Codec `NestedDecodeInput` new  `peek_into` method.
+- `FungibleTokenMapper` caches the token identifier.
+
+## [elrond-wasm 0.35.0, elrond-codec 0.13.0, mandos 0.17.0] - 2022-09-20
+- Rust interactor snippet generator.
+- Added some missing substitution rules in the contract preprocessor.
+- Allow single zero byte when top-decoding Option::None.
+- Ongoing operations module.
+- Claim developer rewards module.
+- `FromIterator` trait for `ManagedVec`.
+- Mandos `"id"` accepted as synonym to `"txId"`.
+
 ## [elrond-wasm 0.34.1] - 2022-07-19
 - `#[only_admin]` annotation
 - Safer BigUint/BigInt conversions

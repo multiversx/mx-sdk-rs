@@ -21,7 +21,7 @@
         },
         {
             "step": "scCall",
-            "txId": "not-enough",
+            "id": "not-enough",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -43,7 +43,7 @@
         },
         {
             "step": "scCall",
-            "txId": "send_esdt-ok",
+            "id": "send_esdt-ok",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",

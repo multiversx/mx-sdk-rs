@@ -21,7 +21,7 @@
         },
         {
             "step": "scCall",
-            "txId": "freeOrders",
+            "id": "freeOrders",
             "tx": {
                 "from": "address:match_provider",
                 "to": "sc:pair",

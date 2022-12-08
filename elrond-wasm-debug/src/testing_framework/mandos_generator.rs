@@ -93,9 +93,10 @@ impl MandosGenerator {
         let step = StepRaw::ScCall {
             comment: None,
             display_logs: None,
-            tx_id: self.next_tx_id_string(),
+            id: self.next_tx_id_string(),
             tx: tx_raw,
             expect: expect_raw,
+            tx_id: None,
         };
         self.add_step(step);
     }
@@ -107,7 +108,8 @@ impl MandosGenerator {
         let step = StepRaw::ScQuery {
             comment: None,
             display_logs: None,
-            tx_id: self.next_tx_id_string(),
+            id: self.next_tx_id_string(),
+            tx_id: None,
             tx: query_raw,
             expect: expect_raw,
         };

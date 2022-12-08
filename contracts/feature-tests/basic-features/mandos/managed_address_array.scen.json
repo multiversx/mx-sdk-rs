@@ -16,7 +16,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "1",
+            "id": "1",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "maddress_from_array",
@@ -32,7 +32,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "2",
+            "id": "2",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "maddress_from_array",

@@ -18,7 +18,7 @@
         },
         {
             "step": "scCall",
-            "txId": "not-enough",
+            "id": "not-enough",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -39,7 +39,7 @@
         },
         {
             "step": "scCall",
-            "txId": "send_egld-ok",
+            "id": "send_egld-ok",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",

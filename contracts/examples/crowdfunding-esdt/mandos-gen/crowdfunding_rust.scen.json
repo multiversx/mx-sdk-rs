@@ -15,7 +15,7 @@
         },
         {
             "step": "scDeploy",
-            "txId": "",
+            "id": "",
             "tx": {
                 "from": "address:owner",
                 "contractCode": "file:output/crowdfunding-esdt.wasm",
@@ -54,7 +54,7 @@
         },
         {
             "step": "scCall",
-            "txId": "",
+            "id": "",
             "tx": {
                 "from": "address:user1",
                 "to": "sc:crowdfunding",
@@ -95,7 +95,7 @@
         },
         {
             "step": "scCall",
-            "txId": "",
+            "id": "",
             "tx": {
                 "from": "address:user2",
                 "to": "sc:crowdfunding",
@@ -136,7 +136,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "",
+            "id": "",
             "tx": {
                 "to": "sc:crowdfunding",
                 "function": "status",
@@ -157,7 +157,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "",
+            "id": "",
             "tx": {
                 "to": "sc:crowdfunding",
                 "function": "status",
@@ -172,7 +172,7 @@
         },
         {
             "step": "scCall",
-            "txId": "",
+            "id": "",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:crowdfunding",
@@ -207,7 +207,7 @@
         },
         {
             "step": "scCall",
-            "txId": "",
+            "id": "",
             "tx": {
                 "from": "address:user1",
                 "to": "sc:crowdfunding",
@@ -242,7 +242,7 @@
         },
         {
             "step": "scCall",
-            "txId": "",
+            "id": "",
             "tx": {
                 "from": "address:user2",
                 "to": "sc:crowdfunding",
@@ -283,7 +283,7 @@
         },
         {
             "step": "scCall",
-            "txId": "",
+            "id": "",
             "tx": {
                 "from": "address:user1",
                 "to": "sc:crowdfunding",
@@ -305,7 +305,7 @@
         },
         {
             "step": "scCall",
-            "txId": "",
+            "id": "",
             "tx": {
                 "from": "address:user2",
                 "to": "sc:crowdfunding",
@@ -327,7 +327,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "",
+            "id": "",
             "tx": {
                 "to": "sc:crowdfunding",
                 "function": "status",
@@ -348,7 +348,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "",
+            "id": "",
             "tx": {
                 "to": "sc:crowdfunding",
                 "function": "status",
@@ -363,7 +363,7 @@
         },
         {
             "step": "scCall",
-            "txId": "",
+            "id": "",
             "tx": {
                 "from": "address:user1",
                 "to": "sc:crowdfunding",
@@ -379,7 +379,7 @@
         },
         {
             "step": "scCall",
-            "txId": "",
+            "id": "",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:crowdfunding",

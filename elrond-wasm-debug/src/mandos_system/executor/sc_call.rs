@@ -70,7 +70,7 @@ pub(crate) fn execute(
             .collect(),
         gas_limit: tx.gas_limit.value,
         gas_price: tx.gas_price.value,
-        tx_hash: generate_tx_hash_dummy(&sc_call_step.tx_id),
+        tx_hash: generate_tx_hash_dummy(&sc_call_step.id),
     };
 
     // nonce gets increased irrespective of whether the tx fails or not
@@ -85,7 +85,7 @@ fn execute_and_check(
 ) -> (TxResult, BlockchainMock) {
     let (tx_result, state) = execute(state, sc_call_step);
     if let Some(tx_expect) = &sc_call_step.expect {
-        check_tx_output(&sc_call_step.tx_id, tx_expect, &tx_result);
+        check_tx_output(&sc_call_step.id, tx_expect, &tx_result);
     }
     (tx_result, state)
 }

@@ -11,7 +11,8 @@ use super::ScCallStep;
 /// `SCCallStep` with explicit return type.
 #[derive(Debug)]
 pub struct TypedScCall<OriginalResult> {
-    pub tx_id: String,
+    pub id: String,
+    pub tx_id: Option<String>,
     pub comment: Option<String>,
     pub tx: Box<TxCall>,
     pub expect: Option<TxExpect>,
@@ -21,6 +22,7 @@ pub struct TypedScCall<OriginalResult> {
 impl<OriginalResult> Default for TypedScCall<OriginalResult> {
     fn default() -> Self {
         Self {
+            id: Default::default(),
             tx_id: Default::default(),
             comment: Default::default(),
             tx: Default::default(),
@@ -33,6 +35,7 @@ impl<OriginalResult> Default for TypedScCall<OriginalResult> {
 impl<OriginalResult> From<TypedScCall<OriginalResult>> for ScCallStep {
     fn from(typed: TypedScCall<OriginalResult>) -> Self {
         ScCallStep {
+            id: typed.id,
             tx_id: typed.tx_id,
             comment: typed.comment,
             tx: typed.tx,
@@ -44,6 +47,7 @@ impl<OriginalResult> From<TypedScCall<OriginalResult>> for ScCallStep {
 impl<OriginalResult> From<ScCallStep> for TypedScCall<OriginalResult> {
     fn from(untyped: ScCallStep) -> Self {
         Self {
+            id: untyped.id,
             tx_id: untyped.tx_id,
             comment: untyped.comment,
             tx: untyped.tx,

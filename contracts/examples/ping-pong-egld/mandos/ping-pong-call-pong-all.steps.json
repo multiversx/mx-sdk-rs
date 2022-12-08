@@ -4,7 +4,7 @@
     "steps": [
         {
             "step": "scCall",
-            "txId": "pong-all-complete",
+            "id": "pong-all-complete",
             "tx": {
                 "from": "address:participant1",
                 "to": "sc:ping-pong",

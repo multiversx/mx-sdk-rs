@@ -17,7 +17,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "1",
+            "id": "1",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "big_uint_to_u64",
@@ -33,7 +33,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "2",
+            "id": "2",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "big_uint_to_u64",
@@ -49,7 +49,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "4",
+            "id": "4",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "big_uint_to_u64",
@@ -65,7 +65,7 @@
         },
         {
             "step": "scQuery",
-            "txId": "5",
+            "id": "5",
             "comment": "too big because we are first converting to int64; TODO: change conversion to completely unsigned",
             "tx": {
                 "to": "sc:basic-features",

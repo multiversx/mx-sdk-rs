@@ -19,7 +19,7 @@
         },
         {
             "step": "scCall",
-            "txId": "static_message",
+            "id": "static_message",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:msg-features",
@@ -39,7 +39,7 @@
         },
         {
             "step": "scCall",
-            "txId": "1",
+            "id": "1",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:msg-features",
@@ -61,7 +61,7 @@
         },
         {
             "step": "scCall",
-            "txId": "2",
+            "id": "2",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:msg-features",
@@ -87,7 +87,7 @@
         },
         {
             "step": "scCall",
-            "txId": "3",
+            "id": "3",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:msg-features",
@@ -113,7 +113,7 @@
         },
         {
             "step": "scCall",
-            "txId": "4",
+            "id": "4",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:msg-features",

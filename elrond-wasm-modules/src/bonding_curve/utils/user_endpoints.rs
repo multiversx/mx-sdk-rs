@@ -7,7 +7,6 @@ use crate::bonding_curve::{
     curves::curve_function::CurveFunction,
     utils::{events, storage, structs::BondingCurve},
 };
-use elrond_wasm::{abi::TypeAbi, elrond_codec::TopEncode};
 
 #[elrond_wasm::module]
 pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {

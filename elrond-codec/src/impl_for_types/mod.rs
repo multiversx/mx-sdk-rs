@@ -7,6 +7,7 @@ mod impl_non_zero_usize;
 mod impl_num_signed;
 mod impl_num_unsigned;
 mod impl_option;
+mod impl_phantom;
 mod impl_ref;
 mod impl_slice;
 mod impl_string;

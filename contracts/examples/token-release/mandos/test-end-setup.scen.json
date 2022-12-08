@@ -8,7 +8,7 @@
         },
         {
             "step": "scCall",
-            "txId": "end-setup-period",
+            "id": "end-setup-period",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:token_release_contract",

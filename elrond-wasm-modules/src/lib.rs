@@ -1,7 +1,8 @@
 #![no_std]
-#![feature(generic_associated_types)]
+#![feature(trait_alias)]
 
 pub mod bonding_curve;
+pub mod claim_developer_rewards;
 pub mod default_issue_callbacks;
 pub mod dns;
 pub mod esdt;

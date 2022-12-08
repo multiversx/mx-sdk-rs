@@ -10,11 +10,11 @@
         "contractCrate": {
             "name": "abi-tester",
             "version": "0.0.0",
-            "git_version": "<git version here>"
+            "gitVersion": "<git version here>"
         },
         "framework": {
             "name": "elrond-wasm",
-            "version": "0.34.1"
+            "version": "0.36.1"
         }
     },
     "docs": [
@@ -25,12 +25,47 @@
         "including Rust docs."
     ],
     "name": "AbiTester",
+    "constructor": {
+        "docs": [
+            "The external view init prepares a contract that looks in another contract's storage.",
+            "It takes a single argument, the other contract's address",
+            "You won't find this constructors' definition in the contract, it gets injected automatically by the framework. See `elrond_wasm::external_view_contract`."
+        ],
+        "inputs": [
+            {
+                "name": "target_contract_address",
+                "type": "Address"
+            }
+        ],
+        "outputs": []
+    },
     "endpoints": [
         {
             "name": "external_view",
-            "mutability": "readonly",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [],
+            "labels": [
+                "test-external-view"
+            ]
+        },
+        {
+            "name": "payable_any_token",
+            "mutability": "mutable",
+            "payableInTokens": [
+                "*"
+            ],
             "inputs": [],
             "outputs": []
+        },
+        {
+            "name": "label_a",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [],
+            "labels": [
+                "label1"
+            ]
         }
     ],
     "events": [

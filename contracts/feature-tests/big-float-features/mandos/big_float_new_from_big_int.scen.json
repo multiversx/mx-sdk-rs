@@ -17,7 +17,7 @@
         },
         {
             "step": "scCall",
-            "txId": "newBigFloatFromBigInt - 1",
+            "id": "newBigFloatFromBigInt - 1",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -36,7 +36,7 @@
         },
         {
             "step": "scCall",
-            "txId": "newBigFloatFromBigInt - 2",
+            "id": "newBigFloatFromBigInt - 2",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -55,7 +55,7 @@
         },
         {
             "step": "scCall",
-            "txId": "newBigFloatFromBigInt - 3",
+            "id": "newBigFloatFromBigInt - 3",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -74,7 +74,7 @@
         },
         {
             "step": "scCall",
-            "txId": "newBigFloatFromBigInt - 4",
+            "id": "newBigFloatFromBigInt - 4",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -93,7 +93,7 @@
         },
         {
             "step": "scCall",
-            "txId": "newBigFloatFromBigInt - 5",
+            "id": "newBigFloatFromBigInt - 5",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -112,7 +112,7 @@
         },
         {
             "step": "scCall",
-            "txId": "newBigFloatFromBigInt - 6",
+            "id": "newBigFloatFromBigInt - 6",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
