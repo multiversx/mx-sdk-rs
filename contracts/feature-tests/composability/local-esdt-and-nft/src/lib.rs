@@ -231,24 +231,15 @@ pub trait LocalEsdtAndEsdtNft {
 
     #[endpoint(controlChanges)]
     fn control_changes(&self, token: TokenIdentifier) {
-        let mut properties = MultiValueEncoded::new();
-
-        proprietes.push(MultiValue2::from((
-            Properties::CanFreeze,
-            true
-        )));
-
-        proprietes.push(MultiValue2::from((
-            Properties::CanBurn,
-            true
-        )));
+        let property_arguments = TokenPropertyArguments {
+            can_freeze: Some(true),
+            can_burn: Some(true),
+            ..Default::default()
+        };
 
         self.send()
             .esdt_system_sc_proxy()
-            .control_changes(
-                &token,
-                properties
-            )
+            .control_changes(&token, &property_arguments)
             .async_call()
             .call_and_exit();
     }

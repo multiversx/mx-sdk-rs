@@ -1,5 +1,3 @@
-use elrond_codec::elrond_codec_derive::TopDecode;
-
 pub struct TokenProperties {
     pub num_decimals: usize,
     pub can_freeze: bool,
@@ -12,7 +10,6 @@ pub struct TokenProperties {
     pub can_upgrade: bool,
     pub can_add_special_roles: bool,
 }
-
 pub struct FungibleTokenProperties {
     pub num_decimals: usize,
     pub can_freeze: bool,
@@ -54,19 +51,6 @@ pub struct MetaTokenProperties {
     pub can_change_owner: bool,
     pub can_upgrade: bool,
     pub can_add_special_roles: bool,
-}
-
-#[derive(TopDecode)]
-pub enum Properties {
-    CanFreeze,
-    CanWipe,
-    CanPause,
-    CanTransferCreateRole,
-    CanMint,
-    CanBurn,
-    CanChangeOwner,
-    CanUpgrade,
-    CanAddSpecialRoles
 }
 
 impl Default for TokenProperties {
@@ -145,18 +129,18 @@ impl Default for MetaTokenProperties {
     }
 }
 
-impl Properties {
-    pub fn as_bytes(&self) -> &'static [u8] {
-        match self {
-            Properties::CanFreeze => b"canFreeze",
-            Properties::CanWipe => b"canWipe",
-            Properties::CanPause => b"canPause",
-            Properties::CanTransferCreateRole => b"canTransferNFTCreateRole",
-            Properties::CanMint => b"canMint",
-            Properties::CanBurn => b"canBurn",
-            Properties::CanChangeOwner => b"canChangeOwner",
-            Properties::CanUpgrade => b"canUpgrade",
-            Properties::CanAddSpecialRoles => b"canAddSpecialRoles",
-        }
-    }
+/// Represents property arguments to be sent to the system SC.
+///
+/// Fields set to None will not be mentioned at all. When upgrading tokens, this means leaving the old value in place.
+#[derive(Default)]
+pub struct TokenPropertyArguments {
+    pub can_freeze: Option<bool>,
+    pub can_wipe: Option<bool>,
+    pub can_pause: Option<bool>,
+    pub can_transfer_create_role: Option<bool>,
+    pub can_mint: Option<bool>,
+    pub can_burn: Option<bool>,
+    pub can_change_owner: Option<bool>,
+    pub can_upgrade: Option<bool>,
+    pub can_add_special_roles: Option<bool>,
 }
