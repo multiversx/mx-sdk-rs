@@ -26,7 +26,7 @@ pub trait ForwarderQueuedCallModule {
     fn self_proxy(&self, to: ManagedAddress) -> crate::Proxy<Self::Api>;
 
     #[view]
-    #[storage_mapper("programmed_calls")]
+    #[storage_mapper("queued_calls")]
     fn queued_calls(&self) -> LinkedListMapper<QueuedCall<Self::Api>>;
 
     #[endpoint]
