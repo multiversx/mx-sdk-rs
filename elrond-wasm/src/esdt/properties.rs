@@ -12,19 +12,17 @@ pub struct TokenProperties {
     pub can_add_special_roles: bool,
 }
 
-#[derive(TopDecode)]
-pub enum Properties {
-    CanFreeze,
-    CanWipe,
-    CanPause,
-    CanMint,
-    CanBurn,
-    CanChangeOwner,
-    CanUpgrade,
-    CanAddSpecialRoles
+pub struct FungibleTokenProperties {
+    pub num_decimals: usize,
+    pub can_freeze: bool,
+    pub can_wipe: bool,
+    pub can_pause: bool,
+    pub can_mint: bool,
+    pub can_burn: bool,
+    pub can_change_owner: bool,
+    pub can_upgrade: bool,
+    pub can_add_special_roles: bool,
 }
-
-pub type FungibleTokenProperties = TokenProperties;
 
 pub struct NonFungibleTokenProperties {
     pub can_freeze: bool,
@@ -52,6 +50,18 @@ pub struct MetaTokenProperties {
     pub can_change_owner: bool,
     pub can_upgrade: bool,
     pub can_add_special_roles: bool,
+}
+
+#[derive(TopDecode)]
+pub enum Properties {
+    CanFreeze,
+    CanWipe,
+    CanPause,
+    CanMint,
+    CanBurn,
+    CanChangeOwner,
+    CanUpgrade,
+    CanAddSpecialRoles
 }
 
 impl Default for TokenProperties {
