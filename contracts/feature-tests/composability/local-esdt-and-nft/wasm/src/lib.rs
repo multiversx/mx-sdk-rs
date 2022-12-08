@@ -4,14 +4,16 @@
 ////////////////// AUTO-GENERATED //////////////////
 ////////////////////////////////////////////////////
 
-// Number of endpoints: 17
+// Init:                                 1
+// Endpoints:                           17
+// Async Callback:                       1
+// Total number of exported functions:  19
 
 #![no_std]
 
 elrond_wasm_node::wasm_endpoints! {
     local_esdt_and_nft
     (
-        callBack
         issueFungibleToken
         localMint
         localBurn
@@ -29,5 +31,6 @@ elrond_wasm_node::wasm_endpoints! {
         getCurrentNftNonce
         lastIssuedToken
         lastErrorMessage
+        callBack
     )
 }
