@@ -46,6 +46,7 @@ pub fn execute_esdt_transfer(tx_input: TxInput, tx_cache: TxCache) -> (TxResult,
         gas_limit: tx_input.gas_limit,
         gas_price: tx_input.gas_price,
         tx_hash: tx_input.tx_hash,
+        promise_callback_closure_data: Vec::new(),
     };
 
     let (mut tx_result, blockchain_updates) = default_execution(exec_input, tx_cache);

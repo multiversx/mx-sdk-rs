@@ -7,7 +7,7 @@ use super::{
     attributes::{
         is_callback_raw, is_init, is_only_admin, is_only_owner, is_only_user_account,
         CallbackAttribute, EndpointAttribute, ExternalViewAttribute, LabelAttribute,
-        OutputNameAttribute, ViewAttribute,
+        OutputNameAttribute, PromisesCallbackAttribute, ViewAttribute,
     },
     MethodAttributesPass1,
 };
@@ -158,6 +158,21 @@ pub fn process_callback_attribute(attr: &syn::Attribute, method: &mut Method) ->
                 None => method.name.clone(),
             };
             method.public_role = PublicRole::Callback(CallbackMetadata {
+                callback_name: callback_ident,
+            });
+        })
+        .is_some()
+}
+
+pub fn process_promises_callback_attribute(attr: &syn::Attribute, method: &mut Method) -> bool {
+    PromisesCallbackAttribute::parse(attr)
+        .map(|callback_attr| {
+            check_single_role(&*method);
+            let callback_ident = match callback_attr.callback_name {
+                Some(ident) => ident,
+                None => method.name.clone(),
+            };
+            method.public_role = PublicRole::CallbackPromise(CallbackMetadata {
                 callback_name: callback_ident,
             });
         })

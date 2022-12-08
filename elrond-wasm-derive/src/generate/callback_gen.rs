@@ -1,12 +1,14 @@
 use super::{
     method_call_gen::{
-        generate_body_with_result, generate_call_method_body, generate_call_to_method_expr,
+        generate_body_with_result, generate_call_to_method_expr, generate_endpoint_call_method_body,
     },
     payable_gen::*,
     util::*,
 };
 use crate::{
-    generate::method_call_gen::generate_arg_nested_tuples,
+    generate::method_call_gen_arg::{
+        load_call_result_args_snippet, load_legacy_cb_closure_args_snippet,
+    },
     model::{ContractTrait, Method, PublicRole, Supertrait},
 };
 
@@ -19,7 +21,7 @@ pub fn generate_callback_selector_and_main(
 ) -> (proc_macro2::TokenStream, proc_macro2::TokenStream) {
     let raw_decl = find_raw_callback(&contract.methods);
     if let Some(raw) = raw_decl {
-        let as_call_method = generate_call_method_body(&raw);
+        let as_call_method = generate_endpoint_call_method_body(&raw);
         let cb_selector_body = quote! {
             #as_call_method
             elrond_wasm::types::CallbackSelectorResult::Processed
@@ -81,40 +83,6 @@ fn callback_selector_body(
     }
 }
 
-fn load_call_result_args_snippet(m: &Method) -> proc_macro2::TokenStream {
-    // if no `#[call_result]` present, ignore altogether
-    let has_call_result = m
-        .method_args
-        .iter()
-        .any(|arg| arg.metadata.callback_call_result);
-    if !has_call_result {
-        return quote! {};
-    }
-
-    let (call_result_var_names, call_result_var_types, call_result_var_names_str) =
-        generate_arg_nested_tuples(m.method_args.as_slice(), |arg| {
-            arg.metadata.callback_call_result
-        });
-    quote! {
-        let #call_result_var_names = elrond_wasm::io::load_endpoint_args::<Self::Api,#call_result_var_types>(
-            #call_result_var_names_str,
-        );
-    }
-}
-
-fn load_cb_closure_args_snippet(m: &Method) -> proc_macro2::TokenStream {
-    let (closure_var_names, closure_var_types, closure_var_names_str) =
-        generate_arg_nested_tuples(m.method_args.as_slice(), |arg| {
-            arg.is_endpoint_arg() && !arg.metadata.callback_call_result
-        });
-    quote! {
-        let #closure_var_names = elrond_wasm::io::load_multi_args_custom_loader::<Self::Api, _, #closure_var_types>(
-            ___cb_closure___.into_arg_loader(),
-            #closure_var_names_str,
-        );
-    }
-}
-
 fn match_arms(methods: &[Method]) -> Vec<proc_macro2::TokenStream> {
     methods
         .iter()
@@ -130,7 +98,7 @@ fn match_arms(methods: &[Method]) -> Vec<proc_macro2::TokenStream> {
                 );
                 let callback_name_literal = byte_str_literal(callback_name_str.as_bytes());
                 let load_call_result_args = load_call_result_args_snippet(m);
-                let load_cb_closure_args = load_cb_closure_args_snippet(m);
+                let load_cb_closure_args = load_legacy_cb_closure_args_snippet(m);
                 let call = generate_call_to_method_expr(m);
                 let body_with_result = generate_body_with_result(&m.return_type, &call);
 

@@ -13,7 +13,7 @@ pub trait ManagedType<M: ManagedTypeApi>: Sized {
 
     #[doc(hidden)]
     fn from_raw_handle(handle: RawHandle) -> Self {
-        Self::from_handle(handle.cast_or_signal_error::<M, _>())
+        Self::from_handle(Self::OwnHandle::new(handle))
     }
 
     fn get_raw_handle(&self) -> RawHandle {

@@ -916,6 +916,7 @@ fn build_tx_input(
         gas_limit: u64::MAX,
         gas_price: 0,
         tx_hash: H256::zero(),
+        promise_callback_closure_data: Vec::new(),
     }
 }
 

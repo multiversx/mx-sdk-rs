@@ -4,15 +4,18 @@
 ////////////////// AUTO-GENERATED //////////////////
 ////////////////////////////////////////////////////
 
-// Number of endpoints: 2
+// Init:                                 1
+// Endpoints:                            2
+// Async Callback:                       1
+// Total number of exported functions:   4
 
 #![no_std]
 
 elrond_wasm_node::wasm_endpoints! {
     child
     (
-        callBack
         issueWrappedEgld
         getWrappedEgldTokenIdentifier
+        callBack
     )
 }

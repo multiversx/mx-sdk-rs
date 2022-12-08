@@ -4,14 +4,16 @@
 ////////////////// AUTO-GENERATED //////////////////
 ////////////////////////////////////////////////////
 
-// Number of endpoints: 26
+// Init:                                 1
+// Endpoints:                           26
+// Async Callback:                       1
+// Total number of exported functions:  28
 
 #![no_std]
 
 elrond_wasm_node::wasm_endpoints! {
     rust_testing_framework_tester
     (
-        callBack
         sum
         sum_sc_result
         get_caller_legacy
@@ -38,5 +40,6 @@ elrond_wasm_node::wasm_endpoints! {
         execute_on_dest_add_value
         addValue
         panic
+        callBack
     )
 }

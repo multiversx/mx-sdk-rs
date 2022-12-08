@@ -8,6 +8,7 @@ pub struct ContractAbi {
     pub name: &'static str,
     pub constructors: Vec<EndpointAbi>,
     pub endpoints: Vec<EndpointAbi>,
+    pub promise_callbacks: Vec<EndpointAbi>,
     pub events: Vec<EventAbi>,
     pub has_callback: bool,
     pub type_descriptions: TypeDescriptionContainerImpl,
@@ -19,6 +20,8 @@ impl ContractAbi {
             .extend_from_slice(other.constructors.as_slice());
         self.endpoints.extend_from_slice(other.endpoints.as_slice());
         self.events.extend_from_slice(other.events.as_slice());
+        self.promise_callbacks
+            .extend_from_slice(other.promise_callbacks.as_slice());
         self.has_callback |= other.has_callback;
         self.type_descriptions.insert_all(&other.type_descriptions);
     }

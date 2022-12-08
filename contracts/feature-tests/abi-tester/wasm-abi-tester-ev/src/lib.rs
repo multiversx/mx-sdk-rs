@@ -4,7 +4,10 @@
 ////////////////// AUTO-GENERATED //////////////////
 ////////////////////////////////////////////////////
 
-// Number of endpoints: 1
+// Init:                                 1
+// Endpoints:                            3
+// Async Callback (empty):               1
+// Total number of exported functions:   5
 
 #![no_std]
 
@@ -12,6 +15,8 @@ elrond_wasm_node::external_view_wasm_endpoints! {
     abi_tester
     (
         external_view
+        payable_any_token
+        label_a
     )
 }
 

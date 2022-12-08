@@ -35,11 +35,8 @@ where
     pub egld_payment: BigUint<SA>,
     pub payments: ManagedVec<SA, EsdtTokenPayment<SA>>,
     pub endpoint_name: ManagedBuffer<SA>,
-    pub extra_gas_for_callback: u64,
     pub explicit_gas_limit: u64,
     pub arg_buffer: ManagedArgBuffer<SA>,
-    pub success_callback: &'static [u8],
-    pub error_callback: &'static [u8],
     _return_type: PhantomData<OriginalResult>,
 }
 
@@ -74,20 +71,15 @@ where
     ) -> Self {
         let arg_buffer = ManagedArgBuffer::new();
         let egld_payment = BigUint::zero();
-        let success_callback = b"";
-        let error_callback = b"";
         ContractCall {
             _phantom: PhantomData,
             to,
             egld_payment,
             payments,
             explicit_gas_limit: UNSPECIFIED_GAS_LIMIT,
-            extra_gas_for_callback: UNSPECIFIED_GAS_LIMIT,
             endpoint_name,
             arg_buffer,
             _return_type: PhantomData,
-            success_callback,
-            error_callback,
         }
     }
 
@@ -131,27 +123,6 @@ where
         payments: ManagedVec<SA, EsdtTokenPayment<SA>>,
     ) -> Self {
         self.payments = payments;
-        self
-    }
-
-    #[cfg(feature = "promises")]
-    #[inline]
-    pub fn with_success_callback(mut self, callback: &'static [u8]) -> Self {
-        self.success_callback = callback;
-        self
-    }
-
-    #[cfg(feature = "promises")]
-    #[inline]
-    pub fn with_error_callback(mut self, callback: &'static [u8]) -> Self {
-        self.error_callback = callback;
-        self
-    }
-
-    #[cfg(feature = "promises")]
-    #[inline]
-    pub fn with_extra_gas_for_callback(mut self, gas_limit: u64) -> Self {
-        self.extra_gas_for_callback = gas_limit;
         self
     }
 
@@ -219,12 +190,9 @@ where
                     egld_payment: zero,
                     payments: no_payments,
                     explicit_gas_limit: self.explicit_gas_limit,
-                    extra_gas_for_callback: self.extra_gas_for_callback,
                     endpoint_name,
                     arg_buffer: new_arg_buffer.concat(self.arg_buffer),
                     _return_type: PhantomData,
-                    success_callback: self.success_callback,
-                    error_callback: self.error_callback,
                 }
             } else {
                 let payments = self.no_payments();
@@ -255,12 +223,9 @@ where
                     egld_payment: zero,
                     payments,
                     explicit_gas_limit: self.explicit_gas_limit,
-                    extra_gas_for_callback: self.extra_gas_for_callback,
                     endpoint_name,
                     arg_buffer: new_arg_buffer.concat(self.arg_buffer),
                     _return_type: PhantomData,
-                    success_callback: self.success_callback,
-                    error_callback: self.error_callback,
                 }
             }
         } else {
@@ -295,12 +260,9 @@ where
             egld_payment: zero,
             payments,
             explicit_gas_limit: self.explicit_gas_limit,
-            extra_gas_for_callback: self.extra_gas_for_callback,
             endpoint_name,
             arg_buffer: new_arg_buffer.concat(self.arg_buffer),
             _return_type: PhantomData,
-            success_callback: self.success_callback,
-            error_callback: self.error_callback,
         }
     }
 
@@ -315,7 +277,6 @@ where
     pub fn async_call(mut self) -> AsyncCall<SA> {
         self = self.convert_to_esdt_transfer_call();
         AsyncCall {
-            _phantom: PhantomData,
             to: self.to,
             egld_payment: self.egld_payment,
             endpoint_name: self.endpoint_name,
@@ -325,18 +286,17 @@ where
     }
 
     #[cfg(feature = "promises")]
-    pub fn register_promise(mut self) {
+    pub fn async_call_promise(mut self) -> super::AsyncCallPromises<SA> {
         self = self.convert_to_esdt_transfer_call();
-        SendRawWrapper::<SA>::new().create_async_call_raw(
-            &self.to,
-            &self.egld_payment,
-            &self.endpoint_name,
-            self.success_callback,
-            self.error_callback,
-            self.explicit_gas_limit,
-            self.extra_gas_for_callback,
-            &self.arg_buffer,
-        )
+        super::AsyncCallPromises {
+            to: self.to,
+            egld_payment: self.egld_payment,
+            endpoint_name: self.endpoint_name,
+            arg_buffer: self.arg_buffer,
+            explicit_gas_limit: self.explicit_gas_limit,
+            extra_gas_for_callback: 0,
+            callback_call: None,
+        }
     }
 }
 

@@ -1,23 +1,14 @@
-#![no_std]
-#![allow(clippy::type_complexity)]
-
 elrond_wasm::imports!();
 
 /// Test contract for investigating the new async call framework.
-#[elrond_wasm::contract]
-pub trait PromisesFeatures {
+#[elrond_wasm::module]
+pub trait CallPromisesDirectModule {
     #[proxy]
     fn vault_proxy(&self) -> vault::Proxy<Self::Api>;
 
-    #[proxy]
-    fn self_proxy(&self) -> self::Proxy<Self::Api>;
-
-    #[init]
-    fn init(&self) {}
-
     #[endpoint]
     #[payable("*")]
-    fn promise_single_token(
+    fn promise_raw_single_token(
         &self,
         to: ManagedAddress,
         endpoint_name: ManagedBuffer,
@@ -25,20 +16,24 @@ pub trait PromisesFeatures {
         extra_gas_for_callback: u64,
         args: MultiValueEncoded<ManagedBuffer>,
     ) {
-        let (token, payment) = self.call_value().single_fungible_esdt();
+        let payment = self.call_value().egld_or_single_esdt();
         self.send()
             .contract_call::<()>(to, endpoint_name)
-            .add_esdt_token_transfer(token, 0, payment)
+            .with_egld_or_single_esdt_token_transfer(
+                payment.token_identifier,
+                payment.token_nonce,
+                payment.amount,
+            )
             .with_arguments_raw(args.to_arg_buffer())
             .with_gas_limit(gas_limit)
+            .async_call_promise()
             .with_extra_gas_for_callback(extra_gas_for_callback)
-            .with_success_callback(b"success_callback")
-            .with_error_callback(b"error_callback")
+            .with_callback(self.callbacks().the_one_callback(1001, 1002))
             .register_promise();
     }
 
     #[endpoint]
-    fn promise_multi_transfer(
+    fn promise_raw_multi_transfer(
         &self,
         to: ManagedAddress,
         endpoint_name: ManagedBuffer,
@@ -56,30 +51,20 @@ pub trait PromisesFeatures {
             .contract_call::<()>(to, endpoint_name)
             .with_multi_token_transfer(token_payments_vec)
             .with_gas_limit(gas_limit)
+            .async_call_promise()
             .with_extra_gas_for_callback(extra_gas_for_callback)
-            .with_success_callback(b"success_callback")
-            .with_error_callback(b"error_callback")
+            .with_callback(self.callbacks().the_one_callback(2001, 2002))
             .register_promise();
     }
 
-    #[endpoint]
-    fn success_callback(&self, args: MultiValueEncoded<ManagedBuffer>) {
-        self.async_call_callback_data().set(true);
-        let args_as_vec = args.into_vec_of_buffers();
-        self.async_call_event_callback(&args_as_vec);
+    #[promises_callback]
+    fn the_one_callback(&self, #[call_result] result: MultiValueEncoded<ManagedBuffer>, arg1: usize, arg2: usize) {
+        self.async_call_event_callback(arg1, arg2, &result.into_vec_of_buffers());
     }
-
-    #[endpoint]
-    fn error_callback(&self, args: MultiValueEncoded<ManagedBuffer>) {
-        self.async_call_callback_data().set(false);
-        let args_as_vec = args.into_vec_of_buffers();
-        self.async_call_event_callback(&args_as_vec);
-    }
-
-    #[view]
-    #[storage_mapper("async_call_callback_data")]
-    fn async_call_callback_data(&self) -> SingleValueMapper<bool>;
 
     #[event("async_call_event_callback")]
-    fn async_call_event_callback(&self, arguments: &ManagedVec<Self::Api, ManagedBuffer>);
+    fn async_call_event_callback(&self, 
+        #[indexed] arg1: usize, 
+        #[indexed] arg2: usize,
+        arguments: &ManagedVec<Self::Api, ManagedBuffer>);
 }
