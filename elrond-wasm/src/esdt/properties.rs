@@ -10,7 +10,6 @@ pub struct TokenProperties {
     pub can_upgrade: bool,
     pub can_add_special_roles: bool,
 }
-
 pub struct FungibleTokenProperties {
     pub num_decimals: usize,
     pub can_freeze: bool,
@@ -128,4 +127,20 @@ impl Default for MetaTokenProperties {
             can_add_special_roles: true,
         }
     }
+}
+
+/// Represents property arguments to be sent to the system SC.
+///
+/// Fields set to None will not be mentioned at all. When upgrading tokens, this means leaving the old value in place.
+#[derive(Default)]
+pub struct TokenPropertyArguments {
+    pub can_freeze: Option<bool>,
+    pub can_wipe: Option<bool>,
+    pub can_pause: Option<bool>,
+    pub can_transfer_create_role: Option<bool>,
+    pub can_mint: Option<bool>,
+    pub can_burn: Option<bool>,
+    pub can_change_owner: Option<bool>,
+    pub can_upgrade: Option<bool>,
+    pub can_add_special_roles: Option<bool>,
 }

@@ -241,34 +241,24 @@ where
             contract_call.push_endpoint_arg(&properties.num_decimals);
         }
 
-        set_token_property(&mut contract_call, &b"canFreeze"[..], properties.can_freeze);
-        set_token_property(&mut contract_call, &b"canWipe"[..], properties.can_wipe);
-        set_token_property(&mut contract_call, &b"canPause"[..], properties.can_pause);
+        let mut token_prop_args = TokenPropertyArguments {
+            can_freeze: Some(properties.can_freeze),
+            can_wipe: Some(properties.can_wipe),
+            can_pause: Some(properties.can_pause),
+            can_change_owner: Some(properties.can_change_owner),
+            can_upgrade: Some(properties.can_upgrade),
+            can_add_special_roles: Some(properties.can_add_special_roles),
+            ..TokenPropertyArguments::default()
+        };
 
         if token_type == EsdtTokenType::Fungible {
-            set_token_property(&mut contract_call, &b"canMint"[..], properties.can_mint);
-            set_token_property(&mut contract_call, &b"canBurn"[..], properties.can_burn);
+            token_prop_args.can_mint = Some(properties.can_mint);
+            token_prop_args.can_burn = Some(properties.can_burn);
+        } else {
+            token_prop_args.can_transfer_create_role = Some(properties.can_transfer_create_role);
         }
 
-        if token_type != EsdtTokenType::Fungible {
-            set_token_property(&mut contract_call, &b"canTransferNFTCreateRole"[..], properties.can_transfer_create_role);
-        }
-
-        set_token_property(
-            &mut contract_call,
-            &b"canChangeOwner"[..],
-            properties.can_change_owner,
-        );
-        set_token_property(
-            &mut contract_call,
-            &b"canUpgrade"[..],
-            properties.can_upgrade,
-        );
-        set_token_property(
-            &mut contract_call,
-            &b"canAddSpecialRoles"[..],
-            properties.can_add_special_roles,
-        );
+        append_token_property_arguments(&mut contract_call, &token_prop_args);
 
         contract_call
     }
@@ -459,6 +449,17 @@ where
         contract_call
     }
 
+    pub fn control_changes(
+        self,
+        token_identifier: &TokenIdentifier<SA>,
+        property_arguments: &TokenPropertyArguments,
+    ) -> ContractCall<SA, ()> {
+        let mut contract_call = self.esdt_system_sc_call_no_args(b"controlChanges");
+        contract_call.push_endpoint_arg(token_identifier);
+        append_token_property_arguments(&mut contract_call, property_arguments);
+        contract_call
+    }
+
     pub fn esdt_system_sc_address(&self) -> ManagedAddress<SA> {
         ManagedAddress::new_from_bytes(&ESDT_SYSTEM_SC_ADDRESS_ARRAY)
     }
@@ -489,4 +490,55 @@ where
 {
     contract_call.push_argument_raw_bytes(name);
     contract_call.push_argument_raw_bytes(bool_name_bytes(value));
+}
+
+fn append_token_property_arguments<SA, R>(
+    contract_call: &mut ContractCall<SA, R>,
+    token_prop_args: &TokenPropertyArguments,
+) where
+    SA: CallTypeApi + 'static,
+{
+    if let Some(can_freeze) = token_prop_args.can_freeze {
+        set_token_property(contract_call, &b"canFreeze"[..], can_freeze);
+    }
+
+    if let Some(can_wipe) = token_prop_args.can_wipe {
+        set_token_property(contract_call, &b"canWipe"[..], can_wipe);
+    }
+
+    if let Some(can_pause) = token_prop_args.can_pause {
+        set_token_property(contract_call, &b"canPause"[..], can_pause);
+    }
+
+    if let Some(can_transfer_create_role) = token_prop_args.can_transfer_create_role {
+        set_token_property(
+            contract_call,
+            &b"canTransferNFTCreateRole"[..],
+            can_transfer_create_role,
+        );
+    }
+
+    if let Some(can_mint) = token_prop_args.can_mint {
+        set_token_property(contract_call, &b"canMint"[..], can_mint);
+    }
+
+    if let Some(can_burn) = token_prop_args.can_burn {
+        set_token_property(contract_call, &b"canBurn"[..], can_burn);
+    }
+
+    if let Some(can_change_owner) = token_prop_args.can_change_owner {
+        set_token_property(contract_call, &b"canChangeOwner"[..], can_change_owner);
+    }
+
+    if let Some(can_upgrade) = token_prop_args.can_upgrade {
+        set_token_property(contract_call, &b"canUpgrade"[..], can_upgrade);
+    }
+
+    if let Some(can_add_special_roles) = token_prop_args.can_add_special_roles {
+        set_token_property(
+            contract_call,
+            &b"canAddSpecialRoles"[..],
+            can_add_special_roles,
+        );
+    }
 }
