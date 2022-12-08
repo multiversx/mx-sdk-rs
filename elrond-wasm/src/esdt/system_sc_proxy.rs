@@ -65,7 +65,18 @@ where
             token_display_name,
             token_ticker,
             initial_supply,
-            properties,
+            TokenProperties {
+                num_decimals: properties.num_decimals,
+                can_freeze: properties.can_freeze,
+                can_wipe: properties.can_wipe,
+                can_pause: properties.can_pause,
+                can_transfer_create_role: false,
+                can_mint: properties.can_mint,
+                can_burn: properties.can_burn,
+                can_change_owner: properties.can_change_owner,
+                can_upgrade: properties.can_upgrade,
+                can_add_special_roles: properties.can_add_special_roles,
+            },
         )
     }
 
@@ -90,6 +101,7 @@ where
                 can_freeze: properties.can_freeze,
                 can_wipe: properties.can_wipe,
                 can_pause: properties.can_pause,
+                can_transfer_create_role: properties.can_transfer_create_role,
                 can_mint: false,
                 can_burn: false,
                 can_change_owner: properties.can_change_owner,
@@ -120,6 +132,7 @@ where
                 can_freeze: properties.can_freeze,
                 can_wipe: properties.can_wipe,
                 can_pause: properties.can_pause,
+                can_transfer_create_role: properties.can_transfer_create_role,
                 can_mint: false,
                 can_burn: false,
                 can_change_owner: properties.can_change_owner,
@@ -150,6 +163,7 @@ where
                 can_freeze: properties.can_freeze,
                 can_wipe: properties.can_wipe,
                 can_pause: properties.can_pause,
+                can_transfer_create_role: properties.can_transfer_create_role,
                 can_mint: false,
                 can_burn: false,
                 can_change_owner: properties.can_change_owner,
@@ -234,6 +248,10 @@ where
         if token_type == EsdtTokenType::Fungible {
             set_token_property(&mut contract_call, &b"canMint"[..], properties.can_mint);
             set_token_property(&mut contract_call, &b"canBurn"[..], properties.can_burn);
+        }
+
+        if token_type != EsdtTokenType::Fungible {
+            set_token_property(&mut contract_call, &b"canTransferNFTCreateRole"[..], properties.can_transfer_create_role);
         }
 
         set_token_property(
