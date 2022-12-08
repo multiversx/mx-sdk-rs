@@ -21,8 +21,9 @@ pub fn perform<AbiObj: ContractAbiProvider>() {
 
     if args.len() > 1 {
         match args[1].as_str() {
-            "build" => meta_config.build_wasm(),
-            "clean" => meta_config.clean_wasm(),
+            "build" => meta_config.build(),
+            "build-dbg" => meta_config.build_dbg(),
+            "clean" => meta_config.clean(),
             "snippets" => {
                 let overwrite = match args.get(2) {
                     Some(arg) => arg.as_str() == SNIPPETS_OVERWRITE_FLAG_NAME,
