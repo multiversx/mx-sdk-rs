@@ -52,7 +52,7 @@ impl TxFunctionName {
     pub const INIT: TxFunctionName = TxFunctionName::from_static("init");
 
     /// The the legacy async central callback name of any smart contract.
-    pub const CALLBACK: TxFunctionName = TxFunctionName::from_static("init");
+    pub const CALLBACK: TxFunctionName = TxFunctionName::from_static("callBack");
 
     pub fn is_empty(&self) -> bool {
         self.0.is_empty()
