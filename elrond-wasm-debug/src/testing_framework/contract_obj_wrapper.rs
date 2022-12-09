@@ -951,9 +951,7 @@ fn print_token_balance_specialized<T: core::fmt::Debug>(
     token_balance: &num_bigint::BigUint,
     attributes: &T,
 ) {
-    println!(
-        "      Nonce {token_nonce}, balance: {token_balance}, attributes: {attributes:?}"
-    );
+    println!("      Nonce {token_nonce}, balance: {token_balance}, attributes: {attributes:?}");
 }
 
 fn create_contract_obj_box<CB, ContractObjBuilder>(

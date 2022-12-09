@@ -78,14 +78,14 @@ fn generate_topic_conversion_code(
                         ),
                     }
                 },
-                _ => panic!(
-                    "[Event topic] Unsupported reference argument type: {type_reference:?}"
-                ),
+                _ => {
+                    panic!("[Event topic] Unsupported reference argument type: {type_reference:?}")
+                },
             }
         },
-        other_arg => panic!(
-            "[Event topic] Unsupported argument type: {other_arg:?}, should be reference"
-        ),
+        other_arg => {
+            panic!("[Event topic] Unsupported argument type: {other_arg:?}, should be reference")
+        },
     }
 }
 
