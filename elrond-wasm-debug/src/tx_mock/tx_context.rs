@@ -64,7 +64,7 @@ impl TxContext {
             to: contract_address,
             egld_value: 0u32.into(),
             esdt_values: Vec::new(),
-            func_name: TxFunctionName::empty(),
+            func_name: TxFunctionName::EMPTY,
             args: Vec::new(),
             gas_limit: 0,
             gas_price: 0,

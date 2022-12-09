@@ -43,7 +43,7 @@ impl TxInput {
             to: Address::zero(),
             egld_value: BigUint::zero(),
             esdt_values: Vec::new(),
-            func_name: TxFunctionName::empty(),
+            func_name: TxFunctionName::EMPTY,
             args: Vec::new(),
             gas_limit: 0,
             gas_price: 0,
@@ -56,7 +56,7 @@ impl TxInput {
         if let Some(arg) = self.args.get(arg_index) {
             arg.into()
         } else {
-            TxFunctionName::empty()
+            TxFunctionName::EMPTY
         }
     }
 }

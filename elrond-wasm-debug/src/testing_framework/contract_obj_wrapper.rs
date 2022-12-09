@@ -911,7 +911,7 @@ fn build_tx_input(
         to: dest.clone(),
         egld_value: egld_value.clone(),
         esdt_values,
-        func_name: TxFunctionName::empty(),
+        func_name: TxFunctionName::EMPTY,
         args: Vec::new(),
         gas_limit: u64::MAX,
         gas_price: 0,

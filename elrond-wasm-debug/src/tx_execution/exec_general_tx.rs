@@ -77,7 +77,7 @@ pub fn deploy_contract(
 ) -> (TxResult, Address, BlockchainUpdate) {
     let new_address = tx_cache.get_new_address(&tx_input.from);
     tx_input.to = new_address.clone();
-    tx_input.func_name = TxFunctionName::init();
+    tx_input.func_name = TxFunctionName::INIT;
     let tx_context = TxContext::new(tx_input, tx_cache);
     let tx_input_ref = &*tx_context.tx_input_box;
 

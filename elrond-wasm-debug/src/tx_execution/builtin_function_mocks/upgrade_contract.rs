@@ -34,7 +34,7 @@ pub fn execute_upgrade_contract(
         to: tx_input.to,
         egld_value: tx_input.egld_value,
         esdt_values: Vec::new(),
-        func_name: TxFunctionName::init(),
+        func_name: TxFunctionName::INIT,
         args,
         gas_limit: tx_input.gas_limit,
         gas_price: tx_input.gas_price,
