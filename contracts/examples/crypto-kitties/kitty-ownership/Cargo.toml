@@ -2,7 +2,7 @@
 name = "kitty-ownership"
 version = "0.0.0"
 authors = [ "dorin-iancu <dorin.iancu@elrond.com>",]
-edition = "2018"
+edition = "2021"
 publish = false
 
 [lib]

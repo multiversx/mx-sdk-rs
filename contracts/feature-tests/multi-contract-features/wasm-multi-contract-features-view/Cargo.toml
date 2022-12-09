@@ -2,7 +2,7 @@
 name = "multi-contract-features-view-wasm"
 version = "0.0.0"
 authors = ["Andrei Marinica <andrei.marinica@elrond.com>"]
-edition = "2018"
+edition = "2021"
 publish = false
 
 [lib]

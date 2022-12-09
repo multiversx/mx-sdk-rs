@@ -56,7 +56,7 @@ pub(crate) fn create_snippets_cargo_toml(
 name = "rust-interact"
 version = "0.0.0"
 authors = ["you"]
-edition = "2018"
+edition = "2021"
 publish = false
 
 [[bin]]

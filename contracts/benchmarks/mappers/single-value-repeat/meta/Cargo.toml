@@ -2,7 +2,7 @@
 name = "single-value-repeat-meta"
 version = "0.0.0"
 authors = ["Andrei Marinica <andrei.marinica@elrond.com>"]
-edition = "2018"
+edition = "2021"
 publish = false
 
 [dependencies.single-value-repeat]
