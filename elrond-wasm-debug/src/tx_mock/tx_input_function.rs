@@ -3,6 +3,8 @@ use std::borrow::Cow;
 const TX_FUNC_NAME_UTF8_ERROR: &str = "error converting function name to utf-8";
 
 /// Contains a SC function name (endpoint, "init", etc.)
+///
+/// Can be initialized statically and we can make constants out of it.
 #[derive(Default, Clone, PartialEq, Eq, Debug)]
 pub struct TxFunctionName(Cow<'static, str>);
 
@@ -64,18 +66,6 @@ impl TxFunctionName {
 
     pub fn as_str(&self) -> &str {
         &self.0
-    }
-
-    pub fn into_bytes(self) -> Vec<u8> {
-        self.into_string().into_bytes()
-    }
-
-    pub fn as_bytes(&self) -> &[u8] {
-        self.as_str().as_bytes()
-    }
-
-    pub fn to_bytes(&self) -> Vec<u8> {
-        self.as_bytes().to_vec()
     }
 }
 
