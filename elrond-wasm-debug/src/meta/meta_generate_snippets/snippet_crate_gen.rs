@@ -63,7 +63,7 @@ publish = false
 name = "rust-interact"
 path = "src/lib.rs"
 
-[dependencies.{}]
+[dependencies.{contract_crate_name}]
 path = ".."
 
 [dependencies.elrond-interact-snippets]
@@ -71,8 +71,7 @@ version = "0.1.0"
 
 [workspace]
 
-"#,
-        contract_crate_name
+"#
     )
     .unwrap();
 }

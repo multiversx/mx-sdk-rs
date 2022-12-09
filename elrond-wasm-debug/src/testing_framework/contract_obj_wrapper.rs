@@ -952,8 +952,7 @@ fn print_token_balance_specialized<T: core::fmt::Debug>(
     attributes: &T,
 ) {
     println!(
-        "      Nonce {}, balance: {}, attributes: {:?}",
-        token_nonce, token_balance, attributes
+        "      Nonce {token_nonce}, balance: {token_balance}, attributes: {attributes:?}"
     );
 }
 
