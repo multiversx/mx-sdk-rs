@@ -55,7 +55,7 @@ pub fn async_callback_tx_input(async_data: &AsyncCallTxData, async_result: &TxRe
         to: async_data.from.clone(),
         egld_value: 0u32.into(),
         esdt_values: Vec::new(),
-        func_name: TxFunctionName::callback(),
+        func_name: TxFunctionName::CALLBACK,
         args,
         gas_limit: 1000,
         gas_price: 0,

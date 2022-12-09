@@ -79,7 +79,7 @@ pub(crate) fn execute(
         to: Address::zero(),
         egld_value: tx.egld_value.value.clone(),
         esdt_values: Vec::new(),
-        func_name: TxFunctionName::init(),
+        func_name: TxFunctionName::INIT,
         args: tx
             .arguments
             .iter()

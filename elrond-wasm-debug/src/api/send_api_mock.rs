@@ -132,7 +132,7 @@ impl DebugApi {
             to: Address::zero(),
             egld_value,
             esdt_values: Vec::new(),
-            func_name: TxFunctionName::empty(),
+            func_name: TxFunctionName::EMPTY,
             args,
             gas_limit: 1000,
             gas_price: 0,
