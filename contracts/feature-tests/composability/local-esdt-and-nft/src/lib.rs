@@ -229,6 +229,21 @@ pub trait LocalEsdtAndEsdtNft {
             .call_and_exit()
     }
 
+    #[endpoint(controlChanges)]
+    fn control_changes(&self, token: TokenIdentifier) {
+        let property_arguments = TokenPropertyArguments {
+            can_freeze: Some(true),
+            can_burn: Some(true),
+            ..Default::default()
+        };
+
+        self.send()
+            .esdt_system_sc_proxy()
+            .control_changes(&token, &property_arguments)
+            .async_call()
+            .call_and_exit();
+    }
+
     // views
 
     #[view(getFungibleEsdtBalance)]
