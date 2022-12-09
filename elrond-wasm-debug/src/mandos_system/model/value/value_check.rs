@@ -120,7 +120,7 @@ impl CheckValueList {
                     if i > 0 {
                         s.push(',');
                     }
-                    write!(s, "{}", check_value).unwrap();
+                    write!(s, "{check_value}").unwrap();
                 }
                 s.push(']');
                 s

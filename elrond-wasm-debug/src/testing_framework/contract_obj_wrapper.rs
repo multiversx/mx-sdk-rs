@@ -860,7 +860,7 @@ impl BlockchainStateWrapper {
         }
         for (token_id, acc_esdt) in account.esdt.iter() {
             let token_id_str = String::from_utf8(token_id.to_vec()).unwrap();
-            println!("  Token: {}", token_id_str);
+            println!("  Token: {token_id_str}");
 
             for (token_nonce, instance) in acc_esdt.instances.get_instances() {
                 if std::any::TypeId::of::<AttributesType>() == std::any::TypeId::of::<Vec<u8>>() {
@@ -895,7 +895,7 @@ impl BlockchainStateWrapper {
             };
             let value_str = bytes_to_hex(value);
 
-            println!("  {}: {}", key_str, value_str);
+            println!("  {key_str}: {value_str}");
         }
     }
 }

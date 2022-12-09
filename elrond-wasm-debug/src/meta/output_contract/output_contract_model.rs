@@ -134,7 +134,7 @@ impl OutputContract {
         if let Some(wasm_name_override) = &build_args.wasm_name_override {
             wasm_name_override.clone()
         } else if let Some(suffix) = &build_args.wasm_name_suffix {
-            format!("{}-{}", &self.contract_name, suffix)
+            format!("{}-{suffix}", &self.contract_name)
         } else {
             self.contract_name.clone()
         }

@@ -55,7 +55,7 @@ impl Interactor {
         self.set_nonce_and_sign_tx(sender_address, &mut transaction)
             .await;
         let tx_hash = self.proxy.send_transaction(&transaction).await.unwrap();
-        println!("sc call tx hash: {}", tx_hash);
+        println!("sc call tx hash: {tx_hash}");
         info!("sc call tx hash: {}", tx_hash);
         tx_hash
     }
@@ -102,7 +102,7 @@ impl Interactor {
         self.set_nonce_and_sign_tx(sender_address, &mut transaction)
             .await;
         let tx_hash = self.proxy.send_transaction(&transaction).await.unwrap();
-        println!("transfer tx hash: {}", tx_hash);
+        println!("transfer tx hash: {tx_hash}");
         info!("transfer tx hash: {}", tx_hash);
         tx_hash
     }

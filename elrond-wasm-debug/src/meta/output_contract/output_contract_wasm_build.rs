@@ -36,7 +36,7 @@ impl OutputContract {
 
     fn copy_contracts_to_output(&self, build_args: &BuildArgs, output_path: &str) {
         let source_wasm_path = self.wasm_compilation_output_path(&build_args.target_dir);
-        let output_wasm_path = format!("{}/{}", output_path, self.wasm_output_name(build_args));
+        let output_wasm_path = format!("{output_path}/{}", self.wasm_output_name(build_args));
         fs::copy(source_wasm_path, output_wasm_path)
             .expect("failed to copy compiled contract to output directory");
     }
@@ -46,7 +46,7 @@ impl OutputContract {
             return;
         }
 
-        let output_wasm_path = format!("{}/{}", output_path, self.wasm_output_name(build_args));
+        let output_wasm_path = format!("{output_path}/{}", self.wasm_output_name(build_args));
         meta_wasm_tools::run_wasm_opt(output_wasm_path.as_str());
     }
 
@@ -55,8 +55,8 @@ impl OutputContract {
             return;
         }
 
-        let output_wasm_path = format!("{}/{}", output_path, self.wasm_output_name(build_args));
-        let output_wat_path = format!("{}/{}", output_path, self.wat_output_name(build_args));
+        let output_wasm_path = format!("{output_path}/{}", self.wasm_output_name(build_args));
+        let output_wat_path = format!("{output_path}/{}", self.wat_output_name(build_args));
         meta_wasm_tools::run_wasm2wat(output_wasm_path.as_str(), output_wat_path.as_str());
     }
 
@@ -65,7 +65,7 @@ impl OutputContract {
             return;
         }
 
-        let output_wasm_path = format!("{}/{}", output_path, self.wasm_output_name(build_args));
+        let output_wasm_path = format!("{output_path}/{}", self.wasm_output_name(build_args));
         let output_imports_json_path = format!(
             "{}/{}",
             output_path,

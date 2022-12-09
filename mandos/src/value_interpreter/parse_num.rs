@@ -119,7 +119,7 @@ fn parse_unsigned(s: &str) -> Vec<u8> {
         return if clean.len() % 2 == 0 {
             hex::decode(clean).unwrap()
         } else {
-            let even_bytes = format!("0{}", clean);
+            let even_bytes = format!("0{clean}");
             hex::decode(&even_bytes[..]).unwrap()
         };
     }

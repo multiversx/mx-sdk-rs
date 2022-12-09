@@ -26,7 +26,7 @@ impl TxResult {
     }
 
     pub fn print(&self) {
-        println!("{}", self);
+        println!("{self}");
     }
 
     pub fn from_panic_obj(panic_obj: &TxPanic) -> Self {
@@ -120,8 +120,8 @@ impl fmt::Display for TxResult {
             .collect();
         write!(
             f,
-            "TxResult {{\n\tresult_status: {},\n\tresult_values:{:?}\n}}",
-            self.result_status, results_hex
+            "TxResult {{\n\tresult_status: {},\n\tresult_values:{results_hex:?}\n}}",
+            self.result_status
         )
     }
 }

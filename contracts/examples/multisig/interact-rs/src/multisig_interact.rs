@@ -100,8 +100,8 @@ impl State {
             .await;
         let new_address = deploy_result.new_deployed_address();
         let new_address_bech32 = bech32::encode(&new_address);
-        println!("new address: {}", new_address_bech32);
-        let new_address_expr = format!("bech32:{}", new_address_bech32);
+        println!("new address: {new_address_bech32}");
+        let new_address_expr = format!("bech32:{new_address_bech32}");
         save_address_expr(new_address_expr.as_str());
         self.multisig = MultisigContract::new(new_address_expr);
     }

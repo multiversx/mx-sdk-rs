@@ -43,7 +43,7 @@ impl BlockchainMock {
     pub fn print_accounts(&self) {
         let mut accounts_buf = String::new();
         for (address, account) in &self.accounts {
-            write!(accounts_buf, "\n\t{} -> {}", address_hex(address), account).unwrap();
+            write!(accounts_buf, "\n\t{} -> {account}", address_hex(address)).unwrap();
         }
         println!("Accounts: {}", &accounts_buf);
     }

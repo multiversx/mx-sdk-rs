@@ -175,7 +175,7 @@ impl fmt::Display for AccountEsdt {
 
         for key in &esdt_keys {
             let value = self.0.get(key).unwrap();
-            write!(esdt_buf, "\n\t\t\t{} -> {}", key_hex(key.as_slice()), value)?;
+            write!(esdt_buf, "\n\t\t\t{} -> {value}", key_hex(key.as_slice()))?;
         }
         Ok(())
     }
