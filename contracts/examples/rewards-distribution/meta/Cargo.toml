@@ -11,5 +11,5 @@ authors = ["Claudiu-Marcel Bruda <claudiu.bruda@elrond.com>"]
 path = ".."
 
 [dependencies.elrond-wasm-debug]
-version = "0.36.1"
+version = "0.37.0"
 path = "../../../../elrond-wasm-debug"
