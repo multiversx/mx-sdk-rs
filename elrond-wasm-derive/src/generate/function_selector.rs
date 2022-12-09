@@ -8,9 +8,8 @@ fn endpoint_match_arm(
 ) -> proc_macro2::TokenStream {
     let fn_ident = &m.name;
     let call_method_ident = generate_call_method_name(fn_ident);
-    let endpoint_name_str = array_literal(endpoint_name.to_string().as_bytes());
     quote! {
-        #endpoint_name_str #match_guard =>
+        #endpoint_name #match_guard =>
         {
             self.#call_method_ident();
             true
@@ -45,11 +44,11 @@ pub fn generate_function_selector_body(contract: &ContractTrait) -> proc_macro2:
         supertrait_gen::function_selector_module_calls(contract.supertraits.as_slice());
     quote! {
         if match fn_name {
-            b"callBack" => {
+            "callBack" => {
                 self::EndpointWrappers::callback(self);
                 return true;
             },
-            b"init" if <Self::Api as elrond_wasm::api::VMApi>::external_view_init_override() => {
+            "init" if <Self::Api as elrond_wasm::api::VMApi>::external_view_init_override() => {
                 elrond_wasm::external_view_contract::external_view_contract_constructor::<Self::Api>();
                 return true;
             },
