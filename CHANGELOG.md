@@ -16,13 +16,13 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 	- callback optimizations.
 - `elrond-codec` refactor: removed `TopEncodeNoErr`, `NestedEncodeNoErr` and `TypeInfo`
 - System SC proxy: added support for `controlChanges` endpoint and transfer create role (from community).
-- Storage mappers can read from another contract.
 - Module updates:
 	- `MergedTokenInstances` module;
 	- Governance module improvements;
 	- `set_if_empty` for FungibleTokenMapper and NonFungibleTokenMapper.
 - `IntoMultiValue` trait.
 - Storage mapper improvements:
+	- Storage mappers can read from another contract.
 	- `BiDiMapper` improvements;
 	- Fixed missing substitution rules for `FungibleTokenMapper`, `NonFungibleTokenMapper`, `UniqueIdMapper`, `BiDiMapper`, `WhitelistMapper`, `RandomnessSource`;
 	- Added `take` and `replace` methods for `SingleValueMapper`;
