@@ -37,7 +37,7 @@ pub fn execute_builtin_function_or_default(
     tx_input: TxInput,
     tx_cache: TxCache,
 ) -> (TxResult, BlockchainUpdate) {
-    match tx_input.func_name.as_slice() {
+    match tx_input.func_name.as_bytes() {
         ESDT_LOCAL_MINT_FUNC_NAME => check_and_execute_builtin_function(
             ESDT_ROLE_LOCAL_MINT,
             tx_input,

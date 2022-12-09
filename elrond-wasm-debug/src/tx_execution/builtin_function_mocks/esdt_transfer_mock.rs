@@ -29,7 +29,7 @@ pub fn execute_esdt_transfer(tx_input: TxInput, tx_cache: TxCache) -> (TxResult,
         &value,
     );
 
-    let func_name = tx_input.args.get(2).map(Vec::clone).unwrap_or_default();
+    let func_name = tx_input.func_name_from_arg_index(2);
     let args = if tx_input.args.len() > 2 {
         tx_input.args[3..].to_vec()
     } else {

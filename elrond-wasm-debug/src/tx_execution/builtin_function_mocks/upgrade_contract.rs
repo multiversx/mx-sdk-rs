@@ -1,6 +1,6 @@
 use crate::{
     tx_execution::default_execution,
-    tx_mock::{BlockchainUpdate, TxCache, TxInput, TxResult},
+    tx_mock::{BlockchainUpdate, TxCache, TxFunctionName, TxInput, TxResult},
 };
 
 pub fn execute_upgrade_contract(
@@ -34,7 +34,7 @@ pub fn execute_upgrade_contract(
         to: tx_input.to,
         egld_value: tx_input.egld_value,
         esdt_values: Vec::new(),
-        func_name: b"init".to_vec(),
+        func_name: TxFunctionName::init(),
         args,
         gas_limit: tx_input.gas_limit,
         gas_price: tx_input.gas_price,

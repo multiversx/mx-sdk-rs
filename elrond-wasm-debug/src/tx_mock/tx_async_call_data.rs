@@ -8,7 +8,7 @@ use crate::num_bigint::BigUint;
 
 use alloc::vec::Vec;
 
-use super::Promise;
+use super::{Promise, TxFunctionName};
 
 #[derive(Debug, Clone)]
 pub struct AsyncCallTxData {
@@ -26,7 +26,7 @@ pub fn async_call_tx_input(async_data: &AsyncCallTxData) -> TxInput {
         to: async_data.to.clone(),
         egld_value: async_data.call_value.clone(),
         esdt_values: Vec::new(),
-        func_name: async_data.endpoint_name.clone(),
+        func_name: async_data.endpoint_name.clone().into(),
         args: async_data.arguments.clone(),
         gas_limit: 1000,
         gas_price: 0,
@@ -55,7 +55,7 @@ pub fn async_callback_tx_input(async_data: &AsyncCallTxData, async_result: &TxRe
         to: async_data.from.clone(),
         egld_value: 0u32.into(),
         esdt_values: Vec::new(),
-        func_name: b"callBack".to_vec(),
+        func_name: TxFunctionName::callback(),
         args,
         gas_limit: 1000,
         gas_price: 0,
@@ -85,7 +85,7 @@ pub fn async_promise_tx_input(
         to: address.clone(),
         egld_value: 0u32.into(),
         esdt_values: Vec::new(),
-        func_name: callback,
+        func_name: callback.into(),
         args,
         gas_limit: 1000,
         gas_price: 0,

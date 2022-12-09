@@ -45,7 +45,7 @@ pub fn execute_esdt_nft_transfer(
         data: vec![],
     };
 
-    let func_name = tx_input.args.get(4).map(Vec::clone).unwrap_or_default();
+    let func_name = tx_input.func_name_from_arg_index(4);
     let args = if tx_input.args.len() > 5 {
         tx_input.args[5..].to_vec()
     } else {
