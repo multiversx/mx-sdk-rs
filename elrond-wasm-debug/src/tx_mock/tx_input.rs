@@ -4,13 +4,15 @@ use elrond_wasm::types::heap::{Address, H256};
 use num_traits::Zero;
 use std::fmt;
 
+use super::TxFunctionName;
+
 #[derive(Clone, Debug)]
 pub struct TxInput {
     pub from: Address,
     pub to: Address,
     pub egld_value: BigUint,
     pub esdt_values: Vec<TxInputESDT>,
-    pub func_name: Vec<u8>,
+    pub func_name: TxFunctionName,
     pub args: Vec<Vec<u8>>,
     pub gas_limit: u64,
     pub gas_price: u64,
@@ -21,7 +23,7 @@ pub struct TxInput {
 impl fmt::Display for TxInput {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "TxInput {{ func: {}, args: {:?}, call_value: {}, esdt_value: {:?}, from: 0x{}, to: 0x{}\n}}", 
-            String::from_utf8(self.func_name.clone()).unwrap(),
+            self.func_name.as_str(),
             self.args,
             self.egld_value,
             self.esdt_values,
@@ -41,12 +43,20 @@ impl TxInput {
             to: Address::zero(),
             egld_value: BigUint::zero(),
             esdt_values: Vec::new(),
-            func_name: Vec::new(),
+            func_name: TxFunctionName::empty(),
             args: Vec::new(),
             gas_limit: 0,
             gas_price: 0,
             tx_hash: H256::zero(),
             promise_callback_closure_data: Vec::new(),
+        }
+    }
+
+    pub fn func_name_from_arg_index(&self, arg_index: usize) -> TxFunctionName {
+        if let Some(arg) = self.args.get(arg_index) {
+            arg.into()
+        } else {
+            TxFunctionName::empty()
         }
     }
 }

@@ -1,7 +1,10 @@
 use crate::{
     num_bigint,
     tx_execution::{deploy_contract, execute_builtin_function_or_default},
-    tx_mock::{AsyncCallTxData, BlockchainUpdate, Promise, TxCache, TxInput, TxPanic, TxResult},
+    tx_mock::{
+        AsyncCallTxData, BlockchainUpdate, Promise, TxCache, TxFunctionName, TxInput, TxPanic,
+        TxResult,
+    },
     DebugApi,
 };
 use elrond_wasm::{
@@ -61,7 +64,7 @@ impl DebugApi {
             to,
             egld_value,
             esdt_values: Vec::new(),
-            func_name,
+            func_name: func_name.into(),
             args,
             gas_limit: 1000,
             gas_price: 0,
@@ -129,7 +132,7 @@ impl DebugApi {
             to: Address::zero(),
             egld_value,
             esdt_values: Vec::new(),
-            func_name: Vec::new(),
+            func_name: TxFunctionName::empty(),
             args,
             gas_limit: 1000,
             gas_price: 0,

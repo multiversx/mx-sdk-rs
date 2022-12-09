@@ -25,7 +25,7 @@ pub fn execute_tx_context(tx_context: TxContext) -> (TxContext, TxResult) {
 fn execute_tx_context_rc(tx_context_rc: Rc<TxContext>) -> (Rc<TxContext>, TxResult) {
     let tx_context_ref = DebugApi::new(tx_context_rc.clone());
 
-    let func_name = tx_context_ref.tx_input_box.func_name.as_slice();
+    let func_name = tx_context_ref.tx_input_box.func_name.as_bytes();
     let contract_identifier = get_contract_identifier(&tx_context_ref);
     let contract_map = &tx_context_rc.blockchain_ref().contract_map;
 

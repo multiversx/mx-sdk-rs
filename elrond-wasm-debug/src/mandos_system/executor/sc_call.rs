@@ -62,7 +62,7 @@ pub(crate) fn execute(
         to: tx.to.to_address(),
         egld_value: tx.egld_value.value.clone(),
         esdt_values: tx_esdt_transfers_from_mandos(tx.esdt_value.as_slice()),
-        func_name: tx.function.as_bytes().to_vec(),
+        func_name: tx.function.clone().into(),
         args: tx
             .arguments
             .iter()

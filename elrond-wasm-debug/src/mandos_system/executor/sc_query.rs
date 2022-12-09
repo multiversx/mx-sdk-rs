@@ -93,7 +93,7 @@ pub(crate) fn execute(
         to: sc_query_step.tx.to.to_address(),
         egld_value: BigUint::from(0u32),
         esdt_values: Vec::new(),
-        func_name: sc_query_step.tx.function.as_bytes().to_vec(),
+        func_name: sc_query_step.tx.function.clone().into(),
         args: sc_query_step
             .tx
             .arguments
