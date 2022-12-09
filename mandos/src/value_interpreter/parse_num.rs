@@ -130,7 +130,7 @@ fn parse_unsigned(s: &str) -> Vec<u8> {
     if let Some(bu) = BigUint::parse_bytes(clean.as_bytes(), 10) {
         big_uint_to_bytes_be(&bu)
     } else {
-        panic!("Could not parse base 10 number: {}", clean)
+        panic!("Could not parse base 10 number: {clean}")
     }
 }
 

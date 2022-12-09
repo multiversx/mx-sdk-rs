@@ -44,5 +44,5 @@ pub fn multi_contract_config<AbiObj: ContractAbiProvider>(
     super::meta_validate_abi::validate_abi(&original_contract_abi).unwrap();
 
     OutputContractConfig::load_from_file(multi_contract_config_toml_path, &original_contract_abi)
-        .unwrap_or_else(|| panic!("could not find file {}", multi_contract_config_toml_path))
+        .unwrap_or_else(|| panic!("could not find file {multi_contract_config_toml_path}"))
 }

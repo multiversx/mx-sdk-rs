@@ -927,7 +927,7 @@ fn address_to_hex(address: &Address) -> String {
 fn serialize_attributes<T: TopEncode>(attributes: &T) -> Vec<u8> {
     let mut serialized_attributes = Vec::new();
     if let Result::Err(err) = attributes.top_encode(&mut serialized_attributes) {
-        panic!("Failed to encode attributes: {:?}", err)
+        panic!("Failed to encode attributes: {err:?}")
     }
 
     serialized_attributes

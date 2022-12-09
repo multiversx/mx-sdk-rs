@@ -19,8 +19,7 @@ pub fn format_receiver_args_macro(input: proc_macro::TokenStream) -> proc_macro:
         lit.to_string()
     } else {
         panic!(
-            "Formatting requires that the first argument is a string. Found: {}",
-            format_string_token
+            "Formatting requires that the first argument is a string. Found: {format_string_token}"
         );
     };
 

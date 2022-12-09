@@ -260,7 +260,7 @@ impl OutputContractConfig {
         match fs::read_to_string(path.as_ref()) {
             Ok(s) => {
                 let config_serde: MultiContractConfigSerde = toml::from_str(s.as_str())
-                    .unwrap_or_else(|error| panic!("error parsing multicontract.toml: {}", error));
+                    .unwrap_or_else(|error| panic!("error parsing multicontract.toml: {error}"));
                 Some(Self::load_from_config(&config_serde, original_abi))
             },
             Err(_) => None,
