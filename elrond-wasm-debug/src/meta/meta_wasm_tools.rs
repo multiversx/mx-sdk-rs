@@ -9,15 +9,15 @@ const WASM_OBJDUMP_NAME: &str = "wasm-objdump";
 impl MetaConfig {
     pub(crate) fn check_tools_installed(&mut self) {
         if self.build_args.wasm_opt && !is_wasm_opt_installed() {
-            println!("Warning: {} not installed", WASM_OPT_NAME);
+            println!("Warning: {WASM_OPT_NAME} not installed");
             self.build_args.wasm_opt = false;
         }
         if self.build_args.wat && !is_wasm2wat_installed() {
-            println!("Warning: {} not installed", WASM2WAT_NAME);
+            println!("Warning: {WASM2WAT_NAME} not installed");
             self.build_args.wat = false;
         }
         if self.build_args.extract_imports && !is_wasm_objdump_installed() {
-            println!("Warning: {} not installed", WASM_OBJDUMP_NAME);
+            println!("Warning: {WASM_OBJDUMP_NAME} not installed");
             self.build_args.extract_imports = false;
         }
     }

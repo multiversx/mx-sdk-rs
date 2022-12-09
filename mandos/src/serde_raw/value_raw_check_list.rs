@@ -94,7 +94,7 @@ impl fmt::Display for CheckValueListRaw {
             CheckValueListRaw::CheckList(check_values) => {
                 write!(f, "[")?;
                 for check_value in check_values {
-                    write!(f, "{}", check_value)?;
+                    write!(f, "{check_value}")?;
                 }
                 write!(f, "]")
             },

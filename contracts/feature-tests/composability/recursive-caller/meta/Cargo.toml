@@ -1,7 +1,7 @@
 [package]
 name = "recursive-caller-meta"
 version = "0.0.0"
-edition = "2018"
+edition = "2021"
 publish = false
 
 [dependencies.recursive-caller]

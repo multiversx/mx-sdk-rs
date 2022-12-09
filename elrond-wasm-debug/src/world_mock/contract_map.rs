@@ -52,7 +52,7 @@ impl ContractMap {
 
 fn unknown_contract_panic(contract_identifier: &[u8]) -> ! {
     if let Ok(s) = std::str::from_utf8(contract_identifier) {
-        panic!("Unknown contract: {}", s)
+        panic!("Unknown contract: {s}")
     } else {
         panic!(
             "Unknown contract of length {} bytes",

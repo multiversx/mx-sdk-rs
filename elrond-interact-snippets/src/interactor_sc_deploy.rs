@@ -42,7 +42,7 @@ impl Interactor {
     {
         let sc_call_step: ScDeployStep = typed_sc_call.into();
         let tx_hash = self.send_sc_deploy(sc_call_step).await;
-        println!("deploy tx hash: {}", tx_hash);
+        println!("deploy tx hash: {tx_hash}");
         info!("deploy tx hash: {}", tx_hash);
         let tx = self.retrieve_tx_on_network(tx_hash.as_str()).await;
         InteractorResult::new(tx)

@@ -1,7 +1,7 @@
 [package]
 name = "elrond-wasm-derive"
 version = "0.37.0"
-edition = "2018"
+edition = "2021"
 
 authors = ["Andrei Marinica <andrei.marinica@elrond.com>", "Elrond Network <contact@elrond.com>"]
 license = "GPL-3.0-only"

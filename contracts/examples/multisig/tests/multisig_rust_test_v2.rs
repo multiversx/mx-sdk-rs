@@ -261,7 +261,7 @@ impl MultisigTestState {
             .into_blockchain_call()
             .from(caller)
             .gas_limit("5,000,000")
-            .expect(TxExpect::ok().result(&format!("{}", expected_sum)))
+            .expect(TxExpect::ok().result(&format!("{expected_sum}")))
             .execute(&mut self.world);
         value.into()
     }

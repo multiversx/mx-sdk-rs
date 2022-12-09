@@ -278,7 +278,7 @@ pub(crate) fn opt_raw_value_to_check_raw(raw_value: &Option<ValueSubTree>) -> Ch
 pub(crate) fn bytes_to_mandos_string_or_hex(bytes: &[u8]) -> String {
     let conversion_result = String::from_utf8(bytes.to_vec());
     match conversion_result {
-        core::result::Result::Ok(bytes_as_str) => format!("str:{}", bytes_as_str),
+        core::result::Result::Ok(bytes_as_str) => format!("str:{bytes_as_str}"),
         core::result::Result::Err(_) => bytes_to_hex(bytes),
     }
 }

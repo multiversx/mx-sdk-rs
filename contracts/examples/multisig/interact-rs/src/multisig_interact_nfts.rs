@@ -49,7 +49,7 @@ impl State {
 
     pub async fn issue_collection(&mut self) {
         let action_id = self.propose_issue_collection().await;
-        println!("propose issue collection: {}", action_id);
+        println!("propose issue collection: {action_id}");
         let step = self.perform_action_step(action_id, "80,000,000");
         let raw_result = self.interactor.sc_call_get_raw_result(step).await;
         self.collection_token_identifier = raw_result.issue_non_fungible_new_token_identifier();
@@ -85,9 +85,9 @@ impl State {
 
     pub async fn set_special_role(&mut self) {
         let action_id = self.propose_set_special_role().await;
-        println!("propose set special role: {}", action_id);
+        println!("propose set special role: {action_id}");
         self.perform_action(action_id, "80,000,000").await;
-        println!("perform set special role: {}", action_id);
+        println!("perform set special role: {action_id}");
     }
 
     pub async fn create_items(&mut self) {
@@ -96,10 +96,9 @@ impl State {
 
         let mut steps = Vec::<ScCallStep>::new();
         for item_index in 0..NUM_ITEMS {
-            let item_name = format!("Test collection item #{}", item_index);
+            let item_name = format!("Test collection item #{item_index}");
             let image_cid = format!(
-                "https://ipfs.io/ipfs/QmYyAaEf1phJS5mN6wfou5de5GbpUddBxTY1VekKcjd5PC/nft{:02}.jpeg",
-                item_index
+                "https://ipfs.io/ipfs/QmYyAaEf1phJS5mN6wfou5de5GbpUddBxTY1VekKcjd5PC/nft{item_index:02}.jpeg"
             );
 
             steps.push(

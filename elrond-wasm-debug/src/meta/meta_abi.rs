@@ -13,9 +13,9 @@ fn write_contract_abi(output_contract: &OutputContract, git_version: &str, outpu
     abi_json.build_info.contract_crate.git_version = git_version.to_string();
     let abi_string = serialize_abi_to_json(&abi_json);
 
-    let abi_file_path = format!("{}/{}", output_path, output_contract.abi_output_name(),);
+    let abi_file_path = format!("{output_path}/{}", output_contract.abi_output_name(),);
     let mut abi_file = File::create(abi_file_path).unwrap();
-    write!(abi_file, "{}", abi_string).unwrap();
+    write!(abi_file, "{abi_string}").unwrap();
 }
 
 impl MetaConfig {

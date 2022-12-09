@@ -63,9 +63,7 @@ fn parse_fixed_width_signed(s: &str, length: usize) -> Vec<u8> {
         let bytes = bi.to_signed_bytes_be();
         assert!(
             bytes.len() <= length,
-            "representation of {} does not fit in {} bytes",
-            s,
-            length
+            "representation of {s} does not fit in {length} bytes"
         );
         let offset = length - bytes.len();
         if !bytes.is_empty() {
@@ -81,9 +79,7 @@ fn parse_fixed_width_signed(s: &str, length: usize) -> Vec<u8> {
         let result = parse_fixed_width_unsigned(s, length);
         assert!(
             result.is_empty() || result[0] >> 7 != 1,
-            "representation of {} does not fit in {} bytes",
-            s,
-            length
+            "representation of {s} does not fit in {length} bytes"
         );
         result
     }
@@ -93,9 +89,7 @@ fn parse_fixed_width_unsigned(s: &str, length: usize) -> Vec<u8> {
     let parsed = parse_unsigned(s);
     assert!(
         parsed.len() <= length,
-        "representation of {} does not fit in {} bytes",
-        s,
-        length
+        "representation of {s} does not fit in {length} bytes"
     );
 
     let mut result = vec![0u8; length];
@@ -119,7 +113,7 @@ fn parse_unsigned(s: &str) -> Vec<u8> {
         return if clean.len() % 2 == 0 {
             hex::decode(clean).unwrap()
         } else {
-            let even_bytes = format!("0{}", clean);
+            let even_bytes = format!("0{clean}");
             hex::decode(&even_bytes[..]).unwrap()
         };
     }
@@ -136,7 +130,7 @@ fn parse_unsigned(s: &str) -> Vec<u8> {
     if let Some(bu) = BigUint::parse_bytes(clean.as_bytes(), 10) {
         big_uint_to_bytes_be(&bu)
     } else {
-        panic!("Could not parse base 10 number: {}", clean)
+        panic!("Could not parse base 10 number: {clean}")
     }
 }
 

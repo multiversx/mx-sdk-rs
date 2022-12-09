@@ -2,7 +2,7 @@
 name = "nft-minter-meta"
 version = "0.0.0"
 authors = ["Dorin Iancu <dorin.iancu@elrond.com>"]
-edition = "2018"
+edition = "2021"
 publish = false
 
 [dependencies.nft-minter]

@@ -310,7 +310,7 @@ impl ErdpySnippetGenerator {
             tx_data += &arg_as_hex;
         }
 
-        println!("{}", tx_data);
+        println!("{tx_data}");
     }
 
     fn handle_common_non_query_steps(&self, cmd_builder: &mut CmdBuilder) {

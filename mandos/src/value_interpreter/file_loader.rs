@@ -13,7 +13,7 @@ pub fn load_file(file_path: &str, context: &InterpreterContext) -> Vec<u8> {
 }
 
 fn missing_file_value(path_buf: &Path) -> Vec<u8> {
-    let expr_str = format!("MISSING:{:?}", path_buf);
+    let expr_str = format!("MISSING:{path_buf:?}");
     expr_str.into_bytes()
 }
 
