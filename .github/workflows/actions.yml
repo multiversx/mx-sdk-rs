@@ -15,7 +15,7 @@ jobs:
     name: Contracts
     uses: ElrondNetwork/elrond-actions/.github/workflows/contracts.yml@v1
     with:
-      rust-toolchain: nightly-2022-10-12
+      rust-toolchain: nightly-2022-12-08
       vmtools-version: v1.4.60
       extra-build-args: --ignore-eei-checks
     secrets:
