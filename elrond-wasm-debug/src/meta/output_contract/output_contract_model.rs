@@ -159,6 +159,18 @@ impl OutputContract {
             .map(|endpoint| endpoint.name.to_string())
             .collect()
     }
+
+    /// Yields "init" + all endpoint names + "callBack" (if it exists).
+    ///
+    /// Should correspond to all wasm exported functions.
+    pub fn all_exported_function_names(&self) -> Vec<String> {
+        let mut result = vec!["init".to_string()];
+        result.append(&mut self.endpoint_names());
+        if self.abi.has_callback {
+            result.push("callBack".to_string());
+        }
+        result
+    }
 }
 
 impl std::fmt::Debug for OutputContract {

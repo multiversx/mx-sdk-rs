@@ -98,7 +98,10 @@ impl BlockchainMock {
 
         self.register_contract_container(
             expression,
-            ContractContainer::new(contract_obj, Some(sub_contract.endpoint_names())),
+            ContractContainer::new(
+                contract_obj,
+                Some(sub_contract.all_exported_function_names()),
+            ),
         );
     }
 }
