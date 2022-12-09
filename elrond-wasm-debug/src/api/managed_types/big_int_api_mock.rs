@@ -12,7 +12,7 @@ use num_bigint::BigInt;
 use num_traits::{pow, sign::Signed, Zero};
 use std::convert::TryInto;
 
-use super::big_int_util::big_int_to_i64;
+use super::managed_type_util::big_int_to_i64;
 
 fn assert_positive(bi: &num_bigint::BigInt) {
     assert!(

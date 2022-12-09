@@ -4,14 +4,16 @@
 ////////////////// AUTO-GENERATED //////////////////
 ////////////////////////////////////////////////////
 
-// Number of endpoints: 13
+// Init:                                 1
+// Endpoints:                           13
+// Async Callback:                       1
+// Total number of exported functions:  15
 
 #![no_std]
 
 elrond_wasm_node::wasm_endpoints! {
     erc1155
     (
-        callBack
         safeTransferFrom
         safeBatchTransferFrom
         setApprovalForAll
@@ -25,5 +27,6 @@ elrond_wasm_node::wasm_endpoints! {
         getTokenTypeUri
         isFungible
         isApprovedForAll
+        callBack
     )
 }

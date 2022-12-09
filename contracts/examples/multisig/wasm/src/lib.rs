@@ -4,7 +4,10 @@
 ////////////////// AUTO-GENERATED //////////////////
 ////////////////////////////////////////////////////
 
-// Number of endpoints: 20
+// Init:                                 1
+// Endpoints:                           20
+// Async Callback:                       1
+// Total number of exported functions:  22
 
 #![no_std]
 
@@ -31,7 +34,6 @@ elrond_wasm_node::wasm_endpoints! {
         quorumReached
         performAction
         dnsRegister
+        callBack
     )
 }
-
-elrond_wasm_node::wasm_empty_callback! {}

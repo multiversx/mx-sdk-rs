@@ -9,13 +9,13 @@ publish = false
 path = "src/rewards_distribution.rs"
 
 [dependencies.elrond-wasm]
-version = "0.36.1"
+version = "0.37.0"
 path = "../../../elrond-wasm"
 
 [dependencies.elrond-wasm-modules]
-version = "0.36.1"
+version = "0.37.0"
 path = "../../../elrond-wasm-modules"
 
 [dev-dependencies.elrond-wasm-debug]
-version = "0.36.1"
+version = "0.37.0"
 path = "../../../elrond-wasm-debug"

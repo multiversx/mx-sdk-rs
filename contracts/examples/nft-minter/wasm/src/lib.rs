@@ -4,19 +4,22 @@
 ////////////////// AUTO-GENERATED //////////////////
 ////////////////////////////////////////////////////
 
-// Number of endpoints: 6
+// Init:                                 1
+// Endpoints:                            6
+// Async Callback:                       1
+// Total number of exported functions:   8
 
 #![no_std]
 
 elrond_wasm_node::wasm_endpoints! {
     nft_minter
     (
-        callBack
         createNft
         claimRoyaltiesFromMarketplace
         issueToken
         setLocalRoles
         buyNft
         getNftPrice
+        callBack
     )
 }

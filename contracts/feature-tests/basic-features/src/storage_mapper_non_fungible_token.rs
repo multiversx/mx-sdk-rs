@@ -92,5 +92,5 @@ pub trait NonFungibleTokenMapperFeatures:
 
     #[view(getNonFungibleTokenId)]
     #[storage_mapper("nonFungibleTokenMapper")]
-    fn non_fungible_token_mapper(&self) -> NonFungibleTokenMapper<Self::Api>;
+    fn non_fungible_token_mapper(&self) -> NonFungibleTokenMapper;
 }

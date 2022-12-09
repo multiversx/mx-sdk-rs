@@ -1,5 +1,4 @@
 {
-    "gasSchedule": "v3",
     "steps": [
         {
             "step": "setState",
@@ -26,7 +25,7 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:promises",
-                "function": "promise_single_token",
+                "function": "promise_raw_single_token",
                 "arguments": [
                     "sc:vault",
                     "str:echo_arguments",
@@ -72,7 +71,7 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:promises",
-                "function": "promise_single_token",
+                "function": "promise_raw_single_token",
                 "arguments": [
                     "sc:vault",
                     "str:echo_arguments",
@@ -85,18 +84,24 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [],
+                "out": [
+                    "1",
+                    "2"
+                ],
                 "status": "0",
                 "logs": [
                     {
                         "address": "sc:promises",
-                        "endpoint": "str:error_callback",
+                        "endpoint": "str:the_one_callback",
                         "topics": [
-                            "str:async_call_event_callback"
+                            "str:async_call_event_callback",
+                            "1001",
+                            "1002"
                         ],
                         "data": {
-                            "0-status": "biguint:5",
-                            "1-message": "nested:str:not enough gas"
+                            "0-status": "nested:0x00",
+                            "1-arg1": "biguint:1",
+                            "2-arg2": "biguint:2"
                         }
                     },
                     "+"
@@ -130,7 +135,7 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:promises",
-                "function": "promise_single_token",
+                "function": "promise_raw_single_token",
                 "arguments": [
                     "sc:vault",
                     "str:echo_arguments",
@@ -151,12 +156,14 @@
                 "logs": [
                     {
                         "address": "sc:promises",
-                        "endpoint": "str:success_callback",
+                        "endpoint": "str:the_one_callback",
                         "topics": [
-                            "str:async_call_event_callback"
+                            "str:async_call_event_callback",
+                            "1001",
+                            "1002"
                         ],
                         "data": {
-                            "0-status": "biguint:0",
+                            "0-status": "nested:0x00",
                             "1-echoed-args": [
                                 "biguint:1",
                                 "biguint:2"
@@ -183,9 +190,7 @@
                 "sc:promises": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {
-                        "str:async_call_callback_data": "true"
-                    },
+                    "storage": {},
                     "code": "file:../promises-features/output/promises-features.wasm"
                 }
             }

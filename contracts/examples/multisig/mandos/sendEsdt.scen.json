@@ -226,6 +226,14 @@
                             "address:esdt-owner"
                         ],
                         "data": ""
+                    },
+                    {
+                        "address": "sc:multisig",
+                        "endpoint": "str:callBack",
+                        "topics": [
+                            "str:asyncCallSuccess"
+                        ],
+                        "data": ""
                     }
                 ],
                 "gas": "*",

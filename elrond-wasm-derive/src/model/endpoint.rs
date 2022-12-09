@@ -33,6 +33,8 @@ pub enum PublicRole {
 
     CallbackRaw,
 
+    CallbackPromise(CallbackMetadata),
+
     /// Can only called from within the smart contract.
     Private,
 }

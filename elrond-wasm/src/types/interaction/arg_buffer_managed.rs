@@ -3,8 +3,8 @@ use crate::{
     contract_base::ExitCodecErrorHandler,
     err_msg,
     types::{
-        heap::ArgBuffer, ManagedBuffer, ManagedType, ManagedVec, ManagedVecRefIterator,
-        MultiValueEncoded,
+        heap::ArgBuffer, ManagedBuffer, ManagedBufferNestedDecodeInput, ManagedRef, ManagedType,
+        ManagedVec, ManagedVecRefIterator, MultiValueEncoded,
     },
 };
 use alloc::vec::Vec;
@@ -132,9 +132,18 @@ where
         self.data.is_empty()
     }
 
+    pub fn get(&self, index: usize) -> ManagedRef<'_, M, ManagedBuffer<M>> {
+        self.data.get(index)
+    }
+
     #[inline]
     pub fn push_arg_raw(&mut self, raw_arg: ManagedBuffer<M>) {
         self.data.push(raw_arg);
+    }
+
+    #[inline]
+    pub fn clear(&mut self) {
+        self.data.clear();
     }
 
     /// Concatenates 2 managed arg buffers. Consumes both arguments in the process.
@@ -247,5 +256,30 @@ where
         H: DecodeErrorHandler,
     {
         Ok(ManagedVec::dep_decode_or_handle_err(input, h)?.into())
+    }
+}
+
+impl<M> ManagedArgBuffer<M>
+where
+    M: ManagedTypeApi + ErrorApi + 'static,
+{
+    /// Serializes itself into a managed buffer without allocating a new handle.
+    /// Any data lying in the target buffer is overwritten.
+    pub fn serialize_overwrite(&self, dest: &mut ManagedBuffer<M>) {
+        dest.overwrite(&[]);
+        let h = ExitCodecErrorHandler::<M>::from(err_msg::SERIALIZER_ENCODE_ERROR);
+        let Ok(()) = self.top_encode_or_handle_err(dest, h);
+    }
+
+    /// Deserializes self from a managed buffer in-place, without creating a new handle.
+    /// Any data lying in self is overwritten.
+    pub fn deserialize_overwrite(&mut self, source: ManagedBuffer<M>) {
+        let h = ExitCodecErrorHandler::<M>::from(err_msg::SERIALIZER_DECODE_ERROR);
+        self.clear();
+        let mut nested_de_input = ManagedBufferNestedDecodeInput::new(source);
+        while nested_de_input.remaining_len() > 0 {
+            let Ok(item) = ManagedBuffer::dep_decode_or_handle_err(&mut nested_de_input, h);
+            self.push_arg_raw(item);
+        }
     }
 }

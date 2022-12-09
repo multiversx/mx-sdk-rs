@@ -4,14 +4,16 @@
 ////////////////// AUTO-GENERATED //////////////////
 ////////////////////////////////////////////////////
 
-// Number of endpoints: 21
+// Init:                                 1
+// Endpoints:                           21
+// Async Callback:                       1
+// Total number of exported functions:  23
 
 #![no_std]
 
 elrond_wasm_node::wasm_endpoints! {
     kitty_ownership
     (
-        callBack
         setGeneScienceContractAddress
         setKittyAuctionContractAddress
         claim
@@ -33,5 +35,6 @@ elrond_wasm_node::wasm_endpoints! {
         breedWith
         giveBirth
         birthFee
+        callBack
     )
 }

@@ -34,7 +34,7 @@ fn get_contract_abi() -> ContractAbi {
         EndpointAbi::generate_with_name_and_labels("endpoint2", &["label2"]),
         EndpointAbi::generate_with_name_and_labels("endpoint3", &["label2"]),
         EndpointAbi::generate_with_name_and_labels("endpoint4", &["label2"]),
-        EndpointAbi::generate_with_name_and_labels("endpoint5", &[]),   // unlabeled endpoint, should end up in main contract
+        EndpointAbi::generate_with_name_and_labels("endpoint5", &[]), // unlabeled endpoint, should end up in main contract
     ];
     ContractAbi::generate_with_endpoints(endpoints)
 }
@@ -45,7 +45,10 @@ fn test_serialize_multi_contract() {
 
     let multi_contract = get_serialized_toml();
 
-    assert_eq!(multi_contract.settings.main, Some("main-contract".to_string()));
+    assert_eq!(
+        multi_contract.settings.main,
+        Some("main-contract".to_string())
+    );
 
     assert_eq!(
         multi_contract
@@ -56,11 +59,19 @@ fn test_serialize_multi_contract() {
         None
     );
     assert_eq!(
-        multi_contract.contracts.get("secondary-contract").unwrap().name,
+        multi_contract
+            .contracts
+            .get("secondary-contract")
+            .unwrap()
+            .name,
         Some("contract2-name".to_string())
     );
     assert_eq!(
-        multi_contract.contracts.get("secondary-contract").unwrap().external_view,
+        multi_contract
+            .contracts
+            .get("secondary-contract")
+            .unwrap()
+            .external_view,
         Some(true)
     );
 
@@ -78,7 +89,6 @@ fn test_serialize_multi_contract() {
     );
 }
 
-
 #[test]
 fn test_output_contract_config() {
     let serde = get_serialized_toml();
@@ -90,21 +100,30 @@ fn test_output_contract_config() {
         contract_config.default_contract_config_name,
         "main-contract"
     );
-    assert_eq!(
-        contract_config.contracts.len(),
-        2
-    );
-    assert!(contract_config.get_contract_by_id("secondary-contract".to_string()).is_some());
-    assert!(contract_config.get_contract_by_id("unexisting-contract]".to_string()).is_none());
-    assert!(contract_config.get_contract_by_name("contract2-name".to_string()).is_some());
-    assert!(contract_config.get_contract_by_name("contract-wrong-name]".to_string()).is_none());
+    assert_eq!(contract_config.contracts.len(), 2);
+    assert!(contract_config
+        .get_contract_by_id("secondary-contract".to_string())
+        .is_some());
+    assert!(contract_config
+        .get_contract_by_id("unexisting-contract]".to_string())
+        .is_none());
+    assert!(contract_config
+        .get_contract_by_name("contract2-name".to_string())
+        .is_some());
+    assert!(contract_config
+        .get_contract_by_name("contract-wrong-name]".to_string())
+        .is_none());
 
     let main_contract = contract_config.main_contract();
     assert_eq!(main_contract.contract_id, "main-contract");
     assert_eq!(main_contract.contract_name, "main-contract");
 
-
     assert_eq!(main_contract.endpoint_names(), ["endpoint5", "endpoint1"]);
-    assert_eq!(contract_config.get_contract_by_name("contract2-name".to_string()).unwrap().endpoint_names(),  ["endpoint1", "endpoint2", "endpoint3", "endpoint4"]);
-
+    assert_eq!(
+        contract_config
+            .get_contract_by_name("contract2-name".to_string())
+            .unwrap()
+            .endpoint_names(),
+        ["endpoint1", "endpoint2", "endpoint3", "endpoint4"]
+    );
 }

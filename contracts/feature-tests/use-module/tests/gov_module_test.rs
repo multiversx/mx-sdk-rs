@@ -250,7 +250,7 @@ fn change_gov_config_test() {
     let second_user_addr = gov_setup.second_user.clone();
     let third_user_addr = gov_setup.third_user.clone();
     let sc_addr = gov_setup.gov_wrapper.address_ref().clone();
-    
+
     let (result, proposal_id) = gov_setup.propose(
         &first_user_addr,
         500,
@@ -339,29 +339,19 @@ fn change_gov_config_test() {
         })
         .assert_ok();
 
-    gov_setup.b_mock.check_esdt_balance(
-        &first_user_addr,
-        GOV_TOKEN_ID,
-        &rust_biguint!(300),
-    );
-    gov_setup.b_mock.check_esdt_balance(
-        &second_user_addr,
-        GOV_TOKEN_ID,
-        &rust_biguint!(1),
-    );
-    gov_setup.b_mock.check_esdt_balance(
-        &third_user_addr,
-        GOV_TOKEN_ID,
-        &rust_biguint!(800),
-    );
-    gov_setup.b_mock.check_esdt_balance(
-        &owner_addr,
-        GOV_TOKEN_ID,
-        &rust_biguint!(800),
-    );
+    gov_setup
+        .b_mock
+        .check_esdt_balance(&first_user_addr, GOV_TOKEN_ID, &rust_biguint!(300));
+    gov_setup
+        .b_mock
+        .check_esdt_balance(&second_user_addr, GOV_TOKEN_ID, &rust_biguint!(1));
+    gov_setup
+        .b_mock
+        .check_esdt_balance(&third_user_addr, GOV_TOKEN_ID, &rust_biguint!(800));
+    gov_setup
+        .b_mock
+        .check_esdt_balance(&owner_addr, GOV_TOKEN_ID, &rust_biguint!(800));
 }
-
-
 
 #[test]
 fn down_veto_gov_config_test() {
@@ -371,7 +361,7 @@ fn down_veto_gov_config_test() {
     let second_user_addr = gov_setup.second_user.clone();
     let third_user_addr = gov_setup.third_user.clone();
     let sc_addr = gov_setup.gov_wrapper.address_ref().clone();
-    
+
     let (result, proposal_id) = gov_setup.propose(
         &first_user_addr,
         500,
@@ -390,7 +380,6 @@ fn down_veto_gov_config_test() {
 
     gov_setup.increment_block_nonce(VOTING_PERIOD_BLOCKS);
 
-
     // user 1 vote again
     gov_setup.set_block_nonce(20);
     gov_setup
@@ -404,27 +393,20 @@ fn down_veto_gov_config_test() {
 
     // Vote didn't succeed;
     gov_setup.set_block_nonce(45);
-    gov_setup.queue(proposal_id).assert_user_error("Can only queue succeeded proposals");
+    gov_setup
+        .queue(proposal_id)
+        .assert_user_error("Can only queue succeeded proposals");
 
-
-    gov_setup.b_mock.check_esdt_balance(
-        &first_user_addr,
-        GOV_TOKEN_ID,
-        &rust_biguint!(200),
-    );
-    gov_setup.b_mock.check_esdt_balance(
-        &second_user_addr,
-        GOV_TOKEN_ID,
-        &rust_biguint!(800),
-    );
-    gov_setup.b_mock.check_esdt_balance(
-        &third_user_addr,
-        GOV_TOKEN_ID,
-        &rust_biguint!(800),
-    );
+    gov_setup
+        .b_mock
+        .check_esdt_balance(&first_user_addr, GOV_TOKEN_ID, &rust_biguint!(200));
+    gov_setup
+        .b_mock
+        .check_esdt_balance(&second_user_addr, GOV_TOKEN_ID, &rust_biguint!(800));
+    gov_setup
+        .b_mock
+        .check_esdt_balance(&third_user_addr, GOV_TOKEN_ID, &rust_biguint!(800));
 }
-
-
 
 #[test]
 fn abstain_vote_gov_config_test() {
@@ -434,7 +416,7 @@ fn abstain_vote_gov_config_test() {
     let second_user_addr = gov_setup.second_user.clone();
     let third_user_addr = gov_setup.third_user.clone();
     let sc_addr = gov_setup.gov_wrapper.address_ref().clone();
-    
+
     let (result, proposal_id) = gov_setup.propose(
         &first_user_addr,
         500,
@@ -452,7 +434,6 @@ fn abstain_vote_gov_config_test() {
         .assert_ok();
 
     gov_setup.increment_block_nonce(VOTING_PERIOD_BLOCKS);
-
 
     // user 1 vote again
     gov_setup.set_block_nonce(20);
@@ -482,24 +463,16 @@ fn abstain_vote_gov_config_test() {
         })
         .assert_ok();
 
-
-    gov_setup.b_mock.check_esdt_balance(
-        &first_user_addr,
-        GOV_TOKEN_ID,
-        &rust_biguint!(0),
-    );
-    gov_setup.b_mock.check_esdt_balance(
-        &second_user_addr,
-        GOV_TOKEN_ID,
-        &rust_biguint!(600),
-    );
-    gov_setup.b_mock.check_esdt_balance(
-        &third_user_addr,
-        GOV_TOKEN_ID,
-        &rust_biguint!(400),
-    );
+    gov_setup
+        .b_mock
+        .check_esdt_balance(&first_user_addr, GOV_TOKEN_ID, &rust_biguint!(0));
+    gov_setup
+        .b_mock
+        .check_esdt_balance(&second_user_addr, GOV_TOKEN_ID, &rust_biguint!(600));
+    gov_setup
+        .b_mock
+        .check_esdt_balance(&third_user_addr, GOV_TOKEN_ID, &rust_biguint!(400));
 }
-
 
 #[test]
 fn gov_cancel_defeated_proposal_test() {

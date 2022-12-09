@@ -141,7 +141,7 @@ pub trait MergedTokenSetupModule {
 
     #[view(getMergedTokenId)]
     #[storage_mapper("mergedToken")]
-    fn merged_token(&self) -> NonFungibleTokenMapper<Self::Api>;
+    fn merged_token(&self) -> NonFungibleTokenMapper;
 
     #[view(getMergeableTokensWhitelist)]
     #[storage_mapper("mergeableTokensWhitelist")]

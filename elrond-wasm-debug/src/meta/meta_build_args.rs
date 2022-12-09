@@ -4,6 +4,8 @@ pub struct BuildArgs {
     pub wasm_name_override: Option<String>,
     pub wasm_name_suffix: Option<String>,
     pub wasm_opt: bool,
+    pub wat: bool,
+    pub extract_imports: bool,
     pub target_dir: Option<String>,
     pub abi_git_version: bool,
 }
@@ -15,6 +17,8 @@ impl Default for BuildArgs {
             wasm_name_override: None,
             wasm_name_suffix: None,
             wasm_opt: true,
+            wat: false,
+            extract_imports: true,
             target_dir: None,
             abi_git_version: true,
         }
@@ -44,6 +48,13 @@ impl BuildArgs {
                 },
                 "--no-wasm-opt" => {
                     result.wasm_opt = false;
+                },
+                "--wat" => {
+                    result.wat = true;
+                    result.extract_imports = true;
+                },
+                "--no-imports" => {
+                    result.extract_imports = false;
                 },
                 "--target-dir" => {
                     let arg = iter

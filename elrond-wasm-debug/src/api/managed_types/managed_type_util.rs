@@ -22,6 +22,15 @@ impl DebugApi {
         ManagedBuffer::from_handle(handle)
     }
 
+    pub fn mb_handle_to_value(
+        &self,
+        mb_handle: <Self as HandleTypeInfo>::ManagedBufferHandle,
+    ) -> Vec<u8> {
+        ManagedBuffer::<Self>::from_handle(mb_handle)
+            .to_boxed_bytes()
+            .into_vec()
+    }
+
     pub fn address_handle_to_value(
         &self,
         address_handle: <Self as HandleTypeInfo>::ManagedBufferHandle,

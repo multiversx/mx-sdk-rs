@@ -4,9 +4,29 @@ There are several crates in this repo, this changelog will keep track of all of 
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
-## Unreleased
-#### (Next release must be minor and include elrond-codec)
-- elrond-codec refactor: removed `TopEncodeNoErr`, `NestedEncodeNoErr` and `TypeInfo`
+## [elrond-wasm 0.37.0, elrond-codec 0.15.0] - 2022-12-09
+- Multi-contract build system:
+	- build system refactor;
+	- `multicontract.toml` config system with labels,
+	- eliminated monomorphization issue that was bloating some contracts;
+	- build post-processing: `wasm2wat`, imports via `wasm-objdump`.
+- Support for the new async call system (promises):
+	- new APIs;
+	- a new flavor of callbacks (`#[promises-callback]`);
+	- callback optimizations.
+- `elrond-codec` refactor: removed `TopEncodeNoErr`, `NestedEncodeNoErr` and `TypeInfo`
+- System SC proxy: added support for `controlChanges` endpoint and transfer create role (from community).
+- Module updates:
+	- `MergedTokenInstances` module;
+	- Governance module improvements;
+	- `set_if_empty` for FungibleTokenMapper and NonFungibleTokenMapper.
+- `IntoMultiValue` trait.
+- Storage mapper improvements:
+	- Storage mappers can read from another contract.
+	- `BiDiMapper` improvements;
+	- Fixed missing substitution rules for `FungibleTokenMapper`, `NonFungibleTokenMapper`, `UniqueIdMapper`, `BiDiMapper`, `WhitelistMapper`, `RandomnessSource`;
+	- Added `take` and `replace` methods for `SingleValueMapper`;
+	- Implemented `Extend` trait for `UnorderedSetMapper`.
 
 ## [elrond-wasm 0.36.1] - 2022-11-01
 - Deprecated `ContractCall` `execute_on_dest_context_ignore_result` method, since it is currently redundant.

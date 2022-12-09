@@ -4,7 +4,10 @@
 ////////////////// AUTO-GENERATED //////////////////
 ////////////////////////////////////////////////////
 
-// Number of endpoints: 9
+// Init:                                 1
+// Endpoints:                           13
+// Async Callback (empty):               1
+// Total number of exported functions:  15
 
 #![no_std]
 
@@ -14,12 +17,16 @@ elrond_wasm_node::wasm_endpoints! {
         depositRoyalties
         raffle
         claimRewards
+        computeClaimableAmount
+        getRaffleId
+        getCompletedRaffleIdCount
         getRoyalties
-        getRewards
+        getNftRewardPercent
+        getWasClaimed
         getSeedNftMinterAddress
         getBrackets
         getLastRaffleEpoch
-        getNftTokenIdentifier
+        getNftTokenId
     )
 }
 

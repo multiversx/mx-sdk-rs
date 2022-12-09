@@ -4,14 +4,16 @@
 ////////////////// AUTO-GENERATED //////////////////
 ////////////////////////////////////////////////////
 
-// Number of endpoints: 25
+// Init:                                 1
+// Endpoints:                           25
+// Async Callback:                       1
+// Total number of exported functions:  27
 
 #![no_std]
 
 elrond_wasm_node::wasm_endpoints! {
     forwarder_raw
     (
-        callBack
         forward_payment
         forward_direct_esdt_via_transf_exec
         forward_direct_esdt_multi
@@ -37,5 +39,6 @@ elrond_wasm_node::wasm_endpoints! {
         deploy_from_source
         upgrade
         upgrade_from_source
+        callBack
     )
 }

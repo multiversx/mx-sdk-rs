@@ -4,14 +4,16 @@
 ////////////////// AUTO-GENERATED //////////////////
 ////////////////////////////////////////////////////
 
-// Number of endpoints: 59
+// Init:                                 1
+// Endpoints:                           60
+// Async Callback:                       1
+// Total number of exported functions:  62
 
 #![no_std]
 
 elrond_wasm_node::wasm_endpoints! {
     use_module
     (
-        callBack
         checkFeatureGuard
         checkPause
         call_mod_a
@@ -30,11 +32,10 @@ elrond_wasm_node::wasm_endpoints! {
         dnsRegister
         issueToken
         setFeatureFlag
-        depositTokensForAction
+        depositTokensForProposal
         withdrawGovernanceTokens
         propose
         vote
-        downvote
         queue
         execute
         cancel
@@ -42,6 +43,7 @@ elrond_wasm_node::wasm_endpoints! {
         getProposer
         getProposalDescription
         getProposalActions
+        getProposalVotes
         getTotalVotes
         getTotalDownvotes
         changeQuorum
@@ -51,6 +53,7 @@ elrond_wasm_node::wasm_endpoints! {
         changeLockTimeAfterVotingEndsInBlocks
         getGovernanceTokenId
         getQuorum
+        getMinFeeForPropose
         getMinTokenBalanceForProposing
         getVotingDelayInBlocks
         getVotingPeriodInBlocks
@@ -71,5 +74,6 @@ elrond_wasm_node::wasm_endpoints! {
         addAdmin
         removeAdmin
         getAdmins
+        callBack
     )
 }

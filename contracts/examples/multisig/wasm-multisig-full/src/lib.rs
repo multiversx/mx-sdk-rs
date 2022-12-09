@@ -4,7 +4,10 @@
 ////////////////// AUTO-GENERATED //////////////////
 ////////////////////////////////////////////////////
 
-// Number of endpoints: 28
+// Init:                                 1
+// Endpoints:                           28
+// Async Callback:                       1
+// Total number of exported functions:  30
 
 #![no_std]
 
@@ -39,7 +42,6 @@ elrond_wasm_node::wasm_endpoints! {
         getActionSigners
         getActionSignerCount
         getActionValidSignerCount
+        callBack
     )
 }
-
-elrond_wasm_node::wasm_empty_callback! {}

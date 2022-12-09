@@ -115,7 +115,7 @@ impl OutputContract {
     }
 
     /// This is where Rust will initially compile the WASM binary.
-    pub fn wasm_compilation_output_path(&mut self, explicit_target_dir: &Option<String>) -> String {
+    pub fn wasm_compilation_output_path(&self, explicit_target_dir: &Option<String>) -> String {
         let target_dir = explicit_target_dir
             .clone()
             .unwrap_or_else(|| format!("{}/target", &self.wasm_crate_path(),));
@@ -130,14 +130,26 @@ impl OutputContract {
         format!("{}.abi.json", &self.contract_name)
     }
 
-    pub fn wasm_output_name(&self, build_args: &BuildArgs) -> String {
+    fn output_name_base(&self, build_args: &BuildArgs) -> String {
         if let Some(wasm_name_override) = &build_args.wasm_name_override {
-            format!("{}.wasm", &wasm_name_override)
+            wasm_name_override.clone()
         } else if let Some(suffix) = &build_args.wasm_name_suffix {
-            format!("{}-{}.wasm", &self.contract_name, suffix)
+            format!("{}-{}", &self.contract_name, suffix)
         } else {
-            format!("{}.wasm", &self.contract_name)
+            self.contract_name.clone()
         }
+    }
+
+    pub fn wasm_output_name(&self, build_args: &BuildArgs) -> String {
+        format!("{}.wasm", self.output_name_base(build_args))
+    }
+
+    pub fn wat_output_name(&self, build_args: &BuildArgs) -> String {
+        format!("{}.wat", self.output_name_base(build_args))
+    }
+
+    pub fn imports_json_output_name(&self, build_args: &BuildArgs) -> String {
+        format!("{}.imports.json", self.output_name_base(build_args))
     }
 
     pub fn endpoint_names(&self) -> Vec<String> {
@@ -146,6 +158,18 @@ impl OutputContract {
             .iter()
             .map(|endpoint| endpoint.name.to_string())
             .collect()
+    }
+
+    /// Yields "init" + all endpoint names + "callBack" (if it exists).
+    ///
+    /// Should correspond to all wasm exported functions.
+    pub fn all_exported_function_names(&self) -> Vec<String> {
+        let mut result = vec!["init".to_string()];
+        result.append(&mut self.endpoint_names());
+        if self.abi.has_callback {
+            result.push("callBack".to_string());
+        }
+        result
     }
 }
 
