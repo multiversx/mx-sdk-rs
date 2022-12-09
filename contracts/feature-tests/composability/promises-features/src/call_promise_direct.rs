@@ -58,13 +58,20 @@ pub trait CallPromisesDirectModule {
     }
 
     #[promises_callback]
-    fn the_one_callback(&self, #[call_result] result: MultiValueEncoded<ManagedBuffer>, arg1: usize, arg2: usize) {
+    fn the_one_callback(
+        &self,
+        #[call_result] result: MultiValueEncoded<ManagedBuffer>,
+        arg1: usize,
+        arg2: usize,
+    ) {
         self.async_call_event_callback(arg1, arg2, &result.into_vec_of_buffers());
     }
 
     #[event("async_call_event_callback")]
-    fn async_call_event_callback(&self, 
-        #[indexed] arg1: usize, 
+    fn async_call_event_callback(
+        &self,
+        #[indexed] arg1: usize,
         #[indexed] arg2: usize,
-        arguments: &ManagedVec<Self::Api, ManagedBuffer>);
+        arguments: &ManagedVec<Self::Api, ManagedBuffer>,
+    );
 }
