@@ -54,7 +54,7 @@ pub fn execute_esdt_nft_create(
 
     let esdt_nft_create_log = TxLog {
         address: tx_input.from.clone(),
-        endpoint: ESDT_NFT_CREATE_FUNC_NAME.to_vec(),
+        endpoint: ESDT_NFT_CREATE_FUNC_NAME.into(),
         topics: vec![
             token_identifier.to_vec(),
             top_encode_to_vec_u8(&new_nonce).unwrap(),

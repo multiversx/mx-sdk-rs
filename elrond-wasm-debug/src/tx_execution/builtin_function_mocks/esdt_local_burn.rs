@@ -16,7 +16,7 @@ pub fn execute_local_burn(tx_input: TxInput, tx_cache: TxCache) -> (TxResult, Bl
 
     let esdt_nft_create_log = TxLog {
         address: tx_input.from,
-        endpoint: ESDT_LOCAL_BURN_FUNC_NAME.to_vec(),
+        endpoint: ESDT_LOCAL_BURN_FUNC_NAME.into(),
         topics: vec![token_identifier.to_vec(), Vec::new(), value.to_bytes_be()],
         data: vec![],
     };

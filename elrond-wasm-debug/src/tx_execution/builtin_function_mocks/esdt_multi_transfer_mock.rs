@@ -56,7 +56,7 @@ pub fn execute_esdt_multi_transfer(
 
         builtin_logs.push(TxLog {
             address: tx_input.from.clone(),
-            endpoint: ESDT_MULTI_TRANSFER_FUNC_NAME.to_vec(),
+            endpoint: ESDT_MULTI_TRANSFER_FUNC_NAME.into(),
             topics: vec![
                 token_identifier,
                 nonce_bytes,

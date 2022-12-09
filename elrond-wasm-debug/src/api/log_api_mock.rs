@@ -37,7 +37,7 @@ impl LogApiImpl for DebugApi {
         let mut tx_result = self.result_borrow_mut();
         tx_result.result_logs.push(TxLog {
             address: self.input_ref().to.clone(),
-            endpoint: self.input_ref().func_name.to_bytes(),
+            endpoint: self.input_ref().func_name.clone(),
             topics,
             data: data.to_vec(),
         });
@@ -49,7 +49,7 @@ impl LogApiImpl for DebugApi {
         let mut tx_result = self.result_borrow_mut();
         tx_result.result_logs.push(TxLog {
             address: self.input_ref().to.clone(),
-            endpoint: self.input_ref().func_name.to_bytes(),
+            endpoint: self.input_ref().func_name.clone(),
             topics: topics_vec,
             data: data.to_vec(),
         });

@@ -35,7 +35,7 @@ pub fn execute_esdt_nft_transfer(
 
     let esdt_nft_transfer_log = TxLog {
         address: tx_input.from.clone(),
-        endpoint: ESDT_NFT_TRANSFER_FUNC_NAME.to_vec(),
+        endpoint: ESDT_NFT_TRANSFER_FUNC_NAME.into(),
         topics: vec![
             tx_input.args[0].clone(),
             tx_input.args[1].clone(),
