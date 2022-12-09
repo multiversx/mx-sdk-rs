@@ -66,7 +66,7 @@ pub fn esdt_transfer_event_log(
     let nonce_topic = Vec::<u8>::new();
     TxLog {
         address: from,
-        endpoint: ESDT_TRANSFER_FUNC_NAME.to_vec(),
+        endpoint: ESDT_TRANSFER_FUNC_NAME.into(),
         topics: vec![
             esdt_token_identifier,
             nonce_topic,

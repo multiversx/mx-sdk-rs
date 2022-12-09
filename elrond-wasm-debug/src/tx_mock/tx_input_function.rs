@@ -10,6 +10,12 @@ impl From<String> for TxFunctionName {
     }
 }
 
+impl From<&str> for TxFunctionName {
+    fn from(value: &str) -> Self {
+        TxFunctionName(String::from(value))
+    }
+}
+
 impl From<Vec<u8>> for TxFunctionName {
     fn from(value: Vec<u8>) -> Self {
         TxFunctionName(String::from_utf8(value).expect(TX_FUNC_NAME_UTF8_ERROR))
@@ -65,5 +71,11 @@ impl TxFunctionName {
 
     pub fn as_bytes(&self) -> &[u8] {
         self.0.as_bytes()
+    }
+}
+
+impl core::fmt::Display for TxFunctionName {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        self.0.fmt(f)
     }
 }
