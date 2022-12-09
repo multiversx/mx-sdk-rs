@@ -34,7 +34,7 @@ impl ContractContainer {
 
     pub fn call(&self, function_name: &TxFunctionName) -> bool {
         if self.validate_function_name(function_name) {
-            self.callable.call(function_name.as_bytes())
+            self.callable.call(function_name.as_str())
         } else {
             false
         }
