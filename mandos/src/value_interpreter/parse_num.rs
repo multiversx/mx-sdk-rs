@@ -63,7 +63,7 @@ fn parse_fixed_width_signed(s: &str, length: usize) -> Vec<u8> {
         let bytes = bi.to_signed_bytes_be();
         assert!(
             bytes.len() <= length,
-            "{}", "representation of {s} does not fit in {length} bytes"
+            "representation of {s} does not fit in {length} bytes"
         );
         let offset = length - bytes.len();
         if !bytes.is_empty() {
@@ -79,7 +79,7 @@ fn parse_fixed_width_signed(s: &str, length: usize) -> Vec<u8> {
         let result = parse_fixed_width_unsigned(s, length);
         assert!(
             result.is_empty() || result[0] >> 7 != 1,
-            "{}", "representation of {s} does not fit in {length} bytes"
+            "representation of {s} does not fit in {length} bytes"
         );
         result
     }
@@ -89,7 +89,7 @@ fn parse_fixed_width_unsigned(s: &str, length: usize) -> Vec<u8> {
     let parsed = parse_unsigned(s);
     assert!(
         parsed.len() <= length,
-        "{}", "representation of {s} does not fit in {length} bytes"
+        "representation of {s} does not fit in {length} bytes"
     );
 
     let mut result = vec![0u8; length];

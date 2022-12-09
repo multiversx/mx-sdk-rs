@@ -19,7 +19,7 @@ impl Interactor {
                 Err(err) => {
                     assert!(
                         retries > 0,
-                        "{}", "still no answer after {TX_GET_RESULTS_NUM_RETRIES} retries"
+                        "still no answer after {TX_GET_RESULTS_NUM_RETRIES} retries"
                     );
 
                     info!(
