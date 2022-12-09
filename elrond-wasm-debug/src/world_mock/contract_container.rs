@@ -1,6 +1,8 @@
 use alloc::vec::Vec;
 use elrond_wasm::contract_base::CallableContract;
 
+use crate::tx_mock::TxFunctionName;
+
 /// Contains a reference to a contract implementation.
 ///
 /// It can optionally also contain an allowed endpoint whitelist, to simulate multi-contract.
@@ -20,19 +22,19 @@ impl ContractContainer {
         }
     }
 
-    fn validate_function_name(&self, function_name: &[u8]) -> bool {
+    fn validate_function_name(&self, function_name: &TxFunctionName) -> bool {
         if let Some(function_whitelist) = &self.function_whitelist {
             function_whitelist
                 .iter()
-                .any(|whitelisted_endpoint| whitelisted_endpoint.as_bytes() == function_name)
+                .any(|whitelisted_endpoint| whitelisted_endpoint.as_str() == function_name.as_str())
         } else {
             true
         }
     }
 
-    pub fn call(&self, function_name: &[u8]) -> bool {
+    pub fn call(&self, function_name: &TxFunctionName) -> bool {
         if self.validate_function_name(function_name) {
-            self.callable.call(function_name)
+            self.callable.call(function_name.as_bytes())
         } else {
             false
         }

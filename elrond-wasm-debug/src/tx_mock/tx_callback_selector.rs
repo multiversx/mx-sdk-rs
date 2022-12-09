@@ -1,9 +1,9 @@
-use super::AsyncCallTxData;
+use super::{AsyncCallTxData, TxFunctionName};
 
 #[derive(Clone, Debug)]
 pub struct Promise {
     pub endpoint: AsyncCallTxData,
-    pub success_callback: &'static [u8],
-    pub error_callback: &'static [u8],
+    pub success_callback: TxFunctionName,
+    pub error_callback: TxFunctionName,
     pub callback_closure_data: Vec<u8>,
 }
