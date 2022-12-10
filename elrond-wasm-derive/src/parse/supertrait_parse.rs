@@ -1,5 +1,18 @@
 use crate::{model::Supertrait, parse::split_path_last};
 
+pub fn is_contract_base(supertrait: &syn::TypeParamBound) -> bool {
+    match supertrait {
+        syn::TypeParamBound::Trait(t) => {
+            if let Ok(path) = syn::parse_str::<syn::Path>("elrond_wasm::contract_base::ContractBase") {
+                t.path == path
+            } else {
+                false
+            }
+        },
+        _ => false,
+    }
+}
+
 pub fn parse_supertrait(supertrait: &syn::TypeParamBound) -> Supertrait {
     match supertrait {
         syn::TypeParamBound::Trait(t) => {

@@ -117,6 +117,8 @@ members = [
   "contracts/feature-tests/composability/transfer-role-features/meta",
   "contracts/feature-tests/composability/vault",
   "contracts/feature-tests/composability/vault/meta",
+  "contracts/feature-tests/contract-base-tester",
+  "contracts/feature-tests/contract-base-tester/meta",
   "contracts/feature-tests/erc-style-contracts/crowdfunding-erc20",
   "contracts/feature-tests/erc-style-contracts/crowdfunding-erc20/meta",
   "contracts/feature-tests/erc-style-contracts/erc20",
