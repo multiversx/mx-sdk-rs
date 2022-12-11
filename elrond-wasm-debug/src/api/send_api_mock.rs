@@ -69,7 +69,7 @@ impl DebugApi {
             gas_limit: 1000,
             gas_price: 0,
             tx_hash,
-            promise_callback_closure_data: Vec::new(),
+            ..Default::default()
         }
     }
 

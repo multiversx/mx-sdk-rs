@@ -11,13 +11,15 @@ pub struct TxInput {
     pub from: Address,
     pub to: Address,
     pub egld_value: BigUint,
-    pub esdt_values: Vec<TxInputESDT>,
+    pub esdt_values: Vec<TxTokenTransfer>,
     pub func_name: TxFunctionName,
     pub args: Vec<Vec<u8>>,
     pub gas_limit: u64,
     pub gas_price: u64,
     pub tx_hash: H256,
     pub promise_callback_closure_data: Vec<u8>,
+    pub callback_egld_value: BigUint,
+    pub callback_esdt_values: Vec<TxTokenTransfer>,
 }
 
 impl Default for TxInput {
@@ -33,6 +35,8 @@ impl Default for TxInput {
             gas_price: 0,
             tx_hash: H256::zero(),
             promise_callback_closure_data: Vec::new(),
+            callback_egld_value: BigUint::zero(),
+            callback_esdt_values: Vec::new(),
         }
     }
 }
@@ -63,8 +67,9 @@ impl TxInput {
     }
 }
 
+/// Models ESDT transfers between accounts.
 #[derive(Clone, Debug)]
-pub struct TxInputESDT {
+pub struct TxTokenTransfer {
     pub token_identifier: Vec<u8>,
     pub nonce: u64,
     pub value: BigUint,

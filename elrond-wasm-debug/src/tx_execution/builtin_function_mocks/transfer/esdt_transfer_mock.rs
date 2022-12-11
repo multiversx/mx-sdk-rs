@@ -1,6 +1,6 @@
 use elrond_wasm::api::ESDT_TRANSFER_FUNC_NAME;
 
-use crate::tx_mock::{BlockchainUpdate, TxCache, TxInput, TxInputESDT, TxResult};
+use crate::tx_mock::{BlockchainUpdate, TxCache, TxTokenTransfer, TxInput, TxResult};
 
 use super::{
     super::builtin_func_trait::BuiltinFunction,
@@ -17,7 +17,7 @@ impl BuiltinFunction for ESDTTransfer {
         ESDT_TRANSFER_FUNC_NAME
     }
 
-    fn extract_esdt_transfers(&self, tx_input: TxInput) -> Vec<TxInputESDT> {
+    fn extract_esdt_transfers(&self, tx_input: TxInput) -> Vec<TxTokenTransfer> {
         if let Ok(parsed_tx) = try_parse_input(&tx_input) {
             process_raw_esdt_transfers(parsed_tx.raw_esdt_transfers)
         } else {

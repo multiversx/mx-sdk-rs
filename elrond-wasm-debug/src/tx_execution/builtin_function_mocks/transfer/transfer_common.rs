@@ -1,6 +1,8 @@
 use crate::{
     tx_execution::default_execution,
-    tx_mock::{BlockchainUpdate, TxCache, TxFunctionName, TxInput, TxInputESDT, TxLog, TxResult},
+    tx_mock::{
+        BlockchainUpdate, TxCache, TxTokenTransfer, TxFunctionName, TxInput, TxLog, TxResult,
+    },
 };
 use elrond_wasm::{elrond_codec::TopDecode, types::heap::Address};
 use num_bigint::BigUint;
@@ -19,8 +21,8 @@ pub(super) struct RawEsdtTransfer {
     pub value_bytes: Vec<u8>,
 }
 
-pub(super) fn process_raw_esdt_transfer(raw_esdt_transfer: RawEsdtTransfer) -> TxInputESDT {
-    TxInputESDT {
+pub(super) fn process_raw_esdt_transfer(raw_esdt_transfer: RawEsdtTransfer) -> TxTokenTransfer {
+    TxTokenTransfer {
         token_identifier: raw_esdt_transfer.token_identifier,
         nonce: u64::top_decode(raw_esdt_transfer.nonce_bytes.as_slice()).unwrap(),
         value: BigUint::from_bytes_be(raw_esdt_transfer.value_bytes.as_slice()),
@@ -29,7 +31,7 @@ pub(super) fn process_raw_esdt_transfer(raw_esdt_transfer: RawEsdtTransfer) -> T
 
 pub(super) fn process_raw_esdt_transfers(
     raw_esdt_transfers: Vec<RawEsdtTransfer>,
-) -> Vec<TxInputESDT> {
+) -> Vec<TxTokenTransfer> {
     raw_esdt_transfers
         .into_iter()
         .map(process_raw_esdt_transfer)

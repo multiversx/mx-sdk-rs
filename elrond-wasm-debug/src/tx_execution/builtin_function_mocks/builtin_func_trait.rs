@@ -1,9 +1,9 @@
-use crate::tx_mock::{BlockchainUpdate, TxCache, TxInput, TxInputESDT, TxResult};
+use crate::tx_mock::{BlockchainUpdate, TxCache, TxTokenTransfer, TxInput, TxResult};
 
 pub trait BuiltinFunction {
     fn name(&self) -> &str;
 
-    fn extract_esdt_transfers(&self, _: TxInput) -> Vec<TxInputESDT> {
+    fn extract_esdt_transfers(&self, _: TxInput) -> Vec<TxTokenTransfer> {
         Vec::new()
     }
 

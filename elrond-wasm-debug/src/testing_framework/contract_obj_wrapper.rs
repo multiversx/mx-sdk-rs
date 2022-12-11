@@ -14,7 +14,9 @@ use crate::{
     num_bigint,
     testing_framework::raw_converter::bytes_to_hex,
     tx_execution::{execute_async_call_and_callback, interpret_panic_as_tx_result},
-    tx_mock::{TxCache, TxContext, TxContextStack, TxFunctionName, TxInput, TxInputESDT, TxResult},
+    tx_mock::{
+        TxCache, TxContext, TxContextStack, TxTokenTransfer, TxFunctionName, TxInput, TxResult,
+    },
     world_mock::{
         is_smart_contract_address, AccountData, AccountEsdt, ContractContainer,
         EsdtInstanceMetadata,
@@ -644,7 +646,7 @@ impl BlockchainStateWrapper {
         ContractObjBuilder: 'static + Copy + Fn() -> CB,
         TxFn: FnOnce(CB),
     {
-        let esdt_transfer = vec![TxInputESDT {
+        let esdt_transfer = vec![TxTokenTransfer {
             token_identifier: token_id.to_vec(),
             nonce: esdt_nonce,
             value: esdt_amount.clone(),
@@ -662,7 +664,7 @@ impl BlockchainStateWrapper {
         &mut self,
         caller: &Address,
         sc_wrapper: &ContractObjWrapper<CB, ContractObjBuilder>,
-        esdt_transfers: &[TxInputESDT],
+        esdt_transfers: &[TxTokenTransfer],
         tx_fn: TxFn,
     ) -> TxResult
     where
@@ -701,7 +703,7 @@ impl BlockchainStateWrapper {
         caller: &Address,
         sc_wrapper: &ContractObjWrapper<CB, ContractObjBuilder>,
         egld_payment: &num_bigint::BigUint,
-        esdt_payments: Vec<TxInputESDT>,
+        esdt_payments: Vec<TxTokenTransfer>,
         tx_fn: TxFn,
     ) -> TxResult
     where
@@ -904,7 +906,7 @@ fn build_tx_input(
     caller: &Address,
     dest: &Address,
     egld_value: &num_bigint::BigUint,
-    esdt_values: Vec<TxInputESDT>,
+    esdt_values: Vec<TxTokenTransfer>,
 ) -> TxInput {
     TxInput {
         from: caller.clone(),

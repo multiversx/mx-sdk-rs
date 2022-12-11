@@ -3,7 +3,7 @@ use elrond_wasm::elrond_codec::{CodecFrom, PanicErrorHandler, TopEncodeMulti};
 
 use crate::{
     tx_execution::sc_call_with_async_and_callback,
-    tx_mock::{generate_tx_hash_dummy, TxInput, TxInputESDT, TxResult},
+    tx_mock::{generate_tx_hash_dummy, TxTokenTransfer, TxInput, TxResult},
     world_mock::BlockchainMock,
 };
 
@@ -91,15 +91,15 @@ fn execute_and_check(
     (tx_result, state)
 }
 
-pub fn tx_esdt_transfers_from_mandos(mandos_transf_esdt: &[TxESDT]) -> Vec<TxInputESDT> {
+pub fn tx_esdt_transfers_from_mandos(mandos_transf_esdt: &[TxESDT]) -> Vec<TxTokenTransfer> {
     mandos_transf_esdt
         .iter()
         .map(tx_esdt_transfer_from_mandos)
         .collect()
 }
 
-pub fn tx_esdt_transfer_from_mandos(mandos_transf_esdt: &TxESDT) -> TxInputESDT {
-    TxInputESDT {
+pub fn tx_esdt_transfer_from_mandos(mandos_transf_esdt: &TxESDT) -> TxTokenTransfer {
+    TxTokenTransfer {
         token_identifier: mandos_transf_esdt.esdt_token_identifier.value.clone(),
         nonce: mandos_transf_esdt.nonce.value,
         value: mandos_transf_esdt.esdt_value.value.clone(),
