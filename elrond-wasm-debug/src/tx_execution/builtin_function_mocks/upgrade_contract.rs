@@ -1,46 +1,55 @@
+use elrond_wasm::api::UPGRADE_CONTRACT_FUNC_NAME;
+
 use crate::{
     tx_execution::default_execution,
     tx_mock::{BlockchainUpdate, TxCache, TxFunctionName, TxInput, TxResult},
 };
 
-pub fn execute_upgrade_contract(
-    tx_input: TxInput,
-    tx_cache: TxCache,
-) -> (TxResult, BlockchainUpdate) {
-    if tx_input.args.len() < 2 {
-        return (
-            TxResult::from_vm_error("upgradeContract expects at least 2 arguments".to_string()),
-            BlockchainUpdate::empty(),
-        );
+use super::builtin_func_trait::BuiltinFunction;
+
+pub struct UpgradeContract;
+
+impl BuiltinFunction for UpgradeContract {
+    fn name(&self) -> &str {
+        UPGRADE_CONTRACT_FUNC_NAME
     }
 
-    let new_code = tx_input.args[0].clone();
+    fn execute(&self, tx_input: TxInput, tx_cache: TxCache) -> (TxResult, BlockchainUpdate) {
+        if tx_input.args.len() < 2 {
+            return (
+                TxResult::from_vm_error("upgradeContract expects at least 2 arguments".to_string()),
+                BlockchainUpdate::empty(),
+            );
+        }
 
-    // tx_input.args[1] is the code metadata, we ignore for now
-    // TODO: model code metadata in Mandos
+        let new_code = tx_input.args[0].clone();
 
-    let args = if tx_input.args.len() > 2 {
-        tx_input.args[2..].to_vec()
-    } else {
-        Vec::new()
-    };
+        // tx_input.args[1] is the code metadata, we ignore for now
+        // TODO: model code metadata in Mandos
 
-    tx_cache.with_account_mut(&tx_input.to, |account| {
-        account.contract_path = Some(new_code);
-    });
+        let args = if tx_input.args.len() > 2 {
+            tx_input.args[2..].to_vec()
+        } else {
+            Vec::new()
+        };
 
-    let exec_input = TxInput {
-        from: tx_input.from,
-        to: tx_input.to,
-        egld_value: tx_input.egld_value,
-        esdt_values: Vec::new(),
-        func_name: TxFunctionName::INIT,
-        args,
-        gas_limit: tx_input.gas_limit,
-        gas_price: tx_input.gas_price,
-        tx_hash: tx_input.tx_hash,
-        promise_callback_closure_data: Vec::new(),
-    };
+        tx_cache.with_account_mut(&tx_input.to, |account| {
+            account.contract_path = Some(new_code);
+        });
 
-    default_execution(exec_input, tx_cache)
+        let exec_input = TxInput {
+            from: tx_input.from,
+            to: tx_input.to,
+            egld_value: tx_input.egld_value,
+            esdt_values: Vec::new(),
+            func_name: TxFunctionName::INIT,
+            args,
+            gas_limit: tx_input.gas_limit,
+            gas_price: tx_input.gas_price,
+            tx_hash: tx_input.tx_hash,
+            promise_callback_closure_data: Vec::new(),
+        };
+
+        default_execution(exec_input, tx_cache)
+    }
 }

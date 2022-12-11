@@ -1,8 +1,13 @@
-use crate::{mandos_system::model::Scenario, num_bigint::BigUint, tx_mock::BlockchainUpdate};
+use crate::{
+    mandos_system::model::Scenario,
+    num_bigint::BigUint,
+    tx_execution::{init_builtin_functions, BuiltinFunctionMap},
+    tx_mock::BlockchainUpdate,
+};
 use elrond_wasm::types::heap::Address;
 use mandos::{interpret_trait::InterpreterContext, value_interpreter::interpret_string};
 use num_traits::Zero;
-use std::{collections::HashMap, path::PathBuf};
+use std::{collections::HashMap, path::PathBuf, rc::Rc};
 
 use super::{AccountData, BlockInfo, ContractMap};
 
@@ -11,6 +16,7 @@ const ELROND_REWARD_KEY: &[u8] = b"ELRONDreward";
 #[derive(Debug)]
 pub struct BlockchainMock {
     pub accounts: HashMap<Address, AccountData>,
+    pub builtin_functions: Rc<BuiltinFunctionMap>,
     pub addr_to_mandos_string_map: HashMap<Address, String>,
     pub new_addresses: HashMap<(Address, u64), Address>,
     pub previous_block_info: BlockInfo,
@@ -24,6 +30,7 @@ impl BlockchainMock {
     pub fn new() -> Self {
         BlockchainMock {
             accounts: HashMap::new(),
+            builtin_functions: Rc::new(init_builtin_functions()),
             addr_to_mandos_string_map: HashMap::new(),
             new_addresses: HashMap::new(),
             previous_block_info: BlockInfo::new(),
