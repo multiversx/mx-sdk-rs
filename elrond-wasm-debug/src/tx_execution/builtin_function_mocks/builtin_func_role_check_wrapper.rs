@@ -22,8 +22,8 @@ impl BuiltinFunction for BuiltinFunctionRoleCheckWrapper {
         self.builtin_function.name()
     }
 
-    fn extract_esdt_transfers(&self) -> Vec<TxInputESDT> {
-        self.builtin_function.extract_esdt_transfers()
+    fn extract_esdt_transfers(&self, tx_input: TxInput) -> Vec<TxInputESDT> {
+        self.builtin_function.extract_esdt_transfers(tx_input)
     }
 
     fn execute(&self, tx_input: TxInput, tx_cache: TxCache) -> (TxResult, BlockchainUpdate) {
