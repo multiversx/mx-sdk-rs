@@ -15,7 +15,7 @@ pub struct AsyncCallTxData {
     pub from: Address,
     pub to: Address,
     pub call_value: BigUint,
-    pub endpoint_name: Vec<u8>,
+    pub endpoint_name: TxFunctionName,
     pub arguments: Vec<Vec<u8>>,
     pub tx_hash: H256,
 }

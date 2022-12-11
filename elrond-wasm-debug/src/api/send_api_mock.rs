@@ -54,7 +54,7 @@ impl DebugApi {
         &self,
         to: Address,
         egld_value: num_bigint::BigUint,
-        func_name: Vec<u8>,
+        func_name: TxFunctionName,
         args: Vec<Vec<u8>>,
     ) -> TxInput {
         let contract_address = &self.input_ref().to;
@@ -64,7 +64,7 @@ impl DebugApi {
             to,
             egld_value,
             esdt_values: Vec::new(),
-            func_name: func_name.into(),
+            func_name,
             args,
             gas_limit: 1000,
             gas_price: 0,
@@ -77,7 +77,7 @@ impl DebugApi {
         &self,
         to: Address,
         egld_value: num_bigint::BigUint,
-        func_name: Vec<u8>,
+        func_name: TxFunctionName,
         args: Vec<Vec<u8>>,
     ) -> Vec<Vec<u8>> {
         let tx_input = self.prepare_execute_on_dest_context_input(to, egld_value, func_name, args);
@@ -100,7 +100,7 @@ impl DebugApi {
         &self,
         to: Address,
         egld_value: num_bigint::BigUint,
-        func_name: Vec<u8>,
+        func_name: TxFunctionName,
         args: Vec<Vec<u8>>,
     ) -> Vec<Vec<u8>> {
         let tx_input = self.prepare_execute_on_dest_context_input(to, egld_value, func_name, args);
@@ -190,7 +190,7 @@ impl DebugApi {
             from: contract_address,
             to: recipient,
             call_value,
-            endpoint_name: UPGRADE_CONTRACT_FUNC_NAME.to_vec(),
+            endpoint_name: UPGRADE_CONTRACT_FUNC_NAME.into(),
             arguments,
             tx_hash,
         };
@@ -228,7 +228,7 @@ impl SendApiImpl for DebugApi {
         let _ = self.perform_transfer_execute(
             recipient,
             egld_value,
-            endpoint_name.to_boxed_bytes().into_vec(),
+            endpoint_name.to_boxed_bytes().as_slice().into(),
             arg_buffer.to_raw_args_vec(),
         );
 
@@ -254,7 +254,7 @@ impl SendApiImpl for DebugApi {
         let _ = self.perform_transfer_execute(
             recipient,
             num_bigint::BigUint::zero(),
-            ESDT_TRANSFER_FUNC_NAME.to_vec(),
+            ESDT_TRANSFER_FUNC_NAME.into(),
             args,
         );
 
@@ -290,7 +290,7 @@ impl SendApiImpl for DebugApi {
         let _ = self.perform_transfer_execute(
             contract_address,
             num_bigint::BigUint::zero(),
-            ESDT_NFT_TRANSFER_FUNC_NAME.to_vec(),
+            ESDT_NFT_TRANSFER_FUNC_NAME.into(),
             args,
         );
 
@@ -334,7 +334,7 @@ impl SendApiImpl for DebugApi {
         let _ = self.perform_transfer_execute(
             contract_address,
             num_bigint::BigUint::zero(),
-            ESDT_MULTI_TRANSFER_FUNC_NAME.to_vec(),
+            ESDT_MULTI_TRANSFER_FUNC_NAME.into(),
             args,
         );
 
@@ -357,7 +357,7 @@ impl SendApiImpl for DebugApi {
             from: contract_address,
             to: recipient,
             call_value: amount_value,
-            endpoint_name: endpoint_name.to_boxed_bytes().into_vec(),
+            endpoint_name: endpoint_name.to_boxed_bytes().as_slice().into(),
             arguments: arg_buffer.to_raw_args_vec(),
             tx_hash,
         };
@@ -387,7 +387,7 @@ impl SendApiImpl for DebugApi {
             from: contract_address,
             to: recipient,
             call_value: amount_value,
-            endpoint_name,
+            endpoint_name: endpoint_name.into(),
             arguments: ManagedArgBuffer::<Self>::from_raw_handle(
                 arg_buffer_handle.get_raw_handle_unchecked(),
             )
@@ -484,7 +484,7 @@ impl SendApiImpl for DebugApi {
         let result = self.perform_execute_on_dest_context(
             recipient,
             egld_value,
-            endpoint_name.to_boxed_bytes().into_vec(),
+            endpoint_name.to_boxed_bytes().as_slice().into(),
             arg_buffer.to_raw_args_vec(),
         );
 
