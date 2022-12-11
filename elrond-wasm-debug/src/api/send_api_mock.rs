@@ -396,7 +396,7 @@ impl SendApiImpl for DebugApi {
         };
 
         let promise = Promise {
-            endpoint: call,
+            call,
             success_callback: success_callback.into(),
             error_callback: error_callback.into(),
             callback_closure_data,

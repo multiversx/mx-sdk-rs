@@ -81,7 +81,7 @@ pub fn async_promise_tx_input(
     };
 
     TxInput {
-        from: promise.endpoint.from.clone(),
+        from: promise.call.from.clone(),
         to: address.clone(),
         egld_value: 0u32.into(),
         esdt_values: Vec::new(),
@@ -89,7 +89,7 @@ pub fn async_promise_tx_input(
         args,
         gas_limit: 1000,
         gas_price: 0,
-        tx_hash: promise.endpoint.tx_hash.clone(),
+        tx_hash: promise.call.tx_hash.clone(),
         promise_callback_closure_data: promise.callback_closure_data.clone(),
         ..Default::default()
     }

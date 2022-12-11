@@ -114,8 +114,8 @@ pub fn execute_promise_call_and_callback(
     promise: &Promise,
     state: BlockchainMock,
 ) -> (TxResult, TxResult, BlockchainMock) {
-    if state.accounts.contains_key(&promise.endpoint.to) {
-        let async_input = async_call_tx_input(&promise.endpoint);
+    if state.accounts.contains_key(&promise.call.to) {
+        let async_input = async_call_tx_input(&promise.call);
         let (async_result, state) = sc_call_with_async_and_callback(async_input, state);
 
         let callback_input = async_promise_tx_input(address, promise, &async_result);
@@ -128,11 +128,11 @@ pub fn execute_promise_call_and_callback(
     } else {
         let state_rc = Rc::new(state);
         let tx_cache = TxCache::new(state_rc.clone());
-        tx_cache.subtract_egld_balance(address, &promise.endpoint.call_value);
+        tx_cache.subtract_egld_balance(address, &promise.call.call_value);
         tx_cache.insert_account(AccountData {
-            address: promise.endpoint.to.clone(),
+            address: promise.call.to.clone(),
             nonce: 0,
-            egld_balance: promise.endpoint.call_value.clone(),
+            egld_balance: promise.call.call_value.clone(),
             esdt: AccountEsdt::default(),
             username: Vec::new(),
             storage: HashMap::new(),
