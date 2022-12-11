@@ -31,7 +31,7 @@ pub fn async_call_tx_input(async_data: &AsyncCallTxData) -> TxInput {
         gas_limit: 1000,
         gas_price: 0,
         tx_hash: async_data.tx_hash.clone(),
-        promise_callback_closure_data: Vec::new(),
+        ..Default::default()
     }
 }
 
@@ -60,7 +60,7 @@ pub fn async_callback_tx_input(async_data: &AsyncCallTxData, async_result: &TxRe
         gas_limit: 1000,
         gas_price: 0,
         tx_hash: async_data.tx_hash.clone(),
-        promise_callback_closure_data: Vec::new(),
+        ..Default::default()
     }
 }
 

@@ -67,7 +67,7 @@ pub(super) fn execute_transfer_builtin_func(
         gas_limit: tx_input.gas_limit,
         gas_price: tx_input.gas_price,
         tx_hash: tx_input.tx_hash,
-        promise_callback_closure_data: Vec::new(),
+        ..Default::default()
     };
 
     let (mut tx_result, blockchain_updates) = default_execution(exec_input, tx_cache);

@@ -20,6 +20,23 @@ pub struct TxInput {
     pub promise_callback_closure_data: Vec<u8>,
 }
 
+impl Default for TxInput {
+    fn default() -> Self {
+        TxInput {
+            from: Address::zero(),
+            to: Address::zero(),
+            egld_value: BigUint::zero(),
+            esdt_values: Vec::new(),
+            func_name: TxFunctionName::EMPTY,
+            args: Vec::new(),
+            gas_limit: 0,
+            gas_price: 0,
+            tx_hash: H256::zero(),
+            promise_callback_closure_data: Vec::new(),
+        }
+    }
+}
+
 impl fmt::Display for TxInput {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "TxInput {{ func: {}, args: {:?}, call_value: {}, esdt_value: {:?}, from: 0x{}, to: 0x{}\n}}", 
@@ -35,21 +52,6 @@ impl fmt::Display for TxInput {
 impl TxInput {
     pub fn add_arg(&mut self, arg: Vec<u8>) {
         self.args.push(arg);
-    }
-
-    pub fn dummy() -> Self {
-        TxInput {
-            from: Address::zero(),
-            to: Address::zero(),
-            egld_value: BigUint::zero(),
-            esdt_values: Vec::new(),
-            func_name: TxFunctionName::EMPTY,
-            args: Vec::new(),
-            gas_limit: 0,
-            gas_price: 0,
-            tx_hash: H256::zero(),
-            promise_callback_closure_data: Vec::new(),
-        }
     }
 
     pub fn func_name_from_arg_index(&self, arg_index: usize) -> TxFunctionName {

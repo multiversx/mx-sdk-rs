@@ -2,7 +2,6 @@ use crate::{
     mandos_system::model::{Step, TransferStep, TxTransfer, ValidatorRewardStep},
     tx_mock::TxFunctionName,
 };
-use elrond_wasm::types::heap::H256;
 
 use crate::{
     sc_call::tx_esdt_transfers_from_mandos, tx_execution::execute_sc_call, tx_mock::TxInput,
@@ -41,8 +40,7 @@ fn execute(mut state: BlockchainMock, tx_transfer: &TxTransfer) -> BlockchainMoc
         args: Vec::new(),
         gas_limit: tx_transfer.gas_limit.value,
         gas_price: tx_transfer.gas_price.value,
-        tx_hash: H256::zero(),
-        promise_callback_closure_data: Vec::new(),
+        ..Default::default()
     };
 
     // nonce gets increased irrespective of whether the tx fails or not
