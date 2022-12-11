@@ -56,7 +56,7 @@ fn try_parse_input(tx_input: &TxInput) -> Result<ParsedTransferBuiltinFunCall, &
     Ok(ParsedTransferBuiltinFunCall {
         destination: tx_input.to.clone(),
         raw_esdt_transfers: vec![RawEsdtTransfer {
-            token_identifier: token_identifier,
+            token_identifier,
             nonce_bytes: Vec::new(),
             value_bytes,
         }],

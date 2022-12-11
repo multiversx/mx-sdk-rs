@@ -23,6 +23,7 @@ impl BuiltinFunctionMap {
         Self { func_map }
     }
 
+    #[allow(clippy::borrowed_box)]
     pub fn get(&self, name: &TxFunctionName) -> Option<&Box<dyn BuiltinFunction>> {
         self.func_map.get(name.as_str())
     }
