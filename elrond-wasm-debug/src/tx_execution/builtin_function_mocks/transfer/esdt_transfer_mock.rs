@@ -1,13 +1,14 @@
-use crate::num_bigint::BigUint;
-use elrond_wasm::{api::ESDT_TRANSFER_FUNC_NAME, types::heap::Address};
-use num_traits::Zero;
+use elrond_wasm::api::ESDT_TRANSFER_FUNC_NAME;
 
-use crate::{
-    tx_execution::default_execution,
-    tx_mock::{BlockchainUpdate, TxCache, TxInput, TxInputESDT, TxLog, TxResult},
+use crate::tx_mock::{BlockchainUpdate, TxCache, TxInput, TxInputESDT, TxResult};
+
+use super::{
+    super::builtin_func_trait::BuiltinFunction,
+    transfer_common::{
+        execute_transfer_builtin_func, process_raw_esdt_transfers, ParsedTransferBuiltinFunCall,
+        RawEsdtTransfer,
+    },
 };
-
-use super::super::builtin_func_trait::BuiltinFunction;
 
 pub struct ESDTTransfer;
 
@@ -16,32 +17,34 @@ impl BuiltinFunction for ESDTTransfer {
         ESDT_TRANSFER_FUNC_NAME
     }
 
+    fn extract_esdt_transfers(&self, tx_input: TxInput) -> Vec<TxInputESDT> {
+        if let Ok(parsed_tx) = try_parse_input(&tx_input) {
+            process_raw_esdt_transfers(parsed_tx.raw_esdt_transfers)
+        } else {
+            Vec::new()
+        }
+    }
+
     fn execute(&self, tx_input: TxInput, tx_cache: TxCache) -> (TxResult, BlockchainUpdate) {
-        execute_esdt_transfer(tx_input, tx_cache)
+        match try_parse_input(&tx_input) {
+            Ok(parsed_tx) => {
+                execute_transfer_builtin_func(parsed_tx, self.name(), tx_input, tx_cache)
+            },
+            Err(message) => {
+                let err_result = TxResult::from_vm_error(message.to_string());
+                (err_result, BlockchainUpdate::empty())
+            },
+        }
     }
 }
 
-pub fn execute_esdt_transfer(tx_input: TxInput, tx_cache: TxCache) -> (TxResult, BlockchainUpdate) {
+fn try_parse_input(tx_input: &TxInput) -> Result<ParsedTransferBuiltinFunCall, &'static str> {
     if tx_input.args.len() < 2 {
-        let err_result = TxResult::from_vm_error("ESDTTransfer too few arguments".to_string());
-        return (err_result, BlockchainUpdate::empty());
+        return Err("ESDTTransfer too few arguments");
     }
 
     let token_identifier = tx_input.args[0].clone();
-    let value = BigUint::from_bytes_be(tx_input.args[1].as_slice());
-
-    let esdt_values = vec![TxInputESDT {
-        token_identifier: token_identifier.clone(),
-        nonce: 0,
-        value: value.clone(),
-    }];
-
-    let esdt_transfer_log = esdt_transfer_event_log(
-        tx_input.from.clone(),
-        tx_input.to.clone(),
-        token_identifier,
-        &value,
-    );
+    let value_bytes = tx_input.args[1].clone();
 
     let func_name = tx_input.func_name_from_arg_index(2);
     let args = if tx_input.args.len() > 2 {
@@ -50,43 +53,14 @@ pub fn execute_esdt_transfer(tx_input: TxInput, tx_cache: TxCache) -> (TxResult,
         Vec::new()
     };
 
-    let exec_input = TxInput {
-        from: tx_input.from,
-        to: tx_input.to,
-        egld_value: BigUint::zero(),
-        esdt_values,
+    Ok(ParsedTransferBuiltinFunCall {
+        destination: tx_input.to.clone(),
+        raw_esdt_transfers: vec![RawEsdtTransfer {
+            token_identifier: token_identifier,
+            nonce_bytes: Vec::new(),
+            value_bytes,
+        }],
         func_name,
         args,
-        gas_limit: tx_input.gas_limit,
-        gas_price: tx_input.gas_price,
-        tx_hash: tx_input.tx_hash,
-        promise_callback_closure_data: Vec::new(),
-    };
-
-    let (mut tx_result, blockchain_updates) = default_execution(exec_input, tx_cache);
-
-    // prepends esdt log
-    tx_result.result_logs = [&[esdt_transfer_log][..], tx_result.result_logs.as_slice()].concat();
-
-    (tx_result, blockchain_updates)
-}
-
-pub fn esdt_transfer_event_log(
-    from: Address,
-    to: Address,
-    esdt_token_identifier: Vec<u8>,
-    esdt_value: &BigUint,
-) -> TxLog {
-    let nonce_topic = Vec::<u8>::new();
-    TxLog {
-        address: from,
-        endpoint: ESDT_TRANSFER_FUNC_NAME.into(),
-        topics: vec![
-            esdt_token_identifier,
-            nonce_topic,
-            esdt_value.to_bytes_be(),
-            to.to_vec(),
-        ],
-        data: vec![],
-    }
+    })
 }
