@@ -9,7 +9,7 @@ use crate::{
     world_mock::{EsdtInstance, EsdtInstanceMetadata},
 };
 
-use super::builtin_func_trait::BuiltinFunction;
+use super::super::builtin_func_trait::BuiltinFunction;
 
 pub struct ESDTNftCreate;
 

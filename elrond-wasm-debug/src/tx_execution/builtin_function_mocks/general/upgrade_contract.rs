@@ -5,7 +5,7 @@ use crate::{
     tx_mock::{BlockchainUpdate, TxCache, TxFunctionName, TxInput, TxResult},
 };
 
-use super::builtin_func_trait::BuiltinFunction;
+use super::super::builtin_func_trait::BuiltinFunction;
 
 pub struct UpgradeContract;
 

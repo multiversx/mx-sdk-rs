@@ -2,7 +2,7 @@ use elrond_wasm::api::SET_USERNAME_FUNC_NAME;
 
 use crate::tx_mock::{BlockchainUpdate, TxCache, TxInput, TxResult};
 
-use super::builtin_func_trait::BuiltinFunction;
+use super::super::builtin_func_trait::BuiltinFunction;
 
 pub struct SetUsername;
 

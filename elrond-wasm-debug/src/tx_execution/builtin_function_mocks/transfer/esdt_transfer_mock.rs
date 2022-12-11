@@ -7,7 +7,7 @@ use crate::{
     tx_mock::{BlockchainUpdate, TxCache, TxInput, TxInputESDT, TxLog, TxResult},
 };
 
-use super::builtin_func_trait::BuiltinFunction;
+use super::super::builtin_func_trait::BuiltinFunction;
 
 pub struct ESDTTransfer;
 
