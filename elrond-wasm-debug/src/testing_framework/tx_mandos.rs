@@ -1,4 +1,4 @@
-use crate::{num_bigint, tx_mock::TxInputESDT};
+use crate::{num_bigint, tx_mock::TxTokenTransfer};
 use elrond_wasm::{
     elrond_codec::{top_encode_to_vec_u8_or_panic, TopEncode},
     types::heap::Address,
@@ -9,7 +9,7 @@ pub struct ScCallMandos {
     pub(crate) from: Address,
     pub(crate) to: Address,
     pub(crate) egld_value: num_bigint::BigUint,
-    pub(crate) esdt: Vec<TxInputESDT>,
+    pub(crate) esdt: Vec<TxTokenTransfer>,
     pub(crate) function: String,
     pub(crate) arguments: Vec<Vec<u8>>,
     pub(crate) gas_limit: u64,
@@ -40,7 +40,7 @@ impl ScCallMandos {
         nonce: u64,
         esdt_value: &num_bigint::BigUint,
     ) {
-        self.esdt.push(TxInputESDT {
+        self.esdt.push(TxTokenTransfer {
             token_identifier: token_id.to_vec(),
             nonce,
             value: esdt_value.clone(),

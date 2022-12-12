@@ -14,7 +14,9 @@ use crate::{
     num_bigint,
     testing_framework::raw_converter::bytes_to_hex,
     tx_execution::{execute_async_call_and_callback, interpret_panic_as_tx_result},
-    tx_mock::{TxCache, TxContext, TxContextStack, TxFunctionName, TxInput, TxInputESDT, TxResult},
+    tx_mock::{
+        TxCache, TxContext, TxContextStack, TxFunctionName, TxInput, TxResult, TxTokenTransfer,
+    },
     world_mock::{
         is_smart_contract_address, AccountData, AccountEsdt, ContractContainer,
         EsdtInstanceMetadata,
@@ -644,7 +646,7 @@ impl BlockchainStateWrapper {
         ContractObjBuilder: 'static + Copy + Fn() -> CB,
         TxFn: FnOnce(CB),
     {
-        let esdt_transfer = vec![TxInputESDT {
+        let esdt_transfer = vec![TxTokenTransfer {
             token_identifier: token_id.to_vec(),
             nonce: esdt_nonce,
             value: esdt_amount.clone(),
@@ -662,7 +664,7 @@ impl BlockchainStateWrapper {
         &mut self,
         caller: &Address,
         sc_wrapper: &ContractObjWrapper<CB, ContractObjBuilder>,
-        esdt_transfers: &[TxInputESDT],
+        esdt_transfers: &[TxTokenTransfer],
         tx_fn: TxFn,
     ) -> TxResult
     where
@@ -701,7 +703,7 @@ impl BlockchainStateWrapper {
         caller: &Address,
         sc_wrapper: &ContractObjWrapper<CB, ContractObjBuilder>,
         egld_payment: &num_bigint::BigUint,
-        esdt_payments: Vec<TxInputESDT>,
+        esdt_payments: Vec<TxTokenTransfer>,
         tx_fn: TxFn,
     ) -> TxResult
     where
@@ -758,7 +760,7 @@ impl BlockchainStateWrapper {
             updates.apply(b_mock_ref);
         }
         if is_successful_tx {
-            if let Some(async_data) = &tx_result.result_calls.async_call {
+            if let Some(async_data) = &tx_result.pending_calls.async_call {
                 let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
                 b_mock_ref.with_borrowed(|state| {
                     let (_, _, state) = execute_async_call_and_callback(async_data.clone(), state);
@@ -904,7 +906,7 @@ fn build_tx_input(
     caller: &Address,
     dest: &Address,
     egld_value: &num_bigint::BigUint,
-    esdt_values: Vec<TxInputESDT>,
+    esdt_values: Vec<TxTokenTransfer>,
 ) -> TxInput {
     TxInput {
         from: caller.clone(),
@@ -916,7 +918,7 @@ fn build_tx_input(
         gas_limit: u64::MAX,
         gas_price: 0,
         tx_hash: H256::zero(),
-        promise_callback_closure_data: Vec::new(),
+        ..Default::default()
     }
 }
 

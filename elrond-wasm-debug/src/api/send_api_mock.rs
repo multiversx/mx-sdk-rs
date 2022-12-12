@@ -69,7 +69,7 @@ impl DebugApi {
             gas_limit: 1000,
             gas_price: 0,
             tx_hash,
-            promise_callback_closure_data: Vec::new(),
+            ..Default::default()
         }
     }
 
@@ -137,7 +137,7 @@ impl DebugApi {
             gas_limit: 1000,
             gas_price: 0,
             tx_hash,
-            promise_callback_closure_data: Vec::new(),
+            ..Default::default()
         };
 
         let tx_cache = TxCache::new(self.blockchain_cache_rc());
@@ -162,7 +162,7 @@ impl DebugApi {
     fn perform_async_call(&self, call: AsyncCallTxData) -> ! {
         // the cell is no longer needed, since we end in a panic
         let mut tx_result = self.extract_result();
-        tx_result.result_calls.async_call = Some(call);
+        tx_result.pending_calls.async_call = Some(call);
         std::panic::panic_any(tx_result)
     }
 
@@ -396,14 +396,14 @@ impl SendApiImpl for DebugApi {
         };
 
         let promise = Promise {
-            endpoint: call,
+            call,
             success_callback: success_callback.into(),
             error_callback: error_callback.into(),
             callback_closure_data,
         };
 
         let mut tx_result = self.result_borrow_mut();
-        tx_result.result_calls.promises.push(promise);
+        tx_result.pending_calls.promises.push(promise);
     }
 
     fn deploy_contract<M: ManagedTypeApi>(

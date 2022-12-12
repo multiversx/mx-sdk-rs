@@ -4,7 +4,7 @@ use elrond_wasm::{
     elrond_codec::{top_encode_to_vec_u8, TopDecode},
 };
 
-use crate::tx_mock::{BlockchainUpdate, TxCache, TxInput, TxLog, TxResult, TxResultCalls};
+use crate::tx_mock::{BlockchainUpdate, TxCache, TxInput, TxLog, TxResult};
 
 use super::super::builtin_func_trait::BuiltinFunction;
 
@@ -40,10 +40,8 @@ impl BuiltinFunction for ESDTNftBurn {
 
         let tx_result = TxResult {
             result_status: 0,
-            result_message: String::new(),
-            result_values: Vec::new(),
             result_logs: vec![esdt_nft_create_log],
-            result_calls: TxResultCalls::empty(),
+            ..Default::default()
         };
 
         (tx_result, tx_cache.into_blockchain_updates())

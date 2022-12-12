@@ -5,7 +5,7 @@ use elrond_wasm::{
 };
 
 use crate::{
-    tx_mock::{BlockchainUpdate, TxCache, TxInput, TxLog, TxResult, TxResultCalls},
+    tx_mock::{BlockchainUpdate, TxCache, TxInput, TxLog, TxResult},
     world_mock::{EsdtInstance, EsdtInstanceMetadata},
 };
 
@@ -72,10 +72,9 @@ impl BuiltinFunction for ESDTNftCreate {
 
         let tx_result = TxResult {
             result_status: 0,
-            result_message: String::new(),
             result_values: vec![top_encode_to_vec_u8(&new_nonce).unwrap()],
             result_logs: vec![esdt_nft_create_log],
-            result_calls: TxResultCalls::empty(),
+            ..Default::default()
         };
 
         (tx_result, tx_cache.into_blockchain_updates())
