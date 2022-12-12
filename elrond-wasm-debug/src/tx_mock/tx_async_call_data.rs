@@ -81,7 +81,7 @@ fn extract_callback_payments(
 ) -> CallbackPayments {
     let mut callback_payments = CallbackPayments::default();
     for async_call in &async_result.all_calls {
-        let tx_input = async_call_tx_input(&async_call);
+        let tx_input = async_call_tx_input(async_call);
         let token_transfers = builtin_functions.extract_token_transfers(&tx_input);
         if &token_transfers.real_recipient == callback_contract_address {
             if !token_transfers.is_empty() {

@@ -21,7 +21,7 @@ impl BuiltinFunction for ESDTTransfer {
     }
 
     fn extract_esdt_transfers(&self, tx_input: &TxInput) -> BuiltinFunctionEsdtTransferInfo {
-        if let Ok(parsed_tx) = try_parse_input(&tx_input) {
+        if let Ok(parsed_tx) = try_parse_input(tx_input) {
             extract_transfer_info(parsed_tx)
         } else {
             BuiltinFunctionEsdtTransferInfo::empty(tx_input)
