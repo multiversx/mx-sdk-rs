@@ -66,7 +66,7 @@ pub fn impl_callable_contract() -> proc_macro2::TokenStream {
         where
             A: elrond_wasm::api::VMApi,
         {
-            fn call(&self, fn_name: &[u8]) -> bool {
+            fn call(&self, fn_name: &str) -> bool {
                 EndpointWrappers::call(self, fn_name)
             }
         }

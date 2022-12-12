@@ -27,7 +27,7 @@ pub fn execute_esdt_nft_update_attriutes(
 
     let esdt_nft_create_log = TxLog {
         address: tx_input.from,
-        endpoint: ESDT_NFT_UPDATE_ATTRIBUTES_FUNC_NAME.to_vec(),
+        endpoint: ESDT_NFT_UPDATE_ATTRIBUTES_FUNC_NAME.into(),
         topics: vec![
             token_identifier.to_vec(),
             top_encode_to_vec_u8(&nonce).unwrap(),

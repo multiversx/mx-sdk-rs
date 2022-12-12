@@ -35,7 +35,7 @@ pub fn execute_esdt_nft_transfer(
 
     let esdt_nft_transfer_log = TxLog {
         address: tx_input.from.clone(),
-        endpoint: ESDT_NFT_TRANSFER_FUNC_NAME.to_vec(),
+        endpoint: ESDT_NFT_TRANSFER_FUNC_NAME.into(),
         topics: vec![
             tx_input.args[0].clone(),
             tx_input.args[1].clone(),
@@ -45,7 +45,7 @@ pub fn execute_esdt_nft_transfer(
         data: vec![],
     };
 
-    let func_name = tx_input.args.get(4).map(Vec::clone).unwrap_or_default();
+    let func_name = tx_input.func_name_from_arg_index(4);
     let args = if tx_input.args.len() > 5 {
         tx_input.args[5..].to_vec()
     } else {

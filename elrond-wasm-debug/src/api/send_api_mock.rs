@@ -1,7 +1,10 @@
 use crate::{
     num_bigint,
     tx_execution::{deploy_contract, execute_builtin_function_or_default},
-    tx_mock::{AsyncCallTxData, BlockchainUpdate, Promise, TxCache, TxInput, TxPanic, TxResult},
+    tx_mock::{
+        AsyncCallTxData, BlockchainUpdate, Promise, TxCache, TxFunctionName, TxInput, TxPanic,
+        TxResult,
+    },
     DebugApi,
 };
 use elrond_wasm::{
@@ -61,7 +64,7 @@ impl DebugApi {
             to,
             egld_value,
             esdt_values: Vec::new(),
-            func_name,
+            func_name: func_name.into(),
             args,
             gas_limit: 1000,
             gas_price: 0,
@@ -129,7 +132,7 @@ impl DebugApi {
             to: Address::zero(),
             egld_value,
             esdt_values: Vec::new(),
-            func_name: Vec::new(),
+            func_name: TxFunctionName::EMPTY,
             args,
             gas_limit: 1000,
             gas_price: 0,
@@ -367,8 +370,8 @@ impl SendApiImpl for DebugApi {
         amount: Self::BigIntHandle,
         endpoint_name_handle: Self::ManagedBufferHandle,
         arg_buffer_handle: Self::ManagedBufferHandle,
-        success_callback: &'static [u8],
-        error_callback: &'static [u8],
+        success_callback: &'static str,
+        error_callback: &'static str,
         _gas: u64,
         _extra_gas_for_callback: u64,
         callback_closure_handle: Self::ManagedBufferHandle,
@@ -394,8 +397,8 @@ impl SendApiImpl for DebugApi {
 
         let promise = Promise {
             endpoint: call,
-            success_callback,
-            error_callback,
+            success_callback: success_callback.into(),
+            error_callback: error_callback.into(),
             callback_closure_data,
         };
 

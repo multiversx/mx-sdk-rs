@@ -2,7 +2,7 @@ use elrond_wasm::types::heap::Address;
 use num_traits::Zero;
 
 use crate::{
-    tx_mock::{BlockchainUpdate, TxCache, TxContext, TxInput, TxLog, TxResult},
+    tx_mock::{BlockchainUpdate, TxCache, TxContext, TxFunctionName, TxInput, TxLog, TxResult},
     world_mock::is_smart_contract_address,
 };
 
@@ -27,7 +27,7 @@ pub fn default_execution(tx_input: TxInput, tx_cache: TxCache) -> (TxResult, Blo
     let transfer_value_log = if add_transfer_log {
         Some(TxLog {
             address: Address::zero(), // TODO: figure out the real VM behavior
-            endpoint: b"transferValueOnly".to_vec(),
+            endpoint: "transferValueOnly".into(),
             topics: vec![
                 tx_context.tx_input_box.from.to_vec(),
                 tx_context.tx_input_box.to.to_vec(),
@@ -77,7 +77,7 @@ pub fn deploy_contract(
 ) -> (TxResult, Address, BlockchainUpdate) {
     let new_address = tx_cache.get_new_address(&tx_input.from);
     tx_input.to = new_address.clone();
-    tx_input.func_name = b"init".to_vec();
+    tx_input.func_name = TxFunctionName::INIT;
     let tx_context = TxContext::new(tx_input, tx_cache);
     let tx_input_ref = &*tx_context.tx_input_box;
 

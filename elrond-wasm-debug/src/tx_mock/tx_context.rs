@@ -13,7 +13,8 @@ use std::{
 };
 
 use super::{
-    BlockchainRng, BlockchainUpdate, TxCache, TxInput, TxManagedTypes, TxResult, TxStaticVars,
+    BlockchainRng, BlockchainUpdate, TxCache, TxFunctionName, TxInput, TxManagedTypes, TxResult,
+    TxStaticVars,
 };
 
 #[derive(Debug)]
@@ -63,7 +64,7 @@ impl TxContext {
             to: contract_address,
             egld_value: 0u32.into(),
             esdt_values: Vec::new(),
-            func_name: Vec::new(),
+            func_name: TxFunctionName::EMPTY,
             args: Vec::new(),
             gas_limit: 0,
             gas_price: 0,
