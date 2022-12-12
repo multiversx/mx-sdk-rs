@@ -282,6 +282,12 @@ where
         payment
     }
 
+    pub fn nft_update_attributes<T: TopEncode>(&self, token_nonce: u64, new_attributes: &T) {
+        let send_wrapper = SendWrapper::<SA>::new();
+        let token_id = self.get_token_id_ref();
+        send_wrapper.nft_update_attributes(token_id, token_nonce, new_attributes);
+    }
+
     pub fn nft_burn(&self, token_nonce: u64, amount: &BigUint<SA>) {
         let send_wrapper = SendWrapper::<SA>::new();
         let token_id = self.get_token_id_ref();
