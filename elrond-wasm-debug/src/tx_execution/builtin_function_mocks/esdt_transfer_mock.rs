@@ -7,6 +7,20 @@ use crate::{
     tx_mock::{BlockchainUpdate, TxCache, TxInput, TxInputESDT, TxLog, TxResult},
 };
 
+use super::builtin_func_trait::BuiltinFunction;
+
+pub struct ESDTTransfer;
+
+impl BuiltinFunction for ESDTTransfer {
+    fn name(&self) -> &str {
+        ESDT_TRANSFER_FUNC_NAME
+    }
+
+    fn execute(&self, tx_input: TxInput, tx_cache: TxCache) -> (TxResult, BlockchainUpdate) {
+        execute_esdt_transfer(tx_input, tx_cache)
+    }
+}
+
 pub fn execute_esdt_transfer(tx_input: TxInput, tx_cache: TxCache) -> (TxResult, BlockchainUpdate) {
     if tx_input.args.len() < 2 {
         let err_result = TxResult::from_vm_error("ESDTTransfer too few arguments".to_string());

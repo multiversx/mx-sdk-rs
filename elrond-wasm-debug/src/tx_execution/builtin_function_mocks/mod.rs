@@ -1,4 +1,7 @@
 mod builtin_func_exec;
+mod builtin_func_map;
+mod builtin_func_role_check_wrapper;
+mod builtin_func_trait;
 mod change_owner_mock;
 mod claim_developer_rewards_mock;
 mod esdt_local_burn;
@@ -14,4 +17,5 @@ mod esdt_transfer_mock;
 mod set_username_mock;
 mod upgrade_contract;
 
-pub use builtin_func_exec::execute_builtin_function_or_default;
+pub use builtin_func_exec::{execute_builtin_function_or_default, init_builtin_functions};
+pub use builtin_func_map::BuiltinFunctionMap;
