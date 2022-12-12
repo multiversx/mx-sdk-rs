@@ -22,7 +22,7 @@ impl BuiltinFunction for BuiltinFunctionRoleCheckWrapper {
         self.builtin_function.name()
     }
 
-    fn extract_esdt_transfers(&self, tx_input: TxInput) -> Vec<TxTokenTransfer> {
+    fn extract_esdt_transfers(&self, tx_input: &TxInput) -> Vec<TxTokenTransfer> {
         self.builtin_function.extract_esdt_transfers(tx_input)
     }
 

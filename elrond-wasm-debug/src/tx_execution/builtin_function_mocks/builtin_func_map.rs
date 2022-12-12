@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::tx_mock::TxFunctionName;
+use crate::tx_mock::{TxFunctionName, TxInput, TxTokenTransfer};
 
 use super::builtin_func_trait::BuiltinFunction;
 
@@ -26,6 +26,14 @@ impl BuiltinFunctionMap {
     #[allow(clippy::borrowed_box)]
     pub fn get(&self, name: &TxFunctionName) -> Option<&Box<dyn BuiltinFunction>> {
         self.func_map.get(name.as_str())
+    }
+
+    pub fn extract_token_transfers(&self, tx_input: &TxInput) -> Vec<TxTokenTransfer> {
+        if let Some(builtin_func) = self.get(&tx_input.func_name) {
+            builtin_func.extract_esdt_transfers(tx_input)
+        } else {
+            Vec::new()
+        }
     }
 }
 

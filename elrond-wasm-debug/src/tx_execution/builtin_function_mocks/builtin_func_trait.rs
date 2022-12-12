@@ -3,7 +3,7 @@ use crate::tx_mock::{BlockchainUpdate, TxCache, TxInput, TxResult, TxTokenTransf
 pub trait BuiltinFunction {
     fn name(&self) -> &str;
 
-    fn extract_esdt_transfers(&self, _: TxInput) -> Vec<TxTokenTransfer> {
+    fn extract_esdt_transfers(&self, _tx_input: &TxInput) -> Vec<TxTokenTransfer> {
         Vec::new()
     }
 

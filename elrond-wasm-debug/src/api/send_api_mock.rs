@@ -2,8 +2,8 @@ use crate::{
     num_bigint,
     tx_execution::{deploy_contract, execute_builtin_function_or_default},
     tx_mock::{
-        AsyncCallTxData, BlockchainUpdate, Promise, TxCache, TxFunctionName, TxInput, TxPanic,
-        TxResult,
+        async_call_tx_input, AsyncCallTxData, BlockchainUpdate, Promise, TxCache, TxFunctionName,
+        TxInput, TxPanic, TxResult,
     },
     DebugApi,
 };
@@ -50,6 +50,25 @@ impl DebugApi {
         tx_result.result_values
     }
 
+    fn create_async_call_data(
+        &self,
+        to: Address,
+        egld_value: num_bigint::BigUint,
+        func_name: TxFunctionName,
+        arguments: Vec<Vec<u8>>,
+    ) -> AsyncCallTxData {
+        let contract_address = &self.input_ref().to;
+        let tx_hash = self.get_tx_hash_legacy();
+        AsyncCallTxData {
+            from: contract_address.clone(),
+            to,
+            call_value: egld_value,
+            endpoint_name: func_name,
+            arguments,
+            tx_hash,
+        }
+    }
+
     fn prepare_execute_on_dest_context_input(
         &self,
         to: Address,
@@ -57,20 +76,8 @@ impl DebugApi {
         func_name: TxFunctionName,
         args: Vec<Vec<u8>>,
     ) -> TxInput {
-        let contract_address = &self.input_ref().to;
-        let tx_hash = self.get_tx_hash_legacy();
-        TxInput {
-            from: contract_address.clone(),
-            to,
-            egld_value,
-            esdt_values: Vec::new(),
-            func_name,
-            args,
-            gas_limit: 1000,
-            gas_price: 0,
-            tx_hash,
-            ..Default::default()
-        }
+        let async_call_data = self.create_async_call_data(to, egld_value, func_name, args);
+        async_call_tx_input(&async_call_data)
     }
 
     fn perform_execute_on_dest_context(
@@ -101,14 +108,17 @@ impl DebugApi {
         to: Address,
         egld_value: num_bigint::BigUint,
         func_name: TxFunctionName,
-        args: Vec<Vec<u8>>,
+        arguments: Vec<Vec<u8>>,
     ) -> Vec<Vec<u8>> {
-        let tx_input = self.prepare_execute_on_dest_context_input(to, egld_value, func_name, args);
+        let async_call_data = self.create_async_call_data(to, egld_value, func_name, arguments);
+        let tx_input = async_call_tx_input(&async_call_data);
         let tx_cache = TxCache::new(self.blockchain_cache_rc());
         let (tx_result, blockchain_updates) =
             execute_builtin_function_or_default(tx_input, tx_cache);
 
         if tx_result.result_status == 0 {
+            self.result_borrow_mut().all_calls.push(async_call_data);
+
             self.sync_call_post_processing(tx_result, blockchain_updates)
         } else {
             // also kill current execution
@@ -162,6 +172,7 @@ impl DebugApi {
     fn perform_async_call(&self, call: AsyncCallTxData) -> ! {
         // the cell is no longer needed, since we end in a panic
         let mut tx_result = self.extract_result();
+        tx_result.all_calls.push(call.clone());
         tx_result.pending_calls.async_call = Some(call);
         std::panic::panic_any(tx_result)
     }
@@ -403,6 +414,7 @@ impl SendApiImpl for DebugApi {
         };
 
         let mut tx_result = self.result_borrow_mut();
+        tx_result.all_calls.push(promise.call.clone());
         tx_result.pending_calls.promises.push(promise);
     }
 

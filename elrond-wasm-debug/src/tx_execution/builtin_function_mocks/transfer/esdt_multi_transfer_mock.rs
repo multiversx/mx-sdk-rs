@@ -19,7 +19,7 @@ impl BuiltinFunction for ESDTMultiTransfer {
         ESDT_MULTI_TRANSFER_FUNC_NAME
     }
 
-    fn extract_esdt_transfers(&self, tx_input: TxInput) -> Vec<TxTokenTransfer> {
+    fn extract_esdt_transfers(&self, tx_input: &TxInput) -> Vec<TxTokenTransfer> {
         if let Ok(parsed_tx) = try_parse_input(&tx_input) {
             process_raw_esdt_transfers(parsed_tx.raw_esdt_transfers)
         } else {
