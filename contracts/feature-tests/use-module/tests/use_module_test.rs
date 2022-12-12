@@ -8,9 +8,9 @@ fn test_function_selector() {
 
     assert!(!use_module.call("invalid_endpoint"));
 
-    assert!(use_module.call(b"call_mod_a"));
-    assert!(use_module.call(b"call_mod_b"));
-    assert!(use_module.call(b"call_mod_c"));
-    assert!(use_module.call(b"call_contract_base_full_path_endpoint"));
-    assert!(use_module.call(b"call_contract_base_endpoint"));
+    assert!(use_module.call("call_mod_a"));
+    assert!(use_module.call("call_mod_b"));
+    assert!(use_module.call("call_mod_c"));
+    assert!(use_module.call("call_contract_base_full_path_endpoint"));
+    assert!(use_module.call("call_contract_base_endpoint"));
 }

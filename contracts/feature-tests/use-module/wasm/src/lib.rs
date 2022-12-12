@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                           60
+// Endpoints:                           62
 // Async Callback:                       1
-// Total number of exported functions:  62
+// Total number of exported functions:  64
 
 #![no_std]
 
@@ -16,6 +16,8 @@ elrond_wasm_node::wasm_endpoints! {
     (
         checkFeatureGuard
         checkPause
+        call_contract_base_full_path_endpoint
+        call_contract_base_endpoint
         call_mod_a
         call_mod_b
         call_mod_c
