@@ -1,4 +1,7 @@
-use crate::tx_mock::{BlockchainUpdate, TxCache, TxInput, TxResult, TxTokenTransfer};
+use crate::{
+    tx_execution::builtin_function_mocks::builtin_func_trait::BuiltinFunctionEsdtTransferInfo,
+    tx_mock::{BlockchainUpdate, TxCache, TxInput, TxResult},
+};
 use elrond_wasm::{
     api::ESDT_NFT_TRANSFER_FUNC_NAME, elrond_codec::TopDecode, types::heap::Address,
 };
@@ -6,7 +9,7 @@ use elrond_wasm::{
 use super::{
     super::builtin_func_trait::BuiltinFunction,
     transfer_common::{
-        execute_transfer_builtin_func, process_raw_esdt_transfers, ParsedTransferBuiltinFunCall,
+        execute_transfer_builtin_func, extract_transfer_info, ParsedTransferBuiltinFunCall,
         RawEsdtTransfer,
     },
 };
@@ -18,11 +21,11 @@ impl BuiltinFunction for ESDTNftTransfer {
         ESDT_NFT_TRANSFER_FUNC_NAME
     }
 
-    fn extract_esdt_transfers(&self, tx_input: &TxInput) -> Vec<TxTokenTransfer> {
+    fn extract_esdt_transfers(&self, tx_input: &TxInput) -> BuiltinFunctionEsdtTransferInfo {
         if let Ok(parsed_tx) = try_parse_input(&tx_input) {
-            process_raw_esdt_transfers(parsed_tx.raw_esdt_transfers)
+            extract_transfer_info(parsed_tx)
         } else {
-            Vec::new()
+            BuiltinFunctionEsdtTransferInfo::empty(tx_input)
         }
     }
 

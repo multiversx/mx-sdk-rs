@@ -6,7 +6,6 @@ use elrond_wasm::{
     elrond_codec::*,
     types::heap::{Address, H256},
 };
-use num_traits::Zero;
 
 use crate::num_bigint::BigUint;
 
@@ -82,12 +81,13 @@ fn extract_callback_payments(
 ) -> CallbackPayments {
     let mut callback_payments = CallbackPayments::default();
     for async_call in &async_result.all_calls {
-        if &async_call.to == callback_contract_address {
-            if !async_call.call_value.is_zero() {
-                callback_payments.egld_value = async_call.call_value.clone();
+        let tx_input = async_call_tx_input(&async_call);
+        let token_transfers = builtin_functions.extract_token_transfers(&tx_input);
+        if &token_transfers.real_recipient == callback_contract_address {
+            if !token_transfers.is_empty() {
+                callback_payments.esdt_values = token_transfers.transfers;
             } else {
-                callback_payments.esdt_values =
-                    builtin_functions.extract_token_transfers(&async_call_tx_input(&async_call));
+                callback_payments.egld_value = async_call.call_value.clone();
             }
             break;
         }

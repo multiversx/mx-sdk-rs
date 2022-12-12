@@ -47,13 +47,13 @@ fn forw_raw_async_echo_rs() {
     elrond_wasm_debug::mandos_rs("mandos/forw_raw_async_echo.scen.json", world());
 }
 
-// #[test]
-// fn forw_raw_async_send_and_retrieve_multi_transfer_funds_rs() {
-//     elrond_wasm_debug::mandos_rs(
-//         "mandos/forw_raw_async_send_and_retrieve_multi_transfer_funds.scen.json",
-//         world(),
-//     );
-// }
+#[test]
+fn forw_raw_async_send_and_retrieve_multi_transfer_funds_rs() {
+    elrond_wasm_debug::mandos_rs(
+        "mandos/forw_raw_async_send_and_retrieve_multi_transfer_funds.scen.json",
+        world(),
+    );
+}
 
 #[test]
 fn forw_raw_builtin_nft_local_mint_via_async_call_rs() {
@@ -71,13 +71,13 @@ fn forw_raw_builtin_nft_local_mint_via_sync_call_rs() {
     );
 }
 
-// #[test]
-// fn forw_raw_call_async_retrieve_multi_transfer_rs() {
-//     elrond_wasm_debug::mandos_rs(
-//         "mandos/forw_raw_call_async_retrieve_multi_transfer.scen.json",
-//         world(),
-//     );
-// }
+#[test]
+fn forw_raw_call_async_retrieve_multi_transfer_rs() {
+    elrond_wasm_debug::mandos_rs(
+        "mandos/forw_raw_call_async_retrieve_multi_transfer.scen.json",
+        world(),
+    );
+}
 
 #[test]
 fn forw_raw_contract_deploy_rs() {
@@ -114,10 +114,10 @@ fn forw_raw_sync_echo_rs() {
     elrond_wasm_debug::mandos_rs("mandos/forw_raw_sync_echo.scen.json", world());
 }
 
-// #[test]
-// fn forw_raw_sync_echo_caller_rs() {
-//     elrond_wasm_debug::mandos_rs("mandos/forw_raw_sync_echo_caller.scen.json", world());
-// }
+#[test]
+fn forw_raw_sync_echo_caller_rs() {
+    elrond_wasm_debug::mandos_rs("mandos/forw_raw_sync_echo_caller.scen.json", world());
+}
 
 #[test]
 fn forw_raw_sync_egld_rs() {
