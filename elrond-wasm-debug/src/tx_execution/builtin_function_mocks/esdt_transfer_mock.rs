@@ -7,6 +7,20 @@ use crate::{
     tx_mock::{BlockchainUpdate, TxCache, TxInput, TxInputESDT, TxLog, TxResult},
 };
 
+use super::builtin_func_trait::BuiltinFunction;
+
+pub struct ESDTTransfer;
+
+impl BuiltinFunction for ESDTTransfer {
+    fn name(&self) -> &str {
+        ESDT_TRANSFER_FUNC_NAME
+    }
+
+    fn execute(&self, tx_input: TxInput, tx_cache: TxCache) -> (TxResult, BlockchainUpdate) {
+        execute_esdt_transfer(tx_input, tx_cache)
+    }
+}
+
 pub fn execute_esdt_transfer(tx_input: TxInput, tx_cache: TxCache) -> (TxResult, BlockchainUpdate) {
     if tx_input.args.len() < 2 {
         let err_result = TxResult::from_vm_error("ESDTTransfer too few arguments".to_string());
@@ -29,7 +43,7 @@ pub fn execute_esdt_transfer(tx_input: TxInput, tx_cache: TxCache) -> (TxResult,
         &value,
     );
 
-    let func_name = tx_input.args.get(2).map(Vec::clone).unwrap_or_default();
+    let func_name = tx_input.func_name_from_arg_index(2);
     let args = if tx_input.args.len() > 2 {
         tx_input.args[3..].to_vec()
     } else {
@@ -66,7 +80,7 @@ pub fn esdt_transfer_event_log(
     let nonce_topic = Vec::<u8>::new();
     TxLog {
         address: from,
-        endpoint: ESDT_TRANSFER_FUNC_NAME.to_vec(),
+        endpoint: ESDT_TRANSFER_FUNC_NAME.into(),
         topics: vec![
             esdt_token_identifier,
             nonce_topic,

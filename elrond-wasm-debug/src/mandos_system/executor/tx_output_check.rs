@@ -1,6 +1,6 @@
 use crate::mandos_system::model::{CheckLogs, Checkable, TxExpect};
 
-use crate::{address_hex, bytes_to_string, tx_mock::TxResult, verbose_hex, verbose_hex_list};
+use crate::{address_hex, tx_mock::TxResult, verbose_hex, verbose_hex_list};
 
 pub fn check_tx_output(tx_id: &str, tx_expect: &TxExpect, tx_result: &TxResult) {
     let have_str = tx_result.result_message.as_str();
@@ -53,7 +53,7 @@ pub fn check_tx_output(tx_id: &str, tx_expect: &TxExpect, tx_result: &TxResult) 
                         &expected_log.topics.pretty_str(),
                         &expected_log.data,
                         address_hex(&actual_log.address),
-                        bytes_to_string(&actual_log.endpoint),
+                    &actual_log.endpoint,
                         verbose_hex_list(actual_log.topics.as_slice()),
                         verbose_hex(&actual_log.data),
                     );
@@ -63,7 +63,7 @@ pub fn check_tx_output(tx_id: &str, tx_expect: &TxExpect, tx_result: &TxResult) 
                         tx_id,
                         i,
                         address_hex(&actual_log.address),
-                        bytes_to_string(&actual_log.endpoint),
+                        &actual_log.endpoint,
                         verbose_hex_list(actual_log.topics.as_slice()),
                         verbose_hex(&actual_log.data),
                     )

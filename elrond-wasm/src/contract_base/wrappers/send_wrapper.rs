@@ -238,7 +238,7 @@ where
     ) -> ContractCall<A, ()> {
         ContractCall::new(
             child_sc_address,
-            ManagedBuffer::new_from_bytes(CLAIM_DEVELOPER_REWARDS_FUNC_NAME),
+            ManagedBuffer::from(CLAIM_DEVELOPER_REWARDS_FUNC_NAME),
         )
     }
 
@@ -250,7 +250,7 @@ where
     ) -> ContractCall<A, ()> {
         let mut contract_call = ContractCall::new(
             child_sc_address,
-            ManagedBuffer::new_from_bytes(CHANGE_OWNER_BUILTIN_FUNC_NAME),
+            ManagedBuffer::from(CHANGE_OWNER_BUILTIN_FUNC_NAME),
         );
         contract_call.push_endpoint_arg(&new_owner);
         contract_call
@@ -276,7 +276,7 @@ where
     /// This function cannot be used for NFTs.
     pub fn esdt_local_mint(&self, token: &TokenIdentifier<A>, nonce: u64, amount: &BigUint<A>) {
         let mut arg_buffer = ManagedArgBuffer::new();
-        let func_name: &[u8];
+        let func_name: &str;
 
         arg_buffer.push_arg(token);
 
@@ -291,7 +291,7 @@ where
 
         let _ = self.call_local_esdt_built_in_function(
             A::blockchain_api_impl().get_gas_left(),
-            &ManagedBuffer::new_from_bytes(func_name),
+            &ManagedBuffer::from(func_name),
             &arg_buffer,
         );
     }
@@ -301,7 +301,7 @@ where
     /// or this will fail with "action is not allowed"
     pub fn esdt_local_burn(&self, token: &TokenIdentifier<A>, nonce: u64, amount: &BigUint<A>) {
         let mut arg_buffer = ManagedArgBuffer::new();
-        let func_name: &[u8];
+        let func_name: &str;
 
         arg_buffer.push_arg(token);
         if nonce == 0 {
@@ -315,7 +315,7 @@ where
 
         let _ = self.call_local_esdt_built_in_function(
             A::blockchain_api_impl().get_gas_left(),
-            &ManagedBuffer::new_from_bytes(func_name),
+            &ManagedBuffer::from(func_name),
             &arg_buffer,
         );
     }
@@ -357,7 +357,7 @@ where
 
         let output = self.call_local_esdt_built_in_function(
             A::blockchain_api_impl().get_gas_left(),
-            &ManagedBuffer::new_from_bytes(ESDT_NFT_CREATE_FUNC_NAME),
+            &ManagedBuffer::from(ESDT_NFT_CREATE_FUNC_NAME),
             &arg_buffer,
         );
 
@@ -473,7 +473,7 @@ where
 
         let _ = self.call_local_esdt_built_in_function(
             A::blockchain_api_impl().get_gas_left(),
-            &ManagedBuffer::new_from_bytes(ESDT_NFT_ADD_URI_FUNC_NAME),
+            &ManagedBuffer::from(ESDT_NFT_ADD_URI_FUNC_NAME),
             &arg_buffer,
         );
     }
@@ -491,7 +491,7 @@ where
 
         let _ = self.call_local_esdt_built_in_function(
             A::blockchain_api_impl().get_gas_left(),
-            &ManagedBuffer::new_from_bytes(ESDT_NFT_UPDATE_ATTRIBUTES_FUNC_NAME),
+            &ManagedBuffer::from(ESDT_NFT_UPDATE_ATTRIBUTES_FUNC_NAME),
             &arg_buffer,
         );
     }

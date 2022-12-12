@@ -1,3 +1,5 @@
+use crate::tx_mock::TxFunctionName;
+
 use super::{value_set_big_uint::*, BytesValue, CheckValue, U64Value};
 use num_bigint::BigUint;
 
@@ -8,6 +10,18 @@ pub trait Checkable<V> {
 impl Checkable<&[u8]> for BytesValue {
     fn check(&self, value: &[u8]) -> bool {
         self.value.as_slice() == value
+    }
+}
+
+impl Checkable<&Vec<u8>> for BytesValue {
+    fn check(&self, value: &Vec<u8>) -> bool {
+        &self.value == value
+    }
+}
+
+impl Checkable<&TxFunctionName> for BytesValue {
+    fn check(&self, value: &TxFunctionName) -> bool {
+        self.value.as_slice() == value.as_str().as_bytes()
     }
 }
 

@@ -65,13 +65,13 @@ mod module_1 {
             elrond_wasm::io::finish_multi::<Self::Api, _>(&())
         }
 
-        fn call(&self, fn_name: &[u8]) -> bool {
+        fn call(&self, fn_name: &str) -> bool {
             if match fn_name {
-                b"callBack" => {
+                "callBack" => {
                     self.callback();
                     return true;
                 },
-                b"version" => {
+                "version" => {
                     self.call_version();
                     true
                 },
@@ -200,21 +200,21 @@ mod sample_adder {
             elrond_wasm::io::finish_multi::<Self::Api, _>(&result);
         }
 
-        fn call(&self, fn_name: &[u8]) -> bool {
+        fn call(&self, fn_name: &str) -> bool {
             if match fn_name {
-                b"callBack" => {
+                "callBack" => {
                     Adder::callback(self);
                     return true;
                 },
-                [103u8, 101u8, 116u8, 83u8, 117u8, 109u8] => {
+                "getSum" => {
                     self.call_get_sum();
                     true
                 },
-                [105u8, 110u8, 105u8, 116u8] => {
+                "init" => {
                     self.call_init();
                     true
                 },
-                [97u8, 100u8, 100u8] => {
+                "add" => {
                     self.call_add();
                     true
                 },
@@ -289,7 +289,7 @@ mod sample_adder {
     where
         A: elrond_wasm::api::VMApi,
     {
-        fn call(&self, fn_name: &[u8]) -> bool {
+        fn call(&self, fn_name: &str) -> bool {
             EndpointWrappers::call(
                 &elrond_wasm::contract_base::UniversalContractObj::<A>::new(),
                 fn_name,
@@ -396,7 +396,7 @@ mod sample_adder {
     pub trait CallbackProxy: elrond_wasm::contract_base::CallbackProxyObjBase + Sized {
         fn my_callback(self, caller: &Address) -> elrond_wasm::types::CallbackClosure<Self::Api> {
             let mut ___callback_call___ =
-                elrond_wasm::types::new_callback_call::<Self::Api>(&b"my_callback"[..]);
+                elrond_wasm::types::new_callback_call::<Self::Api>("my_callback");
             ___callback_call___.push_endpoint_arg(caller);
             ___callback_call___
         }
@@ -427,9 +427,9 @@ fn test_add() {
     let _ = adder.add_version();
     assert_eq!(BigInt::from(111), adder.get_sum());
 
-    assert!(!adder.call(b"invalid_endpoint"));
+    assert!(!adder.call("invalid_endpoint"));
 
-    assert!(adder.call(b"version"));
+    assert!(adder.call("version"));
 
     let mut own_proxy =
         sample_adder::Proxy::<DebugApi>::new_proxy_obj().contract(ManagedAddress::zero());

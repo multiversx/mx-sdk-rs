@@ -1,4 +1,4 @@
-use super::{snippets, util::*};
+use super::snippets;
 use crate::model::{
     ArgPaymentMetadata, CallbackMetadata, ContractTrait, Method, MethodArgument, PublicRole,
 };
@@ -24,7 +24,7 @@ fn generate_callback_proxy_method(
     callback: &CallbackMetadata,
 ) -> proc_macro2::TokenStream {
     let arg_decl = cb_proxy_arg_declarations(&m.method_args);
-    let cb_name_literal = ident_str_literal(&callback.callback_name);
+    let cb_name_literal = callback.callback_name.to_string();
 
     let cb_arg_push_snippets: Vec<proc_macro2::TokenStream> = m
         .method_args

@@ -14,7 +14,7 @@ use crate::{
     num_bigint,
     testing_framework::raw_converter::bytes_to_hex,
     tx_execution::{execute_async_call_and_callback, interpret_panic_as_tx_result},
-    tx_mock::{TxCache, TxContext, TxContextStack, TxInput, TxInputESDT, TxResult},
+    tx_mock::{TxCache, TxContext, TxContextStack, TxFunctionName, TxInput, TxInputESDT, TxResult},
     world_mock::{
         is_smart_contract_address, AccountData, AccountEsdt, ContractContainer,
         EsdtInstanceMetadata,
@@ -911,7 +911,7 @@ fn build_tx_input(
         to: dest.clone(),
         egld_value: egld_value.clone(),
         esdt_values,
-        func_name: Vec::new(),
+        func_name: TxFunctionName::EMPTY,
         args: Vec::new(),
         gas_limit: u64::MAX,
         gas_price: 0,

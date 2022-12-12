@@ -1,4 +1,7 @@
-use crate::mandos_system::model::{ScDeployStep, Step, TypedScDeploy, TypedScDeployExecutor};
+use crate::{
+    mandos_system::model::{ScDeployStep, Step, TypedScDeploy, TypedScDeployExecutor},
+    tx_mock::TxFunctionName,
+};
 use elrond_wasm::{
     elrond_codec::{CodecFrom, PanicErrorHandler, TopEncodeMulti},
     types::heap::Address,
@@ -76,7 +79,7 @@ pub(crate) fn execute(
         to: Address::zero(),
         egld_value: tx.egld_value.value.clone(),
         esdt_values: Vec::new(),
-        func_name: b"init".to_vec(),
+        func_name: TxFunctionName::INIT,
         args: tx
             .arguments
             .iter()

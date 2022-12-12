@@ -75,7 +75,7 @@ pub fn contract_implementation(
         {
             #(#call_methods)*
 
-            fn call(&self, fn_name: &[u8]) -> bool {
+            fn call(&self, fn_name: &str) -> bool {
                 #function_selector_body
             }
 
