@@ -3,7 +3,7 @@ use elrond_wasm::elrond_codec::{CodecFrom, PanicErrorHandler, TopEncodeMulti};
 
 use crate::{
     tx_execution::sc_call_with_async_and_callback,
-    tx_mock::{generate_tx_hash_dummy, TxTokenTransfer, TxInput, TxResult},
+    tx_mock::{generate_tx_hash_dummy, TxInput, TxResult, TxTokenTransfer},
     world_mock::BlockchainMock,
 };
 

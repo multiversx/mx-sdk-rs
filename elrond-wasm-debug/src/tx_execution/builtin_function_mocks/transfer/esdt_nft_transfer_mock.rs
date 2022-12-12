@@ -1,4 +1,4 @@
-use crate::tx_mock::{BlockchainUpdate, TxCache, TxTokenTransfer, TxInput, TxResult};
+use crate::tx_mock::{BlockchainUpdate, TxCache, TxInput, TxResult, TxTokenTransfer};
 use elrond_wasm::{
     api::ESDT_NFT_TRANSFER_FUNC_NAME, elrond_codec::TopDecode, types::heap::Address,
 };

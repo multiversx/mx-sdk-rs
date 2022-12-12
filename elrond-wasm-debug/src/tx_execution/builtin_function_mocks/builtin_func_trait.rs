@@ -1,4 +1,4 @@
-use crate::tx_mock::{BlockchainUpdate, TxCache, TxTokenTransfer, TxInput, TxResult};
+use crate::tx_mock::{BlockchainUpdate, TxCache, TxInput, TxResult, TxTokenTransfer};
 
 pub trait BuiltinFunction {
     fn name(&self) -> &str;

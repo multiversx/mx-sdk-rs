@@ -1,6 +1,6 @@
 use elrond_wasm::api::ESDT_TRANSFER_FUNC_NAME;
 
-use crate::tx_mock::{BlockchainUpdate, TxCache, TxTokenTransfer, TxInput, TxResult};
+use crate::tx_mock::{BlockchainUpdate, TxCache, TxInput, TxResult, TxTokenTransfer};
 
 use super::{
     super::builtin_func_trait::BuiltinFunction,
