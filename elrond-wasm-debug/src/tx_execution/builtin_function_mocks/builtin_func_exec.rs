@@ -73,8 +73,8 @@ pub fn execute_builtin_function_or_default(
     tx_input: TxInput,
     tx_cache: TxCache,
 ) -> (TxResult, BlockchainUpdate) {
-    let builtin_funcs = Rc::clone(&tx_cache.blockchain_ref().builtin_functions);
-    if let Some(builtin_func) = builtin_funcs.get(&tx_input.func_name) {
+    let builtin_functions = Rc::clone(&tx_cache.blockchain_ref().builtin_functions);
+    if let Some(builtin_func) = builtin_functions.get(&tx_input.func_name) {
         builtin_func.execute(tx_input, tx_cache)
     } else {
         default_execution(tx_input, tx_cache)

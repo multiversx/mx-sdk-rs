@@ -1,4 +1,7 @@
-use crate::tx_mock::{TxInput, TxResult};
+use crate::{
+    tx_execution::BuiltinFunctionMap,
+    tx_mock::{TxInput, TxResult},
+};
 use elrond_wasm::{
     elrond_codec::*,
     types::heap::{Address, H256},
@@ -8,7 +11,7 @@ use crate::num_bigint::BigUint;
 
 use alloc::vec::Vec;
 
-use super::{Promise, TxFunctionName};
+use super::{CallbackPayments, Promise, TxFunctionName};
 
 #[derive(Debug, Clone)]
 pub struct AsyncCallTxData {
@@ -20,17 +23,17 @@ pub struct AsyncCallTxData {
     pub tx_hash: H256,
 }
 
-pub fn async_call_tx_input(async_data: &AsyncCallTxData) -> TxInput {
+pub fn async_call_tx_input(async_call: &AsyncCallTxData) -> TxInput {
     TxInput {
-        from: async_data.from.clone(),
-        to: async_data.to.clone(),
-        egld_value: async_data.call_value.clone(),
+        from: async_call.from.clone(),
+        to: async_call.to.clone(),
+        egld_value: async_call.call_value.clone(),
         esdt_values: Vec::new(),
-        func_name: async_data.endpoint_name.clone(),
-        args: async_data.arguments.clone(),
+        func_name: async_call.endpoint_name.clone(),
+        args: async_call.arguments.clone(),
         gas_limit: 1000,
         gas_price: 0,
-        tx_hash: async_data.tx_hash.clone(),
+        tx_hash: async_call.tx_hash.clone(),
         ..Default::default()
     }
 }
@@ -43,13 +46,19 @@ fn result_status_bytes(result_status: u64) -> Vec<u8> {
     }
 }
 
-pub fn async_callback_tx_input(async_data: &AsyncCallTxData, async_result: &TxResult) -> TxInput {
+pub fn async_callback_tx_input(
+    async_data: &AsyncCallTxData,
+    async_result: &TxResult,
+    builtin_functions: &BuiltinFunctionMap,
+) -> TxInput {
     let mut args: Vec<Vec<u8>> = vec![result_status_bytes(async_result.result_status)];
     if async_result.result_status == 0 {
         args.extend_from_slice(async_result.result_values.as_slice());
     } else {
         args.push(async_result.result_message.clone().into_bytes());
     }
+    let callback_payments =
+        extract_callback_payments(&async_data.from, async_result, builtin_functions);
     TxInput {
         from: async_data.to.clone(),
         to: async_data.from.clone(),
@@ -60,8 +69,30 @@ pub fn async_callback_tx_input(async_data: &AsyncCallTxData, async_result: &TxRe
         gas_limit: 1000,
         gas_price: 0,
         tx_hash: async_data.tx_hash.clone(),
+        callback_payments,
         ..Default::default()
     }
+}
+
+fn extract_callback_payments(
+    callback_contract_address: &Address,
+    async_result: &TxResult,
+    builtin_functions: &BuiltinFunctionMap,
+) -> CallbackPayments {
+    let mut callback_payments = CallbackPayments::default();
+    for async_call in &async_result.all_calls {
+        let tx_input = async_call_tx_input(async_call);
+        let token_transfers = builtin_functions.extract_token_transfers(&tx_input);
+        if &token_transfers.real_recipient == callback_contract_address {
+            if !token_transfers.is_empty() {
+                callback_payments.esdt_values = token_transfers.transfers;
+            } else {
+                callback_payments.egld_value = async_call.call_value.clone();
+            }
+            break;
+        }
+    }
+    callback_payments
 }
 
 pub fn async_promise_tx_input(

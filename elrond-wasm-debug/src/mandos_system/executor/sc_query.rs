@@ -108,7 +108,7 @@ pub(crate) fn execute(
 
     let (tx_result, state) = execute_sc_query(tx_input, state);
     assert!(
-        tx_result.pending_calls.is_empty(),
+        tx_result.pending_calls.no_calls(),
         "Can't query a view function that performs an async call"
     );
     (tx_result, state)

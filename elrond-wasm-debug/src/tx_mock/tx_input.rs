@@ -18,8 +18,7 @@ pub struct TxInput {
     pub gas_price: u64,
     pub tx_hash: H256,
     pub promise_callback_closure_data: Vec<u8>,
-    pub callback_egld_value: BigUint,
-    pub callback_esdt_values: Vec<TxTokenTransfer>,
+    pub callback_payments: CallbackPayments,
 }
 
 impl Default for TxInput {
@@ -35,8 +34,7 @@ impl Default for TxInput {
             gas_price: 0,
             tx_hash: H256::zero(),
             promise_callback_closure_data: Vec::new(),
-            callback_egld_value: BigUint::zero(),
-            callback_esdt_values: Vec::new(),
+            callback_payments: Default::default(),
         }
     }
 }
@@ -73,4 +71,31 @@ pub struct TxTokenTransfer {
     pub token_identifier: Vec<u8>,
     pub nonce: u64,
     pub value: BigUint,
+}
+
+/// Signals to the callback that funds have been returned to it, without performing any transfer.
+#[derive(Default, Clone, Debug)]
+pub struct CallbackPayments {
+    pub egld_value: BigUint,
+    pub esdt_values: Vec<TxTokenTransfer>,
+}
+
+impl TxInput {
+    /// The received EGLD can come either from the original caller, or from an async call, during callback.
+    pub fn received_egld(&self) -> &BigUint {
+        if !self.callback_payments.egld_value.is_zero() {
+            &self.callback_payments.egld_value
+        } else {
+            &self.egld_value
+        }
+    }
+
+    /// The received ESDT tokens can come either from the original caller, or from an async call, during callback.
+    pub fn received_esdt(&self) -> &[TxTokenTransfer] {
+        if !self.callback_payments.esdt_values.is_empty() {
+            self.callback_payments.esdt_values.as_slice()
+        } else {
+            self.esdt_values.as_slice()
+        }
+    }
 }

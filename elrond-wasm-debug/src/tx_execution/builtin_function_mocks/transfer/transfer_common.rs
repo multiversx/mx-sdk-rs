@@ -1,5 +1,8 @@
 use crate::{
-    tx_execution::default_execution,
+    tx_execution::{
+        builtin_function_mocks::builtin_func_trait::BuiltinFunctionEsdtTransferInfo,
+        default_execution,
+    },
     tx_mock::{
         BlockchainUpdate, TxCache, TxFunctionName, TxInput, TxLog, TxResult, TxTokenTransfer,
     },
@@ -29,13 +32,20 @@ pub(super) fn process_raw_esdt_transfer(raw_esdt_transfer: RawEsdtTransfer) -> T
     }
 }
 
-pub(super) fn process_raw_esdt_transfers(
-    raw_esdt_transfers: Vec<RawEsdtTransfer>,
-) -> Vec<TxTokenTransfer> {
+fn process_raw_esdt_transfers(raw_esdt_transfers: Vec<RawEsdtTransfer>) -> Vec<TxTokenTransfer> {
     raw_esdt_transfers
         .into_iter()
         .map(process_raw_esdt_transfer)
         .collect()
+}
+
+pub(super) fn extract_transfer_info(
+    parsed_tx: ParsedTransferBuiltinFunCall,
+) -> BuiltinFunctionEsdtTransferInfo {
+    BuiltinFunctionEsdtTransferInfo {
+        real_recipient: parsed_tx.destination,
+        transfers: process_raw_esdt_transfers(parsed_tx.raw_esdt_transfers),
+    }
 }
 
 pub(super) fn execute_transfer_builtin_func(

@@ -11,8 +11,16 @@ pub struct TxResult {
     pub result_message: String,
     pub result_values: Vec<Vec<u8>>,
     pub result_logs: Vec<TxLog>,
+
+    /// Calls that need to be executed.
+    ///
+    /// Structure is emptied as soon as async calls are executed.
     pub pending_calls: TxResultCalls,
-    pub transfers: Vec<AsyncCallTxData>,
+
+    /// All async calls launched from the tx (legacy async, promises, transfer-execute).
+    ///
+    /// Is never cleared of its contents.
+    pub all_calls: Vec<AsyncCallTxData>,
 }
 
 impl Default for TxResult {
@@ -23,7 +31,7 @@ impl Default for TxResult {
             result_values: Vec::new(),
             result_logs: Vec::new(),
             pending_calls: TxResultCalls::empty(),
-            transfers: Vec::new(),
+            all_calls: Vec::new(),
         }
     }
 }
