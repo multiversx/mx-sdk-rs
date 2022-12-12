@@ -37,6 +37,7 @@ pub fn byte_str_slice_literal(bytes: &[u8]) -> proc_macro2::TokenStream {
     quote! { &#lit[..] }
 }
 
+#[allow(unused)]
 pub fn ident_str_literal(ident: &syn::Ident) -> proc_macro2::TokenStream {
     byte_str_slice_literal(ident.to_string().as_bytes())
 }

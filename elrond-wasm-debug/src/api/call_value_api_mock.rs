@@ -43,13 +43,13 @@ impl CallValueApiImpl for DebugApi {
 
     #[inline]
     fn load_egld_value(&self, dest: Self::BigIntHandle) {
-        self.set_big_uint(dest, self.input_ref().egld_value.clone())
+        self.set_big_uint(dest, self.input_ref().received_egld().clone())
     }
 
     #[inline]
     fn load_single_esdt_value(&self, dest: Self::BigIntHandle) {
         self.fail_if_more_than_one_esdt_transfer();
-        if let Some(esdt_value) = self.input_ref().esdt_values.get(0) {
+        if let Some(esdt_value) = self.input_ref().received_esdt().get(0) {
             self.set_big_uint(dest, esdt_value.value.clone());
         } else {
             std::panic::panic_any(TxPanic {
@@ -84,12 +84,12 @@ impl CallValueApiImpl for DebugApi {
 
     #[inline]
     fn esdt_num_transfers(&self) -> usize {
-        self.input_ref().esdt_values.len()
+        self.input_ref().received_esdt().len()
     }
 
     #[inline]
     fn esdt_value_by_index(&self, index: usize) -> Self::BigIntHandle {
-        if let Some(esdt_value) = self.input_ref().esdt_values.get(index) {
+        if let Some(esdt_value) = self.input_ref().received_esdt().get(index) {
             self.insert_new_big_uint(esdt_value.value.clone())
         } else {
             std::panic::panic_any(TxPanic {
@@ -101,7 +101,7 @@ impl CallValueApiImpl for DebugApi {
 
     #[inline]
     fn token_by_index(&self, index: usize) -> Self::ManagedBufferHandle {
-        if let Some(esdt_value) = self.input_ref().esdt_values.get(index) {
+        if let Some(esdt_value) = self.input_ref().received_esdt().get(index) {
             self.insert_new_managed_buffer(esdt_value.token_identifier.clone())
         } else {
             std::panic::panic_any(TxPanic {
@@ -113,7 +113,7 @@ impl CallValueApiImpl for DebugApi {
 
     #[inline]
     fn esdt_token_nonce_by_index(&self, index: usize) -> u64 {
-        if let Some(esdt_value) = self.input_ref().esdt_values.get(index) {
+        if let Some(esdt_value) = self.input_ref().received_esdt().get(index) {
             esdt_value.nonce
         } else {
             std::panic::panic_any(TxPanic {

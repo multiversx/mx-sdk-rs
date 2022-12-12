@@ -3,7 +3,7 @@ use elrond_wasm::elrond_codec::{CodecFrom, PanicErrorHandler, TopEncodeMulti};
 
 use crate::{
     tx_execution::sc_call_with_async_and_callback,
-    tx_mock::{generate_tx_hash_dummy, TxInput, TxInputESDT, TxResult},
+    tx_mock::{generate_tx_hash_dummy, TxInput, TxResult, TxTokenTransfer},
     world_mock::BlockchainMock,
 };
 
@@ -62,7 +62,7 @@ pub(crate) fn execute(
         to: tx.to.to_address(),
         egld_value: tx.egld_value.value.clone(),
         esdt_values: tx_esdt_transfers_from_mandos(tx.esdt_value.as_slice()),
-        func_name: tx.function.as_bytes().to_vec(),
+        func_name: tx.function.clone().into(),
         args: tx
             .arguments
             .iter()
@@ -71,7 +71,7 @@ pub(crate) fn execute(
         gas_limit: tx.gas_limit.value,
         gas_price: tx.gas_price.value,
         tx_hash: generate_tx_hash_dummy(&sc_call_step.id),
-        promise_callback_closure_data: Vec::new(),
+        ..Default::default()
     };
 
     // nonce gets increased irrespective of whether the tx fails or not
@@ -91,15 +91,15 @@ fn execute_and_check(
     (tx_result, state)
 }
 
-pub fn tx_esdt_transfers_from_mandos(mandos_transf_esdt: &[TxESDT]) -> Vec<TxInputESDT> {
+pub fn tx_esdt_transfers_from_mandos(mandos_transf_esdt: &[TxESDT]) -> Vec<TxTokenTransfer> {
     mandos_transf_esdt
         .iter()
         .map(tx_esdt_transfer_from_mandos)
         .collect()
 }
 
-pub fn tx_esdt_transfer_from_mandos(mandos_transf_esdt: &TxESDT) -> TxInputESDT {
-    TxInputESDT {
+pub fn tx_esdt_transfer_from_mandos(mandos_transf_esdt: &TxESDT) -> TxTokenTransfer {
+    TxTokenTransfer {
         token_identifier: mandos_transf_esdt.esdt_token_identifier.value.clone(),
         nonce: mandos_transf_esdt.nonce.value,
         value: mandos_transf_esdt.esdt_value.value.clone(),

@@ -93,7 +93,7 @@ pub(crate) fn execute(
         to: sc_query_step.tx.to.to_address(),
         egld_value: BigUint::from(0u32),
         esdt_values: Vec::new(),
-        func_name: sc_query_step.tx.function.as_bytes().to_vec(),
+        func_name: sc_query_step.tx.function.clone().into(),
         args: sc_query_step
             .tx
             .arguments
@@ -103,12 +103,12 @@ pub(crate) fn execute(
         gas_limit: u64::MAX,
         gas_price: 0u64,
         tx_hash: generate_tx_hash_dummy(&sc_query_step.id),
-        promise_callback_closure_data: Vec::new(),
+        ..Default::default()
     };
 
     let (tx_result, state) = execute_sc_query(tx_input, state);
     assert!(
-        tx_result.result_calls.is_empty(),
+        tx_result.pending_calls.no_calls(),
         "Can't query a view function that performs an async call"
     );
     (tx_result, state)
