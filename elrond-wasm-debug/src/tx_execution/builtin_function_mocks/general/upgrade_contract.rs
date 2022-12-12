@@ -5,7 +5,7 @@ use crate::{
     tx_mock::{BlockchainUpdate, TxCache, TxFunctionName, TxInput, TxResult},
 };
 
-use super::builtin_func_trait::BuiltinFunction;
+use super::super::builtin_func_trait::BuiltinFunction;
 
 pub struct UpgradeContract;
 
@@ -47,7 +47,7 @@ impl BuiltinFunction for UpgradeContract {
             gas_limit: tx_input.gas_limit,
             gas_price: tx_input.gas_price,
             tx_hash: tx_input.tx_hash,
-            promise_callback_closure_data: Vec::new(),
+            ..Default::default()
         };
 
         default_execution(exec_input, tx_cache)

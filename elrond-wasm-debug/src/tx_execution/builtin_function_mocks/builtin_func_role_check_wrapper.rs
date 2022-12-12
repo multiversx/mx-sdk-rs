@@ -1,6 +1,6 @@
-use crate::tx_mock::{BlockchainUpdate, TxCache, TxInput, TxInputESDT, TxResult};
+use crate::tx_mock::{BlockchainUpdate, TxCache, TxInput, TxResult};
 
-use super::builtin_func_trait::BuiltinFunction;
+use super::builtin_func_trait::{BuiltinFunction, BuiltinFunctionEsdtTransferInfo};
 
 /// Checks that user has appropriate role before calling the builtin function.
 pub struct BuiltinFunctionRoleCheckWrapper {
@@ -22,8 +22,8 @@ impl BuiltinFunction for BuiltinFunctionRoleCheckWrapper {
         self.builtin_function.name()
     }
 
-    fn extract_esdt_transfers(&self) -> Vec<TxInputESDT> {
-        self.builtin_function.extract_esdt_transfers()
+    fn extract_esdt_transfers(&self, tx_input: &TxInput) -> BuiltinFunctionEsdtTransferInfo {
+        self.builtin_function.extract_esdt_transfers(tx_input)
     }
 
     fn execute(&self, tx_input: TxInput, tx_cache: TxCache) -> (TxResult, BlockchainUpdate) {
