@@ -8,14 +8,13 @@ use crate::{
 use super::{
     builtin_func_map::BuiltinFunctionMap,
     builtin_func_role_check_wrapper::BuiltinFunctionRoleCheckWrapper,
-    builtin_func_trait::BuiltinFunction, change_owner_mock::ChangeOwner,
-    claim_developer_rewards_mock::ClaimDeveloperRewards, esdt_local_burn::ESDTLocalBurn,
-    esdt_local_mint::ESDTLocalMint, esdt_multi_transfer_mock::ESDTMultiTransfer,
-    esdt_nft_add_quantity_mock::ESDTNftAddQuantity, esdt_nft_add_uri_mock::ESDTNftAddUri,
-    esdt_nft_burn_mock::ESDTNftBurn, esdt_nft_create_mock::ESDTNftCreate,
-    esdt_nft_transfer_mock::ESDTNftTransfer,
-    esdt_nft_update_attriutes_mock::ESDTNftUpdateAttributes, esdt_transfer_mock::ESDTTransfer,
-    set_username_mock::SetUsername, upgrade_contract::UpgradeContract,
+    builtin_func_trait::BuiltinFunction,
+    esdt_nft::{
+        ESDTLocalBurn, ESDTLocalMint, ESDTNftAddQuantity, ESDTNftAddUri, ESDTNftBurn,
+        ESDTNftCreate, ESDTNftUpdateAttributes,
+    },
+    general::{ChangeOwner, ClaimDeveloperRewards, SetUsername, UpgradeContract},
+    transfer::{ESDTMultiTransfer, ESDTNftTransfer, ESDTTransfer},
 };
 
 const ESDT_ROLE_LOCAL_MINT: &str = "ESDTRoleLocalMint";

@@ -26,7 +26,7 @@ pub fn async_call_tx_input(async_data: &AsyncCallTxData) -> TxInput {
         to: async_data.to.clone(),
         egld_value: async_data.call_value.clone(),
         esdt_values: Vec::new(),
-        func_name: async_data.endpoint_name.clone().into(),
+        func_name: async_data.endpoint_name.clone(),
         args: async_data.arguments.clone(),
         gas_limit: 1000,
         gas_price: 0,

@@ -1,27 +1,23 @@
 use crate::num_bigint::BigUint;
 use elrond_wasm::{
-    api::ESDT_NFT_ADD_QUANTITY_FUNC_NAME,
+    api::ESDT_NFT_BURN_FUNC_NAME,
     elrond_codec::{top_encode_to_vec_u8, TopDecode},
 };
 
-use crate::{
-    tx_mock::{BlockchainUpdate, TxCache, TxInput, TxLog, TxResult, TxResultCalls},
-    world_mock::EsdtInstanceMetadata,
-};
+use crate::tx_mock::{BlockchainUpdate, TxCache, TxInput, TxLog, TxResult, TxResultCalls};
 
-use super::builtin_func_trait::BuiltinFunction;
+use super::super::builtin_func_trait::BuiltinFunction;
 
-pub struct ESDTNftAddQuantity;
+pub struct ESDTNftBurn;
 
-impl BuiltinFunction for ESDTNftAddQuantity {
+impl BuiltinFunction for ESDTNftBurn {
     fn name(&self) -> &str {
-        ESDT_NFT_ADD_QUANTITY_FUNC_NAME
+        ESDT_NFT_BURN_FUNC_NAME
     }
 
     fn execute(&self, tx_input: TxInput, tx_cache: TxCache) -> (TxResult, BlockchainUpdate) {
         if tx_input.args.len() != 3 {
-            let err_result =
-                TxResult::from_vm_error("ESDTNFTAddQuantity expects 3 arguments".to_string());
+            let err_result = TxResult::from_vm_error("ESDTNFTBurn expects 3 arguments".to_string());
             return (err_result, BlockchainUpdate::empty());
         }
 
@@ -29,17 +25,11 @@ impl BuiltinFunction for ESDTNftAddQuantity {
         let nonce = u64::top_decode(tx_input.args[1].as_slice()).unwrap();
         let value = BigUint::from_bytes_be(tx_input.args[2].as_slice());
 
-        tx_cache.increase_esdt_balance(
-            &tx_input.to,
-            &token_identifier,
-            nonce,
-            &value,
-            EsdtInstanceMetadata::default(),
-        );
+        tx_cache.subtract_esdt_balance(&tx_input.to, &token_identifier, nonce, &value);
 
         let esdt_nft_create_log = TxLog {
             address: tx_input.from,
-            endpoint: ESDT_NFT_ADD_QUANTITY_FUNC_NAME.into(),
+            endpoint: ESDT_NFT_BURN_FUNC_NAME.into(),
             topics: vec![
                 token_identifier.to_vec(),
                 top_encode_to_vec_u8(&nonce).unwrap(),
