@@ -2,9 +2,9 @@ use alloc::vec::Vec;
 
 use std::fmt;
 
-use super::{TxLog, TxPanic, TxResultCalls};
+use super::{AsyncCallTxData, TxLog, TxPanic, TxResultCalls};
 
-#[derive(Clone, Default, Debug)]
+#[derive(Clone, Debug)]
 #[must_use]
 pub struct TxResult {
     pub result_status: u64,
@@ -12,17 +12,25 @@ pub struct TxResult {
     pub result_values: Vec<Vec<u8>>,
     pub result_logs: Vec<TxLog>,
     pub result_calls: TxResultCalls,
+    pub transfers: Vec<AsyncCallTxData>,
 }
 
-impl TxResult {
-    pub fn empty() -> TxResult {
+impl Default for TxResult {
+    fn default() -> Self {
         TxResult {
             result_status: 0,
             result_message: String::new(),
             result_values: Vec::new(),
             result_logs: Vec::new(),
             result_calls: TxResultCalls::empty(),
+            transfers: Vec::new(),
         }
+    }
+}
+
+impl TxResult {
+    pub fn empty() -> TxResult {
+        TxResult::default()
     }
 
     pub fn print(&self) {
@@ -35,7 +43,7 @@ impl TxResult {
             result_message: panic_obj.message.clone(),
             result_values: Vec::new(),
             result_logs: Vec::new(),
-            result_calls: TxResultCalls::empty(),
+            ..Default::default()
         }
     }
 
@@ -46,7 +54,7 @@ impl TxResult {
             // result_message: _s.to_string(),
             result_values: Vec::new(),
             result_logs: Vec::new(),
-            result_calls: TxResultCalls::empty(),
+            ..Default::default()
         }
     }
 
@@ -58,9 +66,7 @@ impl TxResult {
         TxResult {
             result_status: 10,
             result_message,
-            result_values: Vec::new(),
-            result_logs: Vec::new(),
-            result_calls: TxResultCalls::empty(),
+            ..Default::default()
         }
     }
 

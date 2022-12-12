@@ -2,7 +2,7 @@ use crate::num_bigint::BigUint;
 use elrond_wasm::api::ESDT_LOCAL_MINT_FUNC_NAME;
 
 use crate::{
-    tx_mock::{BlockchainUpdate, TxCache, TxInput, TxLog, TxResult, TxResultCalls},
+    tx_mock::{BlockchainUpdate, TxCache, TxInput, TxLog, TxResult},
     world_mock::EsdtInstanceMetadata,
 };
 
@@ -42,10 +42,8 @@ impl BuiltinFunction for ESDTLocalMint {
 
         let tx_result = TxResult {
             result_status: 0,
-            result_message: String::new(),
-            result_values: Vec::new(),
             result_logs: vec![esdt_nft_create_log],
-            result_calls: TxResultCalls::empty(),
+            ..Default::default()
         };
 
         (tx_result, tx_cache.into_blockchain_updates())
