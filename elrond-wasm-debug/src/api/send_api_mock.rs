@@ -162,7 +162,7 @@ impl DebugApi {
     fn perform_async_call(&self, call: AsyncCallTxData) -> ! {
         // the cell is no longer needed, since we end in a panic
         let mut tx_result = self.extract_result();
-        tx_result.result_calls.async_call = Some(call);
+        tx_result.pending_calls.async_call = Some(call);
         std::panic::panic_any(tx_result)
     }
 
@@ -403,7 +403,7 @@ impl SendApiImpl for DebugApi {
         };
 
         let mut tx_result = self.result_borrow_mut();
-        tx_result.result_calls.promises.push(promise);
+        tx_result.pending_calls.promises.push(promise);
     }
 
     fn deploy_contract<M: ManagedTypeApi>(

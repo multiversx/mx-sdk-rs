@@ -760,7 +760,7 @@ impl BlockchainStateWrapper {
             updates.apply(b_mock_ref);
         }
         if is_successful_tx {
-            if let Some(async_data) = &tx_result.result_calls.async_call {
+            if let Some(async_data) = &tx_result.pending_calls.async_call {
                 let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
                 b_mock_ref.with_borrowed(|state| {
                     let (_, _, state) = execute_async_call_and_callback(async_data.clone(), state);

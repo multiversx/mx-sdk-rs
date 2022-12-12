@@ -11,7 +11,7 @@ pub struct TxResult {
     pub result_message: String,
     pub result_values: Vec<Vec<u8>>,
     pub result_logs: Vec<TxLog>,
-    pub result_calls: TxResultCalls,
+    pub pending_calls: TxResultCalls,
     pub transfers: Vec<AsyncCallTxData>,
 }
 
@@ -22,7 +22,7 @@ impl Default for TxResult {
             result_message: String::new(),
             result_values: Vec::new(),
             result_logs: Vec::new(),
-            result_calls: TxResultCalls::empty(),
+            pending_calls: TxResultCalls::empty(),
             transfers: Vec::new(),
         }
     }
@@ -75,12 +75,12 @@ impl TxResult {
             .extend_from_slice(sync_call_result.result_values.as_slice());
         self.result_logs
             .extend_from_slice(sync_call_result.result_logs.as_slice());
-        if let Some(sync_result_async) = &sync_call_result.result_calls.async_call {
+        if let Some(sync_result_async) = &sync_call_result.pending_calls.async_call {
             assert!(
-                self.result_calls.async_call.is_none(),
+                self.pending_calls.async_call.is_none(),
                 "Multiple async calls not supported"
             );
-            self.result_calls.async_call = Some(sync_result_async.clone());
+            self.pending_calls.async_call = Some(sync_result_async.clone());
         }
     }
 

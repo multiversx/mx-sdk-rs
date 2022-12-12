@@ -49,7 +49,7 @@ pub fn execute_async_call_and_callback(
         let callback_input = async_callback_tx_input(&async_data, &async_result);
         let (callback_result, state) = execute_sc_call(callback_input, state);
         assert!(
-            callback_result.result_calls.async_call.is_none(),
+            callback_result.pending_calls.async_call.is_none(),
             "successive asyncs currently not supported"
         );
         (async_result, callback_result, state)
@@ -83,7 +83,7 @@ pub fn sc_call_with_async_and_callback(
 ) -> (TxResult, BlockchainMock) {
     let contract_address = tx_input.to.clone();
     let (mut tx_result, mut state) = execute_sc_call(tx_input, state);
-    let result_calls = std::mem::replace(&mut tx_result.result_calls, TxResultCalls::empty());
+    let result_calls = std::mem::replace(&mut tx_result.pending_calls, TxResultCalls::empty());
     if tx_result.result_status == 0 {
         if let Some(async_data) = result_calls.async_call {
             let (async_result, callback_result, new_state) =
@@ -121,7 +121,7 @@ pub fn execute_promise_call_and_callback(
         let callback_input = async_promise_tx_input(address, promise, &async_result);
         let (callback_result, state) = execute_sc_call(callback_input, state);
         assert!(
-            callback_result.result_calls.promises.is_empty(),
+            callback_result.pending_calls.promises.is_empty(),
             "successive promises currently not supported"
         );
         (async_result, callback_result, state)
