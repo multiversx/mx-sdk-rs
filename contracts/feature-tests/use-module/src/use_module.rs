@@ -1,5 +1,7 @@
 #![no_std]
 
+mod contract_base_full_path_mod;
+mod contract_base_mod;
 mod internal_mod_a;
 mod internal_mod_b;
 mod internal_mod_c;
@@ -11,8 +13,6 @@ mod only_admin_mod;
 mod only_owner_derived_mod;
 mod only_owner_mod;
 pub mod token_merge_mod_impl;
-mod contract_base_full_path_mod;
-mod contract_base_mod;
 
 elrond_wasm::imports!();
 

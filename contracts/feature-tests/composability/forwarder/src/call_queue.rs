@@ -66,11 +66,11 @@ pub trait ForwarderQueuedCallModule {
             let contract_call = self
                 .self_proxy(call.to)
                 .forward_queued_calls(max_call_depth - 1)
-                .with_egld_or_single_esdt_token_transfer(
+                .with_egld_or_single_esdt_transfer((
                     call.payment_token,
                     call.payment_nonce,
                     call.payment_amount,
-                );
+                ));
             match call.call_type {
                 QueuedCallType::Sync => {
                     contract_call.execute_on_dest_context::<()>();

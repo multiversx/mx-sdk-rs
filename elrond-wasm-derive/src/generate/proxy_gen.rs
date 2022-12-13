@@ -140,7 +140,7 @@ pub fn generate_proxy_endpoint(m: &Method, endpoint_name: String) -> proc_macro2
 
     let single_payment_snippet = if token_count > 0 || nonce_count > 0 || payment_count > 0 {
         quote! {
-            ___contract_call___ = ___contract_call___.with_egld_or_single_esdt_token_transfer(#token_expr, #nonce_expr, #payment_expr);
+            ___contract_call___ = ___contract_call___.with_egld_or_single_esdt_transfer((#token_expr, #nonce_expr, #payment_expr));
         }
     } else {
         quote! {}
