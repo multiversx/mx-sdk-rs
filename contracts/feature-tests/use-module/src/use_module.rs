@@ -11,6 +11,8 @@ mod only_admin_mod;
 mod only_owner_derived_mod;
 mod only_owner_mod;
 pub mod token_merge_mod_impl;
+mod contract_base_full_path_mod;
+mod contract_base_mod;
 
 elrond_wasm::imports!();
 
@@ -23,7 +25,10 @@ elrond_wasm::imports!();
 /// - PauseModule
 #[elrond_wasm::contract]
 pub trait UseModule:
-    internal_mod_a::InternalModuleA
+    ContractBase
+    + contract_base_full_path_mod::ContractBaseFullPathTestModule
+    + contract_base_mod::ContractBaseTestModule
+    + internal_mod_a::InternalModuleA
     + internal_mod_b::InternalModuleB
     + internal_mod_c::InternalModuleC
     + internal_mod_init::InternalModuleInit
