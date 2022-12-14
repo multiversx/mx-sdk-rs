@@ -15,7 +15,7 @@ use crate::{
 };
 use core::marker::PhantomData;
 
-use super::contract_call_common::{TRANSFER_EXECUTE_DEFAULT_LEFTOVER, UNSPECIFIED_GAS_LIMIT};
+use super::contract_call_exec::{TRANSFER_EXECUTE_DEFAULT_LEFTOVER, UNSPECIFIED_GAS_LIMIT};
 
 /// Represents metadata for calling another contract.
 /// Can transform into either an async call, transfer call or other types of calls.

@@ -11,7 +11,7 @@ use crate::{
 };
 
 use super::{
-    contract_call_common::UNSPECIFIED_GAS_LIMIT, contract_call_full::ContractCallFull,
+    contract_call_exec::UNSPECIFIED_GAS_LIMIT, contract_call_full::ContractCallFull,
     contract_call_with_egld::ContractCallWithEgld,
     contract_call_with_multi_esdt::ContractCallWithMultiEsdt, ContractCallTrait,
     ContractCallWithEgldOrSingleEsdt, ManagedArgBuffer,
