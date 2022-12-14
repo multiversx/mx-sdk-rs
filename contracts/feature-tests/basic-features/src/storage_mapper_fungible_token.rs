@@ -117,6 +117,11 @@ pub trait FungibleTokenMapperFeatures:
     }
 
     #[endpoint]
+    fn send_fungible(&self, to: ManagedAddress, amount: BigUint) {
+        self.fungible_token_mapper().send(&to, &amount);
+    }
+
+    #[endpoint]
     fn get_balance_fungible(&self) -> BigUint {
         self.fungible_token_mapper().get_balance()
     }
