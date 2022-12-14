@@ -1,0 +1,13 @@
+[package]
+name = "fractional-nfts-meta"
+version = "0.0.0"
+authors = ["Claudiu-Marcel Bruda <claudiu.bruda@elrond.com>"]
+edition = "2021"
+publish = false
+
+[dependencies.fractional-nfts]
+path = ".."
+
+[dependencies.elrond-wasm-debug]
+version = "0.37.0"
+path = "../../../../elrond-wasm-debug"
