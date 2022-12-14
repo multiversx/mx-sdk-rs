@@ -2,16 +2,10 @@ use elrond_codec::TopEncodeMulti;
 
 use crate::{
     api::CallTypeApi,
-    types::{
-        BigUint, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment, EsdtTokenPayment,
-        ManagedAddress, ManagedVec,
-    },
+    types::{BigUint, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment, ManagedAddress},
 };
 
-use super::{
-    contract_call_full::ContractCallFull, contract_call_no_payment::ContractCallNoPayment,
-    ContractCall,
-};
+use super::{contract_call_no_payment::ContractCallNoPayment, ContractCall, ContractCallWithEgld};
 
 #[must_use]
 pub struct ContractCallWithEgldOrSingleEsdt<SA, OriginalResult>
@@ -27,24 +21,17 @@ where
     SA: CallTypeApi + 'static,
     OriginalResult: TopEncodeMulti,
 {
-    fn into_contract_call_full_egld(self) -> ContractCallFull<SA, OriginalResult> {
-        ContractCallFull {
+    fn into_normalized_egld(self) -> ContractCallWithEgld<SA, OriginalResult> {
+        ContractCallWithEgld {
             basic: self.basic,
             egld_payment: self.payment.amount,
-            payments: ManagedVec::new(),
         }
     }
 
-    fn into_contract_call_full_esdt(self) -> ContractCallFull<SA, OriginalResult> {
-        ContractCallFull {
-            basic: self.basic,
-            egld_payment: BigUint::zero(),
-            payments: ManagedVec::from_single_item(EsdtTokenPayment::new(
-                self.payment.token_identifier.unwrap_esdt(),
-                self.payment.token_nonce,
-                self.payment.amount,
-            )),
-        }
+    fn into_normalized_esdt(self) -> ContractCallWithEgld<SA, OriginalResult> {
+        self.basic
+            .into_normalized()
+            .convert_to_single_transfer_esdt_call(self.payment.unwrap_esdt())
     }
 }
 
@@ -55,28 +42,28 @@ where
 {
     type OriginalResult = OriginalResult;
 
-    fn into_contract_call_full(self) -> ContractCallFull<SA, OriginalResult> {
+    fn into_normalized(self) -> ContractCallWithEgld<SA, Self::OriginalResult> {
         if self.payment.token_identifier.is_egld() {
-            self.into_contract_call_full_egld()
-        } else {
-            self.into_contract_call_full_esdt()
-        }
-    }
-
-    fn into_contract_call_normalized(self) -> ContractCallFull<SA, Self::OriginalResult> {
-        if self.payment.token_identifier.is_egld() {
-            self.into_contract_call_full_egld()
+            self.into_normalized_egld()
         } else {
             // Because we know that there can be at most one ESDT payment,
             // there is no need to call the full `convert_to_esdt_transfer_call`.
-            self.into_contract_call_full_esdt()
-                .convert_to_single_transfer_esdt_call()
+            self.into_normalized_esdt()
         }
     }
 
     #[inline]
     fn get_mut_basic(&mut self) -> &mut ContractCallNoPayment<SA, OriginalResult> {
         &mut self.basic
+    }
+
+    fn transfer_execute(self) {
+        if self.payment.token_identifier.is_egld() {
+            self.basic.transfer_execute_egld(self.payment.amount);
+        } else {
+            self.basic
+                .transfer_execute_single_esdt(self.payment.unwrap_esdt());
+        }
     }
 }
 

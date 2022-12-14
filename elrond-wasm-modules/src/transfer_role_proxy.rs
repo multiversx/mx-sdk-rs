@@ -33,7 +33,7 @@ pub trait TransferRoleProxyModule {
     {
         self.execute_async_call(
             original_caller,
-            contract_call.payments.clone(),
+            contract_call.esdt_payments.clone(),
             contract_call,
             opt_custom_callback,
         );
@@ -77,7 +77,8 @@ pub trait TransferRoleProxyModule {
         );
 
         let remaining_gas = self.blockchain().get_gas_left();
-        let cb_gas_needed = CALLBACK_RESERVED_GAS_PER_TOKEN * contract_call.payments.len() as u64;
+        let cb_gas_needed =
+            CALLBACK_RESERVED_GAS_PER_TOKEN * contract_call.esdt_payments.len() as u64;
         require!(
             remaining_gas > cb_gas_needed,
             "Not enough gas to launch async call"

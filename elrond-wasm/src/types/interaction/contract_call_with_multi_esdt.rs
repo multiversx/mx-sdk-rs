@@ -7,10 +7,7 @@ use crate::{
     },
 };
 
-use super::{
-    contract_call_full::ContractCallFull, contract_call_no_payment::ContractCallNoPayment,
-    ContractCall,
-};
+use super::{contract_call_no_payment::ContractCallNoPayment, ContractCall, ContractCallWithEgld};
 
 #[must_use]
 pub struct ContractCallWithMultiEsdt<SA, OriginalResult>
@@ -18,7 +15,7 @@ where
     SA: CallTypeApi + 'static,
 {
     pub basic: ContractCallNoPayment<SA, OriginalResult>,
-    pub payments: ManagedVec<SA, EsdtTokenPayment<SA>>,
+    pub esdt_payments: ManagedVec<SA, EsdtTokenPayment<SA>>,
 }
 
 impl<SA, OriginalResult> ContractCall<SA> for ContractCallWithMultiEsdt<SA, OriginalResult>
@@ -28,22 +25,25 @@ where
 {
     type OriginalResult = OriginalResult;
 
-    fn into_contract_call_full(self) -> ContractCallFull<SA, OriginalResult> {
-        ContractCallFull {
-            basic: self.basic,
-            egld_payment: BigUint::zero(),
-            payments: self.payments,
-        }
-    }
-
-    fn into_contract_call_normalized(self) -> ContractCallFull<SA, Self::OriginalResult> {
-        self.into_contract_call_full()
-            .convert_to_esdt_transfer_call()
+    fn into_normalized(self) -> ContractCallWithEgld<SA, Self::OriginalResult> {
+        self.basic
+            .into_normalized()
+            .convert_to_esdt_transfer_call(self.esdt_payments)
     }
 
     #[inline]
     fn get_mut_basic(&mut self) -> &mut ContractCallNoPayment<SA, OriginalResult> {
         &mut self.basic
+    }
+
+    fn transfer_execute(self) {
+        match self.esdt_payments.len() {
+            0 => self.basic.transfer_execute_egld(BigUint::zero()),
+            1 => self
+                .basic
+                .transfer_execute_single_esdt(self.esdt_payments.get(0)),
+            _ => self.basic.transfer_execute_multi_esdt(self.esdt_payments),
+        }
     }
 }
 
@@ -66,7 +66,7 @@ where
     ) -> Self {
         ContractCallWithMultiEsdt {
             basic: ContractCallNoPayment::new(to, endpoint_name),
-            payments,
+            esdt_payments: payments,
         }
     }
 
@@ -74,7 +74,7 @@ where
     ///
     /// Can be called multiple times on the same call.
     pub fn with_esdt_transfer<P: Into<EsdtTokenPayment<SA>>>(mut self, payment: P) -> Self {
-        self.payments.push(payment.into());
+        self.esdt_payments.push(payment.into());
         self
     }
 

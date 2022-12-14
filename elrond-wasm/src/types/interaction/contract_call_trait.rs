@@ -4,9 +4,7 @@ use crate::{
     api::CallTypeApi, contract_base::ExitCodecErrorHandler, err_msg, types::ManagedBuffer,
 };
 
-use super::{
-    contract_call_full::ContractCallFull, AsyncCall, ContractCallNoPayment, ManagedArgBuffer,
-};
+use super::{AsyncCall, ContractCallNoPayment, ContractCallWithEgld, ManagedArgBuffer};
 
 pub trait ContractCall<SA>: Sized
 where
@@ -14,14 +12,10 @@ where
 {
     type OriginalResult: TopEncodeMulti;
 
-    /// Converts the contract call into the maximal ContractCallFull.
+    /// Converts any ESDT transfers into builtin function calls,
+    /// thus reducing it to a simple transaction with optional EGLD value.
     #[doc(hidden)]
-    fn into_contract_call_full(self) -> ContractCallFull<SA, Self::OriginalResult>;
-
-    /// Converts the contract call into the maximal ContractCallFull,
-    /// with ESDT payments replaced by builtin function calls.
-    #[doc(hidden)]
-    fn into_contract_call_normalized(self) -> ContractCallFull<SA, Self::OriginalResult>;
+    fn into_normalized(self) -> ContractCallWithEgld<SA, Self::OriginalResult>;
 
     /// Mutable access to the common base.
     #[doc(hidden)]
@@ -53,19 +47,17 @@ where
         self
     }
 
-
     /// Converts to a legacy async call.
     #[inline]
     fn async_call(self) -> AsyncCall<SA> {
-        self.into_contract_call_normalized().async_call()
+        self.into_normalized().async_call()
     }
 
     /// Converts to an async promise.
     #[inline]
     #[cfg(feature = "promises")]
     fn async_call_promise(self) -> super::AsyncCallPromises<SA> {
-        self.into_contract_call_normalized()
-            .async_call_promise()
+        self.into_normalized().async_call_promise()
     }
 
     /// Executes immediately, synchronously, and returns contract call result.
@@ -75,8 +67,7 @@ where
     where
         RequestedResult: TopDecodeMulti,
     {
-        self.into_contract_call_normalized()
-            .execute_on_dest_context()
+        self.into_normalized().execute_on_dest_context()
     }
 
     /// Executes immediately, synchronously.
@@ -93,35 +84,30 @@ where
     }
 
     /// Executes immediately, synchronously, and returns contract call result.
-    /// 
+    ///
     /// Performs a readonly call.    
     #[inline]
     fn execute_on_dest_context_readonly<RequestedResult>(self) -> RequestedResult
     where
         RequestedResult: TopDecodeMulti,
     {
-        self.into_contract_call_normalized()
-            .execute_on_dest_context_readonly()
+        self.into_normalized().execute_on_dest_context_readonly()
     }
 
     /// Executes immediately, synchronously, and returns contract call result.
-    /// 
+    ///
     /// Performs call on the same context, i.e. the target contract will operate with the data drom this contract.    
     #[inline]
     fn execute_on_same_context<RequestedResult>(self) -> RequestedResult
     where
         RequestedResult: TopDecodeMulti,
     {
-        self.into_contract_call_normalized()
-            .execute_on_same_context()
+        self.into_normalized().execute_on_same_context()
     }
 
     /// Immediately launches a transfer-execute call.
     ///
     /// This is similar to an async call, but there is no callback
     /// and there can be more than one such call per transaction.
-    #[inline]
-    fn transfer_execute(self) {
-        self.into_contract_call_full().transfer_execute();
-    }
+    fn transfer_execute(self);
 }

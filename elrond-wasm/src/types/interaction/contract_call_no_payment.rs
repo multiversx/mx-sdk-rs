@@ -11,8 +11,7 @@ use crate::{
 };
 
 use super::{
-    contract_call_exec::UNSPECIFIED_GAS_LIMIT, contract_call_full::ContractCallFull,
-    contract_call_with_egld::ContractCallWithEgld,
+    contract_call_exec::UNSPECIFIED_GAS_LIMIT, contract_call_with_egld::ContractCallWithEgld,
     contract_call_with_multi_esdt::ContractCallWithMultiEsdt, ContractCall,
     ContractCallWithEgldOrSingleEsdt, ManagedArgBuffer,
 };
@@ -38,23 +37,21 @@ where
 {
     type OriginalResult = OriginalResult;
 
-    fn into_contract_call_full(self) -> ContractCallFull<SA, OriginalResult> {
-        ContractCallFull {
+    #[inline]
+    fn into_normalized(self) -> ContractCallWithEgld<SA, Self::OriginalResult> {
+        ContractCallWithEgld {
             basic: self,
             egld_payment: BigUint::zero(),
-            payments: ManagedVec::new(),
         }
-    }
-
-    #[inline]
-    fn into_contract_call_normalized(self) -> ContractCallFull<SA, Self::OriginalResult> {
-        // no payment, no conversion needed
-        self.into_contract_call_full()
     }
 
     #[inline]
     fn get_mut_basic(&mut self) -> &mut ContractCallNoPayment<SA, OriginalResult> {
         self
+    }
+
+    fn transfer_execute(self) {
+        self.transfer_execute_egld(BigUint::zero());
     }
 }
 
@@ -97,7 +94,7 @@ where
     ) -> ContractCallWithMultiEsdt<SA, OriginalResult> {
         let result = ContractCallWithMultiEsdt {
             basic: self,
-            payments: ManagedVec::new(),
+            esdt_payments: ManagedVec::new(),
         };
         result.with_esdt_transfer(payment)
     }
@@ -124,7 +121,7 @@ where
     ) -> ContractCallWithMultiEsdt<SA, OriginalResult> {
         ContractCallWithMultiEsdt {
             basic: self,
-            payments,
+            esdt_payments: payments,
         }
     }
 

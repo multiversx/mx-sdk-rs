@@ -4,10 +4,10 @@ use crate::{
     api::{BlockchainApiImpl, CallTypeApi},
     contract_base::SendRawWrapper,
     io::{ArgErrorHandler, ArgId, ManagedResultArgLoader},
-    types::{ManagedBuffer, ManagedVec},
+    types::{BigUint, EsdtTokenPayment, ManagedBuffer, ManagedVec},
 };
 
-use super::{AsyncCall, ContractCallFull};
+use super::{AsyncCall, ContractCallNoPayment, ContractCallWithEgld};
 
 /// Using max u64 to represent maximum possible gas,
 /// so that the value zero is not reserved and can be specified explicitly.
@@ -17,7 +17,7 @@ pub(super) const UNSPECIFIED_GAS_LIMIT: u64 = u64::MAX;
 /// In case of `transfer_execute`, we leave by default a little gas for the calling transaction to finish.
 pub(super) const TRANSFER_EXECUTE_DEFAULT_LEFTOVER: u64 = 100_000;
 
-impl<SA, OriginalResult> ContractCallFull<SA, OriginalResult>
+impl<SA, OriginalResult> ContractCallWithEgld<SA, OriginalResult>
 where
     SA: CallTypeApi + 'static,
 {
@@ -103,75 +103,74 @@ where
 
         decode_result(raw_result)
     }
+}
 
+impl<SA, OriginalResult> ContractCallNoPayment<SA, OriginalResult>
+where
+    SA: CallTypeApi + 'static,
+{
     pub(super) fn resolve_gas_limit_with_leftover(&self) -> u64 {
-        if self.basic.explicit_gas_limit == UNSPECIFIED_GAS_LIMIT {
+        if self.explicit_gas_limit == UNSPECIFIED_GAS_LIMIT {
             let mut gas_left = SA::blockchain_api_impl().get_gas_left();
             if gas_left > TRANSFER_EXECUTE_DEFAULT_LEFTOVER {
                 gas_left -= TRANSFER_EXECUTE_DEFAULT_LEFTOVER;
             }
             gas_left
         } else {
-            self.basic.explicit_gas_limit
+            self.explicit_gas_limit
         }
     }
 
-    pub(super) fn no_payment_transfer_execute(&self) {
+    pub(super) fn transfer_execute_egld(self, egld_payment: BigUint<SA>) {
         let gas_limit = self.resolve_gas_limit_with_leftover();
 
         let _ = SendRawWrapper::<SA>::new().direct_egld_execute(
-            &self.basic.to,
-            &self.egld_payment,
+            &self.to,
+            &egld_payment,
             gas_limit,
-            &self.basic.endpoint_name,
-            &self.basic.arg_buffer,
+            &self.endpoint_name,
+            &self.arg_buffer,
         );
     }
 
-    pub(super) fn single_transfer_execute(self) {
+    pub(super) fn transfer_execute_single_esdt(self, payment: EsdtTokenPayment<SA>) {
         let gas_limit = self.resolve_gas_limit_with_leftover();
-        let payment = &self.payments.try_get(0).unwrap();
 
-        if self.egld_payment > 0 {
-            let _ = SendRawWrapper::<SA>::new().direct_egld_execute(
-                &self.basic.to,
-                &self.egld_payment,
-                gas_limit,
-                &self.basic.endpoint_name,
-                &self.basic.arg_buffer,
-            );
-        } else if payment.token_nonce == 0 {
+        if payment.token_nonce == 0 {
             // fungible ESDT
             let _ = SendRawWrapper::<SA>::new().transfer_esdt_execute(
-                &self.basic.to,
+                &self.to,
                 &payment.token_identifier,
                 &payment.amount,
                 gas_limit,
-                &self.basic.endpoint_name,
-                &self.basic.arg_buffer,
+                &self.endpoint_name,
+                &self.arg_buffer,
             );
         } else {
             // non-fungible/semi-fungible ESDT
             let _ = SendRawWrapper::<SA>::new().transfer_esdt_nft_execute(
-                &self.basic.to,
+                &self.to,
                 &payment.token_identifier,
                 payment.token_nonce,
                 &payment.amount,
                 gas_limit,
-                &self.basic.endpoint_name,
-                &self.basic.arg_buffer,
+                &self.endpoint_name,
+                &self.arg_buffer,
             );
         }
     }
 
-    pub(super) fn multi_transfer_execute(self) {
+    pub(super) fn transfer_execute_multi_esdt(
+        self,
+        payments: ManagedVec<SA, EsdtTokenPayment<SA>>,
+    ) {
         let gas_limit = self.resolve_gas_limit_with_leftover();
         let _ = SendRawWrapper::<SA>::new().multi_esdt_transfer_execute(
-            &self.basic.to,
-            &self.payments,
+            &self.to,
+            &payments,
             gas_limit,
-            &self.basic.endpoint_name,
-            &self.basic.arg_buffer,
+            &self.endpoint_name,
+            &self.arg_buffer,
         );
     }
 }

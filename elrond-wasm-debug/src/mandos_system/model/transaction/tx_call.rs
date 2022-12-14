@@ -2,7 +2,7 @@ use crate::{
     mandos_system::model::{AddressValue, BigUintValue, BytesValue, U64Value},
     DebugApi,
 };
-use elrond_wasm::types::{ContractCall, ContractCallFull, EsdtTokenPayment};
+use elrond_wasm::types::{ContractCall, ContractCallWithEgld, EsdtTokenPayment};
 use mandos::{
     interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
     serde_raw::TxCallRaw,
@@ -70,11 +70,13 @@ impl IntoRaw<TxCallRaw> for TxCall {
 }
 
 impl TxCall {
-    pub fn to_contract_call(&self) -> ContractCallFull<DebugApi, ()> {
-        let mut contract_call = ContractCallFull::new(
+    pub fn to_contract_call(&self) -> ContractCallWithEgld<DebugApi, ()> {
+        let mut contract_call = ContractCallWithEgld::new(
             (&self.to.value).into(),
             self.function.as_bytes(),
             (&self.egld_value.value).into(),
+        )
+        .convert_to_esdt_transfer_call(
             self.esdt_value
                 .iter()
                 .map(|esdt| {

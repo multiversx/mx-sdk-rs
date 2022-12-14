@@ -144,7 +144,7 @@ pub(super) fn process_contract_call<CC>(contract_call: CC) -> (String, String, V
 where
     CC: ContractCall<DebugApi>,
 {
-    let full_cc = contract_call.into_contract_call_full();
+    let full_cc = contract_call.into_normalized();
     let to_str = format!(
         "0x{}",
         hex::encode(full_cc.basic.to.to_address().as_bytes())

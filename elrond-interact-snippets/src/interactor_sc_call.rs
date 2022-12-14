@@ -3,14 +3,14 @@ use elrond_sdk_erdrs::data::transaction::Transaction;
 use elrond_wasm_debug::{
     elrond_wasm::{
         elrond_codec::{multi_types::IgnoreValue, CodecFrom, TopEncodeMulti},
-        types::ContractCallFull,
+        types::ContractCallWithEgld,
     },
     mandos_system::model::{ScCallStep, TransferStep, TxCall, TypedScCall},
     DebugApi,
 };
 use log::info;
 
-fn contract_call_to_tx_data(contract_call: &ContractCallFull<DebugApi, ()>) -> String {
+fn contract_call_to_tx_data(contract_call: &ContractCallWithEgld<DebugApi, ()>) -> String {
     let mut result = String::from_utf8(
         contract_call
             .basic
@@ -28,7 +28,7 @@ fn contract_call_to_tx_data(contract_call: &ContractCallFull<DebugApi, ()>) -> S
 
 impl Interactor {
     fn tx_call_to_blockchain_tx(&self, tx_call: &TxCall) -> Transaction {
-        let contract_call = tx_call.to_contract_call().convert_to_esdt_transfer_call();
+        let contract_call = tx_call.to_contract_call();
         let contract_call_tx_data = contract_call_to_tx_data(&contract_call);
         let data = if contract_call_tx_data.is_empty() {
             None

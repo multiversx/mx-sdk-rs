@@ -15,7 +15,7 @@ impl Interactor {
         CC: ContractCall<DebugApi>,
         RequestedResult: CodecFrom<CC::OriginalResult>,
     {
-        let full_cc = contract_call.into_contract_call_full();
+        let full_cc = contract_call.into_normalized();
         let sc_address = address_h256_to_erdrs(&full_cc.basic.to.to_address());
         let req = VmValueRequest {
             sc_address: sc_address.clone(),
