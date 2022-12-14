@@ -19,12 +19,13 @@ where
     pub(super) egld_payment: BigUint<SA>,
 }
 
-impl<SA, OriginalResult> ContractCallTrait<SA, OriginalResult>
-    for ContractCallWithEgld<SA, OriginalResult>
+impl<SA, OriginalResult> ContractCallTrait<SA> for ContractCallWithEgld<SA, OriginalResult>
 where
     SA: CallTypeApi + 'static,
     OriginalResult: TopEncodeMulti,
 {
+    type OriginalResult = OriginalResult;
+
     fn into_contract_call_full(self) -> ContractCallFull<SA, OriginalResult> {
         ContractCallFull {
             basic: self.basic,

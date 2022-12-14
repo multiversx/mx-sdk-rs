@@ -19,12 +19,13 @@ where
     pub(super) payments: ManagedVec<SA, EsdtTokenPayment<SA>>,
 }
 
-impl<SA, OriginalResult> ContractCallTrait<SA, OriginalResult>
-    for ContractCallWithMultiEsdt<SA, OriginalResult>
+impl<SA, OriginalResult> ContractCallTrait<SA> for ContractCallWithMultiEsdt<SA, OriginalResult>
 where
     SA: CallTypeApi + 'static,
     OriginalResult: TopEncodeMulti,
 {
+    type OriginalResult = OriginalResult;
+
     fn into_contract_call_full(self) -> ContractCallFull<SA, OriginalResult> {
         ContractCallFull {
             basic: self.basic,

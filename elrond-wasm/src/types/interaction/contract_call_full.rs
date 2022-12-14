@@ -22,17 +22,18 @@ pub struct ContractCallFull<SA, OriginalResult>
 where
     SA: CallTypeApi + 'static,
 {
-    pub(super) basic: ContractCallNoPayment<SA, OriginalResult>,
-    pub(super) egld_payment: BigUint<SA>,
-    pub(super) payments: ManagedVec<SA, EsdtTokenPayment<SA>>,
+    pub basic: ContractCallNoPayment<SA, OriginalResult>,
+    pub egld_payment: BigUint<SA>,
+    pub payments: ManagedVec<SA, EsdtTokenPayment<SA>>,
 }
 
-impl<SA, OriginalResult> ContractCallTrait<SA, OriginalResult>
-    for ContractCallFull<SA, OriginalResult>
+impl<SA, OriginalResult> ContractCallTrait<SA> for ContractCallFull<SA, OriginalResult>
 where
     SA: CallTypeApi + 'static,
     OriginalResult: TopEncodeMulti,
 {
+    type OriginalResult = OriginalResult;
+
     fn into_contract_call_full(self) -> ContractCallFull<SA, OriginalResult> {
         self
     }

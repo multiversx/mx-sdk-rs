@@ -24,7 +24,7 @@ pub use callback_selector_result::CallbackSelectorResult;
 pub use contract_call::ContractCall;
 pub use contract_call_no_payment::ContractCallNoPayment;
 pub use contract_call_trait::ContractCallTrait;
+pub use contract_call_with_egld::ContractCallWithEgld;
 pub use contract_call_with_egld_or_single_esdt::ContractCallWithEgldOrSingleEsdt;
 pub use contract_call_with_multi_esdt::ContractCallWithMultiEsdt;
 pub use contract_deploy::{new_contract_deploy, ContractDeploy};
-pub use contract_call_with_egld::ContractCallWithEgld;

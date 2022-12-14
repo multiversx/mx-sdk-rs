@@ -33,12 +33,13 @@ where
     pub(super) _return_type: PhantomData<OriginalResult>,
 }
 
-impl<SA, OriginalResult> ContractCallTrait<SA, OriginalResult>
-    for ContractCallNoPayment<SA, OriginalResult>
+impl<SA, OriginalResult> ContractCallTrait<SA> for ContractCallNoPayment<SA, OriginalResult>
 where
     SA: CallTypeApi + 'static,
     OriginalResult: TopEncodeMulti,
 {
+    type OriginalResult = OriginalResult;
+
     fn into_contract_call_full(self) -> ContractCallFull<SA, OriginalResult> {
         ContractCallFull {
             basic: self,

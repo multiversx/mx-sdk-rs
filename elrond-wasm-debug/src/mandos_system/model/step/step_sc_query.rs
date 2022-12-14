@@ -1,6 +1,6 @@
 use elrond_wasm::{
     elrond_codec::{CodecFrom, TopEncodeMulti},
-    types::ContractCall,
+    types::ContractCallTrait,
 };
 
 use crate::{
@@ -51,10 +51,10 @@ impl ScQueryStep {
     /// - "to"
     /// - "function"
     /// - "arguments"
-    pub fn call<OriginalResult>(
-        mut self,
-        contract_call: ContractCall<DebugApi, OriginalResult>,
-    ) -> Self {
+    pub fn call<CC>(mut self, contract_call: CC) -> Self
+    where
+        CC: ContractCallTrait<DebugApi>,
+    {
         let (to_str, function, mandos_args) = process_contract_call(contract_call);
         self = self.to(to_str.as_str());
         self = self.function(function.as_str());
@@ -71,14 +71,14 @@ impl ScQueryStep {
     /// - "expect"
     ///     - "out"
     ///     - "status" set to 0
-    pub fn call_expect<OriginalResult, ExpectedResult>(
+    pub fn call_expect<CC, ExpectedResult>(
         mut self,
-        contract_call: ContractCall<DebugApi, OriginalResult>,
+        contract_call: CC,
         expect_value: ExpectedResult,
     ) -> Self
     where
-        OriginalResult: TopEncodeMulti,
-        ExpectedResult: CodecFrom<OriginalResult> + TopEncodeMulti,
+        CC: ContractCallTrait<DebugApi>,
+        ExpectedResult: CodecFrom<CC::OriginalResult> + TopEncodeMulti,
     {
         self = self.call(contract_call);
         self = self.expect(format_expect(expect_value));

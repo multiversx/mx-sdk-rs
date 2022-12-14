@@ -9,15 +9,16 @@ use crate::{
 
 use super::{contract_call_full::ContractCallFull, AsyncCall, ContractCallNoPayment};
 
-pub trait ContractCallTrait<SA, OriginalResult>: Sized
+pub trait ContractCallTrait<SA>: Sized
 where
     SA: CallTypeApi + 'static,
-    OriginalResult: TopEncodeMulti,
 {
-    #[doc(hidden)]
-    fn into_contract_call_full(self) -> ContractCallFull<SA, OriginalResult>;
+    type OriginalResult: TopEncodeMulti;
 
-    fn get_mut_basic(&mut self) -> &mut ContractCallNoPayment<SA, OriginalResult>;
+    #[doc(hidden)]
+    fn into_contract_call_full(self) -> ContractCallFull<SA, Self::OriginalResult>;
+
+    fn get_mut_basic(&mut self) -> &mut ContractCallNoPayment<SA, Self::OriginalResult>;
 
     #[inline]
     fn with_gas_limit(mut self, gas_limit: u64) -> Self {

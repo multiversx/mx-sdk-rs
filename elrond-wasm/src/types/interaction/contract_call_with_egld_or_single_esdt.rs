@@ -22,12 +22,14 @@ where
     pub(super) payment: EgldOrEsdtTokenPayment<SA>,
 }
 
-impl<SA, OriginalResult> ContractCallTrait<SA, OriginalResult>
+impl<SA, OriginalResult> ContractCallTrait<SA>
     for ContractCallWithEgldOrSingleEsdt<SA, OriginalResult>
 where
     SA: CallTypeApi + 'static,
     OriginalResult: TopEncodeMulti,
 {
+    type OriginalResult = OriginalResult;
+
     fn into_contract_call_full(self) -> ContractCallFull<SA, OriginalResult> {
         if self.payment.token_identifier.is_egld() {
             ContractCallFull {
