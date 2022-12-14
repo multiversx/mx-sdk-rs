@@ -6,6 +6,9 @@ use crate::{
 
 use super::{AsyncCall, ContractCallNoPayment, ContractCallWithEgld, ManagedArgBuffer};
 
+/// Defines a contract call object, which is the basis for all calls to other contracts.
+/// 
+/// Its implementations differ on the type of payment that gets sent with the call.
 pub trait ContractCall<SA>: Sized
 where
     SA: CallTypeApi + 'static,
@@ -21,6 +24,7 @@ where
     #[doc(hidden)]
     fn get_mut_basic(&mut self) -> &mut ContractCallNoPayment<SA, Self::OriginalResult>;
 
+    /// Used by the generated proxies to add arguments to a call.
     #[doc(hidden)]
     fn proxy_arg<T: TopEncodeMulti>(&mut self, endpoint_arg: &T) {
         let h = ExitCodecErrorHandler::<SA>::from(err_msg::CONTRACT_CALL_ENCODE_ERROR);
@@ -31,16 +35,17 @@ where
     /// For cases where we build the contract call by hand.
     ///
     /// No serialization occurs, just direct conversion to ManagedBuffer.
-    fn push_raw_arg<RawArg: Into<ManagedBuffer<SA>>>(&mut self, raw_arg: RawArg) {
+    fn push_raw_argument<RawArg: Into<ManagedBuffer<SA>>>(&mut self, raw_arg: RawArg) {
         self.get_mut_basic().arg_buffer.push_arg_raw(raw_arg.into())
     }
 
     /// For cases where we build the contract call by hand.
-    fn with_arguments_raw(mut self, raw_argument_buffer: ManagedArgBuffer<SA>) -> Self {
+    fn with_raw_arguments(mut self, raw_argument_buffer: ManagedArgBuffer<SA>) -> Self {
         self.get_mut_basic().arg_buffer = raw_argument_buffer;
         self
     }
 
+    /// Sets an explicit gas limit to the call.
     #[inline]
     fn with_gas_limit(mut self, gas_limit: u64) -> Self {
         self.get_mut_basic().explicit_gas_limit = gas_limit;
@@ -74,7 +79,7 @@ where
     ///
     /// The result (if any) is ignored.
     ///
-    /// Deprecated and will be removed soon. Use `let _: IgnoreValue = contract_call.execute_on_dest_context(...)` instead.
+    /// Deprecated and will be removed soon. Use `execute_on_dest_context::<IgnoreValue>(...)` instead.
     #[deprecated(
         since = "0.36.1",
         note = "Redundant method, use `let _: IgnoreValue = contract_call.execute_on_dest_context(...)` instead"
@@ -96,7 +101,7 @@ where
 
     /// Executes immediately, synchronously, and returns contract call result.
     ///
-    /// Performs call on the same context, i.e. the target contract will operate with the data drom this contract.    
+    /// Performs call on the same context, i.e. the target contract will operate with the data from this contract.    
     #[inline]
     fn execute_on_same_context<RequestedResult>(self) -> RequestedResult
     where

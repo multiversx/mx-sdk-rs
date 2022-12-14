@@ -90,7 +90,7 @@ impl TxCall {
         );
 
         for argument in &self.arguments {
-            contract_call.push_raw_arg(argument.value.as_slice());
+            contract_call.push_raw_argument(argument.value.as_slice());
         }
         contract_call
     }

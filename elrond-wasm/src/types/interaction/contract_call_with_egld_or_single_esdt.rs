@@ -9,6 +9,9 @@ use crate::{
 
 use super::{contract_call_no_payment::ContractCallNoPayment, ContractCall, ContractCallWithEgld};
 
+/// Holds data for calling another contract, with a single payment, either EGLD or a single ESDT token.
+/// 
+/// Gets created when chaining method `with_egld_or_single_esdt_transfer`.
 #[must_use]
 pub struct ContractCallWithEgldOrSingleEsdt<SA, OriginalResult>
 where
@@ -74,6 +77,11 @@ where
     SA: CallTypeApi + 'static,
     OriginalResult: TopEncodeMulti,
 {
+    /// Creates a new instance directly.
+    ///
+    /// The constructor is mostly for hand-written proxies,
+    /// the usual way of constructing this object is via the builder methods of other contract call types,
+    /// especially `with_egld_or_single_esdt_transfer`.
     pub fn new<N: Into<ManagedBuffer<SA>>>(
         to: ManagedAddress<SA>,
         endpoint_name: N,

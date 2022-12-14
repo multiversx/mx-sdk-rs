@@ -388,7 +388,7 @@ where
         contract_call.proxy_arg(address);
         for role in roles_iter {
             if role != EsdtLocalRole::None {
-                contract_call.push_raw_arg(role.as_role_name());
+                contract_call.push_raw_argument(role.as_role_name());
             }
         }
 
@@ -411,7 +411,7 @@ where
         contract_call.proxy_arg(address);
         for role in roles_iter {
             if role != EsdtLocalRole::None {
-                contract_call.push_raw_arg(role.as_role_name());
+                contract_call.push_raw_argument(role.as_role_name());
             }
         }
 
@@ -486,8 +486,8 @@ where
     SA: CallTypeApi + 'static,
     CC: ContractCall<SA>,
 {
-    contract_call.push_raw_arg(name);
-    contract_call.push_raw_arg(bool_name_bytes(value));
+    contract_call.push_raw_argument(name);
+    contract_call.push_raw_argument(bool_name_bytes(value));
 }
 
 fn append_token_property_arguments<SA, CC>(

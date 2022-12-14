@@ -43,7 +43,7 @@ pub trait ForwarderRaw {
     ) -> ContractCallWithEgldOrSingleEsdt<Self::Api, ()> {
         self.send()
             .contract_call(to, endpoint_name)
-            .with_arguments_raw(args.to_arg_buffer())
+            .with_raw_arguments(args.to_arg_buffer())
             .with_egld_or_single_esdt_transfer((payment_token, 0, payment_amount))
     }
 

@@ -50,7 +50,7 @@ pub trait TransferRoleProxyModule {
     ) -> ! {
         let contract_call =
             ContractCallWithMultiEsdt::<Self::Api, ()>::new(dest, endpoint_name, payments.clone())
-                .with_arguments_raw(args);
+                .with_raw_arguments(args);
 
         self.execute_async_call(
             original_caller,

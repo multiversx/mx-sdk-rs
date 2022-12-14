@@ -51,6 +51,11 @@ impl<SA, OriginalResult> ContractCallWithMultiEsdt<SA, OriginalResult>
 where
     SA: CallTypeApi + 'static,
 {
+    /// Creates a new instance directly.
+    ///
+    /// The constructor is mostly for hand-written proxies,
+    /// the usual way of constructing this object is via the builder methods of other contract call types,
+    /// especially `with_esdt_transfer` or `with_multi_token_transfer`.
     pub fn new<N: Into<ManagedBuffer<SA>>>(
         to: ManagedAddress<SA>,
         endpoint_name: N,
