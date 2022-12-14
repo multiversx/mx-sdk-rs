@@ -18,12 +18,12 @@ pub trait CallPromisesModule {
     #[endpoint]
     #[payable("*")]
     fn forward_promise_accept_funds(&self, to: ManagedAddress) {
-        let (token, token_nonce, payment) = self.call_value().egld_or_single_esdt().into_tuple();
+        let payment = self.call_value().egld_or_single_esdt();
         let gas_limit = self.blockchain().get_gas_left() / 2;
         self.vault_proxy()
             .contract(to)
             .accept_funds()
-            .with_egld_or_single_esdt_token_transfer(token, token_nonce, payment)
+            .with_egld_or_single_esdt_transfer(payment)
             .with_gas_limit(gas_limit)
             .async_call_promise()
             .register_promise()

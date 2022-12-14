@@ -4,6 +4,7 @@ mod async_call_promises;
 mod callback_closure;
 mod callback_selector_result;
 mod contract_call;
+mod contract_call_deprecated;
 mod contract_deploy;
 
 pub use arg_buffer_managed::ManagedArgBuffer;

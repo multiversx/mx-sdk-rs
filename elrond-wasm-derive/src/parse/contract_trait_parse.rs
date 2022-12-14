@@ -4,9 +4,8 @@ use super::{
 };
 use crate::{
     model::{ContractTrait, Method, Supertrait, TraitProperties},
-    parse::process_trait_arguments,
+    parse::{is_contract_base, process_trait_arguments},
 };
-use crate::parse::is_contract_base;
 
 pub fn parse_contract_trait(
     args: syn::AttributeArgs,

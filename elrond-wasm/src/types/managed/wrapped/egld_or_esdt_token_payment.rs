@@ -48,6 +48,16 @@ impl<M: ManagedTypeApi> EgldOrEsdtTokenPayment<M> {
     }
 }
 
+impl<M: ManagedTypeApi> From<(EgldOrEsdtTokenIdentifier<M>, u64, BigUint<M>)>
+    for EgldOrEsdtTokenPayment<M>
+{
+    #[inline]
+    fn from(value: (EgldOrEsdtTokenIdentifier<M>, u64, BigUint<M>)) -> Self {
+        let (token_identifier, token_nonce, amount) = value;
+        Self::new(token_identifier, token_nonce, amount)
+    }
+}
+
 impl<M: ManagedTypeApi> From<EsdtTokenPayment<M>> for EgldOrEsdtTokenPayment<M> {
     fn from(esdt_payment: EsdtTokenPayment<M>) -> Self {
         EgldOrEsdtTokenPayment {

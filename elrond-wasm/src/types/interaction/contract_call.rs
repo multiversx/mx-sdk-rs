@@ -2,15 +2,15 @@ use elrond_codec::{TopDecodeMulti, TopEncodeMulti};
 
 use crate::{
     api::{
-        BlockchainApiImpl, CallTypeApi, ESDT_MULTI_TRANSFER_FUNC_NAME, ESDT_NFT_TRANSFER_FUNC_NAME,
-        ESDT_TRANSFER_FUNC_NAME,
+        BlockchainApiImpl, CallTypeApi, ESDT_MULTI_TRANSFER_FUNC_NAME,
+        ESDT_NFT_TRANSFER_FUNC_NAME, ESDT_TRANSFER_FUNC_NAME,
     },
     contract_base::{BlockchainWrapper, ExitCodecErrorHandler, SendRawWrapper},
     err_msg,
     io::{ArgErrorHandler, ArgId, ManagedResultArgLoader},
     types::{
-        AsyncCall, BigUint, EgldOrEsdtTokenIdentifier, EsdtTokenPayment, ManagedAddress,
-        ManagedArgBuffer, ManagedBuffer, ManagedVec, TokenIdentifier,
+        AsyncCall, BigUint, EgldOrEsdtTokenPayment, EsdtTokenPayment, ManagedAddress,
+        ManagedArgBuffer, ManagedBuffer, ManagedVec,
     },
 };
 use core::marker::PhantomData;
@@ -83,40 +83,38 @@ where
         }
     }
 
-    pub fn add_esdt_token_transfer(
-        mut self,
-        payment_token: TokenIdentifier<SA>,
-        payment_nonce: u64,
-        payment_amount: BigUint<SA>,
-    ) -> Self {
-        self.payments.push(EsdtTokenPayment::new(
-            payment_token,
-            payment_nonce,
-            payment_amount,
-        ));
+    /// Adds a single ESDT token transfer to a contract call.
+    ///
+    /// Can be called multiple times on the same call.
+    pub fn with_esdt_transfer<P: Into<EsdtTokenPayment<SA>>>(mut self, payment: P) -> Self {
+        self.payments.push(payment.into());
         self
     }
 
-    pub fn with_egld_or_single_esdt_token_transfer(
+    /// Sets payment to be either EGLD or a single ESDT transfer, as determined at runtime.
+    pub fn with_egld_or_single_esdt_transfer<P: Into<EgldOrEsdtTokenPayment<SA>>>(
         self,
-        payment_token: EgldOrEsdtTokenIdentifier<SA>,
-        payment_nonce: u64,
-        payment_amount: BigUint<SA>,
+        payment: P,
     ) -> Self {
-        if payment_token.is_egld() {
-            self.with_egld_transfer(payment_amount)
+        let payment_cast = payment.into();
+        if payment_cast.token_identifier.is_egld() {
+            self.with_egld_transfer(payment_cast.amount)
         } else {
-            self.add_esdt_token_transfer(payment_token.unwrap_esdt(), payment_nonce, payment_amount)
+            self.with_esdt_transfer((
+                payment_cast.token_identifier.unwrap_esdt(),
+                payment_cast.token_nonce,
+                payment_cast.amount,
+            ))
         }
     }
 
+    /// Sets payment to be EGLD transfer.
     pub fn with_egld_transfer(mut self, egld_amount: BigUint<SA>) -> Self {
-        self.payments.clear();
         self.egld_payment = egld_amount;
-
         self
     }
 
+    /// Sets payment to be a (potentially) multi-token transfer.
     #[inline]
     pub fn with_multi_token_transfer(
         mut self,
@@ -378,28 +376,6 @@ impl<SA, OriginalResult> ContractCall<SA, OriginalResult>
 where
     SA: CallTypeApi + 'static,
 {
-    /// Executes immediately, synchronously.
-    ///
-    /// The result (if any) is ignored.
-    ///
-    /// Deprecated and will be removed soon. Use `let _: IgnoreValue = contract_call.execute_on_dest_context(...)` instead.
-    #[deprecated(
-        since = "0.36.1",
-        note = "Redundant method, use `let _: IgnoreValue = contract_call.execute_on_dest_context(...)` instead"
-    )]
-    pub fn execute_on_dest_context_ignore_result(mut self) {
-        self = self.convert_to_esdt_transfer_call();
-        let _ = SendRawWrapper::<SA>::new().execute_on_dest_context_raw(
-            self.resolve_gas_limit(),
-            &self.to,
-            &self.egld_payment,
-            &self.endpoint_name,
-            &self.arg_buffer,
-        );
-
-        SendRawWrapper::<SA>::new().clean_return_data();
-    }
-
     fn resolve_gas_limit_with_leftover(&self) -> u64 {
         if self.explicit_gas_limit == UNSPECIFIED_GAS_LIMIT {
             let mut gas_left = SA::blockchain_api_impl().get_gas_left();
