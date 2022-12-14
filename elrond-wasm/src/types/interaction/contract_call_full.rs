@@ -8,7 +8,7 @@ use crate::{
         ESDT_TRANSFER_FUNC_NAME,
     },
     contract_base::{BlockchainWrapper, SendRawWrapper},
-    types::{BigUint, EsdtTokenPayment, ManagedVec},
+    types::{BigUint, EsdtTokenPayment, ManagedAddress, ManagedBuffer, ManagedVec},
 };
 
 use super::{
@@ -48,13 +48,26 @@ impl<SA, OriginalResult> ContractCallFull<SA, OriginalResult>
 where
     SA: CallTypeApi + 'static,
 {
+    pub fn new<N: Into<ManagedBuffer<SA>>>(
+        to: ManagedAddress<SA>,
+        endpoint_name: N,
+        egld_payment: BigUint<SA>,
+        esdt_payments: ManagedVec<SA, EsdtTokenPayment<SA>>,
+    ) -> Self {
+        ContractCallFull {
+            basic: ContractCallNoPayment::new(to, endpoint_name),
+            egld_payment,
+            payments: esdt_payments,
+        }
+    }
+
     fn no_payments(&self) -> ManagedVec<SA, EsdtTokenPayment<SA>> {
         ManagedVec::new()
     }
 
     /// If this is an ESDT call, it converts it to a regular call to ESDTTransfer.
     /// Async calls require this step, but not `transfer_esdt_execute`.
-    pub(super) fn convert_to_esdt_transfer_call(self) -> Self {
+    pub fn convert_to_esdt_transfer_call(self) -> Self {
         match self.payments.len() {
             0 => self,
             1 => self.convert_to_single_transfer_esdt_call(),
