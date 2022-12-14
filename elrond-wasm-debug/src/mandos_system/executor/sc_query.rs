@@ -69,13 +69,10 @@ impl BlockchainMock {
     /// Meant to be used for the test to investigate the state of the contract.
     ///
     /// Use `mandos_sc_query` to embed the SC query in the resulting mandos.
-    pub fn quick_query<OriginalResult, RequestedResult>(
-        &mut self,
-        contract_call: ContractCall<DebugApi, OriginalResult>,
-    ) -> RequestedResult
+    pub fn quick_query<CC, RequestedResult>(&mut self, contract_call: CC) -> RequestedResult
     where
-        OriginalResult: TopEncodeMulti,
-        RequestedResult: CodecFrom<OriginalResult>,
+        CC: ContractCall<DebugApi>,
+        RequestedResult: CodecFrom<CC::OriginalResult>,
     {
         let sc_query_step = ScQueryStep::new().call(contract_call);
         let tx_result = self.with_borrowed(|state| execute(state, &sc_query_step));

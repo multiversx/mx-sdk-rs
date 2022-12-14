@@ -67,8 +67,6 @@ pub fn generate_proxy_method_sig(
 }
 
 pub fn generate_proxy_endpoint(m: &Method, endpoint_name: String) -> proc_macro2::TokenStream {
-    let msig = generate_proxy_method_sig(m, quote! { elrond_wasm::types::ContractCall });
-
     let mut token_count = 0;
     let mut token_expr =
         quote! { elrond_wasm::types::EgldOrEsdtTokenIdentifier::<Self::Api>::egld() };
@@ -80,46 +78,38 @@ pub fn generate_proxy_endpoint(m: &Method, endpoint_name: String) -> proc_macro2
     let mut multi_expr =
         quote! { elrond_wasm::types::ManagedVec::<Self::Api, EsdtTokenPayment<Self::Api>>::new() };
 
-    let arg_push_snippets: Vec<proc_macro2::TokenStream> = m
-        .method_args
-        .iter()
-        .map(|arg| match &arg.metadata.payment {
+    let mut arg_push_snippets = Vec::<proc_macro2::TokenStream>::new();
+
+    for arg in &m.method_args {
+        match &arg.metadata.payment {
             ArgPaymentMetadata::NotPayment => {
                 let pat = &arg.pat;
-                quote! {
-                    ___contract_call___.push_endpoint_arg(&#pat);
-                }
+                arg_push_snippets.push(quote! {
+                    elrond_wasm::types::ContractCall::proxy_arg(&mut ___contract_call___, &#pat);
+                });
             },
             ArgPaymentMetadata::PaymentToken => {
                 token_count += 1;
                 let pat = &arg.pat;
                 token_expr = quote! { #pat };
-
-                quote! {}
             },
             ArgPaymentMetadata::PaymentNonce => {
                 nonce_count += 1;
                 let pat = &arg.pat;
                 nonce_expr = quote! { #pat };
-
-                quote! {}
             },
             ArgPaymentMetadata::PaymentAmount => {
                 payment_count += 1;
                 let pat = &arg.pat;
                 payment_expr = quote! { #pat };
-
-                quote! {}
             },
             ArgPaymentMetadata::PaymentMulti => {
                 multi_count += 1;
                 let pat = &arg.pat;
                 multi_expr = quote! { #pat };
-
-                quote! {}
             },
-        })
-        .collect();
+        }
+    }
 
     assert!(
         payment_count <= 1,
@@ -138,35 +128,59 @@ pub fn generate_proxy_endpoint(m: &Method, endpoint_name: String) -> proc_macro2
         "No more than one payment multi argument allowed in call proxy"
     );
 
-    let single_payment_snippet = if token_count > 0 || nonce_count > 0 || payment_count > 0 {
-        quote! {
-            ___contract_call___ = ___contract_call___.with_egld_or_single_esdt_transfer((#token_expr, #nonce_expr, #payment_expr));
-        }
-    } else {
-        quote! {}
-    };
-    let multiple_payment_snippet = if multi_count > 0 {
-        quote! {
-            ___contract_call___ = ___contract_call___.with_multi_token_transfer(#multi_expr);
-        }
-    } else {
-        quote! {}
-    };
+    let contract_call_type;
+    let contract_call_init;
+    if token_count > 0 || nonce_count > 0 || payment_count > 0 {
+        assert!(multi_count == 0, "#[payment_multi] cannot coexist with any other payment annotation in the same endpoint");
 
-    let endpoint_name_literal = byte_str_slice_literal(endpoint_name.as_bytes());
+        if token_count == 0 && nonce_count == 0 {
+            contract_call_type = quote! { elrond_wasm::types::ContractCallWithEgld };
+            contract_call_init = quote! {
+                let mut ___contract_call___ = elrond_wasm::types::ContractCallWithEgld::new(
+                    ___address___,
+                    #endpoint_name,
+                    #payment_expr,
+                );
+            };
+        } else {
+            contract_call_type = quote! { elrond_wasm::types::ContractCallWithEgldOrSingleEsdt };
+            contract_call_init = quote! {
+                let mut ___contract_call___ = elrond_wasm::types::ContractCallWithEgldOrSingleEsdt::new(
+                    ___address___,
+                    #endpoint_name,
+                    #token_expr,
+                    #nonce_expr,
+                    #payment_expr,
+                );
+            };
+        }
+    } else if multi_count > 0 {
+        contract_call_type = quote! { elrond_wasm::types::ContractCallWithMultiEsdt };
+        contract_call_init = quote! {
+            let mut ___contract_call___ = elrond_wasm::types::ContractCallWithMultiEsdt::new(
+                ___address___,
+                #endpoint_name,
+                #multi_expr,
+            );
+        };
+    } else {
+        contract_call_type = quote! { elrond_wasm::types::ContractCallNoPayment };
+        contract_call_init = quote! {
+            let mut ___contract_call___ = elrond_wasm::types::ContractCallNoPayment::new(
+                ___address___,
+                #endpoint_name,
+            );
+        };
+    }
+
+    let msig = generate_proxy_method_sig(m, contract_call_type);
 
     let sig = quote! {
         #[allow(clippy::too_many_arguments)]
         #[allow(clippy::type_complexity)]
         #msig {
             let ___address___ = self.extract_address();
-            let mut ___contract_call___ = elrond_wasm::types::new_contract_call(
-                ___address___,
-                #endpoint_name_literal,
-                ManagedVec::<Self::Api, EsdtTokenPayment<Self::Api>>::new(),
-            );
-            #single_payment_snippet
-            #multiple_payment_snippet
+            #contract_call_init
             #(#arg_push_snippets)*
             ___contract_call___
         }

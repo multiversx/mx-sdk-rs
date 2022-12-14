@@ -99,13 +99,11 @@ mod module_1 {
     }
 
     pub trait ProxyTrait: elrond_wasm::contract_base::ProxyObjBase + Sized {
-        fn version(&mut self) -> ContractCall<Self::Api, BigInt<Self::Api>> {
+        fn version(
+            &mut self,
+        ) -> elrond_wasm::types::ContractCallNoPayment<Self::Api, BigInt<Self::Api>> {
             let ___address___ = self.extract_address();
-            elrond_wasm::types::new_contract_call(
-                ___address___,
-                &b"version"[..],
-                ManagedVec::<Self::Api, EsdtTokenPayment<Self::Api>>::new(),
-            )
+            elrond_wasm::types::ContractCallNoPayment::new(___address___, "version")
         }
     }
 }
@@ -237,22 +235,20 @@ mod sample_adder {
     pub trait ProxyTrait:
         elrond_wasm::contract_base::ProxyObjBase + super::module_1::ProxyTrait
     {
-        fn get_sum(&mut self) -> elrond_wasm::types::ContractCall<Self::Api, BigInt<Self::Api>> {
+        fn get_sum(
+            &mut self,
+        ) -> elrond_wasm::types::ContractCallNoPayment<Self::Api, BigInt<Self::Api>> {
             let ___address___ = self.extract_address();
-            elrond_wasm::types::new_contract_call(
-                ___address___,
-                &b"get_sum"[..],
-                ManagedVec::<Self::Api, EsdtTokenPayment<Self::Api>>::new(),
-            )
+            elrond_wasm::types::ContractCallNoPayment::new(___address___, "get_sum")
         }
-        fn add(&mut self, amount: &BigInt<Self::Api>) -> ContractCall<Self::Api, ()> {
+        fn add(
+            &mut self,
+            amount: &BigInt<Self::Api>,
+        ) -> elrond_wasm::types::ContractCallNoPayment<Self::Api, ()> {
             let ___address___ = self.extract_address();
-            let mut ___contract_call___ = elrond_wasm::types::new_contract_call(
-                ___address___,
-                &b"add"[..],
-                ManagedVec::<Self::Api, EsdtTokenPayment<Self::Api>>::new(),
-            );
-            ___contract_call___.push_endpoint_arg(amount);
+            let mut ___contract_call___ =
+                elrond_wasm::types::ContractCallNoPayment::new(___address___, "add");
+            elrond_wasm::types::ContractCall::proxy_arg(&mut ___contract_call___, amount);
             ___contract_call___
         }
     }

@@ -43,6 +43,15 @@ impl<M: ManagedTypeApi> EgldOrEsdtTokenPayment<M> {
         }
     }
 
+    /// Will convert to just ESDT or terminate execution if the token is EGLD.
+    pub fn unwrap_esdt(self) -> EsdtTokenPayment<M> {
+        EsdtTokenPayment::new(
+            self.token_identifier.unwrap_esdt(),
+            self.token_nonce,
+            self.amount,
+        )
+    }
+
     pub fn into_tuple(self) -> (EgldOrEsdtTokenIdentifier<M>, u64, BigUint<M>) {
         (self.token_identifier, self.token_nonce, self.amount)
     }

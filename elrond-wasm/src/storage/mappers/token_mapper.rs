@@ -5,8 +5,8 @@ use crate::{
     storage::StorageKey,
     storage_get, storage_get_len, storage_set,
     types::{
-        CallbackClosure, EsdtLocalRole, EsdtTokenPayment, ManagedAddress, ManagedRef, ManagedVec,
-        TokenIdentifier,
+        CallbackClosure, ContractCall, EsdtLocalRole, EsdtTokenPayment, ManagedAddress, ManagedRef,
+        ManagedVec, TokenIdentifier,
     },
 };
 
@@ -86,7 +86,7 @@ where
             async_call = async_call.with_callback(cb);
         }
 
-        async_call.call_and_exit();
+        async_call.call_and_exit()
     }
 
     fn get_sc_address() -> ManagedAddress<SA> {

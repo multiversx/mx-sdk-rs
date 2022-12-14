@@ -3,17 +3,23 @@ use elrond_sdk_erdrs::data::transaction::Transaction;
 use elrond_wasm_debug::{
     elrond_wasm::{
         elrond_codec::{multi_types::IgnoreValue, CodecFrom, TopEncodeMulti},
-        types::ContractCall,
+        types::ContractCallWithEgld,
     },
     mandos_system::model::{ScCallStep, TransferStep, TxCall, TypedScCall},
     DebugApi,
 };
 use log::info;
 
-fn contract_call_to_tx_data(contract_call: &ContractCall<DebugApi, ()>) -> String {
-    let mut result =
-        String::from_utf8(contract_call.endpoint_name.to_boxed_bytes().into_vec()).unwrap();
-    for argument in contract_call.arg_buffer.raw_arg_iter() {
+fn contract_call_to_tx_data(contract_call: &ContractCallWithEgld<DebugApi, ()>) -> String {
+    let mut result = String::from_utf8(
+        contract_call
+            .basic
+            .endpoint_name
+            .to_boxed_bytes()
+            .into_vec(),
+    )
+    .unwrap();
+    for argument in contract_call.basic.arg_buffer.raw_arg_iter() {
         result.push('@');
         result.push_str(hex::encode(argument.to_boxed_bytes().as_slice()).as_str());
     }
@@ -22,7 +28,7 @@ fn contract_call_to_tx_data(contract_call: &ContractCall<DebugApi, ()>) -> Strin
 
 impl Interactor {
     fn tx_call_to_blockchain_tx(&self, tx_call: &TxCall) -> Transaction {
-        let contract_call = tx_call.to_contract_call().convert_to_esdt_transfer_call();
+        let contract_call = tx_call.to_contract_call();
         let contract_call_tx_data = contract_call_to_tx_data(&contract_call);
         let data = if contract_call_tx_data.is_empty() {
             None
@@ -34,7 +40,7 @@ impl Interactor {
             nonce: 0,
             value: contract_call.egld_payment.to_alloc().to_string(),
             sender: mandos_to_erdrs_address(&tx_call.from),
-            receiver: address_h256_to_erdrs(&contract_call.to.to_address()),
+            receiver: address_h256_to_erdrs(&contract_call.basic.to.to_address()),
             gas_price: self.network_config.min_gas_price,
             gas_limit: tx_call.gas_limit.value,
             data,
