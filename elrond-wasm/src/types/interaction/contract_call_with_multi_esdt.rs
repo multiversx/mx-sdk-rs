@@ -2,7 +2,7 @@ use elrond_codec::TopEncodeMulti;
 
 use crate::{
     api::CallTypeApi,
-    types::{BigUint, EsdtTokenPayment, ManagedAddress, ManagedVec},
+    types::{BigUint, EsdtTokenPayment, ManagedAddress, ManagedBuffer, ManagedVec},
 };
 
 use super::{
@@ -15,8 +15,8 @@ pub struct ContractCallWithMultiEsdt<SA, OriginalResult>
 where
     SA: CallTypeApi + 'static,
 {
-    pub(super) basic: ContractCallNoPayment<SA, OriginalResult>,
-    pub(super) payments: ManagedVec<SA, EsdtTokenPayment<SA>>,
+    pub basic: ContractCallNoPayment<SA, OriginalResult>,
+    pub payments: ManagedVec<SA, EsdtTokenPayment<SA>>,
 }
 
 impl<SA, OriginalResult> ContractCallTrait<SA> for ContractCallWithMultiEsdt<SA, OriginalResult>
@@ -49,8 +49,16 @@ where
         endpoint_name: &'static str,
         payments: ManagedVec<SA, EsdtTokenPayment<SA>>,
     ) -> Self {
+        ContractCallWithMultiEsdt::new(to, endpoint_name, payments)
+    }
+
+    pub fn new<N: Into<ManagedBuffer<SA>>>(
+        to: ManagedAddress<SA>,
+        endpoint_name: N,
+        payments: ManagedVec<SA, EsdtTokenPayment<SA>>,
+    ) -> Self {
         ContractCallWithMultiEsdt {
-            basic: ContractCallNoPayment::proxy_new(to, endpoint_name),
+            basic: ContractCallNoPayment::new(to, endpoint_name),
             payments,
         }
     }

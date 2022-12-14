@@ -8,7 +8,9 @@ use crate::{
     types::{ManagedBuffer, ManagedVec},
 };
 
-use super::{contract_call_full::ContractCallFull, AsyncCall, ContractCallNoPayment};
+use super::{
+    contract_call_full::ContractCallFull, AsyncCall, ContractCallNoPayment, ManagedArgBuffer,
+};
 
 pub trait ContractCallTrait<SA>: Sized
 where
@@ -28,11 +30,17 @@ where
             endpoint_arg.multi_encode_or_handle_err(&mut self.get_mut_basic().arg_buffer, h);
     }
 
-    /// Provided for cases where we build the contract call by hand.
+    /// For cases where we build the contract call by hand.
     ///
     /// No serialization occurs, just direct conversion to ManagedBuffer.
     fn push_raw_arg<RawArg: Into<ManagedBuffer<SA>>>(&mut self, raw_arg: RawArg) {
         self.get_mut_basic().arg_buffer.push_arg_raw(raw_arg.into())
+    }
+
+    /// For cases where we build the contract call by hand.
+    fn with_arguments_raw(mut self, raw_argument_buffer: ManagedArgBuffer<SA>) -> Self {
+        self.get_mut_basic().arg_buffer = raw_argument_buffer;
+        self
     }
 
     #[inline]

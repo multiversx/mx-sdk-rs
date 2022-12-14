@@ -12,8 +12,9 @@ use crate::{
     },
     esdt::ESDTSystemSmartContractProxy,
     types::{
-        BigUint, ContractCall, EgldOrEsdtTokenIdentifier, EsdtTokenPayment, ManagedAddress,
-        ManagedArgBuffer, ManagedBuffer, ManagedType, ManagedVec, TokenIdentifier,
+        BigUint, ContractCallNoPayment, ContractCallTrait, EgldOrEsdtTokenIdentifier,
+        EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer, ManagedType, ManagedVec,
+        TokenIdentifier,
     },
 };
 
@@ -59,8 +60,8 @@ where
         &self,
         to: ManagedAddress<A>,
         endpoint_name: ManagedBuffer<A>,
-    ) -> ContractCall<A, R> {
-        ContractCall::new(to, endpoint_name)
+    ) -> ContractCallNoPayment<A, R> {
+        ContractCallNoPayment::new(to, endpoint_name)
     }
 
     /// Sends EGLD to a given address, directly.
@@ -215,8 +216,8 @@ where
         nonce: u64,
         amount: BigUint<A>,
     ) -> ! {
-        ContractCall::<A, ()>::new(to, ManagedBuffer::new())
-            .add_esdt_token_transfer(token, nonce, amount)
+        ContractCallNoPayment::<A, ()>::new(to, ManagedBuffer::new())
+            .with_esdt_transfer((token, nonce, amount))
             .async_call()
             .call_and_exit_ignore_callback()
     }
@@ -226,7 +227,7 @@ where
         to: ManagedAddress<A>,
         payments: ManagedVec<A, EsdtTokenPayment<A>>,
     ) -> ! {
-        ContractCall::<A, ()>::new(to, ManagedBuffer::new())
+        ContractCallNoPayment::<A, ()>::new(to, ManagedBuffer::new())
             .with_multi_token_transfer(payments)
             .async_call()
             .call_and_exit_ignore_callback()
@@ -235,11 +236,8 @@ where
     pub fn claim_developer_rewards(
         &self,
         child_sc_address: ManagedAddress<A>,
-    ) -> ContractCall<A, ()> {
-        ContractCall::new(
-            child_sc_address,
-            ManagedBuffer::from(CLAIM_DEVELOPER_REWARDS_FUNC_NAME),
-        )
+    ) -> ContractCallNoPayment<A, ()> {
+        ContractCallNoPayment::new(child_sc_address, CLAIM_DEVELOPER_REWARDS_FUNC_NAME)
     }
 
     /// Sends a synchronous call to change a smart contract address.
@@ -247,12 +245,10 @@ where
         &self,
         child_sc_address: ManagedAddress<A>,
         new_owner: &ManagedAddress<A>,
-    ) -> ContractCall<A, ()> {
-        let mut contract_call = ContractCall::new(
-            child_sc_address,
-            ManagedBuffer::from(CHANGE_OWNER_BUILTIN_FUNC_NAME),
-        );
-        contract_call.push_endpoint_arg(&new_owner);
+    ) -> ContractCallNoPayment<A, ()> {
+        let mut contract_call =
+            ContractCallNoPayment::new(child_sc_address, CHANGE_OWNER_BUILTIN_FUNC_NAME);
+        contract_call.proxy_arg(&new_owner);
         contract_call
     }
 

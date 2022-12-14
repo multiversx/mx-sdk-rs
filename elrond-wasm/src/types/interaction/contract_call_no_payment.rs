@@ -4,8 +4,6 @@ use elrond_codec::TopEncodeMulti;
 
 use crate::{
     api::CallTypeApi,
-    contract_base::ExitCodecErrorHandler,
-    err_msg,
     types::{
         BigUint, EgldOrEsdtTokenPayment, EsdtTokenPayment, ManagedAddress, ManagedBuffer,
         ManagedVec,
@@ -59,28 +57,18 @@ where
     SA: CallTypeApi + 'static,
 {
     pub fn proxy_new(to: ManagedAddress<SA>, endpoint_name: &'static str) -> Self {
-        Self::new(to, endpoint_name.into())
+        Self::new(to, endpoint_name)
     }
 
-    pub fn new(to: ManagedAddress<SA>, endpoint_name: ManagedBuffer<SA>) -> Self {
+    pub fn new<N: Into<ManagedBuffer<SA>>>(to: ManagedAddress<SA>, endpoint_name: N) -> Self {
         ContractCallNoPayment {
             _phantom: PhantomData,
             to,
-            endpoint_name,
+            endpoint_name: endpoint_name.into(),
             arg_buffer: ManagedArgBuffer::new(),
             explicit_gas_limit: UNSPECIFIED_GAS_LIMIT,
             _return_type: PhantomData,
         }
-    }
-
-    pub fn with_arguments_raw(mut self, raw_argument_buffer: ManagedArgBuffer<SA>) -> Self {
-        self.arg_buffer = raw_argument_buffer;
-        self
-    }
-
-    pub fn push_endpoint_arg<T: TopEncodeMulti>(&mut self, endpoint_arg: &T) {
-        let h = ExitCodecErrorHandler::<SA>::from(err_msg::CONTRACT_CALL_ENCODE_ERROR);
-        let Ok(()) = endpoint_arg.multi_encode_or_handle_err(&mut self.arg_buffer, h);
     }
 
     /// Sets payment to be EGLD transfer.

@@ -1,3 +1,5 @@
+use elrond_wasm::elrond_codec::TopEncodeMulti;
+
 elrond_wasm::imports!();
 
 const CALLBACK_RESERVED_GAS_PER_TOKEN: u64 = 1_000_000;
@@ -15,7 +17,7 @@ pub trait TransferRoleProxyModule {
         data: ManagedBuffer,
     ) -> ! {
         let contract_call =
-            ContractCall::<Self::Api, ()>::new_with_esdt_payment(dest, data, payments.clone());
+            ContractCallWithMultiEsdt::<Self::Api, ()>::new(dest, data, payments.clone());
 
         self.execute_async_call(original_caller, payments, contract_call, None);
     }
@@ -23,9 +25,12 @@ pub trait TransferRoleProxyModule {
     fn transfer_to_contract_typed_call<T>(
         &self,
         original_caller: ManagedAddress,
-        contract_call: ContractCall<Self::Api, T>,
+        contract_call: ContractCallWithMultiEsdt<Self::Api, T>,
         opt_custom_callback: Option<CallbackClosure<Self::Api>>,
-    ) -> ! {
+    ) -> !
+    where
+        T: TopEncodeMulti,
+    {
         self.execute_async_call(
             original_caller,
             contract_call.payments.clone(),
@@ -43,12 +48,9 @@ pub trait TransferRoleProxyModule {
         args: ManagedArgBuffer<Self::Api>,
         opt_custom_callback: Option<CallbackClosure<Self::Api>>,
     ) -> ! {
-        let mut contract_call = ContractCall::<Self::Api, ()>::new_with_esdt_payment(
-            dest,
-            endpoint_name,
-            payments.clone(),
-        );
-        contract_call.arg_buffer = args;
+        let contract_call =
+            ContractCallWithMultiEsdt::<Self::Api, ()>::new(dest, endpoint_name, payments.clone())
+                .with_arguments_raw(args);
 
         self.execute_async_call(
             original_caller,
@@ -62,11 +64,15 @@ pub trait TransferRoleProxyModule {
         &self,
         original_caller: ManagedAddress,
         initial_payments: PaymentsVec<Self::Api>,
-        contract_call: ContractCall<Self::Api, T>,
+        contract_call: ContractCallWithMultiEsdt<Self::Api, T>,
         opt_custom_callback: Option<CallbackClosure<Self::Api>>,
-    ) -> ! {
+    ) -> !
+    where
+        T: TopEncodeMulti,
+    {
         require!(
-            self.destination_whitelist().contains(&contract_call.to),
+            self.destination_whitelist()
+                .contains(&contract_call.basic.to),
             "Destination address not whitelisted"
         );
 
@@ -88,7 +94,7 @@ pub trait TransferRoleProxyModule {
             .with_gas_limit(async_call_gas)
             .async_call()
             .with_callback(cb)
-            .call_and_exit();
+            .call_and_exit()
     }
 
     #[callback]
