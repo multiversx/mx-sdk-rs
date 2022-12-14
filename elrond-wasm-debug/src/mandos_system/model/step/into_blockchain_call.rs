@@ -12,8 +12,11 @@ pub trait IntoBlockchainCall {
     fn into_blockchain_call(self) -> Self::BlockchainCall;
 }
 
-impl<OriginalResult> IntoBlockchainCall for ContractCall<DebugApi, OriginalResult> {
-    type BlockchainCall = TypedScCall<OriginalResult>;
+impl<CC> IntoBlockchainCall for CC
+where
+    CC: ContractCall<DebugApi>,
+{
+    type BlockchainCall = TypedScCall<CC::OriginalResult>;
 
     fn into_blockchain_call(self) -> Self::BlockchainCall {
         ScCallStep::new().call(self).into()
@@ -35,8 +38,11 @@ pub trait IntoVMQuery {
     fn into_vm_query(self) -> Self::VMQuery;
 }
 
-impl<OriginalResult> IntoVMQuery for ContractCall<DebugApi, OriginalResult> {
-    type VMQuery = TypedScQuery<OriginalResult>;
+impl<CC> IntoVMQuery for CC
+where
+    CC: ContractCall<DebugApi>,
+{
+    type VMQuery = TypedScQuery<CC::OriginalResult>;
     fn into_vm_query(self) -> Self::VMQuery {
         ScQueryStep::default().call(self).into()
     }

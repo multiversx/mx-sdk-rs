@@ -101,10 +101,10 @@ impl ScCallStep {
     /// - "to"
     /// - "function"
     /// - "arguments"
-    pub fn call<OriginalResult>(
-        mut self,
-        contract_call: ContractCall<DebugApi, OriginalResult>,
-    ) -> Self {
+    pub fn call<CC>(mut self, contract_call: CC) -> Self
+    where
+        CC: ContractCall<DebugApi>,
+    {
         let (to_str, function, mandos_args) = process_contract_call(contract_call);
         self = self.to(to_str.as_str());
         self = self.function(function.as_str());
@@ -121,14 +121,14 @@ impl ScCallStep {
     /// - "expect"
     ///     - "out"
     ///     - "status" set to 0
-    pub fn call_expect<OriginalResult, ExpectedResult>(
+    pub fn call_expect<CC, ExpectedResult>(
         mut self,
-        contract_call: ContractCall<DebugApi, OriginalResult>,
+        contract_call: CC,
         expect_value: ExpectedResult,
     ) -> Self
     where
-        OriginalResult: TopEncodeMulti,
-        ExpectedResult: CodecFrom<OriginalResult> + TopEncodeMulti,
+        CC: ContractCall<DebugApi>,
+        ExpectedResult: CodecFrom<CC::OriginalResult> + TopEncodeMulti,
     {
         self = self.call(contract_call);
         self = self.expect(format_expect(expect_value));
@@ -140,16 +140,18 @@ impl ScCallStep {
 /// - recipient,
 /// - endpoint name,
 /// - the arguments.
-pub(super) fn process_contract_call<OriginalResult>(
-    contract_call: ContractCall<DebugApi, OriginalResult>,
-) -> (String, String, Vec<String>) {
+pub(super) fn process_contract_call<CC>(contract_call: CC) -> (String, String, Vec<String>)
+where
+    CC: ContractCall<DebugApi>,
+{
+    let full_cc = contract_call.into_normalized();
     let to_str = format!(
         "0x{}",
-        hex::encode(contract_call.to.to_address().as_bytes())
+        hex::encode(full_cc.basic.to.to_address().as_bytes())
     );
     let function =
-        String::from_utf8(contract_call.endpoint_name.to_boxed_bytes().into_vec()).unwrap();
-    let mandos_args = convert_call_args(&contract_call.arg_buffer);
+        String::from_utf8(full_cc.basic.endpoint_name.to_boxed_bytes().into_vec()).unwrap();
+    let mandos_args = convert_call_args(&full_cc.basic.arg_buffer);
     (to_str, function, mandos_args)
 }
 

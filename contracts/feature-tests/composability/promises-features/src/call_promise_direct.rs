@@ -20,7 +20,7 @@ pub trait CallPromisesDirectModule {
         self.send()
             .contract_call::<()>(to, endpoint_name)
             .with_egld_or_single_esdt_transfer(payment)
-            .with_arguments_raw(args.to_arg_buffer())
+            .with_raw_arguments(args.to_arg_buffer())
             .with_gas_limit(gas_limit)
             .async_call_promise()
             .with_extra_gas_for_callback(extra_gas_for_callback)

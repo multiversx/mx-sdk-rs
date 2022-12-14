@@ -2,7 +2,7 @@ use crate::{
     mandos_system::model::{AddressValue, BigUintValue, BytesValue, U64Value},
     DebugApi,
 };
-use elrond_wasm::types::{ContractCall, EsdtTokenPayment};
+use elrond_wasm::types::{ContractCall, ContractCallWithEgld, EsdtTokenPayment};
 use mandos::{
     interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
     serde_raw::TxCallRaw,
@@ -70,21 +70,27 @@ impl IntoRaw<TxCallRaw> for TxCall {
 }
 
 impl TxCall {
-    pub fn to_contract_call(&self) -> ContractCall<DebugApi, ()> {
-        let mut contract_call =
-            ContractCall::new((&self.to.value).into(), self.function.as_bytes().into());
-        contract_call.egld_payment = (&self.egld_value.value).into();
-        for esdt in &self.esdt_value {
-            contract_call.payments.push(EsdtTokenPayment::new(
-                esdt.esdt_token_identifier.value.as_slice().into(),
-                esdt.nonce.value,
-                (&esdt.esdt_value.value).into(),
-            ))
-        }
+    pub fn to_contract_call(&self) -> ContractCallWithEgld<DebugApi, ()> {
+        let mut contract_call = ContractCallWithEgld::new(
+            (&self.to.value).into(),
+            self.function.as_bytes(),
+            (&self.egld_value.value).into(),
+        )
+        .convert_to_esdt_transfer_call(
+            self.esdt_value
+                .iter()
+                .map(|esdt| {
+                    EsdtTokenPayment::new(
+                        esdt.esdt_token_identifier.value.as_slice().into(),
+                        esdt.nonce.value,
+                        (&esdt.esdt_value.value).into(),
+                    )
+                })
+                .collect(),
+        );
+
         for argument in &self.arguments {
-            contract_call
-                .arg_buffer
-                .push_arg_raw(argument.value.as_slice().into());
+            contract_call.push_raw_argument(argument.value.as_slice());
         }
         contract_call
     }
