@@ -7,7 +7,7 @@ use crate::{
     types::{ManagedBuffer, ManagedVec},
 };
 
-use super::{AsyncCall, AsyncCallPromises, ContractCallFull};
+use super::{AsyncCall, ContractCallFull};
 
 /// Using max u64 to represent maximum possible gas,
 /// so that the value zero is not reserved and can be specified explicitly.
@@ -39,8 +39,9 @@ where
         }
     }
 
-    pub(super) fn async_call_promise(self) -> AsyncCallPromises<SA> {
-        AsyncCallPromises {
+    #[cfg(feature = "promises")]
+    pub(super) fn async_call_promise(self) -> super::AsyncCallPromises<SA> {
+        super::AsyncCallPromises {
             to: self.basic.to,
             egld_payment: self.egld_payment,
             endpoint_name: self.basic.endpoint_name,
