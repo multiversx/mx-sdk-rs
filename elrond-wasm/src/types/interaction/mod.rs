@@ -5,6 +5,7 @@ mod callback_closure;
 mod callback_selector_result;
 mod contract_call;
 mod contract_call_common;
+mod contract_call_exec;
 mod contract_call_full;
 mod contract_call_no_payment;
 mod contract_call_trait;

@@ -4,18 +4,14 @@ use elrond_codec::TopEncodeMulti;
 
 use crate::{
     api::{
-        BlockchainApiImpl, CallTypeApi, ESDT_MULTI_TRANSFER_FUNC_NAME, ESDT_NFT_TRANSFER_FUNC_NAME,
+        CallTypeApi, ESDT_MULTI_TRANSFER_FUNC_NAME, ESDT_NFT_TRANSFER_FUNC_NAME,
         ESDT_TRANSFER_FUNC_NAME,
     },
-    contract_base::{BlockchainWrapper, SendRawWrapper},
+    contract_base::BlockchainWrapper,
     types::{BigUint, EsdtTokenPayment, ManagedAddress, ManagedBuffer, ManagedVec},
 };
 
-use super::{
-    contract_call_common::{TRANSFER_EXECUTE_DEFAULT_LEFTOVER, UNSPECIFIED_GAS_LIMIT},
-    contract_call_no_payment::ContractCallNoPayment,
-    ContractCallTrait, ManagedArgBuffer,
-};
+use super::{contract_call_no_payment::ContractCallNoPayment, ContractCallTrait, ManagedArgBuffer};
 
 #[must_use]
 pub struct ContractCallFull<SA, OriginalResult>
@@ -58,6 +54,14 @@ where
             basic: ContractCallNoPayment::new(to, endpoint_name),
             egld_payment,
             payments: esdt_payments,
+        }
+    }
+
+    pub(super) fn transfer_execute(self) {
+        match self.payments.len() {
+            0 => self.no_payment_transfer_execute(),
+            1 => self.single_transfer_execute(),
+            _ => self.multi_transfer_execute(),
         }
     }
 
@@ -170,84 +174,5 @@ where
             egld_payment: BigUint::zero(),
             payments,
         }
-    }
-
-    pub fn resolve_gas_limit(&self) -> u64 {
-        if self.basic.explicit_gas_limit == UNSPECIFIED_GAS_LIMIT {
-            SA::blockchain_api_impl().get_gas_left()
-        } else {
-            self.basic.explicit_gas_limit
-        }
-    }
-
-    pub(super) fn resolve_gas_limit_with_leftover(&self) -> u64 {
-        if self.basic.explicit_gas_limit == UNSPECIFIED_GAS_LIMIT {
-            let mut gas_left = SA::blockchain_api_impl().get_gas_left();
-            if gas_left > TRANSFER_EXECUTE_DEFAULT_LEFTOVER {
-                gas_left -= TRANSFER_EXECUTE_DEFAULT_LEFTOVER;
-            }
-            gas_left
-        } else {
-            self.basic.explicit_gas_limit
-        }
-    }
-
-    pub(super) fn no_payment_transfer_execute(&self) {
-        let gas_limit = self.resolve_gas_limit_with_leftover();
-
-        let _ = SendRawWrapper::<SA>::new().direct_egld_execute(
-            &self.basic.to,
-            &self.egld_payment,
-            gas_limit,
-            &self.basic.endpoint_name,
-            &self.basic.arg_buffer,
-        );
-    }
-
-    pub(super) fn single_transfer_execute(self) {
-        let gas_limit = self.resolve_gas_limit_with_leftover();
-        let payment = &self.payments.try_get(0).unwrap();
-
-        if self.egld_payment > 0 {
-            let _ = SendRawWrapper::<SA>::new().direct_egld_execute(
-                &self.basic.to,
-                &self.egld_payment,
-                gas_limit,
-                &self.basic.endpoint_name,
-                &self.basic.arg_buffer,
-            );
-        } else if payment.token_nonce == 0 {
-            // fungible ESDT
-            let _ = SendRawWrapper::<SA>::new().transfer_esdt_execute(
-                &self.basic.to,
-                &payment.token_identifier,
-                &payment.amount,
-                gas_limit,
-                &self.basic.endpoint_name,
-                &self.basic.arg_buffer,
-            );
-        } else {
-            // non-fungible/semi-fungible ESDT
-            let _ = SendRawWrapper::<SA>::new().transfer_esdt_nft_execute(
-                &self.basic.to,
-                &payment.token_identifier,
-                payment.token_nonce,
-                &payment.amount,
-                gas_limit,
-                &self.basic.endpoint_name,
-                &self.basic.arg_buffer,
-            );
-        }
-    }
-
-    pub(super) fn multi_transfer_execute(self) {
-        let gas_limit = self.resolve_gas_limit_with_leftover();
-        let _ = SendRawWrapper::<SA>::new().multi_esdt_transfer_execute(
-            &self.basic.to,
-            &self.payments,
-            gas_limit,
-            &self.basic.endpoint_name,
-            &self.basic.arg_buffer,
-        );
     }
 }
