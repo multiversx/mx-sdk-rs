@@ -2,7 +2,9 @@ use elrond_codec::TopEncodeMulti;
 
 use crate::{
     api::CallTypeApi,
-    types::{BigUint, EsdtTokenPayment, ManagedAddress, ManagedBuffer, ManagedVec},
+    types::{
+        BigUint, EsdtTokenPayment, ManagedAddress, ManagedBuffer, ManagedVec, TokenIdentifier,
+    },
 };
 
 use super::{
@@ -69,5 +71,19 @@ where
     pub fn with_esdt_transfer<P: Into<EsdtTokenPayment<SA>>>(mut self, payment: P) -> Self {
         self.payments.push(payment.into());
         self
+    }
+
+    #[deprecated(
+        since = "0.38.0",
+        note = "Replace by `contract_call.with_esdt_transfer((payment_token, payment_nonce, payment_amount))`. 
+        The tuple argument will get automatically converted to EsdtTokenPayment."
+    )]
+    pub fn add_esdt_token_transfer(
+        self,
+        payment_token: TokenIdentifier<SA>,
+        payment_nonce: u64,
+        payment_amount: BigUint<SA>,
+    ) -> Self {
+        self.with_esdt_transfer((payment_token, payment_nonce, payment_amount))
     }
 }

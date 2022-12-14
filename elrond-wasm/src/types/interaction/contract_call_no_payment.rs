@@ -5,8 +5,8 @@ use elrond_codec::TopEncodeMulti;
 use crate::{
     api::CallTypeApi,
     types::{
-        BigUint, EgldOrEsdtTokenPayment, EsdtTokenPayment, ManagedAddress, ManagedBuffer,
-        ManagedVec,
+        BigUint, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment, EsdtTokenPayment,
+        ManagedAddress, ManagedBuffer, ManagedVec, TokenIdentifier,
     },
 };
 
@@ -96,6 +96,20 @@ where
         result.with_esdt_transfer(payment)
     }
 
+    #[deprecated(
+        since = "0.38.0",
+        note = "Replace by `contract_call.with_esdt_transfer((payment_token, payment_nonce, payment_amount))`. 
+        The tuple argument will get automatically converted to EsdtTokenPayment."
+    )]
+    pub fn add_esdt_token_transfer(
+        self,
+        payment_token: TokenIdentifier<SA>,
+        payment_nonce: u64,
+        payment_amount: BigUint<SA>,
+    ) -> ContractCallWithMultiEsdt<SA, OriginalResult> {
+        self.with_esdt_transfer((payment_token, payment_nonce, payment_amount))
+    }
+
     /// Sets payment to be a (potentially) multi-token transfer.
     #[inline]
     pub fn with_multi_token_transfer(
@@ -117,5 +131,18 @@ where
             basic: self,
             payment: payment.into(),
         }
+    }
+
+    #[deprecated(
+        since = "0.38.0",
+        note = "Replace by `contract_call.with_egld_or_single_esdt_transfer((payment_token, payment_nonce, payment_amount))`. "
+    )]
+    pub fn with_egld_or_single_esdt_token_transfer(
+        self,
+        payment_token: EgldOrEsdtTokenIdentifier<SA>,
+        payment_nonce: u64,
+        payment_amount: BigUint<SA>,
+    ) -> ContractCallWithEgldOrSingleEsdt<SA, OriginalResult> {
+        self.with_egld_or_single_esdt_transfer((payment_token, payment_nonce, payment_amount))
     }
 }

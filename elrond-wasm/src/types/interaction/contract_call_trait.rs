@@ -1,4 +1,4 @@
-use elrond_codec::{TopDecodeMulti, TopEncodeMulti};
+use elrond_codec::{multi_types::IgnoreValue, TopDecodeMulti, TopEncodeMulti};
 
 use crate::{
     api::CallTypeApi,
@@ -98,6 +98,19 @@ where
         SendRawWrapper::<SA>::new().clean_return_data();
 
         decode_result(raw_result)
+    }
+
+    /// Executes immediately, synchronously.
+    ///
+    /// The result (if any) is ignored.
+    ///
+    /// Deprecated and will be removed soon. Use `let _: IgnoreValue = contract_call.execute_on_dest_context(...)` instead.
+    #[deprecated(
+        since = "0.36.1",
+        note = "Redundant method, use `let _: IgnoreValue = contract_call.execute_on_dest_context(...)` instead"
+    )]
+    fn execute_on_dest_context_ignore_result(self) {
+        let _ = self.execute_on_dest_context::<IgnoreValue>();
     }
 
     fn execute_on_dest_context_readonly<RequestedResult>(self) -> RequestedResult
