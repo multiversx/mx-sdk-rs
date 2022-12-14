@@ -85,7 +85,7 @@ pub fn generate_proxy_endpoint(m: &Method, endpoint_name: String) -> proc_macro2
             ArgPaymentMetadata::NotPayment => {
                 let pat = &arg.pat;
                 arg_push_snippets.push(quote! {
-                    ___contract_call___.proxy_arg(&#pat);
+                    elrond_wasm::types::ContractCallTrait::proxy_arg(&mut ___contract_call___, &#pat);
                 });
             },
             ArgPaymentMetadata::PaymentToken => {
@@ -111,12 +111,6 @@ pub fn generate_proxy_endpoint(m: &Method, endpoint_name: String) -> proc_macro2
         }
     }
 
-    // let arg_push_snippets: Vec<proc_macro2::TokenStream> = m
-    //     .method_args
-    //     .iter()
-    //     .map(|arg| )
-    //     .collect();
-
     assert!(
         payment_count <= 1,
         "No more than one payment argument allowed in call proxy"
@@ -134,13 +128,6 @@ pub fn generate_proxy_endpoint(m: &Method, endpoint_name: String) -> proc_macro2
         "No more than one payment multi argument allowed in call proxy"
     );
 
-    // let mut contract_call_type = quote! { elrond_wasm::types::ContractCallNoPayment };
-    // let mut contract_call_init = quote! {
-    //     let mut ___contract_call___ = elrond_wasm::types::ContractCallNoPayment::proxy_new(
-    //         ___address___,
-    //         #endpoint_name,
-    //     );
-    // };
     let contract_call_type;
     let contract_call_init;
     if token_count > 0 || nonce_count > 0 || payment_count > 0 {

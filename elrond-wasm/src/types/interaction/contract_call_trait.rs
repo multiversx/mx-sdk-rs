@@ -2,7 +2,8 @@ use elrond_codec::{TopDecodeMulti, TopEncodeMulti};
 
 use crate::{
     api::CallTypeApi,
-    contract_base::SendRawWrapper,
+    contract_base::{ExitCodecErrorHandler, SendRawWrapper},
+    err_msg,
     io::{ArgErrorHandler, ArgId, ManagedResultArgLoader},
     types::{ManagedBuffer, ManagedVec},
 };
@@ -19,6 +20,20 @@ where
     fn into_contract_call_full(self) -> ContractCallFull<SA, Self::OriginalResult>;
 
     fn get_mut_basic(&mut self) -> &mut ContractCallNoPayment<SA, Self::OriginalResult>;
+
+    #[doc(hidden)]
+    fn proxy_arg<T: TopEncodeMulti>(&mut self, endpoint_arg: &T) {
+        let h = ExitCodecErrorHandler::<SA>::from(err_msg::CONTRACT_CALL_ENCODE_ERROR);
+        let Ok(()) =
+            endpoint_arg.multi_encode_or_handle_err(&mut self.get_mut_basic().arg_buffer, h);
+    }
+
+    /// Provided for cases where we build the contract call by hand.
+    ///
+    /// No serialization occurs, just direct conversion to ManagedBuffer.
+    fn push_raw_arg<RawArg: Into<ManagedBuffer<SA>>>(&mut self, raw_arg: RawArg) {
+        self.get_mut_basic().arg_buffer.push_arg_raw(raw_arg.into())
+    }
 
     #[inline]
     fn with_gas_limit(mut self, gas_limit: u64) -> Self {

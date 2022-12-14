@@ -120,13 +120,6 @@ where
         self.arg_buffer.push_arg_raw(m_buffer)
     }
 
-    /// Provided for cases where we build the contract call by hand.
-    /// Convenience method, also creates the new managed buffer from bytes.
-    pub fn push_argument_raw_bytes(&mut self, bytes: &[u8]) {
-        self.arg_buffer
-            .push_arg_raw(ManagedBuffer::new_from_bytes(bytes));
-    }
-
     pub fn push_endpoint_arg<T: TopEncodeMulti>(&mut self, endpoint_arg: &T) {
         let h = ExitCodecErrorHandler::<SA>::from(err_msg::CONTRACT_CALL_ENCODE_ERROR);
         let Ok(()) = endpoint_arg.multi_encode_or_handle_err(&mut self.arg_buffer, h);

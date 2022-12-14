@@ -62,10 +62,6 @@ where
         Self::new(to, endpoint_name.into())
     }
 
-    pub fn proxy_arg<T: TopEncodeMulti>(&mut self, endpoint_arg: &T) {
-        super::contract_call_common::proxy_arg(&mut self.arg_buffer, endpoint_arg)
-    }
-
     pub fn new(to: ManagedAddress<SA>, endpoint_name: ManagedBuffer<SA>) -> Self {
         ContractCallNoPayment {
             _phantom: PhantomData,
@@ -80,18 +76,6 @@ where
     pub fn with_arguments_raw(mut self, raw_argument_buffer: ManagedArgBuffer<SA>) -> Self {
         self.arg_buffer = raw_argument_buffer;
         self
-    }
-
-    /// Provided for cases where we build the contract call by hand.
-    pub fn push_arg_managed_buffer(&mut self, m_buffer: ManagedBuffer<SA>) {
-        self.arg_buffer.push_arg_raw(m_buffer)
-    }
-
-    /// Provided for cases where we build the contract call by hand.
-    /// Convenience method, also creates the new managed buffer from bytes.
-    pub fn push_argument_raw_bytes(&mut self, bytes: &[u8]) {
-        self.arg_buffer
-            .push_arg_raw(ManagedBuffer::new_from_bytes(bytes));
     }
 
     pub fn push_endpoint_arg<T: TopEncodeMulti>(&mut self, endpoint_arg: &T) {

@@ -55,10 +55,6 @@ where
         }
     }
 
-    pub fn proxy_arg<T: TopEncodeMulti>(&mut self, endpoint_arg: &T) {
-        super::contract_call_common::proxy_arg(&mut self.basic.arg_buffer, endpoint_arg)
-    }
-
     /// Adds a single ESDT token transfer to a contract call.
     ///
     /// Can be called multiple times on the same call.

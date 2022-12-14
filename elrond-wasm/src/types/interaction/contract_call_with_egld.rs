@@ -54,8 +54,4 @@ where
             egld_payment,
         }
     }
-
-    pub fn proxy_arg<T: TopEncodeMulti>(&mut self, endpoint_arg: &T) {
-        super::contract_call_common::proxy_arg(&mut self.basic.arg_buffer, endpoint_arg)
-    }
 }
