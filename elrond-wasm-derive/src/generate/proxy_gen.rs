@@ -136,7 +136,7 @@ pub fn generate_proxy_endpoint(m: &Method, endpoint_name: String) -> proc_macro2
         if token_count == 0 && nonce_count == 0 {
             contract_call_type = quote! { elrond_wasm::types::ContractCallWithEgld };
             contract_call_init = quote! {
-                let mut ___contract_call___ = elrond_wasm::types::ContractCallWithEgld::proxy_new(
+                let mut ___contract_call___ = elrond_wasm::types::ContractCallWithEgld::new(
                     ___address___,
                     #endpoint_name,
                     #payment_expr,
@@ -145,7 +145,7 @@ pub fn generate_proxy_endpoint(m: &Method, endpoint_name: String) -> proc_macro2
         } else {
             contract_call_type = quote! { elrond_wasm::types::ContractCallWithEgldOrSingleEsdt };
             contract_call_init = quote! {
-                let mut ___contract_call___ = elrond_wasm::types::ContractCallWithEgldOrSingleEsdt::proxy_new(
+                let mut ___contract_call___ = elrond_wasm::types::ContractCallWithEgldOrSingleEsdt::new(
                     ___address___,
                     #endpoint_name,
                     #token_expr,
@@ -157,7 +157,7 @@ pub fn generate_proxy_endpoint(m: &Method, endpoint_name: String) -> proc_macro2
     } else if multi_count > 0 {
         contract_call_type = quote! { elrond_wasm::types::ContractCallWithMultiEsdt };
         contract_call_init = quote! {
-            let mut ___contract_call___ = elrond_wasm::types::ContractCallWithMultiEsdt::proxy_new(
+            let mut ___contract_call___ = elrond_wasm::types::ContractCallWithMultiEsdt::new(
                 ___address___,
                 #endpoint_name,
                 #multi_expr,
@@ -166,31 +166,14 @@ pub fn generate_proxy_endpoint(m: &Method, endpoint_name: String) -> proc_macro2
     } else {
         contract_call_type = quote! { elrond_wasm::types::ContractCallNoPayment };
         contract_call_init = quote! {
-            let mut ___contract_call___ = elrond_wasm::types::ContractCallNoPayment::proxy_new(
+            let mut ___contract_call___ = elrond_wasm::types::ContractCallNoPayment::new(
                 ___address___,
                 #endpoint_name,
             );
         };
     }
 
-    // let single_payment_snippet = if token_count > 0 || nonce_count > 0 || payment_count > 0 {
-    //     quote! {
-    //         ___contract_call___ = ___contract_call___.with_egld_or_single_esdt_transfer((#token_expr, #nonce_expr, #payment_expr));
-    //     }
-    // } else {
-    //     quote! {}
-    // };
-    // let multiple_payment_snippet = if multi_count > 0 {
-    //     quote! {
-    //         ___contract_call___ = ___contract_call___.with_multi_token_transfer(#multi_expr);
-    //     }
-    // } else {
-    //     quote! {}
-    // };
-
     let msig = generate_proxy_method_sig(m, contract_call_type);
-
-    // let endpoint_name_literal = byte_str_slice_literal(endpoint_name.as_bytes());
 
     let sig = quote! {
         #[allow(clippy::too_many_arguments)]

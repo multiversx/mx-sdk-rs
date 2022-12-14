@@ -51,14 +51,6 @@ impl<SA, OriginalResult> ContractCallWithMultiEsdt<SA, OriginalResult>
 where
     SA: CallTypeApi + 'static,
 {
-    pub fn proxy_new(
-        to: ManagedAddress<SA>,
-        endpoint_name: &'static str,
-        payments: ManagedVec<SA, EsdtTokenPayment<SA>>,
-    ) -> Self {
-        ContractCallWithMultiEsdt::new(to, endpoint_name, payments)
-    }
-
     pub fn new<N: Into<ManagedBuffer<SA>>>(
         to: ManagedAddress<SA>,
         endpoint_name: N,

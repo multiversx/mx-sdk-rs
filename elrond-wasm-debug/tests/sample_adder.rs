@@ -103,7 +103,7 @@ mod module_1 {
             &mut self,
         ) -> elrond_wasm::types::ContractCallNoPayment<Self::Api, BigInt<Self::Api>> {
             let ___address___ = self.extract_address();
-            elrond_wasm::types::ContractCallNoPayment::proxy_new(___address___, "version")
+            elrond_wasm::types::ContractCallNoPayment::new(___address___, "version")
         }
     }
 }
@@ -239,7 +239,7 @@ mod sample_adder {
             &mut self,
         ) -> elrond_wasm::types::ContractCallNoPayment<Self::Api, BigInt<Self::Api>> {
             let ___address___ = self.extract_address();
-            elrond_wasm::types::ContractCallNoPayment::proxy_new(___address___, "get_sum")
+            elrond_wasm::types::ContractCallNoPayment::new(___address___, "get_sum")
         }
         fn add(
             &mut self,
@@ -247,7 +247,7 @@ mod sample_adder {
         ) -> elrond_wasm::types::ContractCallNoPayment<Self::Api, ()> {
             let ___address___ = self.extract_address();
             let mut ___contract_call___ =
-                elrond_wasm::types::ContractCallNoPayment::proxy_new(___address___, "add");
+                elrond_wasm::types::ContractCallNoPayment::new(___address___, "add");
             elrond_wasm::types::ContractCall::proxy_arg(&mut ___contract_call___, amount);
             ___contract_call___
         }

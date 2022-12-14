@@ -2,7 +2,9 @@ use elrond_codec::TopEncodeMulti;
 
 use crate::{
     api::CallTypeApi,
-    types::{BigUint, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment, ManagedAddress},
+    types::{
+        BigUint, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment, ManagedAddress, ManagedBuffer,
+    },
 };
 
 use super::{contract_call_no_payment::ContractCallNoPayment, ContractCall, ContractCallWithEgld};
@@ -72,15 +74,15 @@ where
     SA: CallTypeApi + 'static,
     OriginalResult: TopEncodeMulti,
 {
-    pub fn proxy_new(
+    pub fn new<N: Into<ManagedBuffer<SA>>>(
         to: ManagedAddress<SA>,
-        endpoint_name: &'static str,
+        endpoint_name: N,
         token_identifier: EgldOrEsdtTokenIdentifier<SA>,
         token_nonce: u64,
         amount: BigUint<SA>,
     ) -> Self {
         ContractCallWithEgldOrSingleEsdt {
-            basic: ContractCallNoPayment::proxy_new(to, endpoint_name),
+            basic: ContractCallNoPayment::new(to, endpoint_name),
             payment: EgldOrEsdtTokenPayment::new(token_identifier, token_nonce, amount),
         }
     }

@@ -183,7 +183,7 @@ where
     ) -> ContractCallWithEgld<SA, ()> {
         let esdt_system_sc_address = self.esdt_system_sc_address();
 
-        let mut contract_call = ContractCallWithEgld::proxy_new(
+        let mut contract_call = ContractCallWithEgld::new(
             esdt_system_sc_address,
             ISSUE_AND_SET_ALL_ROLES_ENDPOINT_NAME,
             issue_cost,
@@ -226,7 +226,7 @@ where
         };
 
         let mut contract_call =
-            ContractCallWithEgld::proxy_new(esdt_system_sc_address, endpoint_name, issue_cost);
+            ContractCallWithEgld::new(esdt_system_sc_address, endpoint_name, issue_cost);
 
         contract_call.proxy_arg(token_display_name);
         contract_call.proxy_arg(token_ticker);
@@ -466,7 +466,7 @@ where
         endpoint_name: &'static str,
     ) -> ContractCallNoPayment<SA, ()> {
         let esdt_system_sc_address = self.esdt_system_sc_address();
-        ContractCallNoPayment::proxy_new(esdt_system_sc_address, endpoint_name)
+        ContractCallNoPayment::new(esdt_system_sc_address, endpoint_name)
     }
 }
 

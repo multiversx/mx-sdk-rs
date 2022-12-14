@@ -59,10 +59,6 @@ impl<SA, OriginalResult> ContractCallNoPayment<SA, OriginalResult>
 where
     SA: CallTypeApi + 'static,
 {
-    pub fn proxy_new(to: ManagedAddress<SA>, endpoint_name: &'static str) -> Self {
-        Self::new(to, endpoint_name)
-    }
-
     pub fn new<N: Into<ManagedBuffer<SA>>>(to: ManagedAddress<SA>, endpoint_name: N) -> Self {
         ContractCallNoPayment {
             _phantom: PhantomData,

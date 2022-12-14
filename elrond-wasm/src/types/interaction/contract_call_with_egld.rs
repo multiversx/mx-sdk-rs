@@ -53,12 +53,4 @@ where
             egld_payment,
         }
     }
-
-    pub fn proxy_new(
-        to: ManagedAddress<SA>,
-        endpoint_name: &'static str,
-        egld_payment: BigUint<SA>,
-    ) -> Self {
-        ContractCallWithEgld::new(to, endpoint_name, egld_payment)
-    }
 }
