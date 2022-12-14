@@ -6,7 +6,7 @@ use hex_literal::hex;
 use crate::{
     api::{CallTypeApi, SendApi},
     types::{
-        BigUint, ContractCallNoPayment, ContractCallTrait, ContractCallWithEgld, EsdtLocalRole,
+        BigUint, ContractCall, ContractCallNoPayment, ContractCallWithEgld, EsdtLocalRole,
         EsdtTokenType, ManagedAddress, ManagedBuffer, TokenIdentifier,
     },
 };
@@ -484,7 +484,7 @@ fn bool_name_bytes(b: bool) -> &'static str {
 fn set_token_property<SA, CC>(contract_call: &mut CC, name: &str, value: bool)
 where
     SA: CallTypeApi + 'static,
-    CC: ContractCallTrait<SA>,
+    CC: ContractCall<SA>,
 {
     contract_call.push_raw_arg(name);
     contract_call.push_raw_arg(bool_name_bytes(value));
@@ -495,7 +495,7 @@ fn append_token_property_arguments<SA, CC>(
     token_prop_args: &TokenPropertyArguments,
 ) where
     SA: CallTypeApi + 'static,
-    CC: ContractCallTrait<SA>,
+    CC: ContractCall<SA>,
 {
     if let Some(can_freeze) = token_prop_args.can_freeze {
         set_token_property(contract_call, "canFreeze", can_freeze);

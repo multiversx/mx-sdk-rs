@@ -8,7 +8,7 @@ use crate::{
 };
 use elrond_wasm::{
     elrond_codec::{CodecFrom, PanicErrorHandler, TopEncodeMulti},
-    types::ContractCallTrait,
+    types::ContractCall,
 };
 
 use super::check_tx_output;
@@ -71,7 +71,7 @@ impl BlockchainMock {
     /// Use `mandos_sc_query` to embed the SC query in the resulting mandos.
     pub fn quick_query<CC, RequestedResult>(&mut self, contract_call: CC) -> RequestedResult
     where
-        CC: ContractCallTrait<DebugApi>,
+        CC: ContractCall<DebugApi>,
         RequestedResult: CodecFrom<CC::OriginalResult>,
     {
         let sc_query_step = ScQueryStep::new().call(contract_call);

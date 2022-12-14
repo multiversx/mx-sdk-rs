@@ -19,7 +19,7 @@ use crate::{
     },
     storage::StorageKey,
     types::{
-        BigUint, CallbackClosure, ContractCallTrait, ContractCallWithEgld, EsdtTokenData,
+        BigUint, CallbackClosure, ContractCall, ContractCallWithEgld, EsdtTokenData,
         EsdtTokenPayment, EsdtTokenType, ManagedAddress, ManagedBuffer, ManagedType,
         TokenIdentifier,
     },

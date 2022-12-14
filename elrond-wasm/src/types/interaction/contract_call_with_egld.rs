@@ -7,7 +7,7 @@ use crate::{
 
 use super::{
     contract_call_full::ContractCallFull, contract_call_no_payment::ContractCallNoPayment,
-    ContractCallTrait,
+    ContractCall,
 };
 
 #[must_use]
@@ -19,7 +19,7 @@ where
     pub(super) egld_payment: BigUint<SA>,
 }
 
-impl<SA, OriginalResult> ContractCallTrait<SA> for ContractCallWithEgld<SA, OriginalResult>
+impl<SA, OriginalResult> ContractCall<SA> for ContractCallWithEgld<SA, OriginalResult>
 where
     SA: CallTypeApi + 'static,
     OriginalResult: TopEncodeMulti,

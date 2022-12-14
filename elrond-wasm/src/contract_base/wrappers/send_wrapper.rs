@@ -12,9 +12,8 @@ use crate::{
     },
     esdt::ESDTSystemSmartContractProxy,
     types::{
-        BigUint, ContractCallNoPayment, ContractCallTrait, EgldOrEsdtTokenIdentifier,
-        EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer, ManagedType, ManagedVec,
-        TokenIdentifier,
+        BigUint, ContractCall, ContractCallNoPayment, EgldOrEsdtTokenIdentifier, EsdtTokenPayment,
+        ManagedAddress, ManagedArgBuffer, ManagedBuffer, ManagedType, ManagedVec, TokenIdentifier,
     },
 };
 

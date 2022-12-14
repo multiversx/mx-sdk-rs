@@ -5,8 +5,8 @@ use crate::{
     storage::StorageKey,
     storage_get, storage_get_len, storage_set,
     types::{
-        CallbackClosure, ContractCallTrait, EsdtLocalRole, EsdtTokenPayment, ManagedAddress,
-        ManagedRef, ManagedVec, TokenIdentifier,
+        CallbackClosure, ContractCall, EsdtLocalRole, EsdtTokenPayment, ManagedAddress, ManagedRef,
+        ManagedVec, TokenIdentifier,
     },
 };
 

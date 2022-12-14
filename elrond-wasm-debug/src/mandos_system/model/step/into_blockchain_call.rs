@@ -1,4 +1,4 @@
-use elrond_wasm::types::{ContractCallTrait, ContractDeploy};
+use elrond_wasm::types::{ContractCall, ContractDeploy};
 
 use crate::DebugApi;
 
@@ -14,7 +14,7 @@ pub trait IntoBlockchainCall {
 
 impl<CC> IntoBlockchainCall for CC
 where
-    CC: ContractCallTrait<DebugApi>,
+    CC: ContractCall<DebugApi>,
 {
     type BlockchainCall = TypedScCall<CC::OriginalResult>;
 
@@ -40,7 +40,7 @@ pub trait IntoVMQuery {
 
 impl<CC> IntoVMQuery for CC
 where
-    CC: ContractCallTrait<DebugApi>,
+    CC: ContractCall<DebugApi>,
 {
     type VMQuery = TypedScQuery<CC::OriginalResult>;
     fn into_vm_query(self) -> Self::VMQuery {

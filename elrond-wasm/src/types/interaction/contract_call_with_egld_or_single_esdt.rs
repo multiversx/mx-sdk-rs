@@ -10,7 +10,7 @@ use crate::{
 
 use super::{
     contract_call_full::ContractCallFull, contract_call_no_payment::ContractCallNoPayment,
-    ContractCallTrait,
+    ContractCall,
 };
 
 #[must_use]
@@ -22,8 +22,7 @@ where
     pub(super) payment: EgldOrEsdtTokenPayment<SA>,
 }
 
-impl<SA, OriginalResult> ContractCallTrait<SA>
-    for ContractCallWithEgldOrSingleEsdt<SA, OriginalResult>
+impl<SA, OriginalResult> ContractCall<SA> for ContractCallWithEgldOrSingleEsdt<SA, OriginalResult>
 where
     SA: CallTypeApi + 'static,
     OriginalResult: TopEncodeMulti,

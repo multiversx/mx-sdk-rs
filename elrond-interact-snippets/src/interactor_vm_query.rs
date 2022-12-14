@@ -3,7 +3,7 @@ use elrond_sdk_erdrs::data::vm::VmValueRequest;
 use elrond_wasm_debug::{
     elrond_wasm::{
         elrond_codec::{CodecFrom, PanicErrorHandler},
-        types::ContractCallTrait,
+        types::ContractCall,
     },
     DebugApi,
 };
@@ -12,7 +12,7 @@ use log::info;
 impl Interactor {
     pub async fn vm_query<CC, RequestedResult>(&mut self, contract_call: CC) -> RequestedResult
     where
-        CC: ContractCallTrait<DebugApi>,
+        CC: ContractCall<DebugApi>,
         RequestedResult: CodecFrom<CC::OriginalResult>,
     {
         let full_cc = contract_call.into_contract_call_full();

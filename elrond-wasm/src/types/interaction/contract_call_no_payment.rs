@@ -13,7 +13,7 @@ use crate::{
 use super::{
     contract_call_exec::UNSPECIFIED_GAS_LIMIT, contract_call_full::ContractCallFull,
     contract_call_with_egld::ContractCallWithEgld,
-    contract_call_with_multi_esdt::ContractCallWithMultiEsdt, ContractCallTrait,
+    contract_call_with_multi_esdt::ContractCallWithMultiEsdt, ContractCall,
     ContractCallWithEgldOrSingleEsdt, ManagedArgBuffer,
 };
 
@@ -31,7 +31,7 @@ where
     pub(super) _return_type: PhantomData<OriginalResult>,
 }
 
-impl<SA, OriginalResult> ContractCallTrait<SA> for ContractCallNoPayment<SA, OriginalResult>
+impl<SA, OriginalResult> ContractCall<SA> for ContractCallNoPayment<SA, OriginalResult>
 where
     SA: CallTypeApi + 'static,
     OriginalResult: TopEncodeMulti,

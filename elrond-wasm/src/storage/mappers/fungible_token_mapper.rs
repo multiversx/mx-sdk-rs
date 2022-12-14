@@ -13,8 +13,8 @@ use crate::{
     esdt::{ESDTSystemSmartContractProxy, FungibleTokenProperties},
     storage::StorageKey,
     types::{
-        BigUint, CallbackClosure, ContractCallTrait, EsdtTokenPayment, EsdtTokenType,
-        ManagedAddress, ManagedBuffer, ManagedRef, ManagedType, TokenIdentifier,
+        BigUint, CallbackClosure, ContractCall, EsdtTokenPayment, EsdtTokenType, ManagedAddress,
+        ManagedBuffer, ManagedRef, ManagedType, TokenIdentifier,
     },
 };
 

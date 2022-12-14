@@ -248,7 +248,7 @@ mod sample_adder {
             let ___address___ = self.extract_address();
             let mut ___contract_call___ =
                 elrond_wasm::types::ContractCallNoPayment::proxy_new(___address___, "add");
-            elrond_wasm::types::ContractCallTrait::proxy_arg(&mut ___contract_call___, amount);
+            elrond_wasm::types::ContractCall::proxy_arg(&mut ___contract_call___, amount);
             ___contract_call___
         }
     }

@@ -85,7 +85,7 @@ pub fn generate_proxy_endpoint(m: &Method, endpoint_name: String) -> proc_macro2
             ArgPaymentMetadata::NotPayment => {
                 let pat = &arg.pat;
                 arg_push_snippets.push(quote! {
-                    elrond_wasm::types::ContractCallTrait::proxy_arg(&mut ___contract_call___, &#pat);
+                    elrond_wasm::types::ContractCall::proxy_arg(&mut ___contract_call___, &#pat);
                 });
             },
             ArgPaymentMetadata::PaymentToken => {

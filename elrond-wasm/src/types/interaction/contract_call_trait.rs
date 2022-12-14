@@ -8,7 +8,7 @@ use super::{
     contract_call_full::ContractCallFull, AsyncCall, ContractCallNoPayment, ManagedArgBuffer,
 };
 
-pub trait ContractCallTrait<SA>: Sized
+pub trait ContractCall<SA>: Sized
 where
     SA: CallTypeApi + 'static,
 {

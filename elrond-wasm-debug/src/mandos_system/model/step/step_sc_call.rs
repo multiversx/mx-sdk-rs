@@ -7,7 +7,7 @@ use crate::{
 
 use elrond_wasm::{
     elrond_codec::{CodecFrom, PanicErrorHandler, TopEncodeMulti},
-    types::{ContractCallTrait, ManagedArgBuffer},
+    types::{ContractCall, ManagedArgBuffer},
 };
 
 #[derive(Debug, Default)]
@@ -103,7 +103,7 @@ impl ScCallStep {
     /// - "arguments"
     pub fn call<CC>(mut self, contract_call: CC) -> Self
     where
-        CC: ContractCallTrait<DebugApi>,
+        CC: ContractCall<DebugApi>,
     {
         let (to_str, function, mandos_args) = process_contract_call(contract_call);
         self = self.to(to_str.as_str());
@@ -127,7 +127,7 @@ impl ScCallStep {
         expect_value: ExpectedResult,
     ) -> Self
     where
-        CC: ContractCallTrait<DebugApi>,
+        CC: ContractCall<DebugApi>,
         ExpectedResult: CodecFrom<CC::OriginalResult> + TopEncodeMulti,
     {
         self = self.call(contract_call);
@@ -142,7 +142,7 @@ impl ScCallStep {
 /// - the arguments.
 pub(super) fn process_contract_call<CC>(contract_call: CC) -> (String, String, Vec<String>)
 where
-    CC: ContractCallTrait<DebugApi>,
+    CC: ContractCall<DebugApi>,
 {
     let full_cc = contract_call.into_contract_call_full();
     let to_str = format!(

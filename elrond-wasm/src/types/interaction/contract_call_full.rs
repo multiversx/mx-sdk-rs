@@ -11,7 +11,7 @@ use crate::{
     types::{BigUint, EsdtTokenPayment, ManagedAddress, ManagedBuffer, ManagedVec},
 };
 
-use super::{contract_call_no_payment::ContractCallNoPayment, ContractCallTrait, ManagedArgBuffer};
+use super::{contract_call_no_payment::ContractCallNoPayment, ContractCall, ManagedArgBuffer};
 
 #[must_use]
 pub struct ContractCallFull<SA, OriginalResult>
@@ -23,7 +23,7 @@ where
     pub payments: ManagedVec<SA, EsdtTokenPayment<SA>>,
 }
 
-impl<SA, OriginalResult> ContractCallTrait<SA> for ContractCallFull<SA, OriginalResult>
+impl<SA, OriginalResult> ContractCall<SA> for ContractCallFull<SA, OriginalResult>
 where
     SA: CallTypeApi + 'static,
     OriginalResult: TopEncodeMulti,
