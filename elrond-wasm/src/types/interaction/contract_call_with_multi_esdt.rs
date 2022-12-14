@@ -36,6 +36,11 @@ where
         }
     }
 
+    fn into_contract_call_normalized(self) -> ContractCallFull<SA, Self::OriginalResult> {
+        self.into_contract_call_full()
+            .convert_to_esdt_transfer_call()
+    }
+
     #[inline]
     fn get_mut_basic(&mut self) -> &mut ContractCallNoPayment<SA, OriginalResult> {
         &mut self.basic

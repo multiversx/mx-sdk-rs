@@ -34,6 +34,10 @@ where
         self
     }
 
+    fn into_contract_call_normalized(self) -> ContractCallFull<SA, Self::OriginalResult> {
+        self.convert_to_esdt_transfer_call()
+    }
+
     #[inline]
     fn get_mut_basic(&mut self) -> &mut ContractCallNoPayment<SA, OriginalResult> {
         &mut self.basic
@@ -65,10 +69,6 @@ where
         }
     }
 
-    fn no_payments(&self) -> ManagedVec<SA, EsdtTokenPayment<SA>> {
-        ManagedVec::new()
-    }
-
     /// If this is an ESDT call, it converts it to a regular call to ESDTTransfer.
     /// Async calls require this step, but not `transfer_esdt_execute`.
     pub fn convert_to_esdt_transfer_call(self) -> Self {
@@ -79,11 +79,9 @@ where
         }
     }
 
-    fn convert_to_single_transfer_esdt_call(self) -> Self {
+    pub(super) fn convert_to_single_transfer_esdt_call(self) -> Self {
         if let Some(payment) = self.payments.try_get(0) {
             if payment.token_nonce == 0 {
-                let no_payments = self.no_payments();
-
                 // fungible ESDT
                 let mut new_arg_buffer = ManagedArgBuffer::new();
                 new_arg_buffer.push_arg(&payment.token_identifier);
@@ -102,11 +100,9 @@ where
                         _return_type: PhantomData,
                     },
                     egld_payment: BigUint::zero(),
-                    payments: no_payments,
+                    payments: ManagedVec::new(),
                 }
             } else {
-                let payments = self.no_payments();
-
                 // NFT
                 // `ESDTNFTTransfer` takes 4 arguments:
                 // arg0 - token identifier
@@ -135,7 +131,7 @@ where
                         _return_type: PhantomData,
                     },
                     egld_payment: BigUint::zero(),
-                    payments,
+                    payments: ManagedVec::new(),
                 }
             }
         } else {
@@ -144,8 +140,6 @@ where
     }
 
     fn convert_to_multi_transfer_esdt_call(self) -> Self {
-        let payments = self.no_payments();
-
         let mut new_arg_buffer = ManagedArgBuffer::new();
         new_arg_buffer.push_arg(self.basic.to);
         new_arg_buffer.push_arg(self.payments.len());
@@ -172,7 +166,7 @@ where
                 _return_type: PhantomData,
             },
             egld_payment: BigUint::zero(),
-            payments,
+            payments: ManagedVec::new(),
         }
     }
 }

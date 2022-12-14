@@ -22,6 +22,32 @@ where
     pub(super) payment: EgldOrEsdtTokenPayment<SA>,
 }
 
+impl<SA, OriginalResult> ContractCallWithEgldOrSingleEsdt<SA, OriginalResult>
+where
+    SA: CallTypeApi + 'static,
+    OriginalResult: TopEncodeMulti,
+{
+    fn into_contract_call_full_egld(self) -> ContractCallFull<SA, OriginalResult> {
+        ContractCallFull {
+            basic: self.basic,
+            egld_payment: self.payment.amount,
+            payments: ManagedVec::new(),
+        }
+    }
+
+    fn into_contract_call_full_esdt(self) -> ContractCallFull<SA, OriginalResult> {
+        ContractCallFull {
+            basic: self.basic,
+            egld_payment: BigUint::zero(),
+            payments: ManagedVec::from_single_item(EsdtTokenPayment::new(
+                self.payment.token_identifier.unwrap_esdt(),
+                self.payment.token_nonce,
+                self.payment.amount,
+            )),
+        }
+    }
+}
+
 impl<SA, OriginalResult> ContractCall<SA> for ContractCallWithEgldOrSingleEsdt<SA, OriginalResult>
 where
     SA: CallTypeApi + 'static,
@@ -31,21 +57,20 @@ where
 
     fn into_contract_call_full(self) -> ContractCallFull<SA, OriginalResult> {
         if self.payment.token_identifier.is_egld() {
-            ContractCallFull {
-                basic: self.basic,
-                egld_payment: self.payment.amount,
-                payments: ManagedVec::new(),
-            }
+            self.into_contract_call_full_egld()
         } else {
-            ContractCallFull {
-                basic: self.basic,
-                egld_payment: BigUint::zero(),
-                payments: ManagedVec::from_single_item(EsdtTokenPayment::new(
-                    self.payment.token_identifier.unwrap_esdt(),
-                    self.payment.token_nonce,
-                    self.payment.amount,
-                )),
-            }
+            self.into_contract_call_full_esdt()
+        }
+    }
+
+    fn into_contract_call_normalized(self) -> ContractCallFull<SA, Self::OriginalResult> {
+        if self.payment.token_identifier.is_egld() {
+            self.into_contract_call_full_egld()
+        } else {
+            // Because we know that there can be at most one ESDT payment,
+            // there is no need to call the full `convert_to_esdt_transfer_call`.
+            self.into_contract_call_full_esdt()
+                .convert_to_single_transfer_esdt_call()
         }
     }
 
