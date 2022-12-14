@@ -2,8 +2,8 @@ use elrond_codec::{TopDecodeMulti, TopEncodeMulti};
 
 use crate::{
     api::{
-        BlockchainApiImpl, CallTypeApi, ESDT_MULTI_TRANSFER_FUNC_NAME,
-        ESDT_NFT_TRANSFER_FUNC_NAME, ESDT_TRANSFER_FUNC_NAME,
+        BlockchainApiImpl, CallTypeApi, ESDT_MULTI_TRANSFER_FUNC_NAME, ESDT_NFT_TRANSFER_FUNC_NAME,
+        ESDT_TRANSFER_FUNC_NAME,
     },
     contract_base::{BlockchainWrapper, ExitCodecErrorHandler, SendRawWrapper},
     err_msg,
@@ -15,13 +15,7 @@ use crate::{
 };
 use core::marker::PhantomData;
 
-/// Using max u64 to represent maximum possible gas,
-/// so that the value zero is not reserved and can be specified explicitly.
-/// Leaving the gas limit unspecified will replace it with `api.get_gas_left()`.
-const UNSPECIFIED_GAS_LIMIT: u64 = u64::MAX;
-
-/// In case of `transfer_execute`, we leave by default a little gas for the calling transaction to finish.
-const TRANSFER_EXECUTE_DEFAULT_LEFTOVER: u64 = 100_000;
+use super::contract_call_common::{TRANSFER_EXECUTE_DEFAULT_LEFTOVER, UNSPECIFIED_GAS_LIMIT};
 
 /// Represents metadata for calling another contract.
 /// Can transform into either an async call, transfer call or other types of calls.
@@ -38,20 +32,6 @@ where
     pub explicit_gas_limit: u64,
     pub arg_buffer: ManagedArgBuffer<SA>,
     _return_type: PhantomData<OriginalResult>,
-}
-
-/// Syntactical sugar to help macros to generate code easier.
-/// Unlike calling `ContractCall::<SA, OriginalResult>::new`, here types can be inferred from the context.
-pub fn new_contract_call<SA, OriginalResult>(
-    to: ManagedAddress<SA>,
-    endpoint_name_slice: &'static [u8],
-    payments: ManagedVec<SA, EsdtTokenPayment<SA>>,
-) -> ContractCall<SA, OriginalResult>
-where
-    SA: CallTypeApi + 'static,
-{
-    let endpoint_name = ManagedBuffer::new_from_bytes(endpoint_name_slice);
-    ContractCall::<SA, OriginalResult>::new_with_esdt_payment(to, endpoint_name, payments)
 }
 
 #[allow(clippy::return_self_not_must_use)]

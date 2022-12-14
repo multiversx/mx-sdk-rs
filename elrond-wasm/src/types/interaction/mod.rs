@@ -4,7 +4,14 @@ mod async_call_promises;
 mod callback_closure;
 mod callback_selector_result;
 mod contract_call;
+mod contract_call_common;
 mod contract_call_deprecated;
+mod contract_call_full;
+mod contract_call_no_payment;
+mod contract_call_trait;
+mod contract_call_with_egld;
+mod contract_call_with_egld_or_single_esdt;
+mod contract_call_with_multi_esdt;
 mod contract_deploy;
 
 pub use arg_buffer_managed::ManagedArgBuffer;
@@ -14,5 +21,10 @@ pub use callback_closure::{
     new_callback_call, CallbackClosure, CallbackClosureForDeser, CallbackClosureMatcher,
 };
 pub use callback_selector_result::CallbackSelectorResult;
-pub use contract_call::{new_contract_call, ContractCall};
+pub use contract_call::ContractCall;
+pub use contract_call_no_payment::ContractCallNoPayment;
+pub use contract_call_trait::ContractCallTrait;
+pub use contract_call_with_egld_or_single_esdt::ContractCallWithEgldOrSingleEsdt;
+pub use contract_call_with_multi_esdt::ContractCallWithMultiEsdt;
 pub use contract_deploy::{new_contract_deploy, ContractDeploy};
+pub use contract_call_with_egld::ContractCallWithEgld;
