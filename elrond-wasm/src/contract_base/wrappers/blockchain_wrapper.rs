@@ -284,7 +284,7 @@ where
         token_data.decode_attributes()
     }
 
-    #[cfg(feature = "ei-1-2")]
+    #[inline]
     pub fn is_esdt_frozen(
         &self,
         address: &ManagedAddress<A>,
@@ -298,12 +298,12 @@ where
         )
     }
 
-    #[cfg(feature = "ei-1-2")]
+    #[inline]
     pub fn is_esdt_paused(&self, token_id: &TokenIdentifier<A>) -> bool {
         A::blockchain_api_impl().check_esdt_paused(token_id.get_handle())
     }
 
-    #[cfg(feature = "ei-1-2")]
+    #[inline]
     pub fn is_esdt_limited_transfer(&self, token_id: &TokenIdentifier<A>) -> bool {
         A::blockchain_api_impl().check_esdt_limited_transfer(token_id.get_handle())
     }

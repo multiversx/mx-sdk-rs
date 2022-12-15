@@ -1,8 +1,8 @@
 use crate::{
     abi::TypeName,
     api::{
-        ErrorApiImpl, HandleConstraints, InvalidSliceError, ManagedBufferApi, ManagedTypeApi,
-        StaticVarApiImpl,
+        use_raw_handle, ErrorApiImpl, HandleConstraints, InvalidSliceError, ManagedBufferApi,
+        ManagedTypeApi, StaticVarApiImpl,
     },
     formatter::{
         hex_util::encode_bytes_as_hex, FormatByteReceiver, SCBinary, SCDisplay, SCLowerHex,
@@ -14,9 +14,6 @@ use elrond_codec::{
     NestedDecodeInput, NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode,
     TopEncodeOutput, TryStaticCast,
 };
-
-#[cfg(feature = "ei-1-2")]
-use crate::api::use_raw_handle;
 
 /// A byte buffer managed by an external API.
 #[repr(transparent)]
@@ -399,17 +396,6 @@ impl<M: ManagedTypeApi> SCDisplay for ManagedBuffer<M> {
     }
 }
 
-#[cfg(not(feature = "ei-1-2"))]
-impl<M: ManagedTypeApi> SCLowerHex for ManagedBuffer<M> {
-    fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
-        // TODO: in Rust thr `0x` prefix appears only when writing "{:#x}", not "{:x}"
-        f.append_managed_buffer_lower_hex(&ManagedBuffer::from_handle(
-            self.get_handle().cast_or_signal_error::<M, _>(),
-        ));
-    }
-}
-
-#[cfg(feature = "ei-1-2")]
 impl<M: ManagedTypeApi> SCLowerHex for ManagedBuffer<M> {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
         let hex_handle: M::ManagedBufferHandle =
