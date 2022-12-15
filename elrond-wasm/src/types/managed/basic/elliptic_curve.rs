@@ -4,7 +4,6 @@ use crate::{
     types::{BigUint, ManagedType},
 };
 
-#[cfg(feature = "ei-1-2")]
 use crate::{api::StaticVarApiImpl, types::ManagedBuffer};
 
 use elrond_codec::*;
@@ -50,7 +49,6 @@ impl<M: ManagedTypeApi> ManagedType<M> for EllipticCurve<M> {
 }
 
 impl<M: ManagedTypeApi> EllipticCurve<M> {
-    #[cfg(feature = "ei-1-2")]
     pub fn from_name(name: &ManagedBuffer<M>) -> Self {
         let handle = M::managed_type_impl().ec_create_from_name_mb(name.get_handle());
         EllipticCurve::from_handle(handle)
@@ -176,7 +174,6 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
         )
     }
 
-    #[cfg(feature = "ei-1-2")]
     pub fn scalar_mult(
         &self,
         x_point: BigUint<M>,
@@ -216,7 +213,6 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
         )
     }
 
-    #[cfg(feature = "ei-1-2")]
     pub fn scalar_base_mult(&self, data: &ManagedBuffer<M>) -> (BigUint<M>, BigUint<M>) {
         let api = M::managed_type_impl();
         let x_result_handle = api.bi_new_zero();
@@ -243,7 +239,6 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
         api.ec_marshal_legacy(self.handle.clone(), x_pair.handle, y_pair.handle)
     }
 
-    #[cfg(feature = "ei-1-2")]
     pub fn marshal(&self, x_pair: BigUint<M>, y_pair: BigUint<M>) -> ManagedBuffer<M> {
         let result_handle: M::ManagedBufferHandle = M::static_var_api_impl().next_handle();
         M::managed_type_impl().ec_marshal(
@@ -265,7 +260,6 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
         api.ec_marshal_compressed_legacy(self.handle.clone(), x_pair.handle, y_pair.handle)
     }
 
-    #[cfg(feature = "ei-1-2")]
     pub fn marshal_compressed(&self, x_pair: BigUint<M>, y_pair: BigUint<M>) -> ManagedBuffer<M> {
         let result_handle: M::ManagedBufferHandle = M::static_var_api_impl().next_handle();
         M::managed_type_impl().ec_marshal_compressed(
@@ -293,7 +287,6 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
         )
     }
 
-    #[cfg(feature = "ei-1-2")]
     pub fn unmarshal(&self, data: &ManagedBuffer<M>) -> (BigUint<M>, BigUint<M>) {
         let api = M::managed_type_impl();
         let x_pair_handle = api.bi_new_zero();
@@ -326,7 +319,6 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
         )
     }
 
-    #[cfg(feature = "ei-1-2")]
     pub fn unmarshal_compressed(&self, data: &ManagedBuffer<M>) -> (BigUint<M>, BigUint<M>) {
         let api = M::managed_type_impl();
         let x_pair_handle = api.bi_new_zero();
@@ -360,7 +352,6 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
         )
     }
 
-    #[cfg(feature = "ei-1-2")]
     pub fn generate_key(&self) -> (BigUint<M>, BigUint<M>, ManagedBuffer<M>) {
         let api = M::managed_type_impl();
         let x_pub_key_handle = api.bi_new_zero();

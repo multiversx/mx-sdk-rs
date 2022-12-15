@@ -3,22 +3,16 @@ use core::{convert::TryInto, marker::PhantomData};
 use crate::{
     abi::TypeName,
     api::{
-        const_handles, use_raw_handle, BigIntApi, ManagedTypeApi, ManagedTypeApiImpl, RawHandle,
-        StaticVarApiImpl,
+        const_handles, use_raw_handle, BigIntApi, HandleConstraints, ManagedTypeApi,
+        ManagedTypeApiImpl, RawHandle, StaticVarApiImpl,
     },
-    formatter::hex_util::encode_bytes_as_hex,
+    formatter::{hex_util::encode_bytes_as_hex, FormatByteReceiver, SCDisplay},
     types::{heap::BoxedBytes, BigUint, ManagedBuffer, ManagedOption, ManagedType, Sign},
 };
 use elrond_codec::{
     CodecFrom, CodecFromSelf, DecodeErrorHandler, EncodeErrorHandler, NestedDecode,
     NestedDecodeInput, NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode,
     TopEncodeOutput, TryStaticCast,
-};
-
-#[cfg(feature = "ei-1-2")]
-use crate::{
-    api::HandleConstraints,
-    formatter::{FormatByteReceiver, SCDisplay},
 };
 
 use super::cast_to_i64::cast_to_i64;
@@ -314,7 +308,6 @@ impl<M: ManagedTypeApi> BigInt<M> {
     }
 }
 
-#[cfg(feature = "ei-1-2")]
 impl<M: ManagedTypeApi> SCDisplay for BigInt<M> {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
         let str_handle: M::ManagedBufferHandle = use_raw_handle(const_handles::MBUF_TEMPORARY_1);

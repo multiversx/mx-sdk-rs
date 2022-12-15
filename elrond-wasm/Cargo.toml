@@ -19,7 +19,6 @@ alloc = ["elrond-codec/alloc"]
 ei-unmanaged = ["alloc"]
 promises = []
 big-float = []
-ei-1-2 = []
 esdt-token-payment-legacy-decode = []
 
 [dependencies]

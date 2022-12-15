@@ -3,8 +3,8 @@ use core::convert::TryInto;
 use crate::{
     abi::TypeName,
     api::{
-        const_handles, use_raw_handle, BigIntApi, ManagedBufferApi, ManagedTypeApi,
-        ManagedTypeApiImpl, RawHandle, StaticVarApiImpl,
+        const_handles, use_raw_handle, BigIntApi, HandleConstraints, ManagedBufferApi,
+        ManagedTypeApi, ManagedTypeApiImpl, RawHandle, StaticVarApiImpl,
     },
     formatter::{hex_util::encode_bytes_as_hex, FormatByteReceiver, SCDisplay},
     types::{heap::BoxedBytes, ManagedBuffer, ManagedType},
@@ -14,9 +14,6 @@ use elrond_codec::{
     NestedDecodeInput, NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode,
     TopEncodeOutput, TryStaticCast,
 };
-
-#[cfg(feature = "ei-1-2")]
-use crate::api::HandleConstraints;
 
 use super::cast_to_i64::cast_to_i64;
 
@@ -287,36 +284,6 @@ impl<M: ManagedTypeApi> crate::abi::TypeAbi for BigUint<M> {
     }
 }
 
-// TODO: should become part of the VM
-#[cfg(not(feature = "ei-1-2"))]
-fn format_big_uint_rec<M, F>(mut num: BigUint<M>, base: &BigUint<M>, f: &mut F)
-where
-    M: ManagedTypeApi,
-    F: FormatByteReceiver,
-{
-    if num > 0 {
-        let last_digit: BigUint<M> = &num % base;
-        if let Some(last_digit_u64) = last_digit.to_u64() {
-            num /= base;
-            format_big_uint_rec(num, base, f);
-            let ascii_last_digit = b'0' + last_digit_u64 as u8;
-            f.append_bytes(&[ascii_last_digit][..]);
-        }
-    }
-}
-
-#[cfg(not(feature = "ei-1-2"))]
-impl<M: ManagedTypeApi> SCDisplay for BigUint<M> {
-    fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
-        if self == &0 {
-            f.append_bytes(&b"0"[..]);
-        } else {
-            format_big_uint_rec(self.clone(), &10u64.into(), f);
-        }
-    }
-}
-
-#[cfg(feature = "ei-1-2")]
 impl<M: ManagedTypeApi> SCDisplay for BigUint<M> {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
         let str_handle: M::ManagedBufferHandle = use_raw_handle(const_handles::MBUF_TEMPORARY_1);
