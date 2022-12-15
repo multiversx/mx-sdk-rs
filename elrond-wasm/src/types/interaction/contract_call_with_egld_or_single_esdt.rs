@@ -10,7 +10,7 @@ use crate::{
 use super::{contract_call_no_payment::ContractCallNoPayment, ContractCall, ContractCallWithEgld};
 
 /// Holds data for calling another contract, with a single payment, either EGLD or a single ESDT token.
-/// 
+///
 /// Gets created when chaining method `with_egld_or_single_esdt_transfer`.
 #[must_use]
 pub struct ContractCallWithEgldOrSingleEsdt<SA, OriginalResult>
