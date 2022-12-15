@@ -25,8 +25,10 @@ impl<M: ManagedTypeApi> FractionalUriInfo<M> {
             .try_get(0)
             .unwrap_or_else(|| M::error_api_impl().signal_error(b"No URIs in fractional token"));
         let serializer = ManagedSerializer::new();
-        serializer
-            .top_decode_from_managed_buffer_custom_message(&first_uri, b"Invalid Fractional URI info")
+        serializer.top_decode_from_managed_buffer_custom_message(
+            &first_uri,
+            b"Invalid Fractional URI info",
+        )
     }
 
     pub fn to_uris(&self) -> ManagedVec<M, ManagedBuffer<M>> {
