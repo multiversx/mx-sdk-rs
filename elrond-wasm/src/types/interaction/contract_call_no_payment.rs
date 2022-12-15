@@ -17,10 +17,10 @@ use super::{
 };
 
 /// Holds metadata for calling another contract, without payments.
-/// 
+///
 /// Proxies generally create contract calls of this type
 /// (unless there are payment arguments in the endpoint - but these are mostly obsolete now).
-/// 
+///
 /// It is also the basis for all other contract call types, all of them contain this one.
 #[must_use]
 pub struct ContractCallNoPayment<SA, OriginalResult>
