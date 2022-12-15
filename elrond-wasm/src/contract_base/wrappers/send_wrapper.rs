@@ -315,6 +315,19 @@ where
         );
     }
 
+    /// Allows burning of multisple ESDT tokens at once.
+    ///
+    /// Will execute a synchronous call to the appropriate burn builtin function for each.
+    pub fn esdt_local_burn_multi(&self, payments: &ManagedVec<A, EsdtTokenPayment<A>>) {
+        for payment in payments {
+            self.esdt_local_burn(
+                &payment.token_identifier,
+                payment.token_nonce,
+                &payment.amount,
+            );
+        }
+    }
+
     /// Creates a new NFT token of a certain type (determined by `token_identifier`).  
     /// `attributes` can be any serializable custom struct.  
     /// This is a built-in function, so the smart contract execution is resumed after.
