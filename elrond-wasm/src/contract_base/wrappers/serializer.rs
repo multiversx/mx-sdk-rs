@@ -54,6 +54,18 @@ where
         value
     }
 
+    pub fn top_decode_from_managed_buffer_custom_message<T: TopDecode>(
+        &self,
+        buffer: &ManagedBuffer<M>,
+        error_message: &'static [u8],
+    ) -> T {
+        let Ok(value) = T::top_decode_or_handle_err(
+            buffer.clone(), // TODO: remove clone
+            ExitCodecErrorHandler::<M>::from(error_message),
+        );
+        value
+    }
+
     pub fn top_decode_from_byte_slice<T: TopDecode>(&self, slice: &[u8]) -> T {
         let Ok(value) = T::top_decode_or_handle_err(
             slice,

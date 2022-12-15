@@ -21,15 +21,16 @@ impl<M: ManagedTypeApi> FractionalUriInfo<M> {
     }
 
     pub fn from_uris(uris: ManagedVec<M, ManagedBuffer<M>>) -> Self {
-        let first_uri = uris.get(0);
+        let first_uri = uris
+            .try_get(0)
+            .unwrap_or_else(|| M::error_api_impl().signal_error(b"No URIs in fractional token"));
         let serializer = ManagedSerializer::new();
-        serializer.top_decode_from_managed_buffer(&first_uri)
+        serializer
+            .top_decode_from_managed_buffer_custom_message(&first_uri, b"Invalid Fractional URI info")
     }
 
     pub fn to_uris(&self) -> ManagedVec<M, ManagedBuffer<M>> {
         let first_uri = ManagedSerializer::new().top_encode_to_managed_buffer(&self);
-        let mut uris = ManagedVec::new();
-        uris.push(first_uri);
-        uris
+        ManagedVec::from_single_item(first_uri)
     }
 }
