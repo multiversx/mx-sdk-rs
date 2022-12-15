@@ -4,17 +4,18 @@ use crate::{
     types::{
         heap::{ArgBuffer, BoxedBytes},
         ManagedBuffer, ManagedBufferNestedDecodeInput, ManagedType, ManagedVecItem, ManagedVecRef,
-        ManagedVecRefIterator, MultiValueEncoded, MultiValueManagedVec, StaticBufferRef,
+        ManagedVecRefIterator, MultiValueEncoded, MultiValueManagedVec,
     },
 };
 use alloc::vec::Vec;
-use core::{borrow::Borrow, iter::FromIterator, marker::PhantomData};
+use core::{borrow::Borrow, fmt::Debug, iter::FromIterator, marker::PhantomData};
 use elrond_codec::{
     DecodeErrorHandler, EncodeErrorHandler, IntoMultiValue, NestedDecode, NestedDecodeInput,
     NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeMultiOutput,
     TopEncodeOutput,
 };
-use core::fmt::Debug;
+
+use super::{CachedManagedBuffer, EncodedManagedVecItem};
 
 pub(crate) const INDEX_OUT_OF_RANGE_MSG: &[u8] = b"ManagedVec index out of range";
 
@@ -297,37 +298,18 @@ where
     M: ManagedTypeApi,
     T: ManagedVecItem + Debug,
 {
-    pub fn with_self_as_slice<F>(&mut self, mut f: F)
+    pub fn with_self_as_slice_mut<F>(&mut self, mut f: F)
     where
-        F: FnMut(&mut [T]),
+        F: FnMut(&mut [EncodedManagedVecItem<T, { T::PAYLOAD_SIZE }>]),
     {
-        if let Some(static_cache) = StaticBufferRef::try_from_managed_buffer(&self.buffer) {
-            static_cache.with_buffer_contents_mut(|bytes| {
-                let ptr = bytes.as_mut_ptr() as *mut T;
-                let len = bytes.len() / T::PAYLOAD_SIZE;
-                let values = unsafe { core::slice::from_raw_parts_mut(ptr, len) };
+        let mut static_cache = CachedManagedBuffer::new(&mut self.buffer);
+        static_cache.with_buffer_contents_mut(|bytes| {
+            let ptr = bytes.as_mut_ptr() as *mut EncodedManagedVecItem<T, { T::PAYLOAD_SIZE }>;
+            let len = bytes.len() / T::PAYLOAD_SIZE;
+            let values = unsafe { core::slice::from_raw_parts_mut(ptr, len) };
 
-                let mut index_start = 0;
-                for index in 0..len {
-                    let index_end = index_start + T::PAYLOAD_SIZE;
-                    let value = T::from_byte_reader(|item_bytes| {
-                        item_bytes.copy_from_slice(&bytes[index_start..index_end]);
-                    });
-                    values[index] = value;
-                    index_start += T::PAYLOAD_SIZE;
-                }
-                f(values);
-                index_start = 0;
-                for index in 0..len {
-                    let index_end = index_start + T::PAYLOAD_SIZE;
-                    values[index].to_byte_writer(|item_bytes| {
-                        bytes[index_start..index_end].copy_from_slice(item_bytes);
-                    });
-                    index_start += T::PAYLOAD_SIZE;
-                }
-                self.buffer.overwrite(bytes);
-            });
-        }
+            f(values);
+        });
     }
 }
 
@@ -337,20 +319,20 @@ where
     T: ManagedVecItem + Ord + Debug,
 {
     pub fn sort(&mut self) {
-        self.with_self_as_slice(|f| f.sort())
+        self.with_self_as_slice_mut(|f| f.sort())
     }
     pub fn sort_unstable(&mut self) {
-        self.with_self_as_slice(|f| f.sort_unstable())
+        self.with_self_as_slice_mut(|f| f.sort_unstable())
     }
 }
 
 impl<M, T> ManagedVec<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem + PartialEq,
+    T: ManagedVecItem + PartialEq + Debug,
 {
     pub fn dedup(&mut self) {
-        self.with_self_as_vec(|t_vec| t_vec.dedup())
+        //    self.with_self_as_slice_mut(|f| f.dedup())
     }
 }
 

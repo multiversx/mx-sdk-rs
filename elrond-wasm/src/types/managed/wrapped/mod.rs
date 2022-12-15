@@ -1,5 +1,7 @@
+mod cached_managed_buffer;
 mod egld_or_esdt_token_identifier;
 mod egld_or_esdt_token_payment;
+mod encoded_namaged_vec_item;
 mod esdt_token_data;
 mod esdt_token_payment;
 mod managed_address;
@@ -16,8 +18,10 @@ pub(crate) mod preloaded_managed_buffer;
 mod randomness_source;
 mod token_identifier;
 
+pub(crate) use cached_managed_buffer::CachedManagedBuffer;
 pub use egld_or_esdt_token_identifier::EgldOrEsdtTokenIdentifier;
 pub use egld_or_esdt_token_payment::EgldOrEsdtTokenPayment;
+pub(crate) use encoded_namaged_vec_item::EncodedManagedVecItem;
 pub use esdt_token_data::EsdtTokenData;
 pub use esdt_token_payment::EsdtTokenPayment;
 pub use managed_address::ManagedAddress;
