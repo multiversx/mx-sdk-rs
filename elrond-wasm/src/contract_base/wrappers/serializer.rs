@@ -47,9 +47,17 @@ where
     }
 
     pub fn top_decode_from_managed_buffer<T: TopDecode>(&self, buffer: &ManagedBuffer<M>) -> T {
+        self.top_decode_from_managed_buffer_custom_message(buffer, err_msg::SERIALIZER_DECODE_ERROR)
+    }
+
+    pub fn top_decode_from_managed_buffer_custom_message<T: TopDecode>(
+        &self,
+        buffer: &ManagedBuffer<M>,
+        error_message: &'static [u8],
+    ) -> T {
         let Ok(value) = T::top_decode_or_handle_err(
             buffer.clone(), // TODO: remove clone
-            ExitCodecErrorHandler::<M>::from(err_msg::SERIALIZER_DECODE_ERROR),
+            ExitCodecErrorHandler::<M>::from(error_message),
         );
         value
     }

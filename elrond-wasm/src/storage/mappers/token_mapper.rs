@@ -37,6 +37,12 @@ where
         }
     }
 
+    fn require_issued_or_set(&self) {
+        if self.is_empty() {
+            SA::error_api_impl().signal_error(MUST_SET_TOKEN_ID_ERR_MSG);
+        }
+    }
+
     fn require_same_token(&self, expected_token_id: &TokenIdentifier<SA>) {
         let actual_token_id = self.get_token_id_ref();
         if actual_token_id != expected_token_id {
@@ -68,9 +74,7 @@ where
         roles: &[EsdtLocalRole],
         opt_callback: Option<CallbackClosure<SA>>,
     ) -> ! {
-        if self.is_empty() {
-            SA::error_api_impl().signal_error(MUST_SET_TOKEN_ID_ERR_MSG);
-        }
+        self.require_issued_or_set();
 
         let system_sc_proxy = ESDTSystemSmartContractProxy::<SA>::new_proxy_obj();
         let token_id = self.get_token_id_ref();
