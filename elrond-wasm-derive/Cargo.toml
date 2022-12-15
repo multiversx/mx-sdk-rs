@@ -1,6 +1,6 @@
 [package]
 name = "elrond-wasm-derive"
-version = "0.37.0"
+version = "0.38.0"
 edition = "2021"
 
 authors = ["Andrei Marinica <andrei.marinica@elrond.com>", "Elrond Network <contact@elrond.com>"]

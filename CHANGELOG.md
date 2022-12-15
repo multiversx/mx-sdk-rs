@@ -4,6 +4,16 @@ There are several crates in this repo, this changelog will keep track of all of 
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [elrond-wasm 0.38.0, elrond-codec 0.16.0, mandos 0.18.0] - 2022-12-15
+- `ContractCall` refactor. Building a contract call comes with harder compile-time constraints. This also reduces compiled code size.
+- `ContractBase` supertrait can be now stated explicitly for contract and module traits.
+- Debugger:
+	- Callback payment is now set correctly.
+	- Function names are represented internally as strings instead of bytes, which aids debugging.
+- Removed the `ei-1-2` feature, which was guarding the newer VM functions. These functions are in the mainnet, so this feature is no longer needed.
+- New utility functions: `self.send().esdt_local_burn_multi(...`, `self.blockchain().get_token_attributes(...)`.
+- Updated all crates to Rust 2021.
+
 ## [elrond-wasm 0.37.0, elrond-codec 0.15.0] - 2022-12-09
 - Multi-contract build system:
 	- build system refactor;
