@@ -14,7 +14,7 @@ impl TxResultCalls {
         }
     }
 
-    pub fn is_empty(&self) -> bool {
+    pub fn no_calls(&self) -> bool {
         self.async_call.is_none() && self.promises.is_empty()
     }
 }

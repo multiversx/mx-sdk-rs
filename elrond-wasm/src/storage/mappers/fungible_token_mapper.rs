@@ -13,14 +13,14 @@ use crate::{
     esdt::{ESDTSystemSmartContractProxy, FungibleTokenProperties},
     storage::StorageKey,
     types::{
-        BigUint, CallbackClosure, EsdtTokenPayment, EsdtTokenType, ManagedAddress, ManagedBuffer,
-        ManagedRef, ManagedType, TokenIdentifier,
+        BigUint, CallbackClosure, ContractCall, EsdtTokenPayment, EsdtTokenType, ManagedAddress,
+        ManagedBuffer, ManagedRef, ManagedType, TokenIdentifier,
     },
 };
 
-pub(crate) const DEFAULT_ISSUE_CALLBACK_NAME: &[u8] = b"default_issue_cb";
-pub(crate) const DEFAULT_ISSUE_WITH_INIT_SUPPLY_CALLBACK_NAME: &[u8] =
-    b"default_issue_init_supply_cb";
+pub(crate) const DEFAULT_ISSUE_CALLBACK_NAME: &str = "default_issue_cb";
+pub(crate) const DEFAULT_ISSUE_WITH_INIT_SUPPLY_CALLBACK_NAME: &str =
+    "default_issue_init_supply_cb";
 
 pub struct FungibleTokenMapper<SA>
 where

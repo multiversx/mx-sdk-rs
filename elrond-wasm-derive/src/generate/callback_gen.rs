@@ -92,9 +92,7 @@ fn match_arms(methods: &[Method]) -> Vec<proc_macro2::TokenStream> {
                 let callback_name_str = &callback.callback_name.to_string();
                 assert!(
                     callback_name_str.len() <= CALLBACK_NAME_MAX_LENGTH,
-                    "Callback name `{}` is too long, it cannot exceed {} characters",
-                    callback_name_str,
-                    CALLBACK_NAME_MAX_LENGTH
+                    "Callback name `{callback_name_str}` is too long, it cannot exceed {CALLBACK_NAME_MAX_LENGTH} characters"
                 );
                 let callback_name_literal = byte_str_literal(callback_name_str.as_bytes());
                 let load_call_result_args = load_call_result_args_snippet(m);

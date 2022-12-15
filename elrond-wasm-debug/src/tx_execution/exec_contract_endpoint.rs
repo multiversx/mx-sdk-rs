@@ -4,7 +4,7 @@ use alloc::boxed::Box;
 
 use crate::{
     address_hex,
-    tx_mock::{TxContext, TxContextStack, TxPanic, TxResult},
+    tx_mock::{TxContext, TxContextStack, TxFunctionName, TxPanic, TxResult},
     world_mock::ContractContainer,
     DebugApi,
 };
@@ -25,7 +25,7 @@ pub fn execute_tx_context(tx_context: TxContext) -> (TxContext, TxResult) {
 fn execute_tx_context_rc(tx_context_rc: Rc<TxContext>) -> (Rc<TxContext>, TxResult) {
     let tx_context_ref = DebugApi::new(tx_context_rc.clone());
 
-    let func_name = tx_context_ref.tx_input_box.func_name.as_slice();
+    let func_name = &tx_context_ref.tx_input_box.func_name;
     let contract_identifier = get_contract_identifier(&tx_context_ref);
     let contract_map = &tx_context_rc.blockchain_ref().contract_map;
 
@@ -57,7 +57,7 @@ fn get_contract_identifier(tx_context: &TxContext) -> Vec<u8> {
 /// The actual execution and the extraction/wrapping of results.
 fn execute_contract_instance_endpoint(
     contract_container: &ContractContainer,
-    endpoint_name: &[u8],
+    endpoint_name: &TxFunctionName,
 ) -> TxResult {
     let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
         let call_successful = contract_container.call(endpoint_name);

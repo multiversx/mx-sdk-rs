@@ -69,13 +69,10 @@ impl BlockchainMock {
     /// Meant to be used for the test to investigate the state of the contract.
     ///
     /// Use `mandos_sc_query` to embed the SC query in the resulting mandos.
-    pub fn quick_query<OriginalResult, RequestedResult>(
-        &mut self,
-        contract_call: ContractCall<DebugApi, OriginalResult>,
-    ) -> RequestedResult
+    pub fn quick_query<CC, RequestedResult>(&mut self, contract_call: CC) -> RequestedResult
     where
-        OriginalResult: TopEncodeMulti,
-        RequestedResult: CodecFrom<OriginalResult>,
+        CC: ContractCall<DebugApi>,
+        RequestedResult: CodecFrom<CC::OriginalResult>,
     {
         let sc_query_step = ScQueryStep::new().call(contract_call);
         let tx_result = self.with_borrowed(|state| execute(state, &sc_query_step));
@@ -93,7 +90,7 @@ pub(crate) fn execute(
         to: sc_query_step.tx.to.to_address(),
         egld_value: BigUint::from(0u32),
         esdt_values: Vec::new(),
-        func_name: sc_query_step.tx.function.as_bytes().to_vec(),
+        func_name: sc_query_step.tx.function.clone().into(),
         args: sc_query_step
             .tx
             .arguments
@@ -103,12 +100,12 @@ pub(crate) fn execute(
         gas_limit: u64::MAX,
         gas_price: 0u64,
         tx_hash: generate_tx_hash_dummy(&sc_query_step.id),
-        promise_callback_closure_data: Vec::new(),
+        ..Default::default()
     };
 
     let (tx_result, state) = execute_sc_query(tx_input, state);
     assert!(
-        tx_result.result_calls.is_empty(),
+        tx_result.pending_calls.no_calls(),
         "Can't query a view function that performs an async call"
     );
     (tx_result, state)

@@ -2,7 +2,7 @@
 name = "use-module-meta"
 version = "0.0.0"
 authors = ["Andrei Marinica <andrei.marinica@elrond.com>"]
-edition = "2018"
+edition = "2021"
 publish = false
 
 [dependencies.use-module]

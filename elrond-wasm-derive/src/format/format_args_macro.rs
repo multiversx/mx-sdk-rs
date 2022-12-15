@@ -19,8 +19,7 @@ pub fn format_receiver_args_macro(input: proc_macro::TokenStream) -> proc_macro:
         lit.to_string()
     } else {
         panic!(
-            "Formatting requires that the first argument is a string. Found: {}",
-            format_string_token
+            "Formatting requires that the first argument is a string. Found: {format_string_token}"
         );
     };
 
@@ -28,9 +27,7 @@ pub fn format_receiver_args_macro(input: proc_macro::TokenStream) -> proc_macro:
     let num_placeholders = count_args(&format_str_parts);
     assert!(
         num_placeholders == num_arguments,
-        "Number of placeholders ({}) does not match number of arguments ({}).",
-        num_placeholders,
-        num_arguments
+        "Number of placeholders ({num_placeholders}) does not match number of arguments ({num_arguments})."
     );
 
     format_str_parts.into_iter().map(|part| {

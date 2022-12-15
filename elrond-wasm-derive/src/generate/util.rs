@@ -11,11 +11,11 @@ pub fn generate_call_method_name(method_ident: &proc_macro2::Ident) -> proc_macr
 }
 
 pub fn generate_endpoints_mod_alias(index: usize) -> proc_macro2::Ident {
-    syn::Ident::new(&format!("__endpoints_{}__", index), Span::call_site())
+    syn::Ident::new(&format!("__endpoints_{index}__"), Span::call_site())
 }
 
 pub fn generate_proxy_type_generic(index: usize) -> proc_macro2::Ident {
-    syn::Ident::new(&format!("Arg{}", index), Span::call_site())
+    syn::Ident::new(&format!("Arg{index}"), Span::call_site())
 }
 
 pub fn array_literal(bytes: &[u8]) -> proc_macro2::TokenStream {
@@ -37,6 +37,7 @@ pub fn byte_str_slice_literal(bytes: &[u8]) -> proc_macro2::TokenStream {
     quote! { &#lit[..] }
 }
 
+#[allow(unused)]
 pub fn ident_str_literal(ident: &syn::Ident) -> proc_macro2::TokenStream {
     byte_str_slice_literal(ident.to_string().as_bytes())
 }

@@ -99,7 +99,7 @@ fn write_endpoint_impl(file: &mut File, endpoint_abi: &EndpointAbi) {
 }
 
 fn write_method_declaration(file: &mut File, endpoint_name: &str) {
-    writeln!(file, "    async fn {}(&mut self) {{", endpoint_name).unwrap();
+    writeln!(file, "    async fn {endpoint_name}(&mut self) {{").unwrap();
 }
 
 fn write_payments_declaration(file: &mut File, accepted_tokens: &[&str]) {

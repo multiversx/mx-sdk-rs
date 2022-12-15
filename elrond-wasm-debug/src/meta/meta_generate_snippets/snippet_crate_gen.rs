@@ -9,7 +9,7 @@ pub(crate) fn create_snippets_folder(snippets_folder_path: &str) {
 }
 
 pub(crate) fn create_snippets_gitignore(snippets_folder_path: &str, overwrite: bool) {
-    let gitignore_path = format!("{}/.gitignore", snippets_folder_path);
+    let gitignore_path = format!("{snippets_folder_path}/.gitignore");
     let mut file = if overwrite {
         File::create(&gitignore_path).unwrap()
     } else {
@@ -36,7 +36,7 @@ pub(crate) fn create_snippets_cargo_toml(
     contract_crate_name: &str,
     overwrite: bool,
 ) {
-    let cargo_toml_path = format!("{}/Cargo.toml", snippets_folder_path);
+    let cargo_toml_path = format!("{snippets_folder_path}/Cargo.toml");
     let mut file = if overwrite {
         File::create(&cargo_toml_path).unwrap()
     } else {
@@ -56,14 +56,14 @@ pub(crate) fn create_snippets_cargo_toml(
 name = "rust-interact"
 version = "0.0.0"
 authors = ["you"]
-edition = "2018"
+edition = "2021"
 publish = false
 
 [[bin]]
 name = "rust-interact"
 path = "src/lib.rs"
 
-[dependencies.{}]
+[dependencies.{contract_crate_name}]
 path = ".."
 
 [dependencies.elrond-interact-snippets]
@@ -71,21 +71,20 @@ version = "0.1.0"
 
 [workspace]
 
-"#,
-        contract_crate_name
+"#
     )
     .unwrap();
 }
 
 pub(crate) fn create_src_folder(snippets_folder_path: &str) {
     // returns error if folder already exists, so we ignore the result
-    let src_folder_path = format!("{}/src", snippets_folder_path);
+    let src_folder_path = format!("{snippets_folder_path}/src");
     let _ = fs::create_dir(src_folder_path);
 }
 
 #[must_use]
 pub(crate) fn create_and_get_lib_file(snippets_folder_path: &str, overwrite: bool) -> File {
-    let lib_path = format!("{}/src/lib.rs", snippets_folder_path);
+    let lib_path = format!("{snippets_folder_path}/src/lib.rs");
     if overwrite {
         File::create(&lib_path).unwrap()
     } else {

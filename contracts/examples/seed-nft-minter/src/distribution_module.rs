@@ -35,11 +35,7 @@ pub trait DistributionModule {
             }
             self.send()
                 .contract_call::<IgnoreValue>(distribution.address, distribution.endpoint)
-                .with_egld_or_single_esdt_token_transfer(
-                    token_id.clone(),
-                    token_nonce,
-                    payment_amount,
-                )
+                .with_egld_or_single_esdt_transfer((token_id.clone(), token_nonce, payment_amount))
                 .with_gas_limit(distribution.gas_limit)
                 .transfer_execute();
         }

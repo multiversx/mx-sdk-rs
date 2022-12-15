@@ -52,7 +52,7 @@ checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
 name = "elrond-codec"
-version = "0.14.0"
+version = "0.15.0"
 dependencies = [
  "arrayvec",
  "elrond-codec-derive",
@@ -61,7 +61,7 @@ dependencies = [
 
 [[package]]
 name = "elrond-codec-derive"
-version = "0.14.0"
+version = "0.15.0"
 dependencies = [
  "hex",
  "proc-macro2",
@@ -71,7 +71,7 @@ dependencies = [
 
 [[package]]
 name = "elrond-wasm"
-version = "0.36.1"
+version = "0.37.0"
 dependencies = [
  "bitflags",
  "elrond-codec",
@@ -84,7 +84,7 @@ dependencies = [
 
 [[package]]
 name = "elrond-wasm-derive"
-version = "0.36.1"
+version = "0.37.0"
 dependencies = [
  "hex",
  "proc-macro2",
@@ -95,14 +95,14 @@ dependencies = [
 
 [[package]]
 name = "elrond-wasm-node"
-version = "0.36.1"
+version = "0.37.0"
 dependencies = [
  "elrond-wasm",
 ]
 
 [[package]]
 name = "elrond-wasm-output"
-version = "0.36.1"
+version = "0.37.0"
 dependencies = [
  "elrond-wasm-node",
  "wee_alloc",

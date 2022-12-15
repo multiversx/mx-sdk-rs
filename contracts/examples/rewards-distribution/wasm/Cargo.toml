@@ -2,7 +2,7 @@
 name = "rewards-distribution-wasm"
 version = "0.0.0"
 authors = ["Claudiu-Marcel Bruda <claudiu.bruda@elrond.com>"]
-edition = "2018"
+edition = "2021"
 publish = false
 
 [lib]

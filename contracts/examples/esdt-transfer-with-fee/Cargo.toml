@@ -2,7 +2,7 @@
 name = "esdt-transfer-with-fee"
 version = "0.0.0"
 authors = ["Alin Cruceat <alin.cruceat@elrond.com>"]
-edition = "2018"
+edition = "2021"
 publish = false
 
 [lib]

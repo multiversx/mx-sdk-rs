@@ -4,7 +4,7 @@ use super::{
 };
 use crate::{
     model::{ContractTrait, Method, Supertrait, TraitProperties},
-    parse::process_trait_arguments,
+    parse::{is_contract_base, process_trait_arguments},
 };
 
 pub fn parse_contract_trait(
@@ -26,6 +26,7 @@ pub fn parse_contract_trait(
     let supertraits: Vec<Supertrait> = contract_trait
         .supertraits
         .iter()
+        .filter(|supertrait| !is_contract_base(supertrait))
         .map(parse_supertrait)
         .collect();
 

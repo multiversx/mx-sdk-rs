@@ -23,7 +23,7 @@ fn validate_method_name(m: &Method) {
             endpoint_name_str != INIT_ENDPOINT_NAME,
             "Cannot declare endpoint with name 'init'. Use #[init] instead."
         );
-        assert!(!reserved::is_reserved(endpoint_name_str.as_str()), "Cannot declare endpoint with name '{}', because that name is reserved by the Arwen API.", endpoint_name_str);
+        assert!(!reserved::is_reserved(endpoint_name_str.as_str()), "Cannot declare endpoint with name '{endpoint_name_str}', because that name is reserved by the Arwen API.");
     }
 }
 

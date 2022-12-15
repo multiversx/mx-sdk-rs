@@ -14,7 +14,7 @@ documentation = "https://docs.elrond.com/"
 description = "Elrond Price aggregator Smart Contract"
 keywords = ["elrond", "wasm", "webassembly", "blockchain", "contract"]
 categories = ["no-std", "wasm", "cryptography::cryptocurrencies"]
-edition = "2018"
+edition = "2021"
 
 [lib]
 path = "src/wegld.rs"

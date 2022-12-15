@@ -49,7 +49,7 @@ where
                 .closure_args
                 .serialize_overwrite(&mut cb_closure_args_serialized);
         } else {
-            callback_name = &[];
+            callback_name = "";
             cb_closure_args_serialized.overwrite(&[]);
         }
 

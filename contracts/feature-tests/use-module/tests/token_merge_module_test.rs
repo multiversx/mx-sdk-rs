@@ -7,7 +7,7 @@ use elrond_wasm::{
 };
 use elrond_wasm_debug::{
     managed_address, managed_biguint, managed_token_id, rust_biguint,
-    testing_framework::BlockchainStateWrapper, tx_mock::TxInputESDT,
+    testing_framework::BlockchainStateWrapper, tx_mock::TxTokenTransfer,
 };
 use elrond_wasm_modules::token_merge::{
     merged_token_instances::MergedTokenInstances, merged_token_setup::MergedTokenSetupModule,
@@ -90,12 +90,12 @@ fn test_token_merge() {
 
     // merge two NFTs
     let nft_transfers = vec![
-        TxInputESDT {
+        TxTokenTransfer {
             token_identifier: NFT_TOKEN_ID.to_vec(),
             nonce: FIRST_NFT_NONCE,
             value: rust_biguint!(NFT_AMOUNT),
         },
-        TxInputESDT {
+        TxTokenTransfer {
             token_identifier: NFT_TOKEN_ID.to_vec(),
             nonce: SECOND_NFT_NONCE,
             value: rust_biguint!(NFT_AMOUNT),
@@ -203,12 +203,12 @@ fn test_token_merge() {
 
     // merge the NFT with fungible
     let esdt_transfers = vec![
-        TxInputESDT {
+        TxTokenTransfer {
             token_identifier: NFT_TOKEN_ID.to_vec(),
             nonce: FIRST_NFT_NONCE,
             value: rust_biguint!(NFT_AMOUNT),
         },
-        TxInputESDT {
+        TxTokenTransfer {
             token_identifier: FUNGIBLE_TOKEN_ID.to_vec(),
             nonce: 0,
             value: rust_biguint!(FUNGIBLE_AMOUNT),
@@ -261,12 +261,12 @@ fn test_token_merge() {
 
     // merge NFT with an already merged token
     let combined_transfers = vec![
-        TxInputESDT {
+        TxTokenTransfer {
             token_identifier: NFT_TOKEN_ID.to_vec(),
             nonce: SECOND_NFT_NONCE,
             value: rust_biguint!(NFT_AMOUNT),
         },
-        TxInputESDT {
+        TxTokenTransfer {
             token_identifier: MERGED_TOKEN_ID.to_vec(),
             nonce: 2,
             value: rust_biguint!(NFT_AMOUNT),
@@ -430,17 +430,17 @@ fn partial_split_test() {
 
     // merge 2 NFTs and a fungible token
     let esdt_transfers = vec![
-        TxInputESDT {
+        TxTokenTransfer {
             token_identifier: NFT_TOKEN_ID.to_vec(),
             nonce: FIRST_NFT_NONCE,
             value: rust_biguint!(NFT_AMOUNT),
         },
-        TxInputESDT {
+        TxTokenTransfer {
             token_identifier: NFT_TOKEN_ID.to_vec(),
             nonce: SECOND_NFT_NONCE,
             value: rust_biguint!(NFT_AMOUNT),
         },
-        TxInputESDT {
+        TxTokenTransfer {
             token_identifier: FUNGIBLE_TOKEN_ID.to_vec(),
             nonce: 0,
             value: rust_biguint!(FUNGIBLE_AMOUNT),
@@ -636,12 +636,12 @@ fn custom_attributes_test() {
 
     // merge two NFTs
     let nft_transfers = vec![
-        TxInputESDT {
+        TxTokenTransfer {
             token_identifier: NFT_TOKEN_ID.to_vec(),
             nonce: FIRST_NFT_NONCE,
             value: rust_biguint!(NFT_AMOUNT),
         },
-        TxInputESDT {
+        TxTokenTransfer {
             token_identifier: NFT_TOKEN_ID.to_vec(),
             nonce: SECOND_NFT_NONCE,
             value: rust_biguint!(NFT_AMOUNT),

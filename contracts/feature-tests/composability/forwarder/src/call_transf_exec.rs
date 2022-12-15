@@ -10,11 +10,11 @@ pub trait ForwarderTransferExecuteModule {
     #[endpoint]
     #[payable("*")]
     fn forward_transf_exec_accept_funds(&self, to: ManagedAddress) {
-        let (token, token_nonce, payment) = self.call_value().egld_or_single_esdt().into_tuple();
+        let payment = self.call_value().egld_or_single_esdt();
         self.vault_proxy()
             .contract(to)
             .accept_funds()
-            .with_egld_or_single_esdt_token_transfer(token, token_nonce, payment)
+            .with_egld_or_single_esdt_transfer(payment)
             .transfer_execute();
     }
 
@@ -32,7 +32,7 @@ pub trait ForwarderTransferExecuteModule {
         self.vault_proxy()
             .contract(to)
             .accept_funds()
-            .with_egld_or_single_esdt_token_transfer(token_id, 0, amount_to_send)
+            .with_egld_or_single_esdt_transfer((token_id, 0, amount_to_send))
             .transfer_execute();
     }
 
@@ -46,18 +46,14 @@ pub trait ForwarderTransferExecuteModule {
         self.vault_proxy()
             .contract(to.clone())
             .accept_funds()
-            .with_egld_or_single_esdt_token_transfer(
-                token.clone(),
-                token_nonce,
-                half_payment.clone(),
-            )
+            .with_egld_or_single_esdt_transfer((token.clone(), token_nonce, half_payment.clone()))
             .with_gas_limit(half_gas)
             .transfer_execute();
 
         self.vault_proxy()
             .contract(to)
             .accept_funds()
-            .with_egld_or_single_esdt_token_transfer(token, token_nonce, half_payment)
+            .with_egld_or_single_esdt_transfer((token, token_nonce, half_payment))
             .with_gas_limit(half_gas)
             .transfer_execute();
     }
@@ -70,18 +66,25 @@ pub trait ForwarderTransferExecuteModule {
         &self,
         to: ManagedAddress,
     ) -> MultiValue4<u64, u64, BigUint, EgldOrEsdtTokenIdentifier> {
-        let (token, token_nonce, payment) = self.call_value().egld_or_single_esdt().into_tuple();
+        let payment = self.call_value().egld_or_single_esdt();
+        let payment_token = payment.token_identifier.clone();
         let gas_left_before = self.blockchain().get_gas_left();
 
         self.vault_proxy()
             .contract(to)
             .accept_funds()
-            .with_egld_or_single_esdt_token_transfer(token.clone(), token_nonce, payment)
+            .with_egld_or_single_esdt_transfer(payment)
             .transfer_execute();
 
         let gas_left_after = self.blockchain().get_gas_left();
 
-        (gas_left_before, gas_left_after, BigUint::zero(), token).into()
+        (
+            gas_left_before,
+            gas_left_after,
+            BigUint::zero(),
+            payment_token,
+        )
+            .into()
     }
 
     #[endpoint]

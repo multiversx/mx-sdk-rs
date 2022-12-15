@@ -2,31 +2,47 @@ use alloc::vec::Vec;
 
 use std::fmt;
 
-use super::{TxLog, TxPanic, TxResultCalls};
+use super::{AsyncCallTxData, TxLog, TxPanic, TxResultCalls};
 
-#[derive(Clone, Default, Debug)]
+#[derive(Clone, Debug)]
 #[must_use]
 pub struct TxResult {
     pub result_status: u64,
     pub result_message: String,
     pub result_values: Vec<Vec<u8>>,
     pub result_logs: Vec<TxLog>,
-    pub result_calls: TxResultCalls,
+
+    /// Calls that need to be executed.
+    ///
+    /// Structure is emptied as soon as async calls are executed.
+    pub pending_calls: TxResultCalls,
+
+    /// All async calls launched from the tx (legacy async, promises, transfer-execute).
+    ///
+    /// Is never cleared of its contents.
+    pub all_calls: Vec<AsyncCallTxData>,
 }
 
-impl TxResult {
-    pub fn empty() -> TxResult {
+impl Default for TxResult {
+    fn default() -> Self {
         TxResult {
             result_status: 0,
             result_message: String::new(),
             result_values: Vec::new(),
             result_logs: Vec::new(),
-            result_calls: TxResultCalls::empty(),
+            pending_calls: TxResultCalls::empty(),
+            all_calls: Vec::new(),
         }
+    }
+}
+
+impl TxResult {
+    pub fn empty() -> TxResult {
+        TxResult::default()
     }
 
     pub fn print(&self) {
-        println!("{}", self);
+        println!("{self}");
     }
 
     pub fn from_panic_obj(panic_obj: &TxPanic) -> Self {
@@ -35,7 +51,7 @@ impl TxResult {
             result_message: panic_obj.message.clone(),
             result_values: Vec::new(),
             result_logs: Vec::new(),
-            result_calls: TxResultCalls::empty(),
+            ..Default::default()
         }
     }
 
@@ -46,7 +62,7 @@ impl TxResult {
             // result_message: _s.to_string(),
             result_values: Vec::new(),
             result_logs: Vec::new(),
-            result_calls: TxResultCalls::empty(),
+            ..Default::default()
         }
     }
 
@@ -58,9 +74,7 @@ impl TxResult {
         TxResult {
             result_status: 10,
             result_message,
-            result_values: Vec::new(),
-            result_logs: Vec::new(),
-            result_calls: TxResultCalls::empty(),
+            ..Default::default()
         }
     }
 
@@ -69,12 +83,12 @@ impl TxResult {
             .extend_from_slice(sync_call_result.result_values.as_slice());
         self.result_logs
             .extend_from_slice(sync_call_result.result_logs.as_slice());
-        if let Some(sync_result_async) = &sync_call_result.result_calls.async_call {
+        if let Some(sync_result_async) = &sync_call_result.pending_calls.async_call {
             assert!(
-                self.result_calls.async_call.is_none(),
+                self.pending_calls.async_call.is_none(),
                 "Multiple async calls not supported"
             );
-            self.result_calls.async_call = Some(sync_result_async.clone());
+            self.pending_calls.async_call = Some(sync_result_async.clone());
         }
     }
 
@@ -120,8 +134,8 @@ impl fmt::Display for TxResult {
             .collect();
         write!(
             f,
-            "TxResult {{\n\tresult_status: {},\n\tresult_values:{:?}\n}}",
-            self.result_status, results_hex
+            "TxResult {{\n\tresult_status: {},\n\tresult_values:{results_hex:?}\n}}",
+            self.result_status
         )
     }
 }

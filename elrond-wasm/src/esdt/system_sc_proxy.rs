@@ -6,8 +6,8 @@ use hex_literal::hex;
 use crate::{
     api::{CallTypeApi, SendApi},
     types::{
-        BigUint, ContractCall, EsdtLocalRole, EsdtTokenType, ManagedAddress, ManagedBuffer,
-        TokenIdentifier,
+        BigUint, ContractCall, ContractCallNoPayment, ContractCallWithEgld, EsdtLocalRole,
+        EsdtTokenType, ManagedAddress, ManagedBuffer, TokenIdentifier,
     },
 };
 
@@ -16,11 +16,11 @@ use crate::{
 pub const ESDT_SYSTEM_SC_ADDRESS_ARRAY: [u8; 32] =
     hex!("000000000000000000010000000000000000000000000000000000000002ffff");
 
-const ISSUE_FUNGIBLE_ENDPOINT_NAME: &[u8] = b"issue";
-const ISSUE_NON_FUNGIBLE_ENDPOINT_NAME: &[u8] = b"issueNonFungible";
-const ISSUE_SEMI_FUNGIBLE_ENDPOINT_NAME: &[u8] = b"issueSemiFungible";
-const REGISTER_META_ESDT_ENDPOINT_NAME: &[u8] = b"registerMetaESDT";
-const ISSUE_AND_SET_ALL_ROLES_ENDPOINT_NAME: &[u8] = b"registerAndSetAllRoles";
+const ISSUE_FUNGIBLE_ENDPOINT_NAME: &str = "issue";
+const ISSUE_NON_FUNGIBLE_ENDPOINT_NAME: &str = "issueNonFungible";
+const ISSUE_SEMI_FUNGIBLE_ENDPOINT_NAME: &str = "issueSemiFungible";
+const REGISTER_META_ESDT_ENDPOINT_NAME: &str = "registerMetaESDT";
+const ISSUE_AND_SET_ALL_ROLES_ENDPOINT_NAME: &str = "registerAndSetAllRoles";
 
 /// Proxy for the ESDT system smart contract.
 /// Unlike other contract proxies, this one has a fixed address,
@@ -58,7 +58,7 @@ where
         token_ticker: &ManagedBuffer<SA>,
         initial_supply: &BigUint<SA>,
         properties: FungibleTokenProperties,
-    ) -> ContractCall<SA, ()> {
+    ) -> ContractCallWithEgld<SA, ()> {
         self.issue(
             issue_cost,
             EsdtTokenType::Fungible,
@@ -88,7 +88,7 @@ where
         token_display_name: &ManagedBuffer<SA>,
         token_ticker: &ManagedBuffer<SA>,
         properties: NonFungibleTokenProperties,
-    ) -> ContractCall<SA, ()> {
+    ) -> ContractCallWithEgld<SA, ()> {
         let zero = BigUint::zero();
         self.issue(
             issue_cost,
@@ -119,7 +119,7 @@ where
         token_display_name: &ManagedBuffer<SA>,
         token_ticker: &ManagedBuffer<SA>,
         properties: SemiFungibleTokenProperties,
-    ) -> ContractCall<SA, ()> {
+    ) -> ContractCallWithEgld<SA, ()> {
         let zero = BigUint::zero();
         self.issue(
             issue_cost,
@@ -150,7 +150,7 @@ where
         token_display_name: &ManagedBuffer<SA>,
         token_ticker: &ManagedBuffer<SA>,
         properties: MetaTokenProperties,
-    ) -> ContractCall<SA, ()> {
+    ) -> ContractCallWithEgld<SA, ()> {
         let zero = BigUint::zero();
         self.issue(
             issue_cost,
@@ -180,27 +180,27 @@ where
         token_ticker: ManagedBuffer<SA>,
         token_type: EsdtTokenType,
         num_decimals: usize,
-    ) -> ContractCall<SA, ()> {
+    ) -> ContractCallWithEgld<SA, ()> {
         let esdt_system_sc_address = self.esdt_system_sc_address();
 
-        let mut contract_call = ContractCall::new(
+        let mut contract_call = ContractCallWithEgld::new(
             esdt_system_sc_address,
-            ManagedBuffer::new_from_bytes(ISSUE_AND_SET_ALL_ROLES_ENDPOINT_NAME),
-        )
-        .with_egld_transfer(issue_cost);
+            ISSUE_AND_SET_ALL_ROLES_ENDPOINT_NAME,
+            issue_cost,
+        );
 
-        contract_call.push_endpoint_arg(&token_display_name);
-        contract_call.push_endpoint_arg(&token_ticker);
+        contract_call.proxy_arg(&token_display_name);
+        contract_call.proxy_arg(&token_ticker);
 
         let token_type_name = match token_type {
-            EsdtTokenType::Fungible => &b"FNG"[..],
-            EsdtTokenType::NonFungible => &b"NFT"[..],
-            EsdtTokenType::SemiFungible => &b"SFT"[..],
-            EsdtTokenType::Meta => &b"META"[..],
-            EsdtTokenType::Invalid => &[],
+            EsdtTokenType::Fungible => "FNG",
+            EsdtTokenType::NonFungible => "NFT",
+            EsdtTokenType::SemiFungible => "SFT",
+            EsdtTokenType::Meta => "META",
+            EsdtTokenType::Invalid => "",
         };
-        contract_call.push_endpoint_arg(&token_type_name);
-        contract_call.push_endpoint_arg(&num_decimals);
+        contract_call.proxy_arg(&token_type_name);
+        contract_call.proxy_arg(&num_decimals);
 
         contract_call
     }
@@ -214,7 +214,7 @@ where
         token_ticker: &ManagedBuffer<SA>,
         initial_supply: &BigUint<SA>,
         properties: TokenProperties,
-    ) -> ContractCall<SA, ()> {
+    ) -> ContractCallWithEgld<SA, ()> {
         let esdt_system_sc_address = self.esdt_system_sc_address();
 
         let endpoint_name = match token_type {
@@ -222,23 +222,20 @@ where
             EsdtTokenType::NonFungible => ISSUE_NON_FUNGIBLE_ENDPOINT_NAME,
             EsdtTokenType::SemiFungible => ISSUE_SEMI_FUNGIBLE_ENDPOINT_NAME,
             EsdtTokenType::Meta => REGISTER_META_ESDT_ENDPOINT_NAME,
-            EsdtTokenType::Invalid => &[],
+            EsdtTokenType::Invalid => "",
         };
 
-        let mut contract_call = ContractCall::new(
-            esdt_system_sc_address,
-            ManagedBuffer::new_from_bytes(endpoint_name),
-        )
-        .with_egld_transfer(issue_cost);
+        let mut contract_call =
+            ContractCallWithEgld::new(esdt_system_sc_address, endpoint_name, issue_cost);
 
-        contract_call.push_endpoint_arg(token_display_name);
-        contract_call.push_endpoint_arg(token_ticker);
+        contract_call.proxy_arg(token_display_name);
+        contract_call.proxy_arg(token_ticker);
 
         if token_type == EsdtTokenType::Fungible {
-            contract_call.push_endpoint_arg(initial_supply);
-            contract_call.push_endpoint_arg(&properties.num_decimals);
+            contract_call.proxy_arg(initial_supply);
+            contract_call.proxy_arg(&properties.num_decimals);
         } else if token_type == EsdtTokenType::Meta {
-            contract_call.push_endpoint_arg(&properties.num_decimals);
+            contract_call.proxy_arg(&properties.num_decimals);
         }
 
         let mut token_prop_args = TokenPropertyArguments {
@@ -270,11 +267,11 @@ where
         self,
         token_identifier: &TokenIdentifier<SA>,
         amount: &BigUint<SA>,
-    ) -> ContractCall<SA, ()> {
-        let mut contract_call = self.esdt_system_sc_call_no_args(b"mint");
+    ) -> ContractCallNoPayment<SA, ()> {
+        let mut contract_call = self.esdt_system_sc_call_no_args("mint");
 
-        contract_call.push_endpoint_arg(token_identifier);
-        contract_call.push_endpoint_arg(amount);
+        contract_call.proxy_arg(token_identifier);
+        contract_call.proxy_arg(amount);
 
         contract_call
     }
@@ -285,30 +282,30 @@ where
         self,
         token_identifier: &TokenIdentifier<SA>,
         amount: &BigUint<SA>,
-    ) -> ContractCall<SA, ()> {
-        let mut contract_call = self.esdt_system_sc_call_no_args(b"ESDTBurn");
+    ) -> ContractCallNoPayment<SA, ()> {
+        let mut contract_call = self.esdt_system_sc_call_no_args("ESDTBurn");
 
-        contract_call.push_endpoint_arg(token_identifier);
-        contract_call.push_endpoint_arg(amount);
+        contract_call.proxy_arg(token_identifier);
+        contract_call.proxy_arg(amount);
 
         contract_call
     }
 
     /// The manager of an ESDT token may choose to suspend all transactions of the token,
     /// except minting, freezing/unfreezing and wiping.
-    pub fn pause(self, token_identifier: &TokenIdentifier<SA>) -> ContractCall<SA, ()> {
-        let mut contract_call = self.esdt_system_sc_call_no_args(b"pause");
+    pub fn pause(self, token_identifier: &TokenIdentifier<SA>) -> ContractCallNoPayment<SA, ()> {
+        let mut contract_call = self.esdt_system_sc_call_no_args("pause");
 
-        contract_call.push_endpoint_arg(token_identifier);
+        contract_call.proxy_arg(token_identifier);
 
         contract_call
     }
 
     /// The reverse operation of `pause`.
-    pub fn unpause(self, token_identifier: &TokenIdentifier<SA>) -> ContractCall<SA, ()> {
-        let mut contract_call = self.esdt_system_sc_call_no_args(b"unPause");
+    pub fn unpause(self, token_identifier: &TokenIdentifier<SA>) -> ContractCallNoPayment<SA, ()> {
+        let mut contract_call = self.esdt_system_sc_call_no_args("unPause");
 
-        contract_call.push_endpoint_arg(token_identifier);
+        contract_call.proxy_arg(token_identifier);
 
         contract_call
     }
@@ -320,11 +317,11 @@ where
         self,
         token_identifier: &TokenIdentifier<SA>,
         address: &ManagedAddress<SA>,
-    ) -> ContractCall<SA, ()> {
-        let mut contract_call = self.esdt_system_sc_call_no_args(b"freeze");
+    ) -> ContractCallNoPayment<SA, ()> {
+        let mut contract_call = self.esdt_system_sc_call_no_args("freeze");
 
-        contract_call.push_endpoint_arg(token_identifier);
-        contract_call.push_endpoint_arg(address);
+        contract_call.proxy_arg(token_identifier);
+        contract_call.proxy_arg(address);
 
         contract_call
     }
@@ -334,11 +331,11 @@ where
         self,
         token_identifier: &TokenIdentifier<SA>,
         address: &ManagedAddress<SA>,
-    ) -> ContractCall<SA, ()> {
-        let mut contract_call = self.esdt_system_sc_call_no_args(b"unFreeze");
+    ) -> ContractCallNoPayment<SA, ()> {
+        let mut contract_call = self.esdt_system_sc_call_no_args("unFreeze");
 
-        contract_call.push_endpoint_arg(token_identifier);
-        contract_call.push_endpoint_arg(address);
+        contract_call.proxy_arg(token_identifier);
+        contract_call.proxy_arg(address);
 
         contract_call
     }
@@ -351,11 +348,11 @@ where
         self,
         token_identifier: &TokenIdentifier<SA>,
         address: &ManagedAddress<SA>,
-    ) -> ContractCall<SA, ()> {
-        let mut contract_call = self.esdt_system_sc_call_no_args(b"wipe");
+    ) -> ContractCallNoPayment<SA, ()> {
+        let mut contract_call = self.esdt_system_sc_call_no_args("wipe");
 
-        contract_call.push_endpoint_arg(token_identifier);
-        contract_call.push_endpoint_arg(address);
+        contract_call.proxy_arg(token_identifier);
+        contract_call.proxy_arg(address);
 
         contract_call
     }
@@ -366,11 +363,11 @@ where
         self,
         token_identifier: &TokenIdentifier<SA>,
         num_decimals: usize,
-    ) -> ContractCall<SA, ()> {
-        let mut contract_call = self.esdt_system_sc_call_no_args(b"changeSFTToMetaESDT");
+    ) -> ContractCallNoPayment<SA, ()> {
+        let mut contract_call = self.esdt_system_sc_call_no_args("changeSFTToMetaESDT");
 
-        contract_call.push_endpoint_arg(&token_identifier);
-        contract_call.push_endpoint_arg(&num_decimals);
+        contract_call.proxy_arg(&token_identifier);
+        contract_call.proxy_arg(&num_decimals);
 
         contract_call
     }
@@ -384,14 +381,14 @@ where
         address: &ManagedAddress<SA>,
         token_identifier: &TokenIdentifier<SA>,
         roles_iter: RoleIter,
-    ) -> ContractCall<SA, ()> {
-        let mut contract_call = self.esdt_system_sc_call_no_args(b"setSpecialRole");
+    ) -> ContractCallNoPayment<SA, ()> {
+        let mut contract_call = self.esdt_system_sc_call_no_args("setSpecialRole");
 
-        contract_call.push_endpoint_arg(token_identifier);
-        contract_call.push_endpoint_arg(address);
+        contract_call.proxy_arg(token_identifier);
+        contract_call.proxy_arg(address);
         for role in roles_iter {
             if role != EsdtLocalRole::None {
-                contract_call.push_argument_raw_bytes(role.as_role_name());
+                contract_call.push_raw_argument(role.as_role_name());
             }
         }
 
@@ -407,14 +404,14 @@ where
         address: &ManagedAddress<SA>,
         token_identifier: &TokenIdentifier<SA>,
         roles_iter: RoleIter,
-    ) -> ContractCall<SA, ()> {
-        let mut contract_call = self.esdt_system_sc_call_no_args(b"unSetSpecialRole");
+    ) -> ContractCallNoPayment<SA, ()> {
+        let mut contract_call = self.esdt_system_sc_call_no_args("unSetSpecialRole");
 
-        contract_call.push_endpoint_arg(token_identifier);
-        contract_call.push_endpoint_arg(address);
+        contract_call.proxy_arg(token_identifier);
+        contract_call.proxy_arg(address);
         for role in roles_iter {
             if role != EsdtLocalRole::None {
-                contract_call.push_argument_raw_bytes(role.as_role_name());
+                contract_call.push_raw_argument(role.as_role_name());
             }
         }
 
@@ -425,11 +422,11 @@ where
         self,
         token_identifier: &TokenIdentifier<SA>,
         new_owner: &ManagedAddress<SA>,
-    ) -> ContractCall<SA, ()> {
-        let mut contract_call = self.esdt_system_sc_call_no_args(b"transferOwnership");
+    ) -> ContractCallNoPayment<SA, ()> {
+        let mut contract_call = self.esdt_system_sc_call_no_args("transferOwnership");
 
-        contract_call.push_endpoint_arg(token_identifier);
-        contract_call.push_endpoint_arg(new_owner);
+        contract_call.proxy_arg(token_identifier);
+        contract_call.proxy_arg(new_owner);
 
         contract_call
     }
@@ -439,12 +436,12 @@ where
         token_identifier: &TokenIdentifier<SA>,
         old_creator: &ManagedAddress<SA>,
         new_creator: &ManagedAddress<SA>,
-    ) -> ContractCall<SA, ()> {
-        let mut contract_call = self.esdt_system_sc_call_no_args(b"transferNFTCreateRole");
+    ) -> ContractCallNoPayment<SA, ()> {
+        let mut contract_call = self.esdt_system_sc_call_no_args("transferNFTCreateRole");
 
-        contract_call.push_endpoint_arg(token_identifier);
-        contract_call.push_endpoint_arg(old_creator);
-        contract_call.push_endpoint_arg(new_creator);
+        contract_call.proxy_arg(token_identifier);
+        contract_call.proxy_arg(old_creator);
+        contract_call.proxy_arg(new_creator);
 
         contract_call
     }
@@ -453,9 +450,9 @@ where
         self,
         token_identifier: &TokenIdentifier<SA>,
         property_arguments: &TokenPropertyArguments,
-    ) -> ContractCall<SA, ()> {
-        let mut contract_call = self.esdt_system_sc_call_no_args(b"controlChanges");
-        contract_call.push_endpoint_arg(token_identifier);
+    ) -> ContractCallNoPayment<SA, ()> {
+        let mut contract_call = self.esdt_system_sc_call_no_args("controlChanges");
+        contract_call.proxy_arg(token_identifier);
         append_token_property_arguments(&mut contract_call, property_arguments);
         contract_call
     }
@@ -464,81 +461,79 @@ where
         ManagedAddress::new_from_bytes(&ESDT_SYSTEM_SC_ADDRESS_ARRAY)
     }
 
-    fn esdt_system_sc_call_no_args(self, endpoint_name: &[u8]) -> ContractCall<SA, ()> {
+    fn esdt_system_sc_call_no_args(
+        self,
+        endpoint_name: &'static str,
+    ) -> ContractCallNoPayment<SA, ()> {
         let esdt_system_sc_address = self.esdt_system_sc_address();
-        ContractCall::new(
-            esdt_system_sc_address,
-            ManagedBuffer::new_from_bytes(endpoint_name),
-        )
+        ContractCallNoPayment::new(esdt_system_sc_address, endpoint_name)
     }
 }
 
-const TRUE_BYTES: &[u8] = b"true";
-const FALSE_BYTES: &[u8] = b"false";
+const TRUE_STR: &str = "true";
+const FALSE_STR: &str = "false";
 
-fn bool_name_bytes(b: bool) -> &'static [u8] {
+fn bool_name_bytes(b: bool) -> &'static str {
     if b {
-        TRUE_BYTES
+        TRUE_STR
     } else {
-        FALSE_BYTES
+        FALSE_STR
     }
 }
 
-fn set_token_property<SA, R>(contract_call: &mut ContractCall<SA, R>, name: &[u8], value: bool)
+fn set_token_property<SA, CC>(contract_call: &mut CC, name: &str, value: bool)
 where
     SA: CallTypeApi + 'static,
+    CC: ContractCall<SA>,
 {
-    contract_call.push_argument_raw_bytes(name);
-    contract_call.push_argument_raw_bytes(bool_name_bytes(value));
+    contract_call.push_raw_argument(name);
+    contract_call.push_raw_argument(bool_name_bytes(value));
 }
 
-fn append_token_property_arguments<SA, R>(
-    contract_call: &mut ContractCall<SA, R>,
+fn append_token_property_arguments<SA, CC>(
+    contract_call: &mut CC,
     token_prop_args: &TokenPropertyArguments,
 ) where
     SA: CallTypeApi + 'static,
+    CC: ContractCall<SA>,
 {
     if let Some(can_freeze) = token_prop_args.can_freeze {
-        set_token_property(contract_call, &b"canFreeze"[..], can_freeze);
+        set_token_property(contract_call, "canFreeze", can_freeze);
     }
 
     if let Some(can_wipe) = token_prop_args.can_wipe {
-        set_token_property(contract_call, &b"canWipe"[..], can_wipe);
+        set_token_property(contract_call, "canWipe", can_wipe);
     }
 
     if let Some(can_pause) = token_prop_args.can_pause {
-        set_token_property(contract_call, &b"canPause"[..], can_pause);
+        set_token_property(contract_call, "canPause", can_pause);
     }
 
     if let Some(can_transfer_create_role) = token_prop_args.can_transfer_create_role {
         set_token_property(
             contract_call,
-            &b"canTransferNFTCreateRole"[..],
+            "canTransferNFTCreateRole",
             can_transfer_create_role,
         );
     }
 
     if let Some(can_mint) = token_prop_args.can_mint {
-        set_token_property(contract_call, &b"canMint"[..], can_mint);
+        set_token_property(contract_call, "canMint", can_mint);
     }
 
     if let Some(can_burn) = token_prop_args.can_burn {
-        set_token_property(contract_call, &b"canBurn"[..], can_burn);
+        set_token_property(contract_call, "canBurn", can_burn);
     }
 
     if let Some(can_change_owner) = token_prop_args.can_change_owner {
-        set_token_property(contract_call, &b"canChangeOwner"[..], can_change_owner);
+        set_token_property(contract_call, "canChangeOwner", can_change_owner);
     }
 
     if let Some(can_upgrade) = token_prop_args.can_upgrade {
-        set_token_property(contract_call, &b"canUpgrade"[..], can_upgrade);
+        set_token_property(contract_call, "canUpgrade", can_upgrade);
     }
 
     if let Some(can_add_special_roles) = token_prop_args.can_add_special_roles {
-        set_token_property(
-            contract_call,
-            &b"canAddSpecialRoles"[..],
-            can_add_special_roles,
-        );
+        set_token_property(contract_call, "canAddSpecialRoles", can_add_special_roles);
     }
 }

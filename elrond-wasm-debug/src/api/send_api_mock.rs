@@ -1,7 +1,10 @@
 use crate::{
     num_bigint,
     tx_execution::{deploy_contract, execute_builtin_function_or_default},
-    tx_mock::{AsyncCallTxData, BlockchainUpdate, Promise, TxCache, TxInput, TxPanic, TxResult},
+    tx_mock::{
+        async_call_tx_input, AsyncCallTxData, BlockchainUpdate, Promise, TxCache, TxFunctionName,
+        TxInput, TxPanic, TxResult,
+    },
     DebugApi,
 };
 use elrond_wasm::{
@@ -47,34 +50,41 @@ impl DebugApi {
         tx_result.result_values
     }
 
+    fn create_async_call_data(
+        &self,
+        to: Address,
+        egld_value: num_bigint::BigUint,
+        func_name: TxFunctionName,
+        arguments: Vec<Vec<u8>>,
+    ) -> AsyncCallTxData {
+        let contract_address = &self.input_ref().to;
+        let tx_hash = self.get_tx_hash_legacy();
+        AsyncCallTxData {
+            from: contract_address.clone(),
+            to,
+            call_value: egld_value,
+            endpoint_name: func_name,
+            arguments,
+            tx_hash,
+        }
+    }
+
     fn prepare_execute_on_dest_context_input(
         &self,
         to: Address,
         egld_value: num_bigint::BigUint,
-        func_name: Vec<u8>,
+        func_name: TxFunctionName,
         args: Vec<Vec<u8>>,
     ) -> TxInput {
-        let contract_address = &self.input_ref().to;
-        let tx_hash = self.get_tx_hash_legacy();
-        TxInput {
-            from: contract_address.clone(),
-            to,
-            egld_value,
-            esdt_values: Vec::new(),
-            func_name,
-            args,
-            gas_limit: 1000,
-            gas_price: 0,
-            tx_hash,
-            promise_callback_closure_data: Vec::new(),
-        }
+        let async_call_data = self.create_async_call_data(to, egld_value, func_name, args);
+        async_call_tx_input(&async_call_data)
     }
 
     fn perform_execute_on_dest_context(
         &self,
         to: Address,
         egld_value: num_bigint::BigUint,
-        func_name: Vec<u8>,
+        func_name: TxFunctionName,
         args: Vec<Vec<u8>>,
     ) -> Vec<Vec<u8>> {
         let tx_input = self.prepare_execute_on_dest_context_input(to, egld_value, func_name, args);
@@ -97,15 +107,18 @@ impl DebugApi {
         &self,
         to: Address,
         egld_value: num_bigint::BigUint,
-        func_name: Vec<u8>,
-        args: Vec<Vec<u8>>,
+        func_name: TxFunctionName,
+        arguments: Vec<Vec<u8>>,
     ) -> Vec<Vec<u8>> {
-        let tx_input = self.prepare_execute_on_dest_context_input(to, egld_value, func_name, args);
+        let async_call_data = self.create_async_call_data(to, egld_value, func_name, arguments);
+        let tx_input = async_call_tx_input(&async_call_data);
         let tx_cache = TxCache::new(self.blockchain_cache_rc());
         let (tx_result, blockchain_updates) =
             execute_builtin_function_or_default(tx_input, tx_cache);
 
         if tx_result.result_status == 0 {
+            self.result_borrow_mut().all_calls.push(async_call_data);
+
             self.sync_call_post_processing(tx_result, blockchain_updates)
         } else {
             // also kill current execution
@@ -129,12 +142,12 @@ impl DebugApi {
             to: Address::zero(),
             egld_value,
             esdt_values: Vec::new(),
-            func_name: Vec::new(),
+            func_name: TxFunctionName::EMPTY,
             args,
             gas_limit: 1000,
             gas_price: 0,
             tx_hash,
-            promise_callback_closure_data: Vec::new(),
+            ..Default::default()
         };
 
         let tx_cache = TxCache::new(self.blockchain_cache_rc());
@@ -159,7 +172,8 @@ impl DebugApi {
     fn perform_async_call(&self, call: AsyncCallTxData) -> ! {
         // the cell is no longer needed, since we end in a panic
         let mut tx_result = self.extract_result();
-        tx_result.result_calls.async_call = Some(call);
+        tx_result.all_calls.push(call.clone());
+        tx_result.pending_calls.async_call = Some(call);
         std::panic::panic_any(tx_result)
     }
 
@@ -187,7 +201,7 @@ impl DebugApi {
             from: contract_address,
             to: recipient,
             call_value,
-            endpoint_name: UPGRADE_CONTRACT_FUNC_NAME.to_vec(),
+            endpoint_name: UPGRADE_CONTRACT_FUNC_NAME.into(),
             arguments,
             tx_hash,
         };
@@ -225,7 +239,7 @@ impl SendApiImpl for DebugApi {
         let _ = self.perform_transfer_execute(
             recipient,
             egld_value,
-            endpoint_name.to_boxed_bytes().into_vec(),
+            endpoint_name.to_boxed_bytes().as_slice().into(),
             arg_buffer.to_raw_args_vec(),
         );
 
@@ -251,7 +265,7 @@ impl SendApiImpl for DebugApi {
         let _ = self.perform_transfer_execute(
             recipient,
             num_bigint::BigUint::zero(),
-            ESDT_TRANSFER_FUNC_NAME.to_vec(),
+            ESDT_TRANSFER_FUNC_NAME.into(),
             args,
         );
 
@@ -287,7 +301,7 @@ impl SendApiImpl for DebugApi {
         let _ = self.perform_transfer_execute(
             contract_address,
             num_bigint::BigUint::zero(),
-            ESDT_NFT_TRANSFER_FUNC_NAME.to_vec(),
+            ESDT_NFT_TRANSFER_FUNC_NAME.into(),
             args,
         );
 
@@ -331,7 +345,7 @@ impl SendApiImpl for DebugApi {
         let _ = self.perform_transfer_execute(
             contract_address,
             num_bigint::BigUint::zero(),
-            ESDT_MULTI_TRANSFER_FUNC_NAME.to_vec(),
+            ESDT_MULTI_TRANSFER_FUNC_NAME.into(),
             args,
         );
 
@@ -354,7 +368,7 @@ impl SendApiImpl for DebugApi {
             from: contract_address,
             to: recipient,
             call_value: amount_value,
-            endpoint_name: endpoint_name.to_boxed_bytes().into_vec(),
+            endpoint_name: endpoint_name.to_boxed_bytes().as_slice().into(),
             arguments: arg_buffer.to_raw_args_vec(),
             tx_hash,
         };
@@ -367,8 +381,8 @@ impl SendApiImpl for DebugApi {
         amount: Self::BigIntHandle,
         endpoint_name_handle: Self::ManagedBufferHandle,
         arg_buffer_handle: Self::ManagedBufferHandle,
-        success_callback: &'static [u8],
-        error_callback: &'static [u8],
+        success_callback: &'static str,
+        error_callback: &'static str,
         _gas: u64,
         _extra_gas_for_callback: u64,
         callback_closure_handle: Self::ManagedBufferHandle,
@@ -384,7 +398,7 @@ impl SendApiImpl for DebugApi {
             from: contract_address,
             to: recipient,
             call_value: amount_value,
-            endpoint_name,
+            endpoint_name: endpoint_name.into(),
             arguments: ManagedArgBuffer::<Self>::from_raw_handle(
                 arg_buffer_handle.get_raw_handle_unchecked(),
             )
@@ -393,14 +407,15 @@ impl SendApiImpl for DebugApi {
         };
 
         let promise = Promise {
-            endpoint: call,
-            success_callback,
-            error_callback,
+            call,
+            success_callback: success_callback.into(),
+            error_callback: error_callback.into(),
             callback_closure_data,
         };
 
         let mut tx_result = self.result_borrow_mut();
-        tx_result.result_calls.promises.push(promise);
+        tx_result.all_calls.push(promise.call.clone());
+        tx_result.pending_calls.promises.push(promise);
     }
 
     fn deploy_contract<M: ManagedTypeApi>(
@@ -481,7 +496,7 @@ impl SendApiImpl for DebugApi {
         let result = self.perform_execute_on_dest_context(
             recipient,
             egld_value,
-            endpoint_name.to_boxed_bytes().into_vec(),
+            endpoint_name.to_boxed_bytes().as_slice().into(),
             arg_buffer.to_raw_args_vec(),
         );
 

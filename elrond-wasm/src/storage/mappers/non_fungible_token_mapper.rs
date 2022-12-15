@@ -19,8 +19,9 @@ use crate::{
     },
     storage::StorageKey,
     types::{
-        BigUint, CallbackClosure, ContractCall, EsdtTokenData, EsdtTokenPayment, EsdtTokenType,
-        ManagedAddress, ManagedBuffer, ManagedType, TokenIdentifier,
+        BigUint, CallbackClosure, ContractCall, ContractCallWithEgld, EsdtTokenData,
+        EsdtTokenPayment, EsdtTokenType, ManagedAddress, ManagedBuffer, ManagedType,
+        TokenIdentifier,
     },
 };
 
@@ -164,7 +165,7 @@ where
         issue_cost: BigUint<SA>,
         token_display_name: ManagedBuffer<SA>,
         token_ticker: ManagedBuffer<SA>,
-    ) -> ContractCall<SA, ()> {
+    ) -> ContractCallWithEgld<SA, ()> {
         let system_sc_proxy = ESDTSystemSmartContractProxy::<SA>::new_proxy_obj();
         system_sc_proxy.issue_non_fungible(
             issue_cost,
@@ -178,7 +179,7 @@ where
         issue_cost: BigUint<SA>,
         token_display_name: ManagedBuffer<SA>,
         token_ticker: ManagedBuffer<SA>,
-    ) -> ContractCall<SA, ()> {
+    ) -> ContractCallWithEgld<SA, ()> {
         let system_sc_proxy = ESDTSystemSmartContractProxy::<SA>::new_proxy_obj();
         system_sc_proxy.issue_semi_fungible(
             issue_cost,
@@ -193,7 +194,7 @@ where
         token_display_name: ManagedBuffer<SA>,
         token_ticker: ManagedBuffer<SA>,
         num_decimals: usize,
-    ) -> ContractCall<SA, ()> {
+    ) -> ContractCallWithEgld<SA, ()> {
         let system_sc_proxy = ESDTSystemSmartContractProxy::<SA>::new_proxy_obj();
         let properties = MetaTokenProperties {
             num_decimals,
@@ -280,6 +281,12 @@ where
         self.send_payment(to, &payment);
 
         payment
+    }
+
+    pub fn nft_update_attributes<T: TopEncode>(&self, token_nonce: u64, new_attributes: &T) {
+        let send_wrapper = SendWrapper::<SA>::new();
+        let token_id = self.get_token_id_ref();
+        send_wrapper.nft_update_attributes(token_id, token_nonce, new_attributes);
     }
 
     pub fn nft_burn(&self, token_nonce: u64, amount: &BigUint<SA>) {

@@ -26,7 +26,7 @@ pub fn local_variable_for_field(index: usize, field: &syn::Field) -> proc_macro2
             #ident
         }
     } else {
-        let local_var_name = format!("unnamed_{}", index);
+        let local_var_name = format!("unnamed_{index}");
         let local_var_ident = syn::Ident::new(&local_var_name, proc_macro2::Span::call_site());
         quote! {
             #local_var_ident

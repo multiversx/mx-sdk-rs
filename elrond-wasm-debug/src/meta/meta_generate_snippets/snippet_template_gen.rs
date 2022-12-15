@@ -9,7 +9,7 @@ pub(crate) fn write_snippet_imports(file: &mut File, contract_crate_name: &str) 
         file,
         "#[allow(non_snake_case)]
 
-use {}::ProxyTrait as _;
+use {contract_crate_name}::ProxyTrait as _;
 use elrond_interact_snippets::{{
     elrond_wasm::{{
         elrond_codec::multi_types::*,
@@ -26,8 +26,7 @@ use elrond_interact_snippets::{{
 use std::{{
     env::Args,
     io::{{Read, Write}},
-}};",
-        contract_crate_name
+}};"
     )
     .unwrap();
 
@@ -50,8 +49,7 @@ const TOKEN_ISSUE_COST: u64 = 50_000_000_000_000_000;").unwrap();
 pub(crate) fn write_contract_type_alias(file: &mut File, contract_crate_name: &str) {
     writeln!(
         file,
-        "type ContractType = ContractInfo<{}::Proxy<DebugApi>>;",
-        contract_crate_name
+        "type ContractType = ContractInfo<{contract_crate_name}::Proxy<DebugApi>>;"
     )
     .unwrap();
 

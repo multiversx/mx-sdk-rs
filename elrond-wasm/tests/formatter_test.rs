@@ -38,7 +38,7 @@ where
 {
     let mut receiver = SimpleReceiver::default();
     SCDisplay::fmt(&item, &mut receiver);
-    let expected = format!("{}", item);
+    let expected = format!("{item}");
     assert_eq!(receiver.0, expected);
 }
 

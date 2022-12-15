@@ -65,13 +65,13 @@ mod module_1 {
             elrond_wasm::io::finish_multi::<Self::Api, _>(&())
         }
 
-        fn call(&self, fn_name: &[u8]) -> bool {
+        fn call(&self, fn_name: &str) -> bool {
             if match fn_name {
-                b"callBack" => {
+                "callBack" => {
                     self.callback();
                     return true;
                 },
-                b"version" => {
+                "version" => {
                     self.call_version();
                     true
                 },
@@ -99,13 +99,11 @@ mod module_1 {
     }
 
     pub trait ProxyTrait: elrond_wasm::contract_base::ProxyObjBase + Sized {
-        fn version(&mut self) -> ContractCall<Self::Api, BigInt<Self::Api>> {
+        fn version(
+            &mut self,
+        ) -> elrond_wasm::types::ContractCallNoPayment<Self::Api, BigInt<Self::Api>> {
             let ___address___ = self.extract_address();
-            elrond_wasm::types::new_contract_call(
-                ___address___,
-                &b"version"[..],
-                ManagedVec::<Self::Api, EsdtTokenPayment<Self::Api>>::new(),
-            )
+            elrond_wasm::types::ContractCallNoPayment::new(___address___, "version")
         }
     }
 }
@@ -200,21 +198,21 @@ mod sample_adder {
             elrond_wasm::io::finish_multi::<Self::Api, _>(&result);
         }
 
-        fn call(&self, fn_name: &[u8]) -> bool {
+        fn call(&self, fn_name: &str) -> bool {
             if match fn_name {
-                b"callBack" => {
+                "callBack" => {
                     Adder::callback(self);
                     return true;
                 },
-                [103u8, 101u8, 116u8, 83u8, 117u8, 109u8] => {
+                "getSum" => {
                     self.call_get_sum();
                     true
                 },
-                [105u8, 110u8, 105u8, 116u8] => {
+                "init" => {
                     self.call_init();
                     true
                 },
-                [97u8, 100u8, 100u8] => {
+                "add" => {
                     self.call_add();
                     true
                 },
@@ -237,22 +235,20 @@ mod sample_adder {
     pub trait ProxyTrait:
         elrond_wasm::contract_base::ProxyObjBase + super::module_1::ProxyTrait
     {
-        fn get_sum(&mut self) -> elrond_wasm::types::ContractCall<Self::Api, BigInt<Self::Api>> {
+        fn get_sum(
+            &mut self,
+        ) -> elrond_wasm::types::ContractCallNoPayment<Self::Api, BigInt<Self::Api>> {
             let ___address___ = self.extract_address();
-            elrond_wasm::types::new_contract_call(
-                ___address___,
-                &b"get_sum"[..],
-                ManagedVec::<Self::Api, EsdtTokenPayment<Self::Api>>::new(),
-            )
+            elrond_wasm::types::ContractCallNoPayment::new(___address___, "get_sum")
         }
-        fn add(&mut self, amount: &BigInt<Self::Api>) -> ContractCall<Self::Api, ()> {
+        fn add(
+            &mut self,
+            amount: &BigInt<Self::Api>,
+        ) -> elrond_wasm::types::ContractCallNoPayment<Self::Api, ()> {
             let ___address___ = self.extract_address();
-            let mut ___contract_call___ = elrond_wasm::types::new_contract_call(
-                ___address___,
-                &b"add"[..],
-                ManagedVec::<Self::Api, EsdtTokenPayment<Self::Api>>::new(),
-            );
-            ___contract_call___.push_endpoint_arg(amount);
+            let mut ___contract_call___ =
+                elrond_wasm::types::ContractCallNoPayment::new(___address___, "add");
+            elrond_wasm::types::ContractCall::proxy_arg(&mut ___contract_call___, amount);
             ___contract_call___
         }
     }
@@ -289,7 +285,7 @@ mod sample_adder {
     where
         A: elrond_wasm::api::VMApi,
     {
-        fn call(&self, fn_name: &[u8]) -> bool {
+        fn call(&self, fn_name: &str) -> bool {
             EndpointWrappers::call(
                 &elrond_wasm::contract_base::UniversalContractObj::<A>::new(),
                 fn_name,
@@ -396,7 +392,7 @@ mod sample_adder {
     pub trait CallbackProxy: elrond_wasm::contract_base::CallbackProxyObjBase + Sized {
         fn my_callback(self, caller: &Address) -> elrond_wasm::types::CallbackClosure<Self::Api> {
             let mut ___callback_call___ =
-                elrond_wasm::types::new_callback_call::<Self::Api>(&b"my_callback"[..]);
+                elrond_wasm::types::new_callback_call::<Self::Api>("my_callback");
             ___callback_call___.push_endpoint_arg(caller);
             ___callback_call___
         }
@@ -427,9 +423,9 @@ fn test_add() {
     let _ = adder.add_version();
     assert_eq!(BigInt::from(111), adder.get_sum());
 
-    assert!(!adder.call(b"invalid_endpoint"));
+    assert!(!adder.call("invalid_endpoint"));
 
-    assert!(adder.call(b"version"));
+    assert!(adder.call("version"));
 
     let mut own_proxy =
         sample_adder::Proxy::<DebugApi>::new_proxy_obj().contract(ManagedAddress::zero());

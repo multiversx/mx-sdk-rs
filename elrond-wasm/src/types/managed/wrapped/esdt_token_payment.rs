@@ -18,6 +18,7 @@ pub struct EsdtTokenPayment<M: ManagedTypeApi> {
 }
 
 impl<M: ManagedTypeApi> EsdtTokenPayment<M> {
+    #[inline]
     pub fn new(token_identifier: TokenIdentifier<M>, token_nonce: u64, amount: BigUint<M>) -> Self {
         EsdtTokenPayment {
             token_identifier,
@@ -43,6 +44,14 @@ impl<M: ManagedTypeApi> EsdtTokenPayment<M> {
     #[inline]
     pub fn into_tuple(self) -> (TokenIdentifier<M>, u64, BigUint<M>) {
         (self.token_identifier, self.token_nonce, self.amount)
+    }
+}
+
+impl<M: ManagedTypeApi> From<(TokenIdentifier<M>, u64, BigUint<M>)> for EsdtTokenPayment<M> {
+    #[inline]
+    fn from(value: (TokenIdentifier<M>, u64, BigUint<M>)) -> Self {
+        let (token_identifier, token_nonce, amount) = value;
+        Self::new(token_identifier, token_nonce, amount)
     }
 }
 

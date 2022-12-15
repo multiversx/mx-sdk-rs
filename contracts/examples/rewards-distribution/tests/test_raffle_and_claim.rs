@@ -4,7 +4,7 @@ use elrond_wasm::{
 };
 use elrond_wasm_debug::{
     managed_token_id, rust_biguint, testing_framework::BlockchainStateWrapper,
-    tx_mock::TxInputESDT, DebugApi,
+    tx_mock::TxTokenTransfer, DebugApi,
 };
 use rewards_distribution::RewardsDistribution as _;
 mod mock_seed_nft_minter;
@@ -149,9 +149,9 @@ fn test_raffle_and_claim() {
     // claim the rewards
 
     let token_identifier = nft_token_id.clone().to_boxed_bytes().into_vec();
-    let nft_payments: Vec<TxInputESDT> = nft_nonces
+    let nft_payments: Vec<TxTokenTransfer> = nft_nonces
         .iter()
-        .map(|nonce| TxInputESDT {
+        .map(|nonce| TxTokenTransfer {
             token_identifier: token_identifier.clone(),
             nonce: *nonce,
             value: rust_biguint!(1),

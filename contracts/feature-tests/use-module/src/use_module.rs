@@ -1,5 +1,7 @@
 #![no_std]
 
+mod contract_base_full_path_mod;
+mod contract_base_mod;
 mod internal_mod_a;
 mod internal_mod_b;
 mod internal_mod_c;
@@ -23,7 +25,10 @@ elrond_wasm::imports!();
 /// - PauseModule
 #[elrond_wasm::contract]
 pub trait UseModule:
-    internal_mod_a::InternalModuleA
+    ContractBase
+    + contract_base_full_path_mod::ContractBaseFullPathTestModule
+    + contract_base_mod::ContractBaseTestModule
+    + internal_mod_a::InternalModuleA
     + internal_mod_b::InternalModuleB
     + internal_mod_c::InternalModuleC
     + internal_mod_init::InternalModuleInit

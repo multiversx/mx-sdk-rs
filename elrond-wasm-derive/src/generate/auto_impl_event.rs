@@ -74,21 +74,18 @@ fn generate_topic_conversion_code(
                             #pat.copy_to_array_big_endian_pad_right(&mut topics[#topic_index]);
                         },
                         other_stype_str => panic!(
-                            "[Event topic] Unsupported reference argument type: {:?}",
-                            other_stype_str
+                            "[Event topic] Unsupported reference argument type: {other_stype_str:?}"
                         ),
                     }
                 },
-                _ => panic!(
-                    "[Event topic] Unsupported reference argument type: {:?}",
-                    type_reference
-                ),
+                _ => {
+                    panic!("[Event topic] Unsupported reference argument type: {type_reference:?}")
+                },
             }
         },
-        other_arg => panic!(
-            "[Event topic] Unsupported argument type: {:?}, should be reference",
-            other_arg
-        ),
+        other_arg => {
+            panic!("[Event topic] Unsupported argument type: {other_arg:?}, should be reference")
+        },
     }
 }
 

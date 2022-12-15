@@ -56,14 +56,14 @@ pub trait ForwarderSyncCallModule {
     #[endpoint]
     #[payable("*")]
     fn forward_sync_accept_funds(&self, to: ManagedAddress) {
-        let (token, token_nonce, payment) = self.call_value().egld_or_single_esdt().into_tuple();
+        let payment = self.call_value().egld_or_single_esdt();
         let half_gas = self.blockchain().get_gas_left() / 2;
 
         let result: MultiValue2<BigUint, MultiValueEncoded<EsdtTokenPaymentMultiValue>> = self
             .vault_proxy()
             .contract(to)
             .accept_funds_echo_payment()
-            .with_egld_or_single_esdt_token_transfer(token, token_nonce, payment)
+            .with_egld_or_single_esdt_transfer(payment)
             .with_gas_limit(half_gas)
             .execute_on_dest_context();
         let (egld_value, esdt_transfers_multi) = result.into_tuple();
@@ -82,7 +82,7 @@ pub trait ForwarderSyncCallModule {
             .vault_proxy()
             .contract(to)
             .accept_funds()
-            .with_egld_or_single_esdt_token_transfer(token_id, 0, amount_to_send)
+            .with_egld_or_single_esdt_transfer((token_id, 0, amount_to_send))
             .execute_on_dest_context();
     }
 
@@ -96,13 +96,12 @@ pub trait ForwarderSyncCallModule {
     #[endpoint]
     #[payable("*")]
     fn forward_sync_accept_funds_then_read(&self, to: ManagedAddress) -> usize {
-        let (token, token_nonce, payment) = self.call_value().egld_or_single_esdt().into_tuple();
-        let () = self
-            .vault_proxy()
+        let payment = self.call_value().egld_or_single_esdt();
+        self.vault_proxy()
             .contract(to.clone())
             .accept_funds()
-            .with_egld_or_single_esdt_token_transfer(token, token_nonce, payment)
-            .execute_on_dest_context();
+            .with_egld_or_single_esdt_transfer(payment)
+            .execute_on_dest_context::<()>();
 
         self.vault_proxy()
             .contract(to)

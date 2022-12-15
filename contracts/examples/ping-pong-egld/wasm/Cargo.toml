@@ -2,7 +2,7 @@
 name = "ping-pong-egld-wasm"
 version = "0.0.1"
 authors = [ "Bruda Claudiu-Marcel <claudiu725@yahoo.com>",]
-edition = "2018"
+edition = "2021"
 publish = false
 
 [lib]

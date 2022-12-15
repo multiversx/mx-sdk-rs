@@ -2,7 +2,7 @@
 name = "erdpy-snippet-generator"
 version = "0.0.0"
 authors = ["Dorin Marian Iancu <dorin.iancu@elrond.com>"]
-edition = "2018"
+edition = "2021"
 
 [[bin]]
 name = "erdpy-snippet-generator"

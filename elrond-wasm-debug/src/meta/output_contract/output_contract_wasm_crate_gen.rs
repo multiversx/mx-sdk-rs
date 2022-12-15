@@ -73,7 +73,7 @@ impl OutputContract {
 }
 
 fn write_stat_comment(wasm_lib_file: &mut File, label: &str, number: usize) {
-    writeln!(wasm_lib_file, "// {:<35} {:3}", label, number).unwrap();
+    writeln!(wasm_lib_file, "// {label:<35} {number:3}").unwrap();
 }
 
 impl OutputContract {
@@ -108,11 +108,11 @@ fn write_endpoints_macro<'a, I>(
 ) where
     I: Iterator<Item = &'a String>,
 {
-    writeln!(wasm_lib_file, "{} {{", full_macro_name).unwrap();
-    writeln!(wasm_lib_file, "    {}", contract_module_name).unwrap();
+    writeln!(wasm_lib_file, "{full_macro_name} {{").unwrap();
+    writeln!(wasm_lib_file, "    {contract_module_name}").unwrap();
     writeln!(wasm_lib_file, "    (").unwrap();
     for endpoint_name in endpoint_names {
-        writeln!(wasm_lib_file, "        {}", endpoint_name).unwrap();
+        writeln!(wasm_lib_file, "        {endpoint_name}").unwrap();
     }
     writeln!(wasm_lib_file, "    )").unwrap();
     writeln!(wasm_lib_file, "}}").unwrap();

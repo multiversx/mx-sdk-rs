@@ -3,8 +3,7 @@ pub(super) fn is_attribute_with_no_args(attr: &syn::Attribute, name: &str) -> bo
         if first_seg.ident == name {
             assert!(
                 attr.path.segments.len() == 1,
-                "no arguments allowed for attribute `{}`",
-                name
+                "no arguments allowed for attribute `{name}`"
             );
             return true;
         }
