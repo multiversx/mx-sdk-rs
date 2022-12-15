@@ -7,7 +7,7 @@ use crate::{
 use super::{AsyncCall, ContractCallNoPayment, ContractCallWithEgld, ManagedArgBuffer};
 
 /// Defines a contract call object, which is the basis for all calls to other contracts.
-/// 
+///
 /// Its implementations differ on the type of payment that gets sent with the call.
 pub trait ContractCall<SA>: Sized
 where

@@ -8,12 +8,12 @@ use crate::{
 use super::{contract_call_no_payment::ContractCallNoPayment, ContractCall};
 
 /// Holds data for calling another contract, with EGLD payment only.
-/// 
+///
 /// Gets created when chaining method `with_egld_transfer`.
-/// 
+///
 /// If the payment is zero, it bevahes exactly like `ContractCallNoPayment`.
-/// 
-/// It also represents the normalized form of any contract call, since ESDT transfers 
+///
+/// It also represents the normalized form of any contract call, since ESDT transfers
 /// (the only payment not available here) get converted to builtin function calls in normalized form.
 #[must_use]
 pub struct ContractCallWithEgld<SA, OriginalResult>
