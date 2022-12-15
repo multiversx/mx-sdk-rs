@@ -85,7 +85,6 @@ where
         crate::types::Box::new(A::crypto_api_impl().ripemd160_legacy(data))
     }
 
-    #[cfg(feature = "ei-1-2")]
     pub fn ripemd160<B: core::borrow::Borrow<ManagedBuffer<A>>>(
         &self,
         data: B,
@@ -99,7 +98,6 @@ where
         A::crypto_api_impl().verify_bls_legacy(key, message, signature)
     }
 
-    #[cfg(feature = "ei-1-2")]
     pub fn verify_bls(
         &self,
         key: &ManagedBuffer<A>,
@@ -135,7 +133,6 @@ where
         )
     }
 
-    #[cfg(feature = "ei-1-2")]
     pub fn verify_ed25519(
         &self,
         key: &ManagedBuffer<A>,
@@ -155,7 +152,6 @@ where
         A::crypto_api_impl().verify_secp256k1_legacy(key, message, signature)
     }
 
-    #[cfg(feature = "ei-1-2")]
     pub fn verify_secp256k1(
         &self,
         key: &ManagedBuffer<A>,
@@ -179,7 +175,6 @@ where
         A::crypto_api_impl().verify_custom_secp256k1_legacy(key, message, signature, hash_type)
     }
 
-    #[cfg(feature = "ei-1-2")]
     pub fn verify_custom_secp256k1(
         &self,
         key: &ManagedBuffer<A>,
@@ -204,7 +199,6 @@ where
         A::crypto_api_impl().encode_secp256k1_der_signature_legacy(r, s)
     }
 
-    #[cfg(feature = "ei-1-2")]
     pub fn encode_secp256k1_der_signature(
         &self,
         r: &ManagedBuffer<A>,
