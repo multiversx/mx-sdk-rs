@@ -1,5 +1,7 @@
 use core::marker::PhantomData;
 
+use elrond_codec::TopDecode;
+
 use crate::{
     api::{
         const_handles, use_raw_handle, BlockchainApi, BlockchainApiImpl, ErrorApi, ErrorApiImpl,
@@ -269,6 +271,17 @@ where
         nonce: u64,
     ) -> EsdtTokenData<A> {
         A::blockchain_api_impl().load_esdt_token_data::<A>(address, token_id, nonce)
+    }
+
+    /// Retrieves and deserializes token attributes from the SC account, with given token identifier and nonce.
+    pub fn get_token_attributes<T: TopDecode>(
+        &self,
+        token_id: &TokenIdentifier<A>,
+        token_nonce: u64,
+    ) -> T {
+        let own_sc_address = self.get_sc_address();
+        let token_data = self.get_esdt_token_data(&own_sc_address, token_id, token_nonce);
+        token_data.decode_attributes()
     }
 
     #[cfg(feature = "ei-1-2")]
