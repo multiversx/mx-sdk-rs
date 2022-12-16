@@ -1,5 +1,5 @@
 use elrond_wasm::types::{BoxedBytes, ManagedAddress, ManagedBuffer};
-use elrond_wasm_debug::*;
+use mx_sc_debug::*;
 
 use alloc_features::managed_buffer_features_alloc::ManagedBufferFeatures;
 

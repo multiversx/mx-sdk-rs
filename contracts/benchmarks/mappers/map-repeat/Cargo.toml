@@ -16,6 +16,6 @@ path = "../benchmark-common"
 version = "0.38.0"
 path = "../../../../framework/base"
 
-[dev-dependencies.elrond-wasm-debug]
+[dev-dependencies.mx-sc-debug]
 version = "0.38.0"
 path = "../../../../framework/debug"

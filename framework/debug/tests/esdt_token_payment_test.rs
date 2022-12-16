@@ -2,7 +2,7 @@ use elrond_wasm::{
     mx_sc_codec::{self, DefaultErrorHandler, TopEncode},
     types::{BigUint, EsdtTokenPayment, TokenIdentifier},
 };
-use elrond_wasm_debug::DebugApi;
+use mx_sc_debug::DebugApi;
 
 /// Helper top-decode that doesn't rely on the `esdt-token-payment-legacy-decode` feature flag.
 fn esdt_token_payment_backwards_compatible_top_decode_or_handle_err<I, H>(

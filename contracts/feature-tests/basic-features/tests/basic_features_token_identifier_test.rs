@@ -1,5 +1,5 @@
 use elrond_wasm::types::{EgldOrEsdtTokenIdentifier, ManagedBuffer, TokenIdentifier};
-use elrond_wasm_debug::*;
+use mx_sc_debug::*;
 
 use basic_features::token_identifier_features::TokenIdentifierFeatures;
 
@@ -12,7 +12,7 @@ fn test_token_identifier_egld() {
 }
 
 /// This just tests the contract syntax.
-/// For a complete suite of test cases, see `elrond-wasm-debug/tests/managed_token_identifier_test.rs`.
+/// For a complete suite of test cases, see `mx-sc-debug/tests/managed_token_identifier_test.rs`.
 #[test]
 fn test_token_identifier_is_valid() {
     let _ = DebugApi::dummy();

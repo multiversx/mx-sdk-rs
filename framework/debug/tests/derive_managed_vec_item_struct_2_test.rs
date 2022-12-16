@@ -1,8 +1,8 @@
-use elrond_wasm_debug::DebugApi;
+use mx_sc_debug::DebugApi;
 
 elrond_wasm::derive_imports!();
 
-// to test, run the following command in elrond-wasm-debug folder:
+// to test, run the following command in mx-sc-debug folder:
 // cargo expand --test derive_managed_vec_item_struct_2_test > expanded.rs
 
 #[derive(

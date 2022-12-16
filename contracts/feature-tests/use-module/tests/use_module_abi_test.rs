@@ -1,4 +1,4 @@
-use elrond_wasm_debug::*;
+use mx_sc_debug::*;
 
 use std::{fs, fs::File, io::Write};
 
@@ -9,7 +9,7 @@ fn use_module_abi_generated_ok() {
 
     // generate ABI
     let multi_contract_config =
-        elrond_wasm_debug::meta::multi_contract_config::<use_module::AbiProvider>(
+        mx_sc_debug::meta::multi_contract_config::<use_module::AbiProvider>(
             blockchain
                 .current_dir
                 .join("multicontract.toml")

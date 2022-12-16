@@ -2,7 +2,7 @@ use elrond_wasm::storage::{
     mappers::{StorageClearable, StorageMapper, UnorderedSetMapper},
     StorageKey,
 };
-use elrond_wasm_debug::DebugApi;
+use mx_sc_debug::DebugApi;
 
 fn create_set() -> UnorderedSetMapper<DebugApi, u64> {
     let _ = DebugApi::dummy();

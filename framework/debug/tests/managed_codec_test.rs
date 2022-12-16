@@ -1,5 +1,5 @@
 use elrond_wasm::types::{BigInt, BigUint, BoxedBytes, ManagedAddress, ManagedBuffer, ManagedVec};
-use elrond_wasm_debug::{check_managed_top_encode_decode, DebugApi};
+use mx_sc_debug::{check_managed_top_encode_decode, DebugApi};
 
 #[test]
 fn test_big_uint_serialization() {

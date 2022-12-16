@@ -1,5 +1,5 @@
 use elrond_wasm::types::ManagedVec;
-use elrond_wasm_debug::DebugApi;
+use mx_sc_debug::DebugApi;
 use rewards_distribution::Bracket;
 
 pub fn to_brackets(brackets_vec: &[(u64, u64)]) -> ManagedVec<DebugApi, Bracket> {

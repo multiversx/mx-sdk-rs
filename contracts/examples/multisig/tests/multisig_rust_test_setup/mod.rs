@@ -3,7 +3,7 @@ use elrond_wasm::{
     mx_sc_codec::multi_types::OptionalValue,
     types::{Address, BigUint, BoxedBytes, CodeMetadata, ManagedBuffer, ManagedVec},
 };
-use elrond_wasm_debug::{
+use mx_sc_debug::{
     managed_address, rust_biguint, testing_framework::*, tx_mock::TxResult, DebugApi,
 };
 use multisig::{

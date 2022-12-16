@@ -1,5 +1,5 @@
 use elrond_wasm::types::Address;
-use elrond_wasm_debug::{rust_biguint, testing_framework::*, DebugApi};
+use mx_sc_debug::{rust_biguint, testing_framework::*, DebugApi};
 use empty::*;
 
 const WASM_PATH: &str = "output/empty.wasm";

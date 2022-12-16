@@ -8,7 +8,7 @@ use elrond_wasm::{
     types::{AsyncCallResult, BigUint},
     HexCallDataDeserializer,
 };
-use elrond_wasm_debug::DebugApi;
+use mx_sc_debug::DebugApi;
 
 #[test]
 fn test_simple_args() {

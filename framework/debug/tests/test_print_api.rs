@@ -1,5 +1,5 @@
 use elrond_wasm::types::BigUint;
-use elrond_wasm_debug::{BigUintPrinter, DebugApi};
+use mx_sc_debug::{BigUintPrinter, DebugApi};
 
 #[test]
 fn test_print_api() {

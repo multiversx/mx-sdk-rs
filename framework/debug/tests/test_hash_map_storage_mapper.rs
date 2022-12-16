@@ -2,7 +2,7 @@ use elrond_wasm::storage::{
     mappers::{MapMapper, MapStorageMapper, StorageClearable, StorageMapper},
     StorageKey,
 };
-use elrond_wasm_debug::DebugApi;
+use mx_sc_debug::DebugApi;
 
 fn create_map_storage() -> MapStorageMapper<DebugApi, u64, MapMapper<DebugApi, u64, u64>> {
     let _ = DebugApi::dummy();

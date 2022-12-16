@@ -6,7 +6,7 @@ use elrond_wasm::{
         TokenIdentifier,
     },
 };
-use elrond_wasm_debug::DebugApi;
+use mx_sc_debug::DebugApi;
 
 fn test_managed_ref_for_type<M, T>(obj: T)
 where

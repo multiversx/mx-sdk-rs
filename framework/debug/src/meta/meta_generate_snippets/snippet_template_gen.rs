@@ -15,7 +15,7 @@ use mx_sc_snippets::{{
         mx_sc_codec::multi_types::*,
         types::{{Address, CodeMetadata}},
     }},
-    elrond_wasm_debug::{{
+    mx_sc_debug::{{
         bech32, mandos::interpret_trait::InterpreterContext, mandos_system::model::*, ContractInfo,
         DebugApi,
     }},

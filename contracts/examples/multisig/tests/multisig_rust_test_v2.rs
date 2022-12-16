@@ -10,7 +10,7 @@ use elrond_wasm::{
     storage::mappers::SingleValue,
     types::{Address, CodeMetadata},
 };
-use elrond_wasm_debug::{
+use mx_sc_debug::{
     mandos::interpret_trait::{InterpretableFrom, InterpreterContext},
     mandos_system::model::*,
     BlockchainMock, ContractInfo, DebugApi,

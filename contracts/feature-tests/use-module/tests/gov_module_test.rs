@@ -1,5 +1,5 @@
 use elrond_wasm::types::{Address, ManagedVec, MultiValueEncoded};
-use elrond_wasm_debug::{
+use mx_sc_debug::{
     managed_address, managed_biguint, managed_buffer, managed_token_id, rust_biguint,
     testing_framework::{BlockchainStateWrapper, ContractObjWrapper},
     tx_mock::TxResult,

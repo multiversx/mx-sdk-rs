@@ -7,7 +7,7 @@ use elrond_wasm::{
         ManagedBuffer, ManagedByteArray, ManagedOption, ManagedType, ManagedVec, TokenIdentifier,
     },
 };
-use elrond_wasm_debug::{
+use mx_sc_debug::{
     api::DebugHandle,
     num_bigint::{BigInt as RustBigInt, BigUint as RustBigUint},
     DebugApi,

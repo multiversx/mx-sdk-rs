@@ -7,7 +7,7 @@ use elrond_wasm::{
     mx_sc_codec::Empty,
     types::{Address, BigUint, EsdtLocalRole, EsdtTokenPayment, ManagedVec, TokenIdentifier},
 };
-use elrond_wasm_debug::{
+use mx_sc_debug::{
     assert_values_eq, managed_address, managed_biguint, managed_buffer, managed_token_id,
     rust_biguint, testing_framework::*, tx_mock::TxTokenTransfer, DebugApi,
 };

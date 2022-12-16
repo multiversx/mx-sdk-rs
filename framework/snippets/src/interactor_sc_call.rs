@@ -1,6 +1,6 @@
 use crate::{address_h256_to_erdrs, mandos_to_erdrs_address, Interactor, InteractorResult};
 use elrond_sdk_erdrs::data::transaction::Transaction;
-use elrond_wasm_debug::{
+use mx_sc_debug::{
     elrond_wasm::{
         mx_sc_codec::{multi_types::IgnoreValue, CodecFrom, TopEncodeMulti},
         types::ContractCallWithEgld,

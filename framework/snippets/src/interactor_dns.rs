@@ -1,7 +1,7 @@
-use elrond_wasm_debug::{elrond_wasm::types::Address, mandos::value_interpreter::keccak256};
+use mx_sc_debug::{elrond_wasm::types::Address, mandos::value_interpreter::keccak256};
 
 #[cfg(test)]
-use elrond_wasm_debug::bech32;
+use mx_sc_debug::bech32;
 
 fn get_initial_dns_address() -> Address {
     Address::from_slice(&[1u8; 32])

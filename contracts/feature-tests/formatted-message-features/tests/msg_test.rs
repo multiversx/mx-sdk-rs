@@ -1,4 +1,4 @@
-use elrond_wasm_debug::DebugApi;
+use mx_sc_debug::DebugApi;
 use formatted_message_features::*;
 
 fn check_printed_and_clear(expected: &str) {

@@ -402,7 +402,7 @@ mod sample_adder {
 
 #[test]
 fn test_add() {
-    use elrond_wasm_debug::DebugApi;
+    use mx_sc_debug::DebugApi;
     use sample_adder::{Adder, EndpointWrappers, ProxyTrait};
 
     let _ = DebugApi::dummy();
@@ -431,11 +431,11 @@ fn test_add() {
         sample_adder::Proxy::<DebugApi>::new_proxy_obj().contract(ManagedAddress::zero());
     let _ = own_proxy.get_sum();
 
-    let _ = elrond_wasm_debug::abi_json::contract_abi::<sample_adder::AbiProvider>();
+    let _ = mx_sc_debug::abi_json::contract_abi::<sample_adder::AbiProvider>();
 }
 
-fn world() -> elrond_wasm_debug::BlockchainMock {
-    let mut blockchain = elrond_wasm_debug::BlockchainMock::new();
+fn world() -> mx_sc_debug::BlockchainMock {
+    let mut blockchain = mx_sc_debug::BlockchainMock::new();
     blockchain.register_contract(
         "file:../../contracts/examples/adder/output/adder.wasm",
         sample_adder::ContractBuilder,
@@ -445,7 +445,7 @@ fn world() -> elrond_wasm_debug::BlockchainMock {
 
 #[test]
 fn test_mandos() {
-    elrond_wasm_debug::mandos_rs(
+    mx_sc_debug::mandos_rs(
         "../../contracts/examples/adder/mandos/adder.scen.json",
         world(),
     );

@@ -6,7 +6,7 @@ use elrond_wasm::{
         ManagedType, TokenIdentifier,
     },
 };
-use elrond_wasm_debug::DebugApi;
+use mx_sc_debug::DebugApi;
 
 fn test_some_for_value<M, T, F>(f: F)
 where

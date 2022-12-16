@@ -20,6 +20,6 @@ version = "0.38.0"
 path = "../../../../framework/wasm-adapter"
 optional = true
 
-[dev-dependencies.elrond-wasm-debug]
+[dev-dependencies.mx-sc-debug]
 version = "0.38.0"
 path = "../../../../framework/debug"

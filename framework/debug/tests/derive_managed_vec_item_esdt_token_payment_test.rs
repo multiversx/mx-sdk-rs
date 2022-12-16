@@ -5,9 +5,9 @@ use elrond_wasm::{
     mx_sc_codec::mx_sc_codec_derive::{NestedDecode, NestedEncode, TopDecode, TopEncode},
     types::{BigUint, EsdtTokenPayment, ManagedByteArray, ManagedType, TokenIdentifier},
 };
-use elrond_wasm_debug::DebugApi;
+use mx_sc_debug::DebugApi;
 
-// to test, run the following command in elrond-wasm-debug folder:
+// to test, run the following command in mx-sc-debug folder:
 // cargo expand --test derive_managed_vec_item_esdt_token_payment_test > expanded.rs
 
 const ETH_ADDR_WIDTH: usize = 20;

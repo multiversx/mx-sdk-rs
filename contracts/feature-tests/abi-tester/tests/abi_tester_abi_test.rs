@@ -1,6 +1,6 @@
 use std::{fs, fs::File, io::Write};
 
-use elrond_wasm_debug::{abi_json, BlockchainMock};
+use mx_sc_debug::{abi_json, BlockchainMock};
 
 #[test]
 fn abi_tester_abi_generated_ok() {
@@ -9,7 +9,7 @@ fn abi_tester_abi_generated_ok() {
 
     // generate ABI
     let multi_contract_config =
-        elrond_wasm_debug::meta::multi_contract_config::<abi_tester::AbiProvider>(
+        mx_sc_debug::meta::multi_contract_config::<abi_tester::AbiProvider>(
             blockchain
                 .current_dir
                 .join("multicontract.toml")
@@ -52,7 +52,7 @@ fn check_multi_contract_config() {
     blockchain.set_current_dir_from_workspace("contracts/feature-tests/abi-tester");
 
     let multi_contract_config =
-        elrond_wasm_debug::meta::multi_contract_config::<abi_tester::AbiProvider>(
+        mx_sc_debug::meta::multi_contract_config::<abi_tester::AbiProvider>(
             blockchain
                 .current_dir
                 .join("multicontract.toml")

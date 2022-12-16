@@ -2,7 +2,7 @@ use elrond_wasm::storage::{
     mappers::{BiDiMapper, StorageMapper},
     StorageKey,
 };
-use elrond_wasm_debug::DebugApi;
+use mx_sc_debug::DebugApi;
 
 fn create_set_1() -> BiDiMapper<DebugApi, u64, u32> {
     let _ = DebugApi::dummy();

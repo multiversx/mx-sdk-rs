@@ -1,5 +1,5 @@
 use elrond_sdk_erdrs::{data::transaction::Transaction, interactors::wallet::Wallet};
-use elrond_wasm_debug::elrond_wasm::types::Address;
+use mx_sc_debug::elrond_wasm::types::Address;
 use log::debug;
 
 use crate::{address_h256_to_erdrs, Interactor};

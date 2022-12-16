@@ -1,5 +1,5 @@
 use elrond_wasm::types::{LockableStaticBuffer, StaticBufferRef};
-use elrond_wasm_debug::DebugApi;
+use mx_sc_debug::DebugApi;
 
 #[test]
 fn test_try_extend_from_slice() {

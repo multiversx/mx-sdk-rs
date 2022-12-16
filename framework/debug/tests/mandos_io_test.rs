@@ -1,6 +1,6 @@
 use std::{fs, fs::File, io::Write};
 
-use elrond_wasm_debug::mandos_system::model::Scenario;
+use mx_sc_debug::mandos_system::model::Scenario;
 
 use mandos::{
     interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},

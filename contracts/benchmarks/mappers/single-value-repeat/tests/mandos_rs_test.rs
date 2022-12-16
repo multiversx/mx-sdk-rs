@@ -1,4 +1,4 @@
-use elrond_wasm_debug::*;
+use mx_sc_debug::*;
 
 fn world() -> BlockchainMock {
     let mut blockchain = BlockchainMock::new();
@@ -13,10 +13,10 @@ fn world() -> BlockchainMock {
 
 #[test]
 fn single_value_repeat_struct_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/single_value_repeat_struct.scen.json", world());
+    mx_sc_debug::mandos_rs("mandos/single_value_repeat_struct.scen.json", world());
 }
 
 #[test]
 fn single_value_repeat_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/single_value_repeat.scen.json", world());
+    mx_sc_debug::mandos_rs("mandos/single_value_repeat.scen.json", world());
 }

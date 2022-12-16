@@ -5,7 +5,7 @@ use elrond_wasm::{
         ManagedByteArray, ManagedVec, TokenIdentifier,
     },
 };
-use elrond_wasm_debug::DebugApi;
+use mx_sc_debug::DebugApi;
 
 #[test]
 fn test_big_uint_format() {

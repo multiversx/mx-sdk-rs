@@ -3,7 +3,7 @@ use std::marker::PhantomData;
 use elrond_sdk_erdrs::data::transaction::{
     ApiLogs, ApiSmartContractResult, Events, TransactionOnNetwork,
 };
-use elrond_wasm_debug::{
+use mx_sc_debug::{
     bech32,
     elrond_wasm::{
         mx_sc_codec::{PanicErrorHandler, TopDecodeMulti},

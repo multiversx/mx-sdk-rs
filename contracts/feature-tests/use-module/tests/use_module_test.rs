@@ -1,5 +1,5 @@
 use elrond_wasm::contract_base::CallableContract;
-use elrond_wasm_debug::*;
+use mx_sc_debug::*;
 
 #[test]
 fn test_function_selector() {

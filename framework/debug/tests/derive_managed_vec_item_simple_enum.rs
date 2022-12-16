@@ -4,7 +4,7 @@ use elrond_wasm::{
     mx_sc_codec::mx_sc_codec_derive::{NestedDecode, NestedEncode, TopDecode, TopEncode},
 };
 
-// to test, run the following command in elrond-wasm-debug folder:
+// to test, run the following command in mx-sc-debug folder:
 // cargo expand --test derive_managed_vec_item_simple_enum > expanded.rs
 
 #[derive(

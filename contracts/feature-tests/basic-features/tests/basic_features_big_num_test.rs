@@ -1,5 +1,5 @@
 use elrond_wasm::types::{BigInt, BigUint, ManagedBuffer};
-use elrond_wasm_debug::*;
+use mx_sc_debug::*;
 
 use basic_features::big_num_methods::BigIntMethods;
 

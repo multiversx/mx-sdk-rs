@@ -1,5 +1,5 @@
 use elrond_wasm::api::CryptoApiImpl;
-use elrond_wasm_debug::DebugApi;
+use mx_sc_debug::DebugApi;
 use hex::FromHex;
 
 #[test]

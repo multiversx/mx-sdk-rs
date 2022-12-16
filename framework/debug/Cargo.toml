@@ -1,5 +1,5 @@
 [package]
-name = "elrond-wasm-debug"
+name = "mx-sc-debug"
 version = "0.38.0"
 edition = "2021"
 

@@ -5,7 +5,7 @@ use elrond_wasm::{
     storage::mappers::StorageTokenWrapper,
     types::{EsdtLocalRole, EsdtTokenPayment, ManagedVec},
 };
-use elrond_wasm_debug::{
+use mx_sc_debug::{
     managed_address, managed_biguint, managed_token_id, rust_biguint,
     testing_framework::BlockchainStateWrapper, tx_mock::TxTokenTransfer,
 };

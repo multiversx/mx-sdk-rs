@@ -12,7 +12,7 @@ path = "src/erdpy_snippet_generator.rs"
 version = "0.38.0"
 path = "../../framework/base"
 
-[dependencies.elrond-wasm-debug]
+[dependencies.mx-sc-debug]
 version = "0.38.0"
 path = "../../framework/debug"
 

@@ -1,6 +1,6 @@
 use adder::*;
 use elrond_wasm::types::BigUint;
-use elrond_wasm_debug::DebugApi;
+use mx_sc_debug::DebugApi;
 
 #[test]
 fn test_add() {

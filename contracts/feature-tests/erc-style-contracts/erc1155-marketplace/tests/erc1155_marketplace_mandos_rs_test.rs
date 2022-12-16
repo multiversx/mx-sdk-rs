@@ -1,4 +1,4 @@
-use elrond_wasm_debug::*;
+use mx_sc_debug::*;
 
 fn world() -> BlockchainMock {
     let mut blockchain = BlockchainMock::new();
@@ -16,30 +16,30 @@ fn world() -> BlockchainMock {
 
 #[test]
 fn auction_single_token_egld_test_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/auction_single_token_egld.scen.json", world());
+    mx_sc_debug::mandos_rs("mandos/auction_single_token_egld.scen.json", world());
 }
 
 #[test]
 fn auction_batch_test_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/auction_batch.scen.json", world());
+    mx_sc_debug::mandos_rs("mandos/auction_batch.scen.json", world());
 }
 
 #[test]
 fn bid_first_egld_test_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/bid_first_egld.scen.json", world());
+    mx_sc_debug::mandos_rs("mandos/bid_first_egld.scen.json", world());
 }
 
 #[test]
 fn bid_second_egld_test_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/bid_second_egld.scen.json", world());
+    mx_sc_debug::mandos_rs("mandos/bid_second_egld.scen.json", world());
 }
 
 #[test]
 fn bid_third_egld_test_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/bid_third_egld.scen.json", world());
+    mx_sc_debug::mandos_rs("mandos/bid_third_egld.scen.json", world());
 }
 
 #[test]
 fn end_auction_test_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/end_auction.scen.json", world());
+    mx_sc_debug::mandos_rs("mandos/end_auction.scen.json", world());
 }

@@ -10,6 +10,6 @@ authors = ["Claudiu-Marcel Bruda <claudiu.bruda@elrond.com>"]
 [dependencies.seed-nft-minter]
 path = ".."
 
-[dependencies.elrond-wasm-debug]
+[dependencies.mx-sc-debug]
 version = "0.38.0"
 path = "../../../../framework/debug"

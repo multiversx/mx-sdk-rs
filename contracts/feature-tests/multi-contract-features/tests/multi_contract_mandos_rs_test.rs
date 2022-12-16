@@ -1,4 +1,4 @@
-use elrond_wasm_debug::*;
+use mx_sc_debug::*;
 
 fn world() -> BlockchainMock {
     let mut blockchain = BlockchainMock::new();
@@ -20,10 +20,10 @@ fn world() -> BlockchainMock {
 
 #[test]
 fn external_pure_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/external-pure.scen.json", world());
+    mx_sc_debug::mandos_rs("mandos/external-pure.scen.json", world());
 }
 
 #[test]
 fn external_get_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/external-get.scen.json", world());
+    mx_sc_debug::mandos_rs("mandos/external-get.scen.json", world());
 }
