@@ -9,7 +9,7 @@
 #![feature(maybe_uninit_array_assume_init)]
 #![feature(negative_impls)]
 
-pub use elrond_wasm_derive::{self as derive, contract, module, proxy};
+pub use mx_sc_derive::{self as derive, contract, module, proxy};
 
 // re-export basic heap types
 extern crate alloc;

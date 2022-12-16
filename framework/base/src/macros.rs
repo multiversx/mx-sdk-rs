@@ -1,4 +1,4 @@
-// Note: Simple macros cannot be placed in elrond-wasm-derive,
+// Note: Simple macros cannot be placed in mx-sc-derive,
 // because Rust "cannot export macro_rules! macros from a `proc-macro` crate type currently".
 
 /// Getting all imports needed for a smart contract.
