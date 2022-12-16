@@ -4,15 +4,15 @@ version = "0.38.0"
 
 authors = [
     "Dorin Iancu <dorin.iancu@elrond.com>",
-    "Elrond Network <contact@elrond.com>",
+    "MultiversX <contact@multiversx.com>",
 ]
 license = "GPL-3.0-only"
 readme = "README.md"
 repository = "https://github.com/ElrondNetwork/elrond-wasm-rs"
-homepage = "https://elrond.com/"
+homepage = "https://multiversx.com/"
 documentation = "https://docs.elrond.com/"
 description = "Elrond Price aggregator Smart Contract"
-keywords = ["elrond", "wasm", "webassembly", "blockchain", "contract"]
+keywords = ["multiversx", "wasm", "webassembly", "blockchain", "contract"]
 categories = ["no-std", "wasm", "cryptography::cryptocurrencies"]
 edition = "2021"
 

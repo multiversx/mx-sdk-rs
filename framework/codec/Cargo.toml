@@ -3,14 +3,14 @@ name = "mx-sc-codec"
 version = "0.16.0"
 edition = "2021"
 
-authors = ["Andrei Marinica <andrei.marinica@elrond.com>", "Elrond Network <contact@elrond.com>"]
+authors = ["Andrei Marinica <andrei.marinica@elrond.com>", "MultiversX <contact@multiversx.com>"]
 license = "GPL-3.0-only"
 readme = "README.md"
 repository = "https://github.com/ElrondNetwork/elrond-wasm-rs"
-homepage = "https://elrond.com/"
+homepage = "https://multiversx.com/"
 documentation = "https://docs.elrond.com/"
-description = "Lightweight binary serializer/deserializer, written especially for Elrond smart contracts"
-keywords = ["elrond", "wasm", "webassembly", "blockchain", "contract"]
+description = "Lightweight binary serializer/deserializer, written especially for MultiversX smart contracts"
+keywords = ["multiversx", "wasm", "webassembly", "blockchain", "contract"]
 categories = ["no-std", "wasm", "cryptography::cryptocurrencies", "development-tools"]
 
 [features]
