@@ -19,14 +19,14 @@ macro_rules! imports {
                 SendApiImpl,
             },
             arrayvec::ArrayVec,
-            contract_base::{ContractBase, ProxyObjBase},
-            err_msg,
-            esdt::*,
-            io::*,
             codec::{
                 multi_types::*, DecodeError, IntoMultiValue, NestedDecode, NestedEncode, TopDecode,
                 TopEncode,
             },
+            contract_base::{ContractBase, ProxyObjBase},
+            err_msg,
+            esdt::*,
+            io::*,
             non_zero_usize,
             non_zero_util::*,
             require, require_old, sc_error, sc_format, sc_panic, sc_print,
@@ -44,12 +44,12 @@ macro_rules! imports {
 macro_rules! derive_imports {
     () => {
         use mx_sc::{
-            derive::{ManagedVecItem, TypeAbi},
             codec,
             codec::mx_sc_codec_derive::{
                 NestedDecode, NestedEncode, TopDecode, TopDecodeOrDefault, TopEncode,
                 TopEncodeOrDefault,
             },
+            derive::{ManagedVecItem, TypeAbi},
         };
     };
 }

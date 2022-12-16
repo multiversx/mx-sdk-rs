@@ -299,12 +299,6 @@ pub fn proxy_obj_code(contract: &ContractTrait) -> proc_macro2::TokenStream {
 
 fn equivalent_encode_path_gen(ty: &syn::Type) -> syn::Path {
     let owned_type = convert_to_owned_type(ty);
-    syn::parse_str(
-        format!(
-            "mx_sc::codec::CodecInto<{}>",
-            owned_type.to_token_stream()
-        )
-        .as_str(),
-    )
-    .unwrap()
+    syn::parse_str(format!("mx_sc::codec::CodecInto<{}>", owned_type.to_token_stream()).as_str())
+        .unwrap()
 }

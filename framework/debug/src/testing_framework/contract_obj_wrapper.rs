@@ -1,8 +1,8 @@
 use std::{collections::HashMap, path::PathBuf, rc::Rc, str::FromStr};
 
 use mx_sc::{
-    contract_base::{CallableContract, ContractBase},
     codec::{TopDecode, TopEncode},
+    contract_base::{CallableContract, ContractBase},
     types::{
         heap::{Address, H256},
         EsdtLocalRole,

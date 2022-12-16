@@ -1,11 +1,13 @@
 use crate::{
     api::ManagedTypeApi,
+    codec,
+    codec::{
+        mx_sc_codec_derive::{NestedDecode, NestedEncode, TopDecode, TopEncode},
+        *,
+    },
     contract_base::ExitCodecErrorHandler,
     types::{BigUint, EsdtTokenType, ManagedAddress, ManagedBuffer, ManagedVec},
 };
-use crate::codec::*;
-use crate::codec::mx_sc_codec_derive::{NestedDecode, NestedEncode, TopDecode, TopEncode};
-use crate::codec;
 
 use crate as mx_sc; // needed by the TypeAbi generated code
 use crate::derive::TypeAbi;

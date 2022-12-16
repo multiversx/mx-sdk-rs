@@ -1,5 +1,7 @@
-use crate::abi::{OutputAbis, TypeAbi, TypeDescriptionContainer, TypeName};
-use crate::codec::multi_types::{IgnoreValue, OptionalValue};
+use crate::{
+    abi::{OutputAbis, TypeAbi, TypeDescriptionContainer, TypeName},
+    codec::multi_types::{IgnoreValue, OptionalValue},
+};
 
 #[cfg(feature = "alloc")]
 impl<T: TypeAbi> TypeAbi for crate::codec::multi_types::MultiValueVec<T> {

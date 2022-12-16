@@ -3,7 +3,6 @@ use core::marker::PhantomData;
 use crate::codec::Empty;
 
 use crate::{
-    codec,
     api::{
         BlockchainApi, BlockchainApiImpl, CallTypeApi, StorageReadApi,
         CHANGE_OWNER_BUILTIN_FUNC_NAME, CLAIM_DEVELOPER_REWARDS_FUNC_NAME,
@@ -11,6 +10,7 @@ use crate::{
         ESDT_NFT_ADD_URI_FUNC_NAME, ESDT_NFT_BURN_FUNC_NAME, ESDT_NFT_CREATE_FUNC_NAME,
         ESDT_NFT_UPDATE_ATTRIBUTES_FUNC_NAME,
     },
+    codec,
     esdt::ESDTSystemSmartContractProxy,
     types::{
         BigUint, ContractCall, ContractCallNoPayment, EgldOrEsdtTokenIdentifier, EsdtTokenPayment,

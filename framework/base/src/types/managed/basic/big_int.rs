@@ -6,14 +6,13 @@ use crate::{
         const_handles, use_raw_handle, BigIntApi, HandleConstraints, ManagedTypeApi,
         ManagedTypeApiImpl, RawHandle, StaticVarApiImpl,
     },
+    codec::{
+        self, CodecFrom, CodecFromSelf, DecodeErrorHandler, EncodeErrorHandler, NestedDecode,
+        NestedDecodeInput, NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode,
+        TopEncodeOutput, TryStaticCast,
+    },
     formatter::{hex_util::encode_bytes_as_hex, FormatByteReceiver, SCDisplay},
     types::{heap::BoxedBytes, BigUint, ManagedBuffer, ManagedOption, ManagedType, Sign},
-};
-use crate::codec::{
-    self,
-    CodecFrom, CodecFromSelf, DecodeErrorHandler, EncodeErrorHandler, NestedDecode,
-    NestedDecodeInput, NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode,
-    TopEncodeOutput, TryStaticCast,
 };
 
 use super::cast_to_i64::cast_to_i64;

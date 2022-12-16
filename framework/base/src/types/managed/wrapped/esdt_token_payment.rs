@@ -4,10 +4,13 @@ use crate::{
 };
 
 use crate as mx_sc; // needed by the codec and TypeAbi generated code
-use crate::derive::TypeAbi;
-use crate::codec::{ self,
-    mx_sc_codec_derive::{NestedEncode, TopEncode},
-    IntoMultiValue, NestedDecode, TopDecode,
+use crate::{
+    codec::{
+        self,
+        mx_sc_codec_derive::{NestedEncode, TopEncode},
+        IntoMultiValue, NestedDecode, TopDecode,
+    },
+    derive::TypeAbi,
 };
 
 #[derive(TopEncode, NestedEncode, TypeAbi, Clone, PartialEq, Eq, Debug)]

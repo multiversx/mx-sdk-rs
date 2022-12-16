@@ -1,10 +1,10 @@
 use mx_sc::{
-    derive::TypeAbi,
     codec::{
         DecodeError, DecodeErrorHandler, EncodeError, EncodeErrorHandler, NestedDecode,
         NestedDecodeInput, NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode,
         TopEncodeOutput,
     },
+    derive::TypeAbi,
 };
 
 /// Helper type to explore encode/decode errors.

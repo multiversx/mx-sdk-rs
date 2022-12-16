@@ -1,6 +1,6 @@
 use mx_sc::{
-    contract_base::ManagedSerializer,
     codec::{test_util::check_top_encode, TopDecode, TopEncode},
+    contract_base::ManagedSerializer,
     types::{heap::BoxedBytes, ManagedBuffer},
 };
 

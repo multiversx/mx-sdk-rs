@@ -1,7 +1,7 @@
-use alloc::boxed::Box;
 use crate::codec::{
     try_execute_then_cast, DecodeError, DecodeErrorHandler, TopDecodeInput, TryStaticCast,
 };
+use alloc::boxed::Box;
 
 use crate::{
     api::ManagedTypeApi,

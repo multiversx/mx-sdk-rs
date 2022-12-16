@@ -1,9 +1,9 @@
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
     api::{ErrorApi, ErrorApiImpl},
+    codec::{self, arrayvec::ArrayVec, NestedDecode, NestedEncode, TopDecode, TopEncode},
 };
 use core::marker::PhantomData;
-use crate::codec::{self, arrayvec::ArrayVec, NestedDecode, NestedEncode, TopDecode, TopEncode};
 
 const EMPTY_ENTRY: usize = 0;
 static INVALID_INDEX_ERR_MSG: &[u8] = b"Index out of bounds";

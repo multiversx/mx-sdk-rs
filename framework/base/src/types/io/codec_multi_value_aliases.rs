@@ -1,5 +1,7 @@
-use crate::codec::multi_types::{IgnoreValue, OptionalValue};
-use crate::codec;
+use crate::{
+    codec,
+    codec::multi_types::{IgnoreValue, OptionalValue},
+};
 
 /// Structure that allows taking a variable number of arguments
 /// or returning a variable number of results in a smart contract endpoint.

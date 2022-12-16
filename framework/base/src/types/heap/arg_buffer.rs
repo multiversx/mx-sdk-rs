@@ -1,9 +1,9 @@
 use crate::{
     api::ManagedTypeApi,
+    codec::TopEncodeOutput,
     types::{heap::BoxedBytes, ManagedArgBuffer},
 };
 use alloc::vec::Vec;
-use crate::codec::TopEncodeOutput;
 
 /// Helper structure for providing arguments to all SC call functions other than async_call_raw.
 /// It keeps argument lengths separately from the argument data itself.

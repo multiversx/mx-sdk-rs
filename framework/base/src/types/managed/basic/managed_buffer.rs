@@ -4,15 +4,15 @@ use crate::{
         use_raw_handle, ErrorApiImpl, HandleConstraints, InvalidSliceError, ManagedBufferApi,
         ManagedTypeApi, StaticVarApiImpl,
     },
+    codec::{
+        CodecFrom, CodecFromSelf, DecodeErrorHandler, Empty, EncodeErrorHandler, NestedDecode,
+        NestedDecodeInput, NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode,
+        TopEncodeOutput, TryStaticCast,
+    },
     formatter::{
         hex_util::encode_bytes_as_hex, FormatByteReceiver, SCBinary, SCDisplay, SCLowerHex,
     },
     types::{heap::BoxedBytes, ManagedType},
-};
-use crate::codec::{
-    CodecFrom, CodecFromSelf, DecodeErrorHandler, Empty, EncodeErrorHandler, NestedDecode,
-    NestedDecodeInput, NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode,
-    TopEncodeOutput, TryStaticCast,
 };
 
 /// A byte buffer managed by an external API.

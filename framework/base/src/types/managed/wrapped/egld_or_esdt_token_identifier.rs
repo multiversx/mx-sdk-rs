@@ -1,11 +1,11 @@
 use crate::{
     abi::{TypeAbi, TypeName},
     api::{HandleConstraints, ManagedTypeApi},
+    codec::*,
     derive::ManagedVecItem,
     formatter::{FormatByteReceiver, SCDisplay, SCLowerHex},
     types::{ManagedBuffer, ManagedOption, ManagedRef, ManagedType, TokenIdentifier},
 };
-use crate::codec::*;
 
 use crate as mx_sc; // required by the ManagedVecItem derive
 

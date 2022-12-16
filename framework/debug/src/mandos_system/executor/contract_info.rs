@@ -2,8 +2,8 @@ use std::ops::{Deref, DerefMut};
 
 use mx_sc::{
     api::ManagedTypeApi,
-    contract_base::ProxyObjBase,
     codec::{CodecFrom, EncodeErrorHandler, TopEncode, TopEncodeOutput},
+    contract_base::ProxyObjBase,
     types::{Address, ManagedAddress},
 };
 

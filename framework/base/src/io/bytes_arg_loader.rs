@@ -1,7 +1,7 @@
 use core::marker::PhantomData;
 
-use alloc::{boxed::Box, vec::Vec};
 use crate::codec::{DecodeError, DecodeErrorHandler, TopDecodeMultiInput};
+use alloc::{boxed::Box, vec::Vec};
 
 use crate::{
     api::{ErrorApi, ManagedTypeApi},

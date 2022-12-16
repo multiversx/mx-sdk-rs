@@ -233,8 +233,8 @@ impl TypeAbi for H256 {
 #[cfg(test)]
 mod h256_tests {
     use super::*;
-    use alloc::vec::Vec;
     use crate::codec::test_util::{check_top_encode, check_top_encode_decode};
+    use alloc::vec::Vec;
 
     #[test]
     fn test_h256_from_array() {

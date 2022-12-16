@@ -202,8 +202,8 @@ impl TypeAbi for Address {
 #[cfg(test)]
 mod address_tests {
     use super::*;
-    use alloc::vec::Vec;
     use crate::codec::test_util::{check_top_encode, check_top_encode_decode};
+    use alloc::vec::Vec;
 
     #[test]
     fn test_address() {

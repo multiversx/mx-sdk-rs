@@ -2,12 +2,12 @@ use core::marker::PhantomData;
 
 use crate::{
     api::{EndpointArgumentApi, EndpointArgumentApiImpl, ManagedTypeApi, StaticVarApiImpl},
+    codec::{
+        try_execute_then_cast, DecodeError, DecodeErrorHandler, TopDecodeInput, TryStaticCast,
+    },
     types::{
         heap::Box, BigInt, BigUint, ManagedBuffer, ManagedBufferNestedDecodeInput, ManagedType,
     },
-};
-use crate::codec::{
-    try_execute_then_cast, DecodeError, DecodeErrorHandler, TopDecodeInput, TryStaticCast,
 };
 
 /// Adapter from the API to the TopDecodeInput trait.

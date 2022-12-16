@@ -1,7 +1,7 @@
 use mx_sc::{
-    derive::ManagedVecItem,
     codec,
     codec::mx_sc_codec_derive::{NestedDecode, NestedEncode, TopDecode, TopEncode},
+    derive::ManagedVecItem,
 };
 
 // to test, run the following command in mx-sc-debug folder:

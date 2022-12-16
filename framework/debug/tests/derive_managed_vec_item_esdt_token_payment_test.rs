@@ -1,8 +1,8 @@
 use mx_sc::{
     api::{HandleConstraints, ManagedTypeApi},
-    derive::ManagedVecItem,
     codec,
     codec::mx_sc_codec_derive::{NestedDecode, NestedEncode, TopDecode, TopEncode},
+    derive::ManagedVecItem,
     types::{BigUint, EsdtTokenPayment, ManagedByteArray, ManagedType, TokenIdentifier},
 };
 use mx_sc_debug::DebugApi;

@@ -4,8 +4,8 @@ use crate::codec::{EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput, Try
 
 use crate::{
     api::{EndpointFinishApi, EndpointFinishApiImpl, ManagedTypeApi},
-    contract_base::ExitCodecErrorHandler,
     codec::{EncodeError, TopEncode, TopEncodeOutput},
+    contract_base::ExitCodecErrorHandler,
     err_msg,
     types::{
         BigInt, BigUint, ManagedBuffer, ManagedBufferCachedBuilder, ManagedSCError, ManagedType,

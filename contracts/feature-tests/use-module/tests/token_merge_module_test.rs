@@ -1,7 +1,7 @@
 use mx_sc::{
     arrayvec::ArrayVec,
-    contract_base::ContractBase,
     codec::Empty,
+    contract_base::ContractBase,
     storage::mappers::StorageTokenWrapper,
     types::{EsdtLocalRole, EsdtTokenPayment, ManagedVec},
 };

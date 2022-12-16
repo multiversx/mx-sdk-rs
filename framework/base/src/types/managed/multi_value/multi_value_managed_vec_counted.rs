@@ -1,11 +1,11 @@
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
     api::ManagedTypeApi,
+    codec::{
+        DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti, TopDecodeMultiInput,
+        TopEncodeMulti, TopEncodeMultiOutput,
+    },
     types::{ManagedVec, ManagedVecItem},
-};
-use crate::codec::{
-    DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti, TopDecodeMultiInput, TopEncodeMulti,
-    TopEncodeMultiOutput,
 };
 
 /// Argument or result that is made up of the argument count, followed by the arguments themselves.
