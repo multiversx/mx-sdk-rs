@@ -3,7 +3,7 @@ use elrond_sdk_erdrs::data::vm::VmValueRequest;
 use log::info;
 use mx_sc_debug::{
     mx_sc::{
-        mx_sc_codec::{CodecFrom, PanicErrorHandler},
+        codec::{CodecFrom, PanicErrorHandler},
         types::ContractCall,
     },
     DebugApi,

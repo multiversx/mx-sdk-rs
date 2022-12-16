@@ -1,11 +1,13 @@
+use mx_sc_codec as codec;
+
 // Some structures with explicit encode/decode, for testing.
-use core::fmt::Debug;
-use mx_sc_codec::{
+use codec::{
     test_util::{check_dep_encode_decode, check_top_encode_decode},
     top_decode_from_nested_or_handle_err, top_encode_from_nested, DecodeErrorHandler,
     EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode, NestedEncodeOutput,
     TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
 };
+use core::fmt::Debug;
 
 #[derive(PartialEq, Eq, Debug, Clone)]
 pub struct S {

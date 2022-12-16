@@ -2,7 +2,7 @@ use crate::{
     tx_execution::builtin_function_mocks::builtin_func_trait::BuiltinFunctionEsdtTransferInfo,
     tx_mock::{BlockchainUpdate, TxCache, TxInput, TxResult},
 };
-use mx_sc::{api::ESDT_NFT_TRANSFER_FUNC_NAME, mx_sc_codec::TopDecode, types::heap::Address};
+use mx_sc::{api::ESDT_NFT_TRANSFER_FUNC_NAME, codec::TopDecode, types::heap::Address};
 
 use super::{
     super::builtin_func_trait::BuiltinFunction,

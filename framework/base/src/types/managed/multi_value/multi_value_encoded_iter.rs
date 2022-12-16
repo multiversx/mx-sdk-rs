@@ -1,6 +1,6 @@
 use core::marker::PhantomData;
 
-use mx_sc_codec::{TopDecodeMulti, TopDecodeMultiInput};
+use crate::codec::{TopDecodeMulti, TopDecodeMultiInput};
 
 use crate::{
     api::{ErrorApi, ManagedTypeApi},

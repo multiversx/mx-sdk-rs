@@ -9,7 +9,7 @@ use crate::{
     types::{ManagedAddress, ManagedType, MultiValueEncoded},
 };
 use core::{marker::PhantomData, usize};
-use mx_sc_codec::{
+use crate::codec::{
     multi_encode_iter_or_handle_err, CodecFrom, EncodeErrorHandler, TopDecode, TopEncode,
     TopEncodeMulti, TopEncodeMultiOutput,
 };

@@ -1,6 +1,6 @@
 use core::{borrow::Borrow, marker::PhantomData, ops::Deref};
 
-use mx_sc_codec::{
+use crate::codec::{
     EncodeErrorHandler, NestedEncode, NestedEncodeOutput, TopEncode, TopEncodeOutput,
 };
 

@@ -4,7 +4,7 @@ use log::info;
 use mx_sc_debug::{
     mandos_system::model::{ScCallStep, TransferStep, TxCall, TypedScCall},
     mx_sc::{
-        mx_sc_codec::{multi_types::IgnoreValue, CodecFrom, TopEncodeMulti},
+        codec::{multi_types::IgnoreValue, CodecFrom, TopEncodeMulti},
         types::ContractCallWithEgld,
     },
     DebugApi,

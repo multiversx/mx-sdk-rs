@@ -1,4 +1,4 @@
-use mx_sc_codec::{
+use crate::codec::{
     CodecFrom, EncodeErrorHandler, TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
 };
 

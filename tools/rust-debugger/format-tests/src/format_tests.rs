@@ -1,5 +1,5 @@
 use mx_sc::{
-    mx_sc_codec::multi_types::OptionalValue,
+    codec::multi_types::OptionalValue,
     esdt::ESDTSystemSmartContractProxy,
     types::{
         heap::{Address, BoxedBytes},

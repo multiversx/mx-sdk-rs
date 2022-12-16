@@ -1,6 +1,7 @@
 #![allow(dead_code)]
 
 extern crate mx_sc_codec_derive;
+use mx_sc_codec as codec;
 use mx_sc_codec_derive::*;
 
 // This test doesn't run any code, the fact that it compiles is the actual testing.
@@ -88,10 +89,7 @@ trait SimpleTrait {
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, PartialEq, Eq, Clone, Debug)]
 struct StructWithNamedFieldsWithGeneric<ST: SimpleTrait>
 where
-    ST: mx_sc_codec::NestedEncode
-        + mx_sc_codec::NestedDecode
-        + mx_sc_codec::TopEncode
-        + mx_sc_codec::TopDecode,
+    ST: codec::NestedEncode + codec::NestedDecode + codec::TopEncode + codec::TopDecode,
 {
     data: u64,
     trait_stuff: ST,

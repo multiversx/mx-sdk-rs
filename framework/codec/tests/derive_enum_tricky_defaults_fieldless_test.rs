@@ -1,7 +1,8 @@
 extern crate mx_sc_codec_derive;
+use mx_sc_codec as codec;
 use mx_sc_codec_derive::*;
 
-use mx_sc_codec::test_util::{check_top_decode, check_top_encode, check_top_encode_decode};
+use codec::test_util::{check_top_decode, check_top_encode, check_top_encode_decode};
 
 // to test, run the following command in mx-sc-codec folder:
 // cargo expand --test enum_tricky_defaults_derive_test > enum_expanded.rs
@@ -19,13 +20,13 @@ enum TrickyDefaultDayOfWeek {
     Sunday,
 }
 
-impl mx_sc_codec::EncodeDefault for TrickyDefaultDayOfWeek {
+impl codec::EncodeDefault for TrickyDefaultDayOfWeek {
     fn is_default(&self) -> bool {
         matches!(self, TrickyDefaultDayOfWeek::Friday)
     }
 }
 
-impl mx_sc_codec::DecodeDefault for TrickyDefaultDayOfWeek {
+impl codec::DecodeDefault for TrickyDefaultDayOfWeek {
     fn default() -> Self {
         TrickyDefaultDayOfWeek::Friday
     }

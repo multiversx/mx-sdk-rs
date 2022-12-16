@@ -1,8 +1,9 @@
 use core::marker::PhantomData;
 
-use mx_sc_codec::Empty;
+use crate::codec::Empty;
 
 use crate::{
+    codec,
     api::{
         BlockchainApi, BlockchainApiImpl, CallTypeApi, StorageReadApi,
         CHANGE_OWNER_BUILTIN_FUNC_NAME, CLAIM_DEVELOPER_REWARDS_FUNC_NAME,
@@ -334,7 +335,7 @@ where
     /// Must have ESDTNftCreate role set, or this will fail with "action is not allowed".
     /// Returns the nonce of the newly created NFT.
     #[allow(clippy::too_many_arguments)]
-    pub fn esdt_nft_create<T: mx_sc_codec::TopEncode>(
+    pub fn esdt_nft_create<T: codec::TopEncode>(
         &self,
         token: &TokenIdentifier<A>,
         amount: &BigUint<A>,
@@ -354,7 +355,7 @@ where
 
         if uris.is_empty() {
             // at least one URI is required, so we push an empty one
-            arg_buffer.push_arg(mx_sc_codec::Empty);
+            arg_buffer.push_arg(codec::Empty);
         } else {
             // The API function has the last argument as variadic,
             // so we top-encode each and send as separate argument
@@ -377,7 +378,7 @@ where
     }
 
     #[inline]
-    pub fn esdt_nft_create_compact<T: mx_sc_codec::TopEncode>(
+    pub fn esdt_nft_create_compact<T: codec::TopEncode>(
         &self,
         token: &TokenIdentifier<A>,
         amount: &BigUint<A>,
@@ -386,7 +387,7 @@ where
         self.esdt_nft_create_compact_named(token, amount, &ManagedBuffer::new(), attributes)
     }
 
-    pub fn esdt_nft_create_compact_named<T: mx_sc_codec::TopEncode>(
+    pub fn esdt_nft_create_compact_named<T: codec::TopEncode>(
         &self,
         token: &TokenIdentifier<A>,
         amount: &BigUint<A>,
@@ -486,7 +487,7 @@ where
         );
     }
 
-    pub fn nft_update_attributes<T: mx_sc_codec::TopEncode>(
+    pub fn nft_update_attributes<T: codec::TopEncode>(
         &self,
         token_id: &TokenIdentifier<A>,
         nft_nonce: u64,

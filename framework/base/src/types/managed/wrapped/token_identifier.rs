@@ -4,7 +4,7 @@ use crate::{
     formatter::{FormatByteReceiver, SCDisplay, SCLowerHex},
     types::{ManagedBuffer, ManagedType},
 };
-use mx_sc_codec::*;
+use crate::codec::*;
 
 use super::EgldOrEsdtTokenIdentifier;
 

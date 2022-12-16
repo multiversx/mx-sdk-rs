@@ -1,6 +1,6 @@
 use crate::{num_bigint, tx_mock::TxTokenTransfer};
 use mx_sc::{
-    mx_sc_codec::{top_encode_to_vec_u8_or_panic, TopEncode},
+    codec::{top_encode_to_vec_u8_or_panic, TopEncode},
     types::heap::Address,
 };
 use num_traits::Zero;

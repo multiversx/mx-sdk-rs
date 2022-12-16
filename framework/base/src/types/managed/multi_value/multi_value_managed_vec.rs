@@ -3,7 +3,7 @@ use crate::{
     api::ManagedTypeApi,
     types::ManagedType,
 };
-use mx_sc_codec::{
+use crate::codec::{
     DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti, TopDecodeMultiInput, TopEncodeMulti,
     TopEncodeMultiOutput, Vec,
 };

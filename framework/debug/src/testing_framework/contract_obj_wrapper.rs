@@ -2,7 +2,7 @@ use std::{collections::HashMap, path::PathBuf, rc::Rc, str::FromStr};
 
 use mx_sc::{
     contract_base::{CallableContract, ContractBase},
-    mx_sc_codec::{TopDecode, TopEncode},
+    codec::{TopDecode, TopEncode},
     types::{
         heap::{Address, H256},
         EsdtLocalRole,

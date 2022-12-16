@@ -3,7 +3,7 @@ use crate::{
     api::{ErrorApi, ErrorApiImpl},
 };
 use core::marker::PhantomData;
-use mx_sc_codec::{arrayvec::ArrayVec, NestedDecode, NestedEncode, TopDecode, TopEncode};
+use crate::codec::{self, arrayvec::ArrayVec, NestedDecode, NestedEncode, TopDecode, TopEncode};
 
 const EMPTY_ENTRY: usize = 0;
 static INVALID_INDEX_ERR_MSG: &[u8] = b"Index out of bounds";
@@ -204,8 +204,8 @@ where
 {
     fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
     where
-        O: mx_sc_codec::TopEncodeOutput,
-        H: mx_sc_codec::EncodeErrorHandler,
+        O: codec::TopEncodeOutput,
+        H: codec::EncodeErrorHandler,
     {
         let mut nested_buffer = output.start_nested_encode();
         for item in self.iter() {
@@ -223,8 +223,8 @@ where
 {
     fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>
     where
-        O: mx_sc_codec::NestedEncodeOutput,
-        H: mx_sc_codec::EncodeErrorHandler,
+        O: codec::NestedEncodeOutput,
+        H: codec::EncodeErrorHandler,
     {
         self.len.dep_encode_or_handle_err(dest, h)?;
         for item in self.iter() {
@@ -241,8 +241,8 @@ where
 {
     fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
     where
-        I: mx_sc_codec::TopDecodeInput,
-        H: mx_sc_codec::DecodeErrorHandler,
+        I: codec::TopDecodeInput,
+        H: codec::DecodeErrorHandler,
     {
         match ArrayVec::<usize, CAPACITY>::top_decode(input) {
             Ok(array_vec) => {
@@ -268,8 +268,8 @@ where
 {
     fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
     where
-        I: mx_sc_codec::NestedDecodeInput,
-        H: mx_sc_codec::DecodeErrorHandler,
+        I: codec::NestedDecodeInput,
+        H: codec::DecodeErrorHandler,
     {
         match ArrayVec::<usize, CAPACITY>::dep_decode(input) {
             Ok(array_vec) => {

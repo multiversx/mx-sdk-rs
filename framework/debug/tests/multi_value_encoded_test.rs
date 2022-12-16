@@ -1,5 +1,5 @@
 use mx_sc::{
-    mx_sc_codec::multi_types::MultiValue5,
+    codec::multi_types::MultiValue5,
     types::{BigUint, MultiValueEncoded},
 };
 use mx_sc_debug::DebugApi;

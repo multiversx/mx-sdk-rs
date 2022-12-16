@@ -1,4 +1,4 @@
-use mx_sc_codec::{TopEncode, TopEncodeMulti};
+use crate::codec::{TopEncode, TopEncodeMulti};
 
 use crate::{
     api::{ErrorApi, LogApi, LogApiImpl, ManagedTypeApi},

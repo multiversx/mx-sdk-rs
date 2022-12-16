@@ -3,7 +3,7 @@ use elrond_sdk_erdrs::data::{address::Address as ErdrsAddress, transaction::Tran
 use log::info;
 use mx_sc_debug::{
     mandos_system::model::{ScDeployStep, TypedScDeploy},
-    mx_sc::mx_sc_codec::{CodecFrom, TopEncodeMulti},
+    mx_sc::codec::{CodecFrom, TopEncodeMulti},
 };
 
 const DEPLOY_RECEIVER: [u8; 32] = [0u8; 32];

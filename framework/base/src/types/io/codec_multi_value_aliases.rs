@@ -1,4 +1,5 @@
-use mx_sc_codec::multi_types::{IgnoreValue, OptionalValue};
+use crate::codec::multi_types::{IgnoreValue, OptionalValue};
+use crate::codec;
 
 /// Structure that allows taking a variable number of arguments
 /// or returning a variable number of results in a smart contract endpoint.
@@ -7,7 +8,7 @@ use mx_sc_codec::multi_types::{IgnoreValue, OptionalValue};
     note = "Alias kept for backwards compatibility. Replace with `MultiValueVec`"
 )]
 #[cfg(feature = "alloc")]
-pub type MultiArgVec<T> = mx_sc_codec::multi_types::MultiValueVec<T>;
+pub type MultiArgVec<T> = codec::multi_types::MultiValueVec<T>;
 
 /// Used for taking a variable number of arguments in an endpoint,
 /// it is synonymous with `MultiResultVec`/`MultiArgVec`.
@@ -16,7 +17,7 @@ pub type MultiArgVec<T> = mx_sc_codec::multi_types::MultiValueVec<T>;
     note = "Alias kept for backwards compatibility. Replace with `MultiValueVec`"
 )]
 #[cfg(feature = "alloc")]
-pub type VarArgs<T> = mx_sc_codec::multi_types::MultiValueVec<T>;
+pub type VarArgs<T> = codec::multi_types::MultiValueVec<T>;
 
 /// Used for returning a variable number of results from an endpoint,
 /// it is synonymous with `MultiResult`.
@@ -25,7 +26,7 @@ pub type VarArgs<T> = mx_sc_codec::multi_types::MultiValueVec<T>;
     note = "Alias kept for backwards compatibility. Replace with `MultiValueVec`"
 )]
 #[cfg(feature = "alloc")]
-pub type MultiResultVec<T> = mx_sc_codec::multi_types::MultiValueVec<T>;
+pub type MultiResultVec<T> = codec::multi_types::MultiValueVec<T>;
 
 /// Structure that allows taking a variable number of arguments,
 /// but does nothing with them, not even deserialization.
@@ -64,13 +65,13 @@ macro_rules! multi_arg_impls {
                 since = "0.29.0",
                 note = "Alias kept for backwards compatibility. Replace with `MultiValue*`"
             )]
-            pub type $marg_struct<$($name,)+> = mx_sc_codec::multi_types::$mval_struct<$($name,)+>;
+            pub type $marg_struct<$($name,)+> = codec::multi_types::$mval_struct<$($name,)+>;
 
             #[deprecated(
                 since = "0.29.0",
                 note = "Alias kept for backwards compatibility. Replace with `MultiValue*`"
             )]
-            pub type $mres_struct<$($name,)+> = mx_sc_codec::multi_types::$mval_struct<$($name,)+>;
+            pub type $mres_struct<$($name,)+> = codec::multi_types::$mval_struct<$($name,)+>;
         )+
     }
 }

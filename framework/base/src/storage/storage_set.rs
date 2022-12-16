@@ -4,7 +4,7 @@ use crate::{
     err_msg,
     types::{BigInt, BigUint, ManagedBuffer, ManagedBufferCachedBuilder, ManagedRef, ManagedType},
 };
-use mx_sc_codec::*;
+use crate::codec::*;
 
 use super::StorageKey;
 

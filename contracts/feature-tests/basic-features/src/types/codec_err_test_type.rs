@@ -1,6 +1,6 @@
 use mx_sc::{
     derive::TypeAbi,
-    mx_sc_codec::{
+    codec::{
         DecodeError, DecodeErrorHandler, EncodeError, EncodeErrorHandler, NestedDecode,
         NestedDecodeInput, NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode,
         TopEncodeOutput,

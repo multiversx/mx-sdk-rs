@@ -42,7 +42,7 @@ pub struct FeatureName<M>(ManagedBuffer<M>)
 where
     M: ManagedTypeApi;
 
-use mx_sc::mx_sc_codec::*;
+use mx_sc::codec::*;
 impl<M> NestedEncode for FeatureName<M>
 where
     M: ManagedTypeApi,

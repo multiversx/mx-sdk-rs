@@ -1,4 +1,4 @@
-use mx_sc::mx_sc_codec::TopEncodeMulti;
+use mx_sc::codec::TopEncodeMulti;
 
 mx_sc::imports!();
 

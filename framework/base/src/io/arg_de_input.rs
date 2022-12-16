@@ -6,7 +6,7 @@ use crate::{
         heap::Box, BigInt, BigUint, ManagedBuffer, ManagedBufferNestedDecodeInput, ManagedType,
     },
 };
-use mx_sc_codec::{
+use crate::codec::{
     try_execute_then_cast, DecodeError, DecodeErrorHandler, TopDecodeInput, TryStaticCast,
 };
 

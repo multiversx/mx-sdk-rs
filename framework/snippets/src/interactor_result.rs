@@ -7,7 +7,7 @@ use log::info;
 use mx_sc_debug::{
     bech32,
     mx_sc::{
-        mx_sc_codec::{PanicErrorHandler, TopDecodeMulti},
+        codec::{PanicErrorHandler, TopDecodeMulti},
         types::Address,
     },
 };

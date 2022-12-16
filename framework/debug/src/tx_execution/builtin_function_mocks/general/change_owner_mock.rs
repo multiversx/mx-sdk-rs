@@ -1,4 +1,4 @@
-use mx_sc::{api::CHANGE_OWNER_BUILTIN_FUNC_NAME, mx_sc_codec::TopDecode, types::heap::Address};
+use mx_sc::{api::CHANGE_OWNER_BUILTIN_FUNC_NAME, codec::TopDecode, types::heap::Address};
 
 use crate::tx_mock::{BlockchainUpdate, TxCache, TxInput, TxResult};
 

@@ -1,4 +1,4 @@
-use mx_sc::{api::ESDT_MULTI_TRANSFER_FUNC_NAME, mx_sc_codec::TopDecode, types::heap::Address};
+use mx_sc::{api::ESDT_MULTI_TRANSFER_FUNC_NAME, codec::TopDecode, types::heap::Address};
 
 use crate::{
     tx_execution::builtin_function_mocks::builtin_func_trait::BuiltinFunctionEsdtTransferInfo,

@@ -7,7 +7,7 @@ pub trait HandleTypeInfo {
     type EllipticCurveHandle: HandleConstraints;
 }
 
-use mx_sc_codec::TryStaticCast;
+use crate::codec::TryStaticCast;
 
 use crate::{
     api::{ErrorApi, ErrorApiImpl},

@@ -1,7 +1,7 @@
 #![no_std]
 #![allow(clippy::type_complexity)]
 
-use mx_sc::mx_sc_codec::Empty;
+use mx_sc::codec::Empty;
 
 mx_sc::imports!();
 

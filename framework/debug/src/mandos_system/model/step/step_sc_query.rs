@@ -1,5 +1,5 @@
 use mx_sc::{
-    mx_sc_codec::{CodecFrom, TopEncodeMulti},
+    codec::{CodecFrom, TopEncodeMulti},
     types::ContractCall,
 };
 

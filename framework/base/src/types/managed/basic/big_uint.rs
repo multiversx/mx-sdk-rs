@@ -9,7 +9,8 @@ use crate::{
     formatter::{hex_util::encode_bytes_as_hex, FormatByteReceiver, SCDisplay},
     types::{heap::BoxedBytes, ManagedBuffer, ManagedType},
 };
-use mx_sc_codec::{
+use crate::codec::{
+    self,
     CodecFrom, CodecFromSelf, DecodeErrorHandler, EncodeErrorHandler, NestedDecode,
     NestedDecodeInput, NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode,
     TopEncodeOutput, TryStaticCast,
@@ -94,26 +95,26 @@ big_uint_conv_num! {u8}
 impl<M> CodecFromSelf for BigUint<M> where M: ManagedTypeApi {}
 
 #[cfg(feature = "num-bigint")]
-impl<M: ManagedTypeApi> CodecFrom<mx_sc_codec::num_bigint::BigUint> for BigUint<M> {}
+impl<M: ManagedTypeApi> CodecFrom<codec::num_bigint::BigUint> for BigUint<M> {}
 #[cfg(feature = "num-bigint")]
-impl<M: ManagedTypeApi> CodecFrom<BigUint<M>> for mx_sc_codec::num_bigint::BigUint {}
+impl<M: ManagedTypeApi> CodecFrom<BigUint<M>> for codec::num_bigint::BigUint {}
 
 #[cfg(feature = "num-bigint")]
-impl<M: ManagedTypeApi> From<&mx_sc_codec::num_bigint::BigUint> for BigUint<M> {
-    fn from(alloc_big_uint: &mx_sc_codec::num_bigint::BigUint) -> Self {
+impl<M: ManagedTypeApi> From<&codec::num_bigint::BigUint> for BigUint<M> {
+    fn from(alloc_big_uint: &codec::num_bigint::BigUint) -> Self {
         BigUint::from_bytes_be(alloc_big_uint.to_bytes_be().as_slice())
     }
 }
 #[cfg(feature = "num-bigint")]
-impl<M: ManagedTypeApi> From<mx_sc_codec::num_bigint::BigUint> for BigUint<M> {
-    fn from(alloc_big_uint: mx_sc_codec::num_bigint::BigUint) -> Self {
+impl<M: ManagedTypeApi> From<codec::num_bigint::BigUint> for BigUint<M> {
+    fn from(alloc_big_uint: codec::num_bigint::BigUint) -> Self {
         BigUint::from(&alloc_big_uint)
     }
 }
 #[cfg(feature = "num-bigint")]
 impl<M: ManagedTypeApi> BigUint<M> {
-    pub fn to_alloc(&self) -> mx_sc_codec::num_bigint::BigUint {
-        mx_sc_codec::num_bigint::BigUint::from_bytes_be(self.to_bytes_be().as_slice())
+    pub fn to_alloc(&self) -> codec::num_bigint::BigUint {
+        codec::num_bigint::BigUint::from_bytes_be(self.to_bytes_be().as_slice())
     }
 }
 

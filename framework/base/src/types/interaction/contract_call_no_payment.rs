@@ -1,6 +1,6 @@
 use core::marker::PhantomData;
 
-use mx_sc_codec::TopEncodeMulti;
+use crate::codec::TopEncodeMulti;
 
 use crate::{
     api::CallTypeApi,

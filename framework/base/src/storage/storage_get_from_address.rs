@@ -9,7 +9,7 @@ use crate::{
     },
 };
 use alloc::boxed::Box;
-use mx_sc_codec::*;
+use crate::codec::*;
 
 use super::{StorageGetErrorHandler, StorageKey};
 

@@ -5,7 +5,7 @@ use crate::{
     formatter::{FormatByteReceiver, SCDisplay, SCLowerHex},
     types::{ManagedBuffer, ManagedOption, ManagedRef, ManagedType, TokenIdentifier},
 };
-use mx_sc_codec::*;
+use crate::codec::*;
 
 use crate as mx_sc; // required by the ManagedVecItem derive
 

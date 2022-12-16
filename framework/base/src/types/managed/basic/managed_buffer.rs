@@ -9,7 +9,7 @@ use crate::{
     },
     types::{heap::BoxedBytes, ManagedType},
 };
-use mx_sc_codec::{
+use crate::codec::{
     CodecFrom, CodecFromSelf, DecodeErrorHandler, Empty, EncodeErrorHandler, NestedDecode,
     NestedDecodeInput, NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode,
     TopEncodeOutput, TryStaticCast,

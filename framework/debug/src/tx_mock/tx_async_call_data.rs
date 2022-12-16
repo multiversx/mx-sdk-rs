@@ -3,7 +3,7 @@ use crate::{
     tx_mock::{TxInput, TxResult},
 };
 use mx_sc::{
-    mx_sc_codec::*,
+    codec::*,
     types::heap::{Address, H256},
 };
 

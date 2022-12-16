@@ -8,7 +8,7 @@ use std::convert::TryInto;
 use mx_sc::{
     api::{BigFloatApi, BigIntApi, ErrorApiImpl, HandleTypeInfo, Sign},
     err_msg,
-    mx_sc_codec::num_bigint::BigInt,
+    codec::num_bigint::BigInt,
 };
 use num_traits::ToPrimitive;
 

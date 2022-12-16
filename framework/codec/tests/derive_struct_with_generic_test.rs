@@ -1,7 +1,8 @@
 extern crate mx_sc_codec_derive;
+use mx_sc_codec as codec;
 use mx_sc_codec_derive::*;
 
-use mx_sc_codec::{
+use codec::{
     test_util::{check_dep_encode_decode, check_top_encode_decode},
     *,
 };

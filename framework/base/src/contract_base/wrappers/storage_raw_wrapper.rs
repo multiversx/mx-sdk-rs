@@ -1,6 +1,6 @@
 use core::marker::PhantomData;
 
-use mx_sc_codec::{TopDecode, TopEncode};
+use crate::codec::{TopDecode, TopEncode};
 
 use crate::{
     api::{

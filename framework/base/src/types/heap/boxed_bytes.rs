@@ -4,7 +4,7 @@ use alloc::{
     boxed::Box,
     vec::Vec,
 };
-use mx_sc_codec::*;
+use crate::codec::*;
 
 /// Simple wrapper around a boxed byte slice,
 /// but with a lot of optimized methods for manipulating it.

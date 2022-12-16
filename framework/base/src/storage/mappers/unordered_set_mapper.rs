@@ -9,7 +9,7 @@ use crate::{
     storage_clear, storage_get, storage_set,
     types::{ManagedAddress, ManagedType, MultiValueEncoded},
 };
-use mx_sc_codec::{
+use crate::codec::{
     multi_encode_iter_or_handle_err, CodecFrom, EncodeErrorHandler, NestedDecode, NestedEncode,
     TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
 };

@@ -6,7 +6,7 @@ use crate::{
     storage::StorageKey,
     types::ManagedAddress,
 };
-use mx_sc_codec::NestedEncode;
+use crate::codec::NestedEncode;
 
 type FlagMapper<SA> = SingleValueMapper<SA, bool>;
 

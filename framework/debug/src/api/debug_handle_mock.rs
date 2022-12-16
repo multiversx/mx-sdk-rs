@@ -2,7 +2,7 @@ use std::rc::Rc;
 
 use mx_sc::{
     api::{use_raw_handle, HandleConstraints, RawHandle},
-    mx_sc_codec::TryStaticCast,
+    codec::TryStaticCast,
     types::ManagedVecItem,
 };
 

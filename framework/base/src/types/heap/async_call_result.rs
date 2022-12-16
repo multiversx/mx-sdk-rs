@@ -2,7 +2,7 @@ use crate::{
     abi::{TypeAbi, TypeName},
     types::heap::BoxedBytes,
 };
-use mx_sc_codec::{
+use crate::codec::{
     DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti, TopDecodeMultiInput, TopEncodeMulti,
     TopEncodeMultiOutput,
 };

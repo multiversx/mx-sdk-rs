@@ -1,4 +1,4 @@
-use mx_sc_codec::mx_sc_codec_derive::{NestedDecode, NestedEncode, TopDecode, TopEncode};
+use crate::codec::mx_sc_codec_derive::{NestedDecode, NestedEncode, TopDecode, TopEncode};use crate::codec;
 
 use super::EsdtLocalRoleFlags;
 use crate as mx_sc;

@@ -14,7 +14,7 @@ use mx_sc::{
         UPGRADE_CONTRACT_FUNC_NAME,
     },
     err_msg,
-    mx_sc_codec::top_encode_to_vec_u8,
+    codec::top_encode_to_vec_u8,
     types::{
         heap::Address, ArgBuffer, BigUint, BoxedBytes, CodeMetadata, EsdtTokenPayment,
         ManagedAddress, ManagedArgBuffer, ManagedBuffer, ManagedType, ManagedVec, TokenIdentifier,

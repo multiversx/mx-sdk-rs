@@ -1,4 +1,4 @@
-use mx_sc_codec::*;
+use crate::codec::*;
 
 const ESDT_TYPE_FUNGIBLE: &[u8] = b"FungibleESDT";
 const ESDT_TYPE_NON_FUNGIBLE: &[u8] = b"NonFungibleESDT";

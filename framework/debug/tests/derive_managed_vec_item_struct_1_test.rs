@@ -1,4 +1,4 @@
-use mx_sc::mx_sc_codec::test_util::{check_dep_encode_decode, check_top_encode_decode};
+use mx_sc::codec::test_util::{check_dep_encode_decode, check_top_encode_decode};
 use mx_sc_debug::DebugApi;
 
 mx_sc::derive_imports!();

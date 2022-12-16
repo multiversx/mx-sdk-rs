@@ -18,7 +18,7 @@ pub fn variant_top_encode_snippets(
                 // top-encode discriminant directly
                 quote! {
                     #name::#variant_ident =>
-                        mx_sc_codec::TopEncode::top_encode_or_handle_err(&#variant_index_u8, output, h),
+                        codec::TopEncode::top_encode_or_handle_err(&#variant_index_u8, output, h),
                 }
             } else {
                 // dep-encode to buffer first
@@ -31,7 +31,7 @@ pub fn variant_top_encode_snippets(
                     #name::#variant_ident #local_var_declarations => {
                         let mut buffer = output.start_nested_encode();
                         let dest = &mut buffer;
-                        mx_sc_codec::NestedEncode::dep_encode_or_handle_err(&#variant_index_u8, dest, h)?;
+                        codec::NestedEncode::dep_encode_or_handle_err(&#variant_index_u8, dest, h)?;
                         #(#variant_field_snippets)*
                         output.finalize_nested_encode(buffer);
                         core::result::Result::Ok(())
@@ -81,11 +81,11 @@ pub fn top_encode_impl(ast: &syn::DeriveInput) -> TokenStream {
     let top_encode_body = top_encode_method_body(ast);
 
     let gen = quote! {
-        impl #impl_generics mx_sc_codec::TopEncode for #name #ty_generics #where_clause {
+        impl #impl_generics codec::TopEncode for #name #ty_generics #where_clause {
             fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> core::result::Result<(), H::HandledErr>
             where
-                O: mx_sc_codec::TopEncodeOutput,
-                H: mx_sc_codec::EncodeErrorHandler,
+                O: codec::TopEncodeOutput,
+                H: codec::EncodeErrorHandler,
             {
                 #top_encode_body
             }
@@ -100,13 +100,13 @@ pub fn top_encode_or_default_impl(ast: &syn::DeriveInput) -> TokenStream {
     let top_encode_body = top_encode_method_body(ast);
 
     let gen = quote! {
-        impl #impl_generics mx_sc_codec::TopEncode for #name #ty_generics #where_clause {
+        impl #impl_generics codec::TopEncode for #name #ty_generics #where_clause {
             fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> core::result::Result<(), H::HandledErr>
             where
-                O: mx_sc_codec::TopEncodeOutput,
-                H: mx_sc_codec::EncodeErrorHandler,
+                O: codec::TopEncodeOutput,
+                H: codec::EncodeErrorHandler,
             {
-                if mx_sc_codec::EncodeDefault::is_default(self) {
+                if codec::EncodeDefault::is_default(self) {
                     output.set_slice_u8(&[]);
                     core::result::Result::Ok(())
                 } else {

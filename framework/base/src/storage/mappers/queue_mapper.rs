@@ -8,7 +8,8 @@ use crate::{
     types::{ManagedType, MultiValueEncoded},
 };
 use alloc::vec::Vec;
-use mx_sc_codec::{
+use crate::codec::{
+    self,
     multi_encode_iter_or_handle_err,
     mx_sc_codec_derive::{TopDecode, TopDecodeOrDefault, TopEncode, TopEncodeOrDefault},
     CodecFrom, DecodeDefault, EncodeDefault, EncodeErrorHandler, TopDecode, TopEncode,
@@ -149,7 +150,7 @@ where
         storage_set(
             self.build_node_id_named_key(NODE_IDENTIFIER, node_id)
                 .as_ref(),
-            &mx_sc_codec::Empty,
+            &codec::Empty,
         );
     }
 
@@ -179,7 +180,7 @@ where
         storage_set(
             self.build_node_id_named_key(VALUE_IDENTIFIER, node_id)
                 .as_ref(),
-            &mx_sc_codec::Empty,
+            &codec::Empty,
         )
     }
 

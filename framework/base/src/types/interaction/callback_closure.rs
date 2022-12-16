@@ -7,7 +7,7 @@ use crate::{
     storage_clear, storage_get, storage_set,
     types::{ManagedBuffer, ManagedType},
 };
-use mx_sc_codec::{
+use crate::codec::{ self,
     mx_sc_codec_derive::{TopDecode, TopEncode},
     TopEncodeMulti,
 };

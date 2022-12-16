@@ -23,7 +23,7 @@ macro_rules! imports {
             err_msg,
             esdt::*,
             io::*,
-            mx_sc_codec::{
+            codec::{
                 multi_types::*, DecodeError, IntoMultiValue, NestedDecode, NestedEncode, TopDecode,
                 TopEncode,
             },
@@ -45,8 +45,8 @@ macro_rules! derive_imports {
     () => {
         use mx_sc::{
             derive::{ManagedVecItem, TypeAbi},
-            mx_sc_codec,
-            mx_sc_codec::mx_sc_codec_derive::{
+            codec,
+            codec::mx_sc_codec_derive::{
                 NestedDecode, NestedEncode, TopDecode, TopDecodeOrDefault, TopEncode,
                 TopEncodeOrDefault,
             },

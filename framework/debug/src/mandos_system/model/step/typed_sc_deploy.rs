@@ -2,7 +2,7 @@ use std::marker::PhantomData;
 
 use mandos::interpret_trait::{InterpretableFrom, InterpreterContext};
 use mx_sc::{
-    mx_sc_codec::{CodecFrom, TopEncodeMulti},
+    codec::{CodecFrom, TopEncodeMulti},
     types::{Address, CodeMetadata},
 };
 

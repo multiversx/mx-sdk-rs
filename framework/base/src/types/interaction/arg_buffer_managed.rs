@@ -8,7 +8,7 @@ use crate::{
     },
 };
 use alloc::vec::Vec;
-use mx_sc_codec::{
+use crate::codec::{
     DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode,
     NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeMultiOutput,
     TopEncodeOutput,

@@ -14,10 +14,11 @@ pub use mx_sc_derive::{self as derive, contract, module, proxy};
 // re-export basic heap types
 extern crate alloc;
 
-/// Reexported for convenience.
-pub use mx_sc_codec::arrayvec;
+/// The current version of `mx_sc_codec`, re-exported.
+pub use mx_sc_codec as codec;
 
-pub use mx_sc_codec;
+/// Reexported for convenience.
+pub use crate::codec::arrayvec;
 
 pub mod abi;
 pub mod api;

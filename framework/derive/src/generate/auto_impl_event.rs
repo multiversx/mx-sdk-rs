@@ -110,7 +110,7 @@ pub fn generate_legacy_event_impl(m: &Method, event_id_bytes: &[u8]) -> proc_mac
             } else {
                 let pat = &arg.pat;
                 quote! {
-                    let data_vec = match mx_sc::mx_sc_codec::top_encode_to_vec_u8(&#pat) {
+                    let data_vec = match mx_sc::codec::top_encode_to_vec_u8(&#pat) {
                         Result::Ok(data_vec) => data_vec,
                         Result::Err(encode_err) => mx_sc::api::ErrorApiImpl::signal_error(
                             &Self::Api::error_api_impl(),

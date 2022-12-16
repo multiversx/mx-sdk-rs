@@ -1,4 +1,4 @@
-use mx_sc_codec::{CodecFrom, EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput};
+use crate::codec::{CodecFrom, EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput};
 
 use super::{
     token_mapper::{

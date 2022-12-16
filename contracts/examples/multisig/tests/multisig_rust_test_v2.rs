@@ -6,7 +6,7 @@ use multisig::{
 };
 
 use mx_sc::{
-    mx_sc_codec::multi_types::{MultiValueVec, OptionalValue},
+    codec::multi_types::{MultiValueVec, OptionalValue},
     storage::mappers::SingleValue,
     types::{Address, CodeMetadata},
 };

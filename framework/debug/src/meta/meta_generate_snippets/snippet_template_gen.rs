@@ -12,7 +12,7 @@ pub(crate) fn write_snippet_imports(file: &mut File, contract_crate_name: &str) 
 use {contract_crate_name}::ProxyTrait as _;
 use mx_sc_snippets::{{
     mx_sc::{{
-        mx_sc_codec::multi_types::*,
+        codec::multi_types::*,
         types::{{Address, CodeMetadata}},
     }},
     mx_sc_debug::{{

@@ -6,7 +6,7 @@ use crate::{
     types::{ManagedArgBuffer, ManagedBuffer, ManagedType, ManagedVec, ManagedVecItem},
 };
 use core::{iter::FromIterator, marker::PhantomData};
-use mx_sc_codec::{
+use crate::codec::{
     try_cast_execute_or_else, CodecFromSelf, DecodeErrorHandler, EncodeErrorHandler, TopDecode,
     TopDecodeMulti, TopDecodeMultiInput, TopDecodeMultiLength, TopEncode, TopEncodeMulti,
     TopEncodeMultiOutput,
@@ -243,7 +243,7 @@ where
 impl<M, T> CodecFromSelf for MultiValueEncoded<M, T> where M: ManagedTypeApi {}
 
 #[cfg(feature = "alloc")]
-use mx_sc_codec::{multi_types::MultiValueVec, CodecFrom};
+use crate::codec::{multi_types::MultiValueVec, CodecFrom};
 
 #[cfg(feature = "alloc")]
 impl<M, T, U> CodecFrom<MultiValueVec<T>> for MultiValueEncoded<M, U>
