@@ -4,7 +4,6 @@ use crate::{
     num_bigint,
     world_mock::{AccountData, BlockInfo, EsdtData},
 };
-use mx_sc::types::heap::Address;
 use mandos::serde_raw::{
     AccountRaw, BlockInfoRaw, CheckAccountRaw, CheckAccountsRaw, CheckBytesValueRaw,
     CheckEsdtDataRaw, CheckEsdtInstanceRaw, CheckEsdtInstancesRaw, CheckEsdtMapContentsRaw,
@@ -12,6 +11,7 @@ use mandos::serde_raw::{
     CheckValueListRaw, EsdtFullRaw, EsdtInstanceRaw, EsdtRaw, TxCallRaw, TxESDTRaw, TxExpectRaw,
     TxQueryRaw, ValueSubTree,
 };
+use mx_sc::types::heap::Address;
 use num_traits::Zero;
 
 use super::{ScCallMandos, ScQueryMandos, TxExpectMandos};

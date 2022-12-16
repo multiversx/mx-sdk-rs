@@ -68,8 +68,7 @@ pub fn generate_proxy_method_sig(
 
 pub fn generate_proxy_endpoint(m: &Method, endpoint_name: String) -> proc_macro2::TokenStream {
     let mut token_count = 0;
-    let mut token_expr =
-        quote! { mx_sc::types::EgldOrEsdtTokenIdentifier::<Self::Api>::egld() };
+    let mut token_expr = quote! { mx_sc::types::EgldOrEsdtTokenIdentifier::<Self::Api>::egld() };
     let mut nonce_count = 0;
     let mut nonce_expr = quote! { 0u64 };
     let mut payment_count = 0;
@@ -190,8 +189,7 @@ pub fn generate_proxy_endpoint(m: &Method, endpoint_name: String) -> proc_macro2
 }
 
 pub fn generate_proxy_deploy(init_method: &Method) -> proc_macro2::TokenStream {
-    let msig =
-        generate_proxy_method_sig(init_method, quote! { mx_sc::types::ContractDeploy });
+    let msig = generate_proxy_method_sig(init_method, quote! { mx_sc::types::ContractDeploy });
 
     let mut payment_count = 0;
     let mut multi_count = 0;

@@ -1,9 +1,9 @@
 use super::{value_from_slice, AddressValue};
-use mx_sc::types::Address;
 use mandos::{
     interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
     value_interpreter::interpret_string,
 };
+use mx_sc::types::Address;
 use std::{cmp::Ordering, fmt};
 
 #[derive(Debug, Clone, Eq)]

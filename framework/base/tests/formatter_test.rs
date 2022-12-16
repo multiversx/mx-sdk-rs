@@ -23,10 +23,7 @@ impl FormatByteReceiver for SimpleReceiver {
         unimplemented!()
     }
 
-    fn append_managed_buffer_binary(
-        &mut self,
-        _item: &mx_sc::types::ManagedBuffer<UncallableApi>,
-    ) {
+    fn append_managed_buffer_binary(&mut self, _item: &mx_sc::types::ManagedBuffer<UncallableApi>) {
         unimplemented!()
     }
 }

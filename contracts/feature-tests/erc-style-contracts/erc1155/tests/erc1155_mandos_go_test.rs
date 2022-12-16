@@ -55,9 +55,7 @@ fn create_token_non_fungible_go() {
 
 #[test]
 fn create_two_tokens_both_fungible_different_creator_go() {
-    mx_sc_debug::mandos_go(
-        "mandos/create_two_tokens_both_fungible_different_creator.scen.json",
-    );
+    mx_sc_debug::mandos_go("mandos/create_two_tokens_both_fungible_different_creator.scen.json");
 }
 
 #[test]
@@ -67,9 +65,7 @@ fn create_two_tokens_both_fungible_same_creator_go() {
 
 #[test]
 fn create_two_tokens_both_non_fungible_same_creator_go() {
-    mx_sc_debug::mandos_go(
-        "mandos/create_two_tokens_both_non_fungible_same_creator.scen.json",
-    );
+    mx_sc_debug::mandos_go("mandos/create_two_tokens_both_non_fungible_same_creator.scen.json");
 }
 
 #[test]

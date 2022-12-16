@@ -2,9 +2,7 @@
 
 mx_sc::imports!();
 mx_sc::derive_imports!();
-use mx_sc_modules::ongoing_operation::{
-    CONTINUE_OP, DEFAULT_MIN_GAS_TO_SAVE_PROGRESS, STOP_OP,
-};
+use mx_sc_modules::ongoing_operation::{CONTINUE_OP, DEFAULT_MIN_GAS_TO_SAVE_PROGRESS, STOP_OP};
 
 type Epoch = u64;
 
@@ -33,9 +31,7 @@ pub struct RaffleProgress<M: ManagedTypeApi> {
 }
 
 #[mx_sc::contract]
-pub trait RewardsDistribution:
-    mx_sc_modules::ongoing_operation::OngoingOperationModule
-{
+pub trait RewardsDistribution: mx_sc_modules::ongoing_operation::OngoingOperationModule {
     #[init]
     fn init(&self, seed_nft_minter_address: ManagedAddress, brackets: ManagedVec<Bracket>) {
         self.seed_nft_minter_address().set(&seed_nft_minter_address);

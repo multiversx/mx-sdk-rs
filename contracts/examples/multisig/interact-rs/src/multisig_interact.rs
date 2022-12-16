@@ -1,6 +1,12 @@
 mod multisig_interact_nfts;
+use multisig::{
+    multisig_perform::ProxyTrait as _, multisig_propose::ProxyTrait as _,
+    multisig_state::ProxyTrait as _, ProxyTrait as _,
+};
+use mx_sc_modules::dns::ProxyTrait as _;
 use mx_sc_snippets::{
-    dns_address_for_name,
+    dns_address_for_name, env_logger,
+    erdrs::interactors::wallet::Wallet,
     mx_sc::{
         mx_sc_codec::multi_types::MultiValueVec,
         storage::mappers::SingleValue,
@@ -10,15 +16,8 @@ use mx_sc_snippets::{
         bech32, mandos::interpret_trait::InterpreterContext, mandos_system::model::*, ContractInfo,
         DebugApi,
     },
-    env_logger,
-    erdrs::interactors::wallet::Wallet,
     tokio, Interactor,
 };
-use multisig::{
-    multisig_perform::ProxyTrait as _, multisig_propose::ProxyTrait as _,
-    multisig_state::ProxyTrait as _, ProxyTrait as _,
-};
-use mx_sc_modules::dns::ProxyTrait as _;
 use std::{
     env::Args,
     io::{Read, Write},

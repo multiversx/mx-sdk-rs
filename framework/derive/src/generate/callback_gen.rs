@@ -119,19 +119,19 @@ fn match_arms(methods: &[Method]) -> Vec<proc_macro2::TokenStream> {
 
 pub fn module_calls(supertraits: &[Supertrait]) -> Vec<proc_macro2::TokenStream> {
     supertraits
-		.iter()
-		.map(|supertrait| {
-			let module_path = &supertrait.module_path;
-			quote! {
-				match #module_path EndpointWrappers::callback_selector(self, ___cb_closure___) {
-					mx_sc::types::CallbackSelectorResult::Processed => {
-						return mx_sc::types::CallbackSelectorResult::Processed;
-					},
-					mx_sc::types::CallbackSelectorResult::NotProcessed(recovered_cb_closure) => {
-						___cb_closure___ = recovered_cb_closure;
-					},
-				}
-			}
-		})
-		.collect()
+        .iter()
+        .map(|supertrait| {
+            let module_path = &supertrait.module_path;
+            quote! {
+                match #module_path EndpointWrappers::callback_selector(self, ___cb_closure___) {
+                    mx_sc::types::CallbackSelectorResult::Processed => {
+                        return mx_sc::types::CallbackSelectorResult::Processed;
+                    },
+                    mx_sc::types::CallbackSelectorResult::NotProcessed(recovered_cb_closure) => {
+                        ___cb_closure___ = recovered_cb_closure;
+                    },
+                }
+            }
+        })
+        .collect()
 }

@@ -1,7 +1,7 @@
 use std::path::{Path, PathBuf};
 
-use mx_sc::contract_base::{CallableContractBuilder, ContractAbiProvider};
 use mandos::{interpret_trait::InterpreterContext, value_interpreter::interpret_string};
+use mx_sc::contract_base::{CallableContractBuilder, ContractAbiProvider};
 
 use crate::DebugApi;
 

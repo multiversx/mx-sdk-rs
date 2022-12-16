@@ -3,6 +3,7 @@ use std::marker::PhantomData;
 use elrond_sdk_erdrs::data::transaction::{
     ApiLogs, ApiSmartContractResult, Events, TransactionOnNetwork,
 };
+use log::info;
 use mx_sc_debug::{
     bech32,
     mx_sc::{
@@ -10,7 +11,6 @@ use mx_sc_debug::{
         types::Address,
     },
 };
-use log::info;
 
 const LOG_IDENTIFIER_SC_DEPLOY: &str = "SCDeploy";
 

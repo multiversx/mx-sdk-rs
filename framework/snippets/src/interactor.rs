@@ -3,7 +3,7 @@ use elrond_sdk_erdrs::{
     data::{address::Address as ErdrsAddress, network_config::NetworkConfig},
     interactors::wallet::Wallet,
 };
-use mx_sc_debug::{mx_sc::types::Address, mandos_system::model::AddressValue, HashMap};
+use mx_sc_debug::{mandos_system::model::AddressValue, mx_sc::types::Address, HashMap};
 use std::time::Duration;
 
 use crate::Sender;

@@ -9,9 +9,10 @@ use crate::{
 };
 use alloc::vec::Vec;
 use mx_sc_codec::{
+    multi_encode_iter_or_handle_err,
     mx_sc_codec_derive::{TopDecode, TopDecodeOrDefault, TopEncode, TopEncodeOrDefault},
-    multi_encode_iter_or_handle_err, CodecFrom, DecodeDefault, EncodeDefault, EncodeErrorHandler,
-    TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
+    CodecFrom, DecodeDefault, EncodeDefault, EncodeErrorHandler, TopDecode, TopEncode,
+    TopEncodeMulti, TopEncodeMultiOutput,
 };
 
 const NULL_ENTRY: u32 = 0;

@@ -8,14 +8,13 @@ fn abi_tester_abi_generated_ok() {
     blockchain.set_current_dir_from_workspace("contracts/feature-tests/abi-tester");
 
     // generate ABI
-    let multi_contract_config =
-        mx_sc_debug::meta::multi_contract_config::<abi_tester::AbiProvider>(
-            blockchain
-                .current_dir
-                .join("multicontract.toml")
-                .to_str()
-                .unwrap(),
-        );
+    let multi_contract_config = mx_sc_debug::meta::multi_contract_config::<abi_tester::AbiProvider>(
+        blockchain
+            .current_dir
+            .join("multicontract.toml")
+            .to_str()
+            .unwrap(),
+    );
 
     let main_contract = multi_contract_config.find_contract("abi-tester");
     assert!(!main_contract.external_view);
@@ -51,14 +50,13 @@ fn check_multi_contract_config() {
     let mut blockchain = BlockchainMock::new();
     blockchain.set_current_dir_from_workspace("contracts/feature-tests/abi-tester");
 
-    let multi_contract_config =
-        mx_sc_debug::meta::multi_contract_config::<abi_tester::AbiProvider>(
-            blockchain
-                .current_dir
-                .join("multicontract.toml")
-                .to_str()
-                .unwrap(),
-        );
+    let multi_contract_config = mx_sc_debug::meta::multi_contract_config::<abi_tester::AbiProvider>(
+        blockchain
+            .current_dir
+            .join("multicontract.toml")
+            .to_str()
+            .unwrap(),
+    );
 
     let ev_contract = multi_contract_config.find_contract("abi-tester-ev");
     assert!(ev_contract.external_view);

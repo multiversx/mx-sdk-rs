@@ -5,8 +5,8 @@ use mx_sc_codec::{EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput, TryS
 use crate::{
     api::{EndpointFinishApi, EndpointFinishApiImpl, ManagedTypeApi},
     contract_base::ExitCodecErrorHandler,
-    mx_sc_codec::{EncodeError, TopEncode, TopEncodeOutput},
     err_msg,
+    mx_sc_codec::{EncodeError, TopEncode, TopEncodeOutput},
     types::{
         BigInt, BigUint, ManagedBuffer, ManagedBufferCachedBuilder, ManagedSCError, ManagedType,
         SCError, StaticSCError,

@@ -1,9 +1,9 @@
 use crate::mandos_system::model::{AddressValue, BigUintValue, BytesValue, U64Value};
-use mx_sc::types::CodeMetadata;
 use mandos::{
     interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
     serde_raw::TxDeployRaw,
 };
+use mx_sc::types::CodeMetadata;
 
 use super::tx_interpret_util::interpret_egld_value;
 

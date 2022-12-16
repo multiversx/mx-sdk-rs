@@ -1,6 +1,6 @@
+use factorial::*;
 use mx_sc::types::BigUint;
 use mx_sc_debug::DebugApi;
-use factorial::*;
 
 #[test]
 fn test_factorial() {

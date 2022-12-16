@@ -97,9 +97,7 @@ fn transferfrom_alldistinct_entireallowancemorethanbalance_go() {
 
 #[test]
 fn transferfrom_alldistinct_entirebalanceeqallowance_go() {
-    mx_sc_debug::mandos_go(
-        "mandos/transferFrom_AllDistinct-EntireBalanceEqAllowance.scen.json",
-    );
+    mx_sc_debug::mandos_go("mandos/transferFrom_AllDistinct-EntireBalanceEqAllowance.scen.json");
 }
 
 #[test]
@@ -179,16 +177,12 @@ fn transferfrom_callereqto_morethanbalancelessthanallowance_go() {
 
 #[test]
 fn transferfrom_exploratory_multipletransferssucceed_go() {
-    mx_sc_debug::mandos_go(
-        "mandos/transferFrom_Exploratory-MultipleTransfersSucceed.scen.json",
-    );
+    mx_sc_debug::mandos_go("mandos/transferFrom_Exploratory-MultipleTransfersSucceed.scen.json");
 }
 
 #[test]
 fn transferfrom_exploratory_multipletransfersthrow_go() {
-    mx_sc_debug::mandos_go(
-        "mandos/transferFrom_Exploratory-MultipleTransfersThrow.scen.json",
-    );
+    mx_sc_debug::mandos_go("mandos/transferFrom_Exploratory-MultipleTransfersThrow.scen.json");
 }
 
 #[test]
@@ -203,9 +197,7 @@ fn transferfrom_fromeqto_balanceneqallowance_go() {
 
 #[test]
 fn transferfrom_fromeqto_entireallowancemorethanbalance_go() {
-    mx_sc_debug::mandos_go(
-        "mandos/transferFrom_FromEqTo-EntireAllowanceMoreThanBalance.scen.json",
-    );
+    mx_sc_debug::mandos_go("mandos/transferFrom_FromEqTo-EntireAllowanceMoreThanBalance.scen.json");
 }
 
 #[test]
@@ -215,9 +207,7 @@ fn transferfrom_fromeqto_entirebalanceeqallowance_go() {
 
 #[test]
 fn transferfrom_fromeqto_entirebalancemorethanallowance_go() {
-    mx_sc_debug::mandos_go(
-        "mandos/transferFrom_FromEqTo-EntireBalanceMoreThanAllowance.scen.json",
-    );
+    mx_sc_debug::mandos_go("mandos/transferFrom_FromEqTo-EntireBalanceMoreThanAllowance.scen.json");
 }
 
 #[test]

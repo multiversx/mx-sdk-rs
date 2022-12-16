@@ -2,11 +2,11 @@ use crate::{
     mandos_system::model::{AddressValue, BigUintValue, BytesValue, U64Value},
     DebugApi,
 };
-use mx_sc::types::{ContractCall, ContractCallWithEgld, EsdtTokenPayment};
 use mandos::{
     interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
     serde_raw::TxCallRaw,
 };
+use mx_sc::types::{ContractCall, ContractCallWithEgld, EsdtTokenPayment};
 
 use super::{tx_interpret_util::interpret_egld_value, TxESDT};
 

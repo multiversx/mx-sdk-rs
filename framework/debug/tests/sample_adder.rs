@@ -47,10 +47,7 @@ mod module_1 {
         fn callback(&self) {}
     }
 
-    impl<A> AutoImpl for mx_sc::contract_base::UniversalContractObj<A> where
-        A: mx_sc::api::VMApi
-    {
-    }
+    impl<A> AutoImpl for mx_sc::contract_base::UniversalContractObj<A> where A: mx_sc::api::VMApi {}
 
     pub trait EndpointWrappers: VersionModule + mx_sc::contract_base::ContractBase {
         #[inline]
@@ -83,10 +80,8 @@ mod module_1 {
         }
     }
 
-    impl<A> EndpointWrappers for mx_sc::contract_base::UniversalContractObj<A> where
-        A: mx_sc::api::VMApi
-    {
-    }
+    impl<A> EndpointWrappers for mx_sc::contract_base::UniversalContractObj<A> where A: mx_sc::api::VMApi
+    {}
 
     pub struct AbiProvider {}
 
@@ -99,9 +94,7 @@ mod module_1 {
     }
 
     pub trait ProxyTrait: mx_sc::contract_base::ProxyObjBase + Sized {
-        fn version(
-            &mut self,
-        ) -> mx_sc::types::ContractCallNoPayment<Self::Api, BigInt<Self::Api>> {
+        fn version(&mut self) -> mx_sc::types::ContractCallNoPayment<Self::Api, BigInt<Self::Api>> {
             let ___address___ = self.extract_address();
             mx_sc::types::ContractCallNoPayment::new(___address___, "version")
         }
@@ -160,10 +153,7 @@ mod sample_adder {
         }
     }
 
-    impl<A> AutoImpl for mx_sc::contract_base::UniversalContractObj<A> where
-        A: mx_sc::api::VMApi
-    {
-    }
+    impl<A> AutoImpl for mx_sc::contract_base::UniversalContractObj<A> where A: mx_sc::api::VMApi {}
 
     pub trait EndpointWrappers:
         Adder + mx_sc::contract_base::ContractBase + super::module_1::EndpointWrappers
@@ -227,17 +217,11 @@ mod sample_adder {
         }
     }
 
-    impl<A> EndpointWrappers for mx_sc::contract_base::UniversalContractObj<A> where
-        A: mx_sc::api::VMApi
-    {
-    }
+    impl<A> EndpointWrappers for mx_sc::contract_base::UniversalContractObj<A> where A: mx_sc::api::VMApi
+    {}
 
-    pub trait ProxyTrait:
-        mx_sc::contract_base::ProxyObjBase + super::module_1::ProxyTrait
-    {
-        fn get_sum(
-            &mut self,
-        ) -> mx_sc::types::ContractCallNoPayment<Self::Api, BigInt<Self::Api>> {
+    pub trait ProxyTrait: mx_sc::contract_base::ProxyObjBase + super::module_1::ProxyTrait {
+        fn get_sum(&mut self) -> mx_sc::types::ContractCallNoPayment<Self::Api, BigInt<Self::Api>> {
             let ___address___ = self.extract_address();
             mx_sc::types::ContractCallNoPayment::new(___address___, "get_sum")
         }
@@ -298,8 +282,7 @@ mod sample_adder {
     impl mx_sc::contract_base::CallableContractBuilder for ContractBuilder {
         fn new_contract_obj<A: mx_sc::api::VMApi>(
             &self,
-        ) -> mx_sc::types::heap::Box<dyn mx_sc::contract_base::CallableContract>
-        {
+        ) -> mx_sc::types::heap::Box<dyn mx_sc::contract_base::CallableContract> {
             mx_sc::types::heap::Box::new(ContractObj::<A> {
                 _phantom: core::marker::PhantomData,
             })
@@ -351,10 +334,8 @@ mod sample_adder {
 
         fn extract_opt_address(
             &mut self,
-        ) -> mx_sc::types::ManagedOption<
-            Self::Api,
-            mx_sc::types::ManagedAddress<Self::Api>,
-        > {
+        ) -> mx_sc::types::ManagedOption<Self::Api, mx_sc::types::ManagedAddress<Self::Api>>
+        {
             core::mem::replace(&mut self.address, mx_sc::types::ManagedOption::none())
         }
 

@@ -1,3 +1,7 @@
+use multisig::{
+    multisig_perform::MultisigPerformModule, multisig_propose::MultisigProposeModule,
+    user_role::UserRole, Multisig,
+};
 use mx_sc::{
     api::ManagedTypeApi,
     mx_sc_codec::multi_types::OptionalValue,
@@ -5,10 +9,6 @@ use mx_sc::{
 };
 use mx_sc_debug::{
     managed_address, rust_biguint, testing_framework::*, tx_mock::TxResult, DebugApi,
-};
-use multisig::{
-    multisig_perform::MultisigPerformModule, multisig_propose::MultisigProposeModule,
-    user_role::UserRole, Multisig,
 };
 
 const MULTISIG_WASM_PATH: &str = "multisig/output/multisig.wasm";

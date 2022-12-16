@@ -38,8 +38,8 @@ fn managed_struct_to_bytes_writer() {
         big_uint: BigUint::from(fortytwo),
         num: 0x12345,
     };
-    let mut arr: [u8; 8] = [0u8;
-        <ManagedStructWithBigUint<DebugApi> as mx_sc::types::ManagedVecItem>::PAYLOAD_SIZE];
+    let mut arr: [u8; 8] =
+        [0u8; <ManagedStructWithBigUint<DebugApi> as mx_sc::types::ManagedVecItem>::PAYLOAD_SIZE];
 
     let handle_bytes = s.big_uint.get_handle().to_be_bytes();
     let expected = [0xff, 0xff, 0xff, handle_bytes[3], 0x00, 0x01, 0x23, 0x45];
@@ -64,12 +64,15 @@ fn managed_struct_from_bytes_reader() {
     let handle_bytes = s.big_uint.get_handle().to_be_bytes();
     let arr: [u8; 8] = [0xff, 0xff, 0xff, handle_bytes[3], 0x00, 0x01, 0x23, 0x45];
 
-    let struct_from_bytes = <ManagedStructWithBigUint<DebugApi> as mx_sc::types::ManagedVecItem>::from_byte_reader( |bytes| {
-        bytes.copy_from_slice(
+    let struct_from_bytes =
+        <ManagedStructWithBigUint<DebugApi> as mx_sc::types::ManagedVecItem>::from_byte_reader(
+            |bytes| {
+                bytes.copy_from_slice(
                     &arr
                         [0
                             ..<ManagedStructWithBigUint::<DebugApi> as mx_sc::types::ManagedVecItem>::PAYLOAD_SIZE],
                 );
-    });
+            },
+        );
     assert_eq!(s, struct_from_bytes);
 }

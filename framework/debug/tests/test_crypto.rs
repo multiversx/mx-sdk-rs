@@ -1,6 +1,6 @@
+use hex::FromHex;
 use mx_sc::api::CryptoApiImpl;
 use mx_sc_debug::DebugApi;
-use hex::FromHex;
 
 #[test]
 fn test_verify_ed25519_basic() {

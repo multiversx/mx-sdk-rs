@@ -237,9 +237,7 @@ fn forwarder_call_transf_exec_accept_esdt_twice_go() {
 
 #[test]
 fn forwarder_call_transf_exec_accept_multi_transfer_go() {
-    mx_sc_debug::mandos_go(
-        "mandos/forwarder_call_transf_exec_accept_multi_transfer.scen.json",
-    );
+    mx_sc_debug::mandos_go("mandos/forwarder_call_transf_exec_accept_multi_transfer.scen.json");
 }
 
 #[test]
@@ -249,9 +247,7 @@ fn forwarder_call_transf_exec_accept_nft_go() {
 
 #[test]
 fn forwarder_call_transf_exec_accept_return_values_go() {
-    mx_sc_debug::mandos_go(
-        "mandos/forwarder_call_transf_exec_accept_return_values.scen.json",
-    );
+    mx_sc_debug::mandos_go("mandos/forwarder_call_transf_exec_accept_return_values.scen.json");
 }
 
 #[test]
@@ -261,9 +257,7 @@ fn forwarder_call_transf_exec_accept_sft_twice_go() {
 
 #[test]
 fn forwarder_call_transf_exec_reject_multi_transfer_go() {
-    mx_sc_debug::mandos_go(
-        "mandos/forwarder_call_transf_exec_reject_multi_transfer.scen.json",
-    );
+    mx_sc_debug::mandos_go("mandos/forwarder_call_transf_exec_reject_multi_transfer.scen.json");
 }
 
 #[test]

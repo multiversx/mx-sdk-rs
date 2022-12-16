@@ -47,8 +47,8 @@ fn struct_to_bytes_writer() {
         eth_address_1: ManagedByteArray::new_from_bytes(&[1u8; 20]),
         eth_address_2: ManagedByteArray::new_from_bytes(&[2u8; 20]),
     };
-    let mut arr: [u8; 28] = [0u8;
-        <ManagedStructWithToken<DebugApi> as mx_sc::types::ManagedVecItem>::PAYLOAD_SIZE];
+    let mut arr: [u8; 28] =
+        [0u8; <ManagedStructWithToken<DebugApi> as mx_sc::types::ManagedVecItem>::PAYLOAD_SIZE];
 
     let handle1 = s.token.token_identifier.get_handle().to_be_bytes();
     let handle2 = s.token.amount.get_handle().to_be_bytes();
@@ -63,7 +63,9 @@ fn struct_to_bytes_writer() {
     <ManagedStructWithToken<DebugApi> as mx_sc::types::ManagedVecItem>::to_byte_writer(
         &s,
         |bytes| {
-            arr[0..<ManagedStructWithToken::<DebugApi> as mx_sc::types::ManagedVecItem>::PAYLOAD_SIZE].copy_from_slice(bytes);
+            arr[0
+                ..<ManagedStructWithToken<DebugApi> as mx_sc::types::ManagedVecItem>::PAYLOAD_SIZE]
+                .copy_from_slice(bytes);
 
             assert_eq!(arr, expected);
         },
