@@ -1,5 +1,5 @@
 mod multisig_interact_nfts;
-use elrond_interact_snippets::{
+use mx_sc_snippets::{
     dns_address_for_name,
     elrond_wasm::{
         elrond_codec::multi_types::MultiValueVec,
@@ -24,7 +24,7 @@ use std::{
     io::{Read, Write},
 };
 
-const GATEWAY: &str = elrond_interact_snippets::erdrs::blockchain::rpc::TESTNET_GATEWAY;
+const GATEWAY: &str = mx_sc_snippets::erdrs::blockchain::rpc::TESTNET_GATEWAY;
 const PEM: &str = "alice.pem";
 const DEFAULT_MULTISIG_ADDRESS_EXPR: &str =
     "0x0000000000000000000000000000000000000000000000000000000000000000";
@@ -82,7 +82,7 @@ impl State {
     }
 
     async fn deploy(&mut self) {
-        let deploy_result: elrond_interact_snippets::InteractorResult<()> = self
+        let deploy_result: mx_sc_snippets::InteractorResult<()> = self
             .interactor
             .sc_deploy(
                 self.multisig

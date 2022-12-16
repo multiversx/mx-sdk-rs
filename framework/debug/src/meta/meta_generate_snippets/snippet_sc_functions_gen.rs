@@ -51,7 +51,7 @@ fn write_deploy_method_impl(
 
     writeln!(
         file,
-        r#"        let result: elrond_interact_snippets::InteractorResult<PlaceholderOutput> = self
+        r#"        let result: mx_sc_snippets::InteractorResult<PlaceholderOutput> = self
             .interactor
             .sc_deploy(
                 self.contract
@@ -158,7 +158,7 @@ fn write_contract_call(file: &mut File, endpoint_abi: &EndpointAbi) {
 
     writeln!(
         file,
-        r#"        let result: elrond_interact_snippets::InteractorResult<PlaceholderOutput> = self
+        r#"        let result: mx_sc_snippets::InteractorResult<PlaceholderOutput> = self
             .interactor
             .sc_call_get_result(
                 self.contract

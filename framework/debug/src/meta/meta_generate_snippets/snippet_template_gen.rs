@@ -10,7 +10,7 @@ pub(crate) fn write_snippet_imports(file: &mut File, contract_crate_name: &str) 
         "#[allow(non_snake_case)]
 
 use {contract_crate_name}::ProxyTrait as _;
-use elrond_interact_snippets::{{
+use mx_sc_snippets::{{
     elrond_wasm::{{
         elrond_codec::multi_types::*,
         types::{{Address, CodeMetadata}},
@@ -34,7 +34,7 @@ use std::{{
 }
 
 pub(crate) fn write_snippet_constants(file: &mut File) {
-    writeln!(file, "const GATEWAY: &str = elrond_interact_snippets::erdrs::blockchain::rpc::DEVNET_GATEWAY;
+    writeln!(file, "const GATEWAY: &str = mx_sc_snippets::erdrs::blockchain::rpc::DEVNET_GATEWAY;
 const PEM: &str = \"alice.pem\";
 const SC_ADDRESS: &str = \"\";
 

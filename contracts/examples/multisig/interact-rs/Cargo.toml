@@ -16,6 +16,6 @@ path = ".."
 version = "0.38.0"
 path = "../../../../contracts/modules"
 
-[dependencies.elrond-interact-snippets]
+[dependencies.mx-sc-snippets]
 version = "0.38.0"
 path = "../../../../framework/snippets"
