@@ -11,11 +11,11 @@
 
 #![no_std]
 
-elrond_wasm_node::wasm_endpoints! {
+mx_sc_wasm_adapter::wasm_endpoints! {
     factorial
     (
         factorial
     )
 }
 
-elrond_wasm_node::wasm_empty_callback! {}
+mx_sc_wasm_adapter::wasm_empty_callback! {}

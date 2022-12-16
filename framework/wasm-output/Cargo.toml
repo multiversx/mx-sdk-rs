@@ -26,6 +26,6 @@ panic-message = []
 [dependencies]
 wee_alloc = "0.4"
 
-[dependencies.elrond-wasm-node]
+[dependencies.mx-sc-wasm-adapter]
 version = "=0.38.0"
 path = "../wasm-adapter"

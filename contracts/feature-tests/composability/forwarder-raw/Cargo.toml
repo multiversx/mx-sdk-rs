@@ -15,7 +15,7 @@ ei-unmanaged = ["elrond-wasm/ei-unmanaged"]
 version = "0.38.0"
 path = "../../../../framework/base"
 
-[dependencies.elrond-wasm-node]
+[dependencies.mx-sc-wasm-adapter]
 version = "0.38.0"
 path = "../../../../framework/wasm-adapter"
 optional = true

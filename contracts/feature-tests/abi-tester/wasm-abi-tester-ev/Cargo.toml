@@ -16,7 +16,7 @@ panic = "abort"
 [dependencies.abi-tester]
 path = ".."
 
-[dependencies.elrond-wasm-node]
+[dependencies.mx-sc-wasm-adapter]
 version = "0.38.0"
 path = "../../../../framework/wasm-adapter"
 
