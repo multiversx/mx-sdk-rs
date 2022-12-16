@@ -1,7 +1,7 @@
-elrond_wasm::imports!();
+mx_sc::imports!();
 
 /// Various features of heap-allocated types.
-#[elrond_wasm::module]
+#[mx_sc::module]
 pub trait AllocTypeFeatures {
     // H256
 

@@ -1,4 +1,4 @@
-use elrond_wasm::{
+use mx_sc::{
     arrayvec::ArrayVec,
     contract_base::ContractBase,
     mx_sc_codec::Empty,

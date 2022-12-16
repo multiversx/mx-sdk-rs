@@ -1,6 +1,6 @@
 use std::{fs::File, io::Write};
 
-use elrond_wasm::abi::{ContractAbi, EndpointAbi, EndpointMutabilityAbi, InputAbi, OutputAbi};
+use mx_sc::abi::{ContractAbi, EndpointAbi, EndpointMutabilityAbi, InputAbi, OutputAbi};
 
 use super::snippet_gen_common::write_newline;
 

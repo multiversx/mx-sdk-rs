@@ -1,4 +1,4 @@
-use elrond_wasm::{
+use mx_sc::{
     mx_sc_codec::{CodecFrom, TopEncodeMulti},
     types::ContractCall,
 };

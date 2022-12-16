@@ -1,4 +1,4 @@
-use elrond_wasm::{
+use mx_sc::{
     api::{const_handles, use_raw_handle, HandleConstraints, StaticVarApi, StaticVarApiImpl},
     types::LockableStaticBuffer,
 };

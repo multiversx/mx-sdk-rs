@@ -1,5 +1,5 @@
 use alloc::vec::Vec;
-use elrond_wasm::contract_base::CallableContract;
+use mx_sc::contract_base::CallableContract;
 
 use crate::tx_mock::TxFunctionName;
 

@@ -1,6 +1,6 @@
-elrond_wasm::derive_imports!();
+mx_sc::derive_imports!();
 
-/// Copied from elrond-wasm serialization tests.
+/// Copied from mx-sc serialization tests.
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi)]
 pub enum ExampleEnumWithFields {
     Unit,

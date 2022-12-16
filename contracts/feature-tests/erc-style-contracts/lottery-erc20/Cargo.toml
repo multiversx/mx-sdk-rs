@@ -11,7 +11,7 @@ path = "src/lottery.rs"
 [dependencies.erc20]
 path = "../erc20"
 
-[dependencies.elrond-wasm]
+[dependencies.mx-sc]
 version = "0.38.0"
 path = "../../../../framework/base"
 features = ["alloc"]

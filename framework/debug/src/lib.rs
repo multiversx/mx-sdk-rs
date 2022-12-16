@@ -24,12 +24,12 @@ pub use world_mock::BlockchainMock;
 pub use mandos;
 
 // Re-exporting for convenience. Using the crate as imported in the codec to make sure the save version is used everywhere.
-pub use elrond_wasm::mx_sc_codec::num_bigint;
+pub use mx_sc::mx_sc_codec::num_bigint;
 
 #[macro_use]
 extern crate alloc;
 pub use alloc::{boxed::Box, vec::Vec};
 
-pub use elrond_wasm;
+pub use mx_sc;
 
 pub use std::collections::HashMap;

@@ -1,4 +1,4 @@
-use elrond_wasm::types::{ManagedAddress, ManagedBuffer};
+use mx_sc::types::{ManagedAddress, ManagedBuffer};
 use mx_sc_debug::*;
 
 use basic_features::managed_buffer_features::ManagedBufferFeatures;

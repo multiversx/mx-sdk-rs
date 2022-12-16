@@ -5,7 +5,7 @@ use elrond_sdk_erdrs::data::transaction::{
 };
 use mx_sc_debug::{
     bech32,
-    elrond_wasm::{
+    mx_sc::{
         mx_sc_codec::{PanicErrorHandler, TopDecodeMulti},
         types::Address,
     },

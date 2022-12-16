@@ -1,4 +1,4 @@
-use elrond_wasm::api::{CallTypeApi, HandleTypeInfo, StorageMapperApi, VMApi};
+use mx_sc::api::{CallTypeApi, HandleTypeInfo, StorageMapperApi, VMApi};
 
 use crate::DebugApi;
 

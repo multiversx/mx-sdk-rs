@@ -18,6 +18,6 @@ vm-validate-token-identifier = []
 vm-esdt-local-roles = []
 ei-unmanaged-node = []
 
-[dependencies.elrond-wasm]
+[dependencies.mx-sc]
 version = "=0.38.0"
 path = "../base"

@@ -1,8 +1,8 @@
 #![no_std]
 
-elrond_wasm::imports!();
+mx_sc::imports!();
 
-#[elrond_wasm::contract]
+#[mx_sc::contract]
 pub trait ProxyTestSecond {
     #[storage_set("last_payment")]
     fn set_last_payment(&self, last_payment: &BigUint);

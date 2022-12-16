@@ -1,7 +1,7 @@
-elrond_wasm::imports!();
-elrond_wasm::derive_imports!();
+mx_sc::imports!();
+mx_sc::derive_imports!();
 
-use elrond_wasm::contract_base::ManagedSerializer;
+use mx_sc::contract_base::ManagedSerializer;
 
 use crate::bonding_curve::{
     curves::curve_function::CurveFunction,
@@ -13,7 +13,7 @@ use crate::bonding_curve::{
 
 use super::structs::CurveArguments;
 
-#[elrond_wasm::module]
+#[mx_sc::module]
 pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
     #[endpoint(setLocalRoles)]
     fn set_local_roles(

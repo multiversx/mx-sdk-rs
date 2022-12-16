@@ -1,4 +1,4 @@
-use elrond_wasm::abi::ContractAbi;
+use mx_sc::abi::ContractAbi;
 
 fn validate_abi_constructor(abi: &ContractAbi) -> Result<(), &'static str> {
     match abi.constructors.len() {

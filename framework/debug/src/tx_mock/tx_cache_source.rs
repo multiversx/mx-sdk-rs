@@ -1,4 +1,4 @@
-use elrond_wasm::types::heap::Address;
+use mx_sc::types::heap::Address;
 
 use crate::world_mock::{AccountData, BlockchainMock};
 

@@ -1,6 +1,6 @@
 use std::{fs::File, io::Write};
 
-use elrond_wasm::abi::ContractAbi;
+use mx_sc::abi::ContractAbi;
 
 use super::snippet_gen_common::write_newline;
 
@@ -11,7 +11,7 @@ pub(crate) fn write_snippet_imports(file: &mut File, contract_crate_name: &str) 
 
 use {contract_crate_name}::ProxyTrait as _;
 use mx_sc_snippets::{{
-    elrond_wasm::{{
+    mx_sc::{{
         mx_sc_codec::multi_types::*,
         types::{{Address, CodeMetadata}},
     }},

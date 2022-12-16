@@ -25,7 +25,7 @@ pub fn generate_function_selector_body(contract: &ContractTrait) -> proc_macro2:
             PublicRole::Init(_) => Some(endpoint_match_arm(
                 m,
                 "init",
-                quote!{ if !<Self::Api as elrond_wasm::api::VMApi>::external_view_init_override() },
+                quote!{ if !<Self::Api as mx_sc::api::VMApi>::external_view_init_override() },
             )),
             PublicRole::Endpoint(endpoint_metadata) => Some(endpoint_match_arm(
                 m,
@@ -48,8 +48,8 @@ pub fn generate_function_selector_body(contract: &ContractTrait) -> proc_macro2:
                 self::EndpointWrappers::callback(self);
                 return true;
             },
-            "init" if <Self::Api as elrond_wasm::api::VMApi>::external_view_init_override() => {
-                elrond_wasm::external_view_contract::external_view_contract_constructor::<Self::Api>();
+            "init" if <Self::Api as mx_sc::api::VMApi>::external_view_init_override() => {
+                mx_sc::external_view_contract::external_view_contract_constructor::<Self::Api>();
                 return true;
             },
             #(#match_arms)*

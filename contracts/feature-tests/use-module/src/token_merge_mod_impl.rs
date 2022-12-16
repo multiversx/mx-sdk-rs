@@ -1,5 +1,5 @@
-elrond_wasm::imports!();
-elrond_wasm::derive_imports!();
+mx_sc::imports!();
+mx_sc::derive_imports!();
 
 use core::marker::PhantomData;
 
@@ -16,7 +16,7 @@ pub struct CustomAttributes {
     pub second: u64,
 }
 
-#[elrond_wasm::module]
+#[mx_sc::module]
 pub trait TokenMergeModImpl:
     mx_sc_modules::pause::PauseModule
     + mx_sc_modules::token_merge::TokenMergeModule

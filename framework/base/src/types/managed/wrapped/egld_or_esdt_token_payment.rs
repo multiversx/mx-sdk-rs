@@ -8,7 +8,7 @@ use mx_sc_codec::{
     CodecFrom, CodecFromSelf,
 };
 
-use crate as elrond_wasm; // needed by the TypeAbi generated code
+use crate as mx_sc; // needed by the TypeAbi generated code
 use crate::derive::TypeAbi;
 
 use super::EsdtTokenPayment;

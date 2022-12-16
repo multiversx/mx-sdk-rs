@@ -5,7 +5,7 @@ use core::{
 };
 use std::convert::TryInto;
 
-use elrond_wasm::{
+use mx_sc::{
     api::{BigFloatApi, BigIntApi, ErrorApiImpl, HandleTypeInfo, Sign},
     mx_sc_codec::num_bigint::BigInt,
     err_msg,
@@ -156,11 +156,11 @@ impl BigFloatApi for DebugApi {
         }
 
         if bf.is_sign_positive() {
-            return elrond_wasm::api::Sign::Plus;
+            return mx_sc::api::Sign::Plus;
         } else if bf.is_sign_negative() {
-            return elrond_wasm::api::Sign::Minus;
+            return mx_sc::api::Sign::Minus;
         }
-        elrond_wasm::api::Sign::NoSign
+        mx_sc::api::Sign::NoSign
     }
 
     fn bf_clone(&self, dest: Self::BigFloatHandle, x: Self::BigFloatHandle) {

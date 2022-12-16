@@ -1,4 +1,4 @@
-use elrond_wasm::types::ManagedVec;
+use mx_sc::types::ManagedVec;
 use mx_sc_debug::DebugApi;
 use rewards_distribution::Bracket;
 

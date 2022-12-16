@@ -1,4 +1,4 @@
-use elrond_wasm::types::{ContractCall, ContractDeploy};
+use mx_sc::types::{ContractCall, ContractDeploy};
 
 use crate::DebugApi;
 

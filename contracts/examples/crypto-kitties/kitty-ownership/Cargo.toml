@@ -20,7 +20,7 @@ path = "../common/random"
 version = "0.0.0"
 path = "../kitty-genetic-alg"
 
-[dependencies.elrond-wasm]
+[dependencies.mx-sc]
 version = "0.38.0"
 path = "../../../../framework/base"
 

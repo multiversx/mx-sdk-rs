@@ -1,11 +1,11 @@
 #![no_std]
 
-elrond_wasm::imports!();
+mx_sc::imports!();
 
 mod pause_proxy {
-    elrond_wasm::imports!();
+    mx_sc::imports!();
 
-    #[elrond_wasm::proxy]
+    #[mx_sc::proxy]
     pub trait Pausable {
         #[endpoint]
         fn pause(&self);
@@ -15,7 +15,7 @@ mod pause_proxy {
     }
 }
 
-#[elrond_wasm::contract]
+#[mx_sc::contract]
 pub trait PauseProxy {
     #[init]
     fn init(&self) {

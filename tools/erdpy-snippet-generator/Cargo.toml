@@ -8,7 +8,7 @@ edition = "2021"
 name = "erdpy-snippet-generator"
 path = "src/erdpy_snippet_generator.rs"
 
-[dependencies.elrond-wasm]
+[dependencies.mx-sc]
 version = "0.38.0"
 path = "../../framework/base"
 

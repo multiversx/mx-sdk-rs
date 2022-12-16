@@ -1,5 +1,5 @@
-elrond_wasm::imports!();
-elrond_wasm::derive_imports!();
+mx_sc::imports!();
+mx_sc::derive_imports!();
 
 #[derive(TopEncode, TopDecode, TypeAbi)]
 pub struct CallbackData<M: ManagedTypeApi> {
@@ -10,7 +10,7 @@ pub struct CallbackData<M: ManagedTypeApi> {
     args: ManagedVec<M, ManagedBuffer<M>>,
 }
 
-#[elrond_wasm::module]
+#[mx_sc::module]
 pub trait CallPromisesModule {
     #[proxy]
     fn vault_proxy(&self) -> vault::Proxy<Self::Api>;

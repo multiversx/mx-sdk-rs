@@ -1,4 +1,4 @@
-elrond_wasm::imports!();
+mx_sc::imports!();
 
 /// Standard smart contract module for managing a single ESDT.
 ///
@@ -11,7 +11,7 @@ elrond_wasm::imports!();
 /// * setting local roles
 /// * minting/burning
 ///
-#[elrond_wasm::module]
+#[mx_sc::module]
 pub trait EsdtModule {
     /*
         EsdtTokenType is an enum (u8):

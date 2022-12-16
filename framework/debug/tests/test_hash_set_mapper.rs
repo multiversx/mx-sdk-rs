@@ -1,4 +1,4 @@
-use elrond_wasm::storage::{
+use mx_sc::storage::{
     mappers::{SetMapper, StorageClearable, StorageMapper},
     StorageKey,
 };

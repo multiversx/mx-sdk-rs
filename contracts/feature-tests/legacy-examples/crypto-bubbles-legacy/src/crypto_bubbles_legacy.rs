@@ -1,8 +1,8 @@
 #![no_std]
 
-elrond_wasm::imports!();
+mx_sc::imports!();
 
-#[elrond_wasm::contract]
+#[mx_sc::contract]
 pub trait CryptoBubbles {
     /// constructor function
     /// is called immediately after the contract is created

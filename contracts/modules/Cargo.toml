@@ -14,8 +14,8 @@ keywords = ["elrond", "wasm", "webassembly", "blockchain", "contract"]
 categories = ["no-std", "wasm", "cryptography::cryptocurrencies"]
 
 [features]
-alloc = ["elrond-wasm/alloc"]
+alloc = ["mx-sc/alloc"]
 
-[dependencies.elrond-wasm]
+[dependencies.mx-sc]
 version = "0.38.0"
 path = "../../framework/base"

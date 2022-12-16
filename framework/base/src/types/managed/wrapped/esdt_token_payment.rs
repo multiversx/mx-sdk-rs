@@ -3,7 +3,7 @@ use crate::{
     types::{BigUint, EsdtTokenPaymentMultiValue, EsdtTokenType, ManagedVecItem, TokenIdentifier},
 };
 
-use crate as elrond_wasm; // needed by the codec and TypeAbi generated code
+use crate as mx_sc; // needed by the codec and TypeAbi generated code
 use crate::derive::TypeAbi;
 use mx_sc_codec::{
     mx_sc_codec_derive::{NestedEncode, TopEncode},

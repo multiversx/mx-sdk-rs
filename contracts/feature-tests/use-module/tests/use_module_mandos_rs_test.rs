@@ -1,7 +1,7 @@
 mod user_builtin {
-    elrond_wasm::imports!();
+    mx_sc::imports!();
 
-    #[elrond_wasm::proxy]
+    #[mx_sc::proxy]
     pub trait UserBuiltin {
         #[endpoint(SetUserName)]
         fn set_user_name(&self, name: &BoxedBytes) -> BigUint;
@@ -9,9 +9,9 @@ mod user_builtin {
 }
 
 mod dns_mock {
-    elrond_wasm::imports!();
+    mx_sc::imports!();
 
-    #[elrond_wasm::contract]
+    #[mx_sc::contract]
     pub trait DnsMock {
         #[proxy]
         fn user_builtin_proxy(&self, to: ManagedAddress) -> super::user_builtin::Proxy<Self::Api>;
@@ -36,7 +36,7 @@ fn world() -> BlockchainMock {
     blockchain.register_contract("file:output/use-module.wasm", use_module::ContractBuilder);
 
     blockchain.register_contract(
-        "file:test-wasm/elrond-wasm-sc-dns.wasm",
+        "file:test-wasm/mx-sc-sc-dns.wasm",
         dns_mock::ContractBuilder,
     );
 

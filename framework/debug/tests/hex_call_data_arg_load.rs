@@ -1,6 +1,6 @@
 #![feature(exhaustive_patterns)]
 
-use elrond_wasm::{
+use mx_sc::{
     mx_sc_codec::{
         multi_types::{MultiValue2, MultiValueVec, OptionalValue},
         PanicErrorHandler, TopDecodeMulti, TopDecodeMultiInput,

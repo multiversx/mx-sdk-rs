@@ -7,13 +7,13 @@ use crate::{
 };
 use mx_sc_codec::*;
 
-use crate as elrond_wasm; // required by the ManagedVecItem derive
+use crate as mx_sc; // required by the ManagedVecItem derive
 
 /// Specialized type for handling either EGLD or ESDT token identifiers.
 ///
 /// Equivalent to a structure of the form
 /// ```
-/// # use elrond_wasm::{api::ManagedTypeApi, types::TokenIdentifier};
+/// # use mx_sc::{api::ManagedTypeApi, types::TokenIdentifier};
 /// enum EgldOrEsdtTokenIdentifier<M: ManagedTypeApi> {
 ///     Egld,
 ///     Esdt(TokenIdentifier<M>),

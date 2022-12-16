@@ -16,7 +16,7 @@ NUM_BIG_INT_TYPE = "num_bigint::bigint::BigInt"
 NUM_BIG_UINT_TYPE = "num_bigint::biguint::BigUint"
 
 # 2. Elrond wasm - Managed basic types
-MOD_PATH = "elrond_wasm::types::managed::basic"
+MOD_PATH = "mx_sc::types::managed::basic"
 
 BIG_INT_TYPE = f"{MOD_PATH}::big_int::BigInt<{DEBUG_API_TYPE}>"
 BIG_UINT_TYPE = f"{MOD_PATH}::big_uint::BigUint<{DEBUG_API_TYPE}>"
@@ -24,7 +24,7 @@ BIG_FLOAT_TYPE = f"{MOD_PATH}::big_float::BigFloat<{DEBUG_API_TYPE}>"
 MANAGED_BUFFER_TYPE = f"{MOD_PATH}::managed_buffer::ManagedBuffer<{DEBUG_API_TYPE}>"
 
 # 3. Elrond wasm - Managed wrapped types
-MOD_PATH = "elrond_wasm::types::managed::wrapped"
+MOD_PATH = "mx_sc::types::managed::wrapped"
 
 TOKEN_IDENTIFIER_TYPE = f"{MOD_PATH}::token_identifier::TokenIdentifier<{DEBUG_API_TYPE}>"
 MANAGED_ADDRESS_TYPE = f"{MOD_PATH}::managed_address::ManagedAddress<{DEBUG_API_TYPE}>"
@@ -45,7 +45,7 @@ MANAGED_VEC_TYPE = f"{MOD_PATH}::managed_vec::ManagedVec<{DEBUG_API_TYPE}, {ANY_
 # 4. Elrond wasm - Managed multi value types
 
 # 5. Elrond wasm - heap
-MOD_PATH = "elrond_wasm::types::heap"
+MOD_PATH = "mx_sc::types::heap"
 
 HEAP_ADDRESS_TYPE = f"{MOD_PATH}::h256_address::Address"
 BOXED_BYTES_TYPE = f"{MOD_PATH}::boxed_bytes::BoxedBytes"
@@ -514,9 +514,9 @@ def __lldb_init_module(debugger: SBDebugger, dict):
         summary_function_name = f"handle{handler_class.__name__}"
         globals()[summary_function_name] = partial(summarize_handler, handler_class)
 
-        summary_command = f'type summary add -x "^{rust_type}$" -F {python_module_name}.{summary_function_name} --category elrond-wasm'
+        summary_command = f'type summary add -x "^{rust_type}$" -F {python_module_name}.{summary_function_name} --category mx-sc'
         debugger.HandleCommand(summary_command)
         # print(f"Registered: {summary_command}")
 
     # Enable categories
-    debugger.HandleCommand('type category enable elrond-wasm')
+    debugger.HandleCommand('type category enable mx-sc')

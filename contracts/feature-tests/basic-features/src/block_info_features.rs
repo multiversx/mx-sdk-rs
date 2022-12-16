@@ -1,7 +1,7 @@
-elrond_wasm::imports!();
+mx_sc::imports!();
 
 /// Block info getters.
-#[elrond_wasm::module]
+#[mx_sc::module]
 pub trait BlockInfoFeatures {
     #[view]
     fn get_block_timestamp(&self) -> u64 {

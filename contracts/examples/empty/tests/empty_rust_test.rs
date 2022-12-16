@@ -1,4 +1,4 @@
-use elrond_wasm::types::Address;
+use mx_sc::types::Address;
 use mx_sc_debug::{rust_biguint, testing_framework::*, DebugApi};
 use empty::*;
 

@@ -1,4 +1,4 @@
-use elrond_wasm::{
+use mx_sc::{
     mx_sc_codec::{self, DefaultErrorHandler, TopEncode},
     types::{BigUint, EsdtTokenPayment, TokenIdentifier},
 };
@@ -96,7 +96,7 @@ fn esdt_token_payment_backwards_compatibility_decode() {
 #[test]
 fn esdt_token_payment_backwards_compatibility_decode_real_data() {
     let _ = DebugApi::dummy();
-    let bytes = elrond_wasm::hex_literal::hex!(
+    let bytes = mx_sc::hex_literal::hex!(
         "020000000f41534845474c44462d3236356334350000000000000001000000065af3107a4000"
     );
     let decoded = esdt_token_payment_backwards_compatible_top_decode_or_handle_err(

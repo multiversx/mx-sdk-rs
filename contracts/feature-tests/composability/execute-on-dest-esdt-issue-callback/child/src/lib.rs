@@ -1,10 +1,10 @@
 #![no_std]
 
-elrond_wasm::imports!();
+mx_sc::imports!();
 
 const EGLD_DECIMALS: usize = 18;
 
-#[elrond_wasm::contract]
+#[mx_sc::contract]
 pub trait Child {
     #[init]
     fn init(&self) {}

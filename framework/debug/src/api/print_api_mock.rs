@@ -1,5 +1,5 @@
 use crate::DebugApi;
-use elrond_wasm::{
+use mx_sc::{
     api::{PrintApi, PrintApiImpl},
     types::ManagedBufferCachedBuilder,
 };

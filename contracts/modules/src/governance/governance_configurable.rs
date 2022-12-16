@@ -1,4 +1,4 @@
-elrond_wasm::imports!();
+mx_sc::imports!();
 
 /// # Elrond smart contract module - Governance
 ///
@@ -27,7 +27,7 @@ elrond_wasm::imports!();
 /// Please note that although the main contract can modify the module's storage directly, it is not recommended to do so,
 /// as that defeats the whole purpose of having governance. These parameters should only be modified through actions.
 ///
-#[elrond_wasm::module]
+#[mx_sc::module]
 pub trait GovernanceConfigurablePropertiesModule {
     // endpoints - owner-only
 

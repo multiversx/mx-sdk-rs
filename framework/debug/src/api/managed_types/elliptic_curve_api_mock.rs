@@ -1,4 +1,4 @@
-use elrond_wasm::{api::EllipticCurveApi, types::heap::BoxedBytes};
+use mx_sc::{api::EllipticCurveApi, types::heap::BoxedBytes};
 
 use crate::DebugApi;
 

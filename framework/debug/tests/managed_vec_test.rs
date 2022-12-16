@@ -1,6 +1,6 @@
 use std::ops::Deref;
 
-use elrond_wasm::types::{BigUint, ManagedVec};
+use mx_sc::types::{BigUint, ManagedVec};
 use mx_sc_debug::DebugApi;
 
 #[test]

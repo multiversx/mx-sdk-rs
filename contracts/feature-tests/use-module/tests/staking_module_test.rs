@@ -1,4 +1,4 @@
-use elrond_wasm::types::{EgldOrEsdtTokenIdentifier, ManagedVec};
+use mx_sc::types::{EgldOrEsdtTokenIdentifier, ManagedVec};
 use mx_sc_debug::{
     managed_address, managed_biguint, managed_token_id, rust_biguint,
     testing_framework::BlockchainStateWrapper,

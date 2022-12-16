@@ -1,8 +1,8 @@
-use elrond_wasm::{
+use mx_sc::{
     api::ManagedTypeApi,
     types::{BigUint, ManagedAddress, Vec},
 };
-elrond_wasm::derive_imports!();
+mx_sc::derive_imports!();
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi)]
 pub struct LotteryInfo<M: ManagedTypeApi> {

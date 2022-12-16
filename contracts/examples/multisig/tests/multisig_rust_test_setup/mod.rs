@@ -1,4 +1,4 @@
-use elrond_wasm::{
+use mx_sc::{
     api::ManagedTypeApi,
     mx_sc_codec::multi_types::OptionalValue,
     types::{Address, BigUint, BoxedBytes, CodeMetadata, ManagedBuffer, ManagedVec},

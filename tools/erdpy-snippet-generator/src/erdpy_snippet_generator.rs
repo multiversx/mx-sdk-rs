@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use elrond_wasm::mx_sc_codec::{top_encode_to_vec_u8_or_panic, TopEncode};
+use mx_sc::mx_sc_codec::{top_encode_to_vec_u8_or_panic, TopEncode};
 use num_traits::Zero;
 
 mod cmd_builder;

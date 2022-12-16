@@ -1,6 +1,6 @@
 use super::*;
 use alloc::vec::Vec;
-use elrond_wasm::abi::*;
+use mx_sc::abi::*;
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 

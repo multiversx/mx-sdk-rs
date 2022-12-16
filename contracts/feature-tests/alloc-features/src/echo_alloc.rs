@@ -1,12 +1,12 @@
-elrond_wasm::imports!();
+mx_sc::imports!();
 
 use crate::types::*;
 
 // String is not part of the standard imports because we want to discourage its use
-use elrond_wasm::types::String;
+use mx_sc::types::String;
 
 /// Test serialization for heap-allocated types.
-#[elrond_wasm::module]
+#[mx_sc::module]
 pub trait EchoAllocTypes {
     #[endpoint]
     fn echo_h256(&self, h: H256) -> H256 {

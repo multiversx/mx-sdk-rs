@@ -1,4 +1,4 @@
-elrond_wasm::imports!();
+mx_sc::imports!();
 
 /// Standard smart contract module that, when added to a smart contract, offers pausability.
 ///
@@ -9,7 +9,7 @@ elrond_wasm::imports!();
 /// * an endpoint where the owner can pause/unpause contract
 /// * a method to check if contract is paused or not
 ///
-#[elrond_wasm::module]
+#[mx_sc::module]
 pub trait PauseModule {
     #[inline]
     fn is_paused(&self) -> bool {

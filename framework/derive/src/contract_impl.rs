@@ -34,7 +34,7 @@ pub fn contract_implementation(
 
         #(#module_original_attributes)*
         pub trait #trait_name_ident:
-        elrond_wasm::contract_base::ContractBase
+        mx_sc::contract_base::ContractBase
         + Sized
         #(#supertraits_main)*
         where
@@ -48,7 +48,7 @@ pub fn contract_implementation(
     };
 
     let auto_impl_trait = quote! {
-        pub trait AutoImpl: elrond_wasm::contract_base::ContractBase {}
+        pub trait AutoImpl: mx_sc::contract_base::ContractBase {}
 
         impl<C> #trait_name_ident for C
         where
@@ -59,8 +59,8 @@ pub fn contract_implementation(
             #callbacks_impl
         }
 
-        impl<A> AutoImpl for elrond_wasm::contract_base::UniversalContractObj<A> where
-            A: elrond_wasm::api::VMApi
+        impl<A> AutoImpl for mx_sc::contract_base::UniversalContractObj<A> where
+            A: mx_sc::api::VMApi
         {
         }
     };
@@ -69,7 +69,7 @@ pub fn contract_implementation(
         supertrait_gen::endpoint_wrapper_supertrait_decl(contract.supertraits.as_slice());
     let endpoint_wrappers = quote! {
         pub trait EndpointWrappers:
-            elrond_wasm::contract_base::ContractBase
+            mx_sc::contract_base::ContractBase
             + #trait_name_ident
             #(#endpoint_wrapper_supertrait_decl)*
         {
@@ -79,7 +79,7 @@ pub fn contract_implementation(
                 #function_selector_body
             }
 
-            fn callback_selector(&self, mut ___cb_closure___: elrond_wasm::types::CallbackClosureForDeser<Self::Api>) -> elrond_wasm::types::CallbackSelectorResult<Self::Api> {
+            fn callback_selector(&self, mut ___cb_closure___: mx_sc::types::CallbackClosureForDeser<Self::Api>) -> mx_sc::types::CallbackSelectorResult<Self::Api> {
                 #callback_selector_body
             }
 
@@ -88,8 +88,8 @@ pub fn contract_implementation(
             }
         }
 
-        impl<A> EndpointWrappers for elrond_wasm::contract_base::UniversalContractObj<A> where
-            A: elrond_wasm::api::VMApi
+        impl<A> EndpointWrappers for mx_sc::contract_base::UniversalContractObj<A> where
+            A: mx_sc::api::VMApi
         {
         }
     };

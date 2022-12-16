@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use mx_sc_snippets::elrond_wasm::mx_sc_codec::test_util::top_encode_to_vec_u8_or_panic;
+use mx_sc_snippets::mx_sc::mx_sc_codec::test_util::top_encode_to_vec_u8_or_panic;
 
 use super::*;
 

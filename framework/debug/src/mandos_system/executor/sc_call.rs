@@ -1,5 +1,5 @@
 use crate::mandos_system::model::{ScCallStep, Step, TxESDT, TypedScCall, TypedScCallExecutor};
-use elrond_wasm::mx_sc_codec::{CodecFrom, PanicErrorHandler, TopEncodeMulti};
+use mx_sc::mx_sc_codec::{CodecFrom, PanicErrorHandler, TopEncodeMulti};
 
 use crate::{
     tx_execution::sc_call_with_async_and_callback,

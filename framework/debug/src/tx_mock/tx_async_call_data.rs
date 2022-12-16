@@ -2,7 +2,7 @@ use crate::{
     tx_execution::BuiltinFunctionMap,
     tx_mock::{TxInput, TxResult},
 };
-use elrond_wasm::{
+use mx_sc::{
     mx_sc_codec::*,
     types::heap::{Address, H256},
 };

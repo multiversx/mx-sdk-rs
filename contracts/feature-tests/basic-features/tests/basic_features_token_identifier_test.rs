@@ -1,4 +1,4 @@
-use elrond_wasm::types::{EgldOrEsdtTokenIdentifier, ManagedBuffer, TokenIdentifier};
+use mx_sc::types::{EgldOrEsdtTokenIdentifier, ManagedBuffer, TokenIdentifier};
 use mx_sc_debug::*;
 
 use basic_features::token_identifier_features::TokenIdentifierFeatures;

@@ -1,7 +1,7 @@
 use mx_sc_codec::mx_sc_codec_derive::{NestedDecode, NestedEncode, TopDecode, TopEncode};
 
 use super::EsdtLocalRoleFlags;
-use crate as elrond_wasm;
+use crate as mx_sc;
 use crate::{derive::TypeAbi, types::ManagedVecItem};
 
 static ESDT_ROLE_NONE: &[u8] = &[];

@@ -1,5 +1,5 @@
 use elrond_sc_price_aggregator::{staking::StakingModule, PriceAggregator};
-use elrond_wasm::types::{Address, EgldOrEsdtTokenIdentifier, MultiValueEncoded};
+use mx_sc::types::{Address, EgldOrEsdtTokenIdentifier, MultiValueEncoded};
 use mx_sc_debug::{
     managed_address, managed_biguint, managed_buffer, rust_biguint,
     testing_framework::{BlockchainStateWrapper, ContractObjWrapper},

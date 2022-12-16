@@ -1,4 +1,4 @@
-use elrond_wasm::contract_base::CallableContract;
+use mx_sc::contract_base::CallableContract;
 use mx_sc_debug::*;
 
 #[test]

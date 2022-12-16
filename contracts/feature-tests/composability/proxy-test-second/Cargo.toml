@@ -9,9 +9,9 @@ publish = false
 path = "src/proxy-test-second.rs"
 
 [features]
-ei-unmanaged = ["elrond-wasm/ei-unmanaged"]
+ei-unmanaged = ["mx-sc/ei-unmanaged"]
 
-[dependencies.elrond-wasm]
+[dependencies.mx-sc]
 version = "0.38.0"
 path = "../../../../framework/base"
 features = ["alloc"]

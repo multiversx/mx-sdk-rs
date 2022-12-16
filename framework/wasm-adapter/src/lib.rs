@@ -9,7 +9,7 @@ extern crate alloc;
 pub use alloc::{boxed::Box, string::String, vec::Vec};
 pub use api::VmApiImpl;
 
-pub use elrond_wasm;
+pub use mx_sc;
 
 /// Provides an API instance.
 pub fn vm_api() -> VmApiImpl {

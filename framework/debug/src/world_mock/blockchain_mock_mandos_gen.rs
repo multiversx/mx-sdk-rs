@@ -2,7 +2,7 @@ use crate::{
     mandos_system::model::{AddressKey, AddressValue, Step},
     BlockchainMock,
 };
-use elrond_wasm::types::Address;
+use mx_sc::types::Address;
 use mandos::{interpret_trait::IntoRaw, serde_raw::ValueSubTree};
 use std::{collections::HashMap, path::Path};
 

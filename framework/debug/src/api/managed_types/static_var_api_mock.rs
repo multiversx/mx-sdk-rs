@@ -1,5 +1,5 @@
 use crate::DebugApi;
-use elrond_wasm::{
+use mx_sc::{
     api::{use_raw_handle, HandleConstraints, StaticVarApi, StaticVarApiImpl},
     types::LockableStaticBuffer,
 };

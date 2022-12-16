@@ -1,7 +1,7 @@
 #![no_std]
 
-elrond_wasm::imports!();
-elrond_wasm::derive_imports!();
+mx_sc::imports!();
+mx_sc::derive_imports!();
 
 mod common;
 mod events;
@@ -11,7 +11,7 @@ mod validation;
 
 use common::OrderInputParams;
 
-#[elrond_wasm::contract]
+#[mx_sc::contract]
 pub trait Pair:
     global::GlobalOperationModule
     + orders::OrdersModule

@@ -1,12 +1,12 @@
 #![no_std]
 
-elrond_wasm::imports!();
+mx_sc::imports!();
 
 use mx_sc_modules::default_issue_callbacks;
 mod fractional_uri_info;
 use fractional_uri_info::FractionalUriInfo;
 
-#[elrond_wasm::contract]
+#[mx_sc::contract]
 pub trait FractionalNfts: default_issue_callbacks::DefaultIssueCallbacksModule {
     #[init]
     fn init(&self) {}
@@ -144,9 +144,9 @@ pub trait FractionalNfts: default_issue_callbacks::DefaultIssueCallbacksModule {
 }
 
 mod nft_marketplace_proxy {
-    elrond_wasm::imports!();
+    mx_sc::imports!();
 
-    #[elrond_wasm::proxy]
+    #[mx_sc::proxy]
     pub trait NftMarketplace {
         #[endpoint(claimTokens)]
         fn claim_tokens(

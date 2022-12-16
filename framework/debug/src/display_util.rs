@@ -1,6 +1,6 @@
 use crate::{num_bigint, num_bigint::BigInt};
 use alloc::string::String;
-use elrond_wasm::{
+use mx_sc::{
     api::ManagedTypeApi,
     types::{
         heap::{Address, BoxedBytes},

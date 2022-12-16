@@ -1,9 +1,9 @@
-elrond_wasm::imports!();
-elrond_wasm::derive_imports!();
+mx_sc::imports!();
+mx_sc::derive_imports!();
 
 use super::structs::TokenOwnershipData;
 
-#[elrond_wasm::module]
+#[mx_sc::module]
 pub trait StorageModule {
     #[storage_mapper("token_details")]
     fn token_details(

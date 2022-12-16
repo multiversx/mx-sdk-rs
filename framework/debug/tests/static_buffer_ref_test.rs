@@ -1,4 +1,4 @@
-use elrond_wasm::types::{LockableStaticBuffer, StaticBufferRef};
+use mx_sc::types::{LockableStaticBuffer, StaticBufferRef};
 use mx_sc_debug::DebugApi;
 
 #[test]

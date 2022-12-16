@@ -1,4 +1,4 @@
-use elrond_wasm::types::{
+use mx_sc::types::{
     BoxedBytes, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment, EsdtTokenPayment,
     TokenIdentifier,
 };

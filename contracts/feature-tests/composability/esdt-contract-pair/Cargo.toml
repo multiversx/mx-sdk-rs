@@ -15,7 +15,7 @@ path = "first-contract"
 [dependencies.second-contract]
 path = "second-contract"
 
-[dependencies.elrond-wasm]
+[dependencies.mx-sc]
 version = "0.38.0"
 path = "../../../../framework/base"
 

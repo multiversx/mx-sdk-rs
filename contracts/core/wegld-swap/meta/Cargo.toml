@@ -10,7 +10,7 @@ publish = false
 [dependencies.elrond-sc-wegld-swap]
 path = ".."
 
-[dependencies.elrond-wasm]
+[dependencies.mx-sc]
 version = "0.38.0"
 path = "../../../../framework/base"
 

@@ -4,7 +4,7 @@ use crate::{
     DebugApi,
 };
 use alloc::vec::Vec;
-use elrond_wasm::api::{EndpointArgumentApi, EndpointArgumentApiImpl, ManagedBufferApi};
+use mx_sc::api::{EndpointArgumentApi, EndpointArgumentApiImpl, ManagedBufferApi};
 use num_traits::cast::ToPrimitive;
 
 impl EndpointArgumentApi for DebugApi {

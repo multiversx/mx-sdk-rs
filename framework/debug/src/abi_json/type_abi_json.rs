@@ -1,5 +1,5 @@
 use alloc::vec::Vec;
-use elrond_wasm::abi::*;
+use mx_sc::abi::*;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]

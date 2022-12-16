@@ -1,5 +1,5 @@
 use adder::*;
-use elrond_wasm::storage::mappers::SingleValue;
+use mx_sc::storage::mappers::SingleValue;
 use mx_sc_debug::{mandos_system::model::*, num_bigint::BigUint, *}; // TODO: clean up imports
 
 fn world() -> BlockchainMock {

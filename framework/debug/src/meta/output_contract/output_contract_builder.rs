@@ -1,4 +1,4 @@
-use elrond_wasm::abi::{ContractAbi, EndpointAbi};
+use mx_sc::abi::{ContractAbi, EndpointAbi};
 use std::{
     collections::{BTreeSet, HashMap, HashSet},
     fs,
@@ -37,7 +37,7 @@ impl OutputContractBuilder {
         let mut constructors = Vec::new();
         if external_view {
             constructors
-                .push(elrond_wasm::external_view_contract::external_view_contract_constructor_abi())
+                .push(mx_sc::external_view_contract::external_view_contract_constructor_abi())
         }
         (
             contract_id.clone(),

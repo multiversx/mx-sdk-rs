@@ -19,7 +19,7 @@ edition = "2021"
 [lib]
 path = "src/wegld.rs"
 
-[dependencies.elrond-wasm]
+[dependencies.mx-sc]
 version = "0.38.0"
 path = "../../../framework/base"
 

@@ -1,4 +1,4 @@
-use mx_sc_debug::{elrond_wasm::types::Address, mandos::value_interpreter::keccak256};
+use mx_sc_debug::{mx_sc::types::Address, mandos::value_interpreter::keccak256};
 
 #[cfg(test)]
 use mx_sc_debug::bech32;

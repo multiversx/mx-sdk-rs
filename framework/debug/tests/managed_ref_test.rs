@@ -1,5 +1,5 @@
 use core::fmt::Debug;
-use elrond_wasm::{
+use mx_sc::{
     api::ManagedTypeApi,
     types::{
         BigInt, BigUint, ManagedAddress, ManagedBuffer, ManagedByteArray, ManagedRef, ManagedType,

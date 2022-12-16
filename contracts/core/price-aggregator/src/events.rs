@@ -1,5 +1,5 @@
-elrond_wasm::imports!();
-elrond_wasm::derive_imports!();
+mx_sc::imports!();
+mx_sc::derive_imports!();
 
 use crate::price_aggregator_data::{TimestampedPrice, TokenPair};
 
@@ -12,7 +12,7 @@ pub struct NewRoundEvent<M: ManagedTypeApi> {
     epoch: u64,
 }
 
-#[elrond_wasm::module]
+#[mx_sc::module]
 pub trait EventsModule {
     fn emit_new_round_event(
         &self,

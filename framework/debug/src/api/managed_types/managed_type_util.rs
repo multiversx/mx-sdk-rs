@@ -1,6 +1,6 @@
 use std::cmp::Ordering;
 
-use elrond_wasm::{
+use mx_sc::{
     api::{HandleTypeInfo, ManagedBufferApi},
     types::{heap::Address, ManagedBuffer, ManagedType},
 };
@@ -63,10 +63,10 @@ impl DebugApi {
     pub fn insert_new_big_uint_old(
         &self,
         value: num_bigint::BigUint,
-    ) -> elrond_wasm::types::BigUint<Self> {
+    ) -> mx_sc::types::BigUint<Self> {
         let mut managed_types = self.m_types_borrow_mut();
         let handle = managed_types.big_int_map.insert_new_handle(value.into());
-        elrond_wasm::types::BigUint::from_handle(handle)
+        mx_sc::types::BigUint::from_handle(handle)
     }
 
     pub fn insert_new_big_uint_zero(&self) -> <Self as HandleTypeInfo>::BigIntHandle {

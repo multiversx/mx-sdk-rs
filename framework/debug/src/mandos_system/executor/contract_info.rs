@@ -1,6 +1,6 @@
 use std::ops::{Deref, DerefMut};
 
-use elrond_wasm::{
+use mx_sc::{
     api::ManagedTypeApi,
     contract_base::ProxyObjBase,
     mx_sc_codec::{CodecFrom, EncodeErrorHandler, TopEncode, TopEncodeOutput},

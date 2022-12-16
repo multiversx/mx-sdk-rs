@@ -11,7 +11,7 @@ path = "src/lib.rs"
 [dev-dependencies.vault]
 path = "../vault"
 
-[dependencies.elrond-wasm]
+[dependencies.mx-sc]
 version = "0.38.0"
 path = "../../../../framework/base"
 

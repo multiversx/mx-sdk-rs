@@ -1,5 +1,5 @@
 use super::{value_from_slice, AddressValue};
-use elrond_wasm::types::Address;
+use mx_sc::types::Address;
 use mandos::{
     interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
     value_interpreter::interpret_string,

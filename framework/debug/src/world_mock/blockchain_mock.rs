@@ -4,7 +4,7 @@ use crate::{
     tx_execution::{init_builtin_functions, BuiltinFunctionMap},
     tx_mock::BlockchainUpdate,
 };
-use elrond_wasm::types::heap::Address;
+use mx_sc::types::heap::Address;
 use mandos::{interpret_trait::InterpreterContext, value_interpreter::interpret_string};
 use num_traits::Zero;
 use std::{collections::HashMap, path::PathBuf, rc::Rc};

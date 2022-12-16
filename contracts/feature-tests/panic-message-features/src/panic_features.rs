@@ -1,11 +1,11 @@
 #![no_std]
 
-elrond_wasm::imports!();
+mx_sc::imports!();
 
 /// Explores panic messaging.
 /// Sending panic messages to the VM is possible, as shown in this contract,
 /// but it greatly inflates the bytecode size.
-#[elrond_wasm::contract]
+#[mx_sc::contract]
 pub trait PanicMessageFeatures {
     #[init]
     fn init(&self) {}

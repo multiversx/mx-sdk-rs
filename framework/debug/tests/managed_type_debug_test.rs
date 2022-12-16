@@ -1,4 +1,4 @@
-use elrond_wasm::{
+use mx_sc::{
     hex_literal::hex,
     types::{
         BigInt, BigUint, EgldOrEsdtTokenIdentifier, ManagedAddress, ManagedBuffer,
@@ -31,7 +31,7 @@ fn test_big_int_format_2() {
 #[test]
 fn test_managed_buffer() {
     let _ = DebugApi::dummy();
-    let _ = elrond_wasm::hex_literal::hex!("abcd");
+    let _ = mx_sc::hex_literal::hex!("abcd");
     let s = format!("{:?}", ManagedBuffer::<DebugApi>::from(&[0x12, 0x34]));
     assert_eq!("ManagedBuffer { handle: -100, hex-value: \"1234\" }", s);
 }

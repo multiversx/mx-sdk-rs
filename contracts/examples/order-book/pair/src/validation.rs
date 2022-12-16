@@ -1,5 +1,5 @@
-elrond_wasm::imports!();
-elrond_wasm::derive_imports!();
+mx_sc::imports!();
+mx_sc::derive_imports!();
 
 use crate::common::{FeeConfig, FeeConfigEnum};
 
@@ -11,7 +11,7 @@ use super::{
     },
 };
 
-#[elrond_wasm::module]
+#[mx_sc::module]
 pub trait ValidationModule: common::CommonModule {
     fn require_valid_order_input_amount(&self, params: &OrderInputParams<Self::Api>) {
         require!(params.amount != BigUint::zero(), "Amout cannot be zero");

@@ -1,9 +1,9 @@
-elrond_wasm::imports!();
+mx_sc::imports!();
 
 use crate::types::*;
 
 /// Storage tests: direct store from the heap to storage.
-#[elrond_wasm::module]
+#[mx_sc::module]
 pub trait StorageStoreFeatures {
     #[endpoint]
     #[storage_set("vec_u8")]

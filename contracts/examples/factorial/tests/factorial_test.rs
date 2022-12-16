@@ -1,4 +1,4 @@
-use elrond_wasm::types::BigUint;
+use mx_sc::types::BigUint;
 use mx_sc_debug::DebugApi;
 use factorial::*;
 

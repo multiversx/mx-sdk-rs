@@ -6,7 +6,7 @@ const ESDT_TYPE_SEMI_FUNGIBLE: &[u8] = b"SemiFungibleESDT";
 const ESDT_TYPE_META: &[u8] = b"MetaESDT";
 const ESDT_TYPE_INVALID: &[u8] = &[];
 
-use crate as elrond_wasm; // needed by the TypeAbi generated code
+use crate as mx_sc; // needed by the TypeAbi generated code
 use crate::derive::TypeAbi;
 
 // Note: In the current implementation, SemiFungible is never returned

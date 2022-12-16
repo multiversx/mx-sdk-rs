@@ -7,7 +7,7 @@ use crate::{
     },
     DebugApi,
 };
-use elrond_wasm::{
+use mx_sc::{
     api::{
         BlockchainApiImpl, HandleConstraints, ManagedTypeApi, SendApi, SendApiImpl,
         ESDT_MULTI_TRANSFER_FUNC_NAME, ESDT_NFT_TRANSFER_FUNC_NAME, ESDT_TRANSFER_FUNC_NAME,

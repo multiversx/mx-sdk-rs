@@ -1,4 +1,4 @@
-use elrond_wasm::abi::{ContractAbi, EndpointAbi};
+use mx_sc::abi::{ContractAbi, EndpointAbi};
 use mx_sc_debug::{
     meta::output_contract::{MultiContractConfigSerde, OutputContractConfig},
     DebugApi,

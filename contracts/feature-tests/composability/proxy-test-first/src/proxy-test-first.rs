@@ -1,6 +1,6 @@
 #![no_std]
 
-elrond_wasm::imports!();
+mx_sc::imports!();
 
 use hex_literal::hex;
 
@@ -8,9 +8,9 @@ static HARDCODED_ADDRESS: [u8; 32] =
     hex!("fefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefe");
 
 mod pay_me_proxy {
-    elrond_wasm::imports!();
+    mx_sc::imports!();
 
-    #[elrond_wasm::proxy]
+    #[mx_sc::proxy]
     pub trait PayMe {
         #[payable("EGLD")]
         #[endpoint(payMe)]
@@ -23,9 +23,9 @@ mod pay_me_proxy {
 }
 
 mod message_me_proxy {
-    elrond_wasm::imports!();
+    mx_sc::imports!();
 
-    #[elrond_wasm::proxy]
+    #[mx_sc::proxy]
     pub trait MessageMe {
         #[init]
         #[payable("EGLD")]
@@ -36,7 +36,7 @@ mod message_me_proxy {
     }
 }
 
-#[elrond_wasm::contract]
+#[mx_sc::contract]
 pub trait ProxyTestFirst {
     #[proxy]
     fn pay_me_proxy(&self) -> pay_me_proxy::Proxy<Self::Api>;

@@ -1,5 +1,5 @@
-use elrond_wasm::types::Box;
-elrond_wasm::derive_imports!();
+use mx_sc::types::Box;
+mx_sc::derive_imports!();
 
 const ARRAY_SIZE: usize = 512;
 

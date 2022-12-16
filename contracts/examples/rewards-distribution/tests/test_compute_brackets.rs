@@ -5,7 +5,7 @@ use rewards_distribution::{RewardsDistribution, DIVISION_SAFETY_CONSTANT};
 
 mod utils;
 
-elrond_wasm::imports!();
+mx_sc::imports!();
 
 #[test]
 fn test_compute_brackets() {

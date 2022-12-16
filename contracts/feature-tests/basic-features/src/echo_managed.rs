@@ -1,7 +1,7 @@
-elrond_wasm::imports!();
+mx_sc::imports!();
 
 /// Test endpoint argument and result serialization.
-#[elrond_wasm::module]
+#[mx_sc::module]
 pub trait EchoManagedTypes {
     #[endpoint]
     fn echo_big_uint(&self, bi: BigUint) -> BigUint {

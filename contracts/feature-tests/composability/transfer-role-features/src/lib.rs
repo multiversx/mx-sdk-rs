@@ -1,9 +1,9 @@
 #![no_std]
 #![allow(clippy::type_complexity)]
 
-elrond_wasm::imports!();
+mx_sc::imports!();
 
-#[elrond_wasm::contract]
+#[mx_sc::contract]
 pub trait TransferRoleFeatures:
     mx_sc_modules::transfer_role_proxy::TransferRoleProxyModule
 {

@@ -1,8 +1,8 @@
-elrond_wasm::imports!();
+mx_sc::imports!();
 
 /// Crypto functions that use the allocator.
 /// Move to basic-features when they get upgraded.
-#[elrond_wasm::module]
+#[mx_sc::module]
 pub trait CryptoFeaturesAlloc {
     #[endpoint]
     fn compute_sha256_legacy_alloc(&self, input: Vec<u8>) -> H256 {

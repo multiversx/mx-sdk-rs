@@ -1,7 +1,7 @@
 use std::convert::TryInto;
 
 use crate::num_bigint::{BigInt, Sign};
-use elrond_wasm::api::{BigIntApi, ManagedBufferApi, ManagedTypeApi, ManagedTypeApiImpl};
+use mx_sc::api::{BigIntApi, ManagedBufferApi, ManagedTypeApi, ManagedTypeApiImpl};
 
 use crate::DebugApi;
 

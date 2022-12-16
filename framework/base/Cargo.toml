@@ -1,5 +1,5 @@
 [package]
-name = "elrond-wasm"
+name = "mx-sc"
 version = "0.38.0"
 edition = "2021"
 

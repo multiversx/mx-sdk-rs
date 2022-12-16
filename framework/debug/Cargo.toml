@@ -37,7 +37,7 @@ bech32 = "0.9.0"
 [features]
 mandos-go-tests = []
 
-[dependencies.elrond-wasm]
+[dependencies.mx-sc]
 version = "=0.38.0"
 path = "../base"
 features = ["alloc", "num-bigint", "promises", "big-float"]

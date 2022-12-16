@@ -1,6 +1,6 @@
-elrond_wasm::imports!();
+mx_sc::imports!();
 
-#[elrond_wasm::module]
+#[mx_sc::module]
 pub trait ForwarderStorageModule {
     #[view(lastIssuedToken)]
     #[storage_mapper("lastIssuedToken")]

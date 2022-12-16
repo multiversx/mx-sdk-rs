@@ -1,4 +1,4 @@
-use elrond_wasm::{
+use mx_sc::{
     api::ESDT_MULTI_TRANSFER_FUNC_NAME, mx_sc_codec::TopDecode, types::heap::Address,
 };
 

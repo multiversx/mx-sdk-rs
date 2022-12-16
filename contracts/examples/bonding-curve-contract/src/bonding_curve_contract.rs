@@ -1,7 +1,7 @@
 #![no_std]
 
-elrond_wasm::imports!();
-elrond_wasm::derive_imports!();
+mx_sc::imports!();
+mx_sc::derive_imports!();
 
 use function_selector::FunctionSelector;
 use mx_sc_modules::{
@@ -10,7 +10,7 @@ use mx_sc_modules::{
 };
 pub mod function_selector;
 
-#[elrond_wasm::contract]
+#[mx_sc::contract]
 pub trait Contract:
     bonding_curve::BondingCurveModule
     + storage::StorageModule

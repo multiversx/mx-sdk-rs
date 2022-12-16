@@ -1,11 +1,11 @@
 #![no_std]
 
-elrond_wasm::imports!();
+mx_sc::imports!();
 
 use kitty::{kitty_genes::*, Kitty};
 use random::Random;
 
-#[elrond_wasm::contract]
+#[mx_sc::contract]
 pub trait KittyGeneticAlg {
     #[init]
     fn init(&self) {}

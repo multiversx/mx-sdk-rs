@@ -4,7 +4,7 @@ use crate::{
     num_bigint,
     world_mock::{AccountData, BlockInfo, EsdtData},
 };
-use elrond_wasm::types::heap::Address;
+use mx_sc::types::heap::Address;
 use mandos::serde_raw::{
     AccountRaw, BlockInfoRaw, CheckAccountRaw, CheckAccountsRaw, CheckBytesValueRaw,
     CheckEsdtDataRaw, CheckEsdtInstanceRaw, CheckEsdtInstancesRaw, CheckEsdtMapContentsRaw,

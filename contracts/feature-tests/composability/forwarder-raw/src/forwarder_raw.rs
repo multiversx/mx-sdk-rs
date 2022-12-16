@@ -1,11 +1,11 @@
 #![no_std]
 #![allow(clippy::type_complexity)]
 
-elrond_wasm::imports!();
+mx_sc::imports!();
 
 /// Test contract for investigating async calls.
 /// TODO: split into modules
-#[elrond_wasm::contract]
+#[mx_sc::contract]
 pub trait ForwarderRaw {
     #[init]
     fn init(&self) {}

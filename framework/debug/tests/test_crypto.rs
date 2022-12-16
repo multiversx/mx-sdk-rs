@@ -1,4 +1,4 @@
-use elrond_wasm::api::CryptoApiImpl;
+use mx_sc::api::CryptoApiImpl;
 use mx_sc_debug::DebugApi;
 use hex::FromHex;
 

@@ -1,6 +1,6 @@
-elrond_wasm::derive_imports!();
+mx_sc::derive_imports!();
 
-use elrond_wasm::{
+use mx_sc::{
     api::ManagedTypeApi,
     types::{BigUint, ManagedAddress},
 };

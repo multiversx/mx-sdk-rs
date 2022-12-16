@@ -1,4 +1,4 @@
-use elrond_wasm::{
+use mx_sc::{
     api::CHANGE_OWNER_BUILTIN_FUNC_NAME, mx_sc_codec::TopDecode, types::heap::Address,
 };
 

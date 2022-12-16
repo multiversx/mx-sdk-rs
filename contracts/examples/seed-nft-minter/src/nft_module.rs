@@ -1,7 +1,7 @@
 use crate::distribution_module;
 
-elrond_wasm::imports!();
-elrond_wasm::derive_imports!();
+mx_sc::imports!();
+mx_sc::derive_imports!();
 
 use mx_sc_modules::default_issue_callbacks;
 
@@ -15,7 +15,7 @@ pub struct PriceTag<M: ManagedTypeApi> {
     pub amount: BigUint<M>,
 }
 
-#[elrond_wasm::module]
+#[mx_sc::module]
 pub trait NftModule:
     distribution_module::DistributionModule + default_issue_callbacks::DefaultIssueCallbacksModule
 {

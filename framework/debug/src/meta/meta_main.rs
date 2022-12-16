@@ -1,4 +1,4 @@
-use elrond_wasm::contract_base::ContractAbiProvider;
+use mx_sc::contract_base::ContractAbiProvider;
 use std::env;
 
 use super::{

@@ -1,14 +1,14 @@
 #![no_std]
 #![allow(clippy::suspicious_operation_groupings)]
 
-elrond_wasm::imports!();
+mx_sc::imports!();
 
 use core::cmp::max;
 
 use kitty::{kitty_genes::*, Kitty};
 use random::*;
 
-#[elrond_wasm::contract]
+#[mx_sc::contract]
 pub trait KittyOwnership {
     #[init]
     fn init(

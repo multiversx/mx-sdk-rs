@@ -14,7 +14,7 @@ mod only_owner_derived_mod;
 mod only_owner_mod;
 pub mod token_merge_mod_impl;
 
-elrond_wasm::imports!();
+mx_sc::imports!();
 
 /// Contract that tests that using modules works correctly.
 /// Also provides testing for the most common modules:
@@ -23,7 +23,7 @@ elrond_wasm::imports!();
 /// - EsdtModule
 /// - GovernanceModule
 /// - PauseModule
-#[elrond_wasm::contract]
+#[mx_sc::contract]
 pub trait UseModule:
     ContractBase
     + contract_base_full_path_mod::ContractBaseFullPathTestModule

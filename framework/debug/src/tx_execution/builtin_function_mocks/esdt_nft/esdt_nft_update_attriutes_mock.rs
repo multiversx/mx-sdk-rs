@@ -1,4 +1,4 @@
-use elrond_wasm::{
+use mx_sc::{
     api::ESDT_NFT_UPDATE_ATTRIBUTES_FUNC_NAME,
     mx_sc_codec::{top_encode_to_vec_u8, TopDecode},
 };

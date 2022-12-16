@@ -1,6 +1,6 @@
-elrond_wasm::imports!();
+mx_sc::imports!();
 
-#[elrond_wasm::module]
+#[mx_sc::module]
 pub trait FungibleTokenMapperFeatures:
     mx_sc_modules::default_issue_callbacks::DefaultIssueCallbacksModule
 {

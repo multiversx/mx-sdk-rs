@@ -1,5 +1,5 @@
 use crate::mandos_system::model::{AddressValue, BigUintValue, BytesValue, U64Value};
-use elrond_wasm::types::CodeMetadata;
+use mx_sc::types::CodeMetadata;
 use mandos::{
     interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
     serde_raw::TxDeployRaw,

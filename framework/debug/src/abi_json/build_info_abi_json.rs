@@ -1,4 +1,4 @@
-use elrond_wasm::abi::{BuildInfoAbi, ContractCrateBuildAbi, FrameworkBuildAbi};
+use mx_sc::abi::{BuildInfoAbi, ContractCrateBuildAbi, FrameworkBuildAbi};
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]

@@ -25,14 +25,14 @@ macro_rules! external_view_wasm_endpoints {
 
         #[no_mangle]
         fn init() {
-            mx_sc_wasm_adapter::elrond_wasm::external_view_contract::external_view_contract_constructor::<mx_sc_wasm_adapter::VmApiImpl>();
+            mx_sc_wasm_adapter::mx_sc::external_view_contract::external_view_contract_constructor::<mx_sc_wasm_adapter::VmApiImpl>();
         }
 
         $(
             #[allow(non_snake_case)]
             #[no_mangle]
             fn $endpoint_name() {
-                $mod_name::endpoints::$endpoint_name::<mx_sc_wasm_adapter::elrond_wasm::api::ExternalViewApi<mx_sc_wasm_adapter::VmApiImpl>>();
+                $mod_name::endpoints::$endpoint_name::<mx_sc_wasm_adapter::mx_sc::api::ExternalViewApi<mx_sc_wasm_adapter::VmApiImpl>>();
             }
         )*
     };

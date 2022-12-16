@@ -1,6 +1,6 @@
 use std::rc::Rc;
 
-use elrond_wasm::{
+use mx_sc::{
     api::{use_raw_handle, HandleConstraints, RawHandle},
     mx_sc_codec::TryStaticCast,
     types::ManagedVecItem,
@@ -34,7 +34,7 @@ impl core::fmt::Debug for DebugHandle {
 }
 
 impl HandleConstraints for DebugHandle {
-    fn new(handle: elrond_wasm::api::RawHandle) -> Self {
+    fn new(handle: mx_sc::api::RawHandle) -> Self {
         Self {
             context: TxContextStack::static_peek(),
             raw_handle: handle,

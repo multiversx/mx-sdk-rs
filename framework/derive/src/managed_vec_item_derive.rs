@@ -11,7 +11,7 @@ pub fn managed_vec_item_derive(ast: &syn::DeriveInput) -> TokenStream {
 
 fn type_payload_size(type_name: &syn::Type) -> proc_macro2::TokenStream {
     quote! {
-        <#type_name as elrond_wasm::types::ManagedVecItem>::PAYLOAD_SIZE
+        <#type_name as mx_sc::types::ManagedVecItem>::PAYLOAD_SIZE
     }
 }
 
@@ -36,7 +36,7 @@ fn generate_skips_reserialization_snippets(fields: &syn::Fields) -> Vec<proc_mac
             .map(|field| {
                 let type_name = &field.ty;
                 quote! {
-                    <#type_name as elrond_wasm::types::ManagedVecItem>::SKIPS_RESERIALIZATION
+                    <#type_name as mx_sc::types::ManagedVecItem>::SKIPS_RESERIALIZATION
                 }
             })
             .collect(),
@@ -55,8 +55,8 @@ fn generate_from_byte_reader_snippets(fields: &syn::Fields) -> Vec<proc_macro2::
                 let field_ident = &field.ident;
                 let type_name = &field.ty;
                 quote! {
-                    #field_ident: elrond_wasm::types::ManagedVecItem::from_byte_reader(|bytes| {
-                        let next_index = index + <#type_name as elrond_wasm::types::ManagedVecItem>::PAYLOAD_SIZE;
+                    #field_ident: mx_sc::types::ManagedVecItem::from_byte_reader(|bytes| {
+                        let next_index = index + <#type_name as mx_sc::types::ManagedVecItem>::PAYLOAD_SIZE;
                         bytes.copy_from_slice(&arr[index .. next_index]);
                         index = next_index;
                     }),
@@ -78,8 +78,8 @@ fn generate_to_byte_writer_snippets(fields: &syn::Fields) -> Vec<proc_macro2::To
                 let field_ident = &field.ident;
                 let type_name = &field.ty;
                 quote! {
-                    elrond_wasm::types::ManagedVecItem::to_byte_writer(&self.#field_ident, |bytes| {
-                        let next_index = index + <#type_name as elrond_wasm::types::ManagedVecItem>::PAYLOAD_SIZE;
+                    mx_sc::types::ManagedVecItem::to_byte_writer(&self.#field_ident, |bytes| {
+                        let next_index = index + <#type_name as mx_sc::types::ManagedVecItem>::PAYLOAD_SIZE;
                         arr[index .. next_index].copy_from_slice(bytes);
                         index = next_index;
                     });
@@ -97,10 +97,10 @@ fn generate_array_init_snippet(ast: &syn::DeriveInput) -> proc_macro2::TokenStre
     let self_expr = if ast.generics.params.is_empty() {
         quote! { #name }
     } else {
-        quote! { #name <elrond_wasm::api::uncallable::UncallableApi> }
+        quote! { #name <mx_sc::api::uncallable::UncallableApi> }
     };
     quote! {
-        const SELF_PAYLOAD_SIZE: usize = <#self_expr as elrond_wasm::types::ManagedVecItem>::PAYLOAD_SIZE;
+        const SELF_PAYLOAD_SIZE: usize = <#self_expr as mx_sc::types::ManagedVecItem>::PAYLOAD_SIZE;
         let mut arr: [u8; SELF_PAYLOAD_SIZE] = [0u8; SELF_PAYLOAD_SIZE];
     }
 }
@@ -129,7 +129,7 @@ fn enum_derive(data_enum: &syn::DataEnum, ast: &syn::DeriveInput) -> TokenStream
     });
 
     let gen = quote! {
-        impl #impl_generics elrond_wasm::types::ManagedVecItem for #name #ty_generics #where_clause {
+        impl #impl_generics mx_sc::types::ManagedVecItem for #name #ty_generics #where_clause {
             const PAYLOAD_SIZE: usize = 1;
             const SKIPS_RESERIALIZATION: bool = true;
             type Ref<'a> = Self;
@@ -170,7 +170,7 @@ fn struct_derive(data_struct: &syn::DataStruct, ast: &syn::DeriveInput) -> Token
     let array_init_snippet = generate_array_init_snippet(ast);
 
     let gen = quote! {
-        impl #impl_generics elrond_wasm::types::ManagedVecItem for #name #ty_generics #where_clause {
+        impl #impl_generics mx_sc::types::ManagedVecItem for #name #ty_generics #where_clause {
             const PAYLOAD_SIZE: usize = #(#payload_snippets)+*;
             const SKIPS_RESERIALIZATION: bool = #(#skips_reserialization_snippets)&&*;
             type Ref<'a> = Self;

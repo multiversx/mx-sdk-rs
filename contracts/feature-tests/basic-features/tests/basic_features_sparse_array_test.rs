@@ -1,4 +1,4 @@
-use elrond_wasm::types::SparseArray;
+use mx_sc::types::SparseArray;
 use mx_sc_debug::DebugApi;
 
 #[test]

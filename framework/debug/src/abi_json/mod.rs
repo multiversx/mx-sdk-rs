@@ -6,7 +6,7 @@ mod type_abi_json;
 
 pub use build_info_abi_json::{BuildInfoAbiJson, RustcAbiJson};
 pub use contract_abi_json::*;
-use elrond_wasm::{abi::ContractAbi, contract_base::ContractAbiProvider};
+use mx_sc::{abi::ContractAbi, contract_base::ContractAbiProvider};
 pub use endpoint_abi_json::*;
 pub use event_abi_json::*;
 pub use type_abi_json::*;

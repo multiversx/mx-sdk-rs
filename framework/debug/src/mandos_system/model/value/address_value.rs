@@ -1,6 +1,6 @@
 use std::fmt;
 
-use elrond_wasm::types::Address;
+use mx_sc::types::Address;
 
 use mandos::{
     interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},

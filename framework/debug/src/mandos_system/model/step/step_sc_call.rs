@@ -5,7 +5,7 @@ use crate::{
     DebugApi,
 };
 
-use elrond_wasm::{
+use mx_sc::{
     mx_sc_codec::{CodecFrom, PanicErrorHandler, TopEncodeMulti},
     types::{ContractCall, ManagedArgBuffer},
 };

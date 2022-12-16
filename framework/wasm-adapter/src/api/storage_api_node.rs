@@ -1,5 +1,5 @@
 use super::VmApiImpl;
-use elrond_wasm::{
+use mx_sc::{
     api::{
         const_handles, StorageReadApi, StorageReadApiImpl, StorageWriteApi, StorageWriteApiImpl,
     },

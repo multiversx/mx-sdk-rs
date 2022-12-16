@@ -1,5 +1,5 @@
 use crate::num_bigint::BigUint;
-use elrond_wasm::{
+use mx_sc::{
     api::ESDT_NFT_CREATE_FUNC_NAME,
     mx_sc_codec::{top_encode_to_vec_u8, TopDecode},
 };

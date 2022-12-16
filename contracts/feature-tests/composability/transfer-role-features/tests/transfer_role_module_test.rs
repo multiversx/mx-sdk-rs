@@ -1,4 +1,4 @@
-use elrond_wasm::types::{
+use mx_sc::types::{
     Address, EsdtLocalRole, EsdtTokenPayment, ManagedArgBuffer, ManagedVec, MultiValueEncoded,
 };
 use mx_sc_debug::{

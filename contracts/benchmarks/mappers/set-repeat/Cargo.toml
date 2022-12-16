@@ -12,7 +12,7 @@ path = "src/set_repeat.rs"
 path = "../benchmark-common"
 
 
-[dependencies.elrond-wasm]
+[dependencies.mx-sc]
 version = "0.38.0"
 path = "../../../../framework/base"
 
