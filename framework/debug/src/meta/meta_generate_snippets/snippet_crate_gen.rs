@@ -66,7 +66,7 @@ path = "src/lib.rs"
 [dependencies.{contract_crate_name}]
 path = ".."
 
-[dependencies.elrond-interact-snippets]
+[dependencies.elrond-snippets]
 version = "0.1.0"
 
 [workspace]

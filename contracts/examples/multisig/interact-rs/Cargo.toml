@@ -18,4 +18,4 @@ path = "../../../../contracts/modules"
 
 [dependencies.elrond-interact-snippets]
 version = "0.38.0"
-path = "../../../../framework/interact-snippets"
+path = "../../../../framework/snippets"
