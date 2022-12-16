@@ -1,6 +1,6 @@
 use core::{borrow::Borrow, marker::PhantomData};
 
-use elrond_codec::{DecodeError, EncodeError};
+use mx_sc_codec::{DecodeError, EncodeError};
 
 use crate::{
     api::{ErrorApiImpl, ManagedTypeApi},

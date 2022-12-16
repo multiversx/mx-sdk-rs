@@ -2,7 +2,7 @@ use crate::{address_h256_to_erdrs, mandos_to_erdrs_address, Interactor, Interact
 use elrond_sdk_erdrs::data::transaction::Transaction;
 use elrond_wasm_debug::{
     elrond_wasm::{
-        elrond_codec::{multi_types::IgnoreValue, CodecFrom, TopEncodeMulti},
+        mx_sc_codec::{multi_types::IgnoreValue, CodecFrom, TopEncodeMulti},
         types::ContractCallWithEgld,
     },
     mandos_system::model::{ScCallStep, TransferStep, TxCall, TypedScCall},

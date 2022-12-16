@@ -1,7 +1,7 @@
 use elrond_wasm::{
     derive::ManagedVecItem,
-    elrond_codec,
-    elrond_codec::elrond_codec_derive::{NestedDecode, NestedEncode, TopDecode, TopEncode},
+    mx_sc_codec,
+    mx_sc_codec::mx_sc_codec_derive::{NestedDecode, NestedEncode, TopDecode, TopEncode},
 };
 
 // to test, run the following command in elrond-wasm-debug folder:

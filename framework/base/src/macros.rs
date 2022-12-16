@@ -20,7 +20,7 @@ macro_rules! imports {
             },
             arrayvec::ArrayVec,
             contract_base::{ContractBase, ProxyObjBase},
-            elrond_codec::{
+            mx_sc_codec::{
                 multi_types::*, DecodeError, IntoMultiValue, NestedDecode, NestedEncode, TopDecode,
                 TopEncode,
             },
@@ -45,8 +45,8 @@ macro_rules! derive_imports {
     () => {
         use elrond_wasm::{
             derive::{ManagedVecItem, TypeAbi},
-            elrond_codec,
-            elrond_codec::elrond_codec_derive::{
+            mx_sc_codec,
+            mx_sc_codec::mx_sc_codec_derive::{
                 NestedDecode, NestedEncode, TopDecode, TopDecodeOrDefault, TopEncode,
                 TopEncodeOrDefault,
             },

@@ -4,7 +4,7 @@ use crate::{
     api::{ErrorApi, ManagedTypeApi},
     io::{signal_arg_de_error, ArgId},
 };
-use elrond_codec::*;
+use mx_sc_codec::*;
 
 #[derive(Clone)]
 pub struct ArgErrorHandler<M>

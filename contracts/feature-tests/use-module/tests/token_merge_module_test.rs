@@ -1,7 +1,7 @@
 use elrond_wasm::{
     arrayvec::ArrayVec,
     contract_base::ContractBase,
-    elrond_codec::Empty,
+    mx_sc_codec::Empty,
     storage::mappers::StorageTokenWrapper,
     types::{EsdtLocalRole, EsdtTokenPayment, ManagedVec},
 };

@@ -1,6 +1,6 @@
 // Some structures with explicit encode/decode, for testing.
 use core::fmt::Debug;
-use elrond_codec::{
+use mx_sc_codec::{
     test_util::{check_dep_encode_decode, check_top_encode_decode},
     top_decode_from_nested_or_handle_err, top_encode_from_nested, DecodeErrorHandler,
     EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode, NestedEncodeOutput,

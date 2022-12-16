@@ -1,6 +1,6 @@
 use elrond_wasm::{
     api::ESDT_NFT_ADD_URI_FUNC_NAME,
-    elrond_codec::{top_encode_to_vec_u8, TopDecode},
+    mx_sc_codec::{top_encode_to_vec_u8, TopDecode},
 };
 
 use crate::tx_mock::{BlockchainUpdate, TxCache, TxInput, TxLog, TxResult};

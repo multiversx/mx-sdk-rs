@@ -1,6 +1,6 @@
 use core::marker::PhantomData;
 
-use elrond_codec::{
+use mx_sc_codec::{
     DecodeError, DecodeErrorHandler, EncodeError, EncodeErrorHandler, TopDecode, TopEncode,
 };
 

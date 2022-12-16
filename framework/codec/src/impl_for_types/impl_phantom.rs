@@ -59,10 +59,10 @@ impl<T> NestedDecode for PhantomData<T> {
 
 #[cfg(test)]
 pub mod tests {
-    use crate as elrond_codec;
+    use crate as mx_sc_codec;
     use crate::test_util::{check_dep_encode_decode, check_top_encode_decode};
     use core::marker::PhantomData;
-    use elrond_codec_derive::{NestedDecode, NestedEncode, TopDecode, TopEncode};
+    use mx_sc_codec_derive::{NestedDecode, NestedEncode, TopDecode, TopEncode};
 
     #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, PartialEq, Eq, Clone, Debug)]
     pub struct TestStructWithPhantom<M> {

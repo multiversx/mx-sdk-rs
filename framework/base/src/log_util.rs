@@ -1,4 +1,4 @@
-use elrond_codec::{TopEncode, TopEncodeMulti};
+use mx_sc_codec::{TopEncode, TopEncodeMulti};
 
 use crate::{
     api::{ErrorApi, LogApi, LogApiImpl, ManagedTypeApi},

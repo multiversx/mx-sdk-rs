@@ -1,6 +1,6 @@
 use elrond_wasm::{
     api::ManagedTypeApi,
-    elrond_codec::multi_types::OptionalValue,
+    mx_sc_codec::multi_types::OptionalValue,
     types::{Address, BigUint, BoxedBytes, CodeMetadata, ManagedBuffer, ManagedVec},
 };
 use elrond_wasm_debug::{

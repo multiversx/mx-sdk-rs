@@ -1,7 +1,7 @@
 #![no_std]
 #![allow(clippy::type_complexity)]
 
-use elrond_wasm::elrond_codec::Empty;
+use elrond_wasm::mx_sc_codec::Empty;
 
 elrond_wasm::imports!();
 

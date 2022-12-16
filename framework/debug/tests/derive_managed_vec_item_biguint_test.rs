@@ -1,8 +1,8 @@
 use elrond_wasm::{
     api::{HandleConstraints, ManagedTypeApi},
     derive::ManagedVecItem,
-    elrond_codec,
-    elrond_codec::elrond_codec_derive::{NestedDecode, NestedEncode, TopDecode, TopEncode},
+    mx_sc_codec,
+    mx_sc_codec::mx_sc_codec_derive::{NestedDecode, NestedEncode, TopDecode, TopEncode},
     types::{BigUint, ManagedType},
 };
 use elrond_wasm_debug::DebugApi;

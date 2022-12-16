@@ -4,7 +4,7 @@ use num_traits::ToPrimitive;
 
 use basic_features::BasicFeatures;
 use elrond_wasm::{
-    elrond_codec::Empty,
+    mx_sc_codec::Empty,
     types::{Address, BigUint, EsdtLocalRole, EsdtTokenPayment, ManagedVec, TokenIdentifier},
 };
 use elrond_wasm_debug::{

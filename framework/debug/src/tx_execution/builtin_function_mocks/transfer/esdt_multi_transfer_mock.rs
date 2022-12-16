@@ -1,5 +1,5 @@
 use elrond_wasm::{
-    api::ESDT_MULTI_TRANSFER_FUNC_NAME, elrond_codec::TopDecode, types::heap::Address,
+    api::ESDT_MULTI_TRANSFER_FUNC_NAME, mx_sc_codec::TopDecode, types::heap::Address,
 };
 
 use crate::{

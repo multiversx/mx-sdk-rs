@@ -1,5 +1,5 @@
 use elrond_wasm::{
-    elrond_codec::multi_types::MultiValue2,
+    mx_sc_codec::multi_types::MultiValue2,
     types::{BigUint, EgldOrEsdtTokenIdentifier, MultiValueEncoded, OperationCompletionStatus},
 };
 use elrond_wasm_debug::{

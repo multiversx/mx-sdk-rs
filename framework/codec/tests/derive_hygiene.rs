@@ -1,11 +1,11 @@
 #![allow(dead_code)]
 
-extern crate elrond_codec_derive;
-use elrond_codec_derive::*;
+extern crate mx_sc_codec_derive;
+use mx_sc_codec_derive::*;
 
 // This test doesn't run any code, the fact that it compiles is the actual testing.
 // It checks that the derive macro generation is immune to type shadowing,
-// i.e. any types that are in scope and happen to have the same name as elrond-codec types do not break the build.
+// i.e. any types that are in scope and happen to have the same name as mx-sc-codec types do not break the build.
 // The derive macro must generate fully qualified type names everywhere to avoid this hurdle.
 
 // All exported traits:
@@ -31,7 +31,7 @@ enum Result {
 #[allow(unused_imports)]
 use crate::Result::{Err, Ok};
 
-// Also adding all public functions exposed by elrond-codec.
+// Also adding all public functions exposed by mx-sc-codec.
 // They are not used in the derive, but just to make sure:
 fn top_encode_number() {}
 fn universal_decode_number() {}
@@ -88,10 +88,10 @@ trait SimpleTrait {
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, PartialEq, Eq, Clone, Debug)]
 struct StructWithNamedFieldsWithGeneric<ST: SimpleTrait>
 where
-    ST: elrond_codec::NestedEncode
-        + elrond_codec::NestedDecode
-        + elrond_codec::TopEncode
-        + elrond_codec::TopDecode,
+    ST: mx_sc_codec::NestedEncode
+        + mx_sc_codec::NestedDecode
+        + mx_sc_codec::TopEncode
+        + mx_sc_codec::TopDecode,
 {
     data: u64,
     trait_stuff: ST,

@@ -1,5 +1,5 @@
 use elrond_wasm::{
-    elrond_codec::multi_types::OptionalValue,
+    mx_sc_codec::multi_types::OptionalValue,
     esdt::ESDTSystemSmartContractProxy,
     types::{
         heap::{Address, BoxedBytes},

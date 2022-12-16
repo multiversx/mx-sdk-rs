@@ -1,6 +1,6 @@
 use elrond_wasm::{
     contract_base::ManagedSerializer,
-    elrond_codec::{test_util::check_top_encode, TopDecode, TopEncode},
+    mx_sc_codec::{test_util::check_top_encode, TopDecode, TopEncode},
     types::{heap::BoxedBytes, ManagedBuffer},
 };
 

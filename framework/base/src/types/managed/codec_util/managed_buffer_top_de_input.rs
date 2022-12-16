@@ -1,5 +1,5 @@
 use alloc::boxed::Box;
-use elrond_codec::{
+use mx_sc_codec::{
     try_execute_then_cast, DecodeError, DecodeErrorHandler, TopDecodeInput, TryStaticCast,
 };
 

@@ -2,7 +2,7 @@ mod multisig_interact_nfts;
 use mx_sc_snippets::{
     dns_address_for_name,
     elrond_wasm::{
-        elrond_codec::multi_types::MultiValueVec,
+        mx_sc_codec::multi_types::MultiValueVec,
         storage::mappers::SingleValue,
         types::{Address, CodeMetadata},
     },

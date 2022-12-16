@@ -15,9 +15,9 @@ pub use elrond_wasm_derive::{self as derive, contract, module, proxy};
 extern crate alloc;
 
 /// Reexported for convenience.
-pub use elrond_codec::arrayvec;
+pub use mx_sc_codec::arrayvec;
 
-pub use elrond_codec;
+pub use mx_sc_codec;
 
 pub mod abi;
 pub mod api;

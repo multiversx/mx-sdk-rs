@@ -3,7 +3,7 @@ use crate::{
     types::{heap::BoxedBytes, ManagedArgBuffer},
 };
 use alloc::vec::Vec;
-use elrond_codec::TopEncodeOutput;
+use mx_sc_codec::TopEncodeOutput;
 
 /// Helper structure for providing arguments to all SC call functions other than async_call_raw.
 /// It keeps argument lengths separately from the argument data itself.

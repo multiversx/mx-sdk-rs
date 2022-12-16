@@ -2,7 +2,7 @@ use std::rc::Rc;
 
 use elrond_wasm::{
     api::{use_raw_handle, HandleConstraints, RawHandle},
-    elrond_codec::TryStaticCast,
+    mx_sc_codec::TryStaticCast,
     types::ManagedVecItem,
 };
 

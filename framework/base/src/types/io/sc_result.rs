@@ -1,4 +1,4 @@
-use elrond_codec::{EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput};
+use mx_sc_codec::{EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput};
 
 use crate::{
     abi::{OutputAbis, TypeAbi, TypeDescriptionContainer, TypeName},
@@ -173,7 +173,7 @@ where
 
 #[cfg(test)]
 mod tests {
-    use elrond_codec::DecodeError;
+    use mx_sc_codec::DecodeError;
 
     use super::*;
 

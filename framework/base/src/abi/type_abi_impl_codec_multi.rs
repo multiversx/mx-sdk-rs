@@ -1,8 +1,8 @@
 use crate::abi::{OutputAbis, TypeAbi, TypeDescriptionContainer, TypeName};
-use elrond_codec::multi_types::{IgnoreValue, OptionalValue};
+use mx_sc_codec::multi_types::{IgnoreValue, OptionalValue};
 
 #[cfg(feature = "alloc")]
-impl<T: TypeAbi> TypeAbi for elrond_codec::multi_types::MultiValueVec<T> {
+impl<T: TypeAbi> TypeAbi for mx_sc_codec::multi_types::MultiValueVec<T> {
     fn type_name() -> TypeName {
         super::type_name_variadic::<T>()
     }
@@ -43,7 +43,7 @@ impl<T: TypeAbi> TypeAbi for OptionalValue<T> {
 macro_rules! multi_arg_impls {
     ($(($mval_struct:ident $($n:tt $name:ident)+) )+) => {
         $(
-            impl<$($name),+ > TypeAbi for elrond_codec::multi_types::$mval_struct<$($name,)+>
+            impl<$($name),+ > TypeAbi for mx_sc_codec::multi_types::$mval_struct<$($name,)+>
             where
                 $($name: TypeAbi,)+
             {

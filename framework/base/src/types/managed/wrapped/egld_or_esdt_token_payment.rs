@@ -3,8 +3,8 @@ use crate::{
     types::{BigUint, EgldOrEsdtTokenIdentifier},
 };
 
-use elrond_codec::{
-    elrond_codec_derive::{NestedDecode, NestedEncode, TopDecode, TopEncode},
+use mx_sc_codec::{
+    mx_sc_codec_derive::{NestedDecode, NestedEncode, TopDecode, TopEncode},
     CodecFrom, CodecFromSelf,
 };
 

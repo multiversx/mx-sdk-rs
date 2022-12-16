@@ -7,7 +7,7 @@ use crate::{
         BlockchainUpdate, TxCache, TxFunctionName, TxInput, TxLog, TxResult, TxTokenTransfer,
     },
 };
-use elrond_wasm::{elrond_codec::TopDecode, types::heap::Address};
+use elrond_wasm::{mx_sc_codec::TopDecode, types::heap::Address};
 use num_bigint::BigUint;
 use num_traits::Zero;
 

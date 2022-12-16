@@ -1,4 +1,4 @@
-use elrond_codec::{EncodeError, EncodeErrorHandler, NestedEncodeOutput, TryStaticCast};
+use mx_sc_codec::{EncodeError, EncodeErrorHandler, NestedEncodeOutput, TryStaticCast};
 
 use crate::{
     api::ManagedTypeApi,

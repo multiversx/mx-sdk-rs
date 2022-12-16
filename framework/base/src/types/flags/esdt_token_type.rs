@@ -1,4 +1,4 @@
-use elrond_codec::*;
+use mx_sc_codec::*;
 
 const ESDT_TYPE_FUNGIBLE: &[u8] = b"FungibleESDT";
 const ESDT_TYPE_NON_FUNGIBLE: &[u8] = b"NonFungibleESDT";

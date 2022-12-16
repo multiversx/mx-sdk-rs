@@ -4,7 +4,7 @@ use crate::{
     err_msg,
     types::{ManagedBuffer, ManagedType},
 };
-use elrond_codec::DecodeError;
+use mx_sc_codec::DecodeError;
 
 pub fn signal_arg_de_error<EA>(arg_id: ArgId, decode_err: DecodeError) -> !
 where

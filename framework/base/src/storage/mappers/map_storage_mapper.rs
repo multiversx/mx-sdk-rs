@@ -5,7 +5,7 @@ use crate::{
     api::StorageMapperApi,
     storage::{self, StorageKey},
 };
-use elrond_codec::{NestedDecode, NestedEncode, TopDecode, TopEncode};
+use mx_sc_codec::{NestedDecode, NestedEncode, TopDecode, TopEncode};
 
 const MAPPED_STORAGE_VALUE_IDENTIFIER: &[u8] = b".storage";
 type Keys<'a, SA, T> = set_mapper::Iter<'a, SA, T>;

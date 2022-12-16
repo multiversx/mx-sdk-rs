@@ -1,5 +1,5 @@
 use crate::abi::{TypeAbi, TypeName};
-use elrond_codec::elrond_codec_derive::{NestedDecode, NestedEncode, TopDecode, TopEncode};
+use mx_sc_codec::mx_sc_codec_derive::{NestedDecode, NestedEncode, TopDecode, TopEncode};
 
 /// Message hash type for the `verifyCustomSecp256k1` CryptoApi function
 #[derive(TopDecode, TopEncode, NestedDecode, NestedEncode, Clone, PartialEq, Eq, Debug)]

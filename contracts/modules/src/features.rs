@@ -42,7 +42,7 @@ pub struct FeatureName<M>(ManagedBuffer<M>)
 where
     M: ManagedTypeApi;
 
-use elrond_wasm::elrond_codec::*;
+use elrond_wasm::mx_sc_codec::*;
 impl<M> NestedEncode for FeatureName<M>
 where
     M: ManagedTypeApi,

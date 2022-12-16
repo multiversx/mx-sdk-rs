@@ -3,7 +3,7 @@ use crate::{
     api::ManagedTypeApi,
     types::ManagedType,
 };
-use elrond_codec::{
+use mx_sc_codec::{
     DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti, TopDecodeMultiInput, TopEncodeMulti,
     TopEncodeMultiOutput, Vec,
 };

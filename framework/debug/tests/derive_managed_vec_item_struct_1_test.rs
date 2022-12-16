@@ -1,4 +1,4 @@
-use elrond_wasm::elrond_codec::test_util::{check_dep_encode_decode, check_top_encode_decode};
+use elrond_wasm::mx_sc_codec::test_util::{check_dep_encode_decode, check_top_encode_decode};
 use elrond_wasm_debug::DebugApi;
 
 elrond_wasm::derive_imports!();

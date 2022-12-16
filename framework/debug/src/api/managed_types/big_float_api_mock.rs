@@ -7,7 +7,7 @@ use std::convert::TryInto;
 
 use elrond_wasm::{
     api::{BigFloatApi, BigIntApi, ErrorApiImpl, HandleTypeInfo, Sign},
-    elrond_codec::num_bigint::BigInt,
+    mx_sc_codec::num_bigint::BigInt,
     err_msg,
 };
 use num_traits::ToPrimitive;

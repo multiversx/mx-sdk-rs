@@ -1,5 +1,5 @@
 [package]
-name = "elrond-codec-derive"
+name = "mx-sc-codec-derive"
 version = "0.16.0"
 edition = "2021"
 
@@ -9,12 +9,12 @@ readme = "README.md"
 repository = "https://github.com/ElrondNetwork/elrond-wasm-rs"
 homepage = "https://elrond.com/"
 documentation = "https://docs.elrond.com/"
-description = "Macro implementations of elrond-codec #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]"
+description = "Macro implementations of mx-sc-codec #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]"
 keywords = ["elrond", "wasm", "webassembly", "blockchain", "contract"]
 categories = ["no-std", "wasm", "cryptography::cryptocurrencies", "development-tools"]
 
 [lib]
-name = "elrond_codec_derive"
+name = "mx_sc_codec_derive"
 proc-macro = true
 
 [features]

@@ -1,11 +1,11 @@
 use core::marker::PhantomData;
 
-use elrond_codec::{EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput, TryStaticCast};
+use mx_sc_codec::{EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput, TryStaticCast};
 
 use crate::{
     api::{EndpointFinishApi, EndpointFinishApiImpl, ManagedTypeApi},
     contract_base::ExitCodecErrorHandler,
-    elrond_codec::{EncodeError, TopEncode, TopEncodeOutput},
+    mx_sc_codec::{EncodeError, TopEncode, TopEncodeOutput},
     err_msg,
     types::{
         BigInt, BigUint, ManagedBuffer, ManagedBufferCachedBuilder, ManagedSCError, ManagedType,

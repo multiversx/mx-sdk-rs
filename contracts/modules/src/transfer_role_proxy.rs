@@ -1,4 +1,4 @@
-use elrond_wasm::elrond_codec::TopEncodeMulti;
+use elrond_wasm::mx_sc_codec::TopEncodeMulti;
 
 elrond_wasm::imports!();
 

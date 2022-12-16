@@ -1,5 +1,5 @@
 use elrond_wasm::{
-    api::CHANGE_OWNER_BUILTIN_FUNC_NAME, elrond_codec::TopDecode, types::heap::Address,
+    api::CHANGE_OWNER_BUILTIN_FUNC_NAME, mx_sc_codec::TopDecode, types::heap::Address,
 };
 
 use crate::tx_mock::{BlockchainUpdate, TxCache, TxInput, TxResult};

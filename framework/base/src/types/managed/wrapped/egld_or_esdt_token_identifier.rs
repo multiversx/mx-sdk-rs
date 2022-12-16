@@ -5,7 +5,7 @@ use crate::{
     formatter::{FormatByteReceiver, SCDisplay, SCLowerHex},
     types::{ManagedBuffer, ManagedOption, ManagedRef, ManagedType, TokenIdentifier},
 };
-use elrond_codec::*;
+use mx_sc_codec::*;
 
 use crate as elrond_wasm; // required by the ManagedVecItem derive
 

@@ -8,8 +8,8 @@ use crate::{
     types::{heap::BoxedBytes, ManagedType, MultiValueEncoded},
 };
 use alloc::vec::Vec;
-use elrond_codec::{
-    elrond_codec_derive::{
+use mx_sc_codec::{
+    mx_sc_codec_derive::{
         NestedDecode, NestedEncode, TopDecode, TopDecodeOrDefault, TopEncode, TopEncodeOrDefault,
     },
     CodecFrom, DecodeDefault, EncodeDefault, EncodeErrorHandler, NestedDecode, NestedEncode,

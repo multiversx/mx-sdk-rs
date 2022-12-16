@@ -1,6 +1,6 @@
 use core::marker::PhantomData;
 
-use elrond_codec::{NestedDecode, NestedEncode, TopDecode, TopEncode};
+use mx_sc_codec::{NestedDecode, NestedEncode, TopDecode, TopEncode};
 
 use super::StorageMapper;
 use crate::{

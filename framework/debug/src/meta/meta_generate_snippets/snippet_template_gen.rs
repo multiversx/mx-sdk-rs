@@ -12,7 +12,7 @@ pub(crate) fn write_snippet_imports(file: &mut File, contract_crate_name: &str) 
 use {contract_crate_name}::ProxyTrait as _;
 use mx_sc_snippets::{{
     elrond_wasm::{{
-        elrond_codec::multi_types::*,
+        mx_sc_codec::multi_types::*,
         types::{{Address, CodeMetadata}},
     }},
     elrond_wasm_debug::{{

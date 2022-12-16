@@ -9,7 +9,7 @@ use crate::{
 };
 use alloc::vec::Vec;
 use core::{borrow::Borrow, iter::FromIterator, marker::PhantomData};
-use elrond_codec::{
+use mx_sc_codec::{
     DecodeErrorHandler, EncodeErrorHandler, IntoMultiValue, NestedDecode, NestedDecodeInput,
     NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeMultiOutput,
     TopEncodeOutput,

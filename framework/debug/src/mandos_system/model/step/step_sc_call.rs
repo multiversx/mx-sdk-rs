@@ -6,7 +6,7 @@ use crate::{
 };
 
 use elrond_wasm::{
-    elrond_codec::{CodecFrom, PanicErrorHandler, TopEncodeMulti},
+    mx_sc_codec::{CodecFrom, PanicErrorHandler, TopEncodeMulti},
     types::{ContractCall, ManagedArgBuffer},
 };
 

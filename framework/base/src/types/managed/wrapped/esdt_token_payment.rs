@@ -5,8 +5,8 @@ use crate::{
 
 use crate as elrond_wasm; // needed by the codec and TypeAbi generated code
 use crate::derive::TypeAbi;
-use elrond_codec::{
-    elrond_codec_derive::{NestedEncode, TopEncode},
+use mx_sc_codec::{
+    mx_sc_codec_derive::{NestedEncode, TopEncode},
     IntoMultiValue, NestedDecode, TopDecode,
 };
 
@@ -58,13 +58,13 @@ impl<M: ManagedTypeApi> From<(TokenIdentifier<M>, u64, BigUint<M>)> for EsdtToke
 impl<M: ManagedTypeApi> TopDecode for EsdtTokenPayment<M> {
     fn top_decode_or_handle_err<I, H>(top_input: I, h: H) -> Result<Self, H::HandledErr>
     where
-        I: elrond_codec::TopDecodeInput,
-        H: elrond_codec::DecodeErrorHandler,
+        I: mx_sc_codec::TopDecodeInput,
+        H: mx_sc_codec::DecodeErrorHandler,
     {
         let mut nested_buffer = top_input.into_nested_buffer();
         let result = Self::dep_decode_or_handle_err(&mut nested_buffer, h)?;
-        if !elrond_codec::NestedDecodeInput::is_depleted(&nested_buffer) {
-            return Err(h.handle_error(elrond_codec::DecodeError::INPUT_TOO_LONG));
+        if !mx_sc_codec::NestedDecodeInput::is_depleted(&nested_buffer) {
+            return Err(h.handle_error(mx_sc_codec::DecodeError::INPUT_TOO_LONG));
         }
         Ok(result)
     }
@@ -74,8 +74,8 @@ impl<M: ManagedTypeApi> NestedDecode for EsdtTokenPayment<M> {
     #[cfg(not(feature = "esdt-token-payment-legacy-decode"))]
     fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
     where
-        I: elrond_codec::NestedDecodeInput,
-        H: elrond_codec::DecodeErrorHandler,
+        I: mx_sc_codec::NestedDecodeInput,
+        H: mx_sc_codec::DecodeErrorHandler,
     {
         Self::regular_dep_decode_or_handle_err(input, h)
     }
@@ -83,8 +83,8 @@ impl<M: ManagedTypeApi> NestedDecode for EsdtTokenPayment<M> {
     #[cfg(feature = "esdt-token-payment-legacy-decode")]
     fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
     where
-        I: elrond_codec::NestedDecodeInput,
-        H: elrond_codec::DecodeErrorHandler,
+        I: mx_sc_codec::NestedDecodeInput,
+        H: mx_sc_codec::DecodeErrorHandler,
     {
         Self::backwards_compatible_dep_decode_or_handle_err(input, h)
     }
@@ -97,8 +97,8 @@ impl<M: ManagedTypeApi> EsdtTokenPayment<M> {
         h: H,
     ) -> Result<Self, H::HandledErr>
     where
-        I: elrond_codec::NestedDecodeInput,
-        H: elrond_codec::DecodeErrorHandler,
+        I: mx_sc_codec::NestedDecodeInput,
+        H: mx_sc_codec::DecodeErrorHandler,
     {
         Ok(EsdtTokenPayment {
             token_identifier: TokenIdentifier::<M>::dep_decode_or_handle_err(input, h)?,
@@ -129,8 +129,8 @@ impl<M: ManagedTypeApi> EsdtTokenPayment<M> {
         h: H,
     ) -> Result<Self, H::HandledErr>
     where
-        I: elrond_codec::NestedDecodeInput,
-        H: elrond_codec::DecodeErrorHandler,
+        I: mx_sc_codec::NestedDecodeInput,
+        H: mx_sc_codec::DecodeErrorHandler,
     {
         let mut first_four_bytes = [0u8; 4];
         input.peek_into(&mut first_four_bytes[..], h)?;

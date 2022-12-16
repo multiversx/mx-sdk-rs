@@ -3,7 +3,7 @@ use crate::{
     tx_mock::{BlockchainUpdate, TxCache, TxInput, TxResult},
 };
 use elrond_wasm::{
-    api::ESDT_NFT_TRANSFER_FUNC_NAME, elrond_codec::TopDecode, types::heap::Address,
+    api::ESDT_NFT_TRANSFER_FUNC_NAME, mx_sc_codec::TopDecode, types::heap::Address,
 };
 
 use super::{

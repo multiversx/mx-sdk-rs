@@ -1,4 +1,4 @@
-use elrond_codec::TopEncodeMulti;
+use mx_sc_codec::TopEncodeMulti;
 
 use crate::{
     api::CallTypeApi,

@@ -6,7 +6,7 @@ use multisig::{
 };
 
 use elrond_wasm::{
-    elrond_codec::multi_types::{MultiValueVec, OptionalValue},
+    mx_sc_codec::multi_types::{MultiValueVec, OptionalValue},
     storage::mappers::SingleValue,
     types::{Address, CodeMetadata},
 };

@@ -1,4 +1,4 @@
-use elrond_codec::{
+use mx_sc_codec::{
     CodecFrom, EncodeErrorHandler, TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
 };
 

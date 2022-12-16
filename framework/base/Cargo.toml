@@ -14,8 +14,8 @@ keywords = ["elrond", "wasm", "webassembly", "blockchain", "contract"]
 categories = ["no-std", "wasm", "cryptography::cryptocurrencies", "development-tools"]
 
 [features]
-num-bigint = ["elrond-codec/num-bigint"]
-alloc = ["elrond-codec/alloc"]
+num-bigint = ["mx-sc-codec/num-bigint"]
+alloc = ["mx-sc-codec/alloc"]
 ei-unmanaged = ["alloc"]
 promises = []
 big-float = []
@@ -35,7 +35,7 @@ default-features = false
 version = "=0.38.0"
 path = "../derive"
 
-[dependencies.elrond-codec]
+[dependencies.mx-sc-codec]
 version = "=0.16.0"
 path = "../codec"
 features = ["derive"]
