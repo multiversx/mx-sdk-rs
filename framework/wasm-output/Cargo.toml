@@ -1,5 +1,5 @@
 [package]
-name = "elrond-wasm-output"
+name = "mx-sc-wasm-output"
 version = "0.38.0"
 edition = "2021"
 

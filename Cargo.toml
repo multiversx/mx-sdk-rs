@@ -156,5 +156,5 @@ members = [
 ]
 
 exclude = [
-  "elrond-wasm-output",
+  "mx-sc-wasm-output",
 ]

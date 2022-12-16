@@ -1,7 +1,7 @@
 #[macro_export]
 macro_rules! wasm_endpoints {
     ($mod_name:ident ( $($endpoint_name:ident)* ) ) => {
-        pub use elrond_wasm_output;
+        pub use mx_sc_wasm_output;
 
         #[no_mangle]
         fn init() {
@@ -21,7 +21,7 @@ macro_rules! wasm_endpoints {
 #[macro_export]
 macro_rules! external_view_wasm_endpoints {
     ($mod_name:ident ( $($endpoint_name:ident)* ) ) => {
-        pub use elrond_wasm_output;
+        pub use mx_sc_wasm_output;
 
         #[no_mangle]
         fn init() {

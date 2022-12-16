@@ -24,7 +24,7 @@ version = "0.38.0"
 path = "../../../../../framework/wasm-adapter"
 features = ["ei-unmanaged-node"]
 
-[dependencies.elrond-wasm-output]
+[dependencies.mx-sc-wasm-output]
 version = "0.38.0"
 path = "../../../../../framework/wasm-output"
 features = ["wasm-output-mode"]
