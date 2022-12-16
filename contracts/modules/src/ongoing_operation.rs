@@ -15,7 +15,7 @@ pub trait OngoingOperationModule {
     /// # Usage example: Counting to 100
     /// ```
     /// # use elrond_wasm::types::OperationCompletionStatus;
-    /// # use elrond_wasm_modules::ongoing_operation::{
+    /// # use mx_sc_modules::ongoing_operation::{
     /// #     self, CONTINUE_OP, DEFAULT_MIN_GAS_TO_SAVE_PROGRESS, STOP_OP,
     /// # };
     /// # pub trait ExampleContract: elrond_wasm::contract_base::ContractBase + ongoing_operation::OngoingOperationModule

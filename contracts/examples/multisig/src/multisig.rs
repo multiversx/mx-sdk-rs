@@ -21,7 +21,7 @@ pub trait Multisig:
     + multisig_propose::MultisigProposeModule
     + multisig_perform::MultisigPerformModule
     + multisig_events::MultisigEventsModule
-    + elrond_wasm_modules::dns::DnsModule
+    + mx_sc_modules::dns::DnsModule
 {
     #[init]
     fn init(&self, quorum: usize, board: MultiValueEncoded<ManagedAddress>) {

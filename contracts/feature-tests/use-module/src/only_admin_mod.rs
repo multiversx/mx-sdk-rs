@@ -1,4 +1,4 @@
-use elrond_wasm_modules::only_admin;
+use mx_sc_modules::only_admin;
 
 elrond_wasm::imports!();
 

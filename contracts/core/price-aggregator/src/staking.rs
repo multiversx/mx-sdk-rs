@@ -1,4 +1,4 @@
-// TODO: Replace with the one from elrond_wasm_modules on next release
+// TODO: Replace with the one from mx_sc_modules on next release
 
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();

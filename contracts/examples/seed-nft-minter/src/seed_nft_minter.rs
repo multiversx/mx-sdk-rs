@@ -7,7 +7,7 @@ mod distribution_module;
 mod nft_module;
 
 use distribution_module::Distribution;
-use elrond_wasm_modules::default_issue_callbacks;
+use mx_sc_modules::default_issue_callbacks;
 
 #[derive(TypeAbi, TopEncode, TopDecode)]
 pub struct ExampleAttributes {

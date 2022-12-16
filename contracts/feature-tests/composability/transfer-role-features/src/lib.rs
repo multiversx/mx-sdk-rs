@@ -5,7 +5,7 @@ elrond_wasm::imports!();
 
 #[elrond_wasm::contract]
 pub trait TransferRoleFeatures:
-    elrond_wasm_modules::transfer_role_proxy::TransferRoleProxyModule
+    mx_sc_modules::transfer_role_proxy::TransferRoleProxyModule
 {
     #[init]
     fn init(&self, whitelist: MultiValueEncoded<ManagedAddress>) {

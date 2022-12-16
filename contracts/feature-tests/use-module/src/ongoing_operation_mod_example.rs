@@ -1,6 +1,6 @@
 elrond_wasm::imports!();
 
-use elrond_wasm_modules::ongoing_operation::{
+use mx_sc_modules::ongoing_operation::{
     self, CONTINUE_OP, DEFAULT_MIN_GAS_TO_SAVE_PROGRESS, STOP_OP,
 };
 

@@ -2,7 +2,7 @@ elrond_wasm::imports!();
 
 #[elrond_wasm::module]
 pub trait FungibleTokenMapperFeatures:
-    elrond_wasm_modules::default_issue_callbacks::DefaultIssueCallbacksModule
+    mx_sc_modules::default_issue_callbacks::DefaultIssueCallbacksModule
 {
     #[payable("EGLD")]
     #[endpoint]

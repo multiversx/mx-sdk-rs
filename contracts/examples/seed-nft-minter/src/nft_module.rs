@@ -3,7 +3,7 @@ use crate::distribution_module;
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
-use elrond_wasm_modules::default_issue_callbacks;
+use mx_sc_modules::default_issue_callbacks;
 
 const NFT_AMOUNT: u32 = 1;
 const ROYALTIES_MAX: u32 = 10_000; // 100%

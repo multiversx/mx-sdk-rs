@@ -2,7 +2,7 @@
 
 elrond_wasm::imports!();
 
-use elrond_wasm_modules::default_issue_callbacks;
+use mx_sc_modules::default_issue_callbacks;
 mod fractional_uri_info;
 use fractional_uri_info::FractionalUriInfo;
 

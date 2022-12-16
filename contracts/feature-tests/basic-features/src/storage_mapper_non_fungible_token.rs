@@ -10,7 +10,7 @@ pub struct RgbColor {
 
 #[elrond_wasm::module]
 pub trait NonFungibleTokenMapperFeatures:
-    elrond_wasm_modules::default_issue_callbacks::DefaultIssueCallbacksModule
+    mx_sc_modules::default_issue_callbacks::DefaultIssueCallbacksModule
 {
     #[payable("EGLD")]
     #[endpoint]

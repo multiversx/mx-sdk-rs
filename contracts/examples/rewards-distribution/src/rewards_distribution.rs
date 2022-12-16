@@ -2,7 +2,7 @@
 
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
-use elrond_wasm_modules::ongoing_operation::{
+use mx_sc_modules::ongoing_operation::{
     CONTINUE_OP, DEFAULT_MIN_GAS_TO_SAVE_PROGRESS, STOP_OP,
 };
 
@@ -34,7 +34,7 @@ pub struct RaffleProgress<M: ManagedTypeApi> {
 
 #[elrond_wasm::contract]
 pub trait RewardsDistribution:
-    elrond_wasm_modules::ongoing_operation::OngoingOperationModule
+    mx_sc_modules::ongoing_operation::OngoingOperationModule
 {
     #[init]
     fn init(&self, seed_nft_minter_address: ManagedAddress, brackets: ManagedVec<Bracket>) {

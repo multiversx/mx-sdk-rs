@@ -71,7 +71,7 @@ pub trait BasicFeatures:
     + struct_eq::StructEquals
     + token_identifier_features::TokenIdentifierFeatures
     + non_zero_features::TypeFeatures
-    + elrond_wasm_modules::default_issue_callbacks::DefaultIssueCallbacksModule
+    + mx_sc_modules::default_issue_callbacks::DefaultIssueCallbacksModule
 {
     #[init]
     fn init(&self) {}

@@ -12,7 +12,7 @@ path = "src/multisig_interact.rs"
 [dependencies.multisig]
 path = ".."
 
-[dependencies.elrond-wasm-modules]
+[dependencies.mx-sc-modules]
 version = "0.38.0"
 path = "../../../../contracts/modules"
 

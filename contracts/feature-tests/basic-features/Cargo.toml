@@ -16,7 +16,7 @@ path = "../../../framework/base"
 version = "0.38.0"
 path = "../../../framework/debug"
 
-[dependencies.elrond-wasm-modules]
+[dependencies.mx-sc-modules]
 version = "0.38.0"
 path = "../../../contracts/modules"
 

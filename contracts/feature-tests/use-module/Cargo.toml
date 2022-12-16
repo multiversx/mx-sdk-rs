@@ -8,7 +8,7 @@ publish = false
 [lib]
 path = "src/use_module.rs"
 
-[dependencies.elrond-wasm-modules]
+[dependencies.mx-sc-modules]
 version = "0.38.0"
 path = "../../../contracts/modules"
 

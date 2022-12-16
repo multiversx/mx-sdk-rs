@@ -3,11 +3,11 @@
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
-use elrond_wasm_modules::{
+use function_selector::FunctionSelector;
+use mx_sc_modules::{
     bonding_curve,
     bonding_curve::utils::{events, owner_endpoints, storage, user_endpoints},
 };
-use function_selector::FunctionSelector;
 pub mod function_selector;
 
 #[elrond_wasm::contract]

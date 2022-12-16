@@ -18,7 +18,7 @@ static WRONG_NUMBER_OF_DECIMALS_ERROR: &[u8] = b"wrong number of decimals";
 
 #[elrond_wasm::contract]
 pub trait PriceAggregator:
-    elrond_wasm_modules::pause::PauseModule + staking::StakingModule + events::EventsModule
+    mx_sc_modules::pause::PauseModule + staking::StakingModule + events::EventsModule
 {
     #[init]
     fn init(

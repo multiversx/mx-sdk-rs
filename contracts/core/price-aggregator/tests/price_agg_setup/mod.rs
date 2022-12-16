@@ -6,7 +6,7 @@ use elrond_wasm_debug::{
     tx_mock::TxResult,
     DebugApi,
 };
-use elrond_wasm_modules::pause::PauseModule;
+use mx_sc_modules::pause::PauseModule;
 
 pub const NR_ORACLES: usize = 4;
 pub const SUBMISSION_COUNT: usize = 3;

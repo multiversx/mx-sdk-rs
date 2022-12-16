@@ -14,11 +14,11 @@ use elrond_interact_snippets::{
     erdrs::interactors::wallet::Wallet,
     tokio, Interactor,
 };
-use elrond_wasm_modules::dns::ProxyTrait as _;
 use multisig::{
     multisig_perform::ProxyTrait as _, multisig_propose::ProxyTrait as _,
     multisig_state::ProxyTrait as _, ProxyTrait as _,
 };
+use mx_sc_modules::dns::ProxyTrait as _;
 use std::{
     env::Args,
     io::{Read, Write},

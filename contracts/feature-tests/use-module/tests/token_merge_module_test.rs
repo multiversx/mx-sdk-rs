@@ -9,7 +9,7 @@ use elrond_wasm_debug::{
     managed_address, managed_biguint, managed_token_id, rust_biguint,
     testing_framework::BlockchainStateWrapper, tx_mock::TxTokenTransfer,
 };
-use elrond_wasm_modules::token_merge::{
+use mx_sc_modules::token_merge::{
     merged_token_instances::MergedTokenInstances, merged_token_setup::MergedTokenSetupModule,
 };
 use use_module::token_merge_mod_impl::{CustomAttributes, TokenMergeModImpl};

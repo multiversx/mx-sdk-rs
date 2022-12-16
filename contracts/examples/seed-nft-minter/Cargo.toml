@@ -12,7 +12,7 @@ path = "src/seed_nft_minter.rs"
 version = "0.38.0"
 path = "../../../framework/base"
 
-[dependencies.elrond-wasm-modules]
+[dependencies.mx-sc-modules]
 version = "0.38.0"
 path = "../../../contracts/modules"
 
