@@ -55,8 +55,6 @@ cd elrond-codec-derive
 cargo publish || return 1
 cd ..
 
-sleep 20
-
 cd elrond-codec
 cargo publish || return 1
 cd ..
@@ -64,8 +62,6 @@ cd ..
 cd elrond-wasm-derive
 cargo publish || return 1
 cd ..
-
-sleep 20
 
 cd elrond-wasm
 cargo publish || return 1
