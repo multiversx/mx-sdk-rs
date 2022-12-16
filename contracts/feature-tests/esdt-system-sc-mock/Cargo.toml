@@ -10,8 +10,8 @@ path = "src/esdt_system_sc_mock.rs"
 
 [dependencies.elrond-wasm]
 version = "0.38.0"
-path = "../../../elrond-wasm"
+path = "../../../framework/base"
 
 [dev-dependencies.elrond-wasm-debug]
 version = "0.38.0"
-path = "../../../elrond-wasm-debug"
+path = "../../../framework/debug"

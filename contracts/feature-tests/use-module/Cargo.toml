@@ -10,13 +10,13 @@ path = "src/use_module.rs"
 
 [dependencies.elrond-wasm-modules]
 version = "0.38.0"
-path = "../../../elrond-wasm-modules"
+path = "../../../contracts/modules"
 
 [dependencies.elrond-wasm]
 version = "0.38.0"
-path = "../../../elrond-wasm"
+path = "../../../framework/base"
 features = [ "alloc" ]
 
 [dev-dependencies.elrond-wasm-debug]
 version = "0.38.0"
-path = "../../../elrond-wasm-debug"
+path = "../../../framework/debug"

@@ -7,7 +7,7 @@ publish = false
 
 [dependencies.elrond-wasm]
 version = "0.38.0"
-path = "../../../elrond-wasm"
+path = "../../../framework/base"
 features = [ "alloc" ]
 
 [dependencies.adder]
@@ -18,7 +18,7 @@ path = "../../feature-tests/basic-features"
 
 [dev-dependencies.elrond-wasm-debug]
 version = "0.38.0"
-path = "../../../elrond-wasm-debug"
+path = "../../../framework/debug"
 
 [dev-dependencies]
 num-bigint = "0.4.2"

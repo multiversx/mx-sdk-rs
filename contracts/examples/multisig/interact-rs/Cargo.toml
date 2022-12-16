@@ -14,8 +14,8 @@ path = ".."
 
 [dependencies.elrond-wasm-modules]
 version = "0.38.0"
-path = "../../../../elrond-wasm-modules"
+path = "../../../../contracts/modules"
 
 [dependencies.elrond-interact-snippets]
 version = "0.38.0"
-path = "../../../../elrond-interact-snippets"
+path = "../../../../framework/interact-snippets"

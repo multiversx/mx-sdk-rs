@@ -26,5 +26,5 @@ env_logger = "0.8.4"
 
 [dependencies.elrond-wasm-debug]
 version = "=0.38.0"
-path = "../elrond-wasm-debug"
+path = "../debug"
 

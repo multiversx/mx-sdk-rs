@@ -2,15 +2,16 @@
 resolver = "2"
 
 members = [
-  "elrond-wasm",
-  "elrond-wasm-debug",
-  "elrond-wasm-derive",
-  "elrond-wasm-node",
-  "elrond-wasm-modules",
-  "mandos",
-  "elrond-codec",
-  "elrond-codec-derive",
-  "elrond-interact-snippets",
+  "framework/base",
+  "framework/debug",
+  "framework/derive",
+  "framework/wasm-adapter",
+  "framework/mandos",
+  "framework/codec",
+  "framework/codec-derive",
+  "framework/interact-snippets",
+
+  "contracts/modules",
 
   "contracts/benchmarks/mappers/benchmark-common",
   "contracts/benchmarks/mappers/linked-list-repeat",

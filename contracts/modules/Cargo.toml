@@ -18,4 +18,4 @@ alloc = ["elrond-wasm/alloc"]
 
 [dependencies.elrond-wasm]
 version = "0.38.0"
-path = "../elrond-wasm"
+path = "../../framework/base"
