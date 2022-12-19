@@ -1,4 +1,6 @@
-use mx_sc_codec::{
+use mx_sc_codec as codec;
+
+use codec::{
     test_util::{check_dep_encode_decode, check_top_encode_decode},
     top_decode_from_nested_or_handle_err, top_encode_from_nested, DecodeError, DecodeErrorHandler,
     EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode, NestedEncodeOutput,

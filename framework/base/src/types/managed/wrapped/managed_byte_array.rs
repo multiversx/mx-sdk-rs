@@ -3,13 +3,13 @@ use core::convert::TryFrom;
 use crate::{
     abi::{TypeAbi, TypeName},
     api::ManagedTypeApi,
+    codec::{
+        DecodeError, DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput,
+        NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
+        TryStaticCast,
+    },
     formatter::{hex_util::encode_bytes_as_hex, FormatByteReceiver, SCLowerHex},
     types::{ManagedBuffer, ManagedType},
-};
-use mx_sc_codec::{
-    DecodeError, DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput,
-    NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
-    TryStaticCast,
 };
 
 const DECODE_ERROR_BAD_LENGTH: &str = "bad array length";

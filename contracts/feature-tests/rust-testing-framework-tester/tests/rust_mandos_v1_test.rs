@@ -4,7 +4,7 @@ use num_traits::ToPrimitive;
 
 use basic_features::BasicFeatures;
 use mx_sc::{
-    mx_sc_codec::Empty,
+    codec::Empty,
     types::{Address, BigUint, EsdtLocalRole, EsdtTokenPayment, ManagedVec, TokenIdentifier},
 };
 use mx_sc_debug::{

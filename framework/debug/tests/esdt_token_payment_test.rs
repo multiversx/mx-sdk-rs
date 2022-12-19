@@ -1,5 +1,5 @@
 use mx_sc::{
-    mx_sc_codec::{self, DefaultErrorHandler, TopEncode},
+    codec::{self, DefaultErrorHandler, TopEncode},
     types::{BigUint, EsdtTokenPayment, TokenIdentifier},
 };
 use mx_sc_debug::DebugApi;
@@ -10,14 +10,14 @@ fn esdt_token_payment_backwards_compatible_top_decode_or_handle_err<I, H>(
     h: H,
 ) -> Result<EsdtTokenPayment<DebugApi>, H::HandledErr>
 where
-    I: mx_sc_codec::TopDecodeInput,
-    H: mx_sc_codec::DecodeErrorHandler,
+    I: codec::TopDecodeInput,
+    H: codec::DecodeErrorHandler,
 {
     let mut nested_buffer = top_input.into_nested_buffer();
     let result =
         EsdtTokenPayment::backwards_compatible_dep_decode_or_handle_err(&mut nested_buffer, h)?;
-    if !mx_sc_codec::NestedDecodeInput::is_depleted(&nested_buffer) {
-        return Err(h.handle_error(mx_sc_codec::DecodeError::INPUT_TOO_LONG));
+    if !codec::NestedDecodeInput::is_depleted(&nested_buffer) {
+        return Err(h.handle_error(codec::DecodeError::INPUT_TOO_LONG));
     }
     Ok(result)
 }
@@ -28,13 +28,13 @@ fn esdt_token_payment_regular_top_decode_or_handle_err<I, H>(
     h: H,
 ) -> Result<EsdtTokenPayment<DebugApi>, H::HandledErr>
 where
-    I: mx_sc_codec::TopDecodeInput,
-    H: mx_sc_codec::DecodeErrorHandler,
+    I: codec::TopDecodeInput,
+    H: codec::DecodeErrorHandler,
 {
     let mut nested_buffer = top_input.into_nested_buffer();
     let result = EsdtTokenPayment::regular_dep_decode_or_handle_err(&mut nested_buffer, h)?;
-    if !mx_sc_codec::NestedDecodeInput::is_depleted(&nested_buffer) {
-        return Err(h.handle_error(mx_sc_codec::DecodeError::INPUT_TOO_LONG));
+    if !codec::NestedDecodeInput::is_depleted(&nested_buffer) {
+        return Err(h.handle_error(codec::DecodeError::INPUT_TOO_LONG));
     }
     Ok(result)
 }

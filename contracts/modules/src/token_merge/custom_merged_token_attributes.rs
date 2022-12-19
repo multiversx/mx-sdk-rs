@@ -2,7 +2,7 @@ mx_sc::imports!();
 
 use core::marker::PhantomData;
 
-use mx_sc::mx_sc_codec::Empty;
+use mx_sc::codec::Empty;
 
 use super::merged_token_instances::MergedTokenInstances;
 

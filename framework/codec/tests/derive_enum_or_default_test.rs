@@ -1,7 +1,8 @@
 extern crate mx_sc_codec_derive;
+use mx_sc_codec as codec;
 use mx_sc_codec_derive::*;
 
-use mx_sc_codec::test_util::{check_top_decode, check_top_encode_decode};
+use codec::test_util::{check_top_decode, check_top_encode_decode};
 
 // to test, run the following command in mx-sc-codec folder:
 // cargo expand --test enum_or_default_derive_test > expanded.rs
@@ -22,13 +23,13 @@ enum EnumWithDefault {
     },
 }
 
-impl mx_sc_codec::EncodeDefault for EnumWithDefault {
+impl codec::EncodeDefault for EnumWithDefault {
     fn is_default(&self) -> bool {
         *self == EnumWithDefault::Basic(0)
     }
 }
 
-impl mx_sc_codec::DecodeDefault for EnumWithDefault {
+impl codec::DecodeDefault for EnumWithDefault {
     fn default() -> Self {
         EnumWithDefault::Basic(0)
     }

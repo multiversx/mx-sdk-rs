@@ -1,7 +1,7 @@
 #![feature(exhaustive_patterns)]
 
 use mx_sc::{
-    mx_sc_codec::{
+    codec::{
         multi_types::{MultiValue2, MultiValueVec, OptionalValue},
         PanicErrorHandler, TopDecodeMulti, TopDecodeMultiInput,
     },

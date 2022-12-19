@@ -3,13 +3,13 @@ use core::convert::{TryFrom, TryInto};
 use crate::{
     abi::{TypeAbi, TypeName},
     api::ManagedTypeApi,
+    codec::{
+        CodecFrom, CodecFromSelf, DecodeError, DecodeErrorHandler, EncodeErrorHandler,
+        NestedDecode, NestedDecodeInput, NestedEncode, NestedEncodeOutput, TopDecode,
+        TopDecodeInput, TopEncode, TopEncodeOutput, TryStaticCast,
+    },
     formatter::{hex_util::encode_bytes_as_hex, FormatByteReceiver, SCLowerHex},
     types::{heap::Address, ManagedBuffer, ManagedByteArray, ManagedType},
-};
-use mx_sc_codec::{
-    CodecFrom, CodecFromSelf, DecodeError, DecodeErrorHandler, EncodeErrorHandler, NestedDecode,
-    NestedDecodeInput, NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode,
-    TopEncodeOutput, TryStaticCast,
 };
 
 #[repr(transparent)]

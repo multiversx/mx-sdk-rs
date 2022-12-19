@@ -1,6 +1,6 @@
 use core::marker::PhantomData;
 
-use mx_sc_codec::{
+use crate::codec::{
     DecodeError, DecodeErrorHandler, EncodeError, EncodeErrorHandler, TopDecode, TopEncode,
 };
 

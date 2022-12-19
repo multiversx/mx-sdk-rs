@@ -1,4 +1,4 @@
-use mx_sc_codec::TopDecodeMulti;
+use crate::codec::TopDecodeMulti;
 
 use crate::{
     api::{BlockchainApiImpl, CallTypeApi},

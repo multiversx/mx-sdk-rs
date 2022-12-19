@@ -1,10 +1,12 @@
-use crate::abi::{TypeAbi, TypeName};
+use crate::{
+    abi::{TypeAbi, TypeName},
+    codec::*,
+};
 use alloc::{
     alloc::{alloc, alloc_zeroed, realloc, Layout},
     boxed::Box,
     vec::Vec,
 };
-use mx_sc_codec::*;
 
 /// Simple wrapper around a boxed byte slice,
 /// but with a lot of optimized methods for manipulating it.

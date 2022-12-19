@@ -6,7 +6,7 @@ use crate::{
 };
 use alloc::string::String;
 
-use mx_sc_codec::{
+use crate::codec::{
     CodecFromSelf, DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput,
     NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
     TryStaticCast,

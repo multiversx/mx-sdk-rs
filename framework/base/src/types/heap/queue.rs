@@ -1,6 +1,8 @@
-use crate::abi::{TypeAbi, TypeName};
+use crate::{
+    abi::{TypeAbi, TypeName},
+    codec::*,
+};
 use alloc::vec::Vec;
-use mx_sc_codec::*;
 
 /// A simple queue struct that is able to push and pop without moving elements.
 /// New items are pushed at the end, just like for a regular Vec.

@@ -4,7 +4,7 @@ use multisig::{
 };
 use mx_sc::{
     api::ManagedTypeApi,
-    mx_sc_codec::multi_types::OptionalValue,
+    codec::multi_types::OptionalValue,
     types::{Address, BigUint, BoxedBytes, CodeMetadata, ManagedBuffer, ManagedVec},
 };
 use mx_sc_debug::{

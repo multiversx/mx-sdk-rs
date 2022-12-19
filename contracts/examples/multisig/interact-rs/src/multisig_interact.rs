@@ -8,7 +8,7 @@ use mx_sc_snippets::{
     dns_address_for_name, env_logger,
     erdrs::interactors::wallet::Wallet,
     mx_sc::{
-        mx_sc_codec::multi_types::MultiValueVec,
+        codec::multi_types::MultiValueVec,
         storage::mappers::SingleValue,
         types::{Address, CodeMetadata},
     },

@@ -151,7 +151,7 @@ impl Address {
     }
 }
 
-use mx_sc_codec::*;
+use crate::codec::*;
 
 impl NestedEncode for Address {
     fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>
@@ -202,8 +202,8 @@ impl TypeAbi for Address {
 #[cfg(test)]
 mod address_tests {
     use super::*;
+    use crate::codec::test_util::{check_top_encode, check_top_encode_decode};
     use alloc::vec::Vec;
-    use mx_sc_codec::test_util::{check_top_encode, check_top_encode_decode};
 
     #[test]
     fn test_address() {

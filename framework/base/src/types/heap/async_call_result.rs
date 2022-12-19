@@ -1,10 +1,10 @@
 use crate::{
     abi::{TypeAbi, TypeName},
+    codec::{
+        DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti, TopDecodeMultiInput,
+        TopEncodeMulti, TopEncodeMultiOutput,
+    },
     types::heap::BoxedBytes,
-};
-use mx_sc_codec::{
-    DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti, TopDecodeMultiInput, TopEncodeMulti,
-    TopEncodeMultiOutput,
 };
 
 pub struct AsyncCallError {

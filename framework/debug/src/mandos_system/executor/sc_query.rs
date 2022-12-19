@@ -7,7 +7,7 @@ use crate::{
     DebugApi,
 };
 use mx_sc::{
-    mx_sc_codec::{CodecFrom, PanicErrorHandler, TopEncodeMulti},
+    codec::{CodecFrom, PanicErrorHandler, TopEncodeMulti},
     types::ContractCall,
 };
 

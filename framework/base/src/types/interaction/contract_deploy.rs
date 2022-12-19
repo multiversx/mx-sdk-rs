@@ -1,6 +1,6 @@
 use core::marker::PhantomData;
 
-use mx_sc_codec::{CodecFrom, TopEncodeMulti};
+use crate::codec::{CodecFrom, TopEncodeMulti};
 
 use crate::{
     api::{BlockchainApiImpl, CallTypeApi},

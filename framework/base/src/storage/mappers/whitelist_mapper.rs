@@ -3,10 +3,10 @@ use core::marker::PhantomData;
 use super::{SingleValueMapper, StorageMapper};
 use crate::{
     api::{ErrorApiImpl, StorageMapperApi},
+    codec::NestedEncode,
     storage::StorageKey,
     types::ManagedAddress,
 };
-use mx_sc_codec::NestedEncode;
 
 type FlagMapper<SA> = SingleValueMapper<SA, bool>;
 

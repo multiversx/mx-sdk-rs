@@ -1,11 +1,11 @@
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
     api::ManagedTypeApi,
+    codec::{
+        DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti, TopDecodeMultiInput,
+        TopEncodeMulti, TopEncodeMultiOutput, Vec,
+    },
     types::ManagedType,
-};
-use mx_sc_codec::{
-    DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti, TopDecodeMultiInput, TopEncodeMulti,
-    TopEncodeMultiOutput, Vec,
 };
 
 use crate::types::{ManagedVec, ManagedVecItem, ManagedVecRefIterator};

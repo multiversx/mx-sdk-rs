@@ -4,16 +4,16 @@ use super::{StorageClearable, StorageMapper};
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
     api::StorageMapperApi,
+    codec::{
+        self, multi_encode_iter_or_handle_err,
+        mx_sc_codec_derive::{TopDecode, TopDecodeOrDefault, TopEncode, TopEncodeOrDefault},
+        CodecFrom, DecodeDefault, EncodeDefault, EncodeErrorHandler, TopDecode, TopEncode,
+        TopEncodeMulti, TopEncodeMultiOutput,
+    },
     storage::{storage_get, storage_set, StorageKey},
     types::{ManagedType, MultiValueEncoded},
 };
 use alloc::vec::Vec;
-use mx_sc_codec::{
-    multi_encode_iter_or_handle_err,
-    mx_sc_codec_derive::{TopDecode, TopDecodeOrDefault, TopEncode, TopEncodeOrDefault},
-    CodecFrom, DecodeDefault, EncodeDefault, EncodeErrorHandler, TopDecode, TopEncode,
-    TopEncodeMulti, TopEncodeMultiOutput,
-};
 
 const NULL_ENTRY: u32 = 0;
 const INFO_IDENTIFIER: &[u8] = b".info";
@@ -149,7 +149,7 @@ where
         storage_set(
             self.build_node_id_named_key(NODE_IDENTIFIER, node_id)
                 .as_ref(),
-            &mx_sc_codec::Empty,
+            &codec::Empty,
         );
     }
 
@@ -179,7 +179,7 @@ where
         storage_set(
             self.build_node_id_named_key(VALUE_IDENTIFIER, node_id)
                 .as_ref(),
-            &mx_sc_codec::Empty,
+            &codec::Empty,
         )
     }
 

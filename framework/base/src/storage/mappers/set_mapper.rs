@@ -5,12 +5,12 @@ use super::{QueueMapper, StorageClearable, StorageMapper};
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
     api::StorageMapperApi,
+    codec::{
+        self, multi_encode_iter_or_handle_err, CodecFrom, EncodeErrorHandler, NestedDecode,
+        NestedEncode, TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
+    },
     storage::{storage_get, storage_set, StorageKey},
     types::{ManagedType, MultiValueEncoded},
-};
-use mx_sc_codec::{
-    multi_encode_iter_or_handle_err, CodecFrom, EncodeErrorHandler, NestedDecode, NestedEncode,
-    TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
 };
 
 const NULL_ENTRY: u32 = 0;
@@ -84,7 +84,7 @@ where
         storage_set(
             self.build_named_value_key(NODE_ID_IDENTIFIER, value)
                 .as_ref(),
-            &mx_sc_codec::Empty,
+            &codec::Empty,
         );
     }
 

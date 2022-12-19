@@ -1,9 +1,9 @@
 use crate::{
     abi::{TypeAbi, TypeName},
+    codec::*,
     formatter::{hex_util, FormatByteReceiver, SCBinary, SCDisplay, SCLowerHex},
 };
 use bitflags::bitflags;
-use mx_sc_codec::*;
 
 const UPGRADEABLE_STRING: &[u8] = b"Upgradeable";
 const READABLE_STRING: &[u8] = b"Readable";

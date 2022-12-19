@@ -1,10 +1,10 @@
 use crate::{
     api::{ErrorApi, ManagedTypeApi, StorageWriteApi, StorageWriteApiImpl},
+    codec::*,
     contract_base::ExitCodecErrorHandler,
     err_msg,
     types::{BigInt, BigUint, ManagedBuffer, ManagedBufferCachedBuilder, ManagedRef, ManagedType},
 };
-use mx_sc_codec::*;
 
 use super::StorageKey;
 

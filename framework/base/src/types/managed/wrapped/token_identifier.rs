@@ -1,10 +1,10 @@
 use crate::{
     abi::{TypeAbi, TypeName},
     api::{HandleConstraints, ManagedTypeApi, ManagedTypeApiImpl},
+    codec::*,
     formatter::{FormatByteReceiver, SCDisplay, SCLowerHex},
     types::{ManagedBuffer, ManagedType},
 };
-use mx_sc_codec::*;
 
 use super::EgldOrEsdtTokenIdentifier;
 

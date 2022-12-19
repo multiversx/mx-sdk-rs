@@ -1,5 +1,10 @@
 use crate::{
     api::{ErrorApi, ManagedTypeApi},
+    codec::{
+        DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode,
+        NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeMultiOutput,
+        TopEncodeOutput,
+    },
     contract_base::ExitCodecErrorHandler,
     err_msg,
     types::{
@@ -8,11 +13,6 @@ use crate::{
     },
 };
 use alloc::vec::Vec;
-use mx_sc_codec::{
-    DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode,
-    NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeMultiOutput,
-    TopEncodeOutput,
-};
 
 #[derive(Debug, Default)]
 #[repr(transparent)]

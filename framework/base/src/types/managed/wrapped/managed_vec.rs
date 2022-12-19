@@ -1,6 +1,11 @@
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
     api::{ErrorApiImpl, InvalidSliceError, ManagedTypeApi},
+    codec::{
+        DecodeErrorHandler, EncodeErrorHandler, IntoMultiValue, NestedDecode, NestedDecodeInput,
+        NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode,
+        TopEncodeMultiOutput, TopEncodeOutput,
+    },
     types::{
         heap::{ArgBuffer, BoxedBytes},
         ManagedBuffer, ManagedBufferNestedDecodeInput, ManagedType, ManagedVecItem, ManagedVecRef,
@@ -9,11 +14,6 @@ use crate::{
 };
 use alloc::vec::Vec;
 use core::{borrow::Borrow, iter::FromIterator, marker::PhantomData};
-use mx_sc_codec::{
-    DecodeErrorHandler, EncodeErrorHandler, IntoMultiValue, NestedDecode, NestedDecodeInput,
-    NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeMultiOutput,
-    TopEncodeOutput,
-};
 
 pub(crate) const INDEX_OUT_OF_RANGE_MSG: &[u8] = b"ManagedVec index out of range";
 

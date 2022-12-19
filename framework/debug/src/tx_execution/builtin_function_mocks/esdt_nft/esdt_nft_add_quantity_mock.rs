@@ -1,7 +1,7 @@
 use crate::num_bigint::BigUint;
 use mx_sc::{
     api::ESDT_NFT_ADD_QUANTITY_FUNC_NAME,
-    mx_sc_codec::{top_encode_to_vec_u8, TopDecode},
+    codec::{top_encode_to_vec_u8, TopDecode},
 };
 
 use crate::{

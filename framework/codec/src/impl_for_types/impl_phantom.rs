@@ -59,7 +59,7 @@ impl<T> NestedDecode for PhantomData<T> {
 
 #[cfg(test)]
 pub mod tests {
-    use crate as mx_sc_codec;
+    use crate as codec;
     use crate::test_util::{check_dep_encode_decode, check_top_encode_decode};
     use core::marker::PhantomData;
     use mx_sc_codec_derive::{NestedDecode, NestedEncode, TopDecode, TopEncode};

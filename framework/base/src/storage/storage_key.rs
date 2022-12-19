@@ -1,10 +1,10 @@
 use crate::{
     api::{ErrorApi, ManagedTypeApi},
+    codec::*,
     contract_base::ExitCodecErrorHandler,
     types::{heap::BoxedBytes, ManagedBuffer, ManagedByteArray, ManagedType},
     *,
 };
-use mx_sc_codec::*;
 
 pub struct StorageKey<A>
 where

@@ -1,5 +1,5 @@
+use crate::codec::{EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput, TryStaticCast};
 use alloc::{string::String, vec::Vec};
-use mx_sc_codec::{EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput, TryStaticCast};
 
 use crate::{
     api::{EndpointFinishApi, ErrorApi, ErrorApiImpl, ManagedTypeApi},

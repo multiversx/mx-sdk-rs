@@ -157,7 +157,7 @@ impl H256 {
     }
 }
 
-use mx_sc_codec::*;
+use crate::codec::*;
 
 impl NestedEncode for H256 {
     fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, _h: H) -> Result<(), H::HandledErr>
@@ -233,8 +233,8 @@ impl TypeAbi for H256 {
 #[cfg(test)]
 mod h256_tests {
     use super::*;
+    use crate::codec::test_util::{check_top_encode, check_top_encode_decode};
     use alloc::vec::Vec;
-    use mx_sc_codec::test_util::{check_top_encode, check_top_encode_decode};
 
     #[test]
     fn test_h256_from_array() {

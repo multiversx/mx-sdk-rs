@@ -1,4 +1,4 @@
-use mx_sc_codec::TryStaticCast;
+use crate::codec::TryStaticCast;
 
 mod big_float_api_uncallable;
 mod big_int_api_uncallable;

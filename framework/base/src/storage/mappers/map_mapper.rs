@@ -4,12 +4,12 @@ use super::{set_mapper, SetMapper, StorageClearable, StorageMapper};
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
     api::StorageMapperApi,
+    codec::{
+        multi_encode_iter_or_handle_err, multi_types::MultiValue2, CodecFrom, EncodeErrorHandler,
+        NestedDecode, NestedEncode, TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
+    },
     storage::{storage_clear, storage_get, storage_set, StorageKey},
     types::{ManagedType, MultiValueEncoded},
-};
-use mx_sc_codec::{
-    multi_encode_iter_or_handle_err, multi_types::MultiValue2, CodecFrom, EncodeErrorHandler,
-    NestedDecode, NestedEncode, TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
 };
 
 const MAPPED_VALUE_IDENTIFIER: &[u8] = b".mapped";

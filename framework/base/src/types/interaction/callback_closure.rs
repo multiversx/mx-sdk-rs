@@ -1,15 +1,16 @@
 use crate::{
     api::{BlockchainApi, ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi},
+    codec::{
+        self,
+        mx_sc_codec_derive::{TopDecode, TopEncode},
+        TopEncodeMulti,
+    },
     contract_base::{BlockchainWrapper, ExitCodecErrorHandler, ManagedSerializer},
     err_msg,
     io::ManagedResultArgLoader,
     storage::StorageKey,
     storage_clear, storage_get, storage_set,
     types::{ManagedBuffer, ManagedType},
-};
-use mx_sc_codec::{
-    mx_sc_codec_derive::{TopDecode, TopEncode},
-    TopEncodeMulti,
 };
 
 use super::ManagedArgBuffer;

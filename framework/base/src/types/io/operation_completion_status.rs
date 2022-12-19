@@ -1,9 +1,9 @@
 use crate::{
     abi::{TypeAbi, TypeName},
     api::ManagedTypeApi,
+    codec::{CodecFrom, EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput},
     types::ManagedBuffer,
 };
-use mx_sc_codec::{CodecFrom, EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput};
 
 /// Standard way of signalling that an operation was interrupted early, before running out of gas.
 /// An endpoint that performs a longer operation can check from time to time if it is running low

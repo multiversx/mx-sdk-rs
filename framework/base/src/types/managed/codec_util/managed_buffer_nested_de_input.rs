@@ -1,6 +1,6 @@
 use core::marker::PhantomData;
 
-use mx_sc_codec::{
+use crate::codec::{
     try_execute_then_cast, DecodeError, DecodeErrorHandler, NestedDecode, NestedDecodeInput,
     TryStaticCast,
 };

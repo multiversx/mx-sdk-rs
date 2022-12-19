@@ -1,4 +1,4 @@
-use mx_sc_codec::{multi_types::IgnoreValue, TopDecodeMulti, TopEncodeMulti};
+use crate::codec::{multi_types::IgnoreValue, TopDecodeMulti, TopEncodeMulti};
 
 use crate::{
     api::CallTypeApi, contract_base::ExitCodecErrorHandler, err_msg, types::ManagedBuffer,
