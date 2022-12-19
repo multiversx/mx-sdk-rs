@@ -36,7 +36,7 @@ fn world() -> BlockchainMock {
     blockchain.register_contract("file:output/use-module.wasm", use_module::ContractBuilder);
 
     blockchain.register_contract(
-        "file:test-wasm/mx-sc-sc-dns.wasm",
+        "file:test-wasm/elrond-wasm-sc-dns.wasm",
         dns_mock::ContractBuilder,
     );
 
@@ -86,11 +86,12 @@ fn use_module_pause_rs() {
     mx_sc_debug::mandos_rs("mandos/use_module_pause.scen.json", world());
 }
 
-// Will not work in mandos-rs, since there is no gas usage
-// #[test]
-// fn use_module_ongoing_operation_rs() {
-//     mx_sc_debug::mandos_rs(
-//         "mandos/use_module_ongoing_operation_example.scen.json",
-//         world(),
-//     );
-// }
+/// Will not work in mandos-rs, since there is no gas usage
+#[test]
+#[ignore]
+fn use_module_ongoing_operation_rs() {
+    mx_sc_debug::mandos_rs(
+        "mandos/use_module_ongoing_operation_example.scen.json",
+        world(),
+    );
+}

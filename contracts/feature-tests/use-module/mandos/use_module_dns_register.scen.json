@@ -20,7 +20,7 @@
                     "storage": {
                         "str:registration_cost": "1000"
                     },
-                    "code": "file:../test-wasm/mx-sc-sc-dns.wasm"
+                    "code": "file:../test-wasm/elrond-wasm-sc-dns.wasm"
                 }
             }
         },
