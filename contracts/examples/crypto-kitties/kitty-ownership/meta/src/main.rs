@@ -1,3 +1,3 @@
 fn main() {
-    mx_sc_meta::perform::<kitty_ownership::AbiProvider>();
+    mx_sc_meta::cli_main::<kitty_ownership::AbiProvider>();
 }

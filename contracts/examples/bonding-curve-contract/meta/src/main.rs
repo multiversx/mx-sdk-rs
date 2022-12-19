@@ -1,3 +1,3 @@
 fn main() {
-    mx_sc_meta::perform::<bonding_curve_contract::AbiProvider>();
+    mx_sc_meta::cli_main::<bonding_curve_contract::AbiProvider>();
 }

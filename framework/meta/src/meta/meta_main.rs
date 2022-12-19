@@ -7,7 +7,7 @@ use super::{
 
 static SNIPPETS_OVERWRITE_FLAG_NAME: &str = "--overwrite";
 
-pub fn perform<AbiObj: ContractAbiProvider>() {
+pub fn cli_main<AbiObj: ContractAbiProvider>() {
     let original_contract_abi = <AbiObj as ContractAbiProvider>::abi();
     super::meta_validate_abi::validate_abi(&original_contract_abi).unwrap();
 

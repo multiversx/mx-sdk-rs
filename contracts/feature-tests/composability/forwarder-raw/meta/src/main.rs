@@ -1,3 +1,3 @@
 fn main() {
-    mx_sc_meta::perform::<forwarder_raw::AbiProvider>();
+    mx_sc_meta::cli_main::<forwarder_raw::AbiProvider>();
 }

@@ -1,3 +1,3 @@
 fn main() {
-    mx_sc_meta::perform::<vault::AbiProvider>();
+    mx_sc_meta::cli_main::<vault::AbiProvider>();
 }

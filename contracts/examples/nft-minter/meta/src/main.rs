@@ -1,3 +1,3 @@
 fn main() {
-    mx_sc_meta::perform::<nft_minter::AbiProvider>();
+    mx_sc_meta::cli_main::<nft_minter::AbiProvider>();
 }

@@ -1,3 +1,3 @@
 fn main() {
-    mx_sc_meta::perform::<formatted_message_features::AbiProvider>();
+    mx_sc_meta::cli_main::<formatted_message_features::AbiProvider>();
 }

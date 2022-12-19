@@ -1,3 +1,3 @@
 fn main() {
-    mx_sc_meta::perform::<lottery_erc20::AbiProvider>();
+    mx_sc_meta::cli_main::<lottery_erc20::AbiProvider>();
 }

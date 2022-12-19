@@ -1,3 +1,3 @@
 fn main() {
-    mx_sc_meta::perform::<vec_repeat::AbiProvider>();
+    mx_sc_meta::cli_main::<vec_repeat::AbiProvider>();
 }

@@ -1,3 +1,3 @@
 fn main() {
-    mx_sc_meta::perform::<multisig::AbiProvider>();
+    mx_sc_meta::cli_main::<multisig::AbiProvider>();
 }

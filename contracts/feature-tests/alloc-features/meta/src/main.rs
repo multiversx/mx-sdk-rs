@@ -1,3 +1,3 @@
 fn main() {
-    mx_sc_meta::perform::<alloc_features::AbiProvider>();
+    mx_sc_meta::cli_main::<alloc_features::AbiProvider>();
 }

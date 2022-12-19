@@ -1,3 +1,3 @@
 fn main() {
-    mx_sc_meta::perform::<queue_repeat::AbiProvider>();
+    mx_sc_meta::cli_main::<queue_repeat::AbiProvider>();
 }
