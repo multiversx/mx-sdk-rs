@@ -1,6 +1,6 @@
 use mx_sc::{
     codec,
-    codec::mx_sc_codec_derive::{NestedDecode, NestedEncode, TopDecode, TopEncode},
+    codec::derive::{NestedDecode, NestedEncode, TopDecode, TopEncode},
     derive::ManagedVecItem,
 };
 

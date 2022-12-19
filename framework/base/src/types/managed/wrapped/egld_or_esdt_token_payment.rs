@@ -5,7 +5,7 @@ use crate::{
 
 use crate::codec::{
     self,
-    mx_sc_codec_derive::{NestedDecode, NestedEncode, TopDecode, TopEncode},
+    derive::{NestedDecode, NestedEncode, TopDecode, TopEncode},
     CodecFrom, CodecFromSelf,
 };
 

@@ -6,7 +6,7 @@ use crate::{
     api::StorageMapperApi,
     codec::{
         self,
-        mx_sc_codec_derive::{
+        derive::{
             NestedDecode, NestedEncode, TopDecode, TopDecodeOrDefault, TopEncode,
             TopEncodeOrDefault,
         },

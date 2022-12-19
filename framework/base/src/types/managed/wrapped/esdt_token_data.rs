@@ -2,7 +2,7 @@ use crate::{
     api::ManagedTypeApi,
     codec,
     codec::{
-        mx_sc_codec_derive::{NestedDecode, NestedEncode, TopDecode, TopEncode},
+        derive::{NestedDecode, NestedEncode, TopDecode, TopEncode},
         *,
     },
     contract_base::ExitCodecErrorHandler,
