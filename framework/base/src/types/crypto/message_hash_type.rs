@@ -1,7 +1,7 @@
 use crate::{
     abi::{TypeAbi, TypeName},
     codec,
-    codec::mx_sc_codec_derive::{NestedDecode, NestedEncode, TopDecode, TopEncode},
+    codec::derive::{NestedDecode, NestedEncode, TopDecode, TopEncode},
 };
 
 /// Message hash type for the `verifyCustomSecp256k1` CryptoApi function

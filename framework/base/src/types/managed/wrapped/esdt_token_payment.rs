@@ -7,7 +7,7 @@ use crate as mx_sc; // needed by the codec and TypeAbi generated code
 use crate::{
     codec::{
         self,
-        mx_sc_codec_derive::{NestedEncode, TopEncode},
+        derive::{NestedEncode, TopEncode},
         IntoMultiValue, NestedDecode, TopDecode,
     },
     derive::TypeAbi,

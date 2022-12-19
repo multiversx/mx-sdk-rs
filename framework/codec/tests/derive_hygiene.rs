@@ -1,6 +1,5 @@
 #![allow(dead_code)]
 
-extern crate mx_sc_codec_derive;
 use mx_sc_codec as codec;
 use mx_sc_codec_derive::*;
 

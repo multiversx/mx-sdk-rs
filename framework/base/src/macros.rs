@@ -45,7 +45,7 @@ macro_rules! derive_imports {
     () => {
         use mx_sc::{
             codec,
-            codec::mx_sc_codec_derive::{
+            codec::derive::{
                 NestedDecode, NestedEncode, TopDecode, TopDecodeOrDefault, TopEncode,
                 TopEncodeOrDefault,
             },

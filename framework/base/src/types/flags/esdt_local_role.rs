@@ -1,6 +1,6 @@
 use crate::{
     codec,
-    codec::mx_sc_codec_derive::{NestedDecode, NestedEncode, TopDecode, TopEncode},
+    codec::derive::{NestedDecode, NestedEncode, TopDecode, TopEncode},
 };
 
 use super::EsdtLocalRoleFlags;
