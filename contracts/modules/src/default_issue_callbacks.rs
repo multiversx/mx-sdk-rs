@@ -1,7 +1,7 @@
-elrond_wasm::imports!();
+mx_sc::imports!();
 
 // Always keep in sync with the token-related storage mappers. Only modify if really necessary.
-#[elrond_wasm::module]
+#[mx_sc::module]
 pub trait DefaultIssueCallbacksModule {
     #[callback]
     fn default_issue_cb(

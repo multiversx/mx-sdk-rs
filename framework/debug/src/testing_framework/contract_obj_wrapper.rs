@@ -1,8 +1,8 @@
 use std::{collections::HashMap, path::PathBuf, rc::Rc, str::FromStr};
 
-use elrond_wasm::{
+use mx_sc::{
     contract_base::{CallableContract, ContractBase},
-    elrond_codec::{TopDecode, TopEncode},
+    mx_sc_codec::{TopDecode, TopEncode},
     types::{
         heap::{Address, H256},
         EsdtLocalRole,

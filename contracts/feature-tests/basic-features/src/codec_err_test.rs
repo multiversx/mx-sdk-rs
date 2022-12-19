@@ -1,11 +1,11 @@
-elrond_wasm::imports!();
+mx_sc::imports!();
 use crate::types::CodecErrorTestType;
 
 mod encode_err_proxy {
-    elrond_wasm::imports!();
+    mx_sc::imports!();
     use crate::types::CodecErrorTestType;
 
-    #[elrond_wasm::proxy]
+    #[mx_sc::proxy]
     pub trait EncodeErrorProxy {
         #[init]
         fn init(&self, error_arg: CodecErrorTestType);
@@ -16,7 +16,7 @@ mod encode_err_proxy {
 }
 
 /// Test various serialization errors.
-#[elrond_wasm::module]
+#[mx_sc::module]
 pub trait CodecErrorTest {
     #[endpoint]
     fn codec_err_finish(&self) -> CodecErrorTestType {

@@ -1,6 +1,6 @@
 use adder::*;
-use elrond_wasm::storage::mappers::SingleValue;
-use elrond_wasm_debug::{mandos_system::model::*, num_bigint::BigUint, *};
+use mx_sc::storage::mappers::SingleValue;
+use mx_sc_debug::{mandos_system::model::*, num_bigint::BigUint, *};
 
 fn world() -> BlockchainMock {
     let mut blockchain = BlockchainMock::new();

@@ -51,9 +51,9 @@ fn generate_callback_proxy_method(
         fn #method_name(
             self,
             #(#arg_decl),*
-        ) -> elrond_wasm::types::CallbackClosure<Self::Api> {
+        ) -> mx_sc::types::CallbackClosure<Self::Api> {
             let mut ___callback_call___ =
-                elrond_wasm::types::new_callback_call::<Self::Api>(#cb_name_literal);
+                mx_sc::types::new_callback_call::<Self::Api>(#cb_name_literal);
             #(#cb_arg_push_snippets)*
             ___callback_call___
         }
@@ -79,11 +79,11 @@ pub fn generate_callback_proxies_object(methods: &[Method]) -> proc_macro2::Toke
     quote! {
         #callback_proxy_object_def
 
-        pub trait CallbackProxy: elrond_wasm::contract_base::CallbackProxyObjBase + Sized {
+        pub trait CallbackProxy: mx_sc::contract_base::CallbackProxyObjBase + Sized {
             #(#proxy_methods)*
         }
 
-        impl<A> self::CallbackProxy for CallbackProxyObj<A> where A: elrond_wasm::api::VMApi + 'static {}
+        impl<A> self::CallbackProxy for CallbackProxyObj<A> where A: mx_sc::api::VMApi + 'static {}
     }
 }
 
@@ -103,7 +103,7 @@ pub fn generate_callback_proxies(
             },
             quote! {
                 fn callbacks(&self) -> self::CallbackProxyObj<Self::Api> {
-                    <self::CallbackProxyObj::<Self::Api> as elrond_wasm::contract_base::CallbackProxyObjBase>::new_cb_proxy_obj()
+                    <self::CallbackProxyObj::<Self::Api> as mx_sc::contract_base::CallbackProxyObjBase>::new_cb_proxy_obj()
                 }
             },
             generate_callback_proxies_object(contract.methods.as_slice()),

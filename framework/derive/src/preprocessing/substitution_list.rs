@@ -16,11 +16,11 @@ fn add_managed_type(substitutions: &mut SubstitutionsMap, type_name: &proc_macro
         quote!(#type_name<Self::Api>));
     substitutions.add_substitution(
         quote!(#type_name::),
-        quote!(elrond_wasm::types::#type_name::<Self::Api>::),
+        quote!(mx_sc::types::#type_name::<Self::Api>::),
     );
     substitutions.add_substitution(
         quote!(#type_name),
-        quote!(elrond_wasm::types::#type_name<Self::Api>),
+        quote!(mx_sc::types::#type_name<Self::Api>),
     );
 }
 

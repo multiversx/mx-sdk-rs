@@ -1,10 +1,10 @@
 use std::marker::PhantomData;
 
-use elrond_wasm::{
-    elrond_codec::{CodecFrom, TopEncodeMulti},
+use mandos::interpret_trait::{InterpretableFrom, InterpreterContext};
+use mx_sc::{
+    mx_sc_codec::{CodecFrom, TopEncodeMulti},
     types::{Address, CodeMetadata},
 };
-use mandos::interpret_trait::{InterpretableFrom, InterpreterContext};
 
 use crate::mandos_system::model::{
     AddressValue, BigUintValue, BytesValue, TxDeploy, TxExpect, U64Value,

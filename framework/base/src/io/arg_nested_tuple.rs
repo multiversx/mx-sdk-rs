@@ -8,7 +8,7 @@ use crate::{
     err_msg,
     io::{ArgErrorHandler, ArgId},
 };
-use elrond_codec::{DecodeError, TopDecodeMulti, TopDecodeMultiInput};
+use mx_sc_codec::{DecodeError, TopDecodeMulti, TopDecodeMultiInput};
 
 /// Argument count cannot change during execution, and it can get queried multiple times,
 /// so it makes sense to save it statically.

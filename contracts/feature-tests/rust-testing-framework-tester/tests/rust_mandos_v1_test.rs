@@ -3,11 +3,11 @@ use forwarder::call_sync::*;
 use num_traits::ToPrimitive;
 
 use basic_features::BasicFeatures;
-use elrond_wasm::{
-    elrond_codec::Empty,
+use mx_sc::{
+    mx_sc_codec::Empty,
     types::{Address, BigUint, EsdtLocalRole, EsdtTokenPayment, ManagedVec, TokenIdentifier},
 };
-use elrond_wasm_debug::{
+use mx_sc_debug::{
     assert_values_eq, managed_address, managed_biguint, managed_buffer, managed_token_id,
     rust_biguint, testing_framework::*, tx_mock::TxTokenTransfer, DebugApi,
 };

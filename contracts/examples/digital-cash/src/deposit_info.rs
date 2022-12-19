@@ -1,9 +1,9 @@
-use elrond_wasm::{
+use mx_sc::{
     api::ManagedTypeApi,
     types::{BigUint, EgldOrEsdtTokenIdentifier, ManagedAddress},
 };
 
-elrond_wasm::derive_imports!();
+mx_sc::derive_imports!();
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi)]
 pub struct DepositInfo<M: ManagedTypeApi> {

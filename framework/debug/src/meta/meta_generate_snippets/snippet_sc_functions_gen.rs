@@ -1,6 +1,6 @@
 use std::{fs::File, io::Write};
 
-use elrond_wasm::abi::{ContractAbi, EndpointAbi, EndpointMutabilityAbi, InputAbi, OutputAbi};
+use mx_sc::abi::{ContractAbi, EndpointAbi, EndpointMutabilityAbi, InputAbi, OutputAbi};
 
 use super::snippet_gen_common::write_newline;
 
@@ -51,7 +51,7 @@ fn write_deploy_method_impl(
 
     writeln!(
         file,
-        r#"        let result: elrond_interact_snippets::InteractorResult<PlaceholderOutput> = self
+        r#"        let result: mx_sc_snippets::InteractorResult<PlaceholderOutput> = self
             .interactor
             .sc_deploy(
                 self.contract
@@ -158,7 +158,7 @@ fn write_contract_call(file: &mut File, endpoint_abi: &EndpointAbi) {
 
     writeln!(
         file,
-        r#"        let result: elrond_interact_snippets::InteractorResult<PlaceholderOutput> = self
+        r#"        let result: mx_sc_snippets::InteractorResult<PlaceholderOutput> = self
             .interactor
             .sc_call_get_result(
                 self.contract

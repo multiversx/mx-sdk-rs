@@ -1,6 +1,6 @@
 #![no_std]
 
-elrond_wasm::imports!();
+mx_sc::imports!();
 
 mod lottery_info;
 mod random;
@@ -13,7 +13,7 @@ use status::Status;
 const PERCENTAGE_TOTAL: u16 = 100;
 const THIRTY_DAYS_IN_SECONDS: u64 = 60 * 60 * 24 * 30;
 
-#[elrond_wasm::contract]
+#[mx_sc::contract]
 pub trait Lottery {
     #[proxy]
     fn erc20_proxy(&self, to: ManagedAddress) -> erc20::Proxy<Self::Api>;

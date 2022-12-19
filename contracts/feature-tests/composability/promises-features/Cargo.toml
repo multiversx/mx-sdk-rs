@@ -11,16 +11,16 @@ path = "src/promises_main.rs"
 [dependencies.vault]
 path = "../vault"
 
-[dependencies.elrond-wasm]
+[dependencies.mx-sc]
 version = "0.38.0"
 path = "../../../../framework/base"
 features = ["promises"]
 
-[dependencies.elrond-wasm-node]
+[dependencies.mx-sc-wasm-adapter]
 version = "0.38.0"
 path = "../../../../framework/wasm-adapter"
 optional = true
 
-[dev-dependencies.elrond-wasm-debug]
+[dev-dependencies.mx-sc-debug]
 version = "0.38.0"
 path = "../../../../framework/debug"

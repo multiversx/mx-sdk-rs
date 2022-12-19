@@ -1,9 +1,9 @@
 use std::ops::{Deref, DerefMut};
 
-use elrond_wasm::{
+use mx_sc::{
     api::ManagedTypeApi,
     contract_base::ProxyObjBase,
-    elrond_codec::{CodecFrom, EncodeErrorHandler, TopEncode, TopEncodeOutput},
+    mx_sc_codec::{CodecFrom, EncodeErrorHandler, TopEncode, TopEncodeOutput},
     types::{Address, ManagedAddress},
 };
 

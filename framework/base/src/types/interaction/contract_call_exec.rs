@@ -1,4 +1,4 @@
-use elrond_codec::TopDecodeMulti;
+use mx_sc_codec::TopDecodeMulti;
 
 use crate::{
     api::{BlockchainApiImpl, CallTypeApi},

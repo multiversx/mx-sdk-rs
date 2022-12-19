@@ -1,6 +1,6 @@
 use crate::num_bigint::BigUint;
 use alloc::vec::Vec;
-use elrond_wasm::types::heap::Address;
+use mx_sc::types::heap::Address;
 use std::{collections::HashMap, fmt, fmt::Write};
 
 use crate::key_hex;

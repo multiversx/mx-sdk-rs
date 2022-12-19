@@ -1,9 +1,9 @@
 use std::borrow::Borrow;
 
-use elrond_wasm::types::{BoxedBytes, CodeMetadata, ManagedAddress};
-use elrond_wasm_debug::{managed_address, managed_biguint, rust_biguint, DebugApi};
 use multisig::user_role::UserRole;
 use multisig_rust_test_setup::{CallActionDataRaw, MultisigSetup};
+use mx_sc::types::{BoxedBytes, CodeMetadata, ManagedAddress};
+use mx_sc_debug::{managed_address, managed_biguint, rust_biguint, DebugApi};
 
 mod multisig_rust_test_setup;
 use adder::Adder;

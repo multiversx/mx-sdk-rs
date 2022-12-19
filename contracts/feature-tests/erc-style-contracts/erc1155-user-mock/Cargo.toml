@@ -8,12 +8,12 @@ publish = false
 [lib]
 path = "src/lib.rs"
 
-[dependencies.elrond-wasm]
+[dependencies.mx-sc]
 version = "0.38.0"
 path = "../../../../framework/base"
 features = ["alloc"]
 
-[dev-dependencies.elrond-wasm-debug]
+[dev-dependencies.mx-sc-debug]
 version = "0.38.0"
 path = "../../../../framework/debug"
 

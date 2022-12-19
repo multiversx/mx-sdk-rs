@@ -1,4 +1,4 @@
-use elrond_wasm::api::UPGRADE_CONTRACT_FUNC_NAME;
+use mx_sc::api::UPGRADE_CONTRACT_FUNC_NAME;
 
 use crate::{
     tx_execution::default_execution,

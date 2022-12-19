@@ -60,8 +60,8 @@ fn top_decode_method_body(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
             quote! {
                 let mut nested_buffer = top_input.into_nested_buffer();
                 let result = #name #field_dep_decode_snippets ;
-                if !elrond_codec::NestedDecodeInput::is_depleted(&nested_buffer) {
-                    return core::result::Result::Err(h.handle_error(elrond_codec::DecodeError::INPUT_TOO_LONG));
+                if !mx_sc_codec::NestedDecodeInput::is_depleted(&nested_buffer) {
+                    return core::result::Result::Err(h.handle_error(mx_sc_codec::DecodeError::INPUT_TOO_LONG));
                 }
                 core::result::Result::Ok(result)
             }
@@ -75,9 +75,9 @@ fn top_decode_method_body(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
                 // fieldless enums are special, they can be top-decoded as u8 directly
                 let top_decode_arms = fieldless_enum_match_arm_result_ok(name, data_enum);
                 quote! {
-                    match <u8 as elrond_codec::TopDecode>::top_decode_or_handle_err(top_input, h)? {
+                    match <u8 as mx_sc_codec::TopDecode>::top_decode_or_handle_err(top_input, h)? {
                         #(#top_decode_arms)*
-                        _ => core::result::Result::Err(h.handle_error(elrond_codec::DecodeError::INVALID_VALUE)),
+                        _ => core::result::Result::Err(h.handle_error(mx_sc_codec::DecodeError::INVALID_VALUE)),
                     }
                 }
             } else {
@@ -86,15 +86,15 @@ fn top_decode_method_body(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
 
                 quote! {
                     let mut nested_buffer = top_input.into_nested_buffer();
-                    let result = match <u8 as elrond_codec::NestedDecode>::dep_decode_or_handle_err(&mut nested_buffer, h)? {
+                    let result = match <u8 as mx_sc_codec::NestedDecode>::dep_decode_or_handle_err(&mut nested_buffer, h)? {
                         #(#variant_dep_decode_snippets)*
                         _ => core::result::Result::Err(
-                            h.handle_error(elrond_codec::DecodeError::INVALID_VALUE),
+                            h.handle_error(mx_sc_codec::DecodeError::INVALID_VALUE),
                         ),
                     };
-                    if !elrond_codec::NestedDecodeInput::is_depleted(&nested_buffer) {
+                    if !mx_sc_codec::NestedDecodeInput::is_depleted(&nested_buffer) {
                         return core::result::Result::Err(
-                            h.handle_error(elrond_codec::DecodeError::INPUT_TOO_LONG),
+                            h.handle_error(mx_sc_codec::DecodeError::INPUT_TOO_LONG),
                         );
                     }
                     result
@@ -112,11 +112,11 @@ pub fn top_decode_impl(ast: &syn::DeriveInput) -> TokenStream {
     let auto_default = auto_default(ast);
 
     let gen = quote! {
-        impl #impl_generics elrond_codec::TopDecode for #name #ty_generics #where_clause {
+        impl #impl_generics mx_sc_codec::TopDecode for #name #ty_generics #where_clause {
             fn top_decode_or_handle_err<I, H>(top_input: I, h: H) -> core::result::Result<Self, H::HandledErr>
             where
-                I: elrond_codec::TopDecodeInput,
-                H: elrond_codec::DecodeErrorHandler,
+                I: mx_sc_codec::TopDecodeInput,
+                H: mx_sc_codec::DecodeErrorHandler,
             {
                 #auto_default
                 #top_decode_body
@@ -133,14 +133,14 @@ pub fn top_decode_or_default_impl(ast: &syn::DeriveInput) -> TokenStream {
     let top_decode_body = top_decode_method_body(ast);
 
     let gen = quote! {
-        impl #impl_generics elrond_codec::TopDecode for #name #ty_generics #where_clause {
+        impl #impl_generics mx_sc_codec::TopDecode for #name #ty_generics #where_clause {
             fn top_decode_or_handle_err<I, H>(top_input: I, h: H) -> core::result::Result<Self, H::HandledErr>
             where
-                I: elrond_codec::TopDecodeInput,
-                H: elrond_codec::DecodeErrorHandler,
+                I: mx_sc_codec::TopDecodeInput,
+                H: mx_sc_codec::DecodeErrorHandler,
             {
                 if top_input.byte_len() == 0 {
-                    core::result::Result::Ok(<#name #ty_generics as elrond_codec::DecodeDefault>::default())
+                    core::result::Result::Ok(<#name #ty_generics as mx_sc_codec::DecodeDefault>::default())
                 } else {
                     #top_decode_body
                 }

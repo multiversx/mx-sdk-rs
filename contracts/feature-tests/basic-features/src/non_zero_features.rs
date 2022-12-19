@@ -1,9 +1,9 @@
-elrond_wasm::imports!();
+mx_sc::imports!();
 
 use core::num::NonZeroUsize;
 
-/// Exposes various methods of various types provided by elrond-wasm.
-#[elrond_wasm::module]
+/// Exposes various methods of various types provided by mx-sc.
+#[mx_sc::module]
 pub trait TypeFeatures {
     #[view]
     fn non_zero_usize_iter(&self, how_many: usize) -> MultiValueEncoded<NonZeroUsize> {

@@ -1,6 +1,6 @@
-elrond_wasm::imports!();
+mx_sc::imports!();
 
-#[elrond_wasm::module]
+#[mx_sc::module]
 pub trait StorageRawApiFeatures {
     #[endpoint]
     fn storage_read_raw(&self, storage_key: ManagedBuffer) -> ManagedBuffer {

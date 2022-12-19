@@ -1,50 +1,50 @@
 #[macro_export]
 macro_rules! rust_biguint {
     ($value:expr) => {{
-        elrond_wasm_debug::num_bigint::BigUint::from($value as u64)
+        mx_sc_debug::num_bigint::BigUint::from($value as u64)
     }};
 }
 
 #[macro_export]
 macro_rules! managed_biguint {
     ($value:expr) => {{
-        elrond_wasm::types::BigUint::from($value as u64)
+        mx_sc::types::BigUint::from($value as u64)
     }};
 }
 
 #[macro_export]
 macro_rules! managed_buffer {
     ($value:expr) => {{
-        elrond_wasm::types::ManagedBuffer::new_from_bytes($value)
+        mx_sc::types::ManagedBuffer::new_from_bytes($value)
     }};
 }
 
 #[macro_export]
 macro_rules! managed_address {
     ($address:expr) => {{
-        elrond_wasm::types::ManagedAddress::from_address($address)
+        mx_sc::types::ManagedAddress::from_address($address)
     }};
 }
 
 #[macro_export]
 macro_rules! managed_token_id {
     ($bytes:expr) => {{
-        elrond_wasm::types::TokenIdentifier::from_esdt_bytes($bytes)
+        mx_sc::types::TokenIdentifier::from_esdt_bytes($bytes)
     }};
 }
 
 #[macro_export]
 macro_rules! managed_token_id_wrapped {
     ($bytes:expr) => {{
-        let ___esdt_token_id___ = elrond_wasm::types::TokenIdentifier::from_esdt_bytes($bytes);
-        elrond_wasm::types::EgldOrEsdtTokenIdentifier::esdt(___esdt_token_id___)
+        let ___esdt_token_id___ = mx_sc::types::TokenIdentifier::from_esdt_bytes($bytes);
+        mx_sc::types::EgldOrEsdtTokenIdentifier::esdt(___esdt_token_id___)
     }};
 }
 
 #[macro_export]
 macro_rules! managed_egld_token_id {
     () => {{
-        elrond_wasm::types::EgldOrEsdtTokenIdentifier::egld()
+        mx_sc::types::EgldOrEsdtTokenIdentifier::egld()
     }};
 }
 
@@ -52,10 +52,10 @@ macro_rules! managed_egld_token_id {
 macro_rules! assert_sc_error {
     ($sc_result:expr, $expected_string:expr) => {{
         match $sc_result {
-            elrond_wasm::types::SCResult::Ok(t) => {
+            mx_sc::types::SCResult::Ok(t) => {
                 panic!("Expected SCError, but got SCResult::Ok: {:?}", t)
             },
-            elrond_wasm::types::SCResult::Err(err) => {
+            mx_sc::types::SCResult::Err(err) => {
                 let as_str = String::from_utf8(err.as_bytes().to_vec()).unwrap();
                 assert_eq!(as_str, $expected_string);
             },
@@ -79,8 +79,8 @@ macro_rules! assert_values_eq {
 macro_rules! unwrap_or_panic {
     ($sc_result:expr) => {{
         match $sc_result {
-            elrond_wasm::types::SCResult::Ok(t) => t,
-            elrond_wasm::types::SCResult::Err(err) => {
+            mx_sc::types::SCResult::Ok(t) => t,
+            mx_sc::types::SCResult::Err(err) => {
                 let as_str = String::from_utf8(err.as_bytes().to_vec()).unwrap();
                 panic!("{}", as_str);
             },

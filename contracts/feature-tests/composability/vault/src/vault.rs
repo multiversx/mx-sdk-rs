@@ -1,13 +1,13 @@
 #![no_std]
 #![allow(clippy::type_complexity)]
 
-use elrond_wasm::elrond_codec::Empty;
+use mx_sc::mx_sc_codec::Empty;
 
-elrond_wasm::imports!();
+mx_sc::imports!();
 
 /// General test contract.
 /// Used especially for investigating async calls and contract interaction in general.
-#[elrond_wasm::contract]
+#[mx_sc::contract]
 pub trait Vault {
     #[init]
     fn init(&self, opt_arg_to_echo: OptionalValue<ManagedBuffer>) -> OptionalValue<ManagedBuffer> {

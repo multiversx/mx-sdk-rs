@@ -1,12 +1,12 @@
 #![no_std]
 
-elrond_wasm::imports!();
+mx_sc::imports!();
 
 const ZERO_ASCII: u8 = b'0';
 const DASH: u8 = b'-';
 const RAND_CHARS_LEN: usize = 6;
 
-#[elrond_wasm::contract]
+#[mx_sc::contract]
 pub trait PayableFeatures {
     #[init]
     fn init(&self) {}

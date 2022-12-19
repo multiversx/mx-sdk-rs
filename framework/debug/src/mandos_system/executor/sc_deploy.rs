@@ -2,8 +2,8 @@ use crate::{
     mandos_system::model::{ScDeployStep, Step, TypedScDeploy, TypedScDeployExecutor},
     tx_mock::TxFunctionName,
 };
-use elrond_wasm::{
-    elrond_codec::{CodecFrom, PanicErrorHandler, TopEncodeMulti},
+use mx_sc::{
+    mx_sc_codec::{CodecFrom, PanicErrorHandler, TopEncodeMulti},
     types::heap::Address,
 };
 

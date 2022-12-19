@@ -1,11 +1,11 @@
 #![no_std]
 #![allow(clippy::type_complexity)]
 
-elrond_wasm::imports!();
+mx_sc::imports!();
 
 /// Contract that only tests the call value features,
 /// i.e. the framework/Arwen functionality for accepting EGLD and ESDT payments.
-#[elrond_wasm::contract]
+#[mx_sc::contract]
 pub trait PayableFeatures {
     #[init]
     fn init(&self) {}

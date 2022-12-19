@@ -1,4 +1,4 @@
-use elrond_codec::TopEncode;
+use mx_sc_codec::TopEncode;
 
 use crate::{
     api::ManagedTypeApi, contract_base::ExitCodecErrorHandler, err_msg, types::ManagedBuffer,

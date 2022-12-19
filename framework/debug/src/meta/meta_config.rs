@@ -1,6 +1,6 @@
 use std::fs;
 
-use elrond_wasm::abi::ContractAbi;
+use mx_sc::abi::ContractAbi;
 
 use super::{
     meta_build_args::BuildArgs,

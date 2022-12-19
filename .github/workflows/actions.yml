@@ -18,5 +18,6 @@ jobs:
       rust-toolchain: nightly-2022-12-08
       vmtools-version: v1.4.60
       extra-build-args: --ignore-eei-checks
+      wasm-tests-args: --features mandos-go-tests
     secrets:
       token: ${{ secrets.GITHUB_TOKEN }}

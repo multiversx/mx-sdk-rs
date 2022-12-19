@@ -1,6 +1,6 @@
-elrond_wasm::imports!();
+mx_sc::imports!();
 
-#[elrond_wasm::module]
+#[mx_sc::module]
 pub trait DummyModule {
     fn some_function(&self) -> BigUint {
         BigUint::zero()

@@ -1,6 +1,6 @@
 use std::rc::Rc;
 
-use elrond_wasm::types::Address;
+use mx_sc::types::Address;
 
 use crate::{
     tx_mock::{TxCache, TxInput, TxResult},

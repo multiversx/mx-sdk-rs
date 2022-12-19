@@ -6,7 +6,7 @@ from pathlib import Path
 import re
 import struct
 
-DEBUG_API_TYPE = "elrond_wasm_debug::tx_mock::tx_context_ref::TxContextRef"
+DEBUG_API_TYPE = "mx_sc_debug::tx_mock::tx_context_ref::TxContextRef"
 ANY_NUMBER = "[0-9]+"
 ANY_TYPE = ".*"
 SOME_OR_NONE = "(Some|None)"
@@ -16,7 +16,7 @@ NUM_BIG_INT_TYPE = "num_bigint::bigint::BigInt"
 NUM_BIG_UINT_TYPE = "num_bigint::biguint::BigUint"
 
 # 2. Elrond wasm - Managed basic types
-MOD_PATH = "elrond_wasm::types::managed::basic"
+MOD_PATH = "mx_sc::types::managed::basic"
 
 BIG_INT_TYPE = f"{MOD_PATH}::big_int::BigInt<{DEBUG_API_TYPE}>"
 BIG_UINT_TYPE = f"{MOD_PATH}::big_uint::BigUint<{DEBUG_API_TYPE}>"
@@ -24,7 +24,7 @@ BIG_FLOAT_TYPE = f"{MOD_PATH}::big_float::BigFloat<{DEBUG_API_TYPE}>"
 MANAGED_BUFFER_TYPE = f"{MOD_PATH}::managed_buffer::ManagedBuffer<{DEBUG_API_TYPE}>"
 
 # 3. Elrond wasm - Managed wrapped types
-MOD_PATH = "elrond_wasm::types::managed::wrapped"
+MOD_PATH = "mx_sc::types::managed::wrapped"
 
 TOKEN_IDENTIFIER_TYPE = f"{MOD_PATH}::token_identifier::TokenIdentifier<{DEBUG_API_TYPE}>"
 MANAGED_ADDRESS_TYPE = f"{MOD_PATH}::managed_address::ManagedAddress<{DEBUG_API_TYPE}>"
@@ -45,13 +45,13 @@ MANAGED_VEC_TYPE = f"{MOD_PATH}::managed_vec::ManagedVec<{DEBUG_API_TYPE}, {ANY_
 # 4. Elrond wasm - Managed multi value types
 
 # 5. Elrond wasm - heap
-MOD_PATH = "elrond_wasm::types::heap"
+MOD_PATH = "mx_sc::types::heap"
 
 HEAP_ADDRESS_TYPE = f"{MOD_PATH}::h256_address::Address"
 BOXED_BYTES_TYPE = f"{MOD_PATH}::boxed_bytes::BoxedBytes"
 
 # 6. Elrond codec - Multi-types
-MOD_PATH = "elrond_codec::multi_types"
+MOD_PATH = "mx_sc_codec::multi_types"
 
 OPTIONAL_VALUE_TYPE = f"{MOD_PATH}::multi_value_optional::OptionalValue<{ANY_TYPE}>::{SOME_OR_NONE}"
 
@@ -514,9 +514,9 @@ def __lldb_init_module(debugger: SBDebugger, dict):
         summary_function_name = f"handle{handler_class.__name__}"
         globals()[summary_function_name] = partial(summarize_handler, handler_class)
 
-        summary_command = f'type summary add -x "^{rust_type}$" -F {python_module_name}.{summary_function_name} --category elrond-wasm'
+        summary_command = f'type summary add -x "^{rust_type}$" -F {python_module_name}.{summary_function_name} --category mx-sc'
         debugger.HandleCommand(summary_command)
         # print(f"Registered: {summary_command}")
 
     # Enable categories
-    debugger.HandleCommand('type category enable elrond-wasm')
+    debugger.HandleCommand('type category enable mx-sc')

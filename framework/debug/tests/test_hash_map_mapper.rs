@@ -1,8 +1,8 @@
-use elrond_wasm::storage::{
+use mx_sc::storage::{
     mappers::{MapMapper, StorageClearable, StorageMapper},
     StorageKey,
 };
-use elrond_wasm_debug::DebugApi;
+use mx_sc_debug::DebugApi;
 
 fn create_map() -> MapMapper<DebugApi, u64, u64> {
     let _ = DebugApi::dummy();

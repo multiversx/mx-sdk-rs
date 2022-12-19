@@ -6,7 +6,7 @@ use crate::{
 
 use crate::{api::StaticVarApiImpl, types::ManagedBuffer};
 
-use elrond_codec::*;
+use mx_sc_codec::*;
 
 pub const ELLIPTIC_CURVE_P224_INT: u32 = 224;
 pub const ELLIPTIC_CURVE_P224_NAME: &str = "p224";

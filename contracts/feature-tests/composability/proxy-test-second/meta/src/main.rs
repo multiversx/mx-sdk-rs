@@ -1,3 +1,3 @@
 fn main() {
-    elrond_wasm_debug::meta::perform::<proxy_test_second::AbiProvider>();
+    mx_sc_debug::meta::perform::<proxy_test_second::AbiProvider>();
 }

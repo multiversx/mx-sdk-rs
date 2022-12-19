@@ -3,7 +3,7 @@ use core::{
     cmp::Ordering,
     ops::{Add, BitAnd, BitOr, BitXor, Div, Mul, Neg, Rem, Shl, Shr, Sub},
 };
-use elrond_wasm::{
+use mx_sc::{
     api::{BigIntApi, ErrorApiImpl, HandleTypeInfo, ManagedBufferApi},
     err_msg,
     types::heap::BoxedBytes,
@@ -166,12 +166,12 @@ impl BigIntApi for DebugApi {
     unary_op_method! {bi_abs, abs}
     unary_op_method! {bi_neg, neg}
 
-    fn bi_sign(&self, x: Self::BigIntHandle) -> elrond_wasm::api::Sign {
+    fn bi_sign(&self, x: Self::BigIntHandle) -> mx_sc::api::Sign {
         let bi = self.bi_get(x);
         match bi.sign() {
-            num_bigint::Sign::Minus => elrond_wasm::api::Sign::Minus,
-            num_bigint::Sign::NoSign => elrond_wasm::api::Sign::NoSign,
-            num_bigint::Sign::Plus => elrond_wasm::api::Sign::Plus,
+            num_bigint::Sign::Minus => mx_sc::api::Sign::Minus,
+            num_bigint::Sign::NoSign => mx_sc::api::Sign::NoSign,
+            num_bigint::Sign::Plus => mx_sc::api::Sign::Plus,
         }
     }
 

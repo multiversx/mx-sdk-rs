@@ -1,7 +1,7 @@
 use std::ops::Deref;
 
-use elrond_wasm::types::{BigUint, ManagedVec};
-use elrond_wasm_debug::DebugApi;
+use mx_sc::types::{BigUint, ManagedVec};
+use mx_sc_debug::DebugApi;
 
 #[test]
 fn test_managed_vec_iter_rev() {

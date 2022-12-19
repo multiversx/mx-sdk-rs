@@ -1,5 +1,5 @@
-use elrond_wasm::{
-    elrond_codec::{CodecFrom, TopEncodeMulti},
+use mx_sc::{
+    mx_sc_codec::{CodecFrom, TopEncodeMulti},
     types::ContractCall,
 };
 

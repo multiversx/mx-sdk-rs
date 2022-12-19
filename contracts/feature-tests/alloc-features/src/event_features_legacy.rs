@@ -1,9 +1,9 @@
-elrond_wasm::imports!();
+mx_sc::imports!();
 
 /// Legacy event logs.
 ///
 /// They are the only ones that still use the old write logs VM endpoint.
-#[elrond_wasm::module]
+#[mx_sc::module]
 pub trait EventFeaturesLegacy {
     #[endpoint(logLegacyEventA)]
     fn log_legacy_event_a(&self, data: &BigUint) {

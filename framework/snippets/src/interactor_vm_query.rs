@@ -1,13 +1,13 @@
 use crate::{address_h256_to_erdrs, Interactor};
 use elrond_sdk_erdrs::data::vm::VmValueRequest;
-use elrond_wasm_debug::{
-    elrond_wasm::{
-        elrond_codec::{CodecFrom, PanicErrorHandler},
+use log::info;
+use mx_sc_debug::{
+    mx_sc::{
+        mx_sc_codec::{CodecFrom, PanicErrorHandler},
         types::ContractCall,
     },
     DebugApi,
 };
-use log::info;
 
 impl Interactor {
     pub async fn vm_query<CC, RequestedResult>(&mut self, contract_call: CC) -> RequestedResult

@@ -9,7 +9,7 @@ use crate::{
     },
     types::{heap::BoxedBytes, ManagedType},
 };
-use elrond_codec::{
+use mx_sc_codec::{
     CodecFrom, CodecFromSelf, DecodeErrorHandler, Empty, EncodeErrorHandler, NestedDecode,
     NestedDecodeInput, NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode,
     TopEncodeOutput, TryStaticCast,

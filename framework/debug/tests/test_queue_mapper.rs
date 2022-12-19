@@ -1,8 +1,8 @@
-use elrond_wasm::storage::{
+use mx_sc::storage::{
     mappers::{QueueMapper, StorageClearable, StorageMapper},
     StorageKey,
 };
-use elrond_wasm_debug::DebugApi;
+use mx_sc_debug::DebugApi;
 
 fn create_queue() -> QueueMapper<DebugApi, u64> {
     let _ = DebugApi::dummy();

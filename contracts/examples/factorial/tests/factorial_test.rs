@@ -1,6 +1,6 @@
-use elrond_wasm::types::BigUint;
-use elrond_wasm_debug::DebugApi;
 use factorial::*;
+use mx_sc::types::BigUint;
+use mx_sc_debug::DebugApi;
 
 #[test]
 fn test_factorial() {

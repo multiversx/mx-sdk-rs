@@ -1,7 +1,7 @@
-elrond_wasm::imports!();
+mx_sc::imports!();
 
 /// Storage mapper test.
-#[elrond_wasm::module]
+#[mx_sc::module]
 pub trait MapStorageMapperFeatures {
     #[storage_mapper("map_storage_mapper")]
     fn map_storage_mapper(&self) -> MapStorageMapper<u32, MapMapper<u32, u32>>;

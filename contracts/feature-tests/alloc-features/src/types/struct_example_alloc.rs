@@ -1,5 +1,5 @@
-use elrond_wasm::types::{BoxedBytes, Vec};
-elrond_wasm::derive_imports!();
+use mx_sc::types::{BoxedBytes, Vec};
+mx_sc::derive_imports!();
 
 /// Example serialization for a structure that uses the heap allocator.
 /// Also checking nested serialization of basic types.

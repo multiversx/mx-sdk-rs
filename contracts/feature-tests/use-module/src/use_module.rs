@@ -14,7 +14,7 @@ mod only_owner_derived_mod;
 mod only_owner_mod;
 pub mod token_merge_mod_impl;
 
-elrond_wasm::imports!();
+mx_sc::imports!();
 
 /// Contract that tests that using modules works correctly.
 /// Also provides testing for the most common modules:
@@ -23,7 +23,7 @@ elrond_wasm::imports!();
 /// - EsdtModule
 /// - GovernanceModule
 /// - PauseModule
-#[elrond_wasm::contract]
+#[mx_sc::contract]
 pub trait UseModule:
     ContractBase
     + contract_base_full_path_mod::ContractBaseFullPathTestModule
@@ -38,20 +38,20 @@ pub trait UseModule:
     + only_admin_derived_mod::OnlyAdminDerivedTestModule
     + ongoing_operation_mod_example::OngoingOperationModExample
     + token_merge_mod_impl::TokenMergeModImpl
-    + elrond_wasm_modules::claim_developer_rewards::ClaimDeveloperRewardsModule
-    + elrond_wasm_modules::dns::DnsModule
-    + elrond_wasm_modules::esdt::EsdtModule
-    + elrond_wasm_modules::features::FeaturesModule
-    + elrond_wasm_modules::governance::GovernanceModule
-    + elrond_wasm_modules::governance::governance_configurable::GovernanceConfigurablePropertiesModule
-    + elrond_wasm_modules::governance::governance_events::GovernanceEventsModule
-    + elrond_wasm_modules::pause::PauseModule
-    + elrond_wasm_modules::staking::StakingModule
-    + elrond_wasm_modules::token_merge::TokenMergeModule
-    + elrond_wasm_modules::token_merge::merged_token_setup::MergedTokenSetupModule
-    + elrond_wasm_modules::default_issue_callbacks::DefaultIssueCallbacksModule
-    + elrond_wasm_modules::only_admin::OnlyAdminModule
-    + elrond_wasm_modules::ongoing_operation::OngoingOperationModule
+    + mx_sc_modules::claim_developer_rewards::ClaimDeveloperRewardsModule
+    + mx_sc_modules::dns::DnsModule
+    + mx_sc_modules::esdt::EsdtModule
+    + mx_sc_modules::features::FeaturesModule
+    + mx_sc_modules::governance::GovernanceModule
+    + mx_sc_modules::governance::governance_configurable::GovernanceConfigurablePropertiesModule
+    + mx_sc_modules::governance::governance_events::GovernanceEventsModule
+    + mx_sc_modules::pause::PauseModule
+    + mx_sc_modules::staking::StakingModule
+    + mx_sc_modules::token_merge::TokenMergeModule
+    + mx_sc_modules::token_merge::merged_token_setup::MergedTokenSetupModule
+    + mx_sc_modules::default_issue_callbacks::DefaultIssueCallbacksModule
+    + mx_sc_modules::only_admin::OnlyAdminModule
+    + mx_sc_modules::ongoing_operation::OngoingOperationModule
 {
     /// Validates that the "featureName" feature is on.
     /// Uses the `feature_guard!` macro.

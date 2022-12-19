@@ -1,6 +1,6 @@
 use std::{collections::HashMap, rc::Rc};
 
-use elrond_wasm::types::Address;
+use mx_sc::types::Address;
 use num_bigint::BigUint;
 use num_traits::Zero;
 

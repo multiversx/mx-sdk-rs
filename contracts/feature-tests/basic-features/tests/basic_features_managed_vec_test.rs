@@ -1,5 +1,5 @@
-use elrond_wasm::types::{BigUint, ManagedVec};
-use elrond_wasm_debug::*;
+use mx_sc::types::{BigUint, ManagedVec};
+use mx_sc_debug::*;
 
 use basic_features::managed_vec_features::ManagedVecFeatures;
 

@@ -11,11 +11,11 @@ pub fn dep_decode_snippet(
     let ty = &field.ty;
     if let Some(ident) = &field.ident {
         quote! {
-            #ident: <#ty as elrond_codec::NestedDecode>::dep_decode_or_handle_err(#input_value, h)?
+            #ident: <#ty as mx_sc_codec::NestedDecode>::dep_decode_or_handle_err(#input_value, h)?
         }
     } else {
         quote! {
-            <#ty as elrond_codec::NestedDecode>::dep_decode_or_handle_err(#input_value, h)?
+            <#ty as mx_sc_codec::NestedDecode>::dep_decode_or_handle_err(#input_value, h)?
         }
     }
 }
@@ -52,11 +52,11 @@ pub fn nested_decode_impl(ast: &syn::DeriveInput) -> TokenStream {
                     dep_decode_snippet(index, field, &quote! {input})
                 });
             quote! {
-                impl #impl_generics elrond_codec::NestedDecode for #name #ty_generics #where_clause {
+                impl #impl_generics mx_sc_codec::NestedDecode for #name #ty_generics #where_clause {
                     fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> core::result::Result<Self, H::HandledErr>
                     where
-                        I: elrond_codec::NestedDecodeInput,
-                        H: elrond_codec::DecodeErrorHandler,
+                        I: mx_sc_codec::NestedDecodeInput,
+                        H: mx_sc_codec::DecodeErrorHandler,
                     {
                         core::result::Result::Ok(
                             #name #field_dep_decode_snippets
@@ -74,15 +74,15 @@ pub fn nested_decode_impl(ast: &syn::DeriveInput) -> TokenStream {
                 variant_dep_decode_snippets(name, data_enum, &quote! {input});
 
             quote! {
-                impl #impl_generics elrond_codec::NestedDecode for #name #ty_generics #where_clause {
+                impl #impl_generics mx_sc_codec::NestedDecode for #name #ty_generics #where_clause {
                     fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> core::result::Result<Self, H::HandledErr>
                     where
-                        I: elrond_codec::NestedDecodeInput,
-                        H: elrond_codec::DecodeErrorHandler,
+                        I: mx_sc_codec::NestedDecodeInput,
+                        H: mx_sc_codec::DecodeErrorHandler,
                     {
-                        match <u8 as elrond_codec::NestedDecode>::dep_decode_or_handle_err(input, h)? {
+                        match <u8 as mx_sc_codec::NestedDecode>::dep_decode_or_handle_err(input, h)? {
                             #(#variant_dep_decode_snippets)*
-                            _ => core::result::Result::Err(h.handle_error(elrond_codec::DecodeError::INVALID_VALUE)),
+                            _ => core::result::Result::Err(h.handle_error(mx_sc_codec::DecodeError::INVALID_VALUE)),
                         }
                     }
                 }

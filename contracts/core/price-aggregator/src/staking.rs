@@ -1,7 +1,7 @@
-// TODO: Replace with the one from elrond_wasm_modules on next release
+// TODO: Replace with the one from mx_sc_modules on next release
 
-elrond_wasm::imports!();
-elrond_wasm::derive_imports!();
+mx_sc::imports!();
+mx_sc::derive_imports!();
 
 #[derive(TopEncode, TopDecode)]
 pub struct TokenAmountPair<M: ManagedTypeApi> {
@@ -11,7 +11,7 @@ pub struct TokenAmountPair<M: ManagedTypeApi> {
 
 static NOT_ENOUGH_STAKE_ERR_MSG: &[u8] = b"Not enough stake";
 
-#[elrond_wasm::module]
+#[mx_sc::module]
 pub trait StakingModule {
     fn init_staking_module(
         &self,

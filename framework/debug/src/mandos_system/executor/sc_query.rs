@@ -6,8 +6,8 @@ use crate::{
     world_mock::BlockchainMock,
     DebugApi,
 };
-use elrond_wasm::{
-    elrond_codec::{CodecFrom, PanicErrorHandler, TopEncodeMulti},
+use mx_sc::{
+    mx_sc_codec::{CodecFrom, PanicErrorHandler, TopEncodeMulti},
     types::ContractCall,
 };
 

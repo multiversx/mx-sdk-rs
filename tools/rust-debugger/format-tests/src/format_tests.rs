@@ -1,5 +1,5 @@
-use elrond_wasm::{
-    elrond_codec::multi_types::OptionalValue,
+use mx_sc::{
+    mx_sc_codec::multi_types::OptionalValue,
     esdt::ESDTSystemSmartContractProxy,
     types::{
         heap::{Address, BoxedBytes},
@@ -7,7 +7,7 @@ use elrond_wasm::{
         ManagedBuffer, ManagedByteArray, ManagedOption, ManagedType, ManagedVec, TokenIdentifier,
     },
 };
-use elrond_wasm_debug::{
+use mx_sc_debug::{
     api::DebugHandle,
     num_bigint::{BigInt as RustBigInt, BigUint as RustBigUint},
     DebugApi,

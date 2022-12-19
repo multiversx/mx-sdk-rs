@@ -1,5 +1,5 @@
 use crate::{tx_mock::TxPanic, DebugApi};
-use elrond_wasm::api::{ErrorApi, ErrorApiImpl, ManagedBufferApi};
+use mx_sc::api::{ErrorApi, ErrorApiImpl, ManagedBufferApi};
 
 impl ErrorApi for DebugApi {
     type ErrorApiImpl = DebugApi;

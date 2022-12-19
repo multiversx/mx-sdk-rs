@@ -2,7 +2,7 @@ use crate::{
     abi::{TypeAbi, TypeName},
     types::heap::BoxedBytes,
 };
-use elrond_codec::{
+use mx_sc_codec::{
     DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti, TopDecodeMultiInput, TopEncodeMulti,
     TopEncodeMultiOutput,
 };

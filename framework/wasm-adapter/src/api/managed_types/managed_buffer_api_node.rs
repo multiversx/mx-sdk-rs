@@ -1,5 +1,5 @@
 use crate::{api::unsafe_buffer, error_hook};
-use elrond_wasm::{
+use mx_sc::{
     api::{InvalidSliceError, ManagedBufferApi},
     err_msg,
     types::heap::BoxedBytes,

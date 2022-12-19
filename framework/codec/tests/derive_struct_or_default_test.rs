@@ -1,7 +1,7 @@
-extern crate elrond_codec_derive;
-use elrond_codec_derive::*;
+extern crate mx_sc_codec_derive;
+use mx_sc_codec_derive::*;
 
-use elrond_codec::test_util::check_top_encode_decode;
+use mx_sc_codec::test_util::check_top_encode_decode;
 
 #[derive(TopEncodeOrDefault, TopDecodeOrDefault, PartialEq, Eq, Clone, Debug)]
 pub struct StructOrDefault {
@@ -12,13 +12,13 @@ pub struct StructOrDefault {
     pub uint_64: u64,
 }
 
-impl elrond_codec::EncodeDefault for StructOrDefault {
+impl mx_sc_codec::EncodeDefault for StructOrDefault {
     fn is_default(&self) -> bool {
         self.int == 5
     }
 }
 
-impl elrond_codec::DecodeDefault for StructOrDefault {
+impl mx_sc_codec::DecodeDefault for StructOrDefault {
     fn default() -> Self {
         StructOrDefault {
             int: 5,

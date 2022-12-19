@@ -11,10 +11,10 @@ path = "src/erc1155.rs"
 [dependencies.erc1155-user-mock]
 path="../erc1155-user-mock"
 
-[dependencies.elrond-wasm]
+[dependencies.mx-sc]
 version = "0.38.0"
 path = "../../../../framework/base"
 
-[dev-dependencies.elrond-wasm-debug]
+[dev-dependencies.mx-sc-debug]
 version = "0.38.0"
 path = "../../../../framework/debug"

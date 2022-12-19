@@ -10,18 +10,18 @@ pub mod user_role;
 use action::ActionFullInfo;
 use user_role::UserRole;
 
-elrond_wasm::imports!();
+mx_sc::imports!();
 
 /// Multi-signature smart contract implementation.
 /// Acts like a wallet that needs multiple signers for any action performed.
 /// See the readme file for more detailed documentation.
-#[elrond_wasm::contract]
+#[mx_sc::contract]
 pub trait Multisig:
     multisig_state::MultisigStateModule
     + multisig_propose::MultisigProposeModule
     + multisig_perform::MultisigPerformModule
     + multisig_events::MultisigEventsModule
-    + elrond_wasm_modules::dns::DnsModule
+    + mx_sc_modules::dns::DnsModule
 {
     #[init]
     fn init(&self, quorum: usize, board: MultiValueEncoded<ManagedAddress>) {

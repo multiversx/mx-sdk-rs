@@ -1,9 +1,9 @@
 use crate::{action::Action, user_role::UserRole};
 
-elrond_wasm::imports!();
+mx_sc::imports!();
 
 /// Contains all events that can be emitted by the contract.
-#[elrond_wasm::module]
+#[mx_sc::module]
 pub trait MultisigStateModule {
     /// Minimum number of signatures needed to perform any action.
     #[view(getQuorum)]

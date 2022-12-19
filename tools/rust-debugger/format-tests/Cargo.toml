@@ -8,11 +8,11 @@ edition = "2021"
 name = "format-tests"
 path = "src/format_tests.rs"
 
-[dependencies.elrond-wasm]
+[dependencies.mx-sc]
 version = "0.38.0"
 path = "../../../framework/base"
 
-[dependencies.elrond-wasm-debug]
+[dependencies.mx-sc-debug]
 version = "0.38.0"
 path = "../../../framework/debug"
 

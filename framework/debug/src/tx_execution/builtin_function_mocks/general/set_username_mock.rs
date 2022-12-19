@@ -1,4 +1,4 @@
-use elrond_wasm::api::SET_USERNAME_FUNC_NAME;
+use mx_sc::api::SET_USERNAME_FUNC_NAME;
 
 use crate::tx_mock::{BlockchainUpdate, TxCache, TxInput, TxResult};
 

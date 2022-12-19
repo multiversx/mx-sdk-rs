@@ -35,31 +35,31 @@ pub fn format_receiver_args_macro(input: proc_macro::TokenStream) -> proc_macro:
             FormatPartType::StaticAscii(ascii_string) => {
                 let str_as_bytes = byte_str_literal(ascii_string.as_bytes());
                 quote! (
-                    elrond_wasm::formatter::FormatBuffer::append_ascii(&mut $accumulator_expr, $str_as_bytes);
+                    mx_sc::formatter::FormatBuffer::append_ascii(&mut $accumulator_expr, $str_as_bytes);
                 )
             },
             FormatPartType::Display => {
                 let arg_expr = tokens_iter.next().unwrap();
                 quote! (
-                    elrond_wasm::formatter::FormatBuffer::append_display(&mut $accumulator_expr, &$arg_expr);
+                    mx_sc::formatter::FormatBuffer::append_display(&mut $accumulator_expr, &$arg_expr);
                 )
             },
             FormatPartType::LowerHex => {
                 let arg_expr = tokens_iter.next().unwrap();
                 quote! (
-                    elrond_wasm::formatter::FormatBuffer::append_lower_hex(&mut $accumulator_expr, &$arg_expr);
+                    mx_sc::formatter::FormatBuffer::append_lower_hex(&mut $accumulator_expr, &$arg_expr);
                 )
             },
             FormatPartType::Codec => {
                 let arg_expr = tokens_iter.next().unwrap();
                 quote! (
-                    elrond_wasm::formatter::FormatBuffer::append_codec(&mut $accumulator_expr, &$arg_expr);
+                    mx_sc::formatter::FormatBuffer::append_codec(&mut $accumulator_expr, &$arg_expr);
                 )
             },
             FormatPartType::Bytes => {
                 let arg_expr = tokens_iter.next().unwrap();
                 quote! (
-                    elrond_wasm::formatter::FormatBuffer::append_binary(&mut $accumulator_expr, &$arg_expr);
+                    mx_sc::formatter::FormatBuffer::append_binary(&mut $accumulator_expr, &$arg_expr);
                 )
             },
         }

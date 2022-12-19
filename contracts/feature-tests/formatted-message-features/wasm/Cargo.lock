@@ -44,64 +44,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
-name = "elrond-codec"
-version = "0.16.0"
-dependencies = [
- "arrayvec",
- "elrond-codec-derive",
- "wee_alloc",
-]
-
-[[package]]
-name = "elrond-codec-derive"
-version = "0.16.0"
-dependencies = [
- "hex",
- "proc-macro2",
- "quote",
- "syn",
-]
-
-[[package]]
-name = "elrond-wasm"
-version = "0.38.0"
-dependencies = [
- "bitflags",
- "elrond-codec",
- "elrond-wasm-derive",
- "hashbrown",
- "hex-literal",
- "num-traits",
- "wee_alloc",
-]
-
-[[package]]
-name = "elrond-wasm-derive"
-version = "0.38.0"
-dependencies = [
- "hex",
- "proc-macro2",
- "quote",
- "radix_trie",
- "syn",
-]
-
-[[package]]
-name = "elrond-wasm-node"
-version = "0.38.0"
-dependencies = [
- "elrond-wasm",
-]
-
-[[package]]
-name = "elrond-wasm-output"
-version = "0.38.0"
-dependencies = [
- "elrond-wasm-node",
- "wee_alloc",
-]
-
-[[package]]
 name = "endian-type"
 version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -111,16 +53,16 @@ checksum = "c34f04666d835ff5d62e058c3995147c06f42fe86ff053337632bca83e42702d"
 name = "formatted-message-features"
 version = "0.0.0"
 dependencies = [
- "elrond-wasm",
+ "mx-sc",
 ]
 
 [[package]]
 name = "formatted-message-features-wasm"
 version = "0.0.0"
 dependencies = [
- "elrond-wasm-node",
- "elrond-wasm-output",
  "formatted-message-features",
+ "mx-sc-wasm-adapter",
+ "mx-sc-wasm-output",
 ]
 
 [[package]]
@@ -166,6 +108,64 @@ name = "memory_units"
 version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8452105ba047068f40ff7093dd1d9da90898e63dd61736462e9cdda6a90ad3c3"
+
+[[package]]
+name = "mx-sc"
+version = "0.38.0"
+dependencies = [
+ "bitflags",
+ "hashbrown",
+ "hex-literal",
+ "mx-sc-codec",
+ "mx-sc-derive",
+ "num-traits",
+ "wee_alloc",
+]
+
+[[package]]
+name = "mx-sc-codec"
+version = "0.16.0"
+dependencies = [
+ "arrayvec",
+ "mx-sc-codec-derive",
+ "wee_alloc",
+]
+
+[[package]]
+name = "mx-sc-codec-derive"
+version = "0.16.0"
+dependencies = [
+ "hex",
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
+name = "mx-sc-derive"
+version = "0.38.0"
+dependencies = [
+ "hex",
+ "proc-macro2",
+ "quote",
+ "radix_trie",
+ "syn",
+]
+
+[[package]]
+name = "mx-sc-wasm-adapter"
+version = "0.38.0"
+dependencies = [
+ "mx-sc",
+]
+
+[[package]]
+name = "mx-sc-wasm-output"
+version = "0.38.0"
+dependencies = [
+ "mx-sc-wasm-adapter",
+ "wee_alloc",
+]
 
 [[package]]
 name = "nibble_vec"

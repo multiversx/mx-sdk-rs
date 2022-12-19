@@ -8,15 +8,15 @@ publish = false
 [lib]
 path = "src/basic_features_main.rs"
 
-[dependencies.elrond-wasm]
+[dependencies.mx-sc]
 version = "0.38.0"
 path = "../../../framework/base"
 
-[dev-dependencies.elrond-wasm-debug]
+[dev-dependencies.mx-sc-debug]
 version = "0.38.0"
 path = "../../../framework/debug"
 
-[dependencies.elrond-wasm-modules]
+[dependencies.mx-sc-modules]
 version = "0.38.0"
 path = "../../../contracts/modules"
 

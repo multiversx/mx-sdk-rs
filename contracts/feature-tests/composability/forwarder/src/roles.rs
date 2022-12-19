@@ -1,8 +1,8 @@
-elrond_wasm::imports!();
+mx_sc::imports!();
 
 use super::storage;
 
-#[elrond_wasm::module]
+#[mx_sc::module]
 pub trait ForwarderRolesModule: storage::ForwarderStorageModule {
     #[endpoint(setLocalRoles)]
     fn set_local_roles(

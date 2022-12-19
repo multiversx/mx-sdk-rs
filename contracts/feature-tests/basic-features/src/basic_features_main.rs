@@ -1,7 +1,7 @@
 #![no_std]
 #![feature(never_type)]
 
-elrond_wasm::imports!();
+mx_sc::imports!();
 
 pub mod big_num_methods;
 pub mod big_num_operators;
@@ -37,7 +37,7 @@ pub mod struct_eq;
 pub mod token_identifier_features;
 pub mod types;
 
-#[elrond_wasm::contract]
+#[mx_sc::contract]
 pub trait BasicFeatures:
     big_num_methods::BigIntMethods
     + big_num_operators::BigIntOperators
@@ -71,7 +71,7 @@ pub trait BasicFeatures:
     + struct_eq::StructEquals
     + token_identifier_features::TokenIdentifierFeatures
     + non_zero_features::TypeFeatures
-    + elrond_wasm_modules::default_issue_callbacks::DefaultIssueCallbacksModule
+    + mx_sc_modules::default_issue_callbacks::DefaultIssueCallbacksModule
 {
     #[init]
     fn init(&self) {}

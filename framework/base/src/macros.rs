@@ -1,4 +1,4 @@
-// Note: Simple macros cannot be placed in elrond-wasm-derive,
+// Note: Simple macros cannot be placed in mx-sc-derive,
 // because Rust "cannot export macro_rules! macros from a `proc-macro` crate type currently".
 
 /// Getting all imports needed for a smart contract.
@@ -10,7 +10,7 @@ macro_rules! imports {
             DivAssign, Mul, MulAssign, Rem, RemAssign, Shl, ShlAssign, Shr, ShrAssign, Sub,
             SubAssign,
         };
-        use elrond_wasm::{
+        use mx_sc::{
             abi::TypeAbi,
             api::{
                 BigFloatApi, BigIntApi, BlockchainApi, BlockchainApiImpl, CallValueApi,
@@ -20,13 +20,13 @@ macro_rules! imports {
             },
             arrayvec::ArrayVec,
             contract_base::{ContractBase, ProxyObjBase},
-            elrond_codec::{
-                multi_types::*, DecodeError, IntoMultiValue, NestedDecode, NestedEncode, TopDecode,
-                TopEncode,
-            },
             err_msg,
             esdt::*,
             io::*,
+            mx_sc_codec::{
+                multi_types::*, DecodeError, IntoMultiValue, NestedDecode, NestedEncode, TopDecode,
+                TopEncode,
+            },
             non_zero_usize,
             non_zero_util::*,
             require, require_old, sc_error, sc_format, sc_panic, sc_print,
@@ -43,10 +43,10 @@ macro_rules! imports {
 #[macro_export]
 macro_rules! derive_imports {
     () => {
-        use elrond_wasm::{
+        use mx_sc::{
             derive::{ManagedVecItem, TypeAbi},
-            elrond_codec,
-            elrond_codec::elrond_codec_derive::{
+            mx_sc_codec,
+            mx_sc_codec::mx_sc_codec_derive::{
                 NestedDecode, NestedEncode, TopDecode, TopDecodeOrDefault, TopEncode,
                 TopEncodeOrDefault,
             },
@@ -58,7 +58,7 @@ macro_rules! derive_imports {
 #[macro_export]
 macro_rules! sc_error {
     ($s:expr) => {
-        elrond_wasm::types::SCResult::Err(elrond_wasm::types::StaticSCError::from($s)).into()
+        mx_sc::types::SCResult::Err(mx_sc::types::StaticSCError::from($s)).into()
     };
 }
 
@@ -69,9 +69,9 @@ macro_rules! sc_error {
 /// Example:
 ///
 /// ```rust
-/// # use elrond_wasm::require_old;
-/// # use elrond_wasm::types::{*, SCResult::Ok};
-/// # pub trait ExampleContract: elrond_wasm::contract_base::ContractBase
+/// # use mx_sc::require_old;
+/// # use mx_sc::types::{*, SCResult::Ok};
+/// # pub trait ExampleContract: mx_sc::contract_base::ContractBase
 /// # {
 /// fn only_accept_positive_old(&self, x: i32) -> SCResult<()> {
 ///     require_old!(x > 0, "only positive values accepted");
@@ -83,7 +83,7 @@ macro_rules! sc_error {
 macro_rules! require_old {
     ($expression:expr, $error_msg:expr) => {
         if (!($expression)) {
-            return elrond_wasm::sc_error!($error_msg);
+            return mx_sc::sc_error!($error_msg);
         }
     };
 }
@@ -92,12 +92,12 @@ macro_rules! require_old {
 macro_rules! sc_panic {
     ($msg:tt, $($arg:expr),+ $(,)?) => {{
         let mut ___buffer___ =
-            elrond_wasm::types::ManagedBufferCachedBuilder::<Self::Api>::new_from_slice(&[]);
-        elrond_wasm::derive::format_receiver_args!(___buffer___, $msg, $($arg),+);
-        elrond_wasm::contract_base::ErrorHelper::<Self::Api>::signal_error_with_message(___buffer___.into_managed_buffer());
+            mx_sc::types::ManagedBufferCachedBuilder::<Self::Api>::new_from_slice(&[]);
+        mx_sc::derive::format_receiver_args!(___buffer___, $msg, $($arg),+);
+        mx_sc::contract_base::ErrorHelper::<Self::Api>::signal_error_with_message(___buffer___.into_managed_buffer());
     }};
     ($msg:expr $(,)?) => {
-        elrond_wasm::contract_base::ErrorHelper::<Self::Api>::signal_error_with_message($msg);
+        mx_sc::contract_base::ErrorHelper::<Self::Api>::signal_error_with_message($msg);
     };
 }
 
@@ -110,8 +110,8 @@ macro_rules! sc_panic {
 /// Examples:
 ///
 /// ```rust
-/// # use elrond_wasm::{types::ManagedBuffer, require};
-/// # pub trait ExampleContract: elrond_wasm::contract_base::ContractBase
+/// # use mx_sc::{types::ManagedBuffer, require};
+/// # pub trait ExampleContract: mx_sc::contract_base::ContractBase
 /// # {
 /// fn only_accept_positive(&self, x: i32) {
 ///     require!(x > 0, "only positive values accepted");
@@ -130,7 +130,7 @@ macro_rules! sc_panic {
 macro_rules! require {
     ($expression:expr, $($msg_tokens:tt),+  $(,)?) => {
         if (!($expression)) {
-            elrond_wasm::sc_panic!($($msg_tokens),+);
+            mx_sc::sc_panic!($($msg_tokens),+);
         }
     };
 }
@@ -139,10 +139,10 @@ macro_rules! require {
 macro_rules! sc_print {
     ($msg:tt, $($arg:expr),* $(,)?) => {{
         let mut ___buffer___ =
-            <<Self::Api as elrond_wasm::api::PrintApi>::PrintApiImpl as elrond_wasm::api::PrintApiImpl>::Buffer::default();
-        elrond_wasm::derive::format_receiver_args!(___buffer___, $msg, $($arg),*);
-        <<Self::Api as elrond_wasm::api::PrintApi>::PrintApiImpl as elrond_wasm::api::PrintApiImpl>::print_buffer(
-            &<Self::Api as elrond_wasm::api::PrintApi>::print_api_impl(),
+            <<Self::Api as mx_sc::api::PrintApi>::PrintApiImpl as mx_sc::api::PrintApiImpl>::Buffer::default();
+        mx_sc::derive::format_receiver_args!(___buffer___, $msg, $($arg),*);
+        <<Self::Api as mx_sc::api::PrintApi>::PrintApiImpl as mx_sc::api::PrintApiImpl>::print_buffer(
+            &<Self::Api as mx_sc::api::PrintApi>::print_api_impl(),
             ___buffer___,
         );
     }};
@@ -152,12 +152,12 @@ macro_rules! sc_print {
 macro_rules! sc_format {
     ($msg:tt, $($arg:expr),+ $(,)?) => {{
         let mut ___buffer___ =
-            elrond_wasm::types::ManagedBufferCachedBuilder::<Self::Api>::new_from_slice(&[]);
-        elrond_wasm::derive::format_receiver_args!(___buffer___, $msg, $($arg),+);
+            mx_sc::types::ManagedBufferCachedBuilder::<Self::Api>::new_from_slice(&[]);
+        mx_sc::derive::format_receiver_args!(___buffer___, $msg, $($arg),+);
         ___buffer___.into_managed_buffer()
     }};
     ($msg:expr $(,)?) => {{
-        elrond_wasm::types::ManagedBuffer::new_from_bytes($msg.as_bytes())
+        mx_sc::types::ManagedBuffer::new_from_bytes($msg.as_bytes())
     }};
 }
 
@@ -170,9 +170,9 @@ macro_rules! sc_format {
 macro_rules! sc_try {
     ($s:expr) => {
         match $s {
-            elrond_wasm::types::SCResult::Ok(t) => t,
-            elrond_wasm::types::SCResult::Err(e) => {
-                return elrond_wasm::types::SCResult::Err(e);
+            mx_sc::types::SCResult::Ok(t) => t,
+            mx_sc::types::SCResult::Err(e) => {
+                return mx_sc::types::SCResult::Err(e);
             },
         }
     };
@@ -183,10 +183,10 @@ macro_rules! sc_try {
 /// It can only be used in a function that returns `SCResult<_>` where _ can be any type.
 ///
 /// ```rust
-/// # use elrond_wasm::*;
-/// # use elrond_wasm::api::BlockchainApi;
-/// # use elrond_wasm::types::{*, SCResult::Ok};
-/// # pub trait ExampleContract: elrond_wasm::contract_base::ContractBase
+/// # use mx_sc::*;
+/// # use mx_sc::api::BlockchainApi;
+/// # use mx_sc::types::{*, SCResult::Ok};
+/// # pub trait ExampleContract: mx_sc::contract_base::ContractBase
 /// # {
 /// fn only_callable_by_owner(&self) -> SCResult<()> {
 ///     only_owner!(self, "Caller must be owner");

@@ -1,6 +1,6 @@
-use elrond_wasm::{
+use mx_sc::{
     derive::TypeAbi,
-    elrond_codec::{
+    mx_sc_codec::{
         DecodeError, DecodeErrorHandler, EncodeError, EncodeErrorHandler, NestedDecode,
         NestedDecodeInput, NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode,
         TopEncodeOutput,

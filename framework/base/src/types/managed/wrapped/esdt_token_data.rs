@@ -3,11 +3,11 @@ use crate::{
     contract_base::ExitCodecErrorHandler,
     types::{BigUint, EsdtTokenType, ManagedAddress, ManagedBuffer, ManagedVec},
 };
-use elrond_codec::*;
+use mx_sc_codec::*;
 
-use elrond_codec::elrond_codec_derive::{NestedDecode, NestedEncode, TopDecode, TopEncode};
+use mx_sc_codec::mx_sc_codec_derive::{NestedDecode, NestedEncode, TopDecode, TopEncode};
 
-use crate as elrond_wasm; // needed by the TypeAbi generated code
+use crate as mx_sc; // needed by the TypeAbi generated code
 use crate::derive::TypeAbi;
 
 const DECODE_ATTRIBUTE_ERROR_PREFIX: &[u8] = b"error decoding ESDT attributes: ";

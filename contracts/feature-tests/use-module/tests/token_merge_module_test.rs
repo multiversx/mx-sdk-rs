@@ -1,15 +1,15 @@
-use elrond_wasm::{
+use mx_sc::{
     arrayvec::ArrayVec,
     contract_base::ContractBase,
-    elrond_codec::Empty,
+    mx_sc_codec::Empty,
     storage::mappers::StorageTokenWrapper,
     types::{EsdtLocalRole, EsdtTokenPayment, ManagedVec},
 };
-use elrond_wasm_debug::{
+use mx_sc_debug::{
     managed_address, managed_biguint, managed_token_id, rust_biguint,
     testing_framework::BlockchainStateWrapper, tx_mock::TxTokenTransfer,
 };
-use elrond_wasm_modules::token_merge::{
+use mx_sc_modules::token_merge::{
     merged_token_instances::MergedTokenInstances, merged_token_setup::MergedTokenSetupModule,
 };
 use use_module::token_merge_mod_impl::{CustomAttributes, TokenMergeModImpl};

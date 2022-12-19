@@ -11,14 +11,14 @@ path = "src/lib.rs"
 [dev-dependencies.vault]
 path = "../vault"
 
-[dependencies.elrond-wasm]
+[dependencies.mx-sc]
 version = "0.38.0"
 path = "../../../../framework/base"
 
-[dependencies.elrond-wasm-modules]
+[dependencies.mx-sc-modules]
 version = "0.38.0"
 path = "../../../../contracts/modules"
 
-[dev-dependencies.elrond-wasm-debug]
+[dev-dependencies.mx-sc-debug]
 version = "0.38.0"
 path = "../../../../framework/debug"

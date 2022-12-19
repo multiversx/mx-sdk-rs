@@ -1,9 +1,9 @@
-extern crate elrond_codec_derive;
-use elrond_codec_derive::*;
+extern crate mx_sc_codec_derive;
+use mx_sc_codec_derive::*;
 
-use elrond_codec::test_util::{check_dep_encode_decode, check_top_encode_decode};
+use mx_sc_codec::test_util::{check_dep_encode_decode, check_top_encode_decode};
 
-// to test, run the following command in elrond-codec folder:
+// to test, run the following command in mx-sc-codec folder:
 // cargo expand --test derive_struct_test > expanded.rs
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, PartialEq, Eq, Clone, Debug)]

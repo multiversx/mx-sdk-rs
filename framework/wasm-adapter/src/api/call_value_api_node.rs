@@ -1,5 +1,5 @@
 use super::VmApiImpl;
-use elrond_wasm::{
+use mx_sc::{
     api::{CallValueApi, CallValueApiImpl, StaticVarApiImpl},
     types::{EsdtTokenType, ManagedType, TokenIdentifier},
 };

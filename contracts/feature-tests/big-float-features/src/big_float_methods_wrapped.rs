@@ -1,8 +1,8 @@
 use crate::big_float_methods;
 
-elrond_wasm::imports!();
+mx_sc::imports!();
 
-#[elrond_wasm::module]
+#[mx_sc::module]
 pub trait BigFloatWrappedMethods: big_float_methods::BigFloatMethods {
     #[endpoint]
     fn new_from_parts_big_float_wrapped(

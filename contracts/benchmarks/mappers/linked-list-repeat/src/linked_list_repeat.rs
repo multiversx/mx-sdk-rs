@@ -1,10 +1,10 @@
 #![no_std]
 
-elrond_wasm::imports!();
+mx_sc::imports!();
 
 use benchmark_common::ExampleStruct;
 
-#[elrond_wasm::contract]
+#[mx_sc::contract]
 pub trait LinkedListRepeat: benchmark_common::BenchmarkCommon {
     #[init]
     fn init(&self) {}

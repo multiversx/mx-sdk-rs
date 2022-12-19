@@ -7,14 +7,14 @@ use crate::{
     },
     DebugApi,
 };
-use elrond_wasm::{
+use mx_sc::{
     api::{
         BlockchainApiImpl, HandleConstraints, ManagedTypeApi, SendApi, SendApiImpl,
         ESDT_MULTI_TRANSFER_FUNC_NAME, ESDT_NFT_TRANSFER_FUNC_NAME, ESDT_TRANSFER_FUNC_NAME,
         UPGRADE_CONTRACT_FUNC_NAME,
     },
-    elrond_codec::top_encode_to_vec_u8,
     err_msg,
+    mx_sc_codec::top_encode_to_vec_u8,
     types::{
         heap::Address, ArgBuffer, BigUint, BoxedBytes, CodeMetadata, EsdtTokenPayment,
         ManagedAddress, ManagedArgBuffer, ManagedBuffer, ManagedType, ManagedVec, TokenIdentifier,

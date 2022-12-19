@@ -1,7 +1,7 @@
 use core::ops::Deref;
 
-elrond_wasm::imports!();
-elrond_wasm::derive_imports!();
+mx_sc::imports!();
+mx_sc::derive_imports!();
 
 pub const MAX_MERGED_TOKENS: usize = 25;
 

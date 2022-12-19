@@ -2,9 +2,9 @@
 
 use benchmark_common::ExampleStruct;
 
-elrond_wasm::imports!();
+mx_sc::imports!();
 
-#[elrond_wasm::contract]
+#[mx_sc::contract]
 pub trait SetRepeat: benchmark_common::BenchmarkCommon {
     #[init]
     fn init(&self) {}

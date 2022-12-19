@@ -1,5 +1,5 @@
 use crate::num_bigint::BigInt;
-use elrond_wasm::api::{const_handles, use_raw_handle, HandleConstraints, RawHandle};
+use mx_sc::api::{const_handles, use_raw_handle, HandleConstraints, RawHandle};
 use std::collections::HashMap;
 
 type ManagedBufferImpl = Vec<u8>;

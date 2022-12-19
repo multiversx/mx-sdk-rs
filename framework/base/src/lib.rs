@@ -9,15 +9,15 @@
 #![feature(maybe_uninit_array_assume_init)]
 #![feature(negative_impls)]
 
-pub use elrond_wasm_derive::{self as derive, contract, module, proxy};
+pub use mx_sc_derive::{self as derive, contract, module, proxy};
 
 // re-export basic heap types
 extern crate alloc;
 
 /// Reexported for convenience.
-pub use elrond_codec::arrayvec;
+pub use mx_sc_codec::arrayvec;
 
-pub use elrond_codec;
+pub use mx_sc_codec;
 
 pub mod abi;
 pub mod api;

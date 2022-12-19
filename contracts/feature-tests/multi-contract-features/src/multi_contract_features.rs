@@ -1,8 +1,8 @@
 #![no_std]
 
-elrond_wasm::imports!();
+mx_sc::imports!();
 
-#[elrond_wasm::contract]
+#[mx_sc::contract]
 pub trait MultiContractFeatures {
     #[init]
     fn init(&self, sample_value: BigUint) {

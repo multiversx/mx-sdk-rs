@@ -151,7 +151,7 @@ impl Address {
     }
 }
 
-use elrond_codec::*;
+use mx_sc_codec::*;
 
 impl NestedEncode for Address {
     fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>
@@ -203,7 +203,7 @@ impl TypeAbi for Address {
 mod address_tests {
     use super::*;
     use alloc::vec::Vec;
-    use elrond_codec::test_util::{check_top_encode, check_top_encode_decode};
+    use mx_sc_codec::test_util::{check_top_encode, check_top_encode_decode};
 
     #[test]
     fn test_address() {

@@ -3,8 +3,8 @@
 mod fee;
 use fee::*;
 
-elrond_wasm::imports!();
-#[elrond_wasm::contract]
+mx_sc::imports!();
+#[mx_sc::contract]
 pub trait EsdtTransferWithFee {
     #[init]
     fn init(&self) {}

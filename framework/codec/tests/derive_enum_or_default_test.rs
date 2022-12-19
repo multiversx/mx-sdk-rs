@@ -1,9 +1,9 @@
-extern crate elrond_codec_derive;
-use elrond_codec_derive::*;
+extern crate mx_sc_codec_derive;
+use mx_sc_codec_derive::*;
 
-use elrond_codec::test_util::{check_top_decode, check_top_encode_decode};
+use mx_sc_codec::test_util::{check_top_decode, check_top_encode_decode};
 
-// to test, run the following command in elrond-codec folder:
+// to test, run the following command in mx-sc-codec folder:
 // cargo expand --test enum_or_default_derive_test > expanded.rs
 
 /// This is a good example of an enum with a useful default.
@@ -22,13 +22,13 @@ enum EnumWithDefault {
     },
 }
 
-impl elrond_codec::EncodeDefault for EnumWithDefault {
+impl mx_sc_codec::EncodeDefault for EnumWithDefault {
     fn is_default(&self) -> bool {
         *self == EnumWithDefault::Basic(0)
     }
 }
 
-impl elrond_codec::DecodeDefault for EnumWithDefault {
+impl mx_sc_codec::DecodeDefault for EnumWithDefault {
     fn default() -> Self {
         EnumWithDefault::Basic(0)
     }

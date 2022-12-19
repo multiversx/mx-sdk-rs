@@ -2,7 +2,7 @@ use crate::{
     num_bigint::{BigInt, BigUint},
     DebugApi,
 };
-use elrond_wasm::api::{BigIntApi, EndpointFinishApi, EndpointFinishApiImpl, ManagedBufferApi};
+use mx_sc::api::{BigIntApi, EndpointFinishApi, EndpointFinishApiImpl, ManagedBufferApi};
 
 impl EndpointFinishApi for DebugApi {
     type EndpointFinishApiImpl = DebugApi;

@@ -3,14 +3,14 @@ use std::marker::PhantomData;
 use elrond_sdk_erdrs::data::transaction::{
     ApiLogs, ApiSmartContractResult, Events, TransactionOnNetwork,
 };
-use elrond_wasm_debug::{
+use log::info;
+use mx_sc_debug::{
     bech32,
-    elrond_wasm::{
-        elrond_codec::{PanicErrorHandler, TopDecodeMulti},
+    mx_sc::{
+        mx_sc_codec::{PanicErrorHandler, TopDecodeMulti},
         types::Address,
     },
 };
-use log::info;
 
 const LOG_IDENTIFIER_SC_DEPLOY: &str = "SCDeploy";
 

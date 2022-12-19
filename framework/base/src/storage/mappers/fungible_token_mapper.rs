@@ -1,4 +1,4 @@
-use elrond_codec::{CodecFrom, EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput};
+use mx_sc_codec::{CodecFrom, EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput};
 
 use super::{
     token_mapper::{
@@ -69,7 +69,7 @@ where
     SA: StorageMapperApi + CallTypeApi,
 {
     /// Important: If you use custom callback, remember to save the token ID in the callback!
-    /// If you want to use default callbacks, import the default_issue_callbacks::DefaultIssueCallbacksModule from elrond-wasm-modules
+    /// If you want to use default callbacks, import the default_issue_callbacks::DefaultIssueCallbacksModule from mx-sc-modules
     /// and pass None for the opt_callback argument
     pub fn issue(
         &self,
@@ -108,7 +108,7 @@ where
     }
 
     /// Important: If you use custom callback, remember to save the token ID in the callback!
-    /// If you want to use default callbacks, import the default_issue_callbacks::DefaultIssueCallbacksModule from elrond-wasm-modules
+    /// If you want to use default callbacks, import the default_issue_callbacks::DefaultIssueCallbacksModule from mx-sc-modules
     /// and pass None for the opt_callback argument
     pub fn issue_and_set_all_roles(
         &self,

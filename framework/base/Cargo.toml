@@ -1,21 +1,21 @@
 [package]
-name = "elrond-wasm"
+name = "mx-sc"
 version = "0.38.0"
 edition = "2021"
 
-authors = ["Andrei Marinica <andrei.marinica@elrond.com>", "Elrond Network <contact@elrond.com>"]
+authors = ["Andrei Marinica <andrei.marinica@elrond.com>", "MultiversX <contact@multiversx.com>"]
 license = "GPL-3.0-only"
 readme = "README.md"
 repository = "https://github.com/ElrondNetwork/elrond-wasm-rs"
-homepage = "https://elrond.com/"
+homepage = "https://multiversx.com/"
 documentation = "https://docs.elrond.com/"
-description = "Elrond WebAssembly smart contract API"
-keywords = ["elrond", "wasm", "webassembly", "blockchain", "contract"]
+description = "MultiversX smart contract API"
+keywords = ["multiversx", "wasm", "webassembly", "blockchain", "contract"]
 categories = ["no-std", "wasm", "cryptography::cryptocurrencies", "development-tools"]
 
 [features]
-num-bigint = ["elrond-codec/num-bigint"]
-alloc = ["elrond-codec/alloc"]
+num-bigint = ["mx-sc-codec/num-bigint"]
+alloc = ["mx-sc-codec/alloc"]
 ei-unmanaged = ["alloc"]
 promises = []
 big-float = []
@@ -31,11 +31,11 @@ bitflags = "1.3.2"
 version = "0.2"
 default-features = false
 
-[dependencies.elrond-wasm-derive]
+[dependencies.mx-sc-derive]
 version = "=0.38.0"
 path = "../derive"
 
-[dependencies.elrond-codec]
+[dependencies.mx-sc-codec]
 version = "=0.16.0"
 path = "../codec"
 features = ["derive"]

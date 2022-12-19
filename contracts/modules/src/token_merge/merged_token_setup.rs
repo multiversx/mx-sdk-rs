@@ -1,4 +1,4 @@
-elrond_wasm::imports!();
+mx_sc::imports!();
 
 use super::{
     custom_merged_token_attributes::MergedTokenAttributesCreator,
@@ -8,7 +8,7 @@ use super::{
 const NFT_AMOUNT: u64 = 1;
 pub static DIFFERENT_CREATOR_ERR_MSG: &[u8] = b"All merged tokens must have the same creator";
 
-#[elrond_wasm::module]
+#[mx_sc::module]
 pub trait MergedTokenSetupModule {
     #[only_owner]
     #[payable("EGLD")]

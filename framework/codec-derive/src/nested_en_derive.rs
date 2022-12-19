@@ -4,7 +4,7 @@ use quote::quote;
 
 pub fn dep_encode_snippet(value: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
     quote! {
-        elrond_codec::NestedEncode::dep_encode_or_handle_err(&#value, dest, h)?;
+        mx_sc_codec::NestedEncode::dep_encode_or_handle_err(&#value, dest, h)?;
     }
 }
 
@@ -26,7 +26,7 @@ fn variant_dep_encode_snippets(
             });
             quote! {
                 #name::#variant_ident #local_var_declarations => {
-                    elrond_codec::NestedEncode::dep_encode_or_handle_err(&#variant_index_u8, dest, h)?;
+                    mx_sc_codec::NestedEncode::dep_encode_or_handle_err(&#variant_index_u8, dest, h)?;
                     #(#variant_field_snippets)*
                 },
             }
@@ -43,11 +43,11 @@ pub fn nested_encode_impl(ast: &syn::DeriveInput) -> TokenStream {
                 dep_encode_snippet(&self_field_expr(index, field))
             });
             quote! {
-                impl #impl_generics elrond_codec::NestedEncode for #name #ty_generics #where_clause {
+                impl #impl_generics mx_sc_codec::NestedEncode for #name #ty_generics #where_clause {
                     fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> core::result::Result<(), H::HandledErr>
                     where
-                        O: elrond_codec::NestedEncodeOutput,
-                        H: elrond_codec::EncodeErrorHandler,
+                        O: mx_sc_codec::NestedEncodeOutput,
+                        H: mx_sc_codec::EncodeErrorHandler,
                     {
                         #(#field_dep_encode_snippets)*
                         core::result::Result::Ok(())
@@ -63,11 +63,11 @@ pub fn nested_encode_impl(ast: &syn::DeriveInput) -> TokenStream {
             let variant_dep_encode_snippets = variant_dep_encode_snippets(name, data_enum);
 
             quote! {
-                impl #impl_generics elrond_codec::NestedEncode for #name #ty_generics #where_clause {
+                impl #impl_generics mx_sc_codec::NestedEncode for #name #ty_generics #where_clause {
                     fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> core::result::Result<(), H::HandledErr>
                     where
-                        O: elrond_codec::NestedEncodeOutput,
-                        H: elrond_codec::EncodeErrorHandler,
+                        O: mx_sc_codec::NestedEncodeOutput,
+                        H: mx_sc_codec::EncodeErrorHandler,
                     {
                         match self {
                             #(#variant_dep_encode_snippets)*

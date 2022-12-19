@@ -1,7 +1,7 @@
 #![no_std]
 #![feature(never_type)]
 
-elrond_wasm::imports!();
+mx_sc::imports!();
 
 pub mod crypto_features_alloc;
 pub mod echo_alloc;
@@ -22,7 +22,7 @@ pub mod types;
 /// Also some legacy/deprecated features still preserved here:
 /// - some will be removed,
 /// - some will be kept to provide test coverage for otherwise unused VM endpoints.
-#[elrond_wasm::contract]
+#[mx_sc::contract]
 pub trait AllocFeatures:
     crypto_features_alloc::CryptoFeaturesAlloc
     + echo_alloc::EchoAllocTypes

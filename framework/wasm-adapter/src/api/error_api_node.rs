@@ -1,5 +1,5 @@
 use crate::{error_hook, VmApiImpl};
-use elrond_wasm::api::{ErrorApi, ErrorApiImpl};
+use mx_sc::api::{ErrorApi, ErrorApiImpl};
 
 extern "C" {
     fn managedSignalError(messageHandle: i32) -> !;

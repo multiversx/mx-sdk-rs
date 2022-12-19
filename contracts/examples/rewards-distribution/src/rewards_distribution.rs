@@ -1,10 +1,8 @@
 #![no_std]
 
-elrond_wasm::imports!();
-elrond_wasm::derive_imports!();
-use elrond_wasm_modules::ongoing_operation::{
-    CONTINUE_OP, DEFAULT_MIN_GAS_TO_SAVE_PROGRESS, STOP_OP,
-};
+mx_sc::imports!();
+mx_sc::derive_imports!();
+use mx_sc_modules::ongoing_operation::{CONTINUE_OP, DEFAULT_MIN_GAS_TO_SAVE_PROGRESS, STOP_OP};
 
 type Epoch = u64;
 
@@ -32,10 +30,8 @@ pub struct RaffleProgress<M: ManagedTypeApi> {
     pub computed_brackets: ManagedVec<M, ComputedBracket<M>>,
 }
 
-#[elrond_wasm::contract]
-pub trait RewardsDistribution:
-    elrond_wasm_modules::ongoing_operation::OngoingOperationModule
-{
+#[mx_sc::contract]
+pub trait RewardsDistribution: mx_sc_modules::ongoing_operation::OngoingOperationModule {
     #[init]
     fn init(&self, seed_nft_minter_address: ManagedAddress, brackets: ManagedVec<Bracket>) {
         self.seed_nft_minter_address().set(&seed_nft_minter_address);
@@ -440,9 +436,9 @@ fn ticket_from_storage(position: u64, ticket_id: u64) -> u64 {
 }
 
 mod seed_nft_minter {
-    elrond_wasm::imports!();
+    mx_sc::imports!();
 
-    #[elrond_wasm::proxy]
+    #[mx_sc::proxy]
     pub trait SeedNftMinter {
         #[endpoint(getNftCount)]
         fn get_nft_count(&self) -> u64;

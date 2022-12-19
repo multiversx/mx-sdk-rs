@@ -1,7 +1,7 @@
 mod dns_proxy {
-    elrond_wasm::imports!();
+    mx_sc::imports!();
 
-    #[elrond_wasm::proxy]
+    #[mx_sc::proxy]
     pub trait Dns {
         #[payable("EGLD")]
         #[endpoint]
@@ -9,14 +9,14 @@ mod dns_proxy {
     }
 }
 
-elrond_wasm::imports!();
+mx_sc::imports!();
 
 /// Standard smart contract module that deals with registering usernames in a DNS contract.
 ///
 /// Elrond usernames/herotags need to be requested by the beneficiary.
 /// For a contract, this means that they need an endpoint via which to request a username from the DNS.
 ///
-#[elrond_wasm::module]
+#[mx_sc::module]
 pub trait DnsModule {
     #[proxy]
     fn dns_proxy(&self, to: ManagedAddress) -> dns_proxy::Proxy<Self::Api>;

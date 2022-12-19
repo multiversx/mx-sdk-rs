@@ -1,5 +1,5 @@
-use elrond_wasm::types::{SCResult, StaticSCError};
-use elrond_wasm_debug::*;
+use mx_sc::types::{SCResult, StaticSCError};
+use mx_sc_debug::*;
 
 use alloc_features::macro_features_legacy::MacroFeaturesLegacy;
 

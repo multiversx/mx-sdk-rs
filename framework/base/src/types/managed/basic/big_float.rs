@@ -6,7 +6,7 @@ use crate::{
 };
 use alloc::string::String;
 
-use elrond_codec::{
+use mx_sc_codec::{
     CodecFromSelf, DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput,
     NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
     TryStaticCast,

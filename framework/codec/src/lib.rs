@@ -7,8 +7,8 @@
 
 extern crate alloc;
 
-#[cfg(feature = "elrond-codec-derive")]
-pub use elrond_codec_derive;
+#[cfg(feature = "mx-sc-codec-derive")]
+pub use mx_sc_codec_derive;
 
 /// Reexport needed by derive.
 pub use alloc::vec::Vec;

@@ -8,11 +8,11 @@ publish = false
 [lib]
 path = "src/token_release.rs"
 
-[dependencies.elrond-wasm]
+[dependencies.mx-sc]
 version = "0.38.0"
 path = "../../../framework/base"
 
-[dev-dependencies.elrond-wasm-debug]
+[dev-dependencies.mx-sc-debug]
 version = "0.38.0"
 path = "../../../framework/debug"
 

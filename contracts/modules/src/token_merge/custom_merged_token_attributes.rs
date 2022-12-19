@@ -1,8 +1,8 @@
-elrond_wasm::imports!();
+mx_sc::imports!();
 
 use core::marker::PhantomData;
 
-use elrond_wasm::elrond_codec::Empty;
+use mx_sc::mx_sc_codec::Empty;
 
 use super::merged_token_instances::MergedTokenInstances;
 

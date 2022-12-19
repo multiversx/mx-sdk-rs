@@ -1,14 +1,14 @@
 #![feature(exhaustive_patterns)]
 
-use elrond_wasm::{
-    elrond_codec::{
+use mx_sc::{
+    mx_sc_codec::{
         multi_types::{MultiValue2, MultiValueVec, OptionalValue},
         PanicErrorHandler, TopDecodeMulti, TopDecodeMultiInput,
     },
     types::{AsyncCallResult, BigUint},
     HexCallDataDeserializer,
 };
-use elrond_wasm_debug::DebugApi;
+use mx_sc_debug::DebugApi;
 
 #[test]
 fn test_simple_args() {

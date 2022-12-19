@@ -3,30 +3,30 @@ name = "elrond-sc-price-aggregator"
 version = "0.38.0"
 authors = [
     "Claudiu-Marcel Bruda <claudiu.bruda@elrond.com>",
-    "Elrond Network <contact@elrond.com>",
+    "MultiversX <contact@multiversx.com>",
 ]
 license = "GPL-3.0-only"
 readme = "README.md"
 repository = "https://github.com/ElrondNetwork/elrond-wasm-rs"
-homepage = "https://elrond.com/"
+homepage = "https://multiversx.com/"
 documentation = "https://docs.elrond.com/"
 description = "Elrond Price aggregator Smart Contract"
-keywords = ["elrond", "wasm", "webassembly", "blockchain", "contract"]
+keywords = ["multiversx", "wasm", "webassembly", "blockchain", "contract"]
 categories = ["no-std", "wasm", "cryptography::cryptocurrencies"]
 edition = "2021"
 
 [lib]
 path = "src/lib.rs"
 
-[dependencies.elrond-wasm]
+[dependencies.mx-sc]
 version = "0.38.0"
 path = "../../../framework/base"
 
-[dependencies.elrond-wasm-modules]
+[dependencies.mx-sc-modules]
 version = "0.38.0"
 path = "../../../contracts/modules"
 
-[dev-dependencies.elrond-wasm-debug]
+[dev-dependencies.mx-sc-debug]
 version = "0.38.0"
 path = "../../../framework/debug"
 

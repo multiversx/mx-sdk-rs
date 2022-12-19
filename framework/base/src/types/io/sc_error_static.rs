@@ -1,4 +1,4 @@
-use elrond_codec::{DecodeError, EncodeError, TopEncodeMulti, TryStaticCast};
+use mx_sc_codec::{DecodeError, EncodeError, TopEncodeMulti, TryStaticCast};
 
 use crate::api::{EndpointFinishApi, ErrorApiImpl};
 
@@ -63,8 +63,8 @@ impl From<!> for StaticSCError {
 impl TopEncodeMulti for StaticSCError {
     fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
     where
-        O: elrond_codec::TopEncodeMultiOutput,
-        H: elrond_codec::EncodeErrorHandler,
+        O: mx_sc_codec::TopEncodeMultiOutput,
+        H: mx_sc_codec::EncodeErrorHandler,
     {
         output.push_multi_specialized(self, h)
     }

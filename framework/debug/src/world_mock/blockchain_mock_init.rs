@@ -1,7 +1,7 @@
 use std::path::{Path, PathBuf};
 
-use elrond_wasm::contract_base::{CallableContractBuilder, ContractAbiProvider};
 use mandos::{interpret_trait::InterpreterContext, value_interpreter::interpret_string};
+use mx_sc::contract_base::{CallableContractBuilder, ContractAbiProvider};
 
 use crate::DebugApi;
 
@@ -91,7 +91,7 @@ impl BlockchainMock {
         );
         let sub_contract = multi_contract_config.find_contract(sub_contract_name);
         let contract_obj = if sub_contract.external_view {
-            contract_builder.new_contract_obj::<elrond_wasm::api::ExternalViewApi<DebugApi>>()
+            contract_builder.new_contract_obj::<mx_sc::api::ExternalViewApi<DebugApi>>()
         } else {
             contract_builder.new_contract_obj::<DebugApi>()
         };

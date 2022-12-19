@@ -50,7 +50,7 @@ fn generate_endpoint_snippet(
     let mutability_tokens = mutability.to_tokens();
 
     quote! {
-        let mut endpoint_abi = elrond_wasm::abi::EndpointAbi{
+        let mut endpoint_abi = mx_sc::abi::EndpointAbi{
             docs: &[ #(#endpoint_docs),* ],
             name: #endpoint_name,
             rust_method_name: #rust_method_name,
@@ -58,8 +58,8 @@ fn generate_endpoint_snippet(
             only_admin: #only_admin,
             mutability: #mutability_tokens,
             payable_in_tokens: &[ #(#payable_in_tokens),* ],
-            inputs: elrond_wasm::types::heap::Vec::new(),
-            outputs: elrond_wasm::types::heap::Vec::new(),
+            inputs: mx_sc::types::heap::Vec::new(),
+            outputs: mx_sc::types::heap::Vec::new(),
             labels: &[ #(#label_names),* ],
         };
         #(#input_snippets)*
@@ -135,10 +135,10 @@ fn generate_event_snippet(m: &Method, event_name: &str) -> proc_macro2::TokenStr
         .collect();
 
     quote! {
-        let mut event_abi = elrond_wasm::abi::EventAbi{
+        let mut event_abi = mx_sc::abi::EventAbi{
             docs: &[ #(#event_docs),* ],
             identifier: #event_name,
-            inputs: elrond_wasm::types::heap::Vec::new(),
+            inputs: mx_sc::types::heap::Vec::new(),
         };
         #(#input_snippets)*
     }
@@ -178,7 +178,7 @@ fn generate_supertrait_snippets(contract: &ContractTrait) -> Vec<proc_macro2::To
 			.map(|supertrait| {
 				let module_path = &supertrait.module_path;
 				quote! {
-					contract_abi.coalesce(<#module_path AbiProvider as elrond_wasm::contract_base::ContractAbiProvider>::abi());
+					contract_abi.coalesce(<#module_path AbiProvider as mx_sc::contract_base::ContractAbiProvider>::abi());
 				}
 			})
 			.collect()
@@ -200,23 +200,23 @@ fn generate_abi_method_body(
     };
 
     quote! {
-        let mut contract_abi = elrond_wasm::abi::ContractAbi {
-            build_info: elrond_wasm::abi::BuildInfoAbi {
-                contract_crate: elrond_wasm::abi::ContractCrateBuildAbi {
+        let mut contract_abi = mx_sc::abi::ContractAbi {
+            build_info: mx_sc::abi::BuildInfoAbi {
+                contract_crate: mx_sc::abi::ContractCrateBuildAbi {
                     name: env!("CARGO_PKG_NAME"),
                     version: env!("CARGO_PKG_VERSION"),
                     git_version: "",
                 },
-                framework: elrond_wasm::abi::FrameworkBuildAbi::create(),
+                framework: mx_sc::abi::FrameworkBuildAbi::create(),
             },
             docs: &[ #(#contract_docs),* ],
             name: #contract_name,
-            constructors: elrond_wasm::types::heap::Vec::new(),
-            endpoints: elrond_wasm::types::heap::Vec::new(),
-            promise_callbacks: elrond_wasm::types::heap::Vec::new(),
-            events: elrond_wasm::types::heap::Vec::new(),
+            constructors: mx_sc::types::heap::Vec::new(),
+            endpoints: mx_sc::types::heap::Vec::new(),
+            promise_callbacks: mx_sc::types::heap::Vec::new(),
+            events: mx_sc::types::heap::Vec::new(),
             has_callback: #has_callbacks,
-            type_descriptions: <elrond_wasm::abi::TypeDescriptionContainerImpl as elrond_wasm::abi::TypeDescriptionContainer>::new(),
+            type_descriptions: <mx_sc::abi::TypeDescriptionContainerImpl as mx_sc::abi::TypeDescriptionContainer>::new(),
         };
         #(#endpoint_snippets)*
         #(#event_snippets)*
@@ -233,10 +233,10 @@ pub fn generate_abi_provider(
     quote! {
         pub struct AbiProvider {}
 
-        impl elrond_wasm::contract_base::ContractAbiProvider for AbiProvider {
-            type Api = elrond_wasm::api::uncallable::UncallableApi;
+        impl mx_sc::contract_base::ContractAbiProvider for AbiProvider {
+            type Api = mx_sc::api::uncallable::UncallableApi;
 
-            fn abi() -> elrond_wasm::abi::ContractAbi {
+            fn abi() -> mx_sc::abi::ContractAbi {
                 #abi_body
             }
         }

@@ -1,5 +1,5 @@
 use crate::VmApiImpl;
-use elrond_wasm::{
+use mx_sc::{
     api::{EndpointArgumentApi, EndpointArgumentApiImpl},
     types::heap::BoxedBytes,
 };

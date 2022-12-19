@@ -4,7 +4,7 @@ use crate::{
     types::{heap::BoxedBytes, ManagedBuffer, ManagedByteArray, ManagedType},
     *,
 };
-use elrond_codec::*;
+use mx_sc_codec::*;
 
 pub struct StorageKey<A>
 where

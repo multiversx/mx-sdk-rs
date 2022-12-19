@@ -1,19 +1,19 @@
 [package]
-name = "elrond-wasm-debug"
+name = "mx-sc-debug"
 version = "0.38.0"
 edition = "2021"
 
 authors = [
     "Andrei Marinica <andrei.marinica@elrond.com>",
-    "Elrond Network <contact@elrond.com>",
+    "MultiversX <contact@multiversx.com>",
 ]
 license = "GPL-3.0-only"
 readme = "README.md"
 repository = "https://github.com/ElrondNetwork/elrond-wasm-rs"
-homepage = "https://elrond.com/"
+homepage = "https://multiversx.com/"
 documentation = "https://docs.elrond.com/"
-description = "Elrond WebAssembly smart contract API debugging mocks and utils"
-keywords = ["elrond", "blockchain", "contract", "debug"]
+description = "MultiversX smart contract API debugging mocks and utils"
+keywords = ["multiversx", "blockchain", "contract", "debug"]
 categories = ["cryptography::cryptocurrencies", "development-tools::debugging"]
 
 [dependencies]
@@ -37,7 +37,7 @@ bech32 = "0.9.0"
 [features]
 mandos-go-tests = []
 
-[dependencies.elrond-wasm]
+[dependencies.mx-sc]
 version = "=0.38.0"
 path = "../base"
 features = ["alloc", "num-bigint", "promises", "big-float"]

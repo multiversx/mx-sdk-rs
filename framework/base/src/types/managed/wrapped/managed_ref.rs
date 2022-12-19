@@ -1,6 +1,6 @@
 use core::{borrow::Borrow, marker::PhantomData, ops::Deref};
 
-use elrond_codec::{
+use mx_sc_codec::{
     EncodeErrorHandler, NestedEncode, NestedEncodeOutput, TopEncode, TopEncodeOutput,
 };
 

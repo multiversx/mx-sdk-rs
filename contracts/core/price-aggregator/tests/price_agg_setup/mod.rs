@@ -1,12 +1,12 @@
 use elrond_sc_price_aggregator::{staking::StakingModule, PriceAggregator};
-use elrond_wasm::types::{Address, EgldOrEsdtTokenIdentifier, MultiValueEncoded};
-use elrond_wasm_debug::{
+use mx_sc::types::{Address, EgldOrEsdtTokenIdentifier, MultiValueEncoded};
+use mx_sc_debug::{
     managed_address, managed_biguint, managed_buffer, rust_biguint,
     testing_framework::{BlockchainStateWrapper, ContractObjWrapper},
     tx_mock::TxResult,
     DebugApi,
 };
-use elrond_wasm_modules::pause::PauseModule;
+use mx_sc_modules::pause::PauseModule;
 
 pub const NR_ORACLES: usize = 4;
 pub const SUBMISSION_COUNT: usize = 3;

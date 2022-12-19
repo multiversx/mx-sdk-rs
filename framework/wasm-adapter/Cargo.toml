@@ -1,16 +1,16 @@
 [package]
-name = "elrond-wasm-node"
+name = "mx-sc-wasm-adapter"
 version = "0.38.0"
 edition = "2021"
 
-authors = ["Andrei Marinica <andrei.marinica@elrond.com>", "Elrond Network <contact@elrond.com>"]
+authors = ["Andrei Marinica <andrei.marinica@elrond.com>", "MultiversX <contact@multiversx.com>"]
 license = "GPL-3.0-only"
 readme = "README.md"
 repository = "https://github.com/ElrondNetwork/elrond-wasm-rs"
-homepage = "https://elrond.com/"
+homepage = "https://multiversx.com/"
 documentation = "https://docs.elrond.com/"
-description = "Elrond WebAssembly VM API wrapper"
-keywords = ["elrond", "wasm", "webassembly", "blockchain", "contract"]
+description = "MultiversX WebAssembly VM API wrapper"
+keywords = ["multiversx", "wasm", "webassembly", "blockchain", "contract"]
 categories = ["no-std", "wasm", "cryptography::cryptocurrencies", "development-tools::ffi"]
 
 [features]
@@ -18,6 +18,6 @@ vm-validate-token-identifier = []
 vm-esdt-local-roles = []
 ei-unmanaged-node = []
 
-[dependencies.elrond-wasm]
+[dependencies.mx-sc]
 version = "=0.38.0"
 path = "../base"

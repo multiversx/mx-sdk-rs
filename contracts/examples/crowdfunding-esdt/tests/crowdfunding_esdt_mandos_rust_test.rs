@@ -1,6 +1,6 @@
 use crowdfunding_esdt::*;
-use elrond_wasm::types::EgldOrEsdtTokenIdentifier;
-use elrond_wasm_debug::{mandos_system::model::*, *};
+use mx_sc::types::EgldOrEsdtTokenIdentifier;
+use mx_sc_debug::{mandos_system::model::*, *};
 
 fn world() -> BlockchainMock {
     let mut blockchain = BlockchainMock::new();

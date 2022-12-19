@@ -1,5 +1,5 @@
 use super::VmApiImpl;
-use elrond_wasm::api::{EndpointFinishApi, EndpointFinishApiImpl};
+use mx_sc::api::{EndpointFinishApi, EndpointFinishApiImpl};
 
 extern "C" {
     fn finish(dataOffset: *const u8, length: i32);

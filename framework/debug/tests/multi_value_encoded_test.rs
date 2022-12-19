@@ -1,8 +1,8 @@
-use elrond_wasm::{
-    elrond_codec::multi_types::MultiValue5,
+use mx_sc::{
+    mx_sc_codec::multi_types::MultiValue5,
     types::{BigUint, MultiValueEncoded},
 };
-use elrond_wasm_debug::DebugApi;
+use mx_sc_debug::DebugApi;
 
 #[test]
 fn test_multi_value_encoded_1() {

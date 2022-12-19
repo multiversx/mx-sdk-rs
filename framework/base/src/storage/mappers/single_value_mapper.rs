@@ -10,7 +10,7 @@ use crate::{
     },
     types::{ManagedAddress, ManagedType},
 };
-use elrond_codec::{
+use mx_sc_codec::{
     multi_types::PlaceholderOutput, CodecFrom, CodecFromSelf, DecodeErrorHandler,
     EncodeErrorHandler, TopDecode, TopDecodeInput, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
     TopEncodeOutput,

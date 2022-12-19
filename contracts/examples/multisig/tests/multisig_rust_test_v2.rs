@@ -5,12 +5,12 @@ use multisig::{
     multisig_perform::ProxyTrait as _, multisig_propose::ProxyTrait as _, ProxyTrait as _,
 };
 
-use elrond_wasm::{
-    elrond_codec::multi_types::{MultiValueVec, OptionalValue},
+use mx_sc::{
+    mx_sc_codec::multi_types::{MultiValueVec, OptionalValue},
     storage::mappers::SingleValue,
     types::{Address, CodeMetadata},
 };
-use elrond_wasm_debug::{
+use mx_sc_debug::{
     mandos::interpret_trait::{InterpretableFrom, InterpreterContext},
     mandos_system::model::*,
     BlockchainMock, ContractInfo, DebugApi,

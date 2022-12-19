@@ -10,6 +10,6 @@ authors = [ "you",]
 [dependencies.proxy-pause]
 path = ".."
 
-[dependencies.elrond-wasm-debug]
+[dependencies.mx-sc-debug]
 version = "0.38.0"
 path = "../../../../framework/debug"

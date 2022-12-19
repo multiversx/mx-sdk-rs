@@ -1,8 +1,8 @@
-use elrond_wasm::types::{
+use mx_sc::types::{
     BoxedBytes, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment, EsdtTokenPayment,
     TokenIdentifier,
 };
-use elrond_wasm_debug::{
+use mx_sc_debug::{
     check_managed_top_encode_decode, managed_egld_token_id, managed_token_id,
     managed_token_id_wrapped, DebugApi,
 };

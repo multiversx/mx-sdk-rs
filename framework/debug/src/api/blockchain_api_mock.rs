@@ -3,7 +3,7 @@ use crate::{
     world_mock::{is_smart_contract_address, EsdtData, EsdtInstance},
     DebugApi,
 };
-use elrond_wasm::{
+use mx_sc::{
     api::{BlockchainApi, BlockchainApiImpl, HandleConstraints, ManagedBufferApi, ManagedTypeApi},
     types::{
         heap::{Address, H256},

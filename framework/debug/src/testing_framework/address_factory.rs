@@ -1,4 +1,4 @@
-use elrond_wasm::types::heap::Address;
+use mx_sc::types::heap::Address;
 use sha2::{Digest, Sha256};
 
 const ADDRESS_LEN: usize = 32;

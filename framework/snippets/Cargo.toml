@@ -1,19 +1,19 @@
 [package]
-name = "elrond-interact-snippets"
+name = "mx-sc-snippets"
 version = "0.38.0"
 edition = "2021"
 
 authors = [
     "Andrei Marinica <andrei.marinica@elrond.com>",
-    "Elrond Network <contact@elrond.com>",
+    "MultiversX <contact@multiversx.com>",
 ]
 license = "GPL-3.0-only"
 readme = "README.md"
 repository = "https://github.com/ElrondNetwork/elrond-wasm-rs"
-homepage = "https://elrond.com/"
+homepage = "https://multiversx.com/"
 documentation = "https://docs.elrond.com/"
-description = "Elrond framework for building smart contract interaction snippets"
-keywords = ["elrond", "blockchain", "contract", "snippets"]
+description = "MultiversX framework for building smart contract interaction snippets"
+keywords = ["multiversx", "blockchain", "contract", "snippets"]
 categories = ["cryptography::cryptocurrencies"]
 
 [dependencies]
@@ -24,7 +24,7 @@ base64 = "0.13.0"
 log = "0.4.17"
 env_logger = "0.8.4"
 
-[dependencies.elrond-wasm-debug]
+[dependencies.mx-sc-debug]
 version = "=0.38.0"
 path = "../debug"
 

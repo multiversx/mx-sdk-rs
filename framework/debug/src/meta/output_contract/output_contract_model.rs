@@ -1,4 +1,4 @@
-use elrond_wasm::abi::ContractAbi;
+use mx_sc::abi::ContractAbi;
 
 use crate::meta::meta_build_args::BuildArgs;
 

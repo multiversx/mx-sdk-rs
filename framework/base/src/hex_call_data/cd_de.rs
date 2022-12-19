@@ -1,7 +1,7 @@
 use super::SEPARATOR;
 use crate::{err_msg, formatter::hex_util::hex_digits_to_byte};
 use alloc::{boxed::Box, vec::Vec};
-use elrond_codec::{DecodeError, DecodeErrorHandler, TopDecodeMultiInput};
+use mx_sc_codec::{DecodeError, DecodeErrorHandler, TopDecodeMultiInput};
 
 /// Deserializes from Elrond's smart contract call format.
 ///

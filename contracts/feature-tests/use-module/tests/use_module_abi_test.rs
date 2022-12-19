@@ -1,4 +1,4 @@
-use elrond_wasm_debug::*;
+use mx_sc_debug::*;
 
 use std::{fs, fs::File, io::Write};
 
@@ -8,14 +8,13 @@ fn use_module_abi_generated_ok() {
     blockchain.set_current_dir_from_workspace("contracts/feature-tests/use-module");
 
     // generate ABI
-    let multi_contract_config =
-        elrond_wasm_debug::meta::multi_contract_config::<use_module::AbiProvider>(
-            blockchain
-                .current_dir
-                .join("multicontract.toml")
-                .to_str()
-                .unwrap(),
-        );
+    let multi_contract_config = mx_sc_debug::meta::multi_contract_config::<use_module::AbiProvider>(
+        blockchain
+            .current_dir
+            .join("multicontract.toml")
+            .to_str()
+            .unwrap(),
+    );
 
     let main_contract = multi_contract_config.find_contract("use-module");
     assert!(!main_contract.external_view);

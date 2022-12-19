@@ -1,9 +1,9 @@
-use elrond_wasm::{
+use mx_sc::{
     api::ManagedTypeApi,
     types::{BigUint, CodeMetadata, ManagedAddress, ManagedBuffer, ManagedVec},
 };
 
-elrond_wasm::derive_imports!();
+mx_sc::derive_imports!();
 
 #[derive(NestedEncode, NestedDecode, TypeAbi, Clone)]
 pub struct CallActionData<M: ManagedTypeApi> {
@@ -56,7 +56,7 @@ pub struct ActionFullInfo<M: ManagedTypeApi> {
 
 #[cfg(test)]
 mod test {
-    use elrond_wasm_debug::DebugApi;
+    use mx_sc_debug::DebugApi;
 
     use super::Action;
 

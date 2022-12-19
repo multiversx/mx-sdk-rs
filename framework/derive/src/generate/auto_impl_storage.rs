@@ -15,7 +15,7 @@ fn generate_key_snippet(key_args: &[MethodArgument], identifier: &str) -> proc_m
         })
         .collect();
     quote! {
-        let mut ___key___ = elrond_wasm::storage::StorageKey::<Self::Api>::new(
+        let mut ___key___ = mx_sc::storage::StorageKey::<Self::Api>::new(
             &#id_literal[..],
         );
         #(#key_appends)*
@@ -31,8 +31,8 @@ pub fn generate_getter_impl(m: &Method, identifier: &str) -> proc_macro2::TokenS
             quote! {
                 #msig {
                     #key_snippet
-                    elrond_wasm::storage::storage_get(
-                        elrond_wasm::types::ManagedRef::new(&___key___),
+                    mx_sc::storage::storage_get(
+                        mx_sc::types::ManagedRef::new(&___key___),
                     )
                 }
             }
@@ -57,8 +57,8 @@ pub fn generate_setter_impl(m: &Method, identifier: &str) -> proc_macro2::TokenS
     quote! {
         #msig {
             #key_snippet
-            elrond_wasm::storage::storage_set(
-                elrond_wasm::types::ManagedRef::new(&___key___),
+            mx_sc::storage::storage_set(
+                mx_sc::types::ManagedRef::new(&___key___),
                 &#pat);
         }
     }
@@ -73,7 +73,7 @@ pub fn generate_mapper_impl(m: &Method, identifier: &str) -> proc_macro2::TokenS
             quote! {
                 #msig {
                     #key_snippet
-                    <#ty as elrond_wasm::storage::mappers::StorageMapper<Self::Api>>::new(
+                    <#ty as mx_sc::storage::mappers::StorageMapper<Self::Api>>::new(
                         ___key___
                     )
                 }
@@ -88,8 +88,8 @@ pub fn generate_is_empty_impl(m: &Method, identifier: &str) -> proc_macro2::Toke
     quote! {
         #msig {
             #key_snippet
-            elrond_wasm::storage::storage_get_len(
-                elrond_wasm::types::ManagedRef::new(&___key___),
+            mx_sc::storage::storage_get_len(
+                mx_sc::types::ManagedRef::new(&___key___),
             ) == 0
         }
     }
@@ -105,8 +105,8 @@ pub fn generate_clear_impl(m: &Method, identifier: &str) -> proc_macro2::TokenSt
     quote! {
         #msig {
             #key_snippet
-            elrond_wasm::storage::storage_clear(
-                elrond_wasm::types::ManagedRef::new(&___key___),
+            mx_sc::storage::storage_clear(
+                mx_sc::types::ManagedRef::new(&___key___),
             );
         }
     }

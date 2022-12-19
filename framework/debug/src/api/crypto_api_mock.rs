@@ -1,6 +1,6 @@
 use crate::DebugApi;
 use ed25519_dalek::*;
-use elrond_wasm::{
+use mx_sc::{
     api::{
         CryptoApi, CryptoApiImpl, ManagedBufferApi, KECCAK256_RESULT_LEN, RIPEMD_RESULT_LEN,
         SHA256_RESULT_LEN,
