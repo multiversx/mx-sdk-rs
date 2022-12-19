@@ -22,8 +22,8 @@ path = "../kitty-genetic-alg"
 
 [dependencies.elrond-wasm]
 version = "0.38.0"
-path = "../../../../elrond-wasm"
+path = "../../../../framework/base"
 
 [dev-dependencies.elrond-wasm-debug]
 version = "0.38.0"
-path = "../../../../elrond-wasm-debug"
+path = "../../../../framework/debug"

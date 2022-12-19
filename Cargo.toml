@@ -2,15 +2,14 @@
 resolver = "2"
 
 members = [
-  "elrond-wasm",
-  "elrond-wasm-debug",
-  "elrond-wasm-derive",
-  "elrond-wasm-node",
-  "elrond-wasm-modules",
-  "mandos",
-  "elrond-codec",
-  "elrond-codec-derive",
-  "elrond-interact-snippets",
+  "framework/base",
+  "framework/codec",
+  "framework/codec-derive",
+  "framework/debug",
+  "framework/derive",
+  "framework/mandos",
+  "framework/snippets",
+  "framework/wasm-adapter",
 
   "contracts/benchmarks/mappers/benchmark-common",
   "contracts/benchmarks/mappers/linked-list-repeat",
@@ -149,6 +148,8 @@ members = [
   "contracts/feature-tests/rust-testing-framework-tester/meta",
   "contracts/feature-tests/use-module",
   "contracts/feature-tests/use-module/meta",
+
+  "contracts/modules",
 
   "tools/test-gen",
   "tools/erdpy-snippet-generator",

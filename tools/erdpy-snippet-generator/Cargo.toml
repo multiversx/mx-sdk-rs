@@ -10,11 +10,11 @@ path = "src/erdpy_snippet_generator.rs"
 
 [dependencies.elrond-wasm]
 version = "0.38.0"
-path = "../../elrond-wasm"
+path = "../../framework/base"
 
 [dependencies.elrond-wasm-debug]
 version = "0.38.0"
-path = "../../elrond-wasm-debug"
+path = "../../framework/debug"
 
 [dependencies]
 bech32 = "0.8.1"

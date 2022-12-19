@@ -20,4 +20,4 @@ ei-unmanaged-node = []
 
 [dependencies.elrond-wasm]
 version = "=0.38.0"
-path = "../elrond-wasm"
+path = "../base"

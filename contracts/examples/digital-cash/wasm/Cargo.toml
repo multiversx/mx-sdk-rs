@@ -25,9 +25,9 @@ path = ".."
 
 [dependencies.elrond-wasm-node]
 version = "0.38.0"
-path = "../../../../elrond-wasm-node"
+path = "../../../../framework/wasm-adapter"
 
 [dependencies.elrond-wasm-output]
 version = "0.38.0"
 features = ["wasm-output-mode"]
-path = "../../../../elrond-wasm-output"
+path = "../../../../framework/wasm-output"

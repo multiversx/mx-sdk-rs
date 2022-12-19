@@ -13,12 +13,12 @@ path = "../vault"
 
 [dependencies.elrond-wasm]
 version = "0.38.0"
-path = "../../../../elrond-wasm"
+path = "../../../../framework/base"
 
 [dependencies.elrond-wasm-modules]
 version = "0.38.0"
-path = "../../../../elrond-wasm-modules"
+path = "../../../../contracts/modules"
 
 [dev-dependencies.elrond-wasm-debug]
 version = "0.38.0"
-path = "../../../../elrond-wasm-debug"
+path = "../../../../framework/debug"
