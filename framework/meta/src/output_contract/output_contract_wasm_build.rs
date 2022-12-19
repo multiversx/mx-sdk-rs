@@ -1,8 +1,7 @@
 use std::{fs, process::Command};
 
-use crate::meta::{meta_build_args::BuildArgs, meta_wasm_tools};
-
 use super::OutputContract;
+use crate::{meta_build_args::BuildArgs, meta_wasm_tools};
 
 impl OutputContract {
     pub fn build_contract(&self, build_args: &BuildArgs, output_path: &str) {

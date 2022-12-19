@@ -2,7 +2,7 @@ use std::fs::File;
 
 use mx_sc::abi::ContractAbi;
 
-use crate::meta::meta_config::MetaConfig;
+use crate::meta_config::MetaConfig;
 
 use super::{
     snippet_crate_gen::{
