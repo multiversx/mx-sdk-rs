@@ -412,7 +412,7 @@ fn test_add() {
         sample_adder::Proxy::<DebugApi>::new_proxy_obj().contract(ManagedAddress::zero());
     let _ = own_proxy.get_sum();
 
-    let _ = mx_sc_debug::abi_json::contract_abi::<sample_adder::AbiProvider>();
+    let _ = mx_sc_meta::abi_json::contract_abi::<sample_adder::AbiProvider>();
 }
 
 fn world() -> mx_sc_debug::BlockchainMock {

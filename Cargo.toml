@@ -8,6 +8,7 @@ members = [
   "framework/debug",
   "framework/derive",
   "framework/mandos",
+  "framework/meta",
   "framework/snippets",
   "framework/wasm-adapter",
 

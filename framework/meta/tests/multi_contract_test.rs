@@ -1,8 +1,5 @@
 use mx_sc::abi::{ContractAbi, EndpointAbi};
-use mx_sc_debug::{
-    meta::output_contract::{MultiContractConfigSerde, OutputContractConfig},
-    DebugApi,
-};
+use mx_sc_meta::meta::output_contract::{MultiContractConfigSerde, OutputContractConfig};
 
 fn get_serialized_toml() -> MultiContractConfigSerde {
     toml::from_str(
@@ -41,8 +38,6 @@ fn get_contract_abi() -> ContractAbi {
 
 #[test]
 fn test_serialize_multi_contract() {
-    let _ = DebugApi::dummy();
-
     let multi_contract = get_serialized_toml();
 
     assert_eq!(

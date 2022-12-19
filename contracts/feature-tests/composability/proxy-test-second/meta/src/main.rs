@@ -1,3 +1,3 @@
 fn main() {
-    mx_sc_debug::meta::perform::<proxy_test_second::AbiProvider>();
+    mx_sc_meta::perform::<proxy_test_second::AbiProvider>();
 }

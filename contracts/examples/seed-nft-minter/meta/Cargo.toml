@@ -10,6 +10,6 @@ authors = ["Claudiu-Marcel Bruda <claudiu.bruda@elrond.com>"]
 [dependencies.seed-nft-minter]
 path = ".."
 
-[dependencies.mx-sc-debug]
+[dependencies.mx-sc-meta]
 version = "0.38.0"
-path = "../../../../framework/debug"
+path = "../../../../framework/meta"

@@ -1,4 +1,5 @@
 use mx_sc_debug::*;
+use mx_sc_meta::abi_json;
 
 use std::{fs, fs::File, io::Write};
 
@@ -8,7 +9,7 @@ fn use_module_abi_generated_ok() {
     blockchain.set_current_dir_from_workspace("contracts/feature-tests/use-module");
 
     // generate ABI
-    let multi_contract_config = mx_sc_debug::meta::multi_contract_config::<use_module::AbiProvider>(
+    let multi_contract_config = mx_sc_meta::multi_contract_config::<use_module::AbiProvider>(
         blockchain
             .current_dir
             .join("multicontract.toml")

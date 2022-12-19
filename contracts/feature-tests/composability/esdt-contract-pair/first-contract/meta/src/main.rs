@@ -1,3 +1,3 @@
 fn main() {
-    mx_sc_debug::meta::perform::<first_contract::AbiProvider>();
+    mx_sc_meta::perform::<first_contract::AbiProvider>();
 }

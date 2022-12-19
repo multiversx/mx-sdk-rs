@@ -20,3 +20,7 @@ features = [ "alloc" ]
 [dev-dependencies.mx-sc-debug]
 version = "0.38.0"
 path = "../../../framework/debug"
+
+[dev-dependencies.mx-sc-meta]
+version = "0.38.0"
+path = "../../../framework/meta"

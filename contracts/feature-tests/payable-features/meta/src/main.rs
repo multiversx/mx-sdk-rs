@@ -1,3 +1,3 @@
 fn main() {
-    mx_sc_debug::meta::perform::<payable_features::AbiProvider>();
+    mx_sc_meta::perform::<payable_features::AbiProvider>();
 }

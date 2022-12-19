@@ -1,3 +1,3 @@
 fn main() {
-    mx_sc_debug::meta::perform::<ping_pong_egld::AbiProvider>();
+    mx_sc_meta::perform::<ping_pong_egld::AbiProvider>();
 }
