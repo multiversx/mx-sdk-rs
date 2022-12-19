@@ -1,5 +1,5 @@
 use mx_sc::abi::{ContractAbi, EndpointAbi};
-use mx_sc_meta::meta::output_contract::{MultiContractConfigSerde, OutputContractConfig};
+use mx_sc_meta::output_contract::{MultiContractConfigSerde, OutputContractConfig};
 
 fn get_serialized_toml() -> MultiContractConfigSerde {
     toml::from_str(
