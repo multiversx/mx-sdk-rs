@@ -71,7 +71,6 @@ version = "0.0.0"
 dependencies = [
  "erc1155-marketplace",
  "mx-sc-wasm-adapter",
- "mx-sc-wasm-output",
 ]
 
 [[package]]
@@ -173,13 +172,6 @@ name = "mx-sc-wasm-adapter"
 version = "0.38.0"
 dependencies = [
  "mx-sc",
-]
-
-[[package]]
-name = "mx-sc-wasm-output"
-version = "0.38.0"
-dependencies = [
- "mx-sc-wasm-adapter",
  "wee_alloc",
 ]
 

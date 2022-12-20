@@ -18,6 +18,18 @@ vm-validate-token-identifier = []
 vm-esdt-local-roles = []
 ei-unmanaged-node = []
 
+# crate functionality can be turned off
+# is only turned off when running the framework tests
+wasm-output-mode = ["wee_alloc"] 
+
+# only provide panic messages if so configured
+# they add a lot of bloat to the final bytecode,
+# so only use them if you really need to learn about a certain panic occuring at some point
+panic-message = [] 
+
+[dependencies]
+wee_alloc = {version = "0.4", optional = true}
+
 [dependencies.mx-sc]
 version = "=0.38.0"
 path = "../base"

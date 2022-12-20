@@ -6,10 +6,10 @@ edition = "2021"
 publish = false
 
 [lib]
-crate-type = [ "cdylib",]
+crate-type = ["cdylib"]
 
 [workspace]
-members = [ ".",]
+members = ["."]
 
 [dev-dependencies]
 
@@ -26,8 +26,4 @@ path = ".."
 [dependencies.mx-sc-wasm-adapter]
 version = "0.38.0"
 path = "../../../../framework/wasm-adapter"
-
-[dependencies.mx-sc-wasm-output]
-version = "0.38.0"
-path = "../../../../framework/wasm-output"
-features = [ "wasm-output-mode",]
+features = ["wasm-output-mode"]
