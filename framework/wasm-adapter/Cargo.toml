@@ -26,8 +26,6 @@ vm-validate-token-identifier = []
 vm-esdt-local-roles = []
 ei-unmanaged-node = []
 
-wasm-output-mode = [] 
-
 # only provide panic messages if so configured
 # they add a lot of bloat to the final bytecode,
 # so only use them if you really need to learn about a certain panic occuring at some point

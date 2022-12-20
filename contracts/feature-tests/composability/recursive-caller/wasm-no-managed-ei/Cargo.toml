@@ -22,7 +22,7 @@ features = ["ei-unmanaged"]
 [dependencies.mx-sc-wasm-adapter]
 version = "0.38.0"
 path = "../../../../../framework/wasm-adapter"
-features = ["ei-unmanaged-node", "wasm-output-mode"]
+features = ["ei-unmanaged-node"]
 
 [workspace]
 members = ["."]
