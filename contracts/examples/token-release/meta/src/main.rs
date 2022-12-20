@@ -1,3 +1,3 @@
 fn main() {
-    mx_sc_debug::meta::perform::<token_release::AbiProvider>();
+    mx_sc_meta::cli_main::<token_release::AbiProvider>();
 }

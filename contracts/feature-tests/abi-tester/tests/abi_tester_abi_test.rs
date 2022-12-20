@@ -1,6 +1,7 @@
 use std::{fs, fs::File, io::Write};
 
-use mx_sc_debug::{abi_json, BlockchainMock};
+use mx_sc_debug::BlockchainMock;
+use mx_sc_meta::abi_json;
 
 #[test]
 fn abi_tester_abi_generated_ok() {
@@ -8,7 +9,7 @@ fn abi_tester_abi_generated_ok() {
     blockchain.set_current_dir_from_workspace("contracts/feature-tests/abi-tester");
 
     // generate ABI
-    let multi_contract_config = mx_sc_debug::meta::multi_contract_config::<abi_tester::AbiProvider>(
+    let multi_contract_config = mx_sc_meta::multi_contract_config::<abi_tester::AbiProvider>(
         blockchain
             .current_dir
             .join("multicontract.toml")
@@ -50,7 +51,7 @@ fn check_multi_contract_config() {
     let mut blockchain = BlockchainMock::new();
     blockchain.set_current_dir_from_workspace("contracts/feature-tests/abi-tester");
 
-    let multi_contract_config = mx_sc_debug::meta::multi_contract_config::<abi_tester::AbiProvider>(
+    let multi_contract_config = mx_sc_meta::multi_contract_config::<abi_tester::AbiProvider>(
         blockchain
             .current_dir
             .join("multicontract.toml")

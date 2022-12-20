@@ -1,4 +1,3 @@
-use alloc::vec::Vec;
 use mx_sc::abi::*;
 use serde::{Deserialize, Serialize};
 

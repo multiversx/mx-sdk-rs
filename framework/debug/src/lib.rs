@@ -1,13 +1,11 @@
 #![allow(clippy::type_complexity)]
 #![feature(exhaustive_patterns)]
 
-pub mod abi_json;
 pub mod api;
 pub mod bech32;
 mod display_util;
 mod managed_test_util;
 pub mod mandos_system;
-pub mod meta;
 pub mod testing_framework;
 pub mod tx_execution;
 pub mod tx_mock;

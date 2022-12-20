@@ -83,7 +83,7 @@ impl BlockchainMock {
         Abi: ContractAbiProvider,
         B: CallableContractBuilder,
     {
-        let multi_contract_config = crate::meta::multi_contract_config::<Abi>(
+        let multi_contract_config = mx_sc_meta::multi_contract_config::<Abi>(
             self.current_dir
                 .join("multicontract.toml")
                 .to_str()

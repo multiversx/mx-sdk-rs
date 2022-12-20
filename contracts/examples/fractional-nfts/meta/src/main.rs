@@ -1,3 +1,3 @@
 fn main() {
-    mx_sc_debug::meta::perform::<fractional_nfts::AbiProvider>();
+    mx_sc_meta::cli_main::<fractional_nfts::AbiProvider>();
 }

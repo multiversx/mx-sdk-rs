@@ -1,6 +1,6 @@
 use mx_sc::abi::ContractAbi;
 
-use crate::meta::meta_build_args::BuildArgs;
+use crate::meta_build_args::BuildArgs;
 
 pub const DEFAULT_LABEL: &str = "default";
 

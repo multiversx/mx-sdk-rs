@@ -1,3 +1,3 @@
 fn main() {
-    mx_sc_debug::meta::perform::<linked_list_repeat::AbiProvider>();
+    mx_sc_meta::cli_main::<linked_list_repeat::AbiProvider>();
 }

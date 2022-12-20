@@ -10,6 +10,6 @@ publish = false
 [dependencies.nft-storage-prepay]
 path = ".."
 
-[dependencies.mx-sc-debug]
+[dependencies.mx-sc-meta]
 version = "0.38.0"
-path = "../../../../framework/debug"
+path = "../../../../framework/meta"

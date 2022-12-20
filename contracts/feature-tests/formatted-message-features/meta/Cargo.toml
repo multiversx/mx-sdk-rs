@@ -10,6 +10,6 @@ authors = [ "you",]
 [dependencies.formatted-message-features]
 path = ".."
 
-[dependencies.mx-sc-debug]
+[dependencies.mx-sc-meta]
 version = "0.38.0"
-path = "../../../../framework/debug"
+path = "../../../../framework/meta"

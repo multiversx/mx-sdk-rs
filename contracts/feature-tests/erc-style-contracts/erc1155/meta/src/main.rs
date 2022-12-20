@@ -1,3 +1,3 @@
 fn main() {
-    mx_sc_debug::meta::perform::<erc1155::AbiProvider>();
+    mx_sc_meta::cli_main::<erc1155::AbiProvider>();
 }
