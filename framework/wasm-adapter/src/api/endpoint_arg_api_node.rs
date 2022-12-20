@@ -1,4 +1,4 @@
-use crate::VmApiImpl;
+use crate::api::VmApiImpl;
 use mx_sc::{
     api::{EndpointArgumentApi, EndpointArgumentApiImpl},
     types::heap::BoxedBytes,

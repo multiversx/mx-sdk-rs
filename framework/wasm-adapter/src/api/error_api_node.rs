@@ -1,4 +1,4 @@
-use crate::{error_hook, VmApiImpl};
+use crate::{api::VmApiImpl, error_hook};
 use mx_sc::api::{ErrorApi, ErrorApiImpl};
 
 extern "C" {

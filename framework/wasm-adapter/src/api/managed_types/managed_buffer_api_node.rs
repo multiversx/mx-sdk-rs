@@ -40,7 +40,7 @@ extern "C" {
     fn managedBufferToHex(sourceHandle: i32, destinationHandle: i32);
 }
 
-impl ManagedBufferApi for crate::VmApiImpl {
+impl ManagedBufferApi for crate::api::VmApiImpl {
     #[inline]
     fn mb_new_empty(&self) -> Self::ManagedBufferHandle {
         unsafe { mBufferNew() }

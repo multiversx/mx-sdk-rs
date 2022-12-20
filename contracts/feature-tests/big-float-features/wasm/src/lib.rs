@@ -10,8 +10,12 @@
 // Total number of exported functions:  72
 
 #![no_std]
+#![feature(alloc_error_handler, lang_items)]
 
-mx_sc_wasm_adapter::wasm_endpoints! {
+mx_sc_wasm_adapter::allocator_declaration!();
+mx_sc_wasm_adapter::panic_handler_declaration!();
+
+mx_sc_wasm_adapter::endpoints! {
     big_float_features
     (
         new_from_parts_big_float
@@ -87,4 +91,4 @@ mx_sc_wasm_adapter::wasm_endpoints! {
     )
 }
 
-mx_sc_wasm_adapter::wasm_empty_callback! {}
+mx_sc_wasm_adapter::empty_callback! {}

@@ -10,8 +10,12 @@
 // Total number of exported functions:   5
 
 #![no_std]
+#![feature(alloc_error_handler, lang_items)]
 
-mx_sc_wasm_adapter::external_view_wasm_endpoints! {
+mx_sc_wasm_adapter::allocator_declaration!();
+mx_sc_wasm_adapter::panic_handler_declaration!();
+
+mx_sc_wasm_adapter::external_view_endpoints! {
     abi_tester
     (
         external_view
@@ -20,4 +24,4 @@ mx_sc_wasm_adapter::external_view_wasm_endpoints! {
     )
 }
 
-mx_sc_wasm_adapter::wasm_empty_callback! {}
+mx_sc_wasm_adapter::empty_callback! {}

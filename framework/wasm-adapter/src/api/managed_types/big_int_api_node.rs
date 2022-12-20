@@ -72,7 +72,7 @@ macro_rules! unary_op_wrapper {
     };
 }
 
-impl BigIntApi for crate::VmApiImpl {
+impl BigIntApi for crate::api::VmApiImpl {
     #[inline]
     fn bi_new(&self, value: i64) -> Self::BigIntHandle {
         unsafe { bigIntNew(value) }

@@ -10,8 +10,12 @@
 // Total number of exported functions:  17
 
 #![no_std]
+#![feature(alloc_error_handler, lang_items)]
 
-mx_sc_wasm_adapter::wasm_endpoints! {
+mx_sc_wasm_adapter::allocator_declaration!();
+mx_sc_wasm_adapter::panic_handler_declaration!();
+
+mx_sc_wasm_adapter::endpoints! {
     payable_features
     (
         echo_call_value
@@ -32,4 +36,4 @@ mx_sc_wasm_adapter::wasm_endpoints! {
     )
 }
 
-mx_sc_wasm_adapter::wasm_empty_callback! {}
+mx_sc_wasm_adapter::empty_callback! {}
