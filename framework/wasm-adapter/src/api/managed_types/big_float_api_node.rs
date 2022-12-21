@@ -67,7 +67,7 @@ macro_rules! unary_op_method_big_int_handle {
     };
 }
 
-impl BigFloatApi for crate::VmApiImpl {
+impl BigFloatApi for crate::api::VmApiImpl {
     #[inline]
     fn bf_from_parts(
         &self,

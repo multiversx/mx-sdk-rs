@@ -22,10 +22,5 @@ path = ".."
 version = "0.38.0"
 path = "../../../../framework/wasm-adapter"
 
-[dependencies.mx-sc-wasm-output]
-version = "0.38.0"
-path = "../../../../framework/wasm-output"
-features = ["wasm-output-mode"]
-
 [workspace]
 members = ["."]

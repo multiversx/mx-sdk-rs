@@ -3,7 +3,7 @@ use mx_sc::{
     types::LockableStaticBuffer,
 };
 
-use crate::VmApiImpl;
+use crate::api::VmApiImpl;
 
 static mut STATIC_BUFFER: LockableStaticBuffer = LockableStaticBuffer::new();
 static mut EXTERNAL_VIEW_TARGET_ADDRESS_HANDLE: i32 = 0;

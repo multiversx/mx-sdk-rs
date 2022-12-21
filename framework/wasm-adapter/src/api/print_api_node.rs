@@ -1,4 +1,4 @@
-use crate::VmApiImpl;
+use crate::api::VmApiImpl;
 use mx_sc::{
     api::{PrintApi, PrintApiImpl},
     formatter::FormatBufferIgnore,

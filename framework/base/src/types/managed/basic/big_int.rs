@@ -7,7 +7,7 @@ use crate::{
         ManagedTypeApiImpl, RawHandle, StaticVarApiImpl,
     },
     codec::{
-        self, CodecFrom, CodecFromSelf, DecodeErrorHandler, EncodeErrorHandler, NestedDecode,
+        CodecFrom, CodecFromSelf, DecodeErrorHandler, EncodeErrorHandler, NestedDecode,
         NestedDecodeInput, NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode,
         TopEncodeOutput, TryStaticCast,
     },
@@ -113,19 +113,19 @@ big_int_conv_num! {i8}
 impl<M> CodecFromSelf for BigInt<M> where M: ManagedTypeApi {}
 
 #[cfg(feature = "num-bigint")]
-impl<M: ManagedTypeApi> CodecFrom<codec::num_bigint::BigInt> for BigInt<M> {}
+impl<M: ManagedTypeApi> CodecFrom<crate::codec::num_bigint::BigInt> for BigInt<M> {}
 #[cfg(feature = "num-bigint")]
-impl<M: ManagedTypeApi> CodecFrom<BigInt<M>> for codec::num_bigint::BigInt {}
+impl<M: ManagedTypeApi> CodecFrom<BigInt<M>> for crate::codec::num_bigint::BigInt {}
 
 #[cfg(feature = "num-bigint")]
-impl<M: ManagedTypeApi> From<&codec::num_bigint::BigInt> for BigInt<M> {
-    fn from(alloc_big_int: &codec::num_bigint::BigInt) -> Self {
+impl<M: ManagedTypeApi> From<&crate::codec::num_bigint::BigInt> for BigInt<M> {
+    fn from(alloc_big_int: &crate::codec::num_bigint::BigInt) -> Self {
         BigInt::from_signed_bytes_be(alloc_big_int.to_signed_bytes_be().as_slice())
     }
 }
 #[cfg(feature = "num-bigint")]
-impl<M: ManagedTypeApi> From<codec::num_bigint::BigInt> for BigInt<M> {
-    fn from(alloc_big_int: codec::num_bigint::BigInt) -> Self {
+impl<M: ManagedTypeApi> From<crate::codec::num_bigint::BigInt> for BigInt<M> {
+    fn from(alloc_big_int: crate::codec::num_bigint::BigInt) -> Self {
         BigInt::from(&alloc_big_int)
     }
 }
