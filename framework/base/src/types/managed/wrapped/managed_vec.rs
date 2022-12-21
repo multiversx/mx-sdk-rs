@@ -338,6 +338,7 @@ where
         slice.sort();
         slice
     }
+
     pub fn sort(&mut self)
     where
         [(); T::PAYLOAD_SIZE]:,
