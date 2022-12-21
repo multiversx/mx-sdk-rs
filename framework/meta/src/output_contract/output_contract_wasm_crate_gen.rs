@@ -20,6 +20,10 @@ const NUM_ASYNC_CB: usize = 1;
 
 const PREFIX_NO_STD: &str = "
 #![no_std]
+#![feature(alloc_error_handler, lang_items)]
+
+mx_sc_wasm_adapter::allocator!();
+mx_sc_wasm_adapter::panic_handler!();
 
 ";
 
@@ -45,9 +49,9 @@ impl OutputContract {
         wasm_lib_file.write_all(PREFIX_NO_STD.as_bytes()).unwrap();
 
         let full_macro_name = if self.external_view {
-            "mx_sc_wasm_adapter::external_view_wasm_endpoints!"
+            "mx_sc_wasm_adapter::external_view_endpoints!"
         } else {
-            "mx_sc_wasm_adapter::wasm_endpoints!"
+            "mx_sc_wasm_adapter::endpoints!"
         };
 
         let mut all_endpoint_names = explicit_endpoint_names;
@@ -120,9 +124,5 @@ fn write_endpoints_macro<'a, I>(
 
 fn write_wasm_empty_callback_macro(wasm_lib_file: &mut File) {
     writeln!(wasm_lib_file).unwrap();
-    writeln!(
-        wasm_lib_file,
-        "mx_sc_wasm_adapter::wasm_empty_callback! {{}}"
-    )
-    .unwrap();
+    writeln!(wasm_lib_file, "mx_sc_wasm_adapter::empty_callback! {{}}").unwrap();
 }

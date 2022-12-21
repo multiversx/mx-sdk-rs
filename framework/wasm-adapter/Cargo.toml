@@ -3,7 +3,10 @@ name = "mx-sc-wasm-adapter"
 version = "0.38.0"
 edition = "2021"
 
-authors = ["Andrei Marinica <andrei.marinica@elrond.com>", "MultiversX <contact@multiversx.com>"]
+authors = [
+    "Andrei Marinica <andrei.marinica@elrond.com>",
+    "MultiversX <contact@multiversx.com>",
+]
 license = "GPL-3.0-only"
 readme = "README.md"
 repository = "https://github.com/ElrondNetwork/elrond-wasm-rs"
@@ -11,12 +14,25 @@ homepage = "https://multiversx.com/"
 documentation = "https://docs.elrond.com/"
 description = "MultiversX WebAssembly VM API wrapper"
 keywords = ["multiversx", "wasm", "webassembly", "blockchain", "contract"]
-categories = ["no-std", "wasm", "cryptography::cryptocurrencies", "development-tools::ffi"]
+categories = [
+    "no-std",
+    "wasm",
+    "cryptography::cryptocurrencies",
+    "development-tools::ffi",
+]
 
 [features]
 vm-validate-token-identifier = []
 vm-esdt-local-roles = []
 ei-unmanaged-node = []
+
+# only provide panic messages if so configured
+# they add a lot of bloat to the final bytecode,
+# so only use them if you really need to learn about a certain panic occuring at some point
+panic-message = []
+
+[dependencies]
+wee_alloc = "0.4" 
 
 [dependencies.mx-sc]
 version = "=0.38.0"

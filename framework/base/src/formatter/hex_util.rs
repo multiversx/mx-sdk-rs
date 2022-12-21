@@ -25,7 +25,7 @@ pub fn encode_bytes_as_hex(input: &[u8]) -> String {
 }
 
 fn hex_digit_to_half_byte(digit: u8) -> Option<u8> {
-    if (b'0'..=b'9').contains(&digit) {
+    if digit.is_ascii_digit() {
         return Some(digit - b'0');
     }
     if (b'a'..=b'f').contains(&digit) {
