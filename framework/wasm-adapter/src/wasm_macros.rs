@@ -1,5 +1,5 @@
 #[macro_export]
-macro_rules! allocator_declaration {
+macro_rules! allocator {
     () => {
         #[global_allocator]
         static ALLOC: mx_sc_wasm_adapter::wasm_deps::WeeAlloc =
@@ -8,7 +8,7 @@ macro_rules! allocator_declaration {
 }
 
 #[macro_export]
-macro_rules! panic_handler_declaration {
+macro_rules! panic_handler {
     () => {
         #[alloc_error_handler]
         fn alloc_error_handler(layout: mx_sc_wasm_adapter::wasm_deps::Layout) -> ! {
