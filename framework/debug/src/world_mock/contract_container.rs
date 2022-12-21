@@ -9,16 +9,19 @@ use crate::tx_mock::TxFunctionName;
 pub struct ContractContainer {
     callable: Box<dyn CallableContract>,
     function_whitelist: Option<Vec<String>>,
+    pub panic_message: bool,
 }
 
 impl ContractContainer {
     pub fn new(
         callable: Box<dyn CallableContract>,
         function_whitelist: Option<Vec<String>>,
+        panic_message: bool,
     ) -> Self {
         ContractContainer {
             callable,
             function_whitelist,
+            panic_message,
         }
     }
 

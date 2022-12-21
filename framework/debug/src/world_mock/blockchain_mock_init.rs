@@ -55,7 +55,7 @@ impl BlockchainMock {
     ) {
         self.register_contract_container(
             expression,
-            ContractContainer::new(contract_builder.new_contract_obj::<DebugApi>(), None),
+            ContractContainer::new(contract_builder.new_contract_obj::<DebugApi>(), None, false),
         )
     }
 
@@ -90,7 +90,7 @@ impl BlockchainMock {
                 .unwrap(),
         );
         let sub_contract = multi_contract_config.find_contract(sub_contract_name);
-        let contract_obj = if sub_contract.external_view {
+        let contract_obj = if sub_contract.settings.external_view {
             contract_builder.new_contract_obj::<mx_sc::api::ExternalViewApi<DebugApi>>()
         } else {
             contract_builder.new_contract_obj::<DebugApi>()
@@ -101,6 +101,7 @@ impl BlockchainMock {
             ContractContainer::new(
                 contract_obj,
                 Some(sub_contract.all_exported_function_names()),
+                sub_contract.settings.panic_message,
             ),
         );
     }

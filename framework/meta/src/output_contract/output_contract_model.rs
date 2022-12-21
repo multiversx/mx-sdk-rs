@@ -54,6 +54,25 @@ impl OutputContractConfig {
     }
 }
 
+#[derive(Clone, PartialEq, Eq)]
+pub struct OutputContractSettings {
+    /// External view contracts are just readers of data from another contract.
+    pub external_view: bool,
+
+    /// Panic messages add a lot of bloat to the final bytecode,
+    /// so they should only be used for debugging purposes.
+    pub panic_message: bool,
+}
+
+impl Default for OutputContractSettings {
+    fn default() -> Self {
+        Self {
+            external_view: false,
+            panic_message: false,
+        }
+    }
+}
+
 /// Represents a contract created by the framework when building.
 ///
 /// It might have only some of the endpoints written by the developer and maybe some other function.
@@ -61,9 +80,6 @@ pub struct OutputContract {
     /// If it is the main contract, then the wasm crate is called just `wasm`,
     ///and the wasm `Cargo.toml` is provided by the dev.
     pub main: bool,
-
-    /// External view contracts are just readers of data from another contract.
-    pub external_view: bool,
 
     /// The contract id is defined in `multicontract.toml`. It has no effect on the produced assets.
     ///
@@ -74,6 +90,9 @@ pub struct OutputContract {
     ///
     /// It is either defined in the multicontract.toml, or is inferred from the main crate name.
     pub contract_name: String,
+
+    /// Collection of flags, specified in the multicontract config.
+    pub settings: OutputContractSettings,
 
     /// Filtered and processed ABI of the output contract.
     pub abi: ContractAbi,

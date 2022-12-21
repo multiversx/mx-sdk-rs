@@ -1,6 +1,7 @@
 use std::rc::Rc;
 
 use alloc::boxed::Box;
+use mx_sc::err_msg;
 
 use crate::{
     address_hex,
@@ -71,7 +72,7 @@ fn execute_contract_instance_endpoint(
     }));
     match result {
         Ok(tx_output) => tx_output,
-        Err(panic_any) => interpret_panic_as_tx_result(panic_any),
+        Err(panic_any) => interpret_panic_as_tx_result(panic_any, contract_container.panic_message),
     }
 }
 
@@ -79,6 +80,7 @@ fn execute_contract_instance_endpoint(
 /// Note: specific tx outcomes from the debugger are signalled via specific panic objects.
 pub fn interpret_panic_as_tx_result(
     panic_any: Box<dyn std::any::Any + std::marker::Send>,
+    panic_message_flag: bool,
 ) -> TxResult {
     if panic_any.downcast_ref::<TxResult>().is_some() {
         // async calls panic with the tx output directly
@@ -91,8 +93,20 @@ pub fn interpret_panic_as_tx_result(
     }
 
     if let Some(panic_string) = panic_any.downcast_ref::<String>() {
-        return TxResult::from_panic_string(panic_string.as_str());
+        return interpret_panic_str_as_tx_result(panic_string.as_str(), panic_message_flag);
+    }
+
+    if let Some(panic_string) = panic_any.downcast_ref::<&str>() {
+        return interpret_panic_str_as_tx_result(*panic_string, panic_message_flag);
     }
 
     TxResult::from_unknown_panic()
+}
+
+pub fn interpret_panic_str_as_tx_result(panic_str: &str, panic_message_flag: bool) -> TxResult {
+    if panic_message_flag {
+        TxResult::from_panic_string(&format!("panic occurred: {panic_str}"))
+    } else {
+        TxResult::from_panic_string(err_msg::PANIC_OCCURRED)
+    }
 }

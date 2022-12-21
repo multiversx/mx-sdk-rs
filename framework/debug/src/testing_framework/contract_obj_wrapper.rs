@@ -264,7 +264,7 @@ impl BlockchainStateWrapper {
             let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
             b_mock_ref.register_contract_container(
                 &wasm_full_path_as_expr,
-                ContractContainer::new(contract_obj, None),
+                ContractContainer::new(contract_obj, None, false),
             );
         }
 
@@ -748,7 +748,7 @@ impl BlockchainStateWrapper {
         let updates = api_after_exec.into_blockchain_updates();
         let tx_result = match exec_result {
             Ok(()) => TxResult::empty(),
-            Err(panic_any) => interpret_panic_as_tx_result(panic_any),
+            Err(panic_any) => interpret_panic_as_tx_result(panic_any, false),
         };
 
         // only commit for successful non-query calls (caller == SC for queries)

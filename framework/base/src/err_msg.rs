@@ -1,3 +1,5 @@
+pub const PANIC_OCCURRED: &str = "panic occurred";
+
 pub const NON_PAYABLE_FUNC_EGLD: &str = "function does not accept EGLD payment";
 pub const NON_PAYABLE_FUNC_ESDT: &str = "function does not accept ESDT payment";
 pub const BAD_TOKEN_PROVIDED: &str = "bad call value token provided";
