@@ -146,6 +146,7 @@ fn test_sort_biguint() {
     assert_eq!(vec, managed_vec.into_vec());
 }
 
+// flips a two-digit number
 fn flip(n: &u64) -> u64 {
     n / 10u64 + n % 10u64 * 10
 }
@@ -165,7 +166,7 @@ fn test_sort_by_u64() {
 
     assert!(!managed_vec.is_sorted_by(|a, b| Some(flip(a).cmp(&flip(b)))));
     managed_vec.sort_by(|a, b| flip(a).cmp(&flip(b)));
-    vec.sort_by_key(|a| flip(a));
+    vec.sort_by_key(flip);
 
     assert!(!managed_vec.is_sorted());
 
@@ -347,7 +348,7 @@ fn test_sort_unstable_by_u64() {
 
     assert!(!managed_vec.is_sorted_by(|a, b| Some(flip(a).cmp(&flip(b)))));
     managed_vec.sort_unstable_by(|a, b| flip(a).cmp(&flip(b)));
-    vec.sort_unstable_by_key(|a| flip(a));
+    vec.sort_unstable_by_key(flip);
 
     assert!(!managed_vec.is_sorted());
 
