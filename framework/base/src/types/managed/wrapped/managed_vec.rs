@@ -302,13 +302,13 @@ where
     where
         F: FnMut(
                 &mut [EncodedManagedVecItem<T, { T::PAYLOAD_SIZE }>],
-            ) -> &mut [EncodedManagedVecItem<T, { T::PAYLOAD_SIZE }>]
+            ) -> &[EncodedManagedVecItem<T, { T::PAYLOAD_SIZE }>]
             + 'static,
     {
         let mut static_cache = CachedManagedBuffer::new(&mut self.buffer);
         static_cache.with_buffer_contents_mut(|bytes| {
             let item_len = bytes.len() / T::PAYLOAD_SIZE;
-            let values = Self::reinterpret_slice(bytes, item_len);
+            let values = Self::reinterpret_slice_mut(bytes, item_len);
 
             let result = f(values);
             let result_len = result.len() * T::PAYLOAD_SIZE;
@@ -316,7 +316,12 @@ where
         });
     }
 
-    fn reinterpret_slice<T1, T2>(from: &mut [T1], len: usize) -> &mut [T2] {
+    fn reinterpret_slice<T1, T2>(from: &[T1], len: usize) -> &[T2] {
+        let ptr = from.as_ptr() as *const T2;
+        unsafe { core::slice::from_raw_parts(ptr, len) }
+    }
+
+    fn reinterpret_slice_mut<T1, T2>(from: &mut [T1], len: usize) -> &mut [T2] {
         let ptr = from.as_mut_ptr() as *mut T2;
         unsafe { core::slice::from_raw_parts_mut(ptr, len) }
     }
@@ -329,7 +334,7 @@ where
 {
     fn inner_sort(
         slice: &mut [EncodedManagedVecItem<T, { T::PAYLOAD_SIZE }>],
-    ) -> &mut [EncodedManagedVecItem<T, { T::PAYLOAD_SIZE }>] {
+    ) -> &[EncodedManagedVecItem<T, { T::PAYLOAD_SIZE }>] {
         slice.sort();
         slice
     }
@@ -342,7 +347,7 @@ where
 
     fn inner_sort_unstable(
         slice: &mut [EncodedManagedVecItem<T, { T::PAYLOAD_SIZE }>],
-    ) -> &mut [EncodedManagedVecItem<T, { T::PAYLOAD_SIZE }>] {
+    ) -> &[EncodedManagedVecItem<T, { T::PAYLOAD_SIZE }>] {
         slice.sort();
         slice
     }
@@ -361,7 +366,7 @@ where
 {
     fn inner_dedup(
         slice: &mut [EncodedManagedVecItem<T, { T::PAYLOAD_SIZE }>],
-    ) -> &mut [EncodedManagedVecItem<T, { T::PAYLOAD_SIZE }>] {
+    ) -> &[EncodedManagedVecItem<T, { T::PAYLOAD_SIZE }>] {
         let (dedup, _) = slice.partition_dedup();
         dedup
     }
