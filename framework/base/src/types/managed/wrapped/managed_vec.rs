@@ -13,7 +13,7 @@ use crate::{
     },
 };
 use alloc::vec::Vec;
-use core::{borrow::Borrow, fmt::Debug, iter::FromIterator, marker::PhantomData};
+use core::{borrow::Borrow, cmp::Ordering, fmt::Debug, iter::FromIterator, marker::PhantomData};
 
 use super::{CachedManagedBuffer, EncodedManagedVecItem};
 
@@ -298,9 +298,22 @@ where
     M: ManagedTypeApi,
     T: ManagedVecItem + Debug,
 {
-    fn with_self_as_slice_mut<F>(&mut self, mut f: F)
+    fn with_self_as_slice<F>(&mut self, f: F)
     where
-        F: FnMut(&mut [EncodedManagedVecItem<T>]) -> &[EncodedManagedVecItem<T>],
+        F: FnOnce(&[EncodedManagedVecItem<T>]),
+        [(); T::PAYLOAD_SIZE]:,
+    {
+        let static_cache = CachedManagedBuffer::new(&mut self.buffer);
+        static_cache.with_buffer_contents(|bytes| {
+            let item_len = bytes.len() / T::PAYLOAD_SIZE;
+            let values = Self::reinterpret_slice(bytes, item_len);
+            f(values);
+        });
+    }
+
+    fn with_self_as_slice_mut<F>(&mut self, f: F)
+    where
+        F: FnOnce(&mut [EncodedManagedVecItem<T>]) -> &[EncodedManagedVecItem<T>],
         [(); T::PAYLOAD_SIZE]:,
     {
         let mut static_cache = CachedManagedBuffer::new(&mut self.buffer);
@@ -338,6 +351,38 @@ where
         });
     }
 
+    pub fn sort_by<F>(&mut self, mut compare: F)
+    where
+        F: FnMut(&T, &T) -> Ordering,
+    {
+        self.with_self_as_slice_mut(|slice| {
+            slice.sort_by(|a, b| compare(&a.decode(), &b.decode()));
+            slice
+        });
+    }
+
+    pub fn sort_by_key<K, F>(&mut self, mut f: F)
+    where
+        F: FnMut(&T) -> K,
+        K: Ord,
+    {
+        self.with_self_as_slice_mut(|slice| {
+            slice.sort_by_key(|a| f(&a.decode()));
+            slice
+        });
+    }
+
+    pub fn sort_by_cached_key<K, F>(&mut self, mut f: F)
+    where
+        F: FnMut(&T) -> K,
+        K: Ord,
+    {
+        self.with_self_as_slice_mut(|slice| {
+            slice.sort_by_cached_key(|a| f(&a.decode()));
+            slice
+        });
+    }
+
     pub fn sort_unstable(&mut self)
     where
         [(); T::PAYLOAD_SIZE]:,
@@ -346,6 +391,62 @@ where
             slice.sort_unstable();
             slice
         })
+    }
+
+    pub fn sort_unstable_by<F>(&mut self, mut compare: F)
+    where
+        F: FnMut(&T, &T) -> Ordering,
+        [(); T::PAYLOAD_SIZE]:,
+    {
+        self.with_self_as_slice_mut(|slice| {
+            slice.sort_unstable_by(|a, b| compare(&a.decode(), &b.decode()));
+            slice
+        })
+    }
+
+    pub fn sort_unstable_by_key<K, F>(&mut self, mut f: F)
+    where
+        F: FnMut(&T) -> K,
+        K: Ord,
+        [(); T::PAYLOAD_SIZE]:,
+    {
+        self.with_self_as_slice_mut(|slice| {
+            slice.sort_unstable_by_key(|a| f(&a.decode()));
+            slice
+        })
+    }
+
+    pub fn is_sorted(&mut self) -> bool {
+        let mut result: bool = false;
+        self.with_self_as_slice(|slice| {
+            result = slice.is_sorted();
+        });
+        result
+    }
+
+    pub fn is_sorted_by<F>(&mut self, mut compare: F) -> bool
+    where
+        F: FnMut(&T, &T) -> Ordering,
+    {
+        let mut result: bool = false;
+        self.with_self_as_slice_mut(|slice| {
+            result = slice.is_sorted_by(|a, b| Some(compare(&a.decode(), &b.decode())));
+            slice
+        });
+        result
+    }
+
+    pub fn is_sorted_by_key<K, F>(&mut self, mut f: F) -> bool
+    where
+        F: FnMut(&T) -> K,
+        K: Ord,
+    {
+        let mut result: bool = false;
+        self.with_self_as_slice_mut(|slice| {
+            result = slice.is_sorted_by_key(|a| f(&a.decode()));
+            slice
+        });
+        result
     }
 }
 

@@ -64,11 +64,11 @@ impl<M: StaticVarApi> StaticBufferRef<M> {
         M::static_var_api_impl().with_lockable_static_buffer(|lsb| lsb.remaining_capacity())
     }
 
-    pub fn with_buffer_contents<R, F: FnMut(&[u8]) -> R>(&self, mut f: F) -> R {
+    pub fn with_buffer_contents<R, F: FnOnce(&[u8]) -> R>(&self, f: F) -> R {
         M::static_var_api_impl().with_lockable_static_buffer(|lsb| f(lsb.as_slice()))
     }
 
-    pub fn with_buffer_contents_mut<R, F: FnMut(&mut [u8]) -> R>(&self, mut f: F) -> R {
+    pub fn with_buffer_contents_mut<R, F: FnOnce(&mut [u8]) -> R>(&self, f: F) -> R {
         M::static_var_api_impl().with_lockable_static_buffer(|lsb| f(lsb.as_slice_mut()))
     }
 

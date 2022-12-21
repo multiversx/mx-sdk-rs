@@ -15,7 +15,7 @@ where
     T: ManagedVecItem,
     [(); <T as ManagedVecItem>::PAYLOAD_SIZE]:,
 {
-    fn decode(&self) -> T {
+    pub(crate) fn decode(&self) -> T {
         T::from_byte_reader(|item_bytes| {
             item_bytes.copy_from_slice(&self.encoded);
         })

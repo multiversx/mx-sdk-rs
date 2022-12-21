@@ -11,6 +11,7 @@
 #![feature(generic_const_exprs)]
 #![allow(incomplete_features)]
 #![feature(slice_partition_dedup)]
+#![feature(is_sorted)]
 pub use mx_sc_derive::{self as derive, contract, module, proxy};
 
 // re-export basic heap types
