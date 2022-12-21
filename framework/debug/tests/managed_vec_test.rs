@@ -112,7 +112,7 @@ fn test_sort_u64() {
     let mut vec = Vec::<u64>::new();
     let mut managed_vec = ManagedVec::<DebugApi, u64>::new();
     for i in (20u64..=30u64).rev() {
-        managed_vec.push(i.clone());
+        managed_vec.push(i);
         vec.push(i);
     }
 
@@ -156,7 +156,7 @@ fn test_sort_by_u64() {
     let mut vec = Vec::<u64>::new();
     let mut managed_vec = ManagedVec::<DebugApi, u64>::new();
     for i in (20u64..=30u64).rev() {
-        managed_vec.push(i.clone());
+        managed_vec.push(i);
         vec.push(i);
     }
 
@@ -235,7 +235,7 @@ fn test_sort_by_key_u64() {
     let mut vec = Vec::<u64>::new();
     let mut managed_vec = ManagedVec::<DebugApi, u64>::new();
     for i in [4444u64, 333u64, 1u64, 22u64] {
-        managed_vec.push(i.clone());
+        managed_vec.push(i);
         vec.push(i);
     }
 
@@ -288,7 +288,7 @@ fn test_sort_by_cached_key_u64() {
     let mut vec = Vec::<u64>::new();
     let mut managed_vec = ManagedVec::<DebugApi, u64>::new();
     for i in [4u64, 33u64, 222u64, 1111u64] {
-        managed_vec.push(i.clone());
+        managed_vec.push(i);
         vec.push(i);
     }
 
@@ -330,7 +330,7 @@ fn test_sort_unstable_u64() {
     let mut vec = Vec::<u64>::new();
     let mut managed_vec = ManagedVec::<DebugApi, u64>::new();
     for i in (20u64..=30u64).rev() {
-        managed_vec.push(i.clone());
+        managed_vec.push(i);
         vec.push(i);
     }
     managed_vec.sort_unstable();
@@ -363,7 +363,7 @@ fn test_sort_unstable_by_u64() {
     let mut vec = Vec::<u64>::new();
     let mut managed_vec = ManagedVec::<DebugApi, u64>::new();
     for i in (20u64..=30u64).rev() {
-        managed_vec.push(i.clone());
+        managed_vec.push(i);
         vec.push(i);
     }
 
@@ -444,7 +444,7 @@ fn test_sort_unstable_by_key_u64() {
     let mut vec = Vec::<u64>::new();
     let mut managed_vec = ManagedVec::<DebugApi, u64>::new();
     for i in [4444u64, 333u64, 1u64, 22u64] {
-        managed_vec.push(i.clone());
+        managed_vec.push(i);
         vec.push(i);
     }
 
@@ -497,7 +497,7 @@ fn test_dedup_u64() {
     let mut vec = Vec::<u64>::new();
     let mut managed_vec = ManagedVec::<DebugApi, u64>::new();
     for i in [2u64, 3u64, 2u64, 2u64, 6u64, 3u64, 5u64, 2u64] {
-        managed_vec.push(i.clone());
+        managed_vec.push(i);
         vec.push(i);
     }
     managed_vec.dedup();
@@ -530,7 +530,7 @@ fn test_sorted_dedup_u64() {
     let mut vec = Vec::<u64>::new();
     let mut managed_vec = ManagedVec::<DebugApi, u64>::new();
     for i in [2u64, 3u64, 2u64, 2u64, 6u64, 3u64, 5u64, 2u64] {
-        managed_vec.push(i.clone());
+        managed_vec.push(i);
         vec.push(i);
     }
     managed_vec.sort();
