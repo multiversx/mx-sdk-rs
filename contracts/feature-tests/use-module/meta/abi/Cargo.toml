@@ -8,10 +8,10 @@ publish = false
 [dependencies.use-module]
 path = ".."
 
-[dependencies.elrond-wasm]
-version = "0.37.0"
-path = "../../../../elrond-wasm"
+[dependencies.mx-sc]
+version = "0.38.0"
+path = "../../../../framework/base"
 
-[dependencies.elrond-wasm-debug]
-version = "0.37.0"
-path = "../../../../elrond-wasm-debug"
+[dependencies.mx-sc-meta]
+version = "0.38.0"
+path = "../../../../framework/meta"

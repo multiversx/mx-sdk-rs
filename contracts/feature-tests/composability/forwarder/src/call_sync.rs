@@ -1,8 +1,8 @@
-elrond_wasm::imports!();
+mx_sc::imports!();
 
 const PERCENTAGE_TOTAL: u64 = 10_000; // 100%
 
-#[elrond_wasm::module]
+#[mx_sc::module]
 pub trait ForwarderSyncCallModule {
     #[proxy]
     fn vault_proxy(&self) -> vault::Proxy<Self::Api>;

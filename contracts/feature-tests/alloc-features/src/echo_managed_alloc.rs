@@ -1,7 +1,7 @@
-elrond_wasm::imports!();
+mx_sc::imports!();
 
 /// Serialization of managed types, mixed with the heap allocator.
-#[elrond_wasm::module]
+#[mx_sc::module]
 pub trait EchoManagedTypesWithAlloc {
     /// This tests that nested serialization of managed buffers within unmanaged types works.
     #[endpoint]

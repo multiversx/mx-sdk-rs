@@ -15,10 +15,10 @@ pub mod roles;
 pub mod sft;
 pub mod storage;
 
-elrond_wasm::imports!();
+mx_sc::imports!();
 
 /// Test contract for investigating contract calls.
-#[elrond_wasm::contract]
+#[mx_sc::contract]
 pub trait Forwarder:
     call_sync::ForwarderSyncCallModule
     + call_async::ForwarderAsyncCallModule

@@ -1,0 +1,28 @@
+[package]
+name = "mx-sc-derive"
+version = "0.38.0"
+edition = "2021"
+
+authors = ["Andrei Marinica <andrei.marinica@elrond.com>", "MultiversX <contact@multiversx.com>"]
+license = "GPL-3.0-only"
+readme = "README.md"
+repository = "https://github.com/ElrondNetwork/elrond-wasm-rs"
+homepage = "https://multiversx.com/"
+documentation = "https://docs.elrond.com/"
+description = "MultiversX smart contract API procedural macros"
+keywords = ["multiversx", "blockchain", "contract"]
+categories = ["cryptography::cryptocurrencies", "development-tools::procedural-macro-helpers"]
+
+[dependencies]
+proc-macro2 = "1.0"
+quote = "1.0"
+syn = "1.0"
+hex = "0.4"
+radix_trie = "0.1"
+
+[features]
+default = ["syn/full", "syn/parsing", "syn/extra-traits"]
+
+[lib]
+name = "mx_sc_derive"
+proc-macro = true

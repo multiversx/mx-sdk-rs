@@ -13,8 +13,8 @@
             "gitVersion": "<git version here>"
         },
         "framework": {
-            "name": "elrond-wasm",
-            "version": "0.37.0"
+            "name": "mx-sc",
+            "version": "0.38.0"
         }
     },
     "docs": [

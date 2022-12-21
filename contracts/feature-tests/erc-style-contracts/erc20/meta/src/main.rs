@@ -1,3 +1,3 @@
 fn main() {
-    elrond_wasm_debug::meta::perform::<erc20::AbiProvider>();
+    mx_sc_meta::cli_main::<erc20::AbiProvider>();
 }

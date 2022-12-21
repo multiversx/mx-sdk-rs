@@ -1,8 +1,8 @@
 use crate::big_float_operators;
 
-elrond_wasm::imports!();
+mx_sc::imports!();
 
-#[elrond_wasm::module]
+#[mx_sc::module]
 pub trait BigFloatWrappedOperators: big_float_operators::BigFloatOperators {
     #[endpoint]
     fn add_big_float_wrapped(&self, a: BigInt, b: BigInt, fixed_point_denominator: i64) -> BigInt {

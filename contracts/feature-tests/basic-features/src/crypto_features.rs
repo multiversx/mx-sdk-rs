@@ -1,7 +1,7 @@
-elrond_wasm::imports!();
+mx_sc::imports!();
 
 /// All crypto functions provided by Arwen exposed here.
-#[elrond_wasm::module]
+#[mx_sc::module]
 pub trait CryptoFeatures {
     #[endpoint]
     #[allow(deprecated)]

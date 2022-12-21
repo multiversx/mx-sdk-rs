@@ -3,7 +3,7 @@ use elrond_sc_price_aggregator::{
     staking::StakingModule,
     PriceAggregator, MAX_ROUND_DURATION_SECONDS,
 };
-use elrond_wasm_debug::{managed_address, managed_biguint, managed_buffer, rust_biguint};
+use mx_sc_debug::{managed_address, managed_biguint, managed_buffer, rust_biguint};
 
 mod price_agg_setup;
 use price_agg_setup::*;

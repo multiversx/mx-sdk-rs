@@ -1,3 +1,3 @@
 fn main() {
-    elrond_wasm_debug::meta::perform::<vault::AbiProvider>();
+    mx_sc_meta::cli_main::<vault::AbiProvider>();
 }

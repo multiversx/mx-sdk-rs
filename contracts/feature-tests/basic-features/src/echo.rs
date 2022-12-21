@@ -1,10 +1,10 @@
-elrond_wasm::imports!();
+mx_sc::imports!();
 
 use crate::types::*;
 use core::num::NonZeroUsize;
 
 /// Test endpoint argument and result serialization.
-#[elrond_wasm::module]
+#[mx_sc::module]
 pub trait EchoTypes {
     #[endpoint]
     fn echo_u64(&self, i: u64) -> u64 {

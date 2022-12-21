@@ -1,4 +1,4 @@
-use elrond_wasm_debug::*;
+use mx_sc_debug::*;
 
 fn world() -> BlockchainMock {
     let mut blockchain = BlockchainMock::new();
@@ -13,24 +13,24 @@ fn world() -> BlockchainMock {
 
 #[test]
 fn deploy_test_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/deploy.scen.json", world());
+    mx_sc_debug::mandos_rs("mandos/deploy.scen.json", world());
 }
 
 // Create token tests
 
 #[test]
 fn create_token_fungible_test_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/create_token_fungible.scen.json", world());
+    mx_sc_debug::mandos_rs("mandos/create_token_fungible.scen.json", world());
 }
 
 #[test]
 fn create_token_non_fungible_test_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/create_token_non_fungible.scen.json", world());
+    mx_sc_debug::mandos_rs("mandos/create_token_non_fungible.scen.json", world());
 }
 
 #[test]
 fn create_two_fungible_same_creator_test_rs() {
-    elrond_wasm_debug::mandos_rs(
+    mx_sc_debug::mandos_rs(
         "mandos/create_two_tokens_both_fungible_same_creator.scen.json",
         world(),
     );
@@ -38,7 +38,7 @@ fn create_two_fungible_same_creator_test_rs() {
 
 #[test]
 fn create_two_fungible_different_creator_test_rs() {
-    elrond_wasm_debug::mandos_rs(
+    mx_sc_debug::mandos_rs(
         "mandos/create_two_tokens_both_fungible_different_creator.scen.json",
         world(),
     );
@@ -46,7 +46,7 @@ fn create_two_fungible_different_creator_test_rs() {
 
 #[test]
 fn create_two_non_fungible_same_creator_test_rs() {
-    elrond_wasm_debug::mandos_rs(
+    mx_sc_debug::mandos_rs(
         "mandos/create_two_tokens_both_non_fungible_same_creator.scen.json",
         world(),
     );
@@ -54,7 +54,7 @@ fn create_two_non_fungible_same_creator_test_rs() {
 
 #[test]
 fn create_one_fungible_one_non_fungible_test_rs() {
-    elrond_wasm_debug::mandos_rs(
+    mx_sc_debug::mandos_rs(
         "mandos/create_one_fungible_one_non_fungible.scen.json",
         world(),
     );
@@ -63,12 +63,12 @@ fn create_one_fungible_one_non_fungible_test_rs() {
 // transfer tests -  to account
 #[test]
 fn transfer_fungible_ok_test_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/transfer_fungible_ok.scen.json", world());
+    mx_sc_debug::mandos_rs("mandos/transfer_fungible_ok.scen.json", world());
 }
 
 #[test]
 fn transfer_fungible_not_enough_balance_test_rs() {
-    elrond_wasm_debug::mandos_rs(
+    mx_sc_debug::mandos_rs(
         "mandos/transfer_fungible_not_enough_balance.scen.json",
         world(),
     );
@@ -76,42 +76,42 @@ fn transfer_fungible_not_enough_balance_test_rs() {
 
 #[test]
 fn transfer_non_fungible_ok_test_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/transfer_non_fungible_ok.scen.json", world());
+    mx_sc_debug::mandos_rs("mandos/transfer_non_fungible_ok.scen.json", world());
 }
 
 #[test]
 fn batch_transfer_fungible_test_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/batch_transfer_fungible.scen.json", world());
+    mx_sc_debug::mandos_rs("mandos/batch_transfer_fungible.scen.json", world());
 }
 
 #[test]
 fn batch_transfer_non_fungible_test_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/batch_transfer_non_fungible.scen.json", world());
+    mx_sc_debug::mandos_rs("mandos/batch_transfer_non_fungible.scen.json", world());
 }
 
 #[test]
 fn batch_transfer_both_types_test_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/batch_transfer_both_types.scen.json", world());
+    mx_sc_debug::mandos_rs("mandos/batch_transfer_both_types.scen.json", world());
 }
 
 #[test]
 fn transfer_fungible_ok_to_sc_test_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/transfer_fungible_ok_to_sc.scen.json", world());
+    mx_sc_debug::mandos_rs("mandos/transfer_fungible_ok_to_sc.scen.json", world());
 }
 
 #[test]
 fn transfer_non_fungible_ok_to_sc_test_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/transfer_non_fungible_ok_to_sc.scen.json", world());
+    mx_sc_debug::mandos_rs("mandos/transfer_non_fungible_ok_to_sc.scen.json", world());
 }
 
 #[test]
 fn batch_transfer_fungible_to_sc_test_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/batch_transfer_fungible_to_sc.scen.json", world());
+    mx_sc_debug::mandos_rs("mandos/batch_transfer_fungible_to_sc.scen.json", world());
 }
 
 #[test]
 fn batch_transfer_non_fungible_to_sc_test_rs() {
-    elrond_wasm_debug::mandos_rs(
+    mx_sc_debug::mandos_rs(
         "mandos/batch_transfer_non_fungible_to_sc.scen.json",
         world(),
     );
@@ -119,34 +119,34 @@ fn batch_transfer_non_fungible_to_sc_test_rs() {
 
 #[test]
 fn batch_transfer_both_types_to_sc_test_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/batch_transfer_both_types_to_sc.scen.json", world());
+    mx_sc_debug::mandos_rs("mandos/batch_transfer_both_types_to_sc.scen.json", world());
 }
 
 // mint tests
 
 #[test]
 fn mint_fungible_test_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/mint_fungible.scen.json", world());
+    mx_sc_debug::mandos_rs("mandos/mint_fungible.scen.json", world());
 }
 
 #[test]
 fn mint_non_fungible_test_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/mint_non_fungible.scen.json", world());
+    mx_sc_debug::mandos_rs("mandos/mint_non_fungible.scen.json", world());
 }
 
 #[test]
 fn mint_not_creator_test_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/mint_not_creator.scen.json", world());
+    mx_sc_debug::mandos_rs("mandos/mint_not_creator.scen.json", world());
 }
 
 // burn tests
 
 #[test]
 fn burn_fungible_test_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/burn_fungible.scen.json", world());
+    mx_sc_debug::mandos_rs("mandos/burn_fungible.scen.json", world());
 }
 
 #[test]
 fn burn_non_fungible_test_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/burn_non_fungible.scen.json", world());
+    mx_sc_debug::mandos_rs("mandos/burn_non_fungible.scen.json", world());
 }

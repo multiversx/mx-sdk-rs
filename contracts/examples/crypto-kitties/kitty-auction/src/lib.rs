@@ -1,11 +1,11 @@
 #![no_std]
 
-elrond_wasm::imports!();
+mx_sc::imports!();
 
 pub mod auction;
 use auction::*;
 
-#[elrond_wasm::contract]
+#[mx_sc::contract]
 pub trait KittyAuction {
     #[init]
     fn init(

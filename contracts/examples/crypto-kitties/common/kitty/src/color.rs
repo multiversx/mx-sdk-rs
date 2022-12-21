@@ -1,4 +1,4 @@
-elrond_wasm::derive_imports!();
+mx_sc::derive_imports!();
 
 use random::*;
 

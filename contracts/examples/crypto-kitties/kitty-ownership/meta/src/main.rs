@@ -1,3 +1,3 @@
 fn main() {
-    elrond_wasm_debug::meta::perform::<kitty_ownership::AbiProvider>();
+    mx_sc_meta::cli_main::<kitty_ownership::AbiProvider>();
 }

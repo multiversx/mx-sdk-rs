@@ -1,7 +1,7 @@
-elrond_wasm::imports!();
+mx_sc::imports!();
 
-#[elrond_wasm::module]
-pub trait ContractBaseFullPathTestModule: elrond_wasm::contract_base::ContractBase {
+#[mx_sc::module]
+pub trait ContractBaseFullPathTestModule: mx_sc::contract_base::ContractBase {
     #[endpoint]
     fn call_contract_base_full_path_endpoint(&self) {}
 }

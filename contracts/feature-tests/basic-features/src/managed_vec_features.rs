@@ -1,6 +1,6 @@
-elrond_wasm::imports!();
+mx_sc::imports!();
 
-#[elrond_wasm::module]
+#[mx_sc::module]
 pub trait ManagedVecFeatures {
     #[endpoint]
     fn managed_vec_new(&self) -> ManagedVec<BigUint> {

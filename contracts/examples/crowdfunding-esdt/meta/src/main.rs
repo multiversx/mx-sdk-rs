@@ -1,3 +1,3 @@
 fn main() {
-    elrond_wasm_debug::meta::perform::<crowdfunding_esdt::AbiProvider>();
+    mx_sc_meta::cli_main::<crowdfunding_esdt::AbiProvider>();
 }

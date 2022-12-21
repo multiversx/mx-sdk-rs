@@ -1,4 +1,4 @@
-use elrond_wasm_debug::*;
+use mx_sc_debug::*;
 
 fn world() -> BlockchainMock {
     let mut blockchain = BlockchainMock::new();
@@ -13,15 +13,15 @@ fn world() -> BlockchainMock {
 
 #[test]
 fn deploy_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/deploy.scen.json", world());
+    mx_sc_debug::mandos_rs("mandos/deploy.scen.json", world());
 }
 
 #[test]
 fn setup_fees_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/setup_fees_and_transfer.scen.json", world());
+    mx_sc_debug::mandos_rs("mandos/setup_fees_and_transfer.scen.json", world());
 }
 
 #[test]
 fn claim_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/claim.scen.json", world());
+    mx_sc_debug::mandos_rs("mandos/claim.scen.json", world());
 }

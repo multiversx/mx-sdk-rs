@@ -1,6 +1,6 @@
 #![no_std]
 
-elrond_wasm::imports!();
+mx_sc::imports!();
 
 mod events;
 pub mod median;
@@ -16,9 +16,9 @@ static PAUSED_ERROR_MSG: &[u8] = b"Contract is paused";
 static PAIR_DECIMALS_NOT_CONFIGURED_ERROR: &[u8] = b"pair decimals not configured";
 static WRONG_NUMBER_OF_DECIMALS_ERROR: &[u8] = b"wrong number of decimals";
 
-#[elrond_wasm::contract]
+#[mx_sc::contract]
 pub trait PriceAggregator:
-    elrond_wasm_modules::pause::PauseModule + staking::StakingModule + events::EventsModule
+    mx_sc_modules::pause::PauseModule + staking::StakingModule + events::EventsModule
 {
     #[init]
     fn init(

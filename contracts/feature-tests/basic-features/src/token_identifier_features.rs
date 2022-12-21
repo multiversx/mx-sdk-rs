@@ -1,6 +1,6 @@
-elrond_wasm::imports!();
+mx_sc::imports!();
 
-#[elrond_wasm::module]
+#[mx_sc::module]
 pub trait TokenIdentifierFeatures {
     #[endpoint]
     fn token_identifier_egld(&self) -> EgldOrEsdtTokenIdentifier {

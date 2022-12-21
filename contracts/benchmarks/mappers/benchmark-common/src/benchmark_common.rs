@@ -1,8 +1,8 @@
 use crate::ExampleStruct;
 
-elrond_wasm::imports!();
+mx_sc::imports!();
 
-#[elrond_wasm::module]
+#[mx_sc::module]
 pub trait BenchmarkCommon {
     fn append_index(&self, base: &ManagedBuffer, index: usize) -> ManagedBuffer {
         let mut concatenated = base.clone();

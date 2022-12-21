@@ -1,7 +1,7 @@
 #![no_std]
 
-elrond_wasm::imports!();
-elrond_wasm::derive_imports!();
+mx_sc::imports!();
+mx_sc::derive_imports!();
 
 const PERCENTAGE_TOTAL: u8 = 100;
 
@@ -24,7 +24,7 @@ pub struct AuctionArgument<M: ManagedTypeApi> {
     pub deadline: u64,
 }
 
-#[elrond_wasm::contract]
+#[mx_sc::contract]
 pub trait Erc1155Marketplace {
     /// `bid_cut_percentage` is the cut that the contract takes from any sucessful bid
     #[init]

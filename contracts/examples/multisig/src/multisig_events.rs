@@ -1,9 +1,9 @@
 use crate::{action::ActionFullInfo, user_role::UserRole};
 
-elrond_wasm::imports!();
+mx_sc::imports!();
 
 /// Contains all events that can be emitted by the contract.
-#[elrond_wasm::module]
+#[mx_sc::module]
 pub trait MultisigEventsModule {
     #[event("startPerformAction")]
     fn start_perform_action_event(&self, data: &ActionFullInfo<Self::Api>);

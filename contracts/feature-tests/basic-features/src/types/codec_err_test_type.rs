@@ -1,10 +1,10 @@
-use elrond_wasm::{
-    derive::TypeAbi,
-    elrond_codec::{
+use mx_sc::{
+    codec::{
         DecodeError, DecodeErrorHandler, EncodeError, EncodeErrorHandler, NestedDecode,
         NestedDecodeInput, NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode,
         TopEncodeOutput,
     },
+    derive::TypeAbi,
 };
 
 /// Helper type to explore encode/decode errors.

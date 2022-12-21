@@ -1,3 +1,3 @@
 fn main() {
-    elrond_wasm_debug::meta::perform::<nft_minter::AbiProvider>();
+    mx_sc_meta::cli_main::<nft_minter::AbiProvider>();
 }

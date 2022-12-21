@@ -8,18 +8,18 @@ publish = false
 [lib]
 path = "src/alloc_features_main.rs"
 
-[dependencies.elrond-wasm]
-version = "0.37.0"
-path = "../../../elrond-wasm"
+[dependencies.mx-sc]
+version = "0.38.0"
+path = "../../../framework/base"
 features = ["alloc"]
 
-[dev-dependencies.elrond-wasm-debug]
-version = "0.37.0"
-path = "../../../elrond-wasm-debug"
+[dev-dependencies.mx-sc-debug]
+version = "0.38.0"
+path = "../../../framework/debug"
 
-[dependencies.elrond-wasm-modules]
-version = "0.37.0"
-path = "../../../elrond-wasm-modules"
+[dependencies.mx-sc-modules]
+version = "0.38.0"
+path = "../../../contracts/modules"
 
 [dev-dependencies.esdt-system-sc-mock]
 path = "../esdt-system-sc-mock"

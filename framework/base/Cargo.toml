@@ -1,0 +1,41 @@
+[package]
+name = "mx-sc"
+version = "0.38.0"
+edition = "2021"
+
+authors = ["Andrei Marinica <andrei.marinica@elrond.com>", "MultiversX <contact@multiversx.com>"]
+license = "GPL-3.0-only"
+readme = "README.md"
+repository = "https://github.com/ElrondNetwork/elrond-wasm-rs"
+homepage = "https://multiversx.com/"
+documentation = "https://docs.elrond.com/"
+description = "MultiversX smart contract API"
+keywords = ["multiversx", "wasm", "webassembly", "blockchain", "contract"]
+categories = ["no-std", "wasm", "cryptography::cryptocurrencies", "development-tools"]
+
+[features]
+num-bigint = ["mx-sc-codec/num-bigint"]
+alloc = ["mx-sc-codec/alloc"]
+ei-unmanaged = ["alloc"]
+promises = []
+big-float = []
+esdt-token-payment-legacy-decode = []
+
+[dependencies]
+wee_alloc = "0.4"
+hashbrown = "0.11.2"
+hex-literal = "0.3.1"
+bitflags = "1.3.2"
+
+[dependencies.num-traits]
+version = "0.2"
+default-features = false
+
+[dependencies.mx-sc-derive]
+version = "=0.38.0"
+path = "../derive"
+
+[dependencies.mx-sc-codec]
+version = "=0.16.0"
+path = "../codec"
+features = ["derive"]

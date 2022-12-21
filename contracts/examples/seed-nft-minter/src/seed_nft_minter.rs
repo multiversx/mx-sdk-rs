@@ -1,20 +1,20 @@
 #![no_std]
 
-elrond_wasm::imports!();
-elrond_wasm::derive_imports!();
+mx_sc::imports!();
+mx_sc::derive_imports!();
 
 mod distribution_module;
 mod nft_module;
 
 use distribution_module::Distribution;
-use elrond_wasm_modules::default_issue_callbacks;
+use mx_sc_modules::default_issue_callbacks;
 
 #[derive(TypeAbi, TopEncode, TopDecode)]
 pub struct ExampleAttributes {
     pub creation_timestamp: u64,
 }
 
-#[elrond_wasm::contract]
+#[mx_sc::contract]
 pub trait SeedNftMinter:
     distribution_module::DistributionModule
     + nft_module::NftModule
@@ -122,9 +122,9 @@ pub trait SeedNftMinter:
 }
 
 mod nft_marketplace_proxy {
-    elrond_wasm::imports!();
+    mx_sc::imports!();
 
-    #[elrond_wasm::proxy]
+    #[mx_sc::proxy]
     pub trait NftMarketplace {
         #[endpoint(claimTokens)]
         fn claim_tokens(

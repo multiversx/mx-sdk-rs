@@ -1,3 +1,3 @@
 fn main() {
-    elrond_wasm_debug::meta::perform::<transfer_role_features::AbiProvider>();
+    mx_sc_meta::cli_main::<transfer_role_features::AbiProvider>();
 }

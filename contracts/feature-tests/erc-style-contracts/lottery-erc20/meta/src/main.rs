@@ -1,3 +1,3 @@
 fn main() {
-    elrond_wasm_debug::meta::perform::<lottery_erc20::AbiProvider>();
+    mx_sc_meta::cli_main::<lottery_erc20::AbiProvider>();
 }

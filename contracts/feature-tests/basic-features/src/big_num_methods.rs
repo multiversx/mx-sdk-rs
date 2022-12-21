@@ -1,6 +1,6 @@
-elrond_wasm::imports!();
+mx_sc::imports!();
 
-#[elrond_wasm::module]
+#[mx_sc::module]
 pub trait BigIntMethods {
     #[endpoint]
     fn sqrt_big_uint(&self, a: BigUint) -> BigUint {

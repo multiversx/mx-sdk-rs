@@ -1,10 +1,10 @@
 #![no_std]
 
-elrond_wasm::imports!();
+mx_sc::imports!();
 
 /// One of the simplest smart contracts possible,
 /// it holds a single variable in storage, which anyone can increment.
-#[elrond_wasm::contract]
+#[mx_sc::contract]
 pub trait Adder {
     #[view(getSum)]
     #[storage_mapper("sum")]

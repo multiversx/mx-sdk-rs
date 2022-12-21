@@ -1,0 +1,13 @@
+[package]
+name = "fractional-nfts-meta"
+version = "0.0.0"
+authors = ["Claudiu-Marcel Bruda <claudiu.bruda@elrond.com>"]
+edition = "2021"
+publish = false
+
+[dependencies.fractional-nfts]
+path = ".."
+
+[dependencies.mx-sc-meta]
+version = "0.38.0"
+path = "../../../../framework/meta"

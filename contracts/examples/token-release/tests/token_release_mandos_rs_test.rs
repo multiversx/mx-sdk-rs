@@ -1,4 +1,4 @@
-use elrond_wasm_debug::*;
+use mx_sc_debug::*;
 
 fn world() -> BlockchainMock {
     let mut blockchain = BlockchainMock::new();
@@ -13,30 +13,30 @@ fn world() -> BlockchainMock {
 
 #[test]
 fn token_release_add_group_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/test-add-group.scen.json", world());
+    mx_sc_debug::mandos_rs("mandos/test-add-group.scen.json", world());
 }
 
 #[test]
 fn token_release_add_user_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/test-add-user.scen.json", world());
+    mx_sc_debug::mandos_rs("mandos/test-add-user.scen.json", world());
 }
 
 #[test]
 fn token_release_change_user_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/test-change-user.scen.json", world());
+    mx_sc_debug::mandos_rs("mandos/test-change-user.scen.json", world());
 }
 
 #[test]
 fn token_release_claim_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/test-claim.scen.json", world());
+    mx_sc_debug::mandos_rs("mandos/test-claim.scen.json", world());
 }
 
 #[test]
 fn token_release_end_setup_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/test-end-setup.scen.json", world());
+    mx_sc_debug::mandos_rs("mandos/test-end-setup.scen.json", world());
 }
 
 #[test]
 fn token_release_init_rs() {
-    elrond_wasm_debug::mandos_rs("mandos/test-init.scen.json", world());
+    mx_sc_debug::mandos_rs("mandos/test-init.scen.json", world());
 }

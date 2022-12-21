@@ -1,8 +1,8 @@
-elrond_wasm::imports!();
+mx_sc::imports!();
 
 use super::storage;
 
-#[elrond_wasm::module]
+#[mx_sc::module]
 pub trait ForwarderSftModule: storage::ForwarderStorageModule {
     #[payable("EGLD")]
     #[endpoint]

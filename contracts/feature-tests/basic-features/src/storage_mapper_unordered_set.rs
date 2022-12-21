@@ -1,7 +1,7 @@
-elrond_wasm::imports!();
+mx_sc::imports!();
 
 /// Storage mapper test.
-#[elrond_wasm::module]
+#[mx_sc::module]
 pub trait UnorderedSetMapperFeatures {
     #[view]
     #[storage_mapper("set_mapper")]

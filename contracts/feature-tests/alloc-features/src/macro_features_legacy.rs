@@ -1,16 +1,16 @@
-elrond_wasm::imports!();
+mx_sc::imports!();
 
-use elrond_wasm::types::String;
+use mx_sc::types::String;
 
 /// Legacy, deprecated macros. Will b removed once they get removed.
 ///
 /// Error conversions should be moved to corresponding new formatter-based error tests.
-#[elrond_wasm::module]
+#[mx_sc::module]
 pub trait MacroFeaturesLegacy {
     #[allow(deprecated)]
     #[view]
     fn only_owner_legacy(&self) -> SCResult<()> {
-        elrond_wasm::only_owner!(self, "Custom only owner message");
+        mx_sc::only_owner!(self, "Custom only owner message");
         Ok(())
     }
 

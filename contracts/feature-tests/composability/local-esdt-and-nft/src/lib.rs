@@ -1,7 +1,7 @@
 #![no_std]
 
-elrond_wasm::imports!();
-elrond_wasm::derive_imports!();
+mx_sc::imports!();
+mx_sc::derive_imports!();
 
 // used as mock attributes for NFTs
 #[derive(TopEncode, TopDecode, TypeAbi)]
@@ -11,7 +11,7 @@ pub struct Color {
     b: u8,
 }
 
-#[elrond_wasm::contract]
+#[mx_sc::contract]
 pub trait LocalEsdtAndEsdtNft {
     #[init]
     fn init(&self) {}

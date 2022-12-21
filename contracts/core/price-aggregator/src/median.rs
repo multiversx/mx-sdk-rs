@@ -1,5 +1,5 @@
-elrond_wasm::imports!();
-elrond_wasm::derive_imports!();
+mx_sc::imports!();
+mx_sc::derive_imports!();
 
 /// Returns the sorted middle, or the average of the two middle indexed items if the
 /// vector has an even number of elements.

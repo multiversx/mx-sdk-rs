@@ -1,6 +1,6 @@
-elrond_wasm::imports!();
+mx_sc::imports!();
 
-#[elrond_wasm::module]
+#[mx_sc::module]
 pub trait BigFloatMethods {
     #[endpoint]
     fn new_from_parts_big_float(

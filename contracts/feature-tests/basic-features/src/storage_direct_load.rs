@@ -1,11 +1,11 @@
-elrond_wasm::imports!();
+mx_sc::imports!();
 
-use elrond_wasm::api::HandleTypeInfo;
+use mx_sc::api::HandleTypeInfo;
 
 use crate::types::*;
 
 /// Storage tests: direct load.
-#[elrond_wasm::module]
+#[mx_sc::module]
 pub trait StorageLoadFeatures {
     #[endpoint]
     #[storage_get("big_uint")]
@@ -74,9 +74,7 @@ pub trait StorageLoadFeatures {
     #[endpoint]
     fn load_from_address_raw(&self, address: ManagedAddress, key: ManagedBuffer) -> ManagedBuffer {
         // TODO: maybe wrap this kind of functionality in a StorageRawWrapper
-        use elrond_wasm::api::{
-            StaticVarApi, StaticVarApiImpl, StorageReadApi, StorageReadApiImpl,
-        };
+        use mx_sc::api::{StaticVarApi, StaticVarApiImpl, StorageReadApi, StorageReadApiImpl};
         let value_handle: <<Self as ContractBase>::Api as HandleTypeInfo>::ManagedBufferHandle =
             Self::Api::static_var_api_impl().next_handle();
         Self::Api::storage_read_api_impl().storage_load_from_address(

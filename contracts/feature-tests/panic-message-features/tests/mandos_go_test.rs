@@ -1,4 +1,4 @@
 #[test]
 fn panic_message_go() {
-    elrond_wasm_debug::mandos_go("mandos/panic-message.scen.json");
+    mx_sc_debug::mandos_go("mandos/panic-message.scen.json");
 }

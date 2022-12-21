@@ -1,3 +1,3 @@
 fn main() {
-    elrond_wasm_debug::meta::perform::<forwarder::AbiProvider>();
+    mx_sc_meta::cli_main::<forwarder::AbiProvider>();
 }

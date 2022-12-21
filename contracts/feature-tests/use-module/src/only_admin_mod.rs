@@ -1,8 +1,8 @@
-use elrond_wasm_modules::only_admin;
+use mx_sc_modules::only_admin;
 
-elrond_wasm::imports!();
+mx_sc::imports!();
 
-#[elrond_wasm::module]
+#[mx_sc::module]
 #[only_admin]
 pub trait OnlyAdminTestModule:
     super::only_admin_derived_mod::OnlyAdminDerivedTestModule + only_admin::OnlyAdminModule

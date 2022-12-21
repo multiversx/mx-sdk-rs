@@ -8,7 +8,7 @@ cargo build
 cargo test
 
 grcov ./target/debug/ -s . -t html --llvm --branch -o ./target/debug/coverage/ \
-	--ignore elrond-wasm-node \
+	--ignore wasm-adapter \
 	--ignore-not-existing \
 	--ignore *abi/src* \
 	--ignore *meta/src* \

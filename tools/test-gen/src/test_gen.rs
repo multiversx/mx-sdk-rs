@@ -53,7 +53,7 @@ fn print_mandos_rs(file: &mut File, names: &[String]) {
             file,
             "#[test]
 fn {}_rs() {{
-    elrond_wasm_debug::mandos_rs(\"mandos/{}.scen.json\", world());
+    mx_sc_debug::mandos_rs(\"mandos/{}.scen.json\", world());
 }}
 ",
             name.replace('-', "_").to_lowercase(),
@@ -69,7 +69,7 @@ fn print_mandos_go(file: &mut File, names: &[String]) {
             file,
             "#[test]
 fn {}_go() {{
-    elrond_wasm_debug::mandos_go(\"mandos/{}.scen.json\");
+    mx_sc_debug::mandos_go(\"mandos/{}.scen.json\");
 }}
 ",
             name.replace('-', "_").to_lowercase(),

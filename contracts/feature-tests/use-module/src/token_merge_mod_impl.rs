@@ -1,9 +1,9 @@
-elrond_wasm::imports!();
-elrond_wasm::derive_imports!();
+mx_sc::imports!();
+mx_sc::derive_imports!();
 
 use core::marker::PhantomData;
 
-use elrond_wasm_modules::token_merge::{
+use mx_sc_modules::token_merge::{
     custom_merged_token_attributes::{
         AllMergeScTraits, DefaultMergedAttributesWrapper, MergedTokenAttributesCreator,
     },
@@ -16,12 +16,12 @@ pub struct CustomAttributes {
     pub second: u64,
 }
 
-#[elrond_wasm::module]
+#[mx_sc::module]
 pub trait TokenMergeModImpl:
-    elrond_wasm_modules::pause::PauseModule
-    + elrond_wasm_modules::token_merge::TokenMergeModule
-    + elrond_wasm_modules::token_merge::merged_token_setup::MergedTokenSetupModule
-    + elrond_wasm_modules::default_issue_callbacks::DefaultIssueCallbacksModule
+    mx_sc_modules::pause::PauseModule
+    + mx_sc_modules::token_merge::TokenMergeModule
+    + mx_sc_modules::token_merge::merged_token_setup::MergedTokenSetupModule
+    + mx_sc_modules::default_issue_callbacks::DefaultIssueCallbacksModule
 {
     #[payable("*")]
     #[endpoint(mergeTokens)]

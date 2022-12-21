@@ -1,3 +1,3 @@
 fn main() {
-    elrond_wasm_debug::meta::perform::<order_book_pair::AbiProvider>();
+    mx_sc_meta::cli_main::<order_book_pair::AbiProvider>();
 }

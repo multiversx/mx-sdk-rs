@@ -1,6 +1,6 @@
-elrond_wasm::imports!();
+mx_sc::imports!();
 
-#[elrond_wasm::contract]
+#[mx_sc::contract]
 pub trait MockSeedNftMinter {
     #[init]
     fn init(&self, nft_token_id: TokenIdentifier) {

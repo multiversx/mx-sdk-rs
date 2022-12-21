@@ -1,7 +1,7 @@
-elrond_wasm::imports!();
+mx_sc::imports!();
 
 /// Storage mapper test.
-#[elrond_wasm::module]
+#[mx_sc::module]
 pub trait QueueMapperFeatures {
     #[view]
     #[storage_mapper("queue_mapper")]

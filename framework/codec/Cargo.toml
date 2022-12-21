@@ -1,0 +1,32 @@
+[package]
+name = "mx-sc-codec"
+version = "0.16.0"
+edition = "2021"
+
+authors = ["Andrei Marinica <andrei.marinica@elrond.com>", "MultiversX <contact@multiversx.com>"]
+license = "GPL-3.0-only"
+readme = "README.md"
+repository = "https://github.com/ElrondNetwork/elrond-wasm-rs"
+homepage = "https://multiversx.com/"
+documentation = "https://docs.elrond.com/"
+description = "Lightweight binary serializer/deserializer, written especially for MultiversX smart contracts"
+keywords = ["multiversx", "wasm", "webassembly", "blockchain", "contract"]
+categories = ["no-std", "wasm", "cryptography::cryptocurrencies", "development-tools"]
+
+[features]
+derive = ["mx-sc-codec-derive"]
+alloc = []
+
+[dependencies.mx-sc-codec-derive]
+path = "../codec-derive"
+version = "=0.16.0"
+optional = true
+
+[dependencies]
+wee_alloc = "0.4"
+arrayvec = { version = "0.7.1", default-features = false }
+num-bigint = { version = "0.4.2", optional = true } # can only be used in std contexts
+
+[dev-dependencies.mx-sc-codec-derive]
+path = "../codec-derive"
+version = "=0.16.0"

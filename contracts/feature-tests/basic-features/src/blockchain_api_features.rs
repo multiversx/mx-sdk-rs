@@ -1,7 +1,7 @@
-elrond_wasm::imports!();
+mx_sc::imports!();
 
 /// Contains all events that can be emitted by the contract.
-#[elrond_wasm::module]
+#[mx_sc::module]
 pub trait BlockchainApiFeatures {
     #[endpoint]
     fn get_caller(&self) -> ManagedAddress {

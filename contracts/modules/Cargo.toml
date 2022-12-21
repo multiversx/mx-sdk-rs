@@ -1,0 +1,21 @@
+[package]
+name = "mx-sc-modules"
+version = "0.38.0"
+edition = "2021"
+
+authors = ["MultiversX <contact@multiversx.com>"]
+license = "GPL-3.0-only"
+readme = "README.md"
+repository = "https://github.com/ElrondNetwork/elrond-wasm-rs"
+homepage = "https://multiversx.com/"
+documentation = "https://docs.elrond.com/"
+description = "Elrond WebAssembly standard smart contract modules"
+keywords = ["multiversx", "wasm", "webassembly", "blockchain", "contract"]
+categories = ["no-std", "wasm", "cryptography::cryptocurrencies"]
+
+[features]
+alloc = ["mx-sc/alloc"]
+
+[dependencies.mx-sc]
+version = "0.38.0"
+path = "../../framework/base"

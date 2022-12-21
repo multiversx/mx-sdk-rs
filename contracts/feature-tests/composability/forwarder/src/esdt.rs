@@ -1,4 +1,4 @@
-elrond_wasm::imports!();
+mx_sc::imports!();
 
 use super::storage;
 
@@ -16,7 +16,7 @@ pub type EsdtTokenDataMultiValue<M> = MultiValue9<
     ManagedVec<M, ManagedBuffer<M>>,
 >;
 
-#[elrond_wasm::module]
+#[mx_sc::module]
 pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
     #[view(getFungibleEsdtBalance)]
     fn get_fungible_esdt_balance(&self, token_identifier: &TokenIdentifier) -> BigUint {

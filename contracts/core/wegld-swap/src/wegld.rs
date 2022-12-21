@@ -1,9 +1,9 @@
 #![no_std]
 
-elrond_wasm::imports!();
+mx_sc::imports!();
 
-#[elrond_wasm::contract]
-pub trait EgldEsdtSwap: elrond_wasm_modules::pause::PauseModule {
+#[mx_sc::contract]
+pub trait EgldEsdtSwap: mx_sc_modules::pause::PauseModule {
     #[init]
     fn init(&self, wrapped_egld_token_id: TokenIdentifier) {
         self.wrapped_egld_token_id().set(&wrapped_egld_token_id);

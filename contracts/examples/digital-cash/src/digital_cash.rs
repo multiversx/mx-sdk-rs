@@ -1,16 +1,16 @@
 #![no_std]
 #![allow(unused_attributes)]
 
-elrond_wasm::imports!();
-elrond_wasm::derive_imports!();
+mx_sc::imports!();
+mx_sc::derive_imports!();
 
 mod deposit_info;
 use deposit_info::DepositInfo;
 
 pub const SECONDS_PER_ROUND: u64 = 6;
-pub use elrond_wasm::api::{ED25519_KEY_BYTE_LEN, ED25519_SIGNATURE_BYTE_LEN};
+pub use mx_sc::api::{ED25519_KEY_BYTE_LEN, ED25519_SIGNATURE_BYTE_LEN};
 
-#[elrond_wasm::contract]
+#[mx_sc::contract]
 pub trait DigitalCash {
     #[init]
     fn init(&self) {}

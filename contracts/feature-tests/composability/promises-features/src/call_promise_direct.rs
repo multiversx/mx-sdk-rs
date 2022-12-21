@@ -1,7 +1,7 @@
-elrond_wasm::imports!();
+mx_sc::imports!();
 
 /// Test contract for investigating the new async call framework.
-#[elrond_wasm::module]
+#[mx_sc::module]
 pub trait CallPromisesDirectModule {
     #[proxy]
     fn vault_proxy(&self) -> vault::Proxy<Self::Api>;
