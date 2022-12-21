@@ -1,11 +1,11 @@
 use super::ManagedVecItem;
 use core::{cmp::Ordering, marker::PhantomData};
 
-pub(crate) struct EncodedManagedVecItem<T: ManagedVecItem, const N: usize>
+pub struct EncodedManagedVecItem<T: ManagedVecItem, const N: usize>
 where
     T: ManagedVecItem,
 {
-    encoded: [u8; N],
+    pub encoded: [u8; N],
     _phantom: PhantomData<T>,
 }
 

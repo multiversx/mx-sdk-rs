@@ -300,16 +300,25 @@ where
 {
     pub fn with_self_as_slice_mut<F>(&mut self, mut f: F)
     where
-        F: FnMut(&mut [EncodedManagedVecItem<T, { T::PAYLOAD_SIZE }>]),
+        F: FnMut(
+                &mut [EncodedManagedVecItem<T, { T::PAYLOAD_SIZE }>],
+            ) -> &mut [EncodedManagedVecItem<T, { T::PAYLOAD_SIZE }>]
+            + 'static,
     {
         let mut static_cache = CachedManagedBuffer::new(&mut self.buffer);
         static_cache.with_buffer_contents_mut(|bytes| {
-            let ptr = bytes.as_mut_ptr() as *mut EncodedManagedVecItem<T, { T::PAYLOAD_SIZE }>;
-            let len = bytes.len() / T::PAYLOAD_SIZE;
-            let values = unsafe { core::slice::from_raw_parts_mut(ptr, len) };
+            let item_len = bytes.len() / T::PAYLOAD_SIZE;
+            let values = Self::reinterpret_slice(bytes, item_len);
 
-            f(values);
+            let result = f(values);
+            let result_len = result.len() * T::PAYLOAD_SIZE;
+            Self::reinterpret_slice(result, result_len)
         });
+    }
+
+    fn reinterpret_slice<T1, T2>(from: &mut [T1], len: usize) -> &mut [T2] {
+        let ptr = from.as_mut_ptr() as *mut T2;
+        unsafe { core::slice::from_raw_parts_mut(ptr, len) }
     }
 }
 
@@ -318,11 +327,30 @@ where
     M: ManagedTypeApi,
     T: ManagedVecItem + Ord + Debug,
 {
-    pub fn sort(&mut self) {
-        self.with_self_as_slice_mut(|f| f.sort())
+    fn inner_sort(
+        slice: &mut [EncodedManagedVecItem<T, { T::PAYLOAD_SIZE }>],
+    ) -> &mut [EncodedManagedVecItem<T, { T::PAYLOAD_SIZE }>] {
+        slice.sort();
+        slice
     }
-    pub fn sort_unstable(&mut self) {
-        self.with_self_as_slice_mut(|f| f.sort_unstable())
+    pub fn sort(&mut self)
+    where
+        [(); T::PAYLOAD_SIZE]:,
+    {
+        self.with_self_as_slice_mut(Self::inner_sort)
+    }
+
+    fn inner_sort_unstable(
+        slice: &mut [EncodedManagedVecItem<T, { T::PAYLOAD_SIZE }>],
+    ) -> &mut [EncodedManagedVecItem<T, { T::PAYLOAD_SIZE }>] {
+        slice.sort();
+        slice
+    }
+    pub fn sort_unstable(&mut self)
+    where
+        [(); T::PAYLOAD_SIZE]:,
+    {
+        self.with_self_as_slice_mut(Self::inner_sort_unstable)
     }
 }
 
@@ -331,8 +359,17 @@ where
     M: ManagedTypeApi,
     T: ManagedVecItem + PartialEq + Debug,
 {
-    pub fn dedup(&mut self) {
-        //    self.with_self_as_slice_mut(|f| f.dedup())
+    fn inner_dedup(
+        slice: &mut [EncodedManagedVecItem<T, { T::PAYLOAD_SIZE }>],
+    ) -> &mut [EncodedManagedVecItem<T, { T::PAYLOAD_SIZE }>] {
+        let (dedup, _) = slice.partition_dedup();
+        dedup
+    }
+    pub fn dedup(&mut self)
+    where
+        [(); T::PAYLOAD_SIZE]:,
+    {
+        self.with_self_as_slice_mut(Self::inner_dedup)
     }
 }
 

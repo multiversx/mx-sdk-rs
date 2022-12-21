@@ -205,7 +205,26 @@ fn test_dedup_biguint() {
 }
 
 #[test]
-fn test_sorted_dedup() {
+fn test_sorted_dedup_u64() {
+    let _ = DebugApi::dummy();
+
+    let mut vec = Vec::<u64>::new();
+    let mut managed_vec = ManagedVec::<DebugApi, u64>::new();
+    for i in [2u64, 3u64, 2u64, 2u64, 6u64, 3u64, 5u64, 2u64] {
+        managed_vec.push(i.clone());
+        vec.push(i);
+    }
+    managed_vec.sort();
+    vec.sort();
+    managed_vec.dedup();
+    vec.dedup();
+
+    assert_eq!(4, managed_vec.len());
+    assert_eq!(vec, managed_vec.into_vec());
+}
+
+#[test]
+fn test_sorted_dedup_biguint() {
     let _ = DebugApi::dummy();
 
     let mut vec = Vec::<BigUint<DebugApi>>::new();

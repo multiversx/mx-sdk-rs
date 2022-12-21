@@ -25,12 +25,14 @@ where
         .unwrap_or_else(|| M::error_api_impl().signal_error(b"Static cache is in use"))
     }
 
-    pub fn with_buffer_contents_mut<F>(&mut self, f: F)
+    pub fn with_buffer_contents_mut<F>(&mut self, mut f: F)
     where
-        F: FnMut(&mut [u8]),
+        F: FnMut(&mut [u8]) -> &[u8],
     {
         let static_cache = self.load_static_cache();
-        static_cache.with_buffer_contents_mut(f);
-        static_cache.with_buffer_contents(|buffer| self.managed_buffer.overwrite(buffer))
+        static_cache.with_buffer_contents_mut(|buffer| {
+            let result = f(buffer);
+            self.managed_buffer.overwrite(result);
+        });
     }
 }
