@@ -298,12 +298,10 @@ where
     M: ManagedTypeApi,
     T: ManagedVecItem + Debug,
 {
-    pub fn with_self_as_slice_mut<F>(&mut self, mut f: F)
+    fn with_self_as_slice_mut<F>(&mut self, mut f: F)
     where
-        F: FnMut(
-                &mut [EncodedManagedVecItem<T, { T::PAYLOAD_SIZE }>],
-            ) -> &[EncodedManagedVecItem<T, { T::PAYLOAD_SIZE }>]
-            + 'static,
+        F: FnMut(&mut [EncodedManagedVecItem<T>]) -> &[EncodedManagedVecItem<T>],
+        [(); T::PAYLOAD_SIZE]:,
     {
         let mut static_cache = CachedManagedBuffer::new(&mut self.buffer);
         static_cache.with_buffer_contents_mut(|bytes| {
@@ -331,32 +329,23 @@ impl<M, T> ManagedVec<M, T>
 where
     M: ManagedTypeApi,
     T: ManagedVecItem + Ord + Debug,
+    [(); T::PAYLOAD_SIZE]:,
 {
-    fn inner_sort(
-        slice: &mut [EncodedManagedVecItem<T, { T::PAYLOAD_SIZE }>],
-    ) -> &[EncodedManagedVecItem<T, { T::PAYLOAD_SIZE }>] {
-        slice.sort();
-        slice
+    pub fn sort(&mut self) {
+        self.with_self_as_slice_mut(|slice| {
+            slice.sort();
+            slice
+        });
     }
 
-    pub fn sort(&mut self)
-    where
-        [(); T::PAYLOAD_SIZE]:,
-    {
-        self.with_self_as_slice_mut(Self::inner_sort)
-    }
-
-    fn inner_sort_unstable(
-        slice: &mut [EncodedManagedVecItem<T, { T::PAYLOAD_SIZE }>],
-    ) -> &[EncodedManagedVecItem<T, { T::PAYLOAD_SIZE }>] {
-        slice.sort();
-        slice
-    }
     pub fn sort_unstable(&mut self)
     where
         [(); T::PAYLOAD_SIZE]:,
     {
-        self.with_self_as_slice_mut(Self::inner_sort_unstable)
+        self.with_self_as_slice_mut(|slice| {
+            slice.sort_unstable();
+            slice
+        })
     }
 }
 
@@ -365,17 +354,14 @@ where
     M: ManagedTypeApi,
     T: ManagedVecItem + PartialEq + Debug,
 {
-    fn inner_dedup(
-        slice: &mut [EncodedManagedVecItem<T, { T::PAYLOAD_SIZE }>],
-    ) -> &[EncodedManagedVecItem<T, { T::PAYLOAD_SIZE }>] {
-        let (dedup, _) = slice.partition_dedup();
-        dedup
-    }
     pub fn dedup(&mut self)
     where
         [(); T::PAYLOAD_SIZE]:,
     {
-        self.with_self_as_slice_mut(Self::inner_dedup)
+        self.with_self_as_slice_mut(|slice| {
+            let (dedup, _) = slice.partition_dedup();
+            dedup
+        })
     }
 }
 
