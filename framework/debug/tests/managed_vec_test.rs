@@ -149,6 +149,10 @@ fn test_sort_biguint() {
     assert_eq!(vec, managed_vec.into_vec());
 }
 
+fn flip(n: &u64) -> u64 {
+    return n / 10u64 + n % 10u64 * 10;
+}
+
 #[test]
 fn test_sort_by_u64() {
     let _ = DebugApi::dummy();
@@ -163,20 +167,16 @@ fn test_sort_by_u64() {
     assert_eq!(managed_vec.is_sorted(), false);
 
     assert_eq!(
-        managed_vec.is_sorted_by(|a, b| Some(
-            (a / 10u64 + a % 10u64 * 10).cmp(&(b / 10u64 + b % 10u64 * 10u64))
-        )),
+        managed_vec.is_sorted_by(|a, b| Some(flip(a).cmp(&flip(b)))),
         false
     );
-    managed_vec.sort_by(|a, b| (a / 10u64 + a % 10u64 * 10).cmp(&(b / 10u64 + b % 10u64 * 10u64)));
-    vec.sort_by(|a, b| (a / 10u64 + a % 10u64 * 10).cmp(&(b / 10u64 + b % 10u64 * 10u64)));
+    managed_vec.sort_by(|a, b| flip(a).cmp(&flip(b)));
+    vec.sort_by(|a, b| flip(a).cmp(&flip(b)));
 
     assert_eq!(managed_vec.is_sorted(), false);
 
     assert_eq!(
-        managed_vec.is_sorted_by(|a, b| Some(
-            (a / 10u64 + a % 10u64 * 10).cmp(&(b / 10u64 + b % 10u64 * 10u64))
-        )),
+        managed_vec.is_sorted_by(|a, b| Some(flip(a).cmp(&flip(b)))),
         true
     );
     assert_eq!(vec, managed_vec.into_vec());
@@ -200,19 +200,19 @@ fn test_sort_by_biguint() {
         managed_vec.is_sorted_by(|a, b| {
             let a_u64 = a.to_u64().unwrap();
             let b_u64 = b.to_u64().unwrap();
-            Some((a_u64 / 10u64 + a_u64 % 10u64 * 10).cmp(&(b_u64 / 10u64 + b_u64 % 10u64 * 10u64)))
+            Some(flip(&a_u64).cmp(&flip(&b_u64)))
         }),
         false
     );
     managed_vec.sort_by(|a, b| {
         let a_u64 = a.to_u64().unwrap();
         let b_u64 = b.to_u64().unwrap();
-        (a_u64 / 10u64 + a_u64 % 10u64 * 10).cmp(&(b_u64 / 10u64 + b_u64 % 10u64 * 10u64))
+        flip(&a_u64).cmp(&flip(&b_u64))
     });
     vec.sort_by(|a, b| {
         let a_u64 = a.to_u64().unwrap();
         let b_u64 = b.to_u64().unwrap();
-        (a_u64 / 10u64 + a_u64 % 10u64 * 10).cmp(&(b_u64 / 10u64 + b_u64 % 10u64 * 10u64))
+        flip(&a_u64).cmp(&flip(&b_u64))
     });
 
     assert_eq!(managed_vec.is_sorted(), false);
@@ -221,7 +221,7 @@ fn test_sort_by_biguint() {
         managed_vec.is_sorted_by(|a, b| {
             let a_u64 = a.to_u64().unwrap();
             let b_u64 = b.to_u64().unwrap();
-            Some((a_u64 / 10u64 + a_u64 % 10u64 * 10).cmp(&(b_u64 / 10u64 + b_u64 % 10u64 * 10u64)))
+            Some(flip(&a_u64).cmp(&flip(&b_u64)))
         }),
         true
     );
@@ -370,22 +370,16 @@ fn test_sort_unstable_by_u64() {
     assert_eq!(managed_vec.is_sorted(), false);
 
     assert_eq!(
-        managed_vec.is_sorted_by(|a, b| Some(
-            (a / 10u64 + a % 10u64 * 10).cmp(&(b / 10u64 + b % 10u64 * 10u64))
-        )),
+        managed_vec.is_sorted_by(|a, b| Some(flip(a).cmp(&flip(b)))),
         false
     );
-    managed_vec.sort_unstable_by(|a, b| {
-        (a / 10u64 + a % 10u64 * 10).cmp(&(b / 10u64 + b % 10u64 * 10u64))
-    });
-    vec.sort_unstable_by(|a, b| (a / 10u64 + a % 10u64 * 10).cmp(&(b / 10u64 + b % 10u64 * 10u64)));
+    managed_vec.sort_unstable_by(|a, b| flip(a).cmp(&flip(b)));
+    vec.sort_unstable_by(|a, b| flip(a).cmp(&flip(b)));
 
     assert_eq!(managed_vec.is_sorted(), false);
 
     assert_eq!(
-        managed_vec.is_sorted_by(|a, b| Some(
-            (a / 10u64 + a % 10u64 * 10).cmp(&(b / 10u64 + b % 10u64 * 10u64))
-        )),
+        managed_vec.is_sorted_by(|a, b| Some(flip(a).cmp(&flip(b)))),
         true
     );
     assert_eq!(vec, managed_vec.into_vec());
@@ -409,19 +403,19 @@ fn test_sort_unstable_by_biguint() {
         managed_vec.is_sorted_by(|a, b| {
             let a_u64 = a.to_u64().unwrap();
             let b_u64 = b.to_u64().unwrap();
-            Some((a_u64 / 10u64 + a_u64 % 10u64 * 10).cmp(&(b_u64 / 10u64 + b_u64 % 10u64 * 10u64)))
+            Some(flip(&a_u64).cmp(&flip(&b_u64)))
         }),
         false
     );
     managed_vec.sort_unstable_by(|a, b| {
         let a_u64 = a.to_u64().unwrap();
         let b_u64 = b.to_u64().unwrap();
-        (a_u64 / 10u64 + a_u64 % 10u64 * 10).cmp(&(b_u64 / 10u64 + b_u64 % 10u64 * 10u64))
+        flip(&a_u64).cmp(&flip(&b_u64))
     });
     vec.sort_unstable_by(|a, b| {
         let a_u64 = a.to_u64().unwrap();
         let b_u64 = b.to_u64().unwrap();
-        (a_u64 / 10u64 + a_u64 % 10u64 * 10).cmp(&(b_u64 / 10u64 + b_u64 % 10u64 * 10u64))
+        flip(&a_u64).cmp(&flip(&b_u64))
     });
 
     assert_eq!(managed_vec.is_sorted(), false);
@@ -430,7 +424,7 @@ fn test_sort_unstable_by_biguint() {
         managed_vec.is_sorted_by(|a, b| {
             let a_u64 = a.to_u64().unwrap();
             let b_u64 = b.to_u64().unwrap();
-            Some((a_u64 / 10u64 + a_u64 % 10u64 * 10).cmp(&(b_u64 / 10u64 + b_u64 % 10u64 * 10u64)))
+            Some(flip(&a_u64).cmp(&flip(&b_u64)))
         }),
         true
     );
