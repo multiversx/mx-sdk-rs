@@ -18,7 +18,6 @@ pub(crate) mod preloaded_managed_buffer;
 mod randomness_source;
 mod token_identifier;
 
-pub(crate) use cached_managed_buffer::CachedManagedBuffer;
 pub use egld_or_esdt_token_identifier::EgldOrEsdtTokenIdentifier;
 pub use egld_or_esdt_token_payment::EgldOrEsdtTokenPayment;
 pub(crate) use encoded_namaged_vec_item::EncodedManagedVecItem;
