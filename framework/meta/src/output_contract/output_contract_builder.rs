@@ -5,20 +5,23 @@ use std::{
     path::Path,
 };
 
-use super::{MultiContractConfigSerde, OutputContract, OutputContractConfig, OutputContractSerde};
+use super::{
+    MultiContractConfigSerde, OutputContract, OutputContractConfig, OutputContractSerde,
+    OutputContractSettings,
+};
 
 /// Temporary structure, to help create instances of `OutputContract`. Not publicly exposed.
 #[derive(Default)]
 struct OutputContractBuilder {
     pub contract_id: String,
     pub explicit_name: String,
-    pub external_view: bool,
     pub add_unlabelled: bool,
     pub add_labels: BTreeSet<String>,
     pub add_endpoints: BTreeSet<String>,
     pub constructors: Vec<EndpointAbi>,
     pub endpoint_names: HashSet<String>,
     pub endpoints: Vec<EndpointAbi>,
+    pub settings: OutputContractSettings,
 }
 
 impl OutputContractBuilder {
@@ -26,7 +29,6 @@ impl OutputContractBuilder {
         OutputContractBuilder {
             contract_id: id.clone(),
             explicit_name: id,
-            external_view: false, // if unspecified, it should be considered false
             ..Default::default()
         }
     }
@@ -44,11 +46,14 @@ impl OutputContractBuilder {
             OutputContractBuilder {
                 contract_id: contract_id.clone(),
                 explicit_name: cms.name.clone().unwrap_or_default(),
-                external_view,
                 add_unlabelled: cms.add_unlabelled.unwrap_or_default(),
                 add_labels: cms.add_labels.iter().cloned().collect(),
                 add_endpoints: cms.add_endpoints.iter().cloned().collect(),
                 constructors,
+                settings: OutputContractSettings {
+                    external_view: cms.external_view.unwrap_or_default(),
+                    panic_message: cms.panic_message.unwrap_or_default(),
+                },
                 ..Default::default()
             },
         )
@@ -172,7 +177,7 @@ fn build_contract_abi(builder: OutputContractBuilder, original_abi: &ContractAbi
         endpoints: builder.endpoints,
         promise_callbacks: original_abi.promise_callbacks.clone(),
         events: original_abi.events.clone(),
-        has_callback: !builder.external_view && original_abi.has_callback,
+        has_callback: !builder.settings.external_view && original_abi.has_callback,
         type_descriptions: original_abi.type_descriptions.clone(),
     }
 }
@@ -181,7 +186,7 @@ fn build_contract(builder: OutputContractBuilder, original_abi: &ContractAbi) ->
     let name = builder.wasm_name().clone();
     OutputContract {
         main: false,
-        external_view: builder.external_view,
+        settings: builder.settings.clone(),
         contract_id: builder.contract_id.clone(),
         contract_name: name,
         abi: build_contract_abi(builder, original_abi),
@@ -247,7 +252,7 @@ impl OutputContractConfig {
             default_contract_config_name: default_contract_config_name.clone(),
             contracts: vec![OutputContract {
                 main: true,
-                external_view: false,
+                settings: OutputContractSettings::default(),
                 contract_id: default_contract_config_name.clone(),
                 contract_name: default_contract_config_name,
                 abi: original_abi.clone(),

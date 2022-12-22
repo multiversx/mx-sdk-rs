@@ -18,9 +18,9 @@ fn abi_tester_abi_generated_ok() {
     );
 
     let main_contract = multi_contract_config.find_contract("abi-tester");
-    assert!(!main_contract.external_view);
+    assert!(!main_contract.settings.external_view);
     let view_contract = multi_contract_config.find_contract("abi-tester-ev");
-    assert!(view_contract.external_view);
+    assert!(view_contract.settings.external_view);
     assert_eq!(
         view_contract.endpoint_names(),
         vec!["external_view", "payable_any_token", "label_a"]
@@ -60,7 +60,7 @@ fn check_multi_contract_config() {
     );
 
     let ev_contract = multi_contract_config.find_contract("abi-tester-ev");
-    assert!(ev_contract.external_view);
+    assert!(ev_contract.settings.external_view);
     assert_eq!(
         ev_contract.endpoint_names(),
         vec!["external_view", "payable_any_token", "label_a"]

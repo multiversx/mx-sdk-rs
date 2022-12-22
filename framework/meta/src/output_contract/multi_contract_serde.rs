@@ -14,18 +14,27 @@ pub struct MultiContractConfigSerde {
 
 #[derive(Deserialize, Debug)]
 pub struct OutputContractSerde {
-    #[serde(rename = "external-view")]
-    pub external_view: Option<bool>,
     pub name: Option<String>,
+
     #[serde(default)]
     #[serde(rename = "add-unlabelled")]
     pub add_unlabelled: Option<bool>,
+
     #[serde(default)]
     #[serde(rename = "add-labels")]
     pub add_labels: Vec<String>,
+
     #[serde(default)]
     #[serde(rename = "add-endpoints")]
     pub add_endpoints: Vec<String>,
+
+    #[serde(default)]
+    #[serde(rename = "external-view")]
+    pub external_view: Option<bool>,
+
+    #[serde(default)]
+    #[serde(rename = "panic-message")]
+    pub panic_message: Option<bool>,
 }
 
 #[derive(Deserialize, Default, Debug)]
