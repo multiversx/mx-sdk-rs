@@ -305,7 +305,7 @@ where
     {
         self.buffer.with_buffer_contents(|bytes| {
             let item_len = bytes.len() / T::PAYLOAD_SIZE;
-            let values = Self::reinterpret_slice(bytes, item_len);
+            let values = Self::transmute_slice(bytes, item_len);
             f(values)
         })
     }
@@ -317,22 +317,22 @@ where
     {
         self.buffer.with_buffer_contents_mut(|bytes| {
             let item_len = bytes.len() / T::PAYLOAD_SIZE;
-            let values = Self::reinterpret_slice_mut(bytes, item_len);
+            let values = Self::transmute_slice_mut(bytes, item_len);
 
             let result = f(values);
             let result_len = result.len() * T::PAYLOAD_SIZE;
-            Self::reinterpret_slice(result, result_len)
+            Self::transmute_slice(result, result_len)
         });
     }
 
-    fn reinterpret_slice<T1, T2>(from: &[T1], len: usize) -> &[T2] {
+    fn transmute_slice<T1, T2>(from: &[T1], len: usize) -> &[T2] {
         unsafe {
             let ptr = from.as_ptr() as *const T2;
             core::slice::from_raw_parts(ptr, len)
         }
     }
 
-    fn reinterpret_slice_mut<T1, T2>(from: &mut [T1], len: usize) -> &mut [T2] {
+    fn transmute_slice_mut<T1, T2>(from: &mut [T1], len: usize) -> &mut [T2] {
         unsafe {
             let ptr = from.as_mut_ptr() as *mut T2;
             core::slice::from_raw_parts_mut(ptr, len)
