@@ -15,10 +15,7 @@ use crate::{
 use alloc::vec::Vec;
 use core::{borrow::Borrow, cmp::Ordering, fmt::Debug, iter::FromIterator, marker::PhantomData};
 
-use super::{
-    cached_managed_buffer::{with_buffer_contents, with_buffer_contents_mut},
-    EncodedManagedVecItem,
-};
+use super::EncodedManagedVecItem;
 
 pub(crate) const INDEX_OUT_OF_RANGE_MSG: &[u8] = b"ManagedVec index out of range";
 
@@ -306,7 +303,7 @@ where
         F: FnOnce(&[EncodedManagedVecItem<T>]) -> R,
         [(); T::PAYLOAD_SIZE]:,
     {
-        with_buffer_contents(&self.buffer, |bytes| {
+        self.buffer.with_buffer_contents(|bytes| {
             let item_len = bytes.len() / T::PAYLOAD_SIZE;
             let values = Self::reinterpret_slice(bytes, item_len);
             f(values)
@@ -318,7 +315,7 @@ where
         F: FnOnce(&mut [EncodedManagedVecItem<T>]) -> &[EncodedManagedVecItem<T>],
         [(); T::PAYLOAD_SIZE]:,
     {
-        with_buffer_contents_mut(&mut self.buffer, |bytes| {
+        self.buffer.with_buffer_contents_mut(|bytes| {
             let item_len = bytes.len() / T::PAYLOAD_SIZE;
             let values = Self::reinterpret_slice_mut(bytes, item_len);
 
@@ -329,13 +326,17 @@ where
     }
 
     fn reinterpret_slice<T1, T2>(from: &[T1], len: usize) -> &[T2] {
-        let ptr = from.as_ptr() as *const T2;
-        unsafe { core::slice::from_raw_parts(ptr, len) }
+        unsafe {
+            let ptr = from.as_ptr() as *const T2;
+            core::slice::from_raw_parts(ptr, len)
+        }
     }
 
     fn reinterpret_slice_mut<T1, T2>(from: &mut [T1], len: usize) -> &mut [T2] {
-        let ptr = from.as_mut_ptr() as *mut T2;
-        unsafe { core::slice::from_raw_parts_mut(ptr, len) }
+        unsafe {
+            let ptr = from.as_mut_ptr() as *mut T2;
+            core::slice::from_raw_parts_mut(ptr, len)
+        }
     }
 }
 

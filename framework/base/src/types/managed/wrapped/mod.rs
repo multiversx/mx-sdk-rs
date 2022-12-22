@@ -1,4 +1,3 @@
-mod cached_managed_buffer;
 mod egld_or_esdt_token_identifier;
 mod egld_or_esdt_token_payment;
 mod encoded_namaged_vec_item;
