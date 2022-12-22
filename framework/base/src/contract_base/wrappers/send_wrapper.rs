@@ -316,7 +316,7 @@ where
         );
     }
 
-    /// Allows burning of multisple ESDT tokens at once.
+    /// Allows burning of multiple ESDT tokens at once.
     ///
     /// Will execute a synchronous call to the appropriate burn builtin function for each.
     pub fn esdt_local_burn_multi(&self, payments: &ManagedVec<A, EsdtTokenPayment<A>>) {
