@@ -12,7 +12,7 @@ use crate::{
     formatter::{
         hex_util::encode_bytes_as_hex, FormatByteReceiver, SCBinary, SCDisplay, SCLowerHex,
     },
-    types::{heap::BoxedBytes, ManagedType},
+    types::{heap::BoxedBytes, ManagedType, StaticBufferRef},
 };
 
 /// A byte buffer managed by an external API.
@@ -59,6 +59,39 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
         let new_handle: M::ManagedBufferHandle = M::static_var_api_impl().next_handle();
         M::managed_type_impl().mb_set_random(new_handle.clone(), nr_bytes);
         ManagedBuffer::from_handle(new_handle)
+    }
+
+    fn load_static_cache(&self) -> StaticBufferRef<M>
+    where
+        M: ManagedTypeApi,
+    {
+        StaticBufferRef::try_new_from_copy_bytes(self.len(), |dest_slice| {
+            let _ = self.load_slice(0, dest_slice);
+        })
+        .unwrap_or_else(|| {
+            M::error_api_impl().signal_error(b"static cache too small or already in use")
+        })
+    }
+
+    pub fn with_buffer_contents<R, F>(&self, f: F) -> R
+    where
+        M: ManagedTypeApi,
+        F: FnOnce(&[u8]) -> R,
+    {
+        let static_cache = self.load_static_cache();
+        static_cache.with_buffer_contents(f)
+    }
+
+    pub fn with_buffer_contents_mut<F>(&mut self, f: F)
+    where
+        M: ManagedTypeApi,
+        F: FnOnce(&mut [u8]) -> &[u8],
+    {
+        let static_cache = self.load_static_cache();
+        static_cache.with_buffer_contents_mut(|buffer| {
+            let result = f(buffer);
+            self.overwrite(result);
+        });
     }
 }
 

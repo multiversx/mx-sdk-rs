@@ -13,7 +13,9 @@ use crate::{
     },
 };
 use alloc::vec::Vec;
-use core::{borrow::Borrow, iter::FromIterator, marker::PhantomData};
+use core::{borrow::Borrow, cmp::Ordering, fmt::Debug, iter::FromIterator, marker::PhantomData};
+
+use super::EncodedManagedVecItem;
 
 pub(crate) const INDEX_OUT_OF_RANGE_MSG: &[u8] = b"ManagedVec index out of range";
 
@@ -288,6 +290,169 @@ where
     /// Creates a reference to and identical object, but one which behaves like a multi-value-vec.
     pub fn as_multi(&self) -> &MultiValueManagedVec<M, T> {
         MultiValueManagedVec::transmute_from_handle_ref(&self.buffer.handle)
+    }
+}
+
+impl<M, T> ManagedVec<M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedVecItem + Debug,
+{
+    fn with_self_as_slice<R, F>(&self, f: F) -> R
+    where
+        F: FnOnce(&[EncodedManagedVecItem<T>]) -> R,
+        [(); T::PAYLOAD_SIZE]:,
+    {
+        self.buffer.with_buffer_contents(|bytes| {
+            let item_len = bytes.len() / T::PAYLOAD_SIZE;
+            let values = Self::transmute_slice(bytes, item_len);
+            f(values)
+        })
+    }
+
+    fn with_self_as_slice_mut<F>(&mut self, f: F)
+    where
+        F: FnOnce(&mut [EncodedManagedVecItem<T>]) -> &[EncodedManagedVecItem<T>],
+        [(); T::PAYLOAD_SIZE]:,
+    {
+        self.buffer.with_buffer_contents_mut(|bytes| {
+            let item_len = bytes.len() / T::PAYLOAD_SIZE;
+            let values = Self::transmute_slice_mut(bytes, item_len);
+
+            let result = f(values);
+            let result_len = result.len() * T::PAYLOAD_SIZE;
+            Self::transmute_slice(result, result_len)
+        });
+    }
+
+    fn transmute_slice<T1, T2>(from: &[T1], len: usize) -> &[T2] {
+        unsafe {
+            let ptr = from.as_ptr() as *const T2;
+            core::slice::from_raw_parts(ptr, len)
+        }
+    }
+
+    fn transmute_slice_mut<T1, T2>(from: &mut [T1], len: usize) -> &mut [T2] {
+        unsafe {
+            let ptr = from.as_mut_ptr() as *mut T2;
+            core::slice::from_raw_parts_mut(ptr, len)
+        }
+    }
+}
+
+impl<M, T> ManagedVec<M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedVecItem + Ord + Debug,
+    [(); T::PAYLOAD_SIZE]:,
+{
+    pub fn sort(&mut self) {
+        self.with_self_as_slice_mut(|slice| {
+            slice.sort();
+            slice
+        });
+    }
+
+    pub fn sort_by<F>(&mut self, mut compare: F)
+    where
+        F: FnMut(&T, &T) -> Ordering,
+    {
+        self.with_self_as_slice_mut(|slice| {
+            slice.sort_by(|a, b| compare(&a.decode(), &b.decode()));
+            slice
+        });
+    }
+
+    pub fn sort_by_key<K, F>(&mut self, mut f: F)
+    where
+        F: FnMut(&T) -> K,
+        K: Ord,
+    {
+        self.with_self_as_slice_mut(|slice| {
+            slice.sort_by_key(|a| f(&a.decode()));
+            slice
+        });
+    }
+
+    pub fn sort_by_cached_key<K, F>(&mut self, mut f: F)
+    where
+        F: FnMut(&T) -> K,
+        K: Ord,
+    {
+        self.with_self_as_slice_mut(|slice| {
+            slice.sort_by_cached_key(|a| f(&a.decode()));
+            slice
+        });
+    }
+
+    pub fn sort_unstable(&mut self)
+    where
+        [(); T::PAYLOAD_SIZE]:,
+    {
+        self.with_self_as_slice_mut(|slice| {
+            slice.sort_unstable();
+            slice
+        })
+    }
+
+    pub fn sort_unstable_by<F>(&mut self, mut compare: F)
+    where
+        F: FnMut(&T, &T) -> Ordering,
+        [(); T::PAYLOAD_SIZE]:,
+    {
+        self.with_self_as_slice_mut(|slice| {
+            slice.sort_unstable_by(|a, b| compare(&a.decode(), &b.decode()));
+            slice
+        })
+    }
+
+    pub fn sort_unstable_by_key<K, F>(&mut self, mut f: F)
+    where
+        F: FnMut(&T) -> K,
+        K: Ord,
+        [(); T::PAYLOAD_SIZE]:,
+    {
+        self.with_self_as_slice_mut(|slice| {
+            slice.sort_unstable_by_key(|a| f(&a.decode()));
+            slice
+        })
+    }
+
+    pub fn is_sorted(&self) -> bool {
+        self.with_self_as_slice(|slice| slice.is_sorted())
+    }
+
+    pub fn is_sorted_by<F>(&self, mut compare: F) -> bool
+    where
+        F: FnMut(&T, &T) -> Option<Ordering>,
+    {
+        self.with_self_as_slice(|slice| {
+            slice.is_sorted_by(|a, b| compare(&a.decode(), &b.decode()))
+        })
+    }
+
+    pub fn is_sorted_by_key<K, F>(&self, mut f: F) -> bool
+    where
+        F: FnMut(&T) -> K,
+        K: Ord,
+    {
+        self.with_self_as_slice(|slice| slice.is_sorted_by_key(|a| f(&a.decode())))
+    }
+}
+
+impl<M, T> ManagedVec<M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedVecItem + PartialEq + Debug,
+{
+    pub fn dedup(&mut self)
+    where
+        [(); T::PAYLOAD_SIZE]:,
+    {
+        self.with_self_as_slice_mut(|slice| {
+            let (dedup, _) = slice.partition_dedup();
+            dedup
+        })
     }
 }
 

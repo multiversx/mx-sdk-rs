@@ -1,5 +1,6 @@
 mod egld_or_esdt_token_identifier;
 mod egld_or_esdt_token_payment;
+mod encoded_managed_vec_item;
 mod esdt_token_data;
 mod esdt_token_payment;
 mod managed_address;
@@ -18,6 +19,7 @@ mod token_identifier;
 
 pub use egld_or_esdt_token_identifier::EgldOrEsdtTokenIdentifier;
 pub use egld_or_esdt_token_payment::EgldOrEsdtTokenPayment;
+pub(crate) use encoded_managed_vec_item::EncodedManagedVecItem;
 pub use esdt_token_data::EsdtTokenData;
 pub use esdt_token_payment::EsdtTokenPayment;
 pub use managed_address::ManagedAddress;

@@ -106,6 +106,416 @@ fn test_into_vec() {
 }
 
 #[test]
+fn test_sort_u64() {
+    let _ = DebugApi::dummy();
+
+    let mut vec = Vec::<u64>::new();
+    let mut managed_vec = ManagedVec::<DebugApi, u64>::new();
+    for i in (20u64..=30u64).rev() {
+        managed_vec.push(i);
+        vec.push(i);
+    }
+
+    assert!(!managed_vec.is_sorted());
+    assert!(managed_vec.is_sorted_by(|a, b| Some(a.cmp(&(b * 10u64)))));
+    assert!(managed_vec.is_sorted_by_key(|d| d / 10u64 > 1u64));
+    managed_vec.sort();
+    vec.sort();
+
+    assert!(managed_vec.is_sorted());
+    managed_vec.sort();
+    assert_eq!(vec, managed_vec.into_vec());
+}
+
+#[test]
+fn test_sort_biguint() {
+    let _ = DebugApi::dummy();
+
+    let mut vec = Vec::<BigUint<DebugApi>>::new();
+    let mut managed_vec = ManagedVec::<DebugApi, BigUint<DebugApi>>::new();
+    for i in (20u64..=30u64).rev() {
+        let biguint = BigUint::<DebugApi>::from(i);
+        managed_vec.push(biguint.clone());
+        vec.push(biguint);
+    }
+    assert!(!managed_vec.is_sorted());
+    managed_vec.sort();
+    vec.sort();
+    assert!(managed_vec.is_sorted());
+
+    assert_eq!(vec, managed_vec.into_vec());
+}
+
+// flips a two-digit number
+fn flip(n: &u64) -> u64 {
+    n / 10u64 + n % 10u64 * 10
+}
+
+#[test]
+fn test_sort_by_u64() {
+    let _ = DebugApi::dummy();
+
+    let mut vec = Vec::<u64>::new();
+    let mut managed_vec = ManagedVec::<DebugApi, u64>::new();
+    for i in (20u64..=30u64).rev() {
+        managed_vec.push(i);
+        vec.push(i);
+    }
+
+    assert!(!managed_vec.is_sorted());
+
+    assert!(!managed_vec.is_sorted_by(|a, b| Some(flip(a).cmp(&flip(b)))));
+    managed_vec.sort_by(|a, b| flip(a).cmp(&flip(b)));
+    vec.sort_by_key(flip);
+
+    assert!(!managed_vec.is_sorted());
+
+    assert!(managed_vec.is_sorted_by(|a, b| Some(flip(a).cmp(&flip(b)))));
+    assert_eq!(vec, managed_vec.into_vec());
+}
+
+#[test]
+fn test_sort_by_biguint() {
+    let _ = DebugApi::dummy();
+
+    let mut vec = Vec::<BigUint<DebugApi>>::new();
+    let mut managed_vec = ManagedVec::<DebugApi, BigUint<DebugApi>>::new();
+    for i in (20u64..=30u64).rev() {
+        let biguint = BigUint::<DebugApi>::from(i);
+        managed_vec.push(biguint.clone());
+        vec.push(biguint);
+    }
+
+    assert!(!managed_vec.is_sorted());
+
+    assert!(!managed_vec.is_sorted_by(|a, b| {
+        let a_u64 = a.to_u64().unwrap();
+        let b_u64 = b.to_u64().unwrap();
+        Some(flip(&a_u64).cmp(&flip(&b_u64)))
+    }));
+    managed_vec.sort_by(|a, b| {
+        let a_u64 = a.to_u64().unwrap();
+        let b_u64 = b.to_u64().unwrap();
+        flip(&a_u64).cmp(&flip(&b_u64))
+    });
+    vec.sort_by(|a, b| {
+        let a_u64 = a.to_u64().unwrap();
+        let b_u64 = b.to_u64().unwrap();
+        flip(&a_u64).cmp(&flip(&b_u64))
+    });
+
+    assert!(!managed_vec.is_sorted());
+
+    assert!(managed_vec.is_sorted_by(|a, b| {
+        let a_u64 = a.to_u64().unwrap();
+        let b_u64 = b.to_u64().unwrap();
+        Some(flip(&a_u64).cmp(&flip(&b_u64)))
+    }));
+    assert_eq!(vec, managed_vec.into_vec());
+}
+
+#[test]
+fn test_sort_by_key_u64() {
+    let _ = DebugApi::dummy();
+
+    let mut vec = Vec::<u64>::new();
+    let mut managed_vec = ManagedVec::<DebugApi, u64>::new();
+    for i in [4444u64, 333u64, 1u64, 22u64] {
+        managed_vec.push(i);
+        vec.push(i);
+    }
+
+    assert!(!managed_vec.is_sorted());
+
+    assert!(!managed_vec.is_sorted_by_key(|a| a.to_string().len()));
+    managed_vec.sort_by_key(|a| a.to_string().len());
+    vec.sort_by_key(|a| a.to_string().len());
+
+    assert!(managed_vec.is_sorted());
+
+    assert!(managed_vec.is_sorted_by_key(|a| a.to_string().len()));
+    assert_eq!(vec, managed_vec.into_vec());
+}
+
+#[test]
+fn test_sort_by_key_biguint() {
+    let _ = DebugApi::dummy();
+
+    let mut vec = Vec::<BigUint<DebugApi>>::new();
+    let mut managed_vec = ManagedVec::<DebugApi, BigUint<DebugApi>>::new();
+    for i in [4444u64, 333u64, 1u64, 22u64] {
+        let biguint = BigUint::<DebugApi>::from(i);
+        managed_vec.push(biguint.clone());
+        vec.push(biguint);
+    }
+
+    assert!(!managed_vec.is_sorted());
+
+    assert!(!managed_vec.is_sorted_by_key(|a| a.to_u64().unwrap().to_string().len()));
+    managed_vec.sort_by_key(|a| a.to_u64().unwrap().to_string().len());
+    vec.sort_by_key(|a| a.to_u64().unwrap().to_string().len());
+
+    assert!(managed_vec.is_sorted());
+
+    assert!(managed_vec.is_sorted_by_key(|a| a.to_u64().unwrap().to_string().len()));
+    assert_eq!(vec, managed_vec.into_vec());
+}
+
+#[test]
+fn test_sort_by_cached_key_u64() {
+    let _ = DebugApi::dummy();
+
+    let mut vec = Vec::<u64>::new();
+    let mut managed_vec = ManagedVec::<DebugApi, u64>::new();
+    for i in [4u64, 33u64, 222u64, 1111u64] {
+        managed_vec.push(i);
+        vec.push(i);
+    }
+
+    managed_vec.sort_by_cached_key(|a| a.to_string());
+    vec.sort_by_cached_key(|a| a.to_string());
+    assert!(managed_vec.is_sorted_by_key(|a| a.to_string()));
+    let managed_vec_as_vec = managed_vec.into_vec();
+    assert_eq!(managed_vec_as_vec, [1111u64, 222u64, 33u64, 4u64]);
+    assert_eq!(vec, managed_vec_as_vec);
+}
+
+#[test]
+fn test_sort_by_cached_key_biguint() {
+    let _ = DebugApi::dummy();
+
+    let mut vec = Vec::<BigUint<DebugApi>>::new();
+    let mut managed_vec = ManagedVec::<DebugApi, BigUint<DebugApi>>::new();
+    for i in [4u64, 33u64, 222u64, 1111u64] {
+        let biguint = BigUint::<DebugApi>::from(i);
+        managed_vec.push(biguint.clone());
+        vec.push(biguint);
+    }
+
+    managed_vec.sort_by_cached_key(|a| a.to_u64().unwrap().to_string());
+    vec.sort_by_cached_key(|a| a.to_u64().unwrap().to_string());
+    assert!(managed_vec.is_sorted_by_key(|a| a.to_u64().unwrap().to_string()));
+    let managed_vec_as_vec = managed_vec.into_vec();
+    assert_eq!(managed_vec_as_vec, [1111u64, 222u64, 33u64, 4u64]);
+    assert_eq!(vec, managed_vec_as_vec);
+}
+
+#[test]
+fn test_sort_unstable_u64() {
+    let _ = DebugApi::dummy();
+
+    let mut vec = Vec::<u64>::new();
+    let mut managed_vec = ManagedVec::<DebugApi, u64>::new();
+    for i in (20u64..=30u64).rev() {
+        managed_vec.push(i);
+        vec.push(i);
+    }
+    managed_vec.sort_unstable();
+    vec.sort_unstable();
+
+    assert_eq!(vec, managed_vec.into_vec());
+}
+
+#[test]
+fn test_sort_unstable_biguint() {
+    let _ = DebugApi::dummy();
+
+    let mut vec = Vec::<BigUint<DebugApi>>::new();
+    let mut managed_vec = ManagedVec::<DebugApi, BigUint<DebugApi>>::new();
+    for i in (20u64..=30u64).rev() {
+        let biguint = BigUint::<DebugApi>::from(i);
+        managed_vec.push(biguint.clone());
+        vec.push(biguint);
+    }
+    managed_vec.sort_unstable();
+    vec.sort_unstable();
+
+    assert_eq!(vec, managed_vec.into_vec());
+}
+
+#[test]
+fn test_sort_unstable_by_u64() {
+    let _ = DebugApi::dummy();
+
+    let mut vec = Vec::<u64>::new();
+    let mut managed_vec = ManagedVec::<DebugApi, u64>::new();
+    for i in (20u64..=30u64).rev() {
+        managed_vec.push(i);
+        vec.push(i);
+    }
+
+    assert!(!managed_vec.is_sorted());
+
+    assert!(!managed_vec.is_sorted_by(|a, b| Some(flip(a).cmp(&flip(b)))));
+    managed_vec.sort_unstable_by(|a, b| flip(a).cmp(&flip(b)));
+    vec.sort_unstable_by_key(flip);
+
+    assert!(!managed_vec.is_sorted());
+
+    assert!(managed_vec.is_sorted_by(|a, b| Some(flip(a).cmp(&flip(b)))));
+    assert_eq!(vec, managed_vec.into_vec());
+}
+
+#[test]
+fn test_sort_unstable_by_biguint() {
+    let _ = DebugApi::dummy();
+
+    let mut vec = Vec::<BigUint<DebugApi>>::new();
+    let mut managed_vec = ManagedVec::<DebugApi, BigUint<DebugApi>>::new();
+    for i in (20u64..=30u64).rev() {
+        let biguint = BigUint::<DebugApi>::from(i);
+        managed_vec.push(biguint.clone());
+        vec.push(biguint);
+    }
+
+    assert!(!managed_vec.is_sorted());
+
+    assert!(!managed_vec.is_sorted_by(|a, b| {
+        let a_u64 = a.to_u64().unwrap();
+        let b_u64 = b.to_u64().unwrap();
+        Some(flip(&a_u64).cmp(&flip(&b_u64)))
+    }));
+    managed_vec.sort_unstable_by(|a, b| {
+        let a_u64 = a.to_u64().unwrap();
+        let b_u64 = b.to_u64().unwrap();
+        flip(&a_u64).cmp(&flip(&b_u64))
+    });
+    vec.sort_unstable_by(|a, b| {
+        let a_u64 = a.to_u64().unwrap();
+        let b_u64 = b.to_u64().unwrap();
+        flip(&a_u64).cmp(&flip(&b_u64))
+    });
+
+    assert!(!managed_vec.is_sorted());
+
+    assert!(managed_vec.is_sorted_by(|a, b| {
+        let a_u64 = a.to_u64().unwrap();
+        let b_u64 = b.to_u64().unwrap();
+        Some(flip(&a_u64).cmp(&flip(&b_u64)))
+    }));
+    assert_eq!(vec, managed_vec.into_vec());
+}
+
+#[test]
+fn test_sort_unstable_by_key_u64() {
+    let _ = DebugApi::dummy();
+
+    let mut vec = Vec::<u64>::new();
+    let mut managed_vec = ManagedVec::<DebugApi, u64>::new();
+    for i in [4444u64, 333u64, 1u64, 22u64] {
+        managed_vec.push(i);
+        vec.push(i);
+    }
+
+    assert!(!managed_vec.is_sorted());
+
+    assert!(!managed_vec.is_sorted_by_key(|a| a.to_string().len()));
+    managed_vec.sort_unstable_by_key(|a| a.to_string().len());
+    vec.sort_unstable_by_key(|a| a.to_string().len());
+
+    assert!(managed_vec.is_sorted());
+
+    assert!(managed_vec.is_sorted_by_key(|a| a.to_string().len()));
+    assert_eq!(vec, managed_vec.into_vec());
+}
+
+#[test]
+fn test_sort_unstable_by_key_biguint() {
+    let _ = DebugApi::dummy();
+
+    let mut vec = Vec::<BigUint<DebugApi>>::new();
+    let mut managed_vec = ManagedVec::<DebugApi, BigUint<DebugApi>>::new();
+    for i in [4444u64, 333u64, 1u64, 22u64] {
+        let biguint = BigUint::<DebugApi>::from(i);
+        managed_vec.push(biguint.clone());
+        vec.push(biguint);
+    }
+
+    assert!(!managed_vec.is_sorted());
+
+    assert!(!managed_vec.is_sorted_by_key(|a| a.to_u64().unwrap().to_string().len()));
+    managed_vec.sort_unstable_by_key(|a| a.to_u64().unwrap().to_string().len());
+    vec.sort_unstable_by_key(|a| a.to_u64().unwrap().to_string().len());
+
+    assert!(managed_vec.is_sorted());
+
+    assert!(managed_vec.is_sorted_by_key(|a| a.to_u64().unwrap().to_string().len()));
+    assert_eq!(vec, managed_vec.into_vec());
+}
+
+#[test]
+fn test_dedup_u64() {
+    let _ = DebugApi::dummy();
+
+    let mut vec = Vec::<u64>::new();
+    let mut managed_vec = ManagedVec::<DebugApi, u64>::new();
+    for i in [2u64, 3u64, 2u64, 2u64, 6u64, 3u64, 5u64, 2u64] {
+        managed_vec.push(i);
+        vec.push(i);
+    }
+    managed_vec.dedup();
+    vec.dedup();
+
+    assert_eq!(vec, managed_vec.into_vec());
+}
+
+#[test]
+fn test_dedup_biguint() {
+    let _ = DebugApi::dummy();
+
+    let mut vec = Vec::<BigUint<DebugApi>>::new();
+    let mut managed_vec = ManagedVec::<DebugApi, BigUint<DebugApi>>::new();
+    for i in [2u64, 3u64, 2u64, 2u64, 6u64, 3u64, 5u64, 2u64] {
+        let biguint = BigUint::from(i);
+        managed_vec.push(biguint.clone());
+        vec.push(biguint);
+    }
+    managed_vec.dedup();
+    vec.dedup();
+
+    assert_eq!(vec, managed_vec.into_vec());
+}
+
+#[test]
+fn test_sorted_dedup_u64() {
+    let _ = DebugApi::dummy();
+
+    let mut vec = Vec::<u64>::new();
+    let mut managed_vec = ManagedVec::<DebugApi, u64>::new();
+    for i in [2u64, 3u64, 2u64, 2u64, 6u64, 3u64, 5u64, 2u64] {
+        managed_vec.push(i);
+        vec.push(i);
+    }
+    managed_vec.sort();
+    vec.sort();
+    managed_vec.dedup();
+    vec.dedup();
+
+    assert_eq!(4, managed_vec.len());
+    assert_eq!(vec, managed_vec.into_vec());
+}
+
+#[test]
+fn test_sorted_dedup_biguint() {
+    let _ = DebugApi::dummy();
+
+    let mut vec = Vec::<BigUint<DebugApi>>::new();
+    let mut managed_vec = ManagedVec::<DebugApi, BigUint<DebugApi>>::new();
+    for i in [2u64, 3u64, 2u64, 2u64, 6u64, 3u64, 5u64, 2u64] {
+        let biguint = BigUint::from(i);
+        managed_vec.push(biguint.clone());
+        vec.push(biguint);
+    }
+    managed_vec.sort();
+    vec.sort();
+    managed_vec.dedup();
+    vec.dedup();
+
+    assert_eq!(4, managed_vec.len());
+    assert_eq!(vec, managed_vec.into_vec());
+}
+
+#[test]
 fn test_with_self_as_vec() {
     let _ = DebugApi::dummy();
 
