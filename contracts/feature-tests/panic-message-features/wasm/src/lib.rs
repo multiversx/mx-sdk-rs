@@ -13,7 +13,7 @@
 #![feature(alloc_error_handler, lang_items)]
 
 mx_sc_wasm_adapter::allocator!();
-mx_sc_wasm_adapter::panic_handler!();
+mx_sc_wasm_adapter::panic_handler_with_message!();
 
 mx_sc_wasm_adapter::endpoints! {
     panic_message_features

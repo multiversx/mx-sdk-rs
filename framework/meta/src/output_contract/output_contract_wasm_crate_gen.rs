@@ -23,14 +23,28 @@ const PREFIX_NO_STD: &str = "
 #![feature(alloc_error_handler, lang_items)]
 
 mx_sc_wasm_adapter::allocator!();
-mx_sc_wasm_adapter::panic_handler!();
-
 ";
 
 impl OutputContract {
     /// Makes sure that all the necessary wasm crate directories exist.
     pub fn create_wasm_crate_dir(&self) {
         fs::create_dir_all(PathBuf::from(&self.wasm_crate_path()).join("src")).unwrap();
+    }
+
+    fn panic_handler_macro_invocation(&self) -> &'static str {
+        if self.settings.panic_message {
+            "mx_sc_wasm_adapter::panic_handler_with_message!();"
+        } else {
+            "mx_sc_wasm_adapter::panic_handler!();"
+        }
+    }
+
+    fn endpoint_macro_name(&self) -> &'static str {
+        if self.settings.external_view {
+            "mx_sc_wasm_adapter::external_view_endpoints!"
+        } else {
+            "mx_sc_wasm_adapter::endpoints!"
+        }
     }
 
     /// Generates the wasm crate lib.rs source, st the given path.
@@ -48,11 +62,9 @@ impl OutputContract {
         self.write_stat_comments(wasm_lib_file);
         wasm_lib_file.write_all(PREFIX_NO_STD.as_bytes()).unwrap();
 
-        let full_macro_name = if self.external_view {
-            "mx_sc_wasm_adapter::external_view_endpoints!"
-        } else {
-            "mx_sc_wasm_adapter::endpoints!"
-        };
+        wasm_lib_file
+            .write_all(self.panic_handler_macro_invocation().as_bytes())
+            .unwrap();
 
         let mut all_endpoint_names = explicit_endpoint_names;
         if self.abi.has_callback {
@@ -64,7 +76,7 @@ impl OutputContract {
 
         let contract_module_name = self.abi.get_crate_name_for_code();
         write_endpoints_macro(
-            full_macro_name,
+            self.endpoint_macro_name(),
             wasm_lib_file,
             &contract_module_name,
             all_endpoint_names.iter(),
@@ -112,6 +124,7 @@ fn write_endpoints_macro<'a, I>(
 ) where
     I: Iterator<Item = &'a String>,
 {
+    writeln!(wasm_lib_file, "\n").unwrap();
     writeln!(wasm_lib_file, "{full_macro_name} {{").unwrap();
     writeln!(wasm_lib_file, "    {contract_module_name}").unwrap();
     writeln!(wasm_lib_file, "    (").unwrap();

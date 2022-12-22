@@ -26,6 +26,24 @@ macro_rules! panic_handler {
 }
 
 #[macro_export]
+macro_rules! panic_handler_with_message {
+    () => {
+        #[alloc_error_handler]
+        fn alloc_error_handler(layout: mx_sc_wasm_adapter::wasm_deps::Layout) -> ! {
+            mx_sc_wasm_adapter::wasm_deps::alloc_error_handler(layout)
+        }
+
+        #[panic_handler]
+        fn panic_fmt(panic_info: &mx_sc_wasm_adapter::wasm_deps::PanicInfo) -> ! {
+            mx_sc_wasm_adapter::wasm_deps::panic_fmt_with_message(panic_info)
+        }
+
+        #[lang = "eh_personality"]
+        fn eh_personality() {}
+    };
+}
+
+#[macro_export]
 macro_rules! endpoints {
     ($mod_name:ident ( $($endpoint_name:ident)* ) ) => {
         #[no_mangle]
