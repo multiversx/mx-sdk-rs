@@ -54,7 +54,7 @@ impl OutputContractConfig {
     }
 }
 
-#[derive(Clone, PartialEq, Eq)]
+#[derive(Default, Clone, PartialEq, Eq)]
 pub struct OutputContractSettings {
     /// External view contracts are just readers of data from another contract.
     pub external_view: bool,
@@ -62,15 +62,6 @@ pub struct OutputContractSettings {
     /// Panic messages add a lot of bloat to the final bytecode,
     /// so they should only be used for debugging purposes.
     pub panic_message: bool,
-}
-
-impl Default for OutputContractSettings {
-    fn default() -> Self {
-        Self {
-            external_view: false,
-            panic_message: false,
-        }
-    }
 }
 
 /// Represents a contract created by the framework when building.

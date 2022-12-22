@@ -97,7 +97,7 @@ pub fn interpret_panic_as_tx_result(
     }
 
     if let Some(panic_string) = panic_any.downcast_ref::<&str>() {
-        return interpret_panic_str_as_tx_result(*panic_string, panic_message_flag);
+        return interpret_panic_str_as_tx_result(panic_string, panic_message_flag);
     }
 
     TxResult::from_unknown_panic()
