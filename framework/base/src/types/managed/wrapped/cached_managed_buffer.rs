@@ -10,7 +10,9 @@ where
     StaticBufferRef::try_new_from_copy_bytes(managed_buffer.len(), |dest_slice| {
         let _ = managed_buffer.load_slice(0, dest_slice);
     })
-    .unwrap_or_else(|| M::error_api_impl().signal_error(b"Static cache is in use"))
+    .unwrap_or_else(|| {
+        M::error_api_impl().signal_error(b"static cache too small or already in use")
+    })
 }
 
 pub fn with_buffer_contents<M, R, F>(managed_buffer: &ManagedBuffer<M>, f: F) -> R
