@@ -13,30 +13,30 @@ fn world() -> BlockchainMock {
 
 #[test]
 fn token_release_add_group_rs() {
-    mx_sc_debug::mandos_rs("scenarios/test-add-group.scen.json", world());
+    mx_sc_debug::scenario_rs("scenarios/test-add-group.scen.json", world());
 }
 
 #[test]
 fn token_release_add_user_rs() {
-    mx_sc_debug::mandos_rs("scenarios/test-add-user.scen.json", world());
+    mx_sc_debug::scenario_rs("scenarios/test-add-user.scen.json", world());
 }
 
 #[test]
 fn token_release_change_user_rs() {
-    mx_sc_debug::mandos_rs("scenarios/test-change-user.scen.json", world());
+    mx_sc_debug::scenario_rs("scenarios/test-change-user.scen.json", world());
 }
 
 #[test]
 fn token_release_claim_rs() {
-    mx_sc_debug::mandos_rs("scenarios/test-claim.scen.json", world());
+    mx_sc_debug::scenario_rs("scenarios/test-claim.scen.json", world());
 }
 
 #[test]
 fn token_release_end_setup_rs() {
-    mx_sc_debug::mandos_rs("scenarios/test-end-setup.scen.json", world());
+    mx_sc_debug::scenario_rs("scenarios/test-end-setup.scen.json", world());
 }
 
 #[test]
 fn token_release_init_rs() {
-    mx_sc_debug::mandos_rs("scenarios/test-init.scen.json", world());
+    mx_sc_debug::scenario_rs("scenarios/test-init.scen.json", world());
 }

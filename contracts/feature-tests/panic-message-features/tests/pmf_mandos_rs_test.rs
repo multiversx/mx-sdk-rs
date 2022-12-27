@@ -15,5 +15,5 @@ fn world() -> BlockchainMock {
 
 #[test]
 fn panic_message_rs() {
-    mx_sc_debug::mandos_rs("scenarios/panic-message.scen.json", world());
+    mx_sc_debug::scenario_rs("scenarios/panic-message.scen.json", world());
 }

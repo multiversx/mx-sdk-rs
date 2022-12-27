@@ -53,7 +53,7 @@ fn print_mandos_rs(file: &mut File, names: &[String]) {
             file,
             "#[test]
 fn {}_rs() {{
-    mx_sc_debug::mandos_rs(\"scenarios/{}.scen.json\", world());
+    mx_sc_debug::scenario_rs(\"scenarios/{}.scen.json\", world());
 }}
 ",
             name.replace('-', "_").to_lowercase(),
@@ -69,7 +69,7 @@ fn print_mandos_go(file: &mut File, names: &[String]) {
             file,
             "#[test]
 fn {}_go() {{
-    mx_sc_debug::mandos_go(\"scenarios/{}.scen.json\");
+    mx_sc_debug::scenario_go(\"scenarios/{}.scen.json\");
 }}
 ",
             name.replace('-', "_").to_lowercase(),

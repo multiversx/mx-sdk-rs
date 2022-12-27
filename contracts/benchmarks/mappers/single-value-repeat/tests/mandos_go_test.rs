@@ -1,9 +1,9 @@
 #[test]
 fn single_value_repeat_struct_go() {
-    mx_sc_debug::mandos_go("scenarios/single_value_repeat_struct.scen.json");
+    mx_sc_debug::scenario_go("scenarios/single_value_repeat_struct.scen.json");
 }
 
 #[test]
 fn single_value_repeat_go() {
-    mx_sc_debug::mandos_go("scenarios/single_value_repeat.scen.json");
+    mx_sc_debug::scenario_go("scenarios/single_value_repeat.scen.json");
 }

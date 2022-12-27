@@ -13,15 +13,15 @@ fn world() -> BlockchainMock {
 
 #[test]
 fn deploy_rs() {
-    mx_sc_debug::mandos_rs("scenarios/deploy.scen.json", world());
+    mx_sc_debug::scenario_rs("scenarios/deploy.scen.json", world());
 }
 
 #[test]
 fn setup_fees_rs() {
-    mx_sc_debug::mandos_rs("scenarios/setup_fees_and_transfer.scen.json", world());
+    mx_sc_debug::scenario_rs("scenarios/setup_fees_and_transfer.scen.json", world());
 }
 
 #[test]
 fn claim_rs() {
-    mx_sc_debug::mandos_rs("scenarios/claim.scen.json", world());
+    mx_sc_debug::scenario_rs("scenarios/claim.scen.json", world());
 }

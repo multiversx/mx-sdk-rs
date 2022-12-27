@@ -10,5 +10,5 @@ fn world() -> BlockchainMock {
 
 #[test]
 fn adder_rs() {
-    mx_sc_debug::mandos_rs("scenarios/adder.scen.json", world());
+    mx_sc_debug::scenario_rs("scenarios/adder.scen.json", world());
 }

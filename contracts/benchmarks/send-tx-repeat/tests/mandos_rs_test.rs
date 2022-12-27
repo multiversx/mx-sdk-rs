@@ -11,5 +11,5 @@ fn world() -> BlockchainMock {
 
 #[test]
 fn send_tx_repeat_mandos_rs() {
-    mx_sc_debug::mandos_rs("scenarios/send_tx_repeat.scen.json", world());
+    mx_sc_debug::scenario_rs("scenarios/send_tx_repeat.scen.json", world());
 }

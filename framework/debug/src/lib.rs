@@ -11,7 +11,7 @@ pub mod tx_execution;
 pub mod tx_mock;
 pub mod world_mock;
 
-pub use crate::mandos_system::{executor::*, mandos_go, mandos_rs};
+pub use crate::mandos_system::{executor::*, scenario_go, scenario_rs};
 pub use display_util::*;
 pub use managed_test_util::*;
 
