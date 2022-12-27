@@ -1,5 +1,5 @@
 use super::{value_from_slice, AddressValue};
-use mandos::{
+use crate::scenario_format::{
     interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
     value_interpreter::interpret_string,
 };

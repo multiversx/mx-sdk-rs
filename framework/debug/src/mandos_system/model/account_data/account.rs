@@ -1,9 +1,11 @@
-use crate::mandos_system::model::{
-    AddressValue, BigUintValue, BytesKey, BytesValue, Esdt, EsdtObject, U64Value,
-};
-use mandos::{
-    interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
-    serde_raw::AccountRaw,
+use crate::{
+    mandos_system::model::{
+        AddressValue, BigUintValue, BytesKey, BytesValue, Esdt, EsdtObject, U64Value,
+    },
+    scenario_format::{
+        interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
+        serde_raw::AccountRaw,
+    },
 };
 
 use std::collections::BTreeMap;

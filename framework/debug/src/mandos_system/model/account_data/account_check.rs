@@ -1,10 +1,12 @@
-use crate::mandos_system::model::{
-    BigUintValue, BytesKey, BytesValue, CheckEsdt, CheckEsdtInstances, CheckEsdtMap,
-    CheckEsdtMapContents, CheckStorage, CheckStorageDetails, CheckValue, U64Value,
-};
-use mandos::{
-    interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
-    serde_raw::CheckAccountRaw,
+use crate::{
+    mandos_system::model::{
+        BigUintValue, BytesKey, BytesValue, CheckEsdt, CheckEsdtInstances, CheckEsdtMap,
+        CheckEsdtMapContents, CheckStorage, CheckStorageDetails, CheckValue, U64Value,
+    },
+    scenario_format::{
+        interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
+        serde_raw::CheckAccountRaw,
+    },
 };
 use std::collections::BTreeMap;
 

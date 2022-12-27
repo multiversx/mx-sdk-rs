@@ -65,8 +65,10 @@ impl Checkable<&[Vec<u8>]> for Vec<CheckValue<BytesValue>> {
 
 #[cfg(test)]
 mod tests {
-    use crate::mandos_system::model::{BytesValue, CheckValue, Checkable, U64Value};
-    use mandos::serde_raw::ValueSubTree;
+    use crate::{
+        mandos_system::model::{BytesValue, CheckValue, Checkable, U64Value},
+        scenario_format::serde_raw::ValueSubTree,
+    };
 
     #[test]
     fn check_bytes() {

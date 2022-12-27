@@ -1,7 +1,9 @@
-use crate::mandos_system::model::{BigUintValue, BytesValue, CheckValue, CheckValueList, U64Value};
-use mandos::{
-    interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
-    serde_raw::CheckEsdtInstanceRaw,
+use crate::{
+    mandos_system::model::{BigUintValue, BytesValue, CheckValue, CheckValueList, U64Value},
+    scenario_format::{
+        interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
+        serde_raw::CheckEsdtInstanceRaw,
+    },
 };
 
 #[derive(Debug, Default)]

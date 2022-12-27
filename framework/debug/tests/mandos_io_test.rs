@@ -1,10 +1,11 @@
 use std::{fs, fs::File, io::Write};
 
-use mx_sc_debug::mandos_system::model::Scenario;
-
-use mandos::{
-    interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
-    serde_raw::ScenarioRaw,
+use mx_sc_debug::{
+    mandos_system::model::Scenario,
+    scenario_format::{
+        interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
+        serde_raw::ScenarioRaw,
+    },
 };
 
 #[test]

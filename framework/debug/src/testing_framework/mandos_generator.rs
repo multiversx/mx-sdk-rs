@@ -1,6 +1,6 @@
 use std::{collections::BTreeMap, fs::File, io::Write};
 
-use mandos::serde_raw::{ScenarioRaw, StepRaw};
+use crate::scenario_format::serde_raw::{ScenarioRaw, StepRaw};
 use serde::Serialize;
 
 use super::{raw_converter::*, ScCallMandos, ScQueryMandos, TxExpectMandos};

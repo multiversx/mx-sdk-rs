@@ -11,15 +11,15 @@ pub mod tx_execution;
 pub mod tx_mock;
 pub mod world_mock;
 
+pub use crate::mandos_system::{executor::*, mandos_go, mandos_rs};
 pub use display_util::*;
 pub use managed_test_util::*;
-pub use mandos_system::{executor::*, mandos_go, mandos_rs};
 
 pub use tx_mock::DebugApi;
 pub use world_mock::BlockchainMock;
 
 // Re-exporting the whole mandos crate for easier use in tests.
-pub use mandos;
+pub use mx_chain_scenario_format as scenario_format;
 
 // Re-exporting for convenience. Using the crate as imported in the codec to make sure the save version is used everywhere.
 pub use mx_sc::codec::num_bigint;

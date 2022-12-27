@@ -1,6 +1,6 @@
 use std::collections::BTreeMap;
 
-use mandos::{
+use crate::scenario_format::{
     interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
     serde_raw::CheckAccountsRaw,
 };

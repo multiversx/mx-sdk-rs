@@ -1,7 +1,9 @@
-use crate::mandos_system::model::BytesKey;
-use mandos::{
-    interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
-    serde_raw::CheckEsdtMapContentsRaw,
+use crate::{
+    mandos_system::model::BytesKey,
+    scenario_format::{
+        interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
+        serde_raw::CheckEsdtMapContentsRaw,
+    },
 };
 
 use std::collections::BTreeMap;

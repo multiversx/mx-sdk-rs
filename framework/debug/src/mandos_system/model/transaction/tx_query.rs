@@ -1,7 +1,9 @@
-use crate::mandos_system::model::{AddressValue, BytesValue};
-use mandos::{
-    interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
-    serde_raw::TxQueryRaw,
+use crate::{
+    mandos_system::model::{AddressValue, BytesValue},
+    scenario_format::{
+        interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
+        serde_raw::TxQueryRaw,
+    },
 };
 
 #[derive(Debug, Default)]

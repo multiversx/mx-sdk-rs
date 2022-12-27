@@ -13,8 +13,8 @@ use mx_sc_snippets::{
         types::{Address, CodeMetadata},
     },
     mx_sc_debug::{
-        bech32, mandos::interpret_trait::InterpreterContext, mandos_system::model::*, ContractInfo,
-        DebugApi,
+        bech32, mandos_system::model::*, scenario_format::interpret_trait::InterpreterContext,
+        ContractInfo, DebugApi,
     },
     tokio, Interactor,
 };

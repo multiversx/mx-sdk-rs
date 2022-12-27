@@ -1,7 +1,9 @@
-use crate::mandos_system::model::{AddressValue, BigUintValue, U64Value};
-use mandos::{
-    interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
-    serde_raw::TxTransferRaw,
+use crate::{
+    mandos_system::model::{AddressValue, BigUintValue, U64Value},
+    scenario_format::{
+        interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
+        serde_raw::TxTransferRaw,
+    },
 };
 
 use super::{tx_interpret_util::interpret_egld_value, TxCall, TxESDT};

@@ -7,8 +7,8 @@ members = [
   "framework/codec-derive",
   "framework/debug",
   "framework/derive",
-  "framework/mandos",
   "framework/meta",
+  "framework/scenario-format",
   "framework/snippets",
   "framework/wasm-adapter",
 

@@ -1,10 +1,10 @@
 use crate::{
     mandos_system::model::Scenario,
     num_bigint::BigUint,
+    scenario_format::{interpret_trait::InterpreterContext, value_interpreter::interpret_string},
     tx_execution::{init_builtin_functions, BuiltinFunctionMap},
     tx_mock::BlockchainUpdate,
 };
-use mandos::{interpret_trait::InterpreterContext, value_interpreter::interpret_string};
 use mx_sc::types::heap::Address;
 use num_traits::Zero;
 use std::{collections::HashMap, path::PathBuf, rc::Rc};

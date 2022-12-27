@@ -1,7 +1,9 @@
-use crate::mandos_system::model::{BytesValue, CheckValue, CheckValueList};
-use mandos::{
-    interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
-    serde_raw::CheckLogRaw,
+use crate::{
+    mandos_system::model::{BytesValue, CheckValue, CheckValueList},
+    scenario_format::{
+        interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
+        serde_raw::CheckLogRaw,
+    },
 };
 
 #[derive(Debug)]

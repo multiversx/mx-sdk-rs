@@ -1,7 +1,9 @@
-use crate::mandos_system::model::Scenario;
-use mandos::{
-    interpret_trait::{InterpretableFrom, InterpreterContext},
-    serde_raw::ScenarioRaw,
+use crate::{
+    mandos_system::model::Scenario,
+    scenario_format::{
+        interpret_trait::{InterpretableFrom, InterpreterContext},
+        serde_raw::ScenarioRaw,
+    },
 };
 
 use std::{fs, path::Path};
