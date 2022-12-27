@@ -25,7 +25,7 @@ impl InterpretableFrom<TxDeployRaw> for TxDeploy {
         TxDeploy {
             from: AddressValue::interpret_from(from.from, context),
             egld_value: interpret_egld_value(from.value, from.egld_value, context),
-            code_metadata: CodeMetadata::empty(), // not yet modelled in mandos
+            code_metadata: CodeMetadata::empty(), // not yet modelled in scenarios
             contract_code: BytesValue::interpret_from(from.contract_code, context),
             arguments: from
                 .arguments

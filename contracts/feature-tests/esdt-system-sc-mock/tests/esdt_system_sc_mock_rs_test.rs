@@ -12,5 +12,5 @@ fn world() -> BlockchainMock {
 
 #[test]
 fn issue_rs() {
-    mx_sc_debug::mandos_rs("mandos/esdt_system_sc.scen.json", world());
+    mx_sc_debug::scenario_rs("scenarios/esdt_system_sc.scen.json", world());
 }

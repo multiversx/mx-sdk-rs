@@ -6,13 +6,13 @@ fn world() -> BlockchainMock {
 
 #[test]
 fn local_path_test() {
-    mx_sc_debug::mandos_rs("tests/mandos-self/path_test.scen.json", world());
+    mx_sc_debug::scenario_rs("tests/scenarios-self/path_test.scen.json", world());
 }
 
 #[test]
 fn nested_path_test() {
-    mx_sc_debug::mandos_rs(
-        "tests/mandos-self/external_steps/external_path_test.scen.json",
+    mx_sc_debug::scenario_rs(
+        "tests/scenarios-self/external_steps/external_path_test.scen.json",
         world(),
     );
 }

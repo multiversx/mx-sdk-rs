@@ -9,7 +9,7 @@ use mx_sc::{
 
 use crate::mandos_system::model::{AddressKey, AddressValue};
 
-/// Bundles a mandos representation of a contract with the contract proxy,
+/// Bundles a representation of a contract with the contract proxy,
 /// so that it can be easily called in the context of a blockchain mock.
 pub struct ContractInfo<P: ProxyObjBase> {
     pub mandos_address_expr: AddressKey,

@@ -10,10 +10,10 @@ fn world() -> BlockchainMock {
 
 #[test]
 fn vec_repeat_struct_rs() {
-    mx_sc_debug::mandos_rs("mandos/vec_repeat_struct.scen.json", world());
+    mx_sc_debug::scenario_rs("scenarios/vec_repeat_struct.scen.json", world());
 }
 
 #[test]
 fn vec_repeat_rs() {
-    mx_sc_debug::mandos_rs("mandos/vec_repeat.scen.json", world());
+    mx_sc_debug::scenario_rs("scenarios/vec_repeat.scen.json", world());
 }

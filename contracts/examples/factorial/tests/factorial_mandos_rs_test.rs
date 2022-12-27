@@ -10,5 +10,5 @@ fn world() -> BlockchainMock {
 
 #[test]
 fn factorial_rs() {
-    mx_sc_debug::mandos_rs("mandos/factorial.scen.json", world());
+    mx_sc_debug::scenario_rs("scenarios/factorial.scen.json", world());
 }

@@ -14,14 +14,14 @@ use mx_sc::{
 use super::check_tx_output;
 
 impl BlockchainMock {
-    /// Adds a mandos SC query step, as specified in the `sc_query_step` argument, then executes it.
+    /// Adds a SC query step, as specified in the `sc_query_step` argument, then executes it.
     pub fn mandos_sc_query(&mut self, sc_query_step: ScQueryStep) -> &mut Self {
         let _ = self.with_borrowed(|state| execute_and_check(state, &sc_query_step));
         self.mandos_trace.steps.push(Step::ScQuery(sc_query_step));
         self
     }
 
-    /// Adds a mandos SC query step, but sets the contract call data and returns the result.
+    /// Adds a SC query step, but sets the contract call data and returns the result.
     ///
     /// It also sets in the trace the expected result to be the actual returned result.
     ///
@@ -64,11 +64,11 @@ impl TypedScQueryExecutor for BlockchainMock {
 }
 
 impl BlockchainMock {
-    /// Performs a SC query to a contract, leaves no mandos trace behind.
+    /// Performs a SC query to a contract, leaves no scenario trace behind.
     ///
     /// Meant to be used for the test to investigate the state of the contract.
     ///
-    /// Use `mandos_sc_query` to embed the SC query in the resulting mandos.
+    /// Use `mandos_sc_query` to embed the SC query in the resulting scenario.
     pub fn quick_query<CC, RequestedResult>(&mut self, contract_call: CC) -> RequestedResult
     where
         CC: ContractCall<DebugApi>,

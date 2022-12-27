@@ -7,4 +7,4 @@
 output
 
 # Mandos test trace
-mandos/trace*.scen.json
+scenarios/trace*.scen.json

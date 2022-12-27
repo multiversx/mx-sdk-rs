@@ -56,7 +56,7 @@ def make_items(set_items):
 
 
 def vec(name, items):
-    """Generates the mandos code for a ``VecMapper`` storage.
+    """Generates the scenario code for a ``VecMapper`` storage.
 
     Examples
     --------
@@ -72,7 +72,7 @@ def vec(name, items):
 
 
 def set(name, items):
-    """Generates the mandos code for a ``SetMapper`` storage.
+    """Generates the scenario code for a ``SetMapper`` storage.
 
     Examples
     --------
@@ -92,7 +92,7 @@ def set(name, items):
 
 
 def map(name, pair_list):
-    """Generates the mandos code for a ``MapMapper`` storage.
+    """Generates the scenario code for a ``MapMapper`` storage.
 
     Examples
     --------

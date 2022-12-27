@@ -4,7 +4,7 @@ use crate::DebugApi;
 
 use super::{ScCallStep, ScDeployStep, ScQueryStep, TypedScCall, TypedScDeploy, TypedScQuery};
 
-/// Converts a `ContractCall` or `ContractDeploy` into a mandos object that additonally
+/// Converts a `ContractCall` or `ContractDeploy` into a scenario object that additonally
 /// contains gas costs and transaction-related data.
 pub trait IntoBlockchainCall {
     type BlockchainCall;
@@ -31,7 +31,7 @@ impl<OriginalResult> IntoBlockchainCall for ContractDeploy<DebugApi, OriginalRes
     }
 }
 
-/// Converts a `ContractCall` into a mandos object that encodes a SC query.
+/// Converts a `ContractCall` into a scenario object that encodes a SC query.
 pub trait IntoVMQuery {
     type VMQuery;
 

@@ -20,10 +20,10 @@ fn world() -> BlockchainMock {
 
 #[test]
 fn external_pure_rs() {
-    mx_sc_debug::mandos_rs("mandos/external-pure.scen.json", world());
+    mx_sc_debug::scenario_rs("scenarios/external-pure.scen.json", world());
 }
 
 #[test]
 fn external_get_rs() {
-    mx_sc_debug::mandos_rs("mandos/external-get.scen.json", world());
+    mx_sc_debug::scenario_rs("scenarios/external-get.scen.json", world());
 }

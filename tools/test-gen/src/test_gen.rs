@@ -1,8 +1,8 @@
 use std::{env, fs, fs::File, io::Write};
 
 /// Examples how to run:
-/// `cargo run ../../contracts/examples/multisig/mandos`
-/// `cargo run ../../contracts/feature-tests/basic-features/mandos`
+/// `cargo run ../../contracts/examples/multisig/scenario`
+/// `cargo run ../../contracts/feature-tests/basic-features/scenario`
 fn main() {
     let args: Vec<String> = env::args().collect();
     let files_path = &args[1];
@@ -53,7 +53,7 @@ fn print_mandos_rs(file: &mut File, names: &[String]) {
             file,
             "#[test]
 fn {}_rs() {{
-    mx_sc_debug::mandos_rs(\"mandos/{}.scen.json\", world());
+    mx_sc_debug::scenario_rs(\"scenarios/{}.scen.json\", world());
 }}
 ",
             name.replace('-', "_").to_lowercase(),
@@ -69,7 +69,7 @@ fn print_mandos_go(file: &mut File, names: &[String]) {
             file,
             "#[test]
 fn {}_go() {{
-    mx_sc_debug::mandos_go(\"mandos/{}.scen.json\");
+    mx_sc_debug::scenario_go(\"scenarios/{}.scen.json\");
 }}
 ",
             name.replace('-', "_").to_lowercase(),

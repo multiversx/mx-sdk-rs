@@ -14,10 +14,10 @@ fn world() -> BlockchainMock {
 
 #[test]
 fn managed_error_message_rs() {
-    mx_sc_debug::mandos_rs("mandos/managed_error_message.scen.json", world());
+    mx_sc_debug::scenario_rs("scenarios/managed_error_message.scen.json", world());
 }
 
 #[test]
 fn sc_format_rs() {
-    mx_sc_debug::mandos_rs("mandos/sc_format.scen.json", world());
+    mx_sc_debug::scenario_rs("scenarios/sc_format.scen.json", world());
 }
