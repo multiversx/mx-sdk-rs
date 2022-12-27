@@ -5,7 +5,7 @@ use crate::world_mock::BlockchainMock;
 use crate::mandos_system::model::Step;
 use std::path::Path;
 
-/// Runs mandos test using the Rust infrastructure and the debug mode.
+/// Runs scenario test using the Rust infrastructure and the debug mode.
 /// Uses a contract map to replace the references to the wasm bytecode
 /// with the contracts running in debug mode.
 pub fn mandos_rs<P: AsRef<Path>>(relative_path: P, mut world: BlockchainMock) {

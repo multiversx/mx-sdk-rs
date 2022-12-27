@@ -253,5 +253,5 @@ fn crowdfunding_mandos_rust_test() {
                 .put_account(cf_sc, CheckAccount::new().esdt_balance(cf_token_id, 0u64)),
         );
 
-    world.write_mandos_trace("mandos-gen/crowdfunding_rust.scen.json");
+    world.write_mandos_trace("scenarios-gen/crowdfunding_rust.scen.json");
 }

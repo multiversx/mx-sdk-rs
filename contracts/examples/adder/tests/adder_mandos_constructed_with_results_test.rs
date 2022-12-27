@@ -36,7 +36,7 @@ fn adder_mandos_constructed() {
         .execute(&mut world);
     assert_eq!(new_address, adder_contract.to_address());
 
-    // mandos query, gets saved in the trace
+    // query, gets saved in the trace
     let result: SingleValue<BigUint> = adder_contract.sum().into_vm_query().execute(&mut world);
     assert_eq!(result.into(), BigUint::from(5u32));
 

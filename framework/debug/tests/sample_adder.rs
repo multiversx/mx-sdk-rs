@@ -427,7 +427,7 @@ fn world() -> mx_sc_debug::BlockchainMock {
 #[test]
 fn test_mandos() {
     mx_sc_debug::mandos_rs(
-        "../../contracts/examples/adder/mandos/adder.scen.json",
+        "../../contracts/examples/adder/scenarios/adder.scen.json",
         world(),
     );
 }

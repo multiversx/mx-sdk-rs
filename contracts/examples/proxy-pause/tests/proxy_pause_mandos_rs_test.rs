@@ -15,5 +15,5 @@ fn world() -> BlockchainMock {
 
 #[test]
 fn pause_rs() {
-    mx_sc_debug::mandos_rs("mandos/pause-and-unpause.scen.json", world());
+    mx_sc_debug::mandos_rs("scenarios/pause-and-unpause.scen.json", world());
 }

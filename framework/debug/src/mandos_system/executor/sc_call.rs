@@ -10,14 +10,14 @@ use crate::{
 use super::check_tx_output;
 
 impl BlockchainMock {
-    /// Adds a mandos SC call step, as specified in the `sc_call_step` argument, then executes it.
+    /// Adds a SC call step, as specified in the `sc_call_step` argument, then executes it.
     pub fn mandos_sc_call(&mut self, sc_call_step: ScCallStep) -> &mut Self {
         let _ = self.with_borrowed(|state| execute_and_check(state, &sc_call_step));
         self.mandos_trace.steps.push(Step::ScCall(sc_call_step));
         self
     }
 
-    /// Adds a mandos SC call step, executes it and retrieves the transaction result ("out" field).
+    /// Adds a SC call step, executes it and retrieves the transaction result ("out" field).
     ///
     /// The transaction is expected to complete successfully.
     ///

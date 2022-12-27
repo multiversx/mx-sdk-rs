@@ -1,54 +1,54 @@
 #[test]
 fn balanceof_go() {
-    mx_sc_debug::mandos_go("mandos/balanceOf.scen.json");
+    mx_sc_debug::mandos_go("scenarios/balanceOf.scen.json");
 }
 
 #[test]
 fn create_go() {
-    mx_sc_debug::mandos_go("mandos/create.scen.json");
+    mx_sc_debug::mandos_go("scenarios/create.scen.json");
 }
 
 #[test]
 fn exceptions_go() {
-    mx_sc_debug::mandos_go("mandos/exceptions.scen.json");
+    mx_sc_debug::mandos_go("scenarios/exceptions.scen.json");
 }
 
 #[test]
 fn joingame_go() {
-    mx_sc_debug::mandos_go("mandos/joinGame.scen.json");
+    mx_sc_debug::mandos_go("scenarios/joinGame.scen.json");
 }
 
 #[test]
 fn rewardandsendtowallet_go() {
-    mx_sc_debug::mandos_go("mandos/rewardAndSendToWallet.scen.json");
+    mx_sc_debug::mandos_go("scenarios/rewardAndSendToWallet.scen.json");
 }
 
 #[test]
 fn rewardwinner_go() {
-    mx_sc_debug::mandos_go("mandos/rewardWinner.scen.json");
+    mx_sc_debug::mandos_go("scenarios/rewardWinner.scen.json");
 }
 
 #[test]
 fn rewardwinner_last_go() {
-    mx_sc_debug::mandos_go("mandos/rewardWinner_Last.scen.json");
+    mx_sc_debug::mandos_go("scenarios/rewardWinner_Last.scen.json");
 }
 
 #[test]
 fn topup_ok_go() {
-    mx_sc_debug::mandos_go("mandos/topUp_ok.scen.json");
+    mx_sc_debug::mandos_go("scenarios/topUp_ok.scen.json");
 }
 
 #[test]
 fn topup_withdraw_go() {
-    mx_sc_debug::mandos_go("mandos/topUp_withdraw.scen.json");
+    mx_sc_debug::mandos_go("scenarios/topUp_withdraw.scen.json");
 }
 
 #[test]
 fn withdraw_ok_go() {
-    mx_sc_debug::mandos_go("mandos/withdraw_Ok.scen.json");
+    mx_sc_debug::mandos_go("scenarios/withdraw_Ok.scen.json");
 }
 
 #[test]
 fn withdraw_toomuch_go() {
-    mx_sc_debug::mandos_go("mandos/withdraw_TooMuch.scen.json");
+    mx_sc_debug::mandos_go("scenarios/withdraw_TooMuch.scen.json");
 }

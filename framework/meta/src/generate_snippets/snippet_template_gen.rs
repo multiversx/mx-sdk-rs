@@ -16,7 +16,7 @@ use mx_sc_snippets::{{
         types::{{Address, CodeMetadata}},
     }},
     mx_sc_debug::{{
-        bech32, mandos::interpret_trait::InterpreterContext, mandos_system::model::*, ContractInfo,
+        bech32, scenario_format::interpret_trait::InterpreterContext, mandos_system::model::*, ContractInfo,
         DebugApi,
     }},
     env_logger,

@@ -67,7 +67,7 @@ impl BlockchainStateWrapper {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         let mut current_dir = std::env::current_dir().unwrap();
-        current_dir.push(PathBuf::from_str("mandos/").unwrap());
+        current_dir.push(PathBuf::from_str("scenarios/").unwrap());
 
         BlockchainStateWrapper {
             address_factory: AddressFactory::new(),
